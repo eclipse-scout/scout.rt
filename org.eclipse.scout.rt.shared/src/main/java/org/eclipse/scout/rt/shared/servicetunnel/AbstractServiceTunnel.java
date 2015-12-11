@@ -15,7 +15,7 @@ import java.lang.reflect.Method;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
-import org.eclipse.scout.rt.platform.exception.RuntimeExceptionTranslator;
+import org.eclipse.scout.rt.platform.exception.DefaultRuntimeExceptionTranslator;
 import org.eclipse.scout.rt.platform.util.concurrent.InterruptedException;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.slf4j.Logger;
@@ -50,7 +50,7 @@ public abstract class AbstractServiceTunnel implements IServiceTunnel {
     Throwable t = response.getException();
     if (t != null) {
       // Associate the exception with context information about the service call (without arg values due to security reasons).
-      RuntimeException serviceException = interceptServiceException(t);
+      RuntimeException serviceException = interceptException(t);
       if (serviceException instanceof PlatformException) {
         ((PlatformException) serviceException)
             .withContextInfo("remote-service.name", serviceInterfaceClass.getSimpleName())
@@ -116,9 +116,9 @@ public abstract class AbstractServiceTunnel implements IServiceTunnel {
   /**
    * Method invoked to intercept a service exception before being propagated to the caller.
    * <p>
-   * The default implementation translates the {@link Throwable} via {@link RuntimeExceptionTranslator}.
+   * The default implementation translates the {@link Throwable} via {@link DefaultRuntimeExceptionTranslator}.
    */
-  protected RuntimeException interceptServiceException(Throwable t) {
-    return BEANS.get(RuntimeExceptionTranslator.class).translate(t);
+  protected RuntimeException interceptException(Throwable t) {
+    return BEANS.get(DefaultRuntimeExceptionTranslator.class).translate(t);
   }
 }

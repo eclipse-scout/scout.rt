@@ -30,7 +30,6 @@ import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
-import org.eclipse.scout.rt.platform.exception.RuntimeExceptionTranslator;
 import org.w3c.dom.Element;
 
 @ClassId("535cfd11-39cf-4804-beef-2bc1bc3d34cc")
@@ -106,13 +105,7 @@ public abstract class AbstractWrappedFormField<FORM extends IForm> extends Abstr
   protected void disposeFieldInternal() {
     super.disposeFieldInternal();
     // Remove listeners, close the form if life cycle is not externally managed
-    try {
-      uninstallInnerForm();
-    }
-    catch (RuntimeException e) {
-      // May occur during form life cycle management (start, close).
-      throw BEANS.get(RuntimeExceptionTranslator.class).translate(e);
-    }
+    uninstallInnerForm();
   }
 
   @Override

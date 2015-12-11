@@ -28,9 +28,9 @@ import org.eclipse.scout.rt.platform.annotations.Internal;
 import org.eclipse.scout.rt.platform.chain.callable.CallableChain;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
-import org.eclipse.scout.rt.platform.exception.IThrowableTranslator;
+import org.eclipse.scout.rt.platform.exception.DefaultRuntimeExceptionTranslator;
+import org.eclipse.scout.rt.platform.exception.IExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
-import org.eclipse.scout.rt.platform.exception.RuntimeExceptionTranslator;
 import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.job.IDoneHandler;
 import org.eclipse.scout.rt.platform.job.IFuture;
@@ -275,18 +275,18 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
 
   @Override
   public RESULT awaitDoneAndGet() {
-    return awaitDoneAndGet(BEANS.get(RuntimeExceptionTranslator.class));
+    return awaitDoneAndGet(DefaultRuntimeExceptionTranslator.class);
   }
 
   @Override
-  public <ERROR extends Throwable> RESULT awaitDoneAndGet(final IThrowableTranslator<ERROR> translator) throws ERROR {
+  public <EXCEPTION extends Exception> RESULT awaitDoneAndGet(final Class<? extends IExceptionTranslator<EXCEPTION>> exceptionTranslator) throws EXCEPTION {
     assertNotSameMutex();
 
     try {
       return m_donePromise.get();
     }
     catch (final ExecutionException e) {
-      throw interceptException(BEANS.get(JobExceptionTranslator.class).translateExecutionException(e, translator));
+      throw interceptException(BEANS.get(JobExceptionTranslator.class).translateExecutionException(e, exceptionTranslator));
     }
     catch (final java.util.concurrent.CancellationException e) {
       throw interceptException(BEANS.get(JobExceptionTranslator.class).translateCancellationException(e, "Failed to wait for a job to complete because the job was cancelled"));
@@ -299,18 +299,18 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
 
   @Override
   public RESULT awaitDoneAndGet(final long timeout, final TimeUnit unit) {
-    return awaitDoneAndGet(timeout, unit, BEANS.get(RuntimeExceptionTranslator.class));
+    return awaitDoneAndGet(timeout, unit, DefaultRuntimeExceptionTranslator.class);
   }
 
   @Override
-  public <ERROR extends Throwable> RESULT awaitDoneAndGet(final long timeout, final TimeUnit unit, final IThrowableTranslator<ERROR> throwableTranslator) throws ERROR {
+  public <EXCEPTION extends Exception> RESULT awaitDoneAndGet(final long timeout, final TimeUnit unit, final Class<? extends IExceptionTranslator<EXCEPTION>> exceptionTranslator) throws EXCEPTION {
     assertNotSameMutex();
 
     try {
       return m_donePromise.get(timeout, unit);
     }
     catch (final ExecutionException e) {
-      throw interceptException(BEANS.get(JobExceptionTranslator.class).translateExecutionException(e, throwableTranslator));
+      throw interceptException(BEANS.get(JobExceptionTranslator.class).translateExecutionException(e, exceptionTranslator));
     }
     catch (final java.util.concurrent.CancellationException e) {
       throw interceptException(BEANS.get(JobExceptionTranslator.class).translateCancellationException(e, "Failed to wait for a job to complete because the job was cancelled"));
@@ -402,7 +402,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
   /**
    * Method invoked to intercept an exception before given to the submitter.
    */
-  protected <ERROR extends Throwable> ERROR interceptException(final ERROR exception) {
+  protected <EXCEPTION extends Exception> EXCEPTION interceptException(final EXCEPTION exception) {
     if (exception instanceof PlatformException) {
       ((PlatformException) exception).withContextInfo("job", getJobInput().getName());
     }

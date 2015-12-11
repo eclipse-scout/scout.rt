@@ -21,8 +21,7 @@ import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
-import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.exception.ThrowableTranslator;
+import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
 import org.eclipse.scout.rt.platform.reflect.ReflectionUtility;
 
 /**
@@ -50,13 +49,17 @@ public class ModelContextProxy {
 
       @Override
       public Object invoke(final Object proxy, final Method method, final Object[] args) throws Throwable {
-        return ClientRunContexts.copyCurrent().withDesktop(modelContext.getDesktop()).withOutline(modelContext.getOutline()).withForm(modelContext.getForm()).call(new Callable<Object>() {
+        return ClientRunContexts.copyCurrent()
+            .withDesktop(modelContext.getDesktop())
+            .withOutline(modelContext.getOutline())
+            .withForm(modelContext.getForm())
+            .call(new Callable<Object>() {
 
           @Override
           public Object call() throws Exception {
             return method.invoke(object, args);
           }
-        }, BEANS.get(ThrowableTranslator.class));
+        }, DefaultExceptionTranslator.class);
       }
     });
   }

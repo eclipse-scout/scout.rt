@@ -19,7 +19,6 @@ import org.eclipse.scout.rt.client.job.filter.future.ModelJobFutureFilter;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
-import org.eclipse.scout.rt.platform.exception.RuntimeExceptionTranslator;
 import org.eclipse.scout.rt.platform.filter.AndFilter;
 import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.job.IFuture;
@@ -77,7 +76,7 @@ public class UiJobs {
         public void run() throws Exception {
           BEANS.get(exceptionHandler).handle(e);
         }
-      }, BEANS.get(RuntimeExceptionTranslator.class));
+      });
     }
   }
 
@@ -111,7 +110,7 @@ public class UiJobs {
     }
     else {
       // Return the job's result because it completed.
-      return future.awaitDoneAndGet(BEANS.get(RuntimeExceptionTranslator.class));
+      return future.awaitDoneAndGet();
     }
   }
 

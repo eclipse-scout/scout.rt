@@ -34,6 +34,7 @@ import org.eclipse.scout.rt.platform.security.SecurityUtility;
 import org.eclipse.scout.rt.platform.security.SimplePrincipal;
 import org.eclipse.scout.rt.platform.util.Base64Utility;
 import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
+import org.eclipse.scout.rt.server.commons.servlet.ServletExceptionTranslator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -163,7 +164,7 @@ public class DataSourceSecurityFilter extends AbstractChainableSecurityFilter {
     }
     catch (Exception e) {
       LOG.error("Cannot SELECT user/pass.", e);
-      throw new ServletException(e.getMessage(), e);
+      throw BEANS.get(ServletExceptionTranslator.class).translate(e);
     }
   }
 
@@ -201,7 +202,7 @@ public class DataSourceSecurityFilter extends AbstractChainableSecurityFilter {
       return Base64Utility.encode(SecurityUtility.hash(pass.getBytes(UTF_8), DEFAULT_SALT));
     }
     catch (RuntimeException e) {
-      throw new ServletException("Unable to hash password", e);
+      throw BEANS.get(ServletExceptionTranslator.class).translate(e);
     }
   }
 

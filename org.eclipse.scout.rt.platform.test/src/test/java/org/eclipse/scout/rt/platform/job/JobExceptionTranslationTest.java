@@ -15,9 +15,8 @@ import static org.junit.Assert.fail;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContexts;
-import org.eclipse.scout.rt.platform.exception.ExceptionTranslator;
+import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
-import org.eclipse.scout.rt.platform.exception.RuntimeExceptionTranslator;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.testing.platform.runner.JUnitExceptionHandler;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
@@ -57,7 +56,7 @@ public class JobExceptionTranslationTest {
 
     // Test with default translator (ExceptionTranslator)
     try {
-      future.awaitDoneAndGet(BEANS.get(ExceptionTranslator.class));
+      future.awaitDoneAndGet(DefaultExceptionTranslator.class);
       fail();
     }
     catch (Exception e) {
@@ -66,7 +65,7 @@ public class JobExceptionTranslationTest {
 
     // Test with default translator (RuntimeExceptionTranslator)
     try {
-      future.awaitDoneAndGet(BEANS.get(RuntimeExceptionTranslator.class));
+      future.awaitDoneAndGet();
       fail();
     }
     catch (RuntimeException e) {
@@ -97,7 +96,7 @@ public class JobExceptionTranslationTest {
 
     // Test with default translator (ExceptionTranslator)
     try {
-      future.awaitDoneAndGet(BEANS.get(ExceptionTranslator.class));
+      future.awaitDoneAndGet(DefaultExceptionTranslator.class);
       fail();
     }
     catch (Exception e) {
@@ -106,7 +105,7 @@ public class JobExceptionTranslationTest {
 
     // Test with default translator (RuntimeExceptionTranslator)
     try {
-      future.awaitDoneAndGet(BEANS.get(RuntimeExceptionTranslator.class));
+      future.awaitDoneAndGet();
       fail();
     }
     catch (RuntimeException e) {

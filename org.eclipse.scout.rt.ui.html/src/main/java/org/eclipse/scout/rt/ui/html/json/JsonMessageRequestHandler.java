@@ -22,7 +22,7 @@ import javax.servlet.http.HttpSession;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.config.CONFIG;
-import org.eclipse.scout.rt.platform.exception.ExceptionTranslator;
+import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
 import org.eclipse.scout.rt.platform.util.CompareUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
@@ -90,7 +90,7 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
             public void run() throws Exception {
               handleJsonRequest(IUiSession.CURRENT.get(), JsonRequest.CURRENT.get(), req, resp);
             }
-          }, BEANS.get(ExceptionTranslator.class));
+          }, DefaultExceptionTranslator.class);
     }
     catch (Exception e) {
       if (jsonRequest == null || uiSession == null || RequestType.STARTUP_REQUEST.equals(jsonRequest.getRequestType())) {

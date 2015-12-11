@@ -32,7 +32,9 @@ public class PlatformException extends RuntimeException implements Serializable 
 
   private static final long serialVersionUID = 1L;
 
-  private final List<String> m_contextInfos = new ArrayList<>();
+  private transient boolean m_consumed;
+
+  private transient final List<String> m_contextInfos = new ArrayList<>();
 
   /**
    * Creates a {@link PlatformException} from the given message.
@@ -103,5 +105,19 @@ public class PlatformException extends RuntimeException implements Serializable 
 
     m_contextInfos.add(contextInfo);
     return this;
+  }
+
+  /**
+   * Returns whether this exception was already consumed.
+   */
+  public boolean isConsumed() {
+    return m_consumed;
+  }
+
+  /**
+   * Marks this exception as <em>consumed</em>.
+   */
+  public void consume() {
+    m_consumed = true;
   }
 }

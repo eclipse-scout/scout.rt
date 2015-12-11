@@ -72,7 +72,7 @@ public class WhenDoneTest {
     assertTrue(verifyLatch.await());
 
     assertEquals(CollectionUtility.arrayList("1", "2", "done"), protocol);
-    assertNull(eventHolder.getValue().getError());
+    assertNull(eventHolder.getValue().getException());
     assertEquals("result", eventHolder.getValue().getResult());
     assertFalse(eventHolder.getValue().isCancelled());
     assertFalse(eventHolder.getValue().isFailed());
@@ -113,7 +113,7 @@ public class WhenDoneTest {
     assertTrue(verifyLatch.await());
 
     assertEquals(CollectionUtility.arrayList("1", "2", "done"), protocol);
-    assertNull(eventHolder.getValue().getError());
+    assertNull(eventHolder.getValue().getException());
     assertEquals("result", eventHolder.getValue().getResult());
     assertFalse(eventHolder.getValue().isCancelled());
     assertFalse(eventHolder.getValue().isFailed());
@@ -155,7 +155,7 @@ public class WhenDoneTest {
     assertTrue(verifyLatch.await());
 
     assertEquals(CollectionUtility.arrayList("1", "2", "done"), protocol);
-    assertSame(pe, eventHolder.getValue().getError());
+    assertSame(pe, eventHolder.getValue().getException());
     assertNull(eventHolder.getValue().getResult());
     assertFalse(eventHolder.getValue().isCancelled());
     assertTrue(eventHolder.getValue().isFailed());
@@ -200,7 +200,7 @@ public class WhenDoneTest {
 
       assertTrue(verifyLatch.await());
       assertEquals(CollectionUtility.arrayList("1", "2", "done"), protocol);
-      assertSame(error, eventHolder.getValue().getError());
+      assertSame(error, eventHolder.getValue().getException());
       assertNull(eventHolder.getValue().getResult());
       assertFalse(eventHolder.getValue().isCancelled());
       assertTrue(eventHolder.getValue().isFailed());
@@ -244,7 +244,7 @@ public class WhenDoneTest {
     assertTrue(verifyLatch.await());
 
     assertEquals(CollectionUtility.arrayList("2", "done", "cancelled"), protocol);
-    assertNull(eventHolder.getValue().getError());
+    assertNull(eventHolder.getValue().getException());
     assertNull(eventHolder.getValue().getResult());
     assertTrue(eventHolder.getValue().isCancelled());
     assertFalse(eventHolder.getValue().isFailed());
@@ -332,7 +332,7 @@ public class WhenDoneTest {
     verifyLatch.await();
 
     assertEquals(CollectionUtility.arrayList("1", "2", "done"), protocol);
-    assertNull(eventHolder.getValue().getError());
+    assertNull(eventHolder.getValue().getException());
     assertEquals("result", eventHolder.getValue().getResult());
     assertFalse(eventHolder.getValue().isCancelled());
     assertFalse(eventHolder.getValue().isFailed());

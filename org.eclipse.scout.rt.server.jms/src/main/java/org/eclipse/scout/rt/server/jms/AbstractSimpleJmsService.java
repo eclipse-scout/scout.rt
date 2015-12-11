@@ -21,10 +21,9 @@ import javax.jms.MessageConsumer;
 import javax.jms.MessageProducer;
 import javax.jms.Session;
 
-import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
-import org.eclipse.scout.rt.platform.exception.ExceptionTranslator;
+import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
@@ -192,7 +191,7 @@ public abstract class AbstractSimpleJmsService<T> extends AbstractJmsService<T> 
                 public void run() throws Exception {
                   onMessage(jmsMessage);
                 }
-              }, BEANS.get(ExceptionTranslator.class));
+              }, DefaultExceptionTranslator.class);
             }
           }
           catch (final Exception e) {

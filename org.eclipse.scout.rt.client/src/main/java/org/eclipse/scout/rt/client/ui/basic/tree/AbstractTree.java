@@ -62,7 +62,7 @@ import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
-import org.eclipse.scout.rt.platform.exception.ProcessingExceptionTranslator;
+import org.eclipse.scout.rt.platform.exception.PlatformExceptionTranslator;
 import org.eclipse.scout.rt.platform.holders.Holder;
 import org.eclipse.scout.rt.platform.reflect.AbstractPropertyObserver;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
@@ -2833,7 +2833,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
           msg.append(node.getCell().getText());
           msg.append("]");
         }
-        throw BEANS.get(ProcessingExceptionTranslator.class).translate(e)
+        throw BEANS.get(PlatformExceptionTranslator.class).translate(e)
             .withContextInfo("nodes", msg.toString());
       }
       finally {
@@ -2867,7 +2867,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
       }
       catch (RuntimeException e) {
         if (node != null) {
-          throw BEANS.get(ProcessingExceptionTranslator.class).translate(e)
+          throw BEANS.get(PlatformExceptionTranslator.class).translate(e)
               .withContextInfo("node", node.getCell().getText());
         }
         throw e;
@@ -2903,7 +2903,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
       }
       catch (RuntimeException e) {
         if (node != null) {
-          throw BEANS.get(ProcessingExceptionTranslator.class).translate(e)
+          throw BEANS.get(PlatformExceptionTranslator.class).translate(e)
               .withContextInfo("cell", node.getCell().getText());
         }
         throw e;
@@ -2947,7 +2947,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
       }
       catch (RuntimeException e) {
         if (nodes != null) {
-          throw BEANS.get(ProcessingExceptionTranslator.class).translate(e)
+          throw BEANS.get(PlatformExceptionTranslator.class).translate(e)
               .withContextInfo("nodes", nodes.toString());
         }
         throw e;

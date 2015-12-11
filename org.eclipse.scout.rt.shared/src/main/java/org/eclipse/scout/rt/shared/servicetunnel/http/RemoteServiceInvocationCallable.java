@@ -21,9 +21,13 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
-import org.eclipse.scout.rt.platform.exception.ExceptionTranslator;
+import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
 import org.eclipse.scout.rt.platform.job.Jobs;
+import org.eclipse.scout.rt.platform.util.BooleanUtility;
+import org.eclipse.scout.rt.platform.util.concurrent.CancellationException;
 import org.eclipse.scout.rt.platform.util.concurrent.ICancellable;
+import org.eclipse.scout.rt.platform.util.concurrent.InterruptedException;
+import org.eclipse.scout.rt.platform.util.concurrent.TimeoutException;
 import org.eclipse.scout.rt.shared.services.common.context.IRunMonitorCancelService;
 import org.eclipse.scout.rt.shared.servicetunnel.HttpException;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
@@ -110,17 +114,13 @@ public class RemoteServiceInvocationCallable implements Callable<ServiceTunnelRe
     // From the Container this method may be invoked from org.eclipse.scout.rt.server.commons.WebappEventListener (no context available).
     final RunContext runContext = m_runContext == null ? m_tunnel.createCurrentRunContext() : m_runContext;
     try {
-      Boolean result = runContext.call(new Callable<Boolean>() {
+      return runContext.call(new Callable<Boolean>() {
+
         @Override
         public Boolean call() throws Exception {
           return sendCancelRequest(requestSequence);
         }
-      }, BEANS.get(ExceptionTranslator.class));
-
-      if (result != null) {
-        return result.booleanValue();
-      }
-      return true;
+      }, DefaultExceptionTranslator.class);
     }
     catch (final Exception e) {
       LOG.warn("Failed to cancel server processing [requestSequence={}]", requestSequence, e);
@@ -128,24 +128,32 @@ public class RemoteServiceInvocationCallable implements Callable<ServiceTunnelRe
     }
   }
 
-  protected Boolean sendCancelRequest(long requestSequence) throws NoSuchMethodException, SecurityException {
+  protected boolean sendCancelRequest(final long requestSequence) throws NoSuchMethodException, SecurityException {
     final ServiceTunnelRequest cancelRequest = m_tunnel.createServiceTunnelRequest(IRunMonitorCancelService.class, IRunMonitorCancelService.class.getMethod(IRunMonitorCancelService.CANCEL_METHOD, long.class), new Object[]{requestSequence});
     final RemoteServiceInvocationCallable remoteInvocationCallable = m_tunnel.createRemoteServiceInvocationCallable(cancelRequest);
 
-    final ServiceTunnelResponse cancelResponse = Jobs.schedule(remoteInvocationCallable, Jobs.newInput()
-        .withRunContext(m_tunnel.createCurrentRunContext().withRunMonitor(BEANS.get(RunMonitor.class))) // do not link the RunMonitor with the current RunMonitor to not cancel this request.))
-        .withName("Cancelling service request [{}]", requestSequence))
-        .awaitDoneAndGet(10, TimeUnit.SECONDS);
+    final ServiceTunnelResponse response;
+    try {
+      response = Jobs.schedule(remoteInvocationCallable, Jobs.newInput()
+          .withRunContext(m_tunnel.createCurrentRunContext().withRunMonitor(BEANS.get(RunMonitor.class))) // do not link the RunMonitor with the current RunMonitor to not cancel this request.))
+          .withName("Cancelling service request [{}]", requestSequence)
+          .withExceptionHandling(null, true))
+          .awaitDoneAndGet(10, TimeUnit.SECONDS);
+    }
+    catch (final TimeoutException | CancellationException | InterruptedException e) {
+      return false; // Do not cancel 'cancel-request' to prevent loop.
+    }
 
-    if (cancelResponse == null) {
+    if (response == null) {
       return false;
     }
-    if (cancelResponse.getException() != null) {
-      LOG.warn("Failed to cancel server processing", cancelResponse.getException());
+    else if (response.getException() != null) {
+      LOG.warn("Failed to cancel server processing", response.getException());
       return false;
     }
-
-    return (Boolean) cancelResponse.getData();
+    else {
+      return BooleanUtility.nvl((Boolean) response.getData(), false);
+    }
   }
 
   @Override

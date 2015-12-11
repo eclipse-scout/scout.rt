@@ -57,7 +57,6 @@ import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
-import org.eclipse.scout.rt.platform.exception.RuntimeExceptionTranslator;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
@@ -729,7 +728,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
           BEANS.get(ExceptionHandler.class).handle(e);
         }
       }
-    }, BEANS.get(RuntimeExceptionTranslator.class));
+    });
   }
 
   /**

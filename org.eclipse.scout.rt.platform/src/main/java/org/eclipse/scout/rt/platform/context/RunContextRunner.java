@@ -12,11 +12,10 @@ package org.eclipse.scout.rt.platform.context;
 
 import java.util.concurrent.Callable;
 
-import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.chain.callable.CallableChain;
-import org.eclipse.scout.rt.platform.chain.callable.ICallableInterceptor;
 import org.eclipse.scout.rt.platform.chain.callable.CallableChain.Chain;
-import org.eclipse.scout.rt.platform.exception.ExceptionTranslator;
+import org.eclipse.scout.rt.platform.chain.callable.ICallableInterceptor;
+import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
 
 /**
  * Processor to run the subsequent sequence of actions on behalf of the given {@link RunContext}.
@@ -42,7 +41,7 @@ public class RunContextRunner<RESULT> implements ICallableInterceptor<RESULT> {
       public RESULT call() throws Exception {
         return chain.continueChain();
       }
-    }, BEANS.get(ExceptionTranslator.class));
+    }, DefaultExceptionTranslator.class);
   }
 
   @Override

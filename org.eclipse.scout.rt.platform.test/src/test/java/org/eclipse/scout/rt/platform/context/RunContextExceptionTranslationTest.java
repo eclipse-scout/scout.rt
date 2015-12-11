@@ -13,11 +13,10 @@ package org.eclipse.scout.rt.platform.context;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.fail;
 
-import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.exception.ExceptionTranslator;
-import org.eclipse.scout.rt.platform.exception.IThrowableTranslator;
-import org.eclipse.scout.rt.platform.exception.ProcessingException;
-import org.eclipse.scout.rt.platform.exception.RuntimeExceptionTranslator;
+import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
+import org.eclipse.scout.rt.platform.exception.DefaultRuntimeExceptionTranslator;
+import org.eclipse.scout.rt.platform.exception.PlatformException;
+import org.eclipse.scout.rt.platform.exception.PlatformExceptionTranslator;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.junit.Test;
 
@@ -35,40 +34,43 @@ public class RunContextExceptionTranslationTest {
       }
     };
 
-    // Test with default translator (ProcessingExceptionTranslator)
+    // Test with DefaultRuntimeExceptionTranslator
     try {
       RunContexts.copyCurrent().run(runnableWithError);
       fail();
     }
-    catch (ProcessingException e) {
+    catch (PlatformException e) {
       assertSame(error, e.getCause());
     }
 
-    // Test with default translator (ExceptionTranslator)
+    // Test with DefaultRuntimeExceptionTranslator
     try {
-      RunContexts.copyCurrent().run(runnableWithError, BEANS.get(ExceptionTranslator.class));
+      RunContexts.copyCurrent().run(runnableWithError, DefaultRuntimeExceptionTranslator.class);
+      fail();
+    }
+    catch (PlatformException e) {
+      assertSame(error, e.getCause());
+    }
+
+    // Test with DefaultExceptionTranslator
+    try {
+      RunContexts.copyCurrent().run(runnableWithError, DefaultExceptionTranslator.class);
+      fail();
+    }
+    catch (RuntimeException e) {
       fail();
     }
     catch (Exception e) {
       assertSame(error, e);
     }
 
-    // Test with default translator (RuntimeExceptionTranslator)
+    // Test with PlatformExceptionTranslator
     try {
-      RunContexts.copyCurrent().run(runnableWithError, BEANS.get(RuntimeExceptionTranslator.class));
+      RunContexts.copyCurrent().run(runnableWithError, PlatformExceptionTranslator.class);
       fail();
     }
-    catch (RuntimeException e) {
+    catch (PlatformException e) {
       assertSame(error, e.getCause());
     }
-
-    // Test with 'swallowed' exception.
-    RunContexts.copyCurrent().run(runnableWithError, new IThrowableTranslator<RuntimeException>() {
-
-      @Override
-      public RuntimeException translate(Throwable t) {
-        return null; // null=swallow
-      }
-    });
   }
 }

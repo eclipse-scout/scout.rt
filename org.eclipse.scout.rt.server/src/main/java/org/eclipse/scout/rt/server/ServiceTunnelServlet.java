@@ -32,7 +32,7 @@ import javax.servlet.http.HttpSessionBindingListener;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.annotations.Internal;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
-import org.eclipse.scout.rt.platform.exception.ExceptionTranslator;
+import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
 import org.eclipse.scout.rt.platform.serialization.SerializationUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.server.admin.html.AdminSession;
@@ -40,6 +40,7 @@ import org.eclipse.scout.rt.server.clientnotification.TransactionalClientNotific
 import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
 import org.eclipse.scout.rt.server.commons.context.ServletRunContexts;
 import org.eclipse.scout.rt.server.commons.servlet.IHttpServletRoundtrip;
+import org.eclipse.scout.rt.server.commons.servlet.ServletExceptionTranslator;
 import org.eclipse.scout.rt.server.context.RunMonitorCancelRegistry;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
@@ -81,23 +82,22 @@ public class ServiceTunnelServlet extends HttpServlet {
 
     lazyInit(servletRequest, servletResponse);
 
-    try {
-      ServletRunContexts.copyCurrent().withLocale(Locale.getDefault()).withServletRequest(servletRequest).withServletResponse(servletResponse).run(new IRunnable() {
+    ServletRunContexts.copyCurrent()
+        .withLocale(Locale.getDefault())
+        .withServletRequest(servletRequest)
+        .withServletResponse(servletResponse)
+        .run(new IRunnable() {
 
-        @Override
-        public void run() throws Exception {
-          ServerRunContext serverRunContext = ServerRunContexts.copyCurrent()
-              .withUserAgent(UserAgent.createDefault())
-              .withProperty(SESSION_ID, UUID.randomUUID().toString());
-          serverRunContext.withSession(lookupServerSessionOnHttpSession(serverRunContext.copy()));
+          @Override
+          public void run() throws Exception {
+            ServerRunContext serverRunContext = ServerRunContexts.copyCurrent()
+                .withUserAgent(UserAgent.createDefault())
+                .withProperty(SESSION_ID, UUID.randomUUID().toString());
+            serverRunContext.withSession(lookupServerSessionOnHttpSession(serverRunContext.copy()));
 
-          invokeAdminService(serverRunContext);
-        }
-      }, BEANS.get(ExceptionTranslator.class));
-    }
-    catch (Exception e) {
-      throw new ServletException("Failed to invoke AdminServlet", e);
-    }
+            invokeAdminService(serverRunContext);
+          }
+        }, ServletExceptionTranslator.class);
   }
 
   // === HTTP-POST ===
@@ -112,46 +112,49 @@ public class ServiceTunnelServlet extends HttpServlet {
     lazyInit(servletRequest, servletResponse);
 
     try {
-      ServletRunContexts.copyCurrent().withServletRequest(servletRequest).withServletResponse(servletResponse).run(new IRunnable() {
+      ServletRunContexts.copyCurrent()
+          .withServletRequest(servletRequest)
+          .withServletResponse(servletResponse)
+          .run(new IRunnable() {
 
-        @Override
-        public void run() throws Exception {
-          ServiceTunnelRequest serviceRequest = deserializeServiceRequest();
-          if (isSessionLess(serviceRequest)) {
-            // TODO [5.2] jgu: Use ServiceOperationInvoker; change ServiceOperationInvoker to support this requirement
-            invokeServiceWithoutSession(serviceRequest);
-          }
-          else {
-            // Collector to collect transactional client notifications issued during processing of the current request.
-            TransactionalClientNotificationCollector transactionalClientNotificationCollector = new TransactionalClientNotificationCollector();
-            // Enable global cancellation of the service request.
-            RunMonitor runMonitor = BEANS.get(RunMonitor.class);
-            ServerRunContext serverRunContext = ServerRunContexts.copyCurrent()
-                .withLocale(serviceRequest.getLocale())
-                .withUserAgent(UserAgent.createByIdentifier(serviceRequest.getUserAgent()))
-                .withRunMonitor(runMonitor)
-                .withTransactionalClientNotificationCollector(transactionalClientNotificationCollector)
-                .withClientNodeId(serviceRequest.getClientNodeId())
-                .withProperty(SESSION_ID, serviceRequest.getSessionId());
-            serverRunContext.withSession(lookupServerSessionOnHttpSession(serverRunContext.copy()));
+            @Override
+            public void run() throws Exception {
+              ServiceTunnelRequest serviceRequest = deserializeServiceRequest();
+              if (isSessionLess(serviceRequest)) {
+                // TODO [5.2] jgu: Use ServiceOperationInvoker; change ServiceOperationInvoker to support this requirement
+                invokeServiceWithoutSession(serviceRequest);
+              }
+              else {
+                // Collector to collect transactional client notifications issued during processing of the current request.
+                TransactionalClientNotificationCollector transactionalClientNotificationCollector = new TransactionalClientNotificationCollector();
+                // Enable global cancellation of the service request.
+                RunMonitor runMonitor = BEANS.get(RunMonitor.class);
+                ServerRunContext serverRunContext = ServerRunContexts.copyCurrent()
+                    .withLocale(serviceRequest.getLocale())
+                    .withUserAgent(UserAgent.createByIdentifier(serviceRequest.getUserAgent()))
+                    .withRunMonitor(runMonitor)
+                    .withTransactionalClientNotificationCollector(transactionalClientNotificationCollector)
+                    .withClientNodeId(serviceRequest.getClientNodeId())
+                    .withProperty(SESSION_ID, serviceRequest.getSessionId());
+                serverRunContext.withSession(lookupServerSessionOnHttpSession(serverRunContext.copy()));
 
-            IServerSession session = serverRunContext.getSession();
-            long requestSequence = serviceRequest.getRequestSequence();
+                IServerSession session = serverRunContext.getSession();
+                long requestSequence = serviceRequest.getRequestSequence();
 
-            BEANS.get(RunMonitorCancelRegistry.class).register(session, requestSequence, runMonitor); // enable global cancellation
-            try {
-              ServiceTunnelResponse serviceResponse = invokeService(serverRunContext, serviceRequest);
-              // Include transactional client notification in response (piggyback).
-              serviceResponse.setNotifications(transactionalClientNotificationCollector.consume());
-              serializeServiceResponse(serviceResponse);
+                BEANS.get(RunMonitorCancelRegistry.class).register(session, requestSequence, runMonitor); // enable global cancellation
+                try {
+                  ServiceTunnelResponse serviceResponse = invokeService(serverRunContext, serviceRequest);
+                  // Include transactional client notification in response (piggyback).
+                  serviceResponse.setNotifications(transactionalClientNotificationCollector.consume());
+                  serializeServiceResponse(serviceResponse);
+                }
+                finally {
+                  BEANS.get(RunMonitorCancelRegistry.class).unregister(session, requestSequence);
+                }
+              }
             }
-            finally {
-              BEANS.get(RunMonitorCancelRegistry.class).unregister(session, requestSequence);
-            }
-          }
-        }
 
-      }, BEANS.get(ExceptionTranslator.class));
+          }, DefaultExceptionTranslator.class);
     }
     catch (Exception e) {
       if (isConnectionError(e)) {
@@ -193,7 +196,7 @@ public class ServiceTunnelServlet extends HttpServlet {
         }
         adminSession.serviceRequest(servletRequest, servletResponse);
       }
-    }, BEANS.get(ExceptionTranslator.class));
+    }, DefaultExceptionTranslator.class);
   }
 
   /**

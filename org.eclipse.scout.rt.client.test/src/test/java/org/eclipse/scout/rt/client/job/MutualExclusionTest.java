@@ -36,14 +36,11 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
-import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IgnoreBean;
 import org.eclipse.scout.rt.platform.Replace;
-import org.eclipse.scout.rt.platform.exception.ExceptionTranslator;
+import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
-import org.eclipse.scout.rt.platform.exception.RuntimeExceptionTranslator;
-import org.eclipse.scout.rt.platform.exception.ThrowableTranslator;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IJobManager;
@@ -151,7 +148,7 @@ public class MutualExclusionTest {
   }
 
   @Test(expected = AssertionException.class, timeout = 5000)
-  public void testAwaitDoneWithSameMutex() throws Throwable {
+  public void testAwaitDoneWithSameMutex() {
     final IMutex mutex = Jobs.newMutex();
     Jobs.schedule(new IRunnable() {
 
@@ -169,7 +166,7 @@ public class MutualExclusionTest {
       }
     }, Jobs.newInput()
         .withMutex(mutex))
-        .awaitDoneAndGet(BEANS.get(ThrowableTranslator.class));
+        .awaitDoneAndGet();
   }
 
   /**
@@ -180,7 +177,7 @@ public class MutualExclusionTest {
    * itself.
    */
   @Test(timeout = 5000)
-  public void testAwaitDoneWithSameMutexButNotMutexOwner() throws Throwable {
+  public void testAwaitDoneWithSameMutexButNotMutexOwner() {
     final IMutex mutex = Jobs.newMutex();
     Jobs.schedule(new IRunnable() {
 
@@ -216,7 +213,7 @@ public class MutualExclusionTest {
         }
       }
 
-    }, Jobs.newInput().withMutex(mutex)).awaitDoneAndGet(BEANS.get(ThrowableTranslator.class));
+    }, Jobs.newInput().withMutex(mutex)).awaitDoneAndGet();
   }
 
   /**
@@ -250,7 +247,7 @@ public class MutualExclusionTest {
                 .withExecutionHint(JOB_IDENTIFIER));
 
             try {
-              future.awaitDoneAndGet(1, TimeUnit.SECONDS, BEANS.get(RuntimeExceptionTranslator.class));
+              future.awaitDoneAndGet(1, TimeUnit.SECONDS);
             }
             catch (AssertionException e) {
               protocol.add(5);
@@ -316,7 +313,7 @@ public class MutualExclusionTest {
             .withExecutionHint(JOB_IDENTIFIER));
 
         try {
-          future.awaitDoneAndGet(1, TimeUnit.SECONDS, BEANS.get(ExceptionTranslator.class));
+          future.awaitDoneAndGet(1, TimeUnit.SECONDS, DefaultExceptionTranslator.class);
         }
         catch (AssertionException e) {
           protocol.add(2);

@@ -77,9 +77,8 @@ import org.eclipse.scout.rt.platform.OrderedComparator;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
+import org.eclipse.scout.rt.platform.exception.PlatformExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
-import org.eclipse.scout.rt.platform.exception.ProcessingExceptionTranslator;
-import org.eclipse.scout.rt.platform.exception.RuntimeExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.holders.Holder;
 import org.eclipse.scout.rt.platform.holders.IHolder;
@@ -187,7 +186,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
       public void run() throws Exception {
         interceptInitConfig();
       }
-    }, BEANS.get(RuntimeExceptionTranslator.class));
+    });
   }
 
   @Override
@@ -953,7 +952,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
           m_outlineChanging = false;
         }
       }
-    }, BEANS.get(RuntimeExceptionTranslator.class));
+    });
   }
 
   protected void setOutlineInternal(IOutline newOutline) {
@@ -1445,7 +1444,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
       firePrint(device, parameters);
     }
     catch (RuntimeException e) {
-      throw BEANS.get(ProcessingExceptionTranslator.class).translate(e)
+      throw BEANS.get(PlatformExceptionTranslator.class).translate(e)
           .withContextInfo("operation", "{} {}", ScoutTexts.get("FormPrint"), getTitle());
     }
   }

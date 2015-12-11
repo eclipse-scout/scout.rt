@@ -22,7 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.exception.ExceptionTranslator;
+import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.server.commons.context.ServletRunContexts;
@@ -75,7 +75,7 @@ public class UiServlet extends HttpServlet {
             public void run() throws Exception {
               m_requestHandlerGet.handleRequest(req, resp);
             }
-          }, BEANS.get(ExceptionTranslator.class));
+          }, DefaultExceptionTranslator.class);
     }
     catch (Exception e) {
       LOG.error("Failed to process HTTP-GET request from UI", e);
@@ -95,7 +95,7 @@ public class UiServlet extends HttpServlet {
             public void run() throws Exception {
               m_requestHandlerPost.handleRequest(req, resp);
             }
-          }, BEANS.get(ExceptionTranslator.class));
+          }, DefaultExceptionTranslator.class);
     }
     catch (Exception e) {
       LOG.error("Failed to process HTTP-POST request from UI", e);

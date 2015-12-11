@@ -17,7 +17,8 @@ import java.util.concurrent.TimeUnit;
 import javax.security.auth.Subject;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
-import org.eclipse.scout.rt.platform.exception.IThrowableTranslator;
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.exception.IExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.security.SecurityUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.CancellationException;
@@ -26,6 +27,8 @@ import org.eclipse.scout.rt.platform.util.concurrent.TimeoutException;
 
 /**
  * Translates exceptions origin from 'Java Executor Framework' into exceptions of Scout Job API.
+ * <p>
+ * Translation is not done in {@link IExceptionTranslator} because internal of Job API.
  *
  * @since 5.2
  */
@@ -36,38 +39,38 @@ public class JobExceptionTranslator {
    * Translates {@link java.util.concurrent.CancellationException} into {@link InterruptedException}.
    */
   protected CancellationException translateCancellationException(final java.util.concurrent.CancellationException e, final String message) {
-    return intercept(new CancellationException(message, e));
+    return decorate(new CancellationException(message, e));
   }
 
   /**
    * Translates {@link java.lang.InterruptedException} into {@link InterruptedException}.
    */
   protected InterruptedException translateInterruptedException(final java.lang.InterruptedException e, final String message) {
-    return intercept(new InterruptedException(message, e));
+    return decorate(new InterruptedException(message, e));
   }
 
   /**
    * Translates {@link java.util.concurrent.TimeoutException} into {@link TimeoutException}.
    */
   protected TimeoutException translateTimeoutException(final java.util.concurrent.TimeoutException e, final String message, final long timeout, final TimeUnit unit) {
-    return intercept(new TimeoutException(message, e).withContextInfo("timeout", "{}ms", unit.toMillis(timeout)));
+    return decorate(new TimeoutException(message, e).withContextInfo("timeout", "{}ms", unit.toMillis(timeout)));
   }
 
   /**
-   * Translates {@link ExecutionException} into exception according to {@link IThrowableTranslator}.
+   * Translates {@link ExecutionException} into exception according to {@link IExceptionTranslator}.
    */
-  protected <ERROR extends Throwable> ERROR translateExecutionException(final ExecutionException e, final IThrowableTranslator<ERROR> translator) {
-    return intercept(translator.translate(e.getCause()));
+  protected <EXCEPTION extends Exception> EXCEPTION translateExecutionException(final ExecutionException e, final Class<? extends IExceptionTranslator<EXCEPTION>> translator) {
+    return decorate(BEANS.get(translator).translate(e.getCause()));
   }
 
   /**
-   * Method invoked to intercept an exception before given to the caller.
+   * Method invoked to decorate an exception before given to the caller.
    */
-  protected <ERROR extends Throwable> ERROR intercept(final ERROR exception) {
+  protected <EXCEPTION extends Exception> EXCEPTION decorate(final EXCEPTION exception) {
     if (exception instanceof PlatformException) {
       ((PlatformException) exception)
           .withContextInfo("user", SecurityUtility.getPrincipalNames(Subject.getSubject(AccessController.getContext())))
-          .withContextInfo("thread", Thread.currentThread().getName());
+          .withContextInfo("calling-thread", Thread.currentThread().getName());
     }
     return exception;
   }

@@ -28,7 +28,7 @@ import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunContextProducer;
 import org.eclipse.scout.rt.platform.context.RunWithRunContext;
-import org.eclipse.scout.rt.platform.exception.ExceptionTranslator;
+import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.server.commons.authentication.ICredentialVerifier;
 import org.eclipse.scout.rt.server.commons.authentication.IPrincipalProducer;
@@ -170,7 +170,7 @@ public class AuthenticationHandler implements SOAPHandler<SOAPMessageContext> {
         public Principal call() throws Exception {
           return m_authenticationMethod.authenticate(context, m_credentialVerifier, m_principalProducer);
         }
-      }, BEANS.get(ExceptionTranslator.class));
+      }, DefaultExceptionTranslator.class);
     }
   }
 

@@ -23,9 +23,8 @@ import javax.security.auth.Subject;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.chain.callable.CallableChain;
-import org.eclipse.scout.rt.platform.exception.IThrowableTranslator;
-import org.eclipse.scout.rt.platform.exception.ProcessingException;
-import org.eclipse.scout.rt.platform.exception.ProcessingExceptionTranslator;
+import org.eclipse.scout.rt.platform.exception.DefaultRuntimeExceptionTranslator;
+import org.eclipse.scout.rt.platform.exception.IExceptionTranslator;
 import org.eclipse.scout.rt.platform.logger.DiagnosticContextValueProcessor;
 import org.eclipse.scout.rt.platform.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.security.SubjectProcessor;
@@ -63,8 +62,8 @@ public class RunContext implements IAdaptable {
    *
    * @param runnable
    *          runnable to be run.
-   * @throws ProcessingException
-   *           exception thrown during the runnable's execution.
+   * @throws RuntimeException
+   *           if the runnable throws an exception, and is translated by {@link DefaultRuntimeExceptionTranslator}.
    */
   public void run(final IRunnable runnable) {
     call(Callables.callable(runnable));
@@ -76,13 +75,13 @@ public class RunContext implements IAdaptable {
    *
    * @param runnable
    *          runnable to be run.
-   * @param throwableTranslator
+   * @param exceptionTranslator
    *          to translate exceptions thrown during execution.
-   * @throws ERROR
-   *           thrown according to the given {@link IThrowableTranslator}.
+   * @throws EXCEPTION
+   *           if the runnable throws an exception, and is translated by the given {@link IExceptionTranslator}.
    */
-  public <ERROR extends Throwable> void run(final IRunnable runnable, final IThrowableTranslator<? extends ERROR> throwableTranslator) throws ERROR {
-    call(Callables.callable(runnable), throwableTranslator);
+  public <EXCEPTION extends Throwable> void run(final IRunnable runnable, final Class<? extends IExceptionTranslator<EXCEPTION>> exceptionTranslator) throws EXCEPTION {
+    call(Callables.callable(runnable), exceptionTranslator);
   }
 
   /**
@@ -92,11 +91,11 @@ public class RunContext implements IAdaptable {
    * @param callable
    *          callable to be run.
    * @return the return value of the callable.
-   * @throws ProcessingException
-   *           exception thrown during the callable's execution.
+   * @throws RuntimeException
+   *           if the callable throws an exception, and is translated by {@link DefaultRuntimeExceptionTranslator}.
    */
   public <RESULT> RESULT call(final Callable<RESULT> callable) {
-    return call(callable, BEANS.get(ProcessingExceptionTranslator.class));
+    return call(callable, DefaultRuntimeExceptionTranslator.class);
   }
 
   /**
@@ -105,26 +104,20 @@ public class RunContext implements IAdaptable {
    *
    * @param callable
    *          callable to be run.
-   * @param throwableTranslator
+   * @param exceptionTranslator
    *          to translate exceptions thrown during execution.
    * @return the return value of the callable.
-   * @throws ERROR
-   *           thrown according to the given {@link IThrowableTranslator}.
+   * @throws EXCEPTION
+   *           if the callable throws an exception, and is translated by the given {@link IExceptionTranslator}.
    */
-  public <RESULT, ERROR extends Throwable> RESULT call(final Callable<RESULT> callable, final IThrowableTranslator<? extends ERROR> throwableTranslator) throws ERROR {
+  public <RESULT, EXCEPTION extends Throwable> RESULT call(final Callable<RESULT> callable, final Class<? extends IExceptionTranslator<EXCEPTION>> exceptionTranslator) throws EXCEPTION {
     try {
       final CallableChain<RESULT> callableChain = new CallableChain<>();
       interceptCallableChain(callableChain);
       return callableChain.call(callable);
     }
     catch (final Throwable t) {
-      final ERROR error = throwableTranslator.translate(t);
-      if (error != null) {
-        throw error;
-      }
-      else {
-        return null;
-      }
+      throw BEANS.get(exceptionTranslator).translate(t);
     }
   }
 

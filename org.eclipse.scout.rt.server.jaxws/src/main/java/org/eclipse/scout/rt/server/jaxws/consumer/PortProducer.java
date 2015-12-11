@@ -35,7 +35,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunContextProducer;
 import org.eclipse.scout.rt.platform.context.RunWithRunContext;
-import org.eclipse.scout.rt.platform.exception.ThrowableTranslator;
+import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 
@@ -126,7 +126,7 @@ public class PortProducer<SERVICE extends Service, PORT> {
             public Object call() throws Exception {
               return method.invoke(handler, args);
             }
-          }, BEANS.get(ThrowableTranslator.class));
+          }, DefaultExceptionTranslator.class);
         }
         else {
           return method.invoke(handler, args);

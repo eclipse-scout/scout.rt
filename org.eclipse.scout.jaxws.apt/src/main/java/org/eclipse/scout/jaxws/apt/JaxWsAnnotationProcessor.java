@@ -54,7 +54,7 @@ import org.eclipse.scout.jaxws.apt.internal.util.Logger;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.annotations.Internal;
 import org.eclipse.scout.rt.platform.context.RunContext;
-import org.eclipse.scout.rt.platform.exception.ExceptionTranslator;
+import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.server.jaxws.MessageContexts;
@@ -69,6 +69,7 @@ import com.sun.codemodel.JClass;
 import com.sun.codemodel.JCodeModel;
 import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JExpr;
+import com.sun.codemodel.JExpression;
 import com.sun.codemodel.JFieldVar;
 import com.sun.codemodel.JInvocation;
 import com.sun.codemodel.JMethod;
@@ -346,7 +347,7 @@ public class JaxWsAnnotationProcessor extends AbstractProcessor {
     }
 
     // Create RunContext invocations.
-    final JInvocation exceptionTranslator = model.ref(BEANS.class).staticInvoke("get").arg(model.ref(ExceptionTranslator.class).dotclass());
+    final JExpression exceptionTranslator = model.ref(DefaultExceptionTranslator.class).dotclass();
 
     final JInvocation servletRunContextInvocation = servletRunContext.invoke(runMethodName).arg(JExpr._new(servletRunContextCallable)).arg(exceptionTranslator);
     final JInvocation runContextInvocation = runContext.invoke(runMethodName).arg(JExpr._new(runContextCallable)).arg(exceptionTranslator);

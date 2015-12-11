@@ -24,7 +24,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContext;
-import org.eclipse.scout.rt.platform.exception.ThrowableTranslator;
+import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
 import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.job.DoneEvent;
 import org.eclipse.scout.rt.platform.job.IDoneHandler;
@@ -232,7 +232,7 @@ class DonePromise<RESULT> {
       return new DoneEvent<>(retrieveFinalValue(future), null, false);
     }
     catch (final ExecutionException e) {
-      final Throwable exception = BEANS.get(JobExceptionTranslator.class).translateExecutionException(e, BEANS.get(ThrowableTranslator.class));
+      final Exception exception = BEANS.get(JobExceptionTranslator.class).translateExecutionException(e, DefaultExceptionTranslator.class);
       return new DoneEvent<>(null, exception, false);
     }
     catch (final CancellationException e) {

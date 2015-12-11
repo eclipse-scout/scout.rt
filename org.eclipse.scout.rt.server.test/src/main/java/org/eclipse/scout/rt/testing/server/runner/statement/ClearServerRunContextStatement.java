@@ -10,11 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.testing.server.runner.statement;
 
-import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.exception.ThrowableTranslator;
 import org.eclipse.scout.rt.platform.util.Assertions;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
+import org.eclipse.scout.rt.testing.platform.runner.SafeStatementInvoker;
 import org.junit.runners.model.Statement;
 
 /**
@@ -32,20 +30,8 @@ public class ClearServerRunContextStatement extends Statement {
 
   @Override
   public void evaluate() throws Throwable {
-    ServerRunContexts.empty().run(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        try {
-          m_next.evaluate();
-        }
-        catch (final Exception | Error e) {
-          throw e;
-        }
-        catch (final Throwable e) {
-          throw new Error(e);
-        }
-      }
-    }, BEANS.get(ThrowableTranslator.class));
+    final SafeStatementInvoker invoker = new SafeStatementInvoker(m_next);
+    ServerRunContexts.empty().run(invoker);
+    invoker.throwOnError();
   }
 }

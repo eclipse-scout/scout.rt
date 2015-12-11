@@ -25,7 +25,6 @@ import org.eclipse.scout.rt.platform.config.IConfigProperty;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
-import org.eclipse.scout.rt.platform.exception.RuntimeExceptionTranslator;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
@@ -218,7 +217,7 @@ public abstract class AbstractHttpServiceTunnel extends AbstractServiceTunnel {
       return Jobs.schedule(remoteInvocationCallable, Jobs.newInput()
           .withRunContext(createCurrentRunContext().withRunMonitor(monitor))
           .withName(createServiceRequestName(requestSequence)))
-          .awaitDoneAndGet(BEANS.get(RuntimeExceptionTranslator.class));
+          .awaitDoneAndGet();
     }
     catch (InterruptedException | CancellationException e) {
       monitor.cancel(true); // Ensure the monitor to be cancelled once this thread is interrupted to cancel the remote call.

@@ -27,7 +27,6 @@ public class ProcessingException extends PlatformException {
   private static final long serialVersionUID = 1L;
 
   private ProcessingStatus m_status;
-  private transient boolean m_consumed;
 
   /**
    * Empty constructor is used to support auto-webservice publishing with java bean support
@@ -122,14 +121,6 @@ public class ProcessingException extends PlatformException {
       m_status.setException(this);
     }
     return this;
-  }
-
-  public boolean isConsumed() {
-    return m_consumed;
-  }
-
-  public void consume() {
-    m_consumed = true;
   }
 
   /**

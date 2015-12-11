@@ -10,13 +10,18 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.exception;
 
+import org.eclipse.scout.rt.platform.ApplicationScoped;
+
 /**
- * Interface used to define how {@link Throwable}s are translated.
+ * Translates exceptions into other exceptions.
+ *
+ * @since 5.2
  */
-public interface IThrowableTranslator<ERROR extends Throwable> {
+@ApplicationScoped
+public interface IExceptionTranslator<EXCEPTION extends Throwable> {
 
   /**
    * Translates the given {@link Throwable}.
    */
-  ERROR translate(Throwable t);
+  EXCEPTION translate(Throwable throwable);
 }

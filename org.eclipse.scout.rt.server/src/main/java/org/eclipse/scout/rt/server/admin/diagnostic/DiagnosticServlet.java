@@ -20,12 +20,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.exception.ExceptionTranslator;
+import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.server.ServiceTunnelServlet;
 import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
 import org.eclipse.scout.rt.server.commons.context.ServletRunContexts;
 import org.eclipse.scout.rt.server.commons.servlet.IHttpServletRoundtrip;
+import org.eclipse.scout.rt.server.commons.servlet.ServletExceptionTranslator;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
@@ -48,22 +49,21 @@ public class DiagnosticServlet extends ServiceTunnelServlet {
 
     lazyInit(servletRequest, servletResponse);
 
-    try {
-      ServletRunContexts.copyCurrent().withLocale(Locale.getDefault()).withServletRequest(servletRequest).withServletResponse(servletResponse).run(new IRunnable() {
+    ServletRunContexts.copyCurrent()
+        .withLocale(Locale.getDefault())
+        .withServletRequest(servletRequest)
+        .withServletResponse(servletResponse)
+        .run(new IRunnable() {
 
-        @Override
-        public void run() throws Exception {
-          ServerRunContext serverRunContext = ServerRunContexts.copyCurrent();
-          serverRunContext.withUserAgent(UserAgent.createDefault());
-          serverRunContext.withSession(lookupServerSessionOnHttpSession(serverRunContext.copy()));
+          @Override
+          public void run() throws Exception {
+            ServerRunContext serverRunContext = ServerRunContexts.copyCurrent();
+            serverRunContext.withUserAgent(UserAgent.createDefault());
+            serverRunContext.withSession(lookupServerSessionOnHttpSession(serverRunContext.copy()));
 
-          invokeDiagnosticService(serverRunContext);
-        }
-      }, BEANS.get(ExceptionTranslator.class));
-    }
-    catch (Exception e) {
-      throw new ServletException("Failed to invoke DiagnosticServlet", e);
-    }
+            invokeDiagnosticService(serverRunContext);
+          }
+        }, ServletExceptionTranslator.class);
   }
 
   /**
@@ -84,6 +84,6 @@ public class DiagnosticServlet extends ServiceTunnelServlet {
         }
         diagnosticSession.serviceRequest(servletRequest, servletResponse);
       }
-    }, BEANS.get(ExceptionTranslator.class));
+    }, DefaultExceptionTranslator.class);
   }
 }

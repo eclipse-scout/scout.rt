@@ -50,7 +50,6 @@ import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
-import org.eclipse.scout.rt.platform.exception.RuntimeExceptionTranslator;
 import org.eclipse.scout.rt.platform.holders.Holder;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
@@ -91,7 +90,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
       public void run() throws Exception {
         AbstractOutline.super.callInitializer();
       }
-    }, BEANS.get(RuntimeExceptionTranslator.class));
+    });
   }
 
   /*

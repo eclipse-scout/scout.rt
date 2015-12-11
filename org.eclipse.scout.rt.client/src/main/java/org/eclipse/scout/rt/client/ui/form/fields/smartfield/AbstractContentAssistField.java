@@ -40,9 +40,9 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
+import org.eclipse.scout.rt.platform.exception.DefaultRuntimeExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
-import org.eclipse.scout.rt.platform.exception.ProcessingExceptionTranslator;
 import org.eclipse.scout.rt.platform.holders.Holder;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
@@ -1064,7 +1064,7 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
             lookupRunnable.run();
           }
           catch (Exception e) {
-            fetcher.dataFetched(null, BEANS.get(ProcessingExceptionTranslator.class).translate(e));
+            fetcher.dataFetched(null, BEANS.get(DefaultRuntimeExceptionTranslator.class).translate(e));
           }
         }
       }
@@ -1171,7 +1171,7 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
             lookupRunnable.run();
           }
           catch (Exception e) {
-            fetcher.dataFetched(null, BEANS.get(ProcessingExceptionTranslator.class).translate(e));
+            fetcher.dataFetched(null, BEANS.get(DefaultRuntimeExceptionTranslator.class).translate(e));
           }
         }
       }

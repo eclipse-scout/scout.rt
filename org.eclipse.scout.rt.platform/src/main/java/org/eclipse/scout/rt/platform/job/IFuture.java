@@ -14,9 +14,9 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.rt.platform.context.RunContext;
-import org.eclipse.scout.rt.platform.exception.IThrowableTranslator;
+import org.eclipse.scout.rt.platform.exception.DefaultRuntimeExceptionTranslator;
+import org.eclipse.scout.rt.platform.exception.IExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
-import org.eclipse.scout.rt.platform.exception.RuntimeExceptionTranslator;
 import org.eclipse.scout.rt.platform.filter.AndFilter;
 import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.filter.NotFilter;
@@ -32,7 +32,7 @@ import org.eclipse.scout.rt.platform.util.concurrent.TimeoutException;
 /**
  * Represents a {@link Future} to interact with the associated job, or to wait for the job to complete and to query it's
  * computation result. Exceptions thrown during the job's execution are propagated in the form of a
- * {@link ProcessingException}, or translated according to the given {@link IThrowableTranslator}.
+ * {@link ProcessingException}, or translated according to the given {@link IExceptionTranslator}.
  *
  * @see Future
  * @since 5.1
@@ -113,7 +113,7 @@ public interface IFuture<RESULT> extends ICancellable {
 
   /**
    * Waits if necessary for the job to complete, and then retrieves its result or throws its exception according to
-   * {@link RuntimeExceptionTranslator}, or throws {@link CancellationException} if cancelled, or throws
+   * {@link DefaultRuntimeExceptionTranslator}, or throws {@link CancellationException} if cancelled, or throws
    * {@link InterruptedException} if the current thread was interrupted while waiting.
    *
    * @return the job's result.
@@ -122,35 +122,34 @@ public interface IFuture<RESULT> extends ICancellable {
    * @throws CancellationException
    *           if the job was cancelled.
    * @throws RuntimeException
-   *           exception as thrown by the job, translated by {@link RuntimeExceptionTranslator} if other than
-   *           {@link RuntimeException}.
+   *           if the job throws an exception, and is translated by {@link DefaultRuntimeExceptionTranslator}.
    */
   RESULT awaitDoneAndGet();
 
   /**
    * Waits if necessary for the job to complete, and then retrieves its result or throws its exception according to
-   * {@link IThrowableTranslator}, or throws {@link CancellationException} if cancelled, or throws
+   * {@link IExceptionTranslator}, or throws {@link CancellationException} if cancelled, or throws
    * {@link InterruptedException} if the current thread was interrupted while waiting.
    * <p>
-   * Use a specific {@link IThrowableTranslator} to control exception translation.
+   * Use a specific {@link IExceptionTranslator} to control exception translation.
    *
-   * @param throwableTranslator
+   * @param exceptionTranslator
    *          to translate the job's exception if the job threw an exception.
    * @return the job's result.
    * @throws InterruptedException
    *           if the current thread was interrupted while waiting.
    * @throws CancellationException
    *           if the job was cancelled.
-   * @throws EXECUTION_EXCEPTION
-   *           exception as thrown by the job, translated by the given {@link IThrowableTranslator}.
+   * @throws EXCEPTION
+   *           if the job throws an exception, and is translated by the given {@link IExceptionTranslator}.
    */
-  <EXECUTION_EXCEPTION extends Throwable> RESULT awaitDoneAndGet(IThrowableTranslator<EXECUTION_EXCEPTION> throwableTranslator) throws EXECUTION_EXCEPTION;
+  <EXCEPTION extends Exception> RESULT awaitDoneAndGet(Class<? extends IExceptionTranslator<EXCEPTION>> exceptionTranslator) throws EXCEPTION;
 
   /**
    * Waits if necessary for at most the given time for the job to complete, and then retrieves its result or throws its
-   * exception according to {@link RuntimeExceptionTranslator}, or throws {@link CancellationException} if cancelled, or
-   * throws {@link TimeoutException} if waiting timeout elapsed, or throws {@link InterruptedException} if the current
-   * thread was interrupted while waiting.
+   * exception according to {@link DefaultRuntimeExceptionTranslator}, or throws {@link CancellationException} if
+   * cancelled, or throws {@link TimeoutException} if waiting timeout elapsed, or throws {@link InterruptedException} if
+   * the current thread was interrupted while waiting.
    *
    * @param timeout
    *          the maximal time to wait for the job to complete.
@@ -164,24 +163,23 @@ public interface IFuture<RESULT> extends ICancellable {
    * @throws TimeoutException
    *           if the wait timed out.
    * @throws RuntimeException
-   *           exception as thrown by the job, translated by {@link RuntimeExceptionTranslator} if other than
-   *           {@link RuntimeException}.
+   *           if the job throws an exception, and is translated by {@link DefaultRuntimeExceptionTranslator}.
    */
   RESULT awaitDoneAndGet(long timeout, TimeUnit unit);
 
   /**
    * Waits if necessary for at most the given time for the job to complete, and then retrieves its result or throws its
-   * exception according to {@link IThrowableTranslator}, or throws {@link CancellationException} if cancelled, or
+   * exception according to {@link IExceptionTranslator}, or throws {@link CancellationException} if cancelled, or
    * throws {@link TimeoutException} if waiting timeout elapsed, or throws {@link InterruptedException} if the current
    * thread was interrupted while waiting.
    * <p>
-   * Use a specific {@link IThrowableTranslator} to control exception translation.
+   * Use a specific {@link IExceptionTranslator} to control exception translation.
    *
    * @param timeout
    *          the maximal time to wait for the job to complete.
    * @param unit
    *          unit of the timeout.
-   * @param throwableTranslator
+   * @param exceptionTranslator
    *          to translate the job's exception if the job threw an exception.
    * @return the job's result.
    * @throws InterruptedException
@@ -190,10 +188,10 @@ public interface IFuture<RESULT> extends ICancellable {
    *           if the job was cancelled.
    * @throws TimeoutException
    *           if the wait timed out.
-   * @throws EXECUTION_EXCEPTION
-   *           exception as thrown by the job, translated by the given {@link IThrowableTranslator}.
+   * @throws EXCEPTION
+   *           if the job throws an exception, and is translated by the given {@link IExceptionTranslator}.
    */
-  <EXECUTION_EXCEPTION extends Throwable> RESULT awaitDoneAndGet(long timeout, TimeUnit unit, IThrowableTranslator<EXECUTION_EXCEPTION> throwableTranslator) throws EXECUTION_EXCEPTION;
+  <EXCEPTION extends Exception> RESULT awaitDoneAndGet(long timeout, TimeUnit unit, Class<? extends IExceptionTranslator<EXCEPTION>> exceptionTranslator) throws EXCEPTION;
 
   /**
    * Registers the given <code>callback</code> to be invoked once the Future enters 'done' state. That is once the

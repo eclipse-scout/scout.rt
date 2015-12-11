@@ -20,16 +20,17 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Replace;
 import org.eclipse.scout.rt.platform.annotations.Internal;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
-import org.eclipse.scout.rt.platform.exception.ProcessingException;
-import org.eclipse.scout.rt.platform.exception.ProcessingExceptionTranslator;
+import org.eclipse.scout.rt.platform.exception.PlatformException;
+import org.eclipse.scout.rt.platform.exception.PlatformExceptionTranslator;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.InterruptedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * {@code ClientExceptionHandler} is the central point for handling client-side exceptions. For processing exceptions,
- * typically an error dialog is opened.
+ * Central point for client-side exception handling.
+ * <p>
+ * This implementation logs the exception and opens {@link ErrorPopup} to visualize the exception.
  */
 @Replace
 public class ClientExceptionHandler extends ExceptionHandler {
@@ -39,21 +40,21 @@ public class ClientExceptionHandler extends ExceptionHandler {
 
   @Override
   protected void handleThrowable(final Throwable t) {
-    // Same error handling for all exceptions, except InterruptedException which is ignored.
-    handleProcessingException(BEANS.get(ProcessingExceptionTranslator.class).translate(t));
+    // 1. Translate into PlatformException.
+    final PlatformException platformException = BEANS.get(PlatformExceptionTranslator.class).translate(t);
+    // 2. Handle as PlatformException.
+    handlePlatformException(platformException);
   }
 
   @Override
-  protected void handleProcessingException(final ProcessingException pe) {
-    super.handleProcessingException(pe);
+  protected void handlePlatformException(final PlatformException pe) {
+    super.handlePlatformException(pe);
 
     final IClientSession session = ClientSessionProvider.currentSession();
     if (session == null) {
-      LOG.debug("No session in current RunContext. ProcessingException cannot be visualized");
       return;
     }
 
-    // Only open the error dialog if not running headless.
     if (session.getDesktop() == null || !session.getDesktop().isOpened()) {
       return;
     }
@@ -76,7 +77,7 @@ public class ClientExceptionHandler extends ExceptionHandler {
               }
             }, ModelJobs.newInput(ClientRunContexts.copyCurrent())
                 .withExceptionHandling(null, true)
-                .withName("Visualizing ProcessingException"))
+                .withName("Visualizing PlatformException"))
                 .awaitDone();
           }
           catch (final InterruptedException e) {
@@ -94,10 +95,10 @@ public class ClientExceptionHandler extends ExceptionHandler {
   }
 
   /**
-   * Method invoked to visualize the exception. This method is called in the model thread.
+   * Method invoked to visualize the exception. This method is invoked in the model thread.
    */
-  protected void showExceptionInUI(final ProcessingException pe) {
-    BEANS.get(ErrorPopup.class).showMessageBox(pe);
+  protected void showExceptionInUI(final PlatformException e) {
+    BEANS.get(ErrorPopup.class).showMessageBox(e);
   }
 
   @Internal

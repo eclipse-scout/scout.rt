@@ -10,30 +10,25 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.testing.server.runner.statement;
 
-import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.exception.ThrowableTranslator;
 import org.eclipse.scout.rt.platform.util.Assertions;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.server.clientnotification.TransactionalClientNotificationCollector;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
+import org.eclipse.scout.rt.server.transaction.TransactionScope;
+import org.eclipse.scout.rt.testing.platform.runner.SafeStatementInvoker;
 import org.eclipse.scout.rt.testing.server.runner.RunWithClientNotifications;
 import org.junit.runners.model.Statement;
 
+/**
+ * Statement to have client notification support.
+ * <p>
+ * This statement requires to run in a new transaction.
+ */
 public class ClientNotificationsStatement extends Statement {
 
   private final Statement m_next;
   private final String m_clientNodeId;
   private final TransactionalClientNotificationCollector m_collector;
 
-  /**
-   * Creates a statement to execute the following statements with client notification thread locals set to simulate a
-   * client request.
-   *
-   * @param next
-   *          next {@link Statement} to be executed.
-   * @param annotation
-   *          {@link RunWithClientNotifications}-annotation to read nodeId
-   */
   public ClientNotificationsStatement(final Statement next, final RunWithClientNotifications annotation) {
     m_next = Assertions.assertNotNull(next, "next statement must not be null");
     m_clientNodeId = (annotation != null ? annotation.clientNodeId() : null);
@@ -42,23 +37,14 @@ public class ClientNotificationsStatement extends Statement {
 
   @Override
   public void evaluate() throws Throwable {
+    final SafeStatementInvoker invoker = new SafeStatementInvoker(m_next);
+
     ServerRunContexts.copyCurrent()
         .withTransactionalClientNotificationCollector(m_collector)
+        .withTransactionScope(TransactionScope.REQUIRES_NEW)
         .withClientNodeId(m_clientNodeId)
-        .run(new IRunnable() {
+        .run(invoker);
 
-          @Override
-          public void run() throws Exception {
-            try {
-              m_next.evaluate();
-            }
-            catch (final Exception | Error e) {
-              throw e;
-            }
-            catch (final Throwable e) {
-              throw new Error(e);
-            }
-          }
-        }, BEANS.get(ThrowableTranslator.class));
+    invoker.throwOnError();
   }
 }

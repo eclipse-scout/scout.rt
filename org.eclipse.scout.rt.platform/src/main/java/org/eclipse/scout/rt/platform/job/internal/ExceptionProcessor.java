@@ -16,7 +16,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.chain.callable.CallableChain;
 import org.eclipse.scout.rt.platform.chain.callable.CallableChain.Chain;
 import org.eclipse.scout.rt.platform.chain.callable.ICallableInterceptor;
-import org.eclipse.scout.rt.platform.exception.ExceptionTranslator;
+import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
 import org.eclipse.scout.rt.platform.job.JobInput;
 
 /**
@@ -42,7 +42,7 @@ public class ExceptionProcessor<RESULT> implements ICallableInterceptor<RESULT> 
     }
     catch (final Exception | Error e) {
       if (m_input.getExceptionHandler() != null) {
-        BEANS.get(m_input.getExceptionHandler()).handle(BEANS.get(ExceptionTranslator.class).translate(e));
+        BEANS.get(m_input.getExceptionHandler()).handle(BEANS.get(DefaultExceptionTranslator.class).translate(e));
       }
 
       if (!m_input.isSwallowException()) {

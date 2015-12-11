@@ -14,9 +14,8 @@ import java.lang.reflect.Method;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.exception.DefaultRuntimeExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
-import org.eclipse.scout.rt.platform.exception.ProcessingExceptionTranslator;
-import org.eclipse.scout.rt.platform.exception.RuntimeExceptionTranslator;
 import org.eclipse.scout.rt.platform.holders.HolderUtility;
 import org.eclipse.scout.rt.platform.holders.IHolder;
 import org.eclipse.scout.rt.platform.holders.NVPair;
@@ -35,7 +34,7 @@ public class ServiceUtility {
       return serviceClass.getMethod(operation, paramTypes);
     }
     catch (NoSuchMethodException | SecurityException e) {
-      throw BEANS.get(ProcessingExceptionTranslator.class).translate(e);
+      throw BEANS.get(DefaultRuntimeExceptionTranslator.class).translate(e);
     }
   }
 
@@ -55,7 +54,7 @@ public class ServiceUtility {
       return operation.invoke(service, args != null ? args : new Object[0]);
     }
     catch (final Throwable t) {
-      throw BEANS.get(RuntimeExceptionTranslator.class).translate(t);
+      throw BEANS.get(DefaultRuntimeExceptionTranslator.class).translate(t);
     }
   }
 

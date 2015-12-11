@@ -18,7 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * {@code ExceptionHandler} is the central point for handling exceptions.
+ * Central point for exception handling.
  */
 @ApplicationScoped
 public class ExceptionHandler {
@@ -26,7 +26,9 @@ public class ExceptionHandler {
   private static final Logger LOG = LoggerFactory.getLogger(ExceptionHandler.class);
 
   /**
-   * Method invoked to handle the given {@code Throwable}. This method must not throw an exception.
+   * Method invoked to handle the given {@link Throwable}.
+   * <p>
+   * This method must not throw an exception.
    */
   public void handle(final Throwable t) {
     if (t instanceof InterruptedException) {
@@ -35,11 +37,11 @@ public class ExceptionHandler {
     else if (t instanceof CancellationException) {
       handleCancelledException((CancellationException) t);
     }
-    else if (t instanceof ProcessingException) {
-      final ProcessingException pe = (ProcessingException) t;
+    else if (t instanceof PlatformException) {
+      final PlatformException pe = (PlatformException) t;
       if (!pe.isConsumed()) {
         try {
-          handleProcessingException(pe);
+          handlePlatformException(pe);
         }
         finally {
           pe.consume();
@@ -52,28 +54,36 @@ public class ExceptionHandler {
   }
 
   /**
-   * Method invoked to handle a {@code InterruptedException}. The default implementation does nothing.
+   * Method invoked to handle an {@link InterruptedException}.
+   * <p>
+   * The default implementation logs it with debug level.
    */
   protected void handleInterruptedException(final InterruptedException e) {
     LOG.debug("Interruption", e);
   }
 
   /**
-   * Method invoked to handle a {@code CancellationException}. The default implementation does nothing. Typically, this
-   * exception is thrown if waiting for a job to complete, but the job was cancelled.
+   * Method invoked to handle a {@link CancellationException}. Typically, such an exception is thrown when waiting on a
+   * cancelled job.
+   * <p>
+   * The default implementation logs it with debug level.
    */
   protected void handleCancelledException(final CancellationException e) {
     LOG.debug("Cancellation", e);
   }
 
   /**
-   * Method invoked to handle a {@code ProcessingException}.<br/>
-   * The default implementation logs the exception according to the severity of the status. In the case of a
-   * {@code VetoException}, only it's message is logged as <code>INFO</code>.
+   * Method invoked to handle a {@link PlatformException} unless already <em>consumed</em>.
+   * <p>
+   * The default implementation logs as following:
+   * <ul>
+   * <li>{@link PlatformException}: is logged as an <em>ERROR</em></li>
+   * <li>{@link ProcessingException}: is logged according to its severity</li>
+   * <li>{@link VetoException}: is logged as <em>INFO</em> without stacktrace, or <em>DEBUG</em> if
+   * <em>debug-logging</em> is enabled</li>
+   * </ul>
    */
-  protected void handleProcessingException(final ProcessingException e) {
-    final IProcessingStatus status = e.getStatus();
-
+  protected void handlePlatformException(final PlatformException e) {
     if (e instanceof VetoException) {
       if (LOG.isDebugEnabled()) {
         LOG.debug("", e);
@@ -82,8 +92,8 @@ public class ExceptionHandler {
         LOG.info("{}: {}", e.getClass().getSimpleName(), e.getMessage());
       }
     }
-    else {
-      switch (status.getSeverity()) {
+    else if (e instanceof ProcessingException) {
+      switch (((ProcessingException) e).getStatus().getSeverity()) {
         case IProcessingStatus.INFO:
         case IProcessingStatus.OK:
           LOG.info("", e);
@@ -96,17 +106,19 @@ public class ExceptionHandler {
           break;
       }
     }
+    else {
+      LOG.error("", e);
+    }
   }
 
   /**
-   * Method invoked to handle a {@code Throwable} which is not of the type {@code ProcessingException}, or
+   * Method invoked to handle a {@link Throwable} which is not of the type {@code PlatformException}, or
    * {@link InterruptedException}, or {@link CancellationException}.
    * <p>
    * The default implementation logs the throwable as <code>ERROR</code>.
    */
   protected void handleThrowable(final Throwable t) {
-    final String message = String.format("%s:%s", t.getClass().getSimpleName(), StringUtility.nvl(t.getMessage(), "n/a"));
-    LOG.error(message, t);
+    LOG.error("{}:{}", t.getClass().getSimpleName(), StringUtility.nvl(t.getMessage(), "n/a"), t);
   }
 
   /**

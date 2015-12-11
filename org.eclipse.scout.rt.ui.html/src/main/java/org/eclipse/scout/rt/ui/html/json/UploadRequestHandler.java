@@ -33,7 +33,7 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.fileupload.util.Streams;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
-import org.eclipse.scout.rt.platform.exception.ExceptionTranslator;
+import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
@@ -80,13 +80,15 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
       IUiSession uiSession = resolveUiSession(req, uiSessionId);
 
       // Associate subsequent processing with the uiSession.
-      UiRunContexts.copyCurrent().withSession(uiSession).run(new IRunnable() {
+      UiRunContexts.copyCurrent()
+          .withSession(uiSession)
+          .run(new IRunnable() {
 
-        @Override
-        public void run() throws Exception {
-          handleUploadFileRequest(IUiSession.CURRENT.get(), req, resp, targetAdapterId);
-        }
-      }, BEANS.get(ExceptionTranslator.class));
+            @Override
+            public void run() throws Exception {
+              handleUploadFileRequest(IUiSession.CURRENT.get(), req, resp, targetAdapterId);
+            }
+          }, DefaultExceptionTranslator.class);
     }
     catch (Exception e) {
       LOG.error("Unexpected error while handling multipart upload request", e);
