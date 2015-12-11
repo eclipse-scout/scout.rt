@@ -22,8 +22,10 @@ scout.ColumnUserFilter = function() {
    */
   this.selectedValues = [];
 
-  // FIXME AWE: split this class into Text-, Number- and Date-ColumnUserFilter
+  // FIXME AWE: split this class into Text-, Number- and Date-ColumnUserFilter, use Range object
   this.freeText;
+  this.numberRange = {from: null, to: null};
+  this.dateRange = {from: null, to: null};
 };
 scout.inherits(scout.ColumnUserFilter, scout.TableUserFilter);
 
@@ -102,11 +104,20 @@ scout.ColumnUserFilter.prototype._useTextInsteadOfNormValue = function(value) {
 
 scout.ColumnUserFilter.prototype.createAddFilterEventData = function() {
   var data = scout.ColumnUserFilter.parent.prototype.createAddFilterEventData.call(this);
-  return $.extend(data, {
+  data = $.extend(data, {
     columnId: this.column.id,
-    selectedValues: this.selectedValues,
-    freeText: this.freeText
+    selectedValues: this.selectedValues
   });
+
+  if (this.column.type === 'text') {
+    data.freeText = this.freeText;
+  } else if (this.column.type === 'number') {
+    data.numberRange = this.numberRange;
+  } else if (this.column.type === 'date') {
+    data.dateRange = this.dateRange;
+  }
+
+  return data;
 };
 
 scout.ColumnUserFilter.prototype.createRemoveFilterEventData = function() {
@@ -129,7 +140,7 @@ scout.ColumnUserFilter.prototype.accept = function(row) {
     // Lazy calculation. It is not possible on init, because the table is not rendered yet.
     this.calculate();
   }
-  var acceptByTable, acceptByFields,
+  var acceptByTable = true, acceptByFields = true,
     key = this.column.cellValueForGrouping(row),
     normKey = this.xAxis.norm(key);
 
@@ -139,14 +150,21 @@ scout.ColumnUserFilter.prototype.accept = function(row) {
 
   if (this.selectedValues.length) {
     acceptByTable = this.selectedValues.indexOf(normKey) > -1;
-  } else {
-    acceptByTable = true;
   }
 
-  if (this.freeText) { // FIXME AWE (filter) use cellTextForTextFilter
+  if (this.column.type === 'text' &&  this.freeText) {
+    // FIXME AWE (filter) use cellTextForTextFilter
     acceptByFields = normKey.toLowerCase().indexOf(this.freeText.toLowerCase()) > -1;
-  } else {
-    acceptByFields = true;
+  } else if (this.column.type === 'number' && this.numberRange) {
+    if (this.numberRange.from && this.numberRange.to) { // FIXME AWE (filter) does not work for 0, must check for null
+      acceptByFields = normKey >= this.numberRange.from && normKey <= this.numberRange.to;
+    } else if (this.numberRange.from) {
+      acceptByFields = normKey >= this.numberRange.from;
+    } else if (this.numberRange.to) {
+      acceptByFields = normKey <= this.numberRange.to;
+    }
+  } else if (this.column.type === 'date' && this.dateRange) {
+
   }
 
   return acceptByTable && acceptByFields;
@@ -156,11 +174,43 @@ scout.ColumnUserFilter.prototype.updateFilterFields = function(event) {
   $.log.debug('(ColumnUserFilter#updateFilterFields) filterType=' + event.filterType + ' text=' + event.text);
   if (event.filterType === 'text') {
     this.freeText = event.text.trim();
+  } else if (event.filterType === 'number') {
+    // FIXME AWE: (filter) discuss with C.GU... unser NumberField.js kann keinen value (numeric) liefern, richtig?
+    // Das field sollte etwas wie getValue() haben das eine fixfertige number liefert anstatt der konvertierung hier
+    this.numberRange = {
+      from: this._toNumber(event.from),
+      to: this._toNumber(event.to)
+    };
+  } else if (event.filterType === 'date') {
+    // FIXME AWE: (filter) rename Range.js to DateRange.js impl. new Range?
+    this.dateRange = {
+        from: this._toDate(event.from),
+        to: this._toDate(event.to)
+      };
   } else {
-    throw new Error('other filter types not implemented yet'); // FIXME AWE: (filter) impl. other types
+    throw new Error('unknown filter type');
   }
 };
 
+scout.ColumnUserFilter.prototype._toNumber = function(numberString) {
+  if (!numberString) {
+    return null;
+  }
+  // clean number string (only digits remain) // FIXME AWE (filter) improv. doesnt work for fractions, etc
+  numberString = numberString.replace(/\D/g, '');
+
+  var number = parseInt(numberString, 10);
+  if (isNaN(number)) {
+    return null;
+  }
+
+  return number;
+};
+
+scout.ColumnUserFilter.prototype._toDate = function(dateString) {
+  return dateString; // FIXME AWE: impl.
+};
+
 scout.ColumnUserFilter.prototype.filterActive = function() {
-  return this.selectedValues.length > 0 || this.freeText; // FIXME AWE: (filter) impl. active for other types
+  return this.selectedValues.length > 0 || this.freeText || this.numberRange || this.dateRange;
 };

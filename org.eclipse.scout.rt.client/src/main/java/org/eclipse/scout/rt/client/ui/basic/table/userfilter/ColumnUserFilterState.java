@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table.userfilter;
 
+import java.util.Date;
 import java.util.Set;
 
 import org.eclipse.scout.rt.client.services.common.bookmark.internal.BookmarkUtility;
@@ -18,6 +19,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.userfilter.AbstractUserFilterState;
 import org.eclipse.scout.rt.client.ui.basic.userfilter.IUserFilterState;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.util.Range;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 
 public class ColumnUserFilterState extends AbstractUserFilterState implements IUserFilterState {
@@ -28,6 +30,8 @@ public class ColumnUserFilterState extends AbstractUserFilterState implements IU
   private String m_columnId;
   private Set<Object> m_selectedValues;
   private String m_freeText;
+  private Range<Number> m_numberRange;
+  private Range<Date> m_dateRange;
 
   public ColumnUserFilterState(IColumn<String> column) {
     setColumn(column);
@@ -59,6 +63,22 @@ public class ColumnUserFilterState extends AbstractUserFilterState implements IU
     m_freeText = freeText;
   }
 
+  public Range<Number> getNumberRange() {
+    return m_numberRange;
+  }
+
+  public void setNumberRange(Range<Number> numberRange) {
+    m_numberRange = numberRange;
+  }
+
+  public Range<Date> getDateRange() {
+    return m_dateRange;
+  }
+
+  public void setDateRange(Range<Date> dateRange) {
+    m_dateRange = dateRange;
+  }
+
   @Override
   public Object createKey() {
     return getColumn();
@@ -78,4 +98,5 @@ public class ColumnUserFilterState extends AbstractUserFilterState implements IU
     }
     m_column = col;
   }
+
 }

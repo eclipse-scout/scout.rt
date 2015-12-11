@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.ui.html.json.table;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -47,6 +48,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.platform.util.Range;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.shared.security.CopyToClipboardPermission;
 import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
@@ -730,12 +732,36 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
         }
       }
       // filter fields
-      // FIXME AWE: (filter) implement other filter types
-      String freeText = data.getString("freeText");
-
       ColumnUserFilterState filter = new ColumnUserFilterState(column);
       filter.setSelectedValues(selectedValues);
-      filter.setFreeText(freeText);
+
+      // FIXME AWE: (filter) split into separate classes / per type
+      String freeText = data.optString("freeText");
+      if (freeText != null) {
+        filter.setFreeText(freeText);
+      }
+
+      JSONObject numberRange = data.optJSONObject("numberRange");
+      if (numberRange != null) {
+        String from = numberRange.getString("from");
+        if ("null".equals(from) || "".equals(from)) {
+          from = null;
+        }
+        Integer fromValue = from == null ? null : Integer.parseInt(from);
+        String to = numberRange.getString("from");
+        if ("null".equals(to) || "".equals(to)) {
+          to = null;
+        }
+        Integer toValue = to == null ? null : Integer.parseInt(to);
+        filter.setNumberRange(new Range<Number>(fromValue, toValue));
+      }
+
+      JSONObject dateRange = data.optJSONObject("dateRange");
+      if (dateRange != null) {
+        // FIXME AWE: (filter) how to create a valid date here?
+        filter.setDateRange(new Range<Date>(null, null));
+      }
+
       return filter;
     }
     else if ("text".equals(filterType)) {

@@ -42,26 +42,54 @@ scout.FilterFieldsGroupBox.prototype._render = function($parent) {
 };
 
 scout.FilterFieldsGroupBox.prototype._addFromToNumberFields = function() {
-  this._addField('NumberField', 'ui.from', 0);
-  this._addField('NumberField', 'ui.to', 1);
+  this._addField('NumberField', 'ui.from', 0, this._toNumberString(this.filter.numberRange.from), this._updateNumberFilter);
+  this._addField('NumberField', 'ui.to', 1, this._toNumberString(this.filter.numberRange.to), this._updateNumberFilter);
+};
+
+scout.FilterFieldsGroupBox.prototype._updateNumberFilter = function(event) {
+  this.trigger('filterUpdated', {
+    filterType: 'number',
+    from: this.fields[0].displayText,
+    to: this.fields[1].displayText
+  });
 };
 
 scout.FilterFieldsGroupBox.prototype._addFromToDateFields = function() {
-  this._addField('DateField', 'ui.from', 0);
-  this._addField('DateField', 'ui.to', 1);
+  this._addField('DateField', 'ui.from', 0, this.filter.dateRange.from, this._updateDateFilter);
+  this._addField('DateField', 'ui.to', 1, this.filter.dateRange.to, this._updateDateFilter);
 };
 
-scout.FilterFieldsGroupBox.prototype._addField = function(objectType, text, gridY) {
-  this.fields.push(scout.create(objectType, {
+scout.FilterFieldsGroupBox.prototype._toNumberString = function(number) {
+  if (number === null || number === undefined) { // not for 0
+    return '';
+  } else {
+    return number.toString();
+  }
+};
+
+scout.FilterFieldsGroupBox.prototype._updateDateFilter = function(event) {
+  this.trigger('filterUpdated', {
+    filterType: 'date',
+    from: this.fields[0].displayText,
+    to: this.fields[1].displayText
+  });
+};
+
+// FIXME AWE: (filter) es braucht wahrscheinlich auch eine validierung? z.B. from muss kleiner sein als to
+scout.FilterFieldsGroupBox.prototype._addField = function(objectType, text, gridY, displayText, onDisplayTextChanged) {
+  var field = scout.create(objectType, {
     parent: this,
     label: this.session.text(text),
+    displayText: displayText, // FIXME AWE: (filter) use setValue() here
     statusVisible: false,
     labelWidthInPixel: 50,
     maxLength: 100,
     gridData: {
       y: gridY
     }
-  }));
+  });
+  field.on('displayTextChanged', onDisplayTextChanged.bind(this));
+  this.fields.push(field);
 };
 
 scout.FilterFieldsGroupBox.prototype._addFreeTextField = function() {
@@ -72,12 +100,11 @@ scout.FilterFieldsGroupBox.prototype._addFreeTextField = function() {
     maxLength: 100,
     displayText: this.filter.freeText
   });
-  freeTextField.on('displayTextChanged', this._updateFilter.bind(this));
+  freeTextField.on('displayTextChanged', this._updateTextFilter.bind(this));
   this.fields.push(freeTextField);
 };
 
-scout.FilterFieldsGroupBox.prototype._updateFilter = function(event) {
-  // FIXME AWE: (filter) other filter types
+scout.FilterFieldsGroupBox.prototype._updateTextFilter = function(event) {
   this.trigger('filterUpdated', {
     filterType: 'text',
     text: event.displayText

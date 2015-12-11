@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.ui.html.json.table.userfilter;
 
 import org.eclipse.scout.rt.client.ui.basic.table.userfilter.ColumnUserFilterState;
+import org.eclipse.scout.rt.platform.util.Range;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -35,7 +36,26 @@ public class JsonColumnUserFilter<T extends ColumnUserFilterState> extends JsonT
     JSONObject json = super.toJson();
     json.put("column", getJsonTable().getColumnId(getFilterState().getColumn()));
     json.put("selectedValues", new JSONArray(getFilterState().getSelectedValues()));
-    json.put("freeText", getFilterState().getFreeText());
+    ColumnUserFilterState state = getFilterState();
+    if ("text".equals(state.getType())) {
+      json.put("freeText", getFilterState().getFreeText());
+    }
+    else if ("number".equals(state.getType())) {
+      json.put("numberRange", toJson(getFilterState().getNumberRange()));
+    }
+    else if ("date".equals(state.getType())) {
+      json.put("dateRange", toJson(getFilterState().getDateRange()));
+    }
+    return json;
+  }
+
+  protected JSONObject toJson(Range<?> range) {
+    if (range == null) {
+      return null;
+    }
+    JSONObject json = new JSONObject();
+    json.put("from", range.getFrom());
+    json.put("to", range.getTo());
     return json;
   }
 
