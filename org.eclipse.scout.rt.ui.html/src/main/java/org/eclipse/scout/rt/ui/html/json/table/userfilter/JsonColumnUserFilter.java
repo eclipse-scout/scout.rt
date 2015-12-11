@@ -10,8 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.table.userfilter;
 
+import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.userfilter.ColumnUserFilterState;
 import org.eclipse.scout.rt.platform.util.Range;
+import org.eclipse.scout.rt.ui.html.json.table.JsonTable;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -33,17 +35,21 @@ public class JsonColumnUserFilter<T extends ColumnUserFilterState> extends JsonT
 
   @Override
   public JSONObject toJson() {
+    // FIXME AWE: (filter) refactor this method when we have Columns per type
     JSONObject json = super.toJson();
-    json.put("column", getJsonTable().getColumnId(getFilterState().getColumn()));
-    json.put("selectedValues", new JSONArray(getFilterState().getSelectedValues()));
-    ColumnUserFilterState state = getFilterState();
-    if ("text".equals(state.getType())) {
+    JsonTable jsonTable = getJsonTable();
+    ColumnUserFilterState filterState = getFilterState();
+    IColumn modelColumn = filterState.getColumn();
+    json.put("column", jsonTable.getColumnId(modelColumn));
+    json.put("selectedValues", new JSONArray(filterState.getSelectedValues()));
+    String colummType = jsonTable.getColumnType(modelColumn);
+    if ("text".equals(colummType)) {
       json.put("freeText", getFilterState().getFreeText());
     }
-    else if ("number".equals(state.getType())) {
+    else if ("number".equals(colummType)) {
       json.put("numberRange", toJson(getFilterState().getNumberRange()));
     }
-    else if ("date".equals(state.getType())) {
+    else if ("date".equals(colummType)) {
       json.put("dateRange", toJson(getFilterState().getDateRange()));
     }
     return json;

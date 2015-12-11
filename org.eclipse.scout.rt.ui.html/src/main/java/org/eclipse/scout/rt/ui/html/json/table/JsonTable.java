@@ -736,6 +736,7 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
       filter.setSelectedValues(selectedValues);
 
       // FIXME AWE: (filter) split into separate classes / per type
+      // move model/json-adapter creation to JsonXxxColumn class, static method?
       String freeText = data.optString("freeText");
       if (freeText != null) {
         filter.setFreeText(freeText);
@@ -743,12 +744,12 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
 
       JSONObject numberRange = data.optJSONObject("numberRange");
       if (numberRange != null) {
-        String from = numberRange.getString("from");
+        String from = numberRange.optString("from");
         if ("null".equals(from) || "".equals(from)) {
           from = null;
         }
         Integer fromValue = from == null ? null : Integer.parseInt(from);
-        String to = numberRange.getString("from");
+        String to = numberRange.optString("to");
         if ("null".equals(to) || "".equals(to)) {
           to = null;
         }
@@ -926,6 +927,17 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
       throw new UiException("No column found for id " + columnId);
     }
     return column;
+  }
+
+  public String getColumnType(IColumn column) { // FIXME AWE: (filter) remove this method when we have JsonColumns per type
+    if (column == null) {
+      return null;
+    }
+    JsonColumn jsonColumn = m_jsonColumns.get(column);
+    if (jsonColumn == null) {
+      return null;
+    }
+    return jsonColumn.computeColumnType(column);
   }
 
   public String getColumnId(IColumn column) {

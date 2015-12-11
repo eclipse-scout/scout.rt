@@ -42,8 +42,13 @@ scout.FilterFieldsGroupBox.prototype._render = function($parent) {
 };
 
 scout.FilterFieldsGroupBox.prototype._addFromToNumberFields = function() {
-  this._addField('NumberField', 'ui.from', 0, this._toNumberString(this.filter.numberRange.from), this._updateNumberFilter);
-  this._addField('NumberField', 'ui.to', 1, this._toNumberString(this.filter.numberRange.to), this._updateNumberFilter);
+  var from, to;
+  if (this.filter.numberRange) {
+    from = this.filter.numberRange.from;
+    to = this.filter.numberRange.to;
+  }
+  this._addField('NumberField', 'ui.from', 0, this._toNumberString(from), this._updateNumberFilter);
+  this._addField('NumberField', 'ui.to', 1, this._toNumberString(to), this._updateNumberFilter);
 };
 
 scout.FilterFieldsGroupBox.prototype._updateNumberFilter = function(event) {

@@ -24,8 +24,8 @@ scout.ColumnUserFilter = function() {
 
   // FIXME AWE: split this class into Text-, Number- and Date-ColumnUserFilter, use Range object
   this.freeText;
-  this.numberRange = {from: null, to: null};
-  this.dateRange = {from: null, to: null};
+  this.numberRange;
+  this.dateRange;
 };
 scout.inherits(scout.ColumnUserFilter, scout.TableUserFilter);
 
@@ -177,10 +177,16 @@ scout.ColumnUserFilter.prototype.updateFilterFields = function(event) {
   } else if (event.filterType === 'number') {
     // FIXME AWE: (filter) discuss with C.GU... unser NumberField.js kann keinen value (numeric) liefern, richtig?
     // Das field sollte etwas wie getValue() haben das eine fixfertige number liefert anstatt der konvertierung hier
-    this.numberRange = {
-      from: this._toNumber(event.from),
-      to: this._toNumber(event.to)
-    };
+    var from = this._toNumber(event.from),
+      to = this._toNumber(event.to);
+    if (from === null && to === null) {
+      this.numberRange = null;
+    } else {
+      this.numberRange = {
+        from: from,
+        to: to
+      };
+    }
   } else if (event.filterType === 'date') {
     // FIXME AWE: (filter) rename Range.js to DateRange.js impl. new Range?
     this.dateRange = {
