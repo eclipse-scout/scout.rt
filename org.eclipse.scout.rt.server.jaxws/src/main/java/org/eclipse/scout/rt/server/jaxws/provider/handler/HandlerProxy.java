@@ -149,7 +149,7 @@ public class HandlerProxy<CONTEXT extends MessageContext> implements Handler<CON
           return;
         }
         catch (final ReflectiveOperationException e) {
-          throw new PlatformException(String.format("Failed to inject 'InitParams' for handler '%s'", handler.getClass().getName()), e);
+          throw new PlatformException("Failed to inject 'InitParams' for handler '{}'", handler.getClass().getName(), e);
         }
       }
     }

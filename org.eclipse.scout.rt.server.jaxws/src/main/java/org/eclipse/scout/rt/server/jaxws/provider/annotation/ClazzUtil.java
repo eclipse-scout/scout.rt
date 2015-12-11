@@ -39,7 +39,7 @@ public final class ClazzUtil {
     final String qualifiedName = annotation.qualifiedName();
 
     if (qualifiedName.isEmpty() && Clazz.NullClazz.class.equals(clazz)) {
-      throw new PlatformException(String.format("No class specified for %s: missing 'value' or 'qualified name' attribute", source));
+      throw new PlatformException("No class specified for {}: missing 'value' or 'qualified name' attribute", source);
     }
 
     try {
@@ -51,7 +51,7 @@ public final class ClazzUtil {
       }
     }
     catch (final ReflectiveOperationException e) {
-      throw new PlatformException(String.format("Failed to load class for %s [class=%s, qualifiedName=%s]", source, clazz, qualifiedName), e);
+      throw new PlatformException("Failed to load class for {} [class={}, qualifiedName={}]", source, clazz, qualifiedName, e);
     }
   }
 
@@ -61,7 +61,7 @@ public final class ClazzUtil {
       return (Class<T>) actualClass;
     }
     else {
-      throw new PlatformException(String.format("Class of wrong type for %s [expected=%s, actual=%s]", source, expectedSuperClass.getName(), actualClass.getName()));
+      throw new PlatformException("Class of wrong type for {} [expected={}, actual={}]", source, expectedSuperClass.getName(), actualClass.getName());
     }
   }
 }
