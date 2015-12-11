@@ -63,25 +63,31 @@ scout.FilterFieldsGroupBox.prototype._updateNumberFilter = function(event) {
   });
 };
 
+// FIXME AWE: (filter) refactor DateField.js -
+// rename timestampAsDate to value (also on JsonDateField)
+// use Date object everywhere and todays 'timestamp' date-string
+// only when we communicate with the UI server. Then remove the _toJsonDate
+// function used here and work with the Date object. Implement a _syncValue
+// method to convert the date-string into a Date object in DateField.js
 scout.FilterFieldsGroupBox.prototype._addFromToDateFields = function() {
   var fromField = this._addField('DateField', 'ui.from', 0);
-  fromField.timestamp = _toDateString(this.filter.dateFrom);
+  fromField.timestamp = _toJsonDate(this.filter.dateFrom);
   fromField.on('timestampChanged', this._updateDateFilter.bind(this));
 
   var toField = this._addField('DateField', 'ui.to', 1);
-  toField.timestamp = _toDateString(this.filter.dateTo);
+  toField.timestamp = _toJsonDate(this.filter.dateTo);
   toField.on('timestampChanged', this._updateDateFilter.bind(this));
 
-  function _toDateString(date) {
-    return date || '';
+  function _toJsonDate(date) {
+    return date ? scout.dates.toJsonDate(date) : null;
   }
 };
 
 scout.FilterFieldsGroupBox.prototype._updateDateFilter = function(event) {
   this.trigger('filterUpdated', {
     filterType: 'date',
-    from: this.fields[0].timestamp,
-    to: this.fields[1].timestamp
+    from: this.fields[0].timestampAsDate,
+    to: this.fields[1].timestampAsDate
   });
 };
 

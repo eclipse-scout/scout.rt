@@ -33,6 +33,18 @@ scout.inherits(scout.ColumnUserFilter, scout.TableUserFilter);
 
 scout.ColumnUserFilter.Type = 'column';
 
+
+/**
+ * @override TableUserFilter.js
+ */
+scout.ColumnUserFilter.prototype._init = function(model) {
+  scout.ColumnUserFilter.parent.prototype._init.call(this, model);
+  if (this.column.type === 'date') {
+    this.dateFrom = scout.dates.parseJsonDate(this.dateFrom);
+    this.dateTo = scout.dates.parseJsonDate(this.dateTo);
+  }
+};
+
 scout.ColumnUserFilter.prototype.calculate = function() {
   var containsSelectedValue, reorderAxis,
     group = -1;
@@ -117,8 +129,8 @@ scout.ColumnUserFilter.prototype.createAddFilterEventData = function() {
     data.numberFrom = this.numberFrom;
     data.numberTo = this.numberTo;
   } else if (this.column.type === 'date') {
-    data.dateFrom = this.dateFrom;
-    data.dateTo = this.dateTo;
+    data.dateFrom = scout.dates.toJsonDate(this.dateFrom);
+    data.dateTo = scout.dates.toJsonDate(this.dateTo);
   }
 
   return data;
@@ -172,14 +184,10 @@ scout.ColumnUserFilter.prototype.accept = function(row) {
         acceptByFields = normKey <= this.numberTo;
       }
     } else if (this.column.type === 'date') {
-      var fromValue, toValue,
-        keyValue = key.valueOf();
-      if (this.dateFrom) {
-        fromValue = scout.dates.parseJsonDate(this.dateFrom).valueOf();
-      }
-      if (this.dateTo) {
-        toValue = scout.dates.parseJsonDate(this.dateTo).valueOf();
-      }
+      var
+        keyValue = key.valueOf(),
+        fromValue = this.dateFrom ? this.dateFrom.valueOf() : null,
+        toValue  = this.dateTo ? this.dateTo.valueOf() : null;
       if (fromValue && toValue) {
         acceptByFields = keyValue >= fromValue && keyValue <= toValue;
       } else if (fromValue) {
@@ -188,7 +196,6 @@ scout.ColumnUserFilter.prototype.accept = function(row) {
         acceptByFields = keyValue <= toValue;
       }
     }
-
   }
 
   return acceptByTable && acceptByFields;
@@ -205,8 +212,8 @@ scout.ColumnUserFilter.prototype.updateFilterFields = function(event) {
     this.numberFrom = this._toNumber(event.from),
     this.numberTo = this._toNumber(event.to);
   } else if (event.filterType === 'date') {
-    this.dateFrom = this._toDate(event.from),
-    this.dateTo = this._toDate(event.to);
+    this.dateFrom = event.from,
+    this.dateTo = event.to;
   } else {
     throw new Error('unknown filter type');
   }
@@ -225,11 +232,6 @@ scout.ColumnUserFilter.prototype._toNumber = function(numberString) {
   }
 
   return number;
-};
-
-// FIXME AWE: (filter) convert to date here (not in calculate), also convert to string when we send the filter-event to the server
-scout.ColumnUserFilter.prototype._toDate = function(dateString) {
-  return dateString || null;
 };
 
 scout.ColumnUserFilter.prototype.filterActive = function() {

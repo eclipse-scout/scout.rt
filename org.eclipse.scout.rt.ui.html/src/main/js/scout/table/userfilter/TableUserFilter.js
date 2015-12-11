@@ -15,6 +15,10 @@ scout.TableUserFilter.prototype.init = function(model) {
   if (!this.session) {
     throw new Error('Session expected: ' + this);
   }
+  this._init(model);
+};
+
+scout.TableUserFilter.prototype._init = function(model) {
   $.extend(this, model);
 };
 
