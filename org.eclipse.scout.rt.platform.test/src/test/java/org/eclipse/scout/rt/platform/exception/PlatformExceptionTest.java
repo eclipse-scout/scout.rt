@@ -10,12 +10,15 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.exception;
 
+import static org.eclipse.scout.rt.platform.util.CollectionUtility.arrayList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 
 import java.util.Arrays;
 
+import org.eclipse.scout.rt.platform.serialization.IObjectSerializer;
+import org.eclipse.scout.rt.platform.serialization.SerializationUtility;
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -99,6 +102,20 @@ public class PlatformExceptionTest {
         .withContextInfo("key3", "value 3");
 
     assertEquals(Arrays.asList("key1=value 1", "key2=value 2", "key3=value 3"), exception.getContextInfos());
+  }
+
+  @Test
+  public void testDeserializeException() throws Exception {
+    PlatformException exception = new PlatformException("exception").withContextInfo("name", "value");
+
+    IObjectSerializer serializer = SerializationUtility.createObjectSerializer();
+    PlatformException deserializedException = serializer.deserialize(serializer.serialize(exception), PlatformException.class);
+
+    assertEquals("exception", deserializedException.getDisplayMessage());
+    assertEquals(arrayList("name=value"), deserializedException.getContextInfos());
+
+    deserializedException.withContextInfo("otherName", "otherValue");
+    assertEquals(arrayList("name=value", "otherName=otherValue"), deserializedException.getContextInfos());
   }
 
   @Test

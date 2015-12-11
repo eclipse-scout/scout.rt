@@ -30,7 +30,7 @@ public class PlatformException extends RuntimeException implements Serializable 
 
   private transient boolean m_consumed;
 
-  private transient final List<String> m_contextInfos = new ArrayList<>();
+  private final List<String> m_contextInfos = new ArrayList<>();
 
   /**
    * Creates a {@link PlatformException} from the given message.
