@@ -65,7 +65,7 @@ public class ClientNotificationCoalescer {
     else {
       List<Serializable> notificationsIn = new ArrayList<>();
       for (ClientNotificationMessage singleMessage : messagesIn) {
-        notificationsIn.add(singleMessage);
+        notificationsIn.add(singleMessage.getNotification());
       }
       List<? extends Serializable> outNotifications = BEANS.get(NotificationCoalescer.class).coalesce(notificationsIn);
       List<ClientNotificationMessage> result = new ArrayList<ClientNotificationMessage>();
