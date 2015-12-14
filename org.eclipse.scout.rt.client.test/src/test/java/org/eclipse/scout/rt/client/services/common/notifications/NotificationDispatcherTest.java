@@ -14,6 +14,8 @@ import static org.mockito.Mockito.mock;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.clientnotification.ClientNotificationDispatcher;
@@ -27,6 +29,7 @@ import org.eclipse.scout.rt.platform.IgnoreBean;
 import org.eclipse.scout.rt.platform.job.DoneEvent;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IDoneHandler;
+import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.shared.notification.INotificationHandler;
@@ -85,7 +88,7 @@ public class NotificationDispatcherTest {
       public void run() throws Exception {
         final ClientNotificationDispatcher dispatcher = BEANS.get(ClientNotificationDispatcher.class);
         dispatcher.dispatch((IClientSession) IClientSession.CURRENT.get(), stringNotification);
-        dispatcher.waitForPendingNotifications();
+        waitForPendingNotifications(dispatcher);
       }
     }, Jobs.newInput()
         .withRunContext(ClientRunContexts.copyCurrent()))
@@ -111,7 +114,7 @@ public class NotificationDispatcherTest {
         dispatcher.dispatch((IClientSession) IClientSession.CURRENT.get(), new Notification01());
         dispatcher.dispatch((IClientSession) IClientSession.CURRENT.get(), new Notification02());
         dispatcher.dispatch((IClientSession) IClientSession.CURRENT.get(), new Notification02());
-        dispatcher.waitForPendingNotifications();
+        waitForPendingNotifications(dispatcher);
       }
     }, Jobs.newInput()
         .withRunContext(ClientRunContexts.copyCurrent()))
@@ -124,6 +127,18 @@ public class NotificationDispatcherTest {
     cond.waitFor();
     Mockito.verify(m_globalNotificationHanlder, Mockito.times(3)).handleNotification(Mockito.any(Serializable.class));
     Mockito.verify(m_groupNotificationHanlder, Mockito.times(2)).handleNotification(Mockito.any(INotificationGroup.class));
+  }
+
+  /**
+   * This method should only be used for debugging or test reasons. It waits for all notification jobs to be executed.
+   */
+  private void waitForPendingNotifications(ClientNotificationDispatcher dispatcher) {
+    final Set<IFuture<?>> futures = dispatcher.getPendingNotifications();
+    // TODO [5.2] jgu: how long to wait? Is this method still in use?
+    Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
+        .andMatchFuture(futures)
+        .andMatchNotFuture(IFuture.CURRENT.get())
+        .toFilter(), Integer.MAX_VALUE, TimeUnit.SECONDS);
   }
 
   @IgnoreBean

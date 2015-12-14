@@ -14,7 +14,6 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
@@ -116,9 +115,7 @@ public class ClientNotificationDispatcher {
           .withRunContext(ClientRunContexts.copyCurrent())
           .withName("Dispatching client notification"));
 
-      synchronized (m_notificationFutures) {
-        m_notificationFutures.add(future);
-      }
+      addPendingNotification(future);
 
       future.whenDone(new P_NotificationFutureCallback(future), null);
     }
@@ -150,32 +147,44 @@ public class ClientNotificationDispatcher {
           .withRunContext(ClientRunContexts.empty().withSession(session, true))
           .withName("Dispatching client notification"));
 
-      synchronized (m_notificationFutures) {
-        m_notificationFutures.add(future);
-      }
+      addPendingNotification(future);
 
       future.whenDone(new P_NotificationFutureCallback(future), null);
+    }
+  }
+
+  /**
+   * keep pending notification future to be able to wait for completion.
+   */
+  protected void addPendingNotification(IFuture<Void> future) {
+    synchronized (m_notificationFutures) {
+      m_notificationFutures.add(future);
+    }
+  }
+
+  /**
+   * keep pending notification future
+   */
+  protected void removePendingNotification(IFuture<Void> future) {
+    synchronized (m_notificationFutures) {
+      m_notificationFutures.remove(future);
+    }
+  }
+
+  /**
+   * @return pending notification futures to be able to to wait for completion.
+   */
+  public Set<IFuture<?>> getPendingNotifications() {
+    final Set<IFuture<?>> futures = new HashSet<>();
+    synchronized (m_notificationFutures) {
+      futures.addAll(m_notificationFutures);
+      return futures;
     }
   }
 
   protected void dispatchSync(Serializable notification) {
     NotificationHandlerRegistry reg = BEANS.get(NotificationHandlerRegistry.class);
     reg.notifyHandlers(notification);
-  }
-
-  /**
-   * This method should only be used for debugging or test reasons. It waits for all notification jobs to be executed.
-   */
-  public void waitForPendingNotifications() {
-    final Set<IFuture<?>> futures = new HashSet<>();
-    synchronized (m_notificationFutures) {
-      futures.addAll(m_notificationFutures);
-    }
-    // TODO [5.2] jgu: how long to wait? Is this method still in use?
-    Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
-        .andMatchFuture(futures)
-        .andMatchNotFuture(IFuture.CURRENT.get())
-        .toFilter(), Integer.MAX_VALUE, TimeUnit.SECONDS);
   }
 
   private class P_NotificationFutureCallback implements IDoneHandler<Void> {
@@ -187,9 +196,7 @@ public class ClientNotificationDispatcher {
 
     @Override
     public void onDone(DoneEvent<Void> event) {
-      synchronized (m_notificationFutures) {
-        m_notificationFutures.remove(m_future);
-      }
+      removePendingNotification(m_future);
     }
   }
 }
