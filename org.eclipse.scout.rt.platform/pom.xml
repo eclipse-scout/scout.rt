@@ -39,15 +39,61 @@
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
     </dependency>
-    <dependency>
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-classic</artifactId>
-      <scope>provided</scope>
-    </dependency>
+
+    <!-- optional logger dependencies -->
+
+    <!-- support for java.util.logging to slf4j -->
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>jul-to-slf4j</artifactId>
-      <scope>provided</scope>
+      <optional>true</optional>
+    </dependency>
+
+    <!-- logger output using logback -->
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <optional>true</optional>
+    </dependency>
+
+    <!-- logger output using log4j -->
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-log4j12</artifactId>
+      <optional>true</optional>
+    </dependency>
+
+    <!-- logger output using java.util.logging -->
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-jdk14</artifactId>
+      <optional>true</optional>
     </dependency>
   </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.basepom.maven</groupId>
+        <artifactId>duplicate-finder-maven-plugin</artifactId>
+        <configuration>
+          <ignoredDependencies>
+            <!-- slf4j bindings include classes with same name by design -->
+            <dependency>
+              <groupId>ch.qos.logback</groupId>
+              <artifactId>logback-classic</artifactId>
+            </dependency>
+            <dependency>
+              <groupId>org.slf4j</groupId>
+              <artifactId>slf4j-log4j12</artifactId>
+            </dependency>
+            <dependency>
+              <groupId>org.slf4j</groupId>
+              <artifactId>slf4j-jdk14</artifactId>
+            </dependency>
+          </ignoredDependencies>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>

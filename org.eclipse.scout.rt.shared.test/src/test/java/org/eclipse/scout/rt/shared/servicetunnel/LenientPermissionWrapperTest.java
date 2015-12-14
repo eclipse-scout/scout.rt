@@ -19,6 +19,9 @@ import java.security.Permissions;
 import java.util.ArrayList;
 import java.util.Enumeration;
 
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.logger.ILoggerSupport;
+import org.eclipse.scout.rt.platform.logger.ILoggerSupport.LogLevel;
 import org.eclipse.scout.rt.platform.serialization.IObjectSerializer;
 import org.eclipse.scout.rt.platform.serialization.SerializationUtility;
 import org.eclipse.scout.rt.platform.util.Base64Utility;
@@ -54,21 +57,20 @@ public class LenientPermissionWrapperTest {
 
   @Test
   public void read() throws Exception {
-    // FIXME abr: switch logging off and on again
-//    Logger logger2 = Logger.getLogger(LenientPermissionWrapper.class.getName());
-//    Level oldLevel2 = logger2.getLevel();
-//    try {
-//      logger2.setLevel(Level.OFF);
-    //
-    Permissions actual = getObjectSerializer().deserialize(new ByteArrayInputStream(Base64Utility.decode(data)), Permissions.class);
-    Permissions expected = new Permissions();
-    expected.add(new A());
-    expected.add(new C());
-    assertPermissionsEqual(expected, actual);
-//    }
-//    finally {
-//      logger2.setLevel(oldLevel2);
-//    }
+    ILoggerSupport loggerSupport = BEANS.get(ILoggerSupport.class);
+    LogLevel oldLevel = loggerSupport.getLogLevel(LenientPermissionWrapper.class);
+    try {
+      loggerSupport.setLogLevel(LenientPermissionWrapper.class, LogLevel.OFF);
+
+      Permissions actual = getObjectSerializer().deserialize(new ByteArrayInputStream(Base64Utility.decode(data)), Permissions.class);
+      Permissions expected = new Permissions();
+      expected.add(new A());
+      expected.add(new C());
+      assertPermissionsEqual(expected, actual);
+    }
+    finally {
+      loggerSupport.setLogLevel(LenientPermissionWrapper.class, oldLevel);
+    }
   }
 
   public static void assertPermissionsEqual(Permissions expected, Permissions actual) {

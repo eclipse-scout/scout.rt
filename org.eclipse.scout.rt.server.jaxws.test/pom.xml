@@ -44,5 +44,11 @@
       <groupId>org.eclipse.scout.rt</groupId>
       <artifactId>org.eclipse.scout.rt.server.test</artifactId>
     </dependency>
+
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 </project>
