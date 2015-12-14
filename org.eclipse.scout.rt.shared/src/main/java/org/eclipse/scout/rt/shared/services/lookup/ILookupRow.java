@@ -146,7 +146,7 @@ public interface ILookupRow<KEY_TYPE> extends Serializable {
   ILookupRow<KEY_TYPE> withActive(boolean active);
 
   /**
-   * @deprecated use {@link #setActive(active)}. will be removed in version 6.1.
+   * @deprecated use {@link #withActive(active)}. will be removed in version 6.1.
    */
   @Deprecated
   void setActive(boolean active);
