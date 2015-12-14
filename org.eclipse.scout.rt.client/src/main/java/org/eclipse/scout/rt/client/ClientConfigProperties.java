@@ -62,7 +62,6 @@ public final class ClientConfigProperties {
   /**
    * Specifies the maximal time (in seconds) to wait until running jobs are cancelled on session shutdown.
    */
-  // TODO [5.2] jgu: Add AbstractLongConfigProperty
   public static class JobCompletionDelayOnSessionShutdown extends AbstractPositiveLongConfigProperty {
 
     @Override
