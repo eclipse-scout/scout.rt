@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright (c) 2015 BSI Business Systems Integration AG.
+  All rights reserved. This program and the accompanying materials
+  are made available under the terms of the Eclipse Public License v1.0
+  which accompanies this distribution, and is available at
+  http://www.eclipse.org/legal/epl-v10.html
+
+  Contributors:
+  BSI Business Systems Integration AG - initial API and implementation
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+
+  <parent>
+    <groupId>org.eclipse.scout.rt</groupId>
+    <artifactId>org.eclipse.scout.rt</artifactId>
+    <version>5.2.0-SNAPSHOT</version>
+    <relativePath>../org.eclipse.scout.rt/pom.xml</relativePath>
+  </parent>
+
+  <artifactId>org.eclipse.scout.rt-settings</artifactId>
+  <packaging>jar</packaging>
+
+  <prerequisites>
+    <!-- Note that "prerequisites" not inherited, but used by versions-maven-plugin -->
+    <maven>${maven.min.version}</maven>
+  </prerequisites>
+
+  <build>
+    <defaultGoal>package</defaultGoal>
+    <resources>
+      <resource>
+        <directory>files</directory>
+        <filtering>false</filtering>
+        <includes>
+          <include>**/*</include>
+        </includes>
+      </resource>
+    </resources>
+
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
+</project>

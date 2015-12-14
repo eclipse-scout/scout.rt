@@ -22,7 +22,6 @@
 .project     text
 .classpath   text
 
-
 # These files are binary and should be left untouched
 # (binary is a macro for -text -diff)
 *.class  binary
@@ -37,3 +36,6 @@
 *.tar    binary
 *.exe    binary
 *.zip    binary
+*.exe    binary
+*polite.ini    binary
+*.ise    binary

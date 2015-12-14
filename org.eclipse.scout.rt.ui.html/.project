@@ -11,86 +11,13 @@
 			</arguments>
 		</buildCommand>
 		<buildCommand>
-			<name>com.eclipsesource.jshint.ui.builder</name>
-			<arguments>
-			</arguments>
-		</buildCommand>
-		<buildCommand>
-			<name>org.eclipse.wst.jsdt.core.javascriptValidator</name>
-			<arguments>
-			</arguments>
-		</buildCommand>
-		<buildCommand>
 			<name>org.eclipse.m2e.core.maven2Builder</name>
 			<arguments>
 			</arguments>
 		</buildCommand>
 	</buildSpec>
 	<natures>
-		<nature>org.eclipse.m2e.core.maven2Nature</nature>
 		<nature>org.eclipse.jdt.core.javanature</nature>
-		<nature>org.eclipse.wst.jsdt.core.jsNature</nature>
+		<nature>org.eclipse.m2e.core.maven2Nature</nature>
 	</natures>
-	<linkedResources>
-		<link>
-			<name>.settings/.jsdtscope</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/org.eclipse.scout.rt.platform/.settings/.jsdtscope</locationURI>
-		</link>
-		<link>
-			<name>.settings/com.eclipsesource.jshint.ui.prefs</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/org.eclipse.scout.rt.platform/.settings/com.eclipsesource.jshint.ui.prefs</locationURI>
-		</link>
-		<link>
-			<name>.settings/de.loskutov.anyedit.AnyEditTools.prefs</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/org.eclipse.scout.rt.platform/.settings/de.loskutov.anyedit.AnyEditTools.prefs</locationURI>
-		</link>
-		<link>
-			<name>.settings/org.eclipse.core.resources.prefs</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/org.eclipse.scout.rt.platform/.settings/org.eclipse.core.resources.prefs</locationURI>
-		</link>
-		<link>
-			<name>.settings/org.eclipse.core.runtime.prefs</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/org.eclipse.scout.rt.platform/.settings/org.eclipse.core.runtime.prefs</locationURI>
-		</link>
-		<link>
-			<name>.settings/org.eclipse.jdt.core.prefs</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/org.eclipse.scout.rt.platform/.settings/org.eclipse.jdt.core.prefs</locationURI>
-		</link>
-		<link>
-			<name>.settings/org.eclipse.jdt.ui.prefs</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/org.eclipse.scout.rt.platform/.settings/org.eclipse.jdt.ui.prefs</locationURI>
-		</link>
-		<link>
-			<name>.settings/org.eclipse.m2e.core.prefs</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/org.eclipse.scout.rt.platform/.settings/org.eclipse.m2e.core.prefs</locationURI>
-		</link>
-		<link>
-			<name>.settings/org.eclipse.wst.jsdt.core.prefs</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/org.eclipse.scout.rt.platform/.settings/org.eclipse.wst.jsdt.core.prefs</locationURI>
-		</link>
-		<link>
-			<name>.settings/org.eclipse.wst.jsdt.ui.prefs</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/org.eclipse.scout.rt.platform/.settings/org.eclipse.wst.jsdt.ui.prefs</locationURI>
-		</link>
-		<link>
-			<name>.settings/org.eclipse.wst.jsdt.ui.superType.container</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/org.eclipse.scout.rt.platform/.settings/org.eclipse.wst.jsdt.ui.superType.container</locationURI>
-		</link>
-		<link>
-			<name>.settings/org.eclipse.wst.jsdt.ui.superType.name</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/org.eclipse.scout.rt.platform/.settings/org.eclipse.wst.jsdt.ui.superType.name</locationURI>
-		</link>
-	</linkedResources>
 </projectDescription>
