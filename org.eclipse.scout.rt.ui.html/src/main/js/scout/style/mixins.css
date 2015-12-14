@@ -269,10 +269,14 @@
   }
 
   .sub-menu-icon(@icon: @icon-angle-down) {
-    display: inline-block;
+    display: block;
     #scout.font-icon();
     font-size: 18px;
     content: @icon;
+    height: 18px;
+    line-height: 18px;
+    position: relative;
+    top: -1px; /* optically center the arrow icon (see also: Popup.css) */
   }
 
   /* Invisible pseudo element that enables vertical-align if container has height set */

@@ -47,7 +47,7 @@
 
     &::before {
       #scout.sub-menu-icon(@icon-angle-up);
-      margin-top: -1px; /* optically center */
+      top: -2px; /* optically center the arrow icon (see also: mixins.css) */
     }
   }
 
