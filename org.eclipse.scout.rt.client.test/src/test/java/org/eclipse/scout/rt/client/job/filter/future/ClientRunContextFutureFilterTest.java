@@ -22,14 +22,16 @@ import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.platform.filter.IFilter;
+import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IMutex;
+import org.eclipse.scout.rt.platform.job.JobState;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.filter.future.FutureFilter;
-import org.eclipse.scout.rt.platform.job.internal.JobFutureTask;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.job.filter.future.SessionFutureFilter;
+import org.eclipse.scout.rt.testing.platform.job.JobTestUtil;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Before;
 import org.junit.Test;
@@ -57,7 +59,28 @@ public class ClientRunContextFutureFilterTest {
 
   @Test
   public void testBlocked() {
-    ((JobFutureTask) m_clientJobFuture).setBlocked(true);
+    final IBlockingCondition condition = Jobs.newBlockingCondition(true);
+
+    // Client Job
+    m_clientJobFuture = Jobs.schedule(new IRunnable() {
+
+      @Override
+      public void run() throws Exception {
+        condition.waitFor(10, TimeUnit.SECONDS);
+      }
+    }, Jobs.newInput().withRunContext(ClientRunContexts.empty().withSession(m_clientSession1, true)));
+
+    // Model Job
+    m_modelJobFuture = ModelJobs.schedule(new IRunnable() {
+
+      @Override
+      public void run() throws Exception {
+        condition.waitFor(10, TimeUnit.SECONDS);
+      }
+    }, ModelJobs.newInput(ClientRunContexts.empty().withSession(m_clientSession1, true)));
+
+    JobTestUtil.waitForState(m_clientJobFuture, JobState.WAITING_FOR_BLOCKING_CONDITION);
+    JobTestUtil.waitForState(m_modelJobFuture, JobState.WAITING_FOR_BLOCKING_CONDITION);
 
     assertTrue(Jobs.newFutureFilterBuilder()
         .andMatchRunContext(ClientRunContext.class)
@@ -66,31 +89,32 @@ public class ClientRunContextFutureFilterTest {
 
     assertTrue(Jobs.newFutureFilterBuilder()
         .andMatchRunContext(ClientRunContext.class)
-        .andAreBlocked()
+        .andMatchState(JobState.WAITING_FOR_BLOCKING_CONDITION)
         .toFilter()
         .accept(m_clientJobFuture));
 
     assertFalse(Jobs.newFutureFilterBuilder()
         .andMatchRunContext(ClientRunContext.class)
-        .andAreNotBlocked()
+        .andMatchNotState(JobState.WAITING_FOR_BLOCKING_CONDITION)
         .toFilter()
         .accept(m_clientJobFuture));
-
-    ((JobFutureTask) m_modelJobFuture).setBlocked(true);
 
     assertTrue(ModelJobs.newFutureFilterBuilder()
         .toFilter()
         .accept(m_modelJobFuture));
 
     assertTrue(ModelJobs.newFutureFilterBuilder()
-        .andAreBlocked()
+        .andMatchState(JobState.WAITING_FOR_BLOCKING_CONDITION)
         .toFilter()
         .accept(m_modelJobFuture));
 
     assertFalse(ModelJobs.newFutureFilterBuilder()
-        .andAreNotBlocked()
+        .andMatchNotState(JobState.WAITING_FOR_BLOCKING_CONDITION)
         .toFilter()
         .accept(m_modelJobFuture));
+
+    // Release threads
+    condition.setBlocking(false);
   }
 
   @Test

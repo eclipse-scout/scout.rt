@@ -18,7 +18,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.eclipse.scout.rt.platform.job.internal.NamedThreadFactory.JobState;
 import org.eclipse.scout.rt.platform.job.internal.NamedThreadFactory.ThreadInfo;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.slf4j.Logger;
@@ -85,7 +84,7 @@ class DelayedExecutor {
 
     @Override
     public void run() {
-      ThreadInfo.CURRENT.get().updateNameAndState(null, m_threadName, JobState.Running);
+      ThreadInfo.CURRENT.get().updateThreadName(null, m_threadName);
       try {
         while (!m_executor.isShutdown()) {
           try {

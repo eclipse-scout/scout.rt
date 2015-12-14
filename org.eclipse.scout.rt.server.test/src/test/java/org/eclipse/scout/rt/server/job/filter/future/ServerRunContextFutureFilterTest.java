@@ -61,27 +61,6 @@ public class ServerRunContextFutureFilterTest {
   }
 
   @Test
-  public void testBlocked() {
-    when(m_serverJobFuture.isBlocked()).thenReturn(true);
-    assertTrue(Jobs.newFutureFilterBuilder()
-        .andMatchRunContext(ServerRunContext.class)
-        .toFilter()
-        .accept(m_serverJobFuture));
-
-    assertTrue(Jobs.newFutureFilterBuilder()
-        .andMatchRunContext(ServerRunContext.class)
-        .andAreBlocked()
-        .toFilter()
-        .accept(m_serverJobFuture));
-
-    assertFalse(Jobs.newFutureFilterBuilder()
-        .andMatchRunContext(ServerRunContext.class)
-        .andAreNotBlocked()
-        .toFilter()
-        .accept(m_serverJobFuture));
-  }
-
-  @Test
   public void testPeriodic() {
     when(m_serverJobFuture.getSchedulingRule()).thenReturn(JobInput.SCHEDULING_RULE_PERIODIC_EXECUTION_AT_FIXED_RATE);
     assertTrue(Jobs.newFutureFilterBuilder()

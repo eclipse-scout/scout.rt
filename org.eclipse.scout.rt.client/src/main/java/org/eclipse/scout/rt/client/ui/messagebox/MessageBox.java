@@ -70,7 +70,7 @@ public class MessageBox extends AbstractPropertyObserver implements IMessageBox 
   // cached
   private String m_copyPasteTextInternal;
   // modality
-  private final IBlockingCondition m_blockingCondition = Jobs.newBlockingCondition("block", false);
+  private final IBlockingCondition m_blockingCondition = Jobs.newBlockingCondition(false);
   // result
   private int m_answer;
   private boolean m_answerSet;

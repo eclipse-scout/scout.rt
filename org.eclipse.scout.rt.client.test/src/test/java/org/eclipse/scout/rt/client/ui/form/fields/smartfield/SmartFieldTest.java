@@ -45,7 +45,6 @@ import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.eclipse.scout.rt.testing.shared.services.lookup.TestingLookupService;
 import org.eclipse.scout.testing.client.form.FormHandler;
-
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -405,7 +404,7 @@ public class SmartFieldTest {
 
   @Test
   public void testDefaultSelectionWithOnlyOneResult() throws Exception {
-    IBlockingCondition bc = Jobs.newBlockingCondition("loadProposals", true);
+    IBlockingCondition bc = Jobs.newBlockingCondition(true);
 
     PropertyChangeListener bcListener = getUnblockOnSearchResultListener(bc);
     m_form.getStyleField().getLookupRowFetcher().addPropertyChangeListener(bcListener);
@@ -434,7 +433,7 @@ public class SmartFieldTest {
 
   @Test
   public void testNoDefaultSelectionWithMoreThanOneResult() throws Exception {
-    IBlockingCondition bc = Jobs.newBlockingCondition("loadProposals", true);
+    IBlockingCondition bc = Jobs.newBlockingCondition(true);
 
     m_form.getStyleField().getLookupRowFetcher().addPropertyChangeListener(getUnblockOnSearchResultListener(bc));
     m_form.getStyleField().getUIFacade().openProposalChooserFromUI("*", false);

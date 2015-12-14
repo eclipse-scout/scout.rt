@@ -52,7 +52,7 @@ public class DonePromiseTest {
     final JobFutureTask<String> future = mock(JobFutureTask.class);
     when(future.isDone()).thenReturn(false);
 
-    final DonePromise<String> promise = new DonePromise<>(future, mock(JobManager.class));
+    final DonePromise<String> promise = new DonePromise<>(future);
 
     // Schedule job-1
     Jobs.schedule(new IRunnable() {

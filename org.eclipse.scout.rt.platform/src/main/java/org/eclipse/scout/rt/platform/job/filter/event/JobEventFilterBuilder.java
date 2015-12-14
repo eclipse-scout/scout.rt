@@ -25,10 +25,12 @@ import org.eclipse.scout.rt.platform.filter.NotFilter;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IMutex;
 import org.eclipse.scout.rt.platform.job.JobInput;
+import org.eclipse.scout.rt.platform.job.JobState;
 import org.eclipse.scout.rt.platform.job.filter.future.ExecutionHintFutureFilter;
 import org.eclipse.scout.rt.platform.job.filter.future.FutureFilter;
 import org.eclipse.scout.rt.platform.job.filter.future.JobNameFutureFilter;
 import org.eclipse.scout.rt.platform.job.filter.future.JobNameRegexFutureFilter;
+import org.eclipse.scout.rt.platform.job.filter.future.JobStateFutureFilter;
 import org.eclipse.scout.rt.platform.job.filter.future.MutexFutureFilter;
 import org.eclipse.scout.rt.platform.job.filter.future.PeriodicExecutionFutureFilter;
 import org.eclipse.scout.rt.platform.job.filter.future.RunContextFutureFilter;
@@ -86,6 +88,14 @@ public class JobEventFilterBuilder {
    */
   public JobEventFilterBuilder andMatchEventType(final JobEventType... eventTypes) {
     andMatch(new JobEventFilter(eventTypes));
+    return this;
+  }
+
+  /**
+   * To match all events for jobs which are in one of the given states.
+   */
+  public JobEventFilterBuilder andMatchState(final JobState... states) {
+    andMatch(new FutureFilterWrapperJobEventFilter(new JobStateFutureFilter(states)));
     return this;
   }
 

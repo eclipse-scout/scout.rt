@@ -28,9 +28,8 @@ import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
 import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.job.DoneEvent;
 import org.eclipse.scout.rt.platform.job.IDoneHandler;
+import org.eclipse.scout.rt.platform.job.JobState;
 import org.eclipse.scout.rt.platform.job.Jobs;
-import org.eclipse.scout.rt.platform.job.listener.JobEvent;
-import org.eclipse.scout.rt.platform.job.listener.JobEventType;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 
@@ -52,14 +51,12 @@ class DonePromise<RESULT> {
   private final Condition m_doneCondition = m_lock.newCondition();
 
   private final JobFutureTask<RESULT> m_future;
-  private final JobManager m_jobManager;
   private final List<PromiseHandler<RESULT>> m_handlers;
 
   private volatile DoneEvent<RESULT> m_doneEvent;
 
-  public DonePromise(final JobFutureTask<RESULT> future, final JobManager jobManager) {
+  public DonePromise(final JobFutureTask<RESULT> future) {
     m_future = future;
-    m_jobManager = jobManager;
     m_handlers = new ArrayList<>();
   }
 
@@ -71,8 +68,8 @@ class DonePromise<RESULT> {
     Assertions.assertTrue(m_future.isDone(), "Unexpected state: Future not in 'done' state");
     Assertions.assertNull(m_doneEvent, "Unexpected state: Promise already in 'done' state");
 
-    // IMPORTANT: event must be sent before any waiting thread is released.
-    m_jobManager.fireEvent(new JobEvent(m_jobManager, JobEventType.DONE).withFuture(m_future));
+    // Transition into 'done' state and fire 'done' event.
+    m_future.changeState(JobState.DONE);
 
     // Release any thread waiting for a future to become 'done'.
     m_lock.lock();
@@ -105,7 +102,7 @@ class DonePromise<RESULT> {
   public void whenDone(final IDoneHandler<RESULT> handler, final RunContext runContext) {
     m_lock.lock();
     try {
-      if (!isDoneEventFired()) {
+      if (!isDone()) {
         m_handlers.add(new PromiseHandler<>(handler, runContext));
         return;
       }
@@ -144,7 +141,7 @@ class DonePromise<RESULT> {
   public RESULT get() throws InterruptedException, ExecutionException {
     m_lock.lockInterruptibly();
     try {
-      while (!isDoneEventFired()) {
+      while (!isDone()) {
         m_doneCondition.await();
       }
     }
@@ -180,7 +177,7 @@ class DonePromise<RESULT> {
     m_lock.lockInterruptibly();
     try {
       long nanos = unit.toNanos(timeout);
-      while (!isDoneEventFired() && nanos > 0L) {
+      while (!isDone() && nanos > 0L) {
         nanos = m_doneCondition.awaitNanos(nanos);
       }
       if (nanos <= 0L) {
@@ -197,9 +194,9 @@ class DonePromise<RESULT> {
   // ==== Internal helper methods ==== //
 
   /**
-   * Returns <code>true</code>, if the future is in 'done' state, and upon firing 'done'.
+   * Returns <code>true</code>, if this promise is in 'done' state.
    */
-  private boolean isDoneEventFired() {
+  private boolean isDone() {
     return m_doneEvent != null;
   }
 
@@ -282,13 +279,13 @@ class DonePromise<RESULT> {
   };
 
   /**
-   * Matches futures in 'done' state and with the 'done' event fired.
+   * Matches futures in 'done' state, for which the 'done' event was fired.
    */
-  static final IFilter<JobFutureTask<?>> DONE_EVENT_FIRED_MATCHER = new IFilter<JobFutureTask<?>>() {
+  static final IFilter<JobFutureTask<?>> PROMISE_DONE_MATCHER = new IFilter<JobFutureTask<?>>() {
 
     @Override
     public boolean accept(final JobFutureTask<?> future) {
-      return future.getDonePromise().isDoneEventFired();
+      return future.getDonePromise().isDone();
     }
   };
 }

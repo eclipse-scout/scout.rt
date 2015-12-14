@@ -61,10 +61,6 @@ public class JobManagerChainTest {
     c = (IChainable) chainIterator.next();
     assertEquals(ExceptionProcessor.class, c.getClass());
 
-    // 5. FireAboutToRunProcessor
-    c = (IChainable) chainIterator.next();
-    assertEquals(FireJobLifecycleEventProcessor.class, c.getClass());
-
     assertFalse(chainIterator.hasNext());
   }
 }

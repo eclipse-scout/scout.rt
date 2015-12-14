@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.job.internal;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicLong;
@@ -102,94 +100,31 @@ public class NamedThreadFactory implements ThreadFactory, UncaughtExceptionHandl
     private final String m_originalThreadName;
     private final long m_sequence;
 
-    private volatile String m_currentThreadName;
-    private volatile String m_currentJobName;
-    private volatile JobState m_currentJobState;
-    private volatile String m_currentJobStateInfo;
-
     public ThreadInfo(final Thread thread, final String threadName, final long sequence) {
       m_thread = thread;
       m_originalThreadName = threadName;
       m_sequence = sequence;
-      m_currentJobState = JobState.Idle;
 
-      m_thread.setName(buildThreadName());
+      reset();
     }
 
     /**
-     * @return current job state.
+     * Resets the worker thread name to its original name.
      */
-    public synchronized JobState getCurrentJobState() {
-      return m_currentJobState;
+    public void reset() {
+      updateThreadName(m_originalThreadName, null);
     }
 
     /**
-     * Invoke to update the thread's state.
-     *
-     * @param jobState
-     *          new state of the current job.
-     * @param jobStateInfo
-     *          information associated with the new job state.
+     * Updates the thread name with the given name and some optional execution information.
      */
-    public synchronized void updateState(final JobState jobState, final String jobStateInfo) {
-      m_currentJobStateInfo = jobStateInfo;
-      m_currentJobState = jobState;
-      m_thread.setName(buildThreadName());
-    }
-
-    /**
-     * Invoke to update the thread's name and state.
-     *
-     * @param threadName
-     *          new thread name, or <code>null</code> to apply the thread's original name.
-     * @param jobName
-     *          name of the current job.
-     * @param state
-     *          state of the current job.
-     */
-    public synchronized void updateNameAndState(final String threadName, final String jobName, final JobState state) {
-      m_currentThreadName = threadName;
-      m_currentJobName = jobName;
-      m_currentJobState = state;
-      m_currentJobStateInfo = null;
-      m_thread.setName(buildThreadName());
-    }
-
-    /**
-     * Invoke to reset the {@link ThreadInfo}.
-     */
-    public synchronized void reset() {
-      m_currentThreadName = null;
-      m_currentJobName = null;
-      m_currentJobState = JobState.Idle;
-      m_currentJobStateInfo = null;
-      m_thread.setName(buildThreadName());
-    }
-
-    private String buildThreadName() {
-      final StringWriter writer = new StringWriter();
-      final PrintWriter out = new PrintWriter(writer);
-
-      out.print(StringUtility.nvl(m_currentThreadName, m_originalThreadName));
-      out.print("-");
-      out.print(m_sequence);
-      if (m_currentJobState != null) {
-        out.print(" (");
-        out.print(m_currentJobState);
-        if (StringUtility.hasText(m_currentJobStateInfo)) {
-          out.printf(" '%s'", m_currentJobStateInfo);
-        }
-        out.print(")");
+    public void updateThreadName(final String threadName, final String executionInfo) {
+      if (StringUtility.hasText(executionInfo)) {
+        m_thread.setName(String.format("%s-%s %s", StringUtility.nvl(threadName, m_originalThreadName), m_sequence, executionInfo));
       }
-      if (StringUtility.hasText(m_currentJobName)) {
-        out.printf(" \"%s\"", m_currentJobName);
+      else {
+        m_thread.setName(String.format("%s-%s", StringUtility.nvl(threadName, m_originalThreadName), m_sequence));
       }
-
-      return writer.toString();
     }
-  }
-
-  public static enum JobState {
-    Idle, Running, Blocked, Resuming;
   }
 }

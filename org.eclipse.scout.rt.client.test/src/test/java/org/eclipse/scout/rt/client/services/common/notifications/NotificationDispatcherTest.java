@@ -80,7 +80,7 @@ public class NotificationDispatcherTest {
 
   @Test
   public void testStringNotification() {
-    final IBlockingCondition cond = Jobs.newBlockingCondition("Suspend JUnit model thread", true);
+    final IBlockingCondition cond = Jobs.newBlockingCondition(true);
     final String stringNotification = "A simple string notification";
 
     Jobs.schedule(new IRunnable() {
@@ -105,7 +105,7 @@ public class NotificationDispatcherTest {
 
   @Test
   public void testSuperClassNotification() {
-    final IBlockingCondition cond = Jobs.newBlockingCondition("Suspend JUnit model thread1", true);
+    final IBlockingCondition cond = Jobs.newBlockingCondition(true);
 
     Jobs.schedule(new IRunnable() {
       @Override

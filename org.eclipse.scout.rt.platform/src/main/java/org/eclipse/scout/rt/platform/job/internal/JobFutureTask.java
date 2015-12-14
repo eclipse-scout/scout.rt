@@ -26,6 +26,7 @@ import java.util.concurrent.TimeUnit;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.annotations.Internal;
 import org.eclipse.scout.rt.platform.chain.callable.CallableChain;
+import org.eclipse.scout.rt.platform.chain.callable.ICallableDecorator;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.exception.DefaultRuntimeExceptionTranslator;
@@ -37,6 +38,7 @@ import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IJobListenerRegistration;
 import org.eclipse.scout.rt.platform.job.IMutex;
 import org.eclipse.scout.rt.platform.job.JobInput;
+import org.eclipse.scout.rt.platform.job.JobState;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.job.listener.JobEventType;
@@ -69,11 +71,11 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
   protected final Long m_expirationDate;
 
   protected final DonePromise<RESULT> m_donePromise;
+  protected final CallableChain<RESULT> m_callableChain;
   protected final List<JobListenerWithFilter> m_listeners = new CopyOnWriteArrayList<>();
 
-  protected volatile boolean m_blocked;
-
-  protected Set<String> m_executionHints = new HashSet<>();
+  protected volatile JobState m_state;
+  protected volatile Set<String> m_executionHints = new HashSet<>();
 
   public JobFutureTask(final JobManager jobManager, final RunMonitor runMonitor, final JobInput input, final CallableChain<RESULT> callableChain, final Callable<RESULT> callable) {
     super(new Callable<RESULT>() {
@@ -87,16 +89,27 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
     m_jobManager = jobManager;
     m_runMonitor = runMonitor;
     m_input = input;
-    m_donePromise = new DonePromise<>(this, jobManager);
+    m_callableChain = callableChain;
 
+    // Initialize this Future
+    m_donePromise = new DonePromise<>(this);
     m_expirationDate = (input.getExpirationTimeMillis() != JobInput.INFINITE_EXPIRATION ? System.currentTimeMillis() + input.getExpirationTimeMillis() : null);
-
-    m_jobManager.registerFuture(this);
-    m_runMonitor.registerCancellable(this); // Register to also cancel this Future once the RunMonitor is cancelled (even if the job is not executed yet).
-
     m_executionHints.addAll(input.getExecutionHints());
 
-    m_jobManager.fireEvent(new JobEvent(m_jobManager, JobEventType.SCHEDULED).withFuture(this));
+    // Contribute to the CallableChain
+    m_jobManager.interceptCallableChain(m_callableChain, this, m_runMonitor, m_input);
+    m_callableChain.addLast(new ICallableDecorator<RESULT>() {
+
+      @Override
+      public IUndecorator<RESULT> decorate() throws Exception {
+        changeState(JobState.RUNNING);
+        return null;
+      }
+    });
+
+    // Register this Future
+    m_jobManager.registerFuture(this);
+    m_runMonitor.registerCancellable(this); // Register to also cancel this Future once the RunMonitor is cancelled (even if the job is not executed yet).
   }
 
   /**
@@ -114,7 +127,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
 
   @Override
   public final void reject() {
-    m_jobManager.fireEvent(new JobEvent(m_jobManager, JobEventType.REJECTED).withFuture(this));
+    changeState(JobState.REJECTED);
     cancel(true); // to enter 'DONE' state and to release a potential waiting submitter.
     releaseMutex();
   }
@@ -144,18 +157,6 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
   }
 
   @Override
-  public boolean isBlocked() {
-    return m_blocked;
-  }
-
-  /**
-   * Marks this task as 'blocked' or 'unblocked'.
-   */
-  public void setBlocked(final boolean blocked) {
-    m_blocked = blocked;
-  }
-
-  @Override
   public int getSchedulingRule() {
     return m_input.getSchedulingRule();
   }
@@ -181,14 +182,19 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
   }
 
   @Override
+  public JobState getState() {
+    return m_state;
+  }
+
+  @Override
   public boolean addExecutionHint(final String hint) {
     try {
       return m_executionHints.add(hint);
     }
     finally {
-      m_jobManager.fireEvent(new JobEvent(m_jobManager, JobEventType.EXECUTION_HINT_CHANGED)
+      m_jobManager.fireEvent(new JobEvent(m_jobManager, JobEventType.JOB_EXECUTION_HINT_ADDED)
           .withFuture(this)
-          .withExecutionHint(hint));
+          .withData(hint));
     }
   }
 
@@ -198,9 +204,9 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
       return m_executionHints.remove(hint);
     }
     finally {
-      m_jobManager.fireEvent(new JobEvent(m_jobManager, JobEventType.EXECUTION_HINT_CHANGED)
+      m_jobManager.fireEvent(new JobEvent(m_jobManager, JobEventType.JOB_EXECUTION_HINT_REMOVED)
           .withFuture(this)
-          .withExecutionHint(hint));
+          .withData(hint));
     }
   }
 
@@ -384,7 +390,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
   }
 
   /**
-   * Releases the mutex if being a mutual exclusive task and currently the mutex owner.
+   * Releases the mutex if being a mutually exclusive task and currently the mutex owner.
    */
   protected void releaseMutex() {
     if (isMutexOwner()) {
@@ -409,11 +415,25 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
     return exception;
   }
 
+  /**
+   * Sets the new state, and fires {@link JobEvent}, unless being in {@link JobState#DONE} or {@link JobState#REJECTED}.
+   */
+  protected synchronized void changeState(final JobState state) {
+    if (m_state == JobState.DONE || m_state == JobState.REJECTED) {
+      return;
+    }
+
+    m_state = state;
+    m_jobManager.fireEvent(new JobEvent(m_jobManager, JobEventType.JOB_STATE_CHANGED)
+        .withData(state)
+        .withFuture(this));
+  }
+
   @Override
   public String toString() {
     final ToStringBuilder builder = new ToStringBuilder(this);
     builder.attr("job", m_input);
-    builder.attr("blocked", m_blocked);
+    builder.attr("state", m_state);
     builder.attr("expirationDate", m_expirationDate);
     return builder.toString();
   }

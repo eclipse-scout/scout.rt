@@ -10,59 +10,32 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.job.listener;
 
-import org.eclipse.scout.rt.platform.job.IBlockingCondition;
-import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.job.JobState;
 
 /**
- * Event to describe the job lifecycle change.
+ * Describes the semantic of a {@link JobEvent}.
  *
  * @since 5.1
  */
 public enum JobEventType {
   /**
-   * Indicates that a job was scheduled.
+   * Signals that a job transitioned to a new {@link JobState}, e.g. form {@link JobState#SCHEDULED} to
+   * {@link JobState#RUNNING}.
    */
-  SCHEDULED,
+  JOB_STATE_CHANGED,
+
   /**
-   * Indicates that a job was rejected for execution. This might happen if the job manager has been shutdown, or if no
-   * more worker threads are available.
+   * Signals that an execution hint was added to a job.
    */
-  REJECTED,
+  JOB_EXECUTION_HINT_ADDED,
+
   /**
-   * Indicates that a job is about to commence execution.
+   * Signals that an execution hint was removed from a job.
    */
-  ABOUT_TO_RUN,
+  JOB_EXECUTION_HINT_REMOVED,
+
   /**
-   * Indicates that a job finished execution, either normally or because it was cancelled. Use
-   * {@link IFuture#isCancelled()} to check for cancellation.
+   * Signals that the job manager was shutdown.
    */
-  DONE,
-  /**
-   * Indicates that the job manager was shutdown.
-   */
-  SHUTDOWN,
-  /**
-   * Indicates that a job entered a blocking condition and is waiting for it to fall.
-   *
-   * @see IBlockingCondition
-   */
-  BLOCKED,
-  /**
-   * Indicates that a job was waiting for a blocking condition to fall and is now resuming execution.
-   *
-   * @see IBlockingCondition
-   */
-  UNBLOCKED,
-  /**
-   * Indicates that an unblocked job resumed execution. For jobs which do not operate on a mutex object, this event
-   * corresponds to the 'unblock-event'. If being a mutex job, this event is fired once the mutex is acquired to
-   * continue execution.
-   *
-   * @see IBlockingCondition
-   */
-  RESUMED,
-  /**
-   * Indicates a change in the execution hints of a job.
-   */
-  EXECUTION_HINT_CHANGED
+  JOB_MANAGER_SHUTDOWN;
 }

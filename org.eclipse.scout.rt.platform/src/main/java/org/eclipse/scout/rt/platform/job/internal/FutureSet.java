@@ -33,10 +33,9 @@ import org.eclipse.scout.rt.platform.filter.OrFilter;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IJobListenerRegistration;
 import org.eclipse.scout.rt.platform.job.IJobManager;
-import org.eclipse.scout.rt.platform.job.Jobs;
+import org.eclipse.scout.rt.platform.job.JobState;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
-import org.eclipse.scout.rt.platform.job.listener.JobEventType;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.visitor.IVisitor;
 
@@ -54,7 +53,7 @@ public class FutureSet {
   private final WriteLock m_writeLock;
   private final Condition m_changedCondition;
 
-  private IJobListenerRegistration m_listenerRegistration;
+  private IJobListenerRegistration m_jobListenerRegistration;
 
   public FutureSet() {
     m_futures = new HashSet<>(CONFIG.getPropertyValue(JobManagerInitialFutureSetCapacityProperty.class));
@@ -69,31 +68,26 @@ public class FutureSet {
    * Invoke to initialize this {@link FutureSet}.
    */
   public void init(final IJobManager jobManager) {
-    m_listenerRegistration = jobManager.addListener(Jobs.newEventFilterBuilder()
-        .andMatchEventType(
-            JobEventType.BLOCKED,
-            JobEventType.UNBLOCKED,
-            JobEventType.EXECUTION_HINT_CHANGED)
-        .toFilter(),
-        new IJobListener() {
-          @Override
-          public void changed(final JobEvent event) {
-            m_writeLock.lock();
-            try {
-              m_changedCondition.signalAll();
-            }
-            finally {
-              m_writeLock.unlock();
-            }
-          }
-        });
+    m_jobListenerRegistration = jobManager.addListener(newSignalingFilter(), new IJobListener() {
+
+      @Override
+      public void changed(final JobEvent event) {
+        m_writeLock.lock();
+        try {
+          m_changedCondition.signalAll();
+        }
+        finally {
+          m_writeLock.unlock();
+        }
+      }
+    });
   }
 
   /**
    * Invoke to destroy this {@link FutureSet}.
    */
   public void dispose() {
-    m_listenerRegistration.dispose();
+    m_jobListenerRegistration.dispose();
 
     // Clear and cancel all futures.
     final List<JobFutureTask<?>> runningFutures;
@@ -150,7 +144,7 @@ public class FutureSet {
    *          to match the filtered Futures.
    * @return <code>true</code> if all Futures accepted by the specified Filter are successfully matched.
    */
-  public boolean matchesAll(final IFilter<IFuture<?>> filter, IFilter<JobFutureTask<?>> matcher) {
+  public boolean matchesAll(final IFilter<IFuture<?>> filter, final IFilter<JobFutureTask<?>> matcher) {
     for (final JobFutureTask<?> future : copyFutures()) {
       if (filter != null && !filter.accept(future)) {
         continue;
@@ -186,7 +180,7 @@ public class FutureSet {
     m_writeLock.lockInterruptibly();
     try {
       long nanos = unit.toNanos(timeout);
-      while (!matchesAll(filter, DonePromise.DONE_EVENT_FIRED_MATCHER) && nanos > 0L) {
+      while (!matchesAll(filter, DonePromise.PROMISE_DONE_MATCHER) && nanos > 0L) {
         nanos = m_changedCondition.awaitNanos(nanos);
       }
 
@@ -259,5 +253,34 @@ public class FutureSet {
     finally {
       m_readLock.unlock();
     }
+  }
+
+  /**
+   * Creates the filter to signal waiting threads upon a job event.
+   */
+  protected IFilter<JobEvent> newSignalingFilter() {
+    return new IFilter<JobEvent>() {
+
+      @Override
+      public boolean accept(final JobEvent event) {
+        switch (event.getType()) {
+          case JOB_EXECUTION_HINT_ADDED:
+          case JOB_EXECUTION_HINT_REMOVED:
+            return true; // manual signaling required
+          case JOB_STATE_CHANGED:
+            switch ((JobState) event.getData()) {
+              case PENDING:
+              case RUNNING:
+              case WAITING_FOR_BLOCKING_CONDITION:
+              case WAITING_FOR_MUTEX:
+                return true; // manual signaling required
+              default:
+                return false; // signaling done by adding/removing the Future
+            }
+          default:
+            return false;
+        }
+      }
+    };
   }
 }

@@ -202,12 +202,10 @@ public interface IJobManager {
    * <p>
    * See {@link IBlockingCondition} for more information.
    *
-   * @param name
-   *          the name of the blocking condition; primarily used for logging purpose.
    * @param blocking
    *          initial blocking-state of the blocking condition.
    */
-  IBlockingCondition newBlockingCondition(String name, boolean blocking);
+  IBlockingCondition newBlockingCondition(boolean blocking);
 
   /**
    * Interrupts all running tasks and prevents scheduled tasks from running. After having shutdown, this job manager

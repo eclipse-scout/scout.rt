@@ -10,29 +10,29 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.job.filter.future;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.eclipse.scout.rt.platform.filter.IFilter;
-import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.job.JobState;
 
 /**
- * Depending on the given 'blocked' argument, this filter accepts only blocked or non-blocked Futures.
+ * Filter to accept Futures in a specific {@link JobState}.
  *
- * @see IBlockingCondition
- * @since 5.1
+ * @since 5.2
  */
-public class BlockedFutureFilter implements IFilter<IFuture<?>> {
+public class JobStateFutureFilter implements IFilter<IFuture<?>> {
 
-  public static final IFilter<IFuture<?>> INSTANCE_BLOCKED = new BlockedFutureFilter(true);
-  public static final IFilter<IFuture<?>> INSTANCE_NOT_BLOCKED = new BlockedFutureFilter(false);
+  private final Set<JobState> m_states;
 
-  private final boolean m_blocked;
-
-  private BlockedFutureFilter(final boolean blocked) {
-    m_blocked = blocked;
+  public JobStateFutureFilter(final JobState... states) {
+    m_states = new HashSet<>(Arrays.asList(states));
   }
 
   @Override
   public boolean accept(final IFuture<?> future) {
-    return future.isBlocked() == m_blocked;
+    return m_states.contains(future.getState());
   }
 }

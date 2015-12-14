@@ -41,6 +41,7 @@ import org.eclipse.scout.rt.platform.job.IJobListenerRegistration;
 import org.eclipse.scout.rt.platform.job.IJobManager;
 import org.eclipse.scout.rt.platform.job.IMutex.QueuePosition;
 import org.eclipse.scout.rt.platform.job.JobInput;
+import org.eclipse.scout.rt.platform.job.JobState;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.job.listener.JobEventType;
@@ -92,13 +93,13 @@ public class JobManager implements IJobManager, IPlatformListener {
 
     switch (input.getSchedulingRule()) {
       case JobInput.SCHEDULING_RULE_SINGLE_EXECUTION:
-        scheduleDelayed(futureTask, input.getSchedulingDelay());
+        scheduleDelayed(futureTask, futureTask, input.getSchedulingDelay());
         break;
       case JobInput.SCHEDULING_RULE_PERIODIC_EXECUTION_AT_FIXED_RATE:
-        scheduleDelayed(new FixedRateRunnable(m_executor, m_delayedExecutor, futureTask, input.getPeriodicDelay()), input.getSchedulingDelay());
+        scheduleDelayed(futureTask, new FixedRateRunnable(m_executor, m_delayedExecutor, futureTask, input.getPeriodicDelay()), input.getSchedulingDelay());
         break;
       case JobInput.SCHEDULING_RULE_PERIODIC_EXECUTION_WITH_FIXED_DELAY:
-        scheduleDelayed(new FixedDelayRunnable(m_executor, m_delayedExecutor, futureTask, input.getPeriodicDelay()), input.getSchedulingDelay());
+        scheduleDelayed(futureTask, new FixedDelayRunnable(m_executor, m_delayedExecutor, futureTask, input.getPeriodicDelay()), input.getSchedulingDelay());
         break;
       default:
         throw new UnsupportedOperationException("Unsupported scheduling rule");
@@ -142,7 +143,7 @@ public class JobManager implements IJobManager, IPlatformListener {
       // NOOP
     }
 
-    fireEvent(new JobEvent(this, JobEventType.SHUTDOWN));
+    fireEvent(new JobEvent(this, JobEventType.JOB_MANAGER_SHUTDOWN));
   }
 
   @Override
@@ -164,16 +165,19 @@ public class JobManager implements IJobManager, IPlatformListener {
    * Runs the given task asynchronously, but not before the given delay elapses.
    */
   @Internal
-  protected void scheduleDelayed(final IRejectableRunnable runnable, final long schedulingDelay) {
+  protected void scheduleDelayed(final JobFutureTask<?> futureTask, final IRejectableRunnable runnable, final long schedulingDelay) {
+    futureTask.changeState(JobState.SCHEDULED);
+
     if (schedulingDelay <= 0L) {
-      competeForMutexAndExecute(runnable);
+      competeForMutexAndExecute(futureTask, runnable);
     }
     else {
+      futureTask.changeState(JobState.PENDING);
       m_delayedExecutor.schedule(new IRejectableRunnable() {
 
         @Override
         public void run() {
-          competeForMutexAndExecute(runnable);
+          competeForMutexAndExecute(futureTask, runnable);
         }
 
         @Override
@@ -187,10 +191,11 @@ public class JobManager implements IJobManager, IPlatformListener {
   /**
    * Executes the given runnable, and if being a mutually exclusive task, acquires the mutex first.
    */
-  private void competeForMutexAndExecute(final IRejectableRunnable runnable) {
+  private void competeForMutexAndExecute(final JobFutureTask<?> futureTask, final IRejectableRunnable runnable) {
     if (runnable instanceof JobFutureTask && ((JobFutureTask) runnable).getMutex() != null) {
       final JobFutureTask<?> mutexTask = (JobFutureTask) runnable;
 
+      futureTask.changeState(JobState.WAITING_FOR_MUTEX);
       mutexTask.getMutex().compete(mutexTask, QueuePosition.TAIL, new IMutexAcquiredCallback() {
 
         @Override
@@ -222,13 +227,7 @@ public class JobManager implements IJobManager, IPlatformListener {
     final RunMonitor runMonitor = Assertions.assertNotNull(input.getRunContext() != null ? input.getRunContext().getRunMonitor() : BEANS.get(RunMonitor.class), "'RunMonitor' required if providing a 'RunContext'");
 
     final JobInput inputCopy = ensureJobInputName(input, callable.getClass().getName());
-    final CallableChain<RESULT> callableChain = new CallableChain<>();
-    final JobFutureTask<RESULT> futureTask = new JobFutureTask<>(this, runMonitor, inputCopy, callableChain, callable);
-
-    // Add functionality to be applied while executing the Callable (Thread-Locals, RunContext, ...).
-    interceptCallableChain(callableChain, futureTask, runMonitor, inputCopy);
-
-    return futureTask;
+    return new JobFutureTask<>(this, runMonitor, inputCopy, new CallableChain<RESULT>(), callable);
   }
 
   /**
@@ -294,15 +293,14 @@ public class JobManager implements IJobManager, IPlatformListener {
     callableChain
         .add(new ThreadLocalProcessor<>(IFuture.CURRENT, future))
         .add(new ThreadLocalProcessor<>(RunMonitor.CURRENT, runMonitor))
-        .add(new ThreadNameDecorator(input.getThreadName(), input.getName()))
+        .add(new ThreadNameDecorator())
         .add(new RunContextRunner<RESULT>(input.getRunContext()))
-        .add(new ExceptionProcessor<RESULT>(input)) // Must following RunContextRunner to handle exception in proper RunContext.
-        .add(new FireJobLifecycleEventProcessor<>(JobEventType.ABOUT_TO_RUN, this, future));
+        .add(new ExceptionProcessor<RESULT>(input)); // must following RunContextRunner to handle exception in proper RunContext
   }
 
   @Override
-  public IBlockingCondition newBlockingCondition(final String name, final boolean blocking) {
-    return new BlockingCondition(name, blocking, this);
+  public IBlockingCondition newBlockingCondition(final boolean blocking) {
+    return new BlockingCondition(blocking);
   }
 
   @Internal

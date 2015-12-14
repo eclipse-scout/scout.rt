@@ -75,17 +75,16 @@ public interface IFuture<RESULT> extends ICancellable {
   boolean isDone();
 
   /**
-   * @return <code>true</code> if the associated job is waiting for a blocking condition to fall.
-   * @see IBlockingCondition
-   */
-  boolean isBlocked();
-
-  /**
    * Returns the scheduling rule how this job is executed, and is one of {@link #SCHEDULING_RULE_SINGLE_EXECUTION}, or
    * {@link #SCHEDULING_RULE_PERIODIC_EXECUTION_AT_FIXED_RATE}, or
    * {@link #SCHEDULING_RULE_PERIODIC_EXECUTION_WITH_FIXED_DELAY}.
    */
   int getSchedulingRule();
+
+  /**
+   * Returns this future's current state; is never <code>null</code>.
+   */
+  JobState getState();
 
   /**
    * Waits if necessary for the job to complete, or until cancelled. This method does not throw an exception if

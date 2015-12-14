@@ -18,8 +18,10 @@ import java.util.concurrent.TimeUnit;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
+import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IJobManager;
 import org.eclipse.scout.rt.platform.job.IMutex;
+import org.eclipse.scout.rt.platform.job.JobState;
 import org.eclipse.scout.rt.platform.job.internal.JobManager;
 
 /**
@@ -56,6 +58,21 @@ public class JobTestUtil {
     while (mutex.getCompetitorCount() != expectedCompetitorCount) {
       if (System.currentTimeMillis() > deadline) {
         fail(String.format("Timeout elapsed while waiting for a mutex-permit count. [expectedPermitCount=%s, actualPermitCount=%s]", expectedCompetitorCount, mutex.getCompetitorCount()));
+      }
+      Thread.yield();
+    }
+  }
+
+  /**
+   * Blocks the calling thread until the job enters the given state. This method blocks 30s at maximum, and throws an
+   * {@link AssertionError} if elapsed.
+   */
+  public static void waitForState(final IFuture<?> future, final JobState state) {
+    final long deadline = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(30);
+
+    while (future.getState() != state) {
+      if (System.currentTimeMillis() > deadline) {
+        fail(String.format("Timeout elapsed while waiting for a job to enter a state. [expectedState=%s, currentState=%s]", state, future.getState()));
       }
       Thread.yield();
     }

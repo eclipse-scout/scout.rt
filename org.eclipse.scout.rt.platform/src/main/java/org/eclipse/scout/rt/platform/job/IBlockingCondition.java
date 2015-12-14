@@ -26,17 +26,17 @@ import org.eclipse.scout.rt.platform.util.concurrent.TimeoutException;
 public interface IBlockingCondition {
 
   /**
-   * @return <code>true</code> if this condition blocks if calling {@link #waitFor()}.
+   * @return <code>true</code> if this condition blocks if calling {@link #waitFor(String...)} or
+   *         {@link #waitFor(long, TimeUnit, String...)}.
    */
   boolean isBlocking();
 
   /**
-   * Invoke this method to change the blocking-state of this blocking condition. This method can be invoked from any
-   * thread.
-   * <p/>
-   * If <code>true</code>, this condition will block subsequent calls on {@link #waitFor()}. If <code>false</code>, the
-   * condition is invalidated, meaning that the blocking-state is set to <code>false</code> and any threads waiting for
-   * this condition to fall are released.
+   * Invoke to change the blocking-state of this blocking condition. This method can be invoked from any thread.
+   * <p>
+   * If <code>true</code>, this condition will block subsequent calls on {@link #waitFor(String...)} or
+   * {@link #waitFor(long, TimeUnit, String...)}. If <code>false</code>, the condition is invalidated, meaning that the
+   * blocking-state is set to <code>false</code> and any thread waiting for this condition to fall is released.
    *
    * @param blocking
    *          <code>true</code> to arm this condition, or <code>false</code> to invalidate it and release all waiting
@@ -45,45 +45,42 @@ public interface IBlockingCondition {
   void setBlocking(boolean blocking);
 
   /**
-   * Waits if necessary for the <em>blocking-state</em> of this blocking condition to become <em>unblocked</em>.
-   * Thereto, the current thread becomes disabled for thread scheduling purposes and lies dormant. This method returns
-   * immediately, if this blocking condition is not <em>blocking</em> at the time of invocation.
-   * <p>
-   * <strong>If this method returns with an exception, and if being invoked from within a mutually exclusive job, the
-   * current thread is not synchronized with the mutex anymore and should terminate its work.</strong>
+   * Waits if necessary for the blocking state of this blocking condition to become <em>unblocked</em>. Thereto, the
+   * current thread becomes disabled for thread scheduling purposes and lies dormant. This method returns immediately,
+   * if this blocking condition is not <em>blocking</em> at the time of invocation.
    *
    * @param executionHints
-   *          optional execution hints to be associated with the current {@link IFuture} for the time of blocking the
-   *          current thread; has no effect if not running in a job.
+   *          optional execution hints to be associated with the current {@link IFuture} for the time of waiting; has no
+   *          effect if not running on behalf of a job.
    * @throws InterruptedException
-   *           if the current thread was interrupted while waiting.
+   *           if the current thread was interrupted while waiting. But, even if not waiting anymore, the blocking
+   *           condition might still be in blocking state. Also, if being a mutually exclusive job, the thread did not
+   *           acquire the mutex, meaning that the thread should terminate its work or waiting anew for the condition to
+   *           fall.
    */
   void waitFor(String... executionHints);
 
   /**
-   * Waits if necessary for at most the given time for the <em>blocking-state</em> of this blocking condition to become
+   * Waits if necessary for at most the given time for the blocking state of this blocking condition to become
    * <em>unblocked</em>. Thereto, the current thread becomes disabled for thread scheduling purposes and lies dormant.
    * This method returns immediately, if this blocking condition is not <em>blocking</em> at the time of invocation.
-   * <p>
-   * <strong>If this method returns with an exception, and if being invoked from within a mutually exclusive job, the
-   * current thread is not synchronized with the mutex anymore and should terminate its work.</strong>
    *
    * @param timeout
    *          the maximal time to wait.
    * @param unit
    *          unit of the given timeout.
    * @param executionHints
-   *          optional execution hints to be associated with the current {@link IFuture} for the time of blocking the
-   *          current thread; has no effect if not running in a job.
+   *          optional execution hints to be associated with the current {@link IFuture} for the time of waiting; has no
+   *          effect if not running on behalf of a job.
    * @throws InterruptedException
-   *           if the current thread was interrupted while waiting.
+   *           if the current thread was interrupted while waiting. But, even if not waiting anymore, the blocking
+   *           condition might still be in blocking state. Also, if being a mutually exclusive job, the thread did not
+   *           acquire the mutex, meaning that the thread should terminate its work or waiting anew for the condition to
+   *           fall.
    * @throws TimeoutException
-   *           if the wait timed out.
+   *           if the wait timed out. But, even if not waiting anymore, the blocking condition might still be in
+   *           blocking state. Also, if being a mutually exclusive job, the thread did not acquire the mutex, meaning
+   *           that the thread should terminate its work or waiting anew for the condition to fall.
    */
   void waitFor(long timeout, TimeUnit unit, String... executionHints);
-
-  /**
-   * @return the name of this blocking condition.
-   */
-  String getName();
 }

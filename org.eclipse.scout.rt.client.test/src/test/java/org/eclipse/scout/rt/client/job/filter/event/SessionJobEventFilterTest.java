@@ -37,35 +37,35 @@ public class SessionJobEventFilterTest {
     SessionJobEventFilter filter = new SessionJobEventFilter(session1);
 
     // Tests JobEvent of an event without a job associated
-    JobEvent event = new JobEvent(mock(IJobManager.class), JobEventType.ABOUT_TO_RUN)
+    JobEvent event = new JobEvent(mock(IJobManager.class), JobEventType.JOB_STATE_CHANGED)
         .withFuture(null);
     assertFalse(filter.accept(event));
 
     // Tests JobEvent with job without RunContext
-    event = new JobEvent(mock(IJobManager.class), JobEventType.ABOUT_TO_RUN)
+    event = new JobEvent(mock(IJobManager.class), JobEventType.JOB_STATE_CHANGED)
         .withFuture(Jobs.schedule(mock(IRunnable.class), Jobs.newInput()));
     assertFalse(filter.accept(event));
 
     // Tests JobEvent with job with RunContext
-    event = new JobEvent(mock(IJobManager.class), JobEventType.ABOUT_TO_RUN)
+    event = new JobEvent(mock(IJobManager.class), JobEventType.JOB_STATE_CHANGED)
         .withFuture(Jobs.schedule(mock(IRunnable.class), Jobs.newInput()
             .withRunContext(RunContexts.empty())));
     assertFalse(filter.accept(event));
 
     // Tests JobEvent with job with ClientRunContext without session
-    event = new JobEvent(mock(IJobManager.class), JobEventType.ABOUT_TO_RUN)
+    event = new JobEvent(mock(IJobManager.class), JobEventType.JOB_STATE_CHANGED)
         .withFuture(Jobs.schedule(mock(IRunnable.class), Jobs.newInput()
             .withRunContext(ClientRunContexts.empty())));
     assertFalse(filter.accept(event));
 
     // Tests JobEvent with job with ClientRunContext with correct session
-    event = new JobEvent(mock(IJobManager.class), JobEventType.ABOUT_TO_RUN)
+    event = new JobEvent(mock(IJobManager.class), JobEventType.JOB_STATE_CHANGED)
         .withFuture(Jobs.schedule(mock(IRunnable.class), Jobs.newInput()
             .withRunContext(ClientRunContexts.empty().withSession(session1, false))));
     assertTrue(filter.accept(event));
 
     // Tests JobEvent with job with ClientRunContext with wrong session
-    event = new JobEvent(mock(IJobManager.class), JobEventType.ABOUT_TO_RUN)
+    event = new JobEvent(mock(IJobManager.class), JobEventType.JOB_STATE_CHANGED)
         .withFuture(Jobs.schedule(mock(IRunnable.class), Jobs.newInput()
             .withRunContext(ClientRunContexts.empty().withSession(session2, false))));
     assertFalse(filter.accept(event));

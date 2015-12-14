@@ -22,6 +22,7 @@ import java.util.concurrent.TimeUnit;
 import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IJobListenerRegistration;
+import org.eclipse.scout.rt.platform.job.JobState;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
@@ -53,7 +54,10 @@ public class AssertNoRunningJobsStatement extends Statement {
   public void evaluate() throws Throwable {
     final ScheduledDescendantJobListener jobListener = new ScheduledDescendantJobListener();
 
-    IJobListenerRegistration reg = Jobs.getJobManager().addListener(jobListener);
+    IJobListenerRegistration reg = Jobs.getJobManager().addListener(Jobs.newEventFilterBuilder()
+        .andMatchEventType(JobEventType.JOB_STATE_CHANGED)
+        .andMatchState(JobState.SCHEDULED)
+        .toFilter(), jobListener);
     try {
       // Continue the chain.
       m_next.evaluate();
@@ -129,10 +133,6 @@ public class AssertNoRunningJobsStatement extends Statement {
 
     @Override
     public void changed(final JobEvent event) {
-      if (event.getType() != JobEventType.SCHEDULED) {
-        return;
-      }
-
       if (isScheduledByInitialThread() || isScheduledByInitialJob() || isScheduledByDescendantJob()) {
         m_scheduledFutures.put(event.getFuture(), PRESENT);
       }

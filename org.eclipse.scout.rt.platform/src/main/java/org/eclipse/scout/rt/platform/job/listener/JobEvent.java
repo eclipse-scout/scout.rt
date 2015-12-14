@@ -12,14 +12,14 @@ package org.eclipse.scout.rt.platform.job.listener;
 
 import java.util.EventObject;
 
-import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IJobManager;
+import org.eclipse.scout.rt.platform.job.JobState;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.ToStringBuilder;
 
 /**
- * Event that is fired upon job lifecycle events.
+ * Event object describing a {@link IFuture} or {@link IJobManager} change.
  *
  * @since 5.1
  */
@@ -27,14 +27,14 @@ public class JobEvent extends EventObject {
 
   private static final long serialVersionUID = 1L;
 
-  private final JobEventType m_eventType;
+  private final JobEventType m_type;
+
+  private Object m_data;
   private IFuture<?> m_future;
-  private IBlockingCondition m_blockingCondition;
-  private String m_executionHint;
 
   public JobEvent(final IJobManager jobManager, final JobEventType type) {
     super(jobManager);
-    m_eventType = Assertions.assertNotNull(type);
+    m_type = Assertions.assertNotNull(type);
   }
 
   @Override
@@ -43,31 +43,15 @@ public class JobEvent extends EventObject {
   }
 
   /**
-   * @return type that describes the event.
+   * Returns the type which describes this event; is never <code>null</code>.
    */
   public JobEventType getType() {
-    return m_eventType;
+    return m_type;
   }
 
   /**
-   * Returns the {@link IBlockingCondition} for events of the type {@link JobEventType#BLOCKED} or
-   * {@link JobEventType#UNBLOCKED}, or <code>null</code> otherwise.
-   */
-  public IBlockingCondition getBlockingCondition() {
-    return m_blockingCondition;
-  }
-
-  /**
-   * To associate this event with a {@link IBlockingCondition}.
-   */
-  public JobEvent withBlockingCondition(final IBlockingCondition blockingCondition) {
-    m_blockingCondition = blockingCondition;
-    return this;
-  }
-
-  /**
-   * @return Future that is associated with the event. For events of the type {@link JobEventType#SHUTDOWN}, there is no
-   *         future associated.
+   * @return Future that is associated with this event. Is always set, unless for
+   *         {@link JobEventType#JOB_MANAGER_SHUTDOWN}.
    */
   public IFuture<?> getFuture() {
     return m_future;
@@ -82,25 +66,44 @@ public class JobEvent extends EventObject {
   }
 
   /**
-   * Returns the execution hint for events of the type {@link JobEventType#EXECUTION_HINT_CHANGED}, or <code>null</code>
-   * otherwise.
+   * Returns data associated with this event, and is specific to the respective {@link JobEventType}.
+   * <p>
+   * <table>
+   * <tr>
+   * <td><strong>event type<strong></td>
+   * <td><strong>event data</strong></td>
+   * </tr>
+   * <tr>
+   * <td>{@link JobEventType#JOB_STATE_CHANGED}</td>
+   * <td>{@link JobState}, which the job transitioned into.</td>
+   * </tr>
+   * <tr>
+   * <td>{@link JobEventType#JOB_EXECUTION_HINT_ADDED}</td>
+   * <td>Execution hint which was added to the Future.</td>
+   * </tr>
+   * <tr>
+   * <td>{@link JobEventType#JOB_EXECUTION_HINT_REMOVED}</td>
+   * <td>Execution hint which was removed from the Future.</td>
+   * </tr>
+   * <tr>
+   * <td>{@link JobEventType#JOB_MANAGER_SHUTDOWN}</td>
+   * <td>Not supported, is always <code>null</code>.</td>
+   * </tr>
    */
-  public String getExecutionHint() {
-    return m_executionHint;
+  public Object getData() {
+    return m_data;
   }
 
-  /**
-   * To associate this event with an execution hint.
-   */
-  public JobEvent withExecutionHint(final String executionHint) {
-    m_executionHint = executionHint;
+  public JobEvent withData(final Object data) {
+    m_data = data;
     return this;
   }
 
   @Override
   public String toString() {
     final ToStringBuilder builder = new ToStringBuilder(this);
-    builder.attr("type", m_eventType.name());
+    builder.attr("type", m_type.name());
+    builder.attr("data", m_data);
     builder.attr("future", m_future);
     builder.ref("source", getSource());
     return builder.toString();

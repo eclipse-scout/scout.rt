@@ -11,15 +11,14 @@
 package org.eclipse.scout.rt.platform.job;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.context.RunContexts;
@@ -33,7 +32,6 @@ import org.eclipse.scout.rt.testing.platform.job.JobTestUtil;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.platform.util.BlockingCountDownLatch;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -58,44 +56,41 @@ public class JobListenerTest {
 
   @Test
   public void testEvents() throws Exception {
-    JobListenerEventCollector jobListener = new JobListenerEventCollector();
-    IJobListenerRegistration jobListenerRegistration = Jobs.getJobManager().addListener(jobListener);
-
-    ShutdownListenerEventCollector shutdownListener = new ShutdownListenerEventCollector();
-    Jobs.getJobManager().addListener(Jobs.newEventFilterBuilder()
-        .andMatchEventType(JobEventType.SHUTDOWN)
-        .toFilter(), shutdownListener);
+    JobEventCaptureListener captureListener = new JobEventCaptureListener();
+    Jobs.getJobManager().addListener(captureListener);
 
     IFuture<Void> future = Jobs.getJobManager().schedule(mock(IRunnable.class), Jobs.newInput().withRunContext(RunContexts.empty()));
     future.awaitDone(10, TimeUnit.SECONDS);
-    jobListenerRegistration.dispose();
-
     Jobs.getJobManager().shutdown();
 
-    List<JobEventType> expectedStati = new ArrayList<>();
-    expectedStati.add(JobEventType.SCHEDULED);
-    expectedStati.add(JobEventType.ABOUT_TO_RUN);
-    expectedStati.add(JobEventType.DONE);
-    assertEquals(expectedStati, jobListener.m_eventTypes);
+    // verify events
+    int i = -1;
+    List<JobEvent> capturedEvents = captureListener.getCapturedEvents();
+    List<JobState> capturedFutureStates = captureListener.getCapturedFutureStates();
 
-    List<IFuture<Void>> expectedFutures = new ArrayList<>();
-    expectedFutures.add(future); // scheduled
-    expectedFutures.add(future); // about to run
-    expectedFutures.add(future); // done
-    assertEquals(expectedFutures, jobListener.m_futures);
+    i++;
+    assertEvent(JobEventType.JOB_STATE_CHANGED, future, JobState.SCHEDULED, capturedEvents.get(i));
+    assertEquals(JobState.SCHEDULED, capturedFutureStates.get(i));
 
-    assertTrue(shutdownListener.m_shutdown.get());
+    i++;
+    assertEvent(JobEventType.JOB_STATE_CHANGED, future, JobState.RUNNING, capturedEvents.get(i));
+    assertEquals(JobState.RUNNING, capturedFutureStates.get(i));
+
+    i++;
+    assertEvent(JobEventType.JOB_STATE_CHANGED, future, JobState.DONE, capturedEvents.get(i));
+    assertEquals(JobState.DONE, capturedFutureStates.get(i));
+
+    i++;
+    assertEvent(JobEventType.JOB_MANAGER_SHUTDOWN, null, null, capturedEvents.get(i));
+    assertNull(capturedFutureStates.get(i));
+
+    assertEquals(i + 1, capturedEvents.size());
   }
 
   @Test
   public void testCancel() throws Exception {
-    JobListenerEventCollector jobListener = new JobListenerEventCollector();
-    IJobListenerRegistration jobListenerRegistration = Jobs.getJobManager().addListener(jobListener);
-
-    ShutdownListenerEventCollector shutdownListener = new ShutdownListenerEventCollector();
-    Jobs.getJobManager().addListener(Jobs.newEventFilterBuilder()
-        .andMatchEventType(JobEventType.SHUTDOWN)
-        .toFilter(), shutdownListener);
+    JobEventCaptureListener captureListener = new JobEventCaptureListener();
+    Jobs.getJobManager().addListener(captureListener);
 
     final BooleanHolder hasStarted = new BooleanHolder(Boolean.FALSE);
     IFuture<Void> future = Jobs.getJobManager().schedule(new IRunnable() {
@@ -112,51 +107,92 @@ public class JobListenerTest {
     Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
         .andMatchFuture(future)
         .toFilter(), 10, TimeUnit.SECONDS);
-    jobListenerRegistration.dispose();
+
     Jobs.getJobManager().shutdown();
 
-    Assert.assertFalse(hasStarted.getValue());
-    assertEquals(Arrays.asList(JobEventType.SCHEDULED, JobEventType.DONE), jobListener.m_eventTypes);
-    assertEquals(Arrays.asList(future, future), jobListener.m_futures);
-    assertTrue(future.isCancelled());
+    // verify events
+    int i = -1;
+    List<JobEvent> capturedEvents = captureListener.getCapturedEvents();
+    List<JobState> capturedFutureStates = captureListener.getCapturedFutureStates();
 
-    assertTrue(shutdownListener.m_shutdown.get());
+    i++;
+    assertEvent(JobEventType.JOB_STATE_CHANGED, future, JobState.SCHEDULED, capturedEvents.get(i));
+    assertEquals(JobState.SCHEDULED, capturedFutureStates.get(i));
+
+    i++;
+    assertEvent(JobEventType.JOB_STATE_CHANGED, future, JobState.PENDING, capturedEvents.get(i));
+    assertEquals(JobState.PENDING, capturedFutureStates.get(i));
+
+    i++;
+    assertEvent(JobEventType.JOB_STATE_CHANGED, future, JobState.DONE, capturedEvents.get(i));
+    assertEquals(JobState.DONE, capturedFutureStates.get(i));
+
+    i++;
+    assertEvent(JobEventType.JOB_MANAGER_SHUTDOWN, null, null, capturedEvents.get(i));
+    assertNull(capturedFutureStates.get(i));
+
+    assertEquals(i + 1, capturedEvents.size());
   }
 
   @Test
   public void testGlobalListener1() {
-    JobListenerEventCollector listener = new JobListenerEventCollector();
-    Jobs.getJobManager().addListener(listener);
+    JobEventCaptureListener captureListener = new JobEventCaptureListener();
+    Jobs.getJobManager().addListener(captureListener);
 
     IFuture<Void> future = Jobs.getJobManager().schedule(mock(IRunnable.class), Jobs.newInput());
     future.awaitDone();
 
-    // verify
-    assertEquals(Arrays.asList(JobEventType.SCHEDULED, JobEventType.ABOUT_TO_RUN, JobEventType.DONE), listener.m_eventTypes);
-    assertEquals(Arrays.asList(future, future, future), listener.m_futures);
+    // verify events
+    int i = -1;
+    List<JobEvent> capturedEvents = captureListener.getCapturedEvents();
+    List<JobState> capturedFutureStates = captureListener.getCapturedFutureStates();
+
+    i++;
+    assertEvent(JobEventType.JOB_STATE_CHANGED, future, JobState.SCHEDULED, capturedEvents.get(i));
+    assertEquals(JobState.SCHEDULED, capturedFutureStates.get(i));
+
+    i++;
+    assertEvent(JobEventType.JOB_STATE_CHANGED, future, JobState.RUNNING, capturedEvents.get(i));
+    assertEquals(JobState.RUNNING, capturedFutureStates.get(i));
+
+    i++;
+    assertEvent(JobEventType.JOB_STATE_CHANGED, future, JobState.DONE, capturedEvents.get(i));
+    assertEquals(JobState.DONE, capturedFutureStates.get(i));
+
+    assertEquals(i + 1, capturedEvents.size());
   }
 
   @Test
   public void testGlobalListener2() {
-    JobListenerEventCollector listener = new JobListenerEventCollector();
+    JobEventCaptureListener captureListener = new JobEventCaptureListener();
     Jobs.getJobManager().addListener(Jobs.newEventFilterBuilder()
-        .andMatchEventType(
-            JobEventType.SCHEDULED,
-            JobEventType.DONE)
-        .toFilter(), listener);
+        .andMatchEventType(JobEventType.JOB_STATE_CHANGED)
+        .andMatchState(
+            JobState.SCHEDULED,
+            JobState.DONE)
+        .toFilter(), captureListener);
 
     IFuture<Void> future = Jobs.getJobManager().schedule(mock(IRunnable.class), Jobs.newInput());
     future.awaitDone();
 
-    // verify
-    assertEquals(Arrays.asList(JobEventType.SCHEDULED, JobEventType.DONE), listener.m_eventTypes);
-    assertEquals(Arrays.asList(future, future), listener.m_futures);
+    // verify events
+    int i = -1;
+    List<JobEvent> capturedEvents = captureListener.getCapturedEvents();
+    List<JobState> capturedFutureStates = captureListener.getCapturedFutureStates();
+
+    i++;
+    assertEvent(JobEventType.JOB_STATE_CHANGED, future, JobState.SCHEDULED, capturedEvents.get(i));
+    assertEquals(JobState.SCHEDULED, capturedFutureStates.get(i));
+
+    i++;
+    assertEvent(JobEventType.JOB_STATE_CHANGED, future, JobState.DONE, capturedEvents.get(i));
+    assertEquals(JobState.DONE, capturedFutureStates.get(i));
+
+    assertEquals(i + 1, capturedEvents.size());
   }
 
   @Test
   public void testLocalListener1() throws InterruptedException {
-    JobListenerEventCollector listener = new JobListenerEventCollector();
-
     // schedule job, and install listener once started running
     final BlockingCountDownLatch jobRunningLatch = new BlockingCountDownLatch(1);
     IFuture<Void> future = Jobs.getJobManager().schedule(new IRunnable() {
@@ -168,22 +204,29 @@ public class JobListenerTest {
     }, Jobs.newInput());
     jobRunningLatch.await();
 
+    JobEventCaptureListener captureListener = new JobEventCaptureListener();
     Jobs.getJobManager().addListener(Jobs.newEventFilterBuilder()
-        .andMatchEventType(JobEventType.DONE)
+        .andMatchEventType(JobEventType.JOB_STATE_CHANGED)
+        .andMatchState(JobState.DONE)
         .andMatchFuture(future)
-        .toFilter(), listener);
+        .toFilter(), captureListener);
     jobRunningLatch.unblock();
     future.awaitDone();
 
-    // verify
-    assertEquals(Arrays.asList(JobEventType.DONE), listener.m_eventTypes);
-    assertEquals(Arrays.asList(future), listener.m_futures);
+    // verify events
+    int i = -1;
+    List<JobEvent> capturedEvents = captureListener.getCapturedEvents();
+    List<JobState> capturedFutureStates = captureListener.getCapturedFutureStates();
+
+    i++;
+    assertEvent(JobEventType.JOB_STATE_CHANGED, future, JobState.DONE, capturedEvents.get(i));
+    assertEquals(JobState.DONE, capturedFutureStates.get(i));
+
+    assertEquals(i + 1, capturedEvents.size());
   }
 
   @Test
   public void testLocalListener2a() throws InterruptedException {
-    JobListenerEventCollector listener = new JobListenerEventCollector();
-
     // Schedule job-1
     IFuture<Void> future1 = Jobs.getJobManager().schedule(mock(IRunnable.class), Jobs.newInput());
     future1.awaitDone();
@@ -200,16 +243,24 @@ public class JobListenerTest {
     job2RunningLatch.await();
 
     // install listener
+    JobEventCaptureListener captureListener = new JobEventCaptureListener();
     Jobs.getJobManager().addListener(Jobs.newEventFilterBuilder()
         .andMatchFuture(future1, future2)
-        .toFilter(), listener);
+        .toFilter(), captureListener);
 
     job2RunningLatch.unblock();
     future2.awaitDone();
 
-    // verify
-    assertEquals(Arrays.asList(JobEventType.DONE), listener.m_eventTypes);
-    assertEquals(Arrays.asList(future2), listener.m_futures);
+    // verify events
+    int i = -1;
+    List<JobEvent> capturedEvents = captureListener.getCapturedEvents();
+    List<JobState> capturedFutureStates = captureListener.getCapturedFutureStates();
+
+    i++;
+    assertEvent(JobEventType.JOB_STATE_CHANGED, future2, JobState.DONE, capturedEvents.get(i));
+    assertEquals(JobState.DONE, capturedFutureStates.get(i));
+
+    assertEquals(i + 1, capturedEvents.size());
   }
 
   @Test
@@ -227,18 +278,18 @@ public class JobListenerTest {
     }, Jobs.newInput());
     job2RunningLatch.await();
 
-    JobListenerEventCollector listener = new JobListenerEventCollector();
+    JobEventCaptureListener captureListener = new JobEventCaptureListener();
     Jobs.getJobManager().addListener(Jobs.newEventFilterBuilder()
         .andMatchFuture(future2)
         .andMatchFuture(future1)
-        .toFilter(), listener);
+        .toFilter(), captureListener);
 
     job2RunningLatch.unblock();
     future2.awaitDone();
 
-    // verify
-    assertEquals(Collections.emptyList(), listener.m_eventTypes);
-    assertEquals(Collections.emptyList(), listener.m_futures);
+    // verify events
+    assertTrue(captureListener.getCapturedEvents().isEmpty());
+    assertTrue(captureListener.getCapturedFutureStates().isEmpty());
   }
 
   @Test
@@ -256,17 +307,17 @@ public class JobListenerTest {
     }, Jobs.newInput());
     job2RunningLatch.await();
 
-    JobListenerEventCollector listener = new JobListenerEventCollector();
+    JobEventCaptureListener captureListener = new JobEventCaptureListener();
     Jobs.getJobManager().addListener(Jobs.newEventFilterBuilder()
         .andMatchNotFuture(future2)
-        .toFilter(), listener);
+        .toFilter(), captureListener);
 
     job2RunningLatch.unblock();
     future2.awaitDone();
 
-    // verify
-    assertEquals(Collections.emptyList(), listener.m_eventTypes);
-    assertEquals(Collections.emptyList(), listener.m_futures);
+    // verify events
+    assertTrue(captureListener.getCapturedEvents().isEmpty());
+    assertTrue(captureListener.getCapturedFutureStates().isEmpty());
   }
 
   @Test
@@ -281,15 +332,22 @@ public class JobListenerTest {
     }, Jobs.newInput());
     jobRunningLatch.await();
 
-    JobListenerEventCollector listener = new JobListenerEventCollector();
-    future.addListener(listener);
+    JobEventCaptureListener captureListener = new JobEventCaptureListener();
+    future.addListener(captureListener);
 
     jobRunningLatch.unblock();
     future.awaitDone();
 
-    // verify
-    assertEquals(Arrays.asList(JobEventType.DONE), listener.m_eventTypes);
-    assertEquals(Arrays.asList(future), listener.m_futures);
+    // verify events
+    int i = -1;
+    List<JobEvent> capturedEvents = captureListener.getCapturedEvents();
+    List<JobState> capturedFutureStates = captureListener.getCapturedFutureStates();
+
+    i++;
+    assertEvent(JobEventType.JOB_STATE_CHANGED, future, JobState.DONE, capturedEvents.get(i));
+    assertEquals(JobState.DONE, capturedFutureStates.get(i));
+
+    assertEquals(i + 1, capturedEvents.size());
   }
 
   @Test
@@ -304,38 +362,50 @@ public class JobListenerTest {
     }, Jobs.newInput());
     jobRunningLatch.await();
 
-    JobListenerEventCollector listener = new JobListenerEventCollector();
+    JobEventCaptureListener captureListener = new JobEventCaptureListener();
     future.addListener(Jobs.newEventFilterBuilder()
-        .andMatchEventType(JobEventType.DONE)
-        .toFilter(), listener);
+        .andMatchEventType(JobEventType.JOB_STATE_CHANGED)
+        .andMatchState(JobState.DONE)
+        .toFilter(), captureListener);
 
     jobRunningLatch.unblock();
     future.awaitDone();
 
-    // verify
-    assertEquals(Arrays.asList(JobEventType.DONE), listener.m_eventTypes);
-    assertEquals(Arrays.asList(future), listener.m_futures);
+    // verify events
+    int i = -1;
+    List<JobEvent> capturedEvents = captureListener.getCapturedEvents();
+    List<JobState> capturedFutureStates = captureListener.getCapturedFutureStates();
+
+    i++;
+    assertEvent(JobEventType.JOB_STATE_CHANGED, future, JobState.DONE, capturedEvents.get(i));
+    assertEquals(JobState.DONE, capturedFutureStates.get(i));
+
+    assertEquals(i + 1, capturedEvents.size());
   }
 
-  private static final class JobListenerEventCollector implements IJobListener {
+  private static void assertEvent(JobEventType expectedType, IFuture<?> expectedFuture, Object expectedData, JobEvent actualEvent) {
+    assertSame(expectedFuture, actualEvent.getFuture());
+    assertSame(expectedData, actualEvent.getData());
+    assertSame(expectedType, actualEvent.getType());
+  }
 
-    private final List<JobEventType> m_eventTypes = Collections.synchronizedList(new ArrayList<JobEventType>());
-    private final List<IFuture<?>> m_futures = Collections.synchronizedList(new ArrayList<IFuture<?>>());
+  private static class JobEventCaptureListener implements IJobListener {
+
+    final List<JobEvent> events = new ArrayList<>();
+    final List<JobState> futureStates = new ArrayList<>();
 
     @Override
     public void changed(JobEvent event) {
-      m_eventTypes.add(event.getType());
-      m_futures.add(event.getFuture());
+      events.add(event);
+      futureStates.add(event.getFuture() != null ? event.getFuture().getState() : null);
     }
-  }
 
-  private static final class ShutdownListenerEventCollector implements IJobListener {
+    public List<JobEvent> getCapturedEvents() {
+      return events;
+    }
 
-    private final AtomicBoolean m_shutdown = new AtomicBoolean();
-
-    @Override
-    public void changed(JobEvent event) {
-      m_shutdown.set(JobEventType.SHUTDOWN == event.getType());
+    public List<JobState> getCapturedFutureStates() {
+      return futureStates;
     }
   }
 }

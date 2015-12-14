@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.platform.job.listener;
 import java.util.EventListener;
 
 /**
- * Listener to be notified about job lifecycle events.
+ * Listener to be notified about job events.
  *
  * @since 5.1
  * @see JobEvent
@@ -21,8 +21,7 @@ import java.util.EventListener;
 public interface IJobListener extends EventListener {
 
   /**
-   * Method invoked to notify about a job lifecycle event and only, if accepted by the filter provided when registered
-   * this listener.
+   * Method invoked to notify about a job event.
    *
    * @param event
    *          describes the event occurred.

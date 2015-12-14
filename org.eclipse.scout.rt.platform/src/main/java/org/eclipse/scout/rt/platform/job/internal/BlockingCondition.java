@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.job.internal;
 
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -20,12 +19,9 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IFuture;
-import org.eclipse.scout.rt.platform.job.IJobManager;
 import org.eclipse.scout.rt.platform.job.IMutex;
 import org.eclipse.scout.rt.platform.job.IMutex.QueuePosition;
-import org.eclipse.scout.rt.platform.job.listener.JobEvent;
-import org.eclipse.scout.rt.platform.job.listener.JobEventType;
-import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.platform.job.JobState;
 import org.eclipse.scout.rt.platform.util.ToStringBuilder;
 import org.eclipse.scout.rt.platform.util.concurrent.InterruptedException;
 import org.eclipse.scout.rt.platform.util.concurrent.TimeoutException;
@@ -35,28 +31,15 @@ import org.eclipse.scout.rt.platform.util.concurrent.TimeoutException;
  */
 public class BlockingCondition implements IBlockingCondition {
 
+  private static final long TIMEOUT_INFINITE = -1;
+
   private volatile boolean m_blocking;
-  private final String m_name;
 
-  private final Lock m_lock;
-  private final Condition m_unblockedCondition;
-  private final Set<JobFutureTask<?>> m_blockedJobFutures;
+  private final Lock m_lock = new ReentrantLock();
+  private final Condition m_unblockedCondition = m_lock.newCondition();
 
-  private final JobManager m_jobManager;
-
-  protected BlockingCondition(final String name, final boolean blocking, final JobManager jobManager) {
-    m_name = StringUtility.nvl(name, "n/a");
+  protected BlockingCondition(final boolean blocking) {
     m_blocking = blocking;
-    m_jobManager = jobManager;
-
-    m_lock = new ReentrantLock();
-    m_unblockedCondition = m_lock.newCondition();
-    m_blockedJobFutures = Collections.synchronizedSet(new HashSet<JobFutureTask<?>>()); // synchronized because modified/read by different threads.
-  }
-
-  @Override
-  public String getName() {
-    return m_name;
   }
 
   @Override
@@ -76,16 +59,9 @@ public class BlockingCondition implements IBlockingCondition {
         return;
       }
 
-      if (!(m_blocking = blocking)) {
-        // Unset blocking state so it is in correct state once this method returns.
-        // That is crucial, if the invoker in turn waits for not-blocked jobs to complete, and expects just released jobs to be unblocked.
-        // Otherwise, jobs that are unblocked by this invocation might be ignored, because still in blocked state.
-        for (final JobFutureTask<?> blockedJobFuture : new HashSet<>(m_blockedJobFutures)) {
-          unregisterAndMarkAsUnblocked(blockedJobFuture);
-        }
-
-        // Wake-up blocked threads.
-        m_unblockedCondition.signalAll();
+      m_blocking = blocking;
+      if (!m_blocking) {
+        m_unblockedCondition.signalAll(); // Wake-up waiting threads.
       }
     }
     finally {
@@ -95,32 +71,22 @@ public class BlockingCondition implements IBlockingCondition {
 
   @Override
   public void waitFor(final String... executionHints) {
-    waitFor(-1L, TimeUnit.MILLISECONDS, executionHints);
+    waitFor(TIMEOUT_INFINITE, TimeUnit.MILLISECONDS, executionHints);
   }
 
   @Override
   public void waitFor(final long timeout, final TimeUnit unit, final String... executionHints) {
-    final JobFutureTask<?> currentTask = (JobFutureTask<?>) IFuture.CURRENT.get();
-    if (currentTask != null) {
-      blockManagedThread(currentTask, timeout, unit, executionHints);
+    final IFuture<?> currentFuture = IFuture.CURRENT.get();
+    if (currentFuture instanceof JobFutureTask) {
+      blockFutureTask((JobFutureTask<?>) currentFuture, timeout, unit, executionHints);
     }
     else {
-      blockArbitraryThread(timeout, unit);
+      blockThread(timeout, unit);
     }
   }
 
-  /**
-   * Blocks the current thread if being managed by {@link IJobManager}. That is if the thread as a {@link JobFutureTask}
-   * associated.
-   *
-   * @throws InterruptedException
-   *           if the current thread was interrupted while waiting.
-   * @throws TimeoutException
-   *           if the wait timed out.
-   */
-  protected void blockManagedThread(final JobFutureTask<?> jobTask, final long timeout, final TimeUnit unit, final String... executionHints) {
-    final IMutex mutex = jobTask.getMutex();
-    final Set<String> associatedExecutionHints = new HashSet<>();
+  protected void blockFutureTask(final JobFutureTask<?> futureTask, final long timeout, final TimeUnit unit, final String... executionHints) {
+    IExecutionHintRegistration executionHintRegistration = IExecutionHintRegistration.NULL_INSTANCE;
 
     m_lock.lock();
     try {
@@ -128,158 +94,158 @@ public class BlockingCondition implements IBlockingCondition {
         return;
       }
 
-      // Associate the current IFuture with execution hints.
-      for (final String executionHint : executionHints) {
-        if (jobTask.addExecutionHint(executionHint)) {
-          associatedExecutionHints.add(executionHint);
-        }
+      // Release the mutex if being a mutually exclusive task.
+      futureTask.releaseMutex();
+
+      // Associate the future with execution hints.
+      executionHintRegistration = registerExecutionHints(futureTask, executionHints);
+
+      // Wait until the condition falls.
+      futureTask.changeState(JobState.WAITING_FOR_BLOCKING_CONDITION);
+      try {
+        blockUntilSignaledOrTimeout(timeout, unit);
       }
-
-      registerAndMarkAsBlocked(jobTask);
-      m_jobManager.fireEvent(new JobEvent(m_jobManager, JobEventType.BLOCKED)
-          .withFuture(jobTask)
-          .withBlockingCondition(this));
-
-      // If being a mutual exclusive task, release the mutex.
-      if (mutex != null) {
-        mutex.release(jobTask);
+      catch (final InterruptedException | TimeoutException e) {
+        executionHintRegistration.dispose();
+        futureTask.changeState(JobState.RUNNING);
+        throw e;
       }
-
-      blockUntilSignaledOrTimeout(timeout, unit, new IBlockingGuard() {
-
-        @Override
-        public boolean shouldBlock() {
-          // This method is called once the condition is signaled or a spurious wake-up occurs.
-          // However, even if being signaled, this BlockingCondition might be armed anew the time this thread finally acquires the monitor lock.
-          // For that reason, the blocking state must be set anew.
-          if (m_blocking && !jobTask.isBlocked()) {
-            registerAndMarkAsBlocked(jobTask);
-          }
-
-          return m_blocking;
-        }
-      });
-    }
-    catch (final InterruptedException | TimeoutException e) {
-      unregisterAndMarkAsUnblocked(jobTask);
-      throw e;
     }
     finally {
-      // Restore to the previous execution hints.
-      for (final String executionHint : associatedExecutionHints) {
-        jobTask.removeExecutionHint(executionHint);
-      }
-
-      // Note: If released gracefully, the job's blocking-state is unset by the releaser.
       m_lock.unlock();
-      m_jobManager.fireEvent(new JobEvent(m_jobManager, JobEventType.UNBLOCKED)
-          .withFuture(jobTask)
-          .withBlockingCondition(this));
     }
 
-    // Acquire the mutex anew if being a mutual exclusive task. If not free, the current thread is blocked until available.
+    // Acquire the mutex if being a mutually exclusive task.
+    final IMutex mutex = futureTask.getMutex();
     if (mutex != null) {
-      mutex.acquire(jobTask, QueuePosition.HEAD);
+      try {
+        futureTask.changeState(JobState.WAITING_FOR_MUTEX);
+        mutex.acquire(futureTask, QueuePosition.HEAD);
+      }
+      catch (final InterruptedException e) {
+        executionHintRegistration.dispose();
+        futureTask.changeState(JobState.RUNNING);
+        throw e;
+      }
     }
 
-    m_jobManager.fireEvent(new JobEvent(m_jobManager, JobEventType.RESUMED)
-        .withFuture(jobTask)
-        .withBlockingCondition(this));
+    executionHintRegistration.dispose();
+    futureTask.changeState(JobState.RUNNING);
   }
 
-  /**
-   * Blocks the current thread if not being managed by {@link IJobManager}.
-   *
-   * @throws InterruptedException
-   *           if the current thread was interrupted while waiting.
-   * @throws TimeoutException
-   *           if the wait timed out.
-   */
-  protected void blockArbitraryThread(final long timeout, final TimeUnit unit) {
+  protected void blockThread(final long timeout, final TimeUnit unit) {
     m_lock.lock();
     try {
       if (!m_blocking) {
         return;
       }
 
-      blockUntilSignaledOrTimeout(timeout, unit, new IBlockingGuard() {
-
-        @Override
-        public boolean shouldBlock() {
-          return m_blocking; // This method is called once the condition is signaled or a spurious wake-up occurs.
-        }
-      });
+      blockUntilSignaledOrTimeout(timeout, unit);
     }
     finally {
       m_lock.unlock();
     }
   }
 
-  protected void unregisterAndMarkAsUnblocked(final JobFutureTask<?> futureTask) {
-    futureTask.setBlocked(false);
-    m_blockedJobFutures.remove(futureTask);
-  }
-
-  protected void registerAndMarkAsBlocked(final JobFutureTask<?> futureTask) {
-    futureTask.setBlocked(true);
-    m_blockedJobFutures.add(futureTask);
-  }
-
   /**
-   * Blocks the current thread until being signaled and {@link IBlockingGuard#shouldBlock()} evaluates to
-   * <code>false</code>, or the timeout elapses.
+   * Blocks the current thread until being signaled, or the timeout elapses.
    *
+   * @param timeout
+   *          the maximal time to wait, or {@link #TIMEOUT_INFINITE} to wait infinitely.
+   * @param unit
+   *          unit of the given timeout.
    * @throws InterruptedException
    *           if the current thread was interrupted while waiting.
    * @throws TimeoutException
    *           if the wait timed out.
    */
-  protected void blockUntilSignaledOrTimeout(final long timeout, final TimeUnit unit, final IBlockingGuard guard) {
+  protected void blockUntilSignaledOrTimeout(final long timeout, final TimeUnit unit) {
+    m_lock.lock();
     try {
-      if (timeout == -1L) {
-        while (guard.shouldBlock()) {
+      if (timeout == TIMEOUT_INFINITE) {
+        while (m_blocking) { // while-loop to address spurious wake-ups.
           m_unblockedCondition.await();
         }
       }
       else {
         long nanos = unit.toNanos(timeout);
-        while (guard.shouldBlock() && nanos > 0L) {
+        while (m_blocking && nanos > 0L) { // while-loop to address spurious wake-ups.
           nanos = m_unblockedCondition.awaitNanos(nanos);
         }
 
         if (nanos <= 0L) {
           throw new TimeoutException("Timeout elapsed while waiting for a blocking condition to fall")
-              .withContextInfo("blockingCondition", m_name)
+              .withContextInfo("blockingCondition", this)
               .withContextInfo("timeout", "{}ms", unit.toMillis(timeout))
               .withContextInfo("thread", Thread.currentThread().getName());
         }
       }
     }
-    catch (java.lang.InterruptedException e) {
+    catch (final java.lang.InterruptedException e) {
       Thread.currentThread().interrupt(); // Restore the interrupted status because cleared by catching InterruptedException.
       throw new InterruptedException("Interrupted while waiting for a blocking condition to fall")
-          .withContextInfo("blockingCondition", m_name)
+          .withContextInfo("blockingCondition", this)
           .withContextInfo("thread", Thread.currentThread().getName());
+    }
+    finally {
+      m_lock.unlock();
     }
   }
 
   @Override
   public String toString() {
     final ToStringBuilder builder = new ToStringBuilder(this);
-    builder.attr("name", m_name);
     builder.attr("blocking", m_blocking);
     return builder.toString();
   }
 
   /**
-   * Guard to protect against spurious wake-ups and to ensure the condition to be still <code>true</code> once being
-   * unblocked.
+   * Registers the given execution hints with the Future, and returns its registration handle.
    */
-  public static interface IBlockingGuard {
+  protected IExecutionHintRegistration registerExecutionHints(final IFuture<?> future, final String... executionHints) {
+    if (executionHints.length == 0) {
+      return IExecutionHintRegistration.NULL_INSTANCE;
+    }
+
+    // Register the execution hints, and remember the hints registered. That are hints not already associated with the future.
+    final Set<String> associatedExecutionHints = new HashSet<>(executionHints.length);
+    for (final String executionHint : executionHints) {
+      if (future.addExecutionHint(executionHint)) {
+        associatedExecutionHints.add(executionHint);
+      }
+    }
+
+    // Return the registration handle to unregister the registered execution hints.
+    return new IExecutionHintRegistration() {
+
+      @Override
+      public void dispose() {
+        for (final String associatedExecutionHint : associatedExecutionHints) {
+          future.removeExecutionHint(associatedExecutionHint);
+        }
+      }
+    };
+  }
+
+  /**
+   * Represents the execution hint registration.
+   */
+  protected interface IExecutionHintRegistration {
 
     /**
-     * @return <code>true</code> to keep the waiting thread blocked, or <code>false</code> to release it.
+     * Unregisters the execution hints represented by this registration.
      */
-    boolean shouldBlock();
+    void dispose();
+
+    /**
+     * Registration that does nothing on {@link #dispose()}.
+     */
+    IExecutionHintRegistration NULL_INSTANCE = new IExecutionHintRegistration() {
+
+      @Override
+      public void dispose() {
+        // NOOP
+      }
+    };
   }
 }

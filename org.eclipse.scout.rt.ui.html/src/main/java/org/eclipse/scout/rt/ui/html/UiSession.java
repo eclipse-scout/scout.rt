@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
@@ -42,7 +43,6 @@ import org.eclipse.scout.rt.platform.job.IJobListenerRegistration;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
-import org.eclipse.scout.rt.platform.job.listener.JobEventType;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.util.SleepUtil;
 import org.eclipse.scout.rt.platform.util.StringUtility;
@@ -112,7 +112,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
   private volatile boolean m_disposed;
   private final ReentrantLock m_uiSessionLock = new ReentrantLock();
   private IJobListenerRegistration m_modelJobFinishedListenerRegistration;
-  private final ArrayBlockingQueue<Object> m_backgroundJobNotificationQueue = new ArrayBlockingQueue<>(1, true);
+  private final BlockingQueue<Object> m_pollerQueue = new ArrayBlockingQueue<>(1, true);
   private final Object m_notificationToken = new Object();
   private volatile long m_lastAccessedTime;
 
@@ -172,27 +172,17 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
     m_modelJobFinishedListenerRegistration = Jobs.getJobManager().addListener(
         ModelJobs.newEventFilterBuilder()
             .andMatch(new SessionJobEventFilter(clientSession))
-            .andMatchNotExecutionHint(UiJobs.EXECUTION_HINT_POLL_REQUEST) // Only non-poll requests are of interest
-            .andMatchEventType(
-                JobEventType.EXECUTION_HINT_CHANGED,
-                JobEventType.DONE,
-                JobEventType.REJECTED,
-                JobEventType.SHUTDOWN)
+            .andMatchNotExecutionHint(UiJobs.EXECUTION_HINT_POLL_REQUEST) // events for poll-requests are not of interest
+            .andMatch(BEANS.get(UiJobs.class).newDataAvailableFilter())
             .andMatch(new IFilter<JobEvent>() {
+
               @Override
               public boolean accept(JobEvent event) {
-                // Only changed hints of type EXECUTION_HINT_UI_INTERACTION_REQUIRED are of interest
-                if (event.getType() == JobEventType.EXECUTION_HINT_CHANGED && !event.getExecutionHint().equals(ModelJobs.EXECUTION_HINT_UI_INTERACTION_REQUIRED)) {
-                  return false;
-                }
+                // Release poll-request only if there is currently no regular request processing.
+                // If such a request is available, the result of the event's model job will be included in the response of that request.
 
-                // no client request must currently being processed (because in that case, the result of the
-                // model job will be returned as payload of the current JSON response).
                 // TODO [5.2] bsh: This check is not thread-safe. At least, 'm_currentJsonRequest' should be volatile. Still, thread-safety is not given.
-                if (isProcessingJsonRequest()) {
-                  return false;
-                }
-                return true;
+                return !isProcessingJsonRequest();
               }
             })
             .toFilter(),
@@ -200,7 +190,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
           @Override
           public void changed(JobEvent event) {
             LOG.trace("Model job finished: {} ({}). Notify waiting requests...", event.getFuture().getJobInput().getName(), event.getType());
-            notifyPollingBackgroundJobRequests();
+            signalPoller();
           }
         });
   }
@@ -476,7 +466,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
 
     // Notify waiting requests - should not delay web-container shutdown
     uninstallPollingBackgroundJobsNotifier();
-    notifyPollingBackgroundJobRequests();
+    signalPoller();
 
     m_jsonAdapterRegistry.disposeAdapters();
     m_currentHttpContext.clear();
@@ -736,7 +726,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
       try {
         long t0 = System.currentTimeMillis();
         // Wait until notified by m_modelJobFinishedListener (when a background job has finished) or a timeout occurs
-        Object notificationToken = m_backgroundJobNotificationQueue.poll(pollWaitSeconds, TimeUnit.SECONDS);
+        Object notificationToken = m_pollerQueue.poll(pollWaitSeconds, TimeUnit.SECONDS);
         int durationSeconds = (int) Math.round((System.currentTimeMillis() - t0) / 1000d);
         int newPollWaitSeconds = pollWaitSeconds - durationSeconds;
         if (notificationToken == null || newPollWaitSeconds <= 0 || currentJsonResponse() == null || !currentJsonResponse().isEmpty()) {
@@ -766,11 +756,15 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
     SleepUtil.sleepSafe(100, TimeUnit.MILLISECONDS);
   }
 
-  protected void notifyPollingBackgroundJobRequests() {
-    // Put a notification token in the queue of size 1. If a thread is waiting, it will wake up. If no thread is waiting, the token
-    // remains in the queue, and the next thread that polls the queue will get the token immediately. If the queue is full (i.e. there
-    // is already a token in the queue), this method does nothing. This method will never block.
-    m_backgroundJobNotificationQueue.offer(m_notificationToken);
+  /**
+   * Signals the 'poll-request' to return to the UI. This method never blocks.
+   * <p>
+   * Internally, a notification token is put into the poller-queue. If a thread is waiting, it will wake up. If no
+   * thread is waiting, the token remains in the queue, and the next thread that polls the queue will get the token
+   * immediately. If the queue is full (i.e. there is already a token in the queue), this method does nothing.
+   */
+  protected void signalPoller() {
+    m_pollerQueue.offer(m_notificationToken);
   }
 
   protected boolean isProcessingJsonRequest() {

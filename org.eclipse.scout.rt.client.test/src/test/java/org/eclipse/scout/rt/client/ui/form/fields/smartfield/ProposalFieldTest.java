@@ -93,7 +93,7 @@ public class ProposalFieldTest {
 
   @Test
   public void testSelectFromProposalChooser() {
-    final IBlockingCondition bc = Jobs.newBlockingCondition("loadProposals", true);
+    final IBlockingCondition bc = Jobs.newBlockingCondition(true);
 
     m_proposalField.getLookupRowFetcher().addPropertyChangeListener(new PropertyChangeListener() {
       @Override
@@ -130,7 +130,7 @@ public class ProposalFieldTest {
    * This method deals with the async nature of the proposal chooser
    */
   void testMatch(String searchText, String expectedValue, int expectedNumProposals) {
-    final IBlockingCondition bc = Jobs.newBlockingCondition("loadProposals", true);
+    final IBlockingCondition bc = Jobs.newBlockingCondition(true);
 
     m_proposalField.getLookupRowFetcher().addPropertyChangeListener(new PropertyChangeListener() {
       @Override

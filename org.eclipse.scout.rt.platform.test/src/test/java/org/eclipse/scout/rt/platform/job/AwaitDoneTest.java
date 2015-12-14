@@ -138,17 +138,17 @@ public class AwaitDoneTest {
   }
 
   @Test
-  public void testAwaitDoneOrBlocked() {
+  public void testAwaitDoneOrWaiting() {
     final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
 
-    final IBlockingCondition bc = Jobs.newBlockingCondition("bc", true);
+    final IBlockingCondition condition = Jobs.newBlockingCondition(true);
 
     IFuture<Void> future = Jobs.getJobManager().schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
         protocol.add("before-1");
-        bc.waitFor();
+        condition.waitFor();
         protocol.add("after-2");
       }
     }, Jobs.newInput()
@@ -167,13 +167,13 @@ public class AwaitDoneTest {
 
     Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
         .andMatchFuture(future)
-        .andAreNotBlocked()
+        .andMatchNotState(JobState.WAITING_FOR_BLOCKING_CONDITION)
         .toFilter(), 10, TimeUnit.SECONDS);
 
     assertEquals(Arrays.asList("before-1"), protocol);
 
     // Cleanup
-    bc.setBlocking(false);
+    condition.setBlocking(false);
     Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
         .andMatchFuture(future)
         .toFilter(), 10, TimeUnit.SECONDS);

@@ -253,39 +253,6 @@ public class JobScheduleTest {
   }
 
   @Test
-  public void testThreadName() {
-    Thread.currentThread().setName("main");
-
-    final Holder<String> actualThreadName1 = new Holder<>();
-    final Holder<String> actualThreadName2 = new Holder<>();
-
-    Jobs.getJobManager().schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        actualThreadName1.setValue(Thread.currentThread().getName());
-
-        Jobs.getJobManager().schedule(new IRunnable() {
-
-          @Override
-          public void run() throws Exception {
-            actualThreadName2.setValue(Thread.currentThread().getName());
-          }
-        }, Jobs.newInput()
-            .withRunContext(RunContexts.copyCurrent())
-            .withName("XYZ"))
-            .awaitDoneAndGet();
-      }
-    }, Jobs.newInput()
-        .withRunContext(RunContexts.copyCurrent())
-        .withName("ABC"))
-        .awaitDoneAndGet();
-    assertTrue(actualThreadName1.getValue(), actualThreadName1.getValue().matches("scout-thread-(\\d)+ \\(Running\\) \"ABC\""));
-    assertTrue(actualThreadName2.getValue(), actualThreadName2.getValue().matches("scout-thread-(\\d)+ \\(Running\\) \"XYZ\""));
-    assertEquals("main", Thread.currentThread().getName());
-  }
-
-  @Test
   public void testCurrentFuture() {
     final Holder<IFuture<?>> expectedFuture1 = new Holder<>();
     final Holder<IFuture<?>> expectedFuture2 = new Holder<>();

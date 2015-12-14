@@ -53,7 +53,7 @@ public class FileChooser implements IFileChooser {
 
   public FileChooser(Collection<String> fileExtensions, boolean multiSelect) {
     m_uiFacade = new P_UIFacade();
-    m_blockingCondition = Jobs.newBlockingCondition("block", false);
+    m_blockingCondition = Jobs.newBlockingCondition(false);
     m_fileExtensions = CollectionUtility.arrayListWithoutNullElements(fileExtensions);
     m_multiSelect = multiSelect;
     m_maximumUploadSize = DEFAULT_MAXIMUM_UPLOAD_SIZE;

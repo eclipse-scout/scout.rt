@@ -211,7 +211,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     m_enabledGranted = true;
     m_visibleGranted = true;
     m_formLoading = true;
-    m_blockingCondition = Jobs.newBlockingCondition("block", false);
+    m_blockingCondition = Jobs.newBlockingCondition(false);
     m_objectExtensions = new ObjectExtensions<AbstractForm, IFormExtension<? extends AbstractForm>>(this);
 
     if (callInitializer) {

@@ -111,7 +111,7 @@ public class ClientHttpServiceTunnel extends AbstractHttpServiceTunnel implement
     if (CollectionUtility.isEmpty(notifications)) {
       return;
     }
-    final IBlockingCondition cond = Jobs.newBlockingCondition("Suspend request processing thread during client notification handling.", true);
+    final IBlockingCondition cond = Jobs.newBlockingCondition(true);
     Jobs.schedule(new IRunnable() {
 
       @Override

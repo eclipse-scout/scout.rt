@@ -24,6 +24,7 @@ import org.eclipse.scout.rt.platform.filter.NotFilter;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IMutex;
 import org.eclipse.scout.rt.platform.job.JobInput;
+import org.eclipse.scout.rt.platform.job.JobState;
 
 /**
  * This builder facilitates the creation of a {@link IFuture} filter to match multiple criteria joined by logical 'AND'
@@ -132,26 +133,26 @@ public class FutureFilterBuilder {
   }
 
   /**
+   * To match all jobs which are in one of the given states.
+   */
+  public FutureFilterBuilder andMatchState(final JobState... states) {
+    andMatch(new JobStateFutureFilter(states));
+    return this;
+  }
+
+  /**
+   * To match all jobs which are not in one of the given states.
+   */
+  public FutureFilterBuilder andMatchNotState(final JobState... states) {
+    andMatchNot(new JobStateFutureFilter(states));
+    return this;
+  }
+
+  /**
    * To match all jobs which have the given mutex object set.
    */
   public FutureFilterBuilder andMatchMutex(final IMutex mutex) {
     andMatch(new MutexFutureFilter(mutex));
-    return this;
-  }
-
-  /**
-   * To match all jobs which are waiting for a blocking condition to fall.
-   */
-  public FutureFilterBuilder andAreBlocked() {
-    andMatch(BlockedFutureFilter.INSTANCE_BLOCKED);
-    return this;
-  }
-
-  /**
-   * To match all jobs which are not waiting for a blocking condition to fall.
-   */
-  public FutureFilterBuilder andAreNotBlocked() {
-    andMatch(BlockedFutureFilter.INSTANCE_NOT_BLOCKED);
     return this;
   }
 

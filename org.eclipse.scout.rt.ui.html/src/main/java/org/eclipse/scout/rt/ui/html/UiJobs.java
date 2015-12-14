@@ -22,8 +22,10 @@ import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.filter.AndFilter;
 import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.job.JobState;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.filter.future.FutureFilter;
+import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.concurrent.CancellationException;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
@@ -96,8 +98,6 @@ public class UiJobs {
    *           if the job is cancelled.
    * @throws InterruptedException
    *           if the current thread is interrupted while waiting for the job to complete.
-   * @throws TimeoutException
-   *           if the job did not complete within the timeout.
    * @throws RuntimeException
    *           if the job completed with an exception.
    */
@@ -128,7 +128,32 @@ public class UiJobs {
   public void await(final IFilter<IFuture<?>> filter) {
     Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
         .andMatchNotExecutionHint(ModelJobs.EXECUTION_HINT_UI_INTERACTION_REQUIRED)
+        .andMatchNotState(JobState.PENDING) // consumed by poller
         .andMatch(filter)
         .toFilter(), AWAIT_TIMEOUT, TimeUnit.MILLISECONDS);
+  }
+
+  /**
+   * Creates a filter to accept only jobs, which provide data to be transported to the UI. That means, that such a job
+   * either transitioned into 'DONE' state, or requires 'UI interaction'.
+   */
+  public IFilter<JobEvent> newDataAvailableFilter() {
+    return new IFilter<JobEvent>() {
+
+      @Override
+      public boolean accept(final JobEvent event) {
+        switch (event.getType()) {
+          case JOB_STATE_CHANGED: {
+            return JobState.DONE.equals(event.getData()); // data for UI available because job completed.
+          }
+          case JOB_EXECUTION_HINT_ADDED: {
+            return ModelJobs.EXECUTION_HINT_UI_INTERACTION_REQUIRED.equals(event.getData()); // data for UI available because job was marked with 'UI_INTERACTION_REQUIRED'.
+          }
+          default: {
+            return false;
+          }
+        }
+      }
+    };
   }
 }

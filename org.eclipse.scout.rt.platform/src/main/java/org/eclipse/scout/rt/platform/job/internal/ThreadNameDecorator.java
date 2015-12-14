@@ -16,30 +16,22 @@ import org.eclipse.scout.rt.platform.chain.callable.CallableChain;
 import org.eclipse.scout.rt.platform.chain.callable.ICallableDecorator;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IJobListenerRegistration;
+import org.eclipse.scout.rt.platform.job.JobState;
 import org.eclipse.scout.rt.platform.job.Jobs;
-import org.eclipse.scout.rt.platform.job.internal.NamedThreadFactory.JobState;
 import org.eclipse.scout.rt.platform.job.internal.NamedThreadFactory.ThreadInfo;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.job.listener.JobEventType;
 
 /**
- * Processor to decorate the thread-name of the worker-thread during the time of executing a job.
+ * Processor to decorate the thread name of the worker thread during the time of executing a job.
  * <p>
  * Instances of this class are to be added to a {@link CallableChain} to participate in the execution of a
- * {@link Callable}. #d
+ * {@link Callable}.
  *
  * @since 5.1
  */
 public class ThreadNameDecorator<RESULT> implements ICallableDecorator<RESULT> {
-
-  private final String m_threadName;
-  private final String m_jobName;
-
-  public ThreadNameDecorator(final String threadName, final String jobName) {
-    m_threadName = threadName;
-    m_jobName = jobName;
-  }
 
   @Override
   public IUndecorator<RESULT> decorate() throws Exception {
@@ -48,35 +40,29 @@ public class ThreadNameDecorator<RESULT> implements ICallableDecorator<RESULT> {
       return null;
     }
 
-    // Install job listener to decorate the thread name
-    final IJobListenerRegistration listenerRegistration = IFuture.CURRENT.get().addListener(
+    final IFuture<?> future = IFuture.CURRENT.get();
+
+    // Update the thread name.
+    currentThreadInfo.updateThreadName(future.getJobInput().getThreadName(), buildThreadName(future));
+
+    // Install listener to decorate the thread name upon job state change.
+    final IJobListenerRegistration listenerRegistration = future.addListener(
         Jobs.newEventFilterBuilder()
-            .andMatchEventType(
-                JobEventType.BLOCKED,
-                JobEventType.UNBLOCKED,
-                JobEventType.RESUMED)
+            .andMatchEventType(JobEventType.JOB_STATE_CHANGED)
+            .andMatchState(
+                JobState.RUNNING,
+                JobState.WAITING_FOR_MUTEX,
+                JobState.WAITING_FOR_BLOCKING_CONDITION)
             .toFilter(),
         new IJobListener() {
+
           @Override
           public void changed(final JobEvent event) {
-            switch (event.getType()) {
-              case BLOCKED:
-                currentThreadInfo.updateState(JobState.Blocked, event.getBlockingCondition().getName());
-                break;
-              case UNBLOCKED:
-                currentThreadInfo.updateState(JobState.Resuming, event.getBlockingCondition().getName());
-                break;
-              case RESUMED:
-                currentThreadInfo.updateState(JobState.Running, null);
-                break;
-            }
+            currentThreadInfo.updateThreadName(future.getJobInput().getThreadName(), buildThreadName(future));
           }
         });
 
-    // Update the name of the thread.
-    currentThreadInfo.updateNameAndState(m_threadName, m_jobName, JobState.Running);
-
-    // Set origin thread name and state.
+    // Restore to the original thread name.
     return new IUndecorator<RESULT>() {
 
       @Override
@@ -85,5 +71,9 @@ public class ThreadNameDecorator<RESULT> implements ICallableDecorator<RESULT> {
         currentThreadInfo.reset();
       }
     };
+  }
+
+  protected String buildThreadName(final IFuture<?> future) {
+    return String.format("(%s) '%s'", future.getState(), future.getJobInput().getName());
   }
 }

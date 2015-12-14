@@ -57,8 +57,8 @@ public class JobFutureVisitTest {
 
     // prepare the test-case
     protocol = Collections.synchronizedSet(new HashSet<String>()); // synchronized because modified/read by different threads.
-    bc1 = Jobs.newBlockingCondition("BC1", true);
-    bc2 = Jobs.newBlockingCondition("BC2", true);
+    bc1 = Jobs.newBlockingCondition(true);
+    bc2 = Jobs.newBlockingCondition(true);
 
     m_latch = new BlockingCountDownLatch(3);
 
@@ -262,7 +262,7 @@ public class JobFutureVisitTest {
   public void testVisitBlockedFilter() {
     final Set<String> visitedFutures = new HashSet<>();
     Jobs.getJobManager().visit(Jobs.newFutureFilterBuilder()
-        .andAreBlocked()
+        .andMatchState(JobState.WAITING_FOR_BLOCKING_CONDITION)
         .toFilter(), new IVisitor<IFuture<?>>() {
 
           @Override
@@ -287,7 +287,7 @@ public class JobFutureVisitTest {
   public void testVisitNotBlockedFilter() {
     final Set<String> visitedFutures = new HashSet<>();
     Jobs.getJobManager().visit(new NotFilter<>(Jobs.newFutureFilterBuilder()
-        .andAreBlocked()
+        .andMatchState(JobState.WAITING_FOR_BLOCKING_CONDITION)
         .toFilter()), new IVisitor<IFuture<?>>() {
 
           @Override
@@ -363,7 +363,7 @@ public class JobFutureVisitTest {
     final Set<String> visitedFutures = new HashSet<>();
     Jobs.getJobManager().visit(new AndFilter<IFuture<?>>(Jobs.newFutureFilterBuilder()
         .andMatchNameRegex(Pattern.compile("mutex1_.*"))
-        .andAreBlocked()
+        .andMatchState(JobState.WAITING_FOR_BLOCKING_CONDITION)
         .toFilter()), new IVisitor<IFuture<?>>() {
 
           @Override

@@ -158,7 +158,6 @@ public class Mutex implements IMutex {
     Assertions.assertSame(mutexTask, m_mutexOwner, "Task does not own the mutex  [mutexOwner={}, task={}]", m_mutexOwner, mutexTask);
 
     final AcquisitionTask acquisitionTask;
-
     m_writeLock.lock();
     try {
       acquisitionTask = m_competitors.poll();
