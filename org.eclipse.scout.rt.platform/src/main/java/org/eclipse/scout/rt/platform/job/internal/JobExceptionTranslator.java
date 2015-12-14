@@ -59,14 +59,14 @@ public class JobExceptionTranslator {
   /**
    * Translates {@link ExecutionException} into exception according to {@link IExceptionTranslator}.
    */
-  protected <EXCEPTION extends Exception> EXCEPTION translateExecutionException(final ExecutionException e, final Class<? extends IExceptionTranslator<EXCEPTION>> translator) {
-    return decorate(BEANS.get(translator).translate(e.getCause()));
+  protected <EXCEPTION extends Throwable> EXCEPTION translateExecutionException(final ExecutionException e, final Class<? extends IExceptionTranslator<EXCEPTION>> translator) {
+    return decorate(BEANS.get(translator).translate(e)); // Do not unwrap ExecutionException here because to be done by translator, so that the submitter can also work with ExecutionException, e.g. by using NullExceptionTranslator.
   }
 
   /**
    * Method invoked to decorate an exception before given to the caller.
    */
-  protected <EXCEPTION extends Exception> EXCEPTION decorate(final EXCEPTION exception) {
+  protected <EXCEPTION extends Throwable> EXCEPTION decorate(final EXCEPTION exception) {
     if (exception instanceof PlatformException) {
       ((PlatformException) exception)
           .withContextInfo("user", SecurityUtility.getPrincipalNames(Subject.getSubject(AccessController.getContext())))

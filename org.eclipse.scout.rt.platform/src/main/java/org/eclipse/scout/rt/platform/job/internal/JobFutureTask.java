@@ -285,7 +285,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
   }
 
   @Override
-  public <EXCEPTION extends Exception> RESULT awaitDoneAndGet(final Class<? extends IExceptionTranslator<EXCEPTION>> exceptionTranslator) throws EXCEPTION {
+  public <EXCEPTION extends Throwable> RESULT awaitDoneAndGet(final Class<? extends IExceptionTranslator<EXCEPTION>> exceptionTranslator) throws EXCEPTION {
     assertNotSameMutex();
 
     try {
@@ -309,7 +309,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
   }
 
   @Override
-  public <EXCEPTION extends Exception> RESULT awaitDoneAndGet(final long timeout, final TimeUnit unit, final Class<? extends IExceptionTranslator<EXCEPTION>> exceptionTranslator) throws EXCEPTION {
+  public <EXCEPTION extends Throwable> RESULT awaitDoneAndGet(final long timeout, final TimeUnit unit, final Class<? extends IExceptionTranslator<EXCEPTION>> exceptionTranslator) throws EXCEPTION {
     assertNotSameMutex();
 
     try {
@@ -408,7 +408,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
   /**
    * Method invoked to intercept an exception before given to the submitter.
    */
-  protected <EXCEPTION extends Exception> EXCEPTION interceptException(final EXCEPTION exception) {
+  protected <EXCEPTION extends Throwable> EXCEPTION interceptException(final EXCEPTION exception) {
     if (exception instanceof PlatformException) {
       ((PlatformException) exception).withContextInfo("job", getJobInput().getName());
     }

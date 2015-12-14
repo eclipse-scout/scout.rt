@@ -142,7 +142,7 @@ public interface IFuture<RESULT> extends ICancellable {
    * @throws EXCEPTION
    *           if the job throws an exception, and is translated by the given {@link IExceptionTranslator}.
    */
-  <EXCEPTION extends Exception> RESULT awaitDoneAndGet(Class<? extends IExceptionTranslator<EXCEPTION>> exceptionTranslator) throws EXCEPTION;
+  <EXCEPTION extends Throwable> RESULT awaitDoneAndGet(Class<? extends IExceptionTranslator<EXCEPTION>> exceptionTranslator) throws EXCEPTION;
 
   /**
    * Waits if necessary for at most the given time for the job to complete, and then retrieves its result or throws its
@@ -190,7 +190,7 @@ public interface IFuture<RESULT> extends ICancellable {
    * @throws EXCEPTION
    *           if the job throws an exception, and is translated by the given {@link IExceptionTranslator}.
    */
-  <EXCEPTION extends Exception> RESULT awaitDoneAndGet(long timeout, TimeUnit unit, Class<? extends IExceptionTranslator<EXCEPTION>> exceptionTranslator) throws EXCEPTION;
+  <EXCEPTION extends Throwable> RESULT awaitDoneAndGet(long timeout, TimeUnit unit, Class<? extends IExceptionTranslator<EXCEPTION>> exceptionTranslator) throws EXCEPTION;
 
   /**
    * Registers the given <code>callback</code> to be invoked once the Future enters 'done' state. That is once the
