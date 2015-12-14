@@ -26,7 +26,7 @@ import org.eclipse.scout.rt.platform.util.ToStringBuilder;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.ServiceTunnelServlet;
 import org.eclipse.scout.rt.server.clientnotification.IClientNodeId;
-import org.eclipse.scout.rt.server.clientnotification.TransactionalClientNotificationCollector;
+import org.eclipse.scout.rt.server.clientnotification.ClientNotificationCollector;
 import org.eclipse.scout.rt.server.session.ServerSessionProvider;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.server.transaction.TransactionRequiredException;
@@ -66,7 +66,7 @@ public class ServerRunContext extends RunContext {
   protected IServerSession m_session;
   protected UserAgent m_userAgent;
   protected String m_clientNodeId;
-  protected TransactionalClientNotificationCollector m_transactionalClientNotificationCollector;
+  protected ClientNotificationCollector m_transactionalClientNotificationCollector;
   protected TransactionScope m_transactionScope;
   protected ITransaction m_transaction;
 
@@ -79,7 +79,7 @@ public class ServerRunContext extends RunContext {
         .add(new DiagnosticContextValueProcessor<>(BEANS.get(UserIdContextValueProvider.class)))
         .add(new ThreadLocalProcessor<>(UserAgent.CURRENT, m_userAgent))
         .add(new ThreadLocalProcessor<>(IClientNodeId.CURRENT, m_clientNodeId))
-        .add(new ThreadLocalProcessor<>(TransactionalClientNotificationCollector.CURRENT, m_transactionalClientNotificationCollector))
+        .add(new ThreadLocalProcessor<>(ClientNotificationCollector.CURRENT, m_transactionalClientNotificationCollector))
         .add(new ThreadLocalProcessor<>(ScoutTexts.CURRENT, (m_session != null ? m_session.getTexts() : ScoutTexts.CURRENT.get())))
         .add(new TransactionProcessor<>(getTransaction(), m_transactionScope));
   }
@@ -178,16 +178,16 @@ public class ServerRunContext extends RunContext {
   }
 
   /**
-   * @see #withTransactionalClientNotificationCollector(TransactionalClientNotificationCollector)
+   * @see #withClientNotificationCollector(ClientNotificationCollector)
    */
-  public TransactionalClientNotificationCollector getTransactionalClientNotificationCollector() {
+  public ClientNotificationCollector getTransactionalClientNotificationCollector() {
     return m_transactionalClientNotificationCollector;
   }
 
   /**
-   * Associates this context with the given {@link TransactionalClientNotificationCollector}, meaning that any code
+   * Associates this context with the given {@link ClientNotificationCollector}, meaning that any code
    * running on behalf of this context has that collector set in
-   * {@link TransactionalClientNotificationCollector#CURRENT} thread-local.
+   * {@link ClientNotificationCollector#CURRENT} thread-local.
    * <p>
    * That collector is used to collect all transactional client notifications, which are to be published upon successful
    * commit of the associated transaction, and which are addressed to the client node which triggered processing (see
@@ -196,7 +196,7 @@ public class ServerRunContext extends RunContext {
    * <p>
    * Typically, that collector is set by {@link ServiceTunnelServlet} for the processing of a service request.
    */
-  public ServerRunContext withTransactionalClientNotificationCollector(final TransactionalClientNotificationCollector collector) {
+  public ServerRunContext withClientNotificationCollector(final ClientNotificationCollector collector) {
     m_transactionalClientNotificationCollector = collector;
     return this;
   }
@@ -276,7 +276,7 @@ public class ServerRunContext extends RunContext {
     super.fillCurrentValues();
     m_identifiers.push(SERVER_RUN_CONTEXT_IDENTIFIER);
     m_userAgent = UserAgent.CURRENT.get();
-    m_transactionalClientNotificationCollector = TransactionalClientNotificationCollector.CURRENT.get();
+    m_transactionalClientNotificationCollector = ClientNotificationCollector.CURRENT.get();
     m_clientNodeId = IClientNodeId.CURRENT.get();
     m_transactionScope = TransactionScope.REQUIRES_NEW;
     m_transaction = ITransaction.CURRENT.get();
@@ -288,7 +288,7 @@ public class ServerRunContext extends RunContext {
     super.fillEmptyValues();
     m_identifiers.push(SERVER_RUN_CONTEXT_IDENTIFIER);
     m_userAgent = null;
-    m_transactionalClientNotificationCollector = new TransactionalClientNotificationCollector();
+    m_transactionalClientNotificationCollector = new ClientNotificationCollector();
     m_clientNodeId = null;
     m_transactionScope = TransactionScope.REQUIRES_NEW;
     m_transaction = null;

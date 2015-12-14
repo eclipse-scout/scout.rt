@@ -196,11 +196,11 @@ public class ClientNotificationRegistryTest {
       final String currentNode = TEST_NODE;
       final String otherNode = "Node2";
 
-      TransactionalClientNotificationCollector collector = new TransactionalClientNotificationCollector();
+      ClientNotificationCollector collector = new ClientNotificationCollector();
 
       ServerRunContexts.copyCurrent()
           .withClientNodeId(currentNode)
-          .withTransactionalClientNotificationCollector(collector)
+          .withClientNotificationCollector(collector)
           .run(new IRunnable() {
 
             @Override
@@ -212,7 +212,7 @@ public class ClientNotificationRegistryTest {
               reg.putTransactionalForUser(TEST_USER, TEST_NOTIFICATION);
               commit();
               //collected for request
-              List<ClientNotificationMessage> notifications = TransactionalClientNotificationCollector.CURRENT.get().consume();
+              List<ClientNotificationMessage> notifications = ClientNotificationCollector.CURRENT.get().consume();
               assertSingleTestNotification(notifications);
               //no notification for current node
               List<ClientNotificationMessage> ownRegNotifications = consumeNoWait(reg, currentNode);
@@ -236,9 +236,9 @@ public class ClientNotificationRegistryTest {
     final String currentNode = TEST_NODE;
     final String otherNode = "Node2";
 
-    TransactionalClientNotificationCollector collector = new TransactionalClientNotificationCollector();
+    ClientNotificationCollector collector = new ClientNotificationCollector();
     collector.consume();
-    ServerRunContexts.copyCurrent().withClientNodeId(currentNode).withTransactionalClientNotificationCollector(collector).run(new IRunnable() {
+    ServerRunContexts.copyCurrent().withClientNodeId(currentNode).withClientNotificationCollector(collector).run(new IRunnable() {
 
       @Override
       public void run() throws Exception {
@@ -248,7 +248,7 @@ public class ClientNotificationRegistryTest {
         reg.putTransactionalForUser(TEST_USER, TEST_NOTIFICATION);
         commit();
         //no notifications for current request (piggy back)
-        List<ClientNotificationMessage> notifications = TransactionalClientNotificationCollector.CURRENT.get().consume();
+        List<ClientNotificationMessage> notifications = ClientNotificationCollector.CURRENT.get().consume();
         assertTrue(notifications.isEmpty());
         //notifications for current nodes
         assertSingleTestNotification(consumeNoWait(reg, currentNode));

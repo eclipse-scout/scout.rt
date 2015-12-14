@@ -23,12 +23,12 @@ import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
  *
  * @see ClientNotificationTransactionMember
  */
-public class TransactionalClientNotificationCollector {
+public class ClientNotificationCollector {
 
   /**
-   * The {@link TransactionalClientNotificationCollector} which is currently associated with the current thread.
+   * The {@link ClientNotificationCollector} which is currently associated with the current thread.
    */
-  public static final ThreadLocal<TransactionalClientNotificationCollector> CURRENT = new ThreadLocal<>();
+  public static final ThreadLocal<ClientNotificationCollector> CURRENT = new ThreadLocal<>();
 
   private final List<ClientNotificationMessage> m_notifications = new ArrayList<>();
   private boolean m_active = true;

@@ -23,14 +23,14 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 /**
- * Tests for {@link TransactionalClientNotificationCollector}
+ * Tests for {@link ClientNotificationCollector}
  */
 public class TransactionalClientNotificationCollectorTest {
-  TransactionalClientNotificationCollector m_collector;
+  ClientNotificationCollector m_collector;
 
   @Before
   public void before() {
-    m_collector = new TransactionalClientNotificationCollector();
+    m_collector = new ClientNotificationCollector();
   }
 
   /**

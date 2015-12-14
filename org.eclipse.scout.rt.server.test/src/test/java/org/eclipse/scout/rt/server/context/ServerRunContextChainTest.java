@@ -28,7 +28,7 @@ import org.eclipse.scout.rt.platform.security.SubjectProcessor;
 import org.eclipse.scout.rt.platform.util.ThreadLocalProcessor;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.clientnotification.IClientNodeId;
-import org.eclipse.scout.rt.server.clientnotification.TransactionalClientNotificationCollector;
+import org.eclipse.scout.rt.server.clientnotification.ClientNotificationCollector;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
@@ -113,7 +113,7 @@ public class ServerRunContextChainTest {
     // 11. ThreadLocalProcessor for TransactionalClientNotificationCollector.CURRENT
     c = chainIterator.next();
     assertEquals(ThreadLocalProcessor.class, c.getClass());
-    assertSame(TransactionalClientNotificationCollector.CURRENT, ((ThreadLocalProcessor) c).getThreadLocal());
+    assertSame(ClientNotificationCollector.CURRENT, ((ThreadLocalProcessor) c).getThreadLocal());
 
     // 12. ThreadLocalProcessor for ScoutTexts.CURRENT
     c = chainIterator.next();

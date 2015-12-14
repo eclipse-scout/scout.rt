@@ -11,7 +11,7 @@
 package org.eclipse.scout.rt.testing.server.runner.statement;
 
 import org.eclipse.scout.rt.platform.util.Assertions;
-import org.eclipse.scout.rt.server.clientnotification.TransactionalClientNotificationCollector;
+import org.eclipse.scout.rt.server.clientnotification.ClientNotificationCollector;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.server.transaction.TransactionScope;
 import org.eclipse.scout.rt.testing.platform.runner.SafeStatementInvoker;
@@ -27,12 +27,12 @@ public class ClientNotificationsStatement extends Statement {
 
   private final Statement m_next;
   private final String m_clientNodeId;
-  private final TransactionalClientNotificationCollector m_collector;
+  private final ClientNotificationCollector m_collector;
 
   public ClientNotificationsStatement(final Statement next, final RunWithClientNotifications annotation) {
     m_next = Assertions.assertNotNull(next, "next statement must not be null");
     m_clientNodeId = (annotation != null ? annotation.clientNodeId() : null);
-    m_collector = new TransactionalClientNotificationCollector();
+    m_collector = new ClientNotificationCollector();
   }
 
   @Override
@@ -40,7 +40,7 @@ public class ClientNotificationsStatement extends Statement {
     final SafeStatementInvoker invoker = new SafeStatementInvoker(m_next);
 
     ServerRunContexts.copyCurrent()
-        .withTransactionalClientNotificationCollector(m_collector)
+        .withClientNotificationCollector(m_collector)
         .withTransactionScope(TransactionScope.REQUIRES_NEW)
         .withClientNodeId(m_clientNodeId)
         .run(invoker);

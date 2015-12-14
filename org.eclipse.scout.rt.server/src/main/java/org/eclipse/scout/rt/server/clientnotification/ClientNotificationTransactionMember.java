@@ -82,7 +82,7 @@ public class ClientNotificationTransactionMember extends AbstractTransactionMemb
    * (piggyback).
    */
   private boolean tryPiggyBack(List<ClientNotificationMessage> notifications) {
-    TransactionalClientNotificationCollector collector = TransactionalClientNotificationCollector.CURRENT.get();
+    ClientNotificationCollector collector = ClientNotificationCollector.CURRENT.get();
     if (IClientNodeId.CURRENT.get() != null && collector != null) {
       return collector.addAll(notifications);
     }

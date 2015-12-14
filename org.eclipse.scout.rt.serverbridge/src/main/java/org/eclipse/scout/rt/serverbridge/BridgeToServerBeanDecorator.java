@@ -20,7 +20,7 @@ import org.eclipse.scout.rt.platform.context.RunContextIdentifiers;
 import org.eclipse.scout.rt.platform.interceptor.IBeanDecorator;
 import org.eclipse.scout.rt.platform.interceptor.IBeanInvocationContext;
 import org.eclipse.scout.rt.server.IServerSession;
-import org.eclipse.scout.rt.server.clientnotification.TransactionalClientNotificationCollector;
+import org.eclipse.scout.rt.server.clientnotification.ClientNotificationCollector;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.server.session.ServerSessionProviderWithCache;
@@ -68,10 +68,10 @@ public class BridgeToServerBeanDecorator<T> implements IBeanDecorator<T> {
     }
 
     // bridge to server scope
-    TransactionalClientNotificationCollector collector = new TransactionalClientNotificationCollector();
+    ClientNotificationCollector collector = new ClientNotificationCollector();
     ServerRunContext bridgeRunContext = ServerRunContexts
         .copyCurrent()
-        .withTransactionalClientNotificationCollector(collector)
+        .withClientNotificationCollector(collector)
         .withClientNodeId(IClientNode.ID);
     ISession currentSession = ISession.CURRENT.get();
     IServerSession bridgeSession = null;

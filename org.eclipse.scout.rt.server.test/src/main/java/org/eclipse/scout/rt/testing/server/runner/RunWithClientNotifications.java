@@ -17,13 +17,13 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import org.eclipse.scout.rt.server.clientnotification.IClientNodeId;
-import org.eclipse.scout.rt.server.clientnotification.TransactionalClientNotificationCollector;
+import org.eclipse.scout.rt.server.clientnotification.ClientNotificationCollector;
 
 /**
  * Annotation to set {@link ThreadLocal} for client notifications.
  * <ul>
  * <li>{@link IClientNodeId#CURRENT}</li>
- * <li>{@link TransactionalClientNotificationCollector#CURRENT}</li>
+ * <li>{@link ClientNotificationCollector#CURRENT}</li>
  * </ul>
  *
  * @since 5.1

@@ -36,7 +36,7 @@ import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
 import org.eclipse.scout.rt.platform.serialization.SerializationUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.server.admin.html.AdminSession;
-import org.eclipse.scout.rt.server.clientnotification.TransactionalClientNotificationCollector;
+import org.eclipse.scout.rt.server.clientnotification.ClientNotificationCollector;
 import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
 import org.eclipse.scout.rt.server.commons.context.ServletRunContexts;
 import org.eclipse.scout.rt.server.commons.servlet.IHttpServletRoundtrip;
@@ -126,14 +126,14 @@ public class ServiceTunnelServlet extends HttpServlet {
               }
               else {
                 // Collector to collect transactional client notifications issued during processing of the current request.
-                TransactionalClientNotificationCollector transactionalClientNotificationCollector = new TransactionalClientNotificationCollector();
+                ClientNotificationCollector transactionalClientNotificationCollector = new ClientNotificationCollector();
                 // Enable global cancellation of the service request.
                 RunMonitor runMonitor = BEANS.get(RunMonitor.class);
                 ServerRunContext serverRunContext = ServerRunContexts.copyCurrent()
                     .withLocale(serviceRequest.getLocale())
                     .withUserAgent(UserAgent.createByIdentifier(serviceRequest.getUserAgent()))
                     .withRunMonitor(runMonitor)
-                    .withTransactionalClientNotificationCollector(transactionalClientNotificationCollector)
+                    .withClientNotificationCollector(transactionalClientNotificationCollector)
                     .withClientNodeId(serviceRequest.getClientNodeId())
                     .withProperty(SESSION_ID, serviceRequest.getSessionId());
                 serverRunContext.withSession(lookupServerSessionOnHttpSession(serverRunContext.copy()));
