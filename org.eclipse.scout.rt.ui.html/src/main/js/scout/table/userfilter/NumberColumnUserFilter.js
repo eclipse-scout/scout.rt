@@ -2,7 +2,9 @@ scout.NumberColumnUserFilter = function() {
   scout.NumberColumnUserFilter.parent.call(this);
 
   this.numberFrom;
+  this.numberFromField;
   this.numberTo;
+  this.numberToField;
 };
 scout.inherits(scout.NumberColumnUserFilter, scout.ColumnUserFilter);
 
@@ -42,12 +44,34 @@ scout.NumberColumnUserFilter.prototype.acceptByFields = function(key, normKey) {
 /**
  * @implements ColumnUserFilter.js
  */
-scout.NumberColumnUserFilter.prototype.updateFilterFields = function(event) {
+scout.NumberColumnUserFilter.prototype.filterFieldsTitle = function() {
+  return this.session.text('ui.NumberRange');
+};
+
+/**
+ * @override ColumnUserFilter.js
+ */
+scout.NumberColumnUserFilter.prototype.addFilterFields = function(groupBox) {
+  this.numberFromField = groupBox.addFilterField('NumberField', 'ui.from', 0);
+  this.numberFromField.displayText = _toNumberString(this.numberFrom);
+  this.numberFromField.on('displayTextChanged', this._onDisplayTextChanged.bind(this));
+
+  this.numberToField = groupBox.addFilterField('NumberField', 'ui.to', 1);
+  this.numberToField.displayText = _toNumberString(this.numberTo);
+  this.numberToField.on('displayTextChanged', this._onDisplayTextChanged.bind(this));
+
+  function _toNumberString(number) {
+    return scout.objects.isNumber(number) ? number.toString() : '';
+  }
+};
+
+scout.NumberColumnUserFilter.prototype._onDisplayTextChanged = function(event) {
   $.log.debug('(NumberColumnUserFilter#updateFilterFields) from=' + event.from + ' to=' + event.to);
   // FIXME AWE: (filter) discuss with C.GU... unser NumberField.js kann keinen value (numeric) liefern, richtig?
   // Das field sollte etwas wie getValue() haben das eine fixfertige number liefert anstatt der konvertierung hier
-  this.numberFrom = this._toNumber(event.from),
-  this.numberTo = this._toNumber(event.to);
+  this.numberFrom = this._toNumber(this.numberFromField.displayText),
+  this.numberTo = this._toNumber(this.numberToField.displayText);
+  this.triggerFilterFieldsChanged(event);
 };
 
 scout.NumberColumnUserFilter.prototype._toNumber = function(numberString) {

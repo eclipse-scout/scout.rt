@@ -43,7 +43,7 @@ describe('ObjectFactory', function() {
       model.selectedDate = '2015-04-06 00:00:00.000';
     } else if ('Form' === objectType) {
       model.displayHint = 'view';
-    } else if ('ColumnUserFilter' === objectType) {
+    } else if ('TextColumnUserFilter' === objectType) {
       model.table = {};
       model.column = {};
       model.calculate = function() {};

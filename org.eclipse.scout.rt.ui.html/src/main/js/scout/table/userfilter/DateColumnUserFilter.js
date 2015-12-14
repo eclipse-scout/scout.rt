@@ -2,7 +2,9 @@ scout.DateColumnUserFilter = function() {
   scout.DateColumnUserFilter.parent.call(this);
 
   this.dateFrom;
+  this.dateFromField;
   this.dateTo;
+  this.dateToField;
 };
 scout.inherits(scout.DateColumnUserFilter, scout.ColumnUserFilter);
 
@@ -65,8 +67,37 @@ scout.DateColumnUserFilter.prototype.acceptByFields = function(key, normKey) {
 /**
  * @implements ColumnUserFilter.js
  */
-scout.DateColumnUserFilter.prototype.updateFilterFields = function(event) {
+scout.DateColumnUserFilter.prototype.filterFieldsTitle = function() {
+  return this.session.text('ui.DateRange');
+};
+
+/**
+ * FIXME AWE: (filter) refactor DateField.js -
+ * rename timestampAsDate to value (also on JsonDateField)
+ * use Date object everywhere and todays 'timestamp' date-string
+ * only when we communicate with the UI server. Then remove the _toJsonDate
+ * function used here and work with the Date object. Implement a _syncValue
+ * method to convert the date-string into a Date object in DateField.js
+ *
+ * @override ColumnUserFilter.js
+ */
+scout.DateColumnUserFilter.prototype.addFilterFields = function(groupBox) {
+  this.dateFromField = groupBox.addFilterField('DateField', 'ui.from', 0);
+  this.dateFromField.timestamp = _toJsonDate(this.dateFrom);
+  this.dateFromField.on('timestampChanged', this._onDisplayTextChanged.bind(this));
+
+  this.dateToField = groupBox.addFilterField('DateField', 'ui.to', 1);
+  this.dateToField.timestamp = _toJsonDate(this.dateTo);
+  this.dateToField.on('timestampChanged', this._onDisplayTextChanged.bind(this));
+
+  function _toJsonDate(date) {
+    return date ? scout.dates.toJsonDate(date) : null;
+  }
+};
+
+scout.DateColumnUserFilter.prototype._onDisplayTextChanged = function(event) {
   $.log.debug('(DateColumnUserFilter#updateFilterFields) from=' + event.from + ' to=' + event.to);
-  this.dateFrom = event.from,
-  this.dateTo = event.to;
+  this.dateFrom = this.dateFromField.timestampAsDate,
+  this.dateTo = this.dateToField.timestampAsDate;
+  this.triggerFilterFieldsChanged(event);
 };

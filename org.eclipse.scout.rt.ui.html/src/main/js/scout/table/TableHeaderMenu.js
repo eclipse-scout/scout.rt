@@ -58,6 +58,7 @@ scout.TableHeaderMenu.prototype._init = function(options) {
   }
   // always recalculate available values to make sure new/updated/deleted rows are considered
   this.filter.calculate();
+  this.filter.on('filterFieldsChanged', this._updateTableFilters.bind(this)); // FIXME AWE: (filter) off handler?
   this._updateFilterCheckedMode();
 };
 
@@ -551,14 +552,8 @@ scout.TableHeaderMenu.prototype._renderFilterFields = function() {
   this.$filterFieldsGroup = this.$columnFilters.appendDiv('table-header-menu-group');
   this.$filterFieldsGroup
     .appendDiv('table-header-menu-group-text')
-    .data('label', this.filterFieldsGroupBox.groupText());
+    .data('label', this.filter.filterFieldsTitle());
   this.filterFieldsGroupBox.render(this.$filterFieldsGroup);
-  this.filterFieldsGroupBox.on('filterUpdated', this._onFilterFieldsUpdated.bind(this)); // FIXME AWE: (filter) remove -> off
-};
-
-scout.TableHeaderMenu.prototype._onFilterFieldsUpdated = function(event) {
-  this.filter.updateFilterFields(event);
-  this._updateTableFilters();
 };
 
 scout.TableHeaderMenu.prototype.isOpenFor = function($headerItem) {

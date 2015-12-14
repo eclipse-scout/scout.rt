@@ -29,7 +29,7 @@ describe("Table Filter", function() {
 
   function createColumnFilterModel(columnId, selectedValues) {
     return {
-      objectType: 'ColumnUserFilter',
+      objectType: 'TextColumnUserFilter',
       column: columnId,
       selectedValues: selectedValues
     };

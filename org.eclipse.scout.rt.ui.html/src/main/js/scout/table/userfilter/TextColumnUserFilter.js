@@ -2,6 +2,7 @@ scout.TextColumnUserFilter = function() {
   scout.TextColumnUserFilter.parent.call(this);
 
   this.freeText;
+  this.freeTextField;
 };
 scout.inherits(scout.TextColumnUserFilter, scout.ColumnUserFilter);
 
@@ -32,15 +33,43 @@ scout.TextColumnUserFilter.prototype.acceptByFields = function(key, normKey) {
 /**
  * @implements ColumnUserFilter.js
  */
-scout.TextColumnUserFilter.prototype.updateFilterFields = function(event) {
-  $.log.debug('(TextColumnUserFilter#updateFilterFields) text=' + event.text);
-  this.freeText = event.text.trim();
+scout.TextColumnUserFilter.prototype._useTextInsteadOfNormValue = function(value) {
+  // null is valid, if for text columns. We do not want to store -empty-
+  return value === null ? false : true;
 };
 
 /**
  * @implements ColumnUserFilter.js
  */
-scout.TextColumnUserFilter.prototype._useTextInsteadOfNormValue = function(value) {
-  // null is valid, if for text columns. We do not want to store -empty-
-  return value === null ? false : true;
+scout.TextColumnUserFilter.prototype.filterFieldsTitle = function() {
+  return this.session.text('ui.FreeText');
+};
+
+/**
+ * @override ColumnUserFilter.js
+ */
+scout.TextColumnUserFilter.prototype.addFilterFields = function(groupBox) {
+  this.freeTextField = scout.create('StringField', {
+    parent: groupBox,
+    labelVisible: false,
+    statusVisible: false,
+    maxLength: 100,
+    displayText: this.freeText
+  });
+  this.freeTextField.on('displayTextChanged', this._onDisplayTextChanged.bind(this));
+  groupBox.addField0(this.freeTextField);
+};
+
+scout.TextColumnUserFilter.prototype._onDisplayTextChanged = function(event) {
+  $.log.debug('(TextColumnUserFilter#updateFilterFields) freeText=' + event.displayText);
+  this.freeText = event.displayText.trim();
+  this.triggerFilterFieldsChanged(event);
+};
+
+/**
+ * @override ColumnUserFilter.js
+ */
+scout.TextColumnUserFilter.prototype.modifyFilterFields = function() {
+  this.freeTextField.$mandatory.remove();
+  this.freeTextField.$mandatory = null;
 };

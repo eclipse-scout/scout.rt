@@ -11,6 +11,7 @@
 scout.ColumnUserFilter = function() {
   scout.ColumnUserFilter.parent.call(this);
   this.filterType = scout.ColumnUserFilter.Type;
+  this.events = new scout.EventSupport();
 
   /**
    * array of (normalized) key, text composite
@@ -143,6 +144,18 @@ scout.ColumnUserFilter.prototype.tableFilterActive = function() {
   return this.selectedValues.length > 0;
 };
 
+scout.ColumnUserFilter.prototype.triggerFilterFieldsChanged = function(event) {
+  this.events.trigger('filterFieldsChanged', event);
+};
+
+scout.ColumnUserFilter.prototype.on = function(type, func) {
+  this.events.on(type, func);
+};
+
+scout.ColumnUserFilter.prototype.off = function(type, func) {
+  this.events.off(type, func);
+};
+
 /**
  * @interface
  */
@@ -154,6 +167,27 @@ scout.ColumnUserFilter.prototype.acceptByFields = function(key, normKey) {};
 scout.ColumnUserFilter.prototype.fieldsFilterActive = function() {};
 
 /**
- * @interface
+ * Adds filter fields for this type of column filter.
+ * The default impl. adds no fields.
+ *
+ * @param groupBox FilterFieldsGroupBox
  */
-scout.ColumnUserFilter.prototype.updateFilterFields = function(event) {};
+scout.ColumnUserFilter.prototype.addFilterFields = function(groupBox) {
+  // NOP
+};
+
+/**
+ * Called after filter group-box has been rendered. Gives the filter impl. a chance to
+ * modify the rendered fields. The default impl. does nothing.
+ */
+scout.ColumnUserFilter.prototype.modifyFilterFields = function() {
+  // NOP
+};
+
+/**
+ * Returns the title displayed above the filter fields.
+ * The default impl. returns a null value, which means the title is not displayed.
+ */
+scout.ColumnUserFilter.prototype.filterFieldsTitle = function() {
+  return null;
+};
