@@ -46,6 +46,14 @@ describe("Table Filter", function() {
 
   describe("row filtering", function() {
 
+    beforeEach(function() {
+      $.fx.off = true;
+    });
+
+    afterEach(function() {
+      $.fx.off = false;
+    });
+
     it("applies row filter when table gets initialized", function() {
       var model = helper.createModelFixture(2, 2);
       var filter = createColumnFilterModel(model.columns[0].id, ['cell1_0']);
@@ -91,7 +99,7 @@ describe("Table Filter", function() {
       var filteredRows = table.filteredRows();
       expect(filteredRows.length).toBe(1);
       expect(table.rows[2].filterAccepted).toBe(false);
-      expect(table.rows[2].$row.isVisible()).toBe(false);
+      expect(table.rows[2].$row).toBeFalsy();
 
       rows = helper.createModelRows(2, 1);
       rows[0].cells[0].value = 'cell1_0';
@@ -122,7 +130,7 @@ describe("Table Filter", function() {
       expect(table.rows[2].$row).toBeFalsy();
 
       table.render(session.$entryPoint);
-      expect(table.rows[2].$row.isVisible()).toBe(false);
+      expect(table.rows[2].$row).toBeFalsy();
     });
 
     it("applies row filter if a row gets updated", function() {
@@ -193,8 +201,8 @@ describe("Table Filter", function() {
       expect(table.rows[1].$row).toBeFalsy();
 
       table.render(session.$entryPoint);
-      expect(table.rows[0].$row.isVisible()).toBe(false);
-      expect(table.rows[1].$row.isVisible()).toBe(false);
+      expect(table.rows[0].$row).toBeFalsy();
+      expect(table.rows[1].$row).toBeFalsy();
     });
 
     it("properly handles successive row insertion and updates", function() {
@@ -217,7 +225,7 @@ describe("Table Filter", function() {
       var filteredRows = table.filteredRows();
       expect(filteredRows.length).toBe(1);
       expect(table.rows[2].filterAccepted).toBe(false);
-      expect(table.rows[2].$row.isVisible()).toBe(false);
+      expect(table.rows[2].$row).toBeFalsy();
 
       // update new row -> still not visible
       rows = helper.createModelRows(2, 1);
@@ -228,10 +236,10 @@ describe("Table Filter", function() {
       filteredRows = table.filteredRows();
       expect(filteredRows.length).toBe(1);
       expect(table.rows[2].filterAccepted).toBe(false);
-      expect(table.rows[2].$row.isVisible()).toBe(false);
+      expect(table.rows[2].$row).toBeFalsy();
     });
 
-    it("properly handles block loading", function() {
+    it("considers view range", function() {
       var model = helper.createModelFixture(2, 7),
         table = helper.createTable(model),
         column0 = table.columns[0],
@@ -240,12 +248,47 @@ describe("Table Filter", function() {
       table.viewRangeSize = 2;
 
       // expects 1 row to be visible
-      var filter = createAndRegisterColumnFilter(table, column0, ['cell1_0']);
+      var filter = createAndRegisterColumnFilter(table, column0, ['cell1_0', 'cell3_0']);
       table.filter();
       table.render(session.$entryPoint);
 
       expect(table.rows.length).toBe(7);
-      expect(table.filteredRows().length).toBe(1);
+      expect(table.filteredRows().length).toBe(2);
+      expect(table.$rows().length).toBe(1); // only one row in view range
+      expect(table.$rows().eq(0).data('row')).toBe(table.filteredRows()[0]);
+
+      // Use last filtered row as base row index
+      var spy = spyOn(table, '_calculateCurrentViewRange').and.returnValue(new scout.Range(1, 2));
+      table._renderViewport();
+
+      expect(table.$rows().length).toBe(1); // only one row in view range
+      expect(table.$rows().eq(0).data('row')).toBe(table.filteredRows()[1]);
+    });
+
+    it("renders empty data if all rows are removed due to filtering", function() {
+      var model = helper.createModelFixture(2, 7),
+        table = helper.createTable(model),
+        column0 = table.columns[0],
+        row1 = table.rows[1];
+
+      table.render(session.$entryPoint);
+      expect(table.$emptyData).toBeUndefined();
+
+      var filter = createAndRegisterColumnFilter(table, column0, ['asdf']);
+      table.filter();
+
+      expect(table.rows.length).toBe(7);
+      expect(table.filteredRows().length).toBe(0);
+      expect(table.$rows().length).toBe(0);
+      expect(table.$emptyData).toBeDefined();
+
+      filter = createAndRegisterColumnFilter(table, column0, ['cell1_0']);
+      table.filter();
+      expect(table.$emptyData).toBeUndefined();
+
+      table.resetFilter();
+      expect(table.$emptyData).toBeUndefined();
+      expect(table.$rows().length).toBe(7);
     });
 
   });
@@ -290,6 +333,57 @@ describe("Table Filter", function() {
 
       expect(table.selectedRows.length).toBe(1);
       expect(table.selectedRows[0]).toBe(table.rows[2]);
+    });
+
+    it("gets restored for visible rows after filtering", function() {
+      var model = helper.createModelSingleColumnByValues([5, 2, 1, 3, 4], 'NumberColumn'),
+        table = helper.createTable(model),
+        column0 = model.columns[0],
+        rows = table.rows;
+      table._animationRowLimit = 0;
+      table.render(session.$entryPoint);
+
+      var $rows = table.$rows();
+      var $row0 = $rows.eq(0);
+      var $row1 = $rows.eq(1);
+      var $row2 = $rows.eq(2);
+      var $row3 = $rows.eq(3);
+      var $row4 = $rows.eq(4);
+
+      expect([$row0, $row1, $row2, $row3, $row4]).not.anyToHaveClass('selected');
+
+      table.selectRows([rows[1], rows[2], rows[3]]);
+
+      // before filtering
+      expect([$row1, $row2, $row3]).allToHaveClass('selected');
+      expect($row1).toHaveClass('select-top');
+      expect($row2).toHaveClass('select-middle');
+      expect($row3).toHaveClass('select-bottom');
+
+      expect([$row0, $row4]).not.anyToHaveClass('selected');
+      expect([$row0, $row2, $row3, $row4]).not.anyToHaveClass('select-top');
+      expect([$row0, $row1, $row3, $row4]).not.anyToHaveClass('select-middle');
+      expect([$row0, $row1, $row2, $row4]).not.anyToHaveClass('select-bottom');
+      expect([$row0, $row1, $row2, $row3, $row4]).not.anyToHaveClass('select-single');
+
+      // filter table (descending)
+      table.addFilter({
+        createKey: function() {
+          return 1;
+        },
+        accept: function(row) {
+          return row.$row.text() % 2 === 0;
+        }
+      });
+      table.filter();
+
+      // after filtering
+      $rows = table.$rows();
+      expect($rows.eq(0)).toHaveClass('selected');
+      expect($rows.eq(0)).toHaveClass('select-single');
+      expect($rows.eq(1)).not.toHaveClass('selected');
+      expect($rows.eq(1)).not.toHaveClass('select-single');
+      expect($rows.eq(1)).not.toHaveClass('select-top');
     });
 
   });

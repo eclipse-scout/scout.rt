@@ -231,7 +231,6 @@ describe("Table", function() {
       helper.selectRowsAndAssert(table, [model.rows[2]]);
     });
 
-
     it("considers view range", function() {
       var model = helper.createModelFixture(2, 5);
       var table = helper.createTable(model);
@@ -724,6 +723,52 @@ describe("Table", function() {
       expect(table._group).toHaveBeenCalled();
     });
 
+    it("restores selection after sorting", function() {
+      var model = helper.createModelSingleColumnByValues([5, 2, 1, 3, 4], 'NumberColumn'),
+        table = helper.createTable(model),
+        column0 = model.columns[0],
+        rows = table.rows;
+      table.render(session.$entryPoint);
+
+      var $rows = table.$rows();
+      var $row0 = $rows.eq(0);
+      var $row1 = $rows.eq(1);
+      var $row2 = $rows.eq(2);
+      var $row3 = $rows.eq(3);
+      var $row4 = $rows.eq(4);
+
+      expect([$row0, $row1, $row2, $row3, $row4]).not.anyToHaveClass('selected');
+
+      table.selectRows([rows[1], rows[2], rows[3]]);
+
+      expect([$row0, $row4]).not.anyToHaveClass('selected');
+      expect([$row0, $row2, $row3, $row4]).not.anyToHaveClass('select-top');
+      expect([$row0, $row1, $row3, $row4]).not.anyToHaveClass('select-middle');
+      expect([$row0, $row1, $row2, $row4]).not.anyToHaveClass('select-bottom');
+      expect([$row0, $row1, $row2, $row3, $row4]).not.anyToHaveClass('select-single');
+
+      // sort table (descending)
+      table.sort(column0, 'desc');
+
+      // after sorting
+      $rows = table.$rows();
+      $row0 = $rows.eq(0);
+      $row1 = $rows.eq(1);
+      $row2 = $rows.eq(2);
+      $row3 = $rows.eq(3);
+      $row4 = $rows.eq(4);
+      expect([$row2, $row3, $row4]).allToHaveClass('selected');
+      expect($row2).toHaveClass('select-top');
+      expect($row3).toHaveClass('select-middle');
+      expect($row4).toHaveClass('select-bottom');
+
+      expect([$row0, $row4]).not.allToHaveClass('selected');
+      expect([$row0, $row1, $row3, $row4]).not.anyToHaveClass('select-top');
+      expect([$row0, $row1, $row2, $row4]).not.anyToHaveClass('select-middle');
+      expect([$row0, $row1, $row2, $row3]).not.anyToHaveClass('select-bottom');
+      expect([$row0, $row1, $row2, $row3, $row4]).not.anyToHaveClass('select-single');
+    });
+
     describe("sorting", function() {
 
       it("sorts text columns considering locale (if browser supports it)", function() {
@@ -965,7 +1010,6 @@ describe("Table", function() {
       expect(table._aggregateRows[1].$aggregateRow).toBeFalsy();
     });
 
-
     it("regroups if rows get inserted", function() {
       if (!scout.device.supportsInternationalization()) {
         return;
@@ -1067,7 +1111,7 @@ describe("Table", function() {
       table._updateRows([row]);
       expect(find$aggregateRows(table).length).toBe(2);
       expect(table._aggregateRows.length).toBe(2);
-      assertGroupingProperty(table, 0);
+      assertGroupingProperty(table, 0);'
       assertGroupingValues(table, column3, ['18', '26']);
       assertGroupingValues(table, column4, ['44', '78']);
     });
@@ -1354,48 +1398,48 @@ describe("Table", function() {
       expect($menu.find('.menu-item').length).toBe(1);
       expect($menu.find('.menu-item').eq(0).isVisible()).toBe(true);
     });
-// TODO nbu
-//    it("context menu only shows sub-menus of matching type", function() {
-//      var model = helper.createModelFixture(2, 2);
-//      var table = helper.createTable(model);
-//      table.selectedRows = [table.rows[0]];
-//      table.render(session.$entryPoint);
-//
-//      var menuModelTop = helper.createMenuModel('topMenu'),
-//      menuTop = helper.menuHelper.createMenu(menuModelTop),
-//      menuModel1 = helper.createMenuModel('singleSelectionMenu'),
-//      menu1 = helper.menuHelper.createMenu(menuModel1),
-//      menuModel2 = helper.createMenuModel('multiSelectionMenu'),
-//      menu2 = helper.menuHelper.createMenu(menuModel2);
-//      menu2.menuTypes = ['Table.MultiSelection'];
-//      // TODO [5.2] nbu: enable when TODO in ContextMenuPopup.prototype._renderMenuItems is done
-////      var menuModel3 = helper.createMenuModel('emptySpaceMenu'),
-////      menu3 = helper.menuHelper.createMenu(menuModel3);
-////      menu3.menuTypes = ['Table.EmptySpace'];
-//
-//      menuTop.childActions = [menu1, menu2
-//      // TODO [5.2] nbu: enable when TODO in ContextMenuPopup.prototype._renderMenuItems is done
-//                              //, menu3
-//                              ];
-//      table.menus = [menuTop];
-//      table._syncMenus([menuTop]);
-//      var $row0 = table.$data.children('.table-row').eq(0);
-//      $row0.triggerContextMenu();
-//
-//      sendQueuedAjaxCalls();
-//
-//      var $menu = helper.getDisplayingContextMenu(table);
-//      expect($menu.find('.menu-item').length).toBe(1);
-//      expect($menu.find('.menu-item').eq(0).isVisible()).toBe(true);
-//
-//      var $menuTop = $menu.find('.menu-item');
-//      $menuTop.triggerClick();
-//      sendQueuedAjaxCalls();
-//      expect($('.menu-item').find("span:contains('singleSelectionMenu')").length).toBe(1);
-//      expect($('.menu-item').find("span:contains('multiSelectionMenu')").length).toBe(0);
-//      // TODO [5.2] nbu: enable when TODO in ContextMenuPopup.prototype._renderMenuItems is done
-////      expect($('.menu-item').find("span:contains('emptySpaceMenu')").length).toBe(0);
-//    });
+    // TODO nbu
+    //    it("context menu only shows sub-menus of matching type", function() {
+    //      var model = helper.createModelFixture(2, 2);
+    //      var table = helper.createTable(model);
+    //      table.selectedRows = [table.rows[0]];
+    //      table.render(session.$entryPoint);
+    //
+    //      var menuModelTop = helper.createMenuModel('topMenu'),
+    //      menuTop = helper.menuHelper.createMenu(menuModelTop),
+    //      menuModel1 = helper.createMenuModel('singleSelectionMenu'),
+    //      menu1 = helper.menuHelper.createMenu(menuModel1),
+    //      menuModel2 = helper.createMenuModel('multiSelectionMenu'),
+    //      menu2 = helper.menuHelper.createMenu(menuModel2);
+    //      menu2.menuTypes = ['Table.MultiSelection'];
+    //      // TODO [5.2] nbu: enable when TODO in ContextMenuPopup.prototype._renderMenuItems is done
+    ////      var menuModel3 = helper.createMenuModel('emptySpaceMenu'),
+    ////      menu3 = helper.menuHelper.createMenu(menuModel3);
+    ////      menu3.menuTypes = ['Table.EmptySpace'];
+    //
+    //      menuTop.childActions = [menu1, menu2
+    //      // TODO [5.2] nbu: enable when TODO in ContextMenuPopup.prototype._renderMenuItems is done
+    //                              //, menu3
+    //                              ];
+    //      table.menus = [menuTop];
+    //      table._syncMenus([menuTop]);
+    //      var $row0 = table.$data.children('.table-row').eq(0);
+    //      $row0.triggerContextMenu();
+    //
+    //      sendQueuedAjaxCalls();
+    //
+    //      var $menu = helper.getDisplayingContextMenu(table);
+    //      expect($menu.find('.menu-item').length).toBe(1);
+    //      expect($menu.find('.menu-item').eq(0).isVisible()).toBe(true);
+    //
+    //      var $menuTop = $menu.find('.menu-item');
+    //      $menuTop.triggerClick();
+    //      sendQueuedAjaxCalls();
+    //      expect($('.menu-item').find("span:contains('singleSelectionMenu')").length).toBe(1);
+    //      expect($('.menu-item').find("span:contains('multiSelectionMenu')").length).toBe(0);
+    //      // TODO [5.2] nbu: enable when TODO in ContextMenuPopup.prototype._renderMenuItems is done
+    ////      expect($('.menu-item').find("span:contains('emptySpaceMenu')").length).toBe(0);
+    //    });
 
   });
 
@@ -1495,7 +1539,7 @@ describe("Table", function() {
     });
   });
 
-  describe("selection: row mouse down / move / up", function() {
+  describe("row mouse down / move / up", function() {
 
     it("selects multiple rows", function() {
       var model = helper.createModelFixture(2, 5);
@@ -1526,113 +1570,6 @@ describe("Table", function() {
       expect([$row0, $row2, $row3, $row4]).not.anyToHaveClass('select-middle');
       expect([$row0, $row1, $row3, $row4]).not.anyToHaveClass('select-bottom');
       expect([$row0, $row1, $row2, $row3, $row4]).not.anyToHaveClass('select-single');
-    });
-
-    it("restores selection after sorting", function() {
-      var model = helper.createModelSingleColumnByValues([5, 2, 1, 3, 4], 'NumberColumn'),
-        table = helper.createTable(model),
-        column0 = model.columns[0];
-      table.render(session.$entryPoint);
-
-      var $rows = table.$rows();
-      var $row0 = $rows.eq(0);
-      var $row1 = $rows.eq(1);
-      var $row2 = $rows.eq(2);
-      var $row3 = $rows.eq(3);
-      var $row4 = $rows.eq(4);
-
-      expect([$row0, $row1, $row2, $row3, $row4]).not.anyToHaveClass('selected');
-
-      $row1.triggerMouseDown();
-      $row2.trigger('mouseover');
-      $row3.trigger('mouseover');
-      $row3.triggerMouseUp();
-
-      expect([$row0, $row4]).not.anyToHaveClass('selected');
-      expect([$row0, $row2, $row3, $row4]).not.anyToHaveClass('select-top');
-      expect([$row0, $row1, $row3, $row4]).not.anyToHaveClass('select-middle');
-      expect([$row0, $row1, $row2, $row4]).not.anyToHaveClass('select-bottom');
-      expect([$row0, $row1, $row2, $row3, $row4]).not.anyToHaveClass('select-single');
-
-      // sort table (descending)
-      table.sort(column0, 'desc');
-
-      // after sorting
-      $rows = table.$rows();
-      $row0 = $rows.eq(0);
-      $row1 = $rows.eq(1);
-      $row2 = $rows.eq(2);
-      $row3 = $rows.eq(3);
-      $row4 = $rows.eq(4);
-      expect([$row2, $row3, $row4]).allToHaveClass('selected');
-      expect($row2).toHaveClass('select-top');
-      expect($row3).toHaveClass('select-middle');
-      expect($row4).toHaveClass('select-bottom');
-
-      expect([$row0, $row4]).not.allToHaveClass('selected');
-      expect([$row0, $row1, $row3, $row4]).not.anyToHaveClass('select-top');
-      expect([$row0, $row1, $row2, $row4]).not.anyToHaveClass('select-middle');
-      expect([$row0, $row1, $row2, $row3]).not.anyToHaveClass('select-bottom');
-      expect([$row0, $row1, $row2, $row3, $row4]).not.anyToHaveClass('select-single');
-    });
-
-    it("restores selection after filtering", function() {
-      var model = helper.createModelSingleColumnByValues([5, 2, 1, 3, 4], 'NumberColumn'),
-        table = helper.createTable(model),
-        column0 = model.columns[0];
-      table._animationRowLimit = 0;
-      table.render(session.$entryPoint);
-
-      var $rows = table.$data.children('.table-row');
-      var $row0 = $rows.eq(0);
-      var $row1 = $rows.eq(1);
-      var $row2 = $rows.eq(2);
-      var $row3 = $rows.eq(3);
-      var $row4 = $rows.eq(4);
-
-      expect([$row0, $row1, $row2, $row3, $row4]).not.anyToHaveClass('hidden');
-      expect([$row0, $row1, $row2, $row3, $row4]).not.anyToHaveClass('selected');
-
-      $row1.triggerMouseDown();
-      $row2.trigger('mouseover');
-      $row3.trigger('mouseover');
-      $row3.triggerMouseUp();
-
-      // before filtering
-      expect([$row0, $row1, $row2, $row3, $row4]).not.anyToHaveClass('hidden');
-      expect([$row1, $row2, $row3]).allToHaveClass('selected');
-      expect($row1).toHaveClass('select-top');
-      expect($row2).toHaveClass('select-middle');
-      expect($row3).toHaveClass('select-bottom');
-
-      expect([$row0, $row4]).not.anyToHaveClass('selected');
-      expect([$row0, $row2, $row3, $row4]).not.anyToHaveClass('select-top');
-      expect([$row0, $row1, $row3, $row4]).not.anyToHaveClass('select-middle');
-      expect([$row0, $row1, $row2, $row4]).not.anyToHaveClass('select-bottom');
-      expect([$row0, $row1, $row2, $row3, $row4]).not.anyToHaveClass('select-single');
-
-      // filter table (descending)
-      table.addFilter({
-        createKey: function() {
-          return 1;
-        },
-        accept: function(row) {
-          return row.$row.text() % 2 === 0;
-        }
-      });
-      table.filter();
-
-      // after filtering
-      expect([$row0, $row2, $row3]).allToHaveClass('hidden');
-      expect($row1).allToHaveClass('selected');
-      expect($row1).toHaveClass('select-single');
-
-      expect([$row1, $row4]).not.anyToHaveClass('hidden');
-      expect([$row0, $row2, $row3, $row4]).not.anyToHaveClass('selected');
-      expect([$row0, $row1, $row2, $row3, $row4]).not.anyToHaveClass('select-top');
-      expect([$row0, $row1, $row2, $row3, $row4]).not.anyToHaveClass('select-middle');
-      expect([$row0, $row1, $row2, $row3, $row4]).not.anyToHaveClass('select-bottom');
-      expect([$row0, $row2, $row3, $row4]).not.anyToHaveClass('select-single');
     });
 
     it("only sends selection event, no click", function() {
@@ -2169,6 +2106,18 @@ describe("Table", function() {
         table = helper.createTable(model);
       });
 
+      it("calls updateRows", function() {
+        spyOn(table, '_updateRows');
+
+        var row = {
+          id: table.rows[0].id,
+          cells: ['newCellText0', 'newCellText1']
+        };
+        var event = createRowsUpdatedEvent(model, [row]);
+        table.onModelAction(event);
+        expect(table._updateRows).toHaveBeenCalledWith([row]);
+      });
+
       it("updates the model cell texts", function() {
         expect(table.rows[0].cells[0].text).toBe('cellText0');
         expect(table.rows[0].cells[1].text).toBe('cellText1');
@@ -2177,10 +2126,7 @@ describe("Table", function() {
           id: table.rows[0].id,
           cells: ['newCellText0', 'newCellText1']
         };
-        var message = {
-          events: [createRowsUpdatedEvent(model, [row])]
-        };
-        session._processSuccessResponse(message);
+        table._updateRows([row]);
 
         expect(table.rows[0].cells[0].text).toBe('newCellText0');
         expect(table.rows[0].cells[1].text).toBe('newCellText1');
@@ -2197,10 +2143,7 @@ describe("Table", function() {
           id: table.rows[0].id,
           cells: ['newCellText0', 'newCellText1']
         };
-        var message = {
-          events: [createRowsUpdatedEvent(model, [row])]
-        };
-        session._processSuccessResponse(message);
+        table._updateRows([row]);
 
         $rows = table.$rows();
         $cells0 = table.$cellsForRow($rows.eq(0));
@@ -2209,22 +2152,59 @@ describe("Table", function() {
       });
 
       it("does not destroy selection", function() {
-        table.selectedRows = [table.rows[0]];
+        model = helper.createModelFixture(2, 3);
+        model.rows[0].cells[0].text = 'cellText0';
+        model.rows[0].cells[1].text = 'cellText1';
+        table = helper.createTable(model);
         table.render(session.$entryPoint);
+        table.selectAll();
 
-        expect($('.selected').length).toBe(1);
-        expect($('.selected')[0]).toBe(table.selectedRows[0].$row[0]);
+        expect(table.$selectedRows().length).toBe(3);
+        expect(table.$selectedRows().eq(0)).toHaveClass('select-top');
+        expect(table.$selectedRows().eq(1)).toHaveClass('select-middle');
+        expect(table.$selectedRows().eq(2)).toHaveClass('select-bottom');
         var row = {
           id: table.rows[0].id,
           cells: ['newCellText0', 'newCellText1']
         };
-        var message = {
-          events: [createRowsUpdatedEvent(model, [row])]
-        };
-        session._processSuccessResponse(message);
+        table._updateRows([row]);
 
-        expect($('.selected').length).toBe(1);
-        expect($('.selected')[0]).toBe(table.selectedRows[0].$row[0]);
+        expect(table.$selectedRows().length).toBe(3);
+        expect(table.$selectedRows().eq(0)).toHaveClass('select-top');
+        expect(table.$selectedRows().eq(1)).toHaveClass('select-middle');
+        expect(table.$selectedRows().eq(2)).toHaveClass('select-bottom');
+      });
+
+      it("silently updates rows which are not in view range", function() {
+        table.viewRangeSize = 2;
+        table.render(session.$entryPoint);
+        expect(table.viewRangeRendered).toEqual(new scout.Range(0, 1));
+        expect(table.$rows().length).toBe(1);
+        expect(table.rows.length).toBe(2);
+        var $rows = table.$rows();
+        var $cells0 = table.$cellsForRow($rows.eq(0));
+        expect($cells0.eq(0).text()).toBe('cellText0');
+
+        var row0 = {
+          id: table.rows[0].id,
+          cells: ['newRow0Cell0', 'newRow0Cell1']
+        };
+        var row1 = {
+          id: table.rows[1].id,
+          cells: ['newRow1Cell0', 'newRow1Cell1']
+        };
+        table._updateRows([row0, row1]);
+
+        // only row 0 is rendered but both rows need to be updated
+        $rows = table.$rows();
+        expect($rows.length).toBe(1);
+        $cells0 = table.$cellsForRow($rows.eq(0));
+        expect($cells0.eq(0).text()).toBe('newRow0Cell0');
+        expect($cells0.eq(1).text()).toBe('newRow0Cell1');
+        expect(table.rows[0].cells[0].text).toBe('newRow0Cell0');
+        expect(table.rows[0].cells[1].text).toBe('newRow0Cell1');
+        expect(table.rows[1].cells[0].text).toBe('newRow1Cell0');
+        expect(table.rows[1].cells[1].text).toBe('newRow1Cell1');
       });
 
       it("silently updates rows which are not in view range", function() {

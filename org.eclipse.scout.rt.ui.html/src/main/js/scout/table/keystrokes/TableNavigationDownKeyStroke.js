@@ -13,7 +13,10 @@ scout.TableNavigationDownKeyStroke = function(table) {
   this.which = [scout.keys.DOWN];
   this.renderingHints.text = '↓';
   this.renderingHints.$drawingArea = function($drawingArea, event) {
-    return this.$firstRowAfterSelection();
+    var row = this.firstRowAfterSelection();
+    if (row) {
+      return row.$row;
+    }
   }.bind(this);
 };
 scout.inherits(scout.TableNavigationDownKeyStroke, scout.AbstractTableNavigationKeyStroke);

@@ -850,6 +850,17 @@
     return $this;
   };
 
+  $.fn.copyCssClasses = function($other, classString) {
+    var classes = classString.split(' ');
+    var $this = this;
+    classes.forEach(function(cssClass) {
+      if ($other.hasClass(cssClass)) {
+        $this.addClass(cssClass);
+      }
+    });
+    return $this;
+  };
+
   $.fn.disableSpellcheck = function() {
     return this.attr('spellcheck', false);
   };

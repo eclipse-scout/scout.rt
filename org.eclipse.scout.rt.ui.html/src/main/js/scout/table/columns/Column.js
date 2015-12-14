@@ -289,6 +289,9 @@ scout.Column.prototype._preprocessTextForTextFilter = function(text, htmlEnabled
  * Removes html tags, converts to single line, removes leading and trailing whitespaces.
  */
 scout.Column.prototype._preprocessText = function(text, options) {
+  if (text === null || text === undefined) {
+    return text;
+  }
   options = options || {};
   if (options.removeHtmlTags) {
     text = scout.strings.plainText(text);

@@ -13,7 +13,10 @@ scout.TableNavigationUpKeyStroke = function(table) {
   this.which = [scout.keys.UP];
   this.renderingHints.text = '↑';
   this.renderingHints.$drawingArea = function($drawingArea, event) {
-    return this.$firstRowBeforeSelection();
+    var row = this.firstRowBeforeSelection();
+    if (row) {
+      return row.$row;
+    }
   }.bind(this);
 };
 scout.inherits(scout.TableNavigationUpKeyStroke, scout.AbstractTableNavigationKeyStroke);

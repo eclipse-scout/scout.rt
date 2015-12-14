@@ -75,22 +75,29 @@ scout.AbstractTableNavigationKeyStroke.prototype._viewportInfo = function() {
   return viewport;
 };
 
-scout.AbstractTableNavigationKeyStroke.prototype.$firstRowAfterSelection = function() {
+scout.AbstractTableNavigationKeyStroke.prototype.firstRowAfterSelection = function() {
   var $selectedRows = this.field.$selectedRows();
   if (!$selectedRows.length) {
     return;
   }
 
-  return this.field.$nextFilteredRow($selectedRows.last(), false);
+  var rows = this.field.filteredRows(),
+    row = $selectedRows.last().data('row'),
+    rowIndex = this.field.filteredRows().indexOf(row);
+
+  return rows[rowIndex + 1];
 };
 
-scout.AbstractTableNavigationKeyStroke.prototype.$firstRowBeforeSelection = function() {
+scout.AbstractTableNavigationKeyStroke.prototype.firstRowBeforeSelection = function() {
   var $selectedRows = this.field.$selectedRows();
   if (!$selectedRows.length) {
     return;
   }
+  var rows = this.field.filteredRows(),
+    row = $selectedRows.first().data('row'),
+    rowIndex = this.field.filteredRows().indexOf(row);
 
-  return this.field.$prevFilteredRow($selectedRows.first(), false);
+  return rows[rowIndex - 1];
 };
 
 /**
