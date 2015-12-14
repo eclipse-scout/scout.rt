@@ -16,7 +16,7 @@ describe("Table", function() {
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
-    session.locale = new LocaleSpecHelper().createLocale('de-CH');
+    session.locale = new LocaleSpecHelper().createLocale(LocaleSpecHelper.DEFAULT_LOCALE);
     helper = new TableSpecHelper(session);
     jasmine.Ajax.install();
     jasmine.clock().install();
@@ -675,7 +675,10 @@ describe("Table", function() {
         table.sort(column0, 'asc');
         helper.assertTextsInCells(table.rows, 0, ['Italien', 'Österreich', 'Zypern']);
 
+        // In order to change Collator at runtime, we must reset the "static" property
+        // since it is set only once
         session.locale = new LocaleSpecHelper().createLocale('sv');
+        scout.StringColumn.collator = undefined;
 
         table.sort(column0, 'desc');
         helper.assertTextsInCells(table.rows, 0, ['Österreich', 'Zypern', 'Italien']);
@@ -685,7 +688,7 @@ describe("Table", function() {
       });
 
       it("sorts number columns", function() {
-        var model = helper.createModelSingleColumnByValues([100, 90, 300], 'number');
+        var model = helper.createModelSingleColumnByValues([100, 90, 300], 'NumberColumn');
         var table = helper.createTable(model);
         column0 = model.columns[0];
         table.render(session.$entryPoint);
@@ -698,7 +701,7 @@ describe("Table", function() {
       });
 
       it("sorts date columns", function() {
-        var model = helper.createModelSingleColumnByValues([new Date('2012-08-10'), new Date('2014-03-01'), new Date('1999-01-10')], 'date');
+        var model = helper.createModelSingleColumnByValues([new Date('2012-08-10'), new Date('2014-03-01'), new Date('1999-01-10')], 'DateColumn');
         var table = helper.createTable(model);
         column0 = model.columns[0];
         table.render(session.$entryPoint);
@@ -722,8 +725,8 @@ describe("Table", function() {
       columns = [helper.createModelColumn('col0'),
         helper.createModelColumn('col1'),
         helper.createModelColumn('col2'),
-        helper.createModelColumn('col3', 'number'),
-        helper.createModelColumn('col4', 'number')
+        helper.createModelColumn('col3', 'NumberColumn'),
+        helper.createModelColumn('col4', 'NumberColumn')
       ];
       columns[0].index = 0;
       columns[1].index = 1;
@@ -1286,7 +1289,7 @@ describe("Table", function() {
     });
 
     it("selection classes after sorting", function() {
-      var model = helper.createModelSingleColumnByValues([5, 2, 1, 3, 4], 'number'),
+      var model = helper.createModelSingleColumnByValues([5, 2, 1, 3, 4], 'NumberColumn'),
         table = helper.createTable(model),
         column0 = model.columns[0];
       table.render(session.$entryPoint);
@@ -1328,7 +1331,7 @@ describe("Table", function() {
     });
 
     it("selection classes after filtering", function() {
-      var model = helper.createModelSingleColumnByValues([5, 2, 1, 3, 4], 'number'),
+      var model = helper.createModelSingleColumnByValues([5, 2, 1, 3, 4], 'NumberColumn'),
         table = helper.createTable(model),
         column0 = model.columns[0];
       table._animationRowLimit = 0;

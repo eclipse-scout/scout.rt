@@ -41,14 +41,14 @@ scout.DateColumnUserFilter.prototype.createAddFilterEventData = function() {
 };
 
 /**
- * @implements ColumnUserFilter.js
+ * @override ColumnUserFilter.js
  */
 scout.DateColumnUserFilter.prototype.fieldsFilterActive = function() {
   return this.dateFrom || this.dateTo;
 };
 
 /**
- * @implements ColumnUserFilter.js
+ * @override ColumnUserFilter.js
  */
 scout.DateColumnUserFilter.prototype.acceptByFields = function(key, normKey) {
   var
@@ -96,8 +96,8 @@ scout.DateColumnUserFilter.prototype.addFilterFields = function(groupBox) {
 };
 
 scout.DateColumnUserFilter.prototype._onDisplayTextChanged = function(event) {
-  $.log.debug('(DateColumnUserFilter#updateFilterFields) from=' + event.from + ' to=' + event.to);
   this.dateFrom = this.dateFromField.timestampAsDate,
   this.dateTo = this.dateToField.timestampAsDate;
+  $.log.debug('(DateColumnUserFilter#_onDisplayTextChanged) dateFrom=' + this.dateFrom + ' dateTo=' + this.dateTo);
   this.triggerFilterFieldsChanged(event);
 };

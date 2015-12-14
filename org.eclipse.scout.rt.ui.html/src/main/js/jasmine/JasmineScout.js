@@ -28,7 +28,7 @@ function sandboxSession(options) {
   options.backgroundJobPollingEnabled = false;
   options.suppressErrors = true;
   session = new scout.Session($sandbox, options);
-  session.locale = new LocaleSpecHelper().createLocale('de');
+  session.locale = new LocaleSpecHelper().createLocale(LocaleSpecHelper.DEFAULT_LOCALE);
   session.desktop = scout.create('Desktop', {
     parent: session.rootAdapter
   });

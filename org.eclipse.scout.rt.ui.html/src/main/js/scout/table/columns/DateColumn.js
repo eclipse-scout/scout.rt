@@ -10,6 +10,7 @@
  ******************************************************************************/
 scout.DateColumn = function() {
   scout.DateColumn.parent.call(this);
+  this.filterType = 'DateColumnUserFilter';
 };
 scout.inherits(scout.DateColumn, scout.Column);
 
@@ -20,14 +21,14 @@ scout.DateColumn.prototype.init = function(model) {
 };
 
 /**
- * Converts the value which is a json date to a javascript date.
+ * If cell.value is a Date instance or undefined we do nothing. If value is a String, we assume
+ * its a JSON date string and convert it to a Date instance.
+ * @override Column.js
  */
-scout.DateColumn.prototype.initCell = function(cell) {
-  cell = scout.DateColumn.parent.prototype.initCell.call(this, cell);
-  if (cell.value !== undefined) {
+scout.DateColumn.prototype._initCell = function(cell) {
+  if (typeof cell.value === 'string') {
     cell.value = scout.dates.parseJsonDate(cell.value);
   }
-  return cell;
 };
 
 scout.DateColumn.prototype.cellTextForGrouping = function(row) {

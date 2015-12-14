@@ -157,14 +157,20 @@ scout.ColumnUserFilter.prototype.off = function(type, func) {
 };
 
 /**
- * @interface
+ * Returns whether or not the given key is accepted by the filter-fields in their current state.
+ * The default impl. returns true.
  */
-scout.ColumnUserFilter.prototype.acceptByFields = function(key, normKey) {};
+scout.ColumnUserFilter.prototype.acceptByFields = function(key, normKey) {
+  return true;
+};
 
 /**
- * @interface
+ * Returns whether or not filter-fields have an effect on the column-filter in their current state.
+ * The default impl. returns false.
  */
-scout.ColumnUserFilter.prototype.fieldsFilterActive = function() {};
+scout.ColumnUserFilter.prototype.fieldsFilterActive = function() {
+  return false;
+};
 
 /**
  * Adds filter fields for this type of column filter.

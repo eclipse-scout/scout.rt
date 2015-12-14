@@ -54,7 +54,7 @@ describe('TableHeaderMenu', function() {
   }
 
   function createSingleColumnTableByValues(values) {
-    var model = helper.createModelSingleColumnByValues(values);
+    var model = helper.createModelSingleColumnByValues(values, 'BooleanColumn');
     return helper.createTable(model);
   }
 

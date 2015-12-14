@@ -16,14 +16,14 @@ scout.TextColumnUserFilter.prototype.createAddFilterEventData = function() {
 };
 
 /**
- * @implements ColumnUserFilter.js
+ * @override ColumnUserFilter.js
  */
 scout.TextColumnUserFilter.prototype.fieldsFilterActive = function() {
   return scout.strings.hasText(this.freeText);
 };
 
 /**
-* @implements ColumnUserFilter.js
+* @override ColumnUserFilter.js
 */
 scout.TextColumnUserFilter.prototype.acceptByFields = function(key, normKey) {
    // FIXME AWE (filter) use cellTextForTextFilter
@@ -61,8 +61,8 @@ scout.TextColumnUserFilter.prototype.addFilterFields = function(groupBox) {
 };
 
 scout.TextColumnUserFilter.prototype._onDisplayTextChanged = function(event) {
-  $.log.debug('(TextColumnUserFilter#updateFilterFields) freeText=' + event.displayText);
   this.freeText = event.displayText.trim();
+  $.log.debug('(TextColumnUserFilter#_onDisplayTextChanged) freeText=' + this.freeText);
   this.triggerFilterFieldsChanged(event);
 };
 

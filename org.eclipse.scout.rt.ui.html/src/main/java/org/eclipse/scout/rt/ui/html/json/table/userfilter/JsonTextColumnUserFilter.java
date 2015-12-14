@@ -8,33 +8,36 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.ui.html.json.table;
+package org.eclipse.scout.rt.ui.html.json.table.userfilter;
 
-import org.eclipse.scout.rt.client.ui.basic.table.columns.IStringColumn;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.userfilter.ColumnUserFilterState;
-import org.eclipse.scout.rt.ui.html.json.table.userfilter.JsonTextColumnUserFilter;
+import org.eclipse.scout.rt.client.ui.basic.table.userfilter.TextColumnUserFilterState;
 import org.json.JSONObject;
 
-public class JsonStringColumn<STRING_COLUMN extends IStringColumn> extends JsonColumn<STRING_COLUMN> {
+public class JsonTextColumnUserFilter extends JsonColumnUserFilter<TextColumnUserFilterState> {
 
-  public JsonStringColumn(STRING_COLUMN model) {
-    super(model);
+  public JsonTextColumnUserFilter(TextColumnUserFilterState filterState) {
+    super(filterState);
   }
 
   @Override
   public String getObjectType() {
-    return "StringColumn";
+    return "TextColumnUserFilter";
   }
 
   @Override
-  protected ColumnUserFilterState createFilterStateFromJson(JSONObject json) {
-    return new JsonTextColumnUserFilter(null).createFilterStateFromJson(getColumn(), json);
+  public ColumnUserFilterState createFilterStateFromJson(IColumn<?> column, JSONObject json) {
+    TextColumnUserFilterState filterState = new TextColumnUserFilterState(column);
+    filterState.setFreeText(json.optString("freeText"));
+    return filterState;
   }
 
   @Override
   public JSONObject toJson() {
     JSONObject json = super.toJson();
-    json.put("textWrap", getColumn().isTextWrap());
+    json.put("freeText", getFilterState().getFreeText());
     return json;
   }
+
 }

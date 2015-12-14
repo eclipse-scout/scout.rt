@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table.userfilter;
 
-import java.math.BigDecimal;
-import java.util.Date;
 import java.util.Set;
 
 import org.eclipse.scout.rt.client.services.common.bookmark.internal.BookmarkUtility;
@@ -29,15 +27,10 @@ public class ColumnUserFilterState extends AbstractUserFilterState implements IU
   private transient IColumn<?> m_column;
   private String m_columnId;
   private Set<Object> m_selectedValues;
-  private String m_freeText;
-  private BigDecimal m_numberFrom;
-  private BigDecimal m_numberTo;
-  private Date m_dateFrom;
-  private Date m_dateTo;
 
-  public ColumnUserFilterState(IColumn<String> column) {
+  public ColumnUserFilterState(IColumn<?> column) {
     setColumn(column);
-    setType("column");
+    setType(TYPE);
   }
 
   public IColumn<?> getColumn() {
@@ -55,46 +48,6 @@ public class ColumnUserFilterState extends AbstractUserFilterState implements IU
 
   public void setSelectedValues(Set<Object> selectedValues) {
     m_selectedValues = selectedValues;
-  }
-
-  public String getFreeText() {
-    return m_freeText;
-  }
-
-  public void setFreeText(String freeText) {
-    m_freeText = freeText;
-  }
-
-  public BigDecimal getNumberFrom() {
-    return m_numberFrom;
-  }
-
-  public void setNumberFrom(BigDecimal numberFrom) {
-    m_numberFrom = numberFrom;
-  }
-
-  public BigDecimal getNumberTo() {
-    return m_numberTo;
-  }
-
-  public void setNumberTo(BigDecimal numberTo) {
-    m_numberTo = numberTo;
-  }
-
-  public Date getDateFrom() {
-    return m_dateFrom;
-  }
-
-  public void setDateFrom(Date dateFrom) {
-    m_dateFrom = dateFrom;
-  }
-
-  public Date getDateTo() {
-    return m_dateTo;
-  }
-
-  public void setDateTo(Date dateTo) {
-    m_dateTo = dateTo;
   }
 
   @Override

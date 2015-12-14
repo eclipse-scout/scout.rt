@@ -10,33 +10,23 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table.userfilter;
 
-import org.eclipse.scout.rt.client.ui.basic.userfilter.AbstractUserFilterState;
-import org.eclipse.scout.rt.client.ui.basic.userfilter.IUserFilterState;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 
-/**
- * @since 5.1
- */
-public class TableTextUserFilterState extends AbstractUserFilterState implements IUserFilterState {
+public class TextColumnUserFilterState extends ColumnUserFilterState {
   private static final long serialVersionUID = 1L;
-  public static final String TYPE = "text";
-  private String m_text;
 
-  public TableTextUserFilterState(String text) {
-    m_text = text;
-    setType(TYPE);
+  private String m_freeText;
+
+  public TextColumnUserFilterState(IColumn<?> column) {
+    super(column);
   }
 
-  public String getText() {
-    return m_text;
+  public String getFreeText() {
+    return m_freeText;
   }
 
-  public void setText(String text) {
-    m_text = text;
-  }
-
-  @Override
-  public String getDisplayText() {
-    return m_text;
+  public void setFreeText(String freeText) {
+    m_freeText = freeText;
   }
 
 }

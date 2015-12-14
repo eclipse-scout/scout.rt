@@ -11,10 +11,20 @@
 scout.Column = function() {
   this.minWidth = scout.Column.DEFAULT_MIN_WIDTH;
   this.showSeparator = true; // currently a UI-only property, defaults to true
+  this.filterType = 'ColumnUserFilter';
 };
 
 scout.Column.DEFAULT_MIN_WIDTH = 50;
 scout.Column.NARROW_MIN_WIDTH = 30; // for columns without text (icon, check box)
+
+scout.Column.DEFAULT_COMPARATOR = function(valueA, valueB) {
+  if (valueA < valueB) {
+    return -1;
+  } else if (valueA > valueB) {
+    return 1;
+  }
+  return 0;
+};
 
 scout.Column.prototype.init = function(model) {
   this.session = model.session;
@@ -50,22 +60,21 @@ scout.Column.prototype.initCell = function(cell) {
       text: cell
     };
   }
-  // server sends cell.value only if it differs from text -> make sure cell.value is set and has the right type
-  if (cell.value === undefined) {
-    // Cell.value may be undefined for other column types -> use table.cellValue to access the value.
-    // The only reason is to save some memory (may get obsolete in the future)
-    if (this.type === 'number') {
-      if (cell.text) { // Number('') would generate 0 -> don't set in that case
-        cell.value = Number(cell.text);
-      }
-    }
-  }
+  this._initCell(cell);
   // when cell doesn't define horiz. alignment - use value from column
   if (cell.horizontalAlignment === undefined) {
     cell.horizontalAlignment = this.horizontalAlignment;
   }
   scout.defaultValues.applyTo(cell, 'Cell');
   return cell;
+};
+
+/**
+ * Override this method to impl. type specific init cell behavior.
+ * The default impl. does nothing.
+ */
+scout.Column.prototype._initCell = function(cell) {
+  // NOP
 };
 
 scout.Column.prototype.buildCellForRow = function(row) {
@@ -445,4 +454,28 @@ scout.Column.prototype._barChart = function(value) {
   return {
     backgroundImage: 'linear-gradient(to left, ' + color + ' 0%, ' + color + ' ' + level + '%, transparent ' + level + '%, transparent 100% )'
   };
+};
+
+/**
+ * Returns a type specific column user-filter. The default impl. returns a ColumnUserFilter.
+ * Sub-classes that must return another type, must simply change the value of the 'filterType' property.
+ */
+scout.Column.prototype.createFilter = function(model) {
+  return scout.create(this.filterType, {
+    session: this.session,
+    table: this.table,
+    column: this
+  });
+};
+
+/**
+ * Override this method to install a specific compare function on a column instance.
+ * The default impl. installs a generic comparator working with less than and greater than.
+ *
+ * @return Whether or not it was possible to install a compare function. If not, client side sorting is disabled.
+ *   Default impl. returns a
+ */
+scout.Column.prototype.prepareForSorting = function() {
+  this.compare = scout.Column.DEFAULT_COMPARATOR;
+  return true;
 };

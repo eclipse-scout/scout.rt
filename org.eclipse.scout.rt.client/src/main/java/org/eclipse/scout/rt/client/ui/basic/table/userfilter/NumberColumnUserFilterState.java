@@ -10,33 +10,34 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table.userfilter;
 
-import org.eclipse.scout.rt.client.ui.basic.userfilter.AbstractUserFilterState;
-import org.eclipse.scout.rt.client.ui.basic.userfilter.IUserFilterState;
+import java.math.BigDecimal;
 
-/**
- * @since 5.1
- */
-public class TableTextUserFilterState extends AbstractUserFilterState implements IUserFilterState {
+import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
+
+public class NumberColumnUserFilterState extends ColumnUserFilterState {
   private static final long serialVersionUID = 1L;
-  public static final String TYPE = "text";
-  private String m_text;
 
-  public TableTextUserFilterState(String text) {
-    m_text = text;
-    setType(TYPE);
+  private BigDecimal m_numberFrom;
+  private BigDecimal m_numberTo;
+
+  public NumberColumnUserFilterState(IColumn<?> column) {
+    super(column);
   }
 
-  public String getText() {
-    return m_text;
+  public BigDecimal getNumberFrom() {
+    return m_numberFrom;
   }
 
-  public void setText(String text) {
-    m_text = text;
+  public void setNumberFrom(BigDecimal numberFrom) {
+    m_numberFrom = numberFrom;
   }
 
-  @Override
-  public String getDisplayText() {
-    return m_text;
+  public BigDecimal getNumberTo() {
+    return m_numberTo;
+  }
+
+  public void setNumberTo(BigDecimal numberTo) {
+    m_numberTo = numberTo;
   }
 
 }

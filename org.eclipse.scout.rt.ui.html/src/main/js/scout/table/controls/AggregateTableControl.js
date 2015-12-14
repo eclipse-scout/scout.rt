@@ -129,20 +129,20 @@ scout.AggregateTableControl.prototype._aggregate = function() {
   }
 
   var prepare = function(column, c) {
-    if (column.type === 'number') {
+    if (column instanceof scout.NumberColumn) {
       aggregateRow[c] = column.aggrStart();
     }
   };
 
   var aggregateFunc = function(row, column, c) {
-    if (column.type === 'number') {
+    if (column instanceof scout.NumberColumn) {
       value = this.table.cellValue(column, row);
       aggregateRow[c] = column.aggrStep(aggregateRow[c], value);
     }
   };
 
   var finish = function(column, c) {
-    if (column.type === 'number') {
+    if (column instanceof scout.NumberColumn) {
       aggregateRow[c] = column.aggrFinish(aggregateRow[c]);
     }
   };
@@ -170,7 +170,7 @@ scout.AggregateTableControl.prototype._reconcileScrollPos = function() {
  */
 scout.AggregateTableControl.prototype._computeEnabled = function() {
   var containsNumberColumn = this.table.columns.some(function(column) {
-    return column.type === 'number';
+    return column instanceof scout.NumberColumn;
   });
   return containsNumberColumn;
 };

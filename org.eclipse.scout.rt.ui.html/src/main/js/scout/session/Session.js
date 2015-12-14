@@ -952,7 +952,7 @@ scout.Session.prototype._onReloadPage = function(event) {
 scout.Session.prototype._onLocaleChanged = function(event) {
   this.locale = new scout.Locale(event.locale);
   this._texts = new scout.Texts(event.textMap);
-  // FIXME bsh: inform components to reformat display text?
+  // FIXME bsh: inform components to reformat display text? also check Collator in scout.StringColumn
 };
 
 scout.Session.prototype._onInitialized = function(event) {

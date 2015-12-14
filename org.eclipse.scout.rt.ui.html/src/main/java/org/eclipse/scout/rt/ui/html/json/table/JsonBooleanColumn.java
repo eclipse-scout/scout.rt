@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.ui.html.json.table;
 
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IBooleanColumn;
-import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 
 public class JsonBooleanColumn<BOOLEAN_COLUMN extends IBooleanColumn> extends JsonColumn<BOOLEAN_COLUMN> {
 
@@ -29,8 +28,4 @@ public class JsonBooleanColumn<BOOLEAN_COLUMN extends IBooleanColumn> extends Js
     return value;
   }
 
-  @Override
-  protected String computeColumnType(IColumn column) {
-    return "boolean";
-  }
 }

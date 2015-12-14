@@ -12,12 +12,14 @@ package org.eclipse.scout.rt.ui.html.json.table;
 
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.customizer.ICustomColumn;
+import org.eclipse.scout.rt.client.ui.basic.table.userfilter.ColumnUserFilterState;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonObject;
 import org.eclipse.scout.rt.ui.html.json.InspectorInfo;
 import org.eclipse.scout.rt.ui.html.json.JsonAdapterUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
+import org.eclipse.scout.rt.ui.html.json.table.userfilter.JsonColumnUserFilter;
 import org.json.JSONObject;
 
 public class JsonColumn<COLUMN extends IColumn<?>> implements IJsonObject {
@@ -53,7 +55,6 @@ public class JsonColumn<COLUMN extends IColumn<?>> implements IJsonObject {
     json.put("objectType", getObjectTypeVariant());
     json.put("index", getColumn().getColumnIndex() - m_indexOffset);
     json.put("text", getColumn().getHeaderCell().getText());
-    json.put("type", computeColumnType(getColumn()));
     json.put(IColumn.PROP_WIDTH, getColumn().getWidth());
     if (getColumn().getInitialWidth() != getColumn().getWidth()) {
       json.put("initialWidth", getColumn().getInitialWidth());
@@ -88,8 +89,14 @@ public class JsonColumn<COLUMN extends IColumn<?>> implements IJsonObject {
     return json;
   }
 
-  protected String computeColumnType(IColumn column) {
-    return "text";
+  /**
+   * This method creates a type specific filter-state model for the given column and JSON data. Sub-classes may
+   * implement this method to return a different type. The default impl. returns a {@link ColumnUserFilterState}.
+   *
+   * @return
+   */
+  protected ColumnUserFilterState createFilterStateFromJson(JSONObject json) {
+    return new JsonColumnUserFilter<ColumnUserFilterState>(null).createFilterStateFromJson(m_column, json);
   }
 
   public Object cellValueToJson(Object value) {

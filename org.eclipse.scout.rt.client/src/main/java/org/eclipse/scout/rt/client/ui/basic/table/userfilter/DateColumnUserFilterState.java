@@ -10,33 +10,34 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table.userfilter;
 
-import org.eclipse.scout.rt.client.ui.basic.userfilter.AbstractUserFilterState;
-import org.eclipse.scout.rt.client.ui.basic.userfilter.IUserFilterState;
+import java.util.Date;
 
-/**
- * @since 5.1
- */
-public class TableTextUserFilterState extends AbstractUserFilterState implements IUserFilterState {
+import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
+
+public class DateColumnUserFilterState extends ColumnUserFilterState {
   private static final long serialVersionUID = 1L;
-  public static final String TYPE = "text";
-  private String m_text;
 
-  public TableTextUserFilterState(String text) {
-    m_text = text;
-    setType(TYPE);
+  private Date m_dateFrom;
+  private Date m_dateTo;
+
+  public DateColumnUserFilterState(IColumn<?> column) {
+    super(column);
   }
 
-  public String getText() {
-    return m_text;
+  public Date getDateFrom() {
+    return m_dateFrom;
   }
 
-  public void setText(String text) {
-    m_text = text;
+  public void setDateFrom(Date dateFrom) {
+    m_dateFrom = dateFrom;
   }
 
-  @Override
-  public String getDisplayText() {
-    return m_text;
+  public Date getDateTo() {
+    return m_dateTo;
+  }
+
+  public void setDateTo(Date dateTo) {
+    m_dateTo = dateTo;
   }
 
 }

@@ -19,14 +19,14 @@ scout.NumberColumnUserFilter.prototype.createAddFilterEventData = function() {
 };
 
 /**
- * @implements ColumnUserFilter.js
+ * @override ColumnUserFilter.js
  */
 scout.NumberColumnUserFilter.prototype.fieldsFilterActive = function() {
   return scout.objects.isNumber(this.numberFrom) || scout.objects.isNumber(this.numberTo);
 };
 
 /**
- * @implements ColumnUserFilter.js
+ * @override ColumnUserFilter.js
  */
 scout.NumberColumnUserFilter.prototype.acceptByFields = function(key, normKey) {
   var
@@ -66,11 +66,11 @@ scout.NumberColumnUserFilter.prototype.addFilterFields = function(groupBox) {
 };
 
 scout.NumberColumnUserFilter.prototype._onDisplayTextChanged = function(event) {
-  $.log.debug('(NumberColumnUserFilter#updateFilterFields) from=' + event.from + ' to=' + event.to);
   // FIXME AWE: (filter) discuss with C.GU... unser NumberField.js kann keinen value (numeric) liefern, richtig?
   // Das field sollte etwas wie getValue() haben das eine fixfertige number liefert anstatt der konvertierung hier
   this.numberFrom = this._toNumber(this.numberFromField.displayText),
   this.numberTo = this._toNumber(this.numberToField.displayText);
+  $.log.debug('(NumberColumnUserFilter#_onDisplayTextChanged) numberFrom=' + this.numberFrom + ' numberTo=' + this.numberTo);
   this.triggerFilterFieldsChanged(event);
 };
 

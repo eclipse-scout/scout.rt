@@ -586,45 +586,18 @@ scout.Table.prototype._sort = function() {
   return true;
 };
 
+// initialize comparators
 scout.Table.prototype._prepareColumnsForSorting = function(sortColumns) {
-  var collator, column;
-
-  var textComparator = function(valueA, valueB) {
-    return collator.compare(valueA, valueB);
-  };
-
-  var defaultComparator = function(valueA, valueB) {
-    if (valueA < valueB) {
-      return -1;
-    } else if (valueA > valueB) {
-      return 1;
-    }
-    return 0;
-  };
-
-  // initialize comparators
-  for (var c = 0; c < sortColumns.length; c++) {
-    column = sortColumns[c];
-
+  var i, column;
+  for (i = 0; i < sortColumns.length; i++) {
+    column = sortColumns[i];
     if (!column.uiSortPossible) {
       return false;
     }
-
-    if (column.type === 'text') {
-      if (!scout.device.supportsInternationalization()) {
-        //Locale comparison not possible -> do it on server
-        return false;
-      }
-
-      if (!collator) {
-        collator = new window.Intl.Collator(this.session.locale.languageTag);
-      }
-      column.compare = textComparator;
-    } else {
-      column.compare = defaultComparator;
+    if (!column.prepareForSorting()) {
+      return false;
     }
   }
-
   return true;
 };
 
@@ -634,7 +607,7 @@ scout.Table.prototype._renderRowOrderChanges = function() {
     $rows = this.$rows(),
     $sortedRows = $();
 
-  //store old position
+  // store old position
   if ($rows.length < that._animationRowLimit) {
     $rows.each(function() {
       $row = $(this);
@@ -1486,20 +1459,20 @@ scout.Table.prototype._group = function(animate) {
 
   // pre-define functions for inline use.
   var prepare = function(column, c) {
-    if (column.type === 'number') {
+    if (column instanceof scout.NumberColumn) {
       states[c] = column.aggrStart();
     }
-  };
+  }; // FIXME AWE: (table) move to NumberColumn, remove from Column
 
   var aggregate = function(row, column, c) {
-    if (column.type === 'number') {
+    if (column instanceof scout.NumberColumn) {
       value = this.cellValue(column, row);
       states[c] = column.aggrStep(states[c], value);
     }
   };
 
   var finish = function(column, c) {
-    if (column.type === 'number') {
+    if (column instanceof scout.NumberColumn) {
       states[c] = column.aggrFinish(states[c]);
     }
   };
@@ -2775,10 +2748,7 @@ scout.Table.prototype._syncFilters = function(filters) {
       }
       filterData.table = this;
       filterData.session = this.session;
-      // FIXME AWE: (filter) remove this line when JsonModel sends the correct objectType
-      filterData.objectType = filterData.column.type.charAt(0).toUpperCase() + filterData.column.type.slice(1) + 'ColumnUserFilter';
-      var filter = scout.create(filterData);
-      this.addFilter(filter, false);
+      this.addFilter(scout.create(filterData), false);
     }, this);
   }
 };

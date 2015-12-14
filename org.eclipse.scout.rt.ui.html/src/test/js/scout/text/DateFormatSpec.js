@@ -16,7 +16,7 @@ describe("DateFormat", function() {
   beforeEach(function() {
     setFixtures(sandbox());
     helper = new LocaleSpecHelper();
-    locale = helper.createLocale('de');
+    locale = helper.createLocale(LocaleSpecHelper.DEFAULT_LOCALE);
   });
 
   afterEach(function() {

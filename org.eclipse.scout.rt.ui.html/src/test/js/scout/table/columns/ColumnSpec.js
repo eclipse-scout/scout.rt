@@ -290,7 +290,7 @@ describe("Column", function() {
 
     describe("colorGradient1", function() {
       it("colors cells from red to green", function() {
-        var model = helper.createModelSingleColumnByValues([0, 50, 100], 'number');
+        var model = helper.createModelSingleColumnByValues([0, 50, 100], 'NumberColumn');
         var table = helper.createTable(model);
         var column0 = table.columns[0];
         table.render(session.$entryPoint);
@@ -303,7 +303,7 @@ describe("Column", function() {
     });
 
     it("updates colors if row gets deleted", function() {
-      var model = helper.createModelSingleColumnByValues([0, 50, 100], 'number');
+      var model = helper.createModelSingleColumnByValues([0, 50, 100], 'NumberColumn');
       var table = helper.createTable(model);
       var column0 = table.columns[0];
       table.render(session.$entryPoint);
@@ -315,7 +315,7 @@ describe("Column", function() {
     });
 
     it("updates colors if row gets inserted", function() {
-      var model = helper.createModelSingleColumnByValues([0, 50, 100], 'number');
+      var model = helper.createModelSingleColumnByValues([0, 50, 100], 'NumberColumn');
       var table = helper.createTable(model);
       var column0 = table.columns[0];
       table.render(session.$entryPoint);
@@ -330,7 +330,7 @@ describe("Column", function() {
     });
 
     it("updates colors if row gets updated", function() {
-      var model = helper.createModelSingleColumnByValues([0, 50, 100], 'number');
+      var model = helper.createModelSingleColumnByValues([0, 50, 100], 'NumberColumn');
       model.columns[0].backgroundEffect = 'colorGradient1';
       var table = helper.createTable(model);
       var column0 = table.columns[0];
@@ -348,7 +348,7 @@ describe("Column", function() {
     });
 
     it("colors cells if table gets rendered", function() {
-      var model = helper.createModelSingleColumnByValues([0, 50, 100], 'number');
+      var model = helper.createModelSingleColumnByValues([0, 50, 100], 'NumberColumn');
       model.columns[0].backgroundEffect = 'colorGradient1';
       var table = helper.createTable(model);
       var column0 = table.columns[0];
@@ -360,7 +360,7 @@ describe("Column", function() {
     });
 
     it("restores existing background color if background effect gets removed", function() {
-      var model = helper.createModelSingleColumnByValues([0, 50, 100], 'number');
+      var model = helper.createModelSingleColumnByValues([0, 50, 100], 'NumberColumn');
       model.rows[1].cells[0].backgroundColor = 'ff0000';
       var table = helper.createTable(model);
       var column0 = table.columns[0];
@@ -383,7 +383,7 @@ describe("Column", function() {
           // PhantomJs does not support gradients
           return;
         }
-        var model = helper.createModelSingleColumnByValues([0, 50, 100], 'number');
+        var model = helper.createModelSingleColumnByValues([0, 50, 100], 'NumberColumn');
         model.rows[1].cells[0].backgroundColor = 'ff0000';
         var table = helper.createTable(model);
         var column0 = table.columns[0];
@@ -397,7 +397,7 @@ describe("Column", function() {
 
     describe("setBackgroundEffect", function() {
       it("changes the background effect", function() {
-        var model = helper.createModelSingleColumnByValues([0, 50, 100], 'number');
+        var model = helper.createModelSingleColumnByValues([0, 50, 100], 'NumberColumn');
         var table = helper.createTable(model);
         var column0 = table.columns[0];
         table.render(session.$entryPoint);
@@ -429,7 +429,7 @@ describe("Column", function() {
       });
 
       it("sends columnBackgroundEffectChanged event", function() {
-        var model = helper.createModelSingleColumnByValues([0, 50, 100], 'number');
+        var model = helper.createModelSingleColumnByValues([0, 50, 100], 'NumberColumn');
         var table = helper.createTable(model);
         var column0 = table.columns[0];
         table.render(session.$entryPoint);

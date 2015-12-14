@@ -16,7 +16,7 @@ describe("AggregateTableControl", function() {
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
-    session.locale = new LocaleSpecHelper().createLocale('de-CH');
+    session.locale = new LocaleSpecHelper().createLocale(LocaleSpecHelper.DEFAULT_LOCALE);
     helper = new TableSpecHelper(session);
 
     jasmine.Ajax.install();
@@ -80,7 +80,7 @@ describe("AggregateTableControl", function() {
 
     function prepareTable() {
       columns = [helper.createModelColumn('col1'),
-        helper.createModelColumn('col2', 'number')
+        helper.createModelColumn('col2', 'NumberColumn')
       ];
       columns[0].index = 0;
       columns[1].index = 1;
@@ -183,7 +183,7 @@ describe("AggregateTableControl", function() {
     it("is true if there is at least one number column", function() {
       columns = [
         helper.createModelColumn('col1'),
-        helper.createModelColumn('col2', 'number')
+        helper.createModelColumn('col2', 'NumberColumn')
       ];
       columns[0].index = 0;
       columns[1].index = 1;

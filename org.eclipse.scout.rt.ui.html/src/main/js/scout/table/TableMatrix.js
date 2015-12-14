@@ -134,7 +134,7 @@ scout.TableMatrix.prototype.addAxis = function(axis, axisGroup) {
   };
 
   // norm and format depends of datatype and group functionality
-  if (axis.type === 'date') {
+  if (axis instanceof scout.DateColumn) {
     if (axisGroup === scout.TableMatrix.DateGroup.NONE) {
       keyAxis.norm = function(f) {
         if (f === null || f === '') {
@@ -203,7 +203,7 @@ scout.TableMatrix.prototype.addAxis = function(axis, axisGroup) {
         }
       };
     }
-  } else if (axis.type === 'number') {
+  } else if (axis instanceof scout.NumberColumn) {
     keyAxis.norm = function(f) {
       if (isNaN(f) || f === null || f === '') {
         return null;
@@ -224,7 +224,7 @@ scout.TableMatrix.prototype.addAxis = function(axis, axisGroup) {
         return format.format(n);
       }
     };
-  } else if (axis.type === 'boolean') {
+  } else if (axis instanceof scout.BooleanColumn) {
     keyAxis.norm = function(f) {
       if (!f) {
         return 0;
@@ -394,11 +394,7 @@ scout.TableMatrix.prototype.columnCount = function() {
   var count = 0;
   for (var c = 0; c < this._columns.length; c++) {
     var column = this._columns[c];
-    if (column.type === 'key' || column.type === 'number') {
-      continue;
-    }
-
-    if (column.text === null || column.text === undefined || column.text === '') {
+    if (column instanceof scout.NumberColumn || !scout.strings.hasText(column.text)) {
       continue;
     }
     colCount.push([column, []]);

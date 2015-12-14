@@ -14,6 +14,10 @@ var LocaleSpecHelper = function() {
   this._initDateFormatDefaultPatterns();
 };
 
+LocaleSpecHelper.DEFAULT_LOCALE = 'de-CH';
+
+LocaleSpecHelper.GERMAN_LOCALE = 'de-DE';
+
 LocaleSpecHelper.prototype.createModel = function(languageTag) {
   var model = {};
   model.languageTag = languageTag;
@@ -31,8 +35,8 @@ LocaleSpecHelper.prototype.createLocale = function(languageTag) {
 
 LocaleSpecHelper.prototype._initDecimalFormatSymbols = function () {
   this.decimalFormatSymbolsByLocale = {};
-  this.decimalFormatSymbolsByLocale['de-CH'] = this.createDecimalFormatSymbolsForDeCH();
-  this.decimalFormatSymbolsByLocale['de-DE'] = this.createDecimalFormatSymbolsForDeDE();
+  this.decimalFormatSymbolsByLocale[LocaleSpecHelper.DEFAULT_LOCALE] = this.createDecimalFormatSymbolsForDeCH();
+  this.decimalFormatSymbolsByLocale[LocaleSpecHelper.GERMAN_LOCALE] = this.createDecimalFormatSymbolsForDeDE();
 };
 
 LocaleSpecHelper.prototype.createDecimalFormatSymbolsForDeCH = function() {
@@ -54,8 +58,10 @@ LocaleSpecHelper.prototype.createDecimalFormatSymbolsForDeDE = function() {
 };
 
 LocaleSpecHelper.prototype._initDateFormatSymbols = function() {
+  var symbols = this.createDateFormatSymbolsForDe();
   this.dateFormatSymbolsByLocale = {};
-  this.dateFormatSymbolsByLocale.de = this.createDateFormatSymbolsForDe();
+  this.dateFormatSymbolsByLocale[LocaleSpecHelper.DEFAULT_LOCALE] = symbols;
+  this.dateFormatSymbolsByLocale[LocaleSpecHelper.GERMAN_LOCALE] = symbols;
 };
 
 LocaleSpecHelper.prototype._initDateFormatDefaultPatterns = function() {

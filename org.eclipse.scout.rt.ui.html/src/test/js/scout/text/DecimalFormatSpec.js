@@ -16,7 +16,7 @@ describe("DecimalFormat", function() {
   beforeEach(function() {
     setFixtures(sandbox());
     helper = new LocaleSpecHelper();
-    locale = helper.createLocale('de-CH');
+    locale = helper.createLocale(LocaleSpecHelper.DEFAULT_LOCALE);
   });
 
   afterEach(function() {

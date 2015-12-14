@@ -77,8 +77,7 @@ TableSpecHelper.prototype.createModelColumn = function(text, type) {
   var column = {
     id: scout.objectFactory.createUniqueId(),
     text: text,
-    type: type,
-    objectType: 'Column',
+    objectType: (type === undefined ? 'StringColumn' : type),
     uiSortPossible: true
   };
   scout.defaultValues.applyTo(column, 'Column');
@@ -106,7 +105,7 @@ TableSpecHelper.prototype.createModelColumns = function(count, columnType) {
     return;
   }
   if (!columnType) {
-    columnType = 'text';
+    columnType = 'StringColumn';
   }
 
   var columns = [];

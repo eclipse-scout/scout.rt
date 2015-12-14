@@ -32,7 +32,10 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.IStringColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.controls.IAggregateTableControl;
 import org.eclipse.scout.rt.client.ui.basic.table.controls.ITableControl;
 import org.eclipse.scout.rt.client.ui.basic.table.userfilter.ColumnUserFilterState;
+import org.eclipse.scout.rt.client.ui.basic.table.userfilter.DateColumnUserFilterState;
+import org.eclipse.scout.rt.client.ui.basic.table.userfilter.NumberColumnUserFilterState;
 import org.eclipse.scout.rt.client.ui.basic.table.userfilter.TableTextUserFilterState;
+import org.eclipse.scout.rt.client.ui.basic.table.userfilter.TextColumnUserFilterState;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IFormToolButton;
@@ -142,7 +145,10 @@ import org.eclipse.scout.rt.ui.html.json.table.JsonTable;
 import org.eclipse.scout.rt.ui.html.json.table.control.JsonAggregateTableControl;
 import org.eclipse.scout.rt.ui.html.json.table.control.JsonTableControl;
 import org.eclipse.scout.rt.ui.html.json.table.userfilter.JsonColumnUserFilter;
+import org.eclipse.scout.rt.ui.html.json.table.userfilter.JsonDateColumnUserFilter;
+import org.eclipse.scout.rt.ui.html.json.table.userfilter.JsonNumberColumnUserFilter;
 import org.eclipse.scout.rt.ui.html.json.table.userfilter.JsonTableTextUserFilter;
+import org.eclipse.scout.rt.ui.html.json.table.userfilter.JsonTextColumnUserFilter;
 import org.eclipse.scout.rt.ui.html.json.tree.JsonTree;
 
 @Bean
@@ -356,6 +362,15 @@ public class JsonObjectFactory extends AbstractJsonObjectFactory {
     }
     if (object instanceof IColumn<?>) {
       return new JsonColumn((IColumn<?>) object);
+    }
+    if (object instanceof DateColumnUserFilterState) { // needs to be before ColumnUserFilterState
+      return new JsonDateColumnUserFilter((DateColumnUserFilterState) object);
+    }
+    if (object instanceof NumberColumnUserFilterState) { // needs to be before ColumnUserFilterState
+      return new JsonNumberColumnUserFilter((NumberColumnUserFilterState) object);
+    }
+    if (object instanceof TextColumnUserFilterState) { // needs to be before ColumnUserFilterState
+      return new JsonTextColumnUserFilter((TextColumnUserFilterState) object);
     }
     if (object instanceof ColumnUserFilterState) {
       return new JsonColumnUserFilter((ColumnUserFilterState) object);

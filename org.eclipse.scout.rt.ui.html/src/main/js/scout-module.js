@@ -148,6 +148,8 @@ __include("scout/table/columns/BeanColumn.js"); // requires Column.js
 __include("scout/table/columns/BooleanColumn.js"); // requires Column.js
 __include("scout/table/columns/DateColumn.js"); // requires Column.js
 __include("scout/table/columns/IconColumn.js"); //requires Column.js
+__include("scout/table/columns/NumberColumn.js"); //requires Column.js
+__include("scout/table/columns/StringColumn.js"); //requires Column.js
 __include("scout/table/controls/TableControl.js");
 __include("scout/table/controls/AggregateTableControl.js"); // requires TableControl.js
 __include("scout/table/editor/CellEditorPopup.js");
@@ -171,7 +173,6 @@ __include("scout/table/keystrokes/TableNavigationPageDownKeyStroke.js");
 __include("scout/table/keystrokes/TableFocusFilterFieldKeyStroke.js");
 __include("scout/table/userfilter/TableUserFilter.js");
 __include("scout/table/userfilter/ColumnUserFilter.js");
-__include("scout/table/userfilter/BooleanColumnUserFilter.js");
 __include("scout/table/userfilter/DateColumnUserFilter.js");
 __include("scout/table/userfilter/NumberColumnUserFilter.js");
 __include("scout/table/userfilter/TextColumnUserFilter.js");

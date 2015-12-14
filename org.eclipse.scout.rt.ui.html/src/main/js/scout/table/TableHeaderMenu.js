@@ -50,27 +50,12 @@ scout.TableHeaderMenu.prototype._init = function(options) {
   // Filtering
   this.filter = this.table.getFilter(this.column.id);
   if (!this.filter) {
-    this.filter = this._createColumnUserFilter({
-      session: this.session,
-      table: this.table,
-      column: this.column
-    });
+    this.filter = this.column.createFilter();
   }
   // always recalculate available values to make sure new/updated/deleted rows are considered
   this.filter.calculate();
   this.filter.on('filterFieldsChanged', this._updateTableFilters.bind(this)); // FIXME AWE: (filter) off handler?
   this._updateFilterCheckedMode();
-};
-
-/**
- * Factory method to create a typed ColumnUserFilter. When type of column is = 'text' this method
- * will create an instance of TextColumnUserFilter.
- * @param model
- */
-scout.TableHeaderMenu.prototype._createColumnUserFilter = function(model) {
-  var columnType = this.column.type,
-    filterType = columnType.charAt(0).toUpperCase() + columnType.slice(1) + 'ColumnUserFilter';
-  return scout.create(filterType, model);
 };
 
 scout.TableHeaderMenu.prototype._createLayout = function() {
@@ -106,20 +91,20 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
 
   // Grouping and aggregation
   var containsNumberColumn = scout.arrays.find(this.table.columns, function(column) {
-    return column.type === 'number';
+    return column instanceof scout.NumberColumn;
   });
   if (containsNumberColumn) {
-    if (this.column.type !== 'number') {
-      this._renderGroupingGroup();
-      this._renderSelectedGrouping();
-    } else {
+    if (this.column instanceof scout.NumberColumn) {
       this._renderAggregationGroup();
       this._renderSelectedAggregation();
+    } else {
+      this._renderGroupingGroup();
+      this._renderSelectedGrouping();
     }
   }
 
   // Coloring
-  if (this.column.type === 'number') {
+  if (this.column instanceof scout.NumberColumn) {
     this._renderColoringGroup();
     this._renderSelectedColoring();
   }

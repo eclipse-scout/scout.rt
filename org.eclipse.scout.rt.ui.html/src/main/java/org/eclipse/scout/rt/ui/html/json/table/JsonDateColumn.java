@@ -16,13 +16,14 @@ import java.util.Date;
 import java.util.Locale;
 
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractDateColumn;
-import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IDateColumn;
+import org.eclipse.scout.rt.client.ui.basic.table.userfilter.ColumnUserFilterState;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
 import org.eclipse.scout.rt.platform.nls.NlsLocale;
 import org.eclipse.scout.rt.ui.html.UiException;
 import org.eclipse.scout.rt.ui.html.json.JsonDate;
+import org.eclipse.scout.rt.ui.html.json.table.userfilter.JsonDateColumnUserFilter;
 import org.json.JSONObject;
 
 public class JsonDateColumn<DATE_COLUMN extends IDateColumn> extends JsonColumn<DATE_COLUMN> {
@@ -32,12 +33,22 @@ public class JsonDateColumn<DATE_COLUMN extends IDateColumn> extends JsonColumn<
   }
 
   @Override
+  public String getObjectType() {
+    return "DateColumn";
+  }
+
+  @Override
+  protected ColumnUserFilterState createFilterStateFromJson(JSONObject json) {
+    return new JsonDateColumnUserFilter(null).createFilterStateFromJson(getColumn(), json);
+  }
+
+  @Override
   public JSONObject toJson() {
     JSONObject json = super.toJson();
     json.put("hasDate", getColumn().isHasDate());
     json.put("hasTime", getColumn().isHasTime());
     json.put(IDateColumn.PROP_GROUP_FORMAT, getColumn().getGroupFormat());
-    // FIXME cgu: update IDateColumnInterface
+    // FIXME CGU: update IDateColumnInterface
     // getDateFormat uses NlsLocale. IMHO getDateFormat should not perform any logic because it just a getter-> refactor. same on AbstractDateField
     // Alternative would be to use a clientJob or set localethreadlocal in ui thread as well, as done in rap
     Locale oldLocale = NlsLocale.get(false);
@@ -66,13 +77,4 @@ public class JsonDateColumn<DATE_COLUMN extends IDateColumn> extends JsonColumn<
     return null;
   }
 
-  @Override
-  protected String computeColumnType(IColumn column) {
-    return "date";
-  }
-
-  @Override
-  public String getObjectType() {
-    return "DateColumn";
-  }
 }

@@ -10,16 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.table;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.eclipse.scout.rt.client.services.common.clipboard.IClipboardService;
 import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
@@ -37,7 +33,6 @@ import org.eclipse.scout.rt.client.ui.basic.table.TableListener;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.INumberColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.controls.ITableControl;
-import org.eclipse.scout.rt.client.ui.basic.table.userfilter.ColumnUserFilterState;
 import org.eclipse.scout.rt.client.ui.basic.table.userfilter.TableTextUserFilterState;
 import org.eclipse.scout.rt.client.ui.basic.userfilter.IUserFilterState;
 import org.eclipse.scout.rt.client.ui.dnd.IDNDSupport;
@@ -50,7 +45,6 @@ import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.StringUtility;
-import org.eclipse.scout.rt.platform.util.date.DateUtility;
 import org.eclipse.scout.rt.shared.security.CopyToClipboardPermission;
 import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
 import org.eclipse.scout.rt.ui.html.IUiSession;
@@ -709,69 +703,25 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
 
   protected void handleUiAddFilter(JsonEvent event) {
     JSONObject data = event.getData();
-    IUserFilterState filter = createFilterState(data);
+    IUserFilterState filterState = createFilterState(data);
     TableEventFilterCondition condition = addTableEventFilterCondition(TableEvent.TYPE_USER_FILTER_ADDED);
-    condition.setUserFilter(filter);
+    condition.setUserFilter(filterState);
     condition.checkUserFilter();
-    getModel().getUIFacade().fireFilterAddedFromUI(filter);
+    getModel().getUIFacade().fireFilterAddedFromUI(filterState);
   }
 
-  @SuppressWarnings("unchecked")
   protected IUserFilterState createFilterState(JSONObject data) {
     String filterType = data.getString("filterType");
     if ("column".equals(filterType)) {
       IColumn column = extractColumn(data);
-      // filter table
-      JSONArray jsonSelectedValues = data.getJSONArray("selectedValues");
-      Set<Object> selectedValues = new HashSet<Object>();
-      for (int i = 0; i < jsonSelectedValues.length(); i++) {
-        if (jsonSelectedValues.isNull(i)) {
-          selectedValues.add(null);
-        }
-        else {
-          selectedValues.add(jsonSelectedValues.get(i));
-        }
-      }
-      // filter fields
-      ColumnUserFilterState filter = new ColumnUserFilterState(column);
-      filter.setSelectedValues(selectedValues);
-
-      // FIXME AWE: (filter) split into separate classes / per type
-      // move model/json-adapter creation to JsonXxxColumn class, static method?
-      if ("text".equals(getColumnType(column))) {
-        filter.setFreeText(data.optString("freeText"));
-      }
-      else if ("number".equals(getColumnType(column))) {
-        filter.setNumberFrom(toBigDecimal(data.optString("numberFrom")));
-        filter.setNumberTo(toBigDecimal(data.optString("numberTo")));
-      }
-      else if ("date".equals(getColumnType(column))) {
-        filter.setDateFrom(toDate(data.optString("dateFrom")));
-        filter.setDateTo(toDate(data.optString("dateTo")));
-      }
-      return filter;
+      JsonColumn jsonColumn = m_jsonColumns.get(column);
+      return jsonColumn.createFilterStateFromJson(data);
     }
     else if ("text".equals(filterType)) {
       String text = data.getString("text");
-      TableTextUserFilterState filter = new TableTextUserFilterState();
-      filter.setText(text);
-      return filter;
+      return new TableTextUserFilterState(text);
     }
     return null;
-  }
-
-  private BigDecimal toBigDecimal(String numberString) {
-    if (StringUtility.isNullOrEmpty(numberString)) {
-      return null;
-    }
-    return new BigDecimal(numberString);
-  }
-
-  private Date toDate(String dateString) { // FIXME AWE: (filter) fix this poor-mans solution and use JsonDate, property date-format
-    if (StringUtility.isNullOrEmpty(dateString)) {
-      return null;
-    }
-    return DateUtility.parse(dateString, "y-M-d");
   }
 
   protected IUserFilterState getFilterState(JSONObject data) {
@@ -927,17 +877,6 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
       throw new UiException("No column found for id " + columnId);
     }
     return column;
-  }
-
-  public String getColumnType(IColumn column) { // FIXME AWE: (filter) remove this method when we have JsonColumns per type
-    if (column == null) {
-      return null;
-    }
-    JsonColumn jsonColumn = m_jsonColumns.get(column);
-    if (jsonColumn == null) {
-      return null;
-    }
-    return jsonColumn.computeColumnType(column);
   }
 
   public String getColumnId(IColumn column) {
