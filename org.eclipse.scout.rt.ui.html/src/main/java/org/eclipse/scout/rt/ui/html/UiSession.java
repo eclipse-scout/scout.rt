@@ -627,9 +627,11 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
           // Handle exceptions instantaneously in job manager, and not by submitter.
           // That is because the submitting thread might not be waiting anymore, because interrupted or returned because requiring 'user interaction'.
           .withExceptionHandling(ExceptionHandler.class, true));
+
+      // 2. Wait for all model jobs of the session.
       BEANS.get(UiJobs.class).awaitModelJobs(m_clientSession, ExceptionHandler.class);
 
-      // 2. Transform the response to JSON.
+      // 3. Transform the response to JSON.
       final IFuture<JSONObject> future = ModelJobs.schedule(new P_ResponseToJsonTransformer(), ModelJobs.newInput(clientRunContext)
           .withName("Transforming response to JSON")
           .withExecutionHint(UiJobs.EXECUTION_HINT_POLL_REQUEST, RequestType.POLL_REQUEST.equals(jsonRequest.getRequestType()))
@@ -687,9 +689,11 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
           // Handle exceptions instantaneously in job manager, and not by submitter.
           // That is because the submitting thread might not be waiting anymore, because interrupted or returned because requiring 'user interaction'.
           .withExceptionHandling(ExceptionHandler.class, true));
+
+      // 2. Wait for all model jobs of the session.
       BEANS.get(UiJobs.class).awaitModelJobs(m_clientSession, ExceptionHandler.class);
 
-      // 2. Transform the response to JSON.
+      // 3. Transform the response to JSON.
       final IFuture<JSONObject> future = ModelJobs.schedule(new P_ResponseToJsonTransformer(), ModelJobs.newInput(clientRunContext)
           .withName("Transforming response to JSON")
           .withExceptionHandling(null, false)); // Propagate exception to caller (UIServlet)
