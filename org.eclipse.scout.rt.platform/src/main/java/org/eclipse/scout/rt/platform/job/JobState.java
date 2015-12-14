@@ -28,7 +28,8 @@ public enum JobState {
   REJECTED,
 
   /**
-   * Indicates that a job's execution is pending, because being scheduled with a delay.
+   * Indicates that a job's execution is pending, because being scheduled with a delay, at fixed rate, or with a fixed
+   * delay.
    */
   PENDING,
 

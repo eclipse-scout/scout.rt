@@ -20,6 +20,7 @@ import static org.mockito.Mockito.mock;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.scout.rt.platform.IBean;
@@ -472,6 +473,272 @@ public class JobStateTest {
 
     i++;
     assertEvent(JobEventType.JOB_STATE_CHANGED, future1, JobState.DONE, capturedEvents.get(i));
+    assertEquals(JobState.DONE, capturedFutureStates.get(i));
+
+    assertEquals(i + 1, capturedEvents.size());
+  }
+
+  @Test
+  public void testScheduleAtFixedRate() throws InterruptedException, java.lang.InterruptedException {
+    JobEventCaptureListener captureListener = new JobEventCaptureListener();
+    Jobs.getJobManager().addListener(captureListener);
+
+    final AtomicInteger rounds = new AtomicInteger(0);
+    IFuture<Void> future = Jobs.schedule(new IRunnable() {
+
+      @Override
+      public void run() throws Exception {
+        if (rounds.incrementAndGet() == 3) {
+          IFuture.CURRENT.get().cancel(false);
+        }
+      }
+    }, Jobs.newInput()
+        .withSchedulingDelay(1, TimeUnit.MILLISECONDS)
+        .withPeriodicExecutionAtFixedRate(1, TimeUnit.MILLISECONDS));
+
+    future.awaitDone(5, TimeUnit.SECONDS);
+
+    // verify events
+    int i = -1;
+    List<JobEvent> capturedEvents = captureListener.getCapturedEvents();
+    List<JobState> capturedFutureStates = captureListener.getCapturedFutureStates();
+
+    i++;
+    assertEvent(JobEventType.JOB_STATE_CHANGED, future, JobState.SCHEDULED, capturedEvents.get(i));
+    assertEquals(JobState.SCHEDULED, capturedFutureStates.get(i));
+
+    i++;
+    assertEvent(JobEventType.JOB_STATE_CHANGED, future, JobState.PENDING, capturedEvents.get(i));
+    assertEquals(JobState.PENDING, capturedFutureStates.get(i));
+
+    i++; // first round
+    assertEvent(JobEventType.JOB_STATE_CHANGED, future, JobState.RUNNING, capturedEvents.get(i));
+    assertEquals(JobState.RUNNING, capturedFutureStates.get(i));
+
+    i++;
+    assertEvent(JobEventType.JOB_STATE_CHANGED, future, JobState.PENDING, capturedEvents.get(i));
+    assertEquals(JobState.PENDING, capturedFutureStates.get(i));
+
+    i++; // second round
+    assertEvent(JobEventType.JOB_STATE_CHANGED, future, JobState.RUNNING, capturedEvents.get(i));
+    assertEquals(JobState.RUNNING, capturedFutureStates.get(i));
+
+    i++;
+    assertEvent(JobEventType.JOB_STATE_CHANGED, future, JobState.PENDING, capturedEvents.get(i));
+    assertEquals(JobState.PENDING, capturedFutureStates.get(i));
+
+    i++; // third round
+    assertEvent(JobEventType.JOB_STATE_CHANGED, future, JobState.RUNNING, capturedEvents.get(i));
+    assertEquals(JobState.RUNNING, capturedFutureStates.get(i));
+
+    i++;
+    assertEvent(JobEventType.JOB_STATE_CHANGED, future, JobState.DONE, capturedEvents.get(i));
+    assertEquals(JobState.DONE, capturedFutureStates.get(i));
+
+    assertEquals(i + 1, capturedEvents.size());
+  }
+
+  @Test
+  public void testScheduleAtFixedRateAndMutex() throws InterruptedException, java.lang.InterruptedException {
+    JobEventCaptureListener captureListener = new JobEventCaptureListener();
+    Jobs.getJobManager().addListener(captureListener);
+
+    final AtomicInteger rounds = new AtomicInteger(0);
+    IFuture<Void> future = Jobs.schedule(new IRunnable() {
+
+      @Override
+      public void run() throws Exception {
+        if (rounds.incrementAndGet() == 3) {
+          IFuture.CURRENT.get().cancel(false);
+        }
+      }
+    }, Jobs.newInput()
+        .withMutex(Jobs.newMutex())
+        .withSchedulingDelay(1, TimeUnit.MILLISECONDS)
+        .withPeriodicExecutionAtFixedRate(1, TimeUnit.MILLISECONDS));
+
+    future.awaitDone(5, TimeUnit.SECONDS);
+
+    // verify events
+    int i = -1;
+    List<JobEvent> capturedEvents = captureListener.getCapturedEvents();
+    List<JobState> capturedFutureStates = captureListener.getCapturedFutureStates();
+
+    i++;
+    assertEvent(JobEventType.JOB_STATE_CHANGED, future, JobState.SCHEDULED, capturedEvents.get(i));
+    assertEquals(JobState.SCHEDULED, capturedFutureStates.get(i));
+
+    i++;
+    assertEvent(JobEventType.JOB_STATE_CHANGED, future, JobState.PENDING, capturedEvents.get(i));
+    assertEquals(JobState.PENDING, capturedFutureStates.get(i));
+
+    i++;
+    assertEvent(JobEventType.JOB_STATE_CHANGED, future, JobState.WAITING_FOR_MUTEX, capturedEvents.get(i));
+    assertEquals(JobState.WAITING_FOR_MUTEX, capturedFutureStates.get(i));
+
+    i++; // first round
+    assertEvent(JobEventType.JOB_STATE_CHANGED, future, JobState.RUNNING, capturedEvents.get(i));
+    assertEquals(JobState.RUNNING, capturedFutureStates.get(i));
+
+    i++;
+    assertEvent(JobEventType.JOB_STATE_CHANGED, future, JobState.PENDING, capturedEvents.get(i));
+    assertEquals(JobState.PENDING, capturedFutureStates.get(i));
+
+    i++;
+    assertEvent(JobEventType.JOB_STATE_CHANGED, future, JobState.WAITING_FOR_MUTEX, capturedEvents.get(i));
+    assertEquals(JobState.WAITING_FOR_MUTEX, capturedFutureStates.get(i));
+
+    i++; // second round
+    assertEvent(JobEventType.JOB_STATE_CHANGED, future, JobState.RUNNING, capturedEvents.get(i));
+    assertEquals(JobState.RUNNING, capturedFutureStates.get(i));
+
+    i++;
+    assertEvent(JobEventType.JOB_STATE_CHANGED, future, JobState.PENDING, capturedEvents.get(i));
+    assertEquals(JobState.PENDING, capturedFutureStates.get(i));
+
+    i++;
+    assertEvent(JobEventType.JOB_STATE_CHANGED, future, JobState.WAITING_FOR_MUTEX, capturedEvents.get(i));
+    assertEquals(JobState.WAITING_FOR_MUTEX, capturedFutureStates.get(i));
+
+    i++; // third round
+    assertEvent(JobEventType.JOB_STATE_CHANGED, future, JobState.RUNNING, capturedEvents.get(i));
+    assertEquals(JobState.RUNNING, capturedFutureStates.get(i));
+
+    i++;
+    assertEvent(JobEventType.JOB_STATE_CHANGED, future, JobState.DONE, capturedEvents.get(i));
+    assertEquals(JobState.DONE, capturedFutureStates.get(i));
+
+    assertEquals(i + 1, capturedEvents.size());
+  }
+
+  @Test
+  public void testScheduleWithFixedDelay() throws InterruptedException, java.lang.InterruptedException {
+    JobEventCaptureListener captureListener = new JobEventCaptureListener();
+    Jobs.getJobManager().addListener(captureListener);
+
+    final AtomicInteger rounds = new AtomicInteger(0);
+    IFuture<Void> future = Jobs.schedule(new IRunnable() {
+
+      @Override
+      public void run() throws Exception {
+        if (rounds.incrementAndGet() == 3) {
+          IFuture.CURRENT.get().cancel(false);
+        }
+      }
+    }, Jobs.newInput()
+        .withSchedulingDelay(1, TimeUnit.MILLISECONDS)
+        .withPeriodicExecutionWithFixedDelay(1, TimeUnit.MILLISECONDS));
+
+    future.awaitDone(5, TimeUnit.SECONDS);
+
+    // verify events
+    int i = -1;
+    List<JobEvent> capturedEvents = captureListener.getCapturedEvents();
+    List<JobState> capturedFutureStates = captureListener.getCapturedFutureStates();
+
+    i++;
+    assertEvent(JobEventType.JOB_STATE_CHANGED, future, JobState.SCHEDULED, capturedEvents.get(i));
+    assertEquals(JobState.SCHEDULED, capturedFutureStates.get(i));
+
+    i++;
+    assertEvent(JobEventType.JOB_STATE_CHANGED, future, JobState.PENDING, capturedEvents.get(i));
+    assertEquals(JobState.PENDING, capturedFutureStates.get(i));
+
+    i++; // first round
+    assertEvent(JobEventType.JOB_STATE_CHANGED, future, JobState.RUNNING, capturedEvents.get(i));
+    assertEquals(JobState.RUNNING, capturedFutureStates.get(i));
+
+    i++;
+    assertEvent(JobEventType.JOB_STATE_CHANGED, future, JobState.PENDING, capturedEvents.get(i));
+    assertEquals(JobState.PENDING, capturedFutureStates.get(i));
+
+    i++; // second round
+    assertEvent(JobEventType.JOB_STATE_CHANGED, future, JobState.RUNNING, capturedEvents.get(i));
+    assertEquals(JobState.RUNNING, capturedFutureStates.get(i));
+
+    i++;
+    assertEvent(JobEventType.JOB_STATE_CHANGED, future, JobState.PENDING, capturedEvents.get(i));
+    assertEquals(JobState.PENDING, capturedFutureStates.get(i));
+
+    i++; // third round
+    assertEvent(JobEventType.JOB_STATE_CHANGED, future, JobState.RUNNING, capturedEvents.get(i));
+    assertEquals(JobState.RUNNING, capturedFutureStates.get(i));
+
+    i++;
+    assertEvent(JobEventType.JOB_STATE_CHANGED, future, JobState.DONE, capturedEvents.get(i));
+    assertEquals(JobState.DONE, capturedFutureStates.get(i));
+
+    assertEquals(i + 1, capturedEvents.size());
+  }
+
+  @Test
+  public void testScheduleWithFixedDelayAndMutex() throws InterruptedException, java.lang.InterruptedException {
+    JobEventCaptureListener captureListener = new JobEventCaptureListener();
+    Jobs.getJobManager().addListener(captureListener);
+
+    final AtomicInteger rounds = new AtomicInteger(0);
+    IFuture<Void> future = Jobs.schedule(new IRunnable() {
+
+      @Override
+      public void run() throws Exception {
+        if (rounds.incrementAndGet() == 3) {
+          IFuture.CURRENT.get().cancel(false);
+        }
+      }
+    }, Jobs.newInput()
+        .withMutex(Jobs.newMutex())
+        .withSchedulingDelay(1, TimeUnit.MILLISECONDS)
+        .withPeriodicExecutionWithFixedDelay(1, TimeUnit.MILLISECONDS));
+
+    future.awaitDone(5, TimeUnit.SECONDS);
+
+    // verify events
+    int i = -1;
+    List<JobEvent> capturedEvents = captureListener.getCapturedEvents();
+    List<JobState> capturedFutureStates = captureListener.getCapturedFutureStates();
+
+    i++;
+    assertEvent(JobEventType.JOB_STATE_CHANGED, future, JobState.SCHEDULED, capturedEvents.get(i));
+    assertEquals(JobState.SCHEDULED, capturedFutureStates.get(i));
+
+    i++;
+    assertEvent(JobEventType.JOB_STATE_CHANGED, future, JobState.PENDING, capturedEvents.get(i));
+    assertEquals(JobState.PENDING, capturedFutureStates.get(i));
+
+    i++;
+    assertEvent(JobEventType.JOB_STATE_CHANGED, future, JobState.WAITING_FOR_MUTEX, capturedEvents.get(i));
+    assertEquals(JobState.WAITING_FOR_MUTEX, capturedFutureStates.get(i));
+
+    i++; // first round
+    assertEvent(JobEventType.JOB_STATE_CHANGED, future, JobState.RUNNING, capturedEvents.get(i));
+    assertEquals(JobState.RUNNING, capturedFutureStates.get(i));
+
+    i++;
+    assertEvent(JobEventType.JOB_STATE_CHANGED, future, JobState.PENDING, capturedEvents.get(i));
+    assertEquals(JobState.PENDING, capturedFutureStates.get(i));
+
+    i++;
+    assertEvent(JobEventType.JOB_STATE_CHANGED, future, JobState.WAITING_FOR_MUTEX, capturedEvents.get(i));
+    assertEquals(JobState.WAITING_FOR_MUTEX, capturedFutureStates.get(i));
+
+    i++; // second round
+    assertEvent(JobEventType.JOB_STATE_CHANGED, future, JobState.RUNNING, capturedEvents.get(i));
+    assertEquals(JobState.RUNNING, capturedFutureStates.get(i));
+
+    i++;
+    assertEvent(JobEventType.JOB_STATE_CHANGED, future, JobState.PENDING, capturedEvents.get(i));
+    assertEquals(JobState.PENDING, capturedFutureStates.get(i));
+
+    i++;
+    assertEvent(JobEventType.JOB_STATE_CHANGED, future, JobState.WAITING_FOR_MUTEX, capturedEvents.get(i));
+    assertEquals(JobState.WAITING_FOR_MUTEX, capturedFutureStates.get(i));
+
+    i++; // third round
+    assertEvent(JobEventType.JOB_STATE_CHANGED, future, JobState.RUNNING, capturedEvents.get(i));
+    assertEquals(JobState.RUNNING, capturedFutureStates.get(i));
+
+    i++;
+    assertEvent(JobEventType.JOB_STATE_CHANGED, future, JobState.DONE, capturedEvents.get(i));
     assertEquals(JobState.DONE, capturedFutureStates.get(i));
 
     assertEquals(i + 1, capturedEvents.size());

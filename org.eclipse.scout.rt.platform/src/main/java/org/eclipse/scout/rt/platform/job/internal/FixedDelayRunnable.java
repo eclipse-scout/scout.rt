@@ -17,6 +17,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.rt.platform.job.IMutex;
 import org.eclipse.scout.rt.platform.job.IMutex.QueuePosition;
+import org.eclipse.scout.rt.platform.job.JobState;
 
 /**
  * Runnable to run the given {@link JobFutureTask} periodically with the given 'fixed-delay' upon completion of its
@@ -57,6 +58,7 @@ class FixedDelayRunnable implements IRejectableRunnable {
       scheduleNextExecution();
     }
     else {
+      m_futureTask.changeState(JobState.WAITING_FOR_MUTEX);
       mutex.compete(m_futureTask, QueuePosition.TAIL, new IMutexAcquiredCallback() {
 
         @Override
@@ -87,6 +89,7 @@ class FixedDelayRunnable implements IRejectableRunnable {
   private void scheduleNextExecution() {
     // re-schedule the task if still in 'done-state'.
     if (!m_futureTask.isDone()) {
+      m_futureTask.changeState(JobState.PENDING);
       m_delayedExecutor.schedule(this, m_delayMillis, TimeUnit.MILLISECONDS);
     }
   }

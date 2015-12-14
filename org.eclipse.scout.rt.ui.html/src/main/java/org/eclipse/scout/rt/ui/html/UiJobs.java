@@ -22,6 +22,7 @@ import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.filter.AndFilter;
 import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.job.JobState;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.filter.future.FutureFilter;
@@ -129,29 +130,48 @@ public class UiJobs {
     Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
         .andMatchNotExecutionHint(ModelJobs.EXECUTION_HINT_UI_INTERACTION_REQUIRED)
         .andMatchNotState(JobState.PENDING) // consumed by poller
+        .andAreSingleExecuting() // consumed by poller
         .andMatch(filter)
         .toFilter(), AWAIT_TIMEOUT, TimeUnit.MILLISECONDS);
   }
 
   /**
-   * Creates a filter to accept only jobs, which provide data to be transported to the UI. That means, that such a job
-   * either transitioned into 'DONE' state, or requires 'UI interaction'.
+   * Creates a filter to accept jobs, which possibly provide data to be transported to the UI. That means, that such a
+   * job either transitioned into 'DONE' state, or requires 'UI interaction', or is a periodic job with a round
+   * completed.
    */
-  public IFilter<JobEvent> newDataAvailableFilter() {
+  public IFilter<JobEvent> newUiDataAvailableFilter() {
     return new IFilter<JobEvent>() {
 
       @Override
       public boolean accept(final JobEvent event) {
         switch (event.getType()) {
           case JOB_STATE_CHANGED: {
-            return JobState.DONE.equals(event.getData()); // data for UI available because job completed.
+            return handleJobStateChanged((JobState) event.getData(), event.getFuture());
           }
           case JOB_EXECUTION_HINT_ADDED: {
-            return ModelJobs.EXECUTION_HINT_UI_INTERACTION_REQUIRED.equals(event.getData()); // data for UI available because job was marked with 'UI_INTERACTION_REQUIRED'.
+            return ModelJobs.EXECUTION_HINT_UI_INTERACTION_REQUIRED.equals(event.getData()); // UI data available because job was marked with 'UI_INTERACTION_REQUIRED'.
           }
           default: {
             return false;
           }
+        }
+      }
+
+      private boolean handleJobStateChanged(final JobState jobState, final IFuture<?> future) {
+        switch (jobState) {
+          case DONE:
+            return true; // UI data possibly available because job completed.
+          case PENDING:
+            switch (future.getSchedulingRule()) {
+              case JobInput.SCHEDULING_RULE_PERIODIC_EXECUTION_AT_FIXED_RATE:
+              case JobInput.SCHEDULING_RULE_PERIODIC_EXECUTION_WITH_FIXED_DELAY:
+                return true; // UI data possibly available because periodic job completed round.
+              default:
+                return false;
+            }
+          default:
+            return false;
         }
       }
     };

@@ -325,6 +325,7 @@ public class JobManager implements IJobManager, IPlatformListener {
     return input;
   }
 
+  // ==== IPlatformListener ==== //
   @Override
   public void stateChanged(final PlatformEvent event) throws PlatformException {
     if (event.getState() == IPlatform.State.PlatformStopping) {

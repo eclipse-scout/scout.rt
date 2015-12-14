@@ -17,6 +17,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.rt.platform.job.IMutex;
 import org.eclipse.scout.rt.platform.job.IMutex.QueuePosition;
+import org.eclipse.scout.rt.platform.job.JobState;
 
 /**
  * Runnable to run the given {@link JobFutureTask} periodically at a 'fixed-rate', meaning that if the period is 2
@@ -60,6 +61,7 @@ class FixedRateRunnable implements IRejectableRunnable {
       scheduleNextExecution(startTimeNanos);
     }
     else {
+      m_futureTask.changeState(JobState.WAITING_FOR_MUTEX);
       mutex.compete(m_futureTask, QueuePosition.TAIL, new IMutexAcquiredCallback() {
 
         @Override
@@ -90,6 +92,7 @@ class FixedRateRunnable implements IRejectableRunnable {
   private void scheduleNextExecution(final long startTimeNanos) {
     // re-schedule the task if still in 'done-state'.
     if (!m_futureTask.isDone()) {
+      m_futureTask.changeState(JobState.PENDING);
       final long elapsedNanos = System.nanoTime() - startTimeNanos;
       final long remainingNanos = m_periodNanos - elapsedNanos;
       m_delayedExecutor.schedule(this, remainingNanos, TimeUnit.NANOSECONDS); // run the job once the remaining delay is expired.

@@ -111,7 +111,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
   private volatile boolean m_disposing;
   private volatile boolean m_disposed;
   private final ReentrantLock m_uiSessionLock = new ReentrantLock();
-  private IJobListenerRegistration m_modelJobFinishedListenerRegistration;
+  private IJobListenerRegistration m_uiDataAvailableListener;
   private final BlockingQueue<Object> m_pollerQueue = new ArrayBlockingQueue<>(1, true);
   private final Object m_notificationToken = new Object();
   private volatile long m_lastAccessedTime;
@@ -160,20 +160,21 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
   }
 
   /**
-   * Installs a job listener that notifies polling background jobs whenever a model job on the given client session has
-   * finished, but no user request is currently being processed. This enables sending JSON responses back to the UI
-   * without direct user interaction.
+   * Installs a job listener that notifies the poller whenever some UI data are possibly available to be transported to
+   * the UI. That means, that a model job on the given client session completed, or requires 'UI interaction', or is a
+   * periodic job with a round completed. However, the poller is only signaled if no user request is currently being
+   * processed. This enables sending JSON responses back to the UI without direct user interaction.
    */
-  protected void installPollingBackgroundJobsNotifier(final IClientSession clientSession) {
-    // Ensure no listener is currently registered
-    uninstallPollingBackgroundJobsNotifier();
+  protected void installUiDataAvailableListener(final IClientSession clientSession) {
+    // Ensure no listener is currently registered.
+    uninstallUiDataAvailableListener();
 
-    // Add new job listener
-    m_modelJobFinishedListenerRegistration = Jobs.getJobManager().addListener(
+    // Register new job listener.
+    m_uiDataAvailableListener = Jobs.getJobManager().addListener(
         ModelJobs.newEventFilterBuilder()
             .andMatch(new SessionJobEventFilter(clientSession))
             .andMatchNotExecutionHint(UiJobs.EXECUTION_HINT_POLL_REQUEST) // events for poll-requests are not of interest
-            .andMatch(BEANS.get(UiJobs.class).newDataAvailableFilter())
+            .andMatch(BEANS.get(UiJobs.class).newUiDataAvailableFilter()) // filter which evaluates to 'true' once possible UI data are available
             .andMatch(new IFilter<JobEvent>() {
 
               @Override
@@ -187,6 +188,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
             })
             .toFilter(),
         new IJobListener() {
+
           @Override
           public void changed(JobEvent event) {
             LOG.trace("Model job finished: {} ({}). Notify waiting requests...", event.getFuture().getJobInput().getName(), event.getType());
@@ -195,10 +197,10 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
         });
   }
 
-  protected void uninstallPollingBackgroundJobsNotifier() {
-    if (m_modelJobFinishedListenerRegistration != null) {
-      m_modelJobFinishedListenerRegistration.dispose();
-      m_modelJobFinishedListenerRegistration = null;
+  protected void uninstallUiDataAvailableListener() {
+    if (m_uiDataAvailableListener != null) {
+      m_uiDataAvailableListener.dispose();
+      m_uiDataAvailableListener = null;
     }
   }
 
@@ -236,8 +238,8 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
       // Apply theme from model to HTTP session and cookie
       boolean reloadTheme = initUiTheme(req, resp, httpSession);
 
-      // Register polling background jobs notifier for this session
-      installPollingBackgroundJobsNotifier(m_clientSession);
+      // Register job listener to signal poller once possible UI data to be transported to the UI is available.
+      installUiDataAvailableListener(m_clientSession);
 
       // Create a new JsonAdapter for the client session
       JsonClientSession<?> jsonClientSessionAdapter = createClientSessionAdapter(m_clientSession);
@@ -465,7 +467,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
     }
 
     // Notify waiting requests - should not delay web-container shutdown
-    uninstallPollingBackgroundJobsNotifier();
+    uninstallUiDataAvailableListener();
     signalPoller();
 
     m_jsonAdapterRegistry.disposeAdapters();
