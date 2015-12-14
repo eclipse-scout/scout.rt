@@ -1,7 +1,7 @@
 #set( $symbol_pound = '#' )
 #set( $symbol_dollar = '$' )
 #set( $symbol_escape = '\' )
-package ${groupId}.client;
+package ${package}.client;
 
 import java.util.List;
 
@@ -19,9 +19,9 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.form.ScoutInfoForm;
 import org.eclipse.scout.rt.shared.TEXTS;
 
-import ${groupId}.client.search.SearchOutline;
-import ${groupId}.client.settings.SettingsOutline;
-import ${groupId}.client.work.WorkOutline;
+import ${package}.client.search.SearchOutline;
+import ${package}.client.settings.SettingsOutline;
+import ${package}.client.work.WorkOutline;
 
 /**
  * <h3>{@link Desktop}</h3>

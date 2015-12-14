@@ -1,7 +1,7 @@
 #set( $symbol_pound = '#' )
 #set( $symbol_dollar = '$' )
 #set( $symbol_escape = '\' )
-package ${groupId}.client.work;
+package ${package}.client.work;
 
 import java.util.List;
 
@@ -10,8 +10,8 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.shared.TEXTS;
 
-import ${groupId}.client.helloworld.HelloWorldPage;
-import ${groupId}.shared.Icons;
+import ${package}.client.helloworld.HelloWorldPage;
+import ${package}.shared.Icons;
 
 /**
  * <h3>{@link WorkOutline}</h3>

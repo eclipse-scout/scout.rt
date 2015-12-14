@@ -1,7 +1,7 @@
 #set( $symbol_pound = '#' )
 #set( $symbol_dollar = '$' )
 #set( $symbol_escape = '\' )
-package ${groupId}.server.permission;
+package ${package}.server.permission;
 
 import java.security.AllPermission;
 import java.security.Permissions;

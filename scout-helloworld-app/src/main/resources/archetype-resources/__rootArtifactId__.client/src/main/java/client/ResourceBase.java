@@ -1,7 +1,7 @@
 #set( $symbol_pound = '#' )
 #set( $symbol_dollar = '$' )
 #set( $symbol_escape = '\' )
-package ${groupId}.client;
+package ${package}.client;
 
 /**
  * <h3>{@link ResourceBase}</h3>

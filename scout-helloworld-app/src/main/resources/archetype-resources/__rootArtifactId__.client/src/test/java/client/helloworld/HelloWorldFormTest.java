@@ -1,7 +1,7 @@
 #set( $symbol_pound = '#' )
 #set( $symbol_dollar = '$' )
 #set( $symbol_escape = '\' )
-package ${groupId}.client.helloworld;
+package ${package}.client.helloworld;
 
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
@@ -15,9 +15,9 @@ import org.junit.runner.RunWith;
 import org.mockito.Matchers;
 import org.mockito.Mockito;
 
-import ${groupId}.client.helloworld.HelloWorldForm.MainBox.TopBox.MessageField;
-import ${groupId}.shared.helloworld.HelloWorldFormData;
-import ${groupId}.shared.helloworld.IHelloWorldFormService;
+import ${package}.client.helloworld.HelloWorldForm.MainBox.TopBox.MessageField;
+import ${package}.shared.helloworld.HelloWorldFormData;
+import ${package}.shared.helloworld.IHelloWorldFormService;
 
 /**
  * <h3>{@link HelloWorldFormTest}</h3>

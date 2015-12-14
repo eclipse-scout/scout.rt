@@ -1,7 +1,7 @@
 #set( $symbol_pound = '#' )
 #set( $symbol_dollar = '$' )
 #set( $symbol_escape = '\' )
-package ${groupId}.client.helloworld;
+package ${package}.client.helloworld;
 
 import org.eclipse.scout.rt.client.dto.FormData;
 import org.eclipse.scout.rt.platform.Order;
@@ -13,10 +13,10 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.TEXTS;
 
-import ${groupId}.client.helloworld.HelloWorldForm.MainBox.TopBox;
-import ${groupId}.client.helloworld.HelloWorldForm.MainBox.TopBox.MessageField;
-import ${groupId}.shared.helloworld.HelloWorldFormData;
-import ${groupId}.shared.helloworld.IHelloWorldFormService;
+import ${package}.client.helloworld.HelloWorldForm.MainBox.TopBox;
+import ${package}.client.helloworld.HelloWorldForm.MainBox.TopBox.MessageField;
+import ${package}.shared.helloworld.HelloWorldFormData;
+import ${package}.shared.helloworld.IHelloWorldFormService;
 
 /**
  * <h3>{@link HelloWorldForm}</h3>

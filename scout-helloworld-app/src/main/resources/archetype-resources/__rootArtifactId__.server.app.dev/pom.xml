@@ -5,12 +5,12 @@
 
   <parent>
     <groupId>${groupId}</groupId>
-    <artifactId>${groupId}</artifactId>
+    <artifactId>${rootArtifactId}</artifactId>
     <version>${version}</version>
-    <relativePath>../${groupId}/pom.xml</relativePath>
+    <relativePath>../${rootArtifactId}/pom.xml</relativePath>
   </parent>
 
-  <artifactId>${groupId}.server.app.dev</artifactId>
+  <artifactId>${rootArtifactId}.${artifactId}</artifactId>
   <packaging>war</packaging>
 
   <name>${displayName} HTML UI WAR Development</name>
@@ -22,7 +22,7 @@
     </dependency>
     <dependency>
       <groupId>${groupId}</groupId>
-      <artifactId>${groupId}.server</artifactId>
+      <artifactId>${rootArtifactId}.server</artifactId>
     </dependency>
   </dependencies>
 </project>

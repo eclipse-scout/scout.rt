@@ -1,7 +1,7 @@
 #set( $symbol_pound = '#' )
 #set( $symbol_dollar = '$' )
 #set( $symbol_escape = '\' )
-package ${groupId}.shared;
+package ${package}.shared;
 
 import org.eclipse.scout.rt.shared.AbstractIcons;
 

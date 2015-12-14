@@ -5,12 +5,12 @@
 
   <parent>
     <groupId>${groupId}</groupId>
-    <artifactId>${groupId}</artifactId>
+    <artifactId>${rootArtifactId}</artifactId>
     <version>${version}</version>
-    <relativePath>../${groupId}/pom.xml</relativePath>
+    <relativePath>../${rootArtifactId}/pom.xml</relativePath>
   </parent>
 
-  <artifactId>${groupId}.server</artifactId>
+  <artifactId>${rootArtifactId}.${artifactId}</artifactId>
 
   <name>${displayName} Server</name>
 
@@ -21,7 +21,7 @@
     </dependency>
     <dependency>
       <groupId>${groupId}</groupId>
-      <artifactId>${groupId}.shared</artifactId>
+      <artifactId>${rootArtifactId}.shared</artifactId>
     </dependency>
     <dependency>
       <groupId>org.eclipse.scout.rt</groupId>

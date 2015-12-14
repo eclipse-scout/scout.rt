@@ -1,7 +1,7 @@
 #set( $symbol_pound = '#' )
 #set( $symbol_dollar = '$' )
 #set( $symbol_escape = '\' )
-package ${groupId}.shared.text;
+package ${package}.shared.text;
 
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.shared.services.common.text.AbstractDynamicNlsTextProviderService;
@@ -15,6 +15,6 @@ import org.eclipse.scout.rt.shared.services.common.text.AbstractDynamicNlsTextPr
 public class DefaultTextProviderService extends AbstractDynamicNlsTextProviderService {
   @Override
   protected String getDynamicNlsBaseName() {
-    return "${groupId}.shared.texts.Texts";
+    return "${package}.shared.texts.Texts";
   }
 }

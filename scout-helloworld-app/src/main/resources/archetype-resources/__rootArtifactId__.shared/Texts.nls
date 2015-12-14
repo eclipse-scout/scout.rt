@@ -3,4 +3,4 @@
 # To ensure a properly working NLS support    #
 # keep this file untouched.                   #
 ###############################################
-Nls-Class=${groupId}.shared.text.DefaultTextProviderService
+Nls-Class=${package}.shared.text.DefaultTextProviderService

@@ -5,20 +5,24 @@
 
   <parent>
     <groupId>${groupId}</groupId>
-    <artifactId>${groupId}</artifactId>
+    <artifactId>${rootArtifactId}</artifactId>
     <version>${version}</version>
-    <relativePath>../${groupId}/pom.xml</relativePath>
+    <relativePath>../${rootArtifactId}/pom.xml</relativePath>
   </parent>
 
-  <artifactId>${groupId}.server.app.war</artifactId>
+  <artifactId>${rootArtifactId}.${artifactId}</artifactId>
   <packaging>war</packaging>
 
   <name>${displayName} Server WAR</name>
 
+  <build>
+      <finalName>${groupId}.${rootArtifactId}.server</finalName>
+  </build>
+
   <dependencies>
     <dependency>
       <groupId>${groupId}</groupId>
-      <artifactId>${groupId}.server</artifactId>
+      <artifactId>${rootArtifactId}.server</artifactId>
     </dependency>
   </dependencies>
 </project>

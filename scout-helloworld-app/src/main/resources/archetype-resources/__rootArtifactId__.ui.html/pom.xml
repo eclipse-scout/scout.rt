@@ -5,12 +5,12 @@
 
   <parent>
     <groupId>${groupId}</groupId>
-    <artifactId>${groupId}</artifactId>
+    <artifactId>${rootArtifactId}</artifactId>
     <version>${version}</version>
-    <relativePath>../${groupId}/pom.xml</relativePath>
+    <relativePath>../${rootArtifactId}/pom.xml</relativePath>
   </parent>
 
-  <artifactId>${groupId}.ui.html</artifactId>
+  <artifactId>${rootArtifactId}.${artifactId}</artifactId>
 
   <name>${displayName} HTML UI</name>
 
@@ -21,7 +21,7 @@
     </dependency>
     <dependency>
       <groupId>${groupId}</groupId>
-      <artifactId>${groupId}.client</artifactId>
+      <artifactId>${rootArtifactId}.client</artifactId>
     </dependency>
     <dependency>
       <groupId>javax.servlet</groupId>

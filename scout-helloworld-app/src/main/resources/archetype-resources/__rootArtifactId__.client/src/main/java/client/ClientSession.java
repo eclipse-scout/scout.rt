@@ -1,14 +1,14 @@
 #set( $symbol_pound = '#' )
 #set( $symbol_dollar = '$' )
 #set( $symbol_escape = '\' )
-package ${groupId}.client;
+package ${package}.client;
 
 import org.eclipse.scout.rt.client.AbstractClientSession;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.shared.services.common.code.CODES;
 
-import ${groupId}.client.Desktop;
+import ${package}.client.Desktop;
 
 /**
  * <h3>{@link ClientSession}</h3>
@@ -31,8 +31,8 @@ public class ClientSession extends AbstractClientSession {
   @Override
   protected void execLoadSession() {
     //pre-load all known code types
-    CODES.getAllCodeTypes("${groupId}.shared");
-	
+    CODES.getAllCodeTypes("${package}.shared");
+
     setDesktop(new Desktop());
   }
 }

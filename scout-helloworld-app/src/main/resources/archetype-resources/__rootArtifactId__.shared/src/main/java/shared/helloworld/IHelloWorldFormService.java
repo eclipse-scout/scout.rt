@@ -1,12 +1,12 @@
 #set( $symbol_pound = '#' )
 #set( $symbol_dollar = '$' )
 #set( $symbol_escape = '\' )
-package ${groupId}.shared.helloworld;
+package ${package}.shared.helloworld;
 
 import org.eclipse.scout.rt.platform.service.IService;
 import org.eclipse.scout.rt.shared.TunnelToServer;
 
-import ${groupId}.shared.helloworld.HelloWorldFormData;
+import ${package}.shared.helloworld.HelloWorldFormData;
 
 /**
  * <h3>{@link IHelloWorldFormService}</h3>

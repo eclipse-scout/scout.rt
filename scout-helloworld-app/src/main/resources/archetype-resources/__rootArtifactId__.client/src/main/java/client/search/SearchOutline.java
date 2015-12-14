@@ -1,14 +1,14 @@
 #set( $symbol_pound = '#' )
 #set( $symbol_dollar = '$' )
 #set( $symbol_escape = '\' )
-package ${groupId}.client.search;
+package ${package}.client.search;
 
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractSearchOutline;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ${groupId}.shared.Icons;
+import ${package}.shared.Icons;
 
 /**
  * <h3>{@link SearchOutline}</h3>

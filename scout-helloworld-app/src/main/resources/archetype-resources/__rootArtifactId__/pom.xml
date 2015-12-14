@@ -11,25 +11,25 @@
   </parent>
 
   <groupId>${groupId}</groupId>
-  <artifactId>${groupId}</artifactId>
+  <artifactId>${rootArtifactId}</artifactId>
   <version>${version}</version>
   <packaging>pom</packaging>
 
   <name>${displayName} Parent Module</name>
 
   <properties>
-    <${groupId}.version>${project.version}</${groupId}.version>
+    <${groupId}.${rootArtifactId}.version>${project.version}</${groupId}.${rootArtifactId}.version>
     <jdk.source.version>${javaVersion}</jdk.source.version>
     <org.eclipse.scout.rt_version>5.2.0-SNAPSHOT</org.eclipse.scout.rt_version>
   </properties>
 
   <modules>
-    <module>../${groupId}.shared</module>
-    <module>../${groupId}.server</module>
-    <module>../${groupId}.client</module>
-    <module>../${groupId}.server.app.war</module>
-    <module>../${groupId}.ui.html</module>
-    <module>../${groupId}.ui.html.app.war</module>
+    <module>../${rootArtifactId}.shared</module>
+    <module>../${rootArtifactId}.server</module>
+    <module>../${rootArtifactId}.client</module>
+    <module>../${rootArtifactId}.server.app.war</module>
+    <module>../${rootArtifactId}.ui.html</module>
+    <module>../${rootArtifactId}.ui.html.app.war</module>
   </modules>
 
   <dependencyManagement>
@@ -46,42 +46,24 @@
       <!-- Application Dependencies -->
       <dependency>
         <groupId>${groupId}</groupId>
-        <artifactId>${groupId}.client</artifactId>
-        <version>${${groupId}.version}</version>
+        <artifactId>${rootArtifactId}.client</artifactId>
+        <version>${${groupId}.${rootArtifactId}.version}</version>
       </dependency>
       <dependency>
         <groupId>${groupId}</groupId>
-        <artifactId>${groupId}.shared</artifactId>
-        <version>${${groupId}.version}</version>
+        <artifactId>${rootArtifactId}.shared</artifactId>
+        <version>${${groupId}.${rootArtifactId}.version}</version>
       </dependency>
       <dependency>
         <groupId>${groupId}</groupId>
-        <artifactId>${groupId}.server</artifactId>
-        <version>${${groupId}.version}</version>
+        <artifactId>${rootArtifactId}.server</artifactId>
+        <version>${${groupId}.${rootArtifactId}.version}</version>
       </dependency>
       <dependency>
         <groupId>${groupId}</groupId>
-        <artifactId>${groupId}.ui.html</artifactId>
-        <version>${${groupId}.version}</version>
+        <artifactId>${rootArtifactId}.ui.html</artifactId>
+        <version>${${groupId}.${rootArtifactId}.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
-
-  <repositories>
-    <repository>
-      <snapshots></snapshots>
-      <id>eclipse.snapshot</id>
-      <name>eclipse-snapshot-repo</name>
-      <url>https://repo.eclipse.org/content/groups/snapshots/</url>
-    </repository>
-  </repositories>
-
-  <pluginRepositories>
-    <pluginRepository>
-      <snapshots></snapshots>
-      <id>eclipse.snapshot</id>
-      <name>eclipse-snapshot-repo</name>
-      <url>https://repo.eclipse.org/content/groups/snapshots/</url>
-    </pluginRepository>
-  </pluginRepositories>
 </project>

@@ -1,13 +1,13 @@
 #set( $symbol_pound = '#' )
 #set( $symbol_dollar = '$' )
 #set( $symbol_escape = '\' )
-package ${groupId}.client.settings;
+package ${package}.client.settings;
 
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutline;
 import org.eclipse.scout.rt.shared.TEXTS;
 
-import ${groupId}.shared.Icons;
+import ${package}.shared.Icons;
 
 /**
  * <h3>{@link SettingsOutline}</h3>

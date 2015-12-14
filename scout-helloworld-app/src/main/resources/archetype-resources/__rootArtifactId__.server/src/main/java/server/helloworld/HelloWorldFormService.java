@@ -1,11 +1,11 @@
 #set( $symbol_pound = '#' )
 #set( $symbol_dollar = '$' )
 #set( $symbol_escape = '\' )
-package ${groupId}.server.helloworld;
+package ${package}.server.helloworld;
 
-import ${groupId}.server.ServerSession;
-import ${groupId}.shared.helloworld.HelloWorldFormData;
-import ${groupId}.shared.helloworld.IHelloWorldFormService;
+import ${package}.server.ServerSession;
+import ${package}.shared.helloworld.HelloWorldFormData;
+import ${package}.shared.helloworld.IHelloWorldFormService;
 
 /**
  * <h3>{@link HelloWorldFormService}</h3>
