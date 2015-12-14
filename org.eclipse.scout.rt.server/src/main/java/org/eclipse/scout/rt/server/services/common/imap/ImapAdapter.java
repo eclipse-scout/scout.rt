@@ -243,9 +243,7 @@ public class ImapAdapter implements IImapAdapter {
         props.put("mail.imap.user", getUsername());
       }
       if (isUseSSL()) {
-        props.setProperty("mail.imap.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
-        props.setProperty("mail.imap.socketFactory.fallback", "false");
-        props.setProperty("mail.imap.socketFactory.port", "" + getPort());
+        props.setProperty("mail.imap.ssl.enable", "true");
 
         if (CollectionUtility.hasElements(getSSLProtocols())) {
           props.setProperty("mail.imap.ssl.protocols", StringUtility.join(" ", getSSLProtocols()));
