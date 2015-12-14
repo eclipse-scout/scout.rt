@@ -74,6 +74,11 @@ public class ThreadNameDecorator<RESULT> implements ICallableDecorator<RESULT> {
   }
 
   protected String buildThreadName(final IFuture<?> future) {
-    return String.format("(%s) '%s'", future.getState(), future.getJobInput().getName());
+    switch (future.getState()) {
+      case RUNNING:
+        return String.format("'%s'", future.getJobInput().getName()); // do not decorate with RUNNING state.
+      default:
+        return String.format("(%s) '%s'", future.getState(), future.getJobInput().getName());
+    }
   }
 }

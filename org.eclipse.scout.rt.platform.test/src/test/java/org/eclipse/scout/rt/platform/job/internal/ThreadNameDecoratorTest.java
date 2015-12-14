@@ -48,7 +48,7 @@ public class ThreadNameDecoratorTest {
         .withName("job-1"));
 
     future.awaitDone();
-    assertTrue("actual=" + actualThreadName.get(), actualThreadName.get().matches("test-thread-\\d+ \\(RUNNING\\) 'job-1'"));
+    assertTrue("actual=" + actualThreadName.get(), actualThreadName.get().matches("test-thread-\\d+ 'job-1'"));
   }
 
   @Test
@@ -71,14 +71,14 @@ public class ThreadNameDecoratorTest {
 
         // verify job-status is 'RUNNING'.
         String currentThreadName = Thread.currentThread().getName();
-        assertTrue("actual=" + currentThreadName, currentThreadName.matches("scout-thread-\\d+ \\(RUNNING\\) 'job-1'"));
+        assertTrue("actual=" + currentThreadName, currentThreadName.matches("scout-thread-\\d+ 'job-1'"));
 
         // Start blocking
         condition.waitFor();
 
         // verify job-status is 'RUNNING'.
         currentThreadName = Thread.currentThread().getName();
-        assertTrue("actual=" + currentThreadName, currentThreadName.matches("scout-thread-\\d+ \\(RUNNING\\) 'job-1'"));
+        assertTrue("actual=" + currentThreadName, currentThreadName.matches("scout-thread-\\d+ 'job-1'"));
       }
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent())

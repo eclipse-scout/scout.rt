@@ -111,8 +111,8 @@ public class ModelJobTest {
 
     assertTrue(setupLatch.await());
 
-    assertTrue(actualThreadName1.getValue().matches("scout-model-thread-(\\d)+ \\(RUNNING\\) 'ABC'"));
-    assertTrue(actualThreadName2.getValue().matches("scout-model-thread-(\\d)+ \\(RUNNING\\) 'XYZ'"));
+    assertTrue(actualThreadName1.getValue().matches("scout-model-thread-(\\d)+ 'ABC'"));
+    assertTrue(actualThreadName2.getValue().matches("scout-model-thread-(\\d)+ 'XYZ'"));
     assertEquals("main", Thread.currentThread().getName());
   }
 }
