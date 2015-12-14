@@ -16,11 +16,13 @@ scout.inherits(scout.TableTextUserFilter, scout.TableUserFilter);
 
 scout.TableTextUserFilter.Type = 'text';
 
+/**
+ * @override TableUserFilter.js
+ */
 scout.TableTextUserFilter.prototype.createAddFilterEventData = function() {
   var data = scout.ColumnUserFilter.parent.prototype.createAddFilterEventData.call(this);
-  return $.extend(data, {
-    text: this.text
-  });
+  data.text = this.text;
+  return data;
 };
 
 scout.TableTextUserFilter.prototype.createLabel = function() {

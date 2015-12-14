@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-scout.TableCube = function(table, session) {
+scout.TableMatrix = function(table, session) {
   this.session = session;
   this.locale = session.locale;
   this._allData = [];
@@ -18,14 +18,14 @@ scout.TableCube = function(table, session) {
   this._table = table;
 };
 
-scout.TableCube.DateGroup = {
+scout.TableMatrix.DateGroup = {
   NONE: 0,
   YEAR: 1,
   MONTH: 2,
   WEEKDAY: 3
 };
 
-scout.TableCube.NumberGroup = {
+scout.TableMatrix.NumberGroup = {
   COUNT: -1,
   SUM: 1,
   AVG: 2
@@ -34,7 +34,7 @@ scout.TableCube.NumberGroup = {
 /**
  * add data axis
  */
-scout.TableCube.prototype.addData = function(data, dataGroup) {
+scout.TableMatrix.prototype.addData = function(data, dataGroup) {
   var dataAxis = [],
     locale = this.locale;
 
@@ -50,14 +50,14 @@ scout.TableCube.prototype.addData = function(data, dataGroup) {
   };
 
   // count, sum, avg
-  if (dataGroup === scout.TableCube.NumberGroup.COUNT) {
+  if (dataGroup === scout.TableMatrix.NumberGroup.COUNT) {
     dataAxis.norm = function(f) {
       return 1;
     };
     dataAxis.group = function(array) {
       return array.length;
     };
-  } else if (dataGroup === scout.TableCube.NumberGroup.SUM) {
+  } else if (dataGroup === scout.TableMatrix.NumberGroup.SUM) {
     dataAxis.norm = function(f) {
       if (isNaN(f) || f === null || f === '') {
         return null;
@@ -70,7 +70,7 @@ scout.TableCube.prototype.addData = function(data, dataGroup) {
         return a + b;
       });
     };
-  } else if (dataGroup === scout.TableCube.NumberGroup.AVG) {
+  } else if (dataGroup === scout.TableMatrix.NumberGroup.AVG) {
     dataAxis.norm = function(f) {
       if (isNaN(f) || f === null || f === '') {
         return null;
@@ -98,7 +98,7 @@ scout.TableCube.prototype.addData = function(data, dataGroup) {
 };
 
 //add x or y Axis
-scout.TableCube.prototype.addAxis = function(axis, axisGroup) {
+scout.TableMatrix.prototype.addAxis = function(axis, axisGroup) {
   var keyAxis = [],
     locale = this.locale,
     getText = this.session.text.bind(this.session),
@@ -135,7 +135,7 @@ scout.TableCube.prototype.addAxis = function(axis, axisGroup) {
 
   // norm and format depends of datatype and group functionality
   if (axis.type === 'date') {
-    if (axisGroup === scout.TableCube.DateGroup.NONE) {
+    if (axisGroup === scout.TableMatrix.DateGroup.NONE) {
       keyAxis.norm = function(f) {
         if (f === null || f === '') {
           return null;
@@ -156,7 +156,7 @@ scout.TableCube.prototype.addAxis = function(axis, axisGroup) {
           return format.format(new Date(n));
         }
       };
-    } else if (axisGroup === scout.TableCube.DateGroup.YEAR) {
+    } else if (axisGroup === scout.TableMatrix.DateGroup.YEAR) {
       keyAxis.norm = function(f) {
         if (f === null || f === '') {
           return null;
@@ -171,7 +171,7 @@ scout.TableCube.prototype.addAxis = function(axis, axisGroup) {
           return String(n);
         }
       };
-    } else if (axisGroup === scout.TableCube.DateGroup.MONTH) {
+    } else if (axisGroup === scout.TableMatrix.DateGroup.MONTH) {
       keyAxis.norm = function(f) {
         if (f === null || f === '') {
           return null;
@@ -186,7 +186,7 @@ scout.TableCube.prototype.addAxis = function(axis, axisGroup) {
           return locale.dateFormatSymbols.months[n];
         }
       };
-    } else if (axisGroup === scout.TableCube.DateGroup.WEEKDAY) {
+    } else if (axisGroup === scout.TableMatrix.DateGroup.WEEKDAY) {
       keyAxis.norm = function(f) {
         if (f === null || f === '') {
           return null;
@@ -277,7 +277,10 @@ scout.TableCube.prototype.addAxis = function(axis, axisGroup) {
   return keyAxis;
 };
 
-scout.TableCube.prototype.calculate = function() {
+/**
+ * @returns a cube containing the results
+ */
+scout.TableMatrix.prototype.calculate = function() {
   var cube = {},
     r, v, k, data, key, normData, normKey;
 
@@ -385,7 +388,7 @@ scout.TableCube.prototype.calculate = function() {
   return cube;
 };
 
-scout.TableCube.prototype.columnCount = function() {
+scout.TableMatrix.prototype.columnCount = function() {
   var colCount = [];
 
   var count = 0;
@@ -414,6 +417,6 @@ scout.TableCube.prototype.columnCount = function() {
   return colCount;
 };
 
-scout.TableCube.prototype.isEmpty = function() {
+scout.TableMatrix.prototype.isEmpty = function() {
   return this._rows.length === 0;
 };

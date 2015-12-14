@@ -131,7 +131,7 @@ __include("scout/filechooser/FileChooser.js");
 __include("scout/filechooser/FileChooserController.js");
 // Table
 __include("scout/table/Table.js");
-__include("scout/table/TableCube.js");
+__include("scout/table/TableMatrix.js");
 __include("scout/table/TableFooter.js");
 __include("scout/table/TableFooterLayout.js");
 __include("scout/table/TableInfoFilterTooltip.js");
@@ -171,6 +171,9 @@ __include("scout/table/keystrokes/TableNavigationPageDownKeyStroke.js");
 __include("scout/table/keystrokes/TableFocusFilterFieldKeyStroke.js");
 __include("scout/table/userfilter/TableUserFilter.js");
 __include("scout/table/userfilter/ColumnUserFilter.js");
+__include("scout/table/userfilter/DateColumnUserFilter.js");
+__include("scout/table/userfilter/NumberColumnUserFilter.js");
+__include("scout/table/userfilter/TextColumnUserFilter.js");
 __include("scout/table/userfilter/TableTextUserFilter.js");
 // Tree
 __include("scout/tree/Tree.js");

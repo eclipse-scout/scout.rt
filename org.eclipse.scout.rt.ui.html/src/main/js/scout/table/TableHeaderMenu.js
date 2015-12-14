@@ -45,13 +45,12 @@ scout.TableHeaderMenu.prototype._init = function(options) {
   this._tableFilterHandler = this._onTableFilterChanged.bind(this);
   this.table.on('addFilter', this._tableFilterHandler);
   this.table.on('removeFilter', this._tableFilterHandler);
-
   this._filterTableCheckedRowsHandler = this._onFilterTableCheckedRows.bind(this);
 
   // Filtering
   this.filter = this.table.getFilter(this.column.id);
   if (!this.filter) {
-    this.filter = scout.create('ColumnUserFilter', {
+    this.filter = this._createColumnUserFilter({
       session: this.session,
       table: this.table,
       column: this.column
@@ -60,6 +59,17 @@ scout.TableHeaderMenu.prototype._init = function(options) {
   // always recalculate available values to make sure new/updated/deleted rows are considered
   this.filter.calculate();
   this._updateFilterCheckedMode();
+};
+
+/**
+ * Factory method to create a typed ColumnUserFilter. When type of column is = 'text' this method
+ * will create an instance of TextColumnUserFilter.
+ * @param model
+ */
+scout.TableHeaderMenu.prototype._createColumnUserFilter = function(model) {
+  var columnType = this.column.type,
+    filterType = columnType.charAt(0).toUpperCase() + columnType.slice(1) + 'ColumnUserFilter';
+  return scout.create(filterType, model);
 };
 
 scout.TableHeaderMenu.prototype._createLayout = function() {

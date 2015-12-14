@@ -2775,6 +2775,8 @@ scout.Table.prototype._syncFilters = function(filters) {
       }
       filterData.table = this;
       filterData.session = this.session;
+      // FIXME AWE: (filter) remove this line when JsonModel sends the correct objectType
+      filterData.objectType = filterData.column.type.charAt(0).toUpperCase() + filterData.column.type.slice(1) + 'ColumnUserFilter';
       var filter = scout.create(filterData);
       this.addFilter(filter, false);
     }, this);
