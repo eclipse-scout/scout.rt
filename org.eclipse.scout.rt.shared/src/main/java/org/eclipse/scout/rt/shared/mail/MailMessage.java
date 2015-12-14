@@ -15,10 +15,13 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import org.eclipse.scout.rt.platform.Bean;
+
 /**
  * Class representing a mail message that is used to create a mime message with
  * {@link MailUtility#createMimeMessage(MailMessage)}.
  */
+@Bean
 public class MailMessage {
 
   private final List<MailParticipant> m_toRecipients = new ArrayList<MailParticipant>();

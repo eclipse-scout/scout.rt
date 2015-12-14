@@ -22,6 +22,7 @@ package org.eclipse.scout.rt.shared.mail;
 
 import java.io.Serializable;
 
+import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 
 /**
@@ -29,6 +30,7 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
  *
  * @since 5.2
  */
+@Bean
 public class MailParticipant implements Serializable {
 
   private static final long serialVersionUID = 1L;
