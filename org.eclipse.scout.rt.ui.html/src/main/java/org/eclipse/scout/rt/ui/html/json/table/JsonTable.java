@@ -393,6 +393,7 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
         continue;
       }
       JSONObject jsonRow = tableRowToJson(row);
+//      row.getTable().getRow
       jsonRows.put(jsonRow);
     }
     putProperty(json, PROP_ROWS, jsonRows);
