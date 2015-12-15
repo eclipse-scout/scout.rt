@@ -106,12 +106,6 @@ body {
   box-sizing: border-box;
 }
 
-/* Workaround for firefox bug https://bugzilla.mozilla.org/show_bug.cgi?id=648624 */
-/* use -moz-none to allow child element to set -moz-user-select: text*/
-div {
-  -moz-user-select: -moz-none;
-}
-
 input, textarea, button {
   #scout.font-text-normal();
 }
