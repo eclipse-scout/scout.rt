@@ -22,6 +22,7 @@ import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.job.IJobManager;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
+import org.eclipse.scout.rt.platform.job.listener.JobEventData;
 import org.eclipse.scout.rt.platform.job.listener.JobEventType;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
@@ -42,61 +43,47 @@ public class ModelJobEventFilterTest {
     IFilter<JobEvent> filter = ModelJobEventFilter.INSTANCE;
 
     // not a model job (no future)
-    JobEvent event = new JobEvent(mock(IJobManager.class), JobEventType.JOB_STATE_CHANGED)
-        .withFuture(null);
+    JobEvent event = new JobEvent(mock(IJobManager.class), JobEventType.JOB_STATE_CHANGED, new JobEventData().withFuture(null));
     assertFalse(filter.accept(event));
 
     // not a model job (no ClientRunContext)
-    event = new JobEvent(mock(IJobManager.class), JobEventType.JOB_STATE_CHANGED)
-        .withFuture(Jobs.schedule(mock(IRunnable.class), Jobs.newInput()));
+    event = new JobEvent(mock(IJobManager.class), JobEventType.JOB_STATE_CHANGED,
+        new JobEventData().withFuture(Jobs.schedule(mock(IRunnable.class), Jobs.newInput())));
     assertFalse(filter.accept(event));
 
     // not a model job (no ClientRunContext)
-    event = new JobEvent(mock(IJobManager.class), JobEventType.JOB_STATE_CHANGED)
-        .withFuture(Jobs.schedule(mock(IRunnable.class), Jobs.newInput()
-            .withRunContext(RunContexts.empty())));
+    event = new JobEvent(mock(IJobManager.class), JobEventType.JOB_STATE_CHANGED,
+        new JobEventData().withFuture(Jobs.schedule(mock(IRunnable.class), Jobs.newInput().withRunContext(RunContexts.empty()))));
     assertFalse(filter.accept(event));
 
     // not a model job (no mutex and not session on ClientRunContext)
-    event = new JobEvent(mock(IJobManager.class), JobEventType.JOB_STATE_CHANGED)
-        .withFuture(Jobs.schedule(mock(IRunnable.class), Jobs.newInput()
-            .withRunContext(ClientRunContexts.empty())));
+    event = new JobEvent(mock(IJobManager.class), JobEventType.JOB_STATE_CHANGED,
+        new JobEventData().withFuture(Jobs.schedule(mock(IRunnable.class), Jobs.newInput().withRunContext(ClientRunContexts.empty()))));
     assertFalse(filter.accept(event));
 
     // not a model job (no mutex)
-    event = new JobEvent(mock(IJobManager.class), JobEventType.JOB_STATE_CHANGED)
-        .withFuture(Jobs.schedule(mock(IRunnable.class), Jobs.newInput()
-            .withRunContext(ClientRunContexts.empty().withSession(session1, false))));
+    event = new JobEvent(mock(IJobManager.class), JobEventType.JOB_STATE_CHANGED,
+        new JobEventData().withFuture(Jobs.schedule(mock(IRunnable.class), Jobs.newInput().withRunContext(ClientRunContexts.empty().withSession(session1, false)))));
     assertFalse(filter.accept(event));
 
     // not a model job (wrong mutex type)
-    event = new JobEvent(mock(IJobManager.class), JobEventType.JOB_STATE_CHANGED)
-        .withFuture(Jobs.schedule(mock(IRunnable.class), Jobs.newInput()
-            .withRunContext(ClientRunContexts.empty().withSession(session1, false))
-            .withMutex(Jobs.newMutex())));
+    event = new JobEvent(mock(IJobManager.class), JobEventType.JOB_STATE_CHANGED,
+        new JobEventData().withFuture(Jobs.schedule(mock(IRunnable.class), Jobs.newInput().withRunContext(ClientRunContexts.empty().withSession(session1, false)).withMutex(Jobs.newMutex()))));
     assertFalse(filter.accept(event));
 
     // not a model job (different session on ClientRunContext and mutex)
-    event = new JobEvent(mock(IJobManager.class), JobEventType.JOB_STATE_CHANGED)
-        .withFuture(Jobs.schedule(mock(IRunnable.class), Jobs.newInput()
-            .withRunContext(ClientRunContexts.empty()
-                .withSession(session1, false))
-            .withMutex(session2.getModelJobMutex())));
+    event = new JobEvent(mock(IJobManager.class), JobEventType.JOB_STATE_CHANGED,
+        new JobEventData().withFuture(Jobs.schedule(mock(IRunnable.class), Jobs.newInput().withRunContext(ClientRunContexts.empty().withSession(session1, false)).withMutex(session2.getModelJobMutex()))));
     assertFalse(filter.accept(event));
 
     // not a model job (no session on ClientRunContext)
-    event = new JobEvent(mock(IJobManager.class), JobEventType.JOB_STATE_CHANGED)
-        .withFuture(Jobs.schedule(mock(IRunnable.class), Jobs.newInput()
-            .withRunContext(ClientRunContexts.empty()
-                .withSession(null, false))
-            .withMutex(session1.getModelJobMutex())));
+    event = new JobEvent(mock(IJobManager.class), JobEventType.JOB_STATE_CHANGED,
+        new JobEventData().withFuture(Jobs.schedule(mock(IRunnable.class), Jobs.newInput().withRunContext(ClientRunContexts.empty().withSession(null, false)).withMutex(session1.getModelJobMutex()))));
     assertFalse(filter.accept(event));
 
     // this is a model job (same session on ClientRunContext and mutex)
-    event = new JobEvent(mock(IJobManager.class), JobEventType.JOB_STATE_CHANGED)
-        .withFuture(Jobs.schedule(mock(IRunnable.class), Jobs.newInput()
-            .withRunContext(ClientRunContexts.empty().withSession(session1, false))
-            .withMutex(session1.getModelJobMutex())));
+    event = new JobEvent(mock(IJobManager.class), JobEventType.JOB_STATE_CHANGED,
+        new JobEventData().withFuture(Jobs.schedule(mock(IRunnable.class), Jobs.newInput().withRunContext(ClientRunContexts.empty().withSession(session1, false)).withMutex(session1.getModelJobMutex()))));
     assertTrue(filter.accept(event));
   }
 }

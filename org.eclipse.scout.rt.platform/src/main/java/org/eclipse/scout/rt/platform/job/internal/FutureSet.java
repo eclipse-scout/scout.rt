@@ -33,7 +33,6 @@ import org.eclipse.scout.rt.platform.filter.OrFilter;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IJobListenerRegistration;
 import org.eclipse.scout.rt.platform.job.IJobManager;
-import org.eclipse.scout.rt.platform.job.JobState;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.util.Assertions;
@@ -268,7 +267,7 @@ public class FutureSet {
           case JOB_EXECUTION_HINT_REMOVED:
             return true; // manual signaling required
           case JOB_STATE_CHANGED:
-            switch ((JobState) event.getData()) {
+            switch (event.getData().getState()) {
               case PENDING:
               case RUNNING:
               case WAITING_FOR_BLOCKING_CONDITION:

@@ -87,19 +87,19 @@ public class JobListenerBlockedFutureTest {
     List<JobState> capturedFutureStates = captureListener.getCapturedFutureStates();
 
     i++;
-    assertEvent(JobEventType.JOB_STATE_CHANGED, future, JobState.SCHEDULED, capturedEvents.get(i));
+    assertStateChangedEvent(future, JobState.SCHEDULED, capturedEvents.get(i));
     assertEquals(JobState.SCHEDULED, capturedFutureStates.get(i));
 
     i++;
-    assertEvent(JobEventType.JOB_STATE_CHANGED, future, JobState.RUNNING, capturedEvents.get(i));
+    assertStateChangedEvent(future, JobState.RUNNING, capturedEvents.get(i));
     assertEquals(JobState.RUNNING, capturedFutureStates.get(i));
 
     i++;
-    assertEvent(JobEventType.JOB_STATE_CHANGED, future, JobState.DONE, capturedEvents.get(i));
+    assertStateChangedEvent(future, JobState.DONE, capturedEvents.get(i));
     assertEquals(JobState.DONE, capturedFutureStates.get(i));
 
     i++;
-    assertEvent(JobEventType.JOB_MANAGER_SHUTDOWN, null, null, capturedEvents.get(i));
+    assertJobManagerShutdownEvent(capturedEvents.get(i));
     assertNull(capturedFutureStates.get(i));
 
     assertEquals(i + 1, capturedEvents.size());
@@ -154,60 +154,66 @@ public class JobListenerBlockedFutureTest {
     List<JobState> capturedFutureStates = captureListener.getCapturedFutureStates();
 
     i++; // outer
-    assertEvent(JobEventType.JOB_STATE_CHANGED, outerFuture, JobState.SCHEDULED, capturedEvents.get(i));
+    assertStateChangedEvent(outerFuture, JobState.SCHEDULED, capturedEvents.get(i));
     assertEquals(JobState.SCHEDULED, capturedFutureStates.get(i));
 
     i++; // outer
-    assertEvent(JobEventType.JOB_STATE_CHANGED, outerFuture, JobState.WAITING_FOR_MUTEX, capturedEvents.get(i));
+    assertStateChangedEvent(outerFuture, JobState.WAITING_FOR_MUTEX, capturedEvents.get(i));
     assertEquals(JobState.WAITING_FOR_MUTEX, capturedFutureStates.get(i));
 
     i++; // outer
-    assertEvent(JobEventType.JOB_STATE_CHANGED, outerFuture, JobState.RUNNING, capturedEvents.get(i));
+    assertStateChangedEvent(outerFuture, JobState.RUNNING, capturedEvents.get(i));
     assertEquals(JobState.RUNNING, capturedFutureStates.get(i));
 
     i++; // inner
-    assertEvent(JobEventType.JOB_STATE_CHANGED, innerFuture.get(), JobState.SCHEDULED, capturedEvents.get(i));
+    assertStateChangedEvent(innerFuture.get(), JobState.SCHEDULED, capturedEvents.get(i));
     assertEquals(JobState.SCHEDULED, capturedFutureStates.get(i));
 
     i++; // inner
-    assertEvent(JobEventType.JOB_STATE_CHANGED, innerFuture.get(), JobState.PENDING, capturedEvents.get(i));
+    assertStateChangedEvent(innerFuture.get(), JobState.PENDING, capturedEvents.get(i));
     assertEquals(JobState.PENDING, capturedFutureStates.get(i));
 
     i++; // outer
-    assertEvent(JobEventType.JOB_STATE_CHANGED, outerFuture, JobState.WAITING_FOR_BLOCKING_CONDITION, capturedEvents.get(i));
+    assertStateChangedEvent(outerFuture, JobState.WAITING_FOR_BLOCKING_CONDITION, capturedEvents.get(i));
     assertEquals(JobState.WAITING_FOR_BLOCKING_CONDITION, capturedFutureStates.get(i));
 
     i++; // inner
-    assertEvent(JobEventType.JOB_STATE_CHANGED, innerFuture.get(), JobState.WAITING_FOR_MUTEX, capturedEvents.get(i));
+    assertStateChangedEvent(innerFuture.get(), JobState.WAITING_FOR_MUTEX, capturedEvents.get(i));
     assertEquals(JobState.WAITING_FOR_MUTEX, capturedFutureStates.get(i));
 
     i++; // inner
-    assertEvent(JobEventType.JOB_STATE_CHANGED, innerFuture.get(), JobState.RUNNING, capturedEvents.get(i));
+    assertStateChangedEvent(innerFuture.get(), JobState.RUNNING, capturedEvents.get(i));
     assertEquals(JobState.RUNNING, capturedFutureStates.get(i));
 
     i++; // outer
-    assertEvent(JobEventType.JOB_STATE_CHANGED, outerFuture, JobState.WAITING_FOR_MUTEX, capturedEvents.get(i));
+    assertStateChangedEvent(outerFuture, JobState.WAITING_FOR_MUTEX, capturedEvents.get(i));
     assertEquals(JobState.WAITING_FOR_MUTEX, capturedFutureStates.get(i));
 
     i++; // inner
-    assertEvent(JobEventType.JOB_STATE_CHANGED, innerFuture.get(), JobState.DONE, capturedEvents.get(i));
+    assertStateChangedEvent(innerFuture.get(), JobState.DONE, capturedEvents.get(i));
     assertEquals(JobState.DONE, capturedFutureStates.get(i));
 
     i++; // outer
-    assertEvent(JobEventType.JOB_STATE_CHANGED, outerFuture, JobState.RUNNING, capturedEvents.get(i));
+    assertStateChangedEvent(outerFuture, JobState.RUNNING, capturedEvents.get(i));
     assertEquals(JobState.RUNNING, capturedFutureStates.get(i));
 
     i++; // outer
-    assertEvent(JobEventType.JOB_STATE_CHANGED, outerFuture, JobState.DONE, capturedEvents.get(i));
+    assertStateChangedEvent(outerFuture, JobState.DONE, capturedEvents.get(i));
     assertEquals(JobState.DONE, capturedFutureStates.get(i));
 
     assertEquals(i + 1, capturedEvents.size());
   }
 
-  private static void assertEvent(JobEventType expectedType, IFuture<?> expectedFuture, Object expectedData, JobEvent actualEvent) {
-    assertSame(expectedFuture, actualEvent.getFuture());
-    assertSame(expectedData, actualEvent.getData());
-    assertSame(expectedType, actualEvent.getType());
+  private static void assertStateChangedEvent(IFuture<?> expectedFuture, JobState expectedState, JobEvent actualEvent) {
+    assertSame(expectedFuture, actualEvent.getData().getFuture());
+    assertSame(expectedState, actualEvent.getData().getState());
+    assertSame(JobEventType.JOB_STATE_CHANGED, actualEvent.getType());
+  }
+
+  private static void assertJobManagerShutdownEvent(JobEvent actualEvent) {
+    assertNull(actualEvent.getData().getFuture());
+    assertNull(actualEvent.getData().getState());
+    assertSame(JobEventType.JOB_MANAGER_SHUTDOWN, actualEvent.getType());
   }
 
   private static class JobEventCaptureListener implements IJobListener {
@@ -218,7 +224,7 @@ public class JobListenerBlockedFutureTest {
     @Override
     public void changed(JobEvent event) {
       events.add(event);
-      futureStates.add(event.getFuture() != null ? event.getFuture().getState() : null);
+      futureStates.add(event.getData().getFuture() != null ? event.getData().getFuture().getState() : null);
     }
 
     public List<JobEvent> getCapturedEvents() {

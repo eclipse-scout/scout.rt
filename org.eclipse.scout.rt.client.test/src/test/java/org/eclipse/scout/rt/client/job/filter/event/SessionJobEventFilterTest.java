@@ -21,6 +21,7 @@ import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.job.IJobManager;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
+import org.eclipse.scout.rt.platform.job.listener.JobEventData;
 import org.eclipse.scout.rt.platform.job.listener.JobEventType;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.shared.ISession;
@@ -37,37 +38,33 @@ public class SessionJobEventFilterTest {
     SessionJobEventFilter filter = new SessionJobEventFilter(session1);
 
     // Tests JobEvent of an event without a job associated
-    JobEvent event = new JobEvent(mock(IJobManager.class), JobEventType.JOB_STATE_CHANGED)
-        .withFuture(null);
+    JobEvent event = new JobEvent(mock(IJobManager.class), JobEventType.JOB_STATE_CHANGED,
+        new JobEventData().withFuture(null));
     assertFalse(filter.accept(event));
 
     // Tests JobEvent with job without RunContext
-    event = new JobEvent(mock(IJobManager.class), JobEventType.JOB_STATE_CHANGED)
-        .withFuture(Jobs.schedule(mock(IRunnable.class), Jobs.newInput()));
+    event = new JobEvent(mock(IJobManager.class), JobEventType.JOB_STATE_CHANGED,
+        new JobEventData().withFuture(Jobs.schedule(mock(IRunnable.class), Jobs.newInput())));
     assertFalse(filter.accept(event));
 
     // Tests JobEvent with job with RunContext
-    event = new JobEvent(mock(IJobManager.class), JobEventType.JOB_STATE_CHANGED)
-        .withFuture(Jobs.schedule(mock(IRunnable.class), Jobs.newInput()
-            .withRunContext(RunContexts.empty())));
+    event = new JobEvent(mock(IJobManager.class), JobEventType.JOB_STATE_CHANGED,
+        new JobEventData().withFuture(Jobs.schedule(mock(IRunnable.class), Jobs.newInput().withRunContext(RunContexts.empty()))));
     assertFalse(filter.accept(event));
 
     // Tests JobEvent with job with ClientRunContext without session
-    event = new JobEvent(mock(IJobManager.class), JobEventType.JOB_STATE_CHANGED)
-        .withFuture(Jobs.schedule(mock(IRunnable.class), Jobs.newInput()
-            .withRunContext(ClientRunContexts.empty())));
+    event = new JobEvent(mock(IJobManager.class), JobEventType.JOB_STATE_CHANGED,
+        new JobEventData().withFuture(Jobs.schedule(mock(IRunnable.class), Jobs.newInput().withRunContext(ClientRunContexts.empty()))));
     assertFalse(filter.accept(event));
 
     // Tests JobEvent with job with ClientRunContext with correct session
-    event = new JobEvent(mock(IJobManager.class), JobEventType.JOB_STATE_CHANGED)
-        .withFuture(Jobs.schedule(mock(IRunnable.class), Jobs.newInput()
-            .withRunContext(ClientRunContexts.empty().withSession(session1, false))));
+    event = new JobEvent(mock(IJobManager.class), JobEventType.JOB_STATE_CHANGED,
+        new JobEventData().withFuture(Jobs.schedule(mock(IRunnable.class), Jobs.newInput().withRunContext(ClientRunContexts.empty().withSession(session1, false)))));
     assertTrue(filter.accept(event));
 
     // Tests JobEvent with job with ClientRunContext with wrong session
-    event = new JobEvent(mock(IJobManager.class), JobEventType.JOB_STATE_CHANGED)
-        .withFuture(Jobs.schedule(mock(IRunnable.class), Jobs.newInput()
-            .withRunContext(ClientRunContexts.empty().withSession(session2, false))));
+    event = new JobEvent(mock(IJobManager.class), JobEventType.JOB_STATE_CHANGED,
+        new JobEventData().withFuture(Jobs.schedule(mock(IRunnable.class), Jobs.newInput().withRunContext(ClientRunContexts.empty().withSession(session2, false)))));
     assertFalse(filter.accept(event));
 
     // Tests adaptable to the session

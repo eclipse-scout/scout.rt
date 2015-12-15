@@ -147,10 +147,10 @@ public class UiJobs {
       public boolean accept(final JobEvent event) {
         switch (event.getType()) {
           case JOB_STATE_CHANGED: {
-            return handleJobStateChanged((JobState) event.getData(), event.getFuture());
+            return handleJobStateChanged(event.getData().getState(), event.getData().getFuture());
           }
           case JOB_EXECUTION_HINT_ADDED: {
-            return ModelJobs.EXECUTION_HINT_UI_INTERACTION_REQUIRED.equals(event.getData()); // UI data available because job was marked with 'UI_INTERACTION_REQUIRED'.
+            return ModelJobs.EXECUTION_HINT_UI_INTERACTION_REQUIRED.equals(event.getData().getExecutionHint()); // UI data available because job was marked with 'UI_INTERACTION_REQUIRED'.
           }
           default: {
             return false;

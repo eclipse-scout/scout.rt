@@ -44,6 +44,7 @@ import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.job.JobState;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
+import org.eclipse.scout.rt.platform.job.listener.JobEventData;
 import org.eclipse.scout.rt.platform.job.listener.JobEventType;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.ThreadLocalProcessor;
@@ -143,7 +144,7 @@ public class JobManager implements IJobManager, IPlatformListener {
       // NOOP
     }
 
-    fireEvent(new JobEvent(this, JobEventType.JOB_MANAGER_SHUTDOWN));
+    fireEvent(new JobEvent(this, JobEventType.JOB_MANAGER_SHUTDOWN, new JobEventData()));
   }
 
   @Override

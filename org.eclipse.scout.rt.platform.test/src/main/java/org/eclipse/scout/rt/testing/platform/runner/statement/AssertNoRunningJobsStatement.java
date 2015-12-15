@@ -134,7 +134,7 @@ public class AssertNoRunningJobsStatement extends Statement {
     @Override
     public void changed(final JobEvent event) {
       if (isScheduledByInitialThread() || isScheduledByInitialJob() || isScheduledByDescendantJob()) {
-        m_scheduledFutures.put(event.getFuture(), PRESENT);
+        m_scheduledFutures.put(event.getData().getFuture(), PRESENT);
       }
     }
 

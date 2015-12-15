@@ -41,6 +41,7 @@ import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.job.JobState;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
+import org.eclipse.scout.rt.platform.job.listener.JobEventData;
 import org.eclipse.scout.rt.platform.job.listener.JobEventType;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
@@ -192,9 +193,9 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
       return m_executionHints.add(hint);
     }
     finally {
-      m_jobManager.fireEvent(new JobEvent(m_jobManager, JobEventType.JOB_EXECUTION_HINT_ADDED)
+      m_jobManager.fireEvent(new JobEvent(m_jobManager, JobEventType.JOB_EXECUTION_HINT_ADDED, new JobEventData()
           .withFuture(this)
-          .withData(hint));
+          .withExecutionHint(hint)));
     }
   }
 
@@ -204,9 +205,9 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
       return m_executionHints.remove(hint);
     }
     finally {
-      m_jobManager.fireEvent(new JobEvent(m_jobManager, JobEventType.JOB_EXECUTION_HINT_REMOVED)
+      m_jobManager.fireEvent(new JobEvent(m_jobManager, JobEventType.JOB_EXECUTION_HINT_REMOVED, new JobEventData()
           .withFuture(this)
-          .withData(hint));
+          .withExecutionHint(hint)));
     }
   }
 
@@ -416,17 +417,32 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
   }
 
   /**
-   * Sets the new state, and fires {@link JobEvent}, unless being in {@link JobState#DONE} or {@link JobState#REJECTED}.
+   * Sets the new state, and fires {@link JobEvent}, unless already being in state {@link JobState#DONE} or
+   * {@link JobState#REJECTED}.
    */
-  protected synchronized void changeState(final JobState state) {
+  protected void changeState(final JobState state) {
+    changeState(new JobEventData()
+        .withState(state)
+        .withFuture(this));
+  }
+
+  /**
+   * Sets the new state, and fires the given event, unless already being in state {@link JobState#DONE} or
+   * {@link JobState#REJECTED}.
+   * <p>
+   * The caller is responsible for setting {@link JobEventData#getState()} and {@link JobEventData#getFuture()}
+   * accordingly.
+   */
+  protected synchronized void changeState(final JobEventData eventData) {
+    Assertions.assertNotNull(eventData.getState(), "missing state");
+    Assertions.assertSame(this, eventData.getFuture(), "wrong future [expected={}]", this);
+
     if (m_state == JobState.DONE || m_state == JobState.REJECTED) {
       return;
     }
 
-    m_state = state;
-    m_jobManager.fireEvent(new JobEvent(m_jobManager, JobEventType.JOB_STATE_CHANGED)
-        .withData(state)
-        .withFuture(this));
+    m_state = eventData.getState();
+    m_jobManager.fireEvent(new JobEvent(m_jobManager, JobEventType.JOB_STATE_CHANGED, eventData));
   }
 
   @Override

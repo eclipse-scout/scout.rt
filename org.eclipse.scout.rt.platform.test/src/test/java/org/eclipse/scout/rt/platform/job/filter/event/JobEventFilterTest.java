@@ -16,6 +16,7 @@ import static org.mockito.Mockito.mock;
 
 import org.eclipse.scout.rt.platform.job.IJobManager;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
+import org.eclipse.scout.rt.platform.job.listener.JobEventData;
 import org.eclipse.scout.rt.platform.job.listener.JobEventType;
 import org.junit.Test;
 
@@ -25,17 +26,17 @@ public class JobEventFilterTest {
   public void test1() {
     JobEventFilter filter = new JobEventFilter(JobEventType.JOB_STATE_CHANGED);
 
-    assertTrue(filter.accept(new JobEvent(mock(IJobManager.class), JobEventType.JOB_STATE_CHANGED)));
-    assertFalse(filter.accept(new JobEvent(mock(IJobManager.class), JobEventType.JOB_MANAGER_SHUTDOWN)));
-    assertFalse(filter.accept(new JobEvent(mock(IJobManager.class), JobEventType.JOB_EXECUTION_HINT_ADDED)));
+    assertTrue(filter.accept(new JobEvent(mock(IJobManager.class), JobEventType.JOB_STATE_CHANGED, new JobEventData())));
+    assertFalse(filter.accept(new JobEvent(mock(IJobManager.class), JobEventType.JOB_MANAGER_SHUTDOWN, new JobEventData())));
+    assertFalse(filter.accept(new JobEvent(mock(IJobManager.class), JobEventType.JOB_EXECUTION_HINT_ADDED, new JobEventData())));
   }
 
   @Test
   public void test2() {
     JobEventFilter filter = new JobEventFilter(JobEventType.JOB_STATE_CHANGED, JobEventType.JOB_MANAGER_SHUTDOWN);
 
-    assertTrue(filter.accept(new JobEvent(mock(IJobManager.class), JobEventType.JOB_STATE_CHANGED)));
-    assertTrue(filter.accept(new JobEvent(mock(IJobManager.class), JobEventType.JOB_MANAGER_SHUTDOWN)));
-    assertFalse(filter.accept(new JobEvent(mock(IJobManager.class), JobEventType.JOB_EXECUTION_HINT_ADDED)));
+    assertTrue(filter.accept(new JobEvent(mock(IJobManager.class), JobEventType.JOB_STATE_CHANGED, new JobEventData())));
+    assertTrue(filter.accept(new JobEvent(mock(IJobManager.class), JobEventType.JOB_MANAGER_SHUTDOWN, new JobEventData())));
+    assertFalse(filter.accept(new JobEvent(mock(IJobManager.class), JobEventType.JOB_EXECUTION_HINT_ADDED, new JobEventData())));
   }
 }

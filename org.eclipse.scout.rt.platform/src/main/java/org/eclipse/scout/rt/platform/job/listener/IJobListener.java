@@ -12,6 +12,8 @@ package org.eclipse.scout.rt.platform.job.listener;
 
 import java.util.EventListener;
 
+import org.eclipse.scout.rt.platform.context.RunContext;
+
 /**
  * Listener to be notified about job events.
  *
@@ -26,6 +28,8 @@ public interface IJobListener extends EventListener {
    * <strong>This method is invoked from the thread firing the given event. Hence, any long running operation should be
    * done asynchronously within a separate job. Also, never wait for that job to complete, because no assumption about
    * the current mutex can be made.</strong>
+   * <p>
+   * The implementor is responsible to handle the event in the proper {@link RunContext}.
    *
    * @param event
    *          describes the event occurred.

@@ -118,7 +118,7 @@ public class JobListeners {
    * Notifies all local listeners which are registered on the event's future and accept the given event.
    */
   public void notifyLocalListeners(final JobEvent eventToFire) {
-    final JobFutureTask<?> future = (JobFutureTask<?>) eventToFire.getFuture();
+    final JobFutureTask<?> future = (JobFutureTask<?>) eventToFire.getData().getFuture();
     if (future == null) {
       return;
     }

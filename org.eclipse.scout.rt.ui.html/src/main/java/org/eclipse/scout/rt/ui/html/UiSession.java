@@ -191,7 +191,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
 
           @Override
           public void changed(JobEvent event) {
-            LOG.trace("Model job finished: {} ({}). Notify waiting requests...", event.getFuture().getJobInput().getName(), event.getType());
+            LOG.trace("Model job finished. Wake up 'poll-request'. [job={}, eventType={}]", event.getData().getFuture().getJobInput().getName(), event.getType());
             signalPoller();
           }
         });

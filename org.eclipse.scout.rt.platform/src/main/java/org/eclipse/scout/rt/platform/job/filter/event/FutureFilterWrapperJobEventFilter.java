@@ -32,7 +32,13 @@ public class FutureFilterWrapperJobEventFilter implements IFilter<JobEvent>, IAd
 
   @Override
   public final boolean accept(final JobEvent event) {
-    return (event.getFuture() != null ? m_futureFilterDelegate.accept(event.getFuture()) : false);
+    final IFuture<?> future = event.getData().getFuture();
+    if (future == null) {
+      return false;
+    }
+    else {
+      return m_futureFilterDelegate.accept(future);
+    }
   }
 
   @Override

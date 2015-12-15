@@ -25,6 +25,7 @@ import org.eclipse.scout.rt.platform.job.IJobManager;
 import org.eclipse.scout.rt.platform.job.IMutex;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
+import org.eclipse.scout.rt.platform.job.listener.JobEventData;
 import org.eclipse.scout.rt.platform.job.listener.JobEventType;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
@@ -324,7 +325,7 @@ public class JobEventFilterBuilderTest {
   }
 
   private static JobEvent newJobStateChangedEvent(IFuture<?> future) {
-    return new JobEvent(mock(IJobManager.class), JobEventType.JOB_STATE_CHANGED).withFuture(future);
+    return new JobEvent(mock(IJobManager.class), JobEventType.JOB_STATE_CHANGED, new JobEventData().withFuture(future));
   }
 
   private static class P_RunContext extends RunContext {

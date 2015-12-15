@@ -15,22 +15,32 @@ import org.eclipse.scout.rt.platform.job.JobState;
 /**
  * Describes the semantic of a {@link JobEvent}.
  *
- * @since 5.1
+ * @since 5.2
  */
 public enum JobEventType {
   /**
    * Signals that a job transitioned to a new {@link JobState}, e.g. form {@link JobState#SCHEDULED} to
    * {@link JobState#RUNNING}.
+   *
+   * @see JobEventData#getState()
+   * @see JobEventData#getFuture()
+   * @see JobEventData#getBlockingCondition()
    */
   JOB_STATE_CHANGED,
 
   /**
    * Signals that an execution hint was added to a job.
+   *
+   * @see JobEventData#getExecutionHint()
+   * @see JobEventData#getFuture()
    */
   JOB_EXECUTION_HINT_ADDED,
 
   /**
    * Signals that an execution hint was removed from a job.
+   *
+   * @see JobEventData#getExecutionHint()
+   * @see JobEventData#getFuture()
    */
   JOB_EXECUTION_HINT_REMOVED,
 
