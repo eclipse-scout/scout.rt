@@ -142,19 +142,8 @@ scout.AggregateTableControl.prototype._reconcileScrollPos = function() {
   this.$contentContainer.scrollLeft(scrollLeft);
 };
 
-/**
- * Ignores the model value and set enabled based on columns.<p>
- *
- */
-scout.AggregateTableControl.prototype._computeEnabled = function() {
-  var containsNumberColumn = this.table.columns.some(function(column) {
-    return column instanceof scout.NumberColumn;
-  });
-  return containsNumberColumn;
-};
-
 scout.AggregateTableControl.prototype._updateEnabledAndSelectedState = function() {
-  this.setEnabled(this._computeEnabled());
+  this.setEnabled(this.table.containsNumberColumn());
 
   // Make sure a disabled control is not selected
   if (!this.enabled && this.selected) {

@@ -90,10 +90,7 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
   }
 
   // Grouping and aggregation
-  var containsNumberColumn = scout.arrays.find(this.table.columns, function(column) {
-    return column instanceof scout.NumberColumn;
-  });
-  if (containsNumberColumn) {
+  if (this.table.containsNumberColumn()) {
     if (this.column instanceof scout.NumberColumn) {
       this._renderAggregationGroup();
       this._renderSelectedAggregation();

@@ -3054,6 +3054,12 @@ scout.Table.prototype._onAggregationFunctionChanged = function(event) {
   this._group();
 };
 
+scout.Table.prototype.containsNumberColumn = function() {
+  return this.columns.some(function(column) {
+    return column instanceof scout.NumberColumn;
+  });
+};
+
 scout.Table.prototype.onModelAction = function(event) {
   // _renderRows() might not have drawn all rows yet, therefore postpone the
   // execution of this method to prevent conflicts on the row objects.
