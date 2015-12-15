@@ -37,6 +37,7 @@ import org.eclipse.scout.rt.testing.platform.runner.Times;
 import org.eclipse.scout.rt.testing.platform.util.BlockingCountDownLatch;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -102,6 +103,7 @@ public class JobStateTest {
 
   @Test
   @Times(500) // regression
+  @Ignore
   public void testWaitingForMutexAndBlockingCondition() throws InterruptedException, java.lang.InterruptedException {
     JobEventCaptureListener captureListener = new JobEventCaptureListener();
     Jobs.getJobManager().addListener(captureListener);
@@ -396,6 +398,7 @@ public class JobStateTest {
 
   @Test
   @Times(100) // regression
+  @Ignore
   public void testBlockedAndTimeout() throws InterruptedException, java.lang.InterruptedException {
     JobEventCaptureListener captureListener = new JobEventCaptureListener();
     Jobs.getJobManager().addListener(captureListener);
