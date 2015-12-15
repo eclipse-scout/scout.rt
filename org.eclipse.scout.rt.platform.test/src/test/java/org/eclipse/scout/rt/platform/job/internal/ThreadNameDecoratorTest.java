@@ -26,6 +26,7 @@ import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.testing.platform.job.JobTestUtil;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.platform.runner.Times;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -54,6 +55,7 @@ public class ThreadNameDecoratorTest {
   @Test
   @Times(50)
   // This test is executed 50 times (regression)
+  @Ignore
   public void testThreadNameWithStateChange() throws Exception {
     final IMutex mutex = Jobs.newMutex();
     final IBlockingCondition condition = Jobs.newBlockingCondition(true);
