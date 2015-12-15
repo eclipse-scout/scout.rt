@@ -49,9 +49,7 @@ scout.LayoutValidator.prototype.invalidate = function(htmlComp) {
  */
 scout.LayoutValidator.prototype.validate = function() {
   this._invalidComponents.forEach(function(comp) {
-    if (comp.isAttached()) { // don't layout components which don't exist anymore or are detached from the DOM
-      comp.validateLayout();
-    }
+    comp.validateLayout();
   });
   this._invalidComponents = [];
 };

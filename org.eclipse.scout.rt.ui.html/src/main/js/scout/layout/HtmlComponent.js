@@ -85,6 +85,11 @@ scout.HtmlComponent.prototype.validateLayout = function() {
   if (!this._layout) {
     throw new Error('Called layout() but component has no layout');
   }
+  if(!this.isAttached() || !this.isVisible()) {
+    // don't layout components which are not visible, don't exist anymore or are detached from the DOM
+    // Moved inside validate layout instead of checking on caller site.
+    return;
+  }
   if (!this.valid) {
     this.layouting = true;
     this._layout.layout(this.$comp);
