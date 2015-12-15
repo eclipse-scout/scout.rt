@@ -66,6 +66,9 @@ public class JobTestUtil {
   /**
    * Blocks the calling thread until the job enters the given state. This method blocks 30s at maximum, and throws an
    * {@link AssertionError} if elapsed.
+   * <p>
+   * <strong>When this method returns, the future is in the given state. But, event listeners not necessarily notified
+   * yet.</strong>
    */
   public static void waitForState(final IFuture<?> future, final JobState state) {
     final long deadline = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(30);
