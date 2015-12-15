@@ -125,9 +125,14 @@ public class ExceptionHandler {
    * Helper method to get the exception's root cause.
    */
   public static Throwable getRootCause(final Throwable e) {
-    if (e.getCause() != null) {
-      return ExceptionHandler.getRootCause(e.getCause());
+    if (e == null) {
+      return null;
     }
-    return e;
+
+    Throwable cause = e;
+    while (cause.getCause() != null) {
+      cause = cause.getCause();
+    }
+    return cause;
   }
 }
