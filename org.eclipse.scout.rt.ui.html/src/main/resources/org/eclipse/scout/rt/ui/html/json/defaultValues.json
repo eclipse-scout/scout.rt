@@ -75,7 +75,8 @@
       "mainBox": false,
       "scrollable": false,
       "expandable": false,
-      "expanded": true
+      "expanded": true,
+      "fields": []
     },
     "PlannerField": {
       "splitterPosition": 168

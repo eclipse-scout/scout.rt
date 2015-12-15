@@ -19,7 +19,7 @@ import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.ui.html.cache.HttpCacheKey;
 import org.eclipse.scout.rt.ui.html.cache.HttpCacheObject;
 import org.eclipse.scout.rt.ui.html.cache.IHttpCacheControl;
-import org.eclipse.scout.rt.ui.html.json.DefaultValuesFilterService;
+import org.eclipse.scout.rt.ui.html.json.IDefaultValuesFilterService;
 
 /**
  * This class loads and parses JSON files from WebContent/ folder.
@@ -33,7 +33,7 @@ public class DefaultValuesLoader extends AbstractResourceLoader {
   @Override
   public HttpCacheObject loadResource(HttpCacheKey cacheKey) throws IOException {
     String pathInfo = cacheKey.getResourcePath();
-    BinaryResource res = BEANS.get(DefaultValuesFilterService.class).getCombinedDefaultValuesConfigurationFile(pathInfo);
+    BinaryResource res = BEANS.get(IDefaultValuesFilterService.class).getCombinedDefaultValuesConfigurationFile(pathInfo);
     return new HttpCacheObject(cacheKey, true, IHttpCacheControl.MAX_AGE_4_HOURS, res);
   }
 }
