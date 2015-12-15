@@ -19,7 +19,7 @@ describe('EventSupport', function() {
   describe('on / trigger / off', function() {
 
     beforeEach(function() {
-      events = new scout.EventSupport()
+      events = new scout.EventSupport();
       count = 0;
     });
 
@@ -45,7 +45,7 @@ describe('EventSupport', function() {
   describe('one', function() {
 
     beforeEach(function() {
-      events = new scout.EventSupport()
+      events = new scout.EventSupport();
       count = 0;
     });
 
@@ -67,6 +67,13 @@ describe('EventSupport', function() {
       expect(receivedEvent.theProp).toBe('bar');
       // expect the type property is automatically set by EventSupport
       expect(receivedEvent.type).toBe('foo');
+    });
+
+    it('de-register function registered with one()', function() {
+      events.one('foo', fooListener);
+      expect(events._eventListeners.length).toBe(1);
+      events.off('foo', fooListener);
+      expect(events._eventListeners.length).toBe(0);
     });
 
   });
