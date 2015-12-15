@@ -402,7 +402,6 @@ public class JobStateTest {
 
     final IMutex mutex = Jobs.newMutex();
     final IBlockingCondition condition = Jobs.newBlockingCondition(true);
-    final BlockingCountDownLatch job1RunningLatch = new BlockingCountDownLatch(1);
     final AtomicReference<Thread> workerThread = new AtomicReference<>();
 
     final IFuture<Void> future1 = Jobs.schedule(new IRunnable() {
@@ -412,7 +411,6 @@ public class JobStateTest {
         workerThread.set(Thread.currentThread());
         assertSame(JobState.RUNNING, IFuture.CURRENT.get().getState());
 
-        job1RunningLatch.countDownAndBlock();
         try {
           condition.waitFor(1, TimeUnit.MILLISECONDS, "ABC");
           fail("timeout expected");
@@ -426,14 +424,8 @@ public class JobStateTest {
         .withName("job-1")
         .withMutex(mutex));
 
-    // Wait until job-1 is running
-    job1RunningLatch.await();
-    job1RunningLatch.unblock();
-    JobTestUtil.waitForState(future1, JobState.WAITING_FOR_BLOCKING_CONDITION);
-
-    // Interrupt worker thread
-    future1.awaitDoneAndGet();
-
+    // Wait until job-1 completed
+    future1.awaitDoneAndGet(10, TimeUnit.SECONDS);
     assertTrue(future1.isDone());
     assertFalse(future1.isCancelled());
     assertEquals(0, mutex.getCompetitorCount());
