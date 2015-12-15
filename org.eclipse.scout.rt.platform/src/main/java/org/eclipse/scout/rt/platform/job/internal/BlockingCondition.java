@@ -94,16 +94,16 @@ public class BlockingCondition implements IBlockingCondition {
         return;
       }
 
-      // Release the mutex if being a mutually exclusive task.
-      futureTask.releaseMutex();
-
       // Associate the future with execution hints.
       executionHintRegistration = registerExecutionHints(futureTask, executionHints);
 
-      // Wait until the condition falls.
+      // Change job state.
       futureTask.changeState(JobState.WAITING_FOR_BLOCKING_CONDITION);
+
+      // Release the mutex if being a mutually exclusive task.
+      futureTask.releaseMutex();
       try {
-        blockUntilSignaledOrTimeout(timeout, unit);
+        blockUntilSignaledOrTimeout(timeout, unit); // Wait until the condition falls
       }
       catch (final InterruptedException | TimeoutException e) {
         executionHintRegistration.dispose();

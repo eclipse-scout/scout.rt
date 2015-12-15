@@ -22,6 +22,10 @@ public interface IJobListener extends EventListener {
 
   /**
    * Method invoked to notify about a job event.
+   * <p>
+   * <strong>This method is invoked from the thread firing the given event. Hence, any long running operation should be
+   * done asynchronously within a separate job. Also, never wait for that job to complete, because no assumption about
+   * the current mutex can be made.</strong>
    *
    * @param event
    *          describes the event occurred.
