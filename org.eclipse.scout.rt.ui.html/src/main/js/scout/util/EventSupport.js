@@ -12,17 +12,37 @@ scout.EventSupport = function() {
   this._eventListeners = [];
 };
 
-scout.EventSupport.prototype.on = function(type, func) {
+scout.EventSupport.prototype._assertFunc = function(func) {
   if (!func) {
     throw new Error('Missing callback function');
   }
+};
 
+scout.EventSupport.prototype.on = function(type, func) {
+  this._assertFunc(func);
   var listener = {
     type: type,
     func: func
   };
   this.addListener(listener);
   return listener;
+};
+
+/**
+ * Registers the given func for the event specified by the type param.
+ * The event is only triggered one time, and after that it is automatically de-registered by calling the off() function.
+ *
+ * @param type event-name
+ * @param func callback function executed when event is triggered. An event object is passed to the func as first parameter
+ */
+scout.EventSupport.prototype.one = function(type, func) {
+  this._assertFunc(func);
+  var that = this;
+  var offFunc = function(event) {
+    func(event);
+    that.off(type, offFunc);
+  }.bind(this);
+  this.on(type, offFunc);
 };
 
 scout.EventSupport.prototype.off = function(type, func) {
@@ -62,9 +82,9 @@ scout.EventSupport.prototype.trigger = function(type, event) {
   event = event || {};
   event.type = type;
 
-  var listeners = this._eventListeners.slice();
-  for (var i = 0; i < listeners.length; i++) {
-    var listener = listeners[i];
+  var i, listener, listeners = this._eventListeners.slice();
+  for (i = 0; i < listeners.length; i++) {
+    listener = listeners[i];
     if (!listener.type || typeMatches(event.type, listener.type)) {
       listener.func(event);
     }

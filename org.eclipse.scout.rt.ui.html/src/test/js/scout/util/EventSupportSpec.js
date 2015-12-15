@@ -8,21 +8,22 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-describe("EventSupport", function() {
+describe('EventSupport', function() {
 
-  describe("on / trigger / off", function() {
+  var count, events;
 
-    var count, events = new scout.EventSupport();
+  function fooListener() {
+    count++;
+  }
 
-    function fooListener() {
-      count++;
-    }
+  describe('on / trigger / off', function() {
 
     beforeEach(function() {
+      events = new scout.EventSupport()
       count = 0;
     });
 
-    it("single event", function() {
+    it('single event func only triggered until off() is called', function() {
       events.on('foo', fooListener);
       events.trigger('foo');
       expect(count).toBe(1);
@@ -32,11 +33,40 @@ describe("EventSupport", function() {
       expect(count).toBe(1);
     });
 
-    it("multiple events", function() {
+    it('multiple events', function() {
       events.on('foo bar', fooListener);
       events.trigger('foo');
       events.trigger('bar');
       expect(count).toBe(2);
+    });
+
+  });
+
+  describe('one', function() {
+
+    beforeEach(function() {
+      events = new scout.EventSupport()
+      count = 0;
+    });
+
+    it('single event func only triggered once when registered with one()', function() {
+      events.one('foo', fooListener);
+      events.trigger('foo');
+      events.trigger('foo');
+      expect(count).toBe(1);
+      expect(events._eventListeners.length).toBe(0);
+    });
+
+    it('event parameter passed to registered func', function() {
+      var receivedEvent = null;
+      events.one('foo', function(event) {
+        receivedEvent = event;
+      });
+      events.trigger('foo', {theProp: 'bar'});
+      // expect the event has been passed to the registered func
+      expect(receivedEvent.theProp).toBe('bar');
+      // expect the type property is automatically set by EventSupport
+      expect(receivedEvent.type).toBe('foo');
     });
 
   });

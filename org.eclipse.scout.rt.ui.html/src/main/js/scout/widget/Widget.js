@@ -308,6 +308,10 @@ scout.Widget.prototype.entryPoint = function($element) {
   return $element.entryPoint();
 };
 
+scout.Widget.prototype.one = function(type, func) {
+  this.events.one(type, func);
+};
+
 scout.Widget.prototype.on = function(type, func) {
   return this.events.on(type, func);
 };

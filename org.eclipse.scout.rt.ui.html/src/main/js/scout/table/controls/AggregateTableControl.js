@@ -35,6 +35,7 @@ scout.AggregateTableControl.prototype._init = function(model) {
 
   this._updateEnabledAndSelectedState();
   this.table.on('columnStructureChanged', this._tableColumnStructureChangedHandler);
+  this.table.one('initialized', this._updateEnabledAndSelectedState.bind(this));
 };
 
 scout.AggregateTableControl.prototype.destroy = function() {
@@ -144,7 +145,6 @@ scout.AggregateTableControl.prototype._reconcileScrollPos = function() {
 
 scout.AggregateTableControl.prototype._updateEnabledAndSelectedState = function() {
   this.setEnabled(this.table.containsNumberColumn());
-
   // Make sure a disabled control is not selected
   if (!this.enabled && this.selected) {
     this.setSelected(false);

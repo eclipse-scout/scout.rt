@@ -60,8 +60,8 @@ scout.Table.CheckableStyle = {
 
 scout.Table.prototype._init = function(model) {
   scout.Table.parent.prototype._init.call(this, model);
-
   this._initColumns();
+
   this.rows.forEach(function(row) {
     this._initRow(row);
   }, this);
