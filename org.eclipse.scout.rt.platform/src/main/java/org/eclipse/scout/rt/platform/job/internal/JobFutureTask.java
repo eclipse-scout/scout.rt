@@ -70,6 +70,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
   protected final RunMonitor m_runMonitor;
   protected final JobInput m_input;
   protected final Long m_expirationDate;
+  protected final Mutex m_mutex;
 
   protected final DonePromise<RESULT> m_donePromise;
   protected final CallableChain<RESULT> m_callableChain;
@@ -90,6 +91,8 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
     m_jobManager = jobManager;
     m_runMonitor = runMonitor;
     m_input = input;
+    m_mutex = Mutex.getMutex(input);
+
     m_callableChain = callableChain;
 
     // Initialize this Future
@@ -162,19 +165,9 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
     return m_input.getSchedulingRule();
   }
 
-  /**
-   * @return the mutex object, or <code>null</code> if not being a mutual exclusive task.
-   */
-  public IMutex getMutex() {
-    return m_input.getMutex();
-  }
-
-  /**
-   * @return <code>true</code> if this task is a mutual exclusive task and currently owns the mutex.
-   */
-  public boolean isMutexOwner() {
-    final IMutex mutex = getMutex();
-    return mutex != null && mutex.isMutexOwner(this);
+  @Override
+  public Mutex getMutex() {
+    return m_mutex;
   }
 
   @Override
@@ -387,15 +380,15 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
       return; // job already in 'done'-state.
     }
 
-    Assertions.assertNotSame(currentMutex, getMutex(), "Deadlock detected: Cannot wait for a job that has the same mutex as the current job [mutex={}]", currentMutex);
+    Assertions.assertNotSame(currentMutex, m_mutex, "Deadlock detected: Cannot wait for a job that has the same mutex as the current job [mutex={}]", currentMutex);
   }
 
   /**
    * Releases the mutex if being a mutually exclusive task and currently the mutex owner.
    */
   protected void releaseMutex() {
-    if (isMutexOwner()) {
-      getMutex().release(this);
+    if (m_mutex != null && m_mutex.isMutexOwner(this)) {
+      m_mutex.release(this);
     }
   }
 

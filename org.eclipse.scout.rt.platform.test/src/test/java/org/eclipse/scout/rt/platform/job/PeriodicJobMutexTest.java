@@ -19,7 +19,6 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.eclipse.scout.rt.platform.job.internal.JobFutureTask;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.TimeoutException;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
@@ -71,8 +70,9 @@ public class PeriodicJobMutexTest {
         protocol.add("begin");
 
         // This task should be mutex-owner
-        JobFutureTask currentTask = (JobFutureTask) IFuture.CURRENT.get();
-        if (currentTask.isMutexOwner()) {
+        IFuture<?> currentFuture = IFuture.CURRENT.get();
+        IMutex mutex = currentFuture.getMutex();
+        if (mutex != null && mutex.isMutexOwner(currentFuture)) {
           protocol.add("mutex-owner");
         }
 

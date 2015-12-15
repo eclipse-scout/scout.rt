@@ -45,9 +45,14 @@ public interface IFuture<RESULT> extends ICancellable {
   ThreadLocal<IFuture<?>> CURRENT = new ThreadLocal<>();
 
   /**
-   * @return {@link JobInput} the job was instrumented with.
+   * Returns {@link JobInput} the job was instrumented with.
    */
   JobInput getJobInput();
+
+  /**
+   * Returns the mutex object, or <code>null</code> if not being a mutually exclusive task.
+   */
+  IMutex getMutex();
 
   /**
    * Attempts to cancel the execution of the associated job. This attempt will be ignored if the job has already
@@ -64,13 +69,13 @@ public interface IFuture<RESULT> extends ICancellable {
   boolean cancel(boolean interruptIfRunning);
 
   /**
-   * @return <code>true</code> if the associated job was cancelled before it completed normally.
+   * Returns <code>true</code> if the associated job was cancelled before it completed normally.
    */
   @Override
   boolean isCancelled();
 
   /**
-   * @return <code>true</code> if the associated job completed either normally, by an exception or was canceled.
+   * Returns <code>true</code> if the associated job completed either normally, by an exception or was canceled.
    */
   boolean isDone();
 

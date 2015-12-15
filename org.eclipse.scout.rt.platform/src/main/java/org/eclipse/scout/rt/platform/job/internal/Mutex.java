@@ -17,9 +17,12 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
+import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IMutex;
+import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.ToStringBuilder;
 import org.eclipse.scout.rt.platform.util.concurrent.InterruptedException;
 import org.slf4j.Logger;
@@ -28,6 +31,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Default implementation of {@link IMutex}.
  */
+@Bean
 public class Mutex implements IMutex {
 
   private static final Logger LOG = LoggerFactory.getLogger(Mutex.class);
@@ -62,6 +66,9 @@ public class Mutex implements IMutex {
     }
   }
 
+  /**
+   * Returns whether the given task is the current mutex owner.
+   */
   @Override
   public boolean isMutexOwner(final IFuture<?> task) {
     m_readLock.lock();
@@ -73,8 +80,18 @@ public class Mutex implements IMutex {
     }
   }
 
-  @Override
-  public void acquire(final IFuture<?> mutexTask, final QueuePosition queuePosition) {
+  /**
+   * Blocks the calling thread until the mutex can be acquired for the given task.
+   *
+   * @param task
+   *          the task to acquire the mutex for.
+   * @param queuePosition
+   *          the position where to place the task in the queue of competing tasks if the mutex is not free at the time
+   *          of invocation.
+   * @throws InterruptedException
+   *           if the current thread was interrupted while waiting.
+   */
+  protected void acquire(final IFuture<?> mutexTask, final QueuePosition queuePosition) {
     Assertions.assertSame(this, mutexTask.getJobInput().getMutex(), "Wrong mutex object [expected={}, actual={}]", this, mutexTask.getJobInput().getMutex());
 
     final Object acquisitionLock = new Object();
@@ -113,8 +130,21 @@ public class Mutex implements IMutex {
     }
   }
 
-  @Override
-  public boolean compete(final IFuture<?> mutexTask, final QueuePosition queuePosition, final IMutexAcquiredCallback mutexAcquiredCallback) {
+  /**
+   * Makes the given task to compete for this mutex. Upon mutex acquisition, the given callback is invoked. The callback
+   * is invoked immediately and on behalf of the calling thread, if being available at the time of invocation.
+   * Otherwise, this method returns immediately.
+   *
+   * @param task
+   *          the task to acquire the mutex for.
+   * @param queuePosition
+   *          the position where to place the task in the queue of competing tasks if the mutex is not free at the time
+   *          of invocation.
+   * @param mutexAcquiredCallback
+   *          the callback to be invoked once the given task acquired the mutex.
+   * @return <code>true</code> if the mutex was free and was acquired immediately, or <code>false</code> otherwise.
+   */
+  protected boolean compete(final IFuture<?> mutexTask, final QueuePosition queuePosition, final IMutexAcquiredCallback mutexAcquiredCallback) {
     Assertions.assertSame(this, mutexTask.getJobInput().getMutex(), "Wrong mutex object [expected={}, actual={}]", this, mutexTask.getJobInput().getMutex());
 
     boolean mutexFree;
@@ -152,8 +182,14 @@ public class Mutex implements IMutex {
     }
   }
 
-  @Override
-  public void release(final IFuture<?> mutexTask) {
+  /**
+   * Releases the mutex, and passes it to the next competing task.
+   *
+   * @param expectedMutexOwner
+   *          the task which is currently owning the mutex, and is only used to do a consistency check against the
+   *          actual mutex owner.
+   */
+  protected void release(final IFuture<?> mutexTask) {
     Assertions.assertSame(this, mutexTask.getJobInput().getMutex(), "Wrong mutex object [expected={}, actual={}]", this, mutexTask.getJobInput().getMutex());
     Assertions.assertSame(mutexTask, m_mutexOwner, "Task does not own the mutex  [mutexOwner={}, task={}]", m_mutexOwner, mutexTask);
 
@@ -209,5 +245,25 @@ public class Mutex implements IMutex {
         LOG.error("Failed to notify new mutex owner about mutex acquisition [task={}]", m_competingTask, e);
       }
     }
+  }
+
+  /**
+   * Position in the queue of competing tasks.
+   */
+  protected static enum QueuePosition {
+    HEAD, TAIL;
+  }
+
+  /**
+   * Returns the {@link Mutex} of the given {@link JobInput}, or <code>null</code> if not set, or throws
+   * {@link AssertionException} if not of type {@link Mutex}.
+   */
+  protected static Mutex getMutex(final JobInput input) {
+    if (input.getMutex() == null) {
+      return null;
+    }
+
+    Assertions.assertTrue(input.getMutex() instanceof Mutex, "Mutex object must be of type {} [mutex={}]", Mutex.class.getName(), input.getMutex().getClass().getName());
+    return (Mutex) input.getMutex();
   }
 }

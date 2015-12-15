@@ -15,9 +15,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import org.eclipse.scout.rt.platform.job.IMutex;
-import org.eclipse.scout.rt.platform.job.IMutex.QueuePosition;
 import org.eclipse.scout.rt.platform.job.JobState;
+import org.eclipse.scout.rt.platform.job.internal.Mutex.QueuePosition;
 
 /**
  * Runnable to run the given {@link JobFutureTask} periodically at a 'fixed-rate', meaning that if the period is 2
@@ -55,7 +54,7 @@ class FixedRateRunnable implements IRejectableRunnable {
 
     final long startTimeNanos = System.nanoTime();
 
-    final IMutex mutex = m_futureTask.getMutex();
+    final Mutex mutex = m_futureTask.getMutex();
     if (mutex == null) {
       m_futureTask.run();
       scheduleNextExecution(startTimeNanos);

@@ -19,9 +19,8 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IFuture;
-import org.eclipse.scout.rt.platform.job.IMutex;
-import org.eclipse.scout.rt.platform.job.IMutex.QueuePosition;
 import org.eclipse.scout.rt.platform.job.JobState;
+import org.eclipse.scout.rt.platform.job.internal.Mutex.QueuePosition;
 import org.eclipse.scout.rt.platform.job.listener.JobEventData;
 import org.eclipse.scout.rt.platform.util.ToStringBuilder;
 import org.eclipse.scout.rt.platform.util.concurrent.InterruptedException;
@@ -120,7 +119,7 @@ public class BlockingCondition implements IBlockingCondition {
     }
 
     // Acquire the mutex if being a mutually exclusive task.
-    final IMutex mutex = futureTask.getMutex();
+    final Mutex mutex = futureTask.getMutex();
     if (mutex != null) {
       try {
         futureTask.changeState(JobState.WAITING_FOR_MUTEX);

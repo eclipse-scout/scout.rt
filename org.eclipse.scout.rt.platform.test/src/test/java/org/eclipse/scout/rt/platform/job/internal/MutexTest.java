@@ -26,8 +26,8 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IMutex;
-import org.eclipse.scout.rt.platform.job.IMutex.QueuePosition;
 import org.eclipse.scout.rt.platform.job.Jobs;
+import org.eclipse.scout.rt.platform.job.internal.Mutex.QueuePosition;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.InterruptedException;
@@ -39,7 +39,7 @@ import org.junit.Test;
 
 public class MutexTest {
 
-  private IMutex m_mutex;
+  private Mutex m_mutex;
 
   private IFuture<?> m_task1;
   private IFuture<?> m_task2;
@@ -48,27 +48,36 @@ public class MutexTest {
 
   @Before
   public void before() {
-    m_mutex = Jobs.newMutex();
+    m_mutex = new Mutex();
 
     m_task1 = mock(IFuture.class);
     when(m_task1.getJobInput()).thenReturn(Jobs.newInput()
         .withMutex(m_mutex)
         .withName("job-1"));
+    when(m_task1.getMutex()).thenReturn(m_mutex);
 
     m_task2 = mock(IFuture.class);
     when(m_task2.getJobInput()).thenReturn(Jobs.newInput()
         .withMutex(m_mutex)
         .withName("job-2"));
+    when(m_task2.getMutex()).thenReturn(m_mutex);
 
     m_task3 = mock(IFuture.class);
     when(m_task3.getJobInput()).thenReturn(Jobs.newInput()
         .withMutex(m_mutex)
         .withName("job-3"));
+    when(m_task3.getMutex()).thenReturn(m_mutex);
 
     m_task4 = mock(IFuture.class);
     when(m_task4.getJobInput()).thenReturn(Jobs.newInput()
         .withMutex(null)
         .withName("job-2"));
+    when(m_task4.getMutex()).thenReturn(null);
+  }
+
+  @Test(expected = AssertionException.class)
+  public void testWrongMutexType() {
+    Jobs.schedule(mock(IRunnable.class), Jobs.newInput().withMutex(mock(IMutex.class)));
   }
 
   @Test(expected = AssertionException.class)
@@ -86,7 +95,7 @@ public class MutexTest {
    */
   @Test(timeout = 1000)
   public void testAcquisition1() {
-    IMutex mutex = m_task1.getJobInput().getMutex();
+    Mutex mutex = (Mutex) m_task1.getMutex();
 
     assertEquals(0, mutex.getCompetitorCount());
 
@@ -116,7 +125,7 @@ public class MutexTest {
    */
   @Test(timeout = 1000)
   public void testAcquisition2() {
-    IMutex mutex = m_task1.getJobInput().getMutex();
+    Mutex mutex = (Mutex) m_task1.getMutex();
 
     assertEquals(0, mutex.getCompetitorCount());
 
@@ -157,7 +166,7 @@ public class MutexTest {
    */
   @Test(timeout = 1000)
   public void testAcquisition3() {
-    IMutex mutex = m_task1.getJobInput().getMutex();
+    Mutex mutex = (Mutex) m_task1.getMutex();
 
     assertEquals(0, mutex.getCompetitorCount());
 
@@ -204,7 +213,7 @@ public class MutexTest {
    */
   @Test(timeout = 5000)
   public void testAcquisition4() {
-    final IMutex mutex = m_task1.getJobInput().getMutex();
+    final Mutex mutex = (Mutex) m_task1.getMutex();
 
     assertEquals(0, mutex.getCompetitorCount());
 
@@ -251,7 +260,7 @@ public class MutexTest {
    */
   @Test(timeout = 5_000)
   public void testAcquisition5() throws java.lang.InterruptedException {
-    final IMutex mutex = m_task1.getJobInput().getMutex();
+    final Mutex mutex = (Mutex) m_task1.getMutex();
 
     assertEquals(0, mutex.getCompetitorCount());
 

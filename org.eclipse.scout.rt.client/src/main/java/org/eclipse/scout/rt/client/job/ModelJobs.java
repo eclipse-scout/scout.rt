@@ -22,10 +22,10 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IJobManager;
+import org.eclipse.scout.rt.platform.job.IMutex;
 import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.job.filter.event.JobEventFilterBuilder;
 import org.eclipse.scout.rt.platform.job.filter.future.FutureFilterBuilder;
-import org.eclipse.scout.rt.platform.job.internal.JobFutureTask;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
@@ -263,7 +263,12 @@ public final class ModelJobs {
    */
   public static boolean isModelThread(final IClientSession clientSession) {
     final IFuture<?> currentFuture = IFuture.CURRENT.get();
-    return ModelJobs.isModelJob(currentFuture) && ((JobFutureTask) currentFuture).isMutexOwner();
+    if (!ModelJobs.isModelJob(currentFuture)) {
+      return false;
+    }
+
+    final IMutex mutex = currentFuture.getMutex();
+    return mutex != null && mutex.isMutexOwner(currentFuture);
   }
 
   /**
