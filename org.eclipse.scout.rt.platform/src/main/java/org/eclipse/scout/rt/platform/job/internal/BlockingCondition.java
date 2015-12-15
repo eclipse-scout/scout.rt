@@ -22,6 +22,7 @@ import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IMutex;
 import org.eclipse.scout.rt.platform.job.IMutex.QueuePosition;
 import org.eclipse.scout.rt.platform.job.JobState;
+import org.eclipse.scout.rt.platform.job.listener.JobEventData;
 import org.eclipse.scout.rt.platform.util.ToStringBuilder;
 import org.eclipse.scout.rt.platform.util.concurrent.InterruptedException;
 import org.eclipse.scout.rt.platform.util.concurrent.TimeoutException;
@@ -98,7 +99,10 @@ public class BlockingCondition implements IBlockingCondition {
       executionHintRegistration = registerExecutionHints(futureTask, executionHints);
 
       // Change job state.
-      futureTask.changeState(JobState.WAITING_FOR_BLOCKING_CONDITION);
+      futureTask.changeState(new JobEventData()
+          .withState(JobState.WAITING_FOR_BLOCKING_CONDITION)
+          .withFuture(futureTask)
+          .withBlockingCondition(this));
 
       // Release the mutex if being a mutually exclusive task.
       futureTask.releaseMutex();
