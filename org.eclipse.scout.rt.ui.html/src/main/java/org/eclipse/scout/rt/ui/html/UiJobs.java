@@ -22,11 +22,9 @@ import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.filter.AndFilter;
 import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.job.IFuture;
-import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.job.JobState;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.filter.future.FutureFilter;
-import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.concurrent.CancellationException;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
@@ -133,47 +131,5 @@ public class UiJobs {
         .andAreSingleExecuting() // consumed by poller
         .andMatch(filter)
         .toFilter(), AWAIT_TIMEOUT, TimeUnit.MILLISECONDS);
-  }
-
-  /**
-   * Creates a filter to accept jobs, which possibly provide data to be transported to the UI. That means, that such a
-   * job either transitioned into 'DONE' state, or requires 'UI interaction', or is a periodic job with a round
-   * completed.
-   */
-  public IFilter<JobEvent> newUiDataAvailableFilter() {
-    return new IFilter<JobEvent>() {
-
-      @Override
-      public boolean accept(final JobEvent event) {
-        switch (event.getType()) {
-          case JOB_STATE_CHANGED: {
-            return handleJobStateChanged(event.getData().getState(), event.getData().getFuture());
-          }
-          case JOB_EXECUTION_HINT_ADDED: {
-            return ModelJobs.EXECUTION_HINT_UI_INTERACTION_REQUIRED.equals(event.getData().getExecutionHint()); // UI data available because job was marked with 'UI_INTERACTION_REQUIRED'.
-          }
-          default: {
-            return false;
-          }
-        }
-      }
-
-      private boolean handleJobStateChanged(final JobState jobState, final IFuture<?> future) {
-        switch (jobState) {
-          case DONE:
-            return true; // UI data possibly available because job completed.
-          case PENDING:
-            switch (future.getSchedulingRule()) {
-              case JobInput.SCHEDULING_RULE_PERIODIC_EXECUTION_AT_FIXED_RATE:
-              case JobInput.SCHEDULING_RULE_PERIODIC_EXECUTION_WITH_FIXED_DELAY:
-                return true; // UI data possibly available because periodic job completed round.
-              default:
-                return false;
-            }
-          default:
-            return false;
-        }
-      }
-    };
   }
 }

@@ -20,6 +20,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.security.auth.Subject;
@@ -40,6 +41,8 @@ import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IJobListenerRegistration;
+import org.eclipse.scout.rt.platform.job.JobInput;
+import org.eclipse.scout.rt.platform.job.JobState;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
@@ -94,24 +97,24 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
   private final JsonAdapterRegistry m_jsonAdapterRegistry;
   private final P_RootAdapter m_rootJsonAdapter;
 
-  private boolean m_initialized;
-  private String m_uiSessionId;
-  private IClientSession m_clientSession;
-  private long m_jsonAdapterSeq = ROOT_ID;
-  private long m_responseSequenceNo = 1;
-  private JsonResponse m_currentJsonResponse;
-  private JsonRequest m_currentJsonRequest;
+  private volatile boolean m_initialized;
+  private volatile String m_uiSessionId;
+  private volatile IClientSession m_clientSession;
+  private final AtomicLong m_jsonAdapterSeq = new AtomicLong(ROOT_ID);
+  private final AtomicLong m_responseSequenceNo = new AtomicLong(1);
+  private volatile JsonResponse m_currentJsonResponse;
+  private volatile JsonRequest m_currentJsonRequest;
   /**
    * Note: This variable is referenced by reflection (!) in JsonTestUtility.endRequest() The variable is accessed by
    * different threads, thus all methods on HttpContext are synchronized.
    */
-  private HttpContext m_currentHttpContext = new HttpContext();
-  private HttpSession m_currentHttpSession;
+  private final HttpContext m_currentHttpContext = new HttpContext();
+  private volatile HttpSession m_currentHttpSession;
   private final JsonEventProcessor m_jsonEventProcessor;
   private volatile boolean m_disposing;
   private volatile boolean m_disposed;
   private final ReentrantLock m_uiSessionLock = new ReentrantLock();
-  private IJobListenerRegistration m_uiDataAvailableListener;
+  private volatile IJobListenerRegistration m_uiDataAvailableListener;
   private final BlockingQueue<Object> m_pollerQueue = new ArrayBlockingQueue<>(1, true);
   private final Object m_notificationToken = new Object();
   private volatile long m_lastAccessedTime;
@@ -125,7 +128,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
 
   protected JsonResponse createJsonResponse() {
     JsonResponse response = new JsonResponse();
-    response.assignSequenceNo(m_responseSequenceNo++);
+    response.assignSequenceNo(m_responseSequenceNo.getAndIncrement());
     return response;
   }
 
@@ -174,15 +177,13 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
         ModelJobs.newEventFilterBuilder()
             .andMatch(new SessionJobEventFilter(clientSession))
             .andMatchNotExecutionHint(UiJobs.EXECUTION_HINT_POLL_REQUEST) // events for poll-requests are not of interest
-            .andMatch(BEANS.get(UiJobs.class).newUiDataAvailableFilter()) // filter which evaluates to 'true' once possible UI data are available
+            .andMatch(newUiDataAvailableFilter()) // filter which evaluates to 'true' once possible UI data are available
             .andMatch(new IFilter<JobEvent>() {
 
               @Override
               public boolean accept(JobEvent event) {
                 // Release poll-request only if there is currently no regular request processing.
                 // If such a request is available, the result of the event's model job will be included in the response of that request.
-
-                // TODO [5.2] bsh: This check is not thread-safe. At least, 'm_currentJsonRequest' should be volatile. Still, thread-safety is not given.
                 return !isProcessingJsonRequest();
               }
             })
@@ -195,6 +196,48 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
             signalPoller();
           }
         });
+  }
+
+  /**
+   * Creates a filter to accept jobs, which possibly provide data to be transported to the UI. That means, that such a
+   * job either transitioned into 'DONE' state, or requires 'UI interaction', or is a periodic job with a round
+   * completed.
+   */
+  protected IFilter<JobEvent> newUiDataAvailableFilter() {
+    return new IFilter<JobEvent>() {
+
+      @Override
+      public boolean accept(final JobEvent event) {
+        switch (event.getType()) {
+          case JOB_STATE_CHANGED: {
+            return isJobDone(event.getData().getState(), event.getData().getFuture());
+          }
+          case JOB_EXECUTION_HINT_ADDED: {
+            return ModelJobs.EXECUTION_HINT_UI_INTERACTION_REQUIRED.equals(event.getData().getExecutionHint()); // UI data available because job was marked with 'UI_INTERACTION_REQUIRED'.
+          }
+          default: {
+            return false;
+          }
+        }
+      }
+
+      private boolean isJobDone(final JobState jobState, final IFuture<?> future) {
+        switch (jobState) {
+          case DONE:
+            return true; // UI data possibly available because job completed.
+          case PENDING:
+            switch (future.getSchedulingRule()) {
+              case JobInput.SCHEDULING_RULE_PERIODIC_EXECUTION_AT_FIXED_RATE:
+              case JobInput.SCHEDULING_RULE_PERIODIC_EXECUTION_WITH_FIXED_DELAY:
+                return true; // UI data possibly available because periodic job completed round.
+              default:
+                return false;
+            }
+          default:
+            return false;
+        }
+      }
+    };
   }
 
   protected void uninstallUiDataAvailableListener() {
@@ -506,12 +549,12 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
   }
 
   public long getJsonAdapterSeq() {
-    return m_jsonAdapterSeq;
+    return m_jsonAdapterSeq.get();
   }
 
   @Override
   public String createUniqueId() {
-    return "" + (++m_jsonAdapterSeq);
+    return "" + m_jsonAdapterSeq.incrementAndGet();
   }
 
   @Override
@@ -634,7 +677,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
       BEANS.get(UiJobs.class).awaitModelJobs(m_clientSession, ExceptionHandler.class);
 
       // 3. Transform the response to JSON.
-      final IFuture<JSONObject> future = ModelJobs.schedule(new P_ResponseToJsonTransformer(), ModelJobs.newInput(clientRunContext)
+      final IFuture<JSONObject> future = ModelJobs.schedule(newResponseToJsonTransformer(), ModelJobs.newInput(clientRunContext)
           .withName("Transforming response to JSON")
           .withExecutionHint(UiJobs.EXECUTION_HINT_POLL_REQUEST, RequestType.POLL_REQUEST.equals(jsonRequest.getRequestType()))
           .withExceptionHandling(null, false)); // Propagate exception to caller (UIServlet)
@@ -647,6 +690,9 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
       }
     }
     finally {
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("Adapter count after request: {}", m_jsonAdapterRegistry.size());
+      }
       m_currentHttpContext.clear();
       m_currentJsonRequest = null;
       if (m_disposing) {
@@ -665,12 +711,21 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
   }
 
   /**
-   * <b>Do not call this internal method directly!</b> It should only be called be
-   * {@link #processJsonRequest(HttpServletRequest, JsonRequest)} which ensures that the required state is set up
-   * correctly (and will be cleaned up later) and is run as a model job.
+   * @return a new {@link Callable} that returns the current {@link JsonResponse} as JSON and prepares a new current
+   *         json response for future jobs. The callable <b>must</b> be called from a model job.
    */
-  protected JSONObject responseToJsonInternal(JsonResponse jsonResponse) {
-    return jsonResponse.toJson();
+  protected Callable<JSONObject> newResponseToJsonTransformer() {
+    return new Callable<JSONObject>() {
+      @Override
+      public JSONObject call() throws Exception {
+        // 1. Convert response to JSON (must be done in model thread due to model access).
+        final JSONObject json = m_currentJsonResponse.toJson();
+        // 2. Create a new JSON response for future jobs
+        m_currentJsonResponse = createJsonResponse();
+        // TODO [5.2] bsh, awe, dwi: Should we catch errors from toJson() and create a new json response in the finally?
+        return json;
+      }
+    };
   }
 
   @Override
@@ -696,7 +751,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
       BEANS.get(UiJobs.class).awaitModelJobs(m_clientSession, ExceptionHandler.class);
 
       // 3. Transform the response to JSON.
-      final IFuture<JSONObject> future = ModelJobs.schedule(new P_ResponseToJsonTransformer(), ModelJobs.newInput(clientRunContext)
+      final IFuture<JSONObject> future = ModelJobs.schedule(newResponseToJsonTransformer(), ModelJobs.newInput(clientRunContext)
           .withName("Transforming response to JSON")
           .withExceptionHandling(null, false)); // Propagate exception to caller (UIServlet)
       try {
@@ -953,26 +1008,6 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
 
     public synchronized HttpServletResponse getResponse() {
       return m_resp;
-    }
-
-  }
-
-  /**
-   * Transforms the current response to JSON.
-   */
-  protected class P_ResponseToJsonTransformer implements Callable<JSONObject> {
-
-    @Override
-    public JSONObject call() throws Exception {
-      // 1. Convert response to JSON (must be done in model thread due to model access).
-      final JSONObject json = responseToJsonInternal(m_currentJsonResponse);
-      // 2. Create JSON response (must be done in model thread to avoid race conditions).
-      m_currentJsonResponse = createJsonResponse();
-      // 3. Log adapter count (must be done in model thread to avoid race conditions).
-      if (LOG.isDebugEnabled()) {
-        LOG.debug("Adapter count after request: {}", m_jsonAdapterRegistry.size());
-      }
-      return json;
     }
   }
 }
