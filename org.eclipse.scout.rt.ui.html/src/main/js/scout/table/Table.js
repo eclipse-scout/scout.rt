@@ -1441,63 +1441,51 @@ scout.Table.prototype.clearAggregateRows = function(animate) {
   this._aggregateRows.length = 0;
 };
 
+/**
+ * Executes the aggregate function with the given funcName for each column, but only if the Column
+ * has that function, which is currently only the case for NumberColumns.
+ *
+ * @param states is a reference to an Array containig the results for each column.
+ * @param row (optional) if set, an additional cell-value parameter is passed to the aggregate function
+ */
+scout.Table.prototype._forEachColumn = function(funcName, states, row) {
+  var value, that = this;
+  this.columns.forEach(function(column, i) {
+    if (column[funcName]) {
+      if (row) {
+        value = that.cellValue(column, row);
+      }
+      states[i] = column[funcName](states[i], value);
+    }
+  });
+};
+
 scout.Table.prototype._group = function(animate) {
-  var alignment, rows, states, columnGroupingActive, value, nextRow, newGroup,
-    that = this,
-    groupColumns = this._groupedColumns();
+  var rows, nextRow, newGroup,
+    groupColumns = this._groupedColumns(),
+    states = [];
 
   this.clearAggregateRows();
-
-  columnGroupingActive = (groupColumns ? groupColumns.length > 0 : false);
-  if (!columnGroupingActive) {
+  if (!groupColumns.length) {
     return;
   }
 
-  // prepare data
   rows = this.filteredRows();
-  states = [];
-
-  // pre-define functions for inline use.
-  var prepare = function(column, c) {
-    if (column instanceof scout.NumberColumn) {
-      states[c] = column.aggrStart();
-    }
-  }; // FIXME AWE: (table) move to NumberColumn, remove from Column
-
-  var aggregate = function(row, column, c) {
-    if (column instanceof scout.NumberColumn) {
-      value = this.cellValue(column, row);
-      states[c] = column.aggrStep(states[c], value);
-    }
-  };
-
-  var finish = function(column, c) {
-    if (column instanceof scout.NumberColumn) {
-      states[c] = column.aggrFinish(states[c]);
-    }
-  };
-
-  // prepare columns
-  this.columns.forEach(prepare);
-
+  this._forEachColumn('aggrStart', states);
   rows.forEach(function(row, r) {
-
-    this.columns.forEach(aggregate.bind(this, row));
-
+  this._forEachColumn('aggrStep', states, row);
     // test if sum should be shown, if yes: reset sum-array
     nextRow = rows[r + 1];
-
     // test if group is finished
     newGroup = (r === rows.length - 1) || this._isNewGroup(groupColumns, row, nextRow);
     // if group is finished: add group row
-
     if (newGroup) {
       //finish aggregation
-      this.columns.forEach(finish);
+      this._forEachColumn('aggrFinish', states);
       //append sum row
       this._addAggregateRow(states, row);
       //reset after group
-      this.columns.forEach(prepare);
+      this._forEachColumn('aggrStart', states);
     }
   }.bind(this));
 

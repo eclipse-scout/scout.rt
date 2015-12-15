@@ -116,8 +116,7 @@ scout.AggregateTableControl.prototype._rerenderAggregate = function() {
 };
 
 scout.AggregateTableControl.prototype._aggregate = function() {
-  var value, rows,
-    columns = this.table.columns,
+  var rows,
     aggregateRow = [],
     selectedRows = this.table.selectedRows;
 
@@ -128,32 +127,11 @@ scout.AggregateTableControl.prototype._aggregate = function() {
     rows = this.table.filteredRows();
   }
 
-  var prepare = function(column, c) {
-    if (column instanceof scout.NumberColumn) {
-      aggregateRow[c] = column.aggrStart();
-    }
-  };
-
-  var aggregateFunc = function(row, column, c) {
-    if (column instanceof scout.NumberColumn) {
-      value = this.table.cellValue(column, row);
-      aggregateRow[c] = column.aggrStep(aggregateRow[c], value);
-    }
-  };
-
-  var finish = function(column, c) {
-    if (column instanceof scout.NumberColumn) {
-      aggregateRow[c] = column.aggrFinish(aggregateRow[c]);
-    }
-  };
-
-  columns.forEach(prepare);
-
-  rows.forEach(function(row, r) {
-    columns.forEach(aggregateFunc.bind(this, row));
-  }.bind(this));
-
-  columns.forEach(finish);
+  this.table._forEachColumn('aggrStart', aggregateRow);
+  rows.forEach(function(row) {
+    this.table._forEachColumn('aggrStep', aggregateRow, row);
+  }, this);
+  this.table._forEachColumn('aggrFinish', aggregateRow);
 
   this.aggregateRow = aggregateRow;
 };
