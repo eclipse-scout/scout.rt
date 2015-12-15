@@ -134,7 +134,6 @@ public class NotificationDispatcherTest {
    */
   private void waitForPendingNotifications(ClientNotificationDispatcher dispatcher) {
     final Set<IFuture<?>> futures = dispatcher.getPendingNotifications();
-    // TODO [5.2] jgu: how long to wait? Is this method still in use?
     Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
         .andMatchFuture(futures)
         .andMatchNotFuture(IFuture.CURRENT.get())
