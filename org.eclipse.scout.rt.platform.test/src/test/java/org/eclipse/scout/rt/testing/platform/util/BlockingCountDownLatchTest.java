@@ -41,11 +41,11 @@ public class BlockingCountDownLatchTest {
     s_executor.shutdown();
   }
 
-  @Test
+  @Test(timeout = 10000)
   public void test() throws InterruptedException {
     final Set<String> protocol = Collections.synchronizedSet(new HashSet<String>());
 
-    final BlockingCountDownLatch testee = new BlockingCountDownLatch(3);
+    final BlockingCountDownLatch testee = new BlockingCountDownLatch(4);
     final CountDownLatch latch = new CountDownLatch(3);
 
     s_executor.schedule(new Callable<Void>() {
