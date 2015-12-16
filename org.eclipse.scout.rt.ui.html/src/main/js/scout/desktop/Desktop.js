@@ -666,11 +666,47 @@ scout.Desktop.prototype.glassPaneTargets = function() {
     .not('.notifications')); // exclude notification box like 'connection interrupted' to be locked
 
   // When a popup-window is opened its container must also be added to the result
-  this.formController._popupWindows.forEach(function(popupWindow) {
-    glassPaneTargets.push(popupWindow.$container[0]);
-  });
+  this._pushPopupWindowGlassPaneTargets(glassPaneTargets);
 
   return glassPaneTargets;
+};
+
+/**
+ * This 'deferred' object is used because popup windows are not immediately usable when they're opened.
+ * That's why we must render the glass-pane of a popup window later. Which means, at the point in time
+ * when its $container is created and ready for usage. To avoid race conditions we must also wait until
+ * the glass pane renderer is ready. Only when both conditions are fullfilled, we can render the glass
+ * pane.
+ */
+scout.Desktop.prototype._deferredGlassPaneTarget = function(popupWindow) {
+  var deferred = {
+    $glassPaneTarget: null,  // set by PopupWindow
+    glassPaneRenderer: null, // set by GlassPaneRenderer,
+    popupReady: function($glassPaneTarget) {
+      this.$glassPaneTarget = $glassPaneTarget;
+      this.renderWhenReady();
+    },
+    rendererReady: function(glassPaneRenderer) {
+      this.glassPaneRenderer = glassPaneRenderer;
+      this.renderWhenReady();
+    },
+    renderWhenReady: function() {
+      if (this.glassPaneRenderer && this.$glassPaneTarget) {
+        this.glassPaneRenderer.renderGlassPane(this.$glassPaneTarget[0]);
+      }
+    }
+  };
+  popupWindow.events.one('initialized', function() {
+    deferred.popupReady(popupWindow.$container);
+  });
+  return deferred;
+};
+
+scout.Desktop.prototype._pushPopupWindowGlassPaneTargets = function(glassPaneTargets) {
+  this.formController._popupWindows.forEach(function(popupWindow) {
+    glassPaneTargets.push(popupWindow.initialized ?
+      popupWindow.$container[0] : this._deferredGlassPaneTarget(popupWindow));
+  }, this);
 };
 
 /**

@@ -20,30 +20,38 @@ scout.GlassPaneRenderer = function(session, element, enabled) {
 };
 
 scout.GlassPaneRenderer.prototype.renderGlassPanes = function() {
-  var $glassPane;
   this.findGlassPaneTargets().forEach(function(glassPaneTarget) {
-    // Render glasspanes onto glasspane targets.
-    $glassPane = $(glassPaneTarget)
-      .appendDiv('glasspane')
-      .on('mousedown', this._onMousedown.bind(this));
-
-    // Glasspanes in popup-windows must be visible, otherwise the user cannot recognize that the popup
-    // is blocked, since the element that blocks (e.g a message-box) may be opened in the main-window.
-    if ($glassPane.window(true).popupWindow) {
-      $glassPane.addClass('dark');
+    if (glassPaneTarget.hasOwnProperty('glassPaneRenderer')) { // FIXME AWE: make class, use instanceof
+      glassPaneTarget.rendererReady(this);
+    } else {
+      this.renderGlassPane(glassPaneTarget);
     }
-
-    this._$glassPanes.push($glassPane);
-    this._$glassPaneTargets.push(glassPaneTarget);
-
-    // Register 'glassPaneTarget' in focus manager.
-    this.session.focusManager.registerGlassPaneTarget(glassPaneTarget);
-
   }, this);
 };
 
+scout.GlassPaneRenderer.prototype.renderGlassPane = function(glassPaneTarget) {
+  var $glassPane;
+
+  // Render glasspanes onto glasspane targets.
+  $glassPane = $(glassPaneTarget)
+    .appendDiv('glasspane')
+    .on('mousedown', this._onMousedown.bind(this));
+
+  // Glasspanes in popup-windows must be visible, otherwise the user cannot recognize that the popup
+  // is blocked, since the element that blocks (e.g a message-box) may be opened in the main-window.
+  if ($glassPane.window(true).popupWindow) {
+    $glassPane.addClass('dark');
+  }
+
+  this._$glassPanes.push($glassPane);
+  this._$glassPaneTargets.push(glassPaneTarget);
+
+  // Register 'glassPaneTarget' in focus manager.
+  this.session.focusManager.registerGlassPaneTarget(glassPaneTarget);
+};
+
 scout.GlassPaneRenderer.prototype.removeGlassPanes = function() {
-  // Remove glasspanes
+  // Remove glass-panes
   this._$glassPanes.forEach(function($glassPane) {
     $glassPane.remove();
   });

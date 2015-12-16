@@ -13,6 +13,7 @@ scout.PopupWindow = function(myWindow, form) { // use 'myWindow' in place of 'wi
   this.form = form;
   this.session = form.session;
   this.events = new scout.EventSupport();
+  this.initialized = false;
   this.$container;
   this.htmlComp;
 
@@ -88,6 +89,10 @@ scout.PopupWindow.prototype._onReady = function() {
 
   // Delegate uncaught JavaScript errors in the popup-window to the main-window
   this.myWindow.onerror = this.myWindow.opener.onerror;
+
+  // Finally set initialized flag to true, at this point the PopupWindow is fully initialized
+  this.initialized = true;
+  this.events.trigger('initialized');
 };
 
 // Note: currently _onResize is only called when the window is resized, but not when the position of the window changes.

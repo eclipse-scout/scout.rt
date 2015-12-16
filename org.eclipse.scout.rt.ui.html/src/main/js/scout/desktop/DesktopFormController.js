@@ -134,9 +134,10 @@ scout.DesktopFormController.prototype._removePopupWindow = function(form) {
   if (!popupWindow) {
     throw new Error('Form has no popupWindow reference');
   }
+  delete form.popupWindow;
+  scout.arrays.remove(this._popupWindows, popupWindow); // FIXME AWE: (2nd screen) spec this!
   if (form.rendered) {
     form.remove();
     popupWindow.close();
-    delete form.popupWindow;
   }
 };
