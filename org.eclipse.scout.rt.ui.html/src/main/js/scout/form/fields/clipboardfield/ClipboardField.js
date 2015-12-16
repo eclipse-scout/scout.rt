@@ -31,21 +31,6 @@ scout.ClipboardField.prototype._render = function($parent) {
   this.addField($parent.makeElement('<div>'));
   this.addStatus();
 
-  // add drag and drop support
-  this.dragAndDropHandler = scout.dragAndDrop.handler(this,
-    scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER,
-    function() {
-      return this.dropType;
-    }.bind(this),
-    function() {
-      return this.maximumSize;
-    }.bind(this),
-    undefined,
-    function() {
-      return this.allowedMimeTypes;
-    }.bind(this));
-  this.dragAndDropHandler.install(this.$field);
-
   this.$field
     .attr('contenteditable', 'true')
     .attr('tabindex', '0')
@@ -60,6 +45,27 @@ scout.ClipboardField.prototype._render = function($parent) {
   if (this.rendered) {
     this.session.focusManager.requestFocus(this.$field);
   }
+};
+
+scout.ClipboardField.prototype._renderProperties = function() {
+  scout.ClipboardField.parent.prototype._renderProperties.call(this);
+
+  this._renderDropType();
+};
+
+scout.ClipboardField.prototype._createDragAndDropHandler = function() {
+  return scout.dragAndDrop.handler(this, {
+    supportedScoutTypes: scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER,
+    dropType: function() {
+      return this.dropType;
+    }.bind(this),
+    dropMaximumSize: function() {
+      return this.maximumSize;
+    }.bind(this),
+    allowedTypes: function() {
+      return this.allowedMimeTypes;
+    }.bind(this)
+  });
 };
 
 scout.ClipboardField.prototype._renderDisplayText = function(displayText) {

@@ -117,56 +117,67 @@ scout.dragAndDrop = {
     return false;
   },
 
-  handler: function(that, supportedScoutTypesArray, dropTypeCallback, dropMaximumSizeCallback, additionalDropPropertiesCallback, allowedTypesCallback) {
-    supportedScoutTypesArray = scout.arrays.ensure(supportedScoutTypesArray);
+  handler: function(target, options) {
+    options = options || {};
+    options.target = target;
+    return new scout.DragAndDropHandler(options);
+  }
+};
 
-    // create handler
-    var handlerInternal = {
-      install: function(element) {
-        element.on('dragenter', handlerInternal.onDragEnter)
-          .on('dragover', handlerInternal.onDragOver)
-          .on('drop', handlerInternal.onDrop);
-      },
+scout.DragAndDropHandler = function(options) {
+  options = options || {};
+  $.extend(this, options);
+  this.supportedScoutTypes = scout.arrays.ensure(options.supportedScoutTypes);
 
-      onDragEnter: function(event) {
-        handlerInternal.onDragEnterOrOver(event);
-      },
+  this._onDragEnterHandler = this._onDragEnter.bind(this);
+  this._onDragOverHandler = this._onDragOver.bind(this);
+  this._onDropHandler = this._onDrop.bind(this);
+};
 
-      onDragOver: function(event) {
-        handlerInternal.onDragEnterOrOver(event);
-      },
+scout.DragAndDropHandler.prototype.install = function($element, selector) {
+  if (this.$element) {
+    throw new Error('Already installed.');
+  }
+  this.selector = selector;
+  this.$element = $element;
+  this.$element.on('dragenter', this.selector, this._onDragEnterHandler)
+    .on('dragover', this.selector, this._onDragOverHandler)
+    .on('drop', this.selector, this._onDropHandler);
+};
 
-      onDragEnterOrOver: function(event) {
-        scout.dragAndDrop.verifyDataTransferTypesScoutTypes(event, handlerInternal.supportedScoutTypesArray, handlerInternal.dropType());
-      },
+scout.DragAndDropHandler.prototype.uninstall = function() {
+  this.$element.off('dragenter', this.selector, this._onDragEnterHandler)
+    .off('dragover', this.selector, this._onDragOverHandler)
+    .off('drop', this.selector, this._onDropHandler);
+  this.$element = null;
+  this.selector = null;
+};
 
-      onDrop: function(event) {
-        if (handlerInternal.supportedScoutTypesArray.indexOf(scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER) >= 0 &&
-          handlerInternal.dropType() & scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER === scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER &&
-          scout.dragAndDrop.dataTransferTypesContainsScoutTypes(event.originalEvent.dataTransfer, scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER)) {
-          event.stopPropagation();
-          event.preventDefault();
+scout.DragAndDropHandler.prototype._onDragEnter = function(event) {
+  this._onDragEnterOrOver(event);
+};
 
-          var files = event.originalEvent.dataTransfer.files;
-          if (files.length >= 1) {
-            that.session.uploadFiles(that, files,
-              handlerInternal.additionalDropProperties ? handlerInternal.additionalDropProperties(event) : undefined,
-              handlerInternal.dropSize ? handlerInternal.dropSize() : undefined,
-              handlerInternal.allowedTypes ? handlerInternal.allowedTypes() : undefined);
-          }
-        }
-      }
-    };
+scout.DragAndDropHandler.prototype._onDragOver = function(event) {
+  this._onDragEnterOrOver(event);
+};
 
-    // set handler properties (some are functions)
-    handlerInternal.that = that;
-    handlerInternal.supportedScoutTypesArray = supportedScoutTypesArray;
-    handlerInternal.dropType = dropTypeCallback;
-    handlerInternal.dropSize = dropMaximumSizeCallback;
-    handlerInternal.additionalDropProperties = additionalDropPropertiesCallback;
-    handlerInternal.allowedTypes = allowedTypesCallback;
+scout.DragAndDropHandler.prototype._onDragEnterOrOver = function(event) {
+  scout.dragAndDrop.verifyDataTransferTypesScoutTypes(event, this.supportedScoutTypes, this.dropType());
+};
 
-    // return handler
-    return handlerInternal;
+scout.DragAndDropHandler.prototype._onDrop = function(event) {
+  if (this.supportedScoutTypes.indexOf(scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER) >= 0 &&
+    this.dropType() & scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER === scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER &&
+    scout.dragAndDrop.dataTransferTypesContainsScoutTypes(event.originalEvent.dataTransfer, scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER)) {
+    event.stopPropagation();
+    event.preventDefault();
+
+    var files = event.originalEvent.dataTransfer.files;
+    if (files.length >= 1) {
+      this.target.session.uploadFiles(this.target, files,
+        this.additionalDropProperties ? this.additionalDropProperties(event) : undefined,
+        this.dropSize ? this.dropSize() : undefined,
+        this.allowedTypes ? this.allowedTypes() : undefined);
+    }
   }
 };

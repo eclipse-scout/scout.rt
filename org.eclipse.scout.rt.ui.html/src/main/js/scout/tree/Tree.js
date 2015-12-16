@@ -162,24 +162,6 @@ scout.Tree.prototype._render = function($parent) {
   });
   this._installNodeTooltipSupport();
   this.menuBar.render(this.$container);
-
-  // add drag and drop support
-  this.dragAndDropHandler = scout.dragAndDrop.handler(this,
-    scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER,
-    function() {
-      return this.dropType;
-    }.bind(this),
-    function() {
-      return this.dropMaximumSize;
-    }.bind(this),
-    function(event) {
-      var target = event.currentTarget;
-      return {
-        'nodeId': (target.classList.contains('tree-node') ? $(target).data('node').id : '')
-      };
-    }.bind(this));
-  this.dragAndDropHandler.install(this.$data);
-
   this._addNodes(this.nodes);
 };
 
@@ -202,6 +184,7 @@ scout.Tree.prototype._renderProperties = function() {
   this._renderEnabled();
   this._renderMenus();
   this._renderBreadcrumbEnabled();
+  this._renderDropType();
 };
 
 scout.Tree.prototype._addNodes = function(nodes, $parent, $predecessor) {
@@ -353,7 +336,6 @@ scout.Tree.prototype._decorateNode = function(node) {
   }
   this._renderNodeFilterAccepted(node);
 
-  this.dragAndDropHandler.install($node);
   // TODO [5.2] bsh: More attributes...
   // iconId
 
@@ -657,6 +639,49 @@ scout.Tree.prototype._removeSelection = function() {
       }
     }
   }, this);
+};
+
+scout.Tree.prototype._renderDropType = function() {
+  if (this.dropType) {
+    this._installDragAndDropHandler();
+  } else {
+    this._uninstallDragAndDropHandler();
+  }
+};
+
+scout.Tree.prototype._installDragAndDropHandler = function(event) {
+  if (this.dragAndDropHandler) {
+    return;
+  }
+  this.dragAndDropHandler = scout.dragAndDrop.handler(this, {
+    supportedScoutTypes: scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER,
+    dropType: function() {
+      return this.dropType;
+    }.bind(this),
+    dropMaximumSize: function() {
+      return this.dropMaximumSize;
+    }.bind(this),
+    additionalDropProperties: function(event) {
+      var $target = $(event.currentTarget);
+      var properties = {
+        nodeId: ''
+      };
+      if ($target.hasClass('tree-node')) {
+        var node = $target.data('node');
+        properties.nodeId = node.id;
+      }
+      return properties;
+    }.bind(this)
+  });
+  this.dragAndDropHandler.install(this.$container, '.tree-data,.tree-node');
+};
+
+scout.Tree.prototype._uninstallDragAndDropHandler = function(event) {
+  if (!this.dragAndDropHandler) {
+    return;
+  }
+  this.dragAndDropHandler.uninstall();
+  this.dragAndDropHandler = null;
 };
 
 scout.Tree.prototype._updateMarkChildrenChecked = function(node, init, checked, checkChildrenChecked) {

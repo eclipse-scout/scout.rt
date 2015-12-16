@@ -517,7 +517,7 @@ scout.FormField.prototype.addStatus = function() {
  * This makes it possible to make components without a status as width as components with a status.
  */
 scout.FormField.prototype.addPseudoStatus = function() {
-  this.$pseudoStatus =  this.$container.appendSpan('status');
+  this.$pseudoStatus = this.$container.appendSpan('status');
 };
 
 scout.FormField.prototype.addMandatoryIndicator = function() {
@@ -623,4 +623,40 @@ scout.FormField.prototype.prepareForCellEdit = function(opts) {
       this.$field.addClass('first');
     }
   }
+};
+
+scout.FormField.prototype._renderDropType = function() {
+  if (this.dropType) {
+    this._installDragAndDropHandler();
+  } else {
+    this._uninstallDragAndDropHandler();
+  }
+};
+
+scout.FormField.prototype._createDragAndDropHandler = function() {
+  return scout.dragAndDrop.handler(this, {
+    supportedScoutTypes: scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER,
+    dropType: function() {
+      return this.dropType;
+    }.bind(this),
+    dropMaximumSize: function() {
+      return this.dropMaximumSize;
+    }.bind(this)
+  });
+};
+
+scout.FormField.prototype._installDragAndDropHandler = function(event) {
+  if (this.dragAndDropHandler) {
+    return;
+  }
+  this.dragAndDropHandler = this._createDragAndDropHandler();
+  this.dragAndDropHandler.install(this.$field);
+};
+
+scout.FormField.prototype._uninstallDragAndDropHandler = function(event) {
+  if (!this.dragAndDropHandler) {
+    return;
+  }
+  this.dragAndDropHandler.uninstall();
+  this.dragAndDropHandler = null;
 };

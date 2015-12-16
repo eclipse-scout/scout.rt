@@ -1136,7 +1136,7 @@ describe("Table", function() {
       table._updateRows([row]);
       expect(find$aggregateRows(table).length).toBe(2);
       expect(table._aggregateRows.length).toBe(2);
-      assertGroupingProperty(table, 0);'
+      assertGroupingProperty(table, 0);
       assertGroupingValues(table, column3, ['18', '26']);
       assertGroupingValues(table, column4, ['44', '78']);
     });
@@ -2202,38 +2202,6 @@ describe("Table", function() {
 
       it("silently updates rows which are not in view range", function() {
         table.viewRangeSize = 1;
-        table.render(session.$entryPoint);
-        expect(table.viewRangeRendered).toEqual(new scout.Range(0, 1));
-        expect(table.$rows().length).toBe(1);
-        expect(table.rows.length).toBe(2);
-        var $rows = table.$rows();
-        var $cells0 = table.$cellsForRow($rows.eq(0));
-        expect($cells0.eq(0).text()).toBe('cellText0');
-
-        var row0 = {
-          id: table.rows[0].id,
-          cells: ['newRow0Cell0', 'newRow0Cell1']
-        };
-        var row1 = {
-          id: table.rows[1].id,
-          cells: ['newRow1Cell0', 'newRow1Cell1']
-        };
-        table._updateRows([row0, row1]);
-
-        // only row 0 is rendered but both rows need to be updated
-        $rows = table.$rows();
-        expect($rows.length).toBe(1);
-        $cells0 = table.$cellsForRow($rows.eq(0));
-        expect($cells0.eq(0).text()).toBe('newRow0Cell0');
-        expect($cells0.eq(1).text()).toBe('newRow0Cell1');
-        expect(table.rows[0].cells[0].text).toBe('newRow0Cell0');
-        expect(table.rows[0].cells[1].text).toBe('newRow0Cell1');
-        expect(table.rows[1].cells[0].text).toBe('newRow1Cell0');
-        expect(table.rows[1].cells[1].text).toBe('newRow1Cell1');
-      });
-
-      it("silently updates rows which are not in view range", function() {
-        table.viewRangeSize = 2;
         table.render(session.$entryPoint);
         expect(table.viewRangeRendered).toEqual(new scout.Range(0, 1));
         expect(table.$rows().length).toBe(1);

@@ -55,17 +55,6 @@ scout.StringField.prototype._render = function($parent) {
   }
   $field.on('blur', this._onFieldBlur.bind(this));
 
-  // add drag and drop support
-  this.dragAndDropHandler = scout.dragAndDrop.handler(this,
-    scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER,
-    function() {
-      return this.dropType;
-    }.bind(this),
-    function() {
-      return this.dropMaximumSize;
-    }.bind(this));
-  this.dragAndDropHandler.install($field);
-
   this.addField($field);
   this.addStatus();
 };
@@ -82,6 +71,7 @@ scout.StringField.prototype._renderProperties = function() {
   this._renderSelectionStart();
   this._renderSelectionEnd();
   this._renderSelectionTrackingEnabled();
+  this._renderDropType();
 };
 
 scout.StringField.prototype._renderMaxLength = function(maxLength0) {

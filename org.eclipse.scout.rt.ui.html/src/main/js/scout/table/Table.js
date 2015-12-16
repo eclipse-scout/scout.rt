@@ -243,22 +243,6 @@ scout.Table.prototype._render = function($parent) {
   this._installCellTooltipSupport();
   this.menuBar.render(this.$container);
 
-  this.dragAndDropHandler = scout.dragAndDrop.handler(this,
-    scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER,
-    function() {
-      return this.dropType;
-    }.bind(this),
-    function() {
-      return this.dropMaximumSize;
-    }.bind(this),
-    function(event) {
-      var row = this._rowAtY(event.originalEvent.pageY);
-      return {
-        'rowId': (row ? row.id : '')
-      };
-    }.bind(this));
-  this.dragAndDropHandler.install(this.$data);
-
   // layout bugfix for IE9 (and maybe other browsers)
   if (scout.device.tableAdditionalDivRequired) {
     // determine @table-cell-padding-left and @table-cell-padding-right (actually the sum)
@@ -378,7 +362,7 @@ scout.Table.prototype._remove = function() {
   this.footer = null;
   this._removeAggregateRows();
   this._uninstallCellTooltipSupport();
-  this.viewRangeRendered = new scout.Range(0, 0);
+  this._removeRows();
   this.$fillBefore = null;
   this.$fillAfter = null;
   scout.Table.parent.prototype._remove.call(this);
@@ -409,6 +393,15 @@ scout.Table.prototype._syncTableControls = function(controls) {
       this.keyStrokeContext.registerKeyStroke(this.tableControls[i]);
     }
   }
+};
+
+scout.Table.prototype._onDataScroll = function() {
+  var scrollTop = this.$data[0].scrollTop;
+  if (this.scrollTop === scrollTop) {
+    return;
+  }
+  this._renderViewport();
+  this.scrollTop = scrollTop;
 };
 
 /**
@@ -1154,7 +1147,6 @@ scout.Table.prototype._removeRow = function(row) {
   }
 };
 
-
 /**
  * Animates the rendering of a row by setting it to invisible before doing a slideDown animation. The row needs to already be rendered.
  */
@@ -1288,25 +1280,6 @@ scout.Table.prototype._columnAtX = function(x) {
     column = this.columns[this.columns.length - 1];
   }
   return column;
-};
-
-/**
- * @returns the row at position y (e.g. from event.pageY)
- */
-scout.Table.prototype._rowAtY = function(y) {
-  var rowOffsetBottom = 0,
-    rowOffsetTop = this.$data.offset().top,
-    scrollTop = this.$data.scrollTop();
-
-  rowOffsetTop -= scrollTop;
-  //FIXME CGU delete? or fix
-  return scout.arrays.find(this.rows, function(row) {
-    rowOffsetBottom = rowOffsetTop + row.$row.height();
-    if (rowOffsetTop >= 0 && y >= rowOffsetTop && y < rowOffsetBottom) {
-      return true;
-    }
-    rowOffsetTop = rowOffsetBottom;
-  });
 };
 
 scout.Table.prototype._find$AppLink = function(event) {
@@ -2993,13 +2966,47 @@ scout.Table.prototype._renderAutoResizeColumns = function() {
   }
 };
 
-scout.Table.prototype._onDataScroll = function() {
-  var scrollTop = this.$data[0].scrollTop;
-  if (this.scrollTop === scrollTop) {
+scout.Table.prototype._renderDropType = function() {
+  if (this.dropType) {
+    this._installDragAndDropHandler();
+  } else {
+    this._uninstallDragAndDropHandler();
+  }
+};
+
+scout.Table.prototype._installDragAndDropHandler = function(event) {
+  if (this.dragAndDropHandler) {
     return;
   }
-  this._renderViewport();
-  this.scrollTop = scrollTop;
+  this.dragAndDropHandler = scout.dragAndDrop.handler(this, {
+    supportedScoutTypes: scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER,
+    dropType: function() {
+      return this.dropType;
+    }.bind(this),
+    dropMaximumSize: function() {
+      return this.dropMaximumSize;
+    }.bind(this),
+    additionalDropProperties: function(event) {
+      var $target = $(event.currentTarget);
+      var properties = {
+        rowId: ''
+      };
+      if ($target.hasClass('table-row')) {
+        var row = $target.data('row');
+        properties.rowId = row.id;
+      }
+      return properties;
+    }.bind(this)
+  });
+  this.dragAndDropHandler.install(this.$container, '.table-data,.table-row');
+};
+
+scout.Table.prototype._uninstallDragAndDropHandler = function(event) {
+  if (!this.dragAndDropHandler) {
+    return;
+  }
+  this.dragAndDropHandler.uninstall();
+  this.dragAndDropHandler = null;
 };
 
 /**
