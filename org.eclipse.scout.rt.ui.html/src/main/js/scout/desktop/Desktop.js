@@ -696,7 +696,7 @@ scout.Desktop.prototype._deferredGlassPaneTarget = function(popupWindow) {
       }
     }
   };
-  popupWindow.events.one('initialized', function() {
+  popupWindow.one('initialized', function() {
     deferred.popupReady(popupWindow.$container);
   });
   return deferred;

@@ -132,6 +132,10 @@ scout.PopupWindow.prototype.isClosed = function() {
   return this.myWindow.closed;
 };
 
+scout.PopupWindow.prototype.one = function(type, func) {
+  this.events.one(type, func);
+};
+
 scout.PopupWindow.prototype.close = function() {
   this.myWindow.close();
 };
