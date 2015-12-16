@@ -11,12 +11,15 @@
 scout.DesktopFormController = function(displayParent, session) {
   scout.DesktopFormController.parent.call(this, displayParent, session);
   this._popupWindows = [];
+  this._documentPopupWindowReadyHandler = this._onDocumentPopupWindowReady.bind(this);
 
   // must use a document-event, since when popup-window is reloading it does
   // only know the opener of its own window (and nothing about Scout).
-  $(document).on('popupWindowReady', this._onDocumentPopupWindowReady.bind(this));
+  $(document).on('popupWindowReady', this._documentPopupWindowReadyHandler);
 };
 scout.inherits(scout.DesktopFormController, scout.FormController);
+
+scout.DesktopFormController.instanceCounter = 0;
 
 /**
  * @override FormController.js
@@ -135,9 +138,13 @@ scout.DesktopFormController.prototype._removePopupWindow = function(form) {
     throw new Error('Form has no popupWindow reference');
   }
   delete form.popupWindow;
-  scout.arrays.remove(this._popupWindows, popupWindow); // FIXME AWE: (2nd screen) spec this!
+  scout.arrays.remove(this._popupWindows, popupWindow);
   if (form.rendered) {
     form.remove();
     popupWindow.close();
   }
+};
+
+scout.DesktopFormController.prototype.dispose = function() {
+  $(document).off('popupWindowReady', this._documentPopupWindowReadyHandler);
 };
