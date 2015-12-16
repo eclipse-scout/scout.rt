@@ -670,11 +670,7 @@ scout.Session.prototype.uploadFiles = function(target, files, uploadProperties, 
   $.each(files, function(index, value) {
     if (!allowedTypes || allowedTypes.length === 0 || scout.isOneOf(value.type, allowedTypes)) {
       totalSize += value.size;
-      var filename = value.name;
-      if (!filename) {
-        filename = scout.mimeTypes.getDefaultFilename(value.type, '-' + scout.dates.timestamp());
-      }
-      formData.append('files', value, filename);
+      formData.append('files', value, value.name || '');
     }
   }.bind(this));
 
