@@ -23,14 +23,15 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PrivilegedAction;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public final class SandboxClassLoaderBuilder {
 
-  private static final Logger LOG = Logger.getLogger(SandboxClassLoaderBuilder.class.getName());
+  private static final Logger LOG = LoggerFactory.getLogger(SandboxClassLoaderBuilder.class);
 
   private static final int ANY_SIZE = 10240;
 
@@ -119,7 +120,7 @@ public final class SandboxClassLoaderBuilder {
           // sha1 hash of existing file doesn't match
           // use newly created temporary file as fallback
           File f = File.createTempFile("jar-sandbox-", name);
-          LOG.log(Level.SEVERE, "Target file " + targetFile.getAbsolutePath() + " already exists but has wrong sha1 hash [" + targetFileSha1 + "]. Using new temporary file instead " + f.getAbsolutePath() + " [" + sha1 + "].");
+          LOG.error("Target file '{}' already exists but has wrong sha1 hash [{}]. Using new temporary file instead '{}' [{}].", targetFile.getAbsolutePath(), targetFileSha1, f.getAbsolutePath(), sha1);
           targetFile = f;
           targetFile.deleteOnExit();
           writeContent(url, targetFile);
