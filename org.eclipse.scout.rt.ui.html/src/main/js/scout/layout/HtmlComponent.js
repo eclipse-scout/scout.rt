@@ -283,5 +283,5 @@ scout.HtmlComponent.get = function($comp) {
  * @memberOf scout.HtmlComponent
  */
 scout.HtmlComponent.optGet = function($comp) {
-  return $comp.data('htmlComponent');
+  return $comp && $comp.data('htmlComponent');
 };
