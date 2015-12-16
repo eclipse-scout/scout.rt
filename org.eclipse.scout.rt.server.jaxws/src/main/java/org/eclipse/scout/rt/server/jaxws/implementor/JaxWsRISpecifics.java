@@ -14,8 +14,10 @@ import java.io.Closeable;
 import java.lang.reflect.Proxy;
 
 import javax.annotation.PostConstruct;
+import javax.xml.ws.handler.MessageContext;
 
 import org.eclipse.scout.rt.platform.exception.PlatformException;
+import org.eclipse.scout.rt.server.jaxws.provider.auth.handler.WebServiceRequestRejectedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,8 +34,8 @@ public class JaxWsRISpecifics extends JaxWsImplementorSpecifics {
   @PostConstruct
   protected void initConfig() {
     super.initConfig();
-    m_properties.put(PROP_SOCKET_CONNECT_TIMEOUT, "com.sun.xml.internal.ws.connect.timeout");
-    m_properties.put(PROP_SOCKET_READ_TIMEOUT, "com.sun.xml.internal.ws.request.timeout");
+    m_implementorContextProperties.put(PROP_SOCKET_CONNECT_TIMEOUT, "com.sun.xml.internal.ws.connect.timeout"); // com.sun.xml.internal.ws.developer.JAXWSProperties.CONNECT_TIMEOUT
+    m_implementorContextProperties.put(PROP_SOCKET_READ_TIMEOUT, "com.sun.xml.internal.ws.request.timeout"); // com.sun.xml.internal.ws.developer.JAXWSProperties.REQUEST_TIMEOUT
   }
 
   @Override
@@ -61,5 +63,11 @@ public class JaxWsRISpecifics extends JaxWsImplementorSpecifics {
     catch (final Throwable e) {
       LOG.error("Failed to close Socket for: {}", operation, e);
     }
+  }
+
+  @Override
+  public void interceptWebServiceRequestRejected(final MessageContext messageContext, final int httpStatusCode) throws WebServiceRequestRejectedException {
+    // SECURITY: Exit with an exception because JAX-WS METRO (v2.2.10) does not exit call chain upon returning 'false' for one-way communication requests.
+    throw new WebServiceRequestRejectedException(httpStatusCode);
   }
 }

@@ -22,6 +22,7 @@ import javax.xml.namespace.QName;
 import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.handler.soap.SOAPHandler;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
+import javax.xml.ws.http.HTTPException;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
@@ -29,6 +30,8 @@ import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunContextProducer;
 import org.eclipse.scout.rt.platform.context.RunWithRunContext;
 import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
+import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
+import org.eclipse.scout.rt.platform.exception.PlatformExceptionTranslator;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.server.commons.authentication.ICredentialVerifier;
 import org.eclipse.scout.rt.server.commons.authentication.IPrincipalProducer;
@@ -39,8 +42,6 @@ import org.eclipse.scout.rt.server.jaxws.implementor.JaxWsImplementorSpecifics;
 import org.eclipse.scout.rt.server.jaxws.provider.annotation.Authentication;
 import org.eclipse.scout.rt.server.jaxws.provider.annotation.ClazzUtil;
 import org.eclipse.scout.rt.server.jaxws.provider.auth.method.IAuthenticationMethod;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * <code>SOAPHandler</code> used to authenticate webservice requests based on the configured <i>Authentication
@@ -59,8 +60,6 @@ import org.slf4j.LoggerFactory;
  */
 public class AuthenticationHandler implements SOAPHandler<SOAPMessageContext> {
 
-  private static final Logger LOG = LoggerFactory.getLogger(AuthenticationHandler.class);
-
   protected static final Subject CREDENTIAL_AUTH_SUBJECT = CONFIG.getPropertyValue(JaxWsAuthenticatorSubjectProperty.class);
 
   protected IAuthenticationMethod m_authenticationMethod; // Strategy to do authentication.
@@ -69,6 +68,8 @@ public class AuthenticationHandler implements SOAPHandler<SOAPMessageContext> {
 
   protected RunContextProducer m_authRunContextProducer; // RunContext to run authentication.
   protected RunContextProducer m_runContextProducer; // RunContext to run subsequent handlers and the port type invocation.
+
+  private final JaxWsImplementorSpecifics m_implementorSpecifics = BEANS.get(JaxWsImplementorSpecifics.class);
 
   /**
    * Use this constructor if installing an authentication handler yourself. That allows for dynamic instrumentation of
@@ -129,12 +130,40 @@ public class AuthenticationHandler implements SOAPHandler<SOAPMessageContext> {
         return true;
       }
 
+      // Ensure HTTP status code to be set.
+      final int httpStatusCode;
+      final Integer currentHttpResponseCode = m_implementorSpecifics.getHttpResponseCode(messageContext);
+      if (currentHttpResponseCode != null) {
+        httpStatusCode = currentHttpResponseCode.intValue();
+      }
+      else {
+        httpStatusCode = HttpServletResponse.SC_FORBIDDEN;
+        m_implementorSpecifics.setHttpResponseCode(messageContext, httpStatusCode);
+      }
+
+      m_implementorSpecifics.interceptWebServiceRequestRejected(messageContext, httpStatusCode);
       return false;
     }
-    catch (final Exception e) {
-      LOG.error("Unexpected while authenticating webservice request.", e);
-      BEANS.get(JaxWsImplementorSpecifics.class).setHttpResponseCode(messageContext, HttpServletResponse.SC_INTERNAL_SERVER_ERROR); // do not send cause to the client
-      return false;
+    catch (final WebServiceRequestRejectedException e) {
+      throw new HTTPException(e.getHttpStatusCode());
+    }
+    catch (final Throwable t) {
+      m_implementorSpecifics.setHttpResponseCode(messageContext, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+
+      // Log exception with information about the webservice request associated.
+      BEANS.get(ExceptionHandler.class).handle(BEANS.get(PlatformExceptionTranslator.class).translate(t)
+          .withContextInfo("service", messageContext.get(SOAPMessageContext.WSDL_SERVICE))
+          .withContextInfo("port", messageContext.get(SOAPMessageContext.WSDL_PORT))
+          .withContextInfo("operation", messageContext.get(SOAPMessageContext.WSDL_OPERATION)));
+
+      try {
+        m_implementorSpecifics.interceptWebServiceRequestRejected(messageContext, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+      }
+      catch (final WebServiceRequestRejectedException e) {
+        throw new HTTPException(e.getHttpStatusCode()); // SECURITY: Do not propagate cause to the caller.
+      }
+
+      return false; // SECURITY: Do not propagate cause to the caller.
     }
   }
 

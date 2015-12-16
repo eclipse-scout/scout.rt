@@ -34,9 +34,9 @@ public class JaxWsCxfSpecifics extends JaxWsImplementorSpecifics {
   @PostConstruct
   protected void initConfig() {
     super.initConfig();
-    m_properties.put(PROP_HTTP_RESPONSE_CODE, "org.apache.cxf.message.Message.RESPONSE_CODE");
-    m_properties.put(PROP_SOCKET_CONNECT_TIMEOUT, "javax.xml.ws.client.connectionTimeout");
-    m_properties.put(PROP_SOCKET_READ_TIMEOUT, "javax.xml.ws.client.receiveTimeout");
+    m_implementorContextProperties.put(PROP_HTTP_RESPONSE_CODE, "org.apache.cxf.message.Message.RESPONSE_CODE");
+    m_implementorContextProperties.put(PROP_SOCKET_CONNECT_TIMEOUT, "javax.xml.ws.client.connectionTimeout");
+    m_implementorContextProperties.put(PROP_SOCKET_READ_TIMEOUT, "javax.xml.ws.client.receiveTimeout");
   }
 
   @Override

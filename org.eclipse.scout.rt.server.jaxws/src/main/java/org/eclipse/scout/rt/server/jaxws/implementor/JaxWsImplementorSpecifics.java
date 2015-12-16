@@ -15,12 +15,14 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
+import javax.xml.ws.handler.Handler;
 import javax.xml.ws.handler.MessageContext;
+import javax.xml.ws.http.HTTPException;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.Replace;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.server.jaxws.provider.auth.handler.WebServiceRequestRejectedException;
 
 /**
  * This class encapsulates functionality as defined by JAX-WS JSR 224 but may divergence among JAX-WS implementations.
@@ -37,15 +39,15 @@ public class JaxWsImplementorSpecifics {
   public static final String PROP_SOCKET_CONNECT_TIMEOUT = "org.eclipse.scout.jaxws.timeout.connect";
   public static final String PROP_SOCKET_READ_TIMEOUT = "org.eclipse.scout.jaxws.timeout.read";
 
-  protected final Map<String, String> m_properties = new HashMap<>();
+  protected final Map<String, String> m_implementorContextProperties = new HashMap<>();
 
   @PostConstruct
   protected void initConfig() {
-    m_properties.put(PROP_HTTP_REQUEST_HEADERS, MessageContext.HTTP_REQUEST_HEADERS);
-    m_properties.put(PROP_HTTP_RESPONSE_HEADERS, MessageContext.HTTP_RESPONSE_HEADERS);
-    m_properties.put(PROP_HTTP_RESPONSE_CODE, MessageContext.HTTP_RESPONSE_CODE);
-    m_properties.put(PROP_SOCKET_CONNECT_TIMEOUT, null /* implementor specific */);
-    m_properties.put(PROP_SOCKET_READ_TIMEOUT, null /* implementor specific */);
+    m_implementorContextProperties.put(PROP_HTTP_REQUEST_HEADERS, MessageContext.HTTP_REQUEST_HEADERS);
+    m_implementorContextProperties.put(PROP_HTTP_RESPONSE_HEADERS, MessageContext.HTTP_RESPONSE_HEADERS);
+    m_implementorContextProperties.put(PROP_HTTP_RESPONSE_CODE, MessageContext.HTTP_RESPONSE_CODE);
+    m_implementorContextProperties.put(PROP_SOCKET_CONNECT_TIMEOUT, null /* implementor specific */);
+    m_implementorContextProperties.put(PROP_SOCKET_READ_TIMEOUT, null /* implementor specific */);
   }
 
   /**
@@ -147,11 +149,32 @@ public class JaxWsImplementorSpecifics {
     return CollectionUtility.arrayList(CollectionUtility.getObject(headers, key));
   }
 
+  /**
+   * Returns the implementor specific property name, or throws {@link UnsupportedOperationException} if not supported by
+   * the implementor.
+   */
   protected String valueOf(final String property) {
-    final String jaxwsProperty = m_properties.get(property);
-    if (StringUtility.isNullOrEmpty(jaxwsProperty)) {
+    final String implementorContextProperty = m_implementorContextProperties.get(property);
+    if (implementorContextProperty == null) {
       throw new UnsupportedOperationException(String.format("Functionality '%s' not supported by the JAX-WS implementor '%s'", property, getClass().getSimpleName()));
     }
-    return jaxwsProperty;
+    else {
+      return implementorContextProperty;
+    }
+  }
+
+  /**
+   * Method invoked by a {@link Handler}, if the call chain should not be continued.
+   * <p>
+   * If throwing {@link WebServiceRequestRejectedException}, the handler chain is exit by throwing a
+   * {@link HTTPException}, or by returning <code>false</code> otherwise.
+   * <p>
+   * The default implementation does nothing.
+   * <p>
+   * Some JAX-WS implementors (like METRO v2.2.10) do not exit the call chain if the {@link Handler} returns with
+   * <code>false</code>. That happens for one-way communication requests. As a result, the endpoint operation is still
+   * invoked.
+   */
+  public void interceptWebServiceRequestRejected(final MessageContext messageContext, final int httpStatusCode) throws WebServiceRequestRejectedException {
   }
 }
