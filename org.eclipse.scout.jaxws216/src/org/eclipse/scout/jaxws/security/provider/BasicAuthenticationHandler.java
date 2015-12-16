@@ -22,9 +22,9 @@ import javax.xml.namespace.QName;
 import javax.xml.ws.WebServiceException;
 import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
+import javax.xml.ws.http.HTTPException;
 
 import org.eclipse.scout.commons.Base64Utility;
-import org.eclipse.scout.commons.BooleanUtility;
 import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -35,8 +35,6 @@ import org.eclipse.scout.jaxws.security.Authenticator;
 import org.eclipse.scout.jaxws.session.IServerSessionFactory;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.service.ServiceUtility;
-
-import com.sun.xml.internal.ws.client.BindingProviderProperties;
 
 /**
  * <p>
@@ -51,7 +49,6 @@ import com.sun.xml.internal.ws.client.BindingProviderProperties;
  * Sockets Layer (SSL) encryption and Transport Layer Security (TLS).
  * </p>
  */
-@SuppressWarnings("restriction")
 @ScoutTransaction
 public class BasicAuthenticationHandler implements IAuthenticationHandler {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(BasicAuthenticationHandler.class);
@@ -77,7 +74,7 @@ public class BasicAuthenticationHandler implements IAuthenticationHandler {
     if (authorizationHeader.length == 0) {
       // force consumer to include authentication information
       installAuthHeader(context);
-      return breakHandlerChain(context);
+      return breakHandlerChain(context, HttpServletResponse.SC_UNAUTHORIZED);
     }
 
     for (String headerValue : authorizationHeader) {
@@ -94,14 +91,18 @@ public class BasicAuthenticationHandler implements IAuthenticationHandler {
             }
             return true;
           }
-          return breakHandlerChain(context);
+          return breakHandlerChain(context, HttpServletResponse.SC_FORBIDDEN);
+        }
+        catch (HTTPException e) {
+          throw e;
         }
         catch (Exception e) {
           return breakHandlerChainWithException(context, e);
         }
       }
     }
-    return breakHandlerChain(context);
+
+    return breakHandlerChain(context, HttpServletResponse.SC_FORBIDDEN);
   }
 
   @Override
@@ -141,7 +142,6 @@ public class BasicAuthenticationHandler implements IAuthenticationHandler {
     basicAuthToken.add("Basic realm=\"" + getRealm() + "\"");
     httpResponseHeaders.put("WWW-Authenticate", basicAuthToken);
 
-    context.put(MessageContext.HTTP_RESPONSE_CODE, HttpServletResponse.SC_UNAUTHORIZED);
     context.put(MessageContext.HTTP_RESPONSE_HEADERS, httpResponseHeaders);
   }
 
@@ -155,15 +155,12 @@ public class BasicAuthenticationHandler implements IAuthenticationHandler {
     return (Map<String, List<String>>) context.get(MessageContext.HTTP_RESPONSE_HEADERS);
   }
 
-  protected boolean breakHandlerChain(SOAPMessageContext context) {
-    context.put(MessageContext.HTTP_RESPONSE_CODE, HttpServletResponse.SC_UNAUTHORIZED);
+  protected boolean breakHandlerChain(SOAPMessageContext context, int httpStatusCode) {
+    context.put(MessageContext.HTTP_RESPONSE_CODE, httpStatusCode);
 
-    boolean oneway = BooleanUtility.nvl((Boolean) context.get(BindingProviderProperties.ONE_WAY_OPERATION), false);
-    if (oneway) {
-      // do not just return false as in one-way communication, the chain is continued regardless of the status.
-      throw new WebServiceException("Unauthorized");
-    }
-    return false;
+    // JAX-WS METRO v2.2.10 does not exit the call chain if the Handler returns with 'false'.
+    // That happens for one-way communication requests. As a result, the endpoint operation is still invoked.
+    throw new HTTPException(httpStatusCode);
   }
 
   protected boolean breakHandlerChainWithException(SOAPMessageContext context, Exception exception) {
