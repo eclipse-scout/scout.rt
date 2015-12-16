@@ -148,7 +148,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
         cancel(true); // to enter 'DONE' state and to interrupt a potential waiting submitter.
       }
 
-      if (m_input.getSchedulingRule() == JobInput.SCHEDULING_RULE_SINGLE_EXECUTION) {
+      if (m_input.getExecutionMode() == JobInput.EXECUTION_MODE_SINGLE) {
         super.run();
       }
       else {
@@ -161,8 +161,8 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
   }
 
   @Override
-  public int getSchedulingRule() {
-    return m_input.getSchedulingRule();
+  public int getExecutionMode() {
+    return m_input.getExecutionMode();
   }
 
   @Override

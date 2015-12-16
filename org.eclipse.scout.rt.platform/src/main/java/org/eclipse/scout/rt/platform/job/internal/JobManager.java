@@ -92,18 +92,18 @@ public class JobManager implements IJobManager, IPlatformListener {
     Assertions.assertNotNull(input, "'JobInput' must not be null");
     final JobFutureTask<RESULT> futureTask = createJobFutureTask(callable, input);
 
-    switch (input.getSchedulingRule()) {
-      case JobInput.SCHEDULING_RULE_SINGLE_EXECUTION:
+    switch (input.getExecutionMode()) {
+      case JobInput.EXECUTION_MODE_SINGLE:
         scheduleDelayed(futureTask, futureTask, input.getSchedulingDelay());
         break;
-      case JobInput.SCHEDULING_RULE_PERIODIC_EXECUTION_AT_FIXED_RATE:
+      case JobInput.EXECUTION_MODE_PERIODIC_AT_FIXED_RATE:
         scheduleDelayed(futureTask, new FixedRateRunnable(m_executor, m_delayedExecutor, futureTask, input.getPeriodicDelay()), input.getSchedulingDelay());
         break;
-      case JobInput.SCHEDULING_RULE_PERIODIC_EXECUTION_WITH_FIXED_DELAY:
+      case JobInput.EXECUTION_MODE_PERIODIC_WITH_FIXED_DELAY:
         scheduleDelayed(futureTask, new FixedDelayRunnable(m_executor, m_delayedExecutor, futureTask, input.getPeriodicDelay()), input.getSchedulingDelay());
         break;
       default:
-        throw new UnsupportedOperationException("Unsupported scheduling rule");
+        throw new PlatformException("Unsupported execution mode [mode={}]", input.getExecutionMode());
     }
 
     return futureTask;

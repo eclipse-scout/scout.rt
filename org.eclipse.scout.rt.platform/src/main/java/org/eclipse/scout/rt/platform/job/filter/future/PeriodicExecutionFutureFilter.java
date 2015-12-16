@@ -18,8 +18,8 @@ import org.eclipse.scout.rt.platform.job.JobInput;
  * Filter to accept periodic executing jobs. That are jobs, which are executed periodically, either 'at a fixed rate',
  * or 'with a fixed delay'.
  *
- * @see JobInput#SCHEDULING_RULE_PERIODIC_EXECUTION_AT_FIXED_RATE
- * @see JobInput#SCHEDULING_RULE_PERIODIC_EXECUTION_WITH_FIXED_DELAY
+ * @see JobInput#EXECUTION_MODE_PERIODIC_AT_FIXED_RATE
+ * @see JobInput#EXECUTION_MODE_PERIODIC_WITH_FIXED_DELAY
  * @since 5.1
  */
 public class PeriodicExecutionFutureFilter implements IFilter<IFuture<?>> {
@@ -31,6 +31,6 @@ public class PeriodicExecutionFutureFilter implements IFilter<IFuture<?>> {
 
   @Override
   public boolean accept(final IFuture<?> future) {
-    return future.getSchedulingRule() != JobInput.SCHEDULING_RULE_SINGLE_EXECUTION;
+    return future.getExecutionMode() != JobInput.EXECUTION_MODE_SINGLE;
   }
 }

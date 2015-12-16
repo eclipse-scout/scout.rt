@@ -159,7 +159,7 @@ public class FutureFilterBuilder {
   /**
    * To match all jobs which are configured to run once.
    *
-   * @see JobInput#SCHEDULING_RULE_SINGLE_EXECUTION
+   * @see JobInput#EXECUTION_MODE_SINGLE
    */
   public FutureFilterBuilder andAreSingleExecuting() {
     andMatch(SingleExecutionFutureFilter.INSTANCE);
@@ -169,8 +169,8 @@ public class FutureFilterBuilder {
   /**
    * To match all jobs which are configured to run periodically.
    *
-   * @see JobInput#SCHEDULING_RULE_PERIODIC_EXECUTION_AT_FIXED_RATE
-   * @see JobInput#SCHEDULING_RULE_PERIODIC_EXECUTION_WITH_FIXED_DELAY
+   * @see JobInput#EXECUTION_MODE_PERIODIC_AT_FIXED_RATE
+   * @see JobInput#EXECUTION_MODE_PERIODIC_WITH_FIXED_DELAY
    */
   public FutureFilterBuilder andArePeriodicExecuting() {
     andMatch(PeriodicExecutionFutureFilter.INSTANCE);

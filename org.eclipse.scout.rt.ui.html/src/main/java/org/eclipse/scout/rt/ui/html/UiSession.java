@@ -226,9 +226,9 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
           case DONE:
             return true; // UI data possibly available because job completed.
           case PENDING:
-            switch (future.getSchedulingRule()) {
-              case JobInput.SCHEDULING_RULE_PERIODIC_EXECUTION_AT_FIXED_RATE:
-              case JobInput.SCHEDULING_RULE_PERIODIC_EXECUTION_WITH_FIXED_DELAY:
+            switch (future.getExecutionMode()) {
+              case JobInput.EXECUTION_MODE_PERIODIC_AT_FIXED_RATE:
+              case JobInput.EXECUTION_MODE_PERIODIC_WITH_FIXED_DELAY:
                 return true; // UI data possibly available because periodic job completed round.
               default:
                 return false;

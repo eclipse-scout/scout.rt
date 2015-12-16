@@ -38,15 +38,15 @@ public class JobInput {
   /**
    * Indicates to execute a job exactly one time.
    */
-  public static final int SCHEDULING_RULE_SINGLE_EXECUTION = 1 << 0;
+  public static final int EXECUTION_MODE_SINGLE = 1 << 0;
   /**
    * Indicates to execute a job periodically with a fixed delay.
    */
-  public static final int SCHEDULING_RULE_PERIODIC_EXECUTION_WITH_FIXED_DELAY = 1 << 1;
+  public static final int EXECUTION_MODE_PERIODIC_WITH_FIXED_DELAY = 1 << 1;
   /**
    * Indicates to execute a job periodically at a fixed rate.
    */
-  public static final int SCHEDULING_RULE_PERIODIC_EXECUTION_AT_FIXED_RATE = 1 << 2;
+  public static final int EXECUTION_MODE_PERIODIC_AT_FIXED_RATE = 1 << 2;
   /**
    * Indicates that an executable always should commence execution regardless of how long it was waiting for its
    * execution to start.
@@ -60,7 +60,7 @@ public class JobInput {
   protected RunContext m_runContext;
   protected long m_schedulingDelay;
   protected long m_periodicDelay;
-  protected int m_schedulingRule = SCHEDULING_RULE_SINGLE_EXECUTION;
+  protected int m_executionMode = EXECUTION_MODE_SINGLE;
 
   protected Class<? extends ExceptionHandler> m_exceptionHandler = ExceptionHandler.class;
   protected boolean m_swallowException = false;
@@ -94,8 +94,8 @@ public class JobInput {
   }
 
   /**
-   * A periodic delay is only set for periodic jobs. That are jobs with a scheduling rule 'at-fixed-rate' or
-   * 'with-fixed-delay'.
+   * A periodic delay is only set for periodic jobs. That are jobs with an execution mode
+   * {@link #EXECUTION_MODE_PERIODIC_WITH_FIXED_DELAY} or {@link #EXECUTION_MODE_PERIODIC_AT_FIXED_RATE}.
    * <p>
    * Returns the rate for 'at-fixed-rate' jobs, or the delay for 'with-fixed-delay' jobs. The delay is given in
    * milliseconds, and is ignored for one-time executing jobs. The delay is used by the job manager to reschedule a
@@ -125,8 +125,8 @@ public class JobInput {
    *          the time unit of the <code>period</code> argument.
    */
   public JobInput withPeriodicExecutionAtFixedRate(final long period, final TimeUnit unit) {
-    Assertions.assertTrue(m_schedulingRule == SCHEDULING_RULE_SINGLE_EXECUTION || m_schedulingRule == SCHEDULING_RULE_PERIODIC_EXECUTION_AT_FIXED_RATE, "Periodic scheduling rule already set");
-    m_schedulingRule = SCHEDULING_RULE_PERIODIC_EXECUTION_AT_FIXED_RATE;
+    Assertions.assertTrue(m_executionMode == EXECUTION_MODE_SINGLE || m_executionMode == EXECUTION_MODE_PERIODIC_AT_FIXED_RATE, "Periodic execution mode already set");
+    m_executionMode = EXECUTION_MODE_PERIODIC_AT_FIXED_RATE;
     m_periodicDelay = unit.toMillis(period);
     return this;
   }
@@ -144,8 +144,8 @@ public class JobInput {
    *          the time unit of the <code>delay</code> argument.
    */
   public JobInput withPeriodicExecutionWithFixedDelay(final long delay, final TimeUnit unit) {
-    Assertions.assertTrue(m_schedulingRule == SCHEDULING_RULE_SINGLE_EXECUTION || m_schedulingRule == SCHEDULING_RULE_PERIODIC_EXECUTION_WITH_FIXED_DELAY, "Periodic scheduling rule already set");
-    m_schedulingRule = SCHEDULING_RULE_PERIODIC_EXECUTION_WITH_FIXED_DELAY;
+    Assertions.assertTrue(m_executionMode == EXECUTION_MODE_SINGLE || m_executionMode == EXECUTION_MODE_PERIODIC_WITH_FIXED_DELAY, "Periodic execution mode already set");
+    m_executionMode = EXECUTION_MODE_PERIODIC_WITH_FIXED_DELAY;
     m_periodicDelay = unit.toMillis(delay);
     return this;
   }
@@ -296,12 +296,11 @@ public class JobInput {
   }
 
   /**
-   * Returns the scheduling rule to run the job, and is one of {@link #SCHEDULING_RULE_SINGLE_EXECUTION}, or
-   * {@link #SCHEDULING_RULE_PERIODIC_EXECUTION_AT_FIXED_RATE}, or
-   * {@link #SCHEDULING_RULE_PERIODIC_EXECUTION_WITH_FIXED_DELAY}.
+   * Returns the execution mode of the job, and is one of {@link #EXECUTION_MODE_SINGLE}, or
+   * {@link #EXECUTION_MODE_PERIODIC_AT_FIXED_RATE}, or {@link #EXECUTION_MODE_PERIODIC_WITH_FIXED_DELAY}.
    */
-  public int getSchedulingRule() {
-    return m_schedulingRule;
+  public int getExecutionMode() {
+    return m_executionMode;
   }
 
   @Override
@@ -313,7 +312,7 @@ public class JobInput {
     builder.attr("exceptionHandler", m_exceptionHandler);
     builder.attr("swallowException", m_swallowException);
     builder.attr("threadName", m_threadName);
-    builder.attr("schedulingRule", m_schedulingRule);
+    builder.attr("executionMode", m_executionMode);
     builder.attr("schedulingDelay", m_schedulingDelay);
     builder.attr("periodicDelay", m_periodicDelay);
     builder.attr("runContext", m_runContext);
@@ -336,7 +335,7 @@ public class JobInput {
     copy.m_runContext = (m_runContext != null ? m_runContext.copy() : null);
     copy.m_schedulingDelay = m_schedulingDelay;
     copy.m_periodicDelay = m_periodicDelay;
-    copy.m_schedulingRule = m_schedulingRule;
+    copy.m_executionMode = m_executionMode;
     copy.m_executionHints = new HashSet<>(m_executionHints);
 
     return copy;

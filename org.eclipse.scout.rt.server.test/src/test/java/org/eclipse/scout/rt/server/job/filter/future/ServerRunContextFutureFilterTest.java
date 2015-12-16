@@ -62,7 +62,7 @@ public class ServerRunContextFutureFilterTest {
 
   @Test
   public void testPeriodic() {
-    when(m_serverJobFuture.getSchedulingRule()).thenReturn(JobInput.SCHEDULING_RULE_PERIODIC_EXECUTION_AT_FIXED_RATE);
+    when(m_serverJobFuture.getExecutionMode()).thenReturn(JobInput.EXECUTION_MODE_PERIODIC_AT_FIXED_RATE);
     assertTrue(Jobs.newFutureFilterBuilder()
         .andMatchRunContext(ServerRunContext.class)
         .toFilter()

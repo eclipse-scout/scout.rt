@@ -17,7 +17,7 @@ import org.eclipse.scout.rt.platform.job.JobInput;
 /**
  * Filter to accept single executing jobs. That are jobs, which are run only once, and not in periodic manner.
  *
- * @see JobInput#SCHEDULING_RULE_SINGLE_EXECUTION
+ * @see JobInput#EXECUTION_MODE_SINGLE
  * @since 5.1
  */
 public class SingleExecutionFutureFilter implements IFilter<IFuture<?>> {
@@ -29,6 +29,6 @@ public class SingleExecutionFutureFilter implements IFilter<IFuture<?>> {
 
   @Override
   public boolean accept(final IFuture<?> future) {
-    return future.getSchedulingRule() == JobInput.SCHEDULING_RULE_SINGLE_EXECUTION;
+    return future.getExecutionMode() == JobInput.EXECUTION_MODE_SINGLE;
   }
 }

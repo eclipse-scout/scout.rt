@@ -174,7 +174,7 @@ public class JobEventFilterBuilder {
   /**
    * To match all events related to single executing jobs.
    *
-   * @see JobInput#SCHEDULING_RULE_SINGLE_EXECUTION
+   * @see JobInput#EXECUTION_MODE_SINGLE
    */
   public JobEventFilterBuilder andAreSingleExecuting() {
     andMatch(new FutureFilterWrapperJobEventFilter(SingleExecutionFutureFilter.INSTANCE));
@@ -184,8 +184,8 @@ public class JobEventFilterBuilder {
   /**
    * To match all events related to periodic executing jobs.
    *
-   * @see JobInput#SCHEDULING_RULE_PERIODIC_EXECUTION_AT_FIXED_RATE
-   * @see JobInput#SCHEDULING_RULE_PERIODIC_EXECUTION_WITH_FIXED_DELAY
+   * @see JobInput#EXECUTION_MODE_PERIODIC_AT_FIXED_RATE
+   * @see JobInput#EXECUTION_MODE_PERIODIC_WITH_FIXED_DELAY
    */
   public JobEventFilterBuilder andArePeriodicExecuting() {
     andMatch(new FutureFilterWrapperJobEventFilter(PeriodicExecutionFutureFilter.INSTANCE));

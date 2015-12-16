@@ -80,11 +80,10 @@ public interface IFuture<RESULT> extends ICancellable {
   boolean isDone();
 
   /**
-   * Returns the scheduling rule how this job is executed, and is one of {@link #SCHEDULING_RULE_SINGLE_EXECUTION}, or
-   * {@link #SCHEDULING_RULE_PERIODIC_EXECUTION_AT_FIXED_RATE}, or
-   * {@link #SCHEDULING_RULE_PERIODIC_EXECUTION_WITH_FIXED_DELAY}.
+   * Returns the execution mode of the job, and is one of {@link #EXECUTION_MODE_SINGLE}, or
+   * {@link #EXECUTION_MODE_PERIODIC_AT_FIXED_RATE}, or {@link #EXECUTION_MODE_PERIODIC_WITH_FIXED_DELAY}.
    */
-  int getSchedulingRule();
+  int getExecutionMode();
 
   /**
    * Returns this future's current state; is never <code>null</code>.
