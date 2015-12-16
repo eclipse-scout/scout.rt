@@ -203,6 +203,15 @@
     return $element;
   };
 
+  /**
+   * Creates a DIV element in the current document. The function adds an unselectable attribute,
+   * if this is required by the current device (@see Device.js). When you don't want the (un-)
+   * selectable behavior use <code>makeElement('&lt;div&gt;')</code>.
+   *
+   * @param cssClass (optional) string added to the 'class' attribute
+   * @param htmlContent (optional) string used as HTML content
+   * @param id (optional) string added to the 'id' attribute
+   */
   $.fn.makeDiv = function(cssClass, htmlContent, id) {
     var unselectable = scout.device.unselectableAttribute,
       $div = this.makeElement('<div>', cssClass);

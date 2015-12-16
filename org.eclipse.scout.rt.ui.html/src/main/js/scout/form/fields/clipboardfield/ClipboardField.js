@@ -23,9 +23,12 @@ scout.ClipboardField.prototype._createKeyStrokeContext = function() {
 };
 
 scout.ClipboardField.prototype._render = function($parent) {
+  // We don't use makeDiv() here intentionally because the DIV created must
+  // not have the 'unselectable' attribute. Otherwise clipboard-field will
+  // not work in IE9.
   this.addContainer($parent, 'clipboard-field');
   this.addLabel();
-  this.addField($parent.makeDiv());
+  this.addField($parent.makeElement('<div>'));
   this.addStatus();
 
   // add drag and drop support
