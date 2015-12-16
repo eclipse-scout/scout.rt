@@ -1039,12 +1039,10 @@ scout.Table.prototype._renderRowsInRange = function(range) {
     }
   }
 
-  // Link model and jQuery objects
   $rows.each(function(index, rowObject) {
     var $row = $(rowObject);
     var row = rows[range.from + index];
     scout.Table.linkRowToDiv(row, $row);
-    row.height = $row.height();
     this._installRow(row);
   }.bind(this));
 
@@ -1077,11 +1075,6 @@ scout.Table.prototype._removeRowsInRange = function(range) {
   }
   this.viewRangeRendered = newRange[0];
   this._removeEmptyData();
-
-  for (i = range.from; i < range.to; i++) {
-    row = rows[i];
-    row.height = row.$row.height();
-  }
 
   for (i = range.from; i < range.to; i++) {
     row = rows[i];
@@ -1223,7 +1216,8 @@ scout.Table.prototype._hideRow = function(row) {
  * is expected to be linked with the corresponding '$row' (row.$row and $row.data('row')).
  */
 scout.Table.prototype._installRow = function(row) {
-  var editorField;
+  row.height = row.$row.height();
+
   this._removeTooltipsForRow(row);
   if (row.hasError) {
     this._showCellErrorForRow(row);
@@ -1231,7 +1225,7 @@ scout.Table.prototype._installRow = function(row) {
   // Reopen editor popup with cell because state of popup (row, $anchor etc.) is not valid anymore
   if (this.cellEditorPopup && this.cellEditorPopup.row.id === row.id) {
     this.cellEditorPopup.remove();
-    editorField = this.cellEditorPopup.cell.field;
+    var editorField = this.cellEditorPopup.cell.field;
     this._startCellEdit(this.cellEditorPopup.column, row, editorField.id);
   }
 };
@@ -2575,14 +2569,18 @@ scout.Table.prototype.resizeColumn = function(column, width) {
   this.$rows(true)
     .css('width', this.rowWidth);
 
+  // If resized column contains cells with wrapped text, view port needs to be updated
   // Remove row height for non rendered rows because it may have changed due to resizing (wrap text)
   this.rows.forEach(function(row) { //FIXME CGU maybe this.filteredRows()
     if (!row.$row) {
       row.height = null;
+    } else {
+      row.height = row.$row.height();
     }
   });
   this._renderFiller();
-  //FIXME CGU detect whether last render row is in view and if yes rerender viewport
+  this._renderViewport();
+  this.updateScrollbars();
 
   this._triggerColumnResized(column);
   this._sendColumnResized(column);
@@ -3013,6 +3011,9 @@ scout.Table.prototype.calculateViewRangeSize = function() {
   // Make sure row height is up to date (row height may be different after zooming)
   this._updateRowHeight();
 
+  if (this.rowHeight === 0) {
+    throw new Error('Cannot calculate view range with rowHeight = 0');
+  }
   return Math.ceil(this.$data.outerHeight() / this.rowHeight) * 2;
 };
 

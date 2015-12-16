@@ -69,13 +69,14 @@ describe("HtmlComponent", function() {
   });
 
   describe("setSize", function() {
+    var $comp;
+    var htmlComp;
 
     // return size(6, 7)
     addWidthHeightMock(jqueryMock);
 
-    var $comp = $('<div>');
-    var htmlComp;
     beforeEach(function() {
+      $comp = $('<div>').appendTo(session.$entryPoint);
       htmlComp = new scout.HtmlComponent($comp, session);
       htmlComp._layout = new LayoutMock();
     });

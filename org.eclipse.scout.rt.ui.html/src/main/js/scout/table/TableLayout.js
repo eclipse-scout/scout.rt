@@ -55,6 +55,8 @@ scout.TableLayout.prototype.layout = function($container) {
   }
 
   this.table.setViewRangeSize(this.table.calculateViewRangeSize());
+  // Always render viewport (not only when viewRangeSize changes), because view range depends on scroll position and data height
+  this.table._renderViewport();
 
   // Make sure tooltips and editor popup are at correct position after layouting (e.g after window resizing)
   this.table.tooltips.forEach(function(tooltip) {

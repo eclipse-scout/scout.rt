@@ -192,7 +192,7 @@ scout.HtmlComponent.prototype.getSize = function(includeMargins) {
  * from the given size before setting the width/height of the component.
  */
 scout.HtmlComponent.prototype.setSize = function(size) {
-  if (!this.$comp.isVisible()) {
+  if (!this.isAttachedAndVisible()) {
     // don't invalidate the layout if component is invisible because sizes may not be read correctly and therefore prefSize will be wrong
     return;
   }
@@ -215,7 +215,7 @@ scout.HtmlComponent.prototype.offsetBounds = function() {
 };
 
 scout.HtmlComponent.prototype.setBounds = function(bounds) {
-  if (!this.$comp.isVisible()) {
+  if (!this.isAttachedAndVisible()) {
     // don't invalidate the layout if component is invisible because sizes may not be read correctly and therefore prefSize will be wrong
     return;
   }
@@ -243,12 +243,16 @@ scout.HtmlComponent.prototype.isAttached = function() {
   return this.$comp.isAttached() && this.$comp.window(true);
 };
 
-scout.HtmlComponent.prototype.debug = function() {
-  return scout.graphics.debugOutput(this.$comp);
-};
-
 scout.HtmlComponent.prototype.isVisible = function() {
   return this.$comp.isVisible();
+};
+
+scout.HtmlComponent.prototype.isAttachedAndVisible = function() {
+  return this.isAttached() && this.isVisible();
+};
+
+scout.HtmlComponent.prototype.debug = function() {
+  return scout.graphics.debugOutput(this.$comp);
 };
 
 /* --- STATIC HELPERS ------------------------------------------------------------- */
