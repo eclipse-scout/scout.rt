@@ -306,7 +306,7 @@ describe("Column", function() {
       var model = helper.createModelSingleColumnByValues([0, 50, 100], 'number');
       var table = helper.createTable(model);
       var column0 = table.columns[0];
-      table.viewRangeSize = 4;
+      table.viewRangeSize = 2;
       table.render(session.$entryPoint);
 
       table.setColumnBackgroundEffect(column0, 'colorGradient1');

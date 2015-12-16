@@ -54,6 +54,8 @@ scout.TableLayout.prototype.layout = function($container) {
     header.resizeHeaderItem(lastColumn);
   }
 
+  this.table.setViewRangeSize(this.table.calculateViewRangeSize());
+
   // Make sure tooltips and editor popup are at correct position after layouting (e.g after window resizing)
   this.table.tooltips.forEach(function(tooltip) {
     tooltip.position();

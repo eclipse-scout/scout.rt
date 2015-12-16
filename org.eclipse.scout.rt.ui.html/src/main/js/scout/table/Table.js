@@ -42,7 +42,10 @@ scout.Table = function(model) {
 
   this._permanentHeadSortColumns = [];
   this._permanentTailSortColumns = [];
-  this.viewRangeSize = 50;
+  // Initial value must be > 0 to make prefSize work (if it is 0, no filler will be generated).
+  // If rows have a variable height, prefSize is only correct for 10 rows.
+  // Layout will adjust this value depending on the view port size.
+  this.viewRangeSize = 10;
   this.viewRangeRendered = new scout.Range(0, 0);
   this._filterMenusHandler = this._filterMenus.bind(this);
 };
@@ -3001,6 +3004,28 @@ scout.Table.prototype._onDataScroll = function() {
   this.scrollTop = scrollTop;
 };
 
+/**
+ * Calculates the optimal view range size (number of rows to be rendered).
+ * It uses the default row height to estimate how many rows fit in the view port.
+ * The view range size is this value * 2.
+ */
+scout.Table.prototype.calculateViewRangeSize = function() {
+  // Make sure row height is up to date (row height may be different after zooming)
+  this._updateRowHeight();
+
+  return Math.ceil(this.$data.outerHeight() / this.rowHeight) * 2;
+};
+
+scout.Table.prototype.setViewRangeSize = function(viewRangeSize) {
+  if (this.viewRangeSize === viewRangeSize) {
+    return;
+  }
+  this.viewRangeSize = viewRangeSize;
+  if (this.rendered) {
+    this._renderViewport();
+  }
+};
+
 scout.Table.prototype._calculateCurrentViewRange = function() {
   var pos, rowIndex,
     scrollTop = this.$data[0].scrollTop,
@@ -3036,10 +3061,17 @@ scout.Table.prototype._rowIndexAtScrollTop = function(scrollTop) {
 
 scout.Table.prototype._calculateViewRangeForRowIndex = function(rowIndex) {
   var viewRange = new scout.Range(),
-    halfRange = this.viewRangeSize / 2;
+    halfRange = Math.floor(this.viewRangeSize / 2),
+    diff;
 
   viewRange.from = Math.max(rowIndex - halfRange, 0);
-  viewRange.to = Math.min(rowIndex + halfRange, this.filteredRows().length);
+  viewRange.to = Math.min(viewRange.from + this.viewRangeSize, this.filteredRows().length);
+
+  // Try to use the whole viewRangeSize (extend from if necessary)
+  diff = this.viewRangeSize - viewRange.size();
+  if (diff > 0) {
+    viewRange.from = Math.max(viewRange.to - this.viewRangeSize, 0);
+  }
   return viewRange;
 };
 

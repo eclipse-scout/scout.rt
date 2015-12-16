@@ -70,6 +70,31 @@ describe("Table", function() {
 
   });
 
+  describe("_calculateViewRangeForRowIndex", function() {
+    it("returns a range based on viewRangeSize", function() {
+      var model = helper.createModelFixture(2, 10);
+      var table = helper.createTable(model);
+
+      table.viewRangeSize = 3;
+      expect(table._calculateViewRangeForRowIndex(0)).toEqual(new scout.Range(0, 3));
+      expect(table._calculateViewRangeForRowIndex(1)).toEqual(new scout.Range(0, 3));
+      expect(table._calculateViewRangeForRowIndex(2)).toEqual(new scout.Range(1, 4));
+      expect(table._calculateViewRangeForRowIndex(7)).toEqual(new scout.Range(6, 9));
+      expect(table._calculateViewRangeForRowIndex(8)).toEqual(new scout.Range(7, 10));
+      expect(table._calculateViewRangeForRowIndex(9)).toEqual(new scout.Range(7, 10));
+
+      table.viewRangeSize = 4;
+      expect(table._calculateViewRangeForRowIndex(0)).toEqual(new scout.Range(0, 4));
+      expect(table._calculateViewRangeForRowIndex(1)).toEqual(new scout.Range(0, 4));
+      expect(table._calculateViewRangeForRowIndex(2)).toEqual(new scout.Range(0, 4));
+      expect(table._calculateViewRangeForRowIndex(3)).toEqual(new scout.Range(1, 5));
+      expect(table._calculateViewRangeForRowIndex(6)).toEqual(new scout.Range(4, 8));
+      expect(table._calculateViewRangeForRowIndex(7)).toEqual(new scout.Range(5, 9));
+      expect(table._calculateViewRangeForRowIndex(8)).toEqual(new scout.Range(6, 10));
+      expect(table._calculateViewRangeForRowIndex(9)).toEqual(new scout.Range(6, 10));
+    });
+  });
+
   describe("checkRow", function() {
 
     function findCheckedRows(rows) {
@@ -187,7 +212,7 @@ describe("Table", function() {
       model.checkable = true;
       model.multiCheck = true;
       var table = helper.createTable(model);
-      table.viewRangeSize = 4;
+      table.viewRangeSize = 2;
       table.render(session.$entryPoint);
 
       var rows = table.rows;
@@ -235,7 +260,7 @@ describe("Table", function() {
       var model = helper.createModelFixture(2, 5);
       var table = helper.createTable(model);
       var rows = table.rows;
-      table.viewRangeSize = 4;
+      table.viewRangeSize = 2;
       table.render(session.$entryPoint);
       table.selectRows(rows[2]);
       expect(table.selectedRows.length).toBe(1);
@@ -320,7 +345,7 @@ describe("Table", function() {
     it("considers view range -> renders selection only for rendered rows", function() {
       var model = helper.createModelFixture(2, 5);
       var table = helper.createTable(model);
-      table.viewRangeSize = 4; // only two rows are rendered
+      table.viewRangeSize = 2;
       table.render(session.$entryPoint);
 
       expect(table.selectedRows.length).toBe(0);
@@ -961,7 +986,7 @@ describe("Table", function() {
       }
       prepareTable();
       prepareContent();
-      table.viewRangeSize = 8; // 4 rows visible
+      table.viewRangeSize = 4;
       render(table);
 
       expect(find$aggregateRows(table).length).toBe(0);
@@ -983,7 +1008,7 @@ describe("Table", function() {
       }
       prepareTable();
       prepareContent();
-      table.viewRangeSize = 6; // 3 rows visible
+      table.viewRangeSize = 3;
       render(table);
 
       expect(find$aggregateRows(table).length).toBe(0);
@@ -1708,7 +1733,7 @@ describe("Table", function() {
     });
 
     it("considers view range (does not fail if not all rows are rendered)", function() {
-      table.viewRangeSize = 2;
+      table.viewRangeSize = 1;
       table.render(session.$entryPoint);
 
       var $rows = table.$rows();
@@ -1840,7 +1865,7 @@ describe("Table", function() {
 
         // reset spy -> view range now starts from 0
         spy.and.callThrough();
-        table.viewRangeSize = 6;
+        table.viewRangeSize = 3;
 
         // delete first (not rendered)
         table._deleteRows([table.rows[0]]);
@@ -1913,7 +1938,7 @@ describe("Table", function() {
       });
 
       it("silently removes not rendered rows", function() {
-        table.viewRangeSize = 4; // only two rows are rendered
+        table.viewRangeSize = 2;
         table.render(session.$entryPoint);
         expect(table.viewRangeRendered).toEqual(new scout.Range(0, 2));
         expect(table.$rows().length).toBe(2);
@@ -1965,7 +1990,7 @@ describe("Table", function() {
       });
 
       it("renders rows only if view range is not full yet", function() {
-        table.viewRangeSize = 4;
+        table.viewRangeSize = 2;
         table.render(session.$entryPoint);
         expect(table.rows.length).toBe(0);
         expect(table.$rows().length).toBe(0);
@@ -2065,7 +2090,7 @@ describe("Table", function() {
       });
 
       it("considers view range", function() {
-        table.viewRangeSize = 4;
+        table.viewRangeSize = 2;
         table.render(session.$entryPoint);
 
         var $rows = table.$rows();
@@ -2176,7 +2201,7 @@ describe("Table", function() {
       });
 
       it("silently updates rows which are not in view range", function() {
-        table.viewRangeSize = 2;
+        table.viewRangeSize = 1;
         table.render(session.$entryPoint);
         expect(table.viewRangeRendered).toEqual(new scout.Range(0, 1));
         expect(table.$rows().length).toBe(1);
@@ -2371,7 +2396,7 @@ describe("Table", function() {
       });
 
       it("silently moves cells which are not rendered in view range", function() {
-        table.viewRangeSize = 2; // only one row is rendered
+        table.viewRangeSize = 1;
         table.render(session.$entryPoint);
         expect(table.viewRangeRendered).toEqual(new scout.Range(0, 1));
 

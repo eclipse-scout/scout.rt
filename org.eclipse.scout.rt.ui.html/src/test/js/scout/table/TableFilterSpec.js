@@ -245,7 +245,7 @@ describe("Table Filter", function() {
         column0 = table.columns[0],
         row1 = table.rows[1];
 
-      table.viewRangeSize = 2;
+      table.viewRangeSize = 1;
 
       // expects 1 row to be visible
       var filter = createAndRegisterColumnFilter(table, column0, ['cell1_0', 'cell3_0']);
