@@ -23,7 +23,6 @@ import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICellObserver;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
-import org.eclipse.scout.rt.client.ui.basic.table.ITableRowCustomValueContributor;
 import org.eclipse.scout.rt.client.ui.basic.table.TableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.platform.annotations.Internal;
@@ -258,10 +257,6 @@ public class InternalTableRow extends TableRow implements ITableRow, ICellObserv
   @Override
   public boolean/* changed */ setCellValue(int columnIndex, Object value) {
     boolean changed = getCellForUpdate(columnIndex).setValue(value);
-    if (changed && getTable().getColumns().get(columnIndex) instanceof ITableRowCustomValueContributor) {
-      ITableRowCustomValueContributor col = (ITableRowCustomValueContributor) getTable().getColumns().get(columnIndex);
-      col.enrichCustomValues(this, getCustomValues());
-    }
     return changed;
   }
 

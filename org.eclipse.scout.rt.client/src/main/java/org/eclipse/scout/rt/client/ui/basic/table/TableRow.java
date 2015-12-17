@@ -297,10 +297,6 @@ public class TableRow implements ITableRow {
         else {
           // keep inserted, deleted
         }
-        if (getTable().getColumns().get(columnIndex) instanceof ITableRowCustomValueContributor) {
-          ITableRowCustomValueContributor col = (ITableRowCustomValueContributor) getTable().getColumns().get(columnIndex);
-          col.enrichCustomValues(this, getCustomValues());
-        }
         return true;
       }
     }

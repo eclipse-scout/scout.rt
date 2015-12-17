@@ -153,6 +153,9 @@ public class TableRowDataMapper implements ITableRowDataMapper {
   }
 
   public void importCustomValues(ITableRow row, AbstractTableRowData rowData) {
+    if (rowData.getCustomValues() == null) {
+      return;
+    }
     Map<String, Object> customValuesCopy = new HashMap<String, Object>(rowData.getCustomValues());
     for (IColumn col : m_columnSet.getColumns()) {
       customValuesCopy.remove(col.getColumnId());

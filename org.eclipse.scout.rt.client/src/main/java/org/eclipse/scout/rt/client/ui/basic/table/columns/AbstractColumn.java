@@ -35,6 +35,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.HeaderCell;
 import org.eclipse.scout.rt.client.ui.basic.table.IHeaderCell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
+import org.eclipse.scout.rt.client.ui.basic.table.ITableRowCustomValueContributor;
 import org.eclipse.scout.rt.client.ui.basic.table.TableRowDataMapper;
 import org.eclipse.scout.rt.client.ui.basic.table.userfilter.TableUserFilterManager;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithTable;
@@ -1114,6 +1115,9 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
       // set newValue into the cell only if there's no error.
       if (!cell.hasError()) {
         r.setCellValue(getColumnIndex(), newValue);
+        if (this instanceof ITableRowCustomValueContributor) {
+          ((ITableRowCustomValueContributor) this).enrichCustomValues(r, r.getCustomValues());
+        }
       }
 
       ensureVisibileIfInvalid(r);
