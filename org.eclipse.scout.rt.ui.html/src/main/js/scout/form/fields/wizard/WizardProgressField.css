@@ -85,19 +85,31 @@
 
   /* Step content */
   & > .wizard-step-content {
-    display: inline-block;
-    max-width: 200px;
+    display: inline-table;
     line-height: normal;
     vertical-align: middle;
-    margin-top: -2px; /* TODO [15.1] bsh: Why is this necessary? inline-block seems to add some implicit margins, which causes the block not to be vertically centered */
+    margin-top: -2px; /* "display: inline-xyz" seems to add some implicit margins, which causes the block not to be vertically centered */
+    table-layout: fixed;
+    max-width: 200px;
     min-height: 30px;
 
-    & > .wizard-step-title {
-      #scout.overflow-ellipsis-nowrap();
-      font-weight: bold;
+    & > .wizard-step-content-icon {
+      display: table-cell;
+      vertical-align: top;
+      padding-right: 8px;
     }
-    & > .wizard-step-sub-title {
-      #scout.overflow-ellipsis-nowrap();
+
+    & > .wizard-step-content-text {
+      display: table-cell;
+      vertical-align: top;
+
+      & > .wizard-step-title {
+        #scout.overflow-ellipsis-nowrap();
+        font-weight: bold;
+      }
+      & > .wizard-step-sub-title {
+        #scout.overflow-ellipsis-nowrap();
+      }
     }
   }
   &.first {

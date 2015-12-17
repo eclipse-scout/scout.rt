@@ -96,6 +96,7 @@ public class JsonWizardProgressField<WIZARD_PROGRESS_FIELD extends IWizardProgre
     jsonStep.put("iconId", BinaryResourceUrlUtility.createIconUrl(wizardStep.getIconId()));
     jsonStep.put("enabled", wizardStep.isEnabled());
     jsonStep.put("actionEnabled", wizardStep.isActionEnabled());
+    jsonStep.put("cssClass", wizardStep.getCssClass());
     BEANS.get(InspectorInfo.class).put(getUiSession(), jsonStep, wizardStep);
     return jsonStep;
   }

@@ -64,6 +64,7 @@ scout.WizardProgressField.prototype._renderSteps = function() {
     // Step
     var $step = this.$wizardStepsBody
       .appendDiv('wizard-step')
+      .addClass(step.cssClass)
       .data('wizard-step', step);
     step.$step = $step;
     if (this.enabled && step.enabled && step.actionEnabled) {
@@ -79,27 +80,36 @@ scout.WizardProgressField.prototype._renderSteps = function() {
         position: 'bottom'
       });
     }
+    scout.FormField.prototype._renderCssClass = function(cssClass, oldCssClass) {
+      this.$container.removeClass(oldCssClass);
+      this.$container.addClass(cssClass);
+    };
     this._updateStepClasses(step);
 
     // Inspector info
     scout.inspector.applyInfo(step, $step);
-    if (step.classId) {
+    if (step.classId) { // true if inspector hints are enabled
       $step.attr('data-step-index', step.index);
     }
 
     // Content
     var $content = $step.appendDiv('wizard-step-content');
-    $content.appendDiv('wizard-step-title').textOrNbsp(step.title);
+    // Icon
+    if (step.iconId) {
+      var $icon = $content.appendDiv('wizard-step-content-icon');
+      $icon.icon(step.iconId);
+    }
+    // Text
+    var $text = $content.appendDiv('wizard-step-content-text');
+    $text.appendDiv('wizard-step-title').textOrNbsp(step.title);
     if (step.subTitle) {
-      $content.appendDiv('wizard-step-sub-title').textOrNbsp(step.subTitle);
+      $text.appendDiv('wizard-step-sub-title').textOrNbsp(step.subTitle);
     }
 
     // Separator
     if (index < this.steps.length - 1) {
       $step.appendDiv('wizard-step-separator');
     }
-
-    // TODO [5.2] bsh: Wizard | Add icon
   }.bind(this));
 
   this.invalidateLayoutTree(false);
