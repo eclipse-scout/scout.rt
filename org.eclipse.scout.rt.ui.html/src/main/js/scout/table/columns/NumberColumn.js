@@ -19,7 +19,7 @@ scout.inherits(scout.NumberColumn, scout.Column);
  */
 scout.NumberColumn.prototype.init = function(model) {
   scout.NumberColumn.parent.prototype.init.call(this, model);
-  if(!this.decimalFormat instanceof scout.DecimalFormat) {
+  if(!(this.decimalFormat instanceof scout.DecimalFormat)) {
     this.decimalFormat = new scout.DecimalFormat(this.session.locale, this.decimalFormat);
   }
 };

@@ -15,7 +15,7 @@ scout.inherits(scout.NumberField, scout.BasicField);
 
 scout.NumberField.prototype._init = function(model) {
   scout.NumberField.parent.prototype._init.call(this, model);
-  if (!this.decimalFormat instanceof scout.DecimalFormat) {
+  if (!(this.decimalFormat instanceof scout.DecimalFormat)) {
     this.decimalFormat = new scout.DecimalFormat(this.session.locale, this.decimalFormat);
   }
 };
