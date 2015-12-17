@@ -52,7 +52,7 @@
 
   & > .status {
     position: absolute;
-    margin-left: 10px;
+    margin-left: @field-status-margin-left;
 
     &::before  {
       #scout.font-icon();

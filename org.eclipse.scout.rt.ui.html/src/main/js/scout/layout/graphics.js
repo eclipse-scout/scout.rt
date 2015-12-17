@@ -444,5 +444,5 @@ scout.HtmlEnvironment = {
   smallColumnGap: 4,
   fieldLabelWidth: 140,
   fieldMandatoryIndicatorWidth: 8, // @mandatory-indicator-width
-  fieldStatusWidth: 20
+  fieldStatusWidth: 20 // @field-status-width
 };

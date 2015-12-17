@@ -27,6 +27,8 @@
 /* If you change them, be sure to apply them at both places. */
 @logical-grid-height: 30px;
 @mandatory-indicator-width: 8px;
+@field-status-width: 20px;
+@field-status-margin-left: 10px;
 /* ------------------------------- */
 
 @tree-node-control-size: 15px;
