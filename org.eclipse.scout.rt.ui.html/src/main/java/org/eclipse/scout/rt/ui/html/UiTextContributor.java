@@ -25,6 +25,7 @@ public class UiTextContributor implements IUiTextContributor {
         "Column",
         "Cancel",
         "Ok",
+        "NavigationBackward",
         // From org.eclipse.scout.rt.ui.html
         "ui.CalendarToday",
         "ui.CalendarDay",
