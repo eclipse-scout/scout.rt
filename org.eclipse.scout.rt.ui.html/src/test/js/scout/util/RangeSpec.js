@@ -10,26 +10,10 @@
  ******************************************************************************/
 describe('Range', function() {
 
-  it('dateEquals', function() {
-    var date1 = scout.dates.create('2015-25-11'),
-      date2 = scout.dates.create('2015-25-11'),
-      date3 = scout.dates.create('2014-25-11');
-
-    expect(scout.Range.dateEquals(null, null)).toBe(true);
-    expect(scout.Range.dateEquals(date1, null)).toBe(false);
-    expect(scout.Range.dateEquals(null, date1)).toBe(false);
-    expect(scout.Range.dateEquals(date1, date2)).toBe(true);
-    expect(scout.Range.dateEquals(date1, date3)).toBe(false);
-  });
-
   it('equals', function() {
-    var range1 = new scout.Range(scout.dates.create('2015-24-11'), scout.dates.create('2015-25-11')),
-      range2 = new scout.Range(scout.dates.create('2015-24-11'), scout.dates.create('2015-25-11')),
-      range3 = new scout.Range(scout.dates.create('2014-24-11'), scout.dates.create('2014-25-11'));
-
-    expect(range1.equals(range2)).toBe(true);
-    expect(range2.equals(range1)).toBe(true);
-    expect(range1.equals(range3)).toBe(false);
+    expect(new scout.Range(10, 20).equals(new scout.Range(10, 20))).toBe(true);
+    expect(new scout.Range(20, 10).equals(new scout.Range(10, 20))).toBe(false);
+    expect(new scout.Range(10, 20).equals(new scout.Range(20, 10))).toBe(false);
   });
 
   describe('union', function() {

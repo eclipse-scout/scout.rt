@@ -116,7 +116,7 @@ scout.Calendar.prototype._syncDisplayMode = function(displayMode) {
 };
 
 scout.Calendar.prototype._syncViewRange = function(viewRange) {
-  this.viewRange = new scout.Range(
+  this.viewRange = new scout.DateRange(
     scout.dates.parseJsonDate(viewRange.from),
     scout.dates.parseJsonDate(viewRange.to));
 };
@@ -308,7 +308,7 @@ scout.Calendar.prototype._calcExactRange = function() {
     throw new Error('invalid value for displayMode');
   }
 
-  return new scout.Range(from, to);
+  return new scout.DateRange(from, to);
 };
 
 /**
@@ -319,7 +319,7 @@ scout.Calendar.prototype._calcExactRange = function() {
 scout.Calendar.prototype._calcViewRange = function() {
   var viewFrom = _calcViewFromDate(this._exactRange.from),
     viewTo = _calcViewToDate(viewFrom);
-  return new scout.Range(viewFrom, viewTo);
+  return new scout.DateRange(viewFrom, viewTo);
 
   function _calcViewFromDate(fromDate) {
     var i, tmpDate = new Date(fromDate.valueOf());

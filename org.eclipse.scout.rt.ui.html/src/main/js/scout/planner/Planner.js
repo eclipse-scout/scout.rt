@@ -177,7 +177,7 @@ scout.Planner.prototype._onNextClick = function(event) {
 };
 
 scout.Planner.prototype._navigateDate = function(direction) {
-  var viewRange = new scout.Range(this.viewRange.from, this.viewRange.to),
+  var viewRange = new scout.DateRange(this.viewRange.from, this.viewRange.to),
     displayMode = scout.Planner.DisplayMode;
 
   if (this.displayMode === displayMode.DAY) {
@@ -937,7 +937,7 @@ scout.Planner.prototype._renderDisplayMode = function() {
 };
 
 scout.Planner.prototype._syncViewRange = function(viewRange) {
-  this.viewRange = new scout.Range(
+  this.viewRange = new scout.DateRange(
     scout.dates.parseJsonDate(viewRange.from),
     scout.dates.parseJsonDate(viewRange.to)
   );
@@ -1087,7 +1087,7 @@ scout.Planner.prototype.setYearPanelVisible = function(visible) {
 
 scout.Planner.prototype.setViewRangeFrom = function(date) {
   var diff = this.viewRange.to.getTime() - this.viewRange.from.getTime(),
-    viewRange = new scout.Range(this.viewRange.from, this.viewRange.to);
+    viewRange = new scout.DateRange(this.viewRange.from, this.viewRange.to);
 
   viewRange.from = date;
   viewRange.to = new Date(date.getTime() + diff);

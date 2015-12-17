@@ -303,7 +303,7 @@ describe("Column", function() {
     });
 
     it("considers view range -> only colors rendered cells", function() {
-      var model = helper.createModelSingleColumnByValues([0, 50, 100], 'number');
+      var model = helper.createModelSingleColumnByValues([0, 50, 100], 'NumberColumn');
       var table = helper.createTable(model);
       var column0 = table.columns[0];
       table.viewRangeSize = 2;
