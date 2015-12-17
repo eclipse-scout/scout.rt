@@ -19,7 +19,7 @@ import org.eclipse.scout.rt.shared.services.common.text.AbstractDynamicNlsTextPr
  * Note: Texts that are required on the UI (javascript) have to be sent to the browser beforehand, by adding the
  * corresponding keys to {@link UiSession#getTextKeys()}.
  */
-@Order(5010)
+@Order(5020)
 public class UiTextProviderService extends AbstractDynamicNlsTextProviderService {
 
   @Override
