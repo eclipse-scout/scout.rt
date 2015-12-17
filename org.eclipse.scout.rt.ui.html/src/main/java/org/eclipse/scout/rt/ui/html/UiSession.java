@@ -222,20 +222,16 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
       }
 
       private boolean isJobDone(final JobState jobState, final IFuture<?> future) {
-        switch (jobState) {
-          case DONE:
-            return true; // UI data possibly available because job completed.
-          case PENDING:
-            switch (future.getExecutionMode()) {
-              case JobInput.EXECUTION_MODE_PERIODIC_AT_FIXED_RATE:
-              case JobInput.EXECUTION_MODE_PERIODIC_WITH_FIXED_DELAY:
-                return true; // UI data possibly available because periodic job completed round.
-              default:
-                return false;
-            }
-          default:
-            return false;
+        if (jobState == JobState.DONE) {
+          // UI data possibly available because job completed.
+          return true;
         }
+        if (jobState == JobState.PENDING &&
+            (future.getExecutionMode() == JobInput.EXECUTION_MODE_PERIODIC_AT_FIXED_RATE || future.getExecutionMode() == JobInput.EXECUTION_MODE_PERIODIC_WITH_FIXED_DELAY)) {
+          // UI data possibly available because periodic job completed round.
+          return true;
+        }
+        return false;
       }
     };
   }
