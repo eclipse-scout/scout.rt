@@ -46,7 +46,7 @@ scout.TableMatrix.prototype.addData = function(data, dataGroup) {
 
   // data always is number
   dataAxis.format = function(n) {
-    return dataAxis.column.decimalFormat.format(n);
+    return locale.decimalFormat.format(n);
   };
 
   // count, sum, avg
