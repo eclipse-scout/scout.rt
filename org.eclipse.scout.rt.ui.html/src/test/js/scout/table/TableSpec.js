@@ -998,8 +998,8 @@ describe("Table", function() {
       expect(find$aggregateRows(table).length).toBe(1);
       expect(table.$rows().length).toBe(4);
       expect(table.$rows(true).length).toBe(5);
-      expect(table._aggregateRows[0].$aggregateRow).toBeTruthy();
-      expect(table._aggregateRows[1].$aggregateRow).toBeFalsy();
+      expect(table._aggregateRows[0].$row).toBeTruthy();
+      expect(table._aggregateRows[1].$row).toBeFalsy();
     });
 
     it("considers view range -> doesn't render an aggregate row if the last row of the group is not rendered", function() {
@@ -1020,8 +1020,8 @@ describe("Table", function() {
       expect(find$aggregateRows(table).length).toBe(0);
       expect(table.$rows().length).toBe(3);
       expect(table.$rows(true).length).toBe(3);
-      expect(table._aggregateRows[0].$aggregateRow).toBeFalsy();
-      expect(table._aggregateRows[1].$aggregateRow).toBeFalsy();
+      expect(table._aggregateRows[0].$row).toBeFalsy();
+      expect(table._aggregateRows[1].$row).toBeFalsy();
 
       var spy = spyOn(table, '_calculateCurrentViewRange').and.returnValue(new scout.Range(1, 4));
       table._renderViewport();
@@ -1031,8 +1031,8 @@ describe("Table", function() {
       expect(find$aggregateRows(table).length).toBe(1);
       expect(table.$rows().length).toBe(3);
       expect(table.$rows(true).length).toBe(4);
-      expect(table._aggregateRows[0].$aggregateRow).toBeTruthy();
-      expect(table._aggregateRows[1].$aggregateRow).toBeFalsy();
+      expect(table._aggregateRows[0].$row).toBeTruthy();
+      expect(table._aggregateRows[1].$row).toBeFalsy();
     });
 
     it("regroups if rows get inserted", function() {

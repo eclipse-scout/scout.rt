@@ -80,21 +80,10 @@ scout.AggregateTableControl.prototype._renderAggregate = function() {
 
     aggregateValue = this.aggregateRow[c];
     if (aggregateValue === undefined || aggregateValue === null) {
-      cell = {
-        empty: true
-      };
+      cell = column.createAggrEmptyCell();
     } else {
-      if (column.decimalFormat) {
-        aggregateValue = column.decimalFormat.format(aggregateValue);
-      }
-      cell = {
-        text: aggregateValue,
-        iconId: column.aggrSymbol,
-        horizontalAlignment: column.horizontalAlignment,
-        cssClass: 'table-aggregate-cell'
-      };
+      cell = column.createAggrValueCell(aggregateValue);
     }
-
     $cell = $(column.buildCell(cell, {}));
 
     // If aggregation is based on the selection and not on all rows -> mark it

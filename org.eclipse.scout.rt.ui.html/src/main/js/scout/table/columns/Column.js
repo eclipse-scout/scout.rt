@@ -330,6 +330,22 @@ scout.Column.prototype.setAggregationFunction = function(func) {
   }
 };
 
+scout.Column.prototype.createAggrGroupCell = function(row) {
+  return {
+    // value necessary for value based columns (e.g. checkbox column)
+    value: this.table.cellValue(this, row),
+    text: this.cellTextForGrouping(row),
+    horizontalAlignment: this.horizontalAlignment,
+    cssClass: 'table-aggregate-cell'
+  };
+};
+
+scout.Column.prototype.createAggrEmptyCell = function() {
+  return {
+    empty: true
+  };
+};
+
 scout.Column.prototype.setBackgroundEffect = function(effect, notifyServer) {
   if (this.backgroundEffect === effect) {
     return;

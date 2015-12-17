@@ -19,7 +19,7 @@ scout.inherits(scout.NumberColumn, scout.Column);
  */
 scout.NumberColumn.prototype.init = function(model) {
   scout.NumberColumn.parent.prototype.init.call(this, model);
-  if(!(this.decimalFormat instanceof scout.DecimalFormat)) {
+  if (!(this.decimalFormat instanceof scout.DecimalFormat)) {
     this.decimalFormat = new scout.DecimalFormat(this.session.locale, this.decimalFormat);
   }
 };
@@ -34,4 +34,13 @@ scout.NumberColumn.prototype._initCell = function(cell) {
   if (cell.value === undefined && cell.text) { // Number('') would generate 0 -> don't set in that case
     cell.value = Number(cell.text);
   }
+};
+
+scout.NumberColumn.prototype.createAggrValueCell = function(value) {
+  return {
+    text: this.decimalFormat.format(value),
+    iconId: this.aggrSymbol,
+    horizontalAlignment: this.horizontalAlignment,
+    cssClass: 'table-aggregate-cell'
+  };
 };

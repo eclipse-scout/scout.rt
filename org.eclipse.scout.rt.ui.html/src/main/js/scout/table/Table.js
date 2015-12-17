@@ -628,7 +628,7 @@ scout.Table.prototype._renderRowOrderChanges = function() {
 
   // store old position
   // animate only if every row is rendered, otherwise some rows would be animated and some not
-  if ($rows.length === this.rows.length) {
+  if ($rows.length === this.filteredRows().length) {
     $rows.each(function(index, elem) {
       var rowWasInserted = false,
         $row = $(elem),
@@ -652,6 +652,9 @@ scout.Table.prototype._renderRowOrderChanges = function() {
   }
 
   this._rerenderViewport();
+  // If aggregate rows are being removed by animation, rerenderViewport does not delete them -> reorder
+  // This may happen if grouping gets deactivated and another column will get the new first sort column
+  this._order$AggregateRows();
 
   // for less than animationRowLimit rows: move to old position and then animate
   if (animate) {
@@ -670,8 +673,6 @@ scout.Table.prototype._renderRowOrderChanges = function() {
       }
     }.bind(this));
   }
-
-  this.renderSelection();
 };
 
 /**
@@ -792,12 +793,12 @@ scout.Table.prototype._isGroupingPossible = function(column) {
   //TODO: incorporate this logic into visibility of grouping buttons on column header
 
   if (this._permanentHeadSortColumns && this._permanentHeadSortColumns.length === 0) {
-    //no permanent head sort columns. grouping ok.
+    // no permanent head sort columns. grouping ok.
     return true;
   }
 
   if (!column.initialAlwaysIncludeSortAtBegin && !column.initialAlwaysIncludeSortAtEnd) {
-    //col itself is not a head or tail sort column. therefore, all head sort columns must be grouped.
+    // col itself is not a head or tail sort column. therefore, all head sort columns must be grouped.
     this._permanentHeadSortColumns.forEach(function(c) {
       possible &= c.grouped;
     });
@@ -1551,7 +1552,7 @@ scout.Table.prototype.clearAggregateRows = function(animate) {
   if (this.rendered) {
     this._removeAggregateRows(animate);
   }
-  this._aggregateRows.length = 0;
+  this._aggregateRows = [];
 };
 
 /**
@@ -1636,7 +1637,7 @@ scout.Table.prototype._groupedColumns = function() {
 scout.Table.prototype._addAggregateRow = function(contents, afterRow) {
   this._aggregateRows.push({
     contents: contents.slice(),
-    row: afterRow
+    refRow: afterRow
   });
 };
 
@@ -1648,40 +1649,13 @@ scout.Table.prototype._removeAggregateRows = function(animate) {
   animate = scout.nvl(animate, false);
   if (!animate) {
     this._aggregateRows.forEach(function(aggregateRow) {
-      if (!aggregateRow.$aggregateRow) {
-        return;
-      }
-      aggregateRow.$aggregateRow.remove();
-      aggregateRow.$aggregateRow = null;
+      this._removeRow(aggregateRow);
     }, this);
-    this.renderSelection();
     this.updateScrollbars();
   } else {
     this._aggregateRows.forEach(function(aggregateRow, i) {
-      if (!aggregateRow.$aggregateRow) {
-        return;
-      }
-
-      var deferred = $.Deferred();
-      deferreds.push(deferred);
-
-      aggregateRow.$aggregateRow.slideUp({
-        duration: 200,
-        progress: this.updateScrollbars.bind(this),
-        complete: function() {
-          aggregateRow.$aggregateRow.remove();
-          aggregateRow.$aggregateRow = null;
-          deferred.resolve();
-        }.bind(this)
-      });
+      this._hideRow(aggregateRow);
     }, this);
-
-    // when all animations have been finished
-    if (deferreds.length > 0) {
-      $.when.apply($, deferreds).done(function() {
-        this.renderSelection();
-      }.bind(this));
-    }
   }
 };
 
@@ -1690,53 +1664,36 @@ scout.Table.prototype._renderAggregateRows = function(animate) {
   animate = scout.nvl(animate, false);
 
   this._aggregateRows.forEach(function(aggregateRow, r) {
-    if (aggregateRow.$aggregateRow) {
+    if (aggregateRow.$row) {
       // already rendered, no need to update again (necessary for subsequent renderAggregateRows calls (eg. in insertRows -> renderRows)
       return;
     }
-    row = aggregateRow.row;
+    row = aggregateRow.refRow;
     if (!row.$row) {
       return;
     }
-    $aggregateRow = this.$container.makeDiv('table-aggregate-row');
+
+    $aggregateRow = this.$container.makeDiv('table-aggregate-row')
+      .data('aggregateRow', aggregateRow);
     contents = aggregateRow.contents;
 
     for (c = 0; c < this.columns.length; c++) {
       column = this.columns[c];
       if (column instanceof scout.NumberColumn) {
-        cell = {
-          text: column.decimalFormat.format(contents[c]),
-          iconId: column.aggrSymbol,
-          horizontalAlignment: column.horizontalAlignment,
-          cssClass: 'table-aggregate-cell'
-        };
+        cell = column.createAggrValueCell(contents[c]);
       } else if (column.grouped) {
-        cell = {
-          // value necessary for value based columns (e.g. checkbox column)
-          value: this.cellValue(column, row),
-          text: column.cellTextForGrouping(row),
-          horizontalAlignment: column.horizontalAlignment,
-          cssClass: 'table-aggregate-cell'
-        };
+        cell = column.createAggrGroupCell(row);
       } else {
-        cell = {
-          empty: true
-        };
+        cell = column.createAggrEmptyCell(row);
       }
-
       $cell = $(column.buildCell(cell, {}));
       $cell.appendTo($aggregateRow);
     }
 
     $aggregateRow.insertAfter(row.$row).width(this.rowWidth);
-    aggregateRow.$aggregateRow = $aggregateRow;
+    aggregateRow.$row = $aggregateRow;
     if (animate) {
-      $aggregateRow
-        .hide()
-        .slideDown({
-          duration: 200,
-          progress: this.updateScrollbars.bind(this)
-        });
+      this._showRow(aggregateRow);
     }
   }, this);
 };
@@ -2197,22 +2154,22 @@ scout.Table.prototype.removeRowFromSelection = function(row, ongoingSelection) {
 
 scout.Table.prototype.selectRows = function(rows, notifyServer, debounceSend) {
   rows = scout.arrays.ensure(rows);
-  var selectedEqualsRows = scout.arrays.equalsIgnoreOrder(rows, this.selectedRows);
-  if (selectedEqualsRows) {
+  var selectedEqualRows = scout.arrays.equalsIgnoreOrder(rows, this.selectedRows);
+  if (selectedEqualRows) {
     return;
   }
 
-  // never fire clear selection because of notification thru select row
   this.clearSelection(true);
   this.selectedRows = rows;
   notifyServer = scout.nvl(notifyServer, true);
   if (notifyServer) {
     this._sendRowsSelected(this._rowsToIds(rows), debounceSend);
   }
+  this._triggerRowsSelected();
 
   if (this.rendered) {
+    this.renderSelection();
     this.selectedRows.forEach(function(row) {
-      this.renderSelection(row);
 
       // Make sure the cell editor popup is correctly layouted because selection changes the cell bounds
       if (this.cellEditorPopup && this.cellEditorPopup.row.id === row.id) {
@@ -2220,7 +2177,6 @@ scout.Table.prototype.selectRows = function(rows, notifyServer, debounceSend) {
         this.cellEditorPopup.pack();
       }
     }, this);
-    this._triggerRowsSelected();
     if (this.scrollToSelection) {
       this.revealSelection();
     }
@@ -2268,6 +2224,10 @@ scout.Table.prototype.$rows = function(includeAggrRows) {
     selector += ', .table-aggregate-row';
   }
   return this.$data.find(selector);
+};
+
+scout.Table.prototype.$aggregateRows = function() {
+  return this.$data.find('.table-aggregate-row');
 };
 
 scout.Table.prototype.$selectedRows = function() {
@@ -2345,21 +2305,24 @@ scout.Table.prototype.filter = function() {
 
       this._rerenderViewport();
       // Rows removed by an animation are still there, new rows were appended -> reset correct row order
-      this._sort$Rows(this.$rows()).insertAfter(this.$fillBefore);
-
+      this._order$Rows().insertAfter(this.$fillBefore);
+      // Also make sure aggregate rows are at the correct position (_renderAggregateRows does nothing because they are already rendered)
+      this._order$AggregateRows();
       newShownRows.forEach(function(row) {
         this._showRow(row);
       }, this);
     }
+    this._renderEmptyData();
   }
-  this.renderSelection();
-  this._renderEmptyData();
 };
 
 /**
  * Sorts the given $rows according to the row index
  */
-scout.Table.prototype._sort$Rows = function($rows) {
+scout.Table.prototype._order$Rows = function($rows) {
+  // Find rows using jquery because
+  // this.filteredRows() may be empty but there may be $rows which are getting removed by animation
+  $rows = $rows || this.$rows();
   return $rows.sort(function(elem1, elem2) {
     var $row1 = $(elem1),
       $row2 = $(elem2),
@@ -2368,6 +2331,18 @@ scout.Table.prototype._sort$Rows = function($rows) {
 
     return this.rows.indexOf(row1) > this.rows.indexOf(row2);
   }.bind(this));
+};
+
+scout.Table.prototype._order$AggregateRows = function($rows) {
+  // Find aggregate rows using jquery because
+  // this._aggregateRows may be empty but there may be $aggregateRows which are getting removed by animation
+  $rows = $rows || this.$aggregateRows();
+  $rows.each(function(i, elem) {
+    var $aggrRow = $(elem),
+      aggregateRow = $aggrRow.data('aggregateRow');
+
+    $aggrRow.insertAfter(aggregateRow.refRow.$row);
+  });
 };
 
 scout.Table.prototype._rowsFiltered = function(hiddenRows) {
@@ -2539,7 +2514,7 @@ scout.Table.prototype.resizeColumn = function(column, width) {
 
   // If resized column contains cells with wrapped text, view port needs to be updated
   // Remove row height for non rendered rows because it may have changed due to resizing (wrap text)
-  this.rows.forEach(function(row) { //FIXME CGU maybe this.filteredRows()
+  this.rows.forEach(function(row) {
     if (!row.$row) {
       row.height = null;
     } else {
@@ -3164,11 +3139,10 @@ scout.Table.prototype._applyFillerStyle = function($filler) {
   var lineColor = $filler.css('background-color');
   // In order to get a 1px border we need to get the right value in percentage for the linear gradient
   var lineWidth = ((1 - (1 / this.rowHeight)) * 100).toFixed(2) + '%';
-
   $filler.css({
     background: 'linear-gradient(to bottom, transparent, transparent ' + lineWidth + ', ' + lineColor + ' ' + lineWidth + ', ' + lineColor + ')',
     backgroundSize: '100% ' + this.rowHeight + 'px',
-    backgroundColor: null
+    backgroundColor: 'transparent'
   });
 };
 
@@ -3308,6 +3282,7 @@ scout.Table.prototype._onRowOrderChanged = function(rowIds) {
     rows[newPos] = row;
   }
   this.rows = rows;
+  this._filteredRowsDirty = true; // order has been changed
 
   this.clearAggregateRows(this._animateAggregateRows);
   if (this.rendered) {
