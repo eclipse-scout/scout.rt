@@ -47,7 +47,7 @@ scout.DetachHelper.prototype._storeScrollPositions = function($container) {
   }
 
   for (var i = 0; i < $scrollables.length; i++) {
-    if ($.contains($container[0], $scrollables[i][0])) {
+    if ($container.isOrHas($scrollables[i][0])) {
       scrollTop = $scrollables[i].scrollTop();
       $scrollables[i].data('scrollTop', scrollTop);
       scrollLeft = $scrollables[i].scrollLeft();
@@ -65,7 +65,7 @@ scout.DetachHelper.prototype._restoreScrollPositions = function($container) {
   }
 
   for (var i = 0; i < $scrollables.length; i++) {
-    if ($.contains($container[0], $scrollables[i][0])) {
+    if ($container.isOrHas($scrollables[i][0])) {
       scrollTop = $scrollables[i].data('scrollTop');
       if (scrollTop) {
         $scrollables[i].scrollTop(scrollTop);
