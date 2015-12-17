@@ -27,7 +27,7 @@ public abstract class AbstractTableRowData extends AbstractContributionComposite
   private static final long serialVersionUID = 1L;
 
   private int m_rowState;
-  private Map<String, Object> m_customColumnValues;
+  private Map<String, Object> m_customValues;
 
   /**
    * @return Returns this row's state.
@@ -57,70 +57,70 @@ public abstract class AbstractTableRowData extends AbstractContributionComposite
   /**
    * @return Returns a map with custom column values or <code>null</code>, if none have been set.
    */
-  public Map<String, Object> getCustomColumnValues() {
-    return m_customColumnValues;
+  public Map<String, Object> getCustomValues() {
+    return m_customValues;
   }
 
   /**
-   * Sets a map with custom column values.
+   * Sets a map with custom values.
    *
-   * @param customColumnValues
+   * @param customValues
    */
-  public void setCustomColumnValues(Map<String, Object> customColumnValues) {
-    m_customColumnValues = customColumnValues;
+  public void setCustomValues(Map<String, Object> customValues) {
+    m_customValues = customValues;
   }
 
   /**
-   * Returns the custom column value with the given <code>columnId</code> or <code>null</code> if it does not exist.
+   * Returns the custom value with the given <code>id</code> or <code>null</code> if it does not exist.
    *
-   * @param columnId
+   * @param id
    * @return
    */
-  public Object getCustomColumnValue(String columnId) {
-    if (m_customColumnValues == null) {
+  public Object getCustomValue(String id) {
+    if (m_customValues == null) {
       return null;
     }
-    return m_customColumnValues.get(columnId);
+    return m_customValues.get(id);
   }
 
   /**
-   * Sets a custom column value for the given <code>columnId</code>. If <code>value</code> is <code>null</code>, the
-   * custom column entry is removed by {@link #removeCustomColumnValue(String)}.
+   * Sets a custom value for the given <code>id</code>. If <code>value</code> is <code>null</code>, the custom column
+   * entry is removed by {@link #removeCustomValue(String)}.
    *
-   * @param columnId
+   * @param id
    * @param value
    */
-  public void setCustomColumnValue(String columnId, Object value) {
+  public void setCustomValue(String id, Object value) {
     if (value == null) {
-      removeCustomColumnValue(columnId);
+      removeCustomValue(id);
       return;
     }
 
-    if (m_customColumnValues == null) {
-      m_customColumnValues = new HashMap<String, Object>();
+    if (m_customValues == null) {
+      m_customValues = new HashMap<String, Object>();
     }
-    m_customColumnValues.put(columnId, value);
+    m_customValues.put(id, value);
   }
 
   /**
-   * Removes the custom column value from the map.
+   * Removes the custom value from the map.
    * <p>
-   * Returns the custom column value to which the map previously associated the <code>columnId</code>, or
-   * <code>null</code> if the map contained no mapping for the <code>columnId</code>.
+   * Returns the custom value to which the map previously associated the <code>id</code>, or <code>null</code> if the
+   * map contained no mapping for the <code>id</code>.
    * </p>
    *
-   * @param columnId
-   *          columnId whose mapping is to be removed
-   * @return the previous custom column value associated with <code>columnId</code>, or <code>null</code> if there was
-   *         no mapping for <code>columnId</code>.
+   * @param id
+   *          id whose mapping is to be removed
+   * @return the previous custom column value associated with <code>id</code>, or <code>null</code> if there was no
+   *         mapping for <code>id</code>.
    */
-  public Object removeCustomColumnValue(String columnId) {
-    if (m_customColumnValues == null) {
+  public Object removeCustomValue(String id) {
+    if (m_customValues == null) {
       return null;
     }
-    Object value = m_customColumnValues.remove(columnId);
-    if (m_customColumnValues.isEmpty()) {
-      m_customColumnValues = null;
+    Object value = m_customValues.remove(id);
+    if (m_customValues.isEmpty()) {
+      m_customValues = null;
     }
     return value;
   }

@@ -33,26 +33,26 @@ public class AbstractTableRowDataTest {
 
   @Test
   public void testSetCustomColumnValue() {
-    assertNull(m_rowData.getCustomColumnValues());
-    assertNull(m_rowData.getCustomColumnValue(TEST_COLUMN_ID));
+    assertNull(m_rowData.getCustomValues());
+    assertNull(m_rowData.getCustomValue(TEST_COLUMN_ID));
 
     String value = "TEST";
-    m_rowData.setCustomColumnValue(TEST_COLUMN_ID, value);
-    assertNotNull(m_rowData.getCustomColumnValues());
-    assertEquals(value, m_rowData.getCustomColumnValue(TEST_COLUMN_ID));
+    m_rowData.setCustomValue(TEST_COLUMN_ID, value);
+    assertNotNull(m_rowData.getCustomValues());
+    assertEquals(value, m_rowData.getCustomValue(TEST_COLUMN_ID));
   }
 
   @Test
   public void testRemoveCustomColumnValue() {
-    assertNull(m_rowData.getCustomColumnValues());
-    assertNull(m_rowData.removeCustomColumnValue(TEST_COLUMN_ID));
-    assertNull(m_rowData.getCustomColumnValues());
+    assertNull(m_rowData.getCustomValues());
+    assertNull(m_rowData.removeCustomValue(TEST_COLUMN_ID));
+    assertNull(m_rowData.getCustomValues());
 
     String value = "TEST";
-    m_rowData.setCustomColumnValue(TEST_COLUMN_ID, value);
-    assertNotNull(m_rowData.getCustomColumnValues());
-    assertEquals(value, m_rowData.removeCustomColumnValue(TEST_COLUMN_ID));
-    assertNull(m_rowData.getCustomColumnValues());
+    m_rowData.setCustomValue(TEST_COLUMN_ID, value);
+    assertNotNull(m_rowData.getCustomValues());
+    assertEquals(value, m_rowData.removeCustomValue(TEST_COLUMN_ID));
+    assertNull(m_rowData.getCustomValues());
   }
 
   private static class TestingTableRowData extends AbstractTableRowData {

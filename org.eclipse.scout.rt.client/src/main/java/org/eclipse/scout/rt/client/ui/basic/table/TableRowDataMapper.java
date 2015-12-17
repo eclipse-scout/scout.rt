@@ -15,11 +15,12 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.eclipse.scout.rt.client.dto.ColumnData;
-import org.eclipse.scout.rt.client.dto.DtoUtility;
 import org.eclipse.scout.rt.client.dto.ColumnData.SdkColumnCommand;
+import org.eclipse.scout.rt.client.dto.DtoUtility;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Replace;
@@ -148,6 +149,17 @@ public class TableRowDataMapper implements ITableRowDataMapper {
       column.importValue(row, value);
     }
     row.setStatus(rowData.getRowState());
+    importCustomValues(row, rowData);
+  }
+
+  public void importCustomValues(ITableRow row, AbstractTableRowData rowData) {
+    Map<String, Object> customValuesCopy = new HashMap<String, Object>(rowData.getCustomValues());
+    for (IColumn col : m_columnSet.getColumns()) {
+      customValuesCopy.remove(col.getColumnId());
+    }
+    for (Entry<String, Object> entry : customValuesCopy.entrySet()) {
+      row.setCustomValue(entry.getKey(), entry.getValue());
+    }
   }
 
   private Object getValue(IColumn<?> column, AbstractTableRowData rowData) {
@@ -163,7 +175,7 @@ public class TableRowDataMapper implements ITableRowDataMapper {
       }
     }
     else {
-      value = rowData.getCustomColumnValue(column.getColumnId());
+      value = rowData.getCustomValue(column.getColumnId());
     }
     return value;
   }
@@ -186,10 +198,19 @@ public class TableRowDataMapper implements ITableRowDataMapper {
         }
       }
       else {
-        rowData.setCustomColumnValue(column.getColumnId(), value);
+        rowData.setCustomValue(column.getColumnId(), value);
       }
     }
     rowData.setRowState(row.getStatus());
+
+    exportCustomValues(row, rowData);
+  }
+
+  public void exportCustomValues(ITableRow row, AbstractTableRowData rowData) {
+    Set<Entry<String, Object>> entries = row.getCustomValues().entrySet();
+    for (Entry<String, Object> entry : entries) {
+      rowData.setCustomValue(entry.getKey(), entry.getValue());
+    }
   }
 
   protected Object getDataContainer(IColumn column, AbstractTableRowData rowData) {

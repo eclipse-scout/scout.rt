@@ -116,7 +116,7 @@ public class TableWithIgnoredColumnsTest {
     for (int i = 0; i < ROW_COUNT; i++) {
       assertEquals("Default " + (i + 1), tableBean.rowAt(i).getDefault());
       assertEquals("Create " + (i + 1), tableBean.rowAt(i).getCreate());
-      assertNull(tableBean.rowAt(i).getCustomColumnValue(table.getIgnoreColumn().getColumnId()));
+      assertNull(tableBean.rowAt(i).getCustomValue(table.getIgnoreColumn().getColumnId()));
     }
   }
 
@@ -125,7 +125,7 @@ public class TableWithIgnoredColumnsTest {
       P_TableBean.TableBeanRowData row = tableBean.addRow();
       row.setDefault("Default " + i);
       row.setCreate("Create " + i);
-      row.setCustomColumnValue("Ignore", "Ignore " + i);
+      row.setCustomValue("Ignore", "Ignore " + i);
     }
     table.importFromTableBeanData(tableBean);
 

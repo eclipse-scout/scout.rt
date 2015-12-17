@@ -12,7 +12,9 @@ package org.eclipse.scout.rt.client.ui.basic.table;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
@@ -33,6 +35,7 @@ public class TableRow implements ITableRow {
   protected final List<Cell> m_cells;
   private boolean m_rowPropertiesChanged;
   private Set<Integer> m_updatedColumnIndexes;
+  private final Map<String, Object> m_customValues = new HashMap<String, Object>();
 
   /**
    * @param columnSet
@@ -48,6 +51,8 @@ public class TableRow implements ITableRow {
 
   public TableRow(ColumnSet columnSet, ITableRow row) {
     m_columnSet = columnSet;
+    m_customValues.clear();
+    m_customValues.putAll(row.getCustomValues());
     int colCount = columnSet != null ? columnSet.getColumnCount() : 0;
     m_cells = new ArrayList<Cell>(colCount);
     copyCells(row);
@@ -230,6 +235,21 @@ public class TableRow implements ITableRow {
   }
 
   @Override
+  public Object getCustomValue(String id) {
+    return m_customValues.get(id);
+  }
+
+  @Override
+  public Map<String, Object> getCustomValues() {
+    return m_customValues;
+  }
+
+  @Override
+  public void setCustomValue(String id, Object value) {
+    m_customValues.put(id, value);
+  }
+
+  @Override
   public List<Object> getKeyValues() {
     if (m_columnSet == null) {
       throw new UnsupportedOperationException("can only be called when TableRow was constructed with a non-null columnSet");
@@ -276,6 +296,10 @@ public class TableRow implements ITableRow {
         }
         else {
           // keep inserted, deleted
+        }
+        if (getTable().getColumns().get(columnIndex) instanceof ITableRowCustomValueContributor) {
+          ITableRowCustomValueContributor col = (ITableRowCustomValueContributor) getTable().getColumns().get(columnIndex);
+          col.enrichCustomValues(this, getCustomValues());
         }
         return true;
       }

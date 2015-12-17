@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.ui.basic.table;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
@@ -66,7 +67,7 @@ public interface ITableRow {
 
   /**
    * Indicates whether {@link #isFilterAccepted()} returns false because the row has been filtered by the user.
-   * 
+   *
    * @return true if @link IUserFilter is the only filter not accepting the row.
    */
   boolean isRejectedByUser();
@@ -86,6 +87,12 @@ public interface ITableRow {
   Cell getCellForUpdate(int columnIndex);
 
   Object getCellValue(int columnIndex);
+
+  Object getCustomValue(String id);
+
+  Map<String, Object> getCustomValues();
+
+  void setCustomValue(String id, Object value);
 
   /**
    * Warning: this method is not validating the new value against the corresponding table column use
