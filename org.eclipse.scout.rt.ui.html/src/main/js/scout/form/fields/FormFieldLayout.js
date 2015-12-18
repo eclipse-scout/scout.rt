@@ -77,7 +77,6 @@ scout.FormFieldLayout.prototype.layout = function($container) {
   }
   if (this._isStatusVisible()) {
     formField.$status
-      .cssRight(right)
       .cssWidth(statusWidth);
     // If both status and label position is "top", pull status up (without margin on the right side)
     if (formField.statusPosition === scout.FormField.STATUS_POSITION_TOP && labelHasFieldWidth) {
@@ -86,6 +85,7 @@ scout.FormFieldLayout.prototype.layout = function($container) {
       var statusTop = containerPadding.top + (formField.$label.height() / 2) - (statusHeight / 2);
       formField.$status
         .cssTop(statusTop)
+        .cssRight(right + formField.$label.cssMarginRight())
         .cssHeight(statusHeight);
       // Add padding to label to prevent overlay of text and status icon
       var w = scout.graphics.getSize(formField.$status, true).width;
@@ -94,6 +94,7 @@ scout.FormFieldLayout.prototype.layout = function($container) {
       // Default status position
       formField.$status
         .cssTop(top)
+        .cssRight(right)
         .cssHeight(this.rowHeight)
         .cssLineHeight(this.rowHeight);
       right += statusWidth + formField.$status.cssMarginX();
@@ -127,7 +128,7 @@ scout.FormFieldLayout.prototype.layout = function($container) {
     formField.$field.toggleClass('compact', fieldBounds.width < scout.FormFieldLayout.MIN_FIELD_WIDTH);
 
     if (labelHasFieldWidth) {
-      formField.$label.cssWidth(fieldSize.add(fieldMargins).width);
+      formField.$label.cssWidth(fieldSize.add(fieldMargins).width - formField.$label.cssMarginX());
     }
   }
 
