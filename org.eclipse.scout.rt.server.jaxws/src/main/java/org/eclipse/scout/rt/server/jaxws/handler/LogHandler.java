@@ -76,10 +76,7 @@ public class LogHandler implements SOAPHandler<SOAPMessageContext> {
   }
 
   protected void handleLogMessage(final SOAPMessageContext context) throws Exception {
-    if (!LOG.isDebugEnabled() && !LOG.isInfoEnabled()) {
-      return;
-    }
-    else if (m_logDebug && !LOG.isDebugEnabled()) {
+    if (!LOG.isInfoEnabled() || m_logDebug && !LOG.isDebugEnabled()) {
       return;
     }
 
