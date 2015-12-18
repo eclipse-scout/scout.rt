@@ -22,10 +22,6 @@ scout.inherits(scout.TableSelectAllKeyStroke, scout.KeyStroke);
 
 scout.TableSelectAllKeyStroke.prototype.handle = function(event) {
   var table = this.field;
-  if (table.filteredRows().length === this.field.selectedRows.length) {
-    table.clearSelection();
-  } else {
-    table.selectAll();
-  }
+  table.toggleSelection();
   table.selectionHandler.lastActionRow = null;
 };

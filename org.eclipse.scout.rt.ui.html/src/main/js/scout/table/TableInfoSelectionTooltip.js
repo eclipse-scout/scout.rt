@@ -37,7 +37,7 @@ scout.TableInfoSelectionTooltip.prototype._renderText = function() {
 };
 
 scout.TableInfoSelectionTooltip.prototype._onSelectNoneClick = function() {
-  this.tableFooter.table.clearSelection();
+  this.tableFooter.table.deselectAll();
   this.remove();
 };
 

@@ -57,7 +57,8 @@ scout.TableSelectionHandler.prototype.onMouseDown = function(event) {
     // Click on the already selected row must not clear the selection it to avoid another selection event sent to the server
     // Right click on already selected rows must not clear the selection
     if (!oldSelectedState || (this.table.selectedRows.length > 1 && event.which !== 3)) {
-      this.table.clearSelection(true);
+      this.table._removeSelection();
+      this.table.selectedRows = [];
     }
   }
   if (this.fromIndex === undefined || this.fromIndex < 0) {
@@ -92,7 +93,6 @@ scout.TableSelectionHandler.prototype.onMouseOver = function(event) {
   this.toIndex = this._allRows.indexOf(row);
   this.handleSelection(event);
   this.lastActionRow = row;
-
 };
 
 scout.TableSelectionHandler.prototype.handleSelection = function(event) {
@@ -126,7 +126,8 @@ scout.TableSelectionHandler.prototype.handleSelection = function(event) {
   } else {
     // Single selection -> unselect previously selected row
     if (this.select) {
-      this.table.clearSelection(true);
+      this.table._removeSelection();
+      this.table.selectedRows = [];
     }
 
     // Adjust the indexes

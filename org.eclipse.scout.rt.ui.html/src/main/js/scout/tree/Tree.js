@@ -891,7 +891,7 @@ scout.Tree.prototype.revealSelection = function() {
   }
 };
 
-scout.Tree.prototype.clearSelection = function() {
+scout.Tree.prototype.deselectAll = function() {
   this.selectNodes([]);
 };
 

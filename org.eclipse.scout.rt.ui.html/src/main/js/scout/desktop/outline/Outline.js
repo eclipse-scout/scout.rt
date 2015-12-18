@@ -287,7 +287,7 @@ scout.Outline.prototype._onTitleClick = function(event) {
 };
 
 scout.Outline.prototype.navigateToTop = function() {
-  this.clearSelection();
+  this.deselectAll();
   this.collapseAll();
   if (this.defaultDetailForm) {
     this._showDefaultDetailForm();

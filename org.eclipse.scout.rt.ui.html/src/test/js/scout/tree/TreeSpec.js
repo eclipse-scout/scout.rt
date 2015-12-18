@@ -597,7 +597,7 @@ describe("Tree", function() {
     });
   });
 
-  describe("clearSelection", function() {
+  describe("deselectAll", function() {
 
     it("clears the selection", function() {
       var model = createModelFixture(1, 1);
@@ -608,7 +608,7 @@ describe("Tree", function() {
       tree.render(session.$entryPoint);
       expect(tree.$selectedNodes().length).toBe(1);
 
-      tree.clearSelection();
+      tree.deselectAll();
 
       //Check model
       expect(tree.selectedNodes.length).toBe(0);
@@ -662,7 +662,7 @@ describe("Tree", function() {
       expect($parents.eq(0)[0]).toBe(nodes[1].$node[0]);
       expect($parents.eq(1)[0]).toBe(nodes[1].childNodes[1].$node[0]);
 
-      tree.clearSelection();
+      tree.deselectAll();
       $parents = tree.$data.find('.tree-node.ancestor-of-selected');
       expect($parents.length).toBe(0);
     });
@@ -691,7 +691,7 @@ describe("Tree", function() {
       expect($children.eq(1)[0]).toBe(nodes[1].childNodes[1].$node[0]);
       expect($children.eq(2)[0]).toBe(nodes[1].childNodes[2].$node[0]);
 
-      tree.clearSelection();
+      tree.deselectAll();
       $children = tree.$data.find('.tree-node.child-of-selected');
       expect($children.length).toBe(3);
       expect($children.eq(0)[0]).toBe(nodes[0].$node[0]);

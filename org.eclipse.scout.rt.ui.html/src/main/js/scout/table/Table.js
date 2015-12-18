@@ -62,6 +62,7 @@ scout.Table.CheckableStyle = {
    */
   TABLE_ROW: 'tableRow'
 };
+scout.Table.SELECTION_CLASSES = 'select-middle select-top select-bottom select-single selected';
 
 scout.Table.prototype._init = function(model) {
   scout.Table.parent.prototype._init.call(this, model);
@@ -495,40 +496,20 @@ scout.Table.prototype.exportToClipboard = function() {
   this._sendExportToClipboard();
 };
 
-scout.Table.prototype.clearSelection = function(dontFire) {
-  this.selectedRows.forEach(function(row) {
-    if (row.$row) {
-      row.$row.select(false);
-      row.$row.toggleClass('select-middle select-top select-bottom select-single selected', false);
-    }
-  });
-  this.selectedRows = [];
-  if (!dontFire) {
-    this._sendRowsPending = true;
-    this.notifyRowSelectionFinished();
-  }
-};
-
 scout.Table.prototype.toggleSelection = function() {
-  if (this.selectedRows.length === this.rows.length) {
-    this.clearSelection();
+  if (this.selectedRows.length === this.filteredRows().length) {
+    this.deselectAll();
   } else {
     this.selectAll();
   }
 };
 
-scout.Table.prototype.selectAll = function() {
-  // TODO NBU: async? only select visible rows and then others.
-  if (!this.multiSelect) {
-    return; // not possible
-  }
-  this.clearSelection(true);
-  var rows = this.filteredRows();
-  rows.forEach(function(row) {
-    this.addRowToSelection(row, true);
-  }, this);
-  this._sendRowsPending = true;
-  this.notifyRowSelectionFinished();
+scout.Table.prototype.selectAll = function(notifyServer) {
+  this.selectRows(this.filteredRows(), notifyServer);
+};
+
+scout.Table.prototype.deselectAll = function(notifyServer) {
+  this.selectRows([], notifyServer);
 };
 
 scout.Table.prototype.checkAll = function(check) {
@@ -1933,7 +1914,7 @@ scout.Table.prototype._deleteAllRows = function() {
   // Update model
   this.rows = [];
   this.rowsMap = {};
-  this.selectRows([], false);
+  this.deselectAll(false);
   this._filteredRows = [];
 
   if (filterChanged) {
@@ -1990,7 +1971,7 @@ scout.Table.prototype._updateRows = function(rows) {
       // render row and replace div in DOM
       var $updatedRow = $(this._buildRowDiv(updatedRow));
       scout.Table.linkRowToDiv(updatedRow, $updatedRow);
-      $updatedRow.copyCssClasses(oldRow.$row, 'selected select-single select-middle select-top select-bottom');
+      $updatedRow.copyCssClasses(oldRow.$row, scout.Table.SELECTION_CLASSES);
       oldRow.$row.replaceWith($updatedRow);
       this._installRow(updatedRow);
     }
@@ -2116,6 +2097,16 @@ scout.Table.prototype.renderSelection = function(rows) {
   }
 };
 
+scout.Table.prototype._removeSelection = function() {
+  this.selectedRows.forEach(function(row) {
+    if (!row.$row) {
+      return;
+    }
+      row.$row.select(false);
+      row.$row.toggleClass(scout.Table.SELECTION_CLASSES, false);
+  }, this);
+};
+
 scout.Table.prototype.addRowToSelection = function(row, ongoingSelection) {
   if (this.selectedRows.indexOf(row) > -1) {
     return;
@@ -2159,7 +2150,14 @@ scout.Table.prototype.selectRows = function(rows, notifyServer, debounceSend) {
     return;
   }
 
-  this.clearSelection(true);
+  if (this.rendered) {
+    this._removeSelection();
+  }
+
+  if (!this.multiSelect && rows.length > 1) {
+    rows = rows[0];
+  }
+
   this.selectedRows = rows;
   notifyServer = scout.nvl(notifyServer, true);
   if (notifyServer) {

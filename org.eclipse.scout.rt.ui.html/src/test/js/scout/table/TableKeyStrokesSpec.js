@@ -75,7 +75,7 @@ describe("TableKeyStrokes", function() {
       table.$data.triggerKeyDown(scout.keys.UP);
       helper.assertSelection(table, [table.rows[0]]);
 
-      table.clearSelection();
+      table.deselectAll();
       table.selectionHandler.lastActionRow = table.rows[0];
 
       table.$data.triggerKeyDown(scout.keys.UP);
@@ -262,7 +262,7 @@ describe("TableKeyStrokes", function() {
       table.$data.triggerKeyDown(scout.keys.DOWN);
       helper.assertSelection(table, [table.rows[0]]);
 
-      table.clearSelection();
+      table.deselectAll();
       table.selectionHandler.lastActionRow = table.rows[0];
 
       table.$data.triggerKeyDown(scout.keys.DOWN);
@@ -679,7 +679,7 @@ describe("TableKeyStrokes", function() {
       table.$data.triggerKeyDown(scout.keys.PAGE_UP);
       helper.assertSelection(table, [table.rows[0]]);
 
-      table.clearSelection();
+      table.deselectAll();
       table.selectionHandler.lastActionRow = table.rows[0];
 
       table.$data.triggerKeyDown(scout.keys.PAGE_UP);
@@ -699,7 +699,7 @@ describe("TableKeyStrokes", function() {
       table.$data.triggerKeyDown(scout.keys.PAGE_DOWN);
       helper.assertSelection(table, [table.rows[0]]);
 
-      table.clearSelection();
+      table.deselectAll();
       table.selectionHandler.lastActionRow = table.rows[0];
 
       table.$data.triggerKeyDown(scout.keys.PAGE_DOWN);
