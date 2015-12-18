@@ -329,7 +329,7 @@ describe("Column", function() {
       table.render(session.$entryPoint);
 
       table.setColumnBackgroundEffect(column0, 'colorGradient1');
-      table._deleteRow(table.rows[2]);
+      table.deleteRow(table.rows[2]);
       expect(table.$cell(column0, table.rows[0].$row).css('background-color')).toBe(rgbLevel0);
       expect(table.$cell(column0, table.rows[1].$row).css('background-color')).toBe(rgbLevel100);
     });
@@ -342,7 +342,7 @@ describe("Column", function() {
 
       table.setColumnBackgroundEffect(column0, 'colorGradient1');
       var row = helper.createModelRowByValues(undefined, 200);
-      table._insertRow(row);
+      table.insertRow(row);
       expect(table.$cell(column0, table.rows[0].$row).css('background-color')).toBe(rgbLevel0);
       expect(table.$cell(column0, table.rows[1].$row).css('background-color')).toBe('rgb(234, 185, 168)');
       expect(table.$cell(column0, table.rows[2].$row).css('background-color')).toBe('rgb(213, 195, 161)');
@@ -360,7 +360,7 @@ describe("Column", function() {
       var rows = helper.createModelRows(1, 1);
       rows[0].id = table.rows[0].id;
       rows[0].cells[0].value = 150;
-      table._updateRows(rows);
+      table.updateRows(rows);
 
       expect(table.$cell(column0, table.rows[0].$row).css('background-color')).toBe(rgbLevel100);
       expect(table.$cell(column0, table.rows[1].$row).css('background-color')).toBe(rgbLevel0);

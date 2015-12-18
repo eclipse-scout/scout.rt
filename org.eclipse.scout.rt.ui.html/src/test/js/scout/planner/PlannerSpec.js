@@ -81,7 +81,7 @@ describe("Planner", function() {
       expect(planner.resourceMap[resource0.id]).toBe(resource0);
       expect(planner.activityMap[resource0.activities[0].id]).toBe(resource0.activities[0]);
 
-      planner._deleteResources([resource0]);
+      planner.deleteResources([resource0]);
       expect(planner.resources.length).toBe(2);
       expect(planner.resources[0]).toBe(resource1);
       expect(Object.keys(planner.resourceMap).length).toBe(2);
@@ -89,7 +89,7 @@ describe("Planner", function() {
       expect(planner.resourceMap[resource0.id]).toBeUndefined();
       expect(planner.activityMap[resource0.activities[0].id]).toBeUndefined();
 
-      planner._deleteResources([resource1, resource2]);
+      planner.deleteResources([resource1, resource2]);
       expect(Object.keys(planner.resourceMap).length).toBe(0);
       expect(Object.keys(planner.activityMap).length).toBe(0);
       expect(planner.resourceMap.length).toBe(0);
@@ -100,18 +100,18 @@ describe("Planner", function() {
       planner.render(session.$entryPoint);
       expect(find$Resources(planner).length).toBe(3);
 
-      planner._deleteResources([resource0]);
+      planner.deleteResources([resource0]);
       expect(find$Resources(planner).length).toBe(2);
       expect(find$Resources(planner).eq(0).data('resource')).toBe(resource1);
 
-      planner._deleteResources([resource1, resource2]);
+      planner.deleteResources([resource1, resource2]);
       expect(find$Resources(planner).length).toBe(0);
     });
 
     it("also adjusts selectedResources and selectionRange if deleted resource was selected", function() {
       planner.selectedResources = [resource0];
       expect(planner.selectedResources.length).toBe(1);
-      planner._deleteResources([resource0]);
+      planner.deleteResources([resource0]);
       expect(planner.selectedResources.length).toBe(0);
       expect(planner.selectionRange.from).toBeUndefined();
       expect(planner.selectionRange.to).toBeUndefined();
@@ -120,7 +120,7 @@ describe("Planner", function() {
   });
 
 
-  describe("_updateResources", function() {
+  describe("updateResources", function() {
     var model, planner, resource0, resource1, resource2, $resource1;
 
     beforeEach(function() {

@@ -363,7 +363,7 @@ describe("CellEditor", function() {
       startAndAssertCellEdit(table, table.columns[0], row0);
       spyOn(table, '_sendCancelCellEdit');
 
-      table._deleteRows([row0]);
+      table.deleteRows([row0]);
 
       // Check if popup is closed
       expect($findPopup().length).toBe(0);
@@ -378,7 +378,7 @@ describe("CellEditor", function() {
       startAndAssertCellEdit(table, table.columns[0], row0);
       spyOn(table, '_sendCancelCellEdit');
 
-      table._deleteAllRows();
+      table.deleteAllRows();
 
       // Check if popup is closed
       expect($findPopup().length).toBe(0);
@@ -407,7 +407,7 @@ describe("CellEditor", function() {
       expect($('.tooltip').length).toBe(1);
       expect(table.tooltips.length).toBe(1);
 
-      table._deleteRows([row0]);
+      table.deleteRows([row0]);
 
       expect($('.tooltip').length).toBe(0);
       expect(table.tooltips.length).toBe(0);

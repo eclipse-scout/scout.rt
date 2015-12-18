@@ -1808,11 +1808,11 @@ scout.Table.prototype.doRowAction = function(row, column) {
   this._sendRowAction(row, column);
 };
 
-scout.Table.prototype._insertRow = function(row) {
-  this._insertRows([row]);
+scout.Table.prototype.insertRow = function(row) {
+  this.insertRows([row]);
 };
 
-scout.Table.prototype._insertRows = function(rows, fromServer) {
+scout.Table.prototype.insertRows = function(rows, fromServer) {
   var filterChanged = false,
     newHiddenRows = [];
 
@@ -1849,11 +1849,11 @@ scout.Table.prototype._insertRows = function(rows, fromServer) {
   this._triggerRowsInserted(rows);
 };
 
-scout.Table.prototype._deleteRow = function(row) {
-  this._deleteRows([row]);
+scout.Table.prototype.deleteRow = function(row) {
+  this.deleteRows([row]);
 };
 
-scout.Table.prototype._deleteRows = function(rows) {
+scout.Table.prototype.deleteRows = function(rows) {
   var invalidate, i, filterChanged;
 
   rows.forEach(function(row) {
@@ -1897,7 +1897,7 @@ scout.Table.prototype._deleteRows = function(rows) {
   }
 };
 
-scout.Table.prototype._deleteAllRows = function() {
+scout.Table.prototype.deleteAllRows = function() {
   var filterChanged = this._filteredRows.length > 0;
 
   // Update HTML
@@ -1932,7 +1932,7 @@ scout.Table.prototype._deleteAllRows = function() {
   }
 };
 
-scout.Table.prototype._updateRows = function(rows) {
+scout.Table.prototype.updateRows = function(rows) {
   var filterChanged, newHiddenRows = [];
 
   // Update model
@@ -2102,8 +2102,8 @@ scout.Table.prototype._removeSelection = function() {
     if (!row.$row) {
       return;
     }
-      row.$row.select(false);
-      row.$row.toggleClass(scout.Table.SELECTION_CLASSES, false);
+    row.$row.select(false);
+    row.$row.toggleClass(scout.Table.SELECTION_CLASSES, false);
   }, this);
 };
 
@@ -3235,20 +3235,20 @@ scout.Table.prototype._findLastRowInViewport = function(startRowIndex, viewportB
 };
 
 scout.Table.prototype._onRowsInserted = function(rows) {
-  this._insertRows(rows, true);
+  this.insertRows(rows, true);
 };
 
 scout.Table.prototype._onRowsDeleted = function(rowIds) {
   var rows = this._rowsByIds(rowIds);
-  this._deleteRows(rows);
+  this.deleteRows(rows);
 };
 
 scout.Table.prototype._onAllRowsDeleted = function() {
-  this._deleteAllRows();
+  this.deleteAllRows();
 };
 
 scout.Table.prototype._onRowsUpdated = function(rows) {
-  this._updateRows(rows);
+  this.updateRows(rows);
 };
 
 scout.Table.prototype._onRowsSelected = function(rowIds) {

@@ -1145,7 +1145,7 @@ scout.Planner.prototype.deselectResources = function(resources, notifyServer) {
   return deselected;
 };
 
-scout.Planner.prototype._insertResources = function(resources) {
+scout.Planner.prototype.insertResources = function(resources) {
   // Update model
   resources.forEach(function(resource) {
     this._initResource(resource);
@@ -1160,7 +1160,7 @@ scout.Planner.prototype._insertResources = function(resources) {
   }
 };
 
-scout.Planner.prototype._deleteResources = function(resources) {
+scout.Planner.prototype.deleteResources = function(resources) {
   if (this.deselectResources(resources, false)) {
     this.selectRange({}, false);
   }
@@ -1183,7 +1183,7 @@ scout.Planner.prototype._deleteResources = function(resources) {
   this.invalidateLayoutTree();
 };
 
-scout.Planner.prototype._deleteAllResources = function() {
+scout.Planner.prototype.deleteAllResources = function() {
   // Update HTML
   if (this.rendered) {
     this._removeAllResources();
@@ -1243,12 +1243,12 @@ scout.Planner.prototype._sendSetSelection = function() {
 };
 
 scout.Planner.prototype._onResourcesInserted = function(resources) {
-  this._insertResources(resources);
+  this.insertResources(resources);
 };
 
 scout.Planner.prototype._onResourcesDeleted = function(resourceIds) {
   var resources = this._resourcesByIds(resourceIds);
-  this._deleteResources(resources);
+  this.deleteResources(resources);
 };
 
 scout.Planner.prototype._onResourcesSelected = function(resourceIds) {
@@ -1257,7 +1257,7 @@ scout.Planner.prototype._onResourcesSelected = function(resourceIds) {
 };
 
 scout.Planner.prototype._onAllResourcesDeleted = function() {
-  this._deleteAllResources();
+  this.deleteAllResources();
 };
 
 scout.Planner.prototype._onResourcesUpdated = function(resources) {

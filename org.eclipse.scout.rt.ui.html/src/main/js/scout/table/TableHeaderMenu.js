@@ -477,7 +477,7 @@ scout.TableHeaderMenu.prototype._renderFilterTable = function() {
     };
     tableRows.push(tableRow);
   }, this);
-  this.filterTable._insertRows(tableRows);
+  this.filterTable.insertRows(tableRows);
   this.filterTable.render(this.$filterTableGroup);
 };
 

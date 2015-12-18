@@ -130,7 +130,7 @@ describe('TableHeaderMenu', function() {
 
         var newRows = helper.createModelRows(2, 1);
         newRows[0].cells[0].value = 'NewValue';
-        table._insertRows(newRows);
+        table.insertRows(newRows);
 
         table.header.openTableHeaderMenu(column);
         $filterItems = find$FilterItems(table);

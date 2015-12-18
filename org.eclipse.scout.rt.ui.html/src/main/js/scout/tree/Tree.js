@@ -982,7 +982,7 @@ scout.Tree.prototype._updateChildNodeIndex = function(nodes, startIndex) {
   }
 };
 
-scout.Tree.prototype._insertNodes = function(nodes, parentNode) {
+scout.Tree.prototype.insertNodes = function(nodes, parentNode) {
   var $parentNode, $predecessor;
 
   // Append continuous node blocks
@@ -1064,7 +1064,7 @@ scout.Tree.prototype._insertNodes = function(nodes, parentNode) {
   }
 };
 
-scout.Tree.prototype._updateNodes = function(nodes) {
+scout.Tree.prototype.updateNodes = function(nodes) {
   // Update model
   var anyPropertiesChanged = false;
   for (var i = 0; i < nodes.length; i++) {
@@ -1123,7 +1123,7 @@ scout.Tree.prototype._applyUpdatedNodeProperties = function(oldNode, updatedNode
   return propertiesChanged;
 };
 
-scout.Tree.prototype._deleteNodes = function(nodes, parentNode) {
+scout.Tree.prototype.deleteNodes = function(nodes, parentNode) {
   var deletedNodes = [];
 
   nodes.forEach(function(node) {
@@ -1154,7 +1154,7 @@ scout.Tree.prototype._deleteNodes = function(nodes, parentNode) {
   });
 };
 
-scout.Tree.prototype._deleteAllChildNodes = function(parentNode) {
+scout.Tree.prototype.deleteAllChildNodes = function(parentNode) {
   var nodes;
   if (parentNode) {
     nodes = parentNode.childNodes;
@@ -1651,11 +1651,11 @@ scout.Tree.prototype._onNodesInserted = function(nodes, parentNodeId) {
       throw new Error('Parent node could not be found. Id: ' + parentNodeId);
     }
   }
-  this._insertNodes(nodes, parentNode);
+  this.insertNodes(nodes, parentNode);
 };
 
 scout.Tree.prototype._onNodesUpdated = function(nodes) {
-  this._updateNodes(nodes);
+  this.updateNodes(nodes);
 };
 
 scout.Tree.prototype._onNodesDeleted = function(nodeIds, parentNodeId) {
@@ -1667,7 +1667,7 @@ scout.Tree.prototype._onNodesDeleted = function(nodeIds, parentNodeId) {
     }
   }
   var nodes = this._nodesByIds(nodeIds);
-  this._deleteNodes(nodes, parentNode);
+  this.deleteNodes(nodes, parentNode);
 };
 
 scout.Tree.prototype._onAllChildNodesDeleted = function(parentNodeId) {
@@ -1678,7 +1678,7 @@ scout.Tree.prototype._onAllChildNodesDeleted = function(parentNodeId) {
       throw new Error('Parent node could not be found. Id: ' + parentNodeId);
     }
   }
-  this._deleteAllChildNodes(parentNode);
+  this.deleteAllChildNodes(parentNode);
 };
 
 scout.Tree.prototype._onNodesSelected = function(nodeIds) {

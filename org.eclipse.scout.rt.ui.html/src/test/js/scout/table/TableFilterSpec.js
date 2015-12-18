@@ -94,7 +94,7 @@ describe("Table Filter", function() {
 
       var rows = helper.createModelRows(2, 1);
       rows[0].cells[0].value = 'newCell';
-      table._insertRows(rows);
+      table.insertRows(rows);
 
       var filteredRows = table.filteredRows();
       expect(filteredRows.length).toBe(1);
@@ -103,7 +103,7 @@ describe("Table Filter", function() {
 
       rows = helper.createModelRows(2, 1);
       rows[0].cells[0].value = 'cell1_0';
-      table._insertRows(rows);
+      table.insertRows(rows);
 
       filteredRows = table.filteredRows();
       expect(filteredRows.length).toBe(2);
@@ -122,7 +122,7 @@ describe("Table Filter", function() {
 
       var rows = helper.createModelRows(2, 1);
       rows[0].cells[0].value = 'newCell';
-      table._insertRows(rows);
+      table.insertRows(rows);
 
       var filteredRows = table.filteredRows();
       expect(filteredRows.length).toBe(1);
@@ -148,7 +148,7 @@ describe("Table Filter", function() {
       var rows = helper.createModelRows(2, 1);
       rows[0].id = row1.id;
       rows[0].cells[0].value = 'updatedCell';
-      table._updateRows(rows);
+      table.updateRows(rows);
 
       // expects no row to be visible
       var filteredRows = table.filteredRows();
@@ -157,7 +157,7 @@ describe("Table Filter", function() {
       rows = helper.createModelRows(2, 1);
       rows[0].id = row1.id;
       rows[0].cells[0].value = 'cell1_0';
-      table._updateRows(rows);
+      table.updateRows(rows);
 
       // expects 1 row to be visible
       filteredRows = table.filteredRows();
@@ -169,7 +169,7 @@ describe("Table Filter", function() {
       rows[0].id = row1.id;
       rows[0].cells[0].value = 'cell1_0';
       rows[0].cells[1].value = 'new cell1_1';
-      table._updateRows(rows);
+      table.updateRows(rows);
 
       // still expects 1 row to be visible
       filteredRows = table.filteredRows();
@@ -192,7 +192,7 @@ describe("Table Filter", function() {
       var rows = helper.createModelRows(2, 1);
       rows[0].id = row1.id;
       rows[0].cells[0].value = 'updatedCell';
-      table._updateRows(rows);
+      table.updateRows(rows);
 
       // expects no row to be visible
       var filteredRows = table.filteredRows();
@@ -220,7 +220,7 @@ describe("Table Filter", function() {
       // insert new row -> not visible
       var rows = helper.createModelRows(2, 1);
       rows[0].cells[0].value = 'newCell';
-      table._insertRows(rows);
+      table.insertRows(rows);
 
       var filteredRows = table.filteredRows();
       expect(filteredRows.length).toBe(1);
@@ -231,7 +231,7 @@ describe("Table Filter", function() {
       rows = helper.createModelRows(2, 1);
       rows[0].id = table.rows[2].id;
       rows[0].cells[0].value = 'updatedCell';
-      table._updateRows(rows);
+      table.updateRows(rows);
 
       filteredRows = table.filteredRows();
       expect(filteredRows.length).toBe(1);
@@ -329,7 +329,7 @@ describe("Table Filter", function() {
       var rows = helper.createModelRows(2, 1);
       rows[0].id = row1.id;
       rows[0].cells[0].value = 'updatedCell';
-      table._updateRows(rows);
+      table.updateRows(rows);
 
       expect(table.selectedRows.length).toBe(1);
       expect(table.selectedRows[0]).toBe(table.rows[2]);
@@ -492,7 +492,7 @@ describe("Table Filter", function() {
         var rows = helper.createModelRows(2, 1);
         rows[0].id = row1.id;
         rows[0].cells[0].value = 'updatedCell';
-        table._updateRows(rows);
+        table.updateRows(rows);
 
         expect(table.filteredRows().length).toBe(0);
         expect(listener._onRowsFiltered).toHaveBeenCalled();
@@ -514,14 +514,14 @@ describe("Table Filter", function() {
 
         var rows = helper.createModelRows(2, 1);
         rows[0].cells[0].value = 'cell1_0';
-        table._insertRows(rows);
+        table.insertRows(rows);
 
         expect(table.filteredRows().length).toBe(2);
         expect(listener._onRowsFiltered).toHaveBeenCalled();
 
         rows = helper.createModelRows(2, 1);
         rows[0].cells[0].value = 'wont accept';
-        table._insertRows(rows);
+        table.insertRows(rows);
 
         expect(table.filteredRows().length).toBe(2);
         expect(listener._onRowsFiltered).toHaveBeenCalled();
@@ -541,7 +541,7 @@ describe("Table Filter", function() {
         spyOn(listener, '_onRowsFiltered');
         table.on('rowsFiltered', listener._onRowsFiltered);
 
-        table._deleteRows([row1]);
+        table.deleteRows([row1]);
 
         expect(table.filteredRows().length).toBe(0);
         expect(listener._onRowsFiltered).toHaveBeenCalled();
@@ -561,7 +561,7 @@ describe("Table Filter", function() {
         spyOn(listener, '_onRowsFiltered');
         table.on('rowsFiltered', listener._onRowsFiltered);
 
-        table._deleteAllRows();
+        table.deleteAllRows();
 
         expect(table.filteredRows().length).toBe(0);
         expect(listener._onRowsFiltered).toHaveBeenCalled();
@@ -585,7 +585,7 @@ describe("Table Filter", function() {
         rows[0].id = row1.id;
         rows[0].cells[0].value = row1.cells[0].value;
         rows[0].cells[1].value = 'updatedCell1';
-        table._updateRows(rows);
+        table.updateRows(rows);
 
         expect(table.filteredRows().length).toBe(1);
         expect(listener._onRowsFiltered).not.toHaveBeenCalled();

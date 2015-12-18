@@ -65,7 +65,7 @@ describe('TableTextUserFilter', function() {
       }, {
         cells: ['cell10', 'cell11']
       }];
-      table._insertRows(rows);
+      table.insertRows(rows);
 
       expect(table.filteredRows().length).toBe(2);
 
@@ -98,7 +98,7 @@ describe('TableTextUserFilter', function() {
       }, {
         cells: ['cell10', 'cell11']
       }];
-      table._insertRows(rows);
+      table.insertRows(rows);
 
       expect(table.filteredRows().length).toBe(2);
 
@@ -144,7 +144,7 @@ describe('TableTextUserFilter', function() {
           value: bean1
         }]
       }];
-      table._insertRows(rows);
+      table.insertRows(rows);
 
       expect(table.filteredRows().length).toBe(2);
 

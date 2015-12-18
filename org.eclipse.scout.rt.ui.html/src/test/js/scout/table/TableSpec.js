@@ -95,6 +95,276 @@ describe("Table", function() {
     });
   });
 
+  describe("insertRows", function() {
+    var model, table;
+
+    beforeEach(function() {
+      model = helper.createModelFixture(2);
+      table = helper.createTable(model);
+    });
+
+    it("inserts rows at the end of the table", function() {
+      expect(table.rows.length).toBe(0);
+
+      var rows = helper.createModelRows(2, 5);
+      table.insertRows(rows);
+
+      expect(table.rows.length).toBe(5);
+      expect(Object.keys(table.rowsMap).length).toBe(5);
+
+      rows = helper.createModelRows(2, 3);
+      table.insertRows(rows);
+
+      expect(table.rows.length).toBe(5 + 3);
+      expect(Object.keys(table.rowsMap).length).toBe(5 + 3);
+    });
+
+    it("renders rows only if view range is not full yet", function() {
+      table.viewRangeSize = 2;
+      table.render(session.$entryPoint);
+      expect(table.rows.length).toBe(0);
+      expect(table.$rows().length).toBe(0);
+      expect(table.viewRangeRendered).toEqual(new scout.Range(0, 0));
+
+      table.insertRows(helper.createModelRows(2, 1));
+      expect(table.rows.length).toBe(1);
+      expect(table.$rows().length).toBe(1);
+      expect(table.viewRangeRendered).toEqual(new scout.Range(0, 1));
+
+      // 2 rows may get rendered, one row already is. Inserting another 2 rows must only render 1 row
+      table.insertRows(helper.createModelRows(2, 2));
+      expect(table.rows.length).toBe(3);
+      expect(table.$rows().length).toBe(2);
+      expect(table.viewRangeRendered).toEqual(new scout.Range(0, 2));
+    });
+  });
+
+  describe("updateRows", function() {
+    var model, table, row0;
+
+    beforeEach(function() {
+      model = helper.createModelFixture(2, 2);
+      model.rows[0].cells[0].text = 'cellText0';
+      model.rows[0].cells[1].text = 'cellText1';
+      table = helper.createTable(model);
+    });
+
+    it("updates the model cell texts", function() {
+      expect(table.rows[0].cells[0].text).toBe('cellText0');
+      expect(table.rows[0].cells[1].text).toBe('cellText1');
+
+      var row = {
+        id: table.rows[0].id,
+        cells: ['newCellText0', 'newCellText1']
+      };
+      table.updateRows([row]);
+
+      expect(table.rows[0].cells[0].text).toBe('newCellText0');
+      expect(table.rows[0].cells[1].text).toBe('newCellText1');
+    });
+
+    it("updates the html cell texts", function() {
+      table.render(session.$entryPoint);
+      var $rows = table.$rows();
+      var $cells0 = table.$cellsForRow($rows.eq(0));
+      expect($cells0.eq(0).text()).toBe('cellText0');
+      expect($cells0.eq(1).text()).toBe('cellText1');
+
+      var row = {
+        id: table.rows[0].id,
+        cells: ['newCellText0', 'newCellText1']
+      };
+      table.updateRows([row]);
+
+      $rows = table.$rows();
+      $cells0 = table.$cellsForRow($rows.eq(0));
+      expect($cells0.eq(0).text()).toBe('newCellText0');
+      expect($cells0.eq(1).text()).toBe('newCellText1');
+    });
+
+    it("does not destroy selection", function() {
+      model = helper.createModelFixture(2, 3);
+      model.rows[0].cells[0].text = 'cellText0';
+      model.rows[0].cells[1].text = 'cellText1';
+      table = helper.createTable(model);
+      table.render(session.$entryPoint);
+      table.selectAll();
+
+      expect(table.$selectedRows().length).toBe(3);
+      expect(table.$selectedRows().eq(0)).toHaveClass('select-top');
+      expect(table.$selectedRows().eq(1)).toHaveClass('select-middle');
+      expect(table.$selectedRows().eq(2)).toHaveClass('select-bottom');
+      var row = {
+        id: table.rows[0].id,
+        cells: ['newCellText0', 'newCellText1']
+      };
+      table.updateRows([row]);
+
+      expect(table.$selectedRows().length).toBe(3);
+      expect(table.$selectedRows().eq(0)).toHaveClass('select-top');
+      expect(table.$selectedRows().eq(1)).toHaveClass('select-middle');
+      expect(table.$selectedRows().eq(2)).toHaveClass('select-bottom');
+    });
+
+    it("silently updates rows which are not in view range", function() {
+      table.viewRangeSize = 1;
+      table.render(session.$entryPoint);
+      expect(table.viewRangeRendered).toEqual(new scout.Range(0, 1));
+      expect(table.$rows().length).toBe(1);
+      expect(table.rows.length).toBe(2);
+      var $rows = table.$rows();
+      var $cells0 = table.$cellsForRow($rows.eq(0));
+      expect($cells0.eq(0).text()).toBe('cellText0');
+
+      var row0 = {
+        id: table.rows[0].id,
+        cells: ['newRow0Cell0', 'newRow0Cell1']
+      };
+      var row1 = {
+        id: table.rows[1].id,
+        cells: ['newRow1Cell0', 'newRow1Cell1']
+      };
+      table.updateRows([row0, row1]);
+
+      // only row 0 is rendered but both rows need to be updated
+      $rows = table.$rows();
+      expect($rows.length).toBe(1);
+      $cells0 = table.$cellsForRow($rows.eq(0));
+      expect($cells0.eq(0).text()).toBe('newRow0Cell0');
+      expect($cells0.eq(1).text()).toBe('newRow0Cell1');
+      expect(table.rows[0].cells[0].text).toBe('newRow0Cell0');
+      expect(table.rows[0].cells[1].text).toBe('newRow0Cell1');
+      expect(table.rows[1].cells[0].text).toBe('newRow1Cell0');
+      expect(table.rows[1].cells[1].text).toBe('newRow1Cell1');
+    });
+  });
+
+  describe("deleteRows", function() {
+    var model, table, rows, row0, row1, row2;
+
+    beforeEach(function() {
+      model = helper.createModelFixture(2, 3);
+      table = helper.createTable(model);
+      rows = table.rows;
+      row0 = model.rows[0];
+      row1 = model.rows[1];
+      row2 = model.rows[2];
+    });
+
+    it("deletes single rows from model", function() {
+      expect(table.rows.length).toBe(3);
+      expect(table.rows[0]).toBe(row0);
+
+      table.deleteRows([table.rows[0]]);
+      expect(table.rows.length).toBe(2);
+      expect(table.rows[0]).toBe(row1);
+
+      table.deleteRows([table.rows[0], table.rows[1]]);
+      expect(table.rows.length).toBe(0);
+    });
+
+    it("deletes single rows from html document", function() {
+      table.render(session.$entryPoint);
+      expect(table.$rows().length).toBe(3);
+
+      table.deleteRows([table.rows[0]]);
+      expect(table.$rows().length).toBe(2);
+      expect(table.$rows().eq(0).data('row').id).toBe(row1.id);
+      expect(table.$rows().eq(1).data('row').id).toBe(row2.id);
+
+      table.deleteRows([table.rows[0], table.rows[1]]);
+      expect(table.$rows().length).toBe(0);
+    });
+
+    it("considers view range (distinguishes between rendered and non rendered rows, adjusts viewRangeRendered)", function() {
+      model = helper.createModelFixture(2, 6);
+      table = helper.createTable(model);
+      var spy = spyOn(table, '_calculateCurrentViewRange').and.returnValue(new scout.Range(1, 4));
+      table.render(session.$entryPoint);
+      expect(table.viewRangeRendered).toEqual(new scout.Range(1, 4));
+      expect(table.$rows().length).toBe(3);
+      expect(table.rows.length).toBe(6);
+
+      // reset spy -> view range now starts from 0
+      spy.and.callThrough();
+      table.viewRangeSize = 3;
+
+      // delete first (not rendered)
+      table.deleteRows([table.rows[0]]);
+      expect(table.viewRangeRendered).toEqual(new scout.Range(0, 3));
+      expect(table.$rows().length).toBe(3);
+      expect(table.rows.length).toBe(5);
+
+      // delete first rendered
+      table.deleteRows([table.rows[0]]);
+      expect(table.viewRangeRendered).toEqual(new scout.Range(0, 3));
+      expect(table.$rows().length).toBe(3);
+      expect(table.rows.length).toBe(4);
+
+      // delete last not rendered
+      table.deleteRows([table.rows[3]]);
+      expect(table.viewRangeRendered).toEqual(new scout.Range(0, 3));
+      expect(table.$rows().length).toBe(3);
+      expect(table.rows.length).toBe(3);
+
+      // delete remaining (rendered) rows
+      table.deleteRows([table.rows[0], table.rows[1], table.rows[2]]);
+      expect(table.viewRangeRendered).toEqual(new scout.Range(0, 0));
+      expect(table.$rows().length).toBe(0);
+      expect(table.rows.length).toBe(0);
+      expect(table.$fillBefore.height()).toBe(0);
+      expect(table.$fillAfter.height()).toBe(0);
+    });
+  });
+
+  describe("deleteAllRows", function() {
+    var model, table;
+
+    function createAllRowsDeletedEvent(model, rowIds) {
+      return {
+        target: model.id,
+        type: 'allRowsDeleted'
+      };
+    }
+
+    beforeEach(function() {
+      model = helper.createModelFixture(2, 3);
+      table = helper.createTable(model);
+    });
+
+    it("deletes all rows from model", function() {
+      expect(table.rows.length).toBe(3);
+
+      table.deleteAllRows();
+      expect(table.rows.length).toBe(0);
+    });
+
+    it("deletes all rows from html document", function() {
+      table.render(session.$entryPoint);
+      expect(table.$rows().length).toBe(3);
+
+      table.deleteAllRows();
+      expect(table.$rows().length).toBe(0);
+    });
+
+    it("silently removes not rendered rows", function() {
+      table.viewRangeSize = 2;
+      table.render(session.$entryPoint);
+      expect(table.viewRangeRendered).toEqual(new scout.Range(0, 2));
+      expect(table.$rows().length).toBe(2);
+      expect(table.rows.length).toBe(3);
+      expect(table.$fillBefore.height()).toBe(0);
+      expect(table.$fillAfter.height()).not.toBe(0);
+
+      table.deleteAllRows();
+      expect(table.viewRangeRendered).toEqual(new scout.Range(0, 0));
+      expect(table.$rows().length).toBe(0);
+      expect(table.rows.length).toBe(0);
+      expect(table.$fillBefore.height()).toBe(0);
+      expect(table.$fillAfter.height()).toBe(0);
+    });
+  });
+
   describe("checkRow", function() {
 
     function findCheckedRows(rows) {
@@ -1054,7 +1324,7 @@ describe("Table", function() {
       var rows = [{
         cells: ['a', 'xyz', 'xyz', 10, 20]
       }];
-      table._insertRows(rows);
+      table.insertRows(rows);
 
       expect(find$aggregateRows(table).length).toBe(2);
       assertGroupingProperty(table, 0);
@@ -1077,14 +1347,14 @@ describe("Table", function() {
       assertGroupingValues(table, column3, ['10', '26']);
       assertGroupingValues(table, column4, ['30', '78']);
 
-      table._deleteRow(table.rows[0]);
+      table.deleteRow(table.rows[0]);
       expect(find$aggregateRows(table).length).toBe(2);
       expect(table._aggregateRows.length).toBe(2);
       assertGroupingProperty(table, 0);
       assertGroupingValues(table, column3, ['9', '26']);
       assertGroupingValues(table, column4, ['27', '78']);
 
-      table._deleteRows([table.rows[0], table.rows[1], table.rows[2]]);
+      table.deleteRows([table.rows[0], table.rows[1], table.rows[2]]);
       expect(find$aggregateRows(table).length).toBe(1);
       expect(table._aggregateRows.length).toBe(1);
       assertGroupingProperty(table, 0);
@@ -1108,7 +1378,7 @@ describe("Table", function() {
       assertGroupingValues(table, column3, ['10', '26']);
       assertGroupingValues(table, column4, ['30', '78']);
 
-      table._deleteAllRows();
+      table.deleteAllRows();
       expect(find$aggregateRows(table).length).toBe(0);
       expect(table._aggregateRows.length).toBe(0);
       assertGroupingProperty(table, 0);
@@ -1133,7 +1403,7 @@ describe("Table", function() {
         id: table.rows[1].id,
         cells: ['a', 'xyz', 'xyz', 10, 20]
       };
-      table._updateRows([row]);
+      table.updateRows([row]);
       expect(find$aggregateRows(table).length).toBe(2);
       expect(table._aggregateRows.length).toBe(2);
       assertGroupingProperty(table, 0);
@@ -1813,85 +2083,12 @@ describe("Table", function() {
       });
 
       it("calls deleteRows", function() {
-        spyOn(table, '_deleteRows');
+        spyOn(table, 'deleteRows');
 
         var rowIds = [rows[0].id, rows[2].id];
         var event = createRowsDeletedEvent(model, rowIds);
         table.onModelAction(event);
-        expect(table._deleteRows).toHaveBeenCalledWith([rows[0], rows[2]]);
-      });
-
-      it("deletes single rows from model", function() {
-        expect(table.rows.length).toBe(3);
-        expect(table.rows[0]).toBe(row0);
-
-        var message = {
-          events: [createRowsDeletedEvent(model, [row0.id])]
-        };
-        session._processSuccessResponse(message);
-
-        expect(table.rows.length).toBe(2);
-        expect(table.rows[0]).toBe(row1);
-
-        message = {
-          events: [createRowsDeletedEvent(model, [row1.id, row2.id])]
-        };
-        session._processSuccessResponse(message);
-
-        expect(table.rows.length).toBe(0);
-      });
-
-      it("deletes single rows from html document", function() {
-        table.render(session.$entryPoint);
-        expect(table.$rows().length).toBe(3);
-
-        table._deleteRows([table.rows[0]]);
-        expect(table.$rows().length).toBe(2);
-        expect(table.$rows().eq(0).data('row').id).toBe(row1.id);
-        expect(table.$rows().eq(1).data('row').id).toBe(row2.id);
-
-        table._deleteRows([table.rows[0], table.rows[1]]);
-        expect(table.$rows().length).toBe(0);
-      });
-
-      it("considers view range (distinguishes between rendered and non rendered rows, adjusts viewRangeRendered)", function() {
-        model = helper.createModelFixture(2, 6);
-        table = helper.createTable(model);
-        var spy = spyOn(table, '_calculateCurrentViewRange').and.returnValue(new scout.Range(1, 4));
-        table.render(session.$entryPoint);
-        expect(table.viewRangeRendered).toEqual(new scout.Range(1, 4));
-        expect(table.$rows().length).toBe(3);
-        expect(table.rows.length).toBe(6);
-
-        // reset spy -> view range now starts from 0
-        spy.and.callThrough();
-        table.viewRangeSize = 3;
-
-        // delete first (not rendered)
-        table._deleteRows([table.rows[0]]);
-        expect(table.viewRangeRendered).toEqual(new scout.Range(0, 3));
-        expect(table.$rows().length).toBe(3);
-        expect(table.rows.length).toBe(5);
-
-        // delete first rendered
-        table._deleteRows([table.rows[0]]);
-        expect(table.viewRangeRendered).toEqual(new scout.Range(0, 3));
-        expect(table.$rows().length).toBe(3);
-        expect(table.rows.length).toBe(4);
-
-        // delete last not rendered
-        table._deleteRows([table.rows[3]]);
-        expect(table.viewRangeRendered).toEqual(new scout.Range(0, 3));
-        expect(table.$rows().length).toBe(3);
-        expect(table.rows.length).toBe(3);
-
-        // delete remaining (rendered) rows
-        table._deleteRows([table.rows[0], table.rows[1], table.rows[2]]);
-        expect(table.viewRangeRendered).toEqual(new scout.Range(0, 0));
-        expect(table.$rows().length).toBe(0);
-        expect(table.rows.length).toBe(0);
-        expect(table.$fillBefore.height()).toBe(0);
-        expect(table.$fillAfter.height()).toBe(0);
+        expect(table.deleteRows).toHaveBeenCalledWith([rows[0], rows[2]]);
       });
 
     });
@@ -1909,49 +2106,14 @@ describe("Table", function() {
       beforeEach(function() {
         model = helper.createModelFixture(2, 3);
         table = helper.createTable(model);
-        row0 = model.rows[0];
-        row1 = model.rows[1];
-        row2 = model.rows[2];
       });
 
       it("calls deleteAllRows", function() {
-        spyOn(table, '_deleteAllRows');
+        spyOn(table, 'deleteAllRows');
 
         var event = createAllRowsDeletedEvent(model);
         table.onModelAction(event);
-        expect(table._deleteAllRows).toHaveBeenCalled();
-      });
-
-      it("deletes all rows from model", function() {
-        expect(table.rows.length).toBe(3);
-
-        table._deleteAllRows();
-        expect(table.rows.length).toBe(0);
-      });
-
-      it("deletes all rows from html document", function() {
-        table.render(session.$entryPoint);
-        expect(table.$rows().length).toBe(3);
-
-        table._deleteAllRows();
-        expect(table.$rows().length).toBe(0);
-      });
-
-      it("silently removes not rendered rows", function() {
-        table.viewRangeSize = 2;
-        table.render(session.$entryPoint);
-        expect(table.viewRangeRendered).toEqual(new scout.Range(0, 2));
-        expect(table.$rows().length).toBe(2);
-        expect(table.rows.length).toBe(3);
-        expect(table.$fillBefore.height()).toBe(0);
-        expect(table.$fillAfter.height()).not.toBe(0);
-
-        table._deleteAllRows();
-        expect(table.viewRangeRendered).toEqual(new scout.Range(0, 0));
-        expect(table.$rows().length).toBe(0);
-        expect(table.rows.length).toBe(0);
-        expect(table.$fillBefore.height()).toBe(0);
-        expect(table.$fillAfter.height()).toBe(0);
+        expect(table.deleteAllRows).toHaveBeenCalled();
       });
 
     });
@@ -1965,47 +2127,12 @@ describe("Table", function() {
       });
 
       it("calls insertRows", function() {
-        spyOn(table, '_insertRows');
+        spyOn(table, 'insertRows');
 
         var rows = helper.createModelRows(2, 5);
         var event = createRowsInsertedEvent(model, rows);
         table.onModelAction(event);
-        expect(table._insertRows).toHaveBeenCalledWith(rows, true);
-      });
-
-      it("inserts rows at the end of the table", function() {
-        expect(table.rows.length).toBe(0);
-
-        var rows = helper.createModelRows(2, 5);
-        table._insertRows(rows);
-
-        expect(table.rows.length).toBe(5);
-        expect(Object.keys(table.rowsMap).length).toBe(5);
-
-        rows = helper.createModelRows(2, 3);
-        table._insertRows(rows);
-
-        expect(table.rows.length).toBe(5 + 3);
-        expect(Object.keys(table.rowsMap).length).toBe(5 + 3);
-      });
-
-      it("renders rows only if view range is not full yet", function() {
-        table.viewRangeSize = 2;
-        table.render(session.$entryPoint);
-        expect(table.rows.length).toBe(0);
-        expect(table.$rows().length).toBe(0);
-        expect(table.viewRangeRendered).toEqual(new scout.Range(0, 0));
-
-        table._insertRows(helper.createModelRows(2, 1));
-        expect(table.rows.length).toBe(1);
-        expect(table.$rows().length).toBe(1);
-        expect(table.viewRangeRendered).toEqual(new scout.Range(0, 1));
-
-        // 2 rows may get rendered, one row already is. Inserting another 2 rows must only render 1 row
-        table._insertRows(helper.createModelRows(2, 2));
-        expect(table.rows.length).toBe(3);
-        expect(table.$rows().length).toBe(2);
-        expect(table.viewRangeRendered).toEqual(new scout.Range(0, 2));
+        expect(table.insertRows).toHaveBeenCalledWith(rows, true);
       });
     });
 
@@ -2132,7 +2259,7 @@ describe("Table", function() {
       });
 
       it("calls updateRows", function() {
-        spyOn(table, '_updateRows');
+        spyOn(table, 'updateRows');
 
         var row = {
           id: table.rows[0].id,
@@ -2140,96 +2267,7 @@ describe("Table", function() {
         };
         var event = createRowsUpdatedEvent(model, [row]);
         table.onModelAction(event);
-        expect(table._updateRows).toHaveBeenCalledWith([row]);
-      });
-
-      it("updates the model cell texts", function() {
-        expect(table.rows[0].cells[0].text).toBe('cellText0');
-        expect(table.rows[0].cells[1].text).toBe('cellText1');
-
-        var row = {
-          id: table.rows[0].id,
-          cells: ['newCellText0', 'newCellText1']
-        };
-        table._updateRows([row]);
-
-        expect(table.rows[0].cells[0].text).toBe('newCellText0');
-        expect(table.rows[0].cells[1].text).toBe('newCellText1');
-      });
-
-      it("updates the html cell texts", function() {
-        table.render(session.$entryPoint);
-        var $rows = table.$rows();
-        var $cells0 = table.$cellsForRow($rows.eq(0));
-        expect($cells0.eq(0).text()).toBe('cellText0');
-        expect($cells0.eq(1).text()).toBe('cellText1');
-
-        var row = {
-          id: table.rows[0].id,
-          cells: ['newCellText0', 'newCellText1']
-        };
-        table._updateRows([row]);
-
-        $rows = table.$rows();
-        $cells0 = table.$cellsForRow($rows.eq(0));
-        expect($cells0.eq(0).text()).toBe('newCellText0');
-        expect($cells0.eq(1).text()).toBe('newCellText1');
-      });
-
-      it("does not destroy selection", function() {
-        model = helper.createModelFixture(2, 3);
-        model.rows[0].cells[0].text = 'cellText0';
-        model.rows[0].cells[1].text = 'cellText1';
-        table = helper.createTable(model);
-        table.render(session.$entryPoint);
-        table.selectAll();
-
-        expect(table.$selectedRows().length).toBe(3);
-        expect(table.$selectedRows().eq(0)).toHaveClass('select-top');
-        expect(table.$selectedRows().eq(1)).toHaveClass('select-middle');
-        expect(table.$selectedRows().eq(2)).toHaveClass('select-bottom');
-        var row = {
-          id: table.rows[0].id,
-          cells: ['newCellText0', 'newCellText1']
-        };
-        table._updateRows([row]);
-
-        expect(table.$selectedRows().length).toBe(3);
-        expect(table.$selectedRows().eq(0)).toHaveClass('select-top');
-        expect(table.$selectedRows().eq(1)).toHaveClass('select-middle');
-        expect(table.$selectedRows().eq(2)).toHaveClass('select-bottom');
-      });
-
-      it("silently updates rows which are not in view range", function() {
-        table.viewRangeSize = 1;
-        table.render(session.$entryPoint);
-        expect(table.viewRangeRendered).toEqual(new scout.Range(0, 1));
-        expect(table.$rows().length).toBe(1);
-        expect(table.rows.length).toBe(2);
-        var $rows = table.$rows();
-        var $cells0 = table.$cellsForRow($rows.eq(0));
-        expect($cells0.eq(0).text()).toBe('cellText0');
-
-        var row0 = {
-          id: table.rows[0].id,
-          cells: ['newRow0Cell0', 'newRow0Cell1']
-        };
-        var row1 = {
-          id: table.rows[1].id,
-          cells: ['newRow1Cell0', 'newRow1Cell1']
-        };
-        table._updateRows([row0, row1]);
-
-        // only row 0 is rendered but both rows need to be updated
-        $rows = table.$rows();
-        expect($rows.length).toBe(1);
-        $cells0 = table.$cellsForRow($rows.eq(0));
-        expect($cells0.eq(0).text()).toBe('newRow0Cell0');
-        expect($cells0.eq(1).text()).toBe('newRow0Cell1');
-        expect(table.rows[0].cells[0].text).toBe('newRow0Cell0');
-        expect(table.rows[0].cells[1].text).toBe('newRow0Cell1');
-        expect(table.rows[1].cells[0].text).toBe('newRow1Cell0');
-        expect(table.rows[1].cells[1].text).toBe('newRow1Cell1');
+        expect(table.updateRows).toHaveBeenCalledWith([row]);
       });
 
     });
