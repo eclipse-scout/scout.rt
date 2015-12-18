@@ -29,6 +29,8 @@ public abstract class AbstractTableRowData extends AbstractContributionComposite
   private int m_rowState;
   private Map<String, Object> m_customValues;
 
+  public static final String CUSTOM_VALUES_ID_GEO_LOCATION = "geoLocationCustomValuesId";
+
   /**
    * @return Returns this row's state.
    * @see #STATUS_NON_CHANGED

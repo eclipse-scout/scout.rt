@@ -27,7 +27,6 @@ import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
-import org.eclipse.scout.rt.client.ui.basic.table.ITableRowCustomValueContributor;
 import org.eclipse.scout.rt.client.ui.basic.table.TableAdapter;
 import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
 import org.eclipse.scout.rt.client.ui.basic.table.TableListener;
@@ -46,6 +45,7 @@ import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 import org.eclipse.scout.rt.shared.security.CopyToClipboardPermission;
 import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
 import org.eclipse.scout.rt.ui.html.IUiSession;
@@ -768,8 +768,8 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
     putProperty(jsonRow, "enabled", row.isEnabled());
     putProperty(jsonRow, "iconId", BinaryResourceUrlUtility.createIconUrl(row.getIconId()));
     putProperty(jsonRow, "cssClass", row.getCssClass());
-    if (row.getCustomValue(ITableRowCustomValueContributor.GEO_LOCATION_CUSTOM_VALUES_ID) != null) {
-      JSONObject geoLocations = new JSONObject((Map) row.getCustomValue(ITableRowCustomValueContributor.GEO_LOCATION_CUSTOM_VALUES_ID));
+    if (row.getCustomValue(AbstractTableRowData.CUSTOM_VALUES_ID_GEO_LOCATION) != null) {
+      JSONObject geoLocations = new JSONObject((Map) row.getCustomValue(AbstractTableRowData.CUSTOM_VALUES_ID_GEO_LOCATION));
       putProperty(jsonRow, "geoLocationValues", geoLocations);
     }
     JsonObjectUtility.filterDefaultValues(jsonRow, "TableRow");
