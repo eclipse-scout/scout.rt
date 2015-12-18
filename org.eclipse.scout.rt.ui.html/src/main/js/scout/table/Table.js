@@ -469,18 +469,26 @@ scout.Table.prototype._cellTooltipText = function($cell) {
   var cell, tooltipText,
     $row = $cell.parent(),
     cellIndex = $cell.index(),
+    column = this.columns[cellIndex],
     row = $row.data('row');
 
   if (row) {
-    cell = this.cellByCellIndex(cellIndex, row);
+    cell = this.cell(column, row);
     tooltipText = cell.tooltipText;
   }
 
   if (tooltipText) {
     return tooltipText;
-  } else if ($cell.isContentTruncated()) {
+  } else if (this._isTruncatedCellTooltipEnabled(column) && $cell.isContentTruncated()) {
     return $cell.text();
   }
+};
+
+/**
+ * Show cell tooltip only if it is not possible to resize the column
+ */
+scout.Table.prototype._isTruncatedCellTooltipEnabled = function(column) {
+  return !this.headerVisible || column.fixedWidth;
 };
 
 scout.Table.prototype.reload = function() {

@@ -777,9 +777,13 @@ scout.Tree.prototype._nodeTooltipText = function($node) {
 
   if (node.tooltipText) {
     return node.tooltipText;
-  } else if ($node.isContentTruncated()) {
+  } else if (this._isTruncatedNodeTooltipEnabled() && $node.isContentTruncated()) {
     return $node.text();
   }
+};
+
+scout.Tree.prototype._isTruncatedNodeTooltipEnabled = function() {
+  return true;
 };
 
 scout.Tree.prototype.setBreadcrumbEnabled = function(enabled, notifyServer) {

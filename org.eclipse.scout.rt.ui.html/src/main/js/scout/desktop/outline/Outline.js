@@ -446,6 +446,13 @@ scout.Outline.prototype._isGroupingEnd = function(node) {
   return node.nodeType == 'table';
 };
 
+/**
+ * Disabled for outlines because outline may be resized.
+ */
+scout.Outline.prototype._isTruncatedNodeTooltipEnabled = function() {
+  return false;
+};
+
 /* event handling */
 
 scout.Outline.prototype._onDetailTableRowsSelected = function(event) {

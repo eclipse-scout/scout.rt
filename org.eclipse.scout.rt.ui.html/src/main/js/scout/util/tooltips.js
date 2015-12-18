@@ -58,7 +58,7 @@ scout.tooltips = {
 scout.TooltipSupport = function(options) {
   var defaultOptions = {
     selector: null,
-    delay: 350,
+    delay: 600,
     text: undefined,
     nativeTooltip: false
   };
