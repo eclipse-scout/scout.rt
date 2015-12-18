@@ -92,9 +92,12 @@
     height: 100%;
     #scout.menubar-background-color-inherit();
 
-    & > .menu-item,
-    & > .menu-separator {
-      margin-right: 5px;
+    & > .menubox {
+
+      & > .menu-item:not(.last),
+      & > .menu-separator {
+        margin-right: 10px;
+      }
     }
   }
 }
