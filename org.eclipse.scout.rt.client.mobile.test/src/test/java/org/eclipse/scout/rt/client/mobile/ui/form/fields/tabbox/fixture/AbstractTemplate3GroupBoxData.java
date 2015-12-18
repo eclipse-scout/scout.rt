@@ -1,13 +1,3 @@
-/*******************************************************************************
- * Copyright (c) 2010-2015 BSI Business Systems Integration AG.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *     BSI Business Systems Integration AG - initial API and implementation
- ******************************************************************************/
 package org.eclipse.scout.rt.client.mobile.ui.form.fields.tabbox.fixture;
 
 import javax.annotation.Generated;
@@ -24,9 +14,6 @@ public abstract class AbstractTemplate3GroupBoxData extends AbstractFormFieldDat
 
   private static final long serialVersionUID = 1L;
 
-  public AbstractTemplate3GroupBoxData() {
-  }
-
   public T2Text1 getT2Text1() {
     return getFieldByClass(T2Text1.class);
   }
@@ -34,8 +21,5 @@ public abstract class AbstractTemplate3GroupBoxData extends AbstractFormFieldDat
   public static class T2Text1 extends AbstractValueFieldData<String> {
 
     private static final long serialVersionUID = 1L;
-
-    public T2Text1() {
-    }
   }
 }

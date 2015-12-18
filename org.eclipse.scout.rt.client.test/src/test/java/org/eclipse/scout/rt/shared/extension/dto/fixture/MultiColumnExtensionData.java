@@ -1,13 +1,3 @@
-/*******************************************************************************
- * Copyright (c) 2010-2015 BSI Business Systems Integration AG.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *     BSI Business Systems Integration AG - initial API and implementation
- ******************************************************************************/
 package org.eclipse.scout.rt.shared.extension.dto.fixture;
 
 import java.io.Serializable;
@@ -32,22 +22,19 @@ public class MultiColumnExtensionData implements Serializable {
   private Long m_thirdLong;
   private BigDecimal m_fourthBigDecimal;
 
-  public MultiColumnExtensionData() {
-  }
-
   public Long getThirdLong() {
     return m_thirdLong;
   }
 
-  public void setThirdLong(Long thirdLong) {
-    m_thirdLong = thirdLong;
+  public void setThirdLong(Long newThirdLong) {
+    m_thirdLong = newThirdLong;
   }
 
   public BigDecimal getFourthBigDecimal() {
     return m_fourthBigDecimal;
   }
 
-  public void setFourthBigDecimal(BigDecimal fourthBigDecimal) {
-    m_fourthBigDecimal = fourthBigDecimal;
+  public void setFourthBigDecimal(BigDecimal newFourthBigDecimal) {
+    m_fourthBigDecimal = newFourthBigDecimal;
   }
 }

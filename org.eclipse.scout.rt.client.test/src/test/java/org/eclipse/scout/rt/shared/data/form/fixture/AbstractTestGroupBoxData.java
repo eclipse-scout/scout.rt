@@ -1,13 +1,3 @@
-/*******************************************************************************
- * Copyright (c) 2010-2015 BSI Business Systems Integration AG.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *     BSI Business Systems Integration AG - initial API and implementation
- ******************************************************************************/
 package org.eclipse.scout.rt.shared.data.form.fixture;
 
 import java.util.Set;
@@ -27,9 +17,6 @@ public abstract class AbstractTestGroupBoxData extends AbstractFormFieldData {
 
   private static final long serialVersionUID = 1L;
 
-  public AbstractTestGroupBoxData() {
-  }
-
   public TestListBox getTestListBox() {
     return getFieldByClass(TestListBox.class);
   }
@@ -45,25 +32,16 @@ public abstract class AbstractTestGroupBoxData extends AbstractFormFieldData {
   public static class TestListBox extends AbstractValueFieldData<Set<String>> {
 
     private static final long serialVersionUID = 1L;
-
-    public TestListBox() {
-    }
   }
 
   @ClassId("1b67f4c4-1579-4875-a2c9-d62c7cd63508-formdata")
   public static class Text1 extends AbstractValueFieldData<String> {
 
     private static final long serialVersionUID = 1L;
-
-    public Text1() {
-    }
   }
 
   public static class Text2 extends AbstractValueFieldData<String> {
 
     private static final long serialVersionUID = 1L;
-
-    public Text2() {
-    }
   }
 }

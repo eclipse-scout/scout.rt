@@ -1,13 +1,3 @@
-/*******************************************************************************
- * Copyright (c) 2010-2015 BSI Business Systems Integration AG.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *     BSI Business Systems Integration AG - initial API and implementation
- ******************************************************************************/
 package org.eclipse.scout.rt.shared.extension.dto.fixture;
 
 import javax.annotation.Generated;
@@ -24,9 +14,6 @@ public class OrigFormData extends AbstractFormData {
 
   private static final long serialVersionUID = 1L;
 
-  public OrigFormData() {
-  }
-
   public FirstString getFirstString() {
     return getFieldByClass(FirstString.class);
   }
@@ -42,24 +29,15 @@ public class OrigFormData extends AbstractFormData {
   public static class FirstString extends AbstractValueFieldData<String> {
 
     private static final long serialVersionUID = 1L;
-
-    public FirstString() {
-    }
   }
 
   public static class FirstUseOfTemplateBox extends AbstractTemplateBoxData {
 
     private static final long serialVersionUID = 1L;
-
-    public FirstUseOfTemplateBox() {
-    }
   }
 
   public static class SecondUseOfTemplateBox extends AbstractTemplateBoxData {
 
     private static final long serialVersionUID = 1L;
-
-    public SecondUseOfTemplateBox() {
-    }
   }
 }
