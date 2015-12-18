@@ -468,7 +468,7 @@ scout.Table.prototype._uninstallCellTooltipSupport = function() {
 scout.Table.prototype._cellTooltipText = function($cell) {
   var cell, tooltipText,
     $row = $cell.parent(),
-    cellIndex = $cell.index(),
+    cellIndex = this.$cellsForRow($row).index($cell),
     column = this.columns[cellIndex],
     row = $row.data('row');
 
@@ -2995,7 +2995,9 @@ scout.Table.prototype.calculateViewRangeSize = function() {
   this._updateRowHeight();
 
   if (this.rowHeight === 0) {
-    throw new Error('Cannot calculate view range with rowHeight = 0');
+    return 0;
+    //FIXME CGU/AWE uncomment and remove return as soon as HtmlComp.validateLayout checks for invisible components
+//    throw new Error('Cannot calculate view range with rowHeight = 0');
   }
   return Math.ceil(this.$data.outerHeight() / this.rowHeight) * 2;
 };
@@ -3164,82 +3166,6 @@ scout.Table.prototype._calculateFillerHeight = function(range) {
     totalHeight += height;
   }
   return totalHeight;
-};
-
-/**
- * Returns viewport sensitive information containing the first and last visible row in the viewport.
- */
-scout.Table.prototype._viewportInfo = function() {
-  var x, y, viewportBounds, dataInsets, dataMarginTop, firstRow, lastRow,
-    document = this.$data.document(true),
-    viewport = {},
-    rows = this.filteredRows();
-
-  if (rows.length === 0) {
-    return viewport;
-  }
-
-  viewportBounds = scout.graphics.offsetBounds(this.$data);
-  dataInsets = scout.graphics.getInsets(this.$data);
-  dataMarginTop = this.$data.cssMarginTop();
-  viewportBounds = viewportBounds.subtract(dataInsets);
-
-  // if data has a negative margin, adjust viewport otherwise a selected first row will never be in the viewport
-  if (dataMarginTop < 0) {
-    viewportBounds.y -= Math.abs(dataMarginTop);
-    viewportBounds.height += Math.abs(dataMarginTop);
-  }
-
-  // get first element at the top of the viewport
-  x = viewportBounds.x + 1;
-  y = viewportBounds.y + 1;
-
-  firstRow = this._findFirstRowInViewport(viewportBounds);
-  lastRow = this._findLastRowInViewport(rows.indexOf(firstRow), viewportBounds);
-
-  viewport.firstRow = firstRow;
-  viewport.lastRow = lastRow;
-  return viewport;
-};
-
-scout.Table.prototype._findFirstRowInViewport = function(viewportBounds) {
-  var rows = this.filteredRows();
-  return scout.arrays.find(rows, function(row, i) {
-    var rowOffset,
-      $row = row.$row;
-
-    if (!row.$row) {
-      // If row is not rendered, it cannot be part of the view port -> check next row
-      return false;
-    }
-    rowOffset = $row.offset();
-    // If the row is fully visible in the viewport -> break and return the row
-    return viewportBounds.contains(rowOffset.left, rowOffset.top);
-  });
-};
-
-scout.Table.prototype._findLastRowInViewport = function(startRowIndex, viewportBounds) {
-  var rows = this.filteredRows();
-  if (startRowIndex === rows.length - 1) {
-    return rows[startRowIndex];
-  }
-  return scout.arrays.findFromNext(rows, startRowIndex, function(row, i) {
-    var nextRowOffsetBounds, $nextRow,
-      nextRow = rows[i + 1];
-
-    if (!nextRow) {
-      // If next row is not available (row is the last row) -> break and return current row
-      return true;
-    }
-    $nextRow = nextRow.$row;
-    if (!$nextRow) {
-      // If next row is not rendered anymore, current row has to be the last in the viewport
-      return true;
-    }
-    nextRowOffsetBounds = scout.graphics.offsetBounds($nextRow);
-    // If the next row is not fully visible in the viewport -> break and return current row
-    return !viewportBounds.contains(nextRowOffsetBounds.x, nextRowOffsetBounds.y + nextRowOffsetBounds.height);
-  });
 };
 
 scout.Table.prototype._onRowsInserted = function(rows) {
