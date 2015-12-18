@@ -361,12 +361,12 @@ scout.TableFooter.prototype._setInfoVisible = function($info, visible, complete)
   }
 };
 
-scout.TableFooter.prototype._toggleTableInfoTooltip = function($info, tooltipClass) {
+scout.TableFooter.prototype._toggleTableInfoTooltip = function($info, tooltipType) {
   if (this._tableInfoTooltip && this._tableInfoTooltip.rendered) {
     this._tableInfoTooltip.remove();
     this._tableInfoTooltip = null;
   } else {
-    this._tableInfoTooltip = scout.create(tooltipClass, {
+    this._tableInfoTooltip = scout.create(tooltipType, {
       parent: this,
       tableFooter: this,
       cssClass: 'table-info-tooltip',
@@ -537,7 +537,7 @@ scout.TableFooter.prototype._onFilterInput = function(event) {
 
 scout.TableFooter.prototype._onInfoLoadClick = function() {
   if (this._compactStyle) {
-    this._toggleTableInfoTooltip(this._$infoLoad, scout.TableInfoLoadTooltip);
+    this._toggleTableInfoTooltip(this._$infoLoad, 'TableInfoLoadTooltip');
   } else {
     this.table.reload();
   }
@@ -545,7 +545,7 @@ scout.TableFooter.prototype._onInfoLoadClick = function() {
 
 scout.TableFooter.prototype._onInfoFilterClick = function() {
   if (this._compactStyle) {
-    this._toggleTableInfoTooltip(this._$infoFilter, scout.TableInfoFilterTooltip);
+    this._toggleTableInfoTooltip(this._$infoFilter, 'TableInfoFilterTooltip');
   } else {
     this.table.resetFilter();
   }
@@ -553,7 +553,7 @@ scout.TableFooter.prototype._onInfoFilterClick = function() {
 
 scout.TableFooter.prototype._onInfoSelectionClick = function() {
   if (this._compactStyle) {
-    this._toggleTableInfoTooltip(this._$infoSelection, scout.TableInfoSelectionTooltip);
+    this._toggleTableInfoTooltip(this._$infoSelection, 'TableInfoSelectionTooltip');
   } else {
     this.table.toggleSelection();
   }
