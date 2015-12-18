@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.ui.html.script;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -116,10 +115,9 @@ public class ScriptFileBuilder {
 
   protected ScriptSource locateFragmentScript(String fragmentPath, FileType fileType) {
     if (FileType.CSS == fileType && m_theme != null) {
-      File file = new File(fragmentPath);
-      String[] parts = FileUtility.getFilenameParts(file);
-      File themeFile = new File(file.getParent(), parts[0] + "-" + m_theme + "." + parts[1]);
-      URL url = m_resourceLocator.getScriptSource(themeFile.getPath());
+      String[] parts = FileUtility.getFilenameParts(fragmentPath);
+      String themeFragmentPath = parts[0] + "-" + m_theme + (parts[1] == null ? "" : "." + parts[1]);
+      URL url = m_resourceLocator.getScriptSource(themeFragmentPath);
       if (url != null) {
         return new ScriptSource(fragmentPath, url, ScriptSource.NodeType.SRC_FRAGMENT);
       }
