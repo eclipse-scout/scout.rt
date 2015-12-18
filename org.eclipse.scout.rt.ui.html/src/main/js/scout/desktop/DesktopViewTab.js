@@ -126,11 +126,7 @@ scout.DesktopViewTab.prototype._titlesUpdated = function() {
   // ----- Helper functions -----
 
   function setTitle($titleElement, title) {
-    if (title) {
-      $titleElement.text(title).setVisible(true);
-    } else {
-      $titleElement.setVisible(false);
-    }
+    $titleElement.textOrNbsp(title);
   }
 };
 
