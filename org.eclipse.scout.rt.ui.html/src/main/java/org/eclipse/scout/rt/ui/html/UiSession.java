@@ -226,8 +226,8 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
           // UI data possibly available because job completed.
           return true;
         }
-        if (jobState == JobState.PENDING &&
-            (future.getExecutionMode() == JobInput.EXECUTION_MODE_PERIODIC_AT_FIXED_RATE || future.getExecutionMode() == JobInput.EXECUTION_MODE_PERIODIC_WITH_FIXED_DELAY)) {
+        if (jobState == JobState.PENDING
+            && (future.getExecutionMode() == JobInput.EXECUTION_MODE_PERIODIC_AT_FIXED_RATE || future.getExecutionMode() == JobInput.EXECUTION_MODE_PERIODIC_WITH_FIXED_DELAY)) {
           // UI data possibly available because periodic job completed round.
           return true;
         }
