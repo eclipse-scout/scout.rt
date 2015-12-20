@@ -30,19 +30,24 @@ import org.eclipse.scout.rt.platform.visitor.IVisitor;
 /**
  * Job manager to run tasks in parallel.
  * <p>
- * This job manager supports sequential execution of tasks that belong to the same mutex object (mutual exclusion),
- * meaning that no more than one task will be active at any given time for that mutex object.
+ * A task is called a job, and consists of some work in the form of a {@link IRunnable} or {@link Callable}, and some
+ * instruction information in the form of a {@link JobInput} for the job manager to run the job.
+ * <p>
+ * This job manager allows to control the maximal number of jobs running concurrently by assigning a job to a
+ * {@link ISchedulingSemaphore}. That way, jobs which are assigned to the same semaphore run concurrently until they
+ * reach the concurrency level defined for that semaphore. Subsequent tasks then wait in the queue until a permit
+ * becomes available.
  *
  * @since 5.1
  */
 public interface IJobManager {
 
   /**
-   * Runs the given {@link IRunnable} asynchronously in another thread at the next reasonable opportunity. If the task
-   * is subject for mutual exclusion, the task only commence execution once acquired the mutex. The caller of this
-   * method continues to run in parallel.
+   * Runs the given {@link IRunnable} asynchronously in another thread at the next reasonable opportunity. The submitter
+   * of the job continues to run in parallel. If the job is assigned to a {@link ISchedulingSemaphore} and the maximal
+   * concurrency level for that semaphore is reached, the job is queued until a permit becomes available.
    * <p>
-   * The job manager will use the {@link JobInput} as provided to run the job.
+   * The job manager will use the {@link JobInput} as given to control job execution.
    * <p>
    * The {@link IFuture} returned allows to wait for the job to complete or to cancel its execution. To immediately
    * block waiting for the job to complete, you can use constructions of the following form.
@@ -58,12 +63,12 @@ public interface IJobManager {
   IFuture<Void> schedule(IRunnable runnable, JobInput input);
 
   /**
-   * Runs the given {@link Callable} asynchronously in another thread at the next reasonable opportunity. If the task is
-   * subject for mutual exclusion, the task only commence execution once acquired the mutex. The caller of this method
-   * continues to run in parallel. Jobs in the form of a {@link Callable} typically return a computation result to the
-   * submitter.
+   * Runs the given {@link Callable} asynchronously in another thread at the next reasonable opportunity. The submitter
+   * of the job continues to run in parallel. If the job is assigned to a {@link ISchedulingSemaphore} and the maximal
+   * concurrency level for that semaphore is reached, the job is queued until a permit becomes available. Jobs in the
+   * form of a {@link Callable} typically return a computation result to the submitter.
    * <p>
-   * The job manager will use the {@link JobInput} as provided to run the job.
+   * The job manager will use the {@link JobInput} as given to control job execution.
    * <p>
    * The {@link IFuture} returned allows to wait for the job to complete or to cancel its execution. To immediately
    * block waiting for the job to complete, you can use constructions of the following form.
@@ -197,8 +202,10 @@ public interface IJobManager {
   boolean cancel(IFilter<IFuture<?>> filter, boolean interruptIfRunning);
 
   /**
-   * Creates a blocking condition to put a job into waiting mode until the condition falls. If the job is a mutually
-   * exclusive job, the job's mutex is released and passed to the next competing job while being blocked.
+   * Creates a blocking condition to put a job into waiting mode until the condition falls.
+   * <p>
+   * If the job is assigned to a {@link ISchedulingSemaphore}, the job's permit is released and passed to the next
+   * competing job of that same semaphore while being blocked.
    * <p>
    * See {@link IBlockingCondition} for more information.
    *

@@ -39,9 +39,9 @@ public enum JobState {
   RUNNING,
 
   /**
-   * Indicates that a mutually exclusive job is waiting for the mutex to become free.
+   * Indicates that a job is competing for a permit of a {@link ISchedulingSemaphore} to become available.
    */
-  WAITING_FOR_MUTEX,
+  WAITING_FOR_PERMIT,
 
   /**
    * Indicates that a job is blocked by a blocking condition, and is waiting for it to fall.

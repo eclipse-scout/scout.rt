@@ -20,7 +20,7 @@ import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IJobManager;
-import org.eclipse.scout.rt.platform.job.IMutex;
+import org.eclipse.scout.rt.platform.job.ISchedulingSemaphore;
 import org.eclipse.scout.rt.platform.job.JobState;
 import org.eclipse.scout.rt.platform.job.internal.JobManager;
 
@@ -48,16 +48,16 @@ public class JobTestUtil {
   }
 
   /**
-   * Blocks the calling thread until the expected number of tasks competing for the mutex is reached. That is the
-   * mutex-owner plus any queued task. This method blocks 30s at maximum, and throws an {@link AssertionError} if
+   * Blocks the calling thread until the expected number of tasks competing for a permit is reached. That is all the
+   * permit owners plus all queued task. This method blocks 30s at maximum, and throws an {@link AssertionError} if
    * elapsed.
    */
-  public static void waitForMutexCompetitors(final IMutex mutex, final int expectedCompetitorCount) {
+  public static void waitForPermitCompetitors(final ISchedulingSemaphore semaphore, final int expectedCompetitorCount) {
     final long deadline = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(30);
 
-    while (mutex.getCompetitorCount() != expectedCompetitorCount) {
+    while (semaphore.getCompetitorCount() != expectedCompetitorCount) {
       if (System.currentTimeMillis() > deadline) {
-        fail(String.format("Timeout elapsed while waiting for a mutex-permit count. [expectedPermitCount=%s, actualPermitCount=%s]", expectedCompetitorCount, mutex.getCompetitorCount()));
+        fail(String.format("Timeout elapsed while waiting for a semaphore-permit count. [expectedPermitCount=%s, actualPermitCount=%s]", expectedCompetitorCount, semaphore.getCompetitorCount()));
       }
       Thread.yield();
     }

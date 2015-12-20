@@ -60,7 +60,7 @@ public class RunMonitorJobTest {
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent().withRunMonitor(explicitMonitor)));
 
-    setupLatch.await();
+    assertTrue(setupLatch.await());
     assertSame(currentMonitor, RunMonitor.CURRENT.get());
     setupLatch.unblock();
 
@@ -89,7 +89,7 @@ public class RunMonitorJobTest {
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent().withRunMonitor(explicitMonitor)));
 
-    setupLatch.await();
+    assertTrue(setupLatch.await());
     assertNull(RunMonitor.CURRENT.get());
     setupLatch.unblock();
 
@@ -116,7 +116,7 @@ public class RunMonitorJobTest {
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent()));
 
-    setupLatch.await();
+    assertTrue(setupLatch.await());
     assertSame(currentMonitor, RunMonitor.CURRENT.get());
     setupLatch.unblock();
 
@@ -142,7 +142,7 @@ public class RunMonitorJobTest {
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent()));
 
-    setupLatch.await();
+    assertTrue(setupLatch.await());
     assertNull(RunMonitor.CURRENT.get());
     setupLatch.unblock();
 

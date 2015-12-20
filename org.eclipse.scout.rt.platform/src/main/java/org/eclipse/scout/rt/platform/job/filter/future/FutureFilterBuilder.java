@@ -22,7 +22,7 @@ import org.eclipse.scout.rt.platform.filter.AndFilter;
 import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.filter.NotFilter;
 import org.eclipse.scout.rt.platform.job.IFuture;
-import org.eclipse.scout.rt.platform.job.IMutex;
+import org.eclipse.scout.rt.platform.job.ISchedulingSemaphore;
 import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.job.JobState;
 
@@ -149,10 +149,10 @@ public class FutureFilterBuilder {
   }
 
   /**
-   * To match all jobs which have the given mutex object set.
+   * To match all jobs which are assigned to the given {@link ISchedulingSemaphore}.
    */
-  public FutureFilterBuilder andMatchMutex(final IMutex mutex) {
-    andMatch(new MutexFutureFilter(mutex));
+  public FutureFilterBuilder andMatchSchedulingSemaphore(final ISchedulingSemaphore semaphore) {
+    andMatch(new SchedulingSemaphoreFutureFilter(semaphore));
     return this;
   }
 

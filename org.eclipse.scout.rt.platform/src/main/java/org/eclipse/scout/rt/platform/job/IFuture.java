@@ -50,9 +50,13 @@ public interface IFuture<RESULT> extends ICancellable {
   JobInput getJobInput();
 
   /**
-   * Returns the mutex object, or <code>null</code> if not being a mutually exclusive task.
+   * Returns the {@link ISchedulingSemaphore} which controls this job's execution, or <code>null</code> if there is no
+   * concurrency restriction for this job.
+   * <p>
+   * With a semaphore in place, this job only commences execution, once a permit is free or gets available. If free, the
+   * job commences execution immediately at the next reasonable opportunity, unless no worker thread is available.
    */
-  IMutex getMutex();
+  ISchedulingSemaphore getSchedulingSemaphore();
 
   /**
    * Attempts to cancel the execution of the associated job. This attempt will be ignored if the job has already
@@ -80,7 +84,7 @@ public interface IFuture<RESULT> extends ICancellable {
   boolean isDone();
 
   /**
-   * Returns the execution mode of the job, and is one of {@link #EXECUTION_MODE_SINGLE}, or
+   * Returns the execution mode of this job, and is one of {@link #EXECUTION_MODE_SINGLE}, or
    * {@link #EXECUTION_MODE_PERIODIC_AT_FIXED_RATE}, or {@link #EXECUTION_MODE_PERIODIC_WITH_FIXED_DELAY}.
    */
   int getExecutionMode();

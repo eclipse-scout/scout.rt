@@ -51,7 +51,7 @@ public class ThreadNameDecorator<RESULT> implements ICallableDecorator<RESULT> {
             .andMatchEventType(JobEventType.JOB_STATE_CHANGED)
             .andMatchState(
                 JobState.RUNNING,
-                JobState.WAITING_FOR_MUTEX,
+                JobState.WAITING_FOR_PERMIT,
                 JobState.WAITING_FOR_BLOCKING_CONDITION)
             .toFilter(),
         new IJobListener() {

@@ -10,8 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.job.filter.event;
 
-import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.client.context.ClientRunContext;
+import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.job.filter.future.ModelJobFutureFilter;
 import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.job.filter.event.FutureFilterWrapperJobEventFilter;
@@ -19,11 +18,9 @@ import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.util.IAdaptable;
 
 /**
- * Filter to accept all events for model jobs. Those are jobs, which are running on behalf of a {@link ClientRunContext}
- * , and have the {@link IClientSession} set as their mutex object.
- * <p>
- * However, only one such model job Future is active at any time, and its executing thread is called the model thread.
+ * Filter to accept events only related to model jobs.
  *
+ * @see ModelJobs
  * @since 5.2
  */
 public class ModelJobEventFilter implements IFilter<JobEvent>, IAdaptable {

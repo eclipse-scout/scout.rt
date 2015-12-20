@@ -44,7 +44,7 @@ import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.context.PropertyMap;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.job.IFuture;
-import org.eclipse.scout.rt.platform.job.IMutex;
+import org.eclipse.scout.rt.platform.job.ISchedulingSemaphore;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.reflect.AbstractPropertyObserver;
@@ -79,7 +79,7 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
 
   private final EventListenerList m_eventListeners;
 
-  private final IMutex m_modelJobMutex = Jobs.newMutex();
+  private final ISchedulingSemaphore m_modelJobSemaphore = Jobs.newSchedulingSemaphore(1).seal();
 
   // state
   private final Object m_stateLock;
@@ -645,8 +645,8 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
   }
 
   @Override
-  public IMutex getModelJobMutex() {
-    return m_modelJobMutex;
+  public ISchedulingSemaphore getModelJobSemaphore() {
+    return m_modelJobSemaphore;
   }
 
   @Internal

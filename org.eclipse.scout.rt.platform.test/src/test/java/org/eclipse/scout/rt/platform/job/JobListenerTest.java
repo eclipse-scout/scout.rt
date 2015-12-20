@@ -202,7 +202,7 @@ public class JobListenerTest {
         jobRunningLatch.countDownAndBlock();
       }
     }, Jobs.newInput());
-    jobRunningLatch.await();
+    assertTrue(jobRunningLatch.await());
 
     JobEventCaptureListener captureListener = new JobEventCaptureListener();
     Jobs.getJobManager().addListener(Jobs.newEventFilterBuilder()
@@ -240,7 +240,7 @@ public class JobListenerTest {
         job2RunningLatch.countDownAndBlock();
       }
     }, Jobs.newInput());
-    job2RunningLatch.await();
+    assertTrue(job2RunningLatch.await());
 
     // install listener
     JobEventCaptureListener captureListener = new JobEventCaptureListener();
@@ -276,7 +276,7 @@ public class JobListenerTest {
         job2RunningLatch.countDownAndBlock();
       }
     }, Jobs.newInput());
-    job2RunningLatch.await();
+    assertTrue(job2RunningLatch.await());
 
     JobEventCaptureListener captureListener = new JobEventCaptureListener();
     Jobs.getJobManager().addListener(Jobs.newEventFilterBuilder()
@@ -305,7 +305,7 @@ public class JobListenerTest {
         job2RunningLatch.countDownAndBlock();
       }
     }, Jobs.newInput());
-    job2RunningLatch.await();
+    assertTrue(job2RunningLatch.await());
 
     JobEventCaptureListener captureListener = new JobEventCaptureListener();
     Jobs.getJobManager().addListener(Jobs.newEventFilterBuilder()
@@ -330,7 +330,7 @@ public class JobListenerTest {
         jobRunningLatch.countDownAndBlock();
       }
     }, Jobs.newInput());
-    jobRunningLatch.await();
+    assertTrue(jobRunningLatch.await());
 
     JobEventCaptureListener captureListener = new JobEventCaptureListener();
     future.addListener(captureListener);
@@ -360,7 +360,7 @@ public class JobListenerTest {
         jobRunningLatch.countDownAndBlock();
       }
     }, Jobs.newInput());
-    jobRunningLatch.await();
+    assertTrue(jobRunningLatch.await());
 
     JobEventCaptureListener captureListener = new JobEventCaptureListener();
     future.addListener(Jobs.newEventFilterBuilder()

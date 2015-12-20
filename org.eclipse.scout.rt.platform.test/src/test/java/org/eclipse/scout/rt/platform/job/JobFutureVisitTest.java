@@ -20,9 +20,11 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
+import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.filter.AndFilter;
 import org.eclipse.scout.rt.platform.filter.NotFilter;
+import org.eclipse.scout.rt.platform.job.internal.JobManager;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.visitor.IVisitor;
 import org.eclipse.scout.rt.testing.platform.job.JobTestUtil;
@@ -38,9 +40,9 @@ public class JobFutureVisitTest {
 
   private static final String JOB_IDENTIFIER = UUID.randomUUID().toString();
 
-  private IMutex m_mutex1;
-  private IMutex m_mutex2;
-  private IMutex m_mutex3;
+  private ISchedulingSemaphore m_mutex1;
+  private ISchedulingSemaphore m_mutex2;
+  private ISchedulingSemaphore m_mutex3;
 
   private Set<String> protocol;
 
@@ -49,11 +51,16 @@ public class JobFutureVisitTest {
   private IBlockingCondition bc1;
   private IBlockingCondition bc2;
 
+  private IBean<IJobManager> m_jobManagerBean;
+
   @Before
   public void before() throws InterruptedException {
-    m_mutex1 = Jobs.newMutex();
-    m_mutex2 = Jobs.newMutex();
-    m_mutex3 = Jobs.newMutex();
+    m_jobManagerBean = JobTestUtil.replaceCurrentJobManager(new JobManager() {
+    });
+
+    m_mutex1 = Jobs.newSchedulingSemaphore(1);
+    m_mutex2 = Jobs.newSchedulingSemaphore(1);
+    m_mutex3 = Jobs.newSchedulingSemaphore(1);
 
     // prepare the test-case
     protocol = Collections.synchronizedSet(new HashSet<String>()); // synchronized because modified/read by different threads.
@@ -73,7 +80,7 @@ public class JobFutureVisitTest {
     }, Jobs.newInput()
         .withRunContext(RunContexts.empty())
         .withName("mutex1_job1")
-        .withMutex(m_mutex1)
+        .withSchedulingSemaphore(m_mutex1)
         .withExecutionHint(JOB_IDENTIFIER)
         .withExceptionHandling(null, false));
 
@@ -88,7 +95,7 @@ public class JobFutureVisitTest {
     }, Jobs.newInput()
         .withRunContext(RunContexts.empty())
         .withName("mutex1_job2")
-        .withMutex(m_mutex1)
+        .withSchedulingSemaphore(m_mutex1)
         .withExecutionHint(JOB_IDENTIFIER)
         .withExceptionHandling(null, false));
 
@@ -103,7 +110,7 @@ public class JobFutureVisitTest {
         .withRunContext(RunContexts.empty())
         .withName("mutex1_job3")
         .withExecutionHint(JOB_IDENTIFIER)
-        .withMutex(m_mutex1));
+        .withSchedulingSemaphore(m_mutex1));
 
     // =========
     // SESSION 2 (JOB-1)
@@ -117,7 +124,7 @@ public class JobFutureVisitTest {
         .withRunContext(RunContexts.empty())
         .withName("mutex2_job1")
         .withExecutionHint(JOB_IDENTIFIER)
-        .withMutex(m_mutex2));
+        .withSchedulingSemaphore(m_mutex2));
 
     // SESSION 2 (JOB-2)
     Jobs.getJobManager().schedule(new IRunnable() {
@@ -130,7 +137,7 @@ public class JobFutureVisitTest {
     }, Jobs.newInput()
         .withRunContext(RunContexts.empty())
         .withName("mutex2_job2")
-        .withMutex(m_mutex2)
+        .withSchedulingSemaphore(m_mutex2)
         .withExecutionHint(JOB_IDENTIFIER)
         .withExceptionHandling(null, false));
 
@@ -142,14 +149,14 @@ public class JobFutureVisitTest {
         protocol.add(IFuture.CURRENT.get().getJobInput().getName());
         bc2.setBlocking(false);
 
-        JobTestUtil.waitForMutexCompetitors(m_mutex2, 3); // Wait until job 'mutex2_job2' is re-acquiring the mutex. [3=job-2, job-3, job-4]
+        JobTestUtil.waitForPermitCompetitors(m_mutex2, 3); // Wait until job 'mutex2_job2' is re-acquiring the mutex. [3=job-2, job-3, job-4]
 
         m_latch.countDownAndBlock();
       }
     }, Jobs.newInput()
         .withRunContext(RunContexts.empty())
         .withName("mutex2_job3")
-        .withMutex(m_mutex2)
+        .withSchedulingSemaphore(m_mutex2)
         .withExecutionHint(JOB_IDENTIFIER)
         .withExceptionHandling(null, false));
 
@@ -164,7 +171,7 @@ public class JobFutureVisitTest {
         .withRunContext(RunContexts.empty())
         .withName("mutex2_job4")
         .withExecutionHint(JOB_IDENTIFIER)
-        .withMutex(m_mutex2));
+        .withSchedulingSemaphore(m_mutex2));
 
     // =========
     // SESSION 3 (JOB-1)
@@ -178,7 +185,7 @@ public class JobFutureVisitTest {
     }, Jobs.newInput()
         .withRunContext(RunContexts.empty())
         .withName("mutex3_job1")
-        .withMutex(m_mutex3)
+        .withSchedulingSemaphore(m_mutex3)
         .withExecutionHint(JOB_IDENTIFIER)
         .withExceptionHandling(null, false));
 
@@ -193,6 +200,8 @@ public class JobFutureVisitTest {
     Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
         .andMatchExecutionHint(JOB_IDENTIFIER)
         .toFilter(), 10, TimeUnit.SECONDS);
+
+    JobTestUtil.unregisterAndShutdownJobManager(m_jobManagerBean);
   }
 
   @Test

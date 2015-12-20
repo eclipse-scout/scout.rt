@@ -34,14 +34,14 @@ public class PeriodicJobMutexTest {
   public void testAtFixedRate() {
     testInternal(Jobs.newInput()
         .withPeriodicExecutionAtFixedRate(100, TimeUnit.MILLISECONDS)
-        .withMutex(Jobs.newMutex()));
+        .withSchedulingSemaphore(Jobs.newSchedulingSemaphore(1)));
   }
 
   @Test
   public void testWithFixedDelay() {
     testInternal(Jobs.newInput()
         .withPeriodicExecutionWithFixedDelay(100, TimeUnit.MILLISECONDS)
-        .withMutex(Jobs.newMutex()));
+        .withSchedulingSemaphore(Jobs.newSchedulingSemaphore(1)));
   }
 
   /**
@@ -71,8 +71,8 @@ public class PeriodicJobMutexTest {
 
         // This task should be mutex-owner
         IFuture<?> currentFuture = IFuture.CURRENT.get();
-        IMutex mutex = currentFuture.getMutex();
-        if (mutex != null && mutex.isMutexOwner(currentFuture)) {
+        ISchedulingSemaphore mutex = currentFuture.getSchedulingSemaphore();
+        if (mutex != null && mutex.isPermitOwner(currentFuture)) {
           protocol.add("mutex-owner");
         }
 
@@ -91,7 +91,7 @@ public class PeriodicJobMutexTest {
                   protocol.add("running-2");
                 }
               }, Jobs.newInput()
-                  .withMutex(periodicJobInput.getMutex())
+                  .withSchedulingSemaphore(periodicJobInput.getSchedulingSemaphore())
                   .withExecutionHint(JOB_IDENTIFIER))
                   .awaitDone(200, TimeUnit.MILLISECONDS);
             }
@@ -112,7 +112,7 @@ public class PeriodicJobMutexTest {
             protocol.add("running-3");
           }
         }, Jobs.newInput()
-            .withMutex(periodicJobInput.getMutex())
+            .withSchedulingSemaphore(periodicJobInput.getSchedulingSemaphore())
             .withExecutionHint(JOB_IDENTIFIER));
 
         protocol.add("end");
@@ -129,7 +129,7 @@ public class PeriodicJobMutexTest {
         protocol.add("other job");
       }
     }, Jobs.newInput()
-        .withMutex(periodicJobInput.getMutex()));
+        .withSchedulingSemaphore(periodicJobInput.getSchedulingSemaphore()));
 
     // Wait for the job to complete
     Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()

@@ -329,7 +329,7 @@ public class WhenDoneTest {
         verifyLatch.countDown();
       }
     }, RunContexts.copyCurrent());
-    verifyLatch.await();
+    assertTrue(verifyLatch.await());
 
     assertEquals(CollectionUtility.arrayList("1", "2", "done"), protocol);
     assertNull(eventHolder.getValue().getException());

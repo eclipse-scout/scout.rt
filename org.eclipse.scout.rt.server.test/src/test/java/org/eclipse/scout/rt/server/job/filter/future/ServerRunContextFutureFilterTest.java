@@ -18,7 +18,7 @@ import static org.mockito.Mockito.when;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.job.IFuture;
-import org.eclipse.scout.rt.platform.job.IMutex;
+import org.eclipse.scout.rt.platform.job.ISchedulingSemaphore;
 import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.filter.future.FutureFilter;
@@ -184,11 +184,11 @@ public class ServerRunContextFutureFilterTest {
   }
 
   @Test
-  public void testMutex() {
-    IMutex mutex1 = Jobs.newMutex();
-    IMutex mutex2 = Jobs.newMutex();
+  public void testMutualExclusion() {
+    ISchedulingSemaphore mutex1 = Jobs.newSchedulingSemaphore(1);
+    ISchedulingSemaphore mutex2 = Jobs.newSchedulingSemaphore(1);
 
-    m_serverJobFuture.getJobInput().withMutex(mutex1);
+    m_serverJobFuture.getJobInput().withSchedulingSemaphore(mutex1);
     assertTrue(Jobs.newFutureFilterBuilder()
         .andMatchRunContext(ServerRunContext.class)
         .toFilter()
@@ -196,23 +196,23 @@ public class ServerRunContextFutureFilterTest {
 
     assertFalse(Jobs.newFutureFilterBuilder()
         .andMatchRunContext(ServerRunContext.class)
-        .andMatchMutex(null)
+        .andMatchSchedulingSemaphore(null)
         .toFilter()
         .accept(m_serverJobFuture));
 
     assertTrue(Jobs.newFutureFilterBuilder()
         .andMatchRunContext(ServerRunContext.class)
-        .andMatchMutex(mutex1)
+        .andMatchSchedulingSemaphore(mutex1)
         .toFilter()
         .accept(m_serverJobFuture));
 
     assertFalse(Jobs.newFutureFilterBuilder()
         .andMatchRunContext(ServerRunContext.class)
-        .andMatchMutex(mutex2)
+        .andMatchSchedulingSemaphore(mutex2)
         .toFilter()
         .accept(m_serverJobFuture));
 
-    m_serverJobFuture.getJobInput().withMutex(null);
+    m_serverJobFuture.getJobInput().withSchedulingSemaphore(null);
     assertTrue(Jobs.newFutureFilterBuilder()
         .andMatchRunContext(ServerRunContext.class)
         .toFilter()
@@ -220,19 +220,19 @@ public class ServerRunContextFutureFilterTest {
 
     assertTrue(Jobs.newFutureFilterBuilder()
         .andMatchRunContext(ServerRunContext.class)
-        .andMatchMutex(null)
+        .andMatchSchedulingSemaphore(null)
         .toFilter()
         .accept(m_serverJobFuture));
 
     assertFalse(Jobs.newFutureFilterBuilder()
         .andMatchRunContext(ServerRunContext.class)
-        .andMatchMutex(mutex1)
+        .andMatchSchedulingSemaphore(mutex1)
         .toFilter()
         .accept(m_serverJobFuture));
 
     assertFalse(Jobs.newFutureFilterBuilder()
         .andMatchRunContext(ServerRunContext.class)
-        .andMatchMutex(mutex2)
+        .andMatchSchedulingSemaphore(mutex2)
         .toFilter()
         .accept(m_serverJobFuture));
   }

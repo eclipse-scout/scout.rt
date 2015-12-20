@@ -12,24 +12,24 @@ package org.eclipse.scout.rt.platform.job.filter.future;
 
 import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.job.IFuture;
-import org.eclipse.scout.rt.platform.job.IMutex;
+import org.eclipse.scout.rt.platform.job.ISchedulingSemaphore;
 import org.eclipse.scout.rt.platform.util.CompareUtility;
 
 /**
- * Filter which accepts all Futures that belong to the given mutex object.
+ * Filter which accepts all Futures that are assigned to the given {@link ISchedulingSemaphore}.
  *
  * @since 5.1
  */
-public class MutexFutureFilter implements IFilter<IFuture<?>> {
+public class SchedulingSemaphoreFutureFilter implements IFilter<IFuture<?>> {
 
-  private final IMutex m_mutex;
+  private final ISchedulingSemaphore m_semaphore;
 
-  public MutexFutureFilter(final IMutex mutexObject) {
-    m_mutex = mutexObject;
+  public SchedulingSemaphoreFutureFilter(final ISchedulingSemaphore semaphore) {
+    m_semaphore = semaphore;
   }
 
   @Override
   public boolean accept(final IFuture<?> future) {
-    return CompareUtility.equals(m_mutex, future.getJobInput().getMutex());
+    return CompareUtility.equals(m_semaphore, future.getJobInput().getSchedulingSemaphore());
   }
 }

@@ -112,7 +112,7 @@ public class JobStateTest {
     final BlockingCountDownLatch job3RunningLatch = new BlockingCountDownLatch(1);
     final IBlockingCondition condition = Jobs.newBlockingCondition(true);
 
-    final IMutex mutex = Jobs.newMutex();
+    final ISchedulingSemaphore mutex = Jobs.newSchedulingSemaphore(1);
 
     // Schedule job-1
     IFuture<Void> future1 = Jobs.schedule(new IRunnable() {
@@ -123,7 +123,7 @@ public class JobStateTest {
       }
     }, Jobs.newInput()
         .withName("job-1")
-        .withMutex(mutex));
+        .withSchedulingSemaphore(mutex));
 
     // Wait until running
     assertTrue(job1RunningLatch.await());
@@ -139,7 +139,7 @@ public class JobStateTest {
       }
     }, Jobs.newInput()
         .withName("job-2")
-        .withMutex(mutex));
+        .withSchedulingSemaphore(mutex));
 
     // Schedule job-3
     IFuture<Void> future3 = Jobs.schedule(new IRunnable() {
@@ -147,22 +147,22 @@ public class JobStateTest {
       @Override
       public void run() throws Exception {
         job3RunningLatch.countDownAndBlock();
-        JobTestUtil.waitForMutexCompetitors(mutex, 2);
+        JobTestUtil.waitForPermitCompetitors(mutex, 2);
       }
     }, Jobs.newInput()
         .withName("job-3")
-        .withMutex(mutex));
+        .withSchedulingSemaphore(mutex));
 
     assertTrue(job1RunningLatch.await());
     assertEquals(JobState.RUNNING, future1.getState());
-    assertEquals(JobState.WAITING_FOR_MUTEX, future2.getState());
-    assertEquals(JobState.WAITING_FOR_MUTEX, future3.getState());
+    assertEquals(JobState.WAITING_FOR_PERMIT, future2.getState());
+    assertEquals(JobState.WAITING_FOR_PERMIT, future3.getState());
     job1RunningLatch.unblock();
 
     job2RunningLatch.await();
     assertEquals(JobState.DONE, future1.getState());
     assertEquals(JobState.RUNNING, future2.getState());
-    assertEquals(JobState.WAITING_FOR_MUTEX, future3.getState());
+    assertEquals(JobState.WAITING_FOR_PERMIT, future3.getState());
     job2RunningLatch.unblock();
 
     job3RunningLatch.await();
@@ -171,10 +171,10 @@ public class JobStateTest {
     assertEquals(JobState.RUNNING, future3.getState());
 
     condition.setBlocking(false);
-    JobTestUtil.waitForMutexCompetitors(mutex, 2); // job-2 and job-3
+    JobTestUtil.waitForPermitCompetitors(mutex, 2); // job-2 and job-3
 
     assertEquals(JobState.DONE, future1.getState());
-    assertEquals(JobState.WAITING_FOR_MUTEX, future2.getState());
+    assertEquals(JobState.WAITING_FOR_PERMIT, future2.getState());
     assertEquals(JobState.RUNNING, future3.getState());
 
     job3RunningLatch.unblock();
@@ -201,8 +201,8 @@ public class JobStateTest {
     assertEquals(JobState.SCHEDULED, capturedFutureStates.get(i));
 
     i++;
-    assertStateChangedEvent(future1, JobState.WAITING_FOR_MUTEX, capturedEvents.get(i));
-    assertEquals(JobState.WAITING_FOR_MUTEX, capturedFutureStates.get(i));
+    assertStateChangedEvent(future1, JobState.WAITING_FOR_PERMIT, capturedEvents.get(i));
+    assertEquals(JobState.WAITING_FOR_PERMIT, capturedFutureStates.get(i));
 
     i++;
     assertStateChangedEvent(future1, JobState.RUNNING, capturedEvents.get(i));
@@ -213,16 +213,16 @@ public class JobStateTest {
     assertEquals(JobState.SCHEDULED, capturedFutureStates.get(i));
 
     i++;
-    assertStateChangedEvent(future2, JobState.WAITING_FOR_MUTEX, capturedEvents.get(i));
-    assertEquals(JobState.WAITING_FOR_MUTEX, capturedFutureStates.get(i));
+    assertStateChangedEvent(future2, JobState.WAITING_FOR_PERMIT, capturedEvents.get(i));
+    assertEquals(JobState.WAITING_FOR_PERMIT, capturedFutureStates.get(i));
 
     i++;
     assertStateChangedEvent(future3, JobState.SCHEDULED, capturedEvents.get(i));
     assertEquals(JobState.SCHEDULED, capturedFutureStates.get(i));
 
     i++;
-    assertStateChangedEvent(future3, JobState.WAITING_FOR_MUTEX, capturedEvents.get(i));
-    assertEquals(JobState.WAITING_FOR_MUTEX, capturedFutureStates.get(i));
+    assertStateChangedEvent(future3, JobState.WAITING_FOR_PERMIT, capturedEvents.get(i));
+    assertEquals(JobState.WAITING_FOR_PERMIT, capturedFutureStates.get(i));
 
     i++;
     assertStateChangedEvent(future1, JobState.DONE, capturedEvents.get(i));
@@ -241,8 +241,8 @@ public class JobStateTest {
     assertEquals(JobState.RUNNING, capturedFutureStates.get(i));
 
     i++;
-    assertStateChangedEvent(future2, JobState.WAITING_FOR_MUTEX, capturedEvents.get(i));
-    assertEquals(JobState.WAITING_FOR_MUTEX, capturedFutureStates.get(i));
+    assertStateChangedEvent(future2, JobState.WAITING_FOR_PERMIT, capturedEvents.get(i));
+    assertEquals(JobState.WAITING_FOR_PERMIT, capturedFutureStates.get(i));
 
     i++;
     assertStateChangedEvent(future3, JobState.DONE, capturedEvents.get(i));
@@ -321,7 +321,7 @@ public class JobStateTest {
     JobEventCaptureListener captureListener = new JobEventCaptureListener();
     Jobs.getJobManager().addListener(captureListener);
 
-    final IMutex mutex = Jobs.newMutex();
+    final ISchedulingSemaphore mutex = Jobs.newSchedulingSemaphore(1);
     final IBlockingCondition condition = Jobs.newBlockingCondition(true);
     final AtomicReference<Thread> workerThread = new AtomicReference<>();
 
@@ -336,13 +336,13 @@ public class JobStateTest {
           fail("timeout expected");
         }
         catch (InterruptedException e) {
-          assertFalse(mutex.isMutexOwner(IFuture.CURRENT.get()));
+          assertFalse(mutex.isPermitOwner(IFuture.CURRENT.get()));
           assertSame(JobState.RUNNING, IFuture.CURRENT.get().getState());
         }
       }
     }, Jobs.newInput()
         .withName("job-1")
-        .withMutex(mutex));
+        .withSchedulingSemaphore(mutex));
 
     // Wait until job-1 is running
     JobTestUtil.waitForState(future1, JobState.WAITING_FOR_BLOCKING_CONDITION);
@@ -364,8 +364,8 @@ public class JobStateTest {
     assertEquals(JobState.SCHEDULED, capturedFutureStates.get(i));
 
     i++;
-    assertStateChangedEvent(future1, JobState.WAITING_FOR_MUTEX, capturedEvents.get(i));
-    assertEquals(JobState.WAITING_FOR_MUTEX, capturedFutureStates.get(i));
+    assertStateChangedEvent(future1, JobState.WAITING_FOR_PERMIT, capturedEvents.get(i));
+    assertEquals(JobState.WAITING_FOR_PERMIT, capturedFutureStates.get(i));
 
     i++;
     assertStateChangedEvent(future1, JobState.RUNNING, capturedEvents.get(i));
@@ -400,7 +400,7 @@ public class JobStateTest {
     JobEventCaptureListener captureListener = new JobEventCaptureListener();
     Jobs.getJobManager().addListener(captureListener);
 
-    final IMutex mutex = Jobs.newMutex();
+    final ISchedulingSemaphore mutex = Jobs.newSchedulingSemaphore(1);
     final IBlockingCondition condition = Jobs.newBlockingCondition(true);
     final AtomicReference<Thread> workerThread = new AtomicReference<>();
 
@@ -416,13 +416,13 @@ public class JobStateTest {
           fail("timeout expected");
         }
         catch (TimeoutException e) {
-          assertFalse(mutex.isMutexOwner(IFuture.CURRENT.get()));
+          assertFalse(mutex.isPermitOwner(IFuture.CURRENT.get()));
           assertSame(JobState.RUNNING, IFuture.CURRENT.get().getState());
         }
       }
     }, Jobs.newInput()
         .withName("job-1")
-        .withMutex(mutex));
+        .withSchedulingSemaphore(mutex));
 
     // Wait until job-1 completed
     future1.awaitDoneAndGet(10, TimeUnit.SECONDS);
@@ -440,8 +440,8 @@ public class JobStateTest {
     assertEquals(JobState.SCHEDULED, capturedFutureStates.get(i));
 
     i++;
-    assertStateChangedEvent(future1, JobState.WAITING_FOR_MUTEX, capturedEvents.get(i));
-    assertEquals(JobState.WAITING_FOR_MUTEX, capturedFutureStates.get(i));
+    assertStateChangedEvent(future1, JobState.WAITING_FOR_PERMIT, capturedEvents.get(i));
+    assertEquals(JobState.WAITING_FOR_PERMIT, capturedFutureStates.get(i));
 
     i++;
     assertStateChangedEvent(future1, JobState.RUNNING, capturedEvents.get(i));
@@ -545,7 +545,7 @@ public class JobStateTest {
         }
       }
     }, Jobs.newInput()
-        .withMutex(Jobs.newMutex())
+        .withSchedulingSemaphore(Jobs.newSchedulingSemaphore(1))
         .withSchedulingDelay(1, TimeUnit.MILLISECONDS)
         .withPeriodicExecutionAtFixedRate(1, TimeUnit.MILLISECONDS));
 
@@ -565,8 +565,8 @@ public class JobStateTest {
     assertEquals(JobState.PENDING, capturedFutureStates.get(i));
 
     i++;
-    assertStateChangedEvent(future, JobState.WAITING_FOR_MUTEX, capturedEvents.get(i));
-    assertEquals(JobState.WAITING_FOR_MUTEX, capturedFutureStates.get(i));
+    assertStateChangedEvent(future, JobState.WAITING_FOR_PERMIT, capturedEvents.get(i));
+    assertEquals(JobState.WAITING_FOR_PERMIT, capturedFutureStates.get(i));
 
     i++; // first round
     assertStateChangedEvent(future, JobState.RUNNING, capturedEvents.get(i));
@@ -577,8 +577,8 @@ public class JobStateTest {
     assertEquals(JobState.PENDING, capturedFutureStates.get(i));
 
     i++;
-    assertStateChangedEvent(future, JobState.WAITING_FOR_MUTEX, capturedEvents.get(i));
-    assertEquals(JobState.WAITING_FOR_MUTEX, capturedFutureStates.get(i));
+    assertStateChangedEvent(future, JobState.WAITING_FOR_PERMIT, capturedEvents.get(i));
+    assertEquals(JobState.WAITING_FOR_PERMIT, capturedFutureStates.get(i));
 
     i++; // second round
     assertStateChangedEvent(future, JobState.RUNNING, capturedEvents.get(i));
@@ -589,8 +589,8 @@ public class JobStateTest {
     assertEquals(JobState.PENDING, capturedFutureStates.get(i));
 
     i++;
-    assertStateChangedEvent(future, JobState.WAITING_FOR_MUTEX, capturedEvents.get(i));
-    assertEquals(JobState.WAITING_FOR_MUTEX, capturedFutureStates.get(i));
+    assertStateChangedEvent(future, JobState.WAITING_FOR_PERMIT, capturedEvents.get(i));
+    assertEquals(JobState.WAITING_FOR_PERMIT, capturedFutureStates.get(i));
 
     i++; // third round
     assertStateChangedEvent(future, JobState.RUNNING, capturedEvents.get(i));
@@ -678,7 +678,7 @@ public class JobStateTest {
         }
       }
     }, Jobs.newInput()
-        .withMutex(Jobs.newMutex())
+        .withSchedulingSemaphore(Jobs.newSchedulingSemaphore(1))
         .withSchedulingDelay(1, TimeUnit.MILLISECONDS)
         .withPeriodicExecutionWithFixedDelay(1, TimeUnit.MILLISECONDS));
 
@@ -698,8 +698,8 @@ public class JobStateTest {
     assertEquals(JobState.PENDING, capturedFutureStates.get(i));
 
     i++;
-    assertStateChangedEvent(future, JobState.WAITING_FOR_MUTEX, capturedEvents.get(i));
-    assertEquals(JobState.WAITING_FOR_MUTEX, capturedFutureStates.get(i));
+    assertStateChangedEvent(future, JobState.WAITING_FOR_PERMIT, capturedEvents.get(i));
+    assertEquals(JobState.WAITING_FOR_PERMIT, capturedFutureStates.get(i));
 
     i++; // first round
     assertStateChangedEvent(future, JobState.RUNNING, capturedEvents.get(i));
@@ -710,8 +710,8 @@ public class JobStateTest {
     assertEquals(JobState.PENDING, capturedFutureStates.get(i));
 
     i++;
-    assertStateChangedEvent(future, JobState.WAITING_FOR_MUTEX, capturedEvents.get(i));
-    assertEquals(JobState.WAITING_FOR_MUTEX, capturedFutureStates.get(i));
+    assertStateChangedEvent(future, JobState.WAITING_FOR_PERMIT, capturedEvents.get(i));
+    assertEquals(JobState.WAITING_FOR_PERMIT, capturedFutureStates.get(i));
 
     i++; // second round
     assertStateChangedEvent(future, JobState.RUNNING, capturedEvents.get(i));
@@ -722,8 +722,8 @@ public class JobStateTest {
     assertEquals(JobState.PENDING, capturedFutureStates.get(i));
 
     i++;
-    assertStateChangedEvent(future, JobState.WAITING_FOR_MUTEX, capturedEvents.get(i));
-    assertEquals(JobState.WAITING_FOR_MUTEX, capturedFutureStates.get(i));
+    assertStateChangedEvent(future, JobState.WAITING_FOR_PERMIT, capturedEvents.get(i));
+    assertEquals(JobState.WAITING_FOR_PERMIT, capturedFutureStates.get(i));
 
     i++; // third round
     assertStateChangedEvent(future, JobState.RUNNING, capturedEvents.get(i));

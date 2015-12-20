@@ -20,7 +20,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.JobState;
-import org.eclipse.scout.rt.platform.job.internal.Mutex.QueuePosition;
+import org.eclipse.scout.rt.platform.job.internal.SchedulingSemaphore.QueuePosition;
 import org.eclipse.scout.rt.platform.job.listener.JobEventData;
 import org.eclipse.scout.rt.platform.util.ToStringBuilder;
 import org.eclipse.scout.rt.platform.util.concurrent.InterruptedException;
@@ -103,8 +103,8 @@ public class BlockingCondition implements IBlockingCondition {
           .withFuture(futureTask)
           .withBlockingCondition(this));
 
-      // Release the mutex if being a mutually exclusive task.
-      futureTask.releaseMutex();
+      // Release the permit if assigned to a scheduling semaphore and currently being a permit owner.
+      futureTask.releasePermit();
       try {
         blockUntilSignaledOrTimeout(timeout, unit); // Wait until the condition falls
       }
@@ -118,12 +118,12 @@ public class BlockingCondition implements IBlockingCondition {
       m_lock.unlock();
     }
 
-    // Acquire the mutex if being a mutually exclusive task.
-    final Mutex mutex = futureTask.getMutex();
-    if (mutex != null) {
+    // Acquire a permit if assigned to a scheduling semaphore.
+    final SchedulingSemaphore semaphore = futureTask.getSchedulingSemaphore();
+    if (semaphore != null) {
       try {
-        futureTask.changeState(JobState.WAITING_FOR_MUTEX);
-        mutex.acquire(futureTask, QueuePosition.HEAD);
+        futureTask.changeState(JobState.WAITING_FOR_PERMIT);
+        semaphore.acquire(futureTask, QueuePosition.HEAD);
       }
       catch (final InterruptedException e) {
         executionHintRegistration.dispose();

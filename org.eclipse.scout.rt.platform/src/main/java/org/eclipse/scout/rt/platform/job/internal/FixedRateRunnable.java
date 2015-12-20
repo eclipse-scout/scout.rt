@@ -15,8 +15,10 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import org.eclipse.scout.rt.platform.job.ISchedulingSemaphore;
 import org.eclipse.scout.rt.platform.job.JobState;
-import org.eclipse.scout.rt.platform.job.internal.Mutex.QueuePosition;
+import org.eclipse.scout.rt.platform.job.internal.SchedulingSemaphore.IPermitAcquiredCallback;
+import org.eclipse.scout.rt.platform.job.internal.SchedulingSemaphore.QueuePosition;
 
 /**
  * Runnable to run the given {@link JobFutureTask} periodically at a 'fixed-rate', meaning that if the period is 2
@@ -26,6 +28,8 @@ import org.eclipse.scout.rt.platform.job.internal.Mutex.QueuePosition;
  * This class is necessary because {@link ScheduledThreadPoolExecutor} is not applicable for {@link JobManager} due to
  * its fixed-size thread pool. That means, that once the <code>core-pool-size</code> is exceeded, the creation of
  * on-demand threads up to a <code>maximum-pool-size</code> would not be supported.
+ * <p>
+ * This class supports the periodic job to be assigned to a {@link ISchedulingSemaphore}.
  *
  * @since 5.1
  * @see ScheduledExecutorService#scheduleAtFixedRate(Runnable, long, long, TimeUnit)
@@ -54,17 +58,17 @@ class FixedRateRunnable implements IRejectableRunnable {
 
     final long startTimeNanos = System.nanoTime();
 
-    final Mutex mutex = m_futureTask.getMutex();
-    if (mutex == null) {
+    final SchedulingSemaphore semaphore = m_futureTask.getSchedulingSemaphore();
+    if (semaphore == null) {
       m_futureTask.run();
       scheduleNextExecution(startTimeNanos);
     }
     else {
-      m_futureTask.changeState(JobState.WAITING_FOR_MUTEX);
-      mutex.compete(m_futureTask, QueuePosition.TAIL, new IMutexAcquiredCallback() {
+      m_futureTask.changeState(JobState.WAITING_FOR_PERMIT);
+      semaphore.compete(m_futureTask, QueuePosition.TAIL, new IPermitAcquiredCallback() {
 
         @Override
-        public void onMutexAcquired() {
+        public void onPermitAcquired() {
           m_executor.execute(new IRejectableRunnable() {
 
             @Override

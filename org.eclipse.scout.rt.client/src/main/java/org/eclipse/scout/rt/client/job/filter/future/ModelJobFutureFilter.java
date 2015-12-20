@@ -10,17 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.job.filter.future;
 
-import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.job.IFuture;
 
 /**
- * Filter to accept Futures which belong to model jobs. Those are jobs, which are running on behalf of a
- * {@link ClientRunContext}, and have the {@link IClientSession} set as their mutex object.
- * <p>
- * However, only one such model job Future is active at any time, and its executing thread is called the model thread.
+ * Filter to accept Futures which belong to model jobs.
  *
  * @since 5.2
  */

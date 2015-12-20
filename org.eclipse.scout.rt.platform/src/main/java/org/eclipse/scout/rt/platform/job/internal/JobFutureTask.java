@@ -18,7 +18,6 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.RunnableFuture;
 import java.util.concurrent.TimeUnit;
@@ -36,7 +35,7 @@ import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.job.IDoneHandler;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IJobListenerRegistration;
-import org.eclipse.scout.rt.platform.job.IMutex;
+import org.eclipse.scout.rt.platform.job.ISchedulingSemaphore;
 import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.job.JobState;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
@@ -48,17 +47,7 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.ToStringBuilder;
 
 /**
- * {@link RunnableFuture} to be given to {@link ExecutorService} for execution. Basically, this class adds the following
- * functionality to Java {@link FutureTask}:
- * <ul>
- * <li>registers/unregisters this task in {@link JobManager};</li>
- * <li>fires a job lifecycle event when transitioning to another state;</li>
- * <li>passes the mutex to the next queued task after job completion;</li>
- * <li>ensures a {@link RunMonitor} to be set on <code>ThreadLocal</code>;</li>
- * <li>combines cancellation of {@link RunMonitor} and {@link Future};</li>
- * <li>ensures this {@link IFuture} to be set on <code>ThreadLocal</code>;</li>
- * <li>adds functionality to await for the Future's completion (either synchronously or asynchronously);</li>
- * </ul>
+ * Represents a {@link RunnableFuture} to be given to {@link ExecutorService} for execution.
  *
  * @see FutureTask
  * @since 5.1
@@ -70,7 +59,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
   protected final RunMonitor m_runMonitor;
   protected final JobInput m_input;
   protected final Long m_expirationDate;
-  protected final Mutex m_mutex;
+  protected final SchedulingSemaphore m_schedulingSemaphore;
 
   protected final DonePromise<RESULT> m_donePromise;
   protected final CallableChain<RESULT> m_callableChain;
@@ -91,7 +80,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
     m_jobManager = jobManager;
     m_runMonitor = runMonitor;
     m_input = input;
-    m_mutex = Mutex.getMutex(input);
+    m_schedulingSemaphore = SchedulingSemaphore.get(input);
 
     m_callableChain = callableChain;
 
@@ -126,20 +115,24 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
     m_jobManager.unregisterFuture(this);
     m_listeners.clear();
 
-    // IMPORTANT: do not pass mutex here because invoked immediately upon cancellation.
+    // IMPORTANT: do not pass permit here because invoked immediately upon cancellation.
   }
 
   @Override
   public final void reject() {
     changeState(JobState.REJECTED);
     cancel(true); // to enter 'DONE' state and to release a potential waiting submitter.
-    releaseMutex();
+    releasePermit();
   }
 
   /**
-   * Method invoked if this task was accepted by the executor immediately before this task is executed. This method is
-   * also invoked for <code>cancelled</code> tasks which are not subject for execution. This method is invoked by the
-   * thread that will execute this task. When being invoked and this task is a mutex task, this task is the mutex owner.
+   * Method invoked after this task was accepted by {@link ExecutorService} and assigned to a worker thread to commence
+   * execution, and is also invoked for <code>cancelled</code> tasks. However, 'super.run()' or 'super.runAndReset()'
+   * will prevent cancelled tasks from running.
+   * <p>
+   * This method is invoked in the worker thread which will finally run the task.
+   * <p>
+   * When invoked and this task is assigned to a {@link ISchedulingSemaphore}, this task owns a permit.
    */
   @Override
   public void run() {
@@ -156,7 +149,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
       }
     }
     finally {
-      releaseMutex();
+      releasePermit();
     }
   }
 
@@ -166,8 +159,8 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
   }
 
   @Override
-  public Mutex getMutex() {
-    return m_mutex;
+  public SchedulingSemaphore getSchedulingSemaphore() {
+    return m_schedulingSemaphore;
   }
 
   @Override
@@ -240,7 +233,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
 
   @Override
   public void awaitDone() {
-    assertNotSameMutex();
+    assertNotSameSemaphore();
 
     try {
       m_donePromise.get();
@@ -256,7 +249,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
 
   @Override
   public void awaitDone(final long timeout, final TimeUnit unit) {
-    assertNotSameMutex();
+    assertNotSameSemaphore();
 
     try {
       m_donePromise.get(timeout, unit);
@@ -280,7 +273,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
 
   @Override
   public <EXCEPTION extends Throwable> RESULT awaitDoneAndGet(final Class<? extends IExceptionTranslator<EXCEPTION>> exceptionTranslator) throws EXCEPTION {
-    assertNotSameMutex();
+    assertNotSameSemaphore();
 
     try {
       return m_donePromise.get();
@@ -304,7 +297,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
 
   @Override
   public <EXCEPTION extends Throwable> RESULT awaitDoneAndGet(final long timeout, final TimeUnit unit, final Class<? extends IExceptionTranslator<EXCEPTION>> exceptionTranslator) throws EXCEPTION {
-    assertNotSameMutex();
+    assertNotSameSemaphore();
 
     try {
       return m_donePromise.get(timeout, unit);
@@ -358,37 +351,38 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
   }
 
   /**
-   * Asserts that the current job (if applicable) does not share the same mutex as the job to be awaited for. Otherwise,
-   * that would end up in a deadlock.
+   * Asserts that the current job (if present) is not assigned to the same {@link ISchedulingSemaphore} as the job to be
+   * awaited for. Otherwise, that could end up in a deadlock.
    */
-  protected void assertNotSameMutex() {
+  protected void assertNotSameSemaphore() {
     final IFuture<?> currentFuture = IFuture.CURRENT.get();
     if (currentFuture == null) {
       return; // not running in a job.
     }
 
-    final IMutex currentMutex = currentFuture.getJobInput().getMutex();
-    if (currentMutex == null) {
-      return; // current job is not running in mutual exclusive manner.
+    final ISchedulingSemaphore currentSemaphore = currentFuture.getJobInput().getSchedulingSemaphore();
+    if (currentSemaphore == null) {
+      return; // current job has no maximal concurrency restriction.
     }
 
-    if (!currentMutex.isMutexOwner(currentFuture)) {
-      return; // current job is not mutex owner.
+    if (!currentSemaphore.isPermitOwner(currentFuture)) {
+      return; // current job is not permit owner.
     }
 
     if (isDone()) {
       return; // job already in 'done'-state.
     }
 
-    Assertions.assertNotSame(currentMutex, m_mutex, "Deadlock detected: Cannot wait for a job that has the same mutex as the current job [mutex={}]", currentMutex);
+    Assertions.assertNotSame(currentSemaphore, m_schedulingSemaphore, "Potential deadlock detected: Cannot wait for a job which is assigned to the same scheduling semaphore as the current job [semaphore={}]", currentSemaphore);
   }
 
   /**
-   * Releases the mutex if being a mutually exclusive task and currently the mutex owner.
+   * Releases this job's permit if assigned to a {@link ISchedulingSemaphore}, but only if this job currently owns a
+   * permit.
    */
-  protected void releaseMutex() {
-    if (m_mutex != null && m_mutex.isMutexOwner(this)) {
-      m_mutex.release(this);
+  protected void releasePermit() {
+    if (m_schedulingSemaphore != null && m_schedulingSemaphore.isPermitOwner(this)) {
+      m_schedulingSemaphore.release(this);
     }
   }
 
@@ -441,9 +435,8 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
   @Override
   public String toString() {
     final ToStringBuilder builder = new ToStringBuilder(this);
-    builder.attr("job", m_input);
+    builder.attr("job", m_input.getName());
     builder.attr("state", m_state);
-    builder.attr("expirationDate", m_expirationDate);
     return builder.toString();
   }
 }

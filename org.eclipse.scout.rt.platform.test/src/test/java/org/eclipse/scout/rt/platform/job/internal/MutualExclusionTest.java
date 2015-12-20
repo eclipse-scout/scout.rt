@@ -25,9 +25,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.scout.rt.platform.job.IFuture;
-import org.eclipse.scout.rt.platform.job.IMutex;
+import org.eclipse.scout.rt.platform.job.ISchedulingSemaphore;
 import org.eclipse.scout.rt.platform.job.Jobs;
-import org.eclipse.scout.rt.platform.job.internal.Mutex.QueuePosition;
+import org.eclipse.scout.rt.platform.job.internal.SchedulingSemaphore.IPermitAcquiredCallback;
+import org.eclipse.scout.rt.platform.job.internal.SchedulingSemaphore.QueuePosition;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.InterruptedException;
@@ -37,9 +38,9 @@ import org.eclipse.scout.rt.testing.platform.util.BlockingCountDownLatch;
 import org.junit.Before;
 import org.junit.Test;
 
-public class MutexTest {
+public class MutualExclusionTest {
 
-  private Mutex m_mutex;
+  private SchedulingSemaphore m_mutex;
 
   private IFuture<?> m_task1;
   private IFuture<?> m_task2;
@@ -48,36 +49,36 @@ public class MutexTest {
 
   @Before
   public void before() {
-    m_mutex = new Mutex();
+    m_mutex = (SchedulingSemaphore) Jobs.newSchedulingSemaphore(1);
 
     m_task1 = mock(IFuture.class);
     when(m_task1.getJobInput()).thenReturn(Jobs.newInput()
-        .withMutex(m_mutex)
+        .withSchedulingSemaphore(m_mutex)
         .withName("job-1"));
-    when(m_task1.getMutex()).thenReturn(m_mutex);
+    when(m_task1.getSchedulingSemaphore()).thenReturn(m_mutex);
 
     m_task2 = mock(IFuture.class);
     when(m_task2.getJobInput()).thenReturn(Jobs.newInput()
-        .withMutex(m_mutex)
+        .withSchedulingSemaphore(m_mutex)
         .withName("job-2"));
-    when(m_task2.getMutex()).thenReturn(m_mutex);
+    when(m_task2.getSchedulingSemaphore()).thenReturn(m_mutex);
 
     m_task3 = mock(IFuture.class);
     when(m_task3.getJobInput()).thenReturn(Jobs.newInput()
-        .withMutex(m_mutex)
+        .withSchedulingSemaphore(m_mutex)
         .withName("job-3"));
-    when(m_task3.getMutex()).thenReturn(m_mutex);
+    when(m_task3.getSchedulingSemaphore()).thenReturn(m_mutex);
 
     m_task4 = mock(IFuture.class);
     when(m_task4.getJobInput()).thenReturn(Jobs.newInput()
-        .withMutex(null)
+        .withSchedulingSemaphore(null)
         .withName("job-2"));
-    when(m_task4.getMutex()).thenReturn(null);
+    when(m_task4.getSchedulingSemaphore()).thenReturn(null);
   }
 
   @Test(expected = AssertionException.class)
   public void testWrongMutexType() {
-    Jobs.schedule(mock(IRunnable.class), Jobs.newInput().withMutex(mock(IMutex.class)));
+    Jobs.schedule(mock(IRunnable.class), Jobs.newInput().withSchedulingSemaphore(mock(ISchedulingSemaphore.class)));
   }
 
   @Test(expected = AssertionException.class)
@@ -87,7 +88,7 @@ public class MutexTest {
 
   @Test(expected = AssertionException.class)
   public void testNoMutexTask2() {
-    m_mutex.compete(m_task4, QueuePosition.HEAD, mock(IMutexAcquiredCallback.class));
+    m_mutex.compete(m_task4, QueuePosition.HEAD, mock(IPermitAcquiredCallback.class));
   }
 
   /**
@@ -95,13 +96,13 @@ public class MutexTest {
    */
   @Test(timeout = 1000)
   public void testAcquisition1() {
-    Mutex mutex = (Mutex) m_task1.getMutex();
+    SchedulingSemaphore mutex = (SchedulingSemaphore) m_task1.getSchedulingSemaphore();
 
     assertEquals(0, mutex.getCompetitorCount());
 
     // Task1 acquires the mutex.
     mutex.acquire(m_task1, QueuePosition.HEAD);
-    assertTrue(mutex.isMutexOwner(m_task1));
+    assertTrue(mutex.isPermitOwner(m_task1));
     assertEquals(1, mutex.getCompetitorCount());
 
     // Wrong mutex release.
@@ -110,13 +111,13 @@ public class MutexTest {
       fail();
     }
     catch (AssertionException e) {
-      assertTrue(mutex.isMutexOwner(m_task1));
+      assertTrue(mutex.isPermitOwner(m_task1));
       assertEquals(1, mutex.getCompetitorCount());
     }
 
     // Task1 releases the mutex.
     mutex.release(m_task1);
-    assertFalse(mutex.isMutexOwner(m_task1));
+    assertFalse(mutex.isPermitOwner(m_task1));
     assertEquals(0, mutex.getCompetitorCount());
   }
 
@@ -125,22 +126,22 @@ public class MutexTest {
    */
   @Test(timeout = 1000)
   public void testAcquisition2() {
-    Mutex mutex = (Mutex) m_task1.getMutex();
+    SchedulingSemaphore mutex = (SchedulingSemaphore) m_task1.getSchedulingSemaphore();
 
     assertEquals(0, mutex.getCompetitorCount());
 
     // Make task1 to acquire the mutex.
     final AtomicReference<Thread> thread = new AtomicReference<>();
-    assertTrue(mutex.compete(m_task1, QueuePosition.HEAD, new IMutexAcquiredCallback() {
+    assertTrue(mutex.compete(m_task1, QueuePosition.HEAD, new IPermitAcquiredCallback() {
 
       @Override
-      public void onMutexAcquired() {
+      public void onPermitAcquired() {
         thread.set(Thread.currentThread());
       }
     }));
     assertSame(Thread.currentThread(), thread.get());
 
-    assertTrue(mutex.isMutexOwner(m_task1));
+    assertTrue(mutex.isPermitOwner(m_task1));
     assertEquals(1, mutex.getCompetitorCount());
 
     // Wrong mutex release.
@@ -149,13 +150,13 @@ public class MutexTest {
       fail();
     }
     catch (AssertionException e) {
-      assertTrue(mutex.isMutexOwner(m_task1));
+      assertTrue(mutex.isPermitOwner(m_task1));
       assertEquals(1, mutex.getCompetitorCount());
     }
 
     // Task1 releases the mutex.
     mutex.release(m_task1);
-    assertFalse(mutex.isMutexOwner(m_task1));
+    assertFalse(mutex.isPermitOwner(m_task1));
     assertEquals(0, mutex.getCompetitorCount());
   }
 
@@ -166,44 +167,44 @@ public class MutexTest {
    */
   @Test(timeout = 1000)
   public void testAcquisition3() {
-    Mutex mutex = (Mutex) m_task1.getMutex();
+    SchedulingSemaphore mutex = (SchedulingSemaphore) m_task1.getSchedulingSemaphore();
 
     assertEquals(0, mutex.getCompetitorCount());
 
     // Make task1 to acquire the mutex
-    IMutexAcquiredCallback callbackTask1 = mock(IMutexAcquiredCallback.class);
+    IPermitAcquiredCallback callbackTask1 = mock(IPermitAcquiredCallback.class);
     assertTrue(mutex.compete(m_task1, QueuePosition.HEAD, callbackTask1));
-    verify(callbackTask1, times(1)).onMutexAcquired();
+    verify(callbackTask1, times(1)).onPermitAcquired();
 
-    assertTrue(mutex.isMutexOwner(m_task1));
+    assertTrue(mutex.isPermitOwner(m_task1));
     assertEquals(1, mutex.getCompetitorCount());
 
     // Task2 tries to acquire the mutex (without blocking)
-    IMutexAcquiredCallback callbackTask2 = mock(IMutexAcquiredCallback.class);
+    IPermitAcquiredCallback callbackTask2 = mock(IPermitAcquiredCallback.class);
     assertFalse(mutex.compete(m_task2, QueuePosition.TAIL, callbackTask2));
-    verify(callbackTask2, never()).onMutexAcquired();
-    assertTrue(mutex.isMutexOwner(m_task1));
+    verify(callbackTask2, never()).onPermitAcquired();
+    assertTrue(mutex.isPermitOwner(m_task1));
     assertEquals(2, mutex.getCompetitorCount());
 
     // Task3 tries to acquire the mutex (without blocking)
-    IMutexAcquiredCallback callbackTask3 = mock(IMutexAcquiredCallback.class);
+    IPermitAcquiredCallback callbackTask3 = mock(IPermitAcquiredCallback.class);
     assertFalse(mutex.compete(m_task3, QueuePosition.HEAD, callbackTask3));
-    verify(callbackTask3, never()).onMutexAcquired();
-    assertTrue(mutex.isMutexOwner(m_task1));
+    verify(callbackTask3, never()).onPermitAcquired();
+    assertTrue(mutex.isPermitOwner(m_task1));
     assertEquals(3, mutex.getCompetitorCount());
 
     mutex.release(m_task1);
-    verify(callbackTask3, times(1)).onMutexAcquired();
-    assertTrue(mutex.isMutexOwner(m_task3));
+    verify(callbackTask3, times(1)).onPermitAcquired();
+    assertTrue(mutex.isPermitOwner(m_task3));
     assertEquals(2, mutex.getCompetitorCount());
 
     mutex.release(m_task3);
-    verify(callbackTask2, times(1)).onMutexAcquired();
-    assertTrue(mutex.isMutexOwner(m_task2));
+    verify(callbackTask2, times(1)).onPermitAcquired();
+    assertTrue(mutex.isPermitOwner(m_task2));
     assertEquals(1, mutex.getCompetitorCount());
 
     mutex.release(m_task2);
-    assertFalse(mutex.isMutexOwner(m_task2));
+    assertFalse(mutex.isPermitOwner(m_task2));
     assertEquals(0, mutex.getCompetitorCount());
   }
 
@@ -213,16 +214,16 @@ public class MutexTest {
    */
   @Test(timeout = 5000)
   public void testAcquisition4() {
-    final Mutex mutex = (Mutex) m_task1.getMutex();
+    final SchedulingSemaphore mutex = (SchedulingSemaphore) m_task1.getSchedulingSemaphore();
 
     assertEquals(0, mutex.getCompetitorCount());
 
     // Make task1 to acquire the mutex
-    IMutexAcquiredCallback callbackTask1 = mock(IMutexAcquiredCallback.class);
+    IPermitAcquiredCallback callbackTask1 = mock(IPermitAcquiredCallback.class);
     assertTrue(mutex.compete(m_task1, QueuePosition.HEAD, callbackTask1));
-    verify(callbackTask1, times(1)).onMutexAcquired();
+    verify(callbackTask1, times(1)).onPermitAcquired();
 
-    assertTrue(mutex.isMutexOwner(m_task1));
+    assertTrue(mutex.isPermitOwner(m_task1));
     assertEquals(1, mutex.getCompetitorCount());
 
     // Task2 tries to acquire the mutex, and blocks until acquired
@@ -241,15 +242,15 @@ public class MutexTest {
     catch (TimeoutException e) {
       // NOOP
     }
-    assertTrue(mutex.isMutexOwner(m_task1));
+    assertTrue(mutex.isPermitOwner(m_task1));
     assertEquals(2, mutex.getCompetitorCount());
 
     mutex.release(m_task1);
-    assertTrue(mutex.isMutexOwner(m_task2));
+    assertTrue(mutex.isPermitOwner(m_task2));
     assertEquals(1, mutex.getCompetitorCount());
 
     mutex.release(m_task2);
-    assertFalse(mutex.isMutexOwner(m_task2));
+    assertFalse(mutex.isPermitOwner(m_task2));
     assertEquals(0, mutex.getCompetitorCount());
   }
 
@@ -260,16 +261,16 @@ public class MutexTest {
    */
   @Test(timeout = 5_000)
   public void testAcquisition5() throws java.lang.InterruptedException {
-    final Mutex mutex = (Mutex) m_task1.getMutex();
+    final SchedulingSemaphore mutex = (SchedulingSemaphore) m_task1.getSchedulingSemaphore();
 
     assertEquals(0, mutex.getCompetitorCount());
 
     // Make task1 to acquire the mutex
-    IMutexAcquiredCallback callbackTask1 = mock(IMutexAcquiredCallback.class);
+    IPermitAcquiredCallback callbackTask1 = mock(IPermitAcquiredCallback.class);
     assertTrue(mutex.compete(m_task1, QueuePosition.HEAD, callbackTask1));
-    verify(callbackTask1, times(1)).onMutexAcquired();
+    verify(callbackTask1, times(1)).onPermitAcquired();
 
-    assertTrue(mutex.isMutexOwner(m_task1));
+    assertTrue(mutex.isPermitOwner(m_task1));
     assertEquals(1, mutex.getCompetitorCount());
 
     // Task2 tries to acquire the mutex, and blocks until acquired
@@ -288,18 +289,18 @@ public class MutexTest {
     }, Jobs.newInput()
         .withExceptionHandling(null, false));
 
-    JobTestUtil.waitForMutexCompetitors(mutex, 2);
-    assertTrue(mutex.isMutexOwner(m_task1));
+    JobTestUtil.waitForPermitCompetitors(mutex, 2);
+    assertTrue(mutex.isPermitOwner(m_task1));
     assertEquals(2, mutex.getCompetitorCount());
 
     future.cancel(true);
 
     assertTrue(interruptedLatch.await());
-    assertTrue(mutex.isMutexOwner(m_task1));
+    assertTrue(mutex.isPermitOwner(m_task1));
     assertEquals(2, mutex.getCompetitorCount());
 
     mutex.release(m_task1);
-    assertFalse(mutex.isMutexOwner(m_task2));
+    assertFalse(mutex.isPermitOwner(m_task2));
     assertEquals(0, mutex.getCompetitorCount());
   }
 }

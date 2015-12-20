@@ -17,26 +17,30 @@ import org.eclipse.scout.rt.platform.util.concurrent.TimeoutException;
 
 /**
  * Use this object to put the current thread into waiting mode until this condition falls. If getting blocked and the
- * job is configured for mutual exclusion, the job's mutex is released and passed to the next competing job.<br/>
- * This condition can be used across multiple threads to wait for the same condition; this condition is reusable upon
- * invalidation.
+ * current job is assigned to a {@link ISchedulingSemaphore}, the job's permit is released and passed to the next
+ * competing job of that same semaphore while being blocked.
+ * <p>
+ * This condition can be used across multiple threads to wait for the same condition. Also, this condition is reusable
+ * upon invalidation. And finally, this condition can be used even if not running on behalf of a job.
  *
  * @since 5.1
  */
 public interface IBlockingCondition {
 
   /**
-   * @return <code>true</code> if this condition blocks if calling {@link #waitFor(String...)} or
-   *         {@link #waitFor(long, TimeUnit, String...)}.
+   * Returns <code>true</code> if this condition is in <em>blocking state</em>, meaning that calls to
+   * {@link #waitFor(String...)} or {@link #waitFor(long, TimeUnit, String...)} block the calling thread.
    */
   boolean isBlocking();
 
   /**
-   * Invoke to change the blocking-state of this blocking condition. This method can be invoked from any thread.
+   * Invoke to change the <em>blocking state</em> of this blocking condition. This method can be invoked from any
+   * thread.
    * <p>
    * If <code>true</code>, this condition will block subsequent calls on {@link #waitFor(String...)} or
    * {@link #waitFor(long, TimeUnit, String...)}. If <code>false</code>, the condition is invalidated, meaning that the
-   * blocking-state is set to <code>false</code> and any thread waiting for this condition to fall is released.
+   * <em>blocking state</em> is set to <code>false</code> and any thread waiting for this condition to fall is released
+   * asynchronously.
    *
    * @param blocking
    *          <code>true</code> to arm this condition, or <code>false</code> to invalidate it and release all waiting
@@ -45,25 +49,31 @@ public interface IBlockingCondition {
   void setBlocking(boolean blocking);
 
   /**
-   * Waits if necessary for the blocking state of this blocking condition to become <em>unblocked</em>. Thereto, the
+   * Waits if necessary for the <em>blocking state</em> of this blocking condition to become unblocked. Thereto, the
    * current thread becomes disabled for thread scheduling purposes and lies dormant. This method returns immediately,
-   * if this blocking condition is not <em>blocking</em> at the time of invocation.
+   * if this blocking condition is not blocking at the time of invocation.
+   * <p>
+   * If invoked from a job, and this job is assigned to a {@link ISchedulingSemaphore}, the job's permit is released and
+   * passed to the next competing job of that same semaphore while being blocked.
    *
    * @param executionHints
    *          optional execution hints to be associated with the current {@link IFuture} for the time of waiting; has no
    *          effect if not running on behalf of a job.
    * @throws InterruptedException
-   *           if the current thread was interrupted while waiting. But, even if not waiting anymore, the blocking
-   *           condition might still be in blocking state. Also, if being a mutually exclusive job, the thread did not
-   *           acquire the mutex, meaning that the thread should terminate its work or waiting anew for the condition to
-   *           fall.
+   *           if the current thread was interrupted while waiting.<br/>
+   *           But, even if not waiting anymore, the blocking condition might still be in <em>blocking state</em>. Also,
+   *           if the job is assigned to a {@link ISchedulingSemaphore}, a permit was not acquired, meaning that the job
+   *           should terminate its work or waiting anew for the condition to fall.
    */
   void waitFor(String... executionHints);
 
   /**
-   * Waits if necessary for at most the given time for the blocking state of this blocking condition to become
-   * <em>unblocked</em>. Thereto, the current thread becomes disabled for thread scheduling purposes and lies dormant.
-   * This method returns immediately, if this blocking condition is not <em>blocking</em> at the time of invocation.
+   * Waits if necessary for at most the given time for the <em>blocking state</em> of this blocking condition to become
+   * unblocked. Thereto, the current thread becomes disabled for thread scheduling purposes and lies dormant. This
+   * method returns immediately, if this blocking condition is not blocking at the time of invocation.
+   * <p>
+   * If invoked from a job, and this job is controlled by a {@link ISchedulingSemaphore}, the job's permit is released
+   * and passed to the next competing job of that same semaphore while being blocked.
    *
    * @param timeout
    *          the maximal time to wait.
@@ -73,14 +83,15 @@ public interface IBlockingCondition {
    *          optional execution hints to be associated with the current {@link IFuture} for the time of waiting; has no
    *          effect if not running on behalf of a job.
    * @throws InterruptedException
-   *           if the current thread was interrupted while waiting. But, even if not waiting anymore, the blocking
-   *           condition might still be in blocking state. Also, if being a mutually exclusive job, the thread did not
-   *           acquire the mutex, meaning that the thread should terminate its work or waiting anew for the condition to
-   *           fall.
+   *           if the current thread was interrupted while waiting.<br/>
+   *           But, even if not waiting anymore, the blocking condition might still be in <em>blocking state</em>. Also,
+   *           if the job is assigned to a {@link ISchedulingSemaphore}, a permit was not acquired, meaning that the job
+   *           should terminate its work or waiting anew for the condition to fall.
    * @throws TimeoutException
-   *           if the wait timed out. But, even if not waiting anymore, the blocking condition might still be in
-   *           blocking state. Also, if being a mutually exclusive job, the thread did not acquire the mutex, meaning
-   *           that the thread should terminate its work or waiting anew for the condition to fall.
+   *           if the wait timed out.<br/>
+   *           But, even if not waiting anymore, the blocking condition might still be in <em>blocking state</em>. Also,
+   *           if the job belongs to a {@link ISchedulingSemaphore}, a permit was not acquired, meaning that the job
+   *           should terminate its work or waiting anew for the condition to fall.
    */
   void waitFor(long timeout, TimeUnit unit, String... executionHints);
 }

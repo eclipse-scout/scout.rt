@@ -41,7 +41,8 @@ import org.eclipse.scout.rt.platform.job.IJobListenerRegistration;
 import org.eclipse.scout.rt.platform.job.IJobManager;
 import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.job.JobState;
-import org.eclipse.scout.rt.platform.job.internal.Mutex.QueuePosition;
+import org.eclipse.scout.rt.platform.job.internal.SchedulingSemaphore.IPermitAcquiredCallback;
+import org.eclipse.scout.rt.platform.job.internal.SchedulingSemaphore.QueuePosition;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.job.listener.JobEventData;
@@ -170,7 +171,7 @@ public class JobManager implements IJobManager, IPlatformListener {
     futureTask.changeState(JobState.SCHEDULED);
 
     if (schedulingDelay <= 0L) {
-      competeForMutexAndExecute(futureTask, runnable);
+      competeForPermitAndExecute(futureTask, runnable);
     }
     else {
       futureTask.changeState(JobState.PENDING);
@@ -178,7 +179,7 @@ public class JobManager implements IJobManager, IPlatformListener {
 
         @Override
         public void run() {
-          competeForMutexAndExecute(futureTask, runnable);
+          competeForPermitAndExecute(futureTask, runnable);
         }
 
         @Override
@@ -190,18 +191,18 @@ public class JobManager implements IJobManager, IPlatformListener {
   }
 
   /**
-   * Executes the given runnable, and if being a mutually exclusive task, acquires the mutex first.
+   * Optionally acquires a permit and then executes the specified {@link IRejectableRunnable}.
    */
-  private void competeForMutexAndExecute(final JobFutureTask<?> futureTask, final IRejectableRunnable runnable) {
-    if (runnable instanceof JobFutureTask && ((JobFutureTask) runnable).getMutex() != null) {
-      final JobFutureTask<?> mutexTask = (JobFutureTask) runnable;
+  private void competeForPermitAndExecute(final JobFutureTask<?> futureTask, final IRejectableRunnable runnable) {
+    if (runnable instanceof JobFutureTask && ((JobFutureTask) runnable).getSchedulingSemaphore() != null) {
+      final JobFutureTask<?> permitTask = (JobFutureTask) runnable;
 
-      futureTask.changeState(JobState.WAITING_FOR_MUTEX);
-      mutexTask.getMutex().compete(mutexTask, QueuePosition.TAIL, new IMutexAcquiredCallback() {
+      futureTask.changeState(JobState.WAITING_FOR_PERMIT);
+      permitTask.getSchedulingSemaphore().compete(permitTask, QueuePosition.TAIL, new IPermitAcquiredCallback() {
 
         @Override
-        public void onMutexAcquired() {
-          m_executor.execute(mutexTask);
+        public void onPermitAcquired() {
+          m_executor.execute(permitTask);
         }
       });
     }

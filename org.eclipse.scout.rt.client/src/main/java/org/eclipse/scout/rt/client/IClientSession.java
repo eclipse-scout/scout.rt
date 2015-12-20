@@ -16,7 +16,7 @@ import java.util.Locale;
 import javax.security.auth.Subject;
 
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
-import org.eclipse.scout.rt.platform.job.IMutex;
+import org.eclipse.scout.rt.platform.job.ISchedulingSemaphore;
 import org.eclipse.scout.rt.platform.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.reflect.IPropertyObserver;
 import org.eclipse.scout.rt.shared.ISession;
@@ -139,8 +139,8 @@ public interface IClientSession extends ISession, IPropertyObserver {
   void replaceSharedVariableMapInternal(SharedVariableMap newMap);
 
   /**
-   * Returns the mutex object to run model jobs of this session in sequence, meaning that only one model job is active
-   * at any given time for this session.
+   * Returns the <em>one-permit</em> {@link ISchedulingSemaphore} to run model jobs of this session in sequence, meaning
+   * that only one model job is active at any given time for this session.
    */
-  IMutex getModelJobMutex();
+  ISchedulingSemaphore getModelJobSemaphore();
 }

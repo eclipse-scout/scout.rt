@@ -110,7 +110,7 @@ public class JobListenerBlockedFutureTest {
     final IBlockingCondition condition = Jobs.newBlockingCondition(true);
 
     IClientSession clientSession = mock(IClientSession.class);
-    when(clientSession.getModelJobMutex()).thenReturn(Jobs.newMutex());
+    when(clientSession.getModelJobSemaphore()).thenReturn(Jobs.newSchedulingSemaphore(1));
 
     JobEventCaptureListener captureListener = new JobEventCaptureListener();
     Jobs.getJobManager().addListener(ModelJobs.newEventFilterBuilder().toFilter(), captureListener);
@@ -131,7 +131,7 @@ public class JobListenerBlockedFutureTest {
             condition.setBlocking(false);
 
             // Wait until the outer future is re-acquiring the mutex.
-            JobTestUtil.waitForMutexCompetitors(modelJobInput.getMutex(), 2); // 2=outer-job + inner-job
+            JobTestUtil.waitForPermitCompetitors(modelJobInput.getSchedulingSemaphore(), 2); // 2=outer-job + inner-job
           }
         }, modelJobInput.copy()
             .withName("inner")
@@ -158,8 +158,8 @@ public class JobListenerBlockedFutureTest {
     assertEquals(JobState.SCHEDULED, capturedFutureStates.get(i));
 
     i++; // outer
-    assertStateChangedEvent(outerFuture, JobState.WAITING_FOR_MUTEX, capturedEvents.get(i));
-    assertEquals(JobState.WAITING_FOR_MUTEX, capturedFutureStates.get(i));
+    assertStateChangedEvent(outerFuture, JobState.WAITING_FOR_PERMIT, capturedEvents.get(i));
+    assertEquals(JobState.WAITING_FOR_PERMIT, capturedFutureStates.get(i));
 
     i++; // outer
     assertStateChangedEvent(outerFuture, JobState.RUNNING, capturedEvents.get(i));
@@ -178,16 +178,16 @@ public class JobListenerBlockedFutureTest {
     assertEquals(JobState.WAITING_FOR_BLOCKING_CONDITION, capturedFutureStates.get(i));
 
     i++; // inner
-    assertStateChangedEvent(innerFuture.get(), JobState.WAITING_FOR_MUTEX, capturedEvents.get(i));
-    assertEquals(JobState.WAITING_FOR_MUTEX, capturedFutureStates.get(i));
+    assertStateChangedEvent(innerFuture.get(), JobState.WAITING_FOR_PERMIT, capturedEvents.get(i));
+    assertEquals(JobState.WAITING_FOR_PERMIT, capturedFutureStates.get(i));
 
     i++; // inner
     assertStateChangedEvent(innerFuture.get(), JobState.RUNNING, capturedEvents.get(i));
     assertEquals(JobState.RUNNING, capturedFutureStates.get(i));
 
     i++; // outer
-    assertStateChangedEvent(outerFuture, JobState.WAITING_FOR_MUTEX, capturedEvents.get(i));
-    assertEquals(JobState.WAITING_FOR_MUTEX, capturedFutureStates.get(i));
+    assertStateChangedEvent(outerFuture, JobState.WAITING_FOR_PERMIT, capturedEvents.get(i));
+    assertEquals(JobState.WAITING_FOR_PERMIT, capturedFutureStates.get(i));
 
     i++; // inner
     assertStateChangedEvent(innerFuture.get(), JobState.DONE, capturedEvents.get(i));

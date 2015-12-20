@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.platform.job.internal;
 
 import org.eclipse.scout.rt.platform.annotations.Internal;
+import org.eclipse.scout.rt.platform.job.ISchedulingSemaphore;
 
 /**
  * Runnable to be given to the executor, and which is notified if being rejected by the executor. This may occur when
@@ -22,8 +23,8 @@ import org.eclipse.scout.rt.platform.annotations.Internal;
 public interface IRejectableRunnable extends Runnable {
 
   /**
-   * Rejects this runnable from being executed. If this task is a mutual exclusive task, this task continues to be the
-   * mutex owner.
+   * Rejects this runnable from being executed. If this task is assigned to a {@link ISchedulingSemaphore}, this task
+   * still owns the permit.
    */
   void reject();
 }

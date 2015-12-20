@@ -19,7 +19,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IFuture;
-import org.eclipse.scout.rt.platform.job.IMutex;
+import org.eclipse.scout.rt.platform.job.ISchedulingSemaphore;
 import org.eclipse.scout.rt.platform.job.JobState;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
@@ -54,7 +54,7 @@ public class ThreadNameDecoratorTest {
   @Test
   @Times(100) // regression
   public void testThreadNameWithStateChange() throws Exception {
-    final IMutex mutex = Jobs.newMutex();
+    final ISchedulingSemaphore mutex = Jobs.newSchedulingSemaphore(1);
     final IBlockingCondition condition = Jobs.newBlockingCondition(true);
 
     final AtomicReference<Thread> future1WorkerThreadHolder = new AtomicReference<>();
@@ -80,7 +80,7 @@ public class ThreadNameDecoratorTest {
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent())
         .withName("job-1")
-        .withMutex(mutex));
+        .withSchedulingSemaphore(mutex));
 
     // Job-2 (same mutex as job-1)
     IFuture<Void> future2 = Jobs.schedule(new IRunnable() {
@@ -97,17 +97,17 @@ public class ThreadNameDecoratorTest {
           condition.setBlocking(false);
 
           // Wait until job-1 is competing for the mutex anew.
-          waitForUpdatedThreadName(future1, future1WorkerThreadHolder.get(), JobState.WAITING_FOR_MUTEX); // because job-1 asynchronously acquires the mutex
+          waitForUpdatedThreadName(future1, future1WorkerThreadHolder.get(), JobState.WAITING_FOR_PERMIT); // because job-1 asynchronously acquires the mutex
 
           // verify job1 to be in resume state.
           String threadNameJob1 = future1WorkerThreadHolder.get().getName();
-          assertTrue("actual=" + threadNameJob1, threadNameJob1.matches("scout-thread-\\d+ \\(WAITING_FOR_MUTEX\\) 'job-1'"));
+          assertTrue("actual=" + threadNameJob1, threadNameJob1.matches("scout-thread-\\d+ \\(WAITING_FOR_PERMIT\\) 'job-1'"));
         }
       }
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent())
         .withName("job-2")
-        .withMutex(mutex));
+        .withSchedulingSemaphore(mutex));
 
     // Wait until completed and propagate assertions
     future1.awaitDoneAndGet(10, TimeUnit.SECONDS);

@@ -271,7 +271,7 @@ public class FutureSet {
               case PENDING:
               case RUNNING:
               case WAITING_FOR_BLOCKING_CONDITION:
-              case WAITING_FOR_MUTEX:
+              case WAITING_FOR_PERMIT:
                 return true; // manual signaling required
               default:
                 return false; // signaling done by adding/removing the Future

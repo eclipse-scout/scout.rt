@@ -16,13 +16,15 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.job.filter.event.JobEventFilterBuilder;
 import org.eclipse.scout.rt.platform.job.filter.future.FutureFilterBuilder;
+import org.eclipse.scout.rt.platform.job.internal.SchedulingSemaphore;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
+import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 
 /**
  * Helper class to schedule jobs that optionally run on behalf of a {@link RunContext}. This class is for convenience
  * purpose to facilitate the creation and scheduling of jobs.
- * <p/>
+ * <p>
  * Example:
  *
  * <pre>
@@ -75,10 +77,11 @@ public final class Jobs {
   }
 
   /**
-   * Runs the given {@link IRunnable} asynchronously in another thread at the next reasonable opportunity. The caller of
-   * this method continues to run in parallel.
+   * Runs the given {@link IRunnable} asynchronously in another thread at the next reasonable opportunity. The submitter
+   * of the job continues to run in parallel. If the job is assigned to a {@link ISchedulingSemaphore} and the maximal
+   * concurrency level for that semaphore is reached, the job is queued until a permit becomes available.
    * <p>
-   * The job manager will use the {@link JobInput} as provided to run the job.
+   * The job manager will use the {@link JobInput} as given to control job execution.
    * <p>
    * The {@link IFuture} returned allows to wait for the job to complete or to cancel its execution. To immediately
    * block waiting for the job to complete, you can use constructions of the following form.
@@ -109,11 +112,12 @@ public final class Jobs {
   }
 
   /**
-   * Runs the given {@link Callable} asynchronously in another thread at the next reasonable opportunity. The caller of
-   * this method continues to run in parallel. Jobs in the form of a {@link Callable} typically return a computation
-   * result to the submitter.
+   * Runs the given {@link Callable} asynchronously in another thread at the next reasonable opportunity. The submitter
+   * of the job continues to run in parallel. If the job is assigned to a {@link ISchedulingSemaphore} and the maximal
+   * concurrency level for that semaphore is reached, the job is queued until a permit becomes available. Jobs in the
+   * form of a {@link Callable} typically return a computation result to the submitter.
    * <p>
-   * The job manager will use the {@link JobInput} as provided to run the job.
+   * The job manager will use the {@link JobInput} as given to control job execution.
    * <p>
    * The {@link IFuture} returned allows to wait for the job to complete or to cancel its execution. To immediately
    * block waiting for the job to complete, you can use constructions of the following form.
@@ -202,15 +206,29 @@ public final class Jobs {
   }
 
   /**
-   * Creates a new mutex object to be used to run jobs in sequence among this mutex.
+   * Creates a scheduling semaphore to control the maximal number of jobs running concurrently among the same semaphore.
+   * <p>
+   * With a semaphore in place, a job only commences execution, once a permit is free or gets available. If free, the
+   * job commences execution immediately at the next reasonable opportunity, unless no worker thread is available.
+   * <p>
+   * A semaphore initialized to <code>one</code> allows to run jobs in a mutually exclusive manner, and a semaphore
+   * initialized to <code>zero</code> to run no job at all. The number of total permits available can be changed at any
+   * time, which allows to adapt the maximal concurrency level to some dynamic criteria like time of day or system load.
+   * However, once calling {@link #seal()}, the number of permits cannot be changed anymore, and any attempts will
+   * result in an {@link AssertionException}.
+   *
+   * @param permits
+   *          the number of permits.
    */
-  public static IMutex newMutex() {
-    return BEANS.get(IMutex.class);
+  public static ISchedulingSemaphore newSchedulingSemaphore(final int permits) {
+    return BEANS.get(SchedulingSemaphore.class).withPermits(permits);
   }
 
   /**
-   * Creates a blocking condition to put a job into waiting mode until the condition falls. If the job is a mutually
-   * exclusive job, the job's mutex is released and passed to the next competing job while being blocked.
+   * Creates a blocking condition to put a job into waiting mode until the condition falls.
+   * <p>
+   * If the job belongs to a {@link ISchedulingSemaphore}, the job's permit is released and passed to the next competing
+   * job of that same semaphore while being blocked.
    * <p>
    * See {@link IBlockingCondition} for more information.
    *

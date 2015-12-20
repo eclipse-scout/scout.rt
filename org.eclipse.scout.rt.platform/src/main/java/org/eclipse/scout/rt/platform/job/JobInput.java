@@ -20,6 +20,7 @@ import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.ToStringBuilder;
 import org.slf4j.helpers.MessageFormatter;
 
@@ -54,7 +55,7 @@ public class JobInput {
   public static final long INFINITE_EXPIRATION = 0;
 
   protected String m_name;
-  protected IMutex m_mutex;
+  protected ISchedulingSemaphore m_schedulingSemaphore;
   protected long m_expirationTime = INFINITE_EXPIRATION;
   protected String m_threadName = "scout-thread";
   protected RunContext m_runContext;
@@ -167,22 +168,32 @@ public class JobInput {
   }
 
   /**
-   * Returns the mutex object, if the job is to be run in sequence among other jobs with the same mutex object, or
-   * <code>null</code> to run the job at the next reasonable opportunity.
+   * Returns the scheduling semaphore which this job is assigned to, or <code>null</code> if there is no maximal
+   * concurrency restriction for this job.
+   * <p>
+   * With a semaphore in place, this job only commences execution, once a permit is free or gets available. If free, the
+   * job commences execution immediately at the next reasonable opportunity, unless no worker thread is available.
    */
-  public IMutex getMutex() {
-    return m_mutex;
+  public ISchedulingSemaphore getSchedulingSemaphore() {
+    return m_schedulingSemaphore;
   }
 
   /**
-   * Sets the mutex object to run the job in sequence among other jobs with the same mutex object, so that no two such
-   * jobs are run in parallel at the same time. By default, no mutex object is set, meaning the job is not executed in
-   * mutually exclusive manner.
+   * Sets the scheduling semaphore to control the job's maximal concurrently level.
+   * <p>
+   * With a semaphore in place, this job only commences execution, once a permit is free or gets available. If free, the
+   * job commences execution immediately at the next reasonable opportunity, unless no worker thread is available.
+   * <p>
+   * A semaphore initialized to <code>one</code> allows to run jobs in a mutually exclusive manner, and a semaphore
+   * initialized to <code>zero</code> to run no job at all. The number of total permits available can be changed at any
+   * time, which allows to adapt the maximal concurrency level to some dynamic criteria like time of day or system load.
+   * However, once calling {@link #seal()}, the number of permits cannot be changed anymore, and any attempts will
+   * result in an {@link AssertionException}.
    *
-   * @see Jobs#newMutex()
+   * @see Jobs#newSchedulingSemaphore()
    */
-  public JobInput withMutex(final IMutex mutex) {
-    m_mutex = mutex;
+  public JobInput withSchedulingSemaphore(final ISchedulingSemaphore schedulingSemaphore) {
+    m_schedulingSemaphore = schedulingSemaphore;
     return this;
   }
 
@@ -307,7 +318,7 @@ public class JobInput {
   public String toString() {
     final ToStringBuilder builder = new ToStringBuilder(this);
     builder.attr("name", m_name);
-    builder.ref("mutex", m_mutex);
+    builder.ref("schedulingSemaphore", m_schedulingSemaphore);
     builder.attr("expirationTime", m_expirationTime);
     builder.attr("exceptionHandler", m_exceptionHandler);
     builder.attr("swallowException", m_swallowException);
@@ -327,7 +338,7 @@ public class JobInput {
   public JobInput copy() {
     final JobInput copy = BEANS.get(JobInput.class);
     copy.m_name = m_name;
-    copy.m_mutex = m_mutex;
+    copy.m_schedulingSemaphore = m_schedulingSemaphore;
     copy.m_expirationTime = m_expirationTime;
     copy.m_exceptionHandler = m_exceptionHandler;
     copy.m_swallowException = m_swallowException;

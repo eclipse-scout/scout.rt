@@ -10,13 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.job;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
@@ -29,34 +26,26 @@ public class ScheduleDelayedTest {
 
   @Test
   public void testScheduleDelayed() {
-    final List<Long> protocol = Collections.synchronizedList(new ArrayList<Long>());
+    final AtomicReference<Long> actualExecutionTime = new AtomicReference<>();
 
-    long delayNanos = TimeUnit.SECONDS.toNanos(1);
     long tStartNano = System.nanoTime();
-    long assertToleranceNano = TimeUnit.MILLISECONDS.toNanos(200);
-
+    long delayNanos = TimeUnit.SECONDS.toNanos(1);
     IFuture<Void> future = Jobs.getJobManager().schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
-        protocol.add(System.nanoTime());
+        actualExecutionTime.set(System.nanoTime());
       }
     }, Jobs.newInput()
         .withRunContext(RunContexts.empty())
         .withSchedulingDelay(delayNanos, TimeUnit.NANOSECONDS));
 
     // verify
-    Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
-        .andMatchFuture(future)
-        .toFilter(), 30, TimeUnit.SECONDS);
-    assertEquals(1, protocol.size());
-    Long actualExecutionTime = protocol.get(0);
-    long expectedExecutionTime = tStartNano + delayNanos;
-    long expectedExecutionTimeMin = expectedExecutionTime;
-    long expectedExecutionTimeMax = expectedExecutionTime + assertToleranceNano;
+    future.awaitDone(10, TimeUnit.SECONDS);
 
-    if (actualExecutionTime < expectedExecutionTimeMin || actualExecutionTime > expectedExecutionTimeMax) {
-      fail(String.format("actualExecutionTime=%s, expectedExecutionTime=[%s;%s]", actualExecutionTime, expectedExecutionTimeMin, expectedExecutionTimeMax));
+    long minExpectedExecutionTime = tStartNano + delayNanos;
+    if (actualExecutionTime.get() < minExpectedExecutionTime) {
+      fail(String.format("actualExecutionTime=%s, minExpectedExecutionTime=[%s]", actualExecutionTime.get(), minExpectedExecutionTime));
     }
   }
 }
