@@ -117,8 +117,8 @@ describe("scrollbars", function() {
 
     it("returns false if x of the given location is outside of the given $scrollable (greater)", function() {
       $element
-        .cssLeft(scrollableBounds.x)
-        .cssTop(scrollableBounds.x + scrollableBounds.width);
+        .cssLeft(scrollableBounds.x + 1)
+        .cssTop(scrollableBounds.y + scrollableBounds.height);
       var bounds = scout.graphics.offsetBounds($element);
       expect(scout.scrollbars.isLocationInView(bounds, $scrollable)).toBe(false);
     });
@@ -126,7 +126,7 @@ describe("scrollbars", function() {
     it("returns false if y of the given location is outside of the given $scrollable (greater)", function() {
       $element
         .cssLeft(scrollableBounds.x)
-        .cssTop(scrollableBounds.y + scrollableBounds.height);
+        .cssTop(scrollableBounds.y + scrollableBounds.height + 1);
       var bounds = scout.graphics.offsetBounds($element);
       expect(scout.scrollbars.isLocationInView(bounds, $scrollable)).toBe(false);
     });

@@ -1003,13 +1003,16 @@ describe("Table", function() {
     });
 
     it("regroups the data if group by column is active", function() {
+      if (!scout.device.supportsInternationalization()) {
+        return;
+      }
+
       prepareTable();
       render(table);
 
       // Make sure sorting is not executed because it does not work with phantomJS
       spyOn(scout.device, "supportsInternationalization").and.returnValue(true);
       spyOn(table, "_sortImpl").and.returnValue(true);
-
       spyOn(table, '_group');
 
       column0.grouped = true;
