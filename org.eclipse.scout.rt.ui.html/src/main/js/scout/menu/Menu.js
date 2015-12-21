@@ -53,6 +53,7 @@ scout.Menu.prototype._render = function($parent) {
 scout.Menu.prototype._remove = function() {
   scout.Menu.parent.prototype._remove.call(this);
   this.$submenuIcon = null;
+  this.$subMenuBody = null;
 };
 
 scout.Menu.prototype._renderSeparator = function($parent) {
