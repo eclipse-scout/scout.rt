@@ -316,17 +316,20 @@ public class JaxWsAnnotationProcessor extends AbstractProcessor {
    */
   @Internal
   protected JInvocation createRunContextInvocation(final JCodeModel model, final JVar servletRunContext, final JVar runContext, final boolean voidMethod, final JMethod portTypeMethod, final String portTypeName) {
+    final JType returnType;
     final JDefinedClass servletRunContextCallable;
     final JDefinedClass runContextCallable;
     final String runMethodName;
     if (voidMethod) {
+      returnType = model.ref(Void.class).unboxify();
       servletRunContextCallable = model.anonymousClass(IRunnable.class);
       runContextCallable = model.anonymousClass(IRunnable.class);
       runMethodName = "run";
     }
     else {
-      servletRunContextCallable = model.anonymousClass(model.ref(Callable.class).narrow(portTypeMethod.type()));
-      runContextCallable = model.anonymousClass(model.ref(Callable.class).narrow(portTypeMethod.type()));
+      returnType = portTypeMethod.type().boxify();
+      servletRunContextCallable = model.anonymousClass(model.ref(Callable.class).narrow(returnType));
+      runContextCallable = model.anonymousClass(model.ref(Callable.class).narrow(returnType));
       runMethodName = "call";
     }
 
@@ -337,7 +340,7 @@ public class JaxWsAnnotationProcessor extends AbstractProcessor {
     }
 
     // Implement RunContext callable.
-    final JMethod runContextRunMethod = runContextCallable.method(JMod.PUBLIC | JMod.FINAL, portTypeMethod.type(), runMethodName)._throws(Exception.class);
+    final JMethod runContextRunMethod = runContextCallable.method(JMod.PUBLIC | JMod.FINAL, returnType, runMethodName)._throws(Exception.class);
     runContextRunMethod.annotate(Override.class);
     if (voidMethod) {
       runContextRunMethod.body().add(beanInvocation);
@@ -353,7 +356,7 @@ public class JaxWsAnnotationProcessor extends AbstractProcessor {
     final JInvocation runContextInvocation = runContext.invoke(runMethodName).arg(JExpr._new(runContextCallable)).arg(exceptionTranslator);
 
     // Implement ServletRunContext callable.
-    final JMethod servletRunContextRunMethod = servletRunContextCallable.method(JMod.PUBLIC | JMod.FINAL, portTypeMethod.type(), runMethodName)._throws(Exception.class);
+    final JMethod servletRunContextRunMethod = servletRunContextCallable.method(JMod.PUBLIC | JMod.FINAL, returnType, runMethodName)._throws(Exception.class);
     servletRunContextRunMethod.annotate(Override.class);
 
     final JConditionalEx servletRunContextCondition = new JConditionalEx(servletRunContextRunMethod.body());
