@@ -27,7 +27,7 @@ scout.TextColumnUserFilter.prototype.fieldsFilterActive = function() {
 */
 scout.TextColumnUserFilter.prototype.acceptByFields = function(key, normKey, row) {
   var filterFieldText = scout.strings.nvl(this.freeText).toLowerCase(),
-    rowText = this.column.cellTextForTextFilter(row).toLowerCase();
+    rowText = scout.strings.nvl(this.column.cellTextForTextFilter(row)).toLowerCase();
   return rowText.indexOf(filterFieldText) > -1;
 };
 
