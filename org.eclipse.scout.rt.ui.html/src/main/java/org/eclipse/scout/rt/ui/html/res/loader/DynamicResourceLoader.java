@@ -10,11 +10,15 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.res.loader;
 
+import java.nio.charset.CharsetEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.regex.Matcher;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
+import org.eclipse.scout.rt.platform.util.IOUtility;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.cache.HttpCacheKey;
 import org.eclipse.scout.rt.ui.html.cache.HttpCacheObject;
@@ -33,6 +37,8 @@ import org.eclipse.scout.rt.ui.html.res.IBinaryResourceProvider;
  * The pathInfo is expected to have the following form: <code>/dynamic/[uiSessionId]/[adapterId]/[filename]</code>
  */
 public class DynamicResourceLoader extends AbstractResourceLoader {
+
+  private static final String DEFAULT_FILENAME = "Download";
 
   public DynamicResourceLoader(HttpServletRequest req) {
     super(req);
@@ -64,15 +70,55 @@ public class DynamicResourceLoader extends AbstractResourceLoader {
     }
     String contentType = binaryResource.get().getContentType();
     if (contentType == null) {
-      contentType = detectContentType(pathInfo);
+      contentType = detectContentType(binaryResource.get().getFilename());
     }
     BinaryResource content = new BinaryResource(pathInfo, contentType, binaryResource.get().getContent(), binaryResource.get().getLastModified());
     HttpCacheObject httpCacheObject = new HttpCacheObject(cacheKey, content.getLastModified() > 0, IHttpCacheControl.MAX_AGE_4_HOURS, content);
     if (binaryResource.isDownload()) {
-      // Set hint for browser to show the "save as" dialog (no in-line display, not even for known types, e.g. XML)
-      httpCacheObject.addHttpResponseInterceptor(new HttpResponseHeaderContributor("Content-Disposition", "attachment"));
+      addResponseHeaderForDownload(httpCacheObject, binaryResource.get().getFilename());
     }
     return httpCacheObject;
   }
 
+  /**
+   * Sets the <code>Content-Disposition</code> HTTP header for downloads (with value <code>attachment</code>).
+   * Additionally, a hint for the filename is added according to RFC 5987, both in UTF-8 and ISO-8859-1 encoding.
+   * <p>
+   * See:<i><br>
+   * http://stackoverflow.com/questions/93551/how-to-encode-the-filename-parameter-of-content-disposition-header-in-http
+   * <br/>
+   * http://tools.ietf.org/html/rfc6266#section-5</i>
+   */
+  protected void addResponseHeaderForDownload(HttpCacheObject httpCacheObject, String originalFilename) {
+    String isoFilename = getIsoFilename(originalFilename);
+    if (StringUtility.isNullOrEmpty(originalFilename)) {
+      originalFilename = DEFAULT_FILENAME;
+    }
+    if (StringUtility.isNullOrEmpty(isoFilename)) { // in case no valid character remaines
+      isoFilename = DEFAULT_FILENAME;
+    }
+
+    // Set hint for browser to show the "save as" dialog (no in-line display, not even for known types, e.g. XML)
+    httpCacheObject.addHttpResponseInterceptor(new HttpResponseHeaderContributor(
+        "Content-Disposition",
+        "attachment; filename=\"" + isoFilename + "\"; filename*=utf-8''" + IOUtility.urlEncode(originalFilename)));
+  }
+
+  /**
+   * Returns the given filename in ISO-8859-1. All characters that are not part of this charset are stripped.
+   */
+  protected String getIsoFilename(String originalFilename) {
+    String isoFilename = originalFilename;
+    CharsetEncoder iso8859Encoder = StandardCharsets.ISO_8859_1.newEncoder();
+    if (!iso8859Encoder.canEncode(originalFilename)) {
+      StringBuffer sb = new StringBuffer();
+      for (char c : originalFilename.toCharArray()) {
+        if (iso8859Encoder.canEncode(String.valueOf(c))) {
+          sb.append(c);
+        }
+      }
+      isoFilename = sb.toString();
+    }
+    return isoFilename;
+  }
 }

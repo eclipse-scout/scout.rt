@@ -35,6 +35,9 @@ public abstract class AbstractResourceLoader implements IResourceLoader {
   }
 
   protected String detectContentType(String path) {
+    if (path == null) {
+      return null;
+    }
     int lastSlash = path.lastIndexOf('/');
     String fileName = lastSlash >= 0 ? path.substring(lastSlash + 1) : path;
     // Prefer mime type mapping from container

@@ -10,11 +10,17 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.res;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.scout.rt.client.services.common.icon.IconLocator;
 import org.eclipse.scout.rt.client.services.common.icon.IconSpec;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.security.SecurityUtility;
+import org.eclipse.scout.rt.platform.util.HexUtility;
 import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.shared.AbstractIcons;
@@ -142,4 +148,31 @@ public class BinaryResourceUrlUtility {
     return ret.toString();
   }
 
+  /**
+   * Calculate the MD5 hash of a filename. This provides a (seemingly) dynamic name of constant length with no special
+   * meaning or characters.
+   * <p>
+   * MD5 was chosen as hash algorithm because of the relative short result strings. Security is not a concern when
+   * downloading dynamic binary resources (because download handlers are only valid for a single UI session and
+   * adapter).
+   * <p>
+   * Example: The MD5 hash of "foo.txt" is <code>4fd8cc85ca9eebd2fa3c550069ce2846</code>. The more secure SHA-512 hash (
+   * {@link SecurityUtility#hash(byte[], byte[])}) however would be much longer:
+   * <code>b0370324e322ccbaf4b749dc85a0de8e4b614c402748b40d4120ffb3c6c05c90eec13cabe7460479c31e508fb8b99324dbbb4810b45612b980d67f818ce9dfbe</code>
+   * .
+   */
+  public static String getFilenameHash(String filename) {
+    MessageDigest md;
+    try {
+      md = MessageDigest.getInstance("MD5");
+    }
+    catch (NoSuchAlgorithmException e) {
+      throw new ProcessingException("Unable to calculate MD5 hash", e);
+    }
+    md.reset();
+
+    byte[] filenameBytes = StringUtility.nvl(filename, "").getBytes(StandardCharsets.UTF_8);
+    String filenameHash = HexUtility.encode(md.digest(filenameBytes));
+    return filenameHash;
+  }
 }

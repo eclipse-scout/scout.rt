@@ -286,15 +286,14 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
   }
 
   protected void handleModelOpenUri(BinaryResource res, IOpenUriAction openUriAction) {
-    String filename = res.getFilename();
-
+    String filenameHash = BinaryResourceUrlUtility.getFilenameHash(res.getFilename());
     // add another path segment to filename to distinguish between different resources
-    // with the same filename
+    // with the same filename (also makes hash collisions irrelevant).
     long counter = RESOURCE_COUNTER.getAndIncrement();
-    filename = counter + "/" + filename;
+    filenameHash = counter + "/" + filenameHash;
 
-    m_downloads.put(filename, res);
-    String downloadUrl = BinaryResourceUrlUtility.createDynamicAdapterResourceUrl(this, filename);
+    m_downloads.put(filenameHash, res);
+    String downloadUrl = BinaryResourceUrlUtility.createDynamicAdapterResourceUrl(this, filenameHash);
     handleModelOpenUri(downloadUrl, openUriAction);
   }
 
