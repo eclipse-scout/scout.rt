@@ -445,6 +445,18 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
     setValue(key);
   }
 
+  /**
+   * use the label of the {@link AbstractRadioButton} contained in this field as display text instead of relying on
+   * {@link Object#toString()} of validValue
+   */
+  @Override
+  protected String formatValueInternal(T validValue) {
+    if (validValue == null || getButtonFor(validValue) == null) {
+      return "";
+    }
+    return getButtonFor(validValue).getLabel();
+  }
+
   @Override
   public void selectButton(IRadioButton button) {
     for (IRadioButton b : getButtons()) {

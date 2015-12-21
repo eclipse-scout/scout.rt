@@ -174,6 +174,29 @@ public class AbstractRadioButtonGroupTest {
   }
 
   @Test
+  public void testDisplayTextInitial() {
+    AbstractRadioButtonGroup<Long> lookupGroup = new P_RadioButtonGroupWithLookupCall();
+    lookupGroup.initConfig();
+    assertEquals("", lookupGroup.getDisplayText());
+  }
+
+  @Test
+  public void testDisplayTextSelectKey() {
+    AbstractRadioButtonGroup<Long> lookupGroup = new P_RadioButtonGroupWithLookupCall();
+    lookupGroup.initConfig();
+    lookupGroup.selectKey(1L);
+    assertEquals("Business Systems Integration AG", lookupGroup.getDisplayText());
+  }
+
+  @Test
+  public void testDisplayTextSelectNull() {
+    AbstractRadioButtonGroup<Long> lookupGroup = new P_RadioButtonGroupWithLookupCall();
+    lookupGroup.initConfig();
+    lookupGroup.selectKey(null);
+    assertEquals("", lookupGroup.getDisplayText());
+  }
+
+  @Test
   public void testGetForm() {
     IForm formMock = mock(IForm.class);
     m_group.setFormInternal(formMock);
