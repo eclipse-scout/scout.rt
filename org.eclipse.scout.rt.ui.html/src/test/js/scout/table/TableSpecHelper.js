@@ -77,7 +77,7 @@ TableSpecHelper.prototype.createModelColumn = function(text, type) {
   var column = {
     id: scout.objectFactory.createUniqueId(),
     text: text,
-    objectType: (type === undefined ? 'StringColumn' : type),
+    objectType: (type === undefined ? 'Column' : type),
     decimalFormat: (type === 'NumberColumn' ? new scout.DecimalFormat(this.session.locale) : undefined),
     uiSortPossible: true
   };
@@ -106,7 +106,7 @@ TableSpecHelper.prototype.createModelColumns = function(count, columnType) {
     return;
   }
   if (!columnType) {
-    columnType = 'StringColumn';
+    columnType = 'Column';
   }
 
   var columns = [];
@@ -269,4 +269,14 @@ TableSpecHelper.prototype.assertSelectionEvent = function(id, rowIds) {
 
 TableSpecHelper.prototype.getDisplayingContextMenu = function(table) {
   return $('body').find('.popup-body');
+};
+
+/**
+ * Since scout.comparators.TEXT is a static object and only installed once,
+ * we must reset the object - otherwise we could not test cases with client
+ * and server side sorting.
+ */
+TableSpecHelper.prototype.resetIntlCollator = function() {
+  scout.comparators.TEXT.installed = false;
+  scout.comparators.TEXT.collator = null;
 };

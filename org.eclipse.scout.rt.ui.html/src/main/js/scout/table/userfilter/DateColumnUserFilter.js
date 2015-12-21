@@ -52,7 +52,7 @@ scout.DateColumnUserFilter.prototype.fieldsFilterActive = function() {
  */
 scout.DateColumnUserFilter.prototype.acceptByFields = function(key, normKey, row) {
   var
-    keyValue = key.valueOf(),
+    keyValue = key ? key.valueOf() : 0,
     fromValue = this.dateFrom ? this.dateFrom.valueOf() : null,
     toValue  = this.dateTo ? this.dateTo.valueOf() : null;
   if (fromValue && toValue) {

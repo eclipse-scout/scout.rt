@@ -26,6 +26,7 @@ describe("Table", function() {
     session = null;
     jasmine.Ajax.uninstall();
     jasmine.clock().uninstall();
+    helper.resetIntlCollator();
   });
 
   describe("render", function() {
@@ -1088,7 +1089,7 @@ describe("Table", function() {
         // In order to change Collator at runtime, we must reset the "static" property
         // since it is set only once
         session.locale = new LocaleSpecHelper().createLocale('sv');
-        scout.StringColumn.collator = undefined;
+        helper.resetIntlCollator();
 
         table.sort(column0, 'desc');
         helper.assertTextsInCells(table.rows, 0, ['Österreich', 'Zypern', 'Italien']);

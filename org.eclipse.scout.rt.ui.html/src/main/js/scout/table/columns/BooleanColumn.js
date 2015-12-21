@@ -15,6 +15,8 @@
 scout.BooleanColumn = function() {
   scout.BooleanColumn.parent.call(this);
   this.minWidth = scout.Column.NARROW_MIN_WIDTH;
+  this.filterType = 'ColumnUserFilter';
+  this.comparator = scout.comparators.NUMERIC;
 };
 scout.inherits(scout.BooleanColumn, scout.Column);
 

@@ -29,7 +29,6 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IDateColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IIconColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.INumberColumn;
-import org.eclipse.scout.rt.client.ui.basic.table.columns.ISmartColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IStringColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.controls.IAggregateTableControl;
 import org.eclipse.scout.rt.client.ui.basic.table.controls.ITableControl;
@@ -143,7 +142,6 @@ import org.eclipse.scout.rt.ui.html.json.table.JsonDateColumn;
 import org.eclipse.scout.rt.ui.html.json.table.JsonIconColumn;
 import org.eclipse.scout.rt.ui.html.json.table.JsonNumberColumn;
 import org.eclipse.scout.rt.ui.html.json.table.JsonOutlineTable;
-import org.eclipse.scout.rt.ui.html.json.table.JsonSmartColumn;
 import org.eclipse.scout.rt.ui.html.json.table.JsonStringColumn;
 import org.eclipse.scout.rt.ui.html.json.table.JsonTable;
 import org.eclipse.scout.rt.ui.html.json.table.control.JsonAggregateTableControl;
@@ -354,9 +352,6 @@ public class JsonObjectFactory extends AbstractJsonObjectFactory {
     }
     if (object instanceof IBooleanColumn) {
       return new JsonBooleanColumn((IBooleanColumn) object);
-    }
-    if (object instanceof ISmartColumn) {
-      return new JsonSmartColumn((ISmartColumn) object);
     }
     if (object instanceof IStringColumn) {
       return new JsonStringColumn((IStringColumn) object);

@@ -11,6 +11,7 @@
 scout.DateColumn = function() {
   scout.DateColumn.parent.call(this);
   this.filterType = 'DateColumnUserFilter';
+  this.comparator = scout.comparators.NUMERIC;
 };
 scout.inherits(scout.DateColumn, scout.Column);
 

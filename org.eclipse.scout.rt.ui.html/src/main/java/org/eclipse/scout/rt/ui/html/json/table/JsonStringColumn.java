@@ -11,26 +11,20 @@
 package org.eclipse.scout.rt.ui.html.json.table;
 
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IStringColumn;
-import org.eclipse.scout.rt.client.ui.basic.table.userfilter.ColumnUserFilterState;
-import org.eclipse.scout.rt.ui.html.json.table.userfilter.JsonTextColumnUserFilter;
 import org.json.JSONObject;
 
 public class JsonStringColumn<T extends IStringColumn> extends JsonColumn<T> {
-
-  public static final String OBJECT_TYPE = "StringColumn";
 
   public JsonStringColumn(T model) {
     super(model);
   }
 
+  /**
+   * Use same object-type as Column, since StringColumn does not exist in JavaScript client.
+   */
   @Override
   public String getObjectType() {
     return OBJECT_TYPE;
-  }
-
-  @Override
-  protected ColumnUserFilterState createFilterStateFromJson(JSONObject json) {
-    return new JsonTextColumnUserFilter(null).createFilterStateFromJson(getColumn(), json);
   }
 
   @Override

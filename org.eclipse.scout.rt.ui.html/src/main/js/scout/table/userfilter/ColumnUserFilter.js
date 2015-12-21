@@ -197,3 +197,7 @@ scout.ColumnUserFilter.prototype.modifyFilterFields = function() {
 scout.ColumnUserFilter.prototype.filterFieldsTitle = function() {
   return null;
 };
+
+scout.ColumnUserFilter.prototype.createComparator = function() {
+  return scout.comparators.NUMERIC;
+};

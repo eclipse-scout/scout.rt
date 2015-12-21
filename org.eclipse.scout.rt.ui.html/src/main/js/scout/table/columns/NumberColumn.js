@@ -11,6 +11,7 @@
 scout.NumberColumn = function() {
   scout.NumberColumn.parent.call(this);
   this.filterType = 'NumberColumnUserFilter';
+  this.comparator = scout.comparators.NUMERIC;
 };
 scout.inherits(scout.NumberColumn, scout.Column);
 

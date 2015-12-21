@@ -144,13 +144,13 @@ __include("scout/table/TableHeaderMenuLayout.js");
 __include("scout/table/TableLayout.js");
 __include("scout/table/TableSelectionHandler.js");
 __include("scout/table/TableTooltip.js");
+__include("scout/table/columns/comparators.js");
 __include("scout/table/columns/Column.js");
 __include("scout/table/columns/BeanColumn.js"); // requires Column.js
 __include("scout/table/columns/BooleanColumn.js"); // requires Column.js
 __include("scout/table/columns/DateColumn.js"); // requires Column.js
 __include("scout/table/columns/IconColumn.js"); //requires Column.js
 __include("scout/table/columns/NumberColumn.js"); //requires Column.js
-__include("scout/table/columns/StringColumn.js"); //requires Column.js
 __include("scout/table/controls/TableControl.js");
 __include("scout/table/controls/AggregateTableControl.js"); // requires TableControl.js
 __include("scout/table/editor/CellEditorPopup.js");

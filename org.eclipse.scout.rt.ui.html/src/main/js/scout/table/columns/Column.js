@@ -11,20 +11,12 @@
 scout.Column = function() {
   this.minWidth = scout.Column.DEFAULT_MIN_WIDTH;
   this.showSeparator = true; // currently a UI-only property, defaults to true
-  this.filterType = 'ColumnUserFilter';
+  this.filterType = 'TextColumnUserFilter';
+  this.comparator = scout.comparators.TEXT;
 };
 
 scout.Column.DEFAULT_MIN_WIDTH = 50;
 scout.Column.NARROW_MIN_WIDTH = 30; // for columns without text (icon, check box)
-
-scout.Column.DEFAULT_COMPARATOR = function(valueA, valueB) {
-  if (valueA < valueB) {
-    return -1;
-  } else if (valueA > valueB) {
-    return 1;
-  }
-  return 0;
-};
 
 scout.Column.prototype.init = function(model) {
   this.session = model.session;
@@ -497,6 +489,9 @@ scout.Column.prototype.createFilter = function(model) {
  *   Default impl. returns a
  */
 scout.Column.prototype.prepareForSorting = function() {
-  this.compare = scout.Column.DEFAULT_COMPARATOR;
-  return true;
+  return this.comparator.install(this.session);
+};
+
+scout.Column.prototype.compare = function(valueA, valueB) {
+  return this.comparator.compare(valueA, valueB);
 };

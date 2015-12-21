@@ -19,10 +19,12 @@ import org.eclipse.scout.rt.ui.html.json.IJsonObject;
 import org.eclipse.scout.rt.ui.html.json.InspectorInfo;
 import org.eclipse.scout.rt.ui.html.json.JsonAdapterUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
-import org.eclipse.scout.rt.ui.html.json.table.userfilter.JsonColumnUserFilter;
+import org.eclipse.scout.rt.ui.html.json.table.userfilter.JsonTextColumnUserFilter;
 import org.json.JSONObject;
 
 public class JsonColumn<T extends IColumn<?>> implements IJsonObject {
+
+  public static final String OBJECT_TYPE = "Column";
 
   private String m_id;
   private IUiSession m_uiSession;
@@ -37,7 +39,7 @@ public class JsonColumn<T extends IColumn<?>> implements IJsonObject {
   }
 
   public String getObjectType() {
-    return "Column";
+    return OBJECT_TYPE;
   }
 
   protected String getObjectTypeVariant() {
@@ -96,7 +98,7 @@ public class JsonColumn<T extends IColumn<?>> implements IJsonObject {
    * @return
    */
   protected ColumnUserFilterState createFilterStateFromJson(JSONObject json) {
-    return new JsonColumnUserFilter<ColumnUserFilterState>(null).createFilterStateFromJson(m_column, json);
+    return new JsonTextColumnUserFilter(null).createFilterStateFromJson(getColumn(), json);
   }
 
   public Object cellValueToJson(Object value) {
