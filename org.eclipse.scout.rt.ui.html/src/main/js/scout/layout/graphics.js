@@ -17,6 +17,8 @@ scout.graphics = {
    * Returns the preferred size of $elem.
    * Precondition: $elem and it's parents must not be hidden (display: none. Visibility: hidden would be ok
    * because in this case the browser reserves the space the element would be using).
+   *
+   * @memberOf scout.graphics
    */
   prefSize: function($elem, includeMargin, useCssSize) {
     // Return 0/0 if element is not displayed (display: none).
