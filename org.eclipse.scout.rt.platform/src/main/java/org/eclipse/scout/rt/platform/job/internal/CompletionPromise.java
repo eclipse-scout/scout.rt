@@ -31,6 +31,7 @@ import org.eclipse.scout.rt.platform.job.IDoneHandler;
 import org.eclipse.scout.rt.platform.job.JobState;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 
 /**
@@ -45,26 +46,30 @@ import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
  *
  * @since 5.2
  */
-class DonePromise<RESULT> {
+class CompletionPromise<RESULT> {
 
   private final Lock m_lock = new ReentrantLock();
   private final Condition m_doneCondition = m_lock.newCondition();
+  private final Condition m_finishedCondition = m_lock.newCondition();
 
   private final JobFutureTask<RESULT> m_future;
   private final List<PromiseHandler<RESULT>> m_handlers;
 
   private volatile DoneEvent<RESULT> m_doneEvent;
+  private volatile boolean m_finished;
 
-  public DonePromise(final JobFutureTask<RESULT> future) {
+  public CompletionPromise(final JobFutureTask<RESULT> future) {
     m_future = future;
     m_handlers = new ArrayList<>();
   }
 
   /**
-   * Invoke to transition into 'done' state, which in turn fires the 'done' event, notifies registered handlers, and
-   * releases any waiting threads.
+   * Invoke to transition into <em>done</em> state.
+   *
+   * @throws AssertionException
+   *           if already in <em>done</em> state, of future is not <em>done</em> yet.
    */
-  public void fulfill() {
+  public void done() {
     Assertions.assertTrue(m_future.isDone(), "Unexpected state: Future not in 'done' state");
     Assertions.assertNull(m_doneEvent, "Unexpected state: Promise already in 'done' state");
 
@@ -74,7 +79,7 @@ class DonePromise<RESULT> {
     // Release any thread waiting for a future to become 'done'.
     m_lock.lock();
     try {
-      m_doneEvent = DonePromise.newDoneEvent(m_future);
+      m_doneEvent = CompletionPromise.newDoneEvent(m_future);
       m_doneCondition.signalAll();
     }
     finally {
@@ -86,6 +91,24 @@ class DonePromise<RESULT> {
       handler.handleAsync(m_doneEvent);
     }
     m_handlers.clear();
+  }
+
+  /**
+   * Invoke to transition into <em>finish</em> state.
+   *
+   * @throws AssertionException
+   *           if already in <em>finish</em> state.
+   */
+  public void finish() {
+    m_lock.lock();
+    try {
+      Assertions.assertFalse(m_finished, "Unexpected state: Future already in 'finished' state");
+      m_finished = true;
+      m_finishedCondition.signalAll();
+    }
+    finally {
+      m_lock.unlock();
+    }
   }
 
   /**
@@ -127,7 +150,7 @@ class DonePromise<RESULT> {
   }
 
   /**
-   * Waits if necessary for the computation to complete, and then returns its result.
+   * Waits if necessary for the execution to complete, or until cancelled, and then returns its result, if available.
    *
    * @return the computed result
    * @throws ExecutionException
@@ -138,7 +161,7 @@ class DonePromise<RESULT> {
    *           if the computation was cancelled.
    * @see Future#get()
    */
-  public RESULT get() throws InterruptedException, ExecutionException {
+  public RESULT awaitDoneAndGet() throws InterruptedException, ExecutionException {
     m_lock.lockInterruptibly();
     try {
       while (!isDone()) {
@@ -149,12 +172,12 @@ class DonePromise<RESULT> {
       m_lock.unlock();
     }
 
-    return DonePromise.retrieveFinalValue(m_future);
+    return CompletionPromise.retrieveFinalValue(m_future);
   }
 
   /**
-   * Waits if necessary for at most the given time for the computation to complete, and then returns its result, if
-   * available.
+   * Waits if necessary for at most the given time for the execution to complete, or until cancelled, and then returns
+   * its result, if available.
    *
    * @param timeout
    *          the maximum time to wait
@@ -171,7 +194,7 @@ class DonePromise<RESULT> {
    *           if the wait timed out.
    * @see Future#get(long, TimeUnit)
    */
-  public RESULT get(final long timeout, final TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+  public RESULT awaitDoneAndGet(final long timeout, final TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
     Assertions.assertGreater(timeout, 0L, "Invalid timeout; must be > 0 [timeout={}]", timeout);
 
     m_lock.lockInterruptibly();
@@ -188,7 +211,38 @@ class DonePromise<RESULT> {
       m_lock.unlock();
     }
 
-    return DonePromise.retrieveFinalValue(m_future);
+    return CompletionPromise.retrieveFinalValue(m_future);
+  }
+
+  /**
+   * Waits if necessary for at most the given time for the job to finish, meaning that the job either completes normally
+   * or by an exception, or that it will never commence execution due to a premature cancellation.
+   *
+   * @param timeout
+   *          the maximum time to wait
+   * @param unit
+   *          the time unit of the timeout argument
+   * @throws InterruptedException
+   *           if the current thread was interrupted while waiting.
+   * @throws TimeoutException
+   *           if the wait timed out.
+   */
+  public void awaitFinished(final long timeout, final TimeUnit unit) throws InterruptedException, TimeoutException {
+    Assertions.assertGreater(timeout, 0L, "Invalid timeout; must be > 0 [timeout={}]", timeout);
+
+    m_lock.lockInterruptibly();
+    try {
+      long nanos = unit.toNanos(timeout);
+      while (!isFinished() && nanos > 0L) {
+        nanos = m_finishedCondition.awaitNanos(nanos);
+      }
+      if (nanos <= 0L) {
+        throw new TimeoutException(String.format("Waiting for the Future to finish timed out [timeout=%sms]", unit.toMillis(timeout)));
+      }
+    }
+    finally {
+      m_lock.unlock();
+    }
   }
 
   // ==== Internal helper methods ==== //
@@ -198,6 +252,13 @@ class DonePromise<RESULT> {
    */
   private boolean isDone() {
     return m_doneEvent != null;
+  }
+
+  /**
+   * Returns <code>true</code>, if this promise is in 'finished' state.
+   */
+  public boolean isFinished() {
+    return m_finished;
   }
 
   /**
@@ -279,13 +340,13 @@ class DonePromise<RESULT> {
   };
 
   /**
-   * Matches futures in 'done' state, for which the 'done' event was fired.
+   * Matches futures in 'done' state, and for which the 'done' event was fired.
    */
   static final IFilter<JobFutureTask<?>> PROMISE_DONE_MATCHER = new IFilter<JobFutureTask<?>>() {
 
     @Override
     public boolean accept(final JobFutureTask<?> future) {
-      return future.getDonePromise().isDone();
+      return future.getCompletionPromise().isDone();
     }
   };
 }

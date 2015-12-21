@@ -112,13 +112,27 @@ public class JobManager implements IJobManager, IPlatformListener {
 
   @Override
   public boolean isDone(final IFilter<IFuture<?>> filter) {
-    return m_futures.matchesAll(filter, DonePromise.FUTURE_DONE_MATCHER);
+    return m_futures.matchesEvery(filter, CompletionPromise.FUTURE_DONE_MATCHER);
   }
 
   @Override
   public void awaitDone(final IFilter<IFuture<?>> filter, final long timeout, final TimeUnit unit) {
     try {
       m_futures.awaitDone(filter, timeout, unit);
+    }
+    catch (final java.util.concurrent.TimeoutException e) {
+      throw BEANS.get(JobExceptionTranslator.class).translateTimeoutException(e, "Failed to wait for jobs to complete because the maximal wait time elapsed", timeout, unit);
+    }
+    catch (final java.lang.InterruptedException e) {
+      Thread.currentThread().interrupt(); // Restore the interrupted status because cleared by catching InterruptedException.
+      throw BEANS.get(JobExceptionTranslator.class).translateInterruptedException(e, "Interrupted while waiting for jobs to complete");
+    }
+  }
+
+  @Override
+  public void awaitFinished(IFilter<IFuture<?>> filter, long timeout, TimeUnit unit) {
+    try {
+      m_futures.awaitFinished(filter, timeout, unit);
     }
     catch (final java.util.concurrent.TimeoutException e) {
       throw BEANS.get(JobExceptionTranslator.class).translateTimeoutException(e, "Failed to wait for jobs to complete because the maximal wait time elapsed", timeout, unit);

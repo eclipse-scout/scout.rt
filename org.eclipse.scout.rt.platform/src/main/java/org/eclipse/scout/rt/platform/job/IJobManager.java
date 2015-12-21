@@ -108,8 +108,8 @@ public interface IJobManager {
   boolean isDone(IFilter<IFuture<?>> filter);
 
   /**
-   * Waits if necessary for at most the given time for the futures matching the given filter to be in 'done' state
-   * (completed or cancelled), or the timeout elapses.
+   * Waits if necessary for at most the given time for all futures matching the given filter to complete, or until
+   * cancelled, or the timeout elapses.
    * <p>
    * Filters can be plugged by using logical filters like {@link AndFilter} or {@link OrFilter}, or negated by enclosing
    * a filter in {@link NotFilter}. Also see {@link newFutureFilterBuilder} to create a filter to match multiple
@@ -125,8 +125,8 @@ public interface IJobManager {
    * </pre>
    *
    * @param filter
-   *          filter to limit the Futures to await to become 'done'. If <code>null</code>, all Futures are awaited,
-   *          which is the same as using {@link AlwaysFilter}.
+   *          filter to limit the Futures to await for. If <code>null</code>, all Futures are awaited, which is the same
+   *          as using {@link AlwaysFilter}.
    * @param timeout
    *          the maximal time to wait.
    * @param unit
@@ -137,6 +137,25 @@ public interface IJobManager {
    *           if the wait timed out.
    */
   void awaitDone(IFilter<IFuture<?>> filter, long timeout, TimeUnit unit);
+
+  /**
+   * Waits if necessary for at most the given time for all futures matching the given filter to finish, meaning that
+   * those jobs either complete normally or by an exception, or that they will never commence execution due to a
+   * premature cancellation.
+   *
+   * @param filter
+   *          filter to limit the Futures to await for. If <code>null</code>, all Futures are awaited, which is the same
+   *          as using {@link AlwaysFilter}.
+   * @param timeout
+   *          the maximal time to wait for the job to complete.
+   * @param unit
+   *          unit of the timeout.
+   * @throws InterruptedException
+   *           if the current thread was interrupted while waiting.
+   * @throws TimeoutException
+   *           if the wait timed out.
+   */
+  void awaitFinished(IFilter<IFuture<?>> filter, long timeout, TimeUnit unit);
 
   /**
    * Visits all Futures that are accepted by the given Filter and are not in 'done-state'.

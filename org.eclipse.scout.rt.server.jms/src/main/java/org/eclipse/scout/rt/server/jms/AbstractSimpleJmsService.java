@@ -106,26 +106,25 @@ public abstract class AbstractSimpleJmsService<T> extends AbstractJmsService<T> 
   }
 
   protected boolean isMessageConsumerRunning() {
-    IFuture<Void> future = m_messageConsumerFuture;
-    return future != null && !future.isDone();
+    final IFuture<Void> future = m_messageConsumerFuture;
+    return future != null && !future.isFinished();
   }
 
   protected synchronized void startMessageConsumer() {
     LOG.debug("starting message consumer for {}", getClass().getSimpleName(), LOG.isTraceEnabled() ? new Exception("stack trace") : null);
     stopMessageConsumer();
-    m_messageConsumerFuture = Jobs.schedule(createMessageConsumerRunnable(), Jobs.newInput().withName("JmsMessageConsumer-{}", getClass().getSimpleName()));
+    m_messageConsumerFuture = Jobs.schedule(createMessageConsumerRunnable(), Jobs.newInput()
+        .withName("JmsMessageConsumer-{}", getClass().getSimpleName()));
   }
 
   protected synchronized void stopMessageConsumer() {
     if (m_messageConsumerFuture != null) {
+      // 1. Cancel the message consumer.
       m_messageConsumerFuture.cancel(true);
 
-      // Wait for the consumer to be stopped.
+      // 2. Wait for the message consumer to be stopped.
       try {
-        // TODO [5.2] dwi: Filter: wrong usage --> COMPLETED
-        Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
-            .andMatchFuture(m_messageConsumerFuture)
-            .toFilter(), m_receiveTimeout * 3, TimeUnit.MILLISECONDS);
+        m_messageConsumerFuture.awaitFinished(m_receiveTimeout * 3, TimeUnit.MILLISECONDS);
       }
       finally {
         m_messageConsumerFuture = null;

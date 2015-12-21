@@ -143,13 +143,11 @@ public class FutureSet {
    *          to match the filtered Futures.
    * @return <code>true</code> if all Futures accepted by the specified Filter are successfully matched.
    */
-  public boolean matchesAll(final IFilter<IFuture<?>> filter, final IFilter<JobFutureTask<?>> matcher) {
+  public boolean matchesEvery(final IFilter<IFuture<?>> filter, final IFilter<JobFutureTask<?>> matcher) {
     for (final JobFutureTask<?> future : copyFutures()) {
-      if (filter != null && !filter.accept(future)) {
-        continue;
-      }
+      final boolean accepted = (filter == null || filter.accept(future));
 
-      if (!matcher.accept(future)) {
+      if (accepted && !matcher.accept(future)) {
         return false;
       }
     }
@@ -157,12 +155,24 @@ public class FutureSet {
   }
 
   /**
-   * Waits if necessary for at most the given time for the futures matching the given filter to be in 'done' state
-   * (completed or cancelled), or the timeout elapses.
+   * Returns <code>true</code>, if this {@link FutureSet} contains one Future matching the given filter at minimum.
+   */
+  public boolean containsSome(final IFilter<IFuture<?>> filter) {
+    for (final JobFutureTask<?> future : copyFutures()) {
+      if (filter == null || filter.accept(future)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Waits if necessary for at most the given time for all the futures matching the given filter to complete, or until
+   * cancelled, or the timeout elapses.
    *
    * @param filter
-   *          filter to limit the Futures to await to become 'done'. If <code>null</code>, all Futures are awaited,
-   *          which is the same as using {@link AlwaysFilter}.
+   *          filter to limit the Futures to await for. If <code>null</code>, all Futures are awaited, which is the same
+   *          as using {@link AlwaysFilter}.
    * @param timeout
    *          the maximal time to wait.
    * @param unit
@@ -175,11 +185,48 @@ public class FutureSet {
   public void awaitDone(final IFilter<IFuture<?>> filter, final long timeout, final TimeUnit unit) throws InterruptedException, TimeoutException {
     Assertions.assertGreater(timeout, 0L, "Invalid timeout; must be > 0 [timeout={}]", timeout);
 
-    // Wait until all Futures matching the filter are 'done' or the deadline is passed.
+    // Wait until all Futures matching the filter are done, or the deadline elapsed.
     m_writeLock.lockInterruptibly();
     try {
       long nanos = unit.toNanos(timeout);
-      while (!matchesAll(filter, DonePromise.PROMISE_DONE_MATCHER) && nanos > 0L) {
+      while (!matchesEvery(filter, CompletionPromise.PROMISE_DONE_MATCHER) && nanos > 0L) {
+        nanos = m_changedCondition.awaitNanos(nanos);
+      }
+
+      if (nanos <= 0L) {
+        throw new TimeoutException();
+      }
+    }
+    finally {
+      m_writeLock.unlock();
+    }
+  }
+
+  /**
+   * Waits if necessary for at most the given time for all futures matching the given filter to finish, meaning that
+   * those jobs either complete normally or by an exception, or that they will never commence execution due to a
+   * premature cancellation.
+   *
+   * @param filter
+   *          filter to limit the Futures to await for. If <code>null</code>, all Futures are awaited, which is the same
+   *          as using {@link AlwaysFilter}.
+   * @param timeout
+   *          the maximal time to wait.
+   * @param unit
+   *          unit of the given timeout.
+   * @throws InterruptedException
+   *           if the current thread was interrupted while waiting.
+   * @throws TimeoutException
+   *           if the wait timed out.
+   */
+  public void awaitFinished(final IFilter<IFuture<?>> filter, final long timeout, final TimeUnit unit) throws InterruptedException, TimeoutException {
+    Assertions.assertGreater(timeout, 0L, "Invalid timeout; must be > 0 [timeout={}]", timeout);
+
+    // Wait until all Futures matching the filter are removed, or the deadline elapsed.
+    m_writeLock.lockInterruptibly();
+    try {
+      long nanos = unit.toNanos(timeout);
+      while (containsSome(filter) && nanos > 0L) {
         nanos = m_changedCondition.awaitNanos(nanos);
       }
 
@@ -272,6 +319,7 @@ public class FutureSet {
               case RUNNING:
               case WAITING_FOR_BLOCKING_CONDITION:
               case WAITING_FOR_PERMIT:
+              case DONE:
                 return true; // manual signaling required
               default:
                 return false; // signaling done by adding/removing the Future

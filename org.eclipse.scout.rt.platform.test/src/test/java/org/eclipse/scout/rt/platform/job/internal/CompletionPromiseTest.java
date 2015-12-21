@@ -35,7 +35,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(PlatformTestRunner.class)
-public class DonePromiseTest {
+public class CompletionPromiseTest {
 
   @SuppressWarnings("unchecked")
   @Test
@@ -52,7 +52,7 @@ public class DonePromiseTest {
     final JobFutureTask<String> future = mock(JobFutureTask.class);
     when(future.isDone()).thenReturn(false);
 
-    final DonePromise<String> promise = new DonePromise<>(future);
+    final CompletionPromise<String> promise = new CompletionPromise<>(future);
 
     // Schedule job-1
     Jobs.schedule(new IRunnable() {
@@ -66,7 +66,7 @@ public class DonePromiseTest {
         when(future.isDone()).thenReturn(true);
 
         // Run the test
-        promise.fulfill();
+        promise.done();
       }
     }, Jobs.newInput().withName("job-1"));
 
@@ -76,7 +76,7 @@ public class DonePromiseTest {
       @Override
       public void run() throws Exception {
         setupLatch.countDown();
-        promise.get();
+        promise.awaitDoneAndGet();
         doneLatch.countDown();
       }
     }, Jobs.newInput().withName("job-2"));
@@ -87,7 +87,7 @@ public class DonePromiseTest {
       @Override
       public void run() throws Exception {
         setupLatch.countDown();
-        promise.get(10, TimeUnit.SECONDS);
+        promise.awaitDoneAndGet(10, TimeUnit.SECONDS);
         doneLatch.countDown();
       }
     }, Jobs.newInput().withName("job-3"));
@@ -131,14 +131,14 @@ public class DonePromiseTest {
     protocol.add("7");
 
     // Any get-call should not block, because Future is in done-state.
-    promise.get(10, TimeUnit.SECONDS);
-    promise.get();
+    promise.awaitDoneAndGet(10, TimeUnit.SECONDS);
+    promise.awaitDoneAndGet();
 
     assertEquals(Arrays.asList("1", "2", "3", "4", "5", "6", "7"), protocol);
   }
 
   @Test
-  @Times(1000) // do not remove this regression
+  @Times(1000) // regression; do not remove
   public void testAwaitDone1() {
     IFuture<Void> future = Jobs.schedule(mock(IRunnable.class), Jobs.newInput());
 
@@ -149,7 +149,7 @@ public class DonePromiseTest {
   }
 
   @Test
-  @Times(1000) // do not remove this regression
+  @Times(1000) // regression; do not remove
   public void testAwaitDone2() {
     IFuture<Void> future = Jobs.schedule(mock(IRunnable.class), Jobs.newInput());
 

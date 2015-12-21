@@ -21,6 +21,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.RunnableFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.annotations.Internal;
@@ -61,11 +62,15 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
   protected final Long m_expirationDate;
   protected final SchedulingSemaphore m_schedulingSemaphore;
 
-  protected final DonePromise<RESULT> m_donePromise;
   protected final CallableChain<RESULT> m_callableChain;
   protected final List<JobListenerWithFilter> m_listeners = new CopyOnWriteArrayList<>();
 
   protected volatile JobState m_state;
+
+  protected final CompletionPromise<RESULT> m_completionPromise;
+  protected volatile boolean m_running = false;
+  protected final AtomicBoolean m_finished = new AtomicBoolean(false);
+
   protected volatile Set<String> m_executionHints = new HashSet<>();
 
   public JobFutureTask(final JobManager jobManager, final RunMonitor runMonitor, final JobInput input, final CallableChain<RESULT> callableChain, final Callable<RESULT> callable) {
@@ -85,7 +90,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
     m_callableChain = callableChain;
 
     // Initialize this Future
-    m_donePromise = new DonePromise<>(this);
+    m_completionPromise = new CompletionPromise<>(this);
     m_expirationDate = (input.getExpirationTimeMillis() != JobInput.INFINITE_EXPIRATION ? System.currentTimeMillis() + input.getExpirationTimeMillis() : null);
     m_executionHints.addAll(input.getExecutionHints());
 
@@ -106,29 +111,9 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
   }
 
   /**
-   * Method invoked once this task completed execution or is cancelled.
-   */
-  @Override
-  protected void done() {
-    m_donePromise.fulfill();
-    m_runMonitor.unregisterCancellable(this);
-    m_jobManager.unregisterFuture(this);
-    m_listeners.clear();
-
-    // IMPORTANT: do not pass permit here because invoked immediately upon cancellation.
-  }
-
-  @Override
-  public final void reject() {
-    changeState(JobState.REJECTED);
-    cancel(true); // to enter 'DONE' state and to release a potential waiting submitter.
-    releasePermit();
-  }
-
-  /**
    * Method invoked after this task was accepted by {@link ExecutorService} and assigned to a worker thread to commence
-   * execution, and is also invoked for <code>cancelled</code> tasks. However, 'super.run()' or 'super.runAndReset()'
-   * will prevent cancelled tasks from running.
+   * execution, and is invoked for every scheduled task, even if being <code>cancelled</code>. However, 'super.run()' or
+   * 'super.runAndReset()' will prevent cancelled tasks from running.
    * <p>
    * This method is invoked in the worker thread which will finally run the task.
    * <p>
@@ -136,6 +121,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
    */
   @Override
   public void run() {
+    m_running = true;
     try {
       if (isExpired()) {
         cancel(true); // to enter 'DONE' state and to interrupt a potential waiting submitter.
@@ -149,8 +135,42 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
       }
     }
     finally {
+      m_running = false;
       releasePermit();
+      finishInternal();
     }
+  }
+
+  /**
+   * Method invoked once this task completed execution or is cancelled (regardless whether still executing), and is
+   * invoked only once.
+   */
+  @Override
+  protected void done() {
+    m_completionPromise.done();
+    m_runMonitor.unregisterCancellable(this);
+    m_listeners.clear();
+    finishInternal();
+
+    // IMPORTANT: do not release permit here because also invoked upon cancellation.
+  }
+
+  /**
+   * Method invoked once this task completed execution, or if cancelled and not currently executing, and is invoked only
+   * once.
+   */
+  protected void finished() {
+    m_jobManager.unregisterFuture(this);
+    m_completionPromise.finish();
+
+    // IMPORTANT: do not release permit here because also invoked upon cancellation.
+  }
+
+  @Override
+  public final void reject() {
+    changeState(JobState.REJECTED);
+    cancel(true); // to enter 'DONE' state and to release a potential waiting submitter.
+    releasePermit();
   }
 
   @Override
@@ -211,6 +231,11 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
   }
 
   @Override
+  public boolean isFinished() {
+    return m_completionPromise.isFinished();
+  }
+
+  @Override
   public boolean cancel(final boolean interruptIfRunning) {
     final Set<Boolean> status = CollectionUtility.hashSet(!isDone()); // Check for 'done' or 'cancel' to comply with Future.isCancelled semantic.
 
@@ -236,7 +261,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
     assertNotSameSemaphore();
 
     try {
-      m_donePromise.get();
+      m_completionPromise.awaitDoneAndGet();
     }
     catch (final ExecutionException | java.util.concurrent.CancellationException e) {
       // NOOP: Do not propagate ExecutionException and CancellationException (see JavaDoc contract)
@@ -252,7 +277,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
     assertNotSameSemaphore();
 
     try {
-      m_donePromise.get(timeout, unit);
+      m_completionPromise.awaitDoneAndGet(timeout, unit);
     }
     catch (final ExecutionException | java.util.concurrent.CancellationException e) {
       // NOOP: Do not propagate ExecutionException and CancellationException (see JavaDoc contract)
@@ -267,6 +292,22 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
   }
 
   @Override
+  public void awaitFinished(final long timeout, final TimeUnit unit) {
+    assertNotSameSemaphore();
+
+    try {
+      m_completionPromise.awaitFinished(timeout, unit);
+    }
+    catch (final java.lang.InterruptedException e) {
+      restoreInterruptionStatus();
+      throw interceptException(BEANS.get(JobExceptionTranslator.class).translateInterruptedException(e, "Interrupted while waiting for a job to finish"));
+    }
+    catch (final java.util.concurrent.TimeoutException e) {
+      throw interceptException(BEANS.get(JobExceptionTranslator.class).translateTimeoutException(e, "Failed to wait for a job to finish because the maximal wait time elapsed", timeout, unit));
+    }
+  }
+
+  @Override
   public RESULT awaitDoneAndGet() {
     return awaitDoneAndGet(DefaultRuntimeExceptionTranslator.class);
   }
@@ -276,7 +317,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
     assertNotSameSemaphore();
 
     try {
-      return m_donePromise.get();
+      return m_completionPromise.awaitDoneAndGet();
     }
     catch (final ExecutionException e) {
       throw interceptException(BEANS.get(JobExceptionTranslator.class).translateExecutionException(e, exceptionTranslator));
@@ -300,7 +341,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
     assertNotSameSemaphore();
 
     try {
-      return m_donePromise.get(timeout, unit);
+      return m_completionPromise.awaitDoneAndGet(timeout, unit);
     }
     catch (final ExecutionException e) {
       throw interceptException(BEANS.get(JobExceptionTranslator.class).translateExecutionException(e, exceptionTranslator));
@@ -319,7 +360,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
 
   @Override
   public IFuture<RESULT> whenDone(final IDoneHandler<RESULT> callback, final RunContext runContext) {
-    m_donePromise.whenDone(callback, runContext);
+    m_completionPromise.whenDone(callback, runContext);
     return this;
   }
 
@@ -346,8 +387,8 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
     return m_listeners;
   }
 
-  protected DonePromise<RESULT> getDonePromise() {
-    return m_donePromise;
+  protected CompletionPromise<RESULT> getCompletionPromise() {
+    return m_completionPromise;
   }
 
   /**
@@ -438,5 +479,27 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
     builder.attr("job", m_input.getName());
     builder.attr("state", m_state);
     return builder.toString();
+  }
+
+  /**
+   * Invokes {@link #finished()} if done and currently not executing.
+   */
+  private void finishInternal() {
+    // Ensure task not currently running.
+    if (m_running) {
+      return;
+    }
+
+    // Ensure task to be in 'done' state, because method also called for periodic tasks which did not complete yet.
+    if (!isDone()) {
+      return;
+    }
+
+    // Ensure to be called only once (thread safety).
+    if (!m_finished.compareAndSet(false, true)) {
+      return;
+    }
+
+    finished();
   }
 }
