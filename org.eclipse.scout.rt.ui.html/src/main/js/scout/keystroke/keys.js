@@ -217,7 +217,7 @@ scout.keyStrokeBox = {
     if ($existingKeyBoxes.length > 0) {
       var $boxLastAdded = $existingKeyBoxes.first();
       if (alignementRight) {
-        offset = $container.width() - $boxLastAdded.position().left + this.gap;
+        offset = $container.outerWidth() - $boxLastAdded.position().left + this.gap;
       } else {
         offset = this.gap + $boxLastAdded.position().left + $boxLastAdded.outerWidth();
       }

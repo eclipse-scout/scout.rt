@@ -36,6 +36,10 @@
     margin: 0 @outline-title-margin-right @outline-title-margin-bottom @outline-title-margin-left;
     border-bottom: 1px solid @outline-title-border-color;
 
+    & > .key-box {
+      top: 10px;
+    }
+
     & > .outline-title-text {
       padding: 21px 2px 13px 6px;
       cursor: pointer;
