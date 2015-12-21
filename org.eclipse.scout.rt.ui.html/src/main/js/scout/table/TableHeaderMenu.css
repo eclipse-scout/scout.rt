@@ -158,6 +158,16 @@
     }
   }
 
+  &.add-column::before {
+    content: @icon-plus;
+  }
+  &.remove-column::before {
+    content: @icon-minus;
+  }
+  &.change-column::before {
+    content: @icon-pencil;
+  }
+
   &.toggle.selected:hover {
     border-width: 0;
 

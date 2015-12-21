@@ -89,6 +89,9 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
     this._renderSelectedSorting();
   }
 
+  // Add/remove/change columns
+  this._renderModifyColumnsGroup();
+
   // Grouping and aggregation
   if (this.table.containsNumberColumn()) {
     if (this.column instanceof scout.NumberColumn) {
@@ -173,6 +176,34 @@ scout.TableHeaderMenu.prototype._renderMovingGroup = function() {
     pos = table.columns.indexOf(column);
   }
 };
+
+scout.TableHeaderMenu.prototype._renderModifyColumnsGroup = function() {
+  var $group = this.$columnActions.appendDiv('table-header-menu-group buttons');
+  $group.appendDiv('table-header-menu-group-text')
+    .data('label', this.session.text('ui.Column'));
+
+  var $button = $group.appendDiv('table-header-menu-command toggle add-column')
+    .data('label', this.session.text('ui.addColumn'))
+    .click(this.onAddColumnClick.bind(this));
+
+  $button = $group.appendDiv('table-header-menu-command toggle sort remove-column')
+    .data('label', this.session.text('ui.removeColumn'))
+    .click(this.onRemoveColumnClick.bind(this));
+
+  $button = $group.appendDiv('table-header-menu-command toggle sort change-column')
+    .data('label', this.session.text('ui.changeColumn'))
+    .click(this.onRemoveColumnClick.bind(this));
+};
+
+scout.TableHeaderMenu.prototype.onAddColumnClick = function(event) {
+};
+
+scout.TableHeaderMenu.prototype.onRemoveColumnClick = function(event) {
+};
+
+scout.TableHeaderMenu.prototype.onChangeColumnClick = function(event) {
+};
+
 
 scout.TableHeaderMenu.prototype._renderSortingGroup = function() {
   var table =
