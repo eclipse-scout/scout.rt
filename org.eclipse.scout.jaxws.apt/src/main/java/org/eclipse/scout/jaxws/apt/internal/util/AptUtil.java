@@ -70,7 +70,7 @@ public final class AptUtil {
   }
 
   /**
-   * Method invoked to intercept the compilation unit content prior being persisted..
+   * Method invoked to intercept the compilation unit content prior being persisted.
    */
   private static String interceptContent(String content) {
     // replace new lines before '{'
@@ -83,6 +83,8 @@ public final class AptUtil {
     content = content.replaceAll("\\s*extends", " extends");
     // change indent space two 2 spaces
     content = content.replaceAll("    ", "  ");
+    // Remove redundant Callable imports (Generics bug in JCodeModel)
+    content = content.replaceAll("import\\s+java\\.util\\.concurrent\\.Callable\\;\\s+import\\s+java\\.util\\.concurrent\\.Callable\\;", "import java.util.concurrent.Callable;");
 
     return content;
   }
