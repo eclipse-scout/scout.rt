@@ -51,8 +51,13 @@ scout.DateColumnUserFilter.prototype.fieldsFilterActive = function() {
  * @override ColumnUserFilter.js
  */
 scout.DateColumnUserFilter.prototype.acceptByFields = function(key, normKey, row) {
+  // if date is empty and dateFrom/dateTo is set, the row should never match
+  if (!key) {
+    return false;
+  }
+
   var
-    keyValue = key ? key.valueOf() : 0,
+    keyValue = key.valueOf(),
     fromValue = this.dateFrom ? this.dateFrom.valueOf() : null,
     toValue  = this.dateTo ? this.dateTo.valueOf() : null;
   if (fromValue && toValue) {
@@ -62,6 +67,9 @@ scout.DateColumnUserFilter.prototype.acceptByFields = function(key, normKey, row
   } else if (toValue) {
     return keyValue <= toValue;
   }
+
+  // acceptByFields is only called when filter fields are active
+  throw new Error('illegal state');
 };
 
 /**
