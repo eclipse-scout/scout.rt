@@ -159,7 +159,7 @@ scout.Button.prototype._doActionTogglesSubMenu = function() {
 };
 
 scout.Button.prototype.setSelected = function(selected) {
-  this.selected = selected;
+  this._setProperty('selected', selected);
   if (this.rendered) {
     this._renderSelected(this.selected);
   }

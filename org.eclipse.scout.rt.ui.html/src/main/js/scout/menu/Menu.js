@@ -83,11 +83,11 @@ scout.Menu.prototype._renderItem = function($parent) {
 };
 
 scout.Menu.prototype._renderSelected = function() {
+  scout.Menu.parent.prototype._renderSelected.call(this);
   if (this.selected) {
     if (this._doActionTogglesSubMenu()) {
       this._renderSubMenuItems(this, this.childActions);
-    } else
-    if (this._doActionTogglesPopup()) {
+    } else if (this._doActionTogglesPopup()) {
       this._openPopup();
     }
   } else {
