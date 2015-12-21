@@ -94,8 +94,7 @@ scout.Outline.prototype._renderTitle = function() {
     this.$title = this.$container.prependDiv('outline-title');
     this.$titleText = this.$title.prependDiv('outline-title-text');
   }
-  this.$titleText.text(this.title)
-    .on('click', this._onTitleClick.bind(this));
+  this.$titleText.text(this.title).on('click', this._onTitleClick.bind(this));
   this._renderTitleMenuBar();
 };
 

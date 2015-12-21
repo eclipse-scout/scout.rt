@@ -31,19 +31,20 @@
   }
 
   & > .outline-title {
-    cursor: pointer;
     #scout.font-text-large();
     #scout.overflow-ellipsis-nowrap();
-    padding: 21px 2px 13px 6px;
     margin: 0 @outline-title-margin-right @outline-title-margin-bottom @outline-title-margin-left;
     border-bottom: 1px solid @outline-title-border-color;
 
     & > .outline-title-text {
-      display: inline-block;
+      padding: 21px 2px 13px 6px;
+      cursor: pointer;
+      display: block;
+      width: auto;
     }
 
     & > .menubar {
-      display: inline-block;
+      display: block;
       background-color: @navigation-background-color;
       width: auto;
       position: absolute;
