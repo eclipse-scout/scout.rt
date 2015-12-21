@@ -16,9 +16,9 @@ import org.eclipse.scout.rt.ui.html.json.MainJsonObjectFactory;
 import org.eclipse.scout.rt.ui.html.json.table.userfilter.JsonNumberColumnUserFilter;
 import org.json.JSONObject;
 
-public class JsonNumberColumn<NUMBER_COLUMN extends INumberColumn<?>> extends JsonColumn<NUMBER_COLUMN> {
+public class JsonNumberColumn<T extends INumberColumn<?>> extends JsonColumn<T> {
 
-  public JsonNumberColumn(NUMBER_COLUMN model) {
+  public JsonNumberColumn(T model) {
     super(model);
   }
 

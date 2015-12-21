@@ -20,12 +20,12 @@ import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonOutline;
 import org.json.JSONObject;
 
-public class JsonOutlineTable<TABLE extends ITable> extends JsonTable<TABLE> {
+public class JsonOutlineTable<T extends ITable> extends JsonTable<T> {
   public static final String PROP_PAGE = "ui:page";
 
   private IPage m_page;
 
-  public JsonOutlineTable(TABLE model, IUiSession uiSession, String id, IJsonAdapter<?> parent, IPage page) {
+  public JsonOutlineTable(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent, IPage page) {
     super(model, uiSession, id, parent);
     m_page = page;
   }

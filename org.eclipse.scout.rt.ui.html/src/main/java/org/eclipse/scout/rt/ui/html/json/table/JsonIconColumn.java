@@ -13,9 +13,9 @@ package org.eclipse.scout.rt.ui.html.json.table;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IIconColumn;
 import org.eclipse.scout.rt.ui.html.json.MainJsonObjectFactory;
 
-public class JsonIconColumn<ICON_COLUMN extends IIconColumn> extends JsonColumn<ICON_COLUMN> {
+public class JsonIconColumn<T extends IIconColumn> extends JsonColumn<T> {
 
-  public JsonIconColumn(ICON_COLUMN model) {
+  public JsonIconColumn(T model) {
     super(model);
   }
 

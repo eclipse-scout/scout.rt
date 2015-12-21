@@ -74,7 +74,7 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserver<TABLE> implements IJsonContextMenuOwner, IBinaryResourceConsumer {
+public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T> implements IJsonContextMenuOwner, IBinaryResourceConsumer {
   private static final Logger LOG = LoggerFactory.getLogger(JsonTable.class);
 
   public static final String EVENT_ROW_CLICKED = "rowClicked";
@@ -129,7 +129,7 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
   private final Map<IColumn, JsonColumn> m_jsonColumns;
   private final AbstractEventBuffer<TableEvent> m_eventBuffer;
 
-  public JsonTable(TABLE model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+  public JsonTable(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
     m_tableRows = new HashMap<>();
     m_tableRowIds = new HashMap<>();
@@ -145,7 +145,7 @@ public class JsonTable<TABLE extends ITable> extends AbstractJsonPropertyObserve
   }
 
   @Override
-  protected void initJsonProperties(TABLE model) {
+  protected void initJsonProperties(T model) {
     putJsonProperty(new JsonProperty<ITable>(ITable.PROP_ENABLED, model) {
       @Override
       protected Boolean modelValue() {

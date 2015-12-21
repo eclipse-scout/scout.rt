@@ -13,9 +13,9 @@ package org.eclipse.scout.rt.ui.html.json.table;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.ui.html.json.MainJsonObjectFactory;
 
-public class JsonBeanColumn<COLUMN extends IColumn<?>> extends JsonColumn<COLUMN> {
+public class JsonBeanColumn<T extends IColumn<?>> extends JsonColumn<T> {
 
-  public JsonBeanColumn(COLUMN model) {
+  public JsonBeanColumn(T model) {
     super(model);
   }
 

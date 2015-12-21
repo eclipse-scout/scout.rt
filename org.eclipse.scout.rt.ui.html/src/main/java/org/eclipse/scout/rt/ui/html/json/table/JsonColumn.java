@@ -22,17 +22,17 @@ import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.table.userfilter.JsonColumnUserFilter;
 import org.json.JSONObject;
 
-public class JsonColumn<COLUMN extends IColumn<?>> implements IJsonObject {
+public class JsonColumn<T extends IColumn<?>> implements IJsonObject {
 
   private String m_id;
   private IUiSession m_uiSession;
-  private COLUMN m_column;
+  private T m_column;
   private int m_indexOffset;
 
   private final String PROP_INITIAL_ALWAYS_INCLUDE_SORT_AT_BEGIN = "initialAlwaysIncludeSortAtBegin";
   private final String PROP_INITIAL_ALWAYS_INCLUDE_SORT_AT_END = "initialAlwaysIncludeSortAtEnd";
 
-  public JsonColumn(COLUMN model) {
+  public JsonColumn(T model) {
     m_column = model;
   }
 
@@ -104,7 +104,7 @@ public class JsonColumn<COLUMN extends IColumn<?>> implements IJsonObject {
     return null;
   }
 
-  public COLUMN getColumn() {
+  public T getColumn() {
     return m_column;
   }
 

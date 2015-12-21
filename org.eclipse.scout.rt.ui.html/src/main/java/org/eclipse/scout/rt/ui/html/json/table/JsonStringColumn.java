@@ -15,15 +15,17 @@ import org.eclipse.scout.rt.client.ui.basic.table.userfilter.ColumnUserFilterSta
 import org.eclipse.scout.rt.ui.html.json.table.userfilter.JsonTextColumnUserFilter;
 import org.json.JSONObject;
 
-public class JsonStringColumn<STRING_COLUMN extends IStringColumn> extends JsonColumn<STRING_COLUMN> {
+public class JsonStringColumn<T extends IStringColumn> extends JsonColumn<T> {
 
-  public JsonStringColumn(STRING_COLUMN model) {
+  public static final String OBJECT_TYPE = "StringColumn";
+
+  public JsonStringColumn(T model) {
     super(model);
   }
 
   @Override
   public String getObjectType() {
-    return "StringColumn";
+    return OBJECT_TYPE;
   }
 
   @Override
