@@ -130,7 +130,7 @@ scout.ColumnUserFilter.prototype.accept = function(row) {
     acceptByTable = this.selectedValues.indexOf(normKey) > -1;
   }
   if (this.fieldsFilterActive()) {
-    acceptByFields = this.acceptByFields(key, normKey);
+    acceptByFields = this.acceptByFields(key, normKey, row);
   }
 
   return acceptByTable && acceptByFields;
@@ -160,7 +160,7 @@ scout.ColumnUserFilter.prototype.off = function(type, func) {
  * Returns whether or not the given key is accepted by the filter-fields in their current state.
  * The default impl. returns true.
  */
-scout.ColumnUserFilter.prototype.acceptByFields = function(key, normKey) {
+scout.ColumnUserFilter.prototype.acceptByFields = function(key, normKey, row) {
   return true;
 };
 

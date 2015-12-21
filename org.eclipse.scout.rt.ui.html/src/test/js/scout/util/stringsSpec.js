@@ -407,4 +407,15 @@ describe("scout.strings", function() {
 
   });
 
+  describe("nvl", function() {
+
+    it("returns an empty string when input is null or undefined", function() {
+      expect(scout.strings.nvl(null)).toBe('');
+      expect(scout.strings.nvl(undefined)).toBe('');
+      expect(scout.strings.nvl('')).toBe('');
+      expect(scout.strings.nvl('foo')).toBe('foo');
+    });
+
+  });
+
 });

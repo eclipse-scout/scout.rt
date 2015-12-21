@@ -50,7 +50,7 @@ scout.DateColumnUserFilter.prototype.fieldsFilterActive = function() {
 /**
  * @override ColumnUserFilter.js
  */
-scout.DateColumnUserFilter.prototype.acceptByFields = function(key, normKey) {
+scout.DateColumnUserFilter.prototype.acceptByFields = function(key, normKey, row) {
   var
     keyValue = key.valueOf(),
     fromValue = this.dateFrom ? this.dateFrom.valueOf() : null,

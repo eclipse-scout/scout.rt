@@ -293,5 +293,14 @@ scout.strings = {
       return input;
     }
     return String(input);
+  },
+
+  /**
+   * Returns an empty string '', when given string is null or undefined.
+   * This is a shortcut for <code>scout.nvl(string, '')</code>.
+   */
+  nvl: function(string) {
+    return scout.nvl(string, '');
   }
+
 };

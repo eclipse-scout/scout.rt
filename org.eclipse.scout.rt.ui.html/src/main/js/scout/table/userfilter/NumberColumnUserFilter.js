@@ -28,7 +28,7 @@ scout.NumberColumnUserFilter.prototype.fieldsFilterActive = function() {
 /**
  * @override ColumnUserFilter.js
  */
-scout.NumberColumnUserFilter.prototype.acceptByFields = function(key, normKey) {
+scout.NumberColumnUserFilter.prototype.acceptByFields = function(key, normKey, row) {
   var
     hasFrom = scout.objects.isNumber(this.numberFrom),
     hasTo = scout.objects.isNumber(this.numberTo);
