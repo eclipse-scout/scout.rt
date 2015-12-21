@@ -25,17 +25,12 @@
   <packaging>jar</packaging>
   <name>${project.groupId}:${project.artifactId}</name>
 
-  <properties>
-    <codemodel.plugin.version>1.0.2</codemodel.plugin.version>
-  </properties>
-
   <dependencies>
     <!-- Build Dependencies -->
     <dependency>
       <!-- do not use 'com.sun.codemodel' nor 'org.glassfish.jaxb' because out-of-date -->
       <groupId>com.unquietcode.tools.jcodemodel</groupId>
       <artifactId>codemodel</artifactId>
-      <version>${codemodel.plugin.version}</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.scout.rt</groupId>
