@@ -40,7 +40,7 @@ import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
 import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
-import org.eclipse.scout.rt.client.dto.DtoUtility;
+import org.eclipse.scout.rt.client.dto.Data;
 import org.eclipse.scout.rt.client.dto.FormData;
 import org.eclipse.scout.rt.client.dto.FormData.SdkCommand;
 import org.eclipse.scout.rt.client.extension.ui.form.FormChains.FormAddSearchTermsChain;
@@ -983,12 +983,26 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     m_blockingCondition.waitFor(ModelJobs.EXECUTION_HINT_UI_INTERACTION_REQUIRED);
   }
 
+  protected static Class<?> getDataAnnotationValue(Class<?> clazz) {
+    while (clazz != null && !Object.class.equals(clazz)) {
+      Data annotation = clazz.getAnnotation(Data.class);
+      if (annotation != null) {
+        Class<?> value = annotation.value();
+        if (value != null && !Object.class.equals(value)) {
+          return value;
+        }
+      }
+      clazz = clazz.getSuperclass();
+    }
+    return null;
+  }
+
   private void exportExtensionProperties(Object o, IPropertyHolder target) {
     if (!(o instanceof IExtensibleObject)) {
       return;
     }
     for (IExtension<?> ex : ((IExtensibleObject) o).getAllExtensions()) {
-      Class<?> dto = DtoUtility.getDataAnnotationValue(ex.getClass());
+      Class<?> dto = getDataAnnotationValue(ex.getClass());
       if (dto != null && !Object.class.equals(dto)) {
         Object propertyTarget = target.getContribution(dto);
         Map<String, Object> fieldProperties = BeanUtility.getProperties(ex, AbstractFormField.class, new FormDataPropertyFilter());
@@ -1122,7 +1136,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     if (owner instanceof IExtensibleObject) {
       IExtensibleObject exOwner = (IExtensibleObject) owner;
       for (IExtension<?> ex : exOwner.getAllExtensions()) {
-        Class<?> dto = DtoUtility.getDataAnnotationValue(ex.getClass());
+        Class<?> dto = getDataAnnotationValue(ex.getClass());
         if (extToSearch.getClass().equals(dto)) {
           return ex;
         }

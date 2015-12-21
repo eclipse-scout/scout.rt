@@ -15,6 +15,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Set;
 
+import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractIntegerColumn;
@@ -44,7 +45,7 @@ import org.mockito.Mockito;
  */
 @RunWith(ClientTestRunner.class)
 @RunWithSubject("anna")
-@RunWithClientSession(TestEnvironmentClientSession.class)
+@RunWithClientSession(value = TestEnvironmentClientSession.class, provider = ClientSessionProvider.class) // ensure a new session is created for this test
 public class ClientUIPreferencesTest {
 
   private IBean<?> m_registeredUserPrefsStorageService;

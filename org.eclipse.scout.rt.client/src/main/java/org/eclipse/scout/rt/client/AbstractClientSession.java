@@ -94,7 +94,7 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
 
   /* locked by m_sharedVarLock*/
   private final SharedVariableMap m_sharedVariableMap;
-  private CountDownLatch m_sharedVarsInitialized = new CountDownLatch(1);
+  private final CountDownLatch m_sharedVarsInitialized = new CountDownLatch(1);
   private final Object m_sharedVarLock = new Object();
 
   private IMemoryPolicy m_memoryPolicy;

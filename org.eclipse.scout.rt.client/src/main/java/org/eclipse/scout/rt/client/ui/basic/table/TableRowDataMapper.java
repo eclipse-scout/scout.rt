@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table;
 
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -20,7 +21,6 @@ import java.util.Set;
 
 import org.eclipse.scout.rt.client.dto.ColumnData;
 import org.eclipse.scout.rt.client.dto.ColumnData.SdkColumnCommand;
-import org.eclipse.scout.rt.client.dto.DtoUtility;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Replace;
@@ -32,7 +32,6 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldBeanData;
 import org.eclipse.scout.rt.shared.data.form.fields.tablefield.TableRowDataPropertyFilter;
-import org.eclipse.scout.rt.shared.extension.IExtension;
 import org.eclipse.scout.rt.shared.extension.IInternalExtensionRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -170,8 +169,9 @@ public class TableRowDataMapper implements ITableRowDataMapper {
     FastPropertyDescriptor propertyDesc = m_propertyDescriptorByColumn.get(column);
     if (propertyDesc != null) {
       try {
-        Object dto = getDataContainer(column, rowData);
-        value = propertyDesc.getReadMethod().invoke(dto);
+        Method columnReadMethod = propertyDesc.getReadMethod();
+        Object dto = getDataContainer(rowData, columnReadMethod.getDeclaringClass());
+        value = columnReadMethod.invoke(dto);
       }
       catch (Exception e) {
         LOG.warn("Error reading row data property for column [{}]", column.getClass().getName(), e);
@@ -193,8 +193,9 @@ public class TableRowDataMapper implements ITableRowDataMapper {
       FastPropertyDescriptor propertyDesc = m_propertyDescriptorByColumn.get(column);
       if (propertyDesc != null) {
         try {
-          Object dto = getDataContainer(column, rowData);
-          propertyDesc.getWriteMethod().invoke(dto, value);
+          Method columnWriteMethod = propertyDesc.getWriteMethod();
+          Object dto = getDataContainer(rowData, columnWriteMethod.getDeclaringClass());
+          columnWriteMethod.invoke(dto, value);
         }
         catch (Exception t) {
           LOG.warn("Error writing row data property for column [{}]", column.getClass().getName(), t);
@@ -216,20 +217,11 @@ public class TableRowDataMapper implements ITableRowDataMapper {
     }
   }
 
-  protected Object getDataContainer(IColumn column, AbstractTableRowData rowData) {
-    Class<?> dtoClass = DtoUtility.getDataAnnotationValue(column.getClass());
-    if (dtoClass == null) {
-      Class<?> declaringClass = column.getClass().getDeclaringClass();
-      if (declaringClass != null && IExtension.class.isAssignableFrom(declaringClass)) {
-        dtoClass = DtoUtility.getDataAnnotationValue(declaringClass);
-      }
-    }
-    if (dtoClass == null || rowData.getClass().equals(dtoClass)) {
+  protected Object getDataContainer(AbstractTableRowData rowData, Class<?> dataOwnerClass) {
+    if (dataOwnerClass.isAssignableFrom(rowData.getClass())) {
       return rowData;
     }
-    else {
-      return rowData.getContribution(dtoClass);
-    }
+    return rowData.getContribution(dataOwnerClass);
   }
 
   @Override

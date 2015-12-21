@@ -32,6 +32,7 @@ import org.eclipse.scout.rt.platform.extension.Extends;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.CompareUtility;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
+import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -165,6 +166,18 @@ public class ExtensionRegistry implements IInternalExtensionRegistry {
       List<Class<?>> innerExtensionClasses = collectInnerExtensionClasses(extensionClass);
       for (Class<?> innerExtensionClass : innerExtensionClasses) {
         autoRegisterInternal(innerExtensionClass, extensionClass, null, ownerClassIdentifier, null);
+      }
+    }
+    else {
+      // step into all static inner classes for form field data if the inner class itself has an @Extends annotation: this is a row data extension
+      boolean isFormFieldData = AbstractFormFieldData.class.isAssignableFrom(extensionClass);
+      if (isFormFieldData) {
+        List<Class<?>> innerExtensionClasses = collectInnerExtensionClasses(extensionClass);
+        for (Class<?> innerExtensionClass : innerExtensionClasses) {
+          if (innerExtensionClass.isAnnotationPresent(Extends.class) && Modifier.isStatic(innerExtensionClass.getModifiers())) {
+            autoRegisterInternal(innerExtensionClass, extensionClass, null, ownerClassIdentifier, null);
+          }
+        }
       }
     }
   }
