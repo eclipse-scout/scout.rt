@@ -354,6 +354,7 @@ scout.Table.prototype._renderProperties = function() {
   this._renderTableFooter();
   this._renderMenus();
   this._renderEnabled();
+  this._renderDropType();
 };
 
 scout.Table.prototype._remove = function() {
