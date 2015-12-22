@@ -89,6 +89,11 @@ public @interface JaxWsPortTypeProxy {
   String portTypeProxyName() default JaxWsPortTypeProxy.DERIVED;
 
   /**
+   * The package of the PortTypeProxy to be generated. If not set, the package of the descriptor is used.
+   */
+  String portTypePackage() default JaxWsPortTypeProxy.DERIVED;
+
+  /**
    * The service name as specified in the WSDL file, and must be set if publishing the webservice in a EE container.
    * Both, {@link #serviceName()} and {@link #portName()} uniquely identify a webservice endpoint to be published.
    *

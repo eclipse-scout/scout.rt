@@ -51,7 +51,6 @@ public class PortTypeProxyDescriptor {
   private final JaxWsPortTypeProxy m_annotation;
   private final AnnotationMirror m_annotationMirror;
   private final List<AnnotationMirror> m_siblingAnnotations;
-  private String m_proxyNameSuffix;
 
   private final ProcessingEnvironment m_env;
 
@@ -83,24 +82,13 @@ public class PortTypeProxyDescriptor {
    * @return the fully qualified name of the port type proxy.
    */
   public String getProxyQualifiedName() {
-    final boolean derived = JaxWsPortTypeProxy.DERIVED.equals(m_annotation.portTypeProxyName());
+    final boolean nameDerived = JaxWsPortTypeProxy.DERIVED.equals(m_annotation.portTypeProxyName());
+    final boolean packageDerived = JaxWsPortTypeProxy.DERIVED.equals(m_annotation.portTypePackage());
 
-    final String suffix = StringUtility.nvl(m_proxyNameSuffix, "");
-    final String pck = m_env.getElementUtils().getPackageOf(m_descriptor).getQualifiedName().toString();
-    if (derived) {
-      return StringUtility.join(".", pck, m_endpointInterface.getSimpleName() + PORT_TYPE_PROXY_SUFFIX + suffix);
-    }
-    else {
-      return StringUtility.join(".", pck, m_annotation.portTypeProxyName() + suffix);
-    }
-  }
+    final String pck = (packageDerived ? m_env.getElementUtils().getPackageOf(m_descriptor).getQualifiedName().toString() : m_annotation.portTypePackage());
+    final String name = (nameDerived ? m_endpointInterface.getSimpleName() + PORT_TYPE_PROXY_SUFFIX : m_annotation.portTypeProxyName());
 
-  /**
-   * Sets a suffix to be appended to the PortTypeProxyName, or <code>null</code> for no suffix. The suffix is used for
-   * unique names.
-   */
-  public void setProxyNameSuffix(final String suffix) {
-    m_proxyNameSuffix = suffix;
+    return StringUtility.join(".", pck, name);
   }
 
   /**
