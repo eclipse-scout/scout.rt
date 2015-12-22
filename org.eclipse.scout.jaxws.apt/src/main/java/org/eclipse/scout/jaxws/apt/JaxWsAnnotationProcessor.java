@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.jaxws.apt;
 
+import static java.lang.String.format;
+
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
@@ -162,7 +164,7 @@ public class JaxWsAnnotationProcessor extends AbstractProcessor {
 
     // Log endpoint interfaces for which no entry point was generated.
     for (final String endpointInterfaceName : endpointInterfaceNames) {
-      m_logger.info("Skipped entry point generation for endpoint interface '{}', because not configured with {}.", endpointInterfaceName, WebServiceEntryPoint.class.getSimpleName());
+      m_logger.info("Skipped entry point generation for endpoint interface '{}' because not configured with {} annotation.", endpointInterfaceName, WebServiceEntryPoint.class.getSimpleName());
     }
   }
 
@@ -504,7 +506,7 @@ public class JaxWsAnnotationProcessor extends AbstractProcessor {
     else {
       final List<String> handlers = new ArrayList<>();
       for (final HandlerDefinition handlerDefinition : entryPointDefinition.getHandlerChain()) {
-        handlers.add(String.format("{@link %s}", handlerDefinition.getHandlerSimpleName()));
+        handlers.add(format("{@link %s}", handlerDefinition.getHandlerSimpleName()));
       }
       out.printf("<tr><td>Handler chain:</td><td>%s</td>", StringUtility.join(", ", handlers)).println();
     }

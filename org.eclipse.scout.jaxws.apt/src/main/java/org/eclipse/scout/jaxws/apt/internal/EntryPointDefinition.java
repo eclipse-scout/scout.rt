@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.jaxws.apt.internal;
 
+import static java.lang.String.format;
+
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +29,6 @@ import javax.xml.ws.soap.MTOM;
 
 import org.eclipse.scout.jaxws.apt.internal.util.AnnotationUtil;
 import org.eclipse.scout.jaxws.apt.internal.util.AptUtil;
-import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.server.commons.authentication.ICredentialVerifier;
@@ -237,7 +238,8 @@ public class EntryPointDefinition {
           m_handlerType = HandlerType.LOGICAL;
         }
         else {
-          throw new PlatformException("Unsupported handler type; must implement '{}' for a SOAP protocol-specific handler, or '{}' for a protocol-agnostic handler.", SOAPHandler.class.getSimpleName(), LogicalHandler.class.getSimpleName());
+          throw new IllegalStateException(
+              format("Unsupported handler type; must implement '%s' for a SOAP protocol-specific handler, or '%s' for a protocol-agnostic handler.", SOAPHandler.class.getSimpleName(), LogicalHandler.class.getSimpleName()));
         }
       }
       else {
