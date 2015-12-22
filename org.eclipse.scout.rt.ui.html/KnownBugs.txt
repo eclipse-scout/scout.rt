@@ -1,0 +1,19 @@
+================================================================================================
+Known Bugs:
+------------------------------------------------------------------------------------------------
+
+[Selection in disabled text fields]
+Firefox (tested with v 35.0.1): it's not possible to select text in a disabled text field.
+There is no workaround. An often suggested workaround is to use the readonly attribute instead
+of disabled, but this leads to a completely different behavior when it comes to event handling.
+When a field is disabled it doesn't fire any events (for instance: click), but when it's set
+to readonly event handling is still enabled. In other words: we'd have to implement
+browser/widget default behavior to work around this problem - additionally the workaround
+should only affect Firefox but none of the other browsers (where this is not an issue at all).
+
+[Table columns]
+IE9 does not support overflow attribute on DIVs with "display-style: table-cell". Therefore,
+the table columns are not correctly aligned.
+
+[Input placeholders]
+On-field labels are not visible in IE9 because it lacks support for the "placeholder" attribute.
