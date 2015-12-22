@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-describe('scout-jquery', function() {
+describe('jquery-scout', function() {
 
   var $e;
 
@@ -145,6 +145,88 @@ describe('scout-jquery', function() {
       $e.icon();
       expect($e.children().length).toBe(0);
       expect($e.data('$icon')).toBeUndefined();
+    });
+
+  });
+
+  describe('textOrNbsp', function() {
+
+    it('sets text or nbsp', function() {
+      $e.textOrNbsp();
+      expect($e.html()).toBe('&nbsp;');
+      $e.empty();
+      expect($e.html()).toBe('');
+      $e.textOrNbsp('');
+      expect($e.html()).toBe('&nbsp;');
+      $e.textOrNbsp('hello');
+      expect($e.html()).toBe('hello');
+      $e.textOrNbsp(' ');
+      expect($e.html()).toBe('&nbsp;');
+      $e.textOrNbsp('hello  <b>world</b>');
+      expect($e.html()).toBe('hello  &lt;b&gt;world&lt;/b&gt;');
+      $e.textOrNbsp('\n \t      ');
+      expect($e.html()).toBe('&nbsp;');
+      $e.textOrNbsp(' hello\nworld');
+      expect($e.html()).toBe(' hello\nworld');
+      $e.textOrNbsp(null);
+      expect($e.html()).toBe('&nbsp;');
+      $e.textOrNbsp('Company & Co.');
+      expect($e.html()).toBe('Company &amp; Co.');
+
+      // Empty class
+      $e.textOrNbsp();
+      expect($e.html()).toBe('&nbsp;');
+      expect($e.hasClass('empty')).toBe(false);
+      $e.textOrNbsp('bla', 'EMPTY');
+      expect($e.html()).toBe('bla');
+      expect($e.hasClass('empty')).toBe(false);
+      expect($e.hasClass('EMPTY')).toBe(false);
+      $e.textOrNbsp('', 'EMPTY');
+      expect($e.html()).toBe('&nbsp;');
+      expect($e.hasClass('empty')).toBe(false);
+      expect($e.hasClass('EMPTY')).toBe(true);
+    });
+
+  });
+
+  describe('htmlOrNbsp', function() {
+
+    it('sets html or nbsp', function() {
+      $e.htmlOrNbsp();
+      expect($e.html()).toBe('&nbsp;');
+      $e.empty();
+      expect($e.html()).toBe('');
+      $e.htmlOrNbsp('');
+      expect($e.html()).toBe('&nbsp;');
+      $e.htmlOrNbsp('hello');
+      expect($e.html()).toBe('hello');
+      $e.htmlOrNbsp(' ');
+      expect($e.html()).toBe('&nbsp;');
+      $e.htmlOrNbsp('hello  <b>world</b>');
+      expect($e.html()).toBe('hello  <b>world</b>');
+      $e.htmlOrNbsp('\n \t      ');
+      expect($e.html()).toBe('&nbsp;');
+      $e.htmlOrNbsp(' hello\nworld');
+      expect($e.html()).toBe(' hello\nworld');
+      $e.htmlOrNbsp(scout.strings.nl2br(' hello\nworld'));
+      expect($e.html()).toBe(' hello<br>world');
+      $e.htmlOrNbsp(null);
+      expect($e.html()).toBe('&nbsp;');
+      $e.htmlOrNbsp('Company & Co.');
+      expect($e.html()).toBe('Company &amp; Co.');
+
+      // Empty class
+      $e.htmlOrNbsp();
+      expect($e.html()).toBe('&nbsp;');
+      expect($e.hasClass('empty')).toBe(false);
+      $e.htmlOrNbsp('bla', 'EMPTY');
+      expect($e.html()).toBe('bla');
+      expect($e.hasClass('empty')).toBe(false);
+      expect($e.hasClass('EMPTY')).toBe(false);
+      $e.htmlOrNbsp('', 'EMPTY');
+      expect($e.html()).toBe('&nbsp;');
+      expect($e.hasClass('empty')).toBe(false);
+      expect($e.hasClass('EMPTY')).toBe(true);
     });
 
   });

@@ -969,6 +969,24 @@
   };
 
   /**
+   * Same as "textOrNbsp", but with html (caller is responsible for encoding).
+   */
+  $.fn.htmlOrNbsp = function(html, emptyCssClass) {
+    if (scout.strings.hasText(html)) {
+      this.html(html);
+      if (emptyCssClass) {
+        this.removeClass(emptyCssClass);
+      }
+    } else {
+      this.html('&nbsp;');
+      if (emptyCssClass) {
+        this.addClass(emptyCssClass);
+      }
+    }
+    return this;
+  };
+
+  /**
    * Like toggleClass(), this toggles a HTML attribute on a set of jquery elements.
    *
    * @param attr
