@@ -11,9 +11,13 @@
         BSI Business Systems Integration AG - initial API and implementation
 
 -->
-<configuration>
+<included>
 
-  <variable scope="context" name="logPattern" value="%date{ISO8601} %-5level %thread %logger{50} - %m%n" />
+  <!-- This file is included in all scout test logback configurations -->
+
+  <variable scope="context" name="mdcPattern" value="principal=%X{subject.principal.name}, jobName=%X{scout.job.name}" />
+  <variable scope="context" name="mdcPatternWithoutEmptyValues" value="%replace(${mdcPattern}){'(, )?\\w+=((?=\\1)|, |$)', ''}" />
+  <variable scope="context" name="logPattern" value="%date{ISO8601} %-5level [%thread] %logger - %msg - MDC[${mdcPatternWithoutEmptyValues}]%n%ex" />
 
   <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
     <filter class="org.eclipse.scout.rt.platform.logger.LevelRangeFilter">
@@ -40,4 +44,4 @@
     <appender-ref ref="STDOUT" />
     <appender-ref ref="STDERR" />
   </root>
-</configuration>
+</included>

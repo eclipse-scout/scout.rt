@@ -32,6 +32,7 @@ import org.eclipse.scout.rt.platform.util.ToStringBuilder;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.logging.UserIdContextValueProvider;
+import org.eclipse.scout.rt.shared.session.ScoutSessionIdContextValueProvider;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 
 /**
@@ -65,6 +66,7 @@ public class ClientRunContext extends RunContext {
     callableChain
         .add(new ThreadLocalProcessor<>(ISession.CURRENT, m_session))
         .add(new DiagnosticContextValueProcessor<>(BEANS.get(UserIdContextValueProvider.class)))
+        .add(new DiagnosticContextValueProcessor<>(BEANS.get(ScoutSessionIdContextValueProvider.class)))
         .add(new ThreadLocalProcessor<>(UserAgent.CURRENT, m_userAgent))
         .add(new ThreadLocalProcessor<>(ScoutTexts.CURRENT, (m_session != null ? m_session.getTexts() : ScoutTexts.CURRENT.get())))
         .add(new ThreadLocalProcessor<>(IDesktop.CURRENT, m_desktop))

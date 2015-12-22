@@ -23,6 +23,7 @@ import org.eclipse.scout.rt.platform.context.RunContextRunner;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.JobInput;
+import org.eclipse.scout.rt.platform.logger.DiagnosticContextValueProcessor;
 import org.eclipse.scout.rt.platform.util.ThreadLocalProcessor;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
@@ -53,11 +54,16 @@ public class JobManagerChainTest {
     c = (IChainable) chainIterator.next();
     assertEquals(ThreadNameDecorator.class, c.getClass());
 
-    // 5. RunContextRunner
+    // 5. JobNameContextValueProvider (MDC)
+    c = (IChainable) chainIterator.next();
+    assertEquals(DiagnosticContextValueProcessor.class, c.getClass());
+    assertEquals("scout.job.name", ((DiagnosticContextValueProcessor) c).getMdcKey());
+
+    // 6. RunContextRunner
     c = (IChainable) chainIterator.next();
     assertEquals(RunContextRunner.class, c.getClass());
 
-    // 6. ExceptionProcessor
+    // 7. ExceptionProcessor
     c = (IChainable) chainIterator.next();
     assertEquals(ExceptionProcessor.class, c.getClass());
 

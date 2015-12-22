@@ -101,27 +101,32 @@ public class ClientRunContextChainTest {
     assertEquals(DiagnosticContextValueProcessor.class, c.getClass());
     assertEquals("scout.user.name", ((DiagnosticContextValueProcessor) c).getMdcKey());
 
-    // 9. ThreadLocalProcessor for UserAgent.CURRENT
+    // 9. DiagnosticContextValueProcessor
+    c = chainIterator.next();
+    assertEquals(DiagnosticContextValueProcessor.class, c.getClass());
+    assertEquals("scout.session.id", ((DiagnosticContextValueProcessor) c).getMdcKey());
+
+    // 10. ThreadLocalProcessor for UserAgent.CURRENT
     c = chainIterator.next();
     assertEquals(ThreadLocalProcessor.class, c.getClass());
     assertSame(UserAgent.CURRENT, ((ThreadLocalProcessor) c).getThreadLocal());
 
-    // 10. ThreadLocalProcessor for ScoutTexts.CURRENT
+    // 11. ThreadLocalProcessor for ScoutTexts.CURRENT
     c = chainIterator.next();
     assertEquals(ThreadLocalProcessor.class, c.getClass());
     assertSame(ScoutTexts.CURRENT, ((ThreadLocalProcessor) c).getThreadLocal());
 
-    // 11. ThreadLocalProcessor for IDesktop.CURRENT
+    // 12. ThreadLocalProcessor for IDesktop.CURRENT
     c = chainIterator.next();
     assertEquals(ThreadLocalProcessor.class, c.getClass());
     assertSame(IDesktop.CURRENT, ((ThreadLocalProcessor) c).getThreadLocal());
 
-    // 12. ThreadLocalProcessor for IOutline.CURRENT
+    // 13. ThreadLocalProcessor for IOutline.CURRENT
     c = chainIterator.next();
     assertEquals(ThreadLocalProcessor.class, c.getClass());
     assertSame(IOutline.CURRENT, ((ThreadLocalProcessor) c).getThreadLocal());
 
-    // 13. ThreadLocalProcessor for IForm.CURRENT
+    // 14. ThreadLocalProcessor for IForm.CURRENT
     c = chainIterator.next();
     assertEquals(ThreadLocalProcessor.class, c.getClass());
     assertSame(IForm.CURRENT, ((ThreadLocalProcessor) c).getThreadLocal());

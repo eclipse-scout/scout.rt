@@ -25,8 +25,8 @@ import org.eclipse.scout.rt.platform.util.ThreadLocalProcessor;
 import org.eclipse.scout.rt.platform.util.ToStringBuilder;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.ServiceTunnelServlet;
-import org.eclipse.scout.rt.server.clientnotification.IClientNodeId;
 import org.eclipse.scout.rt.server.clientnotification.ClientNotificationCollector;
+import org.eclipse.scout.rt.server.clientnotification.IClientNodeId;
 import org.eclipse.scout.rt.server.session.ServerSessionProvider;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.server.transaction.TransactionRequiredException;
@@ -34,6 +34,7 @@ import org.eclipse.scout.rt.server.transaction.TransactionScope;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.logging.UserIdContextValueProvider;
+import org.eclipse.scout.rt.shared.session.ScoutSessionIdContextValueProvider;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 
 /**
@@ -77,6 +78,7 @@ public class ServerRunContext extends RunContext {
     callableChain
         .add(new ThreadLocalProcessor<>(ISession.CURRENT, m_session))
         .add(new DiagnosticContextValueProcessor<>(BEANS.get(UserIdContextValueProvider.class)))
+        .add(new DiagnosticContextValueProcessor<>(BEANS.get(ScoutSessionIdContextValueProvider.class)))
         .add(new ThreadLocalProcessor<>(UserAgent.CURRENT, m_userAgent))
         .add(new ThreadLocalProcessor<>(IClientNodeId.CURRENT, m_clientNodeId))
         .add(new ThreadLocalProcessor<>(ClientNotificationCollector.CURRENT, m_transactionalClientNotificationCollector))
@@ -185,9 +187,8 @@ public class ServerRunContext extends RunContext {
   }
 
   /**
-   * Associates this context with the given {@link ClientNotificationCollector}, meaning that any code
-   * running on behalf of this context has that collector set in
-   * {@link ClientNotificationCollector#CURRENT} thread-local.
+   * Associates this context with the given {@link ClientNotificationCollector}, meaning that any code running on behalf
+   * of this context has that collector set in {@link ClientNotificationCollector#CURRENT} thread-local.
    * <p>
    * That collector is used to collect all transactional client notifications, which are to be published upon successful
    * commit of the associated transaction, and which are addressed to the client node which triggered processing (see

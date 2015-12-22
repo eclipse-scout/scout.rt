@@ -47,6 +47,7 @@ import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.job.listener.JobEventData;
 import org.eclipse.scout.rt.platform.job.listener.JobEventType;
+import org.eclipse.scout.rt.platform.logger.DiagnosticContextValueProcessor;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.ThreadLocalProcessor;
 import org.eclipse.scout.rt.platform.util.concurrent.Callables;
@@ -310,6 +311,7 @@ public class JobManager implements IJobManager, IPlatformListener {
         .add(new ThreadLocalProcessor<>(IFuture.CURRENT, future))
         .add(new ThreadLocalProcessor<>(RunMonitor.CURRENT, runMonitor))
         .add(new ThreadNameDecorator())
+        .add(new DiagnosticContextValueProcessor<>(BEANS.get(JobNameContextValueProvider.class)))
         .add(new RunContextRunner<RESULT>(input.getRunContext()))
         .add(new ExceptionProcessor<RESULT>(input)); // must following RunContextRunner to handle exception in proper RunContext
   }

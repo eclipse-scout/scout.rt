@@ -49,7 +49,6 @@ public class UiRunContext extends RunContext {
     callableChain
         .add(new ThreadLocalProcessor<>(IUiSession.CURRENT, m_session))
         .add(new ThreadLocalProcessor<>(JsonRequest.CURRENT, m_jsonRequest))
-        .add(new DiagnosticContextValueProcessor<>(BEANS.get(ClientSessionIdContextValueProvider.class)))
         .add(new DiagnosticContextValueProcessor<>(BEANS.get(UiSessionIdContextValueProvider.class)));
   }
 
@@ -161,31 +160,6 @@ public class UiRunContext extends RunContext {
     final UiRunContext copy = BEANS.get(UiRunContext.class);
     copy.copyValues(this);
     return copy;
-  }
-
-  /**
-   * This class provides the {@link UiSession#getClientSessionId()} to be set into the
-   * <code>diagnostic context map</code> for logging purpose.
-   *
-   * @see #KEY
-   * @see DiagnosticContextValueProcessor
-   * @see MDC
-   */
-  @ApplicationScoped
-  public static class ClientSessionIdContextValueProvider implements IDiagnosticContextValueProvider {
-
-    public static final String KEY = "scout.session.id";
-
-    @Override
-    public String key() {
-      return KEY;
-    }
-
-    @Override
-    public String value() {
-      final IUiSession uiSession = UiSession.CURRENT.get();
-      return uiSession != null ? uiSession.getClientSessionId() : null;
-    }
   }
 
   /**
