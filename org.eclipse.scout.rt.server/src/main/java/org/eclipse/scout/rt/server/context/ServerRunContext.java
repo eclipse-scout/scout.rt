@@ -77,13 +77,13 @@ public class ServerRunContext extends RunContext {
 
     callableChain
         .add(new ThreadLocalProcessor<>(ISession.CURRENT, m_session))
-        .add(new DiagnosticContextValueProcessor<>(BEANS.get(UserIdContextValueProvider.class)))
-        .add(new DiagnosticContextValueProcessor<>(BEANS.get(ScoutSessionIdContextValueProvider.class)))
+        .add(new DiagnosticContextValueProcessor(BEANS.get(UserIdContextValueProvider.class)))
+        .add(new DiagnosticContextValueProcessor(BEANS.get(ScoutSessionIdContextValueProvider.class)))
         .add(new ThreadLocalProcessor<>(UserAgent.CURRENT, m_userAgent))
         .add(new ThreadLocalProcessor<>(IClientNodeId.CURRENT, m_clientNodeId))
         .add(new ThreadLocalProcessor<>(ClientNotificationCollector.CURRENT, m_transactionalClientNotificationCollector))
         .add(new ThreadLocalProcessor<>(ScoutTexts.CURRENT, (m_session != null ? m_session.getTexts() : ScoutTexts.CURRENT.get())))
-        .add(new TransactionProcessor<>(getTransaction(), m_transactionScope));
+        .add(new TransactionProcessor(getTransaction(), m_transactionScope));
   }
 
   @Override

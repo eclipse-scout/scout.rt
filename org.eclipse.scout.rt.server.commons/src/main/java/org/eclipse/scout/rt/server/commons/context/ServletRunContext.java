@@ -53,9 +53,9 @@ public class ServletRunContext extends RunContext {
     callableChain
         .add(new ThreadLocalProcessor<>(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST, m_servletRequest))
         .add(new ThreadLocalProcessor<>(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE, m_servletResponse))
-        .add(new DiagnosticContextValueProcessor<>(BEANS.get(HttpSessionIdContextValueProvider.class)))
-        .add(new DiagnosticContextValueProcessor<>(BEANS.get(HttpRequestMethodContextValueProvider.class)))
-        .add(new DiagnosticContextValueProcessor<>(BEANS.get(HttpRequestUriContextValueProvider.class)));
+        .add(new DiagnosticContextValueProcessor(BEANS.get(HttpSessionIdContextValueProvider.class)))
+        .add(new DiagnosticContextValueProcessor(BEANS.get(HttpRequestMethodContextValueProvider.class)))
+        .add(new DiagnosticContextValueProcessor(BEANS.get(HttpRequestUriContextValueProvider.class)));
   }
 
   @Override

@@ -31,10 +31,10 @@ import org.eclipse.scout.rt.platform.job.listener.JobEventType;
  *
  * @since 5.1
  */
-public class ThreadNameDecorator<RESULT> implements ICallableDecorator<RESULT> {
+public class ThreadNameDecorator implements ICallableDecorator {
 
   @Override
-  public IUndecorator<RESULT> decorate() throws Exception {
+  public IUndecorator decorate() throws Exception {
     final ThreadInfo currentThreadInfo = ThreadInfo.CURRENT.get();
     if (currentThreadInfo == null) {
       return null;
@@ -63,10 +63,10 @@ public class ThreadNameDecorator<RESULT> implements ICallableDecorator<RESULT> {
         });
 
     // Restore to the original thread name.
-    return new IUndecorator<RESULT>() {
+    return new IUndecorator() {
 
       @Override
-      public void undecorate(final RESULT callableResult, final Throwable callableException) {
+      public void undecorate(final Throwable throwable) {
         listenerRegistration.dispose();
         currentThreadInfo.reset();
       }

@@ -108,7 +108,7 @@ public class TransactionProcessorTest {
   @Test
   public void testMandatoryWithoutExistingTransaction() throws Exception {
     CallableChain<Object> chain = new CallableChain<>();
-    chain.add(new TransactionProcessor<>(null, TransactionScope.MANDATORY));
+    chain.add(new TransactionProcessor(null, TransactionScope.MANDATORY));
 
     try {
       chain.call(new Callable<Object>() {
@@ -131,7 +131,7 @@ public class TransactionProcessorTest {
     final Holder<ITransaction> actualTransaction = new Holder<>();
 
     CallableChain<Object> chain = new CallableChain<>();
-    chain.add(new TransactionProcessor<>(callingTransaction, TransactionScope.MANDATORY));
+    chain.add(new TransactionProcessor(callingTransaction, TransactionScope.MANDATORY));
     Object result = chain.call(new Callable<Object>() {
 
       @Override
@@ -155,7 +155,7 @@ public class TransactionProcessorTest {
     final Holder<ITransaction> actualTransaction = new Holder<>();
 
     CallableChain<Object> chain = new CallableChain<>();
-    chain.add(new TransactionProcessor<>(callingTransaction, TransactionScope.MANDATORY));
+    chain.add(new TransactionProcessor(callingTransaction, TransactionScope.MANDATORY));
     try {
       chain.call(new Callable<Object>() {
 
@@ -185,7 +185,7 @@ public class TransactionProcessorTest {
     final Holder<ITransaction> actualTransaction = new Holder<>();
 
     CallableChain<Object> chain = new CallableChain<>();
-    chain.add(new TransactionProcessor<>(null, TransactionScope.REQUIRES_NEW));
+    chain.add(new TransactionProcessor(null, TransactionScope.REQUIRES_NEW));
     Object result = chain.call(new Callable<Object>() {
 
       @Override
@@ -215,7 +215,7 @@ public class TransactionProcessorTest {
     final Holder<ITransaction> actualTransaction = new Holder<>();
 
     CallableChain<Object> chain = new CallableChain<>();
-    chain.add(new TransactionProcessor<>(null, TransactionScope.REQUIRES_NEW));
+    chain.add(new TransactionProcessor(null, TransactionScope.REQUIRES_NEW));
     try {
       chain.call(new Callable<Object>() {
 
@@ -247,7 +247,7 @@ public class TransactionProcessorTest {
     final Holder<ITransaction> actualTransaction = new Holder<>();
 
     CallableChain<Object> chain = new CallableChain<>();
-    chain.add(new TransactionProcessor<>(callingTransaction, TransactionScope.REQUIRES_NEW));
+    chain.add(new TransactionProcessor(callingTransaction, TransactionScope.REQUIRES_NEW));
     Object result = chain.call(new Callable<Object>() {
 
       @Override
@@ -279,7 +279,7 @@ public class TransactionProcessorTest {
     final Holder<ITransaction> actualTransaction = new Holder<>();
 
     CallableChain<Object> chain = new CallableChain<>();
-    chain.add(new TransactionProcessor<>(callingTransaction, TransactionScope.REQUIRES_NEW));
+    chain.add(new TransactionProcessor(callingTransaction, TransactionScope.REQUIRES_NEW));
     try {
       chain.call(new Callable<Object>() {
 
@@ -312,7 +312,7 @@ public class TransactionProcessorTest {
     final Holder<ITransaction> actualTransaction = new Holder<>();
 
     CallableChain<Object> chain = new CallableChain<>();
-    chain.add(new TransactionProcessor<>(null, TransactionScope.REQUIRED));
+    chain.add(new TransactionProcessor(null, TransactionScope.REQUIRED));
     Object result = chain.call(new Callable<Object>() {
 
       @Override
@@ -342,7 +342,7 @@ public class TransactionProcessorTest {
     final Holder<ITransaction> actualTransaction = new Holder<>();
 
     CallableChain<Object> chain = new CallableChain<>();
-    chain.add(new TransactionProcessor<>(null, TransactionScope.REQUIRES_NEW));
+    chain.add(new TransactionProcessor(null, TransactionScope.REQUIRES_NEW));
     try {
       chain.call(new Callable<Object>() {
 
@@ -375,7 +375,7 @@ public class TransactionProcessorTest {
     final Holder<ITransaction> actualTransaction = new Holder<>();
 
     CallableChain<Object> chain = new CallableChain<>();
-    chain.add(new TransactionProcessor<>(callingTransaction, TransactionScope.REQUIRED));
+    chain.add(new TransactionProcessor(callingTransaction, TransactionScope.REQUIRED));
     Object result = chain.call(new Callable<Object>() {
 
       @Override
@@ -402,7 +402,7 @@ public class TransactionProcessorTest {
     final Holder<ITransaction> actualTransaction = new Holder<>();
 
     CallableChain<Object> chain = new CallableChain<>();
-    chain.add(new TransactionProcessor<>(callingTransaction, TransactionScope.REQUIRED));
+    chain.add(new TransactionProcessor(callingTransaction, TransactionScope.REQUIRED));
     try {
       chain.call(new Callable<Object>() {
 

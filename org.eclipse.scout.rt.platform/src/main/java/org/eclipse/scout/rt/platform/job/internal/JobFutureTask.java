@@ -96,10 +96,10 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
 
     // Contribute to the CallableChain
     m_jobManager.interceptCallableChain(m_callableChain, this, m_runMonitor, m_input);
-    m_callableChain.addLast(new ICallableDecorator<RESULT>() {
+    m_callableChain.addLast(new ICallableDecorator() {
 
       @Override
-      public IUndecorator<RESULT> decorate() throws Exception {
+      public IUndecorator decorate() throws Exception {
         changeState(JobState.RUNNING);
         return null;
       }

@@ -49,7 +49,7 @@ public class UiRunContext extends RunContext {
     callableChain
         .add(new ThreadLocalProcessor<>(IUiSession.CURRENT, m_session))
         .add(new ThreadLocalProcessor<>(JsonRequest.CURRENT, m_jsonRequest))
-        .add(new DiagnosticContextValueProcessor<>(BEANS.get(UiSessionIdContextValueProvider.class)));
+        .add(new DiagnosticContextValueProcessor(BEANS.get(UiSessionIdContextValueProvider.class)));
   }
 
   @Override

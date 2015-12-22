@@ -23,7 +23,7 @@ import org.eclipse.scout.rt.platform.chain.callable.ICallableDecorator;
  *
  * @since 5.1
  */
-public class ThreadLocalProcessor<RESULT, THREAD_LOCAL> implements ICallableDecorator<RESULT> {
+public class ThreadLocalProcessor<THREAD_LOCAL> implements ICallableDecorator {
 
   protected final ThreadLocal<THREAD_LOCAL> m_threadLocal;
   protected final THREAD_LOCAL m_value;
@@ -34,15 +34,15 @@ public class ThreadLocalProcessor<RESULT, THREAD_LOCAL> implements ICallableDeco
   }
 
   @Override
-  public IUndecorator<RESULT> decorate() throws Exception {
+  public IUndecorator decorate() throws Exception {
     final THREAD_LOCAL originValue = m_threadLocal.get();
     m_threadLocal.set(m_value);
 
     // Restore value upon completion of the command.
-    return new IUndecorator<RESULT>() {
+    return new IUndecorator() {
 
       @Override
-      public void undecorate(final RESULT callableResult, final Throwable callableException) {
+      public void undecorate(final Throwable throwable) {
         if (originValue == null) {
           m_threadLocal.remove();
         }

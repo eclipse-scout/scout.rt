@@ -27,7 +27,7 @@ import org.slf4j.MDC;
  * @see MDC
  * @since 5.1
  */
-public class DiagnosticContextValueProcessor<RESULT> implements ICallableDecorator<RESULT> {
+public class DiagnosticContextValueProcessor implements ICallableDecorator {
 
   private final IDiagnosticContextValueProvider m_mdcValueProvider;
   private final String m_mdcKey;
@@ -38,15 +38,15 @@ public class DiagnosticContextValueProcessor<RESULT> implements ICallableDecorat
   }
 
   @Override
-  public IUndecorator<RESULT> decorate() throws Exception {
+  public IUndecorator decorate() throws Exception {
     final String originValue = MDC.get(m_mdcKey);
     MDC.put(m_mdcKey, m_mdcValueProvider.value());
 
     // Restore origin value upon completion of the command.
-    return new IUndecorator<RESULT>() {
+    return new IUndecorator() {
 
       @Override
-      public void undecorate(final RESULT callableResult, final Throwable callableException) {
+      public void undecorate(final Throwable throwable) {
         if (originValue != null) {
           MDC.put(m_mdcKey, originValue);
         }

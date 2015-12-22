@@ -19,9 +19,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-import org.eclipse.scout.rt.platform.chain.callable.CallableChain;
-import org.eclipse.scout.rt.platform.chain.callable.ICallableDecorator;
-import org.eclipse.scout.rt.platform.chain.callable.ICallableInterceptor;
 import org.eclipse.scout.rt.platform.chain.callable.CallableChain.Chain;
 import org.junit.Test;
 
@@ -56,10 +53,10 @@ public class CallableChainTest {
           @Override
           public IUndecorator decorate() throws Exception {
             protocol.add("decorator1:onBefore");
-            return new IUndecorator<String>() {
+            return new IUndecorator() {
 
               @Override
-              public void undecorate(String callableResult, Throwable callableException) {
+              public void undecorate(Throwable throwable) {
                 protocol.add("decorator1:onAfter");
               }
             };
@@ -78,10 +75,10 @@ public class CallableChainTest {
           @Override
           public IUndecorator decorate() throws Exception {
             protocol.add("decorator3:onBefore");
-            return new IUndecorator<String>() {
+            return new IUndecorator() {
 
               @Override
-              public void undecorate(String callableResult, Throwable callableException) {
+              public void undecorate(Throwable throwable) {
                 protocol.add("decorator3:onAfter");
               }
             };
@@ -118,10 +115,10 @@ public class CallableChainTest {
             @Override
             public IUndecorator decorate() throws Exception {
               protocol.add("decorator1:onBefore");
-              return new IUndecorator<String>() {
+              return new IUndecorator() {
 
                 @Override
-                public void undecorate(String callableResult, Throwable callableException) {
+                public void undecorate(Throwable throwable) {
                   protocol.add("decorator1:onAfter");
                   throw new RuntimeException();
                 }
@@ -139,10 +136,10 @@ public class CallableChainTest {
             @Override
             public IUndecorator decorate() throws Exception {
               protocol.add("decorator3:onBefore");
-              return new IUndecorator<String>() {
+              return new IUndecorator() {
 
                 @Override
-                public void undecorate(String callableResult, Throwable callableException) {
+                public void undecorate(Throwable throwable) {
                   protocol.add("decorator3:onAfter");
                 }
               };
@@ -488,10 +485,10 @@ public class CallableChainTest {
           @Override
           public IUndecorator decorate() throws Exception {
             protocol.add("decorator1:onBefore");
-            return new IUndecorator<String>() {
+            return new IUndecorator() {
 
               @Override
-              public void undecorate(String callableResult, Throwable callableException) {
+              public void undecorate(Throwable throwable) {
                 protocol.add("decorator1:onAfter");
               }
             };
@@ -501,10 +498,10 @@ public class CallableChainTest {
           @Override
           public IUndecorator decorate() throws Exception {
             protocol.add("decorator2:onBefore");
-            return new IUndecorator<String>() {
+            return new IUndecorator() {
 
               @Override
-              public void undecorate(String callableResult, Throwable callableException) {
+              public void undecorate(Throwable throwable) {
                 protocol.add("decorator2:onAfter");
               }
             };
@@ -531,10 +528,10 @@ public class CallableChainTest {
           @Override
           public IUndecorator decorate() throws Exception {
             protocol.add("decorator3:onBefore");
-            return new IUndecorator<String>() {
+            return new IUndecorator() {
 
               @Override
-              public void undecorate(String callableResult, Throwable callableException) {
+              public void undecorate(Throwable throwable) {
                 protocol.add("decorator3:onAfter");
               }
             };
@@ -544,10 +541,10 @@ public class CallableChainTest {
           @Override
           public IUndecorator decorate() throws Exception {
             protocol.add("decorator4:onBefore");
-            return new IUndecorator<String>() {
+            return new IUndecorator() {
 
               @Override
-              public void undecorate(String callableResult, Throwable callableException) {
+              public void undecorate(Throwable throwable) {
                 protocol.add("decorator4:onAfter");
               }
             };
@@ -574,10 +571,10 @@ public class CallableChainTest {
           @Override
           public IUndecorator decorate() throws Exception {
             protocol.add("decorator5:onBefore");
-            return new IUndecorator<String>() {
+            return new IUndecorator() {
 
               @Override
-              public void undecorate(String callableResult, Throwable callableException) {
+              public void undecorate(Throwable throwable) {
                 protocol.add("decorator5:onAfter");
               }
             };
@@ -623,10 +620,10 @@ public class CallableChainTest {
             @Override
             public IUndecorator decorate() throws Exception {
               protocol.add("decorator1:onBefore");
-              return new IUndecorator<String>() {
+              return new IUndecorator() {
 
                 @Override
-                public void undecorate(String callableResult, Throwable callableException) {
+                public void undecorate(Throwable throwable) {
                   protocol.add("decorator1:onAfter");
                 }
               };
@@ -636,10 +633,10 @@ public class CallableChainTest {
             @Override
             public IUndecorator decorate() throws Exception {
               protocol.add("decorator2:onBefore");
-              return new IUndecorator<String>() {
+              return new IUndecorator() {
 
                 @Override
-                public void undecorate(String callableResult, Throwable callableException) {
+                public void undecorate(Throwable throwable) {
                   protocol.add("decorator2:onAfter");
                 }
               };
@@ -666,10 +663,10 @@ public class CallableChainTest {
             @Override
             public IUndecorator decorate() throws Exception {
               protocol.add("decorator3:onBefore");
-              return new IUndecorator<String>() {
+              return new IUndecorator() {
 
                 @Override
-                public void undecorate(String callableResult, Throwable callableException) {
+                public void undecorate(Throwable throwable) {
                   protocol.add("decorator3:onAfter");
                 }
               };
@@ -679,10 +676,10 @@ public class CallableChainTest {
             @Override
             public IUndecorator decorate() throws Exception {
               protocol.add("decorator4:onBefore");
-              return new IUndecorator<String>() {
+              return new IUndecorator() {
 
                 @Override
-                public void undecorate(String callableResult, Throwable callableException) {
+                public void undecorate(Throwable throwable) {
                   protocol.add("decorator4:onAfter");
                 }
               };
@@ -709,10 +706,10 @@ public class CallableChainTest {
             @Override
             public IUndecorator decorate() throws Exception {
               protocol.add("decorator5:onBefore");
-              return new IUndecorator<String>() {
+              return new IUndecorator() {
 
                 @Override
-                public void undecorate(String callableResult, Throwable callableException) {
+                public void undecorate(Throwable throwable) {
                   protocol.add("decorator5:onAfter");
                 }
               };

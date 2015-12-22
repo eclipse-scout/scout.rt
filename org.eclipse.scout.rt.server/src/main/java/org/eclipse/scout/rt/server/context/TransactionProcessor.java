@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
  *
  * @since 5.1
  */
-public class TransactionProcessor<RESULT> implements ICallableDecorator<RESULT> {
+public class TransactionProcessor implements ICallableDecorator {
 
   private static final Logger LOG = LoggerFactory.getLogger(TransactionProcessor.class);
 
@@ -48,7 +48,7 @@ public class TransactionProcessor<RESULT> implements ICallableDecorator<RESULT> 
   }
 
   @Override
-  public IUndecorator<RESULT> decorate() {
+  public IUndecorator decorate() {
     switch (m_transactionScope) {
       case REQUIRES_NEW:
         return requiresNew();
@@ -64,16 +64,16 @@ public class TransactionProcessor<RESULT> implements ICallableDecorator<RESULT> 
   /**
    * Decorates the calling context to run in a new transaction, which upon completion is committed or rolled back.
    */
-  protected IUndecorator<RESULT> requiresNew() {
+  protected IUndecorator requiresNew() {
     final ITransaction newTransaction = BEANS.get(ITransaction.class);
     final Registration threadLocalRegistration = registerTransactionInThreadLocal(newTransaction);
     final Registration monitorRegistration = registerTransactionInRunMonitor(newTransaction);
 
-    return new IUndecorator<RESULT>() {
+    return new IUndecorator() {
 
       @Override
-      public void undecorate(final RESULT callableResult, final Throwable callableException) {
-        addTransactionalFailureIfNotNull(callableException);
+      public void undecorate(final Throwable throwable) {
+        addTransactionalFailureIfNotNull(throwable);
         BEANS.get(ITransactionCommitProtocol.class).commitOrRollback(ITransaction.CURRENT.get());
         threadLocalRegistration.undo();
         monitorRegistration.undo();
@@ -85,7 +85,7 @@ public class TransactionProcessor<RESULT> implements ICallableDecorator<RESULT> 
    * Decorates the calling context to run on behalf of the current caller transaction. If not available, a new
    * transaction is started and upon completion, that transaction is committed or rolled back.
    */
-  protected IUndecorator<RESULT> required(final ITransaction callerTransaction) {
+  protected IUndecorator required(final ITransaction callerTransaction) {
     if (callerTransaction != null) {
       return mandatory(callerTransaction);
     }
@@ -97,18 +97,18 @@ public class TransactionProcessor<RESULT> implements ICallableDecorator<RESULT> 
   /**
    * Ensures a caller transaction to exist and decorates the calling context to run on behalf of that transaction.
    */
-  protected IUndecorator<RESULT> mandatory(final ITransaction callerTransaction) {
+  protected IUndecorator mandatory(final ITransaction callerTransaction) {
     if (callerTransaction == null) {
       throw new TransactionRequiredException();
     }
 
     final Registration threadLocalRegistration = registerTransactionInThreadLocal(callerTransaction);
 
-    return new IUndecorator<RESULT>() {
+    return new IUndecorator() {
 
       @Override
-      public void undecorate(final RESULT callableResult, final Throwable callableException) {
-        addTransactionalFailureIfNotNull(callableException);
+      public void undecorate(final Throwable throwable) {
+        addTransactionalFailureIfNotNull(throwable);
         threadLocalRegistration.undo();
       }
     };

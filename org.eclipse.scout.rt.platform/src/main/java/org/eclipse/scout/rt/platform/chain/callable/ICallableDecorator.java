@@ -21,7 +21,7 @@ import org.eclipse.scout.rt.platform.chain.IChainable;
  *
  * @since 5.2
  */
-public interface ICallableDecorator<RESULT> extends IChainable {
+public interface ICallableDecorator extends IChainable {
 
   /**
    * Method invoked prior to executing the {@link Callable command}.
@@ -31,22 +31,19 @@ public interface ICallableDecorator<RESULT> extends IChainable {
    * @throws Exception
    *           throw exception to stop chain processing. The exception is propagated to the caller.
    */
-  IUndecorator<RESULT> decorate() throws Exception;
+  IUndecorator decorate() throws Exception;
 
   /**
    * Undecorator to restore decoration.
    */
-  public interface IUndecorator<RESULT> {
+  public interface IUndecorator {
 
     /**
      * Method invoked after executed the {@link Callable}, and is invoked regardless of success or failure.
      *
-     * @param callableResult
-     *          the result returned by the {@link Callable}, or <code>null</code> if returned with an exception, or if
-     *          returned <code>null</code> as the result.
-     * @param callableException
-     *          the exception if the callable returned with an exception.
+     * @param throwable
+     *          if the callable returned with an exception, else <code>null</code>.
      */
-    void undecorate(RESULT callableResult, Throwable callableException);
+    void undecorate(Throwable throwable);
   }
 }

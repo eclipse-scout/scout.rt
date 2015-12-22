@@ -162,18 +162,15 @@ public class CallableChain<RESULT> {
      */
     public RESULT continueChain() throws Exception {
       // List of decorators invoked in this round.
-      final List<IUndecorator<RESULT>> undecorators = new ArrayList<>();
+      final List<IUndecorator> undecorators = new ArrayList<>();
 
-      RESULT result = null;
       Throwable throwable = null;
       try {
         while (m_iterator.hasNext()) {
           final IChainable next = m_iterator.next();
 
           if (next instanceof ICallableDecorator) {
-            @SuppressWarnings("unchecked")
-            final ICallableDecorator<RESULT> decorator = (ICallableDecorator<RESULT>) next;
-            final IUndecorator<RESULT> undecorator = decorator.decorate();
+            final IUndecorator undecorator = ((ICallableDecorator) next).decorate();
             if (undecorator != null) {
               undecorators.add(undecorator);
             }
@@ -181,28 +178,28 @@ public class CallableChain<RESULT> {
           else if (next instanceof ICallableInterceptor && ((ICallableInterceptor) next).isEnabled()) {
             @SuppressWarnings("unchecked")
             final ICallableInterceptor<RESULT> interceptor = ((ICallableInterceptor<RESULT>) next);
-            return (result = interceptor.intercept(this));
+            return interceptor.intercept(this);
           }
         }
 
         // Invoke the command because all handlers participated in the processing.
-        return (result = m_command.call());
+        return m_command.call();
       }
-      catch (final Exception | Error e) {
-        throwable = e;
-        throw e;
+      catch (final Exception | Error t) {
+        throwable = t;
+        throw t;
       }
       finally {
         // Let the decorators to perform some 'after-execution' actions in reverse order.
         for (int i = undecorators.size() - 1; i >= 0; i--) {
-          undecorateSafe(undecorators.get(i), result, throwable);
+          undecorateSafe(undecorators.get(i), throwable);
         }
       }
     }
 
-    private void undecorateSafe(final IUndecorator<RESULT> undecorator, final RESULT callableResult, final Throwable callableException) {
+    private void undecorateSafe(final IUndecorator undecorator, final Throwable throwable) {
       try {
-        undecorator.undecorate(callableResult, callableException);
+        undecorator.undecorate(throwable);
       }
       catch (final RuntimeException e) {
         LOG.error("Unexpected error during the undecoration of a command's execution. [undecorator={}, command={}]", undecorator.getClass().getName(), m_command, e);
