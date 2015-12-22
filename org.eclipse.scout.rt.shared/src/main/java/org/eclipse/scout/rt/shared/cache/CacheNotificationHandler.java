@@ -13,6 +13,8 @@ package org.eclipse.scout.rt.shared.cache;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IgnoreBean;
 import org.eclipse.scout.rt.shared.notification.INotificationHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Basic handler for {@link InvalidateCacheNotification}. It invalidates cache entries but does not propagate the event
@@ -24,6 +26,7 @@ import org.eclipse.scout.rt.shared.notification.INotificationHandler;
  */
 @IgnoreBean
 public class CacheNotificationHandler implements INotificationHandler<InvalidateCacheNotification> {
+  private static final Logger LOG = LoggerFactory.getLogger(CacheNotificationHandler.class);
 
   @Override
   public void handleNotification(InvalidateCacheNotification notification) {
@@ -33,11 +36,12 @@ public class CacheNotificationHandler implements INotificationHandler<Invalidate
   @SuppressWarnings("unchecked")
   protected <K, V> void handleNotificationImpl(InvalidateCacheNotification notification) {
     String cacheId = notification.getCacheId();
-    for (ICache<K, V> cache : BEANS.all(ICache.class)) {
-      if (cache.getCacheId().equals(cacheId)) {
-        cache.invalidate((ICacheEntryFilter<K, V>) notification.getFilter(), false);
-        return;
-      }
+    ICache<K, V> cache = BEANS.get(ICacheRegistryService.class).opt(cacheId);
+    if (cache != null) {
+      cache.invalidate((ICacheEntryFilter<K, V>) notification.getFilter(), false);
+    }
+    else {
+      LOG.error("Notification received for unknown cache {} ", cacheId);
     }
   }
 }

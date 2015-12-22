@@ -22,6 +22,7 @@ import java.util.concurrent.ConcurrentMap;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
 /**
@@ -45,13 +46,9 @@ public class BasicCache<K, V> implements ICache<K, V> {
   private final boolean m_atomicInsertion;
 
   public BasicCache(String cacheId, ICacheValueResolver<K, V> resolver, Map<K, V> cacheMap, boolean atomicInsertion) {
-    super();
-    if (cacheId == null || resolver == null || cacheMap == null) {
-      throw new NullPointerException();
-    }
-    m_cacheId = cacheId;
-    m_resolver = resolver;
-    m_cacheMap = cacheMap;
+    m_cacheId = Assertions.assertNotNullOrEmpty(cacheId);
+    m_resolver = Assertions.assertNotNull(resolver);
+    m_cacheMap = Assertions.assertNotNull(cacheMap);
     m_unmodifiableMap = Collections.unmodifiableMap(m_cacheMap);
     m_atomicInsertion = atomicInsertion;
     if (m_atomicInsertion && !(cacheMap instanceof ConcurrentMap)) {

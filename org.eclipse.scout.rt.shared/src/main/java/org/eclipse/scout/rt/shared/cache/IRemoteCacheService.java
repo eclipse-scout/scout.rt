@@ -27,11 +27,6 @@ import org.eclipse.scout.rt.shared.TunnelToServer;
 public interface IRemoteCacheService {
 
   /**
-   * Register a cache (server-side) with a given id
-   */
-  <K, V> void register(String cacheId, ICache<K, V> cache);
-
-  /**
    * Like {@link ICache#get(Object)} it gets a value from the cache with the given cacheId.
    *
    * @param cacheId

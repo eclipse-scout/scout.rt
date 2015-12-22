@@ -21,6 +21,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.internal.BeanInstanceUtil;
 import org.eclipse.scout.rt.platform.util.BeanUtility;
@@ -71,7 +72,12 @@ public class CacheBuilder<K, V> implements ICacheBuilder<K, V> {
 
     // before publish cache as bean, initialize all instances
     initializeCacheInstances();
+    register(cache);
     return cache;
+  }
+
+  protected void register(ICache<K, V> cache) {
+    BEANS.get(ICacheRegistryService.class).register(cache);
   }
 
   /**

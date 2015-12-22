@@ -126,14 +126,14 @@ public class ServiceTunnelServlet extends HttpServlet {
               }
               else {
                 // Collector to collect transactional client notifications issued during processing of the current request.
-                ClientNotificationCollector transactionalClientNotificationCollector = new ClientNotificationCollector();
+                ClientNotificationCollector notificationCollector = new ClientNotificationCollector();
                 // Enable global cancellation of the service request.
                 RunMonitor runMonitor = BEANS.get(RunMonitor.class);
                 ServerRunContext serverRunContext = ServerRunContexts.copyCurrent()
                     .withLocale(serviceRequest.getLocale())
                     .withUserAgent(UserAgent.createByIdentifier(serviceRequest.getUserAgent()))
                     .withRunMonitor(runMonitor)
-                    .withClientNotificationCollector(transactionalClientNotificationCollector)
+                    .withClientNotificationCollector(notificationCollector)
                     .withClientNodeId(serviceRequest.getClientNodeId())
                     .withProperty(SESSION_ID, serviceRequest.getSessionId());
                 serverRunContext.withSession(lookupServerSessionOnHttpSession(serverRunContext.copy()));
@@ -145,7 +145,7 @@ public class ServiceTunnelServlet extends HttpServlet {
                 try {
                   ServiceTunnelResponse serviceResponse = invokeService(serverRunContext, serviceRequest);
                   // Include transactional client notification in response (piggyback).
-                  serviceResponse.setNotifications(transactionalClientNotificationCollector.consume());
+                  serviceResponse.setNotifications(notificationCollector.consume());
                   serializeServiceResponse(serviceResponse);
                 }
                 finally {

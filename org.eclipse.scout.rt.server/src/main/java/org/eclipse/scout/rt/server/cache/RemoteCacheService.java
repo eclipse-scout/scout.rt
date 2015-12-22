@@ -12,23 +12,18 @@ package org.eclipse.scout.rt.server.cache;
 
 import java.util.Collection;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.shared.cache.ICache;
 import org.eclipse.scout.rt.shared.cache.ICacheEntryFilter;
+import org.eclipse.scout.rt.shared.cache.ICacheRegistryService;
 import org.eclipse.scout.rt.shared.cache.IRemoteCacheService;
 
 /**
  * @since 5.2
  */
 public class RemoteCacheService implements IRemoteCacheService {
-  private final ConcurrentHashMap<String, ICache> m_map = new ConcurrentHashMap<>();
-
-  @Override
-  public <K, V> void register(String cacheId, ICache<K, V> cache) {
-    m_map.put(cacheId, cache);
-  }
 
   @Override
   public <K, V> V get(String cacheId, K key) {
@@ -56,9 +51,8 @@ public class RemoteCacheService implements IRemoteCacheService {
     }
   }
 
-  @SuppressWarnings("unchecked")
   protected <K, V> ICache<K, V> getCache(String cacheId) {
-    return m_map.get(cacheId);
+    return BEANS.get(ICacheRegistryService.class).get(cacheId);
   }
 
 }
