@@ -6,8 +6,8 @@ import org.eclipse.scout.rt.platform.logger.DiagnosticContextValueProcessor;
 import org.eclipse.scout.rt.platform.logger.DiagnosticContextValueProcessor.IDiagnosticContextValueProvider;
 
 /**
- * This class provides the {@link UiSession#getClientSessionId()} to be set into the <code>diagnostic context map</code>
- * for logging purpose.
+ * Provides the job name to be set into the <code>diagnostic context map</code> for logging purpose. This value provider
+ * is expected to be invoked from within a job, meaning that {@link IFuture} is present.
  *
  * @see #KEY
  * @see DiagnosticContextValueProcessor
@@ -25,7 +25,6 @@ public class JobNameContextValueProvider implements IDiagnosticContextValueProvi
 
   @Override
   public String value() {
-    final IFuture<?> future = IFuture.CURRENT.get();
-    return future != null ? future.getJobInput().getName() : null;
+    return IFuture.CURRENT.get().getJobInput().getName();
   }
 }
