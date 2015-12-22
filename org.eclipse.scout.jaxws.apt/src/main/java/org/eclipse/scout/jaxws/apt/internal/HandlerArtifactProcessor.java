@@ -58,7 +58,7 @@ import com.sun.codemodel.JMod;
 public class HandlerArtifactProcessor {
 
   private static final String AUTH_HANDLER_NAME = "AuthHandler";
-  private static final String HANDLER_SUFFIX = "Delegate";
+  private static final String HANDLER_SUFFIX = "";
   private static final String HANDLERS_FILE_NAME = "handler-chain.xml";
 
   /**
