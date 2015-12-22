@@ -19,14 +19,13 @@ import static org.mockito.Mockito.when;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
-import org.eclipse.scout.rt.platform.holders.Holder;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
-import org.eclipse.scout.rt.testing.platform.util.BlockingCountDownLatch;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -83,36 +82,7 @@ public class ModelJobTest {
 
   @Test
   public void testThreadName() throws InterruptedException {
-    ISession.CURRENT.set(m_clientSession1);
-    Thread.currentThread().setName("main");
-
-    final Holder<String> actualThreadName1 = new Holder<>();
-    final Holder<String> actualThreadName2 = new Holder<>();
-
-    final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(2);
-
-    ModelJobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        actualThreadName1.setValue(Thread.currentThread().getName());
-        setupLatch.countDown();
-
-        ModelJobs.schedule(new IRunnable() {
-
-          @Override
-          public void run() throws Exception {
-            actualThreadName2.setValue(Thread.currentThread().getName());
-            setupLatch.countDown();
-          }
-        }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).withName("XYZ"));
-      }
-    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()).withName("ABC"));
-
-    assertTrue(setupLatch.await());
-
-    assertTrue(actualThreadName1.getValue().matches("scout-model-thread-(\\d)+ 'ABC'"));
-    assertTrue(actualThreadName2.getValue().matches("scout-model-thread-(\\d)+ 'XYZ'"));
-    assertEquals("main", Thread.currentThread().getName());
+    ClientRunContext clientRunContext = ClientRunContexts.empty().withSession(m_clientSession1, true);
+    assertEquals("scout-model-thread", ModelJobs.newInput(clientRunContext).getThreadName());
   }
 }

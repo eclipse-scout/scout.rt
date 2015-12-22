@@ -24,6 +24,7 @@ import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.testing.platform.job.JobTestUtil;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
+import org.eclipse.scout.rt.testing.platform.runner.Times;
 import org.eclipse.scout.rt.testing.platform.util.BlockingCountDownLatch;
 import org.junit.After;
 import org.junit.Before;
@@ -31,22 +32,23 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(PlatformTestRunner.class)
-public class ThreadNameDecoratorTest {
+public class DevelopmentThreadNameDecoratorTest {
 
-  private IBean<ThreadNameDecorator> m_threadNameDecorator;
+  private IBean<? extends ThreadNameDecorator> m_developmentThreadNameDecorator;
 
   @Before
   public void before() {
-    // simulate productive mode
-    m_threadNameDecorator = BEANS.getBeanManager().registerClass(ThreadNameDecorator.class);
+    // simulate development mode
+    m_developmentThreadNameDecorator = BEANS.getBeanManager().registerClass(DevelopmentThreadNameDecorator.class);
   }
 
   @After
   public void after() {
-    Platform.get().getBeanManager().unregisterBean(m_threadNameDecorator);
+    Platform.get().getBeanManager().unregisterBean(m_developmentThreadNameDecorator);
   }
 
   @Test
+  @Times(100) // regression; do no remove
   public void testThreadName() throws InterruptedException {
     final AtomicReference<Thread> workerThread = new AtomicReference<>();
 
@@ -71,23 +73,23 @@ public class ThreadNameDecoratorTest {
 
     // Test while running
     assertTrue(latch1.await());
-    assertTrue("actual=" + workerThread.get().getName(), workerThread.get().getName().matches("test-thread-\\d+"));
+    assertTrue("actual=" + workerThread.get().getName(), workerThread.get().getName().matches("test-thread-\\d+ job-1"));
     latch1.unblock();
 
     // Test while blocked
     JobTestUtil.waitForPermitCompetitors(semaphore, 0);
-    assertTrue("actual=" + workerThread.get().getName(), workerThread.get().getName().matches("test-thread-\\d+"));
+    assertTrue("actual=" + workerThread.get().getName(), workerThread.get().getName().matches("test-thread-\\d+ \\(WAITING_FOR_BLOCKING_CONDITION\\) job-1"));
 
     // Test while waiting for permit
     semaphore.withPermits(0);
     condition.setBlocking(false);
     JobTestUtil.waitForPermitCompetitors(semaphore, 1);
-    assertTrue("actual=" + workerThread.get().getName(), workerThread.get().getName().matches("test-thread-\\d+"));
+    assertTrue("actual=" + workerThread.get().getName(), workerThread.get().getName().matches("test-thread-\\d+ \\(WAITING_FOR_PERMIT\\) job-1"));
 
     // Test while running
     semaphore.withPermits(1);
     assertTrue(latch2.await());
-    assertTrue("actual=" + workerThread.get().getName(), workerThread.get().getName().matches("test-thread-\\d+"));
+    assertTrue("actual=" + workerThread.get().getName(), workerThread.get().getName().matches("test-thread-\\d+ job-1"));
     latch2.unblock();
   }
 }
