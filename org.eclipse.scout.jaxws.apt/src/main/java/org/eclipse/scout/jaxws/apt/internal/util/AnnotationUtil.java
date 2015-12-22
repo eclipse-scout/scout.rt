@@ -27,6 +27,7 @@ import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 
+import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.server.jaxws.provider.annotation.Clazz;
 
@@ -60,7 +61,7 @@ public final class AnnotationUtil {
         return annotationValueEntry.getValue();
       }
     }
-    throw new IllegalArgumentException(String.format("Field on annotation not found [annotation=%s, field=%s]", annotationMirror.getAnnotationType().toString(), fieldName));
+    throw new PlatformException("Field on annotation not found [annotation={}, field={}]", annotationMirror.getAnnotationType().toString(), fieldName);
   }
 
   public static TypeElement getTypeElement(final AnnotationMirror annotationMirror, final String fieldName, final Elements elementUtils, final Types typeUtils) {

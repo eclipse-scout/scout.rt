@@ -30,8 +30,9 @@ import javax.xml.ws.handler.MessageContext;
 
 import org.eclipse.scout.jaxws.apt.JaxWsAnnotationProcessor;
 import org.eclipse.scout.jaxws.apt.internal.PortTypeProxyDescriptor.HandlerDescriptor;
+import org.eclipse.scout.jaxws.apt.internal.util.AptLogger;
 import org.eclipse.scout.jaxws.apt.internal.util.AptUtil;
-import org.eclipse.scout.jaxws.apt.internal.util.Logger;
+import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.util.XmlUtility;
 import org.eclipse.scout.rt.server.jaxws.provider.annotation.JaxWsPortTypeProxy;
 import org.eclipse.scout.rt.server.jaxws.provider.auth.handler.AuthenticationHandler;
@@ -69,18 +70,20 @@ public class HandlerArtifactProcessor {
    *
    * @return relative filename of the XML file.
    */
-  public String generateHandlerArtifacts(final JClass portTypeProxy, final PortTypeProxyDescriptor descriptor, final ProcessingEnvironment env, final Logger logger) {
+  public String generateHandlerArtifacts(final JClass portTypeProxy, final PortTypeProxyDescriptor descriptor, final ProcessingEnvironment env, final AptLogger logger) {
+    final String endpointInterface = descriptor.getEndpointInterface().getQualifiedName().toString();
+
     final List<String> handlers = new ArrayList<>();
 
     // Generate AuthHandler
     if (descriptor.isAuthenticationEnabled()) {
       try {
         final String authHandlerQualifiedName = createAndPersistAuthHandler(portTypeProxy, descriptor, env);
-        logger.logInfo("Generating AuthHandler for '%s': %s", portTypeProxy.fullName(), authHandlerQualifiedName);
+        logger.info("Generating AuthHandler [authHandler={}, portTypeProxy={}, endpointInterface={}]", authHandlerQualifiedName, portTypeProxy.fullName(), endpointInterface);
         handlers.add(authHandlerQualifiedName);
       }
       catch (final Exception e) {
-        throw new RuntimeException(String.format("Failed to generate AuthHandler for '%s'", portTypeProxy.fullName()), e);
+        throw new PlatformException("Failed to generate AuthHandler [portTypeProxy={}]", portTypeProxy.fullName(), e);
       }
     }
 
@@ -90,24 +93,24 @@ public class HandlerArtifactProcessor {
       final HandlerDescriptor handler = handlerChain.get(idx);
 
       try {
-        String proxyHandlerQualifiedName = createAndPersistProxyHandler(portTypeProxy, descriptor, handler, idx, env);
-        logger.logInfo("Generating proxy handler for '%s': %s", handler.getQualifiedName(), proxyHandlerQualifiedName);
+        final String proxyHandlerQualifiedName = createAndPersistProxyHandler(portTypeProxy, descriptor, handler, idx, env);
+        logger.info("Generating handler decorator [handler={}, handlerDecorator={}, portTypeProxy={}, endpointInterface={}]", handler.getQualifiedName(), proxyHandlerQualifiedName, portTypeProxy.fullName(), endpointInterface);
         handlers.add(proxyHandlerQualifiedName);
       }
       catch (final Exception e) {
-        throw new RuntimeException(String.format("Failed to generate proxy handler for '%s'", handler.getQualifiedName()), e);
+        throw new PlatformException("Failed to generate handler decorator [handler={}, portTypeProxy={}, endpointInterface={}]", handler.getQualifiedName(), portTypeProxy.fullName(), endpointInterface, e);
       }
     }
 
     // Generate handler-chain.xml.
     try {
-      String handlerChainFile = createAndPersistHandlerXmlFile(portTypeProxy, descriptor, handlers, env.getFiler());
-      logger.logInfo("Generating XML-file for handler-chain for '%s': %s", portTypeProxy.fullName(), handlerChainFile);
+      final String handlerChainFile = createAndPersistHandlerXmlFile(portTypeProxy, descriptor, handlers, env.getFiler());
+      logger.info("Generating handler chain XML-file [file={}, portTypeProxy={}, endpointInterface={}]", handlerChainFile, portTypeProxy.fullName(), endpointInterface);
 
       return handlerChainFile;
     }
     catch (final Exception e) {
-      throw new RuntimeException(String.format("Failed to generate XML-file for handler-chain for '%s'", portTypeProxy.fullName()), e);
+      throw new PlatformException("Failed to generate handler chain XML-file [portTypeProxy={}, endpointInterface={}]", portTypeProxy.fullName(), endpointInterface, e);
     }
   }
 

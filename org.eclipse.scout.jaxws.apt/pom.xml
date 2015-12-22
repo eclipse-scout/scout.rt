@@ -1,17 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-
-    Copyright (c) 2010-2015 BSI Business Systems Integration AG.
-    All rights reserved. This program and the accompanying materials
-    are made available under the terms of the Eclipse Public License v1.0
-    which accompanies this distribution, and is available at
-    http://www.eclipse.org/legal/epl-v10.html
-
-    Contributors:
-        BSI Business Systems Integration AG - initial API and implementation
-
--->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<!-- Copyright (c) 2010-2015 BSI Business Systems Integration AG. All rights
+  reserved. This program and the accompanying materials are made available
+  under the terms of the Eclipse Public License v1.0 which accompanies this
+  distribution, and is available at http://www.eclipse.org/legal/epl-v10.html
+  Contributors: BSI Business Systems Integration AG - initial API and implementation -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -28,7 +22,7 @@
   <dependencies>
     <!-- Build Dependencies -->
     <dependency>
-      <!-- do not use 'com.sun.codemodel' nor 'org.glassfish.jaxb' because out-of-date -->
+      <!-- do not use 'com.sun.codemodel' and not 'org.glassfish.jaxb' because out-of-date -->
       <groupId>com.unquietcode.tools.jcodemodel</groupId>
       <artifactId>codemodel</artifactId>
     </dependency>
@@ -40,7 +34,7 @@
       <groupId>org.eclipse.scout.rt</groupId>
       <artifactId>org.eclipse.scout.rt.server.jaxws</artifactId>
     </dependency>
-        <dependency>
+    <dependency>
       <groupId>org.eclipse.scout.rt</groupId>
       <artifactId>org.eclipse.scout.rt.server.commons</artifactId>
     </dependency>

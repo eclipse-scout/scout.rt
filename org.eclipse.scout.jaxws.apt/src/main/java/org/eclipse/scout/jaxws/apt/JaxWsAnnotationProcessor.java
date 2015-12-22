@@ -50,8 +50,8 @@ import org.eclipse.scout.jaxws.apt.internal.codemodel.JConditionalEx;
 import org.eclipse.scout.jaxws.apt.internal.codemodel.JExprEx;
 import org.eclipse.scout.jaxws.apt.internal.codemodel.JTypeParser;
 import org.eclipse.scout.jaxws.apt.internal.util.AnnotationUtil;
+import org.eclipse.scout.jaxws.apt.internal.util.AptLogger;
 import org.eclipse.scout.jaxws.apt.internal.util.AptUtil;
-import org.eclipse.scout.jaxws.apt.internal.util.Logger;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.annotations.Internal;
 import org.eclipse.scout.rt.platform.context.RunContext;
@@ -99,17 +99,17 @@ public class JaxWsAnnotationProcessor extends AbstractProcessor {
   protected static final String SERVLET_RUN_CONTEXT_FIELD_NAME = "servletRunContext";
   protected static final String RUN_CONTEXT_FIELD_NAME = "requestRunContext";
 
-  private Logger m_logger;
+  private AptLogger m_logger;
 
   @Override
   public synchronized void init(final ProcessingEnvironment env) {
-    m_logger = new Logger(env);
+    m_logger = new AptLogger(env);
     super.init(env);
   }
 
   @Override
   public boolean process(final Set<? extends TypeElement> annotations, final RoundEnvironment roundEnv) {
-    m_logger.logInfo("Annotation processing started...");
+    m_logger.info("Annotation processing started...");
 
     if (roundEnv.processingOver()) {
       return true;
@@ -130,23 +130,26 @@ public class JaxWsAnnotationProcessor extends AbstractProcessor {
     // Collect descriptors to generate port type proxies.
     for (final Element _descriptorElement : roundEnv.getElementsAnnotatedWith(JaxWsPortTypeProxy.class)) {
       final TypeElement _descriptor = (TypeElement) _descriptorElement;
+      String endpointInterfaceQualifiedName = null;
       try {
         final AnnotationMirror _descriptorAnnotationMirror = AnnotationUtil.findAnnotationMirror(JaxWsPortTypeProxy.class.getName(), _descriptor);
 
         // Resolve and validate the endpoint interface.
         final TypeElement _endpointInterface = AnnotationUtil.getTypeElement(_descriptorAnnotationMirror, "endpointInterface", processingEnv.getElementUtils(), processingEnv.getTypeUtils());
         Assertions.assertNotNull(_endpointInterface, "Failed to resolve endpoint interface for descriptor {}", _descriptor.getQualifiedName().toString());
+        endpointInterfaceQualifiedName = _endpointInterface.getQualifiedName().toString();
+
         Assertions.assertNotNull(_endpointInterface.getAnnotation(WebService.class), "Invalid endpoint interface. Must be annoated with {} annotation [descriptor={}, endpointInterface={}]",
             WebService.class.getSimpleName(),
             _descriptor.getQualifiedName().toString(),
-            _endpointInterface.getQualifiedName().toString());
+            endpointInterfaceQualifiedName);
 
         // Mark endpoint interface as processed
-        endpointInterfaceQualifiedNames.remove(_endpointInterface.getQualifiedName().toString());
+        endpointInterfaceQualifiedNames.remove(endpointInterfaceQualifiedName);
 
         final PortTypeProxyDescriptor descriptor = new PortTypeProxyDescriptor((TypeElement) _descriptor, _endpointInterface, processingEnv);
-        m_logger.logInfo("Generating port type proxy for endpoint interface '%s' [proxy=%s, wsdl:portType=%s, wsdl:service=%s, wsdl:port=%s]",
-            _endpointInterface.getQualifiedName().toString(),
+        m_logger.info("Generating port type proxy for endpoint interface '{}' [proxy={}, wsdl:portType={}, wsdl:service={}, wsdl:port={}]",
+            endpointInterfaceQualifiedName,
             descriptor.getProxyQualifiedName(),
             descriptor.getPortTypeName(),
             descriptor.getServiceName(),
@@ -154,14 +157,14 @@ public class JaxWsAnnotationProcessor extends AbstractProcessor {
         generatePortTypeProxy(descriptor, roundEnv);
       }
       catch (final Exception e) {
-        m_logger.logError(e, e.getMessage());
+        m_logger.error("Failed to generate port type proxy [decorator={}, endpointInterface={}]", _descriptor.getQualifiedName().toString(), endpointInterfaceQualifiedName, e);
       }
     }
 
     // Log port types for which no port type proxy was created.
     for (final String portTypeQualifiedName : endpointInterfaceQualifiedNames) {
-      m_logger.logInfo(
-          "Skipped port type proxy generation for endpoint interface '%s', because no descriptor class annotated with %s found.",
+      m_logger.info(
+          "Skipped port type proxy generation for endpoint interface '{}', because no descriptor class annotated with {} found.",
           portTypeQualifiedName, JaxWsPortTypeProxy.class.getSimpleName());
     }
   }
@@ -208,7 +211,10 @@ public class JaxWsAnnotationProcessor extends AbstractProcessor {
     // Create handler chain.
     final HandlerChain _handlerChainAnnotation = _endpointInterface.getAnnotation(HandlerChain.class);
     if (_handlerChainAnnotation != null) {
-      m_logger.logInfo("Handler file not generated because provided as binding file [file=%s]", _handlerChainAnnotation.file());
+      m_logger.info("Handler file not generated because provided as binding file [file={}, portTypeProxy={}, endpointInterface={}]",
+          _handlerChainAnnotation.file(),
+          descriptor.getProxyQualifiedName(),
+          descriptor.getEndpointInterface().getQualifiedName().toString());
     }
     else if (!descriptor.getHandlerChain().isEmpty() || descriptor.isAuthenticationEnabled()) {
       portTypeProxy.annotate(HandlerChain.class).param("file", new HandlerArtifactProcessor().generateHandlerArtifacts(portTypeProxy, descriptor, processingEnv, m_logger));
@@ -260,7 +266,7 @@ public class JaxWsAnnotationProcessor extends AbstractProcessor {
     // Build and persist this compilation unit.
     AptUtil.buildAndPersist(model, processingEnv.getFiler());
 
-    m_logger.logInfo("PortTypeProxy '%s' successfully generated.'", portTypeProxy.fullName());
+    m_logger.info("PortTypeProxy successfully generated. [portTypeProxy={}, endpointInterface={}]", portTypeProxy.fullName(), endpointInterface.fullName());
   }
 
   /**
@@ -421,14 +427,16 @@ public class JaxWsAnnotationProcessor extends AbstractProcessor {
         webServiceAnnotation.param("serviceName", descriptor.getServiceName());
       }
       else {
-        m_logger.logWarn("No 'serviceName' specified on %s, which is required if running in a container with 'webservice auto-discovery' enabled", descriptor.getDescriptor().getSimpleName().toString());
+        m_logger.warn("No 'serviceName' specified, which is required if running in a EE container with 'webservice auto-discovery' enabled. [portTypeProxy={}, endpointInterface={}]", descriptor.getDescriptor().getSimpleName().toString(),
+            descriptor.getEndpointInterface().getSimpleName().toString());
       }
 
       if (StringUtility.hasText(descriptor.getPortName())) {
         webServiceAnnotation.param("portName", descriptor.getPortName());
       }
       else {
-        m_logger.logWarn("No 'portName' specified on %s, which is required if running in a container with 'webservice auto-discovery' enabled", descriptor.getDescriptor().getSimpleName().toString());
+        m_logger.warn("No 'portName' specified, which is required if running in a EE container with 'webservice auto-discovery' enabled. [portTypeProxy={}, endpointInterface={}]", descriptor.getDescriptor().getSimpleName().toString(),
+            descriptor.getEndpointInterface().getSimpleName().toString());
       }
 
       if (descriptor.isWsdlLocationDerived()) {
@@ -437,10 +445,10 @@ public class JaxWsAnnotationProcessor extends AbstractProcessor {
           webServiceAnnotation.param("wsdlLocation", _webServiceClientAnnotation.wsdlLocation());
         }
         else if (!StringUtility.hasText(descriptor.getServiceName())) {
-          m_logger.logWarn("Cannot derive 'wsdlLocation' because no 'serviceName' specified in %s.", descriptor.getDescriptor().getSimpleName().toString());
+          m_logger.warn("Cannot derive 'wsdlLocation' because no 'serviceName' specified in {}.", descriptor.getDescriptor().getSimpleName().toString());
         }
         else {
-          m_logger.logWarn("Cannot derive 'wsdlLocation' because no Service annotated with '@WebServiceClient(name=\"%s\")' found. [proxy descriptor=%s]", descriptor.getServiceName(),
+          m_logger.warn("Cannot derive 'wsdlLocation' because no Service annotated with '@WebServiceClient(name=\"{}\")' found. [decorator={}]", descriptor.getServiceName(),
               descriptor.getDescriptor().getSimpleName().toString());
         }
       }
