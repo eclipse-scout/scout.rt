@@ -15,9 +15,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.processing.ProcessingEnvironment;
+import javax.jws.WebService;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.AnnotationValue;
-import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.xml.ws.WebServiceClient;
@@ -45,8 +45,8 @@ public class PortTypeProxyDescriptor {
 
   public static final String PORT_TYPE_PROXY_SUFFIX = "Proxy";
 
-  private final TypeElement m_portTypeInterface;
-  private final TypeElement m_declaringType;
+  private final TypeElement m_endpointInterface;
+  private final TypeElement m_descriptor;
   private final JaxWsPortTypeProxy m_annotation;
   private final AnnotationMirror m_annotationMirror;
   private final List<AnnotationMirror> m_siblingAnnotations;
@@ -54,15 +54,15 @@ public class PortTypeProxyDescriptor {
 
   private final ProcessingEnvironment m_env;
 
-  public PortTypeProxyDescriptor(final Element portTypeProxyClazz, final TypeElement portTypeInterface, final ProcessingEnvironment env) {
-    m_portTypeInterface = portTypeInterface;
-    m_declaringType = (TypeElement) env.getTypeUtils().asElement(portTypeProxyClazz.asType());
-    m_annotation = Assertions.assertNotNull(portTypeProxyClazz.getAnnotation(JaxWsPortTypeProxy.class), "Unexpected: Annotation '{}' not found [class={}],", JaxWsPortTypeProxy.class.getName(), portTypeProxyClazz);
+  public PortTypeProxyDescriptor(final TypeElement _descriptor, final TypeElement _endpointInterface, final ProcessingEnvironment env) {
+    m_endpointInterface = _endpointInterface;
+    m_descriptor = _descriptor;
+    m_annotation = Assertions.assertNotNull(_descriptor.getAnnotation(JaxWsPortTypeProxy.class), "Unexpected: Annotation '{}' not found [class={}],", JaxWsPortTypeProxy.class.getName(), _descriptor);
     m_siblingAnnotations = new ArrayList<>();
     m_env = env;
 
     AnnotationMirror descriptorAnnotationMirror = null;
-    for (final AnnotationMirror _annotationMirror : portTypeProxyClazz.getAnnotationMirrors()) {
+    for (final AnnotationMirror _annotationMirror : _descriptor.getAnnotationMirrors()) {
       if (JaxWsPortTypeProxy.class.getName().equals(_annotationMirror.getAnnotationType().toString())) {
         descriptorAnnotationMirror = _annotationMirror;
       }
@@ -74,8 +74,8 @@ public class PortTypeProxyDescriptor {
     m_annotationMirror = Assertions.assertNotNull(descriptorAnnotationMirror, "Unexpected: AnnotationMirror for annotation '{}' not found,", JaxWsPortTypeProxy.class.getName());
   }
 
-  public TypeElement getPortTypeInterface() {
-    return m_portTypeInterface;
+  public TypeElement getEndpointInterface() {
+    return m_endpointInterface;
   }
 
   /**
@@ -85,9 +85,9 @@ public class PortTypeProxyDescriptor {
     final boolean derived = JaxWsPortTypeProxy.DERIVED.equals(m_annotation.portTypeProxyName());
 
     final String suffix = StringUtility.nvl(m_proxyNameSuffix, "");
-    final String pck = m_env.getElementUtils().getPackageOf(m_declaringType).getQualifiedName().toString();
+    final String pck = m_env.getElementUtils().getPackageOf(m_descriptor).getQualifiedName().toString();
     if (derived) {
-      return StringUtility.join(".", pck, m_portTypeInterface.getSimpleName() + PORT_TYPE_PROXY_SUFFIX + suffix);
+      return StringUtility.join(".", pck, m_endpointInterface.getSimpleName() + PORT_TYPE_PROXY_SUFFIX + suffix);
     }
     else {
       return StringUtility.join(".", pck, m_annotation.portTypeProxyName() + suffix);
@@ -105,8 +105,8 @@ public class PortTypeProxyDescriptor {
   /**
    * Returns the class or interface which contains {@link JaxWsPortTypeProxy} annotation.
    */
-  public TypeElement getDeclaringType() {
-    return m_declaringType;
+  public TypeElement getDescriptor() {
+    return m_descriptor;
   }
 
   public Authentication getAuthentication() {
@@ -156,14 +156,21 @@ public class PortTypeProxyDescriptor {
   }
 
   /**
-   * @return configured service name.
+   * @return the name of the Web Service (wsdl:portType).
+   */
+  public String getPortTypeName() {
+    return m_endpointInterface.getAnnotation(WebService.class).name();
+  }
+
+  /**
+   * @return the service name of the Web Service (wsdl:service).
    */
   public String getServiceName() {
     return m_annotation.serviceName();
   }
 
   /**
-   * @return configured port name.
+   * @return the port name of the Web Service (wsdl:port).
    */
   public String getPortName() {
     return m_annotation.portName();

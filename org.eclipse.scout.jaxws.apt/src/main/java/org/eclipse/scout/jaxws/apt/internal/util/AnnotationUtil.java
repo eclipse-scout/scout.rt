@@ -19,6 +19,7 @@ import java.util.Map.Entry;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.AnnotationValue;
+import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
@@ -26,6 +27,7 @@ import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 
+import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.server.jaxws.provider.annotation.Clazz;
 
 import com.sun.codemodel.JAnnotationUse;
@@ -62,7 +64,7 @@ public final class AnnotationUtil {
   }
 
   public static TypeElement getTypeElement(final AnnotationMirror annotationMirror, final String fieldName, final Elements elementUtils, final Types typeUtils) {
-    final AnnotationValue annotationValue = AnnotationUtil.getAnnotationValue(annotationMirror, "value", elementUtils);
+    final AnnotationValue annotationValue = AnnotationUtil.getAnnotationValue(annotationMirror, fieldName, elementUtils);
     return (TypeElement) typeUtils.asElement((TypeMirror) annotationValue.getValue());
   }
 
@@ -185,6 +187,20 @@ public final class AnnotationUtil {
     }
 
     throw new IllegalArgumentException("Invalid handler class specified: missing 'value' or 'qualified name' attribute");
+  }
+
+  /**
+   * Returns the {@link AnnotationMirror} of the specified fully qualified name declared on declaring type.
+   */
+  public static AnnotationMirror findAnnotationMirror(final String fullyQualifiedName, final Element _declaringType) {
+    for (final AnnotationMirror _annotationMirror : _declaringType.getAnnotationMirrors()) {
+      if (fullyQualifiedName.equals(_annotationMirror.getAnnotationType().toString())) {
+        return _annotationMirror;
+      }
+    }
+
+    Assertions.fail("AnnotationMirror of the type '{}' not found on '{}'", fullyQualifiedName, _declaringType.getSimpleName());
+    return null;
   }
 
   /**

@@ -18,6 +18,8 @@ import java.lang.annotation.Target;
 import javax.jws.WebService;
 import javax.xml.ws.WebServiceClient;
 
+import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.IPlatform;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.server.commons.authentication.ICredentialVerifier;
@@ -35,9 +37,29 @@ import org.eclipse.scout.rt.server.jaxws.provider.auth.method.IAuthenticationMet
  * annotation to overwrite values derived from WSDL. If you provide an explicit handler-chain binding file, handlers and
  * authentication declared on this annotation are ignored.
  * <p>
- * The binding to the concrete webservice is done by {@link #belongsToPortType()} attribute. If a WSDL declares multiple
- * services, create a separate decorator interface for each service to be provided, and distinguish the proxy's name by
- * {@link #portTypeProxyName()} attribute.
+ * The binding to the concrete endpoint is done via {@link #endpointInterface()} attribute. If a WSDL declares multiple
+ * services, create a separate decorator for each service to be published.
+ * <p>
+ * <strong>Example usage:</strong>
+ *
+ * <pre>
+ * &#64;JaxWsPortTypeProxy(
+ *     endpointInterface = TestWebServicePortType.class,
+ *     serviceName = "TestWebService",
+ *     portName = "TestWebServicePort",
+ *     handlerChain = {
+ *         &#64;Handler(@Clazz(Handler1.class)),
+ *         &#64;Handler(@Clazz(qualifiedName = "f.q.n.Handler2")),
+ *         &#64;Handler(value = @Clazz(Handler3.class) ,
+ *             initParams = {@InitParam(key = "key1", value = "value1"),
+ *                 &#64;InitParam(key = " key2", value = "value2")}),
+ *     },
+ *     authentication = @Authentication(
+ *         method = @Clazz(BasicAuthenticationMethod.class) ,
+ *         verifier = @Clazz(ConfigFileCredentialVerifier.class))
+ * public interface TestWebServicePortTypeProxyDescriptor {
+ * }
+ * </pre>
  *
  * @since 5.1
  */
@@ -49,15 +71,16 @@ public @interface JaxWsPortTypeProxy {
   public static final String DERIVED = "derived";
 
   /**
-   * The 'port type name' as specified in the WSDL file to generate a PortTypeProxy for.
-   *
-   * <pre>
-   * &lt;wsdl:portType name="PORT_TYPE_NAME"&gt;
-   *   ...
-   * &lt;/wsdl:operation&gt;
-   * </pre>
+   * The endpoint interface which a proxy implementation should be generated for to facilitate registration of handlers,
+   * installation of authentication, and to ensure web service requests to run in a proper {@link RunContext}.
+   * <p>
+   * An endpoint interface defines the service's abstract Web Service contract, and is also known as port type interface
+   * and annotated with {@link WebService} annotation.
+   * <p>
+   * The proxy generated delegates to the implementation via bean manager, meaning that the implementation must be
+   * annotated with {@link Bean} or {@link ApplicationScoped} annotation.
    */
-  String belongsToPortType();
+  Class<?> endpointInterface();
 
   /**
    * The class name of the PortTypeProxy to be generated. If not set, the name is derived from the PortType interface
@@ -66,8 +89,8 @@ public @interface JaxWsPortTypeProxy {
   String portTypeProxyName() default JaxWsPortTypeProxy.DERIVED;
 
   /**
-   * The service name as specified in the WSDL file, and must be set if publishing a webservice in J2EE container. Both,
-   * {@link #serviceName()} and {@link #portName()}, uniquely identify a webservice endpoint to be published.
+   * The service name as specified in the WSDL file, and must be set if publishing the webservice in a EE container.
+   * Both, {@link #serviceName()} and {@link #portName()} uniquely identify a webservice endpoint to be published.
    *
    * <pre>
    * &lt;wsdl:service name="SERVICE_NAME">
@@ -78,8 +101,8 @@ public @interface JaxWsPortTypeProxy {
   String serviceName() default "";
 
   /**
-   * The name of the port as specified in the WSDL file, and must be set if publishing a webservice in J2EE container.
-   * Both, {@link #serviceName()} and {@link #portName()}, uniquely identify a webservice endpoint to be published.
+   * The name of the port as specified in the WSDL file, and must be set if publishing the webservice in a EE container.
+   * Both, {@link #serviceName()} and {@link #portName()} uniquely identify a webservice endpoint to be published.
    *
    * <pre>
    * &lt;wsdl:service name="...">

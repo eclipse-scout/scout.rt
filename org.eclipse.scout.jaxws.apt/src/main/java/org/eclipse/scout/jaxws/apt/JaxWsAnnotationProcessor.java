@@ -30,6 +30,7 @@ import javax.annotation.processing.SupportedSourceVersion;
 import javax.jws.HandlerChain;
 import javax.jws.WebService;
 import javax.lang.model.SourceVersion;
+import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
@@ -55,6 +56,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.annotations.Internal;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
+import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.server.jaxws.MessageContexts;
@@ -122,70 +124,71 @@ public class JaxWsAnnotationProcessor extends AbstractProcessor {
    * Generates a PortTypeProxy for each port type found.
    */
   protected void generatePortTypeProxyForEachEndpoint(final RoundEnvironment roundEnv) {
-    for (final Element candidate : roundEnv.getElementsAnnotatedWith(WebService.class)) {
-      // Iterate through all classes annotated with @WebService
-      if (candidate instanceof TypeElement && ElementKind.INTERFACE.equals(candidate.getKind()) && candidate.getAnnotation(JaxWsPortTypeProxy.class) == null /* skip proxy descriptors */) {
-        final TypeElement _portTypeInterface = (TypeElement) candidate;
-        final String portTypeName = _portTypeInterface.getAnnotation(WebService.class).name();
+    // Collect webservice port types.
+    final Set<String> endpointInterfaceQualifiedNames = collectPortTypes(roundEnv);
 
-        m_logger.logInfo("Webservice found: '%s'", _portTypeInterface.getQualifiedName());
+    // Collect descriptors to generate port type proxies.
+    for (final Element _descriptorElement : roundEnv.getElementsAnnotatedWith(JaxWsPortTypeProxy.class)) {
+      final TypeElement _descriptor = (TypeElement) _descriptorElement;
+      try {
+        final AnnotationMirror _descriptorAnnotationMirror = AnnotationUtil.findAnnotationMirror(JaxWsPortTypeProxy.class.getName(), _descriptor);
 
-        // Find the Descriptor(s) which matches the webservice. There are multiple decorates if the webservices declares multiple services/ports which should be provided.
-        final List<PortTypeProxyDescriptor> descriptors = new ArrayList<>();
-        for (final Element _portTypeProxyDescriptorClazz : roundEnv.getElementsAnnotatedWith(JaxWsPortTypeProxy.class)) {
-          final JaxWsPortTypeProxy _portTypeProxyAnnotation = _portTypeProxyDescriptorClazz.getAnnotation(JaxWsPortTypeProxy.class);
-          if (portTypeName.equals(_portTypeProxyAnnotation.belongsToPortType())) {
-            descriptors.add(new PortTypeProxyDescriptor(_portTypeProxyDescriptorClazz, _portTypeInterface, processingEnv));
-          }
-        }
+        // Resolve and validate the endpoint interface.
+        final TypeElement _endpointInterface = AnnotationUtil.getTypeElement(_descriptorAnnotationMirror, "endpointInterface", processingEnv.getElementUtils(), processingEnv.getTypeUtils());
+        Assertions.assertNotNull(_endpointInterface, "Failed to resolve endpoint interface for descriptor {}", _descriptor.getQualifiedName().toString());
+        Assertions.assertNotNull(_endpointInterface.getAnnotation(WebService.class), "Invalid endpoint interface. Must be annoated with {} annotation [descriptor={}, endpointInterface={}]",
+            WebService.class.getSimpleName(),
+            _descriptor.getQualifiedName().toString(),
+            _endpointInterface.getQualifiedName().toString());
 
-        if (descriptors.isEmpty()) {
-          m_logger.logInfo(
-              "Skipped generation of PortTypeProxy for '%s', because no descriptor class annotated with %s for portType %s found. If that service is to be provided as webservice, create such a proxy descriptor class to instrument proxy generation.",
-              _portTypeInterface.getQualifiedName(), JaxWsPortTypeProxy.class.getSimpleName(), portTypeName);
-        }
-        else {
-          ensureUniqueProxyNames(descriptors);
+        // Mark endpoint interface as processed
+        endpointInterfaceQualifiedNames.remove(_endpointInterface.getQualifiedName().toString());
 
-          for (final PortTypeProxyDescriptor descriptor : descriptors) {
-            try {
-              m_logger.logInfo("Generating PortTypeProxy for '%s' [proxy=%s, portType=%s, service=%s, port=%s]", _portTypeInterface.getQualifiedName(), descriptor.getProxyQualifiedName(), portTypeName, descriptor.getServiceName(),
-                  descriptor.getPortName());
-              generatePortTypeProxy(descriptor, roundEnv);
-            }
-            catch (final Exception e) {
-              m_logger.logError(e, e.getMessage());
-            }
-          }
-        }
+        final PortTypeProxyDescriptor descriptor = new PortTypeProxyDescriptor((TypeElement) _descriptor, _endpointInterface, processingEnv);
+        m_logger.logInfo("Generating port type proxy for endpoint interface '%s' [proxy=%s, wsdl:portType=%s, wsdl:service=%s, wsdl:port=%s]",
+            _endpointInterface.getQualifiedName().toString(),
+            descriptor.getProxyQualifiedName(),
+            descriptor.getPortTypeName(),
+            descriptor.getServiceName(),
+            descriptor.getPortName());
+        generatePortTypeProxy(descriptor, roundEnv);
       }
+      catch (final Exception e) {
+        m_logger.logError(e, e.getMessage());
+      }
+    }
+
+    // Log port types for which no port type proxy was created.
+    for (final String portTypeQualifiedName : endpointInterfaceQualifiedNames) {
+      m_logger.logInfo(
+          "Skipped port type proxy generation for endpoint interface '%s', because no descriptor class annotated with %s found.",
+          portTypeQualifiedName, JaxWsPortTypeProxy.class.getSimpleName());
     }
   }
 
   /**
-   * Ensures the proxies to have unique names.
+   * Collects all webservice port types annotated with {@link WebService}.
    */
-  protected void ensureUniqueProxyNames(final List<PortTypeProxyDescriptor> descriptors) {
-    if (descriptors.size() == 1) {
-      return;
+  protected Set<String> collectPortTypes(final RoundEnvironment roundEnv) {
+    final Set<String> portTypeNames = new HashSet<>();
+
+    for (final Element candidate : roundEnv.getElementsAnnotatedWith(WebService.class)) {
+      if (!(candidate instanceof TypeElement)) {
+        continue; // must be a type
+      }
+
+      if (!ElementKind.INTERFACE.equals(candidate.getKind())) {
+        continue; // must be an interface
+      }
+
+      if (candidate.getAnnotation(JaxWsPortTypeProxy.class) != null) {
+        continue; // ignore descriptors
+      }
+
+      portTypeNames.add(((TypeElement) candidate).getQualifiedName().toString());
     }
 
-    final Set<String> names = new HashSet<>();
-    for (final PortTypeProxyDescriptor descriptor : descriptors) {
-      names.add(descriptor.getProxyQualifiedName());
-    }
-
-    // Check for a name conflict.
-    if (names.size() == descriptors.size()) {
-      return; // no conflict.
-    }
-
-    m_logger.logWarn("Port type proxy names not unique");
-
-    // Make proxy names unique.
-    for (int i = 0; i < descriptors.size(); i++) {
-      descriptors.get(i).setProxyNameSuffix(String.valueOf(i));
-    }
+    return portTypeNames;
   }
 
   /**
@@ -195,15 +198,15 @@ public class JaxWsAnnotationProcessor extends AbstractProcessor {
     final JCodeModel model = new JCodeModel();
 
     // Create PortTypeProxy class.
-    final TypeElement _portTypeInterface = descriptor.getPortTypeInterface();
-    final JClass portTypeInterface = model.ref(_portTypeInterface.getQualifiedName().toString());
-    final JDefinedClass portTypeProxy = model._class(descriptor.getProxyQualifiedName())._implements(portTypeInterface);
+    final TypeElement _endpointInterface = descriptor.getEndpointInterface();
+    final JClass endpointInterface = model.ref(_endpointInterface.getQualifiedName().toString());
+    final JDefinedClass portTypeProxy = model._class(descriptor.getProxyQualifiedName())._implements(endpointInterface);
 
     // Add annotations to the PortTypeProxy.
     addAnnotations(model, portTypeProxy, descriptor, roundEnv);
 
     // Create handler chain.
-    final HandlerChain _handlerChainAnnotation = _portTypeInterface.getAnnotation(HandlerChain.class);
+    final HandlerChain _handlerChainAnnotation = _endpointInterface.getAnnotation(HandlerChain.class);
     if (_handlerChainAnnotation != null) {
       m_logger.logInfo("Handler file not generated because provided as binding file [file=%s]", _handlerChainAnnotation.file());
     }
@@ -221,7 +224,7 @@ public class JaxWsAnnotationProcessor extends AbstractProcessor {
     webServiceContext.annotate(Resource.class);
 
     // Overwrite all methods declared on the PortType interface.
-    for (final Element _element : _portTypeInterface.getEnclosedElements()) {
+    for (final Element _element : _endpointInterface.getEnclosedElements()) {
       if (!(ElementKind.METHOD.equals(_element.getKind()))) {
         continue;
       }
@@ -248,7 +251,7 @@ public class JaxWsAnnotationProcessor extends AbstractProcessor {
       }
 
       // Create the proxy implementation.
-      addMethodProxyImplementation(model, webServiceContext, method, throwTypes, TypeKind.VOID.equals(_method.getReturnType().getKind()), _portTypeInterface.getQualifiedName().toString());
+      addMethodProxyImplementation(model, webServiceContext, method, throwTypes, TypeKind.VOID.equals(_method.getReturnType().getKind()), _endpointInterface.getQualifiedName().toString());
     }
 
     // Create the method to handle undeclared errors.
@@ -408,24 +411,24 @@ public class JaxWsAnnotationProcessor extends AbstractProcessor {
 
     // Add 'WebService' annotation
     if (!descriptor.containsAnnotation(WebService.class)) {
-      final WebService _webServiceAnnotation = descriptor.getPortTypeInterface().getAnnotation(WebService.class);
+      final WebService _webServiceAnnotation = descriptor.getEndpointInterface().getAnnotation(WebService.class);
       final JAnnotationUse webServiceAnnotation = portTypeProxy.annotate(WebService.class);
       webServiceAnnotation.param("name", _webServiceAnnotation.name());
       webServiceAnnotation.param("targetNamespace", _webServiceAnnotation.targetNamespace());
-      webServiceAnnotation.param("endpointInterface", descriptor.getPortTypeInterface().getQualifiedName().toString());
+      webServiceAnnotation.param("endpointInterface", descriptor.getEndpointInterface().getQualifiedName().toString());
 
       if (StringUtility.hasText(descriptor.getServiceName())) {
         webServiceAnnotation.param("serviceName", descriptor.getServiceName());
       }
       else {
-        m_logger.logWarn("No 'serviceName' specified on %s, which is required if running in a container with 'webservice auto-discovery' enabled", descriptor.getDeclaringType().getSimpleName().toString());
+        m_logger.logWarn("No 'serviceName' specified on %s, which is required if running in a container with 'webservice auto-discovery' enabled", descriptor.getDescriptor().getSimpleName().toString());
       }
 
       if (StringUtility.hasText(descriptor.getPortName())) {
         webServiceAnnotation.param("portName", descriptor.getPortName());
       }
       else {
-        m_logger.logWarn("No 'portName' specified on %s, which is required if running in a container with 'webservice auto-discovery' enabled", descriptor.getDeclaringType().getSimpleName().toString());
+        m_logger.logWarn("No 'portName' specified on %s, which is required if running in a container with 'webservice auto-discovery' enabled", descriptor.getDescriptor().getSimpleName().toString());
       }
 
       if (descriptor.isWsdlLocationDerived()) {
@@ -434,11 +437,11 @@ public class JaxWsAnnotationProcessor extends AbstractProcessor {
           webServiceAnnotation.param("wsdlLocation", _webServiceClientAnnotation.wsdlLocation());
         }
         else if (!StringUtility.hasText(descriptor.getServiceName())) {
-          m_logger.logWarn("Cannot derive 'wsdlLocation' because no 'serviceName' specified in %s.", descriptor.getDeclaringType().getSimpleName().toString());
+          m_logger.logWarn("Cannot derive 'wsdlLocation' because no 'serviceName' specified in %s.", descriptor.getDescriptor().getSimpleName().toString());
         }
         else {
           m_logger.logWarn("Cannot derive 'wsdlLocation' because no Service annotated with '@WebServiceClient(name=\"%s\")' found. [proxy descriptor=%s]", descriptor.getServiceName(),
-              descriptor.getDeclaringType().getSimpleName().toString());
+              descriptor.getDescriptor().getSimpleName().toString());
         }
       }
       else if (StringUtility.hasText(descriptor.getWsdlLocation())) {
@@ -468,7 +471,7 @@ public class JaxWsAnnotationProcessor extends AbstractProcessor {
     final StringWriter writer = new StringWriter();
     final PrintWriter out = new PrintWriter(writer);
 
-    out.printf("This class is auto-generated by APT triggered by Maven build based on {@link %s}.", descriptor.getDeclaringType().getSimpleName()).println();
+    out.printf("This class is auto-generated by APT triggered by Maven build based on {@link %s}.", descriptor.getDescriptor().getSimpleName()).println();
     out.println("<p>");
     out.printf(
         "This proxy intercepts webservice requests and runs them on behalf of a {@link RunContext}, before being propagated to the implementing PortType bean. Typically, the RunContext is configured by a preceding handler, like {@link %s}.",
@@ -477,12 +480,12 @@ public class JaxWsAnnotationProcessor extends AbstractProcessor {
 
     out.println("<table>");
 
-    out.printf("<tr><td>Proxy descriptor:</td><td>{@link %s}</td>", descriptor.getDeclaringType().getSimpleName().toString()).println();
-    out.printf("<tr><td>Webservice:</td><td>{@link %s}</td>", descriptor.getPortTypeInterface().getSimpleName().toString()).println();
+    out.printf("<tr><td>Descriptor:</td><td>{@link %s}</td>", descriptor.getDescriptor().getSimpleName().toString()).println();
+    out.printf("<tr><td>Endpoint interface:</td><td>{@link %s}</td>", descriptor.getEndpointInterface().getSimpleName().toString()).println();
 
     // Authentication
     if (descriptor.isAuthenticationEnabled()) {
-      out.printf("<tr><td>Authentication Method:</td><td>{@link %s}</td>", AptUtil.toSimpleName(descriptor.getAuthMethod())).println();
+      out.printf("<tr><td>Authentication method:</td><td>{@link %s}</td>", AptUtil.toSimpleName(descriptor.getAuthMethod())).println();
       out.printf("<tr><td>Credential verifier:</td><td>{@link %s}</td>", AptUtil.toSimpleName(descriptor.getAuthVerifier())).println();
     }
 
