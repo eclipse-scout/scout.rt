@@ -127,7 +127,7 @@
       border-color: @item-selection-border-color;
     }
 
-    &.selected + .menu-item{
+    &.next-to-selected{
       border-top-color: @item-selection-border-color;
     }
 

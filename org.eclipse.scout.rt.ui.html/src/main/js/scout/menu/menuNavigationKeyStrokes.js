@@ -34,6 +34,7 @@ scout.menuNavigationKeyStrokes = {
       return;
     } else {
       $newItem.select(true).focus();
+      this.field.updateNextToSelected(this._menuItemClass, $newItem);
     }
     if ($oldItem.length > 0) {
       $oldItem.select(false);
@@ -56,9 +57,9 @@ scout.inherits(scout.MenuNavigationUpKeyStroke, scout.KeyStroke);
 scout.MenuNavigationUpKeyStroke.prototype.handle = function(event) {
   var menuItems = scout.menuNavigationKeyStrokes._findMenuItems(this.field, this._menuItemClass);
   if (menuItems.$selected.length > 0) {
-    scout.menuNavigationKeyStrokes._changeSelection(menuItems.$selected, menuItems.$selected.prevAll(':visible').first());
+    scout.menuNavigationKeyStrokes._changeSelection.call(this, menuItems.$selected, menuItems.$selected.prevAll(':visible').first());
   } else {
-    scout.menuNavigationKeyStrokes._changeSelection(menuItems.$selected, menuItems.$allVisible.last());
+    scout.menuNavigationKeyStrokes._changeSelection.call(this, menuItems.$selected, menuItems.$allVisible.last());
   }
 };
 
@@ -77,9 +78,9 @@ scout.inherits(scout.MenuNavigationDownKeyStroke, scout.KeyStroke);
 scout.MenuNavigationDownKeyStroke.prototype.handle = function(event) {
   var menuItems = scout.menuNavigationKeyStrokes._findMenuItems(this.field, this._menuItemClass);
   if (menuItems.$selected.length > 0) {
-    scout.menuNavigationKeyStrokes._changeSelection(menuItems.$selected, menuItems.$selected.nextAll(':visible').first());
+    scout.menuNavigationKeyStrokes._changeSelection.call(this, menuItems.$selected, menuItems.$selected.nextAll(':visible').first());
   } else {
-    scout.menuNavigationKeyStrokes._changeSelection(menuItems.$selected, menuItems.$allVisible.first());
+    scout.menuNavigationKeyStrokes._changeSelection.call(this, menuItems.$selected, menuItems.$allVisible.first());
   }
 };
 
@@ -132,16 +133,15 @@ scout.SubCloseKeyStroke = function(popup, menuItemClass) {
 
 scout.inherits(scout.SubCloseKeyStroke, scout.MenuNavigationExecKeyStroke);
 
-
 scout.SubCloseKeyStroke.prototype._accept = function(event) {
   var accepted = scout.MenuExecByNumberKeyStroke.parent.prototype._accept.call(this, event);
   if (!accepted) {
     return false;
   }
 
-  var menuItems = scout.menuNavigationKeyStrokes._findMenuItems(this.field, this._menuItemClass+'.expanded');
+  var menuItems = scout.menuNavigationKeyStrokes._findMenuItems(this.field, this._menuItemClass + '.expanded');
 
-  if (menuItems.$all.length>0) {
+  if (menuItems.$all.length > 0) {
     event._$element = menuItems.$all;
     return true;
   }

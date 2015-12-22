@@ -101,8 +101,9 @@ scout.ContextMenuPopup.prototype.removeSubMenuItems = function(parentMenu, anima
         scout.scrollbars.uninstall(parentMenu.$subMenuBody, this.session);
         if (parentMenu.$container) { //check if $container is not removed before by closing operation.
           parentMenu.$placeHolder.replaceWith(parentMenu.$container);
-          parentMenu.$container.toggleClass('expanded');
+          parentMenu.$container.toggleClass('expanded', false);
           this._updateFirstLastClass();
+          this.updateNextToSelected('menu-item', parentMenu.$container);
         }
         parentMenu.$subMenuBody.detach();
         scout.scrollbars.install(this.$body, {
@@ -141,6 +142,9 @@ scout.ContextMenuPopup.prototype.renderSubMenuItems = function(parentMenu, menus
 
   parentMenu.parentMenu.$subMenuBody = this.$body;
 
+  var $all = this.$body.find('.' + 'menu-item');
+  $all.toggleClass('next-to-selected', false);
+
   if (!parentMenu.$subMenuBody) {
     var textPaddingLeft = parentMenu.$container.find('.text').css('padding-left');
     if (textPaddingLeft) {
@@ -170,6 +174,8 @@ scout.ContextMenuPopup.prototype.renderSubMenuItems = function(parentMenu, menus
   //sets this.animationBounds;
   this.revalidateLayout();
   this.position();
+
+  this.updateNextToSelected();
 
   if (animated && this.rendered) {
     var duration = 300;
@@ -394,6 +400,15 @@ scout.ContextMenuPopup.prototype._updateFirstLastClass = function(event) {
   if ($lastMenuItem) {
     $lastMenuItem.addClass('context-menu-item-last');
   }
+};
+
+scout.ContextMenuPopup.prototype.updateNextToSelected = function(menuItemClass, $selectedItem) {
+  menuItemClass = menuItemClass ? menuItemClass : 'menu-item';
+  var $all = this.$body.find('.' + menuItemClass);
+  $selectedItem = $selectedItem ? $selectedItem : this.$body.find('.' + menuItemClass + '.selected');
+
+  $all.toggleClass('next-to-selected', false);
+  $selectedItem.nextAll(':visible').first().toggleClass('next-to-selected', true);
 };
 
 scout.ContextMenuPopup.prototype._onMenuItemPropertyChange = function(event) {
