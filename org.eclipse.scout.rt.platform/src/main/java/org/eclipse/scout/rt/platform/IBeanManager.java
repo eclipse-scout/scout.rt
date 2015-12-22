@@ -87,17 +87,17 @@ public interface IBeanManager {
   <T> List<IBean<T>> getBeans(Class<T> beanClazz);
 
   /**
-   * This is a convenience for {@link #registerBean(BeanMetaData)} and calls {@link #registerBean(BeanMetaData)} with a
-   * new {@link BeanMetaData#BeanData(Class)}
+   * This is a convenience for {@link IBeanManager#registerBean(BeanMetaData)} and calls
+   * {@link IBeanManager#registerBean(BeanMetaData)} with a new {@link BeanMetaData#BeanMetaData(Class)}
    *
-   * @param beanClazz
+   * @param clazz
    *          The bean class to register.
    * @return the registered {@link IBean}.
    */
   <T> IBean<T> registerClass(Class<T> clazz);
 
   /**
-   * This is a convenience for {@link #unregisterBean(IBean)} and unregisters all {@link IBean}s with
+   * This is a convenience for {@link IBeanManager#unregisterBean(IBean)} and unregisters all {@link IBean}s with
    * {@link IBean#getBeanClazz()} == clazz
    *
    * @param clazz
@@ -116,7 +116,7 @@ public interface IBeanManager {
 
   /**
    * Unregisters the given {@link IBean}.
-   * 
+   *
    * @param bean
    *          The {@link IBean} to unregister.
    */

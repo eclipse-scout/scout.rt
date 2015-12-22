@@ -16,9 +16,8 @@ import org.eclipse.scout.rt.shared.data.form.fields.composer.ComposerAttributeNo
 import org.eclipse.scout.rt.shared.data.form.fields.composer.ComposerEntityNodeData;
 
 /**
- * see {@link FormDataStatementBuilder#addFormDataStatementBuilderInjection(IPartDefinitionInjection)}
+ * see {@link FormDataStatementBuilder#addFormDataStatementBuilderInjection(IFormDataStatementBuilderInjection)}
  *
- * @author imo
  * @since 3.8
  */
 public interface IFormDataStatementBuilderInjection {

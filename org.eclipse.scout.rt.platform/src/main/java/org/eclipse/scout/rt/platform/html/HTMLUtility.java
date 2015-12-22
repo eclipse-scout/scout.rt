@@ -83,7 +83,6 @@ public final class HTMLUtility {
    * </p>
    *
    * @param htmlText
-   * @return
    */
   public static HTMLDocument toHtmlDocument(String htmlText) {
     if (StringUtility.isNullOrEmpty(htmlText)) {
@@ -164,9 +163,9 @@ public final class HTMLUtility {
    * @param rawHtml
    *          the raw HTML document
    * @param ensureContentType
-   *          to add missing meta directive &lt;meta http-equiv="content-type" content="text/html;charset=UTF-8"/>
+   *          to add missing meta directive &lt;meta http-equiv="content-type" content="text/html;charset=UTF-8"/&gt;
    * @param cleanupCss
-   *          to cleanup CSS as HTML has some trouble with some style constructs.<br/>
+   *          to cleanup CSS as HTML has some trouble with some style constructs.<br>
    *          <small>For more information, please refer to
    *          {@link HTMLUtility#cleanupCss(HTMLDocument, DefaultFont)} </small>
    * @param defaultFont
@@ -560,14 +559,13 @@ public final class HTMLUtility {
    *         Rule based conversion:
    *
    *         <pre>
-   * <xmp>
-   * <br>|<br/>
-   * |
-   *
-   *         </p>
+   *     &lt;br&gt;|&lt;br/&gt;
    *         |
-   *         <p/>
-   *         |</tr>|</table> create newlines </xmp>
+   *
+   *         &lt;/p&gt;
+   *         |
+   *         &lt;p/&gt;
+   *         |&lt;/tr&gt;|&lt;/table&gt; create newlines
    *         </pre>
    */
   public static String getPlainText(String s) {
@@ -659,7 +657,12 @@ public final class HTMLUtility {
   }
 
   /**
-   * @return encoded text, ready to be included in a html text <xmp>replaces &, ", ', <, > and all whitespace</xmp>
+   * @return encoded text, ready to be included in a html text
+   *
+   *         <pre>
+   * replaces &#37;, ", ', &gt;, &gt; and all whitespace
+   *         </pre>
+   *
    * @deprecated Will be removed with scout 7. Use {@link StringUtility#htmlEncode(String, boolean)}
    */
   @Deprecated
@@ -668,7 +671,12 @@ public final class HTMLUtility {
   }
 
   /**
-   * @return decoded text, ready to be printed as text <xmp>replaces &, ", ', <, > and all whitespace</xmp>
+   * @return decoded text, ready to be printed as text
+   *
+   *         <pre>
+   * replaces &#37;, ", ', &gt;, &gt; and all whitespace
+   *         </pre>
+   *
    * @deprecated Will be removed with scout 7. Use {@link StringUtility#htmlDecode(String)}
    */
   @Deprecated
@@ -734,7 +742,6 @@ public final class HTMLUtility {
    * @param content
    *          the content
    * @param rawHtml
-   * @return
    */
   private static String addHtmlMetaElement(String httpEquiv, String content, String rawHtml) {
     if (StringUtility.isNullOrEmpty(rawHtml)) {
@@ -765,7 +772,6 @@ public final class HTMLUtility {
    * @param rawHtml
    * @param singleStyleQuote
    *          the quote character for the style attribte
-   * @return
    */
   private static String removeUnclosedStyleQuotes(String rawHtml, boolean singleStyleQuote) {
     char styleQuoteChar;
@@ -809,7 +815,6 @@ public final class HTMLUtility {
    *          the tag the matcher should be created for
    * @param endTag
    *          to indicate whether to match the start or end tag
-   * @return
    */
   private static Matcher createMatcherForTag(String rawHtml, String tag, boolean endTag) {
     String regex = "<\\s*" + (endTag ? "\\/" : "") + "\\s*" + tag + ".*?>";
@@ -820,7 +825,6 @@ public final class HTMLUtility {
    * Eliminates the vertical scrollbar by setting overflow:auto in body style attribute.
    *
    * @param rawHtml
-   * @return
    */
   private static String eliminateVerticalScrollbar(String rawHtml) {
     try {
@@ -873,7 +877,6 @@ public final class HTMLUtility {
    *
    * @param rawHtml
    * @param defaultFont
-   * @return
    */
   private static String ensureDefaultFont(String rawHtml, DefaultFont defaultFont) {
     if (defaultFont == null || rawHtml == null) {

@@ -100,11 +100,11 @@ public @interface ConfigProperty {
    */
   String COMPOSER_ATTRIBUTE_TYPE = "COMPOSER_ATTRIBUTE_TYPE";
   /**
-   * List<String>
+   * Lists&lt;String&gt;
    */
   String FILE_EXTENSIONS = "FILE_EXTENSIONS";
   /**
-   * List<String>
+   * Lists&lt;String&gt;
    */
   String MIME_TYPES = "MIME_TYPES";
   /**

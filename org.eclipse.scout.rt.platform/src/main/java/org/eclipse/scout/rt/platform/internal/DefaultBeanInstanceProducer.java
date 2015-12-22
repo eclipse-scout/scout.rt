@@ -68,7 +68,7 @@ public class DefaultBeanInstanceProducer<T> implements IBeanInstanceProducer<T> 
    * Creates a new instance while keeping track of the classes instantiated during this process and ensuring that there
    * are no circular dependencies.
    *
-   * @returns a new instance of the bean
+   * @return a new instance of the bean
    */
   private T safeCreateInstance(Class<? extends T> beanClass) {
     Deque<String> stack = INSTANTIATION_STACK.get();

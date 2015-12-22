@@ -15,7 +15,7 @@ package org.eclipse.scout.rt.platform.classid;
  * <p>
  * It is sometimes necessary to identify a class by a unique id other than the class name. E.g. an id for a scout model
  * entity could be used in test tools and should therefore not change when a class is moved to another package or
- * another place in the inner class hierarchy. <br/>
+ * another place in the inner class hierarchy. <br>
  * It should still be possible set this id dynamically when creating scout model entities on the fly with anonymous
  * inner classes.
  * </p>

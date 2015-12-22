@@ -126,8 +126,6 @@ public class LegacyStatementBuilder {
   }
 
   /**
-   * @param bindMap
-   *          out parameter containing all binds used in the created pattern
    * @return sql text with operation and bind names
    *         <p>
    *         Simple example for EQ operation

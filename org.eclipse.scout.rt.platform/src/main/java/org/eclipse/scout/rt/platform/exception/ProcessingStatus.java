@@ -70,7 +70,7 @@ public class ProcessingStatus extends Status implements IProcessingStatus, Seria
    * Creates a new status with severity {@link IStatus#ERROR}.
    *
    * @param messageBody
-   *          a human-readable message, localized to the current locale, is never <code>null</null>
+   *          a human-readable message, localized to the current locale, is never <code>null</code>
    */
   public ProcessingStatus(String messageBody) {
     this(messageBody, IStatus.ERROR);
@@ -80,7 +80,7 @@ public class ProcessingStatus extends Status implements IProcessingStatus, Seria
    * Creates a new status without child-statuses.
    *
    * @param messageBody
-   *          a human-readable message, localized to the current locale, is never <code>null</null>
+   *          a human-readable message, localized to the current locale, is never <code>null</code>
    * @param severity
    *          the severity; exactly one of {@link #FATAL}, {@link #ERROR}, {@link #WARNING}, {@link #INFO}, {@link #OK}
    */
@@ -92,9 +92,9 @@ public class ProcessingStatus extends Status implements IProcessingStatus, Seria
    * Creates a new status without child-statuses.
    *
    * @param messageTitle
-   *          a human-readable title, localized to the current locale, can be <code>null</null>
+   *          a human-readable title, localized to the current locale, can be <code>null</code>
    * @param messageBody
-   *          a human-readable message, localized to the current locale, is never <code>null</null>
+   *          a human-readable message, localized to the current locale, is never <code>null</code>
    * @param severity
    *          the severity; exactly one of {@link #FATAL}, {@link #ERROR}, {@link #WARNING}, {@link #INFO}, {@link #OK}
    */
@@ -106,9 +106,8 @@ public class ProcessingStatus extends Status implements IProcessingStatus, Seria
    * Creates a new status without child-statuses.
    *
    * @param messageBody
-   *          a human-readable message, localized to the current locale, is never <code>null</null>
-   * &#64;param cause
-   *          a low-level exception, or <code>null</code> if not applicable
+   *          a human-readable message, localized to the current locale, is never <code>null</code> &#64;param cause a
+   *          low-level exception, or <code>null</code> if not applicable
    * @param code
    *          the custom status code
    * @param severity
@@ -122,11 +121,9 @@ public class ProcessingStatus extends Status implements IProcessingStatus, Seria
    * Creates a new status without child-statuses.
    *
    * @param messageTitle
-   *          a human-readable title, localized to the current locale, can be <code>null</null>
-   * &#64;param messageBody
-   *          a human-readable message, localized to the current locale, is never <code>null</null>
-   * &#64;param cause
-   *          a low-level exception, or <code>null</code> if not applicable
+   *          a human-readable title, localized to the current locale, can be <code>null</code> &#64;param messageBody a
+   *          human-readable message, localized to the current locale, is never <code>null</code> &#64;param cause a
+   *          low-level exception, or <code>null</code> if not applicable
    * @param code
    *          the custom status code
    * @param severity
@@ -159,7 +156,7 @@ public class ProcessingStatus extends Status implements IProcessingStatus, Seria
   }
 
   /**
-   * Status message with {@link #getBody() body} and {@link #getTitle() title}.
+   * Status message with {@link ProcessingStatus#getBody() body} and {@link ProcessingStatus#getTitle() title}.
    */
   @Override
   public String getMessage() {

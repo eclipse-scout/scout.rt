@@ -10,7 +10,7 @@ function usage {
 
 	-h				- Usage info
 
-	Example: ${PRG} -f <module>/pom.xml
+	Example: ${PRG} -f <module>
 
 EOF
 }
@@ -34,4 +34,4 @@ _MAVEN_OPTS="$_MAVEN_OPTS -e -B"
 
 # Parallel executions of maven modules and tests.
 # Half of CPU core are used in to keep other half for OS and other programs.
-mvn clean install -T0.5C -Dmaster_test_forkCount=0.5C -f org.eclipse.scout.rt $_MAVEN_OPTS
+mvn clean install site:site site:stage -T0.5C -Dmaster_unitTest_skip=true -Dmaster_webTest_skip=true -Dmaster_coverage_skip=true -Dmaster_sanityCheck_skip=true -Dmaster_coverage_skip=true -Dmaster_flatten_skip=true -f org.eclipse.scout.rt $_MAVEN_OPTS

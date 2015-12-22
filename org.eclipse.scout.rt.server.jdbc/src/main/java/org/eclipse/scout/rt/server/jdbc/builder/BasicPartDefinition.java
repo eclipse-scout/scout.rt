@@ -28,10 +28,11 @@ import org.eclipse.scout.rt.shared.data.model.DataModelConstants;
  * The part definition uses 1..n fields and properties of a form-data and constructs a statement contribution for the
  * query.
  * <p>
- * The {@link FormDataStatementBuilder} first calls {@link #accept(AbstractFormData, Map, Map)} to decide if this part
- * is used or not. Then it calls {@link #getValueTypeClassIdentifiers()} to collect the filled out values of the form
- * data, to finally call {@link #createInstance(FormDataStatementBuilder, List, List, List, Map)} to retrieve the
- * statement contribution. In its simplest form, the result is just a whereClause.
+ * The {@link FormDataStatementBuilder} first calls {@link BasicPartDefinition#accept(AbstractFormData)} to decide if
+ * this part is used or not. Then it calls {@link BasicPartDefinition#getValueTypeClassIdentifiers()} to collect the
+ * filled out values of the form data, to finally call
+ * {@link BasicPartDefinition#createInstance(FormDataStatementBuilder, AbstractFormData, Map)} to retrieve the statement
+ * contribution. In its simplest form, the result is just a whereClause.
  */
 public class BasicPartDefinition implements DataModelConstants {
   private final ClassIdentifier[] m_valueTypeClassIdentifiers;
@@ -46,9 +47,10 @@ public class BasicPartDefinition implements DataModelConstants {
    *          contains bind names :a, :b, :c for the values of the values correcpsonding to valueTypes
    *          <p>
    *          If different bind names are used,
-   *          {@link #createNewInstance(FormDataStatementBuilder, List, List, List, Map)} shoult be overridden
+   *          {@link BasicPartDefinition#createInstanceImpl(FormDataStatementBuilder, List, List, List, Map)} shoult be
+   *          overridden
    * @param operator
-   *          any of the {@link DataModelConstants#OPERATOR_*} values
+   *          any of the {@link org.eclipse.scout.rt.shared.data.model.DataModelConstants#OPERATOR_}* values
    */
   public BasicPartDefinition(Class<?> valueType, String sqlAttribute, int operator) {
     this(new Class[]{valueType}, sqlAttribute, operator, false);
@@ -64,49 +66,49 @@ public class BasicPartDefinition implements DataModelConstants {
   }
 
   /**
-   * see {@link #ValuePartDefinition(Class, String, int)}
+   * see {@link BasicPartDefinition#BasicPartDefinition(Class, String, int)}
    */
   public BasicPartDefinition(Class<?> valueType, String sqlAttribute) {
     this(new Class[]{valueType}, sqlAttribute, DataModelConstants.OPERATOR_NONE, false);
   }
 
   /**
-   * see {@link #ValuePartDefinition(Class, String, int)}
+   * see {@link BasicPartDefinition#BasicPartDefinition(Class, String, int)}
    */
   public BasicPartDefinition(Class<?>[] valueTypes, String sqlAttribute) {
     this(valueTypes, sqlAttribute, DataModelConstants.OPERATOR_NONE, false);
   }
 
   /**
-   * see {@link #ValuePartDefinition(Class, String, int)}
+   * see {@link BasicPartDefinition#BasicPartDefinition(Class, String, int)}
    */
   public BasicPartDefinition(Class<?> valueType, String sqlAttribute, int operator, boolean plainBind) {
     this(new Class[]{valueType}, sqlAttribute, operator, plainBind);
   }
 
   /**
-   * see {@link #ValuePartDefinition(Class, String, int)}
+   * see {@link BasicPartDefinition#BasicPartDefinition(Class, String, int)}
    */
   public BasicPartDefinition(ClassIdentifier valueTypeIdentifier, String sqlAttribute, int operator, boolean plainBind) {
     this(new ClassIdentifier[]{valueTypeIdentifier}, sqlAttribute, operator, plainBind);
   }
 
   /**
-   * see {@link #ValuePartDefinition(Class, String, int)}
+   * see {@link BasicPartDefinition#BasicPartDefinition(Class, String, int)}
    */
   public BasicPartDefinition(Class<?>[] valueTypes, String sqlAttribute, int operator) {
     this(valueTypes, sqlAttribute, operator, false);
   }
 
   /**
-   * see {@link #ValuePartDefinition(Class, String, int)}
+   * see {@link BasicPartDefinition#BasicPartDefinition(Class, String, int)}
    */
   public BasicPartDefinition(Class<?>[] valueTypes, String sqlAttribute, int operator, boolean plainBind) {
     this(ClassIdentifier.convertClassArrayToClassIdentifierArray(valueTypes), sqlAttribute, operator, plainBind);
   }
 
   /**
-   * see {@link #ValuePartDefinition(Class, String, int)}
+   * see {@link BasicPartDefinition#BasicPartDefinition(Class, String, int)}
    */
   public BasicPartDefinition(ClassIdentifier[] valueTypeClassIdentifiers, String sqlAttribute, int operator, boolean plainBind) {
     m_valueTypeClassIdentifiers = valueTypeClassIdentifiers != null ? valueTypeClassIdentifiers : new ClassIdentifier[0];
@@ -154,9 +156,9 @@ public class BasicPartDefinition implements DataModelConstants {
   }
 
   /**
-   * @return array of {@link AbstractValueData} class identifiers (fields, properties) that are accepted by this part
-   *         definition. This is used by {@link #accept(AbstractFormData, Map, Map)} and
-   *         {@link #createInstance(FormDataStatementBuilder, List, List, List, Map)}
+   * @return array of {@link ClassIdentifier} class identifiers (fields, properties) that are accepted by this part
+   *         definition. This is used by {@link BasicPartDefinition#accept(AbstractFormData)} and
+   *         {@link BasicPartDefinition#createInstance(FormDataStatementBuilder, AbstractFormData, Map)}
    */
   protected ClassIdentifier[] getValueTypeClassIdentifiers() {
     return m_valueTypeClassIdentifiers;
@@ -169,7 +171,8 @@ public class BasicPartDefinition implements DataModelConstants {
    *          the form data to be checked.
    * @return <code>true</code> if the properties in the form data are sufficient in order to append this part to the
    *         result statement This will result in a call to
-   *         {@link #createNewInstance(FormDataStatementBuilder, List, List, List, Map)} building that part.
+   *         {@link BasicPartDefinition#createInstanceImpl(FormDataStatementBuilder, List, List, List, Map)} building
+   *         that part.
    *         <p>
    *         Default accepts when any of the value of the valueType set is set (isValueSet) and has a non-null value in
    *         the form data
@@ -210,7 +213,7 @@ public class BasicPartDefinition implements DataModelConstants {
    * @return the result EntityContribution. null if that part is to be ignored
    *         <p>
    *         normally calls
-   *         {@link FormDataStatementBuilder#createStatementPart(Integer, String, int, List, List, boolean, Map)}
+   *         {@link FormDataStatementBuilder#createSqlPart(Integer, String, int, List, List, boolean, Map)}
    *         <p>
    *         Can make use of alias markers such as @Person@.LAST_NAME, these are resolved in the
    *         {@link FormDataStatementBuilder}
@@ -265,8 +268,9 @@ public class BasicPartDefinition implements DataModelConstants {
   }
 
   /**
-   * This method is called when {@link #createInstance(FormDataStatementBuilder, AbstractFormData, Map)} is not
-   * overridden and can be used to only override the core of create instance.
+   * This method is called when
+   * {@link BasicPartDefinition#createInstance(FormDataStatementBuilder, AbstractFormData, Map)} is not overridden and
+   * can be used to only override the core of create instance.
    * <p>
    * valueDatas, bindNames, bindValues are all pre-processed.
    */

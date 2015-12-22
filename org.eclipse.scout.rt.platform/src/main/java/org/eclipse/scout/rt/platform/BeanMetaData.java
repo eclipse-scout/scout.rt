@@ -18,8 +18,8 @@ import java.util.Map;
 
 import org.eclipse.scout.rt.platform.internal.DefaultBeanInstanceProducer;
 import org.eclipse.scout.rt.platform.util.Assertions;
-import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
 /**
  * Bean descriptor holding meta data for an {@link IBean} creation.<br>
@@ -214,7 +214,7 @@ public class BeanMetaData {
   /**
    * Gets the {@link Annotation} instance for the given {@link Annotation} {@link Class}.
    *
-   * @param annotation
+   * @param annotationClazz
    *          The {@link Annotation} {@link Class} to search.
    * @return The {@link Annotation} instance if this annotation exists for this {@link BeanMetaData} or
    *         <code>null</code> otherwise.
@@ -256,7 +256,7 @@ public class BeanMetaData {
 
   /**
    * Adds all {@link Annotation}s in the given {@link Collection}.
-   * 
+   *
    * @param annotations
    *          The {@link Annotation}s to add.
    * @return this

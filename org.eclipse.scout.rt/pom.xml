@@ -17,7 +17,7 @@
   <parent>
     <groupId>org.eclipse.scout</groupId>
     <artifactId>maven_rt_plugin_config-master</artifactId>
-    <version>2.0.1</version>
+    <version>2.0.2</version>
     <relativePath></relativePath>
   </parent>
 
@@ -576,6 +576,53 @@
       </plugin>
     </plugins>
   </build>
+
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jxr-plugin</artifactId>
+        <reportSets>
+          <reportSet>
+            <id>aggregate</id>
+            <inherited>false</inherited>
+            <reports>
+              <report>aggregate</report>
+            </reports>
+          </reportSet>
+        </reportSets>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <reportSets>
+          <reportSet>
+            <id>aggregate</id>
+            <inherited>false</inherited>
+            <reports>
+              <report>aggregate</report>
+            </reports>
+          </reportSet>
+        </reportSets>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-changelog-plugin</artifactId>
+        <reportSets>
+          <reportSet>
+            <id>dual-report</id>
+            <configuration>
+              <displayFileDetailUrl>https://git.eclipse.org/c/scout/org.eclipse.scout.rt.git/tree/%FILE%</displayFileDetailUrl>
+              <displayFileRevDetailUrl>https://git.eclipse.org/c/scout/org.eclipse.scout.rt.git/tree/%FILE%?id=%REV%</displayFileRevDetailUrl>
+              <displayChangeSetDetailUrl>https://git.eclipse.org/c/scout/org.eclipse.scout.rt.git/commit/?id=%REV%</displayChangeSetDetailUrl>
+            </configuration>
+          </reportSet>
+        </reportSets>
+      </plugin>
+    </plugins>
+  </reporting>
   <url>https://eclipse.org/scout</url>
 
   <!-- primarily for license header generation -->

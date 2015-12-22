@@ -129,7 +129,7 @@ public class CsvSqlAdapter {
    * @param writeColumnTypes
    *          the sql types of the corresponding column
    */
-  public void exportDataWithSql(File f, String encoding, Locale contentLocale, String colSeparator, String textDelimiter, String sqlSelect, NVPair[] bindBase, List<String> csvColumnNames, boolean writeColumNames,
+  public void exportDataWithSql(File f, String encoding, Locale contentLocale, String colSeparator, String textDelimiter, String sqlSelect, NVPair[] bindBase, List<String> csvColumnNames, boolean writeColumnNames,
       List<String> csvColumnTypes, boolean writeColumnTypes) {
     if (encoding == null) {
       encoding = StandardCharsets.UTF_8.name();
@@ -143,7 +143,7 @@ public class CsvSqlAdapter {
       params.setTextDelimiter((textDelimiter == null) ? 0 : textDelimiter.charAt(0));
       params.setSqlSelect(sqlSelect);
       params.setBindBase(bindBase);
-      params.setWriteColumnNames(writeColumNames);
+      params.setWriteColumnNames(writeColumnNames);
       params.setWriteColumnTypes(writeColumnTypes);
       if (csvColumnNames != null) {
         params.setCsvColumnNames(csvColumnNames);

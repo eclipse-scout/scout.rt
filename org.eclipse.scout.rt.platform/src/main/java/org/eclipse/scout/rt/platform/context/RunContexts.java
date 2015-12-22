@@ -19,10 +19,10 @@ import org.eclipse.scout.rt.platform.BEANS;
 /**
  * Factory methods to create new {@link RunContext} objects to propagate context like the current {@link Subject} and
  * {@link Locale}.
- * <p/>
+ * <p>
  * A context typically represents a "snapshot" of the current calling state. This class facilitates propagation of that
  * state among different threads, or allows temporary state changes to be done for the time of executing some code.
- * <p/>
+ * <p>
  * Usage:
  *
  * <pre>
@@ -45,10 +45,10 @@ public final class RunContexts {
 
   /**
    * Creates an empty {@link RunContext}.
-   *
-   * @RunMonitor a new {@link RunMonitor} is created. However, even if there is a current {@link RunMonitor}, it is NOT
-   *             registered as child monitor, meaning that it will not be cancelled once the current {@link RunMonitor}
-   *             is cancelled.
+   * <p>
+   * <strong>RunMonitor</strong><br>
+   * a new {@link RunMonitor} is created. However, even if there is a current {@link RunMonitor}, it is NOT registered
+   * as child monitor, meaning that it will not be cancelled once the current {@link RunMonitor} is cancelled.
    */
   public static final RunContext empty() {
     final RunContext runContext = BEANS.get(RunContext.class);
@@ -57,12 +57,13 @@ public final class RunContexts {
   }
 
   /**
-   * Creates a "snapshot" of the current calling context.<br/>
-   *
-   * @RunMonitor a new {@link RunMonitor} is created, and if the current calling context contains a {@link RunMonitor},
-   *             it is also registered within that {@link RunMonitor}. That makes the <i>returned</i> {@link RunContext}
-   *             to be cancelled as well once the current calling {@link RunContext} is cancelled, but DOES NOT cancel
-   *             the current calling {@link RunContext} if the <i>returned</i> {@link RunContext} is cancelled.
+   * Creates a "snapshot" of the current calling context.<br>
+   * <p>
+   * <strong>RunMonitor</strong><br>
+   * a new {@link RunMonitor} is created, and if the current calling context contains a {@link RunMonitor}, it is also
+   * registered within that {@link RunMonitor}. That makes the <i>returned</i> {@link RunContext} to be cancelled as
+   * well once the current calling {@link RunContext} is cancelled, but DOES NOT cancel the current calling
+   * {@link RunContext} if the <i>returned</i> {@link RunContext} is cancelled.
    */
   public static RunContext copyCurrent() {
     final RunContext runContext = BEANS.get(RunContext.class);

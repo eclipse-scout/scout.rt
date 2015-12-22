@@ -42,11 +42,11 @@ import org.slf4j.LoggerFactory;
  * Properties may contain placeholders for other variables: <code>${variableName}</code>. These variables are then
  * resolved once when the properties are initialized.<br>
  * </p>
- * Examples: <code>
- * <ul>
- * <li>customProperty=customValue</li>
- * <li>myProperty=${customProperty}/subfolder</li>
- * </ul>
+ * Examples: <code><br>
+ * s&lt;ul&gt;<br>
+ *   s&lt;li&gt;customProperty=customValues&lt;/li&gt;<br>
+ *   s&lt;li&gt;myProperty=${customProperty}/subfolders&lt;/li&gt;<br>
+ * s&lt;/ul&gt;<br>
  * </code>
  */
 public class PropertiesHelper {

@@ -701,7 +701,7 @@ public abstract class AbstractSqlService implements ISqlService, IServiceInvento
   /**
    * When the service completes work with an exception, a xa rollback is done on ALL used service request resources
    *
-   * @see commit
+   * @see AbstractSqlService#commit()
    */
   @Override
   public void rollback() {

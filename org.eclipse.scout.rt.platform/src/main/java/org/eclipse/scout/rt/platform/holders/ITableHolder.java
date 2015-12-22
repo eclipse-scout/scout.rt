@@ -21,26 +21,26 @@ package org.eclipse.scout.rt.platform.holders;
 public interface ITableHolder {
   /**
    * same number as
-   * 
-   * @see AbstractTableRowData
+   *
+   * @see org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData
    */
   int STATUS_NON_CHANGED = 0;
   /**
    * same number as
-   * 
-   * @see AbstractTableRowData
+   *
+   * @see org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData
    */
   int STATUS_INSERTED = 1;
   /**
    * same number as
-   * 
-   * @see AbstractTableRowData
+   *
+   * @see org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData
    */
   int STATUS_UPDATED = 2;
   /**
    * same number as
-   * 
-   * @see AbstractTableRowData
+   *
+   * @see org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData
    */
   int STATUS_DELETED = 3;
 
@@ -63,7 +63,7 @@ public interface ITableHolder {
 
   /**
    * The implementation will delegate this setter to one of the column setters
-   * 
+   *
    * @throws IllegalArgumentException
    */
   void setValueAt(int row, int column, Object value);

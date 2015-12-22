@@ -84,7 +84,7 @@ public class CallableChain<RESULT> {
   /**
    * Adds the given decorator at the end of this chain to decorate the execution of a {@link Callable}.
    * <p>
-   * This method is equivalent to {@link #addLast(ICallableDecorator))}.
+   * This method is equivalent to {@link CallableChain#addLast(ICallableDecorator)}.
    *
    * @return <code>this</code> in order to support method chaining.
    */
@@ -96,7 +96,7 @@ public class CallableChain<RESULT> {
   /**
    * Adds the given interceptor at the end of this chain to wrap the execution of a {@link Callable}.
    * <p>
-   * This method is equivalent to {@link #addLast(ICallableInterceptor)}.
+   * This method is equivalent to {@link CallableChain#addLast(ICallableInterceptor)}.
    *
    * @return <code>this</code> in order to support method chaining.
    */

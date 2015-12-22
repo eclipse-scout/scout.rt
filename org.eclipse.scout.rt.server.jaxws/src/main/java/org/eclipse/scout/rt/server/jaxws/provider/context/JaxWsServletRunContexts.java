@@ -21,7 +21,7 @@ import org.eclipse.scout.rt.platform.context.RunMonitor;
 /**
  * Factory methods to create new {@link JaxWsServletRunContext} objects to propagate JAX-WS state like
  * {@link WebServiceContext}, {@link HttpServletRequest} and {@link HttpServletResponse}.
- * <p/>
+ * <p>
  * Usage:
  *
  * <pre>
@@ -43,12 +43,13 @@ public final class JaxWsServletRunContexts {
   }
 
   /**
-   * Creates a "snapshot" of the current calling context.<br/>
-   *
-   * @RunMonitor a new {@link RunMonitor} is created, and if the current calling context contains a {@link RunMonitor},
-   *             it is also registered within that {@link RunMonitor}. That makes the <i>returned</i> {@link RunContext}
-   *             to be cancelled as well once the current calling {@link RunContext} is cancelled, but DOES NOT cancel
-   *             the current calling {@link RunContext} if the <i>returned</i> {@link RunContext} is cancelled.
+   * Creates a "snapshot" of the current calling context.<br>
+   * <p>
+   * <strong>RunMonitor</strong><br>
+   * a new {@link RunMonitor} is created, and if the current calling context contains a {@link RunMonitor}, it is also
+   * registered within that {@link RunMonitor}. That makes the <i>returned</i> {@link RunContext} to be cancelled as
+   * well once the current calling {@link RunContext} is cancelled, but DOES NOT cancel the current calling
+   * {@link RunContext} if the <i>returned</i> {@link RunContext} is cancelled.
    */
   public static JaxWsServletRunContext copyCurrent() {
     final JaxWsServletRunContext runContext = BEANS.get(JaxWsServletRunContext.class);

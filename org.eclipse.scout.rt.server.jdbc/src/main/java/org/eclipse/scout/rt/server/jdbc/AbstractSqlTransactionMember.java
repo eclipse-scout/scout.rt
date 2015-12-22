@@ -47,7 +47,8 @@ public abstract class AbstractSqlTransactionMember extends AbstractTransactionMe
   }
 
   /**
-   * Registers a statement in order to be canceled by {@link ITransaction#cancel(boolean))}
+   * Registers a statement in order to be canceled by
+   * {@link org.eclipse.scout.rt.server.transaction.ITransaction#cancel(boolean)}
    *
    * @param statement
    *          the statement to be registered

@@ -88,7 +88,7 @@ abstract class AbstractBeanPropertyOutput implements IBindOutput {
   }
 
   /**
-   * called from {@link #finishBatch()}
+   * called from {@link AbstractBeanPropertyOutput#finishBatch()}
    */
   protected abstract Object[] getFinalBeanArray();
 

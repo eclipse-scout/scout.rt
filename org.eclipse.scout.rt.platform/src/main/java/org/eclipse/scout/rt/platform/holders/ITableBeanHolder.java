@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.platform.holders;
 
 /**
  * Holder for bean based table. {@link ITableBeanRowHolder} are used for storing the table's contents.
- * 
+ *
  * @since 3.10.0-M3
  */
 public interface ITableBeanHolder {
@@ -34,13 +34,14 @@ public interface ITableBeanHolder {
   ITableBeanRowHolder addRow();
 
   /**
-   * @return Returns the type of the rows managed by this {@link AbstractTableFieldData}.
+   * @return Returns the type of the rows managed by this
+   *         {@link org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldData}.
    */
   Class<? extends ITableBeanRowHolder> getRowType();
 
   /**
    * Removes the row at the given index.
-   * 
+   *
    * @param index
    */
   void removeRow(int index);

@@ -90,7 +90,7 @@ public class JaxWsServletRunContext extends ServletRunContext {
   }
 
   /**
-   * @see #withWebServiceContext(WebServiceContext)
+   * @see WebServiceContext#withWebServiceContext(WebServiceContext)
    */
   public WebServiceContext getWebServiceContext() {
     return m_webServiceContext;

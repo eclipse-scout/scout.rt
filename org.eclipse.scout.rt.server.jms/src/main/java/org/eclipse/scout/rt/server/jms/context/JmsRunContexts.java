@@ -19,7 +19,7 @@ import org.eclipse.scout.rt.platform.context.RunMonitor;
 /**
  * Factory methods to create new {@link JmsRunContext} objects to propagate <i>JMS Java Message Service</i> state like
  * {@link Message}.
- * <p/>
+ * <p>
  * Usage:
  *
  * <pre>
@@ -51,11 +51,12 @@ public final class JmsRunContexts {
 
   /**
    * Creates a "snapshot" of the current calling <code>JmsRunContext</code>.
-   *
-   * @RunMonitor a new {@link RunMonitor} is created and registered within the {@link RunMonitor} of the current calling
-   *             context. That makes the <i>returned</i> {@link RunContext} to be cancelled as well once the current
-   *             calling {@link RunContext} is cancelled, but DOES NOT cancel the current calling {@link RunContext} if
-   *             the <i>returned</i> {@link RunContext} is cancelled.
+   * <p>
+   * <strong>RunMonitor</strong><br>
+   * a new {@link RunMonitor} is created and registered within the {@link RunMonitor} of the current calling context.
+   * That makes the <i>returned</i> {@link RunContext} to be cancelled as well once the current calling
+   * {@link RunContext} is cancelled, but DOES NOT cancel the current calling {@link RunContext} if the <i>returned</i>
+   * {@link RunContext} is cancelled.
    */
   public static JmsRunContext copyCurrent() {
     final JmsRunContext runContext = BEANS.get(JmsRunContext.class);

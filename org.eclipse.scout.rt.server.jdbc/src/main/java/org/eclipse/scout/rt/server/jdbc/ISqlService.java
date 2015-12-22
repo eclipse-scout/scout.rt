@@ -11,16 +11,9 @@
 package org.eclipse.scout.rt.server.jdbc;
 
 import java.sql.Connection;
-import java.util.Collection;
-import java.util.Map;
-
-import javax.sql.DataSource;
 
 import org.eclipse.scout.rt.platform.service.IService;
-import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 import org.eclipse.scout.rt.server.jdbc.style.ISqlStyle;
-import org.eclipse.scout.rt.server.transaction.ITransaction;
-import org.eclipse.scout.rt.server.transaction.ITransactionMember;
 
 /**
  * <p>
@@ -56,7 +49,7 @@ import org.eclipse.scout.rt.server.transaction.ITransactionMember;
  * <li>a plain java bean<br />
  * The name of the bind variable (e.g. <code>:companyNr</code>) must match the property name (e.g. the bean must
  * implement <code>Long getCompanyNr()</code>)</li>
- * <li>a {@link Map} with name/value pairs</li>
+ * <li>a {@link java.util.Map} with name/value pairs</li>
  * <li>by default the ServerSession's bean properties are used as well</li>
  * </ul>
  * </p>
@@ -72,8 +65,8 @@ import org.eclipse.scout.rt.server.transaction.ITransactionMember;
  * <p>
  * <h3>Type Matching</h3>
  * <p>
- * When using this service the database column types are converted to Java types using {@link TypeCastUtility} that can
- * match basically all "normal" java types.
+ * When using this service the database column types are converted to Java types using
+ * {@link org.eclipse.scout.rt.platform.util.TypeCastUtility} that can match basically all "normal" java types.
  * </p>
  * </p>
  * <h3>Input Binds</h3>
@@ -81,7 +74,7 @@ import org.eclipse.scout.rt.server.transaction.ITransactionMember;
  * Input binds are treated as follows
  * <ul>
  * <li><code>:name</code> is bound either directly or as a SQL <code>IN</code> list if it is an array or a
- * {@link Collection}</li>
+ * {@link java.util.Collection}</li>
  * <li><code>:{name}</code> is a batch value. For every value in the array the statement is executed once</li>
  * <li><code>:tableHolder.column</code> is also a batch value. For every row in the tableHolder the statement is
  * executed once. If a statement contains both <code>tableHolder</code> batch values and normal batch values, the batch
@@ -143,7 +136,7 @@ import org.eclipse.scout.rt.server.transaction.ITransactionMember;
  * <ol>
  * <li>Direct (Scout) simple connection pooling when {@link AbstractSqlService#isDirectJdbcConnection()}==true <br>
  * these properties have a prefix of jdbc... and should only be used when there is no j2ee container supporting
- * {@link DataSource}s</li>
+ * {@link javax.sql.DataSource}s</li>
  * <li>J2EE connection pooling when {@link AbstractSqlService#isDirectJdbcConnection()}==true<br>
  * these properties have a prefix of jndi...</li>
  * </ol>
@@ -293,21 +286,22 @@ public interface ISqlService extends IService {
   void rollback();
 
   /**
-   * @returns the next value from a given sequence
+   * @return the next value from a given sequence
    */
   Long getSequenceNextval(String sequenceName);
 
   /**
    * Creates plaintext SQL from the given SQL part by plaining all binds
    *
-   * @see ISqlStyle.createPlainText()
+   * @see ISqlStyle#createPlainText()
    */
   String createPlainText(String s, Object... bindBases);
 
   String getTransactionMemberId();
 
   /**
-   * @return current connection from {@link ITransactionMember} that is registered inside the {@link ITransaction}.
+   * @return current connection from {@link org.eclipse.scout.rt.server.transaction.ITransactionMember} that is
+   *         registered inside the {@link org.eclipse.scout.rt.server.transaction.ITransaction}.
    */
   Connection getConnection();
 

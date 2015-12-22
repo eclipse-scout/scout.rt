@@ -24,7 +24,7 @@ import java.lang.annotation.Target;
  * see also {@link Order}, {@link ApplicationScoped} and annotations qualified with {@link BeanInvocationHint}
  * <p>
  * The existence of the file <code>META-INF/scout.xml</code> will make scout add all relevant beans in this maven module
- * with {@link IBeanManager#registerClass(Class)}. <br/>
+ * with {@link IBeanManager#registerClass(Class)}. <br>
  * These includes classes that satisfy all of the following rules:
  * <ol>
  * <li>class is public or protected</li>

@@ -118,7 +118,7 @@ public abstract class AbstractNumberColumn<NUMBER extends Number> extends Abstra
   /**
    * Configure the aggregation function for this column
    *
-   * @returns one of the constant values in {@link INumberColumn#AggregationFunction}
+   * @return one of the constant values in {@link INumberColumn#AggregationFunction}
    * @since 5.2
    */
   protected String getConfiguredAggregationFunction() {
@@ -128,7 +128,7 @@ public abstract class AbstractNumberColumn<NUMBER extends Number> extends Abstra
   /**
    * Configure the background effect for this column
    *
-   * @returns one of the constant values in {@link INumberColumn#BackgroundEffect} or null
+   * @return one of the constant values in {@link INumberColumn#BackgroundEffect} or null
    * @since 5.2
    */
   @ConfigProperty(ConfigProperty.STRING)

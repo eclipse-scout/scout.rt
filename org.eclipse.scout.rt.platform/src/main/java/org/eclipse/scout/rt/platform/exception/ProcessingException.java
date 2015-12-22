@@ -48,7 +48,7 @@ public class ProcessingException extends PlatformException {
    *
    * @param message
    *          the message with support for <em>formatting anchors</em> in the form of {} pairs.
-   * @param arguments
+   * @param args
    *          optional arguments to substitute <em>formatting anchors</em> in the message, with the last argument used
    *          as the execption's cause if of type {@link Throwable} and not referenced in the message.
    */
@@ -144,8 +144,9 @@ public class ProcessingException extends PlatformException {
   // ==== Deprecated API which will be removed in 6.1 ==== //
 
   /**
-   * @deprecated will be removed in 6.1. Use {@link #VetoException(String, Object...)} with {@link #withCode(int)}
-   *             instead.
+   * @deprecated will be removed in 6.1. Use
+   *             {@link org.eclipse.scout.rt.platform.exception.VetoException#VetoException(String, Object...)} with
+   *             {@link #withCode(int)} instead.
    */
   @Deprecated
   public ProcessingException(final String message, final Throwable cause, final int errorCode) {
@@ -153,8 +154,9 @@ public class ProcessingException extends PlatformException {
   }
 
   /**
-   * @deprecated will be removed in 6.1. Use {@link #VetoException(String, Object...)} with {@link #withCode(int)},
-   *             {@link #withSeverity(int)} instead.
+   * @deprecated will be removed in 6.1. Use
+   *             {@link org.eclipse.scout.rt.platform.exception.VetoException#VetoException(String, Object...)} with
+   *             {@link #withCode(int)}, {@link #withSeverity(int)} instead.
    */
   @Deprecated
   public ProcessingException(final String message, final Throwable cause, final int errorCode, final int severity) {
@@ -162,7 +164,8 @@ public class ProcessingException extends PlatformException {
   }
 
   /**
-   * @deprecated will be removed in 6.1. Use {@link #VetoException(String, Object...)} with
+   * @deprecated will be removed in 6.1. Use
+   *             {@link org.eclipse.scout.rt.platform.exception.VetoException#VetoException(String, Object...)} with
    *             {@link #withTitle(String, Object...)} instead.
    */
   @Deprecated
@@ -171,7 +174,8 @@ public class ProcessingException extends PlatformException {
   }
 
   /**
-   * @deprecated will be removed in 6.1. Use {@link #VetoException(String, Object...)} with
+   * @deprecated will be removed in 6.1. Use
+   *             {@link org.eclipse.scout.rt.platform.exception.VetoException#VetoException(String, Object...)} with
    *             {@link #withTitle(String, Object...)} instead.
    */
   @Deprecated
@@ -180,7 +184,8 @@ public class ProcessingException extends PlatformException {
   }
 
   /**
-   * @deprecated will be removed in 6.1. Use {@link #VetoException(String, Object...)} with
+   * @deprecated will be removed in 6.1. Use
+   *             {@link org.eclipse.scout.rt.platform.exception.VetoException#VetoException(String, Object...)} with
    *             {@link #withTitle(String, Object...)}, {@link #withCode(int)} instead.
    */
   @Deprecated
@@ -189,7 +194,8 @@ public class ProcessingException extends PlatformException {
   }
 
   /**
-   * @deprecated will be removed in 6.1. Use {@link #VetoException(String, Object...)} with
+   * @deprecated will be removed in 6.1. Use
+   *             {@link org.eclipse.scout.rt.platform.exception.VetoException#VetoException(String, Object...)} with
    *             {@link #withTitle(String, Object...)}, {@link #withCode(int)}, {@link #withSeverity(int)} instead.
    */
   @Deprecated
@@ -198,7 +204,7 @@ public class ProcessingException extends PlatformException {
   }
 
   /**
-   * @deprecated will be removed in 6.1. Use {@link #withStatus(IProcessingStatus)} instead.
+   * @deprecated will be removed in 6.1. Use {@link ProcessingException#withStatus(IProcessingStatus)} instead.
    */
   @Deprecated
   public void setStatus(final IProcessingStatus status) {

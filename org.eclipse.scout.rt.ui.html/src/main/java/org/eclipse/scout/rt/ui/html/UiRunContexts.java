@@ -16,7 +16,7 @@ import org.eclipse.scout.rt.platform.context.RunMonitor;
 
 /**
  * Factory methods to create new {@link UiRunContext} objects to propagate UI state like {@link UiSession}.
- * <p/>
+ * <p>
  * Usage:
  *
  * <pre>
@@ -38,12 +38,13 @@ public final class UiRunContexts {
   }
 
   /**
-   * Creates a "snapshot" of the current calling context.<br/>
-   *
-   * @RunMonitor a new {@link RunMonitor} is created, and if the current calling context contains a {@link RunMonitor},
-   *             it is also registered within that {@link RunMonitor}. That makes the <i>returned</i> {@link RunContext}
-   *             to be cancelled as well once the current calling {@link RunContext} is cancelled, but DOES NOT cancel
-   *             the current calling {@link RunContext} if the <i>returned</i> {@link RunContext} is cancelled.
+   * Creates a "snapshot" of the current calling context.<br>
+   * <p>
+   * <strong>RunMonitor</strong><br>
+   * a new {@link RunMonitor} is created, and if the current calling context contains a {@link RunMonitor}, it is also
+   * registered within that {@link RunMonitor}. That makes the <i>returned</i> {@link RunContext} to be cancelled as
+   * well once the current calling {@link RunContext} is cancelled, but DOES NOT cancel the current calling
+   * {@link RunContext} if the <i>returned</i> {@link RunContext} is cancelled.
    */
   public static UiRunContext copyCurrent() {
     final UiRunContext runContext = BEANS.get(UiRunContext.class);

@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.platform;
 /**
  * Runtime equivalent of {@link Order} annotation. This interface allows defining an order for instances, so that they
  * can be used in ordered collections.
- * <p/>
+ * <p>
  * <b>Note</b>: The {@link Order} annotation is only used to initialize this order property. At runtime always
  * {@link #getOrder()} is used.
  *

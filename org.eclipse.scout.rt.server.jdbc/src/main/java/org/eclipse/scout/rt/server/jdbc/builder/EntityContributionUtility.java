@@ -41,10 +41,10 @@ public final class EntityContributionUtility {
    * Creates a where constraints based on the {@link EntityContribution}. This means that from parts etc. are wrapped
    * inside an EXISTS (SELECT 1 FROM ... WHERE ... ) clause.
    *
-   * @returns a where constraint or null if the {@link EntityContribution} is empty.
-   *          <p>
-   *          The constraint does not start with "AND" and can be added with {@link #addWhere(String, NVPair...)} by
-   *          prepending "AND"
+   * @return a where constraint or null if the {@link EntityContribution} is empty.
+   *         <p>
+   *         The constraint does not start with "AND" and can be added with {@link #addWhere(String, NVPair...)} by
+   *         prepending "AND"
    */
   public static String contributionToConstraintText(EntityContribution contrib) {
     // if there are no where parts, do nothing

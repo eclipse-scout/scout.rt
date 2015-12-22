@@ -26,11 +26,12 @@ import java.util.Set;
  * Properties may contain placeholders for other variables: <code>${variableName}</code>. These variables are then
  * resolved once when the properties are initialized.<br>
  * </p>
- * Examples: <code>
- * <ul>
- * <li>customProperty=customValue</li>
- * <li>myProperty=${customProperty}/subfolder</li>
- * </ul>
+ * Examples:<br>
+ * <code>
+ * &lt;ul&gt;<br>
+ *    &lt;li&gt;customProperty=customValues&lt;/li&gt;<br>
+ *    &lt;li&gt;myProperty=${customProperty}/subfolders&lt;/li&gt;<br>
+ * &lt;/ul&gt;<br>
  * </code>
  */
 public final class ConfigUtility {

@@ -18,7 +18,7 @@ import java.lang.annotation.Target;
 import org.eclipse.scout.rt.platform.classid.ClassIdentifier;
 
 /**
- * Annotation to declare the owner of an <code>org.eclipse.scout.rt.shared.extension.IExtension<OWNER></code> or
+ * Annotation to declare the owner of an <code>org.eclipse.scout.rt.shared.extension.IExtensions&lt;OWNER&gt;</code> or
  * contribution.<br>
  * This annotation is used by the <code>org.eclipse.scout.rt.shared.extension.IExtensionRegistry</code> service to
  * automatically calculate the owner of extensions or contributions. Furthermore it is used by the Scout SDK to

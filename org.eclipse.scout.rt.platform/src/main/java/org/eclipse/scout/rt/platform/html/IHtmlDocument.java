@@ -17,7 +17,7 @@ public interface IHtmlDocument extends IHtmlElement {
   IHtmlDocument doctype(CharSequence type);
 
   /**
-   * @return HTML document with HTML5 doctype {@value #HTML5_DOCTYPE}
+   * @return HTML document with HTML5 doctype {@value IHtmlDocument#HTML5_DOCTYPE}
    */
   IHtmlDocument doctype();
 

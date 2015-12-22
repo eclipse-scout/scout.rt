@@ -46,7 +46,7 @@ public final class HTML {
    * String encodedHtml = HTML.head("text").toEncodedHtml(); <br>
    * </p>
    *
-   * @param text
+   * @param elements
    *          text as bind
    */
   public static IHtmlContent head(CharSequence... elements) {
@@ -60,7 +60,7 @@ public final class HTML {
    * String encodedHtml = HTML.body("text").toEncodedHtml(); <br>
    * </p>
    *
-   * @param text
+   * @param elements
    *          text as bind
    */
   public static IHtmlContent body(CharSequence... elements) {
@@ -232,7 +232,7 @@ public final class HTML {
   /**
    * Create a html element with encoded text for &lt;div&gt;content&lt;/div&gt;.
    *
-   * @param content
+   * @param contents
    *          content as bind
    */
   public static IHtmlElement div(List<CharSequence> contents) {
@@ -288,7 +288,7 @@ public final class HTML {
    * String encodedHtml = HTML.imgByBinaryResource("resourceName").toEncodedHtml(); <br>
    * </p>
    *
-   * @param src
+   * @param binaryResource
    *          image source path as bind
    */
   public static IHtmlElement imgByBinaryResource(CharSequence binaryResource) {
@@ -359,17 +359,17 @@ public final class HTML {
    * Example:<br>
    * <code>
    * HTML.table(<br>
-        &nbsp;HTML.row(<br>
-        &nbsp;&nbsp;HTML.cell("cell1"),<br>
-        &nbsp;&nbsp;HTML.cell("cell2")<br>
-        &nbsp;),<br>
-        &nbsp;HTML.row(<br>
-        &nbsp;&nbsp;HTML.cell("cell3"),<br>
-        &nbsp;&nbsp;HTML.cell("cell4")<br>
-        )<br>
-        ).cellspacing(1).cellpadding(2)<br>
-   * </p>
+   *     &nbsp;HTML.row(<br>
+   *     &nbsp;&nbsp;HTML.cell("cell1"),<br>
+   *     &nbsp;&nbsp;HTML.cell("cell2")<br>
+   *     &nbsp;),<br>
+   *     &nbsp;HTML.row(<br>
+   *     &nbsp;&nbsp;HTML.cell("cell3"),<br>
+   *     &nbsp;&nbsp;HTML.cell("cell4")<br>
+   *     )<br>
+   *     ).cellspacing(1).cellpadding(2)<br>
    * </code>
+   * </p>
    *
    * @param text
    *          text with binds
@@ -382,16 +382,15 @@ public final class HTML {
    * Create a html element with encoded text for a table row: &lt;tr&gt;...&lt;/tr&gt;. Example:<br>
    * <code>
    * HTML.table(<br>
-        &nbsp;HTML.row(<br>
-        &nbsp;&nbsp;HTML.cell("cell1"),<br>
-        &nbsp;&nbsp;HTML.cell("cell2")<br>
-        &nbsp;),<br>
-        &nbsp;HTML.row(<br>
-        &nbsp;&nbsp;HTML.cell("cell3"),<br>
-        &nbsp;&nbsp;HTML.cell("cell4")<br>
-        )<br>
-        ).cellspacing(1).cellpadding(2)<br>
-   * </p>
+   *     &nbsp;HTML.row(<br>
+   *     &nbsp;&nbsp;HTML.cell("cell1"),<br>
+   *     &nbsp;&nbsp;HTML.cell("cell2")<br>
+   *     &nbsp;),<br>
+   *     &nbsp;HTML.row(<br>
+   *     &nbsp;&nbsp;HTML.cell("cell3"),<br>
+   *     &nbsp;&nbsp;HTML.cell("cell4")<br>
+   *     )<br>
+   *     ).cellspacing(1).cellpadding(2)<br>
    * </code>
    *
    * @param td
@@ -405,16 +404,15 @@ public final class HTML {
    * Create a html element with encoded text for a table row: &lt;tr&gt;...&lt;/tr&gt;. Example:<br>
    * <code>
    * HTML.table(<br>
-        &nbsp;HTML.row(<br>
-        &nbsp;&nbsp;HTML.cell("cell1"),<br>
-        &nbsp;&nbsp;HTML.cell("cell2")<br>
-        &nbsp;),<br>
-        &nbsp;HTML.row(<br>
-        &nbsp;&nbsp;HTML.cell("cell3"),<br>
-        &nbsp;&nbsp;HTML.cell("cell4")<br>
-        )<br>
-        ).cellspacing(1).cellpadding(2)<br>
-   * </p>
+   *     &nbsp;HTML.row(<br>
+   *     &nbsp;&nbsp;HTML.cell("cell1"),<br>
+   *     &nbsp;&nbsp;HTML.cell("cell2")<br>
+   *     &nbsp;),<br>
+   *     &nbsp;HTML.row(<br>
+   *     &nbsp;&nbsp;HTML.cell("cell3"),<br>
+   *     &nbsp;&nbsp;HTML.cell("cell4")<br>
+   *     )<br>
+   *     ).cellspacing(1).cellpadding(2)<br>
    * </code>
    *
    * @param td
@@ -428,16 +426,15 @@ public final class HTML {
    * Create a html element with encoded text for a table. Example:<br>
    * <code>
    * HTML.table(<br>
-        &nbsp;HTML.row(<br>
-        &nbsp;&nbsp;HTML.cell("cell1"),<br>
-        &nbsp;&nbsp;HTML.cell("cell2")<br>
-        &nbsp;),<br>
-        &nbsp;HTML.row(<br>
-        &nbsp;&nbsp;HTML.cell("cell3"),<br>
-        &nbsp;&nbsp;HTML.cell("cell4")<br>
-        )<br>
-        ).cellspacing(1).cellpadding(2)<br>
-   * </p>
+   *     &nbsp;HTML.row(<br>
+   *     &nbsp;&nbsp;HTML.cell("cell1"),<br>
+   *     &nbsp;&nbsp;HTML.cell("cell2")<br>
+   *     &nbsp;),<br>
+   *     &nbsp;HTML.row(<br>
+   *     &nbsp;&nbsp;HTML.cell("cell3"),<br>
+   *     &nbsp;&nbsp;HTML.cell("cell4")<br>
+   *     )<br>
+   *     ).cellspacing(1).cellpadding(2)<br>
    * </code>
    */
   public static IHtmlTable table(IHtmlTableRow... rows) {
@@ -448,16 +445,15 @@ public final class HTML {
    * Create a html element with encoded text for a table. Example:<br>
    * <code>
    * HTML.table(<br>
-        &nbsp;HTML.row(<br>
-        &nbsp;&nbsp;HTML.cell("cell1"),<br>
-        &nbsp;&nbsp;HTML.cell("cell2")<br>
-        &nbsp;),<br>
-        &nbsp;HTML.row(<br>
-        &nbsp;&nbsp;HTML.cell("cell3"),<br>
-        &nbsp;&nbsp;HTML.cell("cell4")<br>
-        )<br>
-        ).cellspacing(1).cellpadding(2)<br>
-   * </p>
+   *     &nbsp;HTML.row(<br>
+   *     &nbsp;&nbsp;HTML.cell("cell1"),<br>
+   *     &nbsp;&nbsp;HTML.cell("cell2")<br>
+   *     &nbsp;),<br>
+   *     &nbsp;HTML.row(<br>
+   *     &nbsp;&nbsp;HTML.cell("cell3"),<br>
+   *     &nbsp;&nbsp;HTML.cell("cell4")<br>
+   *     )<br>
+   *     ).cellspacing(1).cellpadding(2)<br>
    * </code>
    */
   public static IHtmlTable table(List<IHtmlTableRow> rows) {
@@ -491,14 +487,14 @@ public final class HTML {
   }
 
   /**
-   * Creates HTML content with &ltstyle type="text/css"&gt; cssStype &lt;style&gt;
+   * Creates HTML content with &lt;style type="text/css"&gt; cssStype &lt;style&gt;
    */
   public static IHtmlElement cssStyle(CharSequence... cssContent) {
     return new StyleElementBuilder(cssContent).type("text/css");
   }
 
   /**
-   * Creates HTML content with HTML 5 doctype: &lt!DOCTYPE
+   * Creates HTML content with HTML 5 doctype: &lt;!DOCTYPE
    * html&gt;&lt;html&gt;&lt;head&gt;...&lt;/head&gt;body&gt;...&lt;/body&gt;&lt;html&gt;.
    */
   public static IHtmlDocument html5(CharSequence head, CharSequence body) {

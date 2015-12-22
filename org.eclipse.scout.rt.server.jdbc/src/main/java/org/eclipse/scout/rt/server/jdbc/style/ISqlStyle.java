@@ -46,7 +46,8 @@ import org.eclipse.scout.rt.server.jdbc.SqlBind;
  * <h2>Bind Names</h2>
  * <p>
  * All methods that require a bindName accept bind names (without <code>:</code> prefix) <i>or</i> a plain bind value
- * (prepend a {@value #PLAIN_BIND_MARKER_PREFIX}). Plain bind values are created using {@link #toPlainText(Object)}
+ * (prepend a {@value ISqlStyle#PLAIN_BIND_MARKER_PREFIX}). Plain bind values are created using
+ * {@link ISqlStyle#toPlainText(Object)}
  * <table>
  * <tr>
  * <td>Examples for bind names:</td>
@@ -54,7 +55,7 @@ import org.eclipse.scout.rt.server.jdbc.SqlBind;
  * </tr>
  * <tr>
  * <td>Examples for plain bind values inclusive marker prefix:</td>
- * <td><code>&123</code>, <code>&'John'</code>, <code>&to_date('01.01.2010','dd.mm.yyyy')</code></td>
+ * <td><code>&#38;123</code>, <code>&#38;'John'</code>, <code>&#38;to_date('01.01.2010','dd.mm.yyyy')</code></td>
  * </tr>
  * </table>
  * </p>
@@ -185,7 +186,7 @@ public interface ISqlStyle extends Serializable {
 
   /**
    * <code>P.BUDGET between :bindName1 and :bindName2</code><br />
-   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
+   * (or "<code>&#38;text</code>" for non-binds, see also {@link ISqlStyle#PLAIN_BIND_MARKER_PREFIX})
    * <p>
    * for dates use {@link #createDateBetween(String, String, String)} and
    * {@link #createDateTimeBetween(String, String, String)}
@@ -202,7 +203,7 @@ public interface ISqlStyle extends Serializable {
 
   /**
    * <code>P.EVT_CREATED between :bindName1 and :bindName2</code><br />
-   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
+   * (or "<code>&#38;text</code>" for non-binds, see also {@link ISqlStyle#PLAIN_BIND_MARKER_PREFIX})
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
@@ -216,7 +217,7 @@ public interface ISqlStyle extends Serializable {
 
   /**
    * <code>P.EVT_CREATED between :bindName1 and :bindName2</code><br />
-   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
+   * (or "<code>&#38;text</code>" for non-binds, see also {@link ISqlStyle#PLAIN_BIND_MARKER_PREFIX})
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
@@ -229,7 +230,7 @@ public interface ISqlStyle extends Serializable {
 
   /**
    * <code>P.NAME like :bindName||'*'</code><br />
-   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
+   * (or "<code>&#38;text</code>" for non-binds, see also {@link ISqlStyle#PLAIN_BIND_MARKER_PREFIX})
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
@@ -242,7 +243,7 @@ public interface ISqlStyle extends Serializable {
 
   /**
    * <code>P.NAME not like :bindName||'*'</code><br />
-   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
+   * (or "<code>&#38;text</code>" for non-binds, see also {@link ISqlStyle#PLAIN_BIND_MARKER_PREFIX})
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
@@ -255,7 +256,7 @@ public interface ISqlStyle extends Serializable {
 
   /**
    * <code>P.NAME like '*'||:bindName</code><br />
-   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
+   * (or "<code>&#38;text</code>" for non-binds, see also {@link ISqlStyle#PLAIN_BIND_MARKER_PREFIX})
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
@@ -268,7 +269,7 @@ public interface ISqlStyle extends Serializable {
 
   /**
    * <code>P.NAME not like '*'||:bindName</code><br />
-   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
+   * (or "<code>&#38;text</code>" for non-binds, see also {@link ISqlStyle#PLAIN_BIND_MARKER_PREFIX})
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
@@ -281,7 +282,7 @@ public interface ISqlStyle extends Serializable {
 
   /**
    * <code>P.NAME like '*'||:bindName||'*'</code><br />
-   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
+   * (or "<code>&#38;text</code>" for non-binds, see also {@link ISqlStyle#PLAIN_BIND_MARKER_PREFIX})
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
@@ -295,7 +296,7 @@ public interface ISqlStyle extends Serializable {
   /**
    * <p>
    * <code>P.NAME not like '*'||:bindName||'*'</code><br />
-   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
+   * (or "<code>&#38;text</code>" for non-binds, see also {@link ISqlStyle#PLAIN_BIND_MARKER_PREFIX})
    * </p>
    * <p>
    * In an Oracle implementation this could be represented as
@@ -309,7 +310,7 @@ public interface ISqlStyle extends Serializable {
 
   /**
    * <code>P.NAME like :bindName</code><br />
-   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
+   * (or "<code>&#38;text</code>" for non-binds, see also {@link ISqlStyle#PLAIN_BIND_MARKER_PREFIX})
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
@@ -322,7 +323,7 @@ public interface ISqlStyle extends Serializable {
 
   /**
    * <code>P.NAME not like :bindName</code><br />
-   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
+   * (or "<code>&#38;text</code>" for non-binds, see also {@link ISqlStyle#PLAIN_BIND_MARKER_PREFIX})
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
@@ -347,7 +348,7 @@ public interface ISqlStyle extends Serializable {
 
   /**
    * <code>P.NAME not null</code><br />
-   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
+   * (or "<code>&#38;text</code>" for non-binds, see also {@link ISqlStyle#PLAIN_BIND_MARKER_PREFIX})
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
@@ -412,7 +413,7 @@ public interface ISqlStyle extends Serializable {
 
   /**
    * <code>P.NAME in :bindName</code><br />
-   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX} )
+   * (or "<code>&#38;text</code>" for non-binds, see also {@link ISqlStyle#PLAIN_BIND_MARKER_PREFIX} )
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
@@ -425,7 +426,7 @@ public interface ISqlStyle extends Serializable {
 
   /**
    * <code>P.NAME not in :bindName</code><br />
-   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
+   * (or "<code>&#38;text</code>" for non-binds, see also {@link ISqlStyle#PLAIN_BIND_MARKER_PREFIX})
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
@@ -438,33 +439,33 @@ public interface ISqlStyle extends Serializable {
 
   /**
    * <code>P.NAME in (o1,o2,...)</code><br />
-   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
+   * (or "<code>&#38;text</code>" for non-binds, see also {@link ISqlStyle#PLAIN_BIND_MARKER_PREFIX})
    */
   String createInList(String attribute, Object array);
 
   /**
    * <code>P.NAME not in (o1,o2,...)</code><br />
-   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
+   * (or "<code>&#38;text</code>" for non-binds, see also {@link ISqlStyle#PLAIN_BIND_MARKER_PREFIX})
    */
   String createNotInList(String attribute, Object array);
 
   /**
    * <code>P.NAME in (o1,o2,...)</code><br />
-   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
+   * (or "<code>&#38;text</code>" for non-binds, see also {@link ISqlStyle#PLAIN_BIND_MARKER_PREFIX})
    */
   String createInList(String attribute, boolean plain, Object array);
 
   /**
    * <code>P.NAME not in (o1,o2,...)</code><br />
-   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
+   * (or "<code>&#38;text</code>" for non-binds, see also {@link ISqlStyle#PLAIN_BIND_MARKER_PREFIX})
    */
   String createNotInList(String attribute, boolean plain, Object array);
 
   /**
    * Style can handle arrays as bind or as literal replacement.
    *
-   * @return true if calls to {@link ISqlStyle.createInList(String attribute, Object array)} or
-   *         {@link ISqlStyle.createNotInList(String attribute, Object array)} produce SQL binds.
+   * @return true if calls to {@link ISqlStyle#createInList(String, Object)} or
+   *         {@link ISqlStyle#createNotInList(String, Object)} produce SQL binds.
    */
   boolean isCreatingInListGeneratingBind(Object array);
 
@@ -475,29 +476,29 @@ public interface ISqlStyle extends Serializable {
    * </p>
    *
    * <pre>
-   * attribute >= TRUNC(SYSDATE) AND attribute < TRUNC(SYSDATE+1)
+   * attribute &gt;= TRUNC(SYSDATE) AND attribute &lt; TRUNC(SYSDATE+1)
    * </pre>
    */
   String createDateIsToday(String attribute);
 
   /**
    * <code>P.NAME dateIsInLastDays :bindName</code><br />
-   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
+   * (or "<code>&#38;text</code>" for non-binds, see also {@link ISqlStyle#PLAIN_BIND_MARKER_PREFIX})
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
    *
    * <pre>
-   * attribute >= TRUNC(SYSDATE-( :firstBind ))
+   * attribute &gt;= TRUNC(SYSDATE-( :firstBind ))
    * AND
-   * attribute < TRUNC(SYSDATE+1)
+   * attribute &lt; TRUNC(SYSDATE+1)
    * </pre>
    */
   String createDateIsInLastDays(String attribute, String bindName);
 
   /**
    * <code>P.NAME dateIsInNextDays :bindName</code><br />
-   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
+   * (or "<code>&#38;text</code>" for non-binds, see also {@link ISqlStyle#PLAIN_BIND_MARKER_PREFIX})
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
@@ -505,160 +506,160 @@ public interface ISqlStyle extends Serializable {
    * <pre>
    * attribute &gt;= TRUNC(SYSDATE)
    * AND
-   * attribute < TRUNC(SYSDATE+ :firstBind +1)
+   * attribute &lt; TRUNC(SYSDATE+ :firstBind +1)
    * </pre>
    */
   String createDateIsInNextDays(String attribute, String bindName);
 
   /**
    * <code>P.NAME dateIsInDays :bindName</code><br />
-   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
+   * (or "<code>&#38;text</code>" for non-binds, see also {@link ISqlStyle#PLAIN_BIND_MARKER_PREFIX})
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
    *
    * <pre>
-   * attribute >= TRUNC(SYSDATE+ :firstBind )
+   * attribute &gt;= TRUNC(SYSDATE+ :firstBind )
    * AND
-   * attribute < TRUNC(SYSDATE+ :firstBind +1)
+   * attribute &lt; TRUNC(SYSDATE+ :firstBind +1)
    * </pre>
    */
   String createDateIsInDays(String attribute, String bindName);
 
   /**
    * <code>P.NAME dateIsInWeeks :bindName</code><br />
-   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
+   * (or "<code>&#38;text</code>" for non-binds, see also {@link ISqlStyle#PLAIN_BIND_MARKER_PREFIX})
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
    *
    * <pre>
-   * attribute >= TRUNC(SYSDATE+ (( :firstBind ) *7) )
+   * attribute &gt;= TRUNC(SYSDATE+ (( :firstBind ) *7) )
    * AND
-   * attribute < TRUNC(SYSDATE+(( :firstBind ) *7)+1)
+   * attribute &lt; TRUNC(SYSDATE+(( :firstBind ) *7)+1)
    * </pre>
    */
   String createDateIsInWeeks(String attribute, String bindName);
 
   /**
    * <code>P.NAME dateIsInLastMonths :bindName</code><br />
-   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
+   * (or "<code>&#38;text</code>" for non-binds, see also {@link ISqlStyle#PLAIN_BIND_MARKER_PREFIX})
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
    *
    * <pre>
-   * attribute >= TRUNC(ADD_MONTHS(SYSDATE,(-1)*( :firstBind )))
+   * attribute &gt;= TRUNC(ADD_MONTHS(SYSDATE,(-1)*( :firstBind )))
    * AND
-   * attribute < TRUNC(SYSDATE+1)
+   * attribute &lt; TRUNC(SYSDATE+1)
    * </pre>
    */
   String createDateIsInLastMonths(String attribute, String bindName);
 
   /**
    * <code>P.NAME dateIsInNextMonths :bindName</code><br />
-   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
+   * (or "<code>&#38;text</code>" for non-binds, see also {@link ISqlStyle#PLAIN_BIND_MARKER_PREFIX})
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
    *
    * <pre>
-   * attribute >= TRUNC(SYSDATE)
+   * attribute &gt;= TRUNC(SYSDATE)
    * AND
-   * attribute < TRUNC(ADD_MONTHS(SYSDATE, :firstBind )+1)
+   * attribute &lt; TRUNC(ADD_MONTHS(SYSDATE, :firstBind )+1)
    * </pre>
    */
   String createDateIsInNextMonths(String attribute, String bindName);
 
   /**
    * <code>P.NAME dateIsInMonths :bindName</code><br />
-   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
+   * (or "<code>&#38;text</code>" for non-binds, see also {@link ISqlStyle#PLAIN_BIND_MARKER_PREFIX})
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
    *
    * <pre>
-   * attribute >= TRUNC(ADD_MONTHS(SYSDATE, :firstBind ))
+   * attribute &gt;= TRUNC(ADD_MONTHS(SYSDATE, :firstBind ))
    * AND
-   * attribute < TRUNC(ADD_MONTHS(SYSDATE, :firstBind )+1)
+   * attribute &lt; TRUNC(ADD_MONTHS(SYSDATE, :firstBind )+1)
    * </pre>
    */
   String createDateIsInMonths(String attribute, String bindName);
 
   /**
    * <code>P.NAME dateIsInLEDays :bindName</code><br />
-   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
+   * (or "<code>&#38;text</code>" for non-binds, see also {@link ISqlStyle#PLAIN_BIND_MARKER_PREFIX})
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
    *
    * <pre>
-   * attribute < TRUNC(SYSDATE  + :firstBind +1)
+   * attribute &lt; TRUNC(SYSDATE  + :firstBind +1)
    * </pre>
    */
   String createDateIsInLEDays(String attribute, String bindName);
 
   /**
    * <code>P.NAME dateIsInLEWeeks :bindName</code><br />
-   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX} )
+   * (or "<code>&#38;text</code>" for non-binds, see also {@link ISqlStyle#PLAIN_BIND_MARKER_PREFIX} )
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
    *
    * <pre>
-   * attribute < TRUNC(SYSDATE+(( :firstBind )*7)+1)
+   * attribute &lt; TRUNC(SYSDATE+(( :firstBind )*7)+1)
    * </pre>
    */
   String createDateIsInLEWeeks(String attribute, String bindName);
 
   /**
    * <code>P.NAME dateIsInLEMonths :bindName</code><br />
-   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
+   * (or "<code>&#38;text</code>" for non-binds, see also {@link ISqlStyle#PLAIN_BIND_MARKER_PREFIX})
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
    *
    * <pre>
-   * attribute < TRUNC(ADD_MONTHS(SYSDATE, :firstBind )+1)
+   * attribute &lt; TRUNC(ADD_MONTHS(SYSDATE, :firstBind )+1)
    * </pre>
    */
   String createDateIsInLEMonths(String attribute, String bindName);
 
   /**
    * <code>P.NAME dateIsInGEDays :bindName</code><br />
-   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
+   * (or "<code>&#38;text</code>" for non-binds, see also {@link ISqlStyle#PLAIN_BIND_MARKER_PREFIX})
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
    *
    * <pre>
-   * attribute >= TRUNC(SYSDATE  + :firstBind )
+   * attribute &gt;= TRUNC(SYSDATE  + :firstBind )
    * </pre>
    */
   String createDateIsInGEDays(String attribute, String bindName);
 
   /**
    * <code>P.NAME dateIsInGEWeeks :bindName</code><br />
-   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX} )
+   * (or "<code>&#38;text</code>" for non-binds, see also {@link ISqlStyle#PLAIN_BIND_MARKER_PREFIX} )
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
    *
    * <pre>
-   * attribute >= TRUNC(SYSDATE+(( :firstBind )*7))
+   * attribute &gt;= TRUNC(SYSDATE+(( :firstBind )*7))
    * </pre>
    */
   String createDateIsInGEWeeks(String attribute, String bindName);
 
   /**
    * <code>P.NAME dateIsInGEMonths :bindName</code><br />
-   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
+   * (or "<code>&#38;text</code>" for non-binds, see also {@link ISqlStyle#PLAIN_BIND_MARKER_PREFIX})
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
    *
    * <pre>
-   * attribute >=TRUNC(ADD_MONTHS(SYSDATE, :firstBind ))
+   * attribute &gt;=TRUNC(ADD_MONTHS(SYSDATE, :firstBind ))
    * </pre>
    */
   String createDateIsInGEMonths(String attribute, String bindName);
@@ -668,7 +669,7 @@ public interface ISqlStyle extends Serializable {
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
-   * <code>( attribute <TRUNC(SYSDATE) OR attribute >=TRUNC(SYSDATE+1))
+   * <code>( attribute <TRUNC(SYSDATE) OR attribute &gt;=TRUNC(SYSDATE+1))
    * </pre>
    * </p>
    */
@@ -681,27 +682,27 @@ public interface ISqlStyle extends Serializable {
    * </p>
    *
    * <pre>
-   * ( attribute >= TRUNC(SYSDATE, 'MI') AND attribute < (TRUNC(SYSDATE, 'MI')+(1/24/60)))
+   * ( attribute &gt;= TRUNC(SYSDATE, 'MI') AND attribute &lt; (TRUNC(SYSDATE, 'MI')+(1/24/60)))
    * </pre>
    */
   String createDateTimeIsNow(String attribute);
 
   /**
    * <code>P.NAME dateTimeIsInLEMinutes :bindName</code><br />
-   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
+   * (or "<code>&#38;text</code>" for non-binds, see also {@link ISqlStyle#PLAIN_BIND_MARKER_PREFIX})
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
    *
    * <pre>
-   * attribute < (TRUNC(SYSDATE, 'MI')+(( :firstBind +1)/24/60))
+   * attribute &lt; (TRUNC(SYSDATE, 'MI')+(( :firstBind +1)/24/60))
    * </pre>
    */
   String createDateTimeIsInLEMinutes(String attribute, String bindName);
 
   /**
    * <code>P.NAME dateTimeIsInLEHours :bindName</code><br />
-   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
+   * (or "<code>&#38;text</code>" for non-binds, see also {@link ISqlStyle#PLAIN_BIND_MARKER_PREFIX})
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
@@ -714,26 +715,26 @@ public interface ISqlStyle extends Serializable {
 
   /**
    * <code>P.NAME dateTimeIsInGEMinutes :bindName</code><br />
-   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
+   * (or "<code>&#38;text</code>" for non-binds, see also {@link ISqlStyle#PLAIN_BIND_MARKER_PREFIX})
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
    *
    * <pre>
-   * attribute >=(TRUNC(SYSDATE, 'MI')+( :firstBind /24/60))
+   * attribute &gt;=(TRUNC(SYSDATE, 'MI')+( :firstBind /24/60))
    * </pre>
    */
   String createDateTimeIsInGEMinutes(String attribute, String bindName);
 
   /**
    * <code>P.NAME dateTimeIsInGEHours :bindName</code><br />
-   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
+   * (or "<code>&#38;text</code>" for non-binds, see also {@link ISqlStyle#PLAIN_BIND_MARKER_PREFIX})
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
    *
    * <pre>
-   * attribute >= (TRUNC(SYSDATE, 'MI')+( :firstBind /24))
+   * attribute &gt;= (TRUNC(SYSDATE, 'MI')+( :firstBind /24))
    * </pre>
    */
   String createDateTimeIsInGEHours(String attribute, String bindName);
@@ -745,7 +746,7 @@ public interface ISqlStyle extends Serializable {
    * </p>
    *
    * <pre>
-   * ( attribute <TRUNC(SYSDATE, 'MI') OR  attribute >=(TRUNC(SYSDATE, 'MI')+(1/24/60)))
+   * ( attribute <TRUNC(SYSDATE, 'MI') OR  attribute &gt;=(TRUNC(SYSDATE, 'MI')+(1/24/60)))
    * </pre>
    */
   String createDateTimeIsNotNow(String attribute);
@@ -757,9 +758,9 @@ public interface ISqlStyle extends Serializable {
    * </p>
    *
    * <pre>
-   * attribute >= ((TO_CHAR(SYSDATE,'HH24')*60) + TO_CHAR(SYSDATE,'MI'))/24/60</code><br />
+   * attribute &gt;= ((TO_CHAR(SYSDATE,'HH24')*60) + TO_CHAR(SYSDATE,'MI'))/24/60</code><br />
    * AND
-   * attribute < ((TO_CHAR(SYSDATE,'HH24')*60) + TO_CHAR(SYSDATE,'MI')+(1/24/60))/24/60
+   * attribute &lt; ((TO_CHAR(SYSDATE,'HH24')*60) + TO_CHAR(SYSDATE,'MI')+(1/24/60))/24/60
    * </pre>
    */
   String createTimeIsNow(String attribute);
@@ -771,22 +772,22 @@ public interface ISqlStyle extends Serializable {
    * </p>
    *
    * <pre>
-   * attribute < ((TO_CHAR(SYSDATE,'HH24')*60) + TO_CHAR(SYSDATE,'MI'))/24/60</code><br />
+   * attribute &lt; ((TO_CHAR(SYSDATE,'HH24')*60) + TO_CHAR(SYSDATE,'MI'))/24/60</code><br />
    * OR
-   * attribute > ((TO_CHAR(SYSDATE,'HH24')*60)+TO_CHAR(SYSDATE,'MI')+(1/24/60))/24/60
+   * attribute &gt; ((TO_CHAR(SYSDATE,'HH24')*60)+TO_CHAR(SYSDATE,'MI')+(1/24/60))/24/60
    * </pre>
    */
   String createTimeIsNotNow(String attribute);
 
   /**
    * <code>P.NAME timeIsInMinutes :bindName</code><br />
-   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX} )
+   * (or "<code>&#38;text</code>" for non-binds, see also {@link ISqlStyle#PLAIN_BIND_MARKER_PREFIX} )
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
    *
    * <pre>
-   * attribute >=((TO_CHAR(SYSDATE,'HH24')*60) + TO_CHAR(SYSDATE,'MI')+( :firstBind /24/60))/24/60
+   * attribute &gt;=((TO_CHAR(SYSDATE,'HH24')*60) + TO_CHAR(SYSDATE,'MI')+( :firstBind /24/60))/24/60
    * AND
    * attribute <((TO_CHAR(SYSDATE,'HH24')*60)+TO_CHAR(SYSDATE,'MI')+(( :firstBind +1)/24/60))/24/60
    * </pre>
@@ -795,13 +796,13 @@ public interface ISqlStyle extends Serializable {
 
   /**
    * <code>P.NAME timeIsInHours :bindName</code><br />
-   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
+   * (or "<code>&#38;text</code>" for non-binds, see also {@link ISqlStyle#PLAIN_BIND_MARKER_PREFIX})
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
    *
    * <pre>
-   * attribute >=((TO_CHAR(SYSDATE,'HH24')*60) + TO_CHAR(SYSDATE,'MI')+( :firstBind /24))/24/60
+   * attribute &gt;=((TO_CHAR(SYSDATE,'HH24')*60) + TO_CHAR(SYSDATE,'MI')+( :firstBind /24))/24/60
    * AND
    * attribute <((TO_CHAR(SYSDATE,'HH24')*60)+TO_CHAR(SYSDATE,'MI')+( :firstBind /24)+(1/24/60))/24/60
    * </pre>
@@ -810,7 +811,7 @@ public interface ISqlStyle extends Serializable {
 
   /**
    * <code>P.NAME timeIsInLEMinutes :bindName</code><br />
-   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
+   * (or "<code>&#38;text</code>" for non-binds, see also {@link ISqlStyle#PLAIN_BIND_MARKER_PREFIX})
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
@@ -823,7 +824,7 @@ public interface ISqlStyle extends Serializable {
 
   /**
    * <code>P.NAME timeIsInLEHours :bindName</code><br />
-   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX} )
+   * (or "<code>&#38;text</code>" for non-binds, see also {@link ISqlStyle#PLAIN_BIND_MARKER_PREFIX} )
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
@@ -836,33 +837,33 @@ public interface ISqlStyle extends Serializable {
 
   /**
    * <code>P.NAME timeIsInGEMinutes :bindName</code><br />
-   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
+   * (or "<code>&#38;text</code>" for non-binds, see also {@link ISqlStyle#PLAIN_BIND_MARKER_PREFIX})
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
    *
    * <pre>
-   * attribute >=((TO_CHAR(SYSDATE,'HH24')*60) + TO_CHAR(SYSDATE,'MI')+( :firstBind /24/60))/24/60
+   * attribute &gt;=((TO_CHAR(SYSDATE,'HH24')*60) + TO_CHAR(SYSDATE,'MI')+( :firstBind /24/60))/24/60
    * </pre>
    */
   String createTimeIsInGEMinutes(String attribute, String bindName);
 
   /**
    * <code>P.NAME timeIsInGEHours :bindName</code><br />
-   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX} )
+   * (or "<code>&#38;text</code>" for non-binds, see also {@link ISqlStyle#PLAIN_BIND_MARKER_PREFIX} )
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
    *
    * <pre>
-   * attribute >=((TO_CHAR(SYSDATE,'HH24')*60) + TO_CHAR(SYSDATE,'MI')+( :firstBind /24))/24/60
+   * attribute &gt;=((TO_CHAR(SYSDATE,'HH24')*60) + TO_CHAR(SYSDATE,'MI')+( :firstBind /24))/24/60
    * </pre>
    */
   String createTimeIsInGEHours(String attribute, String bindName);
 
   /**
    * <code>P.NAME = :bindName</code><br />
-   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
+   * (or "<code>&#38;text</code>" for non-binds, see also {@link ISqlStyle#PLAIN_BIND_MARKER_PREFIX})
    * <p>
    * for dates use {@link #createDateEQ(String, String)} and {@link #createDateTimeEQ(String, String)}
    * </p>
@@ -878,7 +879,7 @@ public interface ISqlStyle extends Serializable {
 
   /**
    * <code>P.EVT_CREATED= :bindName</code><br />
-   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
+   * (or "<code>&#38;text</code>" for non-binds, see also {@link ISqlStyle#PLAIN_BIND_MARKER_PREFIX})
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
@@ -891,7 +892,7 @@ public interface ISqlStyle extends Serializable {
 
   /**
    * <code>P.EVT_CREATED = :bindName</code><br />
-   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
+   * (or "<code>&#38;text</code>" for non-binds, see also {@link ISqlStyle#PLAIN_BIND_MARKER_PREFIX})
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
@@ -904,7 +905,7 @@ public interface ISqlStyle extends Serializable {
 
   /**
    * <code>P.NAME <> :bindName</code><br />
-   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
+   * (or "<code>&#38;text</code>" for non-binds, see also {@link ISqlStyle#PLAIN_BIND_MARKER_PREFIX})
    * <p>
    * for dates use {@link #createDateNEQ(String, String)} and {@link #createDateTimeNEQ(String, String)}
    * </p>
@@ -920,7 +921,7 @@ public interface ISqlStyle extends Serializable {
 
   /**
    * <code>P.EVT_CREATED<> :bindName</code><br />
-   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
+   * (or "<code>&#38;text</code>" for non-binds, see also {@link ISqlStyle#PLAIN_BIND_MARKER_PREFIX})
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
@@ -933,7 +934,7 @@ public interface ISqlStyle extends Serializable {
 
   /**
    * <code>P.EVT_CREATED <> :bindName</code><br />
-   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
+   * (or "<code>&#38;text</code>" for non-binds, see also {@link ISqlStyle#PLAIN_BIND_MARKER_PREFIX})
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
@@ -945,8 +946,8 @@ public interface ISqlStyle extends Serializable {
   String createDateTimeNEQ(String attribute, String bindName);
 
   /**
-   * <code>P.NAME < :bindName</code><br />
-   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
+   * <code>P.NAME &lt; :bindName</code><br />
+   * (or "<code>&#38;text</code>" for non-binds, see also {@link ISqlStyle#PLAIN_BIND_MARKER_PREFIX})
    * <p>
    * for dates use {@link #createDateLT(String, String)} and {@link #createDateTimeLT(String, String)}
    * </p>
@@ -955,40 +956,40 @@ public interface ISqlStyle extends Serializable {
    * </p>
    *
    * <pre>
-   * attribute < :firstBind
+   * attribute &lt; :firstBind
    * </pre>
    */
   String createLT(String attribute, String bindName);
 
   /**
-   * <code>P.EVT_CREATED < :bindName</code><br />
-   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
+   * <code>P.EVT_CREATED &lt; :bindName</code><br />
+   * (or "<code>&#38;text</code>" for non-binds, see also {@link ISqlStyle#PLAIN_BIND_MARKER_PREFIX})
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
    *
    * <pre>
-   * attribute < TRUNC( :firstBind )
+   * attribute &lt; TRUNC( :firstBind )
    * </pre>
    */
   String createDateLT(String attribute, String bindName);
 
   /**
-   * <code>P.EVT_CREATED < :bindName</code><br />
-   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
+   * <code>P.EVT_CREATED &lt; :bindName</code><br />
+   * (or "<code>&#38;text</code>" for non-binds, see also {@link ISqlStyle#PLAIN_BIND_MARKER_PREFIX})
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
    *
    * <pre>
-   * attribute < TRUNC( :firstBind ,'MI')
+   * attribute &lt; TRUNC( :firstBind ,'MI')
    * </pre>
    */
   String createDateTimeLT(String attribute, String bindName);
 
   /**
    * <code>P.NAME <= :bindName</code><br />
-   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
+   * (or "<code>&#38;text</code>" for non-binds, see also {@link ISqlStyle#PLAIN_BIND_MARKER_PREFIX})
    * <p>
    * for dates use {@link #createDateLE(String, String)} and {@link #createDateTimeLE(String, String)}
    * </p>
@@ -1004,7 +1005,7 @@ public interface ISqlStyle extends Serializable {
 
   /**
    * <code>P.EVT_CREATED <= :bindName</code><br />
-   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
+   * (or "<code>&#38;text</code>" for non-binds, see also {@link ISqlStyle#PLAIN_BIND_MARKER_PREFIX})
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
@@ -1017,7 +1018,7 @@ public interface ISqlStyle extends Serializable {
 
   /**
    * <code>P.EVT_CREATED <= :bindName</code><br />
-   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
+   * (or "<code>&#38;text</code>" for non-binds, see also {@link ISqlStyle#PLAIN_BIND_MARKER_PREFIX})
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
@@ -1029,8 +1030,8 @@ public interface ISqlStyle extends Serializable {
   String createDateTimeLE(String attribute, String bindName);
 
   /**
-   * <code>P.NAME > :bindName</code><br />
-   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
+   * <code>P.NAME &gt; :bindName</code><br />
+   * (or "<code>&#38;text</code>" for non-binds, see also {@link ISqlStyle#PLAIN_BIND_MARKER_PREFIX})
    * <p>
    * for dates use {@link #createDateGT(String, String)} and {@link #createDateTimeGT(String, String)}
    * </p>
@@ -1039,40 +1040,40 @@ public interface ISqlStyle extends Serializable {
    * </p>
    *
    * <pre>
-   * attribute > :firstBind
+   * attribute &gt; :firstBind
    * </pre>
    */
   String createGT(String attribute, String bindName);
 
   /**
-   * <code>P.EVT_CREATED > :bindName</code><br />
-   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
+   * <code>P.EVT_CREATED &gt; :bindName</code><br />
+   * (or "<code>&#38;text</code>" for non-binds, see also {@link ISqlStyle#PLAIN_BIND_MARKER_PREFIX})
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
    *
    * <pre>
-   * attribute > TRUNC( :firstBind )
+   * attribute &gt; TRUNC( :firstBind )
    * </pre>
    */
   String createDateGT(String attribute, String bindName);
 
   /**
-   * <code>P.EVT_CREATED > :bindName</code><br />
-   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
+   * <code>P.EVT_CREATED &gt; :bindName</code><br />
+   * (or "<code>&#38;text</code>" for non-binds, see also {@link ISqlStyle#PLAIN_BIND_MARKER_PREFIX})
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
    *
    * <pre>
-   * attribute > TRUNC( :firstBind ,'MI')
+   * attribute &gt; TRUNC( :firstBind ,'MI')
    * </pre>
    */
   String createDateTimeGT(String attribute, String bindName);
 
   /**
-   * <code>P.NAME >= :bindName</code><br />
-   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
+   * <code>P.NAME &gt;= :bindName</code><br />
+   * (or "<code>&#38;text</code>" for non-binds, see also {@link ISqlStyle#PLAIN_BIND_MARKER_PREFIX})
    * <p>
    * for dates use {@link #createDateGE(String, String)} and {@link #createDateTimeGE(String, String)}
    * </p>
@@ -1081,33 +1082,33 @@ public interface ISqlStyle extends Serializable {
    * </p>
    *
    * <pre>
-   * attribute >= :firstBind
+   * attribute &gt;= :firstBind
    * </pre>
    */
   String createGE(String attribute, String bindName);
 
   /**
-   * <code>P.EVT_CREATED >= :bindName</code><br />
-   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
+   * <code>P.EVT_CREATED &gt;= :bindName</code><br />
+   * (or "<code>&#38;text</code>" for non-binds, see also {@link ISqlStyle#PLAIN_BIND_MARKER_PREFIX})
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
    *
    * <pre>
-   * attribute >= TRUNC( :firstBind )
+   * attribute &gt;= TRUNC( :firstBind )
    * </pre>
    */
   String createDateGE(String attribute, String bindName);
 
   /**
-   * <code>P.EVT_CREATED >= :bindName</code><br />
-   * (or "<code>&text</code>" for non-binds, see also {@link #PLAIN_BIND_MARKER_PREFIX})
+   * <code>P.EVT_CREATED &gt;= :bindName</code><br />
+   * (or "<code>&#38;text</code>" for non-binds, see also {@link ISqlStyle#PLAIN_BIND_MARKER_PREFIX})
    * <p>
    * In an Oracle implementation this could be represented as
    * </p>
    *
    * <pre>
-   * attribute >= TRUNC( :firstBind ,'MI')
+   * attribute &gt;= TRUNC( :firstBind ,'MI')
    * </pre>
    */
   String createDateTimeGE(String attribute, String bindName);

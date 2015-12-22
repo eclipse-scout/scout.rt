@@ -48,11 +48,13 @@ public final class ServerRunContexts {
 
   /**
    * Creates an empty {@link ServerRunContext}.
-   *
-   * @RunMonitor a new {@link RunMonitor} is created. However, even if there is a current {@link RunMonitor}, it is NOT
-   *             registered as child monitor, meaning that it will not be cancelled once the current {@link RunMonitor}
-   *             is cancelled.
-   * @TransactionScope {@link TransactionScope#REQUIRES_NEW}.
+   * <p>
+   * <strong>RunMonitor</strong><br>
+   * a new {@link RunMonitor} is created. However, even if there is a current {@link RunMonitor}, it is NOT registered
+   * as child monitor, meaning that it will not be cancelled once the current {@link RunMonitor} is cancelled.
+   * <p>
+   * <strong>TransactionScope</strong><br>
+   * {@link TransactionScope#REQUIRES_NEW}.
    */
   public static final ServerRunContext empty() {
     final ServerRunContext runContext = BEANS.get(ServerRunContext.class);
@@ -62,17 +64,21 @@ public final class ServerRunContexts {
 
   /**
    * Creates a "snapshot" of the current calling server context.
-   *
-   * @RunMonitor a new {@link RunMonitor} is created, and if the current calling context contains a {@link RunMonitor},
-   *             it is also registered within that {@link RunMonitor}. That makes the <i>returned</i> {@link RunContext}
-   *             to be cancelled as well once the current calling {@link RunContext} is cancelled, but DOES NOT cancel
-   *             the current calling {@link RunContext} if the <i>returned</i> {@link RunContext} is cancelled.
-   * @Transaction the {@link RunContext} returned contains the transaction of the current calling context. However, by
-   *              default, {@link TransactionScope} is set to {@link TransactionScope#REQUIRES_NEW}, meaning that when
-   *              executing the runnable, a new transaction is created, and therefore committed or rolled back upon
-   *              completion. To work on behalf of the current transaction, set the scope to
-   *              {@link TransactionScope#MANDATORY}.
-   * @TransactionScope {@link TransactionScope#REQUIRES_NEW}.
+   * <p>
+   * <strong>RunMonitor</strong><br>
+   * a new {@link RunMonitor} is created, and if the current calling context contains a {@link RunMonitor}, it is also
+   * registered within that {@link RunMonitor}. That makes the <i>returned</i> {@link RunContext} to be cancelled as
+   * well once the current calling {@link RunContext} is cancelled, but DOES NOT cancel the current calling
+   * {@link RunContext} if the <i>returned</i> {@link RunContext} is cancelled.
+   * <p>
+   * <strong>Transaction</strong><br>
+   * the {@link RunContext} returned contains the transaction of the current calling context. However, by default,
+   * {@link TransactionScope} is set to {@link TransactionScope#REQUIRES_NEW}, meaning that when executing the runnable,
+   * a new transaction is created, and therefore committed or rolled back upon completion. To work on behalf of the
+   * current transaction, set the scope to {@link TransactionScope#MANDATORY}.
+   * <p>
+   * <strong>TransactionScope</strong><br>
+   * {@link TransactionScope#REQUIRES_NEW}.
    */
   public static ServerRunContext copyCurrent() {
     final ServerRunContext runContext = BEANS.get(ServerRunContext.class);

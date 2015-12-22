@@ -42,4 +42,4 @@ echo ''
 # Parallel executions of maven modules and tests.
 # Half of CPU core are used in to keep other half for OS and other programs.
 
-mvn clean install -T0.5C -B -e -DskipTests=true -Pdev $*
+mvn clean install -T0.5C -B -e -DskipTests=true -Pdev -f org.eclipse.scout.rt $*

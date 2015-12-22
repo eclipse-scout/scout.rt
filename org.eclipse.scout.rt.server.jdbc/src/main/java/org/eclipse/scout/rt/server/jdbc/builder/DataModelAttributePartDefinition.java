@@ -142,13 +142,13 @@ public class DataModelAttributePartDefinition implements DataModelConstants {
    * @return the result; empty {@link EntityContribution} if that part is to be ignored
    *         <p>
    *         default calls
-   *         {@link FormDataStatementBuilder2#createAttributePart(AttributeStrategy, Integer, String, int, List, List, boolean, Map)}
+   *         {@link FormDataStatementBuilder#createAttributePart(AttributeStrategy, Integer, String, int, List, List, boolean, Map)}
    *         <p>
    *         Can make use of alias markers such as @Person@.LAST_NAME, these are resolved in the
-   *         {@link FormDataStatementBuilder2}
+   *         {@link FormDataStatementBuilder}
    *         <p>
    *         Additional bind values - other than the parameter bindNames/bindValues - must be added using
-   *         {@link FormDataStatementBuilder2#addBind(String, Object)}
+   *         {@link FormDataStatementBuilder#addBind(String, Object)}
    */
   public EntityContribution createInstance(FormDataStatementBuilder builder, ComposerAttributeNodeData attributeNodeData, AttributeStrategy strategy, String stm, List<String> bindNames, List<Object> bindValues,
       Map<String, String> parentAliasMap) {

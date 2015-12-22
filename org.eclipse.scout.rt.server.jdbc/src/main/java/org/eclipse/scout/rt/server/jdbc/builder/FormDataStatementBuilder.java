@@ -51,16 +51,15 @@ import org.slf4j.LoggerFactory;
  * <pre>
  * Usage:
  * <ul>
- * <li>call {@link #setDataModelEntityDefinition(Class, String, boolean)}, {@link #setDataModelAttributeDefinition(Class, String, boolean)} and {@link #addStatementMapping(Class, String, int, int, boolean)}
- * for all member classes in the FormData</li>
+ * <li>call {@link #setDataModelEntityDefinition(Class, String)}, {@link #setDataModelAttributeDefinition(Class, String, boolean)} for all member classes in the FormData</li>
  * <li>call {@link #build(AbstractFormData)}</li>
  * <li>add {@link #getWhereConstraints()} to the base sql statement (starts with an AND)</li>
  * <li>add {@link #getBindMap()} to the sql bind bases</li>
  * </pre>
  * <p>
- * The method {@link #buildComposerEntityNode(ComposerEntityNodeData)} corrects composer trees for correct handling of
- * zero-traversing aggregation attributes and normal attributes using
- * {@link #isZeroTraversingAttribute(ComposerAttributeNodeData)}.<br>
+ * The method {@link #buildComposerEntityNodeContribution(ComposerEntityNodeData, EntityStrategy)} corrects composer
+ * trees for correct handling of zero-traversing aggregation attributes and normal attributes using
+ * {@link #isZeroTraversingAttribute(int, Object[])}.<br>
  * An attribute is zero-traversing when it contains 0 and therefore null/non-existence together with the operator &lt;,
  * &gt;, &lt;=, &gt;=, =, !=, &lt;&gt;, between. Only numeric attributes can be zero-traversing. Dates never are.
  * <p>
@@ -112,8 +111,6 @@ import org.slf4j.LoggerFactory;
  * Zero-traversing non aggregation attributes are simply wrapped using NLV(attribute).
  * <p>
  * That way non-existent matches are added to the result, which matches the expected behaviour.
- * 
- * @author Ivan Motsch
  */
 public class FormDataStatementBuilder implements DataModelConstants {
   private static final Logger LOG = LoggerFactory.getLogger(FormDataStatementBuilder.class);
@@ -126,14 +123,14 @@ public class FormDataStatementBuilder implements DataModelConstants {
   public static enum AttributeStrategy {
     /**
      * Assuming the constraint "SALARY &gt;= 1000" and the attribute statement
-     * 
+     *
      * <pre>
      * &lt;attribute&gt;@Person@.SALARY&lt;/attribute&gt;
      * AND ACTIVE=1
      * </pre>
-     * 
+     *
      * this strategy only creates the contraint of the attribute part
-     * 
+     *
      * <pre>
      * {@link EntityContribution#getWhereParts()} = SALARY&gt;=1000
      * </pre>
@@ -141,14 +138,14 @@ public class FormDataStatementBuilder implements DataModelConstants {
     BuildConstraintOfAttribute,
     /**
      * Assuming the constraint "SALARY &gt;= 1000" and the attribute statement
-     * 
+     *
      * <pre>
      * &lt;attribute&gt;@Person@.SALARY&lt;/attribute&gt;
      * AND ACTIVE=1
      * </pre>
-     * 
+     *
      * this strategy only creates the contraint of the context (excluding the attribute)
-     * 
+     *
      * <pre>
      * {@link EntityContribution#getWhereParts()} = ACTIVE=1
      * </pre>
@@ -156,14 +153,14 @@ public class FormDataStatementBuilder implements DataModelConstants {
     BuildConstraintOfContext,
     /**
      * Assuming the constraint "SALARY &gt;= 1000" and the attribute statement
-     * 
+     *
      * <pre>
      * &lt;attribute&gt;@Person@.SALARY&lt;/attribute&gt;
      * AND ACTIVE=1
      * </pre>
-     * 
+     *
      * this strategy creates the contraint of the context and the attribute
-     * 
+     *
      * <pre>
      * {@link EntityContribution#getWhereParts()} = SALARY&gt;=1000 AND ACTIVE=1
      * </pre>
@@ -171,14 +168,14 @@ public class FormDataStatementBuilder implements DataModelConstants {
     BuildConstraintOfAttributeWithContext,
     /**
      * Assuming the query "SALARY" and the attribute statement
-     * 
+     *
      * <pre>
      * &lt;attribute&gt;@Person@.SALARY&lt;/attribute&gt;
      * AND ACTIVE=1
      * </pre>
-     * 
+     *
      * this strategy creates the select query part of the attribute and adds constraints for the context
-     * 
+     *
      * <pre>
      * {@link EntityContribution#getSelectParts()} = SALARY
      * {@link EntityContribution#getWhereParts()} = ACTIVE=1
@@ -238,7 +235,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
   /**
    * @return true to consume child contributions by this entity. Default returns true. If the entity is a 1:1 or 1:0
    *         relation to its base and its sql contribution is just a join clause or similar, this method must return
-   *         false to let the parent entity colelct all parts. Use <code>return 
+   *         false to let the parent entity colelct all parts. Use <code>return
    *         {@link IDataModelEntity#isOneToMany()}</code> when such behaviour is implemented.
    */
   protected boolean isConsumeChildContributions(EntityPath ePath) {
@@ -306,8 +303,8 @@ public class FormDataStatementBuilder implements DataModelConstants {
   }
 
   /**
-   * @returns the reference to the sequence provider to be used outside for additional sequenced items or sub statemet
-   *          builders
+   * @return the reference to the sequence provider to be used outside for additional sequenced items or sub statemet
+   *         builders
    */
   public AtomicInteger getSequenceProvider() {
     return m_sequenceProvider;
@@ -518,7 +515,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
   /**
    * Creates a select statement by merging the given entity contributions with the given base statement. This builder's
    * {@link #getWhereConstraints()} are added as well.
-   * 
+   *
    * @param stm
    *          base statement with &lt;selectParts/&gt;, &lt;fromParts/&gt;, &lt;whereParts/&gt;, &lt;groupByParts/&gt;
    *          or &lt;havingParts/&gt; place holders.
@@ -1147,8 +1144,9 @@ public class FormDataStatementBuilder implements DataModelConstants {
    * the contributing tags are missing, the complete part is treated as 'select' on {@link EntityStrategy#BuildQuery}
    * and as 'where' on {@link EntityStrategy#BuildConstraints}
    * <p>
-   * Default calls {@link EntityContributionUtility#createEntityPart(String, EntityContribution, boolean)}
-   * 
+   * Default calls
+   * {@link EntityContributionUtility#mergeContributions(EntityStrategy, String, EntityContribution, boolean)}
+   *
    * @param entityStrategy
    * @param entityPartWithTags
    *          may contain the collecting tags selectParts, fromParts, whereParts, groupBy, groupByParts, havingParts
@@ -1175,7 +1173,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
   /**
    * only used with strategy {@link EntityStrategy#BuildConstraints}
    * <p>
-   * 
+   *
    * @return the statement combined with the contributions
    */
   public String createEntityPart(String stm, boolean negative, EntityContribution childContributions) {
@@ -1217,7 +1215,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
   /**
    * Check if a group by part is valid, i.e. ist not a SELECT clause. default uses
    * {@link EntityContributionUtility#checkGroupByPart(String)}
-   * 
+   *
    * @throws ProcessingException
    *           with {@link IStatus#getCode()} = X
    * @since 3.8
@@ -1230,7 +1228,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
    * adding an attribute as an entity contribution
    * <p>
    * Evaluates the tags in the attribute statement and creates an {@link EntityContribution} based on it.
-   * 
+   *
    * @param stm
    *          may contain attribute, fromPart and wherePart tags
    */
@@ -1426,7 +1424,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
   /**
    * adding an attribute as an entity contribution
    * <p>
-   * 
+   *
    * @param stm
    *          may contain attribute, fromPart and wherePart tags
    */
@@ -1441,7 +1439,7 @@ public class FormDataStatementBuilder implements DataModelConstants {
   /**
    * Create sql text, makes bind names unique, and adds all binds to the bind map
    * <p>
-   * Convenience for {@link #createSqlPart(AGGREGATION_NONE, String, OPERATOR_NONE, List, List, boolean, Map)}
+   * Convenience for <code>createSqlPart(AGGREGATION_NONE, String, OPERATOR_NONE, List, List, boolean, Map)</code>
    */
   public String createSqlPart(String sql, List<String> bindNames, List<Object> bindValues, final boolean plainBind, Map<String, String> parentAliasMap) {
     return createSqlPart(AGGREGATION_NONE, sql, OPERATOR_NONE, bindNames, bindValues, plainBind, parentAliasMap);

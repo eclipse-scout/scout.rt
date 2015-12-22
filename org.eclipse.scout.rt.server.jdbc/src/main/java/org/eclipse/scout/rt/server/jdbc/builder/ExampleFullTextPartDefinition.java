@@ -19,13 +19,15 @@ import org.eclipse.scout.rt.shared.data.model.DataModelConstants;
  * Example handler that demonstrates custom part building for a full-text search field based on a oracle database with
  * full-text engine.
  * <p>
- * the part is registered with {@link FormDataStatementBuilder#setPartDefinition(Class, new
- * PartDefinition("LAST_NAME"))}
+ * the part is registered with
+ * <code>FormDataStatementBuilder.setBasicDefinition(Class, new PartDefinition("LAST_NAME"))</code> see
+ * {@link FormDataStatementBuilder#setBasicDefinition(Class, String, int)}
  */
 public class ExampleFullTextPartDefinition extends BasicPartDefinition {
 
   /**
-   * @param attribute
+   * @param fieldType
+   * @param sqlAttribute
    */
   public ExampleFullTextPartDefinition(Class fieldType, String sqlAttribute) {
     super(fieldType, sqlAttribute, DataModelConstants.OPERATOR_NONE);

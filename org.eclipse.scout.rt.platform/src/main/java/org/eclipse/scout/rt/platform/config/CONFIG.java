@@ -25,7 +25,7 @@ public final class CONFIG {
 
   /**
    * Gets the configured value of the given {@link IConfigProperty}. If no value is configured the default of the
-   * property is returned ({@link IConfigProperty#getDefaultValue()}).
+   * property is returned ({@link IConfigProperty#getValue()}).
    *
    * @param clazz
    *          the config class

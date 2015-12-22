@@ -112,7 +112,6 @@ public class AliasMapper {
    *          </ul>
    * @param alias
    *          for example p, t etc.
-   * @return the alias for the root entity
    */
   public void setRootAlias(String entityName, String alias) {
     m_rootAliases.put(cleanEntityName(entityName), alias);
@@ -162,7 +161,6 @@ public class AliasMapper {
    *          </ul>
    * @param alias
    *          for example p, t etc.
-   * @return the alias for the node entity
    */
   public void setNodeAlias(Object node, String entityName, String alias) {
     Map<String, String> map = m_nodeAliases.get(node);

@@ -125,7 +125,7 @@ public class RunContext implements IAdaptable {
    * Method invoked to contribute to the {@link CallableChain} to initialize this context. Overwrite this method to
    * contribute some behavior to the context.
    * <p>
-   * Contributions are plugged according to the design pattern: 'chain-of-responsibility'.<br/>
+   * Contributions are plugged according to the design pattern: 'chain-of-responsibility'.<br>
    * To contribute to the end of the chain (meaning that you are invoked <strong>after</strong> the contributions of
    * super classes and therefore can base on their contributed functionality), you can use constructions of the
    * following form:
@@ -328,11 +328,12 @@ public class RunContext implements IAdaptable {
 
   /**
    * Method invoked to fill this {@link RunContext} with values from the current calling {@link RunContext}.
-   *
-   * @RunMonitor a new {@link RunMonitor} is created, and if the current calling context contains a {@link RunMonitor},
-   *             it is also registered within that {@link RunMonitor}. That makes the <i>returned</i> {@link RunContext}
-   *             to be cancelled as well once the current calling {@link RunContext} is cancelled, but DOES NOT cancel
-   *             the current calling {@link RunContext} if the <i>returned</i> {@link RunContext} is cancelled.
+   * <p>
+   * <strong>RunMonitor</strong><br>
+   * a new {@link RunMonitor} is created, and if the current calling context contains a {@link RunMonitor}, it is also
+   * registered within that {@link RunMonitor}. That makes the <i>returned</i> {@link RunContext} to be cancelled as
+   * well once the current calling {@link RunContext} is cancelled, but DOES NOT cancel the current calling
+   * {@link RunContext} if the <i>returned</i> {@link RunContext} is cancelled.
    */
   protected void fillCurrentValues() {
     m_subject = Subject.getSubject(AccessController.getContext());
@@ -355,10 +356,10 @@ public class RunContext implements IAdaptable {
 
   /**
    * Method invoked to fill this {@link RunContext} with empty values.
-   *
-   * @RunMonitor a new {@link RunMonitor} is created. However, even if there is a current {@link RunMonitor}, it is NOT
-   *             registered as child monitor, meaning that it will not be cancelled once the current {@link RunMonitor}
-   *             is cancelled.
+   * <p>
+   * <strong>RunMonitor</strong><br>
+   * a new {@link RunMonitor} is created. However, even if there is a current {@link RunMonitor}, it is NOT registered
+   * as child monitor, meaning that it will not be cancelled once the current {@link RunMonitor} is cancelled.
    */
   protected void fillEmptyValues() {
     m_subject = null;

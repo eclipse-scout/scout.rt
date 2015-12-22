@@ -49,7 +49,7 @@ public class EventListenerList implements IEventListenerSource {
   }
 
   /**
-   * @returns the listener in reverse order in which they were added
+   * @return the listener in reverse order in which they were added
    */
   @SuppressWarnings("unchecked")
   public <T extends EventListener> T[] getListeners(Class<T> t) {
@@ -171,8 +171,8 @@ public class EventListenerList implements IEventListenerSource {
   }
 
   /**
-   * Do not call this method directly, it must be called from within a listener synchronized block
-   * (e.g. use listenerListLock).
+   * Do not call this method directly, it must be called from within a listener synchronized block (e.g. use
+   * listenerListLock).
    */
   private <T extends EventListener> boolean removeInternal(Class<T> t, T listener) {
     if (listener == null) {

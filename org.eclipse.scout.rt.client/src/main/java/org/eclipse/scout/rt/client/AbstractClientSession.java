@@ -265,7 +265,7 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
    * The default implementation looks in the current calling context for the URL. Typically, that URL is set only during
    * session initialization.
    *
-   * @see UiSession.createAndStartClientSession()
+   * @see org.eclipse.scout.rt.ui.html.UiSession#createAndStartClientSession()
    */
   protected URI resolveBrowserUri() {
     String url = PropertyMap.CURRENT.get().get("url");
