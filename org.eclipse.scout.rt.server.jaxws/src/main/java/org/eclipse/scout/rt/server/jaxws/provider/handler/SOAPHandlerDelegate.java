@@ -20,15 +20,15 @@ import org.eclipse.scout.rt.platform.annotations.Internal;
 import org.eclipse.scout.rt.server.jaxws.provider.annotation.Handler;
 
 /**
- * {@link HandlerProxy} to proxy a {@link SOAPHandler}.
+ * Like {@link HandlerDelegate}, but to be used for {@link SOAPHandler}.
  *
- * @see HandlerProxy
+ * @see HandlerDelegate
  * @since 5.1
  */
 @Internal
-public class SOAPHandlerProxy extends HandlerProxy<SOAPMessageContext> implements SOAPHandler<SOAPMessageContext> {
+public class SOAPHandlerDelegate extends HandlerDelegate<SOAPMessageContext> implements SOAPHandler<SOAPMessageContext> {
 
-  public SOAPHandlerProxy(final Handler handlerAnnotation) {
+  public SOAPHandlerDelegate(final Handler handlerAnnotation) {
     super(handlerAnnotation);
   }
 

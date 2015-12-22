@@ -22,6 +22,7 @@ import javax.xml.ws.handler.Handler;
 import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.http.HTTPException;
 
+import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IBeanManager;
 import org.eclipse.scout.rt.platform.annotations.Internal;
@@ -39,19 +40,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class proxies a JAX-WS handler to be installed on provider side, and adds the following functionality:
- * <ul>
- * <li>Adds support for 'init-params' to initialize the handler (not supported by JAX-WS specification).</li>
- * <li>Runs the handler's methods on behalf of a {@link RunContext} if annotated with {@link RunWithRunContext}
- * annotation.</li>
- * <li>Obtains the concrete handler instance from {@link IBeanManager}.</li>
- * </ul>
+ * Wraps a JAX-WS handler, so that the handler can be invoked from within {@link RunContext}. The invocation is done via
+ * {@link IBeanManager}, meaning that the handler is to be annotated with {@link ApplicationScoped} annotation. Also,
+ * this class adds support to inject <em>init parameters</em> to the handler.
+ * <p>
+ * To be invoked in a {@link RunContext}, annotate the handler with {@link RunWithRunContext} annotation.
  *
  * @since 5.1
  */
-public class HandlerProxy<CONTEXT extends MessageContext> implements Handler<CONTEXT> {
+public class HandlerDelegate<CONTEXT extends MessageContext> implements Handler<CONTEXT> {
 
-  private static final Logger LOG = LoggerFactory.getLogger(HandlerProxy.class);
+  private static final Logger LOG = LoggerFactory.getLogger(HandlerDelegate.class);
 
   private static final Subject HANDLER_SUBJECT = CONFIG.getPropertyValue(JaxWsHandlerSubjectProperty.class);
 
@@ -60,7 +59,7 @@ public class HandlerProxy<CONTEXT extends MessageContext> implements Handler<CON
   private final RunContextProducer m_handlerRunContextProducer;
 
   @SuppressWarnings("unchecked")
-  public HandlerProxy(final org.eclipse.scout.rt.server.jaxws.provider.annotation.Handler handlerAnnotation) {
+  public HandlerDelegate(final org.eclipse.scout.rt.server.jaxws.provider.annotation.Handler handlerAnnotation) {
     m_handler = BEANS.get(ClazzUtil.resolve(handlerAnnotation.value(), Handler.class, "@Handler.value"));
 
     final RunWithRunContext runHandleWithRunContext = m_handler.getClass().getAnnotation(RunWithRunContext.class);

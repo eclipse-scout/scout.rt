@@ -36,7 +36,7 @@ import org.eclipse.scout.rt.server.jaxws.provider.auth.method.IAuthenticationMet
  * If {@link IAuthenticationMethod} is set, an {@link AuthenticationHandler} is generated at compile time (APT) and
  * registered in the handler chain as very first handler.
  *
- * @see JaxWsPortTypeProxy
+ * @see WebServiceEntryPoint
  * @since 5.1
  */
 @Documented

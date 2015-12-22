@@ -23,7 +23,7 @@ import org.eclipse.scout.rt.server.jaxws.handler.LogHandler;
 import org.eclipse.scout.rt.server.jaxws.implementor.JaxWsImplementorSpecifics;
 import org.eclipse.scout.rt.server.jaxws.implementor.JaxWsMetroSpecifics;
 import org.eclipse.scout.rt.server.jaxws.provider.auth.method.BasicAuthenticationMethod;
-import org.eclipse.scout.rt.server.jaxws.provider.handler.HandlerProxy;
+import org.eclipse.scout.rt.server.jaxws.provider.handler.HandlerDelegate;
 
 /**
  * 'config.properties' used in JAX-WS RT.
@@ -51,7 +51,7 @@ public final class JaxWsConfigProperties {
 
   /**
    * Technical {@link Subject} used to invoke JAX-WS handlers if the request is not authenticated yet; used by
-   * {@link HandlerProxy}.
+   * {@link HandlerDelegate}.
    */
   public static class JaxWsHandlerSubjectProperty extends AbstractSubjectConfigProperty {
 

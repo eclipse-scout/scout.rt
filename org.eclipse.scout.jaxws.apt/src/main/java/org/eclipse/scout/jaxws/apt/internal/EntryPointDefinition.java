@@ -34,44 +34,44 @@ import org.eclipse.scout.rt.server.commons.authentication.ICredentialVerifier;
 import org.eclipse.scout.rt.server.jaxws.provider.annotation.Authentication;
 import org.eclipse.scout.rt.server.jaxws.provider.annotation.Authentication.NullAuthenticationMethod;
 import org.eclipse.scout.rt.server.jaxws.provider.annotation.Handler.HandlerType;
-import org.eclipse.scout.rt.server.jaxws.provider.annotation.JaxWsPortTypeProxy;
+import org.eclipse.scout.rt.server.jaxws.provider.annotation.WebServiceEntryPoint;
 import org.eclipse.scout.rt.server.jaxws.provider.auth.method.IAuthenticationMethod;
 
 /**
- * This class represents values declared in {@link JaxWsPortTypeProxy}.
+ * This class represents values declared via {@link WebServiceEntryPoint}.
  *
  * @since 5.1
  */
-public class PortTypeProxyDescriptor {
+public class EntryPointDefinition {
 
-  public static final String PORT_TYPE_PROXY_SUFFIX = "Proxy";
+  public static final String ENTRY_POINT_SUFFIX = "EntryPoint";
 
   private final TypeElement m_endpointInterface;
-  private final TypeElement m_descriptor;
-  private final JaxWsPortTypeProxy m_annotation;
+  private final TypeElement m_definition;
+  private final WebServiceEntryPoint m_annotation;
   private final AnnotationMirror m_annotationMirror;
   private final List<AnnotationMirror> m_siblingAnnotations;
 
   private final ProcessingEnvironment m_env;
 
-  public PortTypeProxyDescriptor(final TypeElement _descriptor, final TypeElement _endpointInterface, final ProcessingEnvironment env) {
+  public EntryPointDefinition(final TypeElement _definition, final TypeElement _endpointInterface, final ProcessingEnvironment env) {
     m_endpointInterface = _endpointInterface;
-    m_descriptor = _descriptor;
-    m_annotation = Assertions.assertNotNull(_descriptor.getAnnotation(JaxWsPortTypeProxy.class), "Unexpected: Annotation '{}' not found [class={}],", JaxWsPortTypeProxy.class.getName(), _descriptor);
+    m_definition = _definition;
+    m_annotation = Assertions.assertNotNull(_definition.getAnnotation(WebServiceEntryPoint.class), "Unexpected: Annotation '{}' not found [class={}],", WebServiceEntryPoint.class.getName(), _definition);
     m_siblingAnnotations = new ArrayList<>();
     m_env = env;
 
-    AnnotationMirror descriptorAnnotationMirror = null;
-    for (final AnnotationMirror _annotationMirror : _descriptor.getAnnotationMirrors()) {
-      if (JaxWsPortTypeProxy.class.getName().equals(_annotationMirror.getAnnotationType().toString())) {
-        descriptorAnnotationMirror = _annotationMirror;
+    AnnotationMirror _entryPointAnnotationMirror = null;
+    for (final AnnotationMirror _annotationMirror : _definition.getAnnotationMirrors()) {
+      if (WebServiceEntryPoint.class.getName().equals(_annotationMirror.getAnnotationType().toString())) {
+        _entryPointAnnotationMirror = _annotationMirror;
       }
       else {
         m_siblingAnnotations.add(_annotationMirror);
       }
     }
 
-    m_annotationMirror = Assertions.assertNotNull(descriptorAnnotationMirror, "Unexpected: AnnotationMirror for annotation '{}' not found,", JaxWsPortTypeProxy.class.getName());
+    m_annotationMirror = Assertions.assertNotNull(_entryPointAnnotationMirror, "Unexpected: AnnotationMirror for annotation '{}' not found,", WebServiceEntryPoint.class.getName());
   }
 
   public TypeElement getEndpointInterface() {
@@ -79,23 +79,44 @@ public class PortTypeProxyDescriptor {
   }
 
   /**
-   * @return the fully qualified name of the port type proxy.
+   * @return the fully qualified name of the entry point.
    */
-  public String getProxyQualifiedName() {
-    final boolean nameDerived = JaxWsPortTypeProxy.DERIVED.equals(m_annotation.portTypeProxyName());
-    final boolean packageDerived = JaxWsPortTypeProxy.DERIVED.equals(m_annotation.portTypePackage());
+  public String getEntryPointQualifiedName() {
+    final boolean nameDerived = WebServiceEntryPoint.DERIVED.equals(m_annotation.entryPointName());
+    final boolean packageDerived = WebServiceEntryPoint.DERIVED.equals(m_annotation.entryPointPackage());
 
-    final String pck = (packageDerived ? m_env.getElementUtils().getPackageOf(m_descriptor).getQualifiedName().toString() : m_annotation.portTypePackage());
-    final String name = (nameDerived ? m_endpointInterface.getSimpleName() + PORT_TYPE_PROXY_SUFFIX : m_annotation.portTypeProxyName());
+    final String pck = (packageDerived ? m_env.getElementUtils().getPackageOf(m_definition).getQualifiedName().toString() : m_annotation.entryPointPackage());
+    final String name = (nameDerived ? m_endpointInterface.getSimpleName() + ENTRY_POINT_SUFFIX : m_annotation.entryPointName());
 
     return StringUtility.join(".", pck, name);
   }
 
   /**
-   * Returns the class or interface which contains {@link JaxWsPortTypeProxy} annotation.
+   * Returns the qualified name of the element declaring {@link WebServiceEntryPoint} annotation.
    */
-  public TypeElement getDescriptor() {
-    return m_descriptor;
+  public String getQualifiedName() {
+    return m_definition.getQualifiedName().toString();
+  }
+
+  /**
+   * Returns the simple name of the element declaring {@link WebServiceEntryPoint} annotation.
+   */
+  public String getSimpleName() {
+    return m_definition.getSimpleName().toString();
+  }
+
+  /**
+   * Returns the qualified name of the endpoint interface.
+   */
+  public String getEndpointInterfaceQualifiedName() {
+    return m_endpointInterface.getQualifiedName().toString();
+  }
+
+  /**
+   * Returns the simple name of the endpoint interface.
+   */
+  public String getEndpointInterfaceSimpleName() {
+    return m_endpointInterface.getSimpleName().toString();
   }
 
   public Authentication getAuthentication() {
@@ -130,15 +151,15 @@ public class PortTypeProxyDescriptor {
   /**
    * @return {@link List} of declared handlers.
    */
-  public List<HandlerDescriptor> getHandlerChain() {
-    final List<HandlerDescriptor> handlerChain = new ArrayList<>();
+  public List<HandlerDefinition> getHandlerChain() {
+    final List<HandlerDefinition> handlerChain = new ArrayList<>();
 
     @SuppressWarnings("unchecked")
     final List<AnnotationValue> handlerAnnotationValues = (List<AnnotationValue>) AnnotationUtil.getAnnotationValue(m_annotationMirror, "handlerChain", m_env.getElementUtils()).getValue();
 
     for (final AnnotationValue handlerAnnotationValue : handlerAnnotationValues) {
       final AnnotationMirror handlerAnnotation = (AnnotationMirror) handlerAnnotationValue.getValue();
-      handlerChain.add(new HandlerDescriptor(handlerAnnotation));
+      handlerChain.add(new HandlerDefinition(handlerAnnotation));
     }
 
     return handlerChain;
@@ -177,7 +198,7 @@ public class PortTypeProxyDescriptor {
    *         class.
    */
   public boolean isWsdlLocationDerived() {
-    return JaxWsPortTypeProxy.DERIVED.equals(getWsdlLocation());
+    return WebServiceEntryPoint.DERIVED.equals(getWsdlLocation());
   }
 
   /**
@@ -188,7 +209,7 @@ public class PortTypeProxyDescriptor {
   }
 
   /**
-   * @return <code>true</code>, if the descriptor contains the given annotation.
+   * @return <code>true</code>, if the <em>entry point definition</em> contains the given annotation.
    */
   public boolean containsAnnotation(final Class<? extends Annotation> annotationClass) {
     for (final AnnotationMirror siblingAnnotation : m_siblingAnnotations) {
@@ -199,11 +220,11 @@ public class PortTypeProxyDescriptor {
     return false;
   }
 
-  public class HandlerDescriptor {
+  public class HandlerDefinition {
     private final HandlerType m_handlerType;
     private final String m_qualifiedName;
 
-    public HandlerDescriptor(final AnnotationMirror handlerAnnotationMirror) {
+    public HandlerDefinition(final AnnotationMirror handlerAnnotationMirror) {
       final AnnotationMirror clazzMirror = (AnnotationMirror) AnnotationUtil.getAnnotationValue(handlerAnnotationMirror, "value", m_env.getElementUtils()).getValue();
       m_qualifiedName = AnnotationUtil.resolveClass(clazzMirror, m_env);
 
@@ -226,15 +247,24 @@ public class PortTypeProxyDescriptor {
       }
     }
 
+    /**
+     * @return handler type, and is one of {@link HandlerType#LOGICAL} or {@link HandlerType#SOAP}.
+     */
     public HandlerType getHandlerType() {
       return m_handlerType;
     }
 
-    public String getQualifiedName() {
+    /**
+     * @return qualified name of the handler.
+     */
+    public String getHandlerQualifiedName() {
       return m_qualifiedName;
     }
 
-    public String getSimpleName() {
+    /**
+     * @return simple name of the handler.
+     */
+    public String getHandlerSimpleName() {
       return AptUtil.toSimpleName(m_qualifiedName);
     }
   }

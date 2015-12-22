@@ -29,15 +29,15 @@ import javax.xml.ws.handler.LogicalMessageContext;
 import javax.xml.ws.handler.MessageContext;
 
 import org.eclipse.scout.jaxws.apt.JaxWsAnnotationProcessor;
-import org.eclipse.scout.jaxws.apt.internal.PortTypeProxyDescriptor.HandlerDescriptor;
+import org.eclipse.scout.jaxws.apt.internal.EntryPointDefinition.HandlerDefinition;
 import org.eclipse.scout.jaxws.apt.internal.util.AptLogger;
 import org.eclipse.scout.jaxws.apt.internal.util.AptUtil;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.util.XmlUtility;
-import org.eclipse.scout.rt.server.jaxws.provider.annotation.JaxWsPortTypeProxy;
+import org.eclipse.scout.rt.server.jaxws.provider.annotation.WebServiceEntryPoint;
 import org.eclipse.scout.rt.server.jaxws.provider.auth.handler.AuthenticationHandler;
-import org.eclipse.scout.rt.server.jaxws.provider.handler.HandlerProxy;
-import org.eclipse.scout.rt.server.jaxws.provider.handler.SOAPHandlerProxy;
+import org.eclipse.scout.rt.server.jaxws.provider.handler.HandlerDelegate;
+import org.eclipse.scout.rt.server.jaxws.provider.handler.SOAPHandlerDelegate;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
@@ -50,92 +50,103 @@ import com.sun.codemodel.JMethod;
 import com.sun.codemodel.JMod;
 
 /**
- * Processor to generate authentication handler, proxy handlers and the handler-chain XML file.
+ * Processor to generate authentication handler, handler entry points and the handler chain XML file.
  *
  * @since 5.1
  */
 public class HandlerArtifactProcessor {
 
   private static final String AUTH_HANDLER_NAME = "AuthHandler";
-  private static final String HANDLER_PROXY_SUFFIX = "Proxy";
+  private static final String HANDLER_SUFFIX = "Delegate";
   private static final String HANDLERS_FILE_NAME = "handler-chain.xml";
 
   /**
-   * Creates the following artifacts:
-   * <ul>
-   * <li>Authentication handler (if applicable)</li>
-   * <li>HandlerProxies for configured handlers</li>
-   * <li>XML file to describe the handler-chain</li>
-   * </ul>
-   *
    * @return relative filename of the XML file.
    */
-  public String generateHandlerArtifacts(final JClass portTypeProxy, final PortTypeProxyDescriptor descriptor, final ProcessingEnvironment env, final AptLogger logger) {
-    final String endpointInterface = descriptor.getEndpointInterface().getQualifiedName().toString();
+  public String generateHandlerArtifacts(final JClass portTypeEntryPoint, final EntryPointDefinition portTypeEntryPointDefinition, final ProcessingEnvironment env, final AptLogger logger) {
+    final String endpointInterface = portTypeEntryPointDefinition.getEndpointInterfaceQualifiedName();
 
     final List<String> handlers = new ArrayList<>();
 
     // Generate AuthHandler
-    if (descriptor.isAuthenticationEnabled()) {
+    if (portTypeEntryPointDefinition.isAuthenticationEnabled()) {
       try {
-        final String authHandlerQualifiedName = createAndPersistAuthHandler(portTypeProxy, descriptor, env);
-        logger.info("Generating AuthHandler [authHandler={}, portTypeProxy={}, endpointInterface={}]", authHandlerQualifiedName, portTypeProxy.fullName(), endpointInterface);
+        final String authHandlerQualifiedName = createAndPersistAuthHandler(portTypeEntryPoint, portTypeEntryPointDefinition, env);
+        logger.info("Generating AuthHandler [authHandler={}, portTypeDefinition={}, endpointInterface={}]",
+            authHandlerQualifiedName,
+            portTypeEntryPointDefinition.getQualifiedName(),
+            endpointInterface);
         handlers.add(authHandlerQualifiedName);
       }
       catch (final Exception e) {
-        throw new PlatformException("Failed to generate AuthHandler [portTypeProxy={}]", portTypeProxy.fullName(), e);
+        throw new PlatformException("Failed to generate AuthHandler [portTypeDefinition={}, endpointInterface={}]",
+            portTypeEntryPointDefinition.getQualifiedName(),
+            endpointInterface,
+            e);
       }
     }
 
     // Add configured handlers.
-    final List<HandlerDescriptor> handlerChain = descriptor.getHandlerChain();
+    final List<HandlerDefinition> handlerChain = portTypeEntryPointDefinition.getHandlerChain();
     for (int idx = 0; idx < handlerChain.size(); idx++) {
-      final HandlerDescriptor handler = handlerChain.get(idx);
+      final HandlerDefinition handlerDefinition = handlerChain.get(idx);
 
       try {
-        final String proxyHandlerQualifiedName = createAndPersistProxyHandler(portTypeProxy, descriptor, handler, idx, env);
-        logger.info("Generating handler decorator [handler={}, handlerDecorator={}, portTypeProxy={}, endpointInterface={}]", handler.getQualifiedName(), proxyHandlerQualifiedName, portTypeProxy.fullName(), endpointInterface);
-        handlers.add(proxyHandlerQualifiedName);
+        final String handlerDelegateQualifiedName = createAndPersistHandlerDelegate(portTypeEntryPoint, portTypeEntryPointDefinition, handlerDefinition, idx, env);
+        logger.info("Generating handler delegate [handler={}, handlerDelegate={}, portTypeDefinition={}, endpointInterface={}]",
+            handlerDefinition.getHandlerQualifiedName(),
+            handlerDelegateQualifiedName,
+            portTypeEntryPointDefinition.getQualifiedName(),
+            endpointInterface);
+        handlers.add(handlerDelegateQualifiedName);
       }
       catch (final Exception e) {
-        throw new PlatformException("Failed to generate handler decorator [handler={}, portTypeProxy={}, endpointInterface={}]", handler.getQualifiedName(), portTypeProxy.fullName(), endpointInterface, e);
+        throw new PlatformException("Failed to generate handler delegate [handler={}, portTypeDefinition={}, endpointInterface={}]",
+            handlerDefinition.getHandlerQualifiedName(),
+            portTypeEntryPointDefinition.getQualifiedName(),
+            endpointInterface, e);
       }
     }
 
     // Generate handler-chain.xml.
     try {
-      final String handlerChainFile = createAndPersistHandlerXmlFile(portTypeProxy, descriptor, handlers, env.getFiler());
-      logger.info("Generating handler chain XML-file [file={}, portTypeProxy={}, endpointInterface={}]", handlerChainFile, portTypeProxy.fullName(), endpointInterface);
+      final String handlerChainFile = createAndPersistHandlerXmlFile(portTypeEntryPoint, portTypeEntryPointDefinition, handlers, env.getFiler());
+      logger.info("Generating handler chain XML-file [file={}, portTypeDefinition={}, endpointInterface={}]",
+          handlerChainFile,
+          portTypeEntryPointDefinition.getQualifiedName(),
+          endpointInterface);
 
       return handlerChainFile;
     }
     catch (final Exception e) {
-      throw new PlatformException("Failed to generate handler chain XML-file [portTypeProxy={}, endpointInterface={}]", portTypeProxy.fullName(), endpointInterface, e);
+      throw new PlatformException("Failed to generate handler chain XML-file [portTypeDefinition={}, endpointInterface={}]",
+          portTypeEntryPointDefinition.getQualifiedName(),
+          endpointInterface, e);
     }
   }
 
   /**
    * Generates the AuthHandler.
    */
-  public String createAndPersistAuthHandler(final JClass portTypeProxy, final PortTypeProxyDescriptor descriptor, final ProcessingEnvironment processingEnv) throws Exception {
+  public String createAndPersistAuthHandler(final JClass portTypeEntryPoint, final EntryPointDefinition entryPointDefinition, final ProcessingEnvironment processingEnv) throws Exception {
     final JCodeModel model = new JCodeModel();
 
-    final String fullName = descriptor.getProxyQualifiedName() + "_" + AUTH_HANDLER_NAME;
+    final String fullName = entryPointDefinition.getEntryPointQualifiedName() + "_" + AUTH_HANDLER_NAME;
     final JDefinedClass authHandler = model._class(fullName)._extends(model.ref(AuthenticationHandler.class));
 
     // Add 'Generated' annotation
     final JAnnotationUse generatedAnnotation = authHandler.annotate(Generated.class);
     generatedAnnotation.param("value", JaxWsAnnotationProcessor.class.getName());
     generatedAnnotation.param("date", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss:SSSZ").format(new Date()));
-    generatedAnnotation.param("comments", String.format("Authentication Handler for [method=%s, verifier=%s]", AptUtil.toSimpleName(descriptor.getAuthMethod()), AptUtil.toSimpleName(descriptor.getAuthVerifier())));
+    generatedAnnotation.param("comments", String.format("Authentication Handler for [method=%s, verifier=%s]", AptUtil.toSimpleName(entryPointDefinition.getAuthMethod()), AptUtil.toSimpleName(entryPointDefinition.getAuthVerifier())));
 
     // Add default constructor with super call to provide authentication annotation.
     final JMethod defaultConstructor = authHandler.constructor(JMod.PUBLIC);
-    final JClass descriptorClass = model.ref(descriptor.getDescriptor().getQualifiedName().toString());
-    defaultConstructor.body().invoke("super").arg(JExpr.dotclass(descriptorClass).invoke("getAnnotation").arg(JExpr.dotclass(model.ref(JaxWsPortTypeProxy.class))).invoke("authentication"));
+    final JClass entryPointDefinitionClass = model.ref(entryPointDefinition.getQualifiedName());
+    defaultConstructor.body().invoke("super").arg(JExpr.dotclass(entryPointDefinitionClass).invoke("getAnnotation").arg(JExpr.dotclass(model.ref(WebServiceEntryPoint.class))).invoke("authentication"));
 
     AptUtil.addJavaDoc(authHandler,
-        String.format("This class is auto-generated by APT triggered by Maven build and is based on the authentication configuration declared in {@link %s}.", descriptor.getDescriptor().getSimpleName().toString()));
+        String.format("This class is auto-generated by APT triggered by Maven build and is based on the authentication configuration declared in {@link %s}.", entryPointDefinition.getSimpleName()));
 
     AptUtil.buildAndPersist(model, processingEnv.getFiler());
 
@@ -143,56 +154,56 @@ public class HandlerArtifactProcessor {
   }
 
   /**
-   * Generates a ProxyHandler.
+   * Generates the entry point for a handler.
    */
-  public String createAndPersistProxyHandler(final JClass portTypeProxy, final PortTypeProxyDescriptor descriptor, final HandlerDescriptor handler, final int idx, final ProcessingEnvironment env) throws Exception {
+  public String createAndPersistHandlerDelegate(final JClass portTypeEntryPoint, final EntryPointDefinition entryPointDefinition, final HandlerDefinition handler, final int idx, final ProcessingEnvironment env) throws Exception {
     final JCodeModel model = new JCodeModel();
 
-    final String fullName = descriptor.getProxyQualifiedName() + "_" + handler.getSimpleName() + HANDLER_PROXY_SUFFIX;
-    final JDefinedClass handlerProxy = model._class(fullName);
+    final String fullName = entryPointDefinition.getEntryPointQualifiedName() + "_" + handler.getHandlerSimpleName() + HANDLER_SUFFIX;
+    final JDefinedClass handlerDelegate = model._class(fullName);
 
     // Add 'Generated' annotation
-    final JAnnotationUse generatedAnnotation = handlerProxy.annotate(Generated.class);
+    final JAnnotationUse generatedAnnotation = handlerDelegate.annotate(Generated.class);
     generatedAnnotation.param("value", JaxWsAnnotationProcessor.class.getName());
     generatedAnnotation.param("date", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss:SSSZ").format(new Date()));
-    generatedAnnotation.param("comments", "Handler proxy for " + handler.getQualifiedName());
+    generatedAnnotation.param("comments", "Handler delegate for " + handler.getHandlerQualifiedName());
 
-    AptUtil.addJavaDoc(handlerProxy, String.format("This class is auto-generated by APT triggered by Maven build and is based on the handler configuration declared in {@link %s}.", descriptor.getDescriptor().getSimpleName().toString()));
+    AptUtil.addJavaDoc(handlerDelegate, String.format("This class is auto-generated by APT triggered by Maven build and is based on the handler configuration declared in {@link %s}.", entryPointDefinition.getSimpleName()));
 
     switch (handler.getHandlerType()) {
       case SOAP:
-        handlerProxy._extends(model.ref(SOAPHandlerProxy.class));
+        handlerDelegate._extends(model.ref(SOAPHandlerDelegate.class));
         break;
       case LOGICAL:
-        handlerProxy._extends(model.ref(HandlerProxy.class).narrow(LogicalMessageContext.class));
-        handlerProxy._implements(model.ref(LogicalHandler.class).narrow(LogicalMessageContext.class));
+        handlerDelegate._extends(model.ref(HandlerDelegate.class).narrow(LogicalMessageContext.class));
+        handlerDelegate._implements(model.ref(LogicalHandler.class).narrow(LogicalMessageContext.class));
         break;
       default:
-        handlerProxy._extends(model.ref(HandlerProxy.class).narrow(MessageContext.class));
+        handlerDelegate._extends(model.ref(HandlerDelegate.class).narrow(MessageContext.class));
         break;
     }
 
     // Add default constructor with super call to provide handler annotation.
-    final JClass descriptorClass = model.ref(descriptor.getDescriptor().getQualifiedName().toString());
-    final JMethod defaultConstructor = handlerProxy.constructor(JMod.PUBLIC);
-    defaultConstructor.body().invoke("super").arg(JExpr.dotclass(descriptorClass).invoke("getAnnotation").arg(JExpr.dotclass(model.ref(JaxWsPortTypeProxy.class))).invoke("handlerChain").component(JExpr.lit(idx)));
+    final JClass entryPointDefinitionClass = model.ref(entryPointDefinition.getQualifiedName());
+    final JMethod defaultConstructor = handlerDelegate.constructor(JMod.PUBLIC);
+    defaultConstructor.body().invoke("super").arg(JExpr.dotclass(entryPointDefinitionClass).invoke("getAnnotation").arg(JExpr.dotclass(model.ref(WebServiceEntryPoint.class))).invoke("handlerChain").component(JExpr.lit(idx)));
 
     AptUtil.buildAndPersist(model, env.getFiler());
 
-    return handlerProxy.fullName();
+    return handlerDelegate.fullName();
   }
 
-  protected String createAndPersistHandlerXmlFile(final JClass portTypeProxy, final PortTypeProxyDescriptor descriptor, final List<String> handlers, final Filer filer) throws Exception {
+  protected String createAndPersistHandlerXmlFile(final JClass portTypeEntryPoint, final EntryPointDefinition entryPointDefinition, final List<String> handlers, final Filer filer) throws Exception {
     final DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 
     // Create the comment.
     final StringWriter comment = new StringWriter();
     final PrintWriter out = new PrintWriter(comment);
     out.println();
-    out.printf("This file is auto-generated by APT triggered by Maven build, and is populated with handlers declared in '%s'. This file is referenced in @%s annotation in '%s'.<br/>", descriptor.getDescriptor().getSimpleName(),
-        HandlerChain.class.getSimpleName(), portTypeProxy.name()).println();
+    out.printf("This file is auto-generated by APT triggered by Maven build, and is populated with handlers declared in '%s'. This file is referenced in @%s annotation in '%s'.<br/>", entryPointDefinition.getSimpleName(),
+        HandlerChain.class.getSimpleName(), portTypeEntryPoint.name()).println();
     out.printf("Please note that handlers for webservice providers are to be declared in reverse order (JAX-WS JSR 224).<br/>").println();
-    out.printf("This file is updated once any WSDL artifact or %s changes. If providing a handler chain binding file yourself, this file will not be generated.", descriptor.getDescriptor().getSimpleName()).println();
+    out.printf("This file is updated once any WSDL artifact or %s changes. If providing a handler chain binding file yourself, this file will not be generated.", entryPointDefinition.getSimpleName()).println();
     out.println();
 
     // Create the XML content. For webservice providers, handlers are to be registered in the reverse order (JAX-WS JSR 224).
@@ -210,8 +221,8 @@ public class HandlerArtifactProcessor {
     final String xmlContent = XmlUtility.wellformDocument(xmlDocument);
 
     // Determine the package and file name.
-    final String path = portTypeProxy._package().name();
-    final String fileName = AptUtil.toSimpleName(descriptor.getProxyQualifiedName()) + "_" + HANDLERS_FILE_NAME;
+    final String path = portTypeEntryPoint._package().name();
+    final String fileName = AptUtil.toSimpleName(entryPointDefinition.getEntryPointQualifiedName()) + "_" + HANDLERS_FILE_NAME;
 
     // Persist the handler file.
     try (PrintWriter w = new PrintWriter(filer.createResource(StandardLocation.SOURCE_OUTPUT, path, fileName).openWriter())) {
