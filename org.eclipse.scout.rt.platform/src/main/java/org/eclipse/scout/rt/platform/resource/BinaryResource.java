@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.platform.resource;
 
 import java.io.File;
 import java.io.Serializable;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.zip.Adler32;
@@ -164,10 +165,14 @@ public final class BinaryResource implements Serializable {
   }
 
   /**
-   * @return the {@link String} content (expecting character set UTF-8) for this resource
+   * @return the {@link String} content (using defined {@link Charset} or UTF-8 as default) for this resource
    */
   public String getContentAsString() {
-    return new String(m_content, StandardCharsets.UTF_8);
+    Charset charset = null;
+    if (getCharset() != null) {
+      charset = Charset.forName(getCharset());
+    }
+    return new String(m_content, charset == null ? StandardCharsets.UTF_8 : charset);
   }
 
   /**

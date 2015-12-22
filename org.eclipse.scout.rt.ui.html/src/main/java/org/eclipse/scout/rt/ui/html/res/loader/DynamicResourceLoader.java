@@ -72,7 +72,7 @@ public class DynamicResourceLoader extends AbstractResourceLoader {
     if (contentType == null) {
       contentType = detectContentType(binaryResource.get().getFilename());
     }
-    BinaryResource content = new BinaryResource(pathInfo, contentType, binaryResource.get().getContent(), binaryResource.get().getLastModified());
+    BinaryResource content = new BinaryResource(pathInfo, contentType, binaryResource.get().getCharset(), binaryResource.get().getContent(), binaryResource.get().getLastModified());
     HttpCacheObject httpCacheObject = new HttpCacheObject(cacheKey, content.getLastModified() > 0, IHttpCacheControl.MAX_AGE_4_HOURS, content);
     if (binaryResource.isDownload()) {
       addResponseHeaderForDownload(httpCacheObject, binaryResource.get().getFilename());
