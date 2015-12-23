@@ -3,13 +3,10 @@ package org.eclipse.scout.rt.ui.html.json.table;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.IOrganizeColumnsForm;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
-import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ColumnsGroupBox.ColumnsTableField;
 import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ColumnsGroupBox.ColumnsTableField.Table.AddCustomColumnMenu;
-import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ColumnsGroupBox.ColumnsTableField.Table.KeyColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ColumnsGroupBox.ColumnsTableField.Table.ModifyCustomColumnMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ColumnsGroupBox.ColumnsTableField.Table.RemoveMenu;
-import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.menus.OrganizeColumnsMenu;
 import org.eclipse.scout.rt.ui.html.json.IJsonObject;
 import org.json.JSONObject;
@@ -55,27 +52,6 @@ public class JsonOrganizeColumnCommands implements IJsonObject {
     else if ("modify".equals(action)) {
       table.getMenuByClass(ModifyCustomColumnMenu.class).doAction();
     }
-  }
-
-  /**
-   * Simulate a click on a row in the table with the columns so add/remove/modify menus have the right state.
-   *
-   * @param column
-   */
-  public void selectColumn(IColumn column) {
-    ITable table = m_form.getFieldByClass(ColumnsTableField.class).getTable();
-    IColumn<IColumn<?>> keyColumn = table.getColumnSet().getColumnByClass(KeyColumn.class);
-    for (ITableRow row : table.getRows()) {
-      IColumn columnFromRow = (IColumn) row.getCell(keyColumn).getValue();
-      if (column == columnFromRow) {
-        table.selectRow(row);
-        break;
-      }
-    }
-  }
-
-  public void reload() {
-    m_form.reload();
   }
 
 }

@@ -81,45 +81,27 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
   if (this.table.columns.length > 1) {
     this._renderMovingGroup();
   }
-
   // Sorting
   if (this.table.sortEnabled) {
     this._renderSortingGroup();
-    this._renderSelectedSorting();
   }
-
   // Add/remove/change columns
-  this._renderModifyColumnGroup();
-
+  this._renderColumnActionsGroup();
   // Grouping and aggregation
   if (this.table.containsNumberColumn()) {
     if (this.column instanceof scout.NumberColumn) {
       this._renderAggregationGroup();
-      this._renderSelectedAggregation();
     } else {
       this._renderGroupingGroup();
-      this._renderSelectedGrouping();
     }
   }
-
   // Coloring
   if (this.column instanceof scout.NumberColumn) {
     this._renderColoringGroup();
-    this._renderSelectedColoring();
   }
 
   this._renderFilterTable();
   this._renderFilterFields();
-
-  // name all label elements
-  $('.table-header-menu-group-text', this.$container).each(function(i, elem) {
-    var $elem = $(elem);
-    $elem.text($elem.data('label'));
-  });
-
-  this.$container
-    .on('mouseenter click', '.table-header-menu-command', this._onCommandMouseenterClick.bind(this))
-    .on('mouseleave', '.table-header-menu-command', this._onCommandMouseleave.bind(this));
 
   this.tableHeader.$container.on('scroll', this._tableHeaderScrollHandler);
 };
@@ -138,64 +120,71 @@ scout.TableHeaderMenu.prototype._renderMovingGroup = function() {
     column = this.column,
     pos = table.columns.indexOf(column);
 
-  this.$moving = this.$columnActions.appendDiv('table-header-menu-group buttons first');
-  this.$moving.appendDiv('table-header-menu-group-text')
-    .data('label', this.session.text('ui.Move'));
+  var group = scout.create('TableHeaderMenuGroup', {
+    parent: this,
+    textKey: 'ui.Move',
+    cssClass: 'first'});
+  scout.create('TableHeaderMenuButton', {
+    parent: group,
+    textKey: 'ui.toBegin',
+    cssClass: 'move move-top',
+    clickHandler: function() {
+      table.moveColumn(column, pos, 0);
+      pos = table.columns.indexOf(column);
+    }});
+  scout.create('TableHeaderMenuButton', {
+    parent: group,
+    textKey: 'ui.forward',
+    cssClass: 'move move-up',
+    clickHandler: function() {
+      table.moveColumn(column, pos, Math.max(pos - 1, 0));
+      pos = table.columns.indexOf(column);
+    }});
+  scout.create('TableHeaderMenuButton', {
+    parent: group,
+    textKey: 'ui.backward',
+    cssClass: 'move move-down',
+    clickHandler: function() {
+      table.moveColumn(column, pos, Math.min(pos + 1, table.header.findHeaderItems().length - 1));
+      pos = table.columns.indexOf(column);
+    }});
+  scout.create('TableHeaderMenuButton', {
+    parent: group,
+    textKey: 'ui.toEnd',
+    cssClass: 'move move-bottom',
+    clickHandler: function() {
+      table.moveColumn(column, pos, table.header.findHeaderItems().length - 1);
+      pos = table.columns.indexOf(column);
+    }});
 
-  this.$moving.appendDiv('table-header-menu-command move move-top')
-    .data('label', this.session.text('ui.toBegin'))
-    .click(moveToTop);
-  this.$moving.appendDiv('table-header-menu-command move move-up')
-    .data('label', this.session.text('ui.forward'))
-    .click(moveUp);
-  this.$moving.appendDiv('table-header-menu-command move move-down')
-    .data('label', this.session.text('ui.backward'))
-    .click(moveDown);
-  this.$moving.appendDiv('table-header-menu-command move move-bottom')
-    .data('label', this.session.text('ui.toEnd'))
-    .click(moveToBottom);
-
-  function moveToTop() {
-    table.moveColumn(column, pos, 0);
-    pos = table.columns.indexOf(column);
-  }
-
-  function moveUp() {
-    table.moveColumn(column, pos, Math.max(pos - 1, 0));
-    pos = table.columns.indexOf(column);
-  }
-
-  function moveDown() {
-    table.moveColumn(column, pos, Math.min(pos + 1, table.header.findHeaderItems().length - 1));
-    pos = table.columns.indexOf(column);
-  }
-
-  function moveToBottom() {
-    table.moveColumn(column, pos, table.header.findHeaderItems().length - 1);
-    pos = table.columns.indexOf(column);
-  }
+  group.render(this.$columnActions);
 };
 
-scout.TableHeaderMenu.prototype._renderModifyColumnGroup = function() {
-  var $group = this.$columnActions.appendDiv('table-header-menu-group buttons');
-  $group.appendDiv('table-header-menu-group-text')
-    .data('label', this.session.text('ui.Column'));
+scout.TableHeaderMenu.prototype._renderColumnActionsGroup = function() {
+  this.columnActionsGroup = scout.create('TableHeaderMenuGroup', {
+    parent: this,
+    textKey: 'ui.Column'});
 
-  // add button is only visible when table has a table-customizer
-  this.$addColumnAction = $group.appendDiv('table-header-menu-command toggle add-column')
-    .data('label', this.session.text('ui.addColumn'))
-    .click(onClick.bind(this, 'add'));
+  this.addColumnButton = scout.create('TableHeaderMenuButton', {
+    parent: this.columnActionsGroup,
+    textKey: 'ui.addColumn',
+    cssClass: 'add-column',
+    clickHandler: onClick.bind(this, 'add')});
+  this.removeColumnButton = scout.create('TableHeaderMenuButton', {
+    parent: this.columnActionsGroup,
+    textKey: 'ui.removeColumn',
+    cssClass: 'remove-column',
+    clickHandler: onClick.bind(this, 'remove')});
+  // By default modify is not visible because most of the columns cannot be modified
+  // this avoid some flickering in the UI
+  this.modifyColumnButton = scout.create('TableHeaderMenuButton', {
+    parent: this.columnActionsGroup,
+    textKey: 'ui.changeColumn',
+    cssClass: 'change-column',
+    visible: false,
+    clickHandler: onClick.bind(this, 'modify')});
 
-  // remove button is always visible (but it has a different behavior
-  // whether column is a custom or a regular column.
-  this.$removeColumnAction = $group.appendDiv('table-header-menu-command toggle sort remove-column')
-    .data('label', this.session.text('ui.removeColumn'))
-    .click(onClick.bind(this, 'remove'));
-
-  // change button is only visible when column is a custom column
-  this.$modifyColumnAction = $group.appendDiv('table-header-menu-command toggle sort change-column')
-    .data('label', this.session.text('ui.changeColumn'))
-    .click(onClick.bind(this, 'modify'));
+  this.columnActionsGroup.render(this.$columnActions);
 
   function onClick(action) {
     this.table._send('columnOrganizeAction', {action: action});
@@ -203,81 +192,90 @@ scout.TableHeaderMenu.prototype._renderModifyColumnGroup = function() {
 };
 
 scout.TableHeaderMenu.prototype.onColumnActionsChanged = function(event) {
-  this.$addColumnAction.setVisible(event.addVisible);
-  this.$removeColumnAction.setVisible(event.removeVisible);
-  this.$modifyColumnAction.setVisible(event.modifyVisible);
+  this.addColumnButton.setVisible(event.addVisible);
+  this.removeColumnButton.setVisible(event.removeVisible);
+  this.modifyColumnButton.setVisible(event.modifyVisible);
+  var groupVisible = this.columnActionsGroup.children.some(function(button) {
+    return button.visible;
+  });
+  this.columnActionsGroup.setVisible(groupVisible);
 };
 
 scout.TableHeaderMenu.prototype._renderSortingGroup = function() {
-  var table =
-    this.table,
+  var table = this.table,
     column = this.column,
-    that = this;
+    menuPopup = this;
 
-  this.$sorting = this.$columnActions.appendDiv('table-header-menu-group buttons');
-  this.$sorting.appendDiv('table-header-menu-group-text')
-    .data('label', this.session.text('ColumnSorting'));
+  this.sortingGroup = scout.create('TableHeaderMenuGroup', {
+    parent: this,
+    textKey: 'ColumnSorting'});
 
   if (!table.hasPermanentHeadOrTailSortColumns()) {
-    this.$sortAsc = this.$sorting.appendDiv('table-header-menu-command toggle sort sort-asc')
-      .data('label', this.session.text('ui.ascending'))
-      .data('direction', 'asc')
-      .click(onSortClick.bind(this));
-    this.$sortDesc = this.$sorting.appendDiv('table-header-menu-command toggle sort sort-desc')
-      .data('label', this.session.text('ui.descending'))
-      .data('direction', 'desc')
-      .click(onSortClick.bind(this));
+    this.sortAscButton = scout.create('TableHeaderMenuButton', {
+      parent: this.sortingGroup,
+      textKey: 'ui.ascending',
+      cssClass: 'sort sort-asc',
+      direction: 'asc',
+      clickHandler: onSortClick});
+    this.sortDescButton = scout.create('TableHeaderMenuButton', {
+      parent: this.sortingGroup,
+      textKey: 'ui.descending',
+      cssClass: 'sort sort-desc',
+      direction: 'desc',
+      clickHandler: onSortClick});
   }
 
-  this.$sortAscAdd = this.$sorting.appendDiv('table-header-menu-command toggle sort sort-asc-add')
-    .data('label', this.session.text('ui.ascendingAdditionally'))
-    .data('direction', 'asc')
-    .click(onSortAdditionalClick.bind(this));
-  this.$sortDescAdd = this.$sorting.appendDiv('table-header-menu-command toggle sort sort-desc-add')
-    .data('label', this.session.text('ui.descendingAdditionally'))
-    .data('direction', 'desc')
-    .click(onSortAdditionalClick.bind(this));
+  this.sortAscAddButton = scout.create('TableHeaderMenuButton', {
+    parent: this.sortingGroup,
+    textKey: 'ui.ascendingAdditionally',
+    cssClass: 'sort sort-asc-add',
+    direction: 'asc',
+    clickHandler: onSortAdditionalClick});
+  this.sortDescAddButton = scout.create('TableHeaderMenuButton', {
+    parent: this.sortingGroup,
+    textKey: 'ui.descendingAdditionally',
+    cssClass: 'sort sort-desc-add',
+    direction: 'desc',
+    clickHandler: onSortAdditionalClick});
 
-  function onSortClick(event) {
-    var $target = $(event.currentTarget),
-      direction = $target.data('direction');
+  this._updateSortingSelectedState();
+  this.sortingGroup.render(this.$columnActions);
 
-    this.remove();
-    sort(direction, false, $target.isSelected());
+  function onSortClick() {
+    menuPopup.remove();
+    sort(this.direction, false, this.selected);
   }
 
-  function onSortAdditionalClick(event) {
-    var $target = $(event.currentTarget),
-      direction = $target.data('direction');
-
-    this.remove();
-    sort(direction, true, $target.isSelected());
+  function onSortAdditionalClick() {
+    menuPopup.remove();
+    sort(this.direction, true, this.selected);
   }
 
   function sort(direction, multiSort, remove) {
     table.sort(column, direction, multiSort, remove);
-
-    that._renderSelectedSorting();
+    menuPopup._updateSortingSelectedState();
   }
 };
 
-scout.TableHeaderMenu.prototype._renderSelectedSorting = function() {
+scout.TableHeaderMenu.prototype._updateSortingSelectedState = function() {
   if (!this.table.sortEnabled) {
     return;
   }
 
-  var showAddCommands = false,
-    sortCount = this._sortColumnCount(),
-    addIcon;
+  var addIcon,
+    showAddCommands = false,
+    sortCount = this._sortColumnCount();
 
-  $('.table-header-menu-command', this.$sorting).select(false);
+  this.sortingGroup.children.forEach(function(button) {
+    button.setSelected(false);
+  });
 
   if (sortCount === 1 && !this.table.hasPermanentHeadOrTailSortColumns()) {
     if (this.column.sortActive) {
       if (this.column.sortAscending) {
-        this.$sortAsc.select(true);
+        this.sortAscButton.setSelected(true);
       } else {
-        this.$sortDesc.select(true);
+        this.sortDescButton.setSelected(true);
       }
     } else {
       showAddCommands = true;
@@ -286,176 +284,154 @@ scout.TableHeaderMenu.prototype._renderSelectedSorting = function() {
     showAddCommands = true;
     if (this.column.sortActive) {
       if (this.column.sortAscending) {
-        this.$sortAscAdd.select(true);
+        this.sortAscAddButton.setSelected(true);
       } else {
-        this.$sortDescAdd.select(true);
+        this.sortDescAddButton.setSelected(true);
       }
       addIcon = this.column.sortIndex + 1;
-      this.$sortAscAdd.attr('data-icon', addIcon);
-      this.$sortDescAdd.attr('data-icon', addIcon);
+      this.sortAscAddButton.setIcon(addIcon);
+      this.sortDescAddButton.setIcon(addIcon);
     }
   }
 
-  this.$sortAscAdd.setVisible(showAddCommands);
-  this.$sortDescAdd.setVisible(showAddCommands);
+  this.sortAscAddButton.setVisible(showAddCommands);
+  this.sortDescAddButton.setVisible(showAddCommands);
 };
 
 scout.TableHeaderMenu.prototype._renderGroupingGroup = function() {
-  var that = this,
+  var menuPopup = this,
     table = this.table,
     column = this.column,
     groupCount = this._groupColumnCount();
 
-  this.$grouping = this.$columnActions.appendDiv('table-header-menu-group buttons');
-  this.$grouping.appendDiv('table-header-menu-group-text')
-    .data('label', this.session.text('ui.Grouping'));
+  var group = scout.create('TableHeaderMenuGroup', {
+    parent: this,
+    textKey: 'ui.Grouping'});
 
-  this.$groupColumn = this.$grouping.appendDiv('table-header-menu-command toggle group')
-    .data('label', this.session.text('ui.groupingApply'))
-    .click(onGroupClick.bind(this));
-
-  this.$groupColumnAdditional = this.$grouping.appendDiv('table-header-menu-command toggle group-add')
-    .data('label', this.session.text('ui.additionally'))
-    .click(onAdditionalGroupClick.bind(this));
+  var groupButton = scout.create('TableHeaderMenuButton', {
+    parent: group,
+    textKey: 'ui.groupingApply',
+    cssClass: 'toggle group',
+    additional: false,
+    clickHandler: groupColumn});
+  var groupAddButton = scout.create('TableHeaderMenuButton', {
+    parent: group,
+    textKey: 'ui.additionally',
+    cssClass: 'toggle group-add',
+    additional: true,
+    clickHandler: groupColumn});
 
   if (groupCount === 0) {
-    this.$groupColumnAdditional.hide();
+    groupAddButton.setVisible(false);
   } else if (groupCount === 1 && this.column.grouped) {
-    this.$groupColumnAdditional.hide();
+    groupAddButton.setVisible(false);
   } else if (groupCount > 1) {
-    this.$groupColumnAdditional.show();
+    groupAddButton.setVisible(true);
   }
-
-  function onGroupClick(event) {
-    var direction = 'asc',
-      $target = $(event.currentTarget);
-    if (column.sortIndex >= 0 && (!column.sortAscending)) {
-      direction = 'desc';
-    }
-    this.remove();
-    groupColumn($target, column, direction, false);
-  }
-
-  function onAdditionalGroupClick(event) {
-    var direction = 'asc',
-      $target = $(event.currentTarget);
-    if (column.sortIndex >= 0 && (!column.sortAscending)) {
-      direction = 'desc';
-    }
-    this.remove();
-    groupColumn($target, column, direction, true);
-  }
-
-  function groupColumn($command, column, direction, additional) {
-    var remove = $command.isSelected();
-    table.groupColumn(column, additional, direction, remove);
-  }
-};
-
-scout.TableHeaderMenu.prototype._renderSelectedGrouping = function() {
-  var groupCount = this._groupColumnCount();
-
-  this.$groupColumn.select(false);
-  this.$groupColumnAdditional.select(false);
 
   if (this.column.grouped) {
     if (groupCount === 1) {
-      this.$groupColumn.select(true);
+      groupAddButton.setSelected(true);
     } else if (groupCount > 1) {
-      this.$groupColumnAdditional.select(true)
-        .attr('data-icon', this.column.sortIndex + 1);
+      groupAddButton.setSelected(true);
+      groupAddButton.setIcon(this.column.sortIndex + 1);
     }
+  }
+
+  group.render(this.$columnActions);
+
+  function groupColumn() {
+    var direction = (column.sortIndex >= 0 && !column.sortAscending) ? 'desc' : 'asc';
+    menuPopup.remove();
+    table.groupColumn(column, this.additional, direction, this.selected);
   }
 };
 
 scout.TableHeaderMenu.prototype._renderAggregationGroup = function() {
   var table = this.table,
-    column = this.column;
-  this.$aggregation = this.$columnActions.appendDiv('table-header-menu-group buttons');
-  this.$aggregation.appendDiv('table-header-menu-group-text')
-    .data('label', this.session.text('ui.Aggregation'));
+    column = this.column,
+    aggregation = column.aggregationFunction,
+    menuPopup = this,
+    group = scout.create('TableHeaderMenuGroup', {
+      parent: this,
+      textKey: 'ui.Aggregation'});
 
-  this.$aggregationFunctionSum = this.$aggregation.appendDiv('table-header-menu-command aggregation-function sum')
-    .data('label', this.session.text('ui.Sum'))
-    .click(changeAggregation.bind(this, 'sum'));
+  scout.create('TableHeaderMenuButton', {
+    parent: group,
+    textKey: 'ui.Sum',
+    cssClass: 'aggregation-function sum',
+    aggregation: 'sum',
+    clickHandler: onClick});
+  scout.create('TableHeaderMenuButton', {
+    parent: group,
+    textKey: 'ui.Average',
+    cssClass: 'aggregation-function avg',
+    aggregation: 'avg',
+    clickHandler: onClick});
+  scout.create('TableHeaderMenuButton', {
+    parent: group,
+    textKey: 'ui.Minimum',
+    cssClass: 'aggregation-function min',
+    aggregation: 'min',
+    clickHandler: onClick});
+  scout.create('TableHeaderMenuButton', {
+    parent: group,
+    textKey: 'ui.Maximum',
+    cssClass: 'aggregation-function max',
+    aggregation: 'max',
+    clickHandler: onClick});
 
-  this.$aggregationFunctionAvg = this.$aggregation.appendDiv('table-header-menu-command aggregation-function avg')
-    .data('label', this.session.text('ui.Average'))
-    .click(changeAggregation.bind(this, 'avg'));
+  group.children.forEach(function(button) {
+    button.setSelected(button.aggregation === aggregation);
+  });
+  group.render(this.$columnActions);
 
-  this.$aggregationFunctionMin = this.$aggregation.appendDiv('table-header-menu-command aggregation-function min')
-    .data('label', this.session.text('ui.Minimum'))
-    .click(changeAggregation.bind(this, 'min'));
-
-  this.$aggregationFunctionMax = this.$aggregation.appendDiv('table-header-menu-command aggregation-function max')
-    .data('label', this.session.text('ui.Maximum'))
-    .click(changeAggregation.bind(this, 'max'));
-
-  function changeAggregation(func) {
-    this.remove();
-    table.changeAggregation(column, func);
-  }
-};
-
-scout.TableHeaderMenu.prototype._renderSelectedAggregation = function() {
-  var func = this.column.aggregationFunction;
-  if (func) {
-    if (func === 'sum') {
-      this.$aggregationFunctionSum.select(true);
-    } else if (func === 'avg') {
-      this.$aggregationFunctionAvg.select(true);
-    } else if (func === 'min') {
-      this.$aggregationFunctionMin.select(true);
-    } else if (func === 'max') {
-      this.$aggregationFunctionMax.select(true);
-    }
+  function onClick() {
+    menuPopup.remove();
+    table.changeAggregation(column, this.aggregation);
   }
 };
 
 scout.TableHeaderMenu.prototype._renderColoringGroup = function() {
   var table = this.table,
-    column = this.column;
-  this.$coloring = this.$columnActions.appendDiv('table-header-menu-group buttons');
-  this.$coloring.appendDiv('table-header-menu-group-text')
-    .data('label', this.session.text('ui.Coloring'));
+    column = this.column,
+    menuPopup = this,
+    backgroundEffect = column.backgroundEffect,
+    group = scout.create('TableHeaderMenuGroup', {
+      parent: this,
+      textKey: 'ui.Coloring'});
 
-  this.$coloring.appendDiv('table-header-menu-command toggle color color-gradient1')
-    .data('label', this.session.text('ui.fromRedToGreen'))
-    .data('backgroundEffect', 'colorGradient1')
-    .click(onBackgroundEffectClick.bind(this));
-
-  this.$coloring.appendDiv('table-header-menu-command toggle color color-gradient2')
-    .data('label', this.session.text('ui.fromGreenToRed'))
-    .data('backgroundEffect', 'colorGradient2')
-    .click(onBackgroundEffectClick.bind(this));
-
+  scout.create('TableHeaderMenuButton', {
+    parent: group,
+    textKey: 'ui.fromRedToGreen',
+    cssClass: 'color color-gradient1',
+    backgroundEffect: 'colorGradient1',
+    clickHandler: onClick});
+  scout.create('TableHeaderMenuButton', {
+    parent: group,
+    textKey: 'ui.fromGreenToRed',
+    cssClass: 'color color-gradient2',
+    backgroundEffect: 'colorGradient2',
+    clickHandler: onClick});
   if (scout.device.supportsCssGradient()) {
-    this.$coloring.appendDiv('table-header-menu-command toggle color color-bar-chart')
-      .data('label', this.session.text('ui.withBarChart'))
-      .data('backgroundEffect', 'barChart')
-      .click(onBackgroundEffectClick.bind(this));
+    scout.create('TableHeaderMenuButton', {
+      parent: group,
+      textKey: 'ui.withBarChart',
+      cssClass: 'color color-bar-chart',
+      backgroundEffect: 'barChart',
+      clickHandler: onClick});
   }
 
-  function onBackgroundEffectClick(event) {
-    var $target = $(event.currentTarget),
-      effect = $target.data('backgroundEffect');
+  group.children.forEach(function(button) {
+    button.setSelected(button.backgroundEffect === backgroundEffect);
+  });
+  group.render(this.$columnActions);
 
-    if ($target.isSelected()) {
-      effect = null;
-    }
-    this.remove();
-    table.setColumnBackgroundEffect(column, effect);
+  function onClick() {
+    menuPopup.remove();
+    table.setColumnBackgroundEffect(column, this.selected ? null : this.backgroundEffect);
+    this.toggle(); // toggle selected state of button
   }
-};
-
-scout.TableHeaderMenu.prototype._renderSelectedColoring = function() {
-  var bgEffect = this.column.backgroundEffect;
-
-  $('.table-header-menu-command', this.$coloring).each(function(index, elem) {
-    var $elem = $(elem),
-      effect = $elem.data('backgroundEffect');
-    $elem.select(effect === this.column.backgroundEffect);
-  }.bind(this));
 };
 
 scout.TableHeaderMenu.prototype._renderFilterTable = function() {
@@ -681,22 +657,5 @@ scout.TableHeaderMenu.prototype._onMouseDownOutside = function(event) {
   if (this.$headerItem.isOrHas(event.target)) {
     return;
   }
-
   this.close();
 };
-
-scout.TableHeaderMenu.prototype._onCommandMouseenterClick = function(event) {
-  var $command = $(event.currentTarget),
-    $text = $command.siblings('.table-header-menu-group-text'),
-    text = ($command.isSelected() && $command.hasClass('toggle')) ? this.session.text('ui.remove') : $command.data('label');
-
-  $text.text($text.data('label') + ' ' + text);
-};
-
-scout.TableHeaderMenu.prototype._onCommandMouseleave = function(event) {
-  var $command = $(event.currentTarget),
-    $text = $command.siblings('.table-header-menu-group-text');
-
-  $text.text($text.data('label'));
-};
-

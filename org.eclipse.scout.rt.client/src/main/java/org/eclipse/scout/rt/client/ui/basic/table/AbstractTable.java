@@ -66,6 +66,8 @@ import org.eclipse.scout.rt.client.ui.action.menu.root.ITableContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.internal.TableContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
+import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ColumnsGroupBox.ColumnsTableField;
+import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ColumnsGroupBox.ColumnsTableField.Table.KeyColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractBooleanColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
@@ -185,6 +187,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   private List<ITableControl> m_tableControls;
   private IReloadHandler m_reloadHandler;
   private int m_valueChangeTriggerEnabled = 1;// >=1 is true
+  private IOrganizeColumnsForm m_organizeColumnsForm;
 
   public AbstractTable() {
     this(true);
@@ -1008,13 +1011,15 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
             }
             break;
           case TableEvent.TYPE_COLUMN_HEADERS_UPDATED:
+            checkIfColumnPreventsUiSortForTable();
+            break;
           case TableEvent.TYPE_COLUMN_STRUCTURE_CHANGED:
             checkIfColumnPreventsUiSortForTable();
+            updateOrganizeColumnsFormTable();
             break;
         }
       }
     });
-    //
   }
 
   @Override
@@ -1024,6 +1029,15 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
 
   protected AbstractEventBuffer<TableEvent> getEventBuffer() {
     return m_eventBuffer;
+  }
+
+  protected void updateOrganizeColumnsFormTable() {
+    // When organize column form is not opened, we must reload the table containing the columns
+    // So we don't have to reload each time we click on a table header menu. The reload is required
+    // when the table structure has been changed (e.g. a new column has been added)
+    if (m_organizeColumnsForm != null && !getMenuByClass(OrganizeColumnsMenu.class).isSelected()) {
+      m_organizeColumnsForm.reload();
+    }
   }
 
   private void initColumnsInternal() {
@@ -4918,6 +4932,24 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
     else {
       m_valueChangeTriggerEnabled--;
+    }
+  }
+
+  @Override
+  public void selectColumnHeader(IColumn column) {
+    if (m_organizeColumnsForm == null) {
+      OrganizeColumnsMenu organizeColumnsMenu = getMenuByClass(OrganizeColumnsMenu.class);
+      m_organizeColumnsForm = organizeColumnsMenu.getForm();
+    }
+
+    ITable table = m_organizeColumnsForm.getFieldByClass(ColumnsTableField.class).getTable();
+    IColumn<IColumn<?>> keyColumn = table.getColumnSet().getColumnByClass(KeyColumn.class);
+    for (ITableRow row : table.getRows()) {
+      IColumn columnFromRow = (IColumn) row.getCell(keyColumn).getValue();
+      if (column == columnFromRow) {
+        table.selectRow(row);
+        break;
+      }
     }
   }
 }

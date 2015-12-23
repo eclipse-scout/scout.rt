@@ -30,6 +30,7 @@ describe("DecimalFormat", function() {
         pattern: '###0.00'
       });
 
+      expect(decimalFormat.format(null)).toBe(null);
       expect(decimalFormat.format(0)).toBe('0.00');
       expect(decimalFormat.format(0.000)).toBe('0.00');
       expect(decimalFormat.format(1000.1234)).toBe('1000.12');

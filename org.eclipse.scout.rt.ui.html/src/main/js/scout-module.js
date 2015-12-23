@@ -141,6 +141,8 @@ __include("scout/table/TableInfoSelectionTooltip.js");
 __include("scout/table/TableHeader.js");
 __include("scout/table/TableHeaderMenu.js");
 __include("scout/table/TableHeaderMenuLayout.js");
+__include("scout/table/TableHeaderMenuGroup.js");
+__include("scout/table/TableHeaderMenuButton.js");
 __include("scout/table/TableLayout.js");
 __include("scout/table/TableSelectionHandler.js");
 __include("scout/table/TableTooltip.js");

@@ -100,7 +100,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   public static final String EVENT_COLUMN_HEADERS_UPDATED = "columnHeadersUpdated";
   public static final String EVENT_COLUMN_BACKGROUND_EFFECT_CHANGED = "columnBackgroundEffectChanged";
   public static final String EVENT_COLUMN_SELECTED = "columnSelected";
-  public static final String EVENT_COLUMN_ORGANIZE_ACTION = "columnAction";
+  public static final String EVENT_COLUMN_ORGANIZE_ACTION = "columnOrganizeAction";
   public static final String EVENT_REQUEST_FOCUS_IN_CELL = "requestFocusInCell";
   public static final String EVENT_START_CELL_EDIT = "startCellEdit";
   public static final String EVENT_END_CELL_EDIT = "endCellEdit";
@@ -510,7 +510,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
       m_organizeColumnCommands = new JsonOrganizeColumnCommands(organizeColumnsMenu);
     }
     String columnId = event.getData().getString("columnId");
-    m_organizeColumnCommands.selectColumn(getColumn(columnId));
+    getModel().selectColumnHeader(getColumn(columnId));
     addActionEvent("columnActionsChanged", m_organizeColumnCommands.toJson());
   }
 
@@ -1225,12 +1225,6 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     JSONObject jsonEvent = new JSONObject();
     putProperty(jsonEvent, PROP_COLUMNS, columnsToJson(getColumnsInViewOrder()));
     addActionEvent(EVENT_COLUMN_STRUCTURE_CHANGED, jsonEvent);
-
-    // When column structure changes we must also reload the table in our organize columns form
-    // used to render the organize column actions in the table header menu.
-    if (m_organizeColumnCommands != null) {
-      m_organizeColumnCommands.reload();
-    }
 
     // Resend filters because a column with a filter may got invisible.
     // Since the gui does not know invisible columns, the filter would fail.

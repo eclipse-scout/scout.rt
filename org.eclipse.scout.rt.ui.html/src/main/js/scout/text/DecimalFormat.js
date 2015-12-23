@@ -114,6 +114,10 @@ scout.DecimalFormat = function(locale, decimalFormatConfiguration) {
 };
 
 scout.DecimalFormat.prototype.format = function(number) {
+  if (number === null || number === undefined) {
+    return null;
+  }
+
   var prefix = this.positivePrefix;
   var suffix = this.positiveSuffix;
 
