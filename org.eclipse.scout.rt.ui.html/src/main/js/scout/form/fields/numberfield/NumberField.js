@@ -55,9 +55,22 @@ scout.NumberField.prototype._syncDecimalFormat = function(decimalFormat) {
 scout.NumberField.prototype._parse = function() {
   var input = this.$field.val();
   if (input) {
+    //check if valid thousends
+    var thousends = input.match(new RegExp('\\d*[' + this.decimalFormat.groupingChar + ']\\d*', 'g'));
+    if(thousends){
+      for(var i = 0; i < thousends.length; i++){
+        var parts = thousends[i].split(this.decimalFormat.groupingChar);
+        for(var j = 0 ; j<parts.length;j++){
+          if((j===0 && parts[j].length>3 && parts[j].length<0) || (j!==0 && parts[j].length!==3)){
+            return;
+          }
+        }
+      }
+    }
+
     input = input
       .replace(new RegExp('[' + this.decimalFormat.groupingChar + ']', 'g'), '')
-      .replace(new RegExp('[' + this.decimalFormat.pointChar + ']', 'g'), '.')
+      .replace(new RegExp('[' + this.decimalFormat.decimalSeparatorChar + ']', 'g'), '.')
       .replace(/\s/g, '');
 
     // if only math symbols are in the input string...
