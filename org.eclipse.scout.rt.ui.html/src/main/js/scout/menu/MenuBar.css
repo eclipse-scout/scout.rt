@@ -75,14 +75,15 @@
       /* All menu items need the same height to correctly position the key-boxes. "height: 100%" does not seem to */
       /* work in FF, probably because the menubar uses displays "table" and "table-cell". This height is also  */
       /* used when calculating the preferred height of the menubar. */
-      height: 25px;
+      height: 22px;
+      margin-top: 1px;
+      margin-bottom: 1px;
 
       &:not(.disabled) {
         color: @menubar-item-color;
       }
 
       &:focus:not(.disabled):not(.menu-button) {
-        text-decoration: underline;
         color: @focus-color;
 
         &::after {
@@ -98,6 +99,7 @@
 
       /* FIXME awe: reduce copy/paste --> Button.css */
       &.menu-button {
+        height: 25px;
         padding: @button-padding-y @button-padding-x;
         text-align: center;
         color: @menubar-button-color;
@@ -214,6 +216,10 @@
 
     & > .menu-item {
       height: @logical-grid-height;
+
+      &.menu-button {
+        height: @logical-grid-height;
+      }
 
       &:not(.menu-textandicon) > .font-icon {
         font-size: 22px;

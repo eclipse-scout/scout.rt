@@ -180,8 +180,10 @@ scout.Menu.prototype.isTabTarget = function() {
 };
 
 scout.Menu.prototype._updateIconAndTextStyle = function() {
-  var hasTextAndIcon = !!(scout.strings.hasText(this.text) && this.iconId);
+  var hasText = scout.strings.hasText(this.text);
+  var hasTextAndIcon = !!(hasText && this.iconId);
   this.$container.toggleClass('menu-textandicon', hasTextAndIcon);
+  this.$container.toggleClass('menu-icononly', !hasText);
 };
 
 scout.Menu.prototype._closePopup = function() {
