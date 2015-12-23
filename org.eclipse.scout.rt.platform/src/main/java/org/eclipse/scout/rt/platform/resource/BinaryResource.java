@@ -168,11 +168,11 @@ public final class BinaryResource implements Serializable {
    * @return the {@link String} content (using defined {@link Charset} or UTF-8 as default) for this resource
    */
   public String getContentAsString() {
-    Charset charset = null;
+    Charset charset = StandardCharsets.UTF_8;
     if (getCharset() != null) {
       charset = Charset.forName(getCharset());
     }
-    return new String(m_content, charset == null ? StandardCharsets.UTF_8 : charset);
+    return new String(m_content, charset);
   }
 
   /**
