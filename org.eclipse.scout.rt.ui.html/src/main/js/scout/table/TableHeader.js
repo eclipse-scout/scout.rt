@@ -262,11 +262,19 @@ scout.TableHeader.prototype.openTableHeaderMenu = function(column) {
     focusableContainer: true
   });
   this._tableHeaderMenu.open();
+  this.table._send('columnSelected', {columnId: column.id});
 };
 
 scout.TableHeader.prototype.closeTableHeaderMenu = function() {
   this._tableHeaderMenu.remove();
   this._tableHeaderMenu = null;
+};
+
+
+scout.TableHeader.prototype.onColumnActionsChanged = function(event) {
+  if (this._tableHeaderMenu) {
+    this._tableHeaderMenu.onColumnActionsChanged(event);
+  }
 };
 
 scout.TableHeader.prototype.findHeaderItems = function() {

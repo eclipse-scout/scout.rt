@@ -8,7 +8,6 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-// FIXME CRU: implement buttons to show/hide, add/remove columns depending on 'custom' property.
 scout.TableHeaderMenu = function() {
   scout.TableHeaderMenu.parent.call(this);
   this.tableHeader;
@@ -42,7 +41,7 @@ scout.TableHeaderMenu.prototype._init = function(options) {
   this.table = this.tableHeader.table;
   this.$headerItem = this.$anchor;
 
-  this._tableFilterHandler = this._onTableFilterChanged.bind(this);
+  this._tableFilterHandler = this._onFilterTableChanged.bind(this);
   this.table.on('addFilter', this._tableFilterHandler);
   this.table.on('removeFilter', this._tableFilterHandler);
   this._filterTableCheckedRowsHandler = this._onFilterTableCheckedRows.bind(this);
@@ -54,8 +53,8 @@ scout.TableHeaderMenu.prototype._init = function(options) {
   }
   // always recalculate available values to make sure new/updated/deleted rows are considered
   this.filter.calculate();
-  this.filter.on('filterFieldsChanged', this._updateTableFilters.bind(this)); // FIXME AWE: (filter) off handler?
-  this._updateFilterCheckedMode();
+  this.filter.on('filterFieldsChanged', this._updateFilterTable.bind(this)); // FIXME AWE: (filter) off handler?
+  this._updateFilterTableCheckedMode();
 };
 
 scout.TableHeaderMenu.prototype._createLayout = function() {
@@ -90,7 +89,7 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
   }
 
   // Add/remove/change columns
-  this._renderModifyColumnsGroup();
+  this._renderModifyColumnGroup();
 
   // Grouping and aggregation
   if (this.table.containsNumberColumn()) {
@@ -177,33 +176,37 @@ scout.TableHeaderMenu.prototype._renderMovingGroup = function() {
   }
 };
 
-scout.TableHeaderMenu.prototype._renderModifyColumnsGroup = function() {
+scout.TableHeaderMenu.prototype._renderModifyColumnGroup = function() {
   var $group = this.$columnActions.appendDiv('table-header-menu-group buttons');
   $group.appendDiv('table-header-menu-group-text')
     .data('label', this.session.text('ui.Column'));
 
-  var $button = $group.appendDiv('table-header-menu-command toggle add-column')
+  // add button is only visible when table has a table-customizer
+  this.$addColumnAction = $group.appendDiv('table-header-menu-command toggle add-column')
     .data('label', this.session.text('ui.addColumn'))
-    .click(this.onAddColumnClick.bind(this));
+    .click(onClick.bind(this, 'add'));
 
-  $button = $group.appendDiv('table-header-menu-command toggle sort remove-column')
+  // remove button is always visible (but it has a different behavior
+  // whether column is a custom or a regular column.
+  this.$removeColumnAction = $group.appendDiv('table-header-menu-command toggle sort remove-column')
     .data('label', this.session.text('ui.removeColumn'))
-    .click(this.onRemoveColumnClick.bind(this));
+    .click(onClick.bind(this, 'remove'));
 
-  $button = $group.appendDiv('table-header-menu-command toggle sort change-column')
+  // change button is only visible when column is a custom column
+  this.$modifyColumnAction = $group.appendDiv('table-header-menu-command toggle sort change-column')
     .data('label', this.session.text('ui.changeColumn'))
-    .click(this.onRemoveColumnClick.bind(this));
+    .click(onClick.bind(this, 'modify'));
+
+  function onClick(action) {
+    this.table._send('columnOrganizeAction', {action: action});
+  }
 };
 
-scout.TableHeaderMenu.prototype.onAddColumnClick = function(event) {
+scout.TableHeaderMenu.prototype.onColumnActionsChanged = function(event) {
+  this.$addColumnAction.setVisible(event.addVisible);
+  this.$removeColumnAction.setVisible(event.removeVisible);
+  this.$modifyColumnAction.setVisible(event.modifyVisible);
 };
-
-scout.TableHeaderMenu.prototype.onRemoveColumnClick = function(event) {
-};
-
-scout.TableHeaderMenu.prototype.onChangeColumnClick = function(event) {
-};
-
 
 scout.TableHeaderMenu.prototype._renderSortingGroup = function() {
   var table =
@@ -466,7 +469,7 @@ scout.TableHeaderMenu.prototype._renderFilterTable = function() {
   this.$filterToggleChecked = $filterActions
     .appendDiv('table-header-menu-filter-toggle-checked')
     .text(this.session.text(this.filterCheckedMode.text))
-    .on('click', this._toggleFiltersChecked.bind(this));
+    .on('click', this._updateFilterTableCheckedMode.bind(this));
 
   this.$filterTableGroupTitle = this.$filterTableGroup
     .appendDiv('table-header-menu-group-text')
@@ -512,6 +515,9 @@ scout.TableHeaderMenu.prototype._renderFilterTable = function() {
   this.filterTable.render(this.$filterTableGroup);
 };
 
+/**
+ * @returns the title-text used for the filter-table
+ */
 scout.TableHeaderMenu.prototype._filterByText = function() {
   var text = this.session.text('ui.Filter'),
     numSelected = this.filter.selectedValues.length,
@@ -525,7 +531,7 @@ scout.TableHeaderMenu.prototype._filterByText = function() {
   return text;
 };
 
-scout.TableHeaderMenu.prototype._toggleFiltersChecked = function() {
+scout.TableHeaderMenu.prototype._updateFilterTableCheckedMode = function() {
   var checkedMode = scout.TableHeaderMenu.CheckedMode;
   var checkAll = this.filterCheckedMode.checkAll;
   this.filter.selectedValues = [];
@@ -538,11 +544,11 @@ scout.TableHeaderMenu.prototype._toggleFiltersChecked = function() {
     this.filterCheckedMode = checkedMode.ALL;
   }
   this.filterTable.checkAll(checkAll);
-  this._updateTableFilters();
-  this._updateGroupFilterActions();
+  this._updateFilterTable();
+  this._updateFilterTableActions();
 };
 
-scout.TableHeaderMenu.prototype._updateTableFilters = function() {
+scout.TableHeaderMenu.prototype._updateFilterTable = function() {
   if (this.filter.filterActive()) {
     this.table.addFilter(this.filter);
   } else {
@@ -552,7 +558,7 @@ scout.TableHeaderMenu.prototype._updateTableFilters = function() {
   this.table.filter();
 };
 
-scout.TableHeaderMenu.prototype._updateGroupFilterActions = function() {
+scout.TableHeaderMenu.prototype._updateFilterTableActions = function() {
   this.$filterToggleChecked.text(this.session.text(this.filterCheckedMode.text));
 };
 
@@ -651,18 +657,18 @@ scout.TableHeaderMenu.prototype._onFilterTableCheckedRows = function(event) {
       this.filter.selectedValues.push(row.dataMap.filterValue.key);
     }
   }, this);
-  this._updateTableFilters();
+  this._updateFilterTable();
 };
 
-scout.TableHeaderMenu.prototype._onTableFilterChanged = function() {
+scout.TableHeaderMenu.prototype._onFilterTableChanged = function() {
   this.$filterTableGroupTitle.text(this._filterByText());
-  this._updateFilterCheckedMode();
-  this._updateGroupFilterActions();
+  this._updateFilterTableCheckedMode();
+  this._updateFilterTableActions();
 };
 
 // When no filter value is selected, we change the selection mode to ALL
 // since it makes no sense to choose NONE when no value is currently selected
-scout.TableHeaderMenu.prototype._updateFilterCheckedMode = function() {
+scout.TableHeaderMenu.prototype._updateFilterTableCheckedMode = function() {
   if (this.filter.selectedValues.length === 0) {
     this.filterCheckedMode = scout.TableHeaderMenu.CheckedMode.ALL;
   } else {
@@ -693,3 +699,4 @@ scout.TableHeaderMenu.prototype._onCommandMouseleave = function(event) {
 
   $text.text($text.data('label'));
 };
+

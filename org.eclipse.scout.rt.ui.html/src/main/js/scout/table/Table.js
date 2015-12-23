@@ -3405,9 +3405,15 @@ scout.Table.prototype.onModelAction = function(event) {
     this._onColumnBackgroundEffectChanged(event);
   } else if (event.type === 'requestFocusInCell') {
     this._onRequestFocusInCell(event);
+  } else if (event.type === 'columnActionsChanged') {
+    this._onColumnActionsChanged(event);
   } else {
     scout.Table.parent.prototype.onModelAction.call(this, event);
   }
+};
+
+scout.Table.prototype._onColumnActionsChanged = function(event) {
+  this.header.onColumnActionsChanged(event);
 };
 
 /**

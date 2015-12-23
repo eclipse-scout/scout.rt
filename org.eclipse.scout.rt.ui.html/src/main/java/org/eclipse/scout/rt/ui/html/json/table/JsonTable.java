@@ -33,6 +33,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.TableListener;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.INumberColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.controls.ITableControl;
+import org.eclipse.scout.rt.client.ui.basic.table.menus.OrganizeColumnsMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.userfilter.TableTextUserFilterState;
 import org.eclipse.scout.rt.client.ui.basic.userfilter.IUserFilterState;
 import org.eclipse.scout.rt.client.ui.dnd.IDNDSupport;
@@ -98,6 +99,8 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   public static final String EVENT_COLUMN_STRUCTURE_CHANGED = "columnStructureChanged";
   public static final String EVENT_COLUMN_HEADERS_UPDATED = "columnHeadersUpdated";
   public static final String EVENT_COLUMN_BACKGROUND_EFFECT_CHANGED = "columnBackgroundEffectChanged";
+  public static final String EVENT_COLUMN_SELECTED = "columnSelected";
+  public static final String EVENT_COLUMN_ORGANIZE_ACTION = "columnAction";
   public static final String EVENT_REQUEST_FOCUS_IN_CELL = "requestFocusInCell";
   public static final String EVENT_START_CELL_EDIT = "startCellEdit";
   public static final String EVENT_END_CELL_EDIT = "endCellEdit";
@@ -122,6 +125,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   public static final String PROP_HAS_RELOAD_HANDLER = "hasReloadHandler";
 
   private TableListener m_tableListener;
+  private JsonOrganizeColumnCommands m_organizeColumnCommands;
   private final Map<String, ITableRow> m_tableRows;
   private final Map<ITableRow, String> m_tableRowIds;
   private final Map<String, IColumn> m_columns;
@@ -258,10 +262,18 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
         return getModel().getDropMaximumSize();
       }
     });
+    // FIXME CGU/MOT: (von A.WE) das ist doch gar keine property von ITable? AbstractTable triggert
+    // auch kein Event wenn die Property hier ändert. Gehört das darum nicht eher ins toJson()?
     putJsonProperty(new JsonProperty<ITable>(PROP_HAS_RELOAD_HANDLER, model) {
       @Override
       protected Boolean modelValue() {
         return getModel().getReloadHandler() != null;
+      }
+    });
+    putJsonProperty(new JsonProperty<ITable>(ITable.PROP_TABLE_CUSTOMIZER, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().getTableCustomizer() != null;
       }
     });
     putJsonProperty(new JsonProperty<ITable>(ITable.PROP_SORT_ENABLED, model) {
@@ -476,9 +488,30 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     else if (EVENT_COLUMN_BACKGROUND_EFFECT_CHANGED.equals(event.getType())) {
       handleColumnBackgroundEffectChanged(event);
     }
+    else if (EVENT_COLUMN_SELECTED.equals(event.getType())) {
+      handleUiColumnSelected(event);
+    }
+    else if (EVENT_COLUMN_ORGANIZE_ACTION.equals(event.getType())) {
+      handleUiColumnOrganizeAction(event);
+    }
     else {
       super.handleUiEvent(event);
     }
+  }
+
+  private void handleUiColumnOrganizeAction(JsonEvent event) {
+    String action = event.getData().getString("action");
+    m_organizeColumnCommands.doAction(action);
+  }
+
+  private void handleUiColumnSelected(JsonEvent event) {
+    if (m_organizeColumnCommands == null) {
+      OrganizeColumnsMenu organizeColumnsMenu = getModel().getMenuByClass(OrganizeColumnsMenu.class);
+      m_organizeColumnCommands = new JsonOrganizeColumnCommands(organizeColumnsMenu);
+    }
+    String columnId = event.getData().getString("columnId");
+    m_organizeColumnCommands.selectColumn(getColumn(columnId));
+    addActionEvent("columnActionsChanged", m_organizeColumnCommands.toJson());
   }
 
   protected void handleUiRowClicked(JsonEvent event) {
@@ -1192,6 +1225,12 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     JSONObject jsonEvent = new JSONObject();
     putProperty(jsonEvent, PROP_COLUMNS, columnsToJson(getColumnsInViewOrder()));
     addActionEvent(EVENT_COLUMN_STRUCTURE_CHANGED, jsonEvent);
+
+    // When column structure changes we must also reload the table in our organize columns form
+    // used to render the organize column actions in the table header menu.
+    if (m_organizeColumnCommands != null) {
+      m_organizeColumnCommands.reload();
+    }
 
     // Resend filters because a column with a filter may got invisible.
     // Since the gui does not know invisible columns, the filter would fail.

@@ -65,7 +65,6 @@ import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.shared.security.CreateCustomColumnPermission;
 import org.eclipse.scout.rt.shared.security.UpdateCustomColumnPermission;
-import org.eclipse.scout.rt.shared.services.common.bookmark.TableColumnState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -1480,49 +1479,6 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
     tableFieldTable.getMenuByClass(RemoveFilterMenu.class).setVisible(isFilterActive);
     tableFieldTable.getMenuByClass(AddCustomColumnEmptySpaceMenu.class).setEnabled(getOrganizedTable().getTableCustomizer() != null && tableFieldTable.getSelectedRows().size() == 0);
     tableFieldTable.getMenuByClass(AddCustomColumnEmptySpaceMenu.class).setVisible(getOrganizedTable().getTableCustomizer() != null && tableFieldTable.getSelectedRows().size() == 0);
-  }
-
-  /**
-   * complete state (config and data)
-   */
-  protected static class P_TableState {
-    protected byte[] m_tableCustomizerData;
-    protected byte[] m_userFilterData;
-    protected List<TableColumnState> m_columnStates;
-    protected Object[][] m_data;
-
-    public byte[] getTableCustomizerData() {
-      return m_tableCustomizerData;
-    }
-
-    public void setTableCustomizerData(byte[] tableCustomizerData) {
-      m_tableCustomizerData = tableCustomizerData;
-    }
-
-    public byte[] getUserFilterData() {
-      return m_userFilterData;
-    }
-
-    public void setUserFilterData(byte[] userFilterData) {
-      m_userFilterData = userFilterData;
-    }
-
-    public List<TableColumnState> getColumnStates() {
-      return m_columnStates;
-    }
-
-    public void setColumnStates(List<TableColumnState> columnStates) {
-      m_columnStates = columnStates;
-    }
-
-    public Object[][] getData() {
-      return m_data;
-    }
-
-    public void setData(Object[][] data) {
-      m_data = data;
-    }
-
   }
 
   @Override
