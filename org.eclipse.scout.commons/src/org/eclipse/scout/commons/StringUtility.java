@@ -903,7 +903,7 @@ public final class StringUtility {
     s = s.replace("'", "&#39;");
     s = s.replace("<", "&lt;");
     s = s.replace(">", "&gt;");
-    s = s.replace("\n\r", "<br/>");
+    s = s.replace("\r\n", "<br/>");
     s = s.replace("\n", "<br/>");
 
     // temporarily replace tabs with specific tab-identifier to not be replaced by subsequent whitespace pattern
