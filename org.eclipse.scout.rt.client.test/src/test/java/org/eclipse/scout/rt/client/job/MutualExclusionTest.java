@@ -49,6 +49,7 @@ import org.eclipse.scout.rt.platform.job.JobState;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.internal.JobFutureTask;
 import org.eclipse.scout.rt.platform.job.internal.JobManager;
+import org.eclipse.scout.rt.platform.job.internal.NamedThreadFactory.ThreadInfo;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.SleepUtil;
@@ -745,7 +746,7 @@ public class MutualExclusionTest {
             }
           }
 
-          s_executor.execute(runnable);
+          s_executor.execute(new NamedThreadRunnable(runnable));
           return null;
         }
       }).when(executorMock).execute(any(Runnable.class));
@@ -828,7 +829,7 @@ public class MutualExclusionTest {
             }
           }
 
-          s_executor.execute(runnable);
+          s_executor.execute(new NamedThreadRunnable(runnable));
           return null;
         }
       }).when(executorMock).execute(any(Runnable.class));
@@ -1411,5 +1412,25 @@ public class MutualExclusionTest {
     Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
         .andMatchExecutionHint(executionHint)
         .toFilter(), 10, TimeUnit.SECONDS);
+  }
+
+  private static class NamedThreadRunnable implements Runnable {
+
+    private final Runnable m_runnable;
+
+    public NamedThreadRunnable(final Runnable runnable) {
+      m_runnable = runnable;
+    }
+
+    @Override
+    public void run() {
+      ThreadInfo.CURRENT.set(new ThreadInfo(Thread.currentThread(), "JUnit", 1));
+      try {
+        m_runnable.run();
+      }
+      finally {
+        ThreadInfo.CURRENT.remove();
+      }
+    }
   }
 }
