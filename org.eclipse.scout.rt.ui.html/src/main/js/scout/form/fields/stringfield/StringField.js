@@ -43,13 +43,31 @@ scout.StringField.prototype._render = function($parent) {
   this.addLabel();
   this.addMandatoryIndicator();
 
-  var $field;
+  var $field, helper = function(){
+    this.mouseClicked=true;
+  }.bind(this);
   if (this.multilineText) {
     $field = $parent.makeElement('<textarea>')
       .on('DOMMouseScroll mousewheel', function(event) {
         // otherwise scout.Scrollbar.prototype would handle this event for scrollable group boxes and prevent scrolling on textarea
         event.stopPropagation();
-    });
+    }).on('mousedown', helper)
+    .focus(function(event){
+      this.$field.off('mousedown', helper);
+      if(!this.mouseClicked){
+        //only trigger on tab focus in
+        setTimeout(function(){
+          if(this.selectionStart){
+            this._renderSelectionStart();
+            this._renderSelectionEnd();
+          }
+        }.bind(this));
+      }
+      this.mouseClicked = false;
+    }.bind(this))
+    .on('focusout', function(){
+      this.$field.on('mousedown', helper);
+    }.bind(this));
   } else {
     $field = scout.fields.makeTextField($parent);
   }
@@ -57,6 +75,15 @@ scout.StringField.prototype._render = function($parent) {
 
   this.addField($field);
   this.addStatus();
+
+
+};
+
+scout.StringField.prototype._onFieldBlur = function() {
+  scout.StringField.parent.prototype._onFieldBlur.call(this);
+  if(this.multilineText){
+    this._updateSelection(true);
+  }
 };
 
 scout.StringField.prototype._renderProperties = function() {
@@ -167,6 +194,11 @@ scout.StringField.prototype._renderInsertText = function() {
     text = text.slice(0, a) + s + text.slice(b);
     elem.value = text;
 
+    if(elem.selectionStart===elem.selectionEnd){
+      this.selectionStart = a+s.length;
+      this.selectionEnd = this.selectionStart;
+    }
+
     // Make sure display text gets sent (necessary if field does not have the focus)
     if (this.updateDisplayTextOnModify) {
       // If flag is true, we need to send two events (First while typing=true, second = false)
@@ -205,14 +237,14 @@ scout.StringField.prototype._onSelectionChangingAction = function(event) {
   }
 };
 
-scout.StringField.prototype._updateSelection = function() {
+scout.StringField.prototype._updateSelection = function(suppressSend) {
   var oldSelectionStart = this.selectionStart;
   var oldSelectionEnd = this.selectionEnd;
   this.selectionStart = this.$field[0].selectionStart;
   this.selectionEnd = this.$field[0].selectionEnd;
   var selectionChanged = (this.selectionStart !== oldSelectionStart || this.selectionEnd !== oldSelectionEnd);
 
-  if (selectionChanged) {
+  if (selectionChanged && !suppressSend) {
     this._sendSelectionChanged();
   }
 };
