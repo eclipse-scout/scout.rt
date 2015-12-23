@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <configuration>
 
-  <variable name="logPattern" scope="context" value="%date{ISO8601} %-5level %thread %logger{50} - %m%n" />
+  <variable scope="context" name="logPattern" value="%date{ISO8601} %-5level %thread %logger{50} - %m%n" />
 
   <appender class="ch.qos.logback.core.ConsoleAppender" name="STDOUT">
     <filter class="org.eclipse.scout.rt.platform.logger.LevelRangeFilter">
