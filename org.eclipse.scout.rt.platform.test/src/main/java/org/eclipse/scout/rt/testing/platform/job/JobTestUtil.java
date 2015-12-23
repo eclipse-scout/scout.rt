@@ -48,36 +48,65 @@ public class JobTestUtil {
   }
 
   /**
-   * Blocks the calling thread until the expected number of tasks competing for a permit is reached. That is all the
-   * permit owners plus all queued task. This method blocks 30s at maximum, and throws an {@link AssertionError} if
-   * elapsed.
+   * Waits if necessary for at most 30s until the {@link ISchedulingSemaphore} reaches the expected competitor count. If
+   * elapsed, an {@link AssertionError} is thrown.
+   * <p>
+   * Competitor count: all permit owners plus all queued task.
    */
   public static void waitForPermitCompetitors(final ISchedulingSemaphore semaphore, final int expectedCompetitorCount) {
+    waitForCondition(new ICondition() {
+
+      @Override
+      public boolean isFulfilled() {
+        return semaphore.getCompetitorCount() == expectedCompetitorCount;
+      }
+
+      @Override
+      public String toString() {
+        return String.format("expectedPermitCount=%s, actualPermitCount=%s", expectedCompetitorCount, semaphore.getCompetitorCount());
+      }
+    });
+  }
+
+  /**
+   * Waits if necessary for at most 30s until the {@link IFuture} enters the expected state. If elapsed, an
+   * {@link AssertionError} is thrown.
+   * <p>
+   * <strong>When this method returns, the future is in the given state. But, event listeners may not necessarily
+   * notified yet.</strong>
+   */
+  public static void waitForState(final IFuture<?> future, final JobState expectedState) {
+    waitForCondition(new ICondition() {
+
+      @Override
+      public boolean isFulfilled() {
+        return future.getState() == expectedState;
+      }
+
+      @Override
+      public String toString() {
+        return String.format("expectedState=%s, actualState=%s", expectedState, future.getState());
+      }
+    });
+  }
+
+  /**
+   * Waits if necessary for at most 30s until the condition is fulfilled. If elapsed, an {@link AssertionError} is
+   * thrown.
+   */
+  public static void waitForCondition(final ICondition condition) {
     final long deadline = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(30);
 
-    while (semaphore.getCompetitorCount() != expectedCompetitorCount) {
+    while (!condition.isFulfilled()) {
       if (System.currentTimeMillis() > deadline) {
-        fail(String.format("Timeout elapsed while waiting for a semaphore-permit count. [expectedPermitCount=%s, actualPermitCount=%s]", expectedCompetitorCount, semaphore.getCompetitorCount()));
+        fail(String.format("Timeout elapsed while waiting for a condition to be fulfilled. [condition=%s]", condition));
       }
       Thread.yield();
     }
   }
 
-  /**
-   * Blocks the calling thread until the job enters the given state. This method blocks 30s at maximum, and throws an
-   * {@link AssertionError} if elapsed.
-   * <p>
-   * <strong>When this method returns, the future is in the given state. But, event listeners not necessarily notified
-   * yet.</strong>
-   */
-  public static void waitForState(final IFuture<?> future, final JobState state) {
-    final long deadline = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(30);
+  public static interface ICondition {
 
-    while (future.getState() != state) {
-      if (System.currentTimeMillis() > deadline) {
-        fail(String.format("Timeout elapsed while waiting for a job to enter a state. [expectedState=%s, currentState=%s]", state, future.getState()));
-      }
-      Thread.yield();
-    }
+    boolean isFulfilled();
   }
 }

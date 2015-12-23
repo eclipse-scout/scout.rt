@@ -11,20 +11,22 @@
 package org.eclipse.scout.rt.server.scheduler;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Calendar;
-import java.util.concurrent.TimeUnit;
 
 import javax.security.auth.Subject;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.security.SimplePrincipal;
-import org.eclipse.scout.rt.platform.util.SleepUtil;
 import org.eclipse.scout.rt.server.TestServerSession;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.server.session.ServerSessionProvider;
+import org.eclipse.scout.rt.testing.platform.job.JobTestUtil;
+import org.eclipse.scout.rt.testing.platform.job.JobTestUtil.ICondition;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
+import org.eclipse.scout.rt.testing.platform.util.BlockingCountDownLatch;
 import org.eclipse.scout.rt.testing.server.runner.RunWithServerSession;
 import org.eclipse.scout.rt.testing.server.runner.ServerTestRunner;
 import org.junit.Before;
@@ -53,56 +55,68 @@ public class SchedulerTest {
     m_runContext.withSession(BEANS.get(ServerSessionProvider.class).provide(m_runContext.copy()));
 
     m_ticker = new Ticker(Calendar.SECOND);
-
   }
 
   @Test
   public void testRunningJobCount() throws InterruptedException {
-    IScheduler scheduler = new Scheduler(m_ticker, m_runContext);
-    scheduler.addJob(new JobAcceptTick("groupId", "jobIdAccept"));
-    scheduler.addJob(new JobDontAcceptTick("groupId", "jobIdDontAccept"));
-    assertEquals("JobCount must be 2", 2, scheduler.getJobCount());
+    final IScheduler scheduler = new Scheduler(m_ticker, m_runContext);
+    final BlockingCountDownLatch job1RunningLatch = new BlockingCountDownLatch(1);
+
+    // Add 'job-1'(accepts the first tick)
+    scheduler.addJob(new AbstractSchedulerJob("groupId", "job-1") {
+
+      @Override
+      public void run(IScheduler s, TickSignal signal) {
+        try {
+          job1RunningLatch.countDownAndBlock();
+        }
+        catch (InterruptedException e) {
+          // NOOP
+        }
+
+        setDisposed(true); // Unregister the job
+      }
+
+      @Override
+      public boolean acceptTick(TickSignal signal) {
+        return true;
+      }
+    });
+
+    // Add 'job-2'(does not accept ticks)
+    scheduler.addJob(new AbstractSchedulerJob("groupId", "job2") {
+
+      @Override
+      public boolean acceptTick(TickSignal signal) {
+        return false;
+      }
+    });
+
+    assertEquals("job count expected to be 2", 2, scheduler.getJobCount());
     scheduler.start();
 
-    Thread.sleep(150); //now, JobAcceptTick should be running
-    assertEquals("JobAcceptTick should be running only", 1, scheduler.getRunningJobCount());
-    assertEquals("JobAcceptTick should be running only", 1, scheduler.getRunningJobs(null, null).size());
-    assertEquals("2 Jobs should be in the Scheduler", 2, scheduler.getAllJobs().size());
-    assertEquals("2 Jobs should be in the Scheduler", 2, scheduler.getJobCount());
+    // Wait until job-1 is running
+    assertTrue(job1RunningLatch.await());
+    assertEquals("job-1 should be running only", 1, scheduler.getRunningJobCount());
+    assertEquals("job-1 should be running only", 1, scheduler.getRunningJobs(null, null).size());
+    assertEquals("2 jobs should be registered", 2, scheduler.getAllJobs().size());
+    assertEquals("2 jobs should be registered", 2, scheduler.getJobCount());
 
-    Thread.sleep(100); //now JobAcceptTick should be finished
+    // Let job-1 finish
+    job1RunningLatch.unblock();
+
+    // Wait until job-1 completed
+    JobTestUtil.waitForCondition(new ICondition() {
+
+      @Override
+      public boolean isFulfilled() {
+        return scheduler.getJobCount() == 1;
+      }
+    });
+
     assertEquals("No running job left", 0, scheduler.getRunningJobCount());
     assertEquals("No running job left", 0, scheduler.getRunningJobs(null, null).size());
     assertEquals("jobDontAccept should be in the Scheduler", 1, scheduler.getAllJobs().size());
     assertEquals("jobDontAccept should be in the Scheduler", 1, scheduler.getJobCount());
-  }
-}
-
-class JobAcceptTick extends AbstractSchedulerJob {
-
-  public JobAcceptTick(String groupId, String jobId) {
-    super(groupId, jobId);
-  }
-
-  @Override
-  public void run(IScheduler scheduler, TickSignal signal) {
-    SleepUtil.sleepElseLog(200, TimeUnit.MILLISECONDS, "Interrupted tick");
-    setDisposed(true);
-  }
-
-  @Override
-  public boolean acceptTick(TickSignal signal) {
-    return true;
-  }
-}
-
-class JobDontAcceptTick extends AbstractSchedulerJob {
-  public JobDontAcceptTick(String groupId, String jobId) {
-    super(groupId, jobId);
-  }
-
-  @Override
-  public boolean acceptTick(TickSignal signal) {
-    return false;
   }
 }
