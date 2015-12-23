@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.server;
 import java.lang.reflect.Method;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Pattern;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -46,9 +45,6 @@ import org.slf4j.LoggerFactory;
 @ApplicationScoped
 public class ServiceOperationInvoker {
   private static final Logger LOG = LoggerFactory.getLogger(ServiceOperationInvoker.class);
-
-  public static final Pattern DEFAULT_QUERY_NAMES_PATTERN = Pattern.compile("(get|is|has|load|read|find|select)([A-Z].*)?");
-  public static final Pattern DEFAULT_PROCESS_NAMES_PATTERN = Pattern.compile("(set|put|add|remove|store|write|create|insert|update|delete)([A-Z].*)?");
 
   public ServiceTunnelResponse invoke(ServiceTunnelRequest serviceReq) {
     long t0 = System.nanoTime();

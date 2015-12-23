@@ -69,8 +69,6 @@ import org.mockito.stubbing.Answer;
 @RunWithSubject("default")
 public class ServiceTunnelServletTest {
 
-  private static final int TEST_SERVICE_ORDER = -1000;
-
   private List<IBean<?>> m_beans;
 
   private ServiceTunnelServlet m_testServiceTunnelServlet;
@@ -86,11 +84,9 @@ public class ServiceTunnelServletTest {
 
     m_beans = TestingUtility.registerBeans(
         new BeanMetaData(StickySessionCacheService.class)
-            .withOrder(TEST_SERVICE_ORDER)
             .withApplicationScoped(true),
         new BeanMetaData(ServerSessionProvider.class)
             .withInitialInstance(m_serverSessionProviderSpy)
-            .withOrder(TEST_SERVICE_ORDER)
             .withApplicationScoped(true));
 
     m_testServiceTunnelServlet = new ServiceTunnelServlet();
