@@ -878,7 +878,7 @@ public final class StringUtility {
     s = s.replace("'", "&#39;");
     s = s.replace("<", "&lt;");
     s = s.replace(">", "&gt;");
-    s = s.replace("\n\r", "<br/>");
+    s = s.replace("\r\n", "<br/>");
     s = s.replace("\n", "<br/>");
 
     // temporarily replace tabs with specific tab-identifier to not be replaced by subsequent whitespace pattern
@@ -1689,7 +1689,7 @@ public final class StringUtility {
   /**
    * Creates a new string repeating the <code>token</code> <code>repetitions</code> times. If <code>repetitions</code>
    * <= 0 an empty string is returned.
-   * 
+   *
    * @param token
    * @param repetitions
    */
@@ -1704,7 +1704,7 @@ public final class StringUtility {
   /**
    * Similar to {@link #nvl(Object, String)} but returns <code>valueWhenEmpty</code> not only if value is null, but as
    * well when the String representation of <code>value</code> is empty or contains only whitespaces.
-   * 
+   *
    * @param property
    * @param string
    * @return
