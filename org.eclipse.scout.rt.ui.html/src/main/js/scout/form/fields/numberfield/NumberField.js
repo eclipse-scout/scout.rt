@@ -76,7 +76,9 @@ scout.NumberField.prototype._parse = function() {
     // if only math symbols are in the input string...
     if (input.match(/^[\d\(\)\+\-\*\/\.]+$/)) {
       // Remove leading zeros from numbers to prevent interpretation as octal value
-      input = input.replace(/(^|[^\d])0+(\d+)/g, '$1$2');
+      // first group: any character except | . (decimal separator char) or a digit
+      // second group: a digit
+      input = input.replace(/(^|[^\d\.])0+(\d+)/g, '$1$2');
       // ...evaluate, reformat the result and set is to the field. If the display text
       // changed, ValueField.js will make sure, the new value is sent to the model.
       try {
