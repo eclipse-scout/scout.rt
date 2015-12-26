@@ -17,7 +17,6 @@ import java.net.SocketException;
 import java.security.AccessController;
 import java.util.ArrayList;
 import java.util.Locale;
-import java.util.UUID;
 import java.util.concurrent.Callable;
 
 import javax.security.auth.Subject;
@@ -61,8 +60,6 @@ import org.slf4j.LoggerFactory;
  */
 public class ServiceTunnelServlet extends HttpServlet {
 
-  public static final String SESSION_ID = "sessionId";
-
   private static final String ADMIN_SESSION_KEY = AdminSession.class.getName();
 
   private static final long serialVersionUID = 1L;
@@ -90,10 +87,9 @@ public class ServiceTunnelServlet extends HttpServlet {
 
           @Override
           public void run() throws Exception {
-            ServerRunContext serverRunContext = ServerRunContexts.copyCurrent()
-                .withUserAgent(UserAgent.createDefault())
-                .withProperty(SESSION_ID, UUID.randomUUID().toString());
-            serverRunContext.withSession(lookupServerSessionOnHttpSession(serverRunContext.copy()));
+            ServerRunContext serverRunContext = ServerRunContexts.copyCurrent();
+            serverRunContext.withUserAgent(UserAgent.createDefault());
+            serverRunContext.withSession(lookupServerSessionOnHttpSession(null, serverRunContext));
 
             invokeAdminService(serverRunContext);
           }
@@ -134,9 +130,8 @@ public class ServiceTunnelServlet extends HttpServlet {
                     .withUserAgent(UserAgent.createByIdentifier(serviceRequest.getUserAgent()))
                     .withRunMonitor(runMonitor)
                     .withClientNotificationCollector(notificationCollector)
-                    .withClientNodeId(serviceRequest.getClientNodeId())
-                    .withProperty(SESSION_ID, serviceRequest.getSessionId());
-                serverRunContext.withSession(lookupServerSessionOnHttpSession(serverRunContext.copy()));
+                    .withClientNodeId(serviceRequest.getClientNodeId());
+                serverRunContext.withSession(lookupServerSessionOnHttpSession(serviceRequest.getSessionId(), serverRunContext));
 
                 IServerSession session = serverRunContext.getSession();
                 long requestSequence = serviceRequest.getRequestSequence();
@@ -290,27 +285,27 @@ public class ServiceTunnelServlet extends HttpServlet {
   // === SESSION LOOKUP ===
 
   @Internal
-  protected IServerSession lookupServerSessionOnHttpSession(final ServerRunContext serverRunContext) throws ServletException {
+  protected IServerSession lookupServerSessionOnHttpSession(final String sessionId, final ServerRunContext serverRunContext) throws ServletException {
     final HttpServletRequest servletRequest = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.get();
     final HttpServletResponse servletResponse = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.get();
 
     //external request: apply locking, this is the session initialization phase
-    IHttpSessionCacheService cacheService = BEANS.get(IHttpSessionCacheService.class);
+    final IHttpSessionCacheService cacheService = BEANS.get(IHttpSessionCacheService.class);
     IServerSession serverSession = (IServerSession) cacheService.getAndTouch(IServerSession.class.getName(), servletRequest, servletResponse);
     if (serverSession == null) {
       synchronized (servletRequest.getSession()) {
         serverSession = (IServerSession) cacheService.get(IServerSession.class.getName(), servletRequest, servletResponse); // double checking
         if (serverSession == null) {
-          final IServerSession newServerSession = provideServerSession(serverRunContext);
+          final IServerSession newServerSession = createServerSession(sessionId, serverRunContext);
 
           servletRequest.getSession(true).setAttribute("scout.httpsession.binding.listener", new HttpSessionBindingListener() {
             @Override
-            public void valueBound(HttpSessionBindingEvent event) {
+            public void valueBound(final HttpSessionBindingEvent event) {
               // NOOP
             }
 
             @Override
-            public void valueUnbound(HttpSessionBindingEvent event) {
+            public void valueUnbound(final HttpSessionBindingEvent event) {
               newServerSession.stop();
             }
           });
@@ -324,15 +319,10 @@ public class ServiceTunnelServlet extends HttpServlet {
   }
 
   /**
-   * Method invoked to provide a new {@link IServerSession} for the current HTTP-request.
-   *
-   * @param serverRunContext
-   *          <code>ServerRunContext</code> with information about the ongoing service request.
-   * @return {@link IServerSession}; must not be <code>null</code>.
+   * Method invoked to create a new {@link IServerSession} with data as specified by the given {@link ServerRunContext}.
    */
-  protected IServerSession provideServerSession(final ServerRunContext serverRunContext) {
-    String sessionId = serverRunContext.getProperty(SESSION_ID);
-    return BEANS.get(ServerSessionProvider.class).provide(serverRunContext, sessionId);
+  protected IServerSession createServerSession(final String sessionId, final ServerRunContext serverRunContext) {
+    return BEANS.get(ServerSessionProvider.class).provide(sessionId, serverRunContext.copy());
   }
 
   // === Helper methods ===

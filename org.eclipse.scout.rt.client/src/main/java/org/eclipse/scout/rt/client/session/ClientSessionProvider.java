@@ -13,8 +13,6 @@ package org.eclipse.scout.rt.client.session;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 
-import javax.security.auth.Subject;
-
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.clientnotification.IClientSessionRegistry;
 import org.eclipse.scout.rt.client.context.ClientRunContext;
@@ -22,105 +20,109 @@ import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.annotations.Internal;
-import org.eclipse.scout.rt.platform.exception.ProcessingException;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
-import org.eclipse.scout.rt.shared.ISession;
+import org.eclipse.scout.rt.shared.session.Sessions;
 
 /**
- * Provider for client sessions.
+ * Central point to obtain client sessions.
+ *
+ * @since 5.1
  */
 @ApplicationScoped
 public class ClientSessionProvider {
 
   /**
-   * @see ClientSessionProvider#provide(ClientRunContext, String)
+   * Creates and initializes a new {@link IClientSession} with data as specified by the given {@link ClientRunContext}.
+   * <p>
+   * For <em>sessionId</em>, a random UUID is used. To specify a <em>sessionId</em>, use
+   * {@link #provide(String, ClientRunContext)} instead.
+   *
+   * @param clientRunContext
+   *          applied during session start.
+   * @return the new session, is not <code>null</code>.
+   * @throws RuntimeException
+   *           if session creation failed.
    */
-  public <SESSION extends IClientSession> SESSION provide(ClientRunContext runContext) {
-    return provide(runContext, UUID.randomUUID().toString());
+  public <SESSION extends IClientSession> SESSION provide(final ClientRunContext clientRunContext) {
+    return provide(null, clientRunContext);
   }
 
   /**
-   * Provides a new {@link IClientSession} for the {@link Subject} of the given {@link ClientRunContext}.
+   * Creates and initializes a new {@link IClientSession} with data as specified by the given {@link ClientRunContext}.
    *
-   * @param runContext
-   *          <code>RunContext</code> initialized with the Subject used to create and load the session.
    * @param sessionId
-   *          the unique session id for the new session.
-   * @return {@link IClientSession} created; is never <code>null</code>.
-   * @throws ProcessingException
-   *           is thrown if the {@link IClientSession} could not be created or initialized.
+   *          unique session ID, or <code>null</code> to use a random {@link UUID}.
+   * @param clientRunContext
+   *          applied during session start.
+   * @return the new session, is not <code>null</code>.
+   * @throws RuntimeException
+   *           if session creation failed.
    */
-  public <SESSION extends IClientSession> SESSION provide(final ClientRunContext runContext, final String sessionId) {
-    return runContext.call(new Callable<SESSION>() {
+  public <SESSION extends IClientSession> SESSION provide(final String sessionId, final ClientRunContext clientRunContext) {
+    final String sid = sessionId != null ? sessionId : Sessions.randomSessionId();
+
+    // Create the session with the given context applied.
+    return clientRunContext.call(new Callable<SESSION>() {
 
       @Override
       public SESSION call() throws Exception {
         // 1. Create an empty session instance.
-        final SESSION clientSession = ClientSessionProvider.cast(BEANS.get(IClientSession.class));
-        registerClientSessionForNotifications(clientSession, sessionId);
+        @SuppressWarnings("unchecked")
+        final SESSION session = (SESSION) BEANS.get(IClientSession.class);
 
-        // 2. Load the session.
-        ModelJobs.schedule(new IRunnable() {
+        // 2. Enable this session to receive client notifications.
+        registerSessionForNotifications(session, sid);
+
+        // 3. Load the session in the model thread.
+        return ModelJobs.schedule(new Callable<SESSION>() {
 
           @Override
-          public void run() throws Exception {
-            beforeStartSession(clientSession);
-            clientSession.start(sessionId);
+          public SESSION call() throws Exception {
+            beforeStartSession(session, sid);
+            session.start(sid);
+            afterStartSession(session);
+            return session;
           }
         }, ModelJobs.newInput(ClientRunContexts.copyCurrent()
-            .withSession(clientSession, true))
-            .withName("Starting ClientSession [sessionId={}]", sessionId)
-            .withExceptionHandling(null, true))
+            .withSession(session, true))
+            .withName("Starting ClientSession [sessionId={}]", sid)
+            .withExceptionHandling(null, false))
             .awaitDoneAndGet();
-
-        return clientSession;
       }
     });
   }
 
-  protected void registerClientSessionForNotifications(IClientSession session, String sessionId) {
-    // register client session for notifications
+  /**
+   * Registers the {@link IClientSession} to receive client notifications.
+   */
+  protected void registerSessionForNotifications(final IClientSession session, final String sessionId) {
     BEANS.get(IClientSessionRegistry.class).register(session, sessionId);
   }
 
   /**
-   * Callback method for performing any operations before the given session is started.
-   *
-   * @param clientSession
+   * Method invoked before the session is started.
    */
-  protected void beforeStartSession(final IClientSession clientSession) {
+  protected void beforeStartSession(final IClientSession clientSession, final String sessionId) {
   }
 
   /**
-   * @return The {@link IClientSession} which is associated with the current thread, or <code>null</code> if not found.
+   * Method invoked after the session is started.
+   */
+  protected void afterStartSession(final IClientSession clientSession) {
+  }
+
+  /**
+   * Returns the {@link IClientSession} associated with the current thread, or <code>null</code> if not available, or if
+   * not of the type {@link IClientSession}.
    */
   public static final IClientSession currentSession() {
-    final ISession session = ISession.CURRENT.get();
-    return (IClientSession) (session instanceof IClientSession ? session : null);
+    return Sessions.currentSession(IClientSession.class);
   }
 
   /**
-   * @return The {@link IClientSession} which is associated with the current thread, or <code>null</code> if not found
-   *         or not of the expected type.
+   * Returns the {@link IClientSession} associated with the current thread, or <code>null</code> if not available, or if
+   * not of the expected type.
    */
   public static final <SESSION extends IClientSession> SESSION currentSession(final Class<SESSION> type) {
-    final IClientSession clientSession = currentSession();
-    if (clientSession == null) {
-      return null;
-    }
-
-    try {
-      return ClientSessionProvider.cast(clientSession);
-    }
-    catch (final ClassCastException e) {
-      return null; // NOOP
-    }
-  }
-
-  @Internal
-  @SuppressWarnings("unchecked")
-  protected static <SESSION extends IClientSession> SESSION cast(final IClientSession clientSession) {
-    return (SESSION) clientSession;
+    return Sessions.currentSession(type);
   }
 }

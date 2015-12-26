@@ -21,10 +21,8 @@ import javax.servlet.http.HttpSession;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.ApplicationNameProperty;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.ApplicationVersionProperty;
-import org.eclipse.scout.rt.platform.context.PropertyMap;
 import org.eclipse.scout.rt.platform.util.VerboseUtility;
 import org.eclipse.scout.rt.server.IServerSession;
-import org.eclipse.scout.rt.server.ServiceTunnelServlet;
 import org.eclipse.scout.rt.server.admin.html.AbstractHtmlAction;
 import org.eclipse.scout.rt.server.admin.html.AdminSession;
 import org.eclipse.scout.rt.server.admin.html.widget.table.HtmlComponent;
@@ -83,8 +81,6 @@ public class GeneralView extends DefaultView {
     }
 
     p.br();
-    p.print("Session ID: " + PropertyMap.CURRENT.get().get(ServiceTunnelServlet.SESSION_ID));
-    p.p();
     p.print("JAAS Context");
     p.br();
     p.print("&nbsp;&nbsp;remoteUser: " + p.getRequest().getRemoteUser());

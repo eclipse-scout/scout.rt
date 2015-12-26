@@ -65,9 +65,15 @@ public final class TypeCastUtility {
 
   private static final String ZULU_DATE_TO_STRING_FORMAT = "dd.MM.yyyy'T'HH:mm:ss.sss'Z'";
 
+  /**
+   * Casts an object into a specific type.
+   *
+   * @throws IllegalArgumentException
+   *           if the cast failed.
+   */
   @SuppressWarnings("unchecked")
-  public static <T> T castValue(Object o, Class<T> castType) {
-    return (T) instance.castValueImpl(o, castType);
+  public static <T> T castValue(Object object, Class<T> castType) {
+    return (T) instance.castValueImpl(object, castType);
   }
 
   // instance

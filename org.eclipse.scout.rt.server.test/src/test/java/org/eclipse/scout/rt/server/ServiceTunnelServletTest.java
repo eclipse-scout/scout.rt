@@ -14,6 +14,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyObject;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
@@ -115,7 +116,7 @@ public class ServiceTunnelServletTest {
 
           @Override
           public void run() throws Exception {
-            IServerSession session = m_testServiceTunnelServlet.lookupServerSessionOnHttpSession(ServerRunContexts.empty().withProperty(ServiceTunnelServlet.SESSION_ID, "testid"));
+            IServerSession session = m_testServiceTunnelServlet.lookupServerSessionOnHttpSession("testid", ServerRunContexts.empty());
             assertNotNull(session);
           }
         });
@@ -134,7 +135,7 @@ public class ServiceTunnelServletTest {
 
       @Override
       public void run() throws Exception {
-        assertEquals(testSession, m_testServiceTunnelServlet.lookupServerSessionOnHttpSession(ServerRunContexts.empty()));
+        assertEquals(testSession, m_testServiceTunnelServlet.lookupServerSessionOnHttpSession(null, ServerRunContexts.empty()));
       }
     });
   }
@@ -162,7 +163,7 @@ public class ServiceTunnelServletTest {
     doAnswer(putValueInCache(cache)).when(testHttpSession).setAttribute(eq(IServerSession.class.getName()), anyObject());
     when(testHttpSession.getAttribute(IServerSession.class.getName())).thenAnswer(getCachedValue(cache));
 
-    doAnswer(slowCreateTestsession(testServerSession)).when(m_serverSessionProviderSpy).provide(any(ServerRunContext.class), any(String.class));
+    doAnswer(slowCreateTestsession(testServerSession)).when(m_serverSessionProviderSpy).provide(anyString(), any(ServerRunContext.class));
     List<HttpSessionLookupCallable> jobs = new ArrayList<>();
     for (int i = 0; i < 4; i++) {
       jobs.add(new HttpSessionLookupCallable(m_testServiceTunnelServlet, requestMock, m_responseMock));
@@ -177,7 +178,7 @@ public class ServiceTunnelServletTest {
 
     assertEquals(CollectionUtility.hashSet(testServerSession), serverSessions);
 
-    verify(m_serverSessionProviderSpy, times(1)).provide(any(ServerRunContext.class), any(String.class));
+    verify(m_serverSessionProviderSpy, times(1)).provide(anyString(), any(ServerRunContext.class));
   }
 
   private Answer<IServerSession> slowCreateTestsession(final TestServerSession testSession) {
@@ -247,7 +248,7 @@ public class ServiceTunnelServletTest {
 
         @Override
         public IServerSession call() throws Exception {
-          return m_serviceTunnelServlet.lookupServerSessionOnHttpSession(ServerRunContexts.empty());
+          return m_serviceTunnelServlet.lookupServerSessionOnHttpSession(null, ServerRunContexts.empty());
         }
       });
     }

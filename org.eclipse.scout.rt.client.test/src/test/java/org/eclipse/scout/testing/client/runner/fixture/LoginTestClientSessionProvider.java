@@ -32,8 +32,13 @@ public class LoginTestClientSessionProvider extends ClientSessionProviderWithCac
   }
 
   @Override
-  public <SESSION extends IClientSession> SESSION provide(ClientRunContext runContext) {
-    SESSION clientSession = super.provide(runContext);
+  public <SESSION extends IClientSession> SESSION provide(ClientRunContext clientRunContext) {
+    return provide(null, clientRunContext);
+  }
+
+  @Override
+  public <SESSION extends IClientSession> SESSION provide(String sessionId, ClientRunContext clientRunContext) {
+    SESSION clientSession = super.provide(sessionId, clientRunContext);
     s_currentSession = clientSession;
     return clientSession;
   }

@@ -55,7 +55,7 @@ public class ClientSessionRegistry implements IClientSessionRegistry, IGlobalSes
   @Override
   public void register(IClientSession session, String sessionId) {
     synchronized (m_cacheLock) {
-      m_sessionIdToSession.put(sessionId, new WeakReference<IClientSession>(session));
+      m_sessionIdToSession.put(sessionId, new WeakReference<>(session));
     }
     // if the client session is already started, otherwise the listener will invoke the clientSessionStated method.
     if (BEANS.get(IServiceTunnel.class).isActive() && session.isActive()) {
@@ -179,14 +179,14 @@ public class ClientSessionRegistry implements IClientSessionRegistry, IGlobalSes
   }
 
   @Override
-  public IClientSession getClientSession(String sessionid) {
+  public IClientSession getClientSession(String sessionId) {
     synchronized (m_cacheLock) {
-      WeakReference<IClientSession> sessionRef = m_sessionIdToSession.get(sessionid);
+      WeakReference<IClientSession> sessionRef = m_sessionIdToSession.get(sessionId);
       if (sessionRef != null && sessionRef.get() != null) {
         return sessionRef.get();
       }
       else {
-        m_sessionIdToSession.remove(sessionid);
+        m_sessionIdToSession.remove(sessionId);
       }
     }
     return null;

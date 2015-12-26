@@ -76,7 +76,7 @@ public class BridgeToServerBeanDecorator<T> implements IBeanDecorator<T> {
     ISession currentSession = ISession.CURRENT.get();
     IServerSession bridgeSession = null;
     if (currentSession != null) {
-      bridgeSession = BEANS.get(ServerSessionProviderWithCache.class).provide(bridgeRunContext, currentSession.getId());
+      bridgeSession = BEANS.get(ServerSessionProviderWithCache.class).provide(currentSession.getId(), bridgeRunContext);
     }
     Object result = bridgeRunContext.withSession(bridgeSession).call(new Callable<Object>() {
       @Override

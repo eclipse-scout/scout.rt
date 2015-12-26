@@ -177,7 +177,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
         ModelJobs.newEventFilterBuilder()
             .andMatch(new SessionJobEventFilter(clientSession))
             .andMatchNotExecutionHint(UiJobs.EXECUTION_HINT_POLL_REQUEST) // events for poll-requests are not of interest
-            .andMatch(newUiDataAvailableFilter()) // filter which evaluates to 'true' once possible UI data are available
+            .andMatch(newUiDataAvailableFilter()) // filter which evaluates to 'true' once possible UI data is available
             .andMatch(new IFilter<JobEvent>() {
 
               @Override

@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.testing.client;
 
-import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 
 import javax.security.auth.Subject;
@@ -24,10 +23,7 @@ import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
-import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CompositeObject;
-import org.eclipse.scout.rt.platform.util.NumberUtility;
-import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.collection.ConcurrentExpiringMap;
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnel;
@@ -36,74 +32,118 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Provider for client sessions. A client session is only created if not contained in the session cache.
+ * Central point to obtain cached client sessions.
+ * <p>
+ * If a session is found in cache, this session is returned, or else a new session created via
+ * {@link ClientSessionProvider}.
+ * <p>
+ * A session is identified by its <em>sessionId</em>, or if not specified its <em>userId</em>.
+ *
+ * @since 5.1
  */
 public class ClientSessionProviderWithCache extends ClientSessionProvider {
+
   private static final Logger LOG = LoggerFactory.getLogger(ClientSessionProviderWithCache.class);
 
-  private final ConcurrentMap<CompositeObject, IClientSession> m_cache;
+  private final ConcurrentExpiringMap<CompositeObject, IClientSession> m_cache;
 
   public ClientSessionProviderWithCache() {
-    m_cache = createCacheMap();
-  }
-
-  protected ConcurrentMap<CompositeObject, IClientSession> createCacheMap() {
-    long ttl = NumberUtility.nvl(CONFIG.getPropertyValue(ClientSessionCacheExpirationProperty.class), 0L);
-    return new ConcurrentExpiringMap<CompositeObject, IClientSession>(ttl, TimeUnit.MILLISECONDS, 1000);
-  }
-
-  @Override
-  public <SESSION extends IClientSession> SESSION provide(ClientRunContext runContext, String sessionId) {
-    CompositeObject cacheKey = newCacheKey(runContext, sessionId);
-    @SuppressWarnings("unchecked")
-    SESSION clientSession = (SESSION) m_cache.get(cacheKey);
-    if (clientSession != null) {
-      return clientSession;
-    }
-    else {
-      // create and initialize a new session; use optimistic locking because initializing the session is a long-running operation.
-      clientSession = super.provide(runContext, sessionId);
-
-      @SuppressWarnings("unchecked")
-      SESSION oldClientSession = (SESSION) m_cache.putIfAbsent(cacheKey, clientSession);
-      if (oldClientSession != null) {
-        // optimistic locking: check, whether another thread already created and cached the session.
-        return oldClientSession;
-      }
-      return clientSession;
-    }
-  }
-
-  protected CompositeObject newCacheKey(ClientRunContext runContext, String sessionId) {
-    Subject subject = Assertions.assertNotNull(runContext.getSubject(), "Subject must not be null");
-    Class<? extends IClientSession> clientSessionClass = BEANS.get(IClientSession.class).getClass();
-    String userId = BEANS.get(IAccessControlService.class).getUserId(subject);
-    // if userId can not be determined, use sessionId as key and force therefore to create
-    // and return a new session.
-    return new CompositeObject(clientSessionClass, StringUtility.nvl(userId, sessionId));
-  }
-
-  @Override
-  protected void registerClientSessionForNotifications(IClientSession session, String sessionId) {
-    if (BEANS.get(IServiceTunnel.class).isActive()) {
-      super.registerClientSessionForNotifications(session, sessionId);
-    }
-    else {
-      LOG.warn("Error during session registration for notifications.");
-    }
+    m_cache = createSessionCache(CONFIG.getPropertyValue(ClientSessionCacheExpirationProperty.class));
   }
 
   /**
-   * Adds a {@link DesktopListener} that automatically cancels all message boxes.
+   * Returns the cached client session for the context's {@link Subject}. On cache miss, a new session with a random
+   * <em>sessionId</em> is created via {@link ClientSessionProvider}.
    *
-   * @param clientSession
+   * @param clientRunContext
+   *          applied during session start, and to get the session's {@link Subject}.
+   * @return session found in cache, or a new session on cache miss.
+   * @throws RuntimeException
+   *           if session creation failed.
    */
   @Override
-  protected void beforeStartSession(IClientSession clientSession) {
-    // auto-cancel all message boxes
+  public <SESSION extends IClientSession> SESSION provide(final ClientRunContext clientRunContext) {
+    return provide(null, clientRunContext);
+  }
+
+  /**
+   * Returns the cached client session for the given <em>sessionId</em>, or the context's {@link Subject} if
+   * <em>sessionId</em> is not specified. On cache miss, a new session is created via {@link ClientSessionProvider}.
+   *
+   * @param sessionId
+   *          unique session ID to identify the cached session. If <code>null</code>, the context's {@link Subject} is
+   *          used for identification. On cache miss, this <em>sessionId</em> is used to create a new session, or a
+   *          random UUID if <code>null</code>.
+   * @param clientRunContext
+   *          applied during session start, and to get the session's {@link Subject}.
+   * @return session found in cache, or a new session on cache miss.
+   * @throws RuntimeException
+   *           if session creation failed.
+   */
+  @Override
+  public <SESSION extends IClientSession> SESSION provide(final String sessionId, final ClientRunContext clientRunContext) {
+    // 1. Create session lookup key.
+    final CompositeObject sessionCacheKey = newSessionCacheKey(sessionId, clientRunContext.getSubject());
+    if (sessionCacheKey == null) {
+      LOG.warn("Cannot identify cached client session because the cache key is undefined  [sessionId={}, subject={}]", sessionId, clientRunContext.getSubject());
+      return super.provide(sessionId, clientRunContext);
+    }
+
+    // 2. Lookup session in the cache.
+    @SuppressWarnings("unchecked")
+    SESSION clientSession = (SESSION) m_cache.get(sessionCacheKey);
+    if (clientSession != null) {
+      return clientSession;
+    }
+
+    // 3. Cache miss (optimistic locking because session creation might be a long running operation)
+    clientSession = super.provide(sessionId, clientRunContext);
+
+    // 4. Cache the new client session, or return present session if created by another thread in the meantime (optimistic locking).
+    @SuppressWarnings("unchecked")
+    final SESSION cachedClientSession = (SESSION) m_cache.putIfAbsent(sessionCacheKey, clientSession);
+    if (cachedClientSession != null) {
+      clientSession = cachedClientSession;
+    }
+
+    return clientSession;
+  }
+
+  protected ConcurrentExpiringMap<CompositeObject, IClientSession> createSessionCache(final long ttl) {
+    return new ConcurrentExpiringMap<>(ttl, TimeUnit.MILLISECONDS, 1_000);
+  }
+
+  protected CompositeObject newSessionCacheKey(final String sessionId, final Subject subject) {
+    // Test specific: Make session class part of the cache key.
+    //                That is because JUnit tests can be configured to run with another session via {@link RunWithClientSession}.
+
+    if (sessionId != null) {
+      return new CompositeObject(BEANS.get(IClientSession.class).getClass(), sessionId);
+    }
+    else if (subject != null) {
+      return new CompositeObject(BEANS.get(IClientSession.class).getClass(), BEANS.get(IAccessControlService.class).getUserId(subject));
+    }
+    else {
+      return null;
+    }
+  }
+
+  @Override
+  protected void registerSessionForNotifications(final IClientSession session, final String sessionId) {
+    if (BEANS.get(IServiceTunnel.class).isActive()) {
+      super.registerSessionForNotifications(session, sessionId);
+    }
+    else {
+      LOG.warn("Failed to register session for notifications.");
+    }
+  }
+
+  @Override
+  protected void beforeStartSession(final IClientSession clientSession, final String sessionId) {
+    // Adds a DesktopListener to automatically cancel all message boxes.
     ClientRunContexts.copyCurrent().getDesktop().addDesktopListener(new DesktopListener() {
       @Override
-      public void desktopChanged(DesktopEvent e) {
+      public void desktopChanged(final DesktopEvent e) {
         switch (e.getType()) {
           case DesktopEvent.TYPE_MESSAGE_BOX_SHOW:
             e.getMessageBox().getUIFacade().setResultFromUI(IMessageBox.CANCEL_OPTION);

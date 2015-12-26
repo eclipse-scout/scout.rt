@@ -13,94 +13,107 @@ package org.eclipse.scout.rt.server.session;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 
-import javax.security.auth.Subject;
-
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.annotations.Internal;
-import org.eclipse.scout.rt.platform.exception.ProcessingException;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.server.transaction.TransactionScope;
-import org.eclipse.scout.rt.shared.ISession;
+import org.eclipse.scout.rt.shared.session.Sessions;
 
 /**
- * Provider for server sessions.
+ * Central point to obtain server sessions.
+ *
+ * @since 5.1
  */
 @ApplicationScoped
 public class ServerSessionProvider {
 
-  public <SESSION extends IServerSession> SESSION provide(final ServerRunContext serverRunContext) {
-    return provide(serverRunContext, UUID.randomUUID().toString());
-  }
-
   /**
-   * Provides a new {@link IServerSession} for the {@link Subject} of the given {@link ServerRunContext}.
+   * Creates and initializes a new {@link IServerSession} with data as specified by the given {@link ServerRunContext}.
+   * <p>
+   * For <em>sessionId</em>, a random UUID is generated. To specify a <em>sessionId</em>, use
+   * {@link #provide(String, ServerRunContext)} instead.
    *
    * @param serverRunContext
-   *          <code>RunContext</code> initialized with the Subject used to create and load the session.
-   * @return {@link IServerSession} created; is never <code>null</code>.
-   * @throws ProcessingException
-   *           is thrown if the {@link IServerSession} could not be created or initialized.
+   *          applied during session start.
+   * @return the new session, is not <code>null</code>.
+   * @throws RuntimeException
+   *           if session creation failed.
    */
-  public <SESSION extends IServerSession> SESSION provide(final ServerRunContext serverRunContext, final String sessionId) {
-    return serverRunContext.copy().call(new Callable<SESSION>() {
+  public <SESSION extends IServerSession> SESSION provide(final ServerRunContext serverRunContext) {
+    return provide(null, serverRunContext);
+  }
 
-      @Override
-      public SESSION call() throws Exception {
-        // 1. Create an empty session instance.
-        final SESSION serverSession = ServerSessionProvider.cast(BEANS.get(IServerSession.class));
+  /**
+   * Creates and initializes a new {@link IServerSession} with data as specified by the given {@link ServerRunContext}.
+   *
+   * @param sessionId
+   *          unique session ID, or <code>null</code> to use a random {@link UUID}.
+   * @param serverRunContext
+   *          applied during session start.
+   * @return the new session, is not <code>null</code>.
+   * @throws RuntimeException
+   *           if session creation failed.
+   */
+  public <SESSION extends IServerSession> SESSION provide(final String sessionId, final ServerRunContext serverRunContext) {
+    final String sid = sessionId != null ? sessionId : Sessions.randomSessionId();
 
-        // 2. Load the session.
-        ServerRunContexts.copyCurrent().withSession(serverSession).withTransactionScope(TransactionScope.MANDATORY).run(new IRunnable() {
+    // Create the session with the given context applied.
+    return serverRunContext
+        .copy()
+        .withTransactionScope(TransactionScope.REQUIRES_NEW) // enforce a new transaction
+        .call(new Callable<SESSION>() {
 
           @Override
-          public void run() throws Exception {
-            serverSession.start(sessionId);
+          public SESSION call() throws Exception {
+            // 1. Create an empty session instance.
+            @SuppressWarnings("unchecked")
+            final SESSION session = (SESSION) BEANS.get(IServerSession.class);
+
+            // 2. Start the session.
+            return ServerRunContexts.copyCurrent()
+                .withSession(session)
+                .withTransactionScope(TransactionScope.MANDATORY) // run in the same transaction
+                .call(new Callable<SESSION>() {
+
+              @Override
+              public SESSION call() throws Exception {
+                beforeStartSession(session, sid);
+                session.start(sid);
+                afterStartSession(session);
+                return session;
+              }
+            });
           }
         });
-
-        return serverSession;
-      }
-    });
   }
 
   /**
-   * @return The {@link IServerSession} which is associated with the current thread, or <code>null</code> if not found.
+   * Method invoked before the session is started.
+   */
+  protected void beforeStartSession(final IServerSession serverSession, final String sessionId) {
+  }
+
+  /**
+   * Method invoked after the session is started.
+   */
+  protected void afterStartSession(final IServerSession serverSession) {
+  }
+
+  /**
+   * Returns the {@link IServerSession} associated with the current thread, or <code>null</code> if not available, or if
+   * not of the type {@link IServerSession}.
    */
   public static final IServerSession currentSession() {
-    final ISession session = ISession.CURRENT.get();
-    return (IServerSession) (session instanceof IServerSession ? session : null);
+    return Sessions.currentSession(IServerSession.class);
   }
 
   /**
-   * @return The {@link IServerSession} which is associated with the current thread, or <code>null</code> if not found
-   *         or not of the expected type.
+   * Returns the {@link IServerSession} associated with the current thread, or <code>null</code> if not available, or if
+   * not of the expected type.
    */
   public static final <SESSION extends IServerSession> SESSION currentSession(final Class<SESSION> type) {
-    final IServerSession serverSession = currentSession();
-    if (serverSession == null) {
-      return null;
-    }
-
-    try {
-      return ServerSessionProvider.cast(serverSession);
-    }
-    catch (final ProcessingException e) {
-      return null; // NOOP
-    }
-  }
-
-  @Internal
-  @SuppressWarnings("unchecked")
-  protected static <SESSION extends IServerSession> SESSION cast(final IServerSession serverSession) {
-    try {
-      return (SESSION) serverSession;
-    }
-    catch (final ClassCastException e) {
-      throw new ProcessingException("Wrong session class [actual={}]", new Object[]{serverSession.getClass().getName()}, e);
-    }
+    return Sessions.currentSession(type);
   }
 }
