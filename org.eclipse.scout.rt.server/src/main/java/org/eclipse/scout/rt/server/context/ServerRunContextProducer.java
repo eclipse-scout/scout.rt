@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.server.context;
 
 import javax.security.auth.Subject;
 
-import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContextProducer;
 import org.eclipse.scout.rt.platform.util.CompareUtility;
@@ -28,7 +27,6 @@ import org.eclipse.scout.rt.server.transaction.TransactionScope;
  *
  * @since 5.1
  */
-@ApplicationScoped
 public class ServerRunContextProducer extends RunContextProducer {
 
   /**
