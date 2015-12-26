@@ -28,13 +28,13 @@ public class FinalValueTest {
   private static final String TEST_VALUE = "test";
 
   @Test
-  public void testUnititialized() {
+  public void testUnset() {
     FinalValue<String> s = new FinalValue<>();
-    assertFalse(s.isInitialized());
+    assertFalse(s.isSet());
   }
 
   @Test
-  public void testInitializeConstructor() {
+  public void testSetViaConstructor() {
     FinalValue<String> s = new FinalValue<>(TEST_VALUE);
     assertTestValue(s);
   }
@@ -104,7 +104,7 @@ public class FinalValueTest {
   }
 
   private void assertTestValue(FinalValue<String> s) {
-    assertTrue(s.isInitialized());
+    assertTrue(s.isSet());
     assertEquals(TEST_VALUE, s.get());
   }
 

@@ -12,18 +12,20 @@ package org.eclipse.scout.rt.platform.util;
 
 import java.util.concurrent.Callable;
 
+import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 
 /**
- * An effectively final value that can be lazily initialized.
+ * An effectively final value that can be lazily set.
  *
  * @since 5.1
  */
 public class FinalValue<VALUE> {
 
-  private volatile VALUE m_value;
   private final Object m_lock = new Object();
-  private volatile boolean m_initialized = false;
+
+  private volatile VALUE m_value;
+  private volatile boolean m_set = false;
 
   /**
    * Create without initial value
@@ -46,22 +48,24 @@ public class FinalValue<VALUE> {
   }
 
   /**
-   * Sets the value, if it is not initialized yet. Throws {@link AssertionException} otherwise.
+   * Sets the specified value as final value, or throws {@link AssertionException} if already set.
    *
    * @param value
    *          value to set
+   * @throws AssertionException
+   *           if a final value is already set.
    */
   public void set(final VALUE value) {
     synchronized (m_lock) {
-      Assertions.assertFalse(m_initialized, "{} can only be set once.", getClass().getSimpleName());
+      Assertions.assertFalse(m_set, "{} already set.", getClass().getSimpleName());
       setIfAbsent(value);
     }
   }
 
   /**
-   * Sets the value, if it is not already initialized.
+   * Sets the specified value as final value, but only if not set yet.
    *
-   * @return the current value.
+   * @return the final value.
    */
   public VALUE setIfAbsent(final VALUE value) {
     return setIfAbsent(new Callable<VALUE>() {
@@ -73,43 +77,43 @@ public class FinalValue<VALUE> {
   }
 
   /**
-   * Compute the value with the producer, if it is not already initialized
+   * Computes the final value with the specified producer, but only if not set yet.
    *
    * @param producer
-   *          to create a value, if not initialized
-   * @return the current value.
+   *          to produce the final value if no final value is set yet.
+   * @return the final value.
    * @throws RuntimeException
    *           if the producer throws an exception
    */
   public VALUE setIfAbsent(final Callable<VALUE> producer) {
-    if (m_initialized) {
+    if (m_set) {
       return m_value;
     }
 
     synchronized (m_lock) {
-      if (m_value == null) {
-        try {
-          m_value = producer.call();
-          m_initialized = true;
-        }
-        catch (final RuntimeException e) {
-          throw e;
-        }
-        catch (final Error e) {
-          throw e;
-        }
-        catch (final Exception e) {
-          throw new RuntimeException(e);
-        }
+      // double-checked locking
+      if (m_set) {
+        return m_value;
+      }
+
+      try {
+        m_value = producer.call();
+        m_set = true;
+      }
+      catch (final RuntimeException | Error e) {
+        throw e;
+      }
+      catch (final Exception e) {
+        throw new PlatformException("Failed to produce final value", e);
       }
       return m_value;
     }
   }
 
   /**
-   * @return <code>true</code>, if it has been initialized.
+   * @return <code>true</code>, if a final value was set, or else <code>false</code>.
    */
-  public boolean isInitialized() {
-    return m_initialized;
+  public boolean isSet() {
+    return m_set;
   }
 }
