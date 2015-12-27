@@ -20,122 +20,51 @@ import org.eclipse.scout.rt.platform.util.TriState;
 @Bean
 public interface ILookupCall<KEY_TYPE> extends Serializable, Cloneable {
 
-  /**
-   * @return
-   */
   KEY_TYPE getKey();
 
-  /**
-   * @param object
-   */
   void setKey(KEY_TYPE object);
 
-  /**
-   * @param object
-   */
   void setText(String object);
 
-  /**
-   * @param s
-   */
   void setAll(String s);
 
-  /**
-   * @return
-   */
   String getAll();
 
-  /**
-   * @param parent
-   */
   void setRec(KEY_TYPE parent);
 
-  /**
-   * @return
-   */
   KEY_TYPE getRec();
 
-  /**
-   * @param master
-   */
   void setMaster(Object master);
 
-  /**
-   * @return
-   */
   Object getMaster();
 
-  /**
-   * @param activeState
-   */
   void setActive(TriState activeState);
 
-  /**
-   * @return
-   */
   TriState getActive();
 
-  /**
-   * @return
-   */
   String getText();
 
-  /**
-   * @return
-   */
   List<? extends ILookupRow<KEY_TYPE>> getDataByKey();
 
-  /**
-   * @param caller
-   * @return
-   */
-  IFuture<?> getDataByKeyInBackground(ILookupCallFetcher<KEY_TYPE> caller);
+  IFuture<Void> getDataByKeyInBackground(ILookupRowFetchedCallback<KEY_TYPE> callback);
 
-  /**
-   * @return
-   */
   List<? extends ILookupRow<KEY_TYPE>> getDataByText();
 
-  /**
-   * @param caller
-   * @return
-   */
-  IFuture<?> getDataByTextInBackground(ILookupCallFetcher<KEY_TYPE> caller);
+  IFuture<Void> getDataByTextInBackground(ILookupRowFetchedCallback<KEY_TYPE> callback);
 
-  /**
-   * @return
-   */
   List<? extends ILookupRow<KEY_TYPE>> getDataByAll();
 
-  /**
-   * @param caller
-   * @return
-   */
-  IFuture<?> getDataByAllInBackground(ILookupCallFetcher<KEY_TYPE> caller);
+  IFuture<Void> getDataByAllInBackground(ILookupRowFetchedCallback<KEY_TYPE> callback);
 
-  /**
-   * @return
-   */
   List<? extends ILookupRow<KEY_TYPE>> getDataByRec();
 
-  /**
-   * @param caller
-   * @return
-   */
-  IFuture<?> getDataByRecInBackground(ILookupCallFetcher<KEY_TYPE> caller);
+  IFuture<Void> getDataByRecInBackground(ILookupRowFetchedCallback<KEY_TYPE> caller);
 
-  /**
-   * @return
-   */
   int getMaxRowCount();
 
-  /**
-   * @param n
-   */
   void setMaxRowCount(int n);
 
   String getWildcard();
 
   void setWildcard(String wildcard);
-
 }

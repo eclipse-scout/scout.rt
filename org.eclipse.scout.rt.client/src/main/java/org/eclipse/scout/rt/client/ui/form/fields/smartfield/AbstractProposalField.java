@@ -18,10 +18,12 @@ import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.IProposalFieldExtension;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
+import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.util.CompareUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupRowFetchedCallback;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 
 /**
@@ -118,15 +120,34 @@ public abstract class AbstractProposalField<LOOKUP_KEY> extends AbstractContentA
   }
 
   @Override
-  protected void filterKeyLookup(ILookupCall<LOOKUP_KEY> call, List<ILookupRow<LOOKUP_KEY>> result) {
-    super.filterKeyLookup(call, result);
-    /*
-     * ticket 79027
-     */
-    if (result.size() == 0) {
-      String key = "" + call.getKey();
-      result.add(new LookupRow<LOOKUP_KEY>(call.getKey(), key));
-    }
+  protected ILookupRowProvider<LOOKUP_KEY> newByKeyLookupRowProvider(final LOOKUP_KEY key) {
+    final ILookupRowProvider<LOOKUP_KEY> delegate = super.newByKeyLookupRowProvider(key);
+    return new ILookupRowProvider<LOOKUP_KEY>() {
+
+      @Override
+      public void beforeProvide(final ILookupCall<LOOKUP_KEY> lookupCall) {
+        delegate.beforeProvide(lookupCall);
+      }
+
+      @Override
+      public void afterProvide(final ILookupCall<LOOKUP_KEY> lookupCall, final List<ILookupRow<LOOKUP_KEY>> result) {
+        delegate.afterProvide(lookupCall, result);
+        // ticket #79027
+        if (result.isEmpty()) {
+          result.add(new LookupRow<>(lookupCall.getKey(), String.valueOf(lookupCall.getKey())));
+        }
+      }
+
+      @Override
+      public void provideSync(final ILookupCall<LOOKUP_KEY> lookupCall, final ILookupRowFetchedCallback<LOOKUP_KEY> callback) {
+        delegate.provideSync(lookupCall, callback);
+      }
+
+      @Override
+      public IFuture<Void> provideAsync(final ILookupCall<LOOKUP_KEY> lookupCall, final ILookupRowFetchedCallback<LOOKUP_KEY> callback) {
+        return delegate.provideAsync(lookupCall, callback);
+      }
+    };
   }
 
   @Override

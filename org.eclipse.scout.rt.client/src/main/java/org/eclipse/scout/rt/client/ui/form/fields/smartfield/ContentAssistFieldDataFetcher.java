@@ -13,12 +13,12 @@ package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 import java.util.List;
 
 import org.eclipse.scout.rt.platform.job.IFuture;
-import org.eclipse.scout.rt.shared.services.lookup.ILookupCallFetcher;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupRowFetchedCallback;
 
 public class ContentAssistFieldDataFetcher<LOOKUP_KEY> extends AbstractContentAssistFieldLookupRowFetcher<LOOKUP_KEY> {
 
-  private IFuture<?> m_dataLoadJob;
+  private volatile IFuture<?> m_future;
 
   public ContentAssistFieldDataFetcher(IContentAssistField<?, LOOKUP_KEY> contentAssistField) {
     super(contentAssistField);
@@ -31,57 +31,60 @@ public class ContentAssistFieldDataFetcher<LOOKUP_KEY> extends AbstractContentAs
     if (text == null) {
       text = "";
     }
+
+    // Cancel potential running fetcher
+    final IFuture<?> future = m_future;
+    if (future != null) {
+      future.cancel(true);
+    }
+
     final String textNonNull = text;
     final int maxCount = getContentAssistField().getBrowseMaxRowCount();
-    if (m_dataLoadJob != null) {
-      m_dataLoadJob.cancel(true);
-    }
-    ILookupCallFetcher<LOOKUP_KEY> fetcher = new P_LookupCallFetcher(searchText, selectCurrentValue);
-    // go async/sync
+    final ILookupRowFetchedCallback<LOOKUP_KEY> callback = new P_LookupCallDataCallback(searchText, selectCurrentValue);
+    final int maxRowCount = (maxCount > 0 ? maxCount + 1 : 0);
+
     if (synchronous) {
       try {
-        List<? extends ILookupRow<LOOKUP_KEY>> rows;
-        if (getContentAssistField().getWildcard().equals(text)) {
-          rows = getContentAssistField().callBrowseLookup(text, maxCount > 0 ? maxCount + 1 : 0);
-        }
-        else if (text.length() == 0) {
-          rows = getContentAssistField().callBrowseLookup(text, maxCount > 0 ? maxCount + 1 : 0);
+        if (getContentAssistField().getWildcard().equals(text) || text.isEmpty()) {
+          callback.onSuccess(getContentAssistField().callBrowseLookup(text, maxRowCount));
         }
         else {
-          rows = getContentAssistField().callTextLookup(text, maxCount > 0 ? maxCount + 1 : 0);
+          callback.onSuccess(getContentAssistField().callTextLookup(text, maxRowCount));
         }
-        fetcher.dataFetched(rows, null);
       }
       catch (RuntimeException e) {
-        fetcher.dataFetched(null, e);
+        callback.onFailure(e);
       }
     }
     else {
-      if (getContentAssistField().getWildcard().equals(textNonNull)) {
-        m_dataLoadJob = getContentAssistField().callBrowseLookupInBackground(textNonNull, maxCount > 0 ? maxCount + 1 : 0, fetcher);
-      }
-      else if (textNonNull.length() == 0) {
-        m_dataLoadJob = getContentAssistField().callBrowseLookupInBackground(textNonNull, maxCount > 0 ? maxCount + 1 : 0, fetcher);
+      if (getContentAssistField().getWildcard().equals(textNonNull) || textNonNull.isEmpty()) {
+        m_future = getContentAssistField().callBrowseLookupInBackground(textNonNull, maxRowCount, callback);
       }
       else {
-        m_dataLoadJob = getContentAssistField().callTextLookupInBackground(textNonNull, maxCount > 0 ? maxCount + 1 : 0, fetcher);
+        m_future = getContentAssistField().callTextLookupInBackground(textNonNull, maxRowCount, callback);
       }
     }
   }
 
-  private class P_LookupCallFetcher implements ILookupCallFetcher<LOOKUP_KEY> {
+  private class P_LookupCallDataCallback implements ILookupRowFetchedCallback<LOOKUP_KEY> {
     private String m_searchText;
     private boolean m_selectCurrentValue;
 
-    private P_LookupCallFetcher(String searchText, boolean selectCurrentValue) {
+    private P_LookupCallDataCallback(String searchText, boolean selectCurrentValue) {
       m_searchText = searchText;
       m_selectCurrentValue = selectCurrentValue;
-
     }
 
     @Override
-    public void dataFetched(List<? extends ILookupRow<LOOKUP_KEY>> rows, RuntimeException failed) {
-      setResult(new ContentAssistFieldDataFetchResult<LOOKUP_KEY>(rows, failed, m_searchText, m_selectCurrentValue));
+    public void onSuccess(List<? extends ILookupRow<LOOKUP_KEY>> rows) {
+      m_future = null;
+      setResult(new ContentAssistFieldDataFetchResult<>(rows, null, m_searchText, m_selectCurrentValue));
+    }
+
+    @Override
+    public void onFailure(RuntimeException exception) {
+      m_future = null;
+      setResult(new ContentAssistFieldDataFetchResult<LOOKUP_KEY>(null, exception, m_searchText, m_selectCurrentValue));
     }
   }
 }

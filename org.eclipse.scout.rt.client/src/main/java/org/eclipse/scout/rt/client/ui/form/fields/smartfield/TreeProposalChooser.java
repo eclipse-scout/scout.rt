@@ -39,8 +39,8 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.TriState;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.TEXTS;
-import org.eclipse.scout.rt.shared.services.lookup.ILookupCallFetcher;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupRowFetchedCallback;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 
 /**
@@ -58,7 +58,7 @@ public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITr
   private P_MatchingNodesFilter m_matchingNodesFilter;
   private boolean m_selectCurrentValueRequested;
   private boolean m_populateInitialTreeDone;
-  private IFuture<?> m_populateInitialTreeJob;
+  private volatile IFuture<?> m_initialPolulatorFuture;
   private boolean m_modelExternallyManaged = false;
 
   public TreeProposalChooser(IContentAssistField<?, LOOKUP_KEY> contentAssistField, boolean allowCustomText) {
@@ -102,9 +102,11 @@ public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITr
 
   @Override
   public void dispose() {
-    if (m_populateInitialTreeJob != null) {
-      m_populateInitialTreeJob.cancel(true);
+    final IFuture<?> future = m_initialPolulatorFuture;
+    if (future != null) {
+      future.cancel(true);
     }
+
     m_model.disposeTree();
     m_model = null;
   }
@@ -149,44 +151,48 @@ public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITr
   @Override
   protected void init() {
     if (m_contentAssistField.isBrowseLoadIncremental()) {
-      // do sync
+      // Load lookup rows synchronously.
       loadRootNode();
       commitPopulateInitialTree();
     }
     else {
-      //show comment that smartfield is loading
+      // Indicate that lookup rows are loading
       setStatus(new Status(ScoutTexts.get("searchingProposals"), IStatus.OK));
       setStatusVisible(true);
-      //go async to fetch data
-      m_populateInitialTreeJob = m_contentAssistField.callBrowseLookupInBackground(m_contentAssistField.getWildcard(), 100000, TriState.UNDEFINED, new ILookupCallFetcher<LOOKUP_KEY>() {
+
+      // Load lookup rows asynchronously
+      m_initialPolulatorFuture = m_contentAssistField.callBrowseLookupInBackground(m_contentAssistField.getWildcard(), 100000, TriState.UNDEFINED, new ILookupRowFetchedCallback<LOOKUP_KEY>() {
+
         @Override
-        public void dataFetched(List<? extends ILookupRow<LOOKUP_KEY>> rows, RuntimeException failed) {
-          if (failed == null) {
-            try {
-              setStatusVisible(false);
-              List<ITreeNode> subTree = new P_TreeNodeBuilder().createTreeNodes(rows, ITreeNode.STATUS_NON_CHANGED, true);
-              try {
-                m_model.setTreeChanging(true);
-                //
-                updateSubTree(m_model, m_model.getRootNode(), subTree);
-                if (m_contentAssistField.isBrowseAutoExpandAll()) {
-                  m_model.expandAll(m_model.getRootNode());
-                }
-                commitPopulateInitialTree();
-              }
-              finally {
-                m_model.setTreeChanging(false);
-              }
+        public void onSuccess(List<? extends ILookupRow<LOOKUP_KEY>> rows) {
+          m_initialPolulatorFuture = null;
+
+          setStatusVisible(false);
+          List<ITreeNode> subTree = new P_TreeNodeBuilder().createTreeNodes(rows, ITreeNode.STATUS_NON_CHANGED, true);
+
+          m_model.setTreeChanging(true);
+          try {
+            updateSubTree(m_model, m_model.getRootNode(), subTree);
+            if (m_contentAssistField.isBrowseAutoExpandAll()) {
+              m_model.expandAll(m_model.getRootNode());
             }
-            catch (RuntimeException e) {
-              failed = e;
-            }
+            commitPopulateInitialTree();
           }
-          if (failed != null) {
+          catch (RuntimeException e) {
             setStatus(new Status(TEXTS.get("RequestProblem"), IStatus.ERROR));
             setStatusVisible(true);
-            return;
           }
+          finally {
+            m_model.setTreeChanging(false);
+          }
+        }
+
+        @Override
+        public void onFailure(RuntimeException e) {
+          m_initialPolulatorFuture = null;
+
+          setStatus(new Status(TEXTS.get("RequestProblem"), IStatus.ERROR));
+          setStatusVisible(true);
         }
       });
     }

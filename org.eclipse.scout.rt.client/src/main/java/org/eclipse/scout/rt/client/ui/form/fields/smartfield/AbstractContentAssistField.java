@@ -13,8 +13,11 @@ package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
+import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.ContentAssistFieldChains.ContentAssistFieldBrowseNewChain;
@@ -40,33 +43,36 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
-import org.eclipse.scout.rt.platform.exception.DefaultRuntimeExceptionTranslator;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
-import org.eclipse.scout.rt.platform.exception.ProcessingException;
-import org.eclipse.scout.rt.platform.holders.Holder;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.status.Status;
-import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.CompareUtility;
 import org.eclipse.scout.rt.platform.util.EventListenerList;
+import org.eclipse.scout.rt.platform.util.FinalValue;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.TriState;
+import org.eclipse.scout.rt.platform.util.concurrent.CancellationException;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
+import org.eclipse.scout.rt.platform.util.concurrent.InterruptedException;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 import org.eclipse.scout.rt.shared.services.lookup.CodeLookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
-import org.eclipse.scout.rt.shared.services.lookup.ILookupCallFetcher;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupRowFetchedCallback;
+import org.eclipse.scout.rt.shared.services.lookup.LocalLookupCall;
+import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 
 /**
  * This class is not thought to directly subclass. Use {@link AbstractSmartField} or {@link AbstractProposalField}
  * instead.
  */
+@ClassId("bcec8528-625e-471a-984d-2255dcf96251")
 public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends AbstractValueField<VALUE> implements IContentAssistField<VALUE, LOOKUP_KEY> {
 
   /**
@@ -652,21 +658,25 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
 
   @Override
   public void setUniquelyDefinedValue(boolean background) {
-    ILookupCallFetcher<LOOKUP_KEY> fetcher = new ILookupCallFetcher<LOOKUP_KEY>() {
+    ILookupRowFetchedCallback<LOOKUP_KEY> callback = new ILookupRowFetchedCallback<LOOKUP_KEY>() {
+
       @Override
-      public void dataFetched(List<? extends ILookupRow<LOOKUP_KEY>> rows, RuntimeException failed) {
-        if (failed == null) {
-          if (rows.size() == 1) {
-            acceptProposal(rows.get(0));
-          }
+      public void onSuccess(List<? extends ILookupRow<LOOKUP_KEY>> rows) {
+        if (rows.size() == 1) {
+          acceptProposal(rows.get(0));
         }
+      }
+
+      @Override
+      public void onFailure(RuntimeException e) {
+        // NOOP
       }
     };
     if (background) {
-      callBrowseLookupInBackground(getWildcard(), 2, fetcher);
+      callBrowseLookupInBackground(getWildcard(), 2, callback);
     }
     else {
-      fetcher.dataFetched(callBrowseLookup(getWildcard(), 2), null);
+      callback.onSuccess(callBrowseLookup(getWildcard(), 2));
     }
   }
 
@@ -723,8 +733,9 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
     if (row == null) {
       row = EMPTY_LOOKUP_ROW;
     }
+
+    m_installingRowContext = true;
     try {
-      m_installingRowContext = true;
       String text = row.getText();
       if (!isMultilineText() && text != null) {
         text = text.replaceAll("[\\n\\r]+", " ");
@@ -973,133 +984,28 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
     return CompareUtility.equals(lookupRow.getKey(), value);
   }
 
-  protected void filterKeyLookup(ILookupCall<LOOKUP_KEY> call, List<ILookupRow<LOOKUP_KEY>> result) {
-    interceptFilterLookupResult(call, result);
-    interceptFilterKeyLookupResult(call, result);
-  }
-
-  private void filterTextLookup(ILookupCall<LOOKUP_KEY> call, List<ILookupRow<LOOKUP_KEY>> result) {
-    interceptFilterLookupResult(call, result);
-    interceptFilterTextLookupResult(call, result);
-  }
-
-  private void filterBrowseLookup(ILookupCall<LOOKUP_KEY> call, List<ILookupRow<LOOKUP_KEY>> result) {
-    interceptFilterLookupResult(call, result);
-    interceptFilterBrowseLookupResult(call, result);
-  }
-
-  private void filterRecLookup(ILookupCall<LOOKUP_KEY> call, List<ILookupRow<LOOKUP_KEY>> result) {
-    interceptFilterLookupResult(call, result);
-    interceptFilterRecLookupResult(call, result);
+  @Override
+  public List<? extends ILookupRow<LOOKUP_KEY>> callKeyLookup(LOOKUP_KEY key) {
+    LookupRowCollector<LOOKUP_KEY> collector = new LookupRowCollector<>();
+    fetchLookupRows(newByKeyLookupRowProvider(key), collector, false, 1);
+    return collector.get();
   }
 
   @Override
-  public List<? extends ILookupRow<LOOKUP_KEY>> callKeyLookup(LOOKUP_KEY key) {
-    List<? extends ILookupRow<LOOKUP_KEY>> data = null;
-    ILookupCall<LOOKUP_KEY> call = getLookupCall();
-    if (call != null) {
-      call = BEANS.get(ILookupCallProvisioningService.class).newClonedInstance(call, new FormFieldProvisioningContext(AbstractContentAssistField.this));
-      prepareKeyLookup(call, key);
-      data = call.getDataByKey();
-    }
-    List<ILookupRow<LOOKUP_KEY>> result = CollectionUtility.arrayList(data);
-    filterKeyLookup(call, result);
-    return cleanupResultList(result);
+  public IFuture<Void> callKeyLookupInBackground(LOOKUP_KEY key, ILookupRowFetchedCallback<LOOKUP_KEY> callback) {
+    return fetchLookupRows(newByKeyLookupRowProvider(key), callback, true, 1);
   }
 
   @Override
   public List<? extends ILookupRow<LOOKUP_KEY>> callTextLookup(String text, int maxRowCount) {
-    final Holder<List<? extends ILookupRow<LOOKUP_KEY>>> rowsHolder = new Holder<List<? extends ILookupRow<LOOKUP_KEY>>>();
-    final Holder<RuntimeException> failedHolder = new Holder<>(RuntimeException.class, new ProcessingException("callback was not invoked"));
-    callTextLookupInternal(text, maxRowCount, new ILookupCallFetcher<LOOKUP_KEY>() {
-      @Override
-      public void dataFetched(List<? extends ILookupRow<LOOKUP_KEY>> rows, RuntimeException failed) {
-        rowsHolder.setValue(rows);
-        failedHolder.setValue(failed);
-      }
-    }, false);
-    if (failedHolder.getValue() != null) {
-      throw failedHolder.getValue();
-    }
-    else {
-      return rowsHolder.getValue();
-    }
+    LookupRowCollector<LOOKUP_KEY> collector = new LookupRowCollector<>();
+    fetchLookupRows(newByTextLookupRowProvider(text), collector, false, maxRowCount);
+    return collector.get();
   }
 
   @Override
-  public IFuture<?> callTextLookupInBackground(String text, int maxRowCount, ILookupCallFetcher<LOOKUP_KEY> fetcher) {
-    return callTextLookupInternal(text, maxRowCount, fetcher, true);
-  }
-
-  private IFuture<?> callTextLookupInternal(String text, int maxRowCount, final ILookupCallFetcher<LOOKUP_KEY> fetcher, final boolean background) {
-    final ILookupCall<LOOKUP_KEY> call = (getLookupCall() != null ? BEANS.get(ILookupCallProvisioningService.class).newClonedInstance(getLookupCall(), new FormFieldProvisioningContext(AbstractContentAssistField.this)) : null);
-    ILookupCallFetcher<LOOKUP_KEY> internalFetcher = new ILookupCallFetcher<LOOKUP_KEY>() {
-      @Override
-      public void dataFetched(final List<? extends ILookupRow<LOOKUP_KEY>> rows, final RuntimeException failed) {
-        IRunnable lookupRunnable = new IRunnable() {
-          @Override
-          public void run() throws Exception {
-            if (failed == null) {
-              List<ILookupRow<LOOKUP_KEY>> result = new ArrayList<>(rows);
-              try {
-                filterTextLookup(call, result);
-                fetcher.dataFetched(cleanupResultList(result), null);
-              }
-              catch (RuntimeException e) {
-                fetcher.dataFetched(null, e);
-              }
-            }
-            else {
-              fetcher.dataFetched(null, failed);
-            }
-          }
-        };
-
-        if (background || !ModelJobs.isModelThread()) {
-          ModelJobs.schedule(lookupRunnable, ModelJobs.newInput(ClientRunContexts.copyCurrent())
-              .withName("Fetching lookup data [text-lookup]"));
-        }
-        else {
-          try {
-            lookupRunnable.run();
-          }
-          catch (Exception e) {
-            fetcher.dataFetched(null, BEANS.get(DefaultRuntimeExceptionTranslator.class).translate(e));
-          }
-        }
-      }
-    };
-    //
-    if (call != null) {
-      if (maxRowCount > 0) {
-        call.setMaxRowCount(maxRowCount);
-      }
-      else {
-        call.setMaxRowCount(getBrowseMaxRowCount());
-      }
-      if (background) {
-        try {
-          prepareTextLookup(call, text);
-          return call.getDataByTextInBackground(internalFetcher);
-        }
-        catch (RuntimeException e1) {
-          internalFetcher.dataFetched(null, e1);
-        }
-      }
-      else {
-        try {
-          prepareTextLookup(call, text);
-          internalFetcher.dataFetched(call.getDataByText(), null);
-        }
-        catch (RuntimeException e) {
-          internalFetcher.dataFetched(null, e);
-        }
-      }
-    }
-    else {
-      internalFetcher.dataFetched(new ArrayList<ILookupRow<LOOKUP_KEY>>(), null);
-    }
-    return null;
+  public IFuture<Void> callTextLookupInBackground(String text, int maxRowCount, ILookupRowFetchedCallback<LOOKUP_KEY> callback) {
+    return fetchLookupRows(newByTextLookupRowProvider(text), callback, true, maxRowCount);
   }
 
   @Override
@@ -1109,140 +1015,41 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
 
   @Override
   public List<? extends ILookupRow<LOOKUP_KEY>> callBrowseLookup(String browseHint, int maxRowCount, TriState activeState) {
-    final Holder<List<? extends ILookupRow<LOOKUP_KEY>>> rowsHolder = new Holder<List<? extends ILookupRow<LOOKUP_KEY>>>();
-    final Holder<RuntimeException> failedHolder = new Holder<>(RuntimeException.class, new ProcessingException("callback was not invoked"));
-    callBrowseLookupInternal(browseHint, maxRowCount, activeState, new ILookupCallFetcher<LOOKUP_KEY>() {
-      @Override
-      public void dataFetched(List<? extends ILookupRow<LOOKUP_KEY>> rows, RuntimeException failed) {
-        rowsHolder.setValue(rows);
-        failedHolder.setValue(failed);
-      }
-    }, false);
-    if (failedHolder.getValue() != null) {
-      throw failedHolder.getValue();
-    }
-    else {
-      return rowsHolder.getValue();
-    }
+    LookupRowCollector<LOOKUP_KEY> collector = new LookupRowCollector<>();
+    fetchLookupRows(newByAllLookupRowProvider(browseHint, activeState), collector, false, maxRowCount);
+    return collector.get();
   }
 
   @Override
-  public IFuture<?> callBrowseLookupInBackground(String browseHint, int maxRowCount, ILookupCallFetcher<LOOKUP_KEY> fetcher) {
-    return callBrowseLookupInBackground(browseHint, maxRowCount, isActiveFilterEnabled() ? getActiveFilter() : TriState.TRUE, fetcher);
+  public IFuture<Void> callBrowseLookupInBackground(String browseHint, int maxRowCount, ILookupRowFetchedCallback<LOOKUP_KEY> callback) {
+    return callBrowseLookupInBackground(browseHint, maxRowCount, isActiveFilterEnabled() ? getActiveFilter() : TriState.TRUE, callback);
   }
 
   @Override
-  public IFuture<?> callBrowseLookupInBackground(String browseHint, int maxRowCount, TriState activeState, ILookupCallFetcher<LOOKUP_KEY> fetcher) {
-    return callBrowseLookupInternal(browseHint, maxRowCount, activeState, fetcher, true);
-  }
-
-  private IFuture<?> callBrowseLookupInternal(String browseHint, int maxRowCount, TriState activeState, final ILookupCallFetcher<LOOKUP_KEY> fetcher, final boolean background) {
-    final ILookupCall<LOOKUP_KEY> call = (getLookupCall() != null ? BEANS.get(ILookupCallProvisioningService.class).newClonedInstance(getLookupCall(), new FormFieldProvisioningContext(AbstractContentAssistField.this)) : null);
-
-    ILookupCallFetcher<LOOKUP_KEY> internalFetcher = new ILookupCallFetcher<LOOKUP_KEY>() {
-      @Override
-      public void dataFetched(final List<? extends ILookupRow<LOOKUP_KEY>> rows, final RuntimeException failed) {
-
-        IRunnable lookupRunnable = new IRunnable() {
-          @Override
-          public void run() throws Exception {
-            if (failed == null) {
-              List<ILookupRow<LOOKUP_KEY>> result = new ArrayList<>(rows);
-              try {
-                filterBrowseLookup(call, result);
-                fetcher.dataFetched(cleanupResultList(result), null);
-              }
-              catch (RuntimeException e) {
-                fetcher.dataFetched(null, e);
-              }
-            }
-            else {
-              fetcher.dataFetched(null, failed);
-            }
-          }
-        };
-
-        if (background || !ModelJobs.isModelThread()) {
-          ModelJobs.schedule(lookupRunnable, ModelJobs.newInput(ClientRunContexts.copyCurrent())
-              .withName("Fetching lookup data [browse-lookup]"));
-        }
-        else {
-          try {
-            lookupRunnable.run();
-          }
-          catch (Exception e) {
-            fetcher.dataFetched(null, BEANS.get(DefaultRuntimeExceptionTranslator.class).translate(e));
-          }
-        }
-      }
-    };
-
-    if (call != null) {
-      if (maxRowCount > 0) {
-        call.setMaxRowCount(maxRowCount);
-      }
-      else {
-        call.setMaxRowCount(getBrowseMaxRowCount());
-      }
-      if (background) {
-        try {
-          prepareBrowseLookup(call, browseHint, activeState);
-          return call.getDataByAllInBackground(internalFetcher);
-        }
-        catch (RuntimeException e1) {
-          internalFetcher.dataFetched(null, e1);
-        }
-      }
-      else {
-        try {
-          prepareBrowseLookup(call, browseHint, activeState);
-          internalFetcher.dataFetched(call.getDataByAll(), null);
-        }
-        catch (RuntimeException e) {
-          internalFetcher.dataFetched(null, e);
-        }
-      }
-    }
-    else {
-      internalFetcher.dataFetched(new ArrayList<ILookupRow<LOOKUP_KEY>>(), null);
-    }
-    return null;
+  public IFuture<Void> callBrowseLookupInBackground(String browseHint, int maxRowCount, TriState activeState, ILookupRowFetchedCallback<LOOKUP_KEY> callback) {
+    return fetchLookupRows(newByAllLookupRowProvider(browseHint, activeState), callback, true, maxRowCount);
   }
 
   @Override
-  public List<ILookupRow<LOOKUP_KEY>> callSubTreeLookup(LOOKUP_KEY parentKey) {
+  public List<? extends ILookupRow<LOOKUP_KEY>> callSubTreeLookup(LOOKUP_KEY parentKey) {
     return callSubTreeLookup(parentKey, isActiveFilterEnabled() ? getActiveFilter() : TriState.TRUE);
   }
 
   @Override
-  public List<ILookupRow<LOOKUP_KEY>> callSubTreeLookup(LOOKUP_KEY parentKey, TriState activeState) {
-    List<? extends ILookupRow<LOOKUP_KEY>> data = null;
-    ILookupCall<LOOKUP_KEY> call = getLookupCall();
-    if (call != null) {
-      call = BEANS.get(ILookupCallProvisioningService.class).newClonedInstance(call, new FormFieldProvisioningContext(AbstractContentAssistField.this));
-      call.setMaxRowCount(getBrowseMaxRowCount());
-      prepareRecLookup(call, parentKey, activeState);
-      data = call.getDataByRec();
-    }
-    ArrayList<ILookupRow<LOOKUP_KEY>> result;
-    if (data != null) {
-      result = new ArrayList<ILookupRow<LOOKUP_KEY>>(data);
-    }
-    else {
-      result = new ArrayList<ILookupRow<LOOKUP_KEY>>(0);
-    }
-    filterRecLookup(call, result);
-    return cleanupResultList(result);
+  public List<? extends ILookupRow<LOOKUP_KEY>> callSubTreeLookup(LOOKUP_KEY parentKey, TriState activeState) {
+    LookupRowCollector<LOOKUP_KEY> collector = new LookupRowCollector<>();
+    fetchLookupRows(newByRecLookupRowProvider(parentKey, activeState), collector, false, getBrowseMaxRowCount());
+    return collector.get();
   }
 
-  protected List<ILookupRow<LOOKUP_KEY>> cleanupResultList(List<ILookupRow<LOOKUP_KEY>> list) {
-    List<ILookupRow<LOOKUP_KEY>> rows = new ArrayList<ILookupRow<LOOKUP_KEY>>();
-    for (ILookupRow<LOOKUP_KEY> r : list) {
-      if (r != null) {
-        rows.add(r);
+  protected void cleanupResultList(final List<ILookupRow<LOOKUP_KEY>> list) {
+    final Iterator<ILookupRow<LOOKUP_KEY>> iterator = list.iterator();
+    while (iterator.hasNext()) {
+      final ILookupRow<LOOKUP_KEY> candidate = iterator.next();
+      if (candidate == null) {
+        iterator.remove();
       }
     }
-    return rows;
   }
 
   protected void handleProposalChooserClosed() {
@@ -1448,4 +1255,280 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
     return getCurrentLookupRow() != null;
   }
 
+  // ==== Lookup row fetching strategies ==== //
+
+  /**
+   * Creates a {@link ILookupRowProvider} to fetch a row by key.
+   *
+   * @see LookupCall#getDataByKey()
+   * @see LookupCall#getDataByAllInBackground(ILookupRowFetchedCallback)
+   */
+  protected ILookupRowProvider<LOOKUP_KEY> newByKeyLookupRowProvider(final LOOKUP_KEY key) {
+    return new ILookupRowProvider<LOOKUP_KEY>() {
+
+      @Override
+      public void beforeProvide(ILookupCall<LOOKUP_KEY> lookupCall) {
+        prepareKeyLookup(lookupCall, key);
+      }
+
+      @Override
+      public void afterProvide(ILookupCall<LOOKUP_KEY> lookupCall, List<ILookupRow<LOOKUP_KEY>> result) {
+        interceptFilterLookupResult(lookupCall, result);
+        interceptFilterKeyLookupResult(lookupCall, result);
+        cleanupResultList(result);
+      }
+
+      @Override
+      public void provideSync(ILookupCall<LOOKUP_KEY> lookupCall, ILookupRowFetchedCallback<LOOKUP_KEY> callback) {
+        callback.onSuccess(lookupCall.getDataByKey());
+      }
+
+      @Override
+      public IFuture<Void> provideAsync(ILookupCall<LOOKUP_KEY> lookupCall, ILookupRowFetchedCallback<LOOKUP_KEY> callback) {
+        return lookupCall.getDataByKeyInBackground(callback);
+      }
+    };
+  }
+
+  /**
+   * Creates a {@link ILookupRowProvider} to fetch all rows.
+   *
+   * @see LookupCall#getDataByAll()
+   * @see LookupCall#getDataByAllInBackground(ILookupRowFetchedCallback)
+   */
+  protected ILookupRowProvider<LOOKUP_KEY> newByAllLookupRowProvider(final String browseHint, final TriState activeState) {
+    return new ILookupRowProvider<LOOKUP_KEY>() {
+
+      @Override
+      public void beforeProvide(ILookupCall<LOOKUP_KEY> lookupCall) {
+        prepareBrowseLookup(lookupCall, browseHint, activeState);
+      }
+
+      @Override
+      public void afterProvide(ILookupCall<LOOKUP_KEY> lookupCall, List<ILookupRow<LOOKUP_KEY>> result) {
+        interceptFilterLookupResult(lookupCall, result);
+        interceptFilterBrowseLookupResult(lookupCall, result);
+        cleanupResultList(result);
+      }
+
+      @Override
+      public void provideSync(ILookupCall<LOOKUP_KEY> lookupCall, ILookupRowFetchedCallback<LOOKUP_KEY> callback) {
+        callback.onSuccess(lookupCall.getDataByAll());
+      }
+
+      @Override
+      public IFuture<Void> provideAsync(ILookupCall<LOOKUP_KEY> lookupCall, ILookupRowFetchedCallback<LOOKUP_KEY> callback) {
+        return lookupCall.getDataByAllInBackground(callback);
+      }
+    };
+  }
+
+  /**
+   * Creates a {@link ILookupRowProvider} to fetch rows matching the given text.
+   *
+   * @see LookupCall#getDataByText()
+   * @see LookupCall#getDataByTextInBackground(ILookupRowFetchedCallback)
+   */
+  protected ILookupRowProvider<LOOKUP_KEY> newByTextLookupRowProvider(final String text) {
+    return new ILookupRowProvider<LOOKUP_KEY>() {
+
+      @Override
+      public void beforeProvide(ILookupCall<LOOKUP_KEY> lookupCall) {
+        prepareTextLookup(lookupCall, text);
+      }
+
+      @Override
+      public void afterProvide(ILookupCall<LOOKUP_KEY> call, List<ILookupRow<LOOKUP_KEY>> result) {
+        interceptFilterLookupResult(call, result);
+        interceptFilterTextLookupResult(call, result);
+        cleanupResultList(result);
+      }
+
+      @Override
+      public void provideSync(ILookupCall<LOOKUP_KEY> lookupCall, ILookupRowFetchedCallback<LOOKUP_KEY> callback) {
+        callback.onSuccess(lookupCall.getDataByText());
+      }
+
+      @Override
+      public IFuture<Void> provideAsync(ILookupCall<LOOKUP_KEY> lookupCall, ILookupRowFetchedCallback<LOOKUP_KEY> callback) {
+        return lookupCall.getDataByTextInBackground(callback);
+      }
+    };
+  }
+
+  /**
+   * Creates a {@link ILookupRowProvider} to fetch rows recursively.
+   *
+   * @see LookupCall#getDataByRec()
+   * @see LookupCall#getDataByRecInBackground(ILookupRowFetchedCallback)
+   */
+  protected ILookupRowProvider<LOOKUP_KEY> newByRecLookupRowProvider(final LOOKUP_KEY parentKey, final TriState activeState) {
+    return new ILookupRowProvider<LOOKUP_KEY>() {
+
+      @Override
+      public void beforeProvide(ILookupCall<LOOKUP_KEY> lookupCall) {
+        prepareRecLookup(lookupCall, parentKey, activeState);
+      }
+
+      @Override
+      public void afterProvide(ILookupCall<LOOKUP_KEY> lookupCall, List<ILookupRow<LOOKUP_KEY>> result) {
+        interceptFilterLookupResult(lookupCall, result);
+        interceptFilterRecLookupResult(lookupCall, result);
+        cleanupResultList(result);
+      }
+
+      @Override
+      public void provideSync(ILookupCall<LOOKUP_KEY> lookupCall, ILookupRowFetchedCallback<LOOKUP_KEY> callback) {
+        callback.onSuccess(lookupCall.getDataByRec());
+      }
+
+      @Override
+      public IFuture<Void> provideAsync(ILookupCall<LOOKUP_KEY> lookupCall, ILookupRowFetchedCallback<LOOKUP_KEY> callback) {
+        return lookupCall.getDataByRecInBackground(callback);
+      }
+    };
+  }
+
+  /**
+   * Loads lookup rows according to the specified {@link ILookupRowProvider}, and notifies the specified callback upon
+   * fetching completed.
+   *
+   * @return {@link IFuture} if data is fetched asynchronously, or <code>null</code> for synchronous fetching, or if
+   *         using {@link LocalLookupCall}.
+   */
+  private IFuture<Void> fetchLookupRows(final ILookupRowProvider<LOOKUP_KEY> dataProvider, final ILookupRowFetchedCallback<LOOKUP_KEY> callback, final boolean asynchronousFetching, final int maxRowCount) {
+    if (getLookupCall() == null) {
+      callback.onSuccess(Collections.<ILookupRow<LOOKUP_KEY>> emptyList());
+      return null;
+    }
+
+    // Prepare the lookup call.
+    final ILookupCall<LOOKUP_KEY> lookupCall = BEANS.get(ILookupCallProvisioningService.class).newClonedInstance(getLookupCall(), new FormFieldProvisioningContext(AbstractContentAssistField.this));
+    lookupCall.setMaxRowCount(maxRowCount > 0 ? maxRowCount : getBrowseMaxRowCount());
+
+    // Prepare processing of the fetched rows.
+    final ClientRunContext callingRunContext = ClientRunContexts.copyCurrent();
+    final ILookupRowFetchedCallback<LOOKUP_KEY> internalCallback = new ILookupRowFetchedCallback<LOOKUP_KEY>() {
+
+      @Override
+      public void onSuccess(final List<? extends ILookupRow<LOOKUP_KEY>> rows) {
+        joinModelThreadAndUpdateField(rows, null);
+      }
+
+      @Override
+      public void onFailure(final RuntimeException e) {
+        joinModelThreadAndUpdateField(null, e);
+      }
+
+      private void joinModelThreadAndUpdateField(final List<? extends ILookupRow<LOOKUP_KEY>> rows, final RuntimeException exception) {
+        if (ModelJobs.isModelThread(callingRunContext.getSession())) {
+          updateField(rows, exception);
+        }
+        else {
+          ModelJobs.schedule(new IRunnable() {
+
+            @Override
+            public void run() throws Exception {
+              updateField(rows, exception);
+            }
+          }, ModelJobs.newInput(callingRunContext)
+              .withName("Updating {}", AbstractContentAssistField.this.getClass().getName()));
+        }
+      }
+
+      private void updateField(final List<? extends ILookupRow<LOOKUP_KEY>> rows, final RuntimeException exception) {
+        try {
+          if (exception != null) {
+            throw exception; // throw to handle exception at the end.
+          }
+
+          final List<ILookupRow<LOOKUP_KEY>> result = new ArrayList<>(rows);
+          dataProvider.afterProvide(lookupCall, result);
+          callback.onSuccess(result);
+        }
+        catch (CancellationException | InterruptedException e) {
+          callback.onSuccess(Collections.<ILookupRow<LOOKUP_KEY>> emptyList());
+        }
+        catch (final RuntimeException e) {
+          callback.onFailure(exception);
+        }
+      }
+    };
+
+    // Start fetching lookup rows.
+    try {
+      dataProvider.beforeProvide(lookupCall);
+      if (asynchronousFetching) {
+        return dataProvider.provideAsync(lookupCall, internalCallback);
+      }
+      else {
+        dataProvider.provideSync(lookupCall, internalCallback);
+        return null;
+      }
+    }
+    catch (final RuntimeException e) {
+      internalCallback.onFailure(e);
+    }
+    return null;
+  }
+
+  /**
+   * Represents a strategy to fetch lookup rows.
+   */
+  protected static interface ILookupRowProvider<LOOKUP_KEY> {
+
+    /**
+     * Method invoked before fetching lookup rows.
+     */
+    void beforeProvide(ILookupCall<LOOKUP_KEY> lookupCall);
+
+    /**
+     * Method invoked after fetching lookup rows, but before the result is returned.
+     */
+    void afterProvide(ILookupCall<LOOKUP_KEY> lookupCall, List<ILookupRow<LOOKUP_KEY>> result);
+
+    /**
+     * Method invoked to synchronously fetch lookup rows.
+     */
+    void provideSync(ILookupCall<LOOKUP_KEY> lookupCall, ILookupRowFetchedCallback<LOOKUP_KEY> callback);
+
+    /**
+     * Method invoked to asynchronously fetch lookup rows.
+     */
+    IFuture<Void> provideAsync(ILookupCall<LOOKUP_KEY> lookupCall, ILookupRowFetchedCallback<LOOKUP_KEY> callback);
+  }
+
+  /**
+   * {@link ILookupRowFetchedCallback} but with functionality to collect the result.
+   */
+  protected static class LookupRowCollector<LOOKUP_KEY> implements ILookupRowFetchedCallback<LOOKUP_KEY> {
+
+    private final FinalValue<List<? extends ILookupRow<LOOKUP_KEY>>> m_rows = new FinalValue<>();
+    private final FinalValue<RuntimeException> m_exception = new FinalValue<>();
+
+    @Override
+    public void onSuccess(List<? extends ILookupRow<LOOKUP_KEY>> rows) {
+      m_rows.set(rows);
+    }
+
+    @Override
+    public void onFailure(RuntimeException e) {
+      m_exception.set(e);
+    }
+
+    /**
+     * Returns the result, or throws the exception on failure.
+     */
+    public List<? extends ILookupRow<LOOKUP_KEY>> get() {
+      if (m_rows.isSet()) {
+        return m_rows.get();
+      }
+      else if (m_exception.isSet()) {
+        throw m_exception.get();
+      }
+      else {
+        throw new IllegalStateException("Lookup row fetching not completed yet");
+      }
+    }
+  }
 }

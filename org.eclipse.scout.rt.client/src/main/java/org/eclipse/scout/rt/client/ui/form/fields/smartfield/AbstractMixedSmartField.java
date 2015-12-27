@@ -10,22 +10,15 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
-import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.IMixedSmartFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.MixedSmartFieldChains.MixedSmartFieldConvertKeyToValueChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.MixedSmartFieldChains.MixedSmartFieldConvertValueToKeyChain;
-import org.eclipse.scout.rt.client.job.ModelJobs;
-import org.eclipse.scout.rt.client.services.lookup.FormFieldProvisioningContext;
-import org.eclipse.scout.rt.client.services.lookup.ILookupCallProvisioningService;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.ValidationFailedStatus;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -33,18 +26,14 @@ import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.VetoException;
-import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.TEXTS;
-import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
-import org.eclipse.scout.rt.shared.services.lookup.LocalLookupCall;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupRowFetchedCallback;
 
 /**
  * A smart field with a key type different from the value type. The default implementation of
@@ -56,24 +45,22 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends AbstractContentAssistField<VALUE, LOOKUP_KEY> implements IMixedSmartField<VALUE, LOOKUP_KEY> {
 
-  private static final Logger LOG = LoggerFactory.getLogger(AbstractMixedSmartField.class);
-
-  private AtomicReference<IFuture<List<ILookupRow<LOOKUP_KEY>>>> m_backgroundJobFuture;
-  private IContentAssistFieldUIFacade m_uiFacade;
+  private final IContentAssistFieldUIFacade m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(new ContentAssistFieldUIFacade<LOOKUP_KEY>(this), ModelContext.copyCurrent());
+  private final IBlockingCondition m_contextInstalledCondition = Jobs.newBlockingCondition(false);
 
   public AbstractMixedSmartField() {
     this(true);
   }
 
   public AbstractMixedSmartField(boolean callInitializer) {
-    super(callInitializer);
+    super(false); // do not auto-initialize via super constructor, because final members of this class would not be set yet.
+    if (callInitializer) {
+      callInitializer();
+    }
   }
 
   /**
    * the default implementation simply casts one to the other type
-   *
-   * @param key
-   * @return
    */
   @SuppressWarnings("unchecked")
   @ConfigOperation
@@ -84,22 +71,12 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
 
   /**
    * the default implementation simply casts one to the other type
-   *
-   * @param key
-   * @return
    */
   @SuppressWarnings("unchecked")
   @ConfigOperation
   @Order(410)
   protected LOOKUP_KEY execConvertValueToKey(VALUE value) {
     return (LOOKUP_KEY) value;
-  }
-
-  @Override
-  protected void initConfig() {
-    m_backgroundJobFuture = new AtomicReference<>();
-    super.initConfig();
-    m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(new ContentAssistFieldUIFacade<LOOKUP_KEY>(this), ModelContext.copyCurrent());
   }
 
   @Override
@@ -178,60 +155,44 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
 
   @Override
   public void applyLazyStyles() {
-    // override: ensure that (async loading) lookup context has been set
-    if (m_backgroundJobFuture.get() != null && ModelJobs.isModelThread()) {
-      waitForLookupRows();
-    }
+    // Waits if necessary for the lookup row context to be installed (asynchronous operation)
+    m_contextInstalledCondition.waitFor(1, TimeUnit.MINUTES);
   }
 
   @Override
   protected void valueChangedInternal() {
+    m_contextInstalledCondition.setBlocking(true);
+
     // When a current lookup-row is available, we don't need to perform a lookup
     // Usually this happens after the user has selected a row from the proposal-chooser (table or tree).
-    if (getCurrentLookupRow() != null) {
-      safeInstallLookupRowContext(Collections.singletonList(getCurrentLookupRow()));
+    final ILookupRow<LOOKUP_KEY> currentLookupRow = getCurrentLookupRow();
+    if (currentLookupRow != null) {
+      installLookupRowContext(currentLookupRow);
+      m_contextInstalledCondition.setBlocking(false);
       return;
     }
 
-    ILookupCall<LOOKUP_KEY> lookupCall = getLookupCall();
-    if (lookupCall == null) {
+    if (getLookupCall() == null) {
+      m_contextInstalledCondition.setBlocking(false);
       return;
     }
 
     // When no current-lookup row is available we must perform a lookup by key (local or remote)
-    try {
-      if (lookupCall instanceof LocalLookupCall) {
-        List<? extends ILookupRow<LOOKUP_KEY>> rows = callKeyLookup(interceptConvertValueToKey(getValue()));
-        safeInstallLookupRowContext(rows);
-      }
-      else {
-        // Enqueue LookupRow fetcher. this will later on call installLookupRowContext()
-        final ILookupCall<LOOKUP_KEY> call = BEANS.get(ILookupCallProvisioningService.class).newClonedInstance(lookupCall,
-            new FormFieldProvisioningContext(AbstractMixedSmartField.this));
-        prepareKeyLookup(call, interceptConvertValueToKey(getValue()));
+    final LOOKUP_KEY lookupKey = interceptConvertValueToKey(getValue());
+    callKeyLookupInBackground(lookupKey, new ILookupRowFetchedCallback<LOOKUP_KEY>() {
 
-        m_backgroundJobFuture.set(Jobs.schedule(new Callable<List<ILookupRow<LOOKUP_KEY>>>() {
-          @Override
-          public List<ILookupRow<LOOKUP_KEY>> call() throws Exception {
-            List<ILookupRow<LOOKUP_KEY>> result = new ArrayList<>(call.getDataByKey());
-            filterKeyLookup(call, result);
-            return cleanupResultList(result);
-          }
-        }, Jobs.newInput()
-            .withRunContext(ClientRunContexts.copyCurrent())
-            .withName("Fetching smart-field data")));
-
-        ModelJobs.schedule(new IRunnable() {
-          @Override
-          public void run() throws Exception {
-            waitForLookupRows();
-          }
-        }, ModelJobs.newInput(ClientRunContexts.copyCurrent()));
+      @Override
+      public void onSuccess(final List<? extends ILookupRow<LOOKUP_KEY>> rows) {
+        installLookupRowContext(CollectionUtility.firstElement(rows));
+        m_contextInstalledCondition.setBlocking(false);
       }
-    }
-    catch (RuntimeException e) {
-      BEANS.get(ExceptionHandler.class).handle(e);
-    }
+
+      @Override
+      public void onFailure(final RuntimeException exception) {
+        BEANS.get(ExceptionHandler.class).handle(exception);
+        m_contextInstalledCondition.setBlocking(false);
+      }
+    });
   }
 
   @Override
@@ -282,7 +243,7 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
     if (getLookupCall() != null && getValue() != null) {
       try {
         List<? extends ILookupRow<LOOKUP_KEY>> rows = callKeyLookup(interceptConvertValueToKey(getValue()));
-        safeInstallLookupRowContext(rows);
+        installLookupRowContext(CollectionUtility.firstElement(rows));
       }
       catch (RuntimeException e) {
         BEANS.get(ExceptionHandler.class).handle(e);
@@ -300,33 +261,6 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
     IProposalChooser<?, LOOKUP_KEY> proposalChooser = getProposalChooser();
     if (proposalChooser != null && result != null) {
       proposalChooser.dataFetchedDelegate(result, getBrowseMaxRowCount());
-    }
-  }
-
-  protected void safeInstallLookupRowContext(List<? extends ILookupRow<LOOKUP_KEY>> lookupRows) {
-    ILookupRow<LOOKUP_KEY> lookupRow = null;
-    if (CollectionUtility.hasElements(lookupRows)) {
-      lookupRow = lookupRows.get(0);
-    }
-    installLookupRowContext(lookupRow);
-  }
-
-  private void waitForLookupRows() {
-    IFuture<List<ILookupRow<LOOKUP_KEY>>> backgroundJobFuture = m_backgroundJobFuture.get();
-    if (backgroundJobFuture == null) {
-      return;
-    }
-    // here we are in the scout thread and simply need to wait until the
-    // background thread finished fetching
-    try {
-      List<ILookupRow<LOOKUP_KEY>> rows = backgroundJobFuture.awaitDoneAndGet();
-      safeInstallLookupRowContext(rows);
-    }
-    catch (RuntimeException e) {
-      LOG.error("Error loading smartfield data.", e);
-    }
-    finally {
-      m_backgroundJobFuture.set(null);
     }
   }
 

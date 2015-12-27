@@ -30,7 +30,7 @@ import org.eclipse.scout.rt.server.transaction.TransactionScope;
 public class ServerRunContextProducer extends RunContextProducer {
 
   /**
-   * Produces a {@link ServerRunContext} for the given {@link Subject}.
+   * Creates a {@link ServerRunContext} for the specified {@link Subject}.
    */
   @Override
   public ServerRunContext produce(final Subject subject) {
@@ -38,7 +38,7 @@ public class ServerRunContextProducer extends RunContextProducer {
         .withSubject(subject)
         .withTransactionScope(TransactionScope.REQUIRES_NEW);
 
-    // Ensure a session to be associated with belongs to the current subject.
+    // Ensure that the session belongs to the specified subject.
     if (serverRunContext.getSession() == null || CompareUtility.notEquals(serverRunContext.getSubject(), subject)) {
       serverRunContext.withSession(BEANS.get(ServerSessionProviderWithCache.class).provide(serverRunContext.copy()));
     }

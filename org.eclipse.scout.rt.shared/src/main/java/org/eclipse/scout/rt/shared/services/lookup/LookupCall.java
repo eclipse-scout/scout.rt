@@ -17,18 +17,14 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ITypeWithClassId;
-import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
+import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.ToStringBuilder;
 import org.eclipse.scout.rt.platform.util.TriState;
-import org.eclipse.scout.rt.platform.util.concurrent.CancellationException;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
-import org.eclipse.scout.rt.platform.util.concurrent.InterruptedException;
-import org.eclipse.scout.rt.shared.job.IRunContextProvider;
 
 /**
  * There are 2 variants to use lookup values <br>
@@ -287,11 +283,16 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, S
     return true;
   }
 
-  /**
-   * Lookup by performing a "key" filter and activating the <key> tags
-   * <p>
-   * When getConfiguredService is set then delegate call to service, otherwise returns an empty array
-   */
+  @Override
+  public void setWildcard(String wildcard) {
+    m_wildcard = Assertions.assertNotNullOrEmpty(wildcard, "Wildcard must not be null nor empty");
+  }
+
+  @Override
+  public String getWildcard() {
+    return m_wildcard;
+  }
+
   @Override
   public List<? extends ILookupRow<KEY_TYPE>> getDataByKey() {
     if (getKey() != null && getLookupService() != null) {
@@ -300,51 +301,17 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, S
     return CollectionUtility.emptyArrayList();
   }
 
-  /**
-   * Same as {@link #getDataByKey()} but in background.<br>
-   * see {@link ILookupCallFetcher}<br>
-   * {@link ILookupCallFetcher#dataFetched(LookupRow[], ProcessingException)} is called in the background thread
-   * <p>
-   * Note: background call is only done when lookup call is not a {@link LocalLookupCall}
-   *
-   * @return the created async job if applicable or null
-   */
   @Override
-  public IFuture<?> getDataByKeyInBackground(final ILookupCallFetcher<KEY_TYPE> caller) {
-    if (this instanceof LocalLookupCall) {
-      try {
-        caller.dataFetched(getDataByKey(), null);
+  public IFuture<Void> getDataByKeyInBackground(final ILookupRowFetchedCallback<KEY_TYPE> callback) {
+    return loadDataInBackground(new IDataProvider<KEY_TYPE>() {
+
+      @Override
+      public List<? extends ILookupRow<KEY_TYPE>> provide() {
+        return getDataByKey();
       }
-      catch (RuntimeException e) {
-        caller.dataFetched(null, e);
-      }
-      return null;
-    }
-    else {
-      return Jobs.schedule(new IRunnable() {
-        @Override
-        public void run() throws Exception {
-          try {
-            caller.dataFetched(getDataByKey(), null);
-          }
-          catch (InterruptedException | CancellationException e) {
-            // NOOP
-          }
-          catch (RuntimeException e) {
-            caller.dataFetched(null, e);
-          }
-        }
-      }, Jobs.newInput()
-          .withRunContext(BEANS.get(IRunContextProvider.class).copyCurrent())
-          .withName("Fetching lookup data [{}.getDataByKeyInBackground]", getClass().getName()));
-    }
+    }, callback);
   }
 
-  /**
-   * Lookup by performing a "text" filter and activating the <text> tags
-   * <p>
-   * When getConfiguredService is set then delegate call to service, otherwise return null
-   */
   @Override
   public List<? extends ILookupRow<KEY_TYPE>> getDataByText() {
     boolean masterValid = ((!getConfiguredMasterRequired()) || getMaster() != null);
@@ -356,51 +323,17 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, S
     }
   }
 
-  /**
-   * Same as {@link #getDataByText()} but in background.<br>
-   * see {@link ILookupCallFetcher}<br>
-   * {@link ILookupCallFetcher#dataFetched(LookupRow[], ProcessingException)} is called in the background thread
-   * <p>
-   * Note: background call is only done when lookup call is not a {@link LocalLookupCall}
-   *
-   * @return the created async job if applicable or null
-   */
   @Override
-  public IFuture<?> getDataByTextInBackground(final ILookupCallFetcher<KEY_TYPE> caller) {
-    if (this instanceof LocalLookupCall) {
-      try {
-        caller.dataFetched(getDataByText(), null);
+  public IFuture<Void> getDataByTextInBackground(final ILookupRowFetchedCallback<KEY_TYPE> callback) {
+    return loadDataInBackground(new IDataProvider<KEY_TYPE>() {
+
+      @Override
+      public List<? extends ILookupRow<KEY_TYPE>> provide() {
+        return getDataByText();
       }
-      catch (RuntimeException e) {
-        caller.dataFetched(null, e);
-      }
-      return null;
-    }
-    else {
-      return Jobs.schedule(new IRunnable() {
-        @Override
-        public void run() throws Exception {
-          try {
-            caller.dataFetched(getDataByText(), null);
-          }
-          catch (InterruptedException | CancellationException e) {
-            // NOOP
-          }
-          catch (RuntimeException e) {
-            caller.dataFetched(null, e);
-          }
-        }
-      }, Jobs.newInput()
-          .withRunContext(BEANS.get(IRunContextProvider.class).copyCurrent())
-          .withName("Fetching lookup data [{}.getDataByTextInBackground]", getClass().getName()));
-    }
+    }, callback);
   }
 
-  /**
-   * Lookup by performing a "all" filter and activating the <all> tags
-   * <p>
-   * When getConfiguredService is set then delegate call to service, otherwise return null
-   */
   @Override
   public List<? extends ILookupRow<KEY_TYPE>> getDataByAll() {
     boolean masterValid = ((!getConfiguredMasterRequired()) || getMaster() != null);
@@ -412,51 +345,17 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, S
     }
   }
 
-  /**
-   * Same as {@link #getDataByAll()} but in background.<br>
-   * see {@link ILookupCallFetcher}<br>
-   * {@link ILookupCallFetcher#dataFetched(LookupRow[], ProcessingException)} is called in the background thread
-   * <p>
-   * Note: background call is only done when lookup call is not a {@link LocalLookupCall}
-   *
-   * @return the created async job if applicable or null
-   */
   @Override
-  public IFuture<?> getDataByAllInBackground(final ILookupCallFetcher<KEY_TYPE> caller) {
-    if (this instanceof LocalLookupCall) {
-      try {
-        caller.dataFetched(getDataByAll(), null);
+  public IFuture<Void> getDataByAllInBackground(final ILookupRowFetchedCallback<KEY_TYPE> callback) {
+    return loadDataInBackground(new IDataProvider<KEY_TYPE>() {
+
+      @Override
+      public List<? extends ILookupRow<KEY_TYPE>> provide() {
+        return getDataByAll();
       }
-      catch (RuntimeException e) {
-        caller.dataFetched(null, e);
-      }
-      return null;
-    }
-    else {
-      return Jobs.schedule(new IRunnable() {
-        @Override
-        public void run() throws Exception {
-          try {
-            caller.dataFetched(getDataByAll(), null);
-          }
-          catch (InterruptedException | CancellationException e) {
-            // NOOP
-          }
-          catch (RuntimeException e) {
-            caller.dataFetched(null, e);
-          }
-        }
-      }, Jobs.newInput()
-          .withRunContext(BEANS.get(IRunContextProvider.class).copyCurrent())
-          .withName("Fetching lookup data [{}.getDataByAllInBackground]", getClass().getName()));
-    }
+    }, callback);
   }
 
-  /**
-   * Lookup by performing a "recursion" filter and activating the <rec> tags
-   * <p>
-   * When getConfiguredService is set then delegate call to service, otherwise return null
-   */
   @Override
   public List<? extends ILookupRow<KEY_TYPE>> getDataByRec() {
     if (getLookupService() != null) {
@@ -467,44 +366,45 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, S
     }
   }
 
-  /**
-   * Same as {@link #getDataByRec()} but in background.<br>
-   * see {@link ILookupCallFetcher}<br>
-   * {@link ILookupCallFetcher#dataFetched(LookupRow[], ProcessingException)} is called in the background thread
-   * <p>
-   * Note: background call is only done when lookup call is not a {@link LocalLookupCall}
-   *
-   * @return the created async job if applicable or null
-   */
   @Override
-  public IFuture<?> getDataByRecInBackground(final ILookupCallFetcher<KEY_TYPE> caller) {
-    if (this instanceof LocalLookupCall) {
-      try {
-        caller.dataFetched(getDataByRec(), null);
+  public IFuture<Void> getDataByRecInBackground(final ILookupRowFetchedCallback<KEY_TYPE> callback) {
+    return loadDataInBackground(new IDataProvider<KEY_TYPE>() {
+
+      @Override
+      public List<? extends ILookupRow<KEY_TYPE>> provide() {
+        return getDataByRec();
       }
-      catch (RuntimeException e) {
-        caller.dataFetched(null, e);
+    }, callback);
+  }
+
+  /**
+   * Loads data asynchronously, and calls the specified callback once completed.
+   */
+  protected IFuture<Void> loadDataInBackground(final IDataProvider<KEY_TYPE> dataProvider, final ILookupRowFetchedCallback<KEY_TYPE> callback) {
+    return Jobs.schedule(new IRunnable() {
+
+      @Override
+      public void run() throws Exception {
+        loadData(dataProvider, callback);
       }
-      return null;
+    }, Jobs.newInput()
+        .withName("Fetching lookup data [provider={}, lookupCall={}]", dataProvider.getClass().getName(), getClass().getName()));
+  }
+
+  /**
+   * Loads data synchronously, and calls the specified callback once completed.
+   */
+  protected void loadData(final IDataProvider<KEY_TYPE> dataProvider, final ILookupRowFetchedCallback<KEY_TYPE> callback) {
+    final List<? extends ILookupRow<KEY_TYPE>> rows;
+    try {
+      rows = dataProvider.provide();
     }
-    else {
-      return Jobs.schedule(new IRunnable() {
-        @Override
-        public void run() throws Exception {
-          try {
-            caller.dataFetched(getDataByRec(), null);
-          }
-          catch (InterruptedException | CancellationException e) {
-            // NOOP
-          }
-          catch (RuntimeException e) {
-            caller.dataFetched(null, e);
-          }
-        }
-      }, Jobs.newInput()
-          .withRunContext(BEANS.get(IRunContextProvider.class).copyCurrent())
-          .withName("Fetching lookup data [{}.getDataByRecInBackground]", getClass().getName()));
+    catch (RuntimeException e) {
+      callback.onFailure(e);
+      return;
     }
+
+    callback.onSuccess(rows);
   }
 
   @Override
@@ -519,16 +419,11 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, S
     return builder.toString();
   }
 
-  @Override
-  public void setWildcard(String wildcard) {
-    if (StringUtility.isNullOrEmpty(wildcard)) {
-      throw new IllegalArgumentException("Wildcard must not be null nor empty!");
-    }
-    m_wildcard = wildcard;
-  }
+  protected interface IDataProvider<KEY_TYPE> {
 
-  @Override
-  public String getWildcard() {
-    return m_wildcard;
+    /**
+     * Loads lookup rows according to this provider's strategy.
+     */
+    List<? extends ILookupRow<KEY_TYPE>> provide();
   }
 }

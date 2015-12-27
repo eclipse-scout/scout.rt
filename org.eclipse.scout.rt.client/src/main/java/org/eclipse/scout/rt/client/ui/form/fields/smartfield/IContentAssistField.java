@@ -14,15 +14,13 @@ import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTree;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
-import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.util.TriState;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
-import org.eclipse.scout.rt.shared.services.lookup.ILookupCallFetcher;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
-import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
-import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupRowFetchedCallback;
+import org.eclipse.scout.rt.shared.services.lookup.LocalLookupCall;
 
 /**
  * @param <VALUE>
@@ -204,41 +202,55 @@ public interface IContentAssistField<VALUE, LOOKUP_KEY> extends IValueField<VALU
 
   List<? extends ILookupRow<LOOKUP_KEY>> callKeyLookup(LOOKUP_KEY key);
 
+  /**
+   * Loads lookup rows asynchronously, and notifies the specified callback upon loading completed.
+   * <p>
+   * The methods of {@link ILookupRowFetchedCallback} are called in the model thread.
+   * <p>
+   * If it is a {@link LocalLookupCall}, data is fetched synchronously.
+   *
+   * @return {@link IFuture} to cancel data fetching; is <code>null</code> for a {@link LocalLookupCall}.
+   */
+  IFuture<Void> callKeyLookupInBackground(LOOKUP_KEY key, ILookupRowFetchedCallback<LOOKUP_KEY> callback);
+
   List<? extends ILookupRow<LOOKUP_KEY>> callTextLookup(String text, int maxRowCount);
 
   /**
-   * Note: {@link ILookupCallFetcher#dataFetched(LookupRow[], ProcessingException)} is called back in the model thread.
-   * The smartfield is automatically starting an internal background thread and syncs the result back into the model
-   * thread.
+   * Loads lookup rows asynchronously, and notifies the specified callback upon loading completed.
+   * <p>
+   * The methods of {@link ILookupRowFetchedCallback} are called in the model thread.
+   * <p>
+   * If it is a {@link LocalLookupCall}, data is fetched synchronously.
    *
-   * @return the created async job if applicable or null, see
-   *         {@link LookupCall#getDataByTextInBackground(ILookupCallFetcher)}
+   * @return {@link IFuture} to cancel data fetching; is <code>null</code> for a {@link LocalLookupCall}.
    */
-  IFuture<?> callTextLookupInBackground(String text, int maxRowCount, ILookupCallFetcher<LOOKUP_KEY> fetcher);
+  IFuture<Void> callTextLookupInBackground(String text, int maxRowCount, ILookupRowFetchedCallback<LOOKUP_KEY> callback);
 
   List<? extends ILookupRow<LOOKUP_KEY>> callBrowseLookup(String browseHint, int maxRowCount);
 
   List<? extends ILookupRow<LOOKUP_KEY>> callBrowseLookup(String browseHint, int maxRowCount, TriState activeState);
 
   /**
-   * Note: {@link ILookupCallFetcher#dataFetched(LookupRow[], ProcessingException)} is called back in the model thread.
-   * The smartfield is automatically starting an internal background thread and syncs the result back into the model
-   * thread.
+   * Loads lookup rows asynchronously, and notifies the specified callback upon loading completed.
+   * <p>
+   * The methods of {@link ILookupRowFetchedCallback} are called in the model thread.
+   * <p>
+   * If it is a {@link LocalLookupCall}, data is fetched synchronously.
    *
-   * @return the created async job if applicable or null, see
-   *         {@link LookupCall#getDataByAllInBackground(ILookupCallFetcher)}
+   * @return {@link IFuture} to cancel data fetching; is <code>null</code> for a {@link LocalLookupCall}.
    */
-  IFuture<?> callBrowseLookupInBackground(String browseHint, int maxRowCount, ILookupCallFetcher<LOOKUP_KEY> fetcher);
+  IFuture<Void> callBrowseLookupInBackground(String browseHint, int maxRowCount, ILookupRowFetchedCallback<LOOKUP_KEY> callback);
 
   /**
-   * Note: {@link ILookupCallFetcher#dataFetched(LookupRow[], ProcessingException)} is called back in the model thread.
-   * The smartfield is automatically starting an internal background thread and syncs the result back into the model
-   * thread.
+   * Loads lookup rows asynchronously, and notifies the specified callback upon loading completed.
+   * <p>
+   * The methods of {@link ILookupRowFetchedCallback} are called in the model thread.
+   * <p>
+   * If it is a {@link LocalLookupCall}, data is fetched synchronously.
    *
-   * @return the created async job if applicable or null, see
-   *         {@link LookupCall#getDataByAllInBackground(ILookupCallFetcher)}
+   * @return {@link IFuture} to cancel data fetching; is <code>null</code> for a {@link LocalLookupCall}.
    */
-  IFuture<?> callBrowseLookupInBackground(String browseHint, int maxRowCount, TriState activeState, ILookupCallFetcher<LOOKUP_KEY> fetcher);
+  IFuture<Void> callBrowseLookupInBackground(String browseHint, int maxRowCount, TriState activeState, ILookupRowFetchedCallback<LOOKUP_KEY> callback);
 
   List<? extends ILookupRow<LOOKUP_KEY>> callSubTreeLookup(LOOKUP_KEY parentKey);
 
