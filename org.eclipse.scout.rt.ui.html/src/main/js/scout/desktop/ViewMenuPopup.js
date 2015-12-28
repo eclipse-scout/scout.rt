@@ -95,5 +95,8 @@ scout.ViewMenuPopup.prototype.position = function() {
   this.$body.cssWidth(Math.min(scout.ViewMenuPopup.MAX_MENU_WIDTH, this._naviBounds.width));
   this.$body.cssTop(bodyTop);
 
+  // make container smaller, otherwise it will overlap other view buttons on top
+  this.$container.cssWidth(headSize.width);
+
   this.setLocation(new scout.Point(0, 0));
 };
