@@ -217,7 +217,7 @@ describe("scout.numbers", function() {
       expect(scout.numbers.shiftDecimalPoint(0.555e-3, 3)).toBe(0.555);
 
       // corner cases (lost precision!)
-      expect(scout.numbers.shiftDecimalPoint(0.0999999999999999, 1)).toBe(0.999999999999998);
+      expect(scout.numbers.shiftDecimalPoint(0.0999999999999999, 1)).toBe(0.999999999999999);
       expect(scout.numbers.shiftDecimalPoint(1.0999999999999999, 1)).toBe(10.999999999999998);
       expect(scout.numbers.shiftDecimalPoint(2.0999999999999999, 1)).toBe(21);
     });
