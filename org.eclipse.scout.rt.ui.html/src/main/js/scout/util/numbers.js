@@ -148,7 +148,7 @@ scout.numbers = {
       }
     }
     // Remove multiple leading zeros to prevent interpretation as octal number
-    s = s.replace(/^0*(\d)/g, '');
+    s = s.replace(/^0*(\d)/g, '$1');
     return Number(s) * sign;
   }
 
