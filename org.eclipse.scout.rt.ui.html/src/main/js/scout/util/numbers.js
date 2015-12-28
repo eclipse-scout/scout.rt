@@ -147,7 +147,8 @@ scout.numbers = {
         s = a[0] + a[1].substr(0, distance) + '.' + a[1].substr(distance);
       }
     }
-    s = s.replace(/^00/g, '');
+    // Remove multiple leading zeros to prevent interpretation as octal number
+    s = s.replace(/^0*(\d)/g, '');
     return Number(s) * sign;
   }
 
