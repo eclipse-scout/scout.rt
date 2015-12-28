@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.ui.html.json.calendar;
 import org.eclipse.scout.rt.shared.services.common.calendar.RecurrencePattern;
 import org.eclipse.scout.rt.ui.html.json.IJsonObject;
 import org.eclipse.scout.rt.ui.html.json.JsonDate;
-import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.json.JSONObject;
 
 public class JsonRecurrencePattern implements IJsonObject {
@@ -33,7 +32,7 @@ public class JsonRecurrencePattern implements IJsonObject {
     if (m_recurrencePattern == null) {
       return null;
     }
-    JSONObject json = JsonObjectUtility.newOrderedJSONObject();
+    JSONObject json = new JSONObject();
     json.put("lastModified", m_recurrencePattern.getLastModified());
     json.put("regenerate", m_recurrencePattern.isRegenerate());
     json.put("startTimeMinutes", m_recurrencePattern.getStartTimeMinutes());

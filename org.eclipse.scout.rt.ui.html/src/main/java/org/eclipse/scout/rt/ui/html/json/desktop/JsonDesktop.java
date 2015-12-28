@@ -34,7 +34,6 @@ import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
-import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.action.DisplayableActionFilter;
 import org.eclipse.scout.rt.ui.html.res.BinaryResourceHolder;
@@ -279,7 +278,7 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
   }
 
   protected void handleModelOpenUri(String uri, IOpenUriAction openUriAction) {
-    JSONObject json = JsonObjectUtility.newOrderedJSONObject();
+    JSONObject json = new JSONObject();
     putProperty(json, "uri", uri);
     putProperty(json, "action", openUriAction.getIdentifier());
     addActionEvent("openUri", json);
@@ -373,7 +372,7 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
 
   protected void addActionEventForEachDisplayParentAdapter(String eventName, String propModelAdapterId, IJsonAdapter<?> modelAdapter, IDisplayParent displayParent, int position) {
     for (IJsonAdapter<IDisplayParent> displayParentAdapter : getUiSession().getJsonAdapters(displayParent)) {
-      JSONObject jsonEvent = JsonObjectUtility.newOrderedJSONObject();
+      JSONObject jsonEvent = new JSONObject();
       jsonEvent.put(propModelAdapterId, modelAdapter.getId());
       jsonEvent.put(PROP_DISPLAY_PARENT, displayParentAdapter.getId());
       if (position >= 0) {

@@ -18,7 +18,6 @@ import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonObject;
 import org.eclipse.scout.rt.ui.html.json.InspectorInfo;
 import org.eclipse.scout.rt.ui.html.json.JsonAdapterUtility;
-import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.table.userfilter.JsonTextColumnUserFilter;
 import org.json.JSONObject;
 
@@ -52,7 +51,7 @@ public class JsonColumn<T extends IColumn<?>> implements IJsonObject {
 
   @Override
   public JSONObject toJson() {
-    JSONObject json = JsonObjectUtility.newOrderedJSONObject();
+    JSONObject json = new JSONObject();
     json.put("id", getId());
     json.put("objectType", getObjectTypeVariant());
     json.put("index", getColumn().getColumnIndex() - m_indexOffset);

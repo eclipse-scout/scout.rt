@@ -96,11 +96,6 @@ public final class JsonObjectUtility {
     }
   }
 
-  // TODO [5.2] bsh: Remove this method
-  public static JSONObject newOrderedJSONObject() {
-    return new JSONObject();
-  }
-
   /**
    * Returns the given JSON object as formatted string with indent 2. <code>null</code> is returned as
    * <code>"null"</code>.

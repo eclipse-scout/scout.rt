@@ -66,7 +66,6 @@ import org.eclipse.scout.rt.ui.html.json.JsonAdapterRegistry;
 import org.eclipse.scout.rt.ui.html.json.JsonClientSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEventProcessor;
 import org.eclipse.scout.rt.ui.html.json.JsonLocale;
-import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonRequest;
 import org.eclipse.scout.rt.ui.html.json.JsonRequest.RequestType;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
@@ -149,7 +148,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
     }
 
     // Resolve texts with the given locale
-    JSONObject map = JsonObjectUtility.newOrderedJSONObject();
+    JSONObject map = new JSONObject();
     for (String textKey : textKeys) {
       String text = TEXTS.getWithFallback(locale, textKey, null);
       if (text != null) {
@@ -464,7 +463,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
         .withName("Looking up Locale")
         .withExceptionHandling(null, false /* propagate */)); // exception handling done by caller
 
-    final JSONObject jsonEvent = JsonObjectUtility.newOrderedJSONObject();
+    final JSONObject jsonEvent = new JSONObject();
     jsonEvent.put("clientSessionId", m_clientSession.getId()); // Send back clientSessionId to allow the browser to attach to the same client session on page reload
     jsonEvent.put("clientSession", clientSessionAdapterId);
     putLocaleData(jsonEvent, BEANS.get(UiJobs.class).awaitAndGet(future));
@@ -830,7 +829,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
 
   @Override
   public void sendLocaleChangedEvent(Locale locale) {
-    JSONObject jsonEvent = JsonObjectUtility.newOrderedJSONObject();
+    JSONObject jsonEvent = new JSONObject();
     putLocaleData(jsonEvent, locale);
     currentJsonResponse().addActionEvent(getUiSessionId(), EVENT_LOCALE_CHANGED, jsonEvent);
     updatePreferredLocaleCookie(locale);
@@ -854,7 +853,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
 
   @Override
   public void sendDisposeAdapterEvent(IJsonAdapter<?> adapter) {
-    JSONObject jsonEvent = JsonObjectUtility.newOrderedJSONObject();
+    JSONObject jsonEvent = new JSONObject();
     jsonEvent.put("adapter", adapter.getId());
     currentJsonResponse().addActionEvent(getUiSessionId(), EVENT_DISPOSE_ADAPTER, jsonEvent);
   }

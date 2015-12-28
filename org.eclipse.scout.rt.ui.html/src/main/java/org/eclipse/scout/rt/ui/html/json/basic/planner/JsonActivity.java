@@ -36,7 +36,7 @@ public class JsonActivity implements IJsonObject {
     if (m_activity == null) {
       return null;
     }
-    JSONObject json = JsonObjectUtility.newOrderedJSONObject();
+    JSONObject json = new JSONObject();
     json.put("id", m_idProvider.getId(m_activity));
     json.put("beginTime", new JsonDate(m_activity.getBeginTime()).asJsonString());
     json.put("endTime", new JsonDate(m_activity.getEndTime()).asJsonString());

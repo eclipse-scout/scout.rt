@@ -52,7 +52,7 @@ public class JsonCell implements IJsonObject {
     if (m_cell == null) {
       return null;
     }
-    JSONObject json = JsonObjectUtility.newOrderedJSONObject();
+    JSONObject json = new JSONObject();
     json.put("value", m_cellValue);
     json.put("text", m_cellText);
     json.put("iconId", BinaryResourceUrlUtility.createIconUrl(m_cell.getIconId()));

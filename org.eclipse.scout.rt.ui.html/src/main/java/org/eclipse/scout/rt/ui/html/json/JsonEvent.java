@@ -99,7 +99,7 @@ public class JsonEvent implements IJsonObject {
 
   @Override
   public JSONObject toJson() {
-    JSONObject json = JsonObjectUtility.newOrderedJSONObject();
+    JSONObject json = new JSONObject();
     json.put(TARGET, m_target);
     json.put(TYPE, m_type);
     JsonObjectUtility.putProperties(json, m_data);

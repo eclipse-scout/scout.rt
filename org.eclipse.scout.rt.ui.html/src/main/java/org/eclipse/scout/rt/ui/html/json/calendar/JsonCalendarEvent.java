@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.ui.html.json.calendar;
 
 import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarEvent;
 import org.eclipse.scout.rt.ui.html.json.IJsonObject;
-import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.json.JSONObject;
 
 public class JsonCalendarEvent implements IJsonObject {
@@ -38,7 +37,7 @@ public class JsonCalendarEvent implements IJsonObject {
     if (m_event == null) {
       return null;
     }
-    JSONObject json = JsonObjectUtility.newOrderedJSONObject();
+    JSONObject json = new JSONObject();
     json.put("type", m_event.getType());
     json.put("component", m_jsonCalendar.getAdapter(m_event.getComponent()).getId());
     json.put("popupMenus", m_event.getPopupMenus()); // TODO [5.2] bsh: Calendar | Convert JSON menus

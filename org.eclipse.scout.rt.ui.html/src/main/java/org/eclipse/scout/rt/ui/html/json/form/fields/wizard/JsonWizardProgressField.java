@@ -21,7 +21,6 @@ import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.InspectorInfo;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
-import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonFormField;
 import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
@@ -88,7 +87,7 @@ public class JsonWizardProgressField<WIZARD_PROGRESS_FIELD extends IWizardProgre
   }
 
   protected JSONObject wizardStepToJson(IWizardStep<? extends IForm> wizardStep) {
-    JSONObject jsonStep = JsonObjectUtility.newOrderedJSONObject();
+    JSONObject jsonStep = new JSONObject();
     jsonStep.put("index", getStepIndex(wizardStep));
     jsonStep.put("title", wizardStep.getTitle());
     jsonStep.put("subTitle", wizardStep.getSubTitle());

@@ -32,7 +32,7 @@ public class JsonResource implements IJsonObject {
 
   @Override
   public Object toJson() {
-    JSONObject jsonRow = JsonObjectUtility.newOrderedJSONObject();
+    JSONObject jsonRow = new JSONObject();
     jsonRow.put("id", m_resourceIdProvider.getId(m_resource));
     jsonRow.put("resourceCell", new JsonCell(m_resource.getCell()).toJson());
     jsonRow.put("activities", cellsToJson());

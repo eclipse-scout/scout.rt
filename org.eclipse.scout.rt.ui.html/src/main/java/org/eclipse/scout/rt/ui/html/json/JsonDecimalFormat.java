@@ -37,7 +37,7 @@ public class JsonDecimalFormat implements IJsonObject {
     if (getDecimalFormat() == null) {
       return null;
     }
-    JSONObject json = JsonObjectUtility.newOrderedJSONObject();
+    JSONObject json = new JSONObject();
     json.put("pattern", getDecimalFormat().toPattern());
     json.put("multiplier", getDecimalFormat().getMultiplier());
     json.put("roundingMode", getDecimalFormat().getRoundingMode().name());

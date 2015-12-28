@@ -649,7 +649,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
 
     IJsonAdapter<?> jsonField = attachAdapter(field);
     LOG.debug("Created new field adapter for cell editing. Adapter: {}", jsonField);
-    JSONObject json = JsonObjectUtility.newOrderedJSONObject();
+    JSONObject json = new JSONObject();
     putProperty(json, "columnId", event.getData().getString(PROP_COLUMN_ID));
     putProperty(json, "rowId", event.getData().getString(PROP_ROW_ID));
     putProperty(json, "fieldId", jsonField.getId());
@@ -761,7 +761,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
         jsonCells.put(cellToJson(row, column));
       }
     }
-    JSONObject jsonRow = JsonObjectUtility.newOrderedJSONObject();
+    JSONObject jsonRow = new JSONObject();
     putProperty(jsonRow, "id", getOrCreatedRowId(row));
     putProperty(jsonRow, "cells", jsonCells);
     putProperty(jsonRow, "checked", row.isChecked());
@@ -1114,7 +1114,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     if (jsonRowIds.length() == 0) {
       return;
     }
-    JSONObject jsonEvent = JsonObjectUtility.newOrderedJSONObject();
+    JSONObject jsonEvent = new JSONObject();
     jsonEvent.put(PROP_ROW_IDS, jsonRowIds);
     addActionEvent(EVENT_ROWS_DELETED, jsonEvent);
   }
@@ -1156,7 +1156,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
       if (!isRowAccepted(row)) {
         continue;
       }
-      JSONObject jsonRow = JsonObjectUtility.newOrderedJSONObject();
+      JSONObject jsonRow = new JSONObject();
       putProperty(jsonRow, "id", getTableRowId(row));
       putProperty(jsonRow, "checked", row.isChecked());
       jsonRows.put(jsonRow);
@@ -1164,7 +1164,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     if (jsonRows.length() == 0) {
       return;
     }
-    JSONObject jsonEvent = JsonObjectUtility.newOrderedJSONObject();
+    JSONObject jsonEvent = new JSONObject();
     putProperty(jsonEvent, PROP_ROWS, jsonRows);
     addActionEvent(EVENT_ROWS_CHECKED, jsonEvent);
   }

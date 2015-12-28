@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.ui.html.json.basic.planner;
 
 import org.eclipse.scout.rt.client.ui.basic.planner.PlannerEvent;
 import org.eclipse.scout.rt.ui.html.json.IJsonObject;
-import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.json.JSONObject;
 
 public class JsonPlannerEvent implements IJsonObject {
@@ -29,7 +28,7 @@ public class JsonPlannerEvent implements IJsonObject {
 
   @Override
   public JSONObject toJson() {
-    JSONObject json = JsonObjectUtility.newOrderedJSONObject();
+    JSONObject json = new JSONObject();
     // TODO [5.2] bsh: ActivityMap | Fill data
     return json;
   }

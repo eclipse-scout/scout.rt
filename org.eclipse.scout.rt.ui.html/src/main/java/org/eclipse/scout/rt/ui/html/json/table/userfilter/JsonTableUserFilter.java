@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.ui.html.json.table.userfilter;
 
 import org.eclipse.scout.rt.client.ui.basic.userfilter.IUserFilterState;
 import org.eclipse.scout.rt.ui.html.json.IJsonObject;
-import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.table.JsonTable;
 import org.json.JSONObject;
 
@@ -44,7 +43,7 @@ public abstract class JsonTableUserFilter<T extends IUserFilterState> implements
 
   @Override
   public JSONObject toJson() {
-    JSONObject json = JsonObjectUtility.newOrderedJSONObject();
+    JSONObject json = new JSONObject();
     json.put("objectType", getObjectType());
     json.put("filterType", getFilterState().getType());
     return json;

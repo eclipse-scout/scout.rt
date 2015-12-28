@@ -29,7 +29,7 @@ public class JsonDateRange implements IJsonObject {
 
   @Override
   public Object toJson() {
-    JSONObject json = JsonObjectUtility.newOrderedJSONObject();
+    JSONObject json = new JSONObject();
     json.put("from", new JsonDate(m_range.getFrom()).asJsonString());
     json.put("to", new JsonDate(m_range.getTo()).asJsonString());
     return json;

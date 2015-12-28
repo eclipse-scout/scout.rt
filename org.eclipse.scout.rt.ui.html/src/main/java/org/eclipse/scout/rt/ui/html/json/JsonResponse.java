@@ -98,7 +98,7 @@ public class JsonResponse {
 
     JSONObject props = event.getData().optJSONObject("properties");
     if (props == null) {
-      props = JsonObjectUtility.newOrderedJSONObject();
+      props = new JSONObject();
       event.getData().put("properties", props);
     }
     // Add special NULL object for null values to preserve them in the resulting JSON string
@@ -216,8 +216,8 @@ public class JsonResponse {
     // Ensure all buffered events are handled. This might cause the addition of more events and adapters to this response.
     fireProcessBufferedEvents();
 
-    JSONObject json = JsonObjectUtility.newOrderedJSONObject();
-    JSONObject adapterData = JsonObjectUtility.newOrderedJSONObject();
+    JSONObject json = new JSONObject();
+    JSONObject adapterData = new JSONObject();
     m_toJsonInProgress = true;
     try {
       // If you experience a ConcurrentModificationException at this point, then most likely you've created and added a new adapter
@@ -255,7 +255,7 @@ public class JsonResponse {
       if (m_error) {
         // !!! IMPORTANT: If you change the response structure here, it has to be changed accordingly in the card coded string
         // org.eclipse.scout.rt.server.commons.servlet.filter.authentication.ServletFilterHelper.sendJsonSessionTimeout(HttpServletResponse)
-        JSONObject jsonError = JsonObjectUtility.newOrderedJSONObject();
+        JSONObject jsonError = new JSONObject();
         jsonError.put(PROP_ERROR_CODE, m_errorCode);
         jsonError.put(PROP_ERROR_MESSAGE, m_errorMessage);
         json.put(PROP_ERROR, jsonError);

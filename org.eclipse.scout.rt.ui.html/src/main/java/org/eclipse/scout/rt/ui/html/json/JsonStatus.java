@@ -27,7 +27,7 @@ public class JsonStatus implements IJsonObject {
 
   @Override
   public JSONObject toJson() {
-    JSONObject json = JsonObjectUtility.newOrderedJSONObject();
+    JSONObject json = new JSONObject();
     json.put("message", m_status.getMessage());
     json.put("severity", m_status.getSeverity());
     return json;
