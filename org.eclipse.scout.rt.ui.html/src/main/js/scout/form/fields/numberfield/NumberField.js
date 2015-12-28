@@ -52,22 +52,28 @@ scout.NumberField.prototype._syncDecimalFormat = function(decimalFormat) {
   }
 };
 
+scout.NumberField.prototype._renderDecimalFormat = function() {
+  this._parse();
+};
+
 scout.NumberField.prototype._parse = function() {
   var input = this.$field.val();
   if (input) {
-    //check if valid thousends
+    // TODO NBU: (BSH) Is this really necessary? Why should 1234'123 be invalid? Any why should 0.100'000 be valid? Also, the first condition can never be true...
+    // check if valid thousends
     var thousends = input.match(new RegExp('\\d*[' + this.decimalFormat.groupingChar + ']\\d*', 'g'));
-    if(thousends){
-      for(var i = 0; i < thousends.length; i++){
+    if (thousends) {
+      for (var i = 0; i < thousends.length; i++) {
         var parts = thousends[i].split(this.decimalFormat.groupingChar);
-        for(var j = 0 ; j<parts.length;j++){
-          if((j===0 && parts[j].length>3 && parts[j].length<0) || (j!==0 && parts[j].length!==3)){
+        for (var j = 0; j < parts.length; j++) {
+          if ((j === 0 && parts[j].length > 3 && parts[j].length < 0) || (j !== 0 && parts[j].length !== 3)) {
             return;
           }
         }
       }
     }
 
+    // Convert to JS number format (remove groupingChar, replace decimalSeparatorChar with '.')
     input = input
       .replace(new RegExp('[' + this.decimalFormat.groupingChar + ']', 'g'), '')
       .replace(new RegExp('[' + this.decimalFormat.decimalSeparatorChar + ']', 'g'), '.')
@@ -75,9 +81,7 @@ scout.NumberField.prototype._parse = function() {
 
     // if only math symbols are in the input string...
     if (input.match(/^[\d\(\)\+\-\*\/\.]+$/)) {
-      // Remove leading zeros from numbers to prevent interpretation as octal value
-      // first group: any character except | . (decimal separator char) or a digit
-      // second group: a digit
+      // Remove leading zeros from numbers to prevent interpretation as octal value (e.g. '00.025+025' --> '0.025+25')
       input = input.replace(/(^|[^\d\.])0+(\d+)/g, '$1$2');
       // ...evaluate, reformat the result and set is to the field. If the display text
       // changed, ValueField.js will make sure, the new value is sent to the model.

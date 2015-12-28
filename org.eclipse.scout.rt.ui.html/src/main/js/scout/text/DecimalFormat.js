@@ -128,7 +128,7 @@ scout.DecimalFormat.prototype.format = function(number) {
   // after decimal point
   var after = '';
   if (this.allAfter) {
-    after = number.slice(number.indexOf('.') + 1);
+    after = number.toFixed(this.allAfter).split('.')[1];
     for (var j = after.length - 1; j > this.zeroAfter - 1; j--) {
       if (after[j] !== '0') {
         break;

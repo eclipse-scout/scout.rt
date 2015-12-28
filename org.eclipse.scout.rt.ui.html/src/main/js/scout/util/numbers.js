@@ -45,7 +45,12 @@ scout.numbers = {
   },
 
   /**
-   * Rounds number to any number of decimal places.
+   * Rounds a number to the given number of decimal places.
+   *
+   * Numbers should not be rounded with the built-in Number.toFixed() method, since it
+   * behaves differently on different browsers. However, it is safe to apply toFixed()
+   * to the result of this method to ensure a fixed number of decimal places (filled up
+   * with 0's) because this operation does not involve any rounding anymore.
    * <p>
    * If decimalPlaces is omitted, the number will be rounded to integer by default.
    * Rounding mode {@link scout.numbers.RoundingMode.HALF_UP} is used as default.
@@ -56,9 +61,10 @@ scout.numbers = {
     }
     decimalPlaces = decimalPlaces || 0;
 
-    // avoid usage of toFixed on number to round since it behaves differently on different browsers.
-    var multiplier = Math.pow(10, decimalPlaces);
-    number *= multiplier;
+    // Do _not_ multiply with powers of 10 here, because that might cause rounding errors!
+    // Example: 1.005 with 2 decimal places would result in 100.49999999999999
+    number = this.shiftDecimalPoint(number, decimalPlaces);
+
     switch (roundingMode) {
       case scout.numbers.RoundingMode.UP:
         if (number < 0) {
@@ -98,9 +104,51 @@ scout.numbers = {
           number = Math.round(number);
         }
     }
-    number /= multiplier;
-    // crop to decimal places
-    return number.toFixed(decimalPlaces);
+
+    number = this.shiftDecimalPoint(number, -decimalPlaces);
+    return number;
+  },
+
+  /**
+   * Shifts the decimal point in the given number by a certain distance. While the result is also
+   * number, the method uses string operations to move the decimal point. This prevents rounding
+   * errors as long as the number does not exceed JavaScript's Number precision.
+   *
+   * The argument 'move' describes the distance how far the decimal point should be moved:
+   *     0 = do no move      (1.57 --> 1.57)
+   *   > 0 = move to right   (1.57 --> 15.7)
+   *   < 0 = move to left    (1.57 --> 0.157)
+   */
+  shiftDecimalPoint: function(number, move) {
+    if (number === null || number === undefined || !move) {
+      return number;
+    }
+
+    var sign = (number ? (number < 0 ? -1 : 1) : 0);
+    var distance = Math.abs(move);
+
+    number = Math.abs(number);
+    var s = scout.strings.asString(number);
+    var a;
+    if (move < 0) {
+      // move to left
+      s = scout.strings.repeat('0', distance) + s;
+      a = s.split('.', 2);
+      if (a.length === 1) {
+        s = s.substr(0, s.length - distance) + '.' + s.substr(s.length - distance);
+      } else {
+        s = a[0].substr(0, a[0].length - distance) + '.' + a[0].substr(a[0].length - distance) + a[1];
+      }
+    } else if (move > 0) {
+      // move to right
+      s += scout.strings.repeat('0', distance);
+      a = s.split('.', 2);
+      if (a.length === 2) {
+        s = a[0] + a[1].substr(0, distance) + '.' + a[1].substr(distance);
+      }
+    }
+    s = s.replace(/^00/g, '');
+    return Number(s) * sign;
   }
 
 };
