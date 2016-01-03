@@ -15,6 +15,7 @@ import java.text.ParsePosition;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.eclipse.scout.rt.platform.job.IJobManager;
 import org.eclipse.scout.rt.server.scheduler.internal.node.ArgRef;
 import org.eclipse.scout.rt.server.scheduler.internal.node.BooleanAtom;
 import org.eclipse.scout.rt.server.scheduler.internal.node.FormulaRoot;
@@ -39,8 +40,12 @@ import org.slf4j.LoggerFactory;
  * `'` [^delim]* `'` | `"` [^delim]* `"` . NOTE: delim is the delimiting character signal-ref = 'second' | 'minute' |
  * 'hour' | 'day' | 'week' | 'month' | 'year' | 'dayOfWeek' | 'dayOfMonthReverse' | 'dayOfYear' | 'secondOfDay' .
  * arg-ref = 'arg' [0-9]+ . S = ([ \n\t\r] | S_comment)+ .
+ *
+ * @deprecated will be removed in release 6.1; use {@link IJobManager} instead, which provides you support for triggered
+ *             execution via Quartz schedule plans; see {@link JobInput#withExecutionTrigger(...)};
  */
-
+@SuppressWarnings("deprecation")
+@Deprecated
 public class FormulaParser {
   private static final Logger LOG = LoggerFactory.getLogger(FormulaParser.class);
   private static final String S_MAP = " \n\t\r";

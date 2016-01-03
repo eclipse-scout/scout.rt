@@ -10,9 +10,16 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.scheduler;
 
+import org.eclipse.scout.rt.platform.job.IJobManager;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 
+/**
+ * @deprecated will be removed in release 6.1; use {@link IJobManager} instead, which provides you support for triggered
+ *             execution via Quartz schedule plans; see {@link JobInput#withExecutionTrigger(...)};
+ */
+@SuppressWarnings("deprecation")
+@Deprecated
 public class Scheduler extends AbstractScheduler implements IScheduler {
 
   private ServerRunContext m_serverRunContext;

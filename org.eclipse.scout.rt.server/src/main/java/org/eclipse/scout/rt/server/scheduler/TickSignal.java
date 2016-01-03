@@ -10,6 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.scheduler;
 
+import org.eclipse.scout.rt.platform.job.IJobManager;
+
+/**
+ * @deprecated will be removed in release 6.1; use {@link IJobManager} instead, which provides you support for triggered
+ *             execution via Quartz schedule plans; see {@link JobInput#withExecutionTrigger(...)};
+ */
+@Deprecated
 public class TickSignal {
   private int m_second;
   private int m_minute;

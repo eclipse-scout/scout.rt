@@ -10,9 +10,16 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.scheduler.internal.visitor;
 
+import org.eclipse.scout.rt.platform.job.IJobManager;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 import org.eclipse.scout.rt.server.scheduler.TickSignal;
 
+/**
+ * @deprecated will be removed in release 6.1; use {@link IJobManager} instead, which provides you support for triggered
+ *             execution via Quartz schedule plans; see {@link JobInput#withExecutionTrigger(...)};
+ */
+@SuppressWarnings("deprecation")
+@Deprecated
 public class DefaultEvalVisitor implements IEvalVisitor {
 
   private TickSignal m_signal;

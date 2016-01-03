@@ -14,8 +14,15 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.concurrent.TimeUnit;
 
+import org.eclipse.scout.rt.platform.job.IJobManager;
 import org.eclipse.scout.rt.platform.util.SleepUtil;
 
+/**
+ * @deprecated will be removed in release 6.1; use {@link IJobManager} instead, which provides you support for triggered
+ *             execution via Quartz schedule plans; see {@link JobInput#withExecutionTrigger(...)};
+ */
+@SuppressWarnings("deprecation")
+@Deprecated
 public class Ticker {
   private Calendar m_cal;
   private int m_tickField = Calendar.MINUTE;

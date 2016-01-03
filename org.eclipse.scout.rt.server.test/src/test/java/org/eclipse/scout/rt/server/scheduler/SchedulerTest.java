@@ -39,6 +39,7 @@ import org.junit.runner.RunWith;
 @RunWith(ServerTestRunner.class)
 @RunWithServerSession(TestServerSession.class)
 @RunWithSubject("john")
+@SuppressWarnings("deprecation")
 public class SchedulerTest {
 
   private ServerRunContext m_runContext;

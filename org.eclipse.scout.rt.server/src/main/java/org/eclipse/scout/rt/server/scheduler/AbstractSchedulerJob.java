@@ -12,9 +12,16 @@ package org.eclipse.scout.rt.server.scheduler;
 
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
+import org.eclipse.scout.rt.platform.job.IJobManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * @deprecated will be removed in release 6.1; use {@link IJobManager} instead, which provides you support for triggered
+ *             execution via Quartz schedule plans; see {@link JobInput#withExecutionTrigger(...)};
+ */
+@SuppressWarnings("deprecation")
+@Deprecated
 public abstract class AbstractSchedulerJob implements ISchedulerJob {
   private static final Logger LOG = LoggerFactory.getLogger(AbstractSchedulerJob.class);
 

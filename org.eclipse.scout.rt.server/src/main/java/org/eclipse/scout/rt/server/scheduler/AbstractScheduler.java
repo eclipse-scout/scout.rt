@@ -17,6 +17,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import org.eclipse.scout.rt.platform.job.IJobManager;
 import org.eclipse.scout.rt.platform.util.SleepUtil;
 import org.eclipse.scout.rt.platform.util.concurrent.StoppableThread;
 import org.eclipse.scout.rt.server.admin.diagnostic.DiagnosticFactory;
@@ -24,6 +25,12 @@ import org.eclipse.scout.rt.server.admin.diagnostic.IDiagnostic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * @deprecated will be removed in release 6.1; use {@link IJobManager} instead, which provides you support for triggered
+ *             execution via Quartz schedule plans; see {@link JobInput#withExecutionTrigger(...)};
+ */
+@SuppressWarnings("deprecation")
+@Deprecated
 public abstract class AbstractScheduler implements IScheduler, IDiagnostic {
   protected static final Logger LOG = LoggerFactory.getLogger(AbstractScheduler.class);
   private P_Dispatcher m_dispatcher;

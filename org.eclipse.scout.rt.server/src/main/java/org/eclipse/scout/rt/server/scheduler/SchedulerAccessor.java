@@ -12,11 +12,18 @@ package org.eclipse.scout.rt.server.scheduler;
 
 import java.util.Collection;
 
+import org.eclipse.scout.rt.platform.job.IJobManager;
+
 /**
  * This accessor can be used to give individual sessions limited access to a global {@link IScheduler} via their
  * {@link com.bsiag.service.scheduler.ISchedulerService} This implementation is a transparent proxy. Override the
  * methods that are subject to access control restrictions
+ *
+ * @deprecated will be removed in release 6.1; use {@link IJobManager} instead, which provides you support for triggered
+ *             execution via Quartz schedule plans; see {@link JobInput#withExecutionTrigger(...)};
  */
+@SuppressWarnings("deprecation")
+@Deprecated
 public class SchedulerAccessor implements IScheduler {
 
   private IScheduler m_scheduler;

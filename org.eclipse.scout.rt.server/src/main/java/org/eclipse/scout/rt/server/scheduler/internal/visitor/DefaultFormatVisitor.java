@@ -10,6 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.scheduler.internal.visitor;
 
+import org.eclipse.scout.rt.platform.job.IJobManager;
+
+/**
+ * @deprecated will be removed in release 6.1; use {@link IJobManager} instead, which provides you support for triggered
+ *             execution via Quartz schedule plans; see {@link JobInput#withExecutionTrigger(...)};
+ */
+@SuppressWarnings("deprecation")
+@Deprecated
 public class DefaultFormatVisitor implements IFormatVisitor {
   private StringBuffer m_buf;
   private String m_text;

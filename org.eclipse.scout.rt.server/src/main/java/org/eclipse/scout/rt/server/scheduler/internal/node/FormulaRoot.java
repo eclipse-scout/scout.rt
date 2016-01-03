@@ -10,9 +10,16 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.scheduler.internal.node;
 
+import org.eclipse.scout.rt.platform.job.IJobManager;
 import org.eclipse.scout.rt.server.scheduler.internal.visitor.IEvalVisitor;
 import org.eclipse.scout.rt.server.scheduler.internal.visitor.IFormatVisitor;
 
+/**
+ * @deprecated will be removed in release 6.1; use {@link IJobManager} instead, which provides you support for triggered
+ *             execution via Quartz schedule plans; see {@link JobInput#withExecutionTrigger(...)};
+ */
+@SuppressWarnings("deprecation")
+@Deprecated
 public class FormulaRoot extends AbstractNode {
   private INode m_node;
 

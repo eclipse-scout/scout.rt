@@ -13,13 +13,19 @@ package org.eclipse.scout.rt.server.scheduler;
 import java.text.ParseException;
 
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.job.IJobManager;
 import org.eclipse.scout.rt.platform.util.VerboseUtility;
 import org.eclipse.scout.rt.server.scheduler.internal.FormulaParser;
 import org.eclipse.scout.rt.server.scheduler.internal.SchedulingFormula;
 
 /**
  * Special job with a formula that defines the pattern interval
+ *
+ * @deprecated will be removed in release 6.1; use {@link IJobManager} instead, which provides you support for triggered
+ *             execution via Quartz schedule plans; see {@link JobInput#withExecutionTrigger(...)};
  */
+@SuppressWarnings("deprecation")
+@Deprecated
 public abstract class AbstractSchedulerJobWithFormula extends AbstractSchedulerJob {
   private ISchedulingFormula m_formulaCompiled;
   private String m_action;

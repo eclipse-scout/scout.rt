@@ -10,12 +10,19 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.scheduler.internal;
 
+import org.eclipse.scout.rt.platform.job.IJobManager;
 import org.eclipse.scout.rt.server.scheduler.ISchedulingFormula;
 import org.eclipse.scout.rt.server.scheduler.TickSignal;
 import org.eclipse.scout.rt.server.scheduler.internal.node.FormulaRoot;
 import org.eclipse.scout.rt.server.scheduler.internal.visitor.DefaultEvalVisitor;
 import org.eclipse.scout.rt.server.scheduler.internal.visitor.DefaultFormatVisitor;
 
+/**
+ * @deprecated will be removed in release 6.1; use {@link IJobManager} instead, which provides you support for triggered
+ *             execution via Quartz schedule plans; see {@link JobInput#withExecutionTrigger(...)};
+ */
+@SuppressWarnings("deprecation")
+@Deprecated
 public class SchedulingFormula implements ISchedulingFormula {
   private FormulaRoot m_root;
 
