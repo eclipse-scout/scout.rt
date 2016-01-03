@@ -44,7 +44,7 @@ import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IJobManager;
-import org.eclipse.scout.rt.platform.job.ISchedulingSemaphore;
+import org.eclipse.scout.rt.platform.job.IExecutionSemaphore;
 import org.eclipse.scout.rt.platform.job.JobState;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.internal.IFutureRunner;
@@ -92,7 +92,7 @@ public class MutualExclusionTest {
   @Before
   public void before() {
     m_clientSession = mock(IClientSession.class);
-    when(m_clientSession.getModelJobSemaphore()).thenReturn(Jobs.newSchedulingSemaphore(1));
+    when(m_clientSession.getModelJobSemaphore()).thenReturn(Jobs.newExecutionSemaphore(1));
 
     ISession.CURRENT.set(m_clientSession);
   }
@@ -153,7 +153,7 @@ public class MutualExclusionTest {
 
   @Test(expected = AssertionException.class, timeout = 5000)
   public void testAwaitDoneWithSameMutex() {
-    final ISchedulingSemaphore mutex = Jobs.newSchedulingSemaphore(1);
+    final IExecutionSemaphore mutex = Jobs.newExecutionSemaphore(1);
     Jobs.schedule(new IRunnable() {
 
       @Override
@@ -165,11 +165,11 @@ public class MutualExclusionTest {
             // NOOP
           }
         }, Jobs.newInput()
-            .withSchedulingSemaphore(mutex))
+            .withExecutionSemaphore(mutex))
             .awaitDone();
       }
     }, Jobs.newInput()
-        .withSchedulingSemaphore(mutex))
+        .withExecutionSemaphore(mutex))
         .awaitDoneAndGet();
   }
 
@@ -182,7 +182,7 @@ public class MutualExclusionTest {
    */
   @Test(timeout = 5000)
   public void testAwaitDoneWithSameMutexButNotMutexOwner() {
-    final ISchedulingSemaphore mutex = Jobs.newSchedulingSemaphore(1);
+    final IExecutionSemaphore mutex = Jobs.newExecutionSemaphore(1);
     Jobs.schedule(new IRunnable() {
 
       @Override
@@ -204,7 +204,7 @@ public class MutualExclusionTest {
                 run.set(true);
               }
             }, Jobs.newInput()
-                .withSchedulingSemaphore(mutex))
+                .withExecutionSemaphore(mutex))
                 .awaitDone(1, TimeUnit.SECONDS);
             assertTrue(run.get());
           }
@@ -217,7 +217,7 @@ public class MutualExclusionTest {
         }
       }
 
-    }, Jobs.newInput().withSchedulingSemaphore(mutex)).awaitDoneAndGet();
+    }, Jobs.newInput().withExecutionSemaphore(mutex)).awaitDoneAndGet();
   }
 
   /**

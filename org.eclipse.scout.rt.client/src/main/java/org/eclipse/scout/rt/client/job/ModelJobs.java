@@ -20,9 +20,9 @@ import org.eclipse.scout.rt.client.job.filter.future.ModelJobFutureFilter;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.filter.IFilter;
+import org.eclipse.scout.rt.platform.job.IExecutionSemaphore;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IJobManager;
-import org.eclipse.scout.rt.platform.job.ISchedulingSemaphore;
 import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.job.filter.event.JobEventFilterBuilder;
 import org.eclipse.scout.rt.platform.job.filter.future.FutureFilterBuilder;
@@ -36,7 +36,7 @@ import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
  * class is for convenience purpose to facilitate the creation and scheduling of model jobs.
  * <p>
  * <strong>By definition, a <em>model job</em> requires a {@link ClientRunContext} with a {@link IClientSession}, and
- * must have the session's {@link ISchedulingSemaphore} assigned as its semaphore. That causes all jobs within that
+ * must have the session's {@link IExecutionSemaphore} assigned as its semaphore. That causes all jobs within that
  * session to be run in sequence in the model thread. At any given time, there is only one model thread active per
  * client session.</strong>
  * <p>
@@ -50,8 +50,9 @@ import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
  *     // do something
  *   }
  * }, ModelJobs.newInput(ClientRunContexts.copyCurrent())
- *     .withSchedulingDelay(2, TimeUnit.SECONDS)
- *     .withName("job example"));
+ *        .withName("example job")
+ *        .withExecutionTrigger(Jobs.newExecutionTrigger()
+ *            .withStartIn(5, TimeUnit.SECONDS));
  * </pre>
  *
  * The following code snippet illustrates how the job is finally run:
@@ -71,7 +72,7 @@ import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
  *     }
  *   }, BEANS.get(JobInput.class)
  *        .withRunContext(clientRunContext)
- *        .<strong>withSchedulingSemaphore(clientRunContext.getSession().getModelJobSchedulingSemaphore())</strong>);
+ *        .<strong>withExecutionSemaphore(clientRunContext.getSession().getModelJobSemaphore())</strong>);
  * </pre>
  *
  * @since 5.1
@@ -209,9 +210,10 @@ public final class ModelJobs {
    * Example:
    *
    * <pre>
-   * Jobs.newInput(RunContexts.copyCurrent())
-   *     .withSchedulingDelay(10, TimeUnit.SECONDS)
-   *     .withName("example job");
+   * ModelJobs.newInput(ClientRunContexts.copyCurrent())
+   *     .withName("example job")
+   *     .withExecutionTrigger(Jobs.newExecutionTrigger()
+   *         .withStartIn(5, TimeUnit.SECONDS));
    * </pre>
    *
    * @param clientRunContext
@@ -223,7 +225,7 @@ public final class ModelJobs {
     return BEANS.get(JobInput.class)
         .withThreadName("scout-model-thread")
         .withRunContext(clientRunContext)
-        .withSchedulingSemaphore(clientRunContext.getSession().getModelJobSemaphore());
+        .withExecutionSemaphore(clientRunContext.getSession().getModelJobSemaphore());
   }
 
   /**
@@ -278,7 +280,7 @@ public final class ModelJobs {
       return false;
     }
 
-    final ISchedulingSemaphore semaphore = currentFuture.getSchedulingSemaphore();
+    final IExecutionSemaphore semaphore = currentFuture.getExecutionSemaphore();
     return semaphore != null && semaphore.isPermitOwner(currentFuture);
   }
 
@@ -290,7 +292,7 @@ public final class ModelJobs {
       return false;
     }
 
-    if (future.getJobInput().getSchedulingSemaphore() == null) {
+    if (future.getJobInput().getExecutionSemaphore() == null) {
       return false;
     }
 
@@ -303,6 +305,6 @@ public final class ModelJobs {
       return false;
     }
 
-    return future.getJobInput().getSchedulingSemaphore() == clientSession.getModelJobSemaphore();
+    return future.getJobInput().getExecutionSemaphore() == clientSession.getModelJobSemaphore();
   }
 }

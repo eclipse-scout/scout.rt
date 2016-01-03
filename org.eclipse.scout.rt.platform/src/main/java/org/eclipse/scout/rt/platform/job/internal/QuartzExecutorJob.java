@@ -4,8 +4,8 @@ import java.util.concurrent.ExecutorService;
 
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.job.JobState;
-import org.eclipse.scout.rt.platform.job.internal.SchedulingSemaphore.IPermitAcquiredCallback;
-import org.eclipse.scout.rt.platform.job.internal.SchedulingSemaphore.QueuePosition;
+import org.eclipse.scout.rt.platform.job.internal.ExecutionSemaphore.IPermitAcquiredCallback;
+import org.eclipse.scout.rt.platform.job.internal.ExecutionSemaphore.QueuePosition;
 import org.quartz.DisallowConcurrentExecution;
 import org.quartz.Job;
 import org.quartz.JobDataMap;
@@ -89,13 +89,13 @@ public class QuartzExecutorJob implements Job {
     }
 
     // Schedule FutureRunner via ExecutorService.
-    final SchedulingSemaphore schedulingSemaphore = futureTask.getSchedulingSemaphore();
-    if (schedulingSemaphore == null) {
+    final ExecutionSemaphore executionSemaphore = futureTask.getExecutionSemaphore();
+    if (executionSemaphore == null) {
       executor.execute(futureRunner);
     }
     else {
       futureTask.changeState(JobState.WAITING_FOR_PERMIT);
-      schedulingSemaphore.compete(futureTask, QueuePosition.TAIL, new IPermitAcquiredCallback() {
+      executionSemaphore.compete(futureTask, QueuePosition.TAIL, new IPermitAcquiredCallback() {
 
         @Override
         public void onPermitAcquired() {
@@ -148,12 +148,12 @@ public class QuartzExecutorJob implements Job {
    * a permit before the second job does.
    */
   public static int computePriority(final JobFutureTask<?> futureTask) {
-    final SchedulingSemaphore schedulingSemaphore = futureTask.getSchedulingSemaphore();
-    if (schedulingSemaphore == null) {
+    final ExecutionSemaphore executionSemaphore = futureTask.getExecutionSemaphore();
+    if (executionSemaphore == null) {
       return Trigger.DEFAULT_PRIORITY;
     }
     else {
-      return schedulingSemaphore.computeNextLowerPriority();
+      return executionSemaphore.computeNextLowerPriority();
     }
   }
 }

@@ -1,5 +1,7 @@
 package org.eclipse.scout.rt.platform.job.internal;
 
+import org.eclipse.scout.rt.platform.job.IExecutionSemaphore;
+
 /**
  * Runner to control execution of a {@link JobFutureTask}.
  *
@@ -19,7 +21,7 @@ public interface IFutureRunner extends IRejectableRunnable {
    * <em>The following invariants must apply:</em>
    * <ul>
    * <li>{@link #accept()} must have returned with <code>true</code>;</li>
-   * <li>if the job is assigned to a {@link SchedulingSemaphore}, it must be a permit owner;</li>
+   * <li>if the job is assigned to an {@link IExecutionSemaphore}, it must be a permit owner;</li>
    * </ul>
    */
   @Override

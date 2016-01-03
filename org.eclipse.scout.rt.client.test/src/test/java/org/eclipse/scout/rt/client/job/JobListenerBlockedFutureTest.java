@@ -110,7 +110,7 @@ public class JobListenerBlockedFutureTest {
     final IBlockingCondition condition = Jobs.newBlockingCondition(true);
 
     IClientSession clientSession = mock(IClientSession.class);
-    when(clientSession.getModelJobSemaphore()).thenReturn(Jobs.newSchedulingSemaphore(1));
+    when(clientSession.getModelJobSemaphore()).thenReturn(Jobs.newExecutionSemaphore(1));
 
     JobEventCaptureListener captureListener = new JobEventCaptureListener();
     Jobs.getJobManager().addListener(ModelJobs.newEventFilterBuilder().toFilter(), captureListener);
@@ -131,7 +131,7 @@ public class JobListenerBlockedFutureTest {
             condition.setBlocking(false);
 
             // Wait until the outer future is re-acquiring the mutex.
-            JobTestUtil.waitForPermitCompetitors(modelJobInput.getSchedulingSemaphore(), 2); // 2=outer-job + inner-job
+            JobTestUtil.waitForPermitCompetitors(modelJobInput.getExecutionSemaphore(), 2); // 2=outer-job + inner-job
           }
         }, modelJobInput.copy()
             .withName("inner")

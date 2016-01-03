@@ -36,9 +36,9 @@ import org.quartz.Calendar;
  * instruction information in the form of a {@link JobInput} for the job manager to run the job.
  * <p>
  * This job manager allows to control the maximal number of jobs running concurrently by assigning a job to a
- * {@link ISchedulingSemaphore}. That way, jobs which are assigned to the same semaphore run concurrently until they
+ * {@link IExecutionSemaphore}. That way, jobs which are assigned to the same semaphore run concurrently until they
  * reach the concurrency level as defined for that semaphore. Subsequent tasks then wait in a queue until a permit
- * becomes available. For more information, see {@link JobInput#withSchedulingSemaphore(ISchedulingSemaphore)}.
+ * becomes available. For more information, see {@link JobInput#withExecutionSemaphore(IExecutionSemaphore)}.
  * <p>
  * As a general rule, jobs compete for an execution permit once being fired by the associated trigger, and in the order
  * as being scheduled. For example, if scheduling two jobs in a row, they very likely will have the same execution time
@@ -248,7 +248,7 @@ public interface IJobManager {
   /**
    * Creates a blocking condition to put a job into waiting mode until the condition falls.
    * <p>
-   * If the job is assigned to a {@link ISchedulingSemaphore}, the job's permit is released and passed to the next
+   * If the job is assigned to an {@link IExecutionSemaphore}, the job's permit is released and passed to the next
    * competing job of that same semaphore while being blocked.
    * <p>
    * See {@link IBlockingCondition} for more information.

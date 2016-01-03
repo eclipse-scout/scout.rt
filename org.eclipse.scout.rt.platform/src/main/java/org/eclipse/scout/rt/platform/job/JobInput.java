@@ -39,7 +39,7 @@ public class JobInput {
   public static final long EXPIRE_NEVER = 0;
 
   protected String m_name;
-  protected ISchedulingSemaphore m_schedulingSemaphore;
+  protected IExecutionSemaphore m_executionSemaphore;
   protected long m_expirationTime = EXPIRE_NEVER;
   protected String m_threadName = "scout-thread";
   protected RunContext m_runContext;
@@ -109,18 +109,18 @@ public class JobInput {
   }
 
   /**
-   * Returns the scheduling semaphore which this job is assigned to, or <code>null</code> if there is no maximal
+   * Returns the execution semaphore which this job is assigned to, or <code>null</code> if there is no maximal
    * concurrency restriction for this job.
    * <p>
    * With a semaphore in place, this job only commences execution, once a permit is free or gets available. If free, the
    * job commences execution immediately at the next reasonable opportunity, unless no worker thread is available.
    */
-  public ISchedulingSemaphore getSchedulingSemaphore() {
-    return m_schedulingSemaphore;
+  public IExecutionSemaphore getExecutionSemaphore() {
+    return m_executionSemaphore;
   }
 
   /**
-   * Sets the scheduling semaphore to control the job's maximal concurrently level.
+   * Sets the execution semaphore to control the job's maximal concurrently level.
    * <p>
    * With a semaphore in place, this job only commences execution, once a permit is free or gets available. If free, the
    * job commences execution immediately at the next reasonable opportunity, unless no worker thread is available.
@@ -131,10 +131,10 @@ public class JobInput {
    * However, once calling {@link #seal()}, the number of permits cannot be changed anymore, and any attempts will
    * result in an {@link AssertionException}.
    *
-   * @see Jobs#newSchedulingSemaphore()
+   * @see Jobs#newExecutionSemaphore(int)
    */
-  public JobInput withSchedulingSemaphore(final ISchedulingSemaphore schedulingSemaphore) {
-    m_schedulingSemaphore = schedulingSemaphore;
+  public JobInput withExecutionSemaphore(final IExecutionSemaphore executionSemaphore) {
+    m_executionSemaphore = executionSemaphore;
     return this;
   }
 
@@ -259,7 +259,7 @@ public class JobInput {
   public String toString() {
     final ToStringBuilder builder = new ToStringBuilder(this);
     builder.attr("name", m_name);
-    builder.ref("schedulingSemaphore", m_schedulingSemaphore);
+    builder.ref("executionSemaphore", m_executionSemaphore);
     builder.attr("expirationTime", m_expirationTime);
     builder.attr("exceptionHandler", m_exceptionHandler);
     builder.attr("swallowException", m_swallowException);
@@ -277,7 +277,7 @@ public class JobInput {
   public JobInput copy() {
     final JobInput copy = BEANS.get(JobInput.class);
     copy.m_name = m_name;
-    copy.m_schedulingSemaphore = m_schedulingSemaphore;
+    copy.m_executionSemaphore = m_executionSemaphore;
     copy.m_expirationTime = m_expirationTime;
     copy.m_exceptionHandler = m_exceptionHandler;
     copy.m_swallowException = m_swallowException;

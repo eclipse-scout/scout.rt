@@ -39,7 +39,7 @@ public enum JobState {
   RUNNING,
 
   /**
-   * Indicates that a job is competing for a permit of a {@link ISchedulingSemaphore} to become available.
+   * Indicates that a job is competing for a permit of an {@link IExecutionSemaphore} to become available.
    */
   WAITING_FOR_PERMIT,
 

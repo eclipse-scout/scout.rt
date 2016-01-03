@@ -28,7 +28,7 @@ import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
  *
  * @since 5.2
  */
-public interface ISchedulingSemaphore {
+public interface IExecutionSemaphore {
 
   /**
    * Returns whether the given task currently owns a permit.
@@ -57,11 +57,11 @@ public interface ISchedulingSemaphore {
    * @throws AssertionException
    *           if the semaphore is <em>sealed</em>.
    */
-  ISchedulingSemaphore withPermits(int permits);
+  IExecutionSemaphore withPermits(int permits);
 
   /**
    * Seals this semaphore, so that the number of permits cannot be changed afterwards. Any attempt to change the number
    * of permits will result in an {@link AssertionException}.
    */
-  ISchedulingSemaphore seal();
+  IExecutionSemaphore seal();
 }

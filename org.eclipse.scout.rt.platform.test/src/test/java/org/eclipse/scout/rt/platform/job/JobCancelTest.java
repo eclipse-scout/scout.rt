@@ -490,7 +490,7 @@ public class JobCancelTest {
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent())
         .withName(commonJobName)
-        .withSchedulingSemaphore(null)
+        .withExecutionSemaphore(null)
         .withExceptionHandling(null, false));
 
     // Job-2 (common-id) => CANCEL
@@ -509,7 +509,7 @@ public class JobCancelTest {
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent())
         .withName(commonJobName)
-        .withSchedulingSemaphore(null)
+        .withExecutionSemaphore(null)
         .withExceptionHandling(null, false));
 
     // Job-3 (common-id) => CANCEL
@@ -533,7 +533,7 @@ public class JobCancelTest {
         }, Jobs.newInput()
             .withRunContext(RunContexts.copyCurrent())
             .withName("otherName")
-            .withSchedulingSemaphore(null)
+            .withExecutionSemaphore(null)
             .withExceptionHandling(null, false));
 
         // Job-3b (other name, other runMonitor => NO CANCEL)
@@ -551,7 +551,7 @@ public class JobCancelTest {
         }, Jobs.newInput()
             .withRunContext(RunContexts.copyCurrent().withRunMonitor(new RunMonitor()))
             .withName("otherName")
-            .withSchedulingSemaphore(null)
+            .withExecutionSemaphore(null)
             .withExceptionHandling(null, false));
 
         try {
@@ -565,7 +565,7 @@ public class JobCancelTest {
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent())
         .withName(commonJobName)
-        .withSchedulingSemaphore(null));
+        .withExecutionSemaphore(null));
 
     // Job-4 (common-id, but not-null mutex)
     Jobs.getJobManager().schedule(new IRunnable() {
@@ -582,13 +582,13 @@ public class JobCancelTest {
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent())
         .withName(commonJobName)
-        .withSchedulingSemaphore(Jobs.newSchedulingSemaphore(1))
+        .withExecutionSemaphore(Jobs.newExecutionSemaphore(1))
         .withExceptionHandling(null, false));
 
     assertTrue(setupLatch.await());
     Jobs.getJobManager().cancel(Jobs.newFutureFilterBuilder()
         .andMatchName(commonJobName)
-        .andMatchSchedulingSemaphore(null)
+        .andMatchExecutionSemaphore(null)
         .toFilter(), true);
     assertTrue(verifyLatch.await());
 

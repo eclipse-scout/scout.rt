@@ -14,11 +14,11 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
+import org.eclipse.scout.rt.platform.job.IExecutionSemaphore;
 import org.eclipse.scout.rt.platform.job.IFuture;
-import org.eclipse.scout.rt.platform.job.ISchedulingSemaphore;
 import org.eclipse.scout.rt.platform.job.Jobs;
-import org.eclipse.scout.rt.platform.job.internal.SchedulingSemaphore.AcquisitionTask;
-import org.eclipse.scout.rt.platform.job.internal.SchedulingSemaphore.QueuePosition;
+import org.eclipse.scout.rt.platform.job.internal.ExecutionSemaphore.AcquisitionTask;
+import org.eclipse.scout.rt.platform.job.internal.ExecutionSemaphore.QueuePosition;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.SleepUtil;
@@ -32,11 +32,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(PlatformTestRunner.class)
-public class SchedulingSemaphoreTest {
+public class ExecutionSemaphoreTest {
 
   @Test
   public void testZeroPermits() {
-    ISchedulingSemaphore semaphore = Jobs.newSchedulingSemaphore(0);
+    IExecutionSemaphore semaphore = Jobs.newExecutionSemaphore(0);
 
     final Set<String> protocol = Collections.synchronizedSet(new HashSet<String>()); // synchronized because modified/read by different threads.
 
@@ -48,7 +48,7 @@ public class SchedulingSemaphoreTest {
       }
     }, Jobs.newInput()
         .withName("job")
-        .withSchedulingSemaphore(semaphore));
+        .withExecutionSemaphore(semaphore));
 
     SleepUtil.sleepSafe(1, TimeUnit.SECONDS);
     assertTrue(protocol.isEmpty());
@@ -62,12 +62,12 @@ public class SchedulingSemaphoreTest {
   }
 
   /**
-   * Tests SchedulingSemaphore with 3 permits.
+   * Tests execution semaphore with 3 permits.
    */
   @Test
   @Times(500) // regression
   public void testThreePermits() throws InterruptedException {
-    ISchedulingSemaphore semaphore = Jobs.newSchedulingSemaphore(3);
+    IExecutionSemaphore semaphore = Jobs.newExecutionSemaphore(3);
 
     final Set<String> protocol = Collections.synchronizedSet(new HashSet<String>()); // synchronized because modified/read by different threads.
 
@@ -85,7 +85,7 @@ public class SchedulingSemaphoreTest {
       }
     }, Jobs.newInput()
         .withName("job-1")
-        .withSchedulingSemaphore(semaphore));
+        .withExecutionSemaphore(semaphore));
 
     // job-2
     Jobs.schedule(new IRunnable() {
@@ -97,7 +97,7 @@ public class SchedulingSemaphoreTest {
       }
     }, Jobs.newInput()
         .withName("job-2")
-        .withSchedulingSemaphore(semaphore));
+        .withExecutionSemaphore(semaphore));
 
     // job-3
     Jobs.schedule(new IRunnable() {
@@ -109,7 +109,7 @@ public class SchedulingSemaphoreTest {
       }
     }, Jobs.newInput()
         .withName("job-3")
-        .withSchedulingSemaphore(semaphore));
+        .withExecutionSemaphore(semaphore));
 
     // job-4
     Jobs.schedule(new IRunnable() {
@@ -121,7 +121,7 @@ public class SchedulingSemaphoreTest {
       }
     }, Jobs.newInput()
         .withName("job-4")
-        .withSchedulingSemaphore(semaphore));
+        .withExecutionSemaphore(semaphore));
 
     // job-5
     Jobs.schedule(new IRunnable() {
@@ -133,7 +133,7 @@ public class SchedulingSemaphoreTest {
       }
     }, Jobs.newInput()
         .withName("job-5")
-        .withSchedulingSemaphore(semaphore));
+        .withExecutionSemaphore(semaphore));
 
     // job-6
     Jobs.schedule(new IRunnable() {
@@ -145,7 +145,7 @@ public class SchedulingSemaphoreTest {
       }
     }, Jobs.newInput()
         .withName("job-6")
-        .withSchedulingSemaphore(semaphore));
+        .withExecutionSemaphore(semaphore));
 
     // job-7
     Jobs.schedule(new IRunnable() {
@@ -157,7 +157,7 @@ public class SchedulingSemaphoreTest {
       }
     }, Jobs.newInput()
         .withName("job-7")
-        .withSchedulingSemaphore(semaphore));
+        .withExecutionSemaphore(semaphore));
 
     // job-8
     Jobs.schedule(new IRunnable() {
@@ -169,7 +169,7 @@ public class SchedulingSemaphoreTest {
       }
     }, Jobs.newInput()
         .withName("job-8")
-        .withSchedulingSemaphore(semaphore));
+        .withExecutionSemaphore(semaphore));
 
     // verify group-1
     assertTrue(latchGroup1.await());
@@ -204,7 +204,7 @@ public class SchedulingSemaphoreTest {
       }
     }, Jobs.newInput()
         .withName("job-9")
-        .withSchedulingSemaphore(semaphore))
+        .withExecutionSemaphore(semaphore))
         .awaitDone();
 
     assertEquals(CollectionUtility.hashSet(
@@ -217,7 +217,7 @@ public class SchedulingSemaphoreTest {
   }
 
   /**
-   * Tests SchedulingSemaphore with 3 permits and with a blocking condition involved.
+   * Tests execution semaphore with 3 permits and with a blocking condition involved.
    * <p>
    * In total, 7 jobs are scheduled. Thereby, job-1 and job-3 never finish, and job-2 enters a blocking condition.
    * <p>
@@ -229,7 +229,7 @@ public class SchedulingSemaphoreTest {
   @Test
   @Times(500) // regression
   public void testThreePermitsAndBlocking() throws InterruptedException {
-    final ISchedulingSemaphore semaphore = Jobs.newSchedulingSemaphore(3);
+    final IExecutionSemaphore semaphore = Jobs.newExecutionSemaphore(3);
 
     final Set<String> protocol = Collections.synchronizedSet(new HashSet<String>()); // synchronized because modified/read by different threads.
 
@@ -253,7 +253,7 @@ public class SchedulingSemaphoreTest {
       }
     }, Jobs.newInput()
         .withName("job-1")
-        .withSchedulingSemaphore(semaphore));
+        .withExecutionSemaphore(semaphore));
 
     // job-2
     Jobs.schedule(new IRunnable() {
@@ -267,7 +267,7 @@ public class SchedulingSemaphoreTest {
       }
     }, Jobs.newInput()
         .withName("job-2")
-        .withSchedulingSemaphore(semaphore));
+        .withExecutionSemaphore(semaphore));
 
     // job-3
     Jobs.schedule(new IRunnable() {
@@ -280,7 +280,7 @@ public class SchedulingSemaphoreTest {
       }
     }, Jobs.newInput()
         .withName("job-3")
-        .withSchedulingSemaphore(semaphore));
+        .withExecutionSemaphore(semaphore));
 
     // job-4
     Jobs.schedule(new IRunnable() {
@@ -292,7 +292,7 @@ public class SchedulingSemaphoreTest {
       }
     }, Jobs.newInput()
         .withName("job-4")
-        .withSchedulingSemaphore(semaphore));
+        .withExecutionSemaphore(semaphore));
 
     // job-5
     Jobs.schedule(new IRunnable() {
@@ -310,7 +310,7 @@ public class SchedulingSemaphoreTest {
       }
     }, Jobs.newInput()
         .withName("job-5")
-        .withSchedulingSemaphore(semaphore));
+        .withExecutionSemaphore(semaphore));
 
     // job-6
     Jobs.schedule(new IRunnable() {
@@ -322,7 +322,7 @@ public class SchedulingSemaphoreTest {
       }
     }, Jobs.newInput()
         .withName("job-6")
-        .withSchedulingSemaphore(semaphore));
+        .withExecutionSemaphore(semaphore));
 
     // job-7
     Jobs.schedule(new IRunnable() {
@@ -334,7 +334,7 @@ public class SchedulingSemaphoreTest {
       }
     }, Jobs.newInput()
         .withName("job-7")
-        .withSchedulingSemaphore(semaphore));
+        .withExecutionSemaphore(semaphore));
 
     // verify
     assertTrue(setupLatch.await());
@@ -380,7 +380,7 @@ public class SchedulingSemaphoreTest {
 
   @Test(expected = AssertionException.class)
   public void testSealSemaphore() {
-    ISchedulingSemaphore semaphore = Jobs.newSchedulingSemaphore(1).seal();
+    IExecutionSemaphore semaphore = Jobs.newExecutionSemaphore(1).seal();
     semaphore.withPermits(2);
   }
 
@@ -389,7 +389,7 @@ public class SchedulingSemaphoreTest {
    */
   @Test
   public void testChangePermits1() {
-    final ISchedulingSemaphore semaphore = Jobs.newSchedulingSemaphore(1);
+    final IExecutionSemaphore semaphore = Jobs.newExecutionSemaphore(1);
 
     final Set<String> protocol = Collections.synchronizedSet(new HashSet<String>()); // synchronized because modified/read by different threads.
 
@@ -411,7 +411,7 @@ public class SchedulingSemaphoreTest {
             .withName("job-2")
             .withExecutionHint(executionHint)
             .withExceptionHandling(null, false)
-            .withSchedulingSemaphore(semaphore));
+            .withExecutionSemaphore(semaphore));
 
         // Change the permits to 0
         semaphore.withPermits(0);
@@ -419,7 +419,7 @@ public class SchedulingSemaphoreTest {
     }, Jobs.newInput()
         .withName("job-1")
         .withExecutionHint(executionHint)
-        .withSchedulingSemaphore(semaphore));
+        .withExecutionSemaphore(semaphore));
 
     future.awaitDone(1, TimeUnit.SECONDS);
     assertEquals(CollectionUtility.hashSet("job-1-running"), protocol);
@@ -448,7 +448,7 @@ public class SchedulingSemaphoreTest {
    */
   @Test
   public void testChangePermits2() throws InterruptedException {
-    ISchedulingSemaphore semaphore = Jobs.newSchedulingSemaphore(10);
+    IExecutionSemaphore semaphore = Jobs.newExecutionSemaphore(10);
 
     final Set<String> protocol = Collections.synchronizedSet(new HashSet<String>()); // synchronized because modified/read by different threads.
     final BlockingCountDownLatch latch = new BlockingCountDownLatch(1);
@@ -464,7 +464,7 @@ public class SchedulingSemaphoreTest {
     }, Jobs.newInput()
         .withName("job-1")
         .withExceptionHandling(null, true)
-        .withSchedulingSemaphore(semaphore));
+        .withExecutionSemaphore(semaphore));
 
     assertTrue(latch.await());
     assertEquals(CollectionUtility.hashSet(
@@ -485,7 +485,7 @@ public class SchedulingSemaphoreTest {
       }
     }, Jobs.newInput()
         .withName("job-2")
-        .withSchedulingSemaphore(semaphore));
+        .withExecutionSemaphore(semaphore));
 
     SleepUtil.sleepSafe(1, TimeUnit.SECONDS);
     assertTrue(protocol.isEmpty());
@@ -503,7 +503,7 @@ public class SchedulingSemaphoreTest {
    */
   @Test
   public void testChangePermits3() throws InterruptedException {
-    ISchedulingSemaphore semaphore = Jobs.newSchedulingSemaphore(0);
+    IExecutionSemaphore semaphore = Jobs.newExecutionSemaphore(0);
 
     final Set<String> protocol = Collections.synchronizedSet(new HashSet<String>()); // synchronized because modified/read by different threads.
     final BlockingCountDownLatch finishLatch = new BlockingCountDownLatch(3);
@@ -519,7 +519,7 @@ public class SchedulingSemaphoreTest {
     }, Jobs.newInput()
         .withName("job-1")
         .withExceptionHandling(null, true)
-        .withSchedulingSemaphore(semaphore));
+        .withExecutionSemaphore(semaphore));
 
     // job-2
     Jobs.schedule(new IRunnable() {
@@ -532,7 +532,7 @@ public class SchedulingSemaphoreTest {
     }, Jobs.newInput()
         .withName("job-2")
         .withExceptionHandling(null, true)
-        .withSchedulingSemaphore(semaphore));
+        .withExecutionSemaphore(semaphore));
 
     // job-3
     Jobs.schedule(new IRunnable() {
@@ -545,7 +545,7 @@ public class SchedulingSemaphoreTest {
     }, Jobs.newInput()
         .withName("job-3")
         .withExceptionHandling(null, true)
-        .withSchedulingSemaphore(semaphore));
+        .withExecutionSemaphore(semaphore));
 
     JobTestUtil.waitForPermitCompetitors(semaphore, 3); // job-1, job-2, job-3
     semaphore.withPermits(3);
@@ -564,7 +564,7 @@ public class SchedulingSemaphoreTest {
   @Test
   @Times(500) // regression
   public void testChangePermits4() throws InterruptedException {
-    ISchedulingSemaphore semaphore = Jobs.newSchedulingSemaphore(3);
+    IExecutionSemaphore semaphore = Jobs.newExecutionSemaphore(3);
 
     final Set<String> protocol = Collections.synchronizedSet(new HashSet<String>()); // synchronized because modified/read by different threads.
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(3);
@@ -579,7 +579,7 @@ public class SchedulingSemaphoreTest {
       }
     }, Jobs.newInput()
         .withName("job-1")
-        .withSchedulingSemaphore(semaphore));
+        .withExecutionSemaphore(semaphore));
 
     // job-2
     Jobs.schedule(new IRunnable() {
@@ -591,7 +591,7 @@ public class SchedulingSemaphoreTest {
       }
     }, Jobs.newInput()
         .withName("job-2")
-        .withSchedulingSemaphore(semaphore));
+        .withExecutionSemaphore(semaphore));
 
     // job-3
     Jobs.schedule(new IRunnable() {
@@ -603,7 +603,7 @@ public class SchedulingSemaphoreTest {
       }
     }, Jobs.newInput()
         .withName("job-3")
-        .withSchedulingSemaphore(semaphore));
+        .withExecutionSemaphore(semaphore));
 
     // job-4
     final BlockingCountDownLatch latchJob4 = new BlockingCountDownLatch(1);
@@ -616,7 +616,7 @@ public class SchedulingSemaphoreTest {
       }
     }, Jobs.newInput()
         .withName("job-4")
-        .withSchedulingSemaphore(semaphore));
+        .withExecutionSemaphore(semaphore));
 
     // job-5
     final BlockingCountDownLatch latchJob5 = new BlockingCountDownLatch(1);
@@ -629,7 +629,7 @@ public class SchedulingSemaphoreTest {
       }
     }, Jobs.newInput()
         .withName("job-5")
-        .withSchedulingSemaphore(semaphore));
+        .withExecutionSemaphore(semaphore));
 
     // job-6
     final BlockingCountDownLatch latchJob6 = new BlockingCountDownLatch(1);
@@ -642,7 +642,7 @@ public class SchedulingSemaphoreTest {
       }
     }, Jobs.newInput()
         .withName("job-6")
-        .withSchedulingSemaphore(semaphore));
+        .withExecutionSemaphore(semaphore));
 
     assertTrue(setupLatch.await());
     assertEquals(CollectionUtility.hashSet(
@@ -670,11 +670,11 @@ public class SchedulingSemaphoreTest {
   }
 
   /**
-   * Tests an internal of {@link SchedulingSemaphore}, that {@link AcquisitionTask#notifyPermitAcquired()} is invoked
-   * outside the {@link SchedulingSemaphore} lock.
+   * Tests an internal of {@link ExecutionSemaphore}, that {@link AcquisitionTask#notifyPermitAcquired()} is invoked
+   * outside the {@link ExecutionSemaphore} lock.
    * <p>
    * Otherwise, a deadlock might occur, once the resuming job-1 tries to re-acquire the permit, namely exactly the time
-   * when owning acquisitionLock in {@link SchedulingSemaphore#acquire(IFuture, QueuePosition)} and querying
+   * when owning acquisitionLock in {@link ExecutionSemaphore#acquire(IFuture, QueuePosition)} and querying
    * 'isPermitOwner'. Thereto, job-1 must compete for the semaphore lock, while job-2 (owning semaphore lock) tries to
    * notify the resuming job-1 via {@link AcquisitionTask#notifyPermitAcquired()}, but cannot get monitor of
    * acquisitionLock.
@@ -682,7 +682,7 @@ public class SchedulingSemaphoreTest {
   @Test
   @Times(1_000) // regression; do not remove
   public void testInternalDeadlock() {
-    final ISchedulingSemaphore semaphore = Jobs.newSchedulingSemaphore(1);
+    final IExecutionSemaphore semaphore = Jobs.newExecutionSemaphore(1);
 
     final IBlockingCondition condition = Jobs.newBlockingCondition(true);
 
@@ -699,13 +699,13 @@ public class SchedulingSemaphoreTest {
           }
         }, Jobs.newInput()
             .withName("job-2")
-            .withSchedulingSemaphore(semaphore)));
+            .withExecutionSemaphore(semaphore)));
 
         condition.waitFor();
       }
     }, Jobs.newInput()
         .withName("job-1")
-        .withSchedulingSemaphore(semaphore));
+        .withExecutionSemaphore(semaphore));
 
     try {
       future1.awaitDoneAndGet(5, TimeUnit.SECONDS);

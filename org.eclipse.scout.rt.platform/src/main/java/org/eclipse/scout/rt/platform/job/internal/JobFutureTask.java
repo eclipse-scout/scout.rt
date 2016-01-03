@@ -35,9 +35,9 @@ import org.eclipse.scout.rt.platform.exception.IExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.job.IDoneHandler;
+import org.eclipse.scout.rt.platform.job.IExecutionSemaphore;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IJobListenerRegistration;
-import org.eclipse.scout.rt.platform.job.ISchedulingSemaphore;
 import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.job.JobState;
 import org.eclipse.scout.rt.platform.job.Jobs;
@@ -72,7 +72,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
   protected final RunMonitor m_runMonitor;
   protected final JobInput m_input;
   protected final Long m_expirationDate;
-  protected final SchedulingSemaphore m_schedulingSemaphore;
+  protected final ExecutionSemaphore m_executionSemaphore;
 
   protected final CallableChain<RESULT> m_callableChain;
   protected final List<JobListenerWithFilter> m_listeners = new CopyOnWriteArrayList<>();
@@ -102,7 +102,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
     m_jobManager = jobManager;
     m_runMonitor = runMonitor;
     m_input = input;
-    m_schedulingSemaphore = SchedulingSemaphore.get(input);
+    m_executionSemaphore = ExecutionSemaphore.get(input);
 
     m_callableChain = callableChain;
 
@@ -133,7 +133,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
    * <p>
    * This method is invoked in the worker thread which will finally run the task.
    * <p>
-   * When invoked and this task is assigned to a {@link ISchedulingSemaphore}, this task owns a permit.
+   * When invoked and this task is assigned to an {@link IExecutionSemaphore}, this task owns a permit.
    */
   @Override
   public void run() {
@@ -227,8 +227,8 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
   }
 
   @Override
-  public SchedulingSemaphore getSchedulingSemaphore() {
-    return m_schedulingSemaphore;
+  public ExecutionSemaphore getExecutionSemaphore() {
+    return m_executionSemaphore;
   }
 
   @Override
@@ -439,7 +439,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
   }
 
   /**
-   * Asserts that the current job (if present) is not assigned to the same {@link ISchedulingSemaphore} as the job to be
+   * Asserts that the current job (if present) is not assigned to the same {@link IExecutionSemaphore} as the job to be
    * awaited for. Otherwise, that could end up in a deadlock.
    */
   protected void assertNotSameSemaphore() {
@@ -448,7 +448,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
       return; // not running in a job.
     }
 
-    final ISchedulingSemaphore currentSemaphore = currentFuture.getJobInput().getSchedulingSemaphore();
+    final IExecutionSemaphore currentSemaphore = currentFuture.getJobInput().getExecutionSemaphore();
     if (currentSemaphore == null) {
       return; // current job has no maximal concurrency restriction.
     }
@@ -461,16 +461,16 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
       return; // job already in done state.
     }
 
-    Assertions.assertNotSame(currentSemaphore, m_schedulingSemaphore, "Potential deadlock detected: Cannot wait for a job which is assigned to the same scheduling semaphore as the current job [semaphore={}]", currentSemaphore);
+    Assertions.assertNotSame(currentSemaphore, m_executionSemaphore, "Potential deadlock detected: Cannot wait for a job which is assigned to the same    as the current job [semaphore={}]", currentSemaphore);
   }
 
   /**
-   * Releases this job's permit if assigned to a {@link ISchedulingSemaphore}, but only if this job currently owns a
+   * Releases this job's permit if assigned to an {@link IExecutionSemaphore}, but only if this job currently owns a
    * permit.
    */
   protected void releasePermit() {
-    if (m_schedulingSemaphore != null && m_schedulingSemaphore.isPermitOwner(this)) {
-      m_schedulingSemaphore.release(this);
+    if (m_executionSemaphore != null && m_executionSemaphore.isPermitOwner(this)) {
+      m_executionSemaphore.release(this);
     }
   }
 

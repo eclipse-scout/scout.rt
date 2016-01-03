@@ -21,8 +21,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
 import org.eclipse.scout.rt.platform.Bean;
+import org.eclipse.scout.rt.platform.job.IExecutionSemaphore;
 import org.eclipse.scout.rt.platform.job.IFuture;
-import org.eclipse.scout.rt.platform.job.ISchedulingSemaphore;
 import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
@@ -33,14 +33,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Default implementation of {@link ISchedulingSemaphore}.
+ * Default implementation of {@link IExecutionSemaphore}.
  *
  * @since 5.2
  */
 @Bean
-public class SchedulingSemaphore implements ISchedulingSemaphore {
+public class ExecutionSemaphore implements IExecutionSemaphore {
 
-  private static final Logger LOG = LoggerFactory.getLogger(SchedulingSemaphore.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ExecutionSemaphore.class);
 
   private final ReadLock m_readLock;
   private final WriteLock m_writeLock;
@@ -52,7 +52,7 @@ public class SchedulingSemaphore implements ISchedulingSemaphore {
 
   private final AtomicInteger m_executionPriority;
 
-  public SchedulingSemaphore() {
+  public ExecutionSemaphore() {
     m_permits = Integer.MAX_VALUE; // unbounded according to JavaDoc
     m_queue = new ArrayDeque<>();
     m_permitOwners = new HashSet<>();
@@ -69,7 +69,7 @@ public class SchedulingSemaphore implements ISchedulingSemaphore {
   }
 
   @Override
-  public SchedulingSemaphore withPermits(final int permits) {
+  public ExecutionSemaphore withPermits(final int permits) {
     Assertions.assertFalse(m_sealed, "The number of permits cannot be changed because the semaphore is sealed [semaphore={}]", this);
     Assertions.assertGreaterOrEqual(permits, 0, "Number of semaphore permits must be '>= 0'");
     m_permits = permits;
@@ -83,7 +83,7 @@ public class SchedulingSemaphore implements ISchedulingSemaphore {
   }
 
   @Override
-  public ISchedulingSemaphore seal() {
+  public IExecutionSemaphore seal() {
     m_sealed = true;
     return this;
   }
@@ -154,7 +154,7 @@ public class SchedulingSemaphore implements ISchedulingSemaphore {
 
           throw new InterruptedException("Interrupted while competing for a permit")
               .withContextInfo("task", task.getJobInput().getName())
-              .withContextInfo("schedulingSemaphore", this);
+              .withContextInfo("executionSemaphore", this);
         }
       }
     }
@@ -286,7 +286,7 @@ public class SchedulingSemaphore implements ISchedulingSemaphore {
   }
 
   protected void assertSameSemaphore(final IFuture<?> task) {
-    Assertions.assertSame(this, task.getJobInput().getSchedulingSemaphore(), "Wrong scheduling semaphore [expected={}, actual={}]", this, task.getJobInput().getSchedulingSemaphore());
+    Assertions.assertSame(this, task.getJobInput().getExecutionSemaphore(), "Wrong execution semaphore [expected={}, actual={}]", this, task.getJobInput().getExecutionSemaphore());
   }
 
   protected void assertPermitOwner(final IFuture<?> task) {
@@ -344,16 +344,16 @@ public class SchedulingSemaphore implements ISchedulingSemaphore {
   }
 
   /**
-   * Returns the {@link SchedulingSemaphore} of the given {@link JobInput}, or <code>null</code> if not set, or throws
-   * {@link AssertionException} if not of the type {@link SchedulingSemaphore}.
+   * Returns the {@link ExecutionSemaphore} of the given {@link JobInput}, or <code>null</code> if not set, or throws
+   * {@link AssertionException} if not of the type {@link ExecutionSemaphore}.
    */
-  protected static SchedulingSemaphore get(final JobInput input) {
-    if (input.getSchedulingSemaphore() == null) {
+  protected static ExecutionSemaphore get(final JobInput input) {
+    if (input.getExecutionSemaphore() == null) {
       return null;
     }
 
-    Assertions.assertTrue(input.getSchedulingSemaphore() instanceof SchedulingSemaphore, "Semaphore must be of type {} [semaphore={}]", SchedulingSemaphore.class.getName(), input.getSchedulingSemaphore().getClass().getName());
-    return (SchedulingSemaphore) input.getSchedulingSemaphore();
+    Assertions.assertTrue(input.getExecutionSemaphore() instanceof ExecutionSemaphore, "Semaphore must be of type {} [semaphore={}]", ExecutionSemaphore.class.getName(), input.getExecutionSemaphore().getClass().getName());
+    return (ExecutionSemaphore) input.getExecutionSemaphore();
   }
 
   /**

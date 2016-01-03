@@ -113,7 +113,7 @@ public class JobStateTest {
     final BlockingCountDownLatch job3RunningLatch = new BlockingCountDownLatch(1);
     final IBlockingCondition condition = Jobs.newBlockingCondition(true);
 
-    final ISchedulingSemaphore mutex = Jobs.newSchedulingSemaphore(1);
+    final IExecutionSemaphore mutex = Jobs.newExecutionSemaphore(1);
 
     // Schedule job-1
     IFuture<Void> future1 = Jobs.schedule(new IRunnable() {
@@ -124,7 +124,7 @@ public class JobStateTest {
       }
     }, Jobs.newInput()
         .withName("job-1")
-        .withSchedulingSemaphore(mutex));
+        .withExecutionSemaphore(mutex));
 
     assertTrue(job1RunningLatch.await()); // wait until running (for idempotent event assertion)
 
@@ -139,7 +139,7 @@ public class JobStateTest {
       }
     }, Jobs.newInput()
         .withName("job-2")
-        .withSchedulingSemaphore(mutex));
+        .withExecutionSemaphore(mutex));
 
     // Wait until competing for a permit.
     // That is for idempotent event assertion, because permit is acquired asynchronously in another thread.
@@ -156,7 +156,7 @@ public class JobStateTest {
       }
     }, Jobs.newInput()
         .withName("job-3")
-        .withSchedulingSemaphore(mutex));
+        .withExecutionSemaphore(mutex));
 
     // Wait until competing for a permit.
     // That is for idempotent event assertion, because permit is acquired asynchronously in another thread.
@@ -332,7 +332,7 @@ public class JobStateTest {
     JobEventCaptureListener captureListener = new JobEventCaptureListener();
     Jobs.getJobManager().addListener(captureListener);
 
-    final ISchedulingSemaphore mutex = Jobs.newSchedulingSemaphore(1);
+    final IExecutionSemaphore mutex = Jobs.newExecutionSemaphore(1);
     final IBlockingCondition condition = Jobs.newBlockingCondition(true);
     final AtomicReference<Thread> workerThread = new AtomicReference<>();
 
@@ -353,7 +353,7 @@ public class JobStateTest {
       }
     }, Jobs.newInput()
         .withName("job-1")
-        .withSchedulingSemaphore(mutex));
+        .withExecutionSemaphore(mutex));
 
     // Wait until job-1 is running
     JobTestUtil.waitForState(future1, JobState.WAITING_FOR_BLOCKING_CONDITION);
@@ -411,7 +411,7 @@ public class JobStateTest {
     JobEventCaptureListener captureListener = new JobEventCaptureListener();
     Jobs.getJobManager().addListener(captureListener);
 
-    final ISchedulingSemaphore mutex = Jobs.newSchedulingSemaphore(1);
+    final IExecutionSemaphore mutex = Jobs.newExecutionSemaphore(1);
     final IBlockingCondition condition = Jobs.newBlockingCondition(true);
     final AtomicReference<Thread> workerThread = new AtomicReference<>();
 
@@ -433,7 +433,7 @@ public class JobStateTest {
       }
     }, Jobs.newInput()
         .withName("job-1")
-        .withSchedulingSemaphore(mutex));
+        .withExecutionSemaphore(mutex));
 
     // Wait until job-1 completed
     future1.awaitDoneAndGet(10, TimeUnit.SECONDS);
@@ -559,7 +559,7 @@ public class JobStateTest {
         }
       }
     }, Jobs.newInput()
-        .withSchedulingSemaphore(Jobs.newSchedulingSemaphore(1))
+        .withExecutionSemaphore(Jobs.newExecutionSemaphore(1))
         .withExecutionTrigger(Jobs.newExecutionTrigger()
             .withStartIn(1, TimeUnit.MILLISECONDS)
             .withSchedule(SimpleScheduleBuilder.simpleSchedule()
@@ -690,7 +690,7 @@ public class JobStateTest {
         // NOOP
       }
     }, Jobs.newInput()
-        .withSchedulingSemaphore(Jobs.newSchedulingSemaphore(1))
+        .withExecutionSemaphore(Jobs.newExecutionSemaphore(1))
         .withExecutionTrigger(Jobs.newExecutionTrigger()
             .withStartIn(1, TimeUnit.MILLISECONDS)
             .withSchedule(FixedDelayScheduleBuilder.repeatForTotalCount(3, 1, TimeUnit.MILLISECONDS))));

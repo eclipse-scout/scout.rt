@@ -33,37 +33,37 @@ public class ModelJobValidatorTest {
   @Before
   public void before() {
     m_clientSession = mock(IClientSession.class);
-    when(m_clientSession.getModelJobSemaphore()).thenReturn(Jobs.newSchedulingSemaphore(1));
+    when(m_clientSession.getModelJobSemaphore()).thenReturn(Jobs.newExecutionSemaphore(1));
   }
 
   @Test
   public void test() {
-    new ModelJobValidator().validateJobInput(new JobInput().withSchedulingSemaphore(m_clientSession.getModelJobSemaphore()).withRunContext(ClientRunContexts.empty().withSession(m_clientSession, true)));
+    new ModelJobValidator().validateJobInput(new JobInput().withExecutionSemaphore(m_clientSession.getModelJobSemaphore()).withRunContext(ClientRunContexts.empty().withSession(m_clientSession, true)));
     assertTrue(true);
   }
 
   @Test(expected = AssertionException.class)
   public void testNullRunContext() {
-    new ModelJobValidator().validateJobInput(new JobInput().withSchedulingSemaphore(m_clientSession.getModelJobSemaphore()).withRunContext(null));
+    new ModelJobValidator().validateJobInput(new JobInput().withExecutionSemaphore(m_clientSession.getModelJobSemaphore()).withRunContext(null));
   }
 
   @Test(expected = AssertionException.class)
   public void testWrongRunContext() {
-    new ModelJobValidator().validateJobInput(new JobInput().withSchedulingSemaphore(m_clientSession.getModelJobSemaphore()).withRunContext(RunContexts.empty()));
+    new ModelJobValidator().validateJobInput(new JobInput().withExecutionSemaphore(m_clientSession.getModelJobSemaphore()).withRunContext(RunContexts.empty()));
   }
 
   @Test(expected = AssertionException.class)
   public void testNullMutex() {
-    new ModelJobValidator().validateJobInput(new JobInput().withSchedulingSemaphore(null).withRunContext(ClientRunContexts.empty().withSession(m_clientSession, false)));
+    new ModelJobValidator().validateJobInput(new JobInput().withExecutionSemaphore(null).withRunContext(ClientRunContexts.empty().withSession(m_clientSession, false)));
   }
 
   @Test(expected = AssertionException.class)
   public void testWrongMutexType() {
-    new ModelJobValidator().validateJobInput(new JobInput().withSchedulingSemaphore(Jobs.newSchedulingSemaphore(1)).withRunContext(ClientRunContexts.empty().withSession(m_clientSession, true)));
+    new ModelJobValidator().validateJobInput(new JobInput().withExecutionSemaphore(Jobs.newExecutionSemaphore(1)).withRunContext(ClientRunContexts.empty().withSession(m_clientSession, true)));
   }
 
   @Test(expected = AssertionException.class)
   public void testNullClientSession() {
-    new ModelJobValidator().validateJobInput(new JobInput().withSchedulingSemaphore(m_clientSession.getModelJobSemaphore()).withRunContext(ClientRunContexts.empty().withSession(null, false)));
+    new ModelJobValidator().validateJobInput(new JobInput().withExecutionSemaphore(m_clientSession.getModelJobSemaphore()).withRunContext(ClientRunContexts.empty().withSession(null, false)));
   }
 }

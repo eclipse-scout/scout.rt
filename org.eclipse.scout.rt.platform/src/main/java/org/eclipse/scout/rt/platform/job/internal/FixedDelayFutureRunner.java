@@ -64,7 +64,7 @@ public class FixedDelayFutureRunner implements IFutureRunner {
   public void run() {
     // The following invariants applies:
     // - this method is never invoked concurrently for the same future, because triggered via a 'one-shot' trigger upon completion of this method;
-    // - if the future is assigned to a scheduling semaphore, the future owns a permit;
+    // - if the future is assigned to an execution semaphore, the future owns a permit;
     // - after JobFutureTask.run(), the future's permit is released, meaning that the future is no longer a permit owner;
 
     m_futureTask.run();

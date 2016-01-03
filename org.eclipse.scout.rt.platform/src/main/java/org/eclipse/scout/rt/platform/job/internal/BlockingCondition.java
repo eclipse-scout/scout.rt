@@ -20,7 +20,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.JobState;
-import org.eclipse.scout.rt.platform.job.internal.SchedulingSemaphore.QueuePosition;
+import org.eclipse.scout.rt.platform.job.internal.ExecutionSemaphore.QueuePosition;
 import org.eclipse.scout.rt.platform.job.listener.JobEventData;
 import org.eclipse.scout.rt.platform.util.ToStringBuilder;
 import org.eclipse.scout.rt.platform.util.concurrent.InterruptedException;
@@ -103,7 +103,7 @@ public class BlockingCondition implements IBlockingCondition {
           .withFuture(futureTask)
           .withBlockingCondition(this));
 
-      // Release the permit if assigned to a scheduling semaphore and currently being a permit owner.
+      // Release the permit if assigned to an execution semaphore and currently being a permit owner.
       futureTask.releasePermit();
       try {
         blockUntilSignaledOrTimeout(timeout, unit); // Wait until the condition falls
@@ -118,8 +118,8 @@ public class BlockingCondition implements IBlockingCondition {
       m_lock.unlock();
     }
 
-    // Acquire a permit if assigned to a scheduling semaphore.
-    final SchedulingSemaphore semaphore = futureTask.getSchedulingSemaphore();
+    // Acquire a permit if assigned to an execution semaphore.
+    final ExecutionSemaphore semaphore = futureTask.getExecutionSemaphore();
     if (semaphore != null) {
       try {
         futureTask.changeState(JobState.WAITING_FOR_PERMIT);

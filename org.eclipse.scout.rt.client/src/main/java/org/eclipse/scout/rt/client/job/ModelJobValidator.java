@@ -39,6 +39,6 @@ public class ModelJobValidator {
   public void validateJobInput(final JobInput input) {
     Assertions.assertNotNull(input, "A model job requires a job input");
     validateRunContext(input.getRunContext());
-    Assertions.assertSame(((ClientRunContext) input.getRunContext()).getSession().getModelJobSemaphore(), input.getSchedulingSemaphore(), "A model job requires the session's model job semaphore");
+    Assertions.assertSame(((ClientRunContext) input.getRunContext()).getSession().getModelJobSemaphore(), input.getExecutionSemaphore(), "A model job requires the session's model job semaphore");
   }
 }

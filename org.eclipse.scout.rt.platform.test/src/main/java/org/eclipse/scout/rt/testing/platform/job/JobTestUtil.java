@@ -20,7 +20,7 @@ import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IJobManager;
-import org.eclipse.scout.rt.platform.job.ISchedulingSemaphore;
+import org.eclipse.scout.rt.platform.job.IExecutionSemaphore;
 import org.eclipse.scout.rt.platform.job.JobState;
 import org.eclipse.scout.rt.platform.job.internal.JobManager;
 
@@ -48,12 +48,12 @@ public class JobTestUtil {
   }
 
   /**
-   * Waits if necessary for at most 30s until the {@link ISchedulingSemaphore} reaches the expected competitor count. If
+   * Waits if necessary for at most 30s until the {@link IExecutionSemaphore} reaches the expected competitor count. If
    * elapsed, an {@link AssertionError} is thrown.
    * <p>
    * Competitor count: all permit owners plus all queued task.
    */
-  public static void waitForPermitCompetitors(final ISchedulingSemaphore semaphore, final int expectedCompetitorCount) {
+  public static void waitForPermitCompetitors(final IExecutionSemaphore semaphore, final int expectedCompetitorCount) {
     waitForCondition(new ICondition() {
 
       @Override

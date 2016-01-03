@@ -16,7 +16,7 @@ import static org.mockito.Mockito.mock;
 
 import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.job.IFuture;
-import org.eclipse.scout.rt.platform.job.ISchedulingSemaphore;
+import org.eclipse.scout.rt.platform.job.IExecutionSemaphore;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
@@ -28,14 +28,14 @@ public class MutexFutureFilterTest {
 
   @Test
   public void test() {
-    ISchedulingSemaphore mutex1 = Jobs.newSchedulingSemaphore(1);
-    ISchedulingSemaphore mutex2 = Jobs.newSchedulingSemaphore(1);
+    IExecutionSemaphore mutex1 = Jobs.newExecutionSemaphore(1);
+    IExecutionSemaphore mutex2 = Jobs.newExecutionSemaphore(1);
 
-    IFuture<Void> future1 = Jobs.schedule(mock(IRunnable.class), Jobs.newInput().withSchedulingSemaphore(mutex1));
-    IFuture<Void> future2 = Jobs.schedule(mock(IRunnable.class), Jobs.newInput().withSchedulingSemaphore(mutex1));
-    IFuture<Void> future3 = Jobs.schedule(mock(IRunnable.class), Jobs.newInput().withSchedulingSemaphore(mutex2));
+    IFuture<Void> future1 = Jobs.schedule(mock(IRunnable.class), Jobs.newInput().withExecutionSemaphore(mutex1));
+    IFuture<Void> future2 = Jobs.schedule(mock(IRunnable.class), Jobs.newInput().withExecutionSemaphore(mutex1));
+    IFuture<Void> future3 = Jobs.schedule(mock(IRunnable.class), Jobs.newInput().withExecutionSemaphore(mutex2));
 
-    IFilter<IFuture<?>> filter = new SchedulingSemaphoreFutureFilter(mutex1);
+    IFilter<IFuture<?>> filter = new ExecutionSemaphoreFutureFilter(mutex1);
     assertTrue(filter.accept(future1));
     assertTrue(filter.accept(future2));
     assertFalse(filter.accept(future3));

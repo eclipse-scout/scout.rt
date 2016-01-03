@@ -16,7 +16,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.job.filter.event.JobEventFilterBuilder;
 import org.eclipse.scout.rt.platform.job.filter.future.FutureFilterBuilder;
-import org.eclipse.scout.rt.platform.job.internal.SchedulingSemaphore;
+import org.eclipse.scout.rt.platform.job.internal.ExecutionSemaphore;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
@@ -35,11 +35,13 @@ import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
  *     // do something
  *   }
  * }, Jobs.newInput()
- *     .withRunContext(RunContexts.copyCurrent()
- *         .withSubject(...)
- *         .withLocale(Locale.US))
- *     .withSchedulingDelay(10, TimeUnit.SECONDS)
- *     .withName("job example"));
+ *      .withName("example job")
+ *      .withRunContext(RunContexts.copyCurrent()
+ *          .withSubject(...)
+ *          .withLocale(Locale.US))
+ *      .withExecutionTrigger(Jobs.newExecutionTrigger()
+ *          .withStartIn(5, TimeUnit.SECONDS)
+ *          .withSchedule(FixedDelayScheduleBuilder.repeatForever(10, TimeUnit.SECONDS)));
  * </pre>
  *
  * The following code snippet illustrates how the job is finally run:
@@ -175,10 +177,10 @@ public final class Jobs {
    *
    * <pre>
    * Jobs.newInput()
-   *     .withRunContext(RunContexts.copyCurrent())
-   *     .withSchedulingDelay(10, TimeUnit.SECONDS)
-   *     .withPeriodicExecutionAtFixedRate(5, TimeUnit.SECONDS)
-   *     .withName("example job");
+   *     .withName("example job")
+   *     .withRunContext(ClientRunContexts.copyCurrent())
+   *     .withExecutionTrigger(Jobs.newExecutionTrigger()
+   *         .withStartIn(5, TimeUnit.SECONDS));
    * </pre>
    */
   public static JobInput newInput() {
@@ -221,7 +223,7 @@ public final class Jobs {
   }
 
   /**
-   * Creates a scheduling semaphore to control the maximal number of jobs running concurrently among the same semaphore.
+   * Creates an execution semaphore to control the maximal number of jobs running concurrently among the same semaphore.
    * <p>
    * With a semaphore in place, a job only commences execution, once a permit is free or gets available. If free, the
    * job commences execution immediately at the next reasonable opportunity, unless no worker thread is available.
@@ -235,14 +237,14 @@ public final class Jobs {
    * @param permits
    *          the number of permits.
    */
-  public static ISchedulingSemaphore newSchedulingSemaphore(final int permits) {
-    return BEANS.get(SchedulingSemaphore.class).withPermits(permits);
+  public static IExecutionSemaphore newExecutionSemaphore(final int permits) {
+    return BEANS.get(ExecutionSemaphore.class).withPermits(permits);
   }
 
   /**
    * Creates a blocking condition to put a job into waiting mode until the condition falls.
    * <p>
-   * If the job belongs to a {@link ISchedulingSemaphore}, the job's permit is released and passed to the next competing
+   * If the job belongs to an {@link IExecutionSemaphore}, the job's permit is released and passed to the next competing
    * job of that same semaphore while being blocked.
    * <p>
    * See {@link IBlockingCondition} for more information.

@@ -22,7 +22,7 @@ import org.eclipse.scout.rt.platform.filter.AndFilter;
 import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.filter.NotFilter;
 import org.eclipse.scout.rt.platform.job.IFuture;
-import org.eclipse.scout.rt.platform.job.ISchedulingSemaphore;
+import org.eclipse.scout.rt.platform.job.IExecutionSemaphore;
 import org.eclipse.scout.rt.platform.job.JobState;
 
 /**
@@ -148,10 +148,10 @@ public class FutureFilterBuilder {
   }
 
   /**
-   * To match all jobs which are assigned to the given {@link ISchedulingSemaphore}.
+   * To match all jobs which are assigned to the given {@link IExecutionSemaphore}.
    */
-  public FutureFilterBuilder andMatchSchedulingSemaphore(final ISchedulingSemaphore semaphore) {
-    andMatch(new SchedulingSemaphoreFutureFilter(semaphore));
+  public FutureFilterBuilder andMatchExecutionSemaphore(final IExecutionSemaphore semaphore) {
+    andMatch(new ExecutionSemaphoreFutureFilter(semaphore));
     return this;
   }
 

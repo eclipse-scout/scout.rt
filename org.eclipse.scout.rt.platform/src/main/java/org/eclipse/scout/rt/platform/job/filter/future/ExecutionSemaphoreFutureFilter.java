@@ -12,24 +12,24 @@ package org.eclipse.scout.rt.platform.job.filter.future;
 
 import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.job.IFuture;
-import org.eclipse.scout.rt.platform.job.ISchedulingSemaphore;
+import org.eclipse.scout.rt.platform.job.IExecutionSemaphore;
 import org.eclipse.scout.rt.platform.util.CompareUtility;
 
 /**
- * Filter which accepts all Futures that are assigned to the given {@link ISchedulingSemaphore}.
+ * Filter which accepts all Futures that are assigned to the given {@link IExecutionSemaphore}.
  *
  * @since 5.1
  */
-public class SchedulingSemaphoreFutureFilter implements IFilter<IFuture<?>> {
+public class ExecutionSemaphoreFutureFilter implements IFilter<IFuture<?>> {
 
-  private final ISchedulingSemaphore m_semaphore;
+  private final IExecutionSemaphore m_semaphore;
 
-  public SchedulingSemaphoreFutureFilter(final ISchedulingSemaphore semaphore) {
+  public ExecutionSemaphoreFutureFilter(final IExecutionSemaphore semaphore) {
     m_semaphore = semaphore;
   }
 
   @Override
   public boolean accept(final IFuture<?> future) {
-    return CompareUtility.equals(m_semaphore, future.getJobInput().getSchedulingSemaphore());
+    return CompareUtility.equals(m_semaphore, future.getJobInput().getExecutionSemaphore());
   }
 }

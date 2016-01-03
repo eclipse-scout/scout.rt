@@ -39,9 +39,9 @@ public class JobFutureVisitTest {
 
   private static final String JOB_IDENTIFIER = UUID.randomUUID().toString();
 
-  private ISchedulingSemaphore m_mutex1;
-  private ISchedulingSemaphore m_mutex2;
-  private ISchedulingSemaphore m_mutex3;
+  private IExecutionSemaphore m_mutex1;
+  private IExecutionSemaphore m_mutex2;
+  private IExecutionSemaphore m_mutex3;
 
   private Set<String> protocol;
 
@@ -57,9 +57,9 @@ public class JobFutureVisitTest {
     m_jobManagerBean = JobTestUtil.replaceCurrentJobManager(new JobManager() {
     });
 
-    m_mutex1 = Jobs.newSchedulingSemaphore(1);
-    m_mutex2 = Jobs.newSchedulingSemaphore(1);
-    m_mutex3 = Jobs.newSchedulingSemaphore(1);
+    m_mutex1 = Jobs.newExecutionSemaphore(1);
+    m_mutex2 = Jobs.newExecutionSemaphore(1);
+    m_mutex3 = Jobs.newExecutionSemaphore(1);
 
     // prepare the test-case
     protocol = Collections.synchronizedSet(new HashSet<String>()); // synchronized because modified/read by different threads.
@@ -79,7 +79,7 @@ public class JobFutureVisitTest {
     }, Jobs.newInput()
         .withRunContext(RunContexts.empty())
         .withName("mutex1_job1")
-        .withSchedulingSemaphore(m_mutex1)
+        .withExecutionSemaphore(m_mutex1)
         .withExecutionHint(JOB_IDENTIFIER)
         .withExceptionHandling(null, false));
 
@@ -94,7 +94,7 @@ public class JobFutureVisitTest {
     }, Jobs.newInput()
         .withRunContext(RunContexts.empty())
         .withName("mutex1_job2")
-        .withSchedulingSemaphore(m_mutex1)
+        .withExecutionSemaphore(m_mutex1)
         .withExecutionHint(JOB_IDENTIFIER)
         .withExceptionHandling(null, false));
 
@@ -109,7 +109,7 @@ public class JobFutureVisitTest {
         .withRunContext(RunContexts.empty())
         .withName("mutex1_job3")
         .withExecutionHint(JOB_IDENTIFIER)
-        .withSchedulingSemaphore(m_mutex1));
+        .withExecutionSemaphore(m_mutex1));
 
     // =========
     // SESSION 2 (JOB-1)
@@ -123,7 +123,7 @@ public class JobFutureVisitTest {
         .withRunContext(RunContexts.empty())
         .withName("mutex2_job1")
         .withExecutionHint(JOB_IDENTIFIER)
-        .withSchedulingSemaphore(m_mutex2));
+        .withExecutionSemaphore(m_mutex2));
 
     // SESSION 2 (JOB-2)
     Jobs.getJobManager().schedule(new IRunnable() {
@@ -136,7 +136,7 @@ public class JobFutureVisitTest {
     }, Jobs.newInput()
         .withRunContext(RunContexts.empty())
         .withName("mutex2_job2")
-        .withSchedulingSemaphore(m_mutex2)
+        .withExecutionSemaphore(m_mutex2)
         .withExecutionHint(JOB_IDENTIFIER)
         .withExceptionHandling(null, false));
 
@@ -155,7 +155,7 @@ public class JobFutureVisitTest {
     }, Jobs.newInput()
         .withRunContext(RunContexts.empty())
         .withName("mutex2_job3")
-        .withSchedulingSemaphore(m_mutex2)
+        .withExecutionSemaphore(m_mutex2)
         .withExecutionHint(JOB_IDENTIFIER)
         .withExceptionHandling(null, false));
 
@@ -170,7 +170,7 @@ public class JobFutureVisitTest {
         .withRunContext(RunContexts.empty())
         .withName("mutex2_job4")
         .withExecutionHint(JOB_IDENTIFIER)
-        .withSchedulingSemaphore(m_mutex2));
+        .withExecutionSemaphore(m_mutex2));
 
     // =========
     // SESSION 3 (JOB-1)
@@ -184,7 +184,7 @@ public class JobFutureVisitTest {
     }, Jobs.newInput()
         .withRunContext(RunContexts.empty())
         .withName("mutex3_job1")
-        .withSchedulingSemaphore(m_mutex3)
+        .withExecutionSemaphore(m_mutex3)
         .withExecutionHint(JOB_IDENTIFIER)
         .withExceptionHandling(null, false));
 

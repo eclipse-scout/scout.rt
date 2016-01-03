@@ -20,7 +20,7 @@ import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.job.IFuture;
-import org.eclipse.scout.rt.platform.job.ISchedulingSemaphore;
+import org.eclipse.scout.rt.platform.job.IExecutionSemaphore;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
@@ -43,8 +43,8 @@ public class FutureFilterBuilderTest {
 
   @Test
   public void test() {
-    ISchedulingSemaphore mutex1 = Jobs.newSchedulingSemaphore(1);
-    ISchedulingSemaphore mutex2 = Jobs.newSchedulingSemaphore(1);
+    IExecutionSemaphore mutex1 = Jobs.newExecutionSemaphore(1);
+    IExecutionSemaphore mutex2 = Jobs.newExecutionSemaphore(1);
 
     IFuture<?> future1 = Jobs.schedule(mock(IRunnable.class), Jobs.newInput()
         .withName("A")
@@ -53,13 +53,13 @@ public class FutureFilterBuilderTest {
     IFuture<?> future2 = Jobs.schedule(mock(IRunnable.class), Jobs.newInput()
         .withName("B")
         .withRunContext(RunContexts.empty())
-        .withSchedulingSemaphore(mutex1)
+        .withExecutionSemaphore(mutex1)
         .withExecutionHint(JOB_IDENTIFIER));
 
     IFuture<?> future3 = Jobs.schedule(mock(IRunnable.class), Jobs.newInput()
         .withName("C")
         .withRunContext(new P_RunContext())
-        .withSchedulingSemaphore(mutex1)
+        .withExecutionSemaphore(mutex1)
         .withExecutionHint(JOB_IDENTIFIER));
 
     IFuture<?> future4 = Jobs.schedule(mock(IRunnable.class), Jobs.newInput()
@@ -83,23 +83,23 @@ public class FutureFilterBuilderTest {
 
     IFuture<?> future7 = Jobs.schedule(mock(IRunnable.class), Jobs.newInput()
         .withName("F")
-        .withSchedulingSemaphore(mutex1)
+        .withExecutionSemaphore(mutex1)
         .withExecutionHint(JOB_IDENTIFIER));
 
     IFuture<?> future8 = Jobs.schedule(mock(IRunnable.class), Jobs.newInput()
         .withName("G")
-        .withSchedulingSemaphore(mutex1)
+        .withExecutionSemaphore(mutex1)
         .withExecutionHint(JOB_IDENTIFIER));
 
     IFuture<?> future9 = Jobs.schedule(mock(IRunnable.class), Jobs.newInput()
         .withName("H")
-        .withSchedulingSemaphore(mutex2)
+        .withExecutionSemaphore(mutex2)
         .withExecutionHint(JOB_IDENTIFIER));
 
     IFuture<?> future10 = Jobs.schedule(mock(IRunnable.class), Jobs.newInput()
         .withName("I")
         .withRunContext(new P_RunContext())
-        .withSchedulingSemaphore(mutex1)
+        .withExecutionSemaphore(mutex1)
         .withExecutionHint(JOB_IDENTIFIER));
 
     assertTrue(new FutureFilterBuilder().toFilter().accept(future1));
@@ -148,7 +148,7 @@ public class FutureFilterBuilderTest {
     filter = new FutureFilterBuilder()
         .andMatchFuture(future1, future2, future3, future4, future8, future9, future10)
         .andAreSingleExecuting()
-        .andMatchSchedulingSemaphore(mutex1)
+        .andMatchExecutionSemaphore(mutex1)
         .toFilter();
     assertFalse(filter.accept(future1));
     assertTrue(filter.accept(future2));
@@ -165,7 +165,7 @@ public class FutureFilterBuilderTest {
     filter = new FutureFilterBuilder()
         .andMatchFuture(future1, future2, future3, future4, future8, future9, future10)
         .andAreSingleExecuting()
-        .andMatchSchedulingSemaphore(mutex1)
+        .andMatchExecutionSemaphore(mutex1)
         .andMatchRunContext(RunContext.class)
         .toFilter();
     assertFalse(filter.accept(future1));
@@ -183,7 +183,7 @@ public class FutureFilterBuilderTest {
     filter = new FutureFilterBuilder()
         .andMatchFuture(future1, future2, future3, future4, future8, future9, future10)
         .andAreSingleExecuting()
-        .andMatchSchedulingSemaphore(mutex1)
+        .andMatchExecutionSemaphore(mutex1)
         .andMatchRunContext(P_RunContext.class)
         .toFilter();
     assertFalse(filter.accept(future1));
@@ -201,7 +201,7 @@ public class FutureFilterBuilderTest {
     filter = new FutureFilterBuilder()
         .andMatchFuture(future1, future2, future3, future4, future8, future9, future10)
         .andAreSingleExecuting()
-        .andMatchSchedulingSemaphore(mutex1)
+        .andMatchExecutionSemaphore(mutex1)
         .andMatchRunContext(P_RunContext.class)
         .andMatchName("A", "B", "C")
         .toFilter();
@@ -220,7 +220,7 @@ public class FutureFilterBuilderTest {
     filter = new FutureFilterBuilder()
         .andMatchFuture(future1, future2, future3, future4, future8, future9, future10)
         .andAreSingleExecuting()
-        .andMatchSchedulingSemaphore(mutex1)
+        .andMatchExecutionSemaphore(mutex1)
         .andMatchRunContext(P_RunContext.class)
         .andMatchName("D", "E", "F")
         .toFilter();
@@ -238,7 +238,7 @@ public class FutureFilterBuilderTest {
 
   @Test
   public void testFutureExclusion() {
-    ISchedulingSemaphore mutex = Jobs.newSchedulingSemaphore(1);
+    IExecutionSemaphore mutex = Jobs.newExecutionSemaphore(1);
 
     IFuture<?> future1 = Jobs.schedule(mock(IRunnable.class), Jobs.newInput()
         .withExecutionHint(JOB_IDENTIFIER));
@@ -257,23 +257,23 @@ public class FutureFilterBuilderTest {
 
     IFuture<?> future6 = Jobs.schedule(mock(IRunnable.class), Jobs.newInput()
         .withExecutionHint(JOB_IDENTIFIER)
-        .withSchedulingSemaphore(mutex));
+        .withExecutionSemaphore(mutex));
 
     IFuture<?> future7 = Jobs.schedule(mock(IRunnable.class), Jobs.newInput()
         .withExecutionHint(JOB_IDENTIFIER)
-        .withSchedulingSemaphore(mutex));
+        .withExecutionSemaphore(mutex));
 
     IFuture<?> future8 = Jobs.schedule(mock(IRunnable.class), Jobs.newInput()
         .withExecutionHint(JOB_IDENTIFIER)
-        .withSchedulingSemaphore(mutex));
+        .withExecutionSemaphore(mutex));
 
     IFuture<?> future9 = Jobs.schedule(mock(IRunnable.class), Jobs.newInput()
         .withExecutionHint(JOB_IDENTIFIER)
-        .withSchedulingSemaphore(mutex));
+        .withExecutionSemaphore(mutex));
 
     IFuture<?> future10 = Jobs.schedule(mock(IRunnable.class), Jobs.newInput()
         .withExecutionHint(JOB_IDENTIFIER)
-        .withSchedulingSemaphore(mutex));
+        .withExecutionSemaphore(mutex));
 
     // One future exclusion with not other criteria
     IFilter<IFuture<?>> filter = Jobs.newFutureFilterBuilder()
@@ -305,7 +305,7 @@ public class FutureFilterBuilderTest {
 
     // One future exclusion with other criterion (mutex)
     filter = Jobs.newFutureFilterBuilder()
-        .andMatchSchedulingSemaphore(mutex)
+        .andMatchExecutionSemaphore(mutex)
         .andMatchNotFuture(future8).toFilter();
     assertFalse(filter.accept(future1));
     assertFalse(filter.accept(future2));
@@ -320,7 +320,7 @@ public class FutureFilterBuilderTest {
 
     // Multiple future exclusion with other criterion (mutex)
     filter = Jobs.newFutureFilterBuilder()
-        .andMatchSchedulingSemaphore(mutex)
+        .andMatchExecutionSemaphore(mutex)
         .andMatchNotFuture(future8, future9).toFilter();
     assertFalse(filter.accept(future1));
     assertFalse(filter.accept(future2));

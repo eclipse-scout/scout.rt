@@ -10,7 +10,7 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.rt.platform.job.IFuture;
-import org.eclipse.scout.rt.platform.job.ISchedulingSemaphore;
+import org.eclipse.scout.rt.platform.job.IExecutionSemaphore;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
@@ -25,7 +25,7 @@ public class PermitAcquisitionOrderTest {
     final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
     final String jobIdentifier = UUID.randomUUID().toString();
 
-    ISchedulingSemaphore semaphore = Jobs.newSchedulingSemaphore(1);
+    IExecutionSemaphore semaphore = Jobs.newExecutionSemaphore(1);
 
     final Date date = new Date(System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(2));
 
@@ -39,7 +39,7 @@ public class PermitAcquisitionOrderTest {
         }
       }, Jobs.newInput()
           .withName("job-{}", i)
-          .withSchedulingSemaphore(semaphore)
+          .withExecutionSemaphore(semaphore)
           .withExecutionTrigger(Jobs.newExecutionTrigger()
               .withStartAt(date))
           .withExecutionHint(jobIdentifier));

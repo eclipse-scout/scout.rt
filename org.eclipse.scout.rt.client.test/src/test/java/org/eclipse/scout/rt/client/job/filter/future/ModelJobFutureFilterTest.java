@@ -32,10 +32,10 @@ public class ModelJobFutureFilterTest {
   @Test
   public void test() {
     IClientSession session1 = mock(IClientSession.class);
-    when(session1.getModelJobSemaphore()).thenReturn(Jobs.newSchedulingSemaphore(1));
+    when(session1.getModelJobSemaphore()).thenReturn(Jobs.newExecutionSemaphore(1));
 
     IClientSession session2 = mock(IClientSession.class);
-    when(session2.getModelJobSemaphore()).thenReturn(Jobs.newSchedulingSemaphore(1));
+    when(session2.getModelJobSemaphore()).thenReturn(Jobs.newExecutionSemaphore(1));
 
     IFilter<IFuture<?>> filter = ModelJobFutureFilter.INSTANCE;
 
@@ -60,24 +60,24 @@ public class ModelJobFutureFilterTest {
     // not a model job (wrong mutex type)
     assertFalse(filter.accept(Jobs.schedule(mock(IRunnable.class), Jobs.newInput()
         .withRunContext(ClientRunContexts.empty().withSession(session1, false))
-        .withSchedulingSemaphore(Jobs.newSchedulingSemaphore(1)))));
+        .withExecutionSemaphore(Jobs.newExecutionSemaphore(1)))));
 
     // not a model job (different session on ClientRunContext and mutex)
     assertFalse(filter.accept(Jobs.schedule(mock(IRunnable.class), Jobs.newInput()
         .withRunContext(ClientRunContexts.empty()
             .withSession(session1, false))
-        .withSchedulingSemaphore(session2.getModelJobSemaphore()))));
+        .withExecutionSemaphore(session2.getModelJobSemaphore()))));
 
     // not a model job (no session on ClientRunContext)
     assertFalse(filter.accept(Jobs.schedule(mock(IRunnable.class), Jobs.newInput()
         .withRunContext(ClientRunContexts.empty()
             .withSession(null, false))
-        .withSchedulingSemaphore(session1.getModelJobSemaphore()))));
+        .withExecutionSemaphore(session1.getModelJobSemaphore()))));
 
     // this is a model job (same session on ClientRunContext and mutex)
     assertTrue(filter.accept(Jobs.schedule(mock(IRunnable.class), Jobs.newInput()
         .withRunContext(ClientRunContexts.empty()
             .withSession(session1, false))
-        .withSchedulingSemaphore(session1.getModelJobSemaphore()))));
+        .withExecutionSemaphore(session1.getModelJobSemaphore()))));
   }
 }

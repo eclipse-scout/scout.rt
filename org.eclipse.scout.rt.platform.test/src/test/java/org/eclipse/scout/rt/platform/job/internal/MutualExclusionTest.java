@@ -25,10 +25,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.scout.rt.platform.job.IFuture;
-import org.eclipse.scout.rt.platform.job.ISchedulingSemaphore;
+import org.eclipse.scout.rt.platform.job.IExecutionSemaphore;
 import org.eclipse.scout.rt.platform.job.Jobs;
-import org.eclipse.scout.rt.platform.job.internal.SchedulingSemaphore.IPermitAcquiredCallback;
-import org.eclipse.scout.rt.platform.job.internal.SchedulingSemaphore.QueuePosition;
+import org.eclipse.scout.rt.platform.job.internal.ExecutionSemaphore.IPermitAcquiredCallback;
+import org.eclipse.scout.rt.platform.job.internal.ExecutionSemaphore.QueuePosition;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.InterruptedException;
@@ -40,7 +40,7 @@ import org.junit.Test;
 
 public class MutualExclusionTest {
 
-  private SchedulingSemaphore m_mutex;
+  private ExecutionSemaphore m_mutex;
 
   private IFuture<?> m_task1;
   private IFuture<?> m_task2;
@@ -49,36 +49,36 @@ public class MutualExclusionTest {
 
   @Before
   public void before() {
-    m_mutex = (SchedulingSemaphore) Jobs.newSchedulingSemaphore(1);
+    m_mutex = (ExecutionSemaphore) Jobs.newExecutionSemaphore(1);
 
     m_task1 = mock(IFuture.class);
     when(m_task1.getJobInput()).thenReturn(Jobs.newInput()
-        .withSchedulingSemaphore(m_mutex)
+        .withExecutionSemaphore(m_mutex)
         .withName("job-1"));
-    when(m_task1.getSchedulingSemaphore()).thenReturn(m_mutex);
+    when(m_task1.getExecutionSemaphore()).thenReturn(m_mutex);
 
     m_task2 = mock(IFuture.class);
     when(m_task2.getJobInput()).thenReturn(Jobs.newInput()
-        .withSchedulingSemaphore(m_mutex)
+        .withExecutionSemaphore(m_mutex)
         .withName("job-2"));
-    when(m_task2.getSchedulingSemaphore()).thenReturn(m_mutex);
+    when(m_task2.getExecutionSemaphore()).thenReturn(m_mutex);
 
     m_task3 = mock(IFuture.class);
     when(m_task3.getJobInput()).thenReturn(Jobs.newInput()
-        .withSchedulingSemaphore(m_mutex)
+        .withExecutionSemaphore(m_mutex)
         .withName("job-3"));
-    when(m_task3.getSchedulingSemaphore()).thenReturn(m_mutex);
+    when(m_task3.getExecutionSemaphore()).thenReturn(m_mutex);
 
     m_task4 = mock(IFuture.class);
     when(m_task4.getJobInput()).thenReturn(Jobs.newInput()
-        .withSchedulingSemaphore(null)
+        .withExecutionSemaphore(null)
         .withName("job-2"));
-    when(m_task4.getSchedulingSemaphore()).thenReturn(null);
+    when(m_task4.getExecutionSemaphore()).thenReturn(null);
   }
 
   @Test(expected = AssertionException.class)
   public void testWrongMutexType() {
-    Jobs.schedule(mock(IRunnable.class), Jobs.newInput().withSchedulingSemaphore(mock(ISchedulingSemaphore.class)));
+    Jobs.schedule(mock(IRunnable.class), Jobs.newInput().withExecutionSemaphore(mock(IExecutionSemaphore.class)));
   }
 
   @Test(expected = AssertionException.class)
@@ -96,7 +96,7 @@ public class MutualExclusionTest {
    */
   @Test(timeout = 1000)
   public void testAcquisition1() {
-    SchedulingSemaphore mutex = (SchedulingSemaphore) m_task1.getSchedulingSemaphore();
+    ExecutionSemaphore mutex = (ExecutionSemaphore) m_task1.getExecutionSemaphore();
 
     assertEquals(0, mutex.getCompetitorCount());
 
@@ -126,7 +126,7 @@ public class MutualExclusionTest {
    */
   @Test(timeout = 1000)
   public void testAcquisition2() {
-    SchedulingSemaphore mutex = (SchedulingSemaphore) m_task1.getSchedulingSemaphore();
+    ExecutionSemaphore mutex = (ExecutionSemaphore) m_task1.getExecutionSemaphore();
 
     assertEquals(0, mutex.getCompetitorCount());
 
@@ -167,7 +167,7 @@ public class MutualExclusionTest {
    */
   @Test(timeout = 1000)
   public void testAcquisition3() {
-    SchedulingSemaphore mutex = (SchedulingSemaphore) m_task1.getSchedulingSemaphore();
+    ExecutionSemaphore mutex = (ExecutionSemaphore) m_task1.getExecutionSemaphore();
 
     assertEquals(0, mutex.getCompetitorCount());
 
@@ -214,7 +214,7 @@ public class MutualExclusionTest {
    */
   @Test(timeout = 5000)
   public void testAcquisition4() {
-    final SchedulingSemaphore mutex = (SchedulingSemaphore) m_task1.getSchedulingSemaphore();
+    final ExecutionSemaphore mutex = (ExecutionSemaphore) m_task1.getExecutionSemaphore();
 
     assertEquals(0, mutex.getCompetitorCount());
 
@@ -261,7 +261,7 @@ public class MutualExclusionTest {
    */
   @Test(timeout = 5_000)
   public void testAcquisition5() throws java.lang.InterruptedException {
-    final SchedulingSemaphore mutex = (SchedulingSemaphore) m_task1.getSchedulingSemaphore();
+    final ExecutionSemaphore mutex = (ExecutionSemaphore) m_task1.getExecutionSemaphore();
 
     assertEquals(0, mutex.getCompetitorCount());
 

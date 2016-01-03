@@ -17,7 +17,7 @@ import org.eclipse.scout.rt.platform.util.concurrent.TimeoutException;
 
 /**
  * Use this object to put the current thread into waiting mode until this condition falls. If getting blocked and the
- * current job is assigned to a {@link ISchedulingSemaphore}, the job's permit is released and passed to the next
+ * current job is assigned to an {@link IExecutionSemaphore}, the job's permit is released and passed to the next
  * competing job of that same semaphore while being blocked.
  * <p>
  * This condition can be used across multiple threads to wait for the same condition. Also, this condition is reusable
@@ -53,7 +53,7 @@ public interface IBlockingCondition {
    * current thread becomes disabled for thread scheduling purposes and lies dormant. This method returns immediately,
    * if this blocking condition is not blocking at the time of invocation.
    * <p>
-   * If invoked from a job, and this job is assigned to a {@link ISchedulingSemaphore}, the job's permit is released and
+   * If invoked from a job, and this job is assigned to an {@link IExecutionSemaphore}, the job's permit is released and
    * passed to the next competing job of that same semaphore while being blocked.
    *
    * @param executionHints
@@ -62,7 +62,7 @@ public interface IBlockingCondition {
    * @throws InterruptedException
    *           if the current thread was interrupted while waiting.<br/>
    *           But, even if not waiting anymore, the blocking condition might still be in <em>blocking state</em>. Also,
-   *           if the job is assigned to a {@link ISchedulingSemaphore}, a permit was not acquired, meaning that the job
+   *           if the job is assigned to an {@link IExecutionSemaphore}, a permit was not acquired, meaning that the job
    *           should terminate its work or waiting anew for the condition to fall.
    */
   void waitFor(String... executionHints);
@@ -72,7 +72,7 @@ public interface IBlockingCondition {
    * unblocked. Thereto, the current thread becomes disabled for thread scheduling purposes and lies dormant. This
    * method returns immediately, if this blocking condition is not blocking at the time of invocation.
    * <p>
-   * If invoked from a job, and this job is controlled by a {@link ISchedulingSemaphore}, the job's permit is released
+   * If invoked from a job, and this job is controlled by an {@link IExecutionSemaphore}, the job's permit is released
    * and passed to the next competing job of that same semaphore while being blocked.
    *
    * @param timeout
@@ -85,12 +85,12 @@ public interface IBlockingCondition {
    * @throws InterruptedException
    *           if the current thread was interrupted while waiting.<br/>
    *           But, even if not waiting anymore, the blocking condition might still be in <em>blocking state</em>. Also,
-   *           if the job is assigned to a {@link ISchedulingSemaphore}, a permit was not acquired, meaning that the job
+   *           if the job is assigned to an {@link IExecutionSemaphore}, a permit was not acquired, meaning that the job
    *           should terminate its work or waiting anew for the condition to fall.
    * @throws TimeoutException
    *           if the wait timed out.<br/>
    *           But, even if not waiting anymore, the blocking condition might still be in <em>blocking state</em>. Also,
-   *           if the job belongs to a {@link ISchedulingSemaphore}, a permit was not acquired, meaning that the job
+   *           if the job belongs to an {@link IExecutionSemaphore}, a permit was not acquired, meaning that the job
    *           should terminate its work or waiting anew for the condition to fall.
    */
   void waitFor(long timeout, TimeUnit unit, String... executionHints);

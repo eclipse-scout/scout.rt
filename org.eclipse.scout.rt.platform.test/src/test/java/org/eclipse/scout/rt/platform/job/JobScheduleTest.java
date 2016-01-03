@@ -417,7 +417,7 @@ public class JobScheduleTest {
 
   @Test
   public void testScheduleDelayedWithMutex() {
-    final ISchedulingSemaphore mutex = Jobs.newSchedulingSemaphore(1);
+    final IExecutionSemaphore mutex = Jobs.newExecutionSemaphore(1);
 
     IFuture<String> future1 = Jobs.getJobManager().schedule(new Callable<String>() {
 
@@ -425,7 +425,7 @@ public class JobScheduleTest {
       public String call() throws Exception {
         return "job-1";
       }
-    }, Jobs.newInput().withSchedulingSemaphore(mutex));
+    }, Jobs.newInput().withExecutionSemaphore(mutex));
 
     IFuture<String> future2 = Jobs.getJobManager().schedule(new Callable<String>() {
 
@@ -434,7 +434,7 @@ public class JobScheduleTest {
         return "job-2";
       }
     }, Jobs.newInput()
-        .withSchedulingSemaphore(mutex)
+        .withExecutionSemaphore(mutex)
         .withExecutionTrigger(Jobs.newExecutionTrigger()
             .withStartIn(500, TimeUnit.MILLISECONDS)));
 
@@ -444,7 +444,7 @@ public class JobScheduleTest {
 
   @Test
   public void testScheduleWithTimeoutWithMutex() {
-    final ISchedulingSemaphore mutex = Jobs.newSchedulingSemaphore(1);
+    final IExecutionSemaphore mutex = Jobs.newExecutionSemaphore(1);
 
     final BlockingCountDownLatch latch = new BlockingCountDownLatch(1);
 
@@ -457,7 +457,7 @@ public class JobScheduleTest {
       }
     }, Jobs.newInput()
         .withRunContext(RunContexts.empty())
-        .withSchedulingSemaphore(mutex)
+        .withExecutionSemaphore(mutex)
         .withExceptionHandling(null, false));
 
     IFuture<String> future2 = Jobs.getJobManager().schedule(new Callable<String>() {
@@ -468,7 +468,7 @@ public class JobScheduleTest {
       }
     }, Jobs.newInput()
         .withRunContext(RunContexts.empty())
-        .withSchedulingSemaphore(mutex));
+        .withExecutionSemaphore(mutex));
 
     try {
       assertEquals("job-2", future2.awaitDoneAndGet(2, TimeUnit.SECONDS));

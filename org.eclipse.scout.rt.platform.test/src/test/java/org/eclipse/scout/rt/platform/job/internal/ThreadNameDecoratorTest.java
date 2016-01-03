@@ -19,7 +19,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
-import org.eclipse.scout.rt.platform.job.ISchedulingSemaphore;
+import org.eclipse.scout.rt.platform.job.IExecutionSemaphore;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.testing.platform.job.JobTestUtil;
@@ -54,7 +54,7 @@ public class ThreadNameDecoratorTest {
     final BlockingCountDownLatch latch1 = new BlockingCountDownLatch(1);
     final BlockingCountDownLatch latch2 = new BlockingCountDownLatch(1);
 
-    ISchedulingSemaphore semaphore = Jobs.newSchedulingSemaphore(1);
+    IExecutionSemaphore semaphore = Jobs.newExecutionSemaphore(1);
     Jobs.schedule(new IRunnable() {
 
       @Override
@@ -65,7 +65,7 @@ public class ThreadNameDecoratorTest {
         latch2.countDownAndBlock();
       }
     }, Jobs.newInput()
-        .withSchedulingSemaphore(semaphore)
+        .withExecutionSemaphore(semaphore)
         .withThreadName("test-thread")
         .withName("job-1"));
 

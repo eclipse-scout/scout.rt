@@ -42,7 +42,7 @@ public class ModelJobsTest {
   @Before
   public void before() {
     m_clientSession = mock(IClientSession.class);
-    when(m_clientSession.getModelJobSemaphore()).thenReturn(Jobs.newSchedulingSemaphore(1));
+    when(m_clientSession.getModelJobSemaphore()).thenReturn(Jobs.newExecutionSemaphore(1));
   }
 
   @After
@@ -53,10 +53,10 @@ public class ModelJobsTest {
   @Test
   public void testIsModelJob() {
     IClientSession session1 = mock(IClientSession.class);
-    when(session1.getModelJobSemaphore()).thenReturn(Jobs.newSchedulingSemaphore(1));
+    when(session1.getModelJobSemaphore()).thenReturn(Jobs.newExecutionSemaphore(1));
 
     IClientSession session2 = mock(IClientSession.class);
-    when(session2.getModelJobSemaphore()).thenReturn(Jobs.newSchedulingSemaphore(1));
+    when(session2.getModelJobSemaphore()).thenReturn(Jobs.newExecutionSemaphore(1));
 
     // not a model job (no Future)
     assertFalse(ModelJobs.isModelJob(null));
@@ -79,34 +79,34 @@ public class ModelJobsTest {
     // not a model job (wrong mutex type)
     assertFalse(ModelJobs.isModelJob(Jobs.schedule(mock(IRunnable.class), Jobs.newInput()
         .withRunContext(ClientRunContexts.empty().withSession(session1, false))
-        .withSchedulingSemaphore(Jobs.newSchedulingSemaphore(1)))));
+        .withExecutionSemaphore(Jobs.newExecutionSemaphore(1)))));
 
     // not a model job (different session on ClientRunContext and mutex)
     assertFalse(ModelJobs.isModelJob(Jobs.schedule(mock(IRunnable.class), Jobs.newInput()
         .withRunContext(ClientRunContexts.empty()
             .withSession(session1, false))
-        .withSchedulingSemaphore(session2.getModelJobSemaphore()))));
+        .withExecutionSemaphore(session2.getModelJobSemaphore()))));
 
     // not a model job (no session on ClientRunContext)
     assertFalse(ModelJobs.isModelJob(Jobs.schedule(mock(IRunnable.class), Jobs.newInput()
         .withRunContext(ClientRunContexts.empty()
             .withSession(null, false))
-        .withSchedulingSemaphore(session1.getModelJobSemaphore()))));
+        .withExecutionSemaphore(session1.getModelJobSemaphore()))));
 
     // this is a model job (same session on ClientRunContext and mutex)
     assertTrue(ModelJobs.isModelJob(Jobs.schedule(mock(IRunnable.class), Jobs.newInput()
         .withRunContext(ClientRunContexts.empty()
             .withSession(session1, false))
-        .withSchedulingSemaphore(session1.getModelJobSemaphore()))));
+        .withExecutionSemaphore(session1.getModelJobSemaphore()))));
   }
 
   @Test
   public void testIsModelThread() {
     final IClientSession clientSession1 = mock(IClientSession.class);
-    when(clientSession1.getModelJobSemaphore()).thenReturn(Jobs.newSchedulingSemaphore(1));
+    when(clientSession1.getModelJobSemaphore()).thenReturn(Jobs.newExecutionSemaphore(1));
 
     final IClientSession clientSession2 = mock(IClientSession.class);
-    when(clientSession2.getModelJobSemaphore()).thenReturn(Jobs.newSchedulingSemaphore(1));
+    when(clientSession2.getModelJobSemaphore()).thenReturn(Jobs.newExecutionSemaphore(1));
 
     ModelJobs.schedule(new IRunnable() {
 
@@ -176,7 +176,7 @@ public class ModelJobsTest {
 
     assertSame(runContext, ModelJobs.newInput(runContext).getRunContext());
     assertEquals("scout-model-thread", ModelJobs.newInput(runContext).getThreadName());
-    assertSame(m_clientSession.getModelJobSemaphore(), ModelJobs.newInput(runContext).getSchedulingSemaphore());
+    assertSame(m_clientSession.getModelJobSemaphore(), ModelJobs.newInput(runContext).getExecutionSemaphore());
   }
 
   @Test(expected = AssertionException.class)
