@@ -15,7 +15,6 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunContexts;
@@ -32,6 +31,7 @@ import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.quartz.SimpleScheduleBuilder;
 
 @RunWith(PlatformTestRunner.class)
 public class JobEventFilterBuilderTest {
@@ -68,19 +68,22 @@ public class JobEventFilterBuilderTest {
 
     IFuture<?> future4 = Jobs.schedule(mock(IRunnable.class), Jobs.newInput()
         .withName("D")
-        .withPeriodicExecutionAtFixedRate(1, TimeUnit.SECONDS)
-        .withExecutionHint(JOB_IDENTIFIER));
+        .withExecutionHint(JOB_IDENTIFIER)
+        .withExecutionTrigger(Jobs.newExecutionTrigger()
+            .withSchedule(SimpleScheduleBuilder.repeatSecondlyForever())));
 
     IFuture<?> future5 = Jobs.schedule(mock(IRunnable.class), Jobs.newInput()
         .withName("E")
-        .withPeriodicExecutionAtFixedRate(1, TimeUnit.SECONDS)
-        .withExecutionHint(JOB_IDENTIFIER));
+        .withExecutionHint(JOB_IDENTIFIER)
+        .withExecutionTrigger(Jobs.newExecutionTrigger()
+            .withSchedule(SimpleScheduleBuilder.repeatSecondlyForever())));
 
     IFuture<?> future6 = Jobs.schedule(mock(IRunnable.class), Jobs.newInput()
         .withName("E")
         .withRunContext(new P_RunContext())
-        .withPeriodicExecutionAtFixedRate(1, TimeUnit.SECONDS)
-        .withExecutionHint(JOB_IDENTIFIER));
+        .withExecutionHint(JOB_IDENTIFIER)
+        .withExecutionTrigger(Jobs.newExecutionTrigger()
+            .withSchedule(SimpleScheduleBuilder.repeatSecondlyForever())));
 
     IFuture<?> future7 = Jobs.schedule(mock(IRunnable.class), Jobs.newInput()
         .withName("F")
@@ -265,7 +268,7 @@ public class JobEventFilterBuilderTest {
         .withSchedulingSemaphore(mutex)
         .withExecutionHint(JOB_IDENTIFIER));
 
-    // One future exclusion with not other criteria
+    // One future exclusion with no other criteria
     IFilter<JobEvent> filter = Jobs.newEventFilterBuilder()
         .andMatchNotFuture(future8).toFilter();
     assertTrue(filter.accept(newJobStateChangedEvent(future1)));
@@ -279,7 +282,7 @@ public class JobEventFilterBuilderTest {
     assertTrue(filter.accept(newJobStateChangedEvent(future9)));
     assertTrue(filter.accept(newJobStateChangedEvent(future10)));
 
-    // Multiple future exclusions with not other criteria
+    // Multiple future exclusions with no other criteria
     filter = Jobs.newEventFilterBuilder()
         .andMatchNotFuture(future8, future9).toFilter();
     assertTrue(filter.accept(newJobStateChangedEvent(future1)));

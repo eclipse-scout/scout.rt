@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.config;
 
+import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.job.internal.FutureSet;
 
 public final class PlatformConfigProperties {
@@ -87,7 +88,26 @@ public final class PlatformConfigProperties {
 
     @Override
     protected Integer getDefaultValue() {
-      return Integer.valueOf(10);
+      return Integer.valueOf(25);
+    }
+  }
+
+  /**
+   * Specifies whether all threads of the core-pool should be started upon job manager startup, so that they are idle
+   * waiting for work.
+   *
+   * @see JobManagerCorePoolSizeProperty
+   */
+  public static class JobManagerPrestartCoreThreadsProperty extends AbstractBooleanConfigProperty {
+
+    @Override
+    public String getKey() {
+      return "scout.jobmanager.prestartCoreThreads";
+    }
+
+    @Override
+    protected Boolean getDefaultValue() {
+      return !Platform.get().inDevelopmentMode();
     }
   }
 
@@ -137,23 +157,6 @@ public final class PlatformConfigProperties {
     @Override
     protected Boolean getDefaultValue() {
       return Boolean.FALSE;
-    }
-  }
-
-  /**
-   * The number of dispatcher threads to be used to dispatch delayed jobs, meaning jobs scheduled with a delay or
-   * periodic jobs.
-   */
-  public static class JobManagerDispatcherThreadCountProperty extends AbstractPositiveIntegerConfigProperty {
-
-    @Override
-    public String getKey() {
-      return "scout.jobmanager.dispatcherThreadCount";
-    }
-
-    @Override
-    protected Integer getDefaultValue() {
-      return Integer.valueOf(1);
     }
   }
 

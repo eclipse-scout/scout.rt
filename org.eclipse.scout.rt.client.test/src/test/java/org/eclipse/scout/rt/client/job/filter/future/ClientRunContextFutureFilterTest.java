@@ -36,6 +36,7 @@ import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.quartz.SimpleScheduleBuilder;
 
 @RunWith(PlatformTestRunner.class)
 public class ClientRunContextFutureFilterTest {
@@ -118,10 +119,11 @@ public class ClientRunContextFutureFilterTest {
   }
 
   @Test
-  public void testPeriodic() {
+  public void testRepetitive() {
     IFuture<Void> clientJobFuture = Jobs.schedule(mock(IRunnable.class), Jobs.newInput()
         .withRunContext(ClientRunContexts.empty().withSession(m_clientSession1, true))
-        .withPeriodicExecutionAtFixedRate(1, TimeUnit.SECONDS));
+        .withExecutionTrigger(Jobs.newExecutionTrigger()
+            .withSchedule(SimpleScheduleBuilder.repeatSecondlyForever())));
 
     assertTrue(Jobs.newFutureFilterBuilder()
         .andMatchRunContext(ClientRunContext.class)
@@ -130,7 +132,7 @@ public class ClientRunContextFutureFilterTest {
 
     assertTrue(Jobs.newFutureFilterBuilder()
         .andMatchRunContext(ClientRunContext.class)
-        .andArePeriodicExecuting()
+        .andAreNotSingleExecuting()
         .toFilter()
         .accept(clientJobFuture));
 
@@ -141,14 +143,15 @@ public class ClientRunContextFutureFilterTest {
         .accept(clientJobFuture));
 
     IFuture<Void> modelJobFuture = ModelJobs.schedule(mock(IRunnable.class), ModelJobs.newInput(ClientRunContexts.empty().withSession(m_clientSession1, true))
-        .withPeriodicExecutionAtFixedRate(1, TimeUnit.SECONDS));
+        .withExecutionTrigger(Jobs.newExecutionTrigger()
+            .withSchedule(SimpleScheduleBuilder.repeatSecondlyForever())));
 
     assertTrue(ModelJobs.newFutureFilterBuilder()
         .toFilter()
         .accept(modelJobFuture));
 
     assertTrue(ModelJobs.newFutureFilterBuilder()
-        .andArePeriodicExecuting()
+        .andAreNotSingleExecuting()
         .toFilter()
         .accept(modelJobFuture));
 

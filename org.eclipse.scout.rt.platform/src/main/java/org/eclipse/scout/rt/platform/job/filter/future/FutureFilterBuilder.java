@@ -23,7 +23,6 @@ import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.filter.NotFilter;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.ISchedulingSemaphore;
-import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.job.JobState;
 
 /**
@@ -157,9 +156,8 @@ public class FutureFilterBuilder {
   }
 
   /**
-   * To match all jobs which are configured to run once.
-   *
-   * @see JobInput#EXECUTION_MODE_SINGLE
+   * To match all jobs which are configured to run once, meaning have just a single execution at a particular moment in
+   * time.
    */
   public FutureFilterBuilder andAreSingleExecuting() {
     andMatch(SingleExecutionFutureFilter.INSTANCE);
@@ -167,13 +165,10 @@ public class FutureFilterBuilder {
   }
 
   /**
-   * To match all jobs which are configured to run periodically.
-   *
-   * @see JobInput#EXECUTION_MODE_PERIODIC_AT_FIXED_RATE
-   * @see JobInput#EXECUTION_MODE_PERIODIC_WITH_FIXED_DELAY
+   * To match all jobs which are configured to run multiple times, meaning which repeat one time at minimum.
    */
-  public FutureFilterBuilder andArePeriodicExecuting() {
-    andMatch(PeriodicExecutionFutureFilter.INSTANCE);
+  public FutureFilterBuilder andAreNotSingleExecuting() {
+    andMatchNot(SingleExecutionFutureFilter.INSTANCE);
     return this;
   }
 

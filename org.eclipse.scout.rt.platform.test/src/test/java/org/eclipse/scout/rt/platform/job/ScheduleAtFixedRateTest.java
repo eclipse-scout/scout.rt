@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.platform.job;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
@@ -27,6 +28,7 @@ import org.eclipse.scout.rt.testing.platform.runner.JUnitExceptionHandler;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.quartz.SimpleScheduleBuilder;
 
 @RunWith(PlatformTestRunner.class)
 public class ScheduleAtFixedRateTest {
@@ -38,9 +40,9 @@ public class ScheduleAtFixedRateTest {
     final AtomicInteger counter = new AtomicInteger();
 
     final int nRuns = 3;
-    long initialDelayNanos = TimeUnit.MILLISECONDS.toNanos(300);
-    long periodNanos = TimeUnit.MILLISECONDS.toNanos(500);
-    long tStartNano = System.nanoTime();
+    long initialDelayMillis = 300;
+    long periodMillis = 500;
+    long tStartMillis = System.currentTimeMillis();
 
     // Schedule a job which runs 'nRuns' times and cancels itself afterwards.
     IFuture<Void> future = Jobs.getJobManager().schedule(new IRunnable() {
@@ -51,13 +53,16 @@ public class ScheduleAtFixedRateTest {
           IFuture.CURRENT.get().cancel(false);
         }
         else {
-          protocol.add(System.nanoTime());
+          protocol.add(System.currentTimeMillis());
         }
       }
     }, Jobs.newInput()
-        .withSchedulingDelay(initialDelayNanos, TimeUnit.NANOSECONDS)
-        .withPeriodicExecutionAtFixedRate(periodNanos, TimeUnit.NANOSECONDS)
-        .withRunContext(RunContexts.empty()));
+        .withRunContext(RunContexts.empty())
+        .withExecutionTrigger(Jobs.newExecutionTrigger()
+            .withStartIn(initialDelayMillis, TimeUnit.MILLISECONDS)
+            .withSchedule(SimpleScheduleBuilder.simpleSchedule()
+                .withIntervalInMilliseconds(TimeUnit.MILLISECONDS.toMillis(periodMillis))
+                .repeatForever())));
 
     // verify
     Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
@@ -66,7 +71,7 @@ public class ScheduleAtFixedRateTest {
     assertEquals(nRuns, counter.get());
     for (int i = 0; i < protocol.size(); i++) {
       Long actualExecutionTime = protocol.get(i);
-      long expectedExecutionTime = tStartNano + initialDelayNanos + i * periodNanos;
+      long expectedExecutionTime = tStartMillis + initialDelayMillis + i * periodMillis;
       long expectedExecutionTimeMin = expectedExecutionTime;
 
       if (actualExecutionTime < expectedExecutionTimeMin) {
@@ -82,9 +87,9 @@ public class ScheduleAtFixedRateTest {
     final AtomicInteger counter = new AtomicInteger();
 
     final int nRuns = 3;
-    long initialDelayNanos = TimeUnit.MILLISECONDS.toNanos(300);
-    long periodNanos = TimeUnit.MILLISECONDS.toNanos(500);
-    long tStartNano = System.nanoTime();
+    long initialDelayMillis = 300;
+    long periodMillis = 500;
+    long tStartMillis = System.currentTimeMillis();
 
     // Schedule a job which runs 'nRuns' times and cancels itself afterwards.
     IFuture<Void> future = Jobs.getJobManager().schedule(new IRunnable() {
@@ -95,14 +100,17 @@ public class ScheduleAtFixedRateTest {
           throw new Exception("blubber");
         }
         else {
-          protocol.add(System.nanoTime());
+          protocol.add(System.currentTimeMillis());
         }
       }
     }, Jobs.newInput()
         .withRunContext(RunContexts.empty())
-        .withSchedulingDelay(initialDelayNanos, TimeUnit.NANOSECONDS)
-        .withPeriodicExecutionAtFixedRate(periodNanos, TimeUnit.NANOSECONDS)
-        .withExceptionHandling(null, false));
+        .withExceptionHandling(null, false)
+        .withExecutionTrigger(Jobs.newExecutionTrigger()
+            .withStartIn(initialDelayMillis, TimeUnit.MILLISECONDS)
+            .withSchedule(SimpleScheduleBuilder.simpleSchedule()
+                .withIntervalInMilliseconds(TimeUnit.MILLISECONDS.toMillis(periodMillis))
+                .repeatForever())));
 
     // verify
     Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
@@ -111,7 +119,7 @@ public class ScheduleAtFixedRateTest {
     assertEquals(nRuns, counter.get());
     for (int i = 0; i < protocol.size(); i++) {
       Long actualExecutionTime = protocol.get(i);
-      long expectedExecutionTime = tStartNano + initialDelayNanos + i * periodNanos;
+      long expectedExecutionTime = tStartMillis + initialDelayMillis + i * periodMillis;
       long expectedExecutionTimeMin = expectedExecutionTime;
 
       if (actualExecutionTime < expectedExecutionTimeMin) {
@@ -127,10 +135,10 @@ public class ScheduleAtFixedRateTest {
     final AtomicInteger counter = new AtomicInteger();
 
     final int nRuns = 3;
-    final long sleepTimeNano = TimeUnit.MILLISECONDS.toNanos(300);
-    long initialDelayNanos = TimeUnit.MILLISECONDS.toNanos(300);
-    long periodNanos = TimeUnit.MILLISECONDS.toNanos(500);
-    long tStartNano = System.nanoTime();
+    final long sleepTimeMillis = 300;
+    long initialDelayMillis = 300;
+    long periodMillis = 500;
+    long tStartMillis = System.currentTimeMillis();
 
     // Schedule a job which runs 'nRuns' times and cancels itself afterwards.
     IFuture<Void> future = Jobs.getJobManager().schedule(new IRunnable() {
@@ -141,15 +149,18 @@ public class ScheduleAtFixedRateTest {
           throw new Exception("blubber");
         }
         else {
-          protocol.add(System.nanoTime());
-          Thread.sleep(TimeUnit.NANOSECONDS.toMillis(sleepTimeNano));
+          protocol.add(System.currentTimeMillis());
+          Thread.sleep(TimeUnit.MILLISECONDS.toMillis(sleepTimeMillis));
         }
       }
     }, Jobs.newInput()
         .withRunContext(RunContexts.empty())
-        .withSchedulingDelay(initialDelayNanos, TimeUnit.NANOSECONDS)
-        .withPeriodicExecutionAtFixedRate(periodNanos, TimeUnit.NANOSECONDS)
-        .withExceptionHandling(null, false));
+        .withExceptionHandling(null, false)
+        .withExecutionTrigger(Jobs.newExecutionTrigger()
+            .withStartIn(initialDelayMillis, TimeUnit.MILLISECONDS)
+            .withSchedule(SimpleScheduleBuilder.simpleSchedule()
+                .withIntervalInMilliseconds(TimeUnit.MILLISECONDS.toMillis(periodMillis))
+                .repeatForever())));
 
     // verify
     Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
@@ -158,7 +169,7 @@ public class ScheduleAtFixedRateTest {
     assertEquals(nRuns, counter.get());
     for (int i = 0; i < protocol.size(); i++) {
       Long actualExecutionTime = protocol.get(i);
-      long expectedExecutionTime = tStartNano + initialDelayNanos + i * periodNanos;
+      long expectedExecutionTime = tStartMillis + initialDelayMillis + i * periodMillis;
       long expectedExecutionTimeMin = expectedExecutionTime;
 
       if (actualExecutionTime < expectedExecutionTimeMin) {
@@ -174,10 +185,10 @@ public class ScheduleAtFixedRateTest {
     final AtomicInteger counter = new AtomicInteger();
 
     final int nRuns = 3;
-    final long sleepTimeNano = TimeUnit.MILLISECONDS.toNanos(1500);
-    long initialDelayNanos = TimeUnit.MILLISECONDS.toNanos(300);
-    long periodNanos = TimeUnit.MILLISECONDS.toNanos(500);
-    long tStartNano = System.nanoTime();
+    final long sleepTimeMillis = 1500;
+    long initialDelayMillis = 300;
+    long periodMillis = 500;
+    long tStartMillis = System.currentTimeMillis();
 
     // Schedule a job which runs 'nRuns' times and cancels itself afterwards.
     IFuture<Void> future = Jobs.getJobManager().schedule(new IRunnable() {
@@ -188,15 +199,18 @@ public class ScheduleAtFixedRateTest {
           throw new Exception("blubber");
         }
         else {
-          protocol.add(System.nanoTime());
-          Thread.sleep(TimeUnit.NANOSECONDS.toMillis(sleepTimeNano));
+          protocol.add(System.currentTimeMillis());
+          Thread.sleep(TimeUnit.MILLISECONDS.toMillis(sleepTimeMillis));
         }
       }
     }, Jobs.newInput()
         .withRunContext(RunContexts.empty())
-        .withSchedulingDelay(initialDelayNanos, TimeUnit.NANOSECONDS)
-        .withPeriodicExecutionAtFixedRate(periodNanos, TimeUnit.NANOSECONDS)
-        .withExceptionHandling(null, false));
+        .withExceptionHandling(null, false)
+        .withExecutionTrigger(Jobs.newExecutionTrigger()
+            .withStartIn(initialDelayMillis, TimeUnit.MILLISECONDS)
+            .withSchedule(SimpleScheduleBuilder.simpleSchedule()
+                .withIntervalInMilliseconds(TimeUnit.MILLISECONDS.toMillis(periodMillis))
+                .repeatForever())));
 
     // verify
     Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
@@ -205,7 +219,7 @@ public class ScheduleAtFixedRateTest {
     assertEquals(nRuns, counter.get());
     for (int i = 0; i < protocol.size(); i++) {
       Long actualExecutionTime = protocol.get(i);
-      long expectedExecutionTime = tStartNano + initialDelayNanos + i * sleepTimeNano;
+      long expectedExecutionTime = tStartMillis + initialDelayMillis + i * sleepTimeMillis;
       long expectedExecutionTimeMin = expectedExecutionTime;
 
       if (actualExecutionTime < expectedExecutionTimeMin) {
@@ -230,9 +244,12 @@ public class ScheduleAtFixedRateTest {
       }
     }, Jobs.newInput()
         .withRunContext(RunContexts.empty())
-        .withPeriodicExecutionAtFixedRate(1, TimeUnit.NANOSECONDS)
-        .withExceptionHandling(null, true/* swallow */ ))
-        .awaitDone();
+        .withExceptionHandling(null, true/* swallow */ )
+        .withExecutionTrigger(Jobs.newExecutionTrigger()
+            .withSchedule(SimpleScheduleBuilder.simpleSchedule()
+                .withIntervalInMilliseconds(1)
+                .repeatForever())))
+        .awaitDone(10, TimeUnit.SECONDS);
     assertEquals(2, counter.get());
   }
 
@@ -252,9 +269,12 @@ public class ScheduleAtFixedRateTest {
       }
     }, Jobs.newInput()
         .withRunContext(RunContexts.empty())
-        .withPeriodicExecutionAtFixedRate(1, TimeUnit.NANOSECONDS)
-        .withExceptionHandling(null, false /* propagated */ ))
-        .awaitDone();
+        .withExceptionHandling(null, false /* propagated */ )
+        .withExecutionTrigger(Jobs.newExecutionTrigger()
+            .withSchedule(SimpleScheduleBuilder.simpleSchedule()
+                .withIntervalInMilliseconds(1)
+                .repeatForever())))
+        .awaitDone(10, TimeUnit.SECONDS);
     assertEquals(1, counter.get());
   }
 
@@ -277,8 +297,49 @@ public class ScheduleAtFixedRateTest {
       }
     }, Jobs.newInput()
         .withRunContext(RunContexts.empty())
-        .withPeriodicExecutionAtFixedRate(1, TimeUnit.NANOSECONDS))
-        .awaitDone();
+        .withExecutionTrigger(Jobs.newExecutionTrigger()
+            .withSchedule(SimpleScheduleBuilder.simpleSchedule()
+                .withIntervalInMilliseconds(1)
+                .repeatForever())))
+        .awaitDone(10, TimeUnit.SECONDS);
     assertEquals(1, counter.get());
+  }
+
+  @Test
+  public void testRepetiveWithTotalCount() {
+    final AtomicInteger counter = new AtomicInteger();
+    Jobs.getJobManager().schedule(new IRunnable() {
+
+      @Override
+      public void run() throws Exception {
+        counter.incrementAndGet();
+      }
+    }, Jobs.newInput()
+        .withExecutionTrigger(Jobs.newExecutionTrigger()
+            .withSchedule(SimpleScheduleBuilder.simpleSchedule()
+                .withIntervalInSeconds(1) // with 1s, no consolidation should be occur.
+                .withRepeatCount(3))))
+        .awaitDone(10, TimeUnit.SECONDS);
+    assertEquals(4, counter.get());
+  }
+
+  @Test
+  public void testRepetiveWithEndTime() {
+    final AtomicInteger counter = new AtomicInteger();
+    Jobs.getJobManager().schedule(new IRunnable() {
+
+      @Override
+      public void run() throws Exception {
+        counter.incrementAndGet();
+      }
+    }, Jobs.newInput()
+        .withExecutionTrigger(Jobs.newExecutionTrigger()
+            .withEndIn(1, TimeUnit.SECONDS)
+            .withSchedule(SimpleScheduleBuilder.simpleSchedule()
+                .withIntervalInMilliseconds(1)
+                .repeatForever())))
+        .awaitDone(10, TimeUnit.SECONDS);
+
+    assertTrue(counter.get() > 10);
   }
 }

@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.platform.job;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
+import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.filter.AlwaysFilter;
 import org.eclipse.scout.rt.platform.filter.AndFilter;
 import org.eclipse.scout.rt.platform.filter.IFilter;
@@ -26,6 +27,7 @@ import org.eclipse.scout.rt.platform.util.concurrent.InterruptedException;
 import org.eclipse.scout.rt.platform.util.concurrent.TimeoutException;
 import org.eclipse.scout.rt.platform.visitor.CollectorVisitor;
 import org.eclipse.scout.rt.platform.visitor.IVisitor;
+import org.quartz.Calendar;
 
 /**
  * Job manager to run tasks in parallel.
@@ -35,17 +37,32 @@ import org.eclipse.scout.rt.platform.visitor.IVisitor;
  * <p>
  * This job manager allows to control the maximal number of jobs running concurrently by assigning a job to a
  * {@link ISchedulingSemaphore}. That way, jobs which are assigned to the same semaphore run concurrently until they
- * reach the concurrency level defined for that semaphore. Subsequent tasks then wait in the queue until a permit
- * becomes available.
+ * reach the concurrency level as defined for that semaphore. Subsequent tasks then wait in a queue until a permit
+ * becomes available. For more information, see {@link JobInput#withSchedulingSemaphore(ISchedulingSemaphore)}.
+ * <p>
+ * As a general rule, jobs compete for an execution permit once being fired by the associated trigger, and in the order
+ * as being scheduled. For example, if scheduling two jobs in a row, they very likely will have the same execution time
+ * (granularity in milliseconds). However, job manager guarantees the first job to compete for an execution permit
+ * before the second job does.
+ * <p>
+ * This job manager supports jobs to be executed some time in the future, or repeatedly based on a schedule. For more
+ * information, see {@link JobInput#withExecutionTrigger(ExecutionTrigger)}.
  *
  * @since 5.1
  */
 public interface IJobManager {
 
   /**
-   * Runs the given {@link IRunnable} asynchronously in another thread at the next reasonable opportunity. The submitter
-   * of the job continues to run in parallel. If the job is assigned to a {@link ISchedulingSemaphore} and the maximal
-   * concurrency level for that semaphore is reached, the job is queued until a permit becomes available.
+   * Runs the given {@link IRunnable} asynchronously in another thread once the associated execution trigger fires,
+   * which depends on both, the trigger's start time and schedule. However, if not set, the job will commence execution
+   * immediately at the next reasonable opportunity. In either case, the submitter of the job continues to run in
+   * parallel.
+   * <p>
+   * If the maximal concurrency level for a semaphore aware job is reached, the job is queued until a permit becomes
+   * available. As a general rule, jobs compete for an execution permit once being fired by the associated trigger, and
+   * in the order as being scheduled. For example, if scheduling two jobs in a row, they very likely will have the same
+   * execution time (granularity in milliseconds). However, job manager guarantees the first job to compete for an
+   * execution permit before the second job does.
    * <p>
    * The job manager will use the {@link JobInput} as given to control job execution.
    * <p>
@@ -63,10 +80,18 @@ public interface IJobManager {
   IFuture<Void> schedule(IRunnable runnable, JobInput input);
 
   /**
-   * Runs the given {@link Callable} asynchronously in another thread at the next reasonable opportunity. The submitter
-   * of the job continues to run in parallel. If the job is assigned to a {@link ISchedulingSemaphore} and the maximal
-   * concurrency level for that semaphore is reached, the job is queued until a permit becomes available. Jobs in the
-   * form of a {@link Callable} typically return a computation result to the submitter.
+   * Runs the given {@link Callable} asynchronously in another thread once the associated execution trigger fires, which
+   * depends on both, the trigger's start time and schedule. However, if not set, the job will commence execution
+   * immediately at the next reasonable opportunity. In either case, the submitter of the job continues to run in
+   * parallel.
+   * <p>
+   * Jobs in the form of a {@link Callable} typically return a computation result to the submitter.
+   * <p>
+   * If the maximal concurrency level for a semaphore aware job is reached, the job is queued until a permit becomes
+   * available. As a general rule, jobs compete for an execution permit once being fired by the associated trigger, and
+   * in the order as being scheduled. For example, if scheduling two jobs in a row, they very likely will have the same
+   * execution time (granularity in milliseconds). However, job manager guarantees the first job to compete for an
+   * execution permit before the second job does.
    * <p>
    * The job manager will use the {@link JobInput} as given to control job execution.
    * <p>
@@ -234,12 +259,6 @@ public interface IJobManager {
   IBlockingCondition newBlockingCondition(boolean blocking);
 
   /**
-   * Interrupts all running tasks and prevents scheduled tasks from running. After having shutdown, this job manager
-   * cannot be used anymore.
-   */
-  void shutdown();
-
-  /**
    * Registers the given listener to be notified about all job lifecycle events. If the listener is already registered,
    * that previous registration is replaced.
    *
@@ -276,4 +295,51 @@ public interface IJobManager {
    *         unregister the listener.
    */
   IJobListenerRegistration addListener(IFilter<JobEvent> filter, IJobListener listener);
+
+  /**
+   * Returns the {@link Calendar} of the specified symbolic name from Quartz Scheduler, or <code>null</code> if not
+   * registered.
+   */
+  Calendar getCalendar(String calendarName);
+
+  /**
+   * Registers the given {@link Calendar} instance to the Quartz Scheduler, so that it can be referenced in execution
+   * triggers via {@link ExecutionTrigger#withModifiedByCalendar(String)}.
+   *
+   * @param calendarName
+   *          the symbolic name to reference the specified calendar.
+   * @param calendar
+   *          the calendar to be registered.
+   * @param replaceIfPresent
+   *          whether to replace an existing calendar. If <code>false</code> and a calendar of the same symbolic name is
+   *          already registered, this method throws an exception.
+   * @param updateExecutionTriggers
+   *          <code>true</code> if existing triggers referencing the specified calendar should be updated, or else
+   *          <code>false</code>.
+   * @throws PlatformException
+   *           if the calendar could not be registered.
+   */
+  void addCalendar(String calendarName, Calendar calendar, boolean replaceIfPresent, boolean updateExecutionTriggers);
+
+  /**
+   * Unregisters the calendar of the specified symbolic name from Quartz Scheduler.
+   *
+   * @param the
+   *          symbolic name of the calendar to be unregistered.
+   * @return <code>true</code> if the calendar was found and unregistered.
+   * @throws PlatformException
+   *           if the calendar could not be unregistered, or one or more triggers reference the calendar.
+   */
+  boolean removeCalendar(String calendarName);
+
+  /**
+   * Returns <code>true</code> if this job manager is shutdown, or else <code>false</code>.
+   */
+  boolean isShutdown();
+
+  /**
+   * Interrupts all running tasks and prevents scheduled tasks from running. After having shutdown, this job manager
+   * cannot be used anymore.
+   */
+  void shutdown();
 }

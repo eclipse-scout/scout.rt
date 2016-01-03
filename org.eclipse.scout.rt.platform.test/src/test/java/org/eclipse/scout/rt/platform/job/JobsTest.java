@@ -26,6 +26,7 @@ import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.quartz.SimpleScheduleBuilder;
 
 @RunWith(PlatformTestRunner.class)
 public class JobsTest {
@@ -56,7 +57,8 @@ public class JobsTest {
       }
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent())
-        .withSchedulingDelay(0, TimeUnit.MILLISECONDS))
+        .withExecutionTrigger(Jobs.newExecutionTrigger()
+            .withStartIn(1, TimeUnit.MILLISECONDS)))
         .awaitDoneAndGet();
 
     assertEquals(Locale.CANADA_FRENCH, actualFuture.getJobInput().getRunContext().getLocale());
@@ -72,7 +74,10 @@ public class JobsTest {
       }
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent())
-        .withPeriodicExecutionAtFixedRate(0, TimeUnit.MILLISECONDS))
+        .withExecutionTrigger(Jobs.newExecutionTrigger()
+            .withSchedule(SimpleScheduleBuilder.simpleSchedule()
+                .withIntervalInMilliseconds(1)
+                .repeatForever())))
         .awaitDone();
 
     assertEquals(Locale.CANADA_FRENCH, actualFuture.getJobInput().getRunContext().getLocale());
@@ -88,7 +93,8 @@ public class JobsTest {
       }
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent())
-        .withPeriodicExecutionWithFixedDelay(0, TimeUnit.MILLISECONDS))
+        .withExecutionTrigger(Jobs.newExecutionTrigger()
+            .withSchedule(FixedDelayScheduleBuilder.repeatForever(1, TimeUnit.MILLISECONDS))))
         .awaitDone();
 
     assertEquals(Locale.CANADA_FRENCH, actualFuture.getJobInput().getRunContext().getLocale());
@@ -117,7 +123,8 @@ public class JobsTest {
         return IFuture.CURRENT.get();
       }
     }, Jobs.newInput()
-        .withSchedulingDelay(0, TimeUnit.MILLISECONDS))
+        .withExecutionTrigger(Jobs.newExecutionTrigger()
+            .withStartIn(1, TimeUnit.MILLISECONDS)))
         .awaitDoneAndGet();
 
     assertNull(actualFuture.getJobInput().getRunContext());
@@ -132,7 +139,10 @@ public class JobsTest {
         IFuture.CURRENT.get().cancel(false); // cancel periodic action
       }
     }, Jobs.newInput()
-        .withPeriodicExecutionAtFixedRate(0, TimeUnit.MILLISECONDS))
+        .withExecutionTrigger(Jobs.newExecutionTrigger()
+            .withSchedule(SimpleScheduleBuilder.simpleSchedule()
+                .withIntervalInMilliseconds(1)
+                .repeatForever())))
         .awaitDone();
 
     assertNull(actualFuture.getJobInput().getRunContext());
@@ -147,7 +157,8 @@ public class JobsTest {
         IFuture.CURRENT.get().cancel(false); // cancel periodic action
       }
     }, Jobs.newInput()
-        .withPeriodicExecutionWithFixedDelay(0, TimeUnit.MILLISECONDS))
+        .withExecutionTrigger(Jobs.newExecutionTrigger()
+            .withSchedule(FixedDelayScheduleBuilder.repeatForever(1, TimeUnit.MILLISECONDS))))
         .awaitDone();
 
     assertNull(actualFuture.getJobInput().getRunContext());

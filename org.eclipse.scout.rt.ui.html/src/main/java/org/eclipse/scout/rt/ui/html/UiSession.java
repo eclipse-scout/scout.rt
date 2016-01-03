@@ -41,7 +41,6 @@ import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IJobListenerRegistration;
-import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.job.JobState;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
@@ -225,9 +224,8 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
           // UI data possibly available because job completed.
           return true;
         }
-        if (jobState == JobState.PENDING
-            && (future.getExecutionMode() == JobInput.EXECUTION_MODE_PERIODIC_AT_FIXED_RATE || future.getExecutionMode() == JobInput.EXECUTION_MODE_PERIODIC_WITH_FIXED_DELAY)) {
-          // UI data possibly available because periodic job completed round.
+        if (jobState == JobState.PENDING && !future.isSingleExecution()) {
+          // UI data possibly available because a non 'one-shot' job completed a round.
           return true;
         }
         return false;

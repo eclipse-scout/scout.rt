@@ -19,6 +19,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
@@ -31,11 +33,25 @@ import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.platform.runner.Times;
 import org.eclipse.scout.rt.testing.platform.util.BlockingCountDownLatch;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(PlatformTestRunner.class)
 public class CompletionPromiseTest {
+
+  private ExecutorService m_executor;
+
+  @Before
+  public void before() {
+    m_executor = Executors.newSingleThreadExecutor();
+  }
+
+  @After
+  public void after() {
+    m_executor.shutdown();
+  }
 
   @SuppressWarnings("unchecked")
   @Test
@@ -52,7 +68,7 @@ public class CompletionPromiseTest {
     final JobFutureTask<String> future = mock(JobFutureTask.class);
     when(future.isDone()).thenReturn(false);
 
-    final CompletionPromise<String> promise = new CompletionPromise<>(future);
+    final CompletionPromise<String> promise = new CompletionPromise<>(future, m_executor);
 
     // Schedule job-1
     Jobs.schedule(new IRunnable() {

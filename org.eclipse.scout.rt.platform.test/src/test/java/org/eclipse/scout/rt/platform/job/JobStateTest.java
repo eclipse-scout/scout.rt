@@ -39,6 +39,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.quartz.SimpleScheduleBuilder;
 
 @RunWith(PlatformTestRunner.class)
 public class JobStateTest {
@@ -125,8 +126,7 @@ public class JobStateTest {
         .withName("job-1")
         .withSchedulingSemaphore(mutex));
 
-    // Wait until running
-    assertTrue(job1RunningLatch.await());
+    assertTrue(job1RunningLatch.await()); // wait until running (for idempotent event assertion)
 
     // Schedule job-2
     IFuture<Void> future2 = Jobs.schedule(new IRunnable() {
@@ -141,6 +141,11 @@ public class JobStateTest {
         .withName("job-2")
         .withSchedulingSemaphore(mutex));
 
+    // Wait until competing for a permit.
+    // That is for idempotent event assertion, because permit is acquired asynchronously in another thread.
+    // However, permit acquisition is guaranteed to be in the 'as-scheduled' order. Nevertheless, the SCHEDULING and PENDING event of the next job would possibly interfere.
+    JobTestUtil.waitForPermitCompetitors(mutex, 2);
+
     // Schedule job-3
     IFuture<Void> future3 = Jobs.schedule(new IRunnable() {
 
@@ -153,7 +158,11 @@ public class JobStateTest {
         .withName("job-3")
         .withSchedulingSemaphore(mutex));
 
-    assertTrue(job1RunningLatch.await());
+    // Wait until competing for a permit.
+    // That is for idempotent event assertion, because permit is acquired asynchronously in another thread.
+    // However, permit acquisition is guaranteed to be in the 'as-scheduled' order. Nevertheless, the SCHEDULING and PENDING event of the next job would possibly interfere.
+    JobTestUtil.waitForPermitCompetitors(mutex, 3);
+
     assertEquals(JobState.RUNNING, future1.getState());
     assertEquals(JobState.WAITING_FOR_PERMIT, future2.getState());
     assertEquals(JobState.WAITING_FOR_PERMIT, future3.getState());
@@ -272,7 +281,9 @@ public class JobStateTest {
       public void run() throws Exception {
         runningLatch.countDownAndBlock();
       }
-    }, Jobs.newInput().withSchedulingDelay(2, TimeUnit.SECONDS));
+    }, Jobs.newInput()
+        .withExecutionTrigger(Jobs.newExecutionTrigger()
+            .withStartIn(2, TimeUnit.SECONDS)));
 
     JobTestUtil.waitForState(future, JobState.PENDING);
     assertEquals(JobState.PENDING, future.getState());
@@ -485,8 +496,11 @@ public class JobStateTest {
         }
       }
     }, Jobs.newInput()
-        .withSchedulingDelay(1, TimeUnit.MILLISECONDS)
-        .withPeriodicExecutionAtFixedRate(1, TimeUnit.MILLISECONDS));
+        .withExecutionTrigger(Jobs.newExecutionTrigger()
+            .withStartIn(1, TimeUnit.MILLISECONDS)
+            .withSchedule(SimpleScheduleBuilder.simpleSchedule()
+                .withIntervalInMilliseconds(1)
+                .repeatForever())));
 
     future.awaitDone(5, TimeUnit.SECONDS);
 
@@ -546,8 +560,11 @@ public class JobStateTest {
       }
     }, Jobs.newInput()
         .withSchedulingSemaphore(Jobs.newSchedulingSemaphore(1))
-        .withSchedulingDelay(1, TimeUnit.MILLISECONDS)
-        .withPeriodicExecutionAtFixedRate(1, TimeUnit.MILLISECONDS));
+        .withExecutionTrigger(Jobs.newExecutionTrigger()
+            .withStartIn(1, TimeUnit.MILLISECONDS)
+            .withSchedule(SimpleScheduleBuilder.simpleSchedule()
+                .withIntervalInMilliseconds(1)
+                .repeatForever())));
 
     future.awaitDone(5, TimeUnit.SECONDS);
 
@@ -608,18 +625,16 @@ public class JobStateTest {
     JobEventCaptureListener captureListener = new JobEventCaptureListener();
     Jobs.getJobManager().addListener(captureListener);
 
-    final AtomicInteger rounds = new AtomicInteger(0);
     IFuture<Void> future = Jobs.schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
-        if (rounds.incrementAndGet() == 3) {
-          IFuture.CURRENT.get().cancel(false);
-        }
+        // NOOP
       }
     }, Jobs.newInput()
-        .withSchedulingDelay(1, TimeUnit.MILLISECONDS)
-        .withPeriodicExecutionWithFixedDelay(1, TimeUnit.MILLISECONDS));
+        .withExecutionTrigger(Jobs.newExecutionTrigger()
+            .withStartIn(1, TimeUnit.MILLISECONDS)
+            .withSchedule(FixedDelayScheduleBuilder.repeatForTotalCount(3, 1, TimeUnit.MILLISECONDS))));
 
     future.awaitDone(5, TimeUnit.SECONDS);
 
@@ -668,19 +683,17 @@ public class JobStateTest {
     JobEventCaptureListener captureListener = new JobEventCaptureListener();
     Jobs.getJobManager().addListener(captureListener);
 
-    final AtomicInteger rounds = new AtomicInteger(0);
     IFuture<Void> future = Jobs.schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
-        if (rounds.incrementAndGet() == 3) {
-          IFuture.CURRENT.get().cancel(false);
-        }
+        // NOOP
       }
     }, Jobs.newInput()
         .withSchedulingSemaphore(Jobs.newSchedulingSemaphore(1))
-        .withSchedulingDelay(1, TimeUnit.MILLISECONDS)
-        .withPeriodicExecutionWithFixedDelay(1, TimeUnit.MILLISECONDS));
+        .withExecutionTrigger(Jobs.newExecutionTrigger()
+            .withStartIn(1, TimeUnit.MILLISECONDS)
+            .withSchedule(FixedDelayScheduleBuilder.repeatForTotalCount(3, 1, TimeUnit.MILLISECONDS))));
 
     future.awaitDone(5, TimeUnit.SECONDS);
 

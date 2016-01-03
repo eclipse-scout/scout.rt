@@ -24,6 +24,9 @@ import org.eclipse.scout.rt.platform.util.concurrent.TimeoutException;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.quartz.ScheduleBuilder;
+import org.quartz.SimpleScheduleBuilder;
+import org.quartz.Trigger;
 
 @RunWith(PlatformTestRunner.class)
 public class PeriodicJobMutexTest {
@@ -32,16 +35,14 @@ public class PeriodicJobMutexTest {
 
   @Test
   public void testAtFixedRate() {
-    testInternal(Jobs.newInput()
-        .withPeriodicExecutionAtFixedRate(100, TimeUnit.MILLISECONDS)
-        .withSchedulingSemaphore(Jobs.newSchedulingSemaphore(1)));
+    testInternal(SimpleScheduleBuilder.simpleSchedule()
+        .withIntervalInMilliseconds(100)
+        .repeatForever(), Jobs.newSchedulingSemaphore(1));
   }
 
   @Test
   public void testWithFixedDelay() {
-    testInternal(Jobs.newInput()
-        .withPeriodicExecutionWithFixedDelay(100, TimeUnit.MILLISECONDS)
-        .withSchedulingSemaphore(Jobs.newSchedulingSemaphore(1)));
+    testInternal(FixedDelayScheduleBuilder.repeatForever(100, TimeUnit.MILLISECONDS), Jobs.newSchedulingSemaphore(1));
   }
 
   /**
@@ -52,7 +53,7 @@ public class PeriodicJobMutexTest {
    * finally, another job with the same mutex is scheduled, which is expected to be run after the timed out job. Both
    * that jobs are expected to be run right after one iterations completes.
    */
-  private void testInternal(final JobInput periodicJobInput) {
+  private void testInternal(final ScheduleBuilder<? extends Trigger> periodicScheduleBuilder, final ISchedulingSemaphore schedulingSemaphore) {
     final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
 
     final AtomicInteger rounds = new AtomicInteger(0);
@@ -91,7 +92,7 @@ public class PeriodicJobMutexTest {
                   protocol.add("running-2");
                 }
               }, Jobs.newInput()
-                  .withSchedulingSemaphore(periodicJobInput.getSchedulingSemaphore())
+                  .withSchedulingSemaphore(schedulingSemaphore)
                   .withExecutionHint(JOB_IDENTIFIER))
                   .awaitDone(200, TimeUnit.MILLISECONDS);
             }
@@ -112,14 +113,17 @@ public class PeriodicJobMutexTest {
             protocol.add("running-3");
           }
         }, Jobs.newInput()
-            .withSchedulingSemaphore(periodicJobInput.getSchedulingSemaphore())
+            .withSchedulingSemaphore(schedulingSemaphore)
             .withExecutionHint(JOB_IDENTIFIER));
 
         protocol.add("end");
       }
-    }, periodicJobInput.copy()
-        .withSchedulingDelay(200, TimeUnit.MILLISECONDS) // schedule delayed
-        .withExecutionHint(JOB_IDENTIFIER));
+    }, Jobs.newInput()
+        .withExecutionHint(JOB_IDENTIFIER)
+        .withSchedulingSemaphore(schedulingSemaphore)
+        .withExecutionTrigger(Jobs.newExecutionTrigger()
+            .withStartIn(200, TimeUnit.MILLISECONDS) // execute with a delay
+            .withSchedule(periodicScheduleBuilder))); // periodic schedule plan
 
     // Schedule other job
     Jobs.schedule(new IRunnable() {
@@ -129,7 +133,7 @@ public class PeriodicJobMutexTest {
         protocol.add("other job");
       }
     }, Jobs.newInput()
-        .withSchedulingSemaphore(periodicJobInput.getSchedulingSemaphore()));
+        .withSchedulingSemaphore(schedulingSemaphore));
 
     // Wait for the job to complete
     Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()

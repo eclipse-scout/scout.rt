@@ -135,7 +135,8 @@ public class JobListenerBlockedFutureTest {
           }
         }, modelJobInput.copy()
             .withName("inner")
-            .withSchedulingDelay(2, TimeUnit.SECONDS)));
+            .withExecutionTrigger(Jobs.newExecutionTrigger()
+                .withStartIn(2, TimeUnit.SECONDS))));
 
         condition.waitFor();
       }

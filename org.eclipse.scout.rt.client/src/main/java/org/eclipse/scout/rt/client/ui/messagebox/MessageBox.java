@@ -345,16 +345,17 @@ public class MessageBox extends AbstractPropertyObserver implements IMessageBox 
         // attach auto-cancel timer
         IFuture<Void> autoCloseFuture = null;
         if (getAutoCloseMillis() > 0) {
-          final long dt = getAutoCloseMillis();
+          final long closeDelay = getAutoCloseMillis();
           autoCloseFuture = Jobs.schedule(new IRunnable() {
             @Override
             public void run() throws Exception {
               closeMessageBox();
             }
           }, Jobs.newInput()
+              .withName("Closing message box")
               .withRunContext(ClientRunContexts.copyCurrent())
-              .withSchedulingDelay(dt, TimeUnit.MILLISECONDS)
-              .withName("Closing message box"));
+              .withExecutionTrigger(Jobs.newExecutionTrigger()
+                  .withStartIn(closeDelay, TimeUnit.MILLISECONDS)));
         }
         // start sub event dispatch thread
         waitFor();

@@ -18,7 +18,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.concurrent.Callable;
-import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContext;
@@ -159,9 +158,7 @@ public class ModelJobsTest {
       public IFuture<?> call() throws Exception {
         return IFuture.CURRENT.get();
       }
-    }, ModelJobs.newInput(ClientRunContexts.copyCurrent())
-        .withSchedulingDelay(0, TimeUnit.MILLISECONDS))
-        .awaitDoneAndGet();
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent())).awaitDoneAndGet();
 
     assertTrue(ModelJobs.isModelJob(actualFuture));
     assertTrue(actualFuture.getJobInput().getRunContext() instanceof ClientRunContext);

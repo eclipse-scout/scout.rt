@@ -17,6 +17,7 @@ import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
@@ -70,7 +71,8 @@ public class FormBasicTest {
         testSequence.add(3);
       }
     }, ModelJobs.newInput(ClientRunContexts.copyCurrent())
-        .withSchedulingDelay(200, TimeUnit.MILLISECONDS));
+        .withExecutionTrigger(Jobs.newExecutionTrigger()
+            .withStartIn(200, TimeUnit.MILLISECONDS)));
 
     try {
       f.start(new FormHandler());

@@ -90,7 +90,8 @@ public class FutureFinishedTest {
         run.set(true);
       }
     }, Jobs.newInput()
-        .withSchedulingDelay(2, TimeUnit.SECONDS));
+        .withExecutionTrigger(Jobs.newExecutionTrigger()
+            .withStartIn(2, TimeUnit.SECONDS)));
     future.cancel(false);
 
     // Job expected to be done and finished immediately

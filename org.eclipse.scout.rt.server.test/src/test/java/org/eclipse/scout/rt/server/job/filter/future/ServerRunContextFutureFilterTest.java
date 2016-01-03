@@ -19,7 +19,6 @@ import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.ISchedulingSemaphore;
-import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.filter.future.FutureFilter;
 import org.eclipse.scout.rt.server.IServerSession;
@@ -61,8 +60,8 @@ public class ServerRunContextFutureFilterTest {
   }
 
   @Test
-  public void testPeriodic() {
-    when(m_serverJobFuture.getExecutionMode()).thenReturn(JobInput.EXECUTION_MODE_PERIODIC_AT_FIXED_RATE);
+  public void testRepetitive() {
+    when(m_serverJobFuture.isSingleExecution()).thenReturn(false);
     assertTrue(Jobs.newFutureFilterBuilder()
         .andMatchRunContext(ServerRunContext.class)
         .toFilter()
@@ -70,7 +69,7 @@ public class ServerRunContextFutureFilterTest {
 
     assertTrue(Jobs.newFutureFilterBuilder()
         .andMatchRunContext(ServerRunContext.class)
-        .andArePeriodicExecuting()
+        .andAreNotSingleExecuting()
         .toFilter()
         .accept(m_serverJobFuture));
 

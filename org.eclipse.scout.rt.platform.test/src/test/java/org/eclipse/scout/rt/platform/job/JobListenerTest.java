@@ -101,7 +101,8 @@ public class JobListenerTest {
       }
     }, Jobs.newInput()
         .withRunContext(RunContexts.empty())
-        .withSchedulingDelay(1, TimeUnit.HOURS));
+        .withExecutionTrigger(Jobs.newExecutionTrigger()
+            .withStartIn(1, TimeUnit.HOURS)));
 
     future.cancel(true);
     Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()

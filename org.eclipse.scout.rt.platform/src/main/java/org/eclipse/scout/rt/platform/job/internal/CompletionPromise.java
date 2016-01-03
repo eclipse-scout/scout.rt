@@ -11,9 +11,11 @@
 package org.eclipse.scout.rt.platform.job.internal;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
@@ -29,10 +31,11 @@ import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.job.DoneEvent;
 import org.eclipse.scout.rt.platform.job.IDoneHandler;
 import org.eclipse.scout.rt.platform.job.JobState;
-import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This promise represents a proxy for the future's final value, and allows to associate handlers to be notified
@@ -48,6 +51,10 @@ import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
  */
 class CompletionPromise<RESULT> {
 
+  private static final Logger LOG = LoggerFactory.getLogger(CompletionPromise.class);
+
+  private final ExecutorService m_executor;
+
   private final Lock m_lock = new ReentrantLock();
   private final Condition m_doneCondition = m_lock.newCondition();
   private final Condition m_finishedCondition = m_lock.newCondition();
@@ -58,9 +65,10 @@ class CompletionPromise<RESULT> {
   private volatile DoneEvent<RESULT> m_doneEvent;
   private volatile boolean m_finished;
 
-  public CompletionPromise(final JobFutureTask<RESULT> future) {
+  public CompletionPromise(final JobFutureTask<RESULT> future, final ExecutorService executor) {
     m_future = future;
     m_handlers = new ArrayList<>();
+    m_executor = executor;
   }
 
   /**
@@ -86,11 +94,22 @@ class CompletionPromise<RESULT> {
       m_lock.unlock();
     }
 
-    // Notify registered handlers.
-    for (final PromiseHandler<RESULT> handler : m_handlers) {
-      handler.handleAsync(m_doneEvent);
+    // Notify registered handlers asynchronously.
+    // Notice: Do not notify via Jobs.schedule(...), because for every job, JobManager registers a whenDone handler as well
+    //         in order to unregister the associated Quartz Trigger. Otherwise, that could cause an infinite recursion.
+    if (!m_handlers.isEmpty()) {
+      m_executor.execute(new Runnable() {
+
+        @Override
+        public void run() {
+          final Iterator<PromiseHandler<RESULT>> iterator = m_handlers.iterator();
+          while (iterator.hasNext()) {
+            iterator.next().notifySafe(m_doneEvent);
+            iterator.remove();
+          }
+        }
+      });
     }
-    m_handlers.clear();
   }
 
   /**
@@ -123,29 +142,22 @@ class CompletionPromise<RESULT> {
    *          specific {@link RunContext}.
    */
   public void whenDone(final IDoneHandler<RESULT> handler, final RunContext runContext) {
+    final PromiseHandler<RESULT> promiseHandler = new PromiseHandler<>(handler, runContext);
+
+    final boolean done;
     m_lock.lock();
     try {
-      if (!isDone()) {
-        m_handlers.add(new PromiseHandler<>(handler, runContext));
-        return;
+      done = isDone();
+      if (!done) {
+        m_handlers.add(promiseHandler);
       }
     }
     finally {
       m_lock.unlock();
     }
 
-    // Notify the handler synchronously.
-    if (runContext == null) {
-      handler.onDone(m_doneEvent);
-    }
-    else {
-      runContext.run(new IRunnable() {
-
-        @Override
-        public void run() throws Exception {
-          handler.onDone(m_doneEvent);
-        }
-      });
+    if (done) {
+      promiseHandler.notifySafe(m_doneEvent);
     }
   }
 
@@ -245,6 +257,13 @@ class CompletionPromise<RESULT> {
     }
   }
 
+  /**
+   * Returns the internal lock object.
+   */
+  Lock getInternalLock() {
+    return m_lock;
+  }
+
   // ==== Internal helper methods ==== //
 
   /**
@@ -311,18 +330,28 @@ class CompletionPromise<RESULT> {
     }
 
     /**
-     * Notifies the handler asynchronously.
+     * Notifies the associated handler in the specified {@link RunContext}.
+     * <p>
+     * This method never throws an exception.
      */
-    public void handleAsync(final DoneEvent<RESULT> doneEvent) {
-      Jobs.schedule(new IRunnable() {
-
-        @Override
-        public void run() throws Exception {
+    public void notifySafe(final DoneEvent<RESULT> doneEvent) {
+      try {
+        if (m_runContext == null) {
           m_callback.onDone(doneEvent);
         }
-      }, Jobs.newInput()
-          .withRunContext(m_runContext)
-          .withName("Notifying 'done-promise' callback"));
+        else {
+          m_runContext.run(new IRunnable() {
+
+            @Override
+            public void run() throws Exception {
+              m_callback.onDone(doneEvent);
+            }
+          });
+        }
+      }
+      catch (final Throwable t) {
+        LOG.error("Failed to notify 'done-promise' callback", t);
+      }
     }
   }
 

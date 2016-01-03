@@ -15,6 +15,7 @@ import java.util.Deque;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
@@ -27,6 +28,7 @@ import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.ToStringBuilder;
 import org.eclipse.scout.rt.platform.util.concurrent.InterruptedException;
+import org.quartz.Trigger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,10 +50,13 @@ public class SchedulingSemaphore implements ISchedulingSemaphore {
   private final Deque<AcquisitionTask> m_queue;
   private final Set<IFuture<?>> m_permitOwners;
 
+  private final AtomicInteger m_executionPriority;
+
   public SchedulingSemaphore() {
     m_permits = Integer.MAX_VALUE; // unbounded according to JavaDoc
     m_queue = new ArrayDeque<>();
     m_permitOwners = new HashSet<>();
+    m_executionPriority = new AtomicInteger(Integer.MAX_VALUE);
 
     final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
     m_readLock = lock.readLock();
@@ -264,6 +269,20 @@ public class SchedulingSemaphore implements ISchedulingSemaphore {
     finally {
       m_writeLock.unlock();
     }
+  }
+
+  /**
+   * Computes the next lower priority to be used as {@link Trigger}'s priority when submitting a task assigned to this
+   * semaphore. Priority based firing guarantees an 'as-scheduled' permit acquisition for jobs with the same fire time.
+   * <p>
+   * For example, if scheduling two jobs in a row, they very likely will have the same execution time (granularity in
+   * milliseconds). However, priority-based firing and serial permit acquisition guarantee the first job to compete for
+   * a permit before the second job does.
+   * <p>
+   * The first calculation returns with {@link Integer#MAX_VALUE}, and subsequent calls with a value decremented by 1.
+   */
+  protected int computeNextLowerPriority() {
+    return m_executionPriority.getAndDecrement();
   }
 
   protected void assertSameSemaphore(final IFuture<?> task) {

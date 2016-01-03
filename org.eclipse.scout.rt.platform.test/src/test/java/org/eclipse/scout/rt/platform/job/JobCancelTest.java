@@ -40,6 +40,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.quartz.SimpleScheduleBuilder;
 
 @RunWith(PlatformTestRunner.class)
 public class JobCancelTest {
@@ -161,7 +162,8 @@ public class JobCancelTest {
       }
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent())
-        .withSchedulingDelay(10, TimeUnit.SECONDS));
+        .withExecutionTrigger(Jobs.newExecutionTrigger()
+            .withStartIn(10, TimeUnit.SECONDS)));
 
     // RUN THE TEST
     future.cancel(true);
@@ -192,8 +194,11 @@ public class JobCancelTest {
       }
     }, Jobs.newInput()
         .withRunContext(RunContexts.empty())
-        .withPeriodicExecutionAtFixedRate(10, TimeUnit.MILLISECONDS)
-        .withExceptionHandling(null, false));
+        .withExceptionHandling(null, false)
+        .withExecutionTrigger(Jobs.newExecutionTrigger()
+            .withSchedule(SimpleScheduleBuilder.simpleSchedule()
+                .withIntervalInMilliseconds(10)
+                .repeatForever())));
 
     assertTrue(setupLatch.await());
 

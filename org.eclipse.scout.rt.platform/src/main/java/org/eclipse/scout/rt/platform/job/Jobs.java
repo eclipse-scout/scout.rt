@@ -77,9 +77,16 @@ public final class Jobs {
   }
 
   /**
-   * Runs the given {@link IRunnable} asynchronously in another thread at the next reasonable opportunity. The submitter
-   * of the job continues to run in parallel. If the job is assigned to a {@link ISchedulingSemaphore} and the maximal
-   * concurrency level for that semaphore is reached, the job is queued until a permit becomes available.
+   * Runs the given {@link IRunnable} asynchronously in another thread once the associated execution trigger fires,
+   * which depends on both, the trigger's start time and schedule. However, if not set, the job will commence execution
+   * immediately at the next reasonable opportunity. In either case, the submitter of the job continues to run in
+   * parallel.
+   * <p>
+   * If the maximal concurrency level for a semaphore aware job is reached, the job is queued until a permit becomes
+   * available. As a general rule, jobs compete for an execution permit once being fired by the associated trigger, and
+   * in the order as being scheduled. For example, if scheduling two jobs in a row, they very likely will have the same
+   * execution time (granularity in milliseconds). However, job manager guarantees the first job to compete for an
+   * execution permit before the second job does.
    * <p>
    * The job manager will use the {@link JobInput} as given to control job execution.
    * <p>
@@ -112,10 +119,18 @@ public final class Jobs {
   }
 
   /**
-   * Runs the given {@link Callable} asynchronously in another thread at the next reasonable opportunity. The submitter
-   * of the job continues to run in parallel. If the job is assigned to a {@link ISchedulingSemaphore} and the maximal
-   * concurrency level for that semaphore is reached, the job is queued until a permit becomes available. Jobs in the
-   * form of a {@link Callable} typically return a computation result to the submitter.
+   * Runs the given {@link Callable} asynchronously in another thread once the associated execution trigger fires, which
+   * depends on both, the trigger's start time and schedule. However, if not set, the job will commence execution
+   * immediately at the next reasonable opportunity. In either case, the submitter of the job continues to run in
+   * parallel.
+   * <p>
+   * Jobs in the form of a {@link Callable} typically return a computation result to the submitter.
+   * <p>
+   * If the maximal concurrency level for a semaphore aware job is reached, the job is queued until a permit becomes
+   * available. As a general rule, jobs compete for an execution permit once being fired by the associated trigger, and
+   * in the order as being scheduled. For example, if scheduling two jobs in a row, they very likely will have the same
+   * execution time (granularity in milliseconds). However, job manager guarantees the first job to compete for an
+   * execution permit before the second job does.
    * <p>
    * The job manager will use the {@link JobInput} as given to control job execution.
    * <p>
@@ -237,5 +252,17 @@ public final class Jobs {
    */
   public static IBlockingCondition newBlockingCondition(final boolean blocking) {
     return BEANS.get(IJobManager.class).newBlockingCondition(blocking);
+  }
+
+  /**
+   * Creates a trigger to define the schedule upon which the job will commence execution.
+   * <p>
+   * The trigger mechanism is provided by Quartz Scheduler, meaning that you can profit from the powerful Quartz
+   * schedule capabilities.
+   * <p>
+   * For more information, see <a href="http://www.quartz-scheduler.org">http://www.quartz-scheduler.org</a>.
+   */
+  public static ExecutionTrigger newExecutionTrigger() {
+    return BEANS.get(ExecutionTrigger.class);
   }
 }

@@ -24,14 +24,12 @@ import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.filter.NotFilter;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.ISchedulingSemaphore;
-import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.job.JobState;
 import org.eclipse.scout.rt.platform.job.filter.future.ExecutionHintFutureFilter;
 import org.eclipse.scout.rt.platform.job.filter.future.FutureFilter;
 import org.eclipse.scout.rt.platform.job.filter.future.JobNameFutureFilter;
 import org.eclipse.scout.rt.platform.job.filter.future.JobNameRegexFutureFilter;
 import org.eclipse.scout.rt.platform.job.filter.future.JobStateFutureFilter;
-import org.eclipse.scout.rt.platform.job.filter.future.PeriodicExecutionFutureFilter;
 import org.eclipse.scout.rt.platform.job.filter.future.RunContextFutureFilter;
 import org.eclipse.scout.rt.platform.job.filter.future.SchedulingSemaphoreFutureFilter;
 import org.eclipse.scout.rt.platform.job.filter.future.SingleExecutionFutureFilter;
@@ -172,9 +170,8 @@ public class JobEventFilterBuilder {
   }
 
   /**
-   * To match all events related to single executing jobs.
-   *
-   * @see JobInput#EXECUTION_MODE_SINGLE
+   * To match all events related to single executing jobs. That are jobs which are configured to run once, meaning have
+   * just a single execution at a particular moment in time.
    */
   public JobEventFilterBuilder andAreSingleExecuting() {
     andMatch(new FutureFilterWrapperJobEventFilter(SingleExecutionFutureFilter.INSTANCE));
@@ -182,13 +179,11 @@ public class JobEventFilterBuilder {
   }
 
   /**
-   * To match all events related to periodic executing jobs.
-   *
-   * @see JobInput#EXECUTION_MODE_PERIODIC_AT_FIXED_RATE
-   * @see JobInput#EXECUTION_MODE_PERIODIC_WITH_FIXED_DELAY
+   * To match all events related to jobs which are configured to run multiple times, meaning which repeat one time at
+   * minimum.
    */
-  public JobEventFilterBuilder andArePeriodicExecuting() {
-    andMatch(new FutureFilterWrapperJobEventFilter(PeriodicExecutionFutureFilter.INSTANCE));
+  public JobEventFilterBuilder andAreNotSingleExecuting() {
+    andMatchNot(new FutureFilterWrapperJobEventFilter(SingleExecutionFutureFilter.INSTANCE));
     return this;
   }
 

@@ -213,7 +213,8 @@ public class AwaitDoneTest {
       }
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent())
-        .withSchedulingDelay(1, TimeUnit.SECONDS));
+        .withExecutionTrigger(Jobs.newExecutionTrigger()
+            .withStartIn(1, TimeUnit.SECONDS)));
 
     // start waiting for the job to complete or until cancelled
     Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()

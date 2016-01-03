@@ -363,9 +363,10 @@ public class JobScheduleTest {
         executed.set(true);
       }
     }, Jobs.newInput()
-        .withSchedulingDelay(1, TimeUnit.SECONDS)
         .withExpirationTime(500, TimeUnit.MILLISECONDS)
-        .withRunContext(RunContexts.empty()));
+        .withRunContext(RunContexts.empty())
+        .withExecutionTrigger(Jobs.newExecutionTrigger()
+            .withStartIn(1, TimeUnit.SECONDS)));
 
     future.awaitDone();
     assertTrue(future.isCancelled());
@@ -383,9 +384,10 @@ public class JobScheduleTest {
         executed.set(true);
       }
     }, Jobs.newInput()
-        .withSchedulingDelay(1, TimeUnit.SECONDS)
         .withRunContext(RunContexts.empty())
-        .withExpirationTime(JobInput.INFINITE_EXPIRATION, TimeUnit.MILLISECONDS));
+        .withExpirationTime(JobInput.EXPIRE_NEVER, TimeUnit.MILLISECONDS)
+        .withExecutionTrigger(Jobs.newExecutionTrigger()
+            .withStartIn(1, TimeUnit.SECONDS)));
 
     future.awaitDoneAndGet();
     assertTrue(executed.get());
@@ -395,22 +397,22 @@ public class JobScheduleTest {
   public void testScheduleDelayed() {
     final AtomicLong tRunning = new AtomicLong();
 
-    long tScheduled = System.nanoTime();
+    long tScheduled = System.currentTimeMillis();
     String result = Jobs.getJobManager().schedule(new Callable<String>() {
 
       @Override
       public String call() throws Exception {
-        tRunning.set(System.nanoTime());
+        tRunning.set(System.currentTimeMillis());
         return "executed";
       }
     }, Jobs.newInput()
-        .withSchedulingDelay(2, TimeUnit.SECONDS)
-        .withRunContext(RunContexts.empty()))
+        .withExecutionTrigger(Jobs.newExecutionTrigger()
+            .withStartIn(2, TimeUnit.SECONDS)))
         .awaitDoneAndGet(5, TimeUnit.SECONDS);
 
     assertEquals("executed", result);
     long delta = tRunning.get() - tScheduled;
-    assertTrue(delta >= TimeUnit.SECONDS.toNanos(2));
+    assertTrue(delta >= TimeUnit.SECONDS.toMillis(2));
   }
 
   @Test
@@ -432,8 +434,9 @@ public class JobScheduleTest {
         return "job-2";
       }
     }, Jobs.newInput()
-        .withSchedulingDelay(500, TimeUnit.MILLISECONDS)
-        .withSchedulingSemaphore(mutex));
+        .withSchedulingSemaphore(mutex)
+        .withExecutionTrigger(Jobs.newExecutionTrigger()
+            .withStartIn(500, TimeUnit.MILLISECONDS)));
 
     assertEquals("job-2", future2.awaitDoneAndGet(10, TimeUnit.SECONDS));
     assertEquals("job-1", future1.awaitDoneAndGet());

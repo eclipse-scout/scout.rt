@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.platform.job.internal;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -39,6 +40,7 @@ import org.eclipse.scout.rt.platform.job.IJobListenerRegistration;
 import org.eclipse.scout.rt.platform.job.ISchedulingSemaphore;
 import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.job.JobState;
+import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.job.listener.JobEventData;
@@ -46,6 +48,14 @@ import org.eclipse.scout.rt.platform.job.listener.JobEventType;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.ToStringBuilder;
+import org.quartz.Calendar;
+import org.quartz.SchedulerException;
+import org.quartz.Trigger;
+import org.quartz.TriggerKey;
+import org.quartz.spi.OperableTrigger;
+import org.quartz.utils.Key;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Represents a {@link RunnableFuture} to be given to {@link ExecutorService} for execution.
@@ -55,6 +65,8 @@ import org.eclipse.scout.rt.platform.util.ToStringBuilder;
  */
 @Internal
 public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture<RESULT>, IRejectableRunnable {
+
+  private static final Logger LOG = LoggerFactory.getLogger(JobFutureTask.class);
 
   protected final JobManager m_jobManager;
   protected final RunMonitor m_runMonitor;
@@ -73,6 +85,11 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
 
   protected volatile Set<String> m_executionHints = new HashSet<>();
 
+  protected final TriggerKey m_triggerIdentity = new TriggerKey(Key.createUniqueName(null), "scout.jobmanager.quartz.trigger");
+
+  protected volatile boolean m_singleExecution;
+  protected volatile boolean m_delayedExecution;
+
   public JobFutureTask(final JobManager jobManager, final RunMonitor runMonitor, final JobInput input, final CallableChain<RESULT> callableChain, final Callable<RESULT> callable) {
     super(new Callable<RESULT>() {
 
@@ -90,8 +107,8 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
     m_callableChain = callableChain;
 
     // Initialize this Future
-    m_completionPromise = new CompletionPromise<>(this);
-    m_expirationDate = (input.getExpirationTimeMillis() != JobInput.INFINITE_EXPIRATION ? System.currentTimeMillis() + input.getExpirationTimeMillis() : null);
+    m_completionPromise = new CompletionPromise<>(this, jobManager.getExecutor());
+    m_expirationDate = (input.getExpirationTimeMillis() != JobInput.EXPIRE_NEVER ? System.currentTimeMillis() + input.getExpirationTimeMillis() : null);
     m_executionHints.addAll(input.getExecutionHints());
 
     // Contribute to the CallableChain
@@ -105,9 +122,8 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
       }
     });
 
-    // Register this Future
-    m_jobManager.registerFuture(this);
-    m_runMonitor.registerCancellable(this); // Register to also cancel this Future once the RunMonitor is cancelled (even if the job is not executed yet).
+    // Register to also cancel this Future once the RunMonitor is cancelled (even if the job is not executed yet).
+    m_runMonitor.registerCancellable(this);
   }
 
   /**
@@ -124,14 +140,13 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
     m_running = true;
     try {
       if (isExpired()) {
-        cancel(true); // to enter 'DONE' state and to interrupt a potential waiting submitter.
+        cancel(true); // to enter done state and to interrupt a potential waiting submitter.
       }
-
-      if (m_input.getExecutionMode() == JobInput.EXECUTION_MODE_SINGLE) {
-        super.run();
+      else if (isFinalRun()) {
+        super.run(); // will enter done state upon completion.
       }
       else {
-        super.runAndReset();
+        super.runAndReset(); // will not enter done state upon completion.
       }
     }
     finally {
@@ -169,13 +184,46 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
   @Override
   public final void reject() {
     changeState(JobState.REJECTED);
-    cancel(true); // to enter 'DONE' state and to release a potential waiting submitter.
+    cancel(true); // to enter done state and to release a potential waiting submitter.
     releasePermit();
   }
 
+  /**
+   * The associated trigger's identity, and is not <code>null</code>.
+   */
+  protected TriggerKey getTriggerIdentity() {
+    return m_triggerIdentity;
+  }
+
   @Override
-  public int getExecutionMode() {
-    return m_input.getExecutionMode();
+  public boolean isSingleExecution() {
+    return m_singleExecution;
+  }
+
+  /**
+   * Returns whether this task may be executed some time in the future, unless it gets cancelled.
+   */
+  protected boolean isDelayedExecution() {
+    return m_delayedExecution;
+  }
+
+  /**
+   * Returns whether this task may be executed some time in the future, unless it gets cancelled.
+   */
+  protected boolean hasNextExecution() {
+    try {
+      final Trigger trigger = m_jobManager.getQuartz().getTrigger(m_triggerIdentity);
+      if (trigger == null) {
+        return false;
+      }
+      else {
+        return trigger.mayFireAgain();
+      }
+    }
+    catch (final SchedulerException e) {
+      LOG.error("Failed to determine if a job will execute again [future={}]", this, e);
+      return false;
+    }
   }
 
   @Override
@@ -223,8 +271,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
   }
 
   /**
-   * @return <code>true</code> if the expiration time of this Future has elapsed and should be discarded by the job
-   *         manager without commence execution, <code>false</code> otherwise.
+   * Returns <code>true</code> if expired and this job should not commence execution, or else <code>false</code>.
    */
   protected boolean isExpired() {
     return (m_expirationDate == null ? false : System.currentTimeMillis() > m_expirationDate);
@@ -411,7 +458,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
     }
 
     if (isDone()) {
-      return; // job already in 'done'-state.
+      return; // job already in done state.
     }
 
     Assertions.assertNotSame(currentSemaphore, m_schedulingSemaphore, "Potential deadlock detected: Cannot wait for a job which is assigned to the same scheduling semaphore as the current job [semaphore={}]", currentSemaphore);
@@ -446,7 +493,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
 
   /**
    * Sets the new state, and fires {@link JobEvent}, unless already being in state {@link JobState#DONE} or
-   * {@link JobState#REJECTED}.
+   * {@link JobState#REJECTED}, or the specified state is already the current state.
    */
   protected void changeState(final JobState state) {
     changeState(new JobEventData()
@@ -456,7 +503,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
 
   /**
    * Sets the new state, and fires the given event, unless already being in state {@link JobState#DONE} or
-   * {@link JobState#REJECTED}.
+   * {@link JobState#REJECTED}, or the specified state is already the current state.
    * <p>
    * The caller is responsible for setting {@link JobEventData#getState()} and {@link JobEventData#getFuture()}
    * accordingly.
@@ -465,6 +512,12 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
     Assertions.assertNotNull(eventData.getState(), "missing state");
     Assertions.assertSame(this, eventData.getFuture(), "wrong future [expected={}]", this);
 
+    // Do nothing if equals to current state.
+    if (m_state == eventData.getState()) {
+      return;
+    }
+
+    // Do nothing if already in done or rejected state.
     if (m_state == JobState.DONE || m_state == JobState.REJECTED) {
       return;
     }
@@ -482,6 +535,20 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
   }
 
   /**
+   * Returns if this is the very final run of this job.
+   */
+  protected boolean isFinalRun() {
+    if (isSingleExecution()) {
+      return true; // 'one-shot' job
+    }
+    else if (!hasNextExecution()) {
+      return true; // job which will not commence execution once more
+    }
+
+    return false;
+  }
+
+  /**
    * Invokes {@link #finished()} if done and currently not executing.
    */
   private void finishInternal() {
@@ -490,7 +557,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
       return;
     }
 
-    // Ensure task to be in 'done' state, because method also called for periodic tasks which did not complete yet.
+    // Ensure task to be in done state, because method also called for periodic tasks which did not complete yet.
     if (!isDone()) {
       return;
     }
@@ -501,5 +568,64 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
     }
 
     finished();
+  }
+
+  /**
+   * Computes and sets temporal values.
+   */
+  protected void computeAndSetTemporalValues(final Trigger trigger) {
+    Assertions.assertEquals(m_triggerIdentity, trigger.getKey(), "Specified trigger does not belong to this Future [trigger={}, job={}]", trigger, this);
+
+    final Date firstFireTime = computeFirstFireTime(trigger);
+    m_singleExecution = computeSingleExecution(trigger, firstFireTime);
+    m_delayedExecution = computeDelayedExecution(firstFireTime, m_input.getExecutionTrigger().getNow());
+  }
+
+  /**
+   * Computes the time the specified trigger will fire for the first time, and is never <code>null</code>.
+   */
+  protected Date computeFirstFireTime(final Trigger trigger) {
+    Assertions.assertTrue(trigger instanceof OperableTrigger, "Trigger must be of type OperableTrigger [trigger={}, job={}]", trigger, this);
+
+    // Validate the trigger's configuration.
+    final OperableTrigger operableTrigger = (OperableTrigger) trigger;
+    try {
+      operableTrigger.validate();
+    }
+    catch (final SchedulerException e) {
+      throw new PlatformException("Trigger not valid [trigger={}, job={}]", operableTrigger, this, e);
+    }
+
+    // Compute 'first fire time' with respect to an optionally configured calendar.
+    final Date firstFireDate;
+    if (trigger.getCalendarName() == null) {
+      firstFireDate = operableTrigger.computeFirstFireTime(null);
+    }
+    else {
+      final Calendar calendar = Jobs.getJobManager().getCalendar(trigger.getCalendarName());
+      Assertions.assertNotNull(calendar, "Calendar referenced by trigger not registered in Quartz Scheduler [calendar={}, job={}]", trigger.getCalendarName(), this);
+      firstFireDate = operableTrigger.computeFirstFireTime(calendar);
+    }
+
+    return Assertions.assertNotNull(firstFireDate, "Trigger not valid, because it will never fire. Check trigger's schedule. [schedule={}, future={}]", trigger.getScheduleBuilder(), this);
+  }
+
+  /**
+   * Computes whether the specified trigger is single executing, meaning executed just once.
+   */
+  protected boolean computeSingleExecution(final Trigger trigger, final Date firstFireTime) {
+    if (trigger.getFinalFireTime() == null) {
+      return false;
+    }
+    else {
+      return trigger.getFinalFireTime().equals(firstFireTime);
+    }
+  }
+
+  /**
+   * Computes whether this is about a delayed execution.
+   */
+  protected boolean computeDelayedExecution(final Date firstFireTime, final Date now) {
+    return firstFireTime.after(now);
   }
 }

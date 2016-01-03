@@ -17,12 +17,14 @@ import static org.mockito.Mockito.mock;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.rt.platform.filter.IFilter;
+import org.eclipse.scout.rt.platform.job.FixedDelayScheduleBuilder;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.quartz.SimpleScheduleBuilder;
 
 @RunWith(PlatformTestRunner.class)
 public class SingleExecutionFutureFilterTest {
@@ -30,8 +32,14 @@ public class SingleExecutionFutureFilterTest {
   @Test
   public void test() {
     IFuture<Void> future1 = Jobs.schedule(mock(IRunnable.class), Jobs.newInput());
-    IFuture<Void> future2 = Jobs.schedule(mock(IRunnable.class), Jobs.newInput().withPeriodicExecutionAtFixedRate(1, TimeUnit.SECONDS));
-    IFuture<Void> future3 = Jobs.schedule(mock(IRunnable.class), Jobs.newInput().withPeriodicExecutionWithFixedDelay(1, TimeUnit.SECONDS));
+
+    IFuture<Void> future2 = Jobs.schedule(mock(IRunnable.class), Jobs.newInput()
+        .withExecutionTrigger(Jobs.newExecutionTrigger()
+            .withSchedule(SimpleScheduleBuilder.repeatSecondlyForever())));
+
+    IFuture<Void> future3 = Jobs.schedule(mock(IRunnable.class), Jobs.newInput()
+        .withExecutionTrigger(Jobs.newExecutionTrigger()
+            .withSchedule(FixedDelayScheduleBuilder.repeatForever(1, TimeUnit.SECONDS))));
 
     IFilter<IFuture<?>> filter = SingleExecutionFutureFilter.INSTANCE;
     assertTrue(filter.accept(future1));

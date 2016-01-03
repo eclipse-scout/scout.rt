@@ -41,7 +41,7 @@ public class FinalValue<VALUE> {
   }
 
   /**
-   * @return the value or <code>null</code>, if not initialized.
+   * @return the value or <code>null</code>, if not set.
    */
   public VALUE get() {
     return m_value;

@@ -23,7 +23,6 @@ import java.util.regex.Pattern;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.filter.AndFilter;
-import org.eclipse.scout.rt.platform.filter.NotFilter;
 import org.eclipse.scout.rt.platform.job.internal.JobManager;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.visitor.IVisitor;
@@ -295,9 +294,10 @@ public class JobFutureVisitTest {
   @Test
   public void testVisitNotBlockedFilter() {
     final Set<String> visitedFutures = new HashSet<>();
-    Jobs.getJobManager().visit(new NotFilter<>(Jobs.newFutureFilterBuilder()
-        .andMatchState(JobState.WAITING_FOR_BLOCKING_CONDITION)
-        .toFilter()), new IVisitor<IFuture<?>>() {
+    Jobs.getJobManager().visit(Jobs.newFutureFilterBuilder()
+        .andMatchExecutionHint(JOB_IDENTIFIER)
+        .andMatchNotState(JobState.WAITING_FOR_BLOCKING_CONDITION)
+        .toFilter(), new IVisitor<IFuture<?>>() {
 
           @Override
           public boolean visit(IFuture<?> future) {

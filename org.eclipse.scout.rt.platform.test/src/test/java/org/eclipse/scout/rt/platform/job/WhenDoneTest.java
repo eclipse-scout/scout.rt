@@ -51,7 +51,8 @@ public class WhenDoneTest {
       }
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent())
-        .withSchedulingDelay(1, TimeUnit.SECONDS));
+        .withExecutionTrigger(Jobs.newExecutionTrigger()
+            .withStartIn(1, TimeUnit.SECONDS)));
 
     final BlockingCountDownLatch verifyLatch = new BlockingCountDownLatch(1);
     future.whenDone(new IDoneHandler<String>() {
@@ -133,8 +134,9 @@ public class WhenDoneTest {
         throw pe;
       }
     }, Jobs.newInput()
-        .withSchedulingDelay(1, TimeUnit.SECONDS)
-        .withExceptionHandling(null, false));
+        .withExceptionHandling(null, false)
+        .withExecutionTrigger(Jobs.newExecutionTrigger()
+            .withStartIn(1, TimeUnit.SECONDS)));
 
     final BlockingCountDownLatch verifyLatch = new BlockingCountDownLatch(1);
     future.whenDone(new IDoneHandler<String>() {
@@ -221,7 +223,8 @@ public class WhenDoneTest {
       }
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent())
-        .withSchedulingDelay(1, TimeUnit.SECONDS));
+        .withExecutionTrigger(Jobs.newExecutionTrigger()
+            .withStartIn(1, TimeUnit.SECONDS)));
 
     future.cancel(true);
 

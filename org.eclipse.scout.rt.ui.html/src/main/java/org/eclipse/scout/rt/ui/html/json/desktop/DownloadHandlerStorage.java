@@ -72,7 +72,8 @@ public class DownloadHandlerStorage {
     }, Jobs.newInput()
         .withExecutionHint(RESOURCE_CLEANUP_JOB_MARKER)
         .withRunContext(RunContexts.copyCurrent())
-        .withSchedulingDelay(ttl, TimeUnit.MILLISECONDS)));
+        .withExecutionTrigger(Jobs.newExecutionTrigger()
+            .withStartIn(ttl, TimeUnit.MILLISECONDS))));
   }
 
   protected void removeOnTimeout(String key) {

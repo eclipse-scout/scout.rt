@@ -47,6 +47,7 @@ import org.eclipse.scout.rt.platform.job.IJobManager;
 import org.eclipse.scout.rt.platform.job.ISchedulingSemaphore;
 import org.eclipse.scout.rt.platform.job.JobState;
 import org.eclipse.scout.rt.platform.job.Jobs;
+import org.eclipse.scout.rt.platform.job.internal.IFutureRunner;
 import org.eclipse.scout.rt.platform.job.internal.JobFutureTask;
 import org.eclipse.scout.rt.platform.job.internal.JobManager;
 import org.eclipse.scout.rt.platform.job.internal.NamedThreadFactory.ThreadInfo;
@@ -738,10 +739,10 @@ public class MutualExclusionTest {
           final Runnable runnable = (Runnable) invocation.getArguments()[0];
 
           // Reject job-2 from being scheduled
-          if (runnable instanceof JobFutureTask) {
-            JobFutureTask job = (JobFutureTask) runnable;
-            if ("job-2".equals(job.getJobInput().getName())) {
-              job.reject();
+          if (runnable instanceof IFutureRunner) {
+            JobFutureTask<?> future = ((IFutureRunner) runnable).getFutureTask();
+            if ("job-2".equals(future.getJobInput().getName())) {
+              future.reject();
               return null;
             }
           }
@@ -821,10 +822,10 @@ public class MutualExclusionTest {
           final Runnable runnable = (Runnable) invocation.getArguments()[0];
 
           // Reject job-2 from being scheduled
-          if (runnable instanceof JobFutureTask) {
-            JobFutureTask job = (JobFutureTask) runnable;
-            if ("job-2".equals(job.getJobInput().getName())) {
-              job.reject();
+          if (runnable instanceof IFutureRunner) {
+            JobFutureTask<?> future = ((IFutureRunner) runnable).getFutureTask();
+            if ("job-2".equals(future.getJobInput().getName())) {
+              future.reject();
               return null;
             }
           }

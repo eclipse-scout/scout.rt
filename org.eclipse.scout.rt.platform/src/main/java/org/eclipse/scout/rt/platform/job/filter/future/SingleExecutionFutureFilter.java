@@ -12,12 +12,12 @@ package org.eclipse.scout.rt.platform.job.filter.future;
 
 import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.job.IFuture;
-import org.eclipse.scout.rt.platform.job.JobInput;
 
 /**
- * Filter to accept single executing jobs. That are jobs, which are run only once, and not in periodic manner.
+ * Filter to accept only single executing jobs. That are jobs which are 'one-shot' executions, meaning executed just at
+ * a single point in time.
  *
- * @see JobInput#EXECUTION_MODE_SINGLE
+ * @see IFuture#isSingleExecuting(boolean)
  * @since 5.1
  */
 public class SingleExecutionFutureFilter implements IFilter<IFuture<?>> {
@@ -29,6 +29,6 @@ public class SingleExecutionFutureFilter implements IFilter<IFuture<?>> {
 
   @Override
   public boolean accept(final IFuture<?> future) {
-    return future.getExecutionMode() == JobInput.EXECUTION_MODE_SINGLE;
+    return future.isSingleExecution();
   }
 }

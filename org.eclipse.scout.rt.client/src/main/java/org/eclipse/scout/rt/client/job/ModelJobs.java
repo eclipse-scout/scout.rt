@@ -80,10 +80,12 @@ import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 public final class ModelJobs {
 
   /**
-   * Execution hint to signal that a model job requires interaction from UI, typically by a user like closing a message
-   * box. This hint is usually set just before a blocking condition is entered ("waitFor()"). Threads that are waiting
-   * for the model job to be completed can then return to the UI before the job is actually done (which would never
-   * happen without the user interaction).
+   * Execution hint to signal that a model job requires interaction from the UI, which typically would be from the user,
+   * e.g. after opening a message box or dialog.
+   * <p>
+   * This hint is usually set just before a blocking condition is entered via 'waitFor'. Threads that are waiting for
+   * the model job to complete can then return to the UI before the job is actually done (which would never happen
+   * without the user interaction).
    * <p>
    * <b>Usage</b>
    * <p>
@@ -114,8 +116,13 @@ public final class ModelJobs {
   }
 
   /**
-   * Runs the given {@link IRunnable} asynchronously in the model thread once acquired the model permit. The submitter
-   * of the job continues to run in parallel.
+   * Runs the given {@link IRunnable} asynchronously in the model thread. The submitter of the job continues to run in
+   * parallel.
+   * <p>
+   * Model jobs compete for the model permit once being fired by the associated trigger, and in the order as being
+   * scheduled. For example, if scheduling two model jobs in a row, they very likely will have the same execution time
+   * (granularity in milliseconds). However, job manager guarantees the first model job to be executed first. If no
+   * trigger is set, the model job starts competing for the model permit immediately.
    * <p>
    * <strong>Do not wait for this job to complete if being a model job yourself as this would cause a deadlock.</strong>
    * <p>
@@ -148,9 +155,15 @@ public final class ModelJobs {
   }
 
   /**
-   * Runs the given {@link Callable} asynchronously in the model thread once acquired the model permit. The submitter of
-   * the job continues to run in parallel. Jobs in the form of a {@link Callable} typically return a computation result
-   * to the submitter.
+   * Runs the given {@link Callable} asynchronously in the model thread. The submitter of the job continues to run in
+   * parallel.
+   * <p>
+   * Jobs in the form of a {@link Callable} typically return a computation result to the submitter.
+   * <p>
+   * Model jobs compete for the model permit once being fired by the associated trigger, and in the order as being
+   * scheduled. For example, if scheduling two model jobs in a row, they very likely will have the same execution time
+   * (granularity in milliseconds). However, job manager guarantees the first model job to be executed first. If no
+   * trigger is set, the model job starts competing for the model permit immediately.
    * <p>
    * <strong>Do not wait for this job to complete if being a model job yourself as this would cause a deadlock.</strong>
    * <p>

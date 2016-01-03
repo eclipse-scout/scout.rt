@@ -140,6 +140,7 @@ import org.eclipse.scout.rt.shared.extension.IExtension;
 import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
+import org.quartz.SimpleScheduleBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -2940,7 +2941,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   /**
    * Starts the timer that periodically invokes {@link AbstractForm#interceptTimer(String).
    */
-  protected IFuture<Void> startTimer(long intervalSeconds, final String timerId) {
+  protected IFuture<Void> startTimer(int intervalSeconds, final String timerId) {
     return ModelJobs.schedule(new IRunnable() {
 
       @Override
@@ -2956,9 +2957,10 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
         }
       }
     }, ModelJobs.newInput(ClientRunContexts.copyCurrent())
-        .withSchedulingDelay(intervalSeconds, TimeUnit.SECONDS)
-        .withPeriodicExecutionAtFixedRate(intervalSeconds, TimeUnit.SECONDS)
-        .withName("Form timer"));
+        .withName("Form timer")
+        .withExecutionTrigger(Jobs.newExecutionTrigger()
+            .withStartIn(intervalSeconds, TimeUnit.SECONDS)
+            .withSchedule(SimpleScheduleBuilder.repeatSecondlyForever(intervalSeconds))));
   }
 
   /**
@@ -2994,10 +2996,10 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
         }
       }
     }, ModelJobs.newInput(ClientRunContexts.copyCurrent())
-        .withSchedulingDelay(0, TimeUnit.SECONDS)
-        .withPeriodicExecutionAtFixedRate(1, TimeUnit.SECONDS)
+        .withName("Close timer")
         .withExceptionHandling(null, false)
-        .withName("Close timer"));
+        .withExecutionTrigger(Jobs.newExecutionTrigger()
+            .withSchedule(SimpleScheduleBuilder.repeatSecondlyForever())));
   }
 
   private abstract static class P_AbstractCollectingFieldVisitor<T> implements IFormFieldVisitor {

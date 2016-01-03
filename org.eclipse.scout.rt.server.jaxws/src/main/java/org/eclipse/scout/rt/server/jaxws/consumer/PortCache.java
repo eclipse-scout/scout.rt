@@ -22,6 +22,7 @@ import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.ToStringBuilder;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
+import org.quartz.SimpleScheduleBuilder;
 
 /**
  * LRU-Cache for webservice Ports to be reused across multiple webservice calls. This cache improves performance because
@@ -78,10 +79,11 @@ public class PortCache<PORT> {
         discardExpiredPorts();
       }
     }, Jobs.newInput()
-        .withSchedulingDelay(1, TimeUnit.MINUTES)
-        .withPeriodicExecutionAtFixedRate(1, TimeUnit.MINUTES)
+        .withName("Cleaning up JAX-WS port cache")
         .withRunContext(RunContexts.empty())
-        .withName("Cleaning up JAX-WS port cache"));
+        .withExecutionTrigger(Jobs.newExecutionTrigger()
+            .withStartIn(1, TimeUnit.MINUTES)
+            .withSchedule(SimpleScheduleBuilder.repeatMinutelyForever())));
 
     // Ensures to have at minimum 'corePoolSize' Ports in the cache.
     if (m_corePoolSize > 0) {

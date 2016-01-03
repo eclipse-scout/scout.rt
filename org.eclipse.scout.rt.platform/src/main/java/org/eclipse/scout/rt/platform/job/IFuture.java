@@ -59,6 +59,13 @@ public interface IFuture<RESULT> extends ICancellable {
   ISchedulingSemaphore getSchedulingSemaphore();
 
   /**
+   * Returns whether this job is a 'one-shot' execution, meaning just a single execution at a particular moment in time.
+   *
+   * @return <code>true</code> if single executing, or else <code>false</code> if it repeats one time at minimum.
+   */
+  boolean isSingleExecution();
+
+  /**
    * Attempts to cancel the execution of the associated job. This attempt will be ignored if the job has already
    * completed or was cancelled. If not running yet, the job will never run. If the job has already started, then the
    * <code>interruptIfRunning</code> parameter determines whether the thread executing this job should be interrupted in
@@ -89,12 +96,6 @@ public interface IFuture<RESULT> extends ICancellable {
    * return <code>true</code> upon completion.
    */
   boolean isFinished();
-
-  /**
-   * Returns the execution mode of this job, and is one of {@link #EXECUTION_MODE_SINGLE}, or
-   * {@link #EXECUTION_MODE_PERIODIC_AT_FIXED_RATE}, or {@link #EXECUTION_MODE_PERIODIC_WITH_FIXED_DELAY}.
-   */
-  int getExecutionMode();
 
   /**
    * Returns this future's current state; is never <code>null</code>.

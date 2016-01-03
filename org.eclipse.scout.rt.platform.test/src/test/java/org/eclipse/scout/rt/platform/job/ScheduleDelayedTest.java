@@ -28,22 +28,23 @@ public class ScheduleDelayedTest {
   public void testScheduleDelayed() {
     final AtomicReference<Long> actualExecutionTime = new AtomicReference<>();
 
-    long tStartNano = System.nanoTime();
-    long delayNanos = TimeUnit.SECONDS.toNanos(1);
+    long tStartMillis = System.currentTimeMillis();
+    long delayMillis = TimeUnit.SECONDS.toMillis(1);
     IFuture<Void> future = Jobs.getJobManager().schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
-        actualExecutionTime.set(System.nanoTime());
+        actualExecutionTime.set(System.currentTimeMillis());
       }
     }, Jobs.newInput()
         .withRunContext(RunContexts.empty())
-        .withSchedulingDelay(delayNanos, TimeUnit.NANOSECONDS));
+        .withExecutionTrigger(Jobs.newExecutionTrigger()
+            .withStartIn(delayMillis, TimeUnit.MILLISECONDS)));
 
     // verify
     future.awaitDone(10, TimeUnit.SECONDS);
 
-    long minExpectedExecutionTime = tStartNano + delayNanos;
+    long minExpectedExecutionTime = tStartMillis + delayMillis;
     if (actualExecutionTime.get() < minExpectedExecutionTime) {
       fail(String.format("actualExecutionTime=%s, minExpectedExecutionTime=[%s]", actualExecutionTime.get(), minExpectedExecutionTime));
     }

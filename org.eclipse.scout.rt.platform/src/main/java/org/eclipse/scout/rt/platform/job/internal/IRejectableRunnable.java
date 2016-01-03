@@ -24,7 +24,7 @@ public interface IRejectableRunnable extends Runnable {
 
   /**
    * Rejects this runnable from being executed. If this task is assigned to a {@link ISchedulingSemaphore}, this task
-   * still owns the permit.
+   * might still be a permit owner.
    */
   void reject();
 }
