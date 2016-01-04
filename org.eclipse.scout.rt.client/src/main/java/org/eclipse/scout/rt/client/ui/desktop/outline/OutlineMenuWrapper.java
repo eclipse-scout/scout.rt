@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.desktop.outline;
 
+import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.security.Permission;
 import java.util.ArrayList;
@@ -23,13 +24,15 @@ import org.eclipse.scout.rt.client.ui.action.IActionUIFacade;
 import org.eclipse.scout.rt.client.ui.action.IActionVisitor;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
+import org.eclipse.scout.rt.client.ui.action.tree.IActionNode;
 import org.eclipse.scout.rt.platform.classid.ITypeWithClassId;
+import org.eclipse.scout.rt.platform.reflect.AbstractPropertyObserver;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
-public class OutlineMenuWrapper implements IMenu {
+public class OutlineMenuWrapper extends AbstractPropertyObserver implements IMenu {
 
   private IMenu m_wrappedMenu;
-  private List<IMenu> m_childMenus;
+  private PropertyChangeListener m_wrappedMenuPropertyChangeListener;
   private boolean m_localEnabled = true;
   private boolean m_localEnabledInheritAccessibility = true;
   private Set<IMenuType> m_menuTypes;
@@ -70,17 +73,40 @@ public class OutlineMenuWrapper implements IMenu {
     for (IMenuType menuType : originalTypes) {
       m_menuTypes.add(mapper.map(menuType));
     }
+    m_wrappedMenuPropertyChangeListener = createWrappedMenuPropertyChangeListener(mapper);
     setup(mapper);
   }
 
-  protected void setup(IMenuTypeMapper mapper) {
+  protected PropertyChangeListener createWrappedMenuPropertyChangeListener(final IMenuTypeMapper mapper) {
+    return new PropertyChangeListener() {
+      @Override
+      public void propertyChange(PropertyChangeEvent evt) {
+        if (IActionNode.PROP_CHILD_ACTIONS.equals(evt.getPropertyName())) {
+          // Special handling for PROP_CHILD_ACTIONS, wrap child actions as well
+          wrapChildActions(mapper);
+        }
+        else {
+          // Duplicate all other events (pretending they came from the outline menu wrapper)
+          PropertyChangeEvent copy = new PropertyChangeEvent(OutlineMenuWrapper.this, evt.getPropertyName(), evt.getOldValue(), evt.getNewValue());
+          propertySupport.firePropertyChange(copy);
+        }
+      }
+    };
+  }
+
+  protected void setup(final IMenuTypeMapper mapper) {
+    wrapChildActions(mapper);
+    m_wrappedMenu.addPropertyChangeListener(m_wrappedMenuPropertyChangeListener);
+  }
+
+  protected void wrapChildActions(final IMenuTypeMapper mapper) {
     List<IMenu> childActions = m_wrappedMenu.getChildActions();
     List<IMenu> wrappedChildActions = new ArrayList<IMenu>(childActions.size());
     // create child wrapper
     for (IMenu m : childActions) {
       wrappedChildActions.add(new OutlineMenuWrapper(m, mapper));
     }
-    m_childMenus = wrappedChildActions;
+    propertySupport.setProperty(PROP_CHILD_ACTIONS, wrappedChildActions);
   }
 
   public IMenu getWrappedMenu() {
@@ -107,19 +133,23 @@ public class OutlineMenuWrapper implements IMenu {
     throw new UnsupportedOperationException("read only wrapper");
   }
 
+  private List<IMenu> getChildActionsInternal() {
+    return propertySupport.getPropertyList(PROP_CHILD_ACTIONS);
+  }
+
   @Override
   public boolean hasChildActions() {
-    return m_childMenus.size() > 0;
+    return CollectionUtility.hasElements(getChildActionsInternal());
   }
 
   @Override
   public int getChildActionCount() {
-    return m_childMenus.size();
+    return CollectionUtility.size(getChildActionsInternal());
   }
 
   @Override
   public List<IMenu> getChildActions() {
-    return m_childMenus;
+    return CollectionUtility.arrayList(getChildActionsInternal());
   }
 
   @Override
@@ -154,6 +184,7 @@ public class OutlineMenuWrapper implements IMenu {
 
   @Override
   public void dispose() {
+    m_wrappedMenu.removePropertyChangeListener(m_wrappedMenuPropertyChangeListener);
     m_wrappedMenu.dispose();
   }
 
@@ -390,26 +421,6 @@ public class OutlineMenuWrapper implements IMenu {
   @Override
   public void setContainerInternal(ITypeWithClassId container) {
     // void
-  }
-
-  @Override
-  public void addPropertyChangeListener(PropertyChangeListener listener) {
-    m_wrappedMenu.addPropertyChangeListener(listener);
-  }
-
-  @Override
-  public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
-    m_wrappedMenu.addPropertyChangeListener(propertyName, listener);
-  }
-
-  @Override
-  public void removePropertyChangeListener(PropertyChangeListener listener) {
-    m_wrappedMenu.removePropertyChangeListener(listener);
-  }
-
-  @Override
-  public void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
-    m_wrappedMenu.removePropertyChangeListener(propertyName, listener);
   }
 
   @Override
