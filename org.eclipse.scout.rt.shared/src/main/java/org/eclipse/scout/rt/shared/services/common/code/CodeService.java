@@ -24,6 +24,7 @@ import java.util.Set;
 import javax.annotation.PostConstruct;
 
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.CreateImmediately;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.holders.Holder;
@@ -42,6 +43,7 @@ import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
  * @since 4.3.0 (Mars-M5)
  */
 @Order(5100)
+@CreateImmediately
 public class CodeService implements ICodeService {
 
   public static final String CODE_SERVICE_CACHE_ID = CodeService.class.getName();
