@@ -32,22 +32,8 @@
     cursor: default;
   }
 
-  &:focus {
-    outline: none;
-    color: @hover-color;
-  }
-
   &.menu-textandicon > .icon {
     padding-right: 5px;
-  }
-
-  /* Draw border for icon only items */
-  &.menu-icononly:focus::after {
-    #scout.button-focus();
-  }
-
-  &:not(.menu-icononly):focus {
-    text-decoration: underline;
   }
 
   & > .icon,

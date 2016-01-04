@@ -83,11 +83,28 @@
         color: @menubar-item-color;
       }
 
-      &:focus:not(.disabled):not(.menu-button) {
-        color: @focus-color;
+      &:focus {
+        outline: none;
 
-        &::after {
-          color: @focus-color;
+        &:not(.disabled) {
+          color: @hover-color;
+
+          &:not(.menu-button) {
+            color: @focus-color;
+
+            &::after {
+              color: @focus-color;
+            }
+          }
+
+          /* Draw border for icon only items */
+          &.menu-icononly::after {
+            #scout.button-focus();
+          }
+
+          &:not(.menu-icononly):not(.menu-button) {
+            text-decoration: underline;
+          }
         }
       }
 
@@ -130,11 +147,7 @@
           }
         }
 
-        &:focus {
-          outline: none;
-        }
-
-        &:focus::after {
+        &:focus:not(.disabled)::after {
           #scout.button-focus();
         }
 
@@ -145,9 +158,8 @@
         &.default-menu:not(.disabled) {
           #scout.font-text-normal(@font-weight-bold);
           background-color: @default-button-background-color;
-          /* same color border is necessary to align the text with text from buttons with a real border */
-          border-color: @default-button-background-color;
-          border-color: transparent; /* FIXME bsh: Check which is better! */
+          /* border is necessary to align the text with text from buttons with a real border */
+          border-color: transparent;
           color: @default-button-color;
 
           &:focus {
