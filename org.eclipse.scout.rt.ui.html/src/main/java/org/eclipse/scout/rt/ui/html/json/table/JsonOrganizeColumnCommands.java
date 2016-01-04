@@ -23,8 +23,8 @@ public class JsonOrganizeColumnCommands implements IJsonObject {
 
   public JsonOrganizeColumnCommands(OrganizeColumnsMenu formToolButton) {
     formToolButton.ensureFormCreated();
+    formToolButton.ensureFormStarted();
     this.m_form = formToolButton.getForm();
-    this.m_form.reload();
   }
 
   @Override
@@ -51,6 +51,12 @@ public class JsonOrganizeColumnCommands implements IJsonObject {
     }
     else if ("modify".equals(action)) {
       table.getMenuByClass(ModifyCustomColumnMenu.class).doAction();
+    }
+  }
+
+  public void update() {
+    if (m_form.isDirty()) {
+      m_form.reload();
     }
   }
 

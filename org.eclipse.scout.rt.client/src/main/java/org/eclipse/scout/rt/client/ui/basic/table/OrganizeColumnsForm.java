@@ -80,9 +80,12 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
 
   protected boolean m_loading;
 
+  private boolean m_dirty;
+
   public OrganizeColumnsForm(ITable table) {
     super(false);
     m_organizedTable = table;
+    m_dirty = true;
     callInitializer();
   }
 
@@ -1490,7 +1493,18 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
     }
     finally {
       m_loading = false;
+      m_dirty = false;
     }
+  }
+
+  @Override
+  public void setDirty(boolean dirty) {
+    m_dirty = dirty;
+  }
+
+  @Override
+  public boolean isDirty() {
+    return m_dirty;
   }
 
   @Override

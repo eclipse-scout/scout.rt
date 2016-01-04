@@ -509,6 +509,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
       OrganizeColumnsMenu organizeColumnsMenu = getModel().getMenuByClass(OrganizeColumnsMenu.class);
       m_organizeColumnCommands = new JsonOrganizeColumnCommands(organizeColumnsMenu);
     }
+    m_organizeColumnCommands.update();
     String columnId = event.getData().getString("columnId");
     getModel().selectColumnHeader(getColumn(columnId));
     addActionEvent("columnActionsChanged", m_organizeColumnCommands.toJson());

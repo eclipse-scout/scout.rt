@@ -1036,7 +1036,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     // So we don't have to reload each time we click on a table header menu. The reload is required
     // when the table structure has been changed (e.g. a new column has been added)
     if (m_organizeColumnsForm != null && !getMenuByClass(OrganizeColumnsMenu.class).isSelected()) {
-      m_organizeColumnsForm.reload();
+      m_organizeColumnsForm.setDirty(true);
     }
   }
 
