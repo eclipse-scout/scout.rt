@@ -41,7 +41,7 @@ scout.SmartField = function() {
   this._oldSearchText;
   this._popup;
   this._requestedProposal = false;
-  this._tabPrevented = false;
+  this._tabPrevented = undefined;
 };
 scout.inherits(scout.SmartField, scout.ValueField);
 
@@ -215,7 +215,7 @@ scout.SmartField.prototype._onKeyDown = function(e) {
   if (e.which === scout.keys.TAB) {
     if (this._isPreventDefaultTabHandling()) {
       e.preventDefault();
-      this._tabPrevented = true;
+      this._tabPrevented = {directionBack: e.shiftKey};
       this._acceptProposal();
       return;
     }
@@ -311,7 +311,7 @@ scout.SmartField.prototype._fieldBounds = function() {
 
 scout.SmartField.prototype._onFieldBlur = function() {
   // omit super call
-  $.log.debug('(SmartField#_onFieldBlur) tabPrevented=' + this._tabPrevented);
+  $.log.debug('(SmartField#_onFieldBlur) tabPrevented=' + this._tabPrevented ? 'true':'false');
   this._requestedProposal = false;
 
   if (this.embedded) {
@@ -326,7 +326,7 @@ scout.SmartField.prototype._onFieldBlur = function() {
   // is closed and for the Java-client the request would look like, it should perform a lookup after the
   // user has typed something into the SmartField.
   if (this._tabPrevented) {
-    this._tabPrevented = false;
+    this._tabPrevented = undefined;
   } else {
     this._acceptProposal(true);
   }
@@ -395,10 +395,13 @@ scout.SmartField.prototype._sendAcceptProposal = function(searchText, chooser, f
 // FIXME awe, dwi: check if we can find next tabbable in the current focus-context (FocusManager)
 scout.SmartField.prototype._focusNextTabbable = function() {
   var $tabElements = this.entryPoint().find(':tabbable');
-  var nextIndex = 0;
+  var direction = this._tabPrevented.directionBack ? -1 : 1;
   var fieldIndex = $tabElements.index(this.$field);
-  if (fieldIndex + 1 < $tabElements.length) {
-    nextIndex = fieldIndex + 1;
+  var nextIndex = fieldIndex+direction;
+  if (nextIndex < 0) {
+    nextIndex = $tabElements.length -1;
+  } else if(fieldIndex>=$tabElements.length){
+    nextIndex = 0;
   }
   $.log.debug('SmartField tab-index=' + fieldIndex + ' next tab-index=' + nextIndex);
   $tabElements.eq(nextIndex).focus();
