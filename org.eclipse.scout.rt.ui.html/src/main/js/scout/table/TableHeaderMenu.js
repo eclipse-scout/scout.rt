@@ -161,6 +161,8 @@ scout.TableHeaderMenu.prototype._renderMovingGroup = function() {
 };
 
 scout.TableHeaderMenu.prototype._renderColumnActionsGroup = function() {
+  var menuPopup = this;
+
   this.columnActionsGroup = scout.create('TableHeaderMenuGroup', {
     parent: this,
     textKey: 'ui.Column'});
@@ -187,6 +189,7 @@ scout.TableHeaderMenu.prototype._renderColumnActionsGroup = function() {
   this.columnActionsGroup.render(this.$columnActions);
 
   function onClick(action) {
+    menuPopup.remove();
     this.table._send('columnOrganizeAction', {action: action});
   }
 };
