@@ -39,6 +39,11 @@ scout.Outline.prototype._createKeyStrokeContext = function() {
   return new scout.OutlineKeyStrokeContext(this);
 };
 
+scout.Outline.prototype._filterMenus = function(menus, destination, onlyVisible, enableDisableKeyStroke) {
+  //show no contextmenues
+  return [];
+};
+
 /**
  * @override Tree.js
  */
