@@ -28,7 +28,7 @@ scout.RangeKeyStroke.prototype.registerRange = function(from, to) {
  * @override KeyStroke.js
  */
 scout.RangeKeyStroke.prototype._accept = function(event) {
-  if (event.ctrlKey !== this.ctrl ||
+  if ((scout.device.browser === scout.Device.Browser.SAFARI ? event.ctrlKey||event.metaKey : event.ctrlKey) !== this.ctrl ||
     event.altKey !== this.alt ||
     event.shiftKey !== this.shift
   ) {
