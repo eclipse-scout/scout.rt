@@ -31,10 +31,15 @@ scout.BrowserField.prototype._render = function($parent) {
  */
 scout.BrowserField.prototype._renderProperties = function() {
   scout.BrowserField.parent.prototype._renderProperties.call(this);
+  this._renderIframeProperties();
+};
+
+scout.BrowserField.prototype._renderIframeProperties = function() {
   this._renderLocation();
   this._renderScrollBarsEnabled();
   this._renderSandboxEnabled(); // includes _renderSandboxPermissions()
 };
+
 
 scout.BrowserField.prototype._renderLocation = function() {
   this.$field.attr('src', this.location);
@@ -87,3 +92,20 @@ scout.BrowserField.prototype._remove = function() {
   this.myWindow.removeEventListener('message', this._postMessageListener);
   this._postMessageListener = null;
 };
+
+/**
+* @override Widget.js
+*/
+scout.BrowserField.prototype._afterAttach = function(parent) {
+  // the security=restricted attribute prevents browsers (IE 9 and below) from
+  // sending any cookies a second time
+  // as a workaround for IFRAMEs to work, we have to recreate the whole field in that case
+  if (scout.device.requiresIframeSecurityAttribute()) {
+    this.$field.remove();
+    this.removeField();
+    this.addField(parent.$container.makeElement('<iframe>'));
+    this._renderIframeProperties();
+    this.htmlComp.revalidateLayout();
+  }
+};
+
