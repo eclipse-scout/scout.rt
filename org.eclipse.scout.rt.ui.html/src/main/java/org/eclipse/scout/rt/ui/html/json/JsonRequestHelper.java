@@ -38,7 +38,16 @@ public class JsonRequestHelper {
    * @return {@link JSONObject} to indicate that an unrecoverable failure occurred.
    */
   public JSONObject createUnrecoverableFailureResponse() {
-    final JsonResponse response = new JsonResponse();
+    return createUnrecoverableFailureResponse(null);
+  }
+
+  /**
+   * Same as {@link #createUnrecoverableFailureResponse()} but assign the given sequenceNo to the response. This is
+   * useful when an error happens during handling of a specific response. By passing the sequenceNo to the UI, the
+   * response queue order can be kept consistent.
+   */
+  public JSONObject createUnrecoverableFailureResponse(Long sequenceNo) {
+    final JsonResponse response = new JsonResponse(sequenceNo);
     response.markAsError(JsonResponse.ERR_UI_PROCESSING, "UI processing error");
     return response.toJson();
   }

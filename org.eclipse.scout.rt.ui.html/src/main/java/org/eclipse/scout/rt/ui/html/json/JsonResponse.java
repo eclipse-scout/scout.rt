@@ -20,7 +20,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.CompareUtility;
 import org.json.JSONArray;
@@ -42,7 +41,7 @@ public class JsonResponse {
   public static final String PROP_ERROR_CODE = "code";
   public static final String PROP_ERROR_MESSAGE = "message";
 
-  private Long m_sequenceNo;
+  private final Long m_sequenceNo;
   private final Map<String/*adapterId*/, IJsonAdapter<?>> m_adapterMap;
   private final List<JsonEvent> m_eventList;
   private final Map<String/*adapterId*/, JsonEvent> m_idToPropertyChangeEventMap; // helper map to ensure max. 1 event per adapter
@@ -55,6 +54,11 @@ public class JsonResponse {
   private boolean m_processingBufferedEvents;
 
   public JsonResponse() {
+    this(null);
+  }
+
+  public JsonResponse(Long sequenceNo) {
+    m_sequenceNo = sequenceNo;
     m_adapterMap = new HashMap<>();
     m_eventList = new ArrayList<>();
     m_idToPropertyChangeEventMap = new HashMap<>();
@@ -188,9 +192,8 @@ public class JsonResponse {
     return m_error;
   }
 
-  public void assignSequenceNo(Long sequenceNo) {
-    Assertions.assertNull(m_sequenceNo, "SequenceNo cannot be changed once it has been assigned (existing value={}, new value={})", m_sequenceNo, sequenceNo);
-    m_sequenceNo = sequenceNo;
+  public Long getSequenceNo() {
+    return m_sequenceNo;
   }
 
   // FIXME cgu: potential threading issue: toJson is called by servlet thread. Property-Change-Events may alter the eventList from client job thread
@@ -253,8 +256,8 @@ public class JsonResponse {
       json.put(PROP_EVENTS, (eventArray.length() == 0 ? null : eventArray));
       json.put(PROP_ADAPTER_DATA, (adapterData.length() == 0 ? null : adapterData));
       if (m_error) {
-        // !!! IMPORTANT: If you change the response structure here, it has to be changed accordingly in the card coded string
-        // org.eclipse.scout.rt.server.commons.servlet.filter.authentication.ServletFilterHelper.sendJsonSessionTimeout(HttpServletResponse)
+        // !!! IMPORTANT: If you change the response structure here, it has to be changed accordingly in the hard coded string
+        // org.eclipse.scout.rt.server.commons.servlet.filter.authentication.ServletFilterHelper.JSON_SESSION_TIMEOUT_RESPONSE
         JSONObject jsonError = new JSONObject();
         jsonError.put(PROP_ERROR_CODE, m_errorCode);
         jsonError.put(PROP_ERROR_MESSAGE, m_errorMessage);
@@ -370,5 +373,19 @@ public class JsonResponse {
 
   public boolean isEmpty() {
     return m_adapterMap.isEmpty() && m_eventList.isEmpty() && m_bufferedEventsAdapters.isEmpty();
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder("JsonResponse [");
+    sb.append("#" + m_sequenceNo);
+    sb.append(", adapters: ").append(m_adapterMap.size());
+    sb.append(", events: ").append(m_eventList.size());
+    sb.append(", buffered events adapters: ").append(m_bufferedEventsAdapters.size());
+    if (m_error) {
+      sb.append(", MARKED AS ERROR ").append(m_errorCode).append(": ").append(m_errorMessage);
+    }
+    sb.append("]");
+    return sb.toString();
   }
 }

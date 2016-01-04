@@ -67,6 +67,7 @@ import org.eclipse.scout.rt.ui.html.json.JsonEventProcessor;
 import org.eclipse.scout.rt.ui.html.json.JsonLocale;
 import org.eclipse.scout.rt.ui.html.json.JsonRequest;
 import org.eclipse.scout.rt.ui.html.json.JsonRequest.RequestType;
+import org.eclipse.scout.rt.ui.html.json.JsonRequestHelper;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.JsonStartupRequest;
 import org.eclipse.scout.rt.ui.html.json.MainJsonObjectFactory;
@@ -125,9 +126,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
   }
 
   protected JsonResponse createJsonResponse() {
-    JsonResponse response = new JsonResponse();
-    response.assignSequenceNo(m_responseSequenceNo.getAndIncrement());
-    return response;
+    return new JsonResponse(m_responseSequenceNo.getAndIncrement());
   }
 
   protected JsonAdapterRegistry createJsonAdapterRegistry() {
@@ -711,12 +710,20 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
     return new Callable<JSONObject>() {
       @Override
       public JSONObject call() throws Exception {
-        // 1. Convert response to JSON (must be done in model thread due to model access).
-        final JSONObject json = m_currentJsonResponse.toJson();
-        // 2. Create a new JSON response for future jobs
-        m_currentJsonResponse = createJsonResponse();
-        // TODO [5.2] bsh, awe, dwi: Should we catch errors from toJson() and create a new json response in the finally?
-        return json;
+        try {
+          // Convert response to JSON (must be done in model thread due to potential model access inside the toJson() method).
+          return m_currentJsonResponse.toJson();
+        }
+        catch (RuntimeException e) {
+          LOG.warn("Error while transforming response to JSON: {}", m_currentJsonResponse, e);
+          // Return UI error, with same sequenceNo to keep response queue order consistent
+          return BEANS.get(JsonRequestHelper.class).createUnrecoverableFailureResponse(m_currentJsonResponse.getSequenceNo());
+        }
+        finally {
+          // Create a new JSON response for future jobs. This is also done in case of an exception, because apparently the
+          // response is corrupt and the exception is likely to happen again.
+          m_currentJsonResponse = createJsonResponse();
+        }
       }
     };
   }
