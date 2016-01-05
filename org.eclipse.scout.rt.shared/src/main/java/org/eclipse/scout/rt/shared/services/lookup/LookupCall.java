@@ -17,6 +17,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ITypeWithClassId;
+import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
@@ -388,6 +389,7 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, S
         loadData(dataProvider, callback);
       }
     }, Jobs.newInput()
+        .withRunContext(RunContexts.copyCurrent())
         .withName("Fetching lookup data [provider={}, lookupCall={}]", dataProvider.getClass().getName(), getClass().getName()));
   }
 
