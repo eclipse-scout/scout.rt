@@ -34,7 +34,9 @@ scout.menuNavigationKeyStrokes = {
       return;
     } else {
       $newItem.select(true).focus();
-      this.field.updateNextToSelected(this._menuItemClass, $newItem);
+      if(this.field.updateNextToSelected){
+        this.field.updateNextToSelected(this._menuItemClass, $newItem);
+      }
     }
     if ($oldItem.length > 0) {
       $oldItem.select(false);
