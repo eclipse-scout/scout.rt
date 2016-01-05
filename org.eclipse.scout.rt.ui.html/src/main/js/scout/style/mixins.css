@@ -76,9 +76,11 @@
 
   .placeholder() {
     color: @text-field-placeholder-color;
+    opacity: 1; /* necessary for firefox */
   }
   .placeholder-disabled() {
-    color: @disabled-color;
+    /* Fade a little to make it distinguishable from real text. Don't use opacity here because it affects background as well (IE). */
+    color: fade(@disabled-color, 70%);
   }
 
   .overlay(@left: 0px, @top: 0px, @diffW: 0px, @diffH: 0px) {
