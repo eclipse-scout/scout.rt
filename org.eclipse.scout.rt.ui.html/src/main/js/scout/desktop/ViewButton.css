@@ -42,6 +42,7 @@
   }
 
   &.view-menu-popup-head {
+    position: absolute;
     background-color: @active-inverted-color;
     color: @active-color;
   }
