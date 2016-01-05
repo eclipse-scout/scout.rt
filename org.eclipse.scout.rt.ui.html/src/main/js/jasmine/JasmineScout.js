@@ -422,6 +422,7 @@ function extendEventWithModifier(event, modifier) {
   event.altKey = modifier === 'alt';
   event.ctrlKey = modifier === 'ctrl';
   event.shiftKey = modifier === 'shift';
+  event.metaKey = modifier === 'meta';
 }
 
 $.fn.triggerMouseEnter = function(opts) {
