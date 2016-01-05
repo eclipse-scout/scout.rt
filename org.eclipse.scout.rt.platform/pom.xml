@@ -39,11 +39,9 @@
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
     </dependency>
-    <!-- TODO sle: move into dependency management section of Maven master -->
     <dependency>
       <groupId>org.quartz-scheduler</groupId>
       <artifactId>quartz</artifactId>
-      <version>2.2.2</version>
    </dependency>
     <!-- optional logger dependencies -->
 
