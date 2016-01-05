@@ -408,7 +408,9 @@ scout.ContextMenuPopup.prototype.updateNextToSelected = function(menuItemClass, 
   $selectedItem = $selectedItem ? $selectedItem : this.$body.find('.' + menuItemClass + '.selected');
 
   $all.toggleClass('next-to-selected', false);
-  $selectedItem.nextAll(':visible').first().toggleClass('next-to-selected', true);
+  if ($selectedItem.hasClass('selected')) {
+    $selectedItem.nextAll(':visible').first().toggleClass('next-to-selected', true);
+  }
 };
 
 scout.ContextMenuPopup.prototype._onMenuItemPropertyChange = function(event) {
