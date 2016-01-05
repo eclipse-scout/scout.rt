@@ -1839,6 +1839,7 @@ scout.Table.prototype.insertRows = function(rows, fromServer) {
     // If event comes from server, there will be a row order changed event as well -> no sorting necessary
     this._sort();
   }
+  this._rebuildingTable = false;
 
   // Update HTML
   if (this.rendered) {
@@ -2813,11 +2814,6 @@ scout.Table.prototype._syncFilters = function(filters) {
   }
 };
 
-scout.Table.prototype._renderFilters = function() {
-  // _renderFilters is only called after initialization (due to a property change). In that case -> filter()
-  this.filter();
-};
-
 scout.Table.prototype._renderCheckable = function() {
   this._redraw();
 };
@@ -3169,6 +3165,12 @@ scout.Table.prototype._calculateFillerHeight = function(range) {
   return totalHeight;
 };
 
+scout.Table.prototype.containsNumberColumn = function() {
+  return this.columns.some(function(column) {
+    return column instanceof scout.NumberColumn;
+  });
+};
+
 scout.Table.prototype._onRowsInserted = function(rows) {
   this.insertRows(rows, true);
 };
@@ -3232,6 +3234,8 @@ scout.Table.prototype._onRowOrderChanged = function(rowIds) {
  * Does not modify the rows, it expects a deleteAll and insert event to follow which will do the job.
  */
 scout.Table.prototype._onColumnStructureChanged = function(columns) {
+  this._rebuildingTable = true;
+
   this.columns = columns;
   this._initColumns();
 
@@ -3352,10 +3356,12 @@ scout.Table.prototype._onAggregationFunctionChanged = function(event) {
   this._group();
 };
 
-scout.Table.prototype.containsNumberColumn = function() {
-  return this.columns.some(function(column) {
-    return column instanceof scout.NumberColumn;
-  });
+scout.Table.prototype._onFiltersChanged = function(filters) {
+  this._syncFilters(filters);
+  // do not refilter while the table is being rebuilt (because column.index in filter and row.cells may be inconsistent)
+  if (!this._rebuildingTable) {
+    this.filter();
+  }
 };
 
 scout.Table.prototype.onModelAction = function(event) {
@@ -3381,8 +3387,8 @@ scout.Table.prototype.onModelAction = function(event) {
     this._onRowOrderChanged(event.rowIds);
   } else if (event.type === 'rowsUpdated') {
     this._onRowsUpdated(event.rows);
-  } else if (event.type === 'rowFilterChanged') {
-    this._onRowFilterChanged(event.rows);
+  } else if (event.type === 'filtersChanged') {
+    this._onFiltersChanged(event.filters);
   } else if (event.type === 'rowsChecked') {
     this._onRowsChecked(event.rows);
   } else if (event.type === 'columnStructureChanged') {

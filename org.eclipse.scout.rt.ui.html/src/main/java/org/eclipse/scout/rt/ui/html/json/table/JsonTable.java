@@ -112,6 +112,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   public static final String EVENT_EXPORT_TO_CLIPBOARD = "exportToClipboard";
   public static final String EVENT_ADD_FILTER = "addFilter";
   public static final String EVENT_REMOVE_FILTER = "removeFilter";
+  public static final String EVENT_FILTERS_CHANGED = "filtersChanged";
   public static final String EVENT_ROWS_FILTERED = "rowsFiltered";
 
   public static final String PROP_ROWS = "rows";
@@ -1013,6 +1014,13 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
       }
       case TableEvent.TYPE_COLUMN_STRUCTURE_CHANGED: {
         m_eventBuffer.add(event);
+
+        // Resend filters because a column with a filter may got invisible (since the gui does not know invisible columns, the filter would fail).
+        // Also necessary because column ids have changed.
+        if (getModel().getUserFilterManager() != null && getModel().getUserFilterManager().getFilters().size() > 0) {
+          m_eventBuffer.add(new TableEvent(getModel(), TableEvent.TYPE_USER_FILTER_ADDED));
+        }
+
         // If a column got visible it is necessary to resend all rows to inform the gui about the new cells of the new column
         m_eventBuffer.add(new TableEvent(getModel(), TableEvent.TYPE_ALL_ROWS_DELETED));
         m_eventBuffer.add(new TableEvent(getModel(), TableEvent.TYPE_ROWS_INSERTED, getModel().getRows()));
@@ -1226,11 +1234,6 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     JSONObject jsonEvent = new JSONObject();
     putProperty(jsonEvent, PROP_COLUMNS, columnsToJson(getColumnsInViewOrder()));
     addActionEvent(EVENT_COLUMN_STRUCTURE_CHANGED, jsonEvent);
-
-    // Resend filters because a column with a filter may got invisible.
-    // Since the gui does not know invisible columns, the filter would fail.
-    // True means only resend if there are filters at all
-    addUserFiltersChanged(true);
   }
 
   protected void handleModelColumnOrderChanged() {
@@ -1269,21 +1272,10 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   }
 
   protected void handleModelUserFilterChanged(TableEvent event) {
-    addUserFiltersChanged();
-  }
-
-  protected void addUserFiltersChanged() {
-    addUserFiltersChanged(false);
-  }
-
-  protected void addUserFiltersChanged(boolean onlyIfThereAreFilters) {
-    if (getModel().getUserFilterManager() == null) {
-      return;
-    }
     Collection<IUserFilterState> filters = getModel().getUserFilterManager().getFilters();
-    if (!onlyIfThereAreFilters || filters.size() > 0) {
-      addPropertyChangeEvent(PROP_FILTERS, filtersToJson(filters));
-    }
+    JSONObject jsonEvent = new JSONObject();
+    jsonEvent.put(PROP_FILTERS, filtersToJson(filters));
+    addActionEvent(EVENT_FILTERS_CHANGED, jsonEvent);
   }
 
   protected void handleModelColumnAggregationChanged(TableEvent event) {
