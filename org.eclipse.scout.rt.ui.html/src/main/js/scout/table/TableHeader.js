@@ -481,6 +481,11 @@ scout.TableHeader.prototype._onHeaderItemMousedown = function(event) {
     move = $header.outerWidth(),
     $otherHeaders = $header.siblings('.table-header-item:not(.filler)');
 
+  if (column.fixedPosition) {
+    // Don't allow moving a column with fixed position
+    return;
+  }
+
   this.dragging = false;
   // firefox fires a click action after a column has been droped at the new location, chrome doesn't -> we need a hint to avoid menu gets opened after drop
   this.columnMoved = false;

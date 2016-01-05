@@ -78,7 +78,10 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
   }
 
   // Moving
-  if (this.table.columns.length > 1) {
+  var movableColumns = this.table.columns.filter(function(column) {
+    return !column.fixedPosition;
+  });
+  if (movableColumns.length > 1 && !this.column.fixedPosition) {
     this._renderMovingGroup();
   }
   // Sorting
