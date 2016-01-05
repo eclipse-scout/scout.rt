@@ -124,9 +124,8 @@ scout.KeyStroke.prototype._isEnabled = function() {
  * Method invoked in the context of accepting a keystroke, and returns true if the event matches this keystroke.
  */
 scout.KeyStroke.prototype._accept = function(event) {
-  //scout.device.browser === scout.Device.Browser.SAFARI ? event.ctrlKey||event.metaKey : event.ctrlKey) --> some keystrokes with ctrl
-  //modifier are captured and suppressed by osx use in this cases command key
-  return this._acceptModifer(this.ctrl, (scout.device.browser === scout.Device.Browser.SAFARI ? event.ctrlKey||event.metaKey : event.ctrlKey)) &&
+  //event.ctrlKey||event.metaKey  --> some keystrokes with ctrl modifier are captured and suppressed by osx use in this cases command key
+  return this._acceptModifer(this.ctrl, (event.ctrlKey || event.metaKey)) &&
     this._acceptModifer(this.alt, event.altKey) &&
     this._acceptModifer(this.shift, event.shiftKey) &&
     scout.isOneOf(event.which, this.which);

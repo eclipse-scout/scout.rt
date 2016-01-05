@@ -397,7 +397,8 @@ scout.DateField.prototype._onDateFieldKeydown = function(event) {
 
   if (event.which === scout.keys.UP || event.which === scout.keys.DOWN) {
     delta = (event.which === scout.keys.UP ? -1 : 1);
-    if (event.ctrlKey|| (scout.device.browser === scout.Device.Browser.SAFARI &&event.metaKey) && modifierCount === 1) { // only ctrl
+    //event.ctrlKey||event.metaKey  --> some keystrokes with ctrl modifier are captured and suppressed by osx use in this cases command key
+    if ((event.ctrlKey || event.metaKey) && modifierCount === 1) { // only ctrl
       diffYears = delta;
     } else if (event.shiftKey && modifierCount === 1) { // only shift
       diffMonths = delta;

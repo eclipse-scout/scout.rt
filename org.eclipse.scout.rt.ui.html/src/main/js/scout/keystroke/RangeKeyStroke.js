@@ -28,7 +28,8 @@ scout.RangeKeyStroke.prototype.registerRange = function(from, to) {
  * @override KeyStroke.js
  */
 scout.RangeKeyStroke.prototype._accept = function(event) {
-  if ((scout.device.browser === scout.Device.Browser.SAFARI ? event.ctrlKey||event.metaKey : event.ctrlKey) !== this.ctrl ||
+  //event.ctrlKey||event.metaKey  --> some keystrokes with ctrl modifier are captured and suppressed by osx use in this cases command key
+  if ((event.ctrlKey || event.metaKey) !== this.ctrl ||
     event.altKey !== this.alt ||
     event.shiftKey !== this.shift
   ) {
