@@ -11,6 +11,7 @@
 scout.VirtualKeyStrokeEvent = function(which, ctrl, alt, shift, keyStrokeMode, target) {
   this.which = which;
   this.ctrlKey = ctrl;
+  this.metaKey = false;
   this.altKey = alt;
   this.shiftKey = shift;
   this.target = target;
