@@ -146,14 +146,18 @@ scout.ContextMenuPopup.prototype.renderSubMenuItems = function(parentMenu, menus
   $all.toggleClass('next-to-selected', false);
 
   if (!parentMenu.$subMenuBody) {
-    var textPaddingLeft = parentMenu.$container.find('.text').css('padding-left');
+    var textPaddingLeft = parentMenu.$container.find('.text').css('padding-left'),
+      iconOffset = 0;
+    if (parentMenu.iconId && parentMenu.$container.data('$icon').cssWidth() > iconOffset) {
+      iconOffset = parentMenu.$container.data('$icon').cssWidth();
+    }
     if (textPaddingLeft) {
       textPaddingLeft = textPaddingLeft.replace('px', '');
       textPaddingLeft = Number(textPaddingLeft);
     }
     this.$body = this._$createNewBody();
     parentMenu.$subMenuBody = this.$body;
-    this._renderMenuItems(menus, initialSubMenuRendering, textPaddingLeft);
+    this._renderMenuItems(menus, initialSubMenuRendering, Math.max(textPaddingLeft, iconOffset));
   } else {
     //append $body
     this.$body = parentMenu.$subMenuBody;
