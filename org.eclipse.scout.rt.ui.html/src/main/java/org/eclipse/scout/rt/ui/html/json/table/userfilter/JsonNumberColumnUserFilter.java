@@ -46,6 +46,7 @@ public class JsonNumberColumnUserFilter extends JsonColumnUserFilter<NumberColum
   @Override
   public ColumnUserFilterState createFilterStateFromJson(IColumn<?> column, JSONObject json) {
     NumberColumnUserFilterState filterState = new NumberColumnUserFilterState(column);
+    filterState.setSelectedValues(createSelectedValuesFromJson(json));
     filterState.setNumberFrom(toBigDecimal(json.optString("numberFrom")));
     filterState.setNumberTo(toBigDecimal(json.optString("numberTo")));
     return filterState;

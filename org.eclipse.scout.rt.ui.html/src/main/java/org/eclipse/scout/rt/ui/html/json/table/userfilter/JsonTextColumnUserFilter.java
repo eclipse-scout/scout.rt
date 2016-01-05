@@ -29,6 +29,7 @@ public class JsonTextColumnUserFilter extends JsonColumnUserFilter<TextColumnUse
   @Override
   public ColumnUserFilterState createFilterStateFromJson(IColumn<?> column, JSONObject json) {
     TextColumnUserFilterState filterState = new TextColumnUserFilterState(column);
+    filterState.setSelectedValues(createSelectedValuesFromJson(json));
     filterState.setFreeText(json.optString("freeText"));
     return filterState;
   }

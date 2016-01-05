@@ -49,6 +49,7 @@ public class JsonDateColumnUserFilter extends JsonColumnUserFilter<DateColumnUse
   @Override
   public ColumnUserFilterState createFilterStateFromJson(IColumn<?> column, JSONObject json) {
     DateColumnUserFilterState filterState = new DateColumnUserFilterState(column);
+    filterState.setSelectedValues(createSelectedValuesFromJson(json));
     filterState.setDateFrom(toDate(json.optString("dateFrom")));
     filterState.setDateTo(toDate(json.optString("dateTo")));
     return filterState;
