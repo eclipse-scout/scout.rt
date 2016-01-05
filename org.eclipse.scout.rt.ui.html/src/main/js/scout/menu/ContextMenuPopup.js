@@ -38,7 +38,11 @@ scout.ContextMenuPopup.prototype._initKeyStrokeContext = function(keyStrokeConte
 
 scout.ContextMenuPopup.prototype._render = function($parent) {
   scout.ContextMenuPopup.parent.prototype._render.call(this, $parent);
+  scout.scrollbars.install(this.$body, {
+    parent: this
+  });
   this._renderMenuItems();
+
 };
 
 scout.ContextMenuPopup.prototype.removeSubMenuItems = function(parentMenu, animated) {
