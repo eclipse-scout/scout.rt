@@ -43,31 +43,31 @@ scout.StringField.prototype._render = function($parent) {
   this.addLabel();
   this.addMandatoryIndicator();
 
-  var $field, helper = function(){
-    this.mouseClicked=true;
+  var $field, helper = function() {
+    this.mouseClicked = true;
   }.bind(this);
   if (this.multilineText) {
     $field = $parent.makeElement('<textarea>')
       .on('DOMMouseScroll mousewheel', function(event) {
         // otherwise scout.Scrollbar.prototype would handle this event for scrollable group boxes and prevent scrolling on textarea
         event.stopPropagation();
-    }).on('mousedown', helper)
-    .focus(function(event){
-      this.$field.off('mousedown', helper);
-      if(!this.mouseClicked){
-        //only trigger on tab focus in
-        setTimeout(function(){
-          if(this.selectionStart){
-            this._renderSelectionStart();
-            this._renderSelectionEnd();
-          }
-        }.bind(this));
-      }
-      this.mouseClicked = false;
-    }.bind(this))
-    .on('focusout', function(){
-      this.$field.on('mousedown', helper);
-    }.bind(this));
+      }).on('mousedown', helper)
+      .focus(function(event) {
+        this.$field.off('mousedown', helper);
+        if (!this.mouseClicked) {
+          //only trigger on tab focus in
+          setTimeout(function() {
+            if (this.selectionStart) {
+              this._renderSelectionStart();
+              this._renderSelectionEnd();
+            }
+          }.bind(this));
+        }
+        this.mouseClicked = false;
+      }.bind(this))
+      .on('focusout', function() {
+        this.$field.on('mousedown', helper);
+      }.bind(this));
   } else {
     $field = scout.fields.makeTextField($parent);
   }
@@ -76,12 +76,11 @@ scout.StringField.prototype._render = function($parent) {
   this.addField($field);
   this.addStatus();
 
-
 };
 
 scout.StringField.prototype._onFieldBlur = function() {
   scout.StringField.parent.prototype._onFieldBlur.call(this);
-  if(this.multilineText){
+  if (this.multilineText) {
     this._updateSelection(true);
   }
 };
@@ -122,11 +121,15 @@ scout.StringField.prototype._renderMaxLength = function(maxLength0) {
 };
 
 scout.StringField.prototype._renderSelectionStart = function() {
-  this.$field[0].selectionStart = this.selectionStart;
+  if (this.$field && this.$field.length > 0) {
+    this.$field[0].selectionStart = this.selectionStart;
+  }
 };
 
 scout.StringField.prototype._renderSelectionEnd = function() {
-  this.$field[0].selectionEnd = this.selectionEnd;
+  if (this.$field && this.$field.length > 0) {
+    this.$field[0].selectionEnd = this.selectionEnd;
+  }
 };
 
 scout.StringField.prototype._renderSelectionTrackingEnabled = function() {
@@ -194,8 +197,8 @@ scout.StringField.prototype._renderInsertText = function() {
     text = text.slice(0, a) + s + text.slice(b);
     elem.value = text;
 
-    if(elem.selectionStart===elem.selectionEnd){
-      this.selectionStart = a+s.length;
+    if (elem.selectionStart === elem.selectionEnd) {
+      this.selectionStart = a + s.length;
       this.selectionEnd = this.selectionStart;
     }
 
