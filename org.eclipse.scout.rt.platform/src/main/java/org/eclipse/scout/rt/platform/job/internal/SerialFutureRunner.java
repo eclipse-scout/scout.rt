@@ -32,8 +32,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Runner on a 'per-future' basis which prevents concurrent Future execution by suspending (pausing) the trigger. The
- * 'misfire' policy as defined on the schedule controls how to deal with missed firings.
+ * Runner on a 'per-future' basis which prevents concurrent Future execution by suspending (pausing) the Quartz trigger.
+ * The 'misfire' policy as defined on the schedule controls how to deal with missed firings.
  * <p>
  * Upon a 'misfire' but with no planned further firing (as computed by the schedule plan), this runner schedules a last
  * execution to enter done state.
@@ -50,7 +50,7 @@ import org.slf4j.LoggerFactory;
  * @since 5.2
  */
 @Internal
-public class SerialFutureRunner<RESULT> implements IFutureRunner {
+public class SerialFutureRunner<RESULT> implements IRejectableRunnable {
 
   private static final Logger LOG = LoggerFactory.getLogger(SerialFutureRunner.class);
 
@@ -74,7 +74,11 @@ public class SerialFutureRunner<RESULT> implements IFutureRunner {
     }, null);
   }
 
-  @Override
+  /**
+   * Invoke in the Quartz worker thread before starting execution. If this method returns with <code>true</code>, the
+   * caller must either invoke {@link #run()} or {@link #reject()}. If returning <code>false</code>, {@link #run()} must
+   * not be invoked, and it is forbidden to change the job's state, or to acquire an execution permit.
+   */
   public boolean beforeExecute() {
     if (m_futureTask.isDone()) {
       return false;
@@ -92,7 +96,7 @@ public class SerialFutureRunner<RESULT> implements IFutureRunner {
   @Override
   public void run() {
     // The following invariants applies:
-    // - this method is never invoked concurrently for the same future, which is ensured by 'P_Mutex';
+    // - this method is never invoked concurrently for the same future, which is ensured by suspending the trigger in 'beforeExecute';
     // - if the future is assigned to an execution semaphore, the future owns a permit;
     // - after JobFutureTask.run(), the future's permit is released, meaning that the future is no longer a permit owner;
 
@@ -105,14 +109,19 @@ public class SerialFutureRunner<RESULT> implements IFutureRunner {
 
     // Resume the trigger to fire for subsequent or missed (misfire) tasks.
     if (!resumeTrigger()) {
-      m_futureTask.reject();
+      m_futureTask.cancel(false);
     }
 
     // Notify trigger that this round completed.
     if (!afterExecute()) {
-      m_futureTask.reject();
+      m_futureTask.cancel(false);
       return;
     }
+  }
+
+  @Override
+  public void reject() {
+    m_futureTask.reject();
   }
 
   /**
@@ -151,14 +160,9 @@ public class SerialFutureRunner<RESULT> implements IFutureRunner {
       }
       catch (final SchedulerException | RuntimeException e) {
         LOG.error("Failed to schedule last execution of a job after a misfire [future={}]", m_futureTask, e);
-        m_futureTask.reject();
+        m_futureTask.cancel(false);
       }
     }
-  }
-
-  @Override
-  public void reject() {
-    m_futureTask.reject();
   }
 
   /**
@@ -222,10 +226,5 @@ public class SerialFutureRunner<RESULT> implements IFutureRunner {
     catch (final SchedulerException | RuntimeException e) {
       LOG.error("Failed to uninstall misfire handler", e);
     }
-  }
-
-  @Override
-  public JobFutureTask<?> getFutureTask() {
-    return m_futureTask;
   }
 }

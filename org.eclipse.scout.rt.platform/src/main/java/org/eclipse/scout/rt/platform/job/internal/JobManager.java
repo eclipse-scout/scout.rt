@@ -46,6 +46,8 @@ import org.eclipse.scout.rt.platform.job.IJobListenerRegistration;
 import org.eclipse.scout.rt.platform.job.IJobManager;
 import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.job.JobState;
+import org.eclipse.scout.rt.platform.job.internal.ExecutionSemaphore.IPermitAcquiredCallback;
+import org.eclipse.scout.rt.platform.job.internal.ExecutionSemaphore.QueuePosition;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.job.listener.JobEventData;
@@ -60,10 +62,10 @@ import org.quartz.Calendar;
 import org.quartz.JobBuilder;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
-import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
 import org.quartz.impl.StdSchedulerFactory;
 import org.quartz.simpl.RAMJobStore;
+import org.quartz.spi.MutableTrigger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,9 +74,9 @@ import org.slf4j.LoggerFactory;
  * <p>
  * This job manager is based on Quartz {@link Scheduler} and {@link ThreadPoolExecutor}.
  * <p>
- * If a job is scheduled, it is submitted to {@link Scheduler Quartz Scheduler} in the form of a {@link Trigger}. Once
- * the job likes to commence execution, that trigger fires and invokes {@link QuartzExecutorJob}, which submits the job
- * to {@link ExecutorService} for execution.
+ * Jobs which run immediately and exactly one time are directly submitted to {@link ExecutorService}. For repetitive and
+ * delayed jobs, a Quartz Trigger is submitted which fires once the job likes to commence execution. In turn, they are
+ * submitted to {@link ExecutorService} as well, so Quartz Scheduler simply provides the firing facility.
  *
  * @since 5.1
  */
@@ -100,7 +102,7 @@ public class JobManager implements IJobManager, IPlatformListener {
   }
 
   @Override
-  public IFuture<Void> schedule(final IRunnable runnable, final JobInput input) {
+  public final IFuture<Void> schedule(final IRunnable runnable, final JobInput input) {
     return schedule(Callables.callable(runnable), ensureJobInputName(input, runnable.getClass().getName()));
   }
 
@@ -112,36 +114,42 @@ public class JobManager implements IJobManager, IPlatformListener {
     // Create the Future to be given to the ExecutorService.
     final JobFutureTask<RESULT> futureTask = createJobFutureTask(callable, input);
     // Create the Quartz Trigger to fire once the job should commence execution.
-    final Trigger trigger = createQuartzTrigger(futureTask);
-    // Compute and set temporal values.
-    futureTask.computeAndSetTemporalValues(trigger);
-    // Register the Future in job manager.
+    final MutableTrigger trigger = createQuartzTrigger(futureTask);
+
+    futureTask.prepareForExecution(trigger);
     registerFuture(futureTask);
 
     // As of now, the Future is managed by job manager, and needs to be rejected in case of a scheduling error.
 
+    futureTask.changeState(JobState.SCHEDULED);
     try {
-      futureTask.changeState(JobState.SCHEDULED);
-
-      // Enter 'pending' state if about a delayed execution.
-      if (futureTask.isDelayedExecution()) {
-        futureTask.changeState(JobState.PENDING);
+      // Schedule immediately executing 'one-shot' actions directly via executor service.
+      if (futureTask.isSingleExecution() && !futureTask.isDelayedExecution()) {
+        submit(futureTask, futureTask);
       }
-
-      // Submit Quartz Trigger and install 'when-done' handler to remove the trigger from Quartz Scheduler once 'done'.
-      m_quartz.scheduleJob(trigger);
-      futureTask.whenDone(new IDoneHandler<RESULT>() {
-
-        @Override
-        public void onDone(final DoneEvent<RESULT> event) {
-          try {
-            m_quartz.unscheduleJob(trigger.getKey());
-          }
-          catch (final SchedulerException e) {
-            LOG.error("Failed to remove Trigger from Quartz Scheduler [future={}]", futureTask, e);
-          }
+      else {
+        if (futureTask.isDelayedExecution()) {
+          futureTask.changeState(JobState.PENDING);
         }
-      }, null);
+
+        // Schedule trigger via Quartz Scheduler.
+        trigger.setJobDataMap(QuartzExecutorJob.newTriggerData(futureTask, new SerialFutureRunner<>(m_quartz, futureTask)));
+        m_quartz.scheduleJob(trigger);
+
+        // Install 'when-done' handler to remove the trigger once entering 'done' state.
+        futureTask.whenDone(new IDoneHandler<RESULT>() {
+
+          @Override
+          public void onDone(final DoneEvent<RESULT> event) {
+            try {
+              m_quartz.unscheduleJob(trigger.getKey());
+            }
+            catch (final SchedulerException e) {
+              LOG.error("Failed to remove Trigger from Quartz Scheduler [future={}]", futureTask, e);
+            }
+          }
+        }, null);
+      }
     }
     catch (SchedulerException | RuntimeException e) {
       futureTask.reject();
@@ -155,6 +163,26 @@ public class JobManager implements IJobManager, IPlatformListener {
     }
 
     return futureTask;
+  }
+
+  /**
+   * Competes for an execution permit (if semaphore aware) and executes the runnable via {@link ExecutorService}.
+   */
+  protected void submit(final JobFutureTask<?> futureTask, final IRejectableRunnable futureRunner) {
+    final ExecutionSemaphore executionSemaphore = futureTask.getExecutionSemaphore();
+    if (executionSemaphore == null) {
+      m_executor.execute(futureRunner);
+    }
+    else {
+      futureTask.changeState(JobState.WAITING_FOR_PERMIT);
+      executionSemaphore.compete(futureTask, QueuePosition.TAIL, new IPermitAcquiredCallback() {
+
+        @Override
+        public void onPermitAcquired() {
+          m_executor.execute(futureRunner);
+        }
+      });
+    }
   }
 
   @Override
@@ -300,7 +328,7 @@ public class JobManager implements IJobManager, IPlatformListener {
       Assertions.assertTrue(m_quartz.isStarted(), "Quartz Scheduler not started");
       m_quartz.addJob(JobBuilder.newJob(QuartzExecutorJob.class)
           .withIdentity(QuartzExecutorJob.IDENTITY)
-          .setJobData(QuartzExecutorJob.newJobData(m_executor))
+          .setJobData(QuartzExecutorJob.newJobData(this))
           .storeDurably() // not bound to the existence of triggers
           .build(), false);
     }
@@ -327,20 +355,15 @@ public class JobManager implements IJobManager, IPlatformListener {
 
   /**
    * Creates the Quartz Trigger to execute the specified JobFutureTask.
-   * <p>
-   * Upon firing, {@link QuartzExecutorJob} is invoked with {@link JobFutureTask} and {@link IFutureRunner} as its
-   * parameters. {@link QuartzExecutorJob} then first competes for an execution permit (if semaphore aware), and then
-   * executes the specified {@link IFutureRunner} via {@link ExecutorService}.
    */
   @Internal
-  protected <RESULT> Trigger createQuartzTrigger(final JobFutureTask<RESULT> futureTask) {
+  protected <RESULT> MutableTrigger createQuartzTrigger(final JobFutureTask<RESULT> futureTask) {
     final ExecutionTrigger executionTrigger = futureTask.getJobInput().getExecutionTrigger();
 
-    return TriggerBuilder.newTrigger()
+    return (MutableTrigger) TriggerBuilder.newTrigger()
         .withIdentity(futureTask.getTriggerIdentity())
-        .withPriority(QuartzExecutorJob.computePriority(futureTask))
         .forJob(QuartzExecutorJob.IDENTITY)
-        .usingJobData(QuartzExecutorJob.newTriggerData(futureTask, new SerialFutureRunner<RESULT>(m_quartz, futureTask)))
+        .withPriority(QuartzExecutorJob.computePriority(futureTask))
         .startAt(executionTrigger.getStartTime())
         .endAt(executionTrigger.getEndTime())
         .withSchedule(executionTrigger.getSchedule())

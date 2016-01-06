@@ -42,12 +42,11 @@ import org.eclipse.scout.rt.platform.Replace;
 import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
+import org.eclipse.scout.rt.platform.job.IExecutionSemaphore;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IJobManager;
-import org.eclipse.scout.rt.platform.job.IExecutionSemaphore;
 import org.eclipse.scout.rt.platform.job.JobState;
 import org.eclipse.scout.rt.platform.job.Jobs;
-import org.eclipse.scout.rt.platform.job.internal.IFutureRunner;
 import org.eclipse.scout.rt.platform.job.internal.JobFutureTask;
 import org.eclipse.scout.rt.platform.job.internal.JobManager;
 import org.eclipse.scout.rt.platform.job.internal.NamedThreadFactory.ThreadInfo;
@@ -739,10 +738,10 @@ public class MutualExclusionTest {
           final Runnable runnable = (Runnable) invocation.getArguments()[0];
 
           // Reject job-2 from being scheduled
-          if (runnable instanceof IFutureRunner) {
-            JobFutureTask<?> future = ((IFutureRunner) runnable).getFutureTask();
-            if ("job-2".equals(future.getJobInput().getName())) {
-              future.reject();
+          if (runnable instanceof JobFutureTask) {
+            JobFutureTask<?> futureTask = (JobFutureTask<?>) runnable;
+            if ("job-2".equals(futureTask.getJobInput().getName())) {
+              futureTask.reject();
               return null;
             }
           }
@@ -822,10 +821,10 @@ public class MutualExclusionTest {
           final Runnable runnable = (Runnable) invocation.getArguments()[0];
 
           // Reject job-2 from being scheduled
-          if (runnable instanceof IFutureRunner) {
-            JobFutureTask<?> future = ((IFutureRunner) runnable).getFutureTask();
-            if ("job-2".equals(future.getJobInput().getName())) {
-              future.reject();
+          if (runnable instanceof JobFutureTask) {
+            JobFutureTask<?> futureTask = (JobFutureTask<?>) runnable;
+            if ("job-2".equals(futureTask.getJobInput().getName())) {
+              futureTask.reject();
               return null;
             }
           }

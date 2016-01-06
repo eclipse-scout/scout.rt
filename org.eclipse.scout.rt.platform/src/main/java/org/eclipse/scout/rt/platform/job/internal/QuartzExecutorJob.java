@@ -1,11 +1,7 @@
 package org.eclipse.scout.rt.platform.job.internal;
 
-import java.util.concurrent.ExecutorService;
-
 import org.eclipse.scout.rt.platform.Bean;
-import org.eclipse.scout.rt.platform.job.JobState;
-import org.eclipse.scout.rt.platform.job.internal.ExecutionSemaphore.IPermitAcquiredCallback;
-import org.eclipse.scout.rt.platform.job.internal.ExecutionSemaphore.QueuePosition;
+import org.eclipse.scout.rt.platform.util.Assertions;
 import org.quartz.DisallowConcurrentExecution;
 import org.quartz.Job;
 import org.quartz.JobDataMap;
@@ -13,12 +9,9 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.JobKey;
 import org.quartz.Trigger;
-import org.slf4j.helpers.FormattingTuple;
-import org.slf4j.helpers.MessageFormatter;
 
 /**
- * This global Job submits the Future associated with the firing trigger to {@link ExecutorService} for execution.
- * Additionally, for semaphore aware tasks, it asynchronously competes for an execution permit first.
+ * This global Job submits the Future associated with the firing trigger to {@link JobManager} for execution.
  * <p>
  * This job is installed in Quartz Scheduler as a durable job. Durable means, that this job's existence is not bound to
  * the existence of an associated trigger, which is typically true when {@link JobManager} is idle because of no jobs
@@ -31,10 +24,10 @@ import org.slf4j.helpers.MessageFormatter;
  * this guarantees a potential permit acquisition to be done in respect to the scheduling order. For example, if
  * scheduling two jobs in a row, they very likely will have the same execution time (granularity in milliseconds).
  * However, priority-based firing and serial permit acquisition guarantee the first job to compete for a permit before
- * the second job does.<br>
- * Basically, it would be possible to work with two Quartz Jobs and multiple Quartz worker threads, namely one job for
- * regular jobs (parallel processing), an another job for semaphore aware jobs (serial processing). However, tests with
- * lot of jobs showed up, that the performance benefit would be marginal.
+ * the second job does.
+ * <p>
+ * Also, the job's trigger is paused during the time of executing a job. That ensures no concurrent execution among the
+ * same future. That is important for repetitive jobs firing while still executing a round.
  *
  * @since 5.2
  */
@@ -44,75 +37,36 @@ public class QuartzExecutorJob implements Job {
 
   public static final JobKey IDENTITY = new JobKey("dispatcher", "scout.jobmanager.quartz");
 
-  protected static final String PROP_JOB_EXECUTOR = "scout.jobmanager.executor";
+  protected static final String PROP_JOB_MANAGER = "scout.jobmanager";
   protected static final String PROP_TRIGGER_FUTURE_TASK = "scout.jobmanager.futureTask";
   protected static final String PROP_TRIGGER_FUTURE_RUNNER = "scout.jobmanager.futureRunner";
 
   @Override
   public void execute(final JobExecutionContext context) throws JobExecutionException {
-    // Obtain Future to be executed.
-    final JobFutureTask<?> futureTask = (JobFutureTask<?>) context.getTrigger().getJobDataMap().get(PROP_TRIGGER_FUTURE_TASK);
-    if (futureTask == null) {
-      throw newJobExecutionException("Unexpected: no FutureTask provided [quartzJob={}]", getClass().getSimpleName());
-    }
+    final JobDataMap jobData = context.getJobDetail().getJobDataMap();
+    final JobDataMap triggerData = context.getTrigger().getJobDataMap();
 
-    // Obtain Runner to run the Future.
-    final IFutureRunner futureRunner = (IFutureRunner) context.getTrigger().getJobDataMap().get(PROP_TRIGGER_FUTURE_RUNNER);
-    if (futureRunner == null) {
-      futureTask.cancel(false);
-      throw newJobExecutionException("Unexpected: no FutureRunner provided [quartzJob={}, future={}]", getClass().getSimpleName(), futureTask);
-    }
-
-    // Obtain Executor to schedule the Runner.
-    final ExecutorService executor = (ExecutorService) context.getJobDetail().getJobDataMap().get(PROP_JOB_EXECUTOR);
-    if (executor == null) {
-      futureTask.cancel(false);
-      throw newJobExecutionException("Unexpected: no Executor provided [quartzJob={}, future={}]", getClass().getSimpleName(), futureTask);
-    }
-
+    JobFutureTask<?> futureTask = null;
     try {
-      dispatch(futureTask, futureRunner, executor);
+      futureTask = Assertions.assertNotNull((JobFutureTask<?>) triggerData.get(PROP_TRIGGER_FUTURE_TASK), "JobFutureTask must not be null");
+      final SerialFutureRunner<?> futureRunner = Assertions.assertNotNull((SerialFutureRunner<?>) triggerData.get(PROP_TRIGGER_FUTURE_RUNNER), "FutureRunner must not be null");
+      final JobManager jobManager = Assertions.assertNotNull((JobManager) jobData.get(PROP_JOB_MANAGER), "JobManager must not be null");
+
+      // Asynchronously run the job via executor service.
+      if (futureRunner.beforeExecute()) {
+        jobManager.submit(futureTask, futureRunner);
+      }
     }
     catch (final Throwable t) {
-      futureTask.cancel(true);
-      throw newJobExecutionException("Unexpected error while dispatching future [quartzJob={}, future={}]", getClass().getSimpleName(), futureTask, t);
+      if (futureTask != null) {
+        futureTask.reject();
+      }
+
+      final JobExecutionException jee = new JobExecutionException(String.format("Unexpected error while dispatching future [quartzJob=%s, future=%s]", getClass().getSimpleName(), futureTask), t);
+      jee.unscheduleFiringTrigger();
+      jee.setRefireImmediately(false);
+      throw jee;
     }
-  }
-
-  /**
-   * Competes for an execution permit and executes the Future via ExecutorService.
-   */
-  protected void dispatch(final JobFutureTask<?> futureTask, final IFutureRunner futureRunner, final ExecutorService executor) {
-    // Check whether FutureRunner is ready to run the job.
-    if (!futureRunner.beforeExecute()) {
-      return;
-    }
-
-    // Schedule FutureRunner via ExecutorService.
-    final ExecutionSemaphore executionSemaphore = futureTask.getExecutionSemaphore();
-    if (executionSemaphore == null) {
-      executor.execute(futureRunner);
-    }
-    else {
-      futureTask.changeState(JobState.WAITING_FOR_PERMIT);
-      executionSemaphore.compete(futureTask, QueuePosition.TAIL, new IPermitAcquiredCallback() {
-
-        @Override
-        public void onPermitAcquired() {
-          executor.execute(futureRunner);
-        }
-      });
-    }
-    return;
-  }
-
-  protected JobExecutionException newJobExecutionException(final String message, final Object... args) {
-    final FormattingTuple format = MessageFormatter.arrayFormat(message, args);
-
-    final JobExecutionException jobException = new JobExecutionException(format.getMessage(), format.getThrowable());
-    jobException.unscheduleFiringTrigger();
-    jobException.setRefireImmediately(false);
-    return jobException;
   }
 
   // ==== Public Helper methods ==== //
@@ -120,16 +74,16 @@ public class QuartzExecutorJob implements Job {
   /**
    * Creates a {@link JobDataMap} to be given to {@link QuartzExecutorJob}.
    */
-  public static JobDataMap newJobData(final ExecutorService executor) {
+  public static JobDataMap newJobData(final JobManager jobManager) {
     final JobDataMap jobData = new JobDataMap();
-    jobData.put(QuartzExecutorJob.PROP_JOB_EXECUTOR, executor);
+    jobData.put(QuartzExecutorJob.PROP_JOB_MANAGER, jobManager);
     return jobData;
   }
 
   /**
    * Creates a {@link JobDataMap} to associate a {@link JobFutureTask} with a Quartz trigger.
    */
-  public static JobDataMap newTriggerData(final JobFutureTask<?> futureTask, final IFutureRunner futureRunner) {
+  public static JobDataMap newTriggerData(final JobFutureTask<?> futureTask, final SerialFutureRunner<?> futureRunner) {
     final JobDataMap triggerData = new JobDataMap();
     triggerData.put(QuartzExecutorJob.PROP_TRIGGER_FUTURE_TASK, futureTask);
     triggerData.put(QuartzExecutorJob.PROP_TRIGGER_FUTURE_RUNNER, futureRunner);

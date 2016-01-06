@@ -47,6 +47,7 @@ import org.eclipse.scout.rt.platform.job.listener.JobEventData;
 import org.eclipse.scout.rt.platform.job.listener.JobEventType;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.FinalValue;
 import org.eclipse.scout.rt.platform.util.ToStringBuilder;
 import org.quartz.Calendar;
 import org.quartz.SchedulerException;
@@ -87,8 +88,8 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
 
   protected final TriggerKey m_triggerIdentity = new TriggerKey(Key.createUniqueName(null), "scout.jobmanager.quartz.trigger");
 
-  protected volatile boolean m_singleExecution;
-  protected volatile boolean m_delayedExecution;
+  protected final FinalValue<Boolean> m_singleExecution = new FinalValue<>();
+  protected final FinalValue<Boolean> m_delayedExecution = new FinalValue<>();
 
   public JobFutureTask(final JobManager jobManager, final RunMonitor runMonitor, final JobInput input, final CallableChain<RESULT> callableChain, final Callable<RESULT> callable) {
     super(new Callable<RESULT>() {
@@ -197,14 +198,14 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
 
   @Override
   public boolean isSingleExecution() {
-    return m_singleExecution;
+    return m_singleExecution.get();
   }
 
   /**
    * Returns whether this task may be executed some time in the future, unless it gets cancelled.
    */
   protected boolean isDelayedExecution() {
-    return m_delayedExecution;
+    return m_delayedExecution.get();
   }
 
   /**
@@ -571,14 +572,14 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
   }
 
   /**
-   * Computes and sets temporal values.
+   * Prepares this task for execution, which involves the calculation of some temporal aspects.
    */
-  protected void computeAndSetTemporalValues(final Trigger trigger) {
+  protected void prepareForExecution(final Trigger trigger) {
     Assertions.assertEquals(m_triggerIdentity, trigger.getKey(), "Specified trigger does not belong to this Future [trigger={}, job={}]", trigger, this);
 
     final Date firstFireTime = computeFirstFireTime(trigger);
-    m_singleExecution = computeSingleExecution(trigger, firstFireTime);
-    m_delayedExecution = computeDelayedExecution(firstFireTime, m_input.getExecutionTrigger().getNow());
+    m_singleExecution.set(computeSingleExecuting(trigger, firstFireTime));
+    m_delayedExecution.set(computeDelayedExecuting(firstFireTime, m_input.getExecutionTrigger().getNow()));
   }
 
   /**
@@ -613,7 +614,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
   /**
    * Computes whether the specified trigger is single executing, meaning executed just once.
    */
-  protected boolean computeSingleExecution(final Trigger trigger, final Date firstFireTime) {
+  protected boolean computeSingleExecuting(final Trigger trigger, final Date firstFireTime) {
     if (trigger.getFinalFireTime() == null) {
       return false;
     }
@@ -625,7 +626,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
   /**
    * Computes whether this is about a delayed execution.
    */
-  protected boolean computeDelayedExecution(final Date firstFireTime, final Date now) {
+  protected boolean computeDelayedExecuting(final Date firstFireTime, final Date now) {
     return firstFireTime.after(now);
   }
 }
