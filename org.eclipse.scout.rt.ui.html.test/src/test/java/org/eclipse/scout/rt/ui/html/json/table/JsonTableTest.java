@@ -42,6 +42,7 @@ import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.eclipse.scout.rt.ui.html.UiException;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
+import org.eclipse.scout.rt.ui.html.json.JsonEventType;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.fixtures.UiSessionMock;
 import org.eclipse.scout.rt.ui.html.json.menu.JsonContextMenu;
@@ -58,6 +59,7 @@ import org.eclipse.scout.rt.ui.html.json.testing.JsonTestUtility;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -358,10 +360,11 @@ public class JsonTableTest {
     JsonResponse response = m_uiSession.currentJsonResponse();
     response.fireProcessBufferedEvents();
     List<JsonEvent> events = response.getEventList();
-    assertEquals(3, events.size());
+    assertEquals(4, events.size());
     assertEquals(JsonTable.EVENT_COLUMN_STRUCTURE_CHANGED, events.get(0).getType());
-    assertEquals(JsonTable.EVENT_ALL_ROWS_DELETED, events.get(1).getType());
-    assertEquals(JsonTable.EVENT_ROWS_INSERTED, events.get(2).getType());
+    assertEquals(JsonEventType.PROPERTY.getEventType(), events.get(1).getType());
+    assertEquals(JsonTable.EVENT_ALL_ROWS_DELETED, events.get(2).getType());
+    assertEquals(JsonTable.EVENT_ROWS_INSERTED, events.get(3).getType());
   }
 
   /**
