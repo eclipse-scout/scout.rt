@@ -968,7 +968,7 @@ scout.Table.prototype._updateRowWidth = function() {
 scout.Table.prototype._updateRowHeight = function() {
   var $emptyRow = this.$data.appendDiv('table-row');
   $emptyRow.appendDiv('table-cell').html('&nbsp;');
-  this.rowHeight = $emptyRow.outerHeight();
+  this.rowHeight = $emptyRow.outerHeight(true);
   $emptyRow.remove();
 };
 
@@ -1201,7 +1201,7 @@ scout.Table.prototype._hideRow = function(row) {
  * is expected to be linked with the corresponding '$row' (row.$row and $row.data('row')).
  */
 scout.Table.prototype._installRow = function(row) {
-  row.height = row.$row.height();
+  row.height = row.$row.outerHeight(true);
 
   this._removeTooltipsForRow(row);
   if (row.hasError) {
@@ -1857,6 +1857,7 @@ scout.Table.prototype.insertRows = function(rows, fromServer) {
 
     this.viewRangeDirty = true;
     this._renderViewport();
+    this.invalidateLayoutTree();
   }
   this._triggerRowsInserted(rows);
 };
@@ -2528,7 +2529,7 @@ scout.Table.prototype.resizeColumn = function(column, width) {
     if (!row.$row) {
       row.height = null;
     } else {
-      row.height = row.$row.height();
+      row.height = row.$row.outerHeight(true);
     }
   });
   this._renderFiller();
@@ -3115,7 +3116,6 @@ scout.Table.prototype._renderViewRange = function(viewRange) {
   this._renderBackgroundEffect();
   this.renderSelection();
   this.$data[0].scrollTop = scrollTop;
-  this.invalidateLayoutTree();
   this.viewRangeDirty = false;
 };
 
