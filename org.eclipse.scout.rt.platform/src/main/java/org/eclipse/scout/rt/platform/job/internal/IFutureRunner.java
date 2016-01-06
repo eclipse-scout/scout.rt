@@ -10,10 +10,11 @@ import org.eclipse.scout.rt.platform.job.IExecutionSemaphore;
 public interface IFutureRunner extends IRejectableRunnable {
 
   /**
-   * Asks if this runner is ready to accept an execution via {@link #run()}. If <code>false</code>, {@link #run()} must
+   * Invoke in the Quartz worker thread before starting execution. If this method returns with <code>true</code>, the
+   * caller must either invoke {@link #run()} or {@link #reject()}. If returning <code>false</code>, {@link #run()} must
    * not be invoked, and it is forbidden to change the job's state, or to acquire an execution permit.
    */
-  boolean accept();
+  boolean beforeExecute();
 
   /**
    * Invoke to run the associated {@link JobFutureTask}.

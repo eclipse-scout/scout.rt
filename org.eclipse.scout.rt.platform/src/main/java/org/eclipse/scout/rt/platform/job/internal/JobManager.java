@@ -39,7 +39,6 @@ import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.job.DoneEvent;
 import org.eclipse.scout.rt.platform.job.ExecutionTrigger;
-import org.eclipse.scout.rt.platform.job.FixedDelayScheduleBuilder;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IDoneHandler;
 import org.eclipse.scout.rt.platform.job.IFuture;
@@ -250,6 +249,10 @@ public class JobManager implements IJobManager, IPlatformListener {
 
   @Override
   public Calendar getCalendar(final String calendarName) {
+    if (calendarName == null) {
+      return null;
+    }
+
     try {
       return m_quartz.getCalendar(calendarName);
     }
@@ -330,22 +333,14 @@ public class JobManager implements IJobManager, IPlatformListener {
    * executes the specified {@link IFutureRunner} via {@link ExecutorService}.
    */
   @Internal
-  protected Trigger createQuartzTrigger(final JobFutureTask<?> futureTask) {
+  protected <RESULT> Trigger createQuartzTrigger(final JobFutureTask<RESULT> futureTask) {
     final ExecutionTrigger executionTrigger = futureTask.getJobInput().getExecutionTrigger();
-
-    final IFutureRunner futureRunner;
-    if (executionTrigger.getSchedule() instanceof FixedDelayScheduleBuilder) {
-      futureRunner = new FixedDelayFutureRunner(m_quartz, futureTask);
-    }
-    else {
-      futureRunner = new SerialFutureRunner(m_quartz, futureTask);
-    }
 
     return TriggerBuilder.newTrigger()
         .withIdentity(futureTask.getTriggerIdentity())
         .withPriority(QuartzExecutorJob.computePriority(futureTask))
         .forJob(QuartzExecutorJob.IDENTITY)
-        .usingJobData(QuartzExecutorJob.newTriggerData(futureTask, futureRunner))
+        .usingJobData(QuartzExecutorJob.newTriggerData(futureTask, new SerialFutureRunner<RESULT>(m_quartz, futureTask)))
         .startAt(executionTrigger.getStartTime())
         .endAt(executionTrigger.getEndTime())
         .withSchedule(executionTrigger.getSchedule())

@@ -298,7 +298,7 @@ public interface IJobManager {
 
   /**
    * Returns the {@link Calendar} of the specified symbolic name from Quartz Scheduler, or <code>null</code> if not
-   * registered.
+   * registered, or if the specified name is <code>null</code>.
    */
   Calendar getCalendar(String calendarName);
 

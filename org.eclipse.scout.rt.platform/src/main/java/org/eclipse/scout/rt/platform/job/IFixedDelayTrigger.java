@@ -24,11 +24,4 @@ public interface IFixedDelayTrigger extends Trigger {
    * Returns the fixed delay between successive runs.
    */
   long getFixedDelay();
-
-  /**
-   * Computes the next fire time, and is to be invoked at the end of a round.
-   *
-   * @return <code>true</code> if the trigger may fire again, or else <code>false</code>.
-   */
-  boolean computeNextTriggerFireTime();
 }

@@ -84,7 +84,7 @@ public class QuartzExecutorJob implements Job {
    */
   protected void dispatch(final JobFutureTask<?> futureTask, final IFutureRunner futureRunner, final ExecutorService executor) {
     // Check whether FutureRunner is ready to run the job.
-    if (!futureRunner.accept()) {
+    if (!futureRunner.beforeExecute()) {
       return;
     }
 

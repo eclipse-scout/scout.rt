@@ -7,6 +7,8 @@ import org.eclipse.scout.rt.platform.job.FixedDelayScheduleBuilder;
 import org.eclipse.scout.rt.platform.job.IFixedDelayTrigger;
 import org.quartz.Calendar;
 import org.quartz.ScheduleBuilder;
+import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
 import org.quartz.impl.triggers.AbstractTrigger;
 
 /**
@@ -14,11 +16,11 @@ import org.quartz.impl.triggers.AbstractTrigger;
  *
  * @since 5.2
  */
-public class FixedDelayTrigger extends AbstractTrigger<IFixedDelayTrigger> implements IFixedDelayTrigger {
+public class FixedDelayTrigger extends AbstractTrigger<IFixedDelayTrigger> implements IFixedDelayTrigger, IRoundCompletedListener {
 
   private static final long serialVersionUID = 1L;
 
-  private static final Date FUTURE_TIME = new Date(Long.MAX_VALUE);
+  private static final Date TIME_IN_FUTURE = new Date(Long.MAX_VALUE);
 
   private long m_fixedDelay;
   private long m_repeatCount;
@@ -69,19 +71,19 @@ public class FixedDelayTrigger extends AbstractTrigger<IFixedDelayTrigger> imple
       m_nextFireTime = null; // null causes Quartz to not fire anymore
     }
     else {
-      m_nextFireTime = FUTURE_TIME; // will fire some time in the future
+      m_nextFireTime = TIME_IN_FUTURE; // will fire some time in the future
     }
   }
 
   @Override
-  public boolean computeNextTriggerFireTime() {
-    if (FUTURE_TIME.equals(m_nextFireTime)) {
+  public void onRoundCompleted(final Scheduler quartz) throws SchedulerException {
+    if (TIME_IN_FUTURE.equals(m_nextFireTime)) {
+      // Compute the next trigger fire time.
       m_nextFireTime = new Date(System.currentTimeMillis() + m_fixedDelay);
       m_startTime = m_nextFireTime;
-      return true;
-    }
-    else {
-      return false;
+
+      // Replace the trigger to apply the changes.
+      quartz.rescheduleJob(getKey(), this);
     }
   }
 
