@@ -1,4 +1,4 @@
-package org.eclipse.scout.rt.client.ui.basic.table;
+package org.eclipse.scout.rt.client.ui.basic.table.organizer;
 
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 

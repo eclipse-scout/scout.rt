@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.ui.basic.table;
 
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
+import org.eclipse.scout.rt.client.ui.basic.table.organizer.OrganizeColumnsForm;
 
 /**
  * The sort state of the column is displayed as icon in each cell. Usage in {@link OrganizeColumnsForm}

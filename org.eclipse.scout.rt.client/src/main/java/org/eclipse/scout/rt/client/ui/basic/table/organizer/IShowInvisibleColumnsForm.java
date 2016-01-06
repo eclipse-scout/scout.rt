@@ -2,7 +2,7 @@
  * Copyright (c) BSI Business Systems Integration AG. All rights reserved.
  * http://www.bsiag.com/
  */
-package org.eclipse.scout.rt.client.ui.basic.table;
+package org.eclipse.scout.rt.client.ui.basic.table.organizer;
 
 import org.eclipse.scout.rt.client.ui.form.IForm;
 

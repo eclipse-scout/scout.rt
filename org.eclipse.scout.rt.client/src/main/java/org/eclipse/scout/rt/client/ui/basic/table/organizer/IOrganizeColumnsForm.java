@@ -8,18 +8,16 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.ui.basic.table;
+package org.eclipse.scout.rt.client.ui.basic.table.organizer;
+
+import org.eclipse.scout.rt.client.ui.basic.table.menus.OrganizeColumnsMenu;
+import org.eclipse.scout.rt.client.ui.form.IForm;
 
 /**
- * Provides an instance of {@link OrganizeColumnsForm}.
- *
- * @since 5.2
+ * Form to be used inside {@link OrganizeColumnsMenu}
  */
-public class OrganizeColumnsFormProvider implements IOrganizeColumnsFormProvider {
+public interface IOrganizeColumnsForm extends IForm {
 
-  @Override
-  public IOrganizeColumnsForm createOrganizeColumnsForm(ITable table) {
-    return new OrganizeColumnsForm(table);
-  }
+  void reload();
 
 }

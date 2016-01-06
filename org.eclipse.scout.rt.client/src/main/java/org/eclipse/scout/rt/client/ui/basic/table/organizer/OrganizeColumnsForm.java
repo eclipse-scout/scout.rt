@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.ui.basic.table;
+package org.eclipse.scout.rt.client.ui.basic.table.organizer;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -26,15 +26,11 @@ import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenuSeparator;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
-import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox;
-import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ColumnsGroupBox.ColumnsTableField;
-import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ColumnsGroupBox.ColumnsTableField.Table;
-import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ColumnsGroupBox.ColumnsTableField.Table.AddCustomColumnEmptySpaceMenu;
-import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ColumnsGroupBox.ColumnsTableField.Table.AddCustomColumnMenu;
-import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ColumnsGroupBox.ColumnsTableField.Table.ModifyCustomColumnMenu;
-import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ColumnsGroupBox.ColumnsTableField.Table.RemoveFilterMenu;
-import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ColumnsGroupBox.ColumnsTableField.Table.RemoveMenu;
-import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ProfilesBox.ProfilesTableField;
+import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
+import org.eclipse.scout.rt.client.ui.basic.table.IHeaderCell;
+import org.eclipse.scout.rt.client.ui.basic.table.ITable;
+import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
+import org.eclipse.scout.rt.client.ui.basic.table.TableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractIntegerColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
@@ -42,6 +38,15 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.INumberColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.customizer.ICustomColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.customizer.ITableCustomizer;
+import org.eclipse.scout.rt.client.ui.basic.table.organizer.OrganizeColumnsForm.MainBox.GroupBox;
+import org.eclipse.scout.rt.client.ui.basic.table.organizer.OrganizeColumnsForm.MainBox.GroupBox.ColumnsGroupBox.ColumnsTableField;
+import org.eclipse.scout.rt.client.ui.basic.table.organizer.OrganizeColumnsForm.MainBox.GroupBox.ColumnsGroupBox.ColumnsTableField.Table;
+import org.eclipse.scout.rt.client.ui.basic.table.organizer.OrganizeColumnsForm.MainBox.GroupBox.ColumnsGroupBox.ColumnsTableField.Table.AddCustomColumnEmptySpaceMenu;
+import org.eclipse.scout.rt.client.ui.basic.table.organizer.OrganizeColumnsForm.MainBox.GroupBox.ColumnsGroupBox.ColumnsTableField.Table.AddCustomColumnMenu;
+import org.eclipse.scout.rt.client.ui.basic.table.organizer.OrganizeColumnsForm.MainBox.GroupBox.ColumnsGroupBox.ColumnsTableField.Table.ModifyCustomColumnMenu;
+import org.eclipse.scout.rt.client.ui.basic.table.organizer.OrganizeColumnsForm.MainBox.GroupBox.ColumnsGroupBox.ColumnsTableField.Table.RemoveFilterMenu;
+import org.eclipse.scout.rt.client.ui.basic.table.organizer.OrganizeColumnsForm.MainBox.GroupBox.ColumnsGroupBox.ColumnsTableField.Table.RemoveMenu;
+import org.eclipse.scout.rt.client.ui.basic.table.organizer.OrganizeColumnsForm.MainBox.GroupBox.ProfilesBox.ProfilesTableField;
 import org.eclipse.scout.rt.client.ui.basic.table.userfilter.TableUserFilterManager;
 import org.eclipse.scout.rt.client.ui.dnd.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.dnd.JavaTransferObject;
@@ -1247,7 +1252,7 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
               @Override
               protected void execAction() {
                 if (getOrganizedTable() != null) {
-                  if (hasCustomizer()) {
+                  if (isCustomizable()) {
                     if (getColumnsTableField().getTable().getSelectedRow() != null) {
                       IColumn<?> selectedCol = getColumnsTableField().getTable().getKeyColumn().getValue(getColumnsTableField().getTable().getSelectedRow());
                       if (selectedCol instanceof ICustomColumn<?>) {
@@ -1441,7 +1446,7 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
     ClientUIPreferences prefs = ClientUIPreferences.getInstance();
     prefs.addTableColumnsConfig(getOrganizedTable(), configName);
     prefs.setAllTableColumnPreferences(getOrganizedTable(), configName);
-    if (hasCustomizer()) {
+    if (isCustomizable()) {
       prefs.setTableCustomizerData(getOrganizedTable().getTableCustomizer(), configName);
     }
   }
@@ -1460,7 +1465,7 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
 
   public void applyViewForConfig(String configName) {
     ClientUIPreferences prefs = ClientUIPreferences.getInstance();
-    if (hasCustomizer()) {
+    if (isCustomizable()) {
       byte[] tableCustomizerData = prefs.getTableCustomizerData(getOrganizedTable().getTableCustomizer(), configName);
       if (tableCustomizerData != null) {
         getOrganizedTable().getTableCustomizer().removeAllColumns();
@@ -1486,7 +1491,7 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
    * behavior is required.
    */
   protected void execAddColumnAction() {
-    if (hasCustomizer()) {
+    if (isCustomizable()) {
       List<String> existingColumns = getVisibleColumnIds();
       getOrganizedTable().getTableCustomizer().addColumn();
       getColumnsTableField().getTable().moveNewColumnsBeforeSelection(existingColumns);
@@ -1498,7 +1503,7 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
    * Override this method if a different behavior is required.
    */
   protected void execRemoveColumnAction() {
-    if (hasCustomizer()) {
+    if (isCustomizable()) {
       Table columnsTable = getColumnsTableField().getTable();
       for (ITableRow selectedRow : columnsTable.getSelectedRows()) {
         IColumn<?> selectedColumn = columnsTable.getKeyColumn().getValue(selectedRow);
@@ -1571,8 +1576,8 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
     return columnIds;
   }
 
-  protected boolean hasCustomizer() { // FIXME AWE: (organize) also check permission, merge with organizer
-    return getOrganizedTable().getTableCustomizer() != null;
+  private boolean isCustomizable() {
+    return getOrganizedTable().isCustomizable();
   }
 
 }

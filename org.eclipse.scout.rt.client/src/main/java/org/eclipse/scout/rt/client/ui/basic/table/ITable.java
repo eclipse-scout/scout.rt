@@ -26,6 +26,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.IBooleanColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.controls.ITableControl;
 import org.eclipse.scout.rt.client.ui.basic.table.customizer.ITableCustomizer;
+import org.eclipse.scout.rt.client.ui.basic.table.organizer.ITableOrganizer;
 import org.eclipse.scout.rt.client.ui.basic.table.userfilter.TableUserFilterManager;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.dnd.IDNDSupport;
@@ -36,6 +37,7 @@ import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldBeanData;
 import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldData;
+import org.eclipse.scout.rt.shared.security.CreateCustomColumnPermission;
 import org.eclipse.scout.rt.shared.services.common.code.ICode;
 
 /**
@@ -1126,5 +1128,11 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
    * @since 5.2.0
    */
   ITableOrganizer getTableOrganizer();
+
+  /**
+   * @since 5.2.0
+   * @return True if the table has a table-customizer and the {@link CreateCustomColumnPermission}, false otherwise.
+   */
+  boolean isCustomizable();
 
 }

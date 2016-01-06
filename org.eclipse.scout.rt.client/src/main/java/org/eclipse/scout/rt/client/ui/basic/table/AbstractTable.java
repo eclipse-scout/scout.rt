@@ -78,6 +78,8 @@ import org.eclipse.scout.rt.client.ui.basic.table.customizer.ITableCustomizer;
 import org.eclipse.scout.rt.client.ui.basic.table.customizer.ITableCustomizerProvider;
 import org.eclipse.scout.rt.client.ui.basic.table.internal.InternalTableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.menus.OrganizeColumnsMenu;
+import org.eclipse.scout.rt.client.ui.basic.table.organizer.ITableOrganizer;
+import org.eclipse.scout.rt.client.ui.basic.table.organizer.ITableOrganizerProvider;
 import org.eclipse.scout.rt.client.ui.basic.table.userfilter.ColumnUserFilterState;
 import org.eclipse.scout.rt.client.ui.basic.table.userfilter.TableUserFilterManager;
 import org.eclipse.scout.rt.client.ui.basic.table.userfilter.UserTableRowFilter;
@@ -119,7 +121,9 @@ import org.eclipse.scout.rt.shared.extension.IContributionOwner;
 import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
 import org.eclipse.scout.rt.shared.extension.IExtension;
 import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
+import org.eclipse.scout.rt.shared.security.CreateCustomColumnPermission;
 import org.eclipse.scout.rt.shared.services.common.code.ICode;
+import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -943,7 +947,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     ksList.addAll(contributedKeyStrokes);
     setKeyStrokes(ksList);
     // FIXME AWE: (organize) austauschbar mit bean
-    m_tableOrganizer = new TableOrganizer(this);
+    m_tableOrganizer = BEANS.get(ITableOrganizerProvider.class).createTableOrganizer(this);
 
     // add Convenience observer for drag & drop callbacks, event history and ui sort possible check
     addTableListener(new TableAdapter() {
@@ -1028,15 +1032,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   protected AbstractEventBuffer<TableEvent> getEventBuffer() {
     return m_eventBuffer;
   }
-
-//  protected void updateOrganizeColumnsFormTable() {
-//    // When organize column form is not opened, we must reload the table containing the columns
-//    // So we don't have to reload each time we click on a table header menu. The reload is required
-//    // when the table structure has been changed (e.g. a new column has been added)
-//    if (m_organizeColumnsForm != null && !getMenuByClass(OrganizeColumnsMenu.class).isSelected()) {
-//      m_organizeColumnsForm.setDirty(true);
-//    }
-//  }
 
   private void initColumnsInternal() {
     getColumnSet().initColumns();
@@ -4932,19 +4927,15 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
   }
 
-//  private IOrganizeColumnsForm getOrganizeColumnsForm() {
-//    if (m_organizeColumnsForm == null) {
-//      OrganizeColumnsMenu organizeColumnsMenu = getMenuByClass(OrganizeColumnsMenu.class);
-//      organizeColumnsMenu.ensureFormCreated();
-//      organizeColumnsMenu.ensureFormStarted();
-//      m_organizeColumnsForm = organizeColumnsMenu.getForm();
-//    }
-//    return m_organizeColumnsForm;
-//  }
-
   @Override
   public ITableOrganizer getTableOrganizer() {
     return m_tableOrganizer;
+  }
+
+  @Override
+  public boolean isCustomizable() {
+    return getTableCustomizer() != null &&
+        BEANS.get(IAccessControlService.class).checkPermission(new CreateCustomColumnPermission());
   }
 
 }

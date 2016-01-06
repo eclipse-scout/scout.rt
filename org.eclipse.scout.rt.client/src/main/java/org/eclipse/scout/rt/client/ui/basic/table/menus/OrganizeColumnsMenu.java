@@ -14,9 +14,9 @@ import java.util.Set;
 
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
-import org.eclipse.scout.rt.client.ui.basic.table.IOrganizeColumnsForm;
-import org.eclipse.scout.rt.client.ui.basic.table.IOrganizeColumnsFormProvider;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
+import org.eclipse.scout.rt.client.ui.basic.table.organizer.IOrganizeColumnsForm;
+import org.eclipse.scout.rt.client.ui.basic.table.organizer.IOrganizeColumnsFormProvider;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractFormToolButton;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Platform;

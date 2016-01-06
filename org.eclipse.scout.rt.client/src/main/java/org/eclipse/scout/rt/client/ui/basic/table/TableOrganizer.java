@@ -5,6 +5,9 @@ import java.util.List;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.customizer.ICustomColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.customizer.ITableCustomizer;
+import org.eclipse.scout.rt.client.ui.basic.table.organizer.IShowInvisibleColumnsForm;
+import org.eclipse.scout.rt.client.ui.basic.table.organizer.ITableOrganizer;
+import org.eclipse.scout.rt.client.ui.basic.table.organizer.ShowInvisibleColumnsForm;
 
 /**
  * @since 5.2
@@ -19,7 +22,7 @@ public class TableOrganizer implements ITableOrganizer {
 
   @Override
   public boolean isColumnAddable() {
-    return hasCustomizer() || hasInvisibleColumns();
+    return isCustomizable() || hasInvisibleColumns();
   }
 
   private boolean hasInvisibleColumns() {
@@ -39,7 +42,7 @@ public class TableOrganizer implements ITableOrganizer {
 
   @Override
   public void addColumn() {
-    if (hasCustomizer()) {
+    if (isCustomizable()) {
       getCustomizer().addColumn();
     }
     else if (hasInvisibleColumns()) {
@@ -56,7 +59,7 @@ public class TableOrganizer implements ITableOrganizer {
   @Override
   public void removeColumn(IColumn column) {
     if (isCustom(column)) {
-      if (hasCustomizer()) {
+      if (isCustomizable()) {
         getCustomizer().removeColumn((ICustomColumn) column);
       }
     }
@@ -68,9 +71,6 @@ public class TableOrganizer implements ITableOrganizer {
   }
 
   private void hideColumn(IColumn column) {
-    if (column.isColumnFilterActive()) { // FIXME AWE: (organize) don't remove filter (only do for custom columns)
-      m_table.getUserFilterManager().removeFilterByKey(column);
-    }
     ColumnSet columnSet = m_table.getColumnSet();
     List<IColumn<?>> visibleColumns = columnSet.getVisibleColumns();
     visibleColumns.remove(column);
@@ -79,7 +79,7 @@ public class TableOrganizer implements ITableOrganizer {
 
   @Override
   public void modifyColumn(IColumn column) {
-    if (hasCustomizer()) {
+    if (isCustomizable()) {
       getCustomizer().modifyColumn((ICustomColumn) column);
     }
   }
@@ -88,14 +88,12 @@ public class TableOrganizer implements ITableOrganizer {
     return column instanceof ICustomColumn;
   }
 
-  private boolean hasCustomizer() {
-    return getCustomizer() != null;
+  private boolean isCustomizable() {
+    return m_table.isCustomizable();
   }
 
   private ITableCustomizer getCustomizer() {
     return m_table.getTableCustomizer();
   }
 
-  // FIXME AWE: (organizer) also check permission
-  // BEANS.get(IAccessControlService.class).checkPermission(new CreateCustomColumnPermission())) {
 }
