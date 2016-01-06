@@ -1425,7 +1425,7 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
           updateField(rows, exception);
         }
         else {
-          ModelJobs.schedule(new IRunnable() {
+          IFuture<Void> future = ModelJobs.schedule(new IRunnable() {
 
             @Override
             public void run() throws Exception {
@@ -1433,6 +1433,7 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
             }
           }, ModelJobs.newInput(callingRunContext)
               .withName("Updating {}", AbstractContentAssistField.this.getClass().getName()));
+          future.awaitDone();
         }
       }
 
