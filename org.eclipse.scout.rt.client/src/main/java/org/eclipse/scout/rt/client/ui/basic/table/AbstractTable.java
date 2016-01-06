@@ -121,9 +121,7 @@ import org.eclipse.scout.rt.shared.extension.IContributionOwner;
 import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
 import org.eclipse.scout.rt.shared.extension.IExtension;
 import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
-import org.eclipse.scout.rt.shared.security.CreateCustomColumnPermission;
 import org.eclipse.scout.rt.shared.services.common.code.ICode;
-import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -4934,8 +4932,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
 
   @Override
   public boolean isCustomizable() {
-    return getTableCustomizer() != null &&
-        BEANS.get(IAccessControlService.class).checkPermission(new CreateCustomColumnPermission());
+    return getTableCustomizer() != null;
   }
 
 }

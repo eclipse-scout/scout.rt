@@ -8,6 +8,11 @@ import org.eclipse.scout.rt.client.ui.basic.table.customizer.ITableCustomizer;
 import org.eclipse.scout.rt.client.ui.basic.table.organizer.IShowInvisibleColumnsForm;
 import org.eclipse.scout.rt.client.ui.basic.table.organizer.ITableOrganizer;
 import org.eclipse.scout.rt.client.ui.basic.table.organizer.ShowInvisibleColumnsForm;
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.shared.security.CreateCustomColumnPermission;
+import org.eclipse.scout.rt.shared.security.DeleteCustomColumnPermission;
+import org.eclipse.scout.rt.shared.security.UpdateCustomColumnPermission;
+import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
 
 /**
  * @since 5.2
@@ -22,7 +27,7 @@ public class TableOrganizer implements ITableOrganizer {
 
   @Override
   public boolean isColumnAddable() {
-    return isCustomizable() || hasInvisibleColumns();
+    return isCustomizable() && hasCreatePermission() || hasInvisibleColumns();
   }
 
   private boolean hasInvisibleColumns() {
@@ -32,17 +37,19 @@ public class TableOrganizer implements ITableOrganizer {
 
   @Override
   public boolean isColumnRemovable(IColumn column) {
+    // We could write column.isVisible() || isCustomizable() && hasRemovePermission() && isCustom(column)
+    // here but the outcome would be the same as 'true', because the given column is always visible here.
     return true;
   }
 
   @Override
   public boolean isColumnModifiable(IColumn column) {
-    return isCustom(column);
+    return isCustomizable() && hasModifyPermission() && isCustom(column);
   }
 
   @Override
   public void addColumn() {
-    if (isCustomizable()) {
+    if (isCustomizable() && hasCreatePermission()) {
       getCustomizer().addColumn();
     }
     else if (hasInvisibleColumns()) {
@@ -59,7 +66,7 @@ public class TableOrganizer implements ITableOrganizer {
   @Override
   public void removeColumn(IColumn column) {
     if (isCustom(column)) {
-      if (isCustomizable()) {
+      if (isCustomizable() && hasRemovePermission()) {
         getCustomizer().removeColumn((ICustomColumn) column);
       }
     }
@@ -79,7 +86,7 @@ public class TableOrganizer implements ITableOrganizer {
 
   @Override
   public void modifyColumn(IColumn column) {
-    if (isCustomizable()) {
+    if (isCustomizable() && hasModifyPermission()) {
       getCustomizer().modifyColumn((ICustomColumn) column);
     }
   }
@@ -94,6 +101,18 @@ public class TableOrganizer implements ITableOrganizer {
 
   private ITableCustomizer getCustomizer() {
     return m_table.getTableCustomizer();
+  }
+
+  private boolean hasCreatePermission() {
+    return BEANS.get(IAccessControlService.class).checkPermission(new CreateCustomColumnPermission());
+  }
+
+  private boolean hasModifyPermission() {
+    return BEANS.get(IAccessControlService.class).checkPermission(new UpdateCustomColumnPermission());
+  }
+
+  private boolean hasRemovePermission() {
+    return BEANS.get(IAccessControlService.class).checkPermission(new DeleteCustomColumnPermission());
   }
 
 }
