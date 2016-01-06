@@ -384,6 +384,8 @@ scout.Table.prototype._renderSortEnabled = function(dummy) {};
 
 scout.Table.prototype._renderUiSortPossible = function(dummy) {};
 
+scout.Table.prototype._renderColumnAddable = function(dummy) {};
+
 scout.Table.prototype._syncTableControls = function(controls) {
   var i;
   for (i = 0; i < this.tableControls.length; i++) {

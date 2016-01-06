@@ -1222,6 +1222,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     JSONObject jsonEvent = new JSONObject();
     putProperty(jsonEvent, PROP_COLUMNS, columnsToJson(getColumnsInViewOrder()));
     addActionEvent(EVENT_COLUMN_STRUCTURE_CHANGED, jsonEvent);
+    addPropertyChangeEvent(PROP_COLUMN_ADDABLE, getModel().getTableOrganizer().isColumnAddable());
   }
 
   protected void handleModelColumnOrderChanged() {
