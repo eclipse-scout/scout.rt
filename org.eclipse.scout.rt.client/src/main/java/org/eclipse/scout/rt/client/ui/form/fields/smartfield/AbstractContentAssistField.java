@@ -1285,7 +1285,7 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
 
       @Override
       public IFuture<Void> provideAsync(ILookupCall<LOOKUP_KEY> lookupCall, ILookupRowFetchedCallback<LOOKUP_KEY> callback) {
-        return lookupCall.getDataByKeyInBackground(callback);
+        return lookupCall.getDataByKeyInBackground(ClientRunContexts.copyCurrent(), callback);
       }
     };
   }
@@ -1318,7 +1318,7 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
 
       @Override
       public IFuture<Void> provideAsync(ILookupCall<LOOKUP_KEY> lookupCall, ILookupRowFetchedCallback<LOOKUP_KEY> callback) {
-        return lookupCall.getDataByAllInBackground(callback);
+        return lookupCall.getDataByAllInBackground(ClientRunContexts.copyCurrent(), callback);
       }
     };
   }
@@ -1351,7 +1351,7 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
 
       @Override
       public IFuture<Void> provideAsync(ILookupCall<LOOKUP_KEY> lookupCall, ILookupRowFetchedCallback<LOOKUP_KEY> callback) {
-        return lookupCall.getDataByTextInBackground(callback);
+        return lookupCall.getDataByTextInBackground(ClientRunContexts.copyCurrent(), callback);
       }
     };
   }
@@ -1384,7 +1384,7 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
 
       @Override
       public IFuture<Void> provideAsync(ILookupCall<LOOKUP_KEY> lookupCall, ILookupRowFetchedCallback<LOOKUP_KEY> callback) {
-        return lookupCall.getDataByRecInBackground(callback);
+        return lookupCall.getDataByRecInBackground(ClientRunContexts.copyCurrent(), callback);
       }
     };
   }

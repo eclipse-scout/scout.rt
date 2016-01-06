@@ -14,6 +14,7 @@ import java.io.Serializable;
 import java.util.List;
 
 import org.eclipse.scout.rt.platform.Bean;
+import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.util.TriState;
 
@@ -46,19 +47,19 @@ public interface ILookupCall<KEY_TYPE> extends Serializable, Cloneable {
 
   List<? extends ILookupRow<KEY_TYPE>> getDataByKey();
 
-  IFuture<Void> getDataByKeyInBackground(ILookupRowFetchedCallback<KEY_TYPE> callback);
+  IFuture<Void> getDataByKeyInBackground(RunContext runContext, ILookupRowFetchedCallback<KEY_TYPE> callback);
 
   List<? extends ILookupRow<KEY_TYPE>> getDataByText();
 
-  IFuture<Void> getDataByTextInBackground(ILookupRowFetchedCallback<KEY_TYPE> callback);
+  IFuture<Void> getDataByTextInBackground(RunContext runContext, ILookupRowFetchedCallback<KEY_TYPE> callback);
 
   List<? extends ILookupRow<KEY_TYPE>> getDataByAll();
 
-  IFuture<Void> getDataByAllInBackground(ILookupRowFetchedCallback<KEY_TYPE> callback);
+  IFuture<Void> getDataByAllInBackground(RunContext runContext, ILookupRowFetchedCallback<KEY_TYPE> callback);
 
   List<? extends ILookupRow<KEY_TYPE>> getDataByRec();
 
-  IFuture<Void> getDataByRecInBackground(ILookupRowFetchedCallback<KEY_TYPE> caller);
+  IFuture<Void> getDataByRecInBackground(RunContext runContext, ILookupRowFetchedCallback<KEY_TYPE> callback);
 
   int getMaxRowCount();
 
