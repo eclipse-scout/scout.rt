@@ -59,20 +59,6 @@ scout.NumberField.prototype._renderDecimalFormat = function() {
 scout.NumberField.prototype._parse = function() {
   var input = this.$field.val();
   if (input) {
-    // TODO NBU: (BSH) Is this really necessary? Why should 1234'123 be invalid? Any why should 0.100'000 be valid? Also, the first condition can never be true...
-    // check if valid thousends
-    var thousends = input.match(new RegExp('\\d*[' + this.decimalFormat.groupingChar + ']\\d*', 'g'));
-    if (thousends) {
-      for (var i = 0; i < thousends.length; i++) {
-        var parts = thousends[i].split(this.decimalFormat.groupingChar);
-        for (var j = 0; j < parts.length; j++) {
-          if ((j === 0 && parts[j].length > 3 && parts[j].length < 0) || (j !== 0 && parts[j].length !== 3)) {
-            return;
-          }
-        }
-      }
-    }
-
     // Convert to JS number format (remove groupingChar, replace decimalSeparatorChar with '.')
     input = input
       .replace(new RegExp('[' + this.decimalFormat.groupingChar + ']', 'g'), '')
