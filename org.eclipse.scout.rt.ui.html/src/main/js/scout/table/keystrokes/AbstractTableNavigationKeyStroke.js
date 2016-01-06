@@ -137,7 +137,7 @@ scout.AbstractTableNavigationKeyStroke.prototype._findLastSelectedRowAfter = fun
 scout.AbstractTableNavigationKeyStroke.prototype._findFirstRowInViewport = function(table, viewportBounds) {
   var rows = table.filteredRows();
   return scout.arrays.find(rows, function(row, i) {
-    var rowOffset,
+    var rowOffset, rowMarginTop,
       $row = row.$row;
 
     if (!row.$row) {
@@ -145,6 +145,13 @@ scout.AbstractTableNavigationKeyStroke.prototype._findFirstRowInViewport = funct
       return false;
     }
     rowOffset = $row.offset();
+    rowMarginTop = row.$row.cssMarginTop();
+    // Selected row has a negative row margin
+    // -> add this margin to the offset to make sure this function does always return the same row independent of selection state
+    if (rowMarginTop < 0) {
+      rowOffset.top += Math.abs(rowMarginTop);
+    }
+
     // If the row is fully visible in the viewport -> break and return the row
     return viewportBounds.contains(rowOffset.left, rowOffset.top);
   });
