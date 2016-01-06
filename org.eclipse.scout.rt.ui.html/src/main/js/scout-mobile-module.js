@@ -141,14 +141,18 @@ __include("scout/table/TableInfoSelectionTooltip.js");
 __include("scout/table/TableHeader.js");
 __include("scout/table/TableHeaderMenu.js");
 __include("scout/table/TableHeaderMenuLayout.js");
+__include("scout/table/TableHeaderMenuGroup.js");
+__include("scout/table/TableHeaderMenuButton.js");
 __include("scout/table/TableLayout.js");
 __include("scout/table/TableSelectionHandler.js");
 __include("scout/table/TableTooltip.js");
+__include("scout/table/columns/comparators.js");
 __include("scout/table/columns/Column.js");
 __include("scout/table/columns/BeanColumn.js"); // requires Column.js
 __include("scout/table/columns/BooleanColumn.js"); // requires Column.js
 __include("scout/table/columns/DateColumn.js"); // requires Column.js
 __include("scout/table/columns/IconColumn.js"); //requires Column.js
+__include("scout/table/columns/NumberColumn.js"); //requires Column.js
 __include("scout/table/controls/TableControl.js");
 __include("scout/table/controls/AggregateTableControl.js"); // requires TableControl.js
 __include("scout/table/editor/CellEditorPopup.js");
@@ -172,6 +176,9 @@ __include("scout/table/keystrokes/TableNavigationPageDownKeyStroke.js");
 __include("scout/table/keystrokes/TableFocusFilterFieldKeyStroke.js");
 __include("scout/table/userfilter/TableUserFilter.js");
 __include("scout/table/userfilter/ColumnUserFilter.js");
+__include("scout/table/userfilter/DateColumnUserFilter.js");
+__include("scout/table/userfilter/NumberColumnUserFilter.js");
+__include("scout/table/userfilter/TextColumnUserFilter.js");
 __include("scout/table/userfilter/TableTextUserFilter.js");
 // Tree
 __include("scout/tree/Tree.js");
@@ -183,6 +190,13 @@ __include("scout/tree/keystrokes/TreeNavigationDownKeyStroke.js");
 __include("scout/tree/keystrokes/TreeCollapseAllKeyStroke.js");
 __include("scout/tree/keystrokes/TreeCollapseOrDrillUpKeyStroke.js");
 __include("scout/tree/keystrokes/TreeExpandOrDrillDownKeyStroke.js");
+// Compact Tree
+__include("scout/tree/CompactTree.js");
+__include("scout/tree/keystrokes/AbstractCompactTreeControlKeyStroke.js");
+__include("scout/tree/keystrokes/CompactTreeUpKeyStroke.js");
+__include("scout/tree/keystrokes/CompactTreeDownKeyStroke.js");
+__include("scout/tree/keystrokes/CompactTreeLeftKeyStroke.js");
+__include("scout/tree/keystrokes/CompactTreeRightKeyStroke.js");
 // Desktop
 __include("scout/desktop/BaseDesktop.js");
 __include("scout/desktop/Desktop.js");
@@ -196,6 +210,8 @@ __include("scout/desktop/DisableBrowserTabSwitchingKeyStroke.js");
 __include("scout/desktop/DesktopNavigation.js");
 __include("scout/desktop/DetailTableTreeFilter.js");
 __include("scout/desktop/NullDesktopNavigation.js");
+__include("scout/desktop/PopupBlockerHandler.js");
+__include("scout/desktop/PopupWindow.js");
 __include("scout/desktop/ViewButton.js");
 __include("scout/desktop/ViewButtonsLayout.js");
 __include("scout/desktop/ViewTabsController.js");
@@ -290,9 +306,11 @@ __include("scout/form/fields/wizard/WizardProgressField.js");
 __include("scout/form/fields/wizard/WizardProgressFieldLayout.js");
 __include("scout/form/fields/wrappedform/WrappedFormField.js");
 // More misc. elements
+__include("scout/desktop/DesktopFormController.js");
 __include("scout/desktop/AbstractNavigateMenu.js"); // requires Menu.js
 __include("scout/desktop/NavigateDownMenu.js");
 __include("scout/desktop/NavigateUpMenu.js");
+__include("scout/table/FilterFieldsGroupBox.js"); // requires GroupBox.js
 
 __include("scout/table/MobileTable.js");
 __include("scout/desktop/MobileDesktop.js");
