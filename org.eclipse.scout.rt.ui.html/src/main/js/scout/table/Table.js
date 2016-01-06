@@ -2997,7 +2997,7 @@ scout.Table.prototype.calculateViewRangeSize = function() {
   if (this.rowHeight === 0) {
     return 0;
     //FIXME CGU/AWE uncomment and remove return as soon as HtmlComp.validateLayout checks for invisible components
-//    throw new Error('Cannot calculate view range with rowHeight = 0');
+    //    throw new Error('Cannot calculate view range with rowHeight = 0');
   }
   return Math.ceil(this.$data.outerHeight() / this.rowHeight) * 2;
 };
@@ -3028,6 +3028,9 @@ scout.Table.prototype._calculateCurrentViewRange = function() {
   return this._calculateViewRangeForRowIndex(rowIndex);
 };
 
+/**
+ * Returns the index of the row which is at position scrollTop.
+ */
 scout.Table.prototype._rowIndexAtScrollTop = function(scrollTop) {
   var height = 0,
     index = -1;
@@ -3045,12 +3048,17 @@ scout.Table.prototype._rowIndexAtScrollTop = function(scrollTop) {
   return index;
 };
 
+/**
+ * Returns a range of size this.viewRangeSize. Start of range is rowIndex - viewRangeSize / 4.
+ * -> 1/4 of the rows are before the viewport 2/4 in the viewport 1/4 after the viewport,
+ * assuming viewRangeSize is 2*number of possible rows in the viewport (see calculateViewRangeSize).
+ */
 scout.Table.prototype._calculateViewRangeForRowIndex = function(rowIndex) {
   var viewRange = new scout.Range(),
-    halfRange = Math.floor(this.viewRangeSize / 2),
+    quarterRange = Math.floor(this.viewRangeSize / 4),
     diff;
 
-  viewRange.from = Math.max(rowIndex - halfRange, 0);
+  viewRange.from = Math.max(rowIndex - quarterRange, 0);
   viewRange.to = Math.min(viewRange.from + this.viewRangeSize, this.filteredRows().length);
 
   // Try to use the whole viewRangeSize (extend from if necessary)

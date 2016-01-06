@@ -76,23 +76,36 @@ describe("Table", function() {
       var model = helper.createModelFixture(2, 10);
       var table = helper.createTable(model);
 
-      table.viewRangeSize = 3;
-      expect(table._calculateViewRangeForRowIndex(0)).toEqual(new scout.Range(0, 3));
-      expect(table._calculateViewRangeForRowIndex(1)).toEqual(new scout.Range(0, 3));
-      expect(table._calculateViewRangeForRowIndex(2)).toEqual(new scout.Range(1, 4));
-      expect(table._calculateViewRangeForRowIndex(7)).toEqual(new scout.Range(6, 9));
-      expect(table._calculateViewRangeForRowIndex(8)).toEqual(new scout.Range(7, 10));
-      expect(table._calculateViewRangeForRowIndex(9)).toEqual(new scout.Range(7, 10));
-
       table.viewRangeSize = 4;
       expect(table._calculateViewRangeForRowIndex(0)).toEqual(new scout.Range(0, 4));
       expect(table._calculateViewRangeForRowIndex(1)).toEqual(new scout.Range(0, 4));
-      expect(table._calculateViewRangeForRowIndex(2)).toEqual(new scout.Range(0, 4));
-      expect(table._calculateViewRangeForRowIndex(3)).toEqual(new scout.Range(1, 5));
-      expect(table._calculateViewRangeForRowIndex(6)).toEqual(new scout.Range(4, 8));
-      expect(table._calculateViewRangeForRowIndex(7)).toEqual(new scout.Range(5, 9));
+      expect(table._calculateViewRangeForRowIndex(2)).toEqual(new scout.Range(1, 5));
+      expect(table._calculateViewRangeForRowIndex(3)).toEqual(new scout.Range(2, 6));
+      expect(table._calculateViewRangeForRowIndex(6)).toEqual(new scout.Range(5, 9));
+      expect(table._calculateViewRangeForRowIndex(7)).toEqual(new scout.Range(6, 10));
       expect(table._calculateViewRangeForRowIndex(8)).toEqual(new scout.Range(6, 10));
       expect(table._calculateViewRangeForRowIndex(9)).toEqual(new scout.Range(6, 10));
+
+      table.viewRangeSize = 5;
+      expect(table._calculateViewRangeForRowIndex(0)).toEqual(new scout.Range(0, 5));
+      expect(table._calculateViewRangeForRowIndex(1)).toEqual(new scout.Range(0, 5));
+      expect(table._calculateViewRangeForRowIndex(2)).toEqual(new scout.Range(1, 6));
+      expect(table._calculateViewRangeForRowIndex(3)).toEqual(new scout.Range(2, 7));
+      expect(table._calculateViewRangeForRowIndex(4)).toEqual(new scout.Range(3, 8));
+      expect(table._calculateViewRangeForRowIndex(5)).toEqual(new scout.Range(4, 9));
+      expect(table._calculateViewRangeForRowIndex(7)).toEqual(new scout.Range(5, 10));
+      expect(table._calculateViewRangeForRowIndex(8)).toEqual(new scout.Range(5, 10));
+      expect(table._calculateViewRangeForRowIndex(9)).toEqual(new scout.Range(5, 10));
+
+      table.viewRangeSize = 8;
+      expect(table._calculateViewRangeForRowIndex(0)).toEqual(new scout.Range(0, 8));
+      expect(table._calculateViewRangeForRowIndex(1)).toEqual(new scout.Range(0, 8));
+      expect(table._calculateViewRangeForRowIndex(2)).toEqual(new scout.Range(0, 8));
+      expect(table._calculateViewRangeForRowIndex(3)).toEqual(new scout.Range(1, 9));
+      expect(table._calculateViewRangeForRowIndex(4)).toEqual(new scout.Range(2, 10));
+      expect(table._calculateViewRangeForRowIndex(7)).toEqual(new scout.Range(2, 10));
+      expect(table._calculateViewRangeForRowIndex(8)).toEqual(new scout.Range(2, 10));
+      expect(table._calculateViewRangeForRowIndex(9)).toEqual(new scout.Range(2, 10));
     });
   });
 
