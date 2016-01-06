@@ -20,8 +20,4 @@ public interface IOrganizeColumnsForm extends IForm {
 
   void reload();
 
-  void setDirty(boolean dirty);
-
-  boolean isDirty();
-
 }

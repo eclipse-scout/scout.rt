@@ -1123,10 +1123,8 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
   void setValueChangeTriggerEnabled(boolean b);
 
   /**
-   * Notify the table that a column header has been selected.
-   *
    * @since 5.2.0
    */
-  void selectColumnHeader(IColumn column);
+  ITableOrganizer getTableOrganizer();
 
 }

@@ -20,6 +20,7 @@ import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.table.ColumnSet;
 import org.eclipse.scout.rt.client.ui.basic.table.IHeaderCell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
+import org.eclipse.scout.rt.client.ui.basic.table.ITableOrganizer;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.TableRowDataMapper;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
@@ -446,5 +447,15 @@ public interface IColumn<VALUE> extends IPropertyObserver, ITypeWithClassId, IOr
    * Initialize cell properties with column properties
    */
   void initCell(ITableRow row);
+
+  /**
+   * Delegates to {@link ITableOrganizer#isColumnRemovable(IColumn)}.
+   */
+  boolean isRemovable();
+
+  /**
+   * Delegates to {@link ITableOrganizer#isColumnModifiable(IColumn)}.
+   */
+  boolean isModifiable();
 
 }

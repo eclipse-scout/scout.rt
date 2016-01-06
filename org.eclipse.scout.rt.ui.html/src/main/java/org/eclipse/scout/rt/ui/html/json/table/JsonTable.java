@@ -26,6 +26,7 @@ import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
+import org.eclipse.scout.rt.client.ui.basic.table.ITableOrganizer;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.TableAdapter;
 import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
@@ -33,7 +34,6 @@ import org.eclipse.scout.rt.client.ui.basic.table.TableListener;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.INumberColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.controls.ITableControl;
-import org.eclipse.scout.rt.client.ui.basic.table.menus.OrganizeColumnsMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.userfilter.TableTextUserFilterState;
 import org.eclipse.scout.rt.client.ui.basic.userfilter.IUserFilterState;
 import org.eclipse.scout.rt.client.ui.dnd.IDNDSupport;
@@ -99,7 +99,6 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   public static final String EVENT_COLUMN_STRUCTURE_CHANGED = "columnStructureChanged";
   public static final String EVENT_COLUMN_HEADERS_UPDATED = "columnHeadersUpdated";
   public static final String EVENT_COLUMN_BACKGROUND_EFFECT_CHANGED = "columnBackgroundEffectChanged";
-  public static final String EVENT_COLUMN_SELECTED = "columnSelected";
   public static final String EVENT_COLUMN_ORGANIZE_ACTION = "columnOrganizeAction";
   public static final String EVENT_REQUEST_FOCUS_IN_CELL = "requestFocusInCell";
   public static final String EVENT_START_CELL_EDIT = "startCellEdit";
@@ -121,12 +120,12 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   public static final String PROP_COLUMN_ID = "columnId";
   public static final String PROP_COLUMN_IDS = "columnIds";
   public static final String PROP_COLUMNS = "columns";
+  public static final String PROP_COLUMN_ADDABLE = "columnAddable";
   public static final String PROP_SELECTED_ROWS = "selectedRows";
   public static final String PROP_FILTERS = "filters";
   public static final String PROP_HAS_RELOAD_HANDLER = "hasReloadHandler";
 
   private TableListener m_tableListener;
-  private JsonOrganizeColumnCommands m_organizeColumnCommands;
   private final Map<String, ITableRow> m_tableRows;
   private final Map<ITableRow, String> m_tableRowIds;
   private final Map<String, IColumn> m_columns;
@@ -401,15 +400,8 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   public JSONObject toJson() {
     JSONObject json = super.toJson();
     putProperty(json, PROP_COLUMNS, columnsToJson(getColumnsInViewOrder()));
-    JSONArray jsonRows = new JSONArray();
-    for (ITableRow row : getModel().getRows()) {
-      if (!isRowAccepted(row)) {
-        continue;
-      }
-      JSONObject jsonRow = tableRowToJson(row);
-      jsonRows.put(jsonRow);
-    }
-    putProperty(json, PROP_ROWS, jsonRows);
+    putProperty(json, PROP_COLUMN_ADDABLE, getModel().getTableOrganizer().isColumnAddable());
+    putProperty(json, PROP_ROWS, tableRowsToJson(getModel().getRows()));
     JsonContextMenu<IContextMenu> jsonContextMenu = getAdapter(getModel().getContextMenu());
     if (jsonContextMenu != null) {
       json.put(PROP_MENUS, jsonContextMenu.childActionsToJson());
@@ -419,6 +411,16 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
       putProperty(json, PROP_FILTERS, filtersToJson(getModel().getUserFilterManager().getFilters()));
     }
     return json;
+  }
+
+  private JSONArray tableRowsToJson(Collection<ITableRow> rows) {
+    JSONArray jsonRows = new JSONArray();
+    for (ITableRow row : rows) {
+      if (isRowAccepted(row)) {
+        jsonRows.put(tableRowToJson(row));
+      }
+    }
+    return jsonRows;
   }
 
   @Override
@@ -489,9 +491,6 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     else if (EVENT_COLUMN_BACKGROUND_EFFECT_CHANGED.equals(event.getType())) {
       handleColumnBackgroundEffectChanged(event);
     }
-    else if (EVENT_COLUMN_SELECTED.equals(event.getType())) {
-      handleUiColumnSelected(event);
-    }
     else if (EVENT_COLUMN_ORGANIZE_ACTION.equals(event.getType())) {
       handleUiColumnOrganizeAction(event);
     }
@@ -501,19 +500,22 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   }
 
   private void handleUiColumnOrganizeAction(JsonEvent event) {
-    String action = event.getData().getString("action");
-    m_organizeColumnCommands.doAction(action);
-  }
-
-  private void handleUiColumnSelected(JsonEvent event) {
-    if (m_organizeColumnCommands == null) {
-      OrganizeColumnsMenu organizeColumnsMenu = getModel().getMenuByClass(OrganizeColumnsMenu.class);
-      m_organizeColumnCommands = new JsonOrganizeColumnCommands(organizeColumnsMenu);
+    JSONObject data = event.getData();
+    String action = data.getString("action");
+    ITableOrganizer organizer = getModel().getTableOrganizer();
+    switch (action) {
+      case "add":
+        organizer.addColumn();
+        break;
+      case "remove":
+        organizer.removeColumn(extractColumn(data));
+        break;
+      case "modify":
+        organizer.modifyColumn(extractColumn(data));
+        break;
+      default:
+        throw new IllegalArgumentException();
     }
-    m_organizeColumnCommands.update();
-    String columnId = event.getData().getString("columnId");
-    getModel().selectColumnHeader(getColumn(columnId));
-    addActionEvent("columnActionsChanged", m_organizeColumnCommands.toJson());
   }
 
   protected void handleUiRowClicked(JsonEvent event) {
@@ -1103,14 +1105,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   }
 
   protected void handleModelRowsInserted(Collection<ITableRow> modelRows) {
-    JSONArray jsonRows = new JSONArray();
-    for (ITableRow row : modelRows) {
-      if (!isRowAccepted(row)) {
-        continue;
-      }
-      JSONObject jsonRow = tableRowToJson(row);
-      jsonRows.put(jsonRow);
-    }
+    JSONArray jsonRows = tableRowsToJson(modelRows);
     if (jsonRows.length() == 0) {
       return;
     }
@@ -1120,14 +1115,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   }
 
   protected void handleModelRowsUpdated(Collection<ITableRow> modelRows) {
-    JSONArray jsonRows = new JSONArray();
-    for (ITableRow row : modelRows) {
-      if (!isRowAccepted(row)) {
-        continue;
-      }
-      JSONObject jsonRow = tableRowToJson(row);
-      jsonRows.put(jsonRow);
-    }
+    JSONArray jsonRows = tableRowsToJson(modelRows);
     if (jsonRows.length() == 0) {
       return;
     }

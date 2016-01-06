@@ -262,7 +262,6 @@ scout.TableHeader.prototype.openTableHeaderMenu = function(column) {
     focusableContainer: true
   });
   this._tableHeaderMenu.open();
-  this.table._send('columnSelected', {columnId: column.id});
 };
 
 scout.TableHeader.prototype.closeTableHeaderMenu = function() {

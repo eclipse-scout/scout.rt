@@ -33,6 +33,9 @@ public class JsonColumn<T extends IColumn<?>> implements IJsonObject {
   private final String PROP_INITIAL_ALWAYS_INCLUDE_SORT_AT_BEGIN = "initialAlwaysIncludeSortAtBegin";
   private final String PROP_INITIAL_ALWAYS_INCLUDE_SORT_AT_END = "initialAlwaysIncludeSortAtEnd";
 
+  private final String PROP_REMOVABLE = "removable";
+  private final String PROP_MODIFIABLE = "modifiable";
+
   public JsonColumn(T model) {
     m_column = model;
   }
@@ -86,6 +89,8 @@ public class JsonColumn<T extends IColumn<?>> implements IJsonObject {
     json.put(IColumn.PROP_UI_SORT_POSSIBLE, getColumn().isUiSortPossible());
     json.put(PROP_INITIAL_ALWAYS_INCLUDE_SORT_AT_BEGIN, getColumn().isInitialAlwaysIncludeSortAtBegin());
     json.put(PROP_INITIAL_ALWAYS_INCLUDE_SORT_AT_END, getColumn().isInitialAlwaysIncludeSortAtEnd());
+    json.put(PROP_REMOVABLE, getColumn().isRemovable());
+    json.put(PROP_MODIFIABLE, getColumn().isModifiable());
 
     return json;
   }

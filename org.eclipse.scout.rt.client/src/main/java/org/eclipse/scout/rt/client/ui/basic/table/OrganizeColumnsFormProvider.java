@@ -10,16 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table;
 
-import org.eclipse.scout.rt.platform.ApplicationScoped;
-
 /**
- * Provider for {@link IOrganizeColumnsForm}
+ * Provides an instance of {@link OrganizeColumnsForm}.
  *
  * @since 5.2
  */
-@ApplicationScoped
-public class OrganizeColumnsFormProvider {
+public class OrganizeColumnsFormProvider implements IOrganizeColumnsFormProvider {
 
+  @Override
   public IOrganizeColumnsForm createOrganizeColumnsForm(ITable table) {
     return new OrganizeColumnsForm(table);
   }

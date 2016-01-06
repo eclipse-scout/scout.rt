@@ -1909,6 +1909,16 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
     return Assertions.assertNotNull(row).getCell(this).isContentValid();
   }
 
+  @Override
+  public boolean isRemovable() {
+    return getTable().getTableOrganizer().isColumnRemovable(this);
+  }
+
+  @Override
+  public boolean isModifiable() {
+    return getTable().getTableOrganizer().isColumnModifiable(this);
+  }
+
   /**
    * The extension delegating to the local methods. This Extension is always at the end of the chain and will not call
    * any further chain elements.

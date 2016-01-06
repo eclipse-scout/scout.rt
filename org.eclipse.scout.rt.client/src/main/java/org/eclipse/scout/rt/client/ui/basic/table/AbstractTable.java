@@ -66,8 +66,6 @@ import org.eclipse.scout.rt.client.ui.action.menu.root.ITableContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.internal.TableContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
-import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ColumnsGroupBox.ColumnsTableField;
-import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.GroupBox.ColumnsGroupBox.ColumnsTableField.Table.KeyColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractBooleanColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
@@ -187,7 +185,8 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   private List<ITableControl> m_tableControls;
   private IReloadHandler m_reloadHandler;
   private int m_valueChangeTriggerEnabled = 1;// >=1 is true
-  private IOrganizeColumnsForm m_organizeColumnsForm;
+//  private IOrganizeColumnsForm m_organizeColumnsForm;
+  private ITableOrganizer m_tableOrganizer;
 
   public AbstractTable() {
     this(true);
@@ -943,6 +942,8 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     List<IKeyStroke> contributedKeyStrokes = m_contributionHolder.getContributionsByClass(IKeyStroke.class);
     ksList.addAll(contributedKeyStrokes);
     setKeyStrokes(ksList);
+    // FIXME AWE: (organize) austauschbar mit bean
+    m_tableOrganizer = new TableOrganizer(this);
 
     // add Convenience observer for drag & drop callbacks, event history and ui sort possible check
     addTableListener(new TableAdapter() {
@@ -1011,11 +1012,8 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
             }
             break;
           case TableEvent.TYPE_COLUMN_HEADERS_UPDATED:
-            checkIfColumnPreventsUiSortForTable();
-            break;
           case TableEvent.TYPE_COLUMN_STRUCTURE_CHANGED:
             checkIfColumnPreventsUiSortForTable();
-            updateOrganizeColumnsFormTable();
             break;
         }
       }
@@ -1031,14 +1029,14 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     return m_eventBuffer;
   }
 
-  protected void updateOrganizeColumnsFormTable() {
-    // When organize column form is not opened, we must reload the table containing the columns
-    // So we don't have to reload each time we click on a table header menu. The reload is required
-    // when the table structure has been changed (e.g. a new column has been added)
-    if (m_organizeColumnsForm != null && !getMenuByClass(OrganizeColumnsMenu.class).isSelected()) {
-      m_organizeColumnsForm.setDirty(true);
-    }
-  }
+//  protected void updateOrganizeColumnsFormTable() {
+//    // When organize column form is not opened, we must reload the table containing the columns
+//    // So we don't have to reload each time we click on a table header menu. The reload is required
+//    // when the table structure has been changed (e.g. a new column has been added)
+//    if (m_organizeColumnsForm != null && !getMenuByClass(OrganizeColumnsMenu.class).isSelected()) {
+//      m_organizeColumnsForm.setDirty(true);
+//    }
+//  }
 
   private void initColumnsInternal() {
     getColumnSet().initColumns();
@@ -4694,7 +4692,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         popUIProcessor();
       }
     }
-
   }
 
   private class P_TableRowBuilder extends AbstractTableRowBuilder<Object> {
@@ -4935,21 +4932,19 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
   }
 
-  @Override
-  public void selectColumnHeader(IColumn column) {
-    if (m_organizeColumnsForm == null) {
-      OrganizeColumnsMenu organizeColumnsMenu = getMenuByClass(OrganizeColumnsMenu.class);
-      m_organizeColumnsForm = organizeColumnsMenu.getForm();
-    }
+//  private IOrganizeColumnsForm getOrganizeColumnsForm() {
+//    if (m_organizeColumnsForm == null) {
+//      OrganizeColumnsMenu organizeColumnsMenu = getMenuByClass(OrganizeColumnsMenu.class);
+//      organizeColumnsMenu.ensureFormCreated();
+//      organizeColumnsMenu.ensureFormStarted();
+//      m_organizeColumnsForm = organizeColumnsMenu.getForm();
+//    }
+//    return m_organizeColumnsForm;
+//  }
 
-    ITable table = m_organizeColumnsForm.getFieldByClass(ColumnsTableField.class).getTable();
-    IColumn<IColumn<?>> keyColumn = table.getColumnSet().getColumnByClass(KeyColumn.class);
-    for (ITableRow row : table.getRows()) {
-      IColumn columnFromRow = (IColumn) row.getCell(keyColumn).getValue();
-      if (column == columnFromRow) {
-        table.selectRow(row);
-        break;
-      }
-    }
+  @Override
+  public ITableOrganizer getTableOrganizer() {
+    return m_tableOrganizer;
   }
+
 }

@@ -164,7 +164,15 @@ scout.TableHeaderMenu.prototype._renderMovingGroup = function() {
 };
 
 scout.TableHeaderMenu.prototype._renderColumnActionsGroup = function() {
-  var menuPopup = this;
+  // When no button of this group is visible, don't render group at all
+  if (!this.table.addColumnEnabled &&
+      !this.column.removable &&
+      !this.column.modifiable) {
+    return;
+  }
+
+  var column = this.column,
+    menuPopup = this;
 
   this.columnActionsGroup = scout.create('TableHeaderMenuGroup', {
     parent: this,
@@ -174,26 +182,29 @@ scout.TableHeaderMenu.prototype._renderColumnActionsGroup = function() {
     parent: this.columnActionsGroup,
     textKey: 'ui.addColumn',
     cssClass: 'add-column',
+    visible: this.table.columnAddable,
     clickHandler: onClick.bind(this, 'add')});
   this.removeColumnButton = scout.create('TableHeaderMenuButton', {
     parent: this.columnActionsGroup,
     textKey: 'ui.removeColumn',
     cssClass: 'remove-column',
+    visible: this.column.removable,
     clickHandler: onClick.bind(this, 'remove')});
-  // By default modify is not visible because most of the columns cannot be modified
-  // this avoid some flickering in the UI
   this.modifyColumnButton = scout.create('TableHeaderMenuButton', {
     parent: this.columnActionsGroup,
     textKey: 'ui.changeColumn',
     cssClass: 'change-column',
-    visible: false,
+    visible: this.column.modifiable,
     clickHandler: onClick.bind(this, 'modify')});
 
   this.columnActionsGroup.render(this.$columnActions);
 
   function onClick(action) {
     menuPopup.remove();
-    this.table._send('columnOrganizeAction', {action: action});
+    this.table._send('columnOrganizeAction', {
+      action: action,
+      columnId: column.id
+    });
   }
 };
 

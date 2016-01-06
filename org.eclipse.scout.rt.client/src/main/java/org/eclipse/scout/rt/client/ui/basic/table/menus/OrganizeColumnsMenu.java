@@ -15,8 +15,8 @@ import java.util.Set;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
 import org.eclipse.scout.rt.client.ui.basic.table.IOrganizeColumnsForm;
+import org.eclipse.scout.rt.client.ui.basic.table.IOrganizeColumnsFormProvider;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
-import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsFormProvider;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractFormToolButton;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Platform;
@@ -55,7 +55,7 @@ public class OrganizeColumnsMenu extends AbstractFormToolButton<IOrganizeColumns
 
   @Override
   protected IOrganizeColumnsForm createForm() {
-    return BEANS.get(OrganizeColumnsFormProvider.class).createOrganizeColumnsForm(m_table);
+    return BEANS.get(IOrganizeColumnsFormProvider.class).createOrganizeColumnsForm(m_table);
   }
 
   @Override
