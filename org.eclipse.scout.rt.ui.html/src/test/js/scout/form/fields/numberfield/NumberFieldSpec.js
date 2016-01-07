@@ -72,10 +72,10 @@ describe("NumberField", function() {
       field.$field.val('10.000*2,0+3,1');
       field._parse();
       expect(field.$field[0].value).toBe('20.003,1');
-      //could not be parsed on wrong values
+      //point is stripped and 20+31 is 51
       field.$field.val('2.0+3.1');
       field._parse();
-      expect(field.$field[0].value).toBe('2.0+3.1');
+      expect(field.$field[0].value).toBe('51');
     });
   });
 
