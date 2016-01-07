@@ -147,4 +147,8 @@
 
 .context-menu > .menu-item {
   height: @menu-item-height;
+
+  &.menu-textandicon > .icon {
+    padding-right: 10px;
+  }
 }
