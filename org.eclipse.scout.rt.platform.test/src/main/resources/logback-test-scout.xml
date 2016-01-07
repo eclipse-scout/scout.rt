@@ -44,4 +44,6 @@
     <appender-ref ref="STDOUT" />
     <appender-ref ref="STDERR" />
   </root>
+
+  <logger level="WARN" name="org.quartz" />
 </included>
