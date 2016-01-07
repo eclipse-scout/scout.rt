@@ -30,6 +30,7 @@
     <appender-ref ref="STDERR" />
   </root>
 
+  <logger level="WARN" name="org.quartz" />
   <logger name="org.eclipse.scout.rt.platform.internal.BeanFilter" level="WARN" />
   <logger name="org.eclipse.scout.rt.server.commons.servlet.filter.authentication.DevelopmentAuthenticator" level="WARN" />
 </configuration>

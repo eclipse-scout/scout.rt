@@ -33,6 +33,7 @@
     <appender-ref ref="STDERR" />
   </root>
 
+  <logger level="WARN" name="org.quartz" />
   <logger name="org.eclipse.scout.rt.platform.inventory.internal.JandexInventoryBuilder" level="WARN" />
   <logger name="org.eclipse.scout.rt.server.services.common.jdbc.internal.exec.StatementProcessor" level="WARN" />
   <logger name="org.eclipse.scout.rt.platform.internal.BeanFilter" level="WARN" />
