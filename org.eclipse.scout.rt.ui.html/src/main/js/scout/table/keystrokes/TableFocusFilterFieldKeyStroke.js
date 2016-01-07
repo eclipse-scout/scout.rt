@@ -46,7 +46,7 @@ scout.TableFocusFilterFieldKeyStroke.prototype._accept = function(event) {
   var activeElement = this.field.$container.activeElement(true),
     activeElementType = activeElement.tagName.toLowerCase(),
     focusOnInputField = (activeElementType === 'textarea' || activeElementType === 'input');
-  if (activeElement.className === 'table-text-filter' || !focusOnInputField) {
+  if (activeElement.className !== 'table-text-filter' || !focusOnInputField) {
     event._$filterInput = $filterInput;
     this._isKeyStrokeInRange(event);
     return true;

@@ -59,7 +59,8 @@ scout.TableFooter.prototype._render = function($parent) {
   // text filter
   this._$textFilter = scout.fields.makeTextField($parent, 'table-text-filter')
     .appendTo(this._$info)
-    .on('input paste', '', $.debounce(this._onFilterInput.bind(this)))
+    .on('input', '', this._onFilterInput.bind(this))
+    .on('input', '', $.debounce(this._onFilterInputDebounce.bind(this)))
     .placeholder(this.session.text('ui.FilterBy_'));
   filter = this.table.getFilter(scout.TableTextUserFilter.Type);
   if (filter) {
@@ -519,12 +520,24 @@ scout.TableFooter.prototype._onFilterInput = function(event) {
     $input = $(event.currentTarget),
     filterText = $input.val();
 
+  if (!filterText) {
+    return;
+  }
+  $input.val(filterText.toLowerCase());
+};
+
+scout.TableFooter.prototype._onFilterInputDebounce = function(event) {
+  var filter,
+    $input = $(event.currentTarget),
+    filterText = $input.val();
+
   if (filterText) {
     filter = scout.create('TableTextUserFilter', {
       session: this.session,
       table: this.table
     });
-    filter.text = filterText.toLowerCase();
+
+    filter.text = filterText;
     this.table.addFilter(filter);
   } else if (!filterText) {
     this.table.removeFilterByKey(scout.TableTextUserFilter.Type);
