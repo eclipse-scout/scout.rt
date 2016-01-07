@@ -2168,7 +2168,7 @@ scout.Table.prototype.selectRows = function(rows, notifyServer, debounceSend) {
   }
 
   if (!this.multiSelect && rows.length > 1) {
-    rows = rows[0];
+    rows = [rows[0]];
   }
 
   this.selectedRows = rows;
