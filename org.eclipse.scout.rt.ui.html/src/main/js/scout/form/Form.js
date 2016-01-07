@@ -69,7 +69,7 @@ scout.Form.prototype._renderForm = function($parent) {
   if (this.isDialog()) {
     layout = new scout.DialogLayout(this);
     $handle = this.$container.appendDiv('drag-handle');
-    this.$container.makeDraggable($handle);
+    this.$container.makeDraggable($handle, $.throttle(this.onMove.bind(this), 1000 / 60)); // 60fps
 
     if (this.closable) {
       this.$container
@@ -213,6 +213,10 @@ scout.Form.prototype.onResize = function() {
   var $parent = this.$container.parent();
   var parentSize = new scout.Dimension($parent.width(), $parent.height());
   htmlComp.setSize(parentSize);
+};
+
+scout.Form.prototype.onMove = function(newOffset) {
+  this.trigger('move', newOffset);
 };
 
 scout.Form.prototype.appendTo = function($parent) {

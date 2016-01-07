@@ -117,15 +117,43 @@
    * the timer is reset. The default value for 'delay' is 250 ms.
    */
   $.debounce = function(fx, delay) {
-    var delayer = null;
     delay = (delay !== undefined) ? delay : 250;
+    var timeoutId = null;
     return function() {
       var that = this,
         args = arguments;
-      clearTimeout(delayer);
-      delayer = setTimeout(function() {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(function() {
         fx.apply(that, args);
       }, delay);
+    };
+  };
+
+  /**
+   * Executes the given function. Further calls to the same function are delayed by the given delay
+   * (default 250ms). This is similar to $.debounce() but ensures that function is called at least
+   * every 'delay' milliseconds. Can be useful to prevent too many function calls, e.g. from UI events.
+   */
+  $.throttle = function(fx, delay) {
+    delay = (delay !== undefined) ? delay : 250;
+    var timeoutId = null;
+    var lastExecution;
+    return function() {
+      var that = this,
+        args = arguments,
+        now =  new Date().getTime(),
+        callFx = function() {
+          lastExecution = now;
+          fx.apply(that, args);
+        };
+      if (lastExecution && lastExecution + delay > now) {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(function() {
+          callFx();
+        }, delay);
+      } else {
+        callFx();
+      }
     };
   };
 
@@ -875,26 +903,35 @@
   /**
    * Makes any element movable with the mouse. If the argument '$handle' is missing, the entire
    * element can be used as a handle.
+   *
+   * A callback function can be passed as second argument (optional). The function is called for
+   * every change of the draggable's position with an object as argument:
+   * { top: (top pixels), left: (left pixels) }
    */
-  $.fn.makeDraggable = function($handle) {
+  $.fn.makeDraggable = function($handle, callback) {
     var $draggable = this;
     $handle = $handle || $draggable;
     return $handle.on('mousedown.draggable', function(event) {
       var orig_offset = $draggable.offset();
       var orig_event = event;
+      var handleWidth = $handle.width();
+      var windowWidth = $handle.window().width();
+      var windowHeight = $handle.window().height();
       $handle.parents()
         .on('mousemove.dragging', function(event) {
           var top = orig_offset.top + (event.pageY - orig_event.pageY);
           var left = orig_offset.left + (event.pageX - orig_event.pageX);
           // do not drop outside of viewport (and leave a margin of 100 pixels)
-          left = Math.max(100 - $handle.width(), left);
-          left = Math.min($handle.body().width() - 100, left);
+          left = Math.max(100 - handleWidth, left);
+          left = Math.min(windowWidth - 100, left);
           top = Math.max(0, top); // must not be dragged outside of top, otherwise dragging back is impossible
-          top = Math.min($handle.window().height() - 100, top);
-          $draggable.offset({
+          top = Math.min(windowHeight - 100, top);
+          var newOffset = {
             top: top,
             left: left
-          });
+          };
+          $draggable.offset(newOffset);
+          callback && callback(newOffset);
         })
         .on('mouseup.dragging', function(e) {
           $handle.parents().off('.dragging');

@@ -205,15 +205,15 @@ scout.FormController.prototype.detachDialogs = function() {
 
 scout.FormController.prototype._layoutDialog = function(dialog) {
   var left, top, opticalMiddleOffset, dialogSize,
-    $document = dialog.$container.document(),
-    documentSize = new scout.Dimension($document.width(), $document.height());
+    $window = dialog.$container.window(),
+    windowSize = new scout.Dimension($window.width(), $window.height());
 
   dialog.htmlComp.pixelBasedSizing = true;
   dialog.htmlComp.validateLayout();
 
   dialogSize = dialog.htmlComp.getSize(true);
-  left = (documentSize.width - dialogSize.width) / 2;
-  top = (documentSize.height - dialogSize.height) / 2;
+  left = (windowSize.width - dialogSize.width) / 2;
+  top = (windowSize.height - dialogSize.height) / 2;
 
   // optical middle
   opticalMiddleOffset = Math.min(top / 5, 10);
@@ -222,6 +222,11 @@ scout.FormController.prototype._layoutDialog = function(dialog) {
   dialog.$container
     .cssLeft(left)
     .cssTop(top);
+
+  dialog.trigger('move', {
+    top: top,
+    left: left
+  });
 
   // FIXME dwi: If not validated anew, focus on single-button forms is not gained.
   //                 Maybe, this is the same problem as in BusyIndicator.js

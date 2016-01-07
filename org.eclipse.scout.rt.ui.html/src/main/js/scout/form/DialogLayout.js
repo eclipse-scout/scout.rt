@@ -21,9 +21,9 @@ scout.DialogLayout.prototype.layout = function($container) {
   }
 
   var htmlComp = this._form.htmlComp,
-    $document = this._form.$container.document(),
+    $window = this._form.$container.window(),
     dialogMargins = htmlComp.getMargins(),
-    documentSize = new scout.Dimension($document.width(), $document.height()),
+    windowSize = new scout.Dimension($window.width(), $window.height()),
     dialogSize = new scout.Dimension(),
     currentBounds = htmlComp.getBounds(),
     prefSize = this.preferredLayoutSize($container);
@@ -31,8 +31,8 @@ scout.DialogLayout.prototype.layout = function($container) {
   // class .dialog may specify a margin
   // currentBounds.y and x are 0 initially, but if size changes while dialog is open they are greater than 0
   // This guarantees the dialog size may not exceed the document size
-  var maxWidth = (documentSize.width - currentBounds.x - dialogMargins.horizontal());
-  var maxHeight = (documentSize.height - currentBounds.y - dialogMargins.vertical());
+  var maxWidth = (windowSize.width - currentBounds.x - dialogMargins.horizontal());
+  var maxHeight = (windowSize.height - currentBounds.y - dialogMargins.vertical());
 
   // Ensure the dialog is not larger than viewport
   dialogSize.width = Math.min(maxWidth, prefSize.width);

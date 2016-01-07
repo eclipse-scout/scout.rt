@@ -89,6 +89,23 @@ scout.Tooltip.prototype._render = function($parent) {
       scout.scrollbars.onScroll(this.$anchor, this._scrollHandler);
     }
   }
+
+  // If the tooltip is rendered inside a (popup) dialog, get a reference to the dialog.
+  this.dialog = null;
+  var parent = this.parent;
+  while (parent) {
+    if (parent instanceof scout.Form && parent.isDialog()) {
+      this.dialog = parent;
+      break;
+    }
+    parent = parent.parent;
+  }
+  
+  // If inside a dialog, attach a listener to reposition the tooltip when the dialog is moved
+  if (this.dialog) {
+    this._moveHandler = this.position.bind(this);
+    this.dialog.on('move', this._moveHandler);
+  }
 };
 
 scout.Tooltip.prototype._postRender = function() {
@@ -103,6 +120,13 @@ scout.Tooltip.prototype._remove = function() {
     scout.scrollbars.offScroll(this._scrollHandler);
     this._scrollHandler = null;
   }
+  if (this._moveHandler) {
+    if (this.dialog) {
+      this.dialog.off('move', this._moveHandler);
+    }
+    this._moveHandler = null;
+  }
+  this.dialog = null;
   scout.Tooltip.parent.prototype._remove.call(this);
 };
 
