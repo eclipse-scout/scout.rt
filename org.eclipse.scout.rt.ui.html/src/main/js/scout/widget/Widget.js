@@ -63,6 +63,9 @@ scout.Widget.prototype.render = function($parent) {
   this._renderInternal($parent);
   this._link();
   this.session.keyStrokeManager.installKeyStrokeContext(this.keyStrokeContext);
+  if (this.parent) {
+    this.parent.addChild(this);
+  }
   this.rendered = true;
   this.attached = true;
   this._postRender();
@@ -115,6 +118,9 @@ scout.Widget.prototype.remove = function() {
   this._remove();
   this.rendered = false;
   this.attached = false;
+  if (this.parent) {
+    this.parent.removeChild(this);
+  }
   this._trigger('remove');
 };
 
@@ -128,6 +134,8 @@ scout.Widget.prototype._link = function() {
 };
 
 scout.Widget.prototype._trigger = function(type, event) {
+  event = event || {};
+  event.eventOn = this;
   if (this.events) {
     this.events.trigger(type, event);
   }
@@ -145,14 +153,17 @@ scout.Widget.prototype.setParent = function(parent) {
     // Remove from old parent if getting relinked
     this.parent.removeChild(this);
   }
-
   this.parent = parent;
-  this.parent.addChild(this);
+  if (this.parent) { //prevent trying to set child on undefined
+    this.parent.addChild(this);
+  }
 };
 
 scout.Widget.prototype.addChild = function(child) {
   $.log.trace('addChild(' + child + ') to ' + this);
-  this.children.push(child);
+  if (this.children.indexOf(child) === -1) {
+    this.children.push(child);
+  }
 };
 
 scout.Widget.prototype.removeChild = function(child) {

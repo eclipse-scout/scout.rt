@@ -301,8 +301,17 @@ scout.ContextMenuPopup.prototype._renderMenuItems = function(menus, initialSubMe
         }
       });
     } else {
+      var oldParent = menu.parent;
       menu.setParent(this);
     }
+    var menuRemoveHandler = function(event) {
+      var removedMenu = event.eventOn;
+      if (removedMenu.cloneOf) {
+        this.session.unregisterAllAdapterClones(removedMenu.cloneOf);
+      }
+      removedMenu.setParent(oldParent);
+    }.bind(this);
+    menu.on('remove', menuRemoveHandler);
     //just set once because on second executen of this menu.parent is set to a popup.
     if (!menu.parentMenu) {
       menu.parentMenu = parentMenu;

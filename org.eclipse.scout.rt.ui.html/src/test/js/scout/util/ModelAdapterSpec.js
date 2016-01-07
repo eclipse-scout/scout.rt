@@ -148,14 +148,20 @@ describe('ModelAdapter', function() {
       adapter._renderFoo = function(value) {
         $div.text(value);
       };
-      adapter._syncPropertiesOnPropertyChange({}, {foo: 'bar'}, []);
-      adapter._renderPropertiesOnPropertyChange({}, {foo: 'bar'}, []);
+      adapter._syncPropertiesOnPropertyChange({}, {
+        foo: 'bar'
+      }, []);
+      adapter._renderPropertiesOnPropertyChange({}, {
+        foo: 'bar'
+      }, []);
       expect($div.text()).toBe('bar');
     });
 
     it("for non-adapter property -> throw when _render* method does not exist", function() {
       var adapter = new scout.ModelAdapter();
-      expect(adapter._renderPropertiesOnPropertyChange.bind(adapter, {}, {foo: 'bar'})).toThrow();
+      expect(adapter._renderPropertiesOnPropertyChange.bind(adapter, {}, {
+        foo: 'bar'
+      })).toThrow();
     });
 
   });
@@ -163,7 +169,9 @@ describe('ModelAdapter', function() {
   describe("init", function() {
 
     it("check if model properties are copied to adapter", function() {
-      var model = { foo: 6 },
+      var model = {
+          foo: 6
+        },
         adapter = new scout.ModelAdapter();
       model.id = '123';
       model.parent = new scout.NullWidget();
@@ -181,8 +189,10 @@ describe('ModelAdapter', function() {
       var model = createGenericModel();
 
       var message = {
-        adapterData : createAdapterData(model),
-        events: [createPropertyChangeEvent(adapter, {childAdapter: model.id})]
+        adapterData: createAdapterData(model),
+        events: [createPropertyChangeEvent(adapter, {
+          childAdapter: model.id
+        })]
       };
       session._processSuccessResponse(message);
 
@@ -202,8 +212,10 @@ describe('ModelAdapter', function() {
       model.owner = session.rootAdapter.id;
 
       var message = {
-        adapterData : createAdapterData(model),
-        events: [createPropertyChangeEvent(adapter, {childAdapter: model.id})]
+        adapterData: createAdapterData(model),
+        events: [createPropertyChangeEvent(adapter, {
+          childAdapter: model.id
+        })]
       };
       session._processSuccessResponse(message);
 
@@ -286,16 +298,26 @@ describe('ModelAdapter', function() {
     });
 
     it('prefers properties passed as modelOverride', function() {
-      var adapterClone = adapter.cloneAdapter({label: 'foo'});
+      var adapterClone = adapter.cloneAdapter({
+        label: 'foo'
+      });
       expect(adapterClone.label).toBe('foo');
     });
 
-    it('must register clone in adapter registry', function() {
+    it('must register clone in clone adapter registry', function() {
       var adapterClone = adapter.cloneAdapter();
       expect(adapterClone.cloneOf).toBe(adapter);
       // registry may contain multiple clones for a given adapter ID
       // that's why we access index 0 here
       expect(session._clonedModelAdapterRegistry[adapter.id][0]).toBe(adapterClone);
+    });
+
+    it('must not register clone in adapter registry', function() {
+      var adapterClone = adapter.cloneAdapter();
+      expect(adapterClone.cloneOf).toBe(adapter);
+      // registry may contain multiple clones for a given adapter ID
+      // that's why we access index 0 here
+      expect(session.modelAdapterRegistry[adapterClone.id]).toBe(undefined);
     });
 
   });
@@ -309,8 +331,10 @@ describe('ModelAdapter', function() {
         var model = createGenericModel();
 
         var message = {
-          adapterData : createAdapterData(model),
-          events: [createPropertyChangeEvent(adapter, {childAdapter: model.id})]
+          adapterData: createAdapterData(model),
+          events: [createPropertyChangeEvent(adapter, {
+            childAdapter: model.id
+          })]
         };
         session._processSuccessResponse(message);
 
@@ -324,8 +348,10 @@ describe('ModelAdapter', function() {
         var model2 = createGenericModel();
 
         var message = {
-          adapterData : createAdapterData(model1),
-          events: [createPropertyChangeEvent(adapter, {childAdapter: model1.id})]
+          adapterData: createAdapterData(model1),
+          events: [createPropertyChangeEvent(adapter, {
+            childAdapter: model1.id
+          })]
         };
         session._processSuccessResponse(message);
 
@@ -333,8 +359,10 @@ describe('ModelAdapter', function() {
         expect(session.getModelAdapter(model1.id)).toBe(adapter.childAdapter);
 
         message = {
-          adapterData : createAdapterData(model2),
-          events: [createPropertyChangeEvent(adapter, {childAdapter: model2.id})]
+          adapterData: createAdapterData(model2),
+          events: [createPropertyChangeEvent(adapter, {
+            childAdapter: model2.id
+          })]
         };
         session._processSuccessResponse(message);
 
@@ -352,8 +380,10 @@ describe('ModelAdapter', function() {
         var model2 = createGenericModel();
 
         var message = {
-          adapterData : createAdapterData([model1, model2]),
-          events: [createPropertyChangeEvent(adapter, {childAdapters: [model1.id, model2.id]})]
+          adapterData: createAdapterData([model1, model2]),
+          events: [createPropertyChangeEvent(adapter, {
+            childAdapters: [model1.id, model2.id]
+          })]
         };
         session._processSuccessResponse(message);
 
@@ -369,8 +399,10 @@ describe('ModelAdapter', function() {
         var model2 = createGenericModel();
 
         var message = {
-          adapterData : createAdapterData([model1, model2]),
-          events: [createPropertyChangeEvent(adapter, {childAdapters: [model1.id, model2.id]})]
+          adapterData: createAdapterData([model1, model2]),
+          events: [createPropertyChangeEvent(adapter, {
+            childAdapters: [model1.id, model2.id]
+          })]
         };
         session._processSuccessResponse(message);
 
@@ -380,7 +412,9 @@ describe('ModelAdapter', function() {
         expect(session.getModelAdapter(model2.id)).toBe(adapter.childAdapters[1]);
 
         message = {
-          events: [createPropertyChangeEvent(adapter, {childAdapters: [model2.id]})]
+          events: [createPropertyChangeEvent(adapter, {
+            childAdapters: [model2.id]
+          })]
         };
         session._processSuccessResponse(message);
 
@@ -397,8 +431,10 @@ describe('ModelAdapter', function() {
         var model3 = createGenericModel();
 
         var message = {
-          adapterData : createAdapterData([model1, model2]),
-          events: [createPropertyChangeEvent(adapter, {childAdapters: [model1.id, model2.id]})]
+          adapterData: createAdapterData([model1, model2]),
+          events: [createPropertyChangeEvent(adapter, {
+            childAdapters: [model1.id, model2.id]
+          })]
         };
         session._processSuccessResponse(message);
 
@@ -408,8 +444,10 @@ describe('ModelAdapter', function() {
         expect(session.getModelAdapter(model2.id)).toBe(adapter.childAdapters[1]);
 
         message = {
-          adapterData : createAdapterData(model3),
-          events: [createPropertyChangeEvent(adapter, {childAdapters: [model2.id, model3.id]})]
+          adapterData: createAdapterData(model3),
+          events: [createPropertyChangeEvent(adapter, {
+            childAdapters: [model2.id, model3.id]
+          })]
         };
         session._processSuccessResponse(message);
 

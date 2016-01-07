@@ -62,6 +62,8 @@ scout.Popup.prototype._createLayout = function() {
 };
 
 scout.Popup.prototype.open = function($parent, event) {
+  this._triggerPopupOpenEvent();
+
   this._open($parent, event);
 
   // Focus the popup
@@ -72,7 +74,6 @@ scout.Popup.prototype.open = function($parent, event) {
     this.session.focusManager.installFocusContext(this.$container, this.initialFocus());
   }
 
-  this._triggerPopupOpenEvent();
 };
 
 scout.Popup.prototype._uninstallAllChildScrollbars = function() {

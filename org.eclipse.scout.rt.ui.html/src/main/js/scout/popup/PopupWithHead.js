@@ -39,6 +39,11 @@ scout.PopupWithHead.prototype.onResize = function() {
   this.close();
 };
 
+scout.PopupWithHead.prototype._remove = function($parent) {
+  scout.PopupWithHead.parent.prototype._remove.call(this, $parent);
+  this.$parent.window().off('resize', this.resizeHandler);
+};
+
 scout.PopupWithHead.prototype._$createNewBody = function() {
   this.$body = this.$container.appendDiv('popup-body');
   this._modifyBody();
@@ -136,11 +141,11 @@ scout.PopupWithHead.prototype._position = function($container, switchIfNecessary
     scout.PopupWithHead.parent.prototype._position.call(this, $container);
     this.$body.removeClass('up down left right');
     openingDirectionY = 'up';
-     if($container.hasClass('down')){
-       openingDirectionY = 'down';
+    if ($container.hasClass('down')) {
+      openingDirectionY = 'down';
     }
     openingDirectionX = 'right';
-    if($container.hasClass('left')){
+    if ($container.hasClass('left')) {
       openingDirectionX = 'left';
     }
     this.$body.addClass(openingDirectionY + ' ' + openingDirectionX);

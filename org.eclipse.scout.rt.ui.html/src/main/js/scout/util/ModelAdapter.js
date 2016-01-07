@@ -111,7 +111,7 @@ scout.ModelAdapter.prototype._send = function(type, data, delay, coalesceFunc) {
   if (coalesceFunc) {
     event.coalesce = coalesceFunc;
   }
-  this.remoteHandler(event, delay);
+  adapter.remoteHandler(event, delay);
   this.trigger('send', event);
 };
 
@@ -572,14 +572,14 @@ scout.ModelAdapter.prototype.cloneAdapter = function(modelOverride) {
       cloneModel[propertyName] = undefined;
     } else if (this._isAdapterProperty(propertyName)) {
       // NOP - we deal with adapter properties below
+    } else if ('_register' === propertyName) {
+      // NOP - is initialized on create of adapter
     } else if (this.hasOwnProperty(propertyName)) {
       cloneModel[propertyName] = this[propertyName];
     }
   }, this);
 
   cloneAdapter = scout.create(cloneModel);
-
-  //TODO [5.2] nbu: clone uiProperties
 
   // #2 - create child adapters, use cloneAdapter as parent
   this._adapterProperties.forEach(function(propertyName) {
