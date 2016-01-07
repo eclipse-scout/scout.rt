@@ -844,7 +844,10 @@ scout.Session.prototype._onCancelProcessing = function(event) {
     }
   }.bind(this), 100);
 
-  // Send cancel request to the server.
+  this._sendCancelRequest();
+};
+
+scout.Session.prototype._sendCancelRequest = function() {
   this._sendRequest({
     uiSessionId: this.uiSessionId,
     cancel: true
