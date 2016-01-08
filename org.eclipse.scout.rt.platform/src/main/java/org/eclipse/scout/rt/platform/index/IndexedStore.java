@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.platform.index;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
@@ -27,47 +28,47 @@ import java.util.List;
  * <pre>
  * // Define an indexed store with the indices registered.
  * public class PersonStore extends IndexedStore&lt;Person&gt; {
- * 
+ *
  *   private final P_PersonIdIndex m_idxId = registerIndex(new P_PersonIdIndex());
  *   private final P_PersonNameIndex m_idxName = registerIndex(new P_PersonNameIndex());
- * 
+ *
  *   public Person getById(long id) {
  *     return m_idxId.get(id);
  *   }
- * 
+ *
  *   public List&lt;Person&gt; getByName(String name) {
  *     return m_idxName.get(name);
  *   }
- * 
+ *
  *   public Set&lt;String&gt; getNames() {
  *     return m_idxName.indexValues();
  *   }
- * 
+ *
  *   // ====  Index definitions ==== //
- * 
+ *
  *   private class P_PersonIdIndex extends AbstractSingleValueIndex&lt;Long, Person&gt; {
- * 
+ *
  *     &#064;Override
  *     protected Long calculateIndexFor(Person person) {
  *       return person.getId();
  *     }
  *   }
- * 
+ *
  *   private class P_PersonNameIndex extends AbstractMultiValueIndex&lt;String, Person&gt; {
- * 
+ *
  *     &#064;Override
  *     protected String calculateIndexFor(Person person) {
  *       return person.getName();
  *     }
  *   }
  * }
- * 
+ *
  * // Instantiate the store and add some data.
  * PersonStore store = new PersonStore();
  * store.add(new Person().withId(1).withName(&quot;john&quot;));
  * store.add(new Person().withId(2).withName(&quot;anna&quot;));
  * store.add(new Person().withId(3).withName(&quot;john&quot;));
- * 
+ *
  * // Access data of the store by indexed values.
  * store.getById(1); // john
  * store.getById(2); // anna
@@ -100,12 +101,20 @@ public class IndexedStore<ELEMENT> implements Iterable<ELEMENT> {
   }
 
   /**
-   * Removes the given element from this store and removes all calculated indices for the element. This method call has
-   * no effect if not registered.
+   * Removes the given element from this store and all associated indices.
    */
   public void remove(final ELEMENT element) {
     for (final IIndex<?, ELEMENT> index : m_indices) {
       index.removeFromIndex(element);
+    }
+  }
+
+  /**
+   * Removes the given elements from this store and all associated indices.
+   */
+  public void remove(final Collection<ELEMENT> elements) {
+    for (final ELEMENT element : elements) {
+      remove(element);
     }
   }
 
@@ -119,7 +128,7 @@ public class IndexedStore<ELEMENT> implements Iterable<ELEMENT> {
   /**
    * Returns whether the element is contained in this store.
    */
-  public boolean contains(ELEMENT element) {
+  public boolean contains(final ELEMENT element) {
     return m_elementIndex.contains(element);
   }
 
