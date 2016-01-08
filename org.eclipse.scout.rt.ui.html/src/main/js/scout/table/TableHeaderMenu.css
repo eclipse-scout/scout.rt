@@ -168,7 +168,7 @@
     content: @icon-pencil;
   }
 
-  &.toggle.selected:hover {
+  &.togglable.selected:hover {
     border-width: 0;
 
     &::before {
@@ -248,7 +248,7 @@
     &.selected {
       border-width: 2px;
 
-      &.toggle:hover {
+      &.togglable:hover {
         background-color: @table-header-menu-cmd-active-background-color;
         background-image: none;
       }

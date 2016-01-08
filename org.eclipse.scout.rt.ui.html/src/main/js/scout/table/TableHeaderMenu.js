@@ -231,13 +231,13 @@ scout.TableHeaderMenu.prototype._renderSortingGroup = function() {
     this.sortAscButton = scout.create('TableHeaderMenuButton', {
       parent: this.sortingGroup,
       textKey: 'ui.ascending',
-      cssClass: 'sort sort-asc',
+      cssClass: 'sort sort-asc togglable',
       direction: 'asc',
       clickHandler: onSortClick});
     this.sortDescButton = scout.create('TableHeaderMenuButton', {
       parent: this.sortingGroup,
       textKey: 'ui.descending',
-      cssClass: 'sort sort-desc',
+      cssClass: 'sort sort-desc togglable',
       direction: 'desc',
       clickHandler: onSortClick});
   }
@@ -245,13 +245,13 @@ scout.TableHeaderMenu.prototype._renderSortingGroup = function() {
   this.sortAscAddButton = scout.create('TableHeaderMenuButton', {
     parent: this.sortingGroup,
     textKey: 'ui.ascendingAdditionally',
-    cssClass: 'sort sort-asc-add',
+    cssClass: 'sort sort-asc-add togglable',
     direction: 'asc',
     clickHandler: onSortAdditionalClick});
   this.sortDescAddButton = scout.create('TableHeaderMenuButton', {
     parent: this.sortingGroup,
     textKey: 'ui.descendingAdditionally',
-    cssClass: 'sort sort-desc-add',
+    cssClass: 'sort sort-desc-add togglable',
     direction: 'desc',
     clickHandler: onSortAdditionalClick});
 
@@ -328,19 +328,20 @@ scout.TableHeaderMenu.prototype._renderGroupingGroup = function() {
   var groupButton = scout.create('TableHeaderMenuButton', {
     parent: group,
     textKey: 'ui.groupingApply',
-    cssClass: 'toggle group',
+    cssClass: 'group togglable',
     additional: false,
     clickHandler: groupColumn});
   var groupAddButton = scout.create('TableHeaderMenuButton', {
     parent: group,
     textKey: 'ui.additionally',
-    cssClass: 'toggle group-add',
+    cssClass: 'group-add togglable',
     additional: true,
     clickHandler: groupColumn});
 
   if (groupCount === 0) {
     groupAddButton.setVisible(false);
   } else if (groupCount === 1 && this.column.grouped) {
+    groupButton.setSelected(true);
     groupAddButton.setVisible(false);
   } else if (groupCount > 1) {
     groupAddButton.setVisible(true);
@@ -358,9 +359,10 @@ scout.TableHeaderMenu.prototype._renderGroupingGroup = function() {
   group.render(this.$columnActions);
 
   function groupColumn() {
+    this.toggle();
     var direction = (column.sortIndex >= 0 && !column.sortAscending) ? 'desc' : 'asc';
     menuPopup.remove();
-    table.groupColumn(column, this.additional, direction, this.selected);
+    table.groupColumn(column, this.additional, direction, !this.selected);
   }
 };
 
@@ -421,20 +423,20 @@ scout.TableHeaderMenu.prototype._renderColoringGroup = function() {
   scout.create('TableHeaderMenuButton', {
     parent: group,
     textKey: 'ui.fromRedToGreen',
-    cssClass: 'color color-gradient1',
+    cssClass: 'color color-gradient1 togglable',
     backgroundEffect: 'colorGradient1',
     clickHandler: onClick});
   scout.create('TableHeaderMenuButton', {
     parent: group,
     textKey: 'ui.fromGreenToRed',
-    cssClass: 'color color-gradient2',
+    cssClass: 'color color-gradient2 togglable',
     backgroundEffect: 'colorGradient2',
     clickHandler: onClick});
   if (scout.device.supportsCssGradient()) {
     scout.create('TableHeaderMenuButton', {
       parent: group,
       textKey: 'ui.withBarChart',
-      cssClass: 'color color-bar-chart',
+      cssClass: 'color color-bar-chart togglable',
       backgroundEffect: 'barChart',
       clickHandler: onClick});
   }
