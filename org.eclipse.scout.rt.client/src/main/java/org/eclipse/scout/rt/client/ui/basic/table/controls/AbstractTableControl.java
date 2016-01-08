@@ -17,6 +17,8 @@ import org.eclipse.scout.rt.client.extension.ui.basic.table.control.ITableContro
 import org.eclipse.scout.rt.client.extension.ui.basic.table.control.TableControlChains.TableControlInitFormChain;
 import org.eclipse.scout.rt.client.ui.action.AbstractAction;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
+import org.eclipse.scout.rt.client.ui.form.FormEvent;
+import org.eclipse.scout.rt.client.ui.form.FormListener;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
@@ -65,7 +67,6 @@ public abstract class AbstractTableControl extends AbstractAction implements ITa
    * Initializes the form associated with this button. This method is called before the form is used for the first time.
    * <p>
    * Subclasses can override this method. The default does nothing.
-   *
    */
   @ConfigOperation
   @Order(120)
@@ -130,6 +131,15 @@ public abstract class AbstractTableControl extends AbstractAction implements ITa
     }
     IForm form = createForm();
     if (form != null) {
+      form.addFormListener(new FormListener() {
+        @Override
+        public void formChanged(FormEvent e) {
+          if (e.getType() == FormEvent.TYPE_CLOSED) {
+            setSelected(false);
+            setForm(null);
+          }
+        }
+      });
       setForm(form);
       decorateForm();
       interceptInitForm();

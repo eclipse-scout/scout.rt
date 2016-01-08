@@ -18,6 +18,8 @@ import org.eclipse.scout.rt.client.extension.ui.desktop.outline.IFormToolButtonE
 import org.eclipse.scout.rt.client.ui.action.AbstractAction;
 import org.eclipse.scout.rt.client.ui.action.tool.AbstractToolButton;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
+import org.eclipse.scout.rt.client.ui.form.FormEvent;
+import org.eclipse.scout.rt.client.ui.form.FormListener;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
@@ -89,6 +91,15 @@ public abstract class AbstractFormToolButton<FORM extends IForm> extends Abstrac
     }
     FORM form = createForm();
     if (form != null) {
+      form.addFormListener(new FormListener() {
+        @Override
+        public void formChanged(FormEvent e) {
+          if (e.getType() == FormEvent.TYPE_CLOSED) {
+            setSelected(false);
+            setForm(null);
+          }
+        }
+      });
       decorateForm(form);
       interceptInitForm(form);
       setForm(form);
