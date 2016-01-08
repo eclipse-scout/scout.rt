@@ -94,6 +94,28 @@ public final class DateUtility {
     }
   }
 
+  /**
+   * Returns <code>true</code> if, and only if the given String is a valid date according to the given date format.
+   *
+   * @param s
+   *          date
+   * @param pattern
+   *          date format
+   * @returns <code>true</code> if, and only if the given String is a valid date according to the given date format.
+   */
+  public static boolean isValidDate(String s, String pattern) {
+    try {
+      Locale loc = NlsLocale.get();
+      SimpleDateFormat df = new SimpleDateFormat(pattern, loc);
+      df.setLenient(false);
+      df.parse(s);
+      return true;
+    }
+    catch (ParseException e) {
+      return false;
+    }
+  }
+
   public static Date addMilliseconds(Date d, int milliseconds) {
     return addTime(d, Calendar.MILLISECOND, milliseconds);
   }
@@ -248,7 +270,7 @@ public final class DateUtility {
 
   /**
    * truncate the date to week (does not depend on locale, monday is always the first day in a week)
-   * 
+   *
    * @see ISO 8601
    */
   public static Date truncDateToIsoWeek(Date d) {

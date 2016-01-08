@@ -21,7 +21,6 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import org.eclipse.scout.rt.platform.util.date.DateUtility;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -331,6 +330,15 @@ public class DateUtilityTest {
     assertFalse(DateUtility.isInDateRange(from, d, DateUtility.parse("08-02-2011 23:59", DATE_TIME_PATTERN)));
     assertTrue(DateUtility.isInDateRange(from, d, DateUtility.parse("09-02-2011 00:00", DATE_TIME_PATTERN)));
     assertTrue(DateUtility.isInDateRange(from, d, DateUtility.parse("09-02-2011 00:01", DATE_TIME_PATTERN)));
+  }
+
+  @Test
+  public void testIsValidDate() {
+    assertFalse(DateUtility.isValidDate("942.790.2016", "dd.MM.yyyy"));
+    assertFalse(DateUtility.isValidDate("13.13.2015", "dd.MM.yyyy"));
+    assertFalse(DateUtility.isValidDate("05.13.2015", "dd.MM.yyyy"));
+    assertFalse(DateUtility.isValidDate("29.02.2015", "dd.MM.yyyy"));
+    assertTrue(DateUtility.isValidDate("29.02.2016", "dd.MM.yyyy"));
   }
 
   @Test

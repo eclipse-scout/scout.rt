@@ -59,16 +59,30 @@ public class FormattingUtilityTest {
 
   @Test
   public void testFormatDateTime() {
-    Date dateTime = DateUtility.parse("20.03.2012 14:06:56", "dd.MM.yyyy hh:mm:ss");
-    assertFormat(deChLocale, "20.03.12 14:06", dateTime);
-    assertFormat(enUsLocale, "3/20/12 2:06 PM", dateTime);
+    Locale previousLocale = NlsLocale.get(false);
+    try {
+      NlsLocale.set(deChLocale);
+      Date dateTime = DateUtility.parse("20.03.2012 14:06:56", "dd.MM.yyyy hh:mm:ss");
+      assertFormat(deChLocale, "20.03.12 14:06", dateTime);
+      assertFormat(enUsLocale, "3/20/12 2:06 PM", dateTime);
+    }
+    finally {
+      NlsLocale.set(previousLocale);
+    }
   }
 
   @Test
   public void testFormatTime() {
-    Date time = DateUtility.parse("14:06:56", "hh:mm:ss");
-    assertFormat(deChLocale, "01.01.70 14:06", time);
-    assertFormat(enUsLocale, "1/1/70 2:06 PM", time);
+    Locale previousLocale = NlsLocale.get(false);
+    try {
+      NlsLocale.set(deChLocale);
+      Date time = DateUtility.parse("14:06:56", "hh:mm:ss");
+      assertFormat(deChLocale, "01.01.70 14:06", time);
+      assertFormat(enUsLocale, "1/1/70 2:06 PM", time);
+    }
+    finally {
+      NlsLocale.set(previousLocale);
+    }
   }
 
   @Test
