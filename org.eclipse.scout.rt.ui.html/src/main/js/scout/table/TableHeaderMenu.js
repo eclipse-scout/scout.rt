@@ -231,28 +231,32 @@ scout.TableHeaderMenu.prototype._renderSortingGroup = function() {
     this.sortAscButton = scout.create('TableHeaderMenuButton', {
       parent: this.sortingGroup,
       textKey: 'ui.ascending',
-      cssClass: 'sort sort-asc togglable',
+      cssClass: 'sort sort-asc',
       direction: 'asc',
+      togglable: true,
       clickHandler: onSortClick});
     this.sortDescButton = scout.create('TableHeaderMenuButton', {
       parent: this.sortingGroup,
       textKey: 'ui.descending',
-      cssClass: 'sort sort-desc togglable',
+      cssClass: 'sort sort-desc',
       direction: 'desc',
+      togglable: true,
       clickHandler: onSortClick});
   }
 
   this.sortAscAddButton = scout.create('TableHeaderMenuButton', {
     parent: this.sortingGroup,
     textKey: 'ui.ascendingAdditionally',
-    cssClass: 'sort sort-asc-add togglable',
+    cssClass: 'sort sort-asc-add',
     direction: 'asc',
+    togglable: true,
     clickHandler: onSortAdditionalClick});
   this.sortDescAddButton = scout.create('TableHeaderMenuButton', {
     parent: this.sortingGroup,
     textKey: 'ui.descendingAdditionally',
-    cssClass: 'sort sort-desc-add togglable',
+    cssClass: 'sort sort-desc-add',
     direction: 'desc',
+    togglable: true,
     clickHandler: onSortAdditionalClick});
 
   this._updateSortingSelectedState();
@@ -328,14 +332,16 @@ scout.TableHeaderMenu.prototype._renderGroupingGroup = function() {
   var groupButton = scout.create('TableHeaderMenuButton', {
     parent: group,
     textKey: 'ui.groupingApply',
-    cssClass: 'group togglable',
+    cssClass: 'group',
     additional: false,
+    togglable: true,
     clickHandler: groupColumn});
   var groupAddButton = scout.create('TableHeaderMenuButton', {
     parent: group,
     textKey: 'ui.additionally',
-    cssClass: 'group-add togglable',
+    cssClass: 'group-add',
     additional: true,
+    togglable: true,
     clickHandler: groupColumn});
 
   if (groupCount === 0) {
@@ -423,21 +429,24 @@ scout.TableHeaderMenu.prototype._renderColoringGroup = function() {
   scout.create('TableHeaderMenuButton', {
     parent: group,
     textKey: 'ui.fromRedToGreen',
-    cssClass: 'color color-gradient1 togglable',
+    cssClass: 'color color-gradient1',
     backgroundEffect: 'colorGradient1',
+    togglable: true,
     clickHandler: onClick});
   scout.create('TableHeaderMenuButton', {
     parent: group,
     textKey: 'ui.fromGreenToRed',
-    cssClass: 'color color-gradient2 togglable',
+    cssClass: 'color color-gradient2',
     backgroundEffect: 'colorGradient2',
+    togglable: true,
     clickHandler: onClick});
   if (scout.device.supportsCssGradient()) {
     scout.create('TableHeaderMenuButton', {
       parent: group,
       textKey: 'ui.withBarChart',
-      cssClass: 'color color-bar-chart togglable',
+      cssClass: 'color color-bar-chart',
       backgroundEffect: 'barChart',
+      togglable: true,
       clickHandler: onClick});
   }
 

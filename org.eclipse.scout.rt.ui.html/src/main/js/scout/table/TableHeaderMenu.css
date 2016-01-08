@@ -101,6 +101,10 @@
     border-color: @palette-blue-6;
   }
 
+  &.disabled {
+    cursor: default;
+  }
+
   &::after {
     position: relative;
     left: 3px;
