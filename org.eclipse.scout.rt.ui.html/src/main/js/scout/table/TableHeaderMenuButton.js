@@ -18,7 +18,6 @@ scout.TableHeaderMenuButton.prototype._init = function(options) {
 
 scout.TableHeaderMenuButton.prototype._render = function($parent) {
   this.$container = $parent.appendDiv('table-header-menu-command toggle')
-    .data('label', this.session.text(this.textKey))
     .on('click', this.clickHandler.bind(this))
     .on('mouseenter click', this._onMouseOver.bind(this))
     .on('mouseleave', this._onMouseOut.bind(this));

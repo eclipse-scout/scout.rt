@@ -466,7 +466,7 @@ scout.TableHeaderMenu.prototype._renderFilterTable = function() {
 
   this.$filterTableGroupTitle = this.$filterTableGroup
     .appendDiv('table-header-menu-group-text')
-    .data('label', this._filterByText());
+    .text(this._filterByText());
 
   this.filterTable = scout.create('Table', {
     parent: this,
@@ -564,7 +564,7 @@ scout.TableHeaderMenu.prototype._renderFilterFields = function() {
   this.$filterFieldsGroup = this.$columnFilters.appendDiv('table-header-menu-group');
   this.$filterFieldsGroup
     .appendDiv('table-header-menu-group-text')
-    .data('label', this.filter.filterFieldsTitle());
+    .text(this.filter.filterFieldsTitle());
   this.filterFieldsGroupBox.render(this.$filterFieldsGroup);
 };
 
