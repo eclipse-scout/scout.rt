@@ -321,6 +321,10 @@ public abstract class AbstractPageWithNodes extends AbstractPage<ITable> impleme
       if (menu instanceof OutlineMenuWrapper) {
         ((OutlineMenuWrapper) menu).getWrappedMenu().setInheritAccessibility(false);
       }
+      if (menu.getMenuTypes().contains(TreeMenuType.Header) && menu.getMenuTypes().size() == 1) {
+        //Don't show TreeMenuType.Header. These menus should only be shown on outline title
+        continue;
+      }
       menus.add(new OutlineMenuWrapper(menu));
     }
     if (!CollectionUtility.equalsCollection(menus, mainBoxContextMenu.getChildActions())) {
