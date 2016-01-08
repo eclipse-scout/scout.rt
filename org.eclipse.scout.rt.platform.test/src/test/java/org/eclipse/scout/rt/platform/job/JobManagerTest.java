@@ -12,6 +12,8 @@ package org.eclipse.scout.rt.platform.job;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -20,6 +22,7 @@ import java.util.Set;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.job.internal.JobManager;
+import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.visitor.IVisitor;
@@ -172,5 +175,13 @@ public class JobManagerTest {
     assertTrue(verifyLatch.await());
 
     assertEquals(CollectionUtility.hashSet("interrupted-1", "interrupted-2", "interrupted-3"), protocol);
+
+    try {
+      Jobs.schedule(mock(IRunnable.class), Jobs.newInput());
+      fail("AssertionError expected");
+    }
+    catch (AssertionException e) {
+      // NOOP
+    }
   }
 }

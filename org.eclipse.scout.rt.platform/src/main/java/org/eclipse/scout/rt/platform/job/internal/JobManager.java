@@ -21,8 +21,9 @@ import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.IPlatform;
+import org.eclipse.scout.rt.platform.IPlatform.State;
 import org.eclipse.scout.rt.platform.IPlatformListener;
+import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.PlatformEvent;
 import org.eclipse.scout.rt.platform.annotations.Internal;
 import org.eclipse.scout.rt.platform.chain.callable.CallableChain;
@@ -35,7 +36,6 @@ import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.JobManagerP
 import org.eclipse.scout.rt.platform.context.RunContextRunner;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.exception.DefaultRuntimeExceptionTranslator;
-import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.job.DoneEvent;
 import org.eclipse.scout.rt.platform.job.ExecutionTrigger;
@@ -81,7 +81,7 @@ import org.slf4j.LoggerFactory;
  * @since 5.1
  */
 @ApplicationScoped
-public class JobManager implements IJobManager, IPlatformListener {
+public class JobManager implements IJobManager {
 
   private static final Logger LOG = LoggerFactory.getLogger(JobManager.class);
 
@@ -110,6 +110,7 @@ public class JobManager implements IJobManager, IPlatformListener {
   public final <RESULT> IFuture<RESULT> schedule(final Callable<RESULT> callable, final JobInput input) {
     Assertions.assertNotNull(input, "JobInput must not be null");
     Assertions.assertNotNull(input.getExecutionTrigger(), "ExecutionTrigger must not be null");
+    Assertions.assertFalse(isShutdown(), "{} not available because the platform has been shut down.", getClass().getSimpleName());
 
     // Create the Future to be given to the ExecutorService.
     final JobFutureTask<RESULT> futureTask = createJobFutureTask(callable, input);
@@ -241,7 +242,7 @@ public class JobManager implements IJobManager, IPlatformListener {
 
     // Shutdown Quartz Scheduler.
     try {
-      m_quartz.shutdown(false);
+      m_quartz.shutdown(true);
     }
     catch (final SchedulerException e) {
       LOG.error("Failed to shutdown Quartz Scheduler", e);
@@ -514,11 +515,17 @@ public class JobManager implements IJobManager, IPlatformListener {
     return input;
   }
 
-  // ==== IPlatformListener ==== //
-  @Override
-  public void stateChanged(final PlatformEvent event) throws PlatformException {
-    if (event.getState() == IPlatform.State.PlatformStopping) {
-      shutdown();
+  /**
+   * {@link IPlatformListener} to shutdown this job manager upon platform shutdown.
+   */
+  @Order(IJobManager.DESTROY_ORDER)
+  public static class PlatformListener implements IPlatformListener {
+
+    @Override
+    public void stateChanged(final PlatformEvent event) {
+      if (State.PlatformStopping.equals(event.getState())) {
+        BEANS.get(JobManager.class).shutdown();
+      }
     }
   }
 }

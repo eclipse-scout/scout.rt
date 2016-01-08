@@ -15,7 +15,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,8 +34,8 @@ import org.eclipse.scout.rt.testing.platform.job.JobTestUtil;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.platform.runner.Times;
 import org.eclipse.scout.rt.testing.platform.util.BlockingCountDownLatch;
-import org.junit.After;
-import org.junit.Before;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.quartz.SimpleScheduleBuilder;
@@ -44,19 +43,19 @@ import org.quartz.SimpleScheduleBuilder;
 @RunWith(PlatformTestRunner.class)
 public class JobStateTest {
 
-  private IBean<IJobManager> m_jobManagerBean;
+  private static IBean<IJobManager> s_jobManagerBean;
 
-  @Before
-  public void before() {
+  @BeforeClass
+  public static void beforeClass() {
     // Use dedicated job manager because job manager is shutdown in tests.
-    m_jobManagerBean = JobTestUtil.replaceCurrentJobManager(new JobManager() {
+    s_jobManagerBean = JobTestUtil.replaceCurrentJobManager(new JobManager() {
       // must be a subclass in order to replace JobManager
     });
   }
 
-  @After
-  public void after() {
-    JobTestUtil.unregisterAndShutdownJobManager(m_jobManagerBean);
+  @AfterClass
+  public static void afterClass() {
+    JobTestUtil.unregisterAndShutdownJobManager(s_jobManagerBean);
   }
 
   @Test
@@ -315,15 +314,6 @@ public class JobStateTest {
     assertEquals(JobState.DONE, capturedFutureStates.get(i));
 
     assertEquals(i + 1, capturedEvents.size());
-  }
-
-  @Test
-  public void testRejected() throws InterruptedException {
-    Jobs.getJobManager().shutdown();
-
-    IFuture<Void> future = Jobs.schedule(mock(IRunnable.class), Jobs.newInput());
-    future.awaitDone(5, TimeUnit.SECONDS);
-    assertEquals(JobState.REJECTED, future.getState());
   }
 
   @Test

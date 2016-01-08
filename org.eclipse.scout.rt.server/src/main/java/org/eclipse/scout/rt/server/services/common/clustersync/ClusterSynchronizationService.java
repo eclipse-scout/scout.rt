@@ -22,10 +22,13 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import javax.security.auth.Subject;
 
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.IPlatform.State;
+import org.eclipse.scout.rt.platform.IPlatformListener;
+import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.PlatformEvent;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.config.ConfigUtility;
 import org.eclipse.scout.rt.platform.security.SimplePrincipal;
@@ -296,11 +299,6 @@ public class ClusterSynchronizationService implements IClusterSynchronizationSer
     }
   }
 
-  @PreDestroy
-  public void disposeServices() {
-    disable();
-  }
-
   /**
    * @return transaction member for publishing messages within a transaction
    */
@@ -361,4 +359,19 @@ public class ClusterSynchronizationService implements IClusterSynchronizationSer
     return getStatusInfoInternal(messageType).getStatus();
   }
 
+  /**
+   * {@link IPlatformListener} to shutdown this cluster synchronization service upon platform shutdown.
+   */
+  @Order(IClusterSynchronizationService.DESTROY_ORDER)
+  public static class PlatformListener implements IPlatformListener {
+
+    @Override
+    public void stateChanged(final PlatformEvent event) {
+      if (State.PlatformStopping.equals(event.getState())) {
+        for (final ClusterSynchronizationService service : BEANS.all(ClusterSynchronizationService.class)) {
+          service.disable();
+        }
+      }
+    }
+  }
 }

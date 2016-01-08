@@ -13,6 +13,8 @@ package org.eclipse.scout.rt.platform.job;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,35 +32,18 @@ import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.job.internal.JobManager;
+import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.testing.platform.job.JobTestUtil;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
-import org.eclipse.scout.rt.testing.platform.runner.Times;
 import org.eclipse.scout.rt.testing.platform.util.BlockingCountDownLatch;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.quartz.SimpleScheduleBuilder;
 
 @RunWith(PlatformTestRunner.class)
 public class JobCancelTest {
-
-  private IBean<IJobManager> m_jobManagerBean;
-
-  @Before
-  public void before() {
-    // Use dedicated job manager because job manager is shutdown in tests.
-    m_jobManagerBean = JobTestUtil.replaceCurrentJobManager(new JobManager() {
-      // must be a subclass in order to replace JobManager
-    });
-  }
-
-  @After
-  public void after() {
-    JobTestUtil.unregisterAndShutdownJobManager(m_jobManagerBean);
-  }
 
   @Test
   public void testCancelSoft() throws InterruptedException {
@@ -216,78 +201,75 @@ public class JobCancelTest {
 
   @Test
   public void testShutdownJobManagerAndSchedule() throws InterruptedException {
-    final Set<String> protocol = Collections.synchronizedSet(new HashSet<String>()); // synchronized because modified/read by different threads.
+    // Use dedicated job manager because job manager is shutdown in tests.
+    IBean<IJobManager> jobManagerBean = JobTestUtil.replaceCurrentJobManager(new JobManager() {
+      // must be a subclass in order to replace JobManager
+    });
+    try {
+      final Set<String> protocol = Collections.synchronizedSet(new HashSet<String>()); // synchronized because modified/read by different threads.
 
-    final BlockingCountDownLatch latch = new BlockingCountDownLatch(2);
+      final BlockingCountDownLatch latch = new BlockingCountDownLatch(2);
 
-    Jobs.getJobManager().schedule(new IRunnable() {
+      Jobs.getJobManager().schedule(new IRunnable() {
 
-      @Override
-      public void run() throws Exception {
-        protocol.add("running-1");
-        try {
-          latch.countDownAndBlock();
+        @Override
+        public void run() throws Exception {
+          protocol.add("running-1");
+          try {
+            latch.countDownAndBlock();
+          }
+          catch (InterruptedException e) {
+            protocol.add("interrupted-1");
+          }
+          finally {
+            protocol.add("done-1");
+          }
         }
-        catch (InterruptedException e) {
-          protocol.add("interrupted-1");
+      }, Jobs.newInput()
+          .withRunContext(RunContexts.copyCurrent())
+          .withExceptionHandling(null, false));
+
+      IFuture<Void> future2 = Jobs.getJobManager().schedule(new IRunnable() {
+
+        @Override
+        public void run() throws Exception {
+          protocol.add("running-2");
+          try {
+            latch.countDownAndBlock();
+          }
+          catch (InterruptedException e) {
+            protocol.add("interrupted-2");
+          }
+          finally {
+            protocol.add("done-2");
+          }
         }
-        finally {
-          protocol.add("done-1");
-        }
+      }, Jobs.newInput()
+          .withRunContext(RunContexts.copyCurrent())
+          .withExceptionHandling(null, false));
+
+      assertTrue(latch.await());
+
+      // SHUTDOWN
+      Jobs.getJobManager().shutdown();
+
+      try {
+        Jobs.schedule(mock(IRunnable.class), Jobs.newInput());
+        fail("AssertionError expected");
       }
-    }, Jobs.newInput()
-        .withRunContext(RunContexts.copyCurrent())
-        .withExceptionHandling(null, false));
-
-    IFuture<Void> future2 = Jobs.getJobManager().schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        protocol.add("running-2");
-        try {
-          latch.countDownAndBlock();
-        }
-        catch (InterruptedException e) {
-          protocol.add("interrupted-2");
-        }
-        finally {
-          protocol.add("done-2");
-        }
+      catch (AssertionException e) {
+        // NOOP
       }
-    }, Jobs.newInput()
-        .withRunContext(RunContexts.copyCurrent())
-        .withExceptionHandling(null, false));
 
-    assertTrue(latch.await());
+      // VERIFY
+      assertEquals(CollectionUtility.hashSet("running-1", "running-2", "interrupted-1", "interrupted-2", "done-1", "done-2"), protocol);
 
-    // SHUTDOWN
-    Jobs.getJobManager().shutdown();
-
-    IFuture<Void> future3 = Jobs.getJobManager().schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        protocol.add("running-3");
-        try {
-          latch.countDownAndBlock();
-        }
-        catch (InterruptedException e) {
-          protocol.add("running-3");
-        }
-        finally {
-          protocol.add("done-3");
-        }
-      }
-    }, Jobs.newInput()
-        .withRunContext(RunContexts.copyCurrent())
-        .withExceptionHandling(null, false));
-
-    // VERIFY
-    assertEquals(CollectionUtility.hashSet("running-1", "running-2", "interrupted-1", "interrupted-2", "done-1", "done-2"), protocol);
-    assertTrue(future3.isCancelled());
-
-    future2.awaitDone(1, TimeUnit.SECONDS);
-    assertTrue(future2.isCancelled());
+      future2.awaitDone(1, TimeUnit.SECONDS);
+      assertTrue(future2.isCancelled());
+    }
+    finally {
+      JobTestUtil.unregisterAndShutdownJobManager(jobManagerBean);
+    }
   }
 
   /**
@@ -465,7 +447,6 @@ public class JobCancelTest {
    * Cancel multiple jobs with the same job-id.
    */
   @Test
-  @Times(20)
   public void testCancelMultipleJobsByName() throws Exception {
     final Set<String> protocol = Collections.synchronizedSet(new HashSet<String>());
 

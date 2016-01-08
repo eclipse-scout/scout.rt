@@ -18,6 +18,6 @@ public class RunMonitorCancelService implements IRunMonitorCancelService {
 
   @Override
   public boolean cancel(long requestSequence) {
-    return BEANS.get(RunMonitorCancelRegistry.class).cancel(ServerSessionProvider.currentSession(), requestSequence);
+    return BEANS.get(RunMonitorCancelRegistry.class).cancelAllBySessionIdAndRequestId(ServerSessionProvider.currentSession().getId(), requestSequence);
   }
 }

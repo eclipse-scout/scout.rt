@@ -183,7 +183,7 @@ public class ClientNotificationNodeQueue {
       }
     }
     catch (InterruptedException e) {
-      LOG.warn("Interrupted while waiting for client notification messages", e);
+      LOG.info("Interrupted while waiting for client notification messages", e);
     }
     return collected;
   }

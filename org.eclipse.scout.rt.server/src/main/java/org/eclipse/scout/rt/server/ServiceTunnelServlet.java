@@ -41,6 +41,7 @@ import org.eclipse.scout.rt.server.commons.context.ServletRunContexts;
 import org.eclipse.scout.rt.server.commons.servlet.IHttpServletRoundtrip;
 import org.eclipse.scout.rt.server.commons.servlet.ServletExceptionTranslator;
 import org.eclipse.scout.rt.server.context.RunMonitorCancelRegistry;
+import org.eclipse.scout.rt.server.context.RunMonitorCancelRegistry.IRegistrationHandle;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.server.session.ServerSessionProvider;
@@ -118,7 +119,16 @@ public class ServiceTunnelServlet extends HttpServlet {
               ServiceTunnelRequest serviceRequest = deserializeServiceRequest();
               if (isSessionLess(serviceRequest)) {
                 // TODO [5.2] jgu: Use ServiceOperationInvoker; change ServiceOperationInvoker to support this requirement
-                invokeServiceWithoutSession(serviceRequest);
+                // TODO [5.2] jgu: why not use a ServerRunContext?
+                // TODO [5.2] jgu: consolidate to not have this if-else here, but within ServerRunContext instead
+
+                final IRegistrationHandle registrationHandle = BEANS.get(RunMonitorCancelRegistry.class).register(RunMonitor.CURRENT.get());
+                try {
+                  invokeServiceWithoutSession(serviceRequest);
+                }
+                finally {
+                  registrationHandle.unregister();
+                }
               }
               else {
                 // Collector to collect transactional client notifications issued during processing of the current request.
@@ -136,15 +146,14 @@ public class ServiceTunnelServlet extends HttpServlet {
                 IServerSession session = serverRunContext.getSession();
                 long requestSequence = serviceRequest.getRequestSequence();
 
-                BEANS.get(RunMonitorCancelRegistry.class).register(session, requestSequence, runMonitor); // enable global cancellation
+                final IRegistrationHandle registrationHandle = BEANS.get(RunMonitorCancelRegistry.class).register(runMonitor, session.getId(), requestSequence); // enable global cancellation
                 try {
                   ServiceTunnelResponse serviceResponse = invokeService(serverRunContext, serviceRequest);
-                  // Include transactional client notification in response (piggyback).
-                  serviceResponse.setNotifications(notificationCollector.consume());
+                  serviceResponse.setNotifications(notificationCollector.consume()); // include transactional client notification in response (piggyback).
                   serializeServiceResponse(serviceResponse);
                 }
                 finally {
-                  BEANS.get(RunMonitorCancelRegistry.class).unregister(session, requestSequence);
+                  registrationHandle.unregister();
                 }
               }
             }

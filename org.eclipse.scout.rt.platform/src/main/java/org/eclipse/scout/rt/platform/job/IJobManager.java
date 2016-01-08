@@ -13,6 +13,8 @@ package org.eclipse.scout.rt.platform.job;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
+import org.eclipse.scout.rt.platform.IPlatform.State;
+import org.eclipse.scout.rt.platform.IPlatformListener;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.filter.AlwaysFilter;
 import org.eclipse.scout.rt.platform.filter.AndFilter;
@@ -51,6 +53,13 @@ import org.quartz.Calendar;
  * @since 5.1
  */
 public interface IJobManager {
+
+  /**
+   * Indicates the order of the job manager's {@link IPlatformListener} to shutdown itself upon entering platform state
+   * {@link State#PlatformStopping}. Any listener depending on job manager facility must be configured with an order
+   * less than {@link #DESTROY_ORDER}.
+   */
+  long DESTROY_ORDER = 5_900;
 
   /**
    * Runs the given {@link IRunnable} asynchronously in another thread once the associated execution trigger fires,

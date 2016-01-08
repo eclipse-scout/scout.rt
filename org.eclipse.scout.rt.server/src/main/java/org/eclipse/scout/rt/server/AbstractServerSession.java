@@ -25,12 +25,15 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.annotations.Internal;
+import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.EventListenerList;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 import org.eclipse.scout.rt.server.clientnotification.ClientNotificationRegistry;
 import org.eclipse.scout.rt.server.clientnotification.IClientNodeId;
+import org.eclipse.scout.rt.server.context.RunMonitorCancelRegistry;
 import org.eclipse.scout.rt.server.extension.IServerSessionExtension;
 import org.eclipse.scout.rt.server.extension.ServerSessionChains.ServerSessionLoadSessionChain;
 import org.eclipse.scout.rt.shared.ScoutTexts;
@@ -38,6 +41,7 @@ import org.eclipse.scout.rt.shared.extension.AbstractSerializableExtension;
 import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
 import org.eclipse.scout.rt.shared.extension.IExtension;
 import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
+import org.eclipse.scout.rt.shared.job.filter.future.SessionFutureFilter;
 import org.eclipse.scout.rt.shared.services.common.context.SharedContextChangedNotification;
 import org.eclipse.scout.rt.shared.services.common.context.SharedVariableMap;
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
@@ -266,6 +270,16 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
     m_active = false;
 
     fireSessionChangedEvent(new SessionEvent(this, SessionEvent.TYPE_STOPPED));
+
+    // Cancel globally registered RunMonitors of this session.
+    BEANS.get(RunMonitorCancelRegistry.class).cancelAllBySessionId(getId());
+
+    // Cancel running jobs of this session.
+    Jobs.getJobManager().cancel(Jobs.newFutureFilterBuilder()
+        .andMatch(new SessionFutureFilter(this))
+        .andMatchNotFuture(IFuture.CURRENT.get())
+        .toFilter(), true);
+
     LOG.info("Server session stopped [session={}, user={}]", this, getUserId());
   }
 

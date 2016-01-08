@@ -12,12 +12,21 @@ package org.eclipse.scout.rt.server.services.common.clustersync;
 
 import java.io.Serializable;
 
+import org.eclipse.scout.rt.platform.IPlatform.State;
+import org.eclipse.scout.rt.platform.IPlatformListener;
 import org.eclipse.scout.rt.platform.service.IService;
 
 /**
  * Service for synchronizing server nodes by sending messages and receiving messages.
  */
 public interface IClusterSynchronizationService extends IService {
+
+  /**
+   * Indicates the order of the cluster synchronization's {@link IPlatformListener} to shutdown itself upon entering
+   * platform state {@link State#PlatformStopping}. Any listener depending on cluster synchronization facility must be
+   * configured with an order less than {@link #DESTROY_ORDER}.
+   */
+  long DESTROY_ORDER = 5_700;
 
   /**
    * Publish a message with the given notification for the other server nodes.
