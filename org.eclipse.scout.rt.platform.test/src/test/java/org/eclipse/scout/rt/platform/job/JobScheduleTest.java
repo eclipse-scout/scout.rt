@@ -224,6 +224,30 @@ public class JobScheduleTest {
     }
   }
 
+  @Test()
+  public void testErrorWithRunnable() {
+    final Error error = new Error();
+
+    IFuture<Void> future = Jobs.getJobManager().schedule(new IRunnable() {
+
+      @Override
+      public void run() throws Exception {
+        throw error;
+      }
+    }, Jobs.newInput()
+        .withRunContext(RunContexts.copyCurrent())
+        .withExceptionHandling(null, false));
+
+    try {
+      future.awaitDoneAndGet(5, TimeUnit.SECONDS); // test with timeout in case the error is not propagated
+      fail("Exception expected");
+    }
+    catch (Error e) {
+      assertSame(e, e);
+      assertTrue(future.isDone());
+    }
+  }
+
   @Test
   public void testWorkerThread() {
     final Set<Thread> protocol = Collections.synchronizedSet(new HashSet<Thread>()); // synchronized because modified/read by different threads.

@@ -60,13 +60,8 @@ public class NamedThreadFactory implements ThreadFactory, UncaughtExceptionHandl
     };
     threadInfoRef.set(new ThreadInfo(thread, m_threadName, m_sequence.incrementAndGet()));
 
-    if (thread.isDaemon()) {
-      thread.setDaemon(false);
-    }
-    if (thread.getPriority() != Thread.NORM_PRIORITY) {
-      thread.setPriority(Thread.NORM_PRIORITY);
-    }
-
+    thread.setDaemon(false);
+    thread.setPriority(Thread.NORM_PRIORITY);
     thread.setUncaughtExceptionHandler(this);
 
     return thread;
@@ -81,7 +76,7 @@ public class NamedThreadFactory implements ThreadFactory, UncaughtExceptionHandl
       BEANS.get(ExceptionHandler.class).handle(t);
     }
     catch (final Throwable unhandledThrowable) {
-      // NOOP
+      LOG.error("Unexpected: Unhandled throwable during job execution", unhandledThrowable);
     }
   }
 

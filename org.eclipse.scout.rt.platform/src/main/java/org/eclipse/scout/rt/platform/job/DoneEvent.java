@@ -19,10 +19,10 @@ package org.eclipse.scout.rt.platform.job;
 public class DoneEvent<RESULT> {
 
   private final RESULT m_result;
-  private final Exception m_exception;
+  private final Throwable m_exception;
   private final boolean m_cancelled;
 
-  public DoneEvent(final RESULT result, final Exception exception, final boolean cancelled) {
+  public DoneEvent(final RESULT result, final Throwable exception, final boolean cancelled) {
     m_result = result;
     m_exception = exception;
     m_cancelled = cancelled;
