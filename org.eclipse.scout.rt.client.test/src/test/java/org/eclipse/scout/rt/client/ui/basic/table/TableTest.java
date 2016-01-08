@@ -15,6 +15,8 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
@@ -24,6 +26,7 @@ import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -320,6 +323,19 @@ public class TableTest {
     assertRowEquals(20, "Ipsum", 1, table, rows, i++);
     assertRowEquals(30, "Ipsum", 1, table, rows, i++);
     assertRowEquals(1, "A Total", 2, table, rows, i++);
+  }
+
+  @Test
+  public void testFindRowByKey() {
+    P_Table table = createTestTable(ITableRow.STATUS_NON_CHANGED);
+
+    Assert.assertNull(table.findRowByKey(null));
+    Assert.assertNull(table.findRowByKey(Collections.singletonList(null)));
+    Assert.assertNull(table.findRowByKey(Collections.singletonList(13)));
+    Assert.assertNull(table.findRowByKey(Collections.singletonList("13")));
+    Assert.assertNull(table.findRowByKey(Collections.singletonList("10")));
+    Assert.assertEquals("Lorem", table.getSecondColumn().getValue(table.findRowByKey(Collections.singletonList(10))));
+    Assert.assertEquals("Ipsum", table.getSecondColumn().getValue(table.findRowByKey(Arrays.asList(11, 12, 13))));
   }
 
   /**

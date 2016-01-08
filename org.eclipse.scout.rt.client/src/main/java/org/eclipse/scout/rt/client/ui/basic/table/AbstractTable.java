@@ -3268,25 +3268,56 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
 
   @Override
   public ITableRow findRowByKey(List<?> keys) {
+    if (!CollectionUtility.hasElements(keys)) {
+      return null;
+    }
+
     List<IColumn<?>> keyColumns = getColumnSet().getKeyColumns();
     if (keyColumns.size() == 0) {
       keyColumns = getColumnSet().getColumns();
     }
+    if (keyColumns.size() == 0) {
+      return null; // no columns in the table: cannot search by keys
+    }
+
     for (ITableRow row : m_rows) {
-      boolean match = true;
-      if (CollectionUtility.hasElements(keys)) {
-        for (int i = 0; i < keyColumns.size() && i < keys.size(); i++) {
-          if (!CompareUtility.equals(keyColumns.get(i).getValue(row), keys.get(i))) {
-            match = false;
-            break;
-          }
-        }
-      }
-      if (match) {
+      if (areCellsEqual(keys, keyColumns, row)) {
         return row;
       }
     }
     return null;
+  }
+
+  /**
+   * Gets if the given cell values are equal to the given search values
+   *
+   * @param searchValues
+   *          The values to search in the given cells. Must not be <code>null</code>.
+   * @param keyColumns
+   *          The columns describing the cells to be searched. Must not be <code>null</code>.
+   * @param row
+   *          The row holding the cells to be searched. Must not be <code>null</code>.
+   * @return <code>true</code> if the cells described by the given columns and row have the same content as the given
+   *         searchValues. <code>false</code> otherwise. If the number of columns is different than the number of search
+   *         values only the columns are searched for which a search value exists (
+   *         <code>min(searchValues.size(), keyColumns.size()</code>).
+   */
+  protected boolean areCellsEqual(List<?> searchValues, List<IColumn<?>> keyColumns, ITableRow row) {
+    int keyIndex = 0;
+    int numKeyColumns = keyColumns.size();
+    for (Object key : searchValues) {
+      if (keyIndex >= numKeyColumns) {
+        break;
+      }
+
+      Object cellValue = keyColumns.get(keyIndex).getValue(row);
+      if (!CompareUtility.equals(key, cellValue)) {
+        return false;
+      }
+
+      keyIndex++;
+    }
+    return true;
   }
 
   @Override
