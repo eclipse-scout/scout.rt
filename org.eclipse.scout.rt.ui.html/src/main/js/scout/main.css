@@ -153,6 +153,14 @@ input {
   margin: 0;
 }
 
+input[type="radio"] {
+  /*radiobutton in activ filter (smartfield) should be displayed as radiobutton */
+  -webkit-appearance: radio;
+  -moz-appearance: radio;
+  appearance: radio;
+  margin: 1px;
+}
+
 .input-field {
   padding:  @text-field-padding-y @text-field-padding-x;
   overflow: hidden;
