@@ -104,12 +104,10 @@ public class TableProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<IC
   protected void dataFetchedDelegateImpl(IContentAssistFieldDataFetchResult<LOOKUP_KEY> result, int maxCount) {
     List<? extends ILookupRow<LOOKUP_KEY>> rows = null;
     boolean selectCurrentValue = false;
-    RuntimeException failed = null;
     String searchText = null;
     if (result != null) {
       rows = result.getLookupRows();
       selectCurrentValue = result.isSelectCurrentValue();
-      failed = result.getException();
       searchText = result.getSearchText();
     }
     if (rows == null) {
@@ -140,34 +138,54 @@ public class TableProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<IC
       finally {
         m_model.setTableChanging(false);
       }
-      String statusText = null;
-      int severity = IStatus.INFO;
-      if (failed != null) {
-        if (failed instanceof ProcessingException) {
-          statusText = ((ProcessingException) failed).getStatus().getMessage();
-        }
-        else {
-          statusText = failed.getMessage();
-        }
-        severity = IStatus.ERROR;
-      }
-      else if (rows.size() <= 0) {
-        statusText = ScoutTexts.get("SmartFieldCannotComplete", (searchText == null) ? ("") : (searchText));
-        severity = IStatus.WARNING;
-      }
-      else if (rows.size() > m_contentAssistField.getBrowseMaxRowCount()) {
-        statusText = ScoutTexts.get("SmartFieldMoreThanXRows", "" + m_contentAssistField.getBrowseMaxRowCount());
-        severity = IStatus.INFO;
-      }
-      if (statusText != null) {
-        setStatus(new Status(statusText, severity));
-      }
-      else {
-        setStatus(null);
-      }
+      updateStatus(result);
     }
     catch (RuntimeException e) {
       LOG.warn("update proposal list", e);
+    }
+  }
+
+  protected void updateStatus(IContentAssistFieldDataFetchResult<LOOKUP_KEY> result) {
+    List<? extends ILookupRow<LOOKUP_KEY>> rows = null;
+    RuntimeException exception = null;
+    String searchText = null;
+    if (result != null) {
+      rows = result.getLookupRows();
+      exception = result.getException();
+      searchText = result.getSearchText();
+    }
+    if (rows == null) {
+      rows = CollectionUtility.emptyArrayList();
+    }
+    String statusText = null;
+    int severity = IStatus.INFO;
+    if (exception != null) {
+      if (exception instanceof ProcessingException) {
+        statusText = ((ProcessingException) exception).getStatus().getMessage();
+      }
+      else {
+        statusText = exception.getMessage();
+      }
+      severity = IStatus.ERROR;
+    }
+    else if (rows.size() <= 0) {
+      if (getContentAssistField().getWildcard().equals(searchText)) {
+        statusText = ScoutTexts.get("SmartFieldNoDataFound");
+      }
+      else {
+        statusText = ScoutTexts.get("SmartFieldCannotComplete", (searchText == null) ? ("") : (searchText));
+      }
+      severity = IStatus.WARNING;
+    }
+    else if (rows.size() > m_contentAssistField.getBrowseMaxRowCount()) {
+      statusText = ScoutTexts.get("SmartFieldMoreThanXRows", "" + m_contentAssistField.getBrowseMaxRowCount());
+      severity = IStatus.INFO;
+    }
+    if (statusText != null) {
+      setStatus(new Status(statusText, severity));
+    }
+    else {
+      setStatus(null);
     }
   }
 
