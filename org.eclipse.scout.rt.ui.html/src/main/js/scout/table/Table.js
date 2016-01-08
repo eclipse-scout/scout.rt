@@ -3073,8 +3073,24 @@ scout.Table.prototype._calculateViewRangeForRowIndex = function(rowIndex) {
  * Calculates and renders the rows which should be visible in the current viewport based on scroll top.
  */
 scout.Table.prototype._renderViewport = function() {
-  var viewRange = this._calculateCurrentViewRange();
+  var viewRange = this._calculateCurrentViewRange(),
+    firstRow, lastRow;
+
+  if (this.viewRangeRendered.size() > 0) {
+    firstRow = this.filteredRows()[this.viewRangeRendered.from],
+    lastRow = this.filteredRows()[this.viewRangeRendered.to - 1];
+    firstRow.$row.removeClass('first');
+    lastRow.$row.removeClass('last');
+  }
+
   this._renderViewRange(viewRange);
+
+  if (this.viewRangeRendered.size() > 0) {
+    firstRow = this.filteredRows()[this.viewRangeRendered.from],
+    lastRow = this.filteredRows()[this.viewRangeRendered.to - 1];
+    firstRow.$row.addClass('first');
+    lastRow.$row.addClass('last');
+  }
 };
 
 scout.Table.prototype._rerenderViewport = function() {

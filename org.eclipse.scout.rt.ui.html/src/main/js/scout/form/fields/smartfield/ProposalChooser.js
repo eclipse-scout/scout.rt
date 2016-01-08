@@ -13,6 +13,7 @@ scout.ProposalChooser = function() {
   this._addAdapterProperties(['model']);
   this.$container;
   this._$status;
+  this._$activeFilter;
   this.htmlComp;
 };
 scout.inherits(scout.ProposalChooser, scout.ModelAdapter);
@@ -27,10 +28,10 @@ scout.ProposalChooser.prototype._render = function($parent) {
 
   // support for activeFilter
   if (this.activeFilter) {
-    var $activeFilter = this.$container.appendDiv('active-filter');
-    this._appendOption($activeFilter, 'UNDEFINED', 'Alle');
-    this._appendOption($activeFilter, 'TRUE', 'Aktive');
-    this._appendOption($activeFilter, 'FALSE', 'Inaktive');
+    this._$activeFilter = this.$container.appendDiv('active-filter');
+    this._appendOption(this._$activeFilter, 'UNDEFINED', 'Alle');
+    this._appendOption(this._$activeFilter, 'TRUE', 'Aktive');
+    this._appendOption(this._$activeFilter, 'FALSE', 'Inaktive');
   }
 };
 

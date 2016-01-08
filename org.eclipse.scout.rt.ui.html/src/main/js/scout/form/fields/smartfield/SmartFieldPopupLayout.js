@@ -51,6 +51,7 @@ scout.SmartFieldPopupLayout.prototype.preferredLayoutSize = function($container)
 
   if (htmlProposalChooser) {
     prefSize = htmlProposalChooser.getPreferredSize();
+    prefSize = prefSize.add(this.popup.htmlComp.getInsets());
   } else {
     prefSize = new scout.Dimension(
       scout.HtmlEnvironment.formColumnWidth,
@@ -58,10 +59,9 @@ scout.SmartFieldPopupLayout.prototype.preferredLayoutSize = function($container)
   }
 
   prefSize.width = Math.max(fieldBounds.width, prefSize.width);
-  prefSize.height = Math.min(350, prefSize.height);
+  prefSize.height = Math.max(15, Math.min(350, prefSize.height)); // at least some pixels height in case there is no data, no status, no active filter
 
-  // hack, remove double selection border
-  return prefSize.add(new scout.Insets(0, 0, -1, 0));
+  return prefSize;
 };
 
 scout.SmartFieldPopupLayout.prototype._htmlProposalChooser = function($container) {

@@ -81,7 +81,8 @@
 }
 
 .proposal-chooser {
-  & > .active-filter, & > .status {
+  & > .active-filter,
+  & > .status {
     background-color: @panel-background-color;
     border-top: solid 1px @item-selection-border-color;
     height: @logical-grid-height;
@@ -91,28 +92,53 @@
     text-overflow: ellipsis;
   }
 
-  /* Avoids a bug where the table is overlapping the status-field by 1 pixel */
-  & .table {
+  &.empty > .active-filter,
+  &.empty > .status {
+    border-top: 0;
+  }
+
+  & > .table {
+    /* Avoids a bug where the table is overlapping the status-field by 1 pixel */
     overflow: hidden;
+
+    & > .table-data > .table-row {
+      padding-left: @text-field-padding-x - 8px;
+
+      &.selected {
+        background-color: @item-selection-background-color;
+        border-color: @item-selection-border-color;
+      }
+
+      &.selected.last {
+        /* Change color of last element to avoid double-border effect */
+        border-bottom-color: @item-selection-background-color;
+      }
+
+      &.last {
+        border-bottom-color: transparent;
+      }
+    }
   }
 
-  & .table-row {
-    padding-left: @text-field-padding-x - 8px;
-  }
+  & > .tree > .tree-data > .tree-node {
+    &.selected {
+      /* tree is not focused but should look as if it were */
+      background-color: @item-selection-background-color;
+      border-color: @item-selection-border-color;
+    }
 
-  & .table-row.selected,
-  & .tree-node.selected {
-    background-color: @item-selection-background-color;
-    border-color: @item-selection-border-color;
-  }
+    &.selected.last {
+      /* Change color of last element to avoid double-border effect */
+      border-bottom-color: @item-selection-background-color;
+    }
 
-  /* Change color of last element to avoid double-border effect */
-  & .table-row:last-of-type.selected, & .tree-node:last-of-type.selected {
-    border-bottom-color: @item-selection-background-color;
-  }
+    &.first {
+      border-top-color: @item-selection-nonfocus-background-color;
+    }
 
-  & .table-row:last-of-type, & .tree-node:last-of-type {
-    border-bottom-color: transparent;
+    &.last {
+      border-bottom-color: transparent;
+    }
   }
 }
 
