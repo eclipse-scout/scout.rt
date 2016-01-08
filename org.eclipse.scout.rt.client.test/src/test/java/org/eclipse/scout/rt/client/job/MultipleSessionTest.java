@@ -142,6 +142,8 @@ public class MultipleSessionTest {
         finally {
           interruptedJob1_S1_Latch.countDown();
         }
+
+        Thread.interrupted(); // ensure the thread's interrupted status to be cleared in order to continue the test.
         awaitAllCancelledLatch.await();
       }
     }, ModelJobs.newInput(ClientRunContexts.empty().withSession(m_clientSession1, true))
@@ -159,7 +161,6 @@ public class MultipleSessionTest {
           setupLatch2.countDownAndBlock();
         }
         catch (InterruptedException e) {
-          System.err.println("WHY");
           protocol.add("job2-S1-interrupted");
         }
       }

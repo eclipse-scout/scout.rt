@@ -196,6 +196,7 @@ public class AwaitDoneTest {
           setupLatch.countDownAndBlock();
         }
         catch (InterruptedException e) {
+          Thread.interrupted(); // ensure the thread's interrupted status to be cleared in order to continue the test.
           continueRunningLatch.countDownAndBlock(); // continue running
         }
       }

@@ -82,6 +82,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
 
   protected final CompletionPromise<RESULT> m_completionPromise;
   protected volatile boolean m_running = false;
+  protected volatile boolean m_cancelled = false;
   protected final AtomicBoolean m_finished = new AtomicBoolean(false);
 
   protected volatile Set<String> m_executionHints = new HashSet<>();
@@ -284,21 +285,32 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
   }
 
   @Override
+  public boolean isCancelled() {
+    if (isDone()) {
+      return super.isCancelled(); // Returns true if this task was cancelled before it completed normally.
+    }
+    else {
+      return m_cancelled; // Ensure proper cancellation state for the executing thread if interrupted and immediately querying isCancelled(). That is, because interruption is also done via RunContext, meaning shortly before the Future is effectively cancelled.
+    }
+  }
+
+  @Override
   public boolean cancel(final boolean interruptIfRunning) {
     final Set<Boolean> status = CollectionUtility.hashSet(!isDone()); // Check for 'done' or 'cancel' to comply with Future.isCancelled semantic.
+    m_cancelled = true;
 
     // 1. Unregister this 'Cancellable' from RunMonitor (to prevent multiple cancel invocations).
     m_runMonitor.unregisterCancellable(this);
 
     // 2. Cancel RunMonitor if not done yet.
-    //    Note: The Future should only be cancelled after the RunMonitor is cancelled, so that waiting threads (via Future.awaitDone) have a proper RunMonitor state.
     if (!m_runMonitor.isCancelled()) {
       status.add(m_runMonitor.cancel(interruptIfRunning));
     }
 
     // 3. Cancel FutureTask if not done yet.
-    if (!JobFutureTask.this.isCancelled()) {
-      status.add(JobFutureTask.super.cancel(interruptIfRunning));
+    //    Note: The Future should be cancelled after the RunMonitor is cancelled, so that waiting threads (via Future.awaitDone) have a proper RunMonitor state.
+    if (!super.isCancelled()) {
+      status.add(super.cancel(interruptIfRunning));
     }
 
     return Collections.singleton(Boolean.TRUE).equals(status);

@@ -17,6 +17,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.Callable;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.security.auth.Subject;
 
@@ -34,6 +35,7 @@ import org.eclipse.scout.rt.platform.util.IAdaptable;
 import org.eclipse.scout.rt.platform.util.ThreadLocalProcessor;
 import org.eclipse.scout.rt.platform.util.ToStringBuilder;
 import org.eclipse.scout.rt.platform.util.concurrent.Callables;
+import org.eclipse.scout.rt.platform.util.concurrent.ICancellable;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 
 /**
@@ -111,6 +113,9 @@ public class RunContext implements IAdaptable {
    *           if the callable throws an exception, and is translated by the given {@link IExceptionTranslator}.
    */
   public <RESULT, EXCEPTION extends Throwable> RESULT call(final Callable<RESULT> callable, final Class<? extends IExceptionTranslator<EXCEPTION>> exceptionTranslator) throws EXCEPTION {
+    final ThreadInterrupter threadInterrupter = new ThreadInterrupter(Thread.currentThread());
+
+    m_runMonitor.registerCancellable(threadInterrupter);
     try {
       final CallableChain<RESULT> callableChain = new CallableChain<>();
       interceptCallableChain(callableChain);
@@ -118,6 +123,9 @@ public class RunContext implements IAdaptable {
     }
     catch (final Throwable t) {
       throw BEANS.get(exceptionTranslator).translate(t);
+    }
+    finally {
+      m_runMonitor.unregisterCancellable(threadInterrupter);
     }
   }
 
@@ -381,5 +389,36 @@ public class RunContext implements IAdaptable {
   @Override
   public <T> T getAdapter(final Class<T> type) {
     return null;
+  }
+
+  /**
+   * Interrupts the associated thread upon a hard cancellation.
+   */
+  private static class ThreadInterrupter implements ICancellable {
+
+    private final AtomicBoolean m_cancelled = new AtomicBoolean();
+    private final Thread m_thread;
+
+    public ThreadInterrupter(final Thread thread) {
+      m_thread = thread;
+    }
+
+    @Override
+    public boolean isCancelled() {
+      return m_cancelled.get();
+    }
+
+    @Override
+    public boolean cancel(final boolean interruptIfRunning) {
+      if (!m_cancelled.compareAndSet(false, true)) {
+        return false;
+      }
+
+      if (interruptIfRunning) {
+        m_thread.interrupt();
+      }
+
+      return true;
+    }
   }
 }

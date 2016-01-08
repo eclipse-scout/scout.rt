@@ -54,7 +54,7 @@ public class AssertNoRunningJobsStatement extends Statement {
   public void evaluate() throws Throwable {
     final ScheduledDescendantJobListener jobListener = new ScheduledDescendantJobListener();
 
-    IJobListenerRegistration reg = Jobs.getJobManager().addListener(Jobs.newEventFilterBuilder()
+    final IJobListenerRegistration reg = Jobs.getJobManager().addListener(Jobs.newEventFilterBuilder()
         .andMatchEventType(JobEventType.JOB_STATE_CHANGED)
         .andMatchState(JobState.SCHEDULED)
         .toFilter(), jobListener);
@@ -66,7 +66,7 @@ public class AssertNoRunningJobsStatement extends Statement {
       reg.dispose();
     }
 
-    Set<IFuture<?>> scheduledFutures = jobListener.getScheduledFutures();
+    final Set<IFuture<?>> scheduledFutures = jobListener.getScheduledFutures();
     if (!scheduledFutures.isEmpty()) {
       assertNoRunningJobs(Jobs.newFutureFilterBuilder()
           .andMatchFuture(scheduledFutures)
@@ -79,6 +79,7 @@ public class AssertNoRunningJobsStatement extends Statement {
    */
   private void assertNoRunningJobs(final IFilter<IFuture<?>> jobFilter) {
     try {
+      Thread.interrupted(); // clear the thread's interrupted status, in case the JUnit test interrupted the executing thread.
       Jobs.getJobManager().awaitDone(jobFilter, AWAIT_DONE_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
     }
     catch (final TimeoutException e) {

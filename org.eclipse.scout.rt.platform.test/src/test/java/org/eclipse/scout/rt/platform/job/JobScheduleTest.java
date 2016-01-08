@@ -395,6 +395,7 @@ public class JobScheduleTest {
 
   @Test
   public void testScheduleDelayed() {
+    long tolerance = 50;
     final AtomicLong tRunning = new AtomicLong();
 
     long tScheduled = System.currentTimeMillis();
@@ -412,7 +413,7 @@ public class JobScheduleTest {
 
     assertEquals("executed", result);
     long delta = tRunning.get() - tScheduled;
-    assertTrue(delta >= TimeUnit.SECONDS.toMillis(2));
+    assertTrue(delta >= TimeUnit.SECONDS.toMillis(2) - tolerance);
   }
 
   @Test

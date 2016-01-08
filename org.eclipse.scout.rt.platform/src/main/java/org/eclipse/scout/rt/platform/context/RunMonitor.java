@@ -62,6 +62,8 @@ public class RunMonitor implements ICancellable {
    * Cancels this monitor and all registered {@link ICancellable}s like associated {@link RunContext}s and
    * {@link IFuture}s. If already cancelled, this cancellation request has no effect.
    *
+   * @param interruptIfRunning
+   *          <code>true</code> to interrupt the executing thread, or else <code>false</code>.
    * @return <code>true</code> if this monitor was not cancelled yet and all registered {@link ICancellable}s could be
    *         cancelled successfully.
    */
