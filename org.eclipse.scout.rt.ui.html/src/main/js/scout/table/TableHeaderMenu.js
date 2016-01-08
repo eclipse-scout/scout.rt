@@ -462,7 +462,7 @@ scout.TableHeaderMenu.prototype._renderFilterTable = function() {
   this.$filterToggleChecked = $filterActions
     .appendDiv('table-header-menu-filter-toggle-checked')
     .text(this.session.text(this.filterCheckedMode.text))
-    .on('click', this._updateFilterTableCheckedMode.bind(this));
+    .on('click', this._onClickFilterCheckedMode.bind(this));
 
   this.$filterTableGroupTitle = this.$filterTableGroup
     .appendDiv('table-header-menu-group-text')
@@ -524,7 +524,7 @@ scout.TableHeaderMenu.prototype._filterByText = function() {
   return text;
 };
 
-scout.TableHeaderMenu.prototype._updateFilterTableCheckedMode = function() {
+scout.TableHeaderMenu.prototype._onClickFilterCheckedMode = function() {
   var checkedMode = scout.TableHeaderMenu.CheckedMode;
   var checkAll = this.filterCheckedMode.checkAll;
   this.filter.selectedValues = [];
