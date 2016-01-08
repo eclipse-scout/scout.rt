@@ -101,9 +101,9 @@ scout.InputFieldKeyStrokeContext.prototype._applyPropagationFlags = function(eve
 };
 
 scout.InputFieldKeyStrokeContext.prototype._isNumberKeyStroke = function(event) {
-  return !event.ctrlKey && !event.shiftKey && event.which >= scout.keys[0] && event.which <= scout.keys[9];
+  return !event.ctrlKey && event.which >= scout.keys[0] && event.which <= scout.keys[9];
 };
 
 scout.InputFieldKeyStrokeContext.prototype._isLetterKeyStroke = function(event) {
-  return !event.ctrlKey && !event.shiftKey && event.which >= scout.keys.A && event.which <= scout.keys.Z;
+  return !event.ctrlKey && event.which >= scout.keys.A && event.which <= scout.keys.Z;
 };
