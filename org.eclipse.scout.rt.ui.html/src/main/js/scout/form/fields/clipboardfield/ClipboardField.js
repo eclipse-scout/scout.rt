@@ -129,8 +129,7 @@ scout.ClipboardField.prototype._onPaste = function(event) {
     contentCount = 0;
 
   // some browsers (e.g. IE) specify text content simply as data of type 'Text', it is not listed in list of types
-  var textContent;
-  textContent = dataTransfer.getData('Text');
+  var textContent = dataTransfer.getData('Text');
   if (textContent) {
     if (window.Blob) {
       filesArgument.push(new Blob([textContent], {
@@ -145,7 +144,7 @@ scout.ClipboardField.prototype._onPaste = function(event) {
   }
 
   if (dataTransfer.items) {
-    $.each(dataTransfer.items, function(idx, item) {
+    Array.prototype.forEach.call(dataTransfer.items, function(item) {
       if (item.type === scout.mimeTypes.TEXT_PLAIN) {
         item.getAsString(function(str) {
           filesArgument.push(new Blob([str], {
@@ -162,7 +161,7 @@ scout.ClipboardField.prototype._onPaste = function(event) {
 
   var waitForFileReaderEvents = 0;
   if (dataTransfer.files) {
-    $.each(dataTransfer.files, function(idx, item) {
+    Array.prototype.forEach.call(dataTransfer.files, function(item) {
       var reader = new FileReader();
       // register functions for file reader
       reader.onload = function(event) {
@@ -224,35 +223,26 @@ scout.ClipboardField.prototype._onPaste = function(event) {
     }.bind(this);
 
     setTimeout(function() {
-      $.each(this.$field.children(), function(idx, elem) {
+      this.$field.children().each(function(idx, elem) {
         if (elem.nodeName === 'IMG') {
-          var $elem = $(elem),
-            srcAttr = $elem.attr('src');
-
-          if (srcAttr && scout.strings.startsWith(srcAttr, 'data:')) {
-            var srcDataMatch = /data:(.*);base64/g.exec(srcAttr);
-            if (srcDataMatch) {
-              var srcArray = srcAttr.split(','),
-                encData = window.atob(srcArray[1]),
-                byteNumbers = new Array(encData.length);
-
-              if (scout.isOneOf(srcDataMatch[1], [scout.mimeTypes.IMAGE_PNG, scout.mimeTypes.IMAGE_JPG, scout.mimeTypes.IMAGE_JPEG, scout.mimeTypes.IMAGE_GIF])) {
-                for (var i = 0; i < encData.length; i++) {
-                  byteNumbers[i] = encData.charCodeAt(i);
-                }
-                var byteArray = new Uint8Array(byteNumbers);
-
-                var f = new Blob([byteArray], {
-                  type: srcDataMatch[1]
-                });
-                f.name = '';
-                filesArgument.push(f);
-              }
+          var srcAttr = $(elem).attr('src');
+          var srcDataMatch = /^data:(.*);base64,(.*)/.exec(srcAttr);
+          var mimeType = srcDataMatch && srcDataMatch[1];
+          if (scout.isOneOf(mimeType, scout.mimeTypes.IMAGE_PNG, scout.mimeTypes.IMAGE_JPG, scout.mimeTypes.IMAGE_JPEG, scout.mimeTypes.IMAGE_GIF)) {
+            var encData = window.atob(srcDataMatch[2]); // base64 decode
+            var byteNumbers = new Array(encData.length);
+            for (var i = 0; i < encData.length; i++) {
+              byteNumbers[i] = encData.charCodeAt(i);
             }
+            var byteArray = new Uint8Array(byteNumbers);
+            var f = new Blob([byteArray], {
+              type: mimeType
+            });
+            f.name = '';
+            filesArgument.push(f);
           }
         }
-      }.bind(this));
-
+      });
       restoreOldHtmlContent();
       uploadFunction();
     }.bind(this), 0);
