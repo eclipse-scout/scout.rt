@@ -480,4 +480,28 @@ public final class NumberUtility {
     }
   }
 
+  /**
+   * Returns <code>true</code> if, and only if the given String is a valid number according to the given separators
+   *
+   * @param str
+   *          {@link String}
+   * @param decimalSeparator
+   *          {@link String}
+   * @param thousandsSeparator
+   *          {@link String}
+   * @returns <code>true</code> if, and only if the given String is a valid number according to the given separators
+   */
+  public static boolean isValidDouble(String str, String decimalSeparator, String thousandsSeparator) {
+    if (str == null || str.length() == 0) {
+      return true;
+    }
+    if (thousandsSeparator != null && thousandsSeparator.length() > 0) {
+      str = str.replace(thousandsSeparator, "");
+    }
+    String regex = "[+-]?\\d*";
+    if (decimalSeparator != null && decimalSeparator.length() > 0) {
+      regex += "(\\" + decimalSeparator + "\\d+)?";
+    }
+    return str.matches(regex);
+  }
 }

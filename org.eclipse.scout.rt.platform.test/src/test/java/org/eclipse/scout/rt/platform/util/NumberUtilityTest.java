@@ -11,7 +11,9 @@
 package org.eclipse.scout.rt.platform.util;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -143,6 +145,20 @@ public class NumberUtilityTest {
     assertEquals(0d, NumberUtility.parseDouble(""), 0.00001d);
     assertEquals(0l, NumberUtility.parseLong(""));
     assertEquals(0, NumberUtility.parseInt(""));
+  }
 
+  @Test
+  public void testIsValidDouble() {
+    assertFalse(NumberUtility.isValidDouble("ABC", ",", "."));
+    assertTrue(NumberUtility.isValidDouble("123", ",", "."));
+    assertTrue(NumberUtility.isValidDouble("+123", ",", "."));
+    assertTrue(NumberUtility.isValidDouble("-123", ",", "."));
+    assertTrue(NumberUtility.isValidDouble("123,45", ",", "."));
+    assertTrue(NumberUtility.isValidDouble("123.456,789", ",", "."));
+    assertTrue(NumberUtility.isValidDouble("123,456.789", ",", "."));
+    assertTrue(NumberUtility.isValidDouble("-123.456,789", ",", "."));
+    assertTrue(NumberUtility.isValidDouble("+123.456,789", ",", "."));
+    assertFalse(NumberUtility.isValidDouble("+-123", ",", "."));
+    assertFalse(NumberUtility.isValidDouble("1A2B", ",", "."));
   }
 }
