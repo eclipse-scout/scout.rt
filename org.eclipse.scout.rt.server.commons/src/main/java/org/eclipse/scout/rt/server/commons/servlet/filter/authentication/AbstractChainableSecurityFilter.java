@@ -29,36 +29,35 @@ import javax.servlet.http.HttpServletResponse;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.security.SimplePrincipal;
 import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.server.commons.authentication.IAccessController;
 import org.eclipse.scout.rt.server.commons.authentication.SecureHttpServletRequestWrapper;
 import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
 
 /**
  * @deprecated will be removed in release 6.0; is to be replaced with a project specific ServletFilter with the
- *             authenticators chained yourself. See {@link IAuthenticator} and its subclasses.
+ *             authenticators chained yourself. See {@link IAccessController} and its subclasses.
  *             <p>
  *             Example client-side filter:
  *
  *             <pre>
  *             &#64;Override
  *             public void doFilter(final ServletRequest request, final ServletResponse response, FilterChain chain) throws IOException, ServletException {
- *               final HttpServletRequest req = (HttpServletRequest) request;
- *               final HttpServletResponse resp = (HttpServletResponse) response;
+ *               final HttpServletRequest req = (HttpServletRequest) in;
+ *               final HttpServletResponse resp = (HttpServletResponse) out;
  *
- *               if (m_formAuthenticator.handle(req, resp, chain)) {
+ *               if (m_trivialAccessController.handle(req, resp, chain)) {
  *                 return;
  *               }
  *
- *               if (m_trivialAuthenticator.handle(req, resp, chain)) {
+ *               if (m_formBasedAccessController.handle(req, resp, chain)) {
  *                 return;
  *               }
  *
- *               if (m_devAuthenticator.handle(req, resp, chain)) {
+ *               if (m_developmentAccessController.handle(req, resp, chain)) {
  *                 return;
  *               }
  *
- *               ...
- *
- *               m_formAuthenticator.forwardToLoginForm(req, resp);
+ *               BEANS.get(ServletFilterHelper.class).forwardToLoginForm(req, resp);
  *             }
  *             </pre>
  *
@@ -70,15 +69,15 @@ import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
  *               final HttpServletRequest req = (HttpServletRequest) request;
  *               final HttpServletResponse resp = (HttpServletResponse) response;
  *
- *               if (m_trivialAuthenticator.handle(req, resp, chain)) {
+ *               if (m_trivialAccessController.handle(req, resp, chain)) {
  *                 return;
  *               }
  *
- *               if (m_tunnelTokenAuthenticator.handle(req, resp, chain)) {
+ *               if (m_tunnelAccessController.handle(req, resp, chain)) {
  *                 return;
  *               }
  *
- *               if (m_devAuthenticator.handle(req, resp, chain)) {
+ *               if (m_developmentAccessController.handle(req, resp, chain)) {
  *                 return;
  *               }
  *
