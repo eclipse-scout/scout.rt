@@ -258,6 +258,10 @@ scout.Table.prototype._render = function($parent) {
   this._updateRowWidth();
   this._updateRowHeight();
   this._renderViewport();
+  if (this.scrollToSelection) {
+    // Execute delayed because table may be not layouted yet
+    setTimeout(this.revealSelection.bind(this));
+  }
 
   //----- inline methods: --------
 
