@@ -359,6 +359,7 @@ scout.Table.prototype._renderProperties = function() {
   this._renderMenus();
   this._renderEnabled();
   this._renderDropType();
+  this._renderCssClass();
 };
 
 scout.Table.prototype._remove = function() {
@@ -2952,6 +2953,19 @@ scout.Table.prototype._renderDropType = function() {
   } else {
     this._uninstallDragAndDropHandler();
   }
+};
+
+scout.Table.prototype._renderCssClass = function() {
+  var cssClass = 'table';
+  if (this.checkableStyle === scout.Table.CheckableStyle.TABLE_ROW) {
+    cssClass += ' checkable';
+  }
+  if (this.cssClass) {
+    cssClass += ' ' + this.cssClass;
+  }
+  this.$container
+    .removeAttr('class')
+    .addClass(cssClass);
 };
 
 scout.Table.prototype._installDragAndDropHandler = function(event) {
