@@ -1906,6 +1906,8 @@ scout.Table.prototype.deleteRows = function(rows) {
   if (invalidate) {
     this._renderFiller();
     this._renderViewport();
+    // Update markers because row may be removed by removeRows. RenderViewport doesn't do it if view range is already correctly rendered.
+    this._renderRangeMarkers();
     this.invalidateLayoutTree();
   }
 };
@@ -3085,24 +3087,8 @@ scout.Table.prototype._calculateViewRangeForRowIndex = function(rowIndex) {
  * Calculates and renders the rows which should be visible in the current viewport based on scroll top.
  */
 scout.Table.prototype._renderViewport = function() {
-  var viewRange = this._calculateCurrentViewRange(),
-    firstRow, lastRow;
-
-  if (this.viewRangeRendered.size() > 0) {
-    firstRow = this.filteredRows()[this.viewRangeRendered.from];
-    lastRow = this.filteredRows()[this.viewRangeRendered.to - 1];
-    firstRow.$row.removeClass('first');
-    lastRow.$row.removeClass('last');
-  }
-
+  var viewRange = this._calculateCurrentViewRange();
   this._renderViewRange(viewRange);
-
-  if (this.viewRangeRendered.size() > 0) {
-    firstRow = this.filteredRows()[this.viewRangeRendered.from];
-    lastRow = this.filteredRows()[this.viewRangeRendered.to - 1];
-    firstRow.$row.addClass('first');
-    lastRow.$row.addClass('last');
-  }
 };
 
 scout.Table.prototype._rerenderViewport = function() {
@@ -3125,6 +3111,7 @@ scout.Table.prototype._renderViewRange = function(viewRange) {
     // Range already rendered -> do nothing
     return;
   }
+  this._removeRangeMarkers();
   var scrollTop = this.$data[0].scrollTop;
   var rangesToRender = viewRange.subtract(this.viewRangeRendered);
   var rangesToRemove = this.viewRangeRendered.subtract(viewRange);
@@ -3145,6 +3132,7 @@ scout.Table.prototype._renderViewRange = function(viewRange) {
     }
   }
 
+  this._renderRangeMarkers();
   this._removeAggregateRows();
   this._renderAggregateRows();
   this._renderFiller();
@@ -3153,6 +3141,28 @@ scout.Table.prototype._renderViewRange = function(viewRange) {
   this.renderSelection();
   this.$data[0].scrollTop = scrollTop;
   this.viewRangeDirty = false;
+};
+
+scout.Table.prototype._removeRangeMarkers = function() {
+  var firstRow, lastRow;
+  if (this.viewRangeRendered.size() === 0) {
+    return;
+  }
+  firstRow = this.filteredRows()[this.viewRangeRendered.from];
+  lastRow = this.filteredRows()[this.viewRangeRendered.to - 1];
+  firstRow.$row.removeClass('first');
+  lastRow.$row.removeClass('last');
+};
+
+scout.Table.prototype._renderRangeMarkers = function() {
+  var firstRow, lastRow;
+  if (this.viewRangeRendered.size() === 0) {
+    return;
+  }
+  firstRow = this.filteredRows()[this.viewRangeRendered.from];
+  lastRow = this.filteredRows()[this.viewRangeRendered.to - 1];
+  firstRow.$row.addClass('first');
+  lastRow.$row.addClass('last');
 };
 
 scout.Table.prototype._renderFiller = function() {
