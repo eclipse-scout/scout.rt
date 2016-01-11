@@ -20,7 +20,7 @@ import org.eclipse.scout.rt.platform.util.date.DateProvider;
  * A date / time provider for testing whose methods return the same date and time when called repeatedly. This provider
  * needs to be registered <strong>manually</strong> with the {@link IBeanManager}.
  *
- * @since 15.0.0
+ * @since 5.2
  */
 @IgnoreBean
 public class FixedDateProvider extends DateProvider {
