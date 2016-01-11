@@ -100,6 +100,7 @@ import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ITypeWithClassId;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.holders.Holder;
+import org.eclipse.scout.rt.platform.html.HTML;
 import org.eclipse.scout.rt.platform.reflect.AbstractPropertyObserver;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.status.IStatus;
@@ -633,6 +634,11 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         }
         else {
           text = StringUtility.emptyIfNull(row.getCell(column).getText());
+        }
+
+        // special intercept for html
+        if (text != null && row.getCell(column).isHtmlEnabled()) {
+          text = HTML.plain(text).toPlainText();
         }
 
         // text/plain
