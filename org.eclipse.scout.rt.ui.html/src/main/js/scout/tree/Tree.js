@@ -1269,7 +1269,7 @@ scout.Tree.prototype._showContextMenu = function(event) {
       $anchor: $part,
       menuFilter: this._filterMenusHandler
     });
-    popup.open();
+    popup.open(null, event);
   }.bind(this);
 
   scout.menus.showContextMenuWithWait(this.session, func, event);

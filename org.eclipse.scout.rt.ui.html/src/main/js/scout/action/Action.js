@@ -91,7 +91,7 @@ scout.Action.prototype._renderVisible = function() {
   this.$container.setVisible(this.visible);
 };
 
-scout.Action.prototype._renderSelected = function() {
+scout.Action.prototype._renderSelected = function(event) {
   this.$container.select(this.selected);
   this._updateTooltip();
 };
@@ -115,8 +115,7 @@ scout.Action.prototype._renderTooltipText = function() {
 scout.Action.prototype._updateTooltip = function() {
   if (this._shouldInstallTooltip()) {
     scout.tooltips.install(this.$container, this._configureTooltip());
-  }
-  else {
+  } else {
     scout.tooltips.uninstall(this.$container);
   }
 };
@@ -177,16 +176,16 @@ scout.Action.prototype.doAction = function(event) {
   }
 
   if (this.isToggleAction()) {
-    this.setSelected(!this.selected);
+    this.setSelected(!this.selected, event);
   } else {
     this.sendDoAction();
   }
   return true;
 };
 
-scout.Action.prototype.toggle = function() {
+scout.Action.prototype.toggle = function(event) {
   if (this.isToggleAction()) {
-    this.setSelected(!this.selected);
+    this.setSelected(!this.selected, event);
   }
 };
 
@@ -244,13 +243,13 @@ scout.Action.prototype.afterSendDoAction = function() {
   // NOP
 };
 
-scout.Action.prototype.setSelected = function(selected) {
+scout.Action.prototype.setSelected = function(selected, event) {
   if (selected === this.selected) {
     return;
   }
   this._setProperty('selected', selected);
   if (this.rendered) {
-    this._renderSelected();
+    this._renderSelected(event);
   }
   this.sendSelected();
 };

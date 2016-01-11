@@ -166,10 +166,15 @@ scout.KeyStrokeManager.prototype._handleKeyStrokeEvent = function(keyStrokeConte
 
     // Handle the keystroke.
     keyStroke.handle(event);
+    this.session.desktop._trigger('keystrokeConsumed', {
+      keyStrokeEvent: event,
+      $target: keyStrokeContext.$getBindTarget(),
+      keyStroke: keyStroke
+    });
 
     // Break on 'stopImmediate'.
     return event.isImmediatePropagationStopped(); // 'some-loop' breaks on true.
-  });
+  }, this);
 };
 
 scout.KeyStrokeManager.prototype._isHelpKeyStroke = function(event) {

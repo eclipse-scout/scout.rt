@@ -132,7 +132,7 @@ scout.ViewMenuTab.prototype.togglePopup = function(event) {
   }
 };
 
-scout.ViewMenuTab.prototype._openPopup = function() {
+scout.ViewMenuTab.prototype._openPopup = function(event) {
   var naviBounds = scout.graphics.bounds(this.$container.parent(), true);
   var popup = scout.create('ViewMenuPopup', {
     parent: this.session.desktop,
@@ -142,7 +142,7 @@ scout.ViewMenuTab.prototype._openPopup = function() {
     breadcrumbEnabled: this._breadcrumbEnabled
   });
   popup.headText = this.text;
-  popup.open();
+  popup.open(null, event);
   return popup;
 };
 

@@ -68,7 +68,7 @@ scout.FormToolButtonActionKeyStroke = function(action) {
 scout.inherits(scout.FormToolButtonActionKeyStroke, scout.ActionKeyStroke);
 
 scout.FormToolButtonActionKeyStroke.prototype.handle = function(event) {
-  this.field.toggle();
+  this.field.toggle(event);
 };
 
 scout.FormToolButtonActionKeyStroke.prototype._postRenderKeyBox = function($drawingArea) {
