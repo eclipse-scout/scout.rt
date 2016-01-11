@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.job.internal;
 
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -46,7 +45,6 @@ import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.job.listener.JobEventData;
 import org.eclipse.scout.rt.platform.job.listener.JobEventType;
 import org.eclipse.scout.rt.platform.util.Assertions;
-import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.FinalValue;
 import org.eclipse.scout.rt.platform.util.ToStringBuilder;
 import org.quartz.Calendar;
@@ -81,8 +79,6 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
   protected volatile JobState m_state;
 
   protected final CompletionPromise<RESULT> m_completionPromise;
-  protected volatile boolean m_running = false;
-  protected volatile boolean m_cancelled = false;
   protected final AtomicBoolean m_finished = new AtomicBoolean(false);
 
   protected volatile Set<String> m_executionHints = new HashSet<>();
@@ -91,6 +87,9 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
 
   protected final FinalValue<Boolean> m_singleExecution = new FinalValue<>();
   protected final FinalValue<Boolean> m_delayedExecution = new FinalValue<>();
+
+  /** The thread currently running the task */
+  protected volatile Thread m_runner;
 
   public JobFutureTask(final JobManager jobManager, final RunMonitor runMonitor, final JobInput input, final CallableChain<RESULT> callableChain, final Callable<RESULT> callable) {
     super(new Callable<RESULT>() {
@@ -139,7 +138,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
    */
   @Override
   public void run() {
-    m_running = true;
+    m_runner = Thread.currentThread();
     try {
       if (isExpired()) {
         cancel(true); // to enter done state and to interrupt a potential waiting submitter.
@@ -152,7 +151,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
       }
     }
     finally {
-      m_running = false;
+      m_runner = null;
       releasePermit();
       finishInternal();
     }
@@ -164,12 +163,29 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
    */
   @Override
   protected void done() {
-    m_completionPromise.done();
-    m_runMonitor.unregisterCancellable(this);
+    changeState(JobState.DONE);
     m_listeners.clear();
+
+    m_runMonitor.unregisterCancellable(this);
+    m_completionPromise.done();
     finishInternal();
 
     // IMPORTANT: do not release permit here because also invoked upon cancellation.
+  }
+
+  /**
+   * Method invoked once this task gets cancelled, and is invoked only once.
+   */
+  protected void cancelled(final boolean interruptIfRunning) {
+    m_runMonitor.cancel(interruptIfRunning);
+
+    // Interrupt a possible runner, but only if not running on behalf of a RunContext. Otherwise, interruption was already done by RunContext.
+    if (interruptIfRunning && m_input.getRunContext() == null) {
+      final Thread runner = m_runner;
+      if (runner != null) {
+        runner.interrupt();
+      }
+    }
   }
 
   /**
@@ -285,35 +301,13 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
   }
 
   @Override
-  public boolean isCancelled() {
-    if (isDone()) {
-      return super.isCancelled(); // Returns true if this task was cancelled before it completed normally.
-    }
-    else {
-      return m_cancelled; // Ensure proper cancellation state for the executing thread if interrupted and immediately querying isCancelled(). That is, because interruption is also done via RunContext, meaning shortly before the Future is effectively cancelled.
-    }
-  }
-
-  @Override
   public boolean cancel(final boolean interruptIfRunning) {
-    final Set<Boolean> status = CollectionUtility.hashSet(!isDone()); // Check for 'done' or 'cancel' to comply with Future.isCancelled semantic.
-    m_cancelled = true;
-
-    // 1. Unregister this 'Cancellable' from RunMonitor (to prevent multiple cancel invocations).
-    m_runMonitor.unregisterCancellable(this);
-
-    // 2. Cancel RunMonitor if not done yet.
-    if (!m_runMonitor.isCancelled()) {
-      status.add(m_runMonitor.cancel(interruptIfRunning));
+    if (super.cancel(false)) { // Interrupt running thread later (if applicable), so that it may query 'RunMonitor.CURRENT.get().isCancelled()' upon interruption.
+      cancelled(interruptIfRunning);
+      return true;
     }
 
-    // 3. Cancel FutureTask if not done yet.
-    //    Note: The Future should be cancelled after the RunMonitor is cancelled, so that waiting threads (via Future.awaitDone) have a proper RunMonitor state.
-    if (!super.isCancelled()) {
-      status.add(super.cancel(interruptIfRunning));
-    }
-
-    return Collections.singleton(Boolean.TRUE).equals(status);
+    return false;
   }
 
   @Override
@@ -566,7 +560,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
    */
   private void finishInternal() {
     // Ensure task not currently running.
-    if (m_running) {
+    if (m_runner != null) {
       return;
     }
 

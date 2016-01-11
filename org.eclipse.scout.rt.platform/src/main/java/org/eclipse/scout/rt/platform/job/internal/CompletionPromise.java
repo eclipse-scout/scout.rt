@@ -30,9 +30,8 @@ import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
 import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.job.DoneEvent;
 import org.eclipse.scout.rt.platform.job.IDoneHandler;
-import org.eclipse.scout.rt.platform.job.JobState;
 import org.eclipse.scout.rt.platform.util.Assertions;
-import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
+import org.eclipse.scout.rt.platform.util.FinalValue;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,8 +61,8 @@ class CompletionPromise<RESULT> {
   private final JobFutureTask<RESULT> m_future;
   private final List<PromiseHandler<RESULT>> m_handlers;
 
-  private volatile DoneEvent<RESULT> m_doneEvent;
-  private volatile boolean m_finished;
+  private final FinalValue<DoneEvent<RESULT>> m_doneEvent = new FinalValue<>();
+  private final FinalValue<Boolean> m_finished = new FinalValue<>();
 
   public CompletionPromise(final JobFutureTask<RESULT> future, final ExecutorService executor) {
     m_future = future;
@@ -72,22 +71,13 @@ class CompletionPromise<RESULT> {
   }
 
   /**
-   * Invoke to transition into <em>done</em> state.
-   *
-   * @throws AssertionException
-   *           if already in <em>done</em> state, of future is not <em>done</em> yet.
+   * Invoke to release threads waiting for done state.
    */
   public void done() {
-    Assertions.assertTrue(m_future.isDone(), "Unexpected state: Future not in 'done' state");
-    Assertions.assertNull(m_doneEvent, "Unexpected state: Promise already in 'done' state");
-
-    // Transition into 'done' state and fire 'done' event.
-    m_future.changeState(JobState.DONE);
-
     // Release any thread waiting for a future to become 'done'.
     m_lock.lock();
     try {
-      m_doneEvent = CompletionPromise.newDoneEvent(m_future);
+      m_doneEvent.set(CompletionPromise.newDoneEvent(m_future));
       m_doneCondition.signalAll();
     }
     finally {
@@ -104,7 +94,7 @@ class CompletionPromise<RESULT> {
         public void run() {
           final Iterator<PromiseHandler<RESULT>> iterator = m_handlers.iterator();
           while (iterator.hasNext()) {
-            iterator.next().notifySafe(m_doneEvent);
+            iterator.next().notifySafe(m_doneEvent.get());
             iterator.remove();
           }
         }
@@ -113,16 +103,12 @@ class CompletionPromise<RESULT> {
   }
 
   /**
-   * Invoke to transition into <em>finish</em> state.
-   *
-   * @throws AssertionException
-   *           if already in <em>finish</em> state.
+   * Invoke to release threads waiting for finish state.
    */
   public void finish() {
     m_lock.lock();
     try {
-      Assertions.assertFalse(m_finished, "Unexpected state: Future already in 'finished' state");
-      m_finished = true;
+      m_finished.set(Boolean.TRUE);
       m_finishedCondition.signalAll();
     }
     finally {
@@ -157,7 +143,7 @@ class CompletionPromise<RESULT> {
     }
 
     if (done) {
-      promiseHandler.notifySafe(m_doneEvent);
+      promiseHandler.notifySafe(m_doneEvent.get());
     }
   }
 
@@ -270,14 +256,14 @@ class CompletionPromise<RESULT> {
    * Returns <code>true</code>, if this promise is in 'done' state.
    */
   private boolean isDone() {
-    return m_doneEvent != null;
+    return m_doneEvent.isSet();
   }
 
   /**
    * Returns <code>true</code>, if this promise is in 'finished' state.
    */
   public boolean isFinished() {
-    return m_finished;
+    return m_finished.isSet();
   }
 
   /**
