@@ -37,8 +37,12 @@
   }
 
   &.checkable {
-    & > .table-data > .table-row.selected > .table-cell {
-      color: @text-color;
+
+    & > .table-data > .table-row {
+      cursor: pointer;
+      &.selected > .table-cell {
+        color: @text-color;
+      }
     }
     & > .table-data > .table-row.selected.checked {
       background-color: @table-row-checked-selected-background-color;

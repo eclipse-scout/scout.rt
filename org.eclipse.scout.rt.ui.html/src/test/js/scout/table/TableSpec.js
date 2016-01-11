@@ -31,6 +31,25 @@ describe("Table", function() {
 
   describe("render", function() {
 
+    it("renders CSS class", function() {
+      // regular table
+      var model = helper.createModelFixture(2, 1);
+      var table = helper.createTable(model);
+      table.render(session.$entryPoint);
+      expect('table', table.$container.attr('class'));
+
+      // checkable table (row style)
+      model.checkable = true;
+      model.checkableStyle = scout.Table.CheckableStyle.TABLE_ROW;
+      table = helper.createTable(model);
+      table.render(session.$entryPoint);
+      expect('table checkable', table.$container.attr('class'));
+
+      // row must have 'checked' class
+      table.checkRow(table.rows[0], true, true);
+      expect(table.$container.find('.table-row').first().hasClass('checked')).toBe(true);
+    });
+
     it("renders a table header", function() {
       var model = helper.createModelFixture(2);
       var table = helper.createTable(model);
