@@ -1904,10 +1904,10 @@ scout.Table.prototype.deleteRows = function(rows) {
   this._triggerRowsDeleted(rows);
 
   if (invalidate) {
-    this._renderFiller();
     this._renderViewport();
-    // Update markers because row may be removed by removeRows. RenderViewport doesn't do it if view range is already correctly rendered.
+    // Update markers and filler because row may be removed by removeRows. RenderViewport doesn't do it if view range is already correctly rendered.
     this._renderRangeMarkers();
+    this._renderFiller();
     this.invalidateLayoutTree();
   }
 };
@@ -1986,7 +1986,7 @@ scout.Table.prototype.updateRows = function(rows) {
       // render row and replace div in DOM
       var $updatedRow = $(this._buildRowDiv(updatedRow));
       scout.Table.linkRowToDiv(updatedRow, $updatedRow);
-      $updatedRow.copyCssClasses(oldRow.$row, scout.Table.SELECTION_CLASSES);
+      $updatedRow.copyCssClasses(oldRow.$row, scout.Table.SELECTION_CLASSES + ' first last');
       oldRow.$row.replaceWith($updatedRow);
       this._installRow(updatedRow);
     }
@@ -1994,6 +1994,10 @@ scout.Table.prototype.updateRows = function(rows) {
 
   if (filterChanged) {
     this._rowsFiltered(newHiddenRows);
+    if (this.rendered) {
+      // Make sure filtered rows get removed and viewport is completely rendered
+      this._rerenderViewport();
+    }
   }
   this._group();
   this._updateBackgroundEffect();

@@ -144,6 +144,8 @@ describe("Table Filter", function() {
       table.filter();
       table.render(session.$entryPoint);
       expect(table.filteredRows().length).toBe(1);
+      expect(table.rows[0].$row).toBeFalsy();
+      expect(table.rows[1].$row).toBeTruthy();
 
       var rows = helper.createModelRows(2, 1);
       rows[0].id = row1.id;
@@ -153,6 +155,8 @@ describe("Table Filter", function() {
       // expects no row to be visible
       var filteredRows = table.filteredRows();
       expect(filteredRows.length).toBe(0);
+      expect(table.rows[0].$row).toBeFalsy();
+      expect(table.rows[1].$row).toBeFalsy();
 
       rows = helper.createModelRows(2, 1);
       rows[0].id = row1.id;
@@ -163,6 +167,8 @@ describe("Table Filter", function() {
       filteredRows = table.filteredRows();
       expect(filteredRows.length).toBe(1);
       expect(filteredRows[0]).toBe(table.rows[1]);
+      expect(table.rows[0].$row).toBeFalsy();
+      expect(table.rows[1].$row).toBeTruthy();
 
       // change cell 2 of row 1, filter state should not change
       rows = helper.createModelRows(2, 1);
@@ -176,6 +182,8 @@ describe("Table Filter", function() {
       expect(filteredRows.length).toBe(1);
       // if this check fails, filteredRow cache has not been updated
       expect(filteredRows[0]).toBe(table.rows[1]);
+      expect(table.rows[0].$row).toBeFalsy();
+      expect(table.rows[1].$row).toBeTruthy();
     });
 
     it("applies row filter if a row gets updated, even if table is not rendered", function() {
