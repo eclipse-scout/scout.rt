@@ -30,6 +30,8 @@ import java.util.zip.DeflaterOutputStream;
 import java.util.zip.Inflater;
 import java.util.zip.InflaterInputStream;
 
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.nls.CollatorProvider;
 import org.eclipse.scout.rt.platform.nls.NlsUtility;
 
 public final class StringUtility {
@@ -1703,6 +1705,8 @@ public final class StringUtility {
 
   /**
    * compare two strings using a locale-dependent {@link Collator}
+   * 
+   * @see CollatorProvider
    */
   public static int compareIgnoreCase(String a, String b) {
     return compareIgnoreCase(NlsUtility.getDefaultLocale(), a, b);
@@ -1710,6 +1714,8 @@ public final class StringUtility {
 
   /**
    * compare two strings using a locale-dependent {@link Collator}
+   *
+   * @see CollatorProvider
    */
   public static int compareIgnoreCase(Locale locale, String a, String b) {
     if (a != null && a.length() == 0) {
@@ -1728,7 +1734,7 @@ public final class StringUtility {
     if (b == null) {
       return 1;
     }
-    Collator collator = Collator.getInstance(locale);
+    Collator collator = BEANS.get(CollatorProvider.class).getInstance(locale);
     collator.setStrength(Collator.SECONDARY);
     return collator.compare(a, b);
   }
