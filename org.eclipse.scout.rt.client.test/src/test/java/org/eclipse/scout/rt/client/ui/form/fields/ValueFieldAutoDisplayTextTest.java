@@ -40,7 +40,7 @@ public class ValueFieldAutoDisplayTextTest extends AbstractValueField<Integer> {
 
   @BeforeClass
   public static void setupBeforeClass() {
-    s_original_locale = NlsLocale.get(false);
+    s_original_locale = NlsLocale.getOrElse(null);
     NlsLocale.set(new Locale("de", "CH"));
   }
 

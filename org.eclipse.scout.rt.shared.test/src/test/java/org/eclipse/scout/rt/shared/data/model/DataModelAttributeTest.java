@@ -52,7 +52,7 @@ public class DataModelAttributeTest {
 
   @Before
   public void before() {
-    m_oldLocale = NlsLocale.get(false);
+    m_oldLocale = NlsLocale.getOrElse(null);
   }
 
   @After

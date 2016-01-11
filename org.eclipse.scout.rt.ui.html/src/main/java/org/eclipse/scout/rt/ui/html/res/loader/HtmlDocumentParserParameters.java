@@ -64,7 +64,7 @@ public class HtmlDocumentParserParameters {
 
   public HttpCacheObject loadScriptFile(String resourcePath) throws IOException {
     ScriptFileLoader scriptLoader = new ScriptFileLoader(m_req, m_scriptProcessor);
-    HttpCacheKey cacheKey = scriptLoader.createCacheKey(resourcePath, NlsLocale.get(false));
+    HttpCacheKey cacheKey = scriptLoader.createCacheKey(resourcePath, NlsLocale.getOrElse(null));
     return scriptLoader.loadResource(cacheKey);
   }
 

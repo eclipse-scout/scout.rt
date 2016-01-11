@@ -30,25 +30,20 @@ public class NlsLocale {
    * not set.
    */
   public static Locale get() {
-    return NlsLocale.get(true);
+    return getOrElse(Locale.getDefault());
   }
 
   /**
-   * Returns the {@link Locale} which is currently associated with the current thread.
-   *
-   * @param defaultIfNotSet
-   *          <code>true</code> to return the default JVM {@link Locale} if no {@link Locale} is associated with the
-   *          current thread.
+   * @param {@link
+   *          #CURRENT} locale or default, if <code>null</code>
+   * @return locale of current thread or the default
    */
-  public static Locale get(final boolean defaultIfNotSet) {
+  public static Locale getOrElse(Locale defaultLocale) {
     final Locale locale = CURRENT.get();
     if (locale != null) {
       return locale;
     }
-    else if (defaultIfNotSet) {
-      return Locale.getDefault();
-    }
-    return null;
+    return defaultLocale;
   }
 
   /**

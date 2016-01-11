@@ -15,7 +15,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Locale;
 
-import org.eclipse.scout.rt.platform.nls.NlsUtility;
+import org.eclipse.scout.rt.platform.nls.NlsLocale;
 
 public final class MatrixUtility {
 
@@ -224,7 +224,7 @@ public final class MatrixUtility {
   }
 
   /**
-   * Delegates to {@link #sort(Locale, Object[][], int...)} using {@link NlsUtility#getDefaultLocale()}
+   * Delegates to {@link #sort(Locale, Object[][], int...)} using {@link NlsLocale#get()}
    * <p>
    * <b>It is recommended to use {@link #sort(Locale, Object[][], int...)} with the specific {@link Locale}</b>
    *
@@ -232,7 +232,7 @@ public final class MatrixUtility {
    * @param sortColumns
    */
   public static void sort(Object[][] data, int... sortColumns) {
-    sort(NlsUtility.getDefaultLocale(), data, sortColumns);
+    sort(NlsLocale.get(), data, sortColumns);
   }
 
   /**

@@ -66,7 +66,7 @@ public class AbstractNumberFieldTest extends AbstractNumberField<BigDecimal> {
 
   @BeforeClass
   public static void setupBeforeClass() {
-    ORIGINAL_LOCALE = NlsLocale.get(false);
+    ORIGINAL_LOCALE = NlsLocale.getOrElse(null);
     NlsLocale.set(new Locale("de", "CH"));
   }
 

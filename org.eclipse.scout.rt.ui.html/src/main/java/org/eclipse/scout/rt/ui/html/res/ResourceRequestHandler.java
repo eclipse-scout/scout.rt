@@ -67,7 +67,7 @@ public class ResourceRequestHandler extends AbstractUiServletRequestHandler {
     }
 
     // Create cache key for resource and check if resource exists in cache
-    HttpCacheKey cacheKey = resourceLoader.createCacheKey(resourcePath, NlsLocale.get(false));
+    HttpCacheKey cacheKey = resourceLoader.createCacheKey(resourcePath, NlsLocale.getOrElse(null));
     HttpCacheObject resource = m_httpCacheControl.getCacheObject(req, cacheKey);
     if (resource == null) {
       // Resource not found in cache --> load it

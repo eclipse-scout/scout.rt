@@ -59,7 +59,7 @@ public class FormattingUtilityTest {
 
   @Test
   public void testFormatDateTime() {
-    Locale previousLocale = NlsLocale.get(false);
+    Locale previousLocale = NlsLocale.getOrElse(null);
     try {
       NlsLocale.set(deChLocale);
       Date dateTime = DateUtility.parse("20.03.2012 14:06:56", "dd.MM.yyyy hh:mm:ss");
@@ -73,7 +73,7 @@ public class FormattingUtilityTest {
 
   @Test
   public void testFormatTime() {
-    Locale previousLocale = NlsLocale.get(false);
+    Locale previousLocale = NlsLocale.getOrElse(null);
     try {
       NlsLocale.set(deChLocale);
       Date time = DateUtility.parse("14:06:56", "hh:mm:ss");
@@ -210,7 +210,7 @@ public class FormattingUtilityTest {
   }
 
   private static void assertFormat(Locale locale, String expected, Object o) {
-    Locale oldLocale = NlsLocale.get(false);
+    Locale oldLocale = NlsLocale.getOrElse(null);
     try {
       if (locale == null) {
         fail("locale must not be null");

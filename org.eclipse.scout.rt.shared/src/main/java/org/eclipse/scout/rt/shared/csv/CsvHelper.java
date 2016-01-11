@@ -41,7 +41,7 @@ import java.util.Locale;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.PlatformExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
-import org.eclipse.scout.rt.platform.nls.NlsUtility;
+import org.eclipse.scout.rt.platform.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.NumberFormatProvider;
 import org.eclipse.scout.rt.platform.util.StringUtility;
@@ -73,7 +73,7 @@ public class CsvHelper {
   }
 
   public CsvHelper(Locale locale, char separatorChar, char textDelimiterChar, String lineSeparator) {
-    m_locale = locale == null ? NlsUtility.getDefaultLocale() : locale;
+    m_locale = locale == null ? NlsLocale.get() : locale;
     m_separatorChar = separatorChar != 0x00 ? separatorChar : ';';
     m_textDelimiterChar = textDelimiterChar != 0x00 ? textDelimiterChar : '"';
     m_lineSeparator = lineSeparator != null ? lineSeparator : "\n";

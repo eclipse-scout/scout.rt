@@ -51,7 +51,7 @@ public class JsonDateColumn<T extends IDateColumn> extends JsonColumn<T> {
     // FIXME CGU: update IDateColumnInterface
     // getDateFormat uses NlsLocale. IMHO getDateFormat should not perform any logic because it just a getter-> refactor. same on AbstractDateField
     // Alternative would be to use a clientJob or set localethreadlocal in ui thread as well, as done in rap
-    Locale oldLocale = NlsLocale.get(false);
+    Locale oldLocale = NlsLocale.getOrElse(null);
     try {
       NlsLocale.set(getUiSession().getClientSession().getLocale());
       Method method = AbstractDateColumn.class.getDeclaredMethod("getDateFormat");

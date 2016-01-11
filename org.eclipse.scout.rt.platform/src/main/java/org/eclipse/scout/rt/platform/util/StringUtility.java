@@ -32,7 +32,7 @@ import java.util.zip.InflaterInputStream;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.nls.CollatorProvider;
-import org.eclipse.scout.rt.platform.nls.NlsUtility;
+import org.eclipse.scout.rt.platform.nls.NlsLocale;
 
 public final class StringUtility {
 
@@ -1705,11 +1705,11 @@ public final class StringUtility {
 
   /**
    * compare two strings using a locale-dependent {@link Collator}
-   * 
+   *
    * @see CollatorProvider
    */
   public static int compareIgnoreCase(String a, String b) {
-    return compareIgnoreCase(NlsUtility.getDefaultLocale(), a, b);
+    return compareIgnoreCase(NlsLocale.get(), a, b);
   }
 
   /**

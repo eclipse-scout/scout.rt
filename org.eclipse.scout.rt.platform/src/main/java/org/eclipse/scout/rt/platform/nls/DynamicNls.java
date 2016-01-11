@@ -144,6 +144,6 @@ public class DynamicNls {
    * Override this method to change default locale behavior
    */
   protected Locale getDefaultLocale() {
-    return NlsUtility.getDefaultLocale();
+    return NlsLocale.get();
   }
 }

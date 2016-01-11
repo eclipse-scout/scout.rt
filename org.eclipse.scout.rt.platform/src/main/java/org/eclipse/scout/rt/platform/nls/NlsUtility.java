@@ -14,7 +14,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -132,21 +131,6 @@ public final class NlsUtility {
       }
     }
     return text;
-  }
-
-  /**
-   * Only use this {@link Locale} resolver if the calling code is executed in both, server- and client side. On client
-   * side, use {@link Locale#getDefault()} whereas on server side use {@link NlsLocale#get()}.
-   *
-   * @return the locale hold by the current thread in {@link NlsLocale} or if not set by the instance of the Java
-   *         Virtual Machine.
-   */
-  public static Locale getDefaultLocale() {
-    Locale locale = NlsLocale.get();
-    if (locale == null) {
-      locale = Locale.getDefault();
-    }
-    return locale;
   }
 
 }
