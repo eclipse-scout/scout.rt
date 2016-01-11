@@ -215,6 +215,10 @@ scout.StringField.prototype._renderWrapText = function() {
   this.$field.attr('wrap', this.wrapText ? 'soft' : 'off');
 };
 
+scout.StringField.prototype._renderTrimText = function() {
+  // nop
+};
+
 scout.StringField.prototype._renderGridData = function() {
   this.updateInnerAlignment({
     useHorizontalAlignment: (this.multilineText ? false : true)
@@ -263,4 +267,11 @@ scout.StringField.prototype._sendSelectionChanged = function() {
   this._send('selectionChanged', eventData, 500, function(previous) {
     return this.id === previous.id && this.type === previous.type;
   });
+};
+
+scout.StringField.prototype._validateDisplayText = function(displayText) {
+  if (this.trimText) {
+    displayText = displayText.trim();
+  }
+  return scout.StringField.parent.prototype._validateDisplayText(displayText);
 };

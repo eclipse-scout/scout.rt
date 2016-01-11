@@ -120,6 +120,12 @@ public class JsonStringField<T extends IStringField> extends JsonBasicField<T> i
         return getModel().getMaxLength();
       }
     });
+    putJsonProperty(new JsonProperty<IStringField>(IStringField.PROP_TRIM_TEXT_ON_VALIDATE, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isTrimText();
+      }
+    });
   }
 
   @Override

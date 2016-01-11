@@ -34,6 +34,10 @@ scout.ValueField.prototype._readDisplayText = function() {
   return this.$field.val();
 };
 
+scout.ValueField.prototype._validateDisplayText = function(displayText) {
+  return displayText;
+};
+
 scout.ValueField.prototype._onFieldBlur = function() {
   this.acceptInput(false);
 };
@@ -51,13 +55,16 @@ scout.ValueField.prototype._onFieldBlur = function() {
  */
 scout.ValueField.prototype.acceptInput = function(whileTyping) {
   whileTyping = !!whileTyping; // cast to boolean
-  var displayText = scout.nvl(this._readDisplayText(), ''),
-    oldDisplayText = scout.nvl(this.displayText, '');
+  var displayText = scout.nvl(this._readDisplayText(), '');
 
   // send only if displayText has really changed
   if (this._checkDisplayTextChanged(displayText, whileTyping)) {
-    this.displayText = displayText;
-    this._sendDisplayTextChanged(displayText, whileTyping);
+    var validatedDisplayText = this._validateDisplayText(displayText);
+    this.displayText = validatedDisplayText;
+    if (displayText !== validatedDisplayText) {
+      this._renderDisplayText(this.displayText);
+    }
+    this._sendDisplayTextChanged(validatedDisplayText, whileTyping);
   }
 };
 
@@ -101,7 +108,7 @@ scout.ValueField.prototype._onStatusMousedown = function(event) {
   if (this.menus && this.menus.length > 0) {
     var $activeElement = this.$container.activeElement();
     if ($activeElement.data('valuefield') === this ||
-        $activeElement.parent().data('valuefield') === this) {
+      $activeElement.parent().data('valuefield') === this) {
       this.acceptInput();
     }
   }
