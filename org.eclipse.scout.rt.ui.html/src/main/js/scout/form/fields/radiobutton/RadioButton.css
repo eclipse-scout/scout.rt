@@ -28,6 +28,7 @@
     position: absolute;
     left: 0;
     top: 5px;
+    background-color: @control-background-color;
     border: 2px solid @palette-gray-5;
     border-radius: 50%;
   }
@@ -51,6 +52,11 @@
 
   &.disabled::before {
     background-color: @control-disabled-background-color;
+  }
+
+  &.disabled.checked::after {
+    background-color: @palette-gray-6;
+    border-color: @palette-gray-6;
   }
 
   &.disabled {
