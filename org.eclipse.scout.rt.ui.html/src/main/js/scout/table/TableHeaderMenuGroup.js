@@ -14,6 +14,7 @@ scout.TableHeaderMenuGroup = function() {
   this.textKey;
   this.cssClass;
   this.visible = true;
+  this.last = false;
 };
 scout.inherits(scout.TableHeaderMenuGroup, scout.Widget);
 
@@ -63,4 +64,11 @@ scout.TableHeaderMenuGroup.prototype.setVisible = function(visible) {
 
 scout.TableHeaderMenuGroup.prototype._renderVisible = function() {
   this.$container.setVisible(this.visible);
+};
+
+scout.TableHeaderMenuGroup.prototype.setLast = function(last) {
+  this.last = last;
+  if (this.rendered) {
+    this.$container.toggleClass('last', this.last);
+  }
 };

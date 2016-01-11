@@ -70,6 +70,9 @@
 
   &.buttons {
     padding-bottom: 35px;
+    &.last {
+      padding-bottom: 29px;
+    }
   }
 }
 

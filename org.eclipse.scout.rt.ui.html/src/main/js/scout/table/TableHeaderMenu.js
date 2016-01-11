@@ -103,6 +103,9 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
     this._renderColoringGroup();
   }
 
+  // Add 'last' class to last group-box
+  this.children[this.children.length - 1].setLast(true);
+
   this._renderFilterTable();
   this._renderFilterFields();
 
