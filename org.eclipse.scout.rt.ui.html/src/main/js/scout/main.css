@@ -194,6 +194,7 @@ button {
 
   &:focus {
     outline: none;
+    overflow: visible; /* without this, IE would cut off the focus glow */
 
     &::before {
       #scout.button-focus();
