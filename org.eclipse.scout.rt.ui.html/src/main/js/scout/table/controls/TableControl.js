@@ -75,7 +75,6 @@ scout.TableControl.prototype._renderContent = function($parent) {
 
   this.form.$container.height($parent.height());
   this.form.$container.width($parent.width());
-  //FIXME cgu: make this more easy to use
   this.form.htmlComp.pixelBasedSizing = true;
   this.form.htmlComp.validateRoot = true;
   this.form.htmlComp.revalidateLayout();

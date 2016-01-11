@@ -27,8 +27,6 @@ scout.TabItem.prototype._render = function($parent) {
 /**
  * This method has nothing to do with the regular rendering of the GroupBox. It is an additional method
  * to render a single tab for this tab-item. Since tab and tab-item share the same model.
- *
- * @return tab button as JQuery object
  */
 scout.TabItem.prototype.renderTab = function($parent) {
   if (this._tabRendered) {

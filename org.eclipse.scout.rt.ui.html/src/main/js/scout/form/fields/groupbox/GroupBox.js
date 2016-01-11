@@ -71,7 +71,7 @@ scout.GroupBox.prototype._render = function($parent) {
   this._$groupBoxTitle = this.$container
     .appendDiv('group-box-title')
     .append(this.$label);
-  this.addPseudoStatus();
+  this.addStatus();
   if (this.menuBar.position === 'top') {
     this.menuBar.render(this.$container);
     // move after title

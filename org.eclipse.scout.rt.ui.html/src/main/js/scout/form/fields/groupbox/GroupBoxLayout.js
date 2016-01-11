@@ -19,26 +19,38 @@ scout.GroupBoxLayout = function(groupBox) {
 scout.inherits(scout.GroupBoxLayout, scout.AbstractLayout);
 
 scout.GroupBoxLayout.prototype.layout = function($container) {
-  var titleMarginX, menuBarSize, gbBodySize,
-    pseudoStatusWidth = 0,
+  var titleMarginX, menuBarSize, gbBodySize, titleInnerHeight, containerPadding, top, right,
+    statusWidth = 0,
     htmlContainer = scout.HtmlComponent.get($container),
     htmlGbBody = this._htmlGbBody(),
     htmlMenuBar = this._htmlMenuBar(),
     $groupBoxTitle = this._groupBox._$groupBoxTitle,
-    $pseudoStatus = this._groupBox.$pseudoStatus,
+    $status = this._groupBox.$status,
     containerSize = htmlContainer.getAvailableSize()
     .subtract(htmlContainer.getInsets());
 
-  if ($pseudoStatus.isVisible()) {
-    $pseudoStatus.cssWidth(this._statusWidth);
-    pseudoStatusWidth = $pseudoStatus.outerWidth(true);
+  containerPadding = htmlContainer.getInsets({
+    includeBorder: false
+  });
+  top = containerPadding.top;
+  right = containerPadding.right;
+
+  if ($status.isVisible()) {
+    titleInnerHeight = $groupBoxTitle.innerHeight();
+    $status.cssWidth(this._statusWidth)
+      .cssTop(top)
+      .cssRight(right)
+      .cssHeight(titleInnerHeight)
+      .cssLineHeight(titleInnerHeight)
+      .cssMarginTop($groupBoxTitle.cssMarginTop());
+    statusWidth = $status.outerWidth(true);
   }
 
   if (htmlMenuBar) {
     menuBarSize = scout.MenuBarLayout.size(htmlMenuBar, containerSize);
     if (!this._groupBox.mainBox) {
       // adjust size of menubar as well if it is in a regular group box
-      menuBarSize.width -= pseudoStatusWidth;
+      menuBarSize.width -= statusWidth;
     }
     htmlMenuBar.setSize(menuBarSize);
   } else {
@@ -49,8 +61,8 @@ scout.GroupBoxLayout.prototype.layout = function($container) {
   gbBodySize.height -= this._titleHeight();
   gbBodySize.height -= menuBarSize.height;
 
-  if (pseudoStatusWidth > 0) {
-    titleMarginX = $groupBoxTitle.cssMarginX() + pseudoStatusWidth;
+  if (statusWidth > 0) {
+    titleMarginX = $groupBoxTitle.cssMarginX() + statusWidth;
     $groupBoxTitle.css('width', 'calc(100% - ' + titleMarginX + 'px');
   }
 

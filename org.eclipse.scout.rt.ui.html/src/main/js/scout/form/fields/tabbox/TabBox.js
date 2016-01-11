@@ -193,7 +193,7 @@ scout.TabBox.prototype._renderTabContent = function() {
   } else {
     // in Swing there's some complicated logic dealing with borders and labels
     // that determines whether the first group-box in a tab-box has a title or not.
-    // I decided to simply this and always set the title of the first group-box
+    // I decided to simplify this and always set the title of the first group-box
     // to invisible.
     selectedTabItem.render(this._$tabContent);
     selectedTabItem._renderLabelVisible(false);
