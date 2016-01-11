@@ -2050,6 +2050,15 @@ scout.Table.prototype.revealSelection = function() {
   }
 };
 
+scout.Table.prototype.revealChecked = function() {
+  var firstCheckedRow = scout.arrays.find(this.rows, function(row) {
+    return row.checked === true;
+  });
+  if (firstCheckedRow) {
+    this.scrollTo(firstCheckedRow);
+  }
+};
+
 scout.Table.prototype.rowById = function(id) {
   return this.rowsMap[id];
 };
