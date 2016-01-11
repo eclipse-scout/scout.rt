@@ -43,30 +43,29 @@ scout.StringField.prototype._render = function($parent) {
   this.addLabel();
   this.addMandatoryIndicator();
 
-  var $field, helper = function() {
-    this.mouseClicked = true;
-  }.bind(this);
+  var $field;
   if (this.multilineText) {
+    var mousedownHandler = function() {
+      this.mouseClicked = true;
+    }.bind(this);
     $field = $parent.makeElement('<textarea>')
       .on('DOMMouseScroll mousewheel', function(event) {
         // otherwise scout.Scrollbar.prototype would handle this event for scrollable group boxes and prevent scrolling on textarea
         event.stopPropagation();
-      }).on('mousedown', helper)
-      .focus(function(event) {
-        this.$field.off('mousedown', helper);
-        if (!this.mouseClicked) {
-          //only trigger on tab focus in
+      })
+      .on('mousedown', mousedownHandler)
+      .on('focus', function(event) {
+        this.$field.off('mousedown', mousedownHandler);
+        if (!this.mouseClicked) { // only trigger on tab focus in
           setTimeout(function() {
-            if (this.selectionStart) {
-              this._renderSelectionStart();
-              this._renderSelectionEnd();
-            }
+            this._renderSelectionStart();
+            this._renderSelectionEnd();
           }.bind(this));
         }
         this.mouseClicked = false;
       }.bind(this))
       .on('focusout', function() {
-        this.$field.on('mousedown', helper);
+        this.$field.on('mousedown', mousedownHandler);
       }.bind(this));
   } else {
     $field = scout.fields.makeTextField($parent);
@@ -81,7 +80,7 @@ scout.StringField.prototype._render = function($parent) {
 scout.StringField.prototype._onFieldBlur = function() {
   scout.StringField.parent.prototype._onFieldBlur.call(this);
   if (this.multilineText) {
-    this._updateSelection(true);
+    this._updateSelection();
   }
 };
 
@@ -121,13 +120,14 @@ scout.StringField.prototype._renderMaxLength = function(maxLength0) {
 };
 
 scout.StringField.prototype._renderSelectionStart = function() {
-  if (this.$field && this.$field.length > 0) {
+  // TODO BSH Ask NBU why this check is needed
+  if (this.$field && this.$field[0] && scout.nvl(this.selectionStart, null) !== null) {
     this.$field[0].selectionStart = this.selectionStart;
   }
 };
 
 scout.StringField.prototype._renderSelectionEnd = function() {
-  if (this.$field && this.$field.length > 0) {
+  if (this.$field && this.$field[0] && scout.nvl(this.selectionEnd, null) !== null) {
     this.$field[0].selectionEnd = this.selectionEnd;
   }
 };
@@ -187,20 +187,19 @@ scout.StringField.prototype._renderInsertText = function() {
   var s = this.insertText;
   if (s && this.$field.length > 0) {
     var elem = this.$field[0];
-    var a = 0;
-    var b = 0;
-    if (elem.selectionStart !== undefined && elem.selectionEnd !== undefined) {
-      a = elem.selectionStart;
-      b = elem.selectionEnd;
+    var a = scout.nvl(elem.selectionStart, null);
+    var b = scout.nvl(elem.selectionEnd, null);
+    if (a === null || b === null) {
+      a = 0;
+      b = 0;
     }
     var text = elem.value;
     text = text.slice(0, a) + s + text.slice(b);
     elem.value = text;
 
-    if (elem.selectionStart === elem.selectionEnd) {
-      this.selectionStart = a + s.length;
-      this.selectionEnd = this.selectionStart;
-    }
+    elem.selectionStart = a + s.length;
+    elem.selectionEnd = a + s.length;
+    this._updateSelection();
 
     // Make sure display text gets sent (necessary if field does not have the focus)
     if (this.updateDisplayTextOnModify) {
@@ -239,20 +238,24 @@ scout.StringField.prototype._onSelectionChangingAction = function(event) {
       // after it really has been changed.
       setTimeout(this._updateSelection.bind(this));
     }.bind(this));
+  } else if (event.type === 'keydown') {
+    // Use set timeout to let the cursor move to the target position
+    setTimeout(this._updateSelection.bind(this));
   } else {
     this._updateSelection();
   }
 };
 
-scout.StringField.prototype._updateSelection = function(suppressSend) {
+scout.StringField.prototype._updateSelection = function() {
   var oldSelectionStart = this.selectionStart;
   var oldSelectionEnd = this.selectionEnd;
   this.selectionStart = this.$field[0].selectionStart;
   this.selectionEnd = this.$field[0].selectionEnd;
-  var selectionChanged = (this.selectionStart !== oldSelectionStart || this.selectionEnd !== oldSelectionEnd);
-
-  if (selectionChanged && !suppressSend) {
-    this._sendSelectionChanged();
+  if (this.selectionTrackingEnabled) {
+    var selectionChanged = (this.selectionStart !== oldSelectionStart || this.selectionEnd !== oldSelectionEnd);
+    if (selectionChanged) {
+      this._sendSelectionChanged();
+    }
   }
 };
 
