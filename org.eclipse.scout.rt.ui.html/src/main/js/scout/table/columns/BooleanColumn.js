@@ -66,8 +66,7 @@ scout.BooleanColumn.prototype._cellCssClass = function(cell) {
 };
 
 scout.BooleanColumn.prototype.onMouseUp = function(event, $row) {
-  var row = $row.data('row'),
-    $target = $(event.target);
+  var row = $row.data('row');
 
   if (this.table.checkableColumn === this) {
     this.table.checkRow(row, !row.checked);

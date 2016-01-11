@@ -262,14 +262,6 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
         return getModel().getDropMaximumSize();
       }
     });
-    // FIXME CGU/MOT: (von A.WE) das ist doch gar keine property von ITable? AbstractTable triggert
-    // auch kein Event wenn die Property hier ändert. Gehört das darum nicht eher ins toJson()?
-    putJsonProperty(new JsonProperty<ITable>(PROP_HAS_RELOAD_HANDLER, model) {
-      @Override
-      protected Boolean modelValue() {
-        return getModel().getReloadHandler() != null;
-      }
-    });
     putJsonProperty(new JsonProperty<ITable>(ITable.PROP_TABLE_CUSTOMIZER, model) {
       @Override
       protected Boolean modelValue() {
@@ -399,17 +391,18 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   @Override
   public JSONObject toJson() {
     JSONObject json = super.toJson();
-    putProperty(json, PROP_COLUMNS, columnsToJson(getColumnsInViewOrder()));
-    putProperty(json, PROP_COLUMN_ADDABLE, getModel().getTableOrganizer().isColumnAddable());
-    putProperty(json, PROP_ROWS, tableRowsToJson(getModel().getRows()));
+    json.put(PROP_COLUMNS, columnsToJson(getColumnsInViewOrder()));
+    json.put(PROP_COLUMN_ADDABLE, getModel().getTableOrganizer().isColumnAddable());
+    json.put(PROP_ROWS, tableRowsToJson(getModel().getRows()));
     JsonContextMenu<IContextMenu> jsonContextMenu = getAdapter(getModel().getContextMenu());
     if (jsonContextMenu != null) {
       json.put(PROP_MENUS, jsonContextMenu.childActionsToJson());
     }
-    putProperty(json, PROP_SELECTED_ROWS, rowIdsToJson(getModel().getSelectedRows()));
+    json.put(PROP_SELECTED_ROWS, rowIdsToJson(getModel().getSelectedRows()));
     if (getModel().getUserFilterManager() != null) {
-      putProperty(json, PROP_FILTERS, filtersToJson(getModel().getUserFilterManager().getFilters()));
+      json.put(PROP_FILTERS, filtersToJson(getModel().getUserFilterManager().getFilters()));
     }
+    json.put(PROP_HAS_RELOAD_HANDLER, getModel().getReloadHandler() != null);
     return json;
   }
 
@@ -687,9 +680,9 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     IJsonAdapter<?> jsonField = attachAdapter(field);
     LOG.debug("Created new field adapter for cell editing. Adapter: {}", jsonField);
     JSONObject json = new JSONObject();
-    putProperty(json, "columnId", event.getData().getString(PROP_COLUMN_ID));
-    putProperty(json, "rowId", event.getData().getString(PROP_ROW_ID));
-    putProperty(json, "fieldId", jsonField.getId());
+    json.put("columnId", event.getData().getString(PROP_COLUMN_ID));
+    json.put("rowId", event.getData().getString(PROP_ROW_ID));
+    json.put("fieldId", jsonField.getId());
     addActionEvent(EVENT_START_CELL_EDIT, json);
   }
 
@@ -716,7 +709,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     // It would be possible if we added a filter mechanism so that events for disposed adapters won't be sent to client
     // TODO [5.2] cgu: maybe optimize by adding a filter for disposed adapters
     JSONObject json = new JSONObject();
-    putProperty(json, "fieldId", jsonField.getId());
+    json.put("fieldId", jsonField.getId());
     addActionEvent(EVENT_END_CELL_EDIT, json);
 
     //FIXME cgu: feld merken, revert bei toJson für page reload

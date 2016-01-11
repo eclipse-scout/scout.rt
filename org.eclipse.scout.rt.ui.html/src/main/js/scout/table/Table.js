@@ -983,7 +983,6 @@ scout.Table.prototype._updateRowHeight = function() {
 scout.Table.prototype._renderRowsInRange = function(range) {
   var $rows,
     rowString = '',
-    that = this,
     numRowsRendered = 0,
     prepend = false;
 
@@ -1001,7 +1000,7 @@ scout.Table.prototype._renderRowsInRange = function(range) {
     prepend = true;
   }
   var newRange = this.viewRangeRendered.union(range);
-  if (newRange.length == 2) {
+  if (newRange.length === 2) {
     throw new Error('Can only prepend or append rows to the existing range. Existing: ' + this.viewRangeRendered + '. New: ' + newRange);
   }
   this.viewRangeRendered = newRange[0];
@@ -1061,7 +1060,7 @@ scout.Table.prototype._removeRowsInRange = function(range) {
   toRow = rows[range.to];
 
   var newRange = this.viewRangeRendered.subtract(range);
-  if (newRange.length == 2) {
+  if (newRange.length === 2) {
     throw new Error('Can only remove rows at the beginning or end of the existing range. ' + this.viewRangeRendered + '. New: ' + newRange);
   }
   this.viewRangeRendered = newRange[0];
@@ -1100,8 +1099,7 @@ scout.Table.prototype._removeRows = function(rows) {
   }
   rows = scout.arrays.ensure(rows);
   rows.forEach(function(row) {
-    var $row = row.$row,
-      rowIndex = this.filteredRows().indexOf(row);
+    var rowIndex = this.filteredRows().indexOf(row);
 
     if (rowIndex === -1) {
       throw new Error('Row not found, cannot remove $row');
@@ -1284,7 +1282,6 @@ scout.Table.prototype._find$AppLink = function(event) {
   // bubble up from target to delegateTarget
   var $elem = $(event.target);
   var $stop = $(event.delegateTarget);
-  var appLink;
   while ($elem.length > 0) {
     if ($elem.hasClass('app-link')) {
       return $elem;
@@ -1639,7 +1636,6 @@ scout.Table.prototype._addAggregateRow = function(contents, afterRow) {
 };
 
 scout.Table.prototype._removeAggregateRows = function(animate) {
-  var deferreds = [];
   if (this._aggregateRows.length === 0) {
     return;
   }
@@ -1657,7 +1653,7 @@ scout.Table.prototype._removeAggregateRows = function(animate) {
 };
 
 scout.Table.prototype._renderAggregateRows = function(animate) {
-  var c, cell, r, column, row, contents, alignment, $cell, $aggregateRow, that = this;
+  var c, cell, column, row, contents, $cell, $aggregateRow;
   animate = scout.nvl(animate, false);
 
   this._aggregateRows.forEach(function(aggregateRow, r) {
@@ -1829,8 +1825,7 @@ scout.Table.prototype.insertRow = function(row) {
 };
 
 scout.Table.prototype.insertRows = function(rows, fromServer) {
-  var filterChanged = false,
-    newHiddenRows = [];
+  var newHiddenRows = [];
 
   // Update model
   rows.forEach(function(row) {
@@ -1872,7 +1867,7 @@ scout.Table.prototype.deleteRow = function(row) {
 };
 
 scout.Table.prototype.deleteRows = function(rows) {
-  var invalidate, i, filterChanged;
+  var invalidate, filterChanged;
 
   rows.forEach(function(row) {
     // Update HTML
@@ -1967,7 +1962,7 @@ scout.Table.prototype.updateRows = function(rows) {
     if (this.selectionHandler.lastActionRow === oldRow) {
       this.selectionHandler.lastActionRow = updatedRow;
     }
-    var rowIndex = scout.arrays.replace(this.rows, oldRow, updatedRow);
+    scout.arrays.replace(this.rows, oldRow, updatedRow);
     scout.arrays.replace(this.selectedRows, oldRow, updatedRow);
 
     // Apply row filter
@@ -3031,9 +3026,8 @@ scout.Table.prototype.setViewRangeSize = function(viewRangeSize) {
 };
 
 scout.Table.prototype._calculateCurrentViewRange = function() {
-  var pos, rowIndex,
+  var rowIndex,
     scrollTop = this.$data[0].scrollTop,
-    scrollTopDiff = this.scrollTop - scrollTop,
     maxScrollTop = this.$data[0].scrollHeight - this.$data[0].clientHeight;
 
   if (maxScrollTop === 0) {
@@ -3095,7 +3089,7 @@ scout.Table.prototype._renderViewport = function() {
     firstRow, lastRow;
 
   if (this.viewRangeRendered.size() > 0) {
-    firstRow = this.filteredRows()[this.viewRangeRendered.from],
+    firstRow = this.filteredRows()[this.viewRangeRendered.from];
     lastRow = this.filteredRows()[this.viewRangeRendered.to - 1];
     firstRow.$row.removeClass('first');
     lastRow.$row.removeClass('last');
@@ -3104,7 +3098,7 @@ scout.Table.prototype._renderViewport = function() {
   this._renderViewRange(viewRange);
 
   if (this.viewRangeRendered.size() > 0) {
-    firstRow = this.filteredRows()[this.viewRangeRendered.from],
+    firstRow = this.filteredRows()[this.viewRangeRendered.from];
     lastRow = this.filteredRows()[this.viewRangeRendered.to - 1];
     firstRow.$row.addClass('first');
     lastRow.$row.addClass('last');
@@ -3162,7 +3156,6 @@ scout.Table.prototype._renderViewRange = function(viewRange) {
 };
 
 scout.Table.prototype._renderFiller = function() {
-  var fakeRowStyle;
   if (!this.$fillBefore) {
     this.$fillBefore = this.$data.prependDiv('table-data-fill');
     this._applyFillerStyle(this.$fillBefore);
@@ -3368,7 +3361,7 @@ scout.Table.prototype._onScrollToSelection = function() {
 };
 
 scout.Table.prototype._onColumnBackgroundEffectChanged = function(event) {
-  var columnId, column, effect;
+  var columnId, column;
   event.eventParts.forEach(function(eventPart) {
     columnId = eventPart.columnId;
     column = this.columnById(columnId);

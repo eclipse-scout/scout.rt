@@ -20,9 +20,7 @@ scout.inherits(scout.ViewButtonsLayout, scout.AbstractLayout);
 scout.ViewButtonsLayout.MIN_TAB_WIDTH = '50px';
 
 scout.ViewButtonsLayout.prototype.layout = function($container) {
-  var $selectedTab, selectedTabWidth,
-    fixedWidth = 0,
-    containerBounds = this._htmlComp.getBounds(),
+  var containerBounds = this._htmlComp.getBounds(),
     tabs = $container.children().length,
     tabWidth = (containerBounds.width / tabs);
   $container.children().each(function() {

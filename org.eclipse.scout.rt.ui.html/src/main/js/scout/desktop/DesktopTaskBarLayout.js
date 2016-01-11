@@ -45,7 +45,6 @@ scout.DesktopTabBarLayout.prototype.layout = function($container) {
     $tools = $container.find('.taskbar-tools'),
     contWidth = scout.graphics.getSize($container).width,
     numTabs = this._desktop.viewTabsController.viewTabCount(),
-    largePrefTabsWidth = numTabs * this.TAB_WIDTH_LARGE,
     smallPrefTabsWidth = numTabs * this.TAB_WIDTH_SMALL,
     logoWidth = 0,
     toolsWidth, tabsWidth;
@@ -136,7 +135,7 @@ scout.DesktopTabBarLayout.prototype.layout = function($container) {
     // FIXME awe: tabs have no 'selected' state, this must be added together with activeForm on model Desktop
     // Never put selected tab into overflow
     var i = 0,
-      selectedIndex, tab;
+      selectedIndex;
     $tabs.find('.desktop-view-tab').each(function() {
       if ($(this).hasClass('selected')) {
         selectedIndex = i;
@@ -180,9 +179,8 @@ scout.DesktopTabBarLayout.prototype.layout = function($container) {
 };
 
 scout.DesktopTabBarLayout.prototype._onMouseDownOverflow = function(event) {
-  var menu, tab, text, popup, overflowMenus = [],
-    desktop = this._desktop,
-    that = this;
+  var menu, tab, popup, overflowMenus = [],
+    desktop = this._desktop;
   this._overflowTabsIndizes.forEach(function(i) {
     // FIXME awe: fix bugs in overflow-menu:
     // - 1. menu schliesst nicht

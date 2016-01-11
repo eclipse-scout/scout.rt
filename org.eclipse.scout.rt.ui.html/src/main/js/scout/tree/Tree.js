@@ -382,7 +382,7 @@ scout.Tree.prototype._renderNodeChecked = function(node) {
     return;
   }
 
-  var $checkbox = node.$node
+  node.$node
     .children('.tree-node-checkbox')
     .children('.check-box')
     .toggleClass('checked', node.checked);
@@ -565,8 +565,6 @@ scout.Tree.prototype._renderExpansion = function(node, $predecessor, animate) {
 };
 
 scout.Tree.prototype._renderSelection = function() {
-  var i, node, $node;
-
   // Add children class to root nodes if no nodes are selected
   if (this.selectedNodes.length === 0) {
     this.nodes.forEach(function(childNode) {
@@ -575,7 +573,7 @@ scout.Tree.prototype._renderSelection = function() {
   }
 
   this.selectedNodes.forEach(function(node) {
-    $node = node.$node;
+    var $node = node.$node;
 
     // If $node is currently not displayed (due to a collapsed parent node), expand the parents
     if (!$node) {
@@ -1357,8 +1355,7 @@ scout.Tree.prototype._showAllNodes = function(parentNode) {
 };
 
 scout.Tree.prototype._updateItemPath = function() {
-  var $selectedNodes, $node, level,
-    selectedNode = this.selectedNodes[0];
+  var $selectedNodes, $node, level;
 
   // first remove and select selected
   this.$data.find('.tree-node').removeClass('group');

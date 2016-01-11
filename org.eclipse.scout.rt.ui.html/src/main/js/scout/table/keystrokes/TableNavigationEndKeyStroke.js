@@ -44,7 +44,7 @@ scout.TableNavigationEndKeyStroke.prototype.handle = function(event) {
   } else {
     newSelectedRows = lastRow;
   }
-  table.selectionHandler.lastActionRow = lastRow; 
+  table.selectionHandler.lastActionRow = lastRow;
   table.selectRows(newSelectedRows);
   table.scrollTo(lastRow);
 };

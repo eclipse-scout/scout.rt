@@ -160,7 +160,7 @@ scout.DateFormat = function(locale, pattern) {
 
   DateFormatPatternDefinition.prototype.createParseFunction = function() {
     return function(parseContext) {
-      var m, i, parsedTerm, match;
+      var m, parsedTerm, match;
 
       var success = false;
       if (this.parseRegExp) {

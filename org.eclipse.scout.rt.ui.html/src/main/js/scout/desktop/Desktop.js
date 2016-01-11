@@ -62,8 +62,7 @@ scout.Desktop.prototype._onChildAdapterCreation = function(propertyName, model) 
 };
 
 scout.Desktop.prototype._render = function($parent) {
-  var hasNavigation = this._hasNavigation(),
-    hasTaskBar = this._hasTaskBar();
+  var hasNavigation = this._hasNavigation();
 
   this.$container = $parent;
   this.$container

@@ -142,7 +142,7 @@ scout.ProposalChooserLayout.prototype.preferredLayoutSize = function($container)
   this._typeHandler.prepare($container, this);
 
   modelSize = this._proposalChooser.model.htmlComp.getPreferredSize();
-  prefSize = modelSize,
+  prefSize = modelSize;
 
   // pref size of table and tree don't return accurate values for width -> measure width
   this._typeHandler.modifyDom($container);

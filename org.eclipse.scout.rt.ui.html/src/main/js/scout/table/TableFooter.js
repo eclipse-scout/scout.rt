@@ -516,8 +516,7 @@ scout.TableFooter.prototype._onStatusMousedown = function(event) {
 };
 
 scout.TableFooter.prototype._onFilterInput = function(event) {
-  var filter,
-    $input = $(event.currentTarget),
+  var $input = $(event.currentTarget),
     filterText = $input.val();
 
   if (!filterText) {

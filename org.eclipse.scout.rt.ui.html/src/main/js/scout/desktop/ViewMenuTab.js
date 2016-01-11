@@ -152,7 +152,7 @@ scout.ViewMenuTab.prototype._openPopup = function(event) {
  * the 'visibleInMenu' property.
  */
 scout.ViewMenuTab.prototype._popupViewMenus = function() {
-  var i, popupMenus = [];
+  var popupMenus = [];
   this.viewMenus.forEach(function(viewMenu) {
     if (scout.nvl(viewMenu.visibleInMenu, true)) {
       popupMenus.push(viewMenu);

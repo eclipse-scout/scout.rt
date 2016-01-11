@@ -76,7 +76,7 @@ scout.AggregateTableControl.prototype._removeContent = function() {
 
 scout.AggregateTableControl.prototype._renderAggregate = function() {
   this.table.columns.forEach(function(column, c) {
-    var aggregateValue, decimalFormat, cell, $cell;
+    var aggregateValue, cell, $cell;
 
     aggregateValue = this.aggregateRow[c];
     if (aggregateValue === undefined || aggregateValue === null) {

@@ -44,7 +44,6 @@ scout.AbstractTableNavigationKeyStroke.prototype._accept = function(event) {
 scout.AbstractTableNavigationKeyStroke.prototype._viewportInfo = function() {
   var x, y, viewportBounds, dataInsets, dataMarginTop, firstRow, lastRow,
     table = this.field,
-    document = table.$data.document(true),
     viewport = {},
     rows = table.filteredRows();
 

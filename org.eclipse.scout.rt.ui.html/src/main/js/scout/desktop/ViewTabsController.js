@@ -85,7 +85,6 @@ scout.ViewTabsController.prototype._removeViewTab = function(viewTab, viewId) {
   // Select next available view tab.
   // FIXME dwi: (activeForm) use activeForm here or when no form is active, show outline again (from A.WE)
   if (this._selectedViewTab === viewTab) {
-    var parentViewTab = this.viewTab(viewTab._view.parent);
     if (viewTabIndexBefore >= 0) {
       this.selectViewTab(this._viewTabs[viewTabIndexBefore]);
     } else {
