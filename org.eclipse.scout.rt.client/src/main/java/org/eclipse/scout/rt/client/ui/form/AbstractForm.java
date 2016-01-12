@@ -2138,6 +2138,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
       try {
         FormUtility.disposeFormFields(this);
         interceptDisposeForm();
+        unregisterDataChangeListener((Object[]) null);
       }
       catch (Exception t) {
         LOG.warn("Failed to dispose Form {}", getClass().getName(), t);
