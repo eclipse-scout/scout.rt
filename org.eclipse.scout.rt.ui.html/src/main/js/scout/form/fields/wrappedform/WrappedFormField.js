@@ -45,5 +45,5 @@ scout.WrappedFormField.prototype._removeInnerForm = function(oldInnerForm) {
   if (oldInnerForm) {
     oldInnerForm.remove();
   }
-  this.removeField();
+  this._removeField();
 };

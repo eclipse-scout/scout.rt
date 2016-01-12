@@ -112,7 +112,7 @@ scout.FormField.prototype._renderProperties = function() {
 
 scout.FormField.prototype._remove = function() {
   scout.FormField.parent.prototype._remove.call(this);
-  this.removeField();
+  this._removeField();
   this._removeStatus();
   this._removeLabel();
 };
@@ -510,7 +510,7 @@ scout.FormField.prototype.addFieldContainer = function($fieldContainer) {
 /**
  * Removes this.$field and this.$fieldContainer and sets the properties to null.
  */
-scout.FormField.prototype.removeField = function() {
+scout.FormField.prototype._removeField = function() {
   if (this.$field) {
     this.$field.remove();
     this.$field = null;

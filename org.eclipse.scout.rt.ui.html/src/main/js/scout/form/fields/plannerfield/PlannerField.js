@@ -33,7 +33,7 @@ scout.PlannerField.prototype._renderPlanner = function() {
 
 scout.PlannerField.prototype._removePlanner = function(oldPlanner) {
   oldPlanner.remove();
-  this.removeField();
+  this._removeField();
 };
 
 scout.PlannerField.prototype._renderSplitterPosition = function() {};

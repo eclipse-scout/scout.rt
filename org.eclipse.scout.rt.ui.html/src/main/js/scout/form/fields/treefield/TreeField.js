@@ -34,5 +34,5 @@ scout.TreeField.prototype._renderTree = function() {
 
 scout.TreeField.prototype._removeTree = function(oldTree) {
   oldTree.remove();
-  this.removeField();
+  this._removeField();
 };

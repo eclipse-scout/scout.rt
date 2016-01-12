@@ -102,7 +102,7 @@ scout.BrowserField.prototype._afterAttach = function(parent) {
   // as a workaround for IFRAMEs to work, we have to recreate the whole field in that case
   if (scout.device.requiresIframeSecurityAttribute()) {
     this.$field.remove();
-    this.removeField();
+    this._removeField();
     this.addField(parent.$container.makeElement('<iframe>'));
     this._renderIframeProperties();
     this.htmlComp.revalidateLayout();
