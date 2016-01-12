@@ -12,18 +12,15 @@ package org.eclipse.scout.rt.shared.servicetunnel.http;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
 import java.net.URLConnection;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
-import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
 import org.eclipse.scout.rt.platform.job.Jobs;
-import org.eclipse.scout.rt.platform.util.BooleanUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.CancellationException;
 import org.eclipse.scout.rt.platform.util.concurrent.ICancellable;
 import org.eclipse.scout.rt.platform.util.concurrent.InterruptedException;
@@ -45,15 +42,12 @@ import org.slf4j.LoggerFactory;
  *
  * @see AbstractHttpServiceTunnel
  */
-public class RemoteServiceInvocationCallable implements Callable<ServiceTunnelResponse>, ICancellable {
+public class RemoteServiceInvocationCallable implements Callable<ServiceTunnelResponse> {
 
   private static final Logger LOG = LoggerFactory.getLogger(RemoteServiceInvocationCallable.class);
 
   private final AbstractHttpServiceTunnel m_tunnel;
   private final ServiceTunnelRequest m_serviceRequest;
-  private final AtomicBoolean m_cancelled = new AtomicBoolean(false);
-
-  private RunContext m_runContext; // remember in which context the call() was done to cancel it in the same context.
 
   public RemoteServiceInvocationCallable(final AbstractHttpServiceTunnel tunnel, final ServiceTunnelRequest serviceRequest) {
     m_tunnel = tunnel;
@@ -71,8 +65,6 @@ public class RemoteServiceInvocationCallable implements Callable<ServiceTunnelRe
 
     final long tStart = LOG.isDebugEnabled() ? System.nanoTime() : 0L;
     try {
-      m_runContext = m_tunnel.createCurrentRunContext();
-
       // Create the request.
       final ByteArrayOutputStream requestMessage = new ByteArrayOutputStream();
       m_tunnel.getContentHandler().writeRequest(requestMessage, m_serviceRequest);
@@ -102,62 +94,31 @@ public class RemoteServiceInvocationCallable implements Callable<ServiceTunnelRe
     }
   }
 
-  @Override
-  public boolean cancel(final boolean interruptIfRunning) {
-    if (!m_cancelled.compareAndSet(false, true)) {
-      return true;
-    }
-
+  /**
+   * Cancels the remote service operation on server side.
+   */
+  public void cancel(final RunContext cancellationRunContext) {
     final long requestSequence = m_serviceRequest.getRequestSequence();
-
-    // From UI Server, this method is invoked from 'JsonMessageRequestInterceptor.handleCancelRequest(IUiSession)'
-    // From the Container this method may be invoked from org.eclipse.scout.rt.server.commons.WebappEventListener (no context available).
-    final RunContext runContext = m_runContext == null ? m_tunnel.createCurrentRunContext() : m_runContext;
     try {
-      return runContext.call(new Callable<Boolean>() {
+      final Method serviceMethod = IRunMonitorCancelService.class.getMethod(IRunMonitorCancelService.CANCEL_METHOD, long.class);
+      final Object[] serviceArgs = new Object[]{requestSequence};
+      final ServiceTunnelRequest cancelRequest = m_tunnel.createServiceTunnelRequest(IRunMonitorCancelService.class, serviceMethod, serviceArgs);
+      final RemoteServiceInvocationCallable remoteInvocationCallable = m_tunnel.createRemoteServiceInvocationCallable(cancelRequest);
 
-        @Override
-        public Boolean call() throws Exception {
-          return sendCancelRequest(requestSequence);
-        }
-      }, DefaultExceptionTranslator.class);
-    }
-    catch (final Exception e) {
-      LOG.warn("Failed to cancel server processing [requestSequence={}]", requestSequence, e);
-      return false;
-    }
-  }
-
-  protected boolean sendCancelRequest(final long requestSequence) throws NoSuchMethodException, SecurityException {
-    final ServiceTunnelRequest cancelRequest = m_tunnel.createServiceTunnelRequest(IRunMonitorCancelService.class, IRunMonitorCancelService.class.getMethod(IRunMonitorCancelService.CANCEL_METHOD, long.class), new Object[]{requestSequence});
-    final RemoteServiceInvocationCallable remoteInvocationCallable = m_tunnel.createRemoteServiceInvocationCallable(cancelRequest);
-
-    final ServiceTunnelResponse response;
-    try {
-      response = Jobs.schedule(remoteInvocationCallable, Jobs.newInput()
-          .withRunContext(m_tunnel.createCurrentRunContext().withRunMonitor(BEANS.get(RunMonitor.class))) // do not link the RunMonitor with the current RunMonitor to not cancel this request.))
+      final ServiceTunnelResponse response = Jobs.schedule(remoteInvocationCallable, Jobs.newInput()
           .withName("Cancelling service request [{}]", requestSequence)
+          .withRunContext(cancellationRunContext)
           .withExceptionHandling(null, true))
           .awaitDoneAndGet(10, TimeUnit.SECONDS);
+      if (response != null && response.getException() != null) {
+        LOG.warn("Failed to cancel server processing", response.getException());
+      }
     }
     catch (final TimeoutException | CancellationException | InterruptedException e) {
-      return false; // Do not cancel 'cancel-request' to prevent loop.
+      // NOOP: Do not cancel 'cancel-request' to prevent loop.
     }
-
-    if (response == null) {
-      return false;
+    catch (RuntimeException | NoSuchMethodException e) {
+      LOG.warn("Failed to cancel server processing [requestSequence={}]", requestSequence, e);
     }
-    else if (response.getException() != null) {
-      LOG.warn("Failed to cancel server processing", response.getException());
-      return false;
-    }
-    else {
-      return BooleanUtility.nvl((Boolean) response.getData(), false);
-    }
-  }
-
-  @Override
-  public boolean isCancelled() {
-    return m_cancelled.get();
   }
 }
