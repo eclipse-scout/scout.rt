@@ -35,6 +35,7 @@ scout.TableHeaderMenuLayout.prototype.layout = function($container) {
   }
 
   var
+    actionColumnSize,
     $filterColumn = this.popup.$columnFilters,
     filterColumnSize = scout.graphics.getSize($filterColumn),
     filterColumnInsets = scout.graphics.getInsets($filterColumn),
@@ -73,9 +74,15 @@ scout.TableHeaderMenuLayout.prototype.layout = function($container) {
         filterColumnSize.width - filterColumnInsets.horizontal(),
         filterTableContainerHeight));
   }
+
+  // fix width of actions column, so it doesn't become wider when user
+  // hovers over a button and thus the text of the group changes.
+  this._setMaxWidth();
+  actionColumnSize = scout.graphics.getSize(this.popup.$columnActions);
+  this._setMaxWidth(actionColumnSize.width);
 };
 
-//group title (size used for table + field container)
+// group title (size used for table + field container)
 scout.TableHeaderMenuLayout.prototype._groupTitleHeight = function($group) {
   return scout.graphics.getSize($group.find('.table-header-menu-group-text'), true).height;
 };
@@ -91,11 +98,14 @@ scout.TableHeaderMenuLayout.prototype._filterFieldsGroupBoxHeight = function() {
  * + paddings of surrounding containers
  */
 scout.TableHeaderMenuLayout.prototype.preferredLayoutSize = function($container) {
-  var
-    containerInsets = scout.graphics.getInsets($container),
-    leftColumnHeight = scout.graphics.getSize(this.popup.$columnActions, true).height,
+  var prefSize,
     rightColumnHeight = 0,
-    prefSize;
+    leftColumnHeight = 0,
+    containerInsets = scout.graphics.getInsets($container),
+    oldMaxWidth = this._getMaxWidth();
+
+  this._setMaxWidth(); // temp. remove max-width so we can determine pref. size
+  leftColumnHeight = scout.graphics.getSize(this.popup.$columnActions, true).height;
 
   // Filter table
   if (this.popup.hasFilterTable) {
@@ -137,5 +147,18 @@ scout.TableHeaderMenuLayout.prototype.preferredLayoutSize = function($container)
   // Use height of left or right column as preferred size (and add insets of container)
   prefSize = scout.graphics.prefSize($container);
   prefSize.height = Math.max(leftColumnHeight, rightColumnHeight) + containerInsets.vertical();
+
+  // restore max-width
+  this._setMaxWidth(oldMaxWidth);
+
   return prefSize;
 };
+
+scout.TableHeaderMenuLayout.prototype._getMaxWidth = function() {
+  return this.popup.$columnActions.css('max-width');
+};
+
+scout.TableHeaderMenuLayout.prototype._setMaxWidth = function(maxWidth) {
+  this.popup.$columnActions.css('max-width', maxWidth || '');
+};
+

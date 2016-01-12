@@ -41,11 +41,6 @@ scout.TableHeaderMenu.prototype._init = function(options) {
   this.table = this.tableHeader.table;
   this.$headerItem = this.$anchor;
 
-  this._tableFilterHandler = this._onFilterTableChanged.bind(this);
-  this.table.on('addFilter', this._tableFilterHandler);
-  this.table.on('removeFilter', this._tableFilterHandler);
-  this._filterTableCheckedRowsHandler = this._onFilterTableCheckedRows.bind(this);
-
   // Filtering
   this.filter = this.table.getFilter(this.column.id);
   if (!this.filter) {
@@ -58,6 +53,13 @@ scout.TableHeaderMenu.prototype._init = function(options) {
 
   this.hasFilterTable = this.filter.availableValues.length > 0,
   this.hasFilterFields = this.filter.hasFilterFields;
+
+  if (this.hasFilterTable) {
+    this._tableFilterHandler = this._onFilterTableChanged.bind(this);
+    this.table.on('addFilter', this._tableFilterHandler);
+    this.table.on('removeFilter', this._tableFilterHandler);
+    this._filterTableCheckedRowsHandler = this._onFilterTableCheckedRows.bind(this);
+  }
 };
 
 scout.TableHeaderMenu.prototype._createLayout = function() {
@@ -500,7 +502,8 @@ scout.TableHeaderMenu.prototype._renderColoringGroup = function() {
 scout.TableHeaderMenu.prototype._renderFilterTable = function() {
   var $filterActions;
 
-  this.$filterTableGroup = this.$columnFilters.appendDiv('table-header-menu-group first');
+  this.$filterTableGroup = this.$columnFilters
+    .appendDiv('table-header-menu-group first');
 
   $filterActions = this.$filterTableGroup
     .appendDiv('table-header-menu-filter-actions');
