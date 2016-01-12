@@ -5,6 +5,8 @@ scout.NumberColumnUserFilter = function() {
   this.numberFromField;
   this.numberTo;
   this.numberToField;
+
+  this.hasFilterFields = true;
 };
 scout.inherits(scout.NumberColumnUserFilter, scout.ColumnUserFilter);
 

@@ -55,6 +55,9 @@ scout.TableHeaderMenu.prototype._init = function(options) {
   this.filter.calculate();
   this.filter.on('filterFieldsChanged', this._updateFilterTable.bind(this)); // FIXME AWE: (filter) off handler?
   this._updateFilterTableCheckedMode();
+
+  this.hasFilterTable = this.filter.availableValues.length > 0,
+  this.hasFilterFields = this.filter.hasFilterFields;
 };
 
 scout.TableHeaderMenu.prototype._createLayout = function() {
@@ -62,12 +65,18 @@ scout.TableHeaderMenu.prototype._createLayout = function() {
 };
 
 scout.TableHeaderMenu.prototype._render = function($parent) {
+  var groups = [];
+
   this.$parent = $parent;
   this.$headerItem.select(true);
 
   this.$container = $parent.appendDiv('table-header-menu');
   this.$columnActions = this.$container.appendDiv('table-header-menu-actions');
-  this.$columnFilters = this.$container.appendDiv('table-header-menu-filters');
+
+  // only add right column if filter has a filter-table or filter-fields
+  if (this.hasFilterTable || this.hasFilterFields) {
+    this.$columnFilters = this.$container.appendDiv('table-header-menu-filters');
+  }
 
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
   this.htmlComp.setLayout(this._createLayout());
@@ -77,6 +86,7 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
     this.$container.attr('tabindex', -1);
   }
 
+  // -- Left column -- //
   // Moving
   var movableColumns = this.table.columns.filter(function(column) {
     return !column.fixedPosition;
@@ -103,17 +113,26 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
     this._renderColoringGroup();
   }
 
-  // Add 'last' class to last group-box
+  // Add 'last' class to last menu-group
   this.children[this.children.length - 1].setLast(true);
 
-  this._renderFilterTable();
-  this._renderFilterFields();
+  // -- Right column -- //
+  // Filter table
+  if (this.hasFilterTable) {
+    this._renderFilterTable();
+  }
+  // Filter fields
+  if (this.hasFilterFields) {
+    this._renderFilterFields();
+  }
 
   this.tableHeader.$container.on('scroll', this._tableHeaderScrollHandler);
 };
 
 scout.TableHeaderMenu.prototype._remove = function() {
-  this.filterTable.off('rowsChecked', this._filterTableCheckedRowsHandler);
+  if (this.filterTable) {
+    this.filterTable.off('rowsChecked', this._filterTableCheckedRowsHandler);
+  }
   this.tableHeader.$container.off('scroll', this._tableHeaderScrollHandler);
   this.$headerItem.select(false);
   this.table.off('addFilter', this._tableFilterHandler);

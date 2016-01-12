@@ -3,6 +3,8 @@ scout.TextColumnUserFilter = function() {
 
   this.freeText;
   this.freeTextField;
+
+  this.hasFilterFields = true;
 };
 scout.inherits(scout.TextColumnUserFilter, scout.ColumnUserFilter);
 

@@ -30,35 +30,49 @@ scout.TableHeaderMenuLayout.TABLE_MAX_HEIGHT = 330;
 scout.TableHeaderMenuLayout.prototype.layout = function($container) {
   scout.TableHeaderMenuLayout.parent.prototype.layout.call(this, $container);
 
+  if (!this.popup.hasFilterFields && !this.popup.hasFilterTable) {
+    return;
+  }
+
   var
     $filterColumn = this.popup.$columnFilters,
     filterColumnSize = scout.graphics.getSize($filterColumn),
     filterColumnInsets = scout.graphics.getInsets($filterColumn),
-    $filterFieldsGroup = this.popup.$filterFieldsGroup,
-    filterFieldGroupSize,
-    filterFieldHtmlComp = scout.HtmlComponent.get($filterFieldsGroup.find('.form-field')),
-    $filterTableGroup = this.popup.$filterTableGroup,
-    filterTableContainerInsets = scout.graphics.getInsets($filterTableGroup),
-    filterTableContainerHeight,
-    filterTableHtmlComp = this.popup.filterTable.htmlComp;
+    filterFieldGroupSize = new scout.Dimension();
 
-  // Layout filter field(s) and get size
-  filterFieldHtmlComp.setSize(new scout.Dimension(filterColumnSize.width - filterColumnInsets.horizontal(), this._filterFieldsGroupBoxHeight()));
-  filterFieldGroupSize = scout.graphics.getSize($filterFieldsGroup, true);
+  // Filter fields
+  if (this.popup.hasFilterFields) {
+    var
+      $filterFieldsGroup = this.popup.$filterFieldsGroup,
+      filterFieldHtmlComp = scout.HtmlComponent.get($filterFieldsGroup.find('.form-field'));
 
-  filterTableContainerHeight = filterColumnSize.height;
-  // subtract height of filter-fields container
-  filterTableContainerHeight -= filterFieldGroupSize.height;
-  // subtract group-title height
-  filterTableContainerHeight -= this._groupTitleHeight($filterTableGroup);
-  // subtract insets of table container
-  filterTableContainerHeight -= filterTableContainerInsets.vertical();
+    // Layout filter field(s) and get size
+    filterFieldHtmlComp.setSize(new scout.Dimension(filterColumnSize.width - filterColumnInsets.horizontal(), this._filterFieldsGroupBoxHeight()));
+    filterFieldGroupSize = scout.graphics.getSize($filterFieldsGroup, true);
+  }
 
-  // Layout filter table
-  filterTableHtmlComp.pixelBasedSizing = true;
-  filterTableHtmlComp.setSize(new scout.Dimension(
-      filterColumnSize.width - filterColumnInsets.horizontal(),
-      filterTableContainerHeight));
+  // Filter table
+  if (this.popup.hasFilterTable) {
+    var
+      filterTableContainerHeight,
+      $filterTableGroup = this.popup.$filterTableGroup,
+      filterTableContainerInsets = scout.graphics.getInsets($filterTableGroup),
+      filterTableHtmlComp = this.popup.filterTable.htmlComp;
+
+    filterTableContainerHeight = filterColumnSize.height;
+    // subtract height of filter-fields container
+    filterTableContainerHeight -= filterFieldGroupSize.height;
+    // subtract group-title height
+    filterTableContainerHeight -= this._groupTitleHeight($filterTableGroup);
+    // subtract insets of table container
+    filterTableContainerHeight -= filterTableContainerInsets.vertical();
+
+    // Layout filter table
+    filterTableHtmlComp.pixelBasedSizing = true;
+    filterTableHtmlComp.setSize(new scout.Dimension(
+        filterColumnSize.width - filterColumnInsets.horizontal(),
+        filterTableContainerHeight));
+  }
 };
 
 //group title (size used for table + field container)
@@ -79,37 +93,46 @@ scout.TableHeaderMenuLayout.prototype._filterFieldsGroupBoxHeight = function() {
 scout.TableHeaderMenuLayout.prototype.preferredLayoutSize = function($container) {
   var
     containerInsets = scout.graphics.getInsets($container),
-    // filter table container
-    $filterTableGroup = this.popup.$filterTableGroup,
-    filterTableHeight = this.popup.filterTable.htmlComp.getSize(true).height,
-    filterTableContainerInsets = scout.graphics.getInsets($filterTableGroup),
-    filterTableContainerHeight,
-    // filter field(s) container
-    filterFieldContainerInsets = scout.graphics.getInsets(this.popup.$filterFieldsGroup),
-    filterFieldContainerHeight,
-    groupTitleHeight = this._groupTitleHeight($filterTableGroup),
     leftColumnHeight = scout.graphics.getSize(this.popup.$columnActions, true).height,
-    rightColumnHeight,
+    rightColumnHeight = 0,
     prefSize;
 
-  // limit height of table
-  filterTableHeight = Math.min(filterTableHeight, scout.TableHeaderMenuLayout.TABLE_MAX_HEIGHT);
-  // size of container with table
-  filterTableContainerHeight = filterTableHeight;
-  // add group-title height
-  filterTableContainerHeight += groupTitleHeight;
-  // add insets of container
-  filterTableContainerHeight += filterTableContainerInsets.vertical();
+  // Filter table
+  if (this.popup.hasFilterTable) {
+    var
+      $filterTableGroup = this.popup.$filterTableGroup,
+      filterTableHeight = this.popup.filterTable.htmlComp.getSize(true).height,
+      filterTableContainerInsets = scout.graphics.getInsets($filterTableGroup),
+      filterTableContainerHeight;
 
+    // limit height of table
+    filterTableHeight = Math.min(filterTableHeight, scout.TableHeaderMenuLayout.TABLE_MAX_HEIGHT);
+    // size of container with table
+    filterTableContainerHeight = filterTableHeight;
+    // add group-title height
+    filterTableContainerHeight += this._groupTitleHeight($filterTableGroup);
+    // add insets of container
+    filterTableContainerHeight += filterTableContainerInsets.vertical();
 
-  // size of group-box with 1 or 2 filter fields
-  filterFieldContainerHeight = this._filterFieldsGroupBoxHeight();
-  // add group-title height
-  filterFieldContainerHeight += groupTitleHeight;
-  // add insets of container
-  filterFieldContainerHeight += filterFieldContainerInsets.vertical();
+    rightColumnHeight += filterTableContainerHeight;
+  }
 
-  rightColumnHeight = filterTableContainerHeight + filterFieldContainerHeight;
+  // Filter fields
+  if (this.popup.hasFilterFields) {
+    var
+      $filterFieldsGroup = this.popup.$filterFieldsGroup,
+      filterFieldContainerInsets = scout.graphics.getInsets($filterFieldsGroup),
+      filterFieldContainerHeight;
+
+    // size of group-box with 1 or 2 filter fields
+    filterFieldContainerHeight = this._filterFieldsGroupBoxHeight();
+    // add group-title height
+    filterFieldContainerHeight += this._groupTitleHeight($filterFieldsGroup);
+    // add insets of container
+    filterFieldContainerHeight += filterFieldContainerInsets.vertical();
+
+    rightColumnHeight += filterFieldContainerHeight;
+  }
 
   // Use height of left or right column as preferred size (and add insets of container)
   prefSize = scout.graphics.prefSize($container);

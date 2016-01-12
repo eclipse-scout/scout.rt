@@ -14,6 +14,12 @@ scout.ColumnUserFilter = function() {
   this.events = new scout.EventSupport();
 
   /**
+   * This property is used to check early whether or not this filter can produce filter-fields.
+   * Set this property to true in your sub-class, if it creates filter fields.
+   */
+  this.hasFilterFields = false;
+
+  /**
    * array of (normalized) key, text composite
    */
   this.availableValues = [];

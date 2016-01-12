@@ -40,6 +40,7 @@
   width: 222px;
   border-left: solid 1px @border-color;
   padding-left: 10px;
+  margin-left: 10px;
 
   & > .table-header-menu-group > .form-field {
     position: relative;
@@ -98,6 +99,10 @@
   background-color: @control-background-color;
   cursor: pointer;
   text-align: center;
+
+  &:last-of-type {
+    margin-right: 0;
+  }
 
   &:hover {
     color: @palette-blue-6;

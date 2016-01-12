@@ -5,6 +5,8 @@ scout.DateColumnUserFilter = function() {
   this.dateFromField;
   this.dateTo;
   this.dateToField;
+
+  this.hasFilterFields = true;
 };
 scout.inherits(scout.DateColumnUserFilter, scout.ColumnUserFilter);
 
