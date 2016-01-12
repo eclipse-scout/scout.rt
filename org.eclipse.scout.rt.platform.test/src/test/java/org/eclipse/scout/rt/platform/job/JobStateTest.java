@@ -334,10 +334,12 @@ public class JobStateTest {
         assertSame(JobState.RUNNING, IFuture.CURRENT.get().getState());
         try {
           condition.waitFor("ABC");
-          fail("timeout expected");
+          fail("interruption expected");
         }
         catch (InterruptedException e) {
-          assertFalse(mutex.isPermitOwner(IFuture.CURRENT.get()));
+          assertTrue(Thread.interrupted());
+          Thread.currentThread().interrupt(); // Restore interrupted status
+          assertTrue(mutex.isPermitOwner(IFuture.CURRENT.get()));
           assertSame(JobState.RUNNING, IFuture.CURRENT.get().getState());
         }
       }
@@ -353,7 +355,8 @@ public class JobStateTest {
     future1.awaitDoneAndGet();
     assertTrue(future1.isDone());
     assertFalse(future1.isCancelled());
-    assertEquals(0, mutex.getCompetitorCount());
+
+    JobTestUtil.waitForPermitCompetitors(mutex, 0); // wait because permit is released just after done (max 30s)
 
     // verify events
     int i = -1;
@@ -381,8 +384,12 @@ public class JobStateTest {
     assertEquals(JobState.WAITING_FOR_BLOCKING_CONDITION, capturedFutureStates.get(i));
 
     i++;
+    assertStateChangedEvent(future1, JobState.WAITING_FOR_PERMIT, capturedEvents.get(i));
+    assertEquals(JobState.WAITING_FOR_PERMIT, capturedFutureStates.get(i));
+
+    i++;
     assertHintChangedEvent(JobEventType.JOB_EXECUTION_HINT_REMOVED, future1, "ABC", capturedEvents.get(i));
-    assertEquals(JobState.WAITING_FOR_BLOCKING_CONDITION, capturedFutureStates.get(i));
+    assertEquals(JobState.WAITING_FOR_PERMIT, capturedFutureStates.get(i));
 
     i++;
     assertStateChangedEvent(future1, JobState.RUNNING, capturedEvents.get(i)); // due to interruption
@@ -417,7 +424,7 @@ public class JobStateTest {
           fail("timeout expected");
         }
         catch (TimeoutException e) {
-          assertFalse(mutex.isPermitOwner(IFuture.CURRENT.get()));
+          assertTrue(mutex.isPermitOwner(IFuture.CURRENT.get()));
           assertSame(JobState.RUNNING, IFuture.CURRENT.get().getState());
         }
       }
@@ -429,7 +436,8 @@ public class JobStateTest {
     future1.awaitDoneAndGet(10, TimeUnit.SECONDS);
     assertTrue(future1.isDone());
     assertFalse(future1.isCancelled());
-    assertEquals(0, mutex.getCompetitorCount());
+
+    JobTestUtil.waitForPermitCompetitors(mutex, 0); // wait because permit is released just after done (max 30s)
 
     // verify events
     int i = -1;
@@ -457,8 +465,12 @@ public class JobStateTest {
     assertEquals(JobState.WAITING_FOR_BLOCKING_CONDITION, capturedFutureStates.get(i));
 
     i++;
+    assertStateChangedEvent(future1, JobState.WAITING_FOR_PERMIT, capturedEvents.get(i));
+    assertEquals(JobState.WAITING_FOR_PERMIT, capturedFutureStates.get(i));
+
+    i++;
     assertHintChangedEvent(JobEventType.JOB_EXECUTION_HINT_REMOVED, future1, "ABC", capturedEvents.get(i));
-    assertEquals(JobState.WAITING_FOR_BLOCKING_CONDITION, capturedFutureStates.get(i));
+    assertEquals(JobState.WAITING_FOR_PERMIT, capturedFutureStates.get(i));
 
     i++;
     assertStateChangedEvent(future1, JobState.RUNNING, capturedEvents.get(i)); // due to timeout

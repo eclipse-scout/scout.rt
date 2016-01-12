@@ -25,11 +25,15 @@ import org.eclipse.scout.rt.platform.job.listener.JobEventData;
 import org.eclipse.scout.rt.platform.util.ToStringBuilder;
 import org.eclipse.scout.rt.platform.util.concurrent.InterruptedException;
 import org.eclipse.scout.rt.platform.util.concurrent.TimeoutException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Implementation of {@link IBlockingCondition}.
  */
 public class BlockingCondition implements IBlockingCondition {
+
+  private static final Logger LOG = LoggerFactory.getLogger(BlockingCondition.class);
 
   private static final long TIMEOUT_INFINITE = -1;
 
@@ -88,6 +92,8 @@ public class BlockingCondition implements IBlockingCondition {
   protected void blockFutureTask(final JobFutureTask<?> futureTask, final long timeout, final TimeUnit unit, final String... executionHints) {
     IExecutionHintRegistration executionHintRegistration = IExecutionHintRegistration.NULL_INSTANCE;
 
+    RuntimeException exceptionWhileBlocking = null;
+
     m_lock.lock();
     try {
       if (!m_blocking) {
@@ -103,35 +109,41 @@ public class BlockingCondition implements IBlockingCondition {
           .withFuture(futureTask)
           .withBlockingCondition(this));
 
-      // Release the permit if assigned to an execution semaphore and currently being a permit owner.
+      // Release the permit if being a semaphore aware task, but only if currently being a permit owner.
       futureTask.releasePermit();
       try {
         blockUntilSignaledOrTimeout(timeout, unit); // Wait until the condition falls
       }
       catch (final InterruptedException | TimeoutException e) {
-        executionHintRegistration.dispose();
-        futureTask.changeState(JobState.RUNNING);
-        throw e;
+        exceptionWhileBlocking = e;
       }
     }
     finally {
       m_lock.unlock();
     }
 
-    // Acquire a permit if assigned to an execution semaphore.
-    final ExecutionSemaphore semaphore = futureTask.getExecutionSemaphore();
-    if (semaphore != null) {
-      try {
-        futureTask.changeState(JobState.WAITING_FOR_PERMIT);
-        semaphore.acquire(futureTask, QueuePosition.HEAD);
-      }
-      catch (final InterruptedException e) {
-        executionHintRegistration.dispose();
-        futureTask.changeState(JobState.RUNNING);
-        throw e;
-      }
+    // Reacquire the permit outside the lock.
+    if (exceptionWhileBlocking instanceof InterruptedException) {
+      Thread.interrupted(); // clear the interrupted status to reacquire the permit.
+      afterBlockFutureTask(futureTask, executionHintRegistration);
+      Thread.currentThread().interrupt(); // interrupt the current thread.
+      throw exceptionWhileBlocking;
     }
+    else if (exceptionWhileBlocking instanceof TimeoutException) {
+      afterBlockFutureTask(futureTask, executionHintRegistration);
+      throw exceptionWhileBlocking;
+    }
+    else {
+      afterBlockFutureTask(futureTask, executionHintRegistration);
+    }
+  }
 
+  /**
+   * Method invoked after blocking the current thread of a {@link JobFutureTask}, and acquires a permit (if being a
+   * semaphore aware task), unsets execution hints, and enters 'running' state.
+   */
+  protected void afterBlockFutureTask(final JobFutureTask<?> futureTask, final IExecutionHintRegistration executionHintRegistration) {
+    acquirePermit(futureTask);
     executionHintRegistration.dispose();
     futureTask.changeState(JobState.RUNNING);
   }
@@ -192,6 +204,40 @@ public class BlockingCondition implements IBlockingCondition {
     }
     finally {
       m_lock.unlock();
+    }
+  }
+
+  /**
+   * Waits until acquired a permit for the given task. This method returns immediately if the specified task is not a
+   * semaphore aware task. In case of an interruption, the permit acquisition is continued, but the method throws an
+   * {@link InterruptedException} upon acquisition.
+   *
+   * @throws InterruptedException
+   *           if interrupted during permit acquisition. However, the permit was acquired.
+   */
+  protected void acquirePermit(final JobFutureTask<?> futureTask) {
+    final ExecutionSemaphore semaphore = futureTask.getExecutionSemaphore();
+    if (semaphore == null) {
+      return;
+    }
+
+    futureTask.changeState(JobState.WAITING_FOR_PERMIT);
+
+    boolean interrupted = false;
+    while (!semaphore.isPermitOwner(futureTask)) {
+      try {
+        semaphore.acquire(futureTask, QueuePosition.HEAD);
+      }
+      catch (final InterruptedException e) {
+        interrupted = true;
+        Thread.interrupted(); // clear the interrupted status to acquire anew.
+        LOG.warn("Interrupted while acquiring semaphore permit. Continue acquisition anew.[future={}, semaphore={}]", futureTask, semaphore, e);
+      }
+    }
+
+    if (interrupted) {
+      Thread.currentThread().interrupt(); // interrupt the current thread
+      throw new InterruptedException("Interrupted while acquiring semaphore permit. However, the permit was successfully acquired. [future={}]", futureTask);
     }
   }
 

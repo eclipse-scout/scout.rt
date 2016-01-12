@@ -53,7 +53,7 @@ public class SerialFutureExecutionTest {
                 .withRepeatCount(100))));
 
     latch.await();
-    Thread.sleep(5000); // Wait some time until trigger fired for all rounds
+    Thread.sleep(6000); // Wait some time until trigger fired for all rounds
 
     // Verify no concurrent execution
     List<String> expectedProtocol = new ArrayList<>();

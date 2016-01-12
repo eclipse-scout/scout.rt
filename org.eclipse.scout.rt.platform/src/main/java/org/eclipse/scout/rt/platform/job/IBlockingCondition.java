@@ -61,9 +61,8 @@ public interface IBlockingCondition {
    *          effect if not running on behalf of a job.
    * @throws InterruptedException
    *           if the current thread was interrupted while waiting.<br/>
-   *           But, even if not waiting anymore, the blocking condition might still be in <em>blocking state</em>. Also,
-   *           if the job is assigned to an {@link IExecutionSemaphore}, a permit was not acquired, meaning that the job
-   *           should terminate its work or waiting anew for the condition to fall.
+   *           But, even if not being blocked anymore, the blocking condition might still be in <em>blocking state</em>.
+   *           Also, if being a semaphore aware job, the permit was acquired accordingly.
    */
   void waitFor(String... executionHints);
 
@@ -84,14 +83,12 @@ public interface IBlockingCondition {
    *          effect if not running on behalf of a job.
    * @throws InterruptedException
    *           if the current thread was interrupted while waiting.<br/>
-   *           But, even if not waiting anymore, the blocking condition might still be in <em>blocking state</em>. Also,
-   *           if the job is assigned to an {@link IExecutionSemaphore}, a permit was not acquired, meaning that the job
-   *           should terminate its work or waiting anew for the condition to fall.
+   *           But, even if not being blocked anymore, the blocking condition might still be in <em>blocking state</em>.
+   *           Also, if being a semaphore aware job, the permit was acquired accordingly.
    * @throws TimeoutException
    *           if the wait timed out.<br/>
-   *           But, even if not waiting anymore, the blocking condition might still be in <em>blocking state</em>. Also,
-   *           if the job belongs to an {@link IExecutionSemaphore}, a permit was not acquired, meaning that the job
-   *           should terminate its work or waiting anew for the condition to fall.
+   *           But, even if not being blocked anymore, the blocking condition might still be in <em>blocking state</em>.
+   *           Also, if being a semaphore aware job, the permit was acquired accordingly.
    */
   void waitFor(long timeout, TimeUnit unit, String... executionHints);
 }
