@@ -663,7 +663,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
           .withExecutionHint(UiJobs.EXECUTION_HINT_POLL_REQUEST, RequestType.POLL_REQUEST.equals(jsonRequest.getRequestType()))
           // Handle exceptions instantaneously in job manager, and not by submitter.
           // That is because the submitting thread might not be waiting anymore, because interrupted or returned because requiring 'user interaction'.
-          .withExceptionHandling(ExceptionHandler.class, true));
+          .withExceptionHandling(BEANS.get(ExceptionHandler.class), true));
 
       // 2. Wait for all model jobs of the session.
       BEANS.get(UiJobs.class).awaitModelJobs(m_clientSession, ExceptionHandler.class);
@@ -745,7 +745,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
           .withName("Processing file upload request")
           // Handle exceptions instantaneously in job manager, and not by submitter.
           // That is because the submitting thread might not be waiting anymore, because interrupted or returned because requiring 'user interaction'.
-          .withExceptionHandling(ExceptionHandler.class, true));
+          .withExceptionHandling(BEANS.get(ExceptionHandler.class), true));
 
       // 2. Wait for all model jobs of the session.
       BEANS.get(UiJobs.class).awaitModelJobs(m_clientSession, ExceptionHandler.class);

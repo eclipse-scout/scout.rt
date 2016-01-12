@@ -45,7 +45,7 @@ public class JobInput {
   protected RunContext m_runContext;
   protected ExecutionTrigger m_executionTrigger = Jobs.newExecutionTrigger();
 
-  protected Class<? extends ExceptionHandler> m_exceptionHandler = ExceptionHandler.class;
+  protected ExceptionHandler m_exceptionHandler = BEANS.get(ExceptionHandler.class);
   protected boolean m_swallowException = false;
 
   protected Set<String> m_executionHints = new HashSet<>();
@@ -181,7 +181,7 @@ public class JobInput {
     return this;
   }
 
-  public Class<? extends ExceptionHandler> getExceptionHandler() {
+  public ExceptionHandler getExceptionHandler() {
     return m_exceptionHandler;
   }
 
@@ -205,7 +205,7 @@ public class JobInput {
    *          <code>true</code> to swallow an uncaught exception, meaning that the exception is not propagated to the
    *          submitter. By default, exceptions are not swallowed and propagated to the submitter.
    */
-  public JobInput withExceptionHandling(final Class<? extends ExceptionHandler> exceptionHandler, final boolean swallowException) {
+  public JobInput withExceptionHandling(final ExceptionHandler exceptionHandler, final boolean swallowException) {
     m_exceptionHandler = exceptionHandler;
     m_swallowException = swallowException;
     return this;
@@ -261,7 +261,7 @@ public class JobInput {
     builder.attr("name", m_name);
     builder.ref("executionSemaphore", m_executionSemaphore);
     builder.attr("expirationTime", m_expirationTime);
-    builder.attr("exceptionHandler", m_exceptionHandler);
+    builder.ref("exceptionHandler", m_exceptionHandler);
     builder.attr("swallowException", m_swallowException);
     builder.attr("threadName", m_threadName);
     builder.attr("executionTrigger", m_executionTrigger);

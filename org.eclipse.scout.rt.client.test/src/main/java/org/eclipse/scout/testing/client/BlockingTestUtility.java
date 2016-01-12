@@ -64,7 +64,7 @@ public final class BlockingTestUtility {
                 }
               }
             }, ModelJobs.newInput(runContext)
-                .withExceptionHandling(JUnitExceptionHandler.class, true)
+                .withExceptionHandling(BEANS.get(JUnitExceptionHandler.class), true)
                 .withName("JUnit: Handling blocked thread because waiting for a blocking condition"));
           }
         });

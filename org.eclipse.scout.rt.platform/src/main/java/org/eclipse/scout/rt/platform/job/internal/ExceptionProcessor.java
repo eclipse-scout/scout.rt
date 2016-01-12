@@ -42,7 +42,7 @@ public class ExceptionProcessor<RESULT> implements ICallableInterceptor<RESULT> 
     }
     catch (final Exception | Error e) {
       if (m_input.getExceptionHandler() != null) {
-        BEANS.get(m_input.getExceptionHandler()).handle(BEANS.get(DefaultExceptionTranslator.class).translate(e));
+        m_input.getExceptionHandler().handle(BEANS.get(DefaultExceptionTranslator.class).translate(e));
       }
 
       if (!m_input.isSwallowException()) {

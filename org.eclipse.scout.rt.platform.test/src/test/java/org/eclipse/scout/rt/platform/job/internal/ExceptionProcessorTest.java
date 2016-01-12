@@ -21,6 +21,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 import java.util.concurrent.Callable;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
@@ -33,7 +34,6 @@ import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -101,7 +101,7 @@ public class ExceptionProcessorTest {
   public void testWithSwallow() throws Exception {
     final RuntimeException exception = new RuntimeException();
 
-    JobInput jobInput = Jobs.newInput().withExceptionHandling(ExceptionHandler.class, true);
+    JobInput jobInput = Jobs.newInput().withExceptionHandling(BEANS.get(ExceptionHandler.class), true);
 
     CallableChain<String> chain = new CallableChain<>();
     chain.add(new ExceptionProcessor<String>(jobInput));
@@ -160,37 +160,30 @@ public class ExceptionProcessorTest {
 
   @Test
   public void testWithCustomExceptionHandler() throws Exception {
-    IBean<Object> testExceptionHandlerBean = Platform.get().getBeanManager().registerBean(new BeanMetaData(TestExceptionHandler.class).withOrder(Long.MAX_VALUE));
-    try {
-      final RuntimeException exception = new RuntimeException();
+    final RuntimeException exception = new RuntimeException();
 
-      JobInput jobInput = Jobs.newInput().withExceptionHandling(TestExceptionHandler.class, true);
+    final AtomicReference<Throwable> error = new AtomicReference<>();
 
-      CallableChain<String> chain = new CallableChain<>();
-      chain.add(new ExceptionProcessor<String>(jobInput));
-      chain.call(new Callable<String>() {
+    JobInput jobInput = Jobs.newInput()
+        .withExceptionHandling(new ExceptionHandler() {
 
-        @Override
-        public String call() throws Exception {
-          throw exception;
-        }
-      });
-      assertSame(exception, BEANS.get(TestExceptionHandler.class).m_throwable);
-      verify(m_exceptionHandler, never()).handle(eq(exception));
-    }
-    finally {
-      Platform.get().getBeanManager().unregisterBean(testExceptionHandlerBean);
-    }
-  }
+          @Override
+          public void handle(Throwable t) {
+            error.set(t);
+          }
 
-  @Ignore
-  public static class TestExceptionHandler extends ExceptionHandler {
+        }, true);
 
-    private Throwable m_throwable;
+    CallableChain<String> chain = new CallableChain<>();
+    chain.add(new ExceptionProcessor<String>(jobInput));
+    chain.call(new Callable<String>() {
 
-    @Override
-    public void handle(Throwable t) {
-      m_throwable = t;
-    }
+      @Override
+      public String call() throws Exception {
+        throw exception;
+      }
+    });
+    assertSame(exception, error.get());
+    verify(m_exceptionHandler, never()).handle(eq(exception));
   }
 }
