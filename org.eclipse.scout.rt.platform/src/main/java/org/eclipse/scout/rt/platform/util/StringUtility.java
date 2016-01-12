@@ -19,6 +19,7 @@ import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.text.Collator;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
@@ -37,6 +38,9 @@ import org.eclipse.scout.rt.platform.nls.NlsLocale;
 public final class StringUtility {
 
   public static final Pattern PATTERN_TRIM_NEWLINES = Pattern.compile("^[\r\n]*(.*?)[\r\n]*$", Pattern.DOTALL);
+
+  public static final Comparator<String> ALPHANUMERIC_COMPARATOR = new AlphanumericComparator(false);
+  public static final Comparator<String> ALPHANUMERIC_COMPARATOR_IGNORE_CASE = new AlphanumericComparator(true);
 
   private static final String[] EMPTY_ARRAY = new String[0];
 

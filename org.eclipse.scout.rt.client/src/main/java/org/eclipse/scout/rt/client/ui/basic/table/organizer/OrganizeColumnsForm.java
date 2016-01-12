@@ -319,6 +319,11 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
               }
 
               @Override
+              public int compareTableRows(ITableRow r1, ITableRow r2) {
+                return StringUtility.ALPHANUMERIC_COMPARATOR.compare(getValue(r1), getValue(r2));
+              }
+
+              @Override
               protected IFormField execPrepareEdit(ITableRow row) {
                 IStringField field = (IStringField) super.execPrepareEdit(row);
                 return field;
