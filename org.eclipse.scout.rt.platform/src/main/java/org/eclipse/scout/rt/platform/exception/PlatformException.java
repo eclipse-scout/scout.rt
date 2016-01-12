@@ -17,6 +17,7 @@ import java.util.List;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.slf4j.Logger;
+import org.slf4j.helpers.FormattingTuple;
 import org.slf4j.helpers.MessageFormatter;
 
 /**
@@ -51,7 +52,14 @@ public class PlatformException extends RuntimeException implements Serializable 
    *          as the execption's cause if of type {@link Throwable} and not referenced in the message.
    */
   public PlatformException(final String message, final Object... args) {
-    super(MessageFormatter.arrayFormat(message, args).getMessage(), MessageFormatter.arrayFormat(message, args).getThrowable());
+    this(MessageFormatter.arrayFormat(message, args));
+  }
+
+  /**
+   * Creates a {@link PlatformException} with the given SLF4j format.
+   */
+  protected PlatformException(final FormattingTuple format) {
+    super(format.getMessage(), format.getThrowable());
   }
 
   /**
@@ -126,7 +134,7 @@ public class PlatformException extends RuntimeException implements Serializable 
     final String msg = extractMessageText();
     final String formattedMessage = StringUtility.hasText(msg) ? msg : "<empty>";
 
-    String contextInfos = StringUtility.join(", ", getAdditionalContextInfos(), StringUtility.join(", ", getContextInfos()));
+    final String contextInfos = StringUtility.join(", ", getAdditionalContextInfos(), StringUtility.join(", ", getContextInfos()));
     if (StringUtility.isNullOrEmpty(contextInfos)) {
       return formattedMessage;
     }
