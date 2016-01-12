@@ -113,9 +113,7 @@ public class RunContext implements IAdaptable {
    *           if the callable throws an exception, and is translated by the given {@link IExceptionTranslator}.
    */
   public <RESULT, EXCEPTION extends Throwable> RESULT call(final Callable<RESULT> callable, final Class<? extends IExceptionTranslator<EXCEPTION>> exceptionTranslator) throws EXCEPTION {
-    final ThreadInterrupter threadInterrupter = new ThreadInterrupter(Thread.currentThread());
-
-    m_runMonitor.registerCancellable(threadInterrupter);
+    final ThreadInterrupter threadInterrupter = new ThreadInterrupter(Thread.currentThread(), m_runMonitor);
     try {
       final CallableChain<RESULT> callableChain = new CallableChain<>();
       interceptCallableChain(callableChain);
@@ -125,7 +123,7 @@ public class RunContext implements IAdaptable {
       throw BEANS.get(exceptionTranslator).translate(t);
     }
     finally {
-      m_runMonitor.unregisterCancellable(threadInterrupter);
+      threadInterrupter.destroy();
     }
   }
 
@@ -392,15 +390,19 @@ public class RunContext implements IAdaptable {
   }
 
   /**
-   * Interrupts the associated thread upon a hard cancellation.
+   * Interrupts the associated thread upon a hard cancellation of the given {@link RunMonitor}.
    */
   private static class ThreadInterrupter implements ICancellable {
 
+    private final RunMonitor m_monitor;
     private final AtomicBoolean m_cancelled = new AtomicBoolean();
-    private final Thread m_thread;
 
-    public ThreadInterrupter(final Thread thread) {
+    private volatile Thread m_thread;
+
+    public ThreadInterrupter(final Thread thread, final RunMonitor monitor) {
       m_thread = thread;
+      m_monitor = monitor;
+      m_monitor.registerCancellable(this);
     }
 
     @Override
@@ -415,10 +417,26 @@ public class RunContext implements IAdaptable {
       }
 
       if (interruptIfRunning) {
-        m_thread.interrupt();
+        synchronized (this) {
+          // Interrupt in synchronized block to ensure the thread still to be associated upon interruption.
+          if (m_thread != null) {
+            m_thread.interrupt();
+          }
+        }
       }
 
       return true;
+    }
+
+    /**
+     * Invoke to no longer interrupt the associated thread upon a hard cancellation of the monitor.
+     */
+    public synchronized void destroy() {
+      m_monitor.unregisterCancellable(this);
+
+      synchronized (this) {
+        m_thread = null;
+      }
     }
   }
 }
