@@ -138,6 +138,55 @@
     }
   }
 
+  .status {
+    &::before  {
+      #scout.font-icon();
+      font-size: 16px;
+    }
+  }
+
+  .tooltip-status {
+    visibility: visible;
+    cursor: pointer;
+
+    &::before  {
+      content: @icon-info;
+      color: @icon-light-color;
+    }
+
+    &:hover::before {
+      color: @icon-color;
+    }
+  }
+
+  .menu-status {
+    visibility: visible;
+    cursor: pointer;
+
+    &::before {
+      content: @icon-ellipsis-v;
+      color: @icon-light-color;
+    }
+
+    &:hover::before {
+      color: @icon-color;
+    }
+  }
+
+  .error-status {
+    visibility: visible;
+    cursor: pointer;
+
+    &::before  {
+      content: @icon-error;
+      color: @error-color;
+    }
+
+    &:hover::before {
+      color: @palette-red-4;
+    }
+  }
+
   .user-select(@mode) {
     -webkit-user-select: @mode;
     -moz-user-select: @mode;

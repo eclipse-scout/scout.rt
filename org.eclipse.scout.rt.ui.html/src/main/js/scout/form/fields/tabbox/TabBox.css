@@ -20,11 +20,13 @@
 
   & > .tab-item {
     position: relative;
+    display: inline-block;
+    vertical-align: middle;
     #scout.font-text-normal(@font-weight-bold);
     color: @title-color;
     border: none;
     background-color: transparent;
-    padding: @group-title-padding-y @tabbox-padding-x;
+    padding: 0 @tabbox-padding-x;
     border-bottom: solid @tabbox-border-width transparent;
     cursor: pointer;
 
@@ -50,8 +52,37 @@
       content: @icon-angle-right;
       color: @active-color;
       position: absolute;
+      top: @group-title-padding-y;
       left: @tabbox-padding-x - @tabbox-focus-arrow-width;
       width: @tabbox-focus-arrow-width;
+      text-align: center;
+    }
+
+    & > .label {
+      padding: @group-title-padding-y 0;
+      display: inline-block;
+      vertical-align: middle;
+    }
+
+    & > .status {
+      margin-left: @field-status-margin-left;
+      display: inline-block;
+      vertical-align: middle;
+
+      #scout.status();
+    }
+
+    &.has-tooltip,
+    &.has-error {
+      padding-right: @field-status-margin-left;
+    }
+
+    &.has-tooltip > .status {
+      #scout.tooltip-status();
+    }
+
+    &.has-error > .status {
+      #scout.error-status();
     }
   }
 

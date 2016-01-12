@@ -62,15 +62,13 @@ scout.GroupBox.prototype._render = function($parent) {
   var htmlBody, i,
     env = scout.HtmlEnvironment;
 
-  this.addContainer($parent, this.mainBox ? 'root-group-box' : 'group-box', new scout.GroupBoxLayout(this));
+  this.addContainer($parent, this.mainBox ? 'root-group-box' : 'group-box', this._createLayout());
   if (this.mainBox) {
     this.htmlComp.layoutData = null;
   }
 
-  this.$label = $parent.makeSpan().html(this.label);
-  this._$groupBoxTitle = this.$container
-    .appendDiv('group-box-title')
-    .append(this.$label);
+  this._$groupBoxTitle = this.$container.appendDiv('group-box-title');
+  this.addLabel();
   this.addStatus();
   if (this.menuBar.position === 'top') {
     this.menuBar.render(this.$container);
@@ -106,6 +104,21 @@ scout.GroupBox.prototype._renderProperties = function() {
   this._renderBorderVisible(this.borderVisible);
   this._renderExpandable(this.expandable);
   this._renderExpanded(this.expanded);
+};
+
+scout.GroupBox.prototype._createLayout = function() {
+  return new scout.GroupBoxLayout(this);
+};
+
+scout.GroupBox.prototype.addLabel = function() {
+  if (this.$label) {
+    return;
+  }
+  this.$label = this._$groupBoxTitle.appendSpan();
+};
+
+scout.GroupBox.prototype._renderLabel = function() {
+  this.$label.textOrNbsp(this.label);
 };
 
 scout.GroupBox.prototype._remove = function() {

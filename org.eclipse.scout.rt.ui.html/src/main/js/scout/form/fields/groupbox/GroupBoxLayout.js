@@ -19,9 +19,9 @@ scout.GroupBoxLayout = function(groupBox) {
 scout.inherits(scout.GroupBoxLayout, scout.AbstractLayout);
 
 scout.GroupBoxLayout.prototype.layout = function($container) {
-  var titleMarginX, menuBarSize, gbBodySize, titleInnerHeight, containerPadding, top, right,
+  var titleMarginX, menuBarSize, gbBodySize,
     statusWidth = 0,
-    htmlContainer = scout.HtmlComponent.get($container),
+    htmlContainer = this._groupBox.htmlComp,
     htmlGbBody = this._htmlGbBody(),
     htmlMenuBar = this._htmlMenuBar(),
     $groupBoxTitle = this._groupBox._$groupBoxTitle,
@@ -29,29 +29,13 @@ scout.GroupBoxLayout.prototype.layout = function($container) {
     containerSize = htmlContainer.getAvailableSize()
     .subtract(htmlContainer.getInsets());
 
-  containerPadding = htmlContainer.getInsets({
-    includeBorder: false
-  });
-  top = containerPadding.top;
-  right = containerPadding.right;
-
-  if ($status.isVisible()) {
-    titleInnerHeight = $groupBoxTitle.innerHeight();
-    $status.cssWidth(this._statusWidth)
-      .cssTop(top)
-      .cssRight(right)
-      .cssHeight(titleInnerHeight)
-      .cssLineHeight(titleInnerHeight)
-      .cssMarginTop($groupBoxTitle.cssMarginTop());
+  if ($status && $status.isVisible()) {
+    this._layoutStatus();
     statusWidth = $status.outerWidth(true);
   }
 
   if (htmlMenuBar) {
-    menuBarSize = scout.MenuBarLayout.size(htmlMenuBar, containerSize);
-    if (!this._groupBox.mainBox) {
-      // adjust size of menubar as well if it is in a regular group box
-      menuBarSize.width -= statusWidth;
-    }
+    menuBarSize = this._menuBarSize(htmlMenuBar, containerSize, statusWidth);
     htmlMenuBar.setSize(menuBarSize);
   } else {
     menuBarSize = new scout.Dimension(0, 0);
@@ -90,8 +74,27 @@ scout.GroupBoxLayout.prototype.layout = function($container) {
   }
 };
 
+scout.GroupBoxLayout.prototype._layoutStatus = function() {
+  var htmlContainer = this._groupBox.htmlComp,
+    containerPadding = htmlContainer.getInsets({
+      includeBorder: false
+    }),
+    top = containerPadding.top,
+    right = containerPadding.right,
+    $groupBoxTitle = this._groupBox._$groupBoxTitle,
+    titleInnerHeight = $groupBoxTitle.innerHeight(),
+    $status = this._groupBox.$status;
+
+  $status.cssWidth(this._statusWidth)
+    .cssTop(top)
+    .cssRight(right)
+    .cssHeight(titleInnerHeight)
+    .cssLineHeight(titleInnerHeight)
+    .cssMarginTop($groupBoxTitle.cssMarginTop());
+};
+
 scout.GroupBoxLayout.prototype.preferredLayoutSize = function($container) {
-  var htmlContainer = scout.HtmlComponent.get($container),
+  var htmlContainer = this._groupBox.htmlComp,
     htmlGbBody = this._htmlGbBody(),
     htmlMenuBar,
     prefSize;
@@ -123,6 +126,15 @@ scout.GroupBoxLayout.prototype.preferredLayoutSize = function($container) {
 
 scout.GroupBoxLayout.prototype._titleHeight = function() {
   return scout.graphics.prefSize(this._groupBox._$groupBoxTitle, true).height;
+};
+
+scout.GroupBoxLayout.prototype._menuBarSize = function(htmlMenuBar, containerSize, statusWidth) {
+  var menuBarSize = scout.MenuBarLayout.size(htmlMenuBar, containerSize);
+  if (!this._groupBox.mainBox) {
+    // adjust size of menubar as well if it is in a regular group box
+    menuBarSize.width -= statusWidth;
+  }
+  return menuBarSize;
 };
 
 /**

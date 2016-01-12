@@ -299,6 +299,7 @@ __include("scout/form/fields/tabbox/TabBox.js");
 __include("scout/form/fields/tabbox/TabItemMnemonicKeyStroke.js");
 __include("scout/form/fields/tabbox/TabBoxLayout.js");
 __include("scout/form/fields/tabbox/TabItem.js");
+__include("scout/form/fields/tabbox/TabItemLayout.js");
 __include("scout/form/fields/tablefield/TableField.js");
 __include("scout/form/fields/treebox/TreeBox.js");
 __include("scout/form/fields/treebox/TreeBoxLayout.js");

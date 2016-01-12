@@ -16,12 +16,23 @@ scout.TabItem = function() {
 };
 scout.inherits(scout.TabItem, scout.GroupBox);
 
+scout.TabItem.prototype._init = function(model) {
+  scout.TabItem.parent.prototype._init.call(this, model);
+  this._syncStatusVisible(this.statusVisible);
+  this._syncMenusVisible(this.menusVisible);
+};
+
 scout.TabItem.prototype._render = function($parent) {
   scout.TabItem.parent.prototype._render.call(this, $parent);
   // LogicalGridData.isValidateRoot would always return true which is wrong if the data has not been validated yet.
   // Since the tabbox does not use the logical grid layout, noone validates the griddata -> isValidateRoot is never correct.
   // Because there is no logical grid layout, there is no use for the logical grid data.
+  // TODO CGU [6.0] we should consider removing new scout.LogicalGridData(this) from addContainer and set it explicitly in the composites which use a logical grid layout
   this.htmlComp.layoutData = null;
+};
+
+scout.TabItem.prototype._createLayout = function() {
+  return new scout.TabItemLayout(this);
 };
 
 /**
@@ -32,18 +43,30 @@ scout.TabItem.prototype.renderTab = function($parent) {
   if (this._tabRendered) {
     throw new Error('Tab already rendered');
   }
-  this.$tabContainer = $parent.appendElement('<button>', 'tab-item')
+  this.$tabContainer = $parent.appendDiv('tab-item')
     .data('tabItem', this)
     .on('mousedown', this._onTabMouseDown.bind(this));
 
+  this.addLabel();
+  this.addStatus();
   this._renderTabActive();
   this._renderLabel();
+  this._renderMarked();
+  this._renderVisible();
+  this._renderTooltipText();
   this._tabRendered = true;
-  this._updateTab();
 };
 
 scout.TabItem.prototype._onTabMouseDown = function(event) {
   this.parent._selectTab(this);
+};
+
+scout.TabItem.prototype._onStatusMousedown = function(event) {
+  scout.TabItem.parent.prototype._onStatusMousedown.call(this, event);
+  // Prevent switching tabs when status gets clicked
+  event.stopPropagation();
+  // Prevent focusing the tab
+  event.preventDefault();
 };
 
 scout.TabItem.prototype.focusTab = function() {
@@ -63,7 +86,7 @@ scout.TabItem.prototype.setTabActive = function(active) {
 scout.TabItem.prototype._renderTabActive = function() {
   this.$tabContainer.select(this._tabActive);
   if (this._tabActive) {
-    this.$tabContainer.removeAttr('tabindex');
+    this.$tabContainer.setTabbable(true);
   } else {
     this.$tabContainer.attr('tabindex', -1);
   }
@@ -78,56 +101,92 @@ scout.TabItem.prototype.removeTab = function() {
   if (this._tabRendered) {
     this.$tabContainer.remove();
     this.$tabContainer = null;
+    this._removeStatus();
+    this._removeLabel();
     this._tabRendered = false;
   }
 };
 
 scout.TabItem.prototype._syncMarked = function(marked) {
   this.marked = marked;
-  // Special case: If the group box part of the TabItem is NOT (yet) rendered, but the
-  // tabButton IS, render the properties that affect the tab button.
-  if (!this.rendered && this._tabRendered) {
-    this._updateTab();
+  // Marked affects the tab item -> it needs to be rendered even if groupox is not
+  if (this._tabRendered) {
+    this._renderMarked();
+    return false;
   }
 };
 
 scout.TabItem.prototype._renderMarked = function(marked) {
-  this._updateTab();
+  this.$tabContainer.toggleClass('marked', this.marked);
 };
 
 scout.TabItem.prototype._syncVisible = function(visible) {
   this.visible = visible;
-  // Special case: If the group box part of the TabItem is NOT (yet) rendered, but the
-  // tabButton IS, render the properties that affect the tab button.
-  if (!this.rendered && this._tabRendered) {
-    this._updateTab();
+  // Visible affects the tab item -> it needs to be rendered even if groupox is not
+  if (this._tabRendered) {
+    this._renderVisible();
+    return false;
   }
 };
 
 scout.TabItem.prototype._renderVisible = function(visible) {
-  scout.TabItem.parent.prototype._renderVisible.call(this, visible);
-  this._updateTab();
+  // Call super if it is rendered or it is rendering
+  if (this.$container) {
+    scout.TabItem.parent.prototype._renderVisible.call(this, visible);
+  }
+  this.$tabContainer.setVisible(this.visible);
 };
 
 scout.TabItem.prototype._syncLabel = function(label) {
   this.label = label;
-  // TODO [5.2] bsh, awe, cgu: Find a better solution for this!
-  // Special case: If the group box part of the TabItem is NOT (yet) rendered, but the
-  // tabButton IS, render the properties that affect the tab button.
-  if (!this.rendered && this._tabRendered) {
-    this._updateTab();
+  // Label affects the tab item -> it needs to be rendered even if groupox is not
+  if (this._tabRendered) {
+    this._renderLabel();
+    return false;
   }
 };
 
 scout.TabItem.prototype._renderLabel = function() {
-  scout.TabItem.parent.prototype._renderLabel.call(this);
-  this._updateTab();
+  this.$label.textOrNbsp(scout.strings.removeAmpersand(this.label));
 };
 
-scout.TabItem.prototype._updateTab = function() {
-  this.$tabContainer.toggleClass('marked', this.marked);
-  this.$tabContainer.setVisible(this.visible);
-  this.$tabContainer.textOrNbsp(scout.strings.removeAmpersand(this.label));
+scout.TabItem.prototype.addLabel = function() {
+  if (this.$label) {
+    return;
+  }
+  this.$label = this.$tabContainer.appendSpan('label');
+};
+
+scout.TabItem.prototype.addStatus = function() {
+  if (this.$status) {
+    return;
+  }
+  this.$status = this.$tabContainer
+    .appendSpan('status')
+    .on('mousedown', this._onStatusMousedown.bind(this));
+};
+
+scout.TabItem.prototype._syncStatusVisible = function() {
+  // Always invisible to not waste space, icon will be visible if status needs to be shown
+  this.statusVisible = false;
+};
+
+scout.TabItem.prototype._renderTooltipText = function() {
+  if (this.$container) {
+    scout.TabItem.parent.prototype._renderTooltipText.call(this);
+  } else {
+    // Normally done by renderTooltipText, but since it is not called -> call explicitly
+    this._updateStatusVisible();
+  }
+  var hasTooltipText = scout.strings.hasText(this.tooltipText);
+  this.$tabContainer.toggleClass('has-tooltip', hasTooltipText);
+};
+
+scout.TabItem.prototype._syncMenusVisible = function() {
+  // Always invisible because menus are displayed in menu bar and not with status icon
+  // Actually not needed for displaying purpose (at the moment) because it is only set for value fields,
+  // but if there is a tooltip as well, _onStatusMousedown needs to know whether a click should show menus or the tooltip
+  this.menusVisible = false;
 };
 
 /**

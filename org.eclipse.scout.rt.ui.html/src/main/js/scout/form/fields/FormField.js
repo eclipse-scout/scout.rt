@@ -113,7 +113,8 @@ scout.FormField.prototype._renderProperties = function() {
 scout.FormField.prototype._remove = function() {
   scout.FormField.parent.prototype._remove.call(this);
   this.removeField();
-  this._hideStatusMessage();
+  this._removeStatus();
+  this._removeLabel();
 };
 
 scout.FormField.prototype._renderMandatory = function() {
@@ -121,7 +122,7 @@ scout.FormField.prototype._renderMandatory = function() {
 };
 
 scout.FormField.prototype._renderErrorStatus = function() {
-  var hasError = !!(this.errorStatus);
+  var hasError = this._hasError();
 
   this.$container.toggleClass('has-error', hasError);
   if (this.$field) {
@@ -350,6 +351,10 @@ scout.FormField.prototype.setErrorStatus = function(errorStatus) {
   }
 };
 
+scout.FormField.prototype._hasError = function() {
+  return !!(this.errorStatus);
+};
+
 scout.FormField.prototype.setMenus = function(menus) {
   this._setProperty('menus', menus);
   if (this.rendered) {
@@ -365,7 +370,7 @@ scout.FormField.prototype.setMenusVisible = function(menusVisible) {
 };
 
 scout.FormField.prototype._onStatusMousedown = function(event) {
-  if (this._hasMenus()) {
+  if (this.menusVisible && this._hasMenus()) {
     var func = function func(event) {
       var menus = this._getCurrentMenus();
       // showing menus is more important than showing tooltips
@@ -392,7 +397,7 @@ scout.FormField.prototype._onStatusMousedown = function(event) {
       this._hideStatusMessage();
     } else {
       var opts = {};
-      if (this.$container.hasClass('has-error')) {
+      if (this._hasError()) {
         opts.autoRemove = false;
       }
       this._showStatusMessage(opts);
@@ -474,6 +479,14 @@ scout.FormField.prototype.addLabel = function() {
   });
 };
 
+scout.FormField.prototype._removeLabel = function() {
+  if (!this.$label) {
+    return;
+  }
+  this.$label.remove();
+  this.$label = null;
+};
+
 /**
  * Appends the given field to the this.$container and sets the property this.$field.
  * The $field is used as $fieldContainer as long as you don't explicitly call addFieldContainer before calling addField.
@@ -495,20 +508,38 @@ scout.FormField.prototype.addFieldContainer = function($fieldContainer) {
 };
 
 /**
- * Sets the properties this.$field, this.$fieldContainer to null.
+ * Removes this.$field and this.$fieldContainer and sets the properties to null.
  */
 scout.FormField.prototype.removeField = function() {
-  this.$field = null;
-  this.$fieldContainer = null;
+  if (this.$field) {
+    this.$field.remove();
+    this.$field = null;
+  }
+  if (this.$fieldContainer) {
+    this.$fieldContainer.remove();
+    this.$fieldContainer = null;
+  }
 };
 
 /**
  * Appends a SPAN element for form-field status to this.$container and sets the this.$status property.
  */
 scout.FormField.prototype.addStatus = function() {
+  if (this.$status) {
+    return;
+  }
   this.$status = this.$container
     .appendSpan('status')
     .on('mousedown', this._onStatusMousedown.bind(this));
+};
+
+scout.FormField.prototype._removeStatus = function() {
+  this._hideStatusMessage();
+  if (!this.$status) {
+    return;
+  }
+  this.$status.remove();
+  this.$status = null;
 };
 
 /**
