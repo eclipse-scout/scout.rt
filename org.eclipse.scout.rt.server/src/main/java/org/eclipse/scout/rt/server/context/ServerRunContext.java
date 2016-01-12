@@ -67,7 +67,7 @@ public class ServerRunContext extends RunContext {
   protected IServerSession m_session;
   protected UserAgent m_userAgent;
   protected String m_clientNodeId;
-  protected ClientNotificationCollector m_transactionalClientNotificationCollector;
+  protected ClientNotificationCollector m_clientNotificationCollector;
   protected TransactionScope m_transactionScope;
   protected ITransaction m_transaction;
 
@@ -81,7 +81,7 @@ public class ServerRunContext extends RunContext {
         .add(new DiagnosticContextValueProcessor(BEANS.get(ScoutSessionIdContextValueProvider.class)))
         .add(new ThreadLocalProcessor<>(UserAgent.CURRENT, m_userAgent))
         .add(new ThreadLocalProcessor<>(IClientNodeId.CURRENT, m_clientNodeId))
-        .add(new ThreadLocalProcessor<>(ClientNotificationCollector.CURRENT, m_transactionalClientNotificationCollector))
+        .add(new ThreadLocalProcessor<>(ClientNotificationCollector.CURRENT, m_clientNotificationCollector))
         .add(new ThreadLocalProcessor<>(ScoutTexts.CURRENT, (m_session != null ? m_session.getTexts() : ScoutTexts.CURRENT.get())))
         .add(new TransactionProcessor(getTransaction(), m_transactionScope));
   }
@@ -182,8 +182,8 @@ public class ServerRunContext extends RunContext {
   /**
    * @see #withClientNotificationCollector(ClientNotificationCollector)
    */
-  public ClientNotificationCollector getTransactionalClientNotificationCollector() {
-    return m_transactionalClientNotificationCollector;
+  public ClientNotificationCollector getClientNotificationCollector() {
+    return m_clientNotificationCollector;
   }
 
   /**
@@ -198,7 +198,7 @@ public class ServerRunContext extends RunContext {
    * Typically, that collector is set by {@link ServiceTunnelServlet} for the processing of a service request.
    */
   public ServerRunContext withClientNotificationCollector(final ClientNotificationCollector collector) {
-    m_transactionalClientNotificationCollector = collector;
+    m_clientNotificationCollector = collector;
     return this;
   }
 
@@ -251,7 +251,7 @@ public class ServerRunContext extends RunContext {
     builder.ref("session", getSession());
     builder.attr("userAgent", getUserAgent());
     builder.attr("clientNodeId", getClientNodeId());
-    builder.ref("transactionalClientNotificationCollector", getTransactionalClientNotificationCollector());
+    builder.ref("transactionalClientNotificationCollector", getClientNotificationCollector());
     builder.ref("transaction", getTransaction());
     builder.attr("transactionScope", getTransactionScope());
     return builder.toString();
@@ -266,7 +266,7 @@ public class ServerRunContext extends RunContext {
     super.copyValues(originRunContext);
     m_session = originRunContext.m_session;
     m_userAgent = originRunContext.m_userAgent;
-    m_transactionalClientNotificationCollector = originRunContext.m_transactionalClientNotificationCollector;
+    m_clientNotificationCollector = originRunContext.m_clientNotificationCollector;
     m_clientNodeId = originRunContext.m_clientNodeId;
     m_transactionScope = originRunContext.m_transactionScope;
     m_transaction = originRunContext.m_transaction;
@@ -277,7 +277,7 @@ public class ServerRunContext extends RunContext {
     super.fillCurrentValues();
     m_identifiers.push(SERVER_RUN_CONTEXT_IDENTIFIER);
     m_userAgent = UserAgent.CURRENT.get();
-    m_transactionalClientNotificationCollector = ClientNotificationCollector.CURRENT.get();
+    m_clientNotificationCollector = ClientNotificationCollector.CURRENT.get();
     m_clientNodeId = IClientNodeId.CURRENT.get();
     m_transactionScope = TransactionScope.REQUIRES_NEW;
     m_transaction = ITransaction.CURRENT.get();
@@ -289,7 +289,7 @@ public class ServerRunContext extends RunContext {
     super.fillEmptyValues();
     m_identifiers.push(SERVER_RUN_CONTEXT_IDENTIFIER);
     m_userAgent = null;
-    m_transactionalClientNotificationCollector = new ClientNotificationCollector();
+    m_clientNotificationCollector = new ClientNotificationCollector();
     m_clientNodeId = null;
     m_transactionScope = TransactionScope.REQUIRES_NEW;
     m_transaction = null;
