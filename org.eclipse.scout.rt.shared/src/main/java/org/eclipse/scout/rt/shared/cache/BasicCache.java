@@ -22,7 +22,6 @@ import java.util.concurrent.ConcurrentMap;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.PlatformExceptionTranslator;
-import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
@@ -94,9 +93,9 @@ public class BasicCache<K, V> implements ICache<K, V> {
         //   throw BEANS.get(PlatformExceptionTranslator.class).translate(e)
         //       .withContextInfo("key", key);
         // }
-    	// 
-    	// Original solution: BEANS.get(ExceptionHandler.class).handle(new ProcessingException("Failed resolving key: {}", key, e));
-    	// Problem: Interruption is visualized as an error. 
+        //
+        // Original solution: BEANS.get(ExceptionHandler.class).handle(new ProcessingException("Failed resolving key: {}", key, e));
+        // Problem: Interruption is visualized as an error.
         //
         BEANS.get(ExceptionHandler.class).handle(BEANS.get(PlatformExceptionTranslator.class).translate(e)
             .withContextInfo("key", key));
@@ -138,7 +137,20 @@ public class BasicCache<K, V> implements ICache<K, V> {
       resolvedValues = m_resolver.resolveAll(keys);
     }
     catch (Exception e) {
-      BEANS.get(ExceptionHandler.class).handle(new ProcessingException("Failed resolving keys: {}", new Object[]{CollectionUtility.format(keys), e}));
+      // TODO [5.2] jgu: - is it possible to change the API to throw a RuntimeException instead of checked Exception?
+      //                 - do we really have to handle the exception here?
+      // In my opinion, the following would be a better solution:
+      //
+      // catch (RuntimeException e) {
+      //   throw BEANS.get(PlatformExceptionTranslator.class).translate(e)
+      //       .withContextInfo("key", key);
+      // }
+      //
+      // Original solution: BEANS.get(ExceptionHandler.class).handle(new ProcessingException("Failed resolving keys: {}", new Object[]{CollectionUtility.format(keys), e}));
+      // Problem: Interruption is visualized as an error.
+      //
+      BEANS.get(ExceptionHandler.class).handle(BEANS.get(PlatformExceptionTranslator.class).translate(e)
+          .withContextInfo("keys", keys));
       return result;
     }
     for (Iterator<Entry<K, V>> iterator = resolvedValues.entrySet().iterator(); iterator.hasNext();) {
