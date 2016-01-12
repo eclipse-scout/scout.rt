@@ -40,7 +40,7 @@ scout.Button.prototype._init = function(model) {
 };
 
 /**
- * @override ModelAdapter
+ * @override ModelAdapter.js
  */
 scout.Button.prototype._initKeyStrokeContext = function(keyStrokeContext) {
   scout.Button.parent.prototype._initKeyStrokeContext.call(this, keyStrokeContext);

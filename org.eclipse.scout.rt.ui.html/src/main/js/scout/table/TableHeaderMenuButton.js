@@ -8,6 +8,8 @@ scout.TableHeaderMenuButton = function() {
   this.selected = false;
   this.togglable = false;
   this.icon;
+
+  this._addKeyStrokeContextSupport();
 };
 scout.inherits(scout.TableHeaderMenuButton, scout.Widget);
 
@@ -18,11 +20,21 @@ scout.TableHeaderMenuButton.prototype._init = function(options) {
   this.visible = scout.nvl(options.visible, true);
 };
 
+/**
+ * @override ModelAdapter.js
+ */
+scout.TableHeaderMenuButton.prototype._initKeyStrokeContext = function(keyStrokeContext) {
+  scout.TableHeaderMenuButton.parent.prototype._initKeyStrokeContext.call(this, keyStrokeContext);
+
+  keyStrokeContext.registerKeyStroke([new scout.TableHeaderMenuButtonKeyStroke(this)]);
+};
+
 scout.TableHeaderMenuButton.prototype._render = function($parent) {
   this.$container = $parent.appendDiv('table-header-menu-command')
     .on('click', this._onClick.bind(this))
     .on('mouseenter click', this._onMouseOver.bind(this))
-    .on('mouseleave', this._onMouseOut.bind(this));
+    .on('mouseleave', this._onMouseOut.bind(this))
+    .setTabbable(true);
   if (this.cssClass) {
     this.$container.addClass(this.cssClass);
   }

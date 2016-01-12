@@ -101,6 +101,16 @@
   cursor: pointer;
   text-align: center;
 
+  &:focus {
+    border-color: @focus-color;
+    outline: none;
+
+    &::before,
+    &::after {
+      color: @focus-color;
+    }
+  }
+
   &:last-of-type {
     margin-right: 0;
   }
@@ -129,6 +139,15 @@
     &::before,
     &::after {
       color: @table-header-menu-cmd-active-color;
+    }
+
+    &:focus {
+      background-color: @control-background-color;
+
+      &::before,
+      &::after {
+        color: @focus-color;
+      }
     }
   }
 

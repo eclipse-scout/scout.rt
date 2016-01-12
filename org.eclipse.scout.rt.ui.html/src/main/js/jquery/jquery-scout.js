@@ -499,11 +499,7 @@
   };
 
   $.fn.setTabbable = function(tabbable) {
-    var tabIndex = 0;
-    if (!tabbable) {
-      tabIndex = null;
-    }
-    this.attr('tabIndex', tabIndex);
+    return this.attr('tabIndex', tabbable ? 0 : null);
   };
 
   $.fn.icon = function(iconId) {
