@@ -81,13 +81,21 @@ public final class DateUtility {
     return new SimpleDateFormat(pattern, loc).format(d);
   }
 
+  /**
+   * Creates a {@link SimpleDateFormat} to parse the first argument according to the provided pattern. Disables lenient
+   * behavior of {@link SimpleDateFormat}.
+   */
   public static Date parse(String s, String pattern) {
     if (s == null) {
       return null;
     }
     try {
       Locale loc = NlsLocale.get();
-      return new SimpleDateFormat(pattern, loc).parse(s);
+      SimpleDateFormat df = new SimpleDateFormat(pattern, loc);
+      // default for SimpleDateFormat is a lenient behavior, e.g. 13.13.13, 952.1238.2010, 12.01.191;ABC would also be valid dates
+      // disable lenient behavior, could lead to unexpected results
+      df.setLenient(false);
+      return df.parse(s);
     }
     catch (ParseException e) {
       throw new IllegalArgumentException("parse(\"" + s + "\",\"" + pattern + "\") failed", e);
@@ -105,13 +113,10 @@ public final class DateUtility {
    */
   public static boolean isValidDate(String s, String pattern) {
     try {
-      Locale loc = NlsLocale.get();
-      SimpleDateFormat df = new SimpleDateFormat(pattern, loc);
-      df.setLenient(false);
-      df.parse(s);
+      parse(s, pattern);
       return true;
     }
-    catch (ParseException e) {
+    catch (IllegalArgumentException e) {
       return false;
     }
   }

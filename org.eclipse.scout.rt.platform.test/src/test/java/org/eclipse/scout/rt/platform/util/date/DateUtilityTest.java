@@ -857,6 +857,12 @@ public class DateUtilityTest {
     assertCalendarEquals("2015-01-01 23:00:00.000", cal);
   }
 
+  @Test(expected = IllegalArgumentException.class)
+  public void testLenientBehavior() {
+    assertDateEquals("2016-02-29 00:00:00.000", dateOf("2016-02-29 00:00:00.000")); // valid, does not fail
+    assertDateEquals("2015-02-29 00:00:00.000", dateOf("2015-02-29 00:00:00.000")); // fails with exception
+  }
+
   public static void assertDateEquals(String expectedDate, Date date) {
     assertDateEquals(null, expectedDate, date);
   }
