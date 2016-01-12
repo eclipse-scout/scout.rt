@@ -12,10 +12,8 @@ package org.eclipse.scout.rt.server;
 
 import java.io.IOException;
 import java.io.InterruptedIOException;
-import java.lang.reflect.Method;
 import java.net.SocketException;
 import java.security.AccessController;
-import java.util.ArrayList;
 import java.util.Locale;
 import java.util.concurrent.Callable;
 
@@ -45,12 +43,10 @@ import org.eclipse.scout.rt.server.context.RunMonitorCancelRegistry.IRegistratio
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.server.session.ServerSessionProvider;
-import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
 import org.eclipse.scout.rt.shared.clientnotification.IClientNotificationService;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelContentHandler;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
-import org.eclipse.scout.rt.shared.servicetunnel.ServiceUtility;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -118,13 +114,16 @@ public class ServiceTunnelServlet extends HttpServlet {
             public void run() throws Exception {
               ServiceTunnelRequest serviceRequest = deserializeServiceRequest();
               if (isSessionLess(serviceRequest)) {
-                // TODO [5.2] jgu: Use ServiceOperationInvoker; change ServiceOperationInvoker to support this requirement
-                // TODO [5.2] jgu: why not use a ServerRunContext?
                 // TODO [5.2] jgu: consolidate to not have this if-else here, but within ServerRunContext instead
 
                 final IRegistrationHandle registrationHandle = BEANS.get(RunMonitorCancelRegistry.class).register(RunMonitor.CURRENT.get());
                 try {
-                  invokeServiceWithoutSession(serviceRequest);
+                  ServerRunContext serverRunContext = ServerRunContexts.copyCurrent()
+                      .withLocale(serviceRequest.getLocale())
+                      .withUserAgent(UserAgent.createByIdentifier(serviceRequest.getUserAgent()));
+
+                  ServiceTunnelResponse serviceResponse = invokeService(serverRunContext, serviceRequest);
+                  serializeServiceResponse(serviceResponse);
                 }
                 finally {
                   registrationHandle.unregister();
@@ -214,26 +213,6 @@ public class ServiceTunnelServlet extends HttpServlet {
         return BEANS.get(ServiceOperationInvoker.class).invoke(serviceTunnelRequest);
       }
     });
-  }
-
-  /**
-   * Process request without creating a server session
-   */
-  protected void invokeServiceWithoutSession(ServiceTunnelRequest serviceRequest) throws ClassNotFoundException, Exception {
-    // TODO [5.2] jgu: Use ServiceOperationInvoker; change ServiceOperationInvoker to support this requirement
-    ServiceUtility serviceUtility = BEANS.get(ServiceUtility.class);
-
-    Class<?> serviceInterfaceClass = SerializationUtility.getClassLoader().loadClass(serviceRequest.getServiceInterfaceClassName());
-    Method serviceOp = serviceUtility.getServiceOperation(serviceInterfaceClass, serviceRequest.getOperation(), serviceRequest.getParameterTypes());
-    Object service = BEANS.get(serviceInterfaceClass);
-    if (service == null) {
-      throw new SecurityException("service registry does not contain a service of type " + serviceRequest.getServiceInterfaceClassName());
-    }
-    Object data = serviceUtility.invoke(service, serviceOp, serviceRequest.getArgs());
-    Object[] outParameters = serviceUtility.extractHolderArguments(serviceRequest.getArgs());
-    ServiceTunnelResponse serviceResponse = new ServiceTunnelResponse(data, outParameters);
-    serviceResponse.setNotifications(new ArrayList<ClientNotificationMessage>());
-    serializeServiceResponse(serviceResponse);
   }
 
   // === MESSAGE UNMARSHALLING / MARSHALLING ===

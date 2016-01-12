@@ -22,7 +22,9 @@ import static org.mockito.Mockito.when;
 
 import java.util.concurrent.Callable;
 
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.server.admin.inspector.ProcessInspector;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.shared.services.common.ping.IPingService;
@@ -51,6 +53,19 @@ public class ServiceOperationInvokerTest {
     when(m_pingSvc.ping(any(String.class))).thenReturn(m_testData);
     ServiceTunnelResponse res = invokePingService(createRunContextWithSession());
     assertValidResponse(res, m_testData);
+  }
+
+  @Test
+  public void testInvokeInspectedWithSession() {
+    try {
+      BEANS.get(ProcessInspector.class).setEnabled(true);
+      when(m_pingSvc.ping(any(String.class))).thenReturn(m_testData);
+      ServiceTunnelResponse res = invokePingService(createRunContextWithSession());
+      assertValidResponse(res, m_testData);
+    }
+    finally {
+      BEANS.get(ProcessInspector.class).setEnabled(false);
+    }
   }
 
   @Test(expected = ProcessingException.class) //exception is handled with JUnitExceptionHandler
