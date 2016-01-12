@@ -58,8 +58,10 @@ scout.StringField.prototype._render = function($parent) {
         this.$field.off('mousedown', mousedownHandler);
         if (!this.mouseClicked) { // only trigger on tab focus in
           setTimeout(function() {
-            this._renderSelectionStart();
-            this._renderSelectionEnd();
+            if(this.rendered){
+              this._renderSelectionStart();
+              this._renderSelectionEnd();
+            }
           }.bind(this));
         }
         this.mouseClicked = false;
@@ -120,14 +122,13 @@ scout.StringField.prototype._renderMaxLength = function(maxLength0) {
 };
 
 scout.StringField.prototype._renderSelectionStart = function() {
-  // TODO BSH Ask NBU why this check is needed
-  if (this.$field && this.$field[0] && scout.nvl(this.selectionStart, null) !== null) {
+  if (scout.nvl(this.selectionStart, null) !== null) {
     this.$field[0].selectionStart = this.selectionStart;
   }
 };
 
 scout.StringField.prototype._renderSelectionEnd = function() {
-  if (this.$field && this.$field[0] && scout.nvl(this.selectionEnd, null) !== null) {
+  if (scout.nvl(this.selectionEnd, null) !== null) {
     this.$field[0].selectionEnd = this.selectionEnd;
   }
 };
