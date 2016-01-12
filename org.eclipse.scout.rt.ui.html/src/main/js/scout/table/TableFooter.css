@@ -77,7 +77,7 @@
       display: none;
     }
 
-    & > button {
+    & > .tab-item {
       border-top: solid 3px transparent;
       border-bottom: solid 1px transparent !important;
 
