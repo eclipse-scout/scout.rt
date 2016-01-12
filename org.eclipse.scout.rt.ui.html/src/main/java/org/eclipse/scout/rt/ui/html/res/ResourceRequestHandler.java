@@ -82,9 +82,6 @@ public class ResourceRequestHandler extends AbstractUiServletRequestHandler {
       return false;
     }
 
-    BinaryResource binaryResource = resource.getResource();
-    setHttpResponseHeaders(resp, binaryResource);
-
     // cached in browser? -> returns 304 if the resource has not been modified
     // Important: Check is only done if the request still processes the requested resource
     // and hasn't been forwarded to another one (using req.getRequestDispatcher().forward)
@@ -94,6 +91,11 @@ public class ResourceRequestHandler extends AbstractUiServletRequestHandler {
         return true;
       }
     }
+
+    BinaryResource binaryResource = resource.getResource();
+
+    // set the resp headers only if no 304 (according to spec: http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.3.5)
+    setHttpResponseHeaders(resp, binaryResource);
 
     // Apply response interceptors
     resource.applyHttpResponseInterceptors(servlet, req, resp);
