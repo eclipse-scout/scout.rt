@@ -42,15 +42,15 @@ import org.junit.runner.RunWith;
 public class ServiceOperationInvokerTest {
 
   @BeanMock
-  IPingService m_pingSvc;
+  private IPingService m_pingSvc;
+
+  private String m_testData = "hello";
 
   @Test
   public void testInvokeWithSession() {
-    when(m_pingSvc.ping(any(String.class))).thenReturn("hello");
+    when(m_pingSvc.ping(any(String.class))).thenReturn(m_testData);
     ServiceTunnelResponse res = invokePingService(createRunContextWithSession());
-    assertNull(res.getException());
-    assertNotNull(res.getProcessingDuration());
-    assertEquals("hello", res.getData());
+    assertValidResponse(res, m_testData);
   }
 
   @Test(expected = ProcessingException.class) //exception is handled with JUnitExceptionHandler
@@ -58,9 +58,31 @@ public class ServiceOperationInvokerTest {
     String exceptionMessage = "xxx";
     when(m_pingSvc.ping(any(String.class))).thenThrow(new ProcessingException(exceptionMessage));
     ServiceTunnelResponse res = invokePingService(createRunContextWithSession());
+    assertProcessingException(res, exceptionMessage);
+  }
+
+  @Test
+  public void testInvokeWithoutSession() {
+    when(m_pingSvc.ping(any(String.class))).thenReturn(m_testData);
+    ServiceTunnelResponse res = invokePingService(ServerRunContexts.empty());
+    assertValidResponse(res, m_testData);
+  }
+
+  @Test(expected = ProcessingException.class) //exception is handled with JUnitExceptionHandler
+  public void testInvokeInvalidWithoutSession() {
+    String exceptionMessage = "xxx";
+    when(m_pingSvc.ping(any(String.class))).thenThrow(new ProcessingException(exceptionMessage));
+    ServiceTunnelResponse res = invokePingService(ServerRunContexts.empty());
+    assertProcessingException(res, exceptionMessage);
+  }
+
+  /**
+   * Asserts that the response contains an exception without the customMessage information (security)
+   */
+  private void assertProcessingException(ServiceTunnelResponse res, String customMessage) {
     Throwable exception = res.getException();
     assertThat(exception, instanceOf(ProcessingException.class));
-    assertThat(exception.getMessage(), not(containsString(exceptionMessage)));
+    assertThat(exception.getMessage(), not(containsString(customMessage)));
     assertNotNull(res.getProcessingDuration());
   }
 
@@ -79,6 +101,12 @@ public class ServiceOperationInvokerTest {
         return s.invoke(request);
       }
     });
+  }
+
+  private void assertValidResponse(ServiceTunnelResponse res, String data) {
+    assertNull(res.getException());
+    assertNotNull(res.getProcessingDuration());
+    assertEquals(data, res.getData());
   }
 
 }
