@@ -46,6 +46,10 @@ import org.slf4j.LoggerFactory;
 public class ServiceOperationInvoker {
   private static final Logger LOG = LoggerFactory.getLogger(ServiceOperationInvoker.class);
 
+  /**
+   * Invoke the service associated with the {@link ServiceTunnelRequest}. <br>
+   * Must be called within a transaction.
+   */
   public ServiceTunnelResponse invoke(ServiceTunnelRequest serviceReq) {
     long t0 = System.nanoTime();
 
@@ -78,14 +82,14 @@ public class ServiceOperationInvoker {
 
   protected ServiceTunnelResponse invokeInternal(ServiceTunnelRequest serviceReq) throws Throwable {
     IServerSession serverSession = ServerSessionProvider.currentSession();
-    String authenticatedUser = serverSession.getUserId();
     if (LOG.isDebugEnabled()) {
-      LOG.debug("started {}.{} by {} at {}", serviceReq.getServiceInterfaceClassName(), serviceReq.getOperation(), authenticatedUser, new Date());
+      String userId = serverSession != null ? serverSession.getUserId() : "";
+      LOG.debug("started {}.{} by {} at {}", serviceReq.getServiceInterfaceClassName(), serviceReq.getOperation(), userId, new Date());
     }
     CallInspector callInspector = getCallInspector(serviceReq, serverSession);
-    ServiceUtility serviceUtility = BEANS.get(ServiceUtility.class);
     ServiceTunnelResponse serviceRes = null;
     try {
+      ServiceUtility serviceUtility = BEANS.get(ServiceUtility.class);
       Class<?> serviceInterfaceClass = SerializationUtility.getClassLoader().loadClass(serviceReq.getServiceInterfaceClassName());
       Method serviceOp = serviceUtility.getServiceOperation(serviceInterfaceClass, serviceReq.getOperation(), serviceReq.getParameterTypes());
       Object[] args = serviceReq.getArgs();
@@ -93,30 +97,33 @@ public class ServiceOperationInvoker {
 
       Object data = serviceUtility.invoke(service, serviceOp, args);
       Object[] outParameters = serviceUtility.extractHolderArguments(args);
-
       serviceRes = new ServiceTunnelResponse(data, outParameters);
       return serviceRes;
     }
     finally {
-      if (callInspector != null) {
-        try {
-          callInspector.update();
-        }
-        catch (Throwable t) {
-          LOG.warn("Could not update call inspector", t);
-        }
-        try {
-          callInspector.close(serviceRes);
-        }
-        catch (Throwable t) {
-          LOG.warn("Could not close service invocation on call inspector", t);
-        }
-        try {
-          callInspector.getSessionInspector().update();
-        }
-        catch (Throwable t) {
-          LOG.warn("Could not update session inspector", t);
-        }
+      updateInspector(callInspector, serviceRes);
+    }
+  }
+
+  private void updateInspector(CallInspector callInspector, ServiceTunnelResponse serviceRes) {
+    if (callInspector != null) {
+      try {
+        callInspector.update();
+      }
+      catch (Throwable t) {
+        LOG.warn("Could not update call inspector", t);
+      }
+      try {
+        callInspector.close(serviceRes);
+      }
+      catch (Throwable t) {
+        LOG.warn("Could not close service invocation on call inspector", t);
+      }
+      try {
+        callInspector.getSessionInspector().update();
+      }
+      catch (Throwable t) {
+        LOG.warn("Could not update session inspector", t);
       }
     }
   }
@@ -219,9 +226,11 @@ public class ServiceOperationInvoker {
   }
 
   private CallInspector getCallInspector(ServiceTunnelRequest serviceReq, IServerSession serverSession) {
-    SessionInspector sessionInspector = BEANS.get(ProcessInspector.class).getSessionInspector(serverSession, true);
-    if (sessionInspector != null) {
-      return sessionInspector.requestCallInspector(serviceReq);
+    if (serverSession != null) {
+      SessionInspector sessionInspector = BEANS.get(ProcessInspector.class).getSessionInspector(serverSession, true);
+      if (sessionInspector != null) {
+        return sessionInspector.requestCallInspector(serviceReq);
+      }
     }
     return null;
   }

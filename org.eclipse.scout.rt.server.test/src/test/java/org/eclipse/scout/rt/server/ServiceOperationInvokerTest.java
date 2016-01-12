@@ -55,11 +55,12 @@ public class ServiceOperationInvokerTest {
 
   @Test(expected = ProcessingException.class) //exception is handled with JUnitExceptionHandler
   public void testInvokeInvalidWithSession() {
-    when(m_pingSvc.ping(any(String.class))).thenThrow(new ProcessingException("xxx"));
+    String exceptionMessage = "xxx";
+    when(m_pingSvc.ping(any(String.class))).thenThrow(new ProcessingException(exceptionMessage));
     ServiceTunnelResponse res = invokePingService(createRunContextWithSession());
     Throwable exception = res.getException();
     assertThat(exception, instanceOf(ProcessingException.class));
-    assertThat(exception.getMessage(), not(containsString("xxx")));
+    assertThat(exception.getMessage(), not(containsString(exceptionMessage)));
     assertNotNull(res.getProcessingDuration());
   }
 
