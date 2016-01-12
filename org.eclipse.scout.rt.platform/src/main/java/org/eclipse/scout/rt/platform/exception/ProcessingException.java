@@ -141,6 +141,14 @@ public class ProcessingException extends PlatformException {
     return list.toArray(new StackTraceElement[list.size()]);
   }
 
+  @Override
+  protected String extractMessageText() {
+    if (m_status != null) {
+      return m_status.getMessage();
+    }
+    return super.extractMessageText();
+  }
+
   // ==== Deprecated API which will be removed in 6.1 ==== //
 
   /**

@@ -118,12 +118,12 @@ public class PlatformException extends RuntimeException implements Serializable 
    * Returns the bare message without context messages. This method should be used to show the exception to the user.
    */
   public String getDisplayMessage() {
-    return super.getMessage();
+    return extractMessageText();
   }
 
   @Override
   public String getMessage() {
-    final String msg = super.getMessage();
+    final String msg = extractMessageText();
     final String formattedMessage = StringUtility.hasText(msg) ? msg : "<empty>";
 
     String contextInfos = StringUtility.join(", ", getAdditionalContextInfos(), StringUtility.join(", ", getContextInfos()));
@@ -131,6 +131,14 @@ public class PlatformException extends RuntimeException implements Serializable 
       return formattedMessage;
     }
     return String.format("%s [%s]", formattedMessage, contextInfos);
+  }
+
+  /**
+   * @return Extracts the message used to compose the message returned by {@link #getMessage()} and
+   *         {@link #getDisplayMessage()}.
+   */
+  protected String extractMessageText() {
+    return super.getMessage();
   }
 
   /**

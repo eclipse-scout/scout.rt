@@ -105,6 +105,14 @@ public class VetoException extends ProcessingException {
     return this;
   }
 
+  @Override
+  protected String extractMessageText() {
+    if (m_htmlMessage != null) {
+      return m_htmlMessage.toPlainText();
+    }
+    return super.extractMessageText();
+  }
+
   // ==== Deprecated API which will be removed in 6.1 ==== //
 
   /**

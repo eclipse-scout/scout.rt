@@ -119,6 +119,32 @@ public class ProcessingExceptionTest {
     assertUniqueLinesOnStackTrace(pe2);
   }
 
+  @Test
+  public void testGetMessageDefaultConstructor() {
+    ProcessingException processingException = new ProcessingException();
+    assertEquals(new ProcessingStatus("undefined", processingException, 0, IStatus.ERROR), processingException.getStatus());
+    assertEquals("undefined [severity=ERROR]", processingException.getMessage());
+    assertEquals("undefined", processingException.getDisplayMessage());
+  }
+
+  @Test
+  public void testGetMessageDefaultConstructorWithStatus() {
+    ProcessingStatus status = new ProcessingStatus("title", "body", IStatus.ERROR);
+    ProcessingException processingException = new ProcessingException().withStatus(status);
+    assertEquals(status, processingException.getStatus());
+    assertEquals("title: body [severity=ERROR]", processingException.getMessage());
+    assertEquals("title: body", processingException.getDisplayMessage());
+  }
+
+  @Test
+  public void testGetMessageStatusConstructor() {
+    ProcessingStatus status = new ProcessingStatus("title", "body", IStatus.ERROR);
+    ProcessingException processingException = new ProcessingException(status);
+    assertEquals(status, processingException.getStatus());
+    assertEquals("title: body [severity=ERROR]", processingException.getMessage());
+    assertEquals("title: body", processingException.getDisplayMessage());
+  }
+
   private void assertUniqueLinesOnStackTrace(Throwable t) {
     StringWriter writer = new StringWriter();
     PrintWriter pw = new PrintWriter(writer);
