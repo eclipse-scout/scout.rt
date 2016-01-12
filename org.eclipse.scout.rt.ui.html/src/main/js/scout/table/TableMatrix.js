@@ -347,10 +347,16 @@ scout.TableMatrix.prototype.calculate = function() {
       }
     }
 
-    var f = Math.ceil(Math.log(data.max) / Math.LN10) - 1;
+    //To calculate correct y axis scale data.max must not be 0. If data.max===0-> log(data.max)=-infinity
+    if(scout.nvl(data.max, 0)===0){
+      data.max = 0.1;
+    }
 
-    data.max = Math.ceil(data.max / Math.pow(10, f)) * Math.pow(10, f);
-    data.max = Math.ceil(data.max / 4) * 4;
+      var f = Math.ceil(Math.log(data.max) / Math.LN10) - 1;
+
+      data.max = Math.ceil(data.max / Math.pow(10, f)) * Math.pow(10, f);
+      data.max = Math.ceil(data.max / 4) * 4;
+
   }
 
   // find dimensions and sort for x, y axis
@@ -388,7 +394,7 @@ scout.TableMatrix.prototype.columnCount = function() {
   var count = 0;
   for (var c = 0; c < this._columns.length; c++) {
     var column = this._columns[c];
-    if (column instanceof scout.NumberColumn || !scout.strings.hasText(column.text)) {
+    if (column instanceof scout.NumberColumn){
       continue;
     }
     colCount.push([column, []]);
