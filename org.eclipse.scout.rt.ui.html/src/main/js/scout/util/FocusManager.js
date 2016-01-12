@@ -49,14 +49,14 @@ scout.FocusManager.prototype.installTopLevelMouseHandlers = function($container)
 };
 
 scout.FocusManager.prototype._handleIEEvent = function(event) {
-  var $element = $(event.target);
+  var $element = $(event.target),
+  selectableElements = '[tabindex]:not([tabindex=-1]), radio, a[href], area[href], input:not([disabled]),select:not([disabled]),textarea:not([disabled]),button:not([disabled]),iframe';
   if (scout.device.browser === scout.Device.Browser.INTERNET_EXPLORER &&
-    $element.not('[tabindex]:not([tabindex=-1]), [contenteditable="true"], radio, a[href], area[href], input:not([disabled]),select:not([disabled]),textarea:not([disabled]),button:not([disabled]),iframe').length > 0 &&
+    $element.not(selectableElements).length > 0 &&
     $element.closest('[contenteditable="true"]').length === 0) {
-    var $elementToFocus = $element.closest('[tabindex]:not([tabindex=-1]), radio, a[href], area[href], input:not([disabled]),select:not([disabled]),textarea:not([disabled]),button:not([disabled]),iframe');
-    if ($element.is($elementToFocus)) {
-      return;
-    } else if ($elementToFocus) {
+    //TODO[5.2] nbu fix ie9 user-selectable
+    var $elementToFocus = $element.closest(selectableElements);
+   if ($elementToFocus) {
       this.requestFocus($elementToFocus.get(0));
     }
     event.preventDefault();
