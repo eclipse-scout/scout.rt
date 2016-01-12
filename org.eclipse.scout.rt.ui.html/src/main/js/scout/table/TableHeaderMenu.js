@@ -65,7 +65,7 @@ scout.TableHeaderMenu.prototype._createLayout = function() {
 };
 
 scout.TableHeaderMenu.prototype._render = function($parent) {
-  var groups = [];
+  var leftGroups = [], $rightGroups = [];
 
   this.$parent = $parent;
   this.$headerItem.select(true);
@@ -78,6 +78,7 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
     this.$columnFilters = this.$container.appendDiv('table-header-menu-filters');
   }
 
+  this.tableHeader.$container.on('scroll', this._tableHeaderScrollHandler);
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
   this.htmlComp.setLayout(this._createLayout());
   this.$whiter = this.$container.appendDiv('table-header-menu-whiter');
@@ -92,41 +93,54 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
     return !column.fixedPosition;
   });
   if (movableColumns.length > 1 && !this.column.fixedPosition) {
-    this._renderMovingGroup();
+    leftGroups.push(this._renderMovingGroup());
   }
   // Sorting
   if (this.table.sortEnabled) {
-    this._renderSortingGroup();
+    leftGroups.push(this._renderSortingGroup());
   }
   // Add/remove/change columns
-  this._renderColumnActionsGroup();
+  leftGroups.push(this._renderColumnActionsGroup());
   // Grouping and aggregation
   if (this.table.containsNumberColumn()) {
     if (this.column instanceof scout.NumberColumn) {
-      this._renderAggregationGroup();
+      leftGroups.push(this._renderAggregationGroup());
     } else {
-      this._renderGroupingGroup();
+      leftGroups.push(this._renderGroupingGroup());
     }
   }
   // Coloring
   if (this.column instanceof scout.NumberColumn) {
-    this._renderColoringGroup();
+    leftGroups.push(this._renderColoringGroup());
   }
-
-  // Add 'last' class to last menu-group
-  this.children[this.children.length - 1].setLast(true);
 
   // -- Right column -- //
   // Filter table
   if (this.hasFilterTable) {
-    this._renderFilterTable();
+    $rightGroups.push(this._renderFilterTable());
   }
   // Filter fields
   if (this.hasFilterFields) {
-    this._renderFilterFields();
+    $rightGroups.push(this._renderFilterFields());
   }
 
-  this.tableHeader.$container.on('scroll', this._tableHeaderScrollHandler);
+  addFirstLastClass(leftGroups);
+  addFirstLastClass($rightGroups);
+
+  function addFirstLastClass(groups) {
+    if (groups.length) {
+      addCssClass(groups[0], 'first');
+      addCssClass(groups[groups.length - 1], 'last');
+    }
+  }
+
+  // Note: we should refactor code for filter-fields and filter-table so they could also
+  // work with a model-class (like the button menu groups). Currently this would cause
+  // to much work.
+  function addCssClass(group, cssClass) {
+    var $container = group instanceof scout.TableHeaderMenuGroup ? group.$container : group;
+    $container.addClass(cssClass);
+  }
 };
 
 scout.TableHeaderMenu.prototype._remove = function() {
@@ -183,16 +197,10 @@ scout.TableHeaderMenu.prototype._renderMovingGroup = function() {
     }});
 
   group.render(this.$columnActions);
+  return group;
 };
 
 scout.TableHeaderMenu.prototype._renderColumnActionsGroup = function() {
-  // When no button of this group is visible, don't render group at all
-  if (!this.table.addColumnEnabled &&
-      !this.column.removable &&
-      !this.column.modifiable) {
-    return;
-  }
-
   var column = this.column,
     menuPopup = this;
 
@@ -220,6 +228,7 @@ scout.TableHeaderMenu.prototype._renderColumnActionsGroup = function() {
     clickHandler: onClick.bind(this, 'modify')});
 
   this.columnActionsGroup.render(this.$columnActions);
+  return this.columnActionsGroup;
 
   function onClick(action) {
     menuPopup.remove();
@@ -283,6 +292,7 @@ scout.TableHeaderMenu.prototype._renderSortingGroup = function() {
 
   this._updateSortingSelectedState();
   this.sortingGroup.render(this.$columnActions);
+  return this.sortingGroup;
 
   function onSortClick() {
     menuPopup.remove();
@@ -385,6 +395,7 @@ scout.TableHeaderMenu.prototype._renderGroupingGroup = function() {
   }
 
   group.render(this.$columnActions);
+  return group;
 
   function groupColumn() {
     this.toggle();
@@ -432,6 +443,7 @@ scout.TableHeaderMenu.prototype._renderAggregationGroup = function() {
     button.setSelected(button.aggregation === aggregation);
   });
   group.render(this.$columnActions);
+  return group;
 
   function onClick() {
     menuPopup.remove();
@@ -476,6 +488,7 @@ scout.TableHeaderMenu.prototype._renderColoringGroup = function() {
     button.setSelected(button.backgroundEffect === backgroundEffect);
   });
   group.render(this.$columnActions);
+  return group;
 
   function onClick() {
     menuPopup.remove();
@@ -542,6 +555,8 @@ scout.TableHeaderMenu.prototype._renderFilterTable = function() {
 
   // must do this in a setTimeout, since table/popup is not visible yet (same as Table#revealSelection).
   setTimeout(this.filterTable.revealChecked.bind(this.filterTable));
+
+  return this.$filterTableGroup;
 };
 
 /**
@@ -602,6 +617,7 @@ scout.TableHeaderMenu.prototype._renderFilterFields = function() {
     .appendDiv('table-header-menu-group-text')
     .text(this.filter.filterFieldsTitle());
   this.filterFieldsGroupBox.render(this.$filterFieldsGroup);
+  return this.$filterFieldsGroup;
 };
 
 scout.TableHeaderMenu.prototype.isOpenFor = function($headerItem) {
