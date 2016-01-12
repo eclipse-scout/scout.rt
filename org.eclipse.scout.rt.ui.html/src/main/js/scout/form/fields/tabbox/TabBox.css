@@ -12,6 +12,12 @@
 @tabbox-focus-arrow-width: 15px;
 @tabbox-border-width: 3px;
 
+.tab-box {
+  & > .status {
+    margin-bottom: @tabbox-border-width;
+  }
+}
+
 .tab-area {
   margin-top: @group-margin-top;
   margin-left: @mandatory-indicator-width;

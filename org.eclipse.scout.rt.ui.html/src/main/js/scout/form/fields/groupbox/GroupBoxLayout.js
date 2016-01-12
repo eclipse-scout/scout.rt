@@ -83,14 +83,14 @@ scout.GroupBoxLayout.prototype._layoutStatus = function() {
     right = containerPadding.right,
     $groupBoxTitle = this._groupBox._$groupBoxTitle,
     titleInnerHeight = $groupBoxTitle.innerHeight(),
-    $status = this._groupBox.$status;
+    $status = this._groupBox.$status,
+    statusMargins = scout.graphics.getMargins($status);
 
   $status.cssWidth(this._statusWidth)
-    .cssTop(top)
+    .cssTop(top + $groupBoxTitle.cssMarginTop())
     .cssRight(right)
-    .cssHeight(titleInnerHeight)
-    .cssLineHeight(titleInnerHeight)
-    .cssMarginTop($groupBoxTitle.cssMarginTop());
+    .cssHeight(titleInnerHeight - statusMargins.vertical())
+    .cssLineHeight(titleInnerHeight - statusMargins.vertical());
 };
 
 scout.GroupBoxLayout.prototype.preferredLayoutSize = function($container) {

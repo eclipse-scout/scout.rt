@@ -23,7 +23,7 @@ scout.TabBoxLayout.prototype.layout = function($container) {
     tabAreaWidth = 0,
     tabAreaHeight = 0,
     tabAreaSize = new scout.Dimension(),
-    $pseudoStatus = this._tabBox.$pseudoStatus;
+    $status = this._tabBox.$status;
 
   containerSize = htmlContainer.getAvailableSize()
     .subtract(htmlContainer.getInsets());
@@ -32,9 +32,9 @@ scout.TabBoxLayout.prototype.layout = function($container) {
     tabAreaMargins = htmlTabArea.getMargins();
     tabAreaHeight = htmlTabArea.getPreferredSize().height;
     tabAreaWidth = containerSize.subtract(tabAreaMargins).width;
-    if ($pseudoStatus.isVisible()) {
-      $pseudoStatus.cssWidth(this._statusWidth);
-      tabAreaWidth -= $pseudoStatus.outerWidth(true);
+    if ($status && $status.isVisible()) {
+      this._layoutStatus();
+      tabAreaWidth -= $status.outerWidth(true);
     }
     innerTabAreaSize = new scout.Dimension(tabAreaWidth, tabAreaHeight);
     htmlTabArea.setSize(innerTabAreaSize);
@@ -44,6 +44,25 @@ scout.TabBoxLayout.prototype.layout = function($container) {
   tabContentSize = containerSize.subtract(htmlTabContent.getMargins());
   tabContentSize.height -= tabAreaSize.height;
   htmlTabContent.setSize(tabContentSize);
+};
+
+scout.TabBoxLayout.prototype._layoutStatus = function() {
+  var htmlContainer = this._tabBox.htmlComp,
+    containerPadding = htmlContainer.getInsets({
+      includeBorder: false
+    }),
+    top = containerPadding.top,
+    right = containerPadding.right,
+    $tabArea = this._tabBox._$tabArea,
+    tabAreaInnerHeight = $tabArea.innerHeight(),
+    $status = this._tabBox.$status,
+    statusMargins = scout.graphics.getMargins($status);
+
+  $status.cssWidth(this._statusWidth)
+    .cssTop(top + $tabArea.cssMarginTop())
+    .cssRight(right)
+    .cssHeight(tabAreaInnerHeight - statusMargins.vertical())
+    .cssLineHeight(tabAreaInnerHeight - statusMargins.vertical());
 };
 
 /**

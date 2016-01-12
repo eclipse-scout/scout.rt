@@ -58,13 +58,18 @@ scout.TabItem.prototype.renderTab = function($parent) {
 };
 
 scout.TabItem.prototype._onTabMouseDown = function(event) {
+  if (this._preventTabActivation) {
+    this._preventTabActivation = false;
+    return;
+  }
   this.parent._selectTab(this);
 };
 
 scout.TabItem.prototype._onStatusMousedown = function(event) {
   scout.TabItem.parent.prototype._onStatusMousedown.call(this, event);
   // Prevent switching tabs when status gets clicked
-  event.stopPropagation();
+  // Don't use event.preventDefault, otherwise other mouse listener (like tooltip mouse down) will not be executed as well
+  this._preventTabActivation = true;
   // Prevent focusing the tab
   event.preventDefault();
 };
@@ -184,8 +189,9 @@ scout.TabItem.prototype._renderTooltipText = function() {
 
 scout.TabItem.prototype._syncMenusVisible = function() {
   // Always invisible because menus are displayed in menu bar and not with status icon
-  // Actually not needed for displaying purpose (at the moment) because it is only set for value fields,
-  // but if there is a tooltip as well, _onStatusMousedown needs to know whether a click should show menus or the tooltip
+  // Actually not needed at the moment because only value fields have menus (at least at the java model).
+  // But actually we should change this so that menus are possible for every form field
+  // TODO CGU [6.0] remove this comment if java model supports form field menus
   this.menusVisible = false;
 };
 
