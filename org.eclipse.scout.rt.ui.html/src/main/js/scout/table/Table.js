@@ -2356,7 +2356,7 @@ scout.Table.prototype._order$Rows = function($rows) {
       row1 = $row1.data('row'),
       row2 = $row2.data('row');
 
-    return this.rows.indexOf(row1) > this.rows.indexOf(row2);
+    return this.rows.indexOf(row1) - this.rows.indexOf(row2);
   }.bind(this));
 };
 
