@@ -57,6 +57,7 @@ public class SequenceBoxGrid {
       data.y = 0;
       if (data.weightX < 0) {
         if (field instanceof IButton) {
+          data.useUiWidth = true;
           data.weightX = 0;
         }
         else {

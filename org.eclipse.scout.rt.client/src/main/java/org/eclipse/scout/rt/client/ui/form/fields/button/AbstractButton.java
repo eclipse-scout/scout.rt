@@ -128,7 +128,7 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
   }
 
   /**
-   * {@inheritDoc} Default for buttons is false because they usually should use the whole with set by grid layout.
+   * {@inheritDoc} Default for buttons is false because they usually should use the whole width set by grid layout.
    */
   @Override
   protected boolean getConfiguredGridUseUiWidth() {
