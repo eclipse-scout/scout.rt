@@ -102,7 +102,7 @@
             #scout.button-focus();
           }
 
-          &:not(.menu-icononly):not(.menu-button) {
+          &:not(.menu-icononly):not(.menu-button) > .text {
             text-decoration: underline;
           }
         }
