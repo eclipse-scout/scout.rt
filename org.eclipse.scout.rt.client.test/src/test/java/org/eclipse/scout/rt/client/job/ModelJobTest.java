@@ -16,6 +16,11 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.eclipse.scout.rt.client.IClientSession;
@@ -26,6 +31,7 @@ import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
+import org.eclipse.scout.rt.testing.platform.util.BlockingCountDownLatch;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -84,5 +90,54 @@ public class ModelJobTest {
   public void testThreadName() throws InterruptedException {
     ClientRunContext clientRunContext = ClientRunContexts.empty().withSession(m_clientSession1, true);
     assertEquals("scout-model-thread", ModelJobs.newInput(clientRunContext).getThreadName());
+  }
+
+  /**
+   * We have 2 model jobs scheduled in sequence. Due to the mutex, the second model job only commences execution once
+   * the first model job completed. However, job 1 yields its permit, so that job-2 can commence execution.
+   */
+  @Test
+  public void testYield() throws InterruptedException {
+    final Set<String> protocol = Collections.synchronizedSet(new HashSet<String>()); // synchronized because modified/read by different threads.
+    final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
+    final BlockingCountDownLatch finishLatch = new BlockingCountDownLatch(1);
+
+    final ClientRunContext runContext = ClientRunContexts.empty().withSession(m_clientSession1, true);
+
+    // Schedule first model job
+    ModelJobs.schedule(new IRunnable() {
+
+      @Override
+      public void run() throws Exception {
+        protocol.add("job-1-running");
+
+        setupLatch.await();
+        protocol.add("job-1-before-yield");
+        ModelJobs.yield();
+        protocol.add("job-1-after-yield");
+
+        finishLatch.countDown();
+      }
+    }, ModelJobs.newInput(runContext.copy())
+        .withName("job-1"));
+
+    // Schedule second model job
+    ModelJobs.schedule(new IRunnable() {
+
+      @Override
+      public void run() throws Exception {
+        protocol.add("job-2-running");
+      }
+    }, ModelJobs.newInput(runContext.copy())
+        .withName("job-2"));
+
+    setupLatch.countDown();
+    finishLatch.await();
+
+    List<String> expectedProtocol = new ArrayList<>();
+    expectedProtocol.add("job-1-running");
+    expectedProtocol.add("job-1-before-yield");
+    expectedProtocol.add("job-2-running");
+    expectedProtocol.add("job-1-after-yield");
   }
 }

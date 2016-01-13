@@ -468,7 +468,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
       return; // job already in done state.
     }
 
-    Assertions.assertNotSame(currentSemaphore, m_executionSemaphore, "Potential deadlock detected: Cannot wait for a job which is assigned to the same    as the current job [semaphore={}]", currentSemaphore);
+    Assertions.assertNotSame(currentSemaphore, m_executionSemaphore, "Potential deadlock detected: Cannot wait for a job which is assigned to the same semaphore as the current job [semaphore={}]", currentSemaphore);
   }
 
   /**

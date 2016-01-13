@@ -15,18 +15,24 @@ import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContext;
+import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.filter.event.ModelJobEventFilter;
 import org.eclipse.scout.rt.client.job.filter.future.ModelJobFutureFilter;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.filter.IFilter;
+import org.eclipse.scout.rt.platform.job.DoneEvent;
+import org.eclipse.scout.rt.platform.job.IBlockingCondition;
+import org.eclipse.scout.rt.platform.job.IDoneHandler;
 import org.eclipse.scout.rt.platform.job.IExecutionSemaphore;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IJobManager;
 import org.eclipse.scout.rt.platform.job.JobInput;
+import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.filter.event.JobEventFilterBuilder;
 import org.eclipse.scout.rt.platform.job.filter.future.FutureFilterBuilder;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
+import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 
 /**
@@ -112,6 +118,17 @@ public final class ModelJobs {
    * @see {@link IJobManager#awaitDone(IFilter, long, TimeUnit)}
    */
   public static final String EXECUTION_HINT_UI_INTERACTION_REQUIRED = "ui.interaction.required";
+
+  /**
+   * Runnable which does nothing.
+   */
+  private static final IRunnable NULL_RUNNABLE = new IRunnable() {
+
+    @Override
+    public void run() throws Exception {
+      // NOOP
+    }
+  };
 
   private ModelJobs() {
   }
@@ -306,5 +323,28 @@ public final class ModelJobs {
     }
 
     return future.getJobInput().getExecutionSemaphore() == clientSession.getModelJobSemaphore();
+  }
+
+  /**
+   * An instruction to the job manager that the current model job is willing to yield its current model job permit.
+   * <p>
+   * It is rarely appropriate to use this method. It may be useful for debugging or testing purposes.
+   */
+  public static void yield() {
+    Assertions.assertTrue(ModelJobs.isModelThread(), "'Yield' must be invoked from model thread");
+
+    final IBlockingCondition idleCondition = Jobs.newBlockingCondition(true);
+    ModelJobs.schedule(NULL_RUNNABLE, ModelJobs.newInput(ClientRunContexts.copyCurrent())
+        .withName("Technical job to yield model thread"))
+        .whenDone(new IDoneHandler<Void>() {
+
+          @Override
+          public void onDone(final DoneEvent<Void> event) {
+            idleCondition.setBlocking(false);
+          }
+        }, ClientRunContexts.copyCurrent());
+
+    // Release the current model job permit and wait until all competing model jobs of this session completed their work.
+    idleCondition.waitFor();
   }
 }
