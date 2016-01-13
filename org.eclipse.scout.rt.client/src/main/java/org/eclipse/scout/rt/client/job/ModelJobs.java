@@ -326,7 +326,7 @@ public final class ModelJobs {
   }
 
   /**
-   * An instruction to the job manager that the current model job is willing to yield its current model job permit.
+   * Instructs the job manager that the current model job is willing to yield its current model job permit.
    * <p>
    * It is rarely appropriate to use this method. It may be useful for debugging or testing purposes.
    */

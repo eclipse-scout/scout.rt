@@ -73,6 +73,7 @@ public class ContentAssistFieldDataFetcher<LOOKUP_KEY> extends AbstractContentAs
     private P_LookupCallDataCallback(String searchText, boolean selectCurrentValue) {
       m_searchText = searchText;
       m_selectCurrentValue = selectCurrentValue;
+      setResult(null);
     }
 
     @Override

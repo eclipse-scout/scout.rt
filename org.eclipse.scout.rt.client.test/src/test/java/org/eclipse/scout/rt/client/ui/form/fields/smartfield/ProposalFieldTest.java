@@ -16,17 +16,16 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.List;
 
+import org.eclipse.scout.rt.client.context.ClientRunContexts;
+import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.classid.ClassId;
-import org.eclipse.scout.rt.platform.job.IBlockingCondition;
-import org.eclipse.scout.rt.platform.job.Jobs;
+import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupService;
@@ -34,6 +33,7 @@ import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
+import org.eclipse.scout.rt.testing.platform.job.JobTestUtil;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.junit.AfterClass;
@@ -93,18 +93,8 @@ public class ProposalFieldTest {
 
   @Test
   public void testSelectFromProposalChooser() {
-    final IBlockingCondition bc = Jobs.newBlockingCondition(true);
-
-    m_proposalField.getLookupRowFetcher().addPropertyChangeListener(new PropertyChangeListener() {
-      @Override
-      public void propertyChange(PropertyChangeEvent evt) {
-        if (IContentAssistFieldLookupRowFetcher.PROP_SEARCH_RESULT.equals(evt.getPropertyName())) {
-          bc.setBlocking(false);
-        }
-      }
-    });
     m_proposalField.getUIFacade().openProposalChooserFromUI("b", false);
-    bc.waitFor();
+    waitUntilLookupRowsLoaded();
 
     // select a proposal from the proposal chooser table
     assertTrue(m_proposalField.isProposalChooserRegistered());
@@ -130,18 +120,8 @@ public class ProposalFieldTest {
    * This method deals with the async nature of the proposal chooser
    */
   void testMatch(String searchText, String expectedValue, int expectedNumProposals) {
-    final IBlockingCondition bc = Jobs.newBlockingCondition(true);
-
-    m_proposalField.getLookupRowFetcher().addPropertyChangeListener(new PropertyChangeListener() {
-      @Override
-      public void propertyChange(PropertyChangeEvent evt) {
-        if (IContentAssistFieldLookupRowFetcher.PROP_SEARCH_RESULT.equals(evt.getPropertyName())) {
-          bc.setBlocking(false);
-        }
-      }
-    });
     m_proposalField.getUIFacade().openProposalChooserFromUI(searchText, false);
-    bc.waitFor(); // must wait until results from client-job are available...
+    waitUntilLookupRowsLoaded();
 
     boolean proposalChooserOpen = expectedNumProposals > 0;
     if (proposalChooserOpen) {
@@ -204,6 +184,17 @@ public class ProposalFieldTest {
     public List<? extends ILookupRow<Long>> getDataByRec(ILookupCall<Long> call) {
       return null;
     }
+  }
 
+  /**
+   * Waits for at most 30s until lookup rows are loaded.
+   */
+  private static void waitUntilLookupRowsLoaded() {
+    Assertions.assertTrue(ModelJobs.isModelThread(), "must be invoked from model thread");
+
+    // Wait until asynchronous load of lookup rows is completed and ready to be written back to the smart field.
+    JobTestUtil.waitForMinimalPermitCompetitors(ModelJobs.newInput(ClientRunContexts.copyCurrent()).getExecutionSemaphore(), 2); // 2:= 'current model job' + 'smartfield fetch model job'
+    // Yield the current model job permit, so that the lookup rows can be written into the model.
+    ModelJobs.yield();
   }
 }
