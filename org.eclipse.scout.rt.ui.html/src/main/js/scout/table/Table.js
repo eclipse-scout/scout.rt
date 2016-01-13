@@ -3502,6 +3502,9 @@ scout.Table.prototype._attach = function() {
 scout.Table.prototype._detach = function() {
   this.session.detachHelper.beforeDetach(this.$container);
   this.$container.detach();
+  // Detach helper stores the current scroll pos and restores in attach.
+  // To make it work scrollTop needs to be reseted here otherwise viewport won't be rendered by _onDataScroll
+  this.scrollTop = 0;
   scout.Table.parent.prototype._detach.call(this);
 };
 
