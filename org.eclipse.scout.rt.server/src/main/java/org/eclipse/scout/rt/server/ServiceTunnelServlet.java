@@ -28,9 +28,7 @@ import javax.servlet.http.HttpSessionBindingListener;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.annotations.Internal;
-import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
-import org.eclipse.scout.rt.platform.serialization.SerializationUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.server.admin.html.AdminSession;
 import org.eclipse.scout.rt.server.clientnotification.ClientNotificationCollector;
@@ -43,7 +41,6 @@ import org.eclipse.scout.rt.server.context.RunMonitorCancelRegistry.IRegistratio
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.server.session.ServerSessionProvider;
-import org.eclipse.scout.rt.shared.clientnotification.IClientNotificationService;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelContentHandler;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
@@ -113,45 +110,25 @@ public class ServiceTunnelServlet extends HttpServlet {
             @Override
             public void run() throws Exception {
               ServiceTunnelRequest serviceRequest = deserializeServiceRequest();
-              if (isSessionLess(serviceRequest)) {
-                // TODO [5.2] jgu: consolidate to not have this if-else here, but within ServerRunContext instead
 
-                final IRegistrationHandle registrationHandle = BEANS.get(RunMonitorCancelRegistry.class).register(RunMonitor.CURRENT.get());
-                try {
-                  ServerRunContext serverRunContext = ServerRunContexts.copyCurrent()
-                      .withLocale(serviceRequest.getLocale())
-                      .withUserAgent(UserAgent.createByIdentifier(serviceRequest.getUserAgent()));
+              ServerRunContext serverRunContext = ServerRunContexts.copyCurrent()
+                  .withLocale(serviceRequest.getLocale())
+                  .withUserAgent(UserAgent.createByIdentifier(serviceRequest.getUserAgent()))
+                  .withClientNotificationCollector(new ClientNotificationCollector())
+                  .withClientNodeId(serviceRequest.getClientNodeId());
 
-                  ServiceTunnelResponse serviceResponse = invokeService(serverRunContext, serviceRequest);
-                  serializeServiceResponse(serviceResponse);
-                }
-                finally {
-                  registrationHandle.unregister();
-                }
+              if (serviceRequest.getSessionId() != null) {
+                serverRunContext
+                    .withSession(lookupServerSessionOnHttpSession(serviceRequest.getSessionId(), serverRunContext));
               }
-              else {
-                // Collector to collect transactional client notifications issued during processing of the current request.
-                // Enable global cancellation of the service request.
-                RunMonitor runMonitor = BEANS.get(RunMonitor.class);
-                ServerRunContext serverRunContext = ServerRunContexts.copyCurrent()
-                    .withLocale(serviceRequest.getLocale())
-                    .withUserAgent(UserAgent.createByIdentifier(serviceRequest.getUserAgent()))
-                    .withRunMonitor(runMonitor)
-                    .withClientNotificationCollector(new ClientNotificationCollector())
-                    .withClientNodeId(serviceRequest.getClientNodeId());
-                serverRunContext.withSession(lookupServerSessionOnHttpSession(serviceRequest.getSessionId(), serverRunContext));
 
-                IServerSession session = serverRunContext.getSession();
-                long requestSequence = serviceRequest.getRequestSequence();
-
-                final IRegistrationHandle registrationHandle = BEANS.get(RunMonitorCancelRegistry.class).register(runMonitor, session.getId(), requestSequence); // enable global cancellation
-                try {
-                  ServiceTunnelResponse serviceResponse = invokeService(serverRunContext, serviceRequest);
-                  serializeServiceResponse(serviceResponse);
-                }
-                finally {
-                  registrationHandle.unregister();
-                }
+              final IRegistrationHandle registrationHandle = registerForCancelation(serverRunContext, serviceRequest);
+              try {
+                ServiceTunnelResponse serviceResponse = invokeService(serverRunContext, serviceRequest);
+                serializeServiceResponse(serviceResponse);
+              }
+              finally {
+                registrationHandle.unregister();
               }
             }
 
@@ -169,12 +146,9 @@ public class ServiceTunnelServlet extends HttpServlet {
     }
   }
 
-  /**
-   * Do not create a server session for IClientNotificationService
-   */
-  protected boolean isSessionLess(ServiceTunnelRequest serviceRequest) throws Exception {
-    Class<?> serviceInterfaceClass = SerializationUtility.getClassLoader().loadClass(serviceRequest.getServiceInterfaceClassName());
-    return IClientNotificationService.class.isAssignableFrom(serviceInterfaceClass);
+  private IRegistrationHandle registerForCancelation(ServerRunContext runContext, ServiceTunnelRequest req) {
+    String sessionId = runContext.getSession() != null ? runContext.getSession().getId() : null;
+    return BEANS.get(RunMonitorCancelRegistry.class).register(runContext.getRunMonitor(), sessionId, req.getRequestSequence());
   }
 
   // === SERVICE INVOCATION ===

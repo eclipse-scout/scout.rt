@@ -76,9 +76,10 @@ public class ServiceOperationInvoker {
       response = new ServiceTunnelResponse(interceptException(t));
     }
 
+    // include client notifications in response (piggyback)
     ClientNotificationCollector collector = ClientNotificationCollector.CURRENT.get();
     if (collector != null) {
-      response.setNotifications(collector.consume()); // include client notifications in response (piggyback).
+      response.setNotifications(collector.consume());
     }
     response.setProcessingDuration(TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - t0));
     LOG.debug("TIME {}.{} {}ms", serviceReq.getServiceInterfaceClassName(), serviceReq.getOperation(), response.getProcessingDuration());

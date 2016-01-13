@@ -67,15 +67,15 @@ public class RunMonitorCancelRegistry {
   }
 
   /**
-   * Adds a {@link RunMonitor} to this registry, which will be cancelled upon cancellation of the service request, or
-   * shutdown of the session or platform.
+   * Adds a {@link RunMonitor} to this registry, which will be cancelled upon cancellation of the service request (if
+   * specified), or shutdown of the session (if specified) or platform.
    *
    * @param runMonitor
    *          the monitor to be registered.
    * @param sessionId
-   *          the sessionId under which to register the monitor.
+   *          the sessionId under which to register the monitor, unless <code>null</code> is provided.
    * @param requestId
-   *          the requestId under which to register the monitor.
+   *          the requestId under which to register the monitor, unless <code>null</code> is provided.
    * @see #cancelAllBySessionId(String)
    * @see #cancelAllBySessionIdAndRequestId(String, long)
    */
