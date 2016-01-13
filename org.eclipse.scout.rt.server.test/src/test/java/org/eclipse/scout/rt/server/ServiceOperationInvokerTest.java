@@ -97,7 +97,8 @@ public class ServiceOperationInvokerTest {
   private void assertProcessingException(ServiceTunnelResponse res, String customMessage) {
     Throwable exception = res.getException();
     assertThat(exception, instanceOf(ProcessingException.class));
-    assertThat(exception.getMessage(), not(containsString(customMessage)));
+    assertThat("Exception message should not reveil anything (security)", exception.getMessage(), not(containsString(customMessage)));
+    assertEquals("Stacktrace must be empty (security)", 0, exception.getStackTrace().length);
     assertNotNull(res.getProcessingDuration());
   }
 

@@ -200,11 +200,6 @@ public class ServiceTunnelServlet extends HttpServlet {
    * Method invoked to serialize a service response to be sent back to the client.
    */
   protected void serializeServiceResponse(ServiceTunnelResponse serviceResponse) throws Exception {
-    // security: do not send back error stack trace
-    if (serviceResponse.getException() != null) {
-      serviceResponse.getException().setStackTrace(new StackTraceElement[0]);
-    }
-
     HttpServletResponse servletResponse = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.get();
     servletResponse.setDateHeader("Expires", -1);
     servletResponse.setHeader("Cache-Control", "no-cache");
