@@ -25,5 +25,5 @@ scout.inherits(scout.MenuExecKeyStroke, scout.KeyStroke);
  * @override KeyStroke.js
  */
 scout.MenuExecKeyStroke.prototype.handle = function(event) {
-  this.field.doAction(this.field.$container);
+  this.field.doAction(event);
 };
