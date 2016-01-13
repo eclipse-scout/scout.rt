@@ -554,7 +554,7 @@ public class MutualExclusionTest {
     job2RunningLatch.unblock();
 
     // VERIFY
-    Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder().andMatchExecutionHint(JOB_IDENTIFIER).toFilter(), 10, TimeUnit.MILLISECONDS);
+    Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder().andMatchExecutionHint(JOB_IDENTIFIER).toFilter(), 10, TimeUnit.SECONDS);
     assertEquals(Arrays.asList("running-1", "running-2", "interrupted-1 (a)", "interrupted-1 (b)", "model-thread-1", "running-3"), protocol);
   }
 
