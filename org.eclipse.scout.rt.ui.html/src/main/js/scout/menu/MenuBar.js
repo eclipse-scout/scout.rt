@@ -41,6 +41,9 @@ scout.MenuBar = function() {
         this.updateDefaultMenu();
         return;
       }
+      if (event.changedProperties.indexOf('visible') > -1) {
+        this.updateVisibility(true);
+      }
       this.htmlComp.invalidateLayoutTree();
     }
   }.bind(this);
@@ -230,7 +233,7 @@ scout.MenuBar.prototype.updateLastItemMarker = function() {
   }
 };
 
-scout.MenuBar.prototype.updateVisibility = function() {
+scout.MenuBar.prototype.updateVisibility = function(suppressLayout) {
   var oldVisible = this.visible;
   this.visible = !this.hiddenByUi && this.menuItems.some(function(m) {
     return m.visible;
@@ -239,7 +242,9 @@ scout.MenuBar.prototype.updateVisibility = function() {
   // Update visibility, layout
   if (this.visible !== oldVisible) {
     this.$container.setVisible(this.visible);
-    this.htmlComp.invalidateLayoutTree();
+    if (!suppressLayout) {
+      this.htmlComp.invalidateLayoutTree();
+    }
   }
 };
 

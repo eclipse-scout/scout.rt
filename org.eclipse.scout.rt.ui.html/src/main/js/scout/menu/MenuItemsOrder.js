@@ -21,6 +21,7 @@ scout.MenuItemsOrder.prototype.order = function(items) {
     selectionItems = [],
     rightItems = [];
 
+  var isEmptyspaceMenuVisible = false;
   items.forEach(function(item) {
     // skip separators added dynamically by this class
     if (item.createdBy === this) {
@@ -31,6 +32,9 @@ scout.MenuItemsOrder.prototype.order = function(items) {
     } else if (item.horizontalAlignment === 1) {
       rightItems.push(item);
     } else if (scout.menus.checkType(item, this._menuTypes(this.emptySpaceTypes))) {
+      if (item.visible) {
+        isEmptyspaceMenuVisible = true;
+      }
       emptySpaceItems.push(item);
     } else if (scout.menus.checkType(item, this._menuTypes(this.selectionTypes))) {
       selectionItems.push(item);
@@ -38,8 +42,7 @@ scout.MenuItemsOrder.prototype.order = function(items) {
   }, this);
 
   // add fixed separator between emptySpace and selection
-  //FIXME awe: considier visibility of the menus (-> only create separator if there are visible empty space menus)
-  if (emptySpaceItems.length > 0 && selectionItems.length > 0) {
+  if (emptySpaceItems.length > 0 && selectionItems.length > 0 && isEmptyspaceMenuVisible) {
     emptySpaceItems.push(this._createSeparator());
   }
 
