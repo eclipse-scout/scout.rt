@@ -242,12 +242,11 @@ scout.TableFooter.prototype._renderInfoFilter = function() {
   }
 };
 
-scout.TableFooter.prototype._renderInfoSelection = function(numRowsSelected, all) {
-  var $info = this._$infoSelection;
-  var numRows = this.table.rows.length;
-
-  numRowsSelected = scout.nvl(numRowsSelected, this.table.selectedRows.length);
-  all = scout.nvl(all, (numRows === numRowsSelected));
+scout.TableFooter.prototype._renderInfoSelection = function() {
+  var $info = this._$infoSelection,
+    numRows = this.table.filteredRows().length,
+    numRowsSelected = this.table.selectedRows.length,
+    all = numRows === numRowsSelected;
 
   $info.empty();
   if (!this._compactStyle) {
@@ -577,6 +576,7 @@ scout.TableFooter.prototype._onTableRowsChanged = function(event) {
 
 scout.TableFooter.prototype._onTableRowsFiltered = function(event) {
   this._renderInfoFilter();
+  this._renderInfoSelection();
 };
 
 scout.TableFooter.prototype._onTableAddFilter = function(event) {
@@ -596,11 +596,7 @@ scout.TableFooter.prototype._onTableRemoveFilter = function(event) {
 };
 
 scout.TableFooter.prototype._onTableRowsSelected = function(event) {
-  var numRows = 0;
-  if (event.rows) {
-    numRows = event.rows.length;
-  }
-  this._renderInfoSelection(numRows, event.allSelected);
+  this._renderInfoSelection();
 };
 
 scout.TableFooter.prototype._onTableStatusChanged = function(event) {

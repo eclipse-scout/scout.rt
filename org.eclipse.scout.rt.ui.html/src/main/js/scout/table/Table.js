@@ -2679,18 +2679,7 @@ scout.Table.prototype._triggerAllRowsDeleted = function() {
 };
 
 scout.Table.prototype._triggerRowsSelected = function() {
-  var rowCount = this.rows.length,
-    allSelected = false;
-
-  if (this.selectedRows) {
-    allSelected = this.selectedRows.length === rowCount;
-  }
-
-  var event = {
-    rows: this.selectedRows,
-    allSelected: allSelected
-  };
-  this.trigger('rowsSelected', event);
+  this.trigger('rowsSelected');
 };
 
 scout.Table.prototype._triggerRowsChecked = function() {
