@@ -228,9 +228,9 @@ scout.Table.prototype._render = function($parent) {
   this.htmlComp.pixelBasedSizing = false;
 
   this.$data = this.$container.appendDiv('table-data');
-  this.$data.on('mousedown', '.table-row', onMouseDown)
-    .on('mouseup', '.table-row', onMouseUp)
-    .on('dblclick', '.table-row', onDoubleClick)
+  this.$data.on('mousedown', '.table-row', this._onRowMouseDown.bind(this))
+    .on('mouseup', '.table-row', this._onRowMouseUp.bind(this))
+    .on('dblclick', '.table-row', this._onRowDoubleClick.bind(this))
     .on('scroll', this._onDataScroll.bind(this))
     .on('contextmenu', '.table-row', function(event) {
       event.preventDefault();
@@ -262,94 +262,6 @@ scout.Table.prototype._render = function($parent) {
     // Execute delayed because table may be not layouted yet
     setTimeout(this.revealSelection.bind(this));
   }
-
-  //----- inline methods: --------
-
-  var $mouseDownRow, mouseDownColumn, row, that = this;
-
-  function onMouseDown(event) {
-    that._doubleClickSupport.mousedown(event);
-    $mouseDownRow = $(event.currentTarget);
-    mouseDownColumn = that._columnAtX(event.pageX);
-    that.selectionHandler.onMouseDown(event);
-
-    if (that.checkableStyle === scout.Table.CheckableStyle.TABLE_ROW) {
-      row = $mouseDownRow.data('row');
-      that.checkRow(row, !row.checked);
-    }
-  }
-
-  function onMouseUp(event) {
-    var $row, $mouseUpRow, column, $appLink,
-      mouseButton = event.which;
-
-    if (that._doubleClickSupport.doubleClicked()) {
-      // Don't execute on double click events
-      return;
-    }
-
-    $mouseUpRow = $(event.currentTarget);
-    that.selectionHandler.onMouseUp(event, $mouseUpRow);
-
-    if ($mouseDownRow && $mouseUpRow && $mouseDownRow.attr('data-rowid') !== $mouseUpRow.attr('data-rowid')) { // FIXME AWE: replace with $data('row')[0] !== $data('row')[0]
-      return;
-    }
-
-    $row = $mouseUpRow;
-    column = that._columnAtX(event.pageX);
-    if (column !== mouseDownColumn) {
-      // Don't execute click / appLinks when the mouse gets pressed and moved outside of a cell
-      return;
-    }
-    if (mouseButton === 1) {
-      column.onMouseUp(event, $row);
-      $appLink = that._find$AppLink(event);
-    }
-    if ($appLink) {
-      that._sendAppLinkAction(column.id, $appLink.data('ref'));
-    } else if (column.guiOnly) {
-      that._sendRowClicked($row, mouseButton);
-    } else {
-      that._sendRowClicked($row, mouseButton, column.id);
-    }
-  }
-
-  function onDoubleClick(event) {
-    var $row = $(event.currentTarget),
-      column = that._columnAtX(event.pageX);
-    that.doRowAction($row.data('row'), column);
-  }
-};
-
-scout.Table.prototype.onContextMenu = function(event) {
-  var func = function(event) {
-    var menuItems, popup;
-    event.preventDefault();
-    if (this.selectedRows.length > 0) {
-      menuItems = this._filterMenus(this.menus, scout.MenuDestinations.CONTEXT_MENU, true);
-      if (!event.pageX && !event.pageY) {
-        var $rowToDisplay = this.selectionHandler.lastActionRow ? this.selectionHandler.lastActionRow.$row : this.selectedRows[this.selectedRows.length - 1].$row;
-        var offset = $rowToDisplay.offset();
-        event.pageX = offset.left + 10;
-        event.pageY = offset.top + $rowToDisplay.outerHeight() / 2;
-      }
-      if (menuItems.length > 0) {
-        popup = scout.create('ContextMenuPopup', {
-          parent: this,
-          menuItems: menuItems,
-          location: {
-            x: event.pageX,
-            y: event.pageY
-          },
-          $anchor: this.$data,
-          menuFilter: this._filterMenusHandler
-        });
-        popup.open(undefined, event);
-      }
-    }
-  };
-
-  scout.menus.showContextMenuWithWait(this.session, func.bind(this), event);
 };
 
 scout.Table.prototype._renderProperties = function() {
@@ -402,6 +314,94 @@ scout.Table.prototype._syncTableControls = function(controls) {
       this.keyStrokeContext.registerKeyStroke(this.tableControls[i]);
     }
   }
+};
+
+scout.Table.prototype._onRowMouseDown = function(event) {
+  this._doubleClickSupport.mousedown(event);
+  this._$mouseDownRow = $(event.currentTarget);
+  this._mouseDownColumn = this._columnAtX(event.pageX);
+  this._$mouseDownRow.window().one('mouseup', function() {
+    this._$mouseDownRow = null;
+  }.bind(this));
+  this.selectionHandler.onMouseDown(event);
+
+  if (this.checkableStyle === scout.Table.CheckableStyle.TABLE_ROW) {
+    var row = this._$mouseDownRow.data('row');
+    this.checkRow(row, !row.checked);
+  }
+};
+
+scout.Table.prototype._onRowMouseUp = function(event) {
+  var $row, $mouseUpRow, column, $appLink,
+    mouseButton = event.which;
+
+  if (this._doubleClickSupport.doubleClicked()) {
+    // Don't execute on double click events
+    return;
+  }
+
+  $mouseUpRow = $(event.currentTarget);
+  this.selectionHandler.onMouseUp(event, $mouseUpRow);
+
+  if (!this._$mouseDownRow || this._$mouseDownRow[0] !== $mouseUpRow[0]) {
+    // Don't accept if mouse up happens on another row than mouse down, or mousedown didn't happen on a row at all
+    return;
+  }
+
+  $row = $mouseUpRow;
+  column = this._columnAtX(event.pageX);
+  if (column !== this._mouseDownColumn) {
+    // Don't execute click / appLinks when the mouse gets pressed and moved outside of a cell
+    return;
+  }
+  if (mouseButton === 1) {
+    column.onMouseUp(event, $row);
+    $appLink = this._find$AppLink(event);
+  }
+  if ($appLink) {
+    this._sendAppLinkAction(column.id, $appLink.data('ref'));
+  } else if (column.guiOnly) {
+    this._sendRowClicked($row, mouseButton);
+  } else {
+    this._sendRowClicked($row, mouseButton, column.id);
+  }
+};
+
+scout.Table.prototype._onRowDoubleClick = function(event) {
+  var $row = $(event.currentTarget),
+    column = this._columnAtX(event.pageX);
+  this.doRowAction($row.data('row'), column);
+};
+
+scout.Table.prototype.onContextMenu = function(event) {
+var func = function(event) {
+  var menuItems, popup;
+  event.preventDefault();
+  if (this.selectedRows.length > 0) {
+    menuItems = this._filterMenus(this.menus, scout.MenuDestinations.CONTEXT_MENU, true);
+    if (!event.pageX && !event.pageY) {
+      var $rowToDisplay = this.selectionHandler.lastActionRow ? this.selectionHandler.lastActionRow.$row : this.selectedRows[this.selectedRows.length - 1].$row;
+      var offset = $rowToDisplay.offset();
+      event.pageX = offset.left + 10;
+      event.pageY = offset.top + $rowToDisplay.outerHeight() / 2;
+    }
+    if (menuItems.length > 0) {
+      popup = scout.create('ContextMenuPopup', {
+        parent: this,
+        menuItems: menuItems,
+        location: {
+          x: event.pageX,
+          y: event.pageY
+        },
+        $anchor: this.$data,
+        menuFilter: this._filterMenusHandler
+      });
+      popup.open(undefined, event);
+    }
+  }
+};
+
+scout.menus.showContextMenuWithWait(this.session, func.bind(this), event);
 };
 
 scout.Table.prototype._onDataScroll = function() {
@@ -946,6 +946,7 @@ scout.Table.prototype._buildRowDiv = function(row) {
   if (row.checked && this.checkableStyle === scout.Table.CheckableStyle.TABLE_ROW) {
     rowClass += ' checked';
   }
+  // FIXME AWE: remove attr('data-rowid')
   var rowDiv = '<div class="' + rowClass + '" data-rowid="' + row.id + '" style="width: ' + rowWidth + 'px"' + scout.device.unselectableAttribute.string + '>';
   for (var c = 0; c < this.columns.length; c++) {
     rowDiv += this.columns[c].buildCellForRow(row);

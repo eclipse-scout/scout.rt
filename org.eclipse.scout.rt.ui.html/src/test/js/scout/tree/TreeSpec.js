@@ -660,6 +660,59 @@ describe("Tree", function() {
       expect(tree.selectedNodes.length).toBe(1);
       expect(tree.selectedNodes[0].id).toBe(model.nodes[0].id);
     });
+
+    it("does not send click if mouse down happens on another node than mouseup", function() {
+      var model = createModelFixture(2);
+      var tree = createTree(model);
+      tree.render(session.$entryPoint);
+
+      var $node0 = tree.nodes[0].$node;
+      var $node1 = tree.nodes[1].$node;
+      $node0.triggerMouseDown();
+      $node1.triggerMouseUp();
+
+      sendQueuedAjaxCalls();
+      expect(jasmine.Ajax.requests.count()).toBe(1);
+
+      var requestData = mostRecentJsonRequest();
+      // Must contain only selection event (of first node), no clicked
+      expect(requestData).toContainEventsExactly([{
+        nodeIds: [tree.nodes[0].id],
+        target: tree.id,
+        type: 'nodesSelected'
+      }]);
+    });
+
+    it("does not send click if mouse down does not happen on a node", function() {
+      var model = createModelFixture(1);
+      var tree = createTree(model);
+      var $div = session.$entryPoint.makeDiv().cssHeight(10).cssWidth(10);
+      tree.render(session.$entryPoint);
+
+      var $node0 = tree.nodes[0].$node;
+      $node0.triggerMouseDown();
+      $(window).triggerMouseUp({position: {left: 0, top:0}});
+
+      sendQueuedAjaxCalls();
+      expect(jasmine.Ajax.requests.count()).toBe(1);
+
+      var requestData = mostRecentJsonRequest();
+      // Must contain only selection event (of first node), no clicked
+      expect(requestData).toContainEventsExactly([{
+        nodeIds: [tree.nodes[0].id],
+        target: tree.id,
+        type: 'nodesSelected'
+      }]);
+
+      jasmine.Ajax.uninstall();
+      jasmine.Ajax.install();
+
+      $(window).triggerMouseDown({position: {left: 0, top:0}});
+      $node0.triggerMouseUp();
+
+      sendQueuedAjaxCalls();
+      expect(jasmine.Ajax.requests.count()).toBe(0);
+    });
   });
 
   describe("check nodes", function() {

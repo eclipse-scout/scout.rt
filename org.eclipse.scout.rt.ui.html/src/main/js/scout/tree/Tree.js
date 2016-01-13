@@ -1282,6 +1282,10 @@ scout.Tree.prototype._onNodeMouseDown = function(event) {
 
   var $node = $(event.currentTarget);
   var node = $node.data('node');
+  this._$mouseDownNode = $node;
+  $node.window().one('mouseup', function() {
+    this._$mouseDownNode = null;
+  }.bind(this));
 
   this.selectNodes(node);
 
@@ -1299,6 +1303,10 @@ scout.Tree.prototype._onNodeMouseUp = function(event) {
 
   var $node = $(event.currentTarget);
   var node = $node.data('node');
+  if (!this._$mouseDownNode || this._$mouseDownNode[0] !== $node[0]) {
+    // Don't accept if mouse up happens on another node than mouse down, or mousedown didn't happen on a node at all
+    return;
+  }
 
   this._send('nodeClicked', {
     nodeId: node.id
