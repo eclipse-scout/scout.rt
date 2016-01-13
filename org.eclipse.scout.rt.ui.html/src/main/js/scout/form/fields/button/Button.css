@@ -26,6 +26,35 @@
   /* add a transparent border to align text with normal buttons which also have a border */
   border: 1px solid transparent;
 
+  &.menu-item {
+    /* Draw underline in child element, otherwise the position would not be correct in FF */
+    text-decoration: none;
+
+    & > .text {
+      text-decoration: underline;
+    }
+
+    &:focus {
+      outline: none;
+
+      &:not(.disabled) {
+        color: @hover-color;
+
+        &:not(.menu-button) {
+          color: @focus-color;
+
+          &::after {
+            color: @focus-color;
+          }
+        }
+
+        &:focus::after {
+          #scout.button-focus();
+        }
+      }
+    }
+  }
+
   &.menu-item > .icon:not(.font-icon) {
     /* override hack in Menu.css */
     top: 0;
