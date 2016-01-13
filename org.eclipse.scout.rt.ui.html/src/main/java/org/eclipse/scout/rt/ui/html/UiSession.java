@@ -37,6 +37,7 @@ import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.job.IFuture;
@@ -669,15 +670,20 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
       BEANS.get(UiJobs.class).awaitModelJobs(m_clientSession, ExceptionHandler.class);
 
       // 3. Transform the response to JSON.
-      final IFuture<JSONObject> future = ModelJobs.schedule(newResponseToJsonTransformer(), ModelJobs.newInput(clientRunContext)
+      final IFuture<JSONObject> future = ModelJobs.schedule(newResponseToJsonTransformer(), ModelJobs.newInput(clientRunContext.copy()
+          .withRunMonitor(BEANS.get(RunMonitor.class))) // separate RunMonitor to not cancel 'response-to-json' job once processing is cancelled
           .withName("Transforming response to JSON")
+          .withExecutionHint(UiJobs.EXECUTION_HINT_RESPONSE_TO_JSON)
           .withExecutionHint(UiJobs.EXECUTION_HINT_POLL_REQUEST, RequestType.POLL_REQUEST.equals(jsonRequest.getRequestType()))
           .withExceptionHandling(null, false)); // Propagate exception to caller (UIServlet)
       try {
         return BEANS.get(UiJobs.class).awaitAndGet(future);
       }
-      catch (InterruptedException | CancellationException e) {
+      catch (InterruptedException e) {
         future.cancel(true);
+        return null;
+      }
+      catch (CancellationException e) {
         return null;
       }
     }
@@ -751,14 +757,19 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
       BEANS.get(UiJobs.class).awaitModelJobs(m_clientSession, ExceptionHandler.class);
 
       // 3. Transform the response to JSON.
-      final IFuture<JSONObject> future = ModelJobs.schedule(newResponseToJsonTransformer(), ModelJobs.newInput(clientRunContext)
+      final IFuture<JSONObject> future = ModelJobs.schedule(newResponseToJsonTransformer(), ModelJobs.newInput(clientRunContext.copy()
+          .withRunMonitor(BEANS.get(RunMonitor.class))) // separate RunMonitor to not cancel 'response-to-json' job once processing is cancelled
           .withName("Transforming response to JSON")
+          .withExecutionHint(UiJobs.EXECUTION_HINT_RESPONSE_TO_JSON)
           .withExceptionHandling(null, false)); // Propagate exception to caller (UIServlet)
       try {
         return BEANS.get(UiJobs.class).awaitAndGet(future);
       }
-      catch (InterruptedException | CancellationException e) {
+      catch (InterruptedException e) {
         future.cancel(true);
+        return null;
+      }
+      catch (CancellationException e) {
         return null;
       }
     }
@@ -775,6 +786,8 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
     // Cancel all running model jobs for the requested session (interrupt if necessary)
     Jobs.getJobManager().cancel(ModelJobs.newFutureFilterBuilder()
         .andMatch(new SessionFutureFilter(getClientSession()))
+        .andMatchNotExecutionHint(UiJobs.EXECUTION_HINT_RESPONSE_TO_JSON)
+        .andMatchNotExecutionHint(UiJobs.EXECUTION_HINT_POLL_REQUEST)
         .andMatchNotExecutionHint(ModelJobs.EXECUTION_HINT_UI_INTERACTION_REQUIRED)
         .toFilter(), true);
   }

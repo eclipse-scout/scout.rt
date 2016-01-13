@@ -49,6 +49,11 @@ public class UiJobs {
   public static final String EXECUTION_HINT_POLL_REQUEST = UiJobs.class.getName() + ".pollRequest";
 
   /**
+   * Execution hint to mark futures which represent a 'response-to-json' job.
+   */
+  public static final String EXECUTION_HINT_RESPONSE_TO_JSON = UiJobs.class.getName() + ".responseToJson";
+
+  /**
    * Waits until all model jobs of the given session are in 'done' state, or require 'user interaction'. If the jobs
    * cannot be awaited because the current thread is interrupted, or because the jobs did not complete within the
    * maximal timeout, the respective exception is handled by the given {@link ExceptionHandler}.
