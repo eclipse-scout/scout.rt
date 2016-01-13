@@ -26,6 +26,7 @@ import org.eclipse.scout.rt.platform.service.IService;
 import org.eclipse.scout.rt.server.admin.inspector.CallInspector;
 import org.eclipse.scout.rt.server.admin.inspector.ProcessInspector;
 import org.eclipse.scout.rt.server.admin.inspector.SessionInspector;
+import org.eclipse.scout.rt.server.clientnotification.ClientNotificationCollector;
 import org.eclipse.scout.rt.server.session.ServerSessionProvider;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.shared.ScoutTexts;
@@ -75,6 +76,10 @@ public class ServiceOperationInvoker {
       response = new ServiceTunnelResponse(interceptException(t));
     }
 
+    ClientNotificationCollector collector = ClientNotificationCollector.CURRENT.get();
+    if (collector != null) {
+      response.setNotifications(collector.consume()); // include client notifications in response (piggyback).
+    }
     response.setProcessingDuration(TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - t0));
     LOG.debug("TIME {}.{} {}ms", serviceReq.getServiceInterfaceClassName(), serviceReq.getOperation(), response.getProcessingDuration());
     return response;
