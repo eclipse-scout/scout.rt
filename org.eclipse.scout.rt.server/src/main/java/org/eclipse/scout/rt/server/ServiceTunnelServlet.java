@@ -18,7 +18,6 @@ import java.util.Locale;
 import java.util.concurrent.Callable;
 
 import javax.security.auth.Subject;
-import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -60,7 +59,6 @@ public class ServiceTunnelServlet extends HttpServlet {
   private static final Logger LOG = LoggerFactory.getLogger(ServiceTunnelServlet.class);
 
   private transient IServiceTunnelContentHandler m_contentHandler;
-  private boolean m_debug;
 
   // === HTTP-GET ===
 
@@ -210,13 +208,6 @@ public class ServiceTunnelServlet extends HttpServlet {
 
   // === INITIALIZATION ===
 
-  @Override
-  public void init(ServletConfig config) throws ServletException {
-    super.init(config);
-    // read config
-    m_debug = "true".equals(config.getInitParameter("debug"));
-  }
-
   /**
    * Method invoked by 'HTTP-GET' and 'HTTP-POST' to identify the session-class and to initialize the content handler
    * for serialization/deserialization.
@@ -281,14 +272,6 @@ public class ServiceTunnelServlet extends HttpServlet {
   }
 
   // === Helper methods ===
-
-  /**
-   * @return <code>true</code> if the {@link ServiceTunnelServlet} runs in debug mode; see property
-   *         {@link ServiceTunnelServlet#HTTP_DEBUG_PARAM}.
-   */
-  protected boolean isDebug() {
-    return m_debug;
-  }
 
   @Internal
   protected boolean isConnectionError(Exception e) {
