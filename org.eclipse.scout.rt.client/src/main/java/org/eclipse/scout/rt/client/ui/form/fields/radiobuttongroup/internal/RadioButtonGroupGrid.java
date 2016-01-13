@@ -14,15 +14,20 @@ import java.util.ArrayList;
 
 import org.eclipse.scout.rt.client.ui.form.fields.GridData;
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
+import org.eclipse.scout.rt.client.ui.form.fields.ICompositeFieldGrid;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.internal.GridDataBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Grid (model) layout of radio button group only visible process-buttons are used
+ * Grid (model) layout of radio button group only visible process-buttons are used. This class distributes all buttons
+ * (= fields of the group) over the available space, which is the gridH attribute of the group. For each button gridW
+ * and gridH is set to 1, other configured values for these properties are ignored. Also gridX and gridY is set on the
+ * field.
  */
-public class RadioButtonGroupGrid {
+public class RadioButtonGroupGrid implements ICompositeFieldGrid<ICompositeField> {
+
   private static final Logger LOG = LoggerFactory.getLogger(RadioButtonGroupGrid.class);
 
   private ICompositeField m_group = null;
@@ -30,12 +35,13 @@ public class RadioButtonGroupGrid {
   private int m_gridColumns;
   private int m_gridRows;
 
-  public RadioButtonGroupGrid(ICompositeField group) {
-    m_group = group;
+  public RadioButtonGroupGrid() {
   }
 
-  public void validate() {
+  @Override
+  public void validate(ICompositeField compositeField) {
     // reset
+    m_group = compositeField;
     m_gridColumns = 0;
     m_gridRows = 0;
     ArrayList<IFormField> list = new ArrayList<IFormField>();
@@ -50,10 +56,13 @@ public class RadioButtonGroupGrid {
       }
     }
     m_fields = list.toArray(new IFormField[list.size()]);
-    layoutStatic();
+    applyGridData();
   }
 
-  private void layoutStatic() {
+  /**
+   * Sets GridData on each button (= field) of the group.
+   */
+  protected void applyGridData() {
     GridData parentData = m_group.getGridData();
     if (parentData.h <= 0) {
       LOG.error("{} has gridData.h={}; expected value>0", m_group.getClass().getName(), parentData.h);
@@ -74,6 +83,8 @@ public class RadioButtonGroupGrid {
           GridData data = GridDataBuilder.createFromHints(m_fields[i], 1);
           data.x = c;
           data.y = r;
+          data.w = 1;
+          data.h = 1;
           m_fields[i].setGridDataInternal(data);
           i++;
         }
@@ -84,10 +95,12 @@ public class RadioButtonGroupGrid {
     }
   }
 
+  @Override
   public int getGridColumnCount() {
     return m_gridColumns;
   }
 
+  @Override
   public int getGridRowCount() {
     return m_gridRows;
   }

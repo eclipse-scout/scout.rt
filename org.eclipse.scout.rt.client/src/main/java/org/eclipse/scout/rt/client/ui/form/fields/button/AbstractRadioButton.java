@@ -41,7 +41,7 @@ public abstract class AbstractRadioButton<T> extends AbstractButton implements I
    * button group for the current value and this button is the currently selected radio button.
    * <p>
    * Subclasses can override this method. Default is {@code null}.
-   * 
+   *
    * @return an {@code Object} representing the value of this radio button
    * @see AbstractRadioButton
    * @see AbstractRadioButtonGroup
@@ -51,6 +51,11 @@ public abstract class AbstractRadioButton<T> extends AbstractButton implements I
   @Order(230)
   protected T getConfiguredRadioValue() {
     return null;
+  }
+
+  @Override
+  protected boolean getConfiguredFillHorizontal() {
+    return true;
   }
 
   @Override

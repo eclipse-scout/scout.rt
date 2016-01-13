@@ -31,6 +31,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.CompositeFieldUtility;
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
+import org.eclipse.scout.rt.client.ui.form.fields.ICompositeFieldGrid;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractRadioButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
@@ -66,7 +67,7 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
   private boolean m_valueAndSelectionMediatorActive;
   private ILookupCall<T> m_lookupCall;
   private Class<? extends ICodeType<?, T>> m_codeTypeClass;
-  private RadioButtonGroupGrid m_grid;
+  private ICompositeFieldGrid<ICompositeField> m_grid;
   private List<IFormField> m_fields;
   private List<IRadioButton<T>> m_radioButtons;
   private Map<Class<? extends IFormField>, IFormField> m_movedFormFieldsByClass;
@@ -134,7 +135,7 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
   protected void initConfig() {
     m_fields = CollectionUtility.emptyArrayList();
     m_movedFormFieldsByClass = new HashMap<Class<? extends IFormField>, IFormField>();
-    m_grid = new RadioButtonGroupGrid(this);
+    m_grid = createGrid();
     super.initConfig();
     // Configured CodeType
     if (getConfiguredCodeType() != null) {
@@ -230,6 +231,15 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
    */
   protected IRadioButton<T> createEmptyRadioButtonForLookupRow() {
     return new RadioButton();
+  }
+
+  /**
+   * Returns an instance of {@link ICompositeFieldGrid} which arranges the fields of this group box by setting a
+   * GridData object on each field. The default implementation returns a {@link RadioButtonGroupGrid} instance. Override
+   * this method when you have special requirements for displaying radio buttons within the group.
+   */
+  protected ICompositeFieldGrid<ICompositeField> createGrid() {
+    return new RadioButtonGroupGrid();
   }
 
   @Override
@@ -354,7 +364,7 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
   @Override
   public void rebuildFieldGrid() {
     if (m_grid != null) {
-      m_grid.validate();
+      m_grid.validate(this);
       if (isInitialized()) {
         if (getParentField() != null) {
           getParentField().rebuildFieldGrid();
