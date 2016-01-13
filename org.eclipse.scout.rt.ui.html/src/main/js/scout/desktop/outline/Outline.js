@@ -229,6 +229,14 @@ scout.Outline.prototype._initDetailTable = function(node) {
 scout.Outline.prototype._initDetailForm = function(node) {
   var menus = this._createOutlineNavigationButtons(node, node.detailForm.staticMenus);
   node.detailForm.rootGroupBox.staticMenus = menus;
+  node.detailForm.one('destroy', function() {
+    // Unlink detail form if it was closed. May happen in the following case:
+    // The form gets closed on execPageDeactivated. No pageChanged event will
+    // be fired because the deactivated page is not selected anymore.
+    node.detailForm = null;
+    // Also make sure desktop holds no reference to a destroyed form
+    this._updateOutlineNode(node);
+  }.bind(this));
 };
 
 scout.Outline.prototype._linkNodeWithRow = function(row) {
@@ -380,13 +388,6 @@ scout.Outline.prototype._updateOutlineNode = function(node, bringToFront) {
   bringToFront = scout.nvl(bringToFront, true);
   if (!node) {
     throw new Error('called _updateOutlineNode without node');
-  }
-
-  // Unlink detail form if it was closed. May happen in the following case:
-  // The form gets closed on execPageDeactivated. No pageChanged event will
-  // be fired because the deactivated page is not selected anymore.
-  if (node.detailForm && node.detailForm.destroyed) {
-    node.detailForm = null;
   }
 
   if (this.session.desktop.outline !== this || !scout.isOneOf(node, this.selectedNodes)) {
