@@ -1285,8 +1285,8 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
       }
 
       @Override
-      public IFuture<Void> provideAsync(ILookupCall<LOOKUP_KEY> lookupCall, ILookupRowFetchedCallback<LOOKUP_KEY> callback) {
-        return lookupCall.getDataByKeyInBackground(ClientRunContexts.copyCurrent(), callback);
+      public IFuture<Void> provideAsync(ILookupCall<LOOKUP_KEY> lookupCall, ILookupRowFetchedCallback<LOOKUP_KEY> callback, ClientRunContext clientRunContext) {
+        return lookupCall.getDataByKeyInBackground(clientRunContext, callback);
       }
     };
   }
@@ -1318,8 +1318,8 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
       }
 
       @Override
-      public IFuture<Void> provideAsync(ILookupCall<LOOKUP_KEY> lookupCall, ILookupRowFetchedCallback<LOOKUP_KEY> callback) {
-        return lookupCall.getDataByAllInBackground(ClientRunContexts.copyCurrent(), callback);
+      public IFuture<Void> provideAsync(ILookupCall<LOOKUP_KEY> lookupCall, ILookupRowFetchedCallback<LOOKUP_KEY> callback, ClientRunContext clientRunContext) {
+        return lookupCall.getDataByAllInBackground(clientRunContext, callback);
       }
     };
   }
@@ -1351,8 +1351,8 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
       }
 
       @Override
-      public IFuture<Void> provideAsync(ILookupCall<LOOKUP_KEY> lookupCall, ILookupRowFetchedCallback<LOOKUP_KEY> callback) {
-        return lookupCall.getDataByTextInBackground(ClientRunContexts.copyCurrent(), callback);
+      public IFuture<Void> provideAsync(ILookupCall<LOOKUP_KEY> lookupCall, ILookupRowFetchedCallback<LOOKUP_KEY> callback, ClientRunContext clientRunContext) {
+        return lookupCall.getDataByTextInBackground(clientRunContext, callback);
       }
     };
   }
@@ -1384,8 +1384,8 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
       }
 
       @Override
-      public IFuture<Void> provideAsync(ILookupCall<LOOKUP_KEY> lookupCall, ILookupRowFetchedCallback<LOOKUP_KEY> callback) {
-        return lookupCall.getDataByRecInBackground(ClientRunContexts.copyCurrent(), callback);
+      public IFuture<Void> provideAsync(ILookupCall<LOOKUP_KEY> lookupCall, ILookupRowFetchedCallback<LOOKUP_KEY> callback, ClientRunContext clientRunContext) {
+        return lookupCall.getDataByRecInBackground(clientRunContext, callback);
       }
     };
   }
@@ -1410,7 +1410,6 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
     lookupCall.setMaxRowCount(maxRowCount > 0 ? maxRowCount : getBrowseMaxRowCount());
 
     // Prepare processing of the fetched rows.
-    final ClientRunContext callingRunContext = ClientRunContexts.copyCurrent();
     final ILookupRowFetchedCallback<LOOKUP_KEY> internalCallback = new ILookupRowFetchedCallback<LOOKUP_KEY>() {
 
       @Override
@@ -1424,19 +1423,21 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
       }
 
       private void joinModelThreadAndUpdateField(final List<? extends ILookupRow<LOOKUP_KEY>> rows, final RuntimeException exception) {
-        if (ModelJobs.isModelThread(callingRunContext.getSession())) {
+        if (ModelJobs.isModelThread()) {
           updateField(rows, exception);
         }
         else {
+          // Synchronize with the model thread.
+          // Note: The model job will not commence execution if the current ClientRunContext is or gets cancelled.
           ModelJobs.schedule(new IRunnable() {
 
             @Override
             public void run() throws Exception {
               updateField(rows, exception);
             }
-          }, ModelJobs.newInput(callingRunContext)
+          }, ModelJobs.newInput(ClientRunContexts.copyCurrent())
               .withName("Updating {}", AbstractContentAssistField.this.getClass().getName()))
-              .awaitDone();
+              .awaitDone(); // block the current thread until completed
         }
       }
 
@@ -1463,7 +1464,7 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
     try {
       dataProvider.beforeProvide(lookupCall);
       if (asynchronousFetching) {
-        return dataProvider.provideAsync(lookupCall, internalCallback);
+        return dataProvider.provideAsync(lookupCall, internalCallback, ClientRunContexts.copyCurrent());
       }
       else {
         dataProvider.provideSync(lookupCall, internalCallback);
@@ -1492,14 +1493,19 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
     void afterProvide(ILookupCall<LOOKUP_KEY> lookupCall, List<ILookupRow<LOOKUP_KEY>> result);
 
     /**
-     * Method invoked to synchronously fetch lookup rows.
+     * Invoke to load lookup rows synchronously in the current thread. This method must be called from within a session
+     * aware {@link ClientRunContext}.
+     * <p>
+     * Upon loading finished, the given callback is notified, either in the current thread if being the model thread, or
+     * in the model thread as specified by the current {@link ClientRunContext}.
      */
     void provideSync(ILookupCall<LOOKUP_KEY> lookupCall, ILookupRowFetchedCallback<LOOKUP_KEY> callback);
 
     /**
-     * Method invoked to asynchronously fetch lookup rows.
+     * Invoke to load lookup rows asynchronously. Upon loading finished, the given callback is notified in the model
+     * thread as specified by the given session aware {@link ClientRunContext}.
      */
-    IFuture<Void> provideAsync(ILookupCall<LOOKUP_KEY> lookupCall, ILookupRowFetchedCallback<LOOKUP_KEY> callback);
+    IFuture<Void> provideAsync(ILookupCall<LOOKUP_KEY> lookupCall, ILookupRowFetchedCallback<LOOKUP_KEY> callback, ClientRunContext clientRunContext);
   }
 
   /**

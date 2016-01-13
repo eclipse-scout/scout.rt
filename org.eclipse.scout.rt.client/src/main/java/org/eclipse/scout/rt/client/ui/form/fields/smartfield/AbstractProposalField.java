@@ -15,6 +15,7 @@ import java.util.List;
 
 import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
+import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.IProposalFieldExtension;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
@@ -144,8 +145,8 @@ public abstract class AbstractProposalField<LOOKUP_KEY> extends AbstractContentA
       }
 
       @Override
-      public IFuture<Void> provideAsync(final ILookupCall<LOOKUP_KEY> lookupCall, final ILookupRowFetchedCallback<LOOKUP_KEY> callback) {
-        return delegate.provideAsync(lookupCall, callback);
+      public IFuture<Void> provideAsync(final ILookupCall<LOOKUP_KEY> lookupCall, final ILookupRowFetchedCallback<LOOKUP_KEY> callback, final ClientRunContext clientRunContext) {
+        return delegate.provideAsync(lookupCall, callback, clientRunContext);
       }
     };
   }
