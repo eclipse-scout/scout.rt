@@ -14,10 +14,6 @@ scout.TableHeaderMenuButtonKeyStroke = function(field) {
   this.which = [scout.keys.ENTER, scout.keys.SPACE];
   this.renderingHints.render = true;
   this.stopPropagation = true;
-//  this.renderingHints = {
-//    render: !!$drawingArea,
-//    $drawingArea: $drawingArea
-//  };
 };
 scout.inherits(scout.TableHeaderMenuButtonKeyStroke, scout.KeyStroke);
 

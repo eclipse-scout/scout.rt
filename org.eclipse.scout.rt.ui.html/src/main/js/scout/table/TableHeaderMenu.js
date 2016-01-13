@@ -51,7 +51,7 @@ scout.TableHeaderMenu.prototype._init = function(options) {
   this.filter.on('filterFieldsChanged', this._updateFilterTable.bind(this)); // FIXME AWE: (filter) off handler?
   this._updateFilterTableCheckedMode();
 
-  this.hasFilterTable = this.filter.availableValues.length > 0,
+  this.hasFilterTable = this.filter.availableValues.length > 0;
   this.hasFilterFields = this.filter.hasFilterFields;
 
   if (this.hasFilterTable) {
