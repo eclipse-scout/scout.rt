@@ -18,6 +18,10 @@ scout.SplitBox = function() {
 };
 scout.inherits(scout.SplitBox, scout.CompositeField);
 
+scout.SplitBox.SPLITTER_POSITION_TYPE_RELATIVE = 'relative';
+scout.SplitBox.SPLITTER_POSITION_TYPE_ABSOLUTE_FIRST = 'absoluteFirst';
+scout.SplitBox.SPLITTER_POSITION_TYPE_ABSOLUTE_SECOND = 'absoluteSecond';
+
 scout.SplitBox.prototype._render = function($parent) {
   this.addContainer($parent, 'split-box');
   // This widget does not support label, mandatoryIndicator and status
@@ -86,10 +90,10 @@ scout.SplitBox.prototype._render = function($parent) {
         $tempSplitter.cssTop(splitterPosition.top - splitAreaPosition.top);
       }
       this._$splitter.addClass('dragging');
-
-      var newSplitterPosition = this.splitterPosition;
-      var SNAP_SIZE = 25;
     }
+
+    var newSplitterPosition = this.splitterPosition;
+    var SNAP_SIZE = 25;
 
     function resizeMove(event) {
       if (event.clientX === mousePosition.x && event.clientY === mousePosition.y) {
@@ -120,7 +124,11 @@ scout.SplitBox.prototype._render = function($parent) {
         $tempSplitter.cssLeft(targetSplitterPositionLeft - tempSplitterOffsetX);
         // Normalize target position
         newSplitterPosition = (targetSplitterPositionLeft - tempSplitterOffsetX - scout.HtmlEnvironment.fieldMandatoryIndicatorWidth);
-        newSplitterPosition /= (splitAreaSize.width - splitterSize.width - scout.HtmlEnvironment.fieldMandatoryIndicatorWidth);
+        if (this.splitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_RELATIVE) {
+          newSplitterPosition = newSplitterPosition / (splitAreaSize.width - splitterSize.width - scout.HtmlEnvironment.fieldMandatoryIndicatorWidth);
+        } else if (this.splitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_ABSOLUTE_SECOND) {
+          newSplitterPosition = splitAreaSize.width - newSplitterPosition - splitterSize.width;
+        }
       } else { // "--"
         // Calculate target splitter position (in area)
         var targetSplitterPositionTop = event.pageY - splitAreaPosition.top;
@@ -138,7 +146,12 @@ scout.SplitBox.prototype._render = function($parent) {
         // Update temporary splitter
         $tempSplitter.cssTop(targetSplitterPositionTop - tempSplitterOffsetY);
         // Normalize target position
-        newSplitterPosition = targetSplitterPositionTop / splitAreaSize.height;
+        newSplitterPosition = targetSplitterPositionTop;
+        if (this.splitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_RELATIVE) {
+          newSplitterPosition = newSplitterPosition / splitAreaSize.height;
+        } else if (this.splitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_ABSOLUTE_SECOND) {
+          newSplitterPosition = splitAreaSize.height - newSplitterPosition - splitterSize.height;
+        }
       }
     }
 
@@ -180,8 +193,67 @@ scout.SplitBox.prototype._renderProperties = function() {
   this._renderSplitterEnabled();
 };
 
+scout.SplitBox.prototype._syncSplitterPosition = function(splitterPosition) {
+  this.splitterPosition = splitterPosition;
+  // If splitter position is explicitly set by an event, no recalculation is necessary
+  this._oldSplitterPositionType = null;
+};
+
 scout.SplitBox.prototype._renderSplitterPosition = function() {
   this.newSplitterPosition(this.splitterPosition);
+};
+
+scout.SplitBox.prototype._syncSplitterPositionType = function(splitterPositionType) {
+  if (this.splitterPositionType !== splitterPositionType) {
+    if (this.rendered && !this._oldSplitterPositionType) {
+      this._oldSplitterPositionType = this.splitterPositionType;
+      // We need to recalculate the splitter position. Because this requires the proper
+      // size of the split box, this can only be done in _renderSplitterPositionType().
+    }
+    this.splitterPositionType = splitterPositionType;
+  }
+};
+
+scout.SplitBox.prototype._renderSplitterPositionType = function() {
+  if (this._oldSplitterPositionType) {
+    // splitterPositionType changed while the split box was rendered --> convert splitterPosition
+    // to the target type such that the current position in screen does not change.
+    var splitAreaSize = this.htmlSplitArea.getSize(),
+      splitterPosition = this.splitterPosition,
+      splitterSize = scout.graphics.getVisibleSize(this._$splitter, true),
+      totalSize = 0;
+    if (this.splitHorizontal) { // "|"
+      totalSize = splitAreaSize.width - splitterSize.width;
+    } else { // "--"
+      totalSize = splitAreaSize.height - splitterSize.height;
+    }
+
+    // Convert value depending on the old and new type system
+    var oldIsRelative = (this._oldSplitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_RELATIVE);
+    var newIsRelative = (this.splitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_RELATIVE);
+    var oldIsAbsolute = !oldIsRelative;
+    var newIsAbsolute = !newIsRelative;
+    if (oldIsRelative && newIsAbsolute) {
+      // From relative to absolute
+      if (this.splitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_ABSOLUTE_SECOND) {
+        splitterPosition = totalSize - (totalSize * splitterPosition);
+      } else {
+        splitterPosition = totalSize * splitterPosition;
+      }
+    } else if (oldIsAbsolute && newIsRelative) {
+      // From absolute to relative
+      if (this._oldSplitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_ABSOLUTE_SECOND) {
+        splitterPosition = (totalSize - splitterPosition) / totalSize;
+      } else {
+        splitterPosition = splitterPosition / totalSize;
+      }
+    } else if (oldIsAbsolute && newIsAbsolute) {
+      splitterPosition = (totalSize - splitterPosition);
+    }
+    // Set as new splitter position
+    this._oldSplitterPositionType = null;
+    this.newSplitterPosition(splitterPosition);
+  }
 };
 
 scout.SplitBox.prototype._renderSplitterEnabled = function() {
@@ -191,8 +263,13 @@ scout.SplitBox.prototype._renderSplitterEnabled = function() {
 };
 
 scout.SplitBox.prototype.newSplitterPosition = function(newSplitterPosition) {
-  // Ensure range 0..1
-  newSplitterPosition = Math.max(0, Math.min(1, newSplitterPosition));
+  if (this.splitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_RELATIVE) {
+    // Ensure range 0..1
+    newSplitterPosition = Math.max(0, Math.min(1, newSplitterPosition));
+  } else {
+    // Ensure not negative
+    newSplitterPosition = Math.max(0, newSplitterPosition);
+  }
 
   // Set new value (send to server if changed)
   var positionChanged = (this.splitterPosition !== newSplitterPosition);

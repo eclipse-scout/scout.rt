@@ -16,6 +16,11 @@
     @splitter-line-size: 3px;
     @temp-splitter-line-size: 1px;
 
+    & > .first-field,
+    & > .second-field {
+      overflow: hidden;
+    }
+
     & > .splitter {
       position: absolute;
       background-color: @border-color;

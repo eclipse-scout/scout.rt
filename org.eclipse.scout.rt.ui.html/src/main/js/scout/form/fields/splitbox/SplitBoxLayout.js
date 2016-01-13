@@ -36,6 +36,7 @@ scout.SplitBoxLayout.prototype.layout = function($container) {
 
   var hasFirstField = (htmlFirstField && htmlFirstField.isVisible());
   var hasSecondField = (htmlSecondField && htmlSecondField.isVisible());
+  var splitterPosition = this._splitBox.splitterPosition;
 
   // Default case: two fields
   if (hasFirstField && hasSecondField) {
@@ -43,11 +44,37 @@ scout.SplitBoxLayout.prototype.layout = function($container) {
     var firstFieldSize = new scout.Dimension(availableSize);
     var secondFieldSize = new scout.Dimension(availableSize);
     if (splitXAxis) { // "|"
-      firstFieldSize.width *= this._splitBox.splitterPosition;
-      secondFieldSize.width *= (1 - this._splitBox.splitterPosition);
+      if (this._splitBox.splitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_RELATIVE) {
+        // Relative
+        firstFieldSize.width *= splitterPosition;
+        secondFieldSize.width *= (1 - splitterPosition);
+      } else {
+        // Absolute
+        splitterPosition = Math.min(splitterPosition, availableSize.width);
+        if (this._splitBox.splitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_ABSOLUTE_SECOND) {
+          firstFieldSize.width = availableSize.width - splitterPosition;
+          secondFieldSize.width = splitterPosition;
+        } else {
+          firstFieldSize.width = splitterPosition;
+          secondFieldSize.width = availableSize.width - splitterPosition;
+        }
+      }
     } else { // "--"
-      firstFieldSize.height *= this._splitBox.splitterPosition;
-      secondFieldSize.height *= (1 - this._splitBox.splitterPosition);
+      if (this._splitBox.splitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_RELATIVE) {
+        // Relative
+        firstFieldSize.height *= splitterPosition;
+        secondFieldSize.height *= (1 - splitterPosition);
+      } else {
+        // Absolute
+        splitterPosition = Math.min(splitterPosition, availableSize.height);
+        if (this._splitBox.splitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_ABSOLUTE_SECOND) {
+          firstFieldSize.height = availableSize.height - splitterPosition;
+          secondFieldSize.height = splitterPosition;
+        } else {
+          firstFieldSize.height = splitterPosition;
+          secondFieldSize.height = availableSize.height - splitterPosition;
+        }
+      }
     }
     firstFieldSize = firstFieldSize.subtract(htmlFirstField.getMargins());
     secondFieldSize = secondFieldSize.subtract(htmlSecondField.getMargins());

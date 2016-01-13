@@ -57,14 +57,18 @@ public class JsonSplitBox<SPLIT_BOX extends ISplitBox> extends JsonFormField<SPL
   @Override
   protected void initJsonProperties(SPLIT_BOX model) {
     super.initJsonProperties(model);
-
     putJsonProperty(new JsonProperty<ISplitBox>(ISplitBox.PROP_SPLITTER_POSITION, model) {
       @Override
       protected Double modelValue() {
         return getModel().getSplitterPosition();
       }
     });
-
+    putJsonProperty(new JsonProperty<ISplitBox>(ISplitBox.PROP_SPLITTER_POSITION_TYPE, model) {
+      @Override
+      protected String modelValue() {
+        return getModel().getSplitterPositionType();
+      }
+    });
     putJsonProperty(new JsonProperty<ISplitBox>(ISplitBox.PROP_SPLITTER_ENABLED, model) {
       @Override
       protected Boolean modelValue() {

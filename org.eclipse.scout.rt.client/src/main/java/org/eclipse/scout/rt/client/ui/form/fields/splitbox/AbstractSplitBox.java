@@ -71,6 +71,12 @@ public abstract class AbstractSplitBox extends AbstractCompositeField implements
     return 0.5;
   }
 
+  @ConfigProperty(ConfigProperty.STRING)
+  @Order(340)
+  protected String getConfiguredSplitterPositionType() {
+    return SPLITTER_POSITION_TYPE_RELATIVE;
+  }
+
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(355)
   protected boolean getConfiguredCacheSplitterPosition() {
@@ -91,6 +97,7 @@ public abstract class AbstractSplitBox extends AbstractCompositeField implements
     setSplitHorizontal(getConfiguredSplitHorizontal());
     setSplitterEnabled(getConfiguredSplitterEnabled());
     setSplitterPosition(getConfiguredSplitterPosition());
+    setSplitterPositionType(getConfiguredSplitterPositionType());
     setCacheSplitterPosition(getConfiguredCacheSplitterPosition());
     setCacheSplitterPositionPropertyName(getConfiguredCacheSplitterPositionPropertyName());
   }
@@ -151,6 +158,16 @@ public abstract class AbstractSplitBox extends AbstractCompositeField implements
   @Override
   public void setSplitterPosition(double position) {
     propertySupport.setPropertyDouble(PROP_SPLITTER_POSITION, position);
+  }
+
+  @Override
+  public String getSplitterPositionType() {
+    return propertySupport.getPropertyString(PROP_SPLITTER_POSITION_TYPE);
+  }
+
+  @Override
+  public void setSplitterPositionType(String splitterPositionType) {
+    propertySupport.setPropertyString(PROP_SPLITTER_POSITION_TYPE, splitterPositionType);
   }
 
   @Override
