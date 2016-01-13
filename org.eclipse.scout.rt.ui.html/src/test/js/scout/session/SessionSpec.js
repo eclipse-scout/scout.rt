@@ -107,6 +107,33 @@ describe('Session', function() {
       expect(requestData).toContainEventTypesExactly(['nodeClicked', 'nodeSelected', 'nodeExpanded']);
     });
 
+    it('does not await the full delay if a previous send call has a smaller delay', function() {
+      var session = createSession();
+
+      // send first event with 300ms delay
+      send(session, 1, 'nodeClicked', '', 300);
+      expect(jasmine.Ajax.requests.count()).toBe(0);
+
+      // send second event with 500ms delay
+      send(session, 1, 'nodeSelected', '', 500);
+      expect(jasmine.Ajax.requests.count()).toBe(0);
+
+      // tick 100 ms
+      sendQueuedAjaxCalls('', 100);
+
+      // since 300 ms are not passed yet, the request has not been sent
+      expect(jasmine.Ajax.requests.count()).toBe(0);
+
+      // tick 250 ms --> both events should now have been sent
+      sendQueuedAjaxCalls('', 250);
+
+      expect(jasmine.Ajax.requests.count()).toBe(1);
+
+      // check that content is complete and in correct order
+      var requestData = mostRecentJsonRequest();
+      expect(requestData).toContainEventTypesExactly(['nodeClicked', 'nodeSelected']);
+    });
+
     it('coalesces events if event provides a coalesce function', function() {
       var session = createSession();
 

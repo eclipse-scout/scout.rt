@@ -31,7 +31,7 @@ public class JsonNumberField<T extends INumberField> extends JsonBasicField<T> {
   }
 
   @Override
-  protected void handleUiTextChangedImpl(String displayText) {
+  protected void handleUiDisplayTextChangedAfterTyping(String displayText) {
     getModel().getUIFacade().parseAndSetValueFromUI(displayText);
   }
 

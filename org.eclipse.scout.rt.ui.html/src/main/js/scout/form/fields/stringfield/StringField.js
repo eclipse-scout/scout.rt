@@ -183,32 +183,43 @@ scout.StringField.prototype._renderSpellCheckEnabled = function(spellCheckEnable
   }
 };
 
+scout.StringField.prototype._renderDisplayText = function(displayText) {
+  displayText = scout.nvl(displayText, '');
+  var oldDisplayText = scout.nvl(this.$field.val(), '');
+  var oldSelection = this._getSelection();
+  scout.StringField.parent.prototype._renderDisplayText.call(this, displayText);
+
+  // Try to keep the current selection for cases where the old and new display
+  // text only differ because of the automatic trimming.
+  if (this.trimText) {
+    var m = oldDisplayText.match(new RegExp('^(\\s*)' + scout.strings.quote(displayText) + '(\\s*)$'));
+    if (m) {
+      oldSelection.start = Math.min(oldSelection.start - m[1].length, displayText.length);
+      oldSelection.end = Math.min(oldSelection.end - m[1].length, displayText.length);
+      this._setSelection(oldSelection);
+    }
+  }
+};
+
+
 // Not called in _renderProperties() because this is not really a property (more like an event)
 scout.StringField.prototype._renderInsertText = function() {
-  var s = this.insertText;
-  if (s && this.$field.length > 0) {
-    var elem = this.$field[0];
-    var a = scout.nvl(elem.selectionStart, null);
-    var b = scout.nvl(elem.selectionEnd, null);
-    if (a === null || b === null) {
-      a = 0;
-      b = 0;
-    }
-    var text = elem.value;
-    text = text.slice(0, a) + s + text.slice(b);
-    elem.value = text;
-
-    elem.selectionStart = a + s.length;
-    elem.selectionEnd = a + s.length;
-    this._updateSelection();
-
-    // Make sure display text gets sent (necessary if field does not have the focus)
-    if (this.updateDisplayTextOnModify) {
-      // If flag is true, we need to send two events (First while typing=true, second = false)
-      this.acceptInput(true);
-    }
-    this.acceptInput();
+  if (!this.insertText) {
+    return;
   }
+  var selection = this._getSelection();
+  var text = this.$field.val();
+  text = text.slice(0, selection.start) + this.insertText + text.slice(selection.end);
+  this.$field.val(text);
+
+  this._setSelection(selection.start + this.insertText.length);
+
+  // Make sure display text gets sent (necessary if field does not have the focus)
+  if (this.updateDisplayTextOnModify) {
+    // If flag is true, we need to send two events (First while typing=true, second = false)
+    this.acceptInput(true);
+  }
+  this.acceptInput();
 };
 
 scout.StringField.prototype._renderWrapText = function() {
@@ -216,7 +227,7 @@ scout.StringField.prototype._renderWrapText = function() {
 };
 
 scout.StringField.prototype._renderTrimText = function() {
-  // nop
+  // nop, property used in _validateDisplayText()
 };
 
 scout.StringField.prototype._renderGridData = function() {
@@ -247,6 +258,32 @@ scout.StringField.prototype._onSelectionChangingAction = function(event) {
   }
 };
 
+scout.StringField.prototype._getSelection = function() {
+  var start = scout.nvl(this.$field[0].selectionStart, null);
+  var end = scout.nvl(this.$field[0].selectionEnd, null);
+  if (start === null || end === null) {
+    start = 0;
+    end = 0;
+  }
+  return {
+    start: start,
+    end: end
+  };
+};
+
+scout.StringField.prototype._setSelection = function(selectionStart, selectionEnd) {
+  if (typeof selectionStart === 'number') {
+    selectionEnd = scout.nvl(selectionEnd, selectionStart);
+  }
+  else if (typeof selectionStart === 'object') {
+    selectionEnd = selectionStart.end;
+    selectionStart = selectionStart.start;
+  }
+  this.$field[0].selectionStart = selectionStart;
+  this.$field[0].selectionEnd = selectionEnd;
+  this._updateSelection();
+};
+
 scout.StringField.prototype._updateSelection = function() {
   var oldSelectionStart = this.selectionStart;
   var oldSelectionEnd = this.selectionEnd;
@@ -273,9 +310,9 @@ scout.StringField.prototype._sendSelectionChanged = function() {
   });
 };
 
-scout.StringField.prototype._validateDisplayText = function(displayText) {
-  if (this.trimText) {
+scout.StringField.prototype._validateDisplayText = function(displayText, whileTyping) {
+  if (!whileTyping && this.trimText) {
     displayText = displayText.trim();
   }
-  return scout.StringField.parent.prototype._validateDisplayText(displayText);
+  return scout.StringField.parent.prototype._validateDisplayText(displayText, whileTyping);
 };

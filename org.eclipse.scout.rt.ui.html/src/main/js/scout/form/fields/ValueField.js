@@ -34,7 +34,12 @@ scout.ValueField.prototype._readDisplayText = function() {
   return this.$field.val();
 };
 
-scout.ValueField.prototype._validateDisplayText = function(displayText) {
+/**
+ * Called before the displayText is sent to the server.
+ *
+ * @param displayText never null or undefined
+ */
+scout.ValueField.prototype._validateDisplayText = function(displayText, whileTyping) {
   return displayText;
 };
 
@@ -59,7 +64,7 @@ scout.ValueField.prototype.acceptInput = function(whileTyping) {
 
   // send only if displayText has really changed
   if (this._checkDisplayTextChanged(displayText, whileTyping)) {
-    var validatedDisplayText = this._validateDisplayText(displayText);
+    var validatedDisplayText = this._validateDisplayText(displayText, whileTyping);
     this.displayText = validatedDisplayText;
     if (displayText !== validatedDisplayText) {
       this._renderDisplayText(this.displayText);

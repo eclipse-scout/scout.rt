@@ -18,6 +18,7 @@ import java.util.Set;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
+import org.eclipse.scout.rt.client.ui.form.fields.IBasicField;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
@@ -155,19 +156,27 @@ public abstract class JsonValueField<VALUE_FIELD extends IValueField<?>> extends
     addPropertyEventFilterCondition(IValueField.PROP_DISPLAY_TEXT, displayText);
     boolean whileTyping = event.getData().optBoolean("whileTyping", false);
     if (whileTyping) {
-      handleUiDisplayTextChangedImpl(displayText);
+      handleUiDisplayTextChangedWhileTyping(displayText);
     }
     else {
-      handleUiTextChangedImpl(displayText);
+      handleUiDisplayTextChangedAfterTyping(displayText);
     }
   }
 
-  protected void handleUiTextChangedImpl(String displayText) {
+  /**
+   * Called by the UI when the displayText has changed but the editing action has not yet finished (
+   * <code>whileTyping = true</code>). The model field does not yet change its value. This method is usually only called
+   * when the {@link IBasicField#PROP_UPDATE_DISPLAY_TEXT_ON_MODIFY} flag is set.
+   */
+  protected void handleUiDisplayTextChangedWhileTyping(String displayText) {
     // NOP may be implemented by sub-classes
   }
 
-  protected void handleUiDisplayTextChangedImpl(String displayText) {
+  /**
+   * Called by the UI when the displayText has changed and the editing action has finished (
+   * <code>whileTyping = false</code>). The model field parses the displayText and updates its value.
+   */
+  protected void handleUiDisplayTextChangedAfterTyping(String displayText) {
     // NOP may be implemented by sub-classes
   }
-
 }

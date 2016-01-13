@@ -211,16 +211,20 @@ scout.Session.prototype.sendEvent = function(event, delay) {
 
   this._asyncEvents = this._coalesceEvents(this._asyncEvents, event);
   this._asyncEvents.push(event);
+  // Use the specified delay, except another event is already scheduled. In that case, use the minimal delay.
+  // This ensures that an event with a long delay doesn't hold back another event with a short delay.
+  this._asyncDelay = Math.min(delay, scout.nvl(this._asyncDelay, delay));
 
   clearTimeout(this._sendTimeoutId);
   this._sendTimeoutId = setTimeout(function() {
     this._sendTimeoutId = null;
+    this._asyncDelay = null;
     if (this.areRequestsPending()) {
       // do not send if there are any requests pending because the order matters -> prevents race conditions
       return;
     }
     this._sendNow();
-  }.bind(this), delay);
+  }.bind(this), this._asyncDelay);
 };
 
 scout.Session.prototype._sendStartupRequest = function() {

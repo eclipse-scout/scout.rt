@@ -189,12 +189,12 @@ public class JsonDateField<T extends IDateField> extends JsonBasicField<T> {
   }
 
   @Override
-  protected void handleUiTextChangedImpl(String displayText) {
+  protected void handleUiDisplayTextChangedWhileTyping(String displayText) {
     throw new IllegalStateException("DisplayText may not be set manually");
   }
 
   @Override
-  protected void handleUiDisplayTextChangedImpl(String displayText) {
+  protected void handleUiDisplayTextChangedAfterTyping(String displayText) {
     throw new IllegalStateException("DisplayText may not be set manually");
   }
 }

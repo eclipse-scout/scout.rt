@@ -58,11 +58,11 @@ public class JsonFileChooserField<FILE_CHOOSER_FIELD extends IFileChooserField> 
   }
 
   @Override
-  protected void handleUiTextChangedImpl(String displayText) {
+  protected void handleUiDisplayTextChangedAfterTyping(String displayText) {
     getModel().getUIFacade().parseAndSetValueFromUI(displayText);
   }
 
-  private void handleUiChooseFile() {
+  protected void handleUiChooseFile() {
     getModel().getUIFacade().startFileChooserFromUI();
   }
 
