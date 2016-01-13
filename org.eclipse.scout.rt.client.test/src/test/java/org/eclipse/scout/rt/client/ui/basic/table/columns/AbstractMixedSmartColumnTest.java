@@ -17,6 +17,8 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
+import org.eclipse.scout.rt.client.context.ClientRunContexts;
+import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
@@ -25,10 +27,12 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.fixture.TestCodeType;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractMixedSmartField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IMixedSmartField;
+import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
+import org.eclipse.scout.rt.testing.platform.job.JobTestUtil;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -144,6 +148,8 @@ public class AbstractMixedSmartColumnTest {
     table.addRowsByArray(new Long[]{3L});
 
     IValueField<?> field = (IValueField<?>) table.getEditableSmartColumn().prepareEdit(table.getRow(0));
+    waitUntilLookupRowsLoaded();
+
     field.parseAndSetValue("invalid Text");
     table.getEditableSmartColumn().completeEdit(table.getRow(0), field);
     ICell c = table.getCell(0, 0);
@@ -187,7 +193,17 @@ public class AbstractMixedSmartColumnTest {
         return TestCodeType.class;
       }
     }
-
   }
 
+  /**
+   * Waits for at most 30s until lookup rows are loaded.
+   */
+  private static void waitUntilLookupRowsLoaded() {
+    Assertions.assertTrue(ModelJobs.isModelThread(), "must be invoked from model thread");
+
+    // Wait until asynchronous load of lookup rows is completed and ready to be written back to the smart field.
+    JobTestUtil.waitForMinimalPermitCompetitors(ModelJobs.newInput(ClientRunContexts.copyCurrent()).getExecutionSemaphore(), 2); // 2:= 'current model job' + 'smartfield fetch model job'
+    // Yield the current model job permit, so that the lookup rows can be written into the model.
+    ModelJobs.yield();
+  }
 }

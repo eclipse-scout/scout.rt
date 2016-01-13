@@ -14,13 +14,13 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
 
+import org.eclipse.scout.rt.client.context.ClientRunContexts;
+import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -31,8 +31,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.smartfield.SmartFieldTest.Test
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.Order;
-import org.eclipse.scout.rt.platform.job.IBlockingCondition;
-import org.eclipse.scout.rt.platform.job.Jobs;
+import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
@@ -41,6 +40,7 @@ import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
+import org.eclipse.scout.rt.testing.platform.job.JobTestUtil;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.eclipse.scout.rt.testing.shared.services.lookup.TestingLookupService;
@@ -386,35 +386,13 @@ public class SmartFieldTest {
     assertEquals(expectedStyle, actualStyle);
   }
 
-  /**
-   * @param bc
-   * @return
-   */
-  protected PropertyChangeListener getUnblockOnSearchResultListener(final IBlockingCondition bc) {
-    PropertyChangeListener bcListener = new PropertyChangeListener() {
-      @Override
-      public void propertyChange(PropertyChangeEvent evt) {
-        if (IContentAssistFieldLookupRowFetcher.PROP_SEARCH_RESULT.equals(evt.getPropertyName())) {
-          bc.setBlocking(false);
-        }
-      }
-    };
-    return bcListener;
-  }
-
   @Test
   public void testDefaultSelectionWithOnlyOneResult() throws Exception {
-    IBlockingCondition bc = Jobs.newBlockingCondition(true);
-
-    PropertyChangeListener bcListener = getUnblockOnSearchResultListener(bc);
-    m_form.getStyleField().getLookupRowFetcher().addPropertyChangeListener(bcListener);
     m_form.getStyleField().getUIFacade().openProposalChooserFromUI("*", false);
-    bc.waitFor();
+    waitUntilLookupRowsLoaded();
 
-    bc.setBlocking(true);
-    m_form.getStyleField().getLookupRowFetcher().addPropertyChangeListener(bcListener);
     m_form.getStyleField().getUIFacade().proposalTypedFromUI("Y");
-    bc.waitFor();
+    waitUntilLookupRowsLoaded();
 
     // verifies one (and only, unique) result is available and selected
     assertTrue(m_form.getStyleField().isProposalChooserRegistered());
@@ -433,11 +411,8 @@ public class SmartFieldTest {
 
   @Test
   public void testNoDefaultSelectionWithMoreThanOneResult() throws Exception {
-    IBlockingCondition bc = Jobs.newBlockingCondition(true);
-
-    m_form.getStyleField().getLookupRowFetcher().addPropertyChangeListener(getUnblockOnSearchResultListener(bc));
     m_form.getStyleField().getUIFacade().openProposalChooserFromUI("*", false);
-    bc.waitFor();
+    waitUntilLookupRowsLoaded();
 
     // select a proposal from the proposal chooser table
     assertTrue(m_form.getStyleField().isProposalChooserRegistered());
@@ -447,4 +422,15 @@ public class SmartFieldTest {
     assertTrue(resultTable.getRowCount() > 1);
   }
 
+  /**
+   * Waits for at most 30s until lookup rows are loaded.
+   */
+  private static void waitUntilLookupRowsLoaded() {
+    Assertions.assertTrue(ModelJobs.isModelThread(), "must be invoked from model thread");
+
+    // Wait until asynchronous load of lookup rows is completed and ready to be written back to the smart field.
+    JobTestUtil.waitForMinimalPermitCompetitors(ModelJobs.newInput(ClientRunContexts.copyCurrent()).getExecutionSemaphore(), 2); // 2:= 'current model job' + 'smartfield fetch model job'
+    // Yield the current model job permit, so that the lookup rows can be written into the model.
+    ModelJobs.yield();
+  }
 }

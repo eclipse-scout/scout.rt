@@ -16,8 +16,6 @@ import java.util.regex.Pattern;
 
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
-import org.eclipse.scout.rt.platform.context.RunContext;
-import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 
@@ -152,12 +150,5 @@ public class LocalLookupCall<T> extends LookupCall<T> {
       }
     }
     return list;
-  }
-
-  @Override
-  protected IFuture<Void> loadDataInBackground(final IDataProvider<T> dataProvider, final RunContext runContext, final ILookupRowFetchedCallback<T> callback) {
-    // Load data synchronously, and not asynchronously.
-    loadData(dataProvider, callback);
-    return null;
   }
 }

@@ -18,9 +18,9 @@ import java.util.concurrent.TimeUnit;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
+import org.eclipse.scout.rt.platform.job.IExecutionSemaphore;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IJobManager;
-import org.eclipse.scout.rt.platform.job.IExecutionSemaphore;
 import org.eclipse.scout.rt.platform.job.JobState;
 import org.eclipse.scout.rt.platform.job.internal.JobManager;
 
@@ -64,6 +64,27 @@ public class JobTestUtil {
       @Override
       public String toString() {
         return String.format("expectedPermitCount=%s, actualPermitCount=%s", expectedCompetitorCount, semaphore.getCompetitorCount());
+      }
+    });
+  }
+
+  /**
+   * Waits if necessary for at most 30s until the {@link IExecutionSemaphore} reaches a competitor count greater or
+   * equals to the specified number. If elapsed, an {@link AssertionError} is thrown.
+   * <p>
+   * Competitor count: all permit owners plus all queued task.
+   */
+  public static void waitForMinimalPermitCompetitors(final IExecutionSemaphore semaphore, final int count) {
+    waitForCondition(new ICondition() {
+
+      @Override
+      public boolean isFulfilled() {
+        return semaphore.getCompetitorCount() >= count;
+      }
+
+      @Override
+      public String toString() {
+        return String.format("expectedPermitCount='=>%s', actualPermitCount=%s", count, semaphore.getCompetitorCount());
       }
     });
   }

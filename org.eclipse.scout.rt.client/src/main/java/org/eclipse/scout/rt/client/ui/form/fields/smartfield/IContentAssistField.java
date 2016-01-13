@@ -20,7 +20,6 @@ import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRowFetchedCallback;
-import org.eclipse.scout.rt.shared.services.lookup.LocalLookupCall;
 
 /**
  * @param <VALUE>
@@ -205,11 +204,9 @@ public interface IContentAssistField<VALUE, LOOKUP_KEY> extends IValueField<VALU
   /**
    * Loads lookup rows asynchronously, and notifies the specified callback upon loading completed.
    * <p>
-   * The methods of {@link ILookupRowFetchedCallback} are called in the model thread.
-   * <p>
-   * If it is a {@link LocalLookupCall}, data is fetched synchronously.
+   * The methods of {@link ILookupRowFetchedCallback} are invoked in the model thread.
    *
-   * @return {@link IFuture} to cancel data fetching; is <code>null</code> for a {@link LocalLookupCall}.
+   * @return {@link IFuture} to cancel data fetching
    */
   IFuture<Void> callKeyLookupInBackground(LOOKUP_KEY key, ILookupRowFetchedCallback<LOOKUP_KEY> callback);
 
@@ -218,11 +215,9 @@ public interface IContentAssistField<VALUE, LOOKUP_KEY> extends IValueField<VALU
   /**
    * Loads lookup rows asynchronously, and notifies the specified callback upon loading completed.
    * <p>
-   * The methods of {@link ILookupRowFetchedCallback} are called in the model thread.
-   * <p>
-   * If it is a {@link LocalLookupCall}, data is fetched synchronously.
+   * The methods of {@link ILookupRowFetchedCallback} are invoked in the model thread.
    *
-   * @return {@link IFuture} to cancel data fetching; is <code>null</code> for a {@link LocalLookupCall}.
+   * @return {@link IFuture} to cancel data fetching.
    */
   IFuture<Void> callTextLookupInBackground(String text, int maxRowCount, ILookupRowFetchedCallback<LOOKUP_KEY> callback);
 
@@ -233,22 +228,18 @@ public interface IContentAssistField<VALUE, LOOKUP_KEY> extends IValueField<VALU
   /**
    * Loads lookup rows asynchronously, and notifies the specified callback upon loading completed.
    * <p>
-   * The methods of {@link ILookupRowFetchedCallback} are called in the model thread.
-   * <p>
-   * If it is a {@link LocalLookupCall}, data is fetched synchronously.
+   * The methods of {@link ILookupRowFetchedCallback} are invoked in the model thread.
    *
-   * @return {@link IFuture} to cancel data fetching; is <code>null</code> for a {@link LocalLookupCall}.
+   * @return {@link IFuture} to cancel data fetching
    */
   IFuture<Void> callBrowseLookupInBackground(String browseHint, int maxRowCount, ILookupRowFetchedCallback<LOOKUP_KEY> callback);
 
   /**
    * Loads lookup rows asynchronously, and notifies the specified callback upon loading completed.
    * <p>
-   * The methods of {@link ILookupRowFetchedCallback} are called in the model thread.
-   * <p>
-   * If it is a {@link LocalLookupCall}, data is fetched synchronously.
+   * The methods of {@link ILookupRowFetchedCallback} are invoked in the model thread.
    *
-   * @return {@link IFuture} to cancel data fetching; is <code>null</code> for a {@link LocalLookupCall}.
+   * @return {@link IFuture} to cancel data fetching
    */
   IFuture<Void> callBrowseLookupInBackground(String browseHint, int maxRowCount, TriState activeState, ILookupRowFetchedCallback<LOOKUP_KEY> callback);
 
