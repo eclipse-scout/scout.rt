@@ -280,7 +280,7 @@ public class ServiceTunnelServlet extends HttpServlet {
       if (cause instanceof SocketException) {
         return true;
       }
-      else if (cause.getClass().getSimpleName().equalsIgnoreCase("EofException")) {
+      else if ("EofException".equalsIgnoreCase(cause.getClass().getSimpleName())) {
         return true;
       }
       else if (cause instanceof InterruptedIOException) {

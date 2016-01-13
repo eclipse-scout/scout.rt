@@ -57,7 +57,7 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
 
   private static final Logger LOG = LoggerFactory.getLogger(AbstractServerSession.class);
 
-  transient private final EventListenerList m_eventListeners;
+  private final transient EventListenerList m_eventListeners;
 
   private String m_id;
   private boolean m_initialized;
