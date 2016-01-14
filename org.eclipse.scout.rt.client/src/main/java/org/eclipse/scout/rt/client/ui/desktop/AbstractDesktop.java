@@ -59,7 +59,6 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeAdapter;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
-import org.eclipse.scout.rt.client.ui.desktop.navigation.INavigationHistoryService;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutlineViewButton;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IFormToolButton;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
@@ -151,9 +150,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   private final List<Object> m_addOns;
   private IContributionOwner m_contributionHolder;
   private final ObjectExtensions<AbstractDesktop, org.eclipse.scout.rt.client.extension.ui.desktop.IDesktopExtension<? extends AbstractDesktop>> m_objectExtensions;
-
-  // used to restore the outline state correctly in case a page unload is forced of changes in an other outline.
-  private Map<IOutline, Bookmark> m_bookmarkPerOutline = new HashMap<IOutline, Bookmark>();
 
   /**
    * do not instantiate a new desktop<br>
@@ -959,25 +955,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     if (m_outline == newOutline) {
       return;
     }
-    if (m_outline != null) {
-      IPage<?> oldActivePage = m_outline.getActivePage();
-      if (oldActivePage == null) {
-        // if no page is selected, remove the bookmark -> It is not necessary to have an active page
-        m_bookmarkPerOutline.remove(m_outline);
-        // TODO [5.2] cgu: Enhance navigation history service so that null pages can be handled
-      }
-      else {
-        Bookmark bm = BEANS.get(INavigationHistoryService.class).addStep(0, oldActivePage);
-        /*
-         *  prevent the bookmark for the next visit of the outline. The bookmark is needed in case
-         *  a page on the path to the currently selected page is getting invalidated due to changes
-         *  in an other outline.
-         */
-        if (bm != null) {
-          m_bookmarkPerOutline.put(m_outline, bm);
-        }
-      }
-    }
     //
     IOutline oldOutline = m_outline;
     if (m_activeOutlineListener != null && oldOutline != null) {
@@ -1033,20 +1010,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     setPageDetailTable(m_outline.getDetailTable());
     setPageSearchForm(m_outline.getSearchForm(), true);
     m_outline.makeActivePageToContextPage();
-    IPage<?> newActivePage = m_outline.getActivePage();
-    if (newActivePage == null && m_outline.getDefaultDetailForm() == null) {
-      // if there is no active page, restore it from the bookmark.
-      // If there is still no active page it is fine (it is not necessary to have an active page)
-      Bookmark bookmark = m_bookmarkPerOutline.get(m_outline);
-      if (bookmark != null && Boolean.TRUE) {
-        try {
-          activateBookmark(bookmark);
-        }
-        catch (RuntimeException e) {
-          LOG.warn("Could not activate bookmark '{}' for restoring state of outline '{}'.", bookmark.getText(), m_outline, e);
-        }
-      }
-    }
   }
 
   @SuppressWarnings("deprecation")
@@ -2205,18 +2168,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     @Override
     public void treeChanged(TreeEvent e) {
       switch (e.getType()) {
-        case TreeEvent.TYPE_BEFORE_NODES_SELECTED: {
-          if (e.getDeselectedNode() instanceof IPage) {
-            IPage<?> deselectedPage = (IPage) e.getDeselectedNode();
-            BEANS.get(INavigationHistoryService.class).addStep(0, deselectedPage);
-          }
-          break;
-        }
         case TreeEvent.TYPE_NODES_SELECTED: {
-          IPage<?> page = m_outline.getActivePage();
-          if (page != null) {
-            BEANS.get(INavigationHistoryService.class).addStep(0, page);
-          }
           try {
             ClientSessionProvider.currentSession().getMemoryPolicy().afterOutlineSelectionChanged(AbstractDesktop.this);
           }

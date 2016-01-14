@@ -45,7 +45,6 @@ import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.IVirtualTreeNode;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
-import org.eclipse.scout.rt.client.ui.desktop.navigation.INavigationHistoryService;
 import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineMediator;
 import org.eclipse.scout.rt.client.ui.form.FormEvent;
 import org.eclipse.scout.rt.client.ui.form.FormListener;
@@ -471,12 +470,6 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
       public void formChanged(FormEvent e) {
         switch (e.getType()) {
           case FormEvent.TYPE_STORE_AFTER: {
-            // save navigation history
-            IDesktop desktop = ClientSessionProvider.currentSession().getDesktop();
-            IPage<?> page = AbstractPageWithTable.this;
-            if (desktop != null && desktop.getOutline() != null && desktop.getOutline().getActivePage() == page) {
-              BEANS.get(INavigationHistoryService.class).addStep(0, page);
-            }
             // do page reload to execute search
             try {
               reloadPage();
