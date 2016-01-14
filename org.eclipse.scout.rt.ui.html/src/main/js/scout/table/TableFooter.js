@@ -246,7 +246,7 @@ scout.TableFooter.prototype._renderInfoSelection = function() {
   var $info = this._$infoSelection,
     numRows = this.table.filteredRows().length,
     numRowsSelected = this.table.selectedRows.length,
-    all = numRows === numRowsSelected;
+    all = numRows > 0 && numRows === numRowsSelected;
 
   $info.empty();
   if (!this._compactStyle) {

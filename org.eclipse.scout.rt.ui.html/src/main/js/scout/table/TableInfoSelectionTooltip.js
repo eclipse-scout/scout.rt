@@ -21,9 +21,7 @@ scout.TableInfoSelectionTooltip.prototype._init = function(options) {
 
 scout.TableInfoSelectionTooltip.prototype._renderText = function() {
   var table = this.tableFooter.table,
-    numRowsSelected = table.selectedRows.length,
-    numRows = table.rows.length,
-    all = scout.nvl(all, (numRows === numRowsSelected));
+    numRowsSelected = table.selectedRows.length;
 
   this.$content.appendSpan().text(this.session.text('ui.NumRowsSelected', this.tableFooter.computeCountInfo(numRowsSelected)));
   this.$content.appendBr();
