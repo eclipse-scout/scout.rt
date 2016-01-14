@@ -22,7 +22,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.rt.platform.util.SleepUtil;
-import org.eclipse.scout.rt.platform.util.concurrent.InterruptedException;
+import org.eclipse.scout.rt.platform.util.concurrent.InterruptedRuntimeException;
 import org.eclipse.scout.rt.server.jdbc.AbstractSqlService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -112,7 +112,7 @@ public final class SqlConnectionPool {
           }
           catch (java.lang.InterruptedException ie) {
             Thread.currentThread().interrupt(); // Restore the thread's interrupted status because cleared by catching {@link java.lang.InterruptedException}.
-            throw new InterruptedException("Interrupted while leasing database connection");
+            throw new InterruptedRuntimeException("Interrupted while leasing database connection");
           }
         }
         // test candidate connection

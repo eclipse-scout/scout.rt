@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.server.transaction;
 
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
-import org.eclipse.scout.rt.platform.util.concurrent.CancellationException;
+import org.eclipse.scout.rt.platform.util.concurrent.CancellationRuntimeException;
 import org.eclipse.scout.rt.platform.util.concurrent.ICancellable;
 
 /**
@@ -40,7 +40,7 @@ public interface ITransaction extends ICancellable {
   /**
    * Registers the given {@link ITransactionMember}.
    *
-   * @throws CancellationException
+   * @throws CancellationRuntimeException
    *           if the transaction is cancelled.
    */
   void registerMember(ITransactionMember member);
@@ -63,7 +63,7 @@ public interface ITransaction extends ICancellable {
    * Tries to temporarily commit the transaction on all transaction members.
    *
    * @return <code>true</code> without if the commit phase 1 was successful on all members.
-   * @throws CancellationException
+   * @throws CancellationRuntimeException
    *           if the transaction is cancelled.
    */
   boolean commitPhase1();

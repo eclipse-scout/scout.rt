@@ -31,7 +31,7 @@ import org.eclipse.scout.rt.platform.job.internal.ExecutionSemaphore.IPermitAcqu
 import org.eclipse.scout.rt.platform.job.internal.ExecutionSemaphore.QueuePosition;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
-import org.eclipse.scout.rt.platform.util.concurrent.InterruptedException;
+import org.eclipse.scout.rt.platform.util.concurrent.InterruptedRuntimeException;
 import org.eclipse.scout.rt.platform.util.concurrent.TimeoutException;
 import org.eclipse.scout.rt.testing.platform.job.JobTestUtil;
 import org.eclipse.scout.rt.testing.platform.util.BlockingCountDownLatch;
@@ -282,7 +282,7 @@ public class MutualExclusionTest {
         try {
           mutex.acquire(m_task2, QueuePosition.TAIL);
         }
-        catch (InterruptedException e) {
+        catch (InterruptedRuntimeException e) {
           interruptedLatch.countDown();
         }
       }

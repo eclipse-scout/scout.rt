@@ -61,8 +61,8 @@ import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.status.Status;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
-import org.eclipse.scout.rt.platform.util.concurrent.CancellationException;
-import org.eclipse.scout.rt.platform.util.concurrent.InterruptedException;
+import org.eclipse.scout.rt.platform.util.concurrent.CancellationRuntimeException;
+import org.eclipse.scout.rt.platform.util.concurrent.InterruptedRuntimeException;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.data.page.AbstractTablePageData;
@@ -711,7 +711,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
         ensureSearchFormStarted();
         interceptPopulateTable();
       }
-      catch (InterruptedException | CancellationException e) {
+      catch (InterruptedRuntimeException | CancellationRuntimeException e) {
         getTable().discardAllRows();
         setTableStatus(new Status(ScoutTexts.get("SearchWasCanceled"), IStatus.ERROR));
         throw e;
@@ -771,7 +771,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
       try {
         loadTableDataImpl();
       }
-      catch (InterruptedException | CancellationException e) {
+      catch (InterruptedRuntimeException | CancellationRuntimeException e) {
         // NOOP
       }
       finally {

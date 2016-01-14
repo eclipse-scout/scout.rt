@@ -23,7 +23,7 @@ import org.eclipse.scout.rt.platform.job.JobState;
 import org.eclipse.scout.rt.platform.job.internal.ExecutionSemaphore.QueuePosition;
 import org.eclipse.scout.rt.platform.job.listener.JobEventData;
 import org.eclipse.scout.rt.platform.util.ToStringBuilder;
-import org.eclipse.scout.rt.platform.util.concurrent.InterruptedException;
+import org.eclipse.scout.rt.platform.util.concurrent.InterruptedRuntimeException;
 import org.eclipse.scout.rt.platform.util.concurrent.TimeoutException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -114,7 +114,7 @@ public class BlockingCondition implements IBlockingCondition {
       try {
         blockUntilSignaledOrTimeout(timeout, unit); // Wait until the condition falls
       }
-      catch (final InterruptedException | TimeoutException e) {
+      catch (final InterruptedRuntimeException | TimeoutException e) {
         exceptionWhileBlocking = e;
       }
     }
@@ -123,7 +123,7 @@ public class BlockingCondition implements IBlockingCondition {
     }
 
     // Reacquire the permit outside the lock.
-    if (exceptionWhileBlocking instanceof InterruptedException) {
+    if (exceptionWhileBlocking instanceof InterruptedRuntimeException) {
       Thread.interrupted(); // clear the interrupted status to reacquire the permit.
       afterBlockFutureTask(futureTask, executionHintRegistration);
       Thread.currentThread().interrupt(); // interrupt the current thread.
@@ -169,7 +169,7 @@ public class BlockingCondition implements IBlockingCondition {
    *          the maximal time to wait, or {@link #TIMEOUT_INFINITE} to wait infinitely.
    * @param unit
    *          unit of the given timeout.
-   * @throws InterruptedException
+   * @throws InterruptedRuntimeException
    *           if the current thread was interrupted while waiting.
    * @throws TimeoutException
    *           if the wait timed out.
@@ -198,7 +198,7 @@ public class BlockingCondition implements IBlockingCondition {
     }
     catch (final java.lang.InterruptedException e) {
       Thread.currentThread().interrupt(); // Restore the interrupted status because cleared by catching InterruptedException.
-      throw new InterruptedException("Interrupted while waiting for a blocking condition to fall")
+      throw new InterruptedRuntimeException("Interrupted while waiting for a blocking condition to fall")
           .withContextInfo("blockingCondition", this)
           .withContextInfo("thread", Thread.currentThread().getName());
     }
@@ -210,9 +210,9 @@ public class BlockingCondition implements IBlockingCondition {
   /**
    * Waits until acquired a permit for the given task. This method returns immediately if the specified task is not a
    * semaphore aware task. In case of an interruption, the permit acquisition is continued, but the method throws an
-   * {@link InterruptedException} upon acquisition.
+   * {@link InterruptedRuntimeException} upon acquisition.
    *
-   * @throws InterruptedException
+   * @throws InterruptedRuntimeException
    *           if interrupted during permit acquisition. However, the permit was acquired.
    */
   protected void acquirePermit(final JobFutureTask<?> futureTask) {
@@ -228,7 +228,7 @@ public class BlockingCondition implements IBlockingCondition {
       try {
         semaphore.acquire(futureTask, QueuePosition.HEAD);
       }
-      catch (final InterruptedException e) {
+      catch (final InterruptedRuntimeException e) {
         interrupted = true;
         Thread.interrupted(); // clear the interrupted status to acquire anew.
         LOG.warn("Interrupted while acquiring semaphore permit. Continue acquisition anew.[future={}, semaphore={}]", futureTask, semaphore, e);
@@ -237,7 +237,7 @@ public class BlockingCondition implements IBlockingCondition {
 
     if (interrupted) {
       Thread.currentThread().interrupt(); // interrupt the current thread
-      throw new InterruptedException("Interrupted while acquiring semaphore permit. However, the permit was successfully acquired. [future={}]", futureTask);
+      throw new InterruptedRuntimeException("Interrupted while acquiring semaphore permit. However, the permit was successfully acquired. [future={}]", futureTask);
     }
   }
 

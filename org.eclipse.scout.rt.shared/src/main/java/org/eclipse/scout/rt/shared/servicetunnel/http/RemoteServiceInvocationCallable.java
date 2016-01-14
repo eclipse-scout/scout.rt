@@ -21,9 +21,9 @@ import java.util.concurrent.TimeUnit;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.job.Jobs;
-import org.eclipse.scout.rt.platform.util.concurrent.CancellationException;
+import org.eclipse.scout.rt.platform.util.concurrent.CancellationRuntimeException;
 import org.eclipse.scout.rt.platform.util.concurrent.ICancellable;
-import org.eclipse.scout.rt.platform.util.concurrent.InterruptedException;
+import org.eclipse.scout.rt.platform.util.concurrent.InterruptedRuntimeException;
 import org.eclipse.scout.rt.platform.util.concurrent.TimeoutException;
 import org.eclipse.scout.rt.shared.services.common.context.IRunMonitorCancelService;
 import org.eclipse.scout.rt.shared.servicetunnel.HttpException;
@@ -114,7 +114,7 @@ public class RemoteServiceInvocationCallable implements Callable<ServiceTunnelRe
         LOG.warn("Failed to cancel server processing", response.getException());
       }
     }
-    catch (final TimeoutException | CancellationException | InterruptedException e) {
+    catch (final TimeoutException | CancellationRuntimeException | InterruptedRuntimeException e) {
       // NOOP: Do not cancel 'cancel-request' to prevent loop.
     }
     catch (RuntimeException | NoSuchMethodException e) {

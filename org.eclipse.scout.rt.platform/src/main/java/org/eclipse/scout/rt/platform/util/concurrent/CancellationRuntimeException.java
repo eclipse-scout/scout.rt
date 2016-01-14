@@ -19,19 +19,19 @@ import org.eclipse.scout.rt.platform.job.IFuture;
  *
  * @since 5.2
  */
-public class CancellationException extends PlatformException {
+public class CancellationRuntimeException extends PlatformException {
 
   private static final long serialVersionUID = 1L;
 
   /**
    * See constructor of {@link PlatformException}
    */
-  public CancellationException(final String message, final Object... args) {
+  public CancellationRuntimeException(final String message, final Object... args) {
     super(message, args);
   }
 
   @Override
-  public CancellationException withContextInfo(final String name, final Object value, final Object... valueArgs) {
+  public CancellationRuntimeException withContextInfo(final String name, final Object value, final Object... valueArgs) {
     super.withContextInfo(name, value, valueArgs);
     return this;
   }

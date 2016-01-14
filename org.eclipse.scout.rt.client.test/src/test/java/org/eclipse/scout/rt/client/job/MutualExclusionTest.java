@@ -53,7 +53,7 @@ import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.SleepUtil;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
-import org.eclipse.scout.rt.platform.util.concurrent.InterruptedException;
+import org.eclipse.scout.rt.platform.util.concurrent.InterruptedRuntimeException;
 import org.eclipse.scout.rt.platform.util.concurrent.TimeoutException;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.testing.platform.job.JobTestUtil;
@@ -505,7 +505,7 @@ public class MutualExclusionTest {
         try {
           condition.waitFor();
         }
-        catch (InterruptedException e) {
+        catch (InterruptedRuntimeException e) {
           protocol.add("interrupted-1 (a)");
           if (Thread.interrupted()) {
             protocol.add("interrupted-1 (b)");
@@ -585,7 +585,7 @@ public class MutualExclusionTest {
           condition.waitFor();
           protocol.add("not-interrupted-1");
         }
-        catch (InterruptedException e) {
+        catch (InterruptedRuntimeException e) {
           protocol.add("interrupted-1 (a)");
 
           if (Thread.interrupted()) {

@@ -16,7 +16,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.exception.DefaultRuntimeExceptionTranslator;
-import org.eclipse.scout.rt.platform.util.concurrent.InterruptedException;
+import org.eclipse.scout.rt.platform.util.concurrent.InterruptedRuntimeException;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -96,7 +96,7 @@ public abstract class AbstractServiceTunnel implements IServiceTunnel {
    * <p>
    * This method returns, once the current {@link RunMonitor} gets cancelled. When being cancelled, a cancellation
    * request is sent to the server, and the {@link ServiceTunnelResponse} returned contains an
-   * {@link InterruptedException} to indicate cancellation.
+   * {@link InterruptedRuntimeException} to indicate cancellation.
    *
    * @return response sent by the server; is never <code>null</code>.
    */

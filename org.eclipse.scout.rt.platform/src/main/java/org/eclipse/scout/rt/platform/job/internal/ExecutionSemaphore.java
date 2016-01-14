@@ -27,7 +27,7 @@ import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.ToStringBuilder;
-import org.eclipse.scout.rt.platform.util.concurrent.InterruptedException;
+import org.eclipse.scout.rt.platform.util.concurrent.InterruptedRuntimeException;
 import org.quartz.Trigger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -118,7 +118,7 @@ public class ExecutionSemaphore implements IExecutionSemaphore {
    * @param queuePosition
    *          the position where to place the task in the queue of competing tasks if no permit is free at the time of
    *          invocation.
-   * @throws InterruptedException
+   * @throws InterruptedRuntimeException
    *           if the current thread was interrupted while waiting.
    */
   protected void acquire(final IFuture<?> task, final QueuePosition queuePosition) {
@@ -152,7 +152,7 @@ public class ExecutionSemaphore implements IExecutionSemaphore {
           Thread.currentThread().interrupt(); // Restore the interrupted status because cleared by catching InterruptedException.
           waitingForPermit.set(false);
 
-          throw new InterruptedException("Interrupted while competing for a permit")
+          throw new InterruptedRuntimeException("Interrupted while competing for a permit")
               .withContextInfo("task", task.getJobInput().getName())
               .withContextInfo("executionSemaphore", this);
         }

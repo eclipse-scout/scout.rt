@@ -21,8 +21,8 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.IExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.security.SecurityUtility;
-import org.eclipse.scout.rt.platform.util.concurrent.CancellationException;
-import org.eclipse.scout.rt.platform.util.concurrent.InterruptedException;
+import org.eclipse.scout.rt.platform.util.concurrent.CancellationRuntimeException;
+import org.eclipse.scout.rt.platform.util.concurrent.InterruptedRuntimeException;
 import org.eclipse.scout.rt.platform.util.concurrent.TimeoutException;
 
 /**
@@ -36,17 +36,17 @@ import org.eclipse.scout.rt.platform.util.concurrent.TimeoutException;
 public class JobExceptionTranslator {
 
   /**
-   * Translates {@link java.util.concurrent.CancellationException} into {@link InterruptedException}.
+   * Translates {@link java.util.concurrent.CancellationException} into {@link InterruptedRuntimeException}.
    */
-  protected CancellationException translateCancellationException(final java.util.concurrent.CancellationException e, final String message) {
-    return decorate(new CancellationException(message, e));
+  protected CancellationRuntimeException translateCancellationException(final java.util.concurrent.CancellationException e, final String message) {
+    return decorate(new CancellationRuntimeException(message, e));
   }
 
   /**
-   * Translates {@link java.lang.InterruptedException} into {@link InterruptedException}.
+   * Translates {@link java.lang.InterruptedException} into {@link InterruptedRuntimeException}.
    */
-  protected InterruptedException translateInterruptedException(final java.lang.InterruptedException e, final String message) {
-    return decorate(new InterruptedException(message, e));
+  protected InterruptedRuntimeException translateInterruptedException(final java.lang.InterruptedException e, final String message) {
+    return decorate(new InterruptedRuntimeException(message, e));
   }
 
   /**

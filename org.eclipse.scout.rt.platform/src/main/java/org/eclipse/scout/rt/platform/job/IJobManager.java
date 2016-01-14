@@ -25,7 +25,7 @@ import org.eclipse.scout.rt.platform.job.filter.event.JobEventFilterBuilder;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
-import org.eclipse.scout.rt.platform.util.concurrent.InterruptedException;
+import org.eclipse.scout.rt.platform.util.concurrent.InterruptedRuntimeException;
 import org.eclipse.scout.rt.platform.util.concurrent.TimeoutException;
 import org.eclipse.scout.rt.platform.visitor.CollectorVisitor;
 import org.eclipse.scout.rt.platform.visitor.IVisitor;
@@ -165,7 +165,7 @@ public interface IJobManager {
    *          the maximal time to wait.
    * @param unit
    *          unit of the given timeout.
-   * @throws InterruptedException
+   * @throws InterruptedRuntimeException
    *           if the current thread was interrupted while waiting.
    * @throws TimeoutException
    *           if the wait timed out.
@@ -184,7 +184,7 @@ public interface IJobManager {
    *          the maximal time to wait for the job to complete.
    * @param unit
    *          unit of the timeout.
-   * @throws InterruptedException
+   * @throws InterruptedRuntimeException
    *           if the current thread was interrupted while waiting.
    * @throws TimeoutException
    *           if the wait timed out.

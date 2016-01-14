@@ -23,7 +23,7 @@ import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.exception.PlatformExceptionTranslator;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
-import org.eclipse.scout.rt.platform.util.concurrent.InterruptedException;
+import org.eclipse.scout.rt.platform.util.concurrent.InterruptedRuntimeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -80,7 +80,7 @@ public class ClientExceptionHandler extends ExceptionHandler {
                 .withName("Visualizing PlatformException"))
                 .awaitDone();
           }
-          catch (final InterruptedException e) {
+          catch (final InterruptedRuntimeException e) {
             // NOOP
           }
         }

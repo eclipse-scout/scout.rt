@@ -39,9 +39,9 @@ import org.eclipse.scout.rt.platform.reflect.AbstractPropertyObserver;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
-import org.eclipse.scout.rt.platform.util.concurrent.CancellationException;
+import org.eclipse.scout.rt.platform.util.concurrent.CancellationRuntimeException;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
-import org.eclipse.scout.rt.platform.util.concurrent.InterruptedException;
+import org.eclipse.scout.rt.platform.util.concurrent.InterruptedRuntimeException;
 import org.eclipse.scout.rt.platform.util.date.DateUtility;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 import org.eclipse.scout.rt.shared.extension.ContributionComposite;
@@ -315,7 +315,7 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
         }, ModelJobs.newInput(ClientRunContexts.copyCurrent()))
             .awaitDone();
       }
-      catch (InterruptedException e) {
+      catch (InterruptedRuntimeException e) {
         // NOOP
       }
     }
@@ -410,7 +410,7 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
         try {
           interceptLoadItemsInBackground(ClientSessionProvider.currentSession(), m_loadingMinDate, m_loadingMaxDate, m_result);
         }
-        catch (InterruptedException | CancellationException e) {
+        catch (InterruptedRuntimeException | CancellationRuntimeException e) {
           // NOOP
         }
         catch (RuntimeException e) {

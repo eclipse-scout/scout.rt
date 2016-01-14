@@ -49,9 +49,9 @@ import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.util.SleepUtil;
 import org.eclipse.scout.rt.platform.util.StringUtility;
-import org.eclipse.scout.rt.platform.util.concurrent.CancellationException;
+import org.eclipse.scout.rt.platform.util.concurrent.CancellationRuntimeException;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
-import org.eclipse.scout.rt.platform.util.concurrent.InterruptedException;
+import org.eclipse.scout.rt.platform.util.concurrent.InterruptedRuntimeException;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.job.filter.event.SessionJobEventFilter;
 import org.eclipse.scout.rt.shared.job.filter.future.SessionFutureFilter;
@@ -679,11 +679,11 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
       try {
         return BEANS.get(UiJobs.class).awaitAndGet(future);
       }
-      catch (InterruptedException e) {
+      catch (InterruptedRuntimeException e) {
         future.cancel(true);
         return null;
       }
-      catch (CancellationException e) {
+      catch (CancellationRuntimeException e) {
         return null;
       }
     }
@@ -765,11 +765,11 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
       try {
         return BEANS.get(UiJobs.class).awaitAndGet(future);
       }
-      catch (InterruptedException e) {
+      catch (InterruptedRuntimeException e) {
         future.cancel(true);
         return null;
       }
-      catch (CancellationException e) {
+      catch (CancellationRuntimeException e) {
         return null;
       }
     }
@@ -992,7 +992,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
           .withSession(getClientSession(), true)))
           .awaitDone();
     }
-    catch (InterruptedException e) {
+    catch (InterruptedRuntimeException e) {
       LOG.error("Interrupted while waiting for the UISession to be disposed", e);
     }
     finally {

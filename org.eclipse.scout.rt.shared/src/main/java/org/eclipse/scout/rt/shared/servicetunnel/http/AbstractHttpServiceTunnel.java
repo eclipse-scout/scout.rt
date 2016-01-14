@@ -32,9 +32,9 @@ import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.UriUtility;
-import org.eclipse.scout.rt.platform.util.concurrent.CancellationException;
+import org.eclipse.scout.rt.platform.util.concurrent.CancellationRuntimeException;
 import org.eclipse.scout.rt.platform.util.concurrent.ICancellable;
-import org.eclipse.scout.rt.platform.util.concurrent.InterruptedException;
+import org.eclipse.scout.rt.platform.util.concurrent.InterruptedRuntimeException;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.SharedConfigProperties.ServiceTunnelTargetUrlProperty;
 import org.eclipse.scout.rt.shared.servicetunnel.AbstractServiceTunnel;
@@ -232,14 +232,14 @@ public abstract class AbstractHttpServiceTunnel extends AbstractServiceTunnel {
           }, null);
       return future.awaitDoneAndGet();
     }
-    catch (InterruptedException e) {
+    catch (InterruptedRuntimeException e) {
       if (future != null) {
         future.cancel(true); // Ensure the monitor to be cancelled once this thread is interrupted to cancel the remote call.
       }
-      return new ServiceTunnelResponse(new InterruptedException(ScoutTexts.get("UserInterrupted"))); // Interruption has precedence over computation result or computation error.
+      return new ServiceTunnelResponse(new InterruptedRuntimeException(ScoutTexts.get("UserInterrupted"))); // Interruption has precedence over computation result or computation error.
     }
-    catch (CancellationException e) {
-      return new ServiceTunnelResponse(new InterruptedException(ScoutTexts.get("UserInterrupted"))); // Cancellation has precedence over computation result or computation error.
+    catch (CancellationRuntimeException e) {
+      return new ServiceTunnelResponse(new InterruptedRuntimeException(ScoutTexts.get("UserInterrupted"))); // Cancellation has precedence over computation result or computation error.
     }
     catch (final RuntimeException e) {
       return new ServiceTunnelResponse(e);

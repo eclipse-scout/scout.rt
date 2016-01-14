@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.platform.job;
 
 import java.util.concurrent.TimeUnit;
 
-import org.eclipse.scout.rt.platform.util.concurrent.InterruptedException;
+import org.eclipse.scout.rt.platform.util.concurrent.InterruptedRuntimeException;
 import org.eclipse.scout.rt.platform.util.concurrent.TimeoutException;
 
 /**
@@ -59,7 +59,7 @@ public interface IBlockingCondition {
    * @param executionHints
    *          optional execution hints to be associated with the current {@link IFuture} for the time of waiting; has no
    *          effect if not running on behalf of a job.
-   * @throws InterruptedException
+   * @throws InterruptedRuntimeException
    *           if the current thread was interrupted while waiting.<br/>
    *           But, even if not being blocked anymore, the blocking condition might still be in <em>blocking state</em>.
    *           Also, if being a semaphore aware job, the permit was acquired accordingly.
@@ -81,7 +81,7 @@ public interface IBlockingCondition {
    * @param executionHints
    *          optional execution hints to be associated with the current {@link IFuture} for the time of waiting; has no
    *          effect if not running on behalf of a job.
-   * @throws InterruptedException
+   * @throws InterruptedRuntimeException
    *           if the current thread was interrupted while waiting.<br/>
    *           But, even if not being blocked anymore, the blocking condition might still be in <em>blocking state</em>.
    *           Also, if being a semaphore aware job, the permit was acquired accordingly.

@@ -12,8 +12,8 @@ package org.eclipse.scout.rt.platform.exception;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.util.StringUtility;
-import org.eclipse.scout.rt.platform.util.concurrent.CancellationException;
-import org.eclipse.scout.rt.platform.util.concurrent.InterruptedException;
+import org.eclipse.scout.rt.platform.util.concurrent.CancellationRuntimeException;
+import org.eclipse.scout.rt.platform.util.concurrent.InterruptedRuntimeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,11 +31,11 @@ public class ExceptionHandler {
    * This method must not throw an exception.
    */
   public void handle(final Throwable t) {
-    if (t instanceof InterruptedException) {
-      handleInterruptedException((InterruptedException) t);
+    if (t instanceof InterruptedRuntimeException) {
+      handleInterruptedException((InterruptedRuntimeException) t);
     }
-    else if (t instanceof CancellationException) {
-      handleCancelledException((CancellationException) t);
+    else if (t instanceof CancellationRuntimeException) {
+      handleCancelledException((CancellationRuntimeException) t);
     }
     else if (t instanceof PlatformException) {
       final PlatformException pe = (PlatformException) t;
@@ -54,21 +54,21 @@ public class ExceptionHandler {
   }
 
   /**
-   * Method invoked to handle an {@link InterruptedException}.
+   * Method invoked to handle an {@link InterruptedRuntimeException}.
    * <p>
    * The default implementation logs it with debug level.
    */
-  protected void handleInterruptedException(final InterruptedException e) {
+  protected void handleInterruptedException(final InterruptedRuntimeException e) {
     LOG.debug("Interruption", e);
   }
 
   /**
-   * Method invoked to handle a {@link CancellationException}. Typically, such an exception is thrown when waiting on a
+   * Method invoked to handle a {@link CancellationRuntimeException}. Typically, such an exception is thrown when waiting on a
    * cancelled job.
    * <p>
    * The default implementation logs it with debug level.
    */
-  protected void handleCancelledException(final CancellationException e) {
+  protected void handleCancelledException(final CancellationRuntimeException e) {
     LOG.debug("Cancellation", e);
   }
 
@@ -113,7 +113,7 @@ public class ExceptionHandler {
 
   /**
    * Method invoked to handle a {@link Throwable} which is not of the type {@code PlatformException}, or
-   * {@link InterruptedException}, or {@link CancellationException}.
+   * {@link InterruptedRuntimeException}, or {@link CancellationRuntimeException}.
    * <p>
    * The default implementation logs the throwable as <code>ERROR</code>.
    */
