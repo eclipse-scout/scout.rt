@@ -124,6 +124,10 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
 
         // Replace the updated event
         it.set(newEvent);
+
+        if (nodeRemovedFromCreationEvent) {
+          break;
+        }
       }
 
       if (!nodeRemovedFromCreationEvent) {
