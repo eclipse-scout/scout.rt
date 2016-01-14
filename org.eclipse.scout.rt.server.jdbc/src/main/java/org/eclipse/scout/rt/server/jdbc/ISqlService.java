@@ -12,8 +12,12 @@ package org.eclipse.scout.rt.server.jdbc;
 
 import java.sql.Connection;
 
+import org.eclipse.scout.rt.platform.IPlatform.State;
+import org.eclipse.scout.rt.platform.IPlatformListener;
+import org.eclipse.scout.rt.platform.job.IJobManager;
 import org.eclipse.scout.rt.platform.service.IService;
 import org.eclipse.scout.rt.server.jdbc.style.ISqlStyle;
+import org.eclipse.scout.rt.server.services.common.clustersync.IClusterSynchronizationService;
 
 /**
  * <p>
@@ -146,6 +150,16 @@ import org.eclipse.scout.rt.server.jdbc.style.ISqlStyle;
  * @see ISqlStyle
  */
 public interface ISqlService extends IService {
+
+  /**
+   * Indicates the order of the SQL service's {@link IPlatformListener} to destroy itself upon entering platform state
+   * {@link State#PlatformStopping}. Any listener depending on database access facility must be configured with an order
+   * less than {@link #DESTROY_ORDER}.
+   *
+   * @see IJobManager#DESTROY_ORDER
+   * @see IClusterSynchronizationService#DESTROY_ORDER
+   */
+  long DESTROY_ORDER = 5_800;
 
   /**
    * Provides {@link ISqlStyle} to write database independent SQL statements.

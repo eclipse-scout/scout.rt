@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.server.jdbc;
 import java.lang.reflect.Method;
 import java.security.Permission;
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,7 +21,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.IPlatform.State;
+import org.eclipse.scout.rt.platform.IPlatformListener;
 import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.PlatformEvent;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.config.CONFIG;
@@ -36,6 +40,7 @@ import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.NumberUtility;
 import org.eclipse.scout.rt.server.jdbc.SqlConfigProperties.SqlDirectJdbcConnectionProperty;
 import org.eclipse.scout.rt.server.jdbc.SqlConfigProperties.SqlJdbcDriverNameProperty;
+import org.eclipse.scout.rt.server.jdbc.SqlConfigProperties.SqlJdbcDriverUnloadProperty;
 import org.eclipse.scout.rt.server.jdbc.SqlConfigProperties.SqlJdbcMappingNameProperty;
 import org.eclipse.scout.rt.server.jdbc.SqlConfigProperties.SqlJdbcPoolConnectionBusyTimeoutProperty;
 import org.eclipse.scout.rt.server.jdbc.SqlConfigProperties.SqlJdbcPoolConnectionLifetimeProperty;
@@ -68,7 +73,7 @@ public abstract class AbstractSqlService implements ISqlService, IServiceInvento
   private static final Logger LOG = LoggerFactory.getLogger(AbstractSqlService.class);
   public static final int DEFAULT_MEMORY_PREFETCH_SIZE = 1024 * 1024; // = 1MB default
 
-  private SqlConnectionPool m_pool;
+  private volatile SqlConnectionPool m_pool;
   private final String m_transactionMemberId;
   private final boolean m_directJdbcConnection;
   private final String m_jndiName;
@@ -90,6 +95,8 @@ public abstract class AbstractSqlService implements ISqlService, IServiceInvento
 
   private final Map<String, List<Class<?>>> m_permissionNameToDescriptor;
   private final Map<String, List<Class<?>>> m_codeNameToDescriptor;
+
+  private volatile boolean m_destroyed;
 
   public AbstractSqlService() {
     // load config
@@ -512,8 +519,9 @@ public abstract class AbstractSqlService implements ISqlService, IServiceInvento
 
   @Override
   public String getInventory() {
-    if (m_pool != null) {
-      return m_pool.getInventory();
+    final SqlConnectionPool pool = m_pool;
+    if (pool != null) {
+      return pool.getInventory();
     }
     return null;
   }
@@ -583,6 +591,8 @@ public abstract class AbstractSqlService implements ISqlService, IServiceInvento
   }
 
   private synchronized SqlConnectionPool getSqlConnectionPool() {
+    Assertions.assertFalse(isDestroyed(), "{} not available because the platform has been shut down.", getClass().getSimpleName());
+
     if (m_pool == null) {
       m_pool = SqlConnectionPool.getPool(getClass(), getJdbcPoolSize(), getJdbcPoolConnectionLifetime(), getJdbcPoolConnectionBusyTimeout());
     }
@@ -772,6 +782,47 @@ public abstract class AbstractSqlService implements ISqlService, IServiceInvento
     return null;
   }
 
+  /**
+   * Returns whether this SQL service was destroyed, and cannot be used anymore.
+   */
+  public boolean isDestroyed() {
+    return m_destroyed;
+  }
+
+  /**
+   * Method invoked once the platform is shutting down.
+   */
+  protected void destroy() {
+    if (isDestroyed()) {
+      return;
+    }
+
+    synchronized (this) {
+      if (isDestroyed()) {
+        return; // double-checked locking
+      }
+      m_destroyed = true;
+    }
+
+    if (isDirectJdbcConnection()) {
+      // Destroy connection pool
+      if (m_pool != null) {
+        m_pool.destroy();
+        m_pool = null;
+      }
+
+      // Destroy JDBC driver
+      if (CONFIG.getPropertyValue(SqlJdbcDriverUnloadProperty.class)) {
+        try {
+          DriverManager.deregisterDriver(DriverManager.getDriver(getJdbcMappingName()));
+        }
+        catch (final SQLException e) {
+          LOG.warn("Failed to deregister JDBC driver [driver={}, url={}]", getJdbcDriverName(), getJdbcMappingName(), e);
+        }
+      }
+    }
+  }
+
   private class SqlTransactionMember extends AbstractSqlTransactionMember {
     private final Connection m_conn;
 
@@ -826,6 +877,21 @@ public abstract class AbstractSqlService implements ISqlService, IServiceInvento
     public void release() {
       releaseConnection(m_conn);
     }
-  }// end private class
+  } // end private class
 
+  /**
+   * {@link IPlatformListener} to shutdown this SQL service upon platform shutdown.
+   */
+  @Order(ISqlService.DESTROY_ORDER)
+  public static class PlatformListener implements IPlatformListener {
+
+    @Override
+    public void stateChanged(final PlatformEvent event) {
+      if (State.PlatformStopping.equals(event.getState())) {
+        for (final AbstractSqlService sqlService : BEANS.all(AbstractSqlService.class)) {
+          sqlService.destroy();
+        }
+      }
+    }
+  }
 }

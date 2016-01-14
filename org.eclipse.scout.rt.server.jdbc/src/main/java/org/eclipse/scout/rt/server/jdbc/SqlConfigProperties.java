@@ -139,4 +139,21 @@ public class SqlConfigProperties {
     }
   }
 
+  /**
+   * Indicates whether to uninstall JDBC driver upon platform shutdown (<code>true</code> by default).
+   * <p>
+   * This property has no effect if working with JNDI JDBC connections.
+   */
+  public static class SqlJdbcDriverUnloadProperty extends AbstractBooleanConfigProperty {
+
+    @Override
+    public String getKey() {
+      return "org.eclipse.scout.rt.server.services.common.jdbc.AbstractSqlService#jdbcDriverUnload";
+    }
+
+    @Override
+    protected Boolean getDefaultValue() {
+      return Boolean.TRUE;
+    }
+  }
 }
