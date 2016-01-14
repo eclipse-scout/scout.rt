@@ -36,12 +36,12 @@ public class RemoteCacheValueResolver<K, V> implements ICacheValueResolver<K, V>
 
   @SuppressWarnings("unchecked")
   @Override
-  public V resolve(K key) throws Exception {
+  public V resolve(K key) {
     return (V) BEANS.get(IRemoteCacheService.class).get(getCacheId(), key);
   }
 
   @Override
-  public Map<K, V> resolveAll(Set<K> keys) throws Exception {
+  public Map<K, V> resolveAll(Set<K> keys) {
     return BEANS.get(IRemoteCacheService.class).getAll(getCacheId(), keys);
   }
 }

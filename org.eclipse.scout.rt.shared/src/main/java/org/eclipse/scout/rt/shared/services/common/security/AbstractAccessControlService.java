@@ -132,7 +132,7 @@ public abstract class AbstractAccessControlService<K> implements IAccessControlS
     return new AbstractCacheValueResolver<K, PermissionCollection>() {
 
       @Override
-      public PermissionCollection resolve(K key) throws Exception {
+      public PermissionCollection resolve(K key) {
         return execLoadPermissions(key);
       }
     };

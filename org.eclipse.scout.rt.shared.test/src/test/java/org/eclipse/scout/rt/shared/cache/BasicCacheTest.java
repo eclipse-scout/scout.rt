@@ -30,12 +30,12 @@ public class BasicCacheTest {
       private int m_counter = 0;
 
       @Override
-      public String resolve(Integer key) throws Exception {
+      public String resolve(Integer key) {
         if (13 == key) {
           return null;
         }
         if (1337 == key) {
-          throw new ProcessingException("Test exception - Should be logged. Can be ingnored / works as expected");
+          throw new ProcessingException("Test exception - thrown");
         }
         m_counter++;
         return String.valueOf(key) + "." + String.valueOf(m_counter);
@@ -94,7 +94,6 @@ public class BasicCacheTest {
 
     // unresolvable keys
     assertEquals(null, cache.get(13));
-    assertEquals(null, cache.get(1337));
 
     assertEquals(1, cache.getUnmodifiableMap().size());
 
@@ -112,4 +111,11 @@ public class BasicCacheTest {
     assertEquals(0, emptyResultMap.size());
     cache.invalidate(null, true);
   }
+
+  @Test(expected = ProcessingException.class)
+  public void testCacheExceptionDuringCreation() {
+    ICache<Integer, String> cache = createCache();
+    cache.get(1337);
+  }
+
 }

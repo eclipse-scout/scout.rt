@@ -27,6 +27,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.CreateImmediately;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
+import org.eclipse.scout.rt.platform.exception.PlatformExceptionTranslator;
 import org.eclipse.scout.rt.platform.holders.Holder;
 import org.eclipse.scout.rt.platform.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
@@ -70,8 +71,16 @@ public class CodeService implements ICodeService {
     return new AbstractCacheValueResolver<CodeTypeCacheKey, ICodeType<?, ?>>() {
 
       @Override
-      public ICodeType<?, ?> resolve(CodeTypeCacheKey key) throws Exception {
-        return key.getCodeTypeClass().newInstance();
+      public ICodeType<?, ?> resolve(CodeTypeCacheKey key) {
+        try {
+          return key.getCodeTypeClass().newInstance();
+        }
+        catch (ReflectiveOperationException e) {
+          throw BEANS.get(PlatformExceptionTranslator.class)
+              .translate(e)
+              .withContextInfo("key", key)
+              .withContextInfo("codeTypeClass", key.getCodeTypeClass());
+        }
       }
     };
   }

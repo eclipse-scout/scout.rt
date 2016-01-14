@@ -43,7 +43,7 @@ public class BoundedResolveCacheWrapper<K, V> extends AbstractCacheWrapper<K, V>
     catch (InterruptedException e) {
       // interrupted, mark thread again as interrupted and resolve without a semaphore anyway
       Thread.currentThread().interrupt();
-      return super.get(key);
+      throw new org.eclipse.scout.rt.platform.util.concurrent.InterruptedException("Interrupted during acquire", e);
     }
     try {
       return super.get(key);

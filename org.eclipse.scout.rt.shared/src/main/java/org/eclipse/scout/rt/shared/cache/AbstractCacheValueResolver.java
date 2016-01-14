@@ -22,7 +22,7 @@ import java.util.Set;
 public abstract class AbstractCacheValueResolver<K, V> implements ICacheValueResolver<K, V> {
 
   @Override
-  public Map<K, V> resolveAll(Set<K> keys) throws Exception {
+  public Map<K, V> resolveAll(Set<K> keys) {
     Map<K, V> result = new HashMap<K, V>();
     for (K key : keys) {
       result.put(key, resolve(key));

@@ -25,12 +25,12 @@ public interface ICacheValueResolver<K, V> {
    * @param key
    *          never null
    */
-  V resolve(K key) throws Exception;
+  V resolve(K key);
 
   /**
    * @param keys
    *          never null, empty or contains null elements
    * @return non null modifiable map
    */
-  Map<K, V> resolveAll(Set<K> keys) throws Exception;
+  Map<K, V> resolveAll(Set<K> keys);
 }
