@@ -49,7 +49,6 @@ import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.status.Status;
-import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CompareUtility;
 import org.eclipse.scout.rt.platform.util.EventListenerList;
 import org.eclipse.scout.rt.platform.util.FinalValue;
@@ -1398,8 +1397,6 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
    *         using {@link LocalLookupCall}.
    */
   private IFuture<Void> fetchLookupRows(final ILookupRowProvider<LOOKUP_KEY> dataProvider, final ILookupRowFetchedCallback<LOOKUP_KEY> callback, final boolean asynchronousFetching, final int maxRowCount) {
-    Assertions.assertTrue(ModelJobs.isModelThread(), "Must be invoked from model thread");
-
     if (getLookupCall() == null) {
       callback.onSuccess(Collections.<ILookupRow<LOOKUP_KEY>> emptyList());
       return null;
