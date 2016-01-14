@@ -1368,6 +1368,58 @@ describe("Table", function() {
       assertGroupingValues(table, column4, ['50', '78']);
     });
 
+    it("regroups if rows get inserted, event is from server and table was empty", function() {
+      if (!scout.device.supportsInternationalization()) {
+        return;
+      }
+      prepareTable();
+      render(table);
+      table.deleteAllRows();
+      expect(table.rows.length).toBe(0);
+      expect(find$aggregateRows(table).length).toBe(0);
+      addGrouping(table, column0, false);
+      expect(find$aggregateRows(table).length).toBe(0);
+
+      // add new row for group 1
+      var rows = [{
+        cells: ['a', 'xyz', 'xyz', 10, 20]
+      }];
+      table.insertRows(rows, true);
+
+      expect(find$aggregateRows(table).length).toBe(1);
+      assertGroupingProperty(table, 0);
+      assertGroupingValues(table, column3, ['10']);
+      assertGroupingValues(table, column4, ['20']);
+    });
+
+    it("does not regroup if rows get inserted, event is from server and table was not empty", function() {
+      if (!scout.device.supportsInternationalization()) {
+        return;
+      }
+      prepareTable();
+      prepareContent();
+      render(table);
+
+      expect(find$aggregateRows(table).length).toBe(0);
+      addGrouping(table, column0, false);
+      expect(find$aggregateRows(table).length).toBe(2);
+      assertGroupingProperty(table, 0);
+      assertGroupingValues(table, column3, ['10', '26']);
+      assertGroupingValues(table, column4, ['30', '78']);
+
+      // add new row for group 1
+      var rows = [{
+        cells: ['a', 'xyz', 'xyz', 10, 20]
+      }];
+      table.insertRows(rows, true);
+
+      // Still wrong grouping because group was not executed. There will be a rowOrderChanged event which will do it, see comments in table.insertRows
+      expect(find$aggregateRows(table).length).toBe(2);
+      assertGroupingProperty(table, 0);
+      assertGroupingValues(table, column3, ['10', '26']);
+      assertGroupingValues(table, column4, ['30', '78']);
+    });
+
     it("regroups if rows get deleted", function() {
       if (!scout.device.supportsInternationalization()) {
         return;

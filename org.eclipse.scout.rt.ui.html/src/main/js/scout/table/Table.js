@@ -1826,7 +1826,8 @@ scout.Table.prototype.insertRow = function(row) {
 };
 
 scout.Table.prototype.insertRows = function(rows, fromServer) {
-  var newHiddenRows = [];
+  var newHiddenRows = [],
+    wasEmpty = this.rows.length === 0;
 
   // Update model
   rows.forEach(function(row) {
@@ -1841,6 +1842,12 @@ scout.Table.prototype.insertRows = function(rows, fromServer) {
   if (!fromServer) {
     // If event comes from server, there will be a row order changed event as well -> no sorting necessary
     this._sort();
+  } else {
+    // There will only be a row order changed event if table was not empty.
+    // If it was empty, there will be NO row order changed event (tableEventBuffer) -> inserted rows are already in correct order -> no sort necessary but group is
+    if (wasEmpty) {
+      this._group();
+    }
   }
   this._rebuildingTable = false;
 
