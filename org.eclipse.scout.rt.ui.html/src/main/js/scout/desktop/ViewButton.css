@@ -142,6 +142,6 @@
   }
 
   & > .key-box {
-    bottom: 4px;
+    top: 14px;
   }
 }

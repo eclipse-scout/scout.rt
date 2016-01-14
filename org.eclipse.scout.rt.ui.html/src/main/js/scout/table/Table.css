@@ -291,7 +291,7 @@
 /* key box */
 
 .table-row > .key-box {
-  top: calc(~'50%' - 17px/2);
+  top: calc(~'50%' - 23px/2);
 }
 
 .table-controls > .table-control > .key-box {
@@ -299,5 +299,5 @@
 }
 
 .table .key-box.char {
-  top: calc(~'50%' - 17px/2);
+  top: calc(~'50%' - 21px/2);
 }

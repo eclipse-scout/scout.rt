@@ -13,7 +13,7 @@ scout.TableSelectAllKeyStroke = function(table) {
   this.field = table;
   this.ctrl = true;
   this.which = [scout.keys.A];
-  this.renderingHints.offset = 0;
+  this.renderingHints.offset = 14;
   this.renderingHints.$drawingArea = function($drawingArea, event) {
     return this.field.footer ? this.field.footer._$infoSelection.find('.table-info-button') : null;
   }.bind(this);

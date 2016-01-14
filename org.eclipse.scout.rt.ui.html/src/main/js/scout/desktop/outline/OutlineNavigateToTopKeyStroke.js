@@ -11,7 +11,8 @@
 scout.OutlineNavigateToTopKeyStroke = function(tree) {
   scout.OutlineNavigateToTopKeyStroke.parent.call(this, tree);
   this.which = [scout.keys.HOME];
-  this.renderingHints.hAlign = scout.hAlign.LEFT;
+  this.renderingHints.hAlign = scout.hAlign.RIGHT;
+
   this.renderingHints.$drawingArea = function($drawingArea, event) {
     return this.field.$title || this.field.$data;
   }.bind(this);

@@ -100,5 +100,22 @@ scout.ViewButton.prototype._createActionKeyStroke = function() {
  */
 scout.ViewButtonActionKeyStroke = function(action) {
   scout.ViewButtonActionKeyStroke.parent.call(this, action);
+
 };
 scout.inherits(scout.ViewButtonActionKeyStroke, scout.ActionKeyStroke);
+
+scout.ViewButtonActionKeyStroke.prototype._postRenderKeyBox = function($drawingArea) {
+  if (this.field.iconId && this.field._isTab()) {
+    var width = $drawingArea.outerWidth();
+    var wKeybox = $drawingArea.find('.key-box').outerWidth();
+    var leftKeyBox = width / 2 - wKeybox / 2;
+    $drawingArea.find('.key-box').css('left', leftKeyBox + 'px');
+  }
+};
+
+scout.ViewButtonActionKeyStroke.prototype.renderKeyBox = function($drawingArea, event) {
+  if (this.field._isMenu()) {
+    this.renderingHints.hAlign = scout.hAlign.RIGHT;
+  }
+  scout.ViewButtonActionKeyStroke.parent.prototype.renderKeyBox.call(this, $drawingArea, event);
+};

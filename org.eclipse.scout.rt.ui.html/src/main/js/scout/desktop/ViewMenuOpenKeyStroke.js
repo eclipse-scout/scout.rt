@@ -18,7 +18,6 @@ scout.ViewMenuOpenKeyStroke = function(desktopNavigation, keyStroke) {
   this.which = [scout.keys.F2];
   this.stopPropagation = true;
 
-  this.renderingHints.offset = 4;
   this.renderingHints.$drawingArea = function($drawingArea, event) {
     return this.field.viewMenuTab.$container;
   }.bind(this);
@@ -30,4 +29,11 @@ scout.inherits(scout.ViewMenuOpenKeyStroke, scout.KeyStroke);
  */
 scout.ViewMenuOpenKeyStroke.prototype.handle = function(event) {
   this.field.doViewMenuAction(event);
+};
+
+scout.ViewMenuOpenKeyStroke.prototype._postRenderKeyBox = function($drawingArea) {
+  var width = $drawingArea.outerWidth();
+  var wKeybox = $drawingArea.find('.key-box').outerWidth();
+  var leftKeyBox = width / 2 - wKeybox / 2;
+  $drawingArea.find('.key-box').css('left', leftKeyBox + 'px');
 };

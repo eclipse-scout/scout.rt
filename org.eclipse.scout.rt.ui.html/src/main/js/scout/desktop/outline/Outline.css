@@ -37,7 +37,7 @@
     border-bottom: 1px solid @outline-title-border-color;
 
     & > .key-box {
-      top: 10px;
+      top: 19px;
     }
 
     & > .outline-title-text {
