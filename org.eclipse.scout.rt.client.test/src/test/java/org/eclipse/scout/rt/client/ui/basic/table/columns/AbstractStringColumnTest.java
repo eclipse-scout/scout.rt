@@ -38,8 +38,6 @@ public class AbstractStringColumnTest {
     IStringField field = (IStringField) column.prepareEditInternal(row);
     assertEquals("input masked property to be progagated to field", column.isInputMasked(), field.isInputMasked());
     assertEquals("mandatory property to be progagated to field", column.isMandatory(), field.isMandatory());
-    //TODO [5.2] jgu: ???
-//    assertEquals("css class property to be progagated to field", column.getCssClass(), field.getCssClass());
   }
 
   @Test
