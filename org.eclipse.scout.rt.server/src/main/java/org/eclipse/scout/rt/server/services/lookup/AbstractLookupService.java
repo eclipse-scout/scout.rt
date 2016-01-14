@@ -39,7 +39,8 @@ public abstract class AbstractLookupService<LOOKUP_ROW_KEY_TYPE> implements ILoo
    * @see #createLookupRowArray(Object[][], int, ILookupCall, Class)
    */
   public static <KEY_TYPE> List<ILookupRow<KEY_TYPE>> createLookupRowArray(Object[][] data, ILookupCall<KEY_TYPE> call, Class<?> keyClass) {
-    return createLookupRowArray(data, data != null && data.length > 0 ? data[0].length : 0, call, keyClass);
+    int maxColumnIndex = data != null && data.length > 0 ? data[0].length - 1 : 0;
+    return createLookupRowArray(data, maxColumnIndex, call, keyClass);
   }
 
   /**
