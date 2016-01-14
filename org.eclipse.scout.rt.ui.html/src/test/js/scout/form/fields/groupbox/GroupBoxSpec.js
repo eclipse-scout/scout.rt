@@ -70,8 +70,6 @@ describe("GroupBox", function() {
 
     beforeEach(function() {
       form = helper.createFormModel();
-      session.desktop = new scout.Desktop();
-      formController = new scout.FormController(form.parent, session);
       rootGroupBox = model;
       rootGroupBox.fields = [];
       form.rootGroupBox = rootGroupBox.id;
@@ -81,7 +79,7 @@ describe("GroupBox", function() {
     });
 
     it("adds group-box div when label is set", function() {
-      formController._renderDialog(formAdapter);
+      session.desktop.formController._renderDialog(formAdapter);
       expect(formAdapter.rootGroupBox.$container.cssHeight()).toBe(123);
       expect(formAdapter.rootGroupBox.$container.cssWidth()).toBe(97);
     });
