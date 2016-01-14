@@ -14,7 +14,7 @@
  * The message boxes are put into the list 'messageBoxes' contained in 'displayParent'.
  */
 scout.MessageBoxController = function(displayParent, session) {
-  this._displayParent = displayParent;
+  this.displayParent = displayParent;
   this.session = session;
 };
 
@@ -22,9 +22,9 @@ scout.MessageBoxController = function(displayParent, session) {
  * Adds the given message box to this controller and renders it.
  */
 scout.MessageBoxController.prototype.registerAndRender = function(messageBoxAdapterId) {
-  var messageBox = this.session.getOrCreateModelAdapter(messageBoxAdapterId, this._displayParent);
+  var messageBox = this.session.getOrCreateModelAdapter(messageBoxAdapterId, this.displayParent);
 
-  this._displayParent.messageBoxes.push(messageBox);
+  this.displayParent.messageBoxes.push(messageBox);
   this._render(messageBox);
 };
 
@@ -34,7 +34,7 @@ scout.MessageBoxController.prototype.registerAndRender = function(messageBoxAdap
 scout.MessageBoxController.prototype.unregisterAndRemove = function(messageBoxAdapterId) {
   var messageBox = this.session.getModelAdapter(messageBoxAdapterId);
   if (messageBox) {
-    scout.arrays.remove(this._displayParent.messageBoxes, messageBox);
+    scout.arrays.remove(this.displayParent.messageBoxes, messageBox);
     this._remove(messageBox);
   }
 };
@@ -43,19 +43,19 @@ scout.MessageBoxController.prototype.unregisterAndRemove = function(messageBoxAd
  * Removes all message boxes registered with this controller from DOM.
  */
 scout.MessageBoxController.prototype.remove = function() {
-  this._displayParent.messageBoxes.forEach(this._remove.bind(this));
+  this.displayParent.messageBoxes.forEach(this._remove.bind(this));
 };
 
 /**
  * Renders all message boxes registered with this controller.
  */
 scout.MessageBoxController.prototype.render = function() {
-  this._displayParent.messageBoxes.forEach(this._render.bind(this));
+  this.displayParent.messageBoxes.forEach(this._render.bind(this));
 };
 
 scout.MessageBoxController.prototype._render = function(messageBox) {
   // Only render message box if 'displayParent' is rendered yet; if not, the message box will be rendered once 'displayParent' is rendered.
-  if (!this._displayParent.rendered) {
+  if (!this.displayParent.rendered) {
     return;
   }
   // Prevent "Already rendered" errors / FIXME bsh, dwi: Remove this hack! Fix in on model if possible. See #162954.
@@ -66,15 +66,15 @@ scout.MessageBoxController.prototype._render = function(messageBox) {
   // Since the message box doesn't have a DOM element as parent when render is called, we must find the
   // entryPoint by using the model.
   var $mbParent;
-  if (this._displayParent instanceof scout.Form && this._displayParent.isPopupWindow()) {
-    $mbParent = this._displayParent.popupWindow.$container;
+  if (this.displayParent instanceof scout.Form && this.displayParent.isPopupWindow()) {
+    $mbParent = this.displayParent.popupWindow.$container;
   } else {
     $mbParent = this.session.desktop.$container;
   }
   messageBox.render($mbParent);
 
   // Only display the message box if its 'displayParent' is visible to the user.
-  if (!this._displayParent.inFront()) {
+  if (!this.displayParent.inFront()) {
     messageBox.detach();
   }
 };
@@ -90,7 +90,7 @@ scout.MessageBoxController.prototype._remove = function(messageBox) {
  * This method has no effect if already attached.
  */
 scout.MessageBoxController.prototype.attach = function() {
-  this._displayParent.messageBoxes.forEach(function(messageBox) {
+  this.displayParent.messageBoxes.forEach(function(messageBox) {
     messageBox.attach();
   }, this);
 };
@@ -102,7 +102,7 @@ scout.MessageBoxController.prototype.attach = function() {
  * This method has no effect if already detached.
  */
 scout.MessageBoxController.prototype.detach = function() {
-  this._displayParent.messageBoxes.forEach(function(messageBox) {
+  this.displayParent.messageBoxes.forEach(function(messageBox) {
     messageBox.detach();
   }, this);
 };

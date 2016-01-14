@@ -14,7 +14,7 @@
  * The forms are put into the list 'views' and 'dialogs' contained in 'displayParent'.
  */
 scout.FormController = function(displayParent, session) {
-  this._displayParent = displayParent;
+  this.displayParent = displayParent;
   this.session = session;
 };
 
@@ -23,8 +23,8 @@ scout.FormController = function(displayParent, session) {
  * position is only used if form is a view. this position determines at which position the tab is placed.
  */
 scout.FormController.prototype.registerAndRender = function(formAdapterId, position) {
-  var form = this.session.getOrCreateModelAdapter(formAdapterId, this._displayParent);
-  form.displayParent = this._displayParent;
+  var form = this.session.getOrCreateModelAdapter(formAdapterId, this.displayParent);
+  form.displayParent = this.displayParent;
   if (form.isPopupWindow()) {
     this._renderPopupWindow(form);
   } else if (form.isView()) {
@@ -64,12 +64,12 @@ scout.FormController.prototype._removePopupWindow = function(form) {
  * Renders all dialogs and views registered with this controller.
  */
 scout.FormController.prototype.render = function() {
-  this._displayParent.dialogs.forEach(function(dialog) {
-    dialog.displayParent = this._displayParent;
+  this.displayParent.dialogs.forEach(function(dialog) {
+    dialog.displayParent = this.displayParent;
     this._renderDialog(dialog, false);
   }.bind(this));
-  this._displayParent.views.forEach(function(view, position) {
-    view.displayParent = this._displayParent;
+  this.displayParent.views.forEach(function(view, position) {
+    view.displayParent = this.displayParent;
     this._renderView(view, false, position);
   }.bind(this));
 };
@@ -78,7 +78,7 @@ scout.FormController.prototype.render = function() {
  * Activates the given view or dialog.
  */
 scout.FormController.prototype.activateForm = function(formAdapterId) {
-  var form = this.session.getOrCreateModelAdapter(formAdapterId, this._displayParent);
+  var form = this.session.getOrCreateModelAdapter(formAdapterId, this.displayParent);
 
   // FIXME awe: (2nd screen) handle popupWindow?
   if (form.displayHint === scout.Form.DisplayHint.VIEW) {
@@ -91,14 +91,14 @@ scout.FormController.prototype.activateForm = function(formAdapterId) {
 scout.FormController.prototype._renderView = function(view, register, position) {
   if (register) {
     if (position !== undefined) {
-      scout.arrays.insert(this._displayParent.views, view, position);
+      scout.arrays.insert(this.displayParent.views, view, position);
     } else {
-      this._displayParent.views.push(view);
+      this.displayParent.views.push(view);
     }
   }
 
   // Only render view if 'displayParent' is rendered yet; if not, the view will be rendered once 'displayParent' is rendered.
-  if (!this._displayParent.rendered) {
+  if (!this.displayParent.rendered) {
     return;
   }
   // Prevent "Already rendered" errors / FIXME bsh, dwi: Remove this hack! Fix in on model if possible. See #162954.
@@ -109,29 +109,29 @@ scout.FormController.prototype._renderView = function(view, register, position) 
   var viewTabsController = this.session.desktop.viewTabsController;
 
   // Create the view-tab.
-  var viewTab = viewTabsController.createAndRenderViewTab(view, this._displayParent.views.indexOf(view));
+  var viewTab = viewTabsController.createAndRenderViewTab(view, this.displayParent.views.indexOf(view));
   viewTabsController.selectViewTab(viewTab);
 };
 
 scout.FormController.prototype._renderDialog = function(dialog, register) {
   if (register) {
-    this._displayParent.dialogs.push(dialog);
+    this.displayParent.dialogs.push(dialog);
   }
-  if (this._displayParent instanceof scout.Form) {
+  if (this.displayParent instanceof scout.Form) {
     dialog.on('remove', function() {
-      if (this._displayParent.dialogs.length > 0) {
-        this.session.desktop._setFormActivated(this._displayParent.dialogs[this._displayParent.dialogs.length - 1]);
-      } else if (this._displayParent.parent instanceof scout.Outline) {
+      if (this.displayParent.dialogs.length > 0) {
+        this.session.desktop._setFormActivated(this.displayParent.dialogs[this.displayParent.dialogs.length - 1]);
+      } else if (this.displayParent.parent instanceof scout.Outline) {
         // if displayParent is a page
         this.session.desktop._setOutlineActivated();
       } else {
-        this.session.desktop._setFormActivated(this._displayParent);
+        this.session.desktop._setFormActivated(this.displayParent);
       }
     }.bind(this));
   }
 
   // Only render dialog if 'displayParent' is rendered yet; if not, the dialog will be rendered once 'displayParent' is rendered.
-  if (!this._displayParent.rendered) {
+  if (!this.displayParent.rendered) {
     return;
   }
   // Prevent "Already rendered" errors / FIXME bsh, dwi: Remove this hack! Fix in on model if possible. See #162954.
@@ -146,21 +146,21 @@ scout.FormController.prototype._renderDialog = function(dialog, register) {
     this._layoutDialog(dialog);
 
     // Only display the dialog if its 'displayParent' is visible to the user.
-    if (!this._displayParent.inFront()) {
+    if (!this.displayParent.inFront()) {
       dialog.detach();
     }
   }
 };
 
 scout.FormController.prototype._removeView = function(view) {
-  scout.arrays.remove(this._displayParent.views, view);
+  scout.arrays.remove(this.displayParent.views, view);
   if (view.rendered) {
     view.remove();
   }
 };
 
 scout.FormController.prototype._removeDialog = function(dialog) {
-  scout.arrays.remove(this._displayParent.dialogs, dialog);
+  scout.arrays.remove(this.displayParent.dialogs, dialog);
   if (dialog.rendered) {
     dialog.remove();
   }
@@ -174,7 +174,7 @@ scout.FormController.prototype._activateView = function(view) {
 };
 
 scout.FormController.prototype._activateDialog = function(dialog) {
-  if (this._displayParent.inFront() && !dialog.attached) {
+  if (this.displayParent.inFront() && !dialog.attached) {
     dialog.attach();
   }
 };
@@ -186,7 +186,7 @@ scout.FormController.prototype._activateDialog = function(dialog) {
  * This method has no effect if already attached.
  */
 scout.FormController.prototype.attachDialogs = function() {
-  this._displayParent.dialogs.forEach(function(dialog) {
+  this.displayParent.dialogs.forEach(function(dialog) {
     dialog.attach();
   }, this);
 };
@@ -198,7 +198,7 @@ scout.FormController.prototype.attachDialogs = function() {
  * This method has no effect if already detached.
  */
 scout.FormController.prototype.detachDialogs = function() {
-  this._displayParent.dialogs.forEach(function(dialog) {
+  this.displayParent.dialogs.forEach(function(dialog) {
     dialog.detach();
   }, this);
 };

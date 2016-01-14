@@ -478,7 +478,7 @@ scout.Desktop.prototype.setBenchVisible = function(visible) {
 scout.Desktop.prototype._onModelFormShow = function(event) {
   var form, displayParent = this.session.getModelAdapter(event.displayParent);
   if (displayParent) {
-    form = this.session.getOrCreateModelAdapter(event.form, displayParent.formController._displayParent);
+    form = this.session.getOrCreateModelAdapter(event.form, displayParent.formController.displayParent);
     this._setFormActivated(form, true);
     // register listener to recover active form when child dialog is removed
     displayParent.formController.registerAndRender(event.form, event.position);
@@ -496,7 +496,7 @@ scout.Desktop.prototype._onModelFormActivate = function(event) {
   var displayParent = this.session.getModelAdapter(event.displayParent);
   if (displayParent) {
     displayParent.formController.activateForm(event.form);
-    this._setFormActivated(this.session.getOrCreateModelAdapter(event.form, displayParent.formController._displayParent), true);
+    this._setFormActivated(this.session.getOrCreateModelAdapter(event.form, displayParent.formController.displayParent), true);
   }
 };
 

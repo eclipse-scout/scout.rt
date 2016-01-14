@@ -76,7 +76,7 @@ scout.GlassPaneRenderer.prototype.findGlassPaneTargets = function() {
     return []; // No glasspanes to be rendered, e.g. for none-modal dialogs.
   }
 
-  var parent = this._element.parent || this.session.desktop; // use Desktop if no parent set.
+  var parent = this._element.displayParent || this.session.desktop; // use Desktop if no parent set.
   if (!parent) {
     return []; // No parent, e.g. during startup to display fatal errors.
   }
