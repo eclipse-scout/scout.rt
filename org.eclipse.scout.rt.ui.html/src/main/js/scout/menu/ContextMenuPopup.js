@@ -99,8 +99,8 @@ scout.ContextMenuPopup.prototype.removeSubMenuItems = function(parentMenu, anima
       duration: duration,
       queue: false,
       complete: function() {
-        scout.scrollbars.uninstall(parentMenu.$subMenuBody, this.session);
         if (parentMenu.$container) { //check if $container is not removed before by closing operation.
+          scout.scrollbars.uninstall(parentMenu.$subMenuBody, this.session);
           parentMenu.$placeHolder.replaceWith(parentMenu.$container);
           parentMenu.$container.toggleClass('expanded', false);
           this._updateFirstLastClass();

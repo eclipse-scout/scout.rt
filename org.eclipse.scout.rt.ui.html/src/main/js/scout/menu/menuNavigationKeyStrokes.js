@@ -93,6 +93,7 @@ scout.MenuNavigationExecKeyStroke = function(popup, menuItemClass) {
   scout.MenuNavigationExecKeyStroke.parent.call(this);
   this._menuItemClass = menuItemClass;
   this.field = popup;
+  this.stopImmediatePropagation = true;
   this.which = [scout.keys.ENTER, scout.keys.SPACE];
   this.renderingHints.render = false;
 };
