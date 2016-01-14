@@ -33,15 +33,19 @@ scout.AggregateTableControl.CONTAINER_ANIMATE_DURATION = 200;
 scout.AggregateTableControl.prototype._init = function(model) {
   scout.AggregateTableControl.parent.prototype._init.call(this, model);
 
-  this._updateEnabledAndSelectedState();
   this.table.on('columnStructureChanged', this._tableColumnStructureChangedHandler);
-  this.table.one('initialized', this._updateEnabledAndSelectedState.bind(this));
 };
 
 scout.AggregateTableControl.prototype.destroy = function() {
   scout.AggregateTableControl.parent.prototype.destroy.call(this);
 
   this.table.off('columnStructureChanged', this._tableColumnStructureChangedHandler);
+};
+
+scout.AggregateTableControl.prototype._render = function($parent) {
+  scout.AggregateTableControl.parent.prototype._render.call(this, $parent);
+
+  this._updateEnabledAndSelectedState();
 };
 
 scout.AggregateTableControl.prototype._renderContent = function($parent) {
@@ -132,11 +136,12 @@ scout.AggregateTableControl.prototype._reconcileScrollPos = function() {
 };
 
 scout.AggregateTableControl.prototype._updateEnabledAndSelectedState = function() {
-  this.setEnabled(this.table.containsNumberColumn());
+  var enabled = this.table.containsNumberColumn();
   // Make sure a disabled control is not selected
-  if (!this.enabled && this.selected) {
+  if (!enabled && this.selected) {
     this.setSelected(false);
   }
+  this.setEnabled(enabled);
 };
 
 scout.AggregateTableControl.prototype.setEnabled = function(enabled) {

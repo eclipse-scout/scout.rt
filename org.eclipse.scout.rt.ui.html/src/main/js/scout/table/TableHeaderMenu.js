@@ -104,7 +104,8 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
   // Add/remove/change columns
   leftGroups.push(this._renderColumnActionsGroup());
   // Grouping and aggregation
-  if (this.table.containsNumberColumn()) {
+  // column.grouped check necessary to make ungroup possible, even if there is no number column anymore
+  if (this.table.containsNumberColumn() || this.column.grouped) {
     if (this.column instanceof scout.NumberColumn) {
       leftGroups.push(this._renderAggregationGroup());
     } else {
