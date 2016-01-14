@@ -117,5 +117,5 @@ scout.ViewButtonActionKeyStroke.prototype.renderKeyBox = function($drawingArea, 
   if (this.field._isMenu()) {
     this.renderingHints.hAlign = scout.hAlign.RIGHT;
   }
-  scout.ViewButtonActionKeyStroke.parent.prototype.renderKeyBox.call(this, $drawingArea, event);
+  return scout.ViewButtonActionKeyStroke.parent.prototype.renderKeyBox.call(this, $drawingArea, event);
 };
