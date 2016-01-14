@@ -688,9 +688,6 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
       }
     }
     finally {
-      if (LOG.isDebugEnabled()) {
-        LOG.debug("Adapter count after request: {}", m_jsonAdapterRegistry.size());
-      }
       m_currentHttpContext.clear();
       m_currentJsonRequest = null;
       if (m_disposing) {
@@ -729,6 +726,9 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
           // Create a new JSON response for future jobs. This is also done in case of an exception, because apparently the
           // response is corrupt and the exception is likely to happen again.
           m_currentJsonResponse = createJsonResponse();
+          if (LOG.isDebugEnabled()) {
+            LOG.debug("Adapter count after request: {}", m_jsonAdapterRegistry.size());
+          }
         }
       }
     };
