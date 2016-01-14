@@ -53,8 +53,10 @@ scout.FocusManager.prototype._handleIEEvent = function(event) {
   selectableElements = '[tabindex]:not([tabindex=-1]), radio, a[href], area[href], input:not([disabled]),select:not([disabled]),textarea:not([disabled]),button:not([disabled]),iframe';
   if (scout.device.browser === scout.Device.Browser.INTERNET_EXPLORER &&
     $element.not(selectableElements).length > 0 &&
-    $element.closest('[contenteditable="true"]').length === 0) {
-    //TODO[5.2] nbu fix ie9 user-selectable
+    $element.closest('[contenteditable="true"]').length === 0 &&
+    (($element.css('user-select') && $element.css('user-select') === 'none') ||
+        (!$element.css('user-select') && $element.closest('div').not('[unselectable="on"]').length===0)) //IE 9 has no user-select
+    ) {
     var $elementToFocus = $element.closest(selectableElements);
    if ($elementToFocus) {
       this.requestFocus($elementToFocus.get(0));
