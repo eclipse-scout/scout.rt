@@ -10,7 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.util.concurrent;
 
-//TODO [5.2] jgu: delete?
+/**
+ * <h3>{@link StoppableThread}</h3>
+ *
+ * @deprecated will be removed in 'O' release.
+ */
+@Deprecated
 public class StoppableThread extends Thread {
   private boolean m_stopSignal;
 
