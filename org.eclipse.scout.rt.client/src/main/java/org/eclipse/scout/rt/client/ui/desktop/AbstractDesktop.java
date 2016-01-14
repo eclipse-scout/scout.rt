@@ -921,7 +921,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     if (displayParent instanceof IForm) {
       activateForm((IForm) displayParent);
     }
-    else if (displayParent instanceof IOutline) {
+    else if (displayParent instanceof IOutline && !displayParent.equals(getOutline())) {
       activateOutline(((IOutline) displayParent));
     }
     setActiveForm(form);
