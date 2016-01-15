@@ -171,18 +171,6 @@ scout.MessageBox.prototype._onButtonClick = function(event, option) {
   });
 };
 
-scout.MessageBox.prototype.onModelAction = function(event) {
-  if (event.type === 'closed') {
-    this._onMessageBoxClosed(event);
-  } else {
-    $.log.warn('Model event not handled. Widget: MessageBox. Event: ' + event.type + '.');
-  }
-};
-
-scout.MessageBox.prototype._onMessageBoxClosed = function(event) {
-  this.destroy();
-};
-
 /**
  * Used by CloseKeyStroke.js
  */

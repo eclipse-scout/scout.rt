@@ -23,7 +23,6 @@ import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
 public class JsonMessageBox<MESSAGE_BOX extends IMessageBox> extends AbstractJsonPropertyObserver<MESSAGE_BOX> {
 
   public static final String EVENT_ACTION = "action";
-  public static final String EVENT_CLOSED = "closed";
 
   private MessageBoxListener m_messageBoxListener;
 
@@ -138,11 +137,21 @@ public class JsonMessageBox<MESSAGE_BOX extends IMessageBox> extends AbstractJso
   }
 
   protected void handleModelClosed() {
+    // ==> Same code in JsonForm, JsonFileChooser! <==
+
+    // This removes the adapter from the adapter registry and the current JSON response.
+    // Also, all events for this adapter in the current response are removed.
     dispose();
-    // Important: The following event must be send _after_ the dispose() call! Otherwise,
-    // it would be deleted automatically from the JSON response. This is a special case
-    // where we explicitly want to send an event for an already disposed adapter.
-    addActionEvent(EVENT_CLOSED);
+
+    // JSON adapter is now disposed. To dispose it on the UI, too, we have to send an explicit
+    // event to the UI session. We do NOT send a "closed" event for this adapter, because the
+    // adapter may not have been sent to the UI (e.g. opening and closing a message box in the
+    // same request). If we would send a "closed" event for an adapter that does not exist on
+    // the UI, an error would be thrown, because the previous dispose() call removed the adapter
+    // from the response, and it will  never be sent to the UI. Only the 'disposeAdapter' event
+    // handler on the session can handle that situation (see Session.js).
+    getUiSession().sendDisposeAdapterEvent(this);
+
   }
 
   @Override

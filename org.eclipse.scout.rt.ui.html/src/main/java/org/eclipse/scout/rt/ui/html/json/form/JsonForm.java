@@ -203,16 +203,19 @@ public class JsonForm<FORM extends IForm> extends AbstractJsonPropertyObserver<F
   }
 
   protected void handleModelFormClosed(IForm form) {
+    // ==> Same code in JsonMessageBox, JsonFileChooser! <==
+
+    // This removes the adapter from the adapter registry and the current JSON response.
+    // Also, all events for this adapter in the current response are removed.
     dispose();
 
     // JSON adapter is now disposed. To dispose it on the UI, too, we have to send an explicit
-    // event to the UI session. We _don't_ send an EVENT_FORM_CLOSED event for this form adapter,
-    // because:
-    // a) the event targets in the JSON response should not be disposed (in fact, when the adapter
-    //    was disposed, all existing events for that adapter were removed from the response)
-    // b) the form may not have been sent to the UI (e.g. opening and closing a form in
-    //    the same request). If we would send a FORM_CLOSED event for a form that does
-    //    not exist on the UI, an error would be thrown.
+    // event to the UI session. We do NOT send a "closed" event for this adapter, because the
+    // adapter may not have been sent to the UI (e.g. opening and closing a form in the
+    // same request). If we would send a "closed" event for an adapter that does not exist on
+    // the UI, an error would be thrown, because the previous dispose() call removed the adapter
+    // from the response, and it will  never be sent to the UI. Only the 'disposeAdapter' event
+    // handler on the session can handle that situation (see Session.js).
     getUiSession().sendDisposeAdapterEvent(this);
   }
 

@@ -240,16 +240,6 @@ scout.FileChooser.prototype.removeFile = function(file, $file) {
   scout.scrollbars.update(this.$files);
 };
 
-scout.FileChooser.prototype.onModelAction = function(event) {
-  if (event.type === 'closed') {
-    this._onFileChooserClosed();
-  }
-};
-
-scout.FileChooser.prototype._onFileChooserClosed = function() {
-  this.destroy();
-};
-
 scout.FileChooser.prototype._onDragEnterOrOver = function(event) {
   scout.dragAndDrop.verifyDataTransferTypesScoutTypes(event, scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER);
 };

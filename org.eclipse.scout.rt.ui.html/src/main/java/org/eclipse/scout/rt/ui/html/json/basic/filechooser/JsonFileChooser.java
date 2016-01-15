@@ -30,7 +30,6 @@ import org.json.JSONObject;
 
 public class JsonFileChooser<FILE_CHOOSER extends IFileChooser> extends AbstractJsonAdapter<FILE_CHOOSER> implements IBinaryResourceConsumer {
 
-  private static final String EVENT_CLOSED = "closed";
   // UI events
   private static final String EVENT_CANCEL = "cancel";
 
@@ -96,11 +95,20 @@ public class JsonFileChooser<FILE_CHOOSER extends IFileChooser> extends Abstract
   }
 
   protected void handleModelClosed() {
+    // ==> Same code in JsonForm, JsonMessageBox! <==
+
+    // This removes the adapter from the adapter registry and the current JSON response.
+    // Also, all events for this adapter in the current response are removed.
     dispose();
-    // Important: The following event must be send _after_ the dispose() call! Otherwise,
-    // it would be deleted automatically from the JSON response. This is a special case
-    // where we explicitly want to send an event for an already disposed adapter.
-    addActionEvent(EVENT_CLOSED);
+
+    // JSON adapter is now disposed. To dispose it on the UI, too, we have to send an explicit
+    // event to the UI session. We do NOT send a "closed" event for this adapter, because the
+    // adapter may not have been sent to the UI (e.g. opening and closing a file chooser in the
+    // same request). If we would send a "closed" event for an adapter that does not exist on
+    // the UI, an error would be thrown, because the previous dispose() call removed the adapter
+    // from the response, and it will  never be sent to the UI. Only the 'disposeAdapter' event
+    // handler on the session can handle that situation (see Session.js).
+    getUiSession().sendDisposeAdapterEvent(this);
   }
 
   @Override
