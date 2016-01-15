@@ -134,6 +134,9 @@ scout.Popup.prototype._remove = function() {
 
 scout.Popup.prototype.close = function(event) {
   if ((event && this.openEvent && event.originalEvent !== this.openEvent.originalEvent) || !event || !this.openEvent) {
+    if (event && event.originalEvent) { //only add removed widget when event has a originalEvent-> mouse or key events. no custom events.
+      event.originalEvent.removedWidget = this;
+    }
     this._trigger('close', event);
     this.remove();
   }
@@ -195,7 +198,7 @@ scout.Popup.prototype._onMouseDown = function(event) {
 
 scout.Popup.prototype._isMouseDownOutside = function(event) {
   var $target = $(event.target),
-    targetWidget = scout.Widget.getWidgetFor($target);
+    targetWidget = event.originalEvent.removedWidget ? event.originalEvent.closedWidget : scout.Widget.getWidgetFor($target);
 
   // close the popup only if the click happened outside of the popup and its children
   // It is not sufficient to check the dom hierarchy using $container.has($target)

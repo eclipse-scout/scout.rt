@@ -125,7 +125,7 @@ scout.PopupWithHead.prototype._copyCssClassToHead = function(className) {
 
 scout.PopupWithHead.prototype._onHeadMouseDown = function(event) {
   if (this.$head && this.$head.isOrHas(event.target)) {
-    this.close();
+    this.close(event);
   }
 };
 
