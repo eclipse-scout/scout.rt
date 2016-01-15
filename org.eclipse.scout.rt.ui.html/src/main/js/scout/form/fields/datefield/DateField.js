@@ -44,7 +44,6 @@ scout.DateField.prototype._init = function(model) {
   scout.DateField.parent.prototype._init.call(this, model);
   scout.fields.initTouch(this, model);
   this._popup = model.popup;
-  this._syncErrorStatus(this.errorStatus);
 };
 
 scout.DateField.prototype.addPopup = function() {
@@ -59,8 +58,8 @@ scout.DateField.prototype.addPopup = function() {
 };
 
 scout.DateField.prototype._syncErrorStatus = function(errorStatus) {
-  this.errorStatus = errorStatus;
-  this._modelErrorStatus = errorStatus;
+  scout.DateField.parent.prototype._syncErrorStatus.call(this, errorStatus);
+  this._modelErrorStatus = this.errorStatus;
 };
 
 scout.DateField.prototype._render = function($parent) {
@@ -212,15 +211,19 @@ scout.DateField.prototype._renderAutoTimestamp = function() {
  */
 scout.DateField.prototype._renderErrorStatus = function() {
   scout.DateField.parent.prototype._renderErrorStatus.call(this);
-  var hasError = !!(this.errorStatus);
+  var hasStatus = !!this.errorStatus,
+    statusClass = hasStatus ? this.errorStatus.cssClass() : '';
 
   if (this.$dateField) {
-    this.$dateField.toggleClass('has-error', hasError);
+    this.$dateField.removeClass(scout.Status.cssClasses);
+    this.$dateField.toggleClass(statusClass, hasStatus);
+
     // Because the error color of field icons depends on the error status of sibling <input> elements.
     // The prediction fields are clones of the input fields, so the 'has-error' class has to be
     // removed from them as well to make the icon "valid".
     if (this._$predictDateField) {
-      this._$predictDateField.toggleClass('has-error', hasError);
+      this._$predictDateField.removeClass(scout.Status.cssClasses);
+      this._$predictDateField.toggleClass(statusClass, hasStatus);
     }
     // Put invalid input in the field, if the current input differs
     // (don't do it always, this would alter the cursor position)
@@ -231,9 +234,11 @@ scout.DateField.prototype._renderErrorStatus = function() {
 
   // Do the same for the time field
   if (this.$timeField) {
-    this.$timeField.toggleClass('has-error', hasError);
+    this.$timeField.removeClass(scout.Status.cssClasses);
+    this.$timeField.toggleClass(statusClass, hasStatus);
     if (this._$predictTimeField) {
-      this._$predictTimeField.toggleClass('has-error', hasError);
+      this._$predictTimeField.removeClass(scout.Status.cssClasses);
+      this._$predictTimeField.toggleClass(statusClass, hasStatus);
     }
     if (!this._isTimeValid() && this.$timeField.val() !== this.errorStatus.invalidTimeText) {
       this._setTimeDisplayText(this.errorStatus.invalidTimeText);
@@ -241,7 +246,8 @@ scout.DateField.prototype._renderErrorStatus = function() {
   }
 
   if (this.hasDate && this._popup.isOpen()) {
-    this._popup.$container.toggleClass('has-error', hasError);
+    this._popup.$container.removeClass(scout.Status.cssClasses);
+    this._popup.$container.toggleClass(statusClass, hasStatus);
   }
 };
 
@@ -968,9 +974,10 @@ scout.DateField.prototype._setDateValid = function(valid, dateText) {
   } else {
     // Set to invalid (this is always a UI error)
     if (!this._hasUiErrorStatus()) {
-      errorStatus = {
-        message: this.session.text('ui.InvalidDateFormat')
-      };
+      errorStatus = new scout.Status({
+        message: this.session.text('ui.InvalidDateFormat'),
+        severity: scout.Status.Severity.ERROR
+      });
     }
     errorStatus.invalidDateText = dateText;
     errorStatus.invalidDisplayText = scout.strings.join(' ',
@@ -999,9 +1006,10 @@ scout.DateField.prototype._setTimeValid = function(valid, timeText) {
   } else {
     // Set to invalid (this is always a UI error)
     if (!this._hasUiErrorStatus()) {
-      errorStatus = {
-        message: this.session.text('ui.InvalidDateFormat')
-      };
+      errorStatus = new scout.Status({
+        message: this.session.text('ui.InvalidDateFormat'),
+        severity: scout.Status.Severity.ERROR
+      });
     }
     errorStatus.invalidTimeText = timeText;
     errorStatus.invalidDisplayText = scout.strings.join(' ',

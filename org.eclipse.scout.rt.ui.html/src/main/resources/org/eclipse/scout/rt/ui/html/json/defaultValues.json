@@ -21,6 +21,7 @@
       "mandatory": false,
       "statusVisible": true,
       "menus": [],
+      "menusVisible": false,
       "gridData": {
         "x": -1,
         "y": -1,

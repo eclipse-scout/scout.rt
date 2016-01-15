@@ -70,6 +70,7 @@ scout.FormField.prototype._init = function(model) {
   this.refFieldId = this.uniqueId('ref');
   this._syncKeyStrokes(this.keyStrokes);
   this._syncMenus(this.menus);
+  this._syncErrorStatus(this.errorStatus);
 };
 
 /**
@@ -122,18 +123,19 @@ scout.FormField.prototype._renderMandatory = function() {
 };
 
 scout.FormField.prototype._renderErrorStatus = function() {
-  var hasError = this._hasError();
+  var hasStatus = !!this.errorStatus,
+    statusClass = hasStatus ? this.errorStatus.cssClass() : '';
 
-  this.$container.toggleClass('has-error', hasError);
+  this.$container.removeClass(scout.Status.cssClasses);
+  this.$container.addClass(statusClass, hasStatus);
   if (this.$field) {
-    this.$field.toggleClass('has-error', hasError);
+    this.$field.removeClass(scout.Status.cssClasses);
+    this.$field.addClass(statusClass, hasStatus);
   }
 
   this._updateStatusVisible();
-  if (hasError) {
-    this._showStatusMessage({
-      autoRemove: false
-    });
+  if (hasStatus) {
+    this._showStatusMessage();
   } else {
     this._hideStatusMessage();
   }
@@ -223,10 +225,10 @@ scout.FormField.prototype._updateStatusVisible = function() {
  */
 scout.FormField.prototype._computeStatusVisible = function() {
   var statusVisible = this.statusVisible,
-    hasError = !!(this.errorStatus),
+    hasStatus = !!(this.errorStatus),
     hasTooltip = this.tooltipText;
 
-  return !this.suppressStatus && (statusVisible || hasError || hasTooltip || (this._hasMenus() && this.menusVisible));
+  return !this.suppressStatus && (statusVisible || hasStatus || hasTooltip || (this._hasMenus() && this.menusVisible));
 };
 
 scout.FormField.prototype._renderChildVisible = function($child, visible) {
@@ -330,6 +332,14 @@ scout.FormField.prototype._syncMenus = function(newMenus, oldMenus) {
   this._keyStrokeSupport.syncMenus(newMenus, oldMenus);
 };
 
+scout.FormField.prototype._syncErrorStatus = function(errorStatus) {
+  if (errorStatus) {
+    this.errorStatus = new scout.Status(errorStatus);
+  } else {
+    this.errorStatus = null;
+  }
+};
+
 scout.FormField.prototype.setLabel = function(label) {
   this._setProperty('label', label);
   if (this.rendered) {
@@ -349,10 +359,6 @@ scout.FormField.prototype.setErrorStatus = function(errorStatus) {
   if (this.rendered) {
     this._renderErrorStatus();
   }
-};
-
-scout.FormField.prototype._hasError = function() {
-  return !!(this.errorStatus);
 };
 
 scout.FormField.prototype.setMenus = function(menus) {
@@ -396,16 +402,12 @@ scout.FormField.prototype._onStatusMousedown = function(event) {
     if (this.tooltip && this.tooltip.rendered) {
       this._hideStatusMessage();
     } else {
-      var opts = {};
-      if (this._hasError()) {
-        opts.autoRemove = false;
-      }
-      this._showStatusMessage(opts);
+      this._showStatusMessage();
     }
   }
 };
 
-scout.FormField.prototype._showStatusMessage = function(options) {
+scout.FormField.prototype._showStatusMessage = function() {
   // Don't show a tooltip if there is no visible $status (tooltip points to the status)
   if (!this.$status || !this.$status.isVisible()) {
     return;
@@ -413,11 +415,18 @@ scout.FormField.prototype._showStatusMessage = function(options) {
 
   var opts,
     text = this.tooltipText,
-    cssClass = '';
+    severity = scout.Status.OK,
+    autoRemove = true;
 
   if (this.errorStatus) {
     text = this.errorStatus.message;
-    cssClass = 'tooltip-error';
+    severity = this.errorStatus.severity;
+    autoRemove = !(this.errorStatus && this.errorStatus.isError());
+    if (this.tooltip && this.tooltip.autoRemove !== autoRemove) {
+      // AutoRemove may not be changed dynamically -> Remove and reopen tooltip
+      this.tooltip.remove();
+      this.tooltip = null;
+    }
   }
 
   if (!scout.strings.hasText(text)) {
@@ -428,15 +437,16 @@ scout.FormField.prototype._showStatusMessage = function(options) {
   if (this.tooltip && this.tooltip.rendered) {
     // update existing tooltip
     this.tooltip.setText(text);
+    this.tooltip.setSeverity(severity);
   } else {
     // create new tooltip
     opts = {
       parent: this,
       text: text,
-      cssClass: cssClass,
+      severity: severity,
+      autoRemove: autoRemove,
       $anchor: this.$status
     };
-    $.extend(opts, options);
     this.tooltip = scout.create('Tooltip', opts);
     this.tooltip.render();
   }

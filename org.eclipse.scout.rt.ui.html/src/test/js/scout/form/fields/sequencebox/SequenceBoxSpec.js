@@ -198,7 +198,7 @@ describe("SequenceBox", function() {
     it("moves the error from the first field to the seq box if it gets the last field after a visibility change", function() {
       var model = createModel();
       var field = createField(model);
-      field.fields[0].errorStatus = {message: 'foo'};
+      field.fields[0].errorStatus = new scout.Status({message: 'foo'});
       field.statusVisible = false;
       field.render(session.$entryPoint);
 
@@ -224,7 +224,7 @@ describe("SequenceBox", function() {
     it("makes sure the status may be displayed on the field again if the field was the last visible field once", function() {
       var model = createModel();
       var field = createField(model);
-      field.fields[0].errorStatus = {message: 'foo'};
+      field.fields[0].errorStatus = new scout.Status({message: 'foo'});
       field.statusVisible = false;
       field.render(session.$entryPoint);
 

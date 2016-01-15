@@ -145,20 +145,6 @@
     }
   }
 
-  .tooltip-status {
-    visibility: visible;
-    cursor: pointer;
-
-    &::before  {
-      content: @icon-info;
-      color: @icon-light-color;
-    }
-
-    &:hover::before {
-      color: @icon-color;
-    }
-  }
-
   .menu-status {
     visibility: visible;
     cursor: pointer;
@@ -173,17 +159,46 @@
     }
   }
 
+  .tooltip-status,
+  .info-status {
+    visibility: visible;
+    cursor: pointer;
+
+    &::before  {
+      content: @icon-info;
+      color: @status-info-color;
+    }
+
+    &:hover::before {
+      color: @status-info-hover-color;
+    }
+  }
+
+  .warning-status {
+    visibility: visible;
+    cursor: pointer;
+
+    &::before  {
+      content: @icon-error;
+      color: @status-warning-color;
+    }
+
+    &:hover::before {
+      color: @status-warning-hover-color;
+    }
+  }
+
   .error-status {
     visibility: visible;
     cursor: pointer;
 
     &::before  {
       content: @icon-error;
-      color: @error-color;
+      color: @status-error-color;
     }
 
     &:hover::before {
-      color: @palette-red-4;
+      color: @status-error-hover-color;
     }
   }
 

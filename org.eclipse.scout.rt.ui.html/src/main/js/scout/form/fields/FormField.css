@@ -57,12 +57,20 @@
     #scout.status();
   }
 
+  &.has-menus > .status {
+    #scout.menu-status();
+  }
+
   &.has-tooltip > .status {
     #scout.tooltip-status();
   }
 
-  &.has-menus > .status {
-    #scout.menu-status();
+  &.has-info > .status {
+    #scout.info-status();
+  }
+
+  &.has-warning > .status {
+    #scout.warning-status();
   }
 
   &.has-error > .status {

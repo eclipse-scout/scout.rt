@@ -8,9 +8,6 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-// FIXME awe: (smart-field) anderer status-text wenn Suche nach "*" und keine Ergebnisse gefunden
-// --> Keine Daten vorhanden
-
 // FIXME awe: (smart-field) Do not open popup when Ctrl or Alt key is pressed (e.g. Ctrl + 1)
 
 // FIXME awe: (smart-field) Lupe-Icon durch Loading-Icon austauschen während Laden von SmartField

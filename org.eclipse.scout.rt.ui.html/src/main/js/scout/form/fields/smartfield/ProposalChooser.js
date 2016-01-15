@@ -71,7 +71,7 @@ scout.ProposalChooser.prototype._updateStatus = function() {
  * Replaces an ellipsis (...) at the end of the message-text with a CSS animation.
  */
 scout.ProposalChooser.prototype._setStatusMessage = function(message) {
-  scout.status.animateStatusMessage(this._$status, message);
+  scout.Status.animateStatusMessage(this._$status, message);
 };
 
 scout.ProposalChooser.prototype._appendOption = function($parent, value, text) {

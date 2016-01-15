@@ -83,6 +83,7 @@ scout.Table.prototype._init = function(model) {
   this._syncFilters(this.filters);
   this._syncKeyStrokes(this.keyStrokes);
   this._syncMenus(this.menus);
+  this._syncTableStatus(this.tableStatus);
   if (this._filterCount() > 0) {
     this._applyFilters(this.rows);
   }
@@ -2826,6 +2827,14 @@ scout.Table.prototype._syncFilters = function(filters) {
       filterData.session = this.session;
       this.addFilter(scout.create(filterData), false);
     }, this);
+  }
+};
+
+scout.Table.prototype._syncTableStatus = function(tableStatus) {
+  if (tableStatus) {
+    this.tableStatus = new scout.Status(tableStatus);
+  } else {
+    this.tableStatus = null;
   }
 };
 

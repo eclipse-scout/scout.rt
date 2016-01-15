@@ -37,6 +37,7 @@ scout.Tooltip.prototype._init = function(options) {
   scout.Tooltip.parent.prototype._init.call(this, options);
 
   this.text = options.text || '';
+  this.severity = options.severity || 0;
   this.arrowPosition = options.arrowPosition !== undefined ? options.arrowPosition : 25;
   this.arrowPositionUnit = options.arrowPositionUnit || '%';
   this.windowPaddingX = options.windowPaddingX !== undefined ? options.windowPaddingX : 10;
@@ -68,6 +69,7 @@ scout.Tooltip.prototype._render = function($parent) {
   this.$arrow = this.$container.appendDiv('tooltip-arrow');
   this.$content = this.$container.appendDiv('tooltip-content');
   this._renderText();
+  this._renderSeverity();
   this.$container.show();
 
   if (this.autoRemove) {
@@ -100,7 +102,7 @@ scout.Tooltip.prototype._render = function($parent) {
     }
     parent = parent.parent;
   }
-  
+
   // If inside a dialog, attach a listener to reposition the tooltip when the dialog is moved
   if (this.dialog) {
     this._moveHandler = this.position.bind(this);
@@ -138,6 +140,13 @@ scout.Tooltip.prototype.setText = function(text) {
   }
 };
 
+scout.Tooltip.prototype.setSeverity = function(severity) {
+  this.severity = severity;
+  if (this.rendered) {
+    this._renderSeverity();
+  }
+};
+
 scout.Tooltip.prototype._renderText = function() {
   var text = this.text;
   if (this.htmlEnabled) {
@@ -146,6 +155,28 @@ scout.Tooltip.prototype._renderText = function() {
     // use nl2br to allow tooltips with line breaks
     this.$content.html(scout.strings.nl2br(scout.strings.removeAmpersand(text)));
   }
+};
+
+scout.Tooltip.prototype._renderSeverity = function() {
+  this.$container.removeClass('tooltip-error tooltip-warning tooltip-info');
+  this.$container.addClass(this._cssClassForSeverity());
+};
+
+scout.Tooltip.prototype._cssClassForSeverity = function() {
+  var isInfo = (this.severity > scout.Status.Severity.OK);
+  var isWarning = (this.severity > scout.Status.Severity.INFO);
+  var isError = (this.severity > scout.Status.Severity.WARNING);
+
+  if (isError) {
+    return 'tooltip-error';
+  }
+  if (isWarning) {
+    return 'tooltip-warning';
+  }
+  if (isInfo) {
+    return 'tooltip-info';
+  }
+  return '';
 };
 
 scout.Tooltip.prototype.position = function() {

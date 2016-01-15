@@ -135,7 +135,7 @@ describe("FormField", function() {
 
     it("shows a status even though status visible is false but errorStatus is set", function() {
       formField.statusVisible = false;
-      formField.errorStatus = {text: 'error'};
+      formField.errorStatus = new scout.Status({message: 'error', severity: scout.Status.Severity.ERROR});
       formField.render(session.$entryPoint);
 
       expect(formField.$status.isVisible()).toBe(true);
@@ -170,13 +170,13 @@ describe("FormField", function() {
         id:'123',
         type:'property',
         properties: {
-          errorStatus:'foo'
+          errorStatus: {message: 'foo'}
         }
       };
       // required
       formField._$statusLabel = $('<div></div>');
       formField.onModelPropertyChange(event);
-      expect(formField.errorStatus).toBe('foo');
+      expect(formField.errorStatus).toEqual(new scout.Status({message: 'foo'}));
       // never apply id, type, properties on model
       expect(formField.id).toBe(model.id);
       expect(formField.hasOwnProperty('type')).toBe(false);

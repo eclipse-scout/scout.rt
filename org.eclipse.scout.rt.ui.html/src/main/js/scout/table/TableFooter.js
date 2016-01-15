@@ -267,13 +267,9 @@ scout.TableFooter.prototype._renderInfoSelection = function() {
 scout.TableFooter.prototype._renderInfoTableStatus = function() {
   var $info = this._$infoTableStatus;
   var tableStatus = this.table.tableStatus;
+  $info.removeClass(scout.Status.cssClasses);
   if (tableStatus) {
-    var isInfo = (tableStatus.severity > scout.status.Severity.OK);
-    var isWarning = (tableStatus.severity > scout.status.Severity.INFO);
-    var isError = (tableStatus.severity > scout.status.Severity.WARNING);
-    $info.toggleClass('has-error', isError);
-    $info.toggleClass('has-warning', isWarning && !isError);
-    $info.toggleClass('has-info', isInfo && !isWarning && !isError);
+    $info.addClass(tableStatus.cssClass());
   }
 
   if (!this.htmlComp.layouting) {
@@ -459,16 +455,12 @@ scout.TableFooter.prototype._showTableStatusTooltip = function() {
     return; // Refuse to show empty tooltip
   }
 
-  var isInfo = (tableStatus.severity > scout.status.Severity.OK);
-  var isWarning = (tableStatus.severity > scout.status.Severity.INFO);
-  var isError = (tableStatus.severity > scout.status.Severity.WARNING);
-
   // Create new tooltip
   var opts = {
     parent: this,
     text: text,
-    cssClass: (isError ? 'tooltip-error' : (isWarning ? 'tooltip-warning' : (isInfo ? 'tooltip-info' : ''))),
-    autoRemove: (!isError),
+    severity: tableStatus.severity,
+    autoRemove: !tableStatus.isError(),
     $anchor: this._$infoTableStatusIcon
   };
   this._tableStatusTooltip = scout.create('Tooltip', opts);
@@ -482,7 +474,7 @@ scout.TableFooter.prototype._showTableStatusTooltip = function() {
 
   // Auto-hide unimportant messages
   clearTimeout(this._autoHideTableStatusTooltipTimeoutId);
-  if (!isError && !this.table.tableStatus.uiState) {
+  if (!tableStatus.isError() && !this.table.tableStatus.uiState) {
     // Remember auto-hidden, in case the user changes outline before timeout elapses
     this.table.tableStatus.uiState = 'auto-hidden';
     this._autoHideTableStatusTooltipTimeoutId = setTimeout(function() {

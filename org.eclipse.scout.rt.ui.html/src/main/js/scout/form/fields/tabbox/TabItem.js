@@ -54,6 +54,7 @@ scout.TabItem.prototype.renderTab = function($parent) {
   this._renderMarked();
   this._renderVisible();
   this._renderTooltipText();
+  this._renderErrorStatus();
   this._tabRendered = true;
 };
 
@@ -185,6 +186,25 @@ scout.TabItem.prototype._renderTooltipText = function() {
   }
   var hasTooltipText = scout.strings.hasText(this.tooltipText);
   this.$tabContainer.toggleClass('has-tooltip', hasTooltipText);
+};
+
+scout.TabItem.prototype._renderErrorStatus = function() {
+  var hasStatus = !!this.errorStatus,
+    statusClass = hasStatus ? this.errorStatus.cssClass() : '';
+
+  if (this.$container) {
+    this.$container.removeClass(scout.Status.cssClasses);
+    this.$container.addClass(statusClass, hasStatus);
+  }
+  this.$tabContainer.removeClass(scout.Status.cssClasses);
+  this.$tabContainer.addClass(statusClass, hasStatus);
+
+  this._updateStatusVisible();
+  if (hasStatus) {
+    this._showStatusMessage();
+  } else {
+    this._hideStatusMessage();
+  }
 };
 
 scout.TabItem.prototype._syncMenusVisible = function() {

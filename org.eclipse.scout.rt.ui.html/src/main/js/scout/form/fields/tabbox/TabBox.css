@@ -72,6 +72,7 @@
 
     & > .status {
       margin-left: @field-status-margin-left;
+      padding: 4px 0;
       display: inline-block;
       vertical-align: middle;
 
@@ -79,12 +80,22 @@
     }
 
     &.has-tooltip,
+    &.has-info,
+    &.has-warning,
     &.has-error {
       padding-right: @field-status-margin-left;
     }
 
     &.has-tooltip > .status {
       #scout.tooltip-status();
+    }
+
+    &.has-info > .status {
+      #scout.info-status();
+    }
+
+    &.has-warning > .status {
+      #scout.warning-status();
     }
 
     &.has-error > .status {
