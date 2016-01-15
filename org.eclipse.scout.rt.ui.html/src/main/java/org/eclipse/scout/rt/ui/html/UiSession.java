@@ -111,6 +111,7 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
   private final HttpContext m_currentHttpContext = new HttpContext();
   private volatile HttpSession m_currentHttpSession;
   private final JsonEventProcessor m_jsonEventProcessor;
+  private volatile boolean m_processingJsonRequest;
   private volatile boolean m_disposing;
   private volatile boolean m_disposed;
   private final ReentrantLock m_uiSessionLock = new ReentrantLock();
@@ -652,22 +653,29 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
     m_currentHttpContext.set(servletRequest, servletResponse);
     m_currentJsonRequest = jsonRequest;
     try {
-      // 1. Process the JSON request.
-      ModelJobs.schedule(new IRunnable() {
+      m_processingJsonRequest = true;
+      try {
+        // 1. Process the JSON request.
+        ModelJobs.schedule(new IRunnable() {
 
-        @Override
-        public void run() throws Exception {
-          processJsonRequestInternal();
-        }
-      }, ModelJobs.newInput(clientRunContext)
-          .withName("Processing JSON request")
-          .withExecutionHint(UiJobs.EXECUTION_HINT_POLL_REQUEST, RequestType.POLL_REQUEST.equals(jsonRequest.getRequestType()))
-          // Handle exceptions instantaneously in job manager, and not by submitter.
-          // That is because the submitting thread might not be waiting anymore, because interrupted or returned because requiring 'user interaction'.
-          .withExceptionHandling(BEANS.get(ExceptionHandler.class), true));
+          @Override
+          public void run() throws Exception {
+            processJsonRequestInternal();
+          }
+        }, ModelJobs.newInput(clientRunContext)
+            .withName("Processing JSON request")
+            .withExecutionHint(UiJobs.EXECUTION_HINT_POLL_REQUEST, RequestType.POLL_REQUEST.equals(jsonRequest.getRequestType()))
+            // Handle exceptions instantaneously in job manager, and not by submitter.
+            // That is because the submitting thread might not be waiting anymore, because interrupted or returned because requiring 'user interaction'.
+            .withExceptionHandling(BEANS.get(ExceptionHandler.class), true));
 
-      // 2. Wait for all model jobs of the session.
-      BEANS.get(UiJobs.class).awaitModelJobs(m_clientSession, ExceptionHandler.class);
+        // 2. Wait for all model jobs of the session.
+        BEANS.get(UiJobs.class).awaitModelJobs(m_clientSession, ExceptionHandler.class);
+      }
+      finally {
+        // Reset this flag _before_ the "response-to-json" job (#3), because to the response while transforming would be unsafe and unreliable.
+        m_processingJsonRequest = false;
+      }
 
       // 3. Transform the response to JSON.
       final IFuture<JSONObject> future = ModelJobs.schedule(newResponseToJsonTransformer(), ModelJobs.newInput(clientRunContext.copy()
@@ -841,8 +849,13 @@ public class UiSession implements IUiSession, HttpSessionBindingListener {
     m_pollerQueue.offer(m_notificationToken);
   }
 
+  /**
+   * Indicates if currently a /json request is being processed in such a way that anything written to the current JSON
+   * response will be taken back to the UI with that call. If this flag is <code>false</code>, the poller has to be
+   * awaken to send something to the UI ({@link #signalPoller()}).
+   */
   protected boolean isProcessingJsonRequest() {
-    return currentJsonRequest() != null;
+    return m_processingJsonRequest;
   }
 
   @Override
