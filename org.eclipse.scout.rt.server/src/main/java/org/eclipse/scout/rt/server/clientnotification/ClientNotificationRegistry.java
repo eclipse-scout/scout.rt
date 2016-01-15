@@ -63,7 +63,7 @@ public class ClientNotificationRegistry {
   /**
    * Register a session with corresponding user for a given node
    */
-  void registerSession(String nodeId, String sessionId, String userId) {
+  protected void registerSession(String nodeId, String sessionId, String userId) {
     synchronized (m_notificationQueues) {
       getQueue(nodeId).registerSession(sessionId, userId);
     }
@@ -239,16 +239,32 @@ public class ClientNotificationRegistry {
   }
 
   public void publish(Collection<? extends ClientNotificationMessage> messages) {
-    putWithoutClusterNotification(messages, null);
+    publishWithoutClusterNotification(messages, null);
     publishClusterInternal(messages);
   }
 
   public void publish(Collection<? extends ClientNotificationMessage> messages, String excludedUiNodeId) {
-    putWithoutClusterNotification(messages, excludedUiNodeId);
+    publishWithoutClusterNotification(messages, excludedUiNodeId);
     publishClusterInternal(messages);
   }
 
-  private void putWithoutClusterNotification(Collection<? extends ClientNotificationMessage> messages, String excludedUiNodeId) {
+  /**
+   * Publish without triggering cluster notification
+   *
+   * @param messages
+   */
+  public void publishWithoutClusterNotification(Collection<? extends ClientNotificationMessage> messages) {
+    publishWithoutClusterNotification(messages, null);
+  }
+
+  /**
+   * Publish without triggering cluster notification
+   *
+   * @param messages
+   * @param excludedUiNodeId
+   *          may be <code>null</code>
+   */
+  public void publishWithoutClusterNotification(Collection<? extends ClientNotificationMessage> messages, String excludedUiNodeId) {
     synchronized (m_notificationQueues) {
       final Iterator<ClientNotificationNodeQueue> iter = m_notificationQueues.values().iterator();
       while (iter.hasNext()) {
