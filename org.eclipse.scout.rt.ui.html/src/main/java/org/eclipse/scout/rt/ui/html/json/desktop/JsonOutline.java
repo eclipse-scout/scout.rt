@@ -108,7 +108,7 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
       throw new IllegalArgumentException("Expected node to be a page. " + node);
     }
     IPage<?> page = (IPage) node;
-    if (page.isDetailFormVisible()) {
+    if (hasDetailForm(page)) {
       attachGlobalAdapter(page.getDetailForm());
     }
     if (page.isTableVisible()) {
@@ -181,7 +181,7 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
 
   protected void putDetailFormAndTable(JSONObject json, IPage page) {
     putProperty(json, PROP_DETAIL_FORM_VISIBLE, page.isDetailFormVisible());
-    if (page.isDetailFormVisible()) {
+    if (page.isDetailFormVisible() && hasDetailForm(page)) {
       putAdapterIdProperty(json, PROP_DETAIL_FORM, page.getDetailForm());
     }
     putProperty(json, PROP_DETAIL_TABLE_VISIBLE, page.isTableVisible());
@@ -268,5 +268,13 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
     super.putUpdatedPropertiesForResolvedNode(jsonNode, nodeId, node, virtualNode);
     putNodeType(jsonNode, node);
     BEANS.get(InspectorInfo.class).put(getUiSession(), jsonNode, node);
+  }
+
+  /**
+   * @return <code>true</code> if the page has a detail form that is not closed, <code>false</code> otherwise (closed
+   *         forms should not be attached, because the close event causes the JSON adapter to be disposed)
+   */
+  protected boolean hasDetailForm(IPage page) {
+    return (page.getDetailForm() != null && !page.getDetailForm().isFormClosed());
   }
 }
