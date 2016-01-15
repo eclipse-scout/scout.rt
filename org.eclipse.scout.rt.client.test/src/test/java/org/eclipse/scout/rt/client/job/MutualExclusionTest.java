@@ -583,19 +583,16 @@ public class MutualExclusionTest {
         try {
           protocol.add("before-blocking-1");
           condition.waitFor();
-          protocol.add("not-interrupted-1");
         }
         catch (InterruptedRuntimeException e) {
           protocol.add("interrupted-1 (a)");
-
-          if (Thread.interrupted()) {
-            protocol.add("interrupted-1 (b)");
-            Thread.currentThread().interrupt(); // Restore the interruption status
-          }
-
         }
         catch (RuntimeException e) {
           protocol.add("jobException-1");
+        }
+
+        if (Thread.currentThread().isInterrupted()) {
+          protocol.add("interrupted-1 (b)");
         }
 
         if (ModelJobs.isModelThread()) {
@@ -679,7 +676,6 @@ public class MutualExclusionTest {
     expectedProtocol.add("before-cancel-job1-2");
     expectedProtocol.add("running-2b");
     expectedProtocol.add("done-2");
-    expectedProtocol.add("interrupted-1 (a)");
     expectedProtocol.add("interrupted-1 (b)");
     expectedProtocol.add("model-thread-1");
     expectedProtocol.add("done-1");

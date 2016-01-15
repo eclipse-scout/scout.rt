@@ -129,7 +129,8 @@ public class FileChooser implements IFileChooser {
   }
 
   private void waitFor() {
-    m_blockingCondition.waitFor(ModelJobs.EXECUTION_HINT_UI_INTERACTION_REQUIRED);
+    // Do not exit upon interruption, as the file chooser would be closed immediately otherwise.
+    m_blockingCondition.waitForUninterruptibly(ModelJobs.EXECUTION_HINT_UI_INTERACTION_REQUIRED);
   }
 
   @Override

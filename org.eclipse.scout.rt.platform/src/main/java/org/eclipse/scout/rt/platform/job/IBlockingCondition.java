@@ -49,30 +49,43 @@ public interface IBlockingCondition {
   void setBlocking(boolean blocking);
 
   /**
-   * Waits if necessary for the <em>blocking state</em> of this blocking condition to become unblocked. Thereto, the
-   * current thread becomes disabled for thread scheduling purposes and lies dormant. This method returns immediately,
-   * if this blocking condition is not blocking at the time of invocation.
+   * Waits if necessary for the <em>blocking state</em> of this blocking condition to be unblocked, or until the current
+   * thread is interrupted. While waiting, the current thread is disabled for thread scheduling purposes and lies
+   * dormant. This method returns immediately, if this blocking condition is not blocking at the time of invocation.
    * <p>
-   * If invoked from a job, and this job is assigned to an {@link IExecutionSemaphore}, the job's permit is released and
-   * passed to the next competing job of that same semaphore while being blocked.
+   * If invoked from a semaphore aware job, the job's permit is released and passed to the next competing job while
+   * waiting.
+   * <p>
+   * If the current thread's interrupted status is set when it enters this method, or it is interrupted while waiting,
+   * then {@link InterruptedRuntimeException} is thrown with the thread's interrupted status still set. Additionally for
+   * semaphore aware jobs, this method returns with the semaphore permit re-acquired.
    *
    * @param executionHints
    *          optional execution hints to be associated with the current {@link IFuture} for the time of waiting; has no
    *          effect if not running on behalf of a job.
    * @throws InterruptedRuntimeException
-   *           if the current thread was interrupted while waiting.<br/>
-   *           But, even if not being blocked anymore, the blocking condition might still be in <em>blocking state</em>.
-   *           Also, if being a semaphore aware job, the permit was acquired accordingly.
+   *           if the current thread's interrupted status is set when it enters this method, or if it is interrupted
+   *           while waiting. The thread's interrupted status is still set. Additionally for semaphore aware jobs, this
+   *           method returns with the semaphore permit re-acquired. However, this condition may still be in
+   *           <em>blocking state</em>.
    */
   void waitFor(String... executionHints);
 
   /**
-   * Waits if necessary for at most the given time for the <em>blocking state</em> of this blocking condition to become
-   * unblocked. Thereto, the current thread becomes disabled for thread scheduling purposes and lies dormant. This
-   * method returns immediately, if this blocking condition is not blocking at the time of invocation.
+   * Waits if necessary for at most the given time for the <em>blocking state</em> of this blocking condition to be
+   * unblocked, or until the current thread is interrupted, or until the timeout elapses. While waiting, the current
+   * thread is disabled for thread scheduling purposes and lies dormant. This method returns immediately, if this
+   * blocking condition is not blocking at the time of invocation.
    * <p>
-   * If invoked from a job, and this job is controlled by an {@link IExecutionSemaphore}, the job's permit is released
-   * and passed to the next competing job of that same semaphore while being blocked.
+   * If invoked from a semaphore aware job, the job's permit is released and passed to the next competing job while
+   * waiting.
+   * <p>
+   * If the current thread's interrupted status is set when it enters this method, or it is interrupted while waiting,
+   * then {@link InterruptedRuntimeException} is thrown with the thread's interrupted status still set. Additionally for
+   * semaphore aware jobs, when it finally returns from this method the semaphore permit will be re-acquired.
+   * <p>
+   * If the timeout elapses, then {@link TimeoutException} is thrown. Additionally for semaphore aware jobs, this method
+   * returns with the semaphore permit re-acquired.
    *
    * @param timeout
    *          the maximal time to wait.
@@ -82,13 +95,62 @@ public interface IBlockingCondition {
    *          optional execution hints to be associated with the current {@link IFuture} for the time of waiting; has no
    *          effect if not running on behalf of a job.
    * @throws InterruptedRuntimeException
-   *           if the current thread was interrupted while waiting.<br/>
-   *           But, even if not being blocked anymore, the blocking condition might still be in <em>blocking state</em>.
-   *           Also, if being a semaphore aware job, the permit was acquired accordingly.
+   *           if the current thread's interrupted status is set when it enters this method, or if it is interrupted
+   *           while waiting. The thread's interrupted status is still set. Additionally for semaphore aware jobs, this
+   *           method returns with the semaphore permit re-acquired. However, this condition may still be in
+   *           <em>blocking state</em>.
    * @throws TimeoutException
    *           if the wait timed out.<br/>
-   *           But, even if not being blocked anymore, the blocking condition might still be in <em>blocking state</em>.
-   *           Also, if being a semaphore aware job, the permit was acquired accordingly.
+   *           For semaphore aware jobs, this method returns with the semaphore permit re-acquired. However, this
+   *           condition may still be in <em>blocking state</em>.
    */
   void waitFor(long timeout, TimeUnit unit, String... executionHints);
+
+  /**
+   * Waits if necessary for the <em>blocking state</em> of this blocking condition to be unblocked. While waiting, the
+   * current thread is disabled for thread scheduling purposes and lies dormant. This method returns immediately, if
+   * this blocking condition is not blocking at the time of invocation.
+   * <p>
+   * If invoked from a semaphore aware job, the job's permit is released and passed to the next competing job while
+   * waiting.
+   * <p>
+   * If the current thread's interrupted status is set when it enters this method, or it is interrupted while waiting,
+   * it will continue to wait until being unblocked. When it finally returns from this method its interrupted status
+   * will still be set.
+   *
+   * @param executionHints
+   *          optional execution hints to be associated with the current {@link IFuture} for the time of waiting; has no
+   *          effect if not running on behalf of a job.
+   */
+  void waitForUninterruptibly(String... executionHints);
+
+  /**
+   * Waits if necessary for at most the given time for the <em>blocking state</em> of this blocking condition to be
+   * unblocked, or until the timeout elapses. While waiting, the current thread is disabled for thread scheduling
+   * purposes and lies dormant. This method returns immediately, if this blocking condition is not blocking at the time
+   * of invocation.
+   * <p>
+   * If invoked from a semaphore aware job, the job's permit is released and passed to the next competing job while
+   * waiting.
+   * <p>
+   * If the current thread's interrupted status is set when it enters this method, or it is interrupted while waiting,
+   * it will continue to wait until being unblocked. When it finally returns from this method its interrupted status
+   * will still be set.
+   * <p>
+   * If the timeout elapses, then {@link TimeoutException} is thrown. Additionally for semaphore aware jobs, this method
+   * returns with the semaphore permit re-acquired.
+   *
+   * @param timeout
+   *          the maximal time to wait.
+   * @param unit
+   *          unit of the given timeout.
+   * @param executionHints
+   *          optional execution hints to be associated with the current {@link IFuture} for the time of waiting; has no
+   *          effect if not running on behalf of a job.
+   * @throws TimeoutException
+   *           if the wait timed out.<br/>
+   *           For semaphore aware jobs, this method returns with the semaphore permit re-acquired. However, this
+   *           condition may still be in <em>blocking state</em>.
+   */
+  void waitForUninterruptibly(long timeout, TimeUnit unit, String... executionHints);
 }

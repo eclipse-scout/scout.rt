@@ -35,7 +35,7 @@ public class BlockingCondition implements IBlockingCondition {
 
   private static final Logger LOG = LoggerFactory.getLogger(BlockingCondition.class);
 
-  private static final long TIMEOUT_INFINITE = -1;
+  private static final long TIMEOUT_INDEFINITELY = -1;
 
   private volatile boolean m_blocking;
 
@@ -75,29 +75,65 @@ public class BlockingCondition implements IBlockingCondition {
 
   @Override
   public void waitFor(final String... executionHints) {
-    waitFor(TIMEOUT_INFINITE, TimeUnit.MILLISECONDS, executionHints);
+    waitFor(TIMEOUT_INDEFINITELY, TimeUnit.NANOSECONDS, true /* interruptible */, executionHints);
   }
 
   @Override
   public void waitFor(final long timeout, final TimeUnit unit, final String... executionHints) {
+    waitFor(timeout, unit, true /* interruptible */, executionHints);
+  }
+
+  @Override
+  public void waitForUninterruptibly(final long timeout, final TimeUnit unit, final String... executionHints) {
+    waitFor(timeout, unit, false /* uninterruptible */, executionHints);
+  }
+
+  @Override
+  public void waitForUninterruptibly(final String... executionHints) {
+    waitFor(TIMEOUT_INDEFINITELY, TimeUnit.NANOSECONDS, false /* uninterruptible */, executionHints);
+  }
+
+  protected void waitFor(final long timeout, final TimeUnit unit, final boolean awaitInterruptibly, final String... executionHints) {
     final IFuture<?> currentFuture = IFuture.CURRENT.get();
     if (currentFuture instanceof JobFutureTask) {
-      blockFutureTask((JobFutureTask<?>) currentFuture, timeout, unit, executionHints);
+      blockJobThread((JobFutureTask<?>) currentFuture, timeout, unit, awaitInterruptibly, executionHints);
     }
     else {
-      blockThread(timeout, unit);
+      blockNonJobThread(timeout, unit, awaitInterruptibly);
     }
   }
 
-  protected void blockFutureTask(final JobFutureTask<?> futureTask, final long timeout, final TimeUnit unit, final String... executionHints) {
-    IExecutionHintRegistration executionHintRegistration = IExecutionHintRegistration.NULL_INSTANCE;
-
-    RuntimeException exceptionWhileBlocking = null;
+  protected void blockNonJobThread(final long timeout, final TimeUnit unit, final boolean awaitInterruptibly) {
+    if (!m_blocking) {
+      return;
+    }
 
     m_lock.lock();
     try {
       if (!m_blocking) {
-        return;
+        return; // double-checked locking
+      }
+
+      awaitUntilSignaledOrTimeout(timeout, unit, awaitInterruptibly);
+    }
+    finally {
+      m_lock.unlock();
+    }
+  }
+
+  protected void blockJobThread(final JobFutureTask<?> futureTask, final long timeout, final TimeUnit unit, final boolean awaitInterruptibly, final String... executionHints) {
+    if (!m_blocking) {
+      return;
+    }
+
+    IExecutionHintRegistration executionHintRegistration = IExecutionHintRegistration.NULL_INSTANCE;
+    RuntimeException exceptionWhileWaiting = null;
+    Error errorWhileWaiting = null;
+
+    m_lock.lock();
+    try {
+      if (!m_blocking) {
+        return; // double-checked locking
       }
 
       // Associate the future with execution hints.
@@ -112,80 +148,68 @@ public class BlockingCondition implements IBlockingCondition {
       // Release the permit if being a semaphore aware task, but only if currently being a permit owner.
       futureTask.releasePermit();
       try {
-        blockUntilSignaledOrTimeout(timeout, unit); // Wait until the condition falls
+        awaitUntilSignaledOrTimeout(timeout, unit, awaitInterruptibly);
       }
-      catch (final InterruptedRuntimeException | TimeoutException e) {
-        exceptionWhileBlocking = e;
+      catch (final RuntimeException e) {
+        exceptionWhileWaiting = e;
+      }
+      catch (final Error e) { // NOSONAR
+        errorWhileWaiting = e;
       }
     }
     finally {
       m_lock.unlock();
     }
 
-    // Reacquire the permit outside the lock.
-    if (exceptionWhileBlocking instanceof InterruptedRuntimeException) {
-      Thread.interrupted(); // clear the interrupted status to reacquire the permit.
-      afterBlockFutureTask(futureTask, executionHintRegistration);
-      Thread.currentThread().interrupt(); // interrupt the current thread.
-      throw exceptionWhileBlocking;
-    }
-    else if (exceptionWhileBlocking instanceof TimeoutException) {
-      afterBlockFutureTask(futureTask, executionHintRegistration);
-      throw exceptionWhileBlocking;
-    }
-    else {
-      afterBlockFutureTask(futureTask, executionHintRegistration);
-    }
-  }
+    // re-acquire the permit (must be outside the lock)
+    acquirePermitUninterruptibly(futureTask);
 
-  /**
-   * Method invoked after blocking the current thread of a {@link JobFutureTask}, and acquires a permit (if being a
-   * semaphore aware task), unsets execution hints, and enters 'running' state.
-   */
-  protected void afterBlockFutureTask(final JobFutureTask<?> futureTask, final IExecutionHintRegistration executionHintRegistration) {
-    acquirePermit(futureTask);
+    // prepare to continue execution
     executionHintRegistration.dispose();
     futureTask.changeState(JobState.RUNNING);
-  }
 
-  protected void blockThread(final long timeout, final TimeUnit unit) {
-    m_lock.lock();
-    try {
-      if (!m_blocking) {
-        return;
-      }
-
-      blockUntilSignaledOrTimeout(timeout, unit);
+    if (errorWhileWaiting != null) {
+      throw errorWhileWaiting;
     }
-    finally {
-      m_lock.unlock();
+    if (exceptionWhileWaiting != null) {
+      throw exceptionWhileWaiting;
     }
   }
 
   /**
-   * Blocks the current thread until being signaled, or the timeout elapses.
-   *
-   * @param timeout
-   *          the maximal time to wait, or {@link #TIMEOUT_INFINITE} to wait infinitely.
-   * @param unit
-   *          unit of the given timeout.
-   * @throws InterruptedRuntimeException
-   *           if the current thread was interrupted while waiting.
-   * @throws TimeoutException
-   *           if the wait timed out.
+   * Waits until signaled or the timeout elapses. If <code>awaitInterruptibly</code> is set to <code>true</code>, this
+   * method returns with an {@link InterruptedRuntimeException} upon interruption. For either case, when this method
+   * finally returns, the thread's interrupted status will still be set.
    */
-  protected void blockUntilSignaledOrTimeout(final long timeout, final TimeUnit unit) {
+  protected void awaitUntilSignaledOrTimeout(final long timeout, final TimeUnit unit, final boolean awaitInterruptibly) {
+    boolean interrupted = false;
     m_lock.lock();
     try {
-      if (timeout == TIMEOUT_INFINITE) {
-        while (m_blocking) { // while-loop to address spurious wake-ups.
-          m_unblockedCondition.await();
+      if (timeout == TIMEOUT_INDEFINITELY) {
+        while (m_blocking) { // while-loop to address spurious wake-ups
+          if (awaitInterruptibly) {
+            m_unblockedCondition.await();
+          }
+          else {
+            m_unblockedCondition.awaitUninterruptibly();
+          }
         }
       }
       else {
         long nanos = unit.toNanos(timeout);
-        while (m_blocking && nanos > 0L) { // while-loop to address spurious wake-ups.
-          nanos = m_unblockedCondition.awaitNanos(nanos);
+        while (m_blocking && nanos > 0L) { // while-loop to address spurious wake-ups
+          if (awaitInterruptibly) {
+            nanos = m_unblockedCondition.awaitNanos(nanos);
+          }
+          else {
+            try {
+              nanos = m_unblockedCondition.awaitNanos(nanos);
+            }
+            catch (final InterruptedException e) {
+              interrupted = true; // remember interruption
+              Thread.interrupted(); // clear the interrupted status to continue waiting
+            }
+          }
         }
 
         if (nanos <= 0L) {
@@ -196,26 +220,30 @@ public class BlockingCondition implements IBlockingCondition {
         }
       }
     }
-    catch (final java.lang.InterruptedException e) {
-      Thread.currentThread().interrupt(); // Restore the interrupted status because cleared by catching InterruptedException.
+    catch (final InterruptedException e) {
+      interrupted = true;
       throw new InterruptedRuntimeException("Interrupted while waiting for a blocking condition to fall")
           .withContextInfo("blockingCondition", this)
           .withContextInfo("thread", Thread.currentThread().getName());
     }
     finally {
       m_lock.unlock();
+
+      if (interrupted) {
+        Thread.currentThread().interrupt(); // restore interruption status
+      }
     }
   }
 
   /**
    * Waits until acquired a permit for the given task. This method returns immediately if the specified task is not a
-   * semaphore aware task. In case of an interruption, the permit acquisition is continued, but the method throws an
-   * {@link InterruptedRuntimeException} upon acquisition.
-   *
-   * @throws InterruptedRuntimeException
-   *           if interrupted during permit acquisition. However, the permit was acquired.
+   * semaphore aware task.
+   * <p>
+   * If the current thread's interrupted status is set when it enters this method, or it is interrupted while waiting,
+   * it will continue to wait until acquired the permit. When it finally returns from this method its interrupted status
+   * will still be set.
    */
-  protected void acquirePermit(final JobFutureTask<?> futureTask) {
+  protected void acquirePermitUninterruptibly(final JobFutureTask<?> futureTask) {
     final ExecutionSemaphore semaphore = futureTask.getExecutionSemaphore();
     if (semaphore == null) {
       return;
@@ -223,21 +251,20 @@ public class BlockingCondition implements IBlockingCondition {
 
     futureTask.changeState(JobState.WAITING_FOR_PERMIT);
 
-    boolean interrupted = false;
+    boolean interrupted = Thread.interrupted(); // clear interruption status to acquire the permit.
     while (!semaphore.isPermitOwner(futureTask)) {
       try {
         semaphore.acquire(futureTask, QueuePosition.HEAD);
       }
       catch (final InterruptedRuntimeException e) {
         interrupted = true;
-        Thread.interrupted(); // clear the interrupted status to acquire anew.
-        LOG.warn("Interrupted while acquiring semaphore permit. Continue acquisition anew.[future={}, semaphore={}]", futureTask, semaphore, e);
+        Thread.interrupted(); // clear interruption status to re-acquire the permit.
+        LOG.info("Interrupted while acquiring semaphore permit. Continue to re-acquire the permit. [future={}, semaphore={}]", futureTask, semaphore, e);
       }
     }
 
     if (interrupted) {
-      Thread.currentThread().interrupt(); // interrupt the current thread
-      throw new InterruptedRuntimeException("Interrupted while acquiring semaphore permit. However, the permit was successfully acquired. [future={}]", futureTask);
+      Thread.currentThread().interrupt(); // restore interruption status
     }
   }
 

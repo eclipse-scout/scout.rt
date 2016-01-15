@@ -981,7 +981,8 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
 
   @Override
   public void waitFor() {
-    m_blockingCondition.waitFor(ModelJobs.EXECUTION_HINT_UI_INTERACTION_REQUIRED);
+    // Do not exit upon interruption.
+    m_blockingCondition.waitForUninterruptibly(ModelJobs.EXECUTION_HINT_UI_INTERACTION_REQUIRED);
   }
 
   protected static Class<?> getDataAnnotationValue(Class<?> clazz) {
