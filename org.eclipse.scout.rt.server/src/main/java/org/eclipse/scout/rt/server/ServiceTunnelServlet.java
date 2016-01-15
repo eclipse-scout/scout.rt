@@ -109,10 +109,11 @@ public class ServiceTunnelServlet extends HttpServlet {
             public void run() throws Exception {
               ServiceTunnelRequest serviceRequest = deserializeServiceRequest();
 
+              ClientNotificationCollector collector = new ClientNotificationCollector();
               ServerRunContext serverRunContext = ServerRunContexts.copyCurrent()
                   .withLocale(serviceRequest.getLocale())
                   .withUserAgent(UserAgent.createByIdentifier(serviceRequest.getUserAgent()))
-                  .withClientNotificationCollector(new ClientNotificationCollector())
+                  .withClientNotificationCollector(collector)
                   .withClientNodeId(serviceRequest.getClientNodeId());
 
               if (serviceRequest.getSessionId() != null) {
@@ -123,6 +124,8 @@ public class ServiceTunnelServlet extends HttpServlet {
               final IRegistrationHandle registrationHandle = registerForCancelation(serverRunContext, serviceRequest);
               try {
                 ServiceTunnelResponse serviceResponse = invokeService(serverRunContext, serviceRequest);
+                // include client notifications in response (piggyback)
+                serviceResponse.setNotifications(collector.consume());
                 serializeServiceResponse(serviceResponse);
               }
               finally {
