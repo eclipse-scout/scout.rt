@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.client.services.common.exceptionhandler;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.net.MalformedURLException;
@@ -45,7 +44,6 @@ public class ErrorPopup {
   protected String m_detail;
   protected IHtmlContent m_htmlDetail;
   protected String m_acceptText;
-  protected String m_copyPasteText;
   protected ProcessingException m_cause;
 
   /**
@@ -59,7 +57,6 @@ public class ErrorPopup {
         .withBody(m_detail)
         .withHtml(m_htmlDetail)
         .withYesButtonText(m_acceptText)
-        .withHiddenText(m_copyPasteText)
         .withSeverity(m_cause.getStatus().getSeverity())
         .show();
   }
@@ -176,8 +173,6 @@ public class ErrorPopup {
       t = t.getCause();
     }
     m_detail = StringUtility.wrapWord(ScoutTexts.get("OriginalErrorMessageIs", buf.toString()), 120);
-    // copy-paste
-    m_copyPasteText = createCopyPasteText(m_text, m_detail, m_cause);
   }
 
   protected void createNetErrorMessage(String msg) {
@@ -200,24 +195,5 @@ public class ErrorPopup {
         && m_htmlDetail == null) {
       m_detail = ScoutTexts.get("VetoErrorText") + msg;
     }
-  }
-
-  private String createCopyPasteText(String text, String detail, Throwable cause) {
-    StringWriter logText = new StringWriter();
-    logText.append(m_title + "\n");
-    logText.append("\n");
-    if (text != null) {
-      logText.append(text + "\n");
-      logText.append("\n");
-    }
-    if (detail != null) {
-      logText.append(detail + "\n");
-      logText.append("\n");
-    }
-    if (cause != null) {
-      cause.printStackTrace(new PrintWriter(logText, true));
-      logText.append("\n");
-    }
-    return logText.toString();
   }
 }
