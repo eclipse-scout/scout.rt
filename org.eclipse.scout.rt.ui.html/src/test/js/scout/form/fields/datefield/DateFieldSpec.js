@@ -42,7 +42,7 @@ describe("DateField", function() {
     dateField.$dateField.focus();
     jasmine.clock().tick(101);
     expect(dateField.$dateField).toBeFocused();
-    dateField.$dateField.mousedown();
+    dateField.$dateField.triggerMouseDown();
     expect(findPicker().length).toBe(1);
 
     return dateField;
@@ -68,7 +68,7 @@ describe("DateField", function() {
       dateField.render(session.$entryPoint);
       expect(findPicker().length).toBe(0);
 
-      dateField.$dateField.mousedown();
+      dateField.$dateField.triggerMouseDown();
 
       expect(findPicker().length).toBe(1);
     });
