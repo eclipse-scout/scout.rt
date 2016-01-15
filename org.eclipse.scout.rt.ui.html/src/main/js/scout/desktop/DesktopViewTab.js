@@ -91,6 +91,10 @@ scout.DesktopViewTab.prototype.select = function() {
     this._view.attach();
   } else {
     this._renderView();
+    if (this.session.desktop._outlineContent !== this._view) {
+      //notify model this form is active
+      this.session.desktop._setFormActivated(this._view);
+    }
   }
 };
 

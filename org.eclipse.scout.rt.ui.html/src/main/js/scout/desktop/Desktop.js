@@ -183,7 +183,7 @@ scout.Desktop.prototype._postRender = function() {
   this.session.keyStrokeManager.uninstallKeyStrokeContext(this.keyStrokeContext);
 
   // Render attached forms, message boxes and file choosers.
-  this.formController.render();
+  this.formController.render(true);
   this.messageBoxController.render();
   this.fileChooserController.render();
 
@@ -679,7 +679,7 @@ scout.Desktop.prototype.glassPaneTargets = function() {
  */
 scout.Desktop.prototype._deferredGlassPaneTarget = function(popupWindow) {
   var deferred = {
-    $glassPaneTarget: null,  // set by PopupWindow
+    $glassPaneTarget: null, // set by PopupWindow
     glassPaneRenderer: null, // set by GlassPaneRenderer,
     popupReady: function($glassPaneTarget) {
       this.$glassPaneTarget = $glassPaneTarget;
