@@ -108,29 +108,8 @@ public class ServiceTunnelServlet extends HttpServlet {
             @Override
             public void run() throws Exception {
               ServiceTunnelRequest serviceRequest = deserializeServiceRequest();
-
-              ClientNotificationCollector collector = new ClientNotificationCollector();
-              ServerRunContext serverRunContext = ServerRunContexts.copyCurrent()
-                  .withLocale(serviceRequest.getLocale())
-                  .withUserAgent(UserAgent.createByIdentifier(serviceRequest.getUserAgent()))
-                  .withClientNotificationCollector(collector)
-                  .withClientNodeId(serviceRequest.getClientNodeId());
-
-              if (serviceRequest.getSessionId() != null) {
-                serverRunContext
-                    .withSession(lookupServerSessionOnHttpSession(serviceRequest.getSessionId(), serverRunContext));
-              }
-
-              final IRegistrationHandle registrationHandle = registerForCancelation(serverRunContext, serviceRequest);
-              try {
-                ServiceTunnelResponse serviceResponse = invokeService(serverRunContext, serviceRequest);
-                // include client notifications in response (piggyback)
-                serviceResponse.setNotifications(collector.consume());
-                serializeServiceResponse(serviceResponse);
-              }
-              finally {
-                registrationHandle.unregister();
-              }
+              ServiceTunnelResponse serviceResponse = doPost(serviceRequest);
+              serializeServiceResponse(serviceResponse);
             }
 
           }, DefaultExceptionTranslator.class);
@@ -144,6 +123,31 @@ public class ServiceTunnelServlet extends HttpServlet {
         LOG.error("Client={}@{}/{}", servletRequest.getRemoteUser(), servletRequest.getRemoteAddr(), servletRequest.getRemoteHost(), e);
         servletResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
       }
+    }
+  }
+
+  protected ServiceTunnelResponse doPost(ServiceTunnelRequest serviceRequest) throws ServletException {
+    ClientNotificationCollector collector = new ClientNotificationCollector();
+    ServerRunContext serverRunContext = ServerRunContexts.copyCurrent()
+        .withLocale(serviceRequest.getLocale())
+        .withUserAgent(UserAgent.createByIdentifier(serviceRequest.getUserAgent()))
+        .withClientNotificationCollector(collector)
+        .withClientNodeId(serviceRequest.getClientNodeId());
+
+    if (serviceRequest.getSessionId() != null) {
+      serverRunContext
+          .withSession(lookupServerSessionOnHttpSession(serviceRequest.getSessionId(), serverRunContext));
+    }
+
+    final IRegistrationHandle registrationHandle = registerForCancelation(serverRunContext, serviceRequest);
+    try {
+      ServiceTunnelResponse serviceResponse = invokeService(serverRunContext, serviceRequest);
+      // include client notifications in response (piggyback)
+      serviceResponse.setNotifications(collector.consume());
+      return serviceResponse;
+    }
+    finally {
+      registrationHandle.unregister();
     }
   }
 

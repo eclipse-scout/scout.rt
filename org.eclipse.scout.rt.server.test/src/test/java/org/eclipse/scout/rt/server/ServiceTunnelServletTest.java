@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.server;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.anyString;
@@ -23,6 +24,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -50,6 +52,9 @@ import org.eclipse.scout.rt.server.commons.context.ServletRunContexts;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.server.session.ServerSessionProvider;
+import org.eclipse.scout.rt.shared.services.common.ping.IPingService;
+import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
+import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.testing.server.runner.RunWithServerSession;
 import org.eclipse.scout.rt.testing.server.runner.ServerTestRunner;
@@ -175,6 +180,18 @@ public class ServiceTunnelServletTest {
     assertEquals(CollectionUtility.hashSet(testServerSession), serverSessions);
 
     verify(m_serverSessionProviderSpy, times(1)).provide(anyString(), any(ServerRunContext.class));
+  }
+
+  @Test
+  public void testPostSuccessful() throws ServletException, IOException {
+    ServiceTunnelServlet s = new ServiceTunnelServlet();
+    Class[] parameterTypes = new Class[]{String.class};
+    Object[] args = new Object[]{"test"};
+    ServiceTunnelRequest req = new ServiceTunnelRequest(IPingService.class.getName(), "ping", parameterTypes, args);
+    ServiceTunnelResponse res = s.doPost(req);
+    assertEquals("test", res.getData());
+    assertNull(res.getException());
+    assertEquals(0, res.getNotifications().size());
   }
 
   private Answer<IServerSession> slowCreateTestsession(final TestServerSession testSession) {
