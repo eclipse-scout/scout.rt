@@ -88,7 +88,7 @@
 
   & > .menu-item > .key-box {
     bottom: auto;
-    top: 0px;
+    top: 7px;
   }
 
   &.down  {
