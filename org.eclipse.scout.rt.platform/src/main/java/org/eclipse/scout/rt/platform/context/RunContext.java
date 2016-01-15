@@ -399,7 +399,7 @@ public class RunContext implements IAdaptable {
 
     private volatile Thread m_thread;
 
-    public ThreadInterrupter(final Thread thread, final RunMonitor monitor) {
+    ThreadInterrupter(final Thread thread, final RunMonitor monitor) {
       m_thread = thread;
       m_monitor = monitor;
       m_monitor.registerCancellable(this);

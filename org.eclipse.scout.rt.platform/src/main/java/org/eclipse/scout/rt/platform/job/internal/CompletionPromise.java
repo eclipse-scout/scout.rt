@@ -299,7 +299,7 @@ class CompletionPromise<RESULT> {
         final Exception exception = BEANS.get(JobExceptionTranslator.class).translateExecutionException(e, DefaultExceptionTranslator.class);
         return new DoneEvent<>(null, exception, false);
       }
-      catch (final Error error) {
+      catch (final Error error) {// NOSONAR
         // Errors are re-thrown by exception translator.
         return new DoneEvent<>(null, error, false);
       }
@@ -341,7 +341,7 @@ class CompletionPromise<RESULT> {
           });
         }
       }
-      catch (final Throwable t) {
+      catch (final Throwable t) {// NOSONAR
         LOG.error("Failed to notify 'done-promise' callback", t);
       }
     }

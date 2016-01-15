@@ -200,7 +200,7 @@ public class RunMonitorCancelRegistry {
   /**
    * A token representing the registration of a monitor. This token can later be used to unregister the monitor.
    */
-  public static interface IRegistrationHandle {
+  public interface IRegistrationHandle {
 
     /**
      * Unregisters the associated {@link RunMonitor} from {@link RunMonitorCancelRegistry}.
