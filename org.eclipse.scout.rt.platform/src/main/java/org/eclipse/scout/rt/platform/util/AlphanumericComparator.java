@@ -38,7 +38,7 @@ public class AlphanumericComparator implements Comparator<String>, Serializable 
   private final boolean m_ignoreCase;
 
   /**
-   * Creates a new alphanumeric comparator with <code>ignoreCase = false</code>.
+   * Creates a new alphanumeric comparator with {@code ignoreCase = false}.
    */
   public AlphanumericComparator() {
     this(false);
@@ -70,29 +70,52 @@ public class AlphanumericComparator implements Comparator<String>, Serializable 
       return 1;
     }
     Pattern p = Pattern.compile("(([0-9]+)|([^0-9]+))", Pattern.DOTALL);
-    Matcher m1 = p.matcher(s1);
-    Matcher m2 = p.matcher(s2);
-    boolean m1Found = m1.find();
-    boolean m2Found = m2.find();
-    while (m1Found && m2Found) {
-      String x1 = m1.group(1);
-      String x2 = m2.group(1);
-      int result = 0;
-      try {
-        Long n1 = Long.parseLong(x1);
-        Long n2 = Long.parseLong(x2);
-        result = n1.compareTo(n2);
-      }
-      catch (NumberFormatException e) {
-        // At least one of the strings contains non-numeric characters --> use String comparison
-        result = (isIgnoreCase() ? x1.compareToIgnoreCase(x2) : x1.compareTo(x2));
-      }
+    Matcher matcher1 = p.matcher(s1);
+    Matcher matcher2 = p.matcher(s2);
+    boolean found1 = matcher1.find();
+    boolean found2 = matcher2.find();
+    while (found1 && found2) {
+      String nextGroup1 = matcher1.group(1);
+      String nextGroup2 = matcher2.group(1);
+      int result = compareAsLongs(nextGroup1, nextGroup2);
       if (result != 0) {
         return result;
       }
-      m1Found = m1.find();
-      m2Found = m2.find();
+      found1 = matcher1.find();
+      found2 = matcher2.find();
     }
+    return compareEndsHit(matcher1, matcher2);
+  }
+
+  /**
+   * Compares the two strings {@code s1} and {@code s2} as {@link Long}s if possible. If not, a string comparison is
+   * done.
+   */
+  private int compareAsLongs(String s1, String s2) {
+    int result = 0;
+    try {
+      Long n1 = Long.parseLong(s1);
+      Long n2 = Long.parseLong(s2);
+      result = n1.compareTo(n2);
+    }
+    catch (NumberFormatException e) {
+      // At least one of the strings contains non-numeric characters --> use String comparison
+      result = compareAsStrings(s1, s2);
+    }
+    return result;
+  }
+
+  /**
+   * Compares the two strings {@code s1} and {@code s2}.
+   */
+  private int compareAsStrings(String s1, String s2) {
+    return (isIgnoreCase() ? s1.compareToIgnoreCase(s2) : s1.compareTo(s2));
+  }
+
+  /**
+   * Compares the {@link Matcher}s {@code m1} and {@code m2} by checking if ends have been hit.
+   */
+  private int compareEndsHit(Matcher m1, Matcher m2) {
     if (m1.hitEnd() && !m2.hitEnd()) {
       // s2 has more parts
       return -1;
