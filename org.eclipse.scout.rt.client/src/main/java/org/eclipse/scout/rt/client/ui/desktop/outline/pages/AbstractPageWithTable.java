@@ -339,6 +339,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
     if (childPage != null) {
       node.setResolvedNode(childPage);
       ICell tableCell = getTable().getSummaryCell(row);
+      childPage.setRejectedByUser(row.isRejectedByUser());
       childPage.setFilterAccepted(row.isFilterAccepted());
       childPage.setEnabledInternal(row.isEnabled());
       childPage.getCellForUpdate().updateFrom(tableCell);

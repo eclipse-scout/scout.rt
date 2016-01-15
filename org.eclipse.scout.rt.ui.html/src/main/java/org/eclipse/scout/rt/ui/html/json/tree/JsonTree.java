@@ -216,10 +216,9 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
 
   protected void attachNodes(Collection<ITreeNode> nodes, boolean attachChildren) {
     for (ITreeNode node : nodes) {
-      if (!isNodeAccepted(node)) {
-        continue;
+      if (isNodeAccepted(node)) {
+        attachNode(node, attachChildren);
       }
-      attachNode(node, attachChildren);
     }
   }
 
@@ -437,12 +436,11 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
 
   protected void handleModelNodesInserted(TreeEvent event) {
     JSONArray jsonNodes = new JSONArray();
-    attachNodes(event.getNodes(), true);//FIXME cgu: why not inside loop? attaching for rejected nodes?
+    attachNodes(event.getNodes(), true); // FIXME cgu: why not inside loop? attaching for rejected nodes?
     for (ITreeNode node : event.getNodes()) {
-      if (!isNodeAccepted(node)) {
-        continue;
+      if (isNodeAccepted(node)) {
+    	jsonNodes.put(treeNodeToJson(node));
       }
-      jsonNodes.put(treeNodeToJson(node));
     }
     if (jsonNodes.length() == 0) {
       return;
@@ -895,11 +893,11 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
     if (node.isStatusDeleted()) {
       return false;
     }
-    if (!node.isFilterAccepted()) {
-      // Accept if rejected by user row filter because gui is and should be aware of that row
-      return node.isRejectedByUser();
+    if (node.isFilterAccepted()) {
+      return true;
     }
-    return true;
+    // Accept if rejected by user row filter because gui is and should be aware of that row
+    return node.isRejectedByUser();
   }
 
   /**
