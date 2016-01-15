@@ -122,7 +122,7 @@ scout.DecimalFormat.prototype.format = function(number) {
   var suffix = this.positiveSuffix;
 
   // apply multiplier
-  if (this.multiplier != 1) {
+  if (this.multiplier !== 1) {
     number *= this.multiplier;
   }
 
