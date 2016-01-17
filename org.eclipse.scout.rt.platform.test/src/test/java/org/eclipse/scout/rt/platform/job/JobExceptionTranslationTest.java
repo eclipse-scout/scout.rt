@@ -40,7 +40,7 @@ public class JobExceptionTranslationTest {
 
   @Test
   public void testWithImplicitExceptionTranslator() {
-    final Exception error = new Exception();
+    final Exception error = new Exception("expected JUnit test exception");
 
     IFuture<Void> future = Jobs.schedule(new IRunnable() {
 
@@ -61,7 +61,7 @@ public class JobExceptionTranslationTest {
 
   @Test
   public void testWithExplicitExceptionTranslator() {
-    final Exception error = new Exception();
+    final Exception error = new Exception("expected JUnit test exception");
 
     IFuture<Void> future = Jobs.schedule(new IRunnable() {
 
@@ -90,7 +90,7 @@ public class JobExceptionTranslationTest {
 
   @Test
   public void testWithNullExceptionTranslator() throws Throwable {
-    final CancellationRuntimeException cancellationException = new CancellationRuntimeException("cancelled");
+    final CancellationRuntimeException cancellationException = new CancellationRuntimeException("expected JUnit test exception");
 
     IFuture<Void> future = Jobs.schedule(new IRunnable() {
 

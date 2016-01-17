@@ -62,7 +62,7 @@ public class PlatformExceptionTest {
 
   @Test
   public void testWithArgsAndException() {
-    RuntimeException cause = new RuntimeException();
+    RuntimeException cause = new RuntimeException("expected JUnit test exception");
 
     PlatformException e = new PlatformException("hello", cause);
     assertEquals("hello", e.getMessage());

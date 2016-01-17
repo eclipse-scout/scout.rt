@@ -11,9 +11,9 @@ public class ExceptionHandlerTest {
   public void testRootCause() {
     assertNull(ExceptionHandler.getRootCause(null));
 
-    Exception e = new Exception();
+    Exception e = new Exception("expected JUnit test exception");
     assertSame(e, ExceptionHandler.getRootCause(e));
-    assertSame(e, ExceptionHandler.getRootCause(new Exception(e)));
-    assertSame(e, ExceptionHandler.getRootCause(new Throwable(new Exception(e))));
+    assertSame(e, ExceptionHandler.getRootCause(new Exception("expected JUnit test exception", e)));
+    assertSame(e, ExceptionHandler.getRootCause(new Throwable(new Exception("expected JUnit test exception", e))));
   }
 }

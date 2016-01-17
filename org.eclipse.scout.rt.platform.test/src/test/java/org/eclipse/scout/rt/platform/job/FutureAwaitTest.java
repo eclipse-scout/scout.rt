@@ -98,7 +98,7 @@ public class FutureAwaitTest {
 
   @Test(timeout = 5000)
   public void testAwaitDone_ComputationFailed() throws java.lang.InterruptedException {
-    final RuntimeException computationException = new RuntimeException();
+    final RuntimeException computationException = new RuntimeException("expected JUnit test exception");
 
     // Init
     final IFuture<String> future = Jobs.schedule(new Callable<String>() {
@@ -218,7 +218,7 @@ public class FutureAwaitTest {
 
   @Test(timeout = 5000)
   public void testAwaitDoneWithTimeout_ComputationFailed() throws java.lang.InterruptedException {
-    final RuntimeException computationException = new RuntimeException();
+    final RuntimeException computationException = new RuntimeException("expected JUnit test exception");
 
     // Init
     final IFuture<String> future = Jobs.schedule(new Callable<String>() {
@@ -310,7 +310,7 @@ public class FutureAwaitTest {
 
   @Test(timeout = 5000)
   public void testAwaitDoneAndGet_ComputationFailed() throws java.lang.InterruptedException {
-    final RuntimeException computationException = new RuntimeException();
+    final RuntimeException computationException = new RuntimeException("expected JUnit test exception");
 
     // Init
     final IFuture<String> future = Jobs.schedule(new Callable<String>() {
@@ -400,7 +400,7 @@ public class FutureAwaitTest {
 
   @Test(timeout = 5000)
   public void testAwaitDoneAndGetWithTimeout_ComputationFailed() throws java.lang.InterruptedException {
-    final RuntimeException computationException = new RuntimeException();
+    final RuntimeException computationException = new RuntimeException("expected JUnit test exception");
 
     // Init
     final IFuture<String> future = Jobs.schedule(new Callable<String>() {
@@ -561,7 +561,7 @@ public class FutureAwaitTest {
 
   @Test(timeout = 5000)
   public void testJobManagerAwaitDone_ComputationFailed() throws java.lang.InterruptedException {
-    final RuntimeException computationException = new RuntimeException();
+    final RuntimeException computationException = new RuntimeException("expected JUnit test exception");
 
     // Init
     final IFuture<String> future = Jobs.schedule(new Callable<String>() {

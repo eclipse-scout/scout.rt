@@ -101,16 +101,28 @@ public class JUnitExceptionHandlerTest {
   private static class TestException1 extends Exception {
 
     private static final long serialVersionUID = 1L;
+
+    TestException1() {
+      super("expected JUnit test exception");
+    }
   }
 
   private static class TestException2 extends Exception {
 
     private static final long serialVersionUID = 1L;
+
+    TestException2() {
+      super("expected JUnit test exception");
+    }
   }
 
   private static class TestProcessingException3 extends ProcessingException {
 
     private static final long serialVersionUID = 1L;
+
+    TestProcessingException3() {
+      super("expected JUnit test exception");
+    }
   }
 
   private static class TestExceptionHandler extends ExceptionHandler {

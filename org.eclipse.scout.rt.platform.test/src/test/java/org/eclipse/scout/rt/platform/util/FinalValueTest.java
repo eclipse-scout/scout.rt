@@ -16,7 +16,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.concurrent.Callable;
 
-import org.eclipse.scout.rt.platform.util.FinalValue;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.junit.Assert;
 import org.junit.Test;
@@ -67,7 +66,7 @@ public class FinalValueTest {
     String value = s.setIfAbsent(new Callable<String>() {
       @Override
       public String call() throws Exception {
-        throw new Exception();
+        throw new Exception("expected JUnit test exception");
       }
     });
     assertTestValue(s);
@@ -109,6 +108,10 @@ public class FinalValueTest {
   }
 
   class MyRuntimeException extends RuntimeException {
+
+    MyRuntimeException() {
+      super("expected JUnit test exception");
+    }
 
     private static final long serialVersionUID = 1L;
   }

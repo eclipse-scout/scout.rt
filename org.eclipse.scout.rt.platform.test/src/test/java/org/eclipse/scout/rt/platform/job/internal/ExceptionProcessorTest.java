@@ -74,7 +74,7 @@ public class ExceptionProcessorTest {
 
   @Test
   public void testDefaultSettingsWithException() throws Exception {
-    final RuntimeException exception = new RuntimeException();
+    final RuntimeException exception = new RuntimeException("expected JUnit test exception");
 
     JobInput jobInput = Jobs.newInput();
 
@@ -99,7 +99,7 @@ public class ExceptionProcessorTest {
 
   @Test
   public void testWithSwallow() throws Exception {
-    final RuntimeException exception = new RuntimeException();
+    final RuntimeException exception = new RuntimeException("expected JUnit test exception");
 
     JobInput jobInput = Jobs.newInput().withExceptionHandling(BEANS.get(ExceptionHandler.class), true);
 
@@ -118,7 +118,7 @@ public class ExceptionProcessorTest {
 
   @Test
   public void testWithNullExceptionHandlerAndSwallow() throws Exception {
-    final RuntimeException exception = new RuntimeException();
+    final RuntimeException exception = new RuntimeException("expected JUnit test exception");
 
     JobInput jobInput = Jobs.newInput().withExceptionHandling(null, true);
 
@@ -136,7 +136,7 @@ public class ExceptionProcessorTest {
 
   @Test
   public void testWithNullExceptionHandlerAndPropagate() throws Exception {
-    final RuntimeException exception = new RuntimeException();
+    final RuntimeException exception = new RuntimeException("expected JUnit test exception");
 
     JobInput jobInput = Jobs.newInput().withExceptionHandling(null, false);
 
@@ -160,7 +160,7 @@ public class ExceptionProcessorTest {
 
   @Test
   public void testWithCustomExceptionHandler() throws Exception {
-    final RuntimeException exception = new RuntimeException();
+    final RuntimeException exception = new RuntimeException("expected JUnit test exception");
 
     final AtomicReference<Throwable> error = new AtomicReference<>();
 

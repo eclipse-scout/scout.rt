@@ -28,27 +28,27 @@ public class NullExceptionTranslatorTest {
     NullExceptionTranslator translator = new NullExceptionTranslator();
 
     // Throwable
-    Throwable throwable = new Throwable();
+    Throwable throwable = new Throwable("expected JUnit test exception");
     assertSame(throwable, translator.translate(throwable));
 
     // Exception
-    Exception exception = new Exception();
+    Exception exception = new Exception("expected JUnit test exception");
     assertSame(exception, translator.translate(exception));
 
     // Error
-    Error error = new Error();
+    Error error = new Error("expected JUnit test exception");
     assertSame(error, translator.translate(error));
 
     // UndeclaredThrowableException
-    UndeclaredThrowableException ute = new UndeclaredThrowableException(throwable);
+    UndeclaredThrowableException ute = new UndeclaredThrowableException(throwable, "expected JUnit test exception");
     assertSame(ute, translator.translate(ute));
 
     // InvocationTargetException
-    InvocationTargetException ite = new InvocationTargetException(throwable);
+    InvocationTargetException ite = new InvocationTargetException(throwable, "expected JUnit test exception");
     assertSame(ite, translator.translate(ite));
 
     // ExecutionException
-    ExecutionException ee = new ExecutionException(throwable);
+    ExecutionException ee = new ExecutionException("expected JUnit test exception", throwable);
     assertSame(ee, translator.translate(ee));
   }
 }

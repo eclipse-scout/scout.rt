@@ -22,6 +22,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.TimeoutException;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
+import org.eclipse.scout.rt.testing.platform.util.BlockingCountDownLatch;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.quartz.ScheduleBuilder;
@@ -57,11 +58,14 @@ public class PeriodicJobMutexTest {
     final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
 
     final AtomicInteger rounds = new AtomicInteger(0);
+    final BlockingCountDownLatch latch = new BlockingCountDownLatch(1);
 
     Jobs.schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
+        latch.await();
+
         // cancel after 2 iterations
         if (rounds.getAndIncrement() == 2) {
           IFuture.CURRENT.get().cancel(false);
@@ -134,6 +138,8 @@ public class PeriodicJobMutexTest {
       }
     }, Jobs.newInput()
         .withExecutionSemaphore(executionSemaphore));
+
+    latch.countDown();
 
     // Wait for the job to complete
     Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()

@@ -37,14 +37,14 @@ public class DefaultRuntimeExceptionTranslatorTest {
 
   @Before
   public void before() {
-    m_platformException = new ProcessingException();
-    m_processingException = new ProcessingException();
-    m_runtimeException = new RuntimeException();
-    m_illegalArgumentException = new IllegalArgumentException();
-    m_checkedException = new Exception();
-    m_interruptedException = new InterruptedException();
-    m_throwable = new Throwable();
-    m_error = new Error();
+    m_platformException = new ProcessingException("expected JUnit test exception");
+    m_processingException = new ProcessingException("expected JUnit test exception");
+    m_runtimeException = new RuntimeException("expected JUnit test exception");
+    m_illegalArgumentException = new IllegalArgumentException("expected JUnit test exception");
+    m_checkedException = new Exception("expected JUnit test exception");
+    m_interruptedException = new InterruptedException("expected JUnit test exception");
+    m_throwable = new Throwable("expected JUnit test exception");
+    m_error = new Error("expected JUnit test exception");
   }
 
   @Test
@@ -64,7 +64,7 @@ public class DefaultRuntimeExceptionTranslatorTest {
 
       @Override
       public Throwable produce(Throwable throwable) {
-        return new ExecutionException(throwable);
+        return new ExecutionException("expected JUnit test exception", throwable);
       }
     });
   }
@@ -75,9 +75,7 @@ public class DefaultRuntimeExceptionTranslatorTest {
 
       @Override
       public Throwable produce(Throwable throwable) {
-        return new ExecutionException(
-            new ExecutionException(
-                throwable));
+        return new ExecutionException("expected JUnit test exception", new ExecutionException("expected JUnit test exception", throwable));
       }
     });
   }
@@ -88,7 +86,7 @@ public class DefaultRuntimeExceptionTranslatorTest {
 
       @Override
       public Throwable produce(Throwable throwable) {
-        return new UndeclaredThrowableException(throwable);
+        return new UndeclaredThrowableException(throwable, "expected JUnit test exception");
       }
     });
   }
@@ -99,9 +97,7 @@ public class DefaultRuntimeExceptionTranslatorTest {
 
       @Override
       public Throwable produce(Throwable throwable) {
-        return new UndeclaredThrowableException(
-            new UndeclaredThrowableException(
-                throwable));
+        return new UndeclaredThrowableException(new UndeclaredThrowableException(throwable, "expected JUnit test exception"), "expected JUnit test exception");
       }
     });
   }
@@ -112,7 +108,7 @@ public class DefaultRuntimeExceptionTranslatorTest {
 
       @Override
       public Throwable produce(Throwable throwable) {
-        return new InvocationTargetException(throwable);
+        return new InvocationTargetException(throwable, "expected JUnit test exception");
       }
     });
   }
@@ -123,9 +119,7 @@ public class DefaultRuntimeExceptionTranslatorTest {
 
       @Override
       public Throwable produce(Throwable throwable) {
-        return new InvocationTargetException(
-            new InvocationTargetException(
-                throwable));
+        return new InvocationTargetException(new InvocationTargetException(throwable, "expected JUnit test exception"), "expected JUnit test exception");
       }
     });
   }

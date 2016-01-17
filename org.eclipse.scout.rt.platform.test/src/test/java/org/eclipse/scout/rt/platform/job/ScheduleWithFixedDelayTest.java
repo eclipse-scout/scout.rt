@@ -94,7 +94,7 @@ public class ScheduleWithFixedDelayTest {
       @Override
       public void run() throws Exception {
         if (counter.incrementAndGet() == nRuns) {
-          throw new Exception("blubber");
+          throw new Exception("expected JUnit test exception");
         }
         else {
           protocol.add(System.currentTimeMillis());
@@ -141,7 +141,7 @@ public class ScheduleWithFixedDelayTest {
       @Override
       public void run() throws Exception {
         if (counter.incrementAndGet() == nRuns) {
-          throw new Exception("blubber");
+          throw new Exception("expected JUnit test exception");
         }
         else {
           protocol.add(System.currentTimeMillis());
@@ -189,7 +189,7 @@ public class ScheduleWithFixedDelayTest {
       @Override
       public void run() throws Exception {
         if (counter.incrementAndGet() == nRuns) {
-          throw new Exception("blubber");
+          throw new Exception("expected JUnit test exception");
         }
         else {
           protocol.add(System.currentTimeMillis());
@@ -230,7 +230,7 @@ public class ScheduleWithFixedDelayTest {
           RunMonitor.CURRENT.get().cancel(false);
         }
         else {
-          throw new Exception();
+          throw new Exception("expected JUnit test exception");
         }
       }
     }, Jobs.newInput()
@@ -253,7 +253,7 @@ public class ScheduleWithFixedDelayTest {
           RunMonitor.CURRENT.get().cancel(false);
         }
         else {
-          throw new Exception();
+          throw new Exception("expected JUnit test exception");
         }
       }
     }, Jobs.newInput()
@@ -279,7 +279,7 @@ public class ScheduleWithFixedDelayTest {
           RunMonitor.CURRENT.get().cancel(false);
         }
         else {
-          throw new Exception();
+          throw new Exception("expected JUnit test exception");
         }
       }
     }, Jobs.newInput()

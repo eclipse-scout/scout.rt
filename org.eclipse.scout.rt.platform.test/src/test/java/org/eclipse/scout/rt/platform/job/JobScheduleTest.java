@@ -82,7 +82,7 @@ public class JobScheduleTest {
 
   @Test
   public void testProcessingExceptionWithRunnable() {
-    final ProcessingException exception = new ProcessingException();
+    final ProcessingException exception = new ProcessingException("expected JUnit test exception");
 
     IFuture<Void> future = Jobs.getJobManager().schedule(new IRunnable() {
 
@@ -106,7 +106,7 @@ public class JobScheduleTest {
 
   @Test
   public void testProcessingExceptionWithCallable() {
-    final ProcessingException exception = new ProcessingException();
+    final ProcessingException exception = new ProcessingException("expected JUnit test exception");
 
     IFuture<Void> future = Jobs.getJobManager().schedule(new IRunnable() {
 
@@ -130,7 +130,7 @@ public class JobScheduleTest {
 
   @Test
   public void testRuntimeExceptionWithRunnable() {
-    final RuntimeException exception = new RuntimeException();
+    final RuntimeException exception = new RuntimeException("expected JUnit test exception");
 
     IFuture<Void> future = Jobs.getJobManager().schedule(new IRunnable() {
 
@@ -154,7 +154,7 @@ public class JobScheduleTest {
 
   @Test
   public void testRuntimeExceptionWithCallable() {
-    final RuntimeException exception = new RuntimeException();
+    final RuntimeException exception = new RuntimeException("expected JUnit test exception");
 
     IFuture<Void> future = Jobs.getJobManager().schedule(new IRunnable() {
 
@@ -178,7 +178,7 @@ public class JobScheduleTest {
 
   @Test
   public void testExceptionExceptionWithRunnable() {
-    final Exception exception = new Exception();
+    final Exception exception = new Exception("expected JUnit test exception");
 
     IFuture<Void> future = Jobs.getJobManager().schedule(new IRunnable() {
 
@@ -202,7 +202,7 @@ public class JobScheduleTest {
 
   @Test
   public void testExceptionExceptionWithCallable() {
-    final Exception exception = new Exception();
+    final Exception exception = new Exception("expected JUnit test exception");
 
     IFuture<Void> future = Jobs.getJobManager().schedule(new IRunnable() {
 
@@ -226,7 +226,7 @@ public class JobScheduleTest {
 
   @Test()
   public void testErrorWithRunnable() {
-    final Error error = new Error();
+    final Error error = new Error("expected JUnit test exception");
 
     IFuture<Void> future = Jobs.getJobManager().schedule(new IRunnable() {
 

@@ -24,7 +24,7 @@ public class RunContextExceptionTranslationTest {
 
   @Test
   public void test() {
-    final Exception error = new Exception();
+    final Exception error = new Exception("expected JUnit test exception");
 
     IRunnable runnableWithError = new IRunnable() {
 

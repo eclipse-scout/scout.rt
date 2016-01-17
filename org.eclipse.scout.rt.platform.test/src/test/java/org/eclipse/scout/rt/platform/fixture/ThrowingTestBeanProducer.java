@@ -16,7 +16,7 @@ import org.eclipse.scout.rt.platform.IBeanInstanceProducer;
 public class ThrowingTestBeanProducer implements IBeanInstanceProducer<Object> {
 
   public ThrowingTestBeanProducer() {
-    throw new RuntimeException("blubbr");
+    throw new RuntimeException("expected JUnit test exception");
   }
 
   @Override

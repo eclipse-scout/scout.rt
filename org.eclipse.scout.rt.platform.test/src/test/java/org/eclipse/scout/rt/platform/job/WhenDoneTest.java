@@ -124,7 +124,7 @@ public class WhenDoneTest {
   public void testError() throws InterruptedException {
     final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
     final Holder<DoneEvent<String>> eventHolder = new Holder<>();
-    final ProcessingException pe = new ProcessingException();
+    final ProcessingException pe = new ProcessingException("expected JUnit test exception");
 
     final IFuture<String> future = Jobs.schedule(new Callable<String>() {
 
@@ -167,7 +167,7 @@ public class WhenDoneTest {
   public void testErrorWithJobAlreadyCompleted() throws InterruptedException {
     final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
     final Holder<DoneEvent<String>> eventHolder = new Holder<>();
-    final Exception error = new ProcessingException();
+    final Exception error = new ProcessingException("expected JUnit test exception");
 
     final IFuture<String> future = Jobs.schedule(new Callable<String>() {
 

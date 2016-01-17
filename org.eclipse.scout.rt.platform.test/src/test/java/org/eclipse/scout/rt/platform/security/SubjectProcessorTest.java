@@ -72,7 +72,7 @@ public class SubjectProcessorTest {
   public void testException() throws Exception {
     final Holder<Subject> actualSubject = new Holder<>();
 
-    final Exception exception = new Exception("error");
+    final Exception exception = new Exception("expected JUnit test exception");
 
     CallableChain<String> callableChain = new CallableChain<>();
     callableChain.add(new SubjectProcessor<String>(m_subject));
@@ -98,7 +98,7 @@ public class SubjectProcessorTest {
   public void testRuntimeException() throws Exception {
     final Holder<Subject> actualSubject = new Holder<>();
 
-    final RuntimeException runtimeException = new RuntimeException("error");
+    final RuntimeException runtimeException = new RuntimeException("expected JUnit test exception");
 
     // RUN THE TEST
     CallableChain<String> callableChain = new CallableChain<>();
