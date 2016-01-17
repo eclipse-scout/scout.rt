@@ -139,7 +139,7 @@ public class ServiceTunnelServlet extends HttpServlet {
           .withSession(lookupServerSessionOnHttpSession(serviceRequest.getSessionId(), serverRunContext));
     }
 
-    final IRegistrationHandle registrationHandle = registerForCancelation(serverRunContext, serviceRequest);
+    final IRegistrationHandle registrationHandle = registerForCancellation(serverRunContext, serviceRequest);
     try {
       ServiceTunnelResponse serviceResponse = invokeService(serverRunContext, serviceRequest);
       // include client notifications in response (piggyback)
@@ -151,7 +151,7 @@ public class ServiceTunnelServlet extends HttpServlet {
     }
   }
 
-  private IRegistrationHandle registerForCancelation(ServerRunContext runContext, ServiceTunnelRequest req) {
+  private IRegistrationHandle registerForCancellation(ServerRunContext runContext, ServiceTunnelRequest req) {
     String sessionId = runContext.getSession() != null ? runContext.getSession().getId() : null;
     return BEANS.get(RunMonitorCancelRegistry.class).register(runContext.getRunMonitor(), sessionId, req.getRequestSequence());
   }
