@@ -10,14 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.job.internal;
 
-import java.util.Properties;
-import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -35,12 +34,8 @@ import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.JobManagerM
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.JobManagerPrestartCoreThreadsProperty;
 import org.eclipse.scout.rt.platform.context.RunContextRunner;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
-import org.eclipse.scout.rt.platform.exception.DefaultRuntimeExceptionTranslator;
 import org.eclipse.scout.rt.platform.filter.IFilter;
-import org.eclipse.scout.rt.platform.job.DoneEvent;
-import org.eclipse.scout.rt.platform.job.ExecutionTrigger;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
-import org.eclipse.scout.rt.platform.job.IDoneHandler;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IJobListenerRegistration;
 import org.eclipse.scout.rt.platform.job.IJobManager;
@@ -54,29 +49,25 @@ import org.eclipse.scout.rt.platform.job.listener.JobEventData;
 import org.eclipse.scout.rt.platform.job.listener.JobEventType;
 import org.eclipse.scout.rt.platform.logger.DiagnosticContextValueProcessor;
 import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.ThreadLocalProcessor;
 import org.eclipse.scout.rt.platform.util.concurrent.Callables;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.visitor.IVisitor;
-import org.quartz.Calendar;
-import org.quartz.JobBuilder;
-import org.quartz.Scheduler;
-import org.quartz.SchedulerException;
-import org.quartz.TriggerBuilder;
-import org.quartz.impl.StdSchedulerFactory;
-import org.quartz.simpl.RAMJobStore;
-import org.quartz.spi.MutableTrigger;
+import org.quartz.Trigger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Default implementation of {@link IJobManager}.
  * <p>
- * This job manager is based on Quartz {@link Scheduler} and {@link ThreadPoolExecutor}.
+ * This job manager is based on {@link ThreadPoolExecutor}, {@link DelayedExecutor} and Quartz {@link Trigger} to
+ * compute firing times.
  * <p>
- * Jobs which run immediately and exactly one time are directly submitted to {@link ExecutorService}. For repetitive and
- * delayed jobs, a Quartz Trigger is submitted which fires once the job likes to commence execution. In turn, they are
- * submitted to {@link ExecutorService} as well, so Quartz Scheduler simply provides the firing facility.
+ * Jobs which run immediately and exactly one time are executed directly via {@link ExecutorService}. For all other
+ * jobs, they are first queued via {@link DelayedExecutor}, and will commence execution once the trigger's first fire
+ * time elapses. In turn, they are also given to {@link ExecutorService} for execution, so Quartz simply provides the
+ * firing facility.
  *
  * @since 5.1
  */
@@ -86,19 +77,21 @@ public class JobManager implements IJobManager {
   private static final Logger LOG = LoggerFactory.getLogger(JobManager.class);
 
   protected final ExecutorService m_executor;
-  protected final Scheduler m_quartz;
+  protected final DelayedExecutor m_delayedExecutor;
 
   protected final FutureSet m_futures;
   protected final JobListeners m_listeners;
 
+  protected final ReentrantReadWriteLock m_shutdownLock;
+  protected volatile boolean m_shutdown;
+
   public JobManager() {
     m_executor = createExecutor();
-    m_quartz = createQuartzScheduler();
+    m_delayedExecutor = new DelayedExecutor(m_executor, "scout-scheduler-thread");
     m_listeners = BEANS.get(JobListeners.class);
     m_futures = BEANS.get(FutureSet.class);
     m_futures.init(this);
-
-    installDurableExecutorJob();
+    m_shutdownLock = new ReentrantReadWriteLock();
   }
 
   @Override
@@ -113,63 +106,40 @@ public class JobManager implements IJobManager {
     Assertions.assertFalse(isShutdown(), "{} not available because the platform has been shut down.", getClass().getSimpleName());
 
     // Create the Future to be given to the ExecutorService.
-    final JobFutureTask<RESULT> futureTask = createJobFutureTask(callable, input);
-    // Create the Quartz Trigger to fire once the job should commence execution.
-    final MutableTrigger trigger = createQuartzTrigger(futureTask);
-
-    futureTask.prepareForExecution(trigger);
-    registerFuture(futureTask);
-
-    // As of now, the Future is managed by job manager, and needs to be rejected in case of a scheduling error.
-
-    futureTask.changeState(JobState.SCHEDULED);
+    final JobFutureTask<RESULT> futureTask = registerFuture(createJobFutureTask(callable, input));
     try {
-      // Schedule immediately executing 'one-shot' actions directly via executor service.
+      futureTask.changeState(JobState.SCHEDULED);
+
+      // Schedule the task via ExecutorService, or delayed via DelayedExecutor.
       if (futureTask.isSingleExecution() && !futureTask.isDelayedExecution()) {
-        submit(futureTask, futureTask);
+        competeForPermitAndExecute(futureTask, futureTask);
       }
       else {
         if (futureTask.isDelayedExecution()) {
           futureTask.changeState(JobState.PENDING);
         }
 
-        // Schedule trigger via Quartz Scheduler.
-        trigger.setJobDataMap(QuartzExecutorJob.newTriggerData(futureTask, new SerialFutureRunner<>(m_quartz, futureTask)));
-        m_quartz.scheduleJob(trigger);
-
-        // Install 'when-done' handler to remove the trigger once entering 'done' state.
-        futureTask.whenDone(new IDoneHandler<RESULT>() {
+        m_delayedExecutor.schedule(new Runnable() {
 
           @Override
-          public void onDone(final DoneEvent<RESULT> event) {
-            try {
-              m_quartz.unscheduleJob(trigger.getKey());
-            }
-            catch (final SchedulerException e) {
-              LOG.error("Failed to remove Trigger from Quartz Scheduler [future={}]", futureTask, e);
-            }
+          public void run() {
+            competeForPermitAndExecute(futureTask, new FutureRunner<>(JobManager.this, futureTask));
           }
-        }, null);
+        }, futureTask.getFirstFireTime());
       }
+
+      return futureTask;
     }
-    catch (SchedulerException | RuntimeException e) {
+    catch (final RuntimeException | Error e) { // NOSONAR
       futureTask.reject();
-
-      if (isShutdown()) {
-        LOG.debug("Job rejected because the job manager is shutdown.");
-      }
-      else {
-        throw BEANS.get(DefaultRuntimeExceptionTranslator.class).translate(e);
-      }
+      throw e;
     }
-
-    return futureTask;
   }
 
   /**
    * Competes for an execution permit (if semaphore aware) and executes the runnable via {@link ExecutorService}.
    */
-  protected void submit(final JobFutureTask<?> futureTask, final IRejectableRunnable futureRunner) {
+  protected void competeForPermitAndExecute(final JobFutureTask<?> futureTask, final IRejectableRunnable futureRunner) {
     final ExecutionSemaphore executionSemaphore = futureTask.getExecutionSemaphore();
     if (executionSemaphore == null) {
       m_executor.execute(futureRunner);
@@ -226,27 +196,21 @@ public class JobManager implements IJobManager {
 
   @Override
   public boolean isShutdown() {
-    try {
-      return m_executor.isShutdown() || m_quartz.isShutdown();
-    }
-    catch (final SchedulerException e) {
-      LOG.error("Failed to determine job manager shutdown status", e);
-      return false;
-    }
+    return m_shutdown;
   }
 
   @Override
   public final void shutdown() {
+    m_shutdownLock.writeLock().lock();
+    try {
+      m_shutdown = true;
+    }
+    finally {
+      m_shutdownLock.writeLock().unlock();
+    }
+
     // Dispose Futures.
     m_futures.dispose();
-
-    // Shutdown Quartz Scheduler.
-    try {
-      m_quartz.shutdown(true);
-    }
-    catch (final SchedulerException e) {
-      LOG.error("Failed to shutdown Quartz Scheduler", e);
-    }
 
     // Shutdown Java Executor Service.
     m_executor.shutdownNow();
@@ -276,66 +240,9 @@ public class JobManager implements IJobManager {
     return m_listeners.add(filter, listener);
   }
 
-  @Override
-  public Calendar getCalendar(final String calendarName) {
-    if (calendarName == null) {
-      return null;
-    }
-
-    try {
-      return m_quartz.getCalendar(calendarName);
-    }
-    catch (final SchedulerException e) {
-      throw BEANS.get(DefaultRuntimeExceptionTranslator.class).translate(e);
-    }
-  }
-
-  @Override
-  public void addCalendar(final String calendarName, final Calendar calendar, final boolean replaceIfPresent, final boolean updateExecutionTriggers) {
-    try {
-      m_quartz.addCalendar(calendarName, calendar, replaceIfPresent, updateExecutionTriggers);
-    }
-    catch (final SchedulerException e) {
-      throw BEANS.get(DefaultRuntimeExceptionTranslator.class).translate(e);
-    }
-  }
-
-  @Override
-  public boolean removeCalendar(final String calendarName) {
-    try {
-      return m_quartz.deleteCalendar(calendarName);
-    }
-    catch (final SchedulerException e) {
-      throw BEANS.get(DefaultRuntimeExceptionTranslator.class).translate(e);
-    }
-  }
-
   @Internal
   protected void fireEvent(final JobEvent eventToFire) {
     m_listeners.notifyListeners(eventToFire);
-  }
-
-  /**
-   * Installs the durable {@link QuartzExecutorJob} in Quartz Scheduler, which is fired by Quartz trigger once a
-   * {@link JobFutureTask} likes to commence execution. In turn, the associated {@link JobFutureTask} is given to
-   * {@link ExecutorService} for asynchronous execution.
-   * <p>
-   * Durable means, that this job's existence is not bound to the existence of an associated trigger, which is typically
-   * true when {@link JobManager} is idle because of no jobs are scheduled.
-   */
-  @Internal
-  protected void installDurableExecutorJob() {
-    try {
-      Assertions.assertTrue(m_quartz.isStarted(), "Quartz Scheduler not started");
-      m_quartz.addJob(JobBuilder.newJob(QuartzExecutorJob.class)
-          .withIdentity(QuartzExecutorJob.IDENTITY)
-          .setJobData(QuartzExecutorJob.newJobData(this))
-          .storeDurably() // not bound to the existence of triggers
-          .build(), false);
-    }
-    catch (final SchedulerException e) {
-      throw BEANS.get(DefaultRuntimeExceptionTranslator.class).translate(e);
-    }
   }
 
   /**
@@ -352,24 +259,6 @@ public class JobManager implements IJobManager {
 
     final JobInput inputCopy = ensureJobInputName(input, callable.getClass().getName());
     return new JobFutureTask<>(this, runMonitor, inputCopy, new CallableChain<RESULT>(), callable);
-  }
-
-  /**
-   * Creates the Quartz Trigger to execute the specified JobFutureTask.
-   */
-  @Internal
-  protected <RESULT> MutableTrigger createQuartzTrigger(final JobFutureTask<RESULT> futureTask) {
-    final ExecutionTrigger executionTrigger = futureTask.getJobInput().getExecutionTrigger();
-
-    return (MutableTrigger) TriggerBuilder.newTrigger()
-        .withIdentity(futureTask.getTriggerIdentity())
-        .forJob(QuartzExecutorJob.IDENTITY)
-        .withPriority(QuartzExecutorJob.computePriority(futureTask))
-        .startAt(executionTrigger.getStartTime())
-        .endAt(executionTrigger.getEndTime())
-        .withSchedule(executionTrigger.getSchedule())
-        .modifiedByCalendar(executionTrigger.getCalendarName())
-        .build();
   }
 
   /**
@@ -412,32 +301,6 @@ public class JobManager implements IJobManager {
   }
 
   /**
-   * Creates the Quartz Scheduler to submit triggers.
-   */
-  protected Scheduler createQuartzScheduler() {
-    final Properties props = new Properties();
-    props.put("org.quartz.scheduler.instanceName", String.format("scout.jobmanager.quartz.scheduler-%s", UUID.randomUUID())); // UUID as prefix to be unique
-    props.put("org.quartz.scheduler.threadName", "scout-quartz-scheduler-thread");
-    props.put("org.quartz.threadPool.threadNamePrefix", "scout-quartz-worker-thread");
-    props.put("org.quartz.scheduler.skipUpdateCheck", true);
-    props.put("org.quartz.threadPool.threadCount", "1"); // No sense for multiple threads, because the only installed Quartz Job (QuartzExecutorJob) disallows concurrent execution anyway (by design).
-    props.put("org.quartz.jobStore.class", RAMJobStore.class.getName());
-
-    try {
-      final StdSchedulerFactory schedulerFactory = new StdSchedulerFactory();
-      schedulerFactory.initialize(props);
-      final Scheduler scheduler = schedulerFactory.getScheduler();
-      scheduler.setJobFactory(new QuartzJobBeanFactory());
-      scheduler.start();
-
-      return scheduler;
-    }
-    catch (final SchedulerException e) {
-      throw BEANS.get(DefaultRuntimeExceptionTranslator.class).translate(e);
-    }
-  }
-
-  /**
    * Returns the internal Executor Service.
    */
   @Internal
@@ -446,11 +309,11 @@ public class JobManager implements IJobManager {
   }
 
   /**
-   * Returns the internal Quartz Scheduler.
+   * Returns the internal delayed Executor Service.
    */
   @Internal
-  protected Scheduler getQuartz() {
-    return m_quartz;
+  protected DelayedExecutor getDelayedExecutor() {
+    return m_delayedExecutor;
   }
 
   /**
@@ -493,9 +356,23 @@ public class JobManager implements IJobManager {
     return new BlockingCondition(blocking);
   }
 
+  /**
+   * Registers the given future.
+   *
+   * @throws AssertionException
+   *           if the job manager is shut donw.
+   */
   @Internal
-  protected void registerFuture(final JobFutureTask<?> future) {
-    m_futures.add(future);
+  protected <RESULT> JobFutureTask<RESULT> registerFuture(final JobFutureTask<RESULT> future) {
+    m_shutdownLock.readLock().lock();
+    try {
+      Assertions.assertFalse(isShutdown(), "{} not available because the platform has been shut down.", getClass().getSimpleName());
+      m_futures.add(future);
+      return future;
+    }
+    finally {
+      m_shutdownLock.readLock().unlock();
+    }
   }
 
   @Internal

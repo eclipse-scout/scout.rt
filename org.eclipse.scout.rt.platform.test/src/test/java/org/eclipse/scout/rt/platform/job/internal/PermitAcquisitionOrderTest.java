@@ -198,7 +198,7 @@ public class PermitAcquisitionOrderTest {
 
     Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
         .andMatchExecutionHint(jobIdentifier)
-        .toFilter(), 100, TimeUnit.SECONDS);
+        .toFilter(), 10, TimeUnit.SECONDS);
 
     // Assert, that permits are acquires in sequence.
     // However, it is likely that rounds were consolidated, so simply compare the ascending order.

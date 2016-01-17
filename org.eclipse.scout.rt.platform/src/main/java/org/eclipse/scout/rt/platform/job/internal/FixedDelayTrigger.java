@@ -6,9 +6,9 @@ import java.util.concurrent.TimeUnit;
 import org.eclipse.scout.rt.platform.job.FixedDelayScheduleBuilder;
 import org.eclipse.scout.rt.platform.job.IFixedDelayTrigger;
 import org.quartz.Calendar;
+import org.quartz.JobExecutionContext;
+import org.quartz.JobExecutionException;
 import org.quartz.ScheduleBuilder;
-import org.quartz.Scheduler;
-import org.quartz.SchedulerException;
 import org.quartz.impl.triggers.AbstractTrigger;
 
 /**
@@ -16,7 +16,7 @@ import org.quartz.impl.triggers.AbstractTrigger;
  *
  * @since 5.2
  */
-public class FixedDelayTrigger extends AbstractTrigger<IFixedDelayTrigger> implements IFixedDelayTrigger, IRoundCompletedListener {
+public class FixedDelayTrigger extends AbstractTrigger<IFixedDelayTrigger> implements IFixedDelayTrigger {
 
   private static final long serialVersionUID = 1L;
 
@@ -76,15 +76,12 @@ public class FixedDelayTrigger extends AbstractTrigger<IFixedDelayTrigger> imple
   }
 
   @Override
-  public void onRoundCompleted(final Scheduler quartz) throws SchedulerException {
+  public CompletedExecutionInstruction executionComplete(final JobExecutionContext context, final JobExecutionException result) {
     if (TIME_IN_FUTURE.equals(m_nextFireTime)) {
       // Compute the next trigger fire time.
       m_nextFireTime = new Date(System.currentTimeMillis() + m_fixedDelay);
-      m_startTime = m_nextFireTime;
-
-      // Replace the trigger to apply the changes.
-      quartz.rescheduleJob(getKey(), this);
     }
+    return CompletedExecutionInstruction.NOOP;
   }
 
   @Override

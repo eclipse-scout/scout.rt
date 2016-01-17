@@ -83,7 +83,7 @@ public class FutureSet {
   }
 
   /**
-   * Invoke to destroy this {@link FutureSet}.
+   * Invoke to destroy this {@link FutureSet} and to cancel all contained Futures.
    */
   public void dispose() {
     m_jobListenerRegistration.dispose();

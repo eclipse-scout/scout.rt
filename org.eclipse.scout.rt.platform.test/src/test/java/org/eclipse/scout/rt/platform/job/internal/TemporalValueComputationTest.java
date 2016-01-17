@@ -95,6 +95,7 @@ public class TemporalValueComputationTest {
 
     List<String> expectedProtocol = new ArrayList<>();
     expectedProtocol.add("SCHEDULED:single-execution");
+    expectedProtocol.add("SCHEDULED:with-next-execution");
     expectedProtocol.add("JOB:single-execution");
     expectedProtocol.add("DONE:single-execution");
     assertEquals(expectedProtocol, m_protocol);
@@ -116,8 +117,10 @@ public class TemporalValueComputationTest {
 
     List<String> expectedProtocol = new ArrayList<>();
     expectedProtocol.add("SCHEDULED:single-execution");
+    expectedProtocol.add("SCHEDULED:with-next-execution");
     expectedProtocol.add("SCHEDULED:delayed-execution");
     expectedProtocol.add("PENDING:single-execution");
+    expectedProtocol.add("PENDING:with-next-execution");
     expectedProtocol.add("PENDING:delayed-execution");
     expectedProtocol.add("JOB:single-execution");
     expectedProtocol.add("JOB:delayed-execution");
@@ -142,8 +145,10 @@ public class TemporalValueComputationTest {
 
     List<String> expectedProtocol = new ArrayList<>();
     expectedProtocol.add("SCHEDULED:single-execution");
+    expectedProtocol.add("SCHEDULED:with-next-execution");
     expectedProtocol.add("SCHEDULED:delayed-execution");
     expectedProtocol.add("PENDING:single-execution");
+    expectedProtocol.add("PENDING:with-next-execution");
     expectedProtocol.add("PENDING:delayed-execution");
     expectedProtocol.add("JOB:single-execution");
     expectedProtocol.add("JOB:delayed-execution");
@@ -168,6 +173,7 @@ public class TemporalValueComputationTest {
 
     List<String> expectedProtocol = new ArrayList<>();
     expectedProtocol.add("SCHEDULED:single-execution");
+    expectedProtocol.add("SCHEDULED:with-next-execution");
     expectedProtocol.add("JOB:single-execution");
     expectedProtocol.add("DONE:single-execution");
     assertEquals(expectedProtocol, m_protocol);
@@ -189,6 +195,7 @@ public class TemporalValueComputationTest {
 
     List<String> expectedProtocol = new ArrayList<>();
     expectedProtocol.add("SCHEDULED:repetitively-execution");
+    expectedProtocol.add("SCHEDULED:with-next-execution");
     // 1st round
     expectedProtocol.add("JOB:repetitively-execution");
     expectedProtocol.add("JOB:with-next-execution");
@@ -223,8 +230,10 @@ public class TemporalValueComputationTest {
 
     List<String> expectedProtocol = new ArrayList<>();
     expectedProtocol.add("SCHEDULED:repetitively-execution");
+    expectedProtocol.add("SCHEDULED:with-next-execution");
     expectedProtocol.add("SCHEDULED:delayed-execution");
     expectedProtocol.add("PENDING:repetitively-execution");
+    expectedProtocol.add("PENDING:with-next-execution");
     expectedProtocol.add("PENDING:delayed-execution");
 
     // 1st round
@@ -267,8 +276,10 @@ public class TemporalValueComputationTest {
 
     List<String> expectedProtocol = new ArrayList<>();
     expectedProtocol.add("SCHEDULED:repetitively-execution");
+    expectedProtocol.add("SCHEDULED:with-next-execution");
     expectedProtocol.add("SCHEDULED:delayed-execution");
     expectedProtocol.add("PENDING:repetitively-execution");
+    expectedProtocol.add("PENDING:with-next-execution");
     expectedProtocol.add("PENDING:delayed-execution");
 
     // 1st round
@@ -311,6 +322,7 @@ public class TemporalValueComputationTest {
 
     List<String> expectedProtocol = new ArrayList<>();
     expectedProtocol.add("SCHEDULED:repetitively-execution");
+    expectedProtocol.add("SCHEDULED:with-next-execution");
 
     // 1st round
     expectedProtocol.add("JOB:repetitively-execution");
@@ -347,6 +359,7 @@ public class TemporalValueComputationTest {
 
     List<String> expectedProtocol = new ArrayList<>();
     expectedProtocol.add("SCHEDULED:repetitively-execution");
+    expectedProtocol.add("SCHEDULED:with-next-execution");
     // 1st round
     expectedProtocol.add("JOB:repetitively-execution");
     expectedProtocol.add("JOB:with-next-execution");
@@ -383,8 +396,10 @@ public class TemporalValueComputationTest {
 
     List<String> expectedProtocol = new ArrayList<>();
     expectedProtocol.add("SCHEDULED:repetitively-execution");
+    expectedProtocol.add("SCHEDULED:with-next-execution");
     expectedProtocol.add("SCHEDULED:delayed-execution");
     expectedProtocol.add("PENDING:repetitively-execution");
+    expectedProtocol.add("PENDING:with-next-execution");
     expectedProtocol.add("PENDING:delayed-execution");
 
     // 1st round
@@ -429,8 +444,10 @@ public class TemporalValueComputationTest {
 
     List<String> expectedProtocol = new ArrayList<>();
     expectedProtocol.add("SCHEDULED:repetitively-execution");
+    expectedProtocol.add("SCHEDULED:with-next-execution");
     expectedProtocol.add("SCHEDULED:delayed-execution");
     expectedProtocol.add("PENDING:repetitively-execution");
+    expectedProtocol.add("PENDING:with-next-execution");
     expectedProtocol.add("PENDING:delayed-execution");
 
     // 1st round
@@ -475,6 +492,7 @@ public class TemporalValueComputationTest {
 
     List<String> expectedProtocol = new ArrayList<>();
     expectedProtocol.add("SCHEDULED:repetitively-execution");
+    expectedProtocol.add("SCHEDULED:with-next-execution");
 
     // 1st round
     expectedProtocol.add("JOB:repetitively-execution");

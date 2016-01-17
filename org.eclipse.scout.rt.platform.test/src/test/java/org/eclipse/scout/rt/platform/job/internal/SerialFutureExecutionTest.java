@@ -53,7 +53,7 @@ public class SerialFutureExecutionTest {
                 .withRepeatCount(100))));
 
     latch.await();
-    Thread.sleep(6000); // Wait some time until trigger fired for all rounds
+    Thread.sleep(2000); // Wait some time until trigger fired for all rounds
 
     // Verify no concurrent execution
     List<String> expectedProtocol = new ArrayList<>();
@@ -103,7 +103,7 @@ public class SerialFutureExecutionTest {
                 .withRepeatCount(99)))); // see JavaDoc of withRepeatCount: first + repeat count
 
     latch.await();
-    Thread.sleep(5000); // Wait some time until trigger fired for all rounds
+    Thread.sleep(2000); // Wait some time until trigger fired for all rounds
 
     // Verify no concurrent execution
     List<String> expectedProtocol = new ArrayList<>();
@@ -151,7 +151,7 @@ public class SerialFutureExecutionTest {
             .withSchedule(FixedDelayScheduleBuilder.repeatForTotalCount(100, 1, TimeUnit.MILLISECONDS))));
 
     latch.await();
-    Thread.sleep(5000); // Wait some time until trigger fired for all rounds
+    Thread.sleep(2000); // Wait some time until trigger fired for all rounds
 
     // Verify no concurrent execution
     List<String> expectedProtocol = new ArrayList<>();

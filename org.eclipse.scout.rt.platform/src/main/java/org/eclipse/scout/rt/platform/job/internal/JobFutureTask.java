@@ -33,28 +33,24 @@ import org.eclipse.scout.rt.platform.exception.DefaultRuntimeExceptionTranslator
 import org.eclipse.scout.rt.platform.exception.IExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.filter.IFilter;
+import org.eclipse.scout.rt.platform.job.ExecutionTrigger;
 import org.eclipse.scout.rt.platform.job.IDoneHandler;
 import org.eclipse.scout.rt.platform.job.IExecutionSemaphore;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IJobListenerRegistration;
 import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.job.JobState;
-import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.job.listener.JobEventData;
 import org.eclipse.scout.rt.platform.job.listener.JobEventType;
 import org.eclipse.scout.rt.platform.util.Assertions;
-import org.eclipse.scout.rt.platform.util.FinalValue;
 import org.eclipse.scout.rt.platform.util.ToStringBuilder;
 import org.quartz.Calendar;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
-import org.quartz.TriggerKey;
+import org.quartz.TriggerBuilder;
 import org.quartz.spi.OperableTrigger;
-import org.quartz.utils.Key;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Represents a {@link RunnableFuture} to be given to {@link ExecutorService} for execution.
@@ -64,8 +60,6 @@ import org.slf4j.LoggerFactory;
  */
 @Internal
 public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture<RESULT>, IRejectableRunnable {
-
-  private static final Logger LOG = LoggerFactory.getLogger(JobFutureTask.class);
 
   protected final JobManager m_jobManager;
   protected final RunMonitor m_runMonitor;
@@ -83,10 +77,12 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
 
   protected volatile Set<String> m_executionHints = new HashSet<>();
 
-  protected final TriggerKey m_triggerIdentity = new TriggerKey(Key.createUniqueName(null), "scout.jobmanager.quartz.trigger");
+  protected final Date m_firstFireTime;
+  protected final boolean m_singleExecution;
+  protected final boolean m_delayedExecution;
 
-  protected final FinalValue<Boolean> m_singleExecution = new FinalValue<>();
-  protected final FinalValue<Boolean> m_delayedExecution = new FinalValue<>();
+  protected final OperableTrigger m_trigger;
+  protected final Calendar m_calendar;
 
   /** The thread currently running the task */
   protected volatile Thread m_runner;
@@ -123,6 +119,13 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
       }
     });
 
+    // Compute execution data.
+    m_trigger = createQuartzTrigger(input);
+    m_calendar = input.getExecutionTrigger().getCalendar();
+    m_firstFireTime = computeFirstFireTime(m_trigger);
+    m_singleExecution = computeSingleExecuting(m_trigger, m_firstFireTime);
+    m_delayedExecution = computeDelayedExecuting(m_firstFireTime, m_input.getExecutionTrigger().getNow());
+
     // Register to also cancel this Future once the RunMonitor is cancelled (even if the job is not executed yet).
     m_runMonitor.registerCancellable(this);
   }
@@ -138,6 +141,8 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
    */
   @Override
   public void run() {
+    m_trigger.triggered(m_calendar);
+
     m_runner = Thread.currentThread();
     try {
       if (isExpired()) {
@@ -206,42 +211,44 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
     releasePermit();
   }
 
-  /**
-   * The associated trigger's identity, and is not <code>null</code>.
-   */
-  protected TriggerKey getTriggerIdentity() {
-    return m_triggerIdentity;
-  }
-
   @Override
   public boolean isSingleExecution() {
-    return m_singleExecution.get();
+    return m_singleExecution;
   }
 
   /**
    * Returns whether this task may be executed some time in the future, unless it gets cancelled.
    */
   protected boolean isDelayedExecution() {
-    return m_delayedExecution.get();
+    return m_delayedExecution;
   }
 
   /**
    * Returns whether this task may be executed some time in the future, unless it gets cancelled.
    */
   protected boolean hasNextExecution() {
-    try {
-      final Trigger trigger = m_jobManager.getQuartz().getTrigger(m_triggerIdentity);
-      if (trigger == null) {
-        return false;
-      }
-      else {
-        return trigger.mayFireAgain();
-      }
-    }
-    catch (final SchedulerException e) {
-      LOG.error("Failed to determine if a job will execute again [future={}]", this, e);
-      return false;
-    }
+    return m_trigger.mayFireAgain();
+  }
+
+  /**
+   * Returns the time the job's trigger will fire for the first time.
+   */
+  public Date getFirstFireTime() {
+    return m_firstFireTime;
+  }
+
+  /**
+   * Returns the trigger which fires for job execution.
+   */
+  protected OperableTrigger getTrigger() {
+    return m_trigger;
+  }
+
+  /**
+   * Returns the calendar to be applied to this trigger's schedule.
+   */
+  protected Calendar getCalendar() {
+    return m_calendar;
   }
 
   @Override
@@ -578,42 +585,18 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
   }
 
   /**
-   * Prepares this task for execution, which involves the calculation of some temporal aspects.
-   */
-  protected void prepareForExecution(final Trigger trigger) {
-    Assertions.assertEquals(m_triggerIdentity, trigger.getKey(), "Specified trigger does not belong to this Future [trigger={}, job={}]", trigger, this);
-
-    final Date firstFireTime = computeFirstFireTime(trigger);
-    m_singleExecution.set(computeSingleExecuting(trigger, firstFireTime));
-    m_delayedExecution.set(computeDelayedExecuting(firstFireTime, m_input.getExecutionTrigger().getNow()));
-  }
-
-  /**
    * Computes the time the specified trigger will fire for the first time, and is never <code>null</code>.
    */
-  protected Date computeFirstFireTime(final Trigger trigger) {
-    Assertions.assertTrue(trigger instanceof OperableTrigger, "Trigger must be of type OperableTrigger [trigger={}, job={}]", trigger, this);
-
-    // Validate the trigger's configuration.
-    final OperableTrigger operableTrigger = (OperableTrigger) trigger;
+  protected Date computeFirstFireTime(final OperableTrigger trigger) {
     try {
-      operableTrigger.validate();
+      trigger.validate();
     }
     catch (final SchedulerException e) {
-      throw new PlatformException("Trigger not valid [trigger={}, job={}]", operableTrigger, this, e);
+      throw new PlatformException("Trigger not valid [trigger={}, job={}]", trigger, this, e);
     }
 
     // Compute 'first fire time' with respect to an optionally configured calendar.
-    final Date firstFireDate;
-    if (trigger.getCalendarName() == null) {
-      firstFireDate = operableTrigger.computeFirstFireTime(null);
-    }
-    else {
-      final Calendar calendar = Jobs.getJobManager().getCalendar(trigger.getCalendarName());
-      Assertions.assertNotNull(calendar, "Calendar referenced by trigger not registered in Quartz Scheduler [calendar={}, job={}]", trigger.getCalendarName(), this);
-      firstFireDate = operableTrigger.computeFirstFireTime(calendar);
-    }
-
+    final Date firstFireDate = trigger.computeFirstFireTime(m_calendar);
     return Assertions.assertNotNull(firstFireDate, "Trigger not valid, because it will never fire. Check trigger's schedule. [schedule={}, future={}]", trigger.getScheduleBuilder(), this);
   }
 
@@ -634,5 +617,19 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
    */
   protected boolean computeDelayedExecuting(final Date firstFireTime, final Date now) {
     return firstFireTime.after(now);
+  }
+
+  /**
+   * Creates the Quartz Trigger to fire execution.
+   */
+  protected OperableTrigger createQuartzTrigger(final JobInput input) {
+    final ExecutionTrigger executionTrigger = input.getExecutionTrigger();
+
+    return (OperableTrigger) TriggerBuilder.newTrigger()
+        .forJob(JobFutureTask.class.getSimpleName())
+        .startAt(executionTrigger.getStartTime())
+        .endAt(executionTrigger.getEndTime())
+        .withSchedule(executionTrigger.getSchedule())
+        .build();
   }
 }

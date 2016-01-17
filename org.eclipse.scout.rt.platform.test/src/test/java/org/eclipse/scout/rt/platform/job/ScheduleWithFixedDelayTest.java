@@ -42,7 +42,6 @@ public class ScheduleWithFixedDelayTest {
     long initialDelayMillis = 300;
     long delayMillis = 500;
     long tStartMillis = System.currentTimeMillis();
-    long tolerance = 50;
 
     // Schedule a job which runs 'nRuns' times and cancels itself afterwards.
     IFuture<Void> future = Jobs.getJobManager().schedule(new IRunnable() {
@@ -72,7 +71,7 @@ public class ScheduleWithFixedDelayTest {
       long expectedExecutionTime = tStartMillis + initialDelayMillis + i * delayMillis;
       long expectedExecutionTimeMin = expectedExecutionTime;
 
-      if (actualExecutionTime < expectedExecutionTimeMin - tolerance) {
+      if (actualExecutionTime < expectedExecutionTimeMin) {
         fail(String.format("run=%s, actualExecutionTime=%s, expectedExecutionTime=%s", i, actualExecutionTime, expectedExecutionTimeMin));
       }
     }
@@ -88,7 +87,6 @@ public class ScheduleWithFixedDelayTest {
     long initialDelayMillis = 300;
     long delayMillis = 500;
     long tStartMillis = System.currentTimeMillis();
-    long tolerance = 50;
 
     // Schedule a job which runs 'nRuns' times and cancels itself afterwards.
     IFuture<Void> future = Jobs.getJobManager().schedule(new IRunnable() {
@@ -119,7 +117,7 @@ public class ScheduleWithFixedDelayTest {
       long expectedExecutionTime = tStartMillis + initialDelayMillis + i * delayMillis;
       long expectedExecutionTimeMin = expectedExecutionTime;
 
-      if (actualExecutionTime < expectedExecutionTimeMin - tolerance) {
+      if (actualExecutionTime < expectedExecutionTimeMin) {
         fail(String.format("run=%s, actualExecutionTime=%s, expectedExecutionTime=%s", i, actualExecutionTime, expectedExecutionTimeMin));
       }
     }
@@ -136,7 +134,6 @@ public class ScheduleWithFixedDelayTest {
     long initialDelayMillis = 300;
     long delayMillis = 500;
     long tStartMillis = System.currentTimeMillis();
-    long tolerance = 50;
 
     // Schedule a job which runs 'nRuns' times and cancels itself afterwards.
     IFuture<Void> future = Jobs.getJobManager().schedule(new IRunnable() {
@@ -168,7 +165,7 @@ public class ScheduleWithFixedDelayTest {
       long expectedExecutionTime = tStartMillis + initialDelayMillis + i * (sleepTimeMillis + delayMillis);
       long expectedExecutionTimeMin = expectedExecutionTime;
 
-      if (actualExecutionTime < expectedExecutionTimeMin - tolerance) {
+      if (actualExecutionTime < expectedExecutionTimeMin) {
         fail(String.format("run=%s, actualExecutionTime=%s, expectedExecutionTime=%s", i, actualExecutionTime, expectedExecutionTimeMin));
       }
     }
@@ -185,7 +182,6 @@ public class ScheduleWithFixedDelayTest {
     long initialDelayMillis = 300;
     long delayMillis = 500;
     long tStartMillis = System.currentTimeMillis();
-    long tolerance = 50;
 
     // Schedule a job which runs 5 times and cancels itself afterwards.
     IFuture<Void> future = Jobs.getJobManager().schedule(new IRunnable() {
@@ -217,7 +213,7 @@ public class ScheduleWithFixedDelayTest {
       long expectedExecutionTime = tStartMillis + initialDelayMillis + i * (sleepTimeMillis + delayMillis);
       long expectedExecutionTimeMin = expectedExecutionTime;
 
-      if (actualExecutionTime < expectedExecutionTimeMin - tolerance) {
+      if (actualExecutionTime < expectedExecutionTimeMin) {
         fail(String.format("run=%s, actualExecutionTime=%s, expectedExecutionTime=%s", i, actualExecutionTime, expectedExecutionTimeMin));
       }
     }

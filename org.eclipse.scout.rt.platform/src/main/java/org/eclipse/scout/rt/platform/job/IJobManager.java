@@ -15,7 +15,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.rt.platform.IPlatform.State;
 import org.eclipse.scout.rt.platform.IPlatformListener;
-import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.filter.AlwaysFilter;
 import org.eclipse.scout.rt.platform.filter.AndFilter;
 import org.eclipse.scout.rt.platform.filter.IFilter;
@@ -29,7 +28,6 @@ import org.eclipse.scout.rt.platform.util.concurrent.InterruptedRuntimeException
 import org.eclipse.scout.rt.platform.util.concurrent.TimeoutException;
 import org.eclipse.scout.rt.platform.visitor.CollectorVisitor;
 import org.eclipse.scout.rt.platform.visitor.IVisitor;
-import org.quartz.Calendar;
 
 /**
  * Job manager to run tasks in parallel.
@@ -304,42 +302,6 @@ public interface IJobManager {
    *         unregister the listener.
    */
   IJobListenerRegistration addListener(IFilter<JobEvent> filter, IJobListener listener);
-
-  /**
-   * Returns the {@link Calendar} of the specified symbolic name from Quartz Scheduler, or <code>null</code> if not
-   * registered, or if the specified name is <code>null</code>.
-   */
-  Calendar getCalendar(String calendarName);
-
-  /**
-   * Registers the given {@link Calendar} instance to the Quartz Scheduler, so that it can be referenced in execution
-   * triggers via {@link ExecutionTrigger#withModifiedByCalendar(String)}.
-   *
-   * @param calendarName
-   *          the symbolic name to reference the specified calendar.
-   * @param calendar
-   *          the calendar to be registered.
-   * @param replaceIfPresent
-   *          whether to replace an existing calendar. If <code>false</code> and a calendar of the same symbolic name is
-   *          already registered, this method throws an exception.
-   * @param updateExecutionTriggers
-   *          <code>true</code> if existing triggers referencing the specified calendar should be updated, or else
-   *          <code>false</code>.
-   * @throws PlatformException
-   *           if the calendar could not be registered.
-   */
-  void addCalendar(String calendarName, Calendar calendar, boolean replaceIfPresent, boolean updateExecutionTriggers);
-
-  /**
-   * Unregisters the calendar of the specified symbolic name from Quartz Scheduler.
-   *
-   * @param the
-   *          symbolic name of the calendar to be unregistered.
-   * @return <code>true</code> if the calendar was found and unregistered.
-   * @throws PlatformException
-   *           if the calendar could not be unregistered, or one or more triggers reference the calendar.
-   */
-  boolean removeCalendar(String calendarName);
 
   /**
    * Returns <code>true</code> if this job manager is shutdown, or else <code>false</code>.

@@ -45,7 +45,7 @@ public class ExecutionTrigger {
   private boolean m_startTimeSet;
   private Date m_endTime;
   private boolean m_endTimeSet;
-  private String m_calendarName;
+  private Calendar m_calendar;
   private ScheduleBuilder<?> m_scheduleBuilder;
 
   /**
@@ -128,19 +128,16 @@ public class ExecutionTrigger {
   /**
    * Returns the calendar if set.
    */
-  public String getCalendarName() {
-    return m_calendarName;
+  public Calendar getCalendar() {
+    return m_calendar;
   }
 
   /**
-   * Sets the symbolic name of the {@link Calendar} to be applied to this trigger's schedule. This is useful to exclude
-   * firing for some temporal periods, e.g. to not fire on business's holidays.
-   * <p>
-   * Calendars must be instantiated and registered to the {@link IJobManager} via
-   * {@link IJobManager#addCalendar(String, Calendar, boolean, boolean)}.
+   * Sets the {@link Calendar} to be applied to this trigger's schedule. This is useful to exclude firing for some
+   * temporal periods, e.g. to not fire on business's holidays.
    */
-  public ExecutionTrigger withModifiedByCalendar(final String calendarName) {
-    m_calendarName = calendarName;
+  public ExecutionTrigger withModifiedByCalendar(final Calendar calendar) {
+    m_calendar = calendar;
     return this;
   }
 
@@ -186,7 +183,7 @@ public class ExecutionTrigger {
     copy.m_now = m_now;
     copy.m_startTime = (m_startTime != null ? new Date(m_startTime.getTime()) : null);
     copy.m_endTime = (m_endTime != null ? new Date(m_endTime.getTime()) : null);
-    copy.m_calendarName = m_calendarName;
+    copy.m_calendar = (m_calendar != null ? (Calendar) m_calendar.clone() : null);
     copy.m_scheduleBuilder = TriggerBuilder.newTrigger()
         .withSchedule(m_scheduleBuilder)
         .build()
@@ -195,7 +192,7 @@ public class ExecutionTrigger {
   }
 
   private static void assertDuration(final long now, final long duration, final TimeUnit unit) {
-    Assertions.assertNotEquals(unit, TimeUnit.NANOSECONDS, "Quartz Scheduler does not support NANOSECONDS as temporal granularity");
+    Assertions.assertNotEquals(unit, TimeUnit.NANOSECONDS, "Quartz Trigger does not support NANOSECONDS as temporal granularity");
     Assertions.assertGreaterOrEqual(duration, 0L, "Invalid duration; must be >= 0 [duration={}]", duration);
     Assertions.assertGreaterOrEqual(now + duration, now, "Duration caused temporal overflow [duration={}, date={}]", duration, now + duration);
   }
