@@ -16,6 +16,15 @@ import java.util.Set;
 
 import org.eclipse.scout.rt.platform.util.ToStringBuilder;
 
+/**
+ * Determines how the client notification needs to be dispatched and handled. A client notification can be addressed to
+ * <ul>
+ * <li>all nodes</li>
+ * <li>all sessions</li>
+ * <li>one or more specific sessions</li>
+ * <li>one or more specific users</li>
+ * </ul>
+ */
 public class ClientNotificationAddress implements Serializable {
   private static final long serialVersionUID = 1L;
 
