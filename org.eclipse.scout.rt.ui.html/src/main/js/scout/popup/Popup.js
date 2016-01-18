@@ -200,7 +200,7 @@ scout.Popup.prototype._isMouseDownOutside = function(event) {
   var $target = $(event.target),
     targetWidget;
   if (event.originalEvent && event.originalEvent.removedWidget) {
-    targetWidget = event.originalEvent.closedWidget;
+    targetWidget = event.originalEvent.removedWidget;
   } else {
     targetWidget = scout.Widget.getWidgetFor($target);
   }
