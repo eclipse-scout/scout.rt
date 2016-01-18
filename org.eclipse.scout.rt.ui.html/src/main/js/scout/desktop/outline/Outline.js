@@ -160,6 +160,10 @@ scout.Outline.prototype.handleOutlineContent = function(bringToFront) {
 };
 
 scout.Outline.prototype._postRender = function() {
+  //first set Outline content to prevent errors while rendering existing glasspanes. the outline content is a glasspane target
+  //and if this is null there could be errors when the form controller tries to render a popup with a glasspane behind it.
+  //The content is not rendered or attached twice because handleOutlineContent() checks if this is already done.
+  this.handleOutlineContent();
   scout.Outline.parent.prototype._postRender.call(this);
 
   // Ensure outline layout is valid (because DialogLayout relies on that)
