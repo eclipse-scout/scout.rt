@@ -90,9 +90,21 @@ scout.GlassPaneRenderer.prototype.findGlassPaneTargets = function() {
 
 scout.GlassPaneRenderer.prototype._onMousedown = function(event) {
   var $glassPane = $(event.target);
+  var $animationTarget = null;
 
-  if (this._element.$container) {
-    this._element.$container.addClassForAnimation('modality-highlight', {
+  if (this._element instanceof scout.Form && this._element.isView()) {
+    // If the blocking element is a view, the $container cannot be animated (this only works for dialogs). Instead,
+    // highlight the view tab (or the overflow item, if the view tab is not visible).
+    $animationTarget = this.session.desktop.viewTabsController.viewTab(this._element).$container;
+    if (!$animationTarget.isVisible()) {
+      $animationTarget = $animationTarget.siblings('.overflow-tab-item');
+    }
+  } else if (this._element.$container) {
+    $animationTarget = this._element.$container;
+  }
+
+  if ($animationTarget) {
+    $animationTarget.addClassForAnimation('modality-highlight', {
       // remove shown as well, user may click the glasspane before the widget itself was able to remove the shown class
       classesToRemove: 'modality-highlight shown',
       delay: 500

@@ -192,6 +192,7 @@
     padding-top: 17px;
     text-align: center;
     cursor: pointer;
+    vertical-align: top;
 
     &::before {
       #scout.font-icon();
@@ -203,6 +204,10 @@
       color: @disabled-color;
       font-size: 10px;
       margin-top: -4px;
+    }
+
+    &.modality-highlight {
+      #scout.animation-flash-gray();
     }
   }
 }
@@ -218,6 +223,7 @@
   background-color: @view-tab-background-color;
   color: @text-color;
   border-right: 1px solid @border-color;
+  transition: background-color 200ms linear;
 
   &.small {
     width: 130px;
@@ -238,6 +244,7 @@
     color: @view-tab-active-color;
     /* full size of taskbar to draw over the border-bottom */
     height: 100%;
+    transition: off;
 
     &::before {
       .desktop-bench-drop-shadow();
@@ -249,6 +256,15 @@
     &:not(:first-child)::before {
       box-shadow: -7px 0px 10px 0px rgba(0,0,0,0.4);
     }
+  }
+
+/*  &.modality-highlight > .title,
+  &.modality-highlight > .sub-title {
+    #scout.animation-shake();
+  }*/
+
+  &.modality-highlight {
+    #scout.animation-flash-gray();
   }
 
   & > .icon {

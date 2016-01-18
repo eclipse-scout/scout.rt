@@ -271,4 +271,24 @@
 
   @-webkit-keyframes shake { .keyframes-shake(); }
   @keyframes shake { .keyframes-shake(); }
+
+  /*** Flash-Gray ***/
+
+  .animation-flash-gray() {
+    #scout.animation-name(flash-gray);
+    #scout.animation-duration(0.4s);
+    #scout.animation-iteration-count(1);
+    #scout.animation-timing-function(linear);
+  }
+
+  .keyframes-flash-gray() {
+    0% { background-color: @palette-white; }
+    25% { background-color: @palette-gray-5; }
+    50% { background-color: @palette-white; }
+    75% { background-color: @palette-gray-5; }
+    100% { background-color: @palette-white; }
+  }
+
+  @-webkit-keyframes flash-gray { .keyframes-flash-gray(); }
+  @keyframes flash-gray { .keyframes-flash-gray(); }
 }
