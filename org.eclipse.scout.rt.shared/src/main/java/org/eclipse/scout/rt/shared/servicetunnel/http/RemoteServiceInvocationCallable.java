@@ -20,11 +20,10 @@ import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
-import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.concurrent.CancellationRuntimeException;
 import org.eclipse.scout.rt.platform.util.concurrent.ICancellable;
+import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.InterruptedRuntimeException;
-import org.eclipse.scout.rt.platform.util.concurrent.TimeoutException;
 import org.eclipse.scout.rt.shared.services.common.context.IRunMonitorCancelService;
 import org.eclipse.scout.rt.shared.servicetunnel.HttpException;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
@@ -98,27 +97,22 @@ public class RemoteServiceInvocationCallable implements Callable<ServiceTunnelRe
    * Cancels the remote service operation on server side.
    */
   public void cancel(final RunContext cancellationRunContext) {
-    final long requestSequence = m_serviceRequest.getRequestSequence();
-    try {
-      final Method serviceMethod = IRunMonitorCancelService.class.getMethod(IRunMonitorCancelService.CANCEL_METHOD, long.class);
-      final Object[] serviceArgs = new Object[]{requestSequence};
-      final ServiceTunnelRequest cancelRequest = m_tunnel.createServiceTunnelRequest(IRunMonitorCancelService.class, serviceMethod, serviceArgs);
-      final RemoteServiceInvocationCallable remoteInvocationCallable = m_tunnel.createRemoteServiceInvocationCallable(cancelRequest);
+    cancellationRunContext.run(new IRunnable() {
 
-      final ServiceTunnelResponse response = Jobs.schedule(remoteInvocationCallable, Jobs.newInput()
-          .withName("Cancelling service request [{}]", requestSequence)
-          .withRunContext(cancellationRunContext)
-          .withExceptionHandling(null, true))
-          .awaitDoneAndGet(10, TimeUnit.SECONDS);
-      if (response != null && response.getException() != null) {
-        LOG.warn("Failed to cancel server processing", response.getException());
+      @Override
+      public void run() throws Exception {
+        try {
+          final Method serviceMethod = IRunMonitorCancelService.class.getMethod(IRunMonitorCancelService.CANCEL_METHOD, long.class);
+          final Object[] serviceArgs = new Object[]{m_serviceRequest.getRequestSequence()};
+          m_tunnel.invokeService(IRunMonitorCancelService.class, serviceMethod, serviceArgs);
+        }
+        catch (final CancellationRuntimeException | InterruptedRuntimeException e) {
+          // NOOP: Do not cancel 'cancel-request' to prevent loop.
+        }
+        catch (RuntimeException | NoSuchMethodException e) {
+          LOG.warn("Failed to cancel server processing [requestSequence={}]", m_serviceRequest.getRequestSequence(), e);
+        }
       }
-    }
-    catch (final TimeoutException | CancellationRuntimeException | InterruptedRuntimeException e) {
-      // NOOP: Do not cancel 'cancel-request' to prevent loop.
-    }
-    catch (RuntimeException | NoSuchMethodException e) {
-      LOG.warn("Failed to cancel server processing [requestSequence={}]", requestSequence, e);
-    }
+    });
   }
 }

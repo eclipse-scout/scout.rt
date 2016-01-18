@@ -185,12 +185,6 @@ public abstract class AbstractHttpServiceTunnel extends AbstractServiceTunnel {
     return super.invokeService(serviceInterfaceClass, operation, callerArgs);
   }
 
-  @Override
-  // Method overwritten to be accessible from within @{link RemoteServiceInvocationCallable}.
-  protected ServiceTunnelRequest createServiceTunnelRequest(Class serviceInterfaceClass, Method operation, Object[] args) {
-    return super.createServiceTunnelRequest(serviceInterfaceClass, operation, args);
-  }
-
   /**
    * Creates the {@link Callable} to invoke the remote service operation described by 'serviceRequest'.
    * <p>
