@@ -48,14 +48,48 @@ public class BeanProxyImplementor<T> implements InvocationHandler {
     return m_proxy;
   }
 
-  @Override
-  public Object invoke(Object proxy, final Method method, final Object[] args) throws Throwable {
-    final T instance = m_beanInstance.setIfAbsent(new Callable<T>() {
+  public T getBeanInstance() {
+    return m_beanInstance.setIfAbsent(new Callable<T>() {
       @Override
       public T call() throws Exception {
         return m_bean.getInstance();
       }
     });
+  }
+
+  protected boolean isProxyEqualTo(Object other) {
+    if (other == null) {
+      return false;
+    }
+    if (other == m_proxy) {
+      return true;
+    }
+
+    boolean isProxy = Proxy.isProxyClass(other.getClass());
+
+    if (!isProxy) {
+      // argument is not a proxy. can only be equal to our instance
+      return other.equals(getBeanInstance());
+    }
+
+    Object handler = Proxy.getInvocationHandler(other);
+    if (!(handler instanceof BeanProxyImplementor)) {
+      return false; // cannot be equals because it is another invocation handler (unknown proxy)
+    }
+
+    BeanProxyImplementor otherProxyImplementor = (BeanProxyImplementor) handler;
+    T beanInstance = getBeanInstance();
+    if (beanInstance != null) {
+      return beanInstance.equals(otherProxyImplementor.getBeanInstance());
+    }
+
+    // just compare the proxy classes because there is no real bean instance to delegate
+    return Arrays.equals(m_types, otherProxyImplementor.m_types);
+  }
+
+  @Override
+  public Object invoke(Object proxy, final Method method, final Object[] args) throws Throwable {
+    final T instance = getBeanInstance();
 
     if ("hashCode".equals(method.getName()) && (args == null || args.length == 0) && method.getParameterTypes().length == 0) {
       if (instance == null) {
@@ -63,8 +97,8 @@ public class BeanProxyImplementor<T> implements InvocationHandler {
       }
       return instance.hashCode();
     }
-    else if ("equals".equals(method.getName()) && args != null && args.length == 1 && method.getParameterTypes().length == 1 && method.getParameterTypes()[0].equals(Object.class)) {
-      return m_proxy == args[0];
+    else if ("equals".equals(method.getName()) && args != null && args.length == 1 && method.getParameterTypes().length == 1 && Object.class.equals(method.getParameterTypes()[0])) {
+      return isProxyEqualTo(args[0]);
     }
     else if ("toString".equals(method.getName()) && (args == null || args.length == 0) && method.getParameterTypes().length == 0) {
       StringBuilder b = new StringBuilder();
