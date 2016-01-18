@@ -47,7 +47,7 @@ scout.Tooltip.prototype._init = function(options) {
   this.autoRemove = options.autoRemove !== undefined ? options.autoRemove : true;
   this.cssClass = options.cssClass;
   this.tooltipPosition = options.position || 'top';
-  this.scrollType = options.scrollType || 'remove';
+  this.scrollType = options.scrollType || 'position';
   this.htmlEnabled = options.htmlEnabled !== undefined ? options.htmlEnabled : false;
 };
 
@@ -192,8 +192,8 @@ scout.Tooltip.prototype.position = function() {
   }
   y = origin.y;
 
-  if (!this.autoRemove) {
-    // Sticky tooltip must only be visible if the location where the tooltip points is in view
+  if (this.$anchor) {
+    // Sticky tooltip must only be visible if the location where the tooltip points is in view (prevents that the tooltip points at an invisible anchor)
     inView = scout.scrollbars.isLocationInView(origin, this.$anchor.scrollParent());
     this.$container.setVisible(inView);
   }

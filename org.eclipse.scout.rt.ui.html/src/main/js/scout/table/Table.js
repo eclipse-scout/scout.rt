@@ -1241,7 +1241,6 @@ scout.Table.prototype._showCellError = function(row, $cell, errorStatus) {
     parent: this,
     text: text,
     autoRemove: false,
-    scrollType: 'position',
     $anchor: $cell,
     table: this
   };
