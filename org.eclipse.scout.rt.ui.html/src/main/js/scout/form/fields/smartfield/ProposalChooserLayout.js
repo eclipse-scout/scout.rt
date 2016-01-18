@@ -154,7 +154,7 @@ scout.ProposalChooserLayout.prototype.preferredLayoutSize = function($container)
   this._typeHandler.restoreDom($container);
   $container.css('display', 'block');
 
-  if ($status.isVisible()) {
+  if ($status && $status.isVisible()) {
     oldDisplay = $status.css('display');
     $status.css('display', 'inline-block');
     statusSize = scout.graphics.prefSize($status, true, true);
