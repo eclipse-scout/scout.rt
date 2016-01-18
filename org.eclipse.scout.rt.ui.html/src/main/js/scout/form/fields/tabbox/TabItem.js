@@ -64,6 +64,11 @@ scout.TabItem.prototype._onTabMouseDown = function(event) {
     return;
   }
   this.parent._selectTab(this);
+  // Focus tab on mouse down, normally done when the tab get selected, but not if focus manger is deactivated.
+  // -> If user explicitly clicks a tab it needs to get the focus otherwise keystrokes to switch tabs would not work.
+  if (!this.session.focusManager.active) {
+    this.$tabContainer.focus();
+  }
 };
 
 scout.TabItem.prototype._onStatusMousedown = function(event) {
@@ -77,7 +82,7 @@ scout.TabItem.prototype._onStatusMousedown = function(event) {
 
 scout.TabItem.prototype.focusTab = function() {
   if (this._tabRendered) {
-    this.$tabContainer.focus();
+    this.session.focusManager.requestFocus(this.$tabContainer);
   }
 };
 
