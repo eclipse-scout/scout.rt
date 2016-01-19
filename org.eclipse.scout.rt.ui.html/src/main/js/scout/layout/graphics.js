@@ -310,6 +310,10 @@ scout.Rectangle.prototype.toString = function() {
   return 'Rectangle[x=' + this.x + ' y=' + this.y + ' width=' + this.width + ' height=' + this.height + ']';
 };
 
+scout.Rectangle.prototype.center = function() {
+  return new scout.Point(this.x + this.width / 2, this.y + this.height / 2);
+};
+
 scout.Rectangle.prototype.contains = function(x, y) {
   return y >= this.y && y < this.y + this.height && x >= this.x && x < this.x + this.width;
 };

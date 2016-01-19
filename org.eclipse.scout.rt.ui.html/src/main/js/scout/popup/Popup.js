@@ -375,17 +375,24 @@ scout.Popup.prototype.setLocation = function(location) {
 /**
  * Popups with an anchor must only be visible if the anchor is in view (prevents that the popup points at an invisible anchor)
  */
-scout.Popup.prototype._validateVisibility = function(switchIfNecessary) {
+scout.Popup.prototype._validateVisibility = function() {
   if (!this.$anchor) {
     return;
   }
-  var anchorBounds = this.getAnchorBounds();
-  var inView = scout.scrollbars.isLocationInView(anchorBounds, this.$anchor.scrollParent());
+  var inView = this._isInView();
   var needsLayouting = this.$container.isVisible() !== inView && inView;
   this.$container.setVisible(inView);
   if (needsLayouting) {
     this.revalidateLayout();
   }
+};
+
+scout.Popup.prototype._isInView = function() {
+  if (!this.$anchor) {
+    return;
+  }
+  var anchorBounds = this.getAnchorBounds();
+  return scout.scrollbars.isLocationInView(anchorBounds.center(), this.$anchor.scrollParent());
 };
 
 scout.Popup.prototype._triggerLocationChanged = function() {
