@@ -79,7 +79,10 @@ scout.FormController.prototype.render = function(initialRendering) {
  */
 scout.FormController.prototype.activateForm = function(formAdapterId) {
   var form = this.session.getOrCreateModelAdapter(formAdapterId, this.displayParent);
-
+  //if form is not rendered it could not be activated.
+  if (!form.rendered) {
+    return;
+  }
   // FIXME awe: (2nd screen) handle popupWindow?
   if (form.displayHint === scout.Form.DisplayHint.VIEW) {
     this._activateView(form);
