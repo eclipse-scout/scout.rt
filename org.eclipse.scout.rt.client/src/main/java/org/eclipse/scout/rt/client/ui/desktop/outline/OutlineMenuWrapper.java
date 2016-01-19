@@ -29,13 +29,23 @@ import org.eclipse.scout.rt.platform.classid.ITypeWithClassId;
 import org.eclipse.scout.rt.platform.reflect.AbstractPropertyObserver;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
+/**
+ * This class is used to create a read-only menu-instance when an existing menu instance which belongs to a component is
+ * used somewhere else. For instance: menus of a page-node are automatically copied to the the page-table, because its
+ * the logical place to have them there. The menu-wrapper delegates most read- or get-methods to the wrapped menu
+ * instance, all write- or set-methods are implemented as NOP or throw an {@link UnsupportedOperationException}. Thus
+ * the state of the wrapper should only change, when the original wrapped menu changes.
+ * <p>
+ * <b>IMPORTANT</b>: do not use this class in cases where you must change the state of the wrapper-instance directly,
+ * since the class is not intended for that purpose. Only use it when you want to use an existing menu somewhere else,
+ * using the state of the original menu.
+ */
 public class OutlineMenuWrapper extends AbstractPropertyObserver implements IMenu {
 
   private IMenu m_wrappedMenu;
   private PropertyChangeListener m_wrappedMenuPropertyChangeListener;
-  private boolean m_localEnabled = true;
-  private boolean m_localEnabledInheritAccessibility = true;
   private Set<IMenuType> m_menuTypes;
+
   public final static IMenuTypeMapper AUTO_MENU_TYPE_MAPPER = new IMenuTypeMapper() {
     @Override
     public IMenuType map(IMenuType menuType) {
@@ -56,25 +66,67 @@ public class OutlineMenuWrapper extends AbstractPropertyObserver implements IMen
    *
    * @param wrappedMenu
    */
-  public OutlineMenuWrapper(IMenu wrappedMenu) {
+  protected OutlineMenuWrapper(IMenu wrappedMenu) {
     this(wrappedMenu, AUTO_MENU_TYPE_MAPPER);
   }
 
   /**
-   * @param wrappedMenu
+   * Returns a wrapper for the given menu, or if the menu is already a wrapper instance, the same menu-instance.
+   */
+  public static IMenu wrapMenu(IMenu menu) {
+    if (menu instanceof OutlineMenuWrapper) {
+      return menu; // already wrapped - don't wrap again
+    }
+    else {
+      return new OutlineMenuWrapper(menu);
+    }
+  }
+
+  /**
+   * Returns the wrapped menu if the given menu is a wrapper instance or the same menu instance otherwise.
+   */
+  public static IMenu unwrapMenu(IMenu menu) {
+    if (menu instanceof OutlineMenuWrapper) {
+      return ((OutlineMenuWrapper) menu).getWrappedMenu();
+    }
+    else {
+      return menu;
+    }
+  }
+
+  /**
+   * Returns true if the given menu is a wrapper menu and the wrapped menu is contained in the given collection of
+   * menus.
+   */
+  public static boolean containsWrappedMenu(Collection<IMenu> menus, IMenu menu) {
+    if (menu instanceof OutlineMenuWrapper) {
+      OutlineMenuWrapper wrapper = (OutlineMenuWrapper) menu;
+      return menus.contains(wrapper.getWrappedMenu());
+    }
+    return false;
+  }
+
+  /**
+   * @param menu
+   *          the menu to wrap
    * @param mapper
    *          the menuTypes for the menu and for each menu in the sub-hierarchy are individually computed with this
    *          mapper
    */
-  public OutlineMenuWrapper(IMenu wrappedMenu, IMenuTypeMapper mapper) {
-    m_wrappedMenu = wrappedMenu;
-    Set<IMenuType> originalTypes = wrappedMenu.getMenuTypes();
-    m_menuTypes = new HashSet<IMenuType>(originalTypes.size());
-    for (IMenuType menuType : originalTypes) {
-      m_menuTypes.add(mapper.map(menuType));
-    }
+  public OutlineMenuWrapper(IMenu menu, IMenuTypeMapper mapper) {
+    m_wrappedMenu = menu;
+    m_menuTypes = mapMenuTypes(menu, mapper);
     m_wrappedMenuPropertyChangeListener = createWrappedMenuPropertyChangeListener(mapper);
     setup(mapper);
+  }
+
+  protected Set<IMenuType> mapMenuTypes(IMenu menu, IMenuTypeMapper mapper) {
+    Set<IMenuType> originalTypes = menu.getMenuTypes();
+    Set<IMenuType> mappedTypes = new HashSet<IMenuType>(originalTypes.size());
+    for (IMenuType menuType : originalTypes) {
+      mappedTypes.add(mapper.map(menuType));
+    }
+    return mappedTypes;
   }
 
   protected PropertyChangeListener createWrappedMenuPropertyChangeListener(final IMenuTypeMapper mapper) {
@@ -102,7 +154,7 @@ public class OutlineMenuWrapper extends AbstractPropertyObserver implements IMen
   protected void wrapChildActions(final IMenuTypeMapper mapper) {
     List<IMenu> childActions = m_wrappedMenu.getChildActions();
     List<IMenu> wrappedChildActions = new ArrayList<IMenu>(childActions.size());
-    // create child wrapper
+    // create child wrappers
     for (IMenu m : childActions) {
       wrappedChildActions.add(new OutlineMenuWrapper(m, mapper));
     }
@@ -120,7 +172,7 @@ public class OutlineMenuWrapper extends AbstractPropertyObserver implements IMen
 
   @Override
   public void handleOwnerValueChanged(Object newValue) {
-    // void
+    // NOP
   }
 
   @Override
@@ -130,7 +182,11 @@ public class OutlineMenuWrapper extends AbstractPropertyObserver implements IMen
 
   @Override
   public void setParent(IMenu parent) {
-    throw new UnsupportedOperationException("read only wrapper");
+    unsupported();
+  }
+
+  private void unsupported() {
+    throw new UnsupportedOperationException("Method unsupported by menu-wrapper, you should change the state of the original menu instead");
   }
 
   private List<IMenu> getChildActionsInternal() {
@@ -154,27 +210,27 @@ public class OutlineMenuWrapper extends AbstractPropertyObserver implements IMen
 
   @Override
   public void setChildActions(Collection<? extends IMenu> actionList) {
-    throw new UnsupportedOperationException("read only wrapper");
+    unsupported();
   }
 
   @Override
   public void addChildAction(IMenu action) {
-    throw new UnsupportedOperationException("read only wrapper");
+    unsupported();
   }
 
   @Override
   public void addChildActions(Collection<? extends IMenu> actionList) {
-    throw new UnsupportedOperationException("read only wrapper");
+    unsupported();
   }
 
   @Override
   public void removeChildAction(IMenu action) {
-    throw new UnsupportedOperationException("read only wrapper");
+    unsupported();
   }
 
   @Override
   public void removeChildActions(Collection<? extends IMenu> actionList) {
-    throw new UnsupportedOperationException("read only wrapper");
+    unsupported();
   }
 
   @Override
@@ -220,7 +276,7 @@ public class OutlineMenuWrapper extends AbstractPropertyObserver implements IMen
 
   @Override
   public void setIconId(String iconId) {
-    throw new UnsupportedOperationException("read only wrapper");
+    unsupported();
   }
 
   @Override
@@ -230,7 +286,7 @@ public class OutlineMenuWrapper extends AbstractPropertyObserver implements IMen
 
   @Override
   public void setText(String text) {
-    throw new UnsupportedOperationException("read only wrapper");
+    unsupported();
   }
 
   @Override
@@ -245,7 +301,7 @@ public class OutlineMenuWrapper extends AbstractPropertyObserver implements IMen
 
   @Override
   public void setKeyStroke(String text) {
-    throw new UnsupportedOperationException("read only wrapper");
+    unsupported();
   }
 
   @Override
@@ -265,7 +321,7 @@ public class OutlineMenuWrapper extends AbstractPropertyObserver implements IMen
 
   @Override
   public void setSeparator(boolean b) {
-    throw new UnsupportedOperationException("read only wrapper");
+    unsupported();
   }
 
   @Override
@@ -275,17 +331,17 @@ public class OutlineMenuWrapper extends AbstractPropertyObserver implements IMen
 
   @Override
   public void setSelected(boolean b) {
-    throw new UnsupportedOperationException("read only wrapper");
+    unsupported();
   }
 
   @Override
   public boolean isEnabled() {
-    return m_localEnabled && m_localEnabledInheritAccessibility && m_wrappedMenu.isEnabled();
+    return m_wrappedMenu.isEnabled();
   }
 
   @Override
   public void setEnabled(boolean b) {
-    m_localEnabled = b;
+    // NOP
   }
 
   @Override
@@ -295,7 +351,7 @@ public class OutlineMenuWrapper extends AbstractPropertyObserver implements IMen
 
   @Override
   public void setVisible(boolean b) {
-    throw new UnsupportedOperationException("read only wrapper");
+    unsupported();
   }
 
   @Override
@@ -305,12 +361,12 @@ public class OutlineMenuWrapper extends AbstractPropertyObserver implements IMen
 
   @Override
   public void setInheritAccessibility(boolean b) {
-    throw new UnsupportedOperationException("read only wrapper");
+    unsupported();
   }
 
   @Override
   public void setEnabledPermission(Permission p) {
-    throw new UnsupportedOperationException("read only wrapper");
+    unsupported();
   }
 
   @Override
@@ -320,7 +376,7 @@ public class OutlineMenuWrapper extends AbstractPropertyObserver implements IMen
 
   @Override
   public void setEnabledGranted(boolean b) {
-    throw new UnsupportedOperationException("read only wrapper");
+    // NOP
   }
 
   @Override
@@ -330,7 +386,7 @@ public class OutlineMenuWrapper extends AbstractPropertyObserver implements IMen
 
   @Override
   public void setEnabledProcessingAction(boolean b) {
-    throw new UnsupportedOperationException("read only wrapper");
+    // NOP
   }
 
   @Override
@@ -340,12 +396,12 @@ public class OutlineMenuWrapper extends AbstractPropertyObserver implements IMen
 
   @Override
   public void setEnabledInheritAccessibility(boolean enabled) {
-    m_localEnabledInheritAccessibility = enabled;
+    // NOP
   }
 
   @Override
   public void setVisiblePermission(Permission p) {
-    throw new UnsupportedOperationException("read only wrapper");
+    unsupported();
   }
 
   @Override
@@ -355,7 +411,7 @@ public class OutlineMenuWrapper extends AbstractPropertyObserver implements IMen
 
   @Override
   public void setVisibleGranted(boolean b) {
-    throw new UnsupportedOperationException("read only wrapper");
+    unsupported();
   }
 
   @Override
@@ -365,7 +421,7 @@ public class OutlineMenuWrapper extends AbstractPropertyObserver implements IMen
 
   @Override
   public void setToggleAction(boolean b) {
-    throw new UnsupportedOperationException("read only wrapper");
+    unsupported();
   }
 
   @Override
@@ -455,11 +511,20 @@ public class OutlineMenuWrapper extends AbstractPropertyObserver implements IMen
 
   @Override
   public void setView(boolean visible, boolean enabled) {
-    throw new UnsupportedOperationException("read only wrapper");
+    unsupported();
   }
 
   @Override
   public String toString() {
-    return super.toString() + " wrapping '" + m_wrappedMenu.toString() + "'";
+    StringBuilder sb = new StringBuilder(getClass().getSimpleName());
+    sb.append("[wrappedMenu=" + m_wrappedMenu.getClass().getSimpleName());
+    sb.append(" text='" + getText()).append("'");
+    sb.append(" enabled=" + isEnabled());
+    sb.append(" enabledGranted=" + isEnabledGranted());
+    sb.append(" inheritAccessibility=" + isInheritAccessibility());
+    sb.append(" visible=" + isVisible());
+    sb.append(" visibleGranted=" + isVisibleGranted());
+    sb.append("]");
+    return sb.toString();
   }
 }

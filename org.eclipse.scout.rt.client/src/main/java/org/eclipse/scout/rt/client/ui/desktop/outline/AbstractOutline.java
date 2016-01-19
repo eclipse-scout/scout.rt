@@ -61,7 +61,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public abstract class AbstractOutline extends AbstractTree implements IOutline {
+
   private static final Logger LOG = LoggerFactory.getLogger(AbstractOutline.class);
+
+  private static final IMenuTypeMapper TABLE_MENU_TYPE_MAPPER = new IMenuTypeMapper() {
+    @Override
+    public IMenuType map(IMenuType menuType) {
+      if (menuType == TableMenuType.EmptySpace || menuType == TableMenuType.SingleSelection) {
+        return TreeMenuType.SingleSelection;
+      }
+      return menuType;
+    }
+  };
 
   // visible is defined as: visibleGranted && visibleProperty
   private boolean m_visibleGranted;
@@ -607,15 +618,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
   protected void addMenusOfActivePageToContextMenu(IPage<?> activePage) {
     List<IMenu> wrappedMenus = new ArrayList<IMenu>();
     for (IMenu m : computeInheritedMenusOfPage(activePage)) {
-      wrappedMenus.add(new OutlineMenuWrapper(m, new IMenuTypeMapper() {
-        @Override
-        public IMenuType map(IMenuType menuType) {
-          if (menuType == TableMenuType.EmptySpace || menuType == TableMenuType.SingleSelection) {
-            return TreeMenuType.SingleSelection;
-          }
-          return menuType;
-        }
-      }));
+      wrappedMenus.add(new OutlineMenuWrapper(m, TABLE_MENU_TYPE_MAPPER));
     }
     m_inheritedMenusOfPage = wrappedMenus;
     getContextMenu().addChildActions(m_inheritedMenusOfPage);

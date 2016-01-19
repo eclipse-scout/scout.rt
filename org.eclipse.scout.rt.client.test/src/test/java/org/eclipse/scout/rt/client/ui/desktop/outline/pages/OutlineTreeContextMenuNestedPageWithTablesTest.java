@@ -43,6 +43,7 @@ import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -103,21 +104,11 @@ public class OutlineTreeContextMenuNestedPageWithTablesTest {
     // normalize reference
     List<IMenu> refNormalized = new ArrayList<IMenu>(reference.size());
     for (IMenu m : reference) {
-      if (m instanceof OutlineMenuWrapper) {
-        refNormalized.add(((OutlineMenuWrapper) m).getWrappedMenu());
-      }
-      else {
-        refNormalized.add(m);
-      }
+      refNormalized.add(OutlineMenuWrapper.unwrapMenu(m));
     }
     List<IMenu> menusNormalized = new ArrayList<IMenu>(menus.size());
     for (IMenu m : menus) {
-      if (m instanceof OutlineMenuWrapper) {
-        menusNormalized.add(((OutlineMenuWrapper) m).getWrappedMenu());
-      }
-      else {
-        menusNormalized.add(m);
-      }
+      menusNormalized.add(OutlineMenuWrapper.unwrapMenu(m));
     }
     return refNormalized.containsAll(menusNormalized);
   }

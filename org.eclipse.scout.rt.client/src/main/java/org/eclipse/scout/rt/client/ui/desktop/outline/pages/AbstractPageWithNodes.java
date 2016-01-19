@@ -58,6 +58,16 @@ import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
  */
 public abstract class AbstractPageWithNodes extends AbstractPage<ITable> implements IPageWithNodes {
 
+  private static final IMenuTypeMapper TREE_MENU_TYPE_MAPPER = new IMenuTypeMapper() {
+    @Override
+    public IMenuType map(IMenuType menuType) {
+      if (menuType == TreeMenuType.SingleSelection) {
+        return TableMenuType.SingleSelection;
+      }
+      return menuType;
+    }
+  };
+
   public AbstractPageWithNodes() {
     this(true, null);
   }
@@ -290,15 +300,7 @@ public abstract class AbstractPageWithNodes extends AbstractPage<ITable> impleme
         IPageWithNodes pageWithNodes = (IPageWithNodes) node;
         List<IMenu> menus = ActionUtility.getActions(pageWithNodes.getMenus(), ActionUtility.createMenuFilterMenuTypes(CollectionUtility.hashSet(TreeMenuType.SingleSelection), false));
         for (IMenu m : menus) {
-          pageMenus.add(new OutlineMenuWrapper(m, new IMenuTypeMapper() {
-            @Override
-            public IMenuType map(IMenuType menuType) {
-              if (menuType == TreeMenuType.SingleSelection) {
-                return TableMenuType.SingleSelection;
-              }
-              return menuType;
-            }
-          }));
+          pageMenus.add(new OutlineMenuWrapper(m, TREE_MENU_TYPE_MAPPER));
         }
       }
     }
@@ -318,14 +320,11 @@ public abstract class AbstractPageWithNodes extends AbstractPage<ITable> impleme
     List<IMenu> menus = mainBoxContextMenu.getChildActions();
     for (IMenu menu : getOutline().getContextMenu().getChildActions()) {
       // TODO [5.2] hmu, bsh: menues im ui sammeln anstelle in forms injecten
-      if (menu instanceof OutlineMenuWrapper) {
-        ((OutlineMenuWrapper) menu).getWrappedMenu().setInheritAccessibility(false);
-      }
       if (menu.getMenuTypes().contains(TreeMenuType.Header) && menu.getMenuTypes().size() == 1) {
-        //Don't show TreeMenuType.Header. These menus should only be shown on outline title
+        // Don't show TreeMenuType.Header. These menus should only be shown on outline title
         continue;
       }
-      menus.add(new OutlineMenuWrapper(menu));
+      menus.add(OutlineMenuWrapper.wrapMenu(menu));
     }
     if (!CollectionUtility.equalsCollection(menus, mainBoxContextMenu.getChildActions())) {
       mainBoxContextMenu.setChildActions(menus);

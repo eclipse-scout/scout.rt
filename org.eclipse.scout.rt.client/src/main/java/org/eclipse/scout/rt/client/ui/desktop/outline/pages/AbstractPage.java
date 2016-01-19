@@ -66,7 +66,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode implements IPage<T> {
+
   private static final Logger LOG = LoggerFactory.getLogger(AbstractPage.class);
+
+  private static final IMenuTypeMapper TREE_MENU_TYPE_MAPPER = new IMenuTypeMapper() {
+    @Override
+    public IMenuType map(IMenuType menuType) {
+      if (menuType == TreeMenuType.SingleSelection) {
+        return TableMenuType.EmptySpace;
+      }
+      return menuType;
+    }
+  };
 
   private T m_table;
   private IForm m_detailForm;
@@ -582,20 +593,10 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
       ITableContextMenu contextMenu = table.getContextMenu();
       List<IMenu> menus = contextMenu.getChildActions();
       for (IMenu menu : getOutline().getContextMenu().getChildActions()) {
-        if (menu instanceof OutlineMenuWrapper && table.getMenus().contains(((OutlineMenuWrapper) menu).getWrappedMenu())) {
-          continue;
+        if (!OutlineMenuWrapper.containsWrappedMenu(table.getMenus(), menu)) {
+          // mapping from TreeMenuType to TableMenuType
+          menus.add(new OutlineMenuWrapper(menu, TREE_MENU_TYPE_MAPPER));
         }
-
-        // mapping from TreeMenuType to TableMenuType
-        menus.add(new OutlineMenuWrapper(menu, new IMenuTypeMapper() {
-          @Override
-          public IMenuType map(IMenuType menuType) {
-            if (menuType == TreeMenuType.SingleSelection) {
-              return TableMenuType.EmptySpace;
-            }
-            return menuType;
-          }
-        }));
       }
       if (!CollectionUtility.equalsCollection(menus, contextMenu.getChildActions())) {
         contextMenu.setChildActions(menus);
