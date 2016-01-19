@@ -109,9 +109,14 @@ scout.Tooltip.prototype._postRender = function() {
 };
 
 scout.Tooltip.prototype._remove = function() {
-  this.$container.document()
-    .off('mousedown', this._mousedownHandler)
-    .off('keydown', this._keydownHandler);
+  if (this._mousedownHandler) {
+    this.$container.document().off('mousedown', this._mousedownHandler);
+    this._mousedownHandler = null;
+  }
+  if (this._keydownHandler) {
+    this.$container.document().off('keydown', this._keydownHandler);
+    this._keydownHandler = null;
+  }
   if (this._scrollHandler) {
     scout.scrollbars.offScroll(this._scrollHandler);
     this._scrollHandler = null;

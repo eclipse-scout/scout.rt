@@ -699,9 +699,10 @@ scout.Planner.prototype._onCellMousedown = function(event) {
     this._select(true);
 
     // event
+    this._cellMousemoveHandler = this._onCellMousemove.bind(this);
     $target.document()
-      .on('mousemove', this._onCellMousemove.bind(this))
-      .one('mouseup', this._onCellMouseup.bind(this));
+      .on('mousemove', this._cellMousemoveHandler)
+      .one('mouseup', this._onDocumentMouseup.bind(this));
   }
 };
 
@@ -720,12 +721,12 @@ scout.Planner.prototype._onResizeMousedown = function(event) {
 
   $target.body().addClass('col-resize');
 
+  this._resizeMousemoveHandler = this._onResizeMousemove.bind(this);
   $target.document()
-    .on('mousemove', this._onResizeMousemove.bind(this))
-    .one('mouseup', this._onCellMouseup.bind(this));
+    .on('mousemove', this._resizeMousemoveHandler)
+    .one('mouseup', this._onDocumentMouseup.bind(this));
 
   return false;
-
 };
 
 scout.Planner.prototype._onCellMousemove = function(event) {
@@ -741,11 +742,18 @@ scout.Planner.prototype._onResizeMousemove = function(event) {
   this._select(true);
 };
 
-scout.Planner.prototype._onCellMouseup = function(event) {
+scout.Planner.prototype._onDocumentMouseup = function(event) {
   this._select();
   var $target = $(event.target);
   $target.body().removeClass('col-resize');
-  $target.document().off('mousemove');
+  if (this._cellMousemoveHandler) {
+    $target.document().off('mousemove', this._documentMousemoveHandler);
+    this._cellMousemoveHandler = null;
+  }
+  if (this._resizeMousemoveHandler) {
+    $target.document().off('mousemove', this._resizeMousemoveHandler);
+    this._resizeMousemoveHandler = null;
+  }
 };
 
 scout.Planner.prototype._select = function(whileSelecting) {
