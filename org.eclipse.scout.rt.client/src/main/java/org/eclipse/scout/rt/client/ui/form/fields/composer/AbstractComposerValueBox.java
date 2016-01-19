@@ -144,6 +144,7 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
     defaultMap.put(IDataModelAttribute.TYPE_PLAIN_LONG, getFieldByClass(LongField.class));
     defaultMap.put(IDataModelAttribute.TYPE_STRING, getFieldByClass(StringField.class));
     defaultMap.put(IDataModelAttribute.TYPE_FULL_TEXT, getFieldByClass(StringField.class));
+    defaultMap.put(IDataModelAttribute.TYPE_RICH_TEXT, getFieldByClass(StringField.class));
     defaultMap.put(IDataModelAttribute.TYPE_SMART, getFieldByClass(SmartField.class));
     defaultMap.put(IDataModelAttribute.TYPE_TIME, getFieldByClass(TimeField.class));
     m_opTypeToFieldMap.put(0, defaultMap);
