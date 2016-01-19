@@ -155,6 +155,8 @@ scout.KeyStrokeManager.prototype._handleKeyStrokeEvent = function(keyStrokeConte
   }
 
   keyStrokeContext.keyStrokes.some(function(keyStroke) {
+    //handle numpad keystroke
+    event.which = event.which >= 96 && event.which <= 105 ? event.which - 48 : event.which;
     if (!keyStroke.accept(event)) {
       return false;
     }

@@ -100,5 +100,6 @@ scout.TableFocusFilterFieldKeyStroke.prototype._isKeyStrokeInRange = function(ev
   }
   return (event.which >= scout.keys.a && event.which <= scout.keys.z) ||
     (event.which >= scout.keys.A && event.which <= scout.keys.Z) ||
-    (event.which >= scout.keys['0'] && event.which <= scout.keys['9']);
+    (event.which >= scout.keys['0'] && event.which <= scout.keys['9']) ||
+    (event.which >= scout.keys.NUMPAD_0 && event.which <= scout.keys.NUMPAD_9);
 };
