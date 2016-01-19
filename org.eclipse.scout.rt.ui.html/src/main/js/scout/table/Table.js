@@ -1138,6 +1138,9 @@ scout.Table.prototype._removeRow = function(row) {
     return;
   }
 
+  this._removeTooltipsForRow(row);
+  this._removeCellEditorForRow(row);
+
   // Do not remove rows which are removed using an animation
   if (!$row.hasClass('hiding')) {
     $row.remove();
@@ -1208,13 +1211,11 @@ scout.Table.prototype._hideRow = function(row) {
 scout.Table.prototype._installRow = function(row) {
   row.height = row.$row.outerHeight(true);
 
-  this._removeTooltipsForRow(row);
   if (row.hasError) {
     this._showCellErrorForRow(row);
   }
-  // Reopen editor popup with cell because state of popup (row, $anchor etc.) is not valid anymore
-  if (this.cellEditorPopup && this.cellEditorPopup.row.id === row.id) {
-    this.cellEditorPopup.remove();
+  // Reopen editor popup (closed when row was removed)
+  if (this.cellEditorPopup && !this.cellEditorPopup.rendered && this.cellEditorPopup.row.id === row.id) {
     var editorField = this.cellEditorPopup.cell.field;
     this._startCellEdit(this.cellEditorPopup.column, row, editorField.id);
   }
@@ -1884,8 +1885,6 @@ scout.Table.prototype.deleteRows = function(rows) {
       if (this.cellEditorPopup && this.cellEditorPopup.row.id === row.id) {
         this.cellEditorPopup.cancelEdit();
       }
-      // Remove tooltips for the deleted row
-      this._removeTooltipsForRow(row);
 
       this._removeRows(row);
       invalidate = true;
@@ -1996,6 +1995,8 @@ scout.Table.prototype.updateRows = function(rows) {
       scout.Table.linkRowToDiv(updatedRow, $updatedRow);
       $updatedRow.copyCssClasses(oldRow.$row, scout.Table.SELECTION_CLASSES + ' first last');
       oldRow.$row.replaceWith($updatedRow);
+      this._removeTooltipsForRow(updatedRow);
+      this._removeCellEditorForRow(updatedRow);
       this._installRow(updatedRow);
     }
   }
@@ -2020,6 +2021,12 @@ scout.Table.prototype._removeTooltipsForRow = function(row) {
   }
 };
 
+scout.Table.prototype._removeCellEditorForRow = function(row) {
+  if (this.cellEditorPopup && this.cellEditorPopup.rendered && this.cellEditorPopup.row.id === row.id) {
+    this.cellEditorPopup.remove();
+  }
+};
+
 scout.Table.prototype._startCellEdit = function(column, row, fieldId) {
   var popup = column.startCellEdit(row, fieldId);
   this.cellEditorPopup = popup;
@@ -2027,6 +2034,10 @@ scout.Table.prototype._startCellEdit = function(column, row, fieldId) {
 };
 
 scout.Table.prototype.scrollTo = function(row) {
+  if (this.viewRangeRendered.size() === 0) {
+    // Cannot scroll to a row if no row is rendered
+    return;
+  }
   if (!row.$row) {
     var rowIndex = this.filteredRows().indexOf(row);
     this._renderViewRangeForRowIndex(rowIndex);
@@ -2131,6 +2142,12 @@ scout.Table.prototype.renderSelection = function(rows) {
       rows.push(filteredRows[followingIndex]);
     }
   }
+
+  // Make sure the cell editor popup is correctly layouted because selection changes the cell bounds
+  if (this.cellEditorPopup && this.cellEditorPopup.rendered && this.selectedRows.indexOf(this.cellEditorPopup.row) > -1) {
+    this.cellEditorPopup.position();
+    this.cellEditorPopup.pack();
+  }
 };
 
 scout.Table.prototype._removeSelection = function() {
@@ -2203,14 +2220,6 @@ scout.Table.prototype.selectRows = function(rows, notifyServer, debounceSend) {
 
   if (this.rendered) {
     this.renderSelection();
-    this.selectedRows.forEach(function(row) {
-
-      // Make sure the cell editor popup is correctly layouted because selection changes the cell bounds
-      if (this.cellEditorPopup && this.cellEditorPopup.row.id === row.id) {
-        this.cellEditorPopup.position();
-        this.cellEditorPopup.pack();
-      }
-    }, this);
     if (this.scrollToSelection) {
       this.revealSelection();
     }
@@ -3028,9 +3037,7 @@ scout.Table.prototype.calculateViewRangeSize = function() {
   this._updateRowHeight();
 
   if (this.rowHeight === 0) {
-    return 0;
-    //FIXME CGU/AWE uncomment and remove return as soon as HtmlComp.validateLayout checks for invisible components
-    //    throw new Error('Cannot calculate view range with rowHeight = 0');
+    throw new Error('Cannot calculate view range with rowHeight = 0');
   }
   return Math.ceil(this.$data.outerHeight() / this.rowHeight) * 2;
 };

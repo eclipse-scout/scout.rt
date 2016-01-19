@@ -14,6 +14,7 @@ scout.SmartFieldPopup = function() {
 scout.inherits(scout.SmartFieldPopup, scout.Popup);
 
 scout.SmartFieldPopup.prototype._init = function(options) {
+  options.scrollType = options.scrollType || 'layoutAndPosition';
   options.installFocusContext = false;
   scout.SmartFieldPopup.parent.prototype._init.call(this, options);
   this._field = options.field;
@@ -65,8 +66,4 @@ scout.SmartFieldPopup.prototype._onContainerMouseDown = function(event) {
   // so input-field does not lose the focus, popup will be closed by the
   // proposal chooser impl.
   return false;
-};
-
-scout.SmartFieldPopup.prototype._onAnchorScroll = function(event) {
-  this.position();
 };

@@ -14,6 +14,7 @@ scout.DatePickerPopup = function() {
 scout.inherits(scout.DatePickerPopup, scout.Popup);
 
 scout.DatePickerPopup.prototype._init = function(options) {
+  options.scrollType = options.scrollType || 'layoutAndPosition';
   options.installFocusContext = false;
   scout.DatePickerPopup.parent.prototype._init.call(this, options);
 
@@ -23,17 +24,12 @@ scout.DatePickerPopup.prototype._init = function(options) {
   });
 };
 
-scout.DatePickerPopup.prototype._createLayout = function() {
-  return new scout.NullLayout(this);
-};
-
 scout.DatePickerPopup.prototype._render = function($parent) {
   this.picker.render($parent);
   this.$container = this.picker.$container;
   this.$container
     .addClass('date-picker-popup');
-  this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
-  this.htmlComp.setLayout(this._createLayout());
+  this.htmlComp = this.picker.htmlComp;
 };
 
 /**
@@ -48,10 +44,6 @@ scout.DatePickerPopup.prototype._onMouseDown = function(event) {
 
   // or else: clicked somewhere else on the document -> close
   scout.DatePickerPopup.parent.prototype._onMouseDown.call(this, event);
-};
-
-scout.DatePickerPopup.prototype._onAnchorScroll = function(event) {
-  this.position();
 };
 
 /**

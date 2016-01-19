@@ -554,6 +554,17 @@
     return elemVisible(this[0]);
   };
 
+  $.fn.isEveryParentVisible = function() {
+    var everyParentVisible = true;
+    this.parents().each(function() {
+      if (!$(this).isVisible()) {
+        everyParentVisible = false;
+        return false;
+      }
+    });
+    return everyParentVisible;
+  };
+
   /**
    * @return true if the element is attached (= is in the dom tree), false if not
    */

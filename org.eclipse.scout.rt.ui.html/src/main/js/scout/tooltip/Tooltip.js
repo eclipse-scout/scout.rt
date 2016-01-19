@@ -81,15 +81,9 @@ scout.Tooltip.prototype._render = function($parent) {
       .on('keydown', this._keydownHandler);
   }
 
-  if (this.$anchor) {
-    if (this.scrollType === 'position') {
-      this._scrollHandler = this.position.bind(this);
-    } else if (this.scrollType === 'remove') {
-      this._scrollHandler = this.remove.bind(this);
-    }
-    if (this._scrollHandler) {
-      scout.scrollbars.onScroll(this.$anchor, this._scrollHandler);
-    }
+  if (this.$anchor && this.scrollType) {
+    this._scrollHandler = this._onAnchorScroll.bind(this);
+    scout.scrollbars.onScroll(this.$anchor, this._scrollHandler);
   }
 
   // If the tooltip is rendered inside a (popup) dialog, get a reference to the dialog.
@@ -238,6 +232,18 @@ scout.Tooltip.prototype.position = function() {
   this.$container
     .cssLeft(left)
     .cssTop(top);
+};
+
+scout.Tooltip.prototype._onAnchorScroll = function(event) {
+  if (!this.rendered) {
+    // Scroll events may be fired delayed, even if scroll listener are already removed.
+    return;
+  }
+  if (this.scrollType === 'position') {
+    this.position();
+  } else if (this.scrollType === 'remove') {
+    this.remove();
+  }
 };
 
 scout.Tooltip.prototype._onDocumentMousedown = function(event) {

@@ -18,6 +18,7 @@ scout.CellEditorPopup = function() {
 scout.inherits(scout.CellEditorPopup, scout.Popup);
 
 scout.CellEditorPopup.prototype._init = function(options) {
+  options.scrollType = options.scrollType || 'position';
   scout.CellEditorPopup.parent.prototype._init.call(this, options);
 
   this.table = options.column.table;
@@ -144,8 +145,4 @@ scout.CellEditorPopup.prototype.cancelEdit = function() {
 
 scout.CellEditorPopup.prototype._onMouseDownOutside = function(event) {
   this.completeEdit();
-};
-
-scout.CellEditorPopup.prototype._onAnchorScroll = function(event) {
-  this.position();
 };

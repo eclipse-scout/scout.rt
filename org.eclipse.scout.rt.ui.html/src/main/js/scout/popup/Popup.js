@@ -51,6 +51,7 @@ scout.Popup.prototype._init = function(options) {
     return scout.focusRule.AUTO;
   });
   this.focusableContainer = scout.nvl(options.focusableContainer, false);
+  this.scrollType = options.scrollType || 'remove';
 };
 
 scout.Popup.prototype._initKeyStrokeContext = function(keyStrokeContext) {
@@ -156,7 +157,7 @@ scout.Popup.prototype._attachCloseHandler = function() {
   this.session.desktop.on('popupopen', this._popupOpenHandler);
 
   // Install scroll close handler
-  if (this.$anchor) {
+  if (this.$anchor && this.scrollType) {
     this._scrollHandler = this._onAnchorScroll.bind(this);
     scout.scrollbars.onScroll(this.$anchor, this._scrollHandler);
   }
@@ -223,7 +224,18 @@ scout.Popup.prototype._onMouseDownOutside = function(event) {
  * Method invoked once the 'options.$anchor' is scrolled.
  */
 scout.Popup.prototype._onAnchorScroll = function(event) {
-  this.close(event);
+  if (!this.rendered) {
+    // Scroll events may be fired delayed, even if scroll listener are already removed.
+    return;
+  }
+  if (this.scrollType === 'position') {
+    this.position();
+  } else if (this.scrollType === 'layoutAndPosition') {
+    this.revalidateLayout();
+    this.position();
+  } else if (this.scrollType === 'remove') {
+    this.close(event);
+  }
 };
 
 /**
@@ -340,6 +352,7 @@ scout.Popup.prototype.prefSize = function($container) {
 };
 
 scout.Popup.prototype.position = function(switchIfNecessary) {
+  this._validateVisibility();
   this._position(this.$container, switchIfNecessary);
 };
 
@@ -357,6 +370,22 @@ scout.Popup.prototype.setLocation = function(location) {
     .css('left', location.x)
     .css('top', location.y);
   this._triggerLocationChanged();
+};
+
+/**
+ * Popups with an anchor must only be visible if the anchor is in view (prevents that the popup points at an invisible anchor)
+ */
+scout.Popup.prototype._validateVisibility = function(switchIfNecessary) {
+  if (!this.$anchor) {
+    return;
+  }
+  var anchorBounds = this.getAnchorBounds();
+  var inView = scout.scrollbars.isLocationInView(anchorBounds, this.$anchor.scrollParent());
+  var needsLayouting = this.$container.isVisible() !== inView && inView;
+  this.$container.setVisible(inView);
+  if (needsLayouting) {
+    this.revalidateLayout();
+  }
 };
 
 scout.Popup.prototype._triggerLocationChanged = function() {

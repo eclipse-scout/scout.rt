@@ -34,6 +34,7 @@ scout.TableHeaderMenu.CheckedMode = {
 };
 
 scout.TableHeaderMenu.prototype._init = function(options) {
+  options.scrollType = options.scrollType || 'none';
   scout.TableHeaderMenu.parent.prototype._init.call(this, options);
 
   this.tableHeader = options.tableHeader;
