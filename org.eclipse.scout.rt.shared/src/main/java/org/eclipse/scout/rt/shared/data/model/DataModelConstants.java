@@ -55,6 +55,10 @@ public interface DataModelConstants {
    * Attribute used for full text searches
    */
   int TYPE_FULL_TEXT = 18;
+  /**
+   * Attribute used for rich text searches
+   */
+  int TYPE_RICH_TEXT = 19;
 
   /**
    * marker operator that does nothing, no "attribute" "op" "value" pattern is used but simply "attribute"
