@@ -28,8 +28,8 @@ import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.job.listener.JobEventType;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
-import org.eclipse.scout.rt.platform.util.concurrent.InterruptedRuntimeException;
-import org.eclipse.scout.rt.platform.util.concurrent.TimeoutException;
+import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedException;
+import org.eclipse.scout.rt.platform.util.concurrent.TimedOutException;
 import org.eclipse.scout.rt.testing.platform.job.JobTestUtil;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.platform.runner.Times;
@@ -59,7 +59,7 @@ public class JobStateTest {
   }
 
   @Test
-  public void testRunningAndDone() throws InterruptedRuntimeException, java.lang.InterruptedException {
+  public void testRunningAndDone() throws ThreadInterruptedException, java.lang.InterruptedException {
     JobEventCaptureListener captureListener = new JobEventCaptureListener();
     Jobs.getJobManager().addListener(captureListener);
 
@@ -102,7 +102,7 @@ public class JobStateTest {
 
   @Test
   @Times(100) // regression
-  public void testWaitingForMutexAndBlockingCondition() throws InterruptedRuntimeException, java.lang.InterruptedException {
+  public void testWaitingForMutexAndBlockingCondition() throws ThreadInterruptedException, java.lang.InterruptedException {
     JobEventCaptureListener captureListener = new JobEventCaptureListener();
     Jobs.getJobManager().addListener(captureListener);
 
@@ -268,7 +268,7 @@ public class JobStateTest {
   }
 
   @Test
-  public void testPending() throws InterruptedRuntimeException, java.lang.InterruptedException {
+  public void testPending() throws ThreadInterruptedException, java.lang.InterruptedException {
     JobEventCaptureListener captureListener = new JobEventCaptureListener();
     Jobs.getJobManager().addListener(captureListener);
 
@@ -318,7 +318,7 @@ public class JobStateTest {
 
   @Test
   @Times(100) // regression
-  public void testBlockedAndInterrupted() throws InterruptedRuntimeException, java.lang.InterruptedException {
+  public void testBlockedAndInterrupted() throws ThreadInterruptedException, java.lang.InterruptedException {
     JobEventCaptureListener captureListener = new JobEventCaptureListener();
     Jobs.getJobManager().addListener(captureListener);
 
@@ -336,7 +336,7 @@ public class JobStateTest {
           condition.waitFor("ABC");
           fail("interruption expected");
         }
-        catch (InterruptedRuntimeException e) {
+        catch (ThreadInterruptedException e) {
           assertTrue(Thread.interrupted());
           Thread.currentThread().interrupt(); // Restore interrupted status
           assertTrue(mutex.isPermitOwner(IFuture.CURRENT.get()));
@@ -404,7 +404,7 @@ public class JobStateTest {
 
   @Test
   @Times(100) // regression
-  public void testBlockedAndTimeout() throws InterruptedRuntimeException, java.lang.InterruptedException {
+  public void testBlockedAndTimeout() throws ThreadInterruptedException, java.lang.InterruptedException {
     JobEventCaptureListener captureListener = new JobEventCaptureListener();
     Jobs.getJobManager().addListener(captureListener);
 
@@ -423,7 +423,7 @@ public class JobStateTest {
           condition.waitFor(1, TimeUnit.MILLISECONDS, "ABC");
           fail("timeout expected");
         }
-        catch (TimeoutException e) {
+        catch (TimedOutException e) {
           assertTrue(mutex.isPermitOwner(IFuture.CURRENT.get()));
           assertSame(JobState.RUNNING, IFuture.CURRENT.get().getState());
         }
@@ -484,7 +484,7 @@ public class JobStateTest {
   }
 
   @Test
-  public void testScheduleAtFixedRate() throws InterruptedRuntimeException, java.lang.InterruptedException {
+  public void testScheduleAtFixedRate() throws ThreadInterruptedException, java.lang.InterruptedException {
     JobEventCaptureListener captureListener = new JobEventCaptureListener();
     Jobs.getJobManager().addListener(captureListener);
 
@@ -547,7 +547,7 @@ public class JobStateTest {
   }
 
   @Test
-  public void testScheduleAtFixedRateAndMutex() throws InterruptedRuntimeException, java.lang.InterruptedException {
+  public void testScheduleAtFixedRateAndMutex() throws ThreadInterruptedException, java.lang.InterruptedException {
     JobEventCaptureListener captureListener = new JobEventCaptureListener();
     Jobs.getJobManager().addListener(captureListener);
 
@@ -623,7 +623,7 @@ public class JobStateTest {
   }
 
   @Test
-  public void testScheduleWithFixedDelay() throws InterruptedRuntimeException, java.lang.InterruptedException {
+  public void testScheduleWithFixedDelay() throws ThreadInterruptedException, java.lang.InterruptedException {
     JobEventCaptureListener captureListener = new JobEventCaptureListener();
     Jobs.getJobManager().addListener(captureListener);
 
@@ -681,7 +681,7 @@ public class JobStateTest {
   }
 
   @Test
-  public void testScheduleWithFixedDelayAndMutex() throws InterruptedRuntimeException, java.lang.InterruptedException {
+  public void testScheduleWithFixedDelayAndMutex() throws ThreadInterruptedException, java.lang.InterruptedException {
     JobEventCaptureListener captureListener = new JobEventCaptureListener();
     Jobs.getJobManager().addListener(captureListener);
 

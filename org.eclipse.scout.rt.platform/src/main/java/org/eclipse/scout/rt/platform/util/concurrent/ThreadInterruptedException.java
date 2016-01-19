@@ -21,19 +21,19 @@ import org.eclipse.scout.rt.platform.exception.PlatformException;
  *
  * @since 5.2
  */
-public class InterruptedRuntimeException extends PlatformException {
+public class ThreadInterruptedException extends PlatformException {
 
   private static final long serialVersionUID = 1L;
 
   /**
    * See constructor of {@link PlatformException}
    */
-  public InterruptedRuntimeException(final String message, final Object... args) {
+  public ThreadInterruptedException(final String message, final Object... args) {
     super(message, args);
   }
 
   @Override
-  public InterruptedRuntimeException withContextInfo(final String name, final Object value, final Object... valueArgs) {
+  public ThreadInterruptedException withContextInfo(final String name, final Object value, final Object... valueArgs) {
     super.withContextInfo(name, value, valueArgs);
     return this;
   }

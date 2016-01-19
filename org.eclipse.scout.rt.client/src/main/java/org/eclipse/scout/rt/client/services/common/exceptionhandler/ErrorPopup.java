@@ -28,7 +28,7 @@ import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.html.IHtmlContent;
 import org.eclipse.scout.rt.platform.util.StringUtility;
-import org.eclipse.scout.rt.platform.util.concurrent.InterruptedRuntimeException;
+import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedException;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.servicetunnel.HttpException;
 
@@ -114,7 +114,7 @@ public class ErrorPopup {
         createNetErrorMessage(msg);
         return;
       }
-      else if (t instanceof InterruptedRuntimeException || t instanceof java.lang.InterruptedException) {
+      else if (t instanceof ThreadInterruptedException || t instanceof java.lang.InterruptedException) {
         m_title = ScoutTexts.get("InterruptedErrorTitle");
         m_text = ScoutTexts.get("InterruptedErrorText");
         return;

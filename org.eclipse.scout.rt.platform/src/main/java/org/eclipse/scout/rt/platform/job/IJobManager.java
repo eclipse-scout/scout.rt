@@ -24,8 +24,8 @@ import org.eclipse.scout.rt.platform.job.filter.event.JobEventFilterBuilder;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
-import org.eclipse.scout.rt.platform.util.concurrent.InterruptedRuntimeException;
-import org.eclipse.scout.rt.platform.util.concurrent.TimeoutException;
+import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedException;
+import org.eclipse.scout.rt.platform.util.concurrent.TimedOutException;
 import org.eclipse.scout.rt.platform.visitor.CollectorVisitor;
 import org.eclipse.scout.rt.platform.visitor.IVisitor;
 
@@ -163,9 +163,9 @@ public interface IJobManager {
    *          the maximal time to wait.
    * @param unit
    *          unit of the given timeout.
-   * @throws InterruptedRuntimeException
+   * @throws ThreadInterruptedException
    *           if the current thread was interrupted while waiting.
-   * @throws TimeoutException
+   * @throws TimedOutException
    *           if the wait timed out.
    */
   void awaitDone(IFilter<IFuture<?>> filter, long timeout, TimeUnit unit);
@@ -182,9 +182,9 @@ public interface IJobManager {
    *          the maximal time to wait for the job to complete.
    * @param unit
    *          unit of the timeout.
-   * @throws InterruptedRuntimeException
+   * @throws ThreadInterruptedException
    *           if the current thread was interrupted while waiting.
-   * @throws TimeoutException
+   * @throws TimedOutException
    *           if the wait timed out.
    */
   void awaitFinished(IFilter<IFuture<?>> filter, long timeout, TimeUnit unit);

@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.platform.util;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
-import org.eclipse.scout.rt.platform.util.concurrent.InterruptedRuntimeException;
+import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,7 +30,7 @@ public final class SleepUtil {
   }
 
   /**
-   * Like {@link Thread#sleep(long)}, but does not throw {@link InterruptedRuntimeException} If interrupted.
+   * Like {@link Thread#sleep(long)}, but does not throw {@link ThreadInterruptedException} If interrupted.
    * <p>
    * If interrupted, the thread's interruption status is not cleared.
    *
@@ -75,7 +75,7 @@ public final class SleepUtil {
    *          the log message with support for <em>formatting anchors</em> in the form of {} pairs.
    * @param msgArgs
    *          optional arguments to substitute <em>formatting anchors</em> in the message.
-   * @throws InterruptedRuntimeException
+   * @throws ThreadInterruptedException
    *           if the sleeping thread is interrupted.
    */
   public static void sleepElseLog(final long time, final TimeUnit unit, final String msg, final Object... msgArgs) {
@@ -92,7 +92,7 @@ public final class SleepUtil {
   }
 
   /**
-   * Like {@link Thread#sleep(long)}, but throws Scout {@link InterruptedRuntimeException} If interrupted.
+   * Like {@link Thread#sleep(long)}, but throws Scout {@link ThreadInterruptedException} If interrupted.
    * <p>
    * If interrupted, the thread's interruption status is not cleared.
    *
@@ -100,7 +100,7 @@ public final class SleepUtil {
    *          the length of time to sleep.
    * @param unit
    *          unit of the timeout.
-   * @throws InterruptedRuntimeException
+   * @throws ThreadInterruptedException
    *           if the sleeping thread is interrupted.
    */
   public static void sleepElseThrow(final long time, final TimeUnit unit) {
@@ -108,7 +108,7 @@ public final class SleepUtil {
   }
 
   /**
-   * Like {@link Thread#sleep(long)}, but throws Scout {@link InterruptedRuntimeException} If interrupted.
+   * Like {@link Thread#sleep(long)}, but throws Scout {@link ThreadInterruptedException} If interrupted.
    * <p>
    * If interrupted, the thread's interruption status is not cleared.
    *
@@ -120,7 +120,7 @@ public final class SleepUtil {
    *          the exception message with support for <em>formatting anchors</em> in the form of {} pairs.
    * @param msgArgs
    *          optional arguments to substitute <em>formatting anchors</em> in the message.
-   * @throws InterruptedRuntimeException
+   * @throws ThreadInterruptedException
    *           if the sleeping thread is interrupted.
    */
   public static void sleepElseThrow(final long time, final TimeUnit unit, final String msg, final Object... msgArgs) {
@@ -132,7 +132,7 @@ public final class SleepUtil {
 
       final Object[] args = Arrays.copyOf(msgArgs, msgArgs.length + 1);
       args[args.length - 1] = e; // add the exception to the last index to be interpreted as cause
-      throw new InterruptedRuntimeException(msg, args);
+      throw new ThreadInterruptedException(msg, args);
     }
   }
 

@@ -20,7 +20,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
-import org.eclipse.scout.rt.platform.util.concurrent.TimeoutException;
+import org.eclipse.scout.rt.platform.util.concurrent.TimedOutException;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.platform.util.BlockingCountDownLatch;
 import org.junit.Test;
@@ -100,7 +100,7 @@ public class PeriodicJobMutexTest {
                   .withExecutionHint(JOB_IDENTIFIER))
                   .awaitDone(200, TimeUnit.MILLISECONDS);
             }
-            catch (TimeoutException e) {
+            catch (TimedOutException e) {
               protocol.add("timeout-because-mutex-owner");
             }
           }

@@ -20,10 +20,10 @@ import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
-import org.eclipse.scout.rt.platform.util.concurrent.CancellationRuntimeException;
+import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledException;
 import org.eclipse.scout.rt.platform.util.concurrent.ICancellable;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
-import org.eclipse.scout.rt.platform.util.concurrent.InterruptedRuntimeException;
+import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedException;
 import org.eclipse.scout.rt.shared.services.common.context.IRunMonitorCancelService;
 import org.eclipse.scout.rt.shared.servicetunnel.HttpException;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
@@ -106,7 +106,7 @@ public class RemoteServiceInvocationCallable implements Callable<ServiceTunnelRe
           final Object[] serviceArgs = new Object[]{m_serviceRequest.getRequestSequence()};
           m_tunnel.invokeService(IRunMonitorCancelService.class, serviceMethod, serviceArgs);
         }
-        catch (final CancellationRuntimeException | InterruptedRuntimeException e) {
+        catch (final FutureCancelledException | ThreadInterruptedException e) {
           // NOOP: Do not cancel 'cancel-request' to prevent loop.
         }
         catch (RuntimeException | NoSuchMethodException e) {

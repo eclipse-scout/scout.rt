@@ -33,7 +33,7 @@ import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.NumberUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
-import org.eclipse.scout.rt.platform.util.concurrent.InterruptedRuntimeException;
+import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedException;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.server.jaxws.implementor.JaxWsImplementorSpecifics;
@@ -350,7 +350,7 @@ public class InvocationContext<PORT> {
       try {
         future.awaitDone(); // wait until completed or interrupted.
       }
-      catch (final InterruptedRuntimeException e) {
+      catch (final ThreadInterruptedException e) {
         future.cancel(true); // ensure the job to be cancelled once this thread is interrupted.
       }
 

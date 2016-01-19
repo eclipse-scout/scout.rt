@@ -30,7 +30,7 @@ import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
-import org.eclipse.scout.rt.platform.util.concurrent.InterruptedRuntimeException;
+import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedException;
 import org.eclipse.scout.rt.shared.services.common.ping.IPingService;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelUtility;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
@@ -90,7 +90,7 @@ public class ClientJobCancelTest {
       doPingRequestAsync("abc").cancel();
       fail("interruption expected");
     }
-    catch (InterruptedRuntimeException e) {
+    catch (ThreadInterruptedException e) {
       // NOOP
     }
   }

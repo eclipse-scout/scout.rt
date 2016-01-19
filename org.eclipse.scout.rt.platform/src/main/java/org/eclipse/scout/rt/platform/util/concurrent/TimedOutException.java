@@ -11,27 +11,26 @@
 package org.eclipse.scout.rt.platform.util.concurrent;
 
 import org.eclipse.scout.rt.platform.exception.PlatformException;
-import org.eclipse.scout.rt.platform.job.IFuture;
 
 /**
- * Indicates that the result of a job cannot be retrieved, or the {@link IFuture}'s completion not be awaited because
- * the job was cancelled.
+ * Indicates that the maximal wait time elapsed while waiting for some condition to become <code>true</code>, e.g. while
+ * waiting a job to complete.
  *
  * @since 5.2
  */
-public class CancellationRuntimeException extends PlatformException {
+public class TimedOutException extends PlatformException {
 
   private static final long serialVersionUID = 1L;
 
   /**
    * See constructor of {@link PlatformException}
    */
-  public CancellationRuntimeException(final String message, final Object... args) {
+  public TimedOutException(final String message, final Object... args) {
     super(message, args);
   }
 
   @Override
-  public CancellationRuntimeException withContextInfo(final String name, final Object value, final Object... valueArgs) {
+  public TimedOutException withContextInfo(final String name, final Object value, final Object... valueArgs) {
     super.withContextInfo(name, value, valueArgs);
     return this;
   }

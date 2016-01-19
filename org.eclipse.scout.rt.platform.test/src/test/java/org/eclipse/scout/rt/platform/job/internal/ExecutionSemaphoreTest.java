@@ -23,7 +23,7 @@ import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.SleepUtil;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
-import org.eclipse.scout.rt.platform.util.concurrent.TimeoutException;
+import org.eclipse.scout.rt.platform.util.concurrent.TimedOutException;
 import org.eclipse.scout.rt.testing.platform.job.JobTestUtil;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.platform.runner.Times;
@@ -432,7 +432,7 @@ public class ExecutionSemaphoreTest {
       Jobs.getJobManager().awaitDone(job2Filter, 1, TimeUnit.SECONDS);
       fail("timeout expected because no permit available");
     }
-    catch (TimeoutException e) {
+    catch (TimedOutException e) {
       // NOOP
     }
 
@@ -710,7 +710,7 @@ public class ExecutionSemaphoreTest {
     try {
       future1.awaitDoneAndGet(5, TimeUnit.SECONDS);
     }
-    catch (TimeoutException e) {
+    catch (TimedOutException e) {
       fail(String.format("Deadlock while passing permit from 'job-2' to 'job-1' [job-1-state=%s, job-2-state=%s", future1.getState(), future2Ref.get().getState()));
     }
   }

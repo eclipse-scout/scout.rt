@@ -37,7 +37,7 @@ import org.eclipse.scout.rt.platform.holders.Holder;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
-import org.eclipse.scout.rt.platform.util.concurrent.TimeoutException;
+import org.eclipse.scout.rt.platform.util.concurrent.TimedOutException;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.platform.util.BlockingCountDownLatch;
 import org.junit.Test;
@@ -499,7 +499,7 @@ public class JobScheduleTest {
       assertEquals("job-2", future2.awaitDoneAndGet(2, TimeUnit.SECONDS));
       fail("TimeoutException expected");
     }
-    catch (TimeoutException e) {
+    catch (TimedOutException e) {
       // NOOP
     }
 

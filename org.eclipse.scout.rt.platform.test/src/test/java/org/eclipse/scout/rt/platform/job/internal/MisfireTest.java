@@ -15,7 +15,7 @@ import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.SleepUtil;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
-import org.eclipse.scout.rt.platform.util.concurrent.TimeoutException;
+import org.eclipse.scout.rt.platform.util.concurrent.TimedOutException;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.platform.runner.Times;
 import org.junit.Test;
@@ -60,7 +60,7 @@ public class MisfireTest {
     try {
       future.awaitDone(10, TimeUnit.SECONDS);
     }
-    catch (TimeoutException e) {
+    catch (TimedOutException e) {
       future.cancel(true);
       fail("Job is hanging because no last round scheduled upon misfire with end-time arrived");
     }

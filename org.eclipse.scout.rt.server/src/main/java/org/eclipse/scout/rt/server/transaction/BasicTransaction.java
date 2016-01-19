@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.scout.rt.platform.Bean;
-import org.eclipse.scout.rt.platform.util.concurrent.CancellationRuntimeException;
+import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,7 +51,7 @@ public class BasicTransaction implements ITransaction {
       m_memberMap.put(memberId, member);
       //throw AFTER registering the resource in order to correctly release it later-on, bug 383736.
       if (m_cancelled) {
-        throw new CancellationRuntimeException("Transaction cancelled");
+        throw new FutureCancelledException("Transaction cancelled");
       }
     }
   }
@@ -100,7 +100,7 @@ public class BasicTransaction implements ITransaction {
   public boolean commitPhase1() {
     synchronized (m_memberMapLock) {
       if (m_cancelled) {
-        throw new CancellationRuntimeException("Transaction cancelled");
+        throw new FutureCancelledException("Transaction cancelled");
       }
       m_commitPhase = true;
     }
@@ -201,7 +201,7 @@ public class BasicTransaction implements ITransaction {
         return true;
       }
       m_cancelled = true;
-      addFailure(new CancellationRuntimeException("Transaction cancelled"));
+      addFailure(new FutureCancelledException("Transaction cancelled"));
     }
     for (ITransactionMember mem : getMembers()) {
       try {

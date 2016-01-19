@@ -53,8 +53,8 @@ import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.SleepUtil;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
-import org.eclipse.scout.rt.platform.util.concurrent.InterruptedRuntimeException;
-import org.eclipse.scout.rt.platform.util.concurrent.TimeoutException;
+import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedException;
+import org.eclipse.scout.rt.platform.util.concurrent.TimedOutException;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.testing.platform.job.JobTestUtil;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
@@ -191,7 +191,7 @@ public class MutualExclusionTest {
           bc.waitFor(1, TimeUnit.SECONDS);
           fail("timeout expected");
         }
-        catch (TimeoutException e) {
+        catch (TimedOutException e) {
           assertTrue(IFuture.CURRENT.get().getExecutionSemaphore().isPermitOwner(IFuture.CURRENT.get()));
 
           try {
@@ -207,7 +207,7 @@ public class MutualExclusionTest {
                 .awaitDone(1, TimeUnit.SECONDS);
             fail("AssertionException expected, because the current job is the mutex owner");
           }
-          catch (TimeoutException e1) {
+          catch (TimedOutException e1) {
             fail("no timeout expected");
           }
           catch (AssertionException e1) {
@@ -505,7 +505,7 @@ public class MutualExclusionTest {
         try {
           condition.waitFor();
         }
-        catch (InterruptedRuntimeException e) {
+        catch (ThreadInterruptedException e) {
           protocol.add("interrupted-1 (a)");
           if (Thread.interrupted()) {
             protocol.add("interrupted-1 (b)");
@@ -584,7 +584,7 @@ public class MutualExclusionTest {
           protocol.add("before-blocking-1");
           condition.waitFor();
         }
-        catch (InterruptedRuntimeException e) {
+        catch (ThreadInterruptedException e) {
           protocol.add("interrupted-1 (a)");
         }
         catch (RuntimeException e) {
@@ -912,7 +912,7 @@ public class MutualExclusionTest {
         // job-4 and job-5 are pending
         fail("timeout expected");
       }
-      catch (TimeoutException e) {
+      catch (TimedOutException e) {
         // NOOP
       }
       assertFalse(Jobs.getJobManager().isDone(Jobs.newFutureFilterBuilder().andMatchExecutionHint(JOB_IDENTIFIER).toFilter())); // job-4 and job-5 are pending

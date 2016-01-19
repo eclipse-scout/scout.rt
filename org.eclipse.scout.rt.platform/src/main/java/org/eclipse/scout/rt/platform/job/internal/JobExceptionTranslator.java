@@ -21,9 +21,9 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.IExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.security.SecurityUtility;
-import org.eclipse.scout.rt.platform.util.concurrent.CancellationRuntimeException;
-import org.eclipse.scout.rt.platform.util.concurrent.InterruptedRuntimeException;
-import org.eclipse.scout.rt.platform.util.concurrent.TimeoutException;
+import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledException;
+import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedException;
+import org.eclipse.scout.rt.platform.util.concurrent.TimedOutException;
 
 /**
  * Translates exceptions origin from 'Java Executor Framework' into exceptions of Scout Job API.
@@ -36,24 +36,24 @@ import org.eclipse.scout.rt.platform.util.concurrent.TimeoutException;
 public class JobExceptionTranslator {
 
   /**
-   * Translates {@link java.util.concurrent.CancellationException} into {@link InterruptedRuntimeException}.
+   * Translates {@link java.util.concurrent.CancellationException} into {@link ThreadInterruptedException}.
    */
-  protected CancellationRuntimeException translateCancellationException(final java.util.concurrent.CancellationException e, final String message) {
-    return decorate(new CancellationRuntimeException(message, e));
+  protected FutureCancelledException translateCancellationException(final java.util.concurrent.CancellationException e, final String message) {
+    return decorate(new FutureCancelledException(message, e));
   }
 
   /**
-   * Translates {@link java.lang.InterruptedException} into {@link InterruptedRuntimeException}.
+   * Translates {@link java.lang.InterruptedException} into {@link ThreadInterruptedException}.
    */
-  protected InterruptedRuntimeException translateInterruptedException(final java.lang.InterruptedException e, final String message) {
-    return decorate(new InterruptedRuntimeException(message, e));
+  protected ThreadInterruptedException translateInterruptedException(final java.lang.InterruptedException e, final String message) {
+    return decorate(new ThreadInterruptedException(message, e));
   }
 
   /**
-   * Translates {@link java.util.concurrent.TimeoutException} into {@link TimeoutException}.
+   * Translates {@link java.util.concurrent.TimeoutException} into {@link TimedOutException}.
    */
-  protected TimeoutException translateTimeoutException(final java.util.concurrent.TimeoutException e, final String message, final long timeout, final TimeUnit unit) {
-    return decorate(new TimeoutException(message, e).withContextInfo("timeout", "{}ms", unit.toMillis(timeout)));
+  protected TimedOutException translateTimeoutException(final java.util.concurrent.TimeoutException e, final String message, final long timeout, final TimeUnit unit) {
+    return decorate(new TimedOutException(message, e).withContextInfo("timeout", "{}ms", unit.toMillis(timeout)));
   }
 
   /**

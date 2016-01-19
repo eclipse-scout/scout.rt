@@ -4,7 +4,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.util.concurrent.ExecutionException;
 
-import org.eclipse.scout.rt.platform.util.concurrent.CancellationRuntimeException;
+import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledException;
 
 /**
  * Exception handler to return the {@link Throwable} as given.
@@ -13,7 +13,7 @@ import org.eclipse.scout.rt.platform.util.concurrent.CancellationRuntimeExceptio
  * {@link ExecutionException}, that exception is returned as given without unwrapping its cause.
  * <p>
  * For instance, this translator can be used if working with the Job API, e.g. to distinguish between a
- * {@link CancellationRuntimeException} thrown by the job's runnable, or because the job was effectively cancelled.
+ * {@link FutureCancelledException} thrown by the job's runnable, or because the job was effectively cancelled.
  *
  * @since 5.2
  */

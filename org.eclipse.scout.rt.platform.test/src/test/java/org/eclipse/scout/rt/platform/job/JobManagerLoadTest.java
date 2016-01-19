@@ -10,7 +10,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
-import org.eclipse.scout.rt.platform.util.concurrent.TimeoutException;
+import org.eclipse.scout.rt.platform.util.concurrent.TimedOutException;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -44,7 +44,7 @@ public class JobManagerLoadTest {
       Jobs.getJobManager().awaitDone(filter, 10, TimeUnit.SECONDS);
       assertEquals(JOB_COUNT, counter.get());
     }
-    catch (TimeoutException e) {
+    catch (TimedOutException e) {
       Jobs.getJobManager().cancel(filter, true);
       fail("Scheduling 50'000 jobs took longer than 10s");
     }
@@ -76,7 +76,7 @@ public class JobManagerLoadTest {
       Jobs.getJobManager().awaitDone(filter, 10, TimeUnit.SECONDS);
       assertEquals(JOB_COUNT, counter.get());
     }
-    catch (TimeoutException e) {
+    catch (TimedOutException e) {
       Jobs.getJobManager().cancel(filter, true);
       fail("Scheduling 50'000 took longer than 10s");
     }

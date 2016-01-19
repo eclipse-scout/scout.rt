@@ -18,10 +18,10 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.rt.platform.context.RunContexts;
-import org.eclipse.scout.rt.platform.util.concurrent.CancellationRuntimeException;
+import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledException;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
-import org.eclipse.scout.rt.platform.util.concurrent.InterruptedRuntimeException;
-import org.eclipse.scout.rt.platform.util.concurrent.TimeoutException;
+import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedException;
+import org.eclipse.scout.rt.platform.util.concurrent.TimedOutException;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.platform.util.BlockingCountDownLatch;
 import org.junit.Test;
@@ -55,7 +55,7 @@ public class FutureAwaitTest {
           future.awaitDone();
           fail("interruption expected");
         }
-        catch (InterruptedRuntimeException e) {
+        catch (ThreadInterruptedException e) {
           assertTrue(Thread.currentThread().isInterrupted());
         }
       }
@@ -91,7 +91,7 @@ public class FutureAwaitTest {
       future.awaitDoneAndGet();
       fail("cancellation expected");
     }
-    catch (CancellationRuntimeException e) {
+    catch (FutureCancelledException e) {
       // NOOP
     }
   }
@@ -153,7 +153,7 @@ public class FutureAwaitTest {
           future.awaitDone(10, TimeUnit.SECONDS);
           fail("interruption expected");
         }
-        catch (InterruptedRuntimeException e) {
+        catch (ThreadInterruptedException e) {
           assertTrue(Thread.currentThread().isInterrupted());
         }
       }
@@ -210,7 +210,7 @@ public class FutureAwaitTest {
       future.awaitDone(5, TimeUnit.MILLISECONDS);
       fail("timeout expected");
     }
-    catch (TimeoutException e) {
+    catch (TimedOutException e) {
       // NOOP
     }
     setupLatch.unblock();
@@ -268,7 +268,7 @@ public class FutureAwaitTest {
           future.awaitDoneAndGet();
           fail("interruption expected");
         }
-        catch (InterruptedRuntimeException e) {
+        catch (ThreadInterruptedException e) {
           assertTrue(Thread.currentThread().isInterrupted());
         }
       }
@@ -302,7 +302,7 @@ public class FutureAwaitTest {
       future.awaitDoneAndGet();
       fail("cancellation expected");
     }
-    catch (CancellationRuntimeException e) {
+    catch (FutureCancelledException e) {
       assertTrue(future.isCancelled());
     }
     setupLatch.unblock();
@@ -357,7 +357,7 @@ public class FutureAwaitTest {
           future.awaitDoneAndGet(10, TimeUnit.SECONDS);
           fail("interruption expected");
         }
-        catch (InterruptedRuntimeException e) {
+        catch (ThreadInterruptedException e) {
           assertTrue(Thread.currentThread().isInterrupted());
         }
       }
@@ -391,7 +391,7 @@ public class FutureAwaitTest {
       future.awaitDoneAndGet(10, TimeUnit.SECONDS);
       fail("cancellation expected");
     }
-    catch (CancellationRuntimeException e) {
+    catch (FutureCancelledException e) {
       assertTrue(future.isCancelled());
     }
 
@@ -417,7 +417,7 @@ public class FutureAwaitTest {
       future.awaitDoneAndGet(10, TimeUnit.SECONDS);
       fail("execution exception expected");
     }
-    catch (TimeoutException e) {
+    catch (TimedOutException e) {
       fail("execution exception expected");
     }
     catch (RuntimeException e) {
@@ -448,7 +448,7 @@ public class FutureAwaitTest {
       future.awaitDoneAndGet(5, TimeUnit.MILLISECONDS);
       fail("timeout expected");
     }
-    catch (TimeoutException e) {
+    catch (TimedOutException e) {
       // NOOP
     }
 
@@ -486,7 +486,7 @@ public class FutureAwaitTest {
               .toFilter(), 10, TimeUnit.SECONDS);
           fail("interruption expected");
         }
-        catch (InterruptedRuntimeException e) {
+        catch (ThreadInterruptedException e) {
           assertTrue(Thread.currentThread().isInterrupted());
         }
       }
@@ -548,7 +548,7 @@ public class FutureAwaitTest {
           .toFilter(), 1, TimeUnit.MILLISECONDS);
       fail("timeout expected");
     }
-    catch (TimeoutException e) {
+    catch (TimedOutException e) {
       // NOOP
     }
 
@@ -594,7 +594,7 @@ public class FutureAwaitTest {
           condition.waitFor();
           fail("interruption expected");
         }
-        catch (InterruptedRuntimeException e) {
+        catch (ThreadInterruptedException e) {
           assertTrue(Thread.currentThread().isInterrupted());
         }
       }
@@ -611,7 +611,7 @@ public class FutureAwaitTest {
       condition.waitFor(1, TimeUnit.NANOSECONDS);
       fail("timeout expected");
     }
-    catch (TimeoutException e) {
+    catch (TimedOutException e) {
       // NOOP
     }
   }
