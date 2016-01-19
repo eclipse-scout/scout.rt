@@ -730,14 +730,23 @@ scout.Planner.prototype._onResizeMousedown = function(event) {
 };
 
 scout.Planner.prototype._onCellMousemove = function(event) {
-  this.lastRow = this._findRow(event.pageY);
-  this.lastRange = this._findScale(event.pageX);
+  var lastRow = this._findRow(event.pageY);
+  if (lastRow) {
+    this.lastRow = lastRow;
+  }
+  var lastRange = this._findScale(event.pageX);
+  if (lastRange) {
+    this.lastRange = lastRange;
+  }
 
   this._select(true);
 };
 
 scout.Planner.prototype._onResizeMousemove = function(event) {
-  this.lastRange = this._findScale(event.pageX);
+  var lastRange = this._findScale(event.pageX);
+  if (lastRange) {
+    this.lastRange = lastRange;
+  }
 
   this._select(true);
 };
