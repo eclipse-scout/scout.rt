@@ -65,7 +65,13 @@ public class DisplayParentResolver {
       while (currentForm.getOuterForm() != null) {
         currentForm = currentForm.getOuterForm();
       }
-      return currentForm;
+      // Forms that are not showing on the desktop must not be used as display parent, because
+      // everything that is attached to them would not be visible as well. This might lead to
+      // blocking conditions that will never be released (e.g. when a message box is opened with
+      // a form as display parent that is not showing).
+      if (currentForm.isShowing()) {
+        return currentForm;
+      }
     }
 
     // Check whether an Outline is currently the 'displayParent'.
