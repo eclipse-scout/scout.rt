@@ -69,7 +69,7 @@ public class TransactionProcessorTest {
       public ITransaction produce(IBean<ITransaction> bean) {
         return m_transaction;
       }
-    }), new BeanMetaData(ITransactionCommitProtocol.class).withOrder(Long.MAX_VALUE));
+    }));
 
     // mock the transaction
     // ITransaction.commitPhase1

@@ -54,9 +54,9 @@ public class TunnelToServerTest {
   public void testReplace1WithoutTunnelAnnotation() {
     m_beanManager.registerBean(new BeanMetaData(IFixtureTunnelToServer.class).withApplicationScoped(true));
     m_beanManager.registerBean(new BeanMetaData(IFixtureTunnelToServerEx1.class).withApplicationScoped(true));
-    IBean<IFixtureTunnelToServer> bean = m_beanManager.getBean(IFixtureTunnelToServer.class);
+    IBean<IFixtureTunnelToServerEx1> bean = m_beanManager.getBean(IFixtureTunnelToServerEx1.class);
     Assert.assertNotNull(bean);
-    IFixtureTunnelToServer obj = bean.getInstance();
+    IFixtureTunnelToServerEx1 obj = bean.getInstance();
     Assert.assertNull(obj);
   }
 
@@ -70,13 +70,12 @@ public class TunnelToServerTest {
     Assert.assertNotNull(bean);
     IFixtureTunnelToServer obj = bean.getInstance();
     Assert.assertNotNull(obj);
-    Assert.assertEquals("return IFixtureTunnelToServerEx2#ping", obj.ping());
+    Assert.assertEquals("return IFixtureTunnelToServer#ping", obj.ping());
 
     IBean<IFixtureTunnelToServerEx1> bean1 = m_beanManager.getBean(IFixtureTunnelToServerEx1.class);
     Assert.assertNotNull(bean1);
     IFixtureTunnelToServerEx1 obj1 = bean1.getInstance();
-    Assert.assertNotNull(obj1);
-    Assert.assertEquals("return IFixtureTunnelToServerEx2#ping", obj1.ping());
+    Assert.assertNull(obj1);
 
     IBean<IFixtureTunnelToServerEx2> bean2 = m_beanManager.getBean(IFixtureTunnelToServerEx2.class);
     Assert.assertNotNull(bean2);
@@ -105,13 +104,11 @@ public class TunnelToServerTest {
     String ping();
   }
 
-  @Replace
   //not set, annotations do not inherit on interfaces @TunnelToServer
   private static interface IFixtureTunnelToServerEx1 extends IFixtureTunnelToServer, IService {
     String ping1();
   }
 
-  @Replace
   @TunnelToServer
   private static interface IFixtureTunnelToServerEx2 extends IFixtureTunnelToServerEx1, IService {
     String ping3();

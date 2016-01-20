@@ -80,13 +80,13 @@ public class RegisterTunnelToServerPlatformListenerTest {
   @Test
   public void testReplaceEx1() {
     registerTunnelToServerBeans(IFixtureTunnelToServer.class, IFixtureTunnelToServerEx1.class);
-    assertPing("return IFixtureTunnelToServerEx1#ping", IFixtureTunnelToServer.class, IFixtureTunnelToServerEx1.class);
+    assertPing("return IFixtureTunnelToServerEx1#ping", IFixtureTunnelToServerEx1.class);
   }
 
   @Test
   public void testReplaceEx1ReverseOrderRegistration() {
     registerTunnelToServerBeans(IFixtureTunnelToServerEx1.class, IFixtureTunnelToServer.class);
-    assertPing("return IFixtureTunnelToServerEx1#ping", IFixtureTunnelToServer.class, IFixtureTunnelToServerEx1.class);
+    assertPing("return IFixtureTunnelToServerEx1#ping", IFixtureTunnelToServerEx1.class);
   }
 
   @Test
@@ -126,7 +126,7 @@ public class RegisterTunnelToServerPlatformListenerTest {
   }
 
   private void assertReplaceEx2() {
-    assertPing("return IFixtureTunnelToServerEx2#ping", IFixtureTunnelToServer.class, IFixtureTunnelToServerEx1.class, IFixtureTunnelToServerEx2.class);
+    assertPing("return IFixtureTunnelToServerEx2#ping", IFixtureTunnelToServerEx2.class);
   }
 
   private void registerTunnelToServerBeans(Class<?>... classes) {
@@ -168,12 +168,10 @@ public class RegisterTunnelToServerPlatformListenerTest {
     String ping();
   }
 
-  @Replace
   @TunnelToServer
   public static interface IFixtureTunnelToServerEx1 extends IFixtureTunnelToServer {
   }
 
-  @Replace
   @TunnelToServer
   public static interface IFixtureTunnelToServerEx2 extends IFixtureTunnelToServerEx1 {
   }

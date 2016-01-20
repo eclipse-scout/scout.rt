@@ -26,11 +26,15 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.Replace;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class is not thread safe
  */
 public class BeanHierarchy<T> {
+
+  private static final Logger LOG = LoggerFactory.getLogger(BeanHierarchy.class);
 
   private final Class<T> m_clazz;
   private final Set<IBean<T>> m_beans;
@@ -97,7 +101,6 @@ public class BeanHierarchy<T> {
 
   @SuppressWarnings("unchecked")
   protected List<IBean<T>> query(boolean querySingle) {
-
     boolean isInitialized = false;
     m_queryCacheLock.readLock().lock();
     try {
@@ -113,6 +116,7 @@ public class BeanHierarchy<T> {
         List<IBean<T>> list = new ArrayList<>(m_beans);
         //sort by Order ascending
         Collections.sort(list, ORDER_COMPARATOR);
+
         //remove duplicate classes
         Class<?> lastSeen = null;
         for (Iterator<IBean<T>> it = list.iterator(); it.hasNext();) {
@@ -129,17 +133,18 @@ public class BeanHierarchy<T> {
           if (bean.getBeanAnnotation(Replace.class) != null) {
             Class<?> superClazz = null;
             if (bean.getBeanClazz().isInterface()) {
-              //interface replaces interfaces, only replace FIRST declared interface
-              Class[] ifs = bean.getBeanClazz().getInterfaces();
-              if (ifs != null && ifs.length > 0) {
-                superClazz = ifs[0];
-              }
+              throw new IllegalArgumentException('@' + Replace.class.getSimpleName() + " annotation not supported on interface: " + bean + '.');
             }
             else {
               //class replaces class
               Class<?> s = bean.getBeanClazz().getSuperclass();
-              if (s != null && !s.isInterface() && !Modifier.isAbstract(s.getModifiers())) {
-                superClazz = s;
+              if (s != null) {
+                if (Modifier.isAbstract(s.getModifiers())) {
+                  LOG.warn("Cannot replace an abstract super class: {}. Delete this @{} annotation.", bean, Replace.class.getSimpleName());
+                }
+                else {
+                  superClazz = s;
+                }
               }
             }
             if (superClazz != null) {
@@ -162,37 +167,42 @@ public class BeanHierarchy<T> {
           }
         }
 
-        m_all = Collections.unmodifiableList(new ArrayList<IBean<T>>(list));
+        if (list.isEmpty()) {
+          m_all = Collections.emptyList();
+          m_single = Collections.emptyList();
+        }
+        else {
+          m_all = Collections.unmodifiableList(new ArrayList<IBean<T>>(list));
 
-        //now retain only beans that are exactly of type refClazz, but only if refClass is not an interface
-        if (!refClazz.isInterface()) {
-          for (Iterator<IBean<T>> it = list.iterator(); it.hasNext();) {
-            IBean<T> bean = it.next();
-            if (bean.getBeanClazz().isInterface()) {
-              continue;
+          IBean<T> exactBean = getExactBean(list, refClazz);
+          if (exactBean != null) {
+            // we have an exact match: use it
+            m_single = Collections.singletonList(exactBean);
+          }
+          else if (!refClazz.isInterface() && !Modifier.isAbstract(refClazz.getModifiers())) {
+            // we queried an specific class (no interface, no abstract class): only exact beans are allowed but we don't have one.
+            m_single = Collections.emptyList();
+          }
+          else if (list.size() == 1) {
+            m_single = Collections.singletonList(list.get(0));
+          }
+          else {
+            //only retain lowest order and if lowest order is same for multiple beans, keep them all, provocating a multiple instance exception on querySingle
+            List<IBean<T>> lowestOrderBeans = new ArrayList<>(list.size());
+            Iterator<IBean<T>> iterator = list.iterator();
+
+            // first bean
+            IBean<T> curBean = iterator.next();
+            double lowestOrder = orderOf(curBean);
+            lowestOrderBeans.add(curBean);
+
+            // all others having the same order
+            while (iterator.hasNext() && orderOf(curBean = iterator.next()) == lowestOrder) {
+              lowestOrderBeans.add(curBean);
             }
-            if (bean.getBeanClazz() == refClazz) {
-              continue;
-            }
-            it.remove();
+            m_single = Collections.unmodifiableList(new ArrayList<IBean<T>>(lowestOrderBeans));
           }
         }
-        //only retain lowest order and if lowest order is same for multiple beans, keep them all, provocating a multiple instance exception on getBean()
-        if (list.size() > 1) {
-          Double lowestOrder = null;
-          for (Iterator<IBean<T>> it = list.iterator(); it.hasNext();) {
-            IBean<T> bean = it.next();
-            if (lowestOrder == null || orderOf(bean) == lowestOrder.doubleValue()) {
-              //keep it
-              if (lowestOrder == null) {
-                lowestOrder = orderOf(bean);
-              }
-              continue;
-            }
-            it.remove();
-          }
-        }
-        m_single = Collections.unmodifiableList(new ArrayList<IBean<T>>(list));
       }
       finally {
         m_queryCacheLock.writeLock().unlock();
@@ -203,6 +213,15 @@ public class BeanHierarchy<T> {
       return m_single;
     }
     return m_all;
+  }
+
+  protected static <T> IBean<T> getExactBean(List<IBean<T>> list, Class<?> c) {
+    for (IBean<T> bean : list) {
+      if (bean.getBeanClazz() == c) {
+        return bean;
+      }
+    }
+    return null; // no exact match found
   }
 
   private static final Comparator<IBean<?>> ORDER_COMPARATOR = new Comparator<IBean<?>>() {

@@ -33,6 +33,8 @@ public class BEANSTest {
   private IBean<?> m_ref1;
   private IBean<?> m_ref2;
   private IBean<?> m_ref3;
+  private IBean<?> m_ref4;
+  private IBean<?> m_ref5;
 
   /**
    * Registers test services with different rankings.
@@ -42,9 +44,11 @@ public class BEANSTest {
     m_ref1 = registerBean(TestService1.class, 2);
     m_ref2 = registerBean(TestService2.class, 1);
     m_ref3 = registerBean(TestService3.class, 0);
+    m_ref4 = registerBean(Service1BelowAbstractTestService.class, -3);
+    m_ref5 = registerBean(Service2BelowAbstractTestService.class, -2);
   }
 
-  private IBean<?> registerBean(Class<? extends ITestService> serviceClazz, double order) {
+  private IBean<?> registerBean(Class<?> serviceClazz, double order) {
     BeanMetaData bean = new BeanMetaData(serviceClazz);
     bean.withAnnotation(AnnotationFactory.createOrder(order));
     return Platform.get().getBeanManager().registerBean(bean);
@@ -58,6 +62,8 @@ public class BEANSTest {
     Platform.get().getBeanManager().unregisterBean(m_ref1);
     Platform.get().getBeanManager().unregisterBean(m_ref2);
     Platform.get().getBeanManager().unregisterBean(m_ref3);
+    Platform.get().getBeanManager().unregisterBean(m_ref4);
+    Platform.get().getBeanManager().unregisterBean(m_ref5);
   }
 
   /**
@@ -99,6 +105,15 @@ public class BEANSTest {
     assertEquals("No services should be found. ", 0, services.size());
   }
 
+  @Test
+  public void testAbstractService() {
+    List<AbstractTestService> all = BEANS.all(AbstractTestService.class);
+    assertEquals(2, all.size());
+    assertEquals(Service1BelowAbstractTestService.class, all.get(0).getClass());
+    assertEquals(Service2BelowAbstractTestService.class, all.get(1).getClass());
+    assertEquals(Service1BelowAbstractTestService.class, BEANS.get(AbstractTestService.class).getClass());
+  }
+
   /* Test data*/
 
   /**
@@ -138,4 +153,12 @@ public class BEANSTest {
   public class TestService implements ITestService2 {
   }
 
+  private static abstract class AbstractTestService {
+  }
+
+  private static class Service1BelowAbstractTestService extends AbstractTestService {
+  }
+
+  private static class Service2BelowAbstractTestService extends AbstractTestService {
+  }
 }
