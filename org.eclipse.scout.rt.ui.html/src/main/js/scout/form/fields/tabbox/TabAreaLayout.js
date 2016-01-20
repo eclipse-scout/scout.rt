@@ -35,16 +35,22 @@ scout.TabAreaLayout.prototype.layout = function($container) {
   if (clientWidth < scrollWidth) {
 
     // determine visible range (at least selected tab must be visible)
-    var i, tabItem,
-      numTabs = this._tabBox.tabItems.length,
-      selectedTab = this._tabBox.selectedTab,
-      tabBounds = [],
-      visibleTabs = [];
-    for (i = 0; i < numTabs; i++) {
-      tabItem = this._tabBox.tabItems[i];
-      bounds = scout.graphics.bounds(tabItem.$tabContainer, true, true);
-      tabBounds.push(bounds);
+    var i, tab, numTabs,
+      tabs = [], // tabs that are visible by model
+      tabBounds = [], // bounds of visible tabs
+      visibleTabs = [], // tabs that are visible by model and visible in the UI (= not in overflow)
+      selectedTab = this._tabBox.selectedTab;
+
+    // reduce list to tab-items that are visible by model
+    for (i = 0; i < this._tabBox.tabItems.length; i++) {
+      tab = this._tabBox.tabItems[i];
+      if (tab.visible) {
+        bounds = scout.graphics.bounds(tab.$tabContainer, true, true);
+        tabs.push(tab);
+        tabBounds.push(bounds);
+      }
     }
+    numTabs = tabs.length;
 
     // if we have too few space to even display the selected tab, only render the selected tab
     visibleTabs.push(selectedTab);
@@ -85,11 +91,11 @@ scout.TabAreaLayout.prototype.layout = function($container) {
 
     // remove all tabs which aren't visible
     for (i = 0; i < numTabs; i++) {
-      tabItem = this._tabBox.tabItems[i];
+      tab = tabs[i];
       if (visibleTabs.indexOf(i) === -1) {
-        $.log.debug('Overflow tabItem=' + tabItem);
-        this._overflowTabs.push(tabItem);
-        tabItem.removeTab();
+        $.log.debug('Overflow tab=' + tab);
+        this._overflowTabs.push(tab);
+        tab.removeTab();
       }
     }
   }
