@@ -361,7 +361,7 @@ scout.Outline.prototype._syncDefaultDetailForm = function(defaultDetailForm) {
 };
 
 scout.Outline.prototype._showDefaultDetailForm = function() {
-  if (this.defaultDetailForm) {
+  if (this.defaultDetailForm && this.session.desktop.outline === this) {
     this.session.desktop.setOutlineContent(this.defaultDetailForm, true);
   }
 };
