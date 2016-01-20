@@ -40,6 +40,15 @@ public class AbstractBeanField<VALUE> extends AbstractValueField<VALUE> implemen
     return m_uiFacade;
   }
 
+  @Override
+  protected String execFormatValue(VALUE value) {
+    // Bean fields should not have a display text by default, because it cannot be generated automatically
+    // from the value bean. To suppress the default Object.toString() result, we return "" here. However,
+    // subclasses may define their own bean formatting by overriding this method (although it will
+    // probably be of no use).
+    return "";
+  }
+
   /**
    * Called when an app link has been clicked.
    * <p>

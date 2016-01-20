@@ -158,7 +158,9 @@
       "dialogs": [],
       "views": [],
       "messageBoxes": [],
-      "fileChoosers": []
+      "fileChoosers": [],
+      "closable": true,
+      "cacheBounds": false
     },
     "Tree": {
       "autoCheckChildren": false,
@@ -248,6 +250,7 @@
       "TreeField": null,
       "TreeBox": null,
       "ValueField": {
+        "BeanField": null,
         "CheckBoxField": null,
         "CalendarField": null,
         "DateField": null,
