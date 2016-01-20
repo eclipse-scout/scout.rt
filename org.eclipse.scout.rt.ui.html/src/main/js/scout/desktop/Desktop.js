@@ -35,7 +35,7 @@ scout.Desktop = function() {
   this.messageBoxController;
   this.fileChooserController;
   this.benchVisible = true;
-  this.suppressSetActiveForm = false;
+  this.initialFormRendering = false;
 };
 scout.inherits(scout.Desktop, scout.BaseDesktop);
 
@@ -183,10 +183,10 @@ scout.Desktop.prototype._postRender = function() {
   this.session.keyStrokeManager.uninstallKeyStrokeContext(this.keyStrokeContext);
 
   // Render attached forms, message boxes and file choosers.
-  this.formController.render(true);
+  this.initialFormRendering = true;
+  this.formController.render();
   this.messageBoxController.render();
   this.fileChooserController.render();
-
   // Align a potential open popup to its respective tool button.
   this.actions
     .filter(function(action) {
@@ -199,7 +199,6 @@ scout.Desktop.prototype._postRender = function() {
 
   //find active form and set selected.
   var selectable;
-  this.suppressSetActiveForm = true;
   if (this.activeForm) {
     var form = this.session.getModelAdapter(this.activeForm);
     if (form.isDialog()) {
@@ -214,7 +213,7 @@ scout.Desktop.prototype._postRender = function() {
   } else {
     this.viewTabsController.selectViewTab(this.viewTabsController.viewTab(selectable));
   }
-  this.suppressSetActiveForm = false;
+  this.initialFormRendering = false;
 };
 
 scout.Desktop.prototype._renderActiveForm = function($parent) {
@@ -678,25 +677,9 @@ scout.Desktop.prototype.glassPaneTargets = function() {
  * pane.
  */
 scout.Desktop.prototype._deferredGlassPaneTarget = function(popupWindow) {
-  var deferred = {
-    $glassPaneTarget: null, // set by PopupWindow
-    glassPaneRenderer: null, // set by GlassPaneRenderer,
-    popupReady: function($glassPaneTarget) {
-      this.$glassPaneTarget = $glassPaneTarget;
-      this.renderWhenReady();
-    },
-    rendererReady: function(glassPaneRenderer) {
-      this.glassPaneRenderer = glassPaneRenderer;
-      this.renderWhenReady();
-    },
-    renderWhenReady: function() {
-      if (this.glassPaneRenderer && this.$glassPaneTarget) {
-        this.glassPaneRenderer.renderGlassPane(this.$glassPaneTarget[0]);
-      }
-    }
-  };
+  var deferred = new scout.DeferredGlassPaneTarget();
   popupWindow.one('initialized', function() {
-    deferred.popupReady(popupWindow.$container);
+    deferred.ready(popupWindow.$container);
   });
   return deferred;
 };
@@ -750,7 +733,7 @@ scout.Desktop.prototype._setOutlineActivated = function() {
 scout.Desktop.prototype._setFormActivated = function(form, suppressSend) {
 
   //if desktop is in rendering process the can not set a new active for. instead the active form from the model is set selected.
-  if (!this.rendered || this.suppressSetActiveForm) {
+  if (!this.rendered || this.initialFormRendering) {
     return;
   }
 

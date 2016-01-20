@@ -21,7 +21,7 @@ scout.GlassPaneRenderer = function(session, element, enabled) {
 
 scout.GlassPaneRenderer.prototype.renderGlassPanes = function() {
   this.findGlassPaneTargets().forEach(function(glassPaneTarget) {
-    if (glassPaneTarget.hasOwnProperty('glassPaneRenderer')) { // FIXME AWE: make class, use instanceof
+    if (glassPaneTarget instanceof scout.DeferredGlassPaneTarget) {
       glassPaneTarget.rendererReady(this);
     } else {
       this.renderGlassPane(glassPaneTarget);

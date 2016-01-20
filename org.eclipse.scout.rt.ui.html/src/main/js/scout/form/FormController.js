@@ -63,14 +63,14 @@ scout.FormController.prototype._removePopupWindow = function(form) {
 /**
  * Renders all dialogs and views registered with this controller.
  */
-scout.FormController.prototype.render = function(initialRendering) {
+scout.FormController.prototype.render = function() {
   this.displayParent.dialogs.forEach(function(dialog) {
     dialog.displayParent = this.displayParent;
     this._renderDialog(dialog, false);
   }.bind(this));
   this.displayParent.views.forEach(function(view, position) {
     view.displayParent = this.displayParent;
-    this._renderView(view, false, position, initialRendering);
+    this._renderView(view, false, position);
   }.bind(this));
 };
 
@@ -91,7 +91,7 @@ scout.FormController.prototype.activateForm = function(formAdapterId) {
   }
 };
 
-scout.FormController.prototype._renderView = function(view, register, position, initialRendering) {
+scout.FormController.prototype._renderView = function(view, register, position) {
   if (register) {
     if (position !== undefined) {
       scout.arrays.insert(this.displayParent.views, view, position);
@@ -101,7 +101,8 @@ scout.FormController.prototype._renderView = function(view, register, position, 
   }
 
   // Only render view if 'displayParent' is rendered yet; if not, the view will be rendered once 'displayParent' is rendered.
-  if (!this.displayParent.rendered) {
+  // Except when Desktop is in initial rendering-> the tab has to be rendered to exist in overview
+  if (!this.displayParent.rendered && !this.session.desktop.initialFormRendering) {
     return;
   }
   // Prevent "Already rendered" errors / FIXME bsh, dwi: Remove this hack! Fix in on model if possible. See #162954.
@@ -113,7 +114,7 @@ scout.FormController.prototype._renderView = function(view, register, position, 
 
   // Create the view-tab.
   var viewTab = viewTabsController.createAndRenderViewTab(view, this.displayParent.views.indexOf(view));
-  if (!initialRendering) {
+  if (!this.session.desktop.initialFormRendering) {
     viewTabsController.selectViewTab(viewTab);
   }
 };

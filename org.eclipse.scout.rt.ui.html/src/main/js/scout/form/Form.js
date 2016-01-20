@@ -344,7 +344,15 @@ scout.Form.prototype._uninstallFocusContext = function() {
  * Returns the DOM elements to paint a glassPanes over, once a modal Form, message-box or file-chooser is showed with this Form as its 'displayParent'.
  */
 scout.Form.prototype.glassPaneTargets = function() {
-  return [this.$container];
+  if (this.$container) {
+    return [this.$container];
+  } else {
+    var deferred = new scout.DeferredGlassPaneTarget();
+    this.one('rendered', function(event) {
+      deferred.ready(event.eventOn.$container);
+    });
+    return [deferred];
+  }
 };
 
 /**

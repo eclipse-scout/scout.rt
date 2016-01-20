@@ -22,34 +22,45 @@ scout.ViewTabsController = function(desktop) {
  * Creates and renders a view tab for the given view.
  */
 scout.ViewTabsController.prototype.createAndRenderViewTab = function(view, position) {
-  // Create the view tab.
-  var viewTab = scout.create('DesktopViewTab', {
-    parent: view.displayParent,
-    view: view,
-    $bench: this._desktop.$bench,
-    viewTabController: this
-  });
   var viewId = view.id;
+  //Tab is already existing.
+  var viewTab = this._viewTabMap[viewId],
+    newViewTab = !viewTab;
+  if (newViewTab) {
 
-  // Register lifecycle listener on view tab.
-  viewTab.on('tabClicked', this.selectViewTab.bind(this));
-  viewTab.on('remove', this._removeViewTab.bind(this, viewTab, viewId));
+    // Create the view tab.
+    viewTab = scout.create('DesktopViewTab', {
+      parent: view.displayParent,
+      view: view,
+      $bench: this._desktop.$bench,
+      viewTabController: this
+    });
 
-  var index = position;
-  var parentViewTab = this.viewTab(viewTab._view.displayParent);
-  if (parentViewTab) {
-    index = this._viewTabs.indexOf(parentViewTab) + this._calculateExactPosition(parentViewTab, index) + 1;
-  } else {
-    index = this._calculateExactPosition(this._desktop, index);
+    // Register lifecycle listener on view tab.
+    viewTab.on('tabClicked', this.selectViewTab.bind(this));
+    viewTab.on('remove', this._removeViewTab.bind(this, viewTab, viewId));
+
+    var index = position;
+    var parentViewTab = this.viewTab(viewTab._view.displayParent);
+    if (parentViewTab) {
+      index = this._viewTabs.indexOf(parentViewTab) + this._calculateExactPosition(parentViewTab, index) + 1;
+    } else {
+      index = this._calculateExactPosition(this._desktop, index);
+    }
+
+    // Register the view tab.
+    scout.arrays.insert(this._viewTabs, viewTab, index);
+    this._viewTabMap[viewId] = viewTab;
+
+  }
+  // Render the view tab.
+  if (this._desktop._hasTaskBar() && !viewTab.rendered) {
+    viewTab.render(this._desktop._$viewTabBar);
   }
 
-  // Register the view tab.
-  scout.arrays.insert(this._viewTabs, viewTab, index);
-  this._viewTabMap[viewId] = viewTab;
-
-  // Render the view tab.
-  if (this._desktop._hasTaskBar()) {
-    viewTab.render(this._desktop._$viewTabBar);
+  //when rendering desktop also add all child tabs.
+  if (view.session.desktop.initialFormRendering && newViewTab) {
+    view.formController.render();
   }
 
   return viewTab;
