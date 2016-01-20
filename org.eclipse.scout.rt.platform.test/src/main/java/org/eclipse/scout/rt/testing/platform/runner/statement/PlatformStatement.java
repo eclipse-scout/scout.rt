@@ -39,20 +39,20 @@ import org.junit.runners.model.Statement;
  * platform tests.</td>
  * </tr>
  * <tr>
- * <td><code>@</code>{@link RunWithPrivatePlatform}<code>(false)</code></td>
+ * <td><code>@</code>{@link RunWithNewPlatform}<code>(false)</code></td>
  * </tr>
  * <tr>
- * <td><code>@</code>{@link RunWithPrivatePlatform}</td>
+ * <td><code>@</code>{@link RunWithNewPlatform}</td>
  * <td rowspan="3"><b>Private Platform</b></td>
  * <td rowspan="3">A new private platform is started for the annotated test class. {@link BeforeClass}, {@link Before},
  * {@link Test}, {@link After} and {@link AfterClass} are all using the same private {@link IPlatform}. The platform
  * that was valid before is restored after the test.</td>
  * </tr>
  * <tr>
- * <td><code>@</code>{@link RunWithPrivatePlatform}<code>(true)</code></td>
+ * <td><code>@</code>{@link RunWithNewPlatform}<code>(true)</code></td>
  * </tr>
  * <tr>
- * <td><code>@</code>{@link RunWithPrivatePlatform}<code>(value = true)</code></td>
+ * <td><code>@</code>{@link RunWithNewPlatform}<code>(value = true)</code></td>
  * </tr>
  * </table>
  *
