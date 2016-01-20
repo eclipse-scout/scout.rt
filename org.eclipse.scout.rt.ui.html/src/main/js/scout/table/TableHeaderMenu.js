@@ -87,7 +87,9 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
   this.$whiter = this.$container.appendDiv('table-header-menu-whiter');
 
   if (this.withFocusContext && this.focusableContainer) {
-    this.$container.attr('tabindex', -1);
+    this.$container
+      .attr('tabindex', -1)
+      .unfocusable();
   }
 
   // -- Left column -- //

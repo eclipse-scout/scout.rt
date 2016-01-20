@@ -107,26 +107,14 @@ body {
 }
 
 /* Workaround for firefox bug https://bugzilla.mozilla.org/show_bug.cgi?id=648624 */
-/* use -moz-none to allow child element to set -moz-user-select: text*/
-.form-field > label,
-.field > .label,
-.file-chooser-title,
-.file-chooser-label,
-.file-chooser-files > .file,
-.messagebox-label,
-.desktop-view-tab > .title,
-.desktop-view-tab > .sub-title,
+/* use -moz-none to allow child element to set -moz-user-select: text */
+/* See also: focusUtil.js, isSelectableText() */
 .table-cell,
 .table-header-item,
 .tree-node,
-.group-box-title,
-.tooltip-content,
 .table-footer,
 .table-control,
-.table-info-item,
-.table-header-menu-group-text,
-.dialog > .title-box > .title,
-.dialog > .title-box > .sub-title {
+.table-info-item {
   -moz-user-select: -moz-none;
 }
 

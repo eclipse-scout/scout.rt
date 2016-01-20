@@ -41,9 +41,23 @@ scout.focusUtils = {
   isSelectableText: function(element) {
     var $element = $(element);
 
-    if ($element.css('user-select') === 'none') {
+    // Find closest element which has a 'user-select' with a value other than 'auto'. If that value
+    // is 'none', the text is not selectable. This code mimics the "inheritance behavior" of the CSS
+    // property "-moz-user-select: -moz-none" as described in [1].  This does not seem to work in some
+    // cases in Firefox, even with bug [2] fixed. As a workaround, we implement the desired behavior here.
+    //
+    // Note: Some additional CSS rules are required for events other than 'mousedown', see main.css.
+    //
+    // [1] https://developer.mozilla.org/en-US/docs/Web/CSS/user-select
+    // [2] https://bugzilla.mozilla.org/show_bug.cgi?id=648624
+    var $el = $element;
+    while ($el && $el.css('user-select') === 'auto') {
+      $el = $el.parent();
+    }
+    if ($el && $el.css('user-select') === 'none') {
       return false;
     }
+
     if ($element.is('input[disabled][type=text], textarea[disabled]')) {
       return true;
     }
