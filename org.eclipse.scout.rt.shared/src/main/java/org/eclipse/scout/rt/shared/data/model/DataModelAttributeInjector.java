@@ -205,6 +205,7 @@ public class DataModelAttributeInjector implements DataModelConstants {
         }
         break;
       }
+      case IDataModelAttribute.TYPE_RICH_TEXT:
       case IDataModelAttribute.TYPE_FULL_TEXT: {
         opList.add(DataModelAttributeOp.create(OPERATOR_CONTAINS));
         if (attribute.isNotOperatorEnabled()) {
