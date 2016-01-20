@@ -143,7 +143,6 @@ scout.Action.prototype._renderToggleAction = function() {
 scout.Action.prototype._configureTooltip = function() {
   return {
     parent: this,
-    delay: 0,
     text: this.tooltipText,
     $anchor: this.$container,
     arrowPosition: 50,

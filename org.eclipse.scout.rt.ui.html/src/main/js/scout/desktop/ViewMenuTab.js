@@ -53,10 +53,7 @@ scout.ViewMenuTab.prototype._update = function() {
 scout.ViewMenuTab.prototype.render = function($parent) {
   this.$container = $parent.appendDiv('view-button-tab')
     .unfocusable()
-    .on('mousedown', this.togglePopup.bind(this))
-    .data('tooltipText', function() {
-      return this.text;
-    }.bind(this));
+    .on('mousedown', this.togglePopup.bind(this));
   this.$arrowIcon = this.$container
     .appendSpan('arrow-icon')
     .on('mousedown', this.togglePopup.bind(this));
@@ -71,15 +68,6 @@ scout.ViewMenuTab.prototype._renderProperties = function() {
 scout.ViewMenuTab.prototype._renderSelected = function() {
   this.$container.select(this.selected);
   this._updateArrowIconVisibility();
-  if (this.selected && !this._breadcrumbEnabled) {
-    scout.tooltips.uninstall(this.$container);
-  } else {
-    scout.tooltips.install(this.$container, {
-      parent: this.session.desktop,
-      delay: 0,
-      text: this.text
-    });
-  }
 };
 
 scout.ViewMenuTab.prototype._renderIconId = function() {

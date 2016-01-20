@@ -44,7 +44,6 @@ scout.ViewButton.prototype._renderAsTab = function($parent) {
  * @override Action.js
  */
 scout.ViewButton.prototype._renderText = function() {
-  this._updateTooltip();
   if (this._isMenu()) {
     scout.ViewButton.parent.prototype._renderText.call(this);
   }
@@ -68,20 +67,6 @@ scout.ViewButton.prototype.setBreadcrumbEnabled = function(enabled) {
   this._breadcrumbEnabled = enabled;
   this._renderText();
   this._renderSelected();
-};
-
-scout.ViewButton.prototype._configureTooltip = function() {
-  var options = scout.ViewButton.parent.prototype._configureTooltip.call(this);
-  options.text = this.text;
-  return options;
-};
-
-/**
- * Compared to Action.js, this.text is used instead of this.tooltipText.
- * Additionally, tooltip is only shown if it is a view tab and never if it is a menu item in the view menu popup.
- */
-scout.ViewButton.prototype._shouldInstallTooltip = function() {
-  return this.text && !this.selected && this.enabled && this._isTab();
 };
 
 scout.ViewButton.prototype._onMouseEvent = function(event) {
