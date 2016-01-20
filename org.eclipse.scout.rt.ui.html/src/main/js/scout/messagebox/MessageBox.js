@@ -99,7 +99,7 @@ scout.MessageBox.prototype._render = function($parent) {
   this._renderHtml(this.html);
   this._renderHiddenText(this.hiddenText);
 
-  // FIXME mot: Somehow let the user copy the 'copyPasteText' - but how?
+  // FIXME bsh: Somehow let the user copy the 'copyPasteText' - but how?
 
   // Prevent resizing when message-box is dragged off the viewport
   this.$container.addClass('calc-helper');
