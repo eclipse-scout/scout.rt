@@ -95,9 +95,10 @@ scout.StringField.prototype._renderProperties = function() {
   this._renderSpellCheckEnabled(this.spellCheckEnabled);
   this._renderHasAction(this.hasAction);
   this._renderMaxLength();
-  this._renderSelectionStart();
-  this._renderSelectionEnd();
   this._renderSelectionTrackingEnabled();
+  // Do not render selectionStart and selectionEnd here, because that would cause the focus to
+  // be set to <textarea>s in IE. Instead, the selection is rendered when the focus has entered
+  // the field, see _render(). #168648
   this._renderDropType();
 };
 
@@ -191,7 +192,7 @@ scout.StringField.prototype._renderDisplayText = function(displayText) {
 
   // Try to keep the current selection for cases where the old and new display
   // text only differ because of the automatic trimming.
-  if (this.trimText) {
+  if (oldDisplayText !== displayText && this.trimText) {
     var m = oldDisplayText.match(new RegExp('^(\\s*)' + scout.strings.quote(displayText) + '(\\s*)$'));
     if (m) {
       oldSelection.start = Math.min(oldSelection.start - m[1].length, displayText.length);
