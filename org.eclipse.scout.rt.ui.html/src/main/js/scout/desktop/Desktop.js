@@ -67,8 +67,7 @@ scout.Desktop.prototype._render = function($parent) {
   this.$container = $parent;
   this.$container
     .addClass('desktop')
-    .toggleClass('has-navigation', hasNavigation)
-    .on('keydown keyup', this._onKeyDown.bind(this));
+    .toggleClass('has-navigation', hasNavigation);
 
   scout.inspector.applyInfo(this, $parent);
 

@@ -39,7 +39,7 @@ scout.TabAreaLayout.prototype.layout = function($container) {
       tabs = [], // tabs that are visible by model
       tabBounds = [], // bounds of visible tabs
       visibleTabs = [], // tabs that are visible by model and visible in the UI (= not in overflow)
-      selectedTab = this._tabBox.selectedTab;
+      selectedTab = 0; // points to index of selected tab (in array of UI visible tabs)
 
     // reduce list to tab-items that are visible by model
     for (i = 0; i < this._tabBox.tabItems.length; i++) {
@@ -48,6 +48,11 @@ scout.TabAreaLayout.prototype.layout = function($container) {
         bounds = scout.graphics.bounds(tab.$tabContainer, true, true);
         tabs.push(tab);
         tabBounds.push(bounds);
+        // cannot use selectedTab property of TabBox, it points to the wrong index
+        // since this layout only works with visible tabs
+        if (tab._tabActive) {
+          selectedTab = tabs.length - 1;
+        }
       }
     }
     numTabs = tabs.length;
