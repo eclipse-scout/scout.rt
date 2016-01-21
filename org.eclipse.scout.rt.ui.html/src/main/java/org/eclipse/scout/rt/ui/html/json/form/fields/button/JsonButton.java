@@ -97,6 +97,19 @@ public class JsonButton<BUTTON extends IButton> extends JsonFormField<BUTTON> im
     if (jsonContextMenu != null) {
       json.put(PROP_MENUS, jsonContextMenu.childActionsToJson());
     }
+    IJsonAdapter<?> adapter = null;
+    if (getModel().getKeyStrokeScope() == null) {
+      adapter = getAdapter(getModel().getForm());
+    }
+    else {
+      List<?> adapterList = getUiSession().getJsonAdapters(getModel().getKeyStrokeScope());
+      if (adapterList.size() > 0) {
+        adapter = (IJsonAdapter<?>) adapterList.get(0);
+      }
+    }
+    if (adapter != null) {
+      json.put(IButton.PROP_KEY_STROKE_SCOPE, adapter.getId());
+    }
     return json;
   }
 

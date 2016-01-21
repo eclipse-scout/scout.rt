@@ -11,7 +11,7 @@
 scout.Button = function() {
   scout.Button.parent.call(this);
   this.$buttonLabel;
-  this._addAdapterProperties('menus');
+  this._addAdapterProperties(['menus']);
 
   this.buttonKeyStroke = new scout.ButtonKeyStroke(this, null);
 };
@@ -54,7 +54,13 @@ scout.Button.prototype._initKeyStrokeContext = function(keyStrokeContext) {
   this.formKeyStrokeContext.invokeAcceptInputOnActiveValueField = true;
   this.formKeyStrokeContext.registerKeyStroke(this.buttonKeyStroke);
   this.formKeyStrokeContext.$bindTarget = function() {
-    // keystrokes have form scope
+    if (this.keyStrokeScope) {
+      var adapter = this.session.getModelAdapter(this.keyStrokeScope);
+      if (adapter) {
+        return adapter.$container;
+      }
+    }
+    //failsave if scope is not set use form
     return this.getForm().$container;
   }.bind(this);
 };

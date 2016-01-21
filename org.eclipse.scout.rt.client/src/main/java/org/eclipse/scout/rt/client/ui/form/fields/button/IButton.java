@@ -34,6 +34,8 @@ public interface IButton extends IFormField {
   String PROP_SELECTED = "selected";
   String PROP_CONTEXT_MENU = "contextMenu";
   String PROP_KEY_STOKE = "keyStroke";
+  String PROP_KEY_STROKE_SCOPE_CLASS = "keyStrokeScopeClass";
+  String PROP_KEY_STROKE_SCOPE = "keyStrokeScope";
 
   /*
    * System Types
@@ -126,4 +128,6 @@ public interface IButton extends IFormField {
   IContextMenu getContextMenu();
 
   void setView(boolean visible, boolean enabled);
+
+  public Object getKeyStrokeScope();
 }

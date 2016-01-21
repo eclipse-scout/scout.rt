@@ -26,6 +26,7 @@ import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.internal.FormFieldContextMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
+import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
@@ -101,6 +102,15 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
   @ConfigProperty(ConfigProperty.STRING)
   @Order(230)
   protected String getConfiguredKeyStroke() {
+    return null;
+  }
+
+  /**
+   * Configures the scope where the keystroke of this button is registered. If nothing is configured the Keystroke is
+   * set on the form.
+   */
+  @Order(240)
+  protected Class<? extends IFormField> getConfiguredKeyStrokeScopeClass() {
     return null;
   }
 
@@ -209,6 +219,7 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
     setProcessButton(getConfiguredProcessButton());
     setIconId(getConfiguredIconId());
     setKeyStroke(getConfiguredKeyStroke());
+    setKeyStrokeScopeClass(getConfiguredKeyStrokeScopeClass());
 
     // menus
     List<Class<? extends IMenu>> declaredMenus = getDeclaredMenus();
@@ -225,6 +236,7 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
     IContextMenu contextMenu = new FormFieldContextMenu<IButton>(this, menus.getOrderedList());
     contextMenu.setContainerInternal(this);
     setContextMenu(contextMenu);
+
   }
 
   @Override
@@ -256,6 +268,23 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
   @Override
   public void setIconId(String iconId) {
     propertySupport.setPropertyString(PROP_ICON_ID, iconId);
+  }
+
+  @SuppressWarnings("unchecked")
+  private Class<? extends IFormField> getKeyStrokeScopeClass() {
+    return (Class) propertySupport.getProperty(PROP_KEY_STROKE_SCOPE_CLASS);
+  }
+
+  @Override
+  public IFormField getKeyStrokeScope() {
+    if (getKeyStrokeScopeClass() != null) {
+      return getForm().getFieldByClass(getKeyStrokeScopeClass());
+    }
+    return null;
+  }
+
+  private void setKeyStrokeScopeClass(Class<? extends IFormField> scope) {
+    propertySupport.setProperty(PROP_KEY_STROKE_SCOPE_CLASS, scope);
   }
 
   @Override
