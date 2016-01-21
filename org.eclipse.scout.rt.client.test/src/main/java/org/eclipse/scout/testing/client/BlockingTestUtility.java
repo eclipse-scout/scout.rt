@@ -4,6 +4,8 @@
  */
 package org.eclipse.scout.testing.client;
 
+import java.util.concurrent.TimeUnit;
+
 import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ModelJobs;
@@ -44,10 +46,12 @@ public final class BlockingTestUtility {
    */
   public static void runBlockingAction(final IRunnable runnableGettingBlocked, final IRunnable runnableOnceBlocked) {
     final ClientRunContext runContext = ClientRunContexts.copyCurrent();
+    final IBlockingCondition onceBlockedDoneCondition = Jobs.newBlockingCondition(true);
 
     final IJobListenerRegistration listenerRegistration = IFuture.CURRENT.get().addListener(Jobs.newEventFilterBuilder()
         .andMatchEventType(JobEventType.JOB_STATE_CHANGED)
         .andMatchState(JobState.WAITING_FOR_BLOCKING_CONDITION)
+        .andMatchExecutionHint(ModelJobs.EXECUTION_HINT_UI_INTERACTION_REQUIRED)
         .toFilter(), new IJobListener() {
 
           @Override
@@ -61,6 +65,7 @@ public final class BlockingTestUtility {
                 }
                 finally {
                   event.getData().getBlockingCondition().setBlocking(false);
+                  onceBlockedDoneCondition.setBlocking(false);
                 }
               }
             }, ModelJobs.newInput(runContext)
@@ -76,6 +81,11 @@ public final class BlockingTestUtility {
     }
     finally {
       listenerRegistration.dispose();
+      // we need to wait until the runnableOnceBlocked is completed.
+      // runnableOnceBlocked may, during its execution,  set the original blocking condition to non-blocking but still execute
+      // important code afterwards. Therefore, the original blocking condition that starts runnableOnceBlocked is only used
+      // to indicate the start of the runnableOnceBlocked, but this method returns only AFTER runnableOnceBlocked completes execution.
+      onceBlockedDoneCondition.waitForUninterruptibly(120, TimeUnit.SECONDS);
     }
   }
 }
