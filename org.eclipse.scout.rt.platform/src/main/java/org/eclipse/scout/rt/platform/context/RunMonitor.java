@@ -10,9 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.context;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -23,14 +22,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A <code>RunMonitor</code> provides cancellation support for operations typically running on behalf of a
- * {@link RunContext}. By default, when {@link RunContexts#copyCurrent() copying} the current RunContext to run some
- * operations on behalf, a new {@link RunMonitor} is created and registered as child monitor in the monitor of the
- * current calling context to allow nested cancellation. However, if that child monitor is cancelled, cancellation is
- * not propagated to the parent monitors.
+ * A <code>RunMonitor</code> allows the registration of {@link ICancellable} objects, which are cancelled upon
+ * cancellation of this monitor.
  * <p>
- * Any {@link ICancellable}s registered with this {@link RunMonitor} are cancelled as well once this {@link RunMonitor}
- * is cancelled.
+ * A <code>RunMonitor</code> is associated with every {@link RunContext} and {@link IFuture}, meaning that executing
+ * code can always query its current cancellation status via <code>RunMonitor.CURRENT.get().isCancelled()</code>.
+ * <p>
+ * When registering a {@link ICancellable} and this monitor is already cancelled, the {@link ICancellable} is cancelled
+ * immediately.
+ * <p>
+ * A <code>RunMonitor</code> implements {@link ICancellable} interface, meaning that monitors can be nested to propagate
+ * cancellation to child monitors.
  *
  * @since 5.1
  */
@@ -45,22 +47,23 @@ public class RunMonitor implements ICancellable {
    */
   public static final ThreadLocal<RunMonitor> CURRENT = new ThreadLocal<>();
 
-  private final Set<ICancellable> m_cancellables = new HashSet<>(1);
-  private final AtomicBoolean m_cancelled = new AtomicBoolean(false);
+  private final ReadWriteLock m_registrationLock = new ReentrantReadWriteLock();
+  private final List<ICancellable> m_cancellables = new ArrayList<>(); // Do not use a Set to ensure cancellation in the order as registered.
 
-  private final ReadWriteLock m_lock = new ReentrantReadWriteLock();
+  private volatile boolean m_cancelled;
+  private final Object m_cancellationLock = new Object();
 
   /**
-   * @return <code>true</code> if this {@link RunMonitor} was cancelled.
+   * Returns <code>true</code> if this {@link RunMonitor} was cancelled, or else <code>false</code>.
    */
   @Override
   public boolean isCancelled() {
-    return m_cancelled.get();
+    return m_cancelled;
   }
 
   /**
-   * Cancels this monitor and all registered {@link ICancellable}s like associated {@link RunContext}s and
-   * {@link IFuture}s. If already cancelled, this cancellation request has no effect.
+   * Cancels this monitor and all registered {@link ICancellable}s. If already cancelled, this cancellation request has
+   * no effect.
    *
    * @param interruptIfRunning
    *          <code>true</code> to interrupt the executing thread, or else <code>false</code>.
@@ -69,13 +72,22 @@ public class RunMonitor implements ICancellable {
    */
   @Override
   public boolean cancel(final boolean interruptIfRunning) {
-    if (!m_cancelled.compareAndSet(false, true)) {
-      return false; // same behavior like Java Future.
+    if (m_cancelled) {
+      return false;
     }
 
+    synchronized (m_cancellationLock) {
+      if (m_cancelled) { // double-checked locking
+        return false;
+      }
+
+      m_cancelled = true;
+    }
+
+    // Cancel the Cancellables outside the lock.
     boolean success = true;
     for (final ICancellable cancellable : getCancellables()) {
-      if (!invokeCancel(cancellable, interruptIfRunning)) {
+      if (!cancel(cancellable, interruptIfRunning)) {
         success = false;
       }
     }
@@ -87,23 +99,34 @@ public class RunMonitor implements ICancellable {
    * cancelled, the given {@link ICancellable} is cancelled immediately with <code>interruptIfRunning=true</code>.
    */
   public void registerCancellable(final ICancellable cancellable) {
-    boolean cancel = true;
+    if (m_cancelled) {
+      cancel(cancellable, true);
+      return;
+    }
 
-    if (!isCancelled()) {
-      m_lock.writeLock().lock();
-      try {
-        if (!isCancelled()) { // double-checked locking
-          m_cancellables.add(cancellable);
-          cancel = false;
-        }
+    boolean cancel;
+    synchronized (m_cancellationLock) {
+      if (m_cancelled) { // double-checked locking
+        cancel = true;
       }
-      finally {
-        m_lock.writeLock().unlock();
+      else {
+        cancel = false;
+
+        m_registrationLock.writeLock().lock();
+        try {
+          if (!m_cancellables.contains(cancellable)) {
+            m_cancellables.add(cancellable);
+          }
+        }
+        finally {
+          m_registrationLock.writeLock().unlock();
+        }
       }
     }
 
+    // Cancel the Cancellable outside the lock.
     if (cancel) {
-      invokeCancel(cancellable, true);
+      cancel(cancellable, true);
     }
   }
 
@@ -111,26 +134,26 @@ public class RunMonitor implements ICancellable {
    * Unregisters the given {@link ICancellable}.
    */
   public void unregisterCancellable(final ICancellable cancellable) {
-    m_lock.writeLock().lock();
+    m_registrationLock.writeLock().lock();
     try {
       m_cancellables.remove(cancellable);
     }
     finally {
-      m_lock.writeLock().unlock();
+      m_registrationLock.writeLock().unlock();
     }
   }
 
-  protected Set<ICancellable> getCancellables() {
-    m_lock.readLock().lock();
+  protected List<ICancellable> getCancellables() {
+    m_registrationLock.readLock().lock();
     try {
-      return new HashSet<>(m_cancellables);
+      return new ArrayList<>(m_cancellables);
     }
     finally {
-      m_lock.readLock().unlock();
+      m_registrationLock.readLock().unlock();
     }
   }
 
-  protected boolean invokeCancel(final ICancellable cancellable, final boolean interruptIfRunning) {
+  protected boolean cancel(final ICancellable cancellable, final boolean interruptIfRunning) {
     try {
       if (!cancellable.isCancelled()) {
         return cancellable.cancel(interruptIfRunning);
