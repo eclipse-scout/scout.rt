@@ -67,7 +67,8 @@ scout.Desktop.prototype._render = function($parent) {
   this.$container = $parent;
   this.$container
     .addClass('desktop')
-    .toggleClass('has-navigation', hasNavigation);
+    .toggleClass('has-navigation', hasNavigation)
+    .on('keydown keyup', this._onKeyDown.bind(this));
 
   scout.inspector.applyInfo(this, $parent);
 
@@ -75,6 +76,7 @@ scout.Desktop.prototype._render = function($parent) {
   this.navigation.render($parent);
   //TODO [5.2] cgu: maybe better move to desktop navigation?
   this._installKeyStrokeContextForDesktopViewButtonBar();
+  this._installKeyStrokeContextForDesktop();
 
   this._renderTaskBar($parent);
   this._renderBench();
@@ -135,6 +137,19 @@ scout.Desktop.prototype._installKeyStrokeContextForDesktopBench = function() {
   keyStrokeContext.$bindTarget = this.session.$entryPoint;
   keyStrokeContext.$scopeTarget = this.$bench;
   keyStrokeContext.registerKeyStroke(this.keyStrokes);
+
+  this.session.keyStrokeManager.installKeyStrokeContext(keyStrokeContext);
+};
+
+/**
+ * Install a keystroke on the top-level DOM element which works as a catch-all when the busy indicator is active.
+ */
+scout.Desktop.prototype._installKeyStrokeContextForDesktop = function() {
+  var keyStrokeContext = new scout.KeyStrokeContext();
+
+  keyStrokeContext.$bindTarget = this.session.$entryPoint;
+  keyStrokeContext.$scopeTarget = this.$container;
+  keyStrokeContext.registerKeyStroke(new scout.DesktopKeyStroke(this.session));
 
   this.session.keyStrokeManager.installKeyStrokeContext(keyStrokeContext);
 };

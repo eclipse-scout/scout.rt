@@ -782,6 +782,10 @@ scout.Session.prototype.areRequestsPending = function() {
   return this._requestsPendingCounter > 0;
 };
 
+scout.Session.prototype.isBusy = function() {
+  return this._busyCounter > 0 || this.areEventsQueued();
+};
+
 scout.Session.prototype.setBusy = function(busy) {
   if (busy) {
     if (this._busyCounter === 0) {
@@ -791,7 +795,7 @@ scout.Session.prototype.setBusy = function(busy) {
   } else {
     this._busyCounter--;
     // Do not remove busy indicators if there is a scheduled request which will run immediately to prevent busy cursor flickering
-    if (this._busyCounter === 0 && !this.areEventsQueued()) {
+    if (!this.isBusy()) {
       this._removeBusy();
     }
   }
