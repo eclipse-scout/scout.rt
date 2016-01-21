@@ -51,10 +51,10 @@ scout.focusUtils = {
     // [1] https://developer.mozilla.org/en-US/docs/Web/CSS/user-select
     // [2] https://bugzilla.mozilla.org/show_bug.cgi?id=648624
     var $el = $element;
-    while ($el && $el.css('user-select') === 'auto') {
+    while ($el.css('user-select') === 'auto') {
       $el = $el.parent();
     }
-    if ($el && $el.css('user-select') === 'none') {
+    if ($el.css('user-select') === 'none') {
       return false;
     }
 
