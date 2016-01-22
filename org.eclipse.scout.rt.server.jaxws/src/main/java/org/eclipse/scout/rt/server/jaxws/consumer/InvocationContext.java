@@ -17,7 +17,6 @@ import java.lang.reflect.Proxy;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.CancellationException;
 
 import javax.jws.WebMethod;
 import javax.mail.MessageContext;
@@ -55,6 +54,9 @@ import org.eclipse.scout.rt.server.transaction.TransactionScope;
  * read-timeout to transfer big data. Also, if associated with a transaction, respective commit or rollback listeners
  * are called upon leaving the transaction boundary, e.g. to implement a <code>2-phase-commit-protocol (2PC)</code> for
  * the webservice operations invoked.
+ * <p>
+ * This context supports the cancellation of web service requests. Upon cancellation, the web method returns with a
+ * {@link WebServiceRequestCancelledException}.
  *
  * @since 5.1
  */
@@ -360,7 +362,9 @@ public class InvocationContext<PORT> {
       // If cancelled, try to close the HTTP connection (if supported by JAX-WS implementor) and throw a CancellationException.
       if (runMonitor.isCancelled()) {
         m_implementorSpecifics.closeSocket(port, operation);
-        throw new CancellationException(operation);
+        throw new WebServiceRequestCancelledException(operation)
+            .withContextInfo("port", port)
+            .withContextInfo("method", "method");
       }
 
       // Propagate result or error.

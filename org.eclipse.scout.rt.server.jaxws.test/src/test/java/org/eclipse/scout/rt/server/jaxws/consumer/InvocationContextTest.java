@@ -26,7 +26,6 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.CancellationException;
 import java.util.concurrent.TimeUnit;
 
 import javax.jws.WebMethod;
@@ -258,9 +257,9 @@ public class InvocationContextTest {
         public void run() throws Exception {
           try {
             invocationContext.getPort().webMethod(); // this method blocks until cancelled.
-            fail("CancellationException expected");
+            fail("WebServiceRequestCancelledException expected");
           }
-          catch (CancellationException e) {
+          catch (WebServiceRequestCancelledException e) {
             verify(m_implementorSpecifics).closeSocket(same(m_port), anyString());
           }
         }
