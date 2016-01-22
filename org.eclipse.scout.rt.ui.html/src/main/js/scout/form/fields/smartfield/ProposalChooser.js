@@ -23,6 +23,10 @@ scout.ProposalChooser.prototype._render = function($parent) {
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
   this.htmlComp.setLayout(new scout.ProposalChooserLayout(this));
   this.model.render(this.$container);
+  if(this.model instanceof scout.Tree){
+    //disable focus on field container
+    this.model._onNodeControlMouseDownDoFocus = function(){};
+  }
 
   this._$status = this.$container.appendDiv('status');
 

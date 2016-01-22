@@ -1619,7 +1619,7 @@ scout.Tree.prototype._onNodeControlMouseDown = function(event) {
     }
   }
   //because we suppress handling by browser we have to set focus manually.
-  this.session.focusManager.requestFocus(this.$container);
+  this._onNodeControlMouseDownDoFocus();
   this.selectNodes(node);
   this.setNodeExpanded(node, expanded, expansionOpts);
   // prevent bubbling to _onNodeMouseDown()
@@ -1627,6 +1627,11 @@ scout.Tree.prototype._onNodeControlMouseDown = function(event) {
 
   // ...but return true, so Outline.js can override this method and check if selection has been changed or not
   return true;
+};
+
+//some fields doesn't want to set focus on container.
+scout.Tree.prototype._onNodeControlMouseDownDoFocus = function() {
+  this.session.focusManager.requestFocus(this.$container);
 };
 
 scout.Tree.prototype._onNodeControlMouseUp = function(event) {
