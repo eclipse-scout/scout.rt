@@ -375,34 +375,43 @@ scout.Table.prototype._onRowDoubleClick = function(event) {
 };
 
 scout.Table.prototype.onContextMenu = function(event) {
-var func = function(event) {
-  var menuItems, popup;
-  event.preventDefault();
-  if (this.selectedRows.length > 0) {
-    menuItems = this._filterMenus(this.menus, scout.MenuDestinations.CONTEXT_MENU, true);
-    if (!event.pageX && !event.pageY) {
-      var $rowToDisplay = this.selectionHandler.lastActionRow ? this.selectionHandler.lastActionRow.$row : this.selectedRows[this.selectedRows.length - 1].$row;
-      var offset = $rowToDisplay.offset();
-      event.pageX = offset.left + 10;
-      event.pageY = offset.top + $rowToDisplay.outerHeight() / 2;
-    }
-    if (menuItems.length > 0) {
-      popup = scout.create('ContextMenuPopup', {
-        parent: this,
-        menuItems: menuItems,
-        location: {
-          x: event.pageX,
-          y: event.pageY
-        },
-        $anchor: this.$data,
-        menuFilter: this._filterMenusHandler
-      });
-      popup.open(undefined, event);
-    }
-  }
-};
+  var func = function(event) {
+    event.preventDefault();
 
-scout.menus.showContextMenuWithWait(this.session, func.bind(this), event);
+    var menuItems, popup;
+    if (this.selectedRows.length > 0) {
+      menuItems = this._filterMenus(this.menus, scout.MenuDestinations.CONTEXT_MENU, true);
+      if (!event.pageX && !event.pageY) {
+        var $rowToDisplay = this.selectionHandler.lastActionRow ? this.selectionHandler.lastActionRow.$row : this.selectedRows[this.selectedRows.length - 1].$row;
+        var offset = $rowToDisplay.offset();
+        event.pageX = offset.left + 10;
+        event.pageY = offset.top + $rowToDisplay.outerHeight() / 2;
+      }
+      if (menuItems.length > 0) {
+        popup = scout.create('ContextMenuPopup', {
+          parent: this,
+          menuItems: menuItems,
+          location: {
+            x: event.pageX,
+            y: event.pageY
+          },
+          $anchor: this.$data,
+          menuFilter: this._filterMenusHandler
+        });
+        popup.open(null, event);
+
+        // Set table style to focused, so that it looks as it still has the focus.
+        // Must be called after open(), because opening the popup might cause another
+        // popup to close first (which will remove the 'focused' class).
+        this.$container.addClass('focused');
+        popup.on('close', function(event) {
+          this.$container.removeClass('focused');
+        }.bind(this));
+      }
+    }
+  };
+
+  scout.menus.showContextMenuWithWait(this.session, func.bind(this), event);
 };
 
 scout.Table.prototype._onDataScroll = function() {

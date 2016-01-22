@@ -1249,9 +1249,9 @@ scout.Tree.prototype._sendBreadCrumbEnabled = function() {
 };
 
 scout.Tree.prototype._showContextMenu = function(event) {
-  event.preventDefault();
-  event.stopPropagation();
   var func = function func(event) {
+    event.preventDefault();
+
     var filteredMenus = this._filterMenus(this.menus, scout.MenuDestinations.CONTEXT_MENU, true),
       $part = $(event.currentTarget);
     if (filteredMenus.length === 0) {
@@ -1268,9 +1268,17 @@ scout.Tree.prototype._showContextMenu = function(event) {
       menuFilter: this._filterMenusHandler
     });
     popup.open(null, event);
-  }.bind(this);
 
-  scout.menus.showContextMenuWithWait(this.session, func, event);
+    // Set table style to focused, so that it looks as it still has the focus.
+    // Must be called after open(), because opening the popup might cause another
+    // popup to close first (which will remove the 'focused' class).
+    this.$container.addClass('focused');
+    popup.on('close', function(event) {
+      this.$container.removeClass('focused');
+    }.bind(this));
+  };
+
+  scout.menus.showContextMenuWithWait(this.session, func.bind(this), event);
 };
 
 scout.Tree.prototype._onNodeMouseDown = function(event) {

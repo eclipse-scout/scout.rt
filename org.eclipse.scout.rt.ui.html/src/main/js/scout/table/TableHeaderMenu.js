@@ -131,6 +131,9 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
   addFirstLastClass(leftGroups);
   addFirstLastClass($rightGroups);
 
+  // Set table style to focused, so that it looks as it still has the focus.
+  this.table.$container.addClass('focused');
+
   function addFirstLastClass(groups) {
     if (groups.length) {
       addCssClass(groups[0], 'first');
@@ -156,6 +159,11 @@ scout.TableHeaderMenu.prototype._remove = function() {
   this.table.off('addFilter', this._tableFilterHandler);
   this.table.off('removeFilter', this._tableFilterHandler);
   scout.TableHeaderMenu.parent.prototype._remove.call(this);
+
+  // table may have been removed in the meantime
+  if (this.table.rendered) {
+    this.table.$container.removeClass('focused');
+  }
 };
 
 scout.TableHeaderMenu.prototype._renderMovingGroup = function() {

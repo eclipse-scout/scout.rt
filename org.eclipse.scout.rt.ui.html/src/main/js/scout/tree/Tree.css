@@ -13,7 +13,9 @@
   height: 100%;
   width: 100%;
 
-  &:focus {
+  &:focus,
+  &.focused {
+    outline: none;
 
     & .tree-node.selected {
       background-color: @item-selection-background-color;
