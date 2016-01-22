@@ -105,13 +105,14 @@ scout.ContextMenuPopup.prototype.removeSubMenuItems = function(parentMenu, anima
           parentMenu.$container.toggleClass('expanded', false);
           this._updateFirstLastClass();
           this.updateNextToSelected('menu-item', parentMenu.$container);
-        }
+
         parentMenu.$subMenuBody.detach();
         scout.scrollbars.install(this.$body, {
           parent: this
         });
         this.$body.css('box-shadow', "");
         this.bodyAnimating = false;
+        }
       }.bind(this)
     });
 
@@ -216,14 +217,16 @@ scout.ContextMenuPopup.prototype.renderSubMenuItems = function(parentMenu, menus
       duration: duration,
       queue: false,
       complete: function() {
-        scout.scrollbars.uninstall(parentMenu.parentMenu.$subMenuBody, this.session);
-        parentMenu.parentMenu.$subMenuBody.detach();
-        this.$body.cssTop(topMargin);
-        scout.scrollbars.install(this.$body, {
-          parent: this
-        });
-        this._updateFirstLastClass();
-        this.$body.css('box-shadow', "");
+        if (parentMenu.parentMenu.$subMenuBody) {
+          scout.scrollbars.uninstall(parentMenu.parentMenu.$subMenuBody, this.session);
+          parentMenu.parentMenu.$subMenuBody.detach();
+          this.$body.cssTop(topMargin);
+          scout.scrollbars.install(this.$body, {
+            parent: this
+          });
+          this._updateFirstLastClass();
+          this.$body.css('box-shadow', "");
+        }
       }.bind(this)
     });
 
