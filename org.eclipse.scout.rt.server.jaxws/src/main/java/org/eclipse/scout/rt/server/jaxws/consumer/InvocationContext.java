@@ -27,6 +27,7 @@ import javax.xml.ws.BindingProvider;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.annotations.Internal;
 import org.eclipse.scout.rt.platform.context.RunContext;
+import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.holders.Holder;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
@@ -264,7 +265,7 @@ public class InvocationContext<PORT> {
    * Typically, the context contains some processing related information, either put by a JAX-WS handler or the JAX-WS
    * implementor. See {@link MessageContext} property constants for some standard properties.
    */
-  public Object getResponseContextProperty(String key) {
+  public Object getResponseContextProperty(final String key) {
     final Map<String, Object> responseContext = getResponseContext();
     return responseContext != null ? responseContext.get(key) : null;
   }
@@ -315,13 +316,15 @@ public class InvocationContext<PORT> {
       final Holder<Throwable> wsError = new Holder<>();
 
       // Reset the HTTP response code.
-      Map<String, Object> responseContext = getResponseContext();
+      final Map<String, Object> responseContext = getResponseContext();
       if (responseContext != null) {
         m_implementorSpecifics.clearHttpResponseCode(getResponseContext());
       }
 
       final String operation = String.format("client=%s, operation=%s.%s", m_name, method.getDeclaringClass().getSimpleName(), method.getName());
-      final ServerRunContext currentRunContext = ServerRunContexts.copyCurrent().withTransactionScope(TransactionScope.REQUIRED);
+
+      final ServerRunContext runContext = ServerRunContexts.copyCurrent().withTransactionScope(TransactionScope.REQUIRED);
+      final RunMonitor runMonitor = runContext.getRunMonitor();
 
       // Invoke the web method in a separate, blocking job to allow cancellation.
       final IFuture<Void> future = Jobs.schedule(new IRunnable() {
@@ -344,7 +347,7 @@ public class InvocationContext<PORT> {
           }
         }
       }, Jobs.newInput()
-          .withRunContext(currentRunContext)
+          .withRunContext(runContext)
           .withName("Handling JAX-WS request [{}]", operation));
 
       try {
@@ -355,7 +358,7 @@ public class InvocationContext<PORT> {
       }
 
       // If cancelled, try to close the HTTP connection (if supported by JAX-WS implementor) and throw a CancellationException.
-      if (future.isCancelled()) {
+      if (runMonitor.isCancelled()) {
         m_implementorSpecifics.closeSocket(port, operation);
         throw new CancellationException(operation);
       }
