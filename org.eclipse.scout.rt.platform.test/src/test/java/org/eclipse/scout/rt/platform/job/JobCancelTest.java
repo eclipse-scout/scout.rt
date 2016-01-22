@@ -27,6 +27,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunContexts;
@@ -600,5 +601,198 @@ public class JobCancelTest {
     future.awaitDone();
     assertFalse(executed.get());
     assertTrue(future.isCancelled());
+  }
+
+  @Test
+  public void testCancelledWithNullRunContext() {
+    final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
+    final BlockingCountDownLatch assertLatch = new BlockingCountDownLatch(1);
+
+    final AtomicBoolean cancelled = new AtomicBoolean();
+
+    // Run test within RunContext to ensure a current RunMonitor
+    RunContexts.empty().run(new IRunnable() {
+
+      @Override
+      public void run() throws Exception {
+        Jobs.schedule(new IRunnable() {
+
+          @Override
+          public void run() throws Exception {
+            setupLatch.countDownAndBlock();
+            cancelled.set(RunMonitor.CURRENT.get().isCancelled());
+            assertLatch.countDown();
+          }
+        }, Jobs.newInput()
+            .withRunContext(null));
+
+        setupLatch.await();
+        RunMonitor.CURRENT.get().cancel(false);
+        setupLatch.unblock();
+        assertLatch.await();
+        assertFalse("no nested cancellation expected", cancelled.get());
+      }
+    });
+  }
+
+  @Test
+  public void testCancelledWithCurrentRunContext() {
+    final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
+    final BlockingCountDownLatch assertLatch = new BlockingCountDownLatch(1);
+
+    final AtomicBoolean cancelled = new AtomicBoolean();
+
+    // Run test within RunContext to ensure a current RunMonitor
+    RunContexts.empty().run(new IRunnable() {
+
+      @Override
+      public void run() throws Exception {
+        Jobs.schedule(new IRunnable() {
+
+          @Override
+          public void run() throws Exception {
+            setupLatch.countDownAndBlock();
+            cancelled.set(RunMonitor.CURRENT.get().isCancelled());
+            assertLatch.countDown();
+          }
+        }, Jobs.newInput()
+            .withRunContext(RunContexts.copyCurrent()));
+
+        setupLatch.await();
+        RunMonitor.CURRENT.get().cancel(false);
+        setupLatch.unblock();
+        assertLatch.await();
+        assertTrue("nested cancellation expected", cancelled.get());
+      }
+    });
+  }
+
+  @Test
+  public void testCancelledWithEmptyRunContext() {
+    final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
+    final BlockingCountDownLatch assertLatch = new BlockingCountDownLatch(1);
+
+    final AtomicBoolean cancelled = new AtomicBoolean();
+
+    // Run test within RunContext to ensure a current RunMonitor
+    RunContexts.empty().run(new IRunnable() {
+
+      @Override
+      public void run() throws Exception {
+        Jobs.schedule(new IRunnable() {
+
+          @Override
+          public void run() throws Exception {
+            setupLatch.countDownAndBlock();
+            cancelled.set(RunMonitor.CURRENT.get().isCancelled());
+            assertLatch.countDown();
+          }
+        }, Jobs.newInput()
+            .withRunContext(RunContexts.empty()));
+
+        setupLatch.await();
+        RunMonitor.CURRENT.get().cancel(false);
+        setupLatch.unblock();
+        assertLatch.await();
+        assertFalse("no nested cancellation expected", cancelled.get()); // RunMonitor of context is not associated with the current monitor
+      }
+    });
+  }
+
+  @Test
+  public void testCancelledWithEmptyRunContextAndCancellationOnMonitor() {
+    final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
+    final BlockingCountDownLatch assertLatch = new BlockingCountDownLatch(1);
+
+    final AtomicBoolean cancelled = new AtomicBoolean();
+
+    // Run test within RunContext to ensure a current RunMonitor
+    RunContexts.empty().run(new IRunnable() {
+
+      @Override
+      public void run() throws Exception {
+        RunContext emptyRunContext = RunContexts.empty();
+        Jobs.schedule(new IRunnable() {
+
+          @Override
+          public void run() throws Exception {
+            setupLatch.countDownAndBlock();
+            cancelled.set(RunMonitor.CURRENT.get().isCancelled());
+            assertLatch.countDown();
+          }
+        }, Jobs.newInput()
+            .withRunContext(emptyRunContext));
+
+        setupLatch.await();
+        emptyRunContext.getRunMonitor().cancel(false);
+        setupLatch.unblock();
+        assertLatch.await();
+        assertTrue("cancellation expected", cancelled.get());
+      }
+    });
+  }
+
+  @Test
+  public void testCancelledWithEmptyRunContextAndCurrentMonitor() {
+    final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
+    final BlockingCountDownLatch assertLatch = new BlockingCountDownLatch(1);
+
+    final AtomicBoolean cancelled = new AtomicBoolean();
+
+    // Run test within RunContext to ensure a current RunMonitor
+    RunContexts.empty().run(new IRunnable() {
+
+      @Override
+      public void run() throws Exception {
+        Jobs.schedule(new IRunnable() {
+
+          @Override
+          public void run() throws Exception {
+            setupLatch.countDownAndBlock();
+            cancelled.set(RunMonitor.CURRENT.get().isCancelled());
+            assertLatch.countDown();
+          }
+        }, Jobs.newInput()
+            .withRunContext(RunContexts.empty().withRunMonitor(RunMonitor.CURRENT.get())));
+
+        setupLatch.await();
+        RunMonitor.CURRENT.get().cancel(false);
+        setupLatch.unblock();
+        assertLatch.await();
+        assertTrue("no nested cancellation expected", cancelled.get());
+      }
+    });
+  }
+
+  @Test
+  public void testCancelledWithDetachedRunMonitor() {
+    final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
+    final BlockingCountDownLatch assertLatch = new BlockingCountDownLatch(1);
+
+    final AtomicBoolean cancelled = new AtomicBoolean();
+
+    // Run test within RunContext to ensure a current RunMonitor
+    RunContexts.empty().run(new IRunnable() {
+
+      @Override
+      public void run() throws Exception {
+        Jobs.schedule(new IRunnable() {
+
+          @Override
+          public void run() throws Exception {
+            setupLatch.countDownAndBlock();
+            cancelled.set(RunMonitor.CURRENT.get().isCancelled());
+            assertLatch.countDown();
+          }
+        }, Jobs.newInput()
+            .withRunContext(RunContexts.empty().withRunMonitor(BEANS.get(RunMonitor.class))));
+
+        setupLatch.await();
+        RunMonitor.CURRENT.get().cancel(false);
+        setupLatch.unblock();
+        assertLatch.await();
+        assertFalse(cancelled.get());
+      }
+    });
   }
 }
