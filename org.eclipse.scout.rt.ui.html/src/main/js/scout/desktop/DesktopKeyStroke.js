@@ -21,8 +21,8 @@ scout.inherits(scout.DesktopKeyStroke, scout.KeyStroke);
  * @override KeyStroke.js
  */
 scout.DesktopKeyStroke.prototype._accept = function(event) {
-  // only apply "catch-all" when busy indicator is active
-  if (this.session.isBusy()) {
+  // only apply "catch-all" when busy indicator is displayed
+  if (this.session._busyIndicator) {
     var whiteList, delegateToBrowser;
     if (event.ctrlKey || event.metaKey) {
       whiteList = this.whiteListCtrlKeys;
