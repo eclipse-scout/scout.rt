@@ -2898,7 +2898,10 @@ scout.Table.prototype._renderEmptyData = function(width) {
     if (!this.$emptyData) {
       this.$emptyData = this.$data.appendDiv().html('&nbsp;');
     }
-    var headerWidth = scout.nvl(width, this.header.$container[0].scrollWidth);
+    // measure header-width and subtract insets from table-data
+    var
+      horizInsets = scout.graphics.getInsets(this.$data).horizontal(),
+      headerWidth = scout.nvl(width, this.header.$container[0].scrollWidth) - horizInsets;
     this.$emptyData
       .css('min-width', headerWidth)
       .css('max-width', headerWidth);
