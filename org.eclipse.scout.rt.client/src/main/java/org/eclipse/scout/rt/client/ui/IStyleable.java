@@ -19,9 +19,4 @@ public interface IStyleable {
   String getCssClass();
 
   void setCssClass(String cssClass);
-
-//  String getBackgroundColor();
-
-//  FontSpec getFont();
-
 }
