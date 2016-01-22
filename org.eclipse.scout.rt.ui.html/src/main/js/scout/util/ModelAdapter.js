@@ -587,7 +587,9 @@ scout.ModelAdapter.prototype.cloneAdapter = function(modelOverride) {
       // NOP - when property is already set by modelOverride
     } else if (this.hasOwnProperty(propertyName)) {
       adapterProperty = this[propertyName];
-      if (Array.isArray(adapterProperty)) {
+      if(adapterProperty === null){
+        cloneProperty = null;
+      } else if (Array.isArray(adapterProperty)) {
         cloneProperty = [];
         adapterProperty.forEach(function(adapterPropertyElement) {
           cloneProperty.push(adapterPropertyElement.cloneAdapter({

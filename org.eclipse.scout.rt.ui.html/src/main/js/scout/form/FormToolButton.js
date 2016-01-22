@@ -34,6 +34,40 @@ scout.FormToolButton.prototype._renderText = function() {
 };
 
 /**
+ *
+ * @override
+ * form of a formToolbutton can be set to null and is set to a real form by model
+ * so we have to update and clone it after it set.
+ */
+scout.FormToolButton.prototype.cloneAdapter = function(modelOverride) {
+  var cloneAdapter = scout.FormToolButton.parent.prototype.cloneAdapter.call(this);
+  cloneAdapter.formChangeListener = this._handleOriginalFormChange.bind(cloneAdapter);
+  this.on('propertyChange', cloneAdapter.formChangeListener);
+  cloneAdapter.visible=false;
+  return cloneAdapter;
+};
+
+scout.FormToolButton.prototype._handleOriginalFormChange = function(event){
+  if(event.newProperties.form){
+    this.form =  event.newProperties.form.cloneAdapter({
+      parent: this
+    });
+  } else if (event.newProperties.form === null){
+    this.form = null;
+  }
+};
+
+/**
+ * @override
+ */
+scout.FormToolButton.prototype._remove = function() {
+  if(this.cloneOf){
+    this.cloneOf.off('propertyChange', this.formChangeListener);
+  }
+  scout.FormToolButton.parent.prototype._remove.call(this);
+};
+
+/**
  * @override
  */
 scout.FormToolButton.prototype._createPopup = function() {
@@ -51,6 +85,18 @@ scout.FormToolButton.prototype._createPopup = function() {
 scout.FormToolButton.prototype._doActionTogglesPopup = function() {
   return !!this.form;
 };
+
+/**
+ * @override
+ */
+scout.FormToolButton.prototype._doAction = function(event) {
+  //clones in submenus and contextmenues do not execute any action
+  if(this.formToolButton.form.cloneOf){
+    return false;
+  }
+  scout.FormToolButton.parent.prototype._doAction.call(this,event);
+};
+
 
 /**
  * @override
