@@ -1290,6 +1290,10 @@ scout.Tree.prototype._onNodeMouseDown = function(event) {
   this.selectNodes(node);
 
   if (this.checkable && this._isCheckboxClicked(event)) {
+    if (scout.device.supportsFocusEmptyBeforeDiv) {
+      this.session.focusManager.requestFocus(this.$container);
+      event.preventDefault();
+    }
     this.checkNode(node, !node.checked);
   }
   return true;
@@ -1614,12 +1618,13 @@ scout.Tree.prototype._onNodeControlMouseDown = function(event) {
       return false;
     }
   }
-
+  //because we suppress handling by browser we have to set focus manually.
+  this.session.focusManager.requestFocus(this.$container);
   this.selectNodes(node);
   this.setNodeExpanded(node, expanded, expansionOpts);
-
   // prevent bubbling to _onNodeMouseDown()
   $.suppressEvent(event);
+
   // ...but return true, so Outline.js can override this method and check if selection has been changed or not
   return true;
 };

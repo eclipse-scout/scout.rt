@@ -267,6 +267,10 @@ scout.Device.prototype.supportsCopyFromDisabledInputFields = function() {
   return scout.Device.Browser.FIREFOX !== this.browser;
 };
 
+scout.Device.prototype.supportsFocusEmptyBeforeDiv = function() {
+  return scout.Device.Browser.FIREFOX !== this.browser;
+};
+
 scout.Device.prototype.supportsCssProperty = function(property) {
   return this.supportsFeature(property, function check(property) {
     if (document.body.style[property] !== undefined) {
@@ -350,7 +354,7 @@ scout.Device.prototype.requiresIframeSecurityAttribute = function() {
     var test = document.createElement('iframe');
     var supportsSandbox = ('sandbox' in test);
 
-    if (supportsSandbox){
+    if (supportsSandbox) {
       return false;
     } else {
       return ('security' in test);

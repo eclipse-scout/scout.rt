@@ -58,8 +58,12 @@ scout.CheckBoxField.prototype._renderDisplayText = function(displayText) {
   //nop;
 };
 
-scout.CheckBoxField.prototype._onMouseDown = function() {
+scout.CheckBoxField.prototype._onMouseDown = function(event) {
   this._toggleChecked();
+  if (scout.device.supportsFocusEmptyBeforeDiv) {
+    this.session.focusManager.requestFocus(this.$checkBox);
+    event.preventDefault();
+  }
 };
 
 scout.CheckBoxField.prototype._toggleChecked = function() {

@@ -30,8 +30,12 @@ scout.RadioButton.prototype._remove = function($parent) {
   scout.RadioButton.parent.prototype._remove.call(this);
 };
 
-scout.RadioButton.prototype._mouseDown = function() {
+scout.RadioButton.prototype._mouseDown = function(event) {
   this._toggleChecked();
+  if (scout.device.supportsFocusEmptyBeforeDiv) {
+    this.session.focusManager.requestFocus(this.$field);
+    event.preventDefault();
+  }
 };
 
 scout.RadioButton.prototype._toggleChecked = function() {
