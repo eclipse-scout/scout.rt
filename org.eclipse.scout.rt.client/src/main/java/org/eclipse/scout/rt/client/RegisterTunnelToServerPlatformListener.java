@@ -91,6 +91,7 @@ public class RegisterTunnelToServerPlatformListener implements IPlatformListener
    * Creates a new {@link BeanMetaData} for the given class.
    */
   protected BeanMetaData createBeanMetaData(Class<?> c) {
-    return new BeanMetaData(c).withApplicationScoped(false);
+    TunnelToServerProxyProducer<?> tunnelProxyProducer = new TunnelToServerProxyProducer<>(c);
+    return new BeanMetaData(c).withApplicationScoped(true).withProducer(tunnelProxyProducer);
   }
 }

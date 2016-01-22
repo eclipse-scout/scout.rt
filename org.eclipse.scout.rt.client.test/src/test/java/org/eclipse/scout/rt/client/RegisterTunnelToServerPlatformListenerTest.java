@@ -23,6 +23,7 @@ import java.util.Set;
 
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.Replace;
+import org.eclipse.scout.rt.platform.SimpleBeanDecorationFactory;
 import org.eclipse.scout.rt.platform.interceptor.IBeanDecorator;
 import org.eclipse.scout.rt.platform.interceptor.IBeanInvocationContext;
 import org.eclipse.scout.rt.platform.internal.BeanManagerImplementor;
@@ -30,9 +31,11 @@ import org.eclipse.scout.rt.platform.inventory.IClassInfo;
 import org.eclipse.scout.rt.platform.inventory.IClassInventory;
 import org.eclipse.scout.rt.platform.inventory.internal.JandexClassInventory;
 import org.eclipse.scout.rt.platform.service.IService;
+import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.shared.TunnelToServer;
 import org.jboss.jandex.Indexer;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -44,8 +47,8 @@ public class RegisterTunnelToServerPlatformListenerTest {
 
   private static JandexClassInventory s_classInventory;
 
-  private BeanManagerImplementor m_beanManager;
   private RegisterTunnelToServerPlatformListener m_registrator;
+  private BeanManagerImplementor m_beanManager;
 
   @BeforeClass
   public static void beforeClass() throws Exception {
@@ -53,7 +56,14 @@ public class RegisterTunnelToServerPlatformListenerTest {
     indexClass(indexer, IFixtureTunnelToServer.class);
     indexClass(indexer, IFixtureTunnelToServerEx1.class);
     indexClass(indexer, IFixtureTunnelToServerEx2.class);
+    indexClass(indexer, IFixtureTunnelToServerEx3.class);
+    indexClass(indexer, FixtureTunnelToServerEx3Impl.class);
     s_classInventory = new JandexClassInventory(indexer.complete());
+  }
+
+  @AfterClass
+  public static void afterClass() {
+    s_classInventory = null;
   }
 
   protected static void indexClass(Indexer indexer, Class<?> clazz) throws IOException {
@@ -69,6 +79,7 @@ public class RegisterTunnelToServerPlatformListenerTest {
   @After
   public void after() {
     m_beanManager = null;
+    m_registrator = null;
   }
 
   @Test
@@ -81,6 +92,18 @@ public class RegisterTunnelToServerPlatformListenerTest {
   public void testReplaceEx1() {
     registerTunnelToServerBeans(IFixtureTunnelToServer.class, IFixtureTunnelToServerEx1.class);
     assertPing("return IFixtureTunnelToServerEx1#ping", IFixtureTunnelToServerEx1.class);
+  }
+
+  @Test(expected = AssertionException.class)
+  public void testNoInterface() {
+    registerTunnelToServerBeans(FixtureTunnelToServerEx3Impl.class);
+    assertPing("whatever", FixtureTunnelToServerEx3Impl.class);
+  }
+
+  @Test
+  public void testNoInheritance() {
+    registerTunnelToServerBeans(IFixtureTunnelToServerEx3.class, IFixtureTunnelToServer.class);
+    assertPing("return IFixtureTunnelToServer#ping", IFixtureTunnelToServer.class);
   }
 
   @Test
@@ -150,9 +173,9 @@ public class RegisterTunnelToServerPlatformListenerTest {
     }
   }
 
-  private static final class FixtureClientBeanDecorationFactory extends ClientBeanDecorationFactory {
+  private static final class FixtureClientBeanDecorationFactory extends SimpleBeanDecorationFactory {
     @Override
-    protected <T> IBeanDecorator<T> decorateWithTunnelToServer(final IBean<T> bean, final Class<? extends T> queryType) {
+    public <T> IBeanDecorator<T> decorate(final IBean<T> bean, Class<? extends T> queryType) {
       return new IBeanDecorator<T>() {
         @Override
         public Object invoke(IBeanInvocationContext<T> context) {
@@ -174,5 +197,16 @@ public class RegisterTunnelToServerPlatformListenerTest {
 
   @TunnelToServer
   public static interface IFixtureTunnelToServerEx2 extends IFixtureTunnelToServerEx1 {
+  }
+
+  public static interface IFixtureTunnelToServerEx3 extends IFixtureTunnelToServerEx2 {
+  }
+
+  public static class FixtureTunnelToServerEx3Impl implements IFixtureTunnelToServerEx3 {
+
+    @Override
+    public String ping() {
+      return "pong";
+    }
   }
 }

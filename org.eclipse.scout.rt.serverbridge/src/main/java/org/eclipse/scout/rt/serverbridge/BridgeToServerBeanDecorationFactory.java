@@ -10,9 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.serverbridge;
 
-import org.eclipse.scout.rt.client.ClientBeanDecorationFactory;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.Replace;
+import org.eclipse.scout.rt.platform.SimpleBeanDecorationFactory;
 import org.eclipse.scout.rt.platform.interceptor.IBeanDecorator;
 import org.eclipse.scout.rt.shared.TunnelToServer;
 
@@ -25,9 +25,13 @@ import org.eclipse.scout.rt.shared.TunnelToServer;
  * @since 5.2
  */
 @Replace
-public class BridgeToServerBeanDecorationFactory extends ClientBeanDecorationFactory {
+public class BridgeToServerBeanDecorationFactory extends SimpleBeanDecorationFactory {
   @Override
-  protected <T> IBeanDecorator<T> decorateWithTunnelToServer(IBean<T> bean, Class<? extends T> queryType) {
-    return new BridgeToServerBeanDecorator<T>();
+  public <T> IBeanDecorator<T> decorate(IBean<T> bean, Class<? extends T> queryType) {
+    IBeanDecorator<T> decorator = super.decorate(bean, queryType);
+    if (bean.getBeanAnnotation(TunnelToServer.class) != null) {
+      decorator = new BridgeToServerBeanDecorator<>(decorator);
+    }
+    return decorator;
   }
 }
