@@ -362,9 +362,10 @@ public class InvocationContext<PORT> {
       // If cancelled, try to close the HTTP connection (if supported by JAX-WS implementor) and throw a CancellationException.
       if (runMonitor.isCancelled()) {
         m_implementorSpecifics.closeSocket(port, operation);
-        throw new WebServiceRequestCancelledException(operation)
-            .withContextInfo("port", port)
-            .withContextInfo("method", "method");
+        throw new WebServiceRequestCancelledException("webservice request cancelled")
+            .withContextInfo("wsClient", m_name)
+            .withContextInfo("port", port.getClass().getSimpleName())
+            .withContextInfo("method", method.getName());
       }
 
       // Propagate result or error.
