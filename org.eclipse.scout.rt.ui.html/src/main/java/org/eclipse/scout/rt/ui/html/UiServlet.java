@@ -32,7 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Instances of this class must be registered global handler for "/*".
+ * Instances of this class must be registered as global handler for "/*".
  * <p>
  * The index.html is served as "/" or "/index.html" using HTTP GET, see {@link ResourceRequestHandler}.
  * <p>
