@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table.columns;
 
-//FIXME fko: revisit and check if needed
 /**
  * A column that renders its content as a font icon or image
  */
