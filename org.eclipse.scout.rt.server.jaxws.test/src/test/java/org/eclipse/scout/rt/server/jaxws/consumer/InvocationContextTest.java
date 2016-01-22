@@ -27,6 +27,7 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CancellationException;
+import java.util.concurrent.TimeUnit;
 
 import javax.jws.WebMethod;
 import javax.xml.ws.BindingProvider;
@@ -38,6 +39,7 @@ import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.holders.BooleanHolder;
 import org.eclipse.scout.rt.platform.holders.Holder;
+import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.server.IServerSession;
@@ -216,9 +218,10 @@ public class InvocationContextTest {
     verify(m_port).notWebMethod();
   }
 
-  @Test
+  @Test(timeout = 5000)
   public void testCancel() {
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
+    final IBlockingCondition processingCondition = Jobs.newBlockingCondition(true);
 
     final InvocationContext<TestPort> invocationContext = new InvocationContext<>(m_port, "name");
     invocationContext.withEndpointUrl("http://localhost");
@@ -228,13 +231,8 @@ public class InvocationContextTest {
 
       @Override
       public Void answer(InvocationOnMock invocation) throws Throwable {
-        try {
-          setupLatch.countDownAndBlock();
-        }
-        catch (InterruptedException e) {
-          // NOOP
-        }
-
+        setupLatch.countDown();
+        processingCondition.waitForUninterruptibly(10, TimeUnit.SECONDS);
         return null;
       }
     }).when(m_port).webMethod();
@@ -253,19 +251,24 @@ public class InvocationContextTest {
         .withRunContext(RunContexts.copyCurrent()));
 
     // Run the test by invoking the web service with a specific RunMonitor to test cancellation.
-    RunContexts.empty().withRunMonitor(runMonitor).run(new IRunnable() {
+    try {
+      RunContexts.empty().withRunMonitor(runMonitor).run(new IRunnable() {
 
-      @Override
-      public void run() throws Exception {
-        try {
-          invocationContext.getPort().webMethod(); // this method blocks until cancelled.
-          fail();
+        @Override
+        public void run() throws Exception {
+          try {
+            invocationContext.getPort().webMethod(); // this method blocks until cancelled.
+            fail("CancellationException expected");
+          }
+          catch (CancellationException e) {
+            verify(m_implementorSpecifics).closeSocket(same(m_port), anyString());
+          }
         }
-        catch (CancellationException e) {
-          verify(m_implementorSpecifics).closeSocket(same(m_port), anyString());
-        }
-      }
-    });
+      });
+    }
+    finally {
+      processingCondition.setBlocking(false);
+    }
   }
 
   interface TestPort extends BindingProvider {
