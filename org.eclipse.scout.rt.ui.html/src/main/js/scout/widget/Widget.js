@@ -68,7 +68,6 @@ scout.Widget.prototype.render = function($parent) {
   }
   this.rendered = true;
   this.attached = true;
-  this._trigger('rendered');
   this._postRender();
 };
 

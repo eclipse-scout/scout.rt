@@ -116,6 +116,7 @@ scout.Form.prototype.close = function() {
 };
 
 scout.Form.prototype._postRender = function() {
+  this._trigger('rendered');
   this._installFocusContext();
 
   if (this.renderInitialFocusEnabled) {
