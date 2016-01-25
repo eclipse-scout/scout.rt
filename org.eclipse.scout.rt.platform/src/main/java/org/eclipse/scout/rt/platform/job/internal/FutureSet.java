@@ -25,7 +25,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.annotations.Internal;
 import org.eclipse.scout.rt.platform.config.CONFIG;
-import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.JobManagerInitialFutureSetCapacityProperty;
+import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.JobManagerCorePoolSizeProperty;
 import org.eclipse.scout.rt.platform.filter.AlwaysFilter;
 import org.eclipse.scout.rt.platform.filter.AndFilter;
 import org.eclipse.scout.rt.platform.filter.IFilter;
@@ -55,7 +55,7 @@ public class FutureSet {
   private IJobListenerRegistration m_jobListenerRegistration;
 
   public FutureSet() {
-    m_futures = new HashSet<>(CONFIG.getPropertyValue(JobManagerInitialFutureSetCapacityProperty.class));
+    m_futures = new HashSet<>(CONFIG.getPropertyValue(JobManagerCorePoolSizeProperty.class));
 
     final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
     m_readLock = lock.readLock();
