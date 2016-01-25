@@ -212,14 +212,8 @@ public class JobManager implements IJobManager {
     // Dispose Futures.
     m_futures.dispose();
 
-    // Shutdown Java Executor Service.
-    m_executor.shutdownNow();
-    try {
-      m_executor.awaitTermination(1, TimeUnit.MINUTES);
-    }
-    catch (final java.lang.InterruptedException e) {
-      // NOOP
-    }
+    // Shutdown the Executor.
+    shutdownExecutor(m_executor);
 
     // Fire event that job manager was shutdown.
     fireEvent(new JobEvent(this, JobEventType.JOB_MANAGER_SHUTDOWN, new JobEventData()));
@@ -264,7 +258,6 @@ public class JobManager implements IJobManager {
   /**
    * Creates the executor to run jobs.
    */
-  @Internal
   protected ExecutorService createExecutor() {
     final int corePoolSize = CONFIG.getPropertyValue(JobManagerCorePoolSizeProperty.class);
     final int maximumPoolSize = CONFIG.getPropertyValue(JobManagerMaximumPoolSizeProperty.class);
@@ -314,6 +307,19 @@ public class JobManager implements IJobManager {
   @Internal
   protected DelayedExecutor getDelayedExecutor() {
     return m_delayedExecutor;
+  }
+
+  /**
+   * Method invoked to shutdown the executor.
+   */
+  protected void shutdownExecutor(final ExecutorService executor) {
+    executor.shutdownNow();
+    try {
+      executor.awaitTermination(1, TimeUnit.MINUTES);
+    }
+    catch (final InterruptedException e) {
+      // NOOP
+    }
   }
 
   /**
