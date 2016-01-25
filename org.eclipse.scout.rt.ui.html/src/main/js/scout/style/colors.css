@@ -220,8 +220,8 @@
 @table-info-warning-color: @palette-blue-4;
 @table-info-warning-hover-color: @palette-blue-6;
 @table-row-border-color: @border-color;
-@table-row-checked-background-color: @palette-blue-4;
-@table-row-checked-selected-focus-background-color: lighten(@palette-blue-4, 22%);
+@table-row-checked-background-color: @palette-blue-5;
+@table-row-checked-selected-focus-background-color: lighten(@palette-blue-5, 22%);
 @table-row-checked-selected-background-color: greyscale(@table-row-checked-selected-focus-background-color);
 @text-field-icon-color: @palette-gray-6;
 @text-field-icon-error-color: @error-border-color;
