@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 @menubar-height: @logical-grid-height;
-@menu-item-margin-right: 18px;
+@menu-item-margin-right: 20px;
 
 /* Mixins */
 
