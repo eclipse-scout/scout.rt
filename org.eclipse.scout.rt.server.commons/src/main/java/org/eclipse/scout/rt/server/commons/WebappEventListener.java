@@ -27,7 +27,8 @@ public class WebappEventListener implements ServletContextListener {
   @Override
   public void contextInitialized(ServletContextEvent sce) {
     // Accessing the class activates the platform if it is not yet initialized
-    Platform.get();
+    IPlatform platform = Platform.get();
+    platform.awaitPlatformStarted();
   }
 
   @Override

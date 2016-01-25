@@ -80,6 +80,13 @@ public interface IPlatform {
   IBeanManager getBeanManager();
 
   /**
+   * Suspends the calling thread until the platform has reached {@link State#PlatformStarted} and all intersted
+   * {@link IPlatformListener}s have been notified. If the platform is already in this state, the method returns
+   * directly.
+   */
+  void awaitPlatformStarted();
+
+  /**
    * Starts the platform.
    *
    * @throws PlatformException

@@ -45,6 +45,7 @@ public class PlatformImplementor implements IPlatform {
   private static final Logger LOG = LoggerFactory.getLogger(PlatformImplementor.class);
 
   private final ReentrantReadWriteLock m_platformLock = new ReentrantReadWriteLock(true);
+  private final Object m_platformStartedLock = new Object();
   private final AtomicReference<State> m_state; // may be read at any time by any thread
   private BeanManagerImplementor m_beanContext;
 
@@ -73,45 +74,84 @@ public class PlatformImplementor implements IPlatform {
   }
 
   @Override
+  public void awaitPlatformStarted() {
+    if (isPlatformStarted()) {
+      return;
+    }
+    synchronized (m_platformStartedLock) {
+      while (!isPlatformStarted()) {
+        try {
+          m_platformStartedLock.wait();
+        }
+        catch (InterruptedException e) {
+          // nop
+        }
+      }
+    }
+  }
+
+  protected boolean isPlatformStarted() {
+    final State state = getState();
+    if (state == null || state == State.PlatformInvalid) {
+      throw new PlatformException("The platform is in an invalid state.");
+    }
+    if (state == State.PlatformStopping) {
+      throw new PlatformException("The platform is stopping.");
+    }
+    return state == State.PlatformStarted;
+  }
+
+  protected void notifyPlatformStarted() {
+    synchronized (m_platformStartedLock) {
+      m_platformStartedLock.notifyAll();
+    }
+  }
+
+  @Override
   public void start() {
     start(null);
   }
 
   @Override
   public void start(PlatformStateLatch stateLatch) {
-    m_platformLock.writeLock().lock();
     try {
-      if (stateLatch != null) {
-        stateLatch.release();
-      }
-      if (m_state.get() != State.PlatformStopped) {
-        throw new PlatformException("Platform is not stopped [m_state=" + m_state.get() + "]");
-      }
-
+      m_platformLock.writeLock().lock();
       try {
-        m_beanContext = createBeanManager();
-        //now all IPlatformListener are registered and can receive platform events
-        changeState(State.BeanManagerPrepared, true);
+        if (stateLatch != null) {
+          stateLatch.release();
+        }
+        if (m_state.get() != State.PlatformStopped) {
+          throw new PlatformException("Platform is not stopped [m_state=" + m_state.get() + "]");
+        }
 
-        //validateBeanManager();
-        validateConfiguration();
-        initBeanDecorationFactory();
+        try {
+          m_beanContext = createBeanManager();
+          //now all IPlatformListener are registered and can receive platform events
+          changeState(State.BeanManagerPrepared, true);
 
-        changeState(State.BeanManagerValid, true);
-        startCreateImmediatelyBeans();
+          //validateBeanManager();
+          validateConfiguration();
+          initBeanDecorationFactory();
+
+          changeState(State.BeanManagerValid, true);
+          startCreateImmediatelyBeans();
+        }
+        catch (RuntimeException | Error e) {
+          LOG.error("Error during platform startup", e);
+          changeState(State.PlatformInvalid, true);
+          throw e;
+        }
       }
-      catch (RuntimeException | Error e) {
-        LOG.error("Error during platform startup", e);
-        changeState(State.PlatformInvalid, true);
-        throw e;
+      finally {
+        //since we are using a reentrant lock, platform beans can be accessed within platform listeners
+        //lock has to be released after the State.BeanManagerValid change to make sure everything is initialized correctly, before beans can be accessed.
+        m_platformLock.writeLock().unlock();
       }
+      changeState(State.PlatformStarted, true);
     }
     finally {
-      //since we are using a reentrant lock, platform beans can be accessed within platform listeners
-      //lock has to be released after the State.BeanManagerValid change to make sure everything is initialized correctly, before beans can be accessed.
-      m_platformLock.writeLock().unlock();
+      notifyPlatformStarted();
     }
-    changeState(State.PlatformStarted, true);
   }
 
   protected void validateConfiguration() {

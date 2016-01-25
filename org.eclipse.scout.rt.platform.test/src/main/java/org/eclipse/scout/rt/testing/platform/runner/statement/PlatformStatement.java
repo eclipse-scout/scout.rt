@@ -79,6 +79,7 @@ public class PlatformStatement extends Statement {
 
   protected void evaluateWithNewPlatform() throws Throwable {
     IPlatform old = Platform.get();
+    old.awaitPlatformStarted();
     Platform.set(new DefaultPlatform());
     try {
       Platform.get().start();
@@ -92,7 +93,8 @@ public class PlatformStatement extends Statement {
 
   protected void evaluateWithGlobalPlatform() throws Throwable {
     //ensure started
-    Platform.get();
+    IPlatform platform = Platform.get();
+    platform.awaitPlatformStarted();
     m_next.evaluate();
   }
 }
