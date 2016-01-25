@@ -501,9 +501,18 @@ public final class BookmarkUtility {
 
       if (!userSortValid) {
         columnSet.clearSortColumns();
-        //TODO [5.2] fko: grouping for header sort cols
-        // do not just set to true, check if headers are grouped & visible or whatever my be necessary
         boolean groupingPossible = true;
+        for (IColumn<?> headSortColumn : columnSet.getPermanentHeadSortColumns()) {
+          if (!headSortColumn.isVisible() || !headSortColumn.isGroupingActive()) {
+            TableColumnState state = sortColToColumnState.get(headSortColumn);
+            if (state != null) {
+              if (!state.isGroupingActive()) {
+                groupingPossible = false;
+                break;
+              }
+            }
+          }
+        }
         for (IColumn<?> col : sortColMap.values()) {
           TableColumnState state = sortColToColumnState.get(col);
           if (groupingPossible) {

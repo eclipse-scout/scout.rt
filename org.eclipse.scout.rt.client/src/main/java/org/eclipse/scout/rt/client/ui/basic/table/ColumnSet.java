@@ -778,7 +778,6 @@ public class ColumnSet {
    */
   public boolean isGroupingAllowed(IColumn<?> col) {
     if (isPermanentTailSortColumn(col)) {
-      //TODO [5.2] fko: make sure this is checked everywhere, e.g. in applyGrouping.
       return false;
     }
 
