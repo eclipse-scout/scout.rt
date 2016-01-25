@@ -66,7 +66,6 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm;
 import org.eclipse.scout.rt.client.ui.form.IForm;
-import org.eclipse.scout.rt.client.ui.form.PrintDevice;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
@@ -76,7 +75,6 @@ import org.eclipse.scout.rt.platform.OrderedComparator;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
-import org.eclipse.scout.rt.platform.exception.PlatformExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.holders.Holder;
@@ -91,7 +89,6 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.EventListenerList;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
-import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 import org.eclipse.scout.rt.shared.extension.ContributionComposite;
 import org.eclipse.scout.rt.shared.extension.ExtensionUtility;
@@ -1401,17 +1398,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     propertySupport.setPropertyBool(PROP_CACHE_SPLITTER_POSITION, b);
   }
 
-  @Override
-  public void printDesktop(PrintDevice device, Map<String, Object> parameters) {
-    try {
-      firePrint(device, parameters);
-    }
-    catch (RuntimeException e) {
-      throw BEANS.get(PlatformExceptionTranslator.class).translate(e)
-          .withContextInfo("operation", "{} {}", ScoutTexts.get("FormPrint"), getTitle());
-    }
-  }
-
   @SuppressWarnings("deprecation")
   @Override
   public List<IFileChooser> getFileChooserStack() {
@@ -1657,10 +1643,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   private void fireDesktopClosed() {
     DesktopEvent e = new DesktopEvent(this, DesktopEvent.TYPE_DESKTOP_CLOSED);
     fireDesktopEvent(e);
-  }
-
-  private void firePrint(PrintDevice device, Map<String, Object> parameters) {
-    fireDesktopEvent(new DesktopEvent(this, DesktopEvent.TYPE_PRINT, device, parameters));
   }
 
   private List<IMenu> fireTrayPopup() {

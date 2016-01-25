@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.client.ui.form;
 
 import java.security.Permission;
 import java.util.List;
-import java.util.Map;
 
 import org.eclipse.scout.rt.client.ui.IDisplayParent;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
@@ -657,26 +656,6 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId, IDis
   SearchFilter getSearchFilter();
 
   void setSearchFilter(SearchFilter filter);
-
-  /**
-   * Prints the form<br>
-   * <p>
-   * The method returns immediately, the print is done in the background.<br>
-   * As soon as the print has been finished the {@link FormEvent#TYPE_PRINTED} is fired.
-   * <p>
-   * For details and parameter details see {@link PrintDevice}
-   */
-  void printForm(PrintDevice device, Map<String, Object> parameters);
-
-  /**
-   * Prints a form field<br>
-   * <p>
-   * The method returns immediately, the print is done in the background.<br>
-   * As soon as the print has been finished the {@link FormEvent#TYPE_PRINTED} is fired.
-   * <p>
-   * For details and parameter details see {@link PrintDevice}
-   */
-  void printField(IFormField field, PrintDevice device, Map<String, Object> parameters);
 
   /**
    * Request focus for the field by sending a {@link FormEvent#TYPE_REQUEST_FOCUS} event

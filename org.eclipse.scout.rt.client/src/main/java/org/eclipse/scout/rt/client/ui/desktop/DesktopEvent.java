@@ -24,7 +24,6 @@ import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm;
 import org.eclipse.scout.rt.client.ui.form.IForm;
-import org.eclipse.scout.rt.client.ui.form.PrintDevice;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
@@ -80,10 +79,6 @@ public class DesktopEvent extends EventObject implements IModelEvent {
   @Deprecated
   public static final int TYPE_MESSAGE_BOX_REMOVED = 710;
   public static final int TYPE_MESSAGE_BOX_HIDE = 710;
-  /**
-   * print a form using properties printDevice, printParameters
-   */
-  public static final int TYPE_PRINT = 900;
 
   public static final int TYPE_PRINTED = 901;
 
@@ -135,7 +130,6 @@ public class DesktopEvent extends EventObject implements IModelEvent {
   private IMessageBox m_messageBox;
   private IFileChooser m_fileChooser;
   private String m_uri;
-  private PrintDevice m_printDevice;
   private Map<String, Object> m_printParameters;
   private List<IMenu> m_popupMenus;
   private File m_printedFile;
@@ -182,13 +176,6 @@ public class DesktopEvent extends EventObject implements IModelEvent {
     this(source, type);
     m_binaryResource = res;
     m_openUriAction = openUriAction;
-  }
-
-  public DesktopEvent(IDesktop source, int type, PrintDevice printDevice, Map<String, Object> printParameters) {
-    super(source);
-    m_type = type;
-    m_printDevice = printDevice;
-    m_printParameters = printParameters;
   }
 
   public IDesktop getDesktop() {
@@ -242,10 +229,6 @@ public class DesktopEvent extends EventObject implements IModelEvent {
 
   public void setFocusedField(IFormField f) {
     m_focusedField = f;
-  }
-
-  public PrintDevice getPrintDevice() {
-    return m_printDevice;
   }
 
   public File getPrintedFile() {

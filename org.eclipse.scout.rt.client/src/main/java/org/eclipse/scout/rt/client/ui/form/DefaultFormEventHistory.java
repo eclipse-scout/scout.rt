@@ -18,11 +18,10 @@ import org.eclipse.scout.rt.client.ui.AbstractEventHistory;
  * <li>{@link FormEvent#TYPE_REQUEST_FOCUS}</li>
  * <li>{@link FormEvent#TYPE_TO_BACK}</li>
  * <li>{@link FormEvent#TYPE_TO_FRONT}</li>
- * <li>{@link FormEvent#TYPE_PRINT}</li>
  * </ul>
  * <p>
  * This object is thread safe.
- * 
+ *
  * @since 3.8
  */
 public class DefaultFormEventHistory extends AbstractEventHistory<FormEvent> {
@@ -43,11 +42,6 @@ public class DefaultFormEventHistory extends AbstractEventHistory<FormEvent> {
         addToCache(event.getType(), event);
         break;
       }
-      case FormEvent.TYPE_PRINT: {
-        addToCache(event, event);
-        break;
-      }
     }
   }
-
 }

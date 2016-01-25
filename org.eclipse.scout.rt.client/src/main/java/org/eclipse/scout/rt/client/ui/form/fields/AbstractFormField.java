@@ -41,7 +41,6 @@ import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.IForm;
-import org.eclipse.scout.rt.client.ui.form.PrintDevice;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
@@ -1023,11 +1022,6 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   @Override
   public String toString() {
     return getLabel() + "/" + getFieldId() + " (" + getClass().getName() + ")";
-  }
-
-  @Override
-  public void printField(PrintDevice device, Map<String, Object> parameters) {
-    getForm().printField(this, device, parameters);
   }
 
   @Override

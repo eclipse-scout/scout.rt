@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form;
 
-import java.io.File;
-
 public interface IFormUIFacade {
 
   void fireFormActivatedFromUI();
@@ -27,10 +25,5 @@ public interface IFormUIFacade {
    * This request is a forced close of the form from the ui and closes the form model regardless of its state.
    */
   void fireFormKilledFromUI();
-
-  /**
-   * Notification that ui has taken a print screen. The file given to this notification is written and closed.
-   */
-  void fireFormPrintedFromUI(File outputFile);
 
 }

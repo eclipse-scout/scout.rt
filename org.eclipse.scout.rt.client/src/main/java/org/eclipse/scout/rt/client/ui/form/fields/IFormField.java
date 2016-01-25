@@ -13,12 +13,10 @@ package org.eclipse.scout.rt.client.ui.form.fields;
 import java.beans.PropertyChangeListener;
 import java.security.Permission;
 import java.util.List;
-import java.util.Map;
 
 import org.eclipse.scout.rt.client.ui.IStyleable;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.form.IForm;
-import org.eclipse.scout.rt.client.ui.form.PrintDevice;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.platform.IOrdered;
 import org.eclipse.scout.rt.platform.classid.ITypeWithClassId;
@@ -193,15 +191,6 @@ public interface IFormField extends IPropertyObserver, ITypeWithClassId, IOrdere
   void initField();
 
   void disposeField();
-
-  /**
-   * Convenience for {@link #getForm()} . {@link IForm#printField(IFormField, PrintDevice, Map)}
-   * <p>
-   * The method returns immediately, the print is done int the background.
-   * <p>
-   * For details and parameter details see {@link PrintDevice}
-   */
-  void printField(PrintDevice device, Map<String, Object> parameters);
 
   void setView(boolean visible, boolean enabled, boolean mandatory);
 

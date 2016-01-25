@@ -36,7 +36,6 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.form.IForm;
-import org.eclipse.scout.rt.client.ui.form.PrintDevice;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
@@ -610,12 +609,6 @@ public class VirtualDesktop implements IDesktop {
 
   @Override
   public boolean isGuiAvailable() {
-    throw createUnsupportedOperationException();
-
-  }
-
-  @Override
-  public void printDesktop(PrintDevice device, Map<String, Object> parameters) {
     throw createUnsupportedOperationException();
   }
 

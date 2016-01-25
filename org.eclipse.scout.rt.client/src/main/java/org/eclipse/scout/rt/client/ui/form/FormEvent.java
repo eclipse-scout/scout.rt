@@ -10,17 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form;
 
-import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.EventObject;
-import java.util.Map;
 
 import org.eclipse.scout.rt.client.ui.IModelEvent;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.pagefield.IPageField;
 import org.eclipse.scout.rt.client.ui.form.fields.wrappedform.IWrappedFormField;
-import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
 /**
  * Form lifecycle for observing form "open" event attach to IDesktop and listen for FORM_ADDED
@@ -36,14 +33,6 @@ public class FormEvent extends EventObject implements IModelEvent {
   public static final int TYPE_STORE_AFTER = 2020;
   public static final int TYPE_DISCARDED = 3000;
   public static final int TYPE_CLOSED = 3010;
-  /**
-   * print a form using properties formField, printDevice, printParameters
-   */
-  public static final int TYPE_PRINT = 4000;
-  /**
-   * This event is sent once the async print job is done
-   */
-  public static final int TYPE_PRINTED = 4010;
   /**
    * When the field structure changes Examples: a field changes its "visible" property a {@link IWrappedFormField}
    * changes its inner form a {@link IPageField} changes its table/search/detail a custom field changes in a way that
@@ -66,9 +55,6 @@ public class FormEvent extends EventObject implements IModelEvent {
 
   private final int m_type;
   private final IFormField m_formField;
-  private final PrintDevice m_printDevice;
-  private final Map<String, Object> m_printParameters;
-  private final File m_printedFile;
 
   /**
    * A form event is sent whenever a form changes. You can register to receive such events via
@@ -77,28 +63,13 @@ public class FormEvent extends EventObject implements IModelEvent {
    * interested in the <b>type</b> you get via <code>getType</code>.
    */
   public FormEvent(IForm form, int type) {
-    this(form, type, null, null, null);
-  }
-
-  public FormEvent(IForm form, int type, File printedFile) {
-    this(form, type, null, null, null, printedFile);
+    this(form, type, null);
   }
 
   public FormEvent(IForm form, int type, IFormField causingField) {
-    this(form, type, causingField, null, null);
-  }
-
-  public FormEvent(IForm form, int type, IFormField printRoot, PrintDevice printDevice, Map<String, Object> printParameters) {
-    this(form, type, printRoot, printDevice, printParameters, null);
-  }
-
-  public FormEvent(IForm form, int type, IFormField printRoot, PrintDevice printDevice, Map<String, Object> printParameters, File printedFile) {
     super(form);
     m_type = type;
-    m_formField = printRoot;
-    m_printDevice = printDevice;
-    m_printParameters = printParameters;
-    m_printedFile = printedFile;
+    m_formField = causingField;
   }
 
   public IForm getForm() {
@@ -114,21 +85,9 @@ public class FormEvent extends EventObject implements IModelEvent {
     return m_formField;
   }
 
-  public PrintDevice getPrintDevice() {
-    return m_printDevice;
-  }
-
-  public File getPrintedFile() {
-    return m_printedFile;
-  }
-
-  public Map<String, Object> getPrintParameters() {
-    return CollectionUtility.copyMap(m_printParameters);
-  }
-
   @Override
   public String toString() {
-    StringBuffer buf = new StringBuffer();
+    StringBuilder buf = new StringBuilder();
     buf.append("DialogEvent[");
     // decode type
     try {

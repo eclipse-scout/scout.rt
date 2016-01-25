@@ -14,7 +14,6 @@ import java.beans.PropertyChangeListener;
 import java.text.Normalizer.Form;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.scout.rt.client.ui.DataChangeListener;
@@ -33,7 +32,6 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.IForm;
-import org.eclipse.scout.rt.client.ui.form.PrintDevice;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
@@ -671,15 +669,6 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent {
    *          The action to be performed on the UI for the URI. Must not be <code>null</code>.
    */
   void openUri(BinaryResource binaryResource, IOpenUriAction openUriAction);
-
-  /**
-   * Prints the desktop
-   * <p>
-   * The method returns immediately, the print is done int the background.
-   * <p>
-   * For details and parameter details see {@link PrintDevice}
-   */
-  void printDesktop(PrintDevice device, Map<String, Object> parameters);
 
   /**
    * Activates a {@link Bookmark} on this desktop.
