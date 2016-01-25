@@ -22,10 +22,8 @@ import java.util.regex.Pattern;
 
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.context.RunContexts;
-import org.eclipse.scout.rt.platform.filter.AndFilter;
 import org.eclipse.scout.rt.platform.job.internal.JobManager;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
-import org.eclipse.scout.rt.platform.visitor.IVisitor;
 import org.eclipse.scout.rt.testing.platform.job.JobTestUtil;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.platform.util.BlockingCountDownLatch;
@@ -220,15 +218,8 @@ public class JobFutureVisitTest {
 
   @Test
   public void testVisitNullFilter() {
-    final Set<String> visitedFutures = new HashSet<>();
-    Jobs.getJobManager().visit(null, new IVisitor<IFuture<?>>() {
+    Set<IFuture<?>> futures = Jobs.getJobManager().getFutures(null);
 
-      @Override
-      public boolean visit(IFuture<?> future) {
-        visitedFutures.add(future.getJobInput().getName());
-        return true;
-      }
-    });
     Set<String> expected = new HashSet<>();
     expected.add("mutex1_job1"); // blocked
     expected.add("mutex1_job2"); // waiting on the latch
@@ -238,22 +229,15 @@ public class JobFutureVisitTest {
     expected.add("mutex2_job3"); // waiting on the latch
     expected.add("mutex2_job4"); // waiting for execution
     expected.add("mutex3_job1"); // waiting on the latch
-    assertEquals(expected, visitedFutures);
+    assertEquals(expected, extractJobNames(futures));
   }
 
   @Test
   public void testVisitFilter() {
-    final Set<String> visitedFutures = new HashSet<>();
-    Jobs.getJobManager().visit(Jobs.newFutureFilterBuilder()
+    Set<IFuture<?>> futures = Jobs.getJobManager().getFutures(Jobs.newFutureFilterBuilder()
         .andMatchExecutionHint(JOB_IDENTIFIER)
-        .toFilter(), new IVisitor<IFuture<?>>() {
+        .toFilter());
 
-          @Override
-          public boolean visit(IFuture<?> future) {
-            visitedFutures.add(future.getJobInput().getName());
-            return true;
-          }
-        });
     Set<String> expected = new HashSet<>();
     expected.add("mutex1_job1"); // blocked
     expected.add("mutex1_job2"); // waiting on the latch
@@ -263,22 +247,15 @@ public class JobFutureVisitTest {
     expected.add("mutex2_job3"); // waiting on the latch
     expected.add("mutex2_job4"); // waiting for execution
     expected.add("mutex3_job1"); // waiting on the latch
-    assertEquals(expected, visitedFutures);
+    assertEquals(expected, extractJobNames(futures));
   }
 
   @Test
   public void testVisitBlockedFilter() {
-    final Set<String> visitedFutures = new HashSet<>();
-    Jobs.getJobManager().visit(Jobs.newFutureFilterBuilder()
+    Set<IFuture<?>> futures = Jobs.getJobManager().getFutures(Jobs.newFutureFilterBuilder()
         .andMatchState(JobState.WAITING_FOR_BLOCKING_CONDITION)
-        .toFilter(), new IVisitor<IFuture<?>>() {
+        .toFilter());
 
-          @Override
-          public boolean visit(IFuture<?> future) {
-            visitedFutures.add(future.getJobInput().getName());
-            return true;
-          }
-        });
     Set<String> expected = new HashSet<>();
     expected.add("mutex1_job1"); // blocked
 //    expected.add("mutex1_job2"); // waiting on the latch
@@ -288,23 +265,16 @@ public class JobFutureVisitTest {
 //    expected.add("mutex2_job3"); // waiting on the latch
 //    expected.add("mutex2_job4"); // waiting for execution
 //    expected.add("mutex3_job1"); // waiting on the latch
-    assertEquals(expected, visitedFutures);
+    assertEquals(expected, extractJobNames(futures));
   }
 
   @Test
   public void testVisitNotBlockedFilter() {
-    final Set<String> visitedFutures = new HashSet<>();
-    Jobs.getJobManager().visit(Jobs.newFutureFilterBuilder()
+    Set<IFuture<?>> futures = Jobs.getJobManager().getFutures(Jobs.newFutureFilterBuilder()
         .andMatchExecutionHint(JOB_IDENTIFIER)
         .andMatchNotState(JobState.WAITING_FOR_BLOCKING_CONDITION)
-        .toFilter(), new IVisitor<IFuture<?>>() {
+        .toFilter());
 
-          @Override
-          public boolean visit(IFuture<?> future) {
-            visitedFutures.add(future.getJobInput().getName());
-            return true;
-          }
-        });
     Set<String> expected = new HashSet<>();
 //    expected.add("mutex1_job1"); // blocked
     expected.add("mutex1_job2"); // waiting on the latch
@@ -314,22 +284,15 @@ public class JobFutureVisitTest {
     expected.add("mutex2_job3"); // waiting on the latch
     expected.add("mutex2_job4"); // waiting for execution
     expected.add("mutex3_job1"); // waiting on the latch
-    assertEquals(expected, visitedFutures);
+    assertEquals(expected, extractJobNames(futures));
   }
 
   @Test
   public void testVisitSession1Filter() {
-    final Set<String> visitedFutures = new HashSet<>();
-    Jobs.getJobManager().visit(Jobs.newFutureFilterBuilder()
+    Set<IFuture<?>> futures = Jobs.getJobManager().getFutures(Jobs.newFutureFilterBuilder()
         .andMatchNameRegex(Pattern.compile("mutex1_.*"))
-        .toFilter(), new IVisitor<IFuture<?>>() {
+        .toFilter());
 
-          @Override
-          public boolean visit(IFuture<?> future) {
-            visitedFutures.add(future.getJobInput().getName());
-            return true;
-          }
-        });
     Set<String> expected = new HashSet<>();
     expected.add("mutex1_job1"); // blocked
     expected.add("mutex1_job2"); // waiting on the latch
@@ -339,22 +302,15 @@ public class JobFutureVisitTest {
 //    expected.add("mutex2_job3"); // waiting on the latch
 //    expected.add("mutex2_job4"); // waiting for execution
 //    expected.add("mutex3_job1"); // waiting on the latch
-    assertEquals(expected, visitedFutures);
+    assertEquals(expected, extractJobNames(futures));
   }
 
   @Test
   public void testVisitSession2Filter() {
-    final Set<String> visitedFutures = new HashSet<>();
-    Jobs.getJobManager().visit(Jobs.newFutureFilterBuilder()
+    Set<IFuture<?>> futures = Jobs.getJobManager().getFutures(Jobs.newFutureFilterBuilder()
         .andMatchNameRegex(Pattern.compile("mutex2_.*"))
-        .toFilter(), new IVisitor<IFuture<?>>() {
+        .toFilter());
 
-          @Override
-          public boolean visit(IFuture<?> future) {
-            visitedFutures.add(future.getJobInput().getName());
-            return true;
-          }
-        });
     Set<String> expected = new HashSet<>();
 //    expected.add("mutex1_job1"); // blocked
 //    expected.add("mutex1_job2"); // waiting on the latch
@@ -364,23 +320,15 @@ public class JobFutureVisitTest {
     expected.add("mutex2_job3"); // waiting on the latch
     expected.add("mutex2_job4"); // waiting for execution
 //    expected.add("mutex3_job1"); // waiting on the latch
-    assertEquals(expected, visitedFutures);
+    assertEquals(expected, extractJobNames(futures));
   }
 
   @Test
   public void testVisitSessionFilterAndBlocked() {
-    final Set<String> visitedFutures = new HashSet<>();
-    Jobs.getJobManager().visit(new AndFilter<IFuture<?>>(Jobs.newFutureFilterBuilder()
+    Set<IFuture<?>> futures = Jobs.getJobManager().getFutures(Jobs.newFutureFilterBuilder()
         .andMatchNameRegex(Pattern.compile("mutex1_.*"))
         .andMatchState(JobState.WAITING_FOR_BLOCKING_CONDITION)
-        .toFilter()), new IVisitor<IFuture<?>>() {
-
-          @Override
-          public boolean visit(IFuture<?> future) {
-            visitedFutures.add(future.getJobInput().getName());
-            return true;
-          }
-        });
+        .toFilter());
     Set<String> expected = new HashSet<>();
     expected.add("mutex1_job1"); // blocked
 //    expected.add("mutex1_job2"); // waiting on the latch
@@ -390,6 +338,14 @@ public class JobFutureVisitTest {
 //    expected.add("mutex2_job3"); // waiting on the latch
 //    expected.add("mutex2_job4"); // waiting for execution
 //    expected.add("mutex3_job1"); // waiting on the latch
-    assertEquals(expected, visitedFutures);
+    assertEquals(expected, extractJobNames(futures));
+  }
+
+  private static Set<String> extractJobNames(Set<IFuture<?>> futures) {
+    Set<String> jobNames = new HashSet<>();
+    for (IFuture<?> future : futures) {
+      jobNames.add(future.getJobInput().getName());
+    }
+    return jobNames;
   }
 }

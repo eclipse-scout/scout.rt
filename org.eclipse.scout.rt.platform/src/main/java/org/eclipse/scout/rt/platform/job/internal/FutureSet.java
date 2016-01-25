@@ -23,6 +23,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
 import org.eclipse.scout.rt.platform.Bean;
+import org.eclipse.scout.rt.platform.annotations.Internal;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.JobManagerInitialFutureSetCapacityProperty;
 import org.eclipse.scout.rt.platform.filter.AlwaysFilter;
@@ -36,7 +37,6 @@ import org.eclipse.scout.rt.platform.job.IJobManager;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.util.Assertions;
-import org.eclipse.scout.rt.platform.visitor.IVisitor;
 
 /**
  * Thread-safe implementation of a {@link Set} to contain {@link IFuture}s.
@@ -240,26 +240,25 @@ public class FutureSet {
   }
 
   /**
-   * Visits all Futures that are accepted by the given Filter and are not in 'done-state'.
+   * Returns all Futures accepted by the given {@link IFilter}.
    * <p>
-   * Filters can be plugged by using logical filters like {@link AndFilter} or {@link OrFilter}, or negated by enclosing
-   * a filter in {@link NotFilter}.
+   * A future is contained as long as not finished yet. A job is finished upon its completion, or upon a premature
+   * cancellation, meaning that it will never commence execution.
+   * <p>
    *
    * @param filter
-   *          to limit the Futures to be visited. If <code>null</code>, all contained Futures are visited, which is the
-   *          same as using {@link AlwaysFilter}.
-   * @param visitor
-   *          called for each Futures that passed the filter.
+   *          to limit the Futures to be returned. If <code>null</code>, all Futures are returned, which is the same as
+   *          using {@link AlwaysFilter}.
+   * @return futures accepted by the given filter.
    */
-  public final void visit(final IFilter<IFuture<?>> filter, final IVisitor<IFuture<?>> visitor) {
-    for (final JobFutureTask<?> future : copyFutures()) {
-      if (future.isDone() || (filter != null && !filter.accept(future))) {
-        continue;
-      }
-      if (!visitor.visit(future)) {
-        return;
+  public final Set<IFuture<?>> values(final IFilter<IFuture<?>> filter) {
+    final Set<IFuture<?>> futures = new HashSet<>();
+    for (final IFuture<?> candidate : copyFutures()) {
+      if (filter == null || filter.accept(candidate)) {
+        futures.add(candidate);
       }
     }
+    return futures;
   }
 
   /**
@@ -279,18 +278,14 @@ public class FutureSet {
   public boolean cancel(final IFilter<IFuture<?>> filter, final boolean interruptIfRunning) {
     final Set<Boolean> success = new HashSet<>();
 
-    visit(filter, new IVisitor<IFuture<?>>() {
-
-      @Override
-      public boolean visit(final IFuture<?> future) {
-        success.add(future.cancel(interruptIfRunning));
-        return true;
-      }
-    });
+    for (final IFuture<?> future : values(filter)) {
+      success.add(future.cancel(interruptIfRunning));
+    }
 
     return Collections.singleton(Boolean.TRUE).equals(success);
   }
 
+  @Internal
   protected List<JobFutureTask<?>> copyFutures() {
     m_readLock.lock();
     try {
@@ -299,20 +294,6 @@ public class FutureSet {
     finally {
       m_readLock.unlock();
     }
-  }
-
-  /**
-   * Returns the total number of futures.
-   */
-  protected int size() {
-    return copyFutures().size();
-  }
-
-  /**
-   * Returns the contained futures.
-   */
-  protected List<JobFutureTask<?>> values() {
-    return copyFutures();
   }
 
   /**

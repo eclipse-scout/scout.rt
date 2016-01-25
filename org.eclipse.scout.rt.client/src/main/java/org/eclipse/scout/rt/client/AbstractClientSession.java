@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -43,8 +44,8 @@ import org.eclipse.scout.rt.platform.annotations.Internal;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.context.PropertyMap;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
-import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IExecutionSemaphore;
+import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.reflect.AbstractPropertyObserver;
@@ -55,7 +56,6 @@ import org.eclipse.scout.rt.platform.util.NumberUtility;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedException;
 import org.eclipse.scout.rt.platform.util.concurrent.TimedOutException;
-import org.eclipse.scout.rt.platform.visitor.CollectorVisitor;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
@@ -525,7 +525,7 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
    * and are not blocked. If yes, a warning with the list of found jobs is printed to the logger.
    */
   protected void cancelRunningJobs() {
-    final List<IFuture<?>> runningJobs = findRunningJobs();
+    final Set<IFuture<?>> runningJobs = findRunningJobs();
     if (!runningJobs.isEmpty()) {
       Jobs.getJobManager().cancel(Jobs.newFutureFilterBuilder()
           .andMatchFuture(runningJobs)
@@ -539,14 +539,12 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
   /**
    * Returns all the jobs which currently are running.
    */
-  protected List<IFuture<?>> findRunningJobs() {
-    CollectorVisitor<IFuture<?>> collector = new CollectorVisitor<>();
-    Jobs.getJobManager().visit(Jobs.newFutureFilterBuilder()
+  protected Set<IFuture<?>> findRunningJobs() {
+    return Jobs.getJobManager().getFutures(Jobs.newFutureFilterBuilder()
         .andMatchRunContext(ClientRunContext.class)
         .andMatch(new SessionFutureFilter(ISession.CURRENT.get()))
         .andMatchNotFuture(IFuture.CURRENT.get())
-        .toFilter(), collector);
-    return collector.getElements();
+        .toFilter());
   }
 
   @Override

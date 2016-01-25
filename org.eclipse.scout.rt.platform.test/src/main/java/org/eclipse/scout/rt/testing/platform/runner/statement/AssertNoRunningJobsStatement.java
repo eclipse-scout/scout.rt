@@ -29,7 +29,6 @@ import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.job.listener.JobEventType;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.concurrent.TimedOutException;
-import org.eclipse.scout.rt.platform.visitor.CollectorVisitor;
 import org.junit.runners.model.Statement;
 
 /**
@@ -91,20 +90,11 @@ public class AssertNoRunningJobsStatement extends Statement {
   }
 
   /**
-   * Finds running futures which comply with the given filter.
-   */
-  private List<IFuture<?>> findFutures(final IFilter<IFuture<?>> filter) {
-    final CollectorVisitor<IFuture<?>> futureCollector = new CollectorVisitor<>();
-    Jobs.getJobManager().visit(filter, futureCollector);
-    return futureCollector.getElements();
-  }
-
-  /**
    * Finds running job names which comply with the given filter.
    */
   private List<String> findJobNames(final IFilter<IFuture<?>> filter) {
     final List<String> jobs = new ArrayList<>();
-    for (final IFuture<?> future : findFutures(filter)) {
+    for (final IFuture<?> future : Jobs.getJobManager().getFutures(filter)) {
       jobs.add(future.getJobInput().getName());
     }
     return jobs;

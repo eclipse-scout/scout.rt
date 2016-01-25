@@ -25,7 +25,6 @@ import org.eclipse.scout.rt.platform.job.internal.JobManager;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
-import org.eclipse.scout.rt.platform.visitor.IVisitor;
 import org.eclipse.scout.rt.testing.platform.job.JobTestUtil;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.platform.util.BlockingCountDownLatch;
@@ -89,20 +88,12 @@ public class JobManagerTest {
     assertTrue(latch.await());
 
     // RUN THE TEST
-    final Set<IFuture<?>> protocol = new HashSet<>();
-    Jobs.getJobManager().visit(Jobs.newFutureFilterBuilder()
+    Set<IFuture<?>> futures = Jobs.getJobManager().getFutures(Jobs.newFutureFilterBuilder()
         .andMatchFuture(future1, future2, future3)
-        .toFilter(), new IVisitor<IFuture<?>>() {
-
-          @Override
-          public boolean visit(IFuture<?> future) {
-            protocol.add(future);
-            return true;
-          }
-        });
+        .toFilter());
 
     // VERIFY
-    assertEquals(CollectionUtility.hashSet(future1, future2, future3), protocol);
+    assertEquals(CollectionUtility.hashSet(future1, future2, future3), futures);
   }
 
   @Test

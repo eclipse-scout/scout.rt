@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.job;
 
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
@@ -26,8 +27,6 @@ import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedException;
 import org.eclipse.scout.rt.platform.util.concurrent.TimedOutException;
-import org.eclipse.scout.rt.platform.visitor.CollectorVisitor;
-import org.eclipse.scout.rt.platform.visitor.IVisitor;
 
 /**
  * Job manager to run tasks in parallel.
@@ -190,7 +189,10 @@ public interface IJobManager {
   void awaitFinished(IFilter<IFuture<?>> filter, long timeout, TimeUnit unit);
 
   /**
-   * Visits all Futures that are accepted by the given Filter and are not in 'done-state'.
+   * Returns all Futures accepted by the given {@link IFilter}.
+   * <p>
+   * A future is registered in job manager as long as not finished yet. A job is finished upon its completion, or upon a
+   * premature cancellation, meaning that it will never commence execution.
    * <p>
    * Filters can be plugged by using logical filters like {@link AndFilter} or {@link OrFilter}, or negated by enclosing
    * a filter in {@link NotFilter}. See {@link newFutureFilterBuilder} to create a filter to match multiple criteria
@@ -205,26 +207,12 @@ public interface IJobManager {
    *     .toFilter();
    * </pre>
    *
-   * Example collector:
-   *
-   * <pre>
-   * CollectorVisitor&lt;IFuture&lt;?>&gt; collector = new CollectorVisitor&lt;&gt;();
-   * Jobs.getJobManager().visit(Jobs.newFutureFilterBuilder()
-   *     .andMatchRunContext(ClientRunContext.class)
-   *     .andMatch(new SessionFutureFilter(ISession.CURRENT.get()))
-   *     .toFilter(), collector);
-   *
-   * List&lt;IFuture&lt;?&gt;&gt; futures = collector.getElements();
-   * </pre>
-   *
    * @param filter
-   *          to limit the Futures to be visited. If <code>null</code>, all Futures are visited, which is the same as
+   *          to limit the Futures to be returned. If <code>null</code>, all Futures are returned, which is the same as
    *          using {@link AlwaysFilter}.
-   * @param visitor
-   *          called for each Futures that passed the filter.
-   * @see CollectorVisitor
+   * @return futures accepted by the given filter.
    */
-  void visit(IFilter<IFuture<?>> filter, IVisitor<IFuture<?>> visitor);
+  Set<IFuture<?>> getFutures(IFilter<IFuture<?>> filter);
 
   /**
    * Cancels all Futures which are accepted by the given Filter.

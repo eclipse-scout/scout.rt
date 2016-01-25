@@ -60,7 +60,7 @@ public class JobManagerTest {
 
     // Assert no futures left
     JobManager jobManager = (JobManager) Jobs.getJobManager();
-    assertEquals(0, jobManager.m_futures.size());
+    assertEquals(0, jobManager.getFutures(null).size());
   }
 
   @Test
@@ -81,7 +81,7 @@ public class JobManagerTest {
 
     // Assert no futures left
     JobManager jobManager = (JobManager) Jobs.getJobManager();
-    assertEquals(0, jobManager.m_futures.size());
+    assertEquals(0, jobManager.getFutures(null).size());
   }
 
   @Test
@@ -99,7 +99,7 @@ public class JobManagerTest {
 
     // Assert no futures left
     JobManager jobManager = (JobManager) Jobs.getJobManager();
-    assertEquals(0, jobManager.m_futures.size());
+    assertEquals(0, jobManager.getFutures(null).size());
   }
 
   @Test
@@ -117,7 +117,7 @@ public class JobManagerTest {
 
     // Assert no futures left
     JobManager jobManager = (JobManager) Jobs.getJobManager();
-    assertEquals(0, jobManager.m_futures.size());
+    assertEquals(0, jobManager.getFutures(null).size());
   }
 
   @Test
@@ -138,7 +138,7 @@ public class JobManagerTest {
 
     // Assert no futures left
     JobManager jobManager = (JobManager) Jobs.getJobManager();
-    assertEquals(0, jobManager.m_futures.size());
+    assertEquals(0, jobManager.getFutures(null).size());
   }
 
   @Test
@@ -157,7 +157,7 @@ public class JobManagerTest {
 
     // Assert no futures left
     JobManager jobManager = (JobManager) Jobs.getJobManager();
-    assertEquals(0, jobManager.m_futures.size());
+    assertEquals(0, jobManager.getFutures(null).size());
   }
 
   @Test
@@ -178,6 +178,6 @@ public class JobManagerTest {
 
     // Assert no futures left
     JobManager jobManager = (JobManager) Jobs.getJobManager();
-    assertEquals(0, jobManager.m_futures.size());
+    assertEquals(0, jobManager.getFutures(null).size());
   }
 }
