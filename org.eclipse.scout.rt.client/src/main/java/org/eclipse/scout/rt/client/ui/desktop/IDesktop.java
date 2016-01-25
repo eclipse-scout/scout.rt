@@ -26,6 +26,7 @@ import org.eclipse.scout.rt.client.ui.action.tool.IToolButton;
 import org.eclipse.scout.rt.client.ui.action.view.IViewButton;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
+import org.eclipse.scout.rt.client.ui.desktop.notification.IDesktopNotification;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
@@ -581,6 +582,20 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent {
   boolean isCacheSplitterPosition();
 
   void setCacheSplitterPosition(boolean b);
+
+  /**
+   * Adds a notification to the desktop.
+   *
+   * @since 5.2
+   */
+  void addNotification(IDesktopNotification notification);
+
+  /**
+   * Removes a notification from the desktop.
+   *
+   * @param notification
+   */
+  void removeNotification(IDesktopNotification notification);
 
   /**
    * get the status of the desktop

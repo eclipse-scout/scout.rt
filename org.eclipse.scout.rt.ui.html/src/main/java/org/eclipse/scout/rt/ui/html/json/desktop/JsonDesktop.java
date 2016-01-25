@@ -23,6 +23,7 @@ import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop.DesktopStyle;
 import org.eclipse.scout.rt.client.ui.desktop.IOpenUriAction;
+import org.eclipse.scout.rt.client.ui.desktop.notification.IDesktopNotification;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
@@ -265,9 +266,27 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
       case DesktopEvent.TYPE_DESKTOP_CLOSED:
         handleModelDesktopClosed();
         break;
+      case DesktopEvent.TYPE_NOTIFICATION_ADDED:
+        handleModelNotificationAdded(event);
+        break;
+      case DesktopEvent.TYPE_NOTIFICATION_REMOVED:
+        handleModelNotificationRemoved(event);
+        break;
       default:
         // NOP
     }
+  }
+
+  private void handleModelNotificationAdded(DesktopEvent event) {
+    IDesktopNotification notification = event.getNotification();
+    addActionEvent("addNotification", JsonDesktopNavigation.toJson(notification));
+  }
+
+  private void handleModelNotificationRemoved(DesktopEvent event) {
+    IDesktopNotification notification = event.getNotification();
+    addActionEvent("removeNotification", JsonDesktopNavigation.toJson(notification));
+    // FIXME AWE: (notification) how to remove? we don't want to store notifications on the model -> fire & forget
+    // this impl. is wrong - we could create an unique handle for each notification.
   }
 
   @Override

@@ -21,6 +21,7 @@ import java.util.Map;
 import org.eclipse.scout.rt.client.ui.IModelEvent;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
+import org.eclipse.scout.rt.client.ui.desktop.notification.IDesktopNotification;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm;
 import org.eclipse.scout.rt.client.ui.form.IForm;
@@ -122,6 +123,16 @@ public class DesktopEvent extends EventObject implements IModelEvent {
    */
   public static final int TYPE_TRAVERSE_FOCUS_PREVIOUS = 1030;
 
+  /**
+   * Event type indicates that a notification has been added to the desktop.
+   */
+  public static final int TYPE_NOTIFICATION_ADDED = 1040;
+
+  /**
+   * Event type indicates that a notification has been removed from the desktop.
+   */
+  public static final int TYPE_NOTIFICATION_REMOVED = 1050;
+
   private final int m_type;
   private IOutline m_outline;
   private IForm m_form;
@@ -135,6 +146,7 @@ public class DesktopEvent extends EventObject implements IModelEvent {
   private File m_printedFile;
   private IOpenUriAction m_openUriAction;
   private BinaryResource m_binaryResource;
+  private IDesktopNotification m_notification;
 
   public DesktopEvent(IDesktop source, int type) {
     super(source);
@@ -176,6 +188,12 @@ public class DesktopEvent extends EventObject implements IModelEvent {
     this(source, type);
     m_binaryResource = res;
     m_openUriAction = openUriAction;
+  }
+
+  public DesktopEvent(IDesktop source, int type, IDesktopNotification notification) {
+    super(source);
+    m_type = type;
+    m_notification = notification;
   }
 
   public IDesktop getDesktop() {
@@ -278,7 +296,7 @@ public class DesktopEvent extends EventObject implements IModelEvent {
     }
   }
 
-  public Map<String, Object> getPrintParameters() {
+  public Map<String, Object> getPrintParameters() { // FIXME AWE: (Scout cleanup) print parameters ausbauen
     return CollectionUtility.copyMap(m_printParameters);
   }
 
@@ -288,6 +306,10 @@ public class DesktopEvent extends EventObject implements IModelEvent {
 
   public void setActiveForm(IForm activeForm) {
     m_activeForm = activeForm;
+  }
+
+  public IDesktopNotification getNotification() {
+    return m_notification;
   }
 
   @Override

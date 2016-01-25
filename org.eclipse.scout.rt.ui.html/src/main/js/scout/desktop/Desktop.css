@@ -419,6 +419,18 @@
   margin-bottom: 20px;
   #scout.drop-shadow();
 
+  &.ok {
+    border-left-color: @palette-green-3;
+  }
+
+  &.info {
+    border-left-color: @palette-blue-4;
+  }
+
+  &.warning {
+    border-left-color: @palette-orange-3;
+  }
+
   &.error {
     border-left-color: @palette-red-3;
   }

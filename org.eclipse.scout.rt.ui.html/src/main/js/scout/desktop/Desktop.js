@@ -569,6 +569,20 @@ scout.Desktop.prototype._onModelOutlineContentActivate = function(event) {
   }
 };
 
+scout.Desktop.prototype._onModelAddNotification = function(event) {
+  if (event.duration > 0) {
+    scout.create('DesktopNotification', {
+      parent: this,
+      duration: event.duration,
+      status: event.status
+    }).show();
+  }
+};
+
+scout.Desktop.prototype._onModelRemoveNotification = function(event) {
+  // FIXME AWE: (notifications) impl. remove
+};
+
 scout.Desktop.prototype.onModelAction = function(event) {
   if (event.type === 'formShow') {
     this._onModelFormShow(event);
@@ -590,6 +604,10 @@ scout.Desktop.prototype.onModelAction = function(event) {
     this._onModelOutlineChanged(event);
   } else if (event.type === 'outlineContentActivate') {
     this._onModelOutlineContentActivate(event);
+  } else if (event.type === 'addNotification') {
+    this._onModelAddNotification(event);
+  } else if (event.type === 'removeNotification') {
+    this._onModelRemoveNotification(event);
   } else {
     scout.Desktop.parent.prototype.onModelAction.call(this, event);
   }

@@ -59,6 +59,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeAdapter;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
+import org.eclipse.scout.rt.client.ui.desktop.notification.IDesktopNotification;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutlineViewButton;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IFormToolButton;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
@@ -1389,6 +1390,16 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   @Override
+  public void addNotification(IDesktopNotification notification) {
+    fireNotification(DesktopEvent.TYPE_NOTIFICATION_ADDED, notification);
+  }
+
+  @Override
+  public void removeNotification(IDesktopNotification notification) {
+    fireNotification(DesktopEvent.TYPE_NOTIFICATION_REMOVED, notification);
+  }
+
+  @Override
   public boolean isCacheSplitterPosition() {
     return propertySupport.getPropertyBool(PROP_CACHE_SPLITTER_POSITION);
   }
@@ -1735,6 +1746,11 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     DesktopEvent e = new DesktopEvent(this, DesktopEvent.TYPE_FIND_FOCUS_OWNER);
     fireDesktopEvent(e);
     return e.getFocusedField();
+  }
+
+  private void fireNotification(int eventType, IDesktopNotification notification) {
+    DesktopEvent e = new DesktopEvent(this, eventType, notification);
+    fireDesktopEvent(e);
   }
 
   // main handler
@@ -2135,7 +2151,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     }
 
     @Override
-    public List<IMenu> fireTrayPopupFromUI() {
+    public List<IMenu> fireTrayPopupFromUI() { // XXX AWE: ausbauen, auch event
       return fireTrayPopup();
     }
 

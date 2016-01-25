@@ -32,6 +32,7 @@ import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktopUIFacade;
 import org.eclipse.scout.rt.client.ui.desktop.IOpenUriAction;
+import org.eclipse.scout.rt.client.ui.desktop.notification.IDesktopNotification;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
@@ -651,6 +652,14 @@ public class VirtualDesktop implements IDesktop {
   @Override
   public void setOutline(Class<? extends IOutline> outlineType) {
     throw createUnsupportedOperationException();
+  }
+
+  @Override
+  public void addNotification(IDesktopNotification notification) {
+  }
+
+  @Override
+  public void removeNotification(IDesktopNotification notification) {
   }
 
   @Override
