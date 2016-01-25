@@ -952,30 +952,30 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
 
             }
 
-            public void moveNewColumnsBeforeSelection(List<String> existingColumns) {
+            public void moveNewColumnsAfterSelection(List<String> existingColumns) {
               Table columnsTable = getColumnsTableField().getTable();
-              ITableRow insertBeforeThisRow = columnsTable.getSelectedRow();
-              if (insertBeforeThisRow == null && columnsTable.getRowCount() > 0) {
-                insertBeforeThisRow = columnsTable.getRow(0);
+              ITableRow insertAfterThisRow = columnsTable.getSelectedRow();
+              if (insertAfterThisRow == null && columnsTable.getRowCount() > 0) {
+                insertAfterThisRow = columnsTable.getRow(0);
               }
               getColumnsTableField().reloadTableData();
-              if (insertBeforeThisRow == null) {
+              if (insertAfterThisRow == null) {
                 return;
               }
-              int insertBeforeRowIndex = insertBeforeThisRow.getRowIndex();
+              int insertAfterRowIndex = insertAfterThisRow.getRowIndex();
               // find new rows
               for (ITableRow columnRow : columnsTable.getRows()) {
                 if (!existingColumns.contains(columnsTable.getKeyColumn().getValue(columnRow).getColumnId())) {
                   // move new column
                   try {
                     getColumnsTableField().getTable().setTableChanging(true);
-                    if (columnRow.getRowIndex() < insertBeforeRowIndex) {
-                      moveDown(columnRow, insertBeforeRowIndex);
+                    if (columnRow.getRowIndex() <= insertAfterRowIndex) {
+                      moveDown(columnRow, insertAfterRowIndex + 1);
                     }
                     else {
-                      moveUp(columnRow, insertBeforeRowIndex);
+                      moveUp(columnRow, insertAfterRowIndex + 1);
                     }
-                    ++insertBeforeRowIndex;
+                    ++insertAfterRowIndex;
                     updateColumnVisibilityAndOrder();
 
                     // select new row
@@ -1518,7 +1518,7 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
     if (isCustomizable()) {
       List<String> existingColumns = getVisibleColumnIds();
       m_organizedTable.getTableCustomizer().addColumn();
-      getColumnsTableField().getTable().moveNewColumnsBeforeSelection(existingColumns);
+      getColumnsTableField().getTable().moveNewColumnsAfterSelection(existingColumns);
     }
   }
 
