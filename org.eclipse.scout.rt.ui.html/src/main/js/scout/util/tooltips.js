@@ -86,6 +86,7 @@ scout.TooltipSupport.prototype.uninstall = function($comp) {
     .off('mouseleave', this._options.selector, this._mouseLeaveHandler)
     .off('mouseenter', this._options.selector, this._onMouseEnterHandler);
   this._removeTooltip();
+  clearTimeout(this._tooltipTimeoutId);
 };
 
 scout.TooltipSupport.prototype._onMouseEnter = function(event) {
@@ -121,6 +122,9 @@ scout.TooltipSupport.prototype._text = function($comp) {
 };
 
 scout.TooltipSupport.prototype._showTooltip = function($comp) {
+  if (!$comp || !$comp.isAttached()) {
+    return; // removed in the meantime (this method is called using setTimeout)
+  }
   var text = this._text($comp);
   if (!text) {
     return; // treat undefined and no text as no tooltip
