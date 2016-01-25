@@ -302,6 +302,20 @@ public class FutureSet {
   }
 
   /**
+   * Returns the total number of futures.
+   */
+  protected int size() {
+    return copyFutures().size();
+  }
+
+  /**
+   * Returns the contained futures.
+   */
+  protected List<JobFutureTask<?>> values() {
+    return copyFutures();
+  }
+
+  /**
    * Creates the filter to signal waiting threads upon a job event.
    */
   protected IFilter<JobEvent> newSignalingFilter() {
