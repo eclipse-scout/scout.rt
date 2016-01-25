@@ -21,7 +21,6 @@ import org.eclipse.scout.rt.platform.Replace;
 import org.eclipse.scout.rt.platform.annotations.Internal;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
-import org.eclipse.scout.rt.platform.exception.PlatformExceptionTranslator;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedException;
 import org.slf4j.Logger;
@@ -39,17 +38,18 @@ public class ClientExceptionHandler extends ExceptionHandler {
   private static final String SESSION_DATA_KEY = "ClientExceptionHandler#loopDetectionSemaphore";
 
   @Override
-  protected void handleThrowable(final Throwable t) {
-    // 1. Translate into PlatformException.
-    final PlatformException platformException = BEANS.get(PlatformExceptionTranslator.class).translate(t);
-    // 2. Handle as PlatformException.
-    handlePlatformException(platformException);
+  protected void handlePlatformException(final PlatformException e) {
+    super.handlePlatformException(e);
+    showExceptionInternal(e);
   }
 
   @Override
-  protected void handlePlatformException(final PlatformException pe) {
-    super.handlePlatformException(pe);
+  protected void handleThrowable(final Throwable t) {
+    super.handleThrowable(t);
+    showExceptionInternal(t);
+  }
 
+  protected void showExceptionInternal(final Throwable t) {
     final IClientSession session = ClientSessionProvider.currentSession();
     if (session == null) {
       return;
@@ -65,7 +65,7 @@ public class ClientExceptionHandler extends ExceptionHandler {
       try {
         // Synchronize with the model thread if not applicable.
         if (ModelJobs.isModelThread()) {
-          showExceptionInUI(pe);
+          showException(t);
         }
         else {
           try {
@@ -73,7 +73,7 @@ public class ClientExceptionHandler extends ExceptionHandler {
 
               @Override
               public void run() throws Exception {
-                showExceptionInUI(pe);
+                showException(t);
               }
             }, ModelJobs.newInput(ClientRunContexts.copyCurrent())
                 .withExceptionHandling(null, true)
@@ -90,15 +90,15 @@ public class ClientExceptionHandler extends ExceptionHandler {
       }
     }
     else {
-      LOG.error("Loop detection in {} when handling '{}'. StackTrace: ", getClass().getName(), pe, new Exception());
+      LOG.error("Loop detection in {} when handling '{}'. StackTrace: ", getClass().getName(), t, new Exception());
     }
   }
 
   /**
    * Method invoked to visualize the exception. This method is invoked in the model thread.
    */
-  protected void showExceptionInUI(final PlatformException e) {
-    BEANS.get(ErrorPopup.class).showMessageBox(e);
+  protected void showException(final Throwable t) {
+    BEANS.get(ErrorPopup.class).showMessageBox(t);
   }
 
   @Internal

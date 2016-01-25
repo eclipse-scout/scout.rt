@@ -200,8 +200,6 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
   protected void finished() {
     m_jobManager.unregisterFuture(this);
     m_completionPromise.finish();
-
-    // IMPORTANT: do not release permit here because also invoked upon cancellation.
   }
 
   @Override
@@ -381,7 +379,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
       return m_completionPromise.awaitDoneAndGet();
     }
     catch (final ExecutionException e) {
-      throw interceptException(BEANS.get(JobExceptionTranslator.class).translateExecutionException(e, exceptionTranslator));
+      throw interceptException(BEANS.get(JobExceptionTranslator.class).translateExecutionException(e, exceptionTranslator, true));
     }
     catch (final java.util.concurrent.CancellationException e) {
       throw interceptException(BEANS.get(JobExceptionTranslator.class).translateCancellationException(e, "Failed to wait for a job to complete because the job was cancelled"));
@@ -405,7 +403,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
       return m_completionPromise.awaitDoneAndGet(timeout, unit);
     }
     catch (final ExecutionException e) {
-      throw interceptException(BEANS.get(JobExceptionTranslator.class).translateExecutionException(e, exceptionTranslator));
+      throw interceptException(BEANS.get(JobExceptionTranslator.class).translateExecutionException(e, exceptionTranslator, true));
     }
     catch (final java.util.concurrent.CancellationException e) {
       throw interceptException(BEANS.get(JobExceptionTranslator.class).translateCancellationException(e, "Failed to wait for a job to complete because the job was cancelled"));

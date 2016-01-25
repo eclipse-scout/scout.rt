@@ -38,6 +38,8 @@ public class NullExceptionTranslatorTest {
     // Error
     Error error = new Error("expected JUnit test exception");
     assertSame(error, translator.translate(error));
+    assertSame(error, translator.translate(error, true));
+    assertSame(error, translator.translate(error, false));
 
     // UndeclaredThrowableException
     UndeclaredThrowableException ute = new UndeclaredThrowableException(throwable, "expected JUnit test exception");

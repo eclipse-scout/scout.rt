@@ -177,6 +177,10 @@ public class ServletExceptionTranslatorTest {
     assertSame(m_throwable, translator.translate(throwableProducer.produce(m_throwable)).getCause());
 
     // Error
+    assertTrue(translator.translate(throwableProducer.produce(m_error), false) instanceof ServletException);
+    assertSame(m_error, translator.translate(throwableProducer.produce(m_error), false).getCause());
+
+    // Error
     try {
       translator.translate(throwableProducer.produce(m_error));
       fail("Error expected");

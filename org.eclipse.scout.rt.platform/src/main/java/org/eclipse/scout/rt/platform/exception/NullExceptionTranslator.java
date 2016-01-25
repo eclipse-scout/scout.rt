@@ -23,4 +23,9 @@ public class NullExceptionTranslator implements IExceptionTranslator<Throwable> 
   public Throwable translate(final Throwable throwable) {
     return throwable;
   }
+
+  @Override
+  public Throwable translate(final Throwable throwable, final boolean throwOnError) {
+    return throwable;
+  }
 }

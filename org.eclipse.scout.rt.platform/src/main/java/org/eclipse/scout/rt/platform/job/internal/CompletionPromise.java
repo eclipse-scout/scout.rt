@@ -295,14 +295,8 @@ class CompletionPromise<RESULT> {
       return new DoneEvent<>(retrieveFinalValue(future), null, false);
     }
     catch (final ExecutionException e) {
-      try {
-        final Exception exception = BEANS.get(JobExceptionTranslator.class).translateExecutionException(e, DefaultExceptionTranslator.class);
-        return new DoneEvent<>(null, exception, false);
-      }
-      catch (final Error error) {// NOSONAR
-        // Errors are re-thrown by exception translator.
-        return new DoneEvent<>(null, error, false);
-      }
+      final Exception exception = BEANS.get(JobExceptionTranslator.class).translateExecutionException(e, DefaultExceptionTranslator.class, false);
+      return new DoneEvent<>(null, exception, false);
     }
     catch (final CancellationException e) {
       return new DoneEvent<>(null, null, true);

@@ -148,10 +148,12 @@ public class DefaultExceptionTranslatorTest {
     // Throwable
     assertTrue(translator.translate(throwableProducer.produce(m_throwable)) instanceof PlatformException);
     assertSame(m_throwable, translator.translate(throwableProducer.produce(m_throwable)).getCause());
-    assertTrue(translator.translate(throwableProducer.produce(m_throwable)) instanceof PlatformException);
     assertTrue(((PlatformException) translator.translate(throwableProducer.produce(m_throwable))).getContextInfos().contains("translator=" + DefaultExceptionTranslator.class.getName()));
 
     // Error
+    assertTrue(translator.translate(throwableProducer.produce(m_error), false) instanceof PlatformException);
+    assertSame(m_error, translator.translate(throwableProducer.produce(m_error), false).getCause());
+
     try {
       translator.translate(throwableProducer.produce(m_error));
       fail("Error expected");

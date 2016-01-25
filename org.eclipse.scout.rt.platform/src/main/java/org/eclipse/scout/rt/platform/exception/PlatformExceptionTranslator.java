@@ -36,17 +36,23 @@ public class PlatformExceptionTranslator implements IExceptionTranslator<Platfor
 
   @Override
   public PlatformException translate(final Throwable throwable) {
-    final DefaultExceptionTranslator helper = BEANS.get(DefaultExceptionTranslator.class);
+    return translate(throwable, true);
+  }
 
-    final Throwable t = helper.unwrap(throwable);
-    return helper.decorate(translateInternal(t));
+  @Override
+  public PlatformException translate(final Throwable throwable, final boolean throwOnError) {
+    final Throwable eUnwrapped = BEANS.get(DefaultExceptionTranslator.class).unwrap(throwable);
+    final PlatformException eTranslated = translateInternal(eUnwrapped, throwOnError);
+    final PlatformException eDecorated = BEANS.get(DefaultExceptionTranslator.class).decorate(eTranslated);
+
+    return eDecorated;
   }
 
   /**
    * Method invoked to translate the given {@link Throwable}.
    */
-  protected PlatformException translateInternal(final Throwable t) {
-    if (t instanceof Error) {
+  protected PlatformException translateInternal(final Throwable t, final boolean throwOnError) {
+    if (t instanceof Error && throwOnError) {
       throw (Error) t;
     }
     else if (t instanceof PlatformException) {

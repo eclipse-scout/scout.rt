@@ -159,6 +159,10 @@ public class PlatformExceptionTranslatorTest {
     assertTrue(translator.translate(throwableProducer.produce(m_throwable)).getContextInfos().contains("translator=" + PlatformExceptionTranslator.class.getName()));
 
     // Error
+    assertTrue(translator.translate(throwableProducer.produce(m_error), false) instanceof PlatformException);
+    assertSame(m_error, translator.translate(throwableProducer.produce(m_error), false).getCause());
+
+    // Error
     try {
       translator.translate(throwableProducer.produce(m_error));
       fail("Error expected");
