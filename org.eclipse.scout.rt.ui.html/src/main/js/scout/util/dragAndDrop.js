@@ -176,7 +176,7 @@ scout.DragAndDropHandler.prototype._onDrop = function(event) {
     if (files.length >= 1) {
       this.target.session.uploadFiles(this.target, files,
         this.additionalDropProperties ? this.additionalDropProperties(event) : undefined,
-        this.dropSize ? this.dropSize() : undefined,
+        this.dropMaximumSize ? this.dropMaximumSize() : undefined,
         this.allowedTypes ? this.allowedTypes() : undefined);
     }
   }
