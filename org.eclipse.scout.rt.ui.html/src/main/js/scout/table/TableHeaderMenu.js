@@ -530,6 +530,7 @@ scout.TableHeaderMenu.prototype._renderFilterTable = function() {
   this.filterTable = scout.create('Table', {
     parent: this,
     headerVisible: false,
+    multiSelect: false,
     autoResizeColumns: true,
     checkable: true,
     checkableStyle: scout.Table.CheckableStyle.TABLE_ROW,
