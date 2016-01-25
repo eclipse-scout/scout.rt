@@ -31,20 +31,21 @@ import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.filter.event.JobEventFilterBuilder;
 import org.eclipse.scout.rt.platform.job.filter.future.FutureFilterBuilder;
+import org.eclipse.scout.rt.platform.job.internal.ExecutionSemaphore;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 
 /**
- * Helper class to schedule jobs that run on behalf of a {@link ClientRunContext} and are executed in sequence among the
- * same session. Such jobs are called model jobs with the characteristics that only one model job is active at any given
- * time for the same session. Model jobs are used to interact with the client model to read and write model values. This
- * class is for convenience purpose to facilitate the creation and scheduling of model jobs.
+ * Helper class to schedule model jobs.
  * <p>
- * <strong>By definition, a <em>model job</em> requires a {@link ClientRunContext} with a {@link IClientSession}, and
- * must have the session's {@link IExecutionSemaphore} assigned as its semaphore. That causes all jobs within that
- * session to be run in sequence in the model thread. At any given time, there is only one model thread active per
- * client session.</strong>
+ * Model jobs are used to interact with the Scout client model to read and write model values in a serial manner per
+ * session. This class is for convenience purpose to facilitate the creation and scheduling of model jobs.
+ * <p>
+ * By definition, a model job requires to be run on behalf of a {@link ClientRunContext} with a {@link IClientSession}
+ * set, and must have the session’s model job semaphore set as its {@link ExecutionSemaphore}. That causes all such jobs
+ * to be run in sequence in the model thread. At any given time, there is only one model thread active per client
+ * session.
  * <p>
  * Example:
  *
@@ -218,7 +219,8 @@ public final class ModelJobs {
   }
 
   /**
-   * Creates a {@link JobInput} specific for model jobs initialized with the given {@link ClientRunContext}.
+   * Creates a {@link JobInput} specific for model jobs initialized with the given {@link ClientRunContext} and the
+   * session's model job semaphore.
    * <p>
    * The job input returned can be associated with meta information about the job and with execution instructions to
    * tell the job manager how to run the job. The input is to be given to the job manager alongside with the
@@ -281,7 +283,7 @@ public final class ModelJobs {
 
   /**
    * Returns <code>true</code> if the current thread represents the model thread for the current client session. At any
-   * given time, there is only one model thread per client session.
+   * given time, there is only one model thread active per client session.
    */
   public static boolean isModelThread() {
     return ModelJobs.isModelThread(ClientSessionProvider.currentSession());
@@ -289,7 +291,7 @@ public final class ModelJobs {
 
   /**
    * Returns <code>true</code> if the current thread represents the model thread for the given client session. At any
-   * given time, there is only one model thread per client session.
+   * given time, there is only one model thread active per client session.
    */
   public static boolean isModelThread(final IClientSession clientSession) {
     final IFuture<?> currentFuture = IFuture.CURRENT.get();
@@ -326,7 +328,7 @@ public final class ModelJobs {
   }
 
   /**
-   * Instructs the job manager that the current model job is willing to yield its current model job permit.
+   * Instructs the job manager that the current model job is willing to temporarily yield its current model job permit.
    * <p>
    * It is rarely appropriate to use this method. It may be useful for debugging or testing purposes.
    */

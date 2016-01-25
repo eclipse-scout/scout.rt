@@ -16,7 +16,6 @@ import java.util.concurrent.TimeUnit;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.exception.DefaultRuntimeExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.IExceptionTranslator;
-import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.filter.AndFilter;
 import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.filter.NotFilter;
@@ -31,8 +30,7 @@ import org.eclipse.scout.rt.platform.util.concurrent.TimedOutException;
 
 /**
  * Represents a {@link Future} to interact with the associated job, or to wait for the job to complete and to query it's
- * computation result. Exceptions thrown during the job's execution are propagated in the form of a
- * {@link ProcessingException}, or translated according to the given {@link IExceptionTranslator}.
+ * computation result.
  *
  * @see Future
  * @since 5.1
@@ -200,8 +198,8 @@ public interface IFuture<RESULT> extends ICancellable {
   /**
    * Waits if necessary for at most the given time for the job to complete, and then returns its result, if available,
    * or throws its exception according to {@link IExceptionTranslator}, or throws {@link FutureCancelledException} if
-   * cancelled, or throws {@link TimedOutException} if waiting timeout elapsed, or throws {@link ThreadInterruptedException} if
-   * the current thread was interrupted while waiting.
+   * cancelled, or throws {@link TimedOutException} if waiting timeout elapsed, or throws
+   * {@link ThreadInterruptedException} if the current thread was interrupted while waiting.
    * <p>
    * Use a specific {@link IExceptionTranslator} to control exception translation.
    *

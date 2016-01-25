@@ -16,12 +16,17 @@ import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedException;
 import org.eclipse.scout.rt.platform.util.concurrent.TimedOutException;
 
 /**
- * Use this object to put the current thread into waiting mode until this condition falls. If getting blocked and the
- * current job is assigned to an {@link IExecutionSemaphore}, the job's permit is released and passed to the next
- * competing job of that same semaphore while being blocked.
+ * A blocking condition allows a thread to wait for a condition to become <code>true</code>. That is similar to the Java
+ * Object's 'wait/notify' mechanism, but with some additional functionality regarding semaphore aware jobs. If a
+ * semaphore aware job enters a blocking condition, it releases ownership of the permit, which allows another job of
+ * that same semaphore to commence execution. Upon the condition becomes <code>true</code>, the job then must compete
+ * for a permit anew.
  * <p>
- * This condition can be used across multiple threads to wait for the same condition. Also, this condition is reusable
- * upon invalidation. And finally, this condition can be used even if not running on behalf of a job.
+ * A condition can be used across multiple threads to wait for the same condition. Also, a condition is reusable upon
+ * invalidation. And finally, a condition can be used even if not running within a job.
+ * <p>
+ * A blocking condition is often used by model jobs to wait for something to happen, but to allow another model job to
+ * run while waiting. A typical use case would be to wait for a MessageBox to be closed.
  *
  * @since 5.1
  */
@@ -84,8 +89,8 @@ public interface IBlockingCondition {
    * then {@link ThreadInterruptedException} is thrown with the thread's interrupted status still set. Additionally for
    * semaphore aware jobs, when it finally returns from this method the semaphore permit will be re-acquired.
    * <p>
-   * If the timeout elapses, then {@link TimedOutException} is thrown. Additionally for semaphore aware jobs, this method
-   * returns with the semaphore permit re-acquired.
+   * If the timeout elapses, then {@link TimedOutException} is thrown. Additionally for semaphore aware jobs, this
+   * method returns with the semaphore permit re-acquired.
    *
    * @param timeout
    *          the maximal time to wait.
@@ -137,8 +142,8 @@ public interface IBlockingCondition {
    * it will continue to wait until being unblocked. When it finally returns from this method its interrupted status
    * will still be set.
    * <p>
-   * If the timeout elapses, then {@link TimedOutException} is thrown. Additionally for semaphore aware jobs, this method
-   * returns with the semaphore permit re-acquired.
+   * If the timeout elapses, then {@link TimedOutException} is thrown. Additionally for semaphore aware jobs, this
+   * method returns with the semaphore permit re-acquired.
    *
    * @param timeout
    *          the maximal time to wait.

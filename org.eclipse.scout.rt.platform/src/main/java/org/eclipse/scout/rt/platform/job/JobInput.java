@@ -54,6 +54,22 @@ public class JobInput {
     return m_name;
   }
 
+  /**
+   * Sets the name of the job, which is used to name the worker thread and for logging purpose.
+   * <p>
+   * Optionally, <em>formatting anchors</em> in the form of {} pairs can be used in the name, which will be replaced by
+   * the respective argument.
+   *
+   * @param name
+   *          the name with support for <em>formatting anchors</em> in the form of {} pairs.
+   * @param valueArgs
+   *          optional arguments to substitute <em>formatting anchors</em> in the name.
+   */
+  public JobInput withName(final String name, final Object... args) {
+    m_name = MessageFormatter.arrayFormat(name, args).getMessage();
+    return this;
+  }
+
   public ExecutionTrigger getExecutionTrigger() {
     return m_executionTrigger;
   }
@@ -93,22 +109,6 @@ public class JobInput {
   }
 
   /**
-   * Sets the name of the job, which is used to name the worker thread and for logging purpose.
-   * <p>
-   * Optionally, <em>formatting anchors</em> in the form of {} pairs can be used in the name, which will be replaced by
-   * the respective argument.
-   *
-   * @param name
-   *          the name with support for <em>formatting anchors</em> in the form of {} pairs.
-   * @param valueArgs
-   *          optional arguments to substitute <em>formatting anchors</em> in the name.
-   */
-  public JobInput withName(final String name, final Object... args) {
-    m_name = MessageFormatter.arrayFormat(name, args).getMessage();
-    return this;
-  }
-
-  /**
    * Returns the execution semaphore which this job is assigned to, or <code>null</code> if there is no maximal
    * concurrency restriction for this job.
    * <p>
@@ -120,7 +120,7 @@ public class JobInput {
   }
 
   /**
-   * Sets the execution semaphore to control the job's maximal concurrently level.
+   * Sets the execution semaphore to control the maximal concurrently level among jobs assigned to the same semaphore.
    * <p>
    * With a semaphore in place, this job only commences execution, once a permit is free or gets available. If free, the
    * job commences execution immediately at the next reasonable opportunity, unless no worker thread is available.
@@ -144,16 +144,15 @@ public class JobInput {
 
   /**
    * Sets the maximal expiration time upon which the job must commence execution. If elapsed, the job is cancelled and
-   * does not commence execution.
+   * does not commence execution. By default, a job never expires.
    * <p>
    * For a job that executes once, the expiration is evaluated just before it commences execution. For a job with a
    * repeating schedule, it is evaluated before every single execution.
    * <p>
    * In contrast, the trigger's end time specifies the time at which the trigger will no longer fire. However, if fired,
-   * the job may or may not be executed at this time, which depends whether having to compete for an execution permit
-   * first.
-   * <p>
-   * By default, a job never expires.
+   * the job may not be executed immediately at this time, which depends on whether having to compete for an execution
+   * permit first. So the end time may already have expired once commencing execution. In contrast, the expiration time
+   * is evaluated just before starting execution.
    *
    * @param time
    *          the maximal expiration time until the job must commence execution.
@@ -170,11 +169,10 @@ public class JobInput {
   }
 
   /**
-   * Sets the {@link RunContext} to be installed during job execution. Also, the context's {@link RunMonitor} is
-   * associated with the jobs's {@link IFuture}, meaning that cancellation requests to the {@link IFuture} or
-   * {@link RunContext} are equivalent. However, if no context is provided, the job manager ensures a {@link RunMonitor}
-   * to be installed, so that executing code can always query the cancellation status via
-   * <code>RunMonitor.CURRENT.get().isCancelled()</code> .
+   * Sets the {@link RunContext} to be installed during job execution. The {@link RunMonitor} associated with the
+   * context will be used as the job's monitor, meaning that cancellation requests to the job future or the context's
+   * monitor are equivalent. If no context is given, the job manager ensures a monitor to be installed, so that
+   * executing code can always query its cancellation status via <code><RunMonitor.CURRENT.get().isCancelled()</code>.
    */
   public JobInput withRunContext(final RunContext runContext) {
     m_runContext = runContext;
@@ -190,13 +188,17 @@ public class JobInput {
   }
 
   /**
-   * Controls the handling of uncaught exceptions.
+   * Controls how to deal with uncaught exceptions.
    * <p>
    * By default, an uncaught exception is handled by {@link ExceptionHandler} bean and then propagated to the submitter,
    * unless the submitter is not waiting for the job to complete via {@link IFuture#awaitDoneAndGet()}.
    * <p>
-   * If running a periodic job with <code>swallowException=true</code>, the job will continue periodic execution upon an
-   * uncaught exception. If set to <code>false</code>, the execution would exit.
+   * This method expects two arguments: an optional exception handler, and a boolean flag indicating whether to swallow
+   * exceptions. 'Swallow' is independent of the specified exception handler, and indicates whether an exception should
+   * be propagated to the submitter, or swallowed otherwise.
+   * <p>
+   * If running a repetitive job with swallowing set to <code>true</code>, the job will continue its repetitive
+   * execution upon an uncaught exception. If set to <code>false</code>, the execution would exit.
    *
    * @param exceptionHandler
    *          optional handler to handle an uncaught exception, or <code>null</code> to not handle the exception. By
@@ -228,10 +230,12 @@ public class JobInput {
   }
 
   /**
-   * Associates the job with an execution hint, which can be evaluated by filters like when listening to job lifecycle
-   * events, or when waiting for job completion, or when cancelling jobs, or by the job manager.
+   * Associates the job with an execution hint.
    * <p>
-   * A job may have multiple hints associated, and hints are not propagated to nested jobs.
+   * An execution hint is simply a marker to mark a job, and can be evaluated by filters to select jobs, e.g. to listen
+   * for job lifecycle events for some particular jobs, or to wait for some particular jobs to complete, or to cancel
+   * some particular jobs. A job may have multiple hints associated. Further, hints can be registered directly on the
+   * future via {@link IFuture#addExecutionHint(String)}, or removed via {@link IFuture#removeExecutionHint(String)}.
    */
   public JobInput withExecutionHint(final String hint) {
     m_executionHints.add(hint);
