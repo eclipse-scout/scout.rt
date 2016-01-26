@@ -161,6 +161,31 @@ scout.DateField.prototype._renderHasTime = function() {
   }
 };
 
+/**
+ * @override FormField.js
+ */
+scout.DateField.prototype._renderPlaceholder = function() {
+  scout.DateField.parent.prototype._renderPlaceholder.call(this,
+      this._fieldForPlaceholder());
+};
+
+/**
+ * @override FormField.js
+ */
+scout.DateField.prototype._removePlaceholder = function() {
+  scout.DateField.parent.prototype._removePlaceholder.call(this,
+      this._fieldForPlaceholder());
+};
+
+scout.DateField.prototype._fieldForPlaceholder = function() {
+  if (this.hasDate) {
+    return this.$dateField;
+  } else if (this.hasTime) {
+    return this.$timeField;
+  }
+  return null;
+};
+
 scout.DateField.prototype._renderDateFormatPattern = function() {
   this.isolatedDateFormat = new scout.DateFormat(this.session.locale, this.dateFormatPattern);
   this.getDatePicker().dateFormat = this.isolatedDateFormat;

@@ -181,15 +181,17 @@ scout.FormField.prototype._renderLabel = function() {
   }
 };
 
-scout.FormField.prototype._renderPlaceholder = function() {
-  if (this.$field) {
-    this.$field.placeholder(this.label);
+scout.FormField.prototype._renderPlaceholder = function($field) {
+  $field = scout.nvl($field, this.$field);
+  if ($field) {
+    $field.placeholder(this.label);
   }
 };
 
-scout.FormField.prototype._removePlaceholder = function() {
-  if (this.$field) {
-    this.$field.removeAttr('placeholder');
+scout.FormField.prototype._removePlaceholder = function($field) {
+  $field = scout.nvl($field, this.$field);
+  if ($field) {
+    $field.removeAttr('placeholder');
   }
 };
 
