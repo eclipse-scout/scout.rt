@@ -13,10 +13,10 @@ package org.eclipse.scout.rt.client.ui.form.fields.booleanfield;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 
 public interface IBooleanField extends IValueField<Boolean> {
+
   /**
    * Configuration
    */
-
   void setChecked(boolean b);
 
   boolean isChecked();

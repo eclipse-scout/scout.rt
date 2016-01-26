@@ -47,27 +47,24 @@ public class JsonCheckBoxField<CHECK_BOX_FIELD extends IBooleanField> extends Js
   @Override
   public void handleUiEvent(JsonEvent event) {
     if (JsonEventType.CLICKED.matches(event)) {
-      handleUiClick(event, event.getData().getBoolean("checked"));
+      handleUiClicked(event);
     }
     else {
-      throw new IllegalArgumentException("unsupported event type");
+      super.handleUiEvent(event);
     }
   }
 
-  private void handleUiClick(JsonEvent event, boolean uiChecked) {
+  protected void handleUiClicked(JsonEvent event) {
+    boolean uiChecked = event.getData().getBoolean("checked");
+    addPropertyEventFilterCondition(IBooleanField.PROP_VALUE, uiChecked);
+    getModel().getUIFacade().setCheckedFromUI(uiChecked);
+
+    // In some cases the widget in the UI is clicked, which causes the check-box to be de-/selected, but the model rejects the value-change.
+    // in that case we must "revert" the click in the UI, so that UI and model are in-sync again. This may happen, when the model-field throws
+    // a VetoExeception in its execValidateValue() method.
     boolean modelChecked = getModel().isChecked();
     if (uiChecked != modelChecked) {
-      getModel().setChecked(uiChecked);
-      /* In some cases the widget in the UI is clicked, which causes the check-box to be de-/selected, but the model rejects the value-change.
-       * in that case we must "revert" the click in the UI, so that UI and model are in-sync again. This may happen, when the model-field throws
-       * a VetoExeception in its execValidateValue() method.
-       */
-      modelChecked = getModel().isChecked();
-      if (uiChecked != modelChecked) {
-        addPropertyChangeEvent(IValueField.PROP_VALUE, modelChecked);
-      }
+      addPropertyChangeEvent(IValueField.PROP_VALUE, modelChecked);
     }
-
   }
-
 }
