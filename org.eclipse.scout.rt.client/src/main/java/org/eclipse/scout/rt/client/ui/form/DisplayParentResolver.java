@@ -65,11 +65,12 @@ public class DisplayParentResolver {
       while (currentForm.getOuterForm() != null) {
         currentForm = currentForm.getOuterForm();
       }
-      // Forms that are not showing on the desktop must not be used as display parent, because
-      // everything that is attached to them would not be visible as well. This might lead to
-      // blocking conditions that will never be released (e.g. when a message box is opened with
-      // a form as display parent that is not showing).
-      if (currentForm.isShowing()) {
+      // Forms that are not started must not be used as display parent, because everything that is attached
+      // to them would not be visible as well. This might lead to blocking conditions that will never be released
+      // (e.g. when a message box is opened with a form as display parent that is not showing).
+      // Note: We cannot use form.isShowing(), because some forms are started but not automatically
+      // added to the desktop (e.g. forms managed by form tool buttons).
+      if (currentForm.isFormStarted()) {
         return currentForm;
       }
     }
