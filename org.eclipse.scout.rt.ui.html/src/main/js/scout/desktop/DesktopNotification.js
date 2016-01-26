@@ -3,6 +3,9 @@ scout.DesktopNotification = function() {
 };
 scout.inherits(scout.DesktopNotification, scout.Widget);
 
+// FIXME AWE: (notifications) add closable property
+// FIXME AWE: (notifications) add INFINITE constant to java model
+
 /**
  * When duration is set to INFINITE, the notification is not removed automatically.
  */
@@ -58,9 +61,13 @@ scout.DesktopNotification.prototype.show = function() {
 
 scout.DesktopNotification.prototype.fadeIn = function($parent) {
   this.render($parent);
-  this.$container
-    .hide()
-    .fadeIn(250);
+  var $container = this.$container,
+    animationCssClass = 'notification-slide-in';
+  $container.addClass(animationCssClass);
+  // The timeout used here is in-sync with the animation duration used in DesktopNotification.css
+  setTimeout(function() {
+    $container.removeClass(animationCssClass);
+  }, 300);
 };
 
 scout.DesktopNotification.prototype.fadeOut = function(callback) {
