@@ -570,13 +570,12 @@ scout.Desktop.prototype._onModelOutlineContentActivate = function(event) {
 };
 
 scout.Desktop.prototype._onModelAddNotification = function(event) {
-  if (event.duration > 0) {
-    scout.create('DesktopNotification', {
-      parent: this,
-      duration: event.duration,
-      status: event.status
-    }).show();
-  }
+  scout.create('DesktopNotification', {
+    parent: this,
+    duration: event.duration,
+    status: event.status,
+    closeable: event.closeable
+  }).show();
 };
 
 scout.Desktop.prototype._onModelRemoveNotification = function(event) {

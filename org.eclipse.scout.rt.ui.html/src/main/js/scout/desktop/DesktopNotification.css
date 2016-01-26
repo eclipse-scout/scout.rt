@@ -5,9 +5,9 @@
   height: 100%;
   margin-top: 60px;
   width: 0; /* Don't block access to the elements in the background */
-
-/*  overflow: hidden; */
 }
+
+/*** Animation: slide-in ***/
 
 @-webkit-keyframes notification-slide-in { .keyframes-notification-slide-in(); }
 @keyframes notification-slide-in { .keyframes-notification-slide-in(); }
@@ -32,6 +32,27 @@
 
 .notification-slide-in {
   .animation-notification-slide-in();
+}
+
+/*** Animation: fade-out ***/
+
+@-webkit-keyframes notification-fade-out { .keyframes-notification-fade-out(); }
+@keyframes notification-fade-out { .keyframes-notification-fade-out(); }
+
+.keyframes-notification-fade-out() {
+  0%   { opacity: 1.0; margin-bottom:  20px; }
+  100% { opacity:   0; margin-bottom: -37px; }
+}
+
+.animation-notification-fade-out() {
+  #scout.animation-name(notification-fade-out);
+  #scout.animation-duration(0.3s);
+  #scout.animation-iteration-count(1);
+  #scout.animation-timing-function(ease-out);
+}
+
+.notification-fade-out {
+  .animation-notification-fade-out();
 }
 
 .notification {
