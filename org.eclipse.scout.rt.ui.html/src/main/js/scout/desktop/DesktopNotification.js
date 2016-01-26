@@ -42,8 +42,11 @@ scout.DesktopNotification.prototype._render = function($parent) {
       cssSeverity = 'error';
       break;
   }
-  this.$container = $parent.appendDiv('notification').addClass(cssSeverity);
-  this.$content = this.$container.appendDiv('notification-content');
+  this.$container = $parent
+    .prependDiv('notification')
+    .addClass(cssSeverity);
+  this.$content = this.$container
+    .appendDiv('notification-content');
 };
 
 scout.DesktopNotification.prototype._renderMessage = function() {

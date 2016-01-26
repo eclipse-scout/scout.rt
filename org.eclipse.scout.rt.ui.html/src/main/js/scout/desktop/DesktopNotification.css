@@ -12,10 +12,15 @@
 @-webkit-keyframes notification-slide-in { .keyframes-notification-slide-in(); }
 @keyframes notification-slide-in { .keyframes-notification-slide-in(); }
 
+/**
+ * Slides in the notification from the right end of the screen
+ * and increases the size of the bottom margin to move down existing
+ * notifications.
+ */
 .keyframes-notification-slide-in() {
-  0%   { left: 250px; }
-  80%  { left: 15px; }
-  100% { left: 0; }
+  0%   { left: 250px; margin-bottom: 0;   }
+  80%  { left: 15px;                      }
+  100% { left: 0;     margin-bottom: 20px;}
 }
 
 .animation-notification-slide-in() {
