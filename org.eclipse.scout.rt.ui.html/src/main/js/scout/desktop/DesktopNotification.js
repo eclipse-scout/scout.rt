@@ -13,6 +13,7 @@ scout.DesktopNotification.INFINITE = -1;
 
 scout.DesktopNotification.prototype._init = function(model) {
   scout.DesktopNotification.parent.prototype._init.call(this, model);
+  this.id = model.id;
   this.duration = model.duration;
   this.status = model.status;
   this.closeable = scout.nvl(model.closeable, true);

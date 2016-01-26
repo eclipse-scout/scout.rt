@@ -572,6 +572,7 @@ scout.Desktop.prototype._onModelOutlineContentActivate = function(event) {
 scout.Desktop.prototype._onModelAddNotification = function(event) {
   scout.create('DesktopNotification', {
     parent: this,
+    id: event.id,
     duration: event.duration,
     status: event.status,
     closeable: event.closeable
@@ -579,7 +580,7 @@ scout.Desktop.prototype._onModelAddNotification = function(event) {
 };
 
 scout.Desktop.prototype._onModelRemoveNotification = function(event) {
-  // FIXME AWE: (notifications) impl. remove
+  this.removeNotification(event.id);
 };
 
 scout.Desktop.prototype.onModelAction = function(event) {

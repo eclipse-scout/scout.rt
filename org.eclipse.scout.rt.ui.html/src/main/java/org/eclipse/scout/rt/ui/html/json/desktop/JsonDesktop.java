@@ -115,7 +115,7 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
     }
     IJsonAdapter<?> jsonAdapter = getUiSession().getJsonAdapter(formId);
     if (jsonAdapter == null) {
-      //should not occure, but if it occures its not fatal because on next dialog/view/outline opening this is repaired
+      //should not occur, but if it occurs its not fatal because on next dialog/view/outline opening this is repaired
       LOG.info("handleUIFormActivated is looking for form which exists no more. ID: {}", formId);
       return;
     }
@@ -279,14 +279,12 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
 
   private void handleModelNotificationAdded(DesktopEvent event) {
     IDesktopNotification notification = event.getNotification();
-    addActionEvent("addNotification", JsonDesktopNavigation.toJson(notification));
+    addActionEvent("addNotification", JsonDesktopNotification.toJson(notification));
   }
 
   private void handleModelNotificationRemoved(DesktopEvent event) {
     IDesktopNotification notification = event.getNotification();
-    addActionEvent("removeNotification", JsonDesktopNavigation.toJson(notification));
-    // FIXME AWE: (notification) how to remove? we don't want to store notifications on the model -> fire & forget
-    // this impl. is wrong - we could create an unique handle for each notification.
+    addActionEvent("removeNotification", JsonDesktopNotification.toNotificationIdJson(notification));
   }
 
   @Override

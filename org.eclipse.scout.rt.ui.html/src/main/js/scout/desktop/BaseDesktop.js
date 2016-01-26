@@ -44,7 +44,17 @@ scout.BaseDesktop.prototype.addNotification = function(notification) {
   notification.fadeIn(this.$notifications);
 };
 
+/**
+ * Removes the given notification.
+ * @param notification Either an instance of scout.DesktopNavigation or a String containing an ID of a notification instance.
+ */
 scout.BaseDesktop.prototype.removeNotification = function(notification) {
+  if (typeof notification === 'string') {
+    var notificationId = notification;
+    notification = scout.arrays.find(this.notifications, function(n) {
+      return notificationId === n.id;
+    });
+  }
   if (!notification) {
     return;
   }
