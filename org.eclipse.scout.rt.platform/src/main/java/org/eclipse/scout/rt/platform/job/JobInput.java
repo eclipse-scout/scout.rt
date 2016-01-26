@@ -19,7 +19,6 @@ import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
-import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.ToStringBuilder;
 import org.slf4j.helpers.MessageFormatter;
@@ -43,7 +42,7 @@ public class JobInput {
   protected long m_expirationTime = EXPIRE_NEVER;
   protected String m_threadName = "scout-thread";
   protected RunContext m_runContext;
-  protected ExecutionTrigger m_executionTrigger = Jobs.newExecutionTrigger();
+  protected ExecutionTrigger m_executionTrigger;
 
   protected ExceptionHandler m_exceptionHandler = BEANS.get(ExceptionHandler.class);
   protected boolean m_swallowException = false;
@@ -70,6 +69,10 @@ public class JobInput {
     return this;
   }
 
+  /**
+   * Returns the execution trigger which this job is assigned to, or <code>null</code> if there is no execution trigger
+   * for this job.
+   */
   public ExecutionTrigger getExecutionTrigger() {
     return m_executionTrigger;
   }
@@ -86,24 +89,21 @@ public class JobInput {
    * Use the static factory method {@link Jobs#newExecutionTrigger()} to get an instance:
    *
    * <pre>
+   * // Example for delayed execution
+   * Jobs.newInput()
+   *     .withName("job")
+   *     .withExecutionTrigger(<strong>Jobs.newExecutionTrigger()</strong>
+   *         .withStartIn(10, TimeUnit.SECONDS));
    *
+   * // Example for repeating execution with a fixed delay
    * Jobs.newInput()
    *     .withName("job")
    *     .withExecutionTrigger(<strong>Jobs.newExecutionTrigger()</strong>
    *         .withSchedule(FixedDelayScheduleBuilder.repeatForever(1, TimeUnit.SECONDS))
    *         .withStartIn(10, TimeUnit.SECONDS));
-   *
-   * or
-   *
-   * Jobs.newInput()
-   *     .withName("job")
-   *     .withExecutionTrigger(<strong>Jobs.newExecutionTrigger()</strong>
-   *         .withSchedule(SimpleScheduleBuilder.repeatSecondlyForever())
-   *         .withStartIn(10, TimeUnit.SECONDS));
    * </pre>
    */
   public JobInput withExecutionTrigger(final ExecutionTrigger executionTrigger) {
-    Assertions.assertNotNull(executionTrigger, "ExecutionTrigger must not be null");
     m_executionTrigger = executionTrigger;
     return this;
   }
@@ -287,7 +287,7 @@ public class JobInput {
     copy.m_swallowException = m_swallowException;
     copy.m_threadName = m_threadName;
     copy.m_runContext = (m_runContext != null ? m_runContext.copy() : null);
-    copy.m_executionTrigger = m_executionTrigger.copy();
+    copy.m_executionTrigger = (m_executionTrigger != null ? m_executionTrigger.copy() : null);
     copy.m_executionHints = new HashSet<>(m_executionHints);
 
     return copy;

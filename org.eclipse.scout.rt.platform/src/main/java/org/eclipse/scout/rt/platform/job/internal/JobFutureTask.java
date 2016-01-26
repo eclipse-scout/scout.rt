@@ -121,10 +121,10 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
 
     // Compute execution data.
     m_trigger = createQuartzTrigger(input);
-    m_calendar = input.getExecutionTrigger().getCalendar();
+    m_calendar = (input.getExecutionTrigger() == null ? null : input.getExecutionTrigger().getCalendar());
     m_firstFireTime = computeFirstFireTime(m_trigger);
     m_singleExecution = computeSingleExecuting(m_trigger, m_firstFireTime);
-    m_delayedExecution = computeDelayedExecuting(m_firstFireTime, m_input.getExecutionTrigger().getNow());
+    m_delayedExecution = (input.getExecutionTrigger() == null ? false : computeDelayedExecuting(m_firstFireTime, m_input.getExecutionTrigger().getNow()));
 
     // Register to also cancel this Future once the RunMonitor is cancelled (even if the job is not executed yet).
     m_runMonitor.registerCancellable(this);
@@ -621,13 +621,16 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
    * Creates the Quartz Trigger to fire execution.
    */
   protected OperableTrigger createQuartzTrigger(final JobInput input) {
-    final ExecutionTrigger executionTrigger = input.getExecutionTrigger();
+    TriggerBuilder<Trigger> builder = TriggerBuilder.newTrigger()
+        .forJob(JobFutureTask.class.getSimpleName());
 
-    return (OperableTrigger) TriggerBuilder.newTrigger()
-        .forJob(JobFutureTask.class.getSimpleName())
-        .startAt(executionTrigger.getStartTime())
-        .endAt(executionTrigger.getEndTime())
-        .withSchedule(executionTrigger.getSchedule())
-        .build();
+    final ExecutionTrigger executionTrigger = input.getExecutionTrigger();
+    if (executionTrigger != null) {
+      builder
+          .startAt(executionTrigger.getStartTime())
+          .endAt(executionTrigger.getEndTime())
+          .withSchedule(executionTrigger.getSchedule());
+    }
+    return (OperableTrigger) builder.build();
   }
 }

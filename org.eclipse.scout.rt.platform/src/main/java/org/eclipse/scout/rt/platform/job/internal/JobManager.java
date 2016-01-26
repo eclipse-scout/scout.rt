@@ -102,7 +102,6 @@ public class JobManager implements IJobManager {
   @Override
   public final <RESULT> IFuture<RESULT> schedule(final Callable<RESULT> callable, final JobInput input) {
     Assertions.assertNotNull(input, "JobInput must not be null");
-    Assertions.assertNotNull(input.getExecutionTrigger(), "ExecutionTrigger must not be null");
     Assertions.assertFalse(isShutdown(), "{} not available because the platform has been shut down.", getClass().getSimpleName());
 
     // Create the Future to be given to the ExecutorService.
