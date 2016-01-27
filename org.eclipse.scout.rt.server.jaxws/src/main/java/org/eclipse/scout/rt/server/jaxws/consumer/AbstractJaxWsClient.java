@@ -48,8 +48,8 @@ import org.eclipse.scout.rt.server.jaxws.consumer.auth.handler.WsseUsernameToken
  * <p>
  * Interaction with the endpoint is done on behalf of a {@link InvocationContext} with the following characteristics:
  * <ul>
- * <li>Request properties are inherited from {@link AbstractJaxWsClient}, and can be overwritten for the scope of
- * an invocation context. This is useful if some operations of the port require different properties to be set, e.g.
+ * <li>Request properties are inherited from {@link AbstractJaxWsClient}, and can be overwritten for the scope of an
+ * invocation context. This is useful if some operations of the port require different properties to be set, e.g.
  * another read-timeout to transfer big data.</li>
  * <li>Operations on the Port are invoked in another thread, which allows for cancellation once the current monitor is
  * cancelled. Then, the operation returns with a {@link WebServiceRequestCancelledException}. But, the thread executing
@@ -155,19 +155,24 @@ public abstract class AbstractJaxWsClient<SERVICE extends Service, PORT> {
   /**
    * Creates a new <code>InvocationContext</code> to interact with a webservice endpoint on behalf of a Port.
    * <p>
-   * Request properties are inherited from {@link AbstractJaxWsClient}, and can be overwritten for the scope of
-   * this context. This is useful if having a port with some operations require some different properties to be set,
-   * e.g. another read-timeout to transfer big data.
+   * Request properties are inherited from {@link AbstractJaxWsClient}, and can be overwritten for the scope of this
+   * context. This is useful if having a port with some operations require some different properties to be set, e.g.
+   * another read-timeout to transfer big data.
    */
   public InvocationContext<PORT> newInvocationContext() {
     final PORT port = (m_portCache != null ? m_portCache.get() : m_portProducer.produce());
 
     final InvocationContext<PORT> portHandle = new InvocationContext<>(port, getClass().getSimpleName());
     portHandle.withEndpointUrl(m_endpointUrl);
-    portHandle.withConnectTimeout(m_connectTimeout);
-    portHandle.withReadTimeout(m_readTimeout);
     portHandle.withUsername(m_username);
     portHandle.withPassword(m_password);
+
+    if (m_connectTimeout != null) {
+      portHandle.withConnectTimeout(m_connectTimeout, TimeUnit.MILLISECONDS);
+    }
+    if (m_readTimeout != null) {
+      portHandle.withReadTimeout(m_readTimeout, TimeUnit.MILLISECONDS);
+    }
 
     return portHandle;
   }

@@ -17,6 +17,7 @@ import java.lang.reflect.Proxy;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import javax.jws.WebMethod;
 import javax.mail.MessageContext;
@@ -31,7 +32,6 @@ import org.eclipse.scout.rt.platform.holders.Holder;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.Assertions;
-import org.eclipse.scout.rt.platform.util.NumberUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedException;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
@@ -211,26 +211,44 @@ public class InvocationContext<PORT> {
   }
 
   /**
-   * Sets the connect timeout for this {@link InvocationContext} to a specified timeout, in milliseconds. If the timeout
-   * expires before the connection can be established, the request is aborted. Use <code>null</code> to specify an
-   * infinite timeout.
+   * Sets the connect timeout for this {@link InvocationContext} to a specified timeout. If the timeout expires before
+   * the connection can be established, the request is aborted.
    *
    * @return <code>this</code> in order to support for method chaining.
    */
-  public InvocationContext<PORT> withConnectTimeout(final Integer connectTimeout) {
-    m_implementorSpecifics.setSocketConnectTimeout(getRequestContext(), (int) NumberUtility.nvl(connectTimeout, 0));
+  public InvocationContext<PORT> withConnectTimeout(final long connectTimeout, final TimeUnit unit) {
+    m_implementorSpecifics.setSocketConnectTimeout(getRequestContext(), (int) unit.toMillis(connectTimeout));
     return this;
   }
 
   /**
-   * Sets the read timeout for this {@link InvocationContext} to a specified timeout, in milliseconds. If the timeout
-   * expires before there is data available for read, the request is aborted. Use <code>null</code> to specify an
-   * infinite timeout.
+   * Unsets the connect timeout for this {@link InvocationContext} to wait infinitely.
    *
    * @return <code>this</code> in order to support for method chaining.
    */
-  public InvocationContext<PORT> withReadTimeout(final Integer readTimeout) {
-    m_implementorSpecifics.setSocketReadTimeout(getRequestContext(), (int) NumberUtility.nvl(readTimeout, 0));
+  public InvocationContext<PORT> withoutConnectTimeout() {
+    m_implementorSpecifics.setSocketConnectTimeout(getRequestContext(), -1);
+    return this;
+  }
+
+  /**
+   * Sets the read timeout for this {@link InvocationContext} to a specified timeout. If the timeout expires before
+   * there is data available for read, the request is aborted.
+   *
+   * @return <code>this</code> in order to support for method chaining.
+   */
+  public InvocationContext<PORT> withReadTimeout(final long readTimeout, final TimeUnit unit) {
+    m_implementorSpecifics.setSocketReadTimeout(getRequestContext(), (int) unit.toMillis(readTimeout));
+    return this;
+  }
+
+  /**
+   * Unsets the read timeout for this {@link InvocationContext} to wait infinitely.
+   *
+   * @return <code>this</code> in order to support for method chaining.
+   */
+  public InvocationContext<PORT> withoutReadTimeout() {
+    m_implementorSpecifics.setSocketReadTimeout(getRequestContext(), -1);
     return this;
   }
 
