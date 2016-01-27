@@ -48,7 +48,7 @@ import org.eclipse.scout.rt.server.jaxws.consumer.auth.handler.WsseUsernameToken
  * <p>
  * Interaction with the endpoint is done on behalf of a {@link InvocationContext} with the following characteristics:
  * <ul>
- * <li>Request properties are inherited from {@link AbstractJaxWsClient}, and can be overwritten for the scope of an
+ * <li>Request properties are inherited from {@link AbstractWebServiceClient}, and can be overwritten for the scope of an
  * invocation context. This is useful if some operations of the port require different properties to be set, e.g.
  * another read-timeout to transfer big data.</li>
  * <li>Operations on the Port are invoked in another thread, which allows for cancellation once the current monitor is
@@ -94,7 +94,7 @@ import org.eclipse.scout.rt.server.jaxws.consumer.auth.handler.WsseUsernameToken
  */
 @ApplicationScoped
 @CreateImmediately
-public abstract class AbstractJaxWsClient<SERVICE extends Service, PORT> {
+public abstract class AbstractWebServiceClient<SERVICE extends Service, PORT> {
 
   protected final WebServiceClient m_webServiceClientAnnotation;
   protected final Class<SERVICE> m_serviceClazz;
@@ -113,11 +113,11 @@ public abstract class AbstractJaxWsClient<SERVICE extends Service, PORT> {
   protected PortProducer<SERVICE, PORT> m_portProducer;
   protected PortCache<PORT> m_portCache;
 
-  public AbstractJaxWsClient() {
+  public AbstractWebServiceClient() {
     m_serviceClazz = resolveServiceClass();
     m_portTypeClazz = resolvePortClass();
     m_webServiceClientAnnotation =
-        Assertions.assertNotNull(m_serviceClazz.getAnnotation(javax.xml.ws.WebServiceClient.class), "Missing '{}' annotation on webservice [service={}]", AbstractJaxWsClient.class.getSimpleName(), m_serviceClazz.getName());
+        Assertions.assertNotNull(m_serviceClazz.getAnnotation(javax.xml.ws.WebServiceClient.class), "Missing '{}' annotation on webservice [service={}]", AbstractWebServiceClient.class.getSimpleName(), m_serviceClazz.getName());
   }
 
   @PostConstruct
@@ -155,7 +155,7 @@ public abstract class AbstractJaxWsClient<SERVICE extends Service, PORT> {
   /**
    * Creates a new <code>InvocationContext</code> to interact with a webservice endpoint on behalf of a Port.
    * <p>
-   * Request properties are inherited from {@link AbstractJaxWsClient}, and can be overwritten for the scope of this
+   * Request properties are inherited from {@link AbstractWebServiceClient}, and can be overwritten for the scope of this
    * context. This is useful if having a port with some operations require some different properties to be set, e.g.
    * another read-timeout to transfer big data.
    */

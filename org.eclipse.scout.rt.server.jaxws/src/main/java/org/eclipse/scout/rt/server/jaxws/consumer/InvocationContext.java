@@ -51,7 +51,7 @@ import org.eclipse.scout.rt.server.transaction.TransactionScope;
  * concurrently among threads. Further, JAX-WS API does not support to reset the Port's request and response context,
  * which is why a Port should only be used for a single webservice call.
  * <p>
- * Request properties are inherited from {@link AbstractJaxWsClient}, and can be overwritten for the scope of this
+ * Request properties are inherited from {@link AbstractWebServiceClient}, and can be overwritten for the scope of this
  * context. That is useful if having a port with some operations require some different properties set, e.g. another
  * read-timeout to transfer big data. Also, if associated with a transaction, respective commit or rollback listeners
  * are called upon leaving the transaction boundary, e.g. to implement a <code>2-phase-commit-protocol (2PC)</code> for
