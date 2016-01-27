@@ -69,21 +69,6 @@ public class HandlerArtifactProcessor {
 
     final List<String> handlers = new ArrayList<>();
 
-    // Generate AuthHandler
-    if (portTypeEntryPointDefinition.isAuthenticationEnabled()) {
-      try {
-        final String authHandlerQualifiedName = createAndPersistAuthHandler(portTypeEntryPoint, portTypeEntryPointDefinition, env);
-        logger.info("Generating AuthHandler [authHandler={}, portTypeDefinition={}, endpointInterface={}]",
-            authHandlerQualifiedName,
-            portTypeEntryPointDefinition.getQualifiedName(),
-            endpointInterface);
-        handlers.add(authHandlerQualifiedName);
-      }
-      catch (final Exception e) {
-        throw new RuntimeException(format("Failed to generate AuthHandler [portTypeDefinition=%s, endpointInterface=%s]", portTypeEntryPointDefinition.getQualifiedName(), endpointInterface), e);
-      }
-    }
-
     // Add configured handlers.
     final List<HandlerDefinition> handlerChain = portTypeEntryPointDefinition.getHandlerChain();
     for (int idx = 0; idx < handlerChain.size(); idx++) {
@@ -102,6 +87,39 @@ public class HandlerArtifactProcessor {
         throw new RuntimeException(
             format("Failed to generate handler delegate [handler=%s, portTypeDefinition=%s, endpointInterface=%s]", handlerDefinition.getHandlerQualifiedName(), portTypeEntryPointDefinition.getQualifiedName(), endpointInterface),
             e);
+      }
+    }
+
+    // Generate AuthHandler
+    if (portTypeEntryPointDefinition.isAuthenticationEnabled()) {
+      // Ensure valid order.
+      int order = portTypeEntryPointDefinition.getAuthentication().order();
+      if (order < 0) {
+        logger.info("Illegal position for authentication handler specified. Register the handler as first handler in the handler chain.  [position={}, portTypeDefinition={}, endpointInterface={}]",
+            order,
+            portTypeEntryPointDefinition.getQualifiedName(),
+            endpointInterface);
+        order = 0;
+      }
+      else if (order > handlerChain.size()) {
+        logger.info("Illegal position for authentication handler specified. Register the handler as last handler in the handler chain.  [position={}, portTypeDefinition={}, endpointInterface={}]",
+            order,
+            portTypeEntryPointDefinition.getQualifiedName(),
+            endpointInterface);
+        order = handlerChain.size();
+      }
+
+      // Generate the AuthHandler
+      try {
+        final String authHandlerQualifiedName = createAndPersistAuthHandler(portTypeEntryPoint, portTypeEntryPointDefinition, env);
+        logger.info("Generating AuthHandler [authHandler={}, portTypeDefinition={}, endpointInterface={}]",
+            authHandlerQualifiedName,
+            portTypeEntryPointDefinition.getQualifiedName(),
+            endpointInterface);
+        handlers.add(order, authHandlerQualifiedName);
+      }
+      catch (final Exception e) {
+        throw new RuntimeException(format("Failed to generate AuthHandler [portTypeDefinition=%s, endpointInterface=%s]", portTypeEntryPointDefinition.getQualifiedName(), endpointInterface), e);
       }
     }
 

@@ -64,6 +64,12 @@ public @interface Authentication {
   ;
 
   /**
+   * Specifies the position where to register the authentication handler in the handler chain. By default, it is
+   * registered as the very first handler. The order is 0-based.
+   */
+  int order() default 0;
+
+  /**
    * Indicates the principal producer to use to create principals to represent authenticated users. By default,
    * {@link SimplePrincipalProducer} is used.
    */
