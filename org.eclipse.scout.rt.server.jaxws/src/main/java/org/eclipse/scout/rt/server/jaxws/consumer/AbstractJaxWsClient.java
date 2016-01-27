@@ -122,9 +122,9 @@ public abstract class AbstractJaxWsClient<SERVICE extends Service, PORT> {
 
   @PostConstruct
   protected void initConfig() {
-    m_endpointUrl = CONFIG.getPropertyValue(getConfiguredEndpointUrlProperty());
-    m_username = AbstractJaxWsClient.getOptionalConfigPropertyValue(getConfiguredUsernameProperty());
-    m_password = AbstractJaxWsClient.getOptionalConfigPropertyValue(getConfiguredPasswordProperty());
+    m_endpointUrl = optConfigValue(getConfiguredEndpointUrlProperty());
+    m_username = optConfigValue(getConfiguredUsernameProperty());
+    m_password = optConfigValue(getConfiguredPasswordProperty());
     m_connectTimeout = CONFIG.getPropertyValue(getConfiguredConnectTimeoutProperty());
     m_readTimeout = CONFIG.getPropertyValue(getConfiguredReadTimeoutProperty());
 
@@ -350,10 +350,13 @@ public abstract class AbstractJaxWsClient<SERVICE extends Service, PORT> {
   }
 
   /**
-   * Overwrite to configure the endpoint URL for requests initiated by this webservice client.
+   * Overwrite to configure the endpoint URL for requests initiated by this webservice client. If not set, the URL must
+   * be set via {@link InvocationContext}.
    */
   @ConfigProperty(ConfigProperty.OBJECT)
-  protected abstract Class<? extends IConfigProperty<String>> getConfiguredEndpointUrlProperty();
+  protected Class<? extends IConfigProperty<String>> getConfiguredEndpointUrlProperty() {
+    return null;
+  }
 
   /**
    * Overwrite to configure the username to be sent to the endpoint for authentication for requests initiated by this
@@ -376,7 +379,7 @@ public abstract class AbstractJaxWsClient<SERVICE extends Service, PORT> {
   /**
    * Returns the property value from the configuration unless the given property class is <code>null</code>.
    */
-  private static <DATA_TYPE> DATA_TYPE getOptionalConfigPropertyValue(final Class<? extends IConfigProperty<DATA_TYPE>> propertyClazz) {
+  private static <DATA_TYPE> DATA_TYPE optConfigValue(final Class<? extends IConfigProperty<DATA_TYPE>> propertyClazz) {
     return (propertyClazz != null ? CONFIG.getPropertyValue(propertyClazz) : null);
   }
 
