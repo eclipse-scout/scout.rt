@@ -35,6 +35,7 @@ import org.eclipse.scout.rt.server.commons.authentication.ICredentialVerifier;
 import org.eclipse.scout.rt.server.jaxws.provider.annotation.Authentication;
 import org.eclipse.scout.rt.server.jaxws.provider.annotation.Authentication.NullAuthenticationMethod;
 import org.eclipse.scout.rt.server.jaxws.provider.annotation.Handler.HandlerType;
+import org.eclipse.scout.rt.server.jaxws.provider.annotation.IgnoreWebServiceEntryPoint;
 import org.eclipse.scout.rt.server.jaxws.provider.annotation.WebServiceEntryPoint;
 import org.eclipse.scout.rt.server.jaxws.provider.auth.method.IAuthenticationMethod;
 
@@ -47,6 +48,7 @@ public class EntryPointDefinition {
 
   public static final String ENTRY_POINT_SUFFIX = "EntryPoint";
 
+  private boolean m_ignore;
   private final TypeElement m_endpointInterface;
   private final TypeElement m_definition;
   private final WebServiceEntryPoint m_annotation;
@@ -64,8 +66,13 @@ public class EntryPointDefinition {
 
     AnnotationMirror _entryPointAnnotationMirror = null;
     for (final AnnotationMirror _annotationMirror : _definition.getAnnotationMirrors()) {
-      if (WebServiceEntryPoint.class.getName().equals(_annotationMirror.getAnnotationType().toString())) {
+      final String candidate = _annotationMirror.getAnnotationType().toString();
+
+      if (WebServiceEntryPoint.class.getName().equals(candidate)) {
         _entryPointAnnotationMirror = _annotationMirror;
+      }
+      else if (IgnoreWebServiceEntryPoint.class.getName().equals(candidate)) {
+        m_ignore = true;
       }
       else {
         m_siblingAnnotations.add(_annotationMirror);
@@ -73,6 +80,13 @@ public class EntryPointDefinition {
     }
 
     m_annotationMirror = Assertions.assertNotNull(_entryPointAnnotationMirror, "Unexpected: AnnotationMirror for annotation '{}' not found,", WebServiceEntryPoint.class.getName());
+  }
+
+  /**
+   * Returns <code>true</code> to not generate an entry point for this definition, or else <code>false</code>.
+   */
+  public boolean isIgnore() {
+    return m_ignore;
   }
 
   public TypeElement getEndpointInterface() {

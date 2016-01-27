@@ -149,13 +149,23 @@ public class JaxWsAnnotationProcessor extends AbstractProcessor {
         endpointInterfaceNames.remove(endpointInterfaceName);
 
         final EntryPointDefinition entryPointDefinition = new EntryPointDefinition((TypeElement) _entryPointDefinition, _endpointInterface, processingEnv);
-        m_logger.info("Generating entry point for endpoint interface '{}' [entryPoint={}, wsdl:portType={}, wsdl:service={}, wsdl:port={}]",
-            endpointInterfaceName,
-            entryPointDefinition.getEntryPointQualifiedName(),
-            entryPointDefinition.getPortTypeName(),
-            entryPointDefinition.getServiceName(),
-            entryPointDefinition.getPortName());
-        generateEntryPoint(entryPointDefinition, roundEnv);
+        if (entryPointDefinition.isIgnore()) {
+          m_logger.info("Ignore entry point definition for endpoint interface '{}' [entryPoint={}, wsdl:portType={}, wsdl:service={}, wsdl:port={}]",
+              endpointInterfaceName,
+              entryPointDefinition.getEntryPointQualifiedName(),
+              entryPointDefinition.getPortTypeName(),
+              entryPointDefinition.getServiceName(),
+              entryPointDefinition.getPortName());
+        }
+        else {
+          m_logger.info("Generate entry point for endpoint interface '{}' [entryPoint={}, wsdl:portType={}, wsdl:service={}, wsdl:port={}]",
+              endpointInterfaceName,
+              entryPointDefinition.getEntryPointQualifiedName(),
+              entryPointDefinition.getPortTypeName(),
+              entryPointDefinition.getServiceName(),
+              entryPointDefinition.getPortName());
+          generateEntryPoint(entryPointDefinition, roundEnv);
+        }
       }
       catch (final Exception e) {
         m_logger.error("Failed to generate entry point for endpoint interface '{}' [entryPointDefinition={}]", endpointInterfaceName, _entryPointDefinition.getQualifiedName().toString(), e);
