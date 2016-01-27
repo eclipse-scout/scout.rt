@@ -1846,7 +1846,12 @@ scout.Table.prototype.insertRows = function(rows, fromServer) {
     this.rows.push(row);
   }, this);
 
-  this._applyFilters(rows);
+  // FIXME CGU: (von A.WE) ohne das If schickt das UI beim SmartField bei jeder Änderung an der Table (insertRows)
+  // ein rowsFiltered event zurück an den Server, obwohl die Table gar keinen Filter hat. Bitte prüfen, ob das so
+  // korrekt ist. Das If wird ja auch schon an anderer Stelle gemacht.
+  if (this._filterCount() > 0) {
+    this._applyFilters(rows);
+  }
   this._calculateValuesForBackgroundEffect();
   fromServer = scout.nvl(fromServer, false);
   if (!fromServer) {
