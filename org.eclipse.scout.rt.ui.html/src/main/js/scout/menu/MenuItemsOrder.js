@@ -21,7 +21,9 @@ scout.MenuItemsOrder.prototype.order = function(items) {
     selectionItems = [],
     rightItems = [];
 
-  var isEmptyspaceMenuVisible = false;
+
+  var isEmptyspaceMenuVisible = false,
+  isSelectionMenuVisible =false;
   items.forEach(function(item) {
     // skip separators added dynamically by this class
     if (item.createdBy === this) {
@@ -37,12 +39,15 @@ scout.MenuItemsOrder.prototype.order = function(items) {
       }
       emptySpaceItems.push(item);
     } else if (scout.menus.checkType(item, this._menuTypes(this.selectionTypes))) {
+      if (item.visible) {
+        isSelectionMenuVisible = true;
+      }
       selectionItems.push(item);
     }
   }, this);
 
   // add fixed separator between emptySpace and selection
-  if (emptySpaceItems.length > 0 && selectionItems.length > 0 && isEmptyspaceMenuVisible) {
+  if (isEmptyspaceMenuVisible && isSelectionMenuVisible) {
     emptySpaceItems.push(this._createSeparator());
   }
 
