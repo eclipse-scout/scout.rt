@@ -21,14 +21,15 @@ scout.FormController = function(displayParent, session) {
 /**
  * Adds the given view or dialog to this controller and renders it.
  * position is only used if form is a view. this position determines at which position the tab is placed.
+ * if select view is set the view rendered in _renderView is also selected.
  */
-scout.FormController.prototype.registerAndRender = function(formAdapterId, position, initialRendering) {
+scout.FormController.prototype.registerAndRender = function(formAdapterId, position, selectView) {
   var form = this.session.getOrCreateModelAdapter(formAdapterId, this.displayParent);
-  form.displayParent = this.displayParent;
+  form._setProperty('displayParent', this.displayParent);
   if (form.isPopupWindow()) {
     this._renderPopupWindow(form);
   } else if (form.isView()) {
-    this._renderView(form, true, position, initialRendering);
+    this._renderView(form, true, position, selectView);
   } else {
     this._renderDialog(form, true);
   }
@@ -65,11 +66,11 @@ scout.FormController.prototype._removePopupWindow = function(form) {
  */
 scout.FormController.prototype.render = function() {
   this.displayParent.dialogs.forEach(function(dialog) {
-    dialog.displayParent = this.displayParent;
+    dialog._setProperty('displayParent', this.displayParent);
     this._renderDialog(dialog, false);
   }.bind(this));
   this.displayParent.views.forEach(function(view, position) {
-    view.displayParent = this.displayParent;
+    view._setProperty('displayParent', this.displayParent);
     this._renderView(view, false, position);
   }.bind(this));
 };
@@ -91,7 +92,7 @@ scout.FormController.prototype.activateForm = function(formAdapterId) {
   }
 };
 
-scout.FormController.prototype._renderView = function(view, register, position) {
+scout.FormController.prototype._renderView = function(view, register, position, selectView) {
   if (register) {
     if (position !== undefined) {
       scout.arrays.insert(this.displayParent.views, view, position);
@@ -114,7 +115,7 @@ scout.FormController.prototype._renderView = function(view, register, position) 
 
   // Create the view-tab.
   var viewTab = viewTabsController.createAndRenderViewTab(view, this.displayParent.views.indexOf(view));
-  if (!this.session.desktop.initialFormRendering) {
+  if (selectView) {
     viewTabsController.selectViewTab(viewTab);
   }
 };

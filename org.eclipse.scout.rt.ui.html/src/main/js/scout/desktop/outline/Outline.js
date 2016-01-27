@@ -160,6 +160,8 @@ scout.Outline.prototype.handleOutlineContent = function(bringToFront) {
 };
 
 scout.Outline.prototype._postRender = function() {
+  //used to render glasspane
+  this._trigger('rendered');
   //first set Outline content to prevent errors while rendering existing glasspanes. the outline content is a glasspane target
   //and if this is null there could be errors when the form controller tries to render a popup with a glasspane behind it.
   //The content is not rendered or attached twice because handleOutlineContent() checks if this is already done.
@@ -561,17 +563,35 @@ scout.Outline.prototype._renderInBackground = function() {
  * Returns the DOM elements to paint a glassPanes over, once a modal Form, message-box or file-chooser is showed with this Outline as its 'displayParent'.
  */
 scout.Outline.prototype.glassPaneTargets = function() {
-  var desktop = this.session.desktop;
-
-  var elements = [];
-  if (desktop.navigation) {
-    elements.push(desktop.navigation.$container); // navigation container; not available if application has no navigation.
+  if (this.rendered) {
+    var desktop = this.session.desktop;
+    var elements = [];
+    if (desktop.navigation) {
+      elements.push(desktop.navigation.$container); // navigation container; not available if application has no navigation.
+    }
+    if (desktop._outlineContent) {
+      elements.push(desktop._outlineContent.$container); // outline content; not available if application has no navigation.
+    }
+    return elements;
+  } else {
+    var deferred = new scout.DeferredGlassPaneTarget();
+    var renderedHandler = function(event) {
+      var desktop = event.eventOn.session.desktop;
+      var elements = [];
+      if (desktop.navigation) {
+        elements.push(desktop.navigation.$container); // navigation container; not available if application has no navigation.
+      }
+      if (desktop._outlineContent) {
+        elements.push(desktop._outlineContent.$container); // outline content; not available if application has no navigation.
+      }
+      deferred.ready(elements);
+    };
+    this.one('rendered', renderedHandler);
+    this.one('destroy', function() {
+      this.off('rendered', renderedHandler);
+    }.bind(this));
+    return [deferred];
   }
-  if (desktop._outlineContent) {
-    elements.push(desktop._outlineContent.$container); // outline content; not available if application has no navigation.
-  }
-
-  return elements;
 };
 
 scout.Outline.prototype._renderMenus = function() {

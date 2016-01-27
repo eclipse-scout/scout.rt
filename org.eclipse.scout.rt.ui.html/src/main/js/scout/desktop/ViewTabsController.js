@@ -44,6 +44,9 @@ scout.ViewTabsController.prototype.createAndRenderViewTab = function(view, posit
     var parentViewTab = this.viewTab(viewTab._view.displayParent);
     if (parentViewTab) {
       index = this._viewTabs.indexOf(parentViewTab) + this._calculateExactPosition(parentViewTab, index) + 1;
+    } else if (view.displayParent instanceof scout.Outline) {
+      var indexInOutline = view.displayParent.views.indexOf(view) === -1 ? 0 : view.displayParent.views.indexOf(view);
+      index = indexInOutline + this._desktop.views.length;
     } else {
       index = this._calculateExactPosition(this._desktop, index);
     }

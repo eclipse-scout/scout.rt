@@ -43,6 +43,16 @@ scout.Form.prototype._init = function(model) {
   // Only render glassPanes if modal and not being a wrapped Form.
   var renderGlassPanes = (this.modal && !(this.parent instanceof scout.WrappedFormField));
   this._glassPaneRenderer = new scout.GlassPaneRenderer(this.session, this, renderGlassPanes);
+  var glasspaneRendererHandler = function(event) {
+    //render glasspanes on parents after initialized
+    if (event.newProperties.displayParent) {
+      this._glassPaneRenderer.renderGlassPanes();
+    }
+  }.bind(this);
+  this.on('propertyChange', glasspaneRendererHandler);
+  this.one('destroy', function() {
+    this.off('propertyChange', glasspaneRendererHandler);
+  }.bind(this));
 };
 
 /**
@@ -54,8 +64,6 @@ scout.Form.prototype._renderProperties = function() {
 };
 
 scout.Form.prototype._render = function($parent) {
-  // Render modality glasspanes (must precede adding the form to the DOM)
-  this._glassPaneRenderer.renderGlassPanes();
   this._renderForm($parent);
 };
 
@@ -348,10 +356,14 @@ scout.Form.prototype.glassPaneTargets = function() {
   if (this.$container) {
     return [this.$container];
   } else {
+    var renderedHandler = function(event) {
+      deferred.ready([event.eventOn.$container]);
+    };
     var deferred = new scout.DeferredGlassPaneTarget();
-    this.one('rendered', function(event) {
-      deferred.ready(event.eventOn.$container);
-    });
+    this.one('rendered', renderedHandler);
+    this.one('destroy', function() {
+      this.off('rendered', renderedHandler);
+    }.bind(this));
     return [deferred];
   }
 };

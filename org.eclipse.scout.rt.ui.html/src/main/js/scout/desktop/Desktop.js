@@ -494,7 +494,7 @@ scout.Desktop.prototype._onModelFormShow = function(event) {
     form = this.session.getOrCreateModelAdapter(event.form, displayParent.formController.displayParent);
     this._setFormActivated(form, true);
     // register listener to recover active form when child dialog is removed
-    displayParent.formController.registerAndRender(event.form, event.position);
+    displayParent.formController.registerAndRender(event.form, event.position, true);
   }
 };
 
@@ -711,7 +711,7 @@ scout.Desktop.prototype.glassPaneTargets = function() {
 scout.Desktop.prototype._deferredGlassPaneTarget = function(popupWindow) {
   var deferred = new scout.DeferredGlassPaneTarget();
   popupWindow.one('initialized', function() {
-    deferred.ready(popupWindow.$container);
+    deferred.ready([popupWindow.$container]);
   });
   return deferred;
 };
