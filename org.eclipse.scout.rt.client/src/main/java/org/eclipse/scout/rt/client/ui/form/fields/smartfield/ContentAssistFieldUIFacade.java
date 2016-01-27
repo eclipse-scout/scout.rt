@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 
+import org.eclipse.scout.rt.platform.util.CompareUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.slf4j.Logger;
@@ -47,7 +48,7 @@ class ContentAssistFieldUIFacade<LOOKUP_KEY> implements IContentAssistFieldUIFac
     if (!m_field.isVisible() || !m_field.isEnabled()) {
       return;
     }
-    LOG.debug("openProposalChooserFromUI");
+    LOG.debug("openProposalChooserFromUI text={} selectCurrentValue={}", text, selectCurrentValue);
     m_field.clearProposal();
     m_field.setDisplayText(text);
     String searchText = toSearchText(text);
@@ -69,8 +70,25 @@ class ContentAssistFieldUIFacade<LOOKUP_KEY> implements IContentAssistFieldUIFac
     if (!m_field.isVisible() || !m_field.isEnabled()) {
       return;
     }
-    boolean openProposalChooser = false;
+    LOG.debug("acceptProposalFromUI text={} chooser={} forceClose={}", text, chooser, forceClose);
+
+    // When the proposal chooser is open, we must check if the display-text has changed
+    // since the last search. When it has changed, we cannot use the accepted proposal
+    // and must perform the lookup again instead. This prevents issues as described in
+    // ticket #162961:
+    // - User types 'Ja' -> matches a lookup-row 'Ja'
+    // - User types an additional 'x' and presses tab -> display-text is now 'Jax'
+    // - the model accepts the lookup-row 'Ja', but the display-text in the UI is still 'Jax'
+    //   and the field looks valid, which is wrong
+    boolean searchTextEquals = true;
     if (chooser) {
+      String searchText = toSearchText(text);
+      String lastSearchText = m_field.getProposalChooser().getSearchText();
+      searchTextEquals = CompareUtility.equals(searchText, lastSearchText);
+    }
+
+    boolean openProposalChooser = false;
+    if (chooser && searchTextEquals) {
       // choose from proposal chooser
       try {
         ILookupRow<LOOKUP_KEY> lookupRow = m_field.getProposalChooser().getAcceptedProposal();
