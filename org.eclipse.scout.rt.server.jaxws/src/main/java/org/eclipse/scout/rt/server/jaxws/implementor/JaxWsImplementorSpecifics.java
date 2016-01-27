@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.xml.ws.handler.Handler;
 import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.http.HTTPException;
@@ -33,6 +35,8 @@ import org.eclipse.scout.rt.server.jaxws.provider.auth.handler.WebServiceRequest
 @ApplicationScoped
 public class JaxWsImplementorSpecifics {
 
+  public static final String PROP_SERVLET_REQUEST = "org.eclipse.scout.jaxws.servlet.request";
+  public static final String PROP_SERVLET_RESPONSE = "org.eclipse.scout.jaxws.servlet.response";
   public static final String PROP_HTTP_REQUEST_HEADERS = "org.eclipse.scout.jaxws.http.request.headers";
   public static final String PROP_HTTP_RESPONSE_HEADERS = "org.eclipse.scout.jaxws.http.response.headers";
   public static final String PROP_HTTP_RESPONSE_CODE = "org.eclipse.scout.jaxws.http.response.code";
@@ -43,6 +47,8 @@ public class JaxWsImplementorSpecifics {
 
   @PostConstruct
   protected void initConfig() {
+    m_implementorContextProperties.put(PROP_SERVLET_REQUEST, MessageContext.SERVLET_REQUEST);
+    m_implementorContextProperties.put(PROP_SERVLET_RESPONSE, MessageContext.SERVLET_RESPONSE);
     m_implementorContextProperties.put(PROP_HTTP_REQUEST_HEADERS, MessageContext.HTTP_REQUEST_HEADERS);
     m_implementorContextProperties.put(PROP_HTTP_RESPONSE_HEADERS, MessageContext.HTTP_RESPONSE_HEADERS);
     m_implementorContextProperties.put(PROP_HTTP_RESPONSE_CODE, MessageContext.HTTP_RESPONSE_CODE);
@@ -55,6 +61,20 @@ public class JaxWsImplementorSpecifics {
    */
   public String getVersionInfo() {
     return "unknown";
+  }
+
+  /**
+   * Returns the {@link HttpServletRequest}.
+   */
+  public HttpServletRequest getServletRequest(final Map<String, Object> ctx) {
+    return (HttpServletRequest) ctx.get(valueOf(PROP_SERVLET_REQUEST));
+  }
+
+  /**
+   * Returns the {@link HttpServletResponse}.
+   */
+  public HttpServletResponse getServletResponse(final Map<String, Object> ctx) {
+    return (HttpServletResponse) ctx.get(valueOf(PROP_SERVLET_RESPONSE));
   }
 
   /**

@@ -104,7 +104,7 @@ public class AuthenticationHandler implements SOAPHandler<SOAPMessageContext> {
     }
 
     try {
-      final HttpServletRequest servletRequest = Assertions.assertNotNull((HttpServletRequest) messageContext.get(MessageContext.SERVLET_REQUEST), "ServletRequest must not be null");
+      final HttpServletRequest servletRequest = Assertions.assertNotNull(m_implementorSpecifics.getServletRequest(messageContext), "ServletRequest must not be null");
 
       // Get Subject if already authenticated, e.g. by application server or Servlet filter.
       final Subject requestSubject = m_authenticationMethod.getRequestSubject(servletRequest, m_principalProducer);

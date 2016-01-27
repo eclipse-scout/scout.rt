@@ -14,8 +14,6 @@ import java.io.Closeable;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
-import javax.servlet.http.HttpServletResponse;
-import javax.xml.ws.handler.MessageContext;
 
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.slf4j.Logger;
@@ -52,8 +50,7 @@ public class JaxWsCxfSpecifics extends JaxWsImplementorSpecifics {
 
   @Override
   public void setHttpResponseHeader(final Map<String, Object> ctx, final String key, final String value) {
-    final HttpServletResponse httpServletResponse = (HttpServletResponse) ctx.get(MessageContext.SERVLET_RESPONSE);
-    httpServletResponse.setHeader(key, value);
+    getServletResponse(ctx).setHeader(key, value);
   }
 
   @Override

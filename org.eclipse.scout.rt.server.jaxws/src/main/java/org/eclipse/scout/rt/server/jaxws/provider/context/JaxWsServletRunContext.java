@@ -29,6 +29,7 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.ThreadLocalProcessor;
 import org.eclipse.scout.rt.platform.util.ToStringBuilder;
 import org.eclipse.scout.rt.server.commons.context.ServletRunContext;
+import org.eclipse.scout.rt.server.jaxws.implementor.JaxWsImplementorSpecifics;
 
 /**
  * The <code>JaxWsServletRunContext</code> facilitates propagation of the {@link JAX-WS} state like
@@ -47,7 +48,7 @@ public class JaxWsServletRunContext extends ServletRunContext {
   protected WebServiceContext m_webServiceContext;
 
   @Override
-  protected <RESULT> void interceptCallableChain(CallableChain<RESULT> callableChain) {
+  protected <RESULT> void interceptCallableChain(final CallableChain<RESULT> callableChain) {
     super.interceptCallableChain(callableChain);
 
     callableChain.add(new ThreadLocalProcessor<>(JaxWsServletRunContext.CURRENT_WEBSERVICE_CONTEXT, m_webServiceContext));
@@ -84,7 +85,7 @@ public class JaxWsServletRunContext extends ServletRunContext {
   }
 
   @Override
-  public JaxWsServletRunContext withIdentifier(String id) {
+  public JaxWsServletRunContext withIdentifier(final String id) {
     super.withIdentifier(id);
     return this;
   }
@@ -105,16 +106,23 @@ public class JaxWsServletRunContext extends ServletRunContext {
    * is set.
    */
   public JaxWsServletRunContext withWebServiceContext(final WebServiceContext webServiceContext) {
+    // WebServiceContext
     m_webServiceContext = webServiceContext;
-    m_servletRequest = (HttpServletRequest) m_webServiceContext.getMessageContext().get(MessageContext.SERVLET_REQUEST);
-    m_servletResponse = (HttpServletResponse) m_webServiceContext.getMessageContext().get(MessageContext.SERVLET_RESPONSE);
 
+    // Subject
     if (m_subject == null) {
       final Principal userPrincipal = m_webServiceContext.getUserPrincipal();
       if (userPrincipal != null) {
         m_subject = new Subject(true, Collections.singleton(userPrincipal), Collections.emptySet(), Collections.emptySet());
       }
     }
+
+    // ServletRequest / ServletResponse
+    final JaxWsImplementorSpecifics implementorSpecifics = BEANS.get(JaxWsImplementorSpecifics.class);
+    final MessageContext messageContext = m_webServiceContext.getMessageContext();
+    m_servletRequest = implementorSpecifics.getServletRequest(messageContext);
+    m_servletResponse = implementorSpecifics.getServletResponse(messageContext);
+
     return this;
   }
 
