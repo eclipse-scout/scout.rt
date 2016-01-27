@@ -15,6 +15,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import javax.security.auth.Subject;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.namespace.QName;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
@@ -50,6 +52,11 @@ public class BasicAuthenticationMethod implements IAuthenticationMethod {
   public BasicAuthenticationMethod() {
     m_implementorSpecifics = BEANS.get(JaxWsImplementorSpecifics.class);
     m_realm = CONFIG.getPropertyValue(JaxWsBasicAuthRealmProperty.class);
+  }
+
+  @Override
+  public Subject getRequestSubject(final HttpServletRequest servletRequest, final IPrincipalProducer principalProducer) {
+    return BEANS.get(ContainerBasedAuthenticationMethod.class).getRequestSubject(servletRequest, principalProducer);
   }
 
   @Override

@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.jaxws.provider.auth.handler;
 
-import java.security.AccessController;
 import java.security.Principal;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -107,17 +106,10 @@ public class AuthenticationHandler implements SOAPHandler<SOAPMessageContext> {
     try {
       final HttpServletRequest servletRequest = Assertions.assertNotNull((HttpServletRequest) messageContext.get(MessageContext.SERVLET_REQUEST), "ServletRequest must not be null");
 
-      // Check whether already running within Subject (e.g. authenticated by EE container).
-      if (BEANS.get(ServletFilterHelper.class).isRunningWithValidSubject(servletRequest)) {
-        MessageContexts.putRunContext(messageContext, m_runContextProducer.produce(Subject.getSubject(AccessController.getContext())));
-        return true;
-      }
-
-      // Check whether already authenticated (e.g. authenticated by EE container).
-      final Principal principalFound = BEANS.get(ServletFilterHelper.class).findPrincipal(servletRequest, m_principalProducer);
-      if (principalFound != null) {
-        final Subject subject = BEANS.get(ServletFilterHelper.class).createSubject(principalFound);
-        MessageContexts.putRunContext(messageContext, m_runContextProducer.produce(subject));
+      // Get Subject if already authenticated, e.g. by application server or Servlet filter.
+      final Subject requestSubject = m_authenticationMethod.getRequestSubject(servletRequest, m_principalProducer);
+      if (requestSubject != null) {
+        MessageContexts.putRunContext(messageContext, m_runContextProducer.produce(requestSubject));
         return true;
       }
 

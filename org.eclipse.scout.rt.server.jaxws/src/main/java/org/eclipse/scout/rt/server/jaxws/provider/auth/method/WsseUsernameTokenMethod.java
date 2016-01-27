@@ -17,6 +17,8 @@ import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import javax.security.auth.Subject;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPElement;
@@ -54,6 +56,11 @@ public class WsseUsernameTokenMethod implements IAuthenticationMethod {
 
   public WsseUsernameTokenMethod() {
     m_implementorSpecifics = BEANS.get(JaxWsImplementorSpecifics.class);
+  }
+
+  @Override
+  public Subject getRequestSubject(final HttpServletRequest servletRequest, final IPrincipalProducer principalProducer) {
+    return BEANS.get(ContainerBasedAuthenticationMethod.class).getRequestSubject(servletRequest, principalProducer);
   }
 
   @Override

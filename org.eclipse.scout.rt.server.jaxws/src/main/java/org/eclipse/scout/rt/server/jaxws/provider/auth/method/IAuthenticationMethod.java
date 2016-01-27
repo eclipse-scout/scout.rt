@@ -13,6 +13,8 @@ package org.eclipse.scout.rt.server.jaxws.provider.auth.method;
 import java.security.Principal;
 import java.util.Set;
 
+import javax.security.auth.Subject;
+import javax.servlet.http.HttpServletRequest;
 import javax.xml.namespace.QName;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
 
@@ -28,6 +30,21 @@ import org.eclipse.scout.rt.server.commons.authentication.IPrincipalProducer;
  */
 @ApplicationScoped
 public interface IAuthenticationMethod {
+
+  /**
+   * Returns the {@link Subject} if already authenticated, e.g. by the application server or Servlet filter, or else
+   * <code>null</code>.
+   * <p>
+   * If authenticated, {@link #authenticate(SOAPMessageContext, ICredentialVerifier, IPrincipalProducer)} will not be
+   * invoked.
+   *
+   * @param servletRequest
+   *          current servlet request.
+   * @param principalProducer
+   *          used to produce {@link Principal} objects for authenticated users.
+   * @return authenticated {@link Subject}, or <code>null</code> if not authenticated yet.
+   */
+  Subject getRequestSubject(HttpServletRequest servletRequest, IPrincipalProducer principalProducer);
 
   /**
    * Challenges the client for authentication and verifies credentials against the given {@link ICredentialVerifier}.
