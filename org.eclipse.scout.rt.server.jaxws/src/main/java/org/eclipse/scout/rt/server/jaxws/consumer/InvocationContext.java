@@ -14,6 +14,7 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -264,12 +265,21 @@ public class InvocationContext<PORT> {
   }
 
   /**
-   * Returns the requested HTTP response header for the most recently completed operation, or <code>null</code> if not
-   * found or the operation did not complete yet.
+   * Returns the requested HTTP response header for the most recently completed operation, or an empty {@link List} if
+   * not found, or if the operation did not complete yet.
    */
   public List<String> getHttpResponseHeader(final String key) {
     final Map<String, Object> responseContext = getResponseContext();
-    return (responseContext != null ? m_implementorSpecifics.getHttpResponseHeader(responseContext, key) : null);
+    if (responseContext == null) {
+      return Collections.emptyList();
+    }
+
+    final List<String> responseHeaders = m_implementorSpecifics.getHttpResponseHeader(responseContext, key);
+    if (responseHeaders == null) {
+      return Collections.emptyList();
+    }
+
+    return responseHeaders;
   }
 
   /**
