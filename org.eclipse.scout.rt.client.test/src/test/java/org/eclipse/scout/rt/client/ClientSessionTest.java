@@ -18,6 +18,7 @@ import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
@@ -38,7 +39,7 @@ public class ClientSessionTest {
   public void testDispose() throws Exception {
     IBean<?> bean = null;
     try {
-      bean = TestingUtility.registerWithTestingOrder(TestEnvironmentClientSession.class);
+      bean = TestingUtility.registerBean(new BeanMetaData(TestEnvironmentClientSession.class));
 
       IClientSession session = BEANS.get(ClientSessionProvider.class).provide(ClientRunContexts.empty().withUserAgent(UserAgent.createDefault()));
       WeakReference<IClientSession> ref = new WeakReference<IClientSession>(session);

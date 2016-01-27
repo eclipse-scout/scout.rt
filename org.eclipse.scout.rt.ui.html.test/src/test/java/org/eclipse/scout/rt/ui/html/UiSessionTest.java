@@ -22,6 +22,7 @@ import javax.servlet.http.HttpSessionBindingEvent;
 
 import org.eclipse.scout.rt.client.ClientConfigProperties.JobCompletionDelayOnSessionShutdown;
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
@@ -62,6 +63,7 @@ public class UiSessionTest {
         };
       }
     }));
+    m_beans.addAll(TestingUtility.registerBeans(new BeanMetaData(TestEnvironmentClientSession.class).withReplace(true)));
   }
 
   @After

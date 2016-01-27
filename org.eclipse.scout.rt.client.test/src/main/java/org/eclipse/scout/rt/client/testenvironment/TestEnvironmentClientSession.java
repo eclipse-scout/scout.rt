@@ -15,6 +15,7 @@ import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.testenvironment.ui.desktop.TestEnvironmentDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
+import org.eclipse.scout.rt.platform.IgnoreBean;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 
 /**
@@ -22,6 +23,7 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
  *
  * @author jbr
  */
+@IgnoreBean
 public class TestEnvironmentClientSession extends AbstractClientSession {
 
   private IDesktop m_testDesktop;
