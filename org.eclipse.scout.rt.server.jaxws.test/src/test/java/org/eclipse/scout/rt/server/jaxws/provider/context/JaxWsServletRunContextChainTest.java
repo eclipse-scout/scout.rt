@@ -97,10 +97,10 @@ public class JaxWsServletRunContextChainTest {
     assertEquals(DiagnosticContextValueProcessor.class, c.getClass());
     assertEquals("http.request.method", ((DiagnosticContextValueProcessor) c).getMdcKey());
 
-    // 12. ThreadLocalProcessor for JaxWsRunContext.CURRENT_WEBSERVICE_CONTEXT
+    // 12. ThreadLocalProcessor for IWebServiceContext.CURRENT
     c = chainIterator.next();
     assertEquals(ThreadLocalProcessor.class, c.getClass());
-    assertSame(JaxWsServletRunContext.CURRENT_WEBSERVICE_CONTEXT, ((ThreadLocalProcessor) c).getThreadLocal());
+    assertSame(IWebServiceContext.CURRENT, ((ThreadLocalProcessor) c).getThreadLocal());
 
     assertFalse(chainIterator.hasNext());
   }

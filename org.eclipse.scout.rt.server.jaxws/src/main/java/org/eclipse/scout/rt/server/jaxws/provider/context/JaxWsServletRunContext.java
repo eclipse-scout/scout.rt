@@ -40,18 +40,13 @@ import org.eclipse.scout.rt.server.jaxws.implementor.JaxWsImplementorSpecifics;
  */
 public class JaxWsServletRunContext extends ServletRunContext {
 
-  /**
-   * The {@link WebServiceContext} which is currently associated with the current thread.
-   */
-  public static final ThreadLocal<WebServiceContext> CURRENT_WEBSERVICE_CONTEXT = new ThreadLocal<>();
-
   protected WebServiceContext m_webServiceContext;
 
   @Override
   protected <RESULT> void interceptCallableChain(final CallableChain<RESULT> callableChain) {
     super.interceptCallableChain(callableChain);
 
-    callableChain.add(new ThreadLocalProcessor<>(JaxWsServletRunContext.CURRENT_WEBSERVICE_CONTEXT, m_webServiceContext));
+    callableChain.add(new ThreadLocalProcessor<>(IWebServiceContext.CURRENT, m_webServiceContext));
   }
 
   @Override
@@ -151,7 +146,7 @@ public class JaxWsServletRunContext extends ServletRunContext {
   @Override
   protected void fillCurrentValues() {
     super.fillCurrentValues();
-    m_webServiceContext = JaxWsServletRunContext.CURRENT_WEBSERVICE_CONTEXT.get();
+    m_webServiceContext = IWebServiceContext.CURRENT.get();
   }
 
   @Override
