@@ -50,21 +50,20 @@ import org.eclipse.scout.rt.server.jaxws.provider.auth.method.IAuthenticationMet
  *
  * <pre>
  * &#64;WebServiceEntryPoint(
- *     endpointInterface = TestWebServicePortType.class,
- *     serviceName = "TestWebService",
- *     portName = "TestWebServicePort",
+ *     endpointInterface = PingWebServicePortType.class,
+ *     entryPointName = "PingWebServiceEntryPoint",
+ *     entryPointPackage = "org.eclipse.ws.ping",
+ *     serviceName = "PingWebService",
+ *     portName = "PingWebServicePort",
  *     handlerChain = {
- *         &#64;Handler(@Clazz(Handler1.class)),
- *         &#64;Handler(@Clazz(qualifiedName = "f.q.n.Handler2")),
- *         &#64;Handler(value = @Clazz(Handler3.class) ,
- *             initParams = {@InitParam(key = "key1", value = "value1"),
- *                 &#64;InitParam(key = " key2", value = "value2")}),
+ *         &#64;Handler(@Clazz(LogHandler.class)),
+ *         &#64;Handler(value = @Clazz(IPAddressFilter.class) , initParams = {
+ *             &#64;InitParam(key = "rangeFrom", value = "192.200.0.0"),
+ *             &#64;InitParam(key = " rangeTo", value = "192.255.0.0")})
  *     },
  *     authentication = @Authentication(
  *         method = @Clazz(BasicAuthenticationMethod.class) ,
- *         verifier = @Clazz(ConfigFileCredentialVerifier.class))
- * public interface TestWebServiceEntryPointDefinition {
- * }
+ *         verifier = @Clazz(ConfigFileCredentialVerifier.class) ) )
  * </pre>
  *
  * @since 5.1
@@ -97,9 +96,9 @@ public @interface WebServiceEntryPoint {
   String entryPointPackage() default WebServiceEntryPoint.DERIVED;
 
   /**
-   * Specifies the service name as declared in the WSDL file, and must be set if publishing the webservice in a EE
-   * container. Both, {@link #serviceName()} and {@link #portName()} uniquely identify a webservice endpoint to be
-   * published.
+   * Specifies the service name as declared in the WSDL file, and must be set if publishing the webservice via auto
+   * discovery in an EE container. Both, {@link #serviceName()} and {@link #portName()} uniquely identify a webservice
+   * endpoint to be published.
    *
    * <pre>
    * &lt;wsdl:service name="SERVICE_NAME">
@@ -110,9 +109,9 @@ public @interface WebServiceEntryPoint {
   String serviceName() default "";
 
   /**
-   * Specifies the name of the port as declared in the WSDL file, and must be set if publishing the webservice in a EE
-   * container. Both, {@link #serviceName()} and {@link #portName()} uniquely identify a webservice endpoint to be
-   * published.
+   * Specifies the name of the port as declared in the WSDL file, and must be set if publishing the webservice via auto
+   * discovery in an EE container. Both, {@link #serviceName()} and {@link #portName()} uniquely identify a webservice
+   * endpoint to be published.
    *
    * <pre>
    * &lt;wsdl:service name="...">
@@ -124,7 +123,7 @@ public @interface WebServiceEntryPoint {
 
   /**
    * Specifies the location of the WSDL document. If not set, the location is derived from {@link WebServiceClient}
-   * annotation which is typically initialized with the location as provided to 'wsimport'.
+   * annotation which is typically initialized with the 'wsdlLocation' as provided to 'wsimport'.
    */
   String wsdlLocation() default WebServiceEntryPoint.DERIVED;
 

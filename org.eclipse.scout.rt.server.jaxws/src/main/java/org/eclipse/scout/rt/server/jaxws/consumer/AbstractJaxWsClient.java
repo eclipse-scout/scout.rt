@@ -12,10 +12,8 @@ package org.eclipse.scout.rt.server.jaxws.consumer;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.net.Socket;
 import java.net.URL;
 import java.util.List;
-import java.util.concurrent.CancellationException;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
@@ -32,7 +30,6 @@ import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.config.IConfigProperty;
 import org.eclipse.scout.rt.platform.context.RunContext;
-import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.context.RunWithRunContext;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
@@ -44,54 +41,53 @@ import org.eclipse.scout.rt.server.jaxws.JaxWsConfigProperties.JaxWsReadTimeoutP
 import org.eclipse.scout.rt.server.jaxws.consumer.PortProducer.IPortInitializer;
 import org.eclipse.scout.rt.server.jaxws.consumer.auth.handler.BasicAuthenticationHandler;
 import org.eclipse.scout.rt.server.jaxws.consumer.auth.handler.WsseUsernameTokenAuthenticationHandler;
-import org.eclipse.scout.rt.server.jaxws.implementor.JaxWsImplementorSpecifics;
 
 /**
  * This class represents and encapsulates a webservice endpoint port to communicate with, and is based on a preemptive
- * cache to obtain new port instances. Interaction with the port is done on behalf of a {@link InvocationContext} with
- * the following characteristics:
+ * cache to obtain new port instances.
+ * <p>
+ * Interaction with the endpoint is done on behalf of a {@link InvocationContext} with the following characteristics:
  * <ul>
- * <li>A context provides you a transactional scope to invoke webservice operations, meaning that once the associated
- * transaction is about to complete, you are invoked to participate as a transaction member in
- * <code>2-phase-commit-protocol</code>, which allows you to finally commit or rollback your webservice interaction done
- * within a <code>InvocationContext</code>. Of course, the webservice endpoint must provide some facility for that to
- * work.</li>
- * <li>Request properties are inherited from {@link AbstractJaxWsClient}, and can be overwritten for the scope of a
- * context. That is useful if having a port with some operations require some different properties set, e.g. another
- * read-timeout to transfer big data.</li>
- * <li>Internally, port operations are invoked within a separate thread with the current {@link RunContext} set, which
- * allows cancellation of operations, once the current {@link RunMonitor} is cancelled. However, even if the request
- * returns with a {@link CancellationException}, the invocation thread is still waiting for the response to be received,
- * or the associated {@link Socket} to be closed. Closing of that socket is implementor specific, and can be implemented
- * in {@link JaxWsImplementorSpecifics#closeSocket()}.</li>
+ * <li>Request properties are inherited from {@link AbstractJaxWsClient}, and can be overwritten for the scope of
+ * an invocation context. This is useful if some operations of the port require different properties to be set, e.g.
+ * another read-timeout to transfer big data.</li>
+ * <li>Operations on the Port are invoked in another thread, which allows for cancellation once the current monitor is
+ * cancelled. Then, the operation returns with a {@link WebServiceRequestCancelledException}. But, the thread executing
+ * the operation may still be waiting for the response to be received, because closing the socket is implementor
+ * specific.</li>
  * </ul>
+ * <p>
+ * The JAX-WS specification does not specify thread safety of a Port instance. Therefore, a Port should not be used
+ * concurrently among threads. Further, JAX-WS API does not support to reset the Port's request and response context,
+ * which is why a Port should only be used for a single webservice call.
+ * <p>
  * Example usage:
  *
  * <pre>
- * <code>
  * // Obtain a context to work on a dedicated Port.
- * final InvocationContext context = BEANS.get(YourWebServiceClient.class).newInvocationContext();
+ * final InvocationContext&lt;YourWebServicePortType&gt; context = BEANS.get(YourWebServicePortType.class).newInvocationContext();
  *
  * // Optionally configure the context.
- * context.endpointUrl(&quot;http://...&quot;)
- *        .connectTimeout(1000)
- *        .readTimeout(10000)
- *        .whenRollback(new IRollbackListener() {
+ * YouWebServicePortType port = context
+ *     .withEndpointUrl("http://...")
+ *     .withConnectTimeout(10, TimeUnit.SECONDS)
+ *     .withReadTimeout(30, TimeUnit.SECONDS)
+ *     .whenRollback(new IRollbackListener() {
  *
- *          &#064;Override
- *          public void onRollback() {
- *            invocationContext.port().webMethod_rollback();
- *          }
- *        });
+ *       &#64;Override
+ *       public void onRollback() {
+ *         context.getPort().webMethod_rollback();
+ *       }
+ *     })
+ *     .getPort();
  *
  * // Invoke the port operation.
  * try {
- *   String wsResult = context.port().webMethod();
+ *   String wsResult = port.webMethod();
  * }
- * catch (CancellationException e) {
+ * catch (WebServiceRequestCancelledException e) {
  *   // Webservice request was cancelled.
  * }
- * </code>
  * </pre>
  *
  * @since 5.1
@@ -157,13 +153,11 @@ public abstract class AbstractJaxWsClient<SERVICE extends Service, PORT> {
   }
 
   /**
-   * Creates a new <code>InvocationContext</code> to interact with a webservice endpoint on behalf of a cached Port.
-   * <br/>
-   * Request properties are inherited from {@link AbstractJaxWsClient}, and can be overwritten for the scope of this
-   * context. That is useful if having a port with some operations require some different properties set, e.g. another
-   * read-timeout to transfer big data. Also, if associated with a transaction, respective commit or rollback listeners
-   * are called upon leaving the transaction boundary, e.g. to implement a 2-phase-commit-protocol (2PC) for the
-   * webservice operations invoked.
+   * Creates a new <code>InvocationContext</code> to interact with a webservice endpoint on behalf of a Port.
+   * <p>
+   * Request properties are inherited from {@link AbstractJaxWsClient}, and can be overwritten for the scope of
+   * this context. This is useful if having a port with some operations require some different properties to be set,
+   * e.g. another read-timeout to transfer big data.
    */
   public InvocationContext<PORT> newInvocationContext() {
     final PORT port = (m_portCache != null ? m_portCache.get() : m_portProducer.produce());
@@ -180,14 +174,13 @@ public abstract class AbstractJaxWsClient<SERVICE extends Service, PORT> {
 
   /**
    * Overwrite to install JAX-WS handlers by adding them to the given {@link List}. The handlers are invoked in the
-   * order as placed in the handler-chain list. By default, no handlers are installed.
+   * order as added to the handler-chain. By default, there is no handler installed.
    * <p>
-   * This method is invoked the time the service and port is preemptively created and put into cache. Consequently, you
-   * cannot do any assumption about the calling thread.
+   * This method is invoked upon preemptive creation of the port. Consequently, you cannot do any assumption about the
+   * calling thread.
    * <p>
-   * At invocation time, if the handler requires to run in another {@link RunContext} than the one from the calling
-   * context, annotate it with {@link RunWithRunContext} annotation, e.g. to run the handler in a separate transaction
-   * to do some logging.
+   * If a handler requires to run in another {@link RunContext} than the calling context, annotate it with
+   * {@link RunWithRunContext} annotation, e.g. to start a new transaction to log into database.
    * <p>
    * If the endpoint requires to authenticate requests, an authentication handler is typically added to the list, e.g.
    * {@link BasicAuthenticationHandler} for 'Basic authentication', or {@link WsseUsernameTokenAuthenticationHandler}

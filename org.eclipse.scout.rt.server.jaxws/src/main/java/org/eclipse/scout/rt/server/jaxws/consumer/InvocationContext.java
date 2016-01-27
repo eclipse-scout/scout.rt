@@ -44,10 +44,11 @@ import org.eclipse.scout.rt.server.transaction.TransactionScope;
 
 /**
  * This context represents a webservice Port to interact with a webservice endpoint, and is associated with a dedicated
- * Port, meaning that it can be used concurrently among other Ports. However, this context itself is not threadsafe and
- * therefore not to be used for concurrent webservice requests. That is due to a restriction of the JAX-WS API which
- * does not require the Port to be threadsafe. If a webservice is to be consumed concurrently, use different
- * {@link InvocationContext} instances instead.
+ * Port, meaning that it can be used concurrently among other Ports.
+ * <p>
+ * The JAX-WS specification does not specify thread safety of a Port instance. Therefore, a Port should not be used
+ * concurrently among threads. Further, JAX-WS API does not support to reset the Port's request and response context,
+ * which is why a Port should only be used for a single webservice call.
  * <p>
  * Request properties are inherited from {@link AbstractJaxWsClient}, and can be overwritten for the scope of this
  * context. That is useful if having a port with some operations require some different properties set, e.g. another
@@ -115,7 +116,8 @@ public class InvocationContext<PORT> {
   }
 
   /**
-   * Installs the given listener for this {@link InvocationContext} to be notified once the transaction is rolled back.
+   * Installs the given listener for this {@link InvocationContext} to be notified once the current transaction is
+   * rolled back.
    *
    * @return <code>this</code> in order to support for method chaining.
    */
@@ -126,7 +128,8 @@ public class InvocationContext<PORT> {
   }
 
   /**
-   * Installs the given listener for this {@link InvocationContext} to be notified once the transaction is committed.
+   * Installs the given listener for this {@link InvocationContext} to be notified once the current transaction is
+   * committed.
    *
    * @return <code>this</code> in order to support for method chaining.
    */
