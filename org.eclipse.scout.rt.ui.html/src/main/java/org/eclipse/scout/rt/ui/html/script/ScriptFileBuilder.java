@@ -44,7 +44,19 @@ import org.slf4j.LoggerFactory;
 public class ScriptFileBuilder {
   private static final Logger LOG = LoggerFactory.getLogger(ScriptFileBuilder.class);
 
-  private static final Pattern INCLUDE_PAT = Pattern.compile("(?://\\s*@|__)include\\s*\\(\\s*(?:\"([^\"]+)\"|'([^']+)')\\s*\\)[;]*");
+  /**
+   * Matches include directives for JS and CSS files. There directives look differently to not confuse the respective
+   * editor's syntax high-lighter. Otherwise, the format has no special meaning (i.e. there is no magic "__include"
+   * function).
+   * <p>
+   * <b>JavaScript:</b> <code>__include("file.js");</code><br>
+   * <b>CSS:</b> <code>//@include("file.css")</code>
+   * <p>
+   * Inner whitespace and trailing semicolon are optional. Both <code>"</code> and <code>'</code> may be used as string
+   * delimiter. Content before and after the matched include directive is preserved, except <i>leading</i> space and tab
+   * characters (= support for JS formatter).
+   */
+  private static final Pattern INCLUDE_PAT = Pattern.compile("^[ \\t]*(?://\\s*@|__)include\\s*\\(\\s*(?:\"([^\"]+)\"|'([^']+)')\\s*\\);*", Pattern.MULTILINE);
 
   /**
    * Pattern for a script url that is not a {@link NodeType#SRC_FRAGMENT}
