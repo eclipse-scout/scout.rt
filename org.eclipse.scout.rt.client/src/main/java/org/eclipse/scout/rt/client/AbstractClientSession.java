@@ -28,7 +28,6 @@ import javax.security.auth.Subject;
 
 import org.eclipse.scout.rt.client.ClientConfigProperties.JobCompletionDelayOnSessionShutdown;
 import org.eclipse.scout.rt.client.ClientConfigProperties.MemoryPolicyProperty;
-import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.client.extension.ClientSessionChains.ClientSessionLoadSessionChain;
 import org.eclipse.scout.rt.client.extension.ClientSessionChains.ClientSessionStoreSessionChain;
 import org.eclipse.scout.rt.client.extension.IClientSessionExtension;
@@ -44,6 +43,7 @@ import org.eclipse.scout.rt.platform.annotations.Internal;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.context.PropertyMap;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.job.IExecutionSemaphore;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
@@ -487,21 +487,44 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
       m_desktop = null;
     }
 
-    // Wait for running jobs to complete prior shutdown the session.
     try {
-      long delay = NumberUtility.nvl(CONFIG.getPropertyValue(JobCompletionDelayOnSessionShutdown.class), 0L);
-      if (delay > 0L) {
-        Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
-            .andMatchFuture(findRunningJobs())
-            .toFilter(), delay, TimeUnit.SECONDS);
-      }
       cancelRunningJobs();
-    }
-    catch (ThreadInterruptedException | TimedOutException e) {
-      LOG.warn("Failed to await for running jobs to complete.", e);
     }
     finally {
       inactivateSession();
+    }
+  }
+
+  protected void cancelRunningJobs() {
+    // Filter matches all running jobs that have the same client session associated, except the current thread
+    IFilter<IFuture<?>> runningJobsFilter = Jobs.newFutureFilterBuilder()
+        .andMatch(new SessionFutureFilter(ISession.CURRENT.get()))
+        .andMatchNotFuture(IFuture.CURRENT.get())
+        .toFilter();
+
+    // Wait for running jobs to complete before we cancel them
+    long delay = NumberUtility.nvl(CONFIG.getPropertyValue(JobCompletionDelayOnSessionShutdown.class), 0L);
+    if (delay > 0L) {
+      try {
+        Jobs.getJobManager().awaitDone(runningJobsFilter, delay, TimeUnit.SECONDS);
+      }
+      catch (TimedOutException e) {
+        // NOP (not all jobs have been finished within the delay)
+      }
+      catch (ThreadInterruptedException e) {
+        LOG.warn("Failed to await for running jobs to complete.", e);
+      }
+    }
+
+    // Cancel remaining jobs and write a warning to the logger
+    Set<IFuture<?>> runningFutures = Jobs.getJobManager().getFutures(runningJobsFilter);
+    if (!runningFutures.isEmpty()) {
+      LOG.warn("Some running client jobs found while stopping the client session; sent a cancellation request to release associated worker threads. "
+          + "[session={}, user={}, jobs={}]", AbstractClientSession.this, getUserId(), runningFutures);
+
+      Jobs.getJobManager().cancel(Jobs.newFutureFilterBuilder()
+          .andMatchFuture(runningFutures)
+          .toFilter(), true);
     }
   }
 
@@ -518,33 +541,6 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
 
     fireSessionChangedEvent(new SessionEvent(this, SessionEvent.TYPE_STOPPED));
     LOG.info("Client session stopped [session={}, user={}]", this, getUserId());
-  }
-
-  /**
-   * Check if any jobs are currently running, that are different from the current job, have the same session assigned
-   * and are not blocked. If yes, a warning with the list of found jobs is printed to the logger.
-   */
-  protected void cancelRunningJobs() {
-    final Set<IFuture<?>> runningJobs = findRunningJobs();
-    if (!runningJobs.isEmpty()) {
-      Jobs.getJobManager().cancel(Jobs.newFutureFilterBuilder()
-          .andMatchFuture(runningJobs)
-          .toFilter(), true);
-
-      LOG.warn("Some running client jobs found while stopping the client session; sent a cancellation request to release associated worker threads. "
-          + "[session={}, user={}, jobs={}]", AbstractClientSession.this, getUserId(), runningJobs);
-    }
-  }
-
-  /**
-   * Returns all the jobs which currently are running.
-   */
-  protected Set<IFuture<?>> findRunningJobs() {
-    return Jobs.getJobManager().getFutures(Jobs.newFutureFilterBuilder()
-        .andMatchRunContext(ClientRunContext.class)
-        .andMatch(new SessionFutureFilter(ISession.CURRENT.get()))
-        .andMatchNotFuture(IFuture.CURRENT.get())
-        .toFilter());
   }
 
   @Override
