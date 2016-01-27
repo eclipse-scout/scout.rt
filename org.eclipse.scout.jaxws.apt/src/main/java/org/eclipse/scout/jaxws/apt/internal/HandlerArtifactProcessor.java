@@ -76,7 +76,7 @@ public class HandlerArtifactProcessor {
 
       try {
         final String handlerDelegateQualifiedName = createAndPersistHandlerDelegate(portTypeEntryPoint, portTypeEntryPointDefinition, handlerDefinition, idx, env);
-        logger.info("Generating handler delegate [handler={}, handlerDelegate={}, portTypeDefinition={}, endpointInterface={}]",
+        logger.info("Generate handler delegate [handler={}, handlerDelegate={}, portTypeDefinition={}, endpointInterface={}]",
             handlerDefinition.getHandlerQualifiedName(),
             handlerDelegateQualifiedName,
             portTypeEntryPointDefinition.getQualifiedName(),
@@ -112,7 +112,7 @@ public class HandlerArtifactProcessor {
       // Generate the AuthHandler
       try {
         final String authHandlerQualifiedName = createAndPersistAuthHandler(portTypeEntryPoint, portTypeEntryPointDefinition, env);
-        logger.info("Generating AuthHandler [authHandler={}, portTypeDefinition={}, endpointInterface={}]",
+        logger.info("Generate AuthHandler [authHandler={}, portTypeDefinition={}, endpointInterface={}]",
             authHandlerQualifiedName,
             portTypeEntryPointDefinition.getQualifiedName(),
             endpointInterface);
@@ -126,7 +126,7 @@ public class HandlerArtifactProcessor {
     // Generate handler-chain.xml.
     try {
       final String handlerChainFile = createAndPersistHandlerXmlFile(portTypeEntryPoint, portTypeEntryPointDefinition, handlers, env.getFiler());
-      logger.info("Generating handler chain XML-file [file={}, portTypeDefinition={}, endpointInterface={}]",
+      logger.info("Generate handler chain XML-file [file={}, portTypeDefinition={}, endpointInterface={}]",
           handlerChainFile,
           portTypeEntryPointDefinition.getQualifiedName(),
           endpointInterface);
