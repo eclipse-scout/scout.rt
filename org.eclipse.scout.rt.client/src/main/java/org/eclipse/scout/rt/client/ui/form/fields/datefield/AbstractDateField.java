@@ -22,8 +22,8 @@ import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.datefield.DateFieldChains.DateFieldShiftDateChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.datefield.DateFieldChains.DateFieldShiftTimeChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.datefield.IDateFieldExtension;
-import org.eclipse.scout.rt.client.ui.form.fields.AbstractBasicField;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
+import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.ParsingFailedStatus;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
@@ -86,7 +86,7 @@ import org.slf4j.LoggerFactory;
  * @see org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelObjectReplacer ServiceTunnelObjectReplacer
  */
 @ClassId("f73eed8c-1e70-4903-a23f-4a29d884e5ea")
-public abstract class AbstractDateField extends AbstractBasicField<Date> implements IDateField {
+public abstract class AbstractDateField extends AbstractValueField<Date> implements IDateField {
   private static final Logger LOG = LoggerFactory.getLogger(AbstractDateField.class);
 
   private IDateFieldUIFacade m_uiFacade;
@@ -230,15 +230,6 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
     setFormat(getConfiguredFormat());
   }
 
-  /**
-   * UpdateDisplayTextOnModify is not supported for DateTimeField.
-   */
-  @Override
-  public final void setUpdateDisplayTextOnModify(boolean b) {
-    super.setUpdateDisplayTextOnModify(b);
-    preventUpdateDisplaytextOnModifiyOnDateTimeField();
-  }
-
   @Override
   public void setFormat(String format) {
     format = checkFormatPatternSupported(format);
@@ -327,16 +318,8 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
   @Override
   public void setHasTime(boolean b) {
     propertySupport.setPropertyBool(PROP_HAS_TIME, b);
-    preventUpdateDisplaytextOnModifiyOnDateTimeField();
     if (isInitialized()) {
       setValue(getValue());
-    }
-  }
-
-  protected void preventUpdateDisplaytextOnModifiyOnDateTimeField() {
-    if (isUpdateDisplayTextOnModify() && isHasDate() && isHasTime()) {
-      LOG.error("UpdateDisplayTextOnModify is not supported for combined Date Time Field {}", getClass().getName());
-      setUpdateDisplayTextOnModify(false);
     }
   }
 
@@ -348,7 +331,6 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
   @Override
   public void setHasDate(boolean b) {
     propertySupport.setPropertyBool(PROP_HAS_DATE, b);
-    preventUpdateDisplaytextOnModifiyOnDateTimeField();
     if (isInitialized()) {
       setValue(getValue());
     }
@@ -476,7 +458,7 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
     return null;
   }
 
-  protected class P_UIFacade extends AbstractBasicField.P_UIFacade implements IDateFieldUIFacade {
+  protected class P_UIFacade implements IDateFieldUIFacade {
 
     @Override
     public void setDateTimeFromUI(Date date) {
@@ -528,7 +510,7 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
     chain.execShiftDate(level, value);
   }
 
-  protected static class LocalDateFieldExtension<OWNER extends AbstractDateField> extends LocalBasicFieldExtension<Date, OWNER> implements IDateFieldExtension<OWNER> {
+  protected static class LocalDateFieldExtension<OWNER extends AbstractDateField> extends LocalValueFieldExtension<Date, OWNER> implements IDateFieldExtension<OWNER> {
 
     public LocalDateFieldExtension(OWNER owner) {
       super(owner);

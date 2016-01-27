@@ -40,10 +40,18 @@ scout.FormField = function() {
   this.statusPosition = scout.FormField.STATUS_POSITION_DEFAULT; // (currently?) an UI-only property
 
   /**
-   * Set this property to false when the form-field should stay enabled in offline case.
+   * Set this property to true when the form-field should stay enabled in offline case.
    * By default the field will be disabled.
    */
-  this.disabledWhenOffline = true;
+  this.enabledWhenOffline = false;
+
+  /**
+   * Some browsers don't support copying text from disabled input fields. If such a browser is detected
+   * and this flag is true (defaul is false), an overlay DIV is rendered over disabled fields which
+   * provides a custom copy context menu that opens the ClipboardForm.
+   */
+  this.disabledCopyOverlay = false;
+  this.$disabledCopyOverlay;
 };
 scout.inherits(scout.FormField, scout.ModelAdapter);
 
@@ -116,6 +124,7 @@ scout.FormField.prototype._remove = function() {
   this._removeField();
   this._removeStatus();
   this._removeLabel();
+  this._removeDisabledCopyOverlay();
 };
 
 scout.FormField.prototype._renderMandatory = function() {
@@ -255,6 +264,7 @@ scout.FormField.prototype._renderEnabled = function(enabled) {
   if (this.$field) {
     this.$field.setEnabled(enabled);
   }
+  this._updateDisabledCopyOverlay();
 };
 
 scout.FormField.prototype._renderCssClass = function(cssClass, oldCssClass) {
@@ -470,13 +480,17 @@ scout.FormField.prototype.getForm = function() {
 };
 
 scout.FormField.prototype._goOffline = function() {
-  if (this.disabledWhenOffline) {
-    this._renderEnabled(false);
+  if (this.enabledWhenOffline) {
+    return;
   }
+  this._renderEnabled(false);
 };
 
 scout.FormField.prototype._goOnline = function() {
-  if (this.disabledWhenOffline && this.enabled) {
+  if (this.enabledWhenOffline) {
+    return;
+  }
+  if (this.enabled) {
     this._renderEnabled(true);
   }
 };
@@ -702,4 +716,58 @@ scout.FormField.prototype._uninstallDragAndDropHandler = function(event) {
   }
   this.dragAndDropHandler.uninstall();
   this.dragAndDropHandler = null;
+};
+
+scout.FormField.prototype._updateDisabledCopyOverlay = function() {
+  if (this.disabledCopyOverlay && !scout.device.supportsCopyFromDisabledInputFields()) {
+    if (this.enabled) {
+      this._removeDisabledCopyOverlay();
+    } else {
+      this._renderDisabledCopyOverlay();
+    }
+  }
+};
+
+scout.FormField.prototype._renderDisabledCopyOverlay = function() {
+  if (!this.$disabledCopyOverlay) {
+    this.$disabledCopyOverlay = this.$container
+      .appendDiv('disabled-overlay')
+      .on('contextmenu', this._createCopyContextMenu.bind(this));
+  }
+};
+
+scout.FormField.prototype._removeDisabledCopyOverlay = function() {
+  if (this.$disabledCopyOverlay) {
+    this.$disabledCopyOverlay.remove();
+    this.$disabledCopyOverlay = null;
+  }
+};
+
+scout.FormField.prototype._createCopyContextMenu = function(event) {
+  if (!this.visible || !scout.strings.hasText(this.displayText)) {
+    return;
+  }
+
+  var field = this;
+  var menu = scout.create('Menu', {
+    parent: this,
+    text: this.session.text('ui.Copy')
+  });
+  menu.remoteHandler = function(event) {
+    if ('doAction' === event.type && field instanceof scout.ValueField) {
+      field._send('exportToClipboard');
+    }
+  };
+
+  var popup = scout.create('ContextMenuPopup', {
+    parent: this,
+    menuItems: [menu],
+    cloneMenuItems: false,
+    location: {
+      x: event.pageX,
+      y: event.pageY
+    },
+    $anchor: this._$disabledOverlay
+  });
+  popup.open();
 };

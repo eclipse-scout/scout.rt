@@ -31,6 +31,7 @@ import org.eclipse.scout.rt.platform.util.CompareUtility;
 public abstract class AbstractBasicField<VALUE> extends AbstractValueField<VALUE> implements IBasicField<VALUE> {
 
   public class P_UIFacade implements IBasicFieldUIFacade {
+
     @Override
     public void setDisplayTextFromUI(String text) {
       if (!isEnabled() || !isVisible()) {
@@ -50,7 +51,6 @@ public abstract class AbstractBasicField<VALUE> extends AbstractValueField<VALUE
       // parse always, validity might change even if text is same
       parseAndSetValue(value);
     }
-
   }
 
   protected AbstractBasicField(boolean callInitializer) {

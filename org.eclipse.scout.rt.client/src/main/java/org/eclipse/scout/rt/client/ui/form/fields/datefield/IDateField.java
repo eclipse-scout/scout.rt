@@ -13,9 +13,9 @@ package org.eclipse.scout.rt.client.ui.form.fields.datefield;
 import java.text.DateFormat;
 import java.util.Date;
 
-import org.eclipse.scout.rt.client.ui.form.fields.IBasicField;
+import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 
-public interface IDateField extends IBasicField<Date> {
+public interface IDateField extends IValueField<Date> {
 
   String PROP_HAS_DATE = "hasDate";
   String PROP_HAS_TIME = "hasTime";
@@ -23,7 +23,6 @@ public interface IDateField extends IBasicField<Date> {
   String PROP_TIME_FORMAT_PATTERN = "timeFormatPattern";
   String PROP_AUTO_DATE = "autoDate";
 
-  @Override
   IDateFieldUIFacade getUIFacade();
 
   void setFormat(String format);

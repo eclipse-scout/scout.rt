@@ -15,11 +15,14 @@ import java.beans.PropertyChangeListener;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.scout.rt.client.services.common.clipboard.IClipboardService;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.IBasicField;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
@@ -46,6 +49,7 @@ public abstract class JsonValueField<VALUE_FIELD extends IValueField<?>> extends
    * flag.
    */
   public static final String EVENT_DISPLAY_TEXT_CHANGED = "displayTextChanged";
+  public static final String EVENT_EXPORT_TO_CLIPBOARD = "exportToClipboard";
 
   private PropertyChangeListener m_contextMenuListener;
 
@@ -146,6 +150,9 @@ public abstract class JsonValueField<VALUE_FIELD extends IValueField<?>> extends
     if (EVENT_DISPLAY_TEXT_CHANGED.equals(event.getType())) {
       handleUiDisplayTextChanged(event);
     }
+    else if (EVENT_EXPORT_TO_CLIPBOARD.equals(event.getType())) {
+      handleUiExportToClipboard();
+    }
     else {
       super.handleUiEvent(event);
     }
@@ -178,5 +185,14 @@ public abstract class JsonValueField<VALUE_FIELD extends IValueField<?>> extends
    */
   protected void handleUiDisplayTextChangedAfterTyping(String displayText) {
     // NOP may be implemented by sub-classes
+  }
+
+  protected void handleUiExportToClipboard() {
+    try {
+      BEANS.get(IClipboardService.class).setTextContents(getModel().getDisplayText());
+    }
+    catch (RuntimeException e) {
+      BEANS.get(ExceptionHandler.class).handle(e);
+    }
   }
 }

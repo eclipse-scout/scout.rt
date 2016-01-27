@@ -14,22 +14,14 @@
 scout.BasicField = function() {
   scout.BasicField.parent.call(this);
   this._onDisplayTextModifiedHandler = this._onDisplayTextModified.bind(this);
-  this._keyUpListener;
-  this.disabledWhenOffline = false;
+  this.enabledWhenOffline = true;
+  this.disabledCopyOverlay = true;
 };
 scout.inherits(scout.BasicField, scout.ValueField);
 
 scout.BasicField.prototype._renderProperties = function() {
   scout.BasicField.parent.prototype._renderProperties.call(this);
   this._renderUpdateDisplayTextOnModify();
-};
-
-/**
- * @override FormField.js
- */
-scout.BasicField.prototype._renderEnabled = function() {
-  scout.BasicField.parent.prototype._renderEnabled.call(this);
-  this._renderDisabledOverlay();
 };
 
 scout.BasicField.prototype._renderUpdateDisplayTextOnModify = function() {
@@ -78,64 +70,4 @@ scout.BasicField.prototype._checkDisplayTextChanged = function(displayText, whil
     return true;
   }
   return false;
-};
-
-/**
- * Add or remove an overlay DIV for browsers that don't support copy from disabled text-fields.
- * The overlay provides a custom 'copy' menu which opens the ClipboardForm.
- */
-scout.BasicField.prototype._renderDisabledOverlay = function() {
-  if (scout.device.supportsCopyFromDisabledInputFields()) {
-    return;
-  }
-
-  if (this.enabled) {
-    this._removeDisabledOverlay();
-  } else if (!this._$disabledOverlay) {
-    this._$disabledOverlay = this.$container
-      .appendDiv('disabled-overlay')
-      .on('contextmenu', this._createCopyContextMenu.bind(this));
-  }
-};
-
-scout.BasicField.prototype._removeDisabledOverlay = function() {
-  if (this._$disabledOverlay) {
-    this._$disabledOverlay.remove();
-    this._$disabledOverlay = null;
-  }
-};
-
-scout.BasicField.prototype._createCopyContextMenu = function(event) {
-  if (!this.visible ||
-    !scout.strings.hasText(this.displayText)) {
-    return;
-  }
-
-  var field = this;
-  var menu = scout.create('Menu', {
-    parent: this,
-    text: this.session.text('ui.Copy')
-  });
-  menu.remoteHandler = function(event) {
-    if ('doAction' === event.type) {
-      field._send('exportToClipboard');
-    }
-  };
-
-  var popup = scout.create('ContextMenuPopup', {
-    parent: this,
-    menuItems: [menu],
-    cloneMenuItems: false,
-    location: {
-      x: event.pageX,
-      y: event.pageY
-    },
-    $anchor: this._$disabledOverlay
-  });
-  popup.open();
-};
-
-scout.BasicField.prototype._remove = function() {
-  scout.BasicField.parent.prototype._remove.call(this);
-  this._removeDisabledOverlay();
 };

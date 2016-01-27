@@ -30,13 +30,4 @@ public abstract class AbstractDateTimeField extends AbstractDateField {
   protected boolean getConfiguredHasTime() {
     return true;
   }
-
-  /**
-   * UpdateDisplayTextOnModify is not supported for DateTimeField.
-   */
-  @Override
-  protected final boolean getConfiguredUpdateDisplayTextOnModify() {
-    return false;
-  }
-
 }

@@ -35,6 +35,11 @@ public abstract class JsonFormField<FORM_FIELD extends IFormField> extends Abstr
   }
 
   @Override
+  public String getObjectType() {
+    return "FormField";
+  }
+
+  @Override
   protected void initJsonProperties(FORM_FIELD model) {
     super.initJsonProperties(model);
     putJsonProperty(new JsonProperty<FORM_FIELD>(IFormField.PROP_LABEL, model) {
@@ -189,10 +194,4 @@ public abstract class JsonFormField<FORM_FIELD extends IFormField> extends Abstr
       }
     });
   }
-
-  @Override
-  public String getObjectType() {
-    return "FormField";
-  }
-
 }

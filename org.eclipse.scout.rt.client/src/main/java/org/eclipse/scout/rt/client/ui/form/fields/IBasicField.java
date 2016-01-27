@@ -16,6 +16,7 @@ package org.eclipse.scout.rt.client.ui.form.fields;
  * @since 3.10.0-M3
  */
 public interface IBasicField<T> extends IValueField<T> {
+
   String PROP_UPDATE_DISPLAY_TEXT_ON_MODIFY = "updateDisplayTextOnModify";
 
   IBasicFieldUIFacade getUIFacade();
@@ -29,5 +30,4 @@ public interface IBasicField<T> extends IValueField<T> {
    * @see AbstractBasicField#getConfiguredUpdateDisplayTextOnModify()
    */
   boolean isUpdateDisplayTextOnModify();
-
 }

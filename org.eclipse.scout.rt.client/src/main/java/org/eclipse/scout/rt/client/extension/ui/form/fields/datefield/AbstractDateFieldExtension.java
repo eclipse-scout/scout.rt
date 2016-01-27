@@ -12,13 +12,13 @@ package org.eclipse.scout.rt.client.extension.ui.form.fields.datefield;
 
 import java.util.Date;
 
-import org.eclipse.scout.rt.client.extension.ui.form.fields.AbstractBasicFieldExtension;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.AbstractValueFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.ValueFieldChains.ValueFieldParseValueChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.datefield.DateFieldChains.DateFieldShiftDateChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.datefield.DateFieldChains.DateFieldShiftTimeChain;
 import org.eclipse.scout.rt.client.ui.form.fields.datefield.AbstractDateField;
 
-public abstract class AbstractDateFieldExtension<OWNER extends AbstractDateField> extends AbstractBasicFieldExtension<Date, OWNER> implements IDateFieldExtension<OWNER> {
+public abstract class AbstractDateFieldExtension<OWNER extends AbstractDateField> extends AbstractValueFieldExtension<Date, OWNER> implements IDateFieldExtension<OWNER> {
 
   public AbstractDateFieldExtension(OWNER owner) {
     super(owner);

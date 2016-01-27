@@ -10,18 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.form.fields;
 
-import org.eclipse.scout.rt.client.services.common.clipboard.IClipboardService;
 import org.eclipse.scout.rt.client.ui.form.fields.IBasicField;
-import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
-import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 
 public class JsonBasicField<T extends IBasicField<?>> extends JsonValueField<T> {
-
-  public static final String EVENT_EXPORT_TO_CLIPBOARD = "exportToClipboard";
 
   public JsonBasicField(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
@@ -37,24 +31,4 @@ public class JsonBasicField<T extends IBasicField<?>> extends JsonValueField<T> 
       }
     });
   }
-
-  @Override
-  public void handleUiEvent(JsonEvent event) {
-    if (EVENT_EXPORT_TO_CLIPBOARD.equals(event.getType())) {
-      handleUiExportToClipboard();
-    }
-    else {
-      super.handleUiEvent(event);
-    }
-  }
-
-  protected void handleUiExportToClipboard() {
-    try {
-      BEANS.get(IClipboardService.class).setTextContents(getModel().getDisplayText());
-    }
-    catch (RuntimeException e) {
-      BEANS.get(ExceptionHandler.class).handle(e);
-    }
-  }
-
 }

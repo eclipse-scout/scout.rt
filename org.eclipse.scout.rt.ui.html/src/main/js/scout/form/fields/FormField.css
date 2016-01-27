@@ -121,4 +121,8 @@
     }
   }
 
+  .disabled-overlay {
+    position: absolute;
+  }
+
 }

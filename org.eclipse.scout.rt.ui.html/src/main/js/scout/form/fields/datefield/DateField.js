@@ -10,6 +10,9 @@
  ******************************************************************************/
 scout.DateField = function() {
   scout.DateField.parent.call(this);
+  this.enabledWhenOffline = true;
+  this.disabledCopyOverlay = true;
+
   this.$dateField;
   this.$timeField;
   this.$dateFieldIcon;
@@ -31,7 +34,7 @@ scout.DateField = function() {
   this._datePickerDateSelectedHandler;
   this._popupCloseHandler;
 };
-scout.inherits(scout.DateField, scout.BasicField);
+scout.inherits(scout.DateField, scout.ValueField);
 
 /**
  * @override Widget.js

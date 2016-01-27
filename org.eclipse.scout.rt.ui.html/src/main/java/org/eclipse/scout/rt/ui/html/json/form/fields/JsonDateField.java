@@ -28,7 +28,7 @@ import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.JsonStatus;
 import org.json.JSONObject;
 
-public class JsonDateField<T extends IDateField> extends JsonBasicField<T> {
+public class JsonDateField<T extends IDateField> extends JsonValueField<T> {
 
   private static final String PROP_TIMESTAMP = "timestamp";
   private static final String PROP_AUTO_TIMESTAMP = "autoTimestamp";
