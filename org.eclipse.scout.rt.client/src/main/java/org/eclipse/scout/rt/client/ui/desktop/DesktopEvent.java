@@ -110,20 +110,6 @@ public class DesktopEvent extends EventObject implements IModelEvent {
   public static final int TYPE_TRAY_POPUP = 1010;
 
   /**
-   * Event type that indicates that the desktop should traverse the focus to the next possible location.
-   *
-   * @see IDesktop#traverseFocusNext()
-   */
-  public static final int TYPE_TRAVERSE_FOCUS_NEXT = 1020;
-
-  /**
-   * Event type that indicates that the desktop should traverse the focus to the previous location.
-   *
-   * @see IDesktop#traverseFocusPrevious()
-   */
-  public static final int TYPE_TRAVERSE_FOCUS_PREVIOUS = 1030;
-
-  /**
    * Event type indicates that a notification has been added to the desktop.
    */
   public static final int TYPE_NOTIFICATION_ADDED = 1040;

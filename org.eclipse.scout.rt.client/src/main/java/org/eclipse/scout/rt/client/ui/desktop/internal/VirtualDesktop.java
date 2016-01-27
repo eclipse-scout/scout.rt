@@ -683,16 +683,6 @@ public class VirtualDesktop implements IDesktop {
   }
 
   @Override
-  public void traverseFocusNext() {
-    throw createUnsupportedOperationException();
-  }
-
-  @Override
-  public void traverseFocusPrevious() {
-    throw createUnsupportedOperationException();
-  }
-
-  @Override
   public List<IForm> getUnsavedForms() {
     throw createUnsupportedOperationException();
   }

@@ -745,24 +745,6 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent {
   boolean doBeforeClosingInternal();
 
   /**
-   * Transfers the keyboard focus to the next possible location. The next location is defined as the default focus
-   * traversal as defined by the UI layer.<br>
-   * This operation is not supported in the RAP UI!
-   *
-   * @since 4.0.0
-   */
-  void traverseFocusNext();
-
-  /**
-   * Transfers the keyboard focus to the previous location. The previous location is defined as the default backwards
-   * focus traversal as defined by the UI layer.<br>
-   * This operation is not supported in the RAP UI!
-   *
-   * @since 4.0.0
-   */
-  void traverseFocusPrevious();
-
-  /**
    * Gets the currently active (focused) {@link IForm}.
    *
    * @return The currently active {@link IForm} or <code>null</code> if no {@link IForm} is active.
