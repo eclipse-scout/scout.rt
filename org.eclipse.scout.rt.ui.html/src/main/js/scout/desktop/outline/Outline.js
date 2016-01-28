@@ -241,7 +241,7 @@ scout.Outline.prototype._initDetailForm = function(node) {
     // be fired because the deactivated page is not selected anymore.
     node.detailForm = null;
     // Also make sure desktop holds no reference to a destroyed form
-    this._updateOutlineNode(node);
+    this._updateOutlineNode(node, false);
   }.bind(this));
 };
 

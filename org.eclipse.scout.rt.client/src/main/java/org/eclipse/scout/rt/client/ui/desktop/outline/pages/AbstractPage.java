@@ -321,13 +321,18 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
     }
     IDesktop desktop = ClientSessionProvider.currentSession().getDesktop();
     final boolean isActiveOutline = (desktop != null ? desktop.getOutline() == this.getOutline() : false);
-    if (isActiveOutline && pathsToSelections.contains(this)) {
+    final boolean isRootNode = pathsToSelections.isEmpty() && getTree() != null && getTree().getRootNode() == this;
+    if (isActiveOutline && (pathsToSelections.contains(this) || isRootNode)) {
       try {
+        //TODO fko: maybe remove when bookmarks can be done on outline level? (currently only pages)
+        if (isRootNode) {
+          this.reloadPage();
+        }
         /*
          * Ticket 77332 (deleting a node in the tree) also requires a reload So
          * the selected and its ancestor nodes require same processing
          */
-        if (desktop != null) {
+        else if (desktop != null) {
           Bookmark bm = desktop.createBookmark();
           setChildrenDirty(true);
           //activate bookmark without activating the outline, since this would hide active tabs.
