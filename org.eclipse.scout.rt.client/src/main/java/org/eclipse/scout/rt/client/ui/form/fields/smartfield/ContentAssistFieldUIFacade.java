@@ -80,16 +80,19 @@ class ContentAssistFieldUIFacade<LOOKUP_KEY> implements IContentAssistFieldUIFac
     // - User types an additional 'x' and presses tab -> display-text is now 'Jax'
     // - the model accepts the lookup-row 'Ja', but the display-text in the UI is still 'Jax'
     //   and the field looks valid, which is wrong
-    boolean searchTextEquals = true;
-    if (chooser) {
-      String searchText = toSearchText(text);
+    boolean openProposalChooser = false;
+    boolean acceptByLookupRow = chooser;
+
+    if (acceptByLookupRow) {
       String lastSearchText = m_field.getProposalChooser().getSearchText();
-      searchTextEquals = CompareUtility.equals(searchText, lastSearchText);
+      if (!lastSearchText.equals(m_field.getWildcard())) {
+        String searchText = toSearchText(text);
+        acceptByLookupRow = CompareUtility.equals(searchText, lastSearchText);
+      }
     }
 
-    boolean openProposalChooser = false;
-    if (chooser && searchTextEquals) {
-      // choose from proposal chooser
+    if (acceptByLookupRow) {
+      // use lookup row selected in proposal chooser
       try {
         ILookupRow<LOOKUP_KEY> lookupRow = m_field.getProposalChooser().getAcceptedProposal();
         if (lookupRow == null) {
@@ -107,6 +110,7 @@ class ContentAssistFieldUIFacade<LOOKUP_KEY> implements IContentAssistFieldUIFac
       }
     }
     else {
+      // perform lookup by display text
       openProposalChooser = acceptByDisplayText(text);
       openProposalChooserIfNotOpenYet(openProposalChooser, text);
     }
