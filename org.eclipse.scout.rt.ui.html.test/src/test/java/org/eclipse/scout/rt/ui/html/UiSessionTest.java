@@ -10,15 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
 
 import javax.servlet.http.HttpSession;
-import javax.servlet.http.HttpSessionBindingEvent;
 
 import org.eclipse.scout.rt.client.ClientConfigProperties.JobCompletionDelayOnSessionShutdown;
 import org.eclipse.scout.rt.client.IClientSession;
@@ -29,9 +28,7 @@ import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IBeanInstanceProducer;
 import org.eclipse.scout.rt.testing.platform.runner.JUnitExceptionHandler;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
-import org.eclipse.scout.rt.ui.html.UiSession.P_ClientSessionCleanupHandler;
 import org.eclipse.scout.rt.ui.html.json.JsonAdapterRegistry;
-import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.testing.JsonTestUtility;
 import org.junit.After;
 import org.junit.Before;
@@ -50,7 +47,7 @@ public class UiSessionTest {
 
   @Before
   public void before() {
-    m_beans = TestingUtility.registerBeans(new BeanMetaData(JobCompletionDelayOnSessionShutdown.class).withReplace(true).withProducer(new IBeanInstanceProducer<JobCompletionDelayOnSessionShutdown>() {
+    m_beans = TestingUtility.registerBeans(new BeanMetaData(JobCompletionDelayOnSessionShutdown.class).withProducer(new IBeanInstanceProducer<JobCompletionDelayOnSessionShutdown>() {
 
       @Override
       public JobCompletionDelayOnSessionShutdown produce(IBean<JobCompletionDelayOnSessionShutdown> bean) {
@@ -63,7 +60,7 @@ public class UiSessionTest {
         };
       }
     }));
-    m_beans.addAll(TestingUtility.registerBeans(new BeanMetaData(TestEnvironmentClientSession.class).withReplace(true)));
+    m_beans.addAll(TestingUtility.registerBeans(new BeanMetaData(TestEnvironmentClientSession.class)));
   }
 
   @After
@@ -88,12 +85,13 @@ public class UiSessionTest {
     IUiSession uiSession = JsonTestUtility.createAndInitializeUiSession();
     HttpSession httpSession = uiSession.currentHttpSession();
 
-    uiSession.logout();
-    List<JsonEvent> responseEvents = JsonTestUtility.extractEventsFromResponse(uiSession.currentJsonResponse(), "logout");
+    uiSession.getClientSession().stop();
+
+    assertTrue(uiSession.isDisposed());
+    assertNull(uiSession.currentJsonResponse());
     JsonTestUtility.endRequest(uiSession);
 
     Mockito.verify(httpSession).invalidate();
-    assertEquals(1, responseEvents.size());
   }
 
   @Test
@@ -104,12 +102,11 @@ public class UiSessionTest {
 
     // Don't waste time waiting for client jobs to finish. Test job itself runs inside a client job so we always have to wait until max time
     WeakReference<IUiSession> ref = new WeakReference<IUiSession>(uiSession);
-    HttpSessionBindingEvent mockEvent = Mockito.mock(HttpSessionBindingEvent.class);
-    P_ClientSessionCleanupHandler dummyCleanupHandler = new UiSession.P_ClientSessionCleanupHandler(clientSession);
+    ISessionStore sessionStore = BEANS.get(HttpSessionHelper.class).getSessionStore(uiSession.currentHttpSession());
+    sessionStore.registerUiSession(uiSession);
 
     JsonTestUtility.endRequest(uiSession);
-    uiSession.valueUnbound(mockEvent);
-    dummyCleanupHandler.valueUnbound(mockEvent);
+    uiSession.currentHttpSession().invalidate();
     BEANS.get(UiJobs.class).awaitModelJobs(clientSession, JUnitExceptionHandler.class);
     assertFalse(clientSession.isActive());
     assertTrue(uiSession.isDisposed());

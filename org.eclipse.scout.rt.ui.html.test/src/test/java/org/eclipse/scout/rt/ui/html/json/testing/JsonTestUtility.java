@@ -18,11 +18,15 @@ import java.util.Locale;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpSessionBindingListener;
 
 import org.eclipse.scout.rt.client.ui.form.IFormFieldVisitor;
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import org.eclipse.scout.rt.ui.html.HttpSessionHelper;
+import org.eclipse.scout.rt.ui.html.ISessionStore;
 import org.eclipse.scout.rt.ui.html.IUiSession;
+import org.eclipse.scout.rt.ui.html.SessionStore;
 import org.eclipse.scout.rt.ui.html.UiException;
 import org.eclipse.scout.rt.ui.html.UiSession;
 import org.eclipse.scout.rt.ui.html.UiSession.HttpContext;
@@ -34,6 +38,8 @@ import org.eclipse.scout.rt.ui.html.json.JsonStartupRequest;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
 public final class JsonTestUtility {
 
@@ -45,12 +51,20 @@ public final class JsonTestUtility {
     String clientSessionId = "testClientSession123";
     HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
     HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
-    HttpSession httpSession = Mockito.mock(HttpSession.class);
+    final HttpSession httpSession = Mockito.mock(HttpSession.class);
+    final ISessionStore sessionStore = new SessionStore(httpSession);
     Mockito.when(request.getLocale()).thenReturn(new Locale("de_CH"));
     Mockito.when(request.getHeader("User-Agent")).thenReturn("dummy");
     Mockito.when(request.getSession()).thenReturn(httpSession);
     Mockito.when(request.getSession(false)).thenReturn(httpSession);
-    Mockito.when(httpSession.getAttribute("scout.htmlui.clientsession." + clientSessionId)).thenReturn(null);
+    Mockito.when(httpSession.getAttribute(HttpSessionHelper.SESSION_STORE_ATTRIBUTE_NAME)).thenReturn(sessionStore);
+    Mockito.doAnswer(new Answer<Void>() {
+      @Override
+      public Void answer(InvocationOnMock invocation) {
+        ((HttpSessionBindingListener) sessionStore).valueUnbound(null);
+        return null;
+      }
+    }).when(httpSession).invalidate();
     JSONObject jsonReqObj = new JSONObject();
     try {
       jsonReqObj.put(JsonRequest.PROP_UI_SESSION_ID, uiSessionId);

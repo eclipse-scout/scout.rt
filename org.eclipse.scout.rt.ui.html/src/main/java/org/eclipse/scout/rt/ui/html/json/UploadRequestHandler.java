@@ -39,6 +39,7 @@ import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.ui.html.AbstractUiServletRequestHandler;
+import org.eclipse.scout.rt.ui.html.HttpSessionHelper;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.UiRunContexts;
 import org.eclipse.scout.rt.ui.html.UiServlet;
@@ -56,6 +57,7 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
 
   private static final Pattern PATTERN_UPLOAD_ADAPTER_RESOURCE_PATH = Pattern.compile("^/upload/([^/]*)/([^/]*)$");
 
+  private final HttpSessionHelper m_httpSessionHelper = BEANS.get(HttpSessionHelper.class);
   private final JsonRequestHelper m_jsonRequestHelper = BEANS.get(JsonRequestHelper.class);
 
   @Override
@@ -174,7 +176,7 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
       throw new IllegalArgumentException("Missing UI session ID.");
     }
     HttpSession httpSession = httpReq.getSession();
-    IUiSession uiSession = (IUiSession) httpSession.getAttribute(IUiSession.HTTP_SESSION_ATTRIBUTE_PREFIX + uiSessionId);
+    IUiSession uiSession = m_httpSessionHelper.getSessionStore(httpSession).getUiSession(uiSessionId);
     if (uiSession == null) {
       throw new IllegalStateException("Could not resolve UI session with ID " + uiSessionId);
     }

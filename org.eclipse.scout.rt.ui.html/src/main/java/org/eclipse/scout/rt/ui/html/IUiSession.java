@@ -39,13 +39,6 @@ public interface IUiSession {
   ThreadLocal<IUiSession> CURRENT = new ThreadLocal<>();
 
   /**
-   * Prefix for name of HTTP session attribute that is used to store the associated {@link IUiSession}s.
-   * <p>
-   * The full attribute name is: <b><code>{@link #HTTP_SESSION_ATTRIBUTE_PREFIX} + uiSessionId</code></b>
-   */
-  String HTTP_SESSION_ATTRIBUTE_PREFIX = "scout.htmlui.uisession."/*+JsonRequest.PROP_UI_SESSION_ID*/;
-
-  /**
    * Cookie name used to store the preferred language of a user (even after user has logged out).
    */
   String PREFERRED_LOCALE_COOKIE_NAME = "scout.preferredLocale";
@@ -77,6 +70,13 @@ public interface IUiSession {
    */
   long getLastAccessedTime();
 
+  /**
+   * Marks the UI session is disposed (irreversible) and destroys the internal data structures and references (i.e. it
+   * disposes the JSON adapter registry).
+   * <p>
+   * <b>Important:</b> This method must only be called in a context that holds the {@link #uiSessionLock()}! (Either the
+   * current thread or a caller that waits for the current thread.)
+   */
   void dispose();
 
   /**
@@ -93,6 +93,8 @@ public interface IUiSession {
   JsonResponse currentJsonResponse();
 
   HttpServletRequest currentHttpRequest();
+
+  HttpServletResponse currentHttpResponse();
 
   HttpSession currentHttpSession();
 

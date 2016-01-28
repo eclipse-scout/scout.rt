@@ -277,12 +277,12 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
     }
   }
 
-  private void handleModelNotificationAdded(DesktopEvent event) {
+  protected void handleModelNotificationAdded(DesktopEvent event) {
     IDesktopNotification notification = event.getNotification();
     addActionEvent("addNotification", JsonDesktopNotification.toJson(notification));
   }
 
-  private void handleModelNotificationRemoved(DesktopEvent event) {
+  protected void handleModelNotificationRemoved(DesktopEvent event) {
     IDesktopNotification notification = event.getNotification();
     addActionEvent("removeNotification", JsonDesktopNotification.toNotificationIdJson(notification));
   }
@@ -384,7 +384,8 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
   }
 
   protected void handleModelDesktopClosed() {
-    getUiSession().logout();
+    // No need to dispose the JsonDesktop. It is disposed automatically
+    // when the JsonClientSession is disposed.
   }
 
   protected void addActionEventForEachDisplayParentAdapter(String eventName, String propModelAdapterId, IJsonAdapter<?> modelAdapter, IDisplayParent displayParent, int position) {

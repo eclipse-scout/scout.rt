@@ -537,10 +537,9 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
     }
     finally {
       setActive(false);
+      fireSessionChangedEvent(new SessionEvent(this, SessionEvent.TYPE_STOPPED));
+      LOG.info("Client session stopped [session={}, user={}]", this, getUserId());
     }
-
-    fireSessionChangedEvent(new SessionEvent(this, SessionEvent.TYPE_STOPPED));
-    LOG.info("Client session stopped [session={}, user={}]", this, getUserId());
   }
 
   @Override

@@ -20,13 +20,17 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.IPlatform;
 import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
 import org.eclipse.scout.rt.platform.util.CompareUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.ui.html.AbstractUiServletRequestHandler;
+import org.eclipse.scout.rt.ui.html.HttpSessionHelper;
+import org.eclipse.scout.rt.ui.html.ISessionStore;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.MaxUserIdleTimeProperty;
 import org.eclipse.scout.rt.ui.html.UiRunContexts;
@@ -51,6 +55,7 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
 
   private final int m_maxUserIdleTime = CONFIG.getPropertyValue(MaxUserIdleTimeProperty.class).intValue();
 
+  private final HttpSessionHelper m_httpSessionHelper = BEANS.get(HttpSessionHelper.class);
   private final IHttpCacheControl m_httpCacheControl = BEANS.get(IHttpCacheControl.class);
   private final JsonRequestHelper m_jsonRequestHelper = BEANS.get(JsonRequestHelper.class);
 
@@ -70,7 +75,7 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
 
       JSONObject jsonObject = m_jsonRequestHelper.readJsonRequest(req);
       jsonRequest = new JsonRequest(jsonObject);
-      if (RequestType.PING_REQUEST.equals(jsonRequest.getRequestType())) {
+      if (jsonRequest.getRequestType() == RequestType.PING_REQUEST) {
         handlePingRequest(resp);
         return true;
       }
@@ -93,7 +98,7 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
           }, DefaultExceptionTranslator.class);
     }
     catch (Exception e) {
-      if (jsonRequest == null || uiSession == null || RequestType.STARTUP_REQUEST.equals(jsonRequest.getRequestType())) {
+      if (jsonRequest == null || uiSession == null || jsonRequest.getRequestType() == RequestType.STARTUP_REQUEST) {
         // Send a special error code when an error happens during initialization, because
         // the UI has no translated texts to show in this case.
         LOG.error("Error while initializing UI session", e);
@@ -131,7 +136,7 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
     // GUI requests for the same session must be processed consecutively
     uiSession.uiSessionLock().lock();
     try {
-      if (uiSession.isDisposed() || uiSession.currentJsonResponse() == null) {
+      if (uiSession.isDisposed()) {
         handleUiSessionDisposed(httpServletResponse, uiSession, jsonRequest);
       }
       else {
@@ -156,7 +161,18 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
   }
 
   protected void handleUiSessionDisposed(HttpServletResponse resp, IUiSession uiSession, JsonRequest jsonReq) throws IOException {
-    if (RequestType.POLL_REQUEST.equals(jsonReq.getRequestType())) { // TODO [5.2] bsh: isManualLogout?
+    // When the UI session becomes invalid, we usually want to show the "session timeout" error message.
+    //
+    // There is one exception: When the user clicked a "logout" action in the model, we want to redirect
+    // the UI to the /logout URL. This is done in UiSession.logout(). For all other client sessions on that
+    // HTTP session, the redirect should also be made, but via poller.
+    //
+    // And here is the exception to the exception: When the platform is no longer valid, it means that
+    // we probably cannot show the /logout URL. To prevent nasty error messages from the app server, we
+    // fall back to the "session timeout" error message.
+
+    boolean platformValid = (Platform.get() != null && Platform.get().getState() == IPlatform.State.PlatformStarted);
+    if (platformValid && jsonReq.getRequestType() == RequestType.POLL_REQUEST) {
       writeJsonResponse(resp, m_jsonRequestHelper.createSessionTerminatedResponse(uiSession.getLogoutRedirectUrl()));
     }
     else {
@@ -205,19 +221,26 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
     writeJsonResponse(resp, m_jsonRequestHelper.createSessionTimeoutResponse());
   }
 
-  protected void handleMaxIdeTimeout(HttpServletResponse resp, JsonRequest jsonReq, HttpSession httpSession, int idleSeconds, int maxIdleSeconds) throws IOException {
+  protected void handleMaxIdeTimeout(HttpServletResponse resp, JsonRequest jsonReq, IUiSession uiSession, int idleSeconds, int maxIdleSeconds) throws IOException {
     LOG.info("Detected UI session timeout [id={}] after idle of {} seconds (maxInactiveInterval={})", jsonReq.getUiSessionId(), idleSeconds, maxIdleSeconds);
-    httpSession.invalidate();
+    if (uiSession != null) {
+      uiSession.uiSessionLock().lock();
+      try {
+        uiSession.dispose();
+      }
+      finally {
+        uiSession.uiSessionLock().unlock();
+      }
+    }
     writeJsonResponse(resp, m_jsonRequestHelper.createSessionTimeoutResponse());
   }
 
-  protected void handleUnloadRequest(HttpServletResponse resp, JsonRequest jsonReq, String uiSessionAttributeName, HttpSession httpSession, IUiSession uiSession) throws IOException {
+  protected void handleUnloadRequest(HttpServletResponse resp, JsonRequest jsonReq, IUiSession uiSession) throws IOException {
     LOG.info("Unloading UI session with ID {} (requested by UI)", jsonReq.getUiSessionId());
     if (uiSession != null) {
-      // Unbinding the uiSession will cause it to be disposed automatically, see UiSession.valueUnbound()
       uiSession.uiSessionLock().lock();
       try {
-        httpSession.removeAttribute(uiSessionAttributeName);
+        uiSession.dispose();
       }
       finally {
         uiSession.uiSessionLock().unlock();
@@ -227,28 +250,27 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
   }
 
   protected IUiSession getOrCreateUiSession(HttpServletRequest req, HttpServletResponse resp, JsonRequest jsonReq) throws ServletException, IOException {
-    String uiSessionAttributeName = IUiSession.HTTP_SESSION_ATTRIBUTE_PREFIX + jsonReq.getUiSessionId();
     HttpSession httpSession = req.getSession();
-
     // Because the app-server might keep or request locks on the httpSession object, we don't synchronize directly
     // on httpSession, but use a dedicated session lock object instead.
-    ReentrantLock httpSessionLock = httpSessionLock(httpSession);
+    ReentrantLock httpSessionLock = m_httpSessionHelper.getHttpSessionLock(httpSession);
     httpSessionLock.lock();
     try {
-      IUiSession uiSession = (IUiSession) httpSession.getAttribute(uiSessionAttributeName);
+      ISessionStore sessionStore = m_httpSessionHelper.getSessionStore(httpSession);
 
-      if (RequestType.UNLOAD_REQUEST.equals(jsonReq.getRequestType())) {
-        handleUnloadRequest(resp, jsonReq, uiSessionAttributeName, httpSession, uiSession);
+      IUiSession uiSession = sessionStore.getUiSession(jsonReq.getUiSessionId());
+
+      if (jsonReq.getRequestType() == RequestType.UNLOAD_REQUEST) {
+        handleUnloadRequest(resp, jsonReq, uiSession);
         return null;
       }
 
       // check startup
-      boolean startupRequest = RequestType.STARTUP_REQUEST.equals(jsonReq.getRequestType());
-      if (!startupRequest && uiSession == null) {
+      if (uiSession == null && jsonReq.getRequestType() != RequestType.STARTUP_REQUEST) {
         handleSessionTimeout(resp, jsonReq);
         return null;
       }
-      else if (startupRequest && uiSession != null) {
+      else if (uiSession != null && jsonReq.getRequestType() == RequestType.STARTUP_REQUEST) {
         throw new IllegalStateException("Startup requested for existing UI session with ID " + jsonReq.getUiSessionId());
       }
 
@@ -259,7 +281,7 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
         uiSession.uiSessionLock().lock();
         try {
           uiSession.init(req, resp, new JsonStartupRequest(jsonReq));
-          httpSession.setAttribute(uiSessionAttributeName, uiSession);
+          sessionStore.registerUiSession(uiSession);
         }
         finally {
           uiSession.uiSessionLock().unlock();
@@ -270,12 +292,12 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
       int idleSeconds = (int) ((System.currentTimeMillis() - uiSession.getLastAccessedTime()) / 1000L);
       int maxIdleSeconds = m_maxUserIdleTime;
       if (idleSeconds > maxIdleSeconds) {
-        handleMaxIdeTimeout(resp, jsonReq, httpSession, idleSeconds, maxIdleSeconds);
+        handleMaxIdeTimeout(resp, jsonReq, uiSession, idleSeconds, maxIdleSeconds);
         return null;
       }
 
       // update timeout
-      if (!RequestType.POLL_REQUEST.equals(jsonReq.getRequestType())) {
+      if (jsonReq.getRequestType() != RequestType.POLL_REQUEST) {
         uiSession.touch();
       }
 
@@ -283,18 +305,6 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
     }
     finally {
       httpSessionLock.unlock();
-    }
-  }
-
-  protected ReentrantLock httpSessionLock(HttpSession httpSession) {
-    synchronized (httpSession) {
-      String lockAttributeName = "scout.htmlui.httpsession.lock";
-      ReentrantLock lock = (ReentrantLock) httpSession.getAttribute(lockAttributeName);
-      if (lock == null) {
-        lock = new ReentrantLock();
-        httpSession.setAttribute(lockAttributeName, lock);
-      }
-      return lock;
     }
   }
 

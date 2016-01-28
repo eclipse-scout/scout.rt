@@ -16,6 +16,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.ui.DataChangeListener;
 import org.eclipse.scout.rt.client.ui.IDisplayParent;
 import org.eclipse.scout.rt.client.ui.action.ActionFinder;
@@ -721,8 +722,9 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent {
   Bookmark createBookmark(IPage<?> page);
 
   /**
-   * do not use this internal method.<br>
-   * for closing scout see <code>ClientScoutSession.getSession().close()</code>
+   * do not use this internal method.
+   * <p>
+   * For closing scout see {@link IClientSession#stop()}.
    */
   void closeInternal();
 
