@@ -12,6 +12,10 @@
     <listener-class>org.eclipse.scout.rt.server.commons.WebappEventListener</listener-class>
   </listener>
 
+  <listener>
+    <listener-class>org.eclipse.scout.rt.ui.html.UiHttpSessionListener</listener-class>
+  </listener>
+
   <filter>
     <filter-name>AuthFilter</filter-name>
     <filter-class>${package}.ui.html.UiServletFilter</filter-class>
