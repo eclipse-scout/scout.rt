@@ -84,11 +84,18 @@ public interface IUiSession {
    */
   boolean isDisposed();
 
+  /**
+   * Called from the model after the client session has been stopped.
+   * <p>
+   * <b>Important:</b> Because this method internally calls {@link #dispose()}, it must only be called in a context that
+   * holds the {@link #uiSessionLock()}! (Either the current thread or a caller that waits for the current thread.)
+   */
   void logout();
 
   /**
    * @return the current UI response that is collecting changes for the next
-   *         {@link #processJsonRequest(HttpServletRequest, JsonRequest)} cycle
+   *         {@link #processJsonRequest(HttpServletRequest, JsonRequest)} cycle. This is never <code>null</code>,
+   *         <b>except</b> when the UI session is disposed (see {@link #isDisposed()}).
    */
   JsonResponse currentJsonResponse();
 

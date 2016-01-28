@@ -799,7 +799,7 @@ public class UiSession implements IUiSession {
         Object notificationToken = m_pollerQueue.poll(pollWaitSeconds, TimeUnit.SECONDS);
         int durationSeconds = (int) Math.round((System.currentTimeMillis() - t0) / 1000d);
         int newPollWaitSeconds = pollWaitSeconds - durationSeconds;
-        if (notificationToken == null || newPollWaitSeconds <= 0 || m_disposed || (m_currentJsonResponse != null && !m_currentJsonResponse.isEmpty())) {
+        if (notificationToken == null || newPollWaitSeconds <= 0 || m_disposed || !m_currentJsonResponse.isEmpty()) {
           // Stop wait loop for one of the following reasons:
           // 1. Timeout has occurred -> return always, even with empty answer
           // 2. Remaining pollWaitTime would be zero -> same as no. 1
@@ -877,19 +877,15 @@ public class UiSession implements IUiSession {
     currentJsonResponse().addActionEvent(getUiSessionId(), EVENT_DISPOSE_ADAPTER, jsonEvent);
   }
 
-  /**
-   * Called from the model after the client session has been stopped.
-   */
   @Override
   public void logout() {
     LOG.info("Logging out from UI session with ID {} [clientSessionId={}, processingJsonRequest={}]", m_uiSessionId, getClientSessionId(), isProcessingJsonRequest());
 
     // Redirect client to "you are now logged out" screen
     if (isProcessingJsonRequest()) {
-      JsonResponse jsonResponse = currentJsonResponse();
       boolean platformValid = (Platform.get() != null && Platform.get().getState() == IPlatform.State.PlatformStarted);
-      if (jsonResponse != null && platformValid) {
-        jsonResponse.addActionEvent(getUiSessionId(), "logout", createLogoutEventData());
+      if (m_currentJsonResponse != null && platformValid) {
+        m_currentJsonResponse.addActionEvent(getUiSessionId(), "logout", createLogoutEventData());
       }
     }
 

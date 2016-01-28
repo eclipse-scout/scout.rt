@@ -1,5 +1,6 @@
 package org.eclipse.scout.rt.ui.html;
 
+import java.io.Serializable;
 import java.util.Map;
 import java.util.Set;
 
@@ -8,6 +9,19 @@ import javax.servlet.http.HttpSession;
 import org.eclipse.scout.rt.client.IClientSession;
 
 /**
+ * Per-HTTP-session store for {@link IUiSession}s and {@link IClientSession}s.
+ * <p>
+ * <b>About Serialization</b>
+ * <p>
+ * Currently, this class does not extend the {@link Serializable} interface. It can therefore be added as a session
+ * attribute, but if the HTTP session is passivated or moved to another cluster node, it will not work. There is no
+ * solution for this problem at the moment. Even when this class was serilaizable, its content would not be
+ * (ClientSession, UiSession, HttpSession). Serializing an empty SessionStore object would not be any better.
+ * <p>
+ * Once there is a solution for serializing {@link IClientSession} (including all forms, outlines etc.), this decision
+ * may be re-thought. See also the related <a href="https://bugs.eclipse.org/bugs/show_bug.cgi?id=458145">Scout bug
+ * 458145</a>.
+ *
  * @since 5.2
  */
 public interface ISessionStore {
