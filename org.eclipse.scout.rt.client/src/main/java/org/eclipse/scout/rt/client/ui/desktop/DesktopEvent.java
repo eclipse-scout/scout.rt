@@ -81,8 +81,6 @@ public class DesktopEvent extends EventObject implements IModelEvent {
   public static final int TYPE_MESSAGE_BOX_REMOVED = 710;
   public static final int TYPE_MESSAGE_BOX_HIDE = 710;
 
-  public static final int TYPE_PRINTED = 901;
-
   /**
    * @deprecated use {@link #TYPE_FILE_CHOOSER_SHOW}; will be removed in version 6.1.
    */

@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.desktop;
 
-import java.io.File;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -39,7 +38,7 @@ public interface IDesktopUIFacade {
    * GUI fires this event when it is in the process of closing the workbench / application
    * <p>
    * The default case is to pass <code>false</code> as parameter.
-   * 
+   *
    * @param forcedClosing
    *          If set to <code>true</code> all vetos to stop the closing process (see
    *          {@link AbstractDesktop#doBeforeClosingInternal()} will be ignored. Otherwise if set to <code>false</code>
@@ -61,10 +60,4 @@ public interface IDesktopUIFacade {
    * GUI fires this event to collect the tray popup menus
    */
   List<IMenu> fireTrayPopupFromUI();
-
-  /**
-   * @param printedFile
-   *          may be null in case a print device has been given to the print event.
-   */
-  void fireDesktopPrintedFromUI(File printedFile);
 }
