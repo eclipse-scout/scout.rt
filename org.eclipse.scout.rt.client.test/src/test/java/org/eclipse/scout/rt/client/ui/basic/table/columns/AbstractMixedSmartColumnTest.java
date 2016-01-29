@@ -24,7 +24,9 @@ import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.fixture.TestCodeType;
-import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
+import org.eclipse.scout.rt.client.ui.form.fields.ParsingFailedStatus;
+import org.eclipse.scout.rt.client.ui.form.fields.ScoutFieldStatus;
+import org.eclipse.scout.rt.client.ui.form.fields.ValidationFailedStatus;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractMixedSmartField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IMixedSmartField;
 import org.eclipse.scout.rt.platform.util.Assertions;
@@ -34,9 +36,10 @@ import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.job.JobTestUtil;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
+import org.mockito.Mockito;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
 
 /**
  * Tests for {@link AbstractMixedSmartColumn}
@@ -144,17 +147,34 @@ public class AbstractMixedSmartColumnTest {
 
   @Test
   public void testCompleteEdit_ParsingError() throws Exception {
+    assertCompleteEditWithErrors(false, ParsingFailedStatus.class);
+  }
+
+  /**
+   * Tests an issue from ticket #168697. When user has entered a search-text which returned no lookup-rows, the error
+   * was not displayed in the editable cell. Its basically the same test
+   */
+  @Test
+  public void testCompleteEdit_ValidationError() throws Exception {
+    assertCompleteEditWithErrors(true, ValidationFailedStatus.class);
+  }
+
+  private void assertCompleteEditWithErrors(boolean useUiFacade, Class<? extends ScoutFieldStatus> statusClass) throws Exception {
     P_Table table = new P_Table();
     table.addRowsByArray(new Long[]{3L});
-
-    IValueField<?> field = (IValueField<?>) table.getEditableSmartColumn().prepareEdit(table.getRow(0));
+    IMixedSmartField<?, ?> field = (IMixedSmartField<?, ?>) table.getEditableSmartColumn().prepareEdit(table.getRow(0));
     waitUntilLookupRowsLoaded();
-
-    field.parseAndSetValue("invalid Text");
+    if (useUiFacade) {
+      field.getUIFacade().acceptProposalFromUI("invalid Text", false, false);
+    }
+    else {
+      field.parseAndSetValue("invalid Text");
+    }
     table.getEditableSmartColumn().completeEdit(table.getRow(0), field);
     ICell c = table.getCell(0, 0);
     assertEquals("invalid Text", c.getText());
     assertNotNull(String.format("The invalid cell should have an error status: value '%s'", c.getValue(), c.getErrorStatus()));
+    assertTrue(c.getErrorStatus().containsStatus(statusClass));
   }
 
   class TestMixedSmartColumn extends AbstractMixedSmartColumn<String, Long> {

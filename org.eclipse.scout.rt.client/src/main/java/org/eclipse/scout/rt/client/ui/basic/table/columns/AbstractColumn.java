@@ -670,25 +670,25 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
       IValueField<VALUE> valueField = (IValueField<VALUE>) editorField;
       LOG.debug("complete edit: [value={}, text={}, status={}]", valueField.getValue(), valueField.getDisplayText(), valueField.getErrorStatus());
 
+      String cellAction = "";
       Cell cell = row.getCellForUpdate(this);
       if (!contentEquals(cell, valueField)) {
-        //parsing error, set text
-        if (valueField.getErrorStatus() != null && valueField.getErrorStatus().containsStatus(ParsingFailedStatus.class)) {
-          LOG.debug("parsing failure");
-          cell.removeErrorStatus(ParsingFailedStatus.class);
-          cell.setText(valueField.getDisplayText());
-          cell.addErrorStatuses(valueField.getErrorStatus().getChildren());
+        // remove existing validation and parsing error (but don't remove other possible error-statuses)
+        cell.removeErrorStatus(ValidationFailedStatus.class);
+        cell.removeErrorStatus(ParsingFailedStatus.class);
+
+        if (valueField.getErrorStatus() == null) {
+          parseValueAndSet(row, valueField.getValue(), true);
+          cellAction = "parseAndSetValue";
         }
         else {
-          //set value to table
-          LOG.debug("setvalue");
-          cell.removeErrorStatus(ValidationFailedStatus.class);
-          cell.removeErrorStatus(ParsingFailedStatus.class);
-          parseValueAndSet(row, valueField.getValue(), true);
+          cell.setText(valueField.getDisplayText());
+          cell.addErrorStatuses(valueField.getErrorStatus().getChildren());
+          cellAction = "setText/addErrorStatuses";
         }
       }
 
-      LOG.debug("cell updated: [value={}, text={}, status={}]", cell.getValue(), cell.getText(), cell.getErrorStatus());
+      LOG.debug("cell updated: [value={}, text={}, status={}, cellAction={}]", cell.getValue(), cell.getText(), cell.getErrorStatus(), cellAction);
     }
   }
 
