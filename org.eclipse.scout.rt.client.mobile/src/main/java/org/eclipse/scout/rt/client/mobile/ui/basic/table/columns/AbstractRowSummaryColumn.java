@@ -29,7 +29,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
-import org.eclipse.scout.rt.platform.html.HTMLUtility;
+import org.eclipse.scout.rt.platform.html.HtmlHelper;
 import org.eclipse.scout.rt.platform.util.BooleanUtility;
 import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
@@ -456,7 +456,7 @@ public abstract class AbstractRowSummaryColumn extends AbstractStringColumn impl
     boolean containsHtml = text.contains("<html>");
     if (containsHtml) {
       //Ignore every html code by removing all the tags to make sure it does not destroy the layout
-      String textWithoutHtml = HTMLUtility.getPlainText(text);
+      String textWithoutHtml = BEANS.get(HtmlHelper.class).toPlainText(text);
       if (textWithoutHtml != null) {
         text = textWithoutHtml;
       }

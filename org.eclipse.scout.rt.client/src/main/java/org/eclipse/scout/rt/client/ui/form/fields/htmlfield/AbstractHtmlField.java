@@ -31,7 +31,7 @@ import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
-import org.eclipse.scout.rt.platform.html.HTMLUtility;
+import org.eclipse.scout.rt.platform.html.HtmlHelper;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.IOUtility;
@@ -130,10 +130,10 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
   @Override
   public String getPlainText() {
     String s = getValue();
-    if (s != null) {
-      return HTMLUtility.getPlainText(HTMLUtility.toHtmlDocument(s));
+    if (s == null) {
+      return "";
     }
-    return "";
+    return BEANS.get(HtmlHelper.class).toPlainText(s);
   }
 
   @Override
