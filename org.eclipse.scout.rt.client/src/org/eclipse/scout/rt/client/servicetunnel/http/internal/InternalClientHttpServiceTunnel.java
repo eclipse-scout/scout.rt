@@ -42,7 +42,7 @@ import org.eclipse.scout.service.SERVICES;
 
 /**
  * Non-public implementation of a client-side tunnel used to invoke a service through HTTP.
- * 
+ *
  * @author awe
  */
 public class InternalClientHttpServiceTunnel extends AbstractInternalHttpServiceTunnel<IClientSession> implements IClientServiceTunnel {
@@ -142,7 +142,7 @@ public class InternalClientHttpServiceTunnel extends AbstractInternalHttpService
       }
       else {
         if (m_pollingJob != null) {
-          m_pollingJob.cancel();
+          m_pollingJob.dispose();
           m_pollingJob = null;
         }
       }
