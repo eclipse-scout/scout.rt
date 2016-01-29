@@ -127,7 +127,7 @@ public class CodeServiceClientProxyTest {
         return hashSet;
       }
     };
-    BeanInstanceUtil.initializeInstance(serviceUnderTest);
+    BeanInstanceUtil.initializeBeanInstance(serviceUnderTest);
     return serviceUnderTest;
   }
 }

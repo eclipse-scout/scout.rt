@@ -14,10 +14,9 @@ import java.util.Deque;
 import java.util.LinkedList;
 import java.util.concurrent.Callable;
 
-import org.eclipse.scout.rt.platform.BeanCreationException;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IBeanInstanceProducer;
-import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.exception.BeanCreationException;
 import org.eclipse.scout.rt.platform.util.FinalValue;
 
 public class DefaultBeanInstanceProducer<T> implements IBeanInstanceProducer<T> {
@@ -50,8 +49,7 @@ public class DefaultBeanInstanceProducer<T> implements IBeanInstanceProducer<T> 
     Deque<String> stack = INSTANTIATION_STACK.get();
     String beanName = bean.getBeanClazz().getName();
     if (stack != null && stack.contains(beanName)) {
-      String message = String.format("The requested bean is currently being created. Creation path: [%s]", CollectionUtility.format(stack, ", "));
-      throw new BeanCreationException(beanName, message);
+      throw new BeanCreationException("The requested bean is currently being created. Creation path: [{}]", stack);
     }
   }
 
@@ -100,7 +98,7 @@ public class DefaultBeanInstanceProducer<T> implements IBeanInstanceProducer<T> 
    * @return new instance
    */
   protected T createInstance(Class<? extends T> beanClass) {
-    return BeanInstanceUtil.create(beanClass);
+    return BeanInstanceUtil.createAndInitializeBean(beanClass);
   }
 
 }

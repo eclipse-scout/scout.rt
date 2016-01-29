@@ -211,7 +211,7 @@ public class CodeServiceTest {
 
   protected ICodeService newCodeServiceInstance() {
     ICodeService service = new P_TestCodeService();
-    BeanInstanceUtil.initializeInstance(service);
+    BeanInstanceUtil.initializeBeanInstance(service);
     return service;
   }
 

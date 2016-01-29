@@ -47,7 +47,7 @@ public class StatementProcessorTest {
     //
     AbstractSqlService sqlService = new AbstractSqlService() {
     };
-    BeanInstanceUtil.initializeInstance(sqlService);
+    BeanInstanceUtil.initializeBeanInstance(sqlService);
     StatementProcessor sp = new StatementProcessor(
         sqlService,
         "SELECT P.PERSON_NR,P.NAME"
@@ -65,7 +65,7 @@ public class StatementProcessorTest {
   public void testSelectLike() throws Exception {
     AbstractSqlService sqlService = new AbstractSqlService() {
     };
-    BeanInstanceUtil.initializeInstance(sqlService);
+    BeanInstanceUtil.initializeBeanInstance(sqlService);
     StatementProcessor sp = new StatementProcessor(
         sqlService,
         "SELECT BP_NR FROM FLM_BP WHERE BP_NO LIKE :bpNo INTO :bpNr",
@@ -85,7 +85,7 @@ public class StatementProcessorTest {
     //
     AbstractSqlService sqlService = new AbstractSqlService() {
     };
-    BeanInstanceUtil.initializeInstance(sqlService);
+    BeanInstanceUtil.initializeBeanInstance(sqlService);
     StatementProcessor sp = new StatementProcessor(
         sqlService,
         "SELECT COUNT(*) "

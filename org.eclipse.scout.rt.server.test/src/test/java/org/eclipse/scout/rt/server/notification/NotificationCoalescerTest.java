@@ -46,7 +46,7 @@ public class NotificationCoalescerTest {
     // register new test coalescer
     m_registerServices = TestingUtility.registerBeans(
         new BeanMetaData(ICoalescer.class).
-            withInitialInstance(BeanInstanceUtil.create(P_TestNotificationCoalescer.class)).
+            withInitialInstance(BeanInstanceUtil.createAndInitializeBean(P_TestNotificationCoalescer.class)).
             withApplicationScoped(true));
 
     // now rebuild coalescer linking

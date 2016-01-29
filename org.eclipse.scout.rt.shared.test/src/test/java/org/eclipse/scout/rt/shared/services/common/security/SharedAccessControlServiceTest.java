@@ -45,7 +45,7 @@ public class SharedAccessControlServiceTest {
 
   @Before
   public void setUp() throws Exception {
-    m_accessControlService = BeanInstanceUtil.create(P_SharedAccessControlService.class);
+    m_accessControlService = BeanInstanceUtil.createAndInitializeBean(P_SharedAccessControlService.class);
 
     //Register this IAccessControlService with an higher priority than AllAccessControlService registered in CustomServerTestEnvironment
     m_registerServices = TestingUtility.registerBeans(

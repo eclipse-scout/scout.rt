@@ -14,100 +14,122 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.UndeclaredThrowableException;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 
 import javax.annotation.PostConstruct;
 
-import org.eclipse.scout.rt.platform.BeanCreationException;
+import org.eclipse.scout.rt.platform.exception.BeanCreationException;
+import org.eclipse.scout.rt.platform.exception.IExceptionTranslator;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public final class BeanInstanceUtil {
+
   private static final Logger LOG = LoggerFactory.getLogger(BeanInstanceUtil.class);
 
   private BeanInstanceUtil() {
-
   }
 
-  public static <T> T create(Class<T> beanClazz) {
+  /**
+   * Crates and initializes a new bean instance.
+   *
+   * @param beanClazz
+   * @return
+   */
+  public static <T> T createAndInitializeBean(Class<T> beanClazz) {
+    Assertions.assertNotNull(beanClazz);
     T instance = null;
     try {
-      instance = Assertions.assertNotNull(newInstance(beanClazz));
-      instance = initializeInstance(instance);
-    }
-    catch (Throwable t) {
-      LOG.warn("Cannot create new instance of [{}].", beanClazz, t);
-      if (t instanceof Error) {
-        throw (Error) t;
-      }
-      else {
-        throw new BeanCreationException(beanClazz == null ? null : beanClazz.getName(), t);
-      }
-    }
-    return instance;
-  }
-
-  public static <T> T newInstance(Class<T> clazz) throws Throwable {
-    try {
-      Constructor<T> cons = clazz.getDeclaredConstructor();
+      Constructor<T> cons = beanClazz.getDeclaredConstructor();
       cons.setAccessible(true);
-      return cons.newInstance();
+      instance = cons.newInstance();
+      initializeBeanInstance(instance);
     }
-    catch (InvocationTargetException e) {
-      throw e.getCause();
+    catch (Exception e) {
+      throw translateException("Could not create bean [" + beanClazz.getName() + "]", e);
     }
-  }
-
-  public static <T> T initializeInstance(T instance) {
-    // post instantiate
-    callPostConstruct(instance);
     return instance;
   }
 
   /**
-   * @param instance
+   * Invokes all {@link PostConstruct} annotated methods of the given instance.
    */
-  private static void callPostConstruct(Object instance) {
-    LinkedHashMap<String /*method name*/, Method> collector = new LinkedHashMap<>();
-    collectPostConstructRec(instance.getClass(), collector);
-    for (Method method : collector.values()) {
+  public static void initializeBeanInstance(Object instance) {
+    Collection<Method> postCosntructMethods = collectPostConstructMethods(instance.getClass());
+    for (Method method : postCosntructMethods) {
+      LOG.debug("invoking post-construct method {}", method);
       try {
-        if (method.getParameterTypes().length == 0) {
-          method.setAccessible(true);
-          method.invoke(instance);
-        }
-        else {
-          throw new IllegalArgumentException(String.format("Methods with @PostConstruct must have no arguments. See '%s' on '%s',", method.getName(), method.getDeclaringClass().getName()));
-        }
+        method.setAccessible(true);
+        method.invoke(instance);
       }
       catch (Exception e) {
-        LOG.error("Could not call initialize method '{}' on '{}'.", method.getName(), instance.getClass(), e);
+        throw translateException("Exception while invoking @PostConstruct method", e);
       }
     }
   }
 
-  private static void collectPostConstructRec(Class<?> clazz, LinkedHashMap<String /*method name*/, Method> outMap) {
-    if (clazz == null || Object.class.getName().equals(clazz.getName())) {
-      return;
+  /**
+   * Transforms the given exception: {@link UndeclaredThrowableException} and {@link InvocationTargetException} are
+   * unpacked and wrapped into a {@link BeanCreationException}. {@link Error} are just rethrown.
+   * <p>
+   * <b>Note:</b> This utility must not use any features of the bean manager. Hence the usage of an
+   * {@link IExceptionTranslator} is not suitable.
+   */
+  private static RuntimeException translateException(String message, Exception e) {
+    Throwable t = e;
+    while ((t instanceof UndeclaredThrowableException || t instanceof InvocationTargetException) && t.getCause() != null) {
+      t = t.getCause();
     }
-    for (Method m : clazz.getDeclaredMethods()) {
-      if (m.getAnnotation(PostConstruct.class) != null) {
-        String name = overrideDistinctiveMethodName(m);
-        if (!outMap.containsKey(name)) {
-          outMap.put(name, m);
+    if (t instanceof Error) {
+      throw (Error) t;
+    }
+    return new BeanCreationException(message, t);
+  }
+
+  /**
+   * Collects all methods in the given class or one of its super classes that are annotated with {@link PostConstruct}.
+   * A post-construct method is added at most once to the resulting collection. If a method is overriding a super class
+   * method, the first one on the super class hierarchy path is added which is annotated with {@link PostConstruct}.
+   * Hence the declaring classes of the resulting method collection do not describe neither the first nor the last
+   * defining class.
+   * <p>
+   * The method is package-private for testing purposes.
+   *
+   * @param clazz
+   *          The class {@link PostConstruct}-annotated methods are searched in.
+   * @return Returns a collection of {@link PostConstruct} methods.
+   * @throws BeanCreationException
+   *           If unsupported methods are annotated with {@link PostConstruct} (i.e. those with parameters)
+   */
+  static Collection<Method> collectPostConstructMethods(Class<?> clazz) {
+    LinkedHashMap<String /*method name*/, Method> collector = new LinkedHashMap<>();
+    Class<?> currentClass = clazz;
+    while (currentClass != null && currentClass != Object.class) {
+      for (Method m : currentClass.getDeclaredMethods()) {
+        if (!m.isAnnotationPresent(PostConstruct.class)) {
+          continue;
+        }
+
+        // check number of parameters
+        if (m.getParameterTypes().length != 0) {
+          throw new BeanCreationException("Methods annotated with @PostConstruct must have no arguments [method={}]", m);
+        }
+
+        // compute method name (special handling for private methods)
+        String name = m.getName();
+        if (Modifier.isPrivate(m.getModifiers())) {
+          name = m.getDeclaringClass().getName() + ":" + name;
+        }
+
+        if (!collector.containsKey(name)) {
+          collector.put(name, m);
         }
       }
+      currentClass = currentClass.getSuperclass();
     }
-    collectPostConstructRec(clazz.getSuperclass(), outMap);
-  }
-
-  private static String overrideDistinctiveMethodName(Method m) {
-    Assertions.assertNotNull(m);
-    if (Modifier.isPrivate(m.getModifiers())) {
-      return m.getDeclaringClass().getName() + ":" + m.getName();
-    }
-    return m.getName();
-
+    return collector.values();
   }
 }

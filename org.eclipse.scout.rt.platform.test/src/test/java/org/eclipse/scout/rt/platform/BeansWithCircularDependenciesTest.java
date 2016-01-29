@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.platform;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.eclipse.scout.rt.platform.exception.BeanCreationException;
 import org.eclipse.scout.rt.platform.internal.DefaultBeanInstanceProducer;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.AfterClass;
