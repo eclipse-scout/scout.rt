@@ -26,9 +26,11 @@ public class ClientNotificationPollingJob extends ClientAsyncJob {
 
   private long m_pollInterval;
   private boolean m_analyzeNetworkLatency;
+  private volatile boolean m_disposed;
 
   public ClientNotificationPollingJob(IClientSession session, long pollInterval, boolean analyzeNetworkLatency) {
     super("Client notification fetcher", session, true);
+    m_disposed = false;
     updatePollingValues(pollInterval, analyzeNetworkLatency);
   }
 
@@ -37,9 +39,17 @@ public class ClientNotificationPollingJob extends ClientAsyncJob {
     m_analyzeNetworkLatency = analyzeNetworkLatency;
   }
 
+  public void dispose() {
+    m_disposed = true;
+  }
+
+  public boolean isDisposed() {
+    return m_disposed;
+  }
+
   @Override
   protected IStatus runStatus(IProgressMonitor monitor) {
-    if (monitor.isCanceled()) {
+    if (isDisposed() || monitor.isCanceled()) {
       return Status.CANCEL_STATUS;
     }
     IPingService pingService = SERVICES.getService(IPingService.class);
@@ -53,7 +63,7 @@ public class ClientNotificationPollingJob extends ClientAsyncJob {
         LOG.info("polling", t);
       }
     }
-    if (monitor.isCanceled()) {
+    if (isDisposed() || monitor.isCanceled()) {
       return Status.CANCEL_STATUS;
     }
     // re-schedule
