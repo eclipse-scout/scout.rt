@@ -34,6 +34,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.client.ui.form.IFormHandler;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
@@ -227,6 +228,25 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent {
    * {@link IDisplayParent}. The forms returned are ordered as registered.
    */
   List<IForm> getViews(IDisplayParent displayParent);
+
+  /**
+   * @param formClass
+   *          - class of the form to be searched
+   * @param handlerClass
+   *          - class of the expected active form handler
+   * @param exclusiveKey
+   *          - exclusive key of the form, returned by {@link IForm#computeExclusiveKey}
+   * @return a list (maybe empty, but never null) of forms that match the above criteria <br/>
+   *         <b>note:</b> if either argument is null, an empty list is returned.
+   */
+  <F extends IForm, H extends IFormHandler> List<F> findAllOpenViews(Class<? extends F> formClass, Class<? extends H> handlerClass, Object exclusiveKey);
+
+  /**
+   * see {@link #findAllOpenForms(Class, Class, Object)}
+   *
+   * @return null if no match is found, else the first encountered match
+   */
+  <F extends IForm, H extends IFormHandler> F findOpenView(Class<? extends F> formClass, Class<? extends H> handlerClass, Object exclusiveKey);
 
   /**
    * Returns all {@link IForm}s with dialog character:
