@@ -21,7 +21,6 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.junit.Test;
 
 /**
@@ -286,6 +285,13 @@ public class StringUtilityTest {
     assertEqualsAfterEncodeDecode(testHtml);
     String htmlDecode = StringUtility.htmlDecode("&lt;a &amp;lt; b&gt;");
     assertEquals("<a &lt; b>", htmlDecode);
+  }
+
+  @Test
+  public void testHtmlDecodeTabs() {
+    assertEquals("a \tb", StringUtility.htmlDecode("a &#9;b"));
+    assertEquals("a<span>\t</span>b", StringUtility.htmlDecode("a<span>&#9;</span>b"));
+    assertEquals("a\tb", StringUtility.htmlDecode("a<span style=\"white-space:pre\">&#9;</span>b"));
   }
 
   /**

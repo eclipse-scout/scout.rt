@@ -3,6 +3,7 @@ package org.eclipse.scout.rt.platform.html;
 import static org.junit.Assert.assertEquals;
 
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -32,6 +33,9 @@ public class HtmlHelperTest {
     assertEquals("hell<", helper.toPlainText("hell&lt;"));
     assertEquals("one   two", helper.toPlainText("one&nbsp;&nbsp; two"));
     assertEquals("hell&ouml;", helper.toPlainText("hell&ouml;")); // [?] not all entities are replaced
+    assertEquals("one\ttwo", helper.toPlainText("one&#9;two"));
+    assertEquals("one \t two", helper.toPlainText("one &#9; two"));
+    assertEquals("one\ttwo", helper.toPlainText("one" + StringUtility.HTML_ENCODED_TAB + "two"));
 
     // Simple documents
     assertEquals("", helper.toPlainText("<html>"));
@@ -40,7 +44,7 @@ public class HtmlHelperTest {
     assertEquals("one", helper.toPlainText("<html><head>one</html>"));
     assertEquals("one & two", helper.toPlainText("<html><head>one & two</html>"));
     assertEquals("one & two", helper.toPlainText("<html><head>one &amp; two</html>"));
-    assertEquals("one & two three", helper.toPlainText("<html><head>one &amp; two</head><body>three</html>")); // [?] invalid <body>, has no end tag
+    assertEquals("one & twothree", helper.toPlainText("<html><head>one &amp; two</head><body>three</html>")); // [?] invalid <body>, has no end tag
     assertEquals("three", helper.toPlainText("<html><head>one &amp; two</head><body>three</body></html>"));
 
     // Line breaks
@@ -52,5 +56,8 @@ public class HtmlHelperTest {
     assertEquals("line1\nx\nline2", helper.toPlainText("<p>line1<br>\nx</p><p>line2</p>"));
     assertEquals("line1 x\nline2", helper.toPlainText("<div>line1\nx</div><div>line2</div>")); // [?]
     assertEquals("line1\nline2", helper.toPlainText("<div>line1<br/></div><div>line2<br/></div>"));
+
+    // Tables
+    assertEquals("one two\nthree four", helper.toPlainText("<table><tr><td>one</td><td>two</td></tr><tr><td>three</td><td>four</td></tr></table>"));
   }
 }

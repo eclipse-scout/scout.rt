@@ -38,6 +38,11 @@ import org.eclipse.scout.rt.platform.nls.NlsLocale;
 public final class StringUtility {
 
   public static final Pattern PATTERN_TRIM_NEWLINES = Pattern.compile("^[\r\n]*(.*?)[\r\n]*$", Pattern.DOTALL);
+  /**
+   * Special constant used by {@link #htmlEncode(String)} to preserve a tab character (<code>\t</code>) in the resulting
+   * HTML. {@link #htmlDecode(String)} can convert it back to <code>\t</code>, but only if the tag was not altered.
+   */
+  public static final String HTML_ENCODED_TAB = "<span style=\"white-space:pre\">&#9;</span>";
 
   public static final Comparator<String> ALPHANUMERIC_COMPARATOR = new AlphanumericComparator(false);
   public static final Comparator<String> ALPHANUMERIC_COMPARATOR_IGNORE_CASE = new AlphanumericComparator(true);
@@ -948,17 +953,12 @@ public final class StringUtility {
     if (replaceSpace) {
       s = s.replaceAll("\\s", "&nbsp;");
     }
-    s = s.replace(tabIdentifier, "<span style=\"white-space:pre\">&#9;</span>");
+    s = s.replace(tabIdentifier, HTML_ENCODED_TAB);
     return s;
   }
 
-  // whitespace patterns
   private static final String ZERO_OR_MORE_WHITESPACES = "\\s*?";
-  private static final String ONE_OR_MORE_WHITESPACES = "\\s+?";
-
   private static final Pattern BR = Pattern.compile("<" + ZERO_OR_MORE_WHITESPACES + "br" + ZERO_OR_MORE_WHITESPACES + "/" + ZERO_OR_MORE_WHITESPACES + ">", Pattern.CASE_INSENSITIVE);
-  private static final Pattern TABS = Pattern.compile("<" + ZERO_OR_MORE_WHITESPACES + "span" + ONE_OR_MORE_WHITESPACES + "style" + ZERO_OR_MORE_WHITESPACES + "=" + ZERO_OR_MORE_WHITESPACES + "\"white-space:pre\"" + ZERO_OR_MORE_WHITESPACES
-      + ">&#9;<" + ZERO_OR_MORE_WHITESPACES + "/" + ZERO_OR_MORE_WHITESPACES + "span" + ZERO_OR_MORE_WHITESPACES + ">", Pattern.CASE_INSENSITIVE);
 
   /**
    * @return decoded text, ready to be printed as text <xmp>replaces &, ", ', <, > and all whitespace</xmp>
@@ -979,7 +979,8 @@ public final class StringUtility {
     // replace <br/> by \n
     s = BR.matcher(s).replaceAll("\n");
     // replace HTML-tabs by \t
-    s = TABS.matcher(s).replaceAll("\t");
+    s = s.replace(HTML_ENCODED_TAB, "\t");
+    s = s.replace("&#9;", "\t");
 
     return s;
   }

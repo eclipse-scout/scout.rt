@@ -12,7 +12,8 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
 @ApplicationScoped
 public class HtmlHelper {
 
-  private static final Pattern HTML_PARAGRAPH_TAGS = Pattern.compile("<br/?></div>|</div>|<br/?>|</p>|<p/>|</tr>|</table>", Pattern.CASE_INSENSITIVE);
+  private static final Pattern TABLE_CELL_END_TAGS = Pattern.compile("</td>|<td/>", Pattern.CASE_INSENSITIVE);
+  private static final Pattern HTML_PARAGRAPH_END_TAGS = Pattern.compile("<br/?></div>|</div>|<br/?>|</p>|<p/>|</tr>|</table>", Pattern.CASE_INSENSITIVE);
 
   /**
    * Very basic HTML to plain text conversion, without parsing and building a model.
@@ -36,6 +37,11 @@ public class HtmlHelper {
    * <li><code>&lt;/tr&gt;</code>
    * <li><code>&lt;/table&gt;</code>
    * </ul>
+   * <li>The following tags are considered "end of table cell" and are converted to <code>" "</code> (space):
+   * <ul>
+   * <li><code>&lt;/td&gt;</code>
+   * <li><code>&lt;td/&gt;</code>
+   * </ul>
    * <li>Multiple spaces are removed.
    * <li>Leading and trailing whitespace line is removed from each line.
    * <li>{@link StringUtility#htmlDecode(String)} is applied to the result, so not all HTML entities are replaced!
@@ -53,12 +59,17 @@ public class HtmlHelper {
       // <body> not found, use entire input
       s = html;
     }
+    // Table cells
+    Matcher matcher = TABLE_CELL_END_TAGS.matcher(s);
+    s = matcher.replaceAll(" ");
     //newlines
     s = s.replaceAll("\r", "").replaceAll("\n", " ");
-    Matcher matcher = HTML_PARAGRAPH_TAGS.matcher(s);
+    matcher = HTML_PARAGRAPH_END_TAGS.matcher(s);
     s = matcher.replaceAll("\n");
+    // tabs
+    s = s.replace(StringUtility.HTML_ENCODED_TAB, "\t");
     //remove tags
-    s = Pattern.compile("<[^>]+>", Pattern.DOTALL).matcher(s).replaceAll(" ");
+    s = Pattern.compile("<[^>]+>", Pattern.DOTALL).matcher(s).replaceAll("");
     //remove multiple spaces
     s = s.replaceAll("[ ]+", " ");
     //remove spaces at the beginning and end of each line
