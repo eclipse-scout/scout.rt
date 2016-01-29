@@ -890,22 +890,24 @@ public abstract class AbstractCalendarDocumentBuilder {
     // remove all old components from the components layer
     CalendarSvgUtility.clearChildNodes(m_elComponentsContainer);
 
+    IComponentElementFactory fact = getComponentElementFactory();
+    if (fact == null) {
+      return;
+    }
+
     for (Entry<Date, Set<CalendarComponent>> e : map.entrySet()) {
       Point p = getPosition(e.getKey());
       if (p != null && e.getValue() != null) {
         Element parent = m_elGridBox[p.y][p.x];
         CalendarComponent[] comps = e.getValue().toArray(new CalendarComponent[e.getValue().size()]);
 
-        IComponentElementFactory fact = getComponentElementFactory();
-        if (fact != null) {
-          fact.setSelectedComponent(getSelectedComponent());
-          Map<CalendarComponent, Element> compEls = fact.create(parent, getDateOfGridElement(parent), comps);
-          if (compEls != null && compEls.size() > 0) {
-            for (Entry<CalendarComponent, Element> el : compEls.entrySet()) {
-              m_elComponentsContainer.appendChild(el.getValue());
-              int linkId = getOrCreateLinkId(el.getKey().getItem().getItemId());
-              SVGUtility.addHyperlink(el.getValue(), LINK_COMPONENT_PREFIX + linkId + "/" + p.x + "" + p.y);
-            }
+        fact.setSelectedComponent(getSelectedComponent());
+        Map<CalendarComponent, Element> compEls = fact.create(parent, getDateOfGridElement(parent), comps);
+        if (compEls != null && compEls.size() > 0) {
+          for (Entry<CalendarComponent, Element> el : compEls.entrySet()) {
+            m_elComponentsContainer.appendChild(el.getValue());
+            int linkId = getOrCreateLinkId(el.getKey().getItem().getItemId());
+            SVGUtility.addHyperlink(el.getValue(), LINK_COMPONENT_PREFIX + linkId + "/" + p.x + "" + p.y);
           }
         }
       }
