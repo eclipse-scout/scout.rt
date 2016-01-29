@@ -44,7 +44,7 @@ public class HtmlHelperTest {
     assertEquals("one", helper.toPlainText("<html><head>one</html>"));
     assertEquals("one & two", helper.toPlainText("<html><head>one & two</html>"));
     assertEquals("one & two", helper.toPlainText("<html><head>one &amp; two</html>"));
-    assertEquals("one & twothree", helper.toPlainText("<html><head>one &amp; two</head><body>three</html>")); // [?] invalid <body>, has no end tag
+    assertEquals("one & two three", helper.toPlainText("<html><head>one &amp; two</head><body>three</html>")); // [?] invalid <body>, has no end tag
     assertEquals("three", helper.toPlainText("<html><head>one &amp; two</head><body>three</body></html>"));
 
     // Line breaks
