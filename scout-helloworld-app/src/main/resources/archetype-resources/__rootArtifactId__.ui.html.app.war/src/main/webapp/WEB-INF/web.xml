@@ -7,7 +7,6 @@
 
   <display-name>${displayName} HTML UI</display-name>
 
-  <!-- Platform Startup listener -->
   <listener>
     <listener-class>org.eclipse.scout.rt.server.commons.WebappEventListener</listener-class>
   </listener>
@@ -46,7 +45,7 @@
 
   <session-config>
     <!-- Session timeout in minutes -->
-    <session-timeout>60</session-timeout>
+    <session-timeout>5</session-timeout>
   </session-config>
 
 </web-app>

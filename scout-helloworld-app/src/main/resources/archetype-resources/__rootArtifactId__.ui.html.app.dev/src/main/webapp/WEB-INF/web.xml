@@ -5,9 +5,8 @@
     xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
     version="2.5">
 
-  <display-name>${displayName} HTML UI</display-name>
+  <display-name>${displayName} HTML UI Development</display-name>
 
-  <!-- Platform Startup listener -->
   <listener>
     <listener-class>org.eclipse.scout.rt.server.commons.WebappEventListener</listener-class>
   </listener>
@@ -46,6 +45,7 @@
 
   <session-config>
     <!-- Session timeout in minutes -->
+    <!-- (Note: Do not use a short timeout in DEV mode to allow longer debugging sessions) -->
     <session-timeout>60</session-timeout>
   </session-config>
 
