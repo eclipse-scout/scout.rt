@@ -72,7 +72,7 @@ public class HtmlContentBuilderTest {
   }
 
   private String createRowString(String prefix, int i) {
-    return HTML.row(HTML.cell("A" + prefix + i), HTML.cell("B" + prefix + i)).toEncodedHtml();
+    return HTML.tr(HTML.td("A" + prefix + i), HTML.td("B" + prefix + i)).toEncodedHtml();
   }
 
   private IHtmlTable createTable(String prefix) {
@@ -84,7 +84,7 @@ public class HtmlContentBuilderTest {
   }
 
   private IHtmlTableRow createRow(String prefix, int i) {
-    return HTML.row(HTML.cell("A" + prefix + i), HTML.cell("B" + prefix + i));
+    return HTML.tr(HTML.td("A" + prefix + i), HTML.td("B" + prefix + i));
   }
 
 }

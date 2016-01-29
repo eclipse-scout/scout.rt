@@ -359,13 +359,13 @@ public final class HTML {
    * Example:<br>
    * <code>
    * HTML.table(<br>
-   *     &nbsp;HTML.row(<br>
-   *     &nbsp;&nbsp;HTML.cell("cell1"),<br>
-   *     &nbsp;&nbsp;HTML.cell("cell2")<br>
+   *     &nbsp;HTML.tr(<br>
+   *     &nbsp;&nbsp;HTML.td("cell1"),<br>
+   *     &nbsp;&nbsp;HTML.td("cell2")<br>
    *     &nbsp;),<br>
-   *     &nbsp;HTML.row(<br>
-   *     &nbsp;&nbsp;HTML.cell("cell3"),<br>
-   *     &nbsp;&nbsp;HTML.cell("cell4")<br>
+   *     &nbsp;HTML.tr(<br>
+   *     &nbsp;&nbsp;HTML.td("cell3"),<br>
+   *     &nbsp;&nbsp;HTML.td("cell4")<br>
    *     )<br>
    *     ).cellspacing(1).cellpadding(2)<br>
    * </code>
@@ -374,7 +374,7 @@ public final class HTML {
    * @param text
    *          text with binds
    */
-  public static IHtmlTableCell cell(CharSequence... text) {
+  public static IHtmlTableCell td(CharSequence... text) {
     return new HtmlTableDataBuilder(Arrays.asList(text));
   }
 
@@ -382,13 +382,13 @@ public final class HTML {
    * Create a html element with encoded text for a table row: &lt;tr&gt;...&lt;/tr&gt;. Example:<br>
    * <code>
    * HTML.table(<br>
-   *     &nbsp;HTML.row(<br>
-   *     &nbsp;&nbsp;HTML.cell("cell1"),<br>
-   *     &nbsp;&nbsp;HTML.cell("cell2")<br>
+   *     &nbsp;HTML.tr(<br>
+   *     &nbsp;&nbsp;HTML.td("cell1"),<br>
+   *     &nbsp;&nbsp;HTML.td("cell2")<br>
    *     &nbsp;),<br>
-   *     &nbsp;HTML.row(<br>
-   *     &nbsp;&nbsp;HTML.cell("cell3"),<br>
-   *     &nbsp;&nbsp;HTML.cell("cell4")<br>
+   *     &nbsp;HTML.tr(<br>
+   *     &nbsp;&nbsp;HTML.td("cell3"),<br>
+   *     &nbsp;&nbsp;HTML.td("cell4")<br>
    *     )<br>
    *     ).cellspacing(1).cellpadding(2)<br>
    * </code>
@@ -396,21 +396,21 @@ public final class HTML {
    * @param td
    *          table data within row
    */
-  public static IHtmlTableRow row(IHtmlTableCell... td) {
-    return row(Arrays.asList(td));
+  public static IHtmlTableRow tr(IHtmlTableCell... td) {
+    return tr(Arrays.asList(td));
   }
 
   /**
    * Create a html element with encoded text for a table row: &lt;tr&gt;...&lt;/tr&gt;. Example:<br>
    * <code>
    * HTML.table(<br>
-   *     &nbsp;HTML.row(<br>
-   *     &nbsp;&nbsp;HTML.cell("cell1"),<br>
-   *     &nbsp;&nbsp;HTML.cell("cell2")<br>
+   *     &nbsp;HTML.tr(<br>
+   *     &nbsp;&nbsp;HTML.td("cell1"),<br>
+   *     &nbsp;&nbsp;HTML.td("cell2")<br>
    *     &nbsp;),<br>
-   *     &nbsp;HTML.row(<br>
-   *     &nbsp;&nbsp;HTML.cell("cell3"),<br>
-   *     &nbsp;&nbsp;HTML.cell("cell4")<br>
+   *     &nbsp;HTML.tr(<br>
+   *     &nbsp;&nbsp;HTML.td("cell3"),<br>
+   *     &nbsp;&nbsp;HTML.td("cell4")<br>
    *     )<br>
    *     ).cellspacing(1).cellpadding(2)<br>
    * </code>
@@ -418,7 +418,7 @@ public final class HTML {
    * @param td
    *          table data within row
    */
-  public static IHtmlTableRow row(List<IHtmlTableCell> td) {
+  public static IHtmlTableRow tr(List<IHtmlTableCell> td) {
     return new HtmlTableRowBuilder(td);
   }
 
@@ -426,13 +426,13 @@ public final class HTML {
    * Create a html element with encoded text for a table. Example:<br>
    * <code>
    * HTML.table(<br>
-   *     &nbsp;HTML.row(<br>
-   *     &nbsp;&nbsp;HTML.cell("cell1"),<br>
-   *     &nbsp;&nbsp;HTML.cell("cell2")<br>
+   *     &nbsp;HTML.tr(<br>
+   *     &nbsp;&nbsp;HTML.td("cell1"),<br>
+   *     &nbsp;&nbsp;HTML.td("cell2")<br>
    *     &nbsp;),<br>
-   *     &nbsp;HTML.row(<br>
-   *     &nbsp;&nbsp;HTML.cell("cell3"),<br>
-   *     &nbsp;&nbsp;HTML.cell("cell4")<br>
+   *     &nbsp;HTML.tr(<br>
+   *     &nbsp;&nbsp;HTML.td("cell3"),<br>
+   *     &nbsp;&nbsp;HTML.td("cell4")<br>
    *     )<br>
    *     ).cellspacing(1).cellpadding(2)<br>
    * </code>
@@ -445,13 +445,13 @@ public final class HTML {
    * Create a html element with encoded text for a table. Example:<br>
    * <code>
    * HTML.table(<br>
-   *     &nbsp;HTML.row(<br>
-   *     &nbsp;&nbsp;HTML.cell("cell1"),<br>
-   *     &nbsp;&nbsp;HTML.cell("cell2")<br>
+   *     &nbsp;HTML.tr(<br>
+   *     &nbsp;&nbsp;HTML.td("cell1"),<br>
+   *     &nbsp;&nbsp;HTML.td("cell2")<br>
    *     &nbsp;),<br>
-   *     &nbsp;HTML.row(<br>
-   *     &nbsp;&nbsp;HTML.cell("cell3"),<br>
-   *     &nbsp;&nbsp;HTML.cell("cell4")<br>
+   *     &nbsp;HTML.tr(<br>
+   *     &nbsp;&nbsp;HTML.td("cell3"),<br>
+   *     &nbsp;&nbsp;HTML.td("cell4")<br>
    *     )<br>
    *     ).cellspacing(1).cellpadding(2)<br>
    * </code>
