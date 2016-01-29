@@ -547,14 +547,12 @@ public abstract class AbstractSqlService implements ISqlService, IServiceInvento
     try {
       if (isDirectJdbcConnection()) {
         // get connection from internal pool
-        Connection conn = getSqlConnectionPool().leaseConnection(this);
-        return conn;
+        return getSqlConnectionPool().leaseConnection(this);
       }
       else {
-        Connection conn = new SqlConnectionBuilder().createJndiConnection(this);
         // do not call execAfterConnectionCreated(conn) because jndi connections
         // are normally pooled
-        return conn;
+        return new SqlConnectionBuilder().createJndiConnection(this);
       }
     }
     catch (Exception e) {
@@ -592,11 +590,21 @@ public abstract class AbstractSqlService implements ISqlService, IServiceInvento
 
   private synchronized SqlConnectionPool getSqlConnectionPool() {
     Assertions.assertFalse(isDestroyed(), "{} not available because the platform has been shut down.", getClass().getSimpleName());
-
     if (m_pool == null) {
-      m_pool = SqlConnectionPool.getPool(getClass(), getJdbcPoolSize(), getJdbcPoolConnectionLifetime(), getJdbcPoolConnectionBusyTimeout());
+      m_pool = BEANS.get(SqlConnectionPool.class);
+      m_pool.initialize(getClass().getName(), getJdbcPoolSize(), getJdbcPoolConnectionLifetime(), getJdbcPoolConnectionBusyTimeout());
     }
     return m_pool;
+  }
+
+  /**
+   * Destroys the current connection pool (created lazy upon releasing conneciton)
+   */
+  public synchronized void destroySqlConnectionPool() {
+    if (m_pool != null) {
+      m_pool.destroy();
+      m_pool = null;
+    }
   }
 
   @Override
@@ -805,11 +813,7 @@ public abstract class AbstractSqlService implements ISqlService, IServiceInvento
     }
 
     if (isDirectJdbcConnection()) {
-      // Destroy connection pool
-      if (m_pool != null) {
-        m_pool.destroy();
-        m_pool = null;
-      }
+      destroySqlConnectionPool();
 
       // Destroy JDBC driver
       if (CONFIG.getPropertyValue(SqlJdbcDriverUnloadProperty.class)) {
