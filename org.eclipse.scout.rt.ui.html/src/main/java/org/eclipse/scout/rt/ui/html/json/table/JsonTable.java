@@ -674,7 +674,10 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     IColumn column = extractColumn(event.getData());
     IFormField field = getModel().getUIFacade().prepareCellEditFromUI(row, column);
     if (field == null) {
-      throw new IllegalStateException("PrepareCellEditFromUi returned null for " + row + " and " + column);
+      // Cell is not editable, simply ignore the request for editing it.
+      // This may happen if the JSON request contained other events that
+      // caused the initially editable cell to be become non-editable.
+      return;
     }
 
     IJsonAdapter<?> jsonField = attachAdapter(field);
