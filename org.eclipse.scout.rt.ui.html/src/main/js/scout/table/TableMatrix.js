@@ -254,6 +254,9 @@ scout.TableMatrix.prototype.addAxis = function(axis, axisGroup) {
       }
     };
     keyAxis.reorder = function() {
+      // prepare comparator
+      axis.prepareForSorting();
+
       keyAxis.sort(function(a, b) {
         // make sure -empty- is at the bottom
         if (a === null) {
@@ -263,7 +266,7 @@ scout.TableMatrix.prototype.addAxis = function(axis, axisGroup) {
           return -1;
         }
         // sort others
-        return (keyAxis.format(a) < keyAxis.format(b) ? -1 : 1);
+        return axis.compare(keyAxis.format(a), keyAxis.format(b));
       });
     };
   }
