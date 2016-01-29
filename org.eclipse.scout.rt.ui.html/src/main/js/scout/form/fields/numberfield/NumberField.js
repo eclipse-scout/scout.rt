@@ -73,7 +73,7 @@ scout.NumberField.prototype._parse = function() {
       // changed, ValueField.js will make sure, the new value is sent to the model.
       try {
         input = eval(input);
-        input = this.decimalFormat.format(input, true);
+        input = this.decimalFormat.format(input, false);
         this.$field.val(input);
       } catch (err) {
         // ignore errors, let the input be handled by scout model

@@ -113,7 +113,8 @@ scout.DecimalFormat = function(locale, decimalFormatConfiguration) {
   }
 };
 
-scout.DecimalFormat.prototype.format = function(number, dontUseMultiplier) {
+scout.DecimalFormat.prototype.format = function(number, applyMultiplier) {
+  applyMultiplier = scout.nvl(applyMultiplier, true);
   if (number === null || number === undefined) {
     return null;
   }
@@ -122,7 +123,7 @@ scout.DecimalFormat.prototype.format = function(number, dontUseMultiplier) {
   var suffix = this.positiveSuffix;
 
   // apply multiplier
-  if (this.multiplier !== 1 && !dontUseMultiplier) {
+  if (applyMultiplier && this.multiplier !== 1) {
     number *= this.multiplier;
   }
 
