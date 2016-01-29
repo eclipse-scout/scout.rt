@@ -26,7 +26,7 @@ import org.eclipse.scout.rt.shared.data.model.IDataModelEntity;
  *
  * <pre>
  * EITHER
- *   name starts with "abb"
+ *   name starts with "aaa"
  *   AND name ends with "ch"
  *   AND has Region with
  *     country is Switzerland
