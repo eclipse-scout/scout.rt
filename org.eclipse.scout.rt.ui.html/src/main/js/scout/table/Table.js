@@ -1093,7 +1093,18 @@ scout.Table.prototype._removeAllRows = function() {
   this.$rows().each(function(i, elem) {
     var $row = $(elem),
       row = $row.data('row');
-    this._removeRow(row);
+    // FIXME CGU: (von A.WE) temporärer Hack wegen ticket #169163:
+    // wenn man im TableHeaderMenu > Filter > Alle anklickt, gibt es dann Fall, dass man hier eine $row
+    // hat, die kein data('row') hat. Das Problem scheint am 17.12.2015 mit dem virtuelle scrolling rein
+    // gekommen zu sein. Ich habe schrittweise bis zum 16.12.2015 reverted und erst mit der version vor
+    // dem 17.12 ging es wieder. Meine Vermutung ist, dass der Bug irgendwo im Commit
+    // 9ab825acf55ef0d27f31d1791ab2ce685f7710f2 steckt.
+    // Ein weiteres (rein optisches) Issue: wenn man zwischen alle/keine Filter togglet, hüpfen die
+    // Rows etwas komisch herum. Evtl. könnte man den Effekt vermeiden, wenn man im checkAllRows nicht
+    // row für row checken würde, sondern eine Bulk-Operation implementieren würde?
+    if (row) {
+      this._removeRow(row);
+    }
   }.bind(this));
   this.viewRangeRendered = new scout.Range(0, 0);
 };
