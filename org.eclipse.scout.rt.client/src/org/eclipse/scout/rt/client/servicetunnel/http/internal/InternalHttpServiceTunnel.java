@@ -14,11 +14,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.servicetunnel.AbstractServiceTunnel;
-import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelContentHandler;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelResponse;
 
@@ -32,12 +29,6 @@ import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelResponse;
 @Deprecated
 @SuppressWarnings("deprecation")
 public class InternalHttpServiceTunnel extends AbstractServiceTunnel {
-
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(InternalHttpServiceTunnel.class);
-
-  private IServiceTunnelContentHandler m_contentHandler;
-  private ClientNotificationPollingJob m_pollingJob;
-  private final Object m_pollingJobLock = new Object();
 
   public InternalHttpServiceTunnel(IClientSession session, String url) throws ProcessingException {
     this(session, url, null);
