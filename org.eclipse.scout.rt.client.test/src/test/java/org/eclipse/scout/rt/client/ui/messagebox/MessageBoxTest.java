@@ -230,7 +230,7 @@ public class MessageBoxTest {
 
   @Test
   public void testYesNoMessageBoxWithHtml() throws Exception {
-    MessageBoxes.createYesNo().withHeader("header").withBody("body").withHtml(HTML.plain("<h1>title</h1>")).show();
+    MessageBoxes.createYesNo().withHeader("header").withBody("body").withHtml(HTML.raw("<h1>title</h1>")).show();
     assertMessageBox("header", "body", "<h1>title</h1>");
   }
 

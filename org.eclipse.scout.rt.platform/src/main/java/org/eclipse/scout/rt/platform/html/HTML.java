@@ -511,7 +511,7 @@ public final class HTML {
   /**
    * Creates HTML content that will not be encoded with {@link IHtmlContent#toEncodedHtml()}. <b>Use with caution!</b>
    */
-  public static IHtmlContent plain(CharSequence... text) {
+  public static IHtmlContent raw(CharSequence... text) {
     return new HtmlPlainBuilder(text);
   }
 
