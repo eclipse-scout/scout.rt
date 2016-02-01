@@ -84,9 +84,7 @@ scout.Table.prototype._init = function(model) {
   this._syncKeyStrokes(this.keyStrokes);
   this._syncMenus(this.menus);
   this._syncTableStatus(this.tableStatus);
-  if (this._filterCount() > 0) {
-    this._applyFilters(this.rows);
-  }
+  this._applyFilters(this.rows);
   this._calculateValuesForBackgroundEffect();
   this._group();
 };
@@ -979,9 +977,34 @@ scout.Table.prototype._updateRowWidth = function() {
 
 scout.Table.prototype._updateRowHeight = function() {
   var $emptyRow = this.$data.appendDiv('table-row');
+  var $emptyAggrRow = this.$data.appendDiv('table-aggregate-row');
+
   $emptyRow.appendDiv('table-cell').html('&nbsp;');
+  $emptyAggrRow.appendDiv('table-cell').html('&nbsp;');
   this.rowHeight = $emptyRow.outerHeight(true);
+  this.aggregateRowHeight = $emptyAggrRow.outerHeight(true);
   $emptyRow.remove();
+  $emptyAggrRow.remove();
+};
+
+/**
+ * Updates the row heights for every visible row and aggregate row and clears the height of the others
+ */
+scout.Table.prototype._updateRowHeights = function() {
+  this.rows.forEach(function(row) {
+    if (!row.$row) {
+      row.height = null;
+    } else {
+      row.height = row.$row.outerHeight(true);
+    }
+  });
+  this._aggregateRows.forEach(function(aggregateRow) {
+    if (!aggregateRow.$row) {
+      aggregateRow.height = null;
+    } else {
+      aggregateRow.height = aggregateRow.$row.outerHeight(true);
+    }
+  });
 };
 
 /**
@@ -1558,10 +1581,10 @@ scout.Table.prototype.clearAggregateRows = function(animate) {
   // Remove "hasAggregateRow" markers from real rows
   this._aggregateRows.forEach(function(aggregateRow) {
     if (aggregateRow.prevRow) {
-      aggregateRow.prevRow.hasAggregateRowAfter = false;
+      aggregateRow.prevRow.aggregateRowAfter = null;
     }
     if (aggregateRow.nextRow) {
-      aggregateRow.nextRow.hasAggregateRowBefore = false;
+      aggregateRow.nextRow.aggregateRowBefore = null;
     }
   }, this);
 
@@ -1660,16 +1683,17 @@ scout.Table.prototype._groupedColumns = function() {
  * @param nextRow row _after_ the new aggregate row
  */
 scout.Table.prototype._addAggregateRow = function(contents, prevRow, nextRow) {
-  this._aggregateRows.push({
+  var aggregateRow = {
     contents: contents.slice(),
     prevRow: prevRow,
     nextRow: nextRow
-  });
+  };
+  this._aggregateRows.push(aggregateRow);
   if (prevRow) {
-    prevRow.hasAggregateRowAfter = true;
+    prevRow.aggregateRowAfter = aggregateRow;
   }
   if (nextRow) {
-    nextRow.hasAggregateRowBefore = true;
+    nextRow.aggregateRowBefore = aggregateRow;
   }
 };
 
@@ -1722,6 +1746,7 @@ scout.Table.prototype._renderAggregateRows = function(animate) {
     }
 
     $aggregateRow.insertAfter(row.$row).width(this.rowWidth);
+    aggregateRow.height = $aggregateRow.outerHeight(true);
     aggregateRow.$row = $aggregateRow;
     if (animate) {
       this._showRow(aggregateRow);
@@ -1866,12 +1891,7 @@ scout.Table.prototype.insertRows = function(rows, fromServer) {
     this.rows.push(row);
   }, this);
 
-  // FIXME CGU: (von A.WE) ohne das If schickt das UI beim SmartField bei jeder Änderung an der Table (insertRows)
-  // ein rowsFiltered event zurück an den Server, obwohl die Table gar keinen Filter hat. Bitte prüfen, ob das so
-  // korrekt ist. Das If wird ja auch schon an anderer Stelle gemacht.
-  if (this._filterCount() > 0) {
-    this._applyFilters(rows);
-  }
+  this._applyFilters(rows);
   this._calculateValuesForBackgroundEffect();
   fromServer = scout.nvl(fromServer, false);
   if (!fromServer) {
@@ -2160,10 +2180,10 @@ scout.Table.prototype._renderSelection = function(rows) {
       followingRowSelected = followingIndex < filteredRows.length && this.selectedRows.indexOf(filteredRows[followingIndex]) !== -1;
 
     // Don't collapse selection borders if two consecutively selected (real) rows are separated by an aggregation row
-    if (thisRowSelected && previousRowSelected && row.hasAggregateRowBefore) {
+    if (thisRowSelected && previousRowSelected && row.aggregateRowBefore) {
       previousRowSelected = false;
     }
-    if (thisRowSelected && followingRowSelected && row.hasAggregateRowAfter) {
+    if (thisRowSelected && followingRowSelected && row.aggregateRowAfter) {
       followingRowSelected = false;
     }
 
@@ -2477,6 +2497,10 @@ scout.Table.prototype._applyFilters = function(rows) {
   var filterChanged,
     newHiddenRows = [];
 
+  if (this._filterCount() === 0) {
+    return;
+  }
+
   rows.forEach(function(row) {
     if (this._applyFiltersForRow(row)) {
       if (!row.filterAccepted) {
@@ -2601,13 +2625,7 @@ scout.Table.prototype.resizeColumn = function(column, width) {
 
   // If resized column contains cells with wrapped text, view port needs to be updated
   // Remove row height for non rendered rows because it may have changed due to resizing (wrap text)
-  this.rows.forEach(function(row) {
-    if (!row.$row) {
-      row.height = null;
-    } else {
-      row.height = row.$row.outerHeight(true);
-    }
-  });
+  this._updateRowHeights();
   this._renderFiller();
   this._renderViewport();
   this.updateScrollbars();
@@ -3152,17 +3170,35 @@ scout.Table.prototype._rowIndexAtScrollTop = function(scrollTop) {
   var height = 0,
     index = -1;
   this.filteredRows().some(function(row, i) {
-    var rowHeight = this.rowHeight;
-    if (row.height) {
-      rowHeight = row.height;
-    }
-    height += rowHeight;
+    height += this._heightForRow(row);
     if (scrollTop < height) {
       index = i;
       return true;
     }
   }.bind(this));
   return index;
+};
+
+scout.Table.prototype._heightForRow = function(row) {
+  var height = 0,
+    aggregateRow = row.aggregateRowAfter;
+
+  if (row.height) {
+    height = row.height;
+  } else {
+    height = this.rowHeight;
+  }
+
+  // Add height of aggregate row as well
+  if (aggregateRow) {
+    if (aggregateRow.height) {
+      height += aggregateRow.height;
+    } else {
+      height += this.aggregateRowHeight;
+    }
+  }
+
+  return height;
 };
 
 /**
@@ -3304,13 +3340,8 @@ scout.Table.prototype._applyFillerStyle = function($filler) {
 scout.Table.prototype._calculateFillerHeight = function(range) {
   var totalHeight = 0;
   for (var i = range.from; i < range.to; i++) {
-    var row = this.filteredRows()[i],
-      height = this.rowHeight;
-
-    if (row.height) {
-      height = row.height;
-    }
-    totalHeight += height;
+    var row = this.filteredRows()[i];
+    totalHeight += this._heightForRow(row);
   }
   return totalHeight;
 };
