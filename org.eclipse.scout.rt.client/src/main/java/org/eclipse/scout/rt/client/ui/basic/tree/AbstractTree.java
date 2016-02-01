@@ -500,7 +500,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   }
 
   @ConfigOperation
-  protected void execAutoCheckChildNodes(List<ITreeNode> nodes) {
+  protected void execAutoCheckChildNodes(List<? extends ITreeNode> nodes) {
     for (ITreeNode node : nodes) {
       for (ITreeNode childNode : node.getFilteredChildNodes()) {
         if (childNode.isEnabled() && childNode.isVisible()) {
@@ -2431,7 +2431,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     chain.execNodesChecked(nodes);
   }
 
-  protected void interceptAutoCheckChildNodes(List<? extends ITreeNode> nodes) {
+  protected void interceptAutoCheckChildNodes(List<ITreeNode> nodes) {
     List<? extends ITreeExtension<? extends AbstractTree>> extensions = getAllExtensions();
     TreeAutoCheckChildNodesChain chain = new TreeAutoCheckChildNodesChain(extensions);
     chain.execAutoCheckChildNodes(nodes);
@@ -3121,13 +3121,13 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     }
 
     @Override
-    public void execNodesChecked(TreeNodesCheckedChain chain, Collection<ITreeNode> nodes) {
-      getOwner().execNodesChecked(CollectionUtility.arrayList(nodes));
+    public void execNodesChecked(TreeNodesCheckedChain chain, List<ITreeNode> nodes) {
+      getOwner().execNodesChecked(nodes);
     }
 
     @Override
-    public void execAutoCheckChildNodes(TreeAutoCheckChildNodesChain chain, Collection<? extends ITreeNode> nodes) {
-      getOwner().execAutoCheckChildNodes(CollectionUtility.arrayList(nodes));
+    public void execAutoCheckChildNodes(TreeAutoCheckChildNodesChain chain, List<ITreeNode> nodes) {
+      getOwner().execAutoCheckChildNodes(nodes);
     }
   }
 

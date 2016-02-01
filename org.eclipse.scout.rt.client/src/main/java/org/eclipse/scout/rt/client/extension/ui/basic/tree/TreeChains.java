@@ -159,7 +159,7 @@ public final class TreeChains {
       super(extensions);
     }
 
-    public void execAutoCheckChildNodes(final List<? extends ITreeNode> nodes) {
+    public void execAutoCheckChildNodes(final List<ITreeNode> nodes) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
         protected void callMethod(ITreeExtension<? extends AbstractTree> next) {
