@@ -1567,7 +1567,7 @@ scout.Table.prototype.clearAggregateRows = function(animate) {
 
   if (this.rendered) {
     this._removeAggregateRows(animate);
-    this.renderSelection(); // fix selection borders
+    this._renderSelection(); // fix selection borders
   }
   this._aggregateRows = [];
 };
@@ -1622,7 +1622,7 @@ scout.Table.prototype._group = function(animate) {
 
   if (this.rendered) {
     this._renderAggregateRows(animate);
-    this.renderSelection(); // fix selection borders
+    this._renderSelection(); // fix selection borders
   }
 };
 
