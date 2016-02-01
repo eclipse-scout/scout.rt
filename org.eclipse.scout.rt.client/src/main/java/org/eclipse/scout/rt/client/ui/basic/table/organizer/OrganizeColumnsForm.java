@@ -955,21 +955,25 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
             public void moveNewColumnsAfterSelection(List<String> existingColumns) {
               Table columnsTable = getColumnsTableField().getTable();
               ITableRow insertAfterThisRow = columnsTable.getSelectedRow();
+              boolean insertOnTop = false;
               if (insertAfterThisRow == null && columnsTable.getRowCount() > 0) {
-                insertAfterThisRow = columnsTable.getRow(0);
+                insertOnTop = true;
               }
               getColumnsTableField().reloadTableData();
-              if (insertAfterThisRow == null) {
-                return;
+              int insertAfterRowIndex = 0;
+              if (insertAfterThisRow != null) {
+                insertAfterRowIndex = insertAfterThisRow.getRowIndex();
               }
-              int insertAfterRowIndex = insertAfterThisRow.getRowIndex();
               // find new rows
               for (ITableRow columnRow : columnsTable.getRows()) {
                 if (!existingColumns.contains(columnsTable.getKeyColumn().getValue(columnRow).getColumnId())) {
                   // move new column
                   try {
                     getColumnsTableField().getTable().setTableChanging(true);
-                    if (columnRow.getRowIndex() <= insertAfterRowIndex) {
+                    if (insertOnTop) {
+                      moveUp(columnRow, 0);
+                    }
+                    else if (columnRow.getRowIndex() <= insertAfterRowIndex) {
                       moveDown(columnRow, insertAfterRowIndex + 1);
                     }
                     else {
@@ -1515,9 +1519,10 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
    * behavior is required.
    */
   protected void execAddColumnAction() {
+    //TODO nbu
     if (isCustomizable()) {
       List<String> existingColumns = getVisibleColumnIds();
-      m_organizedTable.getTableCustomizer().addColumn();
+      m_organizedTable.getTableCustomizer().addColumn(null);
       getColumnsTableField().getTable().moveNewColumnsAfterSelection(existingColumns);
     }
   }

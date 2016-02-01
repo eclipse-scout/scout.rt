@@ -19,7 +19,7 @@ import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 public abstract class AbstractTableCustomizer implements ITableCustomizer {
 
   @Override
-  public void addColumn() {
+  public void addColumn(IColumn<?> insertAfterColumn) {
   }
 
   @Override

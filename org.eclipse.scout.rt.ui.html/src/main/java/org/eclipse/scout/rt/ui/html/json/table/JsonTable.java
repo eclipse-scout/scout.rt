@@ -498,7 +498,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     ITableOrganizer organizer = getModel().getTableOrganizer();
     switch (action) {
       case "add":
-        organizer.addColumn();
+        organizer.addColumn(extractColumn(data));
         break;
       case "remove":
         organizer.removeColumn(extractColumn(data));

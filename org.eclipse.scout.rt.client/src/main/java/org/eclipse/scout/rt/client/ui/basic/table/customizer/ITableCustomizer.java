@@ -29,7 +29,7 @@ public interface ITableCustomizer {
   /**
    * Add a new custom column to the table by for example showing a form with potential candidates
    */
-  void addColumn();
+  void addColumn(IColumn<?> insertAfterColumn);
 
   /**
    * Modify an existing custom column

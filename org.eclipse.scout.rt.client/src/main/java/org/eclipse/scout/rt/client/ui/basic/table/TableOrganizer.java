@@ -48,17 +48,17 @@ public class TableOrganizer implements ITableOrganizer {
   }
 
   @Override
-  public void addColumn() {
+  public void addColumn(IColumn insertAfterColumn) {
     if (isCustomizable() && hasCreatePermission()) {
-      getCustomizer().addColumn();
+      getCustomizer().addColumn(insertAfterColumn);
     }
     else if (hasInvisibleColumns()) {
-      showInvisibleColumnsForm();
+      showInvisibleColumnsForm(insertAfterColumn);
     }
   }
 
-  private void showInvisibleColumnsForm() {
-    IShowInvisibleColumnsForm form = new ShowInvisibleColumnsForm(m_table);
+  private void showInvisibleColumnsForm(IColumn<?> insertAfterColumn) {
+    IShowInvisibleColumnsForm form = new ShowInvisibleColumnsForm(m_table).withInsertAfterColumn(insertAfterColumn);
     form.startModify();
     form.waitFor();
   }
