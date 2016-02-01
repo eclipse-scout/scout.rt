@@ -59,7 +59,7 @@ scout.TableHeaderMenu.prototype._init = function(options) {
     this._tableFilterHandler = this._onFilterTableChanged.bind(this);
     this.table.on('addFilter', this._tableFilterHandler);
     this.table.on('removeFilter', this._tableFilterHandler);
-    this._filterTableCheckedRowsHandler = this._onFilterTableCheckedRows.bind(this);
+    this._filterTableRowsCheckedHandler = this._onFilterTableRowsChecked.bind(this);
   }
 };
 
@@ -152,7 +152,7 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
 
 scout.TableHeaderMenu.prototype._remove = function() {
   if (this.filterTable) {
-    this.filterTable.off('rowsChecked', this._filterTableCheckedRowsHandler);
+    this.filterTable.off('rowsChecked', this._filterTableRowsCheckedHandler);
   }
   this.tableHeader.$container.off('scroll', this._tableHeaderScrollHandler);
   this.$headerItem.select(false);
@@ -551,7 +551,7 @@ scout.TableHeaderMenu.prototype._renderFilterTable = function() {
         session: this.session
       })]
   });
-  this.filterTable.on('rowsChecked', this._filterTableCheckedRowsHandler);
+  this.filterTable.on('rowsChecked', this._filterTableRowsCheckedHandler);
 
   var tableRow, tableRows = [];
   this.filter.availableValues.forEach(function(filterValue) {
@@ -602,7 +602,6 @@ scout.TableHeaderMenu.prototype._onClickFilterCheckedMode = function() {
     this.filterCheckedMode = checkedMode.ALL;
   }
   this.filterTable.checkAll(checkAll);
-  this._updateFilterTable();
   this._updateFilterTableActions();
 };
 
@@ -709,7 +708,7 @@ scout.TableHeaderMenu.prototype._onAnchorScroll = function(event) {
   this.position();
 };
 
-scout.TableHeaderMenu.prototype._onFilterTableCheckedRows = function(event) {
+scout.TableHeaderMenu.prototype._onFilterTableRowsChecked = function(event) {
   this.filter.selectedValues = [];
   this.filterTable.rows.forEach(function(row) {
     if (row.checked) {

@@ -538,12 +538,8 @@ scout.Table.prototype.deselectAll = function(notifyServer) {
   this.selectRows([], notifyServer);
 };
 
-scout.Table.prototype.checkAll = function(check) {
-  check = scout.nvl(check, true);
-  var rows = this.filteredRows();
-  rows.forEach(function(row) {
-    this.checkRow(row, check);
-  }, this);
+scout.Table.prototype.checkAll = function(checked) {
+  this.checkRows(this.filteredRows(), checked);
 };
 
 scout.Table.prototype.uncheckAll = function() {
@@ -1093,18 +1089,12 @@ scout.Table.prototype._removeAllRows = function() {
   this.$rows().each(function(i, elem) {
     var $row = $(elem),
       row = $row.data('row');
-    // FIXME CGU: (von A.WE) temporärer Hack wegen ticket #169163:
-    // wenn man im TableHeaderMenu > Filter > Alle anklickt, gibt es dann Fall, dass man hier eine $row
-    // hat, die kein data('row') hat. Das Problem scheint am 17.12.2015 mit dem virtuelle scrolling rein
-    // gekommen zu sein. Ich habe schrittweise bis zum 16.12.2015 reverted und erst mit der version vor
-    // dem 17.12 ging es wieder. Meine Vermutung ist, dass der Bug irgendwo im Commit
-    // 9ab825acf55ef0d27f31d1791ab2ce685f7710f2 steckt.
-    // Ein weiteres (rein optisches) Issue: wenn man zwischen alle/keine Filter togglet, hüpfen die
-    // Rows etwas komisch herum. Evtl. könnte man den Effekt vermeiden, wenn man im checkAllRows nicht
-    // row für row checken würde, sondern eine Bulk-Operation implementieren würde?
-    if (row) {
-      this._removeRow(row);
+    if ($row.hasClass('hiding')) {
+      // Do not remove rows which are removed using an animation
+      // row.$row may already point to a new row -> don't call removeRow to not accidentally remove the new row
+      return;
     }
+    this._removeRow(row);
   }.bind(this));
   this.viewRangeRendered = new scout.Range(0, 0);
 };
@@ -1775,58 +1765,51 @@ scout.Table.prototype._calculateValuesForBackgroundEffect = function() {
   }, this);
 };
 
-/**
- * Renders the background effect of every column, if column.backgroundEffect is set
- */
-scout.Table.prototype._renderBackgroundEffect = function() {
-  this.columns.forEach(function(column) {
-    if (!column.backgroundEffect) {
+scout.Table.prototype.checkRow = function(row, checked) {
+  this.checkRows([row], checked);
+};
+
+scout.Table.prototype.checkRows = function(rows, checked, notifyServer) {
+  var updatedRows = [];
+  checked = scout.nvl(checked, true);
+  if (!this.checkable || !this.enabled) {
+    return;
+  }
+  rows = scout.arrays.ensure(rows);
+  rows.forEach(function(row) {
+    if (!row.enabled || row.checked === checked) {
       return;
     }
-    column._renderBackgroundEffect();
-  }, this);
-};
-
-scout.Table.prototype._renderRowChecked = function(row) {
-  if (!this.checkable) {
-    return;
-  }
-  if (!row.$row) {
-    return;
-  }
-  var $styleElem;
-  if (this.checkableStyle === scout.Table.CheckableStyle.TABLE_ROW) {
-    $styleElem = row.$row;
-  } else {
-    if (!this.checkableColumn) {
-      throw new Error('checkableColumn not set');
-    }
-    $styleElem = this.checkableColumn.$checkBox(row.$row);
-  }
-  $styleElem.toggleClass('checked', row.checked);
-};
-
-scout.Table.prototype.checkRow = function(row, checked) {
-  if (!this.checkable || !this.enabled || !row.enabled || row.checked === checked) {
-    return;
-  }
-  var updatedRows = [];
-  if (!this.multiCheck && checked) {
-    for (var i = 0; i < this.rows.length; i++) {
-      if (this.rows[i].checked) {
-        this.rows[i].checked = false;
-        updatedRows.push(this.rows[i]);
-        this._renderRowChecked(this.rows[i]);
+    if (!this.multiCheck && checked) {
+      for (var i = 0; i < this.rows.length; i++) {
+        if (this.rows[i].checked) {
+          this.rows[i].checked = false;
+          updatedRows.push(this.rows[i]);
+        }
       }
     }
+    row.checked = checked;
+    updatedRows.push(row);
+  }, this);
+
+  notifyServer = scout.nvl(notifyServer, true);
+  if (notifyServer) {
+    this._sendRowsChecked(updatedRows);
   }
-  row.checked = checked;
-  updatedRows.push(row);
-  this._sendRowsChecked(updatedRows);
   if (this.rendered) {
-    this._renderRowChecked(row);
+    updatedRows.forEach(function(row) {
+      this._renderRowChecked(row);
+    }, this);
   }
   this._triggerRowsChecked();
+};
+
+scout.Table.prototype.uncheckRow = function(row, notifyServer) {
+  this.uncheckRows([row], notifyServer);
+};
+
+scout.Table.prototype.uncheckRows = function(rows, notifyServer) {
+  this.checkRows(rows, false, notifyServer);
 };
 
 scout.Table.prototype.doRowAction = function(row, column) {
@@ -2103,12 +2086,12 @@ scout.Table.prototype.revealChecked = function() {
   }
 };
 
-scout.Table.prototype.rowById = function(id) {
+scout.Table.prototype._rowById = function(id) {
   return this.rowsMap[id];
 };
 
 scout.Table.prototype._rowsByIds = function(ids) {
-  return ids.map(this.rowById.bind(this));
+  return ids.map(this._rowById.bind(this));
 };
 
 scout.Table.prototype._rowsToIds = function(rows) {
@@ -2121,7 +2104,7 @@ scout.Table.prototype._rowsToIds = function(rows) {
  * render borders and selection of row. default select if no argument or false is passed in deselect
  * model has to be updated before calling this method.
  */
-scout.Table.prototype.renderSelection = function(rows) {
+scout.Table.prototype._renderSelection = function(rows) {
   rows = scout.arrays.ensure(rows || this.selectedRows);
 
   // helper function adds/removes a class for a row only if necessary, return true if classes have been changed
@@ -2194,7 +2177,7 @@ scout.Table.prototype.addRowToSelection = function(row, ongoingSelection) {
 
   if (row.$row && this.rendered) {
     row.$row.select(true);
-    this.renderSelection(row);
+    this._renderSelection(row);
     if (this.scrollToSelection) {
       this.revealSelection();
     }
@@ -2210,7 +2193,7 @@ scout.Table.prototype.removeRowFromSelection = function(row, ongoingSelection) {
   ongoingSelection = ongoingSelection !== undefined ? ongoingSelection : true;
   if (scout.arrays.remove(this.selectedRows, row)) {
     if (this.rendered) {
-      this.renderSelection(row);
+      this._renderSelection(row);
     }
     if (!ongoingSelection) {
       this._triggerRowsSelected();
@@ -2244,7 +2227,7 @@ scout.Table.prototype.selectRows = function(rows, notifyServer, debounceSend) {
   this._triggerRowsSelected();
 
   if (this.rendered) {
-    this.renderSelection();
+    this._renderSelection();
     if (this.scrollToSelection) {
       this.revealSelection();
     }
@@ -2330,7 +2313,7 @@ scout.Table.prototype.$cell = function(column, $row) {
   return $row.children().eq(columnIndex);
 };
 
-scout.Table.prototype.columnById = function(columnId) {
+scout.Table.prototype._columnById = function(columnId) {
   return scout.arrays.find(this.columns, function(column) {
     return column.id === columnId;
   });
@@ -2854,7 +2837,7 @@ scout.Table.prototype._syncFilters = function(filters) {
   if (filters) {
     filters.forEach(function(filterData) {
       if (filterData.column) {
-        filterData.column = this.columnById(filterData.column);
+        filterData.column = this._columnById(filterData.column);
       }
       filterData.table = this;
       filterData.session = this.session;
@@ -2869,6 +2852,37 @@ scout.Table.prototype._syncTableStatus = function(tableStatus) {
   } else {
     this.tableStatus = null;
   }
+};
+
+/**
+ * Renders the background effect of every column, if column.backgroundEffect is set
+ */
+scout.Table.prototype._renderBackgroundEffect = function() {
+  this.columns.forEach(function(column) {
+    if (!column.backgroundEffect) {
+      return;
+    }
+    column._renderBackgroundEffect();
+  }, this);
+};
+
+scout.Table.prototype._renderRowChecked = function(row) {
+  if (!this.checkable) {
+    return;
+  }
+  if (!row.$row) {
+    return;
+  }
+  var $styleElem;
+  if (this.checkableStyle === scout.Table.CheckableStyle.TABLE_ROW) {
+    $styleElem = row.$row;
+  } else {
+    if (!this.checkableColumn) {
+      throw new Error('checkableColumn not set');
+    }
+    $styleElem = this.checkableColumn.$checkBox(row.$row);
+  }
+  $styleElem.toggleClass('checked', row.checked);
 };
 
 scout.Table.prototype._renderCheckable = function() {
@@ -3191,7 +3205,7 @@ scout.Table.prototype._renderViewRange = function(viewRange) {
   this._renderFiller();
   this._renderEmptyData();
   this._renderBackgroundEffect();
-  this.renderSelection();
+  this._renderSelection();
   this.$data[0].scrollTop = scrollTop;
   this.viewRangeDirty = false;
 };
@@ -3293,14 +3307,20 @@ scout.Table.prototype._onRowsSelected = function(rowIds) {
 };
 
 scout.Table.prototype._onRowsChecked = function(rows) {
-  for (var i = 0; i < rows.length; i++) {
-    var row = this.rowsMap[rows[i].id];
-    row.checked = rows[i].checked;
-    if (this.rendered) {
-      this._renderRowChecked(row);
+  var checkedRows = [],
+    uncheckedRows = [];
+
+  rows.forEach(function(rowData) {
+    var row = this._rowById(rowData.id);
+    if (rowData.checked) {
+      checkedRows.push(row);
+    } else {
+      uncheckedRows.push(row);
     }
-    this._triggerRowsChecked();
-  }
+  }, this);
+
+  this.checkRows(checkedRows, true, false);
+  this.uncheckRows(uncheckedRows, false);
 };
 
 scout.Table.prototype._onRowOrderChanged = function(rowIds) {
@@ -3358,7 +3378,7 @@ scout.Table.prototype._onColumnOrderChanged = function(columnIds) {
 
   for (i = 0; i < columnIds.length; i++) {
     columnId = columnIds[i];
-    column = this.columnById(columnId);
+    column = this._columnById(columnId);
     currentPosition = this.columns.indexOf(column);
     if (currentPosition < 0) {
       throw new Error('Column with id ' + columnId + 'not found.');
@@ -3385,7 +3405,7 @@ scout.Table.prototype._onColumnHeadersUpdated = function(columns) {
   //Update model columns
   for (var i = 0; i < columns.length; i++) {
     scout.defaultValues.applyTo(columns[i], 'Column');
-    column = this.columnById(columns[i].id);
+    column = this._columnById(columns[i].id);
     oldColumnState = $.extend(oldColumnState, column);
     column.text = columns[i].text;
     column.headerCssClass = columns[i].headerCssClass;
@@ -3399,8 +3419,8 @@ scout.Table.prototype._onColumnHeadersUpdated = function(columns) {
 };
 
 scout.Table.prototype._onStartCellEdit = function(columnId, rowId, fieldId) {
-  var column = this.columnById(columnId),
-    row = this.rowById(rowId);
+  var column = this._columnById(columnId),
+    row = this._rowById(rowId);
   this._startCellEdit(column, row, fieldId);
 };
 
@@ -3427,14 +3447,14 @@ scout.Table.prototype._onColumnBackgroundEffectChanged = function(event) {
   var columnId, column;
   event.eventParts.forEach(function(eventPart) {
     columnId = eventPart.columnId;
-    column = this.columnById(columnId);
+    column = this._columnById(columnId);
     column.setBackgroundEffect(eventPart.backgroundEffect, false);
   }, this);
 };
 
 scout.Table.prototype._onRequestFocusInCell = function(event) {
-  var row = this.rowById(event.rowId),
-    column = this.columnById(event.columnId),
+  var row = this._rowById(event.rowId),
+    column = this._columnById(event.columnId),
     cell = this.cell(column, row);
   if (this.enabled && row.enabled && cell.editable) {
     this.prepareCellEdit(event.rowId, event.columnId, true);
@@ -3447,7 +3467,7 @@ scout.Table.prototype._onAggregationFunctionChanged = function(event) {
   event.eventParts.forEach(function(eventPart) {
     columnId = eventPart.columnId;
     func = eventPart.aggregationFunction;
-    column = this.columnById(columnId);
+    column = this._columnById(columnId);
     column.setAggregationFunction(func);
 
     this._triggerAggregationFunctionChanged(column);
@@ -3462,6 +3482,10 @@ scout.Table.prototype._onFiltersChanged = function(filters) {
   if (!this._rebuildingTable) {
     this.filter();
   }
+};
+
+scout.Table.prototype._onColumnActionsChanged = function(event) {
+  this.header.onColumnActionsChanged(event);
 };
 
 scout.Table.prototype.onModelAction = function(event) {
@@ -3516,10 +3540,6 @@ scout.Table.prototype.onModelAction = function(event) {
   } else {
     scout.Table.parent.prototype.onModelAction.call(this, event);
   }
-};
-
-scout.Table.prototype._onColumnActionsChanged = function(event) {
-  this.header.onColumnActionsChanged(event);
 };
 
 /**

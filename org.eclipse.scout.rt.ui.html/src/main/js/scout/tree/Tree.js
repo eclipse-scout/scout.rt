@@ -1185,44 +1185,63 @@ scout.Tree.prototype.deleteAllChildNodes = function(parentNode) {
   }
 };
 
-scout.Tree.prototype.checkNode = function(node, checked, suppressSend) {
+scout.Tree.prototype.checkNode = function(node, checked, notifyServer) {
+  this.checkNodes([node], checked, notifyServer);
+};
+
+scout.Tree.prototype.checkNodes = function(nodes, checked, notifyServer) {
   var updatedNodes = [];
-  if (!this.enabled || !this.checkable || !node.enabled || node.checked === checked) {
+  if (!this.enabled || !this.checkable) {
     return updatedNodes;
   }
-  if (!this.multiCheck && checked) {
-    for (var i = 0; i < this.checkedNodes.length; i++) {
-      this.checkedNodes[i].checked = false;
-      this._updateMarkChildrenChecked(this.checkedNodes[i], false, false, true);
-      updatedNodes.push(this.checkedNodes[i]);
-      if (this.rendered) {
-        this._renderNodeChecked(this.checkedNodes[i]);
-      }
+  notifyServer = scout.nvl(notifyServer, true);
+  nodes = scout.arrays.ensure(nodes);
+  nodes.forEach(function(node) {
+    if (!node.enabled || node.checked === checked) {
+      return;
     }
-    this.checkedNodes = [];
-  }
-  node.checked = checked;
-  if (node.checked) {
-    this.checkedNodes.push(node);
-  }
-  updatedNodes.push(node);
-  this._updateMarkChildrenChecked(node, false, checked, true);
-  if (!suppressSend) {
-    updatedNodes = updatedNodes.concat(this.checkChildren(node, checked));
+    if (!this.multiCheck && checked) {
+      for (var i = 0; i < this.checkedNodes.length; i++) {
+        this.checkedNodes[i].checked = false;
+        this._updateMarkChildrenChecked(this.checkedNodes[i], false, false, true);
+        updatedNodes.push(this.checkedNodes[i]);
+      }
+      this.checkedNodes = [];
+    }
+    node.checked = checked;
+    if (node.checked) {
+      this.checkedNodes.push(node);
+    }
+    updatedNodes.push(node);
+    this._updateMarkChildrenChecked(node, false, checked, true);
+    if (notifyServer) {
+      updatedNodes = updatedNodes.concat(this.checkChildren(node, checked));
+    }
+  }, this);
+
+  if (notifyServer) {
     this._sendNodesChecked(updatedNodes);
   }
   if (this.rendered) {
-    this._renderNodeChecked(node);
+    updatedNodes.forEach(function(node) {
+      this._renderNodeChecked(node);
+    }, this);
   }
   return updatedNodes;
+};
+
+scout.Tree.prototype.uncheckNode = function(node, notifyServer) {
+  this.uncheckNodes([node], notifyServer);
+};
+
+scout.Tree.prototype.uncheckNodes = function(nodes, notifyServer) {
+  this.checkNodes(nodes, false, notifyServer);
 };
 
 scout.Tree.prototype.checkChildren = function(node, checked) {
   var updatedNodes = [];
   if (this.autoCheckChildren && node) {
-    for (var i = 0; i < node.childNodes.length; i++) {
-      updatedNodes = updatedNodes.concat(this.checkNode(node.childNodes[i], checked, true));
-    }
+    updatedNodes = this.checkNodes(node.childNodes, checked, false);
   }
   return updatedNodes;
 };
@@ -1460,7 +1479,7 @@ scout.Tree.prototype.removeFilter = function(filter) {
 scout.Tree.prototype.filter = function() {
   var useAnimation = false,
     changedNodes = [],
-    newHiddenRows = [];
+    newHiddenNodes = [];
 
   // Filter nodes
   this._visitNodes(this.nodes, function(node) {
@@ -1475,7 +1494,7 @@ scout.Tree.prototype.filter = function() {
     if (changed) {
       changedNodes.push(node);
       if (!node.filterAccepted) {
-        newHiddenRows.push(node);
+        newHiddenNodes.push(node);
       }
     }
   }.bind(this));
@@ -1492,7 +1511,7 @@ scout.Tree.prototype.filter = function() {
     }, this);
   }
 
-  this._nodesFiltered(newHiddenRows);
+  this._nodesFiltered(newHiddenNodes);
 };
 
 scout.Tree.prototype._nodesFiltered = function(hiddenNodes) {
@@ -1580,6 +1599,10 @@ scout.Tree.prototype._nodesByIds = function(ids) {
   return ids.map(function(id) {
     return this.nodesMap[id];
   }.bind(this));
+};
+
+scout.Tree.prototype._nodeById = function(id) {
+  return this.nodesMap[id];
 };
 
 scout.Tree.prototype._onNodeDoubleClick = function(event) {
@@ -1755,9 +1778,20 @@ scout.Tree.prototype._onNodeChanged = function(nodeId, cell) {
 };
 
 scout.Tree.prototype._onNodesChecked = function(nodes) {
-  for (var i = 0; i < nodes.length; i++) {
-    this.checkNode(this.nodesMap[nodes[i].id], nodes[i].checked, true);
-  }
+  var checkedNodes = [],
+    uncheckedNodes = [];
+
+  nodes.forEach(function(nodeData) {
+    var node = this._nodeById(nodeData.id);
+    if (nodeData.checked) {
+      checkedNodes.push(node);
+    } else {
+      uncheckedNodes.push(node);
+    }
+  }, this);
+
+  this.checkNodes(checkedNodes, true, false);
+  this.uncheckNodes(uncheckedNodes, false);
 };
 
 scout.Tree.prototype._onChildNodeOrderChanged = function(parentNodeId, childNodeIds) {
