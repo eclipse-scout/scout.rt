@@ -217,6 +217,7 @@
   display: inline-block;
   /* 1px smaller than the taskbar because of the bottom border (see .selected rule below) */
   height: calc(~'100% - 1px');
+  vertical-align: top;
   width: 220px;
   padding: 6px 10px 0 20px;
   cursor: pointer;
