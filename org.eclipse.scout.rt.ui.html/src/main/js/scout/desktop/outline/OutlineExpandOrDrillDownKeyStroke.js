@@ -25,7 +25,9 @@ scout.OutlineExpandOrDrillDownKeyStroke.prototype._accept = function(event) {
 
 scout.OutlineExpandOrDrillDownKeyStroke.prototype._handleInternal = function($currentNode, currentNode) {
   if (!currentNode.expanded && !currentNode.leaf) {
-    this.field.expandNode(currentNode);
+    this.field.expandNode(currentNode, {
+      lazy: false // always show all nodes on node double click
+    });
     return null;
   } else if (currentNode.childNodes.length > 0) {
     return currentNode.childNodes[0];
