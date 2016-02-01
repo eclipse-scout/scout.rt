@@ -62,7 +62,7 @@ public class Desktop extends AbstractDesktop {
       return TEXTS.get("File");
     }
 
-    @Order(1000.0)
+    @Order(1000)
     public class ExitMenu extends AbstractMenu {
 
       @Override
@@ -108,7 +108,7 @@ public class Desktop extends AbstractDesktop {
     }
   }
 
-  @Order(10.0)
+  @Order(1000)
   public class RefreshOutlineKeyStroke extends AbstractKeyStroke {
 
     @Override
@@ -127,7 +127,7 @@ public class Desktop extends AbstractDesktop {
     }
   }
 
-  @Order(1000.0)
+  @Order(1000)
   public class WorkOutlineViewButton extends AbstractOutlineViewButton {
 
     public WorkOutlineViewButton() {
@@ -144,7 +144,7 @@ public class Desktop extends AbstractDesktop {
     }
   }
 
-  @Order(2000.0)
+  @Order(2000)
   public class SearchOutlineViewButton extends AbstractOutlineViewButton {
 
     public SearchOutlineViewButton() {
@@ -166,7 +166,7 @@ public class Desktop extends AbstractDesktop {
     }
   }
 
-  @Order(3000.0)
+  @Order(3000)
   public class SettingsOutlineViewButton extends AbstractOutlineViewButton {
 
     public SettingsOutlineViewButton() {

@@ -57,10 +57,10 @@ public class HelloWorldForm extends AbstractForm {
     return getFieldByClass(MessageField.class);
   }
 
-  @Order(1000.0)
+  @Order(1000)
   public class MainBox extends AbstractGroupBox {
 
-    @Order(1000.0)
+    @Order(1000)
     public class TopBox extends AbstractGroupBox {
 
       @Override
@@ -68,7 +68,7 @@ public class HelloWorldForm extends AbstractForm {
         return TEXTS.get("MessageFromServer");
       }
 
-      @Order(1000.0)
+      @Order(1000)
       public class MessageField extends AbstractStringField {
         @Override
         protected int getConfiguredGridW() {
