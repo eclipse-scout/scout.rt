@@ -1555,8 +1555,19 @@ scout.Table.prototype.nextEditableCellPosForRow = function(startColumnIndex, row
 };
 
 scout.Table.prototype.clearAggregateRows = function(animate) {
+  // Remove "hasAggregateRow" markers from real rows
+  this._aggregateRows.forEach(function(aggregateRow) {
+    if (aggregateRow.prevRow) {
+      aggregateRow.prevRow.hasAggregateRowAfter = false;
+    }
+    if (aggregateRow.nextRow) {
+      aggregateRow.nextRow.hasAggregateRowBefore = false;
+    }
+  }, this);
+
   if (this.rendered) {
     this._removeAggregateRows(animate);
+    this.renderSelection(); // fix selection borders
   }
   this._aggregateRows = [];
 };
@@ -1603,7 +1614,7 @@ scout.Table.prototype._group = function(animate) {
       //finish aggregation
       this._forEachColumn('aggrFinish', states);
       //append sum row
-      this._addAggregateRow(states, row);
+      this._addAggregateRow(states, row, nextRow);
       //reset after group
       this._forEachColumn('aggrStart', states);
     }
@@ -1611,6 +1622,7 @@ scout.Table.prototype._group = function(animate) {
 
   if (this.rendered) {
     this._renderAggregateRows(animate);
+    this.renderSelection(); // fix selection borders
   }
 };
 
@@ -1640,11 +1652,25 @@ scout.Table.prototype._groupedColumns = function() {
   });
 };
 
-scout.Table.prototype._addAggregateRow = function(contents, afterRow) {
+/**
+ * Inserts a new aggregation row between 'prevRow' and 'nextRow'.
+ *
+ * @param contents cells of the new aggregate row
+ * @param prevRow row _before_ the new aggregate row
+ * @param nextRow row _after_ the new aggregate row
+ */
+scout.Table.prototype._addAggregateRow = function(contents, prevRow, nextRow) {
   this._aggregateRows.push({
     contents: contents.slice(),
-    refRow: afterRow
+    prevRow: prevRow,
+    nextRow: nextRow
   });
+  if (prevRow) {
+    prevRow.hasAggregateRowAfter = true;
+  }
+  if (nextRow) {
+    nextRow.hasAggregateRowBefore = true;
+  }
 };
 
 scout.Table.prototype._removeAggregateRows = function(animate) {
@@ -1673,8 +1699,8 @@ scout.Table.prototype._renderAggregateRows = function(animate) {
       // already rendered, no need to update again (necessary for subsequent renderAggregateRows calls (eg. in insertRows -> renderRows)
       return;
     }
-    row = aggregateRow.refRow;
-    if (!row.$row) {
+    row = aggregateRow.prevRow;
+    if (!row || !row.$row) {
       return;
     }
 
@@ -2121,16 +2147,24 @@ scout.Table.prototype._renderSelection = function(rows) {
   };
 
   for (var i = 0; i < rows.length; i++) { // traditional for loop, elements might be added during loop
-    var row = rows[i],
-      thisRowSelected = this.selectedRows.indexOf(row) !== -1,
+    var row = rows[i];
+    if (!row.$row) {
+      continue;
+    }
+
+    var thisRowSelected = this.selectedRows.indexOf(row) !== -1,
       filteredRows = this.filteredRows(),
       previousIndex = filteredRows.indexOf(row) - 1,
       previousRowSelected = previousIndex >= 0 && this.selectedRows.indexOf(filteredRows[previousIndex]) !== -1,
       followingIndex = filteredRows.indexOf(row) + 1,
       followingRowSelected = followingIndex < filteredRows.length && this.selectedRows.indexOf(filteredRows[followingIndex]) !== -1;
 
-    if (!row.$row) {
-      continue;
+    // Don't collapse selection borders if two consecutively selected (real) rows are separated by an aggregation row
+    if (thisRowSelected && previousRowSelected && row.hasAggregateRowBefore) {
+      previousRowSelected = false;
+    }
+    if (thisRowSelected && followingRowSelected && row.hasAggregateRowAfter) {
+      followingRowSelected = false;
     }
 
     // Note: We deliberately use the '+' operator on booleans here! That way, _all_ methods are executed (boolean
@@ -2391,8 +2425,10 @@ scout.Table.prototype._order$AggregateRows = function($rows) {
   $rows.each(function(i, elem) {
     var $aggrRow = $(elem),
       aggregateRow = $aggrRow.data('aggregateRow');
-
-    $aggrRow.insertAfter(aggregateRow.refRow.$row);
+    if (!aggregateRow || !aggregateRow.prevRow) {
+      return;
+    }
+    $aggrRow.insertAfter(aggregateRow.prevRow.$row);
   });
 };
 
