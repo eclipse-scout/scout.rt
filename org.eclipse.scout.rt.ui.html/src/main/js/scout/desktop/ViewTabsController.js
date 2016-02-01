@@ -23,7 +23,7 @@ scout.ViewTabsController = function(desktop) {
  */
 scout.ViewTabsController.prototype.createAndRenderViewTab = function(view, position) {
   var viewId = view.id;
-  //Tab is already existing.
+  // Tab is already existing.
   var viewTab = this._viewTabMap[viewId],
     newViewTab = !viewTab;
   if (newViewTab) {
@@ -61,7 +61,7 @@ scout.ViewTabsController.prototype.createAndRenderViewTab = function(view, posit
     viewTab.render(this._desktop._$viewTabBar);
   }
 
-  //when rendering desktop also add all child tabs.
+  // when rendering desktop also add all child tabs
   if (view.session.desktop.initialFormRendering && newViewTab) {
     view.formController.render();
   }

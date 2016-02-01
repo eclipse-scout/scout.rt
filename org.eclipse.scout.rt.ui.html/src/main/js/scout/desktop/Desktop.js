@@ -193,7 +193,7 @@ scout.Desktop.prototype._installKeyStrokeContextForDesktopTaskBar = function() {
 };
 
 scout.Desktop.prototype._postRender = function() {
-  //keystroke is not handled by default keystrokecontext.
+  // keystroke is not handled by default keystrokecontext.
   this.session.keyStrokeManager.uninstallKeyStrokeContext(this.keyStrokeContext);
 
   // Render attached forms, message boxes and file choosers.
@@ -211,12 +211,12 @@ scout.Desktop.prototype._postRender = function() {
       return true;
     });
 
-  //find active form and set selected.
+  // find active form and set selected.
   var selectable;
   if (this.activeForm) {
     var form = this.session.getModelAdapter(this.activeForm);
     if (form.isDialog()) {
-      //find ui selectable part
+      // find ui selectable part
       selectable = this._findActiveSelectablePart(form);
     } else if (form.isView()) {
       selectable = form;
@@ -228,10 +228,11 @@ scout.Desktop.prototype._postRender = function() {
     this.viewTabsController.selectViewTab(this.viewTabsController.viewTab(selectable));
   }
   this.initialFormRendering = false;
+  this._layoutTaskBar();
 };
 
 scout.Desktop.prototype._renderActiveForm = function($parent) {
-  //nop -> is handled in _setFormActivated when ui changes active form or if model changes form in _onModelFormShow/_onModelFormActivate
+  // NOP -> is handled in _setFormActivated when ui changes active form or if model changes form in _onModelFormShow/_onModelFormActivate
 };
 
 scout.Desktop.prototype._renderToolMenus = function() {

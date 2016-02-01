@@ -25,7 +25,7 @@ scout.DesktopTabBarLayout.prototype._toolsWidth = function($tools, cssClasses) {
     $items = $clone.find('.taskbar-tool-item');
 
   $items
-    .removeClass('min-padding')
+    .removeClass('compact')
     .removeClass('icon-only');
 
   if (cssClasses) {
@@ -63,7 +63,7 @@ scout.DesktopTabBarLayout.prototype.layout = function($container) {
 
   $tools.find('.taskbar-tool-item').each(function() {
     var $item = $(this);
-    $item.removeClass('min-padding');
+    $item.removeClass('compact');
     var dataText = $item.data('item-text');
     if (dataText) {
       var $title = $item.find('.text');
@@ -88,7 +88,7 @@ scout.DesktopTabBarLayout.prototype.layout = function($container) {
     // 1st try to minimize padding around tool-bar items
     // re-calculate tabsWidth with reduced padding on the tool-bar-items
     $tools.find('.taskbar-tool-item').each(function() {
-      $(this).addClass('min-padding');
+      $(this).addClass('compact');
     });
 
     toolsWidth = scout.graphics.getSize($tools, true).width;
@@ -134,8 +134,7 @@ scout.DesktopTabBarLayout.prototype.layout = function($container) {
     // FIXME awe: display correct range of tabs (around visible tab)
     // FIXME awe: tabs have no 'selected' state, this must be added together with activeForm on model Desktop
     // Never put selected tab into overflow
-    var i = 0,
-      selectedIndex;
+    var i = 0, selectedIndex = 0;
     $tabs.find('.desktop-view-tab').each(function() {
       if ($(this).hasClass('selected')) {
         selectedIndex = i;
