@@ -60,4 +60,53 @@ public class HtmlHelperTest {
     // Tables
     assertEquals("one two\nthree four", helper.toPlainText("<table><tr><td>one</td><td>two</td></tr><tr><td>three</td><td>four</td></tr></table>"));
   }
+
+  @Test
+  public void testEscape() {
+    HtmlHelper helper = BEANS.get(HtmlHelper.class);
+
+    assertEquals(null, helper.escape(null));
+    assertEquals("", helper.escape(""));
+    assertEquals(" ", helper.escape(" "));
+    assertEquals("hello", helper.escape("hello"));
+
+    assertEquals("one &amp; two", helper.escape("one & two"));
+    assertEquals("one &lt; two", helper.escape("one < two"));
+    assertEquals("&gt;&lt;script&gt;alert(&#39;hacker attack&#39;);&lt;/script&gt;&lt;", helper.escape("><script>alert('hacker attack');</script><"));
+    assertEquals("one&amp;nbsp;&amp;nbsp; two", helper.escape("one&nbsp;&nbsp; two"));
+    assertEquals("this is &quot;good&quot;", helper.escape("this is \"good\""));
+    assertEquals("http://www.example.com/~myapp/script?q=search%20query&amp;time=now&amp;x=17263.23", helper.escape("http://www.example.com/~myapp/script?q=search%20query&time=now&x=17263.23"));
+    assertEquals("&lt;div&gt;&lt;span style=&quot;color: red; content: &#39;\\u39&#39;;&quot;&gt;Alert!&lt;/span&gt;&lt;br/&gt;Line2&lt;/div&gt;",
+        helper.escape("<div><span style=\"color: red; content: '\\u39';\">Alert!</span><br/>Line2</div>"));
+    assertEquals("hell&amp;ouml;", helper.escape("hell&ouml;"));
+
+    // Things that should NOT be escaped
+    assertEquals("one\ntwo  end", helper.escape("one\ntwo  end"));
+    assertEquals("key:\tvalue\r\nline2", helper.escape("key:\tvalue\r\nline2"));
+  }
+
+  @Test
+  public void testUnescape() {
+    HtmlHelper helper = BEANS.get(HtmlHelper.class);
+
+    assertEquals(null, helper.unescape(null));
+    assertEquals("", helper.unescape(""));
+    assertEquals(" ", helper.unescape(" "));
+    assertEquals("hello", helper.unescape("hello"));
+
+    assertEquals("one & two", helper.unescape("one &amp; two"));
+    assertEquals("one < two", helper.unescape("one &lt; two"));
+    assertEquals("><script>alert('hacker attack');</script><", helper.unescape("&gt;&lt;script&gt;alert(&#39;hacker attack&#39;);&lt;/script&gt;&lt;"));
+    assertEquals("one&nbsp;&nbsp; two", helper.unescape("one&amp;nbsp;&amp;nbsp; two"));
+    assertEquals("this is \"good\"", helper.unescape("this is &quot;good&quot;"));
+    assertEquals("http://www.example.com/~myapp/script?q=search%20query&time=now&x=17263.23", helper.unescape("http://www.example.com/~myapp/script?q=search%20query&amp;time=now&amp;x=17263.23"));
+    assertEquals("<div><span style=\"color: red; content: '\\u39';\">Alert!</span><br/>Line2</div>",
+        helper.unescape("&lt;div&gt;&lt;span style=&quot;color: red; content: &#39;\\u39&#39;;&quot;&gt;Alert!&lt;/span&gt;&lt;br/&gt;Line2&lt;/div&gt;"));
+    assertEquals("hell&ouml;", helper.unescape("hell&amp;ouml;"));
+
+    // Things that should NOT be unescaped
+    assertEquals("one\ntwo  end", helper.unescape("one\ntwo  end"));
+    assertEquals("key:\tvalue\r\nline2", helper.unescape("key:\tvalue\r\nline2"));
+    assertEquals("hell&ouml;", helper.unescape("hell&ouml;"));
+  }
 }

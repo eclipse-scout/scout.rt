@@ -71,4 +71,50 @@ public class HtmlHelper {
     s = s.trim();
     return s;
   }
+
+  /**
+   * Escapes the given string for use in HTML code. Useful when inserting data from an untrusted source directly inside
+   * HTML. Unlike {@link StringUtility#htmlEncode(String)}, this method does not alter whitespace.
+   * <p>
+   * According to <a href=
+   * "https://www.owasp.org/index.php/XSS_%28Cross_Site_Scripting%29_Prevention_Cheat_Sheet#RULE_.231_-_HTML_Escape_Before_Inserting_Untrusted_Data_into_HTML_Element_Content">
+   * OWASP recommendations</a>, the following characters are replaced:
+   * <ul>
+   * <li><code>&amp;</code> --> <code>&amp;amp;</code>
+   * <li><code>&lt;</code> --> <code>&amp;lt;</code>
+   * <li><code>&gt;</code> --> <code>&amp;gt;</code>
+   * <li><code>&quot;</code> --> <code>&amp;quot;</code>
+   * <li><code>&#39;</code> --> <code>&amp;#39;</code>
+   * </ul>
+   */
+  public String escape(String text) {
+    if (text == null || text.length() == 0) {
+      return text;
+    }
+    //
+    String encoded = text
+        .replace("&", "&amp;")
+        .replace("<", "&lt;")
+        .replace(">", "&gt;")
+        .replace("\"", "&quot;")
+        .replace("'", "&#39;");
+    return encoded;
+  }
+
+  /**
+   * Reverse operation of {@link #escape(String)}. Unlike {@link StringUtility#htmlDecode(String)}, this method does not
+   * alter whitespace.
+   */
+  public String unescape(String html) {
+    if (html == null || html.length() == 0) {
+      return html;
+    }
+    String decoded = html
+        .replace("&amp;", "&")
+        .replace("&lt;", "<")
+        .replace("&gt;", ">")
+        .replace("&quot;", "\"")
+        .replace("&#39;", "'");
+    return decoded;
+  }
 }
