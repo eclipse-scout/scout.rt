@@ -1,0 +1,9 @@
+.popup-blocked-title {
+  margin-right: 15px; /* leave space for close icon */
+}
+
+.popup-blocked-link {
+  display: block;
+  margin-top: 10px;
+  outline: none;
+}

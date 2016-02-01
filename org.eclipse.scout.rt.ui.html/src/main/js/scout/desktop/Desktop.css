@@ -439,13 +439,3 @@
   visibility: hidden;
   /* Do _not_ use 'display: none', because that seems to interrupt the download in Safari */
 }
-
-.popup-blocked-title {
-  margin-right: 15px; /* leave space for close icon */
-}
-
-a.popup-blocked-link {
-  display: block;
-  margin-top: 10px;
-  outline: none;
-}

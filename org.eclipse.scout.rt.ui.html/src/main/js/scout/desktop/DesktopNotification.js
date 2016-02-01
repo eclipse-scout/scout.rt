@@ -61,13 +61,12 @@ scout.DesktopNotification.prototype._renderCloseable = function() {
   if (this.closeable) {
     this.$content
       .appendDiv('close')
-      .on('click', this._onClickCloseIcon.bind(this));
+      .on('click', this._onCloseIconClick.bind(this));
   }
 };
 
-scout.DesktopNotification.prototype._onClickCloseIcon = function() {
-  clearTimeout(this._removeTimeout);
-  this.desktop.removeNotification(this);
+scout.DesktopNotification.prototype._onCloseIconClick = function() {
+  this.hide();
 };
 
 scout.DesktopNotification.prototype.show = function() {
@@ -76,6 +75,11 @@ scout.DesktopNotification.prototype.show = function() {
   if (this.duration > 0) {
     this._removeTimeout = setTimeout(desktop.removeNotification.bind(desktop, this), this.duration);
   }
+};
+
+scout.DesktopNotification.prototype.hide = function() {
+  clearTimeout(this._removeTimeout);
+  this.desktop.removeNotification(this);
 };
 
 scout.DesktopNotification.prototype.fadeIn = function($parent) {
