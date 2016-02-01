@@ -59,8 +59,8 @@ public class JobExceptionTranslator {
   /**
    * Translates {@link ExecutionException} into exception according to {@link IExceptionTranslator}.
    */
-  protected <EXCEPTION extends Throwable> EXCEPTION translateExecutionException(final ExecutionException e, final Class<? extends IExceptionTranslator<EXCEPTION>> translator, final boolean throwOnError) {
-    return decorate(BEANS.get(translator).translate(e, throwOnError)); // Do not unwrap ExecutionException here because to be done by translator, so that the submitter can also work with ExecutionException, e.g. by using NullExceptionTranslator.
+  protected <EXCEPTION extends Throwable> EXCEPTION translateExecutionException(final ExecutionException e, final Class<? extends IExceptionTranslator<EXCEPTION>> translator) {
+    return decorate(BEANS.get(translator).translate(e)); // Do not unwrap ExecutionException here because to be done by translator, so that the submitter can also work with ExecutionException, e.g. by using NullExceptionTranslator.
   }
 
   /**

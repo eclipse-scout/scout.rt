@@ -36,13 +36,8 @@ public class ServletExceptionTranslator implements IExceptionTranslator<ServletE
 
   @Override
   public ServletException translate(final Throwable throwable) {
-    return translate(throwable, true);
-  }
-
-  @Override
-  public ServletException translate(final Throwable throwable, final boolean throwOnError) {
     final Throwable eUnwrapped = BEANS.get(DefaultExceptionTranslator.class).unwrap(throwable);
-    final ServletException eTranslated = translateInternal(eUnwrapped, throwOnError);
+    final ServletException eTranslated = translateInternal(eUnwrapped);
     final ServletException eDecorated = BEANS.get(DefaultExceptionTranslator.class).decorate(eTranslated);
 
     return eDecorated;
@@ -51,8 +46,8 @@ public class ServletExceptionTranslator implements IExceptionTranslator<ServletE
   /**
    * Method invoked to translate the given {@link Throwable}.
    */
-  protected ServletException translateInternal(final Throwable t, final boolean throwOnError) {
-    if (t instanceof Error && throwOnError) {
+  protected ServletException translateInternal(final Throwable t) {
+    if (t instanceof Error) {
       throw (Error) t;
     }
     else if (t instanceof ServletException) {
