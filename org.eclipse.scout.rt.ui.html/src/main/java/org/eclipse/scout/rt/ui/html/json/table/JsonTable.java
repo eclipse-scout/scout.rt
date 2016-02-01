@@ -939,7 +939,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
    * Returns a tableRow for the given rowId.
    *
    * @throws UiException
-   *           when no rowiss found for the given rowId
+   *           when no row is found for the given rowId
    */
   protected ITableRow getTableRow(String rowId) {
     ITableRow row = optTableRow(rowId);
