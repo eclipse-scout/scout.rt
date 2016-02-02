@@ -1138,7 +1138,10 @@ scout.Planner.prototype.selectRange = function(range, notifyServer) {
 scout.Planner.prototype.selectResources = function(resources, notifyServer) {
   var oldSelection = this.selectedResources;
   notifyServer = notifyServer !== undefined ? notifyServer : true;
-  this.selectedResources = resources;
+  resources = scout.arrays.ensure(resources);
+
+  // Make a copy so that original array stays untouched
+  this.selectedResources = resources.slice();
   if (notifyServer) {
     this._sendSetSelection();
   }

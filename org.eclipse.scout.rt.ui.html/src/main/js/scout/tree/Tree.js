@@ -912,7 +912,8 @@ scout.Tree.prototype.selectNodes = function(nodes, notifyServer, debounceSend) {
     this._removeSelection();
   }
 
-  this.selectedNodes = nodes;
+  // Make a copy so that original array stays untouched
+  this.selectedNodes = nodes.slice();
   if (notifyServer) {
     var eventData = {
       nodeIds: this._nodesToIds(nodes)

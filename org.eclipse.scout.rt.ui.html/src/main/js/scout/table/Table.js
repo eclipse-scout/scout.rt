@@ -2272,6 +2272,8 @@ scout.Table.prototype.removeRowFromSelection = function(row, ongoingSelection) {
 scout.Table.prototype.selectRows = function(rows, notifyServer, debounceSend) {
   rows = scout.arrays.ensure(rows);
   var selectedEqualRows = scout.arrays.equalsIgnoreOrder(rows, this.selectedRows);
+  // TODO CGU maybe make sure selectedRows are in correct order, this would make logic in AbstractTableNavigationKeyStroke or renderSelection easier
+  // but requires some effort (remember rowIndex, keep array in order after sort, ... see java Table)
   if (selectedEqualRows) {
     return;
   }
@@ -2284,7 +2286,8 @@ scout.Table.prototype.selectRows = function(rows, notifyServer, debounceSend) {
     rows = [rows[0]];
   }
 
-  this.selectedRows = rows;
+  // Make a copy so that original array stays untouched
+  this.selectedRows = rows.slice();
   notifyServer = scout.nvl(notifyServer, true);
   if (notifyServer) {
     this._sendRowsSelected(this._rowsToIds(rows), debounceSend);
