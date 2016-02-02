@@ -945,6 +945,12 @@ scout.Session.prototype.onModelAction = function(event) {
 };
 
 scout.Session.prototype._onReloadPage = function(event) {
+  // If server already created a client session, store it in sessionStorage to send the
+  // same ID again on page reload (most useful when theme changes during initial request).
+  if (event.clientSessionId) {
+    sessionStorage.setItem('scout:clientSessionId', event.clientSessionId);
+  }
+
   // Don't clear the body, because other events might be processed before the reload and
   // it could cause errors when all DOM elements are already removed.
   scout.reloadPage({

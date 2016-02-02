@@ -421,12 +421,13 @@ public class UiSession implements IUiSession {
   }
 
   protected void sendReloadPageEvent() {
-    m_currentJsonResponse.addActionEvent(getUiSessionId(), EVENT_RELOAD_PAGE, new JSONObject());
+    final JSONObject jsonEvent = new JSONObject();
+    jsonEvent.put("clientSessionId", m_clientSession.getId()); // Send back clientSessionId to allow the browser to attach to the same client session on page reload
+    m_currentJsonResponse.addActionEvent(getUiSessionId(), EVENT_RELOAD_PAGE, jsonEvent);
   }
 
   protected void sendInitializationEvent(final String clientSessionAdapterId) {
     final IFuture<Locale> future = ModelJobs.schedule(new Callable<Locale>() {
-
       @Override
       public Locale call() throws Exception {
         return m_clientSession.getLocale();
@@ -440,7 +441,6 @@ public class UiSession implements IUiSession {
     jsonEvent.put("clientSessionId", m_clientSession.getId()); // Send back clientSessionId to allow the browser to attach to the same client session on page reload
     jsonEvent.put("clientSession", clientSessionAdapterId);
     putLocaleData(jsonEvent, BEANS.get(UiJobs.class).awaitAndGet(future));
-
     m_currentJsonResponse.addActionEvent(m_uiSessionId, EVENT_INITIALIZED, jsonEvent);
   }
 
