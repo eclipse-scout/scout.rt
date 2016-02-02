@@ -2036,6 +2036,7 @@ scout.Table.prototype.updateRows = function(rows) {
     if (this.selectionHandler.lastActionRow === oldRow) {
       this.selectionHandler.lastActionRow = updatedRow;
     }
+    //TODO CGU remove this replace functions, they are slow due to indexOf. Either create maps (rowId/rowIndex) before the loop or even store rowIndex for each row
     scout.arrays.replace(this.rows, oldRow, updatedRow);
     scout.arrays.replace(this.selectedRows, oldRow, updatedRow);
 
@@ -2048,8 +2049,8 @@ scout.Table.prototype.updateRows = function(rows) {
           newHiddenRows.push(updatedRow);
         }
       } else {
-        // If filter state has not changed, just update cached rows
-        scout.arrays.replace(this._filteredRows, oldRow, updatedRow);
+        // If filter state has not changed, just make sure filteredRows will be recalculated the next time its used
+        this._filteredRowsDirty = true;
       }
     }
 
@@ -3418,13 +3419,7 @@ scout.Table.prototype._onRowOrderChanged = function(rowIds) {
   }
 
   // update model
-  rows = scout.arrays.init(this.rows.length, 0);
-  for (var i = 0; i < this.rows.length; i++) {
-    row = this.rows[i];
-    newPos = rowIds.indexOf(this.rows[i].id);
-    rows[newPos] = row;
-  }
-  this.rows = rows;
+  this.rows = this._rowsByIds(rowIds);
   this._filteredRowsDirty = true; // order has been changed
 
   this.clearAggregateRows(this._animateAggregateRows);
