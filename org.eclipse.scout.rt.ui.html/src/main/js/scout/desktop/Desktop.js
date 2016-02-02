@@ -291,6 +291,15 @@ scout.Desktop.prototype._renderTaskBar = function($parent) {
   this._$toolBar = this._$taskBar.appendDiv('taskbar-tools');
   if (this.session.uiUseTaskbarLogo) {
     this._$taskBarLogo = this._$taskBar.appendDiv('taskbar-logo');
+
+    // in memory of the first one...
+    this._$taskBarLogo.dblclick(function(event) {
+      if (event.altKey && event.ctrlKey) {
+        $(event.target).css('background', 'none');
+        $(event.target).css('font-size','9px');
+        $(event.target).text('make software not war');
+      }
+    });
   }
   this._installKeyStrokeContextForDesktopTaskBar();
 };
