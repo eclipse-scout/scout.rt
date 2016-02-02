@@ -151,12 +151,24 @@
     margin-right: @table-control-padding - 1px; /* because left padding includes the ::before border */
   }
 
+  &.disabled {
+    cursor: default;
+
+    & > .table-info-button {
+      text-decoration: none;
+    }
+  }
+
   & > .table-info-button {
     text-decoration: underline;
 
     & > .key-box {
       bottom: 2px;
     }
+  }
+
+  &:hover > .table-info-button {
+    color: @hover-color;
   }
 
   &:hover > .table-info-button {

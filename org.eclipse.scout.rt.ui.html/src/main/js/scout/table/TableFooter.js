@@ -204,13 +204,16 @@ scout.TableFooter.prototype._renderInfoLoad = function() {
   $info.empty();
   if (!this._compactStyle) {
     $info.appendSpan().text(this.session.text('ui.NumRowsLoaded', this.computeCountInfo(numRows)));
-    $info.appendBr();
-    $info.appendSpan('table-info-button').text(this.session.text('ui.ReloadData')).appendTo($info);
+    if (this.table.hasReloadHandler) {
+      $info.appendBr();
+      $info.appendSpan('table-info-button').text(this.session.text('ui.ReloadData')).appendTo($info);
+    }
   } else {
     $info.appendSpan().text(this.session.text('ui.NumRowsLoadedMin'));
     $info.appendBr();
     $info.appendSpan('table-info-button').text(this.computeCountInfo(numRows));
   }
+  $info.setEnabled(this.table.hasReloadHandler);
 
   if (!this.htmlComp.layouting) {
     this.invalidateLayoutTree(false);
@@ -539,6 +542,9 @@ scout.TableFooter.prototype._onFilterInputDebounce = function(event) {
 };
 
 scout.TableFooter.prototype._onInfoLoadClick = function() {
+  if (!this._$infoLoad.isEnabled()) {
+    return;
+  }
   if (this._compactStyle) {
     this._toggleTableInfoTooltip(this._$infoLoad, 'TableInfoLoadTooltip');
   } else {

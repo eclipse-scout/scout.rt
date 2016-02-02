@@ -239,9 +239,6 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
         m_managedTableListener = new P_ManagedTableListener();
         m_table.addTableListener(m_managedTableListener);
       }
-      if (m_table.getReloadHandler() == null) {
-        m_table.setReloadHandler(new TableFieldReloadHandler(this));
-      }
       if (isInitialized()) {
         for (int i = m_valueChangeTriggerEnabled; i <= 0; ++i) {
           m_table.setValueChangeTriggerEnabled(false);
