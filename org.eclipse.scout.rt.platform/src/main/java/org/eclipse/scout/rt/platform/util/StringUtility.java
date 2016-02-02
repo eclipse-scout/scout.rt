@@ -473,7 +473,7 @@ public final class StringUtility {
   }
 
   public static String replaceTags(String text, String tagName, boolean ignoreCase, final String replacement) {
-    return replaceTags(text, tagName, new ITagProcessor() {
+    return replaceTags(text, tagName, ignoreCase, new ITagProcessor() {
       @Override
       public String processTag(String name, String tagContent) {
         return replacement;

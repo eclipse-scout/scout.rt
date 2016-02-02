@@ -410,6 +410,9 @@ public class StringUtilityTest {
     input = "<meta name=\"timestamp\" content=\"01.01.2013\"/>\n"
         + "<meta name=\"date.modified\" content=\"20130314\"/>";
     assertEquals("", StringUtility.replaceTags(input, "meta", "").trim());
+
+    // ingore case test
+    assertEquals("xbybz", StringUtility.replaceTags("x<A>asdf</A>y<a>jkl</a>z", "a", true, "b"));
   }
 
   /**
