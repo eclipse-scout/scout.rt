@@ -13,6 +13,7 @@ scout.LayoutValidator = function() {
 };
 
 // FIXME cgu: maybe it is necessary to sort the list so that the top most root is layouted first.
+
 // Testcase: Field in scrollable groupbox gets invisible and also a field outside the groupbox.
 // If scrollable is layouted first it may be relayouted again when the form gets layouted
 scout.LayoutValidator.prototype.invalidateTree = function(htmlComp) {
@@ -51,7 +52,15 @@ scout.LayoutValidator.prototype.validate = function() {
   this._invalidComponents.forEach(function(comp) {
     if (comp.isAttached()) { // don't layout components which don't exist anymore or are detached from the DOM
       comp.validateLayout();
+      scout.arrays.remove(this._invalidComponents, comp);
     }
   });
-  this._invalidComponents = [];
+};
+
+scout.LayoutValidator.prototype.cleanupInvalidObjects = function($parentContainer){
+  this._invalidComponents.forEach(function(comp){
+    if(comp.$comp.closest($parentContainer).length>0){
+      scout.arrays.remove(this._invalidComponents, comp);
+    }
+  }.bind(this));
 };
