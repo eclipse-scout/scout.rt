@@ -1202,7 +1202,7 @@ scout.Tree.prototype.checkNodes = function(nodes, options) {
   };
   $.extend(opts, options);
   var updatedNodes = [];
-  if (!this.enabled || !this.checkable) {
+  if (!this.enabled || (!this.checkable && opts.checkOnlyEnabled)) {
     return updatedNodes;
   }
   nodes = scout.arrays.ensure(nodes);

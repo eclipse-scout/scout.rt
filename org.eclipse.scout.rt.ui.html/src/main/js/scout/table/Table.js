@@ -1832,7 +1832,7 @@ scout.Table.prototype.checkRows = function(rows, options) {
   };
   $.extend(opts, options);
   var updatedRows = [];
-  if (!this.checkable || !this.enabled) {
+  if (!this.checkable || (!this.enabled && opts.checkOnlyEnabled)) {
     return;
   }
   rows = scout.arrays.ensure(rows);
