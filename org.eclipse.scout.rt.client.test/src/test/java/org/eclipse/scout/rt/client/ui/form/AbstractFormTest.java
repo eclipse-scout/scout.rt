@@ -33,6 +33,7 @@ import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -166,8 +167,21 @@ public class AbstractFormTest {
 
   class TestForm extends AbstractForm {
 
+    private boolean m_closeInInit;
+
     public TestForm() {
-      super();
+      this(false);
+    }
+
+    public TestForm(boolean closeInInit) {
+      m_closeInInit = closeInInit;
+    }
+
+    @Override
+    protected void execInitForm() {
+      if (m_closeInInit) {
+        doClose();
+      }
     }
 
     public MainBox getMainBox() {
@@ -270,6 +284,21 @@ public class AbstractFormTest {
     form.setSubTitle("bar");
     assertEquals("bar", form.getSubTitle());
     assertTrue(called[0]);
+  }
+
+  @Test
+  public void testCloseInInitForm() throws Exception {
+    // call doClose in execInitForm
+    AbstractForm form = new TestForm(true);
+    form.start();
+    assertFalse(form.isFormStarted());
+    assertFalse(form.isBlockingInternal());
+
+    // regular form start
+    form = new TestForm(false);
+    form.start();
+    assertTrue(form.isFormStarted());
+    assertTrue(form.isBlockingInternal());
   }
 
 }

@@ -161,6 +161,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   private boolean m_closeTimerArmed;
   private boolean m_formStored;
   private boolean m_formLoading;
+  private boolean m_formStarted;
   private final IBlockingCondition m_blockingCondition;
   private boolean m_showOnStart;
   private int m_displayHint;// no property, is fixed
@@ -907,7 +908,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
           }
           loadStateInternal();
           // check if form was made invisible ( = access control denied access)
-          if (!isFormStarted()) {
+          if (!isBlockingInternal()) {
             disposeFormInternal();
             return;
           }
@@ -938,6 +939,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
 
         setButtonsArmed(true);
         setCloseTimerArmed(true);
+        m_formStarted = true;
 
         // Notify the UI to display this form.
         if (isShowOnStart()) {
@@ -1580,22 +1582,22 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
    */
   protected void loadStateInternal() {
     fireFormLoadBefore();
-    if (!isFormStarted()) {
+    if (!isBlockingInternal()) {
       return;
     }
     getHandler().onLoad();
-    if (!isFormStarted()) {
+    if (!isBlockingInternal()) {
       return;
     }
     fireFormLoadAfter();
-    if (!isFormStarted()) {
+    if (!isBlockingInternal()) {
       return;
     }
     // set all values to 'unchanged'
     markSaved();
     setFormLoading(false);
     getHandler().onPostLoad();
-    if (!isFormStarted()) {
+    if (!isBlockingInternal()) {
       return;
     }
     // if not visible mode, mark form changed
@@ -1798,7 +1800,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
 
   @Override
   public void doClose() {
-    if (!isFormStarted()) {
+    if (!isBlockingInternal()) {
       return;
     }
     try {
@@ -1815,7 +1817,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
 
   @Override
   public void doCancel() {
-    if (!isFormStarted()) {
+    if (!isBlockingInternal()) {
       return;
     }
     m_closeType = IButton.SYSTEM_TYPE_CANCEL;
@@ -1903,7 +1905,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
    */
   @Override
   public void doOk() {
-    if (!isFormStarted()) {
+    if (!isBlockingInternal()) {
       return;
     }
     try {
@@ -1926,7 +1928,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
 
   @Override
   public void doSaveWithoutMarkerChange() {
-    if (!isFormStarted()) {
+    if (!isBlockingInternal()) {
       return;
     }
     try {
@@ -1946,7 +1948,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
 
   @Override
   public void doSave() {
-    if (!isFormStarted()) {
+    if (!isBlockingInternal()) {
       return;
     }
     try {
@@ -2057,7 +2059,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   }
 
   private void closeFormInternal(boolean kill) {
-    if (isFormStarted()) {
+    if (isBlockingInternal()) {
       try {
         // check if there is an active close, cancel or finish button
         final Set<Integer> enabledSystemTypes = new HashSet<Integer>();
@@ -2119,13 +2121,14 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
    * do not use or override this internal method
    */
   protected void disposeFormInternal() {
-    if (!isFormStarted()) {
+    if (!isBlockingInternal()) {
       return;
     }
 
     try {
       setButtonsArmed(false);
       setCloseTimerArmed(false);
+      m_formStarted = false;
 
       // Cancel and remove timers
       Iterator<IFuture<Void>> iterator = m_timerFutureMap.values().iterator();
@@ -2166,17 +2169,21 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
 
   @Override
   public boolean isFormClosed() {
-    return !isFormStarted();
+    return !isBlockingInternal();
   }
 
   @SuppressWarnings("deprecation")
   @Override
   public boolean isFormOpen() {
-    return isFormStarted();
+    return isBlockingInternal();
   }
 
   @Override
   public boolean isFormStarted() {
+    return m_formStarted;
+  }
+
+  protected boolean isBlockingInternal() {
     return m_blockingCondition.isBlocking();
   }
 
