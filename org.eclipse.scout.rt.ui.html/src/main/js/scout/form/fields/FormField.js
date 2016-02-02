@@ -441,7 +441,7 @@ scout.FormField.prototype._showStatusMessage = function() {
     }
   }
 
-  if (!scout.strings.hasText(text)) {
+  if (scout.strings.empty(text)) {
     // Refuse to show empty tooltip
     return;
   }
@@ -744,7 +744,7 @@ scout.FormField.prototype._removeDisabledCopyOverlay = function() {
 };
 
 scout.FormField.prototype._createCopyContextMenu = function(event) {
-  if (!this.visible || !scout.strings.hasText(this.displayText)) {
+  if (!this.visible || scout.strings.empty(this.displayText)) {
     return;
   }
 

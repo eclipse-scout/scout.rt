@@ -454,7 +454,7 @@ scout.TableFooter.prototype._showTableStatusTooltip = function() {
 
   var tableStatus = this.table.tableStatus;
   var text = (tableStatus ? tableStatus.message : null);
-  if (!scout.strings.hasText(text)) {
+  if (scout.strings.empty(text)) {
     return; // Refuse to show empty tooltip
   }
 

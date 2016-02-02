@@ -30,9 +30,13 @@ class ContentAssistFieldUIFacade<LOOKUP_KEY> implements IContentAssistFieldUIFac
     return StringUtility.isNullOrEmpty(text) ? m_field.getWildcard() : text;
   }
 
+  private boolean ignoreUiEvent() {
+    return !m_field.isVisible() || !m_field.isEnabled();
+  }
+
   @Override
   public void proposalTypedFromUI(String text) {
-    if (!m_field.isVisible() || !m_field.isEnabled()) {
+    if (ignoreUiEvent()) {
       return;
     }
     LOG.debug("proposalTypedFromUI text={}", text);
@@ -45,7 +49,7 @@ class ContentAssistFieldUIFacade<LOOKUP_KEY> implements IContentAssistFieldUIFac
 
   @Override
   public void openProposalChooserFromUI(String text, boolean selectCurrentValue) {
-    if (!m_field.isVisible() || !m_field.isEnabled()) {
+    if (ignoreUiEvent()) {
       return;
     }
     LOG.debug("openProposalChooserFromUI text={} selectCurrentValue={}", text, selectCurrentValue);
@@ -66,8 +70,18 @@ class ContentAssistFieldUIFacade<LOOKUP_KEY> implements IContentAssistFieldUIFac
   }
 
   @Override
+  public void deleteProposalFromUI() {
+    if (ignoreUiEvent()) {
+      return;
+    }
+    LOG.debug("deleteProposalFromUI");
+    m_field.setValue(null);
+    m_field.unregisterProposalChooserInternal();
+  }
+
+  @Override
   public void acceptProposalFromUI(String text, boolean chooser, boolean forceClose) {
-    if (!m_field.isVisible() || !m_field.isEnabled()) {
+    if (ignoreUiEvent()) {
       return;
     }
     LOG.debug("acceptProposalFromUI text={} chooser={} forceClose={}", text, chooser, forceClose);

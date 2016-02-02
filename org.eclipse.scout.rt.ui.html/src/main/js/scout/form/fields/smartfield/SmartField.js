@@ -349,16 +349,27 @@ scout.SmartField.prototype._acceptProposal = function(forceClose) {
 
   $.log.debug('(SmartField#_acceptProposal) searchText=' + searchText + ' proposalChooserOpen=' + proposalChooserOpen + ' forceClose=' + forceClose);
   if (proposalChooserOpen) {
-    // Always send accept proposal, when proposal chooser is opened
+    // Always send accept proposal, when proposal chooser is opened,
     // Because user wants to choose the selected proposal from the
     // proposal chooser by pressing TAB or ENTER.
     // The Java client will use the selected row as value when it
     // receives the acceptProposal event in that case.
-    this._sendAcceptProposal(searchText, true, forceClose);
+    //
+    // We must also handle the case that the user deletes the search
+    // text immediately followed by a TAB key press. In that case the
+    // UI Server has not enough information to find out what happened
+    // and would accept a proposal, since on the model there's still
+    // a selected proposal (ticket #168652).
+    var textDeleted = scout.strings.empty(searchText) && scout.strings.hasText(this._oldSearchText);
+    if (textDeleted) {
+      this._sendDeleteProposal(searchText);
+    } else {
+      this._sendAcceptProposal(searchText, true, forceClose);
+    }
   } else {
     // When proposal chooser is closed, only send accept proposal
     // when search text has changed. Prevents unnecessary requests
-    // to the server when the user tabs over the smartfield.
+    // to the server when the user tabs over the smart-field.
     if (searchText === this._oldSearchText) {
       return;
     }
@@ -381,9 +392,18 @@ scout.SmartField.prototype._readSearchText = function() {
   return this._readDisplayText();
 };
 
-scout.SmartField.prototype._sendAcceptProposal = function(searchText, chooser, forceClose) {
+scout.SmartField.prototype._updateSeachText = function(searchText) {
   this.displayText = searchText;
   this._oldSearchText = searchText;
+};
+
+scout.SmartField.prototype._sendDeleteProposal = function(searchText) {
+  this._updateSeachText(searchText);
+  this._send('deleteProposal');
+};
+
+scout.SmartField.prototype._sendAcceptProposal = function(searchText, chooser, forceClose) {
+  this._updateSeachText(searchText);
   this._send('acceptProposal', {
     searchText: searchText,
     chooser: chooser,
