@@ -537,7 +537,9 @@ scout.Table.prototype.deselectAll = function(notifyServer) {
 };
 
 scout.Table.prototype.checkAll = function(checked) {
-  this.checkRows(this.filteredRows(), checked);
+  this.checkRows(this.filteredRows(), {
+    checked: checked
+  });
 };
 
 scout.Table.prototype.uncheckAll = function() {
@@ -1817,21 +1819,28 @@ scout.Table.prototype._calculateValuesForBackgroundEffect = function() {
 };
 
 scout.Table.prototype.checkRow = function(row, checked) {
-  this.checkRows([row], checked);
+  this.checkRows([row], {
+    checked: checked
+  });
 };
 
-scout.Table.prototype.checkRows = function(rows, checked, notifyServer) {
+scout.Table.prototype.checkRows = function(rows, options) {
+  var opts = {
+    checked: true,
+    notifyServer: true,
+    checkOnlyEnabled: true
+  };
+  $.extend(opts, options);
   var updatedRows = [];
-  checked = scout.nvl(checked, true);
   if (!this.checkable || !this.enabled) {
     return;
   }
   rows = scout.arrays.ensure(rows);
   rows.forEach(function(row) {
-    if (!row.enabled || row.checked === checked) {
+    if ((!row.enabled && opts.checkOnlyEnabled) || row.checked === opts.checked) {
       return;
     }
-    if (!this.multiCheck && checked) {
+    if (!this.multiCheck && opts.checked) {
       for (var i = 0; i < this.rows.length; i++) {
         if (this.rows[i].checked) {
           this.rows[i].checked = false;
@@ -1839,12 +1848,11 @@ scout.Table.prototype.checkRows = function(rows, checked, notifyServer) {
         }
       }
     }
-    row.checked = checked;
+    row.checked = opts.checked;
     updatedRows.push(row);
   }, this);
 
-  notifyServer = scout.nvl(notifyServer, true);
-  if (notifyServer) {
+  if (opts.notifyServer) {
     this._sendRowsChecked(updatedRows);
   }
   if (this.rendered) {
@@ -1856,11 +1864,14 @@ scout.Table.prototype.checkRows = function(rows, checked, notifyServer) {
 };
 
 scout.Table.prototype.uncheckRow = function(row, notifyServer) {
-  this.uncheckRows([row], notifyServer);
+  this.uncheckRows([row], {
+    notifyServer: notifyServer
+  });
 };
 
-scout.Table.prototype.uncheckRows = function(rows, notifyServer) {
-  this.checkRows(rows, false, notifyServer);
+scout.Table.prototype.uncheckRows = function(rows, options) {
+  options.checked = false;
+  this.checkRows(rows, options);
 };
 
 scout.Table.prototype.doRowAction = function(row, column) {
@@ -3386,8 +3397,15 @@ scout.Table.prototype._onRowsChecked = function(rows) {
     }
   }, this);
 
-  this.checkRows(checkedRows, true, false);
-  this.uncheckRows(uncheckedRows, false);
+  this.checkRows(checkedRows, {
+    checked: true,
+    notifyServer: false,
+    checkOnlyEnabled: false
+  });
+  this.uncheckRows(uncheckedRows, {
+    notifyServer: false,
+    checkOnlyEnabled: false
+  });
 };
 
 scout.Table.prototype._onRowOrderChanged = function(rowIds) {

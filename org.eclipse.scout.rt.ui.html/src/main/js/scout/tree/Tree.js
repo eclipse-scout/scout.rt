@@ -1186,21 +1186,33 @@ scout.Tree.prototype.deleteAllChildNodes = function(parentNode) {
 };
 
 scout.Tree.prototype.checkNode = function(node, checked, notifyServer) {
-  this.checkNodes([node], checked, notifyServer);
+  this.checkNodes([node], {
+    checked: checked,
+    notifyServer: notifyServer
+  });
 };
 
-scout.Tree.prototype.checkNodes = function(nodes, checked, notifyServer) {
+scout.Tree.prototype.checkNodes = function(nodes, options) {
+  var opts = {
+    checked: true,
+    notifyServer: true,
+    checkOnlyEnabled: true,
+    isCheckChildren: false
+  };
+  $.extend(opts, options);
   var updatedNodes = [];
   if (!this.enabled || !this.checkable) {
     return updatedNodes;
   }
-  notifyServer = scout.nvl(notifyServer, true);
   nodes = scout.arrays.ensure(nodes);
   nodes.forEach(function(node) {
-    if (!node.enabled || node.checked === checked) {
+    if ((!node.enabled && opts.checkOnlyEnabled) || node.checked === opts.checked) {
+      if (opts.isCheckChildren) {
+        updatedNodes = updatedNodes.concat(this.checkChildren(node, opts.checked));
+      }
       return;
     }
-    if (!this.multiCheck && checked) {
+    if (!this.multiCheck && opts.checked) {
       for (var i = 0; i < this.checkedNodes.length; i++) {
         this.checkedNodes[i].checked = false;
         this._updateMarkChildrenChecked(this.checkedNodes[i], false, false, true);
@@ -1208,18 +1220,18 @@ scout.Tree.prototype.checkNodes = function(nodes, checked, notifyServer) {
       }
       this.checkedNodes = [];
     }
-    node.checked = checked;
+    node.checked = opts.checked;
     if (node.checked) {
       this.checkedNodes.push(node);
     }
     updatedNodes.push(node);
-    this._updateMarkChildrenChecked(node, false, checked, true);
-    if (notifyServer) {
-      updatedNodes = updatedNodes.concat(this.checkChildren(node, checked));
+    this._updateMarkChildrenChecked(node, false, opts.checked, true);
+    if (opts.notifyServer) {
+      updatedNodes = updatedNodes.concat(this.checkChildren(node, opts.checked));
     }
   }, this);
 
-  if (notifyServer) {
+  if (opts.notifyServer) {
     this._sendNodesChecked(updatedNodes);
   }
   if (this.rendered) {
@@ -1231,17 +1243,25 @@ scout.Tree.prototype.checkNodes = function(nodes, checked, notifyServer) {
 };
 
 scout.Tree.prototype.uncheckNode = function(node, notifyServer) {
-  this.uncheckNodes([node], notifyServer);
+  this.uncheckNodes([node], {
+    notifyServer: notifyServer,
+    checkOnlyEnabled: true
+  });
 };
 
-scout.Tree.prototype.uncheckNodes = function(nodes, notifyServer) {
-  this.checkNodes(nodes, false, notifyServer);
+scout.Tree.prototype.uncheckNodes = function(nodes, options) {
+  options.checked = false;
+  this.checkNodes(nodes, options);
 };
 
 scout.Tree.prototype.checkChildren = function(node, checked) {
   var updatedNodes = [];
   if (this.autoCheckChildren && node) {
-    updatedNodes = this.checkNodes(node.childNodes, checked, false);
+    updatedNodes = this.checkNodes(node.childNodes, {
+      checked: checked,
+      notifyServer: false,
+      isCheckChildren: true
+    });
   }
   return updatedNodes;
 };
@@ -1790,8 +1810,15 @@ scout.Tree.prototype._onNodesChecked = function(nodes) {
     }
   }, this);
 
-  this.checkNodes(checkedNodes, true, false);
-  this.uncheckNodes(uncheckedNodes, false);
+  this.checkNodes(checkedNodes, {
+    checked: true,
+    notifyServer: false,
+    checkOnlyEnabled: false
+  });
+  this.uncheckNodes(uncheckedNodes, {
+    notifyServer: false,
+    checkOnlyEnabled: false
+  });
 };
 
 scout.Tree.prototype._onChildNodeOrderChanged = function(parentNodeId, childNodeIds) {
