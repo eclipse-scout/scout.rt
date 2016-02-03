@@ -117,11 +117,12 @@ scout.CellEditorPopup.prototype.position = function() {
   var cellBounds, rowBounds,
     $tableData = this.table.$data,
     $row = this.row.$row,
-    $cell = this.$anchor;
+    $cell = this.$anchor,
+    insetsLeft = $tableData.cssPxValue('padding-left') + $row.cssBorderLeftWidth();
 
   cellBounds = scout.graphics.bounds($cell, false, true);
   rowBounds = scout.graphics.bounds($row, false, true);
-  this.setLocation(new scout.Point(cellBounds.x, $tableData.scrollTop() + rowBounds.y));
+  this.setLocation(new scout.Point(insetsLeft + cellBounds.x, $tableData.scrollTop() + rowBounds.y));
 };
 
 scout.CellEditorPopup.prototype.completeEdit = function() {

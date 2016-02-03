@@ -149,6 +149,10 @@
           border-bottom-color: @item-selection-border-color;
         }
       }
+
+      & > .cell-editor-popup > .check-box-field > .cell-editor-field {
+        padding-top: @desktop-table-row-padding-y - @checkable-cell-padding-adjustment - 1px;
+      }
     }
   }
 }

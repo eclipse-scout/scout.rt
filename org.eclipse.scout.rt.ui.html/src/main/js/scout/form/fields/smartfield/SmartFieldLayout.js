@@ -41,9 +41,13 @@ scout.SmartFieldLayout.prototype.layout = function($container) {
  *
  * @override FormFieldLayout.js
  */
-scout.SmartFieldLayout.prototype._layoutIcon = function(formField, right, top) {
+scout.SmartFieldLayout.prototype._layoutIcon = function(formField, fieldBounds, right, top) {
   var multiline = formField instanceof scout.SmartFieldMultiline;
+  // Cannot use field bounds because icon should be as height as input field
+  var height = this._smartField.$field.outerHeight();
   formField.$icon
     .cssRight(formField.$field.cssBorderRightWidth() + (multiline ? 0 : right))
-    .cssTop(top);
+    .cssTop(top)
+    .cssHeight(height)
+    .cssLineHeight(height);
 };
