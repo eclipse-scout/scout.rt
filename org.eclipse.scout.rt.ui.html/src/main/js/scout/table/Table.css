@@ -207,6 +207,8 @@
     width: @check-box-size;
     height: @check-box-size;
     #scout.checkbox-before-border();
+    /* vertical-align is necessary to remove the bottom margin */
+    vertical-align: middle;
   }
   & > .check-box.checked::before {
     #scout.checkbox-before-checked();
