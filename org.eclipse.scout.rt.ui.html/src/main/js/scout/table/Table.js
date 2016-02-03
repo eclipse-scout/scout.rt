@@ -378,7 +378,7 @@ scout.Table.prototype.onContextMenu = function(event) {
 
     var menuItems, popup;
     if (this.selectedRows.length > 0) {
-      menuItems = this._filterMenus(this.menus, scout.MenuDestinations.CONTEXT_MENU, true);
+      menuItems = this._filterMenus(this.menus, scout.MenuDestinations.CONTEXT_MENU, true, false, ['Header']);
       if (!event.pageX && !event.pageY) {
         var $rowToDisplay = this.selectionHandler.lastActionRow ? this.selectionHandler.lastActionRow.$row : this.selectedRows[this.selectedRows.length - 1].$row;
         var offset = $rowToDisplay.offset();
@@ -1331,8 +1331,8 @@ scout.Table.prototype._find$AppLink = function(event) {
   return null;
 };
 
-scout.Table.prototype._filterMenus = function(menus, destination, onlyVisible, enableDisableKeyStroke) {
-  return scout.menus.filterAccordingToSelection('Table', this.selectedRows.length, menus, destination, onlyVisible, enableDisableKeyStroke);
+scout.Table.prototype._filterMenus = function(menus, destination, onlyVisible, enableDisableKeyStroke, notAllowedTypes) {
+  return scout.menus.filterAccordingToSelection('Table', this.selectedRows.length, menus, destination, onlyVisible, enableDisableKeyStroke, notAllowedTypes);
 };
 
 scout.Table.prototype._renderMenus = function() {
@@ -1343,7 +1343,8 @@ scout.Table.prototype._renderMenus = function() {
 };
 
 scout.Table.prototype._updateMenuBar = function() {
-  var menuItems = this._filterMenus(this.menus, scout.MenuDestinations.MENU_BAR, false, true);
+  var notAllowedTypes = ['Header'];
+  var menuItems = this._filterMenus(this.menus, scout.MenuDestinations.MENU_BAR, false, true, notAllowedTypes);
   menuItems = this.staticMenus.concat(menuItems);
   this.menuBar.updateItems(menuItems);
 };

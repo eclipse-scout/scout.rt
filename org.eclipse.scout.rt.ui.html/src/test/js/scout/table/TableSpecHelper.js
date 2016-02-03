@@ -54,23 +54,23 @@ TableSpecHelper.prototype.createModelRowByTexts = function(id, texts, withoutCel
     if (!withoutCells) {
       cells[i] = this.createModelCell(texts[i]);
     } else {
-      cells [i] = texts[i];
+      cells[i] = texts[i];
     }
   }
   return this.createModelRow(id, cells);
 };
 
 /**
-*
-* @param values array of values for the cells in the new row or a number if only one cell should be created.
-*/
+ *
+ * @param values array of values for the cells in the new row or a number if only one cell should be created.
+ */
 TableSpecHelper.prototype.createModelRowByValues = function(id, values) {
- values = scout.arrays.ensure(values);
- var cells = [];
- for (var i = 0; i < values.length; i++) {
-   cells[i] = this.createModelCell(values[i] + '', values[i]);
- }
- return this.createModelRow(id, cells);
+  values = scout.arrays.ensure(values);
+  var cells = [];
+  for (var i = 0; i < values.length; i++) {
+    cells[i] = this.createModelCell(values[i] + '', values[i]);
+  }
+  return this.createModelRow(id, cells);
 };
 
 TableSpecHelper.prototype.createModelColumn = function(text, type) {
@@ -99,6 +99,10 @@ TableSpecHelper.prototype.createModelCell = function(text, value) {
 
 TableSpecHelper.prototype.createMenuModel = function(text, icon) {
   return this.menuHelper.createModel(text, icon, ['Table.SingleSelection']);
+};
+
+TableSpecHelper.prototype.createMenuModelWithSingleAndHeader = function(text, icon) {
+  return this.menuHelper.createModel(text, icon, ['Table.SingleSelection', 'Table.Header']);
 };
 
 TableSpecHelper.prototype.createModelColumns = function(count, columnType) {
@@ -147,7 +151,7 @@ TableSpecHelper.prototype.createModelRows = function(colCount, rowCount) {
 
 TableSpecHelper.prototype.createModelSingleColumnByTexts = function(texts) {
   var rows = [];
-  for (var i=0; i < texts.length; i++) {
+  for (var i = 0; i < texts.length; i++) {
     rows.push(this.createModelRowByTexts(null, texts[i]));
   }
   return this.createModel(this.createModelColumns(1), rows);
@@ -155,7 +159,7 @@ TableSpecHelper.prototype.createModelSingleColumnByTexts = function(texts) {
 
 TableSpecHelper.prototype.createModelSingleColumnByValues = function(values, columnType) {
   var rows = [];
-  for (var i=0; i < values.length; i++) {
+  for (var i = 0; i < values.length; i++) {
     rows.push(this.createModelRowByValues(null, values[i]));
   }
   return this.createModel(this.createModelColumns(1, columnType), rows);
@@ -177,13 +181,13 @@ TableSpecHelper.prototype.createMobileTable = function(model) {
   return table;
 };
 
-TableSpecHelper.prototype.createColumnFilter = function (model) {
+TableSpecHelper.prototype.createColumnFilter = function(model) {
   var filter = new scout.TextColumnUserFilter();
   filter.init(model);
   return filter;
 };
 
-TableSpecHelper.prototype.createAndRegisterColumnFilter = function (model) {
+TableSpecHelper.prototype.createAndRegisterColumnFilter = function(model) {
   var filter = this.createColumnFilter(model);
   model.table.addFilter(filter);
   return filter;
@@ -241,21 +245,21 @@ TableSpecHelper.prototype.assertSelection = function(table, rows) {
  */
 TableSpecHelper.prototype.assertTextsInCells = function(rows, colIndex, texts) {
   expect(rows.length).toBe(texts.length);
-  for (var i=0; i < rows.length; i++) {
+  for (var i = 0; i < rows.length; i++) {
     expect(rows[i].cells[colIndex].text).toBe(texts[i]);
   }
 };
 
 TableSpecHelper.prototype.assertValuesInCells = function(rows, colIndex, values) {
   expect(rows.length).toBe(values.length);
-  for (var i=0; i < rows.length; i++) {
+  for (var i = 0; i < rows.length; i++) {
     expect(rows[i].cells[colIndex].value).toBe(values[i]);
   }
 };
 
 TableSpecHelper.prototype.assertDatesInCells = function(rows, colIndex, dates) {
   expect(rows.length).toBe(dates.length);
-  for (var i=0; i < rows.length; i++) {
+  for (var i = 0; i < rows.length; i++) {
     expect(rows[i].cells[colIndex].value.getTime()).toBe(dates[i].getTime());
   }
 };

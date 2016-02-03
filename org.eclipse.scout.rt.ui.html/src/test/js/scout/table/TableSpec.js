@@ -1759,6 +1759,30 @@ describe("Table", function() {
       expect($menu.length).toBeTruthy();
     });
 
+    it("context menu only shows items without header type also if there is a type singleSelection", function() {
+      var model = helper.createModelFixture(2, 2);
+      var table = helper.createTable(model);
+      table.selectedRows = [table.rows[0]];
+      table.render(session.$entryPoint);
+
+      var menuModel1 = helper.createMenuModel('menu'),
+        menu1 = helper.menuHelper.createMenu(menuModel1),
+        menuModel2 = helper.createMenuModelWithSingleAndHeader('menu'),
+        menu2 = helper.menuHelper.createMenu(menuModel2);
+
+      table.menus = [menu1, menu2];
+      var $row0 = table.$data.children('.table-row').eq(0);
+      $row0.triggerContextMenu();
+
+      sendQueuedAjaxCalls();
+
+      var $menu = helper.getDisplayingContextMenu(table);
+      expect($menu.find('.menu-item').length).toBe(1);
+      expect($menu.find('.menu-item').eq(0).isVisible()).toBe(true);
+      expect(menu2.$container).not.toBeDefined();
+      expect(menu1.$container).toBeDefined();
+    });
+
     it("context menu only shows visible menus", function() {
       var model = helper.createModelFixture(2, 2);
       var table = helper.createTable(model);
