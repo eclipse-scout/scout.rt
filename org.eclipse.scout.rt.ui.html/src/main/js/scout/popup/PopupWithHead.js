@@ -23,6 +23,14 @@ scout.PopupWithHead.prototype._createLayout = function() {
   return new scout.PopupWithHeadLayout(this);
 };
 
+scout.PopupWithHead.prototype._init = function(options) {
+  scout.PopupWithHead.parent.prototype._init.call(this, options);
+
+  // Compared to a regular popup, the popup is aligned with the head and either opened left or right,
+  // -> the width should be adjusted as well if it does not fit into the window
+  this.trimWidth = scout.nvl(options.trimWidth, true);
+};
+
 scout.PopupWithHead.prototype._render = function($parent) {
   scout.PopupWithHead.parent.prototype._render.call(this, $parent);
   this.$parent = $parent;
