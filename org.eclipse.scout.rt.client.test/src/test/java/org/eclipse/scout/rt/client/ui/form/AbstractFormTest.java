@@ -290,15 +290,41 @@ public class AbstractFormTest {
   public void testCloseInInitForm() throws Exception {
     // call doClose in execInitForm
     AbstractForm form = new TestForm(true);
+    assertTrue(form.isFormStartable());
     form.start();
+    assertTrue(form.isFormStartable());
     assertFalse(form.isFormStarted());
     assertFalse(form.isBlockingInternal());
 
     // regular form start
     form = new TestForm(false);
+    assertTrue(form.isFormStartable());
     form.start();
+    assertFalse(form.isFormStartable());
     assertTrue(form.isFormStarted());
     assertTrue(form.isBlockingInternal());
+  }
+
+  @Test
+  public void testStartedStateDuringInitialisation() throws Exception {
+    final Boolean[] resultStartable = {null};
+    final Boolean[] resultStarted = {null};
+    final Boolean[] resultBlocking = {null};
+    final AbstractForm form = new TestForm(false);
+    form.addFormListener(new FormListener() {
+      @Override
+      public void formChanged(FormEvent e) {
+        if (e.getType() == FormEvent.TYPE_LOAD_AFTER) {
+          resultStartable[0] = Boolean.valueOf(form.isFormStartable());
+          resultStarted[0] = Boolean.valueOf(form.isFormStarted());
+          resultBlocking[0] = Boolean.valueOf(form.isBlockingInternal());
+        }
+      }
+    });
+    form.start();
+    assertFalse(resultStartable[0]);
+    assertFalse(resultStarted[0]);
+    assertTrue(resultBlocking[0]);
   }
 
 }

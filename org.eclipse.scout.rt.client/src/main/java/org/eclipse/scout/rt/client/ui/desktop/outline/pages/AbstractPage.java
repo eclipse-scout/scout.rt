@@ -643,7 +643,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
   }
 
   protected void ensureDetailFormStarted() {
-    if (getDetailForm() == null || getDetailForm().isFormStarted()) {
+    if (getDetailForm() == null || !getDetailForm().isFormStartable()) {
       return;
     }
     startDetailForm();

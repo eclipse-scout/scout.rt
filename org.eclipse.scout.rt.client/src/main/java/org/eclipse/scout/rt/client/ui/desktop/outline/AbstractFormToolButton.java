@@ -107,7 +107,7 @@ public abstract class AbstractFormToolButton<FORM extends IForm> extends Abstrac
   }
 
   public void ensureFormStarted() {
-    if (getForm() == null || getForm().isFormStarted()) {
+    if (getForm() == null || !getForm().isFormStartable()) {
       return;
     }
     startForm();

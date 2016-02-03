@@ -435,7 +435,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
    * Ensures that the search form is started (lazy starting)
    */
   protected void ensureSearchFormStarted() {
-    if (m_searchForm != null && !m_searchForm.isFormStarted()) {
+    if (m_searchForm != null && m_searchForm.isFormStartable()) {
       try {
         m_searchForm.start();
         notifyMemoryPolicyOfSearchFormStart();

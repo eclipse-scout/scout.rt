@@ -885,8 +885,8 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
 
       @Override
       public void run() throws Exception {
-        if (m_blockingCondition.isBlocking()) {
-          throw new ProcessingException("The form " + getFormId() + " has already been started");
+        if (isBlockingInternal()) {
+          throw new IllegalStateException("The form " + getFormId() + " has already been started");
         }
         // Ensure that boolean is set not only once by the constructor
         setFormLoading(true);
@@ -2176,6 +2176,11 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   @Override
   public boolean isFormOpen() {
     return isBlockingInternal();
+  }
+
+  @Override
+  public boolean isFormStartable() {
+    return !m_formStarted && !isBlockingInternal();
   }
 
   @Override
