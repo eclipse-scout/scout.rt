@@ -451,6 +451,15 @@ scout.Table.prototype._hasVisibleTableControls = function() {
   });
 };
 
+scout.Table.prototype.hasAggregateTableControl = function() {
+  return this.tableControls.some(function(control) {
+    if (control instanceof scout.AggregateTableControl) {
+      return true;
+    }
+    return false;
+  });
+};
+
 scout.Table.prototype._createHeader = function() {
   return scout.create('TableHeader', {
     parent: this,
@@ -1788,6 +1797,18 @@ scout.Table.prototype.removeColumnGrouping = function(column) {
   if (column) {
     this.groupColumn(column, false, 'asc', true);
   }
+};
+
+/**
+ * @returns true if at least one column has grouped=true
+ */
+scout.Table.prototype.isGrouped = function() {
+  return this.columns.some(function(column) {
+    if (column.grouped) {
+      return true;
+    }
+    return false;
+  });
 };
 
 scout.Table.prototype.setColumnBackgroundEffect = function(column, effect) {

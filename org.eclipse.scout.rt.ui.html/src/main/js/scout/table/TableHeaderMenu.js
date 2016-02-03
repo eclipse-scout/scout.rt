@@ -108,8 +108,10 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
   // column.grouped check necessary to make ungroup possible, even if there is no number column anymore
   if (this.table.containsNumberColumn() || this.column.grouped) {
     if (this.column instanceof scout.NumberColumn) {
-      leftGroups.push(this._renderAggregationGroup());
-    } else {
+      if (this.table.isGrouped() || this.table.hasAggregateTableControl()) {
+        leftGroups.push(this._renderAggregationGroup());
+      }
+    } else if (this.table.sortEnabled) { // grouping without sorting is not possible
       leftGroups.push(this._renderGroupingGroup());
     }
   }
