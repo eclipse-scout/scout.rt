@@ -43,6 +43,7 @@ public class CellTest {
     assertNull(c.getFont());
     assertTrue(c.isEnabled());
     assertNull(c.getObserver());
+    assertFalse(c.isHtmlEnabled());
   }
 
   @Test
@@ -66,6 +67,7 @@ public class CellTest {
     c.setForegroundColor(fgColor);
     c.setFont(font);
     c.setEnabled(true);
+    c.setHtmlEnabled(true);
     c.setObserver(observer);
 
     Cell copy = new Cell(c);
@@ -78,6 +80,7 @@ public class CellTest {
     assertEquals(fgColor, c.getForegroundColor());
     assertEquals(font.toPattern(), c.getFont().toPattern());
     assertTrue(c.isEnabled());
+    assertTrue(copy.isHtmlEnabled());
     assertSame(observer, c.getObserver());
     Mockito.verifyZeroInteractions(observer);
   }
@@ -96,6 +99,7 @@ public class CellTest {
     assertNull(c.getForegroundColor());
     assertNull(c.getFont());
     assertTrue(c.isEnabled());
+    assertFalse(c.isHtmlEnabled());
     assertSame(observer, c.getObserver());
     Mockito.verifyZeroInteractions(observer);
   }
@@ -259,6 +263,16 @@ public class CellTest {
     c.setEnabled(true);
     assertTrue(c.isEnabled());
     Mockito.verify(observer, Mockito.times(2)).cellChanged(c, ICell.ENABLED_BIT);
+  }
+
+  @Test
+  public void testSetHtmlEnabled() {
+    Cell c = new Cell();
+    ICellObserver observer = Mockito.mock(ICellObserver.class);
+    c.setObserver(observer);
+    c.setHtmlEnabled(true);
+    assertTrue(c.isHtmlEnabled());
+    Mockito.verify(observer).cellChanged(c, ICell.HTML_ENABLED_BIT);
   }
 
   @Test

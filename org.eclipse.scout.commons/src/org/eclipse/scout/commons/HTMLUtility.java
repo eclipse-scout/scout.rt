@@ -555,12 +555,20 @@ public final class HTMLUtility {
    *         |</tr>|</table> create newlines </xmp></pre>
    */
   public static String getPlainText(String s) {
-    s = StringUtility.getTag(s, "body");
+    return getPlainText(s, true, true);
+  }
+
+  public static String getPlainText(String s, boolean fetchInsideBodyTag, boolean replaceNewLine) {
+    if (fetchInsideBodyTag) {
+      s = StringUtility.getTag(s, "body");
+    }
     if (s == null || s.length() == 0) {
       return s;
     }
     //newlines
-    s = s.replaceAll("\n", " ");
+    if (replaceNewLine) {
+      s = s.replaceAll("\n", " ");
+    }
     s = s.replaceAll("<br>|<br/>|</p>|<p/>|</tr>|</table>", "\n");
     //remove tags
     s = Pattern.compile("<[^>]+>", Pattern.DOTALL).matcher(s).replaceAll(" ");
@@ -641,7 +649,7 @@ public final class HTMLUtility {
 
   /**
    * @return encoded text, ready to be included in a html text
-   *         <xmp>replaces &, ", ', <, > and all whitespace</xmp>
+   *         <xmp>replaces &, ", ', <, >, / and all whitespace</xmp>
    */
   public static String encodeText(String s) {
     return StringUtility.htmlEncode(s, true);

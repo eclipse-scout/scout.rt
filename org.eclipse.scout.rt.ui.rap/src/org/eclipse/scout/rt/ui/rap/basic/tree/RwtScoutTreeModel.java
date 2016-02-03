@@ -10,22 +10,25 @@
  *******************************************************************************/
 package org.eclipse.scout.rt.ui.rap.basic.tree;
 
+import java.util.Map;
+
 import org.eclipse.jface.viewers.IColorProvider;
 import org.eclipse.jface.viewers.IFontProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.rap.rwt.RWT;
-import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
+import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
 import org.eclipse.scout.rt.ui.rap.RwtIcons;
+import org.eclipse.scout.rt.ui.rap.basic.AbstractRwtScoutCellTextHelper;
+import org.eclipse.scout.rt.ui.rap.basic.IRwtScoutCellTextHelper;
+import org.eclipse.scout.rt.ui.rap.basic.IRwtScoutComposite;
 import org.eclipse.scout.rt.ui.rap.extension.UiDecorationExtensionPoint;
-import org.eclipse.scout.rt.ui.rap.util.HtmlTextUtility;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
@@ -41,14 +44,16 @@ public class RwtScoutTreeModel extends LabelProvider implements ITreeContentProv
   private Image m_imgCheckboxTrue;
   private Image m_imgCheckboxFalse;
   private Color m_disabledForegroundColor;
+  private final IRwtEnvironment m_env;
 
   public RwtScoutTreeModel(ITree tree, IRwtScoutTree uiTree, TreeViewer treeViewer) {
     m_scoutTree = tree;
     m_uiTree = uiTree;
     m_treeViewer = treeViewer;
-    m_imgCheckboxTrue = getUiTree().getUiEnvironment().getIcon(RwtIcons.CheckboxYes);
-    m_imgCheckboxFalse = getUiTree().getUiEnvironment().getIcon(RwtIcons.CheckboxNo);
-    m_disabledForegroundColor = getUiTree().getUiEnvironment().getColor(UiDecorationExtensionPoint.getLookAndFeel().getColorForegroundDisabled());
+    m_env = getUiTree().getUiEnvironment();
+    m_imgCheckboxTrue = m_env.getIcon(RwtIcons.CheckboxYes);
+    m_imgCheckboxFalse = m_env.getIcon(RwtIcons.CheckboxNo);
+    m_disabledForegroundColor = m_env.getColor(UiDecorationExtensionPoint.getLookAndFeel().getColorForegroundDisabled());
   }
 
   protected ITree getScoutTree() {
@@ -111,7 +116,7 @@ public class RwtScoutTreeModel extends LabelProvider implements ITreeContentProv
     //deco
     String iconId = scoutNode.getCell().getIconId();
     Image decoImage = null;
-    decoImage = getUiTree().getUiEnvironment().getIcon(iconId);
+    decoImage = m_env.getIcon(iconId);
     //merge
     if (checkBoxImage != null && decoImage != null) {
       //TODO rap/rwt: new GC(Image) is not possible since in rwt an image does not implement Drawable.
@@ -128,37 +133,26 @@ public class RwtScoutTreeModel extends LabelProvider implements ITreeContentProv
 
   @Override
   public String getText(Object element) {
-    ITreeNode scoutNode = (ITreeNode) element;
-    if (scoutNode != null && scoutNode.getCell() != null) {
-      ICell cell = scoutNode.getCell();
-      String text = cell.getText();
-      if (text == null) {
-        text = "";
-      }
+    final ITreeNode scoutNode = (ITreeNode) element;
 
-      if (HtmlTextUtility.isTextWithHtmlMarkup(cell.getText())) {
-        text = getUiTree().getUiEnvironment().adaptHtmlCell(getUiTree(), text);
-        text = getUiTree().getUiEnvironment().convertLinksInHtmlCell(getUiTree(), text);
-      }
-      else {
-        if (text.indexOf("\n") >= 0) {
-          text = StringUtility.replaceNewLines(text, " ");
-        }
-        boolean markupEnabled = Boolean.TRUE.equals(getUiTree().getUiField().getData(RWT.MARKUP_ENABLED));
-        if (markupEnabled) {
-          text = HtmlTextUtility.transformPlainTextToHtml(text);
-        }
-      }
-      return text;
+    if (scoutNode == null) {
+      return "";
     }
-    return "";
+
+    final IRwtScoutCellTextHelper cellTextHelper = createCellTextHelper(m_env, getUiTree());
+
+    return cellTextHelper.processCellText(scoutNode.getCell());
+  }
+
+  protected IRwtScoutCellTextHelper createCellTextHelper(IRwtEnvironment env, IRwtScoutComposite<?> uiComposite) {
+    return new P_RwtScoutTreeModelCellTextHelper(env, uiComposite);
   }
 
   @Override
   public Font getFont(Object element) {
     ITreeNode scoutNode = (ITreeNode) element;
     if (scoutNode.getCell().getFont() != null) {
-      return getUiTree().getUiEnvironment().getFont(scoutNode.getCell().getFont(), m_treeViewer.getTree().getFont());
+      return m_env.getFont(scoutNode.getCell().getFont(), m_treeViewer.getTree().getFont());
     }
     return null;
   }
@@ -167,7 +161,7 @@ public class RwtScoutTreeModel extends LabelProvider implements ITreeContentProv
   public Color getForeground(Object element) {
     ITreeNode scoutNode = (ITreeNode) element;
     ICell scoutCell = scoutNode.getCell();
-    Color col = getUiTree().getUiEnvironment().getColor(scoutCell.getForegroundColor());
+    Color col = m_env.getColor(scoutCell.getForegroundColor());
     if (col == null) {
       if (!scoutCell.isEnabled()) {
         col = m_disabledForegroundColor;
@@ -180,12 +174,35 @@ public class RwtScoutTreeModel extends LabelProvider implements ITreeContentProv
   public Color getBackground(Object element) {
     ITreeNode scoutNode = (ITreeNode) element;
     if (scoutNode.getCell().getBackgroundColor() != null) {
-      return getUiTree().getUiEnvironment().getColor(scoutNode.getCell().getBackgroundColor());
+      return m_env.getColor(scoutNode.getCell().getBackgroundColor());
     }
     return null;
   }
 
   @Override
   public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+  }
+
+  private class P_RwtScoutTreeModelCellTextHelper extends AbstractRwtScoutCellTextHelper {
+
+    public P_RwtScoutTreeModelCellTextHelper(IRwtEnvironment env, IRwtScoutComposite<?> uiComposite) {
+      super(env, uiComposite);
+    }
+
+    @Override
+    protected Map<String, String> createAdditionalLinkParams() {
+      return null;
+    }
+
+    @Override
+    protected boolean isMultilineScoutObject() {
+      return false;
+    }
+
+    @Override
+    protected boolean isWrapText() {
+      return false;
+    }
+
   }
 }

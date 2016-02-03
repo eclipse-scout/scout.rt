@@ -67,4 +67,8 @@ public interface ICellSpecialization {
   int getHorizontalAlignment();
 
   void setHorizontalAlignment(int horizontalAlignment);
+
+  void setHtmlEnabled(boolean enabled);
+
+  boolean isHtmlEnabled();
 }

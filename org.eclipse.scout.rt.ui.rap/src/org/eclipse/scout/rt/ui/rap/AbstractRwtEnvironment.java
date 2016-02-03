@@ -22,6 +22,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -73,6 +74,8 @@ import org.eclipse.scout.rt.shared.ui.UiDeviceType;
 import org.eclipse.scout.rt.shared.ui.UiLayer;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.rt.ui.rap.basic.IRwtScoutComposite;
+import org.eclipse.scout.rt.ui.rap.basic.IRwtScoutHtmlValidator;
+import org.eclipse.scout.rt.ui.rap.basic.RwtScoutHtmlValidator;
 import org.eclipse.scout.rt.ui.rap.basic.WidgetPrinter;
 import org.eclipse.scout.rt.ui.rap.busy.RwtBusyHandler;
 import org.eclipse.scout.rt.ui.rap.concurrency.RwtScoutSynchronizer;
@@ -174,6 +177,7 @@ public abstract class AbstractRwtEnvironment extends AbstractEntryPoint implemen
   private LayoutValidateManager m_layoutValidateManager;
   private HtmlAdapter m_htmlAdapter;
   private P_RequestInterceptor m_requestInterceptor;
+  private IRwtScoutHtmlValidator m_htmlValidator;
 
   public AbstractRwtEnvironment(Bundle applicationBundle, Class<? extends IClientSession> clientSessionClazz) {
     m_applicationBundle = applicationBundle;
@@ -439,6 +443,8 @@ public abstract class AbstractRwtEnvironment extends AbstractEntryPoint implemen
         }
       }.schedule();
 
+      m_htmlValidator = createHtmlValidator();
+
       m_status = RwtEnvironmentEvent.STARTED;
       fireEnvironmentChanged(new RwtEnvironmentEvent(this, m_status));
 
@@ -508,12 +514,12 @@ public abstract class AbstractRwtEnvironment extends AbstractEntryPoint implemen
         }
         catch (Exception e) {
           String msg = new StringBuilder()
-          .append(" [thread=").append(Thread.currentThread())
-          .append(", httpSession=").append(event.getSession().getId())
-          .append(", clientSession=").append(clientSession)
-          .append(", environment=").append(AbstractRwtEnvironment.this)
-          .append(", userAgent=").append(clientSession.getUserAgent())
-          .append("]").toString();
+              .append(" [thread=").append(Thread.currentThread())
+              .append(", httpSession=").append(event.getSession().getId())
+              .append(", clientSession=").append(clientSession)
+              .append(", environment=").append(AbstractRwtEnvironment.this)
+              .append(", userAgent=").append(clientSession.getUserAgent())
+              .append("]").toString();
 
           if (Platform.isRunning()) {
             LOG.error("Failed to stop application." + msg, e);
@@ -641,6 +647,11 @@ public abstract class AbstractRwtEnvironment extends AbstractEntryPoint implemen
   @Override
   public String convertLinksInHtmlCell(IRwtScoutComposite<?> uiComposite, String rawHtml) {
     return getHtmlAdapter().convertLinksInHtmlCell(uiComposite, rawHtml);
+  }
+
+  @Override
+  public String convertLinksInHtmlCell(IRwtScoutComposite<?> uiComposite, String rawHtml, Map<String, String> params) {
+    return getHtmlAdapter().convertLinksInHtmlCell(uiComposite, rawHtml, params);
   }
 
   @Override
@@ -1489,6 +1500,15 @@ public abstract class AbstractRwtEnvironment extends AbstractEntryPoint implemen
     if (!CompareUtility.equals(uiThreadLocale, locale)) {
       LocaleThreadLocal.set(locale);
     }
+  }
+
+  protected IRwtScoutHtmlValidator createHtmlValidator() {
+    return new RwtScoutHtmlValidator();
+  }
+
+  @Override
+  public IRwtScoutHtmlValidator getHtmlValidator() {
+    return m_htmlValidator;
   }
 
   private class P_LocaleListener implements ILocaleListener {

@@ -575,12 +575,13 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       boolean firstColumn = true;
       for (IColumn<?> column : columns) {
         String text;
+        ICell cell = row.getCell(column);
         if (column instanceof IBooleanColumn) {
           boolean value = BooleanUtility.nvl(((IBooleanColumn) column).getValue(row), false);
           text = value ? "X" : "";
         }
         else {
-          text = StringUtility.emptyIfNull(row.getCell(column).getText());
+          text = StringUtility.emptyIfNull(cell.getText());
         }
 
         // text/plain
@@ -601,6 +602,11 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         if (html == null) {
           html = StringUtility.htmlEncode(text);
         }
+
+        if (!cell.isHtmlEnabled()) {
+          html = StringUtility.htmlEncode(html);
+        }
+
         htmlText.append("<td>");
         htmlText.append(html);
         htmlText.append("</td>");

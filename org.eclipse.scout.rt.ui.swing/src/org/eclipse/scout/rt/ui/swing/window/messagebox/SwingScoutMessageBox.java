@@ -45,6 +45,7 @@ import javax.swing.UIManager;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
+import javax.swing.plaf.basic.BasicHTML;
 import javax.swing.text.View;
 
 import org.eclipse.scout.commons.StringUtility;
@@ -114,6 +115,7 @@ public class SwingScoutMessageBox extends SwingScoutComposite<IMessageBox> imple
       labelPanel.setBackground(Color.white);
       labelPanel.setOpaque(true);
       JLabelEx label = new JLabelEx();
+      s = processTextOnLabel(s, label, getScoutMessageBox().isHtmlEnabled());
       label.setText(s);
       ensureProperDimension(label, s);
       labelPanel.add(label);
@@ -125,6 +127,7 @@ public class SwingScoutMessageBox extends SwingScoutComposite<IMessageBox> imple
       labelPanel.setBorder(new CompoundBorder(new P_TopSeparatorBorder(), new EmptyBorder(VERTICAL_PADDING, HORIZONTAL_PADDING, VERTICAL_PADDING, HORIZONTAL_PADDING)));
       labelPanel.setOpaque(false);
       JLabelEx label = new JLabelEx();
+      s = processTextOnLabel(s, label, getScoutMessageBox().isHtmlEnabled());
       label.setText(s);
       ensureProperDimension(label, s);
       labelPanel.add(label);
@@ -472,5 +475,18 @@ public class SwingScoutMessageBox extends SwingScoutComposite<IMessageBox> imple
         });
       }
     });
+  }
+
+  protected String processTextOnLabel(String text, JLabelEx label, boolean htmlEnabled) {
+    if (!htmlEnabled && BasicHTML.isHTMLString(text)) {
+      if (SwingUtility.isMultilineLabelText(text)) {
+        String body = getSwingEnvironment().getHtmlValidator().escape(text, getScoutMessageBox());
+        text = "<html>" + StringUtility.convertPlainTextNewLinesToHtml(body, false) + "</html>";
+      }
+      else {
+        text = getSwingEnvironment().getHtmlValidator().escape(text, getScoutMessageBox());
+      }
+    }
+    return text;
   }
 }

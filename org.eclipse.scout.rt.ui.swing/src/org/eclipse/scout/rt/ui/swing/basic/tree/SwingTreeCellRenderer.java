@@ -64,6 +64,7 @@ public class SwingTreeCellRenderer implements TreeCellRenderer {
     if (label == null) {
       return comp;
     }
+    m_env.getHtmlValidator().removeHtmlRenderer(cell, cell.getText(), label);
     label.setEnabled(scoutTree.isEnabled() && node.isEnabled() && cell.isEnabled());
     // icon
     String iconName = cell.getIconId();

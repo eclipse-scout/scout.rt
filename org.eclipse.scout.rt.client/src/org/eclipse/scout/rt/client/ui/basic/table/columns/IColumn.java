@@ -18,6 +18,7 @@ import org.eclipse.scout.commons.ITypeWithClassId;
 import org.eclipse.scout.commons.annotations.IOrdered;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.ui.IHtmlCapable;
 import org.eclipse.scout.rt.client.ui.basic.table.ColumnSet;
 import org.eclipse.scout.rt.client.ui.basic.table.IHeaderCell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
@@ -25,7 +26,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 
-public interface IColumn<VALUE> extends IPropertyObserver, ITypeWithClassId, IOrdered {
+public interface IColumn<VALUE> extends IPropertyObserver, ITypeWithClassId, IOrdered, IHtmlCapable {
   /**
    * type boolean
    */

@@ -18,16 +18,16 @@ import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.LabelProviderChangedEvent;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.rap.rwt.RWT;
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
+import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
+import org.eclipse.scout.rt.ui.rap.basic.AbstractRwtScoutCellTextHelper;
+import org.eclipse.scout.rt.ui.rap.basic.IRwtScoutCellTextHelper;
+import org.eclipse.scout.rt.ui.rap.basic.IRwtScoutComposite;
 import org.eclipse.scout.rt.ui.rap.basic.table.RwtScoutTableEvent;
-import org.eclipse.scout.rt.ui.rap.html.HtmlAdapter;
-import org.eclipse.scout.rt.ui.rap.util.HtmlTextUtility;
 import org.eclipse.swt.graphics.Image;
 
 public class RwtScoutListModel implements IRwtScoutListModel {
@@ -44,10 +44,12 @@ public class RwtScoutListModel implements IRwtScoutListModel {
   private final ITable m_scoutTable;
   private final RwtScoutList m_uiList;
   private boolean m_multiline;
+  private final IRwtEnvironment m_env;
 
   public RwtScoutListModel(ITable scoutTable, RwtScoutList uiTable) {
     m_scoutTable = scoutTable;
     m_uiList = uiTable;
+    m_env = uiTable.getUiEnvironment();
   }
 
   @Override
@@ -162,37 +164,40 @@ public class RwtScoutListModel implements IRwtScoutListModel {
 
   @Override
   public String getText(Object element) {
-    ICell cell = getCell(element);
-    if (cell == null) {
-      return "";
+    final ICell cell = getCell(element);
+    final IRwtScoutCellTextHelper cellTextHelper = createCellTextHelper(m_env, m_uiList, (ITableRow) element);
+
+    return cellTextHelper.processCellText(cell);
+  }
+
+  protected IRwtScoutCellTextHelper createCellTextHelper(IRwtEnvironment env, IRwtScoutComposite<?> uiComposite, ITableRow tableRow) {
+    return new P_RwtScoutListModelCellTextHelper(env, uiComposite, tableRow);
+  }
+
+  private class P_RwtScoutListModelCellTextHelper extends AbstractRwtScoutCellTextHelper {
+
+    private final ITableRow m_tableRow;
+
+    public P_RwtScoutListModelCellTextHelper(IRwtEnvironment env, IRwtScoutComposite<?> uiComposite, ITableRow tableRow) {
+      super(env, uiComposite);
+      m_tableRow = tableRow;
     }
 
-    String text = cell.getText();
-    if (text == null) {
-      text = "";
-    }
-    if (HtmlTextUtility.isTextWithHtmlMarkup(text)) {
-      HtmlAdapter htmlAdapter = m_uiList.getUiEnvironment().getHtmlAdapter();
-      text = htmlAdapter.adaptHtmlCell(m_uiList, text);
-
+    @Override
+    protected Map<String, String> createAdditionalLinkParams() {
       Map<String, String> params = new HashMap<String, String>();
-      ITableRow tableRow = (ITableRow) element;
-      params.put(HYPERLINK_ROW_PARAM, tableRow.getRowIndex() + "");
-      text = htmlAdapter.convertLinksInHtmlCell(m_uiList, text, params);
+      params.put(HYPERLINK_ROW_PARAM, Integer.toString(m_tableRow.getRowIndex()));
+      return params;
     }
-    else {
-      boolean multiline = false;
-      if (text.indexOf("\n") >= 0) {
-        multiline = isMultiline();
-        if (!multiline) {
-          text = StringUtility.replaceNewLines(text, " ");
-        }
-      }
-      boolean markupEnabled = Boolean.TRUE.equals(getUiList().getUiField().getData(RWT.MARKUP_ENABLED));
-      if (markupEnabled || multiline) {
-        text = HtmlTextUtility.transformPlainTextToHtml(text);
-      }
+
+    @Override
+    protected boolean isMultilineScoutObject() {
+      return isMultiline();
     }
-    return text;
+
+    @Override
+    protected boolean isWrapText() {
+      return false;
+    }
   }
 }

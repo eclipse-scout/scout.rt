@@ -37,6 +37,11 @@ import org.eclipse.scout.commons.nls.NlsUtility;
 public final class StringUtility {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(StringUtility.class);
   public static final Pattern PATTERN_TRIM_NEWLINES = Pattern.compile("^[\r\n]*(.*?)[\r\n]*$", Pattern.DOTALL);
+  /**
+   * Special constant used by {@link #htmlEncode(String)} to preserve a tab character (<code>\t</code>) in the resulting
+   * HTML. {@link #htmlDecode(String)} can convert it back to <code>\t</code>, but only if the tag was not altered.
+   */
+  public static final String HTML_ENCODED_TAB = "<span style=\"white-space:pre\">&#9;</span>";
 
   private static final String[] EMPTY_ARRAY = new String[0];
 
@@ -399,11 +404,18 @@ public final class StringUtility {
   /**
    * @return a start tag (ignores single tags) <foo> (not <foo/>)
    */
-  private static TagBounds getStartTag(String text, String tagName, int pos) {
+  private static TagBounds getStartTag(String text, String tagName, boolean ignoreCase, int pos) {
     if (text == null) {
       return TAG_BOUNDS_NOT_FOUND;
     }
-    Pattern pat = Pattern.compile("<" + tagName + "(\\s[^<>]*[^/])?>", Pattern.DOTALL);
+    int flags;
+    if (ignoreCase) {
+      flags = Pattern.CASE_INSENSITIVE | Pattern.DOTALL;
+    }
+    else {
+      flags = Pattern.DOTALL;
+    }
+    Pattern pat = Pattern.compile("<" + tagName + "(\\s[^<>]*[^/])?>", flags);
     Matcher m = pat.matcher(text);
     if (m.find(pos)) {
       return new TagBounds(m.start(), m.end());
@@ -414,11 +426,18 @@ public final class StringUtility {
   /**
    * @return an end tag </foo>
    */
-  private static TagBounds getEndTag(String text, String tagName, int pos) {
+  private static TagBounds getEndTag(String text, String tagName, boolean ignoreCase, int pos) {
     if (text == null) {
       return TAG_BOUNDS_NOT_FOUND;
     }
-    Pattern pat = Pattern.compile("</" + tagName + ">");
+    int flags;
+    if (ignoreCase) {
+      flags = Pattern.CASE_INSENSITIVE;
+    }
+    else {
+      flags = 0;
+    }
+    Pattern pat = Pattern.compile("</" + tagName + ">", flags);
     Matcher m = pat.matcher(text);
     if (m.find(pos)) {
       return new TagBounds(m.start(), m.end());
@@ -431,12 +450,16 @@ public final class StringUtility {
    *         when the tag is not found in the text.
    */
   public static String getTag(String text, String tagName) {
+    return getTag(text, tagName, false);
+  }
+
+  public static String getTag(String text, String tagName, boolean ignoreCase) {
     if (text == null) {
       return null;
     }
     TagBounds a;
     TagBounds b;
-    if ((a = getStartTag(text, tagName, 0)).begin >= 0 && (b = getEndTag(text, tagName, a.end)).begin >= 0) {
+    if ((a = getStartTag(text, tagName, ignoreCase, 0)).begin >= 0 && (b = getEndTag(text, tagName, ignoreCase, a.end)).begin >= 0) {
       return text.substring(a.end, b.begin).trim();
     }
     if ((a = getSingleTag(text, tagName, 0)).begin >= 0) {
@@ -462,6 +485,10 @@ public final class StringUtility {
    * be careful to not replace the tag again with the tag, this will result in an endless loop
    */
   public static String replaceTags(String text, String tagName, ITagProcessor processor) {
+    return replaceTags(text, tagName, false, processor);
+  }
+
+  public static String replaceTags(String text, String tagName, boolean ignoreCase, ITagProcessor processor) {
     if (text == null) {
       return null;
     }
@@ -472,7 +499,7 @@ public final class StringUtility {
       String replacement = processor.processTag(tagName, tagContent);
       text = text.substring(0, a.begin) + replacement + text.substring(a.end);
     }
-    while ((a = getStartTag(text, tagName, 0)).begin >= 0 && (b = getEndTag(text, tagName, a.end)).begin >= 0) {
+    while ((a = getStartTag(text, tagName, ignoreCase, 0)).begin >= 0 && (b = getEndTag(text, tagName, ignoreCase, a.end)).begin >= 0) {
       String tagContent = text.substring(a.end, b.begin);
       String replacement = processor.processTag(tagName, tagContent);
       text = text.substring(0, a.begin) + replacement + text.substring(b.end);
@@ -490,6 +517,10 @@ public final class StringUtility {
    * <code>removeTag(text, "b")</code> will return '&lt;html>some text&lt;/html&gt;'</code>
    */
   public static String removeTag(String text, String tagName) {
+    return removeTag(text, tagName, false);
+  }
+
+  public static String removeTag(String text, String tagName, boolean ignoreCase) {
     if (text == null) {
       return null;
     }
@@ -501,7 +532,7 @@ public final class StringUtility {
     while ((a = getSingleTag(text, tagName, 0)).begin >= 0) {
       text = text.substring(0, a.begin) + text.substring(a.end);
     }
-    while ((a = getStartTag(text, tagName, 0)).begin >= 0 && (b = getEndTag(text, tagName, a.end)).begin >= 0) {
+    while ((a = getStartTag(text, tagName, ignoreCase, 0)).begin >= 0 && (b = getEndTag(text, tagName, ignoreCase, a.end)).begin >= 0) {
       text = text.substring(0, a.begin) + text.substring(b.end);
     }
     return text;
@@ -529,6 +560,10 @@ public final class StringUtility {
   }
 
   public static String removeTagBounds(String text, String tagName) {
+    return removeTagBounds(text, tagName, false);
+  }
+
+  public static String removeTagBounds(String text, String tagName, boolean ignoreCase) {
     if (text == null) {
       return null;
     }
@@ -537,26 +572,30 @@ public final class StringUtility {
     while ((a = getSingleTag(text, tagName, 0)).begin >= 0) {
       text = text.substring(0, a.begin) + text.substring(a.end);
     }
-    while ((a = getStartTag(text, tagName, 0)).begin >= 0 && (b = getEndTag(text, tagName, a.end)).begin >= 0) {
+    while ((a = getStartTag(text, tagName, ignoreCase, 0)).begin >= 0 && (b = getEndTag(text, tagName, ignoreCase, a.end)).begin >= 0) {
       text = text.substring(0, a.begin) + text.substring(a.end, b.begin) + text.substring(b.end);
     }
     return text;
   }
 
   public static String replaceTagBounds(String text, String tagName, String start, String end) {
+    return replaceTagBounds(text, tagName, false, start, end);
+  }
+
+  public static String replaceTagBounds(String text, String tagName, boolean ignoreCase, String start, String end) {
     if (text == null) {
       return null;
     }
     TagBounds a;
     int b;
     int startPos = 0;
-    while (startPos < text.length() && (a = getStartTag(text, tagName, startPos)).begin >= 0 && (b = text.indexOf("</" + tagName + ">", a.end)) > 0) {
+    while (startPos < text.length() && (a = getStartTag(text, tagName, ignoreCase, startPos)).begin >= 0 && (b = text.indexOf("</" + tagName + ">", a.end)) > 0) {
       text =
           text.substring(0, a.begin) +
-              start +
-              text.substring(a.end, b) +
-              end +
-              text.substring(b + tagName.length() + 3);
+          start +
+          text.substring(a.end, b) +
+          end +
+          text.substring(b + tagName.length() + 3);
       //next
       startPos = a.begin + start.length();
     }
@@ -913,7 +952,8 @@ public final class StringUtility {
     if (replaceSpace) {
       s = s.replaceAll("\\s", "&nbsp;");
     }
-    s = s.replace(tabIdentifier, "<span style=\"white-space:pre\">&#9;</span>");
+    s = s.replace(tabIdentifier, HTML_ENCODED_TAB);
+
     return s;
   }
 
@@ -1818,5 +1858,20 @@ public final class StringUtility {
       }
     }
     return true;
+  }
+
+  public static String convertPlainTextNewLinesToHtml(String text, boolean replaceBreakableChars) {
+    if (isNullOrEmpty(text)) {
+      return text;
+    }
+
+    text = replaceNewLines(text, "<br/>");
+
+    if (replaceBreakableChars) {
+      text = text.replace("\\s", "&nbsp;");
+      text = text.replace("-", "&#8209;");
+    }
+
+    return text;
   }
 }

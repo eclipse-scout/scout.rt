@@ -20,6 +20,8 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.html.HTML;
+import org.eclipse.scout.commons.html.HtmlHelper;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientSyncJob;
@@ -218,16 +220,16 @@ public class ScoutInfoForm extends AbstractForm {
       buf.append("<img src=\"" + f.getPath() + "\">");
     }
     else {
-      buf.append("<h3>" + title + "</h3>");
+      buf.append(HTML.h3(title).toHtml());
     }
     buf.append("<p>");
-    buf.append("<h2>" + title + " " + v.getMajor() + "." + v.getMinor() + "." + v.getMicro() + "</h2>");
+    buf.append(HTML.h2(title + " " + v.getMajor() + "." + v.getMinor() + "." + v.getMicro()).toHtml());
     buf.append("<table cellspacing=0 cellpadding=0>");
     //
     StringBuffer contentBuf = new StringBuffer();
     createHtmlPropertyTableContent(contentBuf);
     buf.append(contentBuf.toString());
-    buf.append("<tr><td>" + ScoutTexts.get("DetailedVersion") + ":</td><td>&nbsp;</td><td>" + v.toString() + "</td></tr>");
+    buf.append("<tr><td>" + ScoutTexts.get("DetailedVersion") + ":</td><td>&nbsp;</td><td>" + HtmlHelper.escape(v.toString()) + "</td></tr>");
     //
     buf.append("</table>");
   }
@@ -238,27 +240,27 @@ public class ScoutInfoForm extends AbstractForm {
     long memTotal = Runtime.getRuntime().totalMemory() / 1024 / 1024;
     long memMax = Runtime.getRuntime().maxMemory() / 1024 / 1024;
     //
-    buf.append("<tr><td>" + ScoutTexts.get("Username") + ":</td><td>&nbsp;</td><td>" + session.getUserId() + "</td></tr>");
-    buf.append("<tr><td>" + ScoutTexts.get("Language") + ":</td><td>&nbsp;</td><td>" + LocaleThreadLocal.get().getDisplayLanguage() + "</td></tr>");
-    buf.append("<tr><td>" + ScoutTexts.get("FormattingLocale") + ":</td><td>&nbsp;</td><td>" + LocaleThreadLocal.get() + "</td></tr>");
+    buf.append("<tr><td>" + ScoutTexts.get("Username") + ":</td><td>&nbsp;</td><td>" + HtmlHelper.escape(session.getUserId()) + "</td></tr>");
+    buf.append("<tr><td>" + ScoutTexts.get("Language") + ":</td><td>&nbsp;</td><td>" + HtmlHelper.escape(LocaleThreadLocal.get().getDisplayLanguage()) + "</td></tr>");
+    buf.append("<tr><td>" + ScoutTexts.get("FormattingLocale") + ":</td><td>&nbsp;</td><td>" + HtmlHelper.escape(LocaleThreadLocal.get().toString()) + "</td></tr>");
 
     /**
      * These information must only be presented in the case of an richclient. If the client is a webclient (ui.rap) then
      * these informations must be omitted (Security) https://bugs.eclipse.org/bugs/show_bug.cgi?id=365761
      */
     if (UserAgentUtility.isRichClient()) {
-      buf.append("<tr><td>" + ScoutTexts.get("JavaVersion") + ":</td><td>&nbsp;</td><td>" + System.getProperty("java.version") + "</td></tr>");
-      buf.append("<tr><td>" + ScoutTexts.get("JavaVMVersion") + ":</td><td>&nbsp;</td><td>" + System.getProperty("java.vm.version") + "</td></tr>");
-      buf.append("<tr><td>" + ScoutTexts.get("OSVersion") + ":</td><td>&nbsp;</td><td>" + System.getProperty("os.name") + " " + System.getProperty("os.version") + "</td></tr>");
-      buf.append("<tr><td>" + ScoutTexts.get("OSUser") + ":</td><td>&nbsp;</td><td>" + System.getProperty("user.name") + "</td></tr>");
+      buf.append("<tr><td>" + ScoutTexts.get("JavaVersion") + ":</td><td>&nbsp;</td><td>" + HtmlHelper.escape(System.getProperty("java.version")) + "</td></tr>");
+      buf.append("<tr><td>" + ScoutTexts.get("JavaVMVersion") + ":</td><td>&nbsp;</td><td>" + HtmlHelper.escape(System.getProperty("java.vm.version")) + "</td></tr>");
+      buf.append("<tr><td>" + ScoutTexts.get("OSVersion") + ":</td><td>&nbsp;</td><td>" + HtmlHelper.escape(System.getProperty("os.name") + " " + System.getProperty("os.version")) + "</td></tr>");
+      buf.append("<tr><td>" + ScoutTexts.get("OSUser") + ":</td><td>&nbsp;</td><td>" + HtmlHelper.escape(System.getProperty("user.name")) + "</td></tr>");
       buf.append("<tr><td>" + ScoutTexts.get("MemoryStatus") + ":</td><td>&nbsp;</td><td>" + memUsed + "MB (total " + memTotal + "MB / max " + memMax + "MB)</td></tr>");
       IPerformanceAnalyzerService perf = SERVICES.getService(IPerformanceAnalyzerService.class);
       if (perf != null) {
         buf.append("<tr><td>" + ScoutTexts.get("NetworkLatency") + ":</td><td>&nbsp;</td><td>" + perf.getNetworkLatency() + " ms</td></tr>");
         buf.append("<tr><td>" + ScoutTexts.get("ExecutionTime") + ":</td><td>&nbsp;</td><td>" + perf.getServerExecutionTime() + " ms</td></tr>");
       }
-      if (session.getServiceTunnel() != null) {
-        buf.append("<tr><td>" + ScoutTexts.get("Server") + ":</td><td>&nbsp;</td><td>" + session.getServiceTunnel().getServerURL() + "</td></tr>");
+      if (session.getServiceTunnel() != null && session.getServiceTunnel().getServerURL() != null) {
+        buf.append("<tr><td>" + ScoutTexts.get("Server") + ":</td><td>&nbsp;</td><td>" + HtmlHelper.escape(session.getServiceTunnel().getServerURL().toString()) + "</td></tr>");
       }
     }
   }

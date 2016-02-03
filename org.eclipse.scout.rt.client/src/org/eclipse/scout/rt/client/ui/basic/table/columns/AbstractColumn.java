@@ -505,6 +505,20 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   }
 
   /**
+   * Configures, if HTML rendering is enabled for this column.
+   * <p>
+   * Subclasses can override this method. Default is {@code false}. Make sure that any user input (or other insecure
+   * input) is encoded (security), if this property is enabled.
+   * 
+   * @return {@code true}, if HTML rendering is enabled for this column.{@code false} otherwise.
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(220)
+  protected boolean getConfiguredHtmlEnabled() {
+    return false;
+  }
+
+  /**
    * Called after this column has been added to the column set of the surrounding table. This method may execute
    * additional initialization for this column (e.g. register listeners).
    * <p>
@@ -779,6 +793,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
     if (getConfiguredFont() != null) {
       setFont(FontSpec.parse(getConfiguredFont()));
     }
+    setHtmlEnabled(getConfiguredHtmlEnabled());
   }
 
   /**
@@ -1386,6 +1401,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
     }
     cell.setHorizontalAlignment(getHorizontalAlignment());
     cell.setEditableInternal(isCellEditable(row));
+    cell.setHtmlEnabled(isHtmlEnabled());
   }
 
   @Override
@@ -1616,6 +1632,16 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   @Override
   public void setAutoOptimizeWidth(boolean optimize) {
     propertySupport.setPropertyBool(PROP_AUTO_OPTIMIZE_WIDTH, optimize);
+  }
+
+  @Override
+  public void setHtmlEnabled(boolean enabled) {
+    propertySupport.setProperty(PROP_HTML_ENABLED, enabled);
+  }
+
+  @Override
+  public boolean isHtmlEnabled() {
+    return propertySupport.getPropertyBool(PROP_HTML_ENABLED);
   }
 
   @Override

@@ -98,6 +98,7 @@ public final class SwingUtility {
   public static final boolean IS_JAVA_7_OR_LESS = CompareUtility.compareTo(System.getProperty("java.version"), "1.7") <= 0;
   public static final boolean DO_RESET_COMPONENT_BOUNDS = BundleContextUtility.parseBooleanProperty("scout.ui.layout.resetBoundsOnInvalidate", true);
   public static final boolean VERIFY_INPUT_ON_WINDOW_CLOSED = BundleContextUtility.parseBooleanProperty("scout.ui.verifyInputOnWindowClosed", false);
+  public static final boolean VALIDATE_HTML_CAPABLE = BundleContextUtility.parseBooleanProperty("org.eclipse.scout.rt.ui.swing.validate.htmlCapable", true);
 
   private static Integer topMarginForField = null;
 
@@ -906,7 +907,7 @@ public final class SwingUtility {
    * will be returned. In Windows environments these circumstances (task bar on a none primary screen) will be very rare
    * and therefore ignored until the bug will be fixed in a future Java version.
    * </p>
-   * 
+   *
    * @param screenDevice
    *          a screen thats {@link GraphicsConfiguration} will be used to determine the insets
    * @return the insets of this toolkit's screen, in pixels, if the given screen device is the primary screen, otherwise
@@ -1088,7 +1089,7 @@ public final class SwingUtility {
 
   /**
    * Adjusts the window such that it fits on the screen, if necessary.
-   * 
+   *
    * @param window
    */
   public static void adjustBoundsToScreen(Window window) {
@@ -1197,7 +1198,7 @@ public final class SwingUtility {
    * lies within the specified frame.
    * <p>
    * Intended be used in custom implementations of {@link JComponent#getToolTipLocation(MouseEvent)}.
-   * 
+   *
    * @param e
    *          the event that caused the display of the tool tip
    * @param c
@@ -1272,7 +1273,7 @@ public final class SwingUtility {
   /**
    * This method is used to get a top margin for {@link SwingScoutLabelField} and {@link SwingScoutHtmlField} in order
    * to have correct alignment for customized look and feel (e.g. Rayo)
-   * 
+   *
    * @since 3.10.0-M2
    */
   public static int getTopMarginForField() {
@@ -1351,5 +1352,4 @@ public final class SwingUtility {
     sb.append(rawHtml.substring(matchEndIndex, rawHtml.length()));
     return sb.toString();
   }
-
 }

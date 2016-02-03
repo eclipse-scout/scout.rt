@@ -21,6 +21,7 @@ import org.eclipse.scout.rt.ui.rap.ext.custom.StyledText;
 import org.eclipse.scout.rt.ui.rap.extension.UiDecorationExtensionPoint;
 import org.eclipse.scout.rt.ui.rap.form.fields.groupbox.layout.ButtonBarLayout;
 import org.eclipse.scout.rt.ui.rap.form.fields.groupbox.layout.ButtonBarLayoutData;
+import org.eclipse.scout.rt.ui.rap.util.HtmlTextUtility;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
@@ -56,11 +57,11 @@ public class RwtScoutMessageBoxDialog extends Dialog {
   private P_ScoutMessageBoxListener m_scoutMessageBoxListener;
 
   private final IMessageBox m_scoutObject;
-  private IRwtEnvironment m_uiEnvironment;
+  private final IRwtEnvironment m_uiEnvironment;
 
   private Label m_imageLabel;
-  private StyledText m_introLabel;
-  private StyledText m_actionLabel;
+  private ILabelWrapper m_actionLabelWrapper;
+  private ILabelWrapper m_introLabelWrapper;
 
   public RwtScoutMessageBoxDialog(Shell parentShell, IMessageBox scoutObject, IRwtEnvironment uiEnvironment) {
     super(parentShell);
@@ -126,17 +127,24 @@ public class RwtScoutMessageBoxDialog extends Dialog {
       introText = "";
       exclude = true;
     }
-    m_introLabel.setText(introText);
-    if (m_introLabel.getLayoutData() instanceof GridData) {
-      GridData gridData = ((GridData) m_introLabel.getLayoutData());
+
+    if (m_introLabelWrapper.isHtmlEnabled()) {
+      // escape introText if HTML is enabled, i.e. text will be set on the Label control which renders HTML. This is not needed for the StyledText control since StyledText is not able to render HTML
+      introText = HtmlTextUtility.escapeHtmlCapableText(getUiEnvironment().getHtmlValidator(), getScoutObject(), introText);
+    }
+    m_introLabelWrapper.setLabelText(introText);
+
+    final Control introLabel = m_introLabelWrapper.getLabel();
+    if (introLabel.getLayoutData() instanceof GridData) {
+      GridData gridData = ((GridData) introLabel.getLayoutData());
       if (gridData.exclude != exclude) {
         gridData.exclude = exclude;
         getShell().layout(true);
-        m_introLabel.getParent().getParent().layout(true, true);
+        introLabel.getParent().getParent().layout(true, true);
       }
     }
     // Hide empty labels
-    m_introLabel.setVisible(StringUtility.hasText(m_introLabel.getText()));
+    introLabel.setVisible(StringUtility.hasText(m_introLabelWrapper.getLabelText()));
   }
 
   protected void setActionTextFromScout(String actionText) {
@@ -152,15 +160,21 @@ public class RwtScoutMessageBoxDialog extends Dialog {
       actionText = "";
       exclude = true;
     }
-    m_actionLabel.setText(actionText);
+
+    if (m_actionLabelWrapper.isHtmlEnabled()) {
+      // escape actionText if HTML is enabled, i.e. text will be set on the Label control which renders HTML. This is not needed for the StyledText control since StyledText is not able to render HTML
+      actionText = HtmlTextUtility.escapeHtmlCapableText(getUiEnvironment().getHtmlValidator(), getScoutObject(), actionText);
+    }
+    m_actionLabelWrapper.setLabelText(actionText);
+
     // Hide empty labels
-    m_actionLabel.setVisible(StringUtility.hasText(m_actionLabel.getText()));
-    if (m_actionLabel.getLayoutData() instanceof GridData) {
-      GridData gridData = ((GridData) m_actionLabel.getLayoutData());
+    m_actionLabelWrapper.getLabel().setVisible(StringUtility.hasText(m_actionLabelWrapper.getLabelText()));
+    if (m_actionLabelWrapper.getLabel().getLayoutData() instanceof GridData) {
+      GridData gridData = ((GridData) m_actionLabelWrapper.getLabel().getLayoutData());
       if (gridData.exclude != exclude) {
         gridData.exclude = exclude;
         getShell().layout(true, true);
-        m_actionLabel.getParent().getParent().layout(true, true);
+        m_actionLabelWrapper.getLabel().getParent().getParent().layout(true, true);
       }
     }
   }
@@ -176,9 +190,7 @@ public class RwtScoutMessageBoxDialog extends Dialog {
   protected Control createDialogArea(Composite parent) {
     Composite container = getUiEnvironment().getFormToolkit().createComposite(parent);
     Control header = createHeaderArea(container);
-    m_actionLabel = getUiEnvironment().getFormToolkit().createStyledText(container, SWT.WRAP | SWT.LEFT | SWT.V_SCROLL);
-    m_actionLabel.setEditable(false);
-    m_actionLabel.setData(WRAP_TEXT_WITHOUT_SPACES, Boolean.TRUE);
+    m_actionLabelWrapper = createActionLabel(getScoutObject().isHtmlEnabled(), container);
 
     // layout
     container.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL | GridData.FILL_BOTH));
@@ -192,7 +204,7 @@ public class RwtScoutMessageBoxDialog extends Dialog {
     header.setLayoutData(gridData);
     gridData = new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_BOTH);
     gridData.horizontalIndent = 5;
-    m_actionLabel.setLayoutData(gridData);
+    m_actionLabelWrapper.getLabel().setLayoutData(gridData);
 
     // No control in the dialog area should be in the tab list
     container.setTabList(new Control[]{});
@@ -202,13 +214,7 @@ public class RwtScoutMessageBoxDialog extends Dialog {
   private Control createHeaderArea(Composite parent) {
     Composite container = getUiEnvironment().getFormToolkit().createComposite(parent);
     m_imageLabel = getUiEnvironment().getFormToolkit().createLabel(container, "");
-    m_introLabel = getUiEnvironment().getFormToolkit().createStyledText(container, SWT.WRAP | SWT.LEFT | SWT.V_SCROLL);
-    m_introLabel.setData(WRAP_TEXT_WITHOUT_SPACES, Boolean.TRUE);
-    m_introLabel.setEditable(false);
-    m_introLabel.setData(RWT.MARKUP_ENABLED, Boolean.TRUE);
-    //Unsafe configuration. Size for h1, h2, h3.. tags isn't well calculated at the first time
-    m_introLabel.setData(MarkupValidator.MARKUP_VALIDATION_DISABLED, Boolean.TRUE);
-
+    m_introLabelWrapper = createIntroLabel(getScoutObject().isHtmlEnabled(), container);
     // layout
     GridLayout headerLayout = new GridLayout(2, false);
     headerLayout.marginBottom = 7;
@@ -222,8 +228,16 @@ public class RwtScoutMessageBoxDialog extends Dialog {
     gridData.horizontalIndent = 7;
     gridData.verticalIndent = 0;
     gridData.exclude = true;
-    m_introLabel.setLayoutData(gridData);
+    m_introLabelWrapper.getLabel().setLayoutData(gridData);
     return container;
+  }
+
+  protected ILabelWrapper createIntroLabel(boolean htmlEnabled, Composite container) {
+    return new P_LabelWrapper(htmlEnabled, container);
+  }
+
+  protected ILabelWrapper createActionLabel(boolean htmlEnabled, Composite container) {
+    return new P_LabelWrapper(htmlEnabled, container);
   }
 
   @Override
@@ -410,4 +424,40 @@ public class RwtScoutMessageBoxDialog extends Dialog {
     }
 
   }
+
+  private class P_LabelWrapper extends AbstractLabelWrapper {
+
+    public P_LabelWrapper(boolean htmlEnabled, Composite container) {
+      super(htmlEnabled, container);
+    }
+
+    @Override
+    protected Label createHtmlLabel(boolean htmlEnabled, Composite container) {
+      if (!htmlEnabled) {
+        return null;
+      }
+      // create Label control only if html is enabled since Label is able to render html.
+      Label htmlIntroLabel = getUiEnvironment().getFormToolkit().createLabel(container, "", SWT.WRAP | SWT.LEFT);
+      htmlIntroLabel.setData(RWT.MARKUP_ENABLED, Boolean.TRUE);
+      // Unsafe configuration. Size for h1, h2, h3.. tags isn't well calculated at the first time
+      htmlIntroLabel.setData(MarkupValidator.MARKUP_VALIDATION_DISABLED, Boolean.TRUE);
+
+      return htmlIntroLabel;
+    }
+
+    @Override
+    protected StyledText createTextLabel(boolean htmlEnabled, Composite container) {
+      if (htmlEnabled) {
+        return null;
+      }
+
+      // create StyledText control only if html is disabled since StyledText is not able to render html.
+      StyledText introLabel = getUiEnvironment().getFormToolkit().createStyledText(container, SWT.WRAP | SWT.LEFT | SWT.V_SCROLL);
+      introLabel.setData(WRAP_TEXT_WITHOUT_SPACES, Boolean.TRUE);
+      introLabel.setEditable(false);
+
+      return introLabel;
+    }
+  }
+
 }

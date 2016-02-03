@@ -81,7 +81,7 @@ public class MessageBox extends AbstractPropertyObserver implements IMessageBox 
 
   /**
    * Convenience function for simple delete confirmation message box
-   * 
+   *
    * @param items
    *          one item or array of multiple items
    */
@@ -91,7 +91,7 @@ public class MessageBox extends AbstractPropertyObserver implements IMessageBox 
 
   /**
    * Convenience function for simple delete confirmation message box
-   * 
+   *
    * @param items
    *          a list of multiple items
    * @since Scout 4.0.1
@@ -102,7 +102,7 @@ public class MessageBox extends AbstractPropertyObserver implements IMessageBox 
 
   /**
    * Convenience function for simple delete confirmation message box
-   * 
+   *
    * @param itemType
    *          display text in plural such as "Persons", "Relations", "Tickets",
    *          ...
@@ -126,7 +126,7 @@ public class MessageBox extends AbstractPropertyObserver implements IMessageBox 
 
   /**
    * Convenience function for simple delete confirmation message box
-   * 
+   *
    * @param itemType
    *          display text in plural such as "Persons", "Relations", "Tickets",
    *          ...
@@ -192,6 +192,7 @@ public class MessageBox extends AbstractPropertyObserver implements IMessageBox 
   private String m_cancelButtonText;
   private String m_hiddenText;
   private String m_copyPasteText;
+  private boolean m_htmlEnabled;
   // cached
   private String m_copyPasteTextInternal;
   // modality
@@ -503,6 +504,21 @@ public class MessageBox extends AbstractPropertyObserver implements IMessageBox 
   private void closeMessageBox() {
     m_autoCloseJob = null;
     m_blockingCondition.setBlocking(false);
+  }
+
+  /**
+   * Enables HTML rendering of {@link #m_introText} and {@link #m_actionText}. The setter must be called before starting
+   * the message box.
+   * Subsequent changes of the html enabled flag have no effect after the widget has been initialized.
+   */
+  @Override
+  public void setHtmlEnabled(boolean enabled) {
+    m_htmlEnabled = enabled;
+  }
+
+  @Override
+  public boolean isHtmlEnabled() {
+    return m_htmlEnabled;
   }
 
   private class P_UIFacade implements IMessageBoxUIFacade {

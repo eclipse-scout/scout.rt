@@ -2,6 +2,12 @@ package org.eclipse.scout.rt.ui.rap.util;
 
 import java.util.regex.Pattern;
 
+import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.ui.IHtmlCapable;
+import org.eclipse.scout.rt.ui.rap.basic.IRwtScoutHtmlValidator;
+
 /**
  * Utility class that provides a number of useful static methods to support the
  * implementation of widget life cycle adapters with regard to supporting html markup in table headers, cells, etc.
@@ -10,6 +16,7 @@ import java.util.regex.Pattern;
  */
 public final class HtmlTextUtility {
 
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(HtmlTextUtility.class);
   private static final Pattern htmlMarkupIdentifierPattern = Pattern.compile("<html[^>]*>(.*)</html>.*", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
   private static final Pattern htmlBracketPattern = Pattern.compile("<html[^>]*>(.*)</html>", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
   private static final Pattern headBracketPattern = Pattern.compile("<head[^>]*>(.*)</head>", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
@@ -87,11 +94,7 @@ public final class HtmlTextUtility {
     s = s.replaceAll("[']", "&#39;");
     s = s.replaceAll("[<]", "&lt;");
     s = s.replaceAll("[>]", "&gt;");
-    s = s.replaceAll("[\\n]", "<br/>");
-    if (replaceBreakableChars) {
-      s = s.replaceAll("[\\s]", "&nbsp;");
-      s = s.replaceAll("[-]", "&#8209;");
-    }
+    s = StringUtility.convertPlainTextNewLinesToHtml(s, replaceBreakableChars);
     return s;
   }
 
@@ -152,6 +155,28 @@ public final class HtmlTextUtility {
       pos++;
     }
     return r;
+  }
+
+  /**
+   * Escapes the text of a given object if the object is an instance of {@link IHtmlCapable}. Escaping is done with
+   * the given validator of type {@link IRwtScoutHtmlValidator}
+   *
+   * @since 4.2
+   * @param validator
+   *          the HTML validator
+   * @param obj
+   *          validation is only done if the object is of type {@link IHtmlCapable}
+   * @param text
+   *          the text to validate
+   * @return escaped text if the given object is of type {@link IHtmlCapable}, otherwise the input text will be
+   *         returned.
+   */
+  public static String escapeHtmlCapableText(IRwtScoutHtmlValidator validator, Object obj, String text) {
+    if (!(obj instanceof IHtmlCapable)) {
+      LOG.error("Passed object with text {} is not an instance of {}.", text, IHtmlCapable.class);
+      return text;
+    }
+    return validator.escape(text, (IHtmlCapable) obj);
   }
 
 }

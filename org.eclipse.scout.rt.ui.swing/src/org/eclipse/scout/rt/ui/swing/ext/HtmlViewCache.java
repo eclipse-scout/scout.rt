@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.ui.swing.ext;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.JLabel;
 import javax.swing.UIManager;
@@ -26,18 +27,16 @@ import org.eclipse.scout.commons.CompositeObject;
  * <p>
  * To use on JLabels you must perform the following actions:
  * <ul>
- * <li>Disable automatic html on the field:
- * label.putClientProperty("html.disable",true);</li>
- * <li>Whenever {@link JLabel#setText(String)} is called, call
- * {@link #updateHtmlView(JLabel)} just after it.</li>
+ * <li>Disable automatic html on the field: label.putClientProperty("html.disable",true);</li>
+ * <li>Whenever {@link JLabel#setText(String)} is called, call {@link #updateHtmlView(JLabel)} just after it.</li>
  * </ul>
  */
 public class HtmlViewCache {
-	private HashMap<Object, View> m_viewMap;
+  private final Map<Object, View> m_viewMap;
 
-	public HtmlViewCache() {
-		m_viewMap = new HashMap<Object, View>();
-	}
+  public HtmlViewCache() {
+    m_viewMap = new HashMap<Object, View>();
+  }
 
   /**
    * update html view using the cache

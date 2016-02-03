@@ -78,7 +78,9 @@ import org.eclipse.scout.rt.client.ui.form.fields.mailfield.IMailField;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.ui.swing.action.ISwingScoutAction;
 import org.eclipse.scout.rt.ui.swing.basic.ISwingScoutComposite;
+import org.eclipse.scout.rt.ui.swing.basic.ISwingScoutHtmlValidator;
 import org.eclipse.scout.rt.ui.swing.basic.SwingScoutComposite;
+import org.eclipse.scout.rt.ui.swing.basic.SwingScoutHtmlValidator;
 import org.eclipse.scout.rt.ui.swing.basic.table.ISwingScoutTable;
 import org.eclipse.scout.rt.ui.swing.basic.table.SwingScoutTable;
 import org.eclipse.scout.rt.ui.swing.basic.table.SwingTableColumn;
@@ -140,6 +142,7 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
   private Rectangle m_popupOwnerBounds;
   private final Object m_immediateSwingJobsLock = new Object();
   private final List<Runnable> m_immediateSwingJobs = new ArrayList<Runnable>();
+  private ISwingScoutHtmlValidator m_htmlValidator;
 
   public AbstractSwingEnvironment() {
     checkThread();
@@ -165,6 +168,7 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
         setWindowIcon(m_rootFrame);
       }
       m_synchronizer = new SwingScoutSynchronizer(this);
+      m_htmlValidator = createHtmlValidator();
     }
   }
 
@@ -1241,4 +1245,12 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
     return new CheckboxWithMarginIcon(insets);
   }
 
+  protected ISwingScoutHtmlValidator createHtmlValidator() {
+    return new SwingScoutHtmlValidator();
+  }
+
+  @Override
+  public ISwingScoutHtmlValidator getHtmlValidator() {
+    return m_htmlValidator;
+  }
 }

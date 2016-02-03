@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.mobile.ui.basic.table;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.IOUtility;
+import org.eclipse.scout.commons.html.HTML;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.mobile.Activator;
@@ -51,8 +52,8 @@ public class PagingTableRow extends TableRow {
       else {
         content = TEXTS.get("MobilePagingShowNext");
       }
-      content = "<b>" + content + "</b>";
-      String output = s_htmlCellTemplate.replace("#CONTENT#", content);
+
+      String output = s_htmlCellTemplate.replace("#CONTENT#", HTML.bold(content).toHtml());
       getCellForUpdate(column).setText(output);
     }
   }

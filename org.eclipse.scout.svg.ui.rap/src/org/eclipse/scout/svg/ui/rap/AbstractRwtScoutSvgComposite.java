@@ -185,7 +185,7 @@ public abstract class AbstractRwtScoutSvgComposite<T extends IFormField> extends
         backgroundColorInheritScript = "";
       }
 
-      // set the html content to the browser
+      // assume that html content is encoded properly. set the html content to the browser
       getUiField().setText("<html><body style=\"overflow: hidden;\" width=\"100%\" height=\"100%\" onload=\"" + backgroundColorInheritScript + "\" onclick=\"" + contextMenuHideScript + "\">" + svgText + "</body></html>");
     }
     catch (Exception e) {

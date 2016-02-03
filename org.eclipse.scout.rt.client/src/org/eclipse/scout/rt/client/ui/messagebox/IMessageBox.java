@@ -11,8 +11,9 @@
 package org.eclipse.scout.rt.client.ui.messagebox;
 
 import org.eclipse.scout.commons.beans.IPropertyObserver;
+import org.eclipse.scout.rt.client.ui.IHtmlCapable;
 
-public interface IMessageBox extends IPropertyObserver {
+public interface IMessageBox extends IPropertyObserver, IHtmlCapable {
 
   /**
    * Result status YES

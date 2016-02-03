@@ -1237,7 +1237,9 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
           if (scoutCol.getDataType() == Boolean.class && (!(scoutCol instanceof ISmartColumn) || ((ISmartColumn) scoutCol).getLookupCall() == null)) {
             text = null;
           }
-          if (wrapText || (scoutTable.isMultilineText() && SwingUtility.isMultilineLabelText(text))) {
+
+          final boolean wrapOrMultilineText = wrapText || (scoutTable.isMultilineText() && SwingUtility.isMultilineLabelText(text));
+          if (wrapOrMultilineText) {
             text = SwingUtility.createHtmlLabelText(text, wrapText);
           }
           else {
@@ -1247,9 +1249,16 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
             }
           }
           if (c instanceof JLabel) {
-            ((JLabel) c).setText(text);
-            if (m_htmlViewCache != null) {
-              m_htmlViewCache.updateHtmlView((JLabel) c, cell.getForegroundColor() != null);
+            JLabel label = (JLabel) c;
+
+            boolean removedHtmlRenderer = false;
+            if (!wrapOrMultilineText) { // wrapped and multi-line texts need to be processed a HTML renderer, so it will not be removed
+              removedHtmlRenderer = getSwingEnvironment().getHtmlValidator().removeHtmlRenderer(cell, text, label);
+            }
+
+            label.setText(text);
+            if (!removedHtmlRenderer && m_htmlViewCache != null) {
+              m_htmlViewCache.updateHtmlView(label, cell.getForegroundColor() != null);
             }
           }
           // tooltip

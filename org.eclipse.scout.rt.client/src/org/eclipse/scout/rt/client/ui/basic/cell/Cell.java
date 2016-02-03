@@ -19,6 +19,7 @@ import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.ui.IHtmlCapable;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractColumn;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 
@@ -29,7 +30,7 @@ import org.eclipse.scout.rt.shared.data.basic.FontSpec;
  * rarely used properties.
  * </p>
  */
-public class Cell implements ICell {
+public class Cell implements ICell, IHtmlCapable {
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(Cell.class);
 
@@ -87,6 +88,7 @@ public class Cell implements ICell {
       setValue(c.getValue());
       setEnabled(c.isEnabled());
       setErrorStatus(c.getErrorStatus());
+      setHtmlEnabled(c.isHtmlEnabled());
       //do not reset observer
     }
   }
@@ -312,5 +314,26 @@ public class Cell implements ICell {
       s = StringUtility.emptyIfNull(getValue());
     }
     return s;
+  }
+
+  @Override
+  public void setHtmlEnabled(boolean b) {
+    if (m_cellSpecialization instanceof CellStyle) {
+      if (b) {
+        ICellSpecialization newStyle = new CellExtension(m_cellSpecialization);
+        newStyle.setHtmlEnabled(b);
+        setValueInternal(HTML_ENABLED_BIT, newStyle);
+      }
+    }
+    else if (m_cellSpecialization.isHtmlEnabled() != b) {
+      ICellSpecialization newStyle = m_cellSpecialization.copy();
+      newStyle.setHtmlEnabled(b);
+      setValueInternal(HTML_ENABLED_BIT, newStyle);
+    }
+  }
+
+  @Override
+  public boolean isHtmlEnabled() {
+    return m_cellSpecialization.isHtmlEnabled();
   }
 }

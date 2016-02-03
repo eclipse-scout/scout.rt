@@ -179,6 +179,7 @@ public class RwtScoutHtmlField extends RwtScoutValueFieldComposite<IHtmlField> i
         }
       }
     }
+    // assume that rawHTML is encoded properly in the model layer
     String cleanHtml = getUiEnvironment().styleHtmlText(this, rawHtml);
     cleanHtml = m_browserExtension.adaptHyperlinks(cleanHtml);
     //fast create of browser content if there are no attachments
