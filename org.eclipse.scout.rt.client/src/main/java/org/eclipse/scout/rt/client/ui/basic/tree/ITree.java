@@ -374,6 +374,11 @@ public interface ITree extends IPropertyObserver, IDNDSupport, IAppLinkCapable, 
    */
   void setNodeExpanded(ITreeNode node, boolean expanded, boolean lazy);
 
+  /**
+   * set expanded without check if node is already expanded
+   */
+  void setNodeExpandedInternal(ITreeNode node, boolean expanded, boolean lazy);
+
   void setNodeEnabledPermission(ITreeNode node, Permission p);
 
   boolean isNodeEnabled(ITreeNode node);

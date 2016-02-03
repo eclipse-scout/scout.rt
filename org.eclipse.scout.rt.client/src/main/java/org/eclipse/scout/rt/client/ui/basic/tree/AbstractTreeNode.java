@@ -65,7 +65,7 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
   private boolean m_childrenLoaded;
   private final OptimisticLock m_childrenLoadedLock = new OptimisticLock();
   private boolean m_leaf;
-  private boolean m_defaultExpanded;
+  private boolean m_initialExpanded;
   private boolean m_expanded;
   private boolean m_expandedLazy;
   private boolean m_lazyExpandingEnabled;
@@ -217,7 +217,7 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
     setExpandedInternal(getConfiguredExpanded());
     setLazyExpandingEnabled(getConfiguredLazyExpandingEnabled());
     setExpandedLazyInternal(isLazyExpandingEnabled());
-    m_defaultExpanded = getConfiguredExpanded();
+    m_initialExpanded = getConfiguredExpanded();
     m_contributionHolder = new ContributionComposite(this);
     // menus
     List<Class<? extends IMenu>> declaredMenus = getDeclaredMenus();
@@ -532,12 +532,12 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
 
   @Override
   public boolean isInitialExpanded() {
-    return m_defaultExpanded;
+    return m_initialExpanded;
   }
 
   @Override
   public void setInitialExpanded(boolean b) {
-    m_defaultExpanded = b;
+    m_initialExpanded = b;
   }
 
   @Override
@@ -1077,6 +1077,9 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
   @Override
   public void setTreeInternal(ITree tree, boolean includeSubtree) {
     m_tree = tree;
+    if (m_expanded) {
+      m_tree.setNodeExpandedInternal(this, m_expanded, m_lazyExpandingEnabled);
+    }
     if (includeSubtree) {
       synchronized (m_childNodeListLock) {
         for (Iterator<ITreeNode> it = m_childNodeList.iterator(); it.hasNext();) {

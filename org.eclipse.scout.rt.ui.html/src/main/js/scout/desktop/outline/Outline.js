@@ -313,7 +313,19 @@ scout.Outline.prototype.navigateToTop = function() {
     this._showOutlineOverview();
   }
 
+  this.handleInitialExpanded();
+
   this.handleOutlineContentDebounced(true);
+};
+
+scout.Outline.prototype.handleInitialExpanded = function(){
+  this._visitNodes(this.nodes, function(node) {
+    if (node.initialExpanded) {
+      this.expandNode(node, {
+        renderExpansion: true
+      });
+    }
+  }.bind(this));
 };
 
 scout.Outline.prototype._onNodeDeleted = function(node) {
