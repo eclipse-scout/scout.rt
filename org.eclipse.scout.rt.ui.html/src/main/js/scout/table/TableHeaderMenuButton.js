@@ -33,8 +33,7 @@ scout.TableHeaderMenuButton.prototype._render = function($parent) {
   this.$container = $parent.appendDiv('table-header-menu-command')
     .on('click', this._onClick.bind(this))
     .on('mouseenter click', this._onMouseOver.bind(this))
-    .on('mouseleave', this._onMouseOut.bind(this))
-    .setTabbable(true);
+    .on('mouseleave', this._onMouseOut.bind(this));
   if (this.cssClass) {
     this.$container.addClass(this.cssClass);
   }
@@ -112,6 +111,7 @@ scout.TableHeaderMenuButton.prototype._updateEnabled = function() {
 
 scout.TableHeaderMenuButton.prototype._renderEnabled = function() {
   this.$container.toggleClass('disabled', !this.enabled);
+  this.$container.setTabbable(this.enabled);
 };
 
 scout.TableHeaderMenuButton.prototype.setIcon = function(icon) {
