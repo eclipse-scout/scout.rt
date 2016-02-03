@@ -1493,11 +1493,15 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
 
   @Override
   public void openUri(String url, IOpenUriAction openUriAction) {
+    Assertions.assertNotNull(url);
+    Assertions.assertNotNull(openUriAction);
     fireOpenUri(url, openUriAction);
   }
 
   @Override
   public void openUri(BinaryResource res, IOpenUriAction openUriAction) {
+    Assertions.assertNotNull(res);
+    Assertions.assertNotNull(openUriAction);
     fireOpenUri(res, openUriAction);
   }
 
