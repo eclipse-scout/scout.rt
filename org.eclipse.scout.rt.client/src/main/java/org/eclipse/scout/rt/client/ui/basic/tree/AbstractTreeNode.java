@@ -1077,7 +1077,7 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
   @Override
   public void setTreeInternal(ITree tree, boolean includeSubtree) {
     m_tree = tree;
-    if (m_expanded) {
+    if (m_expanded && m_tree != null) {
       m_tree.setNodeExpandedInternal(this, m_expanded, m_lazyExpandingEnabled);
     }
     if (includeSubtree) {
