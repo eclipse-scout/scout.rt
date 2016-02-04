@@ -56,6 +56,13 @@ scout.NumberField.prototype._renderDecimalFormat = function() {
   this._parse();
 };
 
+
+scout.NumberField.prototype.acceptInput = function(){
+  this._parse();
+  scout.NumberField.parent.prototype.acceptInput.call(this);
+};
+
+
 scout.NumberField.prototype._parse = function() {
   var input = this.$field.val();
   if (input) {
