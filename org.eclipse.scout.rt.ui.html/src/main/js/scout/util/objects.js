@@ -109,10 +109,19 @@ scout.objects = {
   checkMethodOverrides: function() {
     var whitelist = [
       'ModelAdapter.init',
+      'ModelAdapter._init',
       'Calendar.init',
       'MobileTable.init'
     ];
-    var result = [];
+    var result1 = [
+      'Legend:',
+      '[!] Method includes super call, and parent method uses arguments',
+      ' ~  Method includes super call, but parent method does not use arguments',
+      '    Method does not include super call',
+      '',
+      'Wrong number of arguments:'
+    ];
+    var result2 = ['Different argument names:'];
 
     for (var prop in scout) {
       var o = scout[prop];
@@ -142,7 +151,24 @@ scout.objects = {
               var fname = prop + '.' + name;
               if (mismatch && whitelist.indexOf(fname) === -1) { // && args.length !== parentArgs.length) {
                 // Collect found mismatch
-                result.push(fname + '(' + args.join(', ') + ') does not correctly override ' + getPrototypeOwner(parentFn) + '.' + name + '(' + parentArgs.join(', ') + ')');
+                var result = fname + '(' + args.join(', ') + ') does not correctly override ' + getPrototypeOwner(parentFn) + '.' + name + '(' + parentArgs.join(', ') + ')';
+                var includesSuperCall = (fn.toString().match(new RegExp('scout.' + scout.strings.quote(prop) + '.parent.prototype.' + scout.strings.quote(name) + '.call\\(')) !== null);
+                var parentFunctionUsesArguments = false;
+                if (includesSuperCall) {
+                  for (var j = 0; j < parentArgs.length; j++) {
+                    var m = parentFn.toString().match(new RegExp('[^.\\w]' + scout.strings.quote(parentArgs[j]) + '[^\\w]', 'g'));
+                    if (m !== null && m.length > 1) {
+                      parentFunctionUsesArguments = true;
+                      break;
+                    }
+                  }
+                }
+                result = (includesSuperCall ? (parentFunctionUsesArguments ? '[!]' : ' ~ ') : '   ') + ' ' + result;
+                if (args.length !== parentArgs.length) {
+                  result1.push(result);
+                } else {
+                  result2.push(result);
+                }
               }
             }
             parent = parent.parent;
@@ -151,7 +177,8 @@ scout.objects = {
       }
     }
 
-    return result;
+    result1.push('');
+    return result1.concat(result2);
 
     // ----- Helper functions -----
 
