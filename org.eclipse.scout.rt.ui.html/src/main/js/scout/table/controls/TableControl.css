@@ -13,17 +13,18 @@
   display: inline-block;
   padding: 0 @table-control-padding;
   cursor: pointer;
-  height: @table-footer-height;
-  line-height: @table-footer-height;
   border-left: 1px solid transparent;
   border-right: 1px solid transparent;
   /* draw over border-top of .table-footer */
+  height: calc(100% + 1px);
   margin-top: -1px;
   padding-top: 1px;
+  #scout.vertical-align-helper-before();
 
   & > .font-icon {
     font-size: 22px;
     color: @table-control-color;
+    vertical-align: middle;
   }
 
   &:hover > .font-icon {

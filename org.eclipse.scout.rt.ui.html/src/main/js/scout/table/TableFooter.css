@@ -99,6 +99,7 @@
 
 .table-controls {
   position: absolute;
+  height: 100%;
 
   .table-footer > & ~ & {
     margin-left: -1px;
