@@ -3531,12 +3531,13 @@ scout.Table.prototype._onStartCellEdit = function(columnId, rowId, fieldId) {
 
 scout.Table.prototype._onEndCellEdit = function(fieldId) {
   var field = this.session.getModelAdapter(fieldId);
-
-  // Remove the cell-editor popup prior destroying the field, so that the 'cell-editor-popup's focus context is uninstalled first and the focus can be restored onto the last focused element of the surrounding focus context.
-  // Otherwise, if the currently focused field is removed from DOM, the $entryPoint would be focused first, which can be avoided if removing the popup first.
-  this.cellEditorPopup.remove();
-  this.cellEditorPopup = null;
-
+  //the cellEditorPopup could already be removed by scrolling(out of view range) or be removed by update rows
+  if (this.cellEditorPopup) {
+    // Remove the cell-editor popup prior destroying the field, so that the 'cell-editor-popup's focus context is uninstalled first and the focus can be restored onto the last focused element of the surrounding focus context.
+    // Otherwise, if the currently focused field is removed from DOM, the $entryPoint would be focused first, which can be avoided if removing the popup first.
+    this.cellEditorPopup.remove();
+    this.cellEditorPopup = null;
+  }
   field.destroy();
 };
 
