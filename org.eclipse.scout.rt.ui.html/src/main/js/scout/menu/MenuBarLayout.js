@@ -39,7 +39,7 @@ scout.MenuBarLayout.prototype.layout = function($container) {
     this._menuBar.visibleMenuItems = this._menuBar.menuItems;
   } else {
     // create ellipsis menu
-    this._createAndRenderEllipsis(this._menuBar.$left);
+    this._createAndRenderEllipsis(this._menuBar.$left, rightWidth===0);
     var ellipsisSize = scout.graphics.getSize(this._ellipsis.$container, true);
 
     var remainingLeftWidth = Math.min(availableWidth - rightWidth, leftWidth);
@@ -116,7 +116,7 @@ scout.MenuBarLayout.prototype._addEllipsisToMenuItems = function(menuItems) {
   scout.arrays.insert(menuItems, this._ellipsis, insertItemAt);
 };
 
-scout.MenuBarLayout.prototype._createAndRenderEllipsis = function($container) {
+scout.MenuBarLayout.prototype._createAndRenderEllipsis = function($container, lastMenuInBar) {
   var ellipsis = scout.create('Menu', {
     parent: this._menuBar,
     horizontalAlignment: 1,
@@ -124,6 +124,9 @@ scout.MenuBarLayout.prototype._createAndRenderEllipsis = function($container) {
     tabbable: false
   });
   ellipsis.render($container);
+  if(lastMenuInBar){
+    ellipsis.$container.addClass('last');
+  }
   this._ellipsis = ellipsis;
 };
 
