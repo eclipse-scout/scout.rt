@@ -94,6 +94,26 @@ public class TreeBoxTest {
   }
 
   /**
+   * Tests that a initially checked node which is removed from the tree is not contained in the set of checked nodes
+   * after removal.
+   */
+  @Test
+  public void testCheckedNodesRemovedOn() throws Exception {
+    HashSet<Long> initialValues = CollectionUtility.hashSet(1L, 4L, 5L);
+    SimpleTreeBox treeBox = createSimpleTreeBoxWithInitialSelection(initialValues);
+    ITree tree = treeBox.getTree();
+
+    // ensure initial value is set and checked nodes equals initial values
+    assertEquals(initialValues.size(), tree.getCheckedNodesCount());
+    assertTrue(CollectionUtility.equalsCollection(tree.findNodes(initialValues), tree.getCheckedNodes()));
+
+    // re-initialize field and ensures checked nodes equals initial values
+    treeBox.initField();
+    assertEquals(initialValues.size(), tree.getCheckedNodesCount());
+    assertTrue(CollectionUtility.equalsCollection(tree.findNodes(initialValues), tree.getCheckedNodes()));
+  }
+
+  /**
    * Select a parent node in a tree box with auto check child nodes activated, and check whether this node and all child
    * nodes are selected. {@link AbstractTreeBox#getConfiguredAutoCheckChildNodes} returns true on the
    * {@link AutoSelectTreeBox}. Bug 368107 - Check child nodes when parent node is checked
@@ -242,22 +262,22 @@ public class TreeBoxTest {
   @Test
   public void testValidationOfNullValue() {
     ValidatingTreeBox treeBox = createValidatingTreeBox();
-    findAndCheckNode(treeBox, null);
+    findAndSetNodeChecked(treeBox, null, true);
     assertEquals(treeBox.getTree().getCheckedNodes().size(), 0);
   }
 
   @Test
   public void testValidation() {
     ValidatingTreeBox treeBox = createValidatingTreeBox();
-    findAndCheckNode(treeBox, 1L);
-    findAndCheckNode(treeBox, 5L);
-    findAndCheckNode(treeBox, 10L);
+    findAndSetNodeChecked(treeBox, 1L, true);
+    findAndSetNodeChecked(treeBox, 5L, true);
+    findAndSetNodeChecked(treeBox, 10L, true);
     //up to 16, all is well:
 
     assertEquals(treeBox.getTree().getCheckedNodes().size(), 3);
     assertTrue(CollectionUtility.equalsCollection(getCheckedTreeNodeKeys(treeBox), CollectionUtility.hashSet(1L, 5L, 10L)));
 
-    findAndCheckNode(treeBox, 6L);
+    findAndSetNodeChecked(treeBox, 6L, true);
     //validation now adjusts value.
 
     assertEquals(treeBox.getTree().getCheckedNodes().size(), 2);
@@ -270,16 +290,30 @@ public class TreeBoxTest {
     return treeBox;
   }
 
+  private SimpleTreeBox createSimpleTreeBoxWithInitialSelection(final Set<Long> initialValues) {
+    SimpleTreeBox treeBox = new SimpleTreeBox() {
+
+      @Override
+      public Set<Long> getInitValue() {
+        return initialValues;
+      }
+
+    };
+    treeBox.initField();
+    treeBox.resetValue();
+    return treeBox;
+  }
+
   private ValidatingTreeBox createValidatingTreeBox() {
     ValidatingTreeBox treeBox = new ValidatingTreeBox();
     treeBox.initField();
     return treeBox;
   }
 
-  private <T> void findAndCheckNode(ITreeBox<T> treeBox, T pk) {
+  private <T> void findAndSetNodeChecked(ITreeBox<T> treeBox, T pk, boolean check) {
     ITreeNode node = treeBox.getTree().findNode(pk);
     if (node != null) {
-      node.setChecked(true);
+      node.setChecked(check);
     }
   }
 

@@ -1396,6 +1396,19 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     }
   }
 
+  /**
+   * Recursively checks/unchecks the subtree of <code>parent</code>.
+   */
+  private void uncheckAllRec(ITreeNode parent, boolean b) {
+    if (parent == null) {
+      return;
+    }
+    setNodeChecked(parent, b);
+    for (ITreeNode node : parent.getChildNodes()) {
+      uncheckAllRec(node, b);
+    }
+  }
+
   @Override
   public int getNodeStatus(ITreeNode node) {
     if (node != null) {
@@ -1646,6 +1659,10 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
       }
       children = resolveNodes(children);
       deselectNodes(children);
+      // remove children from set of checked nodes
+      for (ITreeNode child : children) {
+        uncheckAllRec(child, false);
+      }
       ((AbstractTreeNode) parent).removeChildNodesInternal(children, true, isAutoDiscardOnDelete());
       decorateAffectedNodeCells(parent, parent.getChildNodes());
       if (!isAutoDiscardOnDelete()) {
@@ -2162,6 +2179,11 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   @Override
   public Set<ITreeNode> getCheckedNodes() {
     return CollectionUtility.hashSet(m_checkedNodes);
+  }
+
+  @Override
+  public int getCheckedNodesCount() {
+    return m_checkedNodes.size();
   }
 
   @Override

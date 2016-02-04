@@ -281,6 +281,8 @@ public interface ITree extends IPropertyObserver, IDNDSupport, IAppLinkCapable, 
    */
   Set<ITreeNode> getCheckedNodes();
 
+  int getCheckedNodesCount();
+
   /**
    * Container of this tree, {@link IPage}, {@link ITreeField}, {@link ITreeBox}
    * <p>
