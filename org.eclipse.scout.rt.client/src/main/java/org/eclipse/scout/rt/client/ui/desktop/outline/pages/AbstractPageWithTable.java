@@ -667,10 +667,10 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
   }
 
   @Override
-  public void nodeRemovedNotify() {
+  public void disposeInternal() {
+    super.disposeInternal();
     try {
       disposeSearchForm();
-      super.nodeRemovedNotify();
     }
     catch (RuntimeException e) {
       BEANS.get(ExceptionHandler.class).handle(e);
