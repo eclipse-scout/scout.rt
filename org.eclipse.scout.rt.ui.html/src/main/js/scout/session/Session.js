@@ -868,6 +868,12 @@ scout.Session.prototype.sendLogRequest = function(message) {
     log: true,
     message: message
   };
+  if (this.currentEvent) {
+    request.event = {
+      target: this.currentEvent.target,
+      type: this.currentEvent.type
+    };
+  }
 
   // Do not use _sendRequest to make sure a log request has no side effects and will be sent only once
   var ajaxOptions = this.defaultAjaxOptions(request);
@@ -891,6 +897,7 @@ scout.Session.prototype._processEvents = function(events) {
   var i, j, event, adapter, adapterClones, eventTargets;
   for (i = 0; i < events.length; i++) {
     event = events[i];
+    this.currentEvent = event;
 
     $.log.debug("Processing event '" + event.type + "' for adapter with ID " + event.target);
     adapter = this.getModelAdapter(event.target);
@@ -906,13 +913,15 @@ scout.Session.prototype._processEvents = function(events) {
     eventTargets = [adapter];
     scout.arrays.pushAll(eventTargets, this.getAdapterClones(adapter));
     for (j = 0; j < eventTargets.length; j++) {
+      var target = eventTargets[j];
       if (event.type === 'property') { // Special handling for 'property' type
-        eventTargets[j].onModelPropertyChange(event);
+        target.onModelPropertyChange(event);
       } else {
-        eventTargets[j].onModelAction(event);
+        target.onModelAction(event);
       }
     }
   }
+  this.currentEvent = null;
 };
 
 scout.Session.prototype.init = function() {
