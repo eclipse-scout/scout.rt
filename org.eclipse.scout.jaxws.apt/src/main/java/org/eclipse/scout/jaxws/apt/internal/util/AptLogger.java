@@ -18,6 +18,7 @@ import javax.annotation.processing.ProcessingEnvironment;
 import javax.tools.Diagnostic.Kind;
 
 import org.eclipse.scout.jaxws.apt.JaxWsAnnotationProcessor;
+import org.eclipse.scout.jaxws.apt.internal.util.SLF4JMessageFormatter.FormattingTuple;
 
 /**
  * Use to log to the APT console.
@@ -43,10 +44,10 @@ public class AptLogger {
    *          optional arguments to substitute <em>formatting anchors</em> in the message.
    */
   public void info(final String msg, final Object... args) {
-    // TODO [6.0] dwi: Use SLF4J MessageFormatter when upgrading to Maven version newer than 3.3.3
+    // TODO [6.1] dwi: Use SLF4J MessageFormatter when upgrading to Maven version newer than 3.3.3
     //                 Maven bug: https://issues.apache.org/jira/browse/MNG-5842
     //                 Correct solution: final String message = MessageFormatter.arrayFormat(msg, args).getMessage();
-    final String message = formatMessage(msg, args).getMessage();
+    final String message = SLF4JMessageFormatter.format(msg, args).getMessage();
     final String logMsg = String.format("Annotation processing: %s [processor=%s]", message, JaxWsAnnotationProcessor.class.getSimpleName());
 
     m_message.printMessage(Kind.NOTE, logMsg);
@@ -64,10 +65,10 @@ public class AptLogger {
    *          optional arguments to substitute <em>formatting anchors</em> in the message.
    */
   public void warn(final String msg, final Object... args) {
-    // TODO [6.0] dwi: Use SLF4J MessageFormatter when upgrading to Maven version newer than 3.3.3
+    // TODO [6.1] dwi: Use SLF4J MessageFormatter when upgrading to Maven version newer than 3.3.3
     //                 Maven bug: https://issues.apache.org/jira/browse/MNG-5842
     //                 Correct solution: final String message = MessageFormatter.arrayFormat(msg, args).getMessage();
-    final String message = formatMessage(msg, args).getMessage();
+    final String message = SLF4JMessageFormatter.format(msg, args).getMessage();
     final String logMsg = String.format("Annotation processing: %s [processor=%s]", message, JaxWsAnnotationProcessor.class.getSimpleName());
 
     m_message.printMessage(Kind.WARNING, logMsg);
@@ -86,11 +87,11 @@ public class AptLogger {
    *          as the execption's cause if of type {@link Throwable} and not referenced in the message.
    */
   public void error(final String msg, final Object... args) {
-    // TODO [6.0] dwi: Use SLF4J MessageFormatter when upgrading to Maven version newer than 3.3.3
+    // TODO [6.1] dwi: Use SLF4J MessageFormatter when upgrading to Maven version newer than 3.3.3
     //                 Maven bug: https://issues.apache.org/jira/browse/MNG-5842
     //                 Correct solution: final String message = MessageFormatter.arrayFormat(msg, args).getMessage();
     //                                   final Throwable throwable = MessageFormatter.arrayFormat(msg, args).getThrowable();
-    final Format format = formatMessage(msg, args);
+    final FormattingTuple format = SLF4JMessageFormatter.format(msg, args);
 
     final StringWriter writer = new StringWriter();
     final PrintWriter out = new PrintWriter(writer);
@@ -108,47 +109,6 @@ public class AptLogger {
     m_message.printMessage(Kind.ERROR, writer.toString()); // fails the build
     if (m_consoleLog) {
       System.err.printf("[ERROR] %s\n", writer.toString());
-    }
-  }
-
-  // TODO [6.0] dwi: Remove when upgrading to Maven version newer than 3.3.3
-  //                 Maven bug: https://issues.apache.org/jira/browse/MNG-5842
-  private static Format formatMessage(final String msg, final Object... args) {
-    if (args.length == 0) {
-      return new Format(msg);
-    }
-
-    final Format format = new Format(String.format(msg.replaceAll("\\{\\}", "%s"), args));
-    final Object lastArg = args[args.length - 1];
-    if (lastArg instanceof Throwable) {
-      format.setThrowable((Throwable) lastArg);
-    }
-
-    return format;
-  }
-
-  // TODO [6.0] dwi: Remove when upgrading to Maven version newer than 3.3.3
-  //                 Maven bug: https://issues.apache.org/jira/browse/MNG-5842
-  private static class Format {
-
-    private final String m_message;
-    private Throwable m_throwable;
-
-    public Format(final String message) {
-      m_message = message;
-    }
-
-    public String getMessage() {
-      return m_message;
-
-    }
-
-    public void setThrowable(final Throwable throwable) {
-      m_throwable = throwable;
-    }
-
-    public Throwable getThrowable() {
-      return m_throwable;
     }
   }
 }
