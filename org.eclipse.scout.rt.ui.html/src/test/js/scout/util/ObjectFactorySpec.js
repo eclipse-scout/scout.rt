@@ -97,13 +97,4 @@ describe('ObjectFactory', function() {
     }
   });
 
-  it('distinguishes between mobile and regular objects', function() {
-    scout.device.type = scout.Device.Type.DESKTOP;
-    var objectType, object = scout.objectFactories.Desktop();
-    expect(object instanceof scout.Desktop).toBe(true);
-    scout.device.type = scout.Device.Type.MOBILE;
-    object = scout.objectFactories.Desktop();
-    expect(object instanceof scout.MobileDesktop).toBe(true);
-  });
-
 });
