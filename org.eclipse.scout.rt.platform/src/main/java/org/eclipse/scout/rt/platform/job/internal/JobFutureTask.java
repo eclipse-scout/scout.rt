@@ -157,8 +157,8 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
     }
     finally {
       m_runner = null;
-      releasePermit();
       finishInternal();
+      releasePermit();
     }
   }
 
@@ -194,12 +194,14 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
   }
 
   /**
-   * Method invoked once this task completed execution, or if cancelled and not currently executing, and is invoked only
-   * once.
+   * Method invoked once this task finished execution, or upon a premature cancellation, meaning that the job did not
+   * commence execution yet, and will never do so.
    */
   protected void finished() {
     m_jobManager.unregisterFuture(this);
     m_completionPromise.finish();
+
+    // IMPORTANT: do not release permit here.
   }
 
   @Override
