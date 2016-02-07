@@ -21,13 +21,13 @@ import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.job.IFuture;
-import org.eclipse.scout.rt.platform.job.IJobListenerRegistration;
 import org.eclipse.scout.rt.platform.job.JobState;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.job.listener.JobEventType;
 import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
 import org.eclipse.scout.rt.platform.util.concurrent.TimedOutException;
 import org.junit.runners.model.Statement;
 
@@ -53,7 +53,7 @@ public class AssertNoRunningJobsStatement extends Statement {
   public void evaluate() throws Throwable {
     final ScheduledDescendantJobListener jobListener = new ScheduledDescendantJobListener();
 
-    final IJobListenerRegistration reg = Jobs.getJobManager().addListener(Jobs.newEventFilterBuilder()
+    final IRegistrationHandle listenerRegistration = Jobs.getJobManager().addListener(Jobs.newEventFilterBuilder()
         .andMatchEventType(JobEventType.JOB_STATE_CHANGED)
         .andMatchState(JobState.SCHEDULED)
         .toFilter(), jobListener);
@@ -62,7 +62,7 @@ public class AssertNoRunningJobsStatement extends Statement {
       m_next.evaluate();
     }
     finally {
-      reg.dispose();
+      listenerRegistration.dispose();
     }
 
     final Set<IFuture<?>> scheduledFutures = jobListener.getScheduledFutures();

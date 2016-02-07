@@ -38,7 +38,6 @@ import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IFuture;
-import org.eclipse.scout.rt.platform.job.IJobListenerRegistration;
 import org.eclipse.scout.rt.platform.job.IJobManager;
 import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.job.JobState;
@@ -51,6 +50,7 @@ import org.eclipse.scout.rt.platform.job.listener.JobEventType;
 import org.eclipse.scout.rt.platform.logger.DiagnosticContextValueProcessor;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
+import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
 import org.eclipse.scout.rt.platform.util.ThreadLocalProcessor;
 import org.eclipse.scout.rt.platform.util.concurrent.Callables;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
@@ -224,12 +224,12 @@ public class JobManager implements IJobManager {
   }
 
   @Override
-  public IJobListenerRegistration addListener(final IJobListener listener) {
+  public IRegistrationHandle addListener(final IJobListener listener) {
     return addListener(null, listener);
   }
 
   @Override
-  public IJobListenerRegistration addListener(final IFilter<JobEvent> filter, final IJobListener listener) {
+  public IRegistrationHandle addListener(final IFilter<JobEvent> filter, final IJobListener listener) {
     return m_listeners.add(filter, listener);
   }
 

@@ -11,11 +11,11 @@ import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.rt.platform.job.FixedDelayScheduleBuilder;
 import org.eclipse.scout.rt.platform.job.IFuture;
-import org.eclipse.scout.rt.platform.job.IJobListenerRegistration;
 import org.eclipse.scout.rt.platform.job.JobState;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
+import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.After;
@@ -28,7 +28,7 @@ import org.quartz.SimpleScheduleBuilder;
 public class TemporalValueComputationTest {
 
   private String m_jobIdentifier;
-  private List<IJobListenerRegistration> m_listeners;
+  private List<IRegistrationHandle> m_listeners;
   private List<String> m_protocol;
 
   @Before
@@ -76,7 +76,7 @@ public class TemporalValueComputationTest {
 
   @After
   public void after() {
-    for (IJobListenerRegistration listener : m_listeners) {
+    for (IRegistrationHandle listener : m_listeners) {
       listener.dispose();
     }
   }

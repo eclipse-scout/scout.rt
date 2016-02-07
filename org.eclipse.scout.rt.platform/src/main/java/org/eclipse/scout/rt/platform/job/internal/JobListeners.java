@@ -17,10 +17,10 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.job.IFuture;
-import org.eclipse.scout.rt.platform.job.IJobListenerRegistration;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.util.IAdaptable;
+import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
 
 /**
  * Responsible for notifying all job listeners about job lifecycle events.
@@ -47,7 +47,7 @@ public class JobListeners {
    * @return A token representing the registration of the given {@link IJobListener}. This token can later be used to
    *         unregister the listener.
    */
-  IJobListenerRegistration add(final IFilter<JobEvent> filter, final IJobListener listener) {
+  IRegistrationHandle add(final IFilter<JobEvent> filter, final IJobListener listener) {
     final IFuture[] futures = getFilteredFutures(filter);
     if (futures != null) {
       return addLocalListener(filter, listener, futures); // register the listener directly on the future to reduce contention.
@@ -60,11 +60,11 @@ public class JobListeners {
   /**
    * Registers the given listener as global listeners.
    */
-  protected IJobListenerRegistration addGlobalListener(final IFilter<JobEvent> filter, final IJobListener listener) {
+  protected IRegistrationHandle addGlobalListener(final IFilter<JobEvent> filter, final IJobListener listener) {
     final JobListenerWithFilter globalListener = new JobListenerWithFilter(listener, filter);
     m_globalListeners.add(globalListener);
 
-    return new IJobListenerRegistration() {
+    return new IRegistrationHandle() {
 
       @Override
       public void dispose() {
@@ -76,17 +76,17 @@ public class JobListeners {
   /**
    * Registers the given listener locally on the given Futures to reduce contention.
    */
-  protected IJobListenerRegistration addLocalListener(final IFilter<JobEvent> filter, final IJobListener listener, final IFuture[] futures) {
-    final List<IJobListenerRegistration> registrations = new ArrayList<>(futures.length);
+  protected IRegistrationHandle addLocalListener(final IFilter<JobEvent> filter, final IJobListener listener, final IFuture[] futures) {
+    final List<IRegistrationHandle> registrations = new ArrayList<>(futures.length);
     for (final IFuture<?> future : futures) {
       registrations.add(future.addListener(filter, listener));
     }
 
-    return new IJobListenerRegistration() {
+    return new IRegistrationHandle() {
 
       @Override
       public void dispose() {
-        for (final IJobListenerRegistration registration : registrations) {
+        for (final IRegistrationHandle registration : registrations) {
           registration.dispose();
         }
       }

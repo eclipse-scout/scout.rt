@@ -37,7 +37,6 @@ import org.eclipse.scout.rt.platform.job.ExecutionTrigger;
 import org.eclipse.scout.rt.platform.job.IDoneHandler;
 import org.eclipse.scout.rt.platform.job.IExecutionSemaphore;
 import org.eclipse.scout.rt.platform.job.IFuture;
-import org.eclipse.scout.rt.platform.job.IJobListenerRegistration;
 import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.job.JobState;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
@@ -45,6 +44,7 @@ import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.job.listener.JobEventData;
 import org.eclipse.scout.rt.platform.job.listener.JobEventType;
 import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
 import org.eclipse.scout.rt.platform.util.ToStringBuilder;
 import org.quartz.Calendar;
 import org.quartz.SchedulerException;
@@ -426,16 +426,16 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
   }
 
   @Override
-  public IJobListenerRegistration addListener(final IJobListener listener) {
+  public IRegistrationHandle addListener(final IJobListener listener) {
     return addListener(null, listener);
   }
 
   @Override
-  public IJobListenerRegistration addListener(final IFilter<JobEvent> filter, final IJobListener listener) {
+  public IRegistrationHandle addListener(final IFilter<JobEvent> filter, final IJobListener listener) {
     final JobListenerWithFilter localListener = new JobListenerWithFilter(listener, filter);
     m_listeners.add(localListener);
 
-    return new IJobListenerRegistration() {
+    return new IRegistrationHandle() {
 
       @Override
       public void dispose() {

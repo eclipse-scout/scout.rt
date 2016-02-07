@@ -17,6 +17,7 @@ import org.eclipse.scout.rt.platform.chain.callable.CallableChain;
 import org.eclipse.scout.rt.platform.chain.callable.ICallableDecorator;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.server.transaction.TransactionRequiredException;
 import org.eclipse.scout.rt.server.transaction.TransactionScope;
@@ -66,8 +67,8 @@ public class TransactionProcessor implements ICallableDecorator {
    */
   protected IUndecorator requiresNew() {
     final ITransaction newTransaction = BEANS.get(ITransaction.class);
-    final Registration threadLocalRegistration = registerTransactionInThreadLocal(newTransaction);
-    final Registration monitorRegistration = registerTransactionInRunMonitor(newTransaction);
+    final IRegistrationHandle threadLocalRegistration = registerTransactionInThreadLocal(newTransaction);
+    final IRegistrationHandle monitorRegistration = registerTransactionInRunMonitor(newTransaction);
 
     return new IUndecorator() {
 
@@ -75,8 +76,8 @@ public class TransactionProcessor implements ICallableDecorator {
       public void undecorate(final Throwable throwable) {
         addTransactionalFailureIfNotNull(throwable);
         BEANS.get(ITransactionCommitProtocol.class).commitOrRollback(ITransaction.CURRENT.get());
-        threadLocalRegistration.undo();
-        monitorRegistration.undo();
+        threadLocalRegistration.dispose();
+        monitorRegistration.dispose();
       }
     };
   }
@@ -102,14 +103,14 @@ public class TransactionProcessor implements ICallableDecorator {
       throw new TransactionRequiredException();
     }
 
-    final Registration threadLocalRegistration = registerTransactionInThreadLocal(callerTransaction);
+    final IRegistrationHandle threadLocalRegistration = registerTransactionInThreadLocal(callerTransaction);
 
     return new IUndecorator() {
 
       @Override
       public void undecorate(final Throwable throwable) {
         addTransactionalFailureIfNotNull(throwable);
-        threadLocalRegistration.undo();
+        threadLocalRegistration.dispose();
       }
     };
   }
@@ -120,14 +121,14 @@ public class TransactionProcessor implements ICallableDecorator {
    *
    * @return the 'undo-action' to unregister the transaction from the monitor.
    */
-  protected Registration registerTransactionInRunMonitor(final ITransaction transaction) {
+  protected IRegistrationHandle registerTransactionInRunMonitor(final ITransaction transaction) {
     RunMonitor.CURRENT.get().registerCancellable(transaction);
 
     // Return the 'undo-action' to unregister the transaction from the monitor.
-    return new Registration() {
+    return new IRegistrationHandle() {
 
       @Override
-      public void undo() {
+      public void dispose() {
         RunMonitor.CURRENT.get().unregisterCancellable(transaction);
       }
     };
@@ -138,15 +139,15 @@ public class TransactionProcessor implements ICallableDecorator {
    *
    * @return the 'undo-action' to restore the thread-local value.
    */
-  protected Registration registerTransactionInThreadLocal(final ITransaction transaction) {
+  protected IRegistrationHandle registerTransactionInThreadLocal(final ITransaction transaction) {
     final ITransaction oldTransaction = ITransaction.CURRENT.get();
     ITransaction.CURRENT.set(transaction);
 
     // Return the 'undo-action' to restore the thread-local value.
-    return new Registration() {
+    return new IRegistrationHandle() {
 
       @Override
-      public void undo() {
+      public void dispose() {
         if (oldTransaction == null) {
           ITransaction.CURRENT.remove();
         }
@@ -172,16 +173,5 @@ public class TransactionProcessor implements ICallableDecorator {
     catch (final RuntimeException e) {
       LOG.error("Unexpected: Failed to register failure on transaction", e);
     }
-  }
-
-  /**
-   * Represents a registration which can be undone.
-   */
-  protected interface Registration {
-
-    /**
-     * Invoke to undo the registration.
-     */
-    void undo();
   }
 }

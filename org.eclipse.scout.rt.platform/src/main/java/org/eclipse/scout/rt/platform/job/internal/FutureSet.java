@@ -32,11 +32,11 @@ import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.filter.NotFilter;
 import org.eclipse.scout.rt.platform.filter.OrFilter;
 import org.eclipse.scout.rt.platform.job.IFuture;
-import org.eclipse.scout.rt.platform.job.IJobListenerRegistration;
 import org.eclipse.scout.rt.platform.job.IJobManager;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
 
 /**
  * Thread-safe implementation of a {@link Set} to contain {@link IFuture}s.
@@ -52,7 +52,7 @@ public class FutureSet {
   private final WriteLock m_writeLock;
   private final Condition m_changedCondition;
 
-  private IJobListenerRegistration m_jobListenerRegistration;
+  private IRegistrationHandle m_jobListenerRegistration;
 
   public FutureSet() {
     m_futures = new HashSet<>(CONFIG.getPropertyValue(JobManagerCorePoolSizeProperty.class));

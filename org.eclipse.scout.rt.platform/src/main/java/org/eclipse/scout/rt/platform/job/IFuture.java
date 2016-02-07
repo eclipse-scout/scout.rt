@@ -23,6 +23,7 @@ import org.eclipse.scout.rt.platform.filter.OrFilter;
 import org.eclipse.scout.rt.platform.job.filter.event.JobEventFilterBuilder;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
+import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
 import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledException;
 import org.eclipse.scout.rt.platform.util.concurrent.ICancellable;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedException;
@@ -267,7 +268,7 @@ public interface IFuture<RESULT> extends ICancellable {
    * @return A token representing the registration of the given {@link IJobListener}. This token can later be used to
    *         unregister the listener.
    */
-  IJobListenerRegistration addListener(IJobListener listener);
+  IRegistrationHandle addListener(IJobListener listener);
 
   /**
    * Registers the given listener to be notified about job lifecycle events related to this Future, and which comply
@@ -293,7 +294,7 @@ public interface IFuture<RESULT> extends ICancellable {
    * @return A token representing the registration of the given {@link IJobListener}. This token can later be used to
    *         unregister the listener.
    */
-  IJobListenerRegistration addListener(IFilter<JobEvent> filter, IJobListener listener);
+  IRegistrationHandle addListener(IFilter<JobEvent> filter, IJobListener listener);
 
   /**
    * Associates this {@link IFuture} with an execution hint, which can be evaluated by filters like when listening to
