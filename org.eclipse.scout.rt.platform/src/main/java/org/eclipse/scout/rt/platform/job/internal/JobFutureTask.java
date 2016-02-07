@@ -15,6 +15,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -324,7 +325,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
     try {
       m_completionPromise.awaitDoneAndGet();
     }
-    catch (final ExecutionException | java.util.concurrent.CancellationException e) {
+    catch (final ExecutionException | CancellationException e) {
       // NOOP: Do not propagate ExecutionException and CancellationException (see JavaDoc contract)
     }
     catch (final java.lang.InterruptedException e) {
@@ -340,7 +341,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
     try {
       m_completionPromise.awaitDoneAndGet(timeout, unit);
     }
-    catch (final ExecutionException | java.util.concurrent.CancellationException e) {
+    catch (final ExecutionException | CancellationException e) {
       // NOOP: Do not propagate ExecutionException and CancellationException (see JavaDoc contract)
     }
     catch (final java.lang.InterruptedException e) {
@@ -383,7 +384,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
     catch (final ExecutionException e) {
       throw interceptException(BEANS.get(JobExceptionTranslator.class).translateExecutionException(e, exceptionTranslator));
     }
-    catch (final java.util.concurrent.CancellationException e) {
+    catch (final CancellationException e) {
       throw interceptException(BEANS.get(JobExceptionTranslator.class).translateCancellationException(e, "Failed to wait for a job to complete because the job was cancelled"));
     }
     catch (final java.lang.InterruptedException e) {
@@ -407,7 +408,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
     catch (final ExecutionException e) {
       throw interceptException(BEANS.get(JobExceptionTranslator.class).translateExecutionException(e, exceptionTranslator));
     }
-    catch (final java.util.concurrent.CancellationException e) {
+    catch (final CancellationException e) {
       throw interceptException(BEANS.get(JobExceptionTranslator.class).translateCancellationException(e, "Failed to wait for a job to complete because the job was cancelled"));
     }
     catch (final java.lang.InterruptedException e) {

@@ -64,7 +64,7 @@ class CompletionPromise<RESULT> {
   private final FinalValue<DoneEvent<RESULT>> m_doneEvent = new FinalValue<>();
   private final FinalValue<Boolean> m_finished = new FinalValue<>();
 
-  public CompletionPromise(final JobFutureTask<RESULT> future, final ExecutorService executor) {
+  CompletionPromise(final JobFutureTask<RESULT> future, final ExecutorService executor) {
     m_future = future;
     m_handlers = new ArrayList<>();
     m_executor = executor;
@@ -297,7 +297,7 @@ class CompletionPromise<RESULT> {
     catch (final ExecutionException e) {
       return new DoneEvent<>(null, BEANS.get(DefaultExceptionTranslator.class).unwrap(e), false);
     }
-    catch (final CancellationException e) {
+    catch (final CancellationException e) { // NOSONAR
       return new DoneEvent<>(null, null, true);
     }
   }
@@ -309,7 +309,7 @@ class CompletionPromise<RESULT> {
     private final RunContext m_runContext;
     private final IDoneHandler<RESULT> m_callback;
 
-    public PromiseHandler(final IDoneHandler<RESULT> callback, final RunContext runContext) {
+    PromiseHandler(final IDoneHandler<RESULT> callback, final RunContext runContext) {
       m_runContext = runContext;
       m_callback = callback;
     }

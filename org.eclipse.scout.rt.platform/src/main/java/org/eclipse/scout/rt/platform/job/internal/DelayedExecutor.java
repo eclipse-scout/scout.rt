@@ -53,7 +53,7 @@ class DelayedExecutor {
    * @param threadName
    *          the thread-name of the 'Dispatch-Loop-Runnable'.
    */
-  public DelayedExecutor(final ExecutorService executor, final String threadName) {
+  DelayedExecutor(final ExecutorService executor, final String threadName) {
     m_executor = executor;
     m_threadName = threadName;
     m_executor.execute(new P_DispatchLoop());
@@ -147,7 +147,7 @@ class DelayedExecutor {
 
     @Override
     public int compareTo(final Delayed other) {
-      if (other == this) {
+      if (other == this) { // NOSONAR
         return 0;
       }
 

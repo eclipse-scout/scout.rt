@@ -28,7 +28,7 @@ public class JobEvent extends EventObject {
   private static final long serialVersionUID = 1L;
 
   private final JobEventType m_type;
-  private final JobEventData m_data;
+  private transient final JobEventData m_data;
 
   public JobEvent(final IJobManager jobManager, final JobEventType type, final JobEventData data) {
     super(jobManager);

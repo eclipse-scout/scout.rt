@@ -75,7 +75,7 @@ public class NamedThreadFactory implements ThreadFactory, UncaughtExceptionHandl
       // Worker thread abruptly terminated due to an uncaught exception.
       BEANS.get(ExceptionHandler.class).handle(t);
     }
-    catch (final Throwable unhandledThrowable) {
+    catch (final Throwable unhandledThrowable) { // NOSONAR
       LOG.error("Unexpected: Unhandled throwable during job execution", unhandledThrowable);
     }
   }

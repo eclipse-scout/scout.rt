@@ -20,7 +20,7 @@ import org.eclipse.scout.rt.platform.job.IFuture;
  * @see IFuture#isSingleExecuting(boolean)
  * @since 5.1
  */
-public class SingleExecutionFutureFilter implements IFilter<IFuture<?>> {
+public final class SingleExecutionFutureFilter implements IFilter<IFuture<?>> {
 
   public static final IFilter<IFuture<?>> INSTANCE = new SingleExecutionFutureFilter();
 

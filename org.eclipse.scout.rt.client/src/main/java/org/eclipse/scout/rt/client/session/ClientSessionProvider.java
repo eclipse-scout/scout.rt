@@ -102,12 +102,14 @@ public class ClientSessionProvider {
    * Method invoked before the session is started.
    */
   protected void beforeStartSession(final IClientSession clientSession, final String sessionId) {
+    // NOOP: The default implementation does nothing
   }
 
   /**
    * Method invoked after the session is started.
    */
   protected void afterStartSession(final IClientSession clientSession) {
+    // NOOP: The default implementation does nothing
   }
 
   /**

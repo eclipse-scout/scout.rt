@@ -339,7 +339,7 @@ public class ExecutionSemaphore implements IExecutionSemaphore {
   /**
    * Position in the queue of competing tasks.
    */
-  protected static enum QueuePosition {
+  protected enum QueuePosition {
     HEAD, TAIL;
   }
 
@@ -361,7 +361,7 @@ public class ExecutionSemaphore implements IExecutionSemaphore {
    *
    * @since 5.2
    */
-  public static interface IPermitAcquiredCallback {
+  public interface IPermitAcquiredCallback {
 
     /**
      * Method invoked once a permit is acquired, and is invoked from the thread releasing a permit. Hence, the

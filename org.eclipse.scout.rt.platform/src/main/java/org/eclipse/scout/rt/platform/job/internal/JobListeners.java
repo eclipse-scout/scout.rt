@@ -135,6 +135,6 @@ public class JobListeners {
     if (filter instanceof IAdaptable) {
       return ((IAdaptable) filter).getAdapter(IFuture[].class);
     }
-    return null;
+    return null; // NOSONAR
   }
 }

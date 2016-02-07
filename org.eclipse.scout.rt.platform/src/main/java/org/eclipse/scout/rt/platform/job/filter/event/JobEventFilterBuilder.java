@@ -22,16 +22,16 @@ import org.eclipse.scout.rt.platform.filter.AlwaysFilter;
 import org.eclipse.scout.rt.platform.filter.AndFilter;
 import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.filter.NotFilter;
-import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IExecutionSemaphore;
+import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.JobState;
 import org.eclipse.scout.rt.platform.job.filter.future.ExecutionHintFutureFilter;
+import org.eclipse.scout.rt.platform.job.filter.future.ExecutionSemaphoreFutureFilter;
 import org.eclipse.scout.rt.platform.job.filter.future.FutureFilter;
 import org.eclipse.scout.rt.platform.job.filter.future.JobNameFutureFilter;
 import org.eclipse.scout.rt.platform.job.filter.future.JobNameRegexFutureFilter;
 import org.eclipse.scout.rt.platform.job.filter.future.JobStateFutureFilter;
 import org.eclipse.scout.rt.platform.job.filter.future.RunContextFutureFilter;
-import org.eclipse.scout.rt.platform.job.filter.future.ExecutionSemaphoreFutureFilter;
 import org.eclipse.scout.rt.platform.job.filter.future.SingleExecutionFutureFilter;
 import org.eclipse.scout.rt.platform.job.internal.JobListeners;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
@@ -258,7 +258,7 @@ public class JobEventFilterBuilder {
       }
 
       if (intersection == null || intersection.isEmpty()) {
-        return null;
+        return null; // NOSONAR
       }
 
       return intersection.toArray(new IFuture<?>[intersection.size()]);

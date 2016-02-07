@@ -93,12 +93,14 @@ public class ServerSessionProvider {
    * Method invoked before the session is started.
    */
   protected void beforeStartSession(final IServerSession serverSession, final String sessionId) {
+    // NOOP: The default implementation does nothing
   }
 
   /**
    * Method invoked after the session is started.
    */
   protected void afterStartSession(final IServerSession serverSession) {
+    // NOOP: The default implementation does nothing
   }
 
   /**

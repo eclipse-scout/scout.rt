@@ -40,7 +40,7 @@ public class ExceptionProcessor<RESULT> implements ICallableInterceptor<RESULT> 
     try {
       return chain.continueChain();
     }
-    catch (final Exception | Error e) {
+    catch (final Exception | Error e) { // NOSONAR
       if (m_input.getExceptionHandler() != null) {
         m_input.getExceptionHandler().handle(BEANS.get(DefaultExceptionTranslator.class).unwrap(e));
       }
