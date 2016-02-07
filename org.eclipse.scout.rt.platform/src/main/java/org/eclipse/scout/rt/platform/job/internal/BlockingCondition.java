@@ -11,8 +11,10 @@
 package org.eclipse.scout.rt.platform.job.internal;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -22,6 +24,7 @@ import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.JobState;
 import org.eclipse.scout.rt.platform.job.internal.ExecutionSemaphore.QueuePosition;
 import org.eclipse.scout.rt.platform.job.listener.JobEventData;
+import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
 import org.eclipse.scout.rt.platform.util.ToStringBuilder;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedException;
 import org.eclipse.scout.rt.platform.util.concurrent.TimedOutException;
@@ -35,12 +38,14 @@ public class BlockingCondition implements IBlockingCondition {
 
   private static final Logger LOG = LoggerFactory.getLogger(BlockingCondition.class);
 
-  private static final long TIMEOUT_INDEFINITELY = -1;
+  protected static final long TIMEOUT_INDEFINITELY = -1;
 
-  private volatile boolean m_blocking;
+  protected volatile boolean m_blocking;
 
-  private final Lock m_lock = new ReentrantLock();
-  private final Condition m_unblockedCondition = m_lock.newCondition();
+  protected final Lock m_lock = new ReentrantLock();
+  protected final Condition m_unblockedCondition = m_lock.newCondition();
+
+  protected final Set<IRegistrationHandle> m_waitForHints = new HashSet<>();
 
   protected BlockingCondition(final boolean blocking) {
     m_blocking = blocking;
@@ -66,6 +71,14 @@ public class BlockingCondition implements IBlockingCondition {
       m_blocking = blocking;
       if (!m_blocking) {
         m_unblockedCondition.signalAll(); // Wake-up waiting threads.
+      }
+
+      // Unset the 'wait-for' hints, which were associated for the time of being blocked.
+      // Do this immediately and not only upon waking up the blocked threads, so that it is reflected immediately and can be evaluated by the caller.
+      final Iterator<IRegistrationHandle> iterator = m_waitForHints.iterator();
+      while (iterator.hasNext()) {
+        iterator.next().dispose();
+        iterator.remove();
       }
     }
     finally {
@@ -99,11 +112,14 @@ public class BlockingCondition implements IBlockingCondition {
       blockJobThread((JobFutureTask<?>) currentFuture, timeout, unit, awaitInterruptibly, executionHints);
     }
     else {
-      blockNonJobThread(timeout, unit, awaitInterruptibly);
+      blockRegularThread(timeout, unit, awaitInterruptibly);
     }
   }
 
-  protected void blockNonJobThread(final long timeout, final TimeUnit unit, final boolean awaitInterruptibly) {
+  /**
+   * Blocks a regular thread not associated with a job.
+   */
+  protected void blockRegularThread(final long timeout, final TimeUnit unit, final boolean awaitInterruptibly) {
     if (!m_blocking) {
       return;
     }
@@ -121,12 +137,15 @@ public class BlockingCondition implements IBlockingCondition {
     }
   }
 
+  /**
+   * Blocks a thread associated with a job.
+   */
   protected void blockJobThread(final JobFutureTask<?> futureTask, final long timeout, final TimeUnit unit, final boolean awaitInterruptibly, final String... executionHints) {
     if (!m_blocking) {
       return;
     }
 
-    IExecutionHintRegistration executionHintRegistration = IExecutionHintRegistration.NULL_INSTANCE;
+    IRegistrationHandle waitForHints = IRegistrationHandle.NULL_HANDLE;
     RuntimeException exceptionWhileWaiting = null;
     Error errorWhileWaiting = null;
 
@@ -137,7 +156,7 @@ public class BlockingCondition implements IBlockingCondition {
       }
 
       // Associate the future with execution hints.
-      executionHintRegistration = registerExecutionHints(futureTask, executionHints);
+      waitForHints = registerWaitForHints(futureTask, executionHints);
 
       // Change job state.
       futureTask.changeState(new JobEventData()
@@ -165,7 +184,7 @@ public class BlockingCondition implements IBlockingCondition {
     acquirePermitUninterruptibly(futureTask);
 
     // prepare to continue execution
-    executionHintRegistration.dispose();
+    waitForHints.dispose(); // if released via 'setBlocking(false)', the 'wait-for' hints are already disposed, but not if interrupted or timed out.
     futureTask.changeState(JobState.RUNNING);
 
     if (errorWhileWaiting != null) {
@@ -276,11 +295,11 @@ public class BlockingCondition implements IBlockingCondition {
   }
 
   /**
-   * Registers the given execution hints with the Future, and returns its registration handle.
+   * Registers the given 'wait-for' execution hints with the Future, and returns its registration handle.
    */
-  protected IExecutionHintRegistration registerExecutionHints(final IFuture<?> future, final String... executionHints) {
+  protected IRegistrationHandle registerWaitForHints(final IFuture<?> future, final String... executionHints) {
     if (executionHints.length == 0) {
-      return IExecutionHintRegistration.NULL_INSTANCE;
+      return IRegistrationHandle.NULL_HANDLE;
     }
 
     // Register the execution hints, and remember the hints registered. That are hints not already associated with the future.
@@ -292,36 +311,21 @@ public class BlockingCondition implements IBlockingCondition {
     }
 
     // Return the registration handle to unregister the registered execution hints.
-    return new IExecutionHintRegistration() {
+    final AtomicBoolean disposed = new AtomicBoolean(false);
+    final IRegistrationHandle registrationHandle = new IRegistrationHandle() {
 
       @Override
       public void dispose() {
+        if (!disposed.compareAndSet(false, true)) {
+          return; // already disposed, e.g. due to timeout or interruption
+        }
+
         for (final String associatedExecutionHint : associatedExecutionHints) {
           future.removeExecutionHint(associatedExecutionHint);
         }
       }
     };
-  }
-
-  /**
-   * Represents the execution hint registration.
-   */
-  protected interface IExecutionHintRegistration {
-
-    /**
-     * Unregisters the execution hints represented by this registration.
-     */
-    void dispose();
-
-    /**
-     * Registration that does nothing on {@link #dispose()}.
-     */
-    IExecutionHintRegistration NULL_INSTANCE = new IExecutionHintRegistration() {
-
-      @Override
-      public void dispose() {
-        // NOOP
-      }
-    };
+    m_waitForHints.add(registrationHandle);
+    return registrationHandle;
   }
 }
