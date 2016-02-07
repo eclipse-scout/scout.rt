@@ -84,7 +84,7 @@ public final class AptUtil {
     // change indent space two 2 spaces
     content = content.replaceAll("    ", "  ");
     // Remove redundant Callable imports (Generics bug in JCodeModel)
-    content = content.replaceAll("import\\s+java\\.util\\.concurrent\\.Callable\\;\\s+import\\s+java\\.util\\.concurrent\\.Callable\\;", "import java.util.concurrent.Callable;");
+    content = content.replaceAll("(import\\s+java\\.util\\.concurrent\\.Callable\\;\\s+){2,}", "$1");
 
     return content;
   }
