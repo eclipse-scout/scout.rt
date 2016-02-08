@@ -904,6 +904,7 @@ scout.Planner.prototype._onYearPanelWidthChange = function() {
   var yearPanelWidth = this._yearPanel.$container.outerWidth();
   this.$grid.css('width', 'calc(100% - ' + yearPanelWidth + 'px)');
   this.$scale.css('width', 'calc(100% - ' + yearPanelWidth + 'px)');
+  this.revalidateLayout();
 };
 
 scout.Planner.prototype._afterYearPanelWidthChange = function() {

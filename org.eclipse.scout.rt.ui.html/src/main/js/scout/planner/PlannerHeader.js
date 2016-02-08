@@ -41,8 +41,6 @@ scout.PlannerHeader.prototype._renderAvailableDisplayModes = function() {
   var displayMode = scout.Planner.DisplayMode;
   this.$commands.empty();
 
-  this.$commands.appendDiv('planner-today').on('click', this._onTodayClick.bind(this));
-
   if (this.availableDisplayModes.length > 1) {
     if (this.availableDisplayModes.indexOf(displayMode.DAY) > -1) {
       this.$commands.appendDiv('planner-mode', this.session.text('ui.CalendarDay'))
@@ -76,7 +74,9 @@ scout.PlannerHeader.prototype._renderAvailableDisplayModes = function() {
     }
   }
 
-  this.$commands.children('.planner-mode').last().addClass('last'); // draw right border
+  var $modes = this.$commands.children('.planner-mode');
+  $modes.first().addClass('first');
+  $modes.last().addClass('last');
   this.$commands.appendDiv('planner-toggle-year').on('click', this._onYearClick.bind(this));
 };
 
