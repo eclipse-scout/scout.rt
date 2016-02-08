@@ -13,6 +13,8 @@ package org.eclipse.scout.rt.client.ui.action.menu;
 /**
  * All possible menus types of a table menu. This menu types are used of {@link AbstractMenu#getConfiguredMenuTypes()}
  * method.
+ * <p>
+ * Specificity: {@link #Header}, {@link #EmptySpace}, {@link #SingleSelection}, {@link #MultiSelection}
  */
 public enum TableMenuType implements IMenuType {
   EmptySpace,
