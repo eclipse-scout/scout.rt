@@ -81,12 +81,20 @@
 }
 
 .proposal-chooser {
+
+  & > .active-filter {
+    padding-left: 7px;
+  }
+
+  & > .status {
+    padding: 7px 8px 0 10px;
+  }
+
   & > .active-filter,
   & > .status {
     background-color: @panel-background-color;
     border-top: solid 1px @item-selection-border-color;
     height: @logical-grid-height;
-    padding: 7px 8px 0 10px;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
@@ -95,6 +103,22 @@
   &.empty > .active-filter,
   &.empty > .status {
     border-top: 0;
+  }
+
+  & > .active-filter > .radiobutton-group {
+    width: 100%;
+    height: @logical-grid-height;
+
+    & > .radiobutton-group-body {
+      width: 100%;
+      height: @logical-grid-height;
+
+      & > .radio-button {
+        position: relative;
+        display: inline-block;
+        margin-right: 10px;
+      }
+    }
   }
 
   & > .table {

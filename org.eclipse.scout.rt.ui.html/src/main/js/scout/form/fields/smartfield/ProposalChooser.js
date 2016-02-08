@@ -23,9 +23,9 @@ scout.ProposalChooser.prototype._render = function($parent) {
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
   this.htmlComp.setLayout(new scout.ProposalChooserLayout(this));
   this.model.render(this.$container);
-  if(this.model instanceof scout.Tree){
+  if (this.model instanceof scout.Tree) {
     //disable focus on field container
-    this.model._onNodeControlMouseDownDoFocus = function(){};
+    this.model._onNodeControlMouseDownDoFocus = function() {};
   }
 
   this._$status = this.$container.appendDiv('status');
@@ -33,9 +33,15 @@ scout.ProposalChooser.prototype._render = function($parent) {
   // support for activeFilter
   if (this.activeFilter) {
     this._$activeFilter = this.$container.appendDiv('active-filter');
-    this._appendOption(this._$activeFilter, 'UNDEFINED', 'Alle');
-    this._appendOption(this._$activeFilter, 'TRUE', 'Aktive');
-    this._appendOption(this._$activeFilter, 'FALSE', 'Inaktive');
+    var group = scout.create('RadioButtonGroup', {
+      parent: this
+    });
+
+    this._appendOption(group, 'UNDEFINED', this.session.text('ui.All'), true);
+    this._appendOption(group, 'TRUE', this.session.text('ui.Active'), false);
+    this._appendOption(group, 'FALSE', this.session.text('ui.Inactive'), false);
+
+    group.render(this._$activeFilter);
   }
 };
 
@@ -78,23 +84,25 @@ scout.ProposalChooser.prototype._setStatusMessage = function(message) {
   scout.Status.animateStatusMessage(this._$status, message);
 };
 
-scout.ProposalChooser.prototype._appendOption = function($parent, value, text) {
-  var $radio = $parent.makeElement('<input>')
-    .attr('type', 'radio')
-    .attr('name', 'activeState')
-    .attr('value', value)
-    .change(this._onActiveFilterChanged.bind(this));
-  if (this.activeFilter === value) {
-    $radio.attr('checked', 'checked');
-  }
-  $parent
-    .append($radio)
-    .appendElement('<label>').text(text);
+scout.ProposalChooser.prototype._appendOption = function(group, value, text, selected) {
+  var radio = scout.create('RadioButton', {
+      parent: group,
+      label: text,
+      radioValue: value,
+      selected: selected
+    }),
+    that = this;
+  radio._mouseDown = function(event) {
+    this._toggleChecked();
+  };
+  radio._send = function() {
+    that._onActiveFilterChanged(this.radioValue);
+  };
+  group.formFields.push(radio);
 };
 
-scout.ProposalChooser.prototype._onActiveFilterChanged = function(event) {
-  var value = $(event.target).val();
+scout.ProposalChooser.prototype._onActiveFilterChanged = function(radioValue) {
   this._send('activeFilterChanged', {
-    state: value
+    state: radioValue
   });
 };
