@@ -53,7 +53,7 @@ public class HTMLTextTest {
 
   @Test
   public void testBoldHtmlText() {
-    IHtmlContent boldText = HTML.bold(HTML.raw(TEXTS.get("key6", HTML.appLink("REF", "text").toEncodedHtml())));
-    assertEquals("<b>value <span class=\"app-link\" data-ref=\"REF\">text</span></b>", boldText.toEncodedHtml());
+    IHtmlContent boldText = HTML.bold(HTML.raw(TEXTS.get("key6", HTML.appLink("REF", "text").toHtml())));
+    assertEquals("<b>value <span class=\"app-link\" data-ref=\"REF\">text</span></b>", boldText.toHtml());
   }
 }

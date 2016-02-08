@@ -39,11 +39,8 @@ public class HtmlHelper {
    * <li>All other tags are replaced by a space.
    * <li>Multiple consecutive spaces are merged to one space.
    * <li>Leading and trailing whitespace line is removed from each line.
-   * <li>{@link StringUtility#htmlDecode(String)} is applied to the result, so not all HTML entities are replaced!
    * </ul>
    * <p>
-   * <i>Note: This method originated from the now-deprecated HTMLUtility. It is possible that it will be enhanced in
-   * future Scout releases.</i>
    */
   public String toPlainText(String html) {
     if (html == null || html.length() == 0) {
@@ -55,11 +52,12 @@ public class HtmlHelper {
       s = html;
     }
     //newlines
-    s = s.replaceAll("\r", "").replaceAll("\n", " ");
+    s = StringUtility.replace(s, "\r", "");
+    s = StringUtility.replace(s, "\n", " ");
     Matcher matcher = HTML_PARAGRAPH_END_TAGS.matcher(s);
     s = matcher.replaceAll("\n");
     //tabs
-    s = s.replace(StringUtility.HTML_ENCODED_TAB, "\t");
+    s = StringUtility.replace(s, StringUtility.HTML_ENCODED_TAB, "\t");
     //remove tags
     s = Pattern.compile("<[^>]+>", Pattern.DOTALL).matcher(s).replaceAll(" ");
     //remove multiple spaces
@@ -67,7 +65,17 @@ public class HtmlHelper {
     //remove spaces at the beginning and end of each line
     s = s.replaceAll("[ ]+\n", "\n");
     s = s.replaceAll("\n[ ]+", "\n");
-    s = StringUtility.htmlDecode(s);
+    s = unescape(s);
+
+    // space
+    s = StringUtility.replace(s, "&nbsp;", " ");
+    s = StringUtility.replace(s, "&#160;", " ");
+    s = StringUtility.replace(s, "&#xa0;", " ");
+
+    // tab
+    s = StringUtility.replace(s, "&#9;", "\t");
+    s = StringUtility.replace(s, "&#x9;", "\t");
+
     s = s.trim();
     return s;
   }
@@ -85,20 +93,22 @@ public class HtmlHelper {
    * <li><code>&gt;</code> --> <code>&amp;gt;</code>
    * <li><code>&quot;</code> --> <code>&amp;quot;</code>
    * <li><code>&#39;</code> --> <code>&amp;#39;</code>
+   * <li><code>&#47;</code> --> <code>&amp;#47;</code>
    * </ul>
+   *
+   * @see https://www.owasp.org/index.php/XSS_%28Cross_Site_Scripting%29_Prevention_Cheat_Sheet
    */
   public String escape(String text) {
     if (text == null || text.length() == 0) {
       return text;
     }
-    //
-    String encoded = text
-        .replace("&", "&amp;")
-        .replace("<", "&lt;")
-        .replace(">", "&gt;")
-        .replace("\"", "&quot;")
-        .replace("'", "&#39;");
-    return encoded;
+    text = StringUtility.replace(text, "&", "&amp;");
+    text = StringUtility.replace(text, "<", "&lt;");
+    text = StringUtility.replace(text, ">", "&gt;");
+    text = StringUtility.replace(text, "\"", "&quot;");
+    text = StringUtility.replace(text, "/", "&#47;");
+    text = StringUtility.replace(text, "'", "&#39;");
+    return text;
   }
 
   /**
@@ -109,12 +119,29 @@ public class HtmlHelper {
     if (html == null || html.length() == 0) {
       return html;
     }
-    String decoded = html
-        .replace("&amp;", "&")
-        .replace("&lt;", "<")
-        .replace("&gt;", ">")
-        .replace("&quot;", "\"")
-        .replace("&#39;", "'");
+
+    String decoded = StringUtility.replace(html, "&amp;", "&");
+    decoded = StringUtility.replace(decoded, "&#38;", "&");
+    decoded = StringUtility.replace(decoded, "&#x26;", "&");
+
+    decoded = StringUtility.replace(decoded, "&lt;", "<");
+    decoded = StringUtility.replace(decoded, "&#60;", "<");
+    decoded = StringUtility.replace(decoded, "&#x3c;", "<");
+
+    decoded = StringUtility.replace(decoded, "&gt;", ">");
+    decoded = StringUtility.replace(decoded, "&#62;", ">");
+    decoded = StringUtility.replace(decoded, "&#x3e;", ">");
+
+    decoded = StringUtility.replace(decoded, "&quot;", "\"");
+    decoded = StringUtility.replace(decoded, "&#34;", "\"");
+    decoded = StringUtility.replace(decoded, "&#x22;", "\"");
+
+    decoded = StringUtility.replace(decoded, "&#47;", "/"); // no named entity for the slash
+    decoded = StringUtility.replace(decoded, "&#x2f;", "/");
+
+    decoded = StringUtility.replace(decoded, "&apos;", "'");
+    decoded = StringUtility.replace(decoded, "&#39;", "'");
+    decoded = StringUtility.replace(decoded, "&#x27;", "'");
     return decoded;
   }
 }

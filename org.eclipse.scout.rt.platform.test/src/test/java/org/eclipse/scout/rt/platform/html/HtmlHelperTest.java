@@ -72,13 +72,14 @@ public class HtmlHelperTest {
 
     assertEquals("one &amp; two", helper.escape("one & two"));
     assertEquals("one &lt; two", helper.escape("one < two"));
-    assertEquals("&gt;&lt;script&gt;alert(&#39;hacker attack&#39;);&lt;/script&gt;&lt;", helper.escape("><script>alert('hacker attack');</script><"));
+    assertEquals("&gt;&lt;script&gt;alert(&#39;hacker attack&#39;);&lt;&#47;script&gt;&lt;", helper.escape("><script>alert('hacker attack');</script><"));
     assertEquals("one&amp;nbsp;&amp;nbsp; two", helper.escape("one&nbsp;&nbsp; two"));
     assertEquals("this is &quot;good&quot;", helper.escape("this is \"good\""));
-    assertEquals("http://www.example.com/~myapp/script?q=search%20query&amp;time=now&amp;x=17263.23", helper.escape("http://www.example.com/~myapp/script?q=search%20query&time=now&x=17263.23"));
-    assertEquals("&lt;div&gt;&lt;span style=&quot;color: red; content: &#39;\\u39&#39;;&quot;&gt;Alert!&lt;/span&gt;&lt;br/&gt;Line2&lt;/div&gt;",
+    assertEquals("http:&#47;&#47;www.example.com&#47;~myapp&#47;script?q=search%20query&amp;time=now&amp;x=17263.23", helper.escape("http://www.example.com/~myapp/script?q=search%20query&time=now&x=17263.23"));
+    assertEquals("&lt;div&gt;&lt;span style=&quot;color: red; content: &#39;\\u39&#39;;&quot;&gt;Alert!&lt;&#47;span&gt;&lt;br&#47;&gt;Line2&lt;&#47;div&gt;",
         helper.escape("<div><span style=\"color: red; content: '\\u39';\">Alert!</span><br/>Line2</div>"));
     assertEquals("hell&amp;ouml;", helper.escape("hell&ouml;"));
+    assertEquals("one&#47;two&#47;end", helper.escape("one/two/end"));
 
     // Things that should NOT be escaped
     assertEquals("one\ntwo  end", helper.escape("one\ntwo  end"));
@@ -103,6 +104,7 @@ public class HtmlHelperTest {
     assertEquals("<div><span style=\"color: red; content: '\\u39';\">Alert!</span><br/>Line2</div>",
         helper.unescape("&lt;div&gt;&lt;span style=&quot;color: red; content: &#39;\\u39&#39;;&quot;&gt;Alert!&lt;/span&gt;&lt;br/&gt;Line2&lt;/div&gt;"));
     assertEquals("hell&ouml;", helper.unescape("hell&amp;ouml;"));
+    assertEquals("one/two/end", helper.unescape("one&#47;two&#47;end"));
 
     // Things that should NOT be unescaped
     assertEquals("one\ntwo  end", helper.unescape("one\ntwo  end"));

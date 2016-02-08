@@ -251,7 +251,7 @@ public class MessageBoxTest {
     MessageBox messageBox = argument.getValue();
     assertEquals("Intro text", expectedIntro, messageBox.getHeader());
     assertEquals("Action text", expectedAction, messageBox.getBody());
-    assertEquals("Html", expectedHtml, messageBox.getHtml() == null ? null : messageBox.getHtml().toEncodedHtml());
+    assertEquals("Html", expectedHtml, messageBox.getHtml() == null ? null : messageBox.getHtml().toHtml());
     assertEquals("Yes button text", TEXTS.get("YesButton"), messageBox.getYesButtonText());
     assertEquals("No button text", TEXTS.get("NoButton"), messageBox.getNoButtonText());
     assertEquals("Cancel button text", null, messageBox.getCancelButtonText());

@@ -453,10 +453,11 @@ public abstract class AbstractRowSummaryColumn extends AbstractStringColumn impl
       return null;
     }
 
+    HtmlHelper htmlHelper = BEANS.get(HtmlHelper.class);
     boolean containsHtml = text.contains("<html>");
     if (containsHtml) {
       //Ignore every html code by removing all the tags to make sure it does not destroy the layout
-      String textWithoutHtml = BEANS.get(HtmlHelper.class).toPlainText(text);
+      String textWithoutHtml = htmlHelper.toPlainText(text);
       if (textWithoutHtml != null) {
         text = textWithoutHtml;
       }
@@ -465,7 +466,7 @@ public abstract class AbstractRowSummaryColumn extends AbstractStringColumn impl
     text = StringUtility.trim(text);
     if (!containsHtml) {
       //If the text is not surrounded by <html> the html must not be interpreted but displayed as it is including all the html tags.
-      text = StringUtility.htmlEncode(text);
+      text = htmlHelper.escape(text);
     }
     text = replaceSpaces(text);
 

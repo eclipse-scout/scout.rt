@@ -16,18 +16,6 @@ package org.eclipse.scout.rt.platform.html;
 public interface IHtmlTable extends IHtmlElement {
 
   /**
-   * @deprecated use {@link IHtmlElement#cssClass(CharSequence)} or {@link IHtmlElement#style(CharSequence)}
-   */
-  @Deprecated
-  IHtmlTable cellspacing(int pixel);
-
-  /**
-   * @deprecated use {@link IHtmlElement#cssClass(CharSequence)} or {@link IHtmlElement#style(CharSequence)}
-   */
-  @Deprecated
-  IHtmlTable cellpadding(int pixel);
-
-  /**
    * Add a css class
    */
   @Override

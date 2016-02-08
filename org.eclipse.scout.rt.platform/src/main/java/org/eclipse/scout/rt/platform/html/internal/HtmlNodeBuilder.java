@@ -13,18 +13,17 @@ package org.eclipse.scout.rt.platform.html.internal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
-import org.eclipse.scout.rt.platform.html.IHtmlBind;
 import org.eclipse.scout.rt.platform.html.IHtmlElement;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 
 /**
  * Builder for a html node with start tag, end tag and attributes.
  */
 public class HtmlNodeBuilder extends HtmlContentBuilder implements IHtmlElement {
 
-  private final List<IHtmlBind> m_attributes = new ArrayList<>();
+  private final List<CharSequence> m_attributes = new ArrayList<>();
   private String m_tag;
 
   protected String getTag() {
@@ -54,22 +53,22 @@ public class HtmlNodeBuilder extends HtmlContentBuilder implements IHtmlElement 
   }
 
   protected void appendStartTag() {
-    append("<");
-    append(getTag());
+    append("<", false);
+    append(getTag(), true);
     appendAttributes();
-    append(">");
+    append(">", false);
   }
 
   protected void appendEndTag() {
-    append("</");
-    append(getTag());
-    append(">");
+    append("</", false);
+    append(getTag(), true);
+    append(">", false);
   }
 
   private void appendAttributes() {
     if (m_attributes.size() > 0) {
-      append(" ");
-      append(CollectionUtility.format(m_attributes, " "));
+      append(" ", false);
+      append(CollectionUtility.format(m_attributes, " "), false);
     }
   }
 
@@ -79,22 +78,22 @@ public class HtmlNodeBuilder extends HtmlContentBuilder implements IHtmlElement 
 
   @Override
   public IHtmlElement addAttribute(String name, CharSequence value) {
+    String attribValue = null;
+    final String doubleQuote = "\"";
+    if (value == null) {
+      attribValue = "";
+    }
+    else {
+      attribValue = StringUtility.replace(value.toString(), doubleQuote, "&quot;");
+    }
+
     HtmlContentBuilder content = new HtmlContentBuilder(
-        getBinds().put(name),
-        new HtmlPlainBuilder("=\""),
-        getBinds().put(value),
-        new HtmlPlainBuilder("\""));
+        new HtmlPlainBuilder(escape(name)),
+        new HtmlPlainBuilder("=" + doubleQuote),
+        new HtmlPlainBuilder(attribValue),
+        new HtmlPlainBuilder(doubleQuote));
     m_attributes.add(content);
     return this;
-  }
-
-  @Override
-  public void replaceBinds(Map<String/*old Bind*/, String/*new Bind*/> bindMap) {
-    super.replaceBinds(bindMap);
-    for (IHtmlBind elem : m_attributes) {
-      elem.replaceBinds(bindMap);
-    }
-    getBinds().replaceBinds(bindMap);
   }
 
 /// GLOBAL ATTRIBUTES

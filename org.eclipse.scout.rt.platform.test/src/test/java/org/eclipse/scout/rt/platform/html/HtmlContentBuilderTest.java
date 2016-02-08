@@ -15,10 +15,6 @@ import static org.junit.Assert.assertEquals;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.scout.rt.platform.html.HTML;
-import org.eclipse.scout.rt.platform.html.IHtmlElement;
-import org.eclipse.scout.rt.platform.html.IHtmlTable;
-import org.eclipse.scout.rt.platform.html.IHtmlTableRow;
 import org.eclipse.scout.rt.platform.html.internal.HtmlContentBuilder;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.junit.Test;
@@ -27,27 +23,6 @@ import org.junit.Test;
  * Tests for {@link HtmlContentBuilder}
  */
 public class HtmlContentBuilderTest {
-
-  @Test
-  public void test2Binds() {
-    IHtmlElement h1 = HTML.h2("0");
-    IHtmlElement h2 = HTML.h2("1");
-    HtmlContentBuilder cb = new HtmlContentBuilder(h1, h2);
-    assertEquals(2, cb.getBinds().getBindMap().size());
-    assertEquals("0", cb.getBinds().getBindMap().get(":b__0"));
-    assertEquals("1", cb.getBinds().getBindMap().get(":b__1"));
-  }
-
-  @Test
-  public void testImportBinds() {
-    IHtmlElement h2 = HTML.h2("0");
-    IHtmlElement h22 = HTML.h2("1", HTML.bold("2"));
-
-    HtmlContentBuilder cb = new HtmlContentBuilder(h2, h22);
-    assertEquals("0", cb.getBinds().getBindMap().get(":b__0"));
-    assertEquals("1", cb.getBinds().getBindMap().get(":b__1"));
-    assertEquals("2", cb.getBinds().getBindMap().get(":b__2"));
-  }
 
   @Test
   public void testManyBinds() throws Exception {
@@ -59,7 +34,7 @@ public class HtmlContentBuilderTest {
         table);
 
     String exp = "<div><h2>h2</h2>" + createTableString("0") + "</div>";
-    assertEquals(exp, html.toEncodedHtml());
+    assertEquals(exp, html.toHtml());
   }
 
   private String createTableString(String prefix) {
@@ -72,7 +47,7 @@ public class HtmlContentBuilderTest {
   }
 
   private String createRowString(String prefix, int i) {
-    return HTML.tr(HTML.td("A" + prefix + i), HTML.td("B" + prefix + i)).toEncodedHtml();
+    return HTML.tr(HTML.td("A" + prefix + i), HTML.td("B" + prefix + i)).toHtml();
   }
 
   private IHtmlTable createTable(String prefix) {

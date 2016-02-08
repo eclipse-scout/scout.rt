@@ -10,27 +10,18 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.html.internal;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Matcher;
-
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.html.HtmlBinds;
 import org.eclipse.scout.rt.platform.html.HtmlHelper;
 import org.eclipse.scout.rt.platform.html.IHtmlContent;
-import org.eclipse.scout.rt.platform.util.StringUtility;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Buffer for expressions</br>
  * (not thread safe)
  */
 public abstract class AbstractExpressionBuilder implements CharSequence, IHtmlContent {
-  private static final Logger LOG = LoggerFactory.getLogger(AbstractExpressionBuilder.class);
+
   private StringBuilder m_buf;
-  private HtmlBinds m_binds = new HtmlBinds();
+  private final HtmlHelper m_htmlHelper = BEANS.get(HtmlHelper.class);
 
   protected StringBuilder validate() {
     if (m_buf == null) {
@@ -66,64 +57,34 @@ public abstract class AbstractExpressionBuilder implements CharSequence, IHtmlCo
     return validate().toString();
   }
 
-  protected void append(CharSequence arg) {
-    m_buf.append(arg);
-  }
-
-  @Override
-  public HtmlBinds getBinds() {
-    return m_binds;
-  }
-
-  @Override
-  public void setBinds(HtmlBinds binds) {
-    m_binds = binds;
-  }
-
-  protected IHtmlContent importHtml(IHtmlContent contentText) {
-    HtmlBinds binds = contentText.getBinds();
-    Map<String, String> replacements = getBinds().getReplacements(binds);
-    if (!replacements.isEmpty()) {
-      contentText.replaceBinds(replacements);
+  protected void append(CharSequence arg, boolean escape) {
+    String toAppend = null;
+    if (arg == null) {
+      toAppend = "";
     }
-
-    getBinds().putAll(contentText.getBinds());
-    return contentText;
+    else if (escape) {
+      toAppend = escape(arg);
+    }
+    else {
+      toAppend = arg.toString();
+    }
+    m_buf.append(toAppend);
   }
 
   @Override
-  public String toEncodedHtml() {
-    String res = this.toString();
-    List<String> binds = getBinds().getBindParameters(res);
-    Collections.sort(binds, new ReversedLengthComparator());
-    for (String b : binds) {
-      Object value = getBinds().getBindValue(b);
-      if (value == null) {
-        LOG.error("No bind value found for ", b);
-      }
-      else {
-        String encode = encode(value);
-        // quoteReplacement disables special meaning of $ and \ (back-references)
-        res = res.replaceAll(b, Matcher.quoteReplacement(encode));
-      }
-    }
-    return res;
+  public String toHtml() {
+    return toString();
   }
 
   @Override
   public String toPlainText() {
-    return BEANS.get(HtmlHelper.class).toPlainText(toEncodedHtml());
+    return m_htmlHelper.toPlainText(toHtml());
   }
 
   /**
    * @return the encoded bind value.
    */
-  protected String encode(Object value) {
-    return StringUtility.htmlEncode(StringUtility.emptyIfNull(value).toString(), false);
-  }
-
-  @Override
-  public void replaceBinds(Map<String, String> bindMap) {
-    invalidate();
+  protected String escape(Object value) {
+    return m_htmlHelper.escape(value.toString());
   }
 }

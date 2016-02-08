@@ -54,6 +54,19 @@ public class StringUtilityTest {
   }
 
   @Test
+  public void testReplace() {
+    assertEquals("ba", StringUtility.replace("aaa", "aa", "b"));
+    assertNull(StringUtility.replace(null, "aa", "b"));
+    assertEquals("", StringUtility.replace("", "aa", "b"));
+    assertEquals("asdfasdf", StringUtility.replace("asdfasdf", null, "b"));
+    assertEquals("asdfasdf", StringUtility.replace("asdfasdf", "", "b"));
+    assertEquals("asdasd", StringUtility.replace("asdfasdf", "f", null));
+    assertEquals("asdasd", StringUtility.replace("asdfasdf", "f", ""));
+    assertEquals("aaffffffcc", StringUtility.replace("aabbcc", "b", "fff"));
+    assertEquals("asdf", StringUtility.replace("asdf", "ll", "fff"));
+  }
+
+  @Test
   public void testImplodeDelimiters() {
     String a = "a";
     String b = "b";
@@ -280,6 +293,7 @@ public class StringUtilityTest {
    * Test for https://bugs.eclipse.org/bugs/show_bug.cgi?id=347254
    */
   @Test
+  @SuppressWarnings("deprecation")
   public void testHtmlEncodeAmpLT() {
     String testHtml = "<a &lt; b>";
     assertEqualsAfterEncodeDecode(testHtml);
@@ -288,6 +302,7 @@ public class StringUtilityTest {
   }
 
   @Test
+  @SuppressWarnings("deprecation")
   public void testHtmlDecodeTabs() {
     assertEquals("a \tb", StringUtility.htmlDecode("a &#9;b"));
     assertEquals("a<span>\t</span>b", StringUtility.htmlDecode("a<span>&#9;</span>b"));
@@ -312,6 +327,7 @@ public class StringUtilityTest {
    * @param replaceSpace
    *          replace all spaces when encoding
    */
+  @SuppressWarnings("deprecation")
   private static void assertEqualsAfterEncodeDecode(String original, boolean replaceSpaces) {
     String encoded = StringUtility.htmlEncode(original, replaceSpaces);
     String decoded = StringUtility.htmlDecode(encoded);

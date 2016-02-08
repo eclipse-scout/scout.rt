@@ -926,11 +926,17 @@ public final class StringUtility {
 
   /**
    * @return encoded text, ready to be included in a html text <xmp>replaces &, ", ', <, > and all whitespace</xmp>
+   * @deprecated Will be removed in Scout 7.0. Use <code>BEANS.get(HtmlHelper.class).escape(String)</code> instead.
    */
+  @Deprecated
   public static String htmlEncode(String s) {
     return htmlEncode(s, false);
   }
 
+  /**
+   * @deprecated Will be removed in Scout 7.0. Use <code>BEANS.get(HtmlHelper.class).escape(String)</code> instead.
+   */
+  @Deprecated
   public static String htmlEncode(String s, boolean replaceSpace) {
     if (s == null) {
       return s;
@@ -962,7 +968,9 @@ public final class StringUtility {
 
   /**
    * @return decoded text, ready to be printed as text <xmp>replaces &, ", ', <, > and all whitespace</xmp>
+   * @deprecated Will be removed in Scout 7.0. Use <code>BEANS.get(HtmlHelper.class).unescape(String)</code> instead.
    */
+  @Deprecated
   public static String htmlDecode(String s) {
     if (s == null || s.length() == 0) {
       return s;
@@ -1353,14 +1361,37 @@ public final class StringUtility {
   }
 
   /**
-   * replace plain text without using regex
+   * Replaces each substring of the given source {@link String} that matches the given search {@link String} with the
+   * specified replacement {@link String}. The replacement proceeds from the beginning of the string to the end, for
+   * example, replacing "aa" with "b" in the string "aaa" will result in "ba" rather than "ab".
+   *
+   * @param source
+   *          The original string
+   * @param search
+   *          The string to be searched within the source string
+   * @param replacement
+   *          The new string that should be used instead of the search string
+   * @return A new string with all occurences of search replaced to replacement.
    */
-  public static String replace(String s, String sOld, String sNew) {
-    sNew = (sNew == null ? "" : sNew);
-    if (s == null || sOld == null) {
-      return s;
+  public static String replace(final String source, final String search, String replacement) {
+    if (source == null || source.length() < 1 || search == null || search.length() < 1) {
+      return source;
     }
-    return s.replace(sOld, sNew);
+    if (replacement == null) {
+      replacement = "";
+    }
+
+    final int searchLength = search.length();
+    StringBuilder result = new StringBuilder(source.length());
+    int lastPos = 0;
+    int occurrenceIndex = source.indexOf(search, lastPos);
+    while (occurrenceIndex >= 0) {
+      result.append(source.substring(lastPos, occurrenceIndex)).append(replacement);
+      lastPos = occurrenceIndex + searchLength;
+      occurrenceIndex = source.indexOf(search, lastPos);
+    }
+    result.append(source.substring(lastPos));
+    return result.toString();
   }
 
   /**

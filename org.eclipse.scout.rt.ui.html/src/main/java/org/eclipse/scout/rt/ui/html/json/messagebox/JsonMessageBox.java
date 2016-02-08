@@ -71,7 +71,7 @@ public class JsonMessageBox<MESSAGE_BOX extends IMessageBox> extends AbstractJso
     putJsonProperty(new JsonProperty<IMessageBox>("html", model) {
       @Override
       protected String modelValue() {
-        return getModel().getHtml() == null ? null : getModel().getHtml().toEncodedHtml();
+        return getModel().getHtml() == null ? null : getModel().getHtml().toHtml();
       }
     });
     putJsonProperty(new JsonProperty<IMessageBox>("hiddenText", model) {

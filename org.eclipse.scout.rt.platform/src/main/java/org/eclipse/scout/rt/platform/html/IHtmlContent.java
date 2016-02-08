@@ -13,14 +13,10 @@ package org.eclipse.scout.rt.platform.html;
 /**
  * Marker Interface for any Html Content that may contain bind variables.
  */
-public interface IHtmlContent extends IHtmlBind {
+public interface IHtmlContent extends CharSequence {
 
-  String toEncodedHtml();
+  String toHtml();
 
   String toPlainText();
-
-  HtmlBinds getBinds();
-
-  void setBinds(HtmlBinds binds);
 
 }

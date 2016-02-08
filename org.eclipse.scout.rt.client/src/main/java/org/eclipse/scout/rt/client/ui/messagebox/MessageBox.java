@@ -261,7 +261,7 @@ public class MessageBox extends AbstractPropertyObserver implements IMessageBox 
       m_copyPasteTextInternal = StringUtility.join("\n\n",
           m_header,
           m_body,
-          m_html == null ? null : BEANS.get(HtmlHelper.class).toPlainText(m_html.toEncodedHtml()),
+          m_html == null ? null : BEANS.get(HtmlHelper.class).toPlainText(m_html.toHtml()),
           m_hiddenText);
     }
   }

@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.platform.html.internal;
 
 import java.util.List;
 
-import org.eclipse.scout.rt.platform.html.IHtmlElement;
 import org.eclipse.scout.rt.platform.html.IHtmlTable;
 import org.eclipse.scout.rt.platform.html.IHtmlTableRow;
 
@@ -23,28 +22,6 @@ public class HtmlTableBuilder extends HtmlNodeBuilder implements IHtmlTable {
 
   public HtmlTableBuilder(List<IHtmlTableRow> rows) {
     super("table", rows);
-  }
-
-  /**
-   * @deprecated use {@link IHtmlElement#cssClass(CharSequence)} or {@link IHtmlElement#style(CharSequence)}
-   */
-  @SuppressWarnings("deprecation")
-  @Override
-  @Deprecated
-  public IHtmlTable cellspacing(int pixel) {
-    addAttribute("cellspacing", pixel);
-    return this;
-  }
-
-  /**
-   * @deprecated use {@link IHtmlElement#cssClass(CharSequence)} or {@link IHtmlElement#style(CharSequence)}
-   */
-  @SuppressWarnings("deprecation")
-  @Override
-  @Deprecated
-  public IHtmlTable cellpadding(int pixel) {
-    addAttribute("cellpadding", pixel);
-    return this;
   }
 
   /**

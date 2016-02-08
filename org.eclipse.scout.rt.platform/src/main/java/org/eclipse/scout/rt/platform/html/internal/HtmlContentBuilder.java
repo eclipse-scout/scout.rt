@@ -13,42 +13,21 @@ package org.eclipse.scout.rt.platform.html.internal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
-import org.eclipse.scout.rt.platform.html.IHtmlBind;
 import org.eclipse.scout.rt.platform.html.IHtmlContent;
 
 /**
  * Empty node for HTML fragments: Creates a node that may contain other html content, but does not have a tag name.
  */
 public class HtmlContentBuilder extends AbstractExpressionBuilder implements IHtmlContent {
-  private final List<? extends IHtmlBind> m_texts;
+  private final List<? extends CharSequence> m_texts;
 
   public HtmlContentBuilder(CharSequence... texts) {
     this(Arrays.asList(texts));
   }
 
   public HtmlContentBuilder(List<? extends CharSequence> texts) {
-    m_texts = importTexts(texts);
-  }
-
-  protected ArrayList<? extends IHtmlBind> importTexts(List<? extends CharSequence> texts) {
-    ArrayList<IHtmlBind> bindTexts = new ArrayList<IHtmlBind>();
-    for (CharSequence text : texts) {
-      if (text == null) {
-        continue;
-      }
-      else if (text instanceof IHtmlContent) {
-        bindTexts.add(importHtml((IHtmlContent) text));
-      }
-      else if (text instanceof IHtmlBind) {
-        bindTexts.add((IHtmlBind) text);
-      }
-      else {
-        bindTexts.add(getBinds().put(text));
-      }
-    }
-    return bindTexts;
+    m_texts = new ArrayList<>(texts);
   }
 
   @Override
@@ -60,19 +39,11 @@ public class HtmlContentBuilder extends AbstractExpressionBuilder implements IHt
 
   protected void appendText() {
     for (CharSequence t : m_texts) {
-      append(t);
+      append(t, !(t instanceof IHtmlContent));
     }
   }
 
-  @Override
-  public void replaceBinds(Map<String, String> bindMap) {
-    super.replaceBinds(bindMap);
-    for (IHtmlBind elem : m_texts) {
-      elem.replaceBinds(bindMap);
-    }
-  }
-
-  protected List<? extends IHtmlBind> getTexts() {
+  protected List<? extends CharSequence> getTexts() {
     return m_texts;
   }
 

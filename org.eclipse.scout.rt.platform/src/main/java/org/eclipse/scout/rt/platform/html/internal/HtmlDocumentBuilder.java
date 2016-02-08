@@ -22,7 +22,7 @@ public class HtmlDocumentBuilder extends HtmlNodeBuilder implements IHtmlDocumen
   @Override
   public void build() {
     if (m_docType != null) {
-      append(m_docType);
+      append(m_docType, false);
     }
     super.build();
   }

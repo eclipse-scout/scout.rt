@@ -14,8 +14,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.eclipse.scout.rt.platform.html.IHtmlContent;
-
 public class HtmlPlainBuilder extends AbstractExpressionBuilder {
   private final List<? extends CharSequence> m_texts;
 
@@ -24,23 +22,7 @@ public class HtmlPlainBuilder extends AbstractExpressionBuilder {
   }
 
   public HtmlPlainBuilder(List<? extends CharSequence> texts) {
-    m_texts = importTexts(texts);
-  }
-
-  protected ArrayList<? extends CharSequence> importTexts(List<? extends CharSequence> texts) {
-    ArrayList<CharSequence> bindTexts = new ArrayList<CharSequence>();
-    for (CharSequence text : texts) {
-      if (text == null) {
-        continue;
-      }
-      if (text instanceof IHtmlContent) {
-        bindTexts.add(importHtml((IHtmlContent) text));
-      }
-      else {
-        bindTexts.add(text);
-      }
-    }
-    return bindTexts;
+    m_texts = new ArrayList<>(texts);
   }
 
   @Override
@@ -52,7 +34,7 @@ public class HtmlPlainBuilder extends AbstractExpressionBuilder {
 
   protected void appendText() {
     for (CharSequence t : m_texts) {
-      append(t);
+      append(t, false);
     }
   }
 

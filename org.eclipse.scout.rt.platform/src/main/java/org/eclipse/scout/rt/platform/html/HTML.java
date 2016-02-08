@@ -43,7 +43,7 @@ public final class HTML {
    * Create a html element with encoded text for &lt;head&gt;text&lt;/head&gt;.
    * <p>
    * Example:<br>
-   * String encodedHtml = HTML.head("text").toEncodedHtml(); <br>
+   * String encodedHtml = HTML.head("text").toHtml(); <br>
    * </p>
    *
    * @param elements
@@ -57,7 +57,7 @@ public final class HTML {
    * Create a html element with encoded text for &lt;body&gt;text&lt;/body&gt;.
    * <p>
    * Example:<br>
-   * String encodedHtml = HTML.body("text").toEncodedHtml(); <br>
+   * String encodedHtml = HTML.body("text").toHtml(); <br>
    * </p>
    *
    * @param elements
@@ -71,7 +71,7 @@ public final class HTML {
    * Create a html element with encoded text for &lt;b&gt;text&lt;/b&gt;.
    * <p>
    * Example:<br>
-   * String encodedHtml = HTML.bold("text").toEncodedHtml(); <br>
+   * String encodedHtml = HTML.bold("text").toHtml(); <br>
    * </p>
    *
    * @param text
@@ -85,7 +85,7 @@ public final class HTML {
    * Create a html element with encoded text for &lt;i&gt;text&lt;/i&gt;.
    * <p>
    * Example:<br>
-   * String encodedHtml = HTML.italic("text").toEncodedHtml(); <br>
+   * String encodedHtml = HTML.italic("text").toHtml(); <br>
    * </p>
    *
    * @param text
@@ -99,7 +99,7 @@ public final class HTML {
    * Create a html element with encoded text for &lt;p&gt;text&lt;/p&gt;.
    * <p>
    * Example:<br>
-   * String encodedHtml = HTML.p("text").toEncodedHtml(); <br>
+   * String encodedHtml = HTML.p("text").toHtml(); <br>
    * </p>
    *
    * @param text
@@ -113,7 +113,7 @@ public final class HTML {
    * Create a html element for &lt;br&gt;.
    * <p>
    * Example:<br>
-   * String encodedHtml = HTML.br().toEncodedHtml(); <br>
+   * String encodedHtml = HTML.br().toHtml(); <br>
    * </p>
    */
   public static IHtmlElement br() {
@@ -124,7 +124,7 @@ public final class HTML {
    * Create a html element for &lt;hr&gt;.
    * <p>
    * Example:<br>
-   * String encodedHtml = HTML.hr().toEncodedHtml(); <br>
+   * String encodedHtml = HTML.hr().toHtml(); <br>
    * </p>
    */
   public static IHtmlElement hr() {
@@ -135,7 +135,7 @@ public final class HTML {
    * Create a html element with encoded text for &lt;h1&gt;text&lt;/h1&gt;.
    * <p>
    * Example:<br>
-   * String encodedHtml = HTML.h1("text").toEncodedHtml(); <br>
+   * String encodedHtml = HTML.h1("text").toHtml(); <br>
    * </p>
    *
    * @param text
@@ -149,7 +149,7 @@ public final class HTML {
    * Create a html element with encoded text for &lt;h2&gt;text&lt;/h2&gt;.
    * <p>
    * Example:<br>
-   * String encodedHtml = HTML.h2("text").toEncodedHtml(); <br>
+   * String encodedHtml = HTML.h2("text").toHtml(); <br>
    * </p>
    *
    * @param text
@@ -163,7 +163,7 @@ public final class HTML {
    * Create a html element with encoded text for &lt;h3&gt;text&lt;/h3&gt;.
    * <p>
    * Example:<br>
-   * String encodedHtml = HTML.h3("text").toEncodedHtml(); <br>
+   * String encodedHtml = HTML.h3("text").toHtml(); <br>
    * </p>
    *
    * @param text
@@ -177,7 +177,7 @@ public final class HTML {
    * Create a html element with encoded text for &lt;h4&gt;text&lt;/h4&gt;.
    * <p>
    * Example:<br>
-   * String encodedHtml = HTML.h4("text").toEncodedHtml(); <br>
+   * String encodedHtml = HTML.h4("text").toHtml(); <br>
    * </p>
    *
    * @param text
@@ -191,7 +191,7 @@ public final class HTML {
    * Create a html element with encoded text for &lt;h5&gt;text&lt;/h5&gt;.
    * <p>
    * Example:<br>
-   * String encodedHtml = HTML.h5("text").toEncodedHtml(); <br>
+   * String encodedHtml = HTML.h5("text").toHtml(); <br>
    * </p>
    *
    * @param text
@@ -205,7 +205,7 @@ public final class HTML {
    * Create a html element with encoded text for &lt;h6&gt;text&lt;/h6&gt;.
    * <p>
    * Example:<br>
-   * String encodedHtml = HTML.h6("text").toEncodedHtml(); <br>
+   * String encodedHtml = HTML.h6("text").toHtml(); <br>
    * </p>
    *
    * @param text
@@ -219,14 +219,14 @@ public final class HTML {
    * Create a html element with encoded text for &lt;div&gt;content&lt;/div&gt;.
    * <p>
    * Example:<br>
-   * String encodedHtml = HTML.div("text").toEncodedHtml(); <br>
+   * String encodedHtml = HTML.div("text").toHtml(); <br>
    * </p>
    *
    * @param content
    *          content as bind
    */
   public static IHtmlElement div(CharSequence... content) {
-    return new HtmlNodeBuilder("div", Arrays.asList(content));
+    return div(Arrays.asList(content));
   }
 
   /**
@@ -243,7 +243,7 @@ public final class HTML {
    * Create a html element with encoded text for &lt;span&gt;content&lt;/span&gt;.
    * <p>
    * Example:<br>
-   * String encodedHtml = HTML.span("text").toEncodedHtml(); <br>
+   * String encodedHtml = HTML.span("text").toHtml(); <br>
    * </p>
    *
    * @param text
@@ -257,7 +257,7 @@ public final class HTML {
    * Create a html element with encoded text for a link &lt;a href="url"&gt;text&lt;/a&gt;.
    * <p>
    * Example:<br>
-   * String encodedHtml = HTML.link("http://xyz.com","text").toEncodedHtml(); <br>
+   * String encodedHtml = HTML.link("http://xyz.com","text").toHtml(); <br>
    * </p>
    *
    * @param text
@@ -271,7 +271,7 @@ public final class HTML {
    * Create a html element for an image: &lt;img src="path"&gt;&lt;/img&gt;.
    * <p>
    * Example:<br>
-   * String encodedHtml = HTML.img("image.png").toEncodedHtml(); <br>
+   * String encodedHtml = HTML.img("image.png").toHtml(); <br>
    * </p>
    *
    * @param src
@@ -285,7 +285,7 @@ public final class HTML {
    * Create a html element for an image: &lt;img src="binaryResource:resourceName"&gt;&lt;/img&gt;.
    * <p>
    * Example:<br>
-   * String encodedHtml = HTML.imgByBinaryResource("resourceName").toEncodedHtml(); <br>
+   * String encodedHtml = HTML.imgByBinaryResource("resourceName").toHtml(); <br>
    * </p>
    *
    * @param binaryResource
@@ -299,7 +299,7 @@ public final class HTML {
    * Create a html element for an image: &lt;img src="iconid:icon_name"&gt;&lt;/img&gt;.
    * <p>
    * Example:<br>
-   * String encodedHtml = HTML.imgByIconId("icon_name").toEncodedHtml(); <br>
+   * String encodedHtml = HTML.imgByIconId("icon_name").toHtml(); <br>
    * </p>
    *
    * @param iconId
@@ -313,7 +313,7 @@ public final class HTML {
    * Create a html list element with encoded text: &lt;li&gt;text&lt;/li&gt;.
    * <p>
    * Example:<br>
-   * String encodedHtml = HTML.li("text").toEncodedHtml(); <br>
+   * String encodedHtml = HTML.li("text").toHtml(); <br>
    * </p>
    */
   public static IHtmlListElement li(CharSequence text) {
@@ -324,7 +324,7 @@ public final class HTML {
    * Create an unordered html list element with encoded text: &lt;ul&gt;...&lt;/ul&gt;.
    * <p>
    * Example:<br>
-   * String encodedHtml = HTML.ul(HTML.li("text"),...).toEncodedHtml(); <br>
+   * String encodedHtml = HTML.ul(HTML.li("text"),...).toHtml(); <br>
    * </p>
    */
   public static IHtmlElement ul(IHtmlListElement... li) {
@@ -335,7 +335,7 @@ public final class HTML {
    * Create an unordered html list element with encoded text: &lt;ul&gt;...&lt;/ul&gt;.
    * <p>
    * Example:<br>
-   * String encodedHtml = HTML.ul(HTML.li("text"),...).toEncodedHtml(); <br>
+   * String encodedHtml = HTML.ul(HTML.li("text"),...).toHtml(); <br>
    * </p>
    */
   public static IHtmlElement ul(List<IHtmlListElement> li) {
@@ -346,7 +346,7 @@ public final class HTML {
    * Create an ordered html list element with encoded text: &lt;ul&gt;...&lt;/ul&gt;.
    * <p>
    * Example:<br>
-   * String encodedHtml = HTML.ol(HTML.li("text"),...).toEncodedHtml(); <br>
+   * String encodedHtml = HTML.ol(HTML.li("text"),...).toHtml(); <br>
    * </p>
    */
   public static IHtmlContent ol(IHtmlListElement... li) {
@@ -461,7 +461,7 @@ public final class HTML {
   }
 
   /**
-   * Creates an application local link String encodedHtml = HTML.appLink("path","text").toEncodedHtml(); <br>
+   * Creates an application local link String encodedHtml = HTML.appLink("path","text").toHtml(); <br>
    *
    * @param ref
    *          what the link is referring to
@@ -509,7 +509,7 @@ public final class HTML {
   }
 
   /**
-   * Creates HTML content that will not be encoded with {@link IHtmlContent#toEncodedHtml()}. <b>Use with caution!</b>
+   * Creates HTML content that will not be encoded with {@link IHtmlContent#toHtml()}. <b>Use with caution!</b>
    */
   public static IHtmlContent raw(CharSequence... text) {
     return new HtmlPlainBuilder(text);

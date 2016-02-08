@@ -75,7 +75,7 @@ public class ScoutInfoForm extends AbstractForm {
         createLogoHtml(),
         createTitleHtml(),
         createHtmlTable(getProperties()));
-    return html.toEncodedHtml();
+    return html.toHtml();
   }
 
   protected IHtmlElement createLogoHtml() {
