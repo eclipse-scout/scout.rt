@@ -141,7 +141,7 @@
     return function() {
       var that = this,
         args = arguments,
-        now =  new Date().getTime(),
+        now = new Date().getTime(),
         callFx = function() {
           lastExecution = now;
           fx.apply(that, args);
@@ -344,7 +344,6 @@
   $.fn.appendTextNode = function(text) {
     return $(this.document(true).createTextNode(text)).appendTo(this);
   };
-
 
   $.fn.makeSVG = function(type, cssClass, htmlContent, id) {
     var myDocument = this.document(true);
@@ -1153,6 +1152,21 @@
    */
   $.fn.isContentTruncated = function() {
     return this[0].scrollWidth > this[0].clientWidth;
+  };
+
+  /**
+   * Returns width with fraction
+   */
+  $.fn.realWidth = function() {
+    var elem = this[0],
+      fullWidth = elem.getBoundingClientRect().width,
+      style = elem.currentStyle || window.getComputedStyle(elem),
+      margin = parseFloat(style.marginLeft) + parseFloat(style.marginRight),
+      padding = parseFloat(style.paddingLeft) + parseFloat(style.paddingRight),
+      border = parseFloat(style.borderLeftWidth) + parseFloat(style.borderRightWidth);
+
+    return fullWidth - margin - padding - border;
+
   };
 
 }(jQuery));
