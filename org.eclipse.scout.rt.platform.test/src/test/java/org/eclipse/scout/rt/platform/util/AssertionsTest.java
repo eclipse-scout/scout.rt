@@ -278,7 +278,7 @@ public class AssertionsTest {
       fail();
     }
     catch (AssertionException e) {
-      assertEquals("Assertion error: n/a", e.getMessage());
+      assertEquals("Assertion error: null", e.getMessage());
     }
 
     // 4. Test with message and null argument

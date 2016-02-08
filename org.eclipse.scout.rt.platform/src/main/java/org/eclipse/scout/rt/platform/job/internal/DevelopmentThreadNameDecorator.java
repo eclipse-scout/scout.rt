@@ -16,13 +16,13 @@ import org.eclipse.scout.rt.platform.IgnoreBean;
 import org.eclipse.scout.rt.platform.PlatformEvent;
 import org.eclipse.scout.rt.platform.Replace;
 import org.eclipse.scout.rt.platform.job.IFuture;
-import org.eclipse.scout.rt.platform.job.IJobListenerRegistration;
 import org.eclipse.scout.rt.platform.job.JobState;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.internal.NamedThreadFactory.ThreadInfo;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.job.listener.JobEventType;
+import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,7 +52,7 @@ public class DevelopmentThreadNameDecorator extends ThreadNameDecorator {
     threadInfo.updateThreadName(future.getJobInput().getThreadName(), buildExecutionInfo(future));
 
     // Decorate the thread name upon job state change.
-    final IJobListenerRegistration listenerRegistration = future.addListener(
+    final IRegistrationHandle listenerRegistration = future.addListener(
         Jobs.newEventFilterBuilder()
             .andMatchEventType(JobEventType.JOB_STATE_CHANGED)
             .andMatchState(

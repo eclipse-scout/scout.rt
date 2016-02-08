@@ -13,8 +13,6 @@ package org.eclipse.scout.rt.server.cache;
 import java.util.Map;
 import java.util.concurrent.ConcurrentMap;
 
-import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.server.services.common.clustersync.IClusterSynchronizationService;
 import org.eclipse.scout.rt.shared.cache.CacheBuilder;
 import org.eclipse.scout.rt.shared.cache.ICache;
 
@@ -51,8 +49,7 @@ public class ServerCacheBuilder<K, V> extends CacheBuilder<K, V> {
       addCacheInstance(cache);
     }
     // it is important, that the ClusterNotificationCacheWrapper is added after the client notification cache wrapper
-    IClusterSynchronizationService service = BEANS.opt(IClusterSynchronizationService.class);
-    if (isClusterEnabled() && service != null && service.isEnabled()) {
+    if (isClusterEnabled()) {
       cache = new ClusterNotificationCacheWrapper<K, V>(cache);
       addCacheInstance(cache);
     }

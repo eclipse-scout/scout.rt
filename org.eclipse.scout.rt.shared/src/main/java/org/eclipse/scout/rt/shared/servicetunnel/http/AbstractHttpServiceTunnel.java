@@ -213,7 +213,8 @@ public abstract class AbstractHttpServiceTunnel extends AbstractServiceTunnel {
     try {
       future = Jobs.schedule(remoteInvocationCallable, Jobs.newInput()
           .withRunContext(executionContext.copy())
-          .withName(createServiceRequestName(requestSequence)))
+          .withName(createServiceRequestName(requestSequence))
+          .withExceptionHandling(null, false)) // do not handle uncaught exceptions because typically invoked from within a model job (might cause a deadlock, because ClientExceptionHandler schedules and waits for a model job to visualize the exception).
           .whenDone(new IDoneHandler<ServiceTunnelResponse>() {
 
             @Override

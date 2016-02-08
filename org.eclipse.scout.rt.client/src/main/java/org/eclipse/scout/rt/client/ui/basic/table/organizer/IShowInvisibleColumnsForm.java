@@ -4,6 +4,7 @@
  */
 package org.eclipse.scout.rt.client.ui.basic.table.organizer;
 
+import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 
 /**
@@ -15,5 +16,7 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 public interface IShowInvisibleColumnsForm extends IForm {
 
   void startModify();
+
+  IShowInvisibleColumnsForm withInsertAfterColumn(IColumn<?> insertAfterColumn);
 
 }

@@ -39,7 +39,7 @@ scout.BooleanColumn.prototype.buildCell = function(cell, row) {
     cssClass += ' disabled';
   }
   tooltipText = cell.tooltipText;
-  tooltip = (!scout.strings.hasText(tooltipText) ? '' : ' title="' + tooltipText + '"');
+  tooltip = (scout.strings.empty(tooltipText) ? '' : ' title="' + tooltipText + '"');
 
   checkBoxCssClass = 'check-box';
   if (checked) {

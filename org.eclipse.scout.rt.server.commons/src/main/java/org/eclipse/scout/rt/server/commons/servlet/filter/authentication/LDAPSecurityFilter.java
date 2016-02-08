@@ -115,18 +115,18 @@ public class LDAPSecurityFilter extends AbstractChainableSecurityFilter {
 
   /**
    * @param username
-   *          e.g. KippingSte
+   *          e.g. FooBar
    * @param server
-   *          e.g. ldap://172.20.1.21
+   *          e.g. ldap://123.45.6.78
    * @param baseDN
-   *          e.g. o=hermes
+   *          e.g. o=firmaxyz
    * @param groupDN
-   *          e.g. cn=AGENTS,ou=ks,ou=lm,ou=hlg,ou=zentrale <br>
+   *          e.g. cn=AGENTS,ou=fb,ou=lm,ou=hlg,ou=zentrale <br>
    *          The user DN is defined within this group
    * @param attributeId
    *          e.g. equivalentToMe <br>
    *          Name of the user DN attribute
-   * @return something like "cn=KippingSte,ou=KS,ou=LM,ou=HLG,ou=ZENTRALE,o=HERMES"
+   * @return something like "cn=FooBar,ou=FB,ou=LM,ou=HLG,ou=ZENTRALE,o=FIRMAXYZ"
    * @throws ServletException
    */
   @SuppressWarnings("unchecked")
@@ -157,7 +157,7 @@ public class LDAPSecurityFilter extends AbstractChainableSecurityFilter {
 
         while (allValues.hasMore()) {
           // dn is something like
-          // "cn=KippingSte,ou=KS,ou=LM,ou=HLG,ou=ZENTRALE,o=HERMES"
+          // "cn=FooBar,ou=FB,ou=LM,ou=HLG,ou=ZENTRALE,o=FIRMAXYZ"
           dn = (String) allValues.next();
           // extract userName (e.g. "BulinskyMir")
           if (dn.length() > 4) {

@@ -147,7 +147,7 @@ public abstract class AbstractTableControl extends AbstractAction implements ITa
   }
 
   public void ensureFormStarted() {
-    if (getForm() == null || getForm().isFormStarted()) {
+    if (getForm() == null || !getForm().isFormStartable()) {
       return;
     }
     startForm();

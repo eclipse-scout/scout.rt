@@ -27,7 +27,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.ILongColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.ISmartColumn;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
-import org.eclipse.scout.rt.platform.html.HTMLUtility;
+import org.eclipse.scout.rt.platform.html.HtmlHelper;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
@@ -277,7 +277,7 @@ public final class TableUtility {
           //special intercept for html
           if (type == String.class) {
             if (text != null && text.startsWith("<html")) {
-              text = HTMLUtility.getPlainText(text);
+              text = BEANS.get(HtmlHelper.class).toPlainText(text);
             }
           }
           a[csvRowIndex][c] = text;

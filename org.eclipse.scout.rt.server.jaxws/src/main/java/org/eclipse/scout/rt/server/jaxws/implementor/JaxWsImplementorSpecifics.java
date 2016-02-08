@@ -196,5 +196,6 @@ public class JaxWsImplementorSpecifics {
    * invoked.
    */
   public void interceptWebServiceRequestRejected(final MessageContext messageContext, final int httpStatusCode) throws WebServiceRequestRejectedException {
+    // NOOP: The default implementation does nothing
   }
 }

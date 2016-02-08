@@ -157,7 +157,7 @@ public class CacheBuilder<K, V> implements ICacheBuilder<K, V> {
 
   protected void initializeCacheInstances() {
     for (ICache<K, V> cache : m_cacheInstances) {
-      BeanInstanceUtil.initializeInstance(cache);
+      BeanInstanceUtil.initializeBeanInstance(cache);
     }
   }
 

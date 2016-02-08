@@ -11,7 +11,9 @@
 package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
@@ -45,6 +47,7 @@ import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.eclipse.scout.rt.testing.shared.services.lookup.TestingLookupService;
 import org.eclipse.scout.testing.client.form.FormHandler;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -67,6 +70,7 @@ public class SmartFieldTest {
 
   protected TestForm m_form;
   private List<IBean<?>> m_reg;
+  private StyleField m_styleField;
 
   @BeforeClass
   public static void beforeClass() throws Exception {
@@ -260,11 +264,12 @@ public class SmartFieldTest {
             .withApplicationScoped(true));
     m_form = new TestForm();
     m_form.startForm();
+    m_styleField = m_form.getStyleField();
   }
 
   @Test
   public void testStyle_SetValue() throws Throwable {
-    StyleField f = m_form.getStyleField();
+    StyleField f = m_styleField;
     f.setValue(10L);
     assertRedFieldStyle(f);
     f.setValue(50L);
@@ -293,7 +298,7 @@ public class SmartFieldTest {
 
   @Test
   public void testStyle_UIFacade() throws Throwable {
-    StyleField f = m_form.getStyleField();
+    StyleField f = m_styleField;
     f.getUIFacade().acceptProposalFromUI("Red", false, false);
     assertRedFieldStyle(f);
     f.getUIFacade().acceptProposalFromUI("Empty", false, false);
@@ -306,7 +311,7 @@ public class SmartFieldTest {
 
   @Test
   public void testStyle_AcceptProposal() throws Throwable {
-    StyleField f = m_form.getStyleField();
+    StyleField f = m_styleField;
     f.acceptProposal(createRedLookupRow());
     assertRedFieldStyle(f);
     f.acceptProposal(new LookupRow<Long>(50L, "Empty"));
@@ -341,7 +346,7 @@ public class SmartFieldTest {
    */
   @Test
   public void testLookupOnlyWhenNecessary() throws Exception {
-    StyleField f = m_form.getStyleField();
+    StyleField f = m_styleField;
     StyleLookupCall lookupCall = (StyleLookupCall) f.getLookupCall();
     // expect lookup is performed
     lookupCall.allowLookup(true);
@@ -369,7 +374,7 @@ public class SmartFieldTest {
 
   @Test
   public void testSmartfieldMenus() {
-    List<IMenu> smartfieldMenus = m_form.getStyleField().getMenus();
+    List<IMenu> smartfieldMenus = m_styleField.getMenus();
     assertEquals("Smartfield should have 2 menus", 2, smartfieldMenus.size());
     assertEquals("TestMenu1", smartfieldMenus.get(0).getText());
     assertEquals("&TestMenu1", smartfieldMenus.get(0).getTextWithMnemonic());
@@ -388,38 +393,52 @@ public class SmartFieldTest {
 
   @Test
   public void testDefaultSelectionWithOnlyOneResult() throws Exception {
-    m_form.getStyleField().getUIFacade().openProposalChooserFromUI("*", false);
+    m_styleField.getUIFacade().openProposalChooserFromUI("*", false);
     waitUntilLookupRowsLoaded();
 
-    m_form.getStyleField().getUIFacade().proposalTypedFromUI("Y");
+    m_styleField.getUIFacade().proposalTypedFromUI("Y");
     waitUntilLookupRowsLoaded();
 
     // verifies one (and only, unique) result is available and selected
-    assertTrue(m_form.getStyleField().isProposalChooserRegistered());
-    TableProposalChooser<?> tableProposalChooser = (TableProposalChooser<?>) m_form.getStyleField().getProposalChooser();
+    assertTrue(m_styleField.isProposalChooserRegistered());
+    TableProposalChooser<?> tableProposalChooser = (TableProposalChooser<?>) m_styleField.getProposalChooser();
     IContentAssistFieldTable<?> resultTable = tableProposalChooser.getModel();
     assertEquals(1, resultTable.getSelectedRowCount());
     assertEquals(1, resultTable.getRowCount());
     ILookupRow<?> expectedLookupRow = resultTable.getSelectedLookupRow();
     tableProposalChooser.execResultTableRowClicked(resultTable.getRow(0));
 
-    assertEquals("Yellow", m_form.getStyleField().getDisplayText());
-    assertEquals(Long.valueOf(20L), m_form.getStyleField().getValue());
-    assertNotNull(m_form.getStyleField().getCurrentLookupRow());
-    assertEquals(expectedLookupRow, m_form.getStyleField().getCurrentLookupRow());
+    assertEquals("Yellow", m_styleField.getDisplayText());
+    assertEquals(Long.valueOf(20L), m_styleField.getValue());
+    assertNotNull(m_styleField.getCurrentLookupRow());
+    assertEquals(expectedLookupRow, m_styleField.getCurrentLookupRow());
   }
 
   @Test
   public void testNoDefaultSelectionWithMoreThanOneResult() throws Exception {
-    m_form.getStyleField().getUIFacade().openProposalChooserFromUI("*", false);
+    m_styleField.getUIFacade().openProposalChooserFromUI("*", false);
     waitUntilLookupRowsLoaded();
 
     // select a proposal from the proposal chooser table
-    assertTrue(m_form.getStyleField().isProposalChooserRegistered());
-    TableProposalChooser<?> tableProposalChooser = (TableProposalChooser<?>) m_form.getStyleField().getProposalChooser();
+    assertTrue(m_styleField.isProposalChooserRegistered());
+    TableProposalChooser<?> tableProposalChooser = (TableProposalChooser<?>) m_styleField.getProposalChooser();
     IContentAssistFieldTable<?> resultTable = tableProposalChooser.getModel();
     assertEquals(0, resultTable.getSelectedRowCount());
     assertTrue(resultTable.getRowCount() > 1);
+  }
+
+  /**
+   * Test for ticket #168652.
+   */
+  @Test
+  public void testDeleteProposal() throws Exception {
+    m_styleField.setValue(10L);
+    m_styleField.getUIFacade().openProposalChooserFromUI("*", false);
+    waitUntilLookupRowsLoaded();
+    assertTrue(m_styleField.isProposalChooserRegistered());
+    m_styleField.getUIFacade().deleteProposalFromUI();
+    assertNull(m_styleField.getValue());
+    assertFalse(m_styleField.isProposalChooserRegistered());
   }
 
   /**

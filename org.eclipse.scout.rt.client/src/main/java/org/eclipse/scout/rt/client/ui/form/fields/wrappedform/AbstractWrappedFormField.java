@@ -155,7 +155,7 @@ public abstract class AbstractWrappedFormField<FORM extends IForm> extends Abstr
     calculateVisibleInternal();
     if (m_innerForm != null) {
       fireSubtreePropertyChange(new PropertyChangeEvent(m_innerForm.getRootGroupBox(), IFormField.PROP_PARENT_FIELD, null, null));
-      if (m_manageInnerFormLifeCycle && !m_innerForm.isFormStarted()) { // TODO [5.2] dwi: Remove 'started check' once assertion is in place
+      if (m_manageInnerFormLifeCycle && m_innerForm.isFormStartable()) { // TODO [5.2] dwi: Remove 'started check' once assertion is in place
         m_innerForm.start();
       }
     }

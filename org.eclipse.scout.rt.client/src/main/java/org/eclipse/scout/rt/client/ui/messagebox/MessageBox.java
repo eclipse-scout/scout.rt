@@ -26,7 +26,7 @@ import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.DisplayParentResolver;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
-import org.eclipse.scout.rt.platform.html.HTMLUtility;
+import org.eclipse.scout.rt.platform.html.HtmlHelper;
 import org.eclipse.scout.rt.platform.html.IHtmlContent;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IFuture;
@@ -261,7 +261,7 @@ public class MessageBox extends AbstractPropertyObserver implements IMessageBox 
       m_copyPasteTextInternal = StringUtility.join("\n\n",
           m_header,
           m_body,
-          m_html == null ? null : HTMLUtility.getPlainText(m_html.toEncodedHtml()),
+          m_html == null ? null : BEANS.get(HtmlHelper.class).toPlainText(m_html.toEncodedHtml()),
           m_hiddenText);
     }
   }

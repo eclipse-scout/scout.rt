@@ -18,7 +18,6 @@ import java.util.concurrent.TimeUnit;
 
 import javax.xml.ws.Service;
 
-import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.ToStringBuilder;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
@@ -80,7 +79,6 @@ public class PortCache<PORT> {
       }
     }, Jobs.newInput()
         .withName("Cleaning up JAX-WS port cache")
-        .withRunContext(RunContexts.empty())
         .withExecutionTrigger(Jobs.newExecutionTrigger()
             .withStartIn(1, TimeUnit.MINUTES)
             .withSchedule(SimpleScheduleBuilder.repeatMinutelyForever())));
@@ -94,7 +92,6 @@ public class PortCache<PORT> {
           ensureCorePool();
         }
       }, Jobs.newInput()
-          .withRunContext(RunContexts.empty())
           .withName("Initializing JAX-WS port cache"));
     }
   }
@@ -116,7 +113,6 @@ public class PortCache<PORT> {
         m_queue.offer(new PortCacheEntry<>(m_portProducer.produce(), m_timeToLive));
       }
     }, Jobs.newInput()
-        .withRunContext(RunContexts.copyCurrent())
         .withName("Producing PortType to be put into cache"));
 
     // Return port from cache, or create a new one.

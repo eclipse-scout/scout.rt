@@ -281,6 +281,8 @@ public interface ITree extends IPropertyObserver, IDNDSupport, IAppLinkCapable, 
    */
   Set<ITreeNode> getCheckedNodes();
 
+  int getCheckedNodesCount();
+
   /**
    * Container of this tree, {@link IPage}, {@link ITreeField}, {@link ITreeBox}
    * <p>
@@ -373,6 +375,11 @@ public interface ITree extends IPropertyObserver, IDNDSupport, IAppLinkCapable, 
    *          {@link ITreeNode#isExpandedLazy()}
    */
   void setNodeExpanded(ITreeNode node, boolean expanded, boolean lazy);
+
+  /**
+   * set expanded without check if node is already expanded
+   */
+  void setNodeExpandedInternal(ITreeNode node, boolean expanded, boolean lazy);
 
   void setNodeEnabledPermission(ITreeNode node, Permission p);
 

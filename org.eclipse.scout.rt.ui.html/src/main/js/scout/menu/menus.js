@@ -15,7 +15,7 @@ scout.menus = {
    */
   CLOSING_EVENTS: 'mousedown.contextMenu keydown.contextMenu', //FIXME cgu: keydown/keyup is a bad idea -> interferes with ctrl click on table to multi select rows
 
-  filterAccordingToSelection: function(prefix, selectionLength, menus, destination, onlyVisible, enableDisableKeyStroke) {
+  filterAccordingToSelection: function(prefix, selectionLength, menus, destination, onlyVisible, enableDisableKeyStroke, notAllowedTypes) {
     var allowedTypes = [];
 
     if (destination === scout.MenuDestinations.MENU_BAR) {
@@ -32,19 +32,31 @@ scout.menus = {
     if (allowedTypes.indexOf(prefix + '.MultiSelection') > -1 && selectionLength <= 1) {
       scout.arrays.remove(allowedTypes, prefix + '.MultiSelection');
     }
-    return scout.menus.filter(menus, allowedTypes, onlyVisible, enableDisableKeyStroke);
+    notAllowedTypes = scout.arrays.ensure(notAllowedTypes);
+    var fixedNotAllowedTypes = [];
+    //ensure prefix
+    prefix = prefix + '.';
+    notAllowedTypes.forEach(function(type) {
+      if (type.slice(0, prefix.length) !== prefix) {
+        type = prefix + type;
+      }
+      fixedNotAllowedTypes.push(type);
+    }, this);
+    return scout.menus.filter(menus, allowedTypes, onlyVisible, enableDisableKeyStroke, fixedNotAllowedTypes);
   },
 
   /**
    * Filters menus that don't match the given types, or in other words: only menus with the given types are returned
    * from this method. The visible state is only checked if the parameter onlyVisible is set to true. Otherwise invisible items are returned and added to the
-   * menu-bar DOM (invisible, however). They may change their visible state later.
+   * menu-bar DOM (invisible, however). They may change their visible state later. If there are any types in notAllowedTypes each menu is checked also against
+   * these types and if they are matching the menu is filtered.
    */
-  filter: function(menus, types, onlyVisible, enableDisableKeyStrokes) {
+  filter: function(menus, types, onlyVisible, enableDisableKeyStrokes, notAllowedTypes) {
     if (!menus) {
       return;
     }
     types = scout.arrays.ensure(types);
+    notAllowedTypes = scout.arrays.ensure(notAllowedTypes);
 
     var filteredMenus = [],
       separatorCount = 0;
@@ -52,13 +64,13 @@ scout.menus = {
     menus.forEach(function(menu) {
       var childMenus = menu.childActions;
       if (childMenus.length > 0) {
-        childMenus = scout.menus.filter(childMenus, types, onlyVisible, enableDisableKeyStrokes);
+        childMenus = scout.menus.filter(childMenus, types, onlyVisible, enableDisableKeyStrokes, notAllowedTypes);
         if (childMenus.length === 0) {
           scout.menus._enableDisableMenuKeyStroke(menu, enableDisableKeyStrokes, true);
           return;
         }
       } // Don't check the menu type for a group
-      else if (!scout.menus._checkType(menu, types)) {
+      else if (!scout.menus._checkType(menu, types) || (notAllowedTypes.length !== 0 && scout.menus._checkType(menu, notAllowedTypes))) {
         scout.menus._enableDisableMenuKeyStroke(menu, enableDisableKeyStrokes, true);
         return;
       }

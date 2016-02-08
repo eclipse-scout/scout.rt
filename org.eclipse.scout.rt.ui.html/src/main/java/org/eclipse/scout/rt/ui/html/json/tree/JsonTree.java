@@ -439,7 +439,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
     attachNodes(event.getNodes(), true); // FIXME cgu: why not inside loop? attaching for rejected nodes?
     for (ITreeNode node : event.getNodes()) {
       if (isNodeAccepted(node)) {
-    	jsonNodes.put(treeNodeToJson(node));
+        jsonNodes.put(treeNodeToJson(node));
       }
     }
     if (jsonNodes.length() == 0) {
@@ -764,6 +764,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
     putProperty(json, "checked", node.isChecked());
     putProperty(json, "enabled", node.isEnabled());
     putProperty(json, "iconId", BinaryResourceUrlUtility.createIconUrl(node.getCell().getIconId()));
+    putProperty(json, "initialExpanded", node.isInitialExpanded());
     putChildNodeIndex(json, node);
     putCellProperties(json, node.getCell());
     JSONArray jsonChildNodes = new JSONArray();

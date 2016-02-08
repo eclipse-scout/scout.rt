@@ -15,6 +15,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -37,7 +38,6 @@ import org.eclipse.scout.rt.platform.job.ExecutionTrigger;
 import org.eclipse.scout.rt.platform.job.IDoneHandler;
 import org.eclipse.scout.rt.platform.job.IExecutionSemaphore;
 import org.eclipse.scout.rt.platform.job.IFuture;
-import org.eclipse.scout.rt.platform.job.IJobListenerRegistration;
 import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.job.JobState;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
@@ -45,6 +45,7 @@ import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.job.listener.JobEventData;
 import org.eclipse.scout.rt.platform.job.listener.JobEventType;
 import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
 import org.eclipse.scout.rt.platform.util.ToStringBuilder;
 import org.quartz.Calendar;
 import org.quartz.SchedulerException;
@@ -157,8 +158,8 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
     }
     finally {
       m_runner = null;
-      releasePermit();
       finishInternal();
+      releasePermit();
     }
   }
 
@@ -194,12 +195,14 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
   }
 
   /**
-   * Method invoked once this task completed execution, or if cancelled and not currently executing, and is invoked only
-   * once.
+   * Method invoked once this task finished execution, or upon a premature cancellation, meaning that the job did not
+   * commence execution yet, and will never do so.
    */
   protected void finished() {
     m_jobManager.unregisterFuture(this);
     m_completionPromise.finish();
+
+    // IMPORTANT: do not release permit here.
   }
 
   @Override
@@ -322,7 +325,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
     try {
       m_completionPromise.awaitDoneAndGet();
     }
-    catch (final ExecutionException | java.util.concurrent.CancellationException e) {
+    catch (final ExecutionException | CancellationException e) {
       // NOOP: Do not propagate ExecutionException and CancellationException (see JavaDoc contract)
     }
     catch (final java.lang.InterruptedException e) {
@@ -338,7 +341,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
     try {
       m_completionPromise.awaitDoneAndGet(timeout, unit);
     }
-    catch (final ExecutionException | java.util.concurrent.CancellationException e) {
+    catch (final ExecutionException | CancellationException e) {
       // NOOP: Do not propagate ExecutionException and CancellationException (see JavaDoc contract)
     }
     catch (final java.lang.InterruptedException e) {
@@ -379,9 +382,9 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
       return m_completionPromise.awaitDoneAndGet();
     }
     catch (final ExecutionException e) {
-      throw interceptException(BEANS.get(JobExceptionTranslator.class).translateExecutionException(e, exceptionTranslator, true));
+      throw interceptException(BEANS.get(JobExceptionTranslator.class).translateExecutionException(e, exceptionTranslator));
     }
-    catch (final java.util.concurrent.CancellationException e) {
+    catch (final CancellationException e) {
       throw interceptException(BEANS.get(JobExceptionTranslator.class).translateCancellationException(e, "Failed to wait for a job to complete because the job was cancelled"));
     }
     catch (final java.lang.InterruptedException e) {
@@ -403,9 +406,9 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
       return m_completionPromise.awaitDoneAndGet(timeout, unit);
     }
     catch (final ExecutionException e) {
-      throw interceptException(BEANS.get(JobExceptionTranslator.class).translateExecutionException(e, exceptionTranslator, true));
+      throw interceptException(BEANS.get(JobExceptionTranslator.class).translateExecutionException(e, exceptionTranslator));
     }
-    catch (final java.util.concurrent.CancellationException e) {
+    catch (final CancellationException e) {
       throw interceptException(BEANS.get(JobExceptionTranslator.class).translateCancellationException(e, "Failed to wait for a job to complete because the job was cancelled"));
     }
     catch (final java.lang.InterruptedException e) {
@@ -424,16 +427,16 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
   }
 
   @Override
-  public IJobListenerRegistration addListener(final IJobListener listener) {
+  public IRegistrationHandle addListener(final IJobListener listener) {
     return addListener(null, listener);
   }
 
   @Override
-  public IJobListenerRegistration addListener(final IFilter<JobEvent> filter, final IJobListener listener) {
+  public IRegistrationHandle addListener(final IFilter<JobEvent> filter, final IJobListener listener) {
     final JobListenerWithFilter localListener = new JobListenerWithFilter(listener, filter);
     m_listeners.add(localListener);
 
-    return new IJobListenerRegistration() {
+    return new IRegistrationHandle() {
 
       @Override
       public void dispose() {

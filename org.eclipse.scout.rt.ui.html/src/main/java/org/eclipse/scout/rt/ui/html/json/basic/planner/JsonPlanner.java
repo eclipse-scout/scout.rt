@@ -28,7 +28,6 @@ import org.eclipse.scout.rt.client.ui.basic.planner.PlannerListener;
 import org.eclipse.scout.rt.client.ui.basic.planner.Resource;
 import org.eclipse.scout.rt.platform.util.Range;
 import org.eclipse.scout.rt.ui.html.IUiSession;
-import org.eclipse.scout.rt.ui.html.UiException;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
 import org.eclipse.scout.rt.ui.html.json.IIdProvider;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
@@ -435,21 +434,21 @@ public class JsonPlanner<PLANNER extends IPlanner<?, ?>> extends AbstractJsonPro
     LOG.debug("selectionRange={}", selectionRange);
   }
 
-  private Range<Date> extractSelectionRange(JSONObject data) {
+  protected Range<Date> extractSelectionRange(JSONObject data) {
     JSONObject selectionRange = data.optJSONObject("selectionRange");
     Date fromDate = toJavaDate(selectionRange, "from");
     Date toDate = toJavaDate(selectionRange, "to");
     return new Range<Date>(fromDate, toDate);
   }
 
-  private Range<Date> extractViewRange(JSONObject data) {
+  protected Range<Date> extractViewRange(JSONObject data) {
     JSONObject range = data.optJSONObject("viewRange");
     Date fromDate = toJavaDate(range, "from");
     Date toDate = toJavaDate(range, "to");
     return new Range<Date>(fromDate, toDate);
   }
 
-  private Date toJavaDate(JSONObject data, String propertyName) {
+  protected Date toJavaDate(JSONObject data, String propertyName) {
     return new JsonDate(data.optString(propertyName, null)).asJavaDate();
   }
 
@@ -457,22 +456,17 @@ public class JsonPlanner<PLANNER extends IPlanner<?, ?>> extends AbstractJsonPro
   protected void handleUiSetSelectedActivityCells(JsonEvent event) {
     Activity<?, ?> activityCell = null;
     // FIXME cgu: Map data from JSON
-
     getModel().getUIFacade().setSelectedActivityCellFromUI(activityCell);
   }
 
   protected List<Resource<?>> extractResources(JSONObject json) {
-    return jsonToResources(json.getJSONArray("resourceIds"));
-  }
-
-  protected List<Resource<?>> jsonToResources(JSONArray resourceIds) {
+    JSONArray resourceIds = json.getJSONArray("resourceIds");
     List<Resource<?>> resources = new ArrayList<>(resourceIds.length());
     for (int i = 0; i < resourceIds.length(); i++) {
       Resource<?> resource = getResource((String) resourceIds.get(i));
-      if (resource == null) {
-        throw new UiException("No resource found for id " + resourceIds.get(i));
+      if (resource != null) {
+        resources.add(resource);
       }
-      resources.add(resource);
     }
     return resources;
   }

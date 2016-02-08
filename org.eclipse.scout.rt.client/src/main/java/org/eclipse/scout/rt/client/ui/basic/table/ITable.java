@@ -1099,6 +1099,14 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
   void setTableStatus(IStatus status);
 
   /**
+   * The reload handler is triggered when the user uses the ui tools to reload the table (reload button, reload
+   * keystroke).
+   * <p>
+   * The existence of a reload handler controls the availability of these tools, meaning if no reload handler is set
+   * the user may not reload the table.
+   * <p>
+   * Default is null.
+   * 
    * @since 5.1.0
    */
   IReloadHandler getReloadHandler();

@@ -143,6 +143,7 @@ scout.Widget.prototype._trigger = function(type, event) {
 
 scout.Widget.prototype._remove = function() {
   if (this.$container) {
+    this.session.layoutValidator.cleanupInvalidObjects(this.$container);
     this.$container.remove();
     this.$container = null;
   }

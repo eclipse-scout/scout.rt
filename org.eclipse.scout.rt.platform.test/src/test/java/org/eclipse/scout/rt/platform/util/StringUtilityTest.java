@@ -21,7 +21,6 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.junit.Test;
 
 /**
@@ -288,6 +287,13 @@ public class StringUtilityTest {
     assertEquals("<a &lt; b>", htmlDecode);
   }
 
+  @Test
+  public void testHtmlDecodeTabs() {
+    assertEquals("a \tb", StringUtility.htmlDecode("a &#9;b"));
+    assertEquals("a<span>\t</span>b", StringUtility.htmlDecode("a<span>&#9;</span>b"));
+    assertEquals("a\tb", StringUtility.htmlDecode("a<span style=\"white-space:pre\">&#9;</span>b"));
+  }
+
   /**
    * Tests if the result string is equal to the original after applying encode and decode.
    *
@@ -404,6 +410,9 @@ public class StringUtilityTest {
     input = "<meta name=\"timestamp\" content=\"01.01.2013\"/>\n"
         + "<meta name=\"date.modified\" content=\"20130314\"/>";
     assertEquals("", StringUtility.replaceTags(input, "meta", "").trim());
+
+    // ingore case test
+    assertEquals("xbybz", StringUtility.replaceTags("x<A>asdf</A>y<a>jkl</a>z", "a", true, "b"));
   }
 
   /**

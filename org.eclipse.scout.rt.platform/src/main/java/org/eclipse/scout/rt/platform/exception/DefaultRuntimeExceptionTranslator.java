@@ -33,13 +33,8 @@ public class DefaultRuntimeExceptionTranslator implements IExceptionTranslator<R
 
   @Override
   public RuntimeException translate(final Throwable throwable) {
-    return translate(throwable, true);
-  }
-
-  @Override
-  public RuntimeException translate(final Throwable throwable, final boolean throwOnError) {
     final Throwable eUnwrapped = BEANS.get(DefaultExceptionTranslator.class).unwrap(throwable);
-    final RuntimeException eTranslated = translateInternal(eUnwrapped, throwOnError);
+    final RuntimeException eTranslated = translateInternal(eUnwrapped);
     final RuntimeException eDecorated = BEANS.get(DefaultExceptionTranslator.class).decorate(eTranslated);
 
     return eDecorated;
@@ -48,8 +43,8 @@ public class DefaultRuntimeExceptionTranslator implements IExceptionTranslator<R
   /**
    * Method invoked to translate the given {@link Throwable}.
    */
-  protected RuntimeException translateInternal(final Throwable t, final boolean throwOnError) {
-    if (t instanceof Error && throwOnError) {
+  protected RuntimeException translateInternal(final Throwable t) {
+    if (t instanceof Error) {
       throw (Error) t;
     }
     else if (t instanceof RuntimeException) {

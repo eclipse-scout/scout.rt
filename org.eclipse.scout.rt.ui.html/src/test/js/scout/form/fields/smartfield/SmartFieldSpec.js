@@ -103,7 +103,7 @@ describe('SmartField', function() {
       expect(smartField.displayText).toBe('foo');
     });
 
-    it ('must call clearTimeout() for pending typedProposal events', function() {
+    it('must call clearTimeout() for pending typedProposal events', function() {
       smartField._sendTimeoutId = null;
       smartField.$field.val('bar');
       smartField._proposalTyped();
@@ -112,7 +112,7 @@ describe('SmartField', function() {
       expect(smartField._sendTimeoutId).toBe(null);
     });
 
-    it ('dont send _acceptProposal when searchText has not changed', function() {
+    it('dont send _acceptProposal when searchText has not changed', function() {
       smartField._oldSearchText = 'foo';
       smartField.$field.val('foo');
       spyOn(smartField, 'remoteHandler');
@@ -120,12 +120,22 @@ describe('SmartField', function() {
       expect(smartField.remoteHandler).not.toHaveBeenCalled();
     });
 
-    it ('send _acceptProposal when searchText has changed', function() {
+    it('send _acceptProposal when searchText has changed', function() {
       smartField._oldSearchText = 'foo';
       smartField.$field.val('bar');
       spyOn(smartField, 'remoteHandler');
       smartField._acceptProposal();
       expect(smartField.remoteHandler).toHaveBeenCalled();
+    });
+
+    // test for ticket #168652
+    it('send deleteProposal when searchText has been deleted quickly', function() {
+      smartField._oldSearchText = 'foo';
+      smartField.$field.val('');
+      smartField.proposalChooser = {}; // fake proposal-chooser is open
+      spyOn(smartField, '_sendDeleteProposal');
+      smartField._acceptProposal();
+      expect(smartField._sendDeleteProposal).toHaveBeenCalled();
     });
 
   });

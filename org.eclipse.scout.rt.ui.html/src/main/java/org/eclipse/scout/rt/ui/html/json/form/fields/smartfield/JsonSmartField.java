@@ -73,6 +73,9 @@ public class JsonSmartField<VALUE, LOOKUP_KEY, CONTENT_ASSIST_FIELD extends ICon
     else if ("acceptProposal".equals(event.getType())) {
       handleUiAcceptProposal(event);
     }
+    else if ("deleteProposal".equals(event.getType())) {
+      handleUiDeleteProposal(event);
+    }
     else {
       super.handleUiEvent(event);
     }
@@ -81,6 +84,10 @@ public class JsonSmartField<VALUE, LOOKUP_KEY, CONTENT_ASSIST_FIELD extends ICon
   protected void handleUiProposalTyped(JsonEvent event) {
     String text = getSearchTextAndAddFilter(event);
     getModel().getUIFacade().proposalTypedFromUI(text);
+  }
+
+  protected void handleUiDeleteProposal(JsonEvent event) {
+    getModel().getUIFacade().deleteProposalFromUI();
   }
 
   protected void handleUiAcceptProposal(JsonEvent event) {

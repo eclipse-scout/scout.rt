@@ -29,7 +29,6 @@ import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 
-import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.server.jaxws.provider.annotation.Clazz;
 
 import com.sun.codemodel.JAnnotationUse;

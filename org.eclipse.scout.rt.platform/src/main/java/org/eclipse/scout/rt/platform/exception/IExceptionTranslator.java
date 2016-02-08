@@ -38,15 +38,4 @@ public interface IExceptionTranslator<EXCEPTION extends Throwable> {
    *          to be translated
    */
   EXCEPTION translate(Throwable throwable);
-
-  /**
-   * Translates the given {@link Throwable}.
-   *
-   * @param throwable
-   *          to be translated
-   * @param throwOnError
-   *          <code>false</code> if an {@link Error} should be translated instead of being re-thrown. By default, errors
-   *          are re-thrown, because indicating a serious problem due to an abnormal condition.
-   */
-  EXCEPTION translate(Throwable throwable, boolean throwOnError);
 }

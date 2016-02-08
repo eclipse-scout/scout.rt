@@ -22,6 +22,7 @@
 package org.eclipse.scout.rt.client.extension.ui.basic.tree;
 
 import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeChains.TreeAutoCheckChildNodesChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeChains.TreeDecorateCellChain;
@@ -58,7 +59,7 @@ public interface ITreeExtension<OWNER extends AbstractTree> extends IExtension<O
 
   void execNodeClick(TreeNodeClickChain chain, ITreeNode node, MouseButton mouseButton);
 
-  void execNodesChecked(TreeNodesCheckedChain chain, Collection<ITreeNode> nodes);
+  void execNodesChecked(TreeNodesCheckedChain chain, List<ITreeNode> nodes);
 
   void execAppLinkAction(TreeHyperlinkActionChain chain, String ref);
 
@@ -70,6 +71,6 @@ public interface ITreeExtension<OWNER extends AbstractTree> extends IExtension<O
 
   TransferObject execDrag(TreeDragNodeChain chain, ITreeNode node);
 
-  void execAutoCheckChildNodes(TreeAutoCheckChildNodesChain chain, Collection<? extends ITreeNode> nodes);
+  void execAutoCheckChildNodes(TreeAutoCheckChildNodesChain chain, List<ITreeNode> nodes);
 
 }

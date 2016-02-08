@@ -32,34 +32,20 @@ scout.PopupBlockerHandler.prototype.openWindow = function(uri, target, windowSpe
 
 // Shows a notfication when popup blocker has been detected
 scout.PopupBlockerHandler.prototype.showNotification = function(vararg) {
-  var desktop = this.session.desktop,
-    $notification = desktop.$container.makeDiv('notification'),
-    $notificationContent = $notification.appendDiv('notification-content notification-closable');
-
-  $notificationContent
-    .appendDiv('close')
-    .on('click', desktop.removeNotification.bind(desktop, $notification));
-  $notificationContent
-    .appendDiv('popup-blocked-title')
-    .text(this.session.text('ui.PopupBlockerDetected'));
-
-  var $a = $notificationContent
-    .appendElement('<a>', 'popup-blocked-link')
-    .text(this.session.text('ui.OpenManually'));
+  var notification, linkUrl,
+    desktop = this.session.desktop;
 
   if (typeof vararg === 'string') {
-    // vararg = URL
-    $a
-      .attr('href', scout.strings.encode(vararg))
-      .attr('target', '_blank')
-      .on('click', desktop.removeNotification.bind(desktop, $notification));
-  } else if ($.isFunction(vararg)) {
-    // vararg = click-handler
-    $a.on('click', function() {
-      vararg();
-      desktop.removeNotification($notification);
-    });
+    linkUrl = vararg;
   }
 
-  desktop.addNotification($notification);
+  notification = scout.create('DesktopNotification.PopupBlocker', {
+    parent: desktop,
+    linkUrl: linkUrl
+  });
+
+  if (!linkUrl && $.isFunction(vararg)) {
+    notification.on('linkClick', vararg);
+  }
+  notification.show();
 };

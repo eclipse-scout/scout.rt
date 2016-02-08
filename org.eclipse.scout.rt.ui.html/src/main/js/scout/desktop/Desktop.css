@@ -149,6 +149,10 @@
           border-bottom-color: @item-selection-border-color;
         }
       }
+
+      & > .cell-editor-popup > .check-box-field > .cell-editor-field {
+        padding-top: @desktop-table-row-padding-y - @checkable-cell-padding-adjustment - 1px;
+      }
     }
   }
 }
@@ -217,6 +221,7 @@
   display: inline-block;
   /* 1px smaller than the taskbar because of the bottom border (see .selected rule below) */
   height: calc(~'100% - 1px');
+  vertical-align: top;
   width: 220px;
   padding: 6px 10px 0 20px;
   cursor: pointer;
@@ -311,9 +316,9 @@
     cursor: default;
   }
 
-  &.min-padding {
-    padding-left: 4px;
-    padding-right: 4px;
+  &.compact {
+    margin-left: 4px;
+    margin-right: 4px;
   }
 
   & > .font-icon {
@@ -437,14 +442,4 @@
   height: 0;
   visibility: hidden;
   /* Do _not_ use 'display: none', because that seems to interrupt the download in Safari */
-}
-
-.popup-blocked-title {
-  margin-right: 15px; /* leave space for close icon */
-}
-
-a.popup-blocked-link {
-  display: block;
-  margin-top: 10px;
-  outline: none;
 }

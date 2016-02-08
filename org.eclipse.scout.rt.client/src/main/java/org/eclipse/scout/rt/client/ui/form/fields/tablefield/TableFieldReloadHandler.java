@@ -14,6 +14,9 @@ import org.eclipse.scout.rt.client.ui.basic.table.IReloadHandler;
 
 /**
  * This class triggers the <code>reloadTableData()</code> method of a referenced tableField.
+ * <p>
+ * The handler is not installed by default since the existence of a reload handler controls the availability of the
+ * reload functionality on the ui (reload keystroke, reload button)
  *
  * @since 5.1
  */

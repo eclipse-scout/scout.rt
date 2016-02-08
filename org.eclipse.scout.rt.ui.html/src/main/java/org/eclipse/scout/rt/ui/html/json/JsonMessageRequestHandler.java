@@ -123,7 +123,7 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
 
     switch (jsonRequest.getRequestType()) {
       case LOG_REQUEST:
-        handleLogRequest(httpServletResponse, jsonRequest.getRequestObject());
+        handleLogRequest(httpServletResponse, uiSession, jsonRequest.getRequestObject());
         return;
       case CANCEL_REQUEST:
         handleCancelRequest(httpServletResponse, uiSession);
@@ -184,9 +184,17 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
     writeJsonResponse(resp, m_jsonRequestHelper.createPingResponse());
   }
 
-  protected void handleLogRequest(HttpServletResponse resp, JSONObject jsonReqObj) throws IOException {
+  protected void handleLogRequest(HttpServletResponse resp, IUiSession uiSession, JSONObject jsonReqObj) throws IOException {
     String message = jsonReqObj.getString("message");
+    JSONObject event = jsonReqObj.optJSONObject("event");
 
+    String header = "JavaScript exception occured";
+    if (event != null) {
+      String target = event.getString("target");
+      String type = event.getString("type");
+      header += " while processing event " + type + " for adapter " + uiSession.getJsonAdapter(target);
+    }
+    message = header + "\n" + message;
     if (message.length() > 10000) {
       // Truncate the message to prevent log inflation by malicious log requests
       message = message.substring(0, 10000) + "...";

@@ -24,6 +24,14 @@ scout.comparators = {
       return !!this.collator;
     },
     compare: function(valueA, valueB) {
+      if (!this.collator) {
+        // Fallback for browsers that don't support internationalization. This is only necessary
+        // for callers that call this method without check for internationalization support
+        // first (e.g. TableMatrix).
+        valueA = scout.nvl(valueA, '');
+        valueB = scout.nvl(valueB, '');
+        return (valueA < valueB ? -1 : ((valueA > valueB) ? 1 : 0));
+      }
       // We don't check the installed flag here. It's a program error when we come here
       // and the collator is not set. Either we forgot to call install() or we've called
       // install but the browser does not support i18n.

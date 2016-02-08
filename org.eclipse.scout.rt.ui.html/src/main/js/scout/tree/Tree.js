@@ -912,7 +912,8 @@ scout.Tree.prototype.selectNodes = function(nodes, notifyServer, debounceSend) {
     this._removeSelection();
   }
 
-  this.selectedNodes = nodes;
+  // Make a copy so that original array stays untouched
+  this.selectedNodes = nodes.slice();
   if (notifyServer) {
     var eventData = {
       nodeIds: this._nodesToIds(nodes)
@@ -1185,44 +1186,83 @@ scout.Tree.prototype.deleteAllChildNodes = function(parentNode) {
   }
 };
 
-scout.Tree.prototype.checkNode = function(node, checked, suppressSend) {
+scout.Tree.prototype.checkNode = function(node, checked, notifyServer) {
+  this.checkNodes([node], {
+    checked: checked,
+    notifyServer: notifyServer
+  });
+};
+
+scout.Tree.prototype.checkNodes = function(nodes, options) {
+  var opts = {
+    checked: true,
+    notifyServer: true,
+    checkOnlyEnabled: true,
+    isCheckChildren: false
+  };
+  $.extend(opts, options);
   var updatedNodes = [];
-  if (!this.enabled || !this.checkable || !node.enabled || node.checked === checked) {
+  if (!this.enabled || (!this.checkable && opts.checkOnlyEnabled)) {
     return updatedNodes;
   }
-  if (!this.multiCheck && checked) {
-    for (var i = 0; i < this.checkedNodes.length; i++) {
-      this.checkedNodes[i].checked = false;
-      this._updateMarkChildrenChecked(this.checkedNodes[i], false, false, true);
-      updatedNodes.push(this.checkedNodes[i]);
-      if (this.rendered) {
-        this._renderNodeChecked(this.checkedNodes[i]);
+  nodes = scout.arrays.ensure(nodes);
+  nodes.forEach(function(node) {
+    if ((!node.enabled && opts.checkOnlyEnabled) || node.checked === opts.checked) {
+      if (opts.isCheckChildren) {
+        updatedNodes = updatedNodes.concat(this.checkChildren(node, opts.checked));
       }
+      return;
     }
-    this.checkedNodes = [];
-  }
-  node.checked = checked;
-  if (node.checked) {
-    this.checkedNodes.push(node);
-  }
-  updatedNodes.push(node);
-  this._updateMarkChildrenChecked(node, false, checked, true);
-  if (!suppressSend) {
-    updatedNodes = updatedNodes.concat(this.checkChildren(node, checked));
+    if (!this.multiCheck && opts.checked) {
+      for (var i = 0; i < this.checkedNodes.length; i++) {
+        this.checkedNodes[i].checked = false;
+        this._updateMarkChildrenChecked(this.checkedNodes[i], false, false, true);
+        updatedNodes.push(this.checkedNodes[i]);
+      }
+      this.checkedNodes = [];
+    }
+    node.checked = opts.checked;
+    if (node.checked) {
+      this.checkedNodes.push(node);
+    }
+    updatedNodes.push(node);
+    this._updateMarkChildrenChecked(node, false, opts.checked, true);
+    if (opts.notifyServer) {
+      updatedNodes = updatedNodes.concat(this.checkChildren(node, opts.checked));
+    }
+  }, this);
+
+  if (opts.notifyServer) {
     this._sendNodesChecked(updatedNodes);
   }
   if (this.rendered) {
-    this._renderNodeChecked(node);
+    updatedNodes.forEach(function(node) {
+      this._renderNodeChecked(node);
+    }, this);
   }
   return updatedNodes;
+};
+
+scout.Tree.prototype.uncheckNode = function(node, notifyServer) {
+  this.uncheckNodes([node], {
+    notifyServer: notifyServer,
+    checkOnlyEnabled: true
+  });
+};
+
+scout.Tree.prototype.uncheckNodes = function(nodes, options) {
+  options.checked = false;
+  this.checkNodes(nodes, options);
 };
 
 scout.Tree.prototype.checkChildren = function(node, checked) {
   var updatedNodes = [];
   if (this.autoCheckChildren && node) {
-    for (var i = 0; i < node.childNodes.length; i++) {
-      updatedNodes = updatedNodes.concat(this.checkNode(node.childNodes[i], checked, true));
-    }
+    updatedNodes = this.checkNodes(node.childNodes, {
+      checked: checked,
+      notifyServer: false,
+      isCheckChildren: true
+    });
   }
   return updatedNodes;
 };
@@ -1460,7 +1500,7 @@ scout.Tree.prototype.removeFilter = function(filter) {
 scout.Tree.prototype.filter = function() {
   var useAnimation = false,
     changedNodes = [],
-    newHiddenRows = [];
+    newHiddenNodes = [];
 
   // Filter nodes
   this._visitNodes(this.nodes, function(node) {
@@ -1475,7 +1515,7 @@ scout.Tree.prototype.filter = function() {
     if (changed) {
       changedNodes.push(node);
       if (!node.filterAccepted) {
-        newHiddenRows.push(node);
+        newHiddenNodes.push(node);
       }
     }
   }.bind(this));
@@ -1492,7 +1532,7 @@ scout.Tree.prototype.filter = function() {
     }, this);
   }
 
-  this._nodesFiltered(newHiddenRows);
+  this._nodesFiltered(newHiddenNodes);
 };
 
 scout.Tree.prototype._nodesFiltered = function(hiddenNodes) {
@@ -1580,6 +1620,10 @@ scout.Tree.prototype._nodesByIds = function(ids) {
   return ids.map(function(id) {
     return this.nodesMap[id];
   }.bind(this));
+};
+
+scout.Tree.prototype._nodeById = function(id) {
+  return this.nodesMap[id];
 };
 
 scout.Tree.prototype._onNodeDoubleClick = function(event) {
@@ -1755,9 +1799,27 @@ scout.Tree.prototype._onNodeChanged = function(nodeId, cell) {
 };
 
 scout.Tree.prototype._onNodesChecked = function(nodes) {
-  for (var i = 0; i < nodes.length; i++) {
-    this.checkNode(this.nodesMap[nodes[i].id], nodes[i].checked, true);
-  }
+  var checkedNodes = [],
+    uncheckedNodes = [];
+
+  nodes.forEach(function(nodeData) {
+    var node = this._nodeById(nodeData.id);
+    if (nodeData.checked) {
+      checkedNodes.push(node);
+    } else {
+      uncheckedNodes.push(node);
+    }
+  }, this);
+
+  this.checkNodes(checkedNodes, {
+    checked: true,
+    notifyServer: false,
+    checkOnlyEnabled: false
+  });
+  this.uncheckNodes(uncheckedNodes, {
+    notifyServer: false,
+    checkOnlyEnabled: false
+  });
 };
 
 scout.Tree.prototype._onChildNodeOrderChanged = function(parentNodeId, childNodeIds) {

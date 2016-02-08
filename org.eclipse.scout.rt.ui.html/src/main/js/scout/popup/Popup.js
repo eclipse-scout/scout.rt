@@ -26,6 +26,9 @@ scout.Popup = function() {
   this.focusableContainer;
   this.openingDirectionX;
   this.openingDirectionY;
+  // hints for the layout to control whether the size should be adjusted if the popup does not fit into the window
+  this.trimWidth;
+  this.trimHeight;
 };
 scout.inherits(scout.Popup, scout.Widget);
 
@@ -46,6 +49,9 @@ scout.Popup.prototype._init = function(options) {
   this.windowPaddingY = scout.nvl(options.windowPaddingY, 5);
   this.openingDirectionX = options.openingDirectionX || 'right';
   this.openingDirectionY = options.openingDirectionY || 'down';
+  // Popup is getting moved if it overlaps a border (and not switched as done for y axis) -> do not adjust its size
+  this.trimWidth = scout.nvl(options.trimWidth, false);
+  this.trimHeight = scout.nvl(options.trimHeight, true);
   this.withFocusContext = scout.nvl(options.installFocusContext, true);
   this.initialFocus = scout.nvl(options.initialFocus, function() {
     return scout.focusRule.AUTO;

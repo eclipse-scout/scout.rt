@@ -49,7 +49,7 @@ scout.FormToolButton.prototype.cloneAdapter = function(modelOverride) {
 
 scout.FormToolButton.prototype._handleOriginalFormChange = function(event){
   if(event.newProperties.form){
-    this.form =  event.newProperties.form.cloneAdapter({
+    this.form =  this.session.getModelAdapter(event.newProperties.form).cloneAdapter({
       parent: this
     });
   } else if (event.newProperties.form === null){

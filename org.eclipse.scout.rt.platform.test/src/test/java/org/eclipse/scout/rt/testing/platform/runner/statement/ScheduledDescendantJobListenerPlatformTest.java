@@ -22,9 +22,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.eclipse.scout.rt.platform.job.IFuture;
-import org.eclipse.scout.rt.platform.job.IJobListenerRegistration;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.After;
@@ -48,7 +48,7 @@ public class ScheduledDescendantJobListenerPlatformTest {
   private static final AtomicBoolean ALIEN_JOB_CREATOR_RUNNING = new AtomicBoolean(true);
   private static final AtomicBoolean ALIEN_JOB_STARTED = new AtomicBoolean();
 
-  private IJobListenerRegistration m_listenerReg;
+  private IRegistrationHandle m_listenerRegistration;
   private AssertNoRunningJobsStatement.ScheduledDescendantJobListener m_jobListener;
   private Map<String, NestedJob> m_nestedJobsByName;
 
@@ -120,8 +120,8 @@ public class ScheduledDescendantJobListenerPlatformTest {
 
   @After
   public void after() {
-    if (m_listenerReg != null) {
-      m_listenerReg.dispose();
+    if (m_listenerRegistration != null) {
+      m_listenerRegistration.dispose();
     }
     // release all nested job latches
     for (NestedJob nestedJob : m_nestedJobsByName.values()) {
@@ -305,11 +305,11 @@ public class ScheduledDescendantJobListenerPlatformTest {
   }
 
   private void installScheduledJobListener() {
-    if (m_listenerReg != null) {
-      m_listenerReg.dispose();
+    if (m_listenerRegistration != null) {
+      m_listenerRegistration.dispose();
     }
     m_jobListener = new AssertNoRunningJobsStatement.ScheduledDescendantJobListener();
-    m_listenerReg = Jobs.getJobManager().addListener(m_jobListener);
+    m_listenerRegistration = Jobs.getJobManager().addListener(m_jobListener);
   }
 
   /**

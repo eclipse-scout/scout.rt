@@ -86,6 +86,14 @@ scout.strings = {
     return !/^\s*$/.test(text);
   },
 
+  /**
+   * Inverse operation of hasText(string). Used because empty(s) is more readable than !hasText(s).
+   * @returns true if the given string is not set or contains only white-space characters.
+   */
+  empty: function(text) {
+    return !scout.strings.hasText(text);
+  },
+
   repeat: function(pattern, count) {
     if (pattern === undefined || pattern === null) {
       return pattern;

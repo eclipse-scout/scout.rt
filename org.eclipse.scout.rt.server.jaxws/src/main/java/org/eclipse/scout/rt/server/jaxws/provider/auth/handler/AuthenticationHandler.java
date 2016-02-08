@@ -82,6 +82,7 @@ public class AuthenticationHandler implements SOAPHandler<SOAPMessageContext> {
    * {@link #setRunContextProducer(RunContextProducer)}
    */
   public AuthenticationHandler() {
+    // NOOP: The default implementation does nothing, and must be initialized by the implementing sub class.
   }
 
   /**

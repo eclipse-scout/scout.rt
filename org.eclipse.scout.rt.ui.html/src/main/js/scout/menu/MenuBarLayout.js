@@ -28,18 +28,18 @@ scout.MenuBarLayout.prototype.layout = function($container) {
   var oldStyle = $container.attr('style');
   $container.css('overflow', 'hidden');
   $container.css('display', 'inline-block'); // override "display: table"
-  var availableWidth = $container.width();
+  var availableWidth = $container.realWidth();
   $container.attrOrRemove('style', oldStyle);
 
-  var leftWidth = this._menuBar.$left.width();
-  var rightWidth = this._menuBar.$right.width();
+  var leftWidth = this._menuBar.$left.realWidth();
+  var rightWidth = this._menuBar.$right.realWidth();
 
   if (leftWidth + rightWidth <= availableWidth) {
     // ok, no ellisis required
     this._menuBar.visibleMenuItems = this._menuBar.menuItems;
   } else {
     // create ellipsis menu
-    this._createAndRenderEllipsis(this._menuBar.$left);
+    this._createAndRenderEllipsis(this._menuBar.$left, rightWidth === 0);
     var ellipsisSize = scout.graphics.getSize(this._ellipsis.$container, true);
 
     var remainingLeftWidth = Math.min(availableWidth - rightWidth, leftWidth);
@@ -116,7 +116,7 @@ scout.MenuBarLayout.prototype._addEllipsisToMenuItems = function(menuItems) {
   scout.arrays.insert(menuItems, this._ellipsis, insertItemAt);
 };
 
-scout.MenuBarLayout.prototype._createAndRenderEllipsis = function($container) {
+scout.MenuBarLayout.prototype._createAndRenderEllipsis = function($container, lastMenuInBar) {
   var ellipsis = scout.create('Menu', {
     parent: this._menuBar,
     horizontalAlignment: 1,
@@ -124,6 +124,9 @@ scout.MenuBarLayout.prototype._createAndRenderEllipsis = function($container) {
     tabbable: false
   });
   ellipsis.render($container);
+  if (lastMenuInBar) {
+    ellipsis.$container.addClass('last');
+  }
   this._ellipsis = ellipsis;
 };
 

@@ -707,7 +707,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
   }
 
   public void ensureDefaultDetailFormStarted() {
-    if (getDefaultDetailForm() == null || getDefaultDetailForm().isFormStarted()) {
+    if (getDefaultDetailForm() == null || !getDefaultDetailForm().isFormStartable()) {
       return;
     }
     startDefaultDetailForm();

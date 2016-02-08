@@ -498,7 +498,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     ITableOrganizer organizer = getModel().getTableOrganizer();
     switch (action) {
       case "add":
-        organizer.addColumn();
+        organizer.addColumn(extractColumn(data));
         break;
       case "remove":
         organizer.removeColumn(extractColumn(data));
@@ -674,7 +674,10 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     IColumn column = extractColumn(event.getData());
     IFormField field = getModel().getUIFacade().prepareCellEditFromUI(row, column);
     if (field == null) {
-      throw new IllegalStateException("PrepareCellEditFromUi returned null for " + row + " and " + column);
+      // Cell is not editable, simply ignore the request for editing it.
+      // This may happen if the JSON request contained other events that
+      // caused the initially editable cell to be become non-editable.
+      return;
     }
 
     IJsonAdapter<?> jsonField = attachAdapter(field);
@@ -936,7 +939,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
    * Returns a tableRow for the given rowId.
    *
    * @throws UiException
-   *           when no rowiss found for the given rowId
+   *           when no row is found for the given rowId
    */
   protected ITableRow getTableRow(String rowId) {
     ITableRow row = optTableRow(rowId);

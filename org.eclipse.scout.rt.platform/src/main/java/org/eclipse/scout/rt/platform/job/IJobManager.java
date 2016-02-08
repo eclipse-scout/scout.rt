@@ -24,6 +24,7 @@ import org.eclipse.scout.rt.platform.filter.OrFilter;
 import org.eclipse.scout.rt.platform.job.filter.event.JobEventFilterBuilder;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
+import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedException;
 import org.eclipse.scout.rt.platform.util.concurrent.TimedOutException;
@@ -262,7 +263,7 @@ public interface IJobManager {
    * @return A token representing the registration of the given {@link IJobListener}. This token can later be used to
    *         unregister the listener.
    */
-  IJobListenerRegistration addListener(IJobListener listener);
+  IRegistrationHandle addListener(IJobListener listener);
 
   /**
    * Registers the given listener to be notified about job lifecycle events that comply with the given filter. If the
@@ -289,7 +290,7 @@ public interface IJobManager {
    * @return A token representing the registration of the given {@link IJobListener}. This token can later be used to
    *         unregister the listener.
    */
-  IJobListenerRegistration addListener(IFilter<JobEvent> filter, IJobListener listener);
+  IRegistrationHandle addListener(IFilter<JobEvent> filter, IJobListener listener);
 
   /**
    * Returns <code>true</code> if this job manager is shutdown, or else <code>false</code>.

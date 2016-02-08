@@ -90,8 +90,8 @@
   border-bottom: 1px solid @table-row-border-color;
 
   &.sum-selection {
-     color: @item-selection-border-color;
-   }
+    color: @item-selection-border-color;
+  }
 
   &.selected {
     background-color: @item-selection-nonfocus-background-color;
@@ -207,6 +207,8 @@
     width: @check-box-size;
     height: @check-box-size;
     #scout.checkbox-before-border();
+    /* vertical-align is necessary to remove the bottom margin */
+    vertical-align: middle;
   }
   & > .check-box.checked::before {
     #scout.checkbox-before-checked();

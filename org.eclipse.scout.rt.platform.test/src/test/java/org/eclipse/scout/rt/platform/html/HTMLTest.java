@@ -11,11 +11,11 @@
 package org.eclipse.scout.rt.platform.html;
 
 import static org.eclipse.scout.rt.platform.html.HTML.bold;
-import static org.eclipse.scout.rt.platform.html.HTML.cell;
+import static org.eclipse.scout.rt.platform.html.HTML.td;
 import static org.eclipse.scout.rt.platform.html.HTML.div;
 import static org.eclipse.scout.rt.platform.html.HTML.italic;
 import static org.eclipse.scout.rt.platform.html.HTML.link;
-import static org.eclipse.scout.rt.platform.html.HTML.row;
+import static org.eclipse.scout.rt.platform.html.HTML.tr;
 import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
@@ -56,7 +56,7 @@ public class HTMLTest {
     assertEncodedText("h6", HTML.h6(BIND_TEXT).toEncodedHtml());
     assertEncodedText("b", bold(BIND_TEXT).toEncodedHtml());
     assertEncodedText("i", italic(BIND_TEXT).toEncodedHtml());
-    assertEncodedText("td", cell(BIND_TEXT).toEncodedHtml());
+    assertEncodedText("td", td(BIND_TEXT).toEncodedHtml());
     assertEncodedText("div", div(BIND_TEXT).toEncodedHtml());
     assertEncodedText("p", HTML.p(BIND_TEXT).toEncodedHtml());
     assertEncodedText("span", HTML.span(BIND_TEXT).toEncodedHtml());
@@ -115,13 +115,13 @@ public class HTMLTest {
 
   @Test
   public void testTableNoBinds() {
-    String html = HTML.table(row(cell(BIND_TEXT))).toEncodedHtml();
+    String html = HTML.table(tr(td(BIND_TEXT))).toEncodedHtml();
     assertEquals("<table><tr><td>" + encode(BIND_TEXT) + "</td></tr></table>", html);
   }
 
   @Test
   public void testTableAttributesNoBinds() {
-    final IHtmlTable table = HTML.table(row(cell(BIND_TEXT)));
+    final IHtmlTable table = HTML.table(tr(td(BIND_TEXT)));
     assertEquals("<table><tr><td>" + encode(BIND_TEXT) + "</td></tr></table>", table.toEncodedHtml());
   }
 
@@ -155,7 +155,7 @@ public class HTMLTest {
 
   @Test
   public void testRowWithMultipleBinds() {
-    IHtmlTableRow row = HTML.row(HTML.cell("p1"), HTML.cell("p2"), HTML.cell("p4"));
+    IHtmlTableRow row = HTML.tr(HTML.td("p1"), HTML.td("p2"), HTML.td("p4"));
     assertEquals("<tr><td>p1</td><td>p2</td><td>p4</td></tr>", row.toEncodedHtml());
     assertEquals("<tr><td>:b__0</td><td>:b__1</td><td>:b__2</td></tr>", row.toString());
     assertEquals(3, row.getBinds().getBindMap().size());
@@ -163,20 +163,20 @@ public class HTMLTest {
 
   @Test
   public void testMultipleCellsNoBinds() {
-    IHtmlTableRow row1 = HTML.row(HTML.cell("p1"), HTML.cell("p2"));
+    IHtmlTableRow row1 = HTML.tr(HTML.td("p1"), HTML.td("p2"));
     assertEquals("<tr><td>:b__0</td><td>:b__1</td></tr>", row1.toString());
   }
 
   @Test
   public void testCellWithColspan() {
-    IHtmlTableRow row = HTML.row(HTML.cell("1").colspan(2), HTML.cell("2"));
+    IHtmlTableRow row = HTML.tr(HTML.td("1").colspan(2), HTML.td("2"));
     assertEquals("<tr><td colspan=\"2\">1</td><td>2</td></tr>", row.toEncodedHtml());
   }
 
   @Test
   public void testMultipleRowsNoBinds() {
-    IHtmlTableRow row1 = HTML.row(HTML.cell("p1"), HTML.cell("p2"));
-    IHtmlTableRow row2 = HTML.row(HTML.cell("p3"), HTML.cell("p4"));
+    IHtmlTableRow row1 = HTML.tr(HTML.td("p1"), HTML.td("p2"));
+    IHtmlTableRow row2 = HTML.tr(HTML.td("p3"), HTML.td("p4"));
     String row1String = "<tr><td>p1</td><td>p2</td></tr>";
     String row2String = "<tr><td>p3</td><td>p4</td></tr>";
 
@@ -186,7 +186,7 @@ public class HTMLTest {
 
   @Test
   public void testComplexHtml() {
-    final IHtmlElement html = HTML.div(link(TEST_URL, BIND_TEXT), HTML.table(row(cell(BIND_TEXT), cell(BIND_TEXT), cell(BIND_TEXT))));
+    final IHtmlElement html = HTML.div(link(TEST_URL, BIND_TEXT), HTML.table(tr(td(BIND_TEXT), td(BIND_TEXT), td(BIND_TEXT))));
     String expected = "<div><a href=\"http://SCOUTBLABLA.com\">Test Last Name&amp;</a><table><tr><td>Test Last Name&amp;</td><td>Test Last Name&amp;</td><td>Test Last Name&amp;</td></tr></table></div>";
     assertEquals(expected, html.toEncodedHtml());
   }
@@ -231,9 +231,9 @@ public class HTMLTest {
 
   @Test
   public void testPlain() {
-    assertEquals("", HTML.plain((CharSequence) null).toEncodedHtml());
-    assertEquals(BIND_TEXT, HTML.plain(BIND_TEXT).toEncodedHtml());
-    IHtmlContent plainLink = HTML.plain(BIND_TEXT, HTML.appLink("REF", BIND_TEXT));
+    assertEquals("", HTML.raw((CharSequence) null).toEncodedHtml());
+    assertEquals(BIND_TEXT, HTML.raw(BIND_TEXT).toEncodedHtml());
+    IHtmlContent plainLink = HTML.raw(BIND_TEXT, HTML.appLink("REF", BIND_TEXT));
     String plainLinkString = String.format("%s<span class=\"app-link\" data-ref=\"REF\">%s</span>", BIND_TEXT, ENCODED_BIND_TEXT);
     assertEquals(String.format(plainLinkString, BIND_TEXT, ENCODED_BIND_TEXT), plainLink.toEncodedHtml());
     assertEquals(String.format("<b>%s</b>", plainLinkString), HTML.bold(plainLink).toEncodedHtml());
@@ -282,7 +282,7 @@ public class HTMLTest {
   }
 
   private String createRowString(String prefix, int i) {
-    return HTML.row(HTML.cell("A" + prefix + i), HTML.cell("B" + prefix + i)).toEncodedHtml();
+    return HTML.tr(HTML.td("A" + prefix + i), HTML.td("B" + prefix + i)).toEncodedHtml();
   }
 
   private IHtmlTable createTable(String prefix) {
@@ -294,7 +294,7 @@ public class HTMLTest {
   }
 
   private IHtmlTableRow createRow(String prefix, int i) {
-    return HTML.row(HTML.cell("A" + prefix + i), HTML.cell("B" + prefix + i));
+    return HTML.tr(HTML.td("A" + prefix + i), HTML.td("B" + prefix + i));
   }
 
 }

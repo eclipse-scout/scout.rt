@@ -17,12 +17,14 @@ scout.GlassPaneRenderer = function(session, element, enabled) {
   this.session = session;
   this._$glassPanes = [];
   this._$glassPaneTargets = [];
+  this._deferredGlassPanes = [];
 };
 
 scout.GlassPaneRenderer.prototype.renderGlassPanes = function() {
   this.findGlassPaneTargets().forEach(function(glassPaneTarget) {
     if (glassPaneTarget instanceof scout.DeferredGlassPaneTarget) {
       glassPaneTarget.rendererReady(this);
+      this._deferredGlassPanes.push(glassPaneTarget);
     } else {
       this.renderGlassPane(glassPaneTarget);
     }
@@ -56,8 +58,16 @@ scout.GlassPaneRenderer.prototype.removeGlassPanes = function() {
     $glassPane.remove();
   });
 
+  //Unregister all deferedGlassPaneTargets
+  this._deferredGlassPanes.forEach(function(glassPaneTarget) {
+    glassPaneTarget.removeGlassPaneRenderer(this);
+  }, this);
+
+  this._deferredGlassPanes = [];
+
   // Unregister glasspane targets from focus manager
   this._$glassPaneTargets.forEach(function($glassPaneTarget) {
+
     this.session.focusManager.unregisterGlassPaneTarget($glassPaneTarget);
   }, this);
 

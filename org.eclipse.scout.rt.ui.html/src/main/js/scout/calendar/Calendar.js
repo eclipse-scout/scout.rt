@@ -611,6 +611,7 @@ scout.Calendar.prototype.layoutLabel = function() {
     } else {
       text = scout.strings.join(' ', this._format(exFrom, 'd. MMMM yyyy'), toText, this._format(exTo, 'd. MMMM yyyy'));
     }
+
   } else if (this._isMonth()) {
     text = this._format(exFrom, 'MMMM yyyy');
   }
@@ -661,17 +662,18 @@ scout.Calendar.prototype.layoutAxis = function() {
   // remove old axis
   $('.calendar-week-axis, .calendar-week-task', this.$grid).remove();
 
-  // set weekname or day schedule
-  if (this._isMonth()) {
-    var session = this.session;
-    $('.calendar-week-name', this.$container).each(function(index) {
-      if (index > 0) {
-        $e = $(this);
-        $e.text(session.text('ui.CW', scout.dates.weekInYear($e.next().data('date'))));
-      }
-    });
-  } else {
-    $('.calendar-week-name', this.$container).text('');
+  // set weekname
+  var session = this.session;
+  $('.calendar-week-name', this.$container).each(function(index) {
+    if (index > 0) {
+      $e = $(this);
+      $e.text(session.text('ui.CW', scout.dates.weekInYear($e.next().data('date'))));
+    }
+  });
+
+  // day schedule
+  if (!this._isMonth()) {
+    //$('.calendar-week-name', this.$container).text('');
     var $parent = $selected.parent();
     $parent.appendDiv('calendar-week-axis').attr('data-axis-name', '08:00').css('top', this._dayPosition(8) + '%');
     $parent.appendDiv('calendar-week-axis').attr('data-axis-name', '12:00').css('top', this._dayPosition(12) + '%');

@@ -66,6 +66,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm;
 import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.client.ui.form.IFormHandler;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
@@ -802,6 +803,38 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     return m_formStore.getViewsByDisplayParent(displayParent);
   }
 
+  @Override
+  public <F extends IForm, H extends IFormHandler> List<F> findAllOpenViews(Class<? extends F> formClass, Class<? extends H> handlerClass, Object exclusiveKey) {
+    List<F> forms = new ArrayList<>();
+    if (exclusiveKey != null) {
+      for (IForm view : getViews()) {
+        if (getPageDetailForm() == view || getPageSearchForm() == view) {
+          continue;
+        }
+        Object candidateKey = view.computeExclusiveKey();
+        if (candidateKey == null) {
+          continue;
+        }
+        else {
+          LOG.debug("form: {} vs {}", candidateKey, exclusiveKey);
+          if (exclusiveKey.equals(candidateKey)
+              && view.getClass() == formClass
+              && view.getHandler() != null
+              && view.getHandler().getClass() == handlerClass
+              && view.getHandler().isOpenExclusive()) {
+            forms.add(formClass.cast(view));
+          }
+        }
+      }
+    }
+    return forms;
+  }
+
+  @Override
+  public <F extends IForm, H extends IFormHandler> F findOpenView(Class<? extends F> formClass, Class<? extends H> handlerClass, Object exclusiveKey) {
+    return CollectionUtility.firstElement(findAllOpenViews(formClass, handlerClass, exclusiveKey));
+  }
+
   @SuppressWarnings("deprecation")
   @Override
   public List<IForm> getDialogStack() {
@@ -1460,11 +1493,15 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
 
   @Override
   public void openUri(String url, IOpenUriAction openUriAction) {
+    Assertions.assertNotNull(url);
+    Assertions.assertNotNull(openUriAction);
     fireOpenUri(url, openUriAction);
   }
 
   @Override
   public void openUri(BinaryResource res, IOpenUriAction openUriAction) {
+    Assertions.assertNotNull(res);
+    Assertions.assertNotNull(openUriAction);
     fireOpenUri(res, openUriAction);
   }
 

@@ -306,7 +306,7 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
               forceClientSessionShutdown(clientSession);
             }
           }, ModelJobs.newInput(ClientRunContexts.copyCurrent().withSession(clientSession, true))
-              .withName("Force shutting down client session {} by housekeeping", clientSession.getId()))
+              .withName("Force shutting down client session {} by session housekeeping", clientSession.getId()))
               .awaitDone();
         }
         catch (ThreadInterruptedException e) {
@@ -332,7 +332,7 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
       // If housekeeping is scheduled for this session, cancel it (session will be used again, so no cleanup necessary)
       IFuture<?> future = m_housekeepingFutures.get(clientSessionId);
       if (future != null) {
-        LOG.debug("Housekeeping for client session with ID {} cancelled", clientSessionId);
+        LOG.debug("Client session with ID {} reserved for use - session housekeeping cancelled!", clientSessionId);
         future.cancel(false);
         m_housekeepingFutures.remove(clientSessionId);
       }
@@ -357,8 +357,9 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
 
       if (m_clientSessionMap.isEmpty()) {
         // no more client sessions -> invalidate HTTP session
-        LOG.info("Invalidate HTTP session with ID {} because session store contains no more client sessions", m_httpSessionId);
         try {
+          m_httpSession.getCreationTime(); // dummy call to prevent the following log statement when the session is already invalid
+          LOG.info("Invalidate HTTP session with ID {} because session store contains no more client sessions", m_httpSessionId);
           m_httpSession.invalidate();
         }
         catch (IllegalStateException e) {
@@ -426,7 +427,7 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
       @Override
       public void run() throws Exception {
         if (futures.size() > 0) {
-          LOG.info("Waiting for {} client sessions to stop...", futures.size());
+          LOG.debug("Waiting for {} client sessions to stop...", futures.size());
           try {
             Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
                 .andMatchFuture(futures)

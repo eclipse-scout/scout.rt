@@ -3,14 +3,22 @@ package org.eclipse.scout.rt.client.ui.desktop.outline.pages;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 
+import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
+import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
+import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
+import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
+import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 
-import org.junit.Test;
-
+@RunWith(ClientTestRunner.class)
+@RunWithSubject("default")
+@RunWithClientSession(TestEnvironmentClientSession.class)
 public class AbstractPageWithTableTest {
 
   private AbstractPageWithTable<ITable> m_page = new AbstractPageWithTable<ITable>(false, null) {
@@ -32,6 +40,22 @@ public class AbstractPageWithTableTest {
           return null;
         }
       };
+    }
+  };
+
+  private TestSearchForm m_searchFormMock = null;
+  private AbstractPageWithTable<ITable> m_pageWithSearchForm = new AbstractPageWithTable<ITable>() {
+
+    @Override
+    protected ITable initTable() {
+      return Mockito.mock(ITable.class);
+    }
+
+    @Override
+    protected ISearchForm createSearchForm() {
+      TestSearchForm form = new TestSearchForm();
+      m_searchFormMock = Mockito.spy(form);
+      return m_searchFormMock;
     }
   };
 
@@ -62,4 +86,24 @@ public class AbstractPageWithTableTest {
     assertSame(tableRow, m_page.getTableRowFor(childPage));
   }
 
+  @Test
+  public void doDisposeSearchForm() {
+    m_pageWithSearchForm.ensureSearchFormCreated();
+    m_pageWithSearchForm.ensureSearchFormStarted();
+
+    Mockito.verify(m_searchFormMock, Mockito.times(0)).disposeFormInternal();
+    m_pageWithSearchForm.dispose();
+    Mockito.verify(m_searchFormMock, Mockito.times(1)).disposeFormInternal();
+  }
+
+  public static class TestSearchForm extends AbstractSearchForm {
+
+    @Override
+    public void disposeFormInternal() {
+      super.disposeFormInternal();
+    }
+
+    public class MainBox extends AbstractGroupBox {
+    }
+  }
 }

@@ -638,7 +638,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
 
         // special intercept for html
         if (text != null && row.getCell(column).isHtmlEnabled()) {
-          text = HTML.plain(text).toPlainText();
+          text = HTML.raw(text).toPlainText();
         }
 
         // text/plain

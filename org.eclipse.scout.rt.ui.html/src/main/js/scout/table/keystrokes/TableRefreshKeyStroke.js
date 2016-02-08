@@ -19,6 +19,11 @@ scout.TableRefreshKeyStroke = function(table) {
 };
 scout.inherits(scout.TableRefreshKeyStroke, scout.KeyStroke);
 
+scout.TableRefreshKeyStroke.prototype._accept = function(event) {
+  var accepted = scout.TableRefreshKeyStroke.parent.prototype._accept.call(this, event);
+  return accepted && this.field.hasReloadHandler;
+};
+
 scout.TableRefreshKeyStroke.prototype.handle = function(event) {
   this.field.reload();
 };

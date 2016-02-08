@@ -36,7 +36,7 @@ public interface IContentAssistFieldUIFacade {
   void cancelProposalChooserFromUI();
 
   /**
-   * Called when Enter key has been pressed.<br/>
+   * Called when Enter or Tab key has been pressed.<br/>
    * Calling this method may cause a property change for property {@code PROP_PROPOSAL_CHOOSER} in
    * {@link IContentAssistField}.
    *
@@ -47,5 +47,12 @@ public interface IContentAssistFieldUIFacade {
    *          but not when he tries to leave the field by using the TAB key.
    */
   void acceptProposalFromUI(String text, boolean chooser, boolean forceClose);
+
+  /**
+   * Called when Enter or Tab key has been pressed and search-text has been deleted in the UI. In that case the user
+   * doesn't want to accept a previously selected proposal. When that case is detected in the UI, it will call this
+   * method instead of acceptProposalFromUI.
+   */
+  void deleteProposalFromUI();
 
 }

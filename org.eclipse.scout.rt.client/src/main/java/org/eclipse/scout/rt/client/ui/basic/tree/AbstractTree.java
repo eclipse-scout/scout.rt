@@ -500,7 +500,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   }
 
   @ConfigOperation
-  protected void execAutoCheckChildNodes(List<ITreeNode> nodes) {
+  protected void execAutoCheckChildNodes(List<? extends ITreeNode> nodes) {
     for (ITreeNode node : nodes) {
       for (ITreeNode childNode : node.getFilteredChildNodes()) {
         if (childNode.isEnabled() && childNode.isVisible()) {
@@ -1162,19 +1162,24 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     node = resolveNode(node);
     if (node != null) {
       if (node.isExpanded() != b || node.isExpandedLazy() != lazy) {
-        try {
-          if (b) {
-            node.ensureChildrenLoaded();
-            ensureParentExpanded(node.getParentNode());
-          }
-          node.setExpandedInternal(b);
-          node.setExpandedLazyInternal(lazy);
-          fireNodeExpanded(node, b);
-        }
-        catch (RuntimeException e) {
-          BEANS.get(ExceptionHandler.class).handle(e);
-        }
+        setNodeExpandedInternal(node, b, lazy);
       }
+    }
+  }
+
+  @Override
+  public void setNodeExpandedInternal(ITreeNode node, boolean b, boolean lazy) {
+    try {
+      if (b) {
+        node.ensureChildrenLoaded();
+        ensureParentExpanded(node.getParentNode());
+      }
+      node.setExpandedInternal(b);
+      node.setExpandedLazyInternal(lazy);
+      fireNodeExpanded(node, b);
+    }
+    catch (RuntimeException e) {
+      BEANS.get(ExceptionHandler.class).handle(e);
     }
   }
 
@@ -1388,6 +1393,19 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
         }
       }
       fireNodesChecked(changedNodes);
+    }
+  }
+
+  /**
+   * Recursively checks/unchecks the subtree of <code>parent</code>.
+   */
+  private void uncheckAllRec(ITreeNode parent, boolean b) {
+    if (parent == null) {
+      return;
+    }
+    setNodeChecked(parent, b);
+    for (ITreeNode node : parent.getChildNodes()) {
+      uncheckAllRec(node, b);
     }
   }
 
@@ -1641,6 +1659,10 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
       }
       children = resolveNodes(children);
       deselectNodes(children);
+      // remove children from set of checked nodes
+      for (ITreeNode child : children) {
+        uncheckAllRec(child, false);
+      }
       ((AbstractTreeNode) parent).removeChildNodesInternal(children, true, isAutoDiscardOnDelete());
       decorateAffectedNodeCells(parent, parent.getChildNodes());
       if (!isAutoDiscardOnDelete()) {
@@ -2160,6 +2182,11 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   }
 
   @Override
+  public int getCheckedNodesCount() {
+    return m_checkedNodes.size();
+  }
+
+  @Override
   public boolean isScrollToSelection() {
     return propertySupport.getPropertyBool(PROP_SCROLL_TO_SELECTION);
   }
@@ -2431,7 +2458,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     chain.execNodesChecked(nodes);
   }
 
-  protected void interceptAutoCheckChildNodes(List<? extends ITreeNode> nodes) {
+  protected void interceptAutoCheckChildNodes(List<ITreeNode> nodes) {
     List<? extends ITreeExtension<? extends AbstractTree>> extensions = getAllExtensions();
     TreeAutoCheckChildNodesChain chain = new TreeAutoCheckChildNodesChain(extensions);
     chain.execAutoCheckChildNodes(nodes);
@@ -3121,13 +3148,13 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     }
 
     @Override
-    public void execNodesChecked(TreeNodesCheckedChain chain, Collection<ITreeNode> nodes) {
-      getOwner().execNodesChecked(CollectionUtility.arrayList(nodes));
+    public void execNodesChecked(TreeNodesCheckedChain chain, List<ITreeNode> nodes) {
+      getOwner().execNodesChecked(nodes);
     }
 
     @Override
-    public void execAutoCheckChildNodes(TreeAutoCheckChildNodesChain chain, Collection<? extends ITreeNode> nodes) {
-      getOwner().execAutoCheckChildNodes(CollectionUtility.arrayList(nodes));
+    public void execAutoCheckChildNodes(TreeAutoCheckChildNodesChain chain, List<ITreeNode> nodes) {
+      getOwner().execAutoCheckChildNodes(nodes);
     }
   }
 

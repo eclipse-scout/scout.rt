@@ -912,7 +912,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
       @Override
       public void run() throws Exception {
         interceptStart();
-        if (!m_containerForm.isFormStarted()) {
+        if (m_containerForm.isFormStartable()) {
           m_containerForm.startWizard();
         }
       }

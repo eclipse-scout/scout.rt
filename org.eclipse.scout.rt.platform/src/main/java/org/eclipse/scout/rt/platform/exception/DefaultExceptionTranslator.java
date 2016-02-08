@@ -36,13 +36,8 @@ public class DefaultExceptionTranslator implements IExceptionTranslator<Exceptio
 
   @Override
   public Exception translate(final Throwable throwable) {
-    return translate(throwable, true);
-  }
-
-  @Override
-  public Exception translate(final Throwable throwable, final boolean throwOnError) {
     final Throwable eUnwrapped = unwrap(throwable);
-    final Exception eTranslated = translateInternal(eUnwrapped, throwOnError);
+    final Exception eTranslated = translateInternal(eUnwrapped);
     final Exception eDecorated = decorate(eTranslated);
 
     return eDecorated;
@@ -51,8 +46,8 @@ public class DefaultExceptionTranslator implements IExceptionTranslator<Exceptio
   /**
    * Method invoked to translate the given {@link Throwable}.
    */
-  protected Exception translateInternal(final Throwable t, final boolean throwOnError) {
-    if (t instanceof Error && throwOnError) {
+  protected Exception translateInternal(final Throwable t) {
+    if (t instanceof Error) {
       throw (Error) t;
     }
     else if (t instanceof Exception) {

@@ -14,14 +14,14 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.job.FixedDelayScheduleBuilder;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.Assertions;
@@ -36,28 +36,12 @@ import org.slf4j.LoggerFactory;
  * possible, every scout Session is provided with always the same connection it had in the last request this class is
  * thread-safe
  */
-public final class SqlConnectionPool {
+@Bean
+public class SqlConnectionPool {
   private static final Logger LOG = LoggerFactory.getLogger(SqlConnectionPool.class);
 
   private volatile boolean m_destroyed;
   private final String m_identity = UUID.randomUUID().toString();
-
-  /*
-   * Pool factory per service type (top-level class)
-   */
-  private static final Object poolStoreLock = new Object();
-  private static final Map<Class, SqlConnectionPool> poolStore = new HashMap<Class, SqlConnectionPool>();
-
-  public static SqlConnectionPool getPool(Class serviceType, int poolSize, long connectionLifetime, long connectionBusyTimeout) {
-    synchronized (poolStoreLock) {
-      SqlConnectionPool pool = poolStore.get(serviceType);
-      if (pool == null) {
-        pool = new SqlConnectionPool(serviceType, poolSize, connectionLifetime, connectionBusyTimeout);
-        poolStore.put(serviceType, pool);
-      }
-      return pool;
-    }
-  }
 
   /*
    * Instance
@@ -65,17 +49,25 @@ public final class SqlConnectionPool {
   private final Object m_poolLock = new Object();
   private final Set<PoolEntry> m_idleEntries = new HashSet<PoolEntry>();
   private final Set<PoolEntry> m_busyEntries = new HashSet<PoolEntry>();
-  private final Class m_serviceType;
-  private final int m_poolSize;
-  private final long m_connectionLifetime;
-  private final long m_connectionBusyTimeout;
+  private volatile String m_name;
+  private volatile int m_poolSize;
+  private volatile long m_connectionLifetime;
+  private volatile long m_connectionBusyTimeout;
+  private final AtomicBoolean m_initialized = new AtomicBoolean(false);
 
-  private SqlConnectionPool(Class serviceType, int poolSize, long connectionLifetime, long connectionBusyTimeout) {
-    m_serviceType = serviceType;
+  public void initialize(String name, int poolSize, long connectionLifetime, long connectionBusyTimeout) {
+    Assertions.assertTrue(m_initialized.compareAndSet(false, true), "already initialized");
+    m_name = name;
     m_poolSize = poolSize;
     m_connectionLifetime = connectionLifetime;
     m_connectionBusyTimeout = connectionBusyTimeout;
+    startManagePool();
+  }
 
+  /**
+   * Start managing pool
+   */
+  private void startManagePool() {
     Jobs.schedule(new IRunnable() {
 
       @Override
@@ -83,7 +75,7 @@ public final class SqlConnectionPool {
         managePool();
       }
     }, Jobs.newInput()
-        .withName("Managing SQL connection pool for {}", m_serviceType.getName())
+        .withName("Managing SQL connection pool for {}", m_name)
         .withExecutionHint(m_identity)
         .withExecutionTrigger(Jobs.newExecutionTrigger()
             .withStartIn(1, TimeUnit.MINUTES)
@@ -255,7 +247,7 @@ public final class SqlConnectionPool {
         for (Iterator it = m_idleEntries.iterator(); it.hasNext();) {
           PoolEntry e = (PoolEntry) it.next();
           if (System.currentTimeMillis() - e.createTime > m_connectionLifetime) {
-            closeConnectionAsync(e.conn, m_serviceType.getName(), "expired idle connection");
+            closeConnectionAsync(e.conn, "expired idle connection");
             e.conn = null;
             it.remove();
           }
@@ -264,7 +256,7 @@ public final class SqlConnectionPool {
         for (Iterator it = m_busyEntries.iterator(); it.hasNext();) {
           PoolEntry e = (PoolEntry) it.next();
           if (System.currentTimeMillis() - e.leaseBegin > m_connectionBusyTimeout) {
-            closeConnectionAsync(e.conn, m_serviceType.getName(), "timed out busy connection");
+            closeConnectionAsync(e.conn, "timed out busy connection");
             e.conn = null;
             it.remove();
           }
@@ -303,18 +295,18 @@ public final class SqlConnectionPool {
           .toFilter(), true);
 
       for (final PoolEntry idleEntry : m_idleEntries) {
-        closeConnectionAsync(idleEntry.conn, m_serviceType.getName(), "destroying SQL connection pool");
+        closeConnectionAsync(idleEntry.conn, "destroying SQL connection pool");
       }
       m_idleEntries.clear();
 
       for (final PoolEntry busyEntry : m_busyEntries) {
-        closeConnectionAsync(busyEntry.conn, m_serviceType.getName(), "destroying SQL connection pool");
+        closeConnectionAsync(busyEntry.conn, "destroying SQL connection pool");
       }
       m_busyEntries.clear();
     }
   }
 
-  protected void closeConnectionAsync(final Connection connection, final String serviceName, final String reason) {
+  protected void closeConnectionAsync(final Connection connection, final String reason) {
     Jobs.schedule(new IRunnable() {
 
       @Override
@@ -328,7 +320,7 @@ public final class SqlConnectionPool {
         }
       }
     }, Jobs.newInput()
-        .withName("Closing SQL connection [service={}, connection={}, reason={}]", serviceName, connection, reason)
+        .withName("Closing SQL connection [name={}, connection={}, reason={}]", m_name, connection, reason)
         .withExecutionHint(m_identity));
   }
 }

@@ -33,6 +33,7 @@ import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -166,8 +167,21 @@ public class AbstractFormTest {
 
   class TestForm extends AbstractForm {
 
+    private boolean m_closeInInit;
+
     public TestForm() {
-      super();
+      this(false);
+    }
+
+    public TestForm(boolean closeInInit) {
+      m_closeInInit = closeInInit;
+    }
+
+    @Override
+    protected void execInitForm() {
+      if (m_closeInInit) {
+        doClose();
+      }
     }
 
     public MainBox getMainBox() {
@@ -270,6 +284,47 @@ public class AbstractFormTest {
     form.setSubTitle("bar");
     assertEquals("bar", form.getSubTitle());
     assertTrue(called[0]);
+  }
+
+  @Test
+  public void testCloseInInitForm() throws Exception {
+    // call doClose in execInitForm
+    AbstractForm form = new TestForm(true);
+    assertTrue(form.isFormStartable());
+    form.start();
+    assertTrue(form.isFormStartable());
+    assertFalse(form.isFormStarted());
+    assertFalse(form.isBlockingInternal());
+
+    // regular form start
+    form = new TestForm(false);
+    assertTrue(form.isFormStartable());
+    form.start();
+    assertFalse(form.isFormStartable());
+    assertTrue(form.isFormStarted());
+    assertTrue(form.isBlockingInternal());
+  }
+
+  @Test
+  public void testStartedStateDuringInitialisation() throws Exception {
+    final Boolean[] resultStartable = {null};
+    final Boolean[] resultStarted = {null};
+    final Boolean[] resultBlocking = {null};
+    final AbstractForm form = new TestForm(false);
+    form.addFormListener(new FormListener() {
+      @Override
+      public void formChanged(FormEvent e) {
+        if (e.getType() == FormEvent.TYPE_LOAD_AFTER) {
+          resultStartable[0] = Boolean.valueOf(form.isFormStartable());
+          resultStarted[0] = Boolean.valueOf(form.isFormStarted());
+          resultBlocking[0] = Boolean.valueOf(form.isBlockingInternal());
+        }
+      }
+    });
+    form.start();
+    assertFalse(resultStartable[0]);
+    assertFalse(resultStarted[0]);
+    assertTrue(resultBlocking[0]);
   }
 
 }

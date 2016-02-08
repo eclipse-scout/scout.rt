@@ -30,9 +30,13 @@ class ContentAssistFieldUIFacade<LOOKUP_KEY> implements IContentAssistFieldUIFac
     return StringUtility.isNullOrEmpty(text) ? m_field.getWildcard() : text;
   }
 
+  private boolean ignoreUiEvent() {
+    return !m_field.isVisible() || !m_field.isEnabled();
+  }
+
   @Override
   public void proposalTypedFromUI(String text) {
-    if (!m_field.isVisible() || !m_field.isEnabled()) {
+    if (ignoreUiEvent()) {
       return;
     }
     LOG.debug("proposalTypedFromUI text={}", text);
@@ -45,7 +49,7 @@ class ContentAssistFieldUIFacade<LOOKUP_KEY> implements IContentAssistFieldUIFac
 
   @Override
   public void openProposalChooserFromUI(String text, boolean selectCurrentValue) {
-    if (!m_field.isVisible() || !m_field.isEnabled()) {
+    if (ignoreUiEvent()) {
       return;
     }
     LOG.debug("openProposalChooserFromUI text={} selectCurrentValue={}", text, selectCurrentValue);
@@ -66,41 +70,49 @@ class ContentAssistFieldUIFacade<LOOKUP_KEY> implements IContentAssistFieldUIFac
   }
 
   @Override
+  public void deleteProposalFromUI() {
+    if (ignoreUiEvent()) {
+      return;
+    }
+    LOG.debug("deleteProposalFromUI");
+    m_field.setValue(null);
+    m_field.unregisterProposalChooserInternal();
+  }
+
+  @Override
   public void acceptProposalFromUI(String text, boolean chooser, boolean forceClose) {
-    if (!m_field.isVisible() || !m_field.isEnabled()) {
+    if (ignoreUiEvent()) {
       return;
     }
     LOG.debug("acceptProposalFromUI text={} chooser={} forceClose={}", text, chooser, forceClose);
 
-    // When the proposal chooser is open, we must check if the display-text has changed
-    // since the last search. When it has changed, we cannot use the accepted proposal
-    // and must perform the lookup again instead. This prevents issues as described in
-    // ticket #162961:
-    // - User types 'Ja' -> matches a lookup-row 'Ja'
-    // - User types an additional 'x' and presses tab -> display-text is now 'Jax'
-    // - the model accepts the lookup-row 'Ja', but the display-text in the UI is still 'Jax'
-    //   and the field looks valid, which is wrong
-    boolean openProposalChooser = false;
-    boolean acceptByLookupRow = chooser;
+    if (chooser) {
 
-    if (acceptByLookupRow) {
+      // When the proposal chooser is open, we must check if the display-text has changed
+      // since the last search. When it has changed, we cannot use the accepted proposal
+      // and must perform the lookup again instead. This prevents issues as described in
+      // ticket #162961:
+      // - User types 'Ja' -> matches a lookup-row 'Ja'
+      // - User types an additional 'x' and presses tab -> display-text is now 'Jax'
+      // - the model accepts the lookup-row 'Ja', but the display-text in the UI is still 'Jax'
+      //   and the field looks valid, which is wrong
+      boolean acceptByLookupRow = true;
+      String searchText = toSearchText(text);
       String lastSearchText = m_field.getProposalChooser().getSearchText();
       if (!lastSearchText.equals(m_field.getWildcard())) {
-        String searchText = toSearchText(text);
         acceptByLookupRow = CompareUtility.equals(searchText, lastSearchText);
       }
-    }
 
-    if (acceptByLookupRow) {
-      // use lookup row selected in proposal chooser
+      boolean openProposalChooser = false;
       try {
+        // use lookup row selected in proposal chooser or perform lookup by display text?
         ILookupRow<LOOKUP_KEY> lookupRow = m_field.getProposalChooser().getAcceptedProposal();
-        if (lookupRow == null) {
-          openProposalChooser = acceptByDisplayText(text);
-          openProposalChooserIfNotOpenYet(openProposalChooser, text);
+        if (acceptByLookupRow && lookupRow != null) {
+          m_field.acceptProposal(lookupRow);
         }
         else {
-          m_field.acceptProposal(lookupRow);
+          openProposalChooser = acceptByDisplayText(text);
+          openProposalChooserIfNotOpenYet(openProposalChooser, text);
         }
       }
       finally {
@@ -111,7 +123,7 @@ class ContentAssistFieldUIFacade<LOOKUP_KEY> implements IContentAssistFieldUIFac
     }
     else {
       // perform lookup by display text
-      openProposalChooser = acceptByDisplayText(text);
+      boolean openProposalChooser = acceptByDisplayText(text);
       openProposalChooserIfNotOpenYet(openProposalChooser, text);
     }
   }

@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.client.ui.basic.table;
 /**
  * Interface for classes supporting a reload function.
  *
- * @since 5.1.0
+ * @since 5.1
  */
 public interface IReloadHandler {
 

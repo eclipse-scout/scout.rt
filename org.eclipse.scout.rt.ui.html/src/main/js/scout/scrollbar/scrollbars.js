@@ -227,7 +227,6 @@ scout.scrollbars = {
 
   /**
    * Scrolls the $scrollable to the given $element (must be a child of $scrollable)
-   *
    */
   scrollTo: function($scrollable, $element) {
     var scrollTo,

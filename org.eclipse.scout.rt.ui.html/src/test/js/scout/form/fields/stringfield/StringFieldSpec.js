@@ -10,13 +10,13 @@
  ******************************************************************************/
 /* global FormSpecHelper */
 describe("StringField", function() {
-  var session;
-  var helper;
+  var session, helper, field;
 
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
     helper = new FormSpecHelper(session);
+    field = createField(createModel());
     jasmine.Ajax.install();
     jasmine.clock().install();
   });
@@ -37,12 +37,6 @@ describe("StringField", function() {
   }
 
   describe("Check if field is switched to password field if inputMasked is true", function() {
-    var field;
-
-    beforeEach(function() {
-      field = createField(createModel());
-    });
-
     it("set input masked", function() {
       field.inputMasked = true;
       field.render(session.$entryPoint);
@@ -58,12 +52,6 @@ describe("StringField", function() {
   });
 
   describe("insertText", function() {
-    var field;
-
-    beforeEach(function() {
-      field = createField(createModel());
-    });
-
     it("expects empty field at the beginning", function() {
       field.render(session.$entryPoint);
       expect(field.$field[0].value).toBe('');
@@ -225,13 +213,39 @@ describe("StringField", function() {
 
   });
 
-  describe("displayTextChanged must always be sent to server at the end of input, if at least one change has been was made", function() {
-    var field;
+  describe('trim', function() {
+    it('should restore selection', function() {
+      field.trimText = true;
+      field.render(session.$entryPoint);
+      field.$field.val(' foo ');
+      field.$field[0].select();
+      var selection = field._getSelection();
+      expect(selection.start).toBe(0);
+      expect(selection.end).toBe(5);
+      field._renderDisplayText('foo');
 
-    beforeEach(function() {
-      field = createField(createModel());
+      selection = field._getSelection();
+      expect(selection.start).toBe(0);
+      expect(selection.end).toBe(3);
     });
 
+    it('should not break when displayText is very long (regex is too big)', function() {
+      // this test doesn't expect anything - the test succeeds when no exception is thrown
+      // with a large displayText. In ticket #169354 the issue occured with a displayText
+      // that hat 55'577 bytes, so this is about the size which causes Chrome too crash.
+      var longText = '';
+      for (var i = 0; i < 3500; i++) {
+        longText += 'too big to fail '; // 16 bytes x 3'500 = 56'000 bytes
+      }
+      field.trimText = true;
+      field.render(session.$entryPoint);
+      field.$field.val(' ' + longText + ' ');
+      field._renderDisplayText(longText);
+      expect(true).toBe(true);
+    });
+  });
+
+  describe("displayTextChanged must always be sent to server at the end of input, if at least one change has been was made", function() {
     it("updateDisplayTextOnModify = true, with changed text", function() {
       field.updateDisplayTextOnModify = true;
       field.render(session.$entryPoint);

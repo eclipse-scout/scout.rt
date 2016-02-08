@@ -84,9 +84,7 @@ scout.Table.prototype._init = function(model) {
   this._syncKeyStrokes(this.keyStrokes);
   this._syncMenus(this.menus);
   this._syncTableStatus(this.tableStatus);
-  if (this._filterCount() > 0) {
-    this._applyFilters(this.rows);
-  }
+  this._applyFilters(this.rows);
   this._calculateValuesForBackgroundEffect();
   this._group();
 };
@@ -380,7 +378,7 @@ scout.Table.prototype.onContextMenu = function(event) {
 
     var menuItems, popup;
     if (this.selectedRows.length > 0) {
-      menuItems = this._filterMenus(this.menus, scout.MenuDestinations.CONTEXT_MENU, true);
+      menuItems = this._filterMenus(this.menus, scout.MenuDestinations.CONTEXT_MENU, true, false, ['Header']);
       if (!event.pageX && !event.pageY) {
         var $rowToDisplay = this.selectionHandler.lastActionRow ? this.selectionHandler.lastActionRow.$row : this.selectedRows[this.selectedRows.length - 1].$row;
         var offset = $rowToDisplay.offset();
@@ -447,6 +445,15 @@ scout.Table.prototype._isFooterVisible = function() {
 scout.Table.prototype._hasVisibleTableControls = function() {
   return this.tableControls.some(function(control) {
     if (control.visible) {
+      return true;
+    }
+    return false;
+  });
+};
+
+scout.Table.prototype.hasAggregateTableControl = function() {
+  return this.tableControls.some(function(control) {
+    if (control instanceof scout.AggregateTableControl) {
       return true;
     }
     return false;
@@ -538,12 +545,10 @@ scout.Table.prototype.deselectAll = function(notifyServer) {
   this.selectRows([], notifyServer);
 };
 
-scout.Table.prototype.checkAll = function(check) {
-  check = scout.nvl(check, true);
-  var rows = this.filteredRows();
-  rows.forEach(function(row) {
-    this.checkRow(row, check);
-  }, this);
+scout.Table.prototype.checkAll = function(checked) {
+  this.checkRows(this.filteredRows(), {
+    checked: checked
+  });
 };
 
 scout.Table.prototype.uncheckAll = function() {
@@ -983,9 +988,34 @@ scout.Table.prototype._updateRowWidth = function() {
 
 scout.Table.prototype._updateRowHeight = function() {
   var $emptyRow = this.$data.appendDiv('table-row');
+  var $emptyAggrRow = this.$data.appendDiv('table-aggregate-row');
+
   $emptyRow.appendDiv('table-cell').html('&nbsp;');
+  $emptyAggrRow.appendDiv('table-cell').html('&nbsp;');
   this.rowHeight = $emptyRow.outerHeight(true);
+  this.aggregateRowHeight = $emptyAggrRow.outerHeight(true);
   $emptyRow.remove();
+  $emptyAggrRow.remove();
+};
+
+/**
+ * Updates the row heights for every visible row and aggregate row and clears the height of the others
+ */
+scout.Table.prototype._updateRowHeights = function() {
+  this.rows.forEach(function(row) {
+    if (!row.$row) {
+      row.height = null;
+    } else {
+      row.height = row.$row.outerHeight(true);
+    }
+  });
+  this._aggregateRows.forEach(function(aggregateRow) {
+    if (!aggregateRow.$row) {
+      aggregateRow.height = null;
+    } else {
+      aggregateRow.height = aggregateRow.$row.outerHeight(true);
+    }
+  });
 };
 
 /**
@@ -1093,18 +1123,12 @@ scout.Table.prototype._removeAllRows = function() {
   this.$rows().each(function(i, elem) {
     var $row = $(elem),
       row = $row.data('row');
-    // FIXME CGU: (von A.WE) temporärer Hack wegen ticket #169163:
-    // wenn man im TableHeaderMenu > Filter > Alle anklickt, gibt es dann Fall, dass man hier eine $row
-    // hat, die kein data('row') hat. Das Problem scheint am 17.12.2015 mit dem virtuelle scrolling rein
-    // gekommen zu sein. Ich habe schrittweise bis zum 16.12.2015 reverted und erst mit der version vor
-    // dem 17.12 ging es wieder. Meine Vermutung ist, dass der Bug irgendwo im Commit
-    // 9ab825acf55ef0d27f31d1791ab2ce685f7710f2 steckt.
-    // Ein weiteres (rein optisches) Issue: wenn man zwischen alle/keine Filter togglet, hüpfen die
-    // Rows etwas komisch herum. Evtl. könnte man den Effekt vermeiden, wenn man im checkAllRows nicht
-    // row für row checken würde, sondern eine Bulk-Operation implementieren würde?
-    if (row) {
-      this._removeRow(row);
+    if ($row.hasClass('hiding')) {
+      // Do not remove rows which are removed using an animation
+      // row.$row may already point to a new row -> don't call removeRow to not accidentally remove the new row
+      return;
     }
+    this._removeRow(row);
   }.bind(this));
   this.viewRangeRendered = new scout.Range(0, 0);
 };
@@ -1316,8 +1340,8 @@ scout.Table.prototype._find$AppLink = function(event) {
   return null;
 };
 
-scout.Table.prototype._filterMenus = function(menus, destination, onlyVisible, enableDisableKeyStroke) {
-  return scout.menus.filterAccordingToSelection('Table', this.selectedRows.length, menus, destination, onlyVisible, enableDisableKeyStroke);
+scout.Table.prototype._filterMenus = function(menus, destination, onlyVisible, enableDisableKeyStroke, notAllowedTypes) {
+  return scout.menus.filterAccordingToSelection('Table', this.selectedRows.length, menus, destination, onlyVisible, enableDisableKeyStroke, notAllowedTypes);
 };
 
 scout.Table.prototype._renderMenus = function() {
@@ -1328,7 +1352,8 @@ scout.Table.prototype._renderMenus = function() {
 };
 
 scout.Table.prototype._updateMenuBar = function() {
-  var menuItems = this._filterMenus(this.menus, scout.MenuDestinations.MENU_BAR, false, true);
+  var notAllowedTypes = ['Header'];
+  var menuItems = this._filterMenus(this.menus, scout.MenuDestinations.MENU_BAR, false, true, notAllowedTypes);
   menuItems = this.staticMenus.concat(menuItems);
   this.menuBar.updateItems(menuItems);
 };
@@ -1565,8 +1590,19 @@ scout.Table.prototype.nextEditableCellPosForRow = function(startColumnIndex, row
 };
 
 scout.Table.prototype.clearAggregateRows = function(animate) {
+  // Remove "hasAggregateRow" markers from real rows
+  this._aggregateRows.forEach(function(aggregateRow) {
+    if (aggregateRow.prevRow) {
+      aggregateRow.prevRow.aggregateRowAfter = null;
+    }
+    if (aggregateRow.nextRow) {
+      aggregateRow.nextRow.aggregateRowBefore = null;
+    }
+  }, this);
+
   if (this.rendered) {
     this._removeAggregateRows(animate);
+    this._renderSelection(); // fix selection borders
   }
   this._aggregateRows = [];
 };
@@ -1613,7 +1649,7 @@ scout.Table.prototype._group = function(animate) {
       //finish aggregation
       this._forEachColumn('aggrFinish', states);
       //append sum row
-      this._addAggregateRow(states, row);
+      this._addAggregateRow(states, row, nextRow);
       //reset after group
       this._forEachColumn('aggrStart', states);
     }
@@ -1621,6 +1657,7 @@ scout.Table.prototype._group = function(animate) {
 
   if (this.rendered) {
     this._renderAggregateRows(animate);
+    this._renderSelection(); // fix selection borders
   }
 };
 
@@ -1650,11 +1687,26 @@ scout.Table.prototype._groupedColumns = function() {
   });
 };
 
-scout.Table.prototype._addAggregateRow = function(contents, afterRow) {
-  this._aggregateRows.push({
+/**
+ * Inserts a new aggregation row between 'prevRow' and 'nextRow'.
+ *
+ * @param contents cells of the new aggregate row
+ * @param prevRow row _before_ the new aggregate row
+ * @param nextRow row _after_ the new aggregate row
+ */
+scout.Table.prototype._addAggregateRow = function(contents, prevRow, nextRow) {
+  var aggregateRow = {
     contents: contents.slice(),
-    refRow: afterRow
-  });
+    prevRow: prevRow,
+    nextRow: nextRow
+  };
+  this._aggregateRows.push(aggregateRow);
+  if (prevRow) {
+    prevRow.aggregateRowAfter = aggregateRow;
+  }
+  if (nextRow) {
+    nextRow.aggregateRowBefore = aggregateRow;
+  }
 };
 
 scout.Table.prototype._removeAggregateRows = function(animate) {
@@ -1683,8 +1735,8 @@ scout.Table.prototype._renderAggregateRows = function(animate) {
       // already rendered, no need to update again (necessary for subsequent renderAggregateRows calls (eg. in insertRows -> renderRows)
       return;
     }
-    row = aggregateRow.refRow;
-    if (!row.$row) {
+    row = aggregateRow.prevRow;
+    if (!row || !row.$row) {
       return;
     }
 
@@ -1706,6 +1758,7 @@ scout.Table.prototype._renderAggregateRows = function(animate) {
     }
 
     $aggregateRow.insertAfter(row.$row).width(this.rowWidth);
+    aggregateRow.height = $aggregateRow.outerHeight(true);
     aggregateRow.$row = $aggregateRow;
     if (animate) {
       this._showRow(aggregateRow);
@@ -1746,6 +1799,18 @@ scout.Table.prototype.removeColumnGrouping = function(column) {
   }
 };
 
+/**
+ * @returns true if at least one column has grouped=true
+ */
+scout.Table.prototype.isGrouped = function() {
+  return this.columns.some(function(column) {
+    if (column.grouped) {
+      return true;
+    }
+    return false;
+  });
+};
+
 scout.Table.prototype.setColumnBackgroundEffect = function(column, effect) {
   column.setBackgroundEffect(effect);
 };
@@ -1775,58 +1840,60 @@ scout.Table.prototype._calculateValuesForBackgroundEffect = function() {
   }, this);
 };
 
-/**
- * Renders the background effect of every column, if column.backgroundEffect is set
- */
-scout.Table.prototype._renderBackgroundEffect = function() {
-  this.columns.forEach(function(column) {
-    if (!column.backgroundEffect) {
+scout.Table.prototype.checkRow = function(row, checked) {
+  this.checkRows([row], {
+    checked: checked
+  });
+};
+
+scout.Table.prototype.checkRows = function(rows, options) {
+  var opts = {
+    checked: true,
+    notifyServer: true,
+    checkOnlyEnabled: true
+  };
+  $.extend(opts, options);
+  var updatedRows = [];
+  if (!this.checkable || (!this.enabled && opts.checkOnlyEnabled)) {
+    return;
+  }
+  rows = scout.arrays.ensure(rows);
+  rows.forEach(function(row) {
+    if ((!row.enabled && opts.checkOnlyEnabled) || row.checked === opts.checked) {
       return;
     }
-    column._renderBackgroundEffect();
-  }, this);
-};
-
-scout.Table.prototype._renderRowChecked = function(row) {
-  if (!this.checkable) {
-    return;
-  }
-  if (!row.$row) {
-    return;
-  }
-  var $styleElem;
-  if (this.checkableStyle === scout.Table.CheckableStyle.TABLE_ROW) {
-    $styleElem = row.$row;
-  } else {
-    if (!this.checkableColumn) {
-      throw new Error('checkableColumn not set');
-    }
-    $styleElem = this.checkableColumn.$checkBox(row.$row);
-  }
-  $styleElem.toggleClass('checked', row.checked);
-};
-
-scout.Table.prototype.checkRow = function(row, checked) {
-  if (!this.checkable || !this.enabled || !row.enabled || row.checked === checked) {
-    return;
-  }
-  var updatedRows = [];
-  if (!this.multiCheck && checked) {
-    for (var i = 0; i < this.rows.length; i++) {
-      if (this.rows[i].checked) {
-        this.rows[i].checked = false;
-        updatedRows.push(this.rows[i]);
-        this._renderRowChecked(this.rows[i]);
+    if (!this.multiCheck && opts.checked) {
+      for (var i = 0; i < this.rows.length; i++) {
+        if (this.rows[i].checked) {
+          this.rows[i].checked = false;
+          updatedRows.push(this.rows[i]);
+        }
       }
     }
+    row.checked = opts.checked;
+    updatedRows.push(row);
+  }, this);
+
+  if (opts.notifyServer) {
+    this._sendRowsChecked(updatedRows);
   }
-  row.checked = checked;
-  updatedRows.push(row);
-  this._sendRowsChecked(updatedRows);
   if (this.rendered) {
-    this._renderRowChecked(row);
+    updatedRows.forEach(function(row) {
+      this._renderRowChecked(row);
+    }, this);
   }
   this._triggerRowsChecked();
+};
+
+scout.Table.prototype.uncheckRow = function(row, notifyServer) {
+  this.uncheckRows([row], {
+    notifyServer: notifyServer
+  });
+};
+
+scout.Table.prototype.uncheckRows = function(rows, options) {
+  options.checked = false;
+  this.checkRows(rows, options);
 };
 
 scout.Table.prototype.doRowAction = function(row, column) {
@@ -1857,12 +1924,7 @@ scout.Table.prototype.insertRows = function(rows, fromServer) {
     this.rows.push(row);
   }, this);
 
-  // FIXME CGU: (von A.WE) ohne das If schickt das UI beim SmartField bei jeder Änderung an der Table (insertRows)
-  // ein rowsFiltered event zurück an den Server, obwohl die Table gar keinen Filter hat. Bitte prüfen, ob das so
-  // korrekt ist. Das If wird ja auch schon an anderer Stelle gemacht.
-  if (this._filterCount() > 0) {
-    this._applyFilters(rows);
-  }
+  this._applyFilters(rows);
   this._calculateValuesForBackgroundEffect();
   fromServer = scout.nvl(fromServer, false);
   if (!fromServer) {
@@ -1996,6 +2058,7 @@ scout.Table.prototype.updateRows = function(rows) {
     if (this.selectionHandler.lastActionRow === oldRow) {
       this.selectionHandler.lastActionRow = updatedRow;
     }
+    //TODO CGU remove this replace functions, they are slow due to indexOf. Either create maps (rowId/rowIndex) before the loop or even store rowIndex for each row
     scout.arrays.replace(this.rows, oldRow, updatedRow);
     scout.arrays.replace(this.selectedRows, oldRow, updatedRow);
 
@@ -2008,8 +2071,8 @@ scout.Table.prototype.updateRows = function(rows) {
           newHiddenRows.push(updatedRow);
         }
       } else {
-        // If filter state has not changed, just update cached rows
-        scout.arrays.replace(this._filteredRows, oldRow, updatedRow);
+        // If filter state has not changed, just make sure filteredRows will be recalculated the next time its used
+        this._filteredRowsDirty = true;
       }
     }
 
@@ -2103,12 +2166,12 @@ scout.Table.prototype.revealChecked = function() {
   }
 };
 
-scout.Table.prototype.rowById = function(id) {
+scout.Table.prototype._rowById = function(id) {
   return this.rowsMap[id];
 };
 
 scout.Table.prototype._rowsByIds = function(ids) {
-  return ids.map(this.rowById.bind(this));
+  return ids.map(this._rowById.bind(this));
 };
 
 scout.Table.prototype._rowsToIds = function(rows) {
@@ -2121,7 +2184,7 @@ scout.Table.prototype._rowsToIds = function(rows) {
  * render borders and selection of row. default select if no argument or false is passed in deselect
  * model has to be updated before calling this method.
  */
-scout.Table.prototype.renderSelection = function(rows) {
+scout.Table.prototype._renderSelection = function(rows) {
   rows = scout.arrays.ensure(rows || this.selectedRows);
 
   // helper function adds/removes a class for a row only if necessary, return true if classes have been changed
@@ -2138,16 +2201,24 @@ scout.Table.prototype.renderSelection = function(rows) {
   };
 
   for (var i = 0; i < rows.length; i++) { // traditional for loop, elements might be added during loop
-    var row = rows[i],
-      thisRowSelected = this.selectedRows.indexOf(row) !== -1,
+    var row = rows[i];
+    if (!row.$row) {
+      continue;
+    }
+
+    var thisRowSelected = this.selectedRows.indexOf(row) !== -1,
       filteredRows = this.filteredRows(),
       previousIndex = filteredRows.indexOf(row) - 1,
       previousRowSelected = previousIndex >= 0 && this.selectedRows.indexOf(filteredRows[previousIndex]) !== -1,
       followingIndex = filteredRows.indexOf(row) + 1,
       followingRowSelected = followingIndex < filteredRows.length && this.selectedRows.indexOf(filteredRows[followingIndex]) !== -1;
 
-    if (!row.$row) {
-      continue;
+    // Don't collapse selection borders if two consecutively selected (real) rows are separated by an aggregation row
+    if (thisRowSelected && previousRowSelected && row.aggregateRowBefore) {
+      previousRowSelected = false;
+    }
+    if (thisRowSelected && followingRowSelected && row.aggregateRowAfter) {
+      followingRowSelected = false;
     }
 
     // Note: We deliberately use the '+' operator on booleans here! That way, _all_ methods are executed (boolean
@@ -2194,7 +2265,7 @@ scout.Table.prototype.addRowToSelection = function(row, ongoingSelection) {
 
   if (row.$row && this.rendered) {
     row.$row.select(true);
-    this.renderSelection(row);
+    this._renderSelection(row);
     if (this.scrollToSelection) {
       this.revealSelection();
     }
@@ -2210,7 +2281,7 @@ scout.Table.prototype.removeRowFromSelection = function(row, ongoingSelection) {
   ongoingSelection = ongoingSelection !== undefined ? ongoingSelection : true;
   if (scout.arrays.remove(this.selectedRows, row)) {
     if (this.rendered) {
-      this.renderSelection(row);
+      this._renderSelection(row);
     }
     if (!ongoingSelection) {
       this._triggerRowsSelected();
@@ -2224,6 +2295,8 @@ scout.Table.prototype.removeRowFromSelection = function(row, ongoingSelection) {
 scout.Table.prototype.selectRows = function(rows, notifyServer, debounceSend) {
   rows = scout.arrays.ensure(rows);
   var selectedEqualRows = scout.arrays.equalsIgnoreOrder(rows, this.selectedRows);
+  // TODO CGU maybe make sure selectedRows are in correct order, this would make logic in AbstractTableNavigationKeyStroke or renderSelection easier
+  // but requires some effort (remember rowIndex, keep array in order after sort, ... see java Table)
   if (selectedEqualRows) {
     return;
   }
@@ -2236,7 +2309,8 @@ scout.Table.prototype.selectRows = function(rows, notifyServer, debounceSend) {
     rows = [rows[0]];
   }
 
-  this.selectedRows = rows;
+  // Make a copy so that original array stays untouched
+  this.selectedRows = rows.slice();
   notifyServer = scout.nvl(notifyServer, true);
   if (notifyServer) {
     this._sendRowsSelected(this._rowsToIds(rows), debounceSend);
@@ -2244,7 +2318,7 @@ scout.Table.prototype.selectRows = function(rows, notifyServer, debounceSend) {
   this._triggerRowsSelected();
 
   if (this.rendered) {
-    this.renderSelection();
+    this._renderSelection();
     if (this.scrollToSelection) {
       this.revealSelection();
     }
@@ -2330,7 +2404,7 @@ scout.Table.prototype.$cell = function(column, $row) {
   return $row.children().eq(columnIndex);
 };
 
-scout.Table.prototype.columnById = function(columnId) {
+scout.Table.prototype._columnById = function(columnId) {
   return scout.arrays.find(this.columns, function(column) {
     return column.id === columnId;
   });
@@ -2408,8 +2482,10 @@ scout.Table.prototype._order$AggregateRows = function($rows) {
   $rows.each(function(i, elem) {
     var $aggrRow = $(elem),
       aggregateRow = $aggrRow.data('aggregateRow');
-
-    $aggrRow.insertAfter(aggregateRow.refRow.$row);
+    if (!aggregateRow || !aggregateRow.prevRow) {
+      return;
+    }
+    $aggrRow.insertAfter(aggregateRow.prevRow.$row);
   });
 };
 
@@ -2457,6 +2533,10 @@ scout.Table.prototype._applyFiltersForRow = function(row) {
 scout.Table.prototype._applyFilters = function(rows) {
   var filterChanged,
     newHiddenRows = [];
+
+  if (this._filterCount() === 0) {
+    return;
+  }
 
   rows.forEach(function(row) {
     if (this._applyFiltersForRow(row)) {
@@ -2582,13 +2662,7 @@ scout.Table.prototype.resizeColumn = function(column, width) {
 
   // If resized column contains cells with wrapped text, view port needs to be updated
   // Remove row height for non rendered rows because it may have changed due to resizing (wrap text)
-  this.rows.forEach(function(row) {
-    if (!row.$row) {
-      row.height = null;
-    } else {
-      row.height = row.$row.outerHeight(true);
-    }
-  });
+  this._updateRowHeights();
   this._renderFiller();
   this._renderViewport();
   this.updateScrollbars();
@@ -2854,7 +2928,7 @@ scout.Table.prototype._syncFilters = function(filters) {
   if (filters) {
     filters.forEach(function(filterData) {
       if (filterData.column) {
-        filterData.column = this.columnById(filterData.column);
+        filterData.column = this._columnById(filterData.column);
       }
       filterData.table = this;
       filterData.session = this.session;
@@ -2869,6 +2943,37 @@ scout.Table.prototype._syncTableStatus = function(tableStatus) {
   } else {
     this.tableStatus = null;
   }
+};
+
+/**
+ * Renders the background effect of every column, if column.backgroundEffect is set
+ */
+scout.Table.prototype._renderBackgroundEffect = function() {
+  this.columns.forEach(function(column) {
+    if (!column.backgroundEffect) {
+      return;
+    }
+    column._renderBackgroundEffect();
+  }, this);
+};
+
+scout.Table.prototype._renderRowChecked = function(row) {
+  if (!this.checkable) {
+    return;
+  }
+  if (!row.$row) {
+    return;
+  }
+  var $styleElem;
+  if (this.checkableStyle === scout.Table.CheckableStyle.TABLE_ROW) {
+    $styleElem = row.$row;
+  } else {
+    if (!this.checkableColumn) {
+      throw new Error('checkableColumn not set');
+    }
+    $styleElem = this.checkableColumn.$checkBox(row.$row);
+  }
+  $styleElem.toggleClass('checked', row.checked);
 };
 
 scout.Table.prototype._renderCheckable = function() {
@@ -3102,17 +3207,35 @@ scout.Table.prototype._rowIndexAtScrollTop = function(scrollTop) {
   var height = 0,
     index = -1;
   this.filteredRows().some(function(row, i) {
-    var rowHeight = this.rowHeight;
-    if (row.height) {
-      rowHeight = row.height;
-    }
-    height += rowHeight;
+    height += this._heightForRow(row);
     if (scrollTop < height) {
       index = i;
       return true;
     }
   }.bind(this));
   return index;
+};
+
+scout.Table.prototype._heightForRow = function(row) {
+  var height = 0,
+    aggregateRow = row.aggregateRowAfter;
+
+  if (row.height) {
+    height = row.height;
+  } else {
+    height = this.rowHeight;
+  }
+
+  // Add height of aggregate row as well
+  if (aggregateRow) {
+    if (aggregateRow.height) {
+      height += aggregateRow.height;
+    } else {
+      height += this.aggregateRowHeight;
+    }
+  }
+
+  return height;
 };
 
 /**
@@ -3191,7 +3314,7 @@ scout.Table.prototype._renderViewRange = function(viewRange) {
   this._renderFiller();
   this._renderEmptyData();
   this._renderBackgroundEffect();
-  this.renderSelection();
+  this._renderSelection();
   this.$data[0].scrollTop = scrollTop;
   this.viewRangeDirty = false;
 };
@@ -3254,13 +3377,8 @@ scout.Table.prototype._applyFillerStyle = function($filler) {
 scout.Table.prototype._calculateFillerHeight = function(range) {
   var totalHeight = 0;
   for (var i = range.from; i < range.to; i++) {
-    var row = this.filteredRows()[i],
-      height = this.rowHeight;
-
-    if (row.height) {
-      height = row.height;
-    }
-    totalHeight += height;
+    var row = this.filteredRows()[i];
+    totalHeight += this._heightForRow(row);
   }
   return totalHeight;
 };
@@ -3293,14 +3411,27 @@ scout.Table.prototype._onRowsSelected = function(rowIds) {
 };
 
 scout.Table.prototype._onRowsChecked = function(rows) {
-  for (var i = 0; i < rows.length; i++) {
-    var row = this.rowsMap[rows[i].id];
-    row.checked = rows[i].checked;
-    if (this.rendered) {
-      this._renderRowChecked(row);
+  var checkedRows = [],
+    uncheckedRows = [];
+
+  rows.forEach(function(rowData) {
+    var row = this._rowById(rowData.id);
+    if (rowData.checked) {
+      checkedRows.push(row);
+    } else {
+      uncheckedRows.push(row);
     }
-    this._triggerRowsChecked();
-  }
+  }, this);
+
+  this.checkRows(checkedRows, {
+    checked: true,
+    notifyServer: false,
+    checkOnlyEnabled: false
+  });
+  this.uncheckRows(uncheckedRows, {
+    notifyServer: false,
+    checkOnlyEnabled: false
+  });
 };
 
 scout.Table.prototype._onRowOrderChanged = function(rowIds) {
@@ -3310,13 +3441,7 @@ scout.Table.prototype._onRowOrderChanged = function(rowIds) {
   }
 
   // update model
-  rows = scout.arrays.init(this.rows.length, 0);
-  for (var i = 0; i < this.rows.length; i++) {
-    row = this.rows[i];
-    newPos = rowIds.indexOf(this.rows[i].id);
-    rows[newPos] = row;
-  }
-  this.rows = rows;
+  this.rows = this._rowsByIds(rowIds);
   this._filteredRowsDirty = true; // order has been changed
 
   this.clearAggregateRows(this._animateAggregateRows);
@@ -3358,7 +3483,7 @@ scout.Table.prototype._onColumnOrderChanged = function(columnIds) {
 
   for (i = 0; i < columnIds.length; i++) {
     columnId = columnIds[i];
-    column = this.columnById(columnId);
+    column = this._columnById(columnId);
     currentPosition = this.columns.indexOf(column);
     if (currentPosition < 0) {
       throw new Error('Column with id ' + columnId + 'not found.');
@@ -3385,7 +3510,7 @@ scout.Table.prototype._onColumnHeadersUpdated = function(columns) {
   //Update model columns
   for (var i = 0; i < columns.length; i++) {
     scout.defaultValues.applyTo(columns[i], 'Column');
-    column = this.columnById(columns[i].id);
+    column = this._columnById(columns[i].id);
     oldColumnState = $.extend(oldColumnState, column);
     column.text = columns[i].text;
     column.headerCssClass = columns[i].headerCssClass;
@@ -3399,19 +3524,20 @@ scout.Table.prototype._onColumnHeadersUpdated = function(columns) {
 };
 
 scout.Table.prototype._onStartCellEdit = function(columnId, rowId, fieldId) {
-  var column = this.columnById(columnId),
-    row = this.rowById(rowId);
+  var column = this._columnById(columnId),
+    row = this._rowById(rowId);
   this._startCellEdit(column, row, fieldId);
 };
 
 scout.Table.prototype._onEndCellEdit = function(fieldId) {
   var field = this.session.getModelAdapter(fieldId);
-
-  // Remove the cell-editor popup prior destroying the field, so that the 'cell-editor-popup's focus context is uninstalled first and the focus can be restored onto the last focused element of the surrounding focus context.
-  // Otherwise, if the currently focused field is removed from DOM, the $entryPoint would be focused first, which can be avoided if removing the popup first.
-  this.cellEditorPopup.remove();
-  this.cellEditorPopup = null;
-
+  //the cellEditorPopup could already be removed by scrolling(out of view range) or be removed by update rows
+  if (this.cellEditorPopup) {
+    // Remove the cell-editor popup prior destroying the field, so that the 'cell-editor-popup's focus context is uninstalled first and the focus can be restored onto the last focused element of the surrounding focus context.
+    // Otherwise, if the currently focused field is removed from DOM, the $entryPoint would be focused first, which can be avoided if removing the popup first.
+    this.cellEditorPopup.remove();
+    this.cellEditorPopup = null;
+  }
   field.destroy();
 };
 
@@ -3427,14 +3553,14 @@ scout.Table.prototype._onColumnBackgroundEffectChanged = function(event) {
   var columnId, column;
   event.eventParts.forEach(function(eventPart) {
     columnId = eventPart.columnId;
-    column = this.columnById(columnId);
+    column = this._columnById(columnId);
     column.setBackgroundEffect(eventPart.backgroundEffect, false);
   }, this);
 };
 
 scout.Table.prototype._onRequestFocusInCell = function(event) {
-  var row = this.rowById(event.rowId),
-    column = this.columnById(event.columnId),
+  var row = this._rowById(event.rowId),
+    column = this._columnById(event.columnId),
     cell = this.cell(column, row);
   if (this.enabled && row.enabled && cell.editable) {
     this.prepareCellEdit(event.rowId, event.columnId, true);
@@ -3447,7 +3573,7 @@ scout.Table.prototype._onAggregationFunctionChanged = function(event) {
   event.eventParts.forEach(function(eventPart) {
     columnId = eventPart.columnId;
     func = eventPart.aggregationFunction;
-    column = this.columnById(columnId);
+    column = this._columnById(columnId);
     column.setAggregationFunction(func);
 
     this._triggerAggregationFunctionChanged(column);
@@ -3462,6 +3588,10 @@ scout.Table.prototype._onFiltersChanged = function(filters) {
   if (!this._rebuildingTable) {
     this.filter();
   }
+};
+
+scout.Table.prototype._onColumnActionsChanged = function(event) {
+  this.header.onColumnActionsChanged(event);
 };
 
 scout.Table.prototype.onModelAction = function(event) {
@@ -3516,10 +3646,6 @@ scout.Table.prototype.onModelAction = function(event) {
   } else {
     scout.Table.parent.prototype.onModelAction.call(this, event);
   }
-};
-
-scout.Table.prototype._onColumnActionsChanged = function(event) {
-  this.header.onColumnActionsChanged(event);
 };
 
 /**

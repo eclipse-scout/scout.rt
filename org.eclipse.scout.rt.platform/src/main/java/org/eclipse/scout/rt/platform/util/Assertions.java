@@ -577,8 +577,7 @@ public final class Assertions {
    *          optional arguments to substitute <em>formatting anchors</em> in the message.
    */
   public static <T> T fail(final String msg, final Object... msgArgs) {
-    final String message = (msg != null ? String.format(msg, msgArgs) : "n/a");
-    throw new AssertionException("Assertion error: " + message, msgArgs);
+    throw new AssertionException("Assertion error: " + msg, msgArgs);
   }
 
   /**

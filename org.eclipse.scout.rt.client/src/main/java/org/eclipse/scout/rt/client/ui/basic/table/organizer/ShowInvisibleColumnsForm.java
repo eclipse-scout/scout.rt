@@ -7,7 +7,9 @@ package org.eclipse.scout.rt.client.ui.basic.table.organizer;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
+import org.eclipse.scout.rt.client.ui.basic.table.ColumnSet;
 import org.eclipse.scout.rt.client.ui.basic.table.IHeaderCell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
@@ -30,6 +32,8 @@ import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 public class ShowInvisibleColumnsForm extends AbstractForm implements IShowInvisibleColumnsForm {
 
   private ITable m_table = null;
+
+  private IColumn<?> m_insertAfterColumn = null;
 
   public ShowInvisibleColumnsForm(ITable table) {
     m_table = table;
@@ -213,9 +217,55 @@ public class ShowInvisibleColumnsForm extends AbstractForm implements IShowInvis
 
     @Override
     protected void execStore() {
+      ArrayList<IColumn<?>> newCols = new ArrayList<>();
       for (ITableRow row : getColumnsTableField().getTable().getCheckedRows()) {
-        getColumnsTableField().getTable().getKeyColumn().getValue(row).setVisible(true);
+        IColumn<?> col = getColumnsTableField().getTable().getKeyColumn().getValue(row);
+        newCols.add(col);
+        col.setVisible(true);
       }
+      if (m_insertAfterColumn == null || newCols.size() == 0) {
+        return;
+      }
+      ColumnSet colSet = newCols.get(0).getTable().getColumnSet();
+      List<IColumn<?>> newOrder = new ArrayList<>();
+      List<IColumn<?>> visibleColumns = colSet.getVisibleColumns();
+      int position = 0;
+      int posInsertAfter = -1;
+      int newPosFirst = -1;
+      int newPosLast = -1;
+      for (IColumn<?> col : visibleColumns) {
+        if (newCols.contains(col)) {
+          if (posInsertAfter != -1 && posInsertAfter < newOrder.size() - 1) {
+            newPosFirst = newPosFirst == -1 ? posInsertAfter + 1 : newPosFirst;
+            newPosLast = newPosLast == -1 ? posInsertAfter + 1 : newPosLast + 1;
+            newOrder.add(newPosLast, col);
+          }
+          else {
+            newOrder.add(col);
+            newPosLast = position;
+            newPosFirst = newPosFirst == -1 ? position : newPosFirst;
+          }
+        }
+        else if (newPosFirst != -1 && posInsertAfter == -1) {
+          newOrder.add(newPosFirst, col);
+          posInsertAfter = m_insertAfterColumn.equals(col) ? newPosFirst : posInsertAfter;
+          newPosFirst++;
+          newPosLast++;
+        }
+        else {
+          newOrder.add(col);
+          posInsertAfter = m_insertAfterColumn.equals(col) ? position : posInsertAfter;
+        }
+        position++;
+      }
+      int i = 0;
+      for (IColumn<?> col : newOrder) {
+        col.setVisibleColumnIndexHint(i);
+        i++;
+      }
+      colSet.setVisibleColumns(newOrder);
+      ClientUIPreferences.getInstance().setAllTableColumnPreferences(newCols.get(0).getTable());
+
     }
 
     @Override
@@ -223,6 +273,12 @@ public class ShowInvisibleColumnsForm extends AbstractForm implements IShowInvis
       getColumnsTableField().reloadTableData();
     }
 
+  }
+
+  @Override
+  public IShowInvisibleColumnsForm withInsertAfterColumn(IColumn<?> insertAfterColumn) {
+    m_insertAfterColumn = insertAfterColumn;
+    return this;
   }
 
 }

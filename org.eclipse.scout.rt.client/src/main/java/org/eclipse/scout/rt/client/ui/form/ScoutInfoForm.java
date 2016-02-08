@@ -120,9 +120,9 @@ public class ScoutInfoForm extends AbstractForm {
   }
 
   protected IHtmlTableRow createHtmlRow(String property, Object value) {
-    return HTML.row(
-        HTML.cell(StringUtility.emptyIfNull(StringUtility.box("", property, ":"))),
-        HTML.cell(StringUtility.emptyIfNull(value)));
+    return HTML.tr(
+        HTML.td(StringUtility.emptyIfNull(StringUtility.box("", property, ":"))),
+        HTML.td(StringUtility.emptyIfNull(value)));
   }
 
   @Order(10)

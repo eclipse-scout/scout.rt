@@ -8,20 +8,15 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.platform.job;
-
-import org.eclipse.scout.rt.platform.job.listener.IJobListener;
+package org.eclipse.scout.rt.platform.exception;
 
 /**
- * A token representing the registration of a {@link IJobListener}. This token can later be used to unregister the
- * listener.
- *
- * @since 5.1
+ * Exception thrown in case of any error during the construction of a bean.
  */
-public interface IJobListenerRegistration {
+public class BeanCreationException extends PlatformException {
+  private static final long serialVersionUID = 1L;
 
-  /**
-   * Invoke to unregister the associated listener.
-   */
-  void dispose();
+  public BeanCreationException(String message, Object... args) {
+    super(message, args);
+  }
 }

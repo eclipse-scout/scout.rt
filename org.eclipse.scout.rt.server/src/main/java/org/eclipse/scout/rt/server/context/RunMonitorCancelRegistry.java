@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.server.context;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -114,7 +115,8 @@ public class RunMonitorCancelRegistry {
   }
 
   /**
-   * Cancels all registered monitors associated with the given 'sessionId'.
+   * Cancels all registered monitors associated with the given 'sessionId' except the one that is currently running and
+   * invoking this method (to ensure that the calling {@link RunMonitor} is not cancelled).
    *
    * @return <code>true</code> if all monitors matching the given 'sessionId' could be cancelled, or <code>false</code>
    *         if no monitor is registered, or if at least one monitor was already cancelled or failed to be cancelled.
@@ -122,8 +124,15 @@ public class RunMonitorCancelRegistry {
   public boolean cancelAllBySessionId(final String sessionId) {
     final List<RegistryEntry> registryEntries;
 
+    final RunMonitor currentRunMonitor = RunMonitor.CURRENT.get();
     synchronized (this) {
       registryEntries = m_sessionIdIndex.get(sessionId);
+      for (Iterator<RegistryEntry> it = registryEntries.iterator(); it.hasNext();) {
+        RegistryEntry next = it.next();
+        if (next.getRunMonitor() == currentRunMonitor) {
+          it.remove();
+        }
+      }
       m_registry.remove(registryEntries);
     }
 

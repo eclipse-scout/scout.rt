@@ -435,7 +435,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
    * Ensures that the search form is started (lazy starting)
    */
   protected void ensureSearchFormStarted() {
-    if (m_searchForm != null && !m_searchForm.isFormStarted()) {
+    if (m_searchForm != null && m_searchForm.isFormStartable()) {
       try {
         m_searchForm.start();
         notifyMemoryPolicyOfSearchFormStart();
@@ -667,10 +667,10 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
   }
 
   @Override
-  public void nodeRemovedNotify() {
+  public void disposeInternal() {
+    super.disposeInternal();
     try {
       disposeSearchForm();
-      super.nodeRemovedNotify();
     }
     catch (RuntimeException e) {
       BEANS.get(ExceptionHandler.class).handle(e);

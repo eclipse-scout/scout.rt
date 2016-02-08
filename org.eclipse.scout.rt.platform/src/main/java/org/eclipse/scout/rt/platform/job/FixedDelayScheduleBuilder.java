@@ -13,7 +13,7 @@ import org.quartz.spi.MutableTrigger;
  *
  * @since 5.2
  */
-public class FixedDelayScheduleBuilder extends ScheduleBuilder<IFixedDelayTrigger> {
+public final class FixedDelayScheduleBuilder extends ScheduleBuilder<IFixedDelayTrigger> {
 
   private final long m_fixedDelay;
   private final long m_repeatCount;

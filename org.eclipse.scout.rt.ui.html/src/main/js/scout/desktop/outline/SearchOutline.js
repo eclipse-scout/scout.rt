@@ -26,7 +26,7 @@ scout.SearchOutline.prototype._initKeyStrokeContext = function(keyStrokeContext)
 };
 
 scout.SearchOutline.prototype._createKeyStrokeContextForSearchField = function() {
-  var keyStrokeContext = new scout.KeyStrokeContext();
+  var keyStrokeContext = new scout.InputFieldKeyStrokeContext();
   keyStrokeContext.$scopeTarget = function() {
     return this.$searchPanel;
   }.bind(this);

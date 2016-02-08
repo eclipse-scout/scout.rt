@@ -14,6 +14,9 @@ scout.DesktopKeyStroke = function(session) {
   // this key-stroke handles key-shortcuts with and without Ctrl key
   this.whiteListCtrlKeys = [keys.N, keys.R, keys.T, keys.PAGE_UP, keys.PAGE_DOWN];
   this.whiteListKeys = [keys.F11, keys.F12];
+
+  // Never delegate these keys to the browser (F5 is used to reload tables or forms, ctrl-r may be used to reload the browser)
+  this.blackListKeys = [keys.F5];
 };
 scout.inherits(scout.DesktopKeyStroke, scout.KeyStroke);
 
@@ -21,6 +24,11 @@ scout.inherits(scout.DesktopKeyStroke, scout.KeyStroke);
  * @override KeyStroke.js
  */
 scout.DesktopKeyStroke.prototype._accept = function(event) {
+  if (scout.isOneOf(event.which, this.blackListKeys)) {
+    this.preventDefault = true;
+    return true;
+  }
+
   // only apply "catch-all" when busy indicator is displayed
   if (this.session._busyIndicator) {
     var whiteList, delegateToBrowser;

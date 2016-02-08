@@ -4,7 +4,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 
 /**
  * This interface provides the state for the add/remove and modify buttons in the table-header-menu.
- * 
+ *
  * @since 5.2
  */
 public interface ITableOrganizer {
@@ -15,7 +15,7 @@ public interface ITableOrganizer {
 
   boolean isColumnModifiable(IColumn column);
 
-  void addColumn();
+  void addColumn(IColumn<?> column);
 
   void removeColumn(IColumn column);
 

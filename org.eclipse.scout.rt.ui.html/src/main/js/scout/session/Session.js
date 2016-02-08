@@ -868,6 +868,12 @@ scout.Session.prototype.sendLogRequest = function(message) {
     log: true,
     message: message
   };
+  if (this.currentEvent) {
+    request.event = {
+      target: this.currentEvent.target,
+      type: this.currentEvent.type
+    };
+  }
 
   // Do not use _sendRequest to make sure a log request has no side effects and will be sent only once
   var ajaxOptions = this.defaultAjaxOptions(request);
@@ -891,6 +897,7 @@ scout.Session.prototype._processEvents = function(events) {
   var i, j, event, adapter, adapterClones, eventTargets;
   for (i = 0; i < events.length; i++) {
     event = events[i];
+    this.currentEvent = event;
 
     $.log.debug("Processing event '" + event.type + "' for adapter with ID " + event.target);
     adapter = this.getModelAdapter(event.target);
@@ -906,13 +913,15 @@ scout.Session.prototype._processEvents = function(events) {
     eventTargets = [adapter];
     scout.arrays.pushAll(eventTargets, this.getAdapterClones(adapter));
     for (j = 0; j < eventTargets.length; j++) {
+      var target = eventTargets[j];
       if (event.type === 'property') { // Special handling for 'property' type
-        eventTargets[j].onModelPropertyChange(event);
+        target.onModelPropertyChange(event);
       } else {
-        eventTargets[j].onModelAction(event);
+        target.onModelAction(event);
       }
     }
   }
+  this.currentEvent = null;
 };
 
 scout.Session.prototype.init = function() {
@@ -945,6 +954,12 @@ scout.Session.prototype.onModelAction = function(event) {
 };
 
 scout.Session.prototype._onReloadPage = function(event) {
+  // If server already created a client session, store it in sessionStorage to send the
+  // same ID again on page reload (most useful when theme changes during initial request).
+  if (event.clientSessionId) {
+    sessionStorage.setItem('scout:clientSessionId', event.clientSessionId);
+  }
+
   // Don't clear the body, because other events might be processed before the reload and
   // it could cause errors when all DOM elements are already removed.
   scout.reloadPage({

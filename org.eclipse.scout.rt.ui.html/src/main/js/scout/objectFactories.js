@@ -9,13 +9,6 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 scout.objectFactories = {
-  'Desktop': function() {
-    if (scout.Device.Type.MOBILE === scout.device.type) {
-      return new scout.MobileDesktop();
-    } else {
-      return new scout.Desktop();
-    }
-  },
   'KeyStroke': function() {
     // A model keystroke is represented as an Action
     return new scout.Action();

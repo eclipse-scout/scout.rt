@@ -238,6 +238,14 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId, IDis
   boolean isFormStarted();
 
   /**
+   * @return <code>true</code> if it is allowed to call the start() method of this form, false otherwise. This methods
+   *         checks two things: 1 - is the form started yet? 2 - is the blocking condition of the form blocking? Use
+   *         this method when you must call the start method of the form and you're not completely sure in which state
+   *         the form currently is.
+   */
+  boolean isFormStartable();
+
+  /**
    * true while the {@link IFormHandler#execLoad()} method is running<br>
    * this is often used in {@link AbstractValueField#execChangedValue()}
    */

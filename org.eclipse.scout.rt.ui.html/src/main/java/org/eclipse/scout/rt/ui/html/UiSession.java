@@ -41,12 +41,12 @@ import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.job.IFuture;
-import org.eclipse.scout.rt.platform.job.IJobListenerRegistration;
 import org.eclipse.scout.rt.platform.job.JobState;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
+import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
 import org.eclipse.scout.rt.platform.util.SleepUtil;
 import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledException;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
@@ -108,7 +108,7 @@ public class UiSession implements IUiSession {
   private volatile boolean m_disposing;
   private volatile boolean m_disposed;
   private final ReentrantLock m_uiSessionLock = new ReentrantLock();
-  private volatile IJobListenerRegistration m_uiDataAvailableListener;
+  private volatile IRegistrationHandle m_uiDataAvailableListener;
   private final BlockingQueue<Object> m_pollerQueue = new ArrayBlockingQueue<>(1, true);
   private final Object m_notificationToken = new Object();
   private volatile long m_lastAccessedTime;
@@ -421,12 +421,13 @@ public class UiSession implements IUiSession {
   }
 
   protected void sendReloadPageEvent() {
-    m_currentJsonResponse.addActionEvent(getUiSessionId(), EVENT_RELOAD_PAGE, new JSONObject());
+    final JSONObject jsonEvent = new JSONObject();
+    jsonEvent.put("clientSessionId", m_clientSession.getId()); // Send back clientSessionId to allow the browser to attach to the same client session on page reload
+    m_currentJsonResponse.addActionEvent(getUiSessionId(), EVENT_RELOAD_PAGE, jsonEvent);
   }
 
   protected void sendInitializationEvent(final String clientSessionAdapterId) {
     final IFuture<Locale> future = ModelJobs.schedule(new Callable<Locale>() {
-
       @Override
       public Locale call() throws Exception {
         return m_clientSession.getLocale();
@@ -440,7 +441,6 @@ public class UiSession implements IUiSession {
     jsonEvent.put("clientSessionId", m_clientSession.getId()); // Send back clientSessionId to allow the browser to attach to the same client session on page reload
     jsonEvent.put("clientSession", clientSessionAdapterId);
     putLocaleData(jsonEvent, BEANS.get(UiJobs.class).awaitAndGet(future));
-
     m_currentJsonResponse.addActionEvent(m_uiSessionId, EVENT_INITIALIZED, jsonEvent);
   }
 
@@ -799,7 +799,7 @@ public class UiSession implements IUiSession {
         Object notificationToken = m_pollerQueue.poll(pollWaitSeconds, TimeUnit.SECONDS);
         int durationSeconds = (int) Math.round((System.currentTimeMillis() - t0) / 1000d);
         int newPollWaitSeconds = pollWaitSeconds - durationSeconds;
-        if (notificationToken == null || newPollWaitSeconds <= 0 || m_disposed || (m_currentJsonResponse != null && !m_currentJsonResponse.isEmpty())) {
+        if (notificationToken == null || newPollWaitSeconds <= 0 || m_disposed || !m_currentJsonResponse.isEmpty()) {
           // Stop wait loop for one of the following reasons:
           // 1. Timeout has occurred -> return always, even with empty answer
           // 2. Remaining pollWaitTime would be zero -> same as no. 1
@@ -877,19 +877,15 @@ public class UiSession implements IUiSession {
     currentJsonResponse().addActionEvent(getUiSessionId(), EVENT_DISPOSE_ADAPTER, jsonEvent);
   }
 
-  /**
-   * Called from the model after the client session has been stopped.
-   */
   @Override
   public void logout() {
     LOG.info("Logging out from UI session with ID {} [clientSessionId={}, processingJsonRequest={}]", m_uiSessionId, getClientSessionId(), isProcessingJsonRequest());
 
     // Redirect client to "you are now logged out" screen
     if (isProcessingJsonRequest()) {
-      JsonResponse jsonResponse = currentJsonResponse();
       boolean platformValid = (Platform.get() != null && Platform.get().getState() == IPlatform.State.PlatformStarted);
-      if (jsonResponse != null && platformValid) {
-        jsonResponse.addActionEvent(getUiSessionId(), "logout", createLogoutEventData());
+      if (m_currentJsonResponse != null && platformValid) {
+        m_currentJsonResponse.addActionEvent(getUiSessionId(), "logout", createLogoutEventData());
       }
     }
 

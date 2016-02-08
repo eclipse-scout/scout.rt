@@ -24,7 +24,11 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Patch for CSS class. The patch is applied as soon as this class is accessed.
+ *
+ * @deprecated This legacy utility will be removed in Scout 7. Use {@link org.eclipse.scout.rt.platform.html.HTML} and
+ *             {@link HtmlHelper} instead.
  */
+@Deprecated
 public final class CSSPatch {
   private static final Logger LOG = LoggerFactory.getLogger(CSSPatch.class);
 

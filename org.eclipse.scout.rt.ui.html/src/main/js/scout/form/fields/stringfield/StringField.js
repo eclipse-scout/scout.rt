@@ -19,6 +19,8 @@ scout.StringField.FORMAT = {
   UPPER: 'A' /* IStringField.FORMAT_UPPER */
 };
 
+scout.StringField.TRIM_REGEXP = new RegExp('^(\\s*)(.*?)(\\s*)$');
+
 /**
  * @override ModelAdapter.js
  */
@@ -185,23 +187,22 @@ scout.StringField.prototype._renderSpellCheckEnabled = function(spellCheckEnable
 };
 
 scout.StringField.prototype._renderDisplayText = function(displayText) {
-  displayText = scout.nvl(displayText, '');
-  var oldDisplayText = scout.nvl(this.$field.val(), '');
+  displayText = scout.strings.nvl(displayText);
+  var oldDisplayText = scout.strings.nvl(this.$field.val());
   var oldSelection = this._getSelection();
   scout.StringField.parent.prototype._renderDisplayText.call(this, displayText);
-
   // Try to keep the current selection for cases where the old and new display
   // text only differ because of the automatic trimming.
-  if (oldDisplayText !== displayText && this.trimText) {
-    var m = oldDisplayText.match(new RegExp('^(\\s*)' + scout.strings.quote(displayText) + '(\\s*)$'));
-    if (m) {
-      oldSelection.start = Math.min(oldSelection.start - m[1].length, displayText.length);
-      oldSelection.end = Math.min(oldSelection.end - m[1].length, displayText.length);
-      this._setSelection(oldSelection);
+  if (this.trimText && oldDisplayText !== displayText) {
+    var matches = oldDisplayText.match(scout.StringField.TRIM_REGEXP);
+    if (matches && matches[2] === displayText) {
+      this._setSelection({
+        start: Math.max(oldSelection.start - matches[1].length, 0),
+        end: Math.min(oldSelection.end - matches[1].length, displayText.length)
+      });
     }
   }
 };
-
 
 // Not called in _renderProperties() because this is not really a property (more like an event)
 scout.StringField.prototype._renderInsertText = function() {
