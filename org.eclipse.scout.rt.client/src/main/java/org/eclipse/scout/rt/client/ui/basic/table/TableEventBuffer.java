@@ -62,8 +62,8 @@ public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
 
       int type = event.getType();
       if (type == TableEvent.TYPE_ALL_ROWS_DELETED) {
-        //remove all previous row related events
-        remove(getRowRelatedEvents(), events.subList(0, i));
+        //remove all previous row related events (or clear their row list if they don't require rows)
+        applyAllRowsDeletedToPreviousEvents(events.subList(0, i));
       }
       else if (type == TableEvent.TYPE_COLUMN_STRUCTURE_CHANGED) {
         //ignore all previous aggregate function changes.
@@ -82,6 +82,38 @@ public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
       else if (type == TableEvent.TYPE_ROWS_DELETED) {
         List<ITableRow> remainingRows = removeRowsFromPreviousEvents(event.getRows(), events.subList(0, i), TableEvent.TYPE_ROWS_INSERTED);
         event.setRows(remainingRows);
+      }
+    }
+  }
+
+  /**
+   * Removes all row related events from the given event list if the event type requires rows. If the event type is row
+   * related but rows are not required (e.g. ROWS_SELECTED), the event is not removed, but all rows are stripped.
+   * Exception: {@link TableEvent#TYPE_SCROLL_TO_SELECTION} does not require rows, but is removed nevertheless (because
+   * scrolling is pointless without rows).
+   * <p>
+   * This method is intended to be called when an "all rows deleted" event is encountered.
+   */
+  protected void applyAllRowsDeletedToPreviousEvents(List<TableEvent> events) {
+    List<Integer> typesToDelete = new ArrayList<>();
+    List<Integer> typesToClear = new ArrayList<>();
+    for (Integer type : getRowRelatedEvents()) {
+      if (isRowsRequired(type) || type == TableEvent.TYPE_SCROLL_TO_SELECTION) {
+        typesToDelete.add(type);
+      }
+      else {
+        typesToClear.add(type);
+      }
+    }
+
+    // Delete events
+    remove(typesToDelete, events);
+
+    // Clear rows
+    for (Iterator<TableEvent> it = events.iterator(); it.hasNext();) {
+      TableEvent event = it.next();
+      if (typesToClear.contains(event.getType())) {
+        event.setRows(null);
       }
     }
   }
