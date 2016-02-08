@@ -21,79 +21,80 @@ import org.mockito.Mockito;
 @RunWithClientSession(TestEnvironmentClientSession.class)
 public class AbstractPageWithTableTest {
 
-  private AbstractPageWithTable<ITable> m_page = new AbstractPageWithTable<ITable>(false, null) {
-    @Override
-    protected ITable initTable() {
-      Cell statusCell = new Cell();
-      statusCell.setText("fooBar");
-
-      ITable table = Mockito.mock(ITable.class);
-      Mockito.when(table.getSummaryCell(Mockito.any(ITableRow.class))).thenReturn(statusCell);
-      return table;
-    }
-
-    @Override
-    protected IPage<ITable> createChildPageInternal(ITableRow row) {
-      return new AbstractPage<ITable>(false) {
-        @Override
-        protected ITable initTable() {
-          return null;
-        }
-      };
-    }
-  };
-
-  private TestSearchForm m_searchFormMock = null;
-  private AbstractPageWithTable<ITable> m_pageWithSearchForm = new AbstractPageWithTable<ITable>() {
-
-    @Override
-    protected ITable initTable() {
-      return Mockito.mock(ITable.class);
-    }
-
-    @Override
-    protected ISearchForm createSearchForm() {
-      TestSearchForm form = new TestSearchForm();
-      m_searchFormMock = Mockito.spy(form);
-      return m_searchFormMock;
-    }
-  };
-
   /**
    * This test checks whether or not all boolean flags are copied from the table-row to the new page object when the
    * virtual-node is resolved. Copying the rejectedByUser property solves the problem described in ticket #163450.
    */
   @Test
   public void testExecResolveVirtualChildNode() {
-    doTestExecResolveVirtualChildNode(true);
-    doTestExecResolveVirtualChildNode(false);
+    AbstractPageWithTable<ITable> page = new AbstractPageWithTable<ITable>(false, null) {
+      @Override
+      protected ITable initTable() {
+        Cell statusCell = new Cell();
+        statusCell.setText("fooBar");
+
+        ITable table = Mockito.mock(ITable.class);
+        Mockito.when(table.getSummaryCell(Mockito.any(ITableRow.class))).thenReturn(statusCell);
+        return table;
+      }
+
+      @Override
+      protected IPage<ITable> createChildPageInternal(ITableRow row) {
+        return new AbstractPage<ITable>(false) {
+          @Override
+          protected ITable initTable() {
+            return null;
+          }
+        };
+      }
+    };
+
+    doTestExecResolveVirtualChildNode(page, true);
+    doTestExecResolveVirtualChildNode(page, false);
   }
 
-  private void doTestExecResolveVirtualChildNode(boolean value) {
+  private void doTestExecResolveVirtualChildNode(AbstractPageWithTable<ITable> page, boolean value) {
     VirtualPage vpage = new VirtualPage();
     ITableRow tableRow = Mockito.mock(ITableRow.class);
     Mockito.when(tableRow.isFilterAccepted()).thenReturn(value);
     Mockito.when(tableRow.isRejectedByUser()).thenReturn(value);
     Mockito.when(tableRow.isEnabled()).thenReturn(value);
 
-    m_page.linkTableRowWithPage(tableRow, vpage);
-    ITreeNode childPage = m_page.execResolveVirtualChildNode(vpage);
+    page.linkTableRowWithPage(tableRow, vpage);
+    ITreeNode childPage = page.execResolveVirtualChildNode(vpage);
 
     assertEquals(value, childPage.isFilterAccepted());
     assertEquals(value, childPage.isRejectedByUser());
     assertEquals(value, childPage.isEnabled());
     assertEquals("fooBar", childPage.getCell().getText());
-    assertSame(tableRow, m_page.getTableRowFor(childPage));
+    assertSame(tableRow, page.getTableRowFor(childPage));
   }
 
   @Test
   public void doDisposeSearchForm() {
-    m_pageWithSearchForm.ensureSearchFormCreated();
-    m_pageWithSearchForm.ensureSearchFormStarted();
+    // Setup
+    final TestSearchForm searchForm = new TestSearchForm();
+    final TestSearchForm searchFormMock = Mockito.spy(searchForm);
+    AbstractPageWithTable<ITable> pageWithSearchForm = new AbstractPageWithTable<ITable>() {
 
-    Mockito.verify(m_searchFormMock, Mockito.times(0)).disposeFormInternal();
-    m_pageWithSearchForm.dispose();
-    Mockito.verify(m_searchFormMock, Mockito.times(1)).disposeFormInternal();
+      @Override
+      protected ITable initTable() {
+        return Mockito.mock(ITable.class);
+      }
+
+      @Override
+      protected ISearchForm createSearchForm() {
+        return searchFormMock;
+      }
+    };
+
+    // Begin test
+    pageWithSearchForm.ensureSearchFormCreated();
+    pageWithSearchForm.ensureSearchFormStarted();
+    Mockito.verify(searchFormMock, Mockito.times(0)).disposeFormInternal();
+
+    pageWithSearchForm.dispose();
+    Mockito.verify(searchFormMock, Mockito.times(1)).disposeFormInternal();
   }
 
   public static class TestSearchForm extends AbstractSearchForm {
