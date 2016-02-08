@@ -1716,7 +1716,7 @@ scout.Tree.prototype.onResize = function() {
 
 scout.Tree.prototype._onNodesInserted = function(nodes, parentNodeId) {
   var parentNode;
-  if (parentNodeId >= 0) {
+  if (parentNodeId !== null && parentNodeId !== undefined) {
     parentNode = this.nodesMap[parentNodeId];
     if (!parentNode) {
       throw new Error('Parent node could not be found. Id: ' + parentNodeId);
@@ -1731,7 +1731,7 @@ scout.Tree.prototype._onNodesUpdated = function(nodes) {
 
 scout.Tree.prototype._onNodesDeleted = function(nodeIds, parentNodeId) {
   var parentNode;
-  if (parentNodeId >= 0) {
+  if (parentNodeId !== null && parentNodeId !== undefined) {
     parentNode = this.nodesMap[parentNodeId];
     if (!parentNode) {
       throw new Error('Parent node could not be found. Id: ' + parentNodeId);
@@ -1743,7 +1743,7 @@ scout.Tree.prototype._onNodesDeleted = function(nodeIds, parentNodeId) {
 
 scout.Tree.prototype._onAllChildNodesDeleted = function(parentNodeId) {
   var parentNode;
-  if (parentNodeId >= 0) {
+  if (parentNodeId !== null && parentNodeId !== undefined) {
     parentNode = this.nodesMap[parentNodeId];
     if (!parentNode) {
       throw new Error('Parent node could not be found. Id: ' + parentNodeId);

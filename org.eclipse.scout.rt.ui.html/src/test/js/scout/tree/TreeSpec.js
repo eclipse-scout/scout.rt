@@ -44,11 +44,11 @@ describe("Tree", function() {
 
   function createModelNode(id, text, position) {
     return {
-      "id": id,
-      "text": text,
-      "childNodeIndex": position ? position : 0,
-      "enabled": true,
-      "checked": false
+      id: id + '' || scout.objectFactory.createUniqueId(),
+      text: text,
+      childNodeIndex: position ? position : 0,
+      enabled: true,
+      checked: false
     };
   }
 
@@ -71,7 +71,7 @@ describe("Tree", function() {
       if (parentNode) {
         nodeId = parentNode.id + '_' + nodeId;
       }
-      nodes[i] = createModelNode(nodeId, 'node ' + i);
+      nodes[i] = createModelNode(nodeId, 'node ' + nodeId);
       nodes[i].expanded = expanded;
       if (depth > 0) {
         nodes[i].childNodes = createModelNodesInternal(nodeCount, depth - 1, expanded, nodes[i]);
@@ -239,14 +239,14 @@ describe("Tree", function() {
         expect(node0.childNodes[3].$node.text()).toBe(newNode0Child4.text);
         expect(node0.childNodes[3].$node.attr('data-level')).toBe('1');
         expect(node0.childNodes[3].$node.next().attr('data-level')).toBe('1');
-        expect(node0.childNodes[3].$node.next().text()).toBe('node 2');
+        expect(node0.childNodes[3].$node.next().text()).toBe('node 0_2');
 
         var newNode1Child3 = createModelNode('1_3', 'newNode1Child3', 1);
         var newNode1Child4 = createModelNode('1_4', 'newNode1Child4', 2);
 
         tree.insertNodes([newNode1Child3, newNode1Child4]);
         expect(findAllNodes(tree).length).toBe(16);
-        expect(tree.nodes[1].$node.prev().text()).toBe('node 2');
+        expect(tree.nodes[1].$node.prev().text()).toBe('node 0_2');
         expect(tree.nodes[1].$node.prev().attr('data-level')).toBe('1');
         expect(tree.nodes[1].$node.text()).toBe(newNode1Child3.text);
         expect(tree.nodes[1].$node.attr('data-level')).toBe('0');
@@ -1406,6 +1406,45 @@ describe("Tree", function() {
       expect(tree.nodes[1].$node.isVisible()).toBe(false);
     });
 
+    it("applies filter if a node gets inserted", function() {
+      var model = createModelFixture(2, 1, true);
+      var tree = createTree(model);
+      var filter = {
+        accept: function(node) {
+          return node.text === 'node 0';
+        }
+      };
+      tree.addFilter(filter);
+      tree.render(session.$entryPoint);
+
+      expect(tree.nodes[0].childNodes.length).toBe(2);
+      expect(tree.nodes[0].$node.isVisible()).toBe(true);
+      expect(tree.nodes[1].$node.isVisible()).toBe(false);
+
+      var newNode = createModelNode('', 'newNode0Child1');
+      tree.insertNodes([newNode], tree.nodes[0], 2);
+
+      expect(tree.nodes[0].childNodes.length).toBe(3);
+      expect(tree.nodes[0].$node.isVisible()).toBe(true);
+      expect(tree.nodes[1].$node.isVisible()).toBe(false);
+      expect(tree.nodes[0].childNodes[0].$node.isVisible()).toBe(false);
+      expect(tree.nodes[0].childNodes[1].$node.isVisible()).toBe(false);
+      expect(tree.nodes[0].childNodes[2].$node.isVisible()).toBe(false);
+      expect(tree.nodes[0].childNodes[2].filterAccepted).toBe(false);
+
+      newNode = createModelNode('', 'node 0', 3);
+      tree.insertNodes([newNode], tree.nodes[0]);
+
+      expect(tree.nodes[0].childNodes.length).toBe(4);
+      expect(tree.nodes[0].$node.isVisible()).toBe(true);
+      expect(tree.nodes[1].$node.isVisible()).toBe(false);
+      expect(tree.nodes[0].childNodes[0].$node.isVisible()).toBe(false);
+      expect(tree.nodes[0].childNodes[1].$node.isVisible()).toBe(false);
+      expect(tree.nodes[0].childNodes[2].$node.isVisible()).toBe(false);
+      expect(tree.nodes[0].childNodes[2].filterAccepted).toBe(false);
+      expect(tree.nodes[0].childNodes[3].$node.isVisible()).toBe(true);
+      expect(tree.nodes[0].childNodes[3].filterAccepted).toBe(true);
+    });
   });
 
   describe("onModelAction", function() {

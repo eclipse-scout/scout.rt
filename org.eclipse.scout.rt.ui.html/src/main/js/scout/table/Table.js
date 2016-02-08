@@ -2540,6 +2540,7 @@ scout.Table.prototype._applyFilters = function(rows) {
 
   rows.forEach(function(row) {
     if (this._applyFiltersForRow(row)) {
+      filterChanged = true;
       if (!row.filterAccepted) {
         newHiddenRows.push(row);
       }
