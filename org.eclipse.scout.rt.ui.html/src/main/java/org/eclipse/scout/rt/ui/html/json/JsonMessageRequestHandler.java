@@ -133,8 +133,21 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
         break;
     }
 
-    // GUI requests for the same session must be processed consecutively
-    uiSession.uiSessionLock().lock();
+    // GUI requests for the same session must be processed consecutively, therefore acquire "UI session lock"
+    if (jsonRequest.getRequestType() == RequestType.POLL_REQUEST) {
+      // Special case: Poll requests should only *try* to acquire the lock. If the lock is currently acquired
+      // by some other thread, there is no reason to wait for it, because the other thread will already send
+      // the entire JSON response to the UI. Waiting for too long here could cause the UI session to time out,
+      // because the poller-induced "heart beat" mechanism would stop. Therefore, if the lock cannot be acquired,
+      // and empty response is sent back to the UI.
+      if (!uiSession.uiSessionLock().tryLock()) {
+        writeJsonResponse(httpServletResponse, m_jsonRequestHelper.createEmptyResponse());
+        return;
+      }
+    }
+    else {
+      uiSession.uiSessionLock().lock();
+    }
     try {
       if (uiSession.isDisposed()) {
         handleUiSessionDisposed(httpServletResponse, uiSession, jsonRequest);
