@@ -9,17 +9,14 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 /**
- * $entryPoint and uiSessionId (in the options object) are required to create a new session.
+ * $entryPoint is required to create a new session.
  *
  * The 'options' argument holds all optional values that may be used during
  * initialization (it is the same object passed to the scout.init() function).
  * The following 'options' properties are read by this constructor function:
- *   [uiSessionId]
- *     Mandatory UI session id, must be unique.
  *   [portletPartId]
  *     Optional, default is 0. Necessary when multiple UI sessions are managed
  *     by the same window (portlet support). Each session's partId must be unique.
- *     (Usually, the partId is also part of the uiSessionId.)
  *   [clientSessionId]
  *     Identifies the 'client instance' on the UI server. If the property is not set
  *     (which is the default case), the clientSessionId is taken from the browser's
@@ -50,7 +47,7 @@ scout.Session = function($entryPoint, options) {
 
   // Set members
   this.$entryPoint = $entryPoint;
-  this.uiSessionId = options.uiSessionId;
+  this.uiSessionId; // assigned by server on session init (OWASP recommandation, see https://www.owasp.org/index.php/Cross-Site_Request_Forgery_%28CSRF%29_Prevention_Cheat_Sheet#General_Recommendation:_Synchronizer_Token_Pattern).
   this.partId = scout.nvl(options.portletPartId, 0);
   this.clientSessionId = clientSessionId;
   this.userAgent = options.userAgent || new scout.UserAgent(scout.device.type);
@@ -77,7 +74,6 @@ scout.Session = function($entryPoint, options) {
   this._loggedOut = false;
   this.uiUseTaskbarLogo = options.uiUseTaskbarLogo;
 
-  this.modelAdapterRegistry[this.uiSessionId] = this; // FIXME cgu: maybe better separate session object from event processing, create ClientSession.js?. If yes, desktop should not have rootadapter as parent, see 406
   this.rootAdapter = new scout.ModelAdapter();
   this.rootAdapter.init({
     parent: new scout.NullWidget(),
@@ -230,8 +226,8 @@ scout.Session.prototype.sendEvent = function(event, delay) {
 scout.Session.prototype._sendStartupRequest = function() {
   // Build startup request (see JavaDoc for JsonStartupRequest.java for details)
   var request = {
-    uiSessionId: this.uiSessionId,
-    startup: true
+    startup: true,
+    partId: this.partId
   };
   if (this.clientSessionId) {
     request.clientSessionId = this.clientSessionId;
@@ -877,6 +873,8 @@ scout.Session.prototype.sendLogRequest = function(message) {
 
   // Do not use _sendRequest to make sure a log request has no side effects and will be sent only once
   var ajaxOptions = this.defaultAjaxOptions(request);
+  // Add dummy parameter as marker (for debugging purposes)
+  ajaxOptions.url = new scout.URL(ajaxOptions.url).addParameter('log').toString();
   $.ajax(ajaxOptions);
 };
 
@@ -900,6 +898,13 @@ scout.Session.prototype._processEvents = function(events) {
     this.currentEvent = event;
 
     $.log.debug("Processing event '" + event.type + "' for adapter with ID " + event.target);
+
+    // Auto register UI session on 'initialized' event // TODO BSH Check if it is possible to handle startup in an own request
+    if (!this.uiSessionId && event.type === 'initialized') {
+      this.uiSessionId = event.target;
+      this.modelAdapterRegistry[this.uiSessionId] = this; // FIXME cgu: maybe better separate session object from event processing, create ClientSession.js?. If yes, desktop should not have rootadapter as parent, see 406
+    }
+
     adapter = this.getModelAdapter(event.target);
     if (!adapter) {
       // FIXME bsh, cgu: Check if this should only be getModelAdapter()

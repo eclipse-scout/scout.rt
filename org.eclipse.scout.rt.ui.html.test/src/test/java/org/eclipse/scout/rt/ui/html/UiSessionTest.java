@@ -82,8 +82,8 @@ public class UiSessionTest {
 
   @Test
   public void testLogout() throws Exception {
-    IUiSession uiSession = JsonTestUtility.createAndInitializeUiSession();
-    HttpSession httpSession = uiSession.currentHttpSession();
+    UiSession uiSession = (UiSession) JsonTestUtility.createAndInitializeUiSession();
+    HttpSession httpSession = getHttpSession(uiSession);
 
     uiSession.getClientSession().stop();
 
@@ -97,16 +97,17 @@ public class UiSessionTest {
   @Test
   public void testSessionInvalidation() throws Exception {
     UiSession uiSession = (UiSession) JsonTestUtility.createAndInitializeUiSession();
+    HttpSession httpSession = getHttpSession(uiSession);
     IClientSession clientSession = uiSession.getClientSession();
     assertFalse(uiSession.isDisposed());
 
     // Don't waste time waiting for client jobs to finish. Test job itself runs inside a client job so we always have to wait until max time
     WeakReference<IUiSession> ref = new WeakReference<IUiSession>(uiSession);
-    ISessionStore sessionStore = BEANS.get(HttpSessionHelper.class).getSessionStore(uiSession.currentHttpSession());
+    ISessionStore sessionStore = BEANS.get(HttpSessionHelper.class).getSessionStore(httpSession);
     sessionStore.registerUiSession(uiSession);
 
     JsonTestUtility.endRequest(uiSession);
-    uiSession.currentHttpSession().invalidate();
+    httpSession.invalidate();
     BEANS.get(UiJobs.class).awaitModelJobs(clientSession, JUnitExceptionHandler.class);
     assertFalse(clientSession.isActive());
     assertTrue(uiSession.isDisposed());
@@ -120,5 +121,12 @@ public class UiSessionTest {
    */
   public static JsonAdapterRegistry getJsonAdapterRegistry(UiSession session) {
     return session.getJsonAdapterRegistry();
+  }
+
+  /**
+   * helper method for unit tests to access protected method "sessionStore().getHttpSession()"
+   */
+  public static HttpSession getHttpSession(UiSession session) {
+    return session.sessionStore().getHttpSession();
   }
 }

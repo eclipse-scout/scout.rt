@@ -70,11 +70,9 @@ scout._init = function(options) {
   this._installGlobalJavascriptErrorHandler();
   this._installGlobalMouseDownInterceptor(document);
 
-  var tabId = scout.dates.timestamp();
   $('.scout').each(function() {
     var $entryPoint = $(this);
     options.portletPartId = options.portletPartId || $entryPoint.data('partid') || '0';
-    options.uiSessionId = options.uiSessionId || scout.strings.join(':', options.portletPartId, tabId);
     var session = new scout.Session($entryPoint, options);
     session.init();
     scout.sessions.push(session);

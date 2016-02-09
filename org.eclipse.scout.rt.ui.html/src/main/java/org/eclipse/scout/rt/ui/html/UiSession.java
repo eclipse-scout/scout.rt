@@ -10,10 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html;
 
+import java.math.BigInteger;
 import java.security.AccessController;
+import java.security.SecureRandom;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -86,6 +89,8 @@ public class UiSession implements IUiSession {
   private static final String EVENT_DISPOSE_ADAPTER = "disposeAdapter";
   private static final String EVENT_RELOAD_PAGE = "reloadPage";
 
+  private static final Random RANDOM = new SecureRandom();
+
   private final JsonAdapterRegistry m_jsonAdapterRegistry;
   private final P_RootAdapter m_rootJsonAdapter;
 
@@ -102,7 +107,6 @@ public class UiSession implements IUiSession {
    * different threads, thus all methods on HttpContext are synchronized.
    */
   private final HttpContext m_currentHttpContext = new HttpContext();
-  private volatile HttpSession m_currentHttpSession;
   private final JsonEventProcessor m_jsonEventProcessor;
   private volatile boolean m_processingJsonRequest;
   private volatile boolean m_disposing;
@@ -251,12 +255,12 @@ public class UiSession implements IUiSession {
     try {
       m_currentHttpContext.set(req, resp);
       m_currentJsonRequest = jsonStartupReq;
-
-      m_uiSessionId = jsonStartupReq.getUiSessionId();
       HttpSession httpSession = req.getSession();
-      m_currentHttpSession = httpSession;
 
-      // Remember it here, because getting the store from an invalidated httpSession does not work (there might even be dead locks!)
+      // Assign uiSessionId (https://www.owasp.org/index.php/Cross-Site_Request_Forgery_%28CSRF%29_Prevention_Cheat_Sheet#General_Recommendation:_Synchronizer_Token_Pattern)
+      m_uiSessionId = createUiSessionId(jsonStartupReq);
+
+      // Remember the store here, because getting it from an invalidated httpSession does not work (there might even be dead locks!)
       m_sessionStore = BEANS.get(HttpSessionHelper.class).getSessionStore(httpSession);
 
       // Look up the requested client session (create and start a new one if necessary)
@@ -292,6 +296,11 @@ public class UiSession implements IUiSession {
       m_currentHttpContext.clear();
       m_currentJsonRequest = null;
     }
+  }
+
+  protected String createUiSessionId(JsonStartupRequest jsonStartupReq) {
+    String id = new BigInteger(130, RANDOM).toString(32); // http://stackoverflow.com/questions/29183818/why-use-tostring32-and-not-tostring36
+    return jsonStartupReq.getPartId() + ":" + id;
   }
 
   /**
@@ -493,7 +502,6 @@ public class UiSession implements IUiSession {
     m_jsonAdapterRegistry.disposeAdapters();
     m_currentHttpContext.clear();
     m_currentJsonResponse = null;
-    m_currentHttpSession = null;
   }
 
   @Override
@@ -625,11 +633,6 @@ public class UiSession implements IUiSession {
     return m_currentHttpContext.getResponse();
   }
 
-  @Override
-  public HttpSession currentHttpSession() {
-    return m_currentHttpSession;
-  }
-
   public JsonEventProcessor jsonEventProcessor() {
     return m_jsonEventProcessor;
   }
@@ -661,7 +664,7 @@ public class UiSession implements IUiSession {
         BEANS.get(UiJobs.class).awaitModelJobs(m_clientSession, ExceptionHandler.class);
       }
       finally {
-        // Reset this flag _before_ the "response-to-json" job (#3), because to the response while transforming would be unsafe and unreliable.
+        // Reset this flag _before_ the "response-to-json" job (#3), because writing to the response while transforming would be unsafe and unreliable.
         m_processingJsonRequest = false;
       }
 
@@ -736,21 +739,28 @@ public class UiSession implements IUiSession {
 
     m_currentHttpContext.set(req, res);
     try {
-      // 1. Process the JSON request.
-      ModelJobs.schedule(new IRunnable() {
+      m_processingJsonRequest = true;
+      try {
+        // 1. Process the JSON request.
+        ModelJobs.schedule(new IRunnable() {
 
-        @Override
-        public void run() throws Exception {
-          resourceConsumer.consumeBinaryResource(uploadResources, uploadProperties);
-        }
-      }, ModelJobs.newInput(clientRunContext)
-          .withName("Processing file upload request")
-          // Handle exceptions instantaneously in job manager, and not by submitter.
-          // That is because the submitting thread might not be waiting anymore, because interrupted or returned because requiring 'user interaction'.
-          .withExceptionHandling(BEANS.get(ExceptionHandler.class), true));
+          @Override
+          public void run() throws Exception {
+            resourceConsumer.consumeBinaryResource(uploadResources, uploadProperties);
+          }
+        }, ModelJobs.newInput(clientRunContext)
+            .withName("Processing file upload request")
+            // Handle exceptions instantaneously in job manager, and not by submitter.
+            // That is because the submitting thread might not be waiting anymore, because interrupted or returned because requiring 'user interaction'.
+            .withExceptionHandling(BEANS.get(ExceptionHandler.class), true));
 
-      // 2. Wait for all model jobs of the session.
-      BEANS.get(UiJobs.class).awaitModelJobs(m_clientSession, ExceptionHandler.class);
+        // 2. Wait for all model jobs of the session.
+        BEANS.get(UiJobs.class).awaitModelJobs(m_clientSession, ExceptionHandler.class);
+      }
+      finally {
+        // Reset this flag _before_ the "response-to-json" job (#3), because writing to the response while transforming would be unsafe and unreliable.
+        m_processingJsonRequest = false;
+      }
 
       // 3. Transform the response to JSON.
       final IFuture<JSONObject> future = ModelJobs.schedule(newResponseToJsonTransformer(), ModelJobs.newInput(clientRunContext.copy()
@@ -856,7 +866,7 @@ public class UiSession implements IUiSession {
 
   @Override
   public void updateTheme(String theme) {
-    UiThemeUtility.storeTheme(currentHttpResponse(), m_currentHttpSession, theme);
+    UiThemeUtility.storeTheme(currentHttpResponse(), m_sessionStore.getHttpSession(), theme);
     sendReloadPageEvent();
     LOG.info("UI theme changed to: {}", theme);
   }

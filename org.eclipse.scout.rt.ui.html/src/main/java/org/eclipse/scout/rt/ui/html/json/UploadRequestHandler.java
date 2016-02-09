@@ -40,6 +40,7 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.ui.html.AbstractUiServletRequestHandler;
 import org.eclipse.scout.rt.ui.html.HttpSessionHelper;
+import org.eclipse.scout.rt.ui.html.ISessionStore;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.UiRunContexts;
 import org.eclipse.scout.rt.ui.html.UiServlet;
@@ -77,15 +78,26 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
       return false;
     }
 
+    final long startNanos = System.nanoTime();
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("File upload started");
+    }
+
     try {
-      // Resolve session
-      IUiSession uiSession = resolveUiSession(req, uiSessionId);
+      // Get and validate existing UI session
+      IUiSession uiSession = getUiSession(req, uiSessionId);
+      if (uiSession == null) {
+        throw new IllegalStateException("Could not resolve UI session with ID " + uiSessionId);
+      }
+
+      // Touch the session
+      uiSession.touch();
+      final IUiSession uiSession1 = uiSession;
 
       // Associate subsequent processing with the uiSession.
       UiRunContexts.copyCurrent()
-          .withSession(uiSession)
+          .withSession(uiSession1)
           .run(new IRunnable() {
-
             @Override
             public void run() throws Exception {
               handleUploadFileRequest(IUiSession.CURRENT.get(), req, resp, targetAdapterId);
@@ -96,18 +108,15 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
       LOG.error("Unexpected error while handling multipart upload request", e);
       writeJsonResponse(resp, m_jsonRequestHelper.createUnrecoverableFailureResponse());
     }
+    finally {
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("File upload completed in {} ms", StringUtility.formatNanos(System.nanoTime() - startNanos));
+      }
+    }
     return true;
   }
 
-  /**
-   * Method invoked to handle a file upload request from UI.
-   */
   protected void handleUploadFileRequest(IUiSession uiSession, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, String targetAdapterId) throws IOException, FileUploadException {
-    long start = System.nanoTime();
-    if (LOG.isDebugEnabled()) {
-      LOG.debug("Fileupload started");
-    }
-
     IBinaryResourceConsumer binaryResourceConsumer = resolveJsonAdapter(uiSession, targetAdapterId);
     if (binaryResourceConsumer == null) {
       //Request was already processed and adapter does not exist anymore;
@@ -138,9 +147,6 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
     }
     finally {
       uiSession.uiSessionLock().unlock();
-    }
-    if (LOG.isDebugEnabled()) {
-      LOG.debug("completed in {} ms", StringUtility.formatNanos(System.nanoTime() - start));
     }
   }
 
@@ -175,17 +181,10 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
     }
   }
 
-  protected IUiSession resolveUiSession(HttpServletRequest httpReq, String uiSessionId) {
-    if (!StringUtility.hasText(uiSessionId)) {
-      throw new IllegalArgumentException("Missing UI session ID.");
-    }
-    HttpSession httpSession = httpReq.getSession();
-    IUiSession uiSession = m_httpSessionHelper.getSessionStore(httpSession).getUiSession(uiSessionId);
-    if (uiSession == null) {
-      throw new IllegalStateException("Could not resolve UI session with ID " + uiSessionId);
-    }
-    uiSession.touch();
-    return uiSession;
+  protected IUiSession getUiSession(HttpServletRequest req, String uiSessionId) throws ServletException, IOException {
+    HttpSession httpSession = req.getSession();
+    ISessionStore sessionStore = m_httpSessionHelper.getSessionStore(httpSession);
+    return sessionStore.getUiSession(uiSessionId);
   }
 
   /**

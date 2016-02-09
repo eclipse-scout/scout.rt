@@ -23,17 +23,18 @@ function sandboxSession(options) {
 
   $sandbox.addClass('scout');
   options = options || {};
-  options.uiSessionId = options.uiSessionId || '1.1';
   options.portletPartId = options.portletPartId || '0';
   options.backgroundJobPollingEnabled = false;
   options.suppressErrors = true;
   session = new scout.Session($sandbox, options);
+  // Simulate successful session initialization
+  session.uiSessionId = '1.1';
+  session.modelAdapterRegistry[session.uiSessionId] = session;
   session.locale = new LocaleSpecHelper().createLocale(LocaleSpecHelper.DEFAULT_LOCALE);
   session.desktop = scout.create('Desktop', {
     parent: session.rootAdapter
   });
   session._renderDesktop();
-  session.focusManager = new scout.FocusManager(session);
 
   return session;
 }

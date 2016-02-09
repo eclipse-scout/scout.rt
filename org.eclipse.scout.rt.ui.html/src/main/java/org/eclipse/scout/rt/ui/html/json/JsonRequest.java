@@ -15,10 +15,14 @@ import java.util.List;
 
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
+import org.eclipse.scout.rt.platform.util.CompareUtility;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class JsonRequest {
+  private static final Logger LOG = LoggerFactory.getLogger(JsonRequest.class);
 
   /**
    * The {@link JsonRequest} which is currently associated with the current thread.
@@ -34,23 +38,42 @@ public class JsonRequest {
 
   public static final String PROP_UI_SESSION_ID = "uiSessionId";
   public static final String PROP_EVENTS = "events";
+  public static final String PROP_EVENT = "event";
+  public static final String PROP_MESSAGE = "message";
 
   private final JSONObject m_request;
   private final RequestType m_requestType;
 
   /**
-   * Creates a new JsonRequest instance.
+   * Creates a new (validated) JsonRequest instance.
    *
    * @throws AssertionException
-   *           if mandatory property 'uiSessionId' is not set for a request other than 'PING' request.
+   *           if mandatory property 'uiSessionId' is not set for a request other than 'STARTUP' or 'PING' request.
    */
   public JsonRequest(JSONObject request) {
     final RequestType requestType = RequestType.valueOf(request);
-    Assertions.assertTrue(requestType == RequestType.PING_REQUEST || request.has(PROP_UI_SESSION_ID),
-        "Missing property '{}' in request {}", PROP_UI_SESSION_ID, request);
-
+    validate(requestType, request);
     m_requestType = requestType;
     m_request = request;
+  }
+
+  protected void validate(final RequestType requestType, JSONObject request) {
+    // Ensure request contains an UI session ID, except for the startup and the ping request
+    if (!CompareUtility.isOneOf(requestType, RequestType.STARTUP_REQUEST, RequestType.PING_REQUEST)) {
+      Assertions.assertTrue(request.has(PROP_UI_SESSION_ID), "Missing property '{}' in request {}", PROP_UI_SESSION_ID, request);
+    }
+
+    // Only normal /json requests may send events.
+    if (requestType != RequestType.REQUEST && request.has(PROP_EVENTS)) {
+      request.remove(PROP_EVENTS);
+
+      String requestAsString = request.toString();
+      if (requestAsString.length() > 10000) {
+        // Truncate the message to prevent log inflation by malicious requests
+        requestAsString = requestAsString.substring(0, 10000) + "...";
+      }
+      LOG.info("Request contains unexpected attribute '{}': {}", PROP_EVENTS, requestAsString);
+    }
   }
 
   protected JSONObject getRequestObject() {
@@ -58,7 +81,7 @@ public class JsonRequest {
   }
 
   public String getUiSessionId() {
-    return m_request.getString(PROP_UI_SESSION_ID);
+    return m_request.optString(PROP_UI_SESSION_ID, null);
   }
 
   public List<JsonEvent> getEvents() {
@@ -79,6 +102,20 @@ public class JsonRequest {
    */
   public RequestType getRequestType() {
     return m_requestType;
+  }
+
+  /**
+   * @return attribute {@link #PROP_EVENT} (for type {@link RequestType#LOG_REQUEST})
+   */
+  public JSONObject getEvent() {
+    return m_request.optJSONObject(PROP_EVENT);
+  }
+
+  /**
+   * @return attribute {@link #PROP_MESSAGE} (for type {@link RequestType#LOG_REQUEST})
+   */
+  public String getMessage() {
+    return m_request.optString(PROP_MESSAGE, null);
   }
 
   @Override

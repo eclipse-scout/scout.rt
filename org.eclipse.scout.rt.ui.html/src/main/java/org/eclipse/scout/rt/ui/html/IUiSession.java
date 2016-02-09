@@ -103,8 +103,6 @@ public interface IUiSession {
 
   HttpServletResponse currentHttpResponse();
 
-  HttpSession currentHttpSession();
-
   /**
    * @return a JSON object to send back to the client or <code>null</code> if an empty response shall be sent.
    */
