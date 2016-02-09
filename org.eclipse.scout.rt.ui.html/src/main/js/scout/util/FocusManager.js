@@ -50,15 +50,15 @@ scout.FocusManager.prototype.installTopLevelMouseHandlers = function($container)
 
 scout.FocusManager.prototype._handleIEEvent = function(event) {
   var $element = $(event.target),
-  selectableElements = '[tabindex]:not([tabindex=-1]), radio, a[href], area[href], input:not([disabled]),select:not([disabled]),textarea:not([disabled]),button:not([disabled]),iframe';
+    selectableElements = '[tabindex]:not([tabindex=-1]), radio, a[href], area[href], input:not([disabled]),select:not([disabled]),textarea:not([disabled]),button:not([disabled]),iframe';
   if (scout.device.browser === scout.Device.Browser.INTERNET_EXPLORER &&
     $element.not(selectableElements).length > 0 &&
     $element.closest('[contenteditable="true"]').length === 0 &&
     (($element.css('user-select') && $element.css('user-select') === 'none') ||
-        (!$element.css('user-select') && $element.closest('div').not('[unselectable="on"]').length===0)) //IE 9 has no user-select
-    ) {
+      (!$element.css('user-select') && $element.closest('div').not('[unselectable="on"]').length === 0)) //IE 9 has no user-select
+  ) {
     var $elementToFocus = $element.closest(selectableElements);
-   if ($elementToFocus) {
+    if ($elementToFocus) {
       this.requestFocus($elementToFocus.get(0));
     }
     event.preventDefault();
@@ -228,7 +228,7 @@ scout.FocusManager.prototype.findFirstFocusableElement = function($container, fi
       continue;
     }
 
-    if (!firstElement) {
+    if (!firstElement && !($candidate.hasClass('button') || $candidate.hasClass('menu-item'))) {
       firstElement = candidate;
     }
 
@@ -245,8 +245,20 @@ scout.FocusManager.prototype.findFirstFocusableElement = function($container, fi
       return candidate;
     }
   }
-
-  return firstDefaultButton || firstButton || firstElement;
+  if (firstDefaultButton) {
+    return firstDefaultButton;
+  } else if (firstButton) {
+    if (firstButton !== firstElement && firstElement) {
+      var $tabParentsButton = $(firstButton).parents('.tab-area'),
+        $firstItem = $(firstElement),
+        $tabParentsFirstElement = $(firstElement).parents('.tab-area');
+      if ($tabParentsFirstElement.length > 0 && $tabParentsButton.length > 0 && $firstItem.is('.tab-item')) {
+        return firstElement;
+      }
+    }
+    return firstButton;
+  }
+  return firstElement;
 };
 
 /**

@@ -106,12 +106,21 @@ scout.TabBox.prototype.rebuildTabs = function() {
   // FIXME awe: (tab-box) refactor this and work with a clone in the TabBoxLayout - when we remove an existing
   // DOM element which currently has the focus - the focus is lost. An other solution would be, to render the
   // tab at the correct position but probably that's not so easy because the render impl. does always append.
+  // Temporary focus fix
+  var $focusedElement = $(document.activeElement),
+    focusedElement = null;
+  if ($focusedElement.is('.tab-item')) {
+    focusedElement = $focusedElement.data('tabItem');
+  }
   this.tabItems.forEach(function(tabItem) {
     if (tabItem._tabRendered) {
       tabItem.removeTab();
     }
   }, this);
   this._renderTabs();
+  if (focusedElement) {
+    this.session.focusManager.requestFocus(focusedElement.$tabContainer);
+  }
 };
 
 scout.TabBox.prototype._selectTab = function(tabItem, notifyServer) {
@@ -219,4 +228,3 @@ scout.TabBox.prototype.updateMenuBar = function() {
 scout.TabBox.prototype.getFields = function() {
   return this.tabItems;
 };
-
