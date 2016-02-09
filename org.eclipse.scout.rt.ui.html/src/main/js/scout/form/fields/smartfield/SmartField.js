@@ -39,6 +39,7 @@ scout.SmartField = function() {
   this._popup;
   this._requestedProposal = false;
   this._tabPrevented = null;
+  this._pendingProposalTyped = null;
 };
 scout.inherits(scout.SmartField, scout.ValueField);
 
@@ -230,7 +231,7 @@ scout.SmartField.prototype._onKeyDown = function(e) {
 
   if (this._isNavigationKey(e)) {
     if (this.proposalChooser) {
-      this.proposalChooser.delegateEvent(e);
+      this._delegateToProposalChooser(e);
     } else {
       // Since this is the keyDown handler we cannot access the typed text here
       // But when the user presses the down arrow, we can open the proposal
@@ -239,6 +240,21 @@ scout.SmartField.prototype._onKeyDown = function(e) {
       this._openProposal(true);
     }
   }
+};
+
+/**
+ * Before we delegate to the proposal chooser, we must make sure that no proposal-typed
+ * events are pending (debounce). Otherwise the proposal chooser event is executed _before_
+ * the proposal-typed event, which would destroy the selection in the proposal chooser,
+ * since the proposal chooser is reloaded, when the search-text changes.
+ */
+scout.SmartField.prototype._delegateToProposalChooser = function(event) {
+  if (this._pendingProposalTyped) {
+    // execute pending proposal typed event immediately
+    this._pendingProposalTyped.func();
+    this._clearPendingProposalTyped();
+  }
+  this.proposalChooser.delegateEvent(event);
 };
 
 scout.SmartField.prototype._onKeyUp = function(e) {
@@ -291,13 +307,17 @@ scout.SmartField.prototype._proposalTyped = function() {
   this.displayText = searchText;
 
   // debounce send
-  clearTimeout(this._sendTimeoutId);
-  this._sendTimeoutId = setTimeout(function() {
+  var id, func;
+  this._clearPendingProposalTyped();
+
+  func = function() {
     $.log.debug('(SmartField#_proposalTyped) send searchText=' + searchText);
     this._send('proposalTyped', {
       searchText: searchText
     });
-  }.bind(this), this.DEBOUNCE_DELAY);
+  }.bind(this);
+  id = setTimeout(func, this.DEBOUNCE_DELAY);
+  this._pendingProposalTyped = {func: func, id: id};
 };
 
 /**
@@ -331,6 +351,13 @@ scout.SmartField.prototype._onFieldBlur = function() {
   }
 };
 
+scout.SmartField.prototype._clearPendingProposalTyped = function() {
+  if (this._pendingProposalTyped) {
+    clearTimeout(this._pendingProposalTyped.id);
+  }
+  this._pendingProposalTyped = null;
+};
+
 /**
  * This method is called when the user presses the TAB or ENTER key in the UI, or when _onFieldBlur()
  * or acceptInput(). In case the field is a proposal-field we must send the current searchText
@@ -340,8 +367,7 @@ scout.SmartField.prototype._onFieldBlur = function() {
 scout.SmartField.prototype._acceptProposal = function(forceClose) {
   // must clear pending "proposalTyped" events because nothing good happens
   // when proposalTyped arrives _after_ an "acceptProposal" event.
-  clearTimeout(this._sendTimeoutId);
-  this._sendTimeoutId = null;
+  this._clearPendingProposalTyped();
 
   forceClose = scout.nvl(forceClose, false);
   var proposalChooserOpen = !!this.proposalChooser,
