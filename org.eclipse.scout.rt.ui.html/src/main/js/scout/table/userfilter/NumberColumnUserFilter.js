@@ -71,7 +71,7 @@ scout.NumberColumnUserFilter.prototype._onDisplayTextChanged = function(event) {
   // FIXME AWE: (filter) discuss with C.GU... unser NumberField.js kann keinen value (numeric) liefern, richtig?
   // Das field sollte etwas wie getValue() haben das eine fixfertige number liefert anstatt der konvertierung hier
   this.numberFrom = this._toNumber(this.numberFromField.displayText),
-  this.numberTo = this._toNumber(this.numberToField.displayText);
+    this.numberTo = this._toNumber(this.numberToField.displayText);
   $.log.debug('(NumberColumnUserFilter#_onDisplayTextChanged) numberFrom=' + this.numberFrom + ' numberTo=' + this.numberTo);
   this.triggerFilterFieldsChanged(event);
 };
@@ -89,4 +89,13 @@ scout.NumberColumnUserFilter.prototype._toNumber = function(numberString) {
   }
 
   return number;
+};
+
+scout.NumberColumnUserFilter.prototype.modifyFilterFields = function() {
+  this.numberFromField.$field.on('input', '', $.debounce(function() {
+    this.numberFromField.acceptInput(true);
+  }.bind(this)));
+  this.numberToField.$field.on('input', '', $.debounce(function() {
+    this.numberToField.acceptInput(true);
+  }.bind(this)));
 };

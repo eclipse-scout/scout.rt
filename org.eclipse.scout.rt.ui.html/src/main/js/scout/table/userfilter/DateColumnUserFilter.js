@@ -61,7 +61,7 @@ scout.DateColumnUserFilter.prototype.acceptByFields = function(key, normKey, row
   var
     keyValue = key.valueOf(),
     fromValue = this.dateFrom ? this.dateFrom.valueOf() : null,
-    toValue  = this.dateTo ? this.dateTo.valueOf() : null;
+    toValue = this.dateTo ? this.dateTo.valueOf() : null;
   if (fromValue && toValue) {
     return keyValue >= fromValue && keyValue <= toValue;
   } else if (fromValue) {
@@ -107,7 +107,28 @@ scout.DateColumnUserFilter.prototype.addFilterFields = function(groupBox) {
 
 scout.DateColumnUserFilter.prototype._onDisplayTextChanged = function(event) {
   this.dateFrom = this.dateFromField.timestampAsDate,
-  this.dateTo = this.dateToField.timestampAsDate;
+    this.dateTo = this.dateToField.timestampAsDate;
   $.log.debug('(DateColumnUserFilter#_onDisplayTextChanged) dateFrom=' + this.dateFrom + ' dateTo=' + this.dateTo);
+  this.triggerFilterFieldsChanged(event);
+};
+
+scout.DateColumnUserFilter.prototype.modifyFilterFields = function() {
+  this.dateFromField.$field.on('input', '', $.debounce(this._onInput.bind(this)));
+  this.dateToField.$field.on('input', '', $.debounce(this._onInput.bind(this)));
+};
+
+scout.DateColumnUserFilter.prototype._onInput = function(event) {
+  var datePrediction = this.dateFromField._predictDate(this.dateFromField.$dateField.val()); // this also updates the errorStatus
+  if (datePrediction) {
+    if (datePrediction.date) {
+      this.dateFrom = this.dateFromField._newTimestampAsDate(datePrediction.date, this.dateFromField.timestampAsDate);
+    }
+  }
+  var datePredictionTo = this.dateToField._predictDate(this.dateToField.$dateField.val()); // this also updates the errorStatus
+  if (datePredictionTo) {
+    if (datePredictionTo.date) {
+      this.dateTo = this.dateToField._newTimestampAsDate(datePredictionTo.date, this.dateToField.timestampAsDate);
+    }
+  }
   this.triggerFilterFieldsChanged(event);
 };

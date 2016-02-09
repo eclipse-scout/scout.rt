@@ -25,8 +25,8 @@ scout.TextColumnUserFilter.prototype.fieldsFilterActive = function() {
 };
 
 /**
-* @override ColumnUserFilter.js
-*/
+ * @override ColumnUserFilter.js
+ */
 scout.TextColumnUserFilter.prototype.acceptByFields = function(key, normKey, row) {
   var filterFieldText = scout.strings.nvl(this.freeText).toLowerCase(),
     rowText = scout.strings.nvl(this.column.cellTextForTextFilter(row)).toLowerCase();
@@ -64,7 +64,7 @@ scout.TextColumnUserFilter.prototype.addFilterFields = function(groupBox) {
 };
 
 scout.TextColumnUserFilter.prototype._onDisplayTextChanged = function(event) {
-  this.freeText = event.displayText.trim();
+  this.freeText = this.freeTextField.$field.val().trim();
   $.log.debug('(TextColumnUserFilter#_onDisplayTextChanged) freeText=' + this.freeText);
   this.triggerFilterFieldsChanged(event);
 };
@@ -75,4 +75,7 @@ scout.TextColumnUserFilter.prototype._onDisplayTextChanged = function(event) {
 scout.TextColumnUserFilter.prototype.modifyFilterFields = function() {
   this.freeTextField.$mandatory.remove();
   this.freeTextField.$mandatory = null;
+  this.freeTextField.$field.on('input', '', $.debounce(function() {
+    this.freeTextField.acceptInput(true);
+  }.bind(this)));
 };
