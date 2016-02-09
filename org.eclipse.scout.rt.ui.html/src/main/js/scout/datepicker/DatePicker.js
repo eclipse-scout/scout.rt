@@ -99,13 +99,6 @@ scout.DatePicker.prototype.show = function(viewDate, selectedDate, animated) {
     $box.appendTo(this.$scrollable);
     this.htmlComp.revalidateLayout();
 
-    // Measure box size for the animation
-    if (!this._boxWidth) {
-      this._boxWidth = $box.width();
-    }
-    if (!this._boxHeight) {
-      this._boxHeight = $box.height();
-    }
   }
   this.$currentBox = $box;
 };
@@ -115,9 +108,11 @@ scout.DatePicker.prototype._appendAnimated = function(viewDateDiff, $box) {
   var newLeft = 0,
     that = this;
   var monthBoxCount = this.$scrollable.find('.date-picker-month').length + 1;
-  var scrollableWidth = monthBoxCount * this._boxWidth;
 
   this.htmlComp._layout._layoutMonth($box);
+
+  this._boxWidth = $box.width();
+  var scrollableWidth = monthBoxCount * this._boxWidth;
 
   // Fix the size of the boxes
   $currentBox
