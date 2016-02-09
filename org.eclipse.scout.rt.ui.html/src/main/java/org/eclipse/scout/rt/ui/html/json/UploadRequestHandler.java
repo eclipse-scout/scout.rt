@@ -109,11 +109,11 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
     }
 
     IBinaryResourceConsumer binaryResourceConsumer = resolveJsonAdapter(uiSession, targetAdapterId);
-
     if (binaryResourceConsumer == null) {
       //Request was already processed and adapter does not exist anymore;
       return;
     }
+
     // Read uploaded data
     Map<String, String> uploadProperties = new HashMap<String, String>();
     List<BinaryResource> uploadResources = new ArrayList<>();
@@ -199,10 +199,13 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
       throw new IllegalArgumentException("Missing target adapter ID");
     }
     IJsonAdapter<?> jsonAdapter = uiSession.getJsonAdapter(targetAdapterId);
-    if (jsonAdapter != null && !(jsonAdapter instanceof IBinaryResourceConsumer)) {
-      throw new IllegalStateException("Invalid adapter for ID " + targetAdapterId + (jsonAdapter == null ? "" : " (unexpected type)"));
+    if (jsonAdapter == null) {
+      return null;
     }
-    return (IBinaryResourceConsumer) jsonAdapter;
+    if (jsonAdapter instanceof IBinaryResourceConsumer) {
+      return (IBinaryResourceConsumer) jsonAdapter;
+    }
+    throw new IllegalStateException("Invalid adapter for ID " + targetAdapterId + " (unexpected type: " + jsonAdapter.getClass().getName() + ")");
   }
 
   /**
