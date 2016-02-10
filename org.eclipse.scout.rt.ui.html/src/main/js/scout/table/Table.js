@@ -2743,6 +2743,17 @@ scout.Table.prototype.moveColumn = function(column, oldPos, newPos, dragged) {
   this._triggerColumnMoved(column, oldPos, newPos, dragged);
   this._sendColumnMoved(column, index);
 
+  // move aggregated rows
+  this._aggregateRows.forEach(function(aggregateRow) {
+    var val = aggregateRow.contents[oldPos];
+    aggregateRow.contents.splice(oldPos, 1);
+    if (aggregateRow.contents.length > newPos) {
+      aggregateRow.contents.splice(newPos, 0, val);
+    } else {
+      aggregateRow.contents[newPos] = val;
+    }
+  });
+
   // move cells
   this._rerenderViewport();
 };
