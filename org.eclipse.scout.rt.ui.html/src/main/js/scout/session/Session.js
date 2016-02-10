@@ -64,7 +64,6 @@ scout.Session = function($entryPoint, options) {
   this.url = 'json';
   this._adapterDataCache = {};
   this._texts = new scout.Texts();
-  this._sessionStartupParams;
   this._requestsPendingCounter = 0;
   this._busyCounter = 0; // >0 = busy
   this.layoutValidator = new scout.LayoutValidator();
@@ -82,27 +81,9 @@ scout.Session = function($entryPoint, options) {
     objectType: 'GlobalAdapter'
   });
 
-  // Initializes session startup parameters with information from the URL.
-  this._initSessionStartupParams();
-
   // Install focus management for this session.
   this.focusManager = new scout.FocusManager(this, options);
   this.keyStrokeManager = new scout.KeyStrokeManager(this);
-};
-
-/**
- * Extracts session startup parameters from URL: query string parameters and the URL itself with key 'url'
- */
-scout.Session.prototype._initSessionStartupParams = function() {
-  this._sessionStartupParams = this._sessionStartupParams || {};
-
-  var scoutUrl = new scout.URL();
-  this._sessionStartupParams.url = scoutUrl._baseUrlRaw;
-
-  var urlParameterMap = scoutUrl.parameterMap;
-  for (var prop in urlParameterMap) {
-    this._sessionStartupParams[prop] = urlParameterMap[prop];
-  }
 };
 
 scout.Session.prototype._throwError = function(message) {
@@ -235,9 +216,111 @@ scout.Session.prototype._sendStartupRequest = function() {
   if (this.userAgent.deviceType !== scout.Device.Type.DESKTOP) {
     request.userAgent = this.userAgent;
   }
-  request.sessionStartupParams = this._sessionStartupParams;
+  request.sessionStartupParams = this._createSessionStartupParams();
+
   // Send request
-  this._sendRequest(request);
+  var ajaxOptions = this.defaultAjaxOptions(request);
+
+  $.ajax(ajaxOptions)
+    .done(onAjaxDone.bind(this))
+    .fail(onAjaxFail.bind(this));
+
+  // ----- Helper methods -----
+
+  function onAjaxDone(data) {
+    this._processStartupResponse(data);
+  }
+
+  function onAjaxFail(jqXHR, textStatus, errorThrown) {
+    this._processErrorResponse(jqXHR, textStatus, errorThrown, request);
+  }
+};
+
+/**
+ * Extracts session startup parameters from URL: query string parameters and the URL itself with key 'url'
+ */
+scout.Session.prototype._createSessionStartupParams = function() {
+  var params = {};
+
+  var scoutUrl = new scout.URL();
+  params.url = scoutUrl.baseUrlRaw;
+
+  var urlParameterMap = scoutUrl.parameterMap;
+  for (var prop in urlParameterMap) {
+    params[prop] = urlParameterMap[prop];
+  }
+
+  return params;
+};
+
+scout.Session.prototype._processStartupResponse = function(data) {
+  // Handle errors from server
+  if (data.error) {
+    this._processErrorJsonResponse(data.error);
+    return;
+  }
+
+  if (!data.startupData) {
+    throw new Error('Missing startupData');
+  }
+
+  // Store clientSessionId in sessionStorage (to send the same ID again on page reload)
+  sessionStorage.setItem('scout:clientSessionId', data.startupData.clientSessionId);
+
+  // Special case: Page must be reloaded on startup (e.g. theme changed)
+  if (data.startupData.reloadPage) {
+    scout.reloadPage();
+    return;
+  }
+
+  // Register UI session
+  this.uiSessionId = data.startupData.uiSessionId;
+  this.modelAdapterRegistry[this.uiSessionId] = this; // FIXME cgu: maybe better separate session object from event processing, create ClientSession.js?. If yes, desktop should not have rootadapter as parent, see 406
+
+  // Store adapters to adapter data cache
+  if (data.adapterData) {
+    this._copyAdapterData(data.adapterData);
+  }
+
+  // Create the desktop
+  this._putLocaleData(data.startupData.locale, data.startupData.textMap);
+  // Extract client session data without creating a model adapter for it. It is (currently) only used to transport the desktop's adapterId.
+  var clientSessionData = this._getAdapterData(data.startupData.clientSession);
+  this.desktop = this.getOrCreateModelAdapter(clientSessionData.desktop, this.rootAdapter);
+
+  var renderDesktopImpl = function() {
+    this._renderDesktop();
+
+    // In case the server sent additional events, process them
+    if (data.events) {
+      this.processingEvents = true;
+      try {
+        this._processEvents(data.events);
+      } finally {
+        this.processingEvents = false;
+      }
+    }
+
+    // Ensure layout is valid
+    this.layoutValidator.validate();
+
+    // Start poller
+    this._resumeBackgroundJobPolling();
+
+    this.ready = true;
+    $.log.info('Session initialized. Detected ' + scout.device);
+    if ($.log.isDebugEnabled()) {
+      $.log.debug('size of _adapterDataCache after session has been initialized: ' + scout.objects.countProperties(this._adapterDataCache));
+      $.log.debug('size of modelAdapterRegistry after session has been initialized: ' + scout.objects.countProperties(this.modelAdapterRegistry));
+    }
+  }.bind(this);
+
+  // Render desktop after fonts have been preloaded (this fixes initial layouting issues when font icons are not yet ready)
+  if (scout.fonts.loadingComplete) {
+    renderDesktopImpl();
+  } else {
+    scout.fonts.preloader().then(renderDesktopImpl());
+  }
 };
 
 scout.Session.prototype._sendUnloadRequest = function() {
@@ -496,12 +579,11 @@ scout.Session.prototype.processJsonResponseInternal = function(data) {
 scout.Session.prototype._processSuccessResponse = function(message) {
   this._queuedRequest = null;
 
-  message.adapterData = message.adapterData || {};
-  message.events = message.events || {};
-  if (!$.isEmptyObject(message.adapterData)) {
+  if (message.adapterData) {
     this._copyAdapterData(message.adapterData);
   }
-  if (!$.isEmptyObject(message.events)) {
+
+  if (message.events) {
     this.processingEvents = true;
     try {
       this._processEvents(message.events);
@@ -591,7 +673,7 @@ scout.Session.prototype._processErrorJsonResponse = function(jsonError) {
 };
 
 scout.Session.prototype._fireRequestFinished = function(message) {
-  if (!this._deferred) {
+  if (!this._deferred || !message.events) {
     return;
   }
 
@@ -898,13 +980,6 @@ scout.Session.prototype._processEvents = function(events) {
     this.currentEvent = event;
 
     $.log.debug("Processing event '" + event.type + "' for adapter with ID " + event.target);
-
-    // Auto register UI session on 'initialized' event // TODO BSH Check if it is possible to handle startup in an own request
-    if (!this.uiSessionId && event.type === 'initialized') {
-      this.uiSessionId = event.target;
-      this.modelAdapterRegistry[this.uiSessionId] = this; // FIXME cgu: maybe better separate session object from event processing, create ClientSession.js?. If yes, desktop should not have rootadapter as parent, see 406
-    }
-
     adapter = this.getModelAdapter(event.target);
     if (!adapter) {
       // FIXME bsh, cgu: Check if this should only be getModelAdapter()
@@ -932,7 +1007,7 @@ scout.Session.prototype._processEvents = function(events) {
 scout.Session.prototype.init = function() {
   $.log.info('Session initializing...');
 
-  // After a short time, display a loading animation (will be removed again in _onInitialized)
+  // After a short time, display a loading animation (will be removed again in _renderDesktop)
   this._setApplicationLoading(true);
 
   // Send startup request
@@ -945,8 +1020,6 @@ scout.Session.prototype.init = function() {
 scout.Session.prototype.onModelAction = function(event) {
   if (event.type === 'localeChanged') {
     this._onLocaleChanged(event);
-  } else if (event.type === 'initialized') {
-    this._onInitialized(event);
   } else if (event.type === 'logout') {
     this._onLogout(event);
   } else if (event.type === 'disposeAdapter') {
@@ -958,48 +1031,14 @@ scout.Session.prototype.onModelAction = function(event) {
   }
 };
 
-scout.Session.prototype._onReloadPage = function(event) {
-  // If server already created a client session, store it in sessionStorage to send the
-  // same ID again on page reload (most useful when theme changes during initial request).
-  if (event.clientSessionId) {
-    sessionStorage.setItem('scout:clientSessionId', event.clientSessionId);
-  }
-
-  // Don't clear the body, because other events might be processed before the reload and
-  // it could cause errors when all DOM elements are already removed.
-  scout.reloadPage({
-    clearBody: false
-  });
-};
-
 scout.Session.prototype._onLocaleChanged = function(event) {
-  this.locale = new scout.Locale(event.locale);
-  this._texts = new scout.Texts(event.textMap);
-  // FIXME bsh: inform components to reformat display text? also check Collator in scout.comparators.TEXT
+  this._putLocaleData(event.locale, event.textMap);
 };
 
-scout.Session.prototype._onInitialized = function(event) {
-  this.locale = new scout.Locale(event.locale);
-  this._texts = new scout.Texts(event.textMap);
-
-  // Store clientSessionId in sessionStorage (to send the same ID again on page reload)
-  this.clientSessionId = event.clientSessionId;
-  sessionStorage.setItem('scout:clientSessionId', this.clientSessionId);
-
-  var clientSessionData = this._getAdapterData(event.clientSession);
-  this.desktop = this.getOrCreateModelAdapter(clientSessionData.desktop, this.rootAdapter);
-
-  // Render desktop after fonts have been preloaded (this fixes initial layouting issues when font icons are not yet ready)
-  var renderDesktopImpl = function() {
-    this._renderDesktop();
-    this.ready = true;
-    $.log.info('Session initialized. Detected ' + scout.device);
-  }.bind(this);
-  if (scout.fonts.loadingComplete) {
-    renderDesktopImpl();
-  } else {
-    scout.fonts.preloader().then(renderDesktopImpl());
-  }
+scout.Session.prototype._putLocaleData = function(locale, textMap) {
+  this.locale = new scout.Locale(locale);
+  this._texts = new scout.Texts(textMap);
+  // FIXME bsh: inform components to reformat display text? also check Collator in scout.comparators.TEXT
 };
 
 scout.Session.prototype._renderDesktop = function() {
@@ -1030,6 +1069,14 @@ scout.Session.prototype._onDisposeAdapter = function(event) {
   if (adapter) { // adapter may be null if it was never sent to the UI, e.g. a form that was opened and closed in the same request
     adapter.destroy();
   }
+};
+
+scout.Session.prototype._onReloadPage = function(event) {
+  // Don't clear the body, because other events might be processed before the reload and
+  // it could cause errors when all DOM elements are already removed.
+  scout.reloadPage({
+    clearBody: false
+  });
 };
 
 scout.Session.prototype._onWindowUnload = function() {

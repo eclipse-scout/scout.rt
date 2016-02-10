@@ -13,23 +13,23 @@ describe("scout.URL", function() {
   it("can parse super-simple URL", function() {
     var u = new scout.URL(encodeURI('http://www.simple.example/dir/file.html'));
     expect(u).toBeDefined();
-    expect(u._baseUrlRaw).toBe('http://www.simple.example/dir/file.html');
-    expect(u._queryPartRaw).toBeUndefined();
-    expect(u._hashPartRaw).toBeUndefined();
+    expect(u.baseUrlRaw).toBe('http://www.simple.example/dir/file.html');
+    expect(u.queryPartRaw).toBeUndefined();
+    expect(u.hashPartRaw).toBeUndefined();
     expect(u.getParameter('sort')).toBeUndefined();
   });
 
   it("can parse empty hash", function() {
     var u = new scout.URL(encodeURI('http://www.simple.example/dir/file.html#'));
-    expect(u._hashPartRaw).toBe('');
+    expect(u.hashPartRaw).toBe('');
   });
 
   it("can parse a moderately simple URL", function() {
     var u = new scout.URL(encodeURI('http://www.simple.example/dir/file.html?query=search&action=&sort#bottom'));
     expect(u).toBeDefined();
-    expect(u._baseUrlRaw).toBe('http://www.simple.example/dir/file.html');
-    expect(u._queryPartRaw).toBe('query=search&action=&sort');
-    expect(u._hashPartRaw).toBe('bottom');
+    expect(u.baseUrlRaw).toBe('http://www.simple.example/dir/file.html');
+    expect(u.queryPartRaw).toBe('query=search&action=&sort');
+    expect(u.hashPartRaw).toBe('bottom');
     expect(u.getParameter('query')).toBe('search');
     expect(u.getParameter('doesNotExist')).toBeUndefined();
     expect(u.getParameter('action')).toBe('');
@@ -46,7 +46,7 @@ describe("scout.URL", function() {
   it("can handle multi-valued parameters", function() {
     var u = new scout.URL(encodeURI('http://www.simple.example/dir/file.html?query=search&action=&query&sort&query=go#bottom'));
     expect(u).toBeDefined();
-    expect(u._queryPartRaw).toBe('query=search&action=&query&sort&query=go');
+    expect(u.queryPartRaw).toBe('query=search&action=&query&sort&query=go');
     expect(u.getParameter('query')).toEqual([null, 'go', 'search']);
     expect(u.toString()).toBe('http://www.simple.example/dir/file.html?action=&query&query=go&query=search&sort#bottom');
   });
@@ -98,9 +98,9 @@ describe("scout.URL", function() {
   it("can handle non-ascii characters", function() {
     var u = new scout.URL(encodeURI('http://www.menükarte.example/dir/à la carte.php?query=search&wine=château lafite#\u1F603'));
     expect(u).toBeDefined();
-    expect(decodeURIComponent(u._baseUrlRaw)).toBe('http://www.menükarte.example/dir/à la carte.php');
-    expect(decodeURIComponent(u._queryPartRaw)).toBe('query=search&wine=château lafite');
-    expect(u._hashPartRaw).toBe('%E1%BD%A03');
+    expect(decodeURIComponent(u.baseUrlRaw)).toBe('http://www.menükarte.example/dir/à la carte.php');
+    expect(decodeURIComponent(u.queryPartRaw)).toBe('query=search&wine=château lafite');
+    expect(u.hashPartRaw).toBe('%E1%BD%A03');
     expect(u.getParameter('query')).toBe('search');
     expect(u.getParameter('doesNotExist')).toBeUndefined();
     expect(u.getParameter('wine')).toBe('château lafite');

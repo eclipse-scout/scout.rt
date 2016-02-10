@@ -84,7 +84,6 @@ public class UiSession implements IUiSession {
   private static final Logger LOG = LoggerFactory.getLogger(UiSession.class);
 
   private static final long ROOT_ID = 1;
-  private static final String EVENT_INITIALIZED = "initialized";
   private static final String EVENT_LOCALE_CHANGED = "localeChanged";
   private static final String EVENT_DISPOSE_ADAPTER = "disposeAdapter";
   private static final String EVENT_RELOAD_PAGE = "reloadPage";
@@ -118,7 +117,6 @@ public class UiSession implements IUiSession {
   private volatile long m_lastAccessedTime;
 
   public UiSession() {
-    m_currentJsonResponse = createJsonResponse();
     m_jsonAdapterRegistry = createJsonAdapterRegistry();
     m_rootJsonAdapter = new P_RootAdapter(this);
     m_jsonEventProcessor = createJsonEventProcessor();
@@ -141,7 +139,7 @@ public class UiSession implements IUiSession {
     Set<String> textKeys = new TreeSet<String>();
     for (IUiTextContributor contributor : BEANS.all(IUiTextContributor.class)) {
       contributor.contributeUiTextKeys(textKeys);
-      LOG.debug("Gathered ui text keys from contributor {}", contributor);
+      LOG.debug("Gathered UI text keys from contributor {}", contributor);
     }
 
     // Resolve texts with the given locale
@@ -247,15 +245,18 @@ public class UiSession implements IUiSession {
       throw new IllegalStateException("Already initialized");
     }
     m_initialized = true;
-    if (isDisposed()) {
-      throw new IllegalStateException("UiSession is disposed");
-    }
+
+    // Set initial "touch" time
     touch();
 
     try {
       m_currentHttpContext.set(req, resp);
       m_currentJsonRequest = jsonStartupReq;
       HttpSession httpSession = req.getSession();
+
+      // Create a special startup response (explicitly _without_ sequenceNo)
+      m_currentJsonResponse = new JsonResponse();
+      m_currentJsonResponse.markAsStartupResponse();
 
       // Assign uiSessionId (https://www.owasp.org/index.php/Cross-Site_Request_Forgery_%28CSRF%29_Prevention_Cheat_Sheet#General_Recommendation:_Synchronizer_Token_Pattern)
       m_uiSessionId = createUiSessionId(jsonStartupReq);
@@ -270,7 +271,14 @@ public class UiSession implements IUiSession {
       storePreferredLocaleInCookie(resp, m_clientSession.getLocale());
 
       // Apply theme from model to HTTP session and cookie
-      boolean reloadTheme = initUiTheme(req, resp, httpSession);
+      boolean reloadPage = initUiTheme(req, resp, httpSession);
+
+      // When theme changes, stop initialization (UI session will not be used anyway) and instruct the client to reload the page
+      if (reloadPage) {
+        putReloadPageStartupData();
+        LOG.info("Requested page reload for new UiSession with ID {}", m_uiSessionId);
+        return;
+      }
 
       // Register job listener to signal poller once possible UI data to be transported to the UI is available.
       installUiDataAvailableListener(m_clientSession);
@@ -281,14 +289,8 @@ public class UiSession implements IUiSession {
       // Start desktop
       fireDesktopOpened();
 
-      if (reloadTheme) {
-        // When theme changes during initialization, send page reload event instead of "initialized" event
-        sendReloadPageEvent();
-      }
-      else {
-        // Send "initialized" event
-        sendInitializationEvent(jsonClientSessionAdapter.getId());
-      }
+      // Fill startupData with everything that is needed to start the session on the UI
+      putInitializationStartupData(jsonClientSessionAdapter.getId());
 
       LOG.info("UiSession with ID {} initialized", m_uiSessionId);
     }
@@ -429,13 +431,13 @@ public class UiSession implements IUiSession {
     BEANS.get(UiJobs.class).awaitAndGet(future);
   }
 
-  protected void sendReloadPageEvent() {
-    final JSONObject jsonEvent = new JSONObject();
-    jsonEvent.put("clientSessionId", m_clientSession.getId()); // Send back clientSessionId to allow the browser to attach to the same client session on page reload
-    m_currentJsonResponse.addActionEvent(getUiSessionId(), EVENT_RELOAD_PAGE, jsonEvent);
+  protected void putReloadPageStartupData() {
+    final JSONObject startupData = m_currentJsonResponse.getStartupData();
+    startupData.put("reloadPage", true);
+    startupData.put("clientSessionId", m_clientSession.getId()); // Send back clientSessionId to allow the browser to attach to the same client session on page reload
   }
 
-  protected void sendInitializationEvent(final String clientSessionAdapterId) {
+  protected void putInitializationStartupData(final String clientSessionAdapterId) {
     final IFuture<Locale> future = ModelJobs.schedule(new Callable<Locale>() {
       @Override
       public Locale call() throws Exception {
@@ -446,11 +448,11 @@ public class UiSession implements IUiSession {
         .withName("Looking up Locale")
         .withExceptionHandling(null, false)); // exception handling done by caller
 
-    final JSONObject jsonEvent = new JSONObject();
-    jsonEvent.put("clientSessionId", m_clientSession.getId()); // Send back clientSessionId to allow the browser to attach to the same client session on page reload
-    jsonEvent.put("clientSession", clientSessionAdapterId);
-    putLocaleData(jsonEvent, BEANS.get(UiJobs.class).awaitAndGet(future));
-    m_currentJsonResponse.addActionEvent(m_uiSessionId, EVENT_INITIALIZED, jsonEvent);
+    final JSONObject startupData = m_currentJsonResponse.getStartupData();
+    startupData.put("uiSessionId", m_uiSessionId);
+    startupData.put("clientSessionId", m_clientSession.getId()); // Send back clientSessionId to allow the browser to attach to the same client session on page reload
+    startupData.put("clientSession", clientSessionAdapterId);
+    putLocaleData(startupData, BEANS.get(UiJobs.class).awaitAndGet(future));
   }
 
   protected UserAgent createUserAgent(JsonStartupRequest jsonStartupReq) {
@@ -872,12 +874,12 @@ public class UiSession implements IUiSession {
   }
 
   /**
-   * Writes <code>"locale"</code> and <code>"textMap"</code> according to the given <code>locale</code> as JSON into the
-   * given <code>jsonEvent</code>.
+   * Writes <code>"locale"</code> and <code>"textMap"</code> according to the given <code>locale</code> into the given
+   * JSON object.
    */
-  protected void putLocaleData(JSONObject jsonEvent, Locale locale) {
-    jsonEvent.put("locale", JsonLocale.toJson(locale));
-    jsonEvent.put("textMap", getTextMap(locale));
+  protected void putLocaleData(JSONObject json, Locale locale) {
+    json.put("locale", JsonLocale.toJson(locale));
+    json.put("textMap", getTextMap(locale));
   }
 
   @Override
@@ -885,6 +887,10 @@ public class UiSession implements IUiSession {
     JSONObject jsonEvent = new JSONObject();
     jsonEvent.put("adapter", adapter.getId());
     currentJsonResponse().addActionEvent(getUiSessionId(), EVENT_DISPOSE_ADAPTER, jsonEvent);
+  }
+
+  protected void sendReloadPageEvent() {
+    m_currentJsonResponse.addActionEvent(getUiSessionId(), EVENT_RELOAD_PAGE);
   }
 
   @Override
