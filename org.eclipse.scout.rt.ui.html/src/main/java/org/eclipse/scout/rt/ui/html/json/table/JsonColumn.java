@@ -30,11 +30,11 @@ public class JsonColumn<T extends IColumn<?>> implements IJsonObject {
   private T m_column;
   private int m_indexOffset;
 
-  private final String PROP_INITIAL_ALWAYS_INCLUDE_SORT_AT_BEGIN = "initialAlwaysIncludeSortAtBegin";
-  private final String PROP_INITIAL_ALWAYS_INCLUDE_SORT_AT_END = "initialAlwaysIncludeSortAtEnd";
+  private final static String PROP_INITIAL_ALWAYS_INCLUDE_SORT_AT_BEGIN = "initialAlwaysIncludeSortAtBegin";
+  private final static String PROP_INITIAL_ALWAYS_INCLUDE_SORT_AT_END = "initialAlwaysIncludeSortAtEnd";
 
-  private final String PROP_REMOVABLE = "removable";
-  private final String PROP_MODIFIABLE = "modifiable";
+  private final static String PROP_REMOVABLE = "removable";
+  private final static String PROP_MODIFIABLE = "modifiable";
 
   public JsonColumn(T model) {
     m_column = model;

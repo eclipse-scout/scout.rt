@@ -35,9 +35,6 @@ public class RadioButtonGroupGrid implements ICompositeFieldGrid<ICompositeField
   private int m_gridColumns;
   private int m_gridRows;
 
-  public RadioButtonGroupGrid() {
-  }
-
   @Override
   public void validate(ICompositeField compositeField) {
     // reset

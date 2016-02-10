@@ -188,7 +188,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   private List<ITableControl> m_tableControls;
   private IReloadHandler m_reloadHandler;
   private int m_valueChangeTriggerEnabled = 1;// >=1 is true
-//  private IOrganizeColumnsForm m_organizeColumnsForm;
   private ITableOrganizer m_tableOrganizer;
 
   public AbstractTable() {

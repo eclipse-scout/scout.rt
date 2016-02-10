@@ -55,14 +55,14 @@ scout.NumberColumnUserFilter.prototype.filterFieldsTitle = function() {
  */
 scout.NumberColumnUserFilter.prototype.addFilterFields = function(groupBox) {
   this.numberFromField = groupBox.addFilterField('NumberField', 'ui.from', 0);
-  this.numberFromField.displayText = _toNumberString(this.numberFrom);
+  this.numberFromField.displayText = toNumberString(this.numberFrom);
   this.numberFromField.on('displayTextChanged', this._onDisplayTextChanged.bind(this));
 
   this.numberToField = groupBox.addFilterField('NumberField', 'ui.to', 1);
-  this.numberToField.displayText = _toNumberString(this.numberTo);
+  this.numberToField.displayText = toNumberString(this.numberTo);
   this.numberToField.on('displayTextChanged', this._onDisplayTextChanged.bind(this));
 
-  function _toNumberString(number) {
+  function toNumberString(number) {
     return scout.objects.isNumber(number) ? number.toString() : '';
   }
 };
@@ -70,8 +70,8 @@ scout.NumberColumnUserFilter.prototype.addFilterFields = function(groupBox) {
 scout.NumberColumnUserFilter.prototype._onDisplayTextChanged = function(event) {
   // FIXME AWE: (filter) discuss with C.GU... unser NumberField.js kann keinen value (numeric) liefern, richtig?
   // Das field sollte etwas wie getValue() haben das eine fixfertige number liefert anstatt der konvertierung hier
-  this.numberFrom = this._toNumber(this.numberFromField.displayText),
-    this.numberTo = this._toNumber(this.numberToField.displayText);
+  this.numberFrom = this._toNumber(this.numberFromField.displayText);
+  this.numberTo = this._toNumber(this.numberToField.displayText);
   $.log.debug('(NumberColumnUserFilter#_onDisplayTextChanged) numberFrom=' + this.numberFrom + ' numberTo=' + this.numberTo);
   this.triggerFilterFieldsChanged(event);
 };
