@@ -34,6 +34,8 @@ import org.eclipse.scout.rt.ui.html.json.InspectorInfo;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterProperty;
+import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterPropertyConfig;
+import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterPropertyConfigBuilder;
 import org.eclipse.scout.rt.ui.html.json.table.JsonOutlineTable;
 import org.eclipse.scout.rt.ui.html.json.tree.JsonTree;
 import org.json.JSONObject;
@@ -71,6 +73,11 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
       @Override
       protected IForm modelValue() {
         return getModel().getDefaultDetailForm();
+      }
+
+      @Override
+      protected JsonAdapterPropertyConfig createConfig() {
+        return new JsonAdapterPropertyConfigBuilder().disposeOnChange(false).build();
       }
     });
   }
