@@ -2,5 +2,5 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Scout Runtime
 Bundle-SymbolicName: org.eclipse.scout.rt.feature.about;singleton:=true
-Bundle-Version: 5.0.100.qualifier
+Bundle-Version: 5.0.200.qualifier
 Bundle-Vendor: Eclipse Scout Project

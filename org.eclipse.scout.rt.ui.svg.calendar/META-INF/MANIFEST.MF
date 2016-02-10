@@ -2,12 +2,12 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Scout UI SVG Calendar Field
 Bundle-SymbolicName: org.eclipse.scout.rt.ui.svg.calendar;singleton:=true
-Bundle-Version: 5.0.100.qualifier
+Bundle-Version: 5.0.200.qualifier
 Bundle-Activator: org.eclipse.scout.rt.ui.svg.calendar.Activator
 Bundle-Vendor: Eclipse Scout Project
-Require-Bundle: org.eclipse.scout.rt.client;bundle-version="[5.0.100,5.1.0)";visibility:=reexport,
- org.eclipse.scout.rt.shared;bundle-version="[5.0.100,5.1.0)";visibility:=reexport,
- org.eclipse.scout.svg.client;bundle-version="[5.0.100,5.1.0)"
+Require-Bundle: org.eclipse.scout.rt.client;bundle-version="[5.0.200,5.1.0)";visibility:=reexport,
+ org.eclipse.scout.rt.shared;bundle-version="[5.0.200,5.1.0)";visibility:=reexport,
+ org.eclipse.scout.svg.client;bundle-version="[5.0.200,5.1.0)"
 Import-Package: org.apache.batik.bridge;version="[1.6.0,2.0.0)",
  org.apache.batik.dom.svg;version="[1.6.0,2.0.0)",
  org.apache.batik.util;version="[1.6.0,2.0.0)",

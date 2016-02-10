@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Tests for Specification
 Bundle-SymbolicName: org.eclipse.scout.rt.spec.client.test;singleton:=true
-Bundle-Version: 5.0.100.qualifier
+Bundle-Version: 5.0.200.qualifier
 Fragment-Host: org.eclipse.scout.rt.spec.client
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-Vendor: Eclipse Scout Project

@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Scout JAX-WS Version 2.1.6 JRE 1.8 Fragment
 Bundle-SymbolicName: org.eclipse.scout.jaxws216.jre18.fragment
-Bundle-Version: 5.0.100.qualifier
-Fragment-Host: org.eclipse.scout.jaxws216;bundle-version="5.0.100"
+Bundle-Version: 5.0.200.qualifier
+Fragment-Host: org.eclipse.scout.jaxws216;bundle-version="5.0.200"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-Vendor: Eclipse Scout Project

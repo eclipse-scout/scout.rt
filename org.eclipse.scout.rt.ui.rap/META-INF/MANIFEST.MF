@@ -2,21 +2,21 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Scout UI RAP
 Bundle-SymbolicName: org.eclipse.scout.rt.ui.rap;singleton:=true
-Bundle-Version: 5.0.100.qualifier
+Bundle-Version: 5.0.200.qualifier
 Bundle-Activator: org.eclipse.scout.rt.ui.rap.Activator
 Bundle-Vendor: Eclipse Scout Project
 Require-Bundle: org.eclipse.core.runtime;bundle-version="[3.4.0,4.0.0)";visibility:=reexport,
  org.eclipse.equinox.http.registry;bundle-version="[1.0.100,2.0.0)",
- org.eclipse.scout.rt.shared;bundle-version="[5.0.100,5.1.0)";visibility:=reexport,
- org.eclipse.scout.service;bundle-version="[5.0.100,5.1.0)",
- org.eclipse.scout.rt.server.commons;bundle-version="[5.0.100,5.1.0)",
+ org.eclipse.scout.rt.shared;bundle-version="[5.0.200,5.1.0)";visibility:=reexport,
+ org.eclipse.scout.service;bundle-version="[5.0.200,5.1.0)",
+ org.eclipse.scout.rt.server.commons;bundle-version="[5.0.200,5.1.0)",
  org.eclipse.rap.jface;bundle-version="[2.3.0,4.0.0)";visibility:=reexport,
  org.eclipse.rap.jface.databinding;bundle-version="[2.3.0,4.0.0)";visibility:=reexport,
  org.eclipse.rap.fileupload;bundle-version="[3.0.0,4.0.0)";visibility:=reexport,
  org.eclipse.rap.filedialog;bundle-version="[3.0.0,4.0.0)";visibility:=reexport,
  org.eclipse.rap.ui.forms;bundle-version="[2.3.0,4.0.0)";visibility:=reexport,
  org.eclipse.rap.ui;bundle-version="[2.3.0,4.0.0)";visibility:=reexport,
- org.eclipse.scout.rt.client;bundle-version="[5.0.100,5.1.0)";visibility:=reexport
+ org.eclipse.scout.rt.client;bundle-version="[5.0.200,5.1.0)";visibility:=reexport
 Import-Package: javax.servlet;version="[2.5.0,4.0.0)",
  javax.servlet.http;version="[2.5.0,4.0.0)"
 Export-Package: org.eclipse.scout.rt.ui.rap,

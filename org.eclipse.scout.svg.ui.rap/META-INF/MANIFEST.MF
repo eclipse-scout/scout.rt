@@ -2,14 +2,14 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Scout Client SVG Field RAP Implementation
 Bundle-SymbolicName: org.eclipse.scout.svg.ui.rap;singleton:=true
-Bundle-Version: 5.0.100.qualifier
+Bundle-Version: 5.0.200.qualifier
 Bundle-Vendor: Eclipse Scout Project
 Require-Bundle: org.eclipse.core.runtime;bundle-version="[3.4.0,4.0.0)",
- org.eclipse.scout.commons;bundle-version="[5.0.100,5.1.0)",
- org.eclipse.scout.rt.client;bundle-version="[5.0.100,5.1.0)",
- org.eclipse.scout.rt.ui.rap;bundle-version="[5.0.100,5.1.0)",
- org.eclipse.scout.rt.ui.svg.calendar;bundle-version="[5.0.100,5.1.0)",
- org.eclipse.scout.svg.client;bundle-version="[5.0.100,5.1.0)"
+ org.eclipse.scout.commons;bundle-version="[5.0.200,5.1.0)",
+ org.eclipse.scout.rt.client;bundle-version="[5.0.200,5.1.0)",
+ org.eclipse.scout.rt.ui.rap;bundle-version="[5.0.200,5.1.0)",
+ org.eclipse.scout.rt.ui.svg.calendar;bundle-version="[5.0.200,5.1.0)",
+ org.eclipse.scout.svg.client;bundle-version="[5.0.200,5.1.0)"
 Import-Package: javax.servlet;version="[2.5.0,4.0.0)",
  javax.servlet.http;version="[2.5.0,4.0.0)",
  org.apache.batik.util;version="[1.6.0,2.0.0)",
