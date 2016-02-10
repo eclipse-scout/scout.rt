@@ -18,7 +18,6 @@ import java.util.Map;
 
 import org.eclipse.scout.rt.platform.internal.DefaultBeanInstanceProducer;
 import org.eclipse.scout.rt.platform.util.Assertions;
-import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
 /**
@@ -42,24 +41,8 @@ public class BeanMetaData {
     m_beanAnnotations = new HashMap<>();
     readStaticAnnotations(clazz, false);
     inheritOrderIfRequired(clazz);
-    initProducerAnnotation();
     m_initialInstance = initialInstance;
 
-  }
-
-  private void initProducerAnnotation() {
-    BeanProducer annotation = getBeanAnnotation(BeanProducer.class);
-    if (annotation != null) {
-      Class<? extends IBeanInstanceProducer> producerClass = annotation.value();
-      IBeanInstanceProducer producer;
-      try {
-        producer = producerClass.newInstance();
-        withProducer(producer);
-      }
-      catch (InstantiationException | IllegalAccessException e) {
-        throw new AssertionException(String.format("Error creating producer instance for %s for bean %s: %s", producerClass, m_beanClazz, e.getMessage()));
-      }
-    }
   }
 
   public BeanMetaData(IBean<?> template) {
