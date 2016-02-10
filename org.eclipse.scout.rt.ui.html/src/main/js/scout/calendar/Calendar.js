@@ -134,15 +134,16 @@ scout.Calendar.prototype._render = function($parent) {
 
   this.$grid = this.$container.appendDiv('calendar-grid');
   this.$list = this.$container.appendDiv('calendar-list-container').appendDiv('calendar-list');
-  this.$listTitle = this.$list.appendDiv('list-title');
+  this.$listTitle = this.$list.appendDiv('calendar-list-title');
 
   // header contains all controls
-  this.$progress = this.$header.appendDiv('busyindicator-label');
   this.$range = this.$header.appendDiv('calendar-range');
   this.$range.appendDiv('calendar-previous').click(this._onClickPrevious.bind(this));
   this.$range.appendDiv('calendar-today', this.session.text('ui.CalendarToday')).click(this._onClickToday.bind(this));
   this.$range.appendDiv('calendar-next').click(this._onClickNext.bind(this));
   this.$range.appendDiv('calendar-select');
+
+  this.$progress = this.$header.appendDiv('busyindicator-label');
 
   // ... and modes
   this.$commands = this.$header.appendDiv('calendar-commands');

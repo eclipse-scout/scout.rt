@@ -10,8 +10,8 @@
  ******************************************************************************/
 .year-panel-container {
   display: inline-block;
+  vertical-align: top;
   width: 0%;
-  height: calc(~'100%' - @calendar-header-height);
   background-color: @palette-white;
   overflow: hidden;
 }

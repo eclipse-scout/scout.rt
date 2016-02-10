@@ -182,7 +182,7 @@ scout.CalendarComponent.prototype._description = function() {
   if (scout.strings.hasText(this.item.subject)) {
     descParts.push({
       text: this.item.subject,
-      cssClass: 'bold'
+      cssClass: 'calendar-component-title'
     });
   }
 
@@ -198,7 +198,7 @@ scout.CalendarComponent.prototype._description = function() {
   if (scout.strings.hasText(range)) {
     descParts.push({
       text: range,
-      cssClass: 'small'
+      cssClass: 'calendar-component-intro'
     });
   }
 
