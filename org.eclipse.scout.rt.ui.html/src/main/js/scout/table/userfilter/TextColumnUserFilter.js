@@ -57,7 +57,8 @@ scout.TextColumnUserFilter.prototype.addFilterFields = function(groupBox) {
     labelVisible: false,
     statusVisible: false,
     maxLength: 100,
-    displayText: this.freeText
+    displayText: this.freeText,
+    updateDisplayTextOnModify: true
   });
   this.freeTextField.on('displayTextChanged', this._onDisplayTextChanged.bind(this));
   groupBox.addField0(this.freeTextField);
@@ -75,7 +76,5 @@ scout.TextColumnUserFilter.prototype._onDisplayTextChanged = function(event) {
 scout.TextColumnUserFilter.prototype.modifyFilterFields = function() {
   this.freeTextField.$mandatory.remove();
   this.freeTextField.$mandatory = null;
-  this.freeTextField.$field.on('input', '', $.debounce(function() {
-    this.freeTextField.acceptInput(true);
-  }.bind(this)));
+  this.freeTextField._onDisplayTextModified = this.debounceTextModified;
 };

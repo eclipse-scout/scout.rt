@@ -92,10 +92,7 @@ scout.NumberColumnUserFilter.prototype._toNumber = function(numberString) {
 };
 
 scout.NumberColumnUserFilter.prototype.modifyFilterFields = function() {
-  this.numberFromField.$field.on('input', '', $.debounce(function() {
-    this.numberFromField.acceptInput(true);
-  }.bind(this)));
-  this.numberToField.$field.on('input', '', $.debounce(function() {
-    this.numberToField.acceptInput(true);
-  }.bind(this)));
+  this.numberFromField._onDisplayTextModified = this.debounceTextModified;
+  this.numberToField._onDisplayTextModified = this.debounceTextModified;
 };
+
