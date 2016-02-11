@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 
-import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.reflect.AbstractPropertyObserver;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.status.IStatus;
@@ -177,11 +176,6 @@ public abstract class AbstractProposalChooser<T, LOOKUP_KEY> extends AbstractPro
 
   public IContentAssistField<?, LOOKUP_KEY> getContentAssistField() {
     return m_contentAssistField;
-  }
-
-  @Override
-  public IFuture<Void> getInitialPolulatorFuture() {
-    return null;
   }
 
 }

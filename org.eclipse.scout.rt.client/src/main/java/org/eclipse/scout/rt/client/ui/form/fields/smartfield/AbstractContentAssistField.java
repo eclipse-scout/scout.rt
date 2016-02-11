@@ -1400,8 +1400,10 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
    */
   private IFuture<Void> fetchLookupRows(final ILookupRowProvider<LOOKUP_KEY> dataProvider, final ILookupRowFetchedCallback<LOOKUP_KEY> callback, final boolean asynchronousFetching, final int maxRowCount) {
     cancelPotentialLookup();
+
     if (getLookupCall() == null) {
       callback.onSuccess(Collections.<ILookupRow<LOOKUP_KEY>> emptyList());
+      return null;
     }
 
     // Prepare the lookup call.
@@ -1543,13 +1545,12 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
   }
 
   protected void cancelPotentialLookup() {
-    final IFuture<?> future = m_lookupFuture;
-    if (future == null) {
+    if (m_lookupFuture == null) {
       return;
     }
-    if (getProposalChooser() != null && getProposalChooser().getInitialPolulatorFuture() == future) {
+    if (m_lookupFuture.containsExecutionHint(EXECUTION_HINT_INITIAL_LOOKUP)) {
       return;
     }
-    future.cancel(true);
+    m_lookupFuture.cancel(false);
   }
 }

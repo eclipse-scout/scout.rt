@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 
-import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.reflect.IPropertyObserver;
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.util.TriState;
@@ -77,12 +76,5 @@ public interface IProposalChooser<T, LOOKUP_KEY> extends IPropertyObserver {
    * Deselects all items in the proposal chooser (e.g. removes the selected state from table-rows)
    */
   void deselect();
-
-  /**
-   * In cases of initial lookups are used in init methods of the proposal chooser the job must not be canceled.
-   * <p>
-   * (e.g. TreeProposalChooser)
-   */
-  IFuture<Void> getInitialPolulatorFuture();
 
 }

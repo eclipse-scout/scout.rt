@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
@@ -26,7 +27,10 @@ import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.VetoException;
+import org.eclipse.scout.rt.platform.job.DoneEvent;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
+import org.eclipse.scout.rt.platform.job.IDoneHandler;
+import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
@@ -47,6 +51,7 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
 
   private final IContentAssistFieldUIFacade m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(new ContentAssistFieldUIFacade<LOOKUP_KEY>(this), ModelContext.copyCurrent());
   private final IBlockingCondition m_contextInstalledCondition = Jobs.newBlockingCondition(false);
+  private final AtomicInteger m_valueChangedLookupCounter = new AtomicInteger();
 
   public AbstractMixedSmartField() {
     this(true);
@@ -179,20 +184,30 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
 
     // When no current-lookup row is available we must perform a lookup by key (local or remote)
     final LOOKUP_KEY lookupKey = interceptConvertValueToKey(getValue());
-    callKeyLookupInBackground(lookupKey, new ILookupRowFetchedCallback<LOOKUP_KEY>() {
+
+    m_valueChangedLookupCounter.incrementAndGet();
+    final IFuture<Void> future = callKeyLookupInBackground(lookupKey, new ILookupRowFetchedCallback<LOOKUP_KEY>() {
 
       @Override
       public void onSuccess(final List<? extends ILookupRow<LOOKUP_KEY>> rows) {
         installLookupRowContext(CollectionUtility.firstElement(rows));
-        m_contextInstalledCondition.setBlocking(false);
       }
 
       @Override
       public void onFailure(final RuntimeException exception) {
         BEANS.get(ExceptionHandler.class).handle(exception);
-        m_contextInstalledCondition.setBlocking(false);
       }
     });
+    future.whenDone(new IDoneHandler<Void>() {
+
+      @Override
+      public void onDone(DoneEvent<Void> event) {
+        // Release guard only upon very recent lookup has been finished.
+        if (m_valueChangedLookupCounter.decrementAndGet() == 0) {
+          m_contextInstalledCondition.setBlocking(false);
+        }
+      }
+    }, null);
   }
 
   @Override
