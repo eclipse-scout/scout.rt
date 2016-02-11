@@ -40,6 +40,7 @@ import org.eclipse.scout.rt.server.jaxws.MessageContexts;
 import org.eclipse.scout.rt.server.jaxws.implementor.JaxWsImplementorSpecifics;
 import org.eclipse.scout.rt.server.jaxws.provider.annotation.Authentication;
 import org.eclipse.scout.rt.server.jaxws.provider.annotation.ClazzUtil;
+import org.eclipse.scout.rt.server.jaxws.provider.auth.method.ContainerBasedAuthenticationMethod;
 import org.eclipse.scout.rt.server.jaxws.provider.auth.method.IAuthenticationMethod;
 
 /**
@@ -108,7 +109,7 @@ public class AuthenticationHandler implements SOAPHandler<SOAPMessageContext> {
       final HttpServletRequest servletRequest = Assertions.assertNotNull(m_implementorSpecifics.getServletRequest(messageContext), "ServletRequest must not be null");
 
       // Get Subject if already authenticated, e.g. by application server or Servlet filter.
-      final Subject requestSubject = m_authenticationMethod.getRequestSubject(servletRequest, m_principalProducer);
+      final Subject requestSubject = BEANS.get(ContainerBasedAuthenticationMethod.class).getRequestSubject(servletRequest, m_principalProducer);
       if (requestSubject != null) {
         MessageContexts.putRunContext(messageContext, m_runContextProducer.produce(requestSubject));
         return true;
