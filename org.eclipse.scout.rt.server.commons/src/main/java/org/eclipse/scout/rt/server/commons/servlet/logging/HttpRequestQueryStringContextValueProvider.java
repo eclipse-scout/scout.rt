@@ -19,7 +19,7 @@ import org.eclipse.scout.rt.server.commons.servlet.IHttpServletRoundtrip;
 import org.slf4j.MDC;
 
 /**
- * This class provides the {@link HttpServletRequest#getRequestURI()} to be set into the
+ * This class provides the {@link HttpServletRequest#getQueryString()} to be set into the
  * <code>diagnostic context map</code> for logging purpose.
  *
  * @see #KEY
@@ -28,9 +28,9 @@ import org.slf4j.MDC;
  * @since 5.1
  */
 @ApplicationScoped
-public class HttpRequestUriContextValueProvider implements IDiagnosticContextValueProvider {
+public class HttpRequestQueryStringContextValueProvider implements IDiagnosticContextValueProvider {
 
-  public static final String KEY = "http.request.uri";
+  public static final String KEY = "http.request.querystring";
 
   @Override
   public String key() {
@@ -39,6 +39,6 @@ public class HttpRequestUriContextValueProvider implements IDiagnosticContextVal
 
   @Override
   public String value() {
-    return IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.get().getRequestURI();
+    return IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.get().getQueryString();
   }
 }
