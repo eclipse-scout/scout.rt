@@ -15,4 +15,9 @@ package org.eclipse.scout.rt.client.ui.basic.table.columns;
  */
 public abstract class AbstractBeanColumn<VALUE> extends AbstractColumn<VALUE> implements IBeanColumn<VALUE> {
 
+  @Override
+  protected boolean getConfiguredUiSortPossible() {
+    return true;
+  }
+
 }

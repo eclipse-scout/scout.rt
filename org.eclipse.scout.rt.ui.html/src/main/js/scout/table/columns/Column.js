@@ -492,6 +492,8 @@ scout.Column.prototype.prepareForSorting = function() {
   return this.comparator.install(this.session);
 };
 
-scout.Column.prototype.compare = function(valueA, valueB) {
+scout.Column.prototype.compare = function(row1, row2) {
+  var valueA = this.table.cellValue(this, row1);
+  var valueB = this.table.cellValue(this, row2);
   return this.comparator.compare(valueA, valueB);
 };

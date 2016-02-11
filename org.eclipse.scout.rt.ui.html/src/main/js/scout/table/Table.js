@@ -601,11 +601,9 @@ scout.Table.prototype._sortImpl = function(sortColumns) {
   function compare(row1, row2) {
     for (var s = 0; s < sortColumns.length; s++) {
       var column = sortColumns[s];
-      var valueA = this.cellValue(column, row1);
-      var valueB = this.cellValue(column, row2);
       var direction = column.sortActive && column.sortAscending ? -1 : 1;
 
-      var result = column.compare(valueA, valueB);
+      var result = column.compare(row1, row2);
       if (result < 0) {
         return direction;
       } else if (result > 0) {

@@ -101,6 +101,7 @@ scout.TableMatrix.prototype.addData = function(data, dataGroup) {
 scout.TableMatrix.prototype.addAxis = function(axis, axisGroup) {
   var keyAxis = [],
     locale = this.locale,
+    session = this.session,
     getText = this.session.text.bind(this.session),
     emptyCell = getText('ui.EmptyCell');
 
@@ -254,8 +255,8 @@ scout.TableMatrix.prototype.addAxis = function(axis, axisGroup) {
       }
     };
     keyAxis.reorder = function() {
-      // prepare comparator
-      axis.prepareForSorting();
+      var comparator = scout.comparators.TEXT;
+      comparator.install(session);
 
       keyAxis.sort(function(a, b) {
         // make sure -empty- is at the bottom
@@ -266,7 +267,7 @@ scout.TableMatrix.prototype.addAxis = function(axis, axisGroup) {
           return -1;
         }
         // sort others
-        return axis.compare(keyAxis.format(a), keyAxis.format(b));
+        return comparator.compare(keyAxis.format(a), keyAxis.format(b));
       });
     };
   }
