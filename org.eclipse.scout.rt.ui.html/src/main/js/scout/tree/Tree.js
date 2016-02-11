@@ -1376,6 +1376,15 @@ scout.Tree.prototype._showAllNodes = function(parentNode) {
     this.revealSelection();
   }.bind(this);
 
+  var completeFunc = function() {
+    // "this" will be bound to the $node that completed the animation
+    var oldStyle = this.data('oldStyle');
+    if (oldStyle) {
+      this.removeData('oldStyle');
+      this.attrOrRemove('style', oldStyle);
+    }
+  };
+
   // Show all nodes for this parent
   for (var i = 0; i < parentNode.childNodes.length; i++) {
     var childNode = parentNode.childNodes[i];
@@ -1392,6 +1401,11 @@ scout.Tree.prototype._showAllNodes = function(parentNode) {
       var h = childNode.$node.outerHeight(),
         p = childNode.$node.css('padding-top');
 
+      // Backup the current value of the 'style' attribute, so we can remove the animated
+      // properties again when the animation is complete (otherwise, the values might
+      // interfere with CSS definitions, e.g. in breadcrumb mode)
+      childNode.$node.data('oldStyle', childNode.$node.attr('style'));
+
       // make height 0
       childNode.$node
         .outerHeight(0)
@@ -1402,7 +1416,8 @@ scout.Tree.prototype._showAllNodes = function(parentNode) {
       childNode.$node
         .animateAVCSD('padding-top', p, null, null, 200)
         .animateAVCSD('padding-bottom', p, null, null, 200)
-        .animateAVCSD('height', h, null, updateFunc, 200);
+        .animateAVCSD('height', h, null, updateFunc, 200)
+        .promise().done(completeFunc);
     }
 
     // only first animated element should handle scrollbar and visibility of selection
