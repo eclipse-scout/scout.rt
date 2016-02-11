@@ -1544,11 +1544,12 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
 
   protected void cancelPotentialLookup() {
     final IFuture<?> future = m_lookupFuture;
+    if (future == null) {
+      return;
+    }
     if (getProposalChooser() != null && getProposalChooser().getInitialPolulatorFuture() == future) {
       return;
     }
-    if (future != null) {
-      future.cancel(true);
-    }
+    future.cancel(true);
   }
 }
