@@ -97,6 +97,11 @@ public class ServletRunContextChainTest {
     assertEquals(DiagnosticContextValueProcessor.class, c.getClass());
     assertEquals("http.request.method", ((DiagnosticContextValueProcessor) c).getMdcKey());
 
+    // 12. DiagnosticContextValueProcessor
+    c = chainIterator.next();
+    assertEquals(DiagnosticContextValueProcessor.class, c.getClass());
+    assertEquals("http.request.querystring", ((DiagnosticContextValueProcessor) c).getMdcKey());
+
     assertFalse(chainIterator.hasNext());
   }
 }
