@@ -859,7 +859,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   protected final void interceptInitConfig() {
-    m_objectExtensions.initConfig(createLocalExtension(), new Runnable() {
+    m_objectExtensions.initConfigAndBackupExtensionContext(createLocalExtension(), new Runnable() {
       @Override
       public void run() {
         initConfig();
@@ -3470,7 +3470,13 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       }
       // reset columns
       disposeColumnsInternal();
-      createColumnsInternal();
+      m_objectExtensions.runInExtensionContext(new Runnable() {
+        @Override
+        public void run() {
+          // runs within extension context, so that extensions and contributions can be created
+          createColumnsInternal();
+        }
+      });
       initColumnsInternal();
       // re-apply displayable
       for (IColumn<?> col : getColumns()) {

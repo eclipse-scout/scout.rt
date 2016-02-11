@@ -771,7 +771,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   }
 
   protected final void interceptInitConfig() {
-    m_objectExtensions.initConfig(createLocalExtension(), new Runnable() {
+    m_objectExtensions.initConfigAndBackupExtensionContext(createLocalExtension(), new Runnable() {
       @Override
       public void run() {
         initConfig();
@@ -1893,21 +1893,16 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
 
   @Override
   public void updateKeyStrokes() {
-    Map<String, IKeyStroke> ksMap = new HashMap<String, IKeyStroke>();
-    //
-    List<IKeyStroke> c = getLocalKeyStrokes();
-    if (c != null) {
-      for (IKeyStroke ks : c) {
-        if (ks != null) {
-          ksMap.put(ks.getKeyStroke().toUpperCase(), ks);
-        }
+    m_objectExtensions.runInExtensionContext(new Runnable() {
+      @Override
+      public void run() {
+        List<IKeyStroke> keyStrokes = initLocalKeyStrokes();
+        propertySupport.setPropertyList(PROP_KEY_STROKES, keyStrokes);
       }
-    }
-    propertySupport.setPropertyList(PROP_KEY_STROKES, CollectionUtility.arrayListWithoutNullElements(ksMap.values()));
+    });
   }
 
-  @Override
-  public List<IKeyStroke> getLocalKeyStrokes() {
+  protected List<IKeyStroke> initLocalKeyStrokes() {
     List<Class<? extends IKeyStroke>> configuredKeyStrokes = getConfiguredKeyStrokes();
     List<IKeyStroke> contributedKeyStrokes = m_contributionHolder.getContributionsByClass(IKeyStroke.class);
 
@@ -1931,7 +1926,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
         BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error initializing key stroke '" + ks.getClass().getName() + "'.", e));
       }
     }
-    return CollectionUtility.arrayList(ksMap.values());
+    return CollectionUtility.arrayListWithoutNullElements(ksMap.values());
   }
 
   @Override

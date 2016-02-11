@@ -73,8 +73,8 @@ public interface IInternalExtensionRegistry extends IExtensionRegistry {
    * @param parentModelObjectIterator
    *          Optional iterator that is going through the list of parent model objects. It is used for evaluating
    *          deep-linked move operations (i.e. those registered by
-   *          {@link IExtensionRegistry#registerMove(org.eclipse.scout.rt.platform.classid.ClassIdentifier, Double, Class)}). May be
-   *          <code>null</code>.
+   *          {@link IExtensionRegistry#registerMove(org.eclipse.scout.rt.platform.classid.ClassIdentifier, Double, Class)}
+   *          ). May be <code>null</code>.
    * @return <code>null</code> if no move operations were registered for the given model object or one
    *         {@link MoveDescriptor}.
    */
@@ -105,4 +105,14 @@ public interface IInternalExtensionRegistry extends IExtensionRegistry {
    * Removes the last pushed scope class from the stack.
    */
   void popScope();
+
+  /**
+   * Creates a backup of the current extension context (i.e. extension and scope stacks).
+   */
+  ExtensionContext backupExtensionContext();
+
+  /**
+   * Executes the given runnable in the given {@link ExtensionContext}.
+   */
+  void runInContext(ExtensionContext ctx, Runnable runnable);
 }

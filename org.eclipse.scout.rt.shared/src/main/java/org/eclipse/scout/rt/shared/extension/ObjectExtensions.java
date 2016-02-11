@@ -15,12 +15,14 @@ import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.util.Assertions;
 
 public class ObjectExtensions<OWNER, EXTENSION extends IExtension<? extends OWNER>> implements IExtensibleObject, Serializable {
   private static final long serialVersionUID = 1L;
 
   private final OWNER m_owner;
   private List<EXTENSION> m_extensions;
+  private ExtensionContext m_extensionContext;
 
   public ObjectExtensions(OWNER owner) {
     m_owner = owner;
@@ -51,6 +53,14 @@ public class ObjectExtensions<OWNER, EXTENSION extends IExtension<? extends OWNE
   }
 
   public void initConfig(EXTENSION localExtension, Runnable modelObjectInitializer) {
+    initConfig(localExtension, false, modelObjectInitializer);
+  }
+
+  public void initConfigAndBackupExtensionContext(EXTENSION localExtension, Runnable modelObjectInitializer) {
+    initConfig(localExtension, true, modelObjectInitializer);
+  }
+
+  protected void initConfig(EXTENSION localExtension, boolean backupExtensionContext, Runnable modelObjectInitializer) {
     if (m_extensions != null) {
       throw new IllegalStateException("The model object is already initialized: " + m_owner + ".");
     }
@@ -63,6 +73,9 @@ public class ObjectExtensions<OWNER, EXTENSION extends IExtension<? extends OWNE
       m_extensions = loadExtensions(localExtension);
       try {
         extensionRegistry.pushExtensions(m_extensions);
+        if (backupExtensionContext) {
+          m_extensionContext = extensionRegistry.backupExtensionContext();
+        }
         if (modelObjectInitializer != null) {
           modelObjectInitializer.run();
         }
@@ -74,6 +87,20 @@ public class ObjectExtensions<OWNER, EXTENSION extends IExtension<? extends OWNE
     finally {
       extensionRegistry.popScope();
     }
+  }
+
+  /**
+   * Executes the given runnable in the extension context, in which the referencing model object was created.
+   * {@link #initConfigAndBackupExtensionContext(IExtension, Runnable)} must have been invoked before.
+   */
+  public void runInExtensionContext(Runnable runnable) {
+    IInternalExtensionRegistry extensionRegistry = BEANS.get(IInternalExtensionRegistry.class);
+    if (extensionRegistry == null) {
+      return;
+    }
+    Assertions.assertNotNull(m_extensionContext, "The extension context has not been backed-up for {}. "
+        + "Use initConfigAndBackupExtensionContext for initializing this instance.", m_owner);
+    extensionRegistry.runInContext(m_extensionContext, runnable);
   }
 
   private List<EXTENSION> loadExtensions(EXTENSION localExtension) {
