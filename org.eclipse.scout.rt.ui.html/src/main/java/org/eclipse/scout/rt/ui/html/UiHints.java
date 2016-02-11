@@ -95,11 +95,13 @@ public final class UiHints {
   }
 
   private static boolean calculateHint(HttpServletRequest req, String sessionAttr, boolean defaultValue) {
-    HttpSession session = req.getSession(false);
-    if (session != null) {
-      Boolean hint = (Boolean) session.getAttribute(sessionAttr);
-      if (hint != null) {
-        return hint.booleanValue();
+    if (req != null) {
+      HttpSession session = req.getSession(false);
+      if (session != null) {
+        Boolean hint = (Boolean) session.getAttribute(sessionAttr);
+        if (hint != null) {
+          return hint.booleanValue();
+        }
       }
     }
     return defaultValue;

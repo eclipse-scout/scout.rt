@@ -267,6 +267,9 @@ scout.Session.prototype._processStartupResponse = function(data) {
   // Store clientSessionId in sessionStorage (to send the same ID again on page reload)
   sessionStorage.setItem('scout:clientSessionId', data.startupData.clientSessionId);
 
+  // Assign server generated uiSessionId. It must be sent along with all further requests.
+  this.uiSessionId = data.startupData.uiSessionId;
+
   // Special case: Page must be reloaded on startup (e.g. theme changed)
   if (data.startupData.reloadPage) {
     scout.reloadPage();
@@ -274,7 +277,6 @@ scout.Session.prototype._processStartupResponse = function(data) {
   }
 
   // Register UI session
-  this.uiSessionId = data.startupData.uiSessionId;
   this.modelAdapterRegistry[this.uiSessionId] = this; // FIXME cgu: maybe better separate session object from event processing, create ClientSession.js?. If yes, desktop should not have rootadapter as parent, see 406
 
   // Store adapters to adapter data cache

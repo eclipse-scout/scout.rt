@@ -23,6 +23,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineViewButton;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
+import org.eclipse.scout.rt.ui.html.UiSessionTestUtility;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.desktop.fixtures.OutlineViewButton;
@@ -53,7 +54,7 @@ public class JsonOutlineViewButtonTest {
     IDesktop desktop = Mockito.mock(IDesktop.class);
     Mockito.when(desktop.getAvailableOutlines()).thenReturn(Collections.<IOutline> singletonList(outline));
     IOutlineViewButton button = new OutlineViewButton(desktop, outline.getClass());
-    JsonOutlineViewButton<IOutlineViewButton> jsonViewButton = m_uiSession.newJsonAdapter(button, null);
+    JsonOutlineViewButton<IOutlineViewButton> jsonViewButton = UiSessionTestUtility.newJsonAdapter(m_uiSession, button, null);
     assertNull(jsonViewButton.getAdapter(outline));
 
     button.setSelected(true);
@@ -70,7 +71,7 @@ public class JsonOutlineViewButtonTest {
     IDesktop desktop = Mockito.mock(IDesktop.class);
     Mockito.when(desktop.getAvailableOutlines()).thenReturn(Collections.<IOutline> singletonList(outline));
     IOutlineViewButton button = new OutlineViewButton(desktop, outline.getClass());
-    JsonOutlineViewButton<IOutlineViewButton> jsonViewButton = m_uiSession.newJsonAdapter(button, null);
+    JsonOutlineViewButton<IOutlineViewButton> jsonViewButton = UiSessionTestUtility.newJsonAdapter(m_uiSession, button, null);
     assertNull(jsonViewButton.getAdapter(outline));
 
     JsonEvent event = createJsonDoActionEvent(jsonViewButton.getId());
@@ -91,7 +92,7 @@ public class JsonOutlineViewButtonTest {
     Mockito.when(desktop.getAvailableOutlines()).thenReturn(Collections.<IOutline> singletonList(outline));
     IOutlineViewButton button = new OutlineViewButton(desktop, outline.getClass());
     button.setSelected(true);
-    JsonOutlineViewButton<IOutlineViewButton> jsonViewButton = m_uiSession.newJsonAdapter(button, null);
+    JsonOutlineViewButton<IOutlineViewButton> jsonViewButton = UiSessionTestUtility.newJsonAdapter(m_uiSession, button, null);
 
     IJsonAdapter<?> outlineAdapter = jsonViewButton.getAdapter(outline);
     assertNotNull(outlineAdapter);

@@ -10,31 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.fixtures;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.ui.html.UiSession;
-import org.eclipse.scout.rt.ui.html.json.JsonStartupRequest;
 
 public class UiSessionMock extends UiSession {
 
   public UiSessionMock() {
-  }
-
-  @Override
-  public void init(HttpServletRequest req, HttpServletResponse resp, JsonStartupRequest jsonStartupReq) {
-    // NOP
-  }
-
-  @Override
-  public IClientSession getClientSession() {
-    return TestEnvironmentClientSession.get();
-  }
-
-  @Override
-  public String getUiSessionId() {
-    return "UI:Session:Mock";
+    setCurrentJsonResponseInternal(createJsonStartupResponse());
+    setClientSessionInternal(TestEnvironmentClientSession.get());
+    setUiSessionIdInternal("UI:Session:Mock");
   }
 }

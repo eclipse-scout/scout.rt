@@ -28,7 +28,6 @@ import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IBeanInstanceProducer;
 import org.eclipse.scout.rt.testing.platform.runner.JUnitExceptionHandler;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
-import org.eclipse.scout.rt.ui.html.json.JsonAdapterRegistry;
 import org.eclipse.scout.rt.ui.html.json.testing.JsonTestUtility;
 import org.junit.After;
 import org.junit.Before;
@@ -83,7 +82,7 @@ public class UiSessionTest {
   @Test
   public void testLogout() throws Exception {
     UiSession uiSession = (UiSession) JsonTestUtility.createAndInitializeUiSession();
-    HttpSession httpSession = getHttpSession(uiSession);
+    HttpSession httpSession = UiSessionTestUtility.getHttpSession(uiSession);
 
     uiSession.getClientSession().stop();
 
@@ -97,7 +96,7 @@ public class UiSessionTest {
   @Test
   public void testSessionInvalidation() throws Exception {
     UiSession uiSession = (UiSession) JsonTestUtility.createAndInitializeUiSession();
-    HttpSession httpSession = getHttpSession(uiSession);
+    HttpSession httpSession = UiSessionTestUtility.getHttpSession(uiSession);
     IClientSession clientSession = uiSession.getClientSession();
     assertFalse(uiSession.isDisposed());
 
@@ -114,19 +113,5 @@ public class UiSessionTest {
 
     uiSession = null;
     TestingUtility.assertGC(ref);
-  }
-
-  /**
-   * helper method for unit tests to access protected method "getJsonAdapterRegistry"
-   */
-  public static JsonAdapterRegistry getJsonAdapterRegistry(UiSession session) {
-    return session.getJsonAdapterRegistry();
-  }
-
-  /**
-   * helper method for unit tests to access protected method "sessionStore().getHttpSession()"
-   */
-  public static HttpSession getHttpSession(UiSession session) {
-    return session.sessionStore().getHttpSession();
   }
 }

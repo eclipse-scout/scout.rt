@@ -22,7 +22,7 @@ import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.ui.html.UiSession;
-import org.eclipse.scout.rt.ui.html.UiSessionTest;
+import org.eclipse.scout.rt.ui.html.UiSessionTestUtility;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonDesktop;
 import org.eclipse.scout.rt.ui.html.json.fixtures.UiSessionMock;
 import org.eclipse.scout.rt.ui.html.json.form.JsonForm;
@@ -44,23 +44,23 @@ public class JsonAdapterRegistryTest {
     IJsonAdapter<?> adapter = session.getOrCreateJsonAdapter(model, null);
 
     // Note: Additionally, registry contains the "root adapter" and a context-menu
-    assertEquals(3, UiSessionTest.getJsonAdapterRegistry(session).size());
+    assertEquals(3, UiSessionTestUtility.getJsonAdapterRegistry(session).size());
     assertEquals(2, session.currentJsonResponse().adapterMap().size());
     assertEquals(0, session.currentJsonResponse().eventList().size());
 
     model.setDisplayText("Test");
-    assertEquals(3, UiSessionTest.getJsonAdapterRegistry(session).size());
+    assertEquals(3, UiSessionTestUtility.getJsonAdapterRegistry(session).size());
     assertEquals(2, session.currentJsonResponse().adapterMap().size());
     assertEquals(1, session.currentJsonResponse().eventList().size());
 
     adapter.dispose();
-    assertEquals(1, UiSessionTest.getJsonAdapterRegistry(session).size());
+    assertEquals(1, UiSessionTestUtility.getJsonAdapterRegistry(session).size());
     assertEquals(0, session.currentJsonResponse().adapterMap().size());
     assertEquals(0, session.currentJsonResponse().eventList().size());
   }
 
   public static void testFormOpenedAndClosedInSameRequest(UiSession uiSession) throws JSONException {
-    JsonDesktop<IDesktop> jsonDesktop = uiSession.newJsonAdapter(uiSession.getClientSession().getDesktop(), null);
+    JsonDesktop<IDesktop> jsonDesktop = UiSessionTestUtility.newJsonAdapter(uiSession, uiSession.getClientSession().getDesktop(), null);
     FormWithOneField form = new FormWithOneField();
 
     form.start();

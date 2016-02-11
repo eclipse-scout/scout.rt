@@ -23,6 +23,7 @@ import org.eclipse.scout.rt.client.ui.basic.planner.Resource;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
+import org.eclipse.scout.rt.ui.html.UiSessionTestUtility;
 import org.eclipse.scout.rt.ui.html.json.fixtures.UiSessionMock;
 import org.eclipse.scout.rt.ui.html.json.testing.JsonTestUtility;
 import org.json.JSONException;
@@ -52,7 +53,7 @@ public class JsonPlannerTest {
     Activity<Resource<Integer>, Integer> activity = createActivity(resource, 2);
     resource.addActivity(activity);
     planner.addResource(resource);
-    JsonPlanner<IPlanner> jsonPlanner = m_uiSession.newJsonAdapter(planner, null);
+    JsonPlanner<IPlanner> jsonPlanner = UiSessionTestUtility.newJsonAdapter(m_uiSession, planner, null);
     jsonPlanner.toJson();
     String resourceId = jsonPlanner.getResourceId(resource);
     String activityId = jsonPlanner.getActivityId(activity);

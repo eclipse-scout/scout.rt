@@ -34,6 +34,7 @@ import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.eclipse.scout.rt.ui.html.UiException;
+import org.eclipse.scout.rt.ui.html.UiSessionTestUtility;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.fixtures.UiSessionMock;
@@ -170,7 +171,7 @@ public class JsonTreeTest {
   public void testDispose() {
     ITree tree = new TreeWith3Levels();
     tree.initTree();
-    JsonTree<ITree> object = m_uiSession.newJsonAdapter(tree, null);
+    JsonTree<ITree> object = UiSessionTestUtility.newJsonAdapter(m_uiSession, tree, null);
     WeakReference<JsonTree> ref = new WeakReference<JsonTree>(object);
 
     object.dispose();

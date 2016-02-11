@@ -22,6 +22,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBoxUIFacade;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
+import org.eclipse.scout.rt.ui.html.UiSessionTestUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.fixtures.UiSessionMock;
 import org.eclipse.scout.rt.ui.html.json.form.fields.groupbox.JsonGroupBox;
@@ -80,7 +81,7 @@ public class JsonTabBoxTest {
     ITabBox tabBox = new TabBoxWithNonDisplayableGroup();
     JsonTestUtility.initField(tabBox);
 
-    JsonTabBox<ITabBox> jsonTabBox = m_uiSession.newJsonAdapter(tabBox, null);
+    JsonTabBox<ITabBox> jsonTabBox = UiSessionTestUtility.newJsonAdapter(m_uiSession, tabBox, null);
     JsonGroupBox<IGroupBox> jsonDisplayableGroup = m_uiSession.getJsonAdapter(tabBox.getFieldByClass(TabBoxWithNonDisplayableGroup.DisplayableGroup.class), jsonTabBox);
     JsonGroupBox<IGroupBox> jsonNonDisplayableGroup = m_uiSession.getJsonAdapter(tabBox.getFieldByClass(TabBoxWithNonDisplayableGroup.NonDisplayableGroup.class), jsonTabBox);
 

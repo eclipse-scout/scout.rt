@@ -43,6 +43,11 @@ public interface IUiSession {
    */
   String PREFERRED_LOCALE_COOKIE_NAME = "scout.preferredLocale";
 
+  /**
+   * Returns a reentrant lock that can be used to synchronize on the {@link IUiSession}.
+   */
+  ReentrantLock uiSessionLock();
+
   void init(HttpServletRequest req, HttpServletResponse resp, JsonStartupRequest jsonStartupReq);
 
   /**
@@ -51,10 +56,11 @@ public interface IUiSession {
    */
   boolean isInitialized();
 
-  /**
-   * Returns a reentrant lock that can be used to synchronize on the {@link IUiSession}.
-   */
-  ReentrantLock uiSessionLock();
+  String getUiSessionId();
+
+  String getClientSessionId();
+
+  IClientSession getClientSession();
 
   /**
    * All requests except the polling requests are calling this method from the {@link JsonMessageRequestHandler}
@@ -83,14 +89,6 @@ public interface IUiSession {
    * @return <code>true</code> if {@link #dispose()} has been called.
    */
   boolean isDisposed();
-
-  /**
-   * Called from the model after the client session has been stopped.
-   * <p>
-   * <b>Important:</b> Because this method internally calls {@link #dispose()}, it must only be called in a context that
-   * holds the {@link #uiSessionLock()}! (Either the current thread or a caller that waits for the current thread.)
-   */
-  void logout();
 
   /**
    * @return the current UI response that is collecting changes for the next
@@ -124,13 +122,22 @@ public interface IUiSession {
 
   void processCancelRequest();
 
-  String getUiSessionId();
+  /**
+   * Called from the model after the client session has been stopped.
+   * <p>
+   * <b>Important:</b> Because this method internally calls {@link #dispose()}, it must only be called in a context that
+   * holds the {@link #uiSessionLock()}! (Either the current thread or a caller that waits for the current thread.)
+   */
+  void logout();
 
-  String getClientSessionId();
-
-  IClientSession getClientSession();
+  /**
+   * @return the URL where to redirect the UI on logout
+   */
+  String getLogoutRedirectUrl();
 
   IJsonAdapter<?> getRootJsonAdapter();
+
+  String createUniqueId();
 
   /**
    * Returns an existing IJsonAdapter instance for the given adapter ID.
@@ -138,18 +145,18 @@ public interface IUiSession {
   IJsonAdapter<?> getJsonAdapter(String id);
 
   /**
+   * Returns all JSON adapters which belong to the given model object.
+   */
+  <M> List<IJsonAdapter<M>> getJsonAdapters(M model);
+
+  List<IJsonAdapter<?>> getJsonChildAdapters(IJsonAdapter<?> parent);
+
+  /**
    * Returns an existing IJsonAdapter instance for the given model object.
    */
   <M, A extends IJsonAdapter<? super M>> A getJsonAdapter(M model, IJsonAdapter<?> parent);
 
   <M, A extends IJsonAdapter<? super M>> A getJsonAdapter(M model, IJsonAdapter<?> parent, boolean checkRoot);
-
-  List<IJsonAdapter<?>> getJsonChildAdapters(IJsonAdapter<?> parent);
-
-  /**
-   * Returns all JSON adapters which belong to the given model object.
-   */
-  <M> List<IJsonAdapter<M>> getJsonAdapters(M model);
 
   /**
    * Creates a new initialized IJsonAdapter instance for the given model or returns an existing instance. As a
@@ -159,18 +166,9 @@ public interface IUiSession {
 
   <M, A extends IJsonAdapter<? super M>> A createJsonAdapter(M model, IJsonAdapter<?> parent);
 
-  String createUniqueId();
-
   void registerJsonAdapter(IJsonAdapter<?> adapter);
 
   void unregisterJsonAdapter(String id);
-
-  /**
-   * @return the URL where to redirect the UI on logout
-   */
-  String getLogoutRedirectUrl();
-
-  boolean isInspectorHint();
 
   /**
    * Blocks the current thread/request until a model job started by a background job has terminated.
@@ -191,8 +189,6 @@ public interface IUiSession {
 
   /**
    * Sets the new theme (session & cookie) and triggers a reload of the current page in the browser.
-   *
-   * @param theme
    */
   void updateTheme(String theme);
 }

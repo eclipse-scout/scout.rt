@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.testing;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -27,9 +26,8 @@ import org.eclipse.scout.rt.ui.html.HttpSessionHelper;
 import org.eclipse.scout.rt.ui.html.ISessionStore;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.SessionStore;
-import org.eclipse.scout.rt.ui.html.UiException;
 import org.eclipse.scout.rt.ui.html.UiSession;
-import org.eclipse.scout.rt.ui.html.UiSession.HttpContext;
+import org.eclipse.scout.rt.ui.html.UiSessionTestUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonEventType;
 import org.eclipse.scout.rt.ui.html.json.JsonRequest;
@@ -47,7 +45,6 @@ public final class JsonTestUtility {
   }
 
   public static IUiSession createAndInitializeUiSession() {
-    String uiSessionId = "1.1";
     String clientSessionId = "testClientSession123";
     HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
     HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
@@ -66,30 +63,19 @@ public final class JsonTestUtility {
       }
     }).when(httpSession).invalidate();
     JSONObject jsonReqObj = new JSONObject();
-    try {
-      jsonReqObj.put(JsonRequest.PROP_UI_SESSION_ID, uiSessionId);
-      jsonReqObj.put(JsonStartupRequest.PROP_CLIENT_SESSION_ID, clientSessionId);
-    }
-    catch (JSONException e) {
-      throw new UiException(e);
-    }
-    JsonRequest jsonRequest = new JsonRequest(jsonReqObj);
+    jsonReqObj.put(JsonStartupRequest.PROP_CLIENT_SESSION_ID, clientSessionId);
+    jsonReqObj.put("startup", true);
+    JsonStartupRequest jsonStartupRequest = new JsonStartupRequest(new JsonRequest(jsonReqObj));
     IUiSession uiSession = new TestEnvironmentUiSession();
-    uiSession.init(request, response, new JsonStartupRequest(jsonRequest));
+    uiSession.init(request, response, jsonStartupRequest);
     return uiSession;
   }
 
   /**
    * Empties the response object and flushes the session
    */
-  public static void endRequest(IUiSession uiSession) throws Exception {
-    Field field = UiSession.class.getDeclaredField("m_currentJsonResponse");
-    field.setAccessible(true);
-    field.set(uiSession, new JsonResponse());
-
-    field = UiSession.class.getDeclaredField("m_currentHttpContext");
-    field.setAccessible(true);
-    ((HttpContext) field.get(uiSession)).clear();
+  public static void endRequest(UiSession uiSession) throws Exception {
+    UiSessionTestUtility.endRequest(uiSession);
   }
 
   /**
