@@ -107,9 +107,9 @@ describe('SmartField', function() {
       smartField._sendTimeoutId = null;
       smartField.$field.val('bar');
       smartField._proposalTyped();
-      expect(smartField._sendTimeoutId).toBeTruthy();
+      expect(smartField._pendingProposalTyped).toBeTruthy();
       smartField._acceptProposal();
-      expect(smartField._sendTimeoutId).toBe(null);
+      expect(smartField._pendingProposalTyped).toBe(null);
     });
 
     it('dont send _acceptProposal when searchText has not changed', function() {
