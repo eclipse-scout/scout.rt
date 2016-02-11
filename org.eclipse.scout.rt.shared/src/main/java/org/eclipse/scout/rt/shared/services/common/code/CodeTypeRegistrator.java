@@ -8,7 +8,6 @@ import org.eclipse.scout.rt.platform.IBeanManager;
 import org.eclipse.scout.rt.platform.IPlatform;
 import org.eclipse.scout.rt.platform.IPlatformListener;
 import org.eclipse.scout.rt.platform.PlatformEvent;
-import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,7 +19,7 @@ public class CodeTypeRegistrator implements IPlatformListener {
   private static final Logger LOG = LoggerFactory.getLogger(CodeTypeRegistrator.class);
 
   @Override
-  public void stateChanged(PlatformEvent e) throws PlatformException {
+  public void stateChanged(PlatformEvent e) {
     if (e.getState() == IPlatform.State.BeanManagerPrepared) {
       IBeanManager beanManager = e.getSource().getBeanManager();
       Set<Class<? extends ICodeType<?, ?>>> classes = BEANS.get(CodeTypeClassInventory.class).getClasses();
