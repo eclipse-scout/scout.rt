@@ -401,10 +401,12 @@ scout.Table.prototype.onContextMenu = function(event) {
         // Set table style to focused, so that it looks as it still has the focus.
         // Must be called after open(), because opening the popup might cause another
         // popup to close first (which will remove the 'focused' class).
-        this.$container.addClass('focused');
-        popup.on('close', function(event) {
-          this.$container.removeClass('focused');
-        }.bind(this));
+        if (this.enabled) {
+          this.$container.addClass('focused');
+          popup.on('close', function(event) {
+            this.$container.removeClass('focused');
+          }.bind(this));
+        }
       }
     }
   };

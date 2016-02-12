@@ -132,7 +132,9 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
   addFirstLastClass($rightGroups);
 
   // Set table style to focused, so that it looks as it still has the focus.
-  this.table.$container.addClass('focused');
+  if (this.table.enabled) {
+    this.table.$container.addClass('focused');
+  }
 
   function addFirstLastClass(groups) {
     if (groups.length) {
