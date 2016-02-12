@@ -121,7 +121,8 @@ scout.create = function(vararg, options) {
 };
 
 /**
- * Prepares the DOM for scout. This should be called once while initializing scout.
+ * Prepares the DOM for scout in the given document. This should be called once while initializing scout.
+ * If the target document is not specified, the global "document" variable is used instead.
  *
  * This is used by main.js, login.js and logout.js.
  *
@@ -129,17 +130,18 @@ scout.create = function(vararg, options) {
  * - Remove the <noscript> tag (obviously there is no need for it).
  * - If the browser is Google Chrome, add a special meta header to prevent automatic translation.
  */
-scout.prepareDOM = function() {
+scout.prepareDOM = function(targetDocument) {
+  targetDocument = targetDocument || document;
   // Cleanup DOM
-  $('noscript').remove();
+  $('noscript', targetDocument).remove();
 
   // Prevent "Do you want to translate this page?" in Google Chrome
   if (scout.device.browser === scout.Device.Browser.CHROME) {
     var metaNoTranslate = '<meta name="google" content="notranslate" />';
-    var $title = $('head > title');
+    var $title = $('head > title', targetDocument);
     if ($title.length === 0) {
       // Add to end of head
-      $('head').append(metaNoTranslate);
+      $('head', targetDocument).append(metaNoTranslate);
     } else {
       $title.after(metaNoTranslate);
     }

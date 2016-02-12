@@ -43,15 +43,9 @@ scout.PopupWindow.prototype._onReady = function() {
     $myWindow = $(this.myWindow),
     $myDocument = $(myDocument);
 
-  // TODO [5.2] awe: Try to rewrite URL via history API (to remove "popup-window.html?formId=12345" part)
-  var history = this.myWindow.history;
-  if (history && typeof history.pushState === 'function') {
-    history.replaceState(history.state, this.myWindow.document.title, this.myWindow.opener.location.href);
-  }
-
   // Install polyfills on new window
   scout.polyfills.install(this.myWindow);
-  scout.prepareDOM();
+  scout.prepareDOM(myDocument);
 
   this.$container = $('.scout', myDocument);
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
