@@ -17,12 +17,10 @@
  * which is natively focusable and which is not covert by a glass pane. Furthermore, if a context is unintalled,
  * the previously active focus context is activated and its focus position restored.
  */
-scout.FocusManager = function(session, options) {
-  options = options || {};
-
+scout.FocusManager = function(session, focusManagerActive) {
   var $mainEntryPoint = session.$entryPoint;
   this.session = session;
-  this.active = scout.nvl(options.focusManagerActive, scout.device.focusManagerActive);
+  this.active = scout.nvl(focusManagerActive, scout.device.focusManagerActive);
 
   this._focusContexts = [];
   this._glassPaneTargets = [];

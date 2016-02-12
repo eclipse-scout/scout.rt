@@ -22,6 +22,10 @@
  *     (which is the default case), the clientSessionId is taken from the browser's
  *     session storage (per browser window, survives F5 refresh of page). If no
  *     clientSessionId can be found, a new one is generated on the server.
+ *   [forceNewClientSession]
+ *     Optional, default is false. If this argument is true, any existing
+ *     "clientSessionId" is ignored, which causes the server to always create a
+ *     new client session.
  *   [userAgent]
  *     Default: DESKTOP
  *   [backgroundJobPollingEnabled]
@@ -35,14 +39,17 @@
  *   [uiUseTaskbarLogo]
  *     If true, the desktop will add a small logo to the taskbar. It is styled with
  *     the CSS class ".taskbar-logo". Defaults to false.
+ *   [focusManagerActive]
+ *     Forces the focus manager to be active or not. If undefined, the value is
+ *     auto detected by Device.js.
  */
 scout.Session = function($entryPoint, options) {
   options = options || {};
 
   // Prepare clientSessionId
-  var clientSessionId = options.clientSessionId;
-  if (!clientSessionId) {
-    clientSessionId = sessionStorage.getItem('scout:clientSessionId');
+  var clientSessionId = options.clientSessionId || sessionStorage.getItem('scout:clientSessionId');
+  if (options.forceNewClientSession) {
+    clientSessionId = null;
   }
 
   // Set members
@@ -82,7 +89,7 @@ scout.Session = function($entryPoint, options) {
   });
 
   // Install focus management for this session.
-  this.focusManager = new scout.FocusManager(this, options);
+  this.focusManager = new scout.FocusManager(this, options.focusManagerActive);
   this.keyStrokeManager = new scout.KeyStrokeManager(this);
 };
 
@@ -207,9 +214,11 @@ scout.Session.prototype.sendEvent = function(event, delay) {
 scout.Session.prototype._sendStartupRequest = function() {
   // Build startup request (see JavaDoc for JsonStartupRequest.java for details)
   var request = {
-    startup: true,
-    partId: this.partId
+    startup: true
   };
+  if (this.partId) {
+    request.partId = this.partId;
+  }
   if (this.clientSessionId) {
     request.clientSessionId = this.clientSessionId;
   }
