@@ -559,6 +559,17 @@ scout.Table.prototype.updateScrollbars = function() {
   scout.scrollbars.update(this.$data);
 };
 
+scout.Table.prototype.storeScrollPosition = function() {
+  this.storedScrollTop = this.scrollTop;
+};
+
+scout.Table.prototype.restoreScrollPosition = function() {
+  if (this.storedScrollTop) {
+    this.setScrollTop(this.storedScrollTop);
+    this.storedScrollTop = null;
+  }
+};
+
 scout.Table.prototype._sort = function(animateAggregateRows) {
   var column, sortIndex,
     sortColumns = [];
@@ -3309,10 +3320,10 @@ scout.Table.prototype._renderViewRange = function(viewRange) {
   }.bind(this));
 
   // check if at least last and first row in range got correctly rendered
-  if (this.viewRangeRendered.size > 0) {
+  if (this.viewRangeRendered.size() > 0) {
     var rows = this.filteredRows();
-    var firstRow = rows[this.viewRangeRendered.from].$row;
-    var lastRow = rows[this.viewRangeRendered.to].$row;
+    var firstRow = rows[this.viewRangeRendered.from];
+    var lastRow = rows[this.viewRangeRendered.to - 1];
     if (!firstRow.$row || !lastRow.$row) {
       throw new Error('Rows not rendered as expected. ' + this.viewRangeRendered + '. First: ' + firstRow.$row + '. Last: ' + lastRow.$row);
     }
