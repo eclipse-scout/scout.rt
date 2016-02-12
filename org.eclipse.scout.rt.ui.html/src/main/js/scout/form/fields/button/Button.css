@@ -22,40 +22,44 @@
   margin-left: @mandatory-indicator-width;
 }
 
-.button-field > .link {
+.button-field > .field.link-button {
   /* add a transparent border to align text with normal buttons which also have a border */
-  border: 1px solid transparent;
+  border-top: 1px solid transparent;
+  border-bottom: 1px solid transparent;
 
-  &.menu-item {
+  & > .link.menu-item {
     /* Draw underline in child element, otherwise the position would not be correct in FF */
     text-decoration: none;
+    display: inline;
+    vertical-align: middle;
+    padding-bottom: 2px;
 
     & > .text {
       text-decoration: underline;
     }
+  }
 
-    &:focus {
-      outline: none;
+  &:focus {
+    outline: none;
 
-      &:not(.disabled) {
-        color: @hover-color;
+    & > .link.menu-item {
+      color: @hover-color;
 
-        &:not(.menu-button) {
+      &:not(.menu-button) {
+        color: @focus-color;
+
+        &::after {
           color: @focus-color;
-
-          &::after {
-            color: @focus-color;
-          }
         }
+      }
 
-        &:focus::after {
-          #scout.button-focus();
-        }
+      &::after {
+        #scout.button-focus();
       }
     }
   }
 
-  &.menu-item > .icon:not(.font-icon) {
+  & > .link.menu-item > .icon:not(.font-icon) {
     /* override hack in Menu.css */
     top: 0;
   }
