@@ -231,7 +231,7 @@ scout.scrollbars = {
   scrollTo: function($scrollable, $element) {
     var scrollTo,
       scrollableH = $scrollable.height(),
-      elementBounds = scout.graphics.offsetBounds($element, true, true),
+      elementBounds = scout.graphics.offsetBounds($element, false, false),
       scrollableBounds = scout.graphics.offsetBounds($scrollable, false, false),
       elementTop = elementBounds.y - scrollableBounds.y,
       elementH = elementBounds.height,
