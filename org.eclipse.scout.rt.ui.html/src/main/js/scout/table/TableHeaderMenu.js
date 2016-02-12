@@ -104,16 +104,14 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
   }
   // Add/remove/change columns
   leftGroups.push(this._renderColumnActionsGroup());
-  // Grouping and aggregation
-  // column.grouped check necessary to make ungroup possible, even if there is no number column anymore
-  if (this.table.containsNumberColumn() || this.column.grouped) {
-    if (this.column instanceof scout.NumberColumn) {
-      if (this.table.isGrouped() || this.table.hasAggregateTableControl()) {
-        leftGroups.push(this._renderAggregationGroup());
-      }
-    } else if (this.table.sortEnabled) { // grouping without sorting is not possible
-      leftGroups.push(this._renderGroupingGroup());
-    }
+  // Grouping
+  // column.grouped check necessary to make ungroup possible, even if grouping is not possible anymore
+  if (this.table.isGroupingPossible(this.column) || this.column.grouped) {
+    leftGroups.push(this._renderGroupingGroup());
+  }
+  // Aggregation
+  if (this.table.isAggregationPossible(this.column)) {
+    leftGroups.push(this._renderAggregationGroup());
   }
   // Coloring
   if (this.column instanceof scout.NumberColumn) {
@@ -396,6 +394,12 @@ scout.TableHeaderMenu.prototype._renderGroupingGroup = function() {
     groupButton.setSelected(true);
     groupAddButton.setVisible(false);
   } else if (groupCount > 1) {
+    groupAddButton.setVisible(true);
+  }
+
+  if (table.hasPermanentHeadOrTailSortColumns() && groupCount > 0) {
+    // If table has permanent head columns, other columns may not be grouped exclusively -> only enable add button (equally done for sort buttons)
+    groupButton.setVisible(false);
     groupAddButton.setVisible(true);
   }
 
