@@ -684,14 +684,14 @@ scout.Session.prototype._processErrorJsonResponse = function(jsonError) {
 };
 
 scout.Session.prototype._fireRequestFinished = function(message) {
-  if (!this._deferred || !message.events) {
+  if (!this._deferred) {
     return;
   }
-
-  for (var i = 0; i < message.events.length; i++) {
-    this._deferredEventTypes.push(message.events[i].type);
+  if (message.events) {
+    for (var i = 0; i < message.events.length; i++) {
+      this._deferredEventTypes.push(message.events[i].type);
+    }
   }
-
   if (this._requestsPendingCounter === 0) {
     this._deferred.resolve(this._deferredEventTypes);
     this._deferred = null;
