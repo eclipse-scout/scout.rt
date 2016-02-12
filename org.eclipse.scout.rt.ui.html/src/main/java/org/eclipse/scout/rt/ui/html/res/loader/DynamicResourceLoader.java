@@ -76,18 +76,20 @@ public class DynamicResourceLoader extends AbstractResourceLoader {
       return null;
     }
     IBinaryResourceProvider provider = (IBinaryResourceProvider) jsonAdapter;
-    BinaryResourceHolder binaryResource = provider.provideBinaryResource(filename);
-    if (binaryResource == null || binaryResource.get() == null) {
+    BinaryResourceHolder binaryResourceHolder = provider.provideBinaryResource(filename);
+    if (binaryResourceHolder == null || binaryResourceHolder.get() == null) {
       return null;
     }
-    String contentType = binaryResource.get().getContentType();
+    BinaryResource binaryResource = binaryResourceHolder.get();
+    String contentType = binaryResource.getContentType();
     if (contentType == null) {
-      contentType = detectContentType(binaryResource.get().getFilename());
+      contentType = detectContentType(binaryResource.getFilename());
     }
-    BinaryResource content = new BinaryResource(pathInfo, contentType, binaryResource.get().getCharset(), binaryResource.get().getContent(), binaryResource.get().getLastModified());
+
+    BinaryResource content = new BinaryResource(pathInfo, contentType, binaryResource.getCharset(), binaryResource.getContent(), binaryResource.getLastModified());
     HttpCacheObject httpCacheObject = new HttpCacheObject(cacheKey, content.getLastModified() > 0, IHttpCacheControl.MAX_AGE_4_HOURS, content);
-    if (binaryResource.isDownload()) {
-      addResponseHeaderForDownload(httpCacheObject, binaryResource.get().getFilename());
+    if (binaryResourceHolder.isDownload()) {
+      addResponseHeaderForDownload(httpCacheObject, binaryResource.getFilename());
     }
     return httpCacheObject;
   }
