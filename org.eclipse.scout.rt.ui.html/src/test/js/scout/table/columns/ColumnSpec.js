@@ -86,6 +86,21 @@ describe("Column", function() {
     expect($cells1.eq(2)).toHaveClass('halign-right');
   });
 
+  it("converts linebreak into <br> in header cells", function() {
+    var model = helper.createModelFixture(3, 2);
+    model.columns[0].text = 'header text';
+    model.columns[1].text = 'header text\nNew line';
+    var table = helper.createTable(model);
+    table.render(session.$entryPoint);
+
+    var $headerItems = table.header.$container.find('.table-header-item');
+    var $headerItem0Text = $headerItems.eq(0).children('.table-header-item-text');
+    var $headerItem1Text = $headerItems.eq(1).children('.table-header-item-text');
+
+    expect($headerItem0Text.html()).toBe('header text');
+    expect($headerItem1Text.html()).toBe('header text<br>New line');
+  });
+
   it("considers custom css class of a column", function() {
     var model = helper.createModelFixture(3, 2);
     model.columns[0].cssClass = 'abc';

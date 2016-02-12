@@ -126,8 +126,9 @@ scout.styles = {
       cssColor = scout.styles.modelToCssColor(obj[scout.strings.lowercaseFirstLetter(propertyPrefix + 'ForegroundColor')]);
       cssBackgroundColor = scout.styles.modelToCssColor(obj[scout.strings.lowercaseFirstLetter(propertyPrefix + 'BackgroundColor')]);
 
-      if (obj.font) {
-        var fontSpec = this.parseFontSpec(obj[scout.strings.lowercaseFirstLetter(propertyPrefix + 'Font')]);
+      var fontProperty = scout.strings.lowercaseFirstLetter(propertyPrefix + 'Font');
+      if (fontProperty in obj) {
+        var fontSpec = this.parseFontSpec(obj[fontProperty]);
         if (fontSpec.bold) {
           cssFontWeight = 'bold';
         }

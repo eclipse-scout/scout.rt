@@ -573,8 +573,7 @@ scout.Table.prototype.restoreScrollPosition = function() {
 };
 
 scout.Table.prototype._sort = function(animateAggregateRows) {
-  var column, sortIndex,
-    sortColumns = this._sortColumns();
+  var sortColumns = this._sortColumns();
 
   // Initialize comparators
   var clientSideSortingPossible = this.uiSortPossible && this._prepareColumnsForSorting(sortColumns);
@@ -3591,7 +3590,12 @@ scout.Table.prototype._onColumnHeadersUpdated = function(columns) {
     column = this._columnById(columns[i].id);
     oldColumnState = $.extend(oldColumnState, column);
     column.text = columns[i].text;
+    column.tooltipText = columns[i].tooltipText;
     column.headerCssClass = columns[i].headerCssClass;
+    column.headerBackgroundColor = columns[i].headerBackgroundColor;
+    column.headerForegroundColor = columns[i].headerForegroundColor;
+    column.headerFont = columns[i].headerFont;
+    column.headerIconId = columns[i].headerIconId;
     column.sortActive = columns[i].sortActive;
     column.sortAscending = columns[i].sortAscending;
     if (!column.sortActive && column.sortIndex !== -1) {
