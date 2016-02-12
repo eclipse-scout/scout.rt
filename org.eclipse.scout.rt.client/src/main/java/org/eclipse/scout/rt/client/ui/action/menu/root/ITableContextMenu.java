@@ -18,7 +18,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 public interface ITableContextMenu extends IContextMenu {
 
   @Override
-  ITable getOwner();
+  ITable getContainer();
 
   void callOwnerValueChanged();
 }

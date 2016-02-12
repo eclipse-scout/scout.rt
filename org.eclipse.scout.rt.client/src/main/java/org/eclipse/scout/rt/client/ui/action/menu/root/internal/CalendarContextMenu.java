@@ -15,7 +15,7 @@ import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
-import org.eclipse.scout.rt.client.ui.action.menu.root.AbstractPropertyObserverContextMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.root.AbstractContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.ICalendarContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarComponent;
 import org.eclipse.scout.rt.client.ui.basic.calendar.ICalendar;
@@ -23,7 +23,7 @@ import org.eclipse.scout.rt.client.ui.basic.calendar.ICalendar;
 /**
  * The invisible root menu node of any calendar. (internal usage only)
  */
-public class CalendarContextMenu extends AbstractPropertyObserverContextMenu<ICalendar> implements ICalendarContextMenu {
+public class CalendarContextMenu extends AbstractContextMenu<ICalendar> implements ICalendarContextMenu {
   /**
    * @param owner
    */
@@ -35,7 +35,7 @@ public class CalendarContextMenu extends AbstractPropertyObserverContextMenu<ICa
   protected void initConfig() {
     super.initConfig();
     // set active filter
-    setCurrentMenuTypes(MenuUtility.getMenuTypesForCalendarSelection(getOwner().getSelectedComponent()));
+    setCurrentMenuTypes(MenuUtility.getMenuTypesForCalendarSelection(getContainer().getSelectedComponent()));
     calculateLocalVisibility();
   }
 
@@ -45,8 +45,9 @@ public class CalendarContextMenu extends AbstractPropertyObserverContextMenu<ICa
   }
 
   protected void handleOwnerValueChanged() {
-    if (getOwner() != null) {
-      final CalendarComponent ownerValue = getOwner().getSelectedComponent();
+    ICalendar container = getContainer();
+    if (container != null) {
+      final CalendarComponent ownerValue = container.getSelectedComponent();
       setCurrentMenuTypes(MenuUtility.getMenuTypesForCalendarSelection(ownerValue));
       acceptVisitor(new MenuOwnerChangedVisitor(ownerValue, getCurrentMenuTypes()));
       calculateLocalVisibility();

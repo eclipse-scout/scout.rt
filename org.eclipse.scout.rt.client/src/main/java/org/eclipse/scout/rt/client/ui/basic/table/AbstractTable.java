@@ -927,7 +927,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
 
     // key strokes
     List<Class<? extends IKeyStroke>> ksClasses = getConfiguredKeyStrokes();
-    ArrayList<IKeyStroke> ksList = new ArrayList<IKeyStroke>(ksClasses.size());
+    List<IKeyStroke> ksList = new ArrayList<IKeyStroke>(ksClasses.size());
     for (Class<? extends IKeyStroke> clazz : ksClasses) {
       IKeyStroke ks = ConfigurationUtility.newInnerInstance(this, clazz);
       ks.initAction();
@@ -949,7 +949,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     List<IKeyStroke> contributedKeyStrokes = m_contributionHolder.getContributionsByClass(IKeyStroke.class);
     ksList.addAll(contributedKeyStrokes);
     setKeyStrokes(ksList);
-    // FIXME AWE: (organize) austauschbar mit bean
+
     m_tableOrganizer = BEANS.get(ITableOrganizerProvider.class).createTableOrganizer(this);
 
     // add Convenience observer for drag & drop callbacks, event history and ui sort possible check

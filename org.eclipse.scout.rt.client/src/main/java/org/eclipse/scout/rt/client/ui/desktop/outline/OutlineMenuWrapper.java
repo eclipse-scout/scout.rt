@@ -25,8 +25,8 @@ import org.eclipse.scout.rt.client.ui.action.IActionVisitor;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 import org.eclipse.scout.rt.client.ui.action.tree.IActionNode;
-import org.eclipse.scout.rt.platform.classid.ITypeWithClassId;
 import org.eclipse.scout.rt.platform.reflect.AbstractPropertyObserver;
+import org.eclipse.scout.rt.platform.reflect.IPropertyObserver;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
 /**
@@ -470,12 +470,12 @@ public class OutlineMenuWrapper extends AbstractPropertyObserver implements IMen
   }
 
   @Override
-  public ITypeWithClassId getContainer() {
+  public IPropertyObserver getContainer() {
     return m_wrappedMenu.getContainer();
   }
 
   @Override
-  public void setContainerInternal(ITypeWithClassId container) {
+  public void setContainerInternal(IPropertyObserver container) {
     // void
   }
 

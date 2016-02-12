@@ -17,11 +17,11 @@ import java.util.List;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.IActionVisitor;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
-import org.eclipse.scout.rt.client.ui.action.menu.root.AbstractPropertyObserverContextMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.root.AbstractContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IFormFieldContextMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 
-public class FormFieldContextMenu<T extends IFormField> extends AbstractPropertyObserverContextMenu<T> implements IFormFieldContextMenu {
+public class FormFieldContextMenu<T extends IFormField> extends AbstractContextMenu<T> implements IFormFieldContextMenu {
 
   /**
    * @param owner
@@ -49,8 +49,8 @@ public class FormFieldContextMenu<T extends IFormField> extends AbstractProperty
   }
 
   protected void handleOwnerEnabledChanged() {
-    if (getOwner() != null) {
-      final boolean enabled = getOwner().isEnabled();
+    if (getContainer() != null) {
+      final boolean enabled = getContainer().isEnabled();
       acceptVisitor(new IActionVisitor() {
         @Override
         public int visit(IAction action) {

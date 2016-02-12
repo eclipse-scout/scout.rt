@@ -18,7 +18,7 @@ import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 public interface ITreeContextMenu extends IContextMenu {
 
   @Override
-  ITree getOwner();
+  ITree getContainer();
 
   void callOwnerValueChanged();
 }

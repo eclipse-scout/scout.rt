@@ -34,6 +34,7 @@ import org.eclipse.scout.rt.platform.classid.ITypeWithClassId;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.reflect.AbstractPropertyObserver;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
+import org.eclipse.scout.rt.platform.reflect.IPropertyObserver;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
@@ -647,8 +648,8 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
   @Override
   public String classId() {
     String simpleClassId = ConfigurationUtility.getAnnotatedClassIdWithFallback(getClass());
-    if (getContainer() != null) {
-      return simpleClassId + ID_CONCAT_SYMBOL + getContainer().classId();
+    if (getContainer() instanceof ITypeWithClassId) {
+      return simpleClassId + ID_CONCAT_SYMBOL + ((ITypeWithClassId) getContainer()).classId();
     }
     return simpleClassId;
   }
@@ -681,12 +682,12 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
   }
 
   @Override
-  public ITypeWithClassId getContainer() {
-    return (ITypeWithClassId) propertySupport.getProperty(PROP_CONTAINER);
+  public IPropertyObserver getContainer() {
+    return (IPropertyObserver) propertySupport.getProperty(PROP_CONTAINER);
   }
 
   @Override
-  public void setContainerInternal(ITypeWithClassId container) {
+  public void setContainerInternal(IPropertyObserver container) {
     propertySupport.setProperty(PROP_CONTAINER, container);
   }
 

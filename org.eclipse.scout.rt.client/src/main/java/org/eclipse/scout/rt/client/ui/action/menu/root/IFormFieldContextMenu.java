@@ -15,5 +15,5 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 public interface IFormFieldContextMenu extends IContextMenu {
 
   @Override
-  IFormField getOwner();
+  IFormField getContainer();
 }

@@ -32,7 +32,7 @@ public class ValueFieldContextMenu extends FormFieldContextMenu<IValueField<?>> 
   protected void initConfig() {
     super.initConfig();
     // init current menu types
-    setCurrentMenuTypes(MenuUtility.getMenuTypesForValueFieldValue(getOwner().getValue()));
+    setCurrentMenuTypes(MenuUtility.getMenuTypesForValueFieldValue(getContainer().getValue()));
     calculateLocalVisibility();
   }
 
@@ -54,8 +54,9 @@ public class ValueFieldContextMenu extends FormFieldContextMenu<IValueField<?>> 
   }
 
   protected void handleOwnerValueChanged() {
-    if (getOwner() != null) {
-      final Object ownerValue = getOwner().getValue();
+    IValueField<?> container = getContainer();
+    if (container != null) {
+      final Object ownerValue = container.getValue();
       setCurrentMenuTypes(MenuUtility.getMenuTypesForValueFieldValue(ownerValue));
       acceptVisitor(new MenuOwnerChangedVisitor(ownerValue, getCurrentMenuTypes()));
     }
