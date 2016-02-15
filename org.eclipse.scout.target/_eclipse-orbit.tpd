@@ -1,6 +1,6 @@
 target "_eclipse-orbit.target" with source
 
-location orbit_R "http://download.eclipse.org/tools/orbit/downloads/drops/R20151118145958/repository" {
+location orbit_R "http://download.eclipse.org/tools/orbit/downloads/drops/R20151221205849/repository" {
     javax.jms [1.1.0,1.2.0)
     javax.jms.source [1.1.0,1.2.0)
     javax.servlet [3.0.0,3.1.0)

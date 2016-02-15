@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <?pde?>
 <!-- generated with https://github.com/mbarbero/fr.obeo.releng.targetplatform -->
-<target name="scout-luna.target" sequenceNumber="1453285627">
+<target name="scout-luna.target" sequenceNumber="1455532123">
   <locations>
     <location includeMode="slicer" includeAllPlatforms="false" includeSource="true" includeConfigurePhase="false" type="InstallableUnit">
       <unit id="javax.jms" version="1.1.0.v201205091237"/>
@@ -69,12 +69,12 @@
       <unit id="com.thoughtworks.selenium.source" version="2.25.0.v201212071504"/>
       <unit id="com.google.guava" version="15.0.0.v201403281430"/>
       <unit id="com.google.guava.source" version="15.0.0.v201403281430"/>
-      <repository id="orbit_R" location="http://download.eclipse.org/tools/orbit/downloads/drops/R20151118145958/repository"/>
+      <repository id="orbit_R" location="http://download.eclipse.org/tools/orbit/downloads/drops/R20151221205849/repository"/>
     </location>
     <location includeMode="slicer" includeAllPlatforms="false" includeSource="true" includeConfigurePhase="false" type="InstallableUnit">
       <unit id="org.eclipse.rap.feature.feature.group" version="0.0.0"/>
       <unit id="org.eclipse.rap.equinox.target.feature.feature.group" version="0.0.0"/>
-      <repository id="rap_3.0" location="http://download.eclipse.org/rt/rap/3.0/SR1-20150908-1130/"/>
+      <repository id="rap_3.0" location="http://download.eclipse.org/rt/rap/3.0/SR2-RC3-20160201-1220/"/>
     </location>
     <location includeMode="slicer" includeAllPlatforms="false" includeSource="true" includeConfigurePhase="false" type="InstallableUnit">
       <unit id="org.mockito.mockito-all" version="0.0.0"/>

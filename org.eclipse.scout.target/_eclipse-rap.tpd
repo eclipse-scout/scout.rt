@@ -1,6 +1,6 @@
 target "_eclipse-rap.target" with source
 
-location rap_3.0 "http://download.eclipse.org/rt/rap/3.0/SR1-20150908-1130/" {
+location rap_3.0 "http://download.eclipse.org/rt/rap/3.0/SR2-RC3-20160201-1220/" {
   org.eclipse.rap.feature.feature.group lazy
   org.eclipse.rap.equinox.target.feature.feature.group lazy
 }
