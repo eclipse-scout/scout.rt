@@ -15,8 +15,8 @@ var LocaleSpecHelper = function() {
 };
 
 LocaleSpecHelper.DEFAULT_LOCALE = 'de-CH';
-
 LocaleSpecHelper.GERMAN_LOCALE = 'de-DE';
+LocaleSpecHelper.DEFAULT_DATE_FORMAT_PATTERN = 'dd.MM.yyyy';
 
 LocaleSpecHelper.prototype.createModel = function(languageTag) {
   var model = {};
@@ -29,7 +29,7 @@ LocaleSpecHelper.prototype.createLocale = function(languageTag) {
   model.decimalFormatSymbols = this.decimalFormatSymbolsByLocale[languageTag];
   model.decimalFormatPatternDefault = "#,##0.###";
   model.dateFormatSymbols = this.dateFormatSymbolsByLocale[languageTag];
-  model.dateFormatPatternDefault = this.dateFormatPatternByLocale[languageTag];
+  model.dateFormatPatternDefault = this.dateFormatPatternByLocale[languageTag] || LocaleSpecHelper.DEFAULT_DATE_FORMAT_PATTERN;
   return new scout.Locale(model);
 };
 

@@ -398,13 +398,21 @@ scout.dates = {
   },
 
   format: function(date, locale, pattern) {
-    var dateClone = new Date(date.valueOf()),
-      dateFormat = new scout.DateFormat(locale, pattern);
-    return dateFormat.format(dateClone);
+    var dateFormat = new scout.DateFormat(locale, pattern);
+    return dateFormat.format(date);
   },
 
   compare: function(a, b) {
-    var diff = a.valueOf() - b.valueOf();
+    if (!a && !b) {
+      return 0;
+    }
+    if (!a) {
+      return -1;
+    }
+    if (!b) {
+      return 1;
+    }
+    var diff = a.getTime() - b.getTime();
     if (diff < -1) {
       return -1;
     }
@@ -418,7 +426,6 @@ scout.dates = {
    * TODO [5.2] nbu: Add jasmine test
    * This combines a date and time, passed as date objects to one object with the date part of param date and the time part of param time.
    */
-  // FIXME bsh: Check if this is needed, otherwise remove
   combineDateTime: function(date, time) {
     var newDate = new Date(0);
     if (date) {
