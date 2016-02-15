@@ -11,10 +11,32 @@
 scout.IconColumn = function() {
   scout.IconColumn.parent.call(this);
   this.minWidth = scout.Column.NARROW_MIN_WIDTH;
+  this.filterType = 'ColumnUserFilter';
 };
 scout.inherits(scout.IconColumn, scout.Column);
 
+/**
+ * @override
+ */
 scout.IconColumn.prototype.buildCell = function(cell, row) {
   cell.iconId = cell.value || cell.iconId;
   return scout.IconColumn.parent.prototype.buildCell.call(this, cell, row);
+};
+
+/**
+ * @override
+ */
+scout.IconColumn.prototype.cellTextForGrouping = function(row) {
+  var cell = this.table.cell(this, row);
+  return cell.value;
+};
+
+/**
+ * @override
+ */
+scout.IconColumn.prototype.createAggrGroupCell = function(row) {
+  var cell = scout.IconColumn.parent.prototype.createAggrGroupCell.call(this, row);
+  // Make sure only icon and no text is displayed
+  cell.text = null;
+  return cell;
 };

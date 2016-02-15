@@ -15,4 +15,14 @@ package org.eclipse.scout.rt.client.ui.basic.table.columns;
  */
 public abstract class AbstractIconColumn extends AbstractColumn<String> implements IIconColumn {
 
+  @Override
+  protected int getConfiguredWidth() {
+    return 30;
+  }
+
+  @Override
+  protected int getConfiguredHorizontalAlignment() {
+    return 0;
+  }
+
 }

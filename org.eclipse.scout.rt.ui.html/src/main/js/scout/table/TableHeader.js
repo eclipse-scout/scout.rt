@@ -167,9 +167,14 @@ scout.TableHeader.prototype._removeColumn = function(column) {
 
 scout.TableHeader.prototype.resizeHeaderItem = function(column) {
   if (!column) {
-    //May be undefined if there are no columns
+    // May be undefined if there are no columns
     return;
   }
+  if (!column.$header) {
+    // May be undefined if called when header item is not rendered yet (may caused by _adjustColumnMinWidth)
+    return;
+  }
+
   var remainingHeaderSpace, adjustment,
     $header = column.$header,
     $headerResize,
@@ -205,6 +210,10 @@ scout.TableHeader.prototype.resizeHeaderItem = function(column) {
     .css('max-width', columnWidth)
     .css('margin-left', marginLeft)
     .css('margin-right', marginRight);
+
+  if (this._tableHeaderMenu && this._tableHeaderMenu.rendered && this._tableHeaderMenu.column === column) {
+    this._tableHeaderMenu.onColumnResized();
+  }
 };
 
 scout.TableHeader.prototype._reconcileScrollPos = function() {
@@ -373,8 +382,32 @@ scout.TableHeader.prototype._renderColumnState = function(column) {
       $left.appendDiv().text('F');
     }
   }
-  // Contains sort arow
+  // Contains sort arrow
   $state.appendDiv('right');
+
+  this._adjustColumnMinWidth(column);
+};
+
+/**
+ * Makes sure state is fully visible by adjusting width (happens if column.minWidth is < DEFAULT_MIN_WIDTH)
+ */
+scout.TableHeader.prototype._adjustColumnMinWidth = function(column) {
+  var filtered = this.table.getFilter(column.id);
+  if (column.sortActive || column.grouped || filtered) {
+    if (column.minWidth < scout.Column.DEFAULT_MIN_WIDTH) {
+      column.prefMinWidth = column.minWidth;
+      column.minWidth = scout.Column.DEFAULT_MIN_WIDTH;
+    }
+    if (column.width < column.minWidth) {
+      this.table.resizeColumn(column, column.minWidth);
+    }
+  } else {
+    // Reset to preferred min width if no state is visible
+    if (column.prefMinWidth) {
+      column.minWidth = column.prefMinWidth;
+      column.prefMinWidth = null;
+    }
+  }
 };
 
 scout.TableHeader.prototype.updateMenuBar = function() {

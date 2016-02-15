@@ -246,6 +246,10 @@
   .with-text& {
     margin-right: 8px;
   }
+
+  .table-row.checked > .table-cell > & {
+    color: @text-selection-color;
+  }
 }
 
 .table-aggregate {

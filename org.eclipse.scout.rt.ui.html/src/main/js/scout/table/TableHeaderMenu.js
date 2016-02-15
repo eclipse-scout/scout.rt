@@ -68,7 +68,8 @@ scout.TableHeaderMenu.prototype._createLayout = function() {
 };
 
 scout.TableHeaderMenu.prototype._render = function($parent) {
-  var leftGroups = [], $rightGroups = [];
+  var leftGroups = [],
+    $rightGroups = [];
 
   this.$parent = $parent;
   this.$headerItem.select(true);
@@ -176,7 +177,8 @@ scout.TableHeaderMenu.prototype._renderMovingGroup = function() {
   var group = scout.create('TableHeaderMenuGroup', {
     parent: this,
     textKey: 'ui.Move',
-    cssClass: 'first'});
+    cssClass: 'first'
+  });
   scout.create('TableHeaderMenuButton', {
     parent: group,
     textKey: 'ui.toBegin',
@@ -184,7 +186,8 @@ scout.TableHeaderMenu.prototype._renderMovingGroup = function() {
     clickHandler: function() {
       table.moveColumn(column, pos, 0);
       pos = table.columns.indexOf(column);
-    }});
+    }
+  });
   scout.create('TableHeaderMenuButton', {
     parent: group,
     textKey: 'ui.forward',
@@ -192,7 +195,8 @@ scout.TableHeaderMenu.prototype._renderMovingGroup = function() {
     clickHandler: function() {
       table.moveColumn(column, pos, Math.max(pos - 1, 0));
       pos = table.columns.indexOf(column);
-    }});
+    }
+  });
   scout.create('TableHeaderMenuButton', {
     parent: group,
     textKey: 'ui.backward',
@@ -200,7 +204,8 @@ scout.TableHeaderMenu.prototype._renderMovingGroup = function() {
     clickHandler: function() {
       table.moveColumn(column, pos, Math.min(pos + 1, table.header.findHeaderItems().length - 1));
       pos = table.columns.indexOf(column);
-    }});
+    }
+  });
   scout.create('TableHeaderMenuButton', {
     parent: group,
     textKey: 'ui.toEnd',
@@ -208,7 +213,8 @@ scout.TableHeaderMenu.prototype._renderMovingGroup = function() {
     clickHandler: function() {
       table.moveColumn(column, pos, table.header.findHeaderItems().length - 1);
       pos = table.columns.indexOf(column);
-    }});
+    }
+  });
 
   group.render(this.$columnActions);
   return group;
@@ -220,26 +226,30 @@ scout.TableHeaderMenu.prototype._renderColumnActionsGroup = function() {
 
   this.columnActionsGroup = scout.create('TableHeaderMenuGroup', {
     parent: this,
-    textKey: 'ui.Column'});
+    textKey: 'ui.Column'
+  });
 
   this.addColumnButton = scout.create('TableHeaderMenuButton', {
     parent: this.columnActionsGroup,
     textKey: 'ui.addColumn',
     cssClass: 'add-column',
     visible: this.table.columnAddable,
-    clickHandler: onClick.bind(this, 'add')});
+    clickHandler: onClick.bind(this, 'add')
+  });
   this.removeColumnButton = scout.create('TableHeaderMenuButton', {
     parent: this.columnActionsGroup,
     textKey: 'ui.removeColumn',
     cssClass: 'remove-column',
     visible: this.column.removable,
-    clickHandler: onClick.bind(this, 'remove')});
+    clickHandler: onClick.bind(this, 'remove')
+  });
   this.modifyColumnButton = scout.create('TableHeaderMenuButton', {
     parent: this.columnActionsGroup,
     textKey: 'ui.changeColumn',
     cssClass: 'change-column',
     visible: this.column.modifiable,
-    clickHandler: onClick.bind(this, 'modify')});
+    clickHandler: onClick.bind(this, 'modify')
+  });
 
   this.columnActionsGroup.render(this.$columnActions);
   return this.columnActionsGroup;
@@ -270,7 +280,8 @@ scout.TableHeaderMenu.prototype._renderSortingGroup = function() {
 
   this.sortingGroup = scout.create('TableHeaderMenuGroup', {
     parent: this,
-    textKey: 'ColumnSorting'});
+    textKey: 'ColumnSorting'
+  });
 
   if (!table.hasPermanentHeadOrTailSortColumns()) {
     this.sortAscButton = scout.create('TableHeaderMenuButton', {
@@ -279,14 +290,16 @@ scout.TableHeaderMenu.prototype._renderSortingGroup = function() {
       cssClass: 'sort sort-asc',
       direction: 'asc',
       togglable: true,
-      clickHandler: onSortClick});
+      clickHandler: onSortClick
+    });
     this.sortDescButton = scout.create('TableHeaderMenuButton', {
       parent: this.sortingGroup,
       textKey: 'ui.descending',
       cssClass: 'sort sort-desc',
       direction: 'desc',
       togglable: true,
-      clickHandler: onSortClick});
+      clickHandler: onSortClick
+    });
   }
 
   this.sortAscAddButton = scout.create('TableHeaderMenuButton', {
@@ -295,14 +308,16 @@ scout.TableHeaderMenu.prototype._renderSortingGroup = function() {
     cssClass: 'sort sort-asc-add',
     direction: 'asc',
     togglable: true,
-    clickHandler: onSortAdditionalClick});
+    clickHandler: onSortAdditionalClick
+  });
   this.sortDescAddButton = scout.create('TableHeaderMenuButton', {
     parent: this.sortingGroup,
     textKey: 'ui.descendingAdditionally',
     cssClass: 'sort sort-desc-add',
     direction: 'desc',
     togglable: true,
-    clickHandler: onSortAdditionalClick});
+    clickHandler: onSortAdditionalClick
+  });
 
   this._updateSortingSelectedState();
   this.sortingGroup.render(this.$columnActions);
@@ -373,7 +388,8 @@ scout.TableHeaderMenu.prototype._renderGroupingGroup = function() {
 
   var group = scout.create('TableHeaderMenuGroup', {
     parent: this,
-    textKey: 'ui.Grouping'});
+    textKey: 'ui.Grouping'
+  });
 
   var groupButton = scout.create('TableHeaderMenuButton', {
     parent: group,
@@ -381,14 +397,16 @@ scout.TableHeaderMenu.prototype._renderGroupingGroup = function() {
     cssClass: 'group',
     additional: false,
     togglable: true,
-    clickHandler: groupColumn});
+    clickHandler: groupColumn
+  });
   var groupAddButton = scout.create('TableHeaderMenuButton', {
     parent: group,
     textKey: 'ui.additionally',
     cssClass: 'group-add',
     additional: true,
     togglable: true,
-    clickHandler: groupColumn});
+    clickHandler: groupColumn
+  });
 
   if (groupCount === 0) {
     groupAddButton.setVisible(false);
@@ -432,32 +450,37 @@ scout.TableHeaderMenu.prototype._renderAggregationGroup = function() {
     menuPopup = this,
     group = scout.create('TableHeaderMenuGroup', {
       parent: this,
-      textKey: 'ui.Aggregation'});
+      textKey: 'ui.Aggregation'
+    });
 
   scout.create('TableHeaderMenuButton', {
     parent: group,
     textKey: 'ui.Sum',
     cssClass: 'aggregation-function sum',
     aggregation: 'sum',
-    clickHandler: onClick});
+    clickHandler: onClick
+  });
   scout.create('TableHeaderMenuButton', {
     parent: group,
     textKey: 'ui.Average',
     cssClass: 'aggregation-function avg',
     aggregation: 'avg',
-    clickHandler: onClick});
+    clickHandler: onClick
+  });
   scout.create('TableHeaderMenuButton', {
     parent: group,
     textKey: 'ui.Minimum',
     cssClass: 'aggregation-function min',
     aggregation: 'min',
-    clickHandler: onClick});
+    clickHandler: onClick
+  });
   scout.create('TableHeaderMenuButton', {
     parent: group,
     textKey: 'ui.Maximum',
     cssClass: 'aggregation-function max',
     aggregation: 'max',
-    clickHandler: onClick});
+    clickHandler: onClick
+  });
 
   group.children.forEach(function(button) {
     button.setSelected(button.aggregation === aggregation);
@@ -478,7 +501,8 @@ scout.TableHeaderMenu.prototype._renderColoringGroup = function() {
     backgroundEffect = column.backgroundEffect,
     group = scout.create('TableHeaderMenuGroup', {
       parent: this,
-      textKey: 'ui.Coloring'});
+      textKey: 'ui.Coloring'
+    });
 
   scout.create('TableHeaderMenuButton', {
     parent: group,
@@ -486,14 +510,16 @@ scout.TableHeaderMenu.prototype._renderColoringGroup = function() {
     cssClass: 'color color-gradient1',
     backgroundEffect: 'colorGradient1',
     togglable: true,
-    clickHandler: onClick});
+    clickHandler: onClick
+  });
   scout.create('TableHeaderMenuButton', {
     parent: group,
     textKey: 'ui.fromGreenToRed',
     cssClass: 'color color-gradient2',
     backgroundEffect: 'colorGradient2',
     togglable: true,
-    clickHandler: onClick});
+    clickHandler: onClick
+  });
   if (scout.device.supportsCssGradient()) {
     scout.create('TableHeaderMenuButton', {
       parent: group,
@@ -501,7 +527,8 @@ scout.TableHeaderMenu.prototype._renderColoringGroup = function() {
       cssClass: 'color color-bar-chart',
       backgroundEffect: 'barChart',
       togglable: true,
-      clickHandler: onClick});
+      clickHandler: onClick
+    });
   }
 
   group.children.forEach(function(button) {
@@ -557,14 +584,20 @@ scout.TableHeaderMenu.prototype._renderFilterTable = function() {
         text: 'aggregate-count',
         width: 40,
         session: this.session
-      })]
+      })
+    ]
   });
   this.filterTable.on('rowsChecked', this._filterTableRowsCheckedHandler);
 
   var tableRow, tableRows = [];
   this.filter.availableValues.forEach(function(filterValue) {
     tableRow = {
-      cells: [filterValue.text, filterValue.count],
+      cells: [{
+          text: filterValue.text,
+          iconId: filterValue.iconId
+        },
+        filterValue.count
+      ],
       checked: this.filter.selectedValues.indexOf(filterValue.key) > -1,
       dataMap: {
         filterValue: filterValue
@@ -748,4 +781,12 @@ scout.TableHeaderMenu.prototype._onMouseDownOutside = function(event) {
     return;
   }
   this.close();
+};
+
+/**
+ * Called by table header
+ */
+scout.TableHeaderMenu.prototype.onColumnResized = function() {
+  // Adjust whiter with if size gets changed while menu is open (may caused by TableHeader._adjustColumnMinWidth)
+  this.$whiter.width(this._computeWhitherWidth());
 };

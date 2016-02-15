@@ -26,6 +26,7 @@ import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.ColumnChains
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.ColumnChains.ColumnPrepareEditChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.ColumnChains.ColumnValidateValueChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.IColumnExtension;
+import org.eclipse.scout.rt.client.services.common.icon.IIconProviderService;
 import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
@@ -170,6 +171,18 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   @ConfigProperty(ConfigProperty.TEXT)
   @Order(30)
   protected String getConfiguredHeaderTooltipText() {
+    return null;
+  }
+
+  /**
+   * Configures the header icon of this column.
+   *
+   * @return the ID (name) of the icon
+   * @see IIconProviderService
+   */
+  @ConfigProperty(ConfigProperty.ICON_ID)
+  @Order(40)
+  protected String getConfiguredHeaderIconId() {
     return null;
   }
 
@@ -805,6 +818,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
     if (getConfiguredHeaderTooltipText() != null) {
       m_headerCell.setTooltipText(getConfiguredHeaderTooltipText());
     }
+    m_headerCell.setIconId(getConfiguredHeaderIconId());
     m_headerCell.setCssClass(getConfiguredHeaderCssClass());
     if (getConfiguredHeaderForegroundColor() != null) {
       m_headerCell.setForegroundColor((getConfiguredHeaderForegroundColor()));
