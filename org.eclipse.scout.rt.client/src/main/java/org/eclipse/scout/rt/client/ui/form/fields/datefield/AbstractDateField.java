@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.client.ui.form.fields.datefield;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 
 import org.eclipse.scout.rt.client.ModelContextProxy;
@@ -22,7 +21,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.ParsingFailedStatus;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
-import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.nls.NlsLocale;
@@ -138,34 +136,6 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
   }
 
   /**
-   * Depending whether subclass overrides this method
-   * <p>
-   * Default is as follows<br>
-   * Level 0: shift day up/down [UP, DOWN]<br>
-   * Level 1: shift month up/down [shift-UP,shift-DOWN]<br>
-   * Level 2: shift year up/down [ctrl-UP,ctrl-DOWN]
-   * <p>
-   * see {@link #adjustDate(int, int, int)}
-   */
-  @ConfigOperation
-  protected void execShiftDate(int level, int value) {
-    switch (level) {
-      case 0: {
-        adjustDate(value, 0, 0);
-        break;
-      }
-      case 1: {
-        adjustDate(0, value, 0);
-        break;
-      }
-      case 2: {
-        adjustDate(0, 0, value);
-        break;
-      }
-    }
-  }
-
-  /**
    * @deprecated This method is never called for {@link IDateField}. The UI is responsible for parsing a date.
    */
   @Override
@@ -181,34 +151,6 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
   @Override
   protected String execFormatValue(Date value) {
     return super.execFormatValue(value);
-  }
-
-  /**
-   * Depending whether subclass overrides this method
-   * <p>
-   * Default is as follows<br>
-   * Level 0: shift minute up/down [UP, DOWN]<br>
-   * Level 1: shift hour up/down [shift-UP, shift-DOWN]<br>
-   * Level 2: nop [ctrl-UP, ctrl-DOWN]<br>
-   * <p>
-   * see {@link #adjustDate(int, int, int)}
-   */
-  @ConfigOperation
-  protected void execShiftTime(int level, int value) {
-    switch (level) {
-      case 0: {
-        adjustTime(value, 0, 0);
-        break;
-      }
-      case 1: {
-        adjustTime(0, value, 0);
-        break;
-      }
-      case 2: {
-        adjustTime(0, 0, value);
-        break;
-      }
-    }
   }
 
   @Override
@@ -339,35 +281,6 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
   @Override
   public Date getAutoDate() {
     return (Date) propertySupport.getProperty(PROP_AUTO_DATE);
-  }
-
-  @Override
-  public void adjustDate(int days, int months, int years) {
-    Date d = getValue();
-    if (d == null) {
-      d = applyAutoDate(d);
-    }
-    Calendar cal = Calendar.getInstance();
-    cal.setTime(d);
-    cal.add(Calendar.DATE, days);
-    cal.add(Calendar.MONTH, months);
-    cal.add(Calendar.YEAR, years);
-    d = cal.getTime();
-    setValue(d);
-  }
-
-  @Override
-  public void adjustTime(int minutes, int hours, int reserved) {
-    Date d = getValue();
-    if (d == null) {
-      d = applyAutoDate(d);
-    }
-    Calendar cal = Calendar.getInstance();
-    cal.setTime(d);
-    cal.add(Calendar.MINUTE, minutes);
-    cal.add(Calendar.HOUR_OF_DAY, hours);
-    d = cal.getTime();
-    setValue(d);
   }
 
   @Override

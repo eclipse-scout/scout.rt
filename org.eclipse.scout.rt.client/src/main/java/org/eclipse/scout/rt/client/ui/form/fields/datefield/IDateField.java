@@ -84,8 +84,4 @@ public interface IDateField extends IValueField<Date> {
    * set the time value as a double in the range from [0..1[ for 00:00 - 23:59:59
    */
   void setTimeValue(Double d);
-
-  void adjustDate(int days, int months, int years);
-
-  void adjustTime(int days, int months, int years);
 }
