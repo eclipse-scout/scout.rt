@@ -20,13 +20,4 @@ public interface IDateFieldUIFacade {
 
   void removeParseErrorFromUI();
 
-  /**
-   * see {@link AbstractDateField#execShiftDate(int, int)}
-   */
-  void fireDateShiftActionFromUI(int level, int value);
-
-  /**
-   * see {@link AbstractDateField#execShiftTime(int, int)}
-   */
-  void fireTimeShiftActionFromUI(int level, int value);
 }

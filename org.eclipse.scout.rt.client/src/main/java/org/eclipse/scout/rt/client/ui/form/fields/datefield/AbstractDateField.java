@@ -14,15 +14,10 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 
 import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
-import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
-import org.eclipse.scout.rt.client.extension.ui.form.fields.datefield.DateFieldChains.DateFieldShiftDateChain;
-import org.eclipse.scout.rt.client.extension.ui.form.fields.datefield.DateFieldChains.DateFieldShiftTimeChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.datefield.IDateFieldExtension;
-import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.ParsingFailedStatus;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -469,22 +464,6 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
     }
 
     @Override
-    public void fireDateShiftActionFromUI(int level, int value) {
-      if (!isEnabled() || !isVisible() || !isHasDate()) {
-        return;
-      }
-      interceptShiftDate(level, value);
-    }
-
-    @Override
-    public void fireTimeShiftActionFromUI(int level, int value) {
-      if (!isEnabled() || !isVisible() || !isHasTime()) {
-        return;
-      }
-      interceptShiftTime(level, value);
-    }
-
-    @Override
     public void setParseErrorFromUI(String invalidDisplayText, String invalidDateText, String invalidTimeText) {
       String invalidText = StringUtility.nvl(invalidDisplayText, StringUtility.join(" ", invalidDateText, invalidTimeText));
       ParsingFailedStatus status = new ParsingFailedStatus(ScoutTexts.get("InvalidValueMessageX", invalidText), StringUtility.nvl(invalidDateText, "") + "\n" + StringUtility.nvl(invalidTimeText, "")); // don't use join()!
@@ -498,33 +477,12 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
     }
   }
 
-  protected final void interceptShiftTime(int level, int value) {
-    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
-    DateFieldShiftTimeChain chain = new DateFieldShiftTimeChain(extensions);
-    chain.execShiftTime(level, value);
-  }
-
-  protected final void interceptShiftDate(int level, int value) {
-    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
-    DateFieldShiftDateChain chain = new DateFieldShiftDateChain(extensions);
-    chain.execShiftDate(level, value);
-  }
-
   protected static class LocalDateFieldExtension<OWNER extends AbstractDateField> extends LocalValueFieldExtension<Date, OWNER> implements IDateFieldExtension<OWNER> {
 
     public LocalDateFieldExtension(OWNER owner) {
       super(owner);
     }
 
-    @Override
-    public void execShiftTime(DateFieldShiftTimeChain chain, int level, int value) {
-      getOwner().execShiftTime(level, value);
-    }
-
-    @Override
-    public void execShiftDate(DateFieldShiftDateChain chain, int level, int value) {
-      getOwner().execShiftDate(level, value);
-    }
   }
 
   @Override
