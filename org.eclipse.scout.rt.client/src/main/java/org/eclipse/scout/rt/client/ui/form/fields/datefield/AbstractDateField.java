@@ -309,6 +309,15 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
     setValue(DateUtility.convertDoubleTimeToDate(d));
   }
 
+  /**
+   * Should only be used by scout itself. Setting the display text does not trigger a change in the UI. Only the value
+   * is used and formatted in the UI.
+   */
+  @Override
+  public void setDisplayText(String s) {
+    super.setDisplayText(s);
+  }
+
   protected Date applyAutoDate(Date d) {
     if (d != null) {
       return d;
