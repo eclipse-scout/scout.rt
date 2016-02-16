@@ -214,9 +214,3 @@ scout.ColumnUserFilter.prototype.filterFieldsTitle = function() {
 scout.ColumnUserFilter.prototype.createComparator = function() {
   return scout.comparators.NUMERIC;
 };
-
-scout.ColumnUserFilter.prototype.debounceTextModified = function(){
-  $.debounce(function() {
-    this.acceptInput(true);
-  }.bind(this));
-};

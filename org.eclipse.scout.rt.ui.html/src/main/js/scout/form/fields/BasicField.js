@@ -16,6 +16,7 @@ scout.BasicField = function() {
   this._onDisplayTextModifiedHandler = this._onDisplayTextModified.bind(this);
   this.enabledWhenOffline = true;
   this.disabledCopyOverlay = true;
+  this._displayTextModifiedTimeoutId;
 };
 scout.inherits(scout.BasicField, scout.ValueField);
 
@@ -28,6 +29,7 @@ scout.BasicField.prototype._renderUpdateDisplayTextOnModify = function() {
   if (this.updateDisplayTextOnModify) {
     this.$field.on('input', this._onDisplayTextModifiedHandler);
   } else {
+    clearTimeout(this._displayTextModifiedTimeoutId);
     this.$field.off('input', this._onDisplayTextModifiedHandler);
   }
 };
@@ -35,10 +37,11 @@ scout.BasicField.prototype._renderUpdateDisplayTextOnModify = function() {
 /**
  * Called when the property 'updateDisplayTextOnModified' is TRUE and the display text (field's input
  * value) has been modified by a user action, e.g. a key or paste event. If the property is FALSE, this
- * method is _never_ called.
+ * method is _never_ called. Uses the debounce pattern.
  */
 scout.BasicField.prototype._onDisplayTextModified = function() {
-  this.acceptInput(true);
+  clearTimeout(this._displayTextModifiedTimeoutId);
+  this._displayTextModifiedTimeoutId = setTimeout(this.acceptInput.bind(this, true), 250);
 };
 
 /**

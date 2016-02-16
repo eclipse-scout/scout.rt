@@ -71,9 +71,3 @@ scout.NumberColumnUserFilter.prototype._onDisplayTextChanged = function(event) {
   $.log.debug('(NumberColumnUserFilter#_onDisplayTextChanged) numberFrom=' + this.numberFrom + ' numberTo=' + this.numberTo);
   this.triggerFilterFieldsChanged(event);
 };
-
-scout.NumberColumnUserFilter.prototype.modifyFilterFields = function() {
-  this.numberFromField._onDisplayTextModified = this.debounceTextModified;
-  this.numberToField._onDisplayTextModified = this.debounceTextModified;
-};
-
