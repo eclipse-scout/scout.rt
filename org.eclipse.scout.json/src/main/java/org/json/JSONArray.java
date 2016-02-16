@@ -95,7 +95,8 @@ public class JSONArray {
      */
     Object object = readFrom.nextValue();
     if (object instanceof JSONArray) {
-      values = ((JSONArray) object).values;
+      JSONArray jsonArray = (JSONArray) object;
+      values = jsonArray.values;
     }
     else {
       throw JSON.typeMismatch(object, "JSONArray");
