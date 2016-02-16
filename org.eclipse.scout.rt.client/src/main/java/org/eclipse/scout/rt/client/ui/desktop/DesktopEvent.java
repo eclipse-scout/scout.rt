@@ -10,13 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.desktop;
 
-import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.EventObject;
 import java.util.List;
-import java.util.Map;
 
 import org.eclipse.scout.rt.client.ui.IModelEvent;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -125,9 +123,7 @@ public class DesktopEvent extends EventObject implements IModelEvent {
   private IMessageBox m_messageBox;
   private IFileChooser m_fileChooser;
   private String m_uri;
-  private Map<String, Object> m_printParameters;
   private List<IMenu> m_popupMenus;
-  private File m_printedFile;
   private IOpenUriAction m_openUriAction;
   private BinaryResource m_binaryResource;
   private IDesktopNotification m_notification;
@@ -135,11 +131,6 @@ public class DesktopEvent extends EventObject implements IModelEvent {
   public DesktopEvent(IDesktop source, int type) {
     super(source);
     m_type = type;
-  }
-
-  public DesktopEvent(IDesktop source, int type, File printedFile) {
-    this(source, type);
-    m_printedFile = printedFile;
   }
 
   public DesktopEvent(IDesktop source, int type, IForm form) {
@@ -233,10 +224,6 @@ public class DesktopEvent extends EventObject implements IModelEvent {
     m_focusedField = f;
   }
 
-  public File getPrintedFile() {
-    return m_printedFile;
-  }
-
   /**
    * used by TYPE_TRAY_POPUP to add menus
    */
@@ -278,10 +265,6 @@ public class DesktopEvent extends EventObject implements IModelEvent {
     else {
       return 0;
     }
-  }
-
-  public Map<String, Object> getPrintParameters() { // FIXME AWE: (Scout cleanup) print parameters ausbauen
-    return CollectionUtility.copyMap(m_printParameters);
   }
 
   public IForm getActiveForm() {

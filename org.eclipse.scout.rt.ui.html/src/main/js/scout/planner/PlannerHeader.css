@@ -8,7 +8,6 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-@planner-header-height: 50px;
 @planner-header-buttons: 30px;
 
 .planner-icon(@icon, @size) {
@@ -24,123 +23,127 @@
 }
 
 .planner-header {
-  padding-top: 8px;
-  padding-right: 3px;
-  height: @planner-header-height;
-  line-height: @planner-header-height;
+  display: table;
+  width: 100%;
+  white-space: nowrap;
+  padding: 8px 3px 12px 0;
+}
 
-  min-width: 420px;
+.planner-range {
+  display: table-cell;
+  vertical-align: middle;
+  white-space: nowrap;
+  padding-left: 8px;
+}
+
+.planner-previous,
+.planner-today,
+.planner-next {
+  display: inline-block;
+  vertical-align: middle;
+  white-space: nowrap;
   text-align: center;
+  cursor: pointer;
+  height: @planner-header-buttons;
+  color: @text-color;
+  background-color: @button-background-color;
+  border: 1px solid @border-color;
+  border-radius: @border-radius;
+  cursor: pointer;
+  margin-right: 5px;
+  line-height: @planner-header-buttons;
 
-  & .busyindicator-label::before {
-    margin-top: -14px;
+  &:hover {
+    color: @hover-color;
+  }
+}
+
+.planner-today {
+  width: 65px;
+}
+
+.planner-select {
+  display: inline-block;
+  vertical-align: middle;
+  text-align: center;
+  font-size: 16px;
+  margin-left: 15px;
+  margin-right: 15px;
+}
+
+.planner-previous:hover::before,
+.planner-next:hover::before {
+  color: @hover-color;
+}
+
+.planner-previous::before {
+  .planner-icon(@icon-angle-left, 20px);
+}
+
+.planner-next::before {
+  .planner-icon(@icon-angle-right, 20px);
+}
+
+.planner-commands {
+  display: table-cell;
+  text-align: right;
+}
+
+.planner-mode,
+.planner-toggle-year,
+.planner-toggle-list {
+  display: inline-block;
+  vertical-align: middle;
+  text-align: center;
+  height: @planner-header-buttons;
+  line-height: @planner-header-buttons;
+  cursor: pointer;
+}
+
+.planner-mode {
+  width: 65px;
+  text-align: center;
+  border-top: 1px solid @border-color;
+  border-bottom: 1px solid @border-color;
+  border-left: 1px solid @border-color;
+  #scout.overflow-ellipsis-nowrap();
+
+  &.first {
+    border-left: 1px solid @border-color;
+    border-top-left-radius: @border-radius;
+    border-bottom-left-radius: @border-radius;
   }
 
-  & .planner-range {
-    float: left;
-    padding-left: 8px;
-
-    & .planner-previous,
-    & .planner-today,
-    & .planner-next {
-      cursor: pointer;
-      float: left;
-      height: @planner-header-buttons;
-      color: @text-color;
-      background-color: @button-background-color;
-      border: 1px solid @border-color;
-      border-radius: @border-radius;
-      cursor: pointer;
-      white-space: nowrap;
-      margin-right: 5px;
-
-      line-height: @planner-header-buttons;
-
-      &:hover {
-        color: @hover-color;
-      }
-    }
-
-    & .planner-today {
-      width: 65px;
-    }
-
-
-    & .planner-select {
-      height: @planner-header-buttons;
-      line-height: @planner-header-buttons;
-      float: left;
-      font-size: 16px;
-      margin-left: 15px;
-    }
-
-    & .planner-previous:hover::before,
-    & .planner-next:hover::before {
-      color: @hover-color;
-    }
-
-    & .planner-previous::before {
-      .planner-icon(@icon-angle-left, 20px);
-    }
-
-    & .planner-next::before {
-      .planner-icon(@icon-angle-right, 20px);
-    }
+  &.last {
+    border-right: 1px solid @border-color;
+    border-top-right-radius: @border-radius;
+    border-bottom-right-radius: @border-radius;
+    margin-right: 5px;
   }
 
-  & .planner-commands {
-    float: right;
-
-    & .planner-mode,
-    & .planner-toggle-year,
-    & .planner-toggle-list {
-      height: @planner-header-buttons;
-      line-height: @planner-header-buttons;
-      float: left;
-      cursor: pointer;
-    }
-
-    & .planner-mode {
-      width: 65px;
-      border-top: 1px solid @border-color;
-      border-bottom: 1px solid @border-color;
-      border-left: 1px solid @border-color;
-      #scout.overflow-ellipsis-nowrap();
-
-      &.first {
-        border-left: 1px solid @border-color;
-        border-top-left-radius: @border-radius;
-        border-bottom-left-radius: @border-radius;
-      }
-
-      &.last {
-        border-right: 1px solid @border-color;
-        border-top-right-radius: @border-radius;
-        border-bottom-right-radius: @border-radius;
-        margin-right: 5px;
-      }
-
-      &.selected{
-        background-color: @item-selection-background-color;
-      }
-    }
-
-    & .planner-toggle-year,
-    & .planner-toggle-list {
-      margin-left: 5px;
-    }
-
-    & .planner-toggle-year::before {
-      .planner-icon(@icon-calendar, 20px);
-     }
-
-    & .planner-toggle-list::before {
-      .planner-icon(@icon-th-list, 20px);
-     }
-
-    & *:hover::before, & *:hover,
-    & .selected::before, & .selected {
-      color: @planner-mode-active-text-color;
-    }
+  &.selected {
+    color: @planner-mode-active-text-color;
+    background-color: @item-selection-background-color;
   }
+
+  &:hover {
+    color: @planner-mode-active-text-color;
+  }
+}
+
+.planner-toggle-year,
+.planner-toggle-list {
+  margin-left: 5px;
+
+  &:hover::before{
+    color: @planner-mode-active-text-color;
+  }
+}
+
+.planner-toggle-year::before {
+  .planner-icon(@icon-calendar, 20px);
+}
+
+.planner-toggle-list::before {
+  .planner-icon(@icon-th-list, 20px);
 }

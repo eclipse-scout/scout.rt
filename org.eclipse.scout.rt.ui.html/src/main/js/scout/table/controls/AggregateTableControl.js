@@ -19,6 +19,7 @@ scout.AggregateTableControl = function() {
   this._tableColumnResizedHandler = this._onTableColumnResized.bind(this);
   this._tableColumnStructureChangedHandler = this._onTableColumnStructureChanged.bind(this);
   this._tableAggregationFunctionHandler = this._onTableAggregationFunctionChanged.bind(this);
+  this._tableGroupingHandler = this._onTableGroupingChanged.bind(this);
   this.cssClass = 'aggregate';
   this.height = scout.AggregateTableControl.CONTAINER_SIZE;
   this.animateDuration = scout.AggregateTableControl.CONTAINER_ANIMATE_DURATION;
@@ -62,7 +63,7 @@ scout.AggregateTableControl.prototype._renderContent = function($parent) {
   this.table.on('rowsFiltered', this._tableRowsFilteredHandler);
   this.table.on('rowsSelected', this._tableRowsSelectedHandler);
   this.table.on('columnResized', this._tableColumnResizedHandler);
-  this.table.on('aggregationFunctionChanged', this._tableAggregationFunctionHandler);
+  this.table.on('groupingChanged', this._tableGroupingHandler);
 };
 
 scout.AggregateTableControl.prototype._removeContent = function() {
@@ -76,6 +77,7 @@ scout.AggregateTableControl.prototype._removeContent = function() {
   this.table.off('rowsSelected', this._tableRowsSelectedHandler);
   this.table.off('columnResized', this._tableColumnResizedHandler);
   this.table.off('aggregationFunctionChanged', this._tableAggregationFunctionHandler);
+  this.table.off('groupingChanged', this._tableGroupingHandler);
 };
 
 scout.AggregateTableControl.prototype._renderAggregate = function() {
@@ -83,7 +85,8 @@ scout.AggregateTableControl.prototype._renderAggregate = function() {
     var aggregateValue, cell, $cell;
 
     aggregateValue = this.aggregateRow[c];
-    if (aggregateValue === undefined || aggregateValue === null) {
+    // Aggregation functions are not available if column is grouped -> do not show aggregated value
+    if (aggregateValue === undefined || aggregateValue === null || column.grouped) {
       cell = column.createAggrEmptyCell();
     } else {
       cell = column.createAggrValueCell(aggregateValue);
@@ -197,6 +200,11 @@ scout.AggregateTableControl.prototype._onTableColumnStructureChanged = function(
 };
 
 scout.AggregateTableControl.prototype._onTableAggregationFunctionChanged = function(event) {
+  this._aggregate();
+  this._rerenderAggregate();
+};
+
+scout.AggregateTableControl.prototype._onTableGroupingChanged = function(event) {
   this._aggregate();
   this._rerenderAggregate();
 };

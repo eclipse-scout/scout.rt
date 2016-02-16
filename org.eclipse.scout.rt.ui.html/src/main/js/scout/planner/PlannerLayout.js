@@ -60,7 +60,8 @@ scout.PlannerLayout.prototype.layout = function($container) {
 
   this._updateMinWidth();
   this._layoutScaleLines();
-  scout.scrollbars.update(this.planner.$grid);
+  // immediate update to prevent flickering, due to reset in layoutScaleLines
+  scout.scrollbars.update(this.planner.$grid, true);
   this.planner.layoutYearPanel();
 };
 
@@ -89,7 +90,7 @@ scout.PlannerLayout.prototype._updateMinWidth = function() {
  * Positions the scale lines and set to correct height
  */
 scout.PlannerLayout.prototype._layoutScaleLines = function() {
-  var height, $smallScaleItems, $largeScaleItems,
+  var height, $smallScaleItems, $largeScaleItems, scrollLeft,
     $timelineSmall = this.planner.$timelineSmall,
     $timelineLarge = this.planner.$timelineLarge;
 
@@ -117,17 +118,18 @@ scout.PlannerLayout.prototype._layoutScaleLines = function() {
 
   // Loop again and update height and left
   height = this.planner.$grid[0].scrollHeight;
+  scrollLeft = this.planner.$scale[0].scrollLeft;
   $largeScaleItems.each(function() {
     var $scaleItem = $(this),
       $scaleItemLine = $scaleItem.data('scale-item-line');
-    $scaleItemLine.cssLeft($scaleItem.position().left)
+    $scaleItemLine.cssLeft(scrollLeft + $scaleItem.position().left)
       .cssHeight(height);
   });
   $smallScaleItems.each(function() {
     var $scaleItem = $(this),
       $scaleItemLine = $scaleItem.data('scale-item-line');
     if ($scaleItemLine) {
-      $scaleItemLine.cssLeft($scaleItem.position().left)
+      $scaleItemLine.cssLeft(scrollLeft + $scaleItem.position().left)
         .cssHeight(height);
     }
   });
@@ -135,22 +137,21 @@ scout.PlannerLayout.prototype._layoutScaleLines = function() {
 
 scout.PlannerLayout.prototype._minWidth = function() {
   var $scale = this.planner.$scale,
-    $scaleItems = $scale.find('.timeline-large').children('.scale-item'),
-    numScaleItems = $scaleItems.length,
+    $scaleItemsLarge = this.planner.$timelineLarge.children('.scale-item'),
+    $scaleItemsSmall = this.planner.$timelineSmall.children('.scale-item'),
+    numScaleItemsLarge = $scaleItemsLarge.length,
+    numScaleItemsSmall = $scaleItemsSmall.length,
     displayMode = scout.Planner.DisplayMode;
 
-  var scaleItemMinWidth = 0;
   if (this.planner.displayMode === displayMode.DAY) {
-    scaleItemMinWidth = 52;
-  } else if (scout.isOneOf(this.planner.displayMode, displayMode.WORK_WEEK, displayMode.WEEK)) {
-    scaleItemMinWidth = 160;
-  } else if (this.planner.displayMode === displayMode.MONTH) {
-    scaleItemMinWidth = 450;
-  } else if (this.planner.displayMode === displayMode.CALENDAR_WEEK) {
-    scaleItemMinWidth = 85;
-  } else if (this.planner.displayMode === displayMode.YEAR) {
-    scaleItemMinWidth = 550;
+    return numScaleItemsLarge * 52;
+  } if (scout.isOneOf(this.planner.displayMode, displayMode.WORK_WEEK, displayMode.WEEK)) {
+    return numScaleItemsLarge * 160;
+  } if (this.planner.displayMode === displayMode.MONTH) {
+    return numScaleItemsSmall * 23;
+  } if (this.planner.displayMode === displayMode.CALENDAR_WEEK) {
+    return numScaleItemsSmall * 23;
+  } if (this.planner.displayMode === displayMode.YEAR) {
+    return numScaleItemsSmall * 90;
   }
-
-  return numScaleItems * scaleItemMinWidth;
 };

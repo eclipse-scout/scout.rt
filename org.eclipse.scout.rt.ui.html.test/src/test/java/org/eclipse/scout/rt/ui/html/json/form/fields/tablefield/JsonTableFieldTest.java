@@ -26,6 +26,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
+import org.eclipse.scout.rt.ui.html.UiSessionTestUtility;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonOutline;
 import org.eclipse.scout.rt.ui.html.json.desktop.fixtures.Outline;
 import org.eclipse.scout.rt.ui.html.json.desktop.fixtures.TablePage;
@@ -52,7 +53,7 @@ public class JsonTableFieldTest {
   public void testTableDisposal() {
     ITable table = new Table();
     ITableField<ITable> tableField = new TableField<ITable>(table);
-    JsonTableField<ITableField<?>> jsonTableField = m_uiSession.newJsonAdapter(tableField, null);
+    JsonTableField<ITableField<?>> jsonTableField = UiSessionTestUtility.newJsonAdapter(m_uiSession, tableField, null);
 
     assertNotNull(jsonTableField.getAdapter(table));
     jsonTableField.dispose();
@@ -64,7 +65,7 @@ public class JsonTableFieldTest {
     ITable table = new Table();
     ITable table2 = new Table();
     ITableField<ITable> tableField = new TableField<ITable>(table);
-    JsonTableField<ITableField<?>> jsonTableField = m_uiSession.newJsonAdapter(tableField, null);
+    JsonTableField<ITableField<?>> jsonTableField = UiSessionTestUtility.newJsonAdapter(m_uiSession, tableField, null);
 
     //Switch table -> old one needs to be disposed
     assertNotNull(jsonTableField.getAdapter(table));
@@ -82,12 +83,12 @@ public class JsonTableFieldTest {
     // Create tablePage
     IPageWithTable<?> tablePage = createTablePageAndSelectNode();
     ITable tablePageTable = tablePage.getTable();
-    JsonOutline<IOutline> jsonOutline = m_uiSession.newJsonAdapter(tablePage.getOutline(), null);
+    JsonOutline<IOutline> jsonOutline = UiSessionTestUtility.newJsonAdapter(m_uiSession, tablePage.getOutline(), null);
     Assert.assertNotNull(jsonOutline.getAdapter(tablePageTable));
 
     // Create table field which uses the table from the table page
     ITableField<ITable> tableField = new TableField<ITable>();
-    JsonTableField<ITableField<?>> jsonTableField = m_uiSession.newJsonAdapter(tableField, null);
+    JsonTableField<ITableField<?>> jsonTableField = UiSessionTestUtility.newJsonAdapter(m_uiSession, tableField, null);
     tableField.setTable(tablePageTable, true);
 
     // Dispose table field -> table must not be disposed because table page still needs it
@@ -111,12 +112,12 @@ public class JsonTableFieldTest {
     // Create tablePage
     IPageWithTable<?> tablePage = createTablePageAndSelectNode();
     ITable tablePageTable = tablePage.getTable();
-    JsonOutline<IOutline> jsonOutline = m_uiSession.newJsonAdapter(tablePage.getOutline(), null);
+    JsonOutline<IOutline> jsonOutline = UiSessionTestUtility.newJsonAdapter(m_uiSession, tablePage.getOutline(), null);
     Assert.assertNotNull(jsonOutline.getAdapter(tablePageTable));
 
     // Create table field which uses the table from the table page
     ITableField<ITable> tableField = new TableField<ITable>();
-    JsonTableField<ITableField<?>> jsonTableField = m_uiSession.newJsonAdapter(tableField, null);
+    JsonTableField<ITableField<?>> jsonTableField = UiSessionTestUtility.newJsonAdapter(m_uiSession, tableField, null);
     tableField.setTable(tablePageTable, true);
 
     // Switch table -> table must not be disposed because table page still needs it

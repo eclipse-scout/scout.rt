@@ -58,7 +58,7 @@ public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITr
   private P_MatchingNodesFilter m_matchingNodesFilter;
   private boolean m_selectCurrentValueRequested;
   private boolean m_populateInitialTreeDone;
-  private volatile IFuture<?> m_initialPolulatorFuture;
+  private volatile IFuture<Void> m_initialPolulatorFuture;
   private boolean m_modelExternallyManaged = false;
 
   public TreeProposalChooser(IContentAssistField<?, LOOKUP_KEY> contentAssistField, boolean allowCustomText) {
@@ -102,9 +102,8 @@ public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITr
 
   @Override
   public void dispose() {
-    final IFuture<?> future = m_initialPolulatorFuture;
-    if (future != null) {
-      future.cancel(true);
+    if (m_initialPolulatorFuture != null) {
+      m_initialPolulatorFuture.cancel(false);
     }
 
     m_model.disposeTree();
@@ -195,6 +194,7 @@ public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITr
           setStatusVisible(true);
         }
       });
+      m_initialPolulatorFuture.addExecutionHint(IContentAssistField.EXECUTION_HINT_INITIAL_LOOKUP);
     }
   }
 
@@ -569,5 +569,4 @@ public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITr
       }
     }
   }
-
 }

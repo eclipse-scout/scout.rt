@@ -22,9 +22,9 @@ import org.eclipse.scout.rt.client.ui.action.IActionVisitor;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.OrderedComparator;
-import org.eclipse.scout.rt.platform.classid.ITypeWithClassId;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
+import org.eclipse.scout.rt.platform.reflect.IPropertyObserver;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 import org.eclipse.scout.rt.shared.extension.ContributionComposite;
@@ -105,18 +105,20 @@ public abstract class AbstractActionNode<T extends IActionNode> extends Abstract
   }
 
   @Override
-  public void setContainerInternal(ITypeWithClassId container) {
+  public void setContainerInternal(IPropertyObserver container) {
     super.setContainerInternal(container);
     // children
     setContainerOnActions(getChildActionsInternal());
   }
 
   protected void setContainerOnActions(List<? extends T> actions) {
-    if (actions != null) {
-      for (T childAction : actions) {
-        if (childAction != null) {
-          childAction.setContainerInternal(getContainer());
-        }
+    if (actions == null || actions.isEmpty()) {
+      return;
+    }
+
+    for (T childAction : actions) {
+      if (childAction != null) {
+        childAction.setContainerInternal(getContainer());
       }
     }
   }

@@ -42,21 +42,37 @@ scout.BeanColumn.prototype._renderValue = function($cell, value) {
   // to be implemented by the subclass
 };
 
+scout.BeanColumn.prototype._plainTextForRow = function(row) {
+  var cell = this.table.cell(this, row);
+  if (!cell.plainText) {
+    // Convert to plain text and cache it because rendering is expensive
+    var html = this.buildCellForRow(row);
+    cell.plainText = scout.strings.plainText(html);
+  }
+  return cell.plainText;
+};
+
 /**
  * Default approach reads the html using buildCellForRow and uses _preprocessTextForGrouping to generate the value. Just using text() does not work because new lines get omitted.
  * If this approach does not work for a specific bean column, just override this method.
  */
 scout.BeanColumn.prototype.cellValueForGrouping = function(row) {
-  var html = this.buildCellForRow(row);
-  return this._preprocessTextForValueGrouping(html, true);
+  var plainText = this._plainTextForRow(row);
+  return this._preprocessTextForValueGrouping(plainText);
 };
 
 scout.BeanColumn.prototype.cellTextForGrouping = function(row) {
-  var html = this.buildCellForRow(row);
-  return this._preprocessTextForGrouping(html, true);
+  var plainText = this._plainTextForRow(row);
+  return this._preprocessTextForGrouping(plainText);
 };
 
 scout.BeanColumn.prototype.cellTextForTextFilter = function(row) {
-  var html = this.buildCellForRow(row);
-  return this._preprocessTextForTextFilter(html, true);
+  var plainText = this._plainTextForRow(row);
+  return this._preprocessTextForTextFilter(plainText);
+};
+
+scout.BeanColumn.prototype.compare = function(row1, row2) {
+  var plainText1 = this._plainTextForRow(row1);
+  var plainText2 = this._plainTextForRow(row2);
+  return this.comparator.compare(plainText1, plainText2);
 };

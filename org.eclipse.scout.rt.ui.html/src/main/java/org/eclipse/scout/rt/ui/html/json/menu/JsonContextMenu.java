@@ -97,9 +97,9 @@ public class JsonContextMenu<CONTEXT_MENU extends IContextMenu> extends Abstract
     m_jsonMenuAdapters.addAll(menuAdapters);
 
     IJsonAdapter<?> parent = getParent();
-    if (parent.getModel() != event.getSource().getOwner()) {
+    if (parent.getModel() != event.getSource().getContainer()) {
       // Not sure if this is really possible
-      throw new IllegalStateException("The model of the parent is different than the menu owner. Parent: " + parent + ". Owner: " + event.getSource().getOwner().getClass());
+      throw new IllegalStateException("The model of the parent is different than the menu container. Parent: " + parent + ". Container: " + event.getSource().getContainer().getClass());
     }
     if (!(parent instanceof IJsonContextMenuOwner)) {
       throw new IllegalStateException("Parent is not a context menu owner, context menu changed event cannot be handled. Parent: " + parent);

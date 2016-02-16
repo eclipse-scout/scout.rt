@@ -34,7 +34,7 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
  * for iterating through the scopes. This strategy is used for top-down searches. See {@link #createSubScope(Class)}.
  * </li>
  * <li><b>Filtering</b>: The caller provides an {@link Iterator} that is going through the list of parent model objects.
- * The extension scope is responsible for iterating through the scopes. This strategy is used fro bottom-up searches.
+ * The extension scope is responsible for iterating through the scopes. This strategy is used for bottom-up searches.
  * See {@link #filterScopeItems(Class, Iterator)}.</li>
  * </ul>
  * The root extension scope is called global scope and can be cached outside.

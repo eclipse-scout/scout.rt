@@ -891,4 +891,15 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
     }
     fireTreeEventInternal(new OutlineEvent(this, OutlineEvent.TYPE_PAGE_CHANGED, page));
   }
+
+  @Override
+  protected void disposeTreeInternal() {
+    super.disposeTreeInternal();
+    try {
+      disposeDefaultDetailForm();
+    }
+    catch (RuntimeException e) {
+      BEANS.get(ExceptionHandler.class).handle(e);
+    }
+  }
 }

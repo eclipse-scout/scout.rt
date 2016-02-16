@@ -32,12 +32,14 @@ public interface IContentAssistField<VALUE, LOOKUP_KEY> extends IValueField<VALU
   String PROP_PROPOSAL_CHOOSER = "proposalChooser";
 
   /**
-   * {@link String}
+   * Hint to mark the {@link IFuture} used to load the field's initial lookup rows. Typically, this future must not be
+   * cancelled.
+   * <p>
+   * e.g {@link TreeProposalChooser} requires data to apply tree filter.
    */
+  String EXECUTION_HINT_INITIAL_LOOKUP = "initialLookup";
+
   String PROP_BROWSE_ICON_ID = "browseIconId";
-  /**
-   * {@link String}
-   */
   String PROP_ICON_ID = "iconId";
   String PROP_MULTILINE_TEXT = "multilineText";
 

@@ -119,12 +119,16 @@ public class TableEventBufferTest {
     m_testBuffer.add(mockEvent(TableEvent.TYPE_ROW_ORDER_CHANGED));
     m_testBuffer.add(mockEvent(TableEvent.TYPE_ROWS_INSERTED));
     m_testBuffer.add(mockEvent(TableEvent.TYPE_ROWS_DELETED));
-    final TableEvent alldeleted = mockEvent(TableEvent.TYPE_ALL_ROWS_DELETED);
-    m_testBuffer.add(alldeleted);
+    TableEvent rowsSelectedEvent = mockEvent(TableEvent.TYPE_ROWS_SELECTED, 2);
+    m_testBuffer.add(rowsSelectedEvent);
+    final TableEvent allDeletedEvent = mockEvent(TableEvent.TYPE_ALL_ROWS_DELETED);
+    m_testBuffer.add(allDeletedEvent);
     final List<TableEvent> events = m_testBuffer.consumeAndCoalesceEvents();
-    assertEquals(2, events.size());
+    assertEquals(3, events.size());
     assertSame(columnEvent, events.get(0));
-    assertSame(alldeleted, events.get(1));
+    assertSame(rowsSelectedEvent, events.get(1));
+    assertSame(0, events.get(1).getRowCount());
+    assertSame(allDeletedEvent, events.get(2));
   }
 
   /**

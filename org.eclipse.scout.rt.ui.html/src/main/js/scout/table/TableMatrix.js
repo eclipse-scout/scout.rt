@@ -101,6 +101,7 @@ scout.TableMatrix.prototype.addData = function(data, dataGroup) {
 scout.TableMatrix.prototype.addAxis = function(axis, axisGroup) {
   var keyAxis = [],
     locale = this.locale,
+    session = this.session,
     getText = this.session.text.bind(this.session),
     emptyCell = getText('ui.EmptyCell');
 
@@ -118,7 +119,7 @@ scout.TableMatrix.prototype.addAxis = function(axis, axisGroup) {
     }
   };
 
-  // default sorts function
+  // default functions
   keyAxis.reorder = function() {
     keyAxis.sort(function(a, b) {
       // make sure -empty- is at the bottom
@@ -131,6 +132,25 @@ scout.TableMatrix.prototype.addAxis = function(axis, axisGroup) {
       // sort others
       return (a - b);
     });
+  };
+  keyAxis.norm = function(f) {
+    if (f === null || f === '') {
+      return null;
+    } else {
+      var index = keyAxis.normTable.indexOf(f);
+      if (index === -1) {
+        return keyAxis.normTable.push(f) - 1;
+      } else {
+        return index;
+      }
+    }
+  };
+  keyAxis.format = function(n) {
+    if (n === null) {
+      return emptyCell;
+    } else {
+      return keyAxis.normTable[n];
+    }
   };
 
   // norm and format depends of datatype and group functionality
@@ -233,29 +253,12 @@ scout.TableMatrix.prototype.addAxis = function(axis, axisGroup) {
         return getText('ui.BooleanColumnGroupingTrue');
       }
     };
+  } else if (axis instanceof scout.IconColumn) {
+    keyAxis.textIsIcon = true;
   } else {
-    keyAxis.norm = function(f) {
-      if (f === null || f === '') {
-        return null;
-      } else {
-        var index = keyAxis.normTable.indexOf(f);
-        if (index === -1) {
-          return keyAxis.normTable.push(f) - 1;
-        } else {
-          return index;
-        }
-      }
-    };
-    keyAxis.format = function(n) {
-      if (n === null) {
-        return emptyCell;
-      } else {
-        return keyAxis.normTable[n];
-      }
-    };
     keyAxis.reorder = function() {
-      // prepare comparator
-      axis.prepareForSorting();
+      var comparator = scout.comparators.TEXT;
+      comparator.install(session);
 
       keyAxis.sort(function(a, b) {
         // make sure -empty- is at the bottom
@@ -266,7 +269,7 @@ scout.TableMatrix.prototype.addAxis = function(axis, axisGroup) {
           return -1;
         }
         // sort others
-        return axis.compare(keyAxis.format(a), keyAxis.format(b));
+        return comparator.compare(keyAxis.format(a), keyAxis.format(b));
       });
     };
   }

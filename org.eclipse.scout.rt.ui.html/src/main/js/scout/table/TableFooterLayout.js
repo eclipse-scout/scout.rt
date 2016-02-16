@@ -37,6 +37,7 @@ scout.TableFooterLayout.prototype.layout = function($container) {
       $item.css('width', 'auto');
     }
   });
+  $info.css('max-width', '');
 
   // Always try to use max space first
   if (this._tableFooter._compactStyle) {
@@ -61,6 +62,8 @@ scout.TableFooterLayout.prototype.layout = function($container) {
     if (controlsWidth + infoWidth <= containerWidth) {
       contentFits = true;
     }
+    // Make sure info section does not overlap controls
+    $info.css('max-width', Math.max(containerWidth - controlsWidth, 0));
   }
 
   // don't animate on the first layouting -> only animate on user interactions

@@ -16,13 +16,19 @@ import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
+import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
+import org.eclipse.scout.rt.client.ui.messagebox.MessageBoxes;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Replace;
 import org.eclipse.scout.rt.platform.annotations.Internal;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
+import org.eclipse.scout.rt.platform.exception.IProcessingStatus;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
+import org.eclipse.scout.rt.platform.exception.VetoException;
+import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedException;
+import org.eclipse.scout.rt.shared.TEXTS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -90,7 +96,26 @@ public class ClientExceptionHandler extends ExceptionHandler {
       }
     }
     else {
-      LOG.error("Loop detection in {} when handling '{}'. StackTrace: ", getClass().getName(), t, new Exception());
+      Exception e = new Exception("Stacktrace and suppressed exception");
+      // add original exception for analysis
+      e.addSuppressed(t);
+      LOG.warn("Loop detection in {}", getClass().getName(), e);
+
+      if (ModelJobs.isModelThread()) {
+        IMessageBox msgBox = MessageBoxes
+            .createOk()
+            .withSeverity(IStatus.ERROR)
+            .withHeader(TEXTS.get("Error"));
+
+        if (t instanceof VetoException) {
+          IProcessingStatus status = ((VetoException) t).getStatus();
+          msgBox
+              .withHeader(status.getTitle())
+              .withBody(status.getBody());
+        }
+
+        msgBox.show();
+      }
     }
   }
 

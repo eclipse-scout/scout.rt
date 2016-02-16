@@ -401,10 +401,12 @@ scout.Table.prototype.onContextMenu = function(event) {
         // Set table style to focused, so that it looks as it still has the focus.
         // Must be called after open(), because opening the popup might cause another
         // popup to close first (which will remove the 'focused' class).
-        this.$container.addClass('focused');
-        popup.on('close', function(event) {
-          this.$container.removeClass('focused');
-        }.bind(this));
+        if (this.enabled) {
+          this.$container.addClass('focused');
+          popup.on('close', function(event) {
+            this.$container.removeClass('focused');
+          }.bind(this));
+        }
       }
     }
   };
@@ -559,18 +561,19 @@ scout.Table.prototype.updateScrollbars = function() {
   scout.scrollbars.update(this.$data);
 };
 
-scout.Table.prototype._sort = function(animateAggregateRows) {
-  var column, sortIndex,
-    sortColumns = [];
+scout.Table.prototype.storeScrollPosition = function() {
+  this.storedScrollTop = this.scrollTop;
+};
 
-  // find all sort columns
-  for (var c = 0; c < this.columns.length; c++) {
-    column = this.columns[c];
-    sortIndex = column.sortIndex;
-    if (sortIndex >= 0) {
-      sortColumns[sortIndex] = column;
-    }
+scout.Table.prototype.restoreScrollPosition = function() {
+  if (this.storedScrollTop) {
+    this.setScrollTop(this.storedScrollTop);
+    this.storedScrollTop = null;
   }
+};
+
+scout.Table.prototype._sort = function(animateAggregateRows) {
+  var sortColumns = this._sortColumns();
 
   // Initialize comparators
   var clientSideSortingPossible = this.uiSortPossible && this._prepareColumnsForSorting(sortColumns);
@@ -584,16 +587,29 @@ scout.Table.prototype._sort = function(animateAggregateRows) {
   }
 
   this._sortImpl(sortColumns);
-
   this._filteredRowsDirty = true; // order has been changed
   this._triggerRowOrderChanged();
-  this._group(animateAggregateRows);
   if (this.rendered) {
     this._renderRowOrderChanges();
   }
 
+  // Do it after row order has been rendered, because renderRowOrderChanges rerenders the whole viewport which would destroy the animation
+  this._group(animateAggregateRows);
+
   // Sort was possible -> return true
   return true;
+};
+
+scout.Table.prototype._sortColumns = function() {
+  var sortColumns = [];
+  for (var c = 0; c < this.columns.length; c++) {
+    var column = this.columns[c];
+    var sortIndex = column.sortIndex;
+    if (sortIndex >= 0) {
+      sortColumns[sortIndex] = column;
+    }
+  }
+  return sortColumns;
 };
 
 scout.Table.prototype._sortImpl = function(sortColumns) {
@@ -601,11 +617,9 @@ scout.Table.prototype._sortImpl = function(sortColumns) {
   function compare(row1, row2) {
     for (var s = 0; s < sortColumns.length; s++) {
       var column = sortColumns[s];
-      var valueA = this.cellValue(column, row1);
-      var valueB = this.cellValue(column, row2);
       var direction = column.sortActive && column.sortAscending ? -1 : 1;
 
-      var result = column.compare(valueA, valueB);
+      var result = column.compare(row1, row2);
       if (result < 0) {
         return direction;
       } else if (result > 0) {
@@ -692,11 +706,16 @@ scout.Table.prototype._renderRowOrderChanges = function() {
  * @param remove true to remove the column from the sort columns
  */
 scout.Table.prototype.sort = function(column, direction, multiSort, remove) {
-  var data, sorted,
-    // Animate if sort removes aggregate rows
-    animateAggregateRows = !multiSort;
-
-  this._updateSortColumns(column, direction, multiSort, remove);
+  var data, sorted, animateAggregateRows;
+  multiSort = scout.nvl(multiSort, false);
+  remove = scout.nvl(remove, false);
+  // Animate if sort removes aggregate rows
+  animateAggregateRows = !multiSort;
+  if (remove) {
+    this._removeSortColumn(column);
+  } else {
+    this._addSortColumn(column, direction, multiSort);
+  }
   if (this.header) {
     this.header.onSortingChanged();
   }
@@ -704,10 +723,14 @@ scout.Table.prototype.sort = function(column, direction, multiSort, remove) {
 
   data = {
     columnId: column.id,
-    sortingRemoved: remove,
-    multiSort: multiSort,
     sortAscending: column.sortAscending
   };
+  if (remove) {
+    data.sortingRemoved = true;
+  }
+  if (multiSort) {
+    data.multiSort = true;
+  }
   if (sorted) {
     this._send('rowsSorted', data);
   } else {
@@ -718,73 +741,61 @@ scout.Table.prototype.sort = function(column, direction, multiSort, remove) {
   }
 };
 
-scout.Table.prototype._updateSortColumns = function(column, direction, multiSort, remove) {
-  var sortIndex = -1,
-    deviation,
-    groupColCount,
-    sortColCount;
+scout.Table.prototype._addSortColumn = function(column, direction, multiSort) {
+  var groupColCount, sortColCount;
+  direction = scout.nvl(direction, column.sortAscending ? 'asc' : 'desc');
+  multiSort = scout.nvl(multiSort, true);
 
-  if (remove) {
+  this._updateSortIndexForColumn(column, multiSort);
 
-    if (!(column.initialAlwaysIncludeSortAtBegin || column.initialAlwaysIncludeSortAtEnd)) {
-      column.sortActive = false;
+  // Reset grouped flag if column should be sorted exclusively
+  if (!multiSort) {
+    groupColCount = this._groupedColumns().length;
+    sortColCount = this._sortColumns().length;
+    if (sortColCount === 1 && groupColCount === 1) {
+      // special case: if it is the only sort column and also grouped, do not remove grouped property.
+    } else {
       column.grouped = false;
-
-      // Adjust sibling columns with higher index
-      scout.arrays.eachSibling(this.columns, column, function(siblingColumn) {
-        if (siblingColumn.sortIndex > column.sortIndex) {
-          siblingColumn.sortIndex = siblingColumn.sortIndex - 1;
-        }
-      });
-      column.sortIndex = -1;
     }
-    return;
   }
 
-  if (!(column.initialAlwaysIncludeSortAtBegin || column.initialAlwaysIncludeSortAtEnd)) {
-    // do not update sort index for permanent head/tail sort columns, their order is fixed (see ColumnSet.java)
-    if (multiSort) {
-      // if not already sorted set the appropriate sort index
-      if (!column.sortActive) {
-        sortIndex = Math.max(-1, scout.arrays.max(this.columns.map(function(c) {
-          return (c.sortIndex === undefined || c.initialAlwaysIncludeSortAtEnd) ? -1 : c.sortIndex;
-        })));
-        column.sortIndex = sortIndex + 1;
+  column.sortAscending = direction === 'asc' ? true : false;
+  column.sortActive = true;
+};
 
-        // increase sortIndex for all permanent tail columns (a column has been added in front of them)
-        this._permanentTailSortColumns.forEach(function(c) {
-          c.sortIndex++;
-        });
-      }
-    } else {
+/**
+ * Intended to be called for new sort columns.
+ * Sets the sortIndex of the given column and its siblings.
+ */
+scout.Table.prototype._updateSortIndexForColumn = function(column, multiSort) {
+  var deviation,
+    sortIndex = -1;
+
+  if (multiSort) {
+    // if not already sorted set the appropriate sort index (check for sortIndex necessary if called by _onColumnHeadersUpdated)
+    if (!column.sortActive || column.sortIndex === -1) {
+      sortIndex = Math.max(-1, scout.arrays.max(this.columns.map(function(c) {
+        return (c.sortIndex === undefined || c.initialAlwaysIncludeSortAtEnd) ? -1 : c.sortIndex;
+      })));
+      column.sortIndex = sortIndex + 1;
+
+      // increase sortIndex for all permanent tail columns (a column has been added in front of them)
+      this._permanentTailSortColumns.forEach(function(c) {
+        c.sortIndex++;
+      });
+    }
+  } else {
+    // do not update sort index for permanent head/tail sort columns, their order is fixed (see ColumnSet.java)
+    if (!(column.initialAlwaysIncludeSortAtBegin || column.initialAlwaysIncludeSortAtEnd)) {
       column.sortIndex = this._permanentHeadSortColumns.length;
     }
-  }
-
-  if (!multiSort) {
-    groupColCount = this._groupedColumns() ? this._groupedColumns().length : 0;
-    sortColCount = 0;
-    this.columns.forEach(function(c) {
-      if (c.sortActive) {
-        sortColCount++;
-      }
-    });
 
     // remove sort index for siblings (ignore permanent head/tail columns, only if not multi sort)
     scout.arrays.eachSibling(this.columns, column, function(siblingColumn) {
-      if (siblingColumn.sortActive && !(siblingColumn.initialAlwaysIncludeSortAtBegin || siblingColumn.initialAlwaysIncludeSortAtEnd)) {
-        siblingColumn.sortIndex = -1;
-        siblingColumn.sortActive = false;
-        siblingColumn.grouped = false;
+      if (siblingColumn.sortActive) {
+        this._removeSortColumnInternal(siblingColumn);
       }
-    });
-
-    //special case: if it is the only sort column and also grouped, do not remove grouped property.
-    if (sortColCount === 1 && groupColCount === 1) {
-      //do not remove grouping property
-    } else {
-      column.grouped = false;
-    }
+    }.bind(this));
 
     // set correct sort index for all permanent tail sort columns
     deviation = (column.initialAlwaysIncludeSortAtBegin || column.initialAlwaysIncludeSortAtEnd) ? 0 : 1;
@@ -792,43 +803,77 @@ scout.Table.prototype._updateSortColumns = function(column, direction, multiSort
       c.sortIndex = this._permanentHeadSortColumns.length + deviation + index;
     }, this);
   }
-
-  if (!(column.initialAlwaysIncludeSortAtBegin || column.initialAlwaysIncludeSortAtEnd)) {
-    column.sortAscending = direction === 'asc' ? true : false;
-    column.sortActive = true;
-  }
 };
 
-scout.Table.prototype._isGroupingPossible = function(column) {
+scout.Table.prototype._removeSortColumn = function(column) {
+  if (column.initialAlwaysIncludeSortAtBegin || column.initialAlwaysIncludeSortAtEnd) {
+    return;
+  }
+  // Adjust sibling columns with higher index
+  scout.arrays.eachSibling(this.columns, column, function(siblingColumn) {
+    if (siblingColumn.sortIndex > column.sortIndex) {
+      siblingColumn.sortIndex = siblingColumn.sortIndex - 1;
+    }
+  });
+  this._removeSortColumnInternal(column);
+};
+
+scout.Table.prototype._removeSortColumnInternal = function(column) {
+  if (column.initialAlwaysIncludeSortAtBegin || column.initialAlwaysIncludeSortAtEnd) {
+    return;
+  }
+  column.sortActive = false;
+  column.grouped = false;
+  column.sortIndex = -1;
+};
+
+scout.Table.prototype.isGroupingPossible = function(column) {
   var possible = true;
 
-  //TODO: incorporate this logic into visibility of grouping buttons on column header
+  if (!this.sortEnabled) {
+    // grouping without sorting is not possible
+    return false;
+  }
 
   if (this._permanentHeadSortColumns && this._permanentHeadSortColumns.length === 0) {
     // no permanent head sort columns. grouping ok.
     return true;
   }
 
-  if (!column.initialAlwaysIncludeSortAtBegin && !column.initialAlwaysIncludeSortAtEnd) {
-    // col itself is not a head or tail sort column. therefore, all head sort columns must be grouped.
-    this._permanentHeadSortColumns.forEach(function(c) {
-      possible &= c.grouped;
-    });
-    return possible;
-  }
-
-  if (column.initialAlwaysIncludeSortAtEnd) {
+  if (column.initialAlwaysIncludeSortAtBegin) {
     possible = true;
     scout.arrays.eachSibling(this._permanentHeadSortColumns, column, function(c) {
       if (c.sortIndex < column.sortIndex) {
-        possible &= c.grouped;
+        possible = possible && c.grouped;
       }
     });
     return possible;
   }
 
-  // else: it is a tail sort column. grouping does not make sense.
-  return false;
+  if (column.initialAlwaysIncludeSortAtEnd) {
+    // it is a tail sort column. Grouping does not make sense.
+    return false;
+  }
+
+  // column itself is not a head or tail sort column. Therefore, all head sort columns must be grouped.
+  this._permanentHeadSortColumns.forEach(function(c) {
+    possible = possible && c.grouped;
+  });
+  return possible;
+};
+
+scout.Table.prototype.isAggregationPossible = function(column) {
+  if (!(column instanceof scout.NumberColumn)) {
+    return false;
+  }
+
+  if (column.grouped) {
+    // Aggregation is not possible if column is grouped
+    return false;
+  }
+
+  // Aggregation is possible if it is grouped by another column or aggregation control is available
+  return this.isGrouped() || this.hasAggregateTableControl();
 };
 
 scout.Table.prototype.changeAggregation = function(column, func) {
@@ -840,29 +885,16 @@ scout.Table.prototype.changeAggregation = function(column, func) {
   this._group();
 };
 
-scout.Table.prototype._updateSortColumnsForGrouping = function(column, direction, multiGroup, remove) {
-  var sortIndex = -1,
-    deviation;
+scout.Table.prototype._addGroupColumn = function(column, direction, multiGroup) {
+  var deviation,
+    sortIndex = -1;
 
-  if (remove) {
-    column.grouped = false;
-
-    if (column.initialAlwaysIncludeSortAtBegin) {
-      //head sort case: remove all groupings after this column.
-      this.columns.forEach(function(c) {
-        if (c.sortIndex >= column.sortIndex) {
-          c.grouped = false;
-        }
-      });
-    }
-
-    return this._updateSortColumns(column, direction, multiGroup, remove);
-  }
-
-  if (!this._isGroupingPossible(column)) {
+  if (!this.isGroupingPossible(column)) {
     return;
   }
 
+  direction = scout.nvl(direction, column.sortAscending ? 'asc' : 'desc');
+  multiGroup = scout.nvl(multiGroup, true);
   if (!(column.initialAlwaysIncludeSortAtBegin || column.initialAlwaysIncludeSortAtEnd)) {
     // do not update sort index for permanent head/tail sort columns, their order is fixed (see ColumnSet.java)
     if (multiGroup) {
@@ -887,8 +919,8 @@ scout.Table.prototype._updateSortColumnsForGrouping = function(column, direction
           c.sortIndex++;
         });
       } else {
-        //column already sorted, update position:
-        //move all sort columns between the newly determined sortindex and the old sortindex by one.
+        // column already sorted, update position:
+        // move all sort columns between the newly determined sortindex and the old sortindex by one.
         scout.arrays.eachSibling(this.columns, column, function(siblingColumn) {
           if (siblingColumn.sortActive && !(siblingColumn.initialAlwaysIncludeSortAtBegin || siblingColumn.initialAlwaysIncludeSortAtEnd) &&
             (siblingColumn.sortIndex > sortIndex) &&
@@ -899,12 +931,12 @@ scout.Table.prototype._updateSortColumnsForGrouping = function(column, direction
         column.sortIndex = sortIndex + 1;
       }
     } else {
-      //no multigroup:
+      // no multigroup:
       sortIndex = this._permanentHeadSortColumns.length;
 
       if (column.sortActive) {
-        //column already sorted, update position:
-        //move all sort columns between the newly determined sortindex and the old sortindex by one.
+        // column already sorted, update position:
+        // move all sort columns between the newly determined sortindex and the old sortindex by one.
         scout.arrays.eachSibling(this.columns, column, function(siblingColumn) {
           if (siblingColumn.sortActive && !(siblingColumn.initialAlwaysIncludeSortAtBegin || siblingColumn.initialAlwaysIncludeSortAtEnd) &&
             (siblingColumn.sortIndex >= sortIndex) &&
@@ -928,7 +960,7 @@ scout.Table.prototype._updateSortColumnsForGrouping = function(column, direction
         });
       }
 
-      //remove all other grouped properties:
+      // remove all other grouped properties:
       scout.arrays.eachSibling(this.columns, column, function(siblingColumn) {
         if (siblingColumn.sortActive && !(siblingColumn.initialAlwaysIncludeSortAtBegin || siblingColumn.initialAlwaysIncludeSortAtEnd) && siblingColumn.sortIndex >= sortIndex) {
           siblingColumn.grouped = false;
@@ -943,13 +975,28 @@ scout.Table.prototype._updateSortColumnsForGrouping = function(column, direction
   } else {
 
     if (column.initialAlwaysIncludeSortAtBegin) {
-      //do not change order or direction. just set grouped to true.
+      // do not change order or direction. just set grouped to true.
       column.grouped = true;
     }
 
   }
 
   column.grouped = true;
+};
+
+scout.Table.prototype._removeGroupColumn = function(column) {
+  column.grouped = false;
+
+  if (column.initialAlwaysIncludeSortAtBegin) {
+    // head sort case: remove all groupings after this column.
+    this.columns.forEach(function(c) {
+      if (c.sortIndex >= column.sortIndex) {
+        c.grouped = false;
+      }
+    });
+  }
+
+  this._removeSortColumn(column);
 };
 
 scout.Table.prototype._buildRowDiv = function(row) {
@@ -1746,10 +1793,10 @@ scout.Table.prototype._renderAggregateRows = function(animate) {
 
     for (c = 0; c < this.columns.length; c++) {
       column = this.columns[c];
-      if (column instanceof scout.NumberColumn) {
-        cell = column.createAggrValueCell(contents[c]);
-      } else if (column.grouped) {
+      if (column.grouped) {
         cell = column.createAggrGroupCell(row);
+      } else if (column instanceof scout.NumberColumn) {
+        cell = column.createAggrValueCell(contents[c]);
       } else {
         cell = column.createAggrEmptyCell(row);
       }
@@ -1768,8 +1815,17 @@ scout.Table.prototype._renderAggregateRows = function(animate) {
 
 scout.Table.prototype.groupColumn = function(column, multiGroup, direction, remove) {
   var data, sorted;
-
-  this._updateSortColumnsForGrouping(column, direction, multiGroup, remove);
+  multiGroup = scout.nvl(multiGroup, false);
+  remove = scout.nvl(remove, false);
+  if (remove) {
+    this._removeGroupColumn(column);
+  }
+  if (!this.isGroupingPossible(column)) {
+    return;
+  }
+  if (!remove) {
+    this._addGroupColumn(column, direction, multiGroup);
+  }
 
   if (this.header) {
     this.header.onSortingChanged();
@@ -1778,10 +1834,15 @@ scout.Table.prototype.groupColumn = function(column, multiGroup, direction, remo
 
   data = {
     columnId: column.id,
-    groupingRemoved: remove,
-    multiGroup: multiGroup,
     groupAscending: column.sortAscending
   };
+  if (remove) {
+    data.groupingRemoved = true;
+  }
+  if (multiGroup) {
+    data.multiGroup = true;
+  }
+  this._triggerGroupingChanged();
   if (sorted) {
     this._send('rowsGrouped', data);
   } else {
@@ -2540,6 +2601,7 @@ scout.Table.prototype._applyFilters = function(rows) {
 
   rows.forEach(function(row) {
     if (this._applyFiltersForRow(row)) {
+      filterChanged = true;
       if (!row.filterAccepted) {
         newHiddenRows.push(row);
       }
@@ -2742,6 +2804,17 @@ scout.Table.prototype.moveColumn = function(column, oldPos, newPos, dragged) {
   this._triggerColumnMoved(column, oldPos, newPos, dragged);
   this._sendColumnMoved(column, index);
 
+  // move aggregated rows
+  this._aggregateRows.forEach(function(aggregateRow) {
+    var val = aggregateRow.contents[oldPos];
+    aggregateRow.contents.splice(oldPos, 1);
+    if (aggregateRow.contents.length > newPos) {
+      aggregateRow.contents.splice(newPos, 0, val);
+    } else {
+      aggregateRow.contents[newPos] = val;
+    }
+  });
+
   // move cells
   this._rerenderViewport();
 };
@@ -2839,6 +2912,10 @@ scout.Table.prototype._triggerAggregationFunctionChanged = function(column) {
     column: column.id
   };
   this.trigger('aggregationFunctionChanged', event);
+};
+
+scout.Table.prototype._triggerGroupingChanged = function() {
+  this.trigger('groupingChanged');
 };
 
 scout.Table.prototype._renderHeaderVisible = function() {
@@ -3299,10 +3376,10 @@ scout.Table.prototype._renderViewRange = function(viewRange) {
   }.bind(this));
 
   // check if at least last and first row in range got correctly rendered
-  if (this.viewRangeRendered.size > 0) {
+  if (this.viewRangeRendered.size() > 0) {
     var rows = this.filteredRows();
-    var firstRow = rows[this.viewRangeRendered.from].$row;
-    var lastRow = rows[this.viewRangeRendered.to].$row;
+    var firstRow = rows[this.viewRangeRendered.from];
+    var lastRow = rows[this.viewRangeRendered.to - 1];
     if (!firstRow.$row || !lastRow.$row) {
       throw new Error('Rows not rendered as expected. ' + this.viewRangeRendered + '. First: ' + firstRow.$row + '. Last: ' + lastRow.$row);
     }
@@ -3507,15 +3584,29 @@ scout.Table.prototype._onColumnOrderChanged = function(columnIds) {
 scout.Table.prototype._onColumnHeadersUpdated = function(columns) {
   var column, oldColumnState;
 
-  //Update model columns
+  // Update model columns
   for (var i = 0; i < columns.length; i++) {
     scout.defaultValues.applyTo(columns[i], 'Column');
     column = this._columnById(columns[i].id);
     oldColumnState = $.extend(oldColumnState, column);
     column.text = columns[i].text;
+    column.tooltipText = columns[i].tooltipText;
     column.headerCssClass = columns[i].headerCssClass;
+    column.headerBackgroundColor = columns[i].headerBackgroundColor;
+    column.headerForegroundColor = columns[i].headerForegroundColor;
+    column.headerFont = columns[i].headerFont;
+    column.headerIconId = columns[i].headerIconId;
     column.sortActive = columns[i].sortActive;
     column.sortAscending = columns[i].sortAscending;
+    if (!column.sortActive && column.sortIndex !== -1) {
+      // Adjust indices of other sort columns (if a sort column in the middle got removed, there won't necessarily be an event for the other columns)
+      this._removeSortColumn(column);
+    } else if (column.sortActive && column.sortIndex === -1) {
+      // Necessary if there is a tail sort column (there won't be an event for the tail sort column if another sort column was added before)
+      this._addSortColumn(column);
+    } else {
+      column.sortIndex = columns[i].sortIndex;
+    }
 
     if (this.rendered && this.header) {
       this.header.updateHeader(column, oldColumnState);

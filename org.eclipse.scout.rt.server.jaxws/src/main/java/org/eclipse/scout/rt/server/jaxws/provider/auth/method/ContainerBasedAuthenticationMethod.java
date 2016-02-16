@@ -39,7 +39,19 @@ public class ContainerBasedAuthenticationMethod implements IAuthenticationMethod
 
   private static final Logger LOG = LoggerFactory.getLogger(ContainerBasedAuthenticationMethod.class);
 
-  @Override
+  /**
+   * Returns the {@link Subject} if already authenticated, e.g. by the application server or Servlet filter, or else
+   * <code>null</code>.
+   * <p>
+   * If authenticated, {@link #authenticate(SOAPMessageContext, ICredentialVerifier, IPrincipalProducer)} will not be
+   * invoked.
+   *
+   * @param servletRequest
+   *          current servlet request.
+   * @param principalProducer
+   *          used to produce {@link Principal} objects for authenticated users.
+   * @return authenticated {@link Subject}, or <code>null</code> if not authenticated yet.
+   */
   public Subject getRequestSubject(final HttpServletRequest servletRequest, final IPrincipalProducer principalProducer) {
     // Check if already running within a Subject.
     if (BEANS.get(ServletFilterHelper.class).isRunningWithValidSubject(servletRequest)) {

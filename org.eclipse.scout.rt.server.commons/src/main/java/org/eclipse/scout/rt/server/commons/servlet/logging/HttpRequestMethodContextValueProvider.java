@@ -19,8 +19,8 @@ import org.eclipse.scout.rt.server.commons.servlet.IHttpServletRoundtrip;
 import org.slf4j.MDC;
 
 /**
- * This class provides the {@link HttpServletRequest#getRequestURI()} to be set into the
- * <code>diagnostic context map</code> for logging purpose.
+ * This class provides the {@link HttpServletRequest#getMethod()} to be set into the <code>diagnostic context map</code>
+ * for logging purpose.
  *
  * @see #KEY
  * @see DiagnosticContextValueProcessor
@@ -30,7 +30,7 @@ import org.slf4j.MDC;
 @ApplicationScoped
 public class HttpRequestMethodContextValueProvider implements IDiagnosticContextValueProvider {
 
-  public static final String KEY = "http.request.uri";
+  public static final String KEY = "http.request.method";
 
   @Override
   public String key() {
@@ -39,6 +39,6 @@ public class HttpRequestMethodContextValueProvider implements IDiagnosticContext
 
   @Override
   public String value() {
-    return IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.get().getRequestURI();
+    return IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.get().getMethod();
   }
 }

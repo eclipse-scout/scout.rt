@@ -87,7 +87,9 @@ scout.CellEditorPopup.prototype._render = function($parent) {
   this.table.events.on('rowOrderChanged', this._rowOrderChangedFunc);
   // Set table style to focused, so that it looks as it still has the focus.
   // This prevents flickering if the cell editor gets opened, especially when tabbing to the next cell editor.
-  this.table.$container.addClass('focused');
+  if (this.table.enabled) {
+    this.table.$container.addClass('focused');
+  }
 };
 
 scout.CellEditorPopup.prototype._postRender = function() {

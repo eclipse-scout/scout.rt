@@ -21,7 +21,7 @@ scout.scrollbars = {
    */
 
   _$scrollables: {},
-  _scrollableOptions:{},
+  _scrollableOptions: {},
 
   getScrollables: function(session) {
     return this._$scrollables[session] || [];
@@ -42,9 +42,9 @@ scout.scrollbars = {
   },
 
   pushScrollableOptions: function($container, options) {
-    if(this._scrollableOptions[$container]){
+    if (this._scrollableOptions[$container]) {
       this._scrollableOptions[$container].push(options);
-    }else{
+    } else {
       this._scrollableOptions[$container] = [options];
     }
   },
@@ -54,7 +54,7 @@ scout.scrollbars = {
   },
 
   removeScrollableOptions: function($container) {
-    if(this._scrollableOptions[$container]){
+    if (this._scrollableOptions[$container]) {
       delete this._scrollableOptions[$container];
     }
   },
@@ -161,7 +161,7 @@ scout.scrollbars = {
         scrollbar.remove();
       });
     }
-    this.removeScrollable(session,$container);
+    this.removeScrollable(session, $container);
     $container.removeData('scrollable');
     $container.css('overflow', '');
     $container.removeData('scrollbars');
@@ -231,8 +231,9 @@ scout.scrollbars = {
   scrollTo: function($scrollable, $element) {
     var scrollTo,
       scrollableH = $scrollable.height(),
-      elementBounds = scout.graphics.bounds($element, true, true),
-      elementTop = elementBounds.y,
+      elementBounds = scout.graphics.offsetBounds($element, false, false),
+      scrollableBounds = scout.graphics.offsetBounds($scrollable, false, false),
+      elementTop = elementBounds.y - scrollableBounds.y,
       elementH = elementBounds.height,
       scrollbars;
 

@@ -19,7 +19,7 @@ import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.IActionVisitor;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
-import org.eclipse.scout.rt.client.ui.action.menu.root.AbstractPropertyObserverContextMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.root.AbstractContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.ITreeContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
@@ -28,7 +28,7 @@ import org.eclipse.scout.rt.client.ui.basic.tree.TreeAdapter;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
-public class TreeContextMenu extends AbstractPropertyObserverContextMenu<ITree> implements ITreeContextMenu {
+public class TreeContextMenu extends AbstractContextMenu<ITree> implements ITreeContextMenu {
   private Set<? extends ITreeNode> m_currentSelection;
 
   /**
@@ -41,9 +41,9 @@ public class TreeContextMenu extends AbstractPropertyObserverContextMenu<ITree> 
   @Override
   protected void initConfig() {
     super.initConfig();
-    getOwner().addTreeListener(new P_OwnerTreeListener());
+    getContainer().addTreeListener(new P_OwnerTreeListener());
     // init current menu types
-    setCurrentMenuTypes(MenuUtility.getMenuTypesForTreeSelection(getOwner().getSelectedNodes()));
+    setCurrentMenuTypes(MenuUtility.getMenuTypesForTreeSelection(getContainer().getSelectedNodes()));
     calculateLocalVisibility();
   }
 
@@ -60,8 +60,9 @@ public class TreeContextMenu extends AbstractPropertyObserverContextMenu<ITree> 
   }
 
   protected void handleOwnerEnabledChanged() {
-    if (getOwner() != null) {
-      final boolean enabled = getOwner().isEnabled();
+    ITree container = getContainer();
+    if (container != null) {
+      final boolean enabled = container.isEnabled();
       acceptVisitor(new IActionVisitor() {
         @Override
         public int visit(IAction action) {
@@ -83,8 +84,8 @@ public class TreeContextMenu extends AbstractPropertyObserverContextMenu<ITree> 
   }
 
   protected void handleOwnerValueChanged() {
-    if (getOwner() != null) {
-      final Set<ITreeNode> ownerSelection = getOwner().getSelectedNodes();
+    if (getContainer() != null) {
+      final Set<ITreeNode> ownerSelection = getContainer().getSelectedNodes();
       m_currentSelection = CollectionUtility.hashSet(ownerSelection);
       setCurrentMenuTypes(MenuUtility.getMenuTypesForTreeSelection(ownerSelection));
       acceptVisitor(new MenuOwnerChangedVisitor(ownerSelection, getCurrentMenuTypes()));

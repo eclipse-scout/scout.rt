@@ -12,18 +12,29 @@ package org.eclipse.scout.rt.client.extension.ui.basic.table;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
 
 import org.eclipse.scout.extension.AbstractLocalExtensionTestCase;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.fixture.AbstractPersonTable;
+import org.eclipse.scout.rt.client.extension.ui.basic.table.fixture.AbstractPersonTable.NameColumn;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.fixture.AllPersonTable;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.fixture.FirstNameColumn;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.fixture.OtherPersonTable;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.fixture.PersonTableExtension;
+import org.eclipse.scout.rt.client.extension.ui.basic.table.fixture.PersonTableExtension.NameColumnExtension;
+import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.extension.IExtensionRegistry;
+import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
+import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
+import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
+@RunWith(ClientTestRunner.class)
+@RunWithClientSession(TestEnvironmentClientSession.class)
+@RunWithSubject("anna")
 public class TableExtensionTest extends AbstractLocalExtensionTestCase {
 
   @Test
@@ -57,17 +68,18 @@ public class TableExtensionTest extends AbstractLocalExtensionTestCase {
   @Test
   public void testExtendAbstractPersonTablePersonTableExtensionExplicit() {
     BEANS.get(IExtensionRegistry.class).register(PersonTableExtension.class, AbstractPersonTable.class);
-    doTestPersonTableExtension();
+    verifyExtendedAllPersonTable(new AllPersonTable());
+    verifyExtendedOtherPersonTable(new OtherPersonTable());
   }
 
   @Test
   public void testExtendAbstractPersonTablePersonTableExtensionAnnotation() {
     BEANS.get(IExtensionRegistry.class).register(PersonTableExtension.class);
-    doTestPersonTableExtension();
+    verifyExtendedAllPersonTable(new AllPersonTable());
+    verifyExtendedOtherPersonTable(new OtherPersonTable());
   }
 
-  private void doTestPersonTableExtension() {
-    AllPersonTable allPersonTable = new AllPersonTable();
+  protected void verifyExtendedAllPersonTable(AllPersonTable allPersonTable) {
     assertEquals(4, allPersonTable.getColumnCount());
     assertSame(allPersonTable.getNameColumn(), allPersonTable.getColumnSet().getColumn(0));
     assertSame(allPersonTable.getCityColumn(), allPersonTable.getColumnSet().getColumn(1));
@@ -77,14 +89,40 @@ public class TableExtensionTest extends AbstractLocalExtensionTestCase {
     assertNotNull(extension);
     assertSame(extension.getStreetColumn(), allPersonTable.getColumnSet().getColumn(3));
 
-    OtherPersonTable otherPersonTable = new OtherPersonTable();
+    NameColumnExtension columnExtension = allPersonTable.getNameColumn().getExtension(NameColumnExtension.class);
+    assertNotNull(columnExtension);
+  }
+
+  protected void verifyExtendedOtherPersonTable(OtherPersonTable otherPersonTable) {
     assertEquals(4, otherPersonTable.getColumnCount());
     assertSame(otherPersonTable.getNameColumn(), otherPersonTable.getColumnSet().getColumn(0));
     assertSame(otherPersonTable.getAgeColumn(), otherPersonTable.getColumnSet().getColumn(1));
     assertSame(otherPersonTable.getPhoneNumberColumn(), otherPersonTable.getColumnSet().getColumn(2));
 
-    extension = otherPersonTable.getExtension(PersonTableExtension.class);
+    PersonTableExtension extension = otherPersonTable.getExtension(PersonTableExtension.class);
     assertNotNull(extension);
     assertSame(extension.getStreetColumn(), otherPersonTable.getColumnSet().getColumn(3));
+
+    NameColumnExtension columnExtension = otherPersonTable.getNameColumn().getExtension(NameColumnExtension.class);
+    assertNotNull(columnExtension);
+  }
+
+  @Test
+  public void testResetColumnConfigurationOnExtendedTable() {
+    BEANS.get(IExtensionRegistry.class).register(PersonTableExtension.class);
+
+    AllPersonTable allPersonTable = new AllPersonTable();
+    verifyExtendedAllPersonTable(allPersonTable);
+    NameColumn nameColumn = allPersonTable.getNameColumn();
+    allPersonTable.resetColumnConfiguration();
+    verifyExtendedAllPersonTable(allPersonTable);
+    assertNotSame(nameColumn, allPersonTable.getNameColumn());
+
+    OtherPersonTable otherPersonTable = new OtherPersonTable();
+    nameColumn = otherPersonTable.getNameColumn();
+    verifyExtendedOtherPersonTable(otherPersonTable);
+    otherPersonTable.resetColumnConfiguration();
+    verifyExtendedOtherPersonTable(otherPersonTable);
+    assertNotSame(nameColumn, allPersonTable.getNameColumn());
   }
 }

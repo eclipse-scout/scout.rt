@@ -20,6 +20,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.datefield.IDateField;
 import org.eclipse.scout.rt.platform.status.IMultiStatus;
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.platform.util.date.DateUtility;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonDate;
@@ -174,10 +175,17 @@ public class JsonDateField<T extends IDateField> extends JsonValueField<T> {
   }
 
   protected void handleUiTimestampChanged(JsonEvent event) {
-    Date date = new JsonDate(event.getData().optString(PROP_TIMESTAMP, null)).asJavaDate();
-    addPropertyEventFilterCondition(IValueField.PROP_VALUE, date);
+    Date uiValue = new JsonDate(event.getData().optString(PROP_TIMESTAMP, null)).asJavaDate();
+    addPropertyEventFilterCondition(IValueField.PROP_VALUE, uiValue);
     getModel().getUIFacade().removeParseErrorFromUI();
-    getModel().getUIFacade().setDateTimeFromUI(date);
+    getModel().getUIFacade().setDateTimeFromUI(uiValue);
+
+    // If the model value is changed during validation, it needs to be updated in the GUI again.
+    Date modelValue = getModel().getValue();
+    if (!DateUtility.equals(uiValue, modelValue)) {
+      addPropertyChangeEvent(PROP_TIMESTAMP, dateToJson((Date) modelValue));
+    }
+
   }
 
   protected void handleUiParsingError(JsonEvent event) {

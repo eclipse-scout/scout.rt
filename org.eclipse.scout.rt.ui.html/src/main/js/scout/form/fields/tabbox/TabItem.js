@@ -59,6 +59,9 @@ scout.TabItem.prototype.renderTab = function($parent) {
 };
 
 scout.TabItem.prototype._onTabMouseDown = function(event) {
+  if (event && event.originalEvent) {
+    event.originalEvent.scoutOriginalTargetWidget = this;
+  }
   if (this._preventTabActivation) {
     this._preventTabActivation = false;
     return;

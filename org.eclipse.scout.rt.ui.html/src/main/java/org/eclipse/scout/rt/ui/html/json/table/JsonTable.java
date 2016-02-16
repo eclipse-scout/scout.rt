@@ -514,7 +514,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   protected void handleUiRowClicked(JsonEvent event) {
     ITableRow tableRow = extractTableRow(event.getData());
     if (tableRow == null) {
-      LOG.warn("Requested table-row doesn't exist anymore -> skip rowClicked event");
+      LOG.info("Requested table-row doesn't exist anymore -> skip rowClicked event");
       return;
     }
     IColumn column = extractColumn(event.getData());
@@ -644,6 +644,10 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
 
   protected void handleUiColumnResized(JsonEvent event) {
     IColumn column = extractColumn(event.getData());
+    if (column == null) {
+      LOG.info("Requested column doesn't exist anymore -> skip columnResized event");
+      return;
+    }
     int width = event.getData().getInt("width");
 
     getModel().getUIFacade().setColumnWidthFromUI(column, width);
@@ -668,7 +672,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   protected void handleUiPrepareCellEdit(JsonEvent event) {
     ITableRow row = extractTableRow(event.getData());
     if (row == null) {
-      LOG.warn("Requested table-row doesn't exist anymore. Skip prepareCellEdit event");
+      LOG.info("Requested table-row doesn't exist anymore. Skip prepareCellEdit event");
       return;
     }
     IColumn column = extractColumn(event.getData());
@@ -898,7 +902,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     if (columnId == null) {
       return null;
     }
-    return getColumn(columnId);
+    return optColumn(columnId);
   }
 
   protected JSONArray columnIdsToJson(Collection<IColumn<?>> columns) {
@@ -907,6 +911,10 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
       jsonColumnIds.put(getColumnId(column));
     }
     return jsonColumnIds;
+  }
+
+  protected IColumn optColumn(String columnId) {
+    return m_columns.get(columnId);
   }
 
   protected IColumn getColumn(String columnId) {

@@ -155,7 +155,8 @@ public class JSONObject {
      */
     Object object = readFrom.nextValue();
     if (object instanceof JSONObject) {
-      this.nameValuePairs = ((JSONObject) object).nameValuePairs;
+      JSONObject jsonObject = (JSONObject) object;
+      this.nameValuePairs = jsonObject.nameValuePairs;
     }
     else {
       throw JSON.typeMismatch(object, "JSONObject");

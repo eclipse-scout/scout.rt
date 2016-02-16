@@ -18,11 +18,11 @@ scout.URL = function(url) {
   }
   var urlParts = /^([^?#]*)(?:\?([^#]*))?(?:#(.*))?$/.exec(url || '');
   // encoded
-  this._baseUrlRaw = urlParts[1];
-  this._queryPartRaw = urlParts[2];
-  this._hashPartRaw = urlParts[3];
+  this.baseUrlRaw = urlParts[1];
+  this.queryPartRaw = urlParts[2];
+  this.hashPartRaw = urlParts[3];
   // un-encoded (!)
-  this.parameterMap = scout.URL._parse(this._queryPartRaw);
+  this.parameterMap = scout.URL._parse(this.queryPartRaw);
 };
 
 scout.URL.prototype.getParameter = function(param) {
@@ -67,7 +67,7 @@ scout.URL.prototype.addParameter = function(param, value) {
 };
 
 scout.URL.prototype.toString = function() {
-  var result = this._baseUrlRaw;
+  var result = this.baseUrlRaw;
 
   if (Object.keys(this.parameterMap).length) {
     // Built a sorted string of all formatted parameterMap entries
@@ -86,8 +86,8 @@ scout.URL.prototype.toString = function() {
     result += '?' + reconstructedQueryPart;
   }
 
-  if (this._hashPartRaw) {
-    result += '#' + this._hashPartRaw;
+  if (this.hashPartRaw) {
+    result += '#' + this.hashPartRaw;
   }
 
   return result;

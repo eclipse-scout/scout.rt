@@ -23,9 +23,7 @@ import org.json.JSONObject;
  * The {@link JsonStartupRequest} contains all information used to create a new {@link IUiSession} and a new
  * {@link IClientSession}. The information sources are listed in the following table
  * <ul>
- * <li>tabId - calculated in scout.init() using the current timestamp</li>
- * <li>portletPartId - attribute 'data-partid' of scout html element</li>
- * <li>{@link JsonRequest#PROP_UI_SESSION_ID} - concatenation as 'portletPartId:tabId'</li>
+ * <li>{@link JsonStartupRequest#PROP_PART_ID} - portlet part ID (attribute 'data-partid' of scout html element)</li>
  * <li>{@link JsonStartupRequest#PROP_CLIENT_SESSION_ID} - first one defined: argument to scout.init(),
  * sessionStorage.getItem('scout:clientSessionId'), current timestamp</li>
  * <li>{@link JsonStartupRequest#PROP_USER_AGENT} - first one defined: argument to scout.init(), default
@@ -36,6 +34,7 @@ import org.json.JSONObject;
  */
 public class JsonStartupRequest extends JsonRequest {
 
+  public static final String PROP_PART_ID = "partId";
   public static final String PROP_CLIENT_SESSION_ID = "clientSessionId";
   public static final String PROP_USER_AGENT = "userAgent";
   public static final String PROP_SESSION_STARTUP_PARAMS = "sessionStartupParams";
@@ -45,6 +44,13 @@ public class JsonStartupRequest extends JsonRequest {
   public JsonStartupRequest(JsonRequest request) {
     super(request.getRequestObject());
     m_sessionStartupParams = parseSessionStartupParams(request.getRequestObject());
+  }
+
+  /**
+   * @return partId or <code>"0"</code> (mandatory attribute)
+   */
+  public String getPartId() {
+    return getRequestObject().optString(PROP_PART_ID, "0");
   }
 
   /**
@@ -68,7 +74,7 @@ public class JsonStartupRequest extends JsonRequest {
     return m_sessionStartupParams;
   }
 
-  private Map<String, String> parseSessionStartupParams(JSONObject object) {
+  protected Map<String, String> parseSessionStartupParams(JSONObject object) {
     JSONObject params = getRequestObject().optJSONObject(PROP_SESSION_STARTUP_PARAMS);
     if (params == null) {
       return Collections.emptyMap();

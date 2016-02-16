@@ -11,6 +11,8 @@
 package org.eclipse.scout.rt.client.extension.ui.basic.table.fixture;
 
 import org.eclipse.scout.rt.client.extension.ui.basic.table.AbstractTableExtension;
+import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.AbstractStringColumnExtension;
+import org.eclipse.scout.rt.client.extension.ui.basic.table.fixture.AbstractPersonTable.NameColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.rt.platform.Order;
 
@@ -26,5 +28,11 @@ public class PersonTableExtension extends AbstractTableExtension<AbstractPersonT
 
   @Order(100)
   public class StreetColumn extends AbstractStringColumn {
+  }
+
+  public class NameColumnExtension extends AbstractStringColumnExtension<NameColumn> {
+    public NameColumnExtension(NameColumn owner) {
+      super(owner);
+    }
   }
 }

@@ -28,34 +28,35 @@ import org.eclipse.scout.rt.platform.holders.BooleanHolder;
 import org.eclipse.scout.rt.platform.reflect.IPropertyObserver;
 import org.eclipse.scout.rt.platform.util.EventListenerList;
 
-public abstract class AbstractContextMenu extends AbstractMenu implements IContextMenu {
+public abstract class AbstractContextMenu<T extends IPropertyObserver> extends AbstractMenu implements IContextMenu {
 
   private final EventListenerList m_listeners = new EventListenerList();
-  private final IPropertyObserver m_owner;
   private final PropertyChangeListener m_menuVisibilityListener = new P_VisibilityOfMenuItemChangedListener();
 
-  public AbstractContextMenu(IPropertyObserver owner, List<? extends IMenu> initialChildList) {
-    this(owner, initialChildList, true);
+  public AbstractContextMenu(T container, List<? extends IMenu> initialChildList) {
+    this(container, initialChildList, true);
   }
 
-  public AbstractContextMenu(IPropertyObserver owner, List<? extends IMenu> initialChildList, boolean callInitializer) {
+  public AbstractContextMenu(T container, List<? extends IMenu> initialChildList, boolean callInitializer) {
     super(false);
-    m_owner = owner;
+    setContainerInternal(container);
     if (callInitializer) {
       callInitializer();
     }
     setChildActions(initialChildList);
   }
 
+  @SuppressWarnings("unchecked")
+  @Override
+  public T getContainer() {
+    return (T) super.getContainer();
+  }
+
   @Override
   protected void initConfig() {
     super.initConfig();
     calculateLocalVisibility();
-  }
-
-  @Override
-  public IPropertyObserver getOwner() {
-    return m_owner;
+    getContainer().addPropertyChangeListener(new P_OwnerPropertyListener());
   }
 
   @SuppressWarnings("unchecked")
@@ -136,7 +137,6 @@ public abstract class AbstractContextMenu extends AbstractMenu implements IConte
   }
 
   protected void calculateLocalVisibility() {
-
     final IActionFilter activeFilter = ActionUtility.createMenuFilterMenuTypes(getCurrentMenuTypes(), true);
     if (activeFilter != null) {
       final BooleanHolder visibleHolder = new BooleanHolder(false);
@@ -160,6 +160,9 @@ public abstract class AbstractContextMenu extends AbstractMenu implements IConte
     }
   }
 
+  protected void handleOwnerPropertyChanged(PropertyChangeEvent evt) {
+  }
+
   private class P_VisibilityOfMenuItemChangedListener implements PropertyChangeListener {
     @SuppressWarnings("unchecked")
     @Override
@@ -168,6 +171,13 @@ public abstract class AbstractContextMenu extends AbstractMenu implements IConte
         handleChildActionsChanged((List<IMenu>) evt.getOldValue(), (List<IMenu>) evt.getNewValue());
       }
       calculateLocalVisibility();
+    }
+  }
+
+  private class P_OwnerPropertyListener implements PropertyChangeListener {
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+      handleOwnerPropertyChanged(evt);
     }
   }
 

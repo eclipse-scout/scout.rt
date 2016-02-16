@@ -37,6 +37,7 @@ public class JsonResponse {
   public static final String PROP_SEQUENCE = "#";
   public static final String PROP_EVENTS = "events";
   public static final String PROP_ADAPTER_DATA = "adapterData";
+  public static final String PROP_STARTUP_DATA = "startupData";
   public static final String PROP_ERROR = "error";
   public static final String PROP_ERROR_CODE = "code";
   public static final String PROP_ERROR_MESSAGE = "message";
@@ -46,12 +47,13 @@ public class JsonResponse {
   private final List<JsonEvent> m_eventList;
   private final Map<String/*adapterId*/, JsonEvent> m_idToPropertyChangeEventMap; // helper map to ensure max. 1 event per adapter
   private final Set<IJsonAdapter<?>> m_bufferedEventsAdapters;
-  private boolean m_error;
-  private int m_errorCode;
-  private String m_errorMessage;
+  private volatile JSONObject m_startupData = null;
+  private volatile boolean m_error;
+  private volatile int m_errorCode;
+  private volatile String m_errorMessage;
 
-  private boolean m_toJsonInProgress;
-  private boolean m_processingBufferedEvents;
+  private volatile boolean m_toJsonInProgress;
+  private volatile boolean m_processingBufferedEvents;
 
   public JsonResponse() {
     this(null);
@@ -63,6 +65,10 @@ public class JsonResponse {
     m_eventList = new ArrayList<>();
     m_idToPropertyChangeEventMap = new HashMap<>();
     m_bufferedEventsAdapters = new LinkedHashSet<>(); // use ordered map to make fireProcessBufferedEvents() deterministic
+  }
+
+  public Long getSequenceNo() {
+    return m_sequenceNo;
   }
 
   /**
@@ -172,6 +178,22 @@ public class JsonResponse {
     }
   }
 
+  public void markAsStartupResponse() {
+    m_startupData = new JSONObject();
+  }
+
+  public boolean isMarkedAsStartupResponse() {
+    return m_startupData != null;
+  }
+
+  /**
+   * The (mutable) <code>startupData</code> object if the response is marked as "startup response", <code>null</code>
+   * otherwise.
+   */
+  public JSONObject getStartupData() {
+    return m_startupData;
+  }
+
   /**
    * Marks this JSON response as "error" (default is "success").
    *
@@ -190,10 +212,6 @@ public class JsonResponse {
 
   public boolean isMarkedAsError() {
     return m_error;
-  }
-
-  public Long getSequenceNo() {
-    return m_sequenceNo;
   }
 
   // FIXME cgu: potential threading issue: toJson is called by servlet thread. Property-Change-Events may alter the eventList from client job thread
@@ -253,6 +271,7 @@ public class JsonResponse {
       }
 
       json.put(PROP_SEQUENCE, m_sequenceNo);
+      json.put(PROP_STARTUP_DATA, m_startupData);
       json.put(PROP_EVENTS, (eventArray.length() == 0 ? null : eventArray));
       json.put(PROP_ADAPTER_DATA, (adapterData.length() == 0 ? null : adapterData));
       if (m_error) {
@@ -351,12 +370,16 @@ public class JsonResponse {
     return CollectionUtility.arrayList(m_eventList);
   }
 
+  protected List<JsonEvent> eventList() {
+    return m_eventList;
+  }
+
   protected Map<String, IJsonAdapter<?>> adapterMap() {
     return m_adapterMap;
   }
 
-  protected List<JsonEvent> eventList() {
-    return m_eventList;
+  protected JSONObject startupData() {
+    return m_startupData;
   }
 
   protected boolean error() {
@@ -372,7 +395,7 @@ public class JsonResponse {
   }
 
   public boolean isEmpty() {
-    return m_adapterMap.isEmpty() && m_eventList.isEmpty() && m_bufferedEventsAdapters.isEmpty();
+    return m_adapterMap.isEmpty() && m_eventList.isEmpty() && m_bufferedEventsAdapters.isEmpty() && m_startupData == null;
   }
 
   @Override
@@ -382,6 +405,9 @@ public class JsonResponse {
     sb.append(", adapters: ").append(m_adapterMap.size());
     sb.append(", events: ").append(m_eventList.size());
     sb.append(", buffered events adapters: ").append(m_bufferedEventsAdapters.size());
+    if (m_startupData != null) {
+      sb.append(", MARKED AS STARTUP RESPONSE");
+    }
     if (m_error) {
       sb.append(", MARKED AS ERROR ").append(m_errorCode).append(": ").append(m_errorMessage);
     }

@@ -296,7 +296,7 @@ scout.Desktop.prototype._renderTaskBar = function($parent) {
     this._$taskBarLogo.dblclick(function(event) {
       if (event.altKey && event.ctrlKey) {
         $(event.target).css('background', 'none');
-        $(event.target).css('font-size','9px');
+        $(event.target).css('font-size', '9px');
         $(event.target).text('make software not war');
       }
     });
@@ -450,6 +450,9 @@ scout.Desktop.prototype._detachOutlineContent = function() {
 scout.Desktop.prototype.setOutlineContent = function(content, bringToFront) {
   bringToFront = scout.nvl(bringToFront, true);
   if (this._outlineContent && this._outlineContent !== content) {
+    if (this._outlineContent instanceof scout.Table) {
+      this._outlineContent.storeScrollPosition();
+    }
     this._outlineContent.remove();
     this._outlineContent = null;
   }
@@ -476,6 +479,9 @@ scout.Desktop.prototype.setOutlineContent = function(content, bringToFront) {
 
     content.htmlComp.validateLayout();
     content.htmlComp.validateRoot = true;
+    if (this._outlineContent instanceof scout.Table) {
+      this._outlineContent.restoreScrollPosition();
+    }
   } else if (!content.attached) {
     content.attach();
   }

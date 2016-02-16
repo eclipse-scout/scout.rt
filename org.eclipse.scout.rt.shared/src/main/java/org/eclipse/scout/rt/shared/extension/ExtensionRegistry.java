@@ -29,6 +29,7 @@ import org.eclipse.scout.rt.platform.IOrdered;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.classid.ClassIdentifier;
 import org.eclipse.scout.rt.platform.extension.Extends;
+import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.CompareUtility;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
@@ -712,6 +713,41 @@ public class ExtensionRegistry implements IInternalExtensionRegistry {
     scopeStack.popScope();
     if (scopeStack.isEmpty()) {
       m_scopeStack.remove();
+    }
+  }
+
+  @Override
+  public ExtensionContext backupExtensionContext() {
+    final ScopeStack scopeStack = Assertions.assertNotNull(m_scopeStack.get());
+    final ExtensionStack extensionStack = Assertions.assertNotNull(m_extensionStack.get());
+    return new ExtensionContext(scopeStack, extensionStack);
+  }
+
+  @Override
+  public void runInContext(ExtensionContext ctx, Runnable runnable) {
+    Assertions.assertNotNull(ctx, "Extension context must not be null");
+    Assertions.assertNotNull(runnable, "Runnable must not be null");
+    // backup current extension context
+    final ScopeStack scopeStack = m_scopeStack.get();
+    final ExtensionStack extensionStack = m_extensionStack.get();
+    try {
+      m_scopeStack.set(ctx.getScopeStack());
+      m_extensionStack.set(ctx.getExtensionStack());
+      runnable.run();
+    }
+    finally {
+      // restore extension context
+      restoreStack(m_scopeStack, scopeStack);
+      restoreStack(m_extensionStack, extensionStack);
+    }
+  }
+
+  private <STACK> void restoreStack(ThreadLocal<STACK> threadLocal, STACK value) {
+    if (value == null) {
+      threadLocal.remove();
+    }
+    else {
+      threadLocal.set(value);
     }
   }
 }

@@ -34,6 +34,7 @@ import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.eclipse.scout.rt.ui.html.UiSession;
+import org.eclipse.scout.rt.ui.html.UiSessionTestUtility;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonAdapterRegistryTest;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
@@ -69,7 +70,7 @@ public class JsonDesktopTest {
   }
 
   private JsonDesktop<IDesktop> createJsonDesktop(IDesktop desktop) {
-    return m_uiSession.newJsonAdapter(desktop, null);
+    return UiSessionTestUtility.newJsonAdapter(m_uiSession, desktop, null);
   }
 
   @Test

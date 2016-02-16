@@ -68,18 +68,25 @@ scout.ColumnUserFilter.prototype.calculate = function() {
     this.xAxis.reorder();
   }
 
-  var text, displayKey, cubeValue;
+  var text, displayKey, cubeValue, iconId;
   this.availableValues = [];
   this.xAxis.forEach(function(key) {
     displayKey = key;
     text = this.xAxis.format(key);
+    iconId = null;
     if (this._useTextInsteadOfNormValue(key)) {
       displayKey = text;
+    }
+    if (key !== null && this.xAxis.textIsIcon) {
+      // Only display icon if textIsIcon (still display empty text if key is null)
+      iconId = text;
+      text = null;
     }
     cubeValue = cube.getValue([key]);
     this.availableValues.push({
       key: displayKey,
       text: text,
+      iconId: iconId,
       count: cubeValue ? cubeValue[0] : 0
     });
   }, this);
@@ -206,4 +213,10 @@ scout.ColumnUserFilter.prototype.filterFieldsTitle = function() {
 
 scout.ColumnUserFilter.prototype.createComparator = function() {
   return scout.comparators.NUMERIC;
+};
+
+scout.ColumnUserFilter.prototype.debounceTextModified = function(){
+  $.debounce(function() {
+    this.acceptInput(true);
+  }.bind(this));
 };

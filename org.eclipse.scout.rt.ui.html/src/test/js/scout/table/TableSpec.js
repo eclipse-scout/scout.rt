@@ -2578,7 +2578,6 @@ describe("Table", function() {
 
       beforeEach(function() {
         model = helper.createModelFixture(3, 2);
-        table = helper.createTable(model);
         column0 = model.columns[0];
         column1 = model.columns[1];
         column2 = model.columns[2];
@@ -2593,6 +2592,7 @@ describe("Table", function() {
       }
 
       it("updates the text and sorting state of model columns", function() {
+        table = helper.createTable(model);
         var text0 = table.columns[0].text;
 
         column1 = helper.createModelColumn('newText1');
@@ -2617,7 +2617,43 @@ describe("Table", function() {
         expect(table.columns[2].sortActive).toBe(column2.sortActive);
       });
 
+      it("updates sort indices of the sort columns if a sort column got removed", function() {
+        model.columns[1].id = model.columns[1].id;
+        model.columns[1].sortActive = true;
+        model.columns[1].sortAscending = true;
+        model.columns[1].sortIndex = 1;
+        model.columns[2].id = model.columns[2].id;
+        model.columns[2].sortActive = true;
+        model.columns[2].sortAscending = true;
+        model.columns[2].sortIndex = 0;
+
+        table = helper.createTable(model);
+
+        expect(table.columns[1].sortActive).toBe(true);
+        expect(table.columns[1].sortAscending).toBe(true);
+        expect(table.columns[1].sortIndex).toBe(1);
+        expect(table.columns[2].sortActive).toBe(true);
+        expect(table.columns[2].sortAscending).toBe(true);
+        expect(table.columns[2].sortIndex).toBe(0);
+
+        var message = {
+          events: [createColumnHeadersUpdatedEvent(model, [{
+            id: model.columns[2].id,
+            sortActive: false
+          }])]
+        };
+        session._processSuccessResponse(message);
+
+        expect(table.columns[1].sortAscending).toBe(true);
+        expect(table.columns[1].sortActive).toBe(true);
+        expect(table.columns[1].sortIndex).toBe(0);
+        expect(table.columns[2].sortAscending).toBe(true);
+        expect(table.columns[2].sortActive).toBe(false);
+        expect(table.columns[2].sortIndex).toBe(-1);
+      });
+
       it("updates the text and sorting state of html table header nodes", function() {
+        table = helper.createTable(model);
         table.render(session.$entryPoint);
 
         var $colHeaders = table.header.findHeaderItems();
@@ -2646,6 +2682,7 @@ describe("Table", function() {
       });
 
       it("updates the custom css class of table header nodes", function() {
+        table = helper.createTable(model);
         table.render(session.$entryPoint);
 
         var $colHeaders = table.header.findHeaderItems();

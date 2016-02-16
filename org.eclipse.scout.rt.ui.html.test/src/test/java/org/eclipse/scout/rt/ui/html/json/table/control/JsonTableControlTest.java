@@ -19,6 +19,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.controls.ITableControl;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
+import org.eclipse.scout.rt.ui.html.UiSessionTestUtility;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.fixtures.UiSessionMock;
@@ -52,7 +53,7 @@ public class JsonTableControlTest {
     control.setTable(new Table());
     control.setForm(form);
     control.decorateForm();
-    JsonTableControl<ITableControl> jsonControl = m_uiSession.newJsonAdapter(control, null);
+    JsonTableControl<ITableControl> jsonControl = UiSessionTestUtility.newJsonAdapter(m_uiSession, control, null);
     assertNull(jsonControl.getAdapter(form));
 
     control.setSelected(true);
@@ -70,7 +71,7 @@ public class JsonTableControlTest {
     control.setTable(new Table());
     control.setForm(form);
     control.decorateForm();
-    JsonTableControl<ITableControl> jsonControl = m_uiSession.newJsonAdapter(control, null);
+    JsonTableControl<ITableControl> jsonControl = UiSessionTestUtility.newJsonAdapter(m_uiSession, control, null);
 
     assertNull(jsonControl.getAdapter(form));
 
@@ -105,7 +106,7 @@ public class JsonTableControlTest {
     control.setTable(new Table());
     control.setForm(form);
     control.decorateForm();
-    JsonTableControl<ITableControl> jsonControl = m_uiSession.newJsonAdapter(control, null);
+    JsonTableControl<ITableControl> jsonControl = UiSessionTestUtility.newJsonAdapter(m_uiSession, control, null);
     assertNull(jsonControl.getAdapter(form));
 
     FormWithOneField anotherForm = new FormWithOneField();
@@ -135,7 +136,7 @@ public class JsonTableControlTest {
     control.setForm(form);
     control.decorateForm();
     control.setSelected(true);
-    JsonTableControl<ITableControl> jsonControl = m_uiSession.newJsonAdapter(control, null);
+    JsonTableControl<ITableControl> jsonControl = UiSessionTestUtility.newJsonAdapter(m_uiSession, control, null);
 
     IJsonAdapter<?> formAdapter = jsonControl.getAdapter(form);
     assertNotNull(formAdapter);

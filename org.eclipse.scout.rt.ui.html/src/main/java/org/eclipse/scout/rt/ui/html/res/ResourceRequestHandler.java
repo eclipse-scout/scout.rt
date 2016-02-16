@@ -77,8 +77,8 @@ public class ResourceRequestHandler extends AbstractUiServletRequestHandler {
       }
     }
 
-    // check resource existence
-    if (resource == null) {
+    // check resource existence (also ignore resources without content, to prevent invalid "content-length" header and NPE in write() method)
+    if (resource == null || resource.getResource() == null || resource.getResource().getContent() == null) {
       return false;
     }
 

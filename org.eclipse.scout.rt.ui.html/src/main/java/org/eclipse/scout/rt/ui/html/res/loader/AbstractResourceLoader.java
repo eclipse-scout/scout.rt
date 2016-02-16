@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.ui.html.res.loader;
 import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.FileUtility;
@@ -58,12 +57,7 @@ public abstract class AbstractResourceLoader implements IResourceLoader {
     return UiHints.isCacheHint(m_req);
   }
 
-  protected HttpSession getSession() {
-    return m_req.getSession();
-  }
-
   protected HttpServletRequest getRequest() {
     return m_req;
   }
-
 }

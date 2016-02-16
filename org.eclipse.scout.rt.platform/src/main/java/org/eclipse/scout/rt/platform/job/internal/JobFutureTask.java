@@ -325,7 +325,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
     try {
       m_completionPromise.awaitDoneAndGet();
     }
-    catch (final ExecutionException | CancellationException e) {
+    catch (final ExecutionException | CancellationException e) { // NOSONAR
       // NOOP: Do not propagate ExecutionException and CancellationException (see JavaDoc contract)
     }
     catch (final java.lang.InterruptedException e) {
@@ -341,7 +341,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
     try {
       m_completionPromise.awaitDoneAndGet(timeout, unit);
     }
-    catch (final ExecutionException | CancellationException e) {
+    catch (final ExecutionException | CancellationException e) { // NOSONAR
       // NOOP: Do not propagate ExecutionException and CancellationException (see JavaDoc contract)
     }
     catch (final java.lang.InterruptedException e) {

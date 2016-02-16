@@ -207,13 +207,13 @@ public interface IAction extends IPropertyObserver, ITypeWithClassId, IOrdered {
   /**
    * The container of the action, e.g. {@link org.eclipse.scout.rt.client.ui.basic.table.ITable ITable}
    **/
-  ITypeWithClassId getContainer();
+  IPropertyObserver getContainer();
 
   /**
    * The container of the action node, e.g. a {@link org.eclipse.scout.rt.client.ui.basic.table.ITable ITable} or
    * {@link org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField ISmartField}
    **/
-  void setContainerInternal(ITypeWithClassId container);
+  void setContainerInternal(IPropertyObserver container);
 
   /**
    * @param horizontalAlignment

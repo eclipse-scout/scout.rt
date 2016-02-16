@@ -61,11 +61,6 @@
     color: @text-color;
   }
 
-  &.empty {
-    /* explicitly disable ellipsis, because IE would display it for very narrow columns even if content is '&nbsp;' */
-    text-overflow: clip;
-  }
-
   /* see also: .table-cell.last (Table.css) */
   &.last.halign-left,
   &.last.halign-center,
@@ -107,12 +102,12 @@
     }
   }
 
-  &.not(.disabled):hover,
-  &.header-move {
+  &:not(.disabled):hover,
+  &.moving {
     color: @hover-color;
   }
 
-  &.header-move > .table-header-item-state {
+  &.moving > .table-header-item-state {
     display: none;
   }
 
@@ -128,6 +123,17 @@
     padding: 0;
     margin: 0;
     border: 0;
+  }
+
+  & > .icon.with-text {
+    margin-right: 8px;
+  }
+}
+
+.table-header-item-text {
+  &.empty {
+    /* explicitly disable ellipsis, because IE would display it for very narrow columns even if content is '&nbsp;' */
+    text-overflow: clip;
   }
 }
 
@@ -185,7 +191,7 @@
     cursor: col-resize;
   }
 
-  .header-move & {
+  .table-header.moving > & {
     /* Hide separators while moving, because their position will not be updated until the move-end event */
     visibility: hidden;
   }

@@ -12,8 +12,6 @@ package org.eclipse.scout.rt.shared.services.common.code;
 
 import java.util.List;
 
-import org.eclipse.scout.rt.platform.Bean;
-import org.eclipse.scout.rt.platform.BeanProducer;
 import org.eclipse.scout.rt.platform.classid.ITypeWithClassId;
 import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
 
@@ -26,8 +24,6 @@ import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
  * @param CODE_ID
  *          type of the code: see {@link #getCode(Object)}
  */
-@Bean
-@BeanProducer(CodeTypeProducer.class)
 public interface ICodeType<CODE_TYPE_ID, CODE_ID> extends IExtensibleObject, ITypeWithClassId {
 
   CODE_TYPE_ID getId();

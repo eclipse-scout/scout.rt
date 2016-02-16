@@ -15,6 +15,8 @@ import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 /**
  * All possible menus types of a tree menu. This menu types are used of {@link AbstractMenu#getConfiguredMenuTypes()}
  * method on any {@link ITree}.
+ * <p>
+ * Specificity: {@link #Header}, {@link #EmptySpace}, {@link #SingleSelection}, {@link #MultiSelection}
  */
 public enum TreeMenuType implements IMenuType {
   EmptySpace,

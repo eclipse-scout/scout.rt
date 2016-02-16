@@ -14,24 +14,12 @@ import java.util.Date;
 
 import org.eclipse.scout.rt.client.extension.ui.form.fields.AbstractValueFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.ValueFieldChains.ValueFieldParseValueChain;
-import org.eclipse.scout.rt.client.extension.ui.form.fields.datefield.DateFieldChains.DateFieldShiftDateChain;
-import org.eclipse.scout.rt.client.extension.ui.form.fields.datefield.DateFieldChains.DateFieldShiftTimeChain;
 import org.eclipse.scout.rt.client.ui.form.fields.datefield.AbstractDateField;
 
 public abstract class AbstractDateFieldExtension<OWNER extends AbstractDateField> extends AbstractValueFieldExtension<Date, OWNER> implements IDateFieldExtension<OWNER> {
 
   public AbstractDateFieldExtension(OWNER owner) {
     super(owner);
-  }
-
-  @Override
-  public void execShiftTime(DateFieldShiftTimeChain chain, int level, int value) {
-    chain.execShiftTime(level, value);
-  }
-
-  @Override
-  public void execShiftDate(DateFieldShiftDateChain chain, int level, int value) {
-    chain.execShiftDate(level, value);
   }
 
   /**

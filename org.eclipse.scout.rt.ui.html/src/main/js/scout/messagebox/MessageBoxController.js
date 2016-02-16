@@ -23,7 +23,7 @@ scout.MessageBoxController = function(displayParent, session) {
  */
 scout.MessageBoxController.prototype.registerAndRender = function(messageBoxAdapterId) {
   var messageBox = this.session.getOrCreateModelAdapter(messageBoxAdapterId, this.displayParent);
-
+  messageBox._setProperty('displayParent', this.displayParent);
   this.displayParent.messageBoxes.push(messageBox);
   this._render(messageBox);
 };

@@ -142,7 +142,7 @@ scout.Popup.prototype._remove = function() {
 scout.Popup.prototype.close = function(event) {
   if ((event && this.openEvent && event.originalEvent !== this.openEvent.originalEvent) || !event || !this.openEvent) {
     if (event && event.originalEvent) { //only add removed widget when event has a originalEvent-> mouse or key events. no custom events.
-      event.originalEvent.removedWidget = this;
+      event.originalEvent.scoutOriginalTargetWidget = this;
     }
     this._trigger('close', event);
     this.remove();
@@ -206,8 +206,10 @@ scout.Popup.prototype._onMouseDown = function(event) {
 scout.Popup.prototype._isMouseDownOutside = function(event) {
   var $target = $(event.target),
     targetWidget;
-  if (event.originalEvent && event.originalEvent.removedWidget) {
-    targetWidget = event.originalEvent.removedWidget;
+  //sometimes the Jquery object is removed due to layouting or similar operations in this cases the widget should be set in scoutOriginalTargetWidget to the
+  // original event to resolve hierarchy inside the popup.
+  if (event.originalEvent && event.originalEvent.scoutOriginalTargetWidget) {
+    targetWidget = event.originalEvent.scoutOriginalTargetWidget;
   } else {
     targetWidget = scout.Widget.getWidgetFor($target);
   }

@@ -38,9 +38,10 @@ scout.NumberColumn.prototype._initCell = function(cell) {
 };
 
 scout.NumberColumn.prototype.createAggrValueCell = function(value) {
+  var formattedValue = this.decimalFormat.format(value);
   return {
-    text: this.decimalFormat.format(value),
-    iconId: this.aggrSymbol,
+    text: formattedValue,
+    iconId: (formattedValue ? this.aggrSymbol : null),
     horizontalAlignment: this.horizontalAlignment,
     cssClass: 'table-aggregate-cell'
   };

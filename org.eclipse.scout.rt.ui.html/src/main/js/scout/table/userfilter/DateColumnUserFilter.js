@@ -61,7 +61,7 @@ scout.DateColumnUserFilter.prototype.acceptByFields = function(key, normKey, row
   var
     keyValue = key.valueOf(),
     fromValue = this.dateFrom ? this.dateFrom.valueOf() : null,
-    toValue  = this.dateTo ? this.dateTo.valueOf() : null;
+    toValue = this.dateTo ? this.dateTo.valueOf() : null;
   if (fromValue && toValue) {
     return keyValue >= fromValue && keyValue <= toValue;
   } else if (fromValue) {
@@ -85,7 +85,7 @@ scout.DateColumnUserFilter.prototype.filterFieldsTitle = function() {
  * FIXME AWE: (filter) refactor DateField.js -
  * rename timestampAsDate to value (also on JsonDateField)
  * use Date object everywhere and todays 'timestamp' date-string
- * only when we communicate with the UI server. Then remove the _toJsonDate
+ * only when we communicate with the UI server. Then remove the toJsonDate
  * function used here and work with the Date object. Implement a _syncValue
  * method to convert the date-string into a Date object in DateField.js
  *
@@ -93,21 +93,42 @@ scout.DateColumnUserFilter.prototype.filterFieldsTitle = function() {
  */
 scout.DateColumnUserFilter.prototype.addFilterFields = function(groupBox) {
   this.dateFromField = groupBox.addFilterField('DateField', 'ui.from', 0);
-  this.dateFromField.timestamp = _toJsonDate(this.dateFrom);
+  this.dateFromField.timestamp = toJsonDate(this.dateFrom);
   this.dateFromField.on('timestampChanged', this._onDisplayTextChanged.bind(this));
 
   this.dateToField = groupBox.addFilterField('DateField', 'ui.to', 1);
-  this.dateToField.timestamp = _toJsonDate(this.dateTo);
+  this.dateToField.timestamp = toJsonDate(this.dateTo);
   this.dateToField.on('timestampChanged', this._onDisplayTextChanged.bind(this));
 
-  function _toJsonDate(date) {
+  function toJsonDate(date) {
     return date ? scout.dates.toJsonDate(date) : null;
   }
 };
 
 scout.DateColumnUserFilter.prototype._onDisplayTextChanged = function(event) {
-  this.dateFrom = this.dateFromField.timestampAsDate,
+  this.dateFrom = this.dateFromField.timestampAsDate;
   this.dateTo = this.dateToField.timestampAsDate;
   $.log.debug('(DateColumnUserFilter#_onDisplayTextChanged) dateFrom=' + this.dateFrom + ' dateTo=' + this.dateTo);
+  this.triggerFilterFieldsChanged(event);
+};
+
+scout.DateColumnUserFilter.prototype.modifyFilterFields = function() {
+  this.dateFromField.$field.on('input', '', $.debounce(this._onInput.bind(this)));
+  this.dateToField.$field.on('input', '', $.debounce(this._onInput.bind(this)));
+};
+
+scout.DateColumnUserFilter.prototype._onInput = function(event) {
+  var datePrediction = this.dateFromField._predictDate(this.dateFromField.$dateField.val()); // this also updates the errorStatus
+  if (datePrediction) {
+    if (datePrediction.date) {
+      this.dateFrom = this.dateFromField._newTimestampAsDate(datePrediction.date, this.dateFromField.timestampAsDate);
+    }
+  }
+  var datePredictionTo = this.dateToField._predictDate(this.dateToField.$dateField.val()); // this also updates the errorStatus
+  if (datePredictionTo) {
+    if (datePredictionTo.date) {
+      this.dateTo = this.dateToField._newTimestampAsDate(datePredictionTo.date, this.dateToField.timestampAsDate);
+    }
+  }
   this.triggerFilterFieldsChanged(event);
 };

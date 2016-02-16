@@ -28,7 +28,6 @@ import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IBeanInstanceProducer;
 import org.eclipse.scout.rt.testing.platform.runner.JUnitExceptionHandler;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
-import org.eclipse.scout.rt.ui.html.json.JsonAdapterRegistry;
 import org.eclipse.scout.rt.ui.html.json.testing.JsonTestUtility;
 import org.junit.After;
 import org.junit.Before;
@@ -82,8 +81,8 @@ public class UiSessionTest {
 
   @Test
   public void testLogout() throws Exception {
-    IUiSession uiSession = JsonTestUtility.createAndInitializeUiSession();
-    HttpSession httpSession = uiSession.currentHttpSession();
+    UiSession uiSession = (UiSession) JsonTestUtility.createAndInitializeUiSession();
+    HttpSession httpSession = UiSessionTestUtility.getHttpSession(uiSession);
 
     uiSession.getClientSession().stop();
 
@@ -97,28 +96,22 @@ public class UiSessionTest {
   @Test
   public void testSessionInvalidation() throws Exception {
     UiSession uiSession = (UiSession) JsonTestUtility.createAndInitializeUiSession();
+    HttpSession httpSession = UiSessionTestUtility.getHttpSession(uiSession);
     IClientSession clientSession = uiSession.getClientSession();
     assertFalse(uiSession.isDisposed());
 
     // Don't waste time waiting for client jobs to finish. Test job itself runs inside a client job so we always have to wait until max time
     WeakReference<IUiSession> ref = new WeakReference<IUiSession>(uiSession);
-    ISessionStore sessionStore = BEANS.get(HttpSessionHelper.class).getSessionStore(uiSession.currentHttpSession());
+    ISessionStore sessionStore = BEANS.get(HttpSessionHelper.class).getSessionStore(httpSession);
     sessionStore.registerUiSession(uiSession);
 
     JsonTestUtility.endRequest(uiSession);
-    uiSession.currentHttpSession().invalidate();
+    httpSession.invalidate();
     BEANS.get(UiJobs.class).awaitModelJobs(clientSession, JUnitExceptionHandler.class);
     assertFalse(clientSession.isActive());
     assertTrue(uiSession.isDisposed());
 
     uiSession = null;
     TestingUtility.assertGC(ref);
-  }
-
-  /**
-   * helper method for unit tests to access protected method "getJsonAdapterRegistry"
-   */
-  public static JsonAdapterRegistry getJsonAdapterRegistry(UiSession session) {
-    return session.getJsonAdapterRegistry();
   }
 }

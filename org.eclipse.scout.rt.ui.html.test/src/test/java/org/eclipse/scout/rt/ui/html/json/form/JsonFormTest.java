@@ -23,6 +23,7 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
+import org.eclipse.scout.rt.ui.html.UiSessionTestUtility;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonResponseTest;
 import org.eclipse.scout.rt.ui.html.json.fixtures.UiSessionMock;
@@ -50,7 +51,7 @@ public class JsonFormTest {
   @Test
   public void testFormDisposalOnClose() {
     FormWithOneField form = new FormWithOneField();
-    m_uiSession.newJsonAdapter(form, m_uiSession.getRootJsonAdapter());
+    UiSessionTestUtility.newJsonAdapter(m_uiSession, form, m_uiSession.getRootJsonAdapter());
 
     form.start();
     assertNotNull(m_uiSession.getJsonAdapter(form, m_uiSession.getRootJsonAdapter()));
@@ -66,7 +67,7 @@ public class JsonFormTest {
   @Test
   public void testRequestFocusInPostLoad() {
     FormWithOneField form = new FormWithOneField();
-    IJsonAdapter<?> adapter = m_uiSession.newJsonAdapter(form, m_uiSession.getRootJsonAdapter());
+    IJsonAdapter<?> adapter = UiSessionTestUtility.newJsonAdapter(m_uiSession, form, m_uiSession.getRootJsonAdapter());
     form.start();
     assertNotNull(adapter.toJson().get(JsonForm.PROP_INITIAL_FOCUS));
     form.doClose();
@@ -75,7 +76,7 @@ public class JsonFormTest {
   @Test
   public void testFormOpenCloseInTwoRequests() throws Exception {
     // Create adapter for client session and desktop
-    m_uiSession.newJsonAdapter(IClientSession.CURRENT.get(), null);
+    UiSessionTestUtility.newJsonAdapter(m_uiSession, IClientSession.CURRENT.get(), null);
     JsonTestUtility.processBufferedEvents(m_uiSession);
     JsonTestUtility.endRequest(m_uiSession);
 
@@ -108,7 +109,7 @@ public class JsonFormTest {
   @Test
   public void testFormOpenCloseInSameRequest() throws Exception {
     // Create adapter for client session and desktop
-    m_uiSession.newJsonAdapter(IClientSession.CURRENT.get(), null);
+    UiSessionTestUtility.newJsonAdapter(m_uiSession, IClientSession.CURRENT.get(), null);
     JsonTestUtility.processBufferedEvents(m_uiSession);
     JsonTestUtility.endRequest(m_uiSession);
 
@@ -127,7 +128,7 @@ public class JsonFormTest {
   @Test
   public void testFormOpenCloseInWrappedFormField() throws Exception {
     // Create adapter for client session and desktop
-    m_uiSession.newJsonAdapter(IClientSession.CURRENT.get(), null);
+    UiSessionTestUtility.newJsonAdapter(m_uiSession, IClientSession.CURRENT.get(), null);
     JsonTestUtility.processBufferedEvents(m_uiSession);
     JsonTestUtility.endRequest(m_uiSession);
 

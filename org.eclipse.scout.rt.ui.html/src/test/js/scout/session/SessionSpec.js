@@ -22,7 +22,10 @@ describe('Session', function() {
 
   function createSession(userAgent) {
     setFixtures(sandbox());
-    return sandboxSession({'userAgent':userAgent});
+    var session = sandboxSession({'userAgent':userAgent});
+    // test request only, don't test response (would require valid session, desktop etc.)
+    session._processStartupResponse = function(){};
+    return session;
   }
 
   function send(session, target, type, data, delay) {

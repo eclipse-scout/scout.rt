@@ -953,12 +953,13 @@ public class ColumnSet {
     //
     try {
       m_table.setTableChanging(true);
-      if (col.isGroupingActive()) {
-        updateGroupingColumn(col, ascending);
-        return;
-      }
       if (multiGroup) {
-        addGroupingColumn(col, ascending);
+        if (col.isGroupingActive()) {
+          updateGroupingColumn(col, ascending);
+        }
+        else {
+          addGroupingColumn(col, ascending);
+        }
       }
       else {
         setGroupingColumn(col, ascending);

@@ -15,7 +15,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 public interface IValueFieldContextMenu extends IFormFieldContextMenu {
 
   @Override
-  IValueField<?> getOwner();
+  IValueField<?> getContainer();
 
   void callOwnerValueChanged();
 }

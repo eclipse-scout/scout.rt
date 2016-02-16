@@ -506,11 +506,6 @@ public interface IFormField extends IPropertyObserver, ITypeWithClassId, IOrdere
   void updateKeyStrokes();
 
   /**
-   * @return only local key strokes
-   */
-  List<IKeyStroke> getLocalKeyStrokes();
-
-  /**
    * @return local and contributed key strokes
    */
   List<IKeyStroke> getKeyStrokes();

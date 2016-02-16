@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.ui.html.json.table;
 
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
-import org.eclipse.scout.rt.client.ui.basic.table.customizer.ICustomColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.userfilter.ColumnUserFilterState;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.ui.html.IUiSession;
@@ -30,11 +29,11 @@ public class JsonColumn<T extends IColumn<?>> implements IJsonObject {
   private T m_column;
   private int m_indexOffset;
 
-  private final String PROP_INITIAL_ALWAYS_INCLUDE_SORT_AT_BEGIN = "initialAlwaysIncludeSortAtBegin";
-  private final String PROP_INITIAL_ALWAYS_INCLUDE_SORT_AT_END = "initialAlwaysIncludeSortAtEnd";
+  private final static String PROP_INITIAL_ALWAYS_INCLUDE_SORT_AT_BEGIN = "initialAlwaysIncludeSortAtBegin";
+  private final static String PROP_INITIAL_ALWAYS_INCLUDE_SORT_AT_END = "initialAlwaysIncludeSortAtEnd";
 
-  private final String PROP_REMOVABLE = "removable";
-  private final String PROP_MODIFIABLE = "modifiable";
+  private final static String PROP_REMOVABLE = "removable";
+  private final static String PROP_MODIFIABLE = "modifiable";
 
   public JsonColumn(T model) {
     m_column = model;
@@ -71,9 +70,6 @@ public class JsonColumn<T extends IColumn<?>> implements IJsonObject {
       json.put("sortIndex", getColumn().getSortIndex());
       json.put("grouped", getColumn().isGroupingActive());
     }
-    if (getColumn() instanceof ICustomColumn) {
-      json.put("custom", true);
-    }
     if (getColumn().getTable().isCheckable() && getColumn().getTable().getCheckableColumn() == getColumn()) {
       json.put("checkable", true);
     }
@@ -84,7 +80,11 @@ public class JsonColumn<T extends IColumn<?>> implements IJsonObject {
     json.put(IColumn.PROP_HTML_ENABLED, getColumn().isHtmlEnabled());
     json.put(IColumn.PROP_CSS_CLASS, getColumn().getCssClass());
     json.put("headerCssClass", getColumn().getHeaderCell().getCssClass());
+    json.put("headerBackgroundColor", getColumn().getHeaderCell().getBackgroundColor());
+    json.put("headerForegroundColor", getColumn().getHeaderCell().getForegroundColor());
+    json.put("headerFont", getColumn().getHeaderCell().getFont() != null ? getColumn().getHeaderCell().getFont().toPattern() : null);
     json.put("headerTooltip", getColumn().getHeaderCell().getTooltipText());
+    json.put("headerIconId", getColumn().getHeaderCell().getIconId());
     BEANS.get(InspectorInfo.class).put(getUiSession(), json, getColumn());
     json.put(IColumn.PROP_UI_SORT_POSSIBLE, getColumn().isUiSortPossible());
     json.put(PROP_INITIAL_ALWAYS_INCLUDE_SORT_AT_BEGIN, getColumn().isInitialAlwaysIncludeSortAtBegin());

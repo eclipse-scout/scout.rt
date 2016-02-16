@@ -14,8 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.dto.ColumnData;
-import org.eclipse.scout.rt.client.dto.FormData;
 import org.eclipse.scout.rt.client.dto.ColumnData.SdkColumnCommand;
+import org.eclipse.scout.rt.client.dto.FormData;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
@@ -89,7 +89,8 @@ public class ContentAssistFieldTable<LOOKUP_KEY> extends AbstractTable implement
     List<ITableRow> rows = new ArrayList<ITableRow>();
     for (ILookupRow<LOOKUP_KEY> lookupRow : lookupRows) {
       ITableRow row = createRow();
-      row.getCellForUpdate(getKeyColumn()).setValue(lookupRow);
+      row.getCellForUpdate(getKeyColumn()).setValue(lookupRow); // FIXME AWE: we should use a ComparableLookupRow here 
+      // because restoreSelection does not work as LookupRow does not implement equals/hashCode
       rows.add(row);
       row.setEnabled(lookupRow.isEnabled());
       AbstractTableRowData tableRowBean = lookupRow.getAdditionalTableRowData();
@@ -100,8 +101,7 @@ public class ContentAssistFieldTable<LOOKUP_KEY> extends AbstractTable implement
     }
     try {
       setTableChanging(true);
-      discardAllRows();
-      addRows(rows);
+      replaceRows(rows);
     }
     finally {
       setTableChanging(false);

@@ -76,17 +76,16 @@ scout.Button.prototype._render = function($parent) {
     // This is a bit weird: the model defines a button, but in the UI it behaves like a menu-item.
     // Probably it would be more reasonable to change the configuration (which would lead to additional
     // effort required to change an existing application).
-    $button = $parent.makeDiv('menu-item')
-      .addClass('link');
+    $button = $parent.makeDiv('link-button');
     $button.setTabbable(this.enabled);
+    // Separate $link element to have a smaller focus border
+    this.$link = $button.appendDiv('menu-item link');
+    this.$buttonLabel = this.$link.appendSpan('button-label text');
   } else {
     // render as button
     $button = $parent.makeElement('<button>')
       .addClass('button');
-  }
-  this.$buttonLabel = $button.appendSpan('button-label');
-  if (this.displayStyle === scout.Button.DisplayStyle.LINK) {
-    this.$buttonLabel.addClass('text');
+    this.$buttonLabel = $button.appendSpan('button-label');
   }
   this.addContainer($parent, 'button-field', new scout.ButtonLayout(this));
   this.addField($button);
@@ -105,7 +104,7 @@ scout.Button.prototype._render = function($parent) {
       this.keyStrokeContext.registerKeyStroke(menu);
     }, this);
     if (this.label || !this.iconId) { // no indicator when _only_ the icon is visible
-      this.$submenuIcon = $button.appendSpan('submenu-icon');
+      this.$submenuIcon = (this.$link || $button).appendSpan('submenu-icon');
     }
   }
   $button.unfocusable();
@@ -196,6 +195,7 @@ scout.Button.prototype._renderProperties = function() {
 scout.Button.prototype._renderEnabled = function() {
   scout.Button.parent.prototype._renderEnabled.call(this);
   if (this.displayStyle === scout.Button.DisplayStyle.LINK) {
+    this.$link.setEnabled(this.enabled);
     this.$field.setTabbable(this.enabled);
   }
 };
@@ -225,8 +225,9 @@ scout.Button.prototype._renderLabel = function() {
  * Adds an image or font-based icon to the button by adding either an IMG or SPAN element to the button.
  */
 scout.Button.prototype._renderIconId = function() {
-  this.$field.icon(this.iconId);
-  var $icon = this.$field.data('$icon');
+  var $iconTarget = this.$link || this.$field;
+  $iconTarget.icon(this.iconId);
+  var $icon = $iconTarget.data('$icon');
   if ($icon) {
     $icon.toggleClass('with-label', !!this.label);
     // <img>s are loaded asynchronously. The real image size is not known until the image is loaded.

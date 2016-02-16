@@ -104,6 +104,8 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
 
   private ILookupRow<LOOKUP_KEY> m_currentLookupRow;
 
+  private volatile IFuture<Void> m_lookupFuture;
+
   private Class<? extends IContentAssistFieldTable<VALUE>> m_contentAssistTableClazz;
 
   public AbstractContentAssistField() {
@@ -1397,6 +1399,8 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
    *         using {@link LocalLookupCall}.
    */
   private IFuture<Void> fetchLookupRows(final ILookupRowProvider<LOOKUP_KEY> dataProvider, final ILookupRowFetchedCallback<LOOKUP_KEY> callback, final boolean asynchronousFetching, final int maxRowCount) {
+    cancelPotentialLookup();
+
     if (getLookupCall() == null) {
       callback.onSuccess(Collections.<ILookupRow<LOOKUP_KEY>> emptyList());
       return null;
@@ -1461,17 +1465,18 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
     try {
       dataProvider.beforeProvide(lookupCall);
       if (asynchronousFetching) {
-        return dataProvider.provideAsync(lookupCall, internalCallback, ClientRunContexts.copyCurrent());
+        m_lookupFuture = dataProvider.provideAsync(lookupCall, internalCallback, ClientRunContexts.copyCurrent());
       }
       else {
         dataProvider.provideSync(lookupCall, internalCallback);
-        return null;
+        m_lookupFuture = null;
       }
     }
     catch (final RuntimeException e) {
       internalCallback.onFailure(e);
+      m_lookupFuture = null;
     }
-    return null;
+    return m_lookupFuture;
   }
 
   /**
@@ -1537,5 +1542,15 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
         throw new IllegalStateException("Lookup row fetching not completed yet");
       }
     }
+  }
+
+  protected void cancelPotentialLookup() {
+    if (m_lookupFuture == null) {
+      return;
+    }
+    if (m_lookupFuture.containsExecutionHint(EXECUTION_HINT_INITIAL_LOOKUP)) {
+      return;
+    }
+    m_lookupFuture.cancel(false);
   }
 }

@@ -31,7 +31,8 @@ scout.FilterFieldsGroupBox.prototype.addFilterField = function(objectType, text,
     maxLength: 100,
     gridData: {
       y: gridY
-    }
+    },
+    updateDisplayTextOnModify: true
   });
   this.addField0(field);
   return field;

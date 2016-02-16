@@ -54,6 +54,10 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
    * ValueField, ActivityMap) a combination of several menu type definitions can be returned. In case the menu is added
    * on any other component (different from {@link ITable}, {@link ITree}, {@link IValueField} , {@link IActivityMap} )
    * the menu type does not have any affect.
+   * <p>
+   * If multiple menu types of the same context are returned, the menu is rendered only once, using the most "specific"
+   * of the types (which one depends on the context). Example: If the menu types contain TableMenuType.TableHeader and
+   * TableMenuType.SingleSelection, the menu is only shown in the table header.
    *
    * @see TableMenuType
    * @see TreeMenuType

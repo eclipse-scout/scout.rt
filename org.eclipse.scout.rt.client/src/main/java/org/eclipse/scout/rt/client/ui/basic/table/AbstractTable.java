@@ -188,7 +188,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   private List<ITableControl> m_tableControls;
   private IReloadHandler m_reloadHandler;
   private int m_valueChangeTriggerEnabled = 1;// >=1 is true
-//  private IOrganizeColumnsForm m_organizeColumnsForm;
   private ITableOrganizer m_tableOrganizer;
 
   public AbstractTable() {
@@ -860,7 +859,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   protected final void interceptInitConfig() {
-    m_objectExtensions.initConfig(createLocalExtension(), new Runnable() {
+    m_objectExtensions.initConfigAndBackupExtensionContext(createLocalExtension(), new Runnable() {
       @Override
       public void run() {
         initConfig();
@@ -928,7 +927,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
 
     // key strokes
     List<Class<? extends IKeyStroke>> ksClasses = getConfiguredKeyStrokes();
-    ArrayList<IKeyStroke> ksList = new ArrayList<IKeyStroke>(ksClasses.size());
+    List<IKeyStroke> ksList = new ArrayList<IKeyStroke>(ksClasses.size());
     for (Class<? extends IKeyStroke> clazz : ksClasses) {
       IKeyStroke ks = ConfigurationUtility.newInnerInstance(this, clazz);
       ks.initAction();
@@ -950,7 +949,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     List<IKeyStroke> contributedKeyStrokes = m_contributionHolder.getContributionsByClass(IKeyStroke.class);
     ksList.addAll(contributedKeyStrokes);
     setKeyStrokes(ksList);
-    // FIXME AWE: (organize) austauschbar mit bean
+
     m_tableOrganizer = BEANS.get(ITableOrganizerProvider.class).createTableOrganizer(this);
 
     // add Convenience observer for drag & drop callbacks, event history and ui sort possible check
@@ -3471,7 +3470,13 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       }
       // reset columns
       disposeColumnsInternal();
-      createColumnsInternal();
+      m_objectExtensions.runInExtensionContext(new Runnable() {
+        @Override
+        public void run() {
+          // runs within extension context, so that extensions and contributions can be created
+          createColumnsInternal();
+        }
+      });
       initColumnsInternal();
       // re-apply displayable
       for (IColumn<?> col : getColumns()) {

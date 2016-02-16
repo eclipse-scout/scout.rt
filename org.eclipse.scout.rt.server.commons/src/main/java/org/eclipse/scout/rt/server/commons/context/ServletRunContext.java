@@ -28,6 +28,7 @@ import org.eclipse.scout.rt.platform.util.ThreadLocalProcessor;
 import org.eclipse.scout.rt.platform.util.ToStringBuilder;
 import org.eclipse.scout.rt.server.commons.servlet.IHttpServletRoundtrip;
 import org.eclipse.scout.rt.server.commons.servlet.logging.HttpRequestMethodContextValueProvider;
+import org.eclipse.scout.rt.server.commons.servlet.logging.HttpRequestQueryStringContextValueProvider;
 import org.eclipse.scout.rt.server.commons.servlet.logging.HttpRequestUriContextValueProvider;
 import org.eclipse.scout.rt.server.commons.servlet.logging.HttpSessionIdContextValueProvider;
 
@@ -54,8 +55,9 @@ public class ServletRunContext extends RunContext {
         .add(new ThreadLocalProcessor<>(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST, m_servletRequest))
         .add(new ThreadLocalProcessor<>(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE, m_servletResponse))
         .add(new DiagnosticContextValueProcessor(BEANS.get(HttpSessionIdContextValueProvider.class)))
+        .add(new DiagnosticContextValueProcessor(BEANS.get(HttpRequestUriContextValueProvider.class)))
         .add(new DiagnosticContextValueProcessor(BEANS.get(HttpRequestMethodContextValueProvider.class)))
-        .add(new DiagnosticContextValueProcessor(BEANS.get(HttpRequestUriContextValueProvider.class)));
+        .add(new DiagnosticContextValueProcessor(BEANS.get(HttpRequestQueryStringContextValueProvider.class)));
   }
 
   @Override

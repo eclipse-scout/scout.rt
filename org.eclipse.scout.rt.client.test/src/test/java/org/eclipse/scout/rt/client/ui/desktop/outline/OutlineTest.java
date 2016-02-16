@@ -12,6 +12,9 @@ package org.eclipse.scout.rt.client.ui.desktop.outline;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
 import java.util.List;
@@ -20,6 +23,10 @@ import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeAdapter;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
+import org.eclipse.scout.rt.client.ui.form.AbstractForm;
+import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
+import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
@@ -63,6 +70,51 @@ public class OutlineTest {
 
     public List<? extends TreeEvent> getBatch() {
       return m_batch;
+    }
+  }
+
+  @Test
+  public void testDefaultDetailForm() {
+    TestOutline o = new TestOutline(true);
+
+    assertNotNull("DefaultDetailForm was not instantiated", o.getDefaultDetailForm());
+    assertTrue("DefaultDetailForm was not started", o.getDefaultDetailForm().isFormStarted());
+
+    IForm form = o.getDefaultDetailForm();
+
+    o.disposeTree();
+    assertNull("DefaultDetailForm should be null", o.getDefaultDetailForm());
+    assertTrue("DefaultDetailForm should have been closed", form.isFormClosed());
+  }
+
+  public static class TestOutline extends AbstractOutline {
+
+    public TestOutline(boolean callInitializer) {
+      super(true);
+    }
+
+    @Override
+    protected Class<? extends IForm> getConfiguredDefaultDetailForm() {
+      return TestForm.class;
+    }
+  }
+
+  public static class TestForm extends AbstractForm {
+
+    public TestForm() {
+      super();
+    }
+
+    public TestForm(boolean callInitializer) {
+      super(true);
+    }
+
+    public MainBox getMainBox() {
+      return getFieldByClass(MainBox.class);
+    }
+
+    @Order(10)
+    public class MainBox extends AbstractGroupBox {
     }
   }
 }

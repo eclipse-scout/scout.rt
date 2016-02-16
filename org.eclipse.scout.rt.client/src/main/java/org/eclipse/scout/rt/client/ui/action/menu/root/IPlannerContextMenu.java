@@ -15,7 +15,7 @@ import org.eclipse.scout.rt.client.ui.basic.planner.IPlanner;
 public interface IPlannerContextMenu extends IContextMenu {
 
   @Override
-  IPlanner<?, ?> getOwner();
+  IPlanner<?, ?> getContainer();
 
   void callOwnerValueChanged();
 }

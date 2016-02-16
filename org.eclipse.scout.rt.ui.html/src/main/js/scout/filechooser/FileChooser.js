@@ -182,7 +182,12 @@ scout.FileChooser.prototype._doAddFile = function() {
 };
 
 scout.FileChooser.prototype._onUploadButtonClicked = function(event) {
+  this.$uploadButton.setEnabled(false);
   this._doUpload();
+  this.session.listen().done(function() {
+    this.$uploadButton.setEnabled(true);
+  }.bind(this));
+
 };
 
 scout.FileChooser.prototype._onCancelButtonClicked = function(event) {

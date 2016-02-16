@@ -25,6 +25,7 @@
       <!-- do not use 'com.sun.codemodel' and not 'org.glassfish.jaxb' because out-of-date -->
       <groupId>com.unquietcode.tools.jcodemodel</groupId>
       <artifactId>codemodel</artifactId>
+      <version>1.0.3</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.scout.rt</groupId>

@@ -18,7 +18,7 @@ import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.IActionVisitor;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
-import org.eclipse.scout.rt.client.ui.action.menu.root.AbstractPropertyObserverContextMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.root.AbstractContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.ITableContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
@@ -29,7 +29,7 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
 /**
  * The invisible root menu node of any table. (internal usage only)
  */
-public class TableContextMenu extends AbstractPropertyObserverContextMenu<ITable> implements ITableContextMenu {
+public class TableContextMenu extends AbstractContextMenu<ITable> implements ITableContextMenu {
   private List<? extends ITableRow> m_currentSelection;
 
   /**
@@ -42,9 +42,9 @@ public class TableContextMenu extends AbstractPropertyObserverContextMenu<ITable
   @Override
   protected void initConfig() {
     super.initConfig();
-    getOwner().addTableListener(new P_OwnerTableListener());
+    getContainer().addTableListener(new P_OwnerTableListener());
     // set active filter
-    setCurrentMenuTypes(MenuUtility.getMenuTypesForTableSelection(getOwner().getSelectedRows()));
+    setCurrentMenuTypes(MenuUtility.getMenuTypesForTableSelection(getContainer().getSelectedRows()));
     calculateLocalVisibility();
   }
 
@@ -61,8 +61,9 @@ public class TableContextMenu extends AbstractPropertyObserverContextMenu<ITable
   }
 
   protected void handleOwnerEnabledChanged() {
-    if (getOwner() != null) {
-      final boolean enabled = getOwner().isEnabled();
+    ITable container = getContainer();
+    if (container != null) {
+      final boolean enabled = container.isEnabled();
       acceptVisitor(new IActionVisitor() {
         @Override
         public int visit(IAction action) {
@@ -85,8 +86,8 @@ public class TableContextMenu extends AbstractPropertyObserverContextMenu<ITable
 
   protected void handleOwnerValueChanged() {
     m_currentSelection = null;
-    if (getOwner() != null) {
-      final List<ITableRow> ownerValue = getOwner().getSelectedRows();
+    if (getContainer() != null) {
+      final List<ITableRow> ownerValue = getContainer().getSelectedRows();
       m_currentSelection = CollectionUtility.arrayList(ownerValue);
       setCurrentMenuTypes(MenuUtility.getMenuTypesForTableSelection(ownerValue));
       acceptVisitor(new MenuOwnerChangedVisitor(ownerValue, getCurrentMenuTypes()));

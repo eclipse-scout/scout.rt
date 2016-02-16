@@ -135,6 +135,9 @@ public class UiTextContributor implements IUiTextContributor {
         "ui.Minimum",
         "ui.Maximum",
         "ui.Aggregation",
-        "ui.LoadingPopupWindow"));
+        "ui.LoadingPopupWindow",
+        "ui.Active",
+        "ui.Inactive",
+        "ui.All"));
   }
 }

@@ -47,16 +47,19 @@ scout.FocusContext.prototype._dispose = function() {
 scout.FocusContext.prototype._onKeyDown = function(event) {
   if (event.which === scout.keys.TAB) {
     var activeElement = this.$container.activeElement(true),
-      $focusableElements = this.$container.find(':tabbable'),
+      $focusableElements = this.$container.find(':tabbable:visible'),
       firstFocusableElement = $focusableElements.first()[0],
-      lastFocusableElement = $focusableElements.last()[0];
-
+      lastFocusableElement = $focusableElements.last()[0],
+      focusedElement;
     // Forward Tab
     if (!event.shiftKey) {
       // If the last focusable element is focused, or the focus is on the container, set the focus to the first focusable element
       if (firstFocusableElement && (activeElement === lastFocusableElement || activeElement === this.$container[0])) {
         $.suppressEvent(event);
         this._validateAndSetFocus(firstFocusableElement);
+        focusedElement = firstFocusableElement;
+      } else {
+        focusedElement = $focusableElements.get($focusableElements.index(activeElement) + 1);
       }
     }
     // Backward Tab (Shift+TAB)
@@ -65,7 +68,17 @@ scout.FocusContext.prototype._onKeyDown = function(event) {
       if (lastFocusableElement && (activeElement === this.$container[0] || activeElement === firstFocusableElement)) {
         $.suppressEvent(event);
         this._validateAndSetFocus(lastFocusableElement);
+        focusedElement = firstFocusableElement;
+      } else {
+        focusedElement = $focusableElements.get($focusableElements.index(activeElement) - 1);
       }
+    }
+
+    var $focusableElement = $(focusedElement),
+      containerBounds = scout.graphics.offsetBounds($focusableElement),
+      $scrollable = $focusableElement.scrollParent();
+    if (!scout.scrollbars.isLocationInView(new scout.Point(containerBounds.x, containerBounds.y), $scrollable)) {
+      scout.scrollbars.scrollTo($scrollable, $focusableElement);
     }
   }
 };

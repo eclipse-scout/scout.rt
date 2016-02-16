@@ -12,13 +12,10 @@ package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 
 import java.util.List;
 
-import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRowFetchedCallback;
 
 public class ContentAssistFieldDataFetcher<LOOKUP_KEY> extends AbstractContentAssistFieldLookupRowFetcher<LOOKUP_KEY> {
-
-  private volatile IFuture<?> m_future;
 
   public ContentAssistFieldDataFetcher(IContentAssistField<?, LOOKUP_KEY> contentAssistField) {
     super(contentAssistField);
@@ -30,12 +27,6 @@ public class ContentAssistFieldDataFetcher<LOOKUP_KEY> extends AbstractContentAs
     String text = searchText;
     if (text == null) {
       text = "";
-    }
-
-    // Cancel potential running fetcher
-    final IFuture<?> future = m_future;
-    if (future != null) {
-      future.cancel(true);
     }
 
     final String textNonNull = text;
@@ -58,10 +49,10 @@ public class ContentAssistFieldDataFetcher<LOOKUP_KEY> extends AbstractContentAs
     }
     else {
       if (getContentAssistField().getWildcard().equals(textNonNull) || textNonNull.isEmpty()) {
-        m_future = getContentAssistField().callBrowseLookupInBackground(textNonNull, maxRowCount, callback);
+        getContentAssistField().callBrowseLookupInBackground(textNonNull, maxRowCount, callback);
       }
       else {
-        m_future = getContentAssistField().callTextLookupInBackground(textNonNull, maxRowCount, callback);
+        getContentAssistField().callTextLookupInBackground(textNonNull, maxRowCount, callback);
       }
     }
   }
@@ -78,13 +69,11 @@ public class ContentAssistFieldDataFetcher<LOOKUP_KEY> extends AbstractContentAs
 
     @Override
     public void onSuccess(List<? extends ILookupRow<LOOKUP_KEY>> rows) {
-      m_future = null;
       setResult(new ContentAssistFieldDataFetchResult<>(rows, null, m_searchText, m_selectCurrentValue));
     }
 
     @Override
     public void onFailure(RuntimeException exception) {
-      m_future = null;
       setResult(new ContentAssistFieldDataFetchResult<LOOKUP_KEY>(null, exception, m_searchText, m_selectCurrentValue));
     }
   }

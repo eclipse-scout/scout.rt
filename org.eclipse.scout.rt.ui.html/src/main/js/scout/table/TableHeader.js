@@ -105,6 +105,7 @@ scout.TableHeader.prototype._renderColumn = function(column, index) {
     .css('max-width', columnWidth + 'px')
     .css('margin-left', marginLeft)
     .css('margin-right', marginRight);
+  $header.appendSpan('table-header-item-text');
   if (this.enabled) {
     $header
       .on('click', this._onHeaderItemClick.bind(this))
@@ -166,9 +167,14 @@ scout.TableHeader.prototype._removeColumn = function(column) {
 
 scout.TableHeader.prototype.resizeHeaderItem = function(column) {
   if (!column) {
-    //May be undefined if there are no columns
+    // May be undefined if there are no columns
     return;
   }
+  if (!column.$header) {
+    // May be undefined if called when header item is not rendered yet (may caused by _adjustColumnMinWidth)
+    return;
+  }
+
   var remainingHeaderSpace, adjustment,
     $header = column.$header,
     $headerResize,
@@ -204,6 +210,10 @@ scout.TableHeader.prototype.resizeHeaderItem = function(column) {
     .css('max-width', columnWidth)
     .css('margin-left', marginLeft)
     .css('margin-right', marginRight);
+
+  if (this._tableHeaderMenu && this._tableHeaderMenu.rendered && this._tableHeaderMenu.column === column) {
+    this._tableHeaderMenu.onColumnResized();
+  }
 };
 
 scout.TableHeader.prototype._reconcileScrollPos = function() {
@@ -289,30 +299,53 @@ scout.TableHeader.prototype.updateHeader = function(column, oldColumnState) {
 
 scout.TableHeader.prototype._decorateHeader = function(column, oldColumnState) {
   var $header = column.$header;
+  if (column.disallowHeaderMenu) {
+    $header.addClass('disabled');
+  }
+
+  this._renderColumnCssClass(column, oldColumnState);
+  this._renderColumnText(column);
+  this._renderColumnIconId(column);
+  this._renderColumnState(column);
+  this._renderColumnLegacyStyle(column);
+};
+
+scout.TableHeader.prototype._renderColumnCssClass = function(column, oldColumnState) {
+  var $header = column.$header;
   if (oldColumnState) {
     $header.removeClass(oldColumnState.headerCssClass);
   }
   $header.addClass(column.headerCssClass);
-  if (column.disallowHeaderMenu) {
-    $header.addClass('disabled');
-  }
-  this._renderColumnText(column);
 };
 
 scout.TableHeader.prototype._renderColumnText = function(column) {
   var text = column.text,
-    $header = column.$header;
+    $header = column.$header,
+    $headerText = $header.children('.table-header-item-text');
 
-  if (!text) {
-    // Make sure empty header is as height as the others to make it properly clickable
-    $header.html('&nbsp;');
-    $header.addClass('empty');
-  } else {
-    $header.html(scout.strings.nl2br(text));
-    $header.removeClass('empty');
+  // Make sure empty header is as height as the others to make it properly clickable
+  $headerText.htmlOrNbsp(scout.strings.nl2br(text), 'empty');
+  this._updateColumnIconAndTextStyle(column);
+};
+
+scout.TableHeader.prototype._renderColumnIconId = function(column) {
+  column.$header.icon(column.headerIconId);
+  this._updateColumnIconAndTextStyle(column);
+};
+
+scout.TableHeader.prototype._updateColumnIconAndTextStyle = function(column) {
+  var $icon = column.$header.data('$icon'),
+    $text = column.$header.children('.table-header-item-text');
+
+  if ($icon) {
+    $icon.toggleClass('with-text', !!column.text);
   }
+  // Make text invisible if there is an icon but no text
+  $text.setVisible(!($icon && $text.html() === '&nbsp;'));
+};
 
-  this._renderColumnState(column);
+scout.TableHeader.prototype._renderColumnLegacyStyle = function(column) {
+  scout.styles.legacyStyle(column, column.$header, 'header');
 };
 
 scout.TableHeader.prototype._renderColumnState = function(column) {
@@ -349,8 +382,32 @@ scout.TableHeader.prototype._renderColumnState = function(column) {
       $left.appendDiv().text('F');
     }
   }
-  // Contains sort arow
+  // Contains sort arrow
   $state.appendDiv('right');
+
+  this._adjustColumnMinWidth(column);
+};
+
+/**
+ * Makes sure state is fully visible by adjusting width (happens if column.minWidth is < DEFAULT_MIN_WIDTH)
+ */
+scout.TableHeader.prototype._adjustColumnMinWidth = function(column) {
+  var filtered = this.table.getFilter(column.id);
+  if (column.sortActive || column.grouped || filtered) {
+    if (column.minWidth < scout.Column.DEFAULT_MIN_WIDTH) {
+      column.prefMinWidth = column.minWidth;
+      column.minWidth = scout.Column.DEFAULT_MIN_WIDTH;
+    }
+    if (column.width < column.minWidth) {
+      this.table.resizeColumn(column, column.minWidth);
+    }
+  } else {
+    // Reset to preferred min width if no state is visible
+    if (column.prefMinWidth) {
+      column.minWidth = column.prefMinWidth;
+      column.prefMinWidth = null;
+    }
+  }
 };
 
 scout.TableHeader.prototype.updateMenuBar = function() {
@@ -503,8 +560,8 @@ scout.TableHeader.prototype._onHeaderItemMousedown = function(event) {
     that.dragging = true;
 
     // change css of dragged header
-    $header.addClass('header-move');
-    that.$container.addClass('header-move');
+    $header.addClass('moving');
+    that.$container.addClass('moving');
 
     // move dragged header
     $header.css('left', diff);
@@ -579,9 +636,8 @@ scout.TableHeader.prototype._onHeaderItemMousedown = function(event) {
       $(this).css('left', '');
     });
 
-    $header.css('background', '')
-      .removeClass('header-move');
-    that.$container.removeClass('header-move');
+    $header.removeClass('moving');
+    that.$container.removeClass('moving');
   }
 };
 
