@@ -118,7 +118,7 @@ public class CodeService implements ICodeService {
       return ct;
     }
     // populate code type cache
-    getAllCodeTypes("");
+    getAllCodeTypes();
     return findCodeTypeByIdInternal(id);
   }
 
