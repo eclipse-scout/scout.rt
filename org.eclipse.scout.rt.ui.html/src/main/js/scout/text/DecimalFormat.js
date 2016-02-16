@@ -113,6 +113,25 @@ scout.DecimalFormat = function(locale, decimalFormatConfiguration) {
   }
 };
 
+/**
+ * Returns a number for the given numberString, if the string can be converted into a number.
+ * Throws an Error otherwise
+ */
+scout.DecimalFormat.prototype.parse = function(numberString) {
+  if (scout.strings.empty(numberString)) {
+    return null;
+  }
+  var pureNumber = numberString
+    .replace(new RegExp('[' + this.groupingChar + ']', 'g'), '')
+    .replace(new RegExp('[' + this.decimalSeparatorChar + ']', 'g'), '.')
+    .replace(/\s/g, '');
+  var number = Number(pureNumber);
+  if (isNaN(number)) {
+    throw new Error(numberString + ' is not a number (NaN)');
+  }
+  return number;
+};
+
 scout.DecimalFormat.prototype.format = function(number, applyMultiplier) {
   applyMultiplier = scout.nvl(applyMultiplier, true);
   if (number === null || number === undefined) {
