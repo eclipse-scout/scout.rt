@@ -315,7 +315,7 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
    */
   @Override
   public void setDisplayText(String s) {
-    super.setDisplayText(s);
+    super.setDisplayText(s); // NOSONAR override for javadoc
   }
 
   protected Date applyAutoDate(Date d) {
