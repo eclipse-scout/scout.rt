@@ -161,7 +161,7 @@ public abstract class AbstractSqlService implements ISqlService, IServiceInvento
     m_codeNameToDescriptor = new HashMap<>();
     ICodeService csvc = BEANS.opt(ICodeService.class);
     if (csvc != null) {
-      for (Class<?> d : csvc.getAllCodeTypeClasses("")) {
+      for (Class<?> d : csvc.getAllCodeTypeClasses()) {
         List<Class<?>> list = m_codeNameToDescriptor.get(d.getSimpleName());
         if (list == null) {
           list = new ArrayList<>();

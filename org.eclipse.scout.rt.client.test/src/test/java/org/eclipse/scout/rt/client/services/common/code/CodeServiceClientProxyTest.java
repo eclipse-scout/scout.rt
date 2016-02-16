@@ -70,9 +70,10 @@ public class CodeServiceClientProxyTest {
    * Test method for
    * {@link org.eclipse.scout.rt.client.services.common.code.CodeServiceClientProxy#getAllCodeTypes(java.lang.String)}.
    */
+  @SuppressWarnings("deprecation")
   @Test
   public void testGetAllCodeTypes() throws Exception {
-    List<ICodeType<?, ?>> codeTypes = m_service.getAllCodeTypes("");
+    List<ICodeType<?, ?>> codeTypes = m_service.getAllCodeTypes();
     assertEquals("size", 2, codeTypes.size());
     ICodeType<?, ?> codeType = codeTypes.get(0);
     ICodeType<?, ?> companyRatingCodeType;
@@ -88,7 +89,7 @@ public class CodeServiceClientProxyTest {
     assertEquals("CompanyRatingCodeType class", CompanyRatingCodeType.class, companyRatingCodeType.getClass());
     assertEquals("CompanyTypeCodeType class", CompanyTypeCodeType.class, companyTypeCodeType.getClass());
 
-    codeTypes = m_service.getAllCodeTypes("");
+    codeTypes = m_service.getAllCodeTypes();
     assertEquals("size", 2, codeTypes.size());
 
     codeTypes = m_service.getAllCodeTypes(CLIENT_CODE_TYPE_PREFIX);
@@ -102,7 +103,7 @@ public class CodeServiceClientProxyTest {
   @Test
   public void testFindCodeTypeById() throws Exception {
     //Preload the code, as a client application would do in ClientSession#execLoadSession():
-    List<ICodeType<?, ?>> codeTypes = m_service.getAllCodeTypes("");
+    List<ICodeType<?, ?>> codeTypes = m_service.getAllCodeTypes();
     assertEquals("size", 2, codeTypes.size());
 
     ICodeType<Long, ?> companyTypeCodeType = m_service.findCodeTypeById(CompanyTypeCodeType.ID);

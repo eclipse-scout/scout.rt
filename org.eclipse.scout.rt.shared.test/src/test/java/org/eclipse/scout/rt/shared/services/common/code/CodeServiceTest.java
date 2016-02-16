@@ -45,12 +45,12 @@ public class CodeServiceTest {
   @Test
   public void testGetAllCodeTypeClasses() {
     ICodeService service = newCodeServiceInstance();
-    Collection<Class<? extends ICodeType<?, ?>>> codeTypeClasses1 = service.getAllCodeTypeClasses("");
+    Collection<Class<? extends ICodeType<?, ?>>> codeTypeClasses1 = service.getAllCodeTypeClasses();
     assertEquals("codeTypeClasses1 size", 2, codeTypeClasses1.size());
     assertEquals("codeTypeClasses1 contains AbcCodeType", true, codeTypeClasses1.contains(AbcCodeType.class));
     assertEquals("codeTypeClasses1 contains ZyxCodeType", true, codeTypeClasses1.contains(ZyxCodeType.class));
 
-    Collection<Class<? extends ICodeType<?, ?>>> codeTypeClasses2 = service.getAllCodeTypeClasses("");
+    Collection<Class<? extends ICodeType<?, ?>>> codeTypeClasses2 = service.getAllCodeTypeClasses();
     assertEquals("codeTypeClasses2 size", 1, codeTypeClasses2.size());
     assertEquals("codeTypeClasses2 contains AbcCodeType", true, codeTypeClasses2.contains(AbcCodeType.class));
     assertEquals("codeTypeClasses2 contains ZyxCodeType", false, codeTypeClasses2.contains(ZyxCodeType.class));
@@ -63,7 +63,7 @@ public class CodeServiceTest {
   @Test
   public void testGetAllCodeTypesString() {
     ICodeService service = newCodeServiceInstance();
-    Collection<ICodeType<?, ?>> codeTypes1 = service.getAllCodeTypes("");
+    Collection<ICodeType<?, ?>> codeTypes1 = service.getAllCodeTypes();
     assertEquals("size", 2, codeTypes1.size());
     Set<Class<?>> codeTypeClasses = new HashSet<Class<?>>(2);
     for (ICodeType<?, ?> ct : codeTypes1) {
@@ -72,7 +72,7 @@ public class CodeServiceTest {
     assertTrue(codeTypeClasses.contains(AbcCodeType.class));
     assertTrue(codeTypeClasses.contains(ZyxCodeType.class));
 
-    Collection<ICodeType<?, ?>> codeTypes2 = service.getAllCodeTypes("");
+    Collection<ICodeType<?, ?>> codeTypes2 = service.getAllCodeTypes();
     assertEquals("size", 1, codeTypes2.size());
     assertEquals("codeType 2 (0)", AbcCodeType.class, CollectionUtility.firstElement(codeTypes2).getClass());
   }
@@ -83,7 +83,7 @@ public class CodeServiceTest {
   @Test
   public void testGetCodeTypeClass() {
     ICodeService service = newCodeServiceInstance();
-    service.getAllCodeTypes("");
+    service.getAllCodeTypes();
 
     AbcCodeType abcCodeType1 = service.getCodeType(AbcCodeType.class);
     AbcCodeType abcCodeType2 = service.getCodeType(AbcCodeType.class);
@@ -100,7 +100,7 @@ public class CodeServiceTest {
   @Test
   public void testGetCodeTypesList() {
     ICodeService service = newCodeServiceInstance();
-    service.getAllCodeTypes("");
+    service.getAllCodeTypes();
 
     List<Class<? extends ICodeType<?, ?>>> types1 = new ArrayList<Class<? extends ICodeType<?, ?>>>();
     types1.add(AbcCodeType.class);
@@ -139,7 +139,7 @@ public class CodeServiceTest {
   @Test
   public void testReloadCodeType() throws Exception {
     ICodeService service = newCodeServiceInstance();
-    service.getAllCodeTypes("");
+    service.getAllCodeTypes();
 
     AbcCodeType abcCodeType1 = service.getCodeType(AbcCodeType.class);
 
@@ -162,7 +162,7 @@ public class CodeServiceTest {
   @Test
   public void testReloadCodeTypes() throws Exception {
     ICodeService service = newCodeServiceInstance();
-    service.getAllCodeTypes("");
+    service.getAllCodeTypes();
 
     AbcCodeType abcCodeType1 = service.getCodeType(AbcCodeType.class);
     ZyxCodeType zyxCodeType1 = service.getCodeType(ZyxCodeType.class);
@@ -219,7 +219,7 @@ public class CodeServiceTest {
     private boolean m_isFirst = true;
 
     @Override
-    public Set<Class<? extends ICodeType<?, ?>>> getAllCodeTypeClasses(String classPrefix) {
+    public Set<Class<? extends ICodeType<?, ?>>> getAllCodeTypeClasses() {
       Set<Class<? extends ICodeType<?, ?>>> result = new HashSet<>();
       result.add(AbcCodeType.class);
       if (m_isFirst) {

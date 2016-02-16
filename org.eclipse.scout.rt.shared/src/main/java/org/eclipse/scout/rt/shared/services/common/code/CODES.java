@@ -86,6 +86,7 @@ public final class CODES {
     return BEANS.get(ICodeService.class).reloadCodeTypes(types);
   }
 
+  @SuppressWarnings("deprecation")
   public static Collection<ICodeType<?, ?>> getAllCodeTypes(String classPrefix) {
     return BEANS.get(ICodeService.class).getAllCodeTypes(classPrefix);
   }

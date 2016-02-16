@@ -55,9 +55,22 @@ public interface ICodeService extends IService {
 
   /**
    * @return all code type classes with classPrefix
+   * @deprecated use {@link #getAllCodeTypeClasses()}. Will be removed in Scout 7.
    */
+  @Deprecated
   Set<Class<? extends ICodeType<?, ?>>> getAllCodeTypeClasses(String classPrefix);
 
+  /**
+   * @return all code type classes
+   */
+  Set<Class<? extends ICodeType<?, ?>>> getAllCodeTypeClasses();
+
+  /**
+   * @deprecated use {@link #getAllCodeTypes()}. Will be removed in Scout 7.
+   */
+  @Deprecated
   @RemoteServiceAccessDenied
   Collection<ICodeType<?, ?>> getAllCodeTypes(String classPrefix);
+
+  Collection<ICodeType<?, ?>> getAllCodeTypes();
 }

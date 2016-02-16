@@ -236,6 +236,8 @@ public class CodeService implements ICodeService {
     return getCodeTypes(types);
   }
 
+  @SuppressWarnings("deprecation")
+  @Deprecated
   @Override
   public Set<Class<? extends ICodeType<?, ?>>> getAllCodeTypeClasses(String classPrefix) {
     final Set<Class<? extends ICodeType<?, ?>>> filteredClasses = new LinkedHashSet<>();
@@ -248,12 +250,22 @@ public class CodeService implements ICodeService {
     return filteredClasses;
   }
 
+  @Override
   public Set<Class<? extends ICodeType<?, ?>>> getAllCodeTypeClasses() {
     return BEANS.get(CodeTypeClassInventory.class).getClasses();
   }
 
   @Override
+  public List<ICodeType<?, ?>> getAllCodeTypes() {
+    Set<Class<? extends ICodeType<?, ?>>> allCodeTypeClasses = getAllCodeTypeClasses();
+    List<Class<? extends ICodeType<?, ?>>> list = CollectionUtility.arrayList(allCodeTypeClasses);
+    return getCodeTypes(list);
+  }
+
+  @SuppressWarnings("deprecation")
+  @Override
   @RemoteServiceAccessDenied
+  @Deprecated
   public List<ICodeType<?, ?>> getAllCodeTypes(String classPrefix) {
     Set<Class<? extends ICodeType<?, ?>>> allCodeTypeClasses = getAllCodeTypeClasses(classPrefix);
     List<Class<? extends ICodeType<?, ?>>> list = CollectionUtility.arrayList(allCodeTypeClasses);
