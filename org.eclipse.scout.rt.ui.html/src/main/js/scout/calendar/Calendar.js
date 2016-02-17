@@ -779,7 +779,7 @@ scout.Calendar.prototype._showContextMenu = function(event, allowedType) {
 
 /* -- components, arrangement------------------------------------ */
 
-// FIXME awe, cru: arrange methods should work on the model, not on the DOM
+// FIXME awe, cru: (calendar) arrange methods should work on the model, not on the DOM
 scout.Calendar.prototype._arrangeComponents = function() {
   var k, $day, $children,
     $days = $('.calendar-day', this.$grid);

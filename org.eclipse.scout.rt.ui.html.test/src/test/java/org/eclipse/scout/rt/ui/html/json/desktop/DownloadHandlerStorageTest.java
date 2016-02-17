@@ -55,7 +55,6 @@ public class DownloadHandlerStorageTest {
 
     SleepUtil.sleepElseLog(100, TimeUnit.MILLISECONDS);
 
-    // FIXME awe: Improve this test (it fails sometimes because of timing issues)
     assertNull(storage.remove(KEY));
     assertEquals("futureMap must be cleared after timeout", 0, storage.futureMap().size());
   }

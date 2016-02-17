@@ -41,7 +41,6 @@ public class JsonEventProcessor {
   protected void processEvent(JsonEvent event, JsonResponse response) {
     final IJsonAdapter jsonAdapter = m_uiSession.getJsonAdapter(event.getTarget());
     if (jsonAdapter == null) {
-      // FIXME awe: (json-layer) schauen ob wir eine warning ans UI zurückgeben sollen
       LOG.warn("No adapter found for ID {}", event.getTarget());
       return;
     }

@@ -97,7 +97,7 @@ scout.CalendarComponent.prototype._render = function($parent) {
   }
 };
 
-// FIXME awe: tuning
+// FIXME awe: (calendar) tuning
 scout.CalendarComponent.prototype._findDayInGrid = function(date) {
   var $day;
   $('.calendar-day', this.parent.$grid)
