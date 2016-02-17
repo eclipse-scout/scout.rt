@@ -1050,7 +1050,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
   }
 
-  // FIXME awe, mvi: make TableControls extensible, check copy/paste code in this class
   private void createTableControlsInternal() {
     List<Class<? extends ITableControl>> tcs = getConfiguredTableControls();
     OrderedCollection<ITableControl> tableControls = new OrderedCollection<ITableControl>();
