@@ -69,6 +69,12 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
         return getModel().isBreadcrumbEnabled();
       }
     });
+    putJsonProperty(new JsonProperty<OUTLINE>(IOutline.PROP_NAVIGATE_BUTTONS_VISIBLE, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isNavigateButtonsVisible();
+      }
+    });
     putJsonProperty(new JsonAdapterProperty<OUTLINE>(IOutline.PROP_DEFAULT_DETAIL_FORM, model, getUiSession()) {
       @Override
       protected IForm modelValue() {

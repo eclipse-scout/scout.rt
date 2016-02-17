@@ -132,10 +132,3 @@ scout.MobileViewTabsController.prototype._removeViewTab = function(viewTab, view
     this._desktop.setBenchVisible(false);
   }
 };
-
-// patches Outline.js and prevents creation of outline navigation buttons
-// TODO [5.2] cgu: find better solution, only way I can think of currently is to add a property to the model and set by device transformer.
-// Or maybe make the buttons invisible instead of not creating them
-scout.Outline.prototype._createOutlineNavigationButtons = function(node, staticMenus) {
-  return [];
-};

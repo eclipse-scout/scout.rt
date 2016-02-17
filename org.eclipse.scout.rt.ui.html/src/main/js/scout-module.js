@@ -221,6 +221,9 @@ __include("jquery/jquery-scout.js");
   __include("scout/desktop/ViewButton.js");
   __include("scout/desktop/ViewButtonsLayout.js");
   __include("scout/desktop/ViewTabsController.js");
+  __include("scout/desktop/outline/NavigateButton.js"); // requires Menu.js
+  __include("scout/desktop/outline/NavigateDownButton.js");
+  __include("scout/desktop/outline/NavigateUpButton.js");
   __include("scout/desktop/outline/Outline.js");
   __include("scout/desktop/outline/OutlineOverview.js");
   __include("scout/desktop/outline/OutlineKeyStrokeContext.js");
@@ -314,8 +317,5 @@ __include("jquery/jquery-scout.js");
   __include("scout/form/fields/wrappedform/WrappedFormField.js");
   // More misc. elements
   __include("scout/desktop/DesktopFormController.js");
-  __include("scout/desktop/AbstractNavigateMenu.js"); // requires Menu.js
-  __include("scout/desktop/NavigateDownMenu.js");
-  __include("scout/desktop/NavigateUpMenu.js");
   __include("scout/table/FilterFieldsGroupBox.js"); // requires GroupBox.js
 }(window.scout = window.scout || {}, jQuery));

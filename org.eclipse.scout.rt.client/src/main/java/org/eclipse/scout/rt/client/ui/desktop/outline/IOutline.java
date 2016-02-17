@@ -67,6 +67,8 @@ public interface IOutline extends ITree, ITypeWithClassId, IOrdered, IDisplayPar
 
   String PROP_BREADCRUMB_ENABLED = "breadcrumbEnabled";
 
+  String PROP_NAVIGATE_BUTTONS_VISIBLE = "navigateButtonsVisible";
+
   /**
    * alias to {@link ITree#getSelectedNode()}
    */
@@ -120,6 +122,10 @@ public interface IOutline extends ITree, ITypeWithClassId, IOrdered, IDisplayPar
   boolean isBreadcrumbEnabled();
 
   void setBreadcrumbEnabled(boolean b);
+
+  boolean isNavigateButtonsVisible();
+
+  void setNavigateButtonsVisible(boolean b);
 
   /**
    * @return the default detail form if no page is active (selected)

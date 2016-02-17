@@ -1391,6 +1391,13 @@ scout.Table.prototype._filterMenus = function(menus, destination, onlyVisible, e
   return scout.menus.filterAccordingToSelection('Table', this.selectedRows.length, menus, destination, onlyVisible, enableDisableKeyStroke, notAllowedTypes);
 };
 
+scout.Table.prototype.setStaticMenus = function(staticMenus) {
+  this.staticMenus = staticMenus;
+  if (this.rendered) {
+    this._renderMenus();
+  }
+};
+
 scout.Table.prototype._renderMenus = function() {
   this._updateMenuBar();
   if (this.header) {

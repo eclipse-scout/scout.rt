@@ -11,7 +11,7 @@
 scout.Outline = function() {
   scout.Outline.parent.call(this);
   this._addAdapterProperties(['defaultDetailForm', 'views', 'dialogs', 'messageBoxes', 'fileChoosers']);
-  this.navigateUpInProgress = false; // see NavigateUpMenu.js
+  this.navigateUpInProgress = false; // see NavigateUpButton.js
   this._additionalContainerClasses += ' outline';
   this._treeItemPaddingLeft = 37;
   this._treeItemPaddingLevel = 20;
@@ -213,10 +213,11 @@ scout.Outline.prototype._initTreeNode = function(node, parentNode) {
 };
 
 scout.Outline.prototype._initDetailTable = function(node) {
-  var menus = this._createOutlineNavigationButtons(node, node.detailTable.staticMenus),
-    button = this._getMenu(menus, scout.NavigateDownMenu),
-    that = this;
-  node.detailTable.staticMenus = menus;
+  var that = this;
+
+  if (this.navigateButtonsVisible) {
+    this._appendNavigateButtonsForDetailTable(node);
+  }
 
   // link already existing rows (rows which are inserted later are linked by _onDetailTableRowInitialized)
   node.detailTable.rows.forEach(function(row) {
@@ -233,8 +234,10 @@ scout.Outline.prototype._initDetailTable = function(node) {
 };
 
 scout.Outline.prototype._initDetailForm = function(node) {
-  var menus = this._createOutlineNavigationButtons(node, node.detailForm.staticMenus);
-  node.detailForm.rootGroupBox.staticMenus = menus;
+  if (this.navigateButtonsVisible) {
+    this._appendNavigateButtonsForDetailForm(node);
+  }
+
   node.detailForm.one('destroy', function() {
     // Unlink detail form if it was closed. May happen in the following case:
     // The form gets closed on execPageDeactivated. No pageChanged event will
@@ -266,18 +269,18 @@ scout.Outline.prototype._decorateNode = function(node) {
   scout.inspector.applyInfo(node, node.$node);
 };
 
-scout.Outline.prototype._createOutlineNavigationButtons = function(node, staticMenus) {
+scout.Outline.prototype._createNavigateButtons = function(node, staticMenus) {
   var menus = scout.arrays.ensure(staticMenus);
-  if (!this._hasMenu(menus, scout.NavigateUpMenu)) {
-    var upButton = scout.create('NavigateUpMenu', {
+  if (!this._hasMenu(menus, scout.NavigateUpButton)) {
+    var upButton = scout.create('NavigateUpButton', {
       parent: this,
       outline: this,
       node: node
     });
     menus.push(upButton);
   }
-  if (!this._hasMenu(menus, scout.NavigateDownMenu)) {
-    var downButton = scout.create('NavigateDownMenu', {
+  if (!this._hasMenu(menus, scout.NavigateDownButton)) {
+    var downButton = scout.create('NavigateDownButton', {
       parent: this,
       outline: this,
       node: node
@@ -372,6 +375,68 @@ scout.Outline.prototype._syncDefaultDetailForm = function(defaultDetailForm) {
       });
     }
   }
+};
+
+scout.Outline.prototype._syncNavigateButtonsVisible = function(navigateButtonsVisible) {
+  this.navigateButtonsVisible = navigateButtonsVisible;
+  this._visitNodes(this.nodes, this._syncNavigateButtonsVisibleForNode.bind(this));
+};
+
+scout.Outline.prototype._syncNavigateButtonsVisibleForNode = function(node, parentNode) {
+  if (this.navigateButtonsVisible) {
+    if (node.detailForm) {
+      this._appendNavigateButtonsForDetailForm(node);
+    }
+    if (node.detailTable) {
+      this._appendNavigateButtonsForDetailTable(node);
+    }
+  } else {
+    if (node.detailForm) {
+      this._removeNavigateButtonsForDetailForm(node);
+    }
+    if (node.detailTable) {
+      this._removeNavigateButtonsForDetailTable(node);
+    }
+  }
+};
+
+scout.Outline.prototype._appendNavigateButtonsForDetailForm = function(node) {
+  var menus = this._createNavigateButtons(node, node.detailForm.staticMenus);
+  node.detailForm.rootGroupBox.setStaticMenus(menus);
+};
+
+scout.Outline.prototype._appendNavigateButtonsForDetailTable = function(node) {
+  var menus = this._createNavigateButtons(node, node.detailTable.staticMenus);
+  node.detailTable.setStaticMenus(menus);
+};
+
+scout.Outline.prototype._removeNavigateButtonsForDetailForm = function(node) {
+  var staticMenus = [];
+  node.detailForm.rootGroupBox.staticMenus.forEach(function(menu) {
+    if (menu instanceof scout.NavigateUpButton  || menu instanceof scout.NavigateDownButton) {
+      menu.destroy();
+    } else {
+      staticMenus.push(menu);
+    }
+  });
+  node.detailForm.rootGroupBox.setStaticMenus(staticMenus);
+};
+
+scout.Outline.prototype._removeNavigateButtonsForDetailTable = function(node) {
+  var menus = [];
+  var staticMenus = [];
+  node.detailTable.staticMenus.forEach(function(menu) {
+   if (menu instanceof scout.NavigateUpButton  || menu instanceof scout.NavigateDownButton) {
+     menu.destroy();
+   } else {
+     staticMenus.push(menu);
+   }
+  });
+  node.detailTable.setStaticMenus(staticMenus);
+};
+
+scout.Outline.prototype._renderNavigateButtonsVisible = function() {
+  // nop
 };
 
 scout.Outline.prototype._showDefaultDetailForm = function() {
@@ -478,11 +543,6 @@ scout.Outline.prototype._isTruncatedNodeTooltipEnabled = function() {
 
 /* event handling */
 
-scout.Outline.prototype._onDetailTableRowsSelected = function(event) {
-  var button = this._getMenu(event.detailTable.staticMenus, scout.NavigateDownMenu);
-  button.updateEnabled();
-};
-
 scout.Outline.prototype._onDetailTableRowsFiltered = function(event) {
   this.filter();
 };
@@ -496,8 +556,6 @@ scout.Outline.prototype._onDetailTableEvent = function(event) {
     this._onDetailTableRowInitialized(event);
   } else if (event.type === 'rowsFiltered') {
     this._onDetailTableRowsFiltered(event);
-  } else if (event.type === 'rowsSelected') {
-    this._onDetailTableRowsSelected(event);
   }
 };
 

@@ -220,6 +220,7 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
       outline.setRootNodeVisible(true);
     }
     outline.getContextMenu().setVisibleGranted(true);
+    outline.setNavigateButtonsVisible(false);
   }
 
   @Override

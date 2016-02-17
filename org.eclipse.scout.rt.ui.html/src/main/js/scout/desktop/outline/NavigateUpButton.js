@@ -8,28 +8,28 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-scout.NavigateUpMenu = function(options) {
-  scout.NavigateUpMenu.parent.call(this);
+scout.NavigateUpButton = function() {
+  scout.NavigateUpButton.parent.call(this);
   this._defaultIconId = scout.icons.ANGLE_UP;
   this._defaultText = 'ui.Up';
   this._additionalCssClass = 'small-gap';
   this.iconId = this._defaultIconId;
   this.keyStroke = 'backspace';
 };
-scout.inherits(scout.NavigateUpMenu, scout.AbstractNavigateMenu);
+scout.inherits(scout.NavigateUpButton, scout.NavigateButton);
 
-scout.NavigateUpMenu.prototype._render = function($parent) {
-  scout.NavigateUpMenu.parent.prototype._render.call(this, $parent);
+scout.NavigateUpButton.prototype._render = function($parent) {
+  scout.NavigateUpButton.parent.prototype._render.call(this, $parent);
   this.$container.addClass('up');
 };
 
-scout.NavigateUpMenu.prototype._isDetail = function() {
+scout.NavigateUpButton.prototype._isDetail = function() {
   // Button is in "detail mode" if there are both detail form and detail table visible and detail form _is_ hidden.
   return !!(this.node.detailFormVisible && this.node.detailForm &&
     this.node.detailTableVisible && this.node.detailTable && !this.node.detailFormVisibleByUi);
 };
 
-scout.NavigateUpMenu.prototype._toggleDetail = function() {
+scout.NavigateUpButton.prototype._toggleDetail = function() {
   return true;
 };
 
@@ -37,12 +37,12 @@ scout.NavigateUpMenu.prototype._toggleDetail = function() {
  * Returns true when current node has either a parentNode or if current node is a
  * top-level node without a parent and the outline has a default detail-form.
  */
-scout.NavigateUpMenu.prototype._buttonEnabled = function() {
+scout.NavigateUpButton.prototype._buttonEnabled = function() {
   var parentNode = this.node.parentNode;
   return !!parentNode || !!this.outline.defaultDetailForm || !!this.outline.outlineOverview;
 };
 
-scout.NavigateUpMenu.prototype._drill = function() {
+scout.NavigateUpButton.prototype._drill = function() {
   var parentNode = this.node.parentNode;
   if (parentNode) {
     $.log.debug('drill up to node ' + parentNode);

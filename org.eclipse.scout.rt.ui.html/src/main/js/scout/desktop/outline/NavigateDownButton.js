@@ -8,31 +8,47 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-scout.NavigateDownMenu = function(outline, node) {
-  scout.NavigateDownMenu.parent.call(this, outline, node);
+scout.NavigateDownButton = function() {
+  scout.NavigateDownButton.parent.call(this);
   this._defaultIconId = scout.icons.ANGLE_DOWN;
   this._defaultText = 'ui.Continue';
   this.iconId = this._defaultIconId;
   this.keyStroke = 'enter';
+  this._detailTableRowsSelectedHandler = this._onDetailTableRowsSelected.bind(this);
 };
-scout.inherits(scout.NavigateDownMenu, scout.AbstractNavigateMenu);
+scout.inherits(scout.NavigateDownButton, scout.NavigateButton);
 
-scout.NavigateDownMenu.prototype._render = function($parent) {
-  scout.NavigateDownMenu.parent.prototype._render.call(this, $parent);
+scout.NavigateDownButton.prototype._init = function(options) {
+  scout.NavigateDownButton.parent.prototype._init.call(this, options);
+
+  if (this.node.detailTable) {
+    this.node.detailTable.on('rowsSelected', this._detailTableRowsSelectedHandler);
+  }
+};
+
+scout.NavigateDownButton.prototype.destroy = function() {
+  if (this.node.detailTable) {
+    this.node.detailTable.off('rowsSelected', this._detailTableRowsSelectedHandler);
+  }
+  scout.NavigateDownButton.parent.prototype.destroy.call(this);
+};
+
+scout.NavigateDownButton.prototype._render = function($parent) {
+  scout.NavigateDownButton.parent.prototype._render.call(this, $parent);
   this.$container.addClass('down');
 };
 
-scout.NavigateDownMenu.prototype._isDetail = function() {
+scout.NavigateDownButton.prototype._isDetail = function() {
   // Button is in "detail mode" if there are both detail form and detail table visible and detail form is _not_ hidden.
   return !!(this.node.detailFormVisible && this.node.detailForm &&
     this.node.detailTableVisible && this.node.detailTable && this.node.detailFormVisibleByUi);
 };
 
-scout.NavigateDownMenu.prototype._toggleDetail = function() {
+scout.NavigateDownButton.prototype._toggleDetail = function() {
   return false;
 };
 
-scout.NavigateDownMenu.prototype._buttonEnabled = function() {
+scout.NavigateDownButton.prototype._buttonEnabled = function() {
   if (this._isDetail()) {
     return true;
   }
@@ -49,7 +65,7 @@ scout.NavigateDownMenu.prototype._buttonEnabled = function() {
   }
 };
 
-scout.NavigateDownMenu.prototype._drill = function() {
+scout.NavigateDownButton.prototype._drill = function() {
   var drillNode;
 
   if (this.node.detailTable) {
@@ -85,4 +101,8 @@ scout.NavigateDownMenu.prototype._drill = function() {
       this.outline.expandNode(drillNode);
     }
   }
+};
+
+scout.NavigateDownButton.prototype._onDetailTableRowsSelected = function(event) {
+  this.updateEnabled();
 };

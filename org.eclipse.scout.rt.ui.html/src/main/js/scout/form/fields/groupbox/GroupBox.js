@@ -310,6 +310,13 @@ scout.GroupBox.prototype._removeMenus = function(menus) {
   });
 };
 
+scout.GroupBox.prototype.setStaticMenus = function(staticMenus) {
+  this.staticMenus = staticMenus;
+  if (this.rendered) {
+    this._renderMenus();
+  }
+};
+
 scout.GroupBox.prototype._onGroupBoxControlClick = function(event) {
   if (this.expandable) {
     this.setGroupBoxExpanded(!this.expanded);

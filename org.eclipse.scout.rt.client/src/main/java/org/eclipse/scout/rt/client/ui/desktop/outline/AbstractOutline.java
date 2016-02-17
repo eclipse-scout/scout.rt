@@ -180,8 +180,15 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
    * The folder icon {@link AbstractIcons#Folder} is used as default.
    */
   @Override
+  @Order(150)
   protected String getConfiguredIconId() {
     return AbstractIcons.Folder;
+  }
+
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(160)
+  protected boolean getConfiguredNavigateButtonsVisible() {
+    return true;
   }
 
   /**
@@ -265,6 +272,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
     setVisible(getConfiguredVisible());
     setOrder(calculateViewOrder());
     setBreadcrumbEnabled(getConfiguredBreadcrumbEnabled());
+    setNavigateButtonsVisible(getConfiguredNavigateButtonsVisible());
     ensureDefaultDetailFormCreated();
     ensureDefaultDetailFormStarted();
   }
@@ -464,6 +472,16 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
   @Override
   public void setBreadcrumbEnabled(boolean b) {
     propertySupport.setPropertyBool(PROP_BREADCRUMB_ENABLED, b);
+  }
+
+  @Override
+  public boolean isNavigateButtonsVisible() {
+    return propertySupport.getPropertyBool(PROP_NAVIGATE_BUTTONS_VISIBLE);
+  }
+
+  @Override
+  public void setNavigateButtonsVisible(boolean b) {
+    propertySupport.setPropertyBool(PROP_NAVIGATE_BUTTONS_VISIBLE, b);
   }
 
   @Override

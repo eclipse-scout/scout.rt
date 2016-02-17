@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-describe('NavigateDownMenu', function() {
+describe('NavigateUpButton', function() {
 
   var session, outline, menu, node = {};
 
@@ -17,27 +17,28 @@ describe('NavigateDownMenu', function() {
     session = sandboxSession();
     outline = {
       session: session,
+      navigateToTop: function() {},
       handleOutlineContent: function() {}
     };
-    var model = createSimpleModel('NavigateDownMenu', session);
+    var model = createSimpleModel('NavigateUpButton', session);
     model.outline = outline;
     model.node = node;
-    menu = new scout.NavigateDownMenu();
+    menu = new scout.NavigateUpButton();
     menu.init(model);
   });
 
-  it('_toggleDetail is always false', function() {
-    expect(menu._toggleDetail()).toBe(false);
+  it('_toggleDetail is always true', function() {
+    expect(menu._toggleDetail()).toBe(true);
   });
 
   it('_isDetail returns true or false depending on the state of the detail-form and detail-table', function() {
-    // true when both detailForm and detailTable are visible
+    // false when both detailForm and detailTable are visible
     node.detailForm = {};
     node.detailFormVisible = true;
     node.detailFormVisibleByUi = true;
     node.detailTable = {};
     node.detailTableVisible = true;
-    expect(menu._isDetail()).toBe(true);
+    expect(menu._isDetail()).toBe(false);
 
     // false when detailForm is absent, even when if detailFormVisible=true
     delete node.detailForm;
@@ -49,9 +50,9 @@ describe('NavigateDownMenu', function() {
     expect(menu._isDetail()).toBe(false);
     node.detailTable = {};
 
-    // false when hidden by UI
+    // true when detailForm is hidden by UI
     node.detailFormVisibleByUi = false;
-    expect(menu._isDetail()).toBe(false);
+    expect(menu._isDetail()).toBe(true);
     node.detailFormVisibleByUi = true;
 
     // false when property says to
@@ -64,52 +65,52 @@ describe('NavigateDownMenu', function() {
 
   describe('_buttonEnabled', function() {
 
-    it('is disabled when node is a leaf', function() {
-      node.leaf = true; // node is a leaf
-      expect(menu._buttonEnabled()).toBe(false);
-    });
-
-    it('is enabled when node is not a leaf and we\'re currently displaying the detail', function() {
-      node.leaf = false; // node is not a leaf
-      menu._isDetail = function() { // currently we're displaying the detail-form
-        return true;
-      };
+    it('is true when current node has a parent or...', function() {
+      node.parentNode = {};
+      outline.defaultDetailForm = undefined;
       expect(menu._buttonEnabled()).toBe(true);
     });
 
-    it('is only enabled when detail-table has exactly one selected row', function() {
-      node.leaf = false; // node is not a leaf
-      menu._isDetail = function() { // currently we're not displaying the detail-form
-        return false;
-      };
-      node.detailTable = {
-        selectedRows: []
-      };
-      expect(menu._buttonEnabled()).toBe(false);
-
-      node.detailTable.selectedRows = [{
-        id: '1'
-      }];
+    it('is true when current node is a top-level node and outline a default detail-form or...', function() {
+      node.parentNode = undefined;
+      outline.defaultDetailForm = {};
       expect(menu._buttonEnabled()).toBe(true);
     });
+
+    it('is false otherwise', function() {
+      node.parentNode = undefined;
+      outline.defaultDetailForm = undefined;
+      expect(menu._buttonEnabled()).toBe(false);
+    });
+
   });
 
-  it('_drill drills down to first selected row in the detail table', function() {
-    var drillNode = {};
-    node.detailTable = {
-      selectedRows: [{
-        id: '123',
-        nodeId: '123'
-      }]
-    };
-    outline.nodesMap = {
-      '123': drillNode
-    };
-    outline.selectNodes = function(node) {};
+  describe('_drill', function() {
 
-    spyOn(outline, 'selectNodes');
-    menu._drill();
-    expect(outline.selectNodes).toHaveBeenCalledWith(drillNode);
+    beforeEach(function() {
+      outline.selectNodes = function(node) {};
+      outline.collapseNode = function(node) {};
+      outline.collapseAll = function(node) {};
+    });
+
+    it('drills up to parent node, sets the selection on the tree', function() {
+      node.parentNode = {};
+      spyOn(outline, 'selectNodes');
+      spyOn(outline, 'collapseNode');
+      menu._drill();
+      expect(outline.navigateUpInProgress).toBe(true);
+      expect(outline.selectNodes).toHaveBeenCalledWith(node.parentNode);
+      expect(outline.collapseNode).toHaveBeenCalledWith(node.parentNode, {collapseChildNodes: true});
+    });
+
+    it('shows default detail-form or outline overview', function() {
+      node.parentNode = undefined;
+      menu.drill;
+      spyOn(outline, 'navigateToTop');
+      menu._drill();
+      expect(outline.navigateToTop).toHaveBeenCalled();
+    });
+
   });
 
 });
