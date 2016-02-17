@@ -1008,8 +1008,7 @@ scout.Table.prototype._buildRowDiv = function(row) {
   if (row.checked && this.checkableStyle === scout.Table.CheckableStyle.TABLE_ROW) {
     rowClass += ' checked';
   }
-  // FIXME AWE: remove attr('data-rowid')
-  var rowDiv = '<div class="' + rowClass + '" data-rowid="' + row.id + '" style="width: ' + rowWidth + 'px"' + scout.device.unselectableAttribute.string + '>';
+  var rowDiv = '<div class="' + rowClass + '" style="width: ' + rowWidth + 'px"' + scout.device.unselectableAttribute.string + '>';
   for (var c = 0; c < this.columns.length; c++) {
     rowDiv += this.columns[c].buildCellForRow(row);
   }

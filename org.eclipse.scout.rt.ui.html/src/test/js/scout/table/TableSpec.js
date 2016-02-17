@@ -2288,9 +2288,9 @@ describe("Table", function() {
         session._processSuccessResponse(message);
 
         var $rows = table.$rows();
-        expect($rows.eq(0).attr('data-rowid')).toBe(model.rows[2].id);
-        expect($rows.eq(1).attr('data-rowid')).toBe(model.rows[1].id);
-        expect($rows.eq(2).attr('data-rowid')).toBe(model.rows[0].id);
+        expect($rows.eq(0).data('row').id).toBe(model.rows[2].id);
+        expect($rows.eq(1).data('row').id).toBe(model.rows[1].id);
+        expect($rows.eq(2).data('row').id).toBe(model.rows[0].id);
       });
 
       it("does not animate ordering for newly inserted rows", function() {
@@ -2319,7 +2319,7 @@ describe("Table", function() {
         var $rows = table.$rows();
         $rows.each(function() {
           var $row = $(this);
-          var rowId = $row.attr('data-rowid');
+          var rowId = $row.data('row').id;
           if (rowId === newRows[0].id || rowId === newRows[1].id) {
             expect($row.is(':animated')).toBe(false);
           } else {
