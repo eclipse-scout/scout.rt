@@ -19,7 +19,6 @@ import org.eclipse.scout.rt.client.ui.basic.table.organizer.IOrganizeColumnsForm
 import org.eclipse.scout.rt.client.ui.basic.table.organizer.IOrganizeColumnsFormProvider;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractFormToolButton;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.TEXTS;
@@ -66,16 +65,6 @@ public class OrganizeColumnsMenu extends AbstractFormToolButton<IOrganizeColumns
   @Override
   protected String getConfiguredTooltipText() {
     return TEXTS.get("TableOrganize");
-  }
-
-  /**
-   * Whether or not development menus must be displayed (copy columns width).
-   *
-   * @return
-   */
-  public boolean isDevelopment() {
-    // FIXME awe, cgu: (dev-mode) send this flag with JsonSession - global
-    return Platform.get().inDevelopmentMode();
   }
 
   /**
