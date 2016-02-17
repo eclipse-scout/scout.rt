@@ -12,12 +12,9 @@ package org.eclipse.scout.rt.client.ui.desktop;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
 import java.util.EventObject;
-import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.IModelEvent;
-import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
 import org.eclipse.scout.rt.client.ui.desktop.notification.IDesktopNotification;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
@@ -26,7 +23,6 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
-import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
 public class DesktopEvent extends EventObject implements IModelEvent {
   private static final long serialVersionUID = 1L;
@@ -100,10 +96,6 @@ public class DesktopEvent extends EventObject implements IModelEvent {
    * 2000 ms)
    */
   public static final int TYPE_FIND_FOCUS_OWNER = 1000;
-  /**
-   * Broadcast request to add all popup menus for the tray menu collector: popupMenus
-   */
-  public static final int TYPE_TRAY_POPUP = 1010;
 
   /**
    * Event type indicates that a notification has been added to the desktop.
@@ -123,7 +115,6 @@ public class DesktopEvent extends EventObject implements IModelEvent {
   private IMessageBox m_messageBox;
   private IFileChooser m_fileChooser;
   private String m_uri;
-  private List<IMenu> m_popupMenus;
   private IOpenUriAction m_openUriAction;
   private BinaryResource m_binaryResource;
   private IDesktopNotification m_notification;
@@ -222,49 +213,6 @@ public class DesktopEvent extends EventObject implements IModelEvent {
 
   public void setFocusedField(IFormField f) {
     m_focusedField = f;
-  }
-
-  /**
-   * used by TYPE_TRAY_POPUP to add menus
-   */
-  public void addPopupMenu(IMenu menu) {
-    if (menu != null) {
-      if (m_popupMenus == null) {
-        m_popupMenus = new ArrayList<IMenu>();
-      }
-      m_popupMenus.add(menu);
-    }
-  }
-
-  /**
-   * used by TYPE_TRAY_POPUP to add menus
-   */
-  public void addPopupMenus(List<IMenu> menus) {
-    if (menus != null) {
-      if (m_popupMenus == null) {
-        m_popupMenus = new ArrayList<IMenu>();
-      }
-      m_popupMenus.addAll(menus);
-    }
-  }
-
-  /**
-   * used by TYPE_TRAY_POPUP to add menus
-   */
-  public List<IMenu> getPopupMenus() {
-    return CollectionUtility.arrayList(m_popupMenus);
-  }
-
-  /**
-   * used by TYPE_TRAY_POPUP to add menus
-   */
-  public int getPopupMenuCount() {
-    if (m_popupMenus != null) {
-      return m_popupMenus.size();
-    }
-    else {
-      return 0;
-    }
   }
 
   public IForm getActiveForm() {

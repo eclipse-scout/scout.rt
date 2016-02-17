@@ -10,10 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.desktop;
 
-import java.util.List;
-
-import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
-
 /**
  * The desktop model (may) consist of
  * <ul>
@@ -56,8 +52,4 @@ public interface IDesktopUIFacade {
    */
   void fireGuiDetached();
 
-  /**
-   * GUI fires this event to collect the tray popup menus
-   */
-  List<IMenu> fireTrayPopupFromUI();
 }

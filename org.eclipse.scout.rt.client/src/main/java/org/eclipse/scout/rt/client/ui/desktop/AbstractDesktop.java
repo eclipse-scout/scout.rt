@@ -1674,14 +1674,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     fireDesktopEvent(e);
   }
 
-  private List<IMenu> fireTrayPopup() {
-    DesktopEvent e = new DesktopEvent(this, DesktopEvent.TYPE_TRAY_POPUP);
-    // single observer for exec callback
-    addLocalPopupMenus(e);
-    fireDesktopEvent(e);
-    return e.getPopupMenus();
-  }
-
   private void fireOutlineChanged(IOutline oldOutline, IOutline newOutline) {
     if (oldOutline != newOutline) {
       //extensions
@@ -1770,32 +1762,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
       for (DesktopListener listener : listeners) {
         listener.desktopChanged(event);
       }
-    }
-  }
-
-  private void addLocalPopupMenus(DesktopEvent event) {
-    try {
-      List<IMenu> list = new ArrayList<IMenu>();
-      //extensions
-      for (IDesktopExtension ext : getDesktopExtensions()) {
-        try {
-          ContributionCommand cc = ext.addTrayMenusDelegate(list);
-          if (cc == ContributionCommand.Stop) {
-            break;
-          }
-        }
-        catch (Exception ex) {
-          LOG.error("extension {}", ext, ex);
-        }
-      }
-      for (IMenu m : list) {
-        if (m != null && m.isVisible()) {
-          event.addPopupMenu(m);
-        }
-      }
-    }
-    catch (RuntimeException ex) {
-      BEANS.get(ExceptionHandler.class).handle(ex);
     }
   }
 
@@ -2158,11 +2124,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
         setOpenedInternal(false);
       }
       ClientSessionProvider.currentSession().stop();
-    }
-
-    @Override
-    public List<IMenu> fireTrayPopupFromUI() { // XXX AWE: ausbauen, auch event
-      return fireTrayPopup();
     }
   }
 
