@@ -113,7 +113,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   private BasicPropertySupport m_subtreePropertyChangeSupport;
   private P_MasterListener m_currentMasterListener;// my master
   private DataChangeListener m_internalDataChangeListener;
-  protected IContributionOwner m_contributionHolder;
+  protected ContributionComposite m_contributionHolder;
   private final ObjectExtensions<AbstractFormField, IFormFieldExtension<? extends AbstractFormField>> m_objectExtensions;
 
   private String m_initialLabel;
@@ -1896,6 +1896,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     m_objectExtensions.runInExtensionContext(new Runnable() {
       @Override
       public void run() {
+        m_contributionHolder.resetContributionsByClass(AbstractFormField.this, IKeyStroke.class);
         List<IKeyStroke> keyStrokes = initLocalKeyStrokes();
         propertySupport.setPropertyList(PROP_KEY_STROKES, keyStrokes);
       }
