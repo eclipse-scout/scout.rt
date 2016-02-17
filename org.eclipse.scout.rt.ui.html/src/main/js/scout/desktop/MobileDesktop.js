@@ -37,17 +37,6 @@ scout.MobileDesktop.prototype._render = function($parent) {
 /**
  * @override
  */
-scout.MobileDesktop.prototype.setOutline = function(outline, bringToFront) {
-  scout.MobileDesktop.parent.prototype.setOutline.call(this, outline, bringToFront);
-
-  // Never do lazy expanding since it is essential to see all nodes
-  outline.lazyExpandingEnabled = false;
-};
-
-/**
- * @override
- */
-
 scout.MobileDesktop.prototype._hasTaskBar = function() {
   return false;
 };

@@ -323,23 +323,33 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   }
 
   /**
-   * Moved from AbstractTreeBox to AbstractTree Checks / unchecks all visible child nodes if the parent node gets
-   * checked / unchecked.
+   * Checks / unchecks all visible child nodes if the parent node gets checked / unchecked.
    * <p>
-   * Makes only sense if
+   * Only has an effect if the tree is checkable.
    *
-   * <pre>
-   * {@link #getConfiguredCheckable()}
-   * </pre>
-   *
-   * is set to true.
-   *
+   * @see {@link #getConfiguredCheckable()}
    * @since 5.1
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(100)
   protected boolean getConfiguredAutoCheckChildNodes() {
     return false;
+  }
+
+  /**
+   * Configures whether it should be possible that child nodes may added lazily to the tree when expanding the node.
+   * This property controls whether the feature is available at all. If set to true you need to define which nodes are
+   * affected by using {@link ITreeNode#setLazyExpandingEnabled(boolean)}
+   * <p>
+   * Subclasses can override this method. Default is {@code true}.
+   *
+   * @see ITreeNode#isLazyExpandingEnabled()
+   * @see ITreeNode#isExpandedLazy()
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(110)
+  protected boolean getConfiguredLazyExpandingEnabled() {
+    return true;
   }
 
   private List<Class<? extends IKeyStroke>> getConfiguredKeyStrokes() {
@@ -545,6 +555,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     setScrollToSelection(getConfiguredScrollToSelection());
     setSaveAndRestoreScrollbars(getConfiguredSaveAndRestoreScrollbars());
     setAutoCheckChildNodes(getConfiguredAutoCheckChildNodes());
+    setLazyExpandingEnabled(getConfiguredLazyExpandingEnabled());
     setRootNode(new AbstractTreeNode() {
     });
     // add Convenience observer for drag & drop callbacks and event history
@@ -1005,6 +1016,16 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   }
 
   @Override
+  public boolean isLazyExpandingEnabled() {
+    return propertySupport.getPropertyBool(PROP_LAZY_EXPANDING_ENABLED);
+  }
+
+  @Override
+  public void setLazyExpandingEnabled(boolean lazyExpandingEnabled) {
+    propertySupport.setPropertyBool(PROP_LAZY_EXPANDING_ENABLED, lazyExpandingEnabled);
+  }
+
+  @Override
   public String getPathText(ITreeNode selectedNode) {
     return getPathText(selectedNode, " - ");
   }
@@ -1159,6 +1180,11 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
 
   @Override
   public void setNodeExpanded(ITreeNode node, boolean b, boolean lazy) {
+    // Never do lazy expansion if it is disabled on the tree
+    if (!isLazyExpandingEnabled()) {
+      lazy = false;
+    }
+
     node = resolveNode(node);
     if (node != null) {
       if (node.isExpanded() != b || node.isExpandedLazy() != lazy) {

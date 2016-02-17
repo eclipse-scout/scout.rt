@@ -141,6 +141,12 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
         return getModel().isEnabled();
       }
     });
+    putJsonProperty(new JsonProperty<TREE>(ITree.PROP_LAZY_EXPANDING_ENABLED, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isLazyExpandingEnabled();
+      }
+    });
     putJsonProperty(new JsonProperty<TREE>(ITree.PROP_AUTO_CHECK_CHILDREN, model) {
       @Override
       protected Boolean modelValue() {

@@ -43,6 +43,7 @@ public interface ITree extends IPropertyObserver, IDNDSupport, IAppLinkCapable, 
   String PROP_MULTI_CHECK = "multiCheck";
   String PROP_CHECKABLE = "checkable";
   String PROP_AUTO_CHECK_CHILDREN = "autoCheckChildren";
+  String PROP_LAZY_EXPANDING_ENABLED = "lazyExpandingEnabled";
   /**
    * Integer default -1
    */
@@ -223,6 +224,10 @@ public interface ITree extends IPropertyObserver, IDNDSupport, IAppLinkCapable, 
   void setEnabledGranted(boolean b);
 
   void setEnabledPermission(Permission p);
+
+  boolean isLazyExpandingEnabled();
+
+  void setLazyExpandingEnabled(boolean lazyExpandingEnabled);
 
   int getSelectedNodeCount();
 

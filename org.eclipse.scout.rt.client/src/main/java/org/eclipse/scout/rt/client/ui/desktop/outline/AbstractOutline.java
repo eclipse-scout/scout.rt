@@ -185,6 +185,11 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
     return AbstractIcons.Folder;
   }
 
+  /**
+   * Configures whether the navigate buttons are visible.
+   * <p>
+   * Navigation buttons give the possibility to navigate down or up the tree.
+   */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(160)
   protected boolean getConfiguredNavigateButtonsVisible() {

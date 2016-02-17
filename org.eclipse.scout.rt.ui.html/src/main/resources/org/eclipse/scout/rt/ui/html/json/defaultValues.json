@@ -173,7 +173,8 @@
       "multiCheck": true,
       "nodes": [],
       "selectedNodes": [],
-      "filterEnabled": false
+      "filterEnabled": false,
+      "lazyExpandingEnabled": true
     },
     "ImageField": {
       "scrollBarEnabled": false

@@ -26,7 +26,6 @@ scout.Tree = function() {
   this._keyStrokeSupport = new scout.KeyStrokeSupport(this);
   this._doubleClickSupport = new scout.DoubleClickSupport();
   this._$animationWrapper; // used by _renderExpansion()
-  this.lazyExpandingEnabled = true;
   this._filterMenusHandler = this._filterMenus.bind(this);
 };
 scout.inherits(scout.Tree, scout.ModelAdapter);
