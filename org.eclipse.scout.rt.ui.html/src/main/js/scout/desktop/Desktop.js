@@ -80,11 +80,10 @@ scout.Desktop.prototype._render = function($parent) {
   this._renderTaskBar($parent);
   this._renderBench();
   // render ToolMenus after bench because menus are a part of the taskbar and main structure with all elements
-  //on desktop should be rendered before fill them. Otherwise there are problems with Popups.
+  // on desktop should be rendered before fill them. Otherwise there are problems with Popups.
   this._renderToolMenus();
   this._createSplitter($parent);
   this._setSplitterPosition();
-  // TODO [5.2] awe, bsh: Maybe remove this? Addon functionality may be provided by using an own desktop.
   this.addOns.forEach(function(addOn) {
     addOn.render($parent);
   });

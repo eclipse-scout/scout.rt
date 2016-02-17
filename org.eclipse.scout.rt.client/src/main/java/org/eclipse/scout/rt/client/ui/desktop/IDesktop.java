@@ -781,7 +781,13 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent {
   Collection<Object> getAddOns();
 
   /**
-   * Adds an untyped add-on to the Desktop.
+   * Adds an untyped add-on to the Desktop. Add-ons are required when you want to extend your Desktop with something
+   * that needs to add elements to the DOM of the user interface. Typically these DOM elements are not visible, so the
+   * add-ons are not meant for clickable UI-elements but rather for technical features, like interfaces built with
+   * browser-technologies.
+   * <p>
+   * In order to render the add-ons in the UI you must extend your <code>JsonObjectFactory</code> and provide a
+   * <i>Json[AddOn].java</i> and an <i>[AddOn].js</i>.
    *
    * @since 5.1.0
    */
