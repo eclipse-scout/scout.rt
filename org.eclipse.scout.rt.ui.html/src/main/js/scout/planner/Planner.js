@@ -46,7 +46,6 @@ scout.Planner.Direction = {
  * @see IPlannerDisplayMode.java
  */
 scout.Planner.DisplayMode = $.extend({
-  INTRADAY: 0,
   CALENDAR_WEEK: 5,
   YEAR: 6
 }, scout.Calendar.DisplayMode);
@@ -943,8 +942,6 @@ scout.Planner.prototype._renderWorkDaysOnly = function() {};
 scout.Planner.prototype._renderFirstHourOfDay = function() {};
 
 scout.Planner.prototype._renderLastHourOfDay = function() {};
-
-scout.Planner.prototype._renderIntradayInterval = function() {};
 
 scout.Planner.prototype._renderAvailableDisplayModes = function() {
   // done by PlannerHeader.js

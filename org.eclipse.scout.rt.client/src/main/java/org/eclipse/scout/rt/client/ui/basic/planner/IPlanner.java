@@ -44,10 +44,6 @@ public interface IPlanner<RESOURCE_ID, ACTIVITY_ID> extends IPropertyObserver, I
    * {@link Date}
    */
   String PROP_LAST_HOUR_OF_DAY = "lastHourOfDay";
-  /**
-   * {@link Long}
-   */
-  String PROP_INTRADAY_INTERVAL = "intradayInterval";
 
   /**
    * {@link String}
@@ -60,8 +56,7 @@ public interface IPlanner<RESOURCE_ID, ACTIVITY_ID> extends IPropertyObserver, I
   String PROP_HEADER_VISIBLE = "headerVisible";
 
   /**
-   * {@link #INTRADAY},{@link #DAY}, {@link #WEEK}, {@link #MONTH},
-   * {@link #WORK_WEEK}
+   * {@link #DAY}, {@link #WEEK}, {@link #MONTH}, {@link #WORK_WEEK}
    */
   String PROP_DISPLAY_MODE = "displayMode";
 
@@ -151,14 +146,12 @@ public interface IPlanner<RESOURCE_ID, ACTIVITY_ID> extends IPropertyObserver, I
   void setLastHourOfDay(int i);
 
   /**
-   * {@link #INTRADAY},{@link #DAY}, {@link #WEEK}, {@link #MONTH},
-   * {@link #WORK_WEEK}
+   * {@link #DAY}, {@link #WEEK}, {@link #MONTH}, {@link #WORK_WEEK}
    */
   int getDisplayMode();
 
   /**
-   * {@link #INTRADAY},{@link #DAY}, {@link #WEEK}, {@link #MONTH},
-   * {@link #WORK_WEEK}
+   * {@link #DAY}, {@link #WEEK}, {@link #MONTH}, {@link #WORK_WEEK}
    */
   void setDisplayMode(int mode);
 
@@ -173,15 +166,6 @@ public interface IPlanner<RESOURCE_ID, ACTIVITY_ID> extends IPropertyObserver, I
   int getSelectionMode();
 
   void setSelectionMode(int mode);
-
-  /**
-   * milliseconds
-   */
-  long getIntradayInterval();
-
-  void setIntradayInterval(long millis);
-
-  void setIntradayIntervalInMinutes(long minutes);
 
   long getMinimumActivityDuration();
 

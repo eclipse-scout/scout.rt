@@ -130,7 +130,6 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
   @Order(10)
   protected Set<Integer> getConfiguredAvailableDisplayModes() {
     return CollectionUtility.hashSet(
-        IPlannerDisplayMode.INTRADAY,
         IPlannerDisplayMode.DAY,
         IPlannerDisplayMode.WEEK,
         IPlannerDisplayMode.MONTH,
@@ -161,12 +160,6 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
   @Order(130)
   protected int getConfiguredLastHourOfDay() {
     return 16;
-  }
-
-  @ConfigProperty(ConfigProperty.DURATION_MINUTES)
-  @Order(120)
-  protected long getConfiguredIntradayInterval() {
-    return 1800000L;
   }
 
   @ConfigProperty(ConfigProperty.DURATION_MINUTES)
@@ -205,7 +198,6 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
     Calendar to = Calendar.getInstance();
     DateUtility.truncCalendar(to);
     switch (displayMode) {
-      case IPlannerDisplayMode.INTRADAY:
       case IPlannerDisplayMode.DAY:
         to.add(Calendar.DAY_OF_WEEK, 1);
         break;
@@ -298,7 +290,6 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
     setHeaderVisible(getConfiguredHeaderVisible());
     setSelectionMode(getConfiguredSelectionMode());
     setFirstHourOfDay(getConfiguredFirstHourOfDay());
-    setIntradayInterval(getConfiguredIntradayInterval());
     setMinimumActivityDuration(getConfiguredMinimumActivityDuration());
     setLastHourOfDay(getConfiguredLastHourOfDay());
     // menus
@@ -855,24 +846,6 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
   @Override
   public void setLastHourOfDay(int i) {
     propertySupport.setPropertyInt(PROP_LAST_HOUR_OF_DAY, i);
-  }
-
-  @Override
-  public long getIntradayInterval() {
-    return propertySupport.getPropertyInt(PROP_INTRADAY_INTERVAL);
-  }
-
-  @Override
-  public void setIntradayInterval(long millis) {
-    if (millis < 15L * 60000L || millis > 24L * 3600000L) {
-      throw new IllegalArgumentException("intradayIntervalMinutes must be between 15 minutes and 24 hours");
-    }
-    propertySupport.setPropertyLong(PROP_INTRADAY_INTERVAL, millis);
-  }
-
-  @Override
-  public void setIntradayIntervalInMinutes(long min) {
-    setIntradayInterval(min * 60000L);
   }
 
   @Override
