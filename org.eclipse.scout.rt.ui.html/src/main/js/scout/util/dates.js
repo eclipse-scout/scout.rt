@@ -84,6 +84,13 @@ scout.dates = {
     return scout.dates.shiftToNextOrPrevDayOfType(date, 1, direction);
   },
 
+  ensureMonday: function(date, direction) {
+    if (date.getDay() === 1) {
+      return date;
+    }
+    return scout.dates.shiftToNextOrPrevMonday(date, direction);
+  },
+
   isSameDay: function(date, date2) {
     if (!date || !date2) {
       return false;

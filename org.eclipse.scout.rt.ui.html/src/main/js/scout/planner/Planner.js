@@ -185,15 +185,15 @@ scout.Planner.prototype._navigateDate = function(direction) {
     viewRange.to = scout.dates.shift(this.viewRange.to, 0, 0, direction);
   } else if (scout.isOneOf(this.displayMode, displayMode.WEEK, displayMode.WORK_WEEK)) {
     viewRange.from = scout.dates.shift(this.viewRange.from, 0, 0, direction * 7);
-    viewRange.from = scout.dates.shiftToNextOrPrevMonday(viewRange.from, -1 * direction);
+    viewRange.from = scout.dates.ensureMonday(viewRange.from, -1 * direction);
     viewRange.to = scout.dates.shift(this.viewRange.to, 0, 0, direction * 7);
   } else if (this.displayMode === displayMode.MONTH) {
     viewRange.from = scout.dates.shift(this.viewRange.from, 0, direction, 0);
-    viewRange.from = scout.dates.shiftToNextOrPrevMonday(viewRange.from, -1 * direction);
+    viewRange.from = scout.dates.ensureMonday(viewRange.from, -1 * direction);
     viewRange.to = scout.dates.shift(this.viewRange.to, 0, direction, 0);
   } else if (this.displayMode === displayMode.CALENDAR_WEEK) {
     viewRange.from = scout.dates.shift(this.viewRange.from, 0, direction, 0);
-    viewRange.from = scout.dates.shiftToNextOrPrevMonday(viewRange.from, -1 * direction);
+    viewRange.from = scout.dates.ensureMonday(viewRange.from, -1 * direction);
     viewRange.to = scout.dates.shift(this.viewRange.to, 0, direction, 0);
   } else if (this.displayMode === displayMode.YEAR) {
     viewRange.from = scout.dates.shift(this.viewRange.from, 0, 3 * direction, 0);
@@ -212,7 +212,7 @@ scout.Planner.prototype._onTodayClick = function(event) {
     displayMode = scout.Planner.DisplayMode;
 
   if (this.displayMode === displayMode.DAY) {
-    today = new Date(year, month, day);
+    today = new Date(year, month, date);
   } else if (this.displayMode === displayMode.YEAR) {
     today = new Date(year, month, 1);
   } else {

@@ -152,6 +152,23 @@ describe("scout.dates", function() {
     });
   });
 
+  describe("ensureMonday", function() {
+
+    it("shifts to next monday in direction if it is not a monday yet", function() {
+      var date = scout.dates.create('2016-02-09');
+      expect(scout.dates.ensureMonday(date, 1).toISOString()).toBe(scout.dates.create('2016-02-15 00:00:00.000').toISOString());
+
+      date = scout.dates.create('2016-02-21');
+      expect(scout.dates.ensureMonday(date, -1).toISOString()).toBe(scout.dates.create('2016-02-15 00:00:00.000').toISOString());
+
+      date = scout.dates.create('2016-02-15');
+      expect(scout.dates.ensureMonday(date, 1).toISOString()).toBe(scout.dates.create('2016-02-15 00:00:00.000').toISOString());
+
+      date = scout.dates.create('2016-02-15');
+      expect(scout.dates.ensureMonday(date, -1).toISOString()).toBe(scout.dates.create('2016-02-15 00:00:00.000').toISOString());
+    });
+  });
+
   describe("isSameDay", function() {
     it("returns true if day, month and year matches", function() {
       var date = scout.dates.create('2014-11-21');
