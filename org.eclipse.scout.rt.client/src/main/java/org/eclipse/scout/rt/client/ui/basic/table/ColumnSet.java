@@ -1461,7 +1461,7 @@ public class ColumnSet {
       if (IColumn.PROP_VIEW_COLUMN_INDEX_HINT.equals(e.getPropertyName())) {
         return;
       }
-      if (IColumn.PROP_VIEW_ORDER.equals(e.getPropertyName())) {
+      if (IColumn.PROP_ORDER.equals(e.getPropertyName())) {
         resetColumnsViewOrder();
         return;
       }

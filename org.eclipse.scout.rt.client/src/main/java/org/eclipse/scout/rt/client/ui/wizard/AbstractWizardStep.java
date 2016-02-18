@@ -486,12 +486,12 @@ public abstract class AbstractWizardStep<FORM extends IForm> extends AbstractPro
 
   @Override
   public double getOrder() {
-    return propertySupport.getPropertyDouble(PROP_VIEW_ORDER);
+    return propertySupport.getPropertyDouble(PROP_ORDER);
   }
 
   @Override
   public void setOrder(double order) {
-    propertySupport.setPropertyDouble(PROP_VIEW_ORDER, order);
+    propertySupport.setPropertyDouble(PROP_ORDER, order);
   }
 
   @Override

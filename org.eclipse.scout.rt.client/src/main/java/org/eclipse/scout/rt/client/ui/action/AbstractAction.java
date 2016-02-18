@@ -417,12 +417,12 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
 
   @Override
   public double getOrder() {
-    return propertySupport.getPropertyDouble(PROP_VIEW_ORDER);
+    return propertySupport.getPropertyDouble(PROP_ORDER);
   }
 
   @Override
   public void setOrder(double order) {
-    propertySupport.setPropertyDouble(PROP_VIEW_ORDER, order);
+    propertySupport.setPropertyDouble(PROP_ORDER, order);
   }
 
   @Override

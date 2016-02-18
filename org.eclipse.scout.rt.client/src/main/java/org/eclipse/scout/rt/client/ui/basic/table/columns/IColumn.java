@@ -77,7 +77,7 @@ public interface IColumn<VALUE> extends IPropertyObserver, ITypeWithClassId, IOr
 
   String PROP_EDITABLE = "editable";
 
-  String PROP_VIEW_ORDER = "viewOrder";
+  String PROP_ORDER = "order";
 
   /**
    * type boolean

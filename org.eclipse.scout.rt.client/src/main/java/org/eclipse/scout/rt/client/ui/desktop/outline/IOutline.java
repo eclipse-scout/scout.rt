@@ -63,7 +63,7 @@ public interface IOutline extends ITree, ITypeWithClassId, IOrdered, IDisplayPar
    */
   String PROP_SEARCH_FORM = "searchForm";
 
-  String PROP_VIEW_ORDER = "viewOrder";
+  String PROP_ORDER = "order";
 
   String PROP_BREADCRUMB_ENABLED = "breadcrumbEnabled";
 

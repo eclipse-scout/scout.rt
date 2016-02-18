@@ -71,7 +71,7 @@ public interface IFormField extends IPropertyObserver, ITypeWithClassId, IOrdere
   String PROP_VISIBLE = "visible";
   String PROP_ENABLED = "enabled";
   String PROP_MANDATORY = "mandatory";
-  String PROP_VIEW_ORDER = "viewOrder";
+  String PROP_ORDER = "order";
   String PROP_ERROR_STATUS = "errorStatus";
   String PROP_TOOLTIP_TEXT = "tooltipText";
   String PROP_FOREGROUND_COLOR = "foregroundColor";

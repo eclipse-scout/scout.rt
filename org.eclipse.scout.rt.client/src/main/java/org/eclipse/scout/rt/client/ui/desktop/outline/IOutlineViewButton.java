@@ -15,7 +15,7 @@ import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 
 public interface IOutlineViewButton extends IViewButton {
 
-  IDesktop getDesktop();
+  IDesktop getDesktop(); // FIXME AWE: remove? makes no sense...
 
   IOutline getOutline();
 

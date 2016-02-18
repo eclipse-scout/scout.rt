@@ -37,7 +37,7 @@ public interface IAction extends IPropertyObserver, ITypeWithClassId, IOrdered {
   String PROP_VISIBLE = "visible";
   String PROP_MNEMONIC = "mnemonic";
   String PROP_KEY_STROKE = "keyStroke";
-  String PROP_VIEW_ORDER = "viewOrder"; // FIXME awe: evtl. nur order renamen (gab früher probleme in CRM) --> MVI fragen
+  String PROP_ORDER = "order";
   String PROP_HORIZONTAL_ALIGNMENT = "horizontalAlignment";
   int HORIZONTAL_ALIGNMENT_LEFT = -1;
   int HORIZONTAL_ALIGNMENT_RIGHT = 1;

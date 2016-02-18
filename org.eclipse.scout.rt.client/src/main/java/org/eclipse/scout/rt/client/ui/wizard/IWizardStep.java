@@ -27,7 +27,7 @@ public interface IWizardStep<FORM extends IForm> extends IPropertyObserver, ITyp
   String PROP_ICON_ID = "iconId";
   String PROP_ENABLED = "enabled";
   String PROP_VISIBLE = "visible";
-  String PROP_VIEW_ORDER = "viewOrder";
+  String PROP_ORDER = "order";
   String PROP_ACTION_ENABLED = "actionEnabled";
 
   /**
