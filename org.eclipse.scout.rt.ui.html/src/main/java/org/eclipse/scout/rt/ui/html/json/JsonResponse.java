@@ -401,13 +401,15 @@ public class JsonResponse {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder("JsonResponse [");
-    sb.append("#" + m_sequenceNo);
-    sb.append(", adapters: ").append(m_adapterMap.size());
-    sb.append(", events: ").append(m_eventList.size());
-    sb.append(", buffered events adapters: ").append(m_bufferedEventsAdapters.size());
-    if (m_startupData != null) {
-      sb.append(", MARKED AS STARTUP RESPONSE");
+    if (m_sequenceNo != null) {
+      sb.append("#").append(m_sequenceNo).append(", ");
     }
+    if (m_startupData != null) {
+      sb.append("STARTUP RESPONSE, ");
+    }
+    sb.append("adapters: ").append(m_adapterMap.size()).append(", ");
+    sb.append("events: ").append(m_eventList.size()).append(", ");
+    sb.append("buffered events adapters: ").append(m_bufferedEventsAdapters.size());
     if (m_error) {
       sb.append(", MARKED AS ERROR ").append(m_errorCode).append(": ").append(m_errorMessage);
     }
