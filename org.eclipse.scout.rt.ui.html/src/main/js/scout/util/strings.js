@@ -13,6 +13,7 @@ scout.strings = {
   /**
    * @param text
    * @param encodeHtml defaults to true
+   * @memberOf scout.strings
    */
   nl2br: function(text, encodeHtml) {
     if (!text) {
