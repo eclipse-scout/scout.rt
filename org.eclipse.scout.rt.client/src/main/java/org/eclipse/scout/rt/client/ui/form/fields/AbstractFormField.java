@@ -19,7 +19,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.dto.FormData;
 import org.eclipse.scout.rt.client.dto.FormData.SdkCommand;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.FormFieldChains;
@@ -34,7 +33,6 @@ import org.eclipse.scout.rt.client.extension.ui.form.fields.FormFieldChains.Form
 import org.eclipse.scout.rt.client.extension.ui.form.fields.FormFieldChains.FormFieldMarkSavedChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.services.common.search.ISearchFilterService;
-import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.DataChangeListener;
 import org.eclipse.scout.rt.client.ui.WeakDataChangeListener;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
@@ -958,7 +956,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
         }
       };
     }
-    ClientRunContexts.copyCurrent().getDesktop().addDataChangeListener(m_internalDataChangeListener, dataTypes);
+    IDesktop.CURRENT.get().addDataChangeListener(m_internalDataChangeListener, dataTypes);
   }
 
   /**
@@ -971,7 +969,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
    */
   public void unregisterDataChangeListener(Object... dataTypes) {
     if (m_internalDataChangeListener != null) {
-      ClientSessionProvider.currentSession().getDesktop().removeDataChangeListener(m_internalDataChangeListener, dataTypes);
+      IDesktop.CURRENT.get().removeDataChangeListener(m_internalDataChangeListener, dataTypes);
     }
   }
 
