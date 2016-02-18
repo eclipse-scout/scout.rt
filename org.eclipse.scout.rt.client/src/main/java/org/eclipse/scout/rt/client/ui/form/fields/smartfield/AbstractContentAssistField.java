@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -58,6 +59,7 @@ import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledException;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedException;
 import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 import org.eclipse.scout.rt.shared.services.lookup.CodeLookupCall;
@@ -101,6 +103,14 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
   private boolean m_loadIncremental;
   private int m_proposalFormHeight;
   private String m_wildcard;
+
+  /**
+   * Provides the label-texts for the radio-buttons of the active-filter.
+   */
+  private String[] m_activeFilterLabels = {
+      TEXTS.get("ui.All"),
+      TEXTS.get("ui.Inactive"),
+      TEXTS.get("ui.Active")};
 
   private ILookupRow<LOOKUP_KEY> m_currentLookupRow;
 
@@ -481,6 +491,28 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
         t = TriState.TRUE;
       }
       m_activeFilter = t;
+    }
+  }
+
+  @Override
+  public void setActiveFilterLabel(TriState state, String label) {
+    m_activeFilterLabels[getIndexForTriState(state)] = label;
+  }
+
+  @Override
+  public String[] getActiveFilterLabels() {
+    return Arrays.copyOf(m_activeFilterLabels, m_activeFilterLabels.length);
+  }
+
+  private int getIndexForTriState(TriState state) {
+    if (state.isUndefined()) {
+      return 0;
+    }
+    else if (state.isFalse()) {
+      return 1;
+    }
+    else {
+      return 2;
     }
   }
 

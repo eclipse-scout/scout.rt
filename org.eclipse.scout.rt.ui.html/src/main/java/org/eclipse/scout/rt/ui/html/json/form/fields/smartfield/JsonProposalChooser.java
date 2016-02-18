@@ -20,6 +20,7 @@ import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.JsonStatus;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterProperty;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class JsonProposalChooser<PROPOSAL_CHOOSER extends IProposalChooser> extends AbstractJsonPropertyObserver<PROPOSAL_CHOOSER> {
@@ -90,7 +91,9 @@ public class JsonProposalChooser<PROPOSAL_CHOOSER extends IProposalChooser> exte
     JSONObject json = super.toJson();
     if (getModel().isActiveFilterEnabled()) {
       putProperty(json, "activeFilter", getModel().getActiveFilter().name());
+      putProperty(json, "activeFilterLabels", new JSONArray(getModel().getActiveFilterLabels()));
     }
     return json;
   }
+
 }

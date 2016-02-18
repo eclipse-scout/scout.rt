@@ -165,6 +165,11 @@ public abstract class AbstractProposalChooser<T, LOOKUP_KEY> extends AbstractPro
   }
 
   @Override
+  public String[] getActiveFilterLabels() {
+    return m_contentAssistField.getActiveFilterLabels();
+  }
+
+  @Override
   public void updateActiveFilter(TriState activeState) {
     m_contentAssistField.setActiveFilter(activeState);
     m_contentAssistField.doSearch(false, false);

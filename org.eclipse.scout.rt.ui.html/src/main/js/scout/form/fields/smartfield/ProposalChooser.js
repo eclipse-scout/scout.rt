@@ -24,7 +24,7 @@ scout.ProposalChooser.prototype._render = function($parent) {
   this.htmlComp.setLayout(new scout.ProposalChooserLayout(this));
   this.model.render(this.$container);
   if (this.model instanceof scout.Tree) {
-    //disable focus on field container
+    // disable focus on field container
     this.model._onNodeControlMouseDownDoFocus = function() {};
   }
 
@@ -37,9 +37,9 @@ scout.ProposalChooser.prototype._render = function($parent) {
       parent: this
     });
 
-    this._appendOption(group, 'UNDEFINED', this.session.text('ui.All'), true);
-    this._appendOption(group, 'TRUE', this.session.text('ui.Active'), false);
-    this._appendOption(group, 'FALSE', this.session.text('ui.Inactive'), false);
+    this._appendOption(group, 'UNDEFINED', this.activeFilterLabels[0], true);
+    this._appendOption(group, 'TRUE', this.activeFilterLabels[2], false);
+    this._appendOption(group, 'FALSE', this.activeFilterLabels[1], false);
 
     group.render(this._$activeFilter);
   }

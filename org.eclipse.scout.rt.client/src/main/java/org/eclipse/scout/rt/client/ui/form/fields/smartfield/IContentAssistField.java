@@ -63,7 +63,22 @@ public interface IContentAssistField<VALUE, LOOKUP_KEY> extends IValueField<VALU
   /**
    * see {@link #isActiveFilterEnabled()}
    */
-  void setActiveFilterEnabled(boolean b);
+  void setActiveFilterEnabled(boolean enabled);
+
+  /**
+   * Changes the default-label text for the active-filter radio-button with the given state.
+   */
+  void setActiveFilterLabel(TriState state, String label);
+
+  /**
+   * Returns the label-texts of the active-filter radio-button in this order:
+   * <ol>
+   * <li>UNDEFINED</li>
+   * <li>FALSE</li>
+   * <li>TRUE</li>
+   * </ol>
+   */
+  String[] getActiveFilterLabels();
 
   /**
    * This has only an effect if {@link #isActiveFilterEnabled()} is set to true. true: include only active values false:
@@ -74,7 +89,7 @@ public interface IContentAssistField<VALUE, LOOKUP_KEY> extends IValueField<VALU
   /**
    * see {@link #getActiveFilter()}
    */
-  void setActiveFilter(TriState t);
+  void setActiveFilter(TriState state);
 
   String getBrowseIconId();
 

@@ -68,7 +68,13 @@ public interface IProposalChooser<T, LOOKUP_KEY> extends IPropertyObserver {
   TriState getActiveFilter();
 
   /**
-   * Delegates to contentAssistField to set the given activeState filter and triggers a new search.
+   * @return Delegates to {@link IContentAssistField#getActiveFilterLabels()}
+   */
+  String[] getActiveFilterLabels();
+
+  /**
+   * Delegates to {@link IContentAssistField#getActiveFilter()} to set the given activeState filter and triggers a new
+   * search.
    */
   void updateActiveFilter(TriState activeState);
 
