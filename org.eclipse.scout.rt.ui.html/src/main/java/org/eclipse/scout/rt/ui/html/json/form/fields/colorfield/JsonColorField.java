@@ -15,7 +15,11 @@ import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonValueField;
 
-// FIXME awe: impl. JsonColorField
+/**
+ * Currently not supported by Html UI. JsonColorField.java and ColorField.js are just stub implementations.
+ *
+ * @since 5.2
+ */
 public class JsonColorField<COLOR_FIELD extends IColorField> extends JsonValueField<COLOR_FIELD> {
 
   public JsonColorField(COLOR_FIELD model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {

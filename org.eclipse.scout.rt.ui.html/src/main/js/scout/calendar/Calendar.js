@@ -832,7 +832,7 @@ scout.Calendar.prototype._arrangeComponentInitialW = function($children) {
 };
 
 scout.Calendar.prototype._arrangeComponentFindPlacement = function($children) {
-  // FIXME awe: placement may be improved, test cases needed
+  // FIXME awe: (calendar) placement may be improved, test cases needed
   // 1: change x if column on the left side free
   // 2: change w if place on the right side not used
   // -> then find new w (just use _arrangeComponentInitialW)

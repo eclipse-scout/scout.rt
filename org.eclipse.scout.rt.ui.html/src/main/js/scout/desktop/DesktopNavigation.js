@@ -8,7 +8,6 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-// FIXME nbu/AWE: inherit from Widget.js? refactor un-/installKeyStroke
 scout.DesktopNavigation = function(desktop) {
   this.desktop = desktop;
   this.session = desktop.session;

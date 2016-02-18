@@ -432,7 +432,7 @@ scout.ModelAdapter.prototype._renderPropertiesOnPropertyChange = function(oldPro
       if (!this[renderFuncName]) {
         throw new Error('Render function ' + renderFuncName + ' does not exist in ' + this.toString());
       }
-      // FIXME awe, cgu: value and oldValue should be switched to conform with other functions.
+      // TODO awe, cgu: (model-adapter) value and oldValue should be switched to conform with other functions.
       // Or better create remove function as it is done with adapters? currently only "necessary" for AnalysisTableControl
       // Input von 08.04.15: z.Z. wird die _renderXxx Methode sehr uneinheitlich verwendet. Manche mit ohne Parameter, andere mit
       // 1 oder 2 Parameter. Dann gibt es noch Fälle (DateField.js) bei denen es nötig ist, render aufzurufen, aber mit einem

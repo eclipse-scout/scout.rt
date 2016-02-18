@@ -38,6 +38,9 @@ scout.DesktopTabBarLayout.prototype._toolsWidth = function($tools, cssClasses) {
 };
 
 /**
+ * TODO awe: this layout works primarily with DOM elements and jQuery selectors, it would be better
+ * to use the model objects instead. This should be considered, when this layout is refactored the next time.
+ *
  * @override AbstractLayout.js
  */
 scout.DesktopTabBarLayout.prototype.layout = function($container) {
@@ -131,9 +134,6 @@ scout.DesktopTabBarLayout.prototype.layout = function($container) {
     var numVisibleTabs = Math.floor(tabsWidth / this.TAB_WIDTH_SMALL),
       numOverflowTabs = numTabs - numVisibleTabs;
 
-    // FIXME awe: display correct range of tabs (around visible tab)
-    // FIXME awe: tabs have no 'selected' state, this must be added together with activeForm on model Desktop
-    // Never put selected tab into overflow
     var i = 0, selectedIndex = 0;
     $tabs.find('.desktop-view-tab').each(function() {
       if ($(this).hasClass('selected')) {
