@@ -125,11 +125,6 @@ scout.menus = {
     }
   },
 
-  isButton: function(obj) {
-    // FIXME awe: check this too, move to Menu.js#isButton
-    return obj instanceof scout.Menu && obj.actionStyle === scout.Action.ActionStyle.BUTTON;
-  },
-
   showContextMenuWithWait: function(session, func) {
     var argumentsArray = Array.prototype.slice.call(arguments);
     argumentsArray.shift(); // remove argument session

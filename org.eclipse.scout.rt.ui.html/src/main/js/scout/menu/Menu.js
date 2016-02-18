@@ -77,7 +77,7 @@ scout.Menu.prototype._renderItem = function($parent) {
 
   // when menus with button style are displayed in a overflow-menu,
   // render as regular menu, ignore button styles.
-  if (scout.Action.ActionStyle.BUTTON === this.actionStyle && !this.overflow) {
+  if (this.isButton() && !this.overflow) {
     this.$container.addClass('menu-button');
   }
 };
@@ -176,7 +176,7 @@ scout.Menu.prototype._renderIconId = function() {
 };
 
 scout.Menu.prototype.isTabTarget = function() {
-  return this.enabled && this.visible && (this.actionStyle === scout.Action.ActionStyle.BUTTON || !this.separator);
+  return this.enabled && this.visible && (this.isButton() || !this.separator);
 };
 
 scout.Menu.prototype._updateIconAndTextStyle = function() {
@@ -240,4 +240,8 @@ scout.Menu.prototype._createActionKeyStroke = function() {
 
 scout.Menu.prototype.isToggleAction = function() {
   return this.childActions.length > 0 || this.toggleAction;
+};
+
+scout.Menu.prototype.isButton = function() {
+  return scout.Action.ActionStyle.BUTTON === this.actionStyle;
 };

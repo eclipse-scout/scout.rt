@@ -17,7 +17,7 @@ scout.GroupBoxMenuItemsOrder.prototype.order = function(items) {
     rightMenus = [];
 
   items.forEach(function(item) {
-    if (scout.menus.isButton(item)) {
+    if (item.isButton()) {
       var horizontalAlignment = item.horizontalAlignment;
       if (horizontalAlignment === undefined) {
         // Real buttons have no property 'horizontalAlignment' but a corresponding field on the gridData

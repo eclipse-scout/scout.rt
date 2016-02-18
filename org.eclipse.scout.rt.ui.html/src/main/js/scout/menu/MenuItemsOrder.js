@@ -29,7 +29,7 @@ scout.MenuItemsOrder.prototype.order = function(items) {
     if (item.createdBy === this) {
       return;
     }
-    if (scout.menus.isButton(item)) {
+    if (item.isButton()) {
       buttons.push(item);
     } else if (item.horizontalAlignment === 1) {
       rightItems.push(item);
