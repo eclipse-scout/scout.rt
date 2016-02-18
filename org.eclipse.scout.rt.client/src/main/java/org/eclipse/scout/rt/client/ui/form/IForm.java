@@ -62,7 +62,6 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId, IDis
   String PROP_EMPTY = "empty";
   String PROP_SAVE_NEEDED = "saveNeeded";
   String PROP_ICON_ID = "iconId";
-  String PROP_PERSPECTIVE_ID = "perspectiveId";
 
   /**
    * Hint to render an {@link IForm} as dialog in a separate window. A dialog can be modal or non-modal.
@@ -96,9 +95,6 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId, IDis
    * Hint to render a {@link IForm} in non-modal state.
    */
   int MODALITY_HINT_MODELESS = 20;
-
-  int TOOLBAR_FORM_HEADER = 30;
-  int TOOLBAR_VIEW_PART = 31;
 
   String VIEW_ID_N = "N";
   String VIEW_ID_NE = "NE";
@@ -173,10 +169,6 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId, IDis
   String getIconId();
 
   void setIconId(String s);
-
-  String getPerspectiveId();
-
-  void setPerspectiveId(String s);
 
   /**
    * @return the {@link IWizard} that contains the step that started this form using startWizardStep
@@ -693,10 +685,5 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId, IDis
   IEventHistory<FormEvent> getEventHistory();
 
   IFormUIFacade getUIFacade();
-
-  /**
-   * @return
-   */
-  int getToolbarLocation();
 
 }

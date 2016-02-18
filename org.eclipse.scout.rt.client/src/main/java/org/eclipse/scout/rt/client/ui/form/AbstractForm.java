@@ -194,8 +194,6 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
 
   private String m_classId;
 
-  private int m_toolbarLocation;
-
   private final PreferredValue<IDisplayParent> m_displayParent = new PreferredValue<>(null, false);
   private ClientRunContext m_initialClientRunContext; // ClientRunContext of the calling context during initialization.
 
@@ -429,17 +427,6 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     return null;
   }
 
-  /**
-   * {@link IForm#TOOLBAR_VIEW_PART}. In all other cases the fallback {@link IForm#TOOLBAR_FORM_HEADER} is taken.
-   *
-   * @return {@link IForm#TOOLBAR_FORM_HEADER} | {@link IForm#TOOLBAR_VIEW_PART}
-   */
-  @ConfigProperty(ConfigProperty.TOOLBAR_LOCATION)
-  @Order(160)
-  protected int getConfiguredToolbarLocation() {
-    return TOOLBAR_FORM_HEADER;
-  }
-
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(170)
   protected int/* seconds */ getConfiguredCloseTimer() {
@@ -629,11 +616,9 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
 
   protected void initConfig() {
     m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(new P_UIFacade(), ModelContext.copyCurrent().withForm(this));
-
     m_timerFutureMap = new HashMap<>();
     setShowOnStart(getConfiguredShowOnStart());
     m_contributionHolder = new ContributionComposite(this);
-    setToolbarLocation(getConfiguredToolbarLocation());
 
     // prepare injected fields
     List<Class<IFormField>> fieldArray = getConfiguredInjectedFields();
@@ -799,28 +784,6 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   @Override
   public void setIconId(String iconId) {
     propertySupport.setPropertyString(PROP_ICON_ID, iconId);
-  }
-
-  @Override
-  public String getPerspectiveId() {
-    return propertySupport.getPropertyString(PROP_PERSPECTIVE_ID);
-  }
-
-  @Override
-  public void setPerspectiveId(String perspectiveId) {
-    propertySupport.setPropertyString(PROP_PERSPECTIVE_ID, perspectiveId);
-  }
-
-  /**
-   * @param configuredToolbuttonLocation
-   */
-  private void setToolbarLocation(int toolbarLocation) {
-    m_toolbarLocation = toolbarLocation;
-  }
-
-  @Override
-  public int getToolbarLocation() {
-    return m_toolbarLocation;
   }
 
   /**
