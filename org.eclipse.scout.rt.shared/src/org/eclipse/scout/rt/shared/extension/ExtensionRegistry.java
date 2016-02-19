@@ -702,4 +702,49 @@ public class ExtensionRegistry extends AbstractService implements IInternalExten
       m_scopeStack.remove();
     }
   }
+
+  @Override
+  public ExtensionContext backupExtensionContext() {
+    if (m_scopeStack.get() == null) {
+      throw new IllegalArgumentException();
+    }
+    if (m_extensionStack.get() == null) {
+      throw new IllegalArgumentException();
+    }
+    final ScopeStack scopeStack = m_scopeStack.get();
+    final ExtensionStack extensionStack = m_extensionStack.get();
+    return new ExtensionContext(scopeStack, extensionStack);
+  }
+
+  @Override
+  public void runInContext(ExtensionContext ctx, Runnable runnable) {
+    if (ctx == null) {
+      throw new IllegalArgumentException("Extension context must not be null");
+    }
+    if (runnable == null) {
+      throw new IllegalArgumentException("Runnable must not be null");
+    }
+    // backup current extension context
+    final ScopeStack scopeStack = m_scopeStack.get();
+    final ExtensionStack extensionStack = m_extensionStack.get();
+    try {
+      m_scopeStack.set(ctx.getScopeStack());
+      m_extensionStack.set(ctx.getExtensionStack());
+      runnable.run();
+    }
+    finally {
+      // restore extension context
+      restoreStack(m_scopeStack, scopeStack);
+      restoreStack(m_extensionStack, extensionStack);
+    }
+  }
+
+  private <STACK> void restoreStack(ThreadLocal<STACK> threadLocal, STACK value) {
+    if (value == null) {
+      threadLocal.remove();
+    }
+    else {
+      threadLocal.set(value);
+    }
+  }
 }
