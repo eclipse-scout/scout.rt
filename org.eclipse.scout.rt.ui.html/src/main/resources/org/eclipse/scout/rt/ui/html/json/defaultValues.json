@@ -181,7 +181,10 @@
       "scrollBarEnabled": false
     },
     "HtmlField": {
-      "scrollBarsEnabled": false
+      "scrollBarEnabled": false
+    },
+    "BrowserField": {
+      "scrollBarEnabled": false
     },
 
     // Other objects
