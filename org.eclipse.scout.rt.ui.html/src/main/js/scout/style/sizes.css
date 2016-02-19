@@ -10,7 +10,7 @@
  ******************************************************************************/
 @size-desktop-navigation: 290px;
 @size-desktop-navigation-breadcrumb: 240px;
-@desktop-taskbar-height: 51px;
+@desktop-header-height: 51px;
 @bench-padding-x: 20px;
 
 @text-field-padding-y: 7px;

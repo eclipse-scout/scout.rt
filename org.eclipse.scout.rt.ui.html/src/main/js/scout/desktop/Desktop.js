@@ -12,8 +12,8 @@ scout.Desktop = function() {
   scout.Desktop.parent.call(this);
 
   this._$viewTabBar;
-  this._$taskBar; // FIXME awe: uniform naming
-  this._$toolBar; // FIXME awe: uniform naming
+  this._$header;
+  this._$toolBar;
   this.$bench;
 
   this.navigation;
@@ -85,9 +85,9 @@ scout.Desktop.prototype._render = function($parent) {
   this._installKeyStrokeContextForDesktopViewButtonBar();
   this._installKeyStrokeContextForDesktop();
 
-  this._renderTaskBar($parent);
+  this._renderHeader($parent);
   this._renderBench();
-  // render ToolMenus after bench because menus are a part of the taskbar and main structure with all elements
+  // render ToolMenus after bench because menus are a part of the header and main structure with all elements
   // on desktop should be rendered before fill them. Otherwise there are problems with Popups.
   this._renderToolMenus();
   this._createSplitter($parent);
@@ -182,15 +182,15 @@ scout.Desktop.prototype._installKeyStrokeContextForDesktopViewButtonBar = functi
 /**
  * Installs the keystrokes referring to the desktop task bar, and are keystrokes associated with FormToolButtons (desktop.actions).
  */
-scout.Desktop.prototype._installKeyStrokeContextForDesktopTaskBar = function() {
-  if (!this._hasTaskBar()) {
+scout.Desktop.prototype._installKeyStrokeContextForDesktopHeader = function() {
+  if (!this._hasHeader()) {
     return;
   }
   var keyStrokeContext = new scout.KeyStrokeContext();
 
   keyStrokeContext.invokeAcceptInputOnActiveValueField = true;
   keyStrokeContext.$bindTarget = this.session.$entryPoint;
-  keyStrokeContext.$scopeTarget = this._$taskBar;
+  keyStrokeContext.$scopeTarget = this._$header;
   keyStrokeContext.registerKeyStroke([
     new scout.ViewTabSelectKeyStroke(this),
     new scout.DisableBrowserTabSwitchingKeyStroke(this)
@@ -242,14 +242,14 @@ scout.Desktop.prototype._renderActiveForm = function($parent) {
 };
 
 scout.Desktop.prototype._renderToolMenus = function() {
-  if (!this._hasTaskBar()) {
+  if (!this._hasHeader()) {
     return;
   }
 
   // we set the menuStyle property to render a menu with a different style
-  // depending on where the menu is located (taskbar VS menubar).
+  // depending on where the menu is located (header VS menubar).
   this.actions.forEach(function(action) {
-    action._customCssClasses = "taskbar-tool-item";
+    action._customCssClasses = "header-tool-item";
     action.popupOpeningDirectionX = 'left';
     action.render(this._$toolBar);
   }.bind(this));
@@ -264,7 +264,7 @@ scout.Desktop.prototype._renderBench = function() {
     return;
   }
   this.$bench = this.$container.appendDiv('desktop-bench');
-  this.$bench.toggleClass('has-taskbar', this._hasTaskBar());
+  this.$bench.toggleClass('has-header', this._hasHeader());
   var htmlBench = new scout.HtmlComponent(this.$bench, this.session);
   htmlBench.setLayout(new scout.DesktopBenchLayout(this));
   htmlBench.pixelBasedSizing = false;
@@ -288,21 +288,21 @@ scout.Desktop.prototype._renderBenchVisible = function() {
   }
 };
 
-scout.Desktop.prototype._renderTaskBar = function($parent) {
-  if (!this._hasTaskBar()) {
+scout.Desktop.prototype._renderHeader = function($parent) {
+  if (!this._hasHeader()) {
     return;
   }
-  this._$taskBar = $parent.appendDiv('desktop-taskbar');
-  var htmlTaskBar = new scout.HtmlComponent(this._$taskBar, this.session);
-  htmlTaskBar.setLayout(new scout.DesktopTabBarLayout(this));
-  htmlTaskBar.pixelBasedSizing = false;
-  this._$viewTabBar = this._$taskBar.appendDiv('desktop-view-tabs');
-  this._$toolBar = this._$taskBar.appendDiv('taskbar-tools');
-  if (this.session.uiUseTaskbarLogo) {
-    this._$taskBarLogo = this._$taskBar.appendDiv('taskbar-logo');
+  this._$header = $parent.appendDiv('desktop-header');
+  var htmlHeader = new scout.HtmlComponent(this._$header, this.session);
+  htmlHeader.setLayout(new scout.DesktopHeaderLayout(this));
+  htmlHeader.pixelBasedSizing = false;
+  this._$viewTabBar = this._$header.appendDiv('desktop-view-tabs');
+  this._$toolBar = this._$header.appendDiv('header-tools');
+  if (this.session.uiUseHeaderLogo) {
+    this._$applicationLogo = this._$header.appendDiv('application-logo');
 
     // in memory of the first one...
-    this._$taskBarLogo.dblclick(function(event) {
+    this._$applicationLogo.dblclick(function(event) {
       if (event.altKey && event.ctrlKey) {
         $(event.target).css('background', 'none');
         $(event.target).css('font-size', '9px');
@@ -310,7 +310,7 @@ scout.Desktop.prototype._renderTaskBar = function($parent) {
       }
     });
   }
-  this._installKeyStrokeContextForDesktopTaskBar();
+  this._installKeyStrokeContextForDesktopHeader();
 };
 
 scout.Desktop.prototype._setupDragAndDrop = function() {
@@ -367,7 +367,7 @@ scout.Desktop.prototype._hasNavigation = function() {
   return this.desktopStyle === scout.DesktopStyle.DEFAULT;
 };
 
-scout.Desktop.prototype._hasTaskBar = function() {
+scout.Desktop.prototype._hasHeader = function() {
   return this.desktopStyle === scout.DesktopStyle.DEFAULT;
 };
 
@@ -379,10 +379,10 @@ scout.Desktop.prototype.onResize = function(event) {
   this.revalidateLayout();
 };
 
-scout.Desktop.prototype.revalidateTaskBarLayout = function() {
-  if (this._hasTaskBar()) {
-    var htmlTaskBar = scout.HtmlComponent.get(this._$taskBar);
-    htmlTaskBar.revalidateLayout();
+scout.Desktop.prototype.revalidateHeaderLayout = function() {
+  if (this._hasHeader()) {
+    var htmlHeader = scout.HtmlComponent.get(this._$header);
+    htmlHeader.revalidateLayout();
   }
 };
 

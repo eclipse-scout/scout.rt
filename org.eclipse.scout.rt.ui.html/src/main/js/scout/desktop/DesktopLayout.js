@@ -15,9 +15,9 @@ scout.DesktopLayout = function(desktop) {
 scout.inherits(scout.DesktopLayout, scout.AbstractLayout);
 
 scout.DesktopLayout.prototype.layout = function($container) {
-  var navigationSize, taskBarSize, htmlTaskBar, htmlBench, htmlBenchSize,
+  var navigationSize, headerSize, htmlHeader, htmlBench, htmlBenchSize,
     navigationWidth = 0,
-    taskBarHeight = 0,
+    headerHeight = 0,
     htmlContainer = this.desktop.htmlComp,
     htmlNavigation = this.desktop.navigation.htmlComp,
     containerSize = htmlContainer.getAvailableSize();
@@ -35,21 +35,21 @@ scout.DesktopLayout.prototype.layout = function($container) {
     htmlNavigation.setSize(navigationSize);
   }
 
-  if (this.desktop._hasTaskBar()) {
-    this.desktop._$taskBar.css('left', navigationWidth);
+  if (this.desktop._hasHeader()) {
+    this.desktop._$header.css('left', navigationWidth);
 
-    htmlTaskBar = scout.HtmlComponent.get(this.desktop._$taskBar);
-    taskBarHeight = this.desktop._$taskBar.outerHeight(true);
-    taskBarSize = new scout.Dimension(containerSize.width - navigationWidth, taskBarHeight)
-      .subtract(htmlTaskBar.getMargins());
-    htmlTaskBar.setSize(taskBarSize);
+    htmlHeader = scout.HtmlComponent.get(this.desktop._$header);
+    headerHeight = this.desktop._$header.outerHeight(true);
+    headerSize = new scout.Dimension(containerSize.width - navigationWidth, headerHeight)
+      .subtract(htmlHeader.getMargins());
+    htmlHeader.setSize(headerSize);
   }
 
   if (this.desktop._hasBench()) {
     this.desktop.$bench.css('left', navigationWidth);
 
     htmlBench = scout.HtmlComponent.get(this.desktop.$bench);
-    htmlBenchSize = new scout.Dimension(containerSize.width - navigationWidth, containerSize.height - taskBarHeight)
+    htmlBenchSize = new scout.Dimension(containerSize.width - navigationWidth, containerSize.height - headerHeight)
       .subtract(htmlBench.getMargins());
     htmlBench.setSize(htmlBenchSize);
   }

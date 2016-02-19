@@ -8,8 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-scout.DesktopTabBarLayout = function(desktop) {
-  scout.DesktopTabBarLayout.parent.call(this);
+scout.DesktopHeaderLayout = function(desktop) {
+  scout.DesktopHeaderLayout.parent.call(this);
 
   this.TAB_WIDTH_LARGE = 220;
   this.TAB_WIDTH_SMALL = 130;
@@ -17,12 +17,12 @@ scout.DesktopTabBarLayout = function(desktop) {
   this._$overflowTab;
   this._overflowTabsIndizes = [];
 };
-scout.inherits(scout.DesktopTabBarLayout, scout.AbstractLayout);
+scout.inherits(scout.DesktopHeaderLayout, scout.AbstractLayout);
 
 // create a clone to measure pref. width
-scout.DesktopTabBarLayout.prototype._toolsWidth = function($tools, cssClasses) {
+scout.DesktopHeaderLayout.prototype._toolsWidth = function($tools, cssClasses) {
   var $clone = $tools.clone(),
-    $items = $clone.find('.taskbar-tool-item');
+    $items = $clone.find('.header-tool-item');
 
   $items
     .removeClass('compact')
@@ -43,17 +43,17 @@ scout.DesktopTabBarLayout.prototype._toolsWidth = function($tools, cssClasses) {
  *
  * @override AbstractLayout.js
  */
-scout.DesktopTabBarLayout.prototype.layout = function($container) {
+scout.DesktopHeaderLayout.prototype.layout = function($container) {
   var $tabs = $container.find('.desktop-view-tabs'),
-    $tools = $container.find('.taskbar-tools'),
+    $tools = $container.find('.header-tools'),
     contWidth = scout.graphics.getSize($container).width,
     numTabs = this._desktop.viewTabsController.viewTabCount(),
     smallPrefTabsWidth = numTabs * this.TAB_WIDTH_SMALL,
     logoWidth = 0,
     toolsWidth, tabsWidth;
 
-  if (this._desktop.session.uiUseTaskbarLogo) {
-    var $logo = $container.find('.taskbar-logo');
+  if (this._desktop.session.uiUseHeaderLogo) {
+    var $logo = $container.find('.application-logo');
     logoWidth = scout.graphics.getSize($logo, true).width;
   }
 
@@ -64,7 +64,7 @@ scout.DesktopTabBarLayout.prototype.layout = function($container) {
 
   $tabs.find('.desktop-view-tab').setVisible(true);
 
-  $tools.find('.taskbar-tool-item').each(function() {
+  $tools.find('.header-tool-item').each(function() {
     var $item = $(this);
     $item.removeClass('compact');
     var dataText = $item.data('item-text');
@@ -90,7 +90,7 @@ scout.DesktopTabBarLayout.prototype.layout = function($container) {
 
     // 1st try to minimize padding around tool-bar items
     // re-calculate tabsWidth with reduced padding on the tool-bar-items
-    $tools.find('.taskbar-tool-item').each(function() {
+    $tools.find('.header-tool-item').each(function() {
       $(this).addClass('compact');
     });
 
@@ -107,7 +107,7 @@ scout.DesktopTabBarLayout.prototype.layout = function($container) {
     }
 
     // 2nd remove text from tool-bar items, only show icon
-    $tools.find('.taskbar-tool-item').each(function() {
+    $tools.find('.header-tool-item').each(function() {
       var $item = $(this),
         $title = $item.find('.text'),
         text = $title.text();
@@ -177,7 +177,7 @@ scout.DesktopTabBarLayout.prototype.layout = function($container) {
   }
 };
 
-scout.DesktopTabBarLayout.prototype._onMouseDownOverflow = function(event) {
+scout.DesktopHeaderLayout.prototype._onMouseDownOverflow = function(event) {
   var menu, tab, popup, overflowMenus = [],
     desktop = this._desktop;
   this._overflowTabsIndizes.forEach(function(i) {
@@ -193,7 +193,7 @@ scout.DesktopTabBarLayout.prototype._onMouseDownOverflow = function(event) {
     });
     menu.remoteHandler = function(event) {
       if ('doAction' === event.type) {
-        $.log.debug('(DesktopTaskBarLayout#_onMouseDownOverflow) tab=' + this);
+        $.log.debug('(DesktopHeaderLayout#_onMouseDownOverflow) tab=' + this);
         desktop.viewTabsController.selectViewTab(this);
       }
     }.bind(tab);

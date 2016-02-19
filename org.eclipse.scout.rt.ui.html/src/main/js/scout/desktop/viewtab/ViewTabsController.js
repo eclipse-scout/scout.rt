@@ -57,7 +57,7 @@ scout.ViewTabsController.prototype.createAndRenderViewTab = function(view, posit
 
   }
   // Render the view tab.
-  if (this._desktop._hasTaskBar() && !viewTab.rendered) {
+  if (this._desktop._hasHeader() && !viewTab.rendered) {
     viewTab.render(this._desktop._$viewTabBar);
   }
 
@@ -101,7 +101,7 @@ scout.ViewTabsController.prototype._removeViewTab = function(viewTab, viewId) {
     }
   }
 
-  this._desktop.revalidateTaskBarLayout();
+  this._desktop.revalidateHeaderLayout();
 };
 
 /**
@@ -127,7 +127,7 @@ scout.ViewTabsController.prototype.selectViewTab = function(viewTab) {
   viewTab.select();
 
   // Invalidate layout and focus
-  this._desktop.revalidateTaskBarLayout();
+  this._desktop.revalidateHeaderLayout();
 };
 
 /**

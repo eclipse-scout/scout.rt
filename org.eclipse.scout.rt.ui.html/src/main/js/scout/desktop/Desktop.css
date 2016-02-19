@@ -13,7 +13,7 @@
 @desktop-table-header-padding-x: @bench-padding-x - @table-header-padding-left;
 @desktop-table-data-padding-x: @bench-padding-x - @table-cell-padding-left;
 @desktop-table-header-menubar-padding-right: 10px;
-@taskbar-menu-textandicon-padding-right: 11px;
+@header-menu-textandicon-padding-right: 11px;
 
 /* desktop */
 
@@ -30,7 +30,7 @@
 
   &.has-navigation {
     & > .desktop-bench,
-    & > .desktop-taskbar {
+    & > .desktop-header {
       left: @size-desktop-navigation;
     }
   }
@@ -60,8 +60,8 @@
     .desktop-bench-drop-shadow();
   }
 
-  &.has-taskbar {
-    top: @desktop-taskbar-height;
+  &.has-header {
+    top: @desktop-header-height;
   }
 
   & > .table {
@@ -157,15 +157,15 @@
   }
 }
 
-/* taskbar */
+/* header */
 
-.desktop-taskbar {
+.desktop-header {
   position: absolute;
   left: 0;
   top: 0;
   right: 0;
-  height: @desktop-taskbar-height;
-  background-color: @desktop-taskbar-background-color;
+  height: @desktop-header-height;
+  background-color: @desktop-header-background-color;
   #scout.vertical-align-helper-after();
 
   /* Has the same effect as "border-bottom: 1px solid @border-color", but is over-drawable by child */
@@ -181,7 +181,7 @@
   }
 }
 
-/* taskbar: view-tabs */
+/* header: view-tabs */
 
 .desktop-view-tabs {
   position: absolute;
@@ -219,7 +219,7 @@
 .desktop-view-tab {
   position: relative;
   display: inline-block;
-  /* 1px smaller than the taskbar because of the bottom border (see .selected rule below) */
+  /* 1px smaller than the header because of the bottom border (see .selected rule below) */
   height: calc(~'100% - 1px');
   vertical-align: top;
   width: 220px;
@@ -247,7 +247,7 @@
     cursor: default;
     background-color: @view-tab-active-background-color;
     color: @view-tab-active-color;
-    /* full size of taskbar to draw over the border-bottom */
+    /* full size of header to draw over the border-bottom */
     height: 100%;
     transition: off;
 
@@ -289,17 +289,17 @@
   }
 }
 
-/* taskbar: tools */
+/* header: tools */
 
-.taskbar-tools {
+.header-tools {
   position: absolute;
   top: 0;
   white-space: nowrap;
 }
 
-.taskbar-tool-item.menu-item {
+.header-tool-item.menu-item {
   position: relative;
-  height: @desktop-taskbar-height - 1px;
+  height: @desktop-header-height - 1px;
   color: @text-color;
   #scout.font-text-plus();
   border-left: 1px solid transparent;
@@ -335,14 +335,14 @@
   }
 
   &.menu-textandicon > .icon {
-    padding-right: @taskbar-menu-textandicon-padding-right;
+    padding-right: @header-menu-textandicon-padding-right;
   }
 }
 
-/* taskbar: tools popup */
+/* header: tools popup */
 
-.taskbar-tool-item.popup-head {
-  height: @desktop-taskbar-height - 1px;
+.header-tool-item.popup-head {
+  height: @desktop-header-height - 1px;
   border-left: 1px solid @border-color;
   border-right: 1px solid @border-color;
   background-color: @background-color;
@@ -352,7 +352,7 @@
   border-top: none;
   /*line-height: normal;*/
   //#scout.vertical-align-helper-before();
-  /* OVERRIDE .taskbar-tool-item.menu-item */
+  /* OVERRIDE .header-tool-item.menu-item */
   margin-left: 0;
   margin-right: 0;
   position: absolute;
@@ -378,10 +378,10 @@
   }
 }
 
-/* taskbar: key boxes */
+/* header: key boxes */
 
 .desktop-view-tab .key-box,
-.taskbar-tool-item.menu-item .key-box {
+.header-tool-item.menu-item .key-box {
   bottom: 4px;
 
   &.disabled {
@@ -389,9 +389,9 @@
   }
 }
 
-/* taskbar: logo */
+/* header: logo */
 
-.taskbar-logo {
+.application-logo {
   position: absolute;
   right: 0;
   top: 0;
@@ -400,7 +400,7 @@
   margin-right: @bench-padding-x;
   width: 33px;
   height: 33px;
-  background: url('taskbar-logo.png');
+  background: url('application-logo.png');
   background-size: contain;
   background-repeat: no-repeat;
 }

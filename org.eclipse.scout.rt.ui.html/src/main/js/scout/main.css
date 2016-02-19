@@ -384,7 +384,7 @@ a,
 /* of these elements (iff they are "positioned"). To bring a new element to the top, add it to the end of the list. */
 /* https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Understanding_z_index/The_stacking_context */
 .scout > .desktop-navigation,
-.scout > .desktop-taskbar,
+.scout > .desktop-header,
 .scout > .desktop-bench,
 .scout > .splitter,
 .scout > .glasspane,

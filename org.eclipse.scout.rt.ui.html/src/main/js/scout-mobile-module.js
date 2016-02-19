@@ -203,7 +203,7 @@ __include("jquery/jquery-scout.js");
   __include("scout/desktop/BaseDesktop.js");
   __include("scout/desktop/Desktop.js");
   __include("scout/desktop/DesktopKeyStroke.js");
-  __include("scout/desktop/DesktopTaskBarLayout.js");
+  __include("scout/desktop/DesktopHeaderLayout.js");
   __include("scout/desktop/DesktopViewTab.js");
   __include("scout/desktop/ViewMenuOpenKeyStroke.js");
   __include("scout/desktop/ViewMenuPopup.js");

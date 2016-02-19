@@ -41,7 +41,7 @@ scout.MobileDesktop.prototype._render = function($parent) {
 /**
  * @override
  */
-scout.MobileDesktop.prototype._hasTaskBar = function() {
+scout.MobileDesktop.prototype._hasHeader = function() {
   return false;
 };
 

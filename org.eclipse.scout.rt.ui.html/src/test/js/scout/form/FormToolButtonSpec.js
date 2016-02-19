@@ -18,7 +18,7 @@ describe("FormToolButton", function() {
     helper = new FormSpecHelper(session);
     desktop = {
       $parent: session.$entryPoint,
-      $toolContainer: session.$entryPoint.appendDiv('taskbar-tools').hide()
+      $toolContainer: session.$entryPoint.appendDiv('header-tools').hide()
     };
   });
 

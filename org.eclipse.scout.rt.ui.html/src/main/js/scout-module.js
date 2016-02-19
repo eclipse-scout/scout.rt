@@ -206,7 +206,7 @@ __include("jquery/jquery-scout.js");
   __include("scout/desktop/DesktopLayout.js");
   __include("scout/desktop/DesktopBenchLayout.js");
   __include("scout/desktop/DesktopKeyStroke.js");
-  __include("scout/desktop/DesktopTaskBarLayout.js");
+  __include("scout/desktop/DesktopHeaderLayout.js");
   __include("scout/desktop/DisableBrowserTabSwitchingKeyStroke.js");
   __include("scout/desktop/NullDesktopNavigation.js");
   __include("scout/desktop/PopupWindow.js");
