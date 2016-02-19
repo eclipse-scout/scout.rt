@@ -105,4 +105,14 @@ public interface IInternalExtensionRegistry extends IExtensionRegistry {
    * Removes the last pushed scope class from the stack.
    */
   void popScope();
+
+  /**
+   * Creates a backup of the current extension context (i.e. extension and scope stacks).
+   */
+  ExtensionContext backupExtensionContext();
+
+  /**
+   * Executes the given runnable in the given {@link ExtensionContext}.
+   */
+  void runInContext(ExtensionContext ctx, Runnable runnable);
 }

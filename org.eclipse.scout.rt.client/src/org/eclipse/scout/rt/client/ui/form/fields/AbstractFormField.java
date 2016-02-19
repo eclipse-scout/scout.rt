@@ -114,7 +114,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   private BasicPropertySupport m_subtreePropertyChangeSupport;
   private P_MasterListener m_currentMasterListener;// my master
   private DataChangeListener m_internalDataChangeListener;
-  protected IContributionOwner m_contributionHolder;
+  protected ContributionComposite m_contributionHolder;
   private final ObjectExtensions<AbstractFormField, IFormFieldExtension<? extends AbstractFormField>> m_objectExtensions;
 
   private String m_initialLabel;
@@ -773,7 +773,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   }
 
   protected final void interceptInitConfig() {
-    m_objectExtensions.initConfig(createLocalExtension(), new Runnable() {
+    m_objectExtensions.initConfigAndBackupExtensionContext(createLocalExtension(), new Runnable() {
       @Override
       public void run() {
         initConfig();
@@ -1834,8 +1834,8 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
 
   @Override
   public void updateKeyStrokes() {
-    Map<String, IKeyStroke> ksMap = new HashMap<String, IKeyStroke>();
-    //
+    final Map<String, IKeyStroke> ksMap = new HashMap<String, IKeyStroke>();
+
     List<IKeyStroke> c = getLocalKeyStrokes();
     if (c != null) {
       for (IKeyStroke ks : c) {
@@ -1844,15 +1844,20 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
         }
       }
     }
-    //
-    c = getContributedKeyStrokes();
-    if (c != null) {
-      for (IKeyStroke ks : c) {
-        if (ks != null) {
-          ksMap.put(ks.getKeyStroke().toUpperCase(), ks);
+
+    m_objectExtensions.runInExtensionContext(new Runnable() {
+      @Override
+      public void run() {
+        List<IKeyStroke> contributed = getContributedKeyStrokes();
+        if (contributed != null) {
+          for (IKeyStroke ks : contributed) {
+            if (ks != null) {
+              ksMap.put(ks.getKeyStroke().toUpperCase(), ks);
+            }
+          }
         }
       }
-    }
+    });
     propertySupport.setPropertyList(PROP_KEY_STROKES, CollectionUtility.arrayListWithoutNullElements(ksMap.values()));
   }
 
@@ -1863,30 +1868,38 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
 
   @Override
   public List<IKeyStroke> getLocalKeyStrokes() {
-    List<Class<? extends IKeyStroke>> configuredKeyStrokes = getConfiguredKeyStrokes();
-    List<IKeyStroke> contributedKeyStrokes = m_contributionHolder.getContributionsByClass(IKeyStroke.class);
+    final Map<String, IKeyStroke> ksMap = new HashMap<String, IKeyStroke>();
+    m_objectExtensions.runInExtensionContext(new Runnable() {
+      @Override
+      public void run() {
+        List<Class<? extends IKeyStroke>> configuredKeyStrokes = getConfiguredKeyStrokes();
 
-    Map<String, IKeyStroke> ksMap = new HashMap<String, IKeyStroke>(configuredKeyStrokes.size() + contributedKeyStrokes.size());
-    for (Class<? extends IKeyStroke> keystrokeClazz : configuredKeyStrokes) {
-      try {
-        IKeyStroke ks = ConfigurationUtility.newInnerInstance(this, keystrokeClazz);
-        ks.initAction();
-        ksMap.put(ks.getKeyStroke().toUpperCase(), ks);
-      }
-      catch (Throwable t) {
-        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + keystrokeClazz.getName() + "'.", t));
-      }
-    }
+        // re-create the instances
+        m_contributionHolder.resetContributionsByClass(AbstractFormField.this, IKeyStroke.class);
+        List<IKeyStroke> contributedKeyStrokes = m_contributionHolder.getContributionsByClass(IKeyStroke.class);
 
-    for (IKeyStroke ks : contributedKeyStrokes) {
-      try {
-        ks.initAction();
-        ksMap.put(ks.getKeyStroke().toUpperCase(), ks);
+        for (Class<? extends IKeyStroke> keystrokeClazz : configuredKeyStrokes) {
+          try {
+            IKeyStroke ks = ConfigurationUtility.newInnerInstance(this, keystrokeClazz);
+            ks.initAction();
+            ksMap.put(ks.getKeyStroke().toUpperCase(), ks);
+          }
+          catch (Throwable t) {
+            SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + keystrokeClazz.getName() + "'.", t));
+          }
+        }
+
+        for (IKeyStroke ks : contributedKeyStrokes) {
+          try {
+            ks.initAction();
+            ksMap.put(ks.getKeyStroke().toUpperCase(), ks);
+          }
+          catch (Throwable t) {
+            SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error initializing key stroke '" + ks.getClass().getName() + "'.", t));
+          }
+        }
       }
-      catch (Throwable t) {
-        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error initializing key stroke '" + ks.getClass().getName() + "'.", t));
-      }
-    }
+    });
     return CollectionUtility.arrayList(ksMap.values());
   }
 

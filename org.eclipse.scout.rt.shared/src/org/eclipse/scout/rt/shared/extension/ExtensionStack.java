@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.extension;
 
+import java.util.ArrayList;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
@@ -19,7 +20,14 @@ public class ExtensionStack {
   private final Deque<List<? extends IExtension<?>>> m_extensions;
 
   public ExtensionStack() {
+    this(null);
+  }
+
+  public ExtensionStack(List<List<? extends IExtension<?>>> extensions) {
     m_extensions = new LinkedList<List<? extends IExtension<?>>>();
+    if (extensions != null) {
+      m_extensions.addAll(extensions);
+    }
   }
 
   public void pushExtensions(List<? extends IExtension<?>> extensions) {
@@ -60,5 +68,9 @@ public class ExtensionStack {
       }
     }
     return null;
+  }
+
+  public List<List<? extends IExtension<?>>> snapshot() {
+    return new ArrayList<List<? extends IExtension<?>>>(m_extensions);
   }
 }

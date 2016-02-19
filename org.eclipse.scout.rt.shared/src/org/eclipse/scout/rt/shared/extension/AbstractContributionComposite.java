@@ -42,7 +42,7 @@ public abstract class AbstractContributionComposite implements IContributionOwne
       if (useScope) {
         extensionRegistry.pushScope(getClass());
       }
-      initContributionsMap(o, extensionRegistry);
+      initContributionsMap(o, extensionRegistry, null);
       initConfig();
     }
     finally {
@@ -55,14 +55,16 @@ public abstract class AbstractContributionComposite implements IContributionOwne
   protected void initConfig() {
   }
 
-  private void initContributionsMap(Object o, IInternalExtensionRegistry extensionRegistry) {
+  private <T> void initContributionsMap(Object o, IInternalExtensionRegistry extensionRegistry, Class<T> type) {
     Object owner = this;
     if (o != null) {
       owner = o;
     }
-    List<?> contributionsForMe = extensionRegistry.createContributionsFor(owner, null);
-    m_contributionsByType = new HashMap<Class<?>, ArrayList<?>>();
-    m_contributionsByClass = new HashMap<Class<?>, Object>(contributionsForMe.size());
+    List<?> contributionsForMe = extensionRegistry.createContributionsFor(owner, type);
+    if (type == null) {
+      m_contributionsByType = new HashMap<Class<?>, ArrayList<?>>();
+      m_contributionsByClass = new HashMap<Class<?>, Object>(contributionsForMe.size());
+    }
     if (CollectionUtility.hasElements(contributionsForMe)) {
       for (Object contribution : contributionsForMe) {
         m_contributionsByClass.put(contribution.getClass(), contribution);
@@ -70,12 +72,24 @@ public abstract class AbstractContributionComposite implements IContributionOwne
     }
   }
 
+  public <T> void resetContributionsByClass(Object o, Class<T> type) {
+    m_contributionsByType.remove(type);
+    Collection<Object> values = m_contributionsByClass.values();
+    for (Object obj : values) {
+      if (type.isAssignableFrom(obj.getClass())) {
+        m_contributionsByClass.remove(obj.getClass());
+      }
+    }
+    IInternalExtensionRegistry extensionRegistry = SERVICES.getService(IInternalExtensionRegistry.class);
+    initContributionsMap(o, extensionRegistry, type);
+  }
+
   private void readObject(ObjectInputStream s) throws IOException, ClassNotFoundException {
     s.defaultReadObject();
     if (m_contributionsByClass == null || m_contributionsByType == null) {
       // ensure that the contributions have been initialized
       IInternalExtensionRegistry extensionRegistry = SERVICES.getService(IInternalExtensionRegistry.class);
-      initContributionsMap(null, extensionRegistry);
+      initContributionsMap(null, extensionRegistry, null);
     }
   }
 
