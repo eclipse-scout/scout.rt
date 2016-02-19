@@ -619,31 +619,6 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent {
   void removeNotification(IDesktopNotification notification);
 
   /**
-   * get the status of the desktop
-   * <p>
-   * see also {@link IForm#getFormStatus(IStatus)}
-   */
-  IStatus getStatus();
-
-  /**
-   * set a status on the desktop
-   * <p>
-   * this is normally displayed in as a tray message box
-   * <p>
-   * see also {@link IForm#setFormStatus(IStatus)}
-   */
-  void setStatus(IStatus status);
-
-  /**
-   * set a status on the desktop
-   * <p>
-   * this is normally displayed in as a tray message box
-   * <p>
-   * see also {@link IForm#setFormStatusText(String)}
-   */
-  void setStatusText(String s);
-
-  /**
    * @return <code>true</code> if the given {@link IFileChooser} is currently displayed. However, a value of
    *         <code>true</code> does not imply that the {@link IFileChooser} is the currently active model element.
    * @see #showFileChooser(IFileChooser)

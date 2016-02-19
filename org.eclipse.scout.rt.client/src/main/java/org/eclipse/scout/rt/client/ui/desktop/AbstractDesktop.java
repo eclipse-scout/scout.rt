@@ -83,8 +83,6 @@ import org.eclipse.scout.rt.platform.holders.IHolder;
 import org.eclipse.scout.rt.platform.reflect.AbstractPropertyObserver;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
-import org.eclipse.scout.rt.platform.status.IStatus;
-import org.eclipse.scout.rt.platform.status.Status;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.EventListenerList;
@@ -1399,26 +1397,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   @Override
   public void setSelectViewTabsKeyStrokeModifier(String selectViewTabsKeyStrokeModifier) {
     propertySupport.setPropertyString(PROP_SELECT_VIEW_TABS_KEY_STROKE_MODIFIER, selectViewTabsKeyStrokeModifier);
-  }
-
-  @Override
-  public IStatus getStatus() {
-    return (IStatus) propertySupport.getProperty(PROP_STATUS);
-  }
-
-  @Override
-  public void setStatus(IStatus status) {
-    propertySupport.setProperty(PROP_STATUS, status);
-  }
-
-  @Override
-  public void setStatusText(String s) {
-    if (s != null) {
-      setStatus(new Status(s, IStatus.INFO));
-    }
-    else {
-      setStatus(null);
-    }
   }
 
   @Override
