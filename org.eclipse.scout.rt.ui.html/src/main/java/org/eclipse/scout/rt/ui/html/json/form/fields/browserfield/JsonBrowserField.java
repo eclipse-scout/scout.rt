@@ -45,7 +45,7 @@ public class JsonBrowserField<BROWSER_FIELD extends IBrowserField> extends JsonF
   @Override
   protected void initJsonProperties(BROWSER_FIELD model) {
     super.initJsonProperties(model);
-    putJsonProperty(new JsonProperty<IBrowserField>(IBrowserField.PROP_SCROLLBARS_ENABLED, model) {
+    putJsonProperty(new JsonProperty<IBrowserField>(IBrowserField.PROP_SCROLL_BAR_ENABLED, model) {
       @Override
       protected Boolean modelValue() {
         return getModel().isScrollBarEnabled();

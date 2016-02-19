@@ -176,13 +176,12 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
 
   @Override
   public void setScrollBarEnabled(boolean scrollBarEnabled) {
-    // TODO [5.2] bsh, awe: Cleanup scroll[bB]ar[s] confusion
-    propertySupport.setPropertyBool(PROP_SCROLLBARS_ENABLED, scrollBarEnabled);
+    propertySupport.setPropertyBool(PROP_SCROLL_BAR_ENABLED, scrollBarEnabled);
   }
 
   @Override
   public boolean isScrollBarEnabled() {
-    return propertySupport.getPropertyBool(PROP_SCROLLBARS_ENABLED);
+    return propertySupport.getPropertyBool(PROP_SCROLL_BAR_ENABLED);
   }
 
   protected class P_UIFacade implements IHtmlFieldUIFacade {
@@ -195,17 +194,17 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
 
   @Override
   public void setScrollToAnchor(String anchorName) {
-    propertySupport.setPropertyString(PROP_SCROLLBAR_SCROLL_TO_ANCHOR, anchorName);
+    propertySupport.setPropertyString(PROP_SCROLL_TO_ANCHOR, anchorName);
   }
 
   @Override
   public String getScrollToAnchor() {
-    return propertySupport.getPropertyString(PROP_SCROLLBAR_SCROLL_TO_ANCHOR);
+    return propertySupport.getPropertyString(PROP_SCROLL_TO_ANCHOR);
   }
 
   @Override
   public void scrollToEnd() {
-    propertySupport.setPropertyAlwaysFire(PROP_SCROLLBAR_SCROLL_TO_END, null);
+    propertySupport.setPropertyAlwaysFire(PROP_SCROLL_TO_END, null);
   }
 
   @Override

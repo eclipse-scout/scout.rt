@@ -33,8 +33,8 @@ scout.HtmlField.prototype._render = function($parent) {
 scout.HtmlField.prototype._renderProperties = function() {
   scout.HtmlField.parent.prototype._renderProperties.call(this);
 
-  this._renderScrollBarsEnabled();
-  this._renderScrollToPosition(this.scrollToPosition);
+  this._renderScrollBarEnabled();
+  this._renderScrollToAnchor(this.scrollToAnchor);
 };
 
 /**
@@ -53,7 +53,7 @@ scout.HtmlField.prototype._renderDisplayText = function() {
 
   // this method replaces the content, the scroll bars get lost -> render again (only necessary if already rendered, otherwise it is done by renderProperties)
   if (this.rendered) {
-    this._renderScrollBarsEnabled(this.scrollBarsEnabled);
+    this._renderScrollBarEnabled(this.scrollBarEnabled);
   }
 
   this.invalidateLayoutTree();
@@ -64,8 +64,8 @@ scout.HtmlField.prototype._remove = function() {
   scout.HtmlField.parent.prototype._remove.call(this);
 };
 
-scout.HtmlField.prototype._renderScrollBarsEnabled = function() {
-  if (this.scrollBarsEnabled) {
+scout.HtmlField.prototype._renderScrollBarEnabled = function() {
+  if (this.scrollBarEnabled) {
     scout.scrollbars.install(this.$field, {
       parent: this
     });
@@ -76,13 +76,13 @@ scout.HtmlField.prototype._renderScrollBarsEnabled = function() {
 
 // Not called in _renderProperties() because this is not really a property (more like an event)
 scout.HtmlField.prototype._renderScrollToEnd = function() {
-  if (this.scrollBarsEnabled) {
+  if (this.scrollBarEnabled) {
     scout.scrollbars.scrollToBottom(this.$fieldContainer);
   }
 };
 
-scout.HtmlField.prototype._renderScrollToPosition = function(anchor) {
-  if (this.scrollBarsEnabled && anchor && this.$field.find(anchor)) {
+scout.HtmlField.prototype._renderScrollToAnchor = function(anchor) {
+  if (this.scrollBarEnabled && anchor && this.$field.find(anchor)) {
     var anchorElem = this.$field.find('#'.concat(anchor));
     if (anchorElem && anchorElem.length > 0) {
       scout.scrollbars.scrollTo(this.$fieldContainer, anchorElem);

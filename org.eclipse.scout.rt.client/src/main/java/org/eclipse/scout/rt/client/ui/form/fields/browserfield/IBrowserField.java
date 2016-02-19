@@ -57,8 +57,7 @@ public interface IBrowserField extends IFormField {
   String PROP_LOCATION = "location";
   String PROP_BINARY_RESOURCE = "binaryResource";
   String PROP_ATTACHMENTS = "attachments";
-  // FIXME awe: fix name-inconsistency, constant-name VS property-name VS method-name SCROLLBARS, scrollBars, scrollBar
-  String PROP_SCROLLBARS_ENABLED = "scrollBarsEnabled";
+  String PROP_SCROLL_BAR_ENABLED = "scrollBarEnabled";
   String PROP_SANDBOX_ENABLED = "sandboxEnabled";
   String PROP_SANDBOX_PERMISSIONS = "sandboxPermissions";
 

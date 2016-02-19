@@ -60,19 +60,19 @@ public class JsonHtmlField<HTML_FIELD extends IHtmlField> extends JsonValueField
       }
     });
 
-    putJsonProperty(new JsonProperty<IHtmlField>(IHtmlField.PROP_SCROLLBARS_ENABLED, model) {
+    putJsonProperty(new JsonProperty<IHtmlField>(IHtmlField.PROP_SCROLL_BAR_ENABLED, model) {
       @Override
       protected Boolean modelValue() {
         return getModel().isScrollBarEnabled();
       }
     });
-    putJsonProperty(new JsonProperty<IHtmlField>(IHtmlField.PROP_SCROLLBAR_SCROLL_TO_END, model) {
+    putJsonProperty(new JsonProperty<IHtmlField>(IHtmlField.PROP_SCROLL_TO_END, model) {
       @Override
       protected Object modelValue() {
         return null; // This property is not really a property, but an event, therefore it does not have a value
       }
     });
-    putJsonProperty(new JsonProperty<IHtmlField>(IHtmlField.PROP_SCROLLBAR_SCROLL_TO_ANCHOR, model) {
+    putJsonProperty(new JsonProperty<IHtmlField>(IHtmlField.PROP_SCROLL_TO_ANCHOR, model) {
       @Override
       protected String modelValue() {
         return getModel().getScrollToAnchor();

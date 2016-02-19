@@ -36,7 +36,7 @@ scout.BrowserField.prototype._renderProperties = function() {
 
 scout.BrowserField.prototype._renderIframeProperties = function() {
   this._renderLocation();
-  this._renderScrollBarsEnabled();
+  this._renderScrollBarEnabled();
   this._renderSandboxEnabled(); // includes _renderSandboxPermissions()
 };
 
@@ -45,13 +45,13 @@ scout.BrowserField.prototype._renderLocation = function() {
   this.$field.attr('src', this.location);
 };
 
-scout.BrowserField.prototype._renderScrollBarsEnabled = function() {
-  this.$field.toggleClass('no-scrolling', !this.scrollBarsEnabled);
+scout.BrowserField.prototype._renderScrollBarEnabled = function() {
+  this.$field.toggleClass('no-scrolling', !this.scrollBarEnabled);
   // According to http://stackoverflow.com/a/18470016, setting 'overflow: hidden' via
   // CSS should be enough. However, if the inner page sets 'overflow' to another value,
   // scroll bars are shown again. Therefore, we add the legacy 'scrolling=no' attribute,
   // which is deprecated in HTML5, but seems to do the trick.
-  if (this.scrollBarsEnabled) {
+  if (this.scrollBarEnabled) {
     this.$field.removeAttr('scrolling');
   } else {
     this.$field.attr('scrolling', 'no');
