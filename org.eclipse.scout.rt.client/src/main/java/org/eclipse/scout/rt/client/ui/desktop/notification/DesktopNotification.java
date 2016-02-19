@@ -13,7 +13,14 @@ public class DesktopNotification implements IDesktopNotification {
    * Creates a closable, simple info notification with a text and the default duration.
    */
   public DesktopNotification(String text) {
-    m_status = new Status(text, IStatus.INFO);
+    this(new Status(text, IStatus.INFO));
+  }
+
+  /**
+   * Creates a closable, notification with a status and the default duration.
+   */
+  public DesktopNotification(IStatus status) {
+    m_status = status;
     m_duration = DEFAULT_DURATION;
     m_closable = true;
   }

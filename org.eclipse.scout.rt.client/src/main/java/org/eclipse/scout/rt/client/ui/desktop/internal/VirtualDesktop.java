@@ -41,7 +41,6 @@ import org.eclipse.scout.rt.client.ui.form.IFormHandler;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
-import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.util.EventListenerList;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 
@@ -534,11 +533,6 @@ public class VirtualDesktop implements IDesktop {
   }
 
   @Override
-  public IStatus getStatus() {
-    throw createUnsupportedOperationException();
-  }
-
-  @Override
   public String getTitle() {
     throw createUnsupportedOperationException();
   }
@@ -671,16 +665,6 @@ public class VirtualDesktop implements IDesktop {
 
   @Override
   public void removeNotification(IDesktopNotification notification) {
-  }
-
-  @Override
-  public void setStatus(IStatus status) {
-    throw createUnsupportedOperationException();
-  }
-
-  @Override
-  public void setStatusText(String s) {
-    throw createUnsupportedOperationException();
   }
 
   @Override
