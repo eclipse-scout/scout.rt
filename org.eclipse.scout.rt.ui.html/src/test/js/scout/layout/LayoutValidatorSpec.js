@@ -14,6 +14,9 @@ describe("LayoutValidator", function() {
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
+    session.layoutValidator.validate();
+    // Remove root component
+    session.desktop.$container.removeData('htmlComponent');
   });
 
   describe("invalidateTree", function() {
@@ -53,7 +56,7 @@ describe("LayoutValidator", function() {
     });
   });
 
-  describe("layout", function() {
+  describe("validate", function() {
 
     it("calls validateLayout for each invalid html component", function() {
       var $comp = $('<div>').appendTo(session.$entryPoint);
@@ -75,6 +78,56 @@ describe("LayoutValidator", function() {
       $comp.remove();
       session.layoutValidator.validate();
       expect(htmlComp.validateLayout).not.toHaveBeenCalled();
+    });
+
+    it("does not call validateLayout if component has been detached, but does not remove from invalid components either", function() {
+      var $comp = $('<div>').appendTo(session.$entryPoint);
+      var htmlComp = new scout.HtmlComponent($comp, session);
+      spyOn(htmlComp, 'validateLayout');
+
+      htmlComp.invalidateLayoutTree();
+      expect(session.layoutValidator._invalidComponents.length).toBe(1);
+      expect(session.layoutValidator._invalidComponents[0]).toBe(htmlComp);
+
+      $comp.detach();
+      session.layoutValidator.validate();
+      expect(htmlComp.validateLayout).not.toHaveBeenCalled();
+      expect(session.layoutValidator._invalidComponents.length).toBe(1);
+      expect(session.layoutValidator._invalidComponents[0]).toBe(htmlComp);
+    });
+
+    it("removes the component from the list of invalidate components after validation", function() {
+      var $comp = $('<div>').appendTo(session.$entryPoint);
+      var htmlComp = new scout.HtmlComponent($comp, session);
+      spyOn(htmlComp, 'validateLayout');
+
+      htmlComp.invalidateLayoutTree();
+      expect(session.layoutValidator._invalidComponents.length).toBe(1);
+      expect(session.layoutValidator._invalidComponents[0]).toBe(htmlComp);
+
+      session.layoutValidator.validate();
+      expect(htmlComp.validateLayout).toHaveBeenCalled();
+      expect(htmlComp.validateLayout.calls.count()).toEqual(1);
+      expect(session.layoutValidator._invalidComponents.length).toBe(0);
+    });
+
+  });
+
+  describe("cleanupInvalidObjects", function() {
+
+    it("removes the widget from invalid components when a widget gets removed", function() {
+      var widget = scout.create('StringField', {
+        parent: new scout.NullWidget(),
+        session: session
+      });
+      widget.render(session.$entryPoint);
+
+      widget.invalidateLayoutTree();
+      expect(session.layoutValidator._invalidComponents.length).toBe(1);
+      expect(session.layoutValidator._invalidComponents[0]).toBe(widget.htmlComp);
+
+      widget.remove();
+      expect(session.layoutValidator._invalidComponents.length).toBe(0);
     });
 
   });
