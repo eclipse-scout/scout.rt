@@ -88,6 +88,12 @@ class ContentAssistFieldUIFacade<LOOKUP_KEY> implements IContentAssistFieldUIFac
 
     if (chooser) {
 
+      // last line of defense: normally the UI prevents this kind of request, but you never know...
+      if (!m_field.isProposalChooserRegistered()) {
+        LOG.debug("acceptProposalFromUI: UI says chooser is open, but the chooser has been unregistered on the model");
+        return;
+      }
+
       // When the proposal chooser is open, we must check if the display-text has changed
       // since the last search. When it has changed, we cannot use the accepted proposal
       // and must perform the lookup again instead. This prevents issues as described in

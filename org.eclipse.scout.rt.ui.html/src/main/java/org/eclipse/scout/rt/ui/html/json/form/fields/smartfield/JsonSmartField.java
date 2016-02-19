@@ -93,14 +93,6 @@ public class JsonSmartField<VALUE, LOOKUP_KEY, CONTENT_ASSIST_FIELD extends ICon
   protected void handleUiAcceptProposal(JsonEvent event) {
     String text = getSearchTextAndAddFilter(event);
     boolean chooser = event.getData().getBoolean("chooser");
-
-    // >>> [to be removed]
-    if (chooser && getModel().getProposalChooser() == null) {
-      // FIXME awe: ensure this state not to happen in UI; happens, once a focused smartfield looses focuses by a mouse click (e.g. by clicking into another field), and is based due to 2 'acceptInput' events (mouseclick and blur)
-      return;
-    }
-    // <<< [to be removed]
-
     boolean forceClose = event.getData().getBoolean("forceClose");
     getModel().getUIFacade().acceptProposalFromUI(text, chooser, forceClose);
   }

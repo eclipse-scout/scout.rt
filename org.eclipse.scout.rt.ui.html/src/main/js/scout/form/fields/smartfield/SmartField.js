@@ -36,6 +36,10 @@ scout.SmartField = function() {
   this._oldSearchText;
   this._popup;
   this._requestedProposal = false;
+  /**
+   * This property is used to prevent multiple acceptProposal request to the server (blur, aboutToBlur, acceptInput from Action).
+   */
+  this._acceptedInput = false;
   this._tabPrevented = null;
   this._pendingProposalTyped = null;
 };
@@ -294,6 +298,7 @@ scout.SmartField.prototype._onKeyUp = function(e) {
 
 scout.SmartField.prototype._onFocus = function(e) {
   this._oldSearchText = this._readSearchText();
+  this._acceptedInput = false;
 };
 
 scout.SmartField.prototype._proposalTyped = function() {
@@ -345,7 +350,7 @@ scout.SmartField.prototype._onFieldBlur = function() {
   if (this._tabPrevented) {
     this._tabPrevented = null;
   } else {
-    this._acceptProposal(true);
+    this.acceptInput();
   }
 };
 
@@ -503,8 +508,9 @@ scout.SmartField.prototype._renderPopup = function() {
  * @override ValueField.js
  */
 scout.SmartField.prototype.acceptInput = function(whileTyping) {
-  if (this.mode !== scout.FormField.MODE_CELLEDITOR && !this.embedded) {
+  if (this.mode !== scout.FormField.MODE_CELLEDITOR && !this.embedded && !this._acceptedInput) {
     this._acceptProposal(true);
+    this._acceptedInput = true;
   }
 };
 
