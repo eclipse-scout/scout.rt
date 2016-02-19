@@ -49,6 +49,20 @@ scout.HtmlComponent.prototype.getParent = function() {
 };
 
 /**
+ * @returns true if the given htmlComponent is an ancestor, false if not
+ */
+scout.HtmlComponent.prototype.isDescendantOf = function(htmlComp) {
+  var $parent = this.$comp.parent();
+  while ($parent.length > 0) {
+    if (scout.HtmlComponent.optGet($parent) === htmlComp) {
+      return true;
+    }
+    $parent = $parent.parent();
+  }
+  return false;
+};
+
+/**
  * Computes the preferred height if the component is scrollable and returns it if it is greater than the actual size.
  * If it is not scrollable, the actual height is returned.<p>
  * The returned width is always the actual width because there are no horizontal scrollbars.

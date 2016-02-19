@@ -12,10 +12,6 @@ scout.LayoutValidator = function() {
   this._invalidComponents = [];
 };
 
-// FIXME cgu: maybe it is necessary to sort the list so that the top most root is layouted first.
-
-// Testcase: Field in scrollable groupbox gets invisible and also a field outside the groupbox.
-// If scrollable is layouted first it may be relayouted again when the form gets layouted
 scout.LayoutValidator.prototype.invalidateTree = function(htmlComp) {
   var validateRoot,
     htmlCompParent = htmlComp;
@@ -39,10 +35,23 @@ scout.LayoutValidator.prototype.invalidateTree = function(htmlComp) {
 };
 
 scout.LayoutValidator.prototype.invalidate = function(htmlComp) {
-  // Add validate root to list of invalid components. These are the starting point for a subsequent call to validate().
-  if (this._invalidComponents.indexOf(htmlComp) < 0) {
-    this._invalidComponents.push(htmlComp);
+  var position = 0;
+  // Don't insert if already inserted
+  if (this._invalidComponents.indexOf(htmlComp) >= 0) {
+    return;
   }
+
+  // Make sure it will be inserted before any descendant
+  // This prevents multiple layouting of the descendant
+  this._invalidComponents.forEach(function(invalidComponent, i) {
+    if (invalidComponent.isDescendantOf(htmlComp)) {
+      return;
+    }
+    position++;
+  }, this);
+
+  // Add validate root to list of invalid components. These are the starting point for a subsequent call to validate().
+  scout.arrays.insert(this._invalidComponents, htmlComp, position);
 };
 
 /**

@@ -54,6 +54,22 @@ describe("LayoutValidator", function() {
       expect(session.layoutValidator._invalidComponents.length).toBe(1);
       expect(session.layoutValidator._invalidComponents[0]).toBe(htmlCompChild);
     });
+
+    it("makes sure parent components are put in front of child components", function() {
+      var $comp = $('<div>').appendTo(session.$entryPoint);
+      var htmlComp = new scout.HtmlComponent($comp, session);
+      var $grandchild = $comp.appendDiv().appendDiv();
+      var htmlGrandChild = new scout.HtmlComponent($grandchild, session);
+
+      htmlGrandChild.invalidateLayoutTree(false);
+      expect(session.layoutValidator._invalidComponents.length).toBe(1);
+      expect(session.layoutValidator._invalidComponents[0]).toBe(htmlGrandChild);
+
+      htmlComp.invalidateLayoutTree(false);
+      expect(session.layoutValidator._invalidComponents.length).toBe(2);
+      expect(session.layoutValidator._invalidComponents[0]).toBe(htmlComp);
+      expect(session.layoutValidator._invalidComponents[1]).toBe(htmlGrandChild);
+    });
   });
 
   describe("validate", function() {
