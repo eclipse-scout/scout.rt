@@ -68,10 +68,18 @@ scout.Desktop.prototype._render = function($parent) {
   this.$container
     .addClass('desktop')
     .toggleClass('has-navigation', hasNavigation);
+  this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
+  this.htmlComp.setLayout(new scout.DesktopLayout(this));
 
   scout.inspector.applyInfo(this, $parent);
 
-  this.navigation = hasNavigation ? new scout.DesktopNavigation(this) : scout.NullDesktopNavigation;
+  if (hasNavigation) {
+    this.navigation = scout.create('DesktopNavigation', {
+      parent: this
+    });
+  } else {
+    this.navigation = scout.NullDesktopNavigation;
+  }
   this.navigation.render($parent);
   //TODO [5.2] cgu: maybe better move to desktop navigation?
   this._installKeyStrokeContextForDesktopViewButtonBar();
@@ -227,7 +235,6 @@ scout.Desktop.prototype._postRender = function() {
     this.viewTabsController.selectViewTab(this.viewTabsController.viewTab(selectable));
   }
   this.initialFormRendering = false;
-  this._layoutTaskBar();
 };
 
 scout.Desktop.prototype._renderActiveForm = function($parent) {
@@ -258,7 +265,9 @@ scout.Desktop.prototype._renderBench = function() {
   }
   this.$bench = this.$container.appendDiv('desktop-bench');
   this.$bench.toggleClass('has-taskbar', this._hasTaskBar());
-  new scout.HtmlComponent(this.$bench, this.session);
+  var htmlBench = new scout.HtmlComponent(this.$bench, this.session);
+  htmlBench.setLayout(new scout.DesktopBenchLayout(this));
+  htmlBench.pixelBasedSizing = false;
 
   this._installKeyStrokeContextForDesktopBench();
 };
@@ -284,8 +293,9 @@ scout.Desktop.prototype._renderTaskBar = function($parent) {
     return;
   }
   this._$taskBar = $parent.appendDiv('desktop-taskbar');
-  var htmlTabbar = new scout.HtmlComponent(this._$taskBar, this.session);
-  htmlTabbar.setLayout(new scout.DesktopTabBarLayout(this));
+  var htmlTaskBar = new scout.HtmlComponent(this._$taskBar, this.session);
+  htmlTaskBar.setLayout(new scout.DesktopTabBarLayout(this));
+  htmlTaskBar.pixelBasedSizing = false;
   this._$viewTabBar = this._$taskBar.appendDiv('desktop-view-tabs');
   this._$toolBar = this._$taskBar.appendDiv('taskbar-tools');
   if (this.session.uiUseTaskbarLogo) {
@@ -344,11 +354,11 @@ scout.Desktop.prototype._setSplitterPosition = function() {
     // Restore splitter position
     var splitterPosition = parseInt(storedSplitterPosition, 10);
     this.splitter.updatePosition(splitterPosition);
-    this._handleUpdateSplitterPosition(splitterPosition);
+    this.revalidateLayout();
   } else {
     // Set initial splitter position
     this.splitter.updatePosition();
-    this._handleUpdateSplitterPosition(this.splitter.position);
+    this.revalidateLayout();
   }
 };
 
@@ -366,20 +376,10 @@ scout.Desktop.prototype._hasBench = function() {
 };
 
 scout.Desktop.prototype.onResize = function(event) {
-  var selectedViewTab = this.viewTabsController.selectedViewTab();
-  if (selectedViewTab) {
-    selectedViewTab.onResize();
-  }
-  if (this.outline) {
-    this.outline.onResize();
-  }
-  if (this._outlineContent) {
-    this._outlineContent.onResize();
-  }
-  this._layoutTaskBar();
+  this.revalidateLayout();
 };
 
-scout.Desktop.prototype._layoutTaskBar = function() {
+scout.Desktop.prototype.revalidateTaskBarLayout = function() {
   if (this._hasTaskBar()) {
     var htmlTaskBar = scout.HtmlComponent.get(this._$taskBar);
     htmlTaskBar.revalidateLayout();
@@ -387,7 +387,7 @@ scout.Desktop.prototype._layoutTaskBar = function() {
 };
 
 scout.Desktop.prototype._onSplitterResize = function(event) {
-  this._handleUpdateSplitterPosition(event.data);
+  this.revalidateLayout();
 };
 
 scout.Desktop.prototype._onSplitterResizeEnd = function(event) {
@@ -408,25 +408,16 @@ scout.Desktop.prototype._onSplitterResizeEnd = function(event) {
     }, {
       progress: function() {
         this.splitter.updatePosition();
-        this._handleUpdateSplitterPosition(this.splitter.position);
+        this.revalidateLayout();
       }.bind(this),
       complete: function() {
         this.splitter.updatePosition();
         // Store size
         sessionStorage.setItem('scout:desktopSplitterPosition', this.splitter.position);
-        this._handleUpdateSplitterPosition(this.splitter.position);
+        this.revalidateLayout();
       }.bind(this)
     });
   }
-};
-
-scout.Desktop.prototype._handleUpdateSplitterPosition = function(newPosition) {
-  this.navigation.onResize({
-    data: newPosition
-  });
-  this.onResize({
-    data: newPosition
-  });
 };
 
 scout.Desktop.prototype._attachOutlineContent = function() {
@@ -476,7 +467,7 @@ scout.Desktop.prototype.setOutlineContent = function(content, bringToFront) {
     // Request focus on first element in new outlineTab.
     this.session.focusManager.validateFocus();
 
-    content.htmlComp.validateLayout();
+    content.htmlComp.invalidateLayoutTree(false);
     content.htmlComp.validateRoot = true;
     if (this._outlineContent instanceof scout.Table) {
       this._outlineContent.restoreScrollPosition();
@@ -660,26 +651,8 @@ scout.Desktop.prototype.bringOutlineToFront = function(outline) {
   } else {
     this.setOutline(outline, true);
   }
-  //set active form to null because outline is active form.
+  // Set active form to null because outline is active form.
   this._setOutlineActivated();
-
-  if (this._hasNavigation()) {
-    this.navigation.revalidateLayout();
-  }
-};
-
-/**
- * Called after width of navigation has been updated.
- */
-scout.Desktop.prototype.navigationWidthUpdated = function(navigationWidth) {
-  if (this._hasNavigation()) {
-    if (this._hasTaskBar()) {
-      this._$taskBar.css('left', navigationWidth);
-    }
-    if (this._hasBench()) {
-      this.$bench.css('left', navigationWidth);
-    }
-  }
 };
 
 scout.Desktop.prototype._bringNavigationToFront = function() {

@@ -731,7 +731,7 @@ describe("Table", function() {
       table.onModelPropertyChange(event);
 
       // Triggers TableLayout._layoutColumns()
-      session.layoutValidator.validate();
+      table.revalidateLayout();
 
       expect(table.columns[0].width).toBe(150);
       expect(table.columns[1].width).toBe(300);
@@ -754,7 +754,7 @@ describe("Table", function() {
       table.onModelPropertyChange(event);
 
       // Triggers TableLayout._layoutColumns()
-      session.layoutValidator.validate();
+      table.revalidateLayout();
 
       expect(table.columns[0].width).toBe(100);
       expect(table.columns[1].width).toBe(350);
@@ -774,7 +774,7 @@ describe("Table", function() {
       table.onModelPropertyChange(event);
 
       // Triggers TableLayout._layoutColumns()
-      session.layoutValidator.validate();
+      table.revalidateLayout();
 
       expect(table.columns[0].width).toBe(450 - scout.Column.DEFAULT_MIN_WIDTH);
       expect(table.columns[1].width).toBe(scout.Column.DEFAULT_MIN_WIDTH);

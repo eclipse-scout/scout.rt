@@ -79,7 +79,7 @@ scout.TableFooterLayout.prototype.layout = function($container) {
 
   // Let table controls update their content according to the new footer size
   this._tableFooter.table.tableControls.forEach(function(control) {
-    control.onResize();
+    control.revalidateLayout();
   });
 };
 

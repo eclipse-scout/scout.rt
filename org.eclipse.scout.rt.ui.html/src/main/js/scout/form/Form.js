@@ -216,14 +216,6 @@ scout.Form.prototype._isClosable = function() {
   return false;
 };
 
-scout.Form.prototype.onResize = function() {
-  $.log.trace('(Form#onResize) window was resized -> layout Form container');
-  var htmlComp = scout.HtmlComponent.get(this.$container);
-  var $parent = this.$container.parent();
-  var parentSize = new scout.Dimension($parent.width(), $parent.height());
-  htmlComp.setSize(parentSize);
-};
-
 scout.Form.prototype.onMove = function(newOffset) {
   this.trigger('move', newOffset);
 };
@@ -282,9 +274,7 @@ scout.Form.prototype._attach = function() {
 
   // If the parent was resized while this view was detached, the view has a wrong size.
   if (this.isView()) {
-    var htmlComp = scout.HtmlComponent.get(this.$container);
-    var htmlParent = htmlComp.getParent();
-    htmlComp.setSize(htmlParent.getSize());
+    this.invalidateLayoutTree(false);
   }
 
   this.session.detachHelper.afterAttach(this.$container);

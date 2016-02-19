@@ -1724,12 +1724,6 @@ scout.Tree.prototype._onScrollToSelection = function() {
   this.revealSelection();
 };
 
-scout.Tree.prototype.onResize = function() {
-  if (this.rendered) {
-    this.htmlComp.revalidateLayoutTree();
-  }
-};
-
 scout.Tree.prototype._onNodesInserted = function(nodes, parentNodeId) {
   var parentNode;
   if (parentNodeId !== null && parentNodeId !== undefined) {

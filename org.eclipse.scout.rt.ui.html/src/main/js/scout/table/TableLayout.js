@@ -15,7 +15,7 @@ scout.TableLayout = function(table) {
 scout.inherits(scout.TableLayout, scout.AbstractLayout);
 
 scout.TableLayout.prototype.layout = function($container) {
-  var menuBarSize,
+  var menuBarSize, footerHeight, htmlFooter, footerSize,
     menuBar = this.table.menuBar,
     footer = this.table.footer,
     header = this.table.header,

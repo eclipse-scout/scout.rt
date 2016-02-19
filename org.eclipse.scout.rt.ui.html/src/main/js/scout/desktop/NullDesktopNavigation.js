@@ -16,6 +16,5 @@ scout.NullDesktopNavigation = {
   render: function($parent) {},
   onOutlineChanged: function(outline) {},
   bringToFront: function() {},
-  sendToBack: function() {},
-  onResize: function() {}
+  sendToBack: function() {}
 };

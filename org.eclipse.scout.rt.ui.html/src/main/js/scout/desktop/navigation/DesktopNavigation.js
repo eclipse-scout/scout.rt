@@ -8,23 +8,30 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-scout.DesktopNavigation = function(desktop) {
-  this.desktop = desktop;
-  this.session = desktop.session;
-
+// FIXME nbu/AWE: inherit from Widget.js? refactor un-/installKeyStroke
+scout.DesktopNavigation = function() {
   this.$navigation;
   this.$viewButtons;
   this.$container;
   this.htmlViewButtons;
-
   this.viewMenuTab;
 };
+scout.inherits(scout.DesktopNavigation, scout.Widget);
 
 scout.DesktopNavigation.BREADCRUMB_SWITCH_WIDTH = 240; // Same value as in sizes.css // FIXME awe: make dynamic (min. breadcrumb width)
 scout.DesktopNavigation.MIN_SPLITTER_SIZE = 49; // not 50px because last pixel is the border (would not look good)
 
-scout.DesktopNavigation.prototype.render = function($parent) {
+scout.DesktopNavigation.prototype._init = function(model) {
+  scout.DesktopNavigation.parent.prototype._init.call(this, model);
+  this.desktop = this.parent;
+};
+
+scout.DesktopNavigation.prototype._render = function($parent) {
+  // TODO CGU rename $navigation to $container
   this.$navigation = $parent.appendDiv('desktop-navigation');
+  this.htmlComp = new scout.HtmlComponent(this.$navigation, this.session);
+  this.htmlComp.setLayout(new scout.DesktopNavigationLayout(this));
+
   this.$viewButtons = this.$navigation.appendDiv('view-buttons');
   this.htmlViewButtons = new scout.HtmlComponent(this.$viewButtons, this.session);
   this.htmlViewButtons.setLayout(new scout.ViewButtonsLayout(this.htmlViewButtons));
@@ -90,6 +97,7 @@ scout.DesktopNavigation.prototype.onOutlineChanged = function(outline, bringToFr
   this.outline = outline;
   this.outline.setBreadcrumbEnabled(this._breadcrumbEnabled);
   this.outline.render(this.$container);
+  this.outline.invalidateLayoutTree(false);
   this.outline.handleOutlineContent(bringToFront);
   this._updateViewButtons(outline);
   this.outline.validateFocus();
@@ -106,15 +114,6 @@ scout.DesktopNavigation.prototype._updateViewButtons = function(outline) {
       viewTab.onOutlineChanged(outline);
     }
   });
-};
-
-// vertical splitter
-scout.DesktopNavigation.prototype.onResize = function(event) {
-  var newWidth = Math.max(event.data, scout.DesktopNavigation.MIN_SPLITTER_SIZE); // data = newSize, ensure newSize is not negative
-  this.$navigation.width(newWidth);
-  this.htmlViewButtons.revalidateLayout();
-  this.desktop.navigationWidthUpdated(newWidth);
-  this.setBreadcrumbEnabled(newWidth <= scout.DesktopNavigation.BREADCRUMB_SWITCH_WIDTH);
 };
 
 scout.DesktopNavigation.prototype.setBreadcrumbEnabled = function(enabled) {
@@ -145,16 +144,4 @@ scout.DesktopNavigation.prototype.sendToBack = function() {
 scout.DesktopNavigation.prototype.bringToFront = function() {
   this.viewMenuTab.bringToFront();
   this.outline.bringToFront();
-};
-
-scout.DesktopNavigation.prototype.revalidateLayout = function() {
-  // this check here is required because there are multiple property change
-  // events while the outline changes. Sometimes we have none at all or two
-  // selected tabs at the same time. This makes it impossible to animate the
-  // view-buttons properly. With this check here we wait until all property
-  // change events have been processed. Assuming that in the end there's always
-  // on single selected view-button.
-  if (this._getNumSelectedTabs() === 1) {
-    this.htmlViewButtons.revalidateLayout();
-  }
 };

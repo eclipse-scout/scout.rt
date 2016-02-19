@@ -101,7 +101,7 @@ scout.ViewTabsController.prototype._removeViewTab = function(viewTab, viewId) {
     }
   }
 
-  this._desktop._layoutTaskBar();
+  this._desktop.revalidateTaskBarLayout();
 };
 
 /**
@@ -126,8 +126,8 @@ scout.ViewTabsController.prototype.selectViewTab = function(viewTab) {
   // Select the new view tab.
   viewTab.select();
 
-  // Invalidate layout and focus.
-  this._desktop._layoutTaskBar();
+  // Invalidate layout and focus
+  this._desktop.revalidateTaskBarLayout();
 };
 
 /**

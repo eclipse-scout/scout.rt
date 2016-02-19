@@ -52,7 +52,3 @@ scout.OutlineOverview.prototype._detach = function() {
   this.$container.detach();
   scout.OutlineOverview.parent.prototype._detach.call(this);
 };
-
-scout.OutlineOverview.prototype.onResize = function() {
-
-};

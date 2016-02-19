@@ -1420,11 +1420,6 @@ scout.Table.prototype.notifyRowSelectionFinished = function() {
   this._updateMenuBar();
 };
 
-// Only necessary if the table is a root html comp (outline table)
-scout.Table.prototype.onResize = function() {
-  this.htmlComp.revalidateLayoutTree();
-};
-
 scout.Table.prototype._sendRowClicked = function($row, mouseButton, columnId) {
   var data = {
     rowId: $row.data('row').id,

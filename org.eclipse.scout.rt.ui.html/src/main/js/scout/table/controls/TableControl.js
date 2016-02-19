@@ -49,6 +49,11 @@ scout.TableControl.prototype._createKeyStrokeContextForTableControl = function()
   return keyStrokeContext;
 };
 
+
+scout.TableControl.prototype._createLayout = function() {
+  return new scout.TableControlLayout(this);
+};
+
 scout.TableControl.prototype._render = function($parent) {
   var classes = 'table-control ';
   if (this.cssClass) {
@@ -57,6 +62,8 @@ scout.TableControl.prototype._render = function($parent) {
   this.$container = $parent.appendDiv(classes)
     .on('mousedown', this._onMouseDown.bind(this))
     .data('control', this);
+  this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
+  this.htmlComp.setLayout(this._createLayout());
 };
 
 scout.TableControl.prototype.remove = function() {
@@ -77,7 +84,6 @@ scout.TableControl.prototype._renderContent = function($parent) {
   this.form.$container.width($parent.width());
   this.form.htmlComp.pixelBasedSizing = true;
   this.form.htmlComp.validateRoot = true;
-  this.form.htmlComp.revalidateLayout();
   this.session.keyStrokeManager.installKeyStrokeContext(this.tableControlKeyStrokeContext);
 };
 
@@ -122,6 +128,9 @@ scout.TableControl.prototype.renderContent = function() {
       this.tableFooter.$controlContent.addClass(this.cssClass + '-table-control-content');
     }
     this._renderContent(this.tableFooter.$controlContent);
+    if (this.htmlComp) {
+      this.htmlComp.invalidateLayoutTree(false);
+    }
     this.contentRendered = true;
   }
 };
@@ -219,12 +228,6 @@ scout.TableControl.prototype._goOffline = function() {
 scout.TableControl.prototype._goOnline = function() {
   if (!this.isContentAvailable() && this.enabled) {
     this._renderEnabled(true);
-  }
-};
-
-scout.TableControl.prototype.onResize = function() {
-  if (this.form && this.form.rendered) {
-    this.form.onResize();
   }
 };
 

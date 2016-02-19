@@ -1054,6 +1054,7 @@ scout.Session.prototype._putLocaleData = function(locale, textMap) {
 
 scout.Session.prototype._renderDesktop = function() {
   this.desktop.render(this.$entryPoint);
+  this.desktop.invalidateLayoutTree(false);
   this._setApplicationLoading(false);
 };
 

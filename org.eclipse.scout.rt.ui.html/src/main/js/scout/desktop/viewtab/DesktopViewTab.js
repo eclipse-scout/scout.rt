@@ -80,7 +80,7 @@ scout.DesktopViewTab.prototype._renderView = function($parent) {
   }
   this._view.render(this._$bench);
   this._view.$container.addClass('view');
-  this._view.htmlComp.validateLayout();
+  this._view.htmlComp.invalidateLayoutTree(false);
   this._view.htmlComp.validateRoot = true;
   this._view.rendered = true;
 };
@@ -155,10 +155,6 @@ scout.DesktopViewTab.prototype._onViewRemoved = function() {
   } else {
     this._trigger('remove');
   }
-};
-
-scout.DesktopViewTab.prototype.onResize = function() {
-  this._view.onResize();
 };
 
 scout.DesktopViewTab.prototype.getMenuText = function() {

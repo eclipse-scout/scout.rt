@@ -156,6 +156,7 @@ __include("jquery/jquery-scout.js");
   __include("scout/table/columns/IconColumn.js"); //requires Column.js
   __include("scout/table/columns/NumberColumn.js"); //requires Column.js
   __include("scout/table/controls/TableControl.js");
+  __include("scout/table/controls/TableControlLayout.js");
   __include("scout/table/controls/AggregateTableControl.js"); // requires TableControl.js
   __include("scout/table/editor/CellEditorPopup.js");
   __include("scout/table/editor/CellEditorPopupLayout.js");
@@ -202,12 +203,15 @@ __include("jquery/jquery-scout.js");
   // Desktop
   __include("scout/desktop/BaseDesktop.js");
   __include("scout/desktop/Desktop.js");
+  __include("scout/desktop/DesktopLayout.js");
+  __include("scout/desktop/DesktopBenchLayout.js");
   __include("scout/desktop/DesktopKeyStroke.js");
   __include("scout/desktop/DesktopTaskBarLayout.js");
   __include("scout/desktop/DisableBrowserTabSwitchingKeyStroke.js");
-  __include("scout/desktop/DesktopNavigation.js");
   __include("scout/desktop/NullDesktopNavigation.js");
   __include("scout/desktop/PopupWindow.js");
+  __include("scout/desktop/navigation/DesktopNavigation.js");
+  __include("scout/desktop/navigation/DesktopNavigationLayout.js");
   __include("scout/desktop/notification/DesktopNotification.js");
   __include("scout/desktop/notification/OfflineDesktopNotification.js");
   __include("scout/desktop/popupblocker/PopupBlockerHandler.js");

@@ -26,7 +26,11 @@ scout.MobileDesktop.prototype._init = function(model) {
 scout.MobileDesktop.prototype._render = function($parent) {
   this.$container = $parent;
   this.$container.addClass('desktop');
-  this.navigation = new scout.DesktopNavigation(this);
+  this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
+  this.htmlComp.setLayout(new scout.DesktopLayout(this));
+  this.navigation = scout.create('DesktopNavigation', {
+    parent: this
+  });
   this.navigation.render($parent);
   this.navigation.setBreadcrumbEnabled(true);
   this.navigation.onOutlineChanged(this.outline, true);
@@ -93,12 +97,6 @@ scout.MobileDesktop.prototype.setOutlineContent = function(content, bringToFront
     } else {
       func();
     }
-  }
-};
-
-scout.MobileDesktop.prototype.onResize = function(event) {
-  if (this._currentDetailForm) {
-    this._currentDetailForm.onResize();
   }
 };
 
