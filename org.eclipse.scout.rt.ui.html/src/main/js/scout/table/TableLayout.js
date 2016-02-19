@@ -39,7 +39,7 @@ scout.TableLayout.prototype.layout = function($container) {
   }
   if (footer) {
     // Layout table footer and add size of footer (including the control content) to 'height'
-    footer.htmlComp.revalidateLayout();
+    footer.revalidateLayout();
     height += scout.graphics.getSize(footer.$container).height;
     height += scout.graphics.getSize(footer.$controlContainer).height;
   }

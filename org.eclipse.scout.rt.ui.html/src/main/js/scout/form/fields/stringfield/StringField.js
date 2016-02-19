@@ -161,7 +161,7 @@ scout.StringField.prototype._renderHasAction = function(decorationLink) {
   if (decorationLink) {
     this.$container.addClass("has-action");
     this.addIcon();
-    this.revalidateLayout();
+    this.invalidateLayoutTree(false);
   } else {
     if (this.$icon) {
       this.$icon.remove();

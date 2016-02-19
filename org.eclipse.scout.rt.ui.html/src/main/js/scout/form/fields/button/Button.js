@@ -250,7 +250,7 @@ scout.Button.prototype._renderIconId = function() {
   function updateButtonLayoutAfterImageLoaded(success) {
     $icon.removeClass('loading');
     $icon.toggleClass('broken', !success);
-    this.htmlComp.revalidateLayoutTree();
+    this.htmlComp.invalidateLayoutTree();
   }
 };
 

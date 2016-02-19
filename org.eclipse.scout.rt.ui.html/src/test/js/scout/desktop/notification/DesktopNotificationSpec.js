@@ -16,11 +16,8 @@ describe('DesktopNotification', function() {
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
-    $sandbox = $('#sandbox');
+    $sandbox = session.$entryPoint;
     parent.session = session;
-  });
-
-  afterEach(function() {
   });
 
   it('_init copies properties from event (model)', function() {

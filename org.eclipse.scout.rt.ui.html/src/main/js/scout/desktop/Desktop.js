@@ -46,6 +46,7 @@ scout.Desktop.prototype._init = function(model) {
   this.messageBoxController = new scout.MessageBoxController(this, this.session);
   this.fileChooserController = new scout.FileChooserController(this, this.session);
   this._addNullOutline(model.outline);
+  this._resizeHandler = this.onResize.bind(this);
 };
 
 scout.DesktopStyle = {
@@ -97,12 +98,17 @@ scout.Desktop.prototype._render = function($parent) {
   });
   this.navigation.onOutlineChanged(this.outline, true);
 
-  $parent.window().on('resize', this.onResize.bind(this));
+  $parent.window().on('resize', this._resizeHandler);
 
   // prevent general drag and drop, dropping a file anywhere in the application must not open this file in browser
   this._setupDragAndDrop();
 
   this._disableContextMenu($parent);
+};
+
+scout.Desktop.prototype._remove = function() {
+  this.$container.window().off('resize', this._resizeHandler);
+  scout.Desktop.parent.prototype._remove.call(this);
 };
 
 scout.Desktop.prototype._disableContextMenu = function($parent) {
@@ -354,11 +360,11 @@ scout.Desktop.prototype._setSplitterPosition = function() {
     // Restore splitter position
     var splitterPosition = parseInt(storedSplitterPosition, 10);
     this.splitter.updatePosition(splitterPosition);
-    this.revalidateLayout();
+    this.invalidateLayoutTree();
   } else {
     // Set initial splitter position
     this.splitter.updatePosition();
-    this.revalidateLayout();
+    this.invalidateLayoutTree();
   }
 };
 
@@ -463,12 +469,17 @@ scout.Desktop.prototype.setOutlineContent = function(content, bringToFront) {
       content.menuBar.large();
     }
     content.render(this.$bench);
+    content.validateRoot = true;
+    content.invalidateLayoutTree(false);
 
     // Request focus on first element in new outlineTab.
     this.session.focusManager.validateFocus();
 
-    content.htmlComp.invalidateLayoutTree(false);
-    content.htmlComp.validateRoot = true;
+    // Layout immediate to prevent 'laggy' form visualization,
+    // but not initially while desktop gets rendered because it will be done at the end anyway
+    if (this.rendered) {
+      content.validateLayoutTree();
+    }
     if (this._outlineContent instanceof scout.Table) {
       this._outlineContent.restoreScrollPosition();
     }

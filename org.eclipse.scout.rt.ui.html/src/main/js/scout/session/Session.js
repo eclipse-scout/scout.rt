@@ -312,7 +312,7 @@ scout.Session.prototype._processStartupResponse = function(data) {
       }
     }
 
-    // Ensure layout is valid
+    // Ensure layout is valid (explicitly layout immediately and don't wait for setTimeout to run to make layouting invisible to the user)
     this.layoutValidator.validate();
 
     // Start poller
@@ -389,7 +389,6 @@ scout.Session.prototype._sendRequest = function(request) {
     } else {
       this._queuedRequest = request;
     }
-    this.layoutValidator.validate();
     return;
   }
 
@@ -468,7 +467,6 @@ scout.Session.prototype._performUserAjaxRequest = function(ajaxOptions, busyHand
 
   function onAjaxAlways(data, textStatus, errorThrown) {
     this._requestsPendingCounter--;
-    this.layoutValidator.validate();
     if (success) {
       this._resumeBackgroundJobPolling();
       this._fireRequestFinished(data);
@@ -557,7 +555,6 @@ scout.Session.prototype._pollForBackgroundJobs = function() {
       } else {
         // No user request pending, handle immediately
         this.responseQueue.process(data);
-        this.layoutValidator.validate();
       }
       setTimeout(this._pollForBackgroundJobs.bind(this));
     }

@@ -80,9 +80,13 @@ scout.DesktopViewTab.prototype._renderView = function($parent) {
   }
   this._view.render(this._$bench);
   this._view.$container.addClass('view');
-  this._view.htmlComp.invalidateLayoutTree(false);
-  this._view.htmlComp.validateRoot = true;
-  this._view.rendered = true;
+  this._view.validateRoot = true;
+  this._view.invalidateLayoutTree(false);
+  // Layout immediate to prevent 'laggy' form visualization,
+  // but not initially while desktop gets rendered because it will be done at the end anyway
+  if (this.rendered) {
+    this._view.validateLayoutTree();
+  }
 };
 
 scout.DesktopViewTab.prototype.select = function() {
@@ -92,7 +96,7 @@ scout.DesktopViewTab.prototype.select = function() {
   } else {
     this._renderView();
     if (this.session.desktop._outlineContent !== this._view) {
-      //notify model this form is active
+      // Notify model that this form is active
       this.session.desktop._setFormActivated(this._view);
     }
   }

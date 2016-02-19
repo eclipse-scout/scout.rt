@@ -35,7 +35,8 @@ function sandboxSession(options) {
     parent: session.rootAdapter
   });
   session._renderDesktop();
-
+  // Prevent exception when test window gets resized
+  session.desktop.$container.window().off('resize', session.desktop._resizeHandler);
   return session;
 }
 

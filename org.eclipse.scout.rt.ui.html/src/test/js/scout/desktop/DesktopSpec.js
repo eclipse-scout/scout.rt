@@ -10,13 +10,13 @@
  ******************************************************************************/
 describe('Desktop', function() {
 
-  var session, desktop = new scout.Desktop();
+  var session, desktop;
 
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
+    desktop = session.desktop;
     desktop.viewButtons = [];
-    desktop.session = session;
   });
 
   describe('_addNullOutline', function() {

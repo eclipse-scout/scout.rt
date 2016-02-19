@@ -10,6 +10,7 @@
  ******************************************************************************/
 scout.LayoutValidator = function() {
   this._invalidComponents = [];
+  this._validateTimeoutId = null;
 };
 
 scout.LayoutValidator.prototype.invalidateTree = function(htmlComp) {
@@ -52,12 +53,21 @@ scout.LayoutValidator.prototype.invalidate = function(htmlComp) {
 
   // Add validate root to list of invalid components. These are the starting point for a subsequent call to validate().
   scout.arrays.insert(this._invalidComponents, htmlComp, position);
+
+  // Schedule validation
+  if (this._validateTimeoutId === null) {
+    this._validateTimeoutId = setTimeout(function() {
+      this.validate();
+    }.bind(this));
+  }
 };
 
 /**
  * Layouts all invalid components (as long as they haven't been removed).
  */
 scout.LayoutValidator.prototype.validate = function() {
+  clearTimeout(this._validateTimeoutId);
+  this._validateTimeoutId = null;
   this._invalidComponents.slice().forEach(function(comp) {
     if (comp.isAttached()) { // don't layout components which don't exist anymore or are detached from the DOM
       comp.validateLayout();

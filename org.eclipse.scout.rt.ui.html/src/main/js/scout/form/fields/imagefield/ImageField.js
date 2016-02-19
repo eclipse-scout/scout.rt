@@ -89,11 +89,11 @@ scout.ImageField.prototype._updateInnerAlignment = function() {
 scout.ImageField.prototype._onImageLoad = function(event) {
   this.$field.removeClass('broken');
   scout.scrollbars.update(this.$fieldContainer);
-  this.revalidateLayoutTree();
+  this.invalidateLayoutTree();
 };
 
 scout.ImageField.prototype._onImageError = function(event) {
   this.$field.addClass('empty broken');
   scout.scrollbars.update(this.$fieldContainer);
-  this.revalidateLayoutTree();
+  this.invalidateLayoutTree();
 };

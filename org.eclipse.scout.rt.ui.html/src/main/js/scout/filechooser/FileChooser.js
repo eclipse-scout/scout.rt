@@ -94,7 +94,6 @@ scout.FileChooser.prototype._render = function($parent) {
         } finally {
           // "onAjaxAlways"
           this.session.setBusy(false);
-          this.session.layoutValidator.validate();
         }
       }.bind(this));
     this.$fileInputField

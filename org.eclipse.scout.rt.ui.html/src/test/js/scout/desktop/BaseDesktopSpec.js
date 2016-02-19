@@ -13,21 +13,16 @@ describe('BaseDesktop', function() {
   var session, helper, $sandbox, desktop, ntfc,
     parent = new scout.Widget();
 
-
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
-    $sandbox = $('#sandbox');
+    desktop = session.desktop;
     parent.session = session;
-    desktop = scout.create('Desktop', {
-      parent: parent
-    });
     ntfc = scout.create('DesktopNotification', {
       id: 'theID',
       parent: desktop,
       status: {}
     });
-    desktop.render($sandbox);
   });
 
   it('addNotification', function() {
