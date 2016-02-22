@@ -15,10 +15,10 @@ scout.DesktopNavigationLayout = function(navigation) {
 scout.inherits(scout.DesktopNavigationLayout, scout.AbstractLayout);
 
 scout.DesktopNavigationLayout.prototype.layout = function($container) {
-  var outlineSize, viewButtonsSize, viewButtonsHeight,
+  var bodySize, viewButtonsSize, viewButtonsHeight,
     htmlContainer = this.navigation.htmlComp,
     containerSize = htmlContainer.getSize(),
-    htmlOutline = this.navigation.outline.htmlComp,
+    htmlBody = this.navigation.htmlCompBody,
     htmlViewButtons = this.navigation.htmlViewButtons;
 
   containerSize = containerSize.subtract(htmlContainer.getInsets());
@@ -27,7 +27,7 @@ scout.DesktopNavigationLayout.prototype.layout = function($container) {
     .subtract(htmlContainer.getMargins());
   htmlViewButtons.setSize(viewButtonsSize);
 
-  outlineSize = new scout.Dimension(containerSize.width, containerSize.height - viewButtonsHeight)
+  bodySize = new scout.Dimension(containerSize.width, containerSize.height - viewButtonsHeight)
     .subtract(htmlContainer.getMargins());
-  htmlOutline.setSize(outlineSize);
+  htmlBody.setSize(bodySize);
 };

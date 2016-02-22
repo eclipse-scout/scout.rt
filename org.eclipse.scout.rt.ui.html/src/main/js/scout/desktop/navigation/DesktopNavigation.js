@@ -8,11 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-// FIXME nbu/AWE: inherit from Widget.js? refactor un-/installKeyStroke
 scout.DesktopNavigation = function() {
-  this.$navigation;
-  this.$viewButtons;
   this.$container;
+  this.$viewButtons;
+  this.$body;
   this.htmlViewButtons;
   this.viewMenuTab;
 };
@@ -30,12 +29,11 @@ scout.DesktopNavigation.prototype._init = function(model) {
 };
 
 scout.DesktopNavigation.prototype._render = function($parent) {
-  // TODO CGU rename $navigation to $container
-  this.$navigation = $parent.appendDiv('desktop-navigation');
-  this.htmlComp = new scout.HtmlComponent(this.$navigation, this.session);
+  this.$container = $parent.appendDiv('desktop-navigation');
+  this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
   this.htmlComp.setLayout(new scout.DesktopNavigationLayout(this));
 
-  this.$viewButtons = this.$navigation.appendDiv('view-buttons');
+  this.$viewButtons = this.$container.appendDiv('view-buttons');
   this.htmlViewButtons = new scout.HtmlComponent(this.$viewButtons, this.session);
   this.htmlViewButtons.setLayout(new scout.ViewButtonsLayout(this.htmlViewButtons));
   this.viewMenuTab = new scout.ViewMenuTab(this._viewButtons('MENU'), this.session);
@@ -51,9 +49,9 @@ scout.DesktopNavigation.prototype._render = function($parent) {
     }
   }
 
-  this.$container = this.$navigation.appendDiv('navigation-container')
+  this.$body = this.$container.appendDiv('navigation-body')
     .on('mousedown', this._onNavigationMousedown.bind(this));
-  this.htmlCompBody = new scout.HtmlComponent(this.$container, this.session);
+  this.htmlCompBody = new scout.HtmlComponent(this.$body, this.session);
   this.htmlCompBody.setLayout(new scout.SingleLayout());
 };
 
@@ -103,7 +101,7 @@ scout.DesktopNavigation.prototype.onOutlineChanged = function(outline, bringToFr
 
   this.outline = outline;
   this.outline.setBreadcrumbTogglingThreshold(scout.DesktopNavigation.BREADCRUMB_STYLE_WIDTH);
-  this.outline.render(this.$container);
+  this.outline.render(this.$body);
   this.outline.invalidateLayoutTree();
   this.outline.handleOutlineContent(bringToFront);
   this._updateViewButtons(outline);

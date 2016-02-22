@@ -22,7 +22,7 @@
   width: @desktop-navigation-breadcrumb-width;
 }
 
-.navigation-container {
+.navigation-body {
   position: relative;
   width: 100%;
   height: calc(~'100%' - @view-buttons-height);

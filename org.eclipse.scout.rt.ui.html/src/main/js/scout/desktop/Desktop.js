@@ -341,7 +341,7 @@ scout.Desktop.prototype._createSplitter = function($parent) {
   }
   this.splitter = scout.create('Splitter', {
     parent: this,
-    $anchor: this.navigation.$navigation,
+    $anchor: this.navigation.$container,
     $root: this.$container,
     maxRatio: 0.5
   });
@@ -410,7 +410,7 @@ scout.Desktop.prototype._onSplitterResizeEnd = function(event) {
     // Set width of navigation to BREADCRUMB_STYLE_WIDTH, using an animation.
     // While animating, update the desktop layout.
     // At the end of the animation, update the desktop layout, and store the splitter position.
-    this.navigation.$navigation.animate({
+    this.navigation.$container.animate({
       width: scout.DesktopNavigation.BREADCRUMB_STYLE_WIDTH
     }, {
       progress: function() {

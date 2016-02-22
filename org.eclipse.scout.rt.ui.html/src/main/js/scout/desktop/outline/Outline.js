@@ -634,7 +634,7 @@ scout.Outline.prototype.glassPaneTargets = function() {
     var desktop = this.session.desktop;
     var elements = [];
     if (desktop.navigation) {
-      elements.push(desktop.navigation.$container); // navigation container; not available if application has no navigation.
+      elements.push(desktop.navigation.$body); // navigation body; not available if application has no navigation.
     }
     if (desktop._outlineContent) {
       elements.push(desktop._outlineContent.$container); // outline content; not available if application has no navigation.
@@ -646,7 +646,7 @@ scout.Outline.prototype.glassPaneTargets = function() {
       var desktop = event.eventOn.session.desktop;
       var elements = [];
       if (desktop.navigation) {
-        elements.push(desktop.navigation.$container); // navigation container; not available if application has no navigation.
+        elements.push(desktop.navigation.$body); // navigation body; not available if application has no navigation.
       }
       if (desktop._outlineContent) {
         elements.push(desktop._outlineContent.$container); // outline content; not available if application has no navigation.
