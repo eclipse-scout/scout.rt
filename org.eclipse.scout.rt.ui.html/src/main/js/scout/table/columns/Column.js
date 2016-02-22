@@ -414,6 +414,21 @@ scout.Column.prototype._renderBackgroundEffect = function() {
   }, this);
 };
 
+scout.Column.prototype.calculateOptimalWidth = function() {
+  var row, rows = this.table.rows,
+    optimalWidth = this.minWidth;
+  for (var i = 0; i < rows.length; i++) {
+    row = rows[i];
+    var $div = $(this.buildCellForRow(row));
+    $div.removeAttr('style');
+    $div.hide();
+    this.table.$data.append($div);
+    optimalWidth = optimalWidth < $div.outerWidth() ? $div.outerWidth() : optimalWidth;
+    $div.remove();
+  }
+  return optimalWidth;
+};
+
 scout.Column.prototype.calculateMinMaxValues = function() {
   var row, minValue, maxValue, value,
     rows = this.table.rows;

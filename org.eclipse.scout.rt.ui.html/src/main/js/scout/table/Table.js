@@ -2642,6 +2642,19 @@ scout.Table.prototype.resetFilter = function() {
   this._triggerFilterResetted();
 };
 
+scout.Table.prototype.resizeToFit = function(column) {
+  if (column.fixedWidth) {
+    return;
+  }
+  var calculatedSize = column.calculateOptimalWidth();
+  if (scout.device.browser === scout.Device.Browser.INTERNET_EXPLORER && calculatedSize !== column.minWidth) {
+    calculatedSize++;
+  }
+  if (column.width !== calculatedSize) {
+    this.resizeColumn(column, calculatedSize);
+  }
+};
+
 /**
  * @param filter object with createKey() and accept()
  */
