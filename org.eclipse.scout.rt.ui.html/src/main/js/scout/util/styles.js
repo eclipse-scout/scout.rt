@@ -44,6 +44,7 @@ scout.styles = {
     });
 
     scout.styles.styleMap[key] = style;
+    elem.className = '';
     return style;
   },
 

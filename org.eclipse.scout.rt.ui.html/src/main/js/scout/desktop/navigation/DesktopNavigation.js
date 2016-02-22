@@ -18,13 +18,15 @@ scout.DesktopNavigation = function() {
 };
 scout.inherits(scout.DesktopNavigation, scout.Widget);
 
-scout.DesktopNavigation.DEFAULT_STYLE_WIDTH = 290; // Same value as in sizes.css
-scout.DesktopNavigation.BREADCRUMB_STYLE_WIDTH = 240; // Same value as in sizes.css // FIXME awe: make dynamic (min. breadcrumb width)
+scout.DesktopNavigation.DEFAULT_STYLE_WIDTH; // Configured in sizes.css
+scout.DesktopNavigation.BREADCRUMB_STYLE_WIDTH; // Configured in sizes.css
 scout.DesktopNavigation.MIN_SPLITTER_SIZE = 49; // not 50px because last pixel is the border (would not look good)
 
 scout.DesktopNavigation.prototype._init = function(model) {
   scout.DesktopNavigation.parent.prototype._init.call(this, model);
   this.desktop = this.parent;
+  scout.DesktopNavigation.DEFAULT_STYLE_WIDTH = $.pxToNumber(scout.styles.get('desktop-navigation', 'width').width);
+  scout.DesktopNavigation.BREADCRUMB_STYLE_WIDTH = $.pxToNumber(scout.styles.get('desktop-navigation-breadcrumb', 'width').width);
 };
 
 scout.DesktopNavigation.prototype._render = function($parent) {
