@@ -251,6 +251,7 @@ describe("StringField", function() {
       field.render(session.$entryPoint);
       field.$field.val('Test1');
       field.$field.trigger('input');
+      jasmine.clock().tick(251); // because of debounce
       sendQueuedAjaxCalls();
       var event = new scout.Event(field.id, 'displayTextChanged', {
         displayText: 'Test1', whileTyping: true
@@ -287,6 +288,7 @@ describe("StringField", function() {
       field.render(session.$entryPoint);
       field.$field.val('Test3');
       field.$field.trigger('input');
+      jasmine.clock().tick(251); // because of debounce
       sendQueuedAjaxCalls();
       var event = new scout.Event(field.id, 'displayTextChanged', {
         displayText: 'Test3', whileTyping: true

@@ -8,6 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
+/* global LocaleSpecHelper */
 describe("scout.dates", function() {
 
   describe("shift", function() {
@@ -148,6 +149,23 @@ describe("scout.dates", function() {
 
       date = scout.dates.create('2015-07-09');
       expect(scout.dates.shiftToPreviousDayOfType(date, 6).toISOString()).toBe(scout.dates.create('2015-07-04 00:00:00.000').toISOString());
+    });
+  });
+
+  describe("ensureMonday", function() {
+
+    it("shifts to next monday in direction if it is not a monday yet", function() {
+      var date = scout.dates.create('2016-02-09');
+      expect(scout.dates.ensureMonday(date, 1).toISOString()).toBe(scout.dates.create('2016-02-15 00:00:00.000').toISOString());
+
+      date = scout.dates.create('2016-02-21');
+      expect(scout.dates.ensureMonday(date, -1).toISOString()).toBe(scout.dates.create('2016-02-15 00:00:00.000').toISOString());
+
+      date = scout.dates.create('2016-02-15');
+      expect(scout.dates.ensureMonday(date, 1).toISOString()).toBe(scout.dates.create('2016-02-15 00:00:00.000').toISOString());
+
+      date = scout.dates.create('2016-02-15');
+      expect(scout.dates.ensureMonday(date, -1).toISOString()).toBe(scout.dates.create('2016-02-15 00:00:00.000').toISOString());
     });
   });
 
@@ -382,6 +400,88 @@ describe("scout.dates", function() {
       expect(scout.dates.weekInYear(scout.dates.create('2015-01-11'), 0)).toBe(2);
       expect(scout.dates.weekInYear(scout.dates.create('2015-01-12'), 0)).toBe(2);
       expect(scout.dates.weekInYear(scout.dates.create('2015-01-26'), 0)).toBe(4);
+    });
+
+  });
+
+  describe("format", function() {
+
+    it("can handle invalid values", function() {
+      expect(function() {
+        scout.dates.format();
+      }).toThrow();
+      expect(function() {
+        scout.dates.format(new Date());
+      }).toThrow();
+      expect(function() {
+        scout.dates.format('gugus');
+      }).toThrow();
+
+      var helper = new LocaleSpecHelper();
+      var locale = helper.createLocale(LocaleSpecHelper.DEFAULT_LOCALE);
+
+      expect(scout.dates.format(null, locale)).toBe('');
+      expect(scout.dates.format(scout.dates.create('2014-11-21'), locale)).toBe('21.11.2014');
+    });
+
+    it("can format valid dates", function() {
+      var helper = new LocaleSpecHelper();
+      var locale = helper.createLocale(LocaleSpecHelper.DEFAULT_LOCALE);
+
+      expect(scout.dates.format(scout.dates.create('2014-11-21'), locale, 'yy')).toBe('14');
+    });
+
+  });
+
+  describe("compare", function() {
+
+    it("can handle invalid dates", function() {
+      expect(scout.dates.compare()).toBe(0);
+
+      var date = null;
+      var date2 = null;
+      expect(scout.dates.compare(date, date2)).toBe(0);
+
+      date = scout.dates.create('2014-11-21');
+      expect(scout.dates.compare(date, date2)).toBe(1);
+
+      date = null;
+      date2 = scout.dates.create('2014-11-21');
+      expect(scout.dates.compare(date, date2)).toBe(-1);
+
+      expect(function() {
+        scout.dates.compare('invalid value', date2);
+      }).toThrow();
+
+      date = null;
+      date2 = scout.dates.create('2014-11-21');
+      expect(scout.dates.compare(date, date2)).toBe(-1);
+    });
+
+    it("can compare valid dates", function() {
+      var date = scout.dates.create('2014-11-21');
+      var date2 = scout.dates.create('2014-11-21');
+      expect(scout.dates.compare(date, date2)).toBe(0);
+
+      date = scout.dates.create('2013-11-21');
+      date2 = scout.dates.create('2014-11-21');
+      expect(scout.dates.compare(date, date2)).toBe(-1);
+
+      date = scout.dates.create('2015-11-21');
+      date2 = scout.dates.create('2014-11-21');
+      expect(scout.dates.compare(date, date2)).toBe(1);
+
+      date = scout.dates.create('2016-01-20');
+      date2 = scout.dates.create('2016-02-10');
+      expect(scout.dates.compare(date, date2)).toBe(-1);
+
+      date = scout.dates.create('2016-02-29');
+      date2 = scout.dates.create('2016-03-01');
+      expect(scout.dates.compare(date, date2)).toBe(-1);
+
+      date = scout.dates.create('2015-02-29');
+      date2 = scout.dates.create('2015-03-01');
+      expect(scout.dates.compare(date, date2)).toBe(0);
     });
 
   });

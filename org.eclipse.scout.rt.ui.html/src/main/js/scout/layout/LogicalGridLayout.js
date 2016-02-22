@@ -41,10 +41,10 @@ scout.LogicalGridLayout.prototype.invalidate = function() {
 
 scout.LogicalGridLayout.prototype.validateLayout = function($parent) {
   var visibleComps = [], visibleCons = [], i, cons,
-    children = $parent.children('.form-field');
+    $children = $parent.children('.form-field');
 
-  for (i = 0; i < children.length; i++) {
-    var $comp = $(children[i]);
+  for (i = 0; i < $children.length; i++) {
+    var $comp = $children.eq(i);
     var htmlComp = scout.HtmlComponent.get($comp);
     if ($comp.isVisible()) {
       visibleComps.push($comp);

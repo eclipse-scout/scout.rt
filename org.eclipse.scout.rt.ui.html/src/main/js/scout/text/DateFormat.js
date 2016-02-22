@@ -46,7 +46,13 @@ scout.DateFormatPatternType = {
 scout.DateFormat = function(locale, pattern) {
   /*jshint sub:true*/
   this.locale = locale;
+  if (this.locale === undefined || this.locale === null) {
+    throw new Error('Missing locale');
+  }
   this.pattern = pattern || locale.dateFormatPatternDefault;
+  if (this.pattern === undefined || this.pattern === null) {
+    throw new Error('Missing pattern');
+  }
 
   this.symbols = locale.dateFormatSymbols;
   this.symbols.firstDayOfWeek = 1; // monday //FIXME cgu: deliver from server

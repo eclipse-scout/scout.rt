@@ -57,7 +57,7 @@ public abstract class AbstractBooleanColumn extends AbstractColumn<Boolean> impl
 
   @Override
   protected String formatValueInternal(ITableRow row, Boolean value) {
-    return (BooleanUtility.nvl(value)) ? "X" : "";
+    return (BooleanUtility.nvl(value)) ? TRUE_TEXT : "";
   }
 
   @Override

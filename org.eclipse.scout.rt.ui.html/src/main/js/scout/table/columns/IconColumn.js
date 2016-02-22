@@ -18,9 +18,11 @@ scout.inherits(scout.IconColumn, scout.Column);
 /**
  * @override
  */
-scout.IconColumn.prototype.buildCell = function(cell, row) {
+scout.IconColumn.prototype.initCell = function(cell) {
+  cell = scout.IconColumn.parent.prototype.initCell.call(this, cell);
+  cell.text = null; // only display icon, no text
   cell.iconId = cell.value || cell.iconId;
-  return scout.IconColumn.parent.prototype.buildCell.call(this, cell, row);
+  return cell;
 };
 
 /**
@@ -31,9 +33,6 @@ scout.IconColumn.prototype.cellTextForGrouping = function(row) {
   return cell.value;
 };
 
-/**
- * @override
- */
 scout.IconColumn.prototype.createAggrGroupCell = function(row) {
   var cell = scout.IconColumn.parent.prototype.createAggrGroupCell.call(this, row);
   // Make sure only icon and no text is displayed

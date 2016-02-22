@@ -15,11 +15,11 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.eclipse.scout.rt.client.AbstractDesktopTest.CheckSaveTestForm.MainBox.MessageField;
-import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.testenvironment.ui.desktop.TestEnvironmentDesktop;
 import org.eclipse.scout.rt.client.ui.DataChangeListener;
 import org.eclipse.scout.rt.client.ui.desktop.AbstractDesktop;
+import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
 import org.eclipse.scout.rt.client.ui.form.IForm;
@@ -84,7 +84,7 @@ public class AbstractDesktopTest {
    */
   @Test
   public void testClosingDoBeforeClosingInternal() {
-    TestEnvironmentDesktop desktop = (TestEnvironmentDesktop) ClientRunContexts.copyCurrent().getDesktop();
+    TestEnvironmentDesktop desktop = (TestEnvironmentDesktop) IDesktop.CURRENT.get();
 
     boolean closing = desktop.doBeforeClosingInternal();
     assertTrue(closing);
@@ -92,7 +92,7 @@ public class AbstractDesktopTest {
 
   @Test
   public void testUnsavedForms() {
-    TestEnvironmentDesktop desktop = (TestEnvironmentDesktop) ClientRunContexts.copyCurrent().getDesktop();
+    TestEnvironmentDesktop desktop = (TestEnvironmentDesktop) IDesktop.CURRENT.get();
 
     m_testForm.startNew();
     m_testForm.getMessageField().setValue("test");
@@ -101,7 +101,7 @@ public class AbstractDesktopTest {
 
   @Test
   public void testDataChangedSimple() {
-    TestEnvironmentDesktop desktop = (TestEnvironmentDesktop) ClientRunContexts.copyCurrent().getDesktop();
+    TestEnvironmentDesktop desktop = (TestEnvironmentDesktop) IDesktop.CURRENT.get();
 
     final Holder<Object[]> resultHolder = new Holder<Object[]>(Object[].class);
     desktop.addDataChangeListener(new DataChangeListener() {
@@ -119,7 +119,7 @@ public class AbstractDesktopTest {
 
   @Test
   public void testDataChangedChanging() {
-    TestEnvironmentDesktop desktop = (TestEnvironmentDesktop) ClientRunContexts.copyCurrent().getDesktop();
+    TestEnvironmentDesktop desktop = (TestEnvironmentDesktop) IDesktop.CURRENT.get();
 
     final Holder<Object[]> resultHolder = new Holder<Object[]>(Object[].class);
     desktop.addDataChangeListener(new DataChangeListener() {
@@ -144,7 +144,7 @@ public class AbstractDesktopTest {
   @Test
   @Ignore
   public void testGetDialogs() {
-    TestEnvironmentDesktop desktop = (TestEnvironmentDesktop) ClientRunContexts.copyCurrent().getDesktop();
+    TestEnvironmentDesktop desktop = (TestEnvironmentDesktop) IDesktop.CURRENT.get();
 
     //                       form
     //        _________________|___________________________

@@ -181,7 +181,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   private final Object m_cachedFilteredRowsLock;
   private List<ITableRow> m_cachedFilteredRows;
   private IEventHistory<TableEvent> m_eventHistory;
-  private IContributionOwner m_contributionHolder;
+  private ContributionComposite m_contributionHolder;
   private final ObjectExtensions<AbstractTable, ITableExtension<? extends AbstractTable>> m_objectExtensions;
   // only do one action at a time
   private boolean m_actionRunning;
@@ -3472,6 +3472,8 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       m_objectExtensions.runInExtensionContext(new Runnable() {
         @Override
         public void run() {
+          // enforce recreation of the contributed columns so column indexes etc. will be reset
+          m_contributionHolder.resetContributionsByClass(AbstractTable.this, IColumn.class);
           // runs within extension context, so that extensions and contributions can be created
           createColumnsInternal();
         }

@@ -297,9 +297,6 @@ scout.adapter = function(adapterId, sessionIndex) {
  *     showing "old" content in the browser until the new content arrives. The default is true.
  *   [redirectUrl]
  *      The new URL to load. If not specified, the current location is used (window.location).
- *   [suppressUnload]
- *      If this argument is set to true, 'unload' events are not fired on the window. This can
- *      be used to disable sending the session 'unload' event to the server. The default is false.
  */
 scout.reloadPage = function(options) {
   options = options || {};
@@ -315,11 +312,6 @@ scout.reloadPage = function(options) {
     // Hide everything (on entire page, not only $entryPoint)
     if (scout.nvl(options.clearBody, true)) {
       $('body').html('');
-    }
-
-    // Make sure the unload handler does not get triggered since the server initiated the logout and already disposed the session
-    if (options.suppressUnload) {
-      $(window).off('unload.' + this.id);
     }
 
     // Reload window (using setTimeout, to overcome drawing issues in IE)

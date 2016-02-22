@@ -89,8 +89,8 @@ function receiveResponseForAjaxCall(request, response) {
  */
 function uninstallUnloadHandlers(session) {
   $(window)
-    .off('beforeunload')
-    .off('unload.' + session.id);
+    .off('beforeunload.' + session.uiSessionId)
+    .off('unload.' + session.uiSessionId);
 }
 
 function createPropertyChangeEvent(model, properties) {

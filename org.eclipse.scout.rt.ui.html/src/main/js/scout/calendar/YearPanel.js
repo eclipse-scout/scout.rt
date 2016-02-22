@@ -129,7 +129,7 @@ scout.YearPanel.prototype._colorYear = function() {
     $day = $(this);
     date = $day.data('date');
     if (that.displayMode !== scout.Calendar.DisplayMode.DAY &&
-        date >= that.viewRange.from && date <= that.viewRange.to) {
+        date >= that.viewRange.from && date < that.viewRange.to) {
       $day.addClass('year-range');
     }
     if (scout.dates.isSameDay(date, that.selectedDate)) {

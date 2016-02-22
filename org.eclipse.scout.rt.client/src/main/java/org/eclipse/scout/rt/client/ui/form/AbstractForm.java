@@ -1326,7 +1326,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
    * @return {@link IDesktop} from current calling context.
    */
   protected IDesktop getDesktop() {
-    return ClientRunContexts.copyCurrent().getDesktop();
+    return IDesktop.CURRENT.get();
   }
 
   @Override

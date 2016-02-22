@@ -19,7 +19,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.dto.FormData;
 import org.eclipse.scout.rt.client.dto.FormData.SdkCommand;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.FormFieldChains;
@@ -34,7 +33,6 @@ import org.eclipse.scout.rt.client.extension.ui.form.fields.FormFieldChains.Form
 import org.eclipse.scout.rt.client.extension.ui.form.fields.FormFieldChains.FormFieldMarkSavedChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.services.common.search.ISearchFilterService;
-import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.DataChangeListener;
 import org.eclipse.scout.rt.client.ui.WeakDataChangeListener;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
@@ -113,7 +111,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   private BasicPropertySupport m_subtreePropertyChangeSupport;
   private P_MasterListener m_currentMasterListener;// my master
   private DataChangeListener m_internalDataChangeListener;
-  protected IContributionOwner m_contributionHolder;
+  protected ContributionComposite m_contributionHolder;
   private final ObjectExtensions<AbstractFormField, IFormFieldExtension<? extends AbstractFormField>> m_objectExtensions;
 
   private String m_initialLabel;
@@ -958,7 +956,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
         }
       };
     }
-    ClientRunContexts.copyCurrent().getDesktop().addDataChangeListener(m_internalDataChangeListener, dataTypes);
+    IDesktop.CURRENT.get().addDataChangeListener(m_internalDataChangeListener, dataTypes);
   }
 
   /**
@@ -971,7 +969,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
    */
   public void unregisterDataChangeListener(Object... dataTypes) {
     if (m_internalDataChangeListener != null) {
-      ClientSessionProvider.currentSession().getDesktop().removeDataChangeListener(m_internalDataChangeListener, dataTypes);
+      IDesktop.CURRENT.get().removeDataChangeListener(m_internalDataChangeListener, dataTypes);
     }
   }
 
@@ -1896,6 +1894,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     m_objectExtensions.runInExtensionContext(new Runnable() {
       @Override
       public void run() {
+        m_contributionHolder.resetContributionsByClass(AbstractFormField.this, IKeyStroke.class);
         List<IKeyStroke> keyStrokes = initLocalKeyStrokes();
         propertySupport.setPropertyList(PROP_KEY_STROKES, keyStrokes);
       }

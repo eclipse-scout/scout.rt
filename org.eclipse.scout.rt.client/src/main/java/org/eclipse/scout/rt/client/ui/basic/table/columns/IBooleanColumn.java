@@ -12,6 +12,8 @@ package org.eclipse.scout.rt.client.ui.basic.table.columns;
 
 public interface IBooleanColumn extends IColumn<Boolean> {
 
+  String TRUE_TEXT = "X";
+
   String PROP_VERTICAL_ALIGNMENT = "verticalAlignment";
 
   void setVerticalAlignment(int verticalAlignment);

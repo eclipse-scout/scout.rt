@@ -1849,6 +1849,11 @@ scout.Tree.prototype._onChildNodeOrderChanged = function(parentNodeId, childNode
     // Find the last affected node DIV
     $lastChildNode = scout.Tree.collectSubtree($lastChildNode).last();
 
+    if (this._$animationWrapper) {
+      // Stop the animation wrapper
+      this._$animationWrapper.stop(false, true);
+    }
+
     // Insert a marker DIV
     var $marker = $lastChildNode.afterDiv();
     for (i = 0; i < parentNode.childNodes.length; i++) {

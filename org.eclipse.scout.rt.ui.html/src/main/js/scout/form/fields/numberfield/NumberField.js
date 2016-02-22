@@ -62,6 +62,23 @@ scout.NumberField.prototype.acceptInput = function(whileTyping) {
   scout.NumberField.parent.prototype.acceptInput.call(this, whileTyping);
 };
 
+scout.NumberField.prototype.setDisplayText = function(value) {
+  this.displayText = scout.objects.isNumber(value) ? value.toString() : '';
+  if (this.rendered) {
+    this._renderDisplayText(this.displayText);
+  }
+};
+
+scout.NumberField.prototype.parse = function() {
+  var number = null;
+  try {
+    number = this.decimalFormat.parse(this.displayText);
+  } catch(e) {
+    // catch Error thrown when number isNaN
+  }
+  return number;
+};
+
 scout.NumberField.prototype._parse = function() {
   var input = this.$field.val();
   if (input) {

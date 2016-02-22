@@ -393,7 +393,7 @@ public class CsvHelper {
     }
   }
 
-  private Format getColumnFormat(int colIndex) {
+  protected Format getColumnFormat(int colIndex) {
     if (colIndex < m_colFormat.size()) {
       return m_colFormat.get(colIndex);
     }
@@ -402,7 +402,7 @@ public class CsvHelper {
     }
   }
 
-  private List<String> importRow(Reader reader) throws IOException {
+  protected List<String> importRow(Reader reader) throws IOException {
     List<String> cellList = new ArrayList<String>(Math.max(m_colCount, 2));
     boolean inString = false;
     StringBuffer curBuf = new StringBuffer();
@@ -470,7 +470,7 @@ public class CsvHelper {
     return cellList;
   }
 
-  private String exportRow(Collection<String> strings) {
+  protected String exportRow(Collection<String> strings) {
     StringBuffer buf = new StringBuffer();
     if (strings != null) {
       for (Iterator<String> it = strings.iterator(); it.hasNext();) {
@@ -485,7 +485,7 @@ public class CsvHelper {
     return buf.toString();
   }
 
-  private Object importCell(String text, Format f) {
+  protected Object importCell(String text, Format f) {
     if (text != null && f != null) {
       try {
         return f.parseObject(text.trim());
@@ -499,7 +499,7 @@ public class CsvHelper {
     }
   }
 
-  private String exportCell(Object o, Format f) {
+  protected String exportCell(Object o, Format f) {
     if (f != null && o != null) {
       return f.format(o);
     }
@@ -511,7 +511,7 @@ public class CsvHelper {
     }
   }
 
-  private String encodeText(String text) {
+  protected String encodeText(String text) {
     if (m_textDelimiterChar != 0x00) {
       if (text != null) {
         text = stringReplace(text, "" + m_textDelimiterChar, "" + m_textDelimiterChar + m_textDelimiterChar);
@@ -523,7 +523,7 @@ public class CsvHelper {
     return text;
   }
 
-  private String decodeText(String text) {
+  protected String decodeText(String text) {
     if (text != null && text.length() > 0) {
       if (m_textDelimiterChar != 0x00) {
         if (text.charAt(0) == m_textDelimiterChar && text.charAt(text.length() - 1) == m_textDelimiterChar) {
@@ -535,7 +535,7 @@ public class CsvHelper {
     return text;
   }
 
-  private String stringReplace(String s, String sOld, String sNew) {
+  protected String stringReplace(String s, String sOld, String sNew) {
     sNew = (sNew == null ? "" : sNew);
     if (s == null || sOld == null) {
       return s;

@@ -11,6 +11,8 @@
 package org.eclipse.scout.rt.platform.util;
 
 import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
@@ -22,29 +24,21 @@ import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
  */
 public class FinalValue<VALUE> {
 
-  private final Object m_lock = new Object();
-
-  private volatile VALUE m_value;
-  private volatile boolean m_set = false;
-
   /**
-   * Create without initial value
+   * Marker for initial null-value. It prevents an additional (volatile) boolean member that would track if the final
+   * value has already been set.
    */
-  public FinalValue() {
-  }
+  private static final Object NULL_VALUE = new Object();
 
-  /**
-   * Create with initial value
-   */
-  public FinalValue(final VALUE value) {
-    set(value);
-  }
+  private final AtomicReference<Object> m_value = new AtomicReference<>(NULL_VALUE);
 
   /**
    * @return the value or <code>null</code>, if not set.
    */
+  @SuppressWarnings("unchecked")
   public VALUE get() {
-    return m_value;
+    Object value = m_value.get();
+    return value == NULL_VALUE ? null : (VALUE) value;
   }
 
   /**
@@ -56,10 +50,8 @@ public class FinalValue<VALUE> {
    *           if a final value is already set.
    */
   public void set(final VALUE value) {
-    synchronized (m_lock) {
-      Assertions.assertFalse(m_set, "{} already set.", getClass().getSimpleName());
-      setIfAbsent(value);
-    }
+    Assertions.assertSame(m_value.get(), NULL_VALUE, "{} already set.", getClass().getSimpleName());
+    setIfAbsent(value);
   }
 
   /**
@@ -77,7 +69,9 @@ public class FinalValue<VALUE> {
   }
 
   /**
-   * Computes the final value with the specified producer, but only if not set yet.
+   * Computes the final value with the specified producer, but only if not set yet. It makes the same promises as other
+   * concurrent structures (e.g. like {@link ConcurrentMap}): the producer could be executed concurrently by multiple
+   * threads but only first available value is used. The producer is responsible for dealing with this fact.
    *
    * @param producer
    *          to produce the final value if no final value is set yet.
@@ -85,35 +79,29 @@ public class FinalValue<VALUE> {
    * @throws RuntimeException
    *           if the producer throws an exception
    */
+  @SuppressWarnings("unchecked")
   public VALUE setIfAbsent(final Callable<VALUE> producer) {
-    if (m_set) {
-      return m_value;
+    Object value = m_value.get();
+    if (value != NULL_VALUE) {
+      return (VALUE) value;
     }
 
-    synchronized (m_lock) {
-      // double-checked locking
-      if (m_set) {
-        return m_value;
-      }
-
-      try {
-        m_value = producer.call();
-        m_set = true;
-      }
-      catch (final RuntimeException | Error e) {
-        throw e;
-      }
-      catch (final Exception e) {
-        throw new PlatformException("Failed to produce final value", e);
-      }
-      return m_value;
+    try {
+      m_value.compareAndSet(NULL_VALUE, producer.call());
     }
+    catch (final RuntimeException | Error e) {
+      throw e;
+    }
+    catch (final Exception e) {
+      throw new PlatformException("Failed to produce final value", e);
+    }
+    return (VALUE) m_value.get();
   }
 
   /**
    * @return <code>true</code>, if a final value was set, or else <code>false</code>.
    */
   public boolean isSet() {
-    return m_set;
+    return m_value.get() != NULL_VALUE;
   }
 }

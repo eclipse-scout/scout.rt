@@ -253,8 +253,8 @@ scout.TableHeader.prototype._arrangeHeaderItems = function($headers) {
 
 scout.TableHeader.prototype._headerItemTooltipText = function($col) {
   var column = $col.data('column');
-  if (column && scout.strings.hasText(column.headerTooltip)) {
-    return column.headerTooltip;
+  if (column && scout.strings.hasText(column.headerTooltipText)) {
+    return column.headerTooltipText;
   } else if ($col.isContentTruncated() || ($col.width() + $col.position().left) > $col.parent().width()) {
     $col = $col.clone();
     $col.children('.table-header-item-state').remove();
@@ -406,6 +406,10 @@ scout.TableHeader.prototype._adjustColumnMinWidth = function(column) {
     if (column.prefMinWidth) {
       column.minWidth = column.prefMinWidth;
       column.prefMinWidth = null;
+      // Resize to old min width, assuming user has not manually changed the size because column is still as width as default_min_width
+      if (column.width === scout.Column.DEFAULT_MIN_WIDTH) {
+        this.table.resizeColumn(column, column.minWidth);
+      }
     }
   }
 };

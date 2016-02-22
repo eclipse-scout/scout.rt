@@ -318,6 +318,11 @@ scout.Session.prototype._processStartupResponse = function(data) {
     // Start poller
     this._resumeBackgroundJobPolling();
 
+    // Destroy UI session on server when page is closed or reloaded
+    $(window)
+      .on('beforeunload.' + this.uiSessionId, this._onWindowBeforeUnload.bind(this))
+      .on('unload.' + this.uiSessionId, this._onWindowUnload.bind(this));
+
     this.ready = true;
     $.log.info('Session initialized. Detected ' + scout.device);
     if ($.log.isDebugEnabled()) {
@@ -1020,9 +1025,6 @@ scout.Session.prototype.init = function() {
 
   // Send startup request
   this._sendStartupRequest();
-
-  // Destroy UI session on server when page is closed or reloaded
-  $(window).on('unload.' + this.id, this._onWindowUnload.bind(this));
 };
 
 scout.Session.prototype.onModelAction = function(event) {
@@ -1061,15 +1063,14 @@ scout.Session.prototype._onLogout = function(event) {
 
 scout.Session.prototype.logout = function(logoutUrl) {
   this._loggedOut = true;
-  // remember current url to not loose query parameters
+  // remember current url to not lose query parameters
   sessionStorage.setItem('scout:loginUrl', window.location.href);
   // Clear everything and reload the page. We wrap that in setTimeout() to allow other events to be executed normally before.
   setTimeout(function() {
     scout.reloadPage({
-      redirectUrl: logoutUrl,
-      suppressUnload: true
+      redirectUrl: logoutUrl
     });
-  });
+  }.bind(this));
 };
 
 scout.Session.prototype._onDisposeAdapter = function(event) {
@@ -1088,6 +1089,11 @@ scout.Session.prototype._onReloadPage = function(event) {
   });
 };
 
+scout.Session.prototype._onWindowBeforeUnload = function() {
+  $.log.info('Session before unloading...');
+  // TODO BSH Cancel pending requests
+};
+
 scout.Session.prototype._onWindowUnload = function() {
   $.log.info('Session unloading...');
   this.unloaded = true;
@@ -1097,8 +1103,11 @@ scout.Session.prototype._onWindowUnload = function() {
     this.desktop.formController.closePopupWindows();
   }
 
-  // Destroy UI session on server
-  this._sendUnloadRequest();
+  // Destroy UI session on server (only when the server did not not initiate the logout,
+  // otherwise the UI session would already be dispoed)
+  if (!this._loggedOut) {
+    this._sendUnloadRequest();
+  }
 };
 
 /**

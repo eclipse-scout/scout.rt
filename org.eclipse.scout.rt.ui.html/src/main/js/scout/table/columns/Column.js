@@ -16,7 +16,7 @@ scout.Column = function() {
 };
 
 scout.Column.DEFAULT_MIN_WIDTH = 50;
-scout.Column.NARROW_MIN_WIDTH = 30; // for columns without text (icon, check box)
+scout.Column.NARROW_MIN_WIDTH = 32; // for columns without text (icon, check box)
 
 scout.Column.prototype.init = function(model) {
   this.session = model.session;
@@ -323,10 +323,12 @@ scout.Column.prototype.setAggregationFunction = function(func) {
 };
 
 scout.Column.prototype.createAggrGroupCell = function(row) {
+  var cell = this.table.cell(this, row);
   return {
     // value necessary for value based columns (e.g. checkbox column)
-    value: this.table.cellValue(this, row),
+    value: cell.value,
     text: this.cellTextForGrouping(row),
+    iconId: cell.iconId,
     horizontalAlignment: this.horizontalAlignment,
     cssClass: 'table-aggregate-cell'
   };

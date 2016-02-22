@@ -431,8 +431,6 @@ public abstract class AbstractNumberField<NUMBER extends Number> extends Abstrac
    *         alpha-numerical characters) or is <code>null</code>
    */
   public static boolean isWithinNumberFormatLimits(DecimalFormat format, String curText, int offset, int replaceLen, String insertText) {
-    // !! IMPORTANT NOTE: There is also a JavaScript implementation of this method: org/eclipse/scout/rt/ui/rap/form/fields/numberfield/RwtScoutNumberField.js
-    // When changing this implementation also consider updating the js version!
     if (insertText == null || insertText.length() < 1) {
       return true;
     }

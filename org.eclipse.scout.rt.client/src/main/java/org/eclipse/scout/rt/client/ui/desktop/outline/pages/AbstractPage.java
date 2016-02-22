@@ -718,7 +718,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
       };
     }
 
-    ClientRunContexts.copyCurrent().getDesktop().addDataChangeListener(m_internalDataChangeListener, dataTypes);
+    IDesktop.CURRENT.get().addDataChangeListener(m_internalDataChangeListener, dataTypes);
   }
 
   @Override
@@ -747,7 +747,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
    */
   public void unregisterDataChangeListener(Object... dataTypes) {
     if (m_internalDataChangeListener != null) {
-      ClientRunContexts.copyCurrent().getDesktop().removeDataChangeListener(m_internalDataChangeListener, dataTypes);
+      IDesktop.CURRENT.get().removeDataChangeListener(m_internalDataChangeListener, dataTypes);
     }
   }
 
