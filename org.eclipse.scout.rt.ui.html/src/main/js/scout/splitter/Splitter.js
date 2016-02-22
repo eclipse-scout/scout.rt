@@ -55,7 +55,9 @@ scout.Splitter.prototype.updatePosition = function(newPosition) {
       newPosition = anchorBounds.y + anchorBounds.height;
     }
   }
-
+  if (newPosition === this.position) {
+    return;
+  }
   // Set the new position (center splitter around 'newPosition')
   var splitterSize = scout.graphics.getVisibleSize(this.$container, true);
   if (this.splitHorizontal) {

@@ -13,13 +13,9 @@
 .desktop-navigation {
   position: relative;
   height: 100%;
-  width: @size-desktop-navigation;
+  width: @desktop-navigation-width;
   background-color: @navigation-background-color;
   color: @navigation-color;
-}
-
-.navigation-breadcrumb {
-  width: @size-desktop-navigation-breadcrumb;
 }
 
 .navigation-container {

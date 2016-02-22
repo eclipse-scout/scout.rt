@@ -21,8 +21,6 @@ scout.DesktopNavigationLayout.prototype.layout = function($container) {
     htmlOutline = this.navigation.outline.htmlComp,
     htmlViewButtons = this.navigation.htmlViewButtons;
 
-  this.navigation.setBreadcrumbEnabled(containerSize.width <= scout.DesktopNavigation.BREADCRUMB_SWITCH_WIDTH);
-
   containerSize = containerSize.subtract(htmlContainer.getInsets());
   viewButtonsHeight = this.navigation.$viewButtons.outerHeight(true);
   viewButtonsSize = new scout.Dimension(containerSize.width, viewButtonsHeight)

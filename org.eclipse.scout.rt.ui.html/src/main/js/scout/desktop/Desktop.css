@@ -31,7 +31,7 @@
   &.has-navigation {
     & > .desktop-bench,
     & > .desktop-header {
-      left: @size-desktop-navigation;
+      left: @desktop-navigation-width;
     }
   }
 }

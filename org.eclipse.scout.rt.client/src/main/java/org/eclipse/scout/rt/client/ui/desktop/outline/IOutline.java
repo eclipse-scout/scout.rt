@@ -67,6 +67,8 @@ public interface IOutline extends ITree, ITypeWithClassId, IOrdered, IDisplayPar
 
   String PROP_BREADCRUMB_ENABLED = "breadcrumbEnabled";
 
+  String PROP_BREADCRUMB_TOGGLING_ENABLED = "breadcrumbTogglingEnabled";
+
   String PROP_NAVIGATE_BUTTONS_VISIBLE = "navigateButtonsVisible";
 
   /**
@@ -122,6 +124,10 @@ public interface IOutline extends ITree, ITypeWithClassId, IOrdered, IDisplayPar
   boolean isBreadcrumbEnabled();
 
   void setBreadcrumbEnabled(boolean b);
+
+  boolean isAutoToggleBreadcrumbStyle();
+
+  void setAutoToggleBreadcrumbStyle(boolean b);
 
   boolean isNavigateButtonsVisible();
 

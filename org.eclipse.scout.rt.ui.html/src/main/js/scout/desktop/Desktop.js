@@ -362,7 +362,7 @@ scout.Desktop.prototype._setSplitterPosition = function() {
     this.splitter.updatePosition(splitterPosition);
     this.invalidateLayoutTree();
   } else {
-    // Set initial splitter position
+    // Set initial splitter position (default defined by css)
     this.splitter.updatePosition();
     this.invalidateLayoutTree();
   }
@@ -393,6 +393,7 @@ scout.Desktop.prototype.revalidateHeaderLayout = function() {
 };
 
 scout.Desktop.prototype._onSplitterResize = function(event) {
+  this.resizing = true;
   this.revalidateLayout();
 };
 
@@ -405,24 +406,30 @@ scout.Desktop.prototype._onSplitterResizeEnd = function(event) {
   }
 
   // Check if splitter is smaller than min size
-  if (splitterPosition < scout.DesktopNavigation.BREADCRUMB_SWITCH_WIDTH) {
-    // Set width of navigation to BREADCRUMB_SWITCH_WIDTH, using an animation.
+  if (splitterPosition < scout.DesktopNavigation.BREADCRUMB_STYLE_WIDTH) {
+    // Set width of navigation to BREADCRUMB_STYLE_WIDTH, using an animation.
     // While animating, update the desktop layout.
     // At the end of the animation, update the desktop layout, and store the splitter position.
     this.navigation.$navigation.animate({
-      width: scout.DesktopNavigation.BREADCRUMB_SWITCH_WIDTH
+      width: scout.DesktopNavigation.BREADCRUMB_STYLE_WIDTH
     }, {
       progress: function() {
+        this.resizing = true;
         this.splitter.updatePosition();
         this.revalidateLayout();
+        this.resizing = false; // progress seems to be called after complete again -> layout requires flag to be properly set
       }.bind(this),
       complete: function() {
+        this.resizing = true;
         this.splitter.updatePosition();
         // Store size
         sessionStorage.setItem('scout:desktopSplitterPosition', this.splitter.position);
         this.revalidateLayout();
+        this.resizing = false;
       }.bind(this)
     });
+  } else {
+    this.resizing = false;
   }
 };
 

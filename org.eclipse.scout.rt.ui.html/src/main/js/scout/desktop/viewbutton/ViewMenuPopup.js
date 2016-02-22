@@ -17,7 +17,6 @@ scout.ViewMenuPopup = function() {
   this.$headBlueprint;
   this.viewMenus;
   this._naviBounds;
-  this._breadcrumbEnabled;
   this._tooltip;
 };
 scout.inherits(scout.ViewMenuPopup, scout.PopupWithHead);
@@ -30,7 +29,6 @@ scout.ViewMenuPopup.prototype._init = function(options) {
   this.$headBlueprint = this.$tab;
   this.viewMenus = options.viewMenus;
   this._naviBounds = options.naviBounds;
-  this._breadcrumbEnabled = options.breadcrumbEnabled;
 };
 
 scout.ViewMenuPopup.MAX_MENU_WIDTH = 300;

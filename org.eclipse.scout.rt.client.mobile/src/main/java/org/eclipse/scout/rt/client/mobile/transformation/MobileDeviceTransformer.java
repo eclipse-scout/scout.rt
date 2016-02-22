@@ -222,6 +222,8 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
     outline.getContextMenu().setVisibleGranted(true);
     outline.setNavigateButtonsVisible(false);
     outline.setLazyExpandingEnabled(false);
+    outline.setAutoToggleBreadcrumbStyle(false);
+    outline.setBreadcrumbEnabled(true);
   }
 
   @Override

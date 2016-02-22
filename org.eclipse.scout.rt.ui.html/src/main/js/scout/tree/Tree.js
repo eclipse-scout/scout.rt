@@ -40,7 +40,7 @@ scout.Tree.prototype._init = function(model) {
     menuFilter: this._filterMenusHandler
   });
   this.menuBar.bottom();
-  this._syncBreadcrumbEnabled('', this.breadcrumbEnabled);
+  this._syncBreadcrumbEnabled(this.breadcrumbEnabled);
   this._syncKeyStrokes(this.keyStrokes);
   this._syncMenus(this.menus);
 };
@@ -87,7 +87,7 @@ scout.Tree.prototype._syncKeyStrokes = function(newKeyStrokes, oldKeyStrokes) {
   this._keyStrokeSupport.syncKeyStrokes(newKeyStrokes, oldKeyStrokes);
 };
 
-scout.Tree.prototype._syncBreadcrumbEnabled = function(oldValue, newValue) {
+scout.Tree.prototype._syncBreadcrumbEnabled = function(newValue) {
   this.setBreadcrumbEnabled(newValue, false);
 };
 
@@ -468,6 +468,9 @@ scout.Tree.prototype._renderMultiCheck = function() {
 
 scout.Tree.prototype._renderBreadcrumbEnabled = function() {
   this.$container.toggleClass('breadcrumb', this.breadcrumbEnabled);
+
+  // update scrollbar if mode has changed (from tree to bc or vice versa)
+  this.invalidateLayoutTree();
 };
 
 scout.Tree.prototype._renderExpansion = function(node, $predecessor, animate) {
@@ -788,10 +791,8 @@ scout.Tree.prototype.setBreadcrumbEnabled = function(enabled, notifyServer) {
     return;
   }
 
-  // update scrollbar if mode has changed (from tree to bc or vice versa)
-  this.revalidateLayoutTree();
-
   this.breadcrumbEnabled = enabled;
+  notifyServer = scout.nvl(notifyServer, true);
   if (notifyServer) {
     this._sendBreadCrumbEnabled();
   }
@@ -806,6 +807,10 @@ scout.Tree.prototype.setBreadcrumbEnabled = function(enabled, notifyServer) {
   if (this.rendered) {
     this._renderBreadcrumbEnabled();
   }
+};
+
+scout.Tree.prototype.setBreadcrumbTogglingThreshold = function(width) {
+  this.breadcrumbTogglingThreshold = width;
 };
 
 scout.Tree.prototype.expandNode = function(node, opts) {

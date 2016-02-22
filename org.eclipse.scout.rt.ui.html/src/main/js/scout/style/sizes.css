@@ -8,8 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-@size-desktop-navigation: 290px;
-@size-desktop-navigation-breadcrumb: 240px;
+@desktop-navigation-width: 290px;
+@desktop-navigation-breadcrumb-width: 240px;
 @desktop-header-height: 51px;
 @bench-padding-x: 20px;
 

@@ -69,6 +69,12 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
         return getModel().isBreadcrumbEnabled();
       }
     });
+    putJsonProperty(new JsonProperty<OUTLINE>(IOutline.PROP_BREADCRUMB_TOGGLING_ENABLED, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isAutoToggleBreadcrumbStyle();
+      }
+    });
     putJsonProperty(new JsonProperty<OUTLINE>(IOutline.PROP_NAVIGATE_BUTTONS_VISIBLE, model) {
       @Override
       protected Boolean modelValue() {
@@ -131,8 +137,7 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
 
   @Override
   public void handleUiEvent(JsonEvent event) {
-    super.handleUiEvent(event);
-    if ("breadcrumbEnabled".equals(event.getType())) {
+    if (IOutline.PROP_BREADCRUMB_ENABLED.equals(event.getType())) {
       handleUiBreadcrumbEnabled(event);
     }
     else {
@@ -141,7 +146,7 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
   }
 
   protected void handleUiBreadcrumbEnabled(JsonEvent event) {
-    getModel().setBreadcrumbEnabled(event.getData().getBoolean("breadcrumbEnabled"));
+    getModel().setBreadcrumbEnabled(event.getData().getBoolean(IOutline.PROP_BREADCRUMB_ENABLED));
   }
 
   @Override

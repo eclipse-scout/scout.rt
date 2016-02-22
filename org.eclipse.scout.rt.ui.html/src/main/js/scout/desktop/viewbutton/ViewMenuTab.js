@@ -24,7 +24,6 @@ scout.ViewMenuTab = function(viewMenus, session) {
   this.selected = false;
   this.iconId;
   this._inBackground = false;
-  this._breadcrumbEnabled = false;
 
   this.defaultIconId = scout.icons.OUTLINE;
 
@@ -126,8 +125,7 @@ scout.ViewMenuTab.prototype._openPopup = function(event) {
     parent: this.session.desktop,
     $tab: this.$container,
     viewMenus: this._popupViewMenus(),
-    naviBounds: naviBounds,
-    breadcrumbEnabled: this._breadcrumbEnabled
+    naviBounds: naviBounds
   });
   popup.headText = this.text;
   popup.open(null, event);
@@ -177,10 +175,5 @@ scout.ViewMenuTab.prototype.sendToBack = function() {
 
 scout.ViewMenuTab.prototype.bringToFront = function() {
   this._inBackground = false;
-  this._renderSelected();
-};
-
-scout.ViewMenuTab.prototype.setBreadcrumbEnabled = function(enabled) {
-  this._breadcrumbEnabled = enabled;
   this._renderSelected();
 };

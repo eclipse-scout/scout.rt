@@ -18,7 +18,8 @@ scout.DesktopNavigation = function() {
 };
 scout.inherits(scout.DesktopNavigation, scout.Widget);
 
-scout.DesktopNavigation.BREADCRUMB_SWITCH_WIDTH = 240; // Same value as in sizes.css // FIXME awe: make dynamic (min. breadcrumb width)
+scout.DesktopNavigation.DEFAULT_STYLE_WIDTH = 290; // Same value as in sizes.css
+scout.DesktopNavigation.BREADCRUMB_STYLE_WIDTH = 240; // Same value as in sizes.css // FIXME awe: make dynamic (min. breadcrumb width)
 scout.DesktopNavigation.MIN_SPLITTER_SIZE = 49; // not 50px because last pixel is the border (would not look good)
 
 scout.DesktopNavigation.prototype._init = function(model) {
@@ -48,13 +49,10 @@ scout.DesktopNavigation.prototype._render = function($parent) {
     }
   }
 
-  if (this._breadcrumbEnabled === undefined && this.desktop.outline) {
-    // Read initial value from active outline
-    this.setBreadcrumbEnabled(this.desktop.outline.breadcrumbEnabled);
-  }
-
   this.$container = this.$navigation.appendDiv('navigation-container')
     .on('mousedown', this._onNavigationMousedown.bind(this));
+  this.htmlCompBody = new scout.HtmlComponent(this.$container, this.session);
+  this.htmlCompBody.setLayout(new scout.SingleLayout());
 };
 
 scout.DesktopNavigation.prototype._viewButtons = function(displayStyle) {
@@ -93,14 +91,26 @@ scout.DesktopNavigation.prototype.onOutlineChanged = function(outline, bringToFr
   }
   if (this.outline) {
     this.outline.remove();
+
+    // Make sure new outline uses same display style as old
+    if (outline.autoToggleBreadcrumbStyle) {
+      var breadcrumbEnabled = this.outline.breadcrumbEnabled;
+      outline.setBreadcrumbEnabled(breadcrumbEnabled);
+    }
   }
+
   this.outline = outline;
-  this.outline.setBreadcrumbEnabled(this._breadcrumbEnabled);
+  this.outline.setBreadcrumbTogglingThreshold(scout.DesktopNavigation.BREADCRUMB_STYLE_WIDTH);
   this.outline.render(this.$container);
-  this.outline.invalidateLayoutTree(false);
+  this.outline.invalidateLayoutTree();
   this.outline.handleOutlineContent(bringToFront);
   this._updateViewButtons(outline);
   this.outline.validateFocus();
+  // Layout immediate to prevent flickering when breadcrumb mode is enabled
+  // but not initially while desktop gets rendered because it will be done at the end anyway
+  if (this.desktop.rendered) {
+    this.outline.validateLayoutTree();
+  }
 };
 
 /**
@@ -114,22 +124,6 @@ scout.DesktopNavigation.prototype._updateViewButtons = function(outline) {
       viewTab.onOutlineChanged(outline);
     }
   });
-};
-
-scout.DesktopNavigation.prototype.setBreadcrumbEnabled = function(enabled) {
-  if (this._breadcrumbEnabled === enabled) {
-    return;
-  }
-
-  this._breadcrumbEnabled = enabled;
-  if (this.outline) {
-    this.outline.setBreadcrumbEnabled(enabled);
-  }
-  this.viewMenuTab.setBreadcrumbEnabled(enabled);
-  this._viewButtons('TAB').forEach(function(viewButton) {
-    viewButton.setBreadcrumbEnabled(enabled);
-  });
-  this.$navigation.toggleClass('navigation-breadcrumb', enabled);
 };
 
 scout.DesktopNavigation.prototype.doViewMenuAction = function(event) {

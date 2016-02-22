@@ -10,7 +10,6 @@
  ******************************************************************************/
 scout.ViewButton = function() {
   scout.ViewButton.parent.call(this);
-  this._breadcrumbEnabled = false;
 };
 scout.inherits(scout.ViewButton, scout.Action);
 
@@ -61,12 +60,6 @@ scout.ViewButton.prototype._renderIconId = function() {
 
 scout.ViewButton.prototype.last = function() {
   this.$container.addClass('last');
-};
-
-scout.ViewButton.prototype.setBreadcrumbEnabled = function(enabled) {
-  this._breadcrumbEnabled = enabled;
-  this._renderText();
-  this._renderSelected();
 };
 
 scout.ViewButton.prototype._onMouseEvent = function(event) {

@@ -24,10 +24,9 @@ scout.DesktopLayout.prototype.layout = function($container) {
 
   containerSize = containerSize.subtract(htmlContainer.getInsets());
   if (this.desktop._hasNavigation()) {
-    if (this.desktop._hasBench()) {
-      navigationWidth = Math.max(this.desktop.splitter.position, scout.DesktopNavigation.MIN_SPLITTER_SIZE); // ensure newSize is not negative
-    } else {
-      navigationWidth = containerSize.width;
+    navigationWidth = this._calculateNavigationWidth(containerSize);
+    if (this.desktop.splitter) {
+      this.desktop.splitter.updatePosition(navigationWidth);
     }
 
     navigationSize = new scout.Dimension(navigationWidth, containerSize.height)
@@ -53,4 +52,20 @@ scout.DesktopLayout.prototype.layout = function($container) {
       .subtract(htmlBench.getMargins());
     htmlBench.setSize(htmlBenchSize);
   }
+};
+
+scout.DesktopLayout.prototype._calculateNavigationWidth = function(containerSize) {
+  if (!this.desktop._hasBench()) {
+    return containerSize.width;
+  }
+  var splitterPosition = this.desktop.splitter.position;
+  var outline = this.desktop.outline;
+  if (!this.desktop.resizing && outline && outline.autoToggleBreadcrumbStyle) {
+    if (outline.breadcrumbEnabled) {
+      splitterPosition = scout.DesktopNavigation.BREADCRUMB_STYLE_WIDTH;
+    } else if (splitterPosition <= scout.DesktopNavigation.BREADCRUMB_STYLE_WIDTH) {
+      splitterPosition = scout.DesktopNavigation.DEFAULT_STYLE_WIDTH;
+    }
+  }
+  return Math.max(splitterPosition, scout.DesktopNavigation.MIN_SPLITTER_SIZE); // ensure newSize is not negative
 };

@@ -167,11 +167,25 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
    * Configures whether the outline should be displayed in bread crumb mode or not. It is currently not possible to have
    * outlines with different modes. The mode of the outline which gets activated first is used for the other outlines as
    * well.
+   * <p>
+   * Subclasses can override this method. The default is false.
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(140)
   protected boolean getConfiguredBreadcrumbEnabled() {
     return false;
+  }
+
+  /**
+   * Configures whether the outline should automatically switch to the bread crumb mode when getting smaller and back
+   * when getting bigger. The threshold is determined by the GUI.
+   * <p>
+   * Subclasses can override this method. The default is true.
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(145)
+  protected boolean getConfiguredAutoToggleBreadcrumbStyle() {
+    return true;
   }
 
   /**
@@ -277,6 +291,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
     setVisible(getConfiguredVisible());
     setOrder(calculateViewOrder());
     setBreadcrumbEnabled(getConfiguredBreadcrumbEnabled());
+    setAutoToggleBreadcrumbStyle(getConfiguredAutoToggleBreadcrumbStyle());
     setNavigateButtonsVisible(getConfiguredNavigateButtonsVisible());
     ensureDefaultDetailFormCreated();
     ensureDefaultDetailFormStarted();
@@ -477,6 +492,16 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
   @Override
   public void setBreadcrumbEnabled(boolean b) {
     propertySupport.setPropertyBool(PROP_BREADCRUMB_ENABLED, b);
+  }
+
+  @Override
+  public boolean isAutoToggleBreadcrumbStyle() {
+    return propertySupport.getPropertyBool(PROP_BREADCRUMB_TOGGLING_ENABLED);
+  }
+
+  @Override
+  public void setAutoToggleBreadcrumbStyle(boolean b) {
+    propertySupport.setPropertyBool(PROP_BREADCRUMB_TOGGLING_ENABLED, b);
   }
 
   @Override
