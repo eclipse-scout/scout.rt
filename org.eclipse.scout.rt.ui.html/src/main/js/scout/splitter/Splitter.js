@@ -17,6 +17,7 @@ scout.Splitter = function() {
   this._maxRatio;
   this._oldRatio;
   this.position; // current splitter position in pixels, updated by updatePosition()
+  this._cursorOffset = 0; // distance from cursor to splitter, makes resizing smoother by preventing initial 'jump'
   this._addEventSupport();
 };
 scout.inherits(scout.Splitter, scout.Widget);
@@ -69,12 +70,18 @@ scout.Splitter.prototype.updatePosition = function(newPosition) {
 };
 
 scout.Splitter.prototype._onMouseDown = function(event) {
+  var splitterCenter = scout.graphics.offsetBounds(this.$container, true).center();
+
   // Add listeners (we add them to the window to make sure we get the mouseup event even when the cursor it outside the window)
   this._$window
     .on('mousemove.splitter', this._onMouseMove.bind(this))
     .one('mouseup', this._onMouseUp.bind(this));
   // Ensure the correct cursor is always shown while moving
   this._$body.addClass(this.splitHorizontal ? 'col-resize' : 'row-resize');
+  this._cursorOffset = {
+    left: splitterCenter.x - event.pageX,
+    top: splitterCenter.y - event.pageY
+  };
   this.trigger('resizestart', event);
   // Prevent text selection in a form
   event.preventDefault();
@@ -86,10 +93,10 @@ scout.Splitter.prototype._ratio = function(event) {
   var ratio, rootSize;
   if (this.splitHorizontal) {
     rootSize = rootBounds.width;
-    ratio = (event ? event.pageX : splitterBounds.x) / rootBounds.width;
+    ratio = (event ? event.pageX + this._cursorOffset.left : splitterBounds.x) / rootBounds.width;
   } else {
     rootSize = rootBounds.height;
-    ratio = (event ? event.pageY : splitterBounds.y) / rootBounds.height;
+    ratio = (event ? event.pageY + this._cursorOffset.top : splitterBounds.y) / rootBounds.height;
   }
   return {
     ratio: ratio,
