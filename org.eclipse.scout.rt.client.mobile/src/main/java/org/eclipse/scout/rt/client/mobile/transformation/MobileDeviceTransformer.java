@@ -30,6 +30,7 @@ import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
+import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeAdapter;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
@@ -223,7 +224,7 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
     outline.setNavigateButtonsVisible(false);
     outline.setLazyExpandingEnabled(false);
     outline.setAutoToggleBreadcrumbStyle(false);
-    outline.setBreadcrumbEnabled(true);
+    outline.setDisplayStyle(ITree.DISPLAY_STYLE_BREADCRUMB);
   }
 
   @Override

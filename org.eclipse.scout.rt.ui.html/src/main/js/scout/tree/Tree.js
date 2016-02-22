@@ -30,6 +30,11 @@ scout.Tree = function() {
 };
 scout.inherits(scout.Tree, scout.ModelAdapter);
 
+scout.Tree.DisplayStyle = {
+  DEFAULT: 'default',
+  BREADCRUMB: 'breadcrumb'
+};
+
 scout.Tree.prototype._init = function(model) {
   scout.Tree.parent.prototype._init.call(this, model);
   this._visitNodes(this.nodes, this._initTreeNode.bind(this));
@@ -40,7 +45,7 @@ scout.Tree.prototype._init = function(model) {
     menuFilter: this._filterMenusHandler
   });
   this.menuBar.bottom();
-  this._syncBreadcrumbEnabled(this.breadcrumbEnabled);
+  this._syncDisplayStyle(this.displayStyle);
   this._syncKeyStrokes(this.keyStrokes);
   this._syncMenus(this.menus);
 };
@@ -87,8 +92,8 @@ scout.Tree.prototype._syncKeyStrokes = function(newKeyStrokes, oldKeyStrokes) {
   this._keyStrokeSupport.syncKeyStrokes(newKeyStrokes, oldKeyStrokes);
 };
 
-scout.Tree.prototype._syncBreadcrumbEnabled = function(newValue) {
-  this.setBreadcrumbEnabled(newValue, false);
+scout.Tree.prototype._syncDisplayStyle = function(newValue) {
+  this.setDisplayStyle(newValue, false);
 };
 
 scout.Tree.prototype._initTreeNode = function(node, parentNode) {
@@ -182,7 +187,7 @@ scout.Tree.prototype._renderProperties = function() {
   scout.Tree.parent.prototype._renderProperties.call(this);
   this._renderEnabled();
   this._renderMenus();
-  this._renderBreadcrumbEnabled();
+  this._renderDisplayStyle();
   this._renderDropType();
 };
 
@@ -466,8 +471,8 @@ scout.Tree.prototype._renderMultiCheck = function() {
   // NOP
 };
 
-scout.Tree.prototype._renderBreadcrumbEnabled = function() {
-  this.$container.toggleClass('breadcrumb', this.breadcrumbEnabled);
+scout.Tree.prototype._renderDisplayStyle = function() {
+  this.$container.toggleClass('breadcrumb', this.isBreadcrumbStyleActive());
 
   // update scrollbar if mode has changed (from tree to bc or vice versa)
   this.invalidateLayoutTree();
@@ -516,7 +521,7 @@ scout.Tree.prototype._renderExpansion = function(node, $predecessor, animate) {
 
     // animate opening
     animate = animate && this.rendered; // don't animate while rendering (not necessary, or may even lead to timing issues)
-    animate = animate && !$node.hasClass('leaf') && !$node.hasClass('expanded') && !this.breadcrumbEnabled;
+    animate = animate && !$node.hasClass('leaf') && !$node.hasClass('expanded') && !this.displayStyle;
     if (animate) {
       var $newNodes = scout.Tree.collectSubtree($node, false);
       if ($newNodes.length) {
@@ -786,18 +791,18 @@ scout.Tree.prototype._isTruncatedNodeTooltipEnabled = function() {
   return true;
 };
 
-scout.Tree.prototype.setBreadcrumbEnabled = function(enabled, notifyServer) {
-  if (this.breadcrumbEnabled === enabled) {
+scout.Tree.prototype.setDisplayStyle = function(displayStyle, notifyServer) {
+  if (this.displayStyle === displayStyle) {
     return;
   }
 
-  this.breadcrumbEnabled = enabled;
+  this.displayStyle = displayStyle;
   notifyServer = scout.nvl(notifyServer, true);
   if (notifyServer) {
-    this._sendBreadCrumbEnabled();
+    this._sendDisplayStyleChange();
   }
 
-  if (enabled && this.selectedNodes.length > 0) {
+  if (displayStyle && this.selectedNodes.length > 0) {
     var selectedNode = this.selectedNodes[0];
     if (!selectedNode.expanded) {
       this.expandNode(selectedNode);
@@ -805,8 +810,20 @@ scout.Tree.prototype.setBreadcrumbEnabled = function(enabled, notifyServer) {
   }
 
   if (this.rendered) {
-    this._renderBreadcrumbEnabled();
+    this._renderDisplayStyle();
   }
+};
+
+scout.Tree.prototype.setBreadcrumbStyleActive = function(active, notifyServer) {
+  if (active) {
+    this.setDisplayStyle(scout.Tree.DisplayStyle.BREADCRUMB, notifyServer);
+  } else {
+    this.setDisplayStyle(scout.Tree.DisplayStyle.DEFAULT, notifyServer);
+  }
+};
+
+scout.Tree.prototype.isBreadcrumbStyleActive = function() {
+  return this.displayStyle === scout.Tree.DisplayStyle.BREADCRUMB;
 };
 
 scout.Tree.prototype.setBreadcrumbTogglingThreshold = function(width) {
@@ -846,7 +863,7 @@ scout.Tree.prototype.setNodeExpanded = function(node, expanded, opts) {
     lazy = false;
   }
 
-  if (this.breadcrumbEnabled) {
+  if (this.isBreadcrumbStyleActive()) {
     // Do not allow to collapse a selected node
     if (!expanded && this.selectedNodes.indexOf(node) > -1) {
       this.setNodeExpanded(node, true, opts);
@@ -931,7 +948,7 @@ scout.Tree.prototype.selectNodes = function(nodes, notifyServer, debounceSend) {
   }
 
   // In breadcrumb mode selected node has to expanded
-  if (this.breadcrumbEnabled && this.selectedNodes.length > 0 && !this.selectedNodes[0].expanded) {
+  if (this.isBreadcrumbStyleActive() && this.selectedNodes.length > 0 && !this.selectedNodes[0].expanded) {
     this.expandNode(this.selectedNodes[0]);
   }
 
@@ -1286,9 +1303,9 @@ scout.Tree.prototype._sendNodesChecked = function(nodes) {
   this._send('nodesChecked', data);
 };
 
-scout.Tree.prototype._sendBreadCrumbEnabled = function() {
-  this._send('breadcrumbEnabled', {
-    breadcrumbEnabled: this.breadcrumbEnabled
+scout.Tree.prototype._sendDisplayStyleChange = function() {
+  this._send('displayStyle', {
+    displayStyle: this.displayStyle
   });
 };
 
@@ -1652,7 +1669,7 @@ scout.Tree.prototype._onNodeDoubleClick = function(event) {
   var node = $node.data('node');
   var expanded = !$node.hasClass('expanded');
 
-  if (this.breadcrumbEnabled) {
+  if (this.isBreadcrumbStyleActive()) {
     return;
   }
 

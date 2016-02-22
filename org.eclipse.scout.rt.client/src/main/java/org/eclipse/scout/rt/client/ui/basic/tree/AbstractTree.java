@@ -352,6 +352,39 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     return true;
   }
 
+  /**
+   * Configures the display style of the tree.
+   * <p>
+   * The available styles are:
+   * <ul>
+   * <li>{@link ITree#DISPLAY_STYLE_DEFAULT}</li>
+   * <li>{@link ITree#DISPLAY_STYLE_BREADCRUMB}</li>
+   * </ul>
+   * <p>
+   * Subclasses can override this method. The default is {@link ITree#DISPLAY_STYLE_DEFAULT}.
+   * 
+   * @see #getConfiguredAutoToggleBreadcrumbStyle()
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(140)
+  protected String getConfiguredDisplayStyle() {
+    return DISPLAY_STYLE_DEFAULT;
+  }
+
+  /**
+   * Configures whether the outline should automatically switch to the bread crumb style when getting smaller and back
+   * when getting bigger. The threshold is determined by the GUI.
+   * <p>
+   * Subclasses can override this method. The default is false.
+   * 
+   * @see #getConfiguredDisplayStyle()
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(145)
+  protected boolean getConfiguredAutoToggleBreadcrumbStyle() {
+    return false;
+  }
+
   private List<Class<? extends IKeyStroke>> getConfiguredKeyStrokes() {
     Class<?>[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
     List<Class<IKeyStroke>> fca = ConfigurationUtility.filterClasses(dca, IKeyStroke.class);
@@ -556,6 +589,8 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     setSaveAndRestoreScrollbars(getConfiguredSaveAndRestoreScrollbars());
     setAutoCheckChildNodes(getConfiguredAutoCheckChildNodes());
     setLazyExpandingEnabled(getConfiguredLazyExpandingEnabled());
+    setDisplayStyle(getConfiguredDisplayStyle());
+    setAutoToggleBreadcrumbStyle(getConfiguredAutoToggleBreadcrumbStyle());
     setRootNode(new AbstractTreeNode() {
     });
     // add Convenience observer for drag & drop callbacks and event history
@@ -1023,6 +1058,26 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   @Override
   public void setLazyExpandingEnabled(boolean lazyExpandingEnabled) {
     propertySupport.setPropertyBool(PROP_LAZY_EXPANDING_ENABLED, lazyExpandingEnabled);
+  }
+
+  @Override
+  public String getDisplayStyle() {
+    return propertySupport.getPropertyString(PROP_DISPLAY_STYLE);
+  }
+
+  @Override
+  public void setDisplayStyle(String style) {
+    propertySupport.setPropertyString(PROP_DISPLAY_STYLE, style);
+  }
+
+  @Override
+  public boolean isAutoToggleBreadcrumbStyle() {
+    return propertySupport.getPropertyBool(PROP_AUTO_TOGGLE_BREADCRUMB_STYLE);
+  }
+
+  @Override
+  public void setAutoToggleBreadcrumbStyle(boolean b) {
+    propertySupport.setPropertyBool(PROP_AUTO_TOGGLE_BREADCRUMB_STYLE, b);
   }
 
   @Override

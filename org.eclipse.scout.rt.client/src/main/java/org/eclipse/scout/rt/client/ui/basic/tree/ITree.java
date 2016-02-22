@@ -52,6 +52,12 @@ public interface ITree extends IPropertyObserver, IDNDSupport, IAppLinkCapable, 
   String PROP_ROOT_HANDLES_VISIBLE = "rootHandlesVisible";
   String PROP_KEY_STROKES = "keyStrokes";
   String PROP_SCROLL_TO_SELECTION = "scrollToSelection";
+  String PROP_DISPLAY_STYLE = "displayStyle";
+  String PROP_AUTO_TOGGLE_BREADCRUMB_STYLE = "autoToggleBreadcrumbStyle";
+
+  String DISPLAY_STYLE_DEFAULT = "default";
+  String DISPLAY_STYLE_BREADCRUMB = "breadcrumb";
+
   /**
    * Object
    * <p>
@@ -515,6 +521,17 @@ public interface ITree extends IPropertyObserver, IDNDSupport, IAppLinkCapable, 
    *          scrollbars.
    */
   void setSaveAndRestoreScrollbars(boolean b);
+
+  String getDisplayStyle();
+
+  /**
+   * @see {@link #DISPLAY_STYLE_DEFAULT}, {@link #DISPLAY_STYLE_BREADCRUMB}
+   */
+  void setDisplayStyle(String style);
+
+  boolean isAutoToggleBreadcrumbStyle();
+
+  void setAutoToggleBreadcrumbStyle(boolean b);
 
   /**
    * informs the attached UI that a node has changed in a way that may affect its presentation (e.g. text, font,

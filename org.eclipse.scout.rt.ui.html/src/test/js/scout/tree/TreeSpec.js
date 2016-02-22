@@ -1144,7 +1144,7 @@ describe("Tree", function() {
       var node0 = model.nodes[0];
 
       var tree = createTree(model);
-      tree.breadcrumbEnabled = true;
+      tree.displayStyle = scout.Tree.DisplayStyle.BREADCRUMB;
       tree.render(session.$entryPoint);
 
       tree.selectNodes(node0);
@@ -1254,7 +1254,7 @@ describe("Tree", function() {
       var node0 = model.nodes[0];
 
       var tree = createTree(model);
-      tree.breadcrumbEnabled = true;
+      tree.displayStyle = scout.Tree.DisplayStyle.BREADCRUMB;
       tree.render(session.$entryPoint);
 
       tree.selectNodes(node0);

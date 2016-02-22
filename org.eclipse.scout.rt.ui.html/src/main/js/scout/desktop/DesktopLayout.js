@@ -61,7 +61,7 @@ scout.DesktopLayout.prototype._calculateNavigationWidth = function(containerSize
   var splitterPosition = this.desktop.splitter.position;
   var outline = this.desktop.outline;
   if (!this.desktop.resizing && outline && outline.autoToggleBreadcrumbStyle) {
-    if (outline.breadcrumbEnabled) {
+    if (outline.displayStyle === scout.Tree.DisplayStyle.BREADCRUMB) {
       splitterPosition = scout.DesktopNavigation.BREADCRUMB_STYLE_WIDTH;
     } else if (splitterPosition <= scout.DesktopNavigation.BREADCRUMB_STYLE_WIDTH) {
       splitterPosition = scout.DesktopNavigation.DEFAULT_STYLE_WIDTH;

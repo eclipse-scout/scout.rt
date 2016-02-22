@@ -137,7 +137,7 @@ describe("Outline", function() {
       var node0 = model.nodes[0];
 
       var tree = createOutline(model);
-      tree.breadcrumbEnabled = true;
+      tree.displayStyle = scout.Tree.DisplayStyle.BREADCRUMB;
       tree.render(session.$entryPoint);
 
       tree.selectNodes(node0);

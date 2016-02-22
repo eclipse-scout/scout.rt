@@ -31,7 +31,6 @@ import org.eclipse.scout.rt.platform.util.CompareUtility;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.InspectorInfo;
-import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterPropertyConfig;
@@ -63,18 +62,6 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
   @Override
   protected void initJsonProperties(OUTLINE model) {
     super.initJsonProperties(model);
-    putJsonProperty(new JsonProperty<OUTLINE>(IOutline.PROP_BREADCRUMB_ENABLED, model) {
-      @Override
-      protected Boolean modelValue() {
-        return getModel().isBreadcrumbEnabled();
-      }
-    });
-    putJsonProperty(new JsonProperty<OUTLINE>(IOutline.PROP_BREADCRUMB_TOGGLING_ENABLED, model) {
-      @Override
-      protected Boolean modelValue() {
-        return getModel().isAutoToggleBreadcrumbStyle();
-      }
-    });
     putJsonProperty(new JsonProperty<OUTLINE>(IOutline.PROP_NAVIGATE_BUTTONS_VISIBLE, model) {
       @Override
       protected Boolean modelValue() {
@@ -133,20 +120,6 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
     if (page.isTableVisible()) {
       attachDetailTable(page);
     }
-  }
-
-  @Override
-  public void handleUiEvent(JsonEvent event) {
-    if (IOutline.PROP_BREADCRUMB_ENABLED.equals(event.getType())) {
-      handleUiBreadcrumbEnabled(event);
-    }
-    else {
-      super.handleUiEvent(event);
-    }
-  }
-
-  protected void handleUiBreadcrumbEnabled(JsonEvent event) {
-    getModel().setBreadcrumbEnabled(event.getData().getBoolean(IOutline.PROP_BREADCRUMB_ENABLED));
   }
 
   @Override

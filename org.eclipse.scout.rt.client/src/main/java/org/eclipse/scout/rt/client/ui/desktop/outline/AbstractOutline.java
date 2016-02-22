@@ -164,26 +164,14 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
   }
 
   /**
-   * Configures whether the outline should be displayed in bread crumb mode or not. It is currently not possible to have
-   * outlines with different modes. The mode of the outline which gets activated first is used for the other outlines as
-   * well.
-   * <p>
-   * Subclasses can override this method. The default is false.
-   */
-  @ConfigProperty(ConfigProperty.BOOLEAN)
-  @Order(140)
-  protected boolean getConfiguredBreadcrumbEnabled() {
-    return false;
-  }
-
-  /**
-   * Configures whether the outline should automatically switch to the bread crumb mode when getting smaller and back
+   * Configures whether the outline should automatically switch to the bread crumb style when getting smaller and back
    * when getting bigger. The threshold is determined by the GUI.
    * <p>
    * Subclasses can override this method. The default is true.
+   *
+   * @see #getConfiguredDisplayStyle()
    */
-  @ConfigProperty(ConfigProperty.BOOLEAN)
-  @Order(145)
+  @Override
   protected boolean getConfiguredAutoToggleBreadcrumbStyle() {
     return true;
   }
@@ -290,8 +278,6 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
     setEnabled(getConfiguredEnabled());
     setVisible(getConfiguredVisible());
     setOrder(calculateViewOrder());
-    setBreadcrumbEnabled(getConfiguredBreadcrumbEnabled());
-    setAutoToggleBreadcrumbStyle(getConfiguredAutoToggleBreadcrumbStyle());
     setNavigateButtonsVisible(getConfiguredNavigateButtonsVisible());
     ensureDefaultDetailFormCreated();
     ensureDefaultDetailFormStarted();
@@ -482,26 +468,6 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
 
   private void calculateVisible() {
     propertySupport.setPropertyBool(PROP_VISIBLE, m_visibleGranted && m_visibleProperty);
-  }
-
-  @Override
-  public boolean isBreadcrumbEnabled() {
-    return propertySupport.getPropertyBool(PROP_BREADCRUMB_ENABLED);
-  }
-
-  @Override
-  public void setBreadcrumbEnabled(boolean b) {
-    propertySupport.setPropertyBool(PROP_BREADCRUMB_ENABLED, b);
-  }
-
-  @Override
-  public boolean isAutoToggleBreadcrumbStyle() {
-    return propertySupport.getPropertyBool(PROP_BREADCRUMB_TOGGLING_ENABLED);
-  }
-
-  @Override
-  public void setAutoToggleBreadcrumbStyle(boolean b) {
-    propertySupport.setPropertyBool(PROP_BREADCRUMB_TOGGLING_ENABLED, b);
   }
 
   @Override

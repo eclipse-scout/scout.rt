@@ -94,8 +94,8 @@ scout.DesktopNavigation.prototype.onOutlineChanged = function(outline, bringToFr
 
     // Make sure new outline uses same display style as old
     if (outline.autoToggleBreadcrumbStyle) {
-      var breadcrumbEnabled = this.outline.breadcrumbEnabled;
-      outline.setBreadcrumbEnabled(breadcrumbEnabled);
+      var displayStyle = this.outline.displayStyle;
+      outline.setDisplayStyle(displayStyle);
     }
   }
 

@@ -24,7 +24,6 @@ import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
-import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.IVirtualTreeNode;
@@ -171,7 +170,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
         return getModel().getDropMaximumSize();
       }
     });
-    putJsonProperty(new JsonAdapterProperty<ITree>(ITable.PROP_KEY_STROKES, model, getUiSession()) {
+    putJsonProperty(new JsonAdapterProperty<ITree>(ITree.PROP_KEY_STROKES, model, getUiSession()) {
       @Override
       protected JsonAdapterPropertyConfig createConfig() {
         return new JsonAdapterPropertyConfigBuilder().filter(new DisplayableActionFilter<IAction>()).build();
@@ -180,6 +179,18 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
       @Override
       protected List<IKeyStroke> modelValue() {
         return getModel().getKeyStrokes();
+      }
+    });
+    putJsonProperty(new JsonProperty<TREE>(ITree.PROP_DISPLAY_STYLE, model) {
+      @Override
+      protected String modelValue() {
+        return getModel().getDisplayStyle();
+      }
+    });
+    putJsonProperty(new JsonProperty<TREE>(ITree.PROP_AUTO_TOGGLE_BREADCRUMB_STYLE, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isAutoToggleBreadcrumbStyle();
       }
     });
   }
@@ -837,9 +848,16 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
     else if (EVENT_NODES_CHECKED.equals(event.getType())) {
       handleUiNodesChecked(event);
     }
+    else if (ITree.PROP_DISPLAY_STYLE.equals(event.getType())) {
+      handleUiDisplayStyleChange(event);
+    }
     else {
       super.handleUiEvent(event);
     }
+  }
+
+  protected void handleUiDisplayStyleChange(JsonEvent event) {
+    getModel().setDisplayStyle(event.getData().getString(ITree.PROP_DISPLAY_STYLE));
   }
 
   protected void handleUiNodesChecked(JsonEvent event) {
