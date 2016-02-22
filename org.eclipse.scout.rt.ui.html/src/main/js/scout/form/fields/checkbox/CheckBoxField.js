@@ -32,7 +32,8 @@ scout.CheckBoxField.prototype._render = function($parent) {
 
   this.$checkBox = this.$field
     .appendDiv('check-box')
-    .on('mousedown', this._onMouseDown.bind(this));
+    .on('mousedown', this._onMouseDown.bind(this))
+    .data('valuefield', this);
 
   this.$checkBoxLabel = this.$field
     .appendDiv('label')
