@@ -241,6 +241,7 @@ scout.Session.prototype._sendStartupRequest = function() {
   }
 
   function onAjaxFail(jqXHR, textStatus, errorThrown) {
+    this._setApplicationLoading(false);
     this._processErrorResponse(jqXHR, textStatus, errorThrown, request);
   }
 };
@@ -637,7 +638,7 @@ scout.Session.prototype._processErrorResponse = function(jqXHR, textStatus, erro
 
   // Status code = 0 -> no connection
   // Status code >= 12000 come from windows, see http://msdn.microsoft.com/en-us/library/aa383770%28VS.85%29.aspx. Not sure if it is necessary for IE >= 9.
-  if (!jqXHR.status || jqXHR.status >= 12000) {
+  if (this.ready && (!jqXHR.status || jqXHR.status >= 12000)) {
     this.goOffline();
     if (!this._queuedRequest && request && !request.pollForBackgroundJobs) {
       this._queuedRequest = request;
@@ -653,7 +654,7 @@ scout.Session.prototype._processErrorResponse = function(jqXHR, textStatus, erro
     yesButtonAction: function() {
       scout.reloadPage();
     },
-    noButtonText: this.optText('ui.Ignore', 'Ignore')
+    noButtonText: (this.ready ? this.optText('ui.Ignore', 'Ignore') : null)
   };
   this.showFatalMessage(boxOptions, jqXHR.status + '.net');
 };

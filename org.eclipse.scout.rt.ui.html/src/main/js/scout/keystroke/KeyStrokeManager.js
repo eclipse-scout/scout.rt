@@ -168,11 +168,13 @@ scout.KeyStrokeManager.prototype._handleKeyStrokeEvent = function(keyStrokeConte
 
     // Handle the keystroke.
     keyStroke.handle(event);
-    this.session.desktop._trigger('keystrokeConsumed', {
-      keyStrokeEvent: event,
-      $target: keyStrokeContext.$getBindTarget(),
-      keyStroke: keyStroke
-    });
+    if (this.session.desktop) { // check that desktop is ready (may be undefined on "Initialization failed" message, would cause an error when the user presses Enter)
+      this.session.desktop._trigger('keystrokeConsumed', {
+        keyStrokeEvent: event,
+        $target: keyStrokeContext.$getBindTarget(),
+        keyStroke: keyStroke
+      });
+    }
 
     // Break on 'stopImmediate'.
     return event.isImmediatePropagationStopped(); // 'some-loop' breaks on true.
