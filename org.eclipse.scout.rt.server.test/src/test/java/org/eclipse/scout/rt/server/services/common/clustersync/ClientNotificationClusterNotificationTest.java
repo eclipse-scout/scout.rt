@@ -65,7 +65,7 @@ public class ClientNotificationClusterNotificationTest {
   @Test
   public void testClientNotificationsReceived() {
     ClientNotificationAddress address = ClientNotificationAddress.createAllNodesAddress();
-    ClientNotificationMessage message = new ClientNotificationMessage(address, "test", true);
+    ClientNotificationMessage message = new ClientNotificationMessage(address, "test", true, "cid");
     ArrayList<ClientNotificationMessage> messages = new ArrayList<ClientNotificationMessage>();
     messages.add(message);
     ClientNotificationClusterNotification n = new ClientNotificationClusterNotification(messages);

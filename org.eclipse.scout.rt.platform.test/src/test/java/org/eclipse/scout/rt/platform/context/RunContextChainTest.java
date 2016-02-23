@@ -39,31 +39,41 @@ public class RunContextChainTest {
 
     Iterator<IChainable> chainIterator = chain.values().iterator();
 
-    // 1. ThreadLocalProcessor for RunMonitor.CURRENT
+    // 1. ThreadLocalProcessor for CorrelationId.CURRENT
     IChainable c = chainIterator.next();
+    assertEquals(ThreadLocalProcessor.class, c.getClass());
+    assertSame(CorrelationId.CURRENT, ((ThreadLocalProcessor) c).getThreadLocal());
+
+    // 2. ThreadLocalProcessor for RunMonitor.CURRENT
+    c = chainIterator.next();
     assertEquals(ThreadLocalProcessor.class, c.getClass());
     assertSame(RunMonitor.CURRENT, ((ThreadLocalProcessor) c).getThreadLocal());
 
-    // 2. SubjectProcessor
+    // 3. SubjectProcessor
     c = (IChainable) chainIterator.next();
     assertEquals(SubjectProcessor.class, c.getClass());
 
-    // 3. DiagnosticContextValueProcessor
+    // 4. DiagnosticContextValueProcessor
     c = chainIterator.next();
     assertEquals(DiagnosticContextValueProcessor.class, c.getClass());
     assertEquals("subject.principal.name", ((DiagnosticContextValueProcessor) c).getMdcKey());
 
-    // 4. ThreadLocalProcessor for NlsLocale.CURRENT
+    // 5. DiagnosticContextValueProcessor
+    c = chainIterator.next();
+    assertEquals(DiagnosticContextValueProcessor.class, c.getClass());
+    assertEquals("scout.correlation.id", ((DiagnosticContextValueProcessor) c).getMdcKey());
+
+    // 6. ThreadLocalProcessor for NlsLocale.CURRENT
     c = chainIterator.next();
     assertEquals(ThreadLocalProcessor.class, c.getClass());
     assertSame(NlsLocale.CURRENT, ((ThreadLocalProcessor) c).getThreadLocal());
 
-    // 5. ThreadLocalProcessor for PropertyMap.CURRENT
+    // 7. ThreadLocalProcessor for PropertyMap.CURRENT
     c = chainIterator.next();
     assertEquals(ThreadLocalProcessor.class, c.getClass());
     assertSame(PropertyMap.CURRENT, ((ThreadLocalProcessor) c).getThreadLocal());
 
-    // 6. ThreadLocalProcessor for RunContextIdentifiers.CURRENT
+    // 8. ThreadLocalProcessor for RunContextIdentifiers.CURRENT
     c = chainIterator.next();
     assertEquals(ThreadLocalProcessor.class, c.getClass());
     assertSame(RunContextIdentifiers.CURRENT, ((ThreadLocalProcessor) c).getThreadLocal());

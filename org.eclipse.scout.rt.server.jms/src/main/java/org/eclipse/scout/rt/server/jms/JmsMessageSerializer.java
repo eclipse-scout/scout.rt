@@ -17,6 +17,7 @@ import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.Session;
 
+import org.eclipse.scout.rt.platform.context.CorrelationId;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.serialization.IObjectSerializer;
 import org.eclipse.scout.rt.platform.serialization.SerializationUtility;
@@ -56,6 +57,7 @@ public class JmsMessageSerializer<T> implements IJmsMessageSerializer<T> {
     }
     try {
       BytesMessage jmsMessage = session.createBytesMessage();
+      jmsMessage.setJMSCorrelationID(CorrelationId.CURRENT.get());
       jmsMessage.writeBytes(getObjectSerializer().serialize(message));
       if (LOG.isTraceEnabled()) {
         jmsMessage.setStringProperty(JMS_PROPERTY_TRACE_MESSAGE_CONTENT, message.toString());

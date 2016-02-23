@@ -183,15 +183,20 @@ public abstract class AbstractSimpleJmsService<T> extends AbstractJmsService<T> 
         while (!RunMonitor.CURRENT.get().isCancelled()) {
           try {
             final Message jmsMessage = m_consumer.receive(m_receiveTimeout);
-            if (jmsMessage != null) {
-              JmsRunContexts.empty().withJmsMessage(jmsMessage).run(new IRunnable() {
-
-                @Override
-                public void run() throws Exception {
-                  onMessage(jmsMessage);
-                }
-              }, DefaultExceptionTranslator.class);
+            if (jmsMessage == null) {
+              continue;
             }
+
+            JmsRunContexts.empty()
+                .withJmsMessage(jmsMessage)
+                .withCorrelationId(jmsMessage.getJMSCorrelationID())
+                .run(new IRunnable() {
+
+                  @Override
+                  public void run() throws Exception {
+                    onMessage(jmsMessage);
+                  }
+                }, DefaultExceptionTranslator.class);
           }
           catch (final Exception e) {
             LOG.error("Failed to process JMS-message", e);

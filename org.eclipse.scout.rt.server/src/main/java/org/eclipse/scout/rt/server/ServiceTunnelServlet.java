@@ -27,6 +27,7 @@ import javax.servlet.http.HttpSessionBindingListener;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.annotations.Internal;
+import org.eclipse.scout.rt.platform.context.CorrelationId;
 import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.server.admin.html.AdminSession;
@@ -69,12 +70,14 @@ public class ServiceTunnelServlet extends HttpServlet {
       return;
     }
 
+    final String cid = servletRequest.getHeader(CorrelationId.HTTP_HEADER_NAME);
     lazyInit(servletRequest, servletResponse);
 
     ServletRunContexts.copyCurrent()
         .withLocale(Locale.getDefault())
         .withServletRequest(servletRequest)
         .withServletResponse(servletResponse)
+        .withCorrelationId(cid != null ? cid : BEANS.get(CorrelationId.class).newCorrelationId())
         .run(new IRunnable() {
 
           @Override
@@ -97,12 +100,14 @@ public class ServiceTunnelServlet extends HttpServlet {
       return;
     }
 
+    final String cid = servletRequest.getHeader(CorrelationId.HTTP_HEADER_NAME);
     lazyInit(servletRequest, servletResponse);
 
     try {
       ServletRunContexts.copyCurrent()
           .withServletRequest(servletRequest)
           .withServletResponse(servletResponse)
+          .withCorrelationId(cid != null ? cid : BEANS.get(CorrelationId.class).newCorrelationId())
           .run(new IRunnable() {
 
             @Override

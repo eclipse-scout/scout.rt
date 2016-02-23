@@ -12,7 +12,9 @@ package org.eclipse.scout.rt.server.clientnotification;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +22,7 @@ import java.util.Map.Entry;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.context.CorrelationId;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.server.notification.NotificationCoalescer;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationAddress;
@@ -53,26 +56,28 @@ public class ClientNotificationCoalescer {
     return result;
   }
 
-  protected List<ClientNotificationMessage> coalesce(boolean distributeOverCluster, ClientNotificationAddress address, List<ClientNotificationMessage> messagesIn) {
-    if (messagesIn.isEmpty()) {
-      return new ArrayList<>();
+  protected List<ClientNotificationMessage> coalesce(final boolean distributeOverCluster, final ClientNotificationAddress address, final List<ClientNotificationMessage> messages) {
+    if (messages.isEmpty()) {
+      return Collections.emptyList();
     }
-    else if (messagesIn.size() == 1) {
-      // no coalesce needed
-      ClientNotificationMessage singleMessage = CollectionUtility.firstElement(messagesIn);
-      return CollectionUtility.arrayList(new ClientNotificationMessage(address, singleMessage.getNotification(), singleMessage.isDistributeOverCluster()));
+    else if (messages.size() == 1) {
+      final ClientNotificationMessage message = CollectionUtility.firstElement(messages);
+      return CollectionUtility.arrayList(new ClientNotificationMessage(address, message.getNotification(), message.isDistributeOverCluster(), message.getCorrelationId()));
     }
     else {
-      List<Serializable> notificationsIn = new ArrayList<>();
-      for (ClientNotificationMessage singleMessage : messagesIn) {
-        notificationsIn.add(singleMessage.getNotification());
+      final Map<Serializable, String> messageMap = new LinkedHashMap<>(messages.size()); // respect insertion order
+      for (final ClientNotificationMessage message : messages) {
+        messageMap.put(message.getNotification(), message.getCorrelationId());
       }
-      List<? extends Serializable> outNotifications = BEANS.get(NotificationCoalescer.class).coalesce(notificationsIn);
-      List<ClientNotificationMessage> result = new ArrayList<ClientNotificationMessage>();
-      for (Serializable n : outNotifications) {
-        result.add(new ClientNotificationMessage(address, n, distributeOverCluster));
+
+      final List<? extends Serializable> coalescedNotifications = BEANS.get(NotificationCoalescer.class).coalesce(new ArrayList<>(messageMap.keySet()));
+
+      final List<ClientNotificationMessage> coalescedMessages = new ArrayList<>(coalescedNotifications.size());
+      for (final Serializable coalescedNotification : coalescedNotifications) {
+        final String cid = messageMap.get(coalescedNotification) != null ? messageMap.get(coalescedNotification) : BEANS.get(CorrelationId.class).newCorrelationId();
+        coalescedMessages.add(new ClientNotificationMessage(address, coalescedNotification, distributeOverCluster, cid));
       }
-      return result;
+      return coalescedMessages;
     }
   }
 }

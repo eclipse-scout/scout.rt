@@ -22,6 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.context.CorrelationId;
 import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
@@ -65,11 +66,14 @@ public class UiServlet extends HttpServlet {
 
   @Override
   protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
+    final String cid = req.getHeader(CorrelationId.HTTP_HEADER_NAME);
+
     try {
       ServletRunContexts.copyCurrent()
           .withServletRequest(req)
           .withServletResponse(resp)
           .withLocale(getPreferredLocale(req))
+          .withCorrelationId(cid != null ? cid : BEANS.get(CorrelationId.class).newCorrelationId())
           .run(new IRunnable() {
             @Override
             public void run() throws Exception {
@@ -85,11 +89,14 @@ public class UiServlet extends HttpServlet {
 
   @Override
   protected void doPost(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
+    final String cid = req.getHeader(CorrelationId.HTTP_HEADER_NAME);
+
     try {
       ServletRunContexts.copyCurrent()
           .withServletRequest(req)
           .withServletResponse(resp)
           .withLocale(getPreferredLocale(req))
+          .withCorrelationId(cid != null ? cid : BEANS.get(CorrelationId.class).newCorrelationId())
           .run(new IRunnable() {
             @Override
             public void run() throws Exception {

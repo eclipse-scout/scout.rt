@@ -71,6 +71,12 @@ public class UiRunContext extends RunContext {
   }
 
   @Override
+  public UiRunContext withCorrelationId(final String correlationId) {
+    super.withCorrelationId(correlationId);
+    return this;
+  }
+
+  @Override
   public UiRunContext withProperty(final Object key, final Object value) {
     super.withProperty(key, value);
     return this;

@@ -63,8 +63,8 @@ public class ClientNotificationNodeQueueTest {
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent()));
     ClientNotificationAddress allNodes = ClientNotificationAddress.createAllNodesAddress();
-    m_queue.put(new ClientNotificationMessage(allNodes, "test", true));
-    m_queue.put(new ClientNotificationMessage(allNodes, "test2", true));
+    m_queue.put(new ClientNotificationMessage(allNodes, "test", true, "cid"));
+    m_queue.put(new ClientNotificationMessage(allNodes, "test2", true, "cid"));
     List<ClientNotificationMessage> notifications = res.awaitDoneAndGet();
     assertEquals(2, notifications.size());
     assertEquals("test", notifications.get(0).getNotification());
@@ -82,7 +82,7 @@ public class ClientNotificationNodeQueueTest {
   private void putTestNotifications(int count) {
     ClientNotificationAddress allNodes = ClientNotificationAddress.createAllNodesAddress();
     for (int i = 0; i < count; i++) {
-      m_queue.put(new ClientNotificationMessage(allNodes, "test" + i, true));
+      m_queue.put(new ClientNotificationMessage(allNodes, "test" + i, true, "cid"));
     }
   }
 

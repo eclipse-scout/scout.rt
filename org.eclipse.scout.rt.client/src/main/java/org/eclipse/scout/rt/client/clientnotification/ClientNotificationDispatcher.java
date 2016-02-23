@@ -19,7 +19,9 @@ import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.context.CorrelationId;
 import org.eclipse.scout.rt.platform.context.RunContext;
+import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.job.DoneEvent;
 import org.eclipse.scout.rt.platform.job.IDoneHandler;
 import org.eclipse.scout.rt.platform.job.IFuture;
@@ -43,50 +45,58 @@ public class ClientNotificationDispatcher {
   private final Set<IFuture<Void>> m_notificationFutures = new HashSet<>();
 
   public void dispatchNotifications(List<ClientNotificationMessage> notifications) {
-    IClientSessionRegistry notificationService = BEANS.get(IClientSessionRegistry.class);
+    final IClientSessionRegistry notificationService = BEANS.get(IClientSessionRegistry.class);
     if (notifications == null) {
       LOG.error("Notifications null. Please check your configuration");
       return;
     }
 
-    for (ClientNotificationMessage message : notifications) {
-      ClientNotificationAddress address = message.getAddress();
-      Serializable notification = message.getNotification();
-      LOG.debug("Processing client notification {}", notification);
+    for (final ClientNotificationMessage message : notifications) {
+      RunContexts.copyCurrent()
+          .withCorrelationId(message.getCorrelationId())
+          .run(new IRunnable() {
 
-      if (address.isNotifyAllNodes()) {
-        // notify all nodes
-        LOG.debug("Notify all nodes");
-        dispatch(notification);
-      }
-      else if (address.isNotifyAllSessions()) {
-        // notify all sessions
-        LOG.debug("Notify all sessions");
-        for (IClientSession session : notificationService.getAllClientSessions()) {
-          dispatch(session, notification);
-        }
-      }
-      else if (CollectionUtility.hasElements(address.getSessionIds())) {
-        // notify all specified sessions
-        LOG.debug("Notify sessions by session id: {}", address.getSessionIds());
-        for (String sessionId : address.getSessionIds()) {
-          IClientSession session = notificationService.getClientSession(sessionId);
-          if (session == null) {
-            LOG.warn("received notification for invalid session '{}'.", sessionId);
-          }
-          else {
-            dispatch(session, notification);
-          }
-        }
-      }
-      else if (CollectionUtility.hasElements(address.getUserIds())) {
-        LOG.debug("Notify sessions by user id: {}", address.getUserIds());
-        for (String userId : address.getUserIds()) {
-          for (IClientSession session : notificationService.getClientSessionsForUser(userId)) {
-            dispatch(session, notification);
-          }
-        }
-      }
+            @Override
+            public void run() throws Exception {
+              ClientNotificationAddress address = message.getAddress();
+              Serializable notification = message.getNotification();
+              LOG.debug("Processing client notification {}", notification);
+
+              if (address.isNotifyAllNodes()) {
+                // notify all nodes
+                LOG.debug("Notify all nodes");
+                dispatch(notification);
+              }
+              else if (address.isNotifyAllSessions()) {
+                // notify all sessions
+                LOG.debug("Notify all sessions");
+                for (IClientSession session : notificationService.getAllClientSessions()) {
+                  dispatch(session, notification);
+                }
+              }
+              else if (CollectionUtility.hasElements(address.getSessionIds())) {
+                // notify all specified sessions
+                LOG.debug("Notify sessions by session id: {}", address.getSessionIds());
+                for (String sessionId : address.getSessionIds()) {
+                  IClientSession session = notificationService.getClientSession(sessionId);
+                  if (session == null) {
+                    LOG.warn("received notification for invalid session '{}'.", sessionId);
+                  }
+                  else {
+                    dispatch(session, notification);
+                  }
+                }
+              }
+              else if (CollectionUtility.hasElements(address.getUserIds())) {
+                LOG.debug("Notify sessions by user id: {}", address.getUserIds());
+                for (String userId : address.getUserIds()) {
+                  for (IClientSession session : notificationService.getClientSessionsForUser(userId)) {
+                    dispatch(session, notification);
+                  }
+                }
+              }
+            }
+          });
     }
   }
 
@@ -144,7 +154,9 @@ public class ClientNotificationDispatcher {
           dispatchSync(notification);
         }
       }, Jobs.newInput()
-          .withRunContext(ClientRunContexts.empty().withSession(session, true))
+          .withRunContext(ClientRunContexts.empty()
+              .withSession(session, true)
+              .withCorrelationId(CorrelationId.CURRENT.get()))
           .withName("Dispatching client notification"));
 
       addPendingNotification(future);

@@ -93,7 +93,13 @@ public class ClientRunContext extends RunContext {
   }
 
   @Override
-  public ClientRunContext withIdentifier(String id) {
+  public ClientRunContext withCorrelationId(final String correlationId) {
+    super.withCorrelationId(correlationId);
+    return this;
+  }
+
+  @Override
+  public ClientRunContext withIdentifier(final String id) {
     super.withIdentifier(id);
     return this;
   }
@@ -285,7 +291,7 @@ public class ClientRunContext extends RunContext {
       return desktop;
     }
 
-    ISession currentSession = ISession.CURRENT.get();
+    final ISession currentSession = ISession.CURRENT.get();
     if (currentSession instanceof IClientSession) {
       return ((IClientSession) currentSession).getDesktopElseVirtualDesktop();
     }
