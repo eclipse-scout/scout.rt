@@ -598,6 +598,9 @@ scout.Tree.prototype._renderSelection = function() {
 
     // Mark all ancestor nodes, especially necessary for bread crumb mode
     var parentNode = node.parentNode;
+    if (parentNode) {
+      parentNode.$node.addClass('parent-of-selected');
+    }
     while (parentNode) {
       parentNode.$node.addClass('ancestor-of-selected');
       parentNode = parentNode.parentNode;
@@ -633,6 +636,9 @@ scout.Tree.prototype._removeSelection = function() {
 
       // remove ancestor and child classes
       var parentNode = node.parentNode;
+      if (parentNode) {
+        parentNode.$node.removeClass('parent-of-selected');
+      }
       while (parentNode) {
         parentNode.$node.removeClass('ancestor-of-selected');
         parentNode = parentNode.parentNode;

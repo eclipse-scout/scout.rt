@@ -8,6 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
+@tree-node-padding: 6px;
+
 .tree {
   position: relative;
   height: 100%;
@@ -22,7 +24,7 @@
       border-color: @item-selection-border-color;
     }
 
-    /*first child is the scrollbar*/
+    /* first child is the scrollbar */
     .tree-node:nth-of-type(1).selected {
       border-top-color: @item-selection-nonfocus-background-color;
     }
@@ -52,7 +54,7 @@
   border: 1px solid transparent;
   border-left: 0px solid transparent;
   border-right: 0px solid transparent;
-  padding: 6px;
+  padding: @tree-node-padding;
 
   &.selected {
     background-color: @item-selection-nonfocus-background-color;
@@ -167,6 +169,109 @@
 
   &.checkable {
     margin-left: -@tree-node-control-checkbox-size - 8px;
+  }
+}
+
+/* bread crumb style */
+.tree.breadcrumb {
+
+  & > .tree-data {
+    & > .tree-node,
+    & > .animation-wrapper > .tree-node {
+      overflow: visible;
+      white-space: normal;
+      text-align: center;
+
+      display: none;
+      border-top: 0;
+      border-bottom: 1px solid @border-color;
+
+      /* !important is necessary here to override the element specific left-padding (calculated by Tree.js for level indentation). */
+      padding: 10px @tree-node-padding 8px @tree-node-padding !important;
+
+      &.ancestor-of-selected,
+      &.child-of-selected,
+      &.selected {
+        display: block;
+      }
+
+      &.selected {
+        color: @outline-selection-color;
+        cursor: default;
+      }
+
+      /* arrow is created using ::before and ::after*/
+      &.ancestor-of-selected::before,
+      &.ancestor-of-selected::after,
+      &.selected::before,
+      &.selected::after{
+        position: absolute;
+        left: 50%;
+        margin-left: -13px;
+        border: solid transparent;
+        content: '';
+        height: 0;
+        width: 0;
+        z-index: 1;
+      }
+
+      &.ancestor-of-selected::before,
+      &.selected::before {
+        border-color: @border-color transparent transparent transparent;
+        border-width: 6px 12px 0 12px;
+        bottom: -7px;
+      }
+
+      &.ancestor-of-selected::after,
+      &.selected::after {
+        border-color: @control-background-color transparent transparent transparent;
+        border-width: 6px 12px 0 12px;
+        bottom: -6px;
+      }
+
+      &.selected::after {
+        border-top-color: @item-selection-nonfocus-background-color;
+      }
+
+      &.ancestor-of-selected.leaf::before,
+      &.ancestor-of-selected.leaf::after,
+      &.selected.leaf::before,
+      &.selected.leaf::after {
+        display: none;
+      }
+    }
+
+    & > .tree-node-control {
+      display: none;
+    }
+  }
+
+  &:focus > .tree-data,
+  &.focused > .tree-data {
+    & > .tree-node,
+    & > .animation-wrapper > .tree-node {
+
+      &.parent-of-selected {
+        border-color: @item-selection-border-color;
+      }
+
+      &.parent-of-selected::before {
+        border-top-color: @item-selection-border-color;
+      }
+
+      &.selected {
+        border-color: @item-selection-border-color;
+      }
+
+      &.selected::before {
+        border-top-color: @item-selection-border-color;
+      }
+
+      &.selected::after {
+        border-top-color: @item-selection-background-color;
+      }
+
+    }
   }
 }
 
