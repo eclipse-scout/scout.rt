@@ -20,7 +20,6 @@ import java.util.Map.Entry;
 
 import javax.security.auth.Subject;
 
-import org.eclipse.scout.rt.client.IClientNode;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -29,6 +28,7 @@ import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.CompareUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
+import org.eclipse.scout.rt.shared.INode;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.SharedConfigProperties.NotificationSubjectProperty;
 import org.eclipse.scout.rt.shared.clientnotification.IClientNotificationService;
@@ -79,7 +79,7 @@ public class ClientSessionRegistry implements IClientSessionRegistry, IGlobalSes
       ClientRunContexts.empty().withSubject(NOTIFICATION_SUBJECT).withUserAgent(UserAgent.createDefault()).run(new IRunnable() {
         @Override
         public void run() throws Exception {
-          BEANS.get(IClientNotificationService.class).unregisterSession(IClientNode.ID, sessionId, userId);
+          BEANS.get(IClientNotificationService.class).unregisterSession(INode.ID, sessionId, userId);
         }
       });
     }
@@ -129,7 +129,7 @@ public class ClientSessionRegistry implements IClientSessionRegistry, IGlobalSes
       ClientRunContexts.empty().withSubject(NOTIFICATION_SUBJECT).withUserAgent(UserAgent.createDefault()).run(new IRunnable() {
         @Override
         public void run() throws Exception {
-          BEANS.get(IClientNotificationService.class).registerSession(IClientNode.ID, session.getId(), session.getUserId());
+          BEANS.get(IClientNotificationService.class).registerSession(INode.ID, session.getId(), session.getUserId());
         }
       });
     }

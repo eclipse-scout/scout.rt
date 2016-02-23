@@ -8,16 +8,16 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client;
+package org.eclipse.scout.rt.shared;
 
 import java.util.UUID;
 
 /**
- * Represents a client node which typically hosts multiple client sessions.
+ * Represents a server or client node
  *
  * @since 5.2
  */
-public interface IClientNode {
+public interface INode {
 
   /**
    * Unique ID to identify this node.

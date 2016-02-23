@@ -13,23 +13,20 @@ package org.eclipse.scout.rt.client.servicetunnel.http;
 import java.net.URL;
 import java.util.List;
 
-import org.eclipse.scout.rt.client.IClientNode;
 import org.eclipse.scout.rt.client.clientnotification.ClientNotificationDispatcher;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.services.common.perf.IPerformanceAnalyzerService;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.context.RunContext;
+import org.eclipse.scout.rt.platform.Replace;
 import org.eclipse.scout.rt.platform.job.DoneEvent;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IDoneHandler;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
-import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
-import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
-import org.eclipse.scout.rt.shared.servicetunnel.http.AbstractHttpServiceTunnel;
+import org.eclipse.scout.rt.shared.servicetunnel.http.HttpServiceTunnel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,7 +34,8 @@ import org.slf4j.LoggerFactory;
  * Client-side tunnel used to invoke a service through HTTP. This class re-defines methods of it's super class since the
  * internal class does not belong to the public API.
  */
-public class ClientHttpServiceTunnel extends AbstractHttpServiceTunnel implements IClientServiceTunnel {
+@Replace
+public class ClientHttpServiceTunnel extends HttpServiceTunnel implements IClientServiceTunnel {
 
   private static final Logger LOG = LoggerFactory.getLogger(ClientHttpServiceTunnel.class);
 
@@ -59,19 +57,6 @@ public class ClientHttpServiceTunnel extends AbstractHttpServiceTunnel implement
   @Override
   public void setAnalyzeNetworkLatency(boolean b) {
     m_analyzeNetworkLatency = b;
-  }
-
-  @Override
-  protected void beforeTunnel(ServiceTunnelRequest serviceRequest) {
-    ISession session = ISession.CURRENT.get();
-    if (session != null) {
-      serviceRequest.setSessionId(session.getId());
-    }
-    else {
-      // use this client's node-id for session less communication
-      serviceRequest.setSessionId(IClientNode.ID);
-    }
-    serviceRequest.setClientNodeId(IClientNode.ID);
   }
 
   @Override
@@ -131,8 +116,4 @@ public class ClientHttpServiceTunnel extends AbstractHttpServiceTunnel implement
     cond.waitFor();
   }
 
-  @Override
-  protected RunContext createCurrentRunContext() {
-    return ClientRunContexts.copyCurrent();
-  }
 }

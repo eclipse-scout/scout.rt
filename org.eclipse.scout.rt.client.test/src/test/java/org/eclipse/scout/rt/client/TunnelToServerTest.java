@@ -17,6 +17,7 @@ import org.eclipse.scout.rt.platform.Replace;
 import org.eclipse.scout.rt.platform.internal.BeanManagerImplementor;
 import org.eclipse.scout.rt.platform.service.IService;
 import org.eclipse.scout.rt.shared.TunnelToServer;
+import org.eclipse.scout.rt.shared.servicetunnel.TunnelToServerProxyProducer;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;

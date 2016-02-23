@@ -21,8 +21,8 @@ import javax.servlet.http.HttpSession;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.StringUtility;
-import org.eclipse.scout.rt.shared.servicetunnel.http.AbstractHttpServiceTunnel;
 import org.eclipse.scout.rt.shared.servicetunnel.http.DefaultAuthToken;
+import org.eclipse.scout.rt.shared.servicetunnel.http.HttpServiceTunnel;
 
 /**
  * Access controller to continue filter-chain if a valid {@link AbstractHttpServiceTunnel#TOKEN_AUTH_HTTP_HEADER Service
@@ -53,7 +53,7 @@ public class ServiceTunnelAccessTokenAccessController implements IAccessControll
       return false;
     }
 
-    final String tokenString = request.getHeader(AbstractHttpServiceTunnel.TOKEN_AUTH_HTTP_HEADER);
+    final String tokenString = request.getHeader(HttpServiceTunnel.TOKEN_AUTH_HTTP_HEADER);
     if (tokenString == null) {
       return false;
     }

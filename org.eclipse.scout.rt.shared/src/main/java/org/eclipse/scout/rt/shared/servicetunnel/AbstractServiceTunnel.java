@@ -14,9 +14,11 @@ import java.lang.reflect.Method;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
-import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.exception.DefaultRuntimeExceptionTranslator;
+import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedException;
+import org.eclipse.scout.rt.shared.INode;
+import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,16 +34,15 @@ public abstract class AbstractServiceTunnel implements IServiceTunnel {
   }
 
   @Override
-  public Object invokeService(Class serviceInterfaceClass, Method operation, Object[] callerArgs) {
-    long t0 = System.nanoTime();
-    if (callerArgs == null) {
-      callerArgs = new Object[0];
-    }
+  public Object invokeService(Class<?> serviceInterfaceClass, Method operation, Object[] callerArgs) {
     LOG.debug("{}.{}({})", serviceInterfaceClass, operation, callerArgs);
+    ServiceTunnelRequest request = createRequest(serviceInterfaceClass, operation, callerArgs);
+    interceptRequest(request);
+    return invokeService(request);
+  }
 
-    ServiceUtility serviceUtility = BEANS.get(ServiceUtility.class);
-    Object[] serializableArgs = serviceUtility.filterHolderArguments(callerArgs);
-    ServiceTunnelRequest request = createServiceTunnelRequest(serviceInterfaceClass, operation, serializableArgs);
+  public Object invokeService(ServiceTunnelRequest request) {
+    long t0 = System.nanoTime();
     beforeTunnel(request);
     ServiceTunnelResponse response = tunnel(request);
     afterTunnel(t0, response);
@@ -53,8 +54,8 @@ public abstract class AbstractServiceTunnel implements IServiceTunnel {
       RuntimeException serviceException = interceptException(t);
       if (serviceException instanceof PlatformException) {
         ((PlatformException) serviceException)
-            .withContextInfo("remote-service.name", serviceInterfaceClass.getSimpleName())
-            .withContextInfo("remote-service.operation", operation.getName());
+            .withContextInfo("remote-service.name", request.getServiceInterfaceClassName())
+            .withContextInfo("remote-service.operation", request.getOperation());
       }
 
       // Combine local and remote stacktraces.
@@ -66,22 +67,31 @@ public abstract class AbstractServiceTunnel implements IServiceTunnel {
       serviceException.setStackTrace(both);
       throw serviceException;
     }
-    serviceUtility.updateHolderArguments(callerArgs, response.getOutVars(), false);
+    BEANS.get(ServiceUtility.class).updateHolderArguments(request.getArgs(), response.getOutVars(), false);
     return response.getData();
   }
 
-  protected ServiceTunnelRequest createServiceTunnelRequest(Class serviceInterfaceClass, Method operation, Object[] args) {
+  public ServiceTunnelRequest createRequest(Class<?> interfaceClass, Method operation, Object[] args) {
+    if (args == null) {
+      args = new Object[0];
+    }
+    Object[] serializableArgs = BEANS.get(ServiceUtility.class).filterHolderArguments(args);
+    return new ServiceTunnelRequest(interfaceClass.getName(), operation.getName(), operation.getParameterTypes(), serializableArgs);
+  }
+
+  protected void interceptRequest(ServiceTunnelRequest request) {
     UserAgent userAgent = UserAgent.CURRENT.get();
     if (userAgent == null) {
       LOG.warn("No UserAgent set on calling context; include default in service-request");
       userAgent = UserAgent.createDefault();
     }
+    request.setUserAgent(userAgent.createIdentifier());
 
-    // default implementation
-    ServiceTunnelRequest call = new ServiceTunnelRequest(serviceInterfaceClass.getName(), operation.getName(), operation.getParameterTypes(), args);
-    call.setUserAgent(userAgent.createIdentifier());
-
-    return call;
+    ISession session = ISession.CURRENT.get();
+    if (session != null) {
+      request.setSessionId(session.getId());
+    }
+    request.setClientNodeId(INode.ID);
   }
 
   /**

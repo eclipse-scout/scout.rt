@@ -1,4 +1,4 @@
-package org.eclipse.scout.rt.client;
+package org.eclipse.scout.rt.shared.servicetunnel;
 
 import java.lang.reflect.Method;
 
@@ -8,7 +8,6 @@ import org.eclipse.scout.rt.platform.IBeanInstanceProducer;
 import org.eclipse.scout.rt.platform.interceptor.DecoratingProxy;
 import org.eclipse.scout.rt.platform.interceptor.IInstanceInvocationHandler;
 import org.eclipse.scout.rt.platform.util.VerboseUtility;
-import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

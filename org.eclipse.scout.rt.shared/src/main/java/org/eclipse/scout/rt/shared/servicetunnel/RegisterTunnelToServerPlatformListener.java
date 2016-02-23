@@ -8,13 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client;
+package org.eclipse.scout.rt.shared.servicetunnel;
 
 import java.util.List;
 
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
-import org.eclipse.scout.rt.platform.IBeanDecorationFactory;
 import org.eclipse.scout.rt.platform.IBeanManager;
 import org.eclipse.scout.rt.platform.IPlatform;
 import org.eclipse.scout.rt.platform.IPlatformListener;
@@ -30,7 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Default client-side {@link IBeanDecorationFactory} used in {@link IPlatform#getBeanManager()}
+ * {@link IPlatformListener} to register proxy beans for interfaces annotated with {@link TunnelToServer}.
  */
 public class RegisterTunnelToServerPlatformListener implements IPlatformListener {
   private static final Logger LOG = LoggerFactory.getLogger(RegisterTunnelToServerPlatformListener.class);
@@ -63,6 +62,7 @@ public class RegisterTunnelToServerPlatformListener implements IPlatformListener
         LOG.warn("could not load class [{}]", ci.name(), e);
       }
     }
+    LOG.info("Tunnel to server proxies registered.");
   }
 
   protected void registerTunnelToServerProxy(final IBeanManager beanManager, Class<?> c) {
@@ -72,6 +72,7 @@ public class RegisterTunnelToServerPlatformListener implements IPlatformListener
     }
 
     beanManager.registerBean(createBeanMetaData(c));
+    LOG.debug("Registered [{}}", c);
   }
 
   /**

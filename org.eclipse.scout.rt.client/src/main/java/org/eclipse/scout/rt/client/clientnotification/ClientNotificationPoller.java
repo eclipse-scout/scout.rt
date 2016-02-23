@@ -15,7 +15,6 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
 
-import org.eclipse.scout.rt.client.IClientNode;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -28,6 +27,7 @@ import org.eclipse.scout.rt.platform.util.SleepUtil;
 import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledException;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedException;
+import org.eclipse.scout.rt.shared.INode;
 import org.eclipse.scout.rt.shared.SharedConfigProperties.NotificationSubjectProperty;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
 import org.eclipse.scout.rt.shared.clientnotification.IClientNotificationService;
@@ -81,7 +81,7 @@ public class ClientNotificationPoller {
     public void run() {
       while (!RunMonitor.CURRENT.get().isCancelled()) {
         try {
-          handleMessagesReceived(BEANS.get(IClientNotificationService.class).getNotifications(IClientNode.ID));
+          handleMessagesReceived(BEANS.get(IClientNotificationService.class).getNotifications(INode.ID));
         }
         catch (ThreadInterruptedException | FutureCancelledException e) {
           LOG.debug("Client notification polling has been interrupted.", e);
@@ -93,4 +93,5 @@ public class ClientNotificationPoller {
       }
     }
   }
+
 }

@@ -12,17 +12,17 @@ package org.eclipse.scout.rt.serverbridge;
 
 import java.util.List;
 
-import org.eclipse.scout.rt.client.RegisterTunnelToServerPlatformListener;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IBeanManager;
 import org.eclipse.scout.rt.platform.Replace;
 import org.eclipse.scout.rt.shared.AnnotationFactory;
+import org.eclipse.scout.rt.shared.servicetunnel.RegisterTunnelToServerPlatformListener;
 
 /**
  * Instead of registering @TunnelToServer beans using interfaces we append the @TunnelToServer annotation to all beans
  * actually implementing a @TunnelToServer marked interface.
- * 
+ *
  * @since 5.2
  */
 @Replace

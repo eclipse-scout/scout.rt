@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.serverbridge;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-import org.eclipse.scout.rt.client.IClientNode;
 import org.eclipse.scout.rt.client.clientnotification.ClientNotificationDispatcher;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContextIdentifiers;
@@ -25,6 +24,7 @@ import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.server.session.ServerSessionProviderWithCache;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
+import org.eclipse.scout.rt.shared.INode;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
 
@@ -72,7 +72,7 @@ public class BridgeToServerBeanDecorator<T> implements IBeanDecorator<T> {
     ServerRunContext bridgeRunContext = ServerRunContexts
         .copyCurrent()
         .withClientNotificationCollector(collector)
-        .withClientNodeId(IClientNode.ID);
+        .withClientNodeId(INode.ID);
     ISession currentSession = ISession.CURRENT.get();
     IServerSession bridgeSession = null;
     if (currentSession != null) {

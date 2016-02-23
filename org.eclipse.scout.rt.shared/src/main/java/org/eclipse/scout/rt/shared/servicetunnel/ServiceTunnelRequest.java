@@ -59,10 +59,17 @@ public class ServiceTunnelRequest implements Serializable {
     return m_requestSequence;
   }
 
+  /**
+   * @return Session id or <code>null</code>, if not defined
+   */
   public String getSessionId() {
     return m_sessionId;
   }
 
+  /**
+   * @param sessionId
+   *          (<code>null</code>, if not defined)
+   */
   public void setSessionId(String sessionId) {
     m_sessionId = sessionId;
   }

@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client;
+package org.eclipse.scout.rt.shared.servicetunnel;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;

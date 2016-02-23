@@ -22,7 +22,6 @@ import javax.security.auth.Subject;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.IConfigProperty;
-import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.job.DoneEvent;
@@ -46,7 +45,7 @@ import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
 /**
  * Abstract tunnel used to invoke a service through HTTP.
  */
-public abstract class AbstractHttpServiceTunnel extends AbstractServiceTunnel {
+public class HttpServiceTunnel extends AbstractServiceTunnel {
 
   public static final String TOKEN_AUTH_HTTP_HEADER = "X-ScoutAccessToken";
 
@@ -54,11 +53,11 @@ public abstract class AbstractHttpServiceTunnel extends AbstractServiceTunnel {
   private final URL m_serverUrl;
   private final boolean m_active;
 
-  public AbstractHttpServiceTunnel() {
+  public HttpServiceTunnel() {
     this(getConfiguredServerUrl());
   }
 
-  public AbstractHttpServiceTunnel(URL url) {
+  public HttpServiceTunnel(URL url) {
     m_serverUrl = url;
     m_active = url != null;
   }
@@ -199,45 +198,36 @@ public abstract class AbstractHttpServiceTunnel extends AbstractServiceTunnel {
   protected ServiceTunnelResponse tunnel(final ServiceTunnelRequest serviceRequest) {
     final long requestSequence = serviceRequest.getRequestSequence();
 
-    // RunContext to run the service call.
-    final RunContext executionContext = createCurrentRunContext();
-
     // Create the Callable to be given to the job manager for execution.
     final RemoteServiceInvocationCallable remoteInvocationCallable = createRemoteServiceInvocationCallable(serviceRequest);
 
     // Register the execution monitor as child monitor of the current monitor so that the service request is cancelled once the current monitor gets cancelled.
-    RunMonitor.CURRENT.get().registerCancellable(executionContext.getRunMonitor());
-
     // Invoke the service operation asynchronously (to enable cancellation) and wait until completed or cancelled.
-    IFuture<ServiceTunnelResponse> future = null;
-    try {
-      future = Jobs.schedule(remoteInvocationCallable, Jobs.newInput()
-          .withRunContext(executionContext.copy())
-          .withName(createServiceRequestName(requestSequence))
-          .withExceptionHandling(null, false)) // do not handle uncaught exceptions because typically invoked from within a model job (might cause a deadlock, because ClientExceptionHandler schedules and waits for a model job to visualize the exception).
-          .whenDone(new IDoneHandler<ServiceTunnelResponse>() {
+    final IFuture<ServiceTunnelResponse> future = Jobs
+        .schedule(remoteInvocationCallable,
+            Jobs.newInput().withRunContext(RunContexts.copyCurrent())
+                .withName(createServiceRequestName(requestSequence))
+                .withExceptionHandling(null, false)) // do not handle uncaught exceptions because typically invoked from within a model job (might cause a deadlock, because ClientExceptionHandler schedules and waits for a model job to visualize the exception).
+        .whenDone(new IDoneHandler<ServiceTunnelResponse>() {
 
-            @Override
-            public void onDone(DoneEvent<ServiceTunnelResponse> event) {
-              if (event.isCancelled()) {
-                remoteInvocationCallable.cancel(executionContext.copy()
-                    .withRunMonitor(BEANS.get(RunMonitor.class))); // separate monitor to not cancel this cancellation action.
-              }
+          @Override
+          public void onDone(DoneEvent<ServiceTunnelResponse> event) {
+            if (event.isCancelled()) {
+              remoteInvocationCallable.cancel();
             }
-          }, null);
+          }
+        }, RunContexts.copyCurrent()
+            .withRunMonitor(BEANS.get(RunMonitor.class))); // separate monitor to not cancel this cancellation action.
+
+    try {
       return future.awaitDoneAndGet();
     }
     catch (ThreadInterruptedException e) {
-      if (future != null) {
-        future.cancel(true); // Ensure the monitor to be cancelled once this thread is interrupted to cancel the remote call.
-      }
+      future.cancel(true); // Ensure the monitor to be cancelled once this thread is interrupted to cancel the remote call.
       return new ServiceTunnelResponse(new ThreadInterruptedException(ScoutTexts.get("UserInterrupted"))); // Interruption has precedence over computation result or computation error.
     }
     catch (FutureCancelledException e) {
       return new ServiceTunnelResponse(new ThreadInterruptedException(ScoutTexts.get("UserInterrupted"))); // Cancellation has precedence over computation result or computation error.
-    }
-    catch (final RuntimeException e) {
-      return new ServiceTunnelResponse(e);
     }
   }
 
@@ -249,13 +239,6 @@ public abstract class AbstractHttpServiceTunnel extends AbstractServiceTunnel {
   }
 
   /**
-   * @return a copy of the current calling context to be used to invoke the remote service operation.
-   */
-  protected RunContext createCurrentRunContext() {
-    return RunContexts.copyCurrent();
-  }
-
-  /**
    * Returns the name to decorate the thread's name while executing the service request.
    */
   protected String createServiceRequestName(final long requestSequence) {
@@ -263,4 +246,5 @@ public abstract class AbstractHttpServiceTunnel extends AbstractServiceTunnel {
     final String submitter = (currentFuture != null ? currentFuture.getJobInput().getName() : Thread.currentThread().getName());
     return String.format("Tunneling service request [seq=%s, submitter=%s]", requestSequence, submitter);
   }
+
 }
