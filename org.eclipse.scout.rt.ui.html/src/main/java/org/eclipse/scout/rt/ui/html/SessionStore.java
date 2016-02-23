@@ -300,7 +300,7 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
         return;
       }
 
-      // Check if the client session is referenced by any UI Session
+      // Check if the client session is referenced by any UI session
       Set<IUiSession> uiSessions = m_uiSessionsByClientSession.get(clientSession);
       LOG.debug("Session housekeeping: Client session {} referenced by {} UI sessions", clientSession.getId(), (uiSessions == null ? 0 : uiSessions.size()));
       if (uiSessions == null || uiSessions.isEmpty()) {

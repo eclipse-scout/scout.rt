@@ -282,6 +282,7 @@ scout.Session.prototype._processStartupResponse = function(data) {
 
   // Special case: Page must be reloaded on startup (e.g. theme changed)
   if (data.startupData.reloadPage) {
+    this._sendUnloadRequest(); // ensure current (dummy) UI session is destroyed right away
     scout.reloadPage();
     return;
   }
@@ -358,6 +359,7 @@ scout.Session.prototype._sendNow = function() {
     uiSessionId: this.uiSessionId,
     events: this._asyncEvents
   };
+  this.responseQueue.prepareRequest(request);
   // Send request
   this._sendRequest(request);
   this._asyncEvents = [];
@@ -376,14 +378,14 @@ scout.Session.prototype._sendRequest = function(request) {
     return; // nothing to send
   }
 
-  if (this.offline && !request.unload) {
-    // No need to queue the request when document is unloading
+  if (this.offline && request.events) {
+    // No need to queue the request when request does not contain events (e.g. when document is unloading)
     // Note: Firefox is offline when page is unloaded
 
     // Merge request with queued event
     if (this._queuedRequest) {
       if (this._queuedRequest.events) {
-        // 1 .Remove request events from queued events
+        // 1. Remove request events from queued events
         request.events.forEach(function(event) {
           this._queuedRequest.events = this._coalesceEvents(this._queuedRequest.events, event);
         }.bind(this));
@@ -409,27 +411,54 @@ scout.Session.prototype._sendRequest = function(request) {
     // - http://stackoverflow.com/questions/15479103/can-beforeunload-unload-be-used-to-send-xmlhttprequests-reliably
     // - https://groups.google.com/a/chromium.org/forum/#!topic/blink-dev/7nKMdg_ALcc
     // - https://developer.mozilla.org/en-US/docs/Web/API/Navigator/sendBeacon
-    navigator.sendBeacon(this.url, JSON.stringify(request));
+    navigator.sendBeacon(this._decorateUrl(this.url, request), JSON.stringify(request));
     return;
   }
 
-  var ajaxOptions = this.defaultAjaxOptions(request, !request.unload);
-  var busyHandling = !request.unload;
+  var ajaxOptions = this.defaultAjaxOptions(request);
+  var busyHandling = true;
+  if (request.unload) {
+    ajaxOptions.async = false;
+    busyHandling = false;
+  }
   this._performUserAjaxRequest(ajaxOptions, busyHandling, request);
 };
 
-scout.Session.prototype.defaultAjaxOptions = function(request, async) {
+scout.Session.prototype.defaultAjaxOptions = function(request) {
   request = request || {};
-  async = scout.nvl(async, true);
+  var url = this._decorateUrl(this.url, request);
+
   return {
-    async: async,
+    async: true,
     type: 'POST',
     dataType: 'json',
     contentType: 'application/json; charset=UTF-8',
     cache: false,
-    url: this.url,
+    url: url,
     data: JSON.stringify(request)
   };
+};
+
+scout.Session.prototype._decorateUrl = function(url, request) {
+  var urlHint = null;
+  // Add dummy URL parameter as marker (for debugging purposes)
+  if (request.unload) {
+    urlHint = 'unload';
+  } else if (request.pollForBackgroundJobs) {
+    urlHint = 'poll';
+  } else if (request.ping) {
+    urlHint = 'ping';
+  } else if (request.cancel) {
+    urlHint = 'cancel';
+  } else if (request.log) {
+    urlHint = 'log';
+  } else if (request.syncResponseQueue) {
+    urlHint = 'sync';
+  }
+  if (urlHint) {
+    url = new scout.URL(url).addParameter(urlHint).toString();
+  }
+  return url;
 };
 
 scout.Session.prototype._performUserAjaxRequest = function(ajaxOptions, busyHandling, request) {
@@ -475,18 +504,30 @@ scout.Session.prototype._performUserAjaxRequest = function(ajaxOptions, busyHand
   function onAjaxAlways(data, textStatus, errorThrown) {
     this._requestsPendingCounter--;
     this.layoutValidator.validate();
+
+    // "success" is false when either
+    // a) an HTTP error occurred or
+    // b) a JSON response with the error flag set (UI processing error) was returned
     if (success) {
       this._resumeBackgroundJobPolling();
       this._fireRequestFinished(data);
+
+      // Send events that happened while begin offline
+      var queuedRequest = this._queuedRequest;
+      if (queuedRequest) {
+        this._queuedRequest = null;
+        this.responseQueue.prepareRequest(queuedRequest);
+        this._sendRequest(queuedRequest);
+      }
+
+      // If there already is a another request pending, send it now
+      // But only if it should not be sent delayed
+      if (!this._sendTimeoutId) {
+        this._sendNow();
+      }
     }
 
-    // If there already is a another request pending, send it now
-    // But only if it should not be sent delayed
-    if (!this._sendTimeoutId) {
-      this._sendNow();
-    }
-
-    // Throw previously catched error
+    // Throw previously caught error
     if (jsError) {
       throw jsError;
     }
@@ -522,12 +563,11 @@ scout.Session.prototype._pollForBackgroundJobs = function() {
     uiSessionId: this.uiSessionId,
     pollForBackgroundJobs: true
   };
+  this.responseQueue.prepareRequest(request);
 
   this._backgroundJobPollingSupport.setRunning();
 
   var ajaxOptions = this.defaultAjaxOptions(request);
-  // Add dummy parameter as marker (for debugging purposes)
-  ajaxOptions.url = new scout.URL(ajaxOptions.url).addParameter('poll').toString();
 
   $.ajax(ajaxOptions)
     .done(onAjaxDone.bind(this))
@@ -594,8 +634,6 @@ scout.Session.prototype.processJsonResponseInternal = function(data) {
 };
 
 scout.Session.prototype._processSuccessResponse = function(message) {
-  this._queuedRequest = null;
-
   if (message.adapterData) {
     this._copyAdapterData(message.adapterData);
   }
@@ -830,11 +868,13 @@ scout.Session.prototype.goOffline = function() {
 
 scout.Session.prototype.goOnline = function() {
   this.offline = false;
-  if (this._queuedRequest) {
-    this._sendRequest(this._queuedRequest); // implies "_resumeBackgroundJobPolling"
-  } else {
-    this._resumeBackgroundJobPolling();
-  }
+
+  var request ={
+    uiSessionId: this.uiSessionId,
+    syncResponseQueue: true
+  };
+  this._sendRequest(request); // implies "_resumeBackgroundJobPolling", and also sends queued request
+
   this.rootAdapter.goOnline();
 };
 
@@ -972,8 +1012,6 @@ scout.Session.prototype.sendLogRequest = function(message) {
 
   // Do not use _sendRequest to make sure a log request has no side effects and will be sent only once
   var ajaxOptions = this.defaultAjaxOptions(request);
-  // Add dummy parameter as marker (for debugging purposes)
-  ajaxOptions.url = new scout.URL(ajaxOptions.url).addParameter('log').toString();
   $.ajax(ajaxOptions);
 };
 

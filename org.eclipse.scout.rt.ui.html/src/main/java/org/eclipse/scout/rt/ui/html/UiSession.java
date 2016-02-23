@@ -13,11 +13,15 @@ package org.eclipse.scout.rt.ui.html;
 import java.math.BigInteger;
 import java.security.AccessController;
 import java.security.SecureRandom;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -50,7 +54,6 @@ import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
-import org.eclipse.scout.rt.platform.util.SleepUtil;
 import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledException;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedException;
@@ -87,6 +90,11 @@ public class UiSession implements IUiSession {
   private static final String EVENT_LOCALE_CHANGED = "localeChanged";
   private static final String EVENT_DISPOSE_ADAPTER = "disposeAdapter";
   private static final String EVENT_RELOAD_PAGE = "reloadPage";
+  /**
+   * in milliseconds
+   */
+  private static final long ADDITIONAL_POLLING_DELAY = 100;
+  private static final int MAX_RESPONSE_HISTORY_SIZE = 10;
 
   private static final Random RANDOM = new SecureRandom();
 
@@ -95,9 +103,11 @@ public class UiSession implements IUiSession {
   private final P_RootAdapter m_rootJsonAdapter;
   private final AtomicLong m_jsonAdapterSeq = new AtomicLong(ROOT_ID);
   private final AtomicLong m_responseSequenceNo = new AtomicLong(1);
+  private final SortedMap<Long, JsonResponse> m_responseHistory = Collections.synchronizedSortedMap(new TreeMap<Long, JsonResponse>());
   private final ReentrantLock m_uiSessionLock = new ReentrantLock();
   private final HttpContext m_httpContext = new HttpContext();
   private final BlockingQueue<Object> m_pollerQueue = new ArrayBlockingQueue<>(1, true);
+  private final Object m_pollerQueueLock = new Object();
   private final Object m_notificationToken = new Object();
 
   private volatile boolean m_initialized;
@@ -111,6 +121,7 @@ public class UiSession implements IUiSession {
   private volatile boolean m_disposed;
   private volatile IRegistrationHandle m_uiDataAvailableListener;
   private volatile long m_lastAccessedTime;
+  private volatile RunMonitor m_pollerMonitor;
 
   public UiSession() {
     m_jsonAdapterRegistry = createJsonAdapterRegistry();
@@ -157,6 +168,10 @@ public class UiSession implements IUiSession {
 
   protected final Object notificationToken() {
     return m_notificationToken;
+  }
+
+  protected final RunMonitor pollerMonitor() {
+    return m_pollerMonitor;
   }
 
   @Override
@@ -513,6 +528,23 @@ public class UiSession implements IUiSession {
   }
 
   @Override
+  public void confirmResponseProcessed(Long sequenceNo) {
+    if (sequenceNo == null) {
+      return;
+    }
+    // Update response history
+    int removeCount = 0;
+    for (Iterator<Long> it = m_responseHistory.keySet().iterator(); it.hasNext();) {
+      Long key = it.next();
+      if (key <= sequenceNo) {
+        it.remove();
+        removeCount++;
+      }
+    }
+    LOG.debug("Cleaned up response history (-{}). New content: {} [#ACK={}, uiSessionId={}]", removeCount, m_responseHistory.keySet(), sequenceNo, m_uiSessionId);
+  }
+
+  @Override
   public JSONObject processJsonRequest(final HttpServletRequest servletRequest, final HttpServletResponse servletResponse, final JsonRequest jsonRequest) {
     final ClientRunContext clientRunContext = ClientRunContexts.copyCurrent().withSession(m_clientSession, true);
 
@@ -590,12 +622,34 @@ public class UiSession implements IUiSession {
   }
 
   /**
-   * <b>Do not call this internal method directly!</b> It should only be called be
+   * <b>Do not call this internal method directly!</b> It should only be called by
    * {@link #processJsonRequest(HttpServletRequest, JsonRequest)} which ensures that the required state is set up
    * correctly (and will be cleaned up later) and is run as a model job.
    */
   protected void processJsonRequestInternal() {
     m_jsonEventProcessor.processEvents(m_currentJsonRequest, m_currentJsonResponse);
+  }
+
+  /**
+   * <b>Do not call this internal method directly!</b> It should only be called by the "response-to-json transformer" (
+   * {@link #newResponseToJsonTransformer()}) which ensures that the required state is set up correctly (and will be
+   * cleaned up later) and is run as a model job.
+   */
+  protected JSONObject responseToJsonInternal() {
+    // Remember response in history
+    if (m_currentJsonResponse.getSequenceNo() != null) {
+      if (m_responseHistory.size() > MAX_RESPONSE_HISTORY_SIZE) {
+        // Remove oldest entry to free up memory (protection against malicious clients that send no or wrong #ACKs)
+        Long oldestSeqNo = m_responseHistory.firstKey();
+        LOG.warn("Max. response history size exceeded for UI session {}, dropping oldest response #{}", m_uiSessionId, oldestSeqNo);
+        m_responseHistory.remove(oldestSeqNo);
+      }
+      m_responseHistory.put(m_currentJsonResponse.getSequenceNo(), m_currentJsonResponse);
+      LOG.debug("Added response #{} to history {} for UI session {}", m_currentJsonResponse.getSequenceNo(), m_responseHistory.keySet(), m_uiSessionId);
+    }
+
+    // Convert response to JSON (must be done in model thread due to potential model access inside the toJson() method).
+    return m_currentJsonResponse.toJson();
   }
 
   /**
@@ -607,8 +661,7 @@ public class UiSession implements IUiSession {
       @Override
       public JSONObject call() throws Exception {
         try {
-          // Convert response to JSON (must be done in model thread due to potential model access inside the toJson() method).
-          return m_currentJsonResponse.toJson();
+          return responseToJsonInternal();
         }
         catch (RuntimeException e) {
           LOG.warn("Error while transforming response to JSON: {}", m_currentJsonResponse, e);
@@ -687,6 +740,20 @@ public class UiSession implements IUiSession {
         .andMatchNotExecutionHint(UiJobs.EXECUTION_HINT_POLL_REQUEST)
         .andMatchNotExecutionHint(ModelJobs.EXECUTION_HINT_UI_INTERACTION_REQUIRED)
         .toFilter(), true);
+  }
+
+  @Override
+  public JSONObject processSyncResponseQueueRequest(JsonRequest jsonRequest) {
+    LOG.debug("Synchronize response queue {} for UI session {}", m_responseHistory.keySet(), m_uiSessionId);
+    if (m_responseHistory.isEmpty()) {
+      return null;
+    }
+    Long lastSentSequenceNo = m_responseHistory.lastKey();
+    JsonResponse combinedResponse = new JsonResponse(lastSentSequenceNo);
+    for (JsonResponse response : m_responseHistory.values()) {
+      combinedResponse.combine(response);
+    }
+    return combinedResponse.toJson();
   }
 
   @Override
@@ -880,41 +947,49 @@ public class UiSession implements IUiSession {
   }
 
   @Override
-  public void waitForBackgroundJobs(int pollWaitSeconds) {
+  public void waitForBackgroundJobs(int pollWaitSeconds) throws InterruptedException {
+    // If another poller is currently blocking, interrupt it. This ensures that max. 1 polling
+    // request is waiting for background jobs at the same time (relevant when the UI reconnects
+    // after being offline).
+    synchronized (m_pollerQueueLock) {
+      if (m_pollerMonitor != null) {
+        m_pollerMonitor.cancel(true);
+      }
+      m_pollerMonitor = RunMonitor.CURRENT.get();
+    }
+
     boolean wait = true;
     while (wait) {
       LOG.trace("Wait for max. {} seconds until background job terminates or wait timeout occurs...", pollWaitSeconds);
-      try {
-        long t0 = System.currentTimeMillis();
-        // Wait until notified by m_modelJobFinishedListener (when a background job has finished) or a timeout occurs
-        Object notificationToken = m_pollerQueue.poll(pollWaitSeconds, TimeUnit.SECONDS);
-        int durationSeconds = (int) Math.round((System.currentTimeMillis() - t0) / 1000d);
-        int newPollWaitSeconds = pollWaitSeconds - durationSeconds;
-        if (notificationToken == null || newPollWaitSeconds <= 0 || m_disposed || !m_currentJsonResponse.isEmpty()) {
-          // Stop wait loop for one of the following reasons:
-          // 1. Timeout has occurred -> return always, even with empty answer
-          // 2. Remaining pollWaitTime would be zero -> same as no. 1
-          // 3. Session is disposed
-          // 4. Poller was waken up by m_modelJobFinishedListener and JsonResponse is not empty
-          wait = false;
-        }
-        else {
-          // Continue wait loop, because timeout has not yet elapsed and JsonResponse is empty
-          LOG.trace("Background job terminated, but there is nothing to respond. Going back to sleep.");
-          pollWaitSeconds = newPollWaitSeconds;
-        }
+      long t0 = System.currentTimeMillis();
+      // Wait until notified by m_modelJobFinishedListener (when a background job has finished) or a timeout occurs
+      Object notificationToken = m_pollerQueue.poll(pollWaitSeconds, TimeUnit.SECONDS);
+      int durationSeconds = (int) Math.round((System.currentTimeMillis() - t0) / 1000d);
+      int newPollWaitSeconds = pollWaitSeconds - durationSeconds;
+      if (notificationToken == null || newPollWaitSeconds <= 0 || m_disposed || !m_currentJsonResponse.isEmpty()) {
+        // Stop wait loop for one of the following reasons:
+        // 1. Timeout has occurred -> return always, even with empty answer
+        // 2. Remaining pollWaitTime would be zero -> same as no. 1
+        // 3. Session is disposed
+        // 4. Poller was waken up by m_modelJobFinishedListener and JsonResponse is not empty
+        wait = false;
       }
-      catch (java.lang.InterruptedException e) {
-        LOG.warn("Interrupted while waiting for notification token", e);
+      else {
+        // Continue wait loop, because timeout has not yet elapsed and JsonResponse is empty
+        LOG.trace("Background job terminated, but there is nothing to respond. Going back to sleep.");
+        pollWaitSeconds = newPollWaitSeconds;
       }
+    }
+    if (!m_disposed) {
+      // Wait a short additional time to allow some sort of "coalescing background job result".
+      // This prevents too many short polling requests if many jobs finish at the same time.
+      Thread.sleep(ADDITIONAL_POLLING_DELAY);
+    }
+
+    synchronized (m_pollerQueueLock) {
+      m_pollerMonitor = null;
     }
     LOG.trace("Background job terminated. Continue request processing...");
-    if (!m_disposed) {
-      return;
-    }
-    // Wait at least 100ms to allow some sort of "coalescing background job result" (if many jobs
-    // finish at the same time, we want to prevent too many polling requests).
-    SleepUtil.sleepSafe(100, TimeUnit.MILLISECONDS);
   }
 
   /**

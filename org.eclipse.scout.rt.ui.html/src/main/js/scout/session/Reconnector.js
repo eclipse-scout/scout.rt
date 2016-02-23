@@ -38,8 +38,6 @@ scout.Reconnector.prototype.ping = function() {
   };
 
   var ajaxOptions = this.session.defaultAjaxOptions(request);
-  // Add dummy parameter as marker (for debugging purposes)
-  ajaxOptions.url = new scout.URL(ajaxOptions.url).addParameter('ping').toString();
 
   $.ajax(ajaxOptions)
     .done(onAjaxDone.bind(this))
