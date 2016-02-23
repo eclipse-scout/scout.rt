@@ -194,7 +194,21 @@
       &.selected::before {
         border-top-color: @outline-selection-background-color;
       }
-
     }
+  }
+}
+
+.mobile.outline.breadcrumb {
+  & > .outline-title {
+    text-align: left;
+
+    & > .outline-title-text {
+      padding-left: 16px;
+    }
+  }
+
+  & > .tree-data > .tree-node  {
+    text-align: left;
+    padding-left: 16px !important;
   }
 }

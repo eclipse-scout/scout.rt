@@ -239,10 +239,10 @@
       &.selected.leaf::after {
         display: none;
       }
-    }
 
-    & > .tree-node-control {
-      display: none;
+      & > .tree-node-control {
+        display: none;
+      }
     }
   }
 
@@ -270,7 +270,6 @@
       &.selected::after {
         border-top-color: @item-selection-background-color;
       }
-
     }
   }
 }

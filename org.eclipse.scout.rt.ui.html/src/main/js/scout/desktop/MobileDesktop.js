@@ -32,7 +32,7 @@ scout.MobileDesktop.prototype._render = function($parent) {
     parent: this
   });
   this.navigation.render($parent);
-  this.navigation.onOutlineChanged(this.outline, true);
+  this.setOutline(this.outline, true);
 
   $parent.window().on('resize', this.onResize.bind(this));
 };
@@ -42,6 +42,14 @@ scout.MobileDesktop.prototype._render = function($parent) {
  */
 scout.MobileDesktop.prototype._hasHeader = function() {
   return false;
+};
+
+/**
+ * @override
+ */
+scout.MobileDesktop.prototype.setOutline = function(outline, bringToFront) {
+  scout.MobileDesktop.parent.prototype.setOutline.call(this, outline, bringToFront);
+  this.outline.$container.addClass('mobile');
 };
 
 /**

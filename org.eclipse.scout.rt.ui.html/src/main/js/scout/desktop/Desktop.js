@@ -96,7 +96,7 @@ scout.Desktop.prototype._render = function($parent) {
   this.addOns.forEach(function(addOn) {
     addOn.render($parent);
   });
-  this.navigation.onOutlineChanged(this.outline, true);
+  this.setOutline(this.outline, true);
 
   $parent.window().on('resize', this._resizeHandler);
 
