@@ -10,6 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table.columns;
 
+import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
+import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
+
 /**
  * This column may be used if the value is relevant for the gui, and not just the display text.
  */
@@ -20,4 +23,12 @@ public abstract class AbstractBeanColumn<VALUE> extends AbstractColumn<VALUE> im
     return true;
   }
 
+  protected String getPlainText(ITableRow row) {
+    return null;
+  }
+
+  @Override
+  protected void execDecorateCell(Cell cell, ITableRow row) {
+    cell.setText(getPlainText(row)); // used for excel export
+  }
 }
