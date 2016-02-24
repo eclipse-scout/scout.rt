@@ -1880,7 +1880,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
 
         for (Class<? extends IKeyStroke> keystrokeClazz : configuredKeyStrokes) {
           try {
-            IKeyStroke ks = ConfigurationUtility.newInnerInstance(this, keystrokeClazz);
+            IKeyStroke ks = ConfigurationUtility.newInnerInstance(AbstractFormField.this, keystrokeClazz);
             ks.initAction();
             ksMap.put(ks.getKeyStroke().toUpperCase(), ks);
           }
