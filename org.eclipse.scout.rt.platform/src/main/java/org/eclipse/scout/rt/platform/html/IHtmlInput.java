@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.platform.html;
 public interface IHtmlInput extends IHtmlElement {
 
   String TYPE_TEXT = "text";
-  String TYPE_PASSWORD = "password";
+  String TYPE_PASSWORD = "password"; // NOSONAR
   String TYPE_CHECKBOX = "checkbox";
   String TYPE_RADIO = "radio";
   String TYPE_BUTTON = "button";

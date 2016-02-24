@@ -194,7 +194,7 @@ public class LookupRow<ID_TYPE> extends MemoryOptimizedObject implements ILookup
           withEnabled((Boolean) cells[enabledIndex]);
         }
         else if (cells[enabledIndex] instanceof Number) {
-          withEnabled(Boolean.valueOf(((Number) cells[enabledIndex]).intValue() != 0));
+          withEnabled(((Number) cells[enabledIndex]).intValue() != 0);
         }
         else {
           LOG.error("Ignoring invalid Boolean value '{}'", cells[enabledIndex]);
@@ -210,7 +210,7 @@ public class LookupRow<ID_TYPE> extends MemoryOptimizedObject implements ILookup
           withActive((Boolean) cells[activeIndex]);
         }
         else if (cells[activeIndex] instanceof Number) {
-          withActive(Boolean.valueOf(((Number) cells[activeIndex]).intValue() != 0));
+          withActive(((Number) cells[activeIndex]).intValue() != 0);
         }
         else {
           LOG.error("Ignoring invalid Boolean value '{}'", cells[activeIndex]);
