@@ -16,7 +16,7 @@ scout.HtmlComponent = function($comp, session) {
     throw new Error('session must be defined for ' + this.debug());
   }
   this.$comp = $comp;
-  this._layout = new scout.NullLayout();
+  this.layout = new scout.NullLayout();
   this.layoutData;
   this.valid = false;
 
@@ -86,8 +86,8 @@ scout.HtmlComponent.prototype.getAvailableSize = function() {
  */
 scout.HtmlComponent.prototype.invalidateLayout = function() {
   this.valid = false;
-  if (this._layout) {
-    this._layout.invalidate();
+  if (this.layout) {
+    this.layout.invalidate();
   }
 };
 
@@ -96,12 +96,12 @@ scout.HtmlComponent.prototype.invalidateLayout = function() {
  * @exception when component has no layout
  */
 scout.HtmlComponent.prototype.validateLayout = function() {
-  if (!this._layout) {
+  if (!this.layout) {
     throw new Error('Called layout() but component has no layout');
   }
   if (!this.valid) {
     this.layouting = true;
-    this._layout.layout(this.$comp);
+    this.layout.layout(this.$comp);
     this.layouting = false;
     this.layouted = true;
     // Save size for later use (necessary if pixelBasedSizing is set to false)
@@ -165,7 +165,7 @@ scout.HtmlComponent.prototype.isValidateRoot = function() {
  * Sets the given layout.
  */
 scout.HtmlComponent.prototype.setLayout = function(layout) {
-  this._layout = layout;
+  this.layout = layout;
 };
 
 /**
@@ -173,8 +173,8 @@ scout.HtmlComponent.prototype.setLayout = function(layout) {
  * @exception When component has no layout
  */
 scout.HtmlComponent.prototype.getPreferredSize = function() {
-  if (this._layout) {
-    var prefSize = this._layout.preferredLayoutSize(this.$comp);
+  if (this.layout) {
+    var prefSize = this.layout.preferredLayoutSize(this.$comp);
     $.log.trace('(HtmlComponent#getPreferredSize) ' + this.debug() + ' preferredSize=' + prefSize);
     return prefSize;
   } else {

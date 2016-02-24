@@ -109,7 +109,7 @@ scout.DatePicker.prototype._appendAnimated = function(viewDateDiff, $box) {
     that = this;
   var monthBoxCount = this.$scrollable.find('.date-picker-month').length + 1;
 
-  this.htmlComp._layout._layoutMonth($box);
+  this.htmlComp.layout._layoutMonth($box);
 
   this._boxWidth = $box.width();
   var scrollableWidth = monthBoxCount * this._boxWidth;

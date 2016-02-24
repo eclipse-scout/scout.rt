@@ -32,6 +32,7 @@ scout.MobileDesktop.prototype._render = function($parent) {
     parent: this
   });
   this.navigation.render($parent);
+  this.navigation.setToolBarVisible(true);
   this.setOutline(this.outline, true);
 
   $parent.window().on('resize', this.onResize.bind(this));

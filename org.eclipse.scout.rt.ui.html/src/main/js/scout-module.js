@@ -217,6 +217,7 @@ __include("jquery/jquery-scout.js");
   __include("scout/desktop/popupblocker/PopupBlockerHandler.js");
   __include("scout/desktop/popupblocker/PopupBlockerDesktopNotification.js");
   __include("scout/desktop/viewbutton/ViewButton.js");
+  __include("scout/desktop/viewbutton/ViewButtons.js");
   __include("scout/desktop/viewbutton/ViewButtonsLayout.js");
   __include("scout/desktop/viewbutton/ViewMenuOpenKeyStroke.js");
   __include("scout/desktop/viewbutton/ViewMenuPopup.js");
@@ -322,4 +323,7 @@ __include("jquery/jquery-scout.js");
   // More misc. elements
   __include("scout/desktop/DesktopFormController.js");
   __include("scout/table/FilterFieldsGroupBox.js"); // requires GroupBox.js
+
+  __include("scout/table/MobileTable.js");
+  __include("scout/desktop/MobileDesktop.js");
 }(window.scout = window.scout || {}, jQuery));

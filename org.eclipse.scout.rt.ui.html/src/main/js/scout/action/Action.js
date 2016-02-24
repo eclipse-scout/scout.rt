@@ -25,6 +25,7 @@ scout.Action = function() {
   this.actionStyle = scout.Action.ActionStyle.DEFAULT;
 
   this.actionKeyStroke = this._createActionKeyStroke();
+  this.textVisible = true;
 };
 scout.inherits(scout.Action, scout.ModelAdapter);
 
@@ -58,7 +59,7 @@ scout.Action.prototype._remove = function() {
 
 scout.Action.prototype._renderText = function() {
   var text = this.text || '';
-  if (text) {
+  if (text && this.textVisible) {
     if (!this.$text) {
       // Create a separate text element to so that setting the text does not remove the icon
       this.$text = this.$container.appendSpan('text');
@@ -268,6 +269,13 @@ scout.Action.prototype.setTabbable = function(tabbable) {
   this.tabbable = tabbable;
   if (this.rendered) {
     this._renderTabbable();
+  }
+};
+
+scout.Action.prototype.setTextVisible = function(textVisible) {
+  this.textVisible = textVisible;
+  if (this.rendered) {
+    this._renderText();
   }
 };
 

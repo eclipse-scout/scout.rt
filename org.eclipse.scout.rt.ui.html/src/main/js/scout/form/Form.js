@@ -92,10 +92,10 @@ scout.Form.prototype._renderForm = function($parent) {
       }.bind(this),
 
       resize: function(event, ui) {
-        var autoSizeOld = this.htmlComp._layout.autoSize;
-        this.htmlComp._layout.autoSize = false;
+        var autoSizeOld = this.htmlComp.layout.autoSize;
+        this.htmlComp.layout.autoSize = false;
         this.htmlComp.revalidateLayout();
-        this.htmlComp._layout.autoSize = autoSizeOld;
+        this.htmlComp.layout.autoSize = autoSizeOld;
         // jquery ui resize event bubbles up to the window -> never propagate
         return false;
       }.bind(this)

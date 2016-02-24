@@ -15,17 +15,26 @@ scout.DesktopNavigationLayout = function(navigation) {
 scout.inherits(scout.DesktopNavigationLayout, scout.AbstractLayout);
 
 scout.DesktopNavigationLayout.prototype.layout = function($container) {
-  var bodySize, viewButtonsSize, viewButtonsHeight,
+  var bodySize, viewButtonsSize, viewButtonsHeight, viewButtonsWidth,
     htmlContainer = this.navigation.htmlComp,
     containerSize = htmlContainer.getSize(),
     htmlBody = this.navigation.htmlCompBody,
-    htmlViewButtons = this.navigation.htmlViewButtons;
+    htmlViewButtons = this.navigation.viewButtons.htmlComp;
 
   containerSize = containerSize.subtract(htmlContainer.getInsets());
-  viewButtonsHeight = this.navigation.$viewButtons.outerHeight(true);
-  viewButtonsSize = new scout.Dimension(containerSize.width, viewButtonsHeight)
+  viewButtonsHeight = this.navigation.viewButtons.$container.outerHeight(true);
+  viewButtonsWidth = containerSize.width;
+  if (this.navigation.toolBarVisible) {
+    viewButtonsWidth = htmlViewButtons.getPreferredSize().width;
+  }
+  viewButtonsSize = new scout.Dimension(viewButtonsWidth, viewButtonsHeight)
     .subtract(htmlContainer.getMargins());
   htmlViewButtons.setSize(viewButtonsSize);
+
+  if (this.navigation.toolBarVisible) {
+    this.navigation._$toolBar.cssLeft(viewButtonsWidth);
+    this.navigation._$toolBar.width(containerSize.width - viewButtonsWidth);
+  }
 
   bodySize = new scout.Dimension(containerSize.width, containerSize.height - viewButtonsHeight)
     .subtract(htmlContainer.getMargins());

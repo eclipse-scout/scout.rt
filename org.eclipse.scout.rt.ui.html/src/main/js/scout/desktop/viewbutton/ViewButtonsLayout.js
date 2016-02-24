@@ -8,19 +8,15 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-scout.ViewButtonsLayout = function(htmlComp) {
+scout.ViewButtonsLayout = function(viewButtons) {
   scout.ViewButtonsLayout.parent.call(this);
-  this._htmlComp = htmlComp;
+  this.viewButtons = viewButtons;
 };
 scout.inherits(scout.ViewButtonsLayout, scout.AbstractLayout);
 
-/**
- * Should be the same as in DesktopNavigation.css .view-button-tab > min-width.
- */
-scout.ViewButtonsLayout.MIN_TAB_WIDTH = '50px';
-
 scout.ViewButtonsLayout.prototype.layout = function($container) {
-  var containerBounds = this._htmlComp.getBounds(),
+  var htmlComp = this.viewButtons.htmlComp,
+    containerBounds = htmlComp.getBounds(),
     tabs = $container.children().length,
     tabWidth = (containerBounds.width / tabs);
   $container.children().each(function() {

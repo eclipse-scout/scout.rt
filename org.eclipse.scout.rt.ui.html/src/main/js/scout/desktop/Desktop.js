@@ -177,9 +177,9 @@ scout.Desktop.prototype._installKeyStrokeContextForDesktopViewButtonBar = functi
 
   keyStrokeContext.invokeAcceptInputOnActiveValueField = true;
   keyStrokeContext.$bindTarget = this.session.$entryPoint;
-  keyStrokeContext.$scopeTarget = this.navigation.$viewButtons;
+  keyStrokeContext.$scopeTarget = this.navigation.viewButtons.$container;
   keyStrokeContext.registerKeyStroke([
-    new scout.ViewMenuOpenKeyStroke(this.navigation)
+    new scout.ViewMenuOpenKeyStroke(this.navigation.viewButtons)
   ].concat(this.viewButtons));
 
   this.session.keyStrokeManager.installKeyStrokeContext(keyStrokeContext);

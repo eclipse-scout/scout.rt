@@ -17,6 +17,7 @@ scout.Menu = function() {
   this.excludedByFilter = false;
 
   this.subMenuExpanded = false;
+  this.subMenuIconVisible = true;
 
   /**
    * This property is set if this is a subMenu. The property is set when this submenu is rendered.
@@ -71,7 +72,7 @@ scout.Menu.prototype._renderItem = function($parent) {
     .on('mousedown', mouseEventHandler)
     .on('contextmenu', mouseEventHandler)
     .on('click', mouseEventHandler);
-  if (this.childActions.length > 0 && this.text) {
+  if (this.childActions.length > 0 && this.text && this.subMenuIconVisible) {
     this.$submenuIcon = this.$container.appendSpan('submenu-icon');
   }
 

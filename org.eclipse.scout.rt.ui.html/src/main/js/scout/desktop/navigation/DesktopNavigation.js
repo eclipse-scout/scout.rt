@@ -9,11 +9,11 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 scout.DesktopNavigation = function() {
+  scout.DesktopNavigation.parent.call(this);
   this.$container;
-  this.$viewButtons;
   this.$body;
-  this.htmlViewButtons;
-  this.viewMenuTab;
+  this.viewButtons;
+  this.toolBarVisible = false;
 };
 scout.inherits(scout.DesktopNavigation, scout.Widget);
 
@@ -33,50 +33,17 @@ scout.DesktopNavigation.prototype._render = function($parent) {
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
   this.htmlComp.setLayout(new scout.DesktopNavigationLayout(this));
 
-  this.$viewButtons = this.$container.appendDiv('view-buttons');
-  this.htmlViewButtons = new scout.HtmlComponent(this.$viewButtons, this.session);
-  this.htmlViewButtons.setLayout(new scout.ViewButtonsLayout(this.htmlViewButtons));
-  this.viewMenuTab = new scout.ViewMenuTab(this._viewButtons('MENU'), this.session);
-  this.viewMenuTab.render(this.$viewButtons);
-
-  var i, viewTab,
-    viewTabs = this._viewButtons('TAB');
-  for (i = 0; i < viewTabs.length; i++) {
-    viewTab = viewTabs[i];
-    viewTab.render(this.$viewButtons);
-    if (i === viewTabs.length - 1) {
-      viewTab.last();
-    }
-  }
+  this.viewButtons = scout.create('ViewButtons', {
+    parent: this
+  });
+  this.viewButtons.render(this.$container);
 
   this.$body = this.$container.appendDiv('navigation-body')
     .on('mousedown', this._onNavigationMousedown.bind(this));
   this.htmlCompBody = new scout.HtmlComponent(this.$body, this.session);
   this.htmlCompBody.setLayout(new scout.SingleLayout());
-};
 
-scout.DesktopNavigation.prototype._viewButtons = function(displayStyle) {
-  var viewButtons = [];
-  this.desktop.viewButtons.forEach(function(viewButton) {
-    if (displayStyle === undefined ||
-      displayStyle === viewButton.displayStyle) {
-      viewButtons.push(viewButton);
-    }
-  });
-  return viewButtons;
-};
-
-scout.DesktopNavigation.prototype._getNumSelectedTabs = function() {
-  var numSelected = 0;
-  if (this.viewMenuTab.selected) {
-    numSelected++;
-  }
-  this._viewButtons('TAB').forEach(function(viewTab) {
-    if (viewTab.selected) {
-      numSelected++;
-    }
-  });
-  return numSelected;
+  this._renderToolBarVisible();
 };
 
 scout.DesktopNavigation.prototype._onNavigationMousedown = function(event) {
@@ -104,7 +71,7 @@ scout.DesktopNavigation.prototype.onOutlineChanged = function(outline, bringToFr
   this.outline.render(this.$body);
   this.outline.invalidateLayoutTree();
   this.outline.handleOutlineContent(bringToFront);
-  this._updateViewButtons(outline);
+  this.viewButtons.onOutlineChanged(outline);
   this.outline.validateFocus();
   // Layout immediate to prevent flickering when breadcrumb mode is enabled
   // but not initially while desktop gets rendered because it will be done at the end anyway
@@ -113,29 +80,53 @@ scout.DesktopNavigation.prototype.onOutlineChanged = function(outline, bringToFr
   }
 };
 
-/**
- * This method updates the state of the view-menu-tab and the selected state of outline-view-buttons.
- * This method must also work in offline mode.
- */
-scout.DesktopNavigation.prototype._updateViewButtons = function(outline) {
-  this.viewMenuTab.onOutlineChanged(outline);
-  this._viewButtons('TAB').forEach(function(viewTab) {
-    if (viewTab instanceof scout.OutlineViewButton) {
-      viewTab.onOutlineChanged(outline);
-    }
-  });
-};
-
-scout.DesktopNavigation.prototype.doViewMenuAction = function(event) {
-  this.viewMenuTab.togglePopup(event);
-};
-
 scout.DesktopNavigation.prototype.sendToBack = function() {
-  this.viewMenuTab.sendToBack();
+  this.viewButtons.viewMenuTab.sendToBack();
   this.outline.sendToBack();
 };
 
 scout.DesktopNavigation.prototype.bringToFront = function() {
-  this.viewMenuTab.bringToFront();
+  this.viewButtons.viewMenuTab.bringToFront();
   this.outline.bringToFront();
+};
+
+scout.DesktopNavigation.prototype.setToolBarVisible = function(toolBarVisible) {
+  this.toolBarVisible = toolBarVisible;
+  if (this.rendered) {
+    this._renderToolBarVisible();
+  }
+};
+
+scout.DesktopNavigation.prototype._renderToolBarVisible = function() {
+  if (this.toolBarVisible) {
+    this._renderToolBar();
+  } else {
+    this._removeToolBar();
+  }
+};
+
+scout.DesktopNavigation.prototype._renderToolBar = function() {
+  if (this._$toolBar) {
+    return;
+  }
+  this._$toolBar = this.$body.beforeDiv('header-tools');
+  this.desktop.actions.forEach(function(action) {
+    action._customCssClasses = "header-tool-item compact";
+    action.popupOpeningDirectionX = 'left';
+    action.textVisible = false;
+    action.subMenuIconVisible = false;
+    action.render(this._$toolBar);
+  }.bind(this));
+
+  if (this.desktop.actions) {
+    this.desktop.actions[this.desktop.actions.length - 1].$container.addClass('last');
+  }
+};
+
+scout.DesktopNavigation.prototype._removeToolBar = function() {
+  if (!this._$toolBar) {
+    return;
+  }
+  this._$toolBar.remove();
+  this._$toolBar = null;
 };

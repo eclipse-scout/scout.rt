@@ -29,9 +29,14 @@
 }
 
 .view-buttons {
-  width: 100%;
+  display: inline-block;
   height: @view-buttons-height;
   white-space: nowrap;
   #scout.font-text-large();
   overflow: hidden;
+}
+
+.desktop-navigation > .header-tools {
+  background-color: @palette-white;
+  text-align: right;
 }

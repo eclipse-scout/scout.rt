@@ -11,9 +11,9 @@
 /**
  * Keystroke to open the 'ViewMenuPopup' on 'F2'.
  */
-scout.ViewMenuOpenKeyStroke = function(desktopNavigation, keyStroke) {
+scout.ViewMenuOpenKeyStroke = function(viewButtons, keyStroke) {
   scout.ViewMenuOpenKeyStroke.parent.call(this);
-  this.field = desktopNavigation;
+  this.field = viewButtons;
 
   this.which = [scout.keys.F2];
   this.stopPropagation = true;
