@@ -118,7 +118,7 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
       m_sharedVariableMap = new SharedVariableMap();
     }
 
-    setLocale(NlsLocale.get()); // TODO [5.2] cgu: This is not every transparent. Change this please.
+    setLocale(NlsLocale.get());
 
     if (autoInitConfig) {
       interceptInitConfig();
@@ -186,7 +186,7 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
   @Override
   public final void setLocale(Locale locale) {
     propertySupport.setProperty(PROP_LOCALE, locale);
-    NlsLocale.set(locale); // TODO [5.2] cgu: This is not every transparent. Change this please.
+    NlsLocale.set(locale);
   }
 
   @Override

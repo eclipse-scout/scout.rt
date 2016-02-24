@@ -210,7 +210,7 @@ public class UiSession implements IUiSession {
       JsonClientSession<?> jsonClientSessionAdapter = createClientSessionAdapter(m_clientSession);
 
       // Start desktop
-      fireDesktopOpened();
+      startDesktop();
 
       // Fill startupData with everything that is needed to start the session on the UI
       putInitializationStartupData(jsonClientSessionAdapter.getId());
@@ -337,7 +337,7 @@ public class UiSession implements IUiSession {
     return BEANS.get(UiJobs.class).awaitAndGet(future);
   }
 
-  protected void fireDesktopOpened() {
+  protected void startDesktop() {
     final IFuture<Void> future = ModelJobs.schedule(new IRunnable() {
 
       @Override
