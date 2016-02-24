@@ -394,6 +394,7 @@ scout.Session.prototype._sendRequest = function(request) {
     } else {
       this._queuedRequest = request;
     }
+    this.layoutValidator.validate();
     return;
   }
 
@@ -472,6 +473,7 @@ scout.Session.prototype._performUserAjaxRequest = function(ajaxOptions, busyHand
 
   function onAjaxAlways(data, textStatus, errorThrown) {
     this._requestsPendingCounter--;
+    this.layoutValidator.validate();
     if (success) {
       this._resumeBackgroundJobPolling();
       this._fireRequestFinished(data);
@@ -560,6 +562,7 @@ scout.Session.prototype._pollForBackgroundJobs = function() {
       } else {
         // No user request pending, handle immediately
         this.responseQueue.process(data);
+        this.layoutValidator.validate();
       }
       setTimeout(this._pollForBackgroundJobs.bind(this));
     }
