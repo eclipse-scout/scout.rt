@@ -35,13 +35,52 @@ scout.numbers = {
    * given length. The default length is 8.
    */
   randomId: function(length) {
-    length = (length !== undefined) ? length : 8;
-    var charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-    var s = '';
+    length = length || 8;
+    var alphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    var result = '';
     for (var i = 0; i < length; i++) {
-      s += charset[Math.floor(Math.random() * charset.length)];
+      result += alphabet[Math.floor(Math.random() * alphabet.length)];
     }
-    return s;
+    return result;
+  },
+
+  _correlationCounter: 1,
+
+  /**
+   * Generates a random ID suitable for use as correlation ID.
+   *
+   * Example:
+   *
+   *   Hq5JY2kz3n/27
+   *
+   * The ID is generated from two different alphabets: 1. only letter, 2. only digits. By
+   * always selecting a random digit after two random characters, accidental "rude words"
+   * can be prevented.
+   *
+   * The characters[01olOL] are not used at all because they are easily confused.
+   *
+   * For a length of 11 (default), this method can theoretically generate over 200 trillion
+   * different IDs:
+   *
+   *   46^7 * 8^3 = 223'138'640'494'592
+   *
+   * To further reduce the risk of collisions, a monotonically increasing counter is added
+   * at the end of the result string (separated by "/").
+   */
+  correlationId: function(length) {
+    length = length || 11;
+    var letters = 'abcdefghjkmnpqrstuvwxyzABCDEFGHJKMNPQRSTUVWXYZ';
+    var digits = '23456789';
+    var result = '';
+    for (var i = 0; i < length; i++) {
+      if ((i + 1) % 3 === 0) {
+        result += digits[Math.floor(Math.random() * digits.length)];
+      } else {
+        result += letters[Math.floor(Math.random() * letters.length)];
+      }
+    }
+    result += '/' + (this._correlationCounter++);
+    return result;
   },
 
   /**

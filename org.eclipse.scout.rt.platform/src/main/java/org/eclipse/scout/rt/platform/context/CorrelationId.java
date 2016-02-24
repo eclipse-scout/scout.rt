@@ -34,7 +34,7 @@ public class CorrelationId {
   /**
    * Name of the HTTP header to transport the <em>correlation ID</em>.
    */
-  public static final String HTTP_HEADER_NAME = "X-Scout-Correlation-ID";
+  public static final String HTTP_HEADER_NAME = "X-Scout-Correlation-Id";
 
   /**
    * Generates a new <em>correlation ID</em>.

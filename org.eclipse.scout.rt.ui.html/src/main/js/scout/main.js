@@ -69,6 +69,7 @@ scout._init = function(options) {
   scout.objectFactory.init();
   this._installGlobalJavascriptErrorHandler();
   this._installGlobalMouseDownInterceptor(document);
+  this._globalAjaxSetup();
 
   $('.scout').each(function() {
     var $entryPoint = $(this);
@@ -87,7 +88,6 @@ scout.inherits = function(childCtor, parentCtor) {
   childCtor.prototype.constructor = childCtor;
   childCtor.parent = parentCtor;
 };
-
 
 /**
  * If 'value' is undefined or null, 'defaultValue' is returned. Otherwise, 'value' is returned.
@@ -255,6 +255,14 @@ scout._installGlobalMouseDownInterceptor = function(myDocument) {
   myDocument.addEventListener('mousedown', function(event) {
     scout.ValueField.invokeValueFieldAboutToBlurByMouseDown(event.target || event.srcElement);
   }, true); // true=the event handler is executed in the capturing phase
+};
+
+scout._globalAjaxSetup = function() {
+  $.ajaxSetup({
+    beforeSend: function(request) {
+      request.setRequestHeader('X-Scout-Correlation-Id', scout.numbers.correlationId());
+    }
+  });
 };
 
 /**
