@@ -28,7 +28,7 @@ import org.eclipse.scout.rt.shared.cache.ICache;
 /**
  * <p>
  * A thread-safe map with a transactional behavior based on {@link ITransaction}. The map uses a sharedMap to share
- * values between transactions. Access is delegated to a transaction member {@link MapTransactionMember}. Any changes on
+ * values between transactions. Access is delegated to a transaction member {@link AbstractMapTransactionMember}. Any changes on
  * the map are local within the current transaction. In commit phase2 of the transaction member, so after committing
  * [transactional] data sources, modified values within the transaction member are committed into the shared map.
  * <p>
@@ -37,13 +37,13 @@ import org.eclipse.scout.rt.shared.cache.ICache;
  * <p>
  * If there were concurrent modifications on the same key in different transactions only the first transaction will be
  * able to commit the change to the shared map. As a default, if a commit fails on a key, the entry is completely
- * removed from the shared map ({@link MapTransactionMember#changesCommited(Collection, Collection)}).
+ * removed from the shared map ({@link AbstractMapTransactionMember#changesCommited(Collection, Collection)}).
  * <p>
  * In order to use this map safely one must conform to the following behavior: <b>If the current transaction changed the
  * value of a key in the transactional source, this maps {@link #remove(Object)} to that key must be called
  * <em>before</em> the value is fetched from that source again.</b> If one fails doing so, there are no guarantees, that
  * values in the shared map reflect values in the transactional source. Note that this behavior is given when using
- * {@link ICache}. See also {@link MapTransactionMember#changesCommited(Collection, Collection)}.
+ * {@link ICache}. See also {@link AbstractMapTransactionMember#changesCommited(Collection, Collection)}.
  * <p>
  * If the <tt>fastForward</tt> property is set to true, a newly inserted value is directly committed to the shared map
  * if it is consider as a save commit.
@@ -176,7 +176,7 @@ public abstract class AbstractTransactionalMap<K, V> implements Map<K, V> {
     return getTransactionMap(false).entrySet();
   }
 
-  public static abstract class MapTransactionMember<K, V> extends AbstractMap<K, V> implements ITransactionMember {
+  public abstract static class AbstractMapTransactionMember<K, V> extends AbstractMap<K, V> implements ITransactionMember {
     private final String m_memberId;
 
     /**
@@ -196,7 +196,7 @@ public abstract class AbstractTransactionalMap<K, V> implements Map<K, V> {
      */
     protected final boolean m_fastForward;
 
-    public MapTransactionMember(String transactionId, Map<K, V> removedMap, Map<K, V> insertedMap, boolean fastForward) {
+    public AbstractMapTransactionMember(String transactionId, Map<K, V> removedMap, Map<K, V> insertedMap, boolean fastForward) {
       super();
       m_memberId = transactionId;
       m_removedMap = removedMap;
@@ -367,7 +367,7 @@ public abstract class AbstractTransactionalMap<K, V> implements Map<K, V> {
           return false;
         }
         Map.Entry<?, ?> e = (Map.Entry<?, ?>) o;
-        V v = MapTransactionMember.this.get(e.getKey());
+        V v = AbstractMapTransactionMember.this.get(e.getKey());
         if (v == null) {
           return e.getValue() == null;
         }
@@ -382,17 +382,17 @@ public abstract class AbstractTransactionalMap<K, V> implements Map<K, V> {
           return false;
         }
         Map.Entry<?, ?> e = (Map.Entry<?, ?>) o;
-        return MapTransactionMember.this.remove(e.getKey()) != null;
+        return AbstractMapTransactionMember.this.remove(e.getKey()) != null;
       }
 
       @Override
       public int size() {
-        return MapTransactionMember.this.size();
+        return AbstractMapTransactionMember.this.size();
       }
 
       @Override
       public void clear() {
-        MapTransactionMember.this.clear();
+        AbstractMapTransactionMember.this.clear();
       }
     }
 
@@ -463,7 +463,7 @@ public abstract class AbstractTransactionalMap<K, V> implements Map<K, V> {
         if (m_lastReturned == null) {
           throw new IllegalStateException();
         }
-        MapTransactionMember.this.remove(m_lastReturned.getKey());
+        AbstractMapTransactionMember.this.remove(m_lastReturned.getKey());
         m_lastReturned = null;
       }
     }
@@ -478,7 +478,7 @@ public abstract class AbstractTransactionalMap<K, V> implements Map<K, V> {
       @Override
       public V setValue(V value) {
         V v = super.setValue(value);
-        MapTransactionMember.this.put(getKey(), value);
+        AbstractMapTransactionMember.this.put(getKey(), value);
         return v;
       }
     }

@@ -72,7 +72,7 @@ public class CopyOnWriteTransactionalMap<K, V> extends AbstractTransactionalMap<
     return (TM) new CopyOnWriteMapTransactionMember(getTransactionMemberId(), isFastForward());
   }
 
-  public class CopyOnWriteMapTransactionMember extends AbstractTransactionalMap.MapTransactionMember<K, V> {
+  public class CopyOnWriteMapTransactionMember extends AbstractTransactionalMap.AbstractMapTransactionMember<K, V> {
 
     public CopyOnWriteMapTransactionMember(String transactionMemberId, boolean fastForward) {
       this(transactionMemberId, new HashMap<K, V>(), new HashMap<K, V>(), fastForward);

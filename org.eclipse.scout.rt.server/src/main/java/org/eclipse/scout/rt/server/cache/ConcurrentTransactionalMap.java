@@ -79,7 +79,7 @@ public class ConcurrentTransactionalMap<K, V> extends AbstractTransactionalMap<K
     return (TM) new ConcurrentMapTransactionMember<K, V>(getTransactionMemberId(), getSharedMap(), true, isFastForward());
   }
 
-  public static class ConcurrentMapTransactionMember<K, V> extends AbstractTransactionalMap.MapTransactionMember<K, V> implements ConcurrentMap<K, V> {
+  public static class ConcurrentMapTransactionMember<K, V> extends AbstractTransactionalMap.AbstractMapTransactionMember<K, V> implements ConcurrentMap<K, V> {
 
     /**
      * shared map over all transactions
