@@ -304,19 +304,48 @@ scout.Desktop.prototype._renderHeader = function($parent) {
   htmlHeader.pixelBasedSizing = false;
   this._$viewTabBar = this._$header.appendDiv('desktop-view-tabs');
   this._$toolBar = this._$header.appendDiv('header-tools');
-  if (this.session.uiUseHeaderLogo) {
-    this._$applicationLogo = this._$header.appendDiv('application-logo');
-
-    // in memory of the first one...
-    this._$applicationLogo.dblclick(function(event) {
-      if (event.altKey && event.ctrlKey) {
-        $(event.target).css('background', 'none');
-        $(event.target).css('font-size', '9px');
-        $(event.target).text('make software not war');
-      }
-    });
-  }
+  this._renderApplicationLogoUrl();
   this._installKeyStrokeContextForDesktopHeader();
+};
+
+scout.Desktop.prototype._renderApplicationLogoUrl = function() {
+  if (!this._hasHeader()) {
+    return;
+  }
+  if (this.applicationLogoUrl) {
+    this._renderApplicationLogo();
+  } else {
+    this._removeApplicationLogo();
+  }
+  var htmlHeader = scout.HtmlComponent.get(this._$header);
+  if (htmlHeader) {
+    htmlHeader.invalidateLayoutTree();
+  }
+};
+
+scout.Desktop.prototype._renderApplicationLogo = function() {
+  if (this._$applicationLogo) {
+    return;
+  }
+  this._$applicationLogo = this._$header.appendDiv('application-logo')
+    .css('backgroundImage', 'url(' + this.applicationLogoUrl + ')');
+
+  // in memory of the first one...
+  this._$applicationLogo.dblclick(function(event) {
+    if (event.altKey && event.ctrlKey) {
+      $(event.target).css('background', 'none');
+      $(event.target).css('font-size', '9px');
+      $(event.target).text('make software not war');
+    }
+  });
+};
+
+scout.Desktop.prototype._removeApplicationLogo = function() {
+  if (!this._$applicationLogo) {
+    return;
+  }
+  this._$applicationLogo.remove();
+  this._$applicationLogo = null;
 };
 
 scout.Desktop.prototype._setupDragAndDrop = function() {

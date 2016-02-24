@@ -708,6 +708,15 @@ public class VirtualDesktop implements IDesktop {
   }
 
   @Override
+  public String getApplicationLogoId() {
+    return null;
+  }
+
+  @Override
+  public void setApplicationLogoId(String id) {
+  }
+
+  @Override
   public boolean isCacheSplitterPosition() {
     return false;
   }

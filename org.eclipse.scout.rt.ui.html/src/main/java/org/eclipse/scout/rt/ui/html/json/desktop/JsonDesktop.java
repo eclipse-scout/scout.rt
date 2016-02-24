@@ -200,6 +200,22 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
         return getModel().isCacheSplitterPosition();
       }
     });
+    putJsonProperty(new JsonProperty<DESKTOP>(IDesktop.PROP_APPLICATION_LOGO_ID, model) {
+      @Override
+      protected Object modelValue() {
+        return getModel().getApplicationLogoId();
+      }
+
+      @Override
+      public Object prepareValueForToJson(Object value) {
+        return BinaryResourceUrlUtility.createIconUrl((String) value);
+      }
+
+      @Override
+      public String jsonPropertyName() {
+        return "applicationLogoUrl";
+      }
+    });
   }
 
   @Override

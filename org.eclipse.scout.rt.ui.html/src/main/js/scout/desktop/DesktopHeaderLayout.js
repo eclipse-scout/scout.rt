@@ -13,7 +13,7 @@ scout.DesktopHeaderLayout = function(desktop) {
 
   this.TAB_WIDTH_LARGE = 220;
   this.TAB_WIDTH_SMALL = 130;
-  this._desktop = desktop;
+  this.desktop = desktop;
   this._$overflowTab;
   this._overflowTabsIndizes = [];
 };
@@ -31,7 +31,7 @@ scout.DesktopHeaderLayout.prototype._toolsWidth = function($tools, cssClasses) {
   if (cssClasses) {
     $items.addClass(cssClasses);
   }
-  $clone.width('auto').appendTo(this._desktop.session.$entryPoint);
+  $clone.width('auto').appendTo(this.desktop.session.$entryPoint);
   var toolsWidth = scout.graphics.getSize($clone, true).width;
   $clone.remove();
   return toolsWidth;
@@ -47,14 +47,13 @@ scout.DesktopHeaderLayout.prototype.layout = function($container) {
   var $tabs = $container.find('.desktop-view-tabs'),
     $tools = $container.find('.header-tools'),
     contWidth = scout.graphics.getSize($container).width,
-    numTabs = this._desktop.viewTabsController.viewTabCount(),
+    numTabs = this.desktop.viewTabsController.viewTabCount(),
     smallPrefTabsWidth = numTabs * this.TAB_WIDTH_SMALL,
     logoWidth = 0,
     toolsWidth, tabsWidth;
 
-  if (this._desktop.session.uiUseHeaderLogo) {
-    var $logo = $container.find('.application-logo');
-    logoWidth = scout.graphics.getSize($logo, true).width;
+  if (this.desktop._$applicationLogo) {
+    logoWidth = scout.graphics.getSize(this.desktop._$applicationLogo, true).width;
   }
 
   // reset tabs and tool-items
@@ -179,7 +178,7 @@ scout.DesktopHeaderLayout.prototype.layout = function($container) {
 
 scout.DesktopHeaderLayout.prototype._onMouseDownOverflow = function(event) {
   var menu, tab, popup, overflowMenus = [],
-    desktop = this._desktop;
+    desktop = this.desktop;
   this._overflowTabsIndizes.forEach(function(i) {
     // FIXME awe: fix bugs in overflow-menu:
     // - 1. menu schliesst nicht

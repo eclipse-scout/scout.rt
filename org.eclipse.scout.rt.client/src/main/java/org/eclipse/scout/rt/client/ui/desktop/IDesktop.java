@@ -101,6 +101,8 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent {
 
   String PROP_DESKTOP_STYLE = "desktopStyle";
 
+  String PROP_APPLICATION_LOGO_ID = "applicationLogoId";
+
   String PROP_ACTIVE_FORM = "activeForm";
 
   String PROP_THEME = "theme";
@@ -781,6 +783,16 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent {
    * @since 5.2.0
    */
   DesktopStyle getDesktopStyle();
+
+  /***
+   * @since 6.0
+   */
+  String getApplicationLogoId();
+
+  /**
+   * @since 6.0
+   */
+  void setApplicationLogoId(String id);
 
   /**
    * @return the name of the current theme or null when default theme is active.

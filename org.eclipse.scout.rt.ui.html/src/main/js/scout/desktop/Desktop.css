@@ -400,7 +400,6 @@
   margin-right: @bench-padding-x;
   width: 33px;
   height: 33px;
-  background: url('application-logo.png');
   background-size: contain;
   background-repeat: no-repeat;
 }

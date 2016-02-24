@@ -36,9 +36,6 @@
  *     use setTimeout(), sometimes the Jasmine-Maven plug-in fails and aborts the
  *     build because there were console errors. These errors always happen in this
  *     class. That's why we can skip suppress error handling with this flag.
- *   [uiUseHeaderLogo]
- *     If true, the desktop will add a small logo to the header. It is styled with
- *     the CSS class ".application-logo". Defaults to false.
  *   [focusManagerActive]
  *     Forces the focus manager to be active or not. If undefined, the value is
  *     auto detected by Device.js.
@@ -78,7 +75,6 @@ scout.Session = function($entryPoint, options) {
   this._backgroundJobPollingSupport = new scout.BackgroundJobPollingSupport(scout.nvl(options.backgroundJobPollingEnabled, true));
   this._fatalMessagesOnScreen = {};
   this._loggedOut = false;
-  this.uiUseHeaderLogo = options.uiUseHeaderLogo;
 
   this.rootAdapter = new scout.ModelAdapter();
   this.rootAdapter.init({

@@ -43,6 +43,7 @@ import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopPag
 import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopPageSearchFormChangedChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopTablePageLoadedChain;
 import org.eclipse.scout.rt.client.services.common.bookmark.internal.BookmarkUtility;
+import org.eclipse.scout.rt.client.services.common.icon.IIconProviderService;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.DataChangeListener;
 import org.eclipse.scout.rt.client.ui.IDisplayParent;
@@ -276,6 +277,20 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   @Order(50)
   protected DesktopStyle getConfiguredDesktopStyle() {
     return DesktopStyle.DEFAULT;
+  }
+
+  /**
+   * Configures the application logo id.
+   * <p>
+   * If specified, the logo will be displayed on the top right corner of the desktop.
+   * <p>
+   * Subclasses can override this method. Default is {@code null}.
+   *
+   * @since 6.0
+   * @see IIconProviderService
+   */
+  protected String getConfiguredApplicationLogoId() {
+    return null;
   }
 
   /**
@@ -514,6 +529,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     setSelectViewTabsKeyStrokesEnabled(getConfiguredSelectViewTabsKeyStrokesEnabled());
     setSelectViewTabsKeyStrokeModifier(getConfiguredSelectViewTabsKeyStrokeModifier());
     setDesktopStyle(getConfiguredDesktopStyle());
+    setApplicationLogoId(getConfiguredApplicationLogoId());
     setCacheSplitterPosition(getConfiguredCacheSplitterPosition());
     List<IDesktopExtension> extensions = getDesktopExtensions();
     m_contributionHolder = new ContributionComposite(this);
@@ -758,6 +774,16 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
 
   protected void setDesktopStyle(DesktopStyle desktopStyle) {
     propertySupport.setProperty(PROP_DESKTOP_STYLE, desktopStyle);
+  }
+
+  @Override
+  public String getApplicationLogoId() {
+    return propertySupport.getPropertyString(PROP_APPLICATION_LOGO_ID);
+  }
+
+  @Override
+  public void setApplicationLogoId(String id) {
+    propertySupport.setPropertyString(PROP_APPLICATION_LOGO_ID, id);
   }
 
   @Override
