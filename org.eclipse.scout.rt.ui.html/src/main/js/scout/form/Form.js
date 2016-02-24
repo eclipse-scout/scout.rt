@@ -74,8 +74,11 @@ scout.Form.prototype._renderForm = function($parent) {
     .addClass(this.isDialog() ? 'dialog' : 'form')
     .data('model', this);
 
+  this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
+  this.htmlComp.pixelBasedSizing = false;
   if (this.isDialog()) {
     layout = new scout.DialogLayout(this);
+    this.htmlComp.validateRoot = true;
     $handle = this.$container.appendDiv('drag-handle');
     this.$container.makeDraggable($handle, $.throttle(this.onMove.bind(this), 1000 / 60)); // 60fps
 
@@ -105,9 +108,7 @@ scout.Form.prototype._renderForm = function($parent) {
     layout = new scout.FormLayout(this);
   }
 
-  this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
   this.htmlComp.setLayout(layout);
-  this.htmlComp.pixelBasedSizing = false;
   this.rootGroupBox.render(this.$container);
 
   if (this._locked) {
