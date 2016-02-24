@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.server.admin.diagnostic;
 
 import java.io.IOException;
 import java.security.AccessController;
-import java.util.Locale;
 
 import javax.security.auth.Subject;
 import javax.servlet.ServletException;
@@ -24,7 +23,6 @@ import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.server.ServiceTunnelServlet;
 import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
-import org.eclipse.scout.rt.server.commons.context.ServletRunContexts;
 import org.eclipse.scout.rt.server.commons.servlet.IHttpServletRoundtrip;
 import org.eclipse.scout.rt.server.commons.servlet.ServletExceptionTranslator;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
@@ -49,21 +47,16 @@ public class DiagnosticServlet extends ServiceTunnelServlet {
 
     lazyInit(servletRequest, servletResponse);
 
-    ServletRunContexts.copyCurrent()
-        .withLocale(Locale.getDefault())
-        .withServletRequest(servletRequest)
-        .withServletResponse(servletResponse)
-        .run(new IRunnable() {
+    createServletRunContext(servletRequest, servletResponse).run(new IRunnable() {
+      @Override
+      public void run() throws Exception {
+        ServerRunContext serverRunContext = ServerRunContexts.copyCurrent();
+        serverRunContext.withUserAgent(UserAgent.createDefault());
+        serverRunContext.withSession(lookupServerSessionOnHttpSession(null, serverRunContext.copy()));
 
-          @Override
-          public void run() throws Exception {
-            ServerRunContext serverRunContext = ServerRunContexts.copyCurrent();
-            serverRunContext.withUserAgent(UserAgent.createDefault());
-            serverRunContext.withSession(lookupServerSessionOnHttpSession(null, serverRunContext.copy()));
-
-            invokeDiagnosticService(serverRunContext);
-          }
-        }, ServletExceptionTranslator.class);
+        invokeDiagnosticService(serverRunContext);
+      }
+    }, ServletExceptionTranslator.class);
   }
 
   /**

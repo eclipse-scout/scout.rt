@@ -26,6 +26,7 @@ import org.eclipse.scout.rt.platform.context.CorrelationId;
 import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
+import org.eclipse.scout.rt.server.commons.context.ServletRunContext;
 import org.eclipse.scout.rt.server.commons.context.ServletRunContexts;
 import org.eclipse.scout.rt.ui.html.json.JsonMessageRequestHandler;
 import org.eclipse.scout.rt.ui.html.res.ResourceRequestHandler;
@@ -64,22 +65,25 @@ public class UiServlet extends HttpServlet {
     return new P_RequestHandlerPost();
   }
 
-  @Override
-  protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
+  protected ServletRunContext createServletRunContext(final HttpServletRequest req, final HttpServletResponse resp) {
     final String cid = req.getHeader(CorrelationId.HTTP_HEADER_NAME);
 
+    return ServletRunContexts.copyCurrent()
+        .withServletRequest(req)
+        .withServletResponse(resp)
+        .withLocale(getPreferredLocale(req))
+        .withCorrelationId(cid != null ? cid : BEANS.get(CorrelationId.class).newCorrelationId());
+  }
+
+  @Override
+  protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
     try {
-      ServletRunContexts.copyCurrent()
-          .withServletRequest(req)
-          .withServletResponse(resp)
-          .withLocale(getPreferredLocale(req))
-          .withCorrelationId(cid != null ? cid : BEANS.get(CorrelationId.class).newCorrelationId())
-          .run(new IRunnable() {
-            @Override
-            public void run() throws Exception {
-              m_requestHandlerGet.handleRequest(req, resp);
-            }
-          }, DefaultExceptionTranslator.class);
+      createServletRunContext(req, resp).run(new IRunnable() {
+        @Override
+        public void run() throws Exception {
+          m_requestHandlerGet.handleRequest(req, resp);
+        }
+      }, DefaultExceptionTranslator.class);
     }
     catch (Exception e) {
       LOG.error("Failed to process HTTP-GET request from UI", e);
@@ -89,20 +93,13 @@ public class UiServlet extends HttpServlet {
 
   @Override
   protected void doPost(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
-    final String cid = req.getHeader(CorrelationId.HTTP_HEADER_NAME);
-
     try {
-      ServletRunContexts.copyCurrent()
-          .withServletRequest(req)
-          .withServletResponse(resp)
-          .withLocale(getPreferredLocale(req))
-          .withCorrelationId(cid != null ? cid : BEANS.get(CorrelationId.class).newCorrelationId())
-          .run(new IRunnable() {
-            @Override
-            public void run() throws Exception {
-              m_requestHandlerPost.handleRequest(req, resp);
-            }
-          }, DefaultExceptionTranslator.class);
+      createServletRunContext(req, resp).run(new IRunnable() {
+        @Override
+        public void run() throws Exception {
+          m_requestHandlerPost.handleRequest(req, resp);
+        }
+      }, DefaultExceptionTranslator.class);
     }
     catch (Exception e) {
       LOG.error("Failed to process HTTP-POST request from UI", e);
