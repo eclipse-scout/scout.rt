@@ -73,7 +73,7 @@ scout.polyfills = {
       }
       // Make sure no text encoding stuff is done by xhr
       ajaxOpts.xhr = function() {
-        var xhr = jQuery.ajaxSettings.xhr();
+        var xhr = $.ajaxSettings.xhr();
         xhr.send = xhr.sendAsBinary || xhr.send; // sendAsBinary only exists in older browsers
         return xhr;
       };

@@ -187,7 +187,7 @@ scout.FocusManager.prototype.validateFocus = function(filter) {
  * @return true if focus was gained, or false otherwise.
  */
 scout.FocusManager.prototype.requestFocus = function(element, filter) {
-  element = element instanceof jQuery ? element[0] : element;
+  element = element instanceof $ ? element[0] : element;
 
   var activeContext = this._findActiveContext();
   if (activeContext) {

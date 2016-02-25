@@ -8,4 +8,6 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-__include("scout/svg/SvgField.js");
+(function(scout, $, undefined) {
+  __include("scout/svg/SvgField.js");
+}(scout, jQuery));

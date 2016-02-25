@@ -81,7 +81,7 @@ scout.focusUtils = {
       return false;
     }
     var activeElement;
-    if (element instanceof jQuery) {
+    if (element instanceof $) {
       activeElement = element.activeElement(true);
       element = element[0];
     } else {

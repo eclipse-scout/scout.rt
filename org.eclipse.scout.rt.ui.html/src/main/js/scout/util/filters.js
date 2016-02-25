@@ -43,7 +43,7 @@ scout.filters = {
    * @param DOM or jQuery container.
    */
   outsideFilter: function(container) {
-    container = container instanceof jQuery ? container[0] : container;
+    container = container instanceof $ ? container[0] : container;
     return function() {
       return this !== container && !$.contains(container, this);
     };
@@ -55,7 +55,7 @@ scout.filters = {
    * @param DOM or jQuery element.
    */
   notSameFilter: function(element) {
-    element = element instanceof jQuery ? element[0] : element;
+    element = element instanceof $ ? element[0] : element;
     return function() {
       return this !== element;
     };
