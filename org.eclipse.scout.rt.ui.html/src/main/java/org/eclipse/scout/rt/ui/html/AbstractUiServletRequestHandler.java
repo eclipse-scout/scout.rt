@@ -19,12 +19,12 @@ import javax.servlet.http.HttpServletResponse;
 public abstract class AbstractUiServletRequestHandler implements IUiServletRequestHandler {
 
   @Override
-  public boolean handlePost(UiServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+  public boolean handlePost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     return false;
   }
 
   @Override
-  public boolean handleGet(UiServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+  public boolean handleGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     return false;
   }
 }

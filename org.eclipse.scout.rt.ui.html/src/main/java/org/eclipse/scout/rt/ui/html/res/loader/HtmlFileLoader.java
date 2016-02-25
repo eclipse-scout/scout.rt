@@ -21,7 +21,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.util.IOUtility;
-import org.eclipse.scout.rt.ui.html.UiServlet;
 import org.eclipse.scout.rt.ui.html.UiThemeUtility;
 import org.eclipse.scout.rt.ui.html.cache.HttpCacheKey;
 import org.eclipse.scout.rt.ui.html.cache.HttpCacheObject;
@@ -68,11 +67,11 @@ public class HtmlFileLoader extends AbstractResourceLoader {
       private static final long serialVersionUID = 1L;
 
       @Override
-      public void intercept(UiServlet httpServlet, HttpServletRequest httpReq, HttpServletResponse httpResp) {
-        BrowserInfo browserInfo = BrowserInfo.createFrom(httpReq);
+      public void intercept(HttpServletRequest req, HttpServletResponse resp) {
+        BrowserInfo browserInfo = BrowserInfo.createFrom(req);
         if (browserInfo.isMshtml()) {
           // Send headers only for IE
-          super.intercept(httpServlet, httpReq, httpResp);
+          super.intercept(req, resp);
         }
       }
     });

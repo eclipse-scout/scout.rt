@@ -50,7 +50,7 @@ public class ResourceRequestHandler extends AbstractUiServletRequestHandler {
   private IHttpCacheControl m_httpCacheControl = BEANS.get(IHttpCacheControl.class);
 
   @Override
-  public boolean handleGet(UiServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+  public boolean handleGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     String resourcePath = resolveResourcePath(req);
 
     // Create loader for the requested resource type
@@ -98,7 +98,7 @@ public class ResourceRequestHandler extends AbstractUiServletRequestHandler {
     setHttpResponseHeaders(resp, binaryResource);
 
     // Apply response interceptors
-    resource.applyHttpResponseInterceptors(servlet, req, resp);
+    resource.applyHttpResponseInterceptors(req, resp);
 
     if (!"HEAD".equals(req.getMethod())) {
       resp.getOutputStream().write(binaryResource.getContent());

@@ -13,8 +13,6 @@ package org.eclipse.scout.rt.ui.html.cache;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.eclipse.scout.rt.ui.html.UiServlet;
-
 /**
  * An {@link IHttpResponseInterceptor} that adds a HTTP header from the given key/value pair to the response.
  */
@@ -38,7 +36,7 @@ public class HttpResponseHeaderContributor implements IHttpResponseInterceptor {
   }
 
   @Override
-  public void intercept(UiServlet servlet, HttpServletRequest httpReq, HttpServletResponse httpResp) {
-    httpResp.setHeader(m_name, m_value);
+  public void intercept(HttpServletRequest req, HttpServletResponse resp) {
+    resp.setHeader(m_name, m_value);
   }
 }

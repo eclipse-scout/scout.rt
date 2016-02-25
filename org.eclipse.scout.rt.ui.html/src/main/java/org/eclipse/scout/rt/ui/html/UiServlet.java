@@ -120,7 +120,7 @@ public class UiServlet extends HttpServlet {
   /**
    * Template pattern.
    */
-  protected abstract class P_AbstractRequestHandler implements Serializable {
+  protected static abstract class P_AbstractRequestHandler implements Serializable {
     private static final long serialVersionUID = 1L;
 
     protected P_AbstractRequestHandler() {
@@ -156,7 +156,7 @@ public class UiServlet extends HttpServlet {
     protected abstract boolean delegateRequest(IUiServletRequestHandler handler, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException;
   }
 
-  protected class P_RequestHandlerGet extends P_AbstractRequestHandler {
+  protected static class P_RequestHandlerGet extends P_AbstractRequestHandler {
     private static final long serialVersionUID = 1L;
 
     protected P_RequestHandlerGet() {
@@ -166,7 +166,7 @@ public class UiServlet extends HttpServlet {
     protected void handleRequest(HttpServletRequest req, HttpServletResponse resp) throws IOException {
       // The servlet is registered at '/'. To make relative URLs work, we need to make sure the request URL has a trailing '/'.
       // It is not possible to just check for an empty pathInfo because the container returns "/" even if the user has not entered a '/' at the end.
-      String contextPath = getServletContext().getContextPath();
+      String contextPath = req.getServletContext().getContextPath();
       if (StringUtility.hasText(contextPath) && req.getRequestURI().endsWith(contextPath)) {
         resp.sendRedirect(req.getRequestURI() + "/");
         return;
@@ -179,11 +179,11 @@ public class UiServlet extends HttpServlet {
 
     @Override
     protected boolean delegateRequest(IUiServletRequestHandler handler, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-      return handler.handleGet(UiServlet.this, req, resp);
+      return handler.handleGet(req, resp);
     }
   }
 
-  protected class P_RequestHandlerPost extends P_AbstractRequestHandler {
+  protected static class P_RequestHandlerPost extends P_AbstractRequestHandler {
     private static final long serialVersionUID = 1L;
 
     protected P_RequestHandlerPost() {
@@ -191,7 +191,7 @@ public class UiServlet extends HttpServlet {
 
     @Override
     protected boolean delegateRequest(IUiServletRequestHandler handler, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-      return handler.handlePost(UiServlet.this, req, resp);
+      return handler.handlePost(req, resp);
     }
   }
 }

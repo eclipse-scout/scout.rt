@@ -18,7 +18,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
-import org.eclipse.scout.rt.ui.html.UiServlet;
 
 /**
  * Used in {@link IHttpCacheControl}
@@ -73,10 +72,10 @@ public class HttpCacheObject implements Serializable {
     m_httpResponseInterceptors.remove(interceptor);
   }
 
-  public void applyHttpResponseInterceptors(UiServlet servlet, HttpServletRequest httpReq, HttpServletResponse httpResp) {
-    if (httpResp != null) {
+  public void applyHttpResponseInterceptors(HttpServletRequest req, HttpServletResponse resp) {
+    if (resp != null) {
       for (IHttpResponseInterceptor interceptor : m_httpResponseInterceptors) {
-        interceptor.intercept(servlet, httpReq, httpResp);
+        interceptor.intercept(req, resp);
       }
     }
   }
