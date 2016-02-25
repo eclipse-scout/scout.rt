@@ -18,9 +18,6 @@ import static org.junit.Assert.assertTrue;
 import java.util.List;
 import java.util.Set;
 
-import org.eclipse.scout.rt.platform.index.AbstractMultiValueIndex;
-import org.eclipse.scout.rt.platform.index.AbstractSingleValueIndex;
-import org.eclipse.scout.rt.platform.index.IndexedStore;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.junit.Before;
 import org.junit.Test;
@@ -40,11 +37,11 @@ public class IndexedStoreTest {
   public void before() {
     m_store = new PersonStore();
 
-    m_store.add(m_john1 = new Person().withId(1).withName("john").withAge(35));
+    m_store.add(m_john1 = new Person().withId(1).withName("john").withAge(35).withCar("VW").withCar("Audi"));
     m_store.add(m_anna = new Person().withId(2).withName("anna").withAge(25));
-    m_store.add(m_maria = new Person().withId(3).withName("maria").withAge(80));
-    m_store.add(m_john2 = new Person().withId(4).withName("john").withAge(75));
-    m_store.add(m_frank = new Person().withId(5).withName("frank").withAge(50));
+    m_store.add(m_maria = new Person().withId(3).withName("maria").withAge(80).withCar("Nissan"));
+    m_store.add(m_john2 = new Person().withId(4).withName("john").withAge(75).withCar("VW"));
+    m_store.add(m_frank = new Person().withId(5).withName("frank").withAge(50).withCar("Seat").withCar("Porsche"));
     m_store.add(m_tom = new Person().withId(6).withName("tom").withAge(35));
   }
 
@@ -67,6 +64,11 @@ public class IndexedStoreTest {
     assertEquals(CollectionUtility.arrayList(m_maria), m_store.getByName("maria"));
     assertEquals(CollectionUtility.arrayList(m_frank), m_store.getByName("frank"));
     assertEquals(CollectionUtility.arrayList(m_tom), m_store.getByName("tom"));
+    assertEquals(CollectionUtility.arrayList(m_john1, m_john2), m_store.getByCar("VW"));
+    assertEquals(CollectionUtility.arrayList(m_frank), m_store.getByCar("Porsche"));
+    assertEquals(CollectionUtility.arrayList(m_frank), m_store.getByCar("Seat"));
+    assertEquals(CollectionUtility.arrayList(m_john1), m_store.getByCar("Audi"));
+    assertEquals(CollectionUtility.arrayList(m_maria), m_store.getByCar("Nissan"));
 
     assertEquals(CollectionUtility.arrayList(m_maria, m_john2), m_store.getRetiredPersons());
   }
@@ -114,12 +116,18 @@ public class IndexedStoreTest {
     assertEquals(CollectionUtility.arrayList(m_maria), ageIndex.get(80));
 
     m_maria.withAge(81); // was registered with a age of 80 years
+    m_maria.withCar("Aston Martin");
+    m_maria.withoutCar("Nissan");
     assertEquals(CollectionUtility.arrayList(m_maria), ageIndex.get(80));
+    assertEquals(CollectionUtility.emptyArrayList(), m_store.getByCar("Aston Martin"));
+    assertEquals(CollectionUtility.arrayList(m_maria), m_store.getByCar("Nissan"));
     assertTrue(ageIndex.get(81).isEmpty());
 
     m_store.add(m_maria);
     assertTrue(ageIndex.get(80).isEmpty());
     assertEquals(CollectionUtility.arrayList(m_maria), ageIndex.get(81));
+    assertEquals(CollectionUtility.emptyArrayList(), m_store.getByCar("Nissan"));
+    assertEquals(CollectionUtility.arrayList(m_maria), m_store.getByCar("Aston Martin"));
   }
 
   @Test
@@ -134,6 +142,7 @@ public class IndexedStoreTest {
     private final PersonIdIndex IDX_PERSON_ID = registerIndex(new PersonIdIndex());
     private final PersonNameIndex IDX_PERSON_NAME = registerIndex(new PersonNameIndex());
     private final PersonRetiredIndex IDX_PERSON_RETIRED = registerIndex(new PersonRetiredIndex());
+    private final CarIndex IDX_CAR = registerIndex(new CarIndex());
 
     public Person getById(long id) {
       return IDX_PERSON_ID.get(id);
@@ -153,6 +162,10 @@ public class IndexedStoreTest {
 
     public List<Person> getRetiredPersons() {
       return IDX_PERSON_RETIRED.get(Boolean.TRUE);
+    }
+
+    public List<Person> getByCar(String car) {
+      return IDX_CAR.get(car);
     }
 
     private class PersonIdIndex extends AbstractSingleValueIndex<Long, Person> {
@@ -176,6 +189,14 @@ public class IndexedStoreTest {
       @Override
       protected Boolean calculateIndexFor(Person person) {
         return person.getAge() > 65;
+      }
+    }
+
+    private class CarIndex extends AbstractMultiValuesIndex<String, Person> {
+
+      @Override
+      protected Set<String> calculateIndexesFor(Person person) {
+        return person.getCars();
       }
     }
   }

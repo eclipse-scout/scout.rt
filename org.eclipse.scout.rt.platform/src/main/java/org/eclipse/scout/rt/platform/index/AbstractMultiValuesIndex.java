@@ -19,15 +19,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * Represents an index that is unique among all elements, e.g. an element's primary key.
- *
- * @since 5.1
- */
-public abstract class AbstractSingleValueIndex<INDEX, ELEMENT> implements ISingleValueIndex<INDEX, ELEMENT> {
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
-  private final Map<INDEX, ELEMENT> m_mapByIndex = new HashMap<>();
-  private final Map<ELEMENT, INDEX> m_mapByElement = new LinkedHashMap<>(); // LinkedHashMap to preserve insertion-order.
+/**
+ * Represents an index for which multiple elements can result in the very same index value.
+ * <p>
+ * Use this index if the element provides a multiple index values for this index.
+ *
+ * @since 5.2
+ */
+public abstract class AbstractMultiValuesIndex<INDEX, ELEMENT> implements IMultiValueIndex<INDEX, ELEMENT> {
+
+  private final Map<INDEX, List<ELEMENT>> m_mapByIndex = new HashMap<>();
+  private final Map<ELEMENT, Set<INDEX>> m_mapByElement = new LinkedHashMap<>(); // LinkedHashMap to preserve insertion-order.
 
   @Override
   public boolean addToIndex(final ELEMENT element) {
@@ -35,24 +39,40 @@ public abstract class AbstractSingleValueIndex<INDEX, ELEMENT> implements ISingl
       removeFromIndex(element);
     }
 
-    final INDEX index = calculateIndexFor(element);
-    if (index == null) {
+    final Set<INDEX> indexes = calculateIndexesFor(element);
+    if (indexes == null || indexes.isEmpty()) {
       return false;
     }
 
-    m_mapByIndex.put(index, element);
-    m_mapByElement.put(element, index);
+    for (final INDEX index : indexes) {
+      List<ELEMENT> elements = m_mapByIndex.get(index);
+      if (elements == null) {
+        elements = new ArrayList<>();
+        m_mapByIndex.put(index, elements);
+      }
+      elements.add(element);
+    }
+    m_mapByElement.put(element, new HashSet<>(indexes));
+
     return true;
   }
 
   @Override
   public boolean removeFromIndex(final ELEMENT element) {
-    final INDEX index = m_mapByElement.remove(element);
-    if (index == null) {
+    final Set<INDEX> indexes = m_mapByElement.remove(element);
+    if (indexes == null) {
       return false;
     }
 
-    m_mapByIndex.remove(index);
+    for (final INDEX index : indexes) {
+      final List<ELEMENT> elements = m_mapByIndex.get(index);
+      elements.remove(element);
+
+      if (elements.isEmpty()) {
+        m_mapByIndex.remove(index);
+      }
+    }
+
     return true;
   }
 
@@ -83,16 +103,16 @@ public abstract class AbstractSingleValueIndex<INDEX, ELEMENT> implements ISingl
   }
 
   @Override
-  public ELEMENT get(final INDEX index) {
-    return m_mapByIndex.get(index);
+  public List<ELEMENT> get(final INDEX index) {
+    return CollectionUtility.arrayList(m_mapByIndex.get(index));
   }
 
   /**
-   * Method invoked to calculate the index value for the given element.
+   * Method invoked to calculate the index values for the given element.
    *
    * @param element
-   *          the element to calculate its index value.
-   * @return the index value, or <code>null</code> to not add to the index.
+   *          the element to calculate its index values.
+   * @return the index values, or <code>null</code> or an empty {@link Set} to not add the element to this index.
    */
-  protected abstract INDEX calculateIndexFor(ELEMENT element);
+  protected abstract Set<INDEX> calculateIndexesFor(final ELEMENT element);
 }
