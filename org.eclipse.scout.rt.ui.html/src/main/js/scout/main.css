@@ -403,9 +403,10 @@ a,
   z-index: 0;
 }
 
-/* Used for static pages like login, logout, unsupported-browser and noscript section.
- * Background-image is not defined here, because logo is always project specific.
- * You should define a CSS rule in your project-specific .css files.
+/*
+ * Used for static pages like login, logout, unsupported-browser and noscript section.
+ * Expects that an image with the name logo.png is available. If another name than logo.png is required,
+ * just override the css rule in your in your project-specific .css files.
  */
 .box-with-logo {
   border: 1px solid @palette-gray-5;
@@ -414,7 +415,7 @@ a,
   margin: 150px auto;
   padding: 40px 70px;
   #scout.drop-shadow();
-
+  background-image: url('logo.png');
   background-position: center 45px;
   background-repeat: no-repeat;
   padding-top: 140px;
