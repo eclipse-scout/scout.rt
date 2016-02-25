@@ -32,7 +32,7 @@ scout.ViewTabsController.prototype.createAndRenderViewTab = function(view, posit
     viewTab = scout.create('DesktopViewTab', {
       parent: view.displayParent,
       view: view,
-      $bench: this._desktop.$bench,
+      $bench: this._desktop.bench.$container,
       viewTabController: this
     });
 
@@ -57,8 +57,8 @@ scout.ViewTabsController.prototype.createAndRenderViewTab = function(view, posit
 
   }
   // Render the view tab.
-  if (this._desktop._hasHeader() && !viewTab.rendered) {
-    viewTab.render(this._desktop._$viewTabBar);
+  if (this._desktop.header && !viewTab.rendered) {
+    viewTab.render(this._desktop.header._$viewTabBar);
   }
 
   // when rendering desktop also add all child tabs

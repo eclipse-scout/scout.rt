@@ -11,12 +11,9 @@
 scout.Desktop = function() {
   scout.Desktop.parent.call(this);
 
-  this._$viewTabBar;
-  this._$header;
-  this._$toolBar;
-  this.$bench;
-
   this.navigation;
+  this.header;
+  this.bench;
   /**
    * outline-content = outline form or table
    */
@@ -39,6 +36,11 @@ scout.Desktop = function() {
 };
 scout.inherits(scout.Desktop, scout.BaseDesktop);
 
+scout.DesktopStyle = {
+  DEFAULT: 'DEFAULT',
+  BENCH: 'BENCH'
+};
+
 scout.Desktop.prototype._init = function(model) {
   scout.Desktop.parent.prototype._init.call(this, model);
   this.viewTabsController = new scout.ViewTabsController(this);
@@ -49,9 +51,11 @@ scout.Desktop.prototype._init = function(model) {
   this._resizeHandler = this.onResize.bind(this);
 };
 
-scout.DesktopStyle = {
-  DEFAULT: 'DEFAULT',
-  BENCH: 'BENCH'
+scout.Desktop.prototype._initKeyStrokeContext = function(keyStrokeContext) {
+  scout.Desktop.parent.prototype._initKeyStrokeContext.call(this, keyStrokeContext);
+
+  // Keystroke on the top-level DOM element which works as a catch-all when the busy indicator is active
+  keyStrokeContext.registerKeyStroke(new scout.DesktopKeyStroke(this.session));
 };
 
 scout.Desktop.prototype._onChildAdapterCreation = function(propertyName, model) {
@@ -71,39 +75,27 @@ scout.Desktop.prototype._render = function($parent) {
     .toggleClass('has-navigation', hasNavigation);
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
   this.htmlComp.setLayout(new scout.DesktopLayout(this));
+  // Desktop elements are added before this separator, all overlays are opened after (dialogs, popups, tooltips etc.)
+  this.$overlaySeparator = this.$container.appendDiv().setVisible(false);
+  scout.inspector.applyInfo(this, this.$container);
 
-  scout.inspector.applyInfo(this, $parent);
-
-  if (hasNavigation) {
-    this.navigation = scout.create('DesktopNavigation', {
-      parent: this
-    });
-  } else {
-    this.navigation = scout.NullDesktopNavigation;
-  }
-  this.navigation.render($parent);
-  //TODO [5.2] cgu: maybe better move to desktop navigation?
-  this._installKeyStrokeContextForDesktopViewButtonBar();
-  this._installKeyStrokeContextForDesktop();
-
-  this._renderHeader($parent);
+  this._renderNavigation();
+  this._renderHeader();
   this._renderBench();
-  // render ToolMenus after bench because menus are a part of the header and main structure with all elements
-  // on desktop should be rendered before fill them. Otherwise there are problems with Popups.
-  this._renderToolMenus();
-  this._createSplitter($parent);
+  this._renderApplicationLogoUrl();
+  this._renderSplitter();
   this._setSplitterPosition();
   this.addOns.forEach(function(addOn) {
-    addOn.render($parent);
+    addOn.render(this.$container);
   });
   this.setOutline(this.outline, true);
 
-  $parent.window().on('resize', this._resizeHandler);
+  this.$container.window().on('resize', this._resizeHandler);
 
   // prevent general drag and drop, dropping a file anywhere in the application must not open this file in browser
   this._setupDragAndDrop();
 
-  this._disableContextMenu($parent);
+  this._disableContextMenu();
 };
 
 scout.Desktop.prototype._remove = function() {
@@ -111,9 +103,9 @@ scout.Desktop.prototype._remove = function() {
   scout.Desktop.parent.prototype._remove.call(this);
 };
 
-scout.Desktop.prototype._disableContextMenu = function($parent) {
+scout.Desktop.prototype._disableContextMenu = function() {
   // Switch off browser's default context menu for the entire scout desktop (except input fields)
-  $parent.on('contextmenu', function(event) {
+  this.$container.on('contextmenu', function(event) {
     if (event.target.nodeName !== 'INPUT' && event.target.nodeName !== 'TEXTAREA' && !event.target.isContentEditable) {
       event.preventDefault();
     }
@@ -121,9 +113,7 @@ scout.Desktop.prototype._disableContextMenu = function($parent) {
 };
 
 /**
- * goes up in display hierarchy to find the form to select on desktop. null if outline is selected.
- * @param form
- * @returns
+ * Goes up in display hierarchy to find the form to select on desktop. null if outline is selected.
  */
 scout.Desktop.prototype._findActiveSelectablePart = function(form) {
   if (form.parent.isView && form.parent.isDialog) {
@@ -136,93 +126,12 @@ scout.Desktop.prototype._findActiveSelectablePart = function(form) {
   return null;
 };
 
-/**
- * Installs the keystrokes referring to the desktop bench, and are keystrokes declared on desktop (desktop.keyStrokes).
- */
-scout.Desktop.prototype._installKeyStrokeContextForDesktopBench = function() {
-  if (!this._hasBench()) {
-    return;
-  }
-  var keyStrokeContext = new scout.KeyStrokeContext();
-
-  keyStrokeContext.invokeAcceptInputOnActiveValueField = true;
-  keyStrokeContext.$bindTarget = this.session.$entryPoint;
-  keyStrokeContext.$scopeTarget = this.$bench;
-  keyStrokeContext.registerKeyStroke(this.keyStrokes);
-
-  this.session.keyStrokeManager.installKeyStrokeContext(keyStrokeContext);
-};
-
-/**
- * Install a keystroke on the top-level DOM element which works as a catch-all when the busy indicator is active.
- */
-scout.Desktop.prototype._installKeyStrokeContextForDesktop = function() {
-  var keyStrokeContext = new scout.KeyStrokeContext();
-
-  keyStrokeContext.$bindTarget = this.session.$entryPoint;
-  keyStrokeContext.$scopeTarget = this.$container;
-  keyStrokeContext.registerKeyStroke(new scout.DesktopKeyStroke(this.session));
-
-  this.session.keyStrokeManager.installKeyStrokeContext(keyStrokeContext);
-};
-
-/**
- * Installs the keystrokes referring to the desktop view button area, and are keystrokes to switch between outlines (desktop.viewButtons).
- */
-scout.Desktop.prototype._installKeyStrokeContextForDesktopViewButtonBar = function() {
-  if (!this._hasNavigation()) {
-    return;
-  }
-  var keyStrokeContext = new scout.KeyStrokeContext();
-
-  keyStrokeContext.invokeAcceptInputOnActiveValueField = true;
-  keyStrokeContext.$bindTarget = this.session.$entryPoint;
-  keyStrokeContext.$scopeTarget = this.navigation.viewButtons.$container;
-  keyStrokeContext.registerKeyStroke([
-    new scout.ViewMenuOpenKeyStroke(this.navigation.viewButtons)
-  ].concat(this.viewButtons));
-
-  this.session.keyStrokeManager.installKeyStrokeContext(keyStrokeContext);
-};
-
-/**
- * Installs the keystrokes referring to the desktop task bar, and are keystrokes associated with FormToolButtons (desktop.actions).
- */
-scout.Desktop.prototype._installKeyStrokeContextForDesktopHeader = function() {
-  if (!this._hasHeader()) {
-    return;
-  }
-  var keyStrokeContext = new scout.KeyStrokeContext();
-
-  keyStrokeContext.invokeAcceptInputOnActiveValueField = true;
-  keyStrokeContext.$bindTarget = this.session.$entryPoint;
-  keyStrokeContext.$scopeTarget = this._$header;
-  keyStrokeContext.registerKeyStroke([
-    new scout.ViewTabSelectKeyStroke(this),
-    new scout.DisableBrowserTabSwitchingKeyStroke(this)
-  ].concat(this.actions));
-
-  this.session.keyStrokeManager.installKeyStrokeContext(keyStrokeContext);
-};
-
 scout.Desktop.prototype._postRender = function() {
-  // keystroke is not handled by default keystrokecontext.
-  this.session.keyStrokeManager.uninstallKeyStrokeContext(this.keyStrokeContext);
-
   // Render attached forms, message boxes and file choosers.
   this.initialFormRendering = true;
   this.formController.render();
   this.messageBoxController.render();
   this.fileChooserController.render();
-  // Align a potential open popup to its respective tool button.
-  this.actions
-    .filter(function(action) {
-      return action.selected && action.popup;
-    })
-    .some(function(action) {
-      action.popup.position();
-      return true;
-    });
 
   // find active form and set selected.
   var selectable;
@@ -243,47 +152,27 @@ scout.Desktop.prototype._postRender = function() {
   this.initialFormRendering = false;
 };
 
-scout.Desktop.prototype._renderActiveForm = function($parent) {
+scout.Desktop.prototype._renderActiveForm = function() {
   // NOP -> is handled in _setFormActivated when ui changes active form or if model changes form in _onModelFormShow/_onModelFormActivate
 };
 
-scout.Desktop.prototype._renderToolMenus = function() {
-  if (!this._hasHeader()) {
-    return;
-  }
-
-  // we set the menuStyle property to render a menu with a different style
-  // depending on where the menu is located (header VS menubar).
-  this.actions.forEach(function(action) {
-    action._customCssClasses = "header-tool-item";
-    action.popupOpeningDirectionX = 'left';
-    action.render(this._$toolBar);
-  }.bind(this));
-
-  if (this.actions.length) {
-    this.actions[this.actions.length - 1].$container.addClass('last');
-  }
-};
-
 scout.Desktop.prototype._renderBench = function() {
-  if (!this._hasBench()) {
+  if (!this._hasBench() || this.bench) {
     return;
   }
-  this.$bench = this.$container.appendDiv('desktop-bench');
-  this.$bench.toggleClass('has-header', this._hasHeader());
-  var htmlBench = new scout.HtmlComponent(this.$bench, this.session);
-  htmlBench.setLayout(new scout.DesktopBenchLayout(this));
-  htmlBench.pixelBasedSizing = false;
-
-  this._installKeyStrokeContextForDesktopBench();
+  this.bench = scout.create('DesktopBench', {
+    parent: this
+  });
+  this.bench.render(this.$container);
+  this.bench.$container.insertBefore(this.$overlaySeparator);
 };
 
 scout.Desktop.prototype._removeBench = function() {
-  if (!this.$bench) {
+  if (!this.bench) {
     return;
   }
-  this.$bench.remove();
-  this.$bench = null;
+  this.bench.remove();
+  this.bench = null;
 };
 
 scout.Desktop.prototype._renderBenchVisible = function() {
@@ -294,58 +183,36 @@ scout.Desktop.prototype._renderBenchVisible = function() {
   }
 };
 
-scout.Desktop.prototype._renderHeader = function($parent) {
-  if (!this._hasHeader()) {
+scout.Desktop.prototype._renderNavigation = function() {
+  if (this.navigation) {
     return;
   }
-  this._$header = $parent.appendDiv('desktop-header');
-  var htmlHeader = new scout.HtmlComponent(this._$header, this.session);
-  htmlHeader.setLayout(new scout.DesktopHeaderLayout(this));
-  htmlHeader.pixelBasedSizing = false;
-  this._$viewTabBar = this._$header.appendDiv('desktop-view-tabs');
-  this._$toolBar = this._$header.appendDiv('header-tools');
-  this._renderApplicationLogoUrl();
-  this._installKeyStrokeContextForDesktopHeader();
+  if (this._hasNavigation()) {
+    this.navigation = scout.create('DesktopNavigation', {
+      parent: this
+    });
+  } else {
+    this.navigation = scout.NullDesktopNavigation;
+  }
+  this.navigation.render(this.$container);
+  this.navigation.$container.insertBefore(this.$overlaySeparator);
+};
+
+scout.Desktop.prototype._renderHeader = function() {
+  if (!this._hasHeader() || this.header) {
+    return;
+  }
+  this.header = scout.create('DesktopHeader', {
+    parent: this
+  });
+  this.header.render(this.$container);
+  this.header.$container.insertBefore(this.$overlaySeparator);
 };
 
 scout.Desktop.prototype._renderApplicationLogoUrl = function() {
-  if (!this._hasHeader()) {
-    return;
+  if (this.header) {
+    this.header.setApplicationLogoUrl(this.applicationLogoUrl);
   }
-  if (this.applicationLogoUrl) {
-    this._renderApplicationLogo();
-  } else {
-    this._removeApplicationLogo();
-  }
-  var htmlHeader = scout.HtmlComponent.get(this._$header);
-  if (htmlHeader) {
-    htmlHeader.invalidateLayoutTree();
-  }
-};
-
-scout.Desktop.prototype._renderApplicationLogo = function() {
-  if (this._$applicationLogo) {
-    return;
-  }
-  this._$applicationLogo = this._$header.appendDiv('application-logo')
-    .css('backgroundImage', 'url(' + this.applicationLogoUrl + ')');
-
-  // in memory of the first one...
-  this._$applicationLogo.dblclick(function(event) {
-    if (event.altKey && event.ctrlKey) {
-      $(event.target).css('background', 'none');
-      $(event.target).css('font-size', '9px');
-      $(event.target).text('make software not war');
-    }
-  });
-};
-
-scout.Desktop.prototype._removeApplicationLogo = function() {
-  if (!this._$applicationLogo) {
-    return;
-  }
-  this._$applicationLogo.remove();
-  this._$applicationLogo = null;
 };
 
 scout.Desktop.prototype._setupDragAndDrop = function() {
@@ -364,7 +231,7 @@ scout.Desktop.prototype._setupDragAndDrop = function() {
   });
 };
 
-scout.Desktop.prototype._createSplitter = function($parent) {
+scout.Desktop.prototype._renderSplitter = function() {
   if (!this._hasNavigation()) {
     return;
   }
@@ -374,7 +241,8 @@ scout.Desktop.prototype._createSplitter = function($parent) {
     $root: this.$container,
     maxRatio: 0.5
   });
-  this.splitter.render($parent);
+  this.splitter.render(this.$container);
+  this.splitter.$container.insertBefore(this.$overlaySeparator);
   this.splitter.on('resize', this._onSplitterResize.bind(this));
   this.splitter.on('resizeend', this._onSplitterResizeEnd.bind(this));
 };
@@ -416,8 +284,7 @@ scout.Desktop.prototype.onResize = function(event) {
 
 scout.Desktop.prototype.revalidateHeaderLayout = function() {
   if (this._hasHeader()) {
-    var htmlHeader = scout.HtmlComponent.get(this._$header);
-    htmlHeader.revalidateLayout();
+    this.header.revalidateLayout();
   }
 };
 
@@ -504,7 +371,7 @@ scout.Desktop.prototype.setOutlineContent = function(content, bringToFront) {
       content.menuBar.top();
       content.menuBar.large();
     }
-    content.render(this.$bench);
+    content.render(this.bench.$container);
     content.validateRoot = true;
     content.invalidateLayoutTree(false);
 
@@ -714,7 +581,7 @@ scout.Desktop.prototype._sendNavigationToBack = function() {
 
 scout.Desktop.prototype._renderBenchDropShadow = function(showShadow) {
   if (this._hasNavigation() && this._hasBench()) {
-    this.$bench.toggleClass('drop-shadow', showShadow);
+    this.bench.$container.toggleClass('drop-shadow', showShadow);
   }
 };
 

@@ -8,25 +8,26 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-scout.DesktopBenchLayout = function(desktop) {
+scout.DesktopBenchLayout = function(bench) {
   scout.DesktopBenchLayout.parent.call(this);
-  this.desktop = desktop;
+  this.bench = bench;
 };
 scout.inherits(scout.DesktopBenchLayout, scout.AbstractLayout);
 
 scout.DesktopBenchLayout.prototype.layout = function($container) {
   var viewSize, outlineContentSize, htmlOutlineContent, htmlView,
-    htmlContainer = scout.HtmlComponent.get(this.desktop.$bench),
+    desktop = this.bench.desktop,
+    htmlContainer = this.bench.htmlComp,
     containerSize = htmlContainer.getAvailableSize();
 
   containerSize = containerSize.subtract(htmlContainer.getInsets());
-  if (this.desktop._outlineContent) {
-    htmlOutlineContent = this.desktop._outlineContent.htmlComp;
+  if (desktop._outlineContent) {
+    htmlOutlineContent = desktop._outlineContent.htmlComp;
     outlineContentSize = containerSize.subtract(htmlOutlineContent.getMargins());
     htmlOutlineContent.setSize(outlineContentSize);
   }
 
-  var selectedViewTab = this.desktop.viewTabsController.selectedViewTab();
+  var selectedViewTab = desktop.viewTabsController.selectedViewTab();
   if (selectedViewTab) {
     htmlView = selectedViewTab._view.htmlComp;
     viewSize = containerSize.subtract(htmlView.getMargins());

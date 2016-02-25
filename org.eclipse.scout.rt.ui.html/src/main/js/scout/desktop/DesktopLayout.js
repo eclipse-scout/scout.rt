@@ -35,19 +35,19 @@ scout.DesktopLayout.prototype.layout = function($container) {
   }
 
   if (this.desktop._hasHeader()) {
-    this.desktop._$header.css('left', navigationWidth);
+    this.desktop.header.$container.css('left', navigationWidth);
 
-    htmlHeader = scout.HtmlComponent.get(this.desktop._$header);
-    headerHeight = this.desktop._$header.outerHeight(true);
+    htmlHeader = this.desktop.header.htmlComp;
+    headerHeight = htmlHeader.$comp.outerHeight(true);
     headerSize = new scout.Dimension(containerSize.width - navigationWidth, headerHeight)
       .subtract(htmlHeader.getMargins());
     htmlHeader.setSize(headerSize);
   }
 
   if (this.desktop._hasBench()) {
-    this.desktop.$bench.css('left', navigationWidth);
+    this.desktop.bench.$container.css('left', navigationWidth);
 
-    htmlBench = scout.HtmlComponent.get(this.desktop.$bench);
+    htmlBench = this.desktop.bench.htmlComp;
     htmlBenchSize = new scout.Dimension(containerSize.width - navigationWidth, containerSize.height - headerHeight)
       .subtract(htmlBench.getMargins());
     htmlBench.setSize(htmlBenchSize);

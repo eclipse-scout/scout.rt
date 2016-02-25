@@ -8,12 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-scout.DesktopHeaderLayout = function(desktop) {
+scout.DesktopHeaderLayout = function(header) {
   scout.DesktopHeaderLayout.parent.call(this);
 
   this.TAB_WIDTH_LARGE = 220;
   this.TAB_WIDTH_SMALL = 130;
-  this.desktop = desktop;
+  this.header = header;
+  this.desktop = header.desktop;
   this._$overflowTab;
   this._overflowTabsIndizes = [];
 };
@@ -31,7 +32,7 @@ scout.DesktopHeaderLayout.prototype._toolsWidth = function($tools, cssClasses) {
   if (cssClasses) {
     $items.addClass(cssClasses);
   }
-  $clone.width('auto').appendTo(this.desktop.session.$entryPoint);
+  $clone.width('auto').appendTo(this.desktop.$container);
   var toolsWidth = scout.graphics.getSize($clone, true).width;
   $clone.remove();
   return toolsWidth;
@@ -52,8 +53,8 @@ scout.DesktopHeaderLayout.prototype.layout = function($container) {
     logoWidth = 0,
     toolsWidth, tabsWidth;
 
-  if (this.desktop._$applicationLogo) {
-    logoWidth = scout.graphics.getSize(this.desktop._$applicationLogo, true).width;
+  if (this.header.applicationLogo) {
+    logoWidth = scout.graphics.getSize(this.header.applicationLogo.$container, true).width;
   }
 
   // reset tabs and tool-items
@@ -133,7 +134,8 @@ scout.DesktopHeaderLayout.prototype.layout = function($container) {
     var numVisibleTabs = Math.floor(tabsWidth / this.TAB_WIDTH_SMALL),
       numOverflowTabs = numTabs - numVisibleTabs;
 
-    var i = 0, selectedIndex = 0;
+    var i = 0,
+      selectedIndex = 0;
     $tabs.find('.desktop-view-tab').each(function() {
       if ($(this).hasClass('selected')) {
         selectedIndex = i;
@@ -174,6 +176,16 @@ scout.DesktopHeaderLayout.prototype.layout = function($container) {
       i++;
     });
   }
+
+  // Make sure open popups are at the correct position after layouting
+  this.desktop.actions
+    .filter(function(action) {
+      return action.selected && action.popup;
+    })
+    .some(function(action) {
+      action.popup.position();
+      return true;
+    });
 };
 
 scout.DesktopHeaderLayout.prototype._onMouseDownOverflow = function(event) {

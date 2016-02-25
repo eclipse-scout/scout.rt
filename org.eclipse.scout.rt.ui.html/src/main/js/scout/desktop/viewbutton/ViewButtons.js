@@ -14,10 +14,27 @@ scout.ViewButtons = function() {
 };
 scout.inherits(scout.ViewButtons, scout.Widget);
 
+scout.ViewButtons.prototype._init = function(model) {
+  scout.ViewButtons.parent.prototype._init.call(this, model);
+  this.desktop = this.session.desktop;
+};
+
+scout.ViewButtons.prototype._initKeyStrokeContext = function(keyStrokeContext) {
+  scout.DesktopHeader.parent.prototype._initKeyStrokeContext.call(this, keyStrokeContext);
+
+  // Bound to desktop
+  this.desktopKeyStrokeContext = new scout.KeyStrokeContext();
+  this.desktopKeyStrokeContext.invokeAcceptInputOnActiveValueField = true;
+  this.desktopKeyStrokeContext.$bindTarget = this.desktop.$container;
+  this.desktopKeyStrokeContext.$scopeTarget = this.$container;
+  this.desktopKeyStrokeContext.registerKeyStroke([
+    new scout.ViewMenuOpenKeyStroke(this)
+  ].concat(this.desktop.viewButtons));
+};
+
 scout.ViewButtons.prototype._render = function($parent) {
   var viewTabs;
 
-  this.desktop = this.session.desktop,
   this.$container = $parent.appendDiv('view-buttons');
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
   this.htmlComp.setLayout(new scout.ViewButtonsLayout(this));
@@ -31,6 +48,12 @@ scout.ViewButtons.prototype._render = function($parent) {
       viewTab.last();
     }
   }, this);
+  this.session.keyStrokeManager.installKeyStrokeContext(this.desktopKeyStrokeContext);
+};
+
+scout.ViewButtons.prototype._remove = function() {
+  this.session.keyStrokeManager.uninstallKeyStrokeContext(this.desktopKeyStrokeContext);
+  scout.ViewButtons.parent.prototype._remove.call(this);
 };
 
 scout.ViewButtons.prototype._viewButtons = function(displayStyle) {
@@ -56,7 +79,6 @@ scout.ViewButtons.prototype.onOutlineChanged = function(outline) {
     }
   });
 };
-
 
 scout.ViewButtons.prototype.doViewMenuAction = function(event) {
   this.viewMenuTab.togglePopup(event);
