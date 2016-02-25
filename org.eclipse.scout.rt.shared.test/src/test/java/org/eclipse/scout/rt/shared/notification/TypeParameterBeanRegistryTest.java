@@ -14,8 +14,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
+import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
 import org.junit.Test;
 
 /**
@@ -25,43 +28,74 @@ public class TypeParameterBeanRegistryTest {
 
   @Test
   public void testEmptyRegistry() throws Exception {
-    final TypeParameterBeanRegistry<ITestHandler> reg = new TypeParameterBeanRegistry<>();
+    final TypeParameterBeanRegistry<ITestHandler> reg = new TypeParameterBeanRegistry<>(ITestHandler.class);
     assertTrue(reg.getBeans(String.class).isEmpty());
   }
 
   @Test
   public void testEmptyRegistration() {
-    final TypeParameterBeanRegistry<ITestHandler> reg = new TypeParameterBeanRegistry<>();
+    final TypeParameterBeanRegistry<ITestHandler> reg = new TypeParameterBeanRegistry<>(ITestHandler.class);
     final List<ITestHandler> l = new ArrayList<>();
-    reg.registerBeans(ITestHandler.class, l);
+    reg.registerBeans(l);
     assertTrue(reg.getBeans(String.class).isEmpty());
   }
 
   @Test
   public void testStringHandler() {
-    final TypeParameterBeanRegistry<ITestHandler> reg = new TypeParameterBeanRegistry<>();
+    final TypeParameterBeanRegistry<ITestHandler> registry = new TypeParameterBeanRegistry<>(ITestHandler.class);
     final List<ITestHandler> l = new ArrayList<>();
     l.add(new String1Handler());
     l.add(new LongHandler());
     l.add(new String2Handler());
     l.add(new CharSequenceHandler());
-    reg.registerBeans(ITestHandler.class, l);
-    final List<ITestHandler> res = reg.getBeans(String.class);
-    assertEquals(3, res.size());
-    assertEquals(l.get(0), res.get(0));
-    assertEquals(l.get(2), res.get(1));
-    assertEquals(l.get(3), res.get(2));
+
+    IRegistrationHandle registration = registry.registerBeans(l);
+    final List<ITestHandler> stringResult = registry.getBeans(String.class);
+    assertEquals(3, stringResult.size());
+    assertEquals(l.get(0), stringResult.get(0));
+    assertEquals(l.get(2), stringResult.get(1));
+    assertEquals(l.get(3), stringResult.get(2));
+
+    List<ITestHandler> charSequenceResult = registry.getBeans(CharSequence.class);
+    assertEquals(1, charSequenceResult.size());
+    assertEquals(l.get(3), charSequenceResult.get(0));
+
+    registration.dispose();
+
+    assertEquals(0, registry.getBeans(String.class).size());
+    assertEquals(0, registry.getBeans(CharSequence.class).size());
   }
 
   @Test
-  public void testCahedCharSeqHandler() {
-    final TypeParameterBeanRegistry<ITestHandler> reg = new TypeParameterBeanRegistry<>();
+  public void testStringHandler1() {
+    String1Handler sh1 = new String1Handler();
+    String2Handler sh2 = new String2Handler();
+    CharSequenceHandler ch1 = new CharSequenceHandler();
+
+    final TypeParameterBeanRegistry<ITestHandler> registry = new TypeParameterBeanRegistry<>(ITestHandler.class);
+
+    registry.registerBean(sh1);
+    assertEquals(Arrays.asList(sh1), registry.getBeans(String.class));
+    assertEquals(Collections.emptyList(), registry.getBeans(CharSequence.class));
+
+    registry.registerBean(sh2);
+    assertEquals(Arrays.asList(sh1, sh2), registry.getBeans(String.class));
+    assertEquals(Collections.emptyList(), registry.getBeans(CharSequence.class));
+
+    registry.registerBean(ch1);
+    assertEquals(Arrays.asList(sh1, sh2, ch1), registry.getBeans(String.class));
+    assertEquals(Arrays.asList(ch1), registry.getBeans(CharSequence.class));
+  }
+
+  @Test
+  public void testCachedCharSeqHandler() {
+    final TypeParameterBeanRegistry<ITestHandler> reg = new TypeParameterBeanRegistry<>(ITestHandler.class);
     final List<ITestHandler> l = new ArrayList<>();
     l.add(new String1Handler());
     l.add(new LongHandler());
     l.add(new String2Handler());
     l.add(new CharSequenceHandler());
-    reg.registerBeans(ITestHandler.class, l);
+    reg.registerBeans(l);
     //first lookup
     reg.getBeans(CharSequence.class);
     //get cached result

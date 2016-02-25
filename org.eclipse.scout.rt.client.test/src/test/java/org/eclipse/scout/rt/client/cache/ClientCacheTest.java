@@ -31,8 +31,8 @@ public class ClientCacheTest {
 
   @Test
   public void testCacheNotificationHandlerRegistration() {
-    TypeParameterBeanRegistry<INotificationHandler> registry = new TypeParameterBeanRegistry<>();
-    registry.registerBeans(INotificationHandler.class, BEANS.all(INotificationHandler.class));
+    TypeParameterBeanRegistry<INotificationHandler> registry = new TypeParameterBeanRegistry<>(INotificationHandler.class);
+    registry.registerBeans(BEANS.all(INotificationHandler.class));
     List<INotificationHandler> handlers = registry.getBeans(InvalidateCacheNotification.class);
 
     // ensure that in client exactly one cache notification handler is registered and

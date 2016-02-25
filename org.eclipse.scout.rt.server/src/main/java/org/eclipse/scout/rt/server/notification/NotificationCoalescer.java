@@ -30,11 +30,11 @@ import org.eclipse.scout.rt.shared.notification.TypeParameterBeanRegistry;
 @ApplicationScoped
 @CreateImmediately
 public class NotificationCoalescer {
-  private final TypeParameterBeanRegistry<ICoalescer> m_registry = new TypeParameterBeanRegistry<>();
+  private final TypeParameterBeanRegistry<ICoalescer> m_registry = new TypeParameterBeanRegistry<>(ICoalescer.class);
 
   @PostConstruct
   protected void buildCoalescerLinking() {
-    m_registry.registerBeans(ICoalescer.class, BEANS.all(ICoalescer.class));
+    m_registry.registerBeans(BEANS.all(ICoalescer.class));
   }
 
   @SuppressWarnings("unchecked")

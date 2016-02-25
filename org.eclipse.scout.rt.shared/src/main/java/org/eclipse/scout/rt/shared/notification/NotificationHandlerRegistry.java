@@ -26,11 +26,11 @@ import org.slf4j.LoggerFactory;
 @ApplicationScoped
 public class NotificationHandlerRegistry {
   private static final Logger LOG = LoggerFactory.getLogger(NotificationHandlerRegistry.class);
-  private final TypeParameterBeanRegistry<INotificationHandler> m_registry = new TypeParameterBeanRegistry<>();
+  private final TypeParameterBeanRegistry<INotificationHandler> m_registry = new TypeParameterBeanRegistry<>(INotificationHandler.class);
 
   @PostConstruct
   protected void buildHandlerLinking() {
-    m_registry.registerBeans(INotificationHandler.class, BEANS.all(INotificationHandler.class));
+    m_registry.registerBeans(BEANS.all(INotificationHandler.class));
   }
 
   /**
