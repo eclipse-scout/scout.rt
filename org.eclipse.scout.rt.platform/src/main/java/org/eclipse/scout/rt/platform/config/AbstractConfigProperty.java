@@ -23,7 +23,7 @@ public abstract class AbstractConfigProperty<DATA_TYPE> implements IConfigProper
   }
 
   @Override
-  public final DATA_TYPE getValue() {
+  public DATA_TYPE getValue() {
     if (!m_valueInitialized) {
       try {
         m_value = createValue();
