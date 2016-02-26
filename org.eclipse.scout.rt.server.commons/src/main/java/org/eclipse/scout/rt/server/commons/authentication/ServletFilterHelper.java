@@ -263,6 +263,7 @@ public class ServletFilterHelper {
   public void doLogout(HttpServletRequest req) {
     HttpSession session = req.getSession(false);
     if (session != null) {
+      LOG.info("Invalidating HTTP session with ID {}", session.getId());
       session.invalidate();
     }
   }

@@ -94,7 +94,7 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
   }
 
   @Override
-  public boolean isHttpSessionValid() {
+  public final boolean isHttpSessionValid() {
     return m_httpSessionValid;
   }
 
@@ -236,7 +236,7 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
       }
 
       // Start housekeeping
-      LOG.debug("{} UI Sessions remaining for client session {}", (map == null ? 0 : map.size()), clientSession.getId());
+      LOG.debug("{} UI sessions remaining for client session {}", (map == null ? 0 : map.size()), clientSession.getId());
       if (map == null || map.isEmpty()) {
         m_uiSessionsByClientSession.remove(clientSession);
         startHousekeeping(clientSession);
@@ -293,6 +293,12 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
         return;
       }
       m_housekeepingFutures.remove(clientSession.getId());
+
+      if (!clientSession.isActive() || clientSession.isStopping()) {
+        LOG.info("Session housekeeping: Client session {} is {}, removing it from store", clientSession.getId(), (!clientSession.isActive() ? "inactive" : "stopping"));
+        removeClientSession(clientSession);
+        return;
+      }
 
       // Check if the client session is referenced by any UI Session
       Set<IUiSession> uiSessions = m_uiSessionsByClientSession.get(clientSession);
@@ -355,7 +361,7 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
       LOG.debug("Remove client session with ID {} from session store", clientSession.getId());
       m_clientSessionMap.remove(clientSession.getId());
 
-      if (m_clientSessionMap.isEmpty()) {
+      if (m_clientSessionMap.isEmpty() && m_httpSessionValid) {
         // no more client sessions -> invalidate HTTP session
         try {
           m_httpSession.getCreationTime(); // dummy call to prevent the following log statement when the session is already invalid
@@ -382,14 +388,21 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
   protected void forceClientSessionShutdown(IClientSession clientSession) {
     Assertions.assertNotNull(clientSession);
     IDesktop desktop = clientSession.getDesktop();
-    if (clientSession.isActive() && desktop != null) { // desktop might be null when clientSession.isStopping()
-      desktop.getUIFacade().fireDesktopClosingFromUI(true); // true = force
+    if (!clientSession.isActive()) {
+      LOG.debug("Client session with ID {} is already inactive.", clientSession.getId());
     }
-    if (clientSession.isActive()) {
-      LOG.warn("ClientSession {} is still active after forcing it to shutdown!", clientSession.getId());
+    else if (clientSession.isStopping()) {
+      LOG.debug("Client session with ID {} is already stopping.", clientSession.getId());
     }
     else {
-      LOG.info("Client session with ID {} terminated.", clientSession.getId());
+      LOG.debug("Forcing session with ID {} to shut down...", clientSession.getId());
+      desktop.getUIFacade().fireDesktopClosingFromUI(true); // true = force
+      if (clientSession.isActive()) {
+        LOG.warn("Client session with ID {} is still {} after forcing it to shutdown!", clientSession.getId(), (clientSession.isStopping() ? "stopping" : "active"));
+      }
+      else {
+        LOG.info("Client session with ID {} terminated.", clientSession.getId());
+      }
     }
   }
 
@@ -399,7 +412,11 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
 
   @Override
   public void valueUnbound(HttpSessionBindingEvent event) {
-    setHttpSessionInvalid();
+    if (!m_httpSessionValid) {
+      // valueUnbound() has already been executed
+      return;
+    }
+    m_httpSessionValid = false;
     LOG.info("Detected invalidation of HTTP session {}, cleaning up {} client sessions and {} UI sessions", m_httpSessionId, m_clientSessionMap.size(), m_uiSessionMap.size());
     final List<IFuture<?>> futures = new ArrayList<>();
 
@@ -412,6 +429,7 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
           public void run() {
             LOG.debug("Shutting down client session with ID {} due to invalidation of HTTP session", clientSession.getId());
             forceClientSessionShutdown(clientSession);
+            removeClientSession(clientSession);
           }
         }, ModelJobs.newInput(ClientRunContexts.copyCurrent().withSession(clientSession, true))
             .withName("Closing desktop due to HTTP session invalidation")));

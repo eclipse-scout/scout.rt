@@ -447,7 +447,7 @@ public class UiSession implements IUiSession {
     m_disposed = true;
 
     if (m_sessionStore != null) {
-      m_sessionStore.unregisterUiSession(this); // also removes client session if necessary
+      m_sessionStore.unregisterUiSession(this); // also stops and removes client session if necessary
     }
 
     uninstallUiDataAvailableListener();
