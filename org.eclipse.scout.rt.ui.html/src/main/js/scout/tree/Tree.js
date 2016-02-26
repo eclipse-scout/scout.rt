@@ -976,6 +976,10 @@ scout.Tree.prototype.deselectNodes = function(nodes) {
   }
 };
 
+scout.Tree.prototype.isNodeSelected = function(node) {
+  return this.selectedNodes.indexOf(node) > -1;
+};
+
 scout.Tree.prototype._computeTreeItemPaddingLeft = function(level, selected) {
   if (this.checkable) {
     return level * this._treeItemPaddingLevel + this._treeItemPaddingLeft + this._treeItemCheckBoxPaddingLeft;

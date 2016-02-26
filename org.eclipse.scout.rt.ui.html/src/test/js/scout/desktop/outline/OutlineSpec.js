@@ -236,6 +236,15 @@ describe("Outline", function() {
         outline.selectNodes([node]);
         expect(node.detailFormVisibleByUi).toBe(true);
       });
+
+      it("does not update outline content if node already is selected", function() {
+        spyOn(outline, 'handleOutlineContent');
+        outline.selectNodes(outline.nodes[1]);
+        expect(outline.handleOutlineContent.calls.count()).toEqual(1);
+
+        outline.selectNodes(outline.nodes[1]);
+        expect(outline.handleOutlineContent.calls.count()).toEqual(1);
+      });
     });
 
   });

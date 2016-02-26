@@ -338,11 +338,16 @@ scout.Outline.prototype._onNodeDeleted = function(node) {
 };
 
 scout.Outline.prototype.selectNodes = function(nodes, notifyServer, debounceSend) {
+  nodes = scout.arrays.ensure(nodes);
+  if (nodes.length > 0 && this.isNodeSelected(nodes[0])) {
+    // Already selected, do nothing
+    return;
+  }
   scout.Outline.parent.prototype.selectNodes.call(this, nodes, notifyServer, debounceSend);
+  this.handleOutlineContent(true);
   if (this.navigateUpInProgress) {
     this.navigateUpInProgress = false;
   } else {
-    nodes = scout.arrays.ensure(nodes);
     if (nodes.length === 1) {
       // When a node is selected, the detail form should never be hidden
       nodes[0].detailFormVisibleByUi = true;
@@ -444,24 +449,6 @@ scout.Outline.prototype._showDefaultDetailForm = function() {
 
 scout.Outline.prototype._showOutlineOverview = function() {
   this.session.desktop.setOutlineContent(this.outlineOverview, true);
-};
-
-/**
- * @override Tree.js
- */
-scout.Outline.prototype._onNodeMouseDown = function(event) {
-  if (scout.Outline.parent.prototype._onNodeMouseDown.call(this, event)) {
-    this.handleOutlineContent(true);
-  }
-};
-
-/**
- * @override Tree.js
- */
-scout.Outline.prototype._onNodeControlMouseDown = function(event) {
-  if (scout.Outline.parent.prototype._onNodeControlMouseDown.call(this, event)) {
-    this.handleOutlineContent(true);
-  }
 };
 
 scout.Outline.prototype._updateOutlineNode = function(node, bringToFront) {
@@ -581,11 +568,6 @@ scout.Outline.prototype._onPageChanged = function(event) {
     this.defaultDetailForm = this.session.getOrCreateModelAdapter(event.detailForm, this);
     this._showDefaultDetailForm();
   }
-};
-
-scout.Outline.prototype._onNodesSelected = function(nodeIds) {
-  scout.Outline.parent.prototype._onNodesSelected.call(this, nodeIds);
-  this.handleOutlineContent(this.inFront());
 };
 
 scout.Outline.prototype.onModelAction = function(event) {
