@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <configuration>
 
-  <variable scope="context" name="mdcPattern" value="%X{subject.principal.name} @ %X{http.request.method} %X{http.request.uri} %X{scout.ui.session.id}" />
-  <variable scope="context" name="logPattern" value="%date{ISO8601} %-5level %thread %logger{50} - %m [${mdcPattern}]%n" />
+  <variable scope="context" name="mdcPattern" value="principal=%X{subject.principal.name}, httpUri=%X{http.request.uri}, uiSession=%X{scout.ui.session.id}, clientSession=%X{scout.session.id}, jobName=%X{scout.job.name}, cid=%X{scout.correlation.id}" />
+  <variable scope="context" name="mdcPatternWithoutEmptyValues" value="%replace(${mdcPattern}){'(, )?\\w+=((?=\\1)|, |$)', ''}" />
+  <variable scope="context" name="logPattern" value="%date{ISO8601} %-5level [%thread] %logger - %msg - MDC[${mdcPatternWithoutEmptyValues}]%n%ex" />
 
   <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
     <filter class="org.eclipse.scout.rt.platform.logger.LevelRangeFilter">
