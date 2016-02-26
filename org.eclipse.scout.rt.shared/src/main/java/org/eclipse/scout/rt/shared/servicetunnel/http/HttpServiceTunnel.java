@@ -21,7 +21,6 @@ import java.util.concurrent.Callable;
 import javax.security.auth.Subject;
 
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.config.IConfigProperty;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
@@ -64,18 +63,13 @@ public class HttpServiceTunnel extends AbstractServiceTunnel {
   }
 
   protected static URL getConfiguredServerUrl() {
-    IConfigProperty<String> targetUrlProperty = BEANS.get(ServiceTunnelTargetUrlProperty.class);
-    String url = targetUrlProperty.getValue();
-    if (StringUtility.hasText(url)) {
-      try {
-        URL targetUrl = UriUtility.toUrl(url);
-        return targetUrl;
-      }
-      catch (RuntimeException e) {
-        throw new IllegalArgumentException("targetUrl: " + url, e);
-      }
+    String url = BEANS.get(ServiceTunnelTargetUrlProperty.class).getValue();
+    try {
+      return UriUtility.toUrl(url);
     }
-    return null;
+    catch (RuntimeException e) {
+      throw new IllegalArgumentException("targetUrl: " + url, e);
+    }
   }
 
   @Override
