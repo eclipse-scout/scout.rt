@@ -18,6 +18,7 @@ import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.ContextMenuEvent;
 import org.eclipse.scout.rt.client.ui.action.menu.root.ContextMenuListener;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
+import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
@@ -68,8 +69,15 @@ public class JsonContextMenu<CONTEXT_MENU extends IContextMenu> extends Abstract
     return null;
   }
 
+  public JSONArray childActionsToJson(IFilter<IMenu> menuFilter) {
+    if (menuFilter == null) {
+      menuFilter = new DisplayableActionFilter<IMenu>();
+    }
+    return JsonAdapterUtility.getAdapterIdsForModel(getUiSession(), getModel().getChildActions(), this, menuFilter);
+  }
+
   public JSONArray childActionsToJson() {
-    return JsonAdapterUtility.getAdapterIdsForModel(getUiSession(), getModel().getChildActions(), this, new DisplayableActionFilter<IMenu>());
+    return childActionsToJson(new DisplayableActionFilter<IMenu>());
   }
 
   @Override

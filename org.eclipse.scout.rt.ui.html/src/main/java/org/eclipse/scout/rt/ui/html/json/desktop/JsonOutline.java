@@ -14,6 +14,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.IVirtualTreeNode;
@@ -36,6 +38,7 @@ import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterPropertyConfig;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterPropertyConfigBuilder;
+import org.eclipse.scout.rt.ui.html.json.menu.JsonContextMenu;
 import org.eclipse.scout.rt.ui.html.json.table.JsonOutlineTable;
 import org.eclipse.scout.rt.ui.html.json.tree.JsonTree;
 import org.json.JSONObject;
@@ -101,6 +104,19 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
     attachGlobalAdapters(m_desktop.getDialogs(getModel(), false));
     attachGlobalAdapters(m_desktop.getMessageBoxes(getModel()));
     attachGlobalAdapters(m_desktop.getFileChoosers(getModel()));
+  }
+
+  @Override
+  protected void attachContextMenuAdapters() {
+    attachAdapter(getModel().getContextMenu(), new OutlineContextMenuFilter<IMenu>());
+  }
+
+  @Override
+  protected void putContextMenu(JSONObject json) {
+    JsonContextMenu<IContextMenu> jsonContextMenu = getAdapter(getModel().getContextMenu());
+    if (jsonContextMenu != null) {
+      json.put(PROP_MENUS, jsonContextMenu.childActionsToJson(new OutlineMenuFilter<IMenu>()));
+    }
   }
 
   @Override
