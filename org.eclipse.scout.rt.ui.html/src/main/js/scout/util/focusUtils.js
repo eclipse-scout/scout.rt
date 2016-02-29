@@ -53,6 +53,12 @@ scout.focusUtils = {
     var $el = $element;
     while ($el.css('user-select') === 'auto') {
       $el = $el.parent();
+      // Fix for Firefox: parent of BODY element is HtmlDocument. When calling $el.css on the HtmlDocument
+      // Firefox throws an error that ownerDocument is undefined. Thus we don't go higher than BODY element
+      // and assume body is never selectable.
+      if ($el.is('body')) {
+        return false;
+      }
     }
     if ($el.css('user-select') === 'none') {
       return false;
