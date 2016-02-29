@@ -35,6 +35,7 @@ public class JsonResponse {
   public static final int ERR_UI_PROCESSING = 20;
 
   public static final String PROP_SEQUENCE = "#";
+  public static final String PROP_COMBINED = "combined";
   public static final String PROP_EVENTS = "events";
   public static final String PROP_ADAPTER_DATA = "adapterData";
   public static final String PROP_STARTUP_DATA = "startupData";
@@ -51,6 +52,7 @@ public class JsonResponse {
   private volatile boolean m_error;
   private volatile int m_errorCode;
   private volatile String m_errorMessage;
+  private volatile boolean m_combined;
 
   private volatile boolean m_toJsonInProgress;
   private volatile boolean m_processingBufferedEvents;
@@ -272,6 +274,9 @@ public class JsonResponse {
 
       json.put(PROP_SEQUENCE, m_sequenceNo);
       json.put(PROP_STARTUP_DATA, m_startupData);
+      if (m_combined) {
+        json.put(PROP_COMBINED, true);
+      }
       json.put(PROP_EVENTS, (eventArray.length() == 0 ? null : eventArray));
       json.put(PROP_ADAPTER_DATA, (adapterData.length() == 0 ? null : adapterData));
       if (m_error) {
@@ -303,6 +308,8 @@ public class JsonResponse {
           adapter.processBufferedEvents();
         }
       }
+      // Remove adapter references from the response object, because it might be kept in memory for some time (response history)
+      m_bufferedEventsAdapters.clear();
     }
     finally {
       m_processingBufferedEvents = false;
@@ -415,5 +422,11 @@ public class JsonResponse {
     }
     sb.append("]");
     return sb.toString();
+  }
+
+  public void combine(JsonResponse response) {
+    m_combined = true;
+    m_adapterMap.putAll(response.m_adapterMap);
+    m_eventList.addAll(response.m_eventList);
   }
 }

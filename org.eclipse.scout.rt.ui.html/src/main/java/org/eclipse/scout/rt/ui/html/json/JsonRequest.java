@@ -35,11 +35,13 @@ public class JsonRequest {
   private static final String PROP_POLL = "pollForBackgroundJobs";
   private static final String PROP_CANCEL = "cancel";
   private static final String PROP_PING = "ping";
+  private static final String PROP_SYNC_RESPONSE_QUEUE = "syncResponseQueue";
 
   public static final String PROP_UI_SESSION_ID = "uiSessionId";
   public static final String PROP_EVENTS = "events";
   public static final String PROP_EVENT = "event";
   public static final String PROP_MESSAGE = "message";
+  public static final String PROP_ACK_SEQUENCE_NO = "#ACK";
 
   private final JSONObject m_request;
   private final RequestType m_requestType;
@@ -118,6 +120,11 @@ public class JsonRequest {
     return m_request.optString(PROP_MESSAGE, null);
   }
 
+  public Long getAckSequenceNo() {
+    long val = m_request.optLong(PROP_ACK_SEQUENCE_NO, -1);
+    return (val == -1 ? null : val); // because optLong() cannot only return primitives and opt() does not parse the number correctly
+  }
+
   @Override
   public String toString() {
     return JsonObjectUtility.toString(m_request);
@@ -130,7 +137,8 @@ public class JsonRequest {
     POLL_REQUEST,
     CANCEL_REQUEST,
     PING_REQUEST,
-    LOG_REQUEST;
+    LOG_REQUEST,
+    SYNC_RESPONSE_QUEUE;
 
     /**
      * Returns the <code>enum constant</code> which represents the given {@link JSONObject}.
@@ -153,6 +161,9 @@ public class JsonRequest {
       }
       else if (request.has(PROP_LOG)) {
         return LOG_REQUEST;
+      }
+      else if (request.has(PROP_SYNC_RESPONSE_QUEUE)) {
+        return SYNC_RESPONSE_QUEUE;
       }
       else {
         return REQUEST;

@@ -15,7 +15,7 @@ import org.eclipse.scout.rt.platform.config.AbstractPositiveIntegerConfigPropert
 /**
  * Configuration properties for client notifications
  */
-public class ClientNotificationProperties {
+public final class ClientNotificationProperties {
 
   private ClientNotificationProperties() {
   }

@@ -21,6 +21,7 @@ import java.util.concurrent.Callable;
 import javax.security.auth.Subject;
 
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.context.CorrelationId;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
@@ -122,6 +123,7 @@ public class HttpServiceTunnel extends AbstractServiceTunnel {
    */
   protected void addCustomHeaders(URLConnection urlConn, String method, byte[] callData) throws IOException {
     addSignatureHeader(urlConn, method, callData);
+    addCorrelationId(urlConn);
   }
 
   protected void addSignatureHeader(URLConnection urlConn, String method, byte[] callData) throws IOException {
@@ -133,6 +135,16 @@ public class HttpServiceTunnel extends AbstractServiceTunnel {
     }
     catch (RuntimeException e) {
       throw new IOException(e);
+    }
+  }
+
+  /**
+   * Method invoked to add the <em>correlation ID</em> as HTTP header to the request.
+   */
+  protected void addCorrelationId(final URLConnection urlConn) throws IOException {
+    final String cid = CorrelationId.CURRENT.get();
+    if (cid != null) {
+      urlConn.setRequestProperty(CorrelationId.HTTP_HEADER_NAME, cid);
     }
   }
 

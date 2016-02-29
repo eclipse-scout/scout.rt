@@ -30,6 +30,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
@@ -532,4 +533,24 @@ public class JobScheduleTest {
     }
   }
 
+  @Test
+  public void testScheduleJobWithCancelledRunMonitor() {
+    // setup run context with already cancelled run monitor
+    RunContext runContext = RunContexts.empty();
+    runContext.getRunMonitor().cancel(true);
+
+    // schedule job
+    IFuture<Void> future = Jobs.schedule(new IRunnable() {
+      @Override
+      public void run() throws Exception {
+        fail("job must not be executed");
+      }
+    }, Jobs.newInput().withRunContext(runContext));
+    future.awaitDone();
+
+    assertTrue(future.isCancelled());
+
+    // future must not be referenced by job manager
+    assertEquals(0, Jobs.getJobManager().getFutures(Jobs.newFutureFilterBuilder().andMatchFuture(future).toFilter()).size());
+  }
 }

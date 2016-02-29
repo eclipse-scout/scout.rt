@@ -59,7 +59,7 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
   private final JsonRequestHelper m_jsonRequestHelper = BEANS.get(JsonRequestHelper.class);
 
   @Override
-  public boolean handlePost(final UiServlet servlet, final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
+  public boolean handlePost(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
     // serve only /json
     String pathInfo = req.getPathInfo();
     if (CompareUtility.notEquals(pathInfo, "/json")) {
@@ -137,6 +137,9 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
   }
 
   protected void handleJsonRequest(IUiSession uiSession, JsonRequest jsonRequest, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException {
+    // If client sent ACK#, cleanup response history accordingly
+    uiSession.confirmResponseProcessed(jsonRequest.getAckSequenceNo());
+
     switch (jsonRequest.getRequestType()) {
       case LOG_REQUEST:
         handleLogRequest(httpServletResponse, uiSession, jsonRequest);
@@ -145,15 +148,26 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
         handleCancelRequest(httpServletResponse, uiSession);
         return;
       case UNLOAD_REQUEST:
-        handleUnloadRequest(httpServletResponse, jsonRequest, uiSession);
+        handleUnloadRequest(httpServletResponse, uiSession, jsonRequest);
         return;
+      case SYNC_RESPONSE_QUEUE:
+        handleSyncResponseQueueRequest(httpServletResponse, uiSession, jsonRequest);
+        return;
+      case REQUEST:
+      case STARTUP_REQUEST:
       case POLL_REQUEST:
-        handlePollRequest(uiSession);
         break; // <-- !
+      default:
+        throw new IllegalStateException("Unexpected request type: " + jsonRequest.getRequestType());
     }
 
     // GUI requests for the same session must be processed consecutively, therefore acquire "UI session lock"
     if (jsonRequest.getRequestType() == RequestType.POLL_REQUEST) {
+      // Block for a certain time
+      boolean success = handlePollRequest(uiSession);
+      if (!success) {
+        return; // Interrupted while waiting -> return immediately without sending a response
+      }
       // Special case: Poll requests should only *try* to acquire the lock. If the lock is currently acquired
       // by some other thread, there is no reason to wait for it, because the other thread will already send
       // the entire JSON response to the UI. Waiting for too long here could cause the UI session to time out,
@@ -236,7 +250,11 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
     writeJsonResponse(resp, m_jsonRequestHelper.createEmptyResponse());
   }
 
-  protected void handlePollRequest(IUiSession uiSession) {
+  /**
+   * @return <code>true</code> if the request is still valid after polling and response should be sent back to the UI.
+   *         <code>false</code> when the polling was interrupted and the processing should be stopped immediately.
+   */
+  protected boolean handlePollRequest(IUiSession uiSession) {
     int curIdle = (int) ((System.currentTimeMillis() - uiSession.getLastAccessedTime()) / 1000L);
     int maxIdle = m_maxUserIdleTime;
     // Default don't wait longer than the container timeout for security reasons. However, the minimum is _not_ 0,
@@ -247,10 +265,19 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
     // - a model job terminates
     // - the max. wait time has exceeded
     final long startNanos = System.nanoTime();
-    uiSession.waitForBackgroundJobs(pollWait);
+    try {
+      uiSession.waitForBackgroundJobs(pollWait);
+    }
+    catch (InterruptedException e) {
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("Polling INTERRUPTED after {} ms (ignoring response)", StringUtility.formatNanos(System.nanoTime() - startNanos));
+      }
+      return false;
+    }
     if (LOG.isDebugEnabled()) {
       LOG.debug("Polling end after {} ms", StringUtility.formatNanos(System.nanoTime() - startNanos));
     }
+    return true;
   }
 
   protected void handleSessionTimeout(HttpServletResponse resp, JsonRequest jsonReq) throws IOException {
@@ -258,21 +285,19 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
     writeJsonResponse(resp, m_jsonRequestHelper.createSessionTimeoutResponse());
   }
 
-  protected void handleMaxIdeTimeout(HttpServletResponse resp, JsonRequest jsonReq, IUiSession uiSession, int idleSeconds, int maxIdleSeconds) throws IOException {
-    LOG.info("Detected UI session timeout [id={}] after idle of {} seconds (maxInactiveInterval={})", jsonReq.getUiSessionId(), idleSeconds, maxIdleSeconds);
-    if (uiSession != null) {
-      uiSession.uiSessionLock().lock();
-      try {
-        uiSession.dispose();
-      }
-      finally {
-        uiSession.uiSessionLock().unlock();
-      }
+  protected void handleMaxIdeTimeout(HttpServletResponse resp, IUiSession uiSession, int idleSeconds, int maxIdleSeconds) throws IOException {
+    LOG.info("Detected idle timeout for UI session {} after {} seconds (maxIdleSeconds={})", uiSession.getUiSessionId(), idleSeconds, maxIdleSeconds);
+    uiSession.uiSessionLock().lock();
+    try {
+      uiSession.dispose();
+    }
+    finally {
+      uiSession.uiSessionLock().unlock();
     }
     writeJsonResponse(resp, m_jsonRequestHelper.createSessionTimeoutResponse());
   }
 
-  protected void handleUnloadRequest(HttpServletResponse resp, JsonRequest jsonReq, IUiSession uiSession) throws IOException {
+  protected void handleUnloadRequest(HttpServletResponse resp, IUiSession uiSession, JsonRequest jsonReq) throws IOException {
     LOG.info("Unloading UI session with ID {} (requested by UI)", jsonReq.getUiSessionId());
     if (uiSession != null) {
       uiSession.uiSessionLock().lock();
@@ -284,6 +309,22 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
       }
     }
     writeJsonResponse(resp, m_jsonRequestHelper.createEmptyResponse()); // send empty response to satisfy clients expecting a valid response
+  }
+
+  protected void handleSyncResponseQueueRequest(HttpServletResponse resp, IUiSession uiSession, JsonRequest jsonReq) throws IOException {
+    LOG.info("Sync response queue for UI session {}", uiSession.getUiSessionId());
+    // Without lock we might miss the response of a running UI request that was started before going offline.
+    uiSession.uiSessionLock().lock();
+    try {
+      JSONObject response = uiSession.processSyncResponseQueueRequest(jsonReq);
+      if (response == null) {
+        response = m_jsonRequestHelper.createEmptyResponse();
+      }
+      writeJsonResponse(resp, response);
+    }
+    finally {
+      uiSession.uiSessionLock().unlock();
+    }
   }
 
   protected IUiSession createUiSession(HttpServletRequest req, HttpServletResponse resp, JsonRequest jsonReq) throws ServletException, IOException {
@@ -324,7 +365,7 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
     int idleSeconds = (int) ((System.currentTimeMillis() - uiSession.getLastAccessedTime()) / 1000L);
     int maxIdleSeconds = m_maxUserIdleTime;
     if (idleSeconds > maxIdleSeconds) {
-      handleMaxIdeTimeout(resp, jsonRequest, uiSession, idleSeconds, maxIdleSeconds);
+      handleMaxIdeTimeout(resp, uiSession, idleSeconds, maxIdleSeconds);
       return false;
     }
 

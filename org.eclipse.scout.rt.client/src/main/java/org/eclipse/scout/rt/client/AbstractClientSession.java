@@ -22,6 +22,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
 import javax.security.auth.Subject;
@@ -31,6 +32,7 @@ import org.eclipse.scout.rt.client.ClientConfigProperties.MemoryPolicyProperty;
 import org.eclipse.scout.rt.client.extension.ClientSessionChains.ClientSessionLoadSessionChain;
 import org.eclipse.scout.rt.client.extension.ClientSessionChains.ClientSessionStoreSessionChain;
 import org.eclipse.scout.rt.client.extension.IClientSessionExtension;
+import org.eclipse.scout.rt.client.job.filter.future.ModelJobFutureFilter;
 import org.eclipse.scout.rt.client.ui.DataChangeListener;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
@@ -84,7 +86,8 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
   // state
   private final Object m_stateLock;
   private volatile boolean m_active;
-  private volatile boolean m_isStopping;
+  private volatile boolean m_stopping;
+  private final Semaphore m_permitToStop = new Semaphore(1);
   private int m_exitCode = 0;
   // model
   private String m_id;
@@ -108,7 +111,6 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
     m_eventListeners = new EventListenerList();
     m_clientSessionData = new HashMap<String, Object>();
     m_stateLock = new Object();
-    m_isStopping = false;
     m_userAgent = UserAgent.get();
     m_subject = Subject.getSubject(AccessController.getContext());
     m_objectExtensions = new ObjectExtensions<AbstractClientSession, IClientSessionExtension<? extends AbstractClientSession>>(this);
@@ -118,7 +120,7 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
       m_sharedVariableMap = new SharedVariableMap();
     }
 
-    setLocale(NlsLocale.get()); // TODO [5.2] cgu: This is not every transparent. Change this please.
+    setLocale(NlsLocale.get());
 
     if (autoInitConfig) {
       interceptInitConfig();
@@ -186,7 +188,7 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
   @Override
   public final void setLocale(Locale locale) {
     propertySupport.setProperty(PROP_LOCALE, locale);
-    NlsLocale.set(locale); // TODO [5.2] cgu: This is not every transparent. Change this please.
+    NlsLocale.set(locale);
   }
 
   @Override
@@ -349,6 +351,7 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
 
   @Override
   public void start(String sessionId) {
+    Assertions.assertFalse(m_stopping, "Session cannot be started again");
     Assertions.assertNotNull(sessionId, "Session id must not be null");
     if (isActive()) {
       throw new IllegalStateException("session is active");
@@ -456,19 +459,32 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
 
   @Override
   public void stop(int exitCode) {
-    synchronized (m_stateLock) {
-      if (isStopping()) {
-        // we are already stopping. ignore event
-        return;
-      }
-      m_isStopping = true;
-    }
-
-    if (!m_desktop.doBeforeClosingInternal()) {
-      m_isStopping = false;
+    if (!m_permitToStop.tryAcquire()) {
+      // we are already stopping (or have been stopped)
       return;
     }
+
+    try {
+      if (!m_desktop.doBeforeClosingInternal()) {
+        m_permitToStop.release();
+        return;
+      }
+    }
+    catch (RuntimeException e) {
+      m_permitToStop.release();
+      throw e;
+    }
+
+    // --- Point of no return ---
+
+    m_stopping = true;
     m_exitCode = exitCode;
+    try {
+      fireSessionChangedEvent(new SessionEvent(this, SessionEvent.TYPE_STOPPING));
+    }
+    catch (Exception t) {
+      LOG.error("Failed to send STOPPING event.", t);
+    }
 
     try {
       interceptStoreSession();
@@ -497,9 +513,12 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
 
   protected void cancelRunningJobs() {
     // Filter matches all running jobs that have the same client session associated, except the current thread
+    // and model jobs. Because the current thread is (or should be) a model job, we cannot wait for other
+    // model threads. They are always cancelled.
     IFilter<IFuture<?>> runningJobsFilter = Jobs.newFutureFilterBuilder()
         .andMatch(new SessionFutureFilter(ISession.CURRENT.get()))
         .andMatchNotFuture(IFuture.CURRENT.get())
+        .andMatchNot(ModelJobFutureFilter.INSTANCE)
         .toFilter();
 
     // Wait for running jobs to complete before we cancel them
@@ -519,11 +538,22 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
     // Cancel remaining jobs and write a warning to the logger
     Set<IFuture<?>> runningFutures = Jobs.getJobManager().getFutures(runningJobsFilter);
     if (!runningFutures.isEmpty()) {
-      LOG.warn("Some running client jobs found while stopping the client session; sent a cancellation request to release associated worker threads. "
-          + "[session={}, user={}, jobs={}]", AbstractClientSession.this, getUserId(), runningFutures);
-
+      LOG.warn("Some running client jobs found while stopping the client session; sent a cancellation request to release associated worker threads. [session={}, user={}, jobs={}]", AbstractClientSession.this, getUserId(), runningFutures);
       Jobs.getJobManager().cancel(Jobs.newFutureFilterBuilder()
           .andMatchFuture(runningFutures)
+          .toFilter(), true);
+    }
+
+    // Now cancel all other model jobs. Because the current thread is a model job, they can never run anyway.
+    Set<IFuture<?>> runningModelJobs = Jobs.getJobManager().getFutures(Jobs.newFutureFilterBuilder()
+        .andMatch(new SessionFutureFilter(ISession.CURRENT.get()))
+        .andMatchNotFuture(IFuture.CURRENT.get())
+        .andMatch(ModelJobFutureFilter.INSTANCE)
+        .toFilter());
+    if (!runningModelJobs.isEmpty()) {
+      LOG.info("Cancel running model jobs because the client session was shut down. [session={}, user={}, jobs={}]", AbstractClientSession.this, getUserId(), runningModelJobs);
+      Jobs.getJobManager().cancel(Jobs.newFutureFilterBuilder()
+          .andMatchFuture(runningModelJobs)
           .toFilter(), true);
     }
   }
@@ -544,7 +574,7 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
 
   @Override
   public boolean isStopping() {
-    return m_isStopping;
+    return m_stopping;
   }
 
   @Override

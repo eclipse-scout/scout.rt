@@ -22,9 +22,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.context.CorrelationId;
 import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
+import org.eclipse.scout.rt.server.commons.context.ServletRunContext;
 import org.eclipse.scout.rt.server.commons.context.ServletRunContexts;
 import org.eclipse.scout.rt.ui.html.json.JsonMessageRequestHandler;
 import org.eclipse.scout.rt.ui.html.res.ResourceRequestHandler;
@@ -63,19 +65,25 @@ public class UiServlet extends HttpServlet {
     return new P_RequestHandlerPost();
   }
 
+  protected ServletRunContext createServletRunContext(final HttpServletRequest req, final HttpServletResponse resp) {
+    final String cid = req.getHeader(CorrelationId.HTTP_HEADER_NAME);
+
+    return ServletRunContexts.copyCurrent()
+        .withServletRequest(req)
+        .withServletResponse(resp)
+        .withLocale(getPreferredLocale(req))
+        .withCorrelationId(cid != null ? cid : BEANS.get(CorrelationId.class).newCorrelationId());
+  }
+
   @Override
   protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
     try {
-      ServletRunContexts.copyCurrent()
-          .withServletRequest(req)
-          .withServletResponse(resp)
-          .withLocale(getPreferredLocale(req))
-          .run(new IRunnable() {
-            @Override
-            public void run() throws Exception {
-              m_requestHandlerGet.handleRequest(req, resp);
-            }
-          }, DefaultExceptionTranslator.class);
+      createServletRunContext(req, resp).run(new IRunnable() {
+        @Override
+        public void run() throws Exception {
+          m_requestHandlerGet.handleRequest(req, resp);
+        }
+      }, DefaultExceptionTranslator.class);
     }
     catch (Exception e) {
       LOG.error("Failed to process HTTP-GET request from UI", e);
@@ -86,16 +94,12 @@ public class UiServlet extends HttpServlet {
   @Override
   protected void doPost(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
     try {
-      ServletRunContexts.copyCurrent()
-          .withServletRequest(req)
-          .withServletResponse(resp)
-          .withLocale(getPreferredLocale(req))
-          .run(new IRunnable() {
-            @Override
-            public void run() throws Exception {
-              m_requestHandlerPost.handleRequest(req, resp);
-            }
-          }, DefaultExceptionTranslator.class);
+      createServletRunContext(req, resp).run(new IRunnable() {
+        @Override
+        public void run() throws Exception {
+          m_requestHandlerPost.handleRequest(req, resp);
+        }
+      }, DefaultExceptionTranslator.class);
     }
     catch (Exception e) {
       LOG.error("Failed to process HTTP-POST request from UI", e);
@@ -116,7 +120,7 @@ public class UiServlet extends HttpServlet {
   /**
    * Template pattern.
    */
-  protected abstract class P_AbstractRequestHandler implements Serializable {
+  protected static abstract class P_AbstractRequestHandler implements Serializable {
     private static final long serialVersionUID = 1L;
 
     protected P_AbstractRequestHandler() {
@@ -152,7 +156,7 @@ public class UiServlet extends HttpServlet {
     protected abstract boolean delegateRequest(IUiServletRequestHandler handler, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException;
   }
 
-  protected class P_RequestHandlerGet extends P_AbstractRequestHandler {
+  protected static class P_RequestHandlerGet extends P_AbstractRequestHandler {
     private static final long serialVersionUID = 1L;
 
     protected P_RequestHandlerGet() {
@@ -162,7 +166,7 @@ public class UiServlet extends HttpServlet {
     protected void handleRequest(HttpServletRequest req, HttpServletResponse resp) throws IOException {
       // The servlet is registered at '/'. To make relative URLs work, we need to make sure the request URL has a trailing '/'.
       // It is not possible to just check for an empty pathInfo because the container returns "/" even if the user has not entered a '/' at the end.
-      String contextPath = getServletContext().getContextPath();
+      String contextPath = req.getServletContext().getContextPath();
       if (StringUtility.hasText(contextPath) && req.getRequestURI().endsWith(contextPath)) {
         resp.sendRedirect(req.getRequestURI() + "/");
         return;
@@ -175,11 +179,11 @@ public class UiServlet extends HttpServlet {
 
     @Override
     protected boolean delegateRequest(IUiServletRequestHandler handler, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-      return handler.handleGet(UiServlet.this, req, resp);
+      return handler.handleGet(req, resp);
     }
   }
 
-  protected class P_RequestHandlerPost extends P_AbstractRequestHandler {
+  protected static class P_RequestHandlerPost extends P_AbstractRequestHandler {
     private static final long serialVersionUID = 1L;
 
     protected P_RequestHandlerPost() {
@@ -187,7 +191,7 @@ public class UiServlet extends HttpServlet {
 
     @Override
     protected boolean delegateRequest(IUiServletRequestHandler handler, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-      return handler.handlePost(UiServlet.this, req, resp);
+      return handler.handlePost(req, resp);
     }
   }
 }

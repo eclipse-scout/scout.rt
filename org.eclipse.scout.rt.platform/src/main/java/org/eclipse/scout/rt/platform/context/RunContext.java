@@ -56,6 +56,7 @@ public class RunContext implements IAdaptable {
   protected Subject m_subject;
   protected Locale m_locale;
   protected PropertyMap m_propertyMap = new PropertyMap();
+  protected String m_correlationId;
   protected Deque<String> m_identifiers = new LinkedList<>();
 
   /**
@@ -154,9 +155,11 @@ public class RunContext implements IAdaptable {
    */
   protected <RESULT> void interceptCallableChain(final CallableChain<RESULT> callableChain) {
     callableChain
+        .add(new ThreadLocalProcessor<>(CorrelationId.CURRENT, m_correlationId))
         .add(new ThreadLocalProcessor<>(RunMonitor.CURRENT, Assertions.assertNotNull(m_runMonitor)))
         .add(new SubjectProcessor<RESULT>(m_subject))
         .add(new DiagnosticContextValueProcessor(BEANS.get(PrinicpalContextValueProvider.class)))
+        .add(new DiagnosticContextValueProcessor(BEANS.get(CorrelationIdContextValueProvider.class)))
         .add(new ThreadLocalProcessor<>(NlsLocale.CURRENT, m_locale))
         .add(new ThreadLocalProcessor<>(PropertyMap.CURRENT, m_propertyMap))
         .add(new ThreadLocalProcessor<>(RunContextIdentifiers.CURRENT, m_identifiers));
@@ -225,6 +228,21 @@ public class RunContext implements IAdaptable {
    */
   public RunContext withLocale(final Locale locale) {
     m_locale = locale;
+    return this;
+  }
+
+  /**
+   * @see #withCorrelationId(String)
+   */
+  public String getCorrelationId() {
+    return m_correlationId;
+  }
+
+  /**
+   * Associates this context with the given <em>correlation ID</em>.
+   */
+  public RunContext withCorrelationId(final String correlationId) {
+    m_correlationId = correlationId;
     return this;
   }
 
@@ -317,6 +335,7 @@ public class RunContext implements IAdaptable {
     builder.ref("runMonitor", getRunMonitor());
     builder.ref("subject", getSubject());
     builder.attr("locale", getLocale());
+    builder.attr("cid", getCorrelationId());
     builder.attr("identifiers", CollectionUtility.format(getIdentifiers()));
     return builder.toString();
   }
@@ -328,6 +347,7 @@ public class RunContext implements IAdaptable {
     m_runMonitor = origin.m_runMonitor;
     m_subject = origin.m_subject;
     m_locale = origin.m_locale;
+    m_correlationId = origin.m_correlationId;
     m_propertyMap = new PropertyMap(origin.m_propertyMap);
     m_identifiers = new LinkedList<>(origin.m_identifiers);
   }
@@ -344,6 +364,7 @@ public class RunContext implements IAdaptable {
   protected void fillCurrentValues() {
     m_subject = Subject.getSubject(AccessController.getContext());
     m_locale = NlsLocale.CURRENT.get();
+    m_correlationId = CorrelationId.CURRENT.get();
     m_propertyMap = new PropertyMap(PropertyMap.CURRENT.get());
 
     // RunMonitor
@@ -370,6 +391,7 @@ public class RunContext implements IAdaptable {
   protected void fillEmptyValues() {
     m_subject = null;
     m_locale = null;
+    m_correlationId = null;
     m_runMonitor = BEANS.get(RunMonitor.class);
     m_propertyMap = new PropertyMap();
     m_identifiers = new LinkedList<>();

@@ -113,8 +113,7 @@ public class ClientUIPreferences {
     if (!StringUtility.isNullOrEmpty(value)) {
       try {
         StringTokenizer tok = new StringTokenizer(value, ",");
-        Rectangle r = new Rectangle(new Integer(tok.nextToken()).intValue(), new Integer(tok.nextToken()).intValue(), new Integer(tok.nextToken()).intValue(), new Integer(tok.nextToken()).intValue());
-        return r;
+        return new Rectangle(Integer.parseInt(tok.nextToken()), Integer.parseInt(tok.nextToken()), Integer.parseInt(tok.nextToken()), Integer.parseInt(tok.nextToken()));
       }
       catch (Exception e) {
         LOG.warn("could not get form bounds for [{}]. Loaded value '{}'", form.getClass().getName(), value, e);

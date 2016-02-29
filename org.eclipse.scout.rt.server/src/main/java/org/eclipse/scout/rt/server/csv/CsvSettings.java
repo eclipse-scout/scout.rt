@@ -35,9 +35,6 @@ public class CsvSettings implements Serializable {
   private boolean m_writeColumnTypes;
   private boolean m_allowVariableColumnCount;
 
-  public CsvSettings() {
-  }
-
   public File getFile() {
     return m_file;
   }

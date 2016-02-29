@@ -105,7 +105,7 @@ public class JobManager implements IJobManager {
     Assertions.assertFalse(isShutdown(), "{} not available because the platform has been shut down.", getClass().getSimpleName());
 
     // Create the Future to be given to the ExecutorService.
-    final JobFutureTask<RESULT> futureTask = registerFuture(createJobFutureTask(callable, input));
+    final JobFutureTask<RESULT> futureTask = createJobFutureTask(callable, input);
     try {
       futureTask.changeState(JobState.SCHEDULED);
 
@@ -368,12 +368,11 @@ public class JobManager implements IJobManager {
    *           if the job manager is shut donw.
    */
   @Internal
-  protected <RESULT> JobFutureTask<RESULT> registerFuture(final JobFutureTask<RESULT> future) {
+  protected void registerFuture(final JobFutureTask<?> future) {
     m_shutdownLock.readLock().lock();
     try {
       Assertions.assertFalse(isShutdown(), "{} not available because the platform has been shut down.", getClass().getSimpleName());
       m_futures.add(future);
-      return future;
     }
     finally {
       m_shutdownLock.readLock().unlock();

@@ -102,6 +102,12 @@ public interface IUiSession {
   HttpServletResponse currentHttpResponse();
 
   /**
+   * Used to confirm that the UI has successfully processed the given response sequence number. All responses that have
+   * a sequence number <code>&lt;= sequenceNo</code> are removed from the response history.
+   */
+  void confirmResponseProcessed(Long sequenceNo);
+
+  /**
    * @return a JSON object to send back to the client or <code>null</code> if an empty response shall be sent.
    */
   JSONObject processJsonRequest(HttpServletRequest req, HttpServletResponse resp, JsonRequest jsonReq);
@@ -121,6 +127,8 @@ public interface IUiSession {
       List<BinaryResource> uploadResources, Map<String, String> uploadProperties);
 
   void processCancelRequest();
+
+  JSONObject processSyncResponseQueueRequest(JsonRequest jsonRequest);
 
   /**
    * Called from the model after the client session has been stopped.
@@ -173,7 +181,7 @@ public interface IUiSession {
   /**
    * Blocks the current thread/request until a model job started by a background job has terminated.
    */
-  void waitForBackgroundJobs(int pollWaitSeconds);
+  void waitForBackgroundJobs(int pollWaitSeconds) throws InterruptedException;
 
   /**
    * Sends a "localeChanged" event to the UI. All locale-relevant data (number formats, texts map etc.) is sent along.

@@ -69,6 +69,12 @@ public class JmsRunContext extends RunContext {
   }
 
   @Override
+  public JmsRunContext withCorrelationId(final String correlationId) {
+    super.withCorrelationId(correlationId);
+    return this;
+  }
+
+  @Override
   public JmsRunContext withProperty(final Object key, final Object value) {
     super.withProperty(key, value);
     return this;

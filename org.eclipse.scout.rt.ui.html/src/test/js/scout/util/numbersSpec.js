@@ -224,4 +224,31 @@ describe("scout.numbers", function() {
 
   });
 
+  describe("randomId", function() {
+
+    it ("can generate random IDs", function() {
+      expect(typeof scout.numbers.randomId()).toBe('string');
+      expect(scout.numbers.randomId().length).toBe(8);
+      expect(scout.numbers.randomId(0).length).toBe(8);
+      expect(scout.numbers.randomId(1).length).toBe(1);
+      expect(scout.numbers.randomId(27).length).toBe(27);
+      expect(scout.numbers.randomId()).not.toBe(scout.numbers.randomId());
+    });
+
+  });
+
+  describe("correlationId", function() {
+
+    it ("can generate random correlation IDs", function() {
+      scout.numbers._correlationCounter = 4865;
+      expect(typeof scout.numbers.correlationId()).toBe('string');
+      expect(scout.numbers.correlationId().length).toBe(11 + 5);
+      expect(scout.numbers.correlationId(0).length).toBe(11 + 5);
+      expect(scout.numbers.correlationId(1).length).toBe(1 + 5);
+      expect(scout.numbers.correlationId(27).length).toBe(27 + 5);
+      expect(scout.numbers.correlationId()).toMatch(/^([a-zA-Z]{2}[0-9]){3}[a-zA-Z]{2}\/4870$/);
+    });
+
+  });
+
 });

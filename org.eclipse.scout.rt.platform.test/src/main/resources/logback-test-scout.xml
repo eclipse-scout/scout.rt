@@ -15,7 +15,7 @@
 
   <!-- This file is included in all scout test logback configurations -->
 
-  <variable scope="context" name="mdcPattern" value="principal=%X{subject.principal.name}, jobName=%X{scout.job.name}" />
+  <variable scope="context" name="mdcPattern" value="principal=%X{subject.principal.name}, jobName=%X{scout.job.name}, cid=%X{scout.correlation.id}" />
   <variable scope="context" name="mdcPatternWithoutEmptyValues" value="%replace(${mdcPattern}){'(, )?\\w+=((?=\\1)|, |$)', ''}" />
   <variable scope="context" name="logPattern" value="%date{ISO8601} %-5level [%thread] %logger - %msg - MDC[${mdcPatternWithoutEmptyValues}]%n%ex" />
 

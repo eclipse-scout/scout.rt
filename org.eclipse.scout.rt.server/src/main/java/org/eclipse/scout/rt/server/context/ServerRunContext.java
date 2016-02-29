@@ -105,6 +105,12 @@ public class ServerRunContext extends RunContext {
   }
 
   @Override
+  public ServerRunContext withCorrelationId(final String correlationId) {
+    super.withCorrelationId(correlationId);
+    return this;
+  }
+
+  @Override
   public ServerRunContext withProperty(final Object key, final Object value) {
     super.withProperty(key, value);
     return this;

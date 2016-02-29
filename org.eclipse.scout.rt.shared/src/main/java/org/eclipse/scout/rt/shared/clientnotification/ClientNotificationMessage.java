@@ -12,17 +12,21 @@ package org.eclipse.scout.rt.shared.clientnotification;
 
 import java.io.Serializable;
 
+import org.eclipse.scout.rt.platform.util.ToStringBuilder;
+
 public class ClientNotificationMessage implements Serializable {
   private static final long serialVersionUID = 1L;
 
   private final ClientNotificationAddress m_address;
   private final Serializable m_notification;
   private final boolean m_distributeOverCluster;
+  private final String m_correlationId;
 
-  public ClientNotificationMessage(ClientNotificationAddress address, Serializable notification, boolean distributeOverCluster) {
+  public ClientNotificationMessage(final ClientNotificationAddress address, final Serializable notification, final boolean distributeOverCluster, final String correlationId) {
     m_address = address;
     m_notification = notification;
     m_distributeOverCluster = distributeOverCluster;
+    m_correlationId = correlationId;
   }
 
   public ClientNotificationAddress getAddress() {
@@ -37,11 +41,16 @@ public class ClientNotificationMessage implements Serializable {
     return m_notification;
   }
 
+  public String getCorrelationId() {
+    return m_correlationId;
+  }
+
   @Override
   public String toString() {
-    StringBuilder builder = new StringBuilder();
-    builder.append("Adress={").append(getAddress()).append("}").append(", ");
-    builder.append("notification=").append(getNotification());
+    final ToStringBuilder builder = new ToStringBuilder(this);
+    builder.attr("address", getAddress());
+    builder.attr("notification", getNotification());
+    builder.attr("cid", getCorrelationId());
     return builder.toString();
   }
 }

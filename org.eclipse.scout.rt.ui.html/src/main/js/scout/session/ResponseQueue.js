@@ -11,6 +11,7 @@
 scout.ResponseQueue = function(session) {
   this.session = session;
   this.queue = [];
+  this.lastProcessedSequenceNo = 0;
   this.nextExpectedSequenceNo = 1;
 
   this.force = false;
@@ -21,6 +22,17 @@ scout.ResponseQueue.FORCE_TIMEOUT = 10 * 1000; // in ms
 
 scout.ResponseQueue.prototype.add = function(response) {
   var sequenceNo = response && response['#'];
+
+  // Ignore responses that were already processed (duplicate detection)
+  if (sequenceNo && sequenceNo <= this.lastProcessedSequenceNo) {
+    return;
+  }
+
+  // "Fast-forward" the expected sequence no. when a combined response is received
+  if (response.combined) {
+    this.nextExpectedSequenceNo = Math.max(sequenceNo, this.nextExpectedSequenceNo);
+  }
+
   if (!sequenceNo || this.queue.length === 0) { // Handle messages without sequenceNo in the order they were received
     this.queue.push(response);
   } else {
@@ -49,7 +61,7 @@ scout.ResponseQueue.prototype.process = function(response) {
   }
 
   // Process the queue in ascending order
-  var responseSuccess = null;
+  var responseSuccess = true;
   var missingResponse = false;
   var nonProcessedResponses = [];
   for (var i = 0; i < this.queue.length; i++) {
@@ -58,7 +70,7 @@ scout.ResponseQueue.prototype.process = function(response) {
 
     // For elements with a sequence number, check if they are in the expected order
     if (sequenceNo) {
-      if (!this.force && !missingResponse) {
+      if (this.nextExpectedSequenceNo && !this.force && !missingResponse) {
         missingResponse = (this.nextExpectedSequenceNo !== sequenceNo);
       }
       if (missingResponse) {
@@ -77,6 +89,7 @@ scout.ResponseQueue.prototype.process = function(response) {
 
     // Update the expected next sequenceNo
     if (sequenceNo) {
+      this.lastProcessedSequenceNo = sequenceNo;
       this.nextExpectedSequenceNo = sequenceNo + 1;
     }
   }
@@ -125,4 +138,8 @@ scout.ResponseQueue.prototype._checkTimeout = function() {
       }
     }.bind(this), scout.ResponseQueue.FORCE_TIMEOUT);
   }
+};
+
+scout.ResponseQueue.prototype.prepareRequest = function(request) {
+  request['#ACK'] = this.lastProcessedSequenceNo;
 };

@@ -27,11 +27,13 @@ import javax.servlet.http.HttpSessionBindingListener;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.annotations.Internal;
+import org.eclipse.scout.rt.platform.context.CorrelationId;
 import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.server.admin.html.AdminSession;
 import org.eclipse.scout.rt.server.clientnotification.ClientNotificationCollector;
 import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
+import org.eclipse.scout.rt.server.commons.context.ServletRunContext;
 import org.eclipse.scout.rt.server.commons.context.ServletRunContexts;
 import org.eclipse.scout.rt.server.commons.servlet.IHttpServletRoundtrip;
 import org.eclipse.scout.rt.server.commons.servlet.ServletExceptionTranslator;
@@ -60,6 +62,16 @@ public class ServiceTunnelServlet extends HttpServlet {
 
   private transient IServiceTunnelContentHandler m_contentHandler;
 
+  protected ServletRunContext createServletRunContext(final HttpServletRequest req, final HttpServletResponse resp) {
+    final String cid = req.getHeader(CorrelationId.HTTP_HEADER_NAME);
+
+    return ServletRunContexts.copyCurrent()
+        .withServletRequest(req)
+        .withServletResponse(resp)
+        .withLocale(Locale.getDefault())
+        .withCorrelationId(cid != null ? cid : BEANS.get(CorrelationId.class).newCorrelationId());
+  }
+
   // === HTTP-GET ===
 
   @Override
@@ -71,21 +83,16 @@ public class ServiceTunnelServlet extends HttpServlet {
 
     lazyInit(servletRequest, servletResponse);
 
-    ServletRunContexts.copyCurrent()
-        .withLocale(Locale.getDefault())
-        .withServletRequest(servletRequest)
-        .withServletResponse(servletResponse)
-        .run(new IRunnable() {
+    createServletRunContext(servletRequest, servletResponse).run(new IRunnable() {
+      @Override
+      public void run() throws Exception {
+        ServerRunContext serverRunContext = ServerRunContexts.copyCurrent();
+        serverRunContext.withUserAgent(UserAgent.createDefault());
+        serverRunContext.withSession(lookupServerSessionOnHttpSession(null, serverRunContext));
 
-          @Override
-          public void run() throws Exception {
-            ServerRunContext serverRunContext = ServerRunContexts.copyCurrent();
-            serverRunContext.withUserAgent(UserAgent.createDefault());
-            serverRunContext.withSession(lookupServerSessionOnHttpSession(null, serverRunContext));
-
-            invokeAdminService(serverRunContext);
-          }
-        }, ServletExceptionTranslator.class);
+        invokeAdminService(serverRunContext);
+      }
+    }, ServletExceptionTranslator.class);
   }
 
   // === HTTP-POST ===
@@ -100,19 +107,15 @@ public class ServiceTunnelServlet extends HttpServlet {
     lazyInit(servletRequest, servletResponse);
 
     try {
-      ServletRunContexts.copyCurrent()
-          .withServletRequest(servletRequest)
-          .withServletResponse(servletResponse)
-          .run(new IRunnable() {
+      createServletRunContext(servletRequest, servletResponse).run(new IRunnable() {
+        @Override
+        public void run() throws Exception {
+          ServiceTunnelRequest serviceRequest = deserializeServiceRequest();
+          ServiceTunnelResponse serviceResponse = doPost(serviceRequest);
+          serializeServiceResponse(serviceResponse);
+        }
 
-            @Override
-            public void run() throws Exception {
-              ServiceTunnelRequest serviceRequest = deserializeServiceRequest();
-              ServiceTunnelResponse serviceResponse = doPost(serviceRequest);
-              serializeServiceResponse(serviceResponse);
-            }
-
-          }, DefaultExceptionTranslator.class);
+      }, DefaultExceptionTranslator.class);
     }
     catch (Exception e) {
       if (isConnectionError(e)) {
@@ -135,8 +138,7 @@ public class ServiceTunnelServlet extends HttpServlet {
         .withClientNodeId(serviceRequest.getClientNodeId());
 
     if (serviceRequest.getSessionId() != null) {
-      serverRunContext
-          .withSession(lookupServerSessionOnHttpSession(serviceRequest.getSessionId(), serverRunContext));
+      serverRunContext.withSession(lookupServerSessionOnHttpSession(serviceRequest.getSessionId(), serverRunContext));
     }
 
     final IRegistrationHandle registrationHandle = registerForCancellation(serverRunContext, serviceRequest);
@@ -151,7 +153,7 @@ public class ServiceTunnelServlet extends HttpServlet {
     }
   }
 
-  private IRegistrationHandle registerForCancellation(ServerRunContext runContext, ServiceTunnelRequest req) {
+  protected IRegistrationHandle registerForCancellation(ServerRunContext runContext, ServiceTunnelRequest req) {
     String sessionId = runContext.getSession() != null ? runContext.getSession().getId() : null;
     return BEANS.get(RunMonitorCancelRegistry.class).register(runContext.getRunMonitor(), sessionId, req.getRequestSequence());
   }

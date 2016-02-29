@@ -127,6 +127,9 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
     m_singleExecution = computeSingleExecuting(m_trigger, m_firstFireTime);
     m_delayedExecution = (input.getExecutionTrigger() == null ? false : computeDelayedExecuting(m_firstFireTime, m_input.getExecutionTrigger().getNow()));
 
+    // register this instance with the JobManager before it is registered with the RunMonitor, so that already cancelled RunMonitors are handled correctly.
+    m_jobManager.registerFuture(this);
+
     // Register to also cancel this Future once the RunMonitor is cancelled (even if the job is not executed yet).
     m_runMonitor.registerCancellable(this);
   }

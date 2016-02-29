@@ -230,12 +230,22 @@ scout.scrollbars = {
    */
   scrollTo: function($scrollable, $element) {
     var scrollTo,
+      scrollOffsetUp = 4,
+      scrollOffsetDown = 8,
       scrollableH = $scrollable.height(),
       elementBounds = scout.graphics.offsetBounds($element, false, false),
       scrollableBounds = scout.graphics.offsetBounds($scrollable, false, false),
-      elementTop = elementBounds.y - scrollableBounds.y,
-      elementH = elementBounds.height,
+      elementTop = elementBounds.y - scrollableBounds.y - scrollOffsetUp,
+      elementH = elementBounds.height + scrollOffsetDown,
       scrollbars;
+
+    //There are some elements which has a hight of 0 (Checkboxes / Radiobuttons) -> try to get field and figure out its height and offset
+    if (elementH === scrollOffsetDown && $element.data('valuefield') && $element.data('valuefield').$container) {
+      $element = $element.data('valuefield').$container;
+      elementBounds = scout.graphics.offsetBounds($element, false, false);
+      elementTop = elementBounds.y - scrollableBounds.y - scrollOffsetUp;
+      elementH = elementBounds.height + scrollOffsetDown;
+    }
 
     if (elementTop < 0) {
       scout.scrollbars.scrollTop($scrollable, $scrollable.scrollTop() + elementTop);

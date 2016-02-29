@@ -86,7 +86,7 @@ public final class JsonObjectUtility {
       Object newValue = source.opt(prop);
       Object oldValue = target.opt(prop);
       if (newValue instanceof JSONObject && oldValue instanceof JSONObject) {
-        // Merge recusively
+        // Merge recursively
         mergeProperties((JSONObject) oldValue, (JSONObject) newValue);
       }
       else {

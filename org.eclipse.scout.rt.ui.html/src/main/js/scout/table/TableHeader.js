@@ -142,7 +142,8 @@ scout.TableHeader.prototype._renderColumn = function(column, index) {
     if (column.fixedWidth || !this.enabled) {
       $separator.setEnabled(false);
     } else {
-      $separator.on('mousedown', '', this._onSeparatorMousedown.bind(this));
+      $separator.on('mousedown', '', this._onSeparatorMousedown.bind(this)).
+      on('dblclick', this._onSeparatorDblclick.bind(this));
     }
     column.$separator = $separator;
   }
@@ -278,7 +279,6 @@ scout.TableHeader.prototype.closeTableHeaderMenu = function() {
   this._tableHeaderMenu.remove();
   this._tableHeaderMenu = null;
 };
-
 
 scout.TableHeader.prototype.onColumnActionsChanged = function(event) {
   if (this._tableHeaderMenu) {
@@ -643,6 +643,12 @@ scout.TableHeader.prototype._onHeaderItemMousedown = function(event) {
     $header.removeClass('moving');
     that.$container.removeClass('moving');
   }
+};
+
+scout.TableHeader.prototype._onSeparatorDblclick = function(event) {
+  var $header = $(event.target).prev(),
+    column = $header.data('column');
+  this.table.resizeToFit(column);
 };
 
 scout.TableHeader.prototype._onSeparatorMousedown = function(event) {

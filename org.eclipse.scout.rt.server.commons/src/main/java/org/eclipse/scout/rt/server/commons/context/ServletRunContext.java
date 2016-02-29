@@ -79,6 +79,12 @@ public class ServletRunContext extends RunContext {
   }
 
   @Override
+  public ServletRunContext withCorrelationId(final String correlationId) {
+    super.withCorrelationId(correlationId);
+    return this;
+  }
+
+  @Override
   public ServletRunContext withProperty(final Object key, final Object value) {
     super.withProperty(key, value);
     return this;

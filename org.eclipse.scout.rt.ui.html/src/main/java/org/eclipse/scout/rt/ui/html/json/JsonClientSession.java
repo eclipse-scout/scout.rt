@@ -77,15 +77,15 @@ public class JsonClientSession<CLIENT_SESSION extends IClientSession> extends Ab
 
   protected void handleModelSessionEvent(SessionEvent event) {
     switch (event.getType()) {
-      case SessionEvent.TYPE_STOPPED:
-        handleModelSessionStopped();
+      case SessionEvent.TYPE_STOPPING:
+        handleModelSessionStopping();
         break;
       default:
         // NOP
     }
   }
 
-  protected void handleModelSessionStopped() {
+  protected void handleModelSessionStopping() {
     getUiSession().logout();
   }
 

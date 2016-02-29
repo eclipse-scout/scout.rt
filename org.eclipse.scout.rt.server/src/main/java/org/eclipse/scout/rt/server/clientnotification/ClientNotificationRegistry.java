@@ -25,6 +25,7 @@ import java.util.concurrent.TimeUnit;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
+import org.eclipse.scout.rt.platform.context.CorrelationId;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.server.services.common.clustersync.IClusterSynchronizationService;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
@@ -235,7 +236,7 @@ public class ClientNotificationRegistry {
   }
 
   public void publish(ClientNotificationAddress address, Serializable notification, boolean distributeOverCluster) {
-    publish(Collections.singleton(new ClientNotificationMessage(address, notification, distributeOverCluster)));
+    publish(Collections.singleton(new ClientNotificationMessage(address, notification, distributeOverCluster, CorrelationId.CURRENT.get())));
   }
 
   public void publish(Collection<? extends ClientNotificationMessage> messages) {
@@ -380,7 +381,7 @@ public class ClientNotificationRegistry {
   }
 
   public void putTransactional(ClientNotificationAddress address, Serializable notification, boolean distributeOverCluster) {
-    putTransactional(new ClientNotificationMessage(address, notification, distributeOverCluster));
+    putTransactional(new ClientNotificationMessage(address, notification, distributeOverCluster, CorrelationId.CURRENT.get()));
   }
 
   public void putTransactional(ClientNotificationMessage message) {

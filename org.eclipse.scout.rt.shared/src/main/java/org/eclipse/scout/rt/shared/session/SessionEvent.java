@@ -23,6 +23,7 @@ public class SessionEvent extends EventObject {
   private static final long serialVersionUID = 1L;
 
   public static final int TYPE_STARTED = 100;
+  public static final int TYPE_STOPPING = 105;
   public static final int TYPE_STOPPED = 110;
 
   private final int m_type;

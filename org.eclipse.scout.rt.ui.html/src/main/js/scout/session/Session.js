@@ -51,7 +51,7 @@ scout.Session = function($entryPoint, options) {
 
   // Set members
   this.$entryPoint = $entryPoint;
-  this.uiSessionId; // assigned by server on session init (OWASP recommandation, see https://www.owasp.org/index.php/Cross-Site_Request_Forgery_%28CSRF%29_Prevention_Cheat_Sheet#General_Recommendation:_Synchronizer_Token_Pattern).
+  this.uiSessionId; // assigned by server on session init (OWASP recommendation, see https://www.owasp.org/index.php/Cross-Site_Request_Forgery_%28CSRF%29_Prevention_Cheat_Sheet#General_Recommendation:_Synchronizer_Token_Pattern).
   this.partId = scout.nvl(options.portletPartId, 0);
   this.clientSessionId = clientSessionId;
   this.userAgent = options.userAgent || new scout.UserAgent(scout.device.type);
@@ -59,9 +59,13 @@ scout.Session = function($entryPoint, options) {
   this.modelAdapterRegistry = {};
   this._clonedModelAdapterRegistry = {}; // key = adapter-ID, value = array of clones for that adapter
   this.locale;
+  this.ajaxRequests = [];
   this._asyncEvents = [];
   this.responseQueue = new scout.ResponseQueue(this);
   this._deferred;
+  this.requestTimeoutCancel = 5000; // ms
+  this.requestTimeoutPoll = 75000; // ms
+  this.requestTimeoutPing = 5000; // ms
   this.ready = false; // true after desktop has been completely rendered
   this.unloaded = false; // true after unload event has been received from the window
   this.desktop;
@@ -237,6 +241,7 @@ scout.Session.prototype._sendStartupRequest = function() {
   }
 
   function onAjaxFail(jqXHR, textStatus, errorThrown) {
+    this._setApplicationLoading(false);
     this._processErrorResponse(jqXHR, textStatus, errorThrown, request);
   }
 };
@@ -274,6 +279,11 @@ scout.Session.prototype._processStartupResponse = function(data) {
 
   // Assign server generated uiSessionId. It must be sent along with all further requests.
   this.uiSessionId = data.startupData.uiSessionId;
+
+  // Destroy UI session on server when page is closed or reloaded
+  $(window)
+    .on('beforeunload.' + this.uiSessionId, this._onWindowBeforeUnload.bind(this))
+    .on('unload.' + this.uiSessionId, this._onWindowUnload.bind(this));
 
   // Special case: Page must be reloaded on startup (e.g. theme changed)
   if (data.startupData.reloadPage) {
@@ -314,11 +324,6 @@ scout.Session.prototype._processStartupResponse = function(data) {
     // Start poller
     this._resumeBackgroundJobPolling();
 
-    // Destroy UI session on server when page is closed or reloaded
-    $(window)
-      .on('beforeunload.' + this.uiSessionId, this._onWindowBeforeUnload.bind(this))
-      .on('unload.' + this.uiSessionId, this._onWindowUnload.bind(this));
-
     this.ready = true;
     $.log.info('Session initialized. Detected ' + scout.device);
     if ($.log.isDebugEnabled()) {
@@ -353,6 +358,7 @@ scout.Session.prototype._sendNow = function() {
     uiSessionId: this.uiSessionId,
     events: this._asyncEvents
   };
+  this.responseQueue.prepareRequest(request);
   // Send request
   this._sendRequest(request);
   this._asyncEvents = [];
@@ -371,26 +377,8 @@ scout.Session.prototype._sendRequest = function(request) {
     return; // nothing to send
   }
 
-  if (this.offline && !request.unload) {
-    // No need to queue the request when document is unloading
-    // Note: Firefox is offline when page is unloaded
-
-    // Merge request with queued event
-    if (this._queuedRequest) {
-      if (this._queuedRequest.events) {
-        // 1 .Remove request events from queued events
-        request.events.forEach(function(event) {
-          this._queuedRequest.events = this._coalesceEvents(this._queuedRequest.events, event);
-        }.bind(this));
-        // 2. Add request events to end of queued events
-        this._queuedRequest.events = this._queuedRequest.events.concat(request.events);
-      } else {
-        this._queuedRequest.events = request.events;
-      }
-    } else {
-      this._queuedRequest = request;
-    }
-    this.layoutValidator.validate();
+  if (this.offline) {
+    this._handleSendWhenOffline(request);
     return;
   }
 
@@ -404,27 +392,96 @@ scout.Session.prototype._sendRequest = function(request) {
     // - http://stackoverflow.com/questions/15479103/can-beforeunload-unload-be-used-to-send-xmlhttprequests-reliably
     // - https://groups.google.com/a/chromium.org/forum/#!topic/blink-dev/7nKMdg_ALcc
     // - https://developer.mozilla.org/en-US/docs/Web/API/Navigator/sendBeacon
-    navigator.sendBeacon(this.url, JSON.stringify(request));
+    navigator.sendBeacon(this._decorateUrl(this.url, request), JSON.stringify(request));
     return;
   }
 
-  var ajaxOptions = this.defaultAjaxOptions(request, !request.unload);
-  var busyHandling = !request.unload;
+  var ajaxOptions = this.defaultAjaxOptions(request);
+
+  var busyHandling = true;
+  if (request.unload) {
+    ajaxOptions.async = false;
+    busyHandling = false;
+  }
   this._performUserAjaxRequest(ajaxOptions, busyHandling, request);
 };
 
-scout.Session.prototype.defaultAjaxOptions = function(request, async) {
+scout.Session.prototype._handleSendWhenOffline = function(request) {
+  // Note: Firefox is offline when page is unloaded
+
+  // No need to queue the request when request does not contain events (e.g. log request, unload request)
+  if (!request.events) {
+    return;
+  }
+
+  // Merge request with queued event
+  if (this._queuedRequest) {
+    if (this._queuedRequest.events) {
+      // 1. Remove request events from queued events
+      request.events.forEach(function(event) {
+        this._queuedRequest.events = this._coalesceEvents(this._queuedRequest.events, event);
+      }.bind(this));
+      // 2. Add request events to end of queued events
+      this._queuedRequest.events = this._queuedRequest.events.concat(request.events);
+    } else {
+      this._queuedRequest.events = request.events;
+    }
+  } else {
+    this._queuedRequest = request;
+  }
+  this.layoutValidator.validate();
+};
+
+
+scout.Session.prototype.defaultAjaxOptions = function(request) {
   request = request || {};
-  async = scout.nvl(async, true);
-  return {
-    async: async,
+  var url = this._decorateUrl(this.url, request);
+
+  var ajaxOptions = {
+    async: true,
     type: 'POST',
     dataType: 'json',
     contentType: 'application/json; charset=UTF-8',
     cache: false,
-    url: this.url,
+    url: url,
     data: JSON.stringify(request)
   };
+
+  // Ensure that certain request don't run forever. When a timeout occurs, the session
+  // is put into offline mode. Note that normal requests should NOT be limited, because
+  // the server processing might take very long (e.g. long running database query).
+  if (request.cancel) {
+    ajaxOptions.timeout = this.requestTimeoutCancel;
+  }
+  if (request.ping) {
+    ajaxOptions.timeout = this.requestTimeoutPing;
+  }
+  if (request.pollForBackgroundJobs) {
+    ajaxOptions.timeout = this.requestTimeoutPoll;
+  }
+  return ajaxOptions;
+};
+
+scout.Session.prototype._decorateUrl = function(url, request) {
+  var urlHint = null;
+  // Add dummy URL parameter as marker (for debugging purposes)
+  if (request.unload) {
+    urlHint = 'unload';
+  } else if (request.pollForBackgroundJobs) {
+    urlHint = 'poll';
+  } else if (request.ping) {
+    urlHint = 'ping';
+  } else if (request.cancel) {
+    urlHint = 'cancel';
+  } else if (request.log) {
+    urlHint = 'log';
+  } else if (request.syncResponseQueue) {
+    urlHint = 'sync';
+  }
+  if (urlHint) {
+    url = new scout.URL(url).addParameter(urlHint).toString();
+  }
+  return url;
 };
 
 scout.Session.prototype._performUserAjaxRequest = function(ajaxOptions, busyHandling, request) {
@@ -436,10 +493,11 @@ scout.Session.prototype._performUserAjaxRequest = function(ajaxOptions, busyHand
   var jsError = null,
     success = false;
 
-  $.ajax(ajaxOptions)
+  var xhr = $.ajax(ajaxOptions)
     .done(onAjaxDone.bind(this))
     .fail(onAjaxFail.bind(this))
     .always(onAjaxAlways.bind(this));
+  this.registerAjaxRequest(xhr);
 
   // ----- Helper methods -----
 
@@ -468,23 +526,48 @@ scout.Session.prototype._performUserAjaxRequest = function(ajaxOptions, busyHand
   }
 
   function onAjaxAlways(data, textStatus, errorThrown) {
+    this.unregisterAjaxRequest(xhr);
     this._requestsPendingCounter--;
     this.layoutValidator.validate();
+
+    // "success" is false when either
+    // a) an HTTP error occurred or
+    // b) a JSON response with the error flag set (UI processing error) was returned
     if (success) {
       this._resumeBackgroundJobPolling();
       this._fireRequestFinished(data);
+
+      // Send events that happened while begin offline
+      var queuedRequest = this._queuedRequest;
+      if (queuedRequest) {
+        this._queuedRequest = null;
+        this.responseQueue.prepareRequest(queuedRequest);
+        this._sendRequest(queuedRequest);
+      }
+
+      // If there already is a another request pending, send it now
+      // But only if it should not be sent delayed
+      if (!this._sendTimeoutId) {
+        this._sendNow();
+      }
     }
 
-    // If there already is a another request pending, send it now
-    // But only if it should not be sent delayed
-    if (!this._sendTimeoutId) {
-      this._sendNow();
-    }
-
-    // Throw previously catched error
+    // Throw previously caught error
     if (jsError) {
       throw jsError;
     }
+  }
+};
+
+scout.Session.prototype.registerAjaxRequest = function(xhr) {
+  if (xhr) {
+    this.ajaxRequests.push(xhr);
+  }
+};
+
+scout.Session.prototype.unregisterAjaxRequest = function(xhr) {
+  if (xhr) {
+    scout.arrays.remove(this.ajaxRequests, xhr);
   }
 };
 
@@ -517,16 +600,17 @@ scout.Session.prototype._pollForBackgroundJobs = function() {
     uiSessionId: this.uiSessionId,
     pollForBackgroundJobs: true
   };
+  this.responseQueue.prepareRequest(request);
 
   this._backgroundJobPollingSupport.setRunning();
 
   var ajaxOptions = this.defaultAjaxOptions(request);
-  // Add dummy parameter as marker (for debugging purposes)
-  ajaxOptions.url = new scout.URL(ajaxOptions.url).addParameter('poll').toString();
 
-  $.ajax(ajaxOptions)
+  var xhr = $.ajax(ajaxOptions)
     .done(onAjaxDone.bind(this))
-    .fail(onAjaxFail.bind(this));
+    .fail(onAjaxFail.bind(this))
+    .always(onAjaxAlways.bind(this));
+  this.registerAjaxRequest(xhr);
 
   // --- Helper methods ---
 
@@ -568,6 +652,10 @@ scout.Session.prototype._pollForBackgroundJobs = function() {
     this._backgroundJobPollingSupport.setFailed();
     this._processErrorResponse(jqXHR, textStatus, errorThrown, request);
   }
+
+  function onAjaxAlways(data, textStatus, errorThrown) {
+    this.unregisterAjaxRequest(xhr);
+  }
 };
 
 /**
@@ -589,8 +677,6 @@ scout.Session.prototype.processJsonResponseInternal = function(data) {
 };
 
 scout.Session.prototype._processSuccessResponse = function(message) {
-  this._queuedRequest = null;
-
   if (message.adapterData) {
     this._copyAdapterData(message.adapterData);
   }
@@ -633,7 +719,7 @@ scout.Session.prototype._processErrorResponse = function(jqXHR, textStatus, erro
 
   // Status code = 0 -> no connection
   // Status code >= 12000 come from windows, see http://msdn.microsoft.com/en-us/library/aa383770%28VS.85%29.aspx. Not sure if it is necessary for IE >= 9.
-  if (!jqXHR.status || jqXHR.status >= 12000) {
+  if (this.ready && (!jqXHR.status || jqXHR.status >= 12000)) {
     this.goOffline();
     if (!this._queuedRequest && request && !request.pollForBackgroundJobs) {
       this._queuedRequest = request;
@@ -649,7 +735,7 @@ scout.Session.prototype._processErrorResponse = function(jqXHR, textStatus, erro
     yesButtonAction: function() {
       scout.reloadPage();
     },
-    noButtonText: this.optText('ui.Ignore', 'Ignore')
+    noButtonText: (this.ready ? this.optText('ui.Ignore', 'Ignore') : null)
   };
   this.showFatalMessage(boxOptions, jqXHR.status + '.net');
 };
@@ -805,7 +891,16 @@ scout.Session.prototype.uploadFiles = function(target, files, uploadProperties, 
 };
 
 scout.Session.prototype.goOffline = function() {
+  if (this.offline) {
+    return; // already offline
+  }
   this.offline = true;
+
+  // Abort pending ajax requests. Because the error handlers alter the "this.ajaxRequest" array,
+  // the loop must operate on a copy of the original array.
+  this.ajaxRequests.slice().forEach(function(xhr) {
+    xhr.abort();
+  });
 
   // In Firefox, the current async polling request is interrupted immediately when the page is unloaded. Therefore,
   // an offline message would appear at once on the desktop. When reloading the page, all elements are cleared anyway,
@@ -825,11 +920,13 @@ scout.Session.prototype.goOffline = function() {
 
 scout.Session.prototype.goOnline = function() {
   this.offline = false;
-  if (this._queuedRequest) {
-    this._sendRequest(this._queuedRequest); // implies "_resumeBackgroundJobPolling"
-  } else {
-    this._resumeBackgroundJobPolling();
-  }
+
+  var request ={
+    uiSessionId: this.uiSessionId,
+    syncResponseQueue: true
+  };
+  this._sendRequest(request); // implies "_resumeBackgroundJobPolling", and also sends queued request
+
   this.rootAdapter.goOnline();
 };
 
@@ -881,7 +978,7 @@ scout.Session.prototype.setBusy = function(busy) {
   } else {
     this._busyCounter--;
     // Do not remove busy indicators if there is a scheduled request which will run immediately to prevent busy cursor flickering
-    if (this._busyCounter === 0 && !this.areEventsQueued()) {
+    if (this._busyCounter === 0 && (!this.areEventsQueued() || this.offline)) {
       this._removeBusy();
     }
   }
@@ -967,9 +1064,16 @@ scout.Session.prototype.sendLogRequest = function(message) {
 
   // Do not use _sendRequest to make sure a log request has no side effects and will be sent only once
   var ajaxOptions = this.defaultAjaxOptions(request);
-  // Add dummy parameter as marker (for debugging purposes)
-  ajaxOptions.url = new scout.URL(ajaxOptions.url).addParameter('log').toString();
-  $.ajax(ajaxOptions);
+
+  var xhr = $.ajax(ajaxOptions)
+    .always(onAjaxAlways.bind(this));
+  this.registerAjaxRequest(xhr);
+
+  // ----- Helper methods -----
+
+  function onAjaxAlways(data, textStatus, errorThrown) {
+    this.unregisterAjaxRequest(xhr);
+  }
 };
 
 scout.Session.prototype._setApplicationLoading = function(applicationLoading) {
@@ -981,6 +1085,7 @@ scout.Session.prototype._setApplicationLoading = function(applicationLoading) {
     }.bind(this), 500);
   } else {
     clearTimeout(this._applicationLoadingTimeoutId);
+    this._applicationLoadingTimeoutId = null;
     this.$entryPoint.children('.application-loading').remove();
   }
 };
