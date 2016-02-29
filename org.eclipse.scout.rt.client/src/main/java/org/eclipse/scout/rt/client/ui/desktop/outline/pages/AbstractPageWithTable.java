@@ -277,13 +277,15 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
   }
 
   protected IPage<?> createChildPageInternal(final ITableRow row) {
-    return ClientRunContexts.copyCurrent().withOutline(getOutline()).withForm(null).call(new Callable<IPage<?>>() {
+    return ClientRunContexts.copyCurrent()
+        .withOutline(getOutline(), true)
+        .call(new Callable<IPage<?>>() {
 
-      @Override
-      public IPage<?> call() throws Exception {
-        return interceptCreateChildPage(row);
-      }
-    });
+          @Override
+          public IPage<?> call() throws Exception {
+            return interceptCreateChildPage(row);
+          }
+        });
   }
 
   /**
@@ -417,13 +419,15 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
     }
 
     try {
-      return ClientRunContexts.copyCurrent().withOutline(getOutline()).withForm(null).call(new Callable<ISearchForm>() {
+      return ClientRunContexts.copyCurrent()
+          .withOutline(getOutline(), true)
+          .call(new Callable<ISearchForm>() {
 
-        @Override
-        public ISearchForm call() throws Exception {
-          return configuredSearchForm.newInstance();
-        }
-      });
+            @Override
+            public ISearchForm call() throws Exception {
+              return configuredSearchForm.newInstance();
+            }
+          });
     }
     catch (Exception e) {
       BEANS.get(ExceptionHandler.class).handle(new ProcessingException("error creating instance of class '" + configuredSearchForm.getName() + "'.", e));

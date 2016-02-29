@@ -964,19 +964,21 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
       return;
     }
 
-    ClientRunContexts.copyCurrent().withOutline(newOutline).withForm(null).run(new IRunnable() {
+    ClientRunContexts.copyCurrent()
+        .withOutline(newOutline, true)
+        .run(new IRunnable() {
 
-      @Override
-      public void run() throws Exception {
-        try {
-          m_outlineChanging = true;
-          setOutlineInternal(newOutline);
-        }
-        finally {
-          m_outlineChanging = false;
-        }
-      }
-    });
+          @Override
+          public void run() throws Exception {
+            try {
+              m_outlineChanging = true;
+              setOutlineInternal(newOutline);
+            }
+            finally {
+              m_outlineChanging = false;
+            }
+          }
+        });
   }
 
   protected void setOutlineInternal(IOutline newOutline) {

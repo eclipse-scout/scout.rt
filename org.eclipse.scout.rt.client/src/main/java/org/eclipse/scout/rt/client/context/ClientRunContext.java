@@ -196,8 +196,13 @@ public class ClientRunContext extends RunContext {
    * <p>
    * Typically, that information is set by the UI facade when dispatching a request from UI, or when constructing UI
    * model elements.
+   * <p>
+   * If unsetForm is true the form on this runContext is set to null
    */
-  public ClientRunContext withOutline(final IOutline outline) {
+  public ClientRunContext withOutline(final IOutline outline, boolean unsetForm) {
+    if (unsetForm) {
+      m_form = null;
+    }
     m_outline = outline;
     return this;
   }
