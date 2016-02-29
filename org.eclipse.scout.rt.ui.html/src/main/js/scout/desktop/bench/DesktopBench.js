@@ -31,7 +31,6 @@ scout.DesktopBench.prototype._initKeyStrokeContext = function(keyStrokeContext) 
 
 scout.DesktopBench.prototype._render = function($parent) {
   this.$container = $parent.appendDiv('desktop-bench');
-  this.$container.toggleClass('has-header', this.desktop._hasHeader());
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
   this.htmlComp.setLayout(new scout.DesktopBenchLayout(this));
   this.htmlComp.pixelBasedSizing = false;

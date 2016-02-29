@@ -15,27 +15,27 @@ scout.DesktopLayout = function(desktop) {
 scout.inherits(scout.DesktopLayout, scout.AbstractLayout);
 
 scout.DesktopLayout.prototype.layout = function($container) {
-  var navigationSize, headerSize, htmlHeader, htmlBench, htmlBenchSize,
+  var navigationSize, headerSize, htmlHeader, htmlBench, htmlBenchSize, htmlNavigation,
     navigationWidth = 0,
     headerHeight = 0,
     htmlContainer = this.desktop.htmlComp,
-    htmlNavigation = this.desktop.navigation.htmlComp,
     containerSize = htmlContainer.getAvailableSize();
 
   containerSize = containerSize.subtract(htmlContainer.getInsets());
-  if (this.desktop._hasNavigation()) {
+  if (this.desktop.navigation) {
     navigationWidth = this._calculateNavigationWidth(containerSize);
     if (this.desktop.splitter) {
       this.desktop.splitter.updatePosition(navigationWidth);
     }
 
+    htmlNavigation = this.desktop.navigation.htmlComp;
     navigationSize = new scout.Dimension(navigationWidth, containerSize.height)
       .subtract(htmlNavigation.getMargins());
     htmlNavigation.setSize(navigationSize);
   }
 
-  if (this.desktop._hasHeader()) {
-    this.desktop.header.$container.css('left', navigationWidth);
+  if (this.desktop.header) {
+    this.desktop.header.$container.cssLeft(navigationWidth);
 
     htmlHeader = this.desktop.header.htmlComp;
     headerHeight = htmlHeader.$comp.outerHeight(true);
@@ -44,8 +44,10 @@ scout.DesktopLayout.prototype.layout = function($container) {
     htmlHeader.setSize(headerSize);
   }
 
-  if (this.desktop._hasBench()) {
-    this.desktop.bench.$container.css('left', navigationWidth);
+  if (this.desktop.bench) {
+    this.desktop.bench.$container
+      .cssLeft(navigationWidth)
+      .cssTop(headerHeight);
 
     htmlBench = this.desktop.bench.htmlComp;
     htmlBenchSize = new scout.Dimension(containerSize.width - navigationWidth, containerSize.height - headerHeight)
@@ -55,7 +57,10 @@ scout.DesktopLayout.prototype.layout = function($container) {
 };
 
 scout.DesktopLayout.prototype._calculateNavigationWidth = function(containerSize) {
-  if (!this.desktop._hasBench()) {
+  if (!this.desktop.navigationVisible) {
+    return 0;
+  }
+  if (!this.desktop.benchVisible) {
     return containerSize.width;
   }
   var splitterPosition = this.desktop.splitter.position;

@@ -11,6 +11,7 @@
 scout.ViewButtons = function() {
   scout.ViewButtons.parent.call(this);
   this.viewMenuTab;
+  this._desktopOutlineChangedHandler = this._onDesktopOutlineChanged.bind(this);
 };
 scout.inherits(scout.ViewButtons, scout.Widget);
 
@@ -38,20 +39,27 @@ scout.ViewButtons.prototype._render = function($parent) {
   this.$container = $parent.appendDiv('view-buttons');
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
   this.htmlComp.setLayout(new scout.ViewButtonsLayout(this));
-  this.viewMenuTab = new scout.ViewMenuTab(this._viewButtons('MENU'), this.session);
+  this.viewMenuTab = scout.create('ViewMenuTab', {parent: this,
+    viewMenus: this._viewButtons('MENU')
+  });
   this.viewMenuTab.render(this.$container);
 
   viewTabs = this._viewButtons('TAB');
   this._viewButtons('TAB').forEach(function(viewTab, i) {
+    viewTab.setParent(this);
     viewTab.render(this.$container);
     if (i === viewTabs.length - 1) {
       viewTab.last();
     }
   }, this);
   this.session.keyStrokeManager.installKeyStrokeContext(this.desktopKeyStrokeContext);
+
+  this._onDesktopOutlineChanged();
+  this.desktop.on('outlineChanged', this._desktopOutlineChangedHandler);
 };
 
 scout.ViewButtons.prototype._remove = function() {
+  this.desktop.off('outlineChanged', this._desktopOutlineChangedHandler);
   this.session.keyStrokeManager.uninstallKeyStrokeContext(this.desktopKeyStrokeContext);
   scout.ViewButtons.parent.prototype._remove.call(this);
 };
@@ -67,19 +75,20 @@ scout.ViewButtons.prototype._viewButtons = function(displayStyle) {
   return viewButtons;
 };
 
+scout.ViewButtons.prototype.doViewMenuAction = function(event) {
+  this.viewMenuTab.togglePopup(event);
+};
+
 /**
  * This method updates the state of the view-menu-tab and the selected state of outline-view-buttons.
  * This method must also work in offline mode.
  */
-scout.ViewButtons.prototype.onOutlineChanged = function(outline) {
+scout.ViewButtons.prototype._onDesktopOutlineChanged = function(event) {
+  var outline = this.desktop.outline;
   this.viewMenuTab.onOutlineChanged(outline);
-  this._viewButtons('TAB').forEach(function(viewTab) {
+  this._viewButtons().forEach(function(viewTab) {
     if (viewTab instanceof scout.OutlineViewButton) {
       viewTab.onOutlineChanged(outline);
     }
   });
-};
-
-scout.ViewButtons.prototype.doViewMenuAction = function(event) {
-  this.viewMenuTab.togglePopup(event);
 };

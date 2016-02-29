@@ -35,12 +35,19 @@ scout.OutlineViewButton.prototype.beforeSendDoAction = function() {
   }
 };
 
-scout.OutlineViewButton.prototype.onOutlineChanged = function(outline) {
-  var oldSelected = this.selected,
-    selected = this.outline === outline;
-  if (selected !== oldSelected) {
-    this.selected = selected;
-    this._renderSelected();
-    this._firePropertyChange('selected', oldSelected, selected);
+scout.OutlineViewButton.prototype.setSelected = function(selected) {
+  var oldSelected = this.selected;
+  if (oldSelected === selected) {
+    return;
   }
+  this.selected = selected;
+  if (this.rendered) {
+    this._renderSelected();
+  }
+  this._firePropertyChange('selected', oldSelected, selected);
+};
+
+scout.OutlineViewButton.prototype.onOutlineChanged = function(outline) {
+  var selected = this.outline === outline;
+  this.setSelected(selected);
 };

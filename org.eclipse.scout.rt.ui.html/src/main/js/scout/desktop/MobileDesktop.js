@@ -10,7 +10,6 @@
  ******************************************************************************/
 scout.MobileDesktop = function() {
   scout.MobileDesktop.parent.call(this);
-  this.benchVisible = false;
   this._currentDetailForm;
 };
 scout.inherits(scout.MobileDesktop, scout.Desktop);
@@ -18,6 +17,9 @@ scout.inherits(scout.MobileDesktop, scout.Desktop);
 scout.MobileDesktop.prototype._init = function(model) {
   scout.MobileDesktop.parent.prototype._init.call(this, model);
   this.viewTabsController = new scout.MobileViewTabsController(this);
+  this.navigationVisible = true;
+  this.headerVisible = false;
+  this.benchVisible = false;
 };
 
 /**
@@ -36,13 +38,6 @@ scout.MobileDesktop.prototype._render = function($parent) {
   this.setOutline(this.outline, true);
 
   $parent.window().on('resize', this.onResize.bind(this));
-};
-
-/**
- * @override
- */
-scout.MobileDesktop.prototype._hasHeader = function() {
-  return false;
 };
 
 /**
@@ -116,6 +111,7 @@ scout.inherits(scout.MobileViewTabsController, scout.ViewTabsController);
 scout.MobileViewTabsController.prototype.createAndRenderViewTab = function(view, position) {
   // Make sure bench is visible
   this._desktop.setBenchVisible(true);
+  this._desktop.setNavigationVisible(false);
 
   return scout.MobileViewTabsController.parent.prototype.createAndRenderViewTab.call(this, view, position);
 };
@@ -124,6 +120,7 @@ scout.MobileViewTabsController.prototype._removeViewTab = function(viewTab, view
   scout.MobileViewTabsController.parent.prototype._removeViewTab.call(this, viewTab, viewId);
   if (this._viewTabs.length === 0) {
     // Hide bench if no view forms are open -> show navigation
+    this._desktop.setNavigationVisible(true);
     this._desktop.setBenchVisible(false);
   }
 };

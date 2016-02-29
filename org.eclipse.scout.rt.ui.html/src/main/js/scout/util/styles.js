@@ -11,16 +11,17 @@
 scout.styles = {
 
   /**
+   * @memberOf scout.styles
+   */
+  styleMap: {},
+
+  /**
    * Generates an invisible div and appends it to the body, only once. The same div will be reused on subsequent calls.
    * Adds the given css class to that element and returns a style object containing the values for every given property.
    * The style is cached. Subsequent calls with the same css class will return the same style object.
    */
   get: function(cssClass, properties) {
     var key = cssClass;
-    if (!scout.styles.styleMap) {
-      scout.styles.styleMap = {};
-    }
-
     var style = scout.styles.styleMap[key];
     if (style) {
       return style;
@@ -43,9 +44,13 @@ scout.styles = {
       style[property] = computedStyle[property];
     });
 
-    scout.styles.styleMap[key] = style;
+    scout.styles.put(key, style);
     elem.className = '';
     return style;
+  },
+
+  put: function(cssClass, style) {
+    this.styleMap[cssClass] = style;
   },
 
   /**

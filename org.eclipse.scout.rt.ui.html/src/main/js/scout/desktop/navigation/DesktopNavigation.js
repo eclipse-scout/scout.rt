@@ -39,25 +39,38 @@ scout.DesktopNavigation.prototype._render = function($parent) {
   this.viewButtons.render(this.$container);
 
   this.$body = this.$container.appendDiv('navigation-body')
-    .on('mousedown', this._onNavigationMousedown.bind(this));
+    .on('mousedown', this._onNavigationBodyMousedown.bind(this));
   this.htmlCompBody = new scout.HtmlComponent(this.$body, this.session);
   this.htmlCompBody.setLayout(new scout.SingleLayout());
-
   this._renderToolBarVisible();
-};
 
-scout.DesktopNavigation.prototype._onNavigationMousedown = function(event) {
-  if (this.outline.inBackground) {
-    this.desktop.bringOutlineToFront(this.outline);
+  // This check for rendered is necessary because outline wants to update desktop bench which does not exist yet.
+  //TODO CGU  Remove the dependency from outline to desktop incl. handleOutlineContent and the explicit call of setOutline in desktop.render
+  if (this.desktop.rendered) {
+    this._renderOutline();
   }
 };
 
-scout.DesktopNavigation.prototype.onOutlineChanged = function(outline, bringToFront) {
+scout.DesktopNavigation.prototype._renderOutline = function(bringToFront) {
+  this.outline.render(this.$body);
+  this.outline.invalidateLayoutTree();
+  this.outline.handleOutlineContent(bringToFront);
+  this.outline.validateFocus();
+  // Layout immediate to prevent flickering when breadcrumb mode is enabled
+  // but not initially while desktop gets rendered because it will be done at the end anyway
+  if (this.desktop.rendered) {
+    this.outline.validateLayoutTree();
+  }
+};
+
+scout.DesktopNavigation.prototype.setOutline = function(outline, bringToFront) {
   if (this.outline === outline) {
     return;
   }
   if (this.outline) {
-    this.outline.remove();
+    if (this.rendered) {
+      this.outline.remove();
+    }
 
     // Make sure new outline uses same display style as old
     if (outline.autoToggleBreadcrumbStyle) {
@@ -67,16 +80,11 @@ scout.DesktopNavigation.prototype.onOutlineChanged = function(outline, bringToFr
   }
 
   this.outline = outline;
-  this.outline.setBreadcrumbTogglingThreshold(scout.DesktopNavigation.BREADCRUMB_STYLE_WIDTH);
-  this.outline.render(this.$body);
-  this.outline.invalidateLayoutTree();
-  this.outline.handleOutlineContent(bringToFront);
-  this.viewButtons.onOutlineChanged(outline);
-  this.outline.validateFocus();
-  // Layout immediate to prevent flickering when breadcrumb mode is enabled
-  // but not initially while desktop gets rendered because it will be done at the end anyway
-  if (this.desktop.rendered) {
-    this.outline.validateLayoutTree();
+  if (this.outline) {
+    this.outline.setBreadcrumbTogglingThreshold(scout.DesktopNavigation.BREADCRUMB_STYLE_WIDTH);
+    if (this.rendered) {
+      this._renderOutline(bringToFront);
+    }
   }
 };
 
@@ -129,4 +137,10 @@ scout.DesktopNavigation.prototype._removeToolBar = function() {
   }
   this._$toolBar.remove();
   this._$toolBar = null;
+};
+
+scout.DesktopNavigation.prototype._onNavigationBodyMousedown = function(event) {
+  if (this.outline.inBackground) {
+    this.desktop.bringOutlineToFront(this.outline);
+  }
 };

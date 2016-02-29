@@ -206,7 +206,6 @@
   __include("scout/desktop/Desktop.js");
   __include("scout/desktop/DesktopLayout.js");
   __include("scout/desktop/DesktopKeyStroke.js");
-  __include("scout/desktop/NullDesktopNavigation.js");
   __include("scout/desktop/PopupWindow.js");
   __include("scout/desktop/bench/DesktopBench.js");
   __include("scout/desktop/bench/DesktopBenchLayout.js");

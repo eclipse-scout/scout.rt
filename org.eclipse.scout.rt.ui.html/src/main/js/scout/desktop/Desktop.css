@@ -27,13 +27,6 @@
   &:focus {
     outline: none;
   }
-
-  &.has-navigation {
-    & > .desktop-bench,
-    & > .desktop-header {
-      left: @desktop-navigation-width;
-    }
-  }
 }
 
 /* bench */
@@ -58,10 +51,6 @@
 
   &.drop-shadow::before {
     .desktop-bench-drop-shadow();
-  }
-
-  &.has-header {
-    top: @desktop-header-height;
   }
 
   & > .table {

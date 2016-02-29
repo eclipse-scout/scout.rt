@@ -34,6 +34,8 @@ function sandboxSession(options) {
   session.desktop = scout.create('Desktop', {
     parent: session.rootAdapter
   });
+  session.desktop.navigationVisible = false;
+  session.desktop.headerVisible = false;
   session._renderDesktop();
   // Prevent exception when test window gets resized
   session.desktop.$container.window().off('resize', session.desktop._resizeHandler);

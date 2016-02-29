@@ -134,6 +134,7 @@
       "tableStatusVisible": false
     },
     "Desktop": {
+      "desktopStyle": "DEFAULT",
       "actions": [],
       "addOns": [],
       "dialogs": [],

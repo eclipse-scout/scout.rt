@@ -13,10 +13,8 @@
  * and shows the title of the active outline, if the outline is one
  * of the outline-view-buttons contained in the menu.
  */
-scout.ViewMenuTab = function(viewMenus, session) {
-  this.viewMenus = viewMenus;
-  this.session = session;
-
+scout.ViewMenuTab = function() {
+  scout.ViewMenuTab.parent.call(this);
   this.$container;
   this.$arrowIcon; // small "arrow down" icon at the right side of the icon
 
@@ -26,7 +24,15 @@ scout.ViewMenuTab = function(viewMenus, session) {
   this._inBackground = false;
 
   this.defaultIconId = scout.icons.OUTLINE;
+};
+scout.inherits(scout.ViewMenuTab, scout.Widget);
 
+scout.ViewMenuTab.prototype._init = function(model) {
+  scout.ViewButtons.parent.prototype._init.call(this, model);
+  this.viewMenus = model.viewMenus;
+  this.viewMenus.forEach(function(viewMenu) {
+    viewMenu.setParent(this);
+  }, this);
   this._update();
 };
 
@@ -49,14 +55,13 @@ scout.ViewMenuTab.prototype._update = function() {
   this.iconId = (this.outlineViewButton && this.outlineViewButton.iconId) || this.defaultIconId;
 };
 
-scout.ViewMenuTab.prototype.render = function($parent) {
+scout.ViewMenuTab.prototype._render = function($parent) {
   this.$container = $parent.appendDiv('view-button-tab')
     .unfocusable()
     .on('mousedown', this.togglePopup.bind(this));
   this.$arrowIcon = this.$container
     .appendSpan('arrow-icon')
     .on('mousedown', this.togglePopup.bind(this));
-  this._renderProperties();
 };
 
 scout.ViewMenuTab.prototype._renderProperties = function() {

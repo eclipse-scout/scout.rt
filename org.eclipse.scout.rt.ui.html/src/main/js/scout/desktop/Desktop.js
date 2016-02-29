@@ -31,7 +31,6 @@ scout.Desktop = function() {
   this.formController;
   this.messageBoxController;
   this.fileChooserController;
-  this.benchVisible = true;
   this.initialFormRendering = false;
 };
 scout.inherits(scout.Desktop, scout.BaseDesktop);
@@ -49,6 +48,9 @@ scout.Desktop.prototype._init = function(model) {
   this.fileChooserController = new scout.FileChooserController(this, this.session);
   this._addNullOutline(model.outline);
   this._resizeHandler = this.onResize.bind(this);
+  this.navigationVisible = this.desktopStyle === scout.DesktopStyle.DEFAULT;
+  this.headerVisible = this.desktopStyle === scout.DesktopStyle.DEFAULT;
+  this.benchVisible = this.desktopStyle === scout.DesktopStyle.DEFAULT;
 };
 
 scout.Desktop.prototype._initKeyStrokeContext = function(keyStrokeContext) {
@@ -67,21 +69,18 @@ scout.Desktop.prototype._onChildAdapterCreation = function(propertyName, model) 
 };
 
 scout.Desktop.prototype._render = function($parent) {
-  var hasNavigation = this._hasNavigation();
-
   this.$container = $parent;
-  this.$container
-    .addClass('desktop')
-    .toggleClass('has-navigation', hasNavigation);
+  this.$container.addClass('desktop');
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
   this.htmlComp.setLayout(new scout.DesktopLayout(this));
-  // Desktop elements are added before this separator, all overlays are opened after (dialogs, popups, tooltips etc.)
-  this.$overlaySeparator = this.$container.appendDiv().setVisible(false);
   scout.inspector.applyInfo(this, this.$container);
 
-  this._renderNavigation();
-  this._renderHeader();
-  this._renderBench();
+  // Desktop elements are added before this separator, all overlays are opened after (dialogs, popups, tooltips etc.)
+  this.$overlaySeparator = this.$container.appendDiv().setVisible(false);
+
+  this._renderNavigationVisible();
+  this._renderHeaderVisible();
+  this._renderBenchVisible();
   this._renderApplicationLogoUrl();
   this._renderSplitter();
   this._setSplitterPosition();
@@ -89,7 +88,6 @@ scout.Desktop.prototype._render = function($parent) {
     addOn.render(this.$container);
   });
   this.setOutline(this.outline, true);
-
   this.$container.window().on('resize', this._resizeHandler);
 
   // prevent general drag and drop, dropping a file anywhere in the application must not open this file in browser
@@ -157,7 +155,7 @@ scout.Desktop.prototype._renderActiveForm = function() {
 };
 
 scout.Desktop.prototype._renderBench = function() {
-  if (!this._hasBench() || this.bench) {
+  if (this.bench) {
     return;
   }
   this.bench = scout.create('DesktopBench', {
@@ -187,19 +185,32 @@ scout.Desktop.prototype._renderNavigation = function() {
   if (this.navigation) {
     return;
   }
-  if (this._hasNavigation()) {
-    this.navigation = scout.create('DesktopNavigation', {
-      parent: this
-    });
-  } else {
-    this.navigation = scout.NullDesktopNavigation;
-  }
+  this.navigation = scout.create('DesktopNavigation', {
+    parent: this,
+    outline: this.outline
+  });
   this.navigation.render(this.$container);
   this.navigation.$container.insertBefore(this.$overlaySeparator);
 };
 
+scout.Desktop.prototype._removeNavigation = function() {
+  if (!this.navigation) {
+    return;
+  }
+  this.navigation.remove();
+  this.navigation = null;
+};
+
+scout.Desktop.prototype._renderNavigationVisible = function() {
+  if (this.navigationVisible) {
+    this._renderNavigation();
+  } else {
+    this._removeNavigation();
+  }
+};
+
 scout.Desktop.prototype._renderHeader = function() {
-  if (!this._hasHeader() || this.header) {
+  if (this.header) {
     return;
   }
   this.header = scout.create('DesktopHeader', {
@@ -207,6 +218,22 @@ scout.Desktop.prototype._renderHeader = function() {
   });
   this.header.render(this.$container);
   this.header.$container.insertBefore(this.$overlaySeparator);
+};
+
+scout.Desktop.prototype._removeHeader = function() {
+  if (!this.header) {
+    return;
+  }
+  this.header.remove();
+  this.header = null;
+};
+
+scout.Desktop.prototype._renderHeaderVisible = function() {
+  if (this.headerVisible) {
+    this._renderHeader();
+  } else {
+    this._removeHeader();
+  }
 };
 
 scout.Desktop.prototype._renderApplicationLogoUrl = function() {
@@ -232,7 +259,7 @@ scout.Desktop.prototype._setupDragAndDrop = function() {
 };
 
 scout.Desktop.prototype._renderSplitter = function() {
-  if (!this._hasNavigation()) {
+  if (!this.navigation) {
     return;
   }
   this.splitter = scout.create('Splitter', {
@@ -248,7 +275,7 @@ scout.Desktop.prototype._renderSplitter = function() {
 };
 
 scout.Desktop.prototype._setSplitterPosition = function() {
-  if (!this._hasNavigation()) {
+  if (!this.navigation) {
     return;
   }
   // FIXME awe: (user-prefs) Use user-preferences instead of sessionStorage
@@ -265,25 +292,12 @@ scout.Desktop.prototype._setSplitterPosition = function() {
   }
 };
 
-// TODO [5.2] cgu: maybe better change to actual properties and set on server?
-scout.Desktop.prototype._hasNavigation = function() {
-  return this.desktopStyle === scout.DesktopStyle.DEFAULT;
-};
-
-scout.Desktop.prototype._hasHeader = function() {
-  return this.desktopStyle === scout.DesktopStyle.DEFAULT;
-};
-
-scout.Desktop.prototype._hasBench = function() {
-  return this.benchVisible;
-};
-
 scout.Desktop.prototype.onResize = function(event) {
   this.revalidateLayout();
 };
 
 scout.Desktop.prototype.revalidateHeaderLayout = function() {
-  if (this._hasHeader()) {
+  if (this.header) {
     this.header.revalidateLayout();
   }
 };
@@ -390,7 +404,7 @@ scout.Desktop.prototype.setOutlineContent = function(content, bringToFront) {
     content.attach();
   }
 
-  //set active form to null because outline is active form.
+  // Set active form to null because outline is active form.
   this._setOutlineActivated();
   // Request focus on first element in new outlineTab.
   this.session.focusManager.validateFocus(); // TODO [5.2] nbu, dwi: why double validate?
@@ -398,7 +412,17 @@ scout.Desktop.prototype.setOutlineContent = function(content, bringToFront) {
 
 scout.Desktop.prototype.setOutline = function(outline, bringToFront) {
   this.outline = outline;
-  this.navigation.onOutlineChanged(this.outline, bringToFront);
+  if (this.navigation) {
+    this.navigation.setOutline(this.outline, bringToFront);
+  }
+  this.trigger('outlineChanged');
+};
+
+scout.Desktop.prototype.setNavigationVisible = function(visible) {
+  this.navigationVisible = visible;
+  if (this.rendered) {
+    this._renderNavigationVisible();
+  }
 };
 
 scout.Desktop.prototype.setBenchVisible = function(visible) {
@@ -570,17 +594,21 @@ scout.Desktop.prototype.bringOutlineToFront = function(outline) {
 };
 
 scout.Desktop.prototype._bringNavigationToFront = function() {
-  this.navigation.bringToFront();
+  if (this.navigation) {
+    this.navigation.bringToFront();
+  }
   this._renderBenchDropShadow(false);
 };
 
 scout.Desktop.prototype._sendNavigationToBack = function() {
-  this.navigation.sendToBack();
+  if (this.navigation) {
+    this.navigation.sendToBack();
+  }
   this._renderBenchDropShadow(true);
 };
 
 scout.Desktop.prototype._renderBenchDropShadow = function(showShadow) {
-  if (this._hasNavigation() && this._hasBench()) {
+  if (this.navigation && this.bench) {
     this.bench.$container.toggleClass('drop-shadow', showShadow);
   }
 };
