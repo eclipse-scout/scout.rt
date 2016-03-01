@@ -686,6 +686,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
     }
   }
 
+  @Override
   public void setDefaultDetailForm(IForm form) {
     if (form != null) {
       if (form.getDisplayHint() != IForm.DISPLAY_HINT_VIEW) {

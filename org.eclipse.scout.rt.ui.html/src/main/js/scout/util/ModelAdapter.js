@@ -394,6 +394,7 @@ scout.ModelAdapter.prototype._syncPropertiesOnPropertyChange = function(oldPrope
 
     if (isAdapterProp) {
       if (oldValue) {
+        // TODO CGU this should actually be configurable, otherwise m_disposeOnChange=false on server doesn't work
         this._destroyAdapters(propertyName, oldValue, value);
       }
       if (value) {

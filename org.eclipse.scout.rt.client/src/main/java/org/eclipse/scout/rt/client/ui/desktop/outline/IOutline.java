@@ -126,6 +126,8 @@ public interface IOutline extends ITree, ITypeWithClassId, IOrdered, IDisplayPar
    */
   IForm getDefaultDetailForm();
 
+  void setDefaultDetailForm(IForm form);
+
   /**
    * @return the detail form of the active (selected) page {@link IPage#getDetailForm()}
    */
