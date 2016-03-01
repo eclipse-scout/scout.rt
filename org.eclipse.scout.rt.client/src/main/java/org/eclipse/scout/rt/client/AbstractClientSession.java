@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
@@ -97,8 +96,6 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
 
   /* locked by m_sharedVarLock*/
   private final SharedVariableMap m_sharedVariableMap;
-  private final CountDownLatch m_sharedVarsInitialized = new CountDownLatch(1);
-  private final Object m_sharedVarLock = new Object();
 
   private IMemoryPolicy m_memoryPolicy;
   private final Map<String, Object> m_clientSessionData;
@@ -115,10 +112,7 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
     m_subject = Subject.getSubject(AccessController.getContext());
     m_objectExtensions = new ObjectExtensions<AbstractClientSession, IClientSessionExtension<? extends AbstractClientSession>>(this);
     m_scoutTexts = new ScoutTexts();
-
-    synchronized (m_sharedVarLock) {
-      m_sharedVariableMap = new SharedVariableMap();
-    }
+    m_sharedVariableMap = new SharedVariableMap();
 
     setLocale(NlsLocale.get());
 
@@ -225,9 +219,7 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
 
   @Override
   public Map<String, Object> getSharedVariableMap() {
-    synchronized (m_sharedVarLock) {
-      return CollectionUtility.copyMap(m_sharedVariableMap);
-    }
+    return CollectionUtility.copyMap(m_sharedVariableMap);
   }
 
   /**
@@ -239,10 +231,7 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
    * </p>
    */
   protected <T> T getSharedContextVariable(String name, Class<T> type) {
-    Object o;
-    synchronized (m_sharedVarLock) {
-      o = m_sharedVariableMap.get(name);
-    }
+    Object o = m_sharedVariableMap.get(name);
     return TypeCastUtility.castValue(o, type);
   }
 
@@ -305,48 +294,22 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
    */
   @Override
   public void replaceSharedVariableMapInternal(SharedVariableMap newMap) {
-    synchronized (m_sharedVarLock) {
-      m_sharedVariableMap.updateInternal(newMap);
-    }
-    m_sharedVarsInitialized.countDown();
+    m_sharedVariableMap.updateInternal(newMap);
+  }
+
+  protected void initializeSharedVariables(long timeout, TimeUnit unit) {
+    initializeSharedVariables();
   }
 
   /**
    * Pings the server to get the initial shared variables. Blocks until the initial version of the shared variables is
    * available or the timeout is reached.
    *
-   * @param timeout
-   *          the maximum time to wait
-   * @param unit
-   *          the time unit of the {@code timeout} argument
    * @throws ProcessingException
    *           if interrupted (and the variables are not initialized)
    */
-  protected void initializeSharedVariables(long timeout, TimeUnit unit) {
+  protected void initializeSharedVariables() {
     BEANS.get(IPingService.class).ping("");
-    awaitSharedVariablesInitialized(timeout, unit);
-  }
-
-  /**
-   * Wait until the shared variables are initialized by a notification from the server
-   *
-   * @throws ProcessingException
-   *           if interrupted (and the variables are not initialized)
-   */
-  protected void awaitSharedVariablesInitialized(long timeout, TimeUnit unit) {
-    try {
-      if (LOG.isDebugEnabled()) {
-        LOG.debug("Awaiting shared variable map");
-      }
-      m_sharedVarsInitialized.await(timeout, unit);
-      if (LOG.isDebugEnabled()) {
-        LOG.debug("Shared variables updated");
-      }
-    }
-    catch (java.lang.InterruptedException e) {
-      Thread.currentThread().interrupt(); // Restore the interrupted status because cleared by catching InterruptedException.
-      throw new ThreadInterruptedException("Interrupted while waiting for shared variables to be initialized");
-    }
   }
 
   @Override
