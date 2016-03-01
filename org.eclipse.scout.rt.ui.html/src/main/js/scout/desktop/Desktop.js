@@ -14,10 +14,6 @@ scout.Desktop = function() {
   this.navigation;
   this.header;
   this.bench;
-  /**
-   * outline-content = outline form or table
-   */
-  this._outlineContent;
 
   /**
    * FIXME dwi: (activeForm): selected tool form action wird nun auch als 'activeForm' verwendet (siehe TableKeystrokeContext.js)
@@ -48,9 +44,9 @@ scout.Desktop.prototype._init = function(model) {
   this.fileChooserController = new scout.FileChooserController(this, this.session);
   this._addNullOutline(model.outline);
   this._resizeHandler = this.onResize.bind(this);
-  this.navigationVisible = this.desktopStyle === scout.DesktopStyle.DEFAULT;
-  this.headerVisible = this.desktopStyle === scout.DesktopStyle.DEFAULT;
-  this.benchVisible = this.desktopStyle === scout.DesktopStyle.DEFAULT;
+  this.navigationVisible = scout.nvl(model.navigationVisible, this.desktopStyle === scout.DesktopStyle.DEFAULT);
+  this.headerVisible = scout.nvl(model.headerVisible, this.desktopStyle === scout.DesktopStyle.DEFAULT);
+  this.benchVisible = scout.nvl(model.benchVisible, this.desktopStyle === scout.DesktopStyle.DEFAULT);
 };
 
 scout.Desktop.prototype._initKeyStrokeContext = function(keyStrokeContext) {
@@ -87,7 +83,6 @@ scout.Desktop.prototype._render = function($parent) {
   this.addOns.forEach(function(addOn) {
     addOn.render(this.$container);
   });
-  this.setOutline(this.outline, true);
   this.$container.window().on('resize', this._resizeHandler);
 
   // prevent general drag and drop, dropping a file anywhere in the application must not open this file in browser
@@ -143,7 +138,7 @@ scout.Desktop.prototype._postRender = function() {
     }
   }
   if (!selectable) {
-    this.bringOutlineToFront(this.outline);
+    this.bringOutlineToFront();
   } else {
     this.viewTabsController.selectViewTab(this.viewTabsController.viewTab(selectable));
   }
@@ -343,77 +338,10 @@ scout.Desktop.prototype._onSplitterResizeEnd = function(event) {
   }
 };
 
-scout.Desktop.prototype._attachOutlineContent = function() {
-  // Only re-attach content if it was not destroyed in the mean time. Otherweise, re-render it.
-  if (this._outlineContent && this._outlineContent.rendered && !this._outlineContent.destroyed) {
-    this._outlineContent.attach();
-  } else {
-    this.outline.handleOutlineContent();
-  }
-};
-
-scout.Desktop.prototype._detachOutlineContent = function() {
-  if (this._outlineContent) {
-    this._outlineContent.detach();
-  }
-};
-
-/* communication with outline */
-
-scout.Desktop.prototype.setOutlineContent = function(content, bringToFront) {
-  bringToFront = scout.nvl(bringToFront, true);
-  if (this._outlineContent && this._outlineContent !== content) {
-    if (this._outlineContent instanceof scout.Table) {
-      this._outlineContent.storeScrollPosition();
-    }
-    this._outlineContent.remove();
-    this._outlineContent = null;
-  }
-
-  if (!content) {
-    return;
-  }
-
-  this._outlineContent = content;
-  if (bringToFront) {
-    this.viewTabsController.deselectViewTab();
-    this._bringNavigationToFront();
-  }
-
-  if (!content.rendered) {
-    if (content instanceof scout.Table) {
-      content.menuBar.top();
-      content.menuBar.large();
-    }
-    content.render(this.bench.$container);
-    content.validateRoot = true;
-    content.invalidateLayoutTree(false);
-
-    // Request focus on first element in new outlineTab.
-    this.session.focusManager.validateFocus();
-
-    // Layout immediate to prevent 'laggy' form visualization,
-    // but not initially while desktop gets rendered because it will be done at the end anyway
-    if (this.rendered) {
-      content.validateLayoutTree();
-    }
-    if (this._outlineContent instanceof scout.Table) {
-      this._outlineContent.restoreScrollPosition();
-    }
-  } else if (!content.attached) {
-    content.attach();
-  }
-
-  // Set active form to null because outline is active form.
-  this._setOutlineActivated();
-  // Request focus on first element in new outlineTab.
-  this.session.focusManager.validateFocus(); // TODO [5.2] nbu, dwi: why double validate?
-};
-
-scout.Desktop.prototype.setOutline = function(outline, bringToFront) {
+scout.Desktop.prototype.setOutline = function(outline) {
   this.outline = outline;
   if (this.navigation) {
-    this.navigation.setOutline(this.outline, bringToFront);
+    this.navigation.setOutline(this.outline);
   }
   this.trigger('outlineChanged');
 };
@@ -503,13 +431,13 @@ scout.Desktop.prototype._onModelOpenUri = function(event) {
 
 scout.Desktop.prototype._onModelOutlineChanged = function(event) {
   if (scout.DesktopStyle.DEFAULT === this.desktopStyle) {
-    this.setOutline(this.session.getOrCreateModelAdapter(event.outline, this), false);
+    this.setOutline(this.session.getOrCreateModelAdapter(event.outline, this));
   }
 };
 
 scout.Desktop.prototype._onModelOutlineContentActivate = function(event) {
   if (scout.DesktopStyle.DEFAULT === this.desktopStyle) {
-    this.bringOutlineToFront(this.outline);
+    this.bringOutlineToFront();
   }
 };
 
@@ -578,38 +506,49 @@ scout.Desktop.prototype._openUriAsNewWindow = function(uri) {
   }
 };
 
-scout.Desktop.prototype.bringOutlineToFront = function(outline) {
+scout.Desktop.prototype.bringOutlineToFront = function() {
   this.viewTabsController.deselectViewTab();
 
-  if (this.outline === outline) {
-    if (this.outline.inBackground) {
-      this._attachOutlineContent();
-      this._bringNavigationToFront();
+  if (this.outline.inBackground) {
+    if (this.navigation) {
+      this.navigation.bringToFront();
     }
-  } else {
-    this.setOutline(outline, true);
+    if (this.bench) {
+      this.bench.bringToFront();
+    }
   }
+
+  this._renderBenchDropShadow();
   // Set active form to null because outline is active form.
   this._setOutlineActivated();
 };
 
-scout.Desktop.prototype._bringNavigationToFront = function() {
-  if (this.navigation) {
-    this.navigation.bringToFront();
+scout.Desktop.prototype.sendOutlineToBack = function() {
+  if (this.outline.inBackground) {
+    return;
   }
-  this._renderBenchDropShadow(false);
-};
 
-scout.Desktop.prototype._sendNavigationToBack = function() {
   if (this.navigation) {
     this.navigation.sendToBack();
   }
-  this._renderBenchDropShadow(true);
+  if (this.bench) {
+    this.bench.sendToBack();
+  }
+  this._renderBenchDropShadow();
 };
 
-scout.Desktop.prototype._renderBenchDropShadow = function(showShadow) {
+/**
+ * === Method required for objects that act as 'displayParent' ===
+ *
+ * Returns 'true' if the Desktop is currently accessible to the user.
+ */
+scout.Desktop.prototype.inFront = function() {
+  return true; // Desktop is always available to the user.
+};
+
+scout.Desktop.prototype._renderBenchDropShadow = function() {
   if (this.navigation && this.bench) {
-    this.bench.$container.toggleClass('drop-shadow', showShadow);
+    this.bench.$container.toggleClass('drop-shadow', this.outline.inBackground);
   }
 };
 
@@ -654,15 +593,6 @@ scout.Desktop.prototype._pushPopupWindowGlassPaneTargets = function(glassPaneTar
 };
 
 /**
- * === Method required for objects that act as 'displayParent' ===
- *
- * Returns 'true' if the Desktop is currently accessible to the user.
- */
-scout.Desktop.prototype.inFront = function() {
-  return true; // Desktop is always available to the user.
-};
-
-/**
  * Creates a local "null-outline" and an OutlineViewButton which is used, when no outline is available.
  * This avoids a lot of if/else code. The OVB adds a property 'visibleInMenu' which is only used in
  * the UI to decide whether or not the OVB will be shown in the ViewMenuPopup.js.
@@ -693,8 +623,7 @@ scout.Desktop.prototype._setOutlineActivated = function() {
 };
 
 scout.Desktop.prototype._setFormActivated = function(form, suppressSend) {
-
-  //if desktop is in rendering process the can not set a new active for. instead the active form from the model is set selected.
+  // If desktop is in rendering process the can not set a new active for. instead the active form from the model is set selected.
   if (!this.rendered || this.initialFormRendering) {
     return;
   }

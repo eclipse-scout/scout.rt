@@ -48,7 +48,6 @@ scout.NavigateUpButton.prototype._drill = function() {
     $.log.debug('drill up to node ' + parentNode);
     this.outline.navigateUpInProgress = true;
     this.outline.selectNodes(parentNode);
-    this.outline.handleOutlineContent(true);
     this.outline.collapseNode(parentNode, {
       collapseChildNodes: true
     });

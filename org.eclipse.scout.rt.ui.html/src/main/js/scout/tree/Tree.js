@@ -952,6 +952,7 @@ scout.Tree.prototype.selectNodes = function(nodes, notifyServer, debounceSend) {
       return this.id === previous.id && this.type === previous.type;
     });
   }
+  this._triggerNodesSelected(debounceSend);
 
   // In breadcrumb mode selected node has to expanded
   if (this.isBreadcrumbStyleActive() && this.selectedNodes.length > 0 && !this.selectedNodes[0].expanded) {
@@ -1317,6 +1318,10 @@ scout.Tree.prototype._sendDisplayStyleChange = function() {
   this._send('displayStyle', {
     displayStyle: this.displayStyle
   });
+};
+
+scout.Tree.prototype._triggerNodesSelected = function(debounce) {
+  this.trigger('nodesSelected', {debounce: debounce});
 };
 
 scout.Tree.prototype._showContextMenu = function(event) {

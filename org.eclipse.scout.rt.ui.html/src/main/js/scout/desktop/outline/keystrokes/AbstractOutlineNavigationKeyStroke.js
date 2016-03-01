@@ -38,7 +38,6 @@ scout.AbstractOutlineNavigationKeyStroke.prototype.handle = function(event) {
   if (newNodeSelection) {
     this.field.selectNodes(newNodeSelection, true, true);
     this.field.scrollTo(newNodeSelection);
-    this.field.handleOutlineContentDebounced(true);
   }
 };
 

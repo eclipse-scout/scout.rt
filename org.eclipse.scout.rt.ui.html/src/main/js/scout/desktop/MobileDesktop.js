@@ -30,32 +30,41 @@ scout.MobileDesktop.prototype._render = function($parent) {
   this.$container.addClass('desktop');
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
   this.htmlComp.setLayout(new scout.DesktopLayout(this));
-  this.navigation = scout.create('DesktopNavigation', {
-    parent: this
-  });
-  this.navigation.render($parent);
-  this.navigation.setToolBarVisible(true);
-  this.setOutline(this.outline, true);
+  this._renderNavigationVisible();
+  this._renderHeaderVisible();
+  this._renderBenchVisible();
 
   $parent.window().on('resize', this.onResize.bind(this));
 };
 
-/**
- * @override
- */
-scout.MobileDesktop.prototype.setOutline = function(outline, bringToFront) {
-  scout.MobileDesktop.parent.prototype.setOutline.call(this, outline, bringToFront);
-  this.outline.$container.addClass('mobile');
+scout.MobileDesktop.prototype._renderNavigation = function() {
+  if (this.navigation) {
+    return;
+  }
+  this.navigation = scout.create('DesktopNavigation', {
+    parent: this,
+    outline: this.outline,
+    toolBarVisible: true
+  });
+  this.navigation.render(this.$container);
+  this.navigation.$container.insertBefore(this.$overlaySeparator);
 };
 
 /**
  * @override
  */
-scout.MobileDesktop.prototype.setOutlineContent = function(content, bringToFront) {
+scout.MobileDesktop.prototype.setOutline = function(outline) {
+  scout.MobileDesktop.parent.prototype.setOutline.call(this, outline);
+  this.outline.$container.addClass('mobile'); //TODO CGU maybe use outline.setDisplayStyle(mobile) instead
+};
+
+/**
+ * @override
+ */
+scout.MobileDesktop.prototype.setOutlineContent = function(content) {
   var prefSize, $node,
     selectedNode = this.outline.selectedNodes[0];
 
-  bringToFront = scout.nvl(bringToFront, true);
   this.outline.menuBar.hiddenByUi = false;
   if (this._currentDetailForm) {
     this._currentDetailForm.remove();

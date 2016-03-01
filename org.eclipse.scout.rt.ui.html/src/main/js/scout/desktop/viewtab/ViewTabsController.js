@@ -112,9 +112,8 @@ scout.ViewTabsController.prototype.selectViewTab = function(viewTab) {
     return;
   }
 
-  // Hide outline content.
-  this._desktop._sendNavigationToBack();
-  this._desktop._detachOutlineContent();
+  // Hide outline content
+  this._desktop.sendOutlineToBack();
 
   // Deselect the current selected tab.
   this.deselectViewTab();

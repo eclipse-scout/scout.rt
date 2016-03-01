@@ -281,7 +281,12 @@ scout.Form.prototype._attach = function() {
   this.session.detachHelper.afterAttach(this.$container);
 
   // form is attached even if children are not yet
-  if ((this.isView() || this.isDialog()) && this.session.desktop._outlineContent !== this) {
+  var outlineContent;
+  if (this.session.desktop.bench) {
+    //FIXME CGU what if bench is not available, e.g. on mobile?
+    outlineContent = this.session.desktop.bench.outlineContent;
+  }
+  if ((this.isView() || this.isDialog()) && outlineContent !== this) {
     //notify model this form is active
     this.session.desktop._setFormActivated(this);
   }

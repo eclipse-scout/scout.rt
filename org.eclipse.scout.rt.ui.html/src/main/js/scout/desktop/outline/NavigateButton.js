@@ -81,8 +81,7 @@ scout.NavigateButton.prototype._remove = function() {
 scout.NavigateButton.prototype._setDetailVisible = function() {
   var detailVisible = this._toggleDetail();
   $.log.debug('show detail-' + detailVisible ? 'form' : 'table');
-  this.node.detailFormVisibleByUi = detailVisible;
-  this.outline._updateOutlineNode(this.node, true);
+  this.outline.setDetailFormVisibleByUi(this.node, detailVisible);
 };
 
 /**

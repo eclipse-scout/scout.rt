@@ -13,7 +13,6 @@ scout.DesktopNavigation = function() {
   this.$container;
   this.$body;
   this.viewButtons;
-  this.toolBarVisible = false;
 };
 scout.inherits(scout.DesktopNavigation, scout.Widget);
 
@@ -23,9 +22,11 @@ scout.DesktopNavigation.MIN_SPLITTER_SIZE = 49; // not 50px because last pixel i
 
 scout.DesktopNavigation.prototype._init = function(model) {
   scout.DesktopNavigation.parent.prototype._init.call(this, model);
-  this.desktop = this.parent;
   scout.DesktopNavigation.DEFAULT_STYLE_WIDTH = $.pxToNumber(scout.styles.get('desktop-navigation', 'width').width);
   scout.DesktopNavigation.BREADCRUMB_STYLE_WIDTH = $.pxToNumber(scout.styles.get('desktop-navigation-breadcrumb', 'width').width);
+  this.desktop = this.parent;
+  this.toolBarVisible = scout.nvl(model.toolBarVisible, false);
+  this.setOutline(model.outline);
 };
 
 scout.DesktopNavigation.prototype._render = function($parent) {
@@ -43,27 +44,21 @@ scout.DesktopNavigation.prototype._render = function($parent) {
   this.htmlCompBody = new scout.HtmlComponent(this.$body, this.session);
   this.htmlCompBody.setLayout(new scout.SingleLayout());
   this._renderToolBarVisible();
-
-  // This check for rendered is necessary because outline wants to update desktop bench which does not exist yet.
-  //TODO CGU  Remove the dependency from outline to desktop incl. handleOutlineContent and the explicit call of setOutline in desktop.render
-  if (this.desktop.rendered) {
-    this._renderOutline();
-  }
+  this._renderOutline();
 };
 
-scout.DesktopNavigation.prototype._renderOutline = function(bringToFront) {
+scout.DesktopNavigation.prototype._renderOutline = function() {
   this.outline.render(this.$body);
   this.outline.invalidateLayoutTree();
-  this.outline.handleOutlineContent(bringToFront);
-  this.outline.validateFocus();
   // Layout immediate to prevent flickering when breadcrumb mode is enabled
   // but not initially while desktop gets rendered because it will be done at the end anyway
   if (this.desktop.rendered) {
     this.outline.validateLayoutTree();
+    this.outline.validateFocus();
   }
 };
 
-scout.DesktopNavigation.prototype.setOutline = function(outline, bringToFront) {
+scout.DesktopNavigation.prototype.setOutline = function(outline) {
   if (this.outline === outline) {
     return;
   }
@@ -83,7 +78,7 @@ scout.DesktopNavigation.prototype.setOutline = function(outline, bringToFront) {
   if (this.outline) {
     this.outline.setBreadcrumbTogglingThreshold(scout.DesktopNavigation.BREADCRUMB_STYLE_WIDTH);
     if (this.rendered) {
-      this._renderOutline(bringToFront);
+      this._renderOutline();
     }
   }
 };

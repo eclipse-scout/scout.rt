@@ -95,7 +95,7 @@ scout.DesktopViewTab.prototype.select = function() {
     this._view.attach();
   } else {
     this._renderView();
-    if (this.session.desktop._outlineContent !== this._view) {
+    if (this.session.desktop.bench.outlineContent !== this._view) {
       // Notify model that this form is active
       this.session.desktop._setFormActivated(this._view);
     }

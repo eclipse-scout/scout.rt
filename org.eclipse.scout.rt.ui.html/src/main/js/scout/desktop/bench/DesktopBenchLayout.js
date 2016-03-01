@@ -21,8 +21,8 @@ scout.DesktopBenchLayout.prototype.layout = function($container) {
     containerSize = htmlContainer.getAvailableSize();
 
   containerSize = containerSize.subtract(htmlContainer.getInsets());
-  if (desktop._outlineContent) {
-    htmlOutlineContent = desktop._outlineContent.htmlComp;
+  if (this.bench.outlineContent) {
+    htmlOutlineContent = this.bench.outlineContent.htmlComp;
     outlineContentSize = containerSize.subtract(htmlOutlineContent.getMargins());
     htmlOutlineContent.setSize(outlineContentSize);
   }

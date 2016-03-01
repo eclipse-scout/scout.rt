@@ -16,8 +16,7 @@ describe('NavigateDownButton', function() {
     setFixtures(sandbox());
     session = sandboxSession();
     outline = {
-      session: session,
-      handleOutlineContent: function() {}
+      session: session
     };
     var model = createSimpleModel('NavigateDownButton', session);
     model.outline = outline;

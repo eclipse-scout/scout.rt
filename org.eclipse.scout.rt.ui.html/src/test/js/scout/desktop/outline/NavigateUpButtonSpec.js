@@ -17,8 +17,7 @@ describe('NavigateUpButton', function() {
     session = sandboxSession();
     outline = {
       session: session,
-      navigateToTop: function() {},
-      handleOutlineContent: function() {}
+      navigateToTop: function() {}
     };
     var model = createSimpleModel('NavigateUpButton', session);
     model.outline = outline;

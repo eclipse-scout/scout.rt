@@ -31,11 +31,11 @@ function sandboxSession(options) {
   session.uiSessionId = '1.1';
   session.modelAdapterRegistry[session.uiSessionId] = session;
   session.locale = new LocaleSpecHelper().createLocale(LocaleSpecHelper.DEFAULT_LOCALE);
-  session.desktop = scout.create('Desktop', {
-    parent: session.rootAdapter
-  });
-  session.desktop.navigationVisible = false;
-  session.desktop.headerVisible = false;
+  var desktop = options.desktop || {};
+  desktop.navigationVisible = scout.nvl(desktop.navigationVisible, false);
+  desktop.headerVisible = scout.nvl(desktop.headerVisible, false);
+  desktop.parent = scout.nvl(desktop.parent, session.rootAdapter);
+  session.desktop = scout.create('Desktop', desktop);
   session._renderDesktop();
   // Prevent exception when test window gets resized
   session.desktop.$container.window().off('resize', session.desktop._resizeHandler);

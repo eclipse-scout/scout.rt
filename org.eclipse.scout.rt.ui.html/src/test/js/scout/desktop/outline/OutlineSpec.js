@@ -8,76 +8,22 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
+/* global OutlineSpecHelper */
 describe("Outline", function() {
-  var session;
+  var helper, session;
 
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
+    helper = new OutlineSpecHelper(session);
     jasmine.Ajax.install();
     jasmine.clock().install();
   });
 
   afterEach(function() {
-    session = null;
     jasmine.Ajax.uninstall();
     jasmine.clock().uninstall();
   });
-
-  function createModelFixture(nodeCount, depth, expanded) {
-    return createModel(createModelNodes(nodeCount, depth, expanded));
-  }
-
-  function createModel(nodes) {
-    var model = createSimpleModel('Outline', session);
-
-    if (nodes) {
-      model.nodes = nodes;
-    }
-
-    return model;
-  }
-
-  function createModelNode(id, text) {
-    return {
-      "id": id,
-      "text": text
-    };
-  }
-
-  function createModelNodes(nodeCount, depth, expanded) {
-    return createModelNodesInternal(nodeCount, depth, expanded);
-  }
-
-  function createModelNodesInternal(nodeCount, depth, expanded, parentNode) {
-    if (!nodeCount) {
-      return;
-    }
-
-    var nodes = [],
-      nodeId;
-    if (!depth) {
-      depth = 0;
-    }
-    for (var i = 0; i < nodeCount; i++) {
-      nodeId = i;
-      if (parentNode) {
-        nodeId = parentNode.id + '_' + nodeId;
-      }
-      nodes[i] = createModelNode(nodeId, 'node ' + i);
-      nodes[i].expanded = expanded;
-      if (depth > 0) {
-        nodes[i].childNodes = createModelNodesInternal(nodeCount, depth - 1, expanded, nodes[i]);
-      }
-    }
-    return nodes;
-  }
-
-  function createOutline(model) {
-    var tree = new scout.Outline();
-    tree.init(model);
-    return tree;
-  }
 
   function createNodesDeletedEvent(model, nodeIds, commonParentNodeId) {
     return {
@@ -101,8 +47,8 @@ describe("Outline", function() {
 
     beforeEach(function() {
       // A large tree is used to properly test recursion
-      model = createModelFixture(3, 2, true);
-      tree = createOutline(model);
+      model = helper.createModelFixture(3, 2, true);
+      tree = helper.createOutline(model);
       node0 = model.nodes[0];
       node1 = model.nodes[1];
       node2 = model.nodes[2];
@@ -133,10 +79,10 @@ describe("Outline", function() {
   describe("navigateToTop", function() {
 
     it("collapses all nodes in bread crumb mode", function() {
-      var model = createModelFixture(1, 1);
+      var model = helper.createModelFixture(1, 1);
       var node0 = model.nodes[0];
 
-      var tree = createOutline(model);
+      var tree = helper.createOutline(model);
       tree.displayStyle = scout.Tree.DisplayStyle.BREADCRUMB;
       tree.render(session.$entryPoint);
 
@@ -152,6 +98,41 @@ describe("Outline", function() {
     });
   });
 
+  describe("selectNodes", function() {
+    var model, outline, node;
+
+    beforeEach(function() {
+      model = helper.createModelFixture(3, 2, true);
+      outline = helper.createOutline(model);
+      node = model.nodes[0];
+    });
+
+    it("handle navigateUp only once", function() {
+      outline.selectNodes(node);
+      outline.navigateUpInProgress = true;
+      outline.selectNodes([]);
+      expect(outline.navigateUpInProgress).toBe(false);
+    });
+
+    // we must override the _render* methods for this test-case, since we had to
+    // implement a lot more of set-up code to make these methods work.
+    it("otherwise handle single selection (or do nothing when selection is != 1 node)", function() {
+      node.detailFormVisibleByUi = false;
+      outline.navigateUpInProgress = false;
+      outline._renderSelection = function() {};
+      outline._renderMenus = function() {};
+
+      // don't change the visibleByUi flag when selection is != 1
+      outline.selectNodes([]);
+      expect(node.detailFormVisibleByUi).toBe(false);
+
+      // set the visibleByUi flag to true when selection is exactly 1
+      outline.selectNodes([node]);
+      expect(node.detailFormVisibleByUi).toBe(true);
+    });
+
+  });
+
   describe("onModelAction", function() {
 
     describe("nodesDeleted event", function() {
@@ -159,8 +140,8 @@ describe("Outline", function() {
 
       beforeEach(function() {
         // A large tree is used to properly test recursion
-        model = createModelFixture(3, 2, true);
-        tree = createOutline(model);
+        model = helper.createModelFixture(3, 2, true);
+        tree = helper.createOutline(model);
         node0 = model.nodes[0];
         node1 = model.nodes[1];
         node2 = model.nodes[2];
@@ -184,8 +165,8 @@ describe("Outline", function() {
 
       beforeEach(function() {
         // A large tree is used to properly test recursion
-        model = createModelFixture(3, 2, true);
-        tree = createOutline(model);
+        model = helper.createModelFixture(3, 2, true);
+        tree = helper.createOutline(model);
         node0 = model.nodes[0];
         node1 = model.nodes[1];
         node2 = model.nodes[2];
@@ -203,48 +184,6 @@ describe("Outline", function() {
         expect(scout.objects.countProperties(tree.nodesMap)).toBe(0);
       });
 
-    });
-
-    describe("selectNodes", function() {
-      var model, outline, node;
-
-      beforeEach(function() {
-        model = createModelFixture(3, 2, true);
-        outline = createOutline(model);
-        node = model.nodes[0];
-      });
-
-      it("handle navigateUp only once", function() {
-        outline.navigateUpInProgress = true;
-        outline.selectNodes([]);
-        expect(outline.navigateUpInProgress).toBe(false);
-      });
-
-      // we must override the _render* methods for this test-case, since we had to
-      // implement a lot more of set-up code to make these methods work.
-      it("otherwise handle single selection (or do nothing when selection is != 1 node)", function() {
-        node.detailFormVisibleByUi = false;
-        outline.navigateUpInProgress = false;
-        outline._renderSelection = function() {};
-        outline._renderMenus = function() {};
-
-        // don't change the visibleByUi flag when selection is != 1
-        outline.selectNodes([]);
-        expect(node.detailFormVisibleByUi).toBe(false);
-
-        // set the visibleByUi flag to true when selection is exactly 1
-        outline.selectNodes([node]);
-        expect(node.detailFormVisibleByUi).toBe(true);
-      });
-
-      it("does not update outline content if node already is selected", function() {
-        spyOn(outline, 'handleOutlineContent');
-        outline.selectNodes(outline.nodes[1]);
-        expect(outline.handleOutlineContent.calls.count()).toEqual(1);
-
-        outline.selectNodes(outline.nodes[1]);
-        expect(outline.handleOutlineContent.calls.count()).toEqual(1);
-      });
     });
 
   });

@@ -70,15 +70,6 @@ scout.Outline.prototype._render = function($parent) {
 
   // Override layout
   this.htmlComp.setLayout(new scout.OutlineLayout(this));
-
-  if (this.selectedNodes.length === 0) {
-    if (this.defaultDetailForm) {
-      this._showDefaultDetailForm();
-    } else if (this.outlineOverview) {
-      this._showOutlineOverview();
-    }
-  }
-
 };
 
 scout.Outline.prototype._renderProperties = function() {
@@ -142,30 +133,9 @@ scout.Outline.prototype._renderTitleVisible = function() {
   }
 };
 
-scout.Outline.prototype.handleOutlineContentDebounced = function(bringToFront) {
-  clearTimeout(this._handleOutlineTimeout);
-  this._handleOutlineTimeout = setTimeout(function() {
-    this.handleOutlineContent(bringToFront);
-  }.bind(this), 300);
-};
-
-scout.Outline.prototype.handleOutlineContent = function(bringToFront) {
-  // Outline does not support multi selection -> [0]
-  var node = this.selectedNodes[0];
-  if (node) {
-    this._updateOutlineNode(node, bringToFront);
-  } else {
-    this._showDefaultDetailForm();
-  }
-};
-
 scout.Outline.prototype._postRender = function() {
   //used to render glasspane
   this._trigger('rendered');
-  //first set Outline content to prevent errors while rendering existing glasspanes. the outline content is a glasspane target
-  //and if this is null there could be errors when the form controller tries to render a popup with a glasspane behind it.
-  //The content is not rendered or attached twice because handleOutlineContent() checks if this is already done.
-  this.handleOutlineContent();
   scout.Outline.parent.prototype._postRender.call(this);
 
   // Display attached forms, message boxes and file choosers.
@@ -240,8 +210,8 @@ scout.Outline.prototype._initDetailForm = function(node) {
     // The form gets closed on execPageDeactivated. No pageChanged event will
     // be fired because the deactivated page is not selected anymore.
     node.detailForm = null;
-    // Also make sure desktop holds no reference to a destroyed form
-    this._updateOutlineNode(node, false);
+    // Also make sure other objects hold no reference to a destroyed form (e.g. bench)
+    this._triggerPageChanged(node);
   }.bind(this));
 };
 
@@ -307,15 +277,7 @@ scout.Outline.prototype._onTitleClick = function(event) {
 scout.Outline.prototype.navigateToTop = function() {
   this.deselectAll();
   this.collapseAll();
-  if (this.defaultDetailForm) {
-    this._showDefaultDetailForm();
-  } else if (this.outlineOverview) {
-    this._showOutlineOverview();
-  }
-
   this.handleInitialExpanded();
-
-  this.handleOutlineContentDebounced(true);
 };
 
 scout.Outline.prototype.handleInitialExpanded = function(){
@@ -343,22 +305,23 @@ scout.Outline.prototype.selectNodes = function(nodes, notifyServer, debounceSend
     // Already selected, do nothing
     return;
   }
-  scout.Outline.parent.prototype.selectNodes.call(this, nodes, notifyServer, debounceSend);
-  this.handleOutlineContent(true);
+  if (nodes.length === 0 && this.selectedNodes.length === 0) {
+    // Already unselected, do nothing
+    return;
+  }
   if (this.navigateUpInProgress) {
     this.navigateUpInProgress = false;
   } else {
     if (nodes.length === 1) {
       // When a node is selected, the detail form should never be hidden
-      nodes[0].detailFormVisibleByUi = true;
+      this.setDetailFormVisibleByUi(nodes[0], true);
     }
   }
+  scout.Outline.parent.prototype.selectNodes.call(this, nodes, notifyServer, debounceSend);
 };
 
 scout.Outline.prototype._renderDefaultDetailForm = function() {
-  if (!this.inBackground) {
-    this._showDefaultDetailForm();
-  }
+  // nop
 };
 
 scout.Outline.prototype._syncDefaultDetailForm = function(defaultDetailForm) {
@@ -441,36 +404,6 @@ scout.Outline.prototype._renderNavigateButtonsVisible = function() {
   // nop
 };
 
-scout.Outline.prototype._showDefaultDetailForm = function() {
-  if (this.defaultDetailForm && this.session.desktop.outline === this) {
-    this.session.desktop.setOutlineContent(this.defaultDetailForm, true);
-  }
-};
-
-scout.Outline.prototype._showOutlineOverview = function() {
-  this.session.desktop.setOutlineContent(this.outlineOverview, true);
-};
-
-scout.Outline.prototype._updateOutlineNode = function(node, bringToFront) {
-  bringToFront = scout.nvl(bringToFront, true);
-  if (!node) {
-    throw new Error('called _updateOutlineNode without node');
-  }
-
-  if (this.session.desktop.outline !== this || !scout.isOneOf(node, this.selectedNodes)) {
-    return;
-  }
-
-  var content;
-  if (node.detailForm && node.detailFormVisible && node.detailFormVisibleByUi) {
-    content = node.detailForm;
-  } else if (node.detailTable && node.detailTableVisible) {
-    content = node.detailTable;
-  }
-
-  this.session.desktop.setOutlineContent(content, bringToFront);
-};
-
 /**
  * Returns the selected row or null when no row is selected. When multiple rows are selected
  * the first selected row is returned.
@@ -525,6 +458,11 @@ scout.Outline.prototype._isTruncatedNodeTooltipEnabled = function() {
   return false;
 };
 
+scout.Outline.prototype.setDetailFormVisibleByUi = function(node, visible) {
+  node.detailFormVisibleByUi = visible;
+  this._triggerPageChanged(node);
+};
+
 /* event handling */
 
 scout.Outline.prototype._onDetailTableRowsFiltered = function(event) {
@@ -544,8 +482,9 @@ scout.Outline.prototype._onDetailTableEvent = function(event) {
 };
 
 scout.Outline.prototype._onPageChanged = function(event) {
+  var node;
   if (event.nodeId) {
-    var node = this.nodesMap[event.nodeId];
+    node = this.nodesMap[event.nodeId];
 
     node.detailFormVisible = event.detailFormVisible;
     node.detailForm = this.session.getOrCreateModelAdapter(event.detailForm, this);
@@ -558,16 +497,15 @@ scout.Outline.prototype._onPageChanged = function(event) {
     if (node.detailTable) {
       this._initDetailTable(node);
     }
-
-    // If the following condition is false, the selection state is not synchronized yet which
-    // means there is a selection event in the queue which will be processed right afterwards.
-    if (this.selectedNodes.indexOf(node) !== -1) {
-      this._updateOutlineNode(node, false);
-    }
   } else {
     this.defaultDetailForm = this.session.getOrCreateModelAdapter(event.detailForm, this);
-    this._showDefaultDetailForm();
   }
+
+  this._triggerPageChanged(node);
+};
+
+scout.Outline.prototype._triggerPageChanged = function(page) {
+  this.trigger('pageChanged', {page: page});
 };
 
 scout.Outline.prototype.onModelAction = function(event) {
@@ -616,10 +554,10 @@ scout.Outline.prototype.glassPaneTargets = function() {
     var desktop = this.session.desktop;
     var elements = [];
     if (desktop.navigation) {
-      elements.push(desktop.navigation.$body); // navigation body; not available if application has no navigation.
+      elements.push(desktop.navigation.$body);
     }
-    if (desktop._outlineContent) {
-      elements.push(desktop._outlineContent.$container); // outline content; not available if application has no navigation.
+    if (desktop.bench) {
+      elements.push(desktop.bench.$container);
     }
     return elements;
   } else {
@@ -628,10 +566,10 @@ scout.Outline.prototype.glassPaneTargets = function() {
       var desktop = event.eventOn.session.desktop;
       var elements = [];
       if (desktop.navigation) {
-        elements.push(desktop.navigation.$body); // navigation body; not available if application has no navigation.
+        elements.push(desktop.navigation.$body);
       }
-      if (desktop._outlineContent) {
-        elements.push(desktop._outlineContent.$container); // outline content; not available if application has no navigation.
+      if (desktop.bench) {
+        elements.push(desktop.bench.$container);
       }
       deferred.ready(elements);
     };

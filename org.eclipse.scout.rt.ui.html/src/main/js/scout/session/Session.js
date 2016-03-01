@@ -320,6 +320,7 @@ scout.Session.prototype._processStartupResponse = function(data) {
 
     // Ensure layout is valid (explicitly layout immediately and don't wait for setTimeout to run to make layouting invisible to the user)
     this.layoutValidator.validate();
+    this.focusManager.validateFocus();
 
     // Start poller
     this._resumeBackgroundJobPolling();
