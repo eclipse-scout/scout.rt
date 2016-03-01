@@ -3,12 +3,12 @@
   <head>
     <meta charset="UTF-8">
     <title>${displayName}</title>
-	<meta name="apple-mobile-web-app-capable" content="yes"/>
-	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
     <scout:include template="favicon.html" />
-    <scout:stylesheet src="res/scout-mobile-module.css" />
+    <scout:stylesheet src="res/scout-module.css" />
     <scout:script src="res/jquery-all-macro.js" />
-    <scout:script src="res/scout-mobile-module.js" />
+    <scout:script src="res/scout-module.js" />
     <script>
       $(document).ready(function() {
         scout.init({
@@ -16,8 +16,7 @@
             fonts: ['scoutIcons']
           },
           session: {
-            userAgent: new scout.UserAgent(scout.Device.Type.MOBILE),
-            uiUseTaskbarLogo: true
+            userAgent: new scout.UserAgent(scout.Device.Type.MOBILE)
           }
         })
       });

@@ -35,6 +35,11 @@ public class Desktop extends AbstractDesktop {
   }
 
   @Override
+  protected String getConfiguredApplicationLogoId() {
+    return "application_logo";
+  }
+
+  @Override
   protected List<Class<? extends IOutline>> getConfiguredOutlines() {
     return CollectionUtility.<Class<? extends IOutline>> arrayList(WorkOutline.class, SearchOutline.class, SettingsOutline.class);
   }
