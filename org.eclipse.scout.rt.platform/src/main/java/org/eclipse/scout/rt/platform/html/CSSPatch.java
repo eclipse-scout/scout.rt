@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Patch for CSS class. The patch is applied as soon as this class is accessed.
  *
- * @deprecated This legacy utility will be removed in Scout 7. Use {@link org.eclipse.scout.rt.platform.html.HTML} and
+ * @deprecated This legacy utility will be removed in Scout 6.1. Use {@link org.eclipse.scout.rt.platform.html.HTML} and
  *             {@link HtmlHelper} instead.
  */
 @Deprecated
@@ -203,7 +203,7 @@ public final class CSSPatch {
       try {
         StyleContext.registerStaticAttributeKey(key);
       }
-      catch (Throwable t) {
+      catch (Throwable t) { //NOSONAR (deprecated class)
         LOG.error("Failed registering CSS.Attribute '{}' on StyleContext", key, t);
       }
     }
@@ -215,7 +215,7 @@ public final class CSSPatch {
       c.setAccessible(true);
       return c.newInstance(s1, s2, b);
     }
-    catch (Throwable t) {
+    catch (Throwable t) {//NOSONAR (deprecated class)
       LOG.error("Failed patching CSS by adding key '{}'", s1, t);
     }
     return null;

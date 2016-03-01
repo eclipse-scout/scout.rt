@@ -51,7 +51,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Utility to manipulate HTML documents regardless of ui.
  *
- * @deprecated This legacy utility will be removed in Scout 7. Use {@link org.eclipse.scout.rt.platform.html.HTML} and
+ * @deprecated This legacy utility will be removed in Scout 6.1. Use {@link org.eclipse.scout.rt.platform.html.HTML} and
  *             {@link HtmlHelper} instead.
  */
 @SuppressWarnings("deprecation")
@@ -141,7 +141,7 @@ public final class HTMLUtility {
       kit.write(buf, doc, 0, doc.getLength());
       htmlText = buf.toString();
     }
-    catch (Throwable t) {
+    catch (Throwable t) { //NOSONAR (deprecated class)
       LOG.error("failed to extract HTML text from HTML document", t);
     }
     return htmlText;
@@ -302,7 +302,7 @@ public final class HTMLUtility {
     if (htmlDoc == null) {
       return htmlDoc;
     }
-    MutableHTMLDocument doc = (MutableHTMLDocument) htmlDoc;
+    MutableHTMLDocument doc = (MutableHTMLDocument) htmlDoc; // NOSONAR (deprecated class)
     StyleSheet styleSheet = doc.getStyleSheet();
     Style style;
     // p style
@@ -427,7 +427,7 @@ public final class HTMLUtility {
     if (htmlDoc == null) {
       return htmlDoc;
     }
-    MutableHTMLDocument doc = (MutableHTMLDocument) htmlDoc;
+    MutableHTMLDocument doc = (MutableHTMLDocument) htmlDoc; // NOSONAR (deprecated class)
     StyleSheet styleSheet = doc.getStyleSheet();
     final IntegerHolder changeCount = new IntegerHolder(0);
     // visit all css attributes for occurrences of "cid:" URLs
@@ -484,7 +484,7 @@ public final class HTMLUtility {
     if (htmlDoc == null) {
       return htmlDoc;
     }
-    MutableHTMLDocument doc = (MutableHTMLDocument) htmlDoc;
+    MutableHTMLDocument doc = (MutableHTMLDocument) htmlDoc; // NOSONAR (deprecated class)
     // StyleSheet styleSheet=doc.getStyleSheet();
     final IntegerHolder changeCount = new IntegerHolder(0);
     // visit all img tags for occurrences of "cid:" URLs
