@@ -19,6 +19,7 @@ import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.action.JsonAction;
+import org.json.JSONArray;
 
 public class JsonMenu<MENU extends IMenu> extends JsonAction<MENU> {
 
@@ -58,7 +59,7 @@ public class JsonMenu<MENU extends IMenu> extends JsonAction<MENU> {
           String prefix = type.getClass().getSimpleName().replace("MenuType", "");
           menuTypes.add(prefix + "." + type.toString());
         }
-        return menuTypes;
+        return new JSONArray(menuTypes);
       }
     });
   }
