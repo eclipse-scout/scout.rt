@@ -28,6 +28,7 @@ import org.eclipse.scout.rt.ui.html.UiServlet;
 import org.eclipse.scout.rt.ui.html.cache.HttpCacheKey;
 import org.eclipse.scout.rt.ui.html.cache.HttpCacheObject;
 import org.eclipse.scout.rt.ui.html.cache.IHttpCacheControl;
+import org.eclipse.scout.rt.ui.html.deeplink.DeepLinks;
 import org.eclipse.scout.rt.ui.html.res.loader.IResourceLoader;
 import org.eclipse.scout.rt.ui.html.res.loader.IResourceLoaderFactory;
 import org.slf4j.Logger;
@@ -48,6 +49,7 @@ public class ResourceRequestHandler extends AbstractUiServletRequestHandler {
   // Remember bean instances to save lookups on each GET request
   private List<IResourceLoaderFactory> m_resourceLoaderFactoryList = Collections.unmodifiableList(BEANS.all(IResourceLoaderFactory.class));
   private IHttpCacheControl m_httpCacheControl = BEANS.get(IHttpCacheControl.class);
+  private DeepLinks m_deepLinks = new DeepLinks();
 
   @Override
   public boolean handleGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -137,15 +139,24 @@ public class ResourceRequestHandler extends AbstractUiServletRequestHandler {
     return m_httpCacheControl;
   }
 
+  /**
+   * @return index.html for requests on root (empty or /) and also for deep-link requests, for all other requests the
+   *         pathInfo from the given request
+   */
   protected String resolveResourcePath(HttpServletRequest req) {
     String pathInfo = req.getPathInfo();
     if (pathInfo == null) {
       return null;
     }
-    if ("/".equals(pathInfo)) {
+    if ("/".equals(pathInfo) || isDeepLinkRequest(pathInfo)) {
       pathInfo = resolveIndexHtml(req);
     }
+
     return pathInfo;
+  }
+
+  private boolean isDeepLinkRequest(String pathInfo) {
+    return m_deepLinks.isRequestValid(pathInfo);
   }
 
   protected String resolveIndexHtml(HttpServletRequest request) {

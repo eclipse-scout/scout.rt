@@ -40,6 +40,7 @@ public class HtmlDocumentParser {
   private static final Pattern PATTERN_MESSAGE_TAG = Pattern.compile("<scout\\:message(.*)/>", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
   private static final Pattern PATTERN_STYLESHEET_TAG = Pattern.compile("<scout\\:stylesheet src=\"(.*?)\"(.*)/>", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
   private static final Pattern PATTERN_SCRIPT_TAG = Pattern.compile("<scout\\:script src=\"(.*?)\"(.*)/>", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
+  private static final String PATTERN_BASE_TAG = "<scout\\:base\\s*/>";
 
   private final HtmlDocumentParserParameters m_params;
   private String m_workingContent;
@@ -52,6 +53,7 @@ public class HtmlDocumentParser {
     // the order of calls is important: first we must resolve all includes
     m_workingContent = new String(document, StandardCharsets.UTF_8.name());
     replaceIncludeTags();
+    replaceBaseTags();
     replaceMessageTags();
     replaceStylesheetTags();
     replaceScriptTags();
@@ -127,6 +129,16 @@ public class HtmlDocumentParser {
   protected void replaceScriptTags() throws IOException {
     // <scout:script src="scout-all-macro.css" />
     replaceScriptTags(PATTERN_SCRIPT_TAG, "<script src=\"", "\"></script>");
+  }
+
+  protected void replaceBaseTags() {
+    // <scout:base />
+    String contextPath = m_params.getContextPath();
+    if (StringUtility.isNullOrEmpty(contextPath)) {
+      contextPath = "/";
+    }
+    String baseTag = "<base href=\"" + contextPath + "\">";
+    m_workingContent = m_workingContent.replaceAll(PATTERN_BASE_TAG, baseTag);
   }
 
   protected void replaceIncludeTags() throws IOException {
