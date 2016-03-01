@@ -25,6 +25,7 @@ scout.DesktopNavigation.prototype._init = function(model) {
   scout.DesktopNavigation.DEFAULT_STYLE_WIDTH = $.pxToNumber(scout.styles.get('desktop-navigation', 'width').width);
   scout.DesktopNavigation.BREADCRUMB_STYLE_WIDTH = $.pxToNumber(scout.styles.get('desktop-navigation-breadcrumb', 'width').width);
   this.desktop = this.parent;
+  this.layoutData = model.layoutData || {};
   this.toolBarVisible = scout.nvl(model.toolBarVisible, false);
   this.setOutline(model.outline);
 };
@@ -33,7 +34,7 @@ scout.DesktopNavigation.prototype._render = function($parent) {
   this.$container = $parent.appendDiv('desktop-navigation');
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
   this.htmlComp.setLayout(new scout.DesktopNavigationLayout(this));
-
+  this.htmlComp.layoutData = this.layoutData;
   this.viewButtons = scout.create('ViewButtons', {
     parent: this
   });
@@ -48,6 +49,7 @@ scout.DesktopNavigation.prototype._render = function($parent) {
 };
 
 scout.DesktopNavigation.prototype._renderOutline = function() {
+  this.outline.setParent(this);
   this.outline.render(this.$body);
   this.outline.invalidateLayoutTree();
   // Layout immediate to prevent flickering when breadcrumb mode is enabled
@@ -118,6 +120,7 @@ scout.DesktopNavigation.prototype._renderToolBar = function() {
     action.popupOpeningDirectionX = 'left';
     action.textVisible = false;
     action.subMenuIconVisible = false;
+    action.setParent(this);
     action.render(this._$toolBar);
   }.bind(this));
 

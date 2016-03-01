@@ -44,7 +44,10 @@ scout.MobileDesktop.prototype._renderNavigation = function() {
   this.navigation = scout.create('DesktopNavigation', {
     parent: this,
     outline: this.outline,
-    toolBarVisible: true
+    toolBarVisible: true,
+    layoutData: {
+      fullWidth: true
+    }
   });
   this.navigation.render(this.$container);
   this.navigation.$container.insertBefore(this.$overlaySeparator);

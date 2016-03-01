@@ -57,6 +57,7 @@ scout.DesktopHeader.prototype._renderToolMenus = function() {
   this.desktop.actions.forEach(function(action) {
     action._customCssClasses = "header-tool-item";
     action.popupOpeningDirectionX = 'left';
+    action.setParent(this);
     action.render(this._$toolBar);
   }.bind(this));
 
