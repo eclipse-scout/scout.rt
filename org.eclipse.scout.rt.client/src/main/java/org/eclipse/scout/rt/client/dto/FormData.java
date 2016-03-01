@@ -154,11 +154,11 @@ public @interface FormData {
 
   Class[] interfaces() default {};
 
-  public static enum SdkCommand {
+  enum SdkCommand {
     CREATE, USE, IGNORE, DEFAULT
   }
 
-  public static enum DefaultSubtypeSdkCommand {
+  enum DefaultSubtypeSdkCommand {
     CREATE, IGNORE, DEFAULT
   }
 }

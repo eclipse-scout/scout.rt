@@ -34,9 +34,6 @@ public class HeaderCell implements IHeaderCell, IStyleable {
   private String m_backgroundColor;
   private FontSpec m_font;
 
-  public HeaderCell() {
-  }
-
   @Override
   public int getColumnIndex() {
     return m_columnIndex;

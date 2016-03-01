@@ -762,7 +762,7 @@ public class ClientUIPreferences {
     if (value != null) {
       try {
         StringTokenizer tok = new StringTokenizer(value, ",");
-        BoundsSpec r = new BoundsSpec(new Integer(tok.nextToken()).intValue(), new Integer(tok.nextToken()).intValue(), new Integer(tok.nextToken()).intValue(), new Integer(tok.nextToken()).intValue());
+        BoundsSpec r = new BoundsSpec(Integer.parseInt(tok.nextToken()), Integer.parseInt(tok.nextToken()), Integer.parseInt(tok.nextToken()), Integer.parseInt(tok.nextToken()));
         return r;
       }
       catch (Exception e) {

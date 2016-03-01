@@ -69,7 +69,7 @@ public final class ScoutAssert {
     }
     int actualIndex = 0;
     expectedLoop: for (Object expectedElement : expected) {
-      for (int j = actualIndex; j < actual.length; j++) {
+      for (int j = actualIndex; j < actual.length; j++) { //NOSONAR
         if (expectedElement.equals(actual[j])) {
           actualIndex = j + 1;
           continue expectedLoop;

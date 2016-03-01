@@ -24,14 +24,14 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Builder for {@link URI} and {@link URL} instances.
- * 
+ *
  * @since 3.8.1
  */
 public class UriBuilder {
 
   private static final Logger LOG = LoggerFactory.getLogger(UriBuilder.class);
 
-  private final Map<String, String> m_parameters = new HashMap<String, String>();
+  private final Map<String, String> m_parameters = new HashMap<>();
   private String m_scheme;
   private String m_host;
   private int m_port = -1;
@@ -86,7 +86,7 @@ public class UriBuilder {
 
   /**
    * Sets the remote host's port. Values lower than 1 are resetting a possibly set explicit port.
-   * 
+   *
    * @param port
    * @return
    */

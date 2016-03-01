@@ -1651,7 +1651,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     if (dataTypes != null && dataTypes.length > 0) {
       // Important: Use LinkedHashMaps to make event firing deterministic!
       // (If listeners would be called in random order, bugs may not be reproduced very well.)
-      HashMap<DataChangeListener, Set<Object>> map = new LinkedHashMap<DataChangeListener, Set<Object>>();
+      HashMap<DataChangeListener, Set<Object>> map = new LinkedHashMap<>();
       for (Object dataType : dataTypes) {
         if (dataType != null) {
           EventListenerList list = m_dataChangeListenerList.get(dataType);

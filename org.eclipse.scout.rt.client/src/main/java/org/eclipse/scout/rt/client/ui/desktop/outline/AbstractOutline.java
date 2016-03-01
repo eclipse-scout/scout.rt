@@ -616,7 +616,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
    * @see IOutline#getMenusForPage(IPage)
    */
   protected List<IMenu> computeInheritedMenusOfPage(IPage<?> activePage) {
-    List<IMenu> menus = new ArrayList<IMenu>();
+    List<IMenu> menus = new ArrayList<>();
     if (activePage instanceof IPageWithTable<?>) {
       // in case of a page with table the empty space actions of the table will be added to the context menu of the tree.
       IPageWithTable<?> pageWithTable = (IPageWithTable<?>) activePage;
@@ -634,7 +634,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
   }
 
   protected void addMenusOfActivePageToContextMenu(IPage<?> activePage) {
-    List<IMenu> wrappedMenus = new ArrayList<IMenu>();
+    List<IMenu> wrappedMenus = new ArrayList<>();
     for (IMenu m : computeInheritedMenusOfPage(activePage)) {
       wrappedMenus.add(new OutlineMenuWrapper(m, TABLE_MENU_TYPE_MAPPER));
     }

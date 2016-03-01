@@ -30,9 +30,6 @@ public class PermissionServiceClientProxy implements IPermissionService {
   private final Object m_stateLock = new Object();
   private final Map<Object, ServiceState> m_stateMap = new HashMap<Object, ServiceState>();
 
-  public PermissionServiceClientProxy() {
-  }
-
   private ServiceState getServiceState() {
     IClientSession session = ClientSessionProvider.currentSession();
     Object key = null;

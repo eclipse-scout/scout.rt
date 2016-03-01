@@ -56,7 +56,7 @@ public final class UriUtility {
    */
   public static Map<String, String> getQueryParameters(URL url, String encoding) {
     if (url == null) {
-      return new HashMap<String, String>(0);
+      return new HashMap<>(0);
     }
     return getQueryParameters(urlToUri(url), encoding);
   }
@@ -81,10 +81,10 @@ public final class UriUtility {
    */
   public static Map<String, String> getQueryParameters(URI uri, String encoding) {
     if (uri == null || uri.getQuery() == null) {
-      return new HashMap<String, String>(0);
+      return new HashMap<>(0);
     }
     String[] params = uri.getQuery().split("&");
-    Map<String, String> result = new HashMap<String, String>(params.length);
+    Map<String, String> result = new HashMap<>(params.length);
     for (String param : params) {
       String[] parts = StringUtility.split(param, "=");
       if (parts.length != 2) {

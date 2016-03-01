@@ -73,7 +73,7 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
     m_attributesLock = new Object();
     m_attributes = new HashMap<>();
     m_sharedVariableMap = new SharedVariableMap();
-    m_objectExtensions = new ObjectExtensions<AbstractServerSession, IServerSessionExtension<? extends AbstractServerSession>>(this);
+    m_objectExtensions = new ObjectExtensions<>(this);
     m_scoutTexts = new ScoutTexts();
     if (autoInitConfig) {
       interceptInitConfig();

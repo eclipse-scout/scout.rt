@@ -43,7 +43,7 @@ public class WsseUsernameTokenAuthenticationHandler implements SOAPHandler<SOAPM
   private static final String WS_SEC = "Security";
   private static final String USERNAME_TOKEN = "UsernameToken";
   private static final String USERNAME = "Username";
-  private static final String PASSWORD = "Password";
+  private static final String PASSWORD = "Password"; //NOSONAR
   private static final String NAME_SPACE_URI = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd";
 
   @Override

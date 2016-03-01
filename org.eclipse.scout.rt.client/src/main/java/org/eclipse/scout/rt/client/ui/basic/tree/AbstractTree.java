@@ -88,7 +88,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   private ITreeUIFacade m_uiFacade;
   private boolean m_initialized;
 
-  // enabled is defined as: enabledGranted && enabledProperty && enabledSlave
+  // enabled is defined as: enabledGranted && enabledProperty && enabledSlave // NOSONAR
   private boolean m_enabledGranted;
   private boolean m_enabledProperty;
 

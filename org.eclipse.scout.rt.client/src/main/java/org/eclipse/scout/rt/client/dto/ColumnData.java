@@ -38,15 +38,15 @@ import java.lang.annotation.Target;
  * </table>
  * <h3>Examples</h3>
  * <h4>Ignore a table column</h4> <blockquote>
- * 
+ *
  * <pre>
  * &#ColumnData(SdkColumnCommand.IGNORE)
  * public class DisplayColumn extends AbstractStringColumn { ... }
  * </pre>
- * 
+ *
  * </blockquote> The NameField will not be considered in the form data. The NameField is an inner type in a
  * form.</blockquote>
- * 
+ *
  * @since 3.10.0-M5
  */
 @Retention(RetentionPolicy.RUNTIME)
@@ -55,7 +55,7 @@ public @interface ColumnData {
 
   SdkColumnCommand value();
 
-  public static enum SdkColumnCommand {
+  enum SdkColumnCommand {
     CREATE, IGNORE
   }
 }

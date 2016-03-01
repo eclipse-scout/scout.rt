@@ -202,7 +202,7 @@ public class ClientNotificationDispatcher {
   private class P_NotificationFutureCallback implements IDoneHandler<Void> {
     private IFuture<Void> m_future;
 
-    public P_NotificationFutureCallback(IFuture<Void> furture) {
+    P_NotificationFutureCallback(IFuture<Void> furture) {
       m_future = furture;
     }
 
