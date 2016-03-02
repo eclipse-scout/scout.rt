@@ -10,7 +10,6 @@
  ******************************************************************************/
 scout.MobileDesktop = function() {
   scout.MobileDesktop.parent.call(this);
-  this._currentDetailForm;
 };
 scout.inherits(scout.MobileDesktop, scout.Desktop);
 
@@ -20,6 +19,7 @@ scout.MobileDesktop.prototype._init = function(model) {
   this.navigationVisible = true;
   this.headerVisible = false;
   this.benchVisible = false;
+  this._adaptOutline();
 };
 
 /**
@@ -58,60 +58,13 @@ scout.MobileDesktop.prototype._renderNavigation = function() {
  */
 scout.MobileDesktop.prototype.setOutline = function(outline) {
   scout.MobileDesktop.parent.prototype.setOutline.call(this, outline);
-  this.outline.$container.addClass('mobile'); //TODO CGU maybe use outline.setDisplayStyle(mobile) instead
+  this._adaptOutline();
 };
 
-/**
- * @override
- */
-scout.MobileDesktop.prototype.setOutlineContent = function(content) {
-  var prefSize, $node,
-    selectedNode = this.outline.selectedNodes[0];
-
-  this.outline.menuBar.hiddenByUi = false;
-  if (this._currentDetailForm) {
-    this._currentDetailForm.remove();
-    this._currentDetailForm = null;
-  }
-
-  if (!selectedNode) {
-    return;
-  }
-
-  $node = selectedNode.$node;
-  if (content && content instanceof scout.Form) {
-    content.render($node);
-    content.htmlComp.pixelBasedSizing = true;
-    prefSize = content.htmlComp.getPreferredSize();
-    content.$container.height(prefSize.height);
-    content.$container.width($node.width());
-    content.htmlComp.validateLayout();
-    this._currentDetailForm = content;
-    this.outline.menuBar.hiddenByUi = true;
-    this.outline.menuBar.updateVisibility();
-  } else {
-    // Temporary set menubar to invisible and await response to recompute visibility again
-    // This is necessary because when moving the menubar to the selected node, the menubar probably has shows the wrong menus.
-    // On client side we do not know which menus belong to which page.
-    // The other solution would be to never show outline menus, instead show the menus of the table resp. show the table itself.
-    var oldHiddenByUi = this.outline.menuBar.hiddenByUi;
-    this.outline.menuBar.hiddenByUi = true;
-    this.outline.menuBar.updateVisibility();
-    waitForServer(this.session, function() {
-      this.outline.menuBar.hiddenByUi = oldHiddenByUi;
-      this.outline.menuBar.updateVisibility();
-    }.bind(this));
-  }
-
-  // Move menubar to the selected node
-  this.outline.menuBar.$container.appendTo($node);
-
-  function waitForServer(session, func) {
-    if (session.areRequestsPending() || session.areEventsQueued()) {
-      session.listen().done(func);
-    } else {
-      func();
-    }
+scout.MobileDesktop.prototype._adaptOutline = function() {
+  if (this.outline) {
+    this.outline.setEmbedDetailForm(true);
+    this.outline.mobile = true;
   }
 };
 

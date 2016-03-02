@@ -18,7 +18,8 @@ scout.TreeLayout.prototype.layout = function($container) {
   var menuBarSize, containerSize, heightOffset,
     menuBar = this.tree.menuBar,
     htmlMenuBar = menuBar.htmlComp,
-    htmlContainer = this.tree.htmlComp;
+    htmlContainer = this.tree.htmlComp,
+    $data = this.tree.$data;
 
   containerSize = htmlContainer.getAvailableSize()
     .subtract(htmlContainer.getInsets());
@@ -35,6 +36,7 @@ scout.TreeLayout.prototype.layout = function($container) {
   }
 
   this._setDataHeight(heightOffset);
+  scout.scrollbars.update($data);
 };
 
 scout.TreeLayout.prototype._setDataHeight = function(heightOffset) {
@@ -43,5 +45,4 @@ scout.TreeLayout.prototype._setDataHeight = function(heightOffset) {
   heightOffset += $data.cssMarginTop() + $data.cssMarginBottom();
 
   $data.css('height', (heightOffset === 0 ? '100%' : 'calc(100% - ' + heightOffset + 'px)'));
-  scout.scrollbars.update($data);
 };

@@ -14,6 +14,35 @@ scout.OutlineLayout = function(outline) {
 };
 scout.inherits(scout.OutlineLayout, scout.TreeLayout);
 
+scout.OutlineLayout.prototype.layout = function($container) {
+  var containerSize,
+    htmlContainer = this.outline.htmlComp;
+
+  containerSize = htmlContainer.getAvailableSize()
+    .subtract(htmlContainer.getInsets());
+
+  if (this.outline.embedDetailForm) {
+    var selectedNode = this.outline.selectedNodes[0];
+    if (selectedNode) {
+      var pageHtmlComp = selectedNode.htmlComp;
+      // pageHtmlComp is only set for nodes with a detail form
+      if (pageHtmlComp) {
+        var prefSize = pageHtmlComp.getPreferredSize();
+        pageHtmlComp.setSize(new scout.Dimension(containerSize.width, prefSize.height));
+      }
+    }
+    // Remove width and height from non selected nodes
+    this.outline.$nodes().each(function(i, elem) {
+      var $elem = $(elem);
+      if (!$elem.isSelected()) {
+        $elem.css('height', 'auto')
+          .css('width', 'auto');
+      }
+    });
+  }
+  scout.OutlineLayout.parent.prototype.layout.call(this, $container);
+};
+
 scout.OutlineLayout.prototype._setDataHeight = function(heightOffset) {
   // Add title height to heightOffset
   if (this.outline.titleVisible) {

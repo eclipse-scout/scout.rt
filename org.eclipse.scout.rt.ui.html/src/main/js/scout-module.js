@@ -235,6 +235,7 @@
   __include("scout/desktop/outline/OutlineOverview.js");
   __include("scout/desktop/outline/OutlineLayout.js");
   __include("scout/desktop/outline/OutlineViewButton.js"); // requires ViewButton.js
+  __include("scout/desktop/outline/PageLayout.js");
   __include("scout/desktop/outline/SearchOutline.js");
   __include("scout/desktop/outline/SearchOutlineLayout.js");
   __include("scout/desktop/outline/keystrokes/AbstractOutlineNavigationKeyStroke.js");

@@ -33,6 +33,7 @@ scout.Outline.prototype._init = function(model) {
   this.addFilter(new scout.DetailTableTreeFilter());
   this.titleVisible = true;
   this._syncDefaultDetailForm(this.defaultDetailForm);
+  this.updateOutlineContent();
 };
 
 scout.Outline.prototype._createKeyStrokeContext = function() {
@@ -70,6 +71,10 @@ scout.Outline.prototype._render = function($parent) {
 
   // Override layout
   this.htmlComp.setLayout(new scout.OutlineLayout(this));
+  if (this.mobile) {
+    this.$container.addClass('mobile');
+  }
+  this._renderOutlineContent();
 };
 
 scout.Outline.prototype._renderProperties = function() {
@@ -280,7 +285,7 @@ scout.Outline.prototype.navigateToTop = function() {
   this.handleInitialExpanded();
 };
 
-scout.Outline.prototype.handleInitialExpanded = function(){
+scout.Outline.prototype.handleInitialExpanded = function() {
   this._visitNodes(this.nodes, function(node) {
     if (node.initialExpanded) {
       this.expandNode(node, {
@@ -318,6 +323,7 @@ scout.Outline.prototype.selectNodes = function(nodes, notifyServer, debounceSend
     }
   }
   scout.Outline.parent.prototype.selectNodes.call(this, nodes, notifyServer, debounceSend);
+  this.updateOutlineContent();
 };
 
 scout.Outline.prototype._renderDefaultDetailForm = function() {
@@ -378,7 +384,7 @@ scout.Outline.prototype._appendNavigateButtonsForDetailTable = function(node) {
 scout.Outline.prototype._removeNavigateButtonsForDetailForm = function(node) {
   var staticMenus = [];
   node.detailForm.rootGroupBox.staticMenus.forEach(function(menu) {
-    if (menu instanceof scout.NavigateUpButton  || menu instanceof scout.NavigateDownButton) {
+    if (menu instanceof scout.NavigateUpButton || menu instanceof scout.NavigateDownButton) {
       menu.destroy();
     } else {
       staticMenus.push(menu);
@@ -391,11 +397,11 @@ scout.Outline.prototype._removeNavigateButtonsForDetailTable = function(node) {
   var menus = [];
   var staticMenus = [];
   node.detailTable.staticMenus.forEach(function(menu) {
-   if (menu instanceof scout.NavigateUpButton  || menu instanceof scout.NavigateDownButton) {
-     menu.destroy();
-   } else {
-     staticMenus.push(menu);
-   }
+    if (menu instanceof scout.NavigateUpButton || menu instanceof scout.NavigateDownButton) {
+      menu.destroy();
+    } else {
+      staticMenus.push(menu);
+    }
   });
   node.detailTable.setStaticMenus(staticMenus);
 };
@@ -463,59 +469,6 @@ scout.Outline.prototype.setDetailFormVisibleByUi = function(node, visible) {
   this._triggerPageChanged(node);
 };
 
-/* event handling */
-
-scout.Outline.prototype._onDetailTableRowsFiltered = function(event) {
-  this.filter();
-};
-
-scout.Outline.prototype._onDetailTableRowInitialized = function(event) {
-  this._linkNodeWithRow(event.row);
-};
-
-scout.Outline.prototype._onDetailTableEvent = function(event) {
-  if (event.type === 'rowInitialized') {
-    this._onDetailTableRowInitialized(event);
-  } else if (event.type === 'rowsFiltered') {
-    this._onDetailTableRowsFiltered(event);
-  }
-};
-
-scout.Outline.prototype._onPageChanged = function(event) {
-  var node;
-  if (event.nodeId) {
-    node = this.nodesMap[event.nodeId];
-
-    node.detailFormVisible = event.detailFormVisible;
-    node.detailForm = this.session.getOrCreateModelAdapter(event.detailForm, this);
-    if (node.detailForm) {
-      this._initDetailForm(node);
-    }
-
-    node.detailTableVisible = event.detailTableVisible;
-    node.detailTable = this.session.getOrCreateModelAdapter(event.detailTable, this);
-    if (node.detailTable) {
-      this._initDetailTable(node);
-    }
-  } else {
-    this.defaultDetailForm = this.session.getOrCreateModelAdapter(event.detailForm, this);
-  }
-
-  this._triggerPageChanged(node);
-};
-
-scout.Outline.prototype._triggerPageChanged = function(page) {
-  this.trigger('pageChanged', {page: page});
-};
-
-scout.Outline.prototype.onModelAction = function(event) {
-  if (event.type === 'pageChanged') {
-    this._onPageChanged(event);
-  } else {
-    scout.Outline.parent.prototype.onModelAction.call(this, event);
-  }
-};
-
 scout.Outline.prototype.validateFocus = function() {
   this.session.focusManager.validateFocus();
 };
@@ -540,8 +493,87 @@ scout.Outline.prototype.bringToFront = function() {
   this.fileChooserController.attach();
 };
 
+/**
+ * === Method required for objects that act as 'displayParent' ===
+ *
+ * Returns 'true' if this Outline is currently accessible to the user.
+ */
+scout.Outline.prototype.inFront = function() {
+  return this.rendered && !this.inBackground;
+};
+
 scout.Outline.prototype._renderInBackground = function() {
   this.$container.toggleClass('in-background', this.inBackground);
+};
+
+scout.Outline.prototype._showDetailContentForPage = function(node) {
+  if (!node) {
+    throw new Error('called _showDetailContentForPage without node');
+  }
+
+  var content;
+  if (node.detailForm && node.detailFormVisible && node.detailFormVisibleByUi) {
+    content = node.detailForm;
+  }
+
+  this.setOutlineContent(content);
+};
+
+scout.Outline.prototype._renderOutlineContent = function() {
+  if (!this.outlineContent) {
+    return;
+  }
+
+  var page = this.selectedNodes[0];
+  page.htmlComp = new scout.HtmlComponent(page.$node, this.session);
+  page.htmlComp.setLayout(new scout.PageLayout(this, page));
+  this.outlineContent.render(this.selectedNodes[0].$node);
+  this.outlineContent.validateRoot = true;
+};
+
+scout.Outline.prototype._removeOutlineContent = function() {
+  if (!this.outlineContent) {
+    return;
+  }
+  this.outlineContent.remove();
+};
+
+scout.Outline.prototype.setEmbedDetailForm = function(embed) {
+  this.embedDetailForm = embed;
+  this.updateOutlineContent();
+};
+
+scout.Outline.prototype.setOutlineContent = function(content) {
+  if (this.outlineContent === content) {
+    return;
+  }
+  if (this.rendered) {
+    this._removeOutlineContent();
+  }
+  this.outlineContent = content;
+  if (this.rendered) {
+    this._renderOutlineContent();
+  }
+  this.invalidateLayoutTree();
+  // Layout immediate to prevent 'laggy' form visualization,
+  // but not initially while desktop gets rendered because it will be done at the end anyway
+  if (this.rendered) {
+    this.validateLayoutTree();
+  }
+};
+
+scout.Outline.prototype.updateOutlineContent = function() {
+  if (!this.embedDetailForm) {
+    return;
+  }
+  var selectedPages = this.selectedNodes;
+  if (selectedPages.length === 0) {
+    this.setOutlineContent(null);
+  } else {
+    // Outline does not support multi selection -> [0]
+    var selectedPage = selectedPages[0];
+    this._showDetailContentForPage(selectedPage);
+  }
 };
 
 /**
@@ -586,11 +618,62 @@ scout.Outline.prototype._renderMenus = function() {
   this.titleMenuBar.updateItems(menuItems);
 };
 
-/**
- * === Method required for objects that act as 'displayParent' ===
- *
- * Returns 'true' if this Outline is currently accessible to the user.
- */
-scout.Outline.prototype.inFront = function() {
-  return this.rendered && !this.inBackground;
+/* event handling */
+
+scout.Outline.prototype._onDetailTableRowsFiltered = function(event) {
+  this.filter();
+};
+
+scout.Outline.prototype._onDetailTableRowInitialized = function(event) {
+  this._linkNodeWithRow(event.row);
+};
+
+scout.Outline.prototype._onDetailTableEvent = function(event) {
+  if (event.type === 'rowInitialized') {
+    this._onDetailTableRowInitialized(event);
+  } else if (event.type === 'rowsFiltered') {
+    this._onDetailTableRowsFiltered(event);
+  }
+};
+
+scout.Outline.prototype._onPageChanged = function(event) {
+  var node;
+  if (event.nodeId) {
+    node = this.nodesMap[event.nodeId];
+
+    node.detailFormVisible = event.detailFormVisible;
+    node.detailForm = this.session.getOrCreateModelAdapter(event.detailForm, this);
+    if (node.detailForm) {
+      this._initDetailForm(node);
+    }
+
+    node.detailTableVisible = event.detailTableVisible;
+    node.detailTable = this.session.getOrCreateModelAdapter(event.detailTable, this);
+    if (node.detailTable) {
+      this._initDetailTable(node);
+    }
+  } else {
+    this.defaultDetailForm = this.session.getOrCreateModelAdapter(event.detailForm, this);
+  }
+
+  var selectedPage = this.selectedNodes[0];
+  if (!node && !selectedPage || node === selectedPage) {
+    this.updateOutlineContent();
+  }
+
+  this._triggerPageChanged(node);
+};
+
+scout.Outline.prototype._triggerPageChanged = function(page) {
+  this.trigger('pageChanged', {
+    page: page
+  });
+};
+
+scout.Outline.prototype.onModelAction = function(event) {
+  if (event.type === 'pageChanged') {
+    this._onPageChanged(event);
+  } else {
+    scout.Outline.parent.prototype.onModelAction.call(this, event);
+  }
 };
