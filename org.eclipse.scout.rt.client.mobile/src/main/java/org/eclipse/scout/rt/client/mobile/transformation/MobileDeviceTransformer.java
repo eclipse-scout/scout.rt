@@ -220,7 +220,6 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
       // Necessary to enable drilldown from top of the outline
       outline.setRootNodeVisible(true);
     }
-    outline.getContextMenu().setVisibleGranted(true);
     outline.setNavigateButtonsVisible(false);
     outline.setLazyExpandingEnabled(false);
     outline.setAutoToggleBreadcrumbStyle(false);

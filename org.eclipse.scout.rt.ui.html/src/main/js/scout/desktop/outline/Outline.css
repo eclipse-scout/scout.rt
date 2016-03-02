@@ -13,112 +13,121 @@
 @outline-title-margin-left: 12px;
 @outline-title-margin-right: 12px;
 @outline-title-margin-bottom: 12px;
+@mobile-outline-title-text-padding-left: 16px;
 
-/* we have to combine this with .outline, otherwise the definition would not be specific enough */
-.outline.tree {
-  & .scrollbar-thumb {
-    background-color: fade(@scrollbar-thumb-inverted-color, 30%);
-  }
+.outline {
 
-  & .scrollbar-thumb-move,
-  & .scrollbar-thumb:hover {
-    background-color: fade(@scrollbar-thumb-inverted-color, 60%);
-  }
-
-  &.in-background .tree-node.selected {
+  &.in-background > .tree-data > .tree-node.selected {
     background-color: @outline-in-background-selection-background-color;
     color: @palette-white;
   }
 
-  & > .outline-title {
-    #scout.font-text-large();
-    #scout.overflow-ellipsis-nowrap();
-    margin: 0 @outline-title-margin-right @outline-title-margin-bottom @outline-title-margin-left;
-    border-bottom: 1px solid @outline-title-border-color;
-
-    & > .key-box {
-      top: 19px;
-    }
-
-    & > .outline-title-text {
-      padding: 21px 2px 13px 6px;
-      cursor: pointer;
-      display: block;
-      width: auto;
-    }
-
-    & > .menubar {
-      display: block;
-      background-color: @navigation-background-color;
-      width: auto;
-      position: absolute;
-      right: @outline-title-margin-right;
-      top: @outline-title-margin-bottom;
-      border: none;
-      color: @navigation-color;
-
-      & > .menubox > .menu-item:not(.disabled) {
-        color: @navigation-color;
+  & > .tree-data  {
+    & > .scrollbar {
+      &.y-axis {
+        margin-right: 6px;
       }
 
-      & > .menubox > .menu-item:not(.menu-textandicon):focus::after  {
-        #scout.focus-border-inverted();
+      & > .scrollbar-thumb {
+        background-color: fade(@scrollbar-thumb-inverted-color, 30%);
+      }
+
+      & > .scrollbar-thumb-move,
+      & > .scrollbar-thumb:hover {
+        background-color: fade(@scrollbar-thumb-inverted-color, 60%);
+      }
+    }
+
+    & > .key-box {
+      top: 7px !important;
+    }
+
+    & > .tree-node,
+    & > .animation-wrapper > .tree-node {
+      #scout.font-text-plus();
+      cursor: pointer;
+      border: 0;
+
+      /* leave some space for the scrollbar */
+      padding-right: 8px;
+      /* set top/bottom padding for item */
+      padding-top: 8px;
+      padding-bottom: 8px;
+
+      & > .menubar {
+        border: 0;
+        padding-top: 10px;
+        background-color: @outline-selection-background-color;
+      }
+
+      &.group {
+        background-color: @outline-group-background-color;
+      }
+
+      &.selected {
+        color: @outline-selection-color;
+        background-color: @outline-selection-background-color;
+        border: 0;
+      }
+
+      & > .tree-node-control {
+        /* adjust control position */
+        margin-left: -@outline-node-control-size - 5px;
+        margin-top: -3px;
+
+        width: @outline-node-control-size;
+        height: @outline-node-control-size;
+        line-height: @outline-node-control-size;
+
+        &::before {
+          font-size: @outline-node-control-size;
+          /* always use same color as the tree-node label */
+          color: inherit;
+        }
+
+        &:hover::before {
+          color: @highlight-color;
+        }
       }
     }
   }
 }
 
-.outline > .tree-data {
-  & > .scrollbar.y-axis {
-    margin-right: 6px;
-  }
+.outline-title {
+  #scout.font-text-large();
+  #scout.overflow-ellipsis-nowrap();
+  margin: 0 @outline-title-margin-right @outline-title-margin-bottom @outline-title-margin-left;
+  border-bottom: 1px solid @outline-title-border-color;
 
   & > .key-box {
-    top: 7px !important;
+    top: 19px;
   }
 
-  & > .tree-node,
-  & > .animation-wrapper > .tree-node {
-    #scout.font-text-plus();
-    cursor: pointer;
-    border: 0;
+  & > .menubar {
+    display: block;
+    background-color: @navigation-background-color;
+    width: auto;
+    position: absolute;
+    right: @outline-title-margin-right;
+    top: @outline-title-margin-bottom;
+    border: none;
+    color: @navigation-color;
 
-    /* leave some space for the scrollbar */
-    padding-right: 8px;
-    /* set top/bottom padding for item */
-    padding-top: 8px;
-    padding-bottom: 8px;
-
-    &.group {
-      background-color: @outline-group-background-color;
+    & > .menubox > .menu-item:not(.disabled) {
+      color: @navigation-color;
     }
 
-    &.selected {
-      color: @outline-selection-color;
-      background-color: @outline-selection-background-color;
-      border: 0;
-    }
-
-     & > .tree-node-control {
-      /* adjust control position */
-      margin-left: -@outline-node-control-size - 5px;
-      margin-top: -3px;
-
-      width: @outline-node-control-size;
-      height: @outline-node-control-size;
-      line-height: @outline-node-control-size;
-
-      &::before {
-        font-size: @outline-node-control-size;
-        /* always use same color as the tree-node label */
-        color: inherit;
-      }
-
-      &:hover::before {
-        color: @highlight-color;
-      }
+    & > .menubox > .menu-item:not(.menu-textandicon):focus::after  {
+      #scout.focus-border-inverted();
     }
   }
+}
+
+.outline-title-text {
+  padding: 21px 2px 13px 6px;
+  cursor: pointer;
+  display: block;
+  width: auto;
 }
 
 /* bread crumb style (different colors and bigger font and arrow than original breadcrumb style) */
@@ -203,12 +212,13 @@
     text-align: left;
 
     & > .outline-title-text {
-      padding-left: 16px;
+      padding-left: @mobile-outline-title-text-padding-left;
     }
   }
 
   & > .tree-data > .tree-node  {
     text-align: left;
     padding-left: 16px !important;
+    padding-right: 16px !important;
   }
 }

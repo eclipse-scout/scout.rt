@@ -61,3 +61,10 @@
     text-align: center;
   }
 }
+
+.mobile.outline.breadcrumb > .search-outline-panel {
+  & > .search-outline-status {
+    padding-left: @mobile-outline-title-text-padding-left;
+    text-align: left;
+  }
+}

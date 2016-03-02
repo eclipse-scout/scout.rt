@@ -33,7 +33,12 @@ scout.Outline.prototype._init = function(model) {
   this.addFilter(new scout.DetailTableTreeFilter());
   this.titleVisible = true;
   this._syncDefaultDetailForm(this.defaultDetailForm);
-  this.updateOutlineContent();
+  this.updateDetailForm();
+  this.detailMenuBar = scout.create('MenuBar', {
+    parent: this,
+    menuOrder: new scout.GroupBoxMenuItemsOrder(this.session)
+  });
+  this.detailMenuBar.bottom();
 };
 
 scout.Outline.prototype._createKeyStrokeContext = function() {
@@ -74,7 +79,9 @@ scout.Outline.prototype._render = function($parent) {
   if (this.mobile) {
     this.$container.addClass('mobile');
   }
-  this._renderOutlineContent();
+  this._renderDetailForm();
+  this._renderDetailMenuBarVisible();
+  this._renderDetailMenus();
 };
 
 scout.Outline.prototype._renderProperties = function() {
@@ -323,7 +330,7 @@ scout.Outline.prototype.selectNodes = function(nodes, notifyServer, debounceSend
     }
   }
   scout.Outline.parent.prototype.selectNodes.call(this, nodes, notifyServer, debounceSend);
-  this.updateOutlineContent();
+  this.updateDetailForm();
 };
 
 scout.Outline.prototype._renderDefaultDetailForm = function() {
@@ -506,55 +513,67 @@ scout.Outline.prototype._renderInBackground = function() {
   this.$container.toggleClass('in-background', this.inBackground);
 };
 
-scout.Outline.prototype._showDetailContentForPage = function(node) {
-  if (!node) {
-    throw new Error('called _showDetailContentForPage without node');
-  }
-
-  var content;
-  if (node.detailForm && node.detailFormVisible && node.detailFormVisibleByUi) {
-    content = node.detailForm;
-  }
-
-  this.setOutlineContent(content);
-};
-
-scout.Outline.prototype._renderOutlineContent = function() {
-  if (!this.outlineContent) {
+scout.Outline.prototype._renderDetailForm = function() {
+  if (!this.detailForm) {
     return;
   }
 
   var page = this.selectedNodes[0];
-  page.htmlComp = new scout.HtmlComponent(page.$node, this.session);
-  page.htmlComp.setLayout(new scout.PageLayout(this, page));
-  this.outlineContent.render(this.selectedNodes[0].$node);
-  this.outlineContent.validateRoot = true;
+  this.detailForm.render(page.$node);
+  this.detailForm.validateRoot = true;
+  this._ensurePageLayout(page);
 };
 
-scout.Outline.prototype._removeOutlineContent = function() {
-  if (!this.outlineContent) {
+scout.Outline.prototype._ensurePageLayout = function(page) {
+  // selected page now has content (menubar and form) -> needs a layout
+  // always create new htmlComp, otherwise we would have to remove them when $node or outline gets remvoed
+  page.htmlComp = new scout.HtmlComponent(page.$node, this.session);
+  page.htmlComp.setLayout(new scout.PageLayout(this, page));
+};
+
+scout.Outline.prototype._removeDetailForm = function() {
+  if (!this.detailForm) {
     return;
   }
-  this.outlineContent.remove();
+  this.detailForm.remove();
 };
 
 scout.Outline.prototype.setEmbedDetailForm = function(embed) {
   this.embedDetailForm = embed;
-  this.updateOutlineContent();
+  this.updateDetailForm();
 };
 
-scout.Outline.prototype.setOutlineContent = function(content) {
-  if (this.outlineContent === content) {
+scout.Outline.prototype.setDetailForm = function(content) {
+  if (this.detailForm === content) {
     return;
   }
   if (this.rendered) {
-    this._removeOutlineContent();
+    this._removeDetailForm();
   }
-  this.outlineContent = content;
+  this.detailForm = content;
   if (this.rendered) {
-    this._renderOutlineContent();
+    this._renderDetailForm();
   }
   this.invalidateLayoutTree();
+};
+
+scout.Outline.prototype.updateDetailForm = function() {
+  var detailForm = null,
+    selectedPage = this.selectedNodes[0];
+  if (!this.embedDetailForm) {
+    return;
+  }
+
+  this.setDetailMenuBarVisible(false);
+  if (selectedPage) {
+    // Outline does not support multi selection -> [0]
+    if (selectedPage.detailForm && selectedPage.detailFormVisible && selectedPage.detailFormVisibleByUi) {
+      detailForm = selectedPage.detailForm;
+    }
+  }
+  this.setDetailForm(detailForm);
+  this.updateDetailMenus();
+
   // Layout immediate to prevent 'laggy' form visualization,
   // but not initially while desktop gets rendered because it will be done at the end anyway
   if (this.rendered) {
@@ -562,17 +581,74 @@ scout.Outline.prototype.setOutlineContent = function(content) {
   }
 };
 
-scout.Outline.prototype.updateOutlineContent = function() {
+scout.Outline.prototype.updateDetailMenus = function() {
   if (!this.embedDetailForm) {
     return;
   }
   var selectedPages = this.selectedNodes;
-  if (selectedPages.length === 0) {
-    this.setOutlineContent(null);
-  } else {
-    // Outline does not support multi selection -> [0]
+  var menuItems = [];
+  // get menus from detail form
+  if (this.detailForm) {
+    //TODO CGU
+  }
+  // get menus from detail table
+  else if (selectedPages.length > 0) {
     var selectedPage = selectedPages[0];
-    this._showDetailContentForPage(selectedPage);
+    if (selectedPage.detailTable) {
+      menuItems = selectedPage.detailTable.menus;
+      menuItems = scout.menus.filter(menuItems, ['Table.EmptySpace'], false, true);
+    }
+  }
+  this.setDetailMenus(menuItems);
+};
+
+scout.Outline.prototype.setDetailMenus = function(detailMenus) {
+  this.setDetailMenuBarVisible(detailMenus.length > 0);
+  this.detailMenus = detailMenus;
+  if (this.rendered) {
+    this._renderDetailMenus();
+  }
+};
+
+scout.Outline.prototype._renderDetailMenus = function() {
+  if (this.detailMenuBar.rendered) {
+    this.detailMenuBar.updateItems(this.detailMenus);
+  }
+};
+
+scout.Outline.prototype._renderDetailMenuBarVisible = function() {
+  if (this.detailMenuBarVisible) {
+    this._renderDetailMenuBar();
+  } else {
+    this._removeDetailMenuBar();
+  }
+  this.invalidateLayoutTree();
+};
+
+scout.Outline.prototype._renderDetailMenuBar = function() {
+  if (this.detailMenuBar.rendered) {
+    return;
+  }
+  if (this.selectedNodes.length === 0) {
+    return;
+  }
+
+  var node = this.selectedNodes[0];
+  this.detailMenuBar.render(node.$node);
+  this._ensurePageLayout(node);
+};
+
+scout.Outline.prototype._removeDetailMenuBar = function() {
+  if (!this.detailMenuBar.rendered) {
+    return;
+  }
+  this.detailMenuBar.remove();
+};
+
+scout.Outline.prototype.setDetailMenuBarVisible = function(visible) {
+  this.detailMenuBarVisible = visible;
+  if (this.rendered) {
+    this._renderDetailMenuBarVisible();
   }
 };
 
@@ -658,7 +734,7 @@ scout.Outline.prototype._onPageChanged = function(event) {
 
   var selectedPage = this.selectedNodes[0];
   if (!node && !selectedPage || node === selectedPage) {
-    this.updateOutlineContent();
+    this.updateDetailForm();
   }
 
   this._triggerPageChanged(node);

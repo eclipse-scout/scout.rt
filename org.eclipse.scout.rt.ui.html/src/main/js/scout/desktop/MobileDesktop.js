@@ -19,7 +19,7 @@ scout.MobileDesktop.prototype._init = function(model) {
   this.navigationVisible = true;
   this.headerVisible = false;
   this.benchVisible = false;
-  this._adaptOutline();
+  this._adaptOutline(this.outline);
 };
 
 /**
@@ -53,18 +53,30 @@ scout.MobileDesktop.prototype._renderNavigation = function() {
   this.navigation.$container.insertBefore(this.$overlaySeparator);
 };
 
+scout.MobileDesktop.prototype._renderBench = function() {
+  if (this.bench) {
+    return;
+  }
+  this.bench = scout.create('DesktopBench', {
+    parent: this,
+    outlineContentVisible: false
+  });
+  this.bench.render(this.$container);
+  this.bench.$container.insertBefore(this.$overlaySeparator);
+};
+
 /**
  * @override
  */
 scout.MobileDesktop.prototype.setOutline = function(outline) {
+  this._adaptOutline(outline);
   scout.MobileDesktop.parent.prototype.setOutline.call(this, outline);
-  this._adaptOutline();
 };
 
-scout.MobileDesktop.prototype._adaptOutline = function() {
-  if (this.outline) {
-    this.outline.setEmbedDetailForm(true);
-    this.outline.mobile = true;
+scout.MobileDesktop.prototype._adaptOutline = function(outline) {
+  if (outline) {
+    outline.setEmbedDetailForm(true);
+    outline.mobile = true;
   }
 };
 

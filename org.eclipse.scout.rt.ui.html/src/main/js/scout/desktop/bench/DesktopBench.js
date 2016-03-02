@@ -20,6 +20,7 @@ scout.inherits(scout.DesktopBench, scout.Widget);
 scout.DesktopBench.prototype._init = function(model) {
   scout.DesktopBench.parent.prototype._init.call(this, model);
   this.desktop = this.session.desktop;
+  this.outlineContentVisible = scout.nvl(model.outlineContentVisible, true);
 };
 
 scout.DesktopBench.prototype._initKeyStrokeContext = function(keyStrokeContext) {
@@ -126,6 +127,11 @@ scout.DesktopBench.prototype.setOutlineContent = function(content) {
   }
 };
 
+scout.DesktopBench.prototype.setOutlineContentVisible = function(visible) {
+  this.outlineContentVisible = visible;
+  this.updateOutlineContent();
+};
+
 scout.DesktopBench.prototype.bringToFront = function() {
   this._renderOrAttachOutlineContent();
 };
@@ -160,6 +166,9 @@ scout.DesktopBench.prototype._showDetailContentForPage = function(node) {
 };
 
 scout.DesktopBench.prototype.updateOutlineContent = function() {
+  if (!this.outlineContentVisible) {
+    return;
+  }
   var selectedPages = this.outline.selectedNodes;
   if (selectedPages.length === 0) {
     if (this.outline.defaultDetailForm) {
