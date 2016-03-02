@@ -18,7 +18,6 @@ import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
 import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.IProposalFieldExtension;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.util.CompareUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
@@ -153,26 +152,20 @@ public abstract class AbstractProposalField<LOOKUP_KEY> extends AbstractContentA
 
   @Override
   protected void handleFetchResult(IContentAssistFieldDataFetchResult<LOOKUP_KEY> result) {
-    IProposalChooser<?, LOOKUP_KEY> proposalChooser = getProposalChooser();
+    // Do nothing when fetcher has just started (see ContentAssistFieldDataFetcher#update)
     if (result == null) {
+      return;
+    }
+    IProposalChooser<?, LOOKUP_KEY> proposalChooser = getProposalChooser();
+    Collection<? extends ILookupRow<LOOKUP_KEY>> rows = result.getLookupRows();
+    if (rows == null || rows.isEmpty()) {
       unregisterProposalChooserInternal();
     }
     else {
-      Collection<? extends ILookupRow<LOOKUP_KEY>> rows = result.getLookupRows();
-      if (rows == null || rows.isEmpty()) {
-        unregisterProposalChooserInternal();
+      if (proposalChooser == null) {
+        proposalChooser = registerProposalChooserInternal();
       }
-      else {
-        try {
-          if (proposalChooser == null) {
-            proposalChooser = registerProposalChooserInternal();
-          }
-          proposalChooser.dataFetchedDelegate(result, getBrowseMaxRowCount());
-        }
-        catch (RuntimeException e) {
-          BEANS.get(ExceptionHandler.class).handle(e);
-        }
-      }
+      proposalChooser.dataFetchedDelegate(result, getBrowseMaxRowCount());
     }
   }
 
