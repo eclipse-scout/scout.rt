@@ -873,7 +873,8 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
   }
 
   public IForm findActiveForm() {
-    Shell activeShell = getDisplay().getActiveShell();
+    Shell activeShell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
+//    Shell activeShell = getDisplay().getActiveShell();
     if (activeShell == null) {
       return null;
     }
