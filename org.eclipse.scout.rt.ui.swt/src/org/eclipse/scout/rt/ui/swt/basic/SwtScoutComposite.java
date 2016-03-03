@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.ui.swt.basic;
 
 import java.lang.ref.WeakReference;
 
+import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -33,7 +34,7 @@ import org.eclipse.swt.widgets.Widget;
  * @since 1.0.0 28.03.2008
  * @author Andreas Hoegger
  */
-public abstract class SwtScoutComposite<T extends IPropertyObserver> extends AbstractSwtScoutPropertyObserver<T> implements ISwtScoutComposite<T> {
+public abstract class SwtScoutComposite<T extends IPropertyObserver> extends AbstractSwtScoutPropertyObserver<T> implements ISwtScoutComposite<T>, IInputVerifiable {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwtScoutComposite.class);
 
   protected static final String CLIENT_PROP_INITIAL_OPAQUE = "scoutInitialOpaque";
@@ -43,6 +44,7 @@ public abstract class SwtScoutComposite<T extends IPropertyObserver> extends Abs
 
   private Composite m_swtContainer;
   private Control m_swtField;
+  private EventListenerList m_eventListeners = new EventListenerList();
 
   private boolean m_initialized;
 
@@ -232,8 +234,24 @@ public abstract class SwtScoutComposite<T extends IPropertyObserver> extends Abs
    *
    * @since 3.10.0-M5
    */
+  @Override
   public boolean runSwtInputVerifier() {
-    return handleSwtInputVerifier();
+    boolean verified = handleSwtInputVerifier();
+    for (IInputVerifyListener l : m_eventListeners.getListeners(IInputVerifyListener.class)) {
+      l.inputVerified();
+    }
+    return verified;
+
+  }
+
+  @Override
+  public void addInputVerifyListener(IInputVerifyListener listener) {
+    m_eventListeners.add(IInputVerifyListener.class, listener);
+  }
+
+  @Override
+  public void removeInputVerifyListener(IInputVerifyListener listener) {
+    m_eventListeners.remove(IInputVerifyListener.class, listener);
   }
 
   private class P_SwtFieldListener implements Listener {
@@ -274,7 +292,7 @@ public abstract class SwtScoutComposite<T extends IPropertyObserver> extends Abs
         case SWT.FocusOut:
           // filter all temporary focus events
           if (getSwtField() != null && getSwtField().getDisplay().getActiveShell() != null
-              && getSwtField().getShell() != getSwtField().getDisplay().getActiveShell()) {
+          && getSwtField().getShell() != getSwtField().getDisplay().getActiveShell()) {
             return;
           }
           else {

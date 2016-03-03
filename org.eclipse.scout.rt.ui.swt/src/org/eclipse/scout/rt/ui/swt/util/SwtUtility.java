@@ -43,6 +43,7 @@ import org.eclipse.scout.rt.client.ui.action.keystroke.KeyStroke;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.ui.swt.ISwtEnvironment;
 import org.eclipse.scout.rt.ui.swt.basic.ISwtScoutComposite;
+import org.eclipse.scout.rt.ui.swt.basic.IInputVerifiable;
 import org.eclipse.scout.rt.ui.swt.basic.SwtScoutComposite;
 import org.eclipse.scout.rt.ui.swt.keystroke.ISwtKeyStroke;
 import org.eclipse.scout.rt.ui.swt.keystroke.SwtScoutKeyStroke;
@@ -1125,8 +1126,8 @@ public final class SwtUtility {
     }
 
     ISwtScoutComposite compositeOnWidget = SwtScoutComposite.getCompositeOnWidget(control);
-    if (compositeOnWidget instanceof SwtScoutComposite) {
-      return ((SwtScoutComposite) compositeOnWidget).runSwtInputVerifier();
+    if (compositeOnWidget instanceof IInputVerifiable) {
+      return ((IInputVerifiable) compositeOnWidget).runSwtInputVerifier();
     }
     return true; //continue always
   }

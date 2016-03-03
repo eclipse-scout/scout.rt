@@ -27,6 +27,8 @@ import org.eclipse.scout.rt.client.ui.form.fields.GridData;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField;
 import org.eclipse.scout.rt.ui.swt.ISwtEnvironment;
+import org.eclipse.scout.rt.ui.swt.basic.IInputVerifiable;
+import org.eclipse.scout.rt.ui.swt.basic.IInputVerifyListener;
 import org.eclipse.scout.rt.ui.swt.basic.ISwtScoutComposite;
 import org.eclipse.scout.rt.ui.swt.basic.table.ISwtScoutTable;
 import org.eclipse.scout.rt.ui.swt.basic.table.SwtScoutTable;
@@ -173,6 +175,16 @@ public class TableCellEditor extends CellEditor {
     }
     else {
       swtScoutFormField = m_environment.createFormField(m_container, formField);
+    }
+    // add a input verify listener to ensure the editor gets closed
+    if (swtScoutFormField instanceof IInputVerifiable) {
+      ((IInputVerifiable) swtScoutFormField).addInputVerifyListener(new IInputVerifyListener() {
+
+        @Override
+        public void inputVerified() {
+          fireApplyEditorValue();
+        }
+      });
     }
     // hook to customize the form field.
     decorateEditorComposite(swtScoutFormField, m_scoutRow, m_scoutColumn);
