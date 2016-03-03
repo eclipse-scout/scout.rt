@@ -280,7 +280,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   /**
-   * Configures the application logo id.
+   * Configures the logo id.
    * <p>
    * If specified, the logo will be displayed on the top right corner of the desktop.
    * <p>
@@ -289,7 +289,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
    * @since 6.0
    * @see IIconProviderService
    */
-  protected String getConfiguredApplicationLogoId() {
+  protected String getConfiguredLogoId() {
     return null;
   }
 
@@ -529,7 +529,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     setSelectViewTabsKeyStrokesEnabled(getConfiguredSelectViewTabsKeyStrokesEnabled());
     setSelectViewTabsKeyStrokeModifier(getConfiguredSelectViewTabsKeyStrokeModifier());
     setDesktopStyle(getConfiguredDesktopStyle());
-    setApplicationLogoId(getConfiguredApplicationLogoId());
+    setLogoId(getConfiguredLogoId());
     setCacheSplitterPosition(getConfiguredCacheSplitterPosition());
     List<IDesktopExtension> extensions = getDesktopExtensions();
     m_contributionHolder = new ContributionComposite(this);
@@ -777,13 +777,13 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   @Override
-  public String getApplicationLogoId() {
-    return propertySupport.getPropertyString(PROP_APPLICATION_LOGO_ID);
+  public String getLogoId() {
+    return propertySupport.getPropertyString(PROP_LOGO_ID);
   }
 
   @Override
-  public void setApplicationLogoId(String id) {
-    propertySupport.setPropertyString(PROP_APPLICATION_LOGO_ID, id);
+  public void setLogoId(String id) {
+    propertySupport.setPropertyString(PROP_LOGO_ID, id);
   }
 
   @Override

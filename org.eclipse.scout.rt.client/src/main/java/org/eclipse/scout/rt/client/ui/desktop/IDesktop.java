@@ -69,6 +69,12 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent {
    * String
    */
   String PROP_TITLE = "title";
+
+  /**
+   * String
+   */
+  String PROP_LOGO_ID = "logoId";
+
   /**
    * {@link IStatus}
    */
@@ -100,8 +106,6 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent {
   String PROP_CACHE_SPLITTER_POSITION = "cacheSplitterPosition";
 
   String PROP_DESKTOP_STYLE = "desktopStyle";
-
-  String PROP_APPLICATION_LOGO_ID = "applicationLogoId";
 
   String PROP_ACTIVE_FORM = "activeForm";
 
@@ -787,12 +791,12 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent {
   /***
    * @since 6.0
    */
-  String getApplicationLogoId();
+  String getLogoId();
 
   /**
    * @since 6.0
    */
-  void setApplicationLogoId(String id);
+  void setLogoId(String id);
 
   /**
    * @return the name of the current theme or null when default theme is active.

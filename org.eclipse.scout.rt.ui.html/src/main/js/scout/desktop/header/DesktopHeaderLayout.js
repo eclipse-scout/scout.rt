@@ -53,8 +53,8 @@ scout.DesktopHeaderLayout.prototype.layout = function($container) {
     logoWidth = 0,
     toolsWidth, tabsWidth;
 
-  if (this.header.applicationLogo) {
-    logoWidth = scout.graphics.getSize(this.header.applicationLogo.$container, true).width;
+  if (this.header.logo) {
+    logoWidth = scout.graphics.getSize(this.header.logo.$container, true).width;
   }
 
   // reset tabs and tool-items

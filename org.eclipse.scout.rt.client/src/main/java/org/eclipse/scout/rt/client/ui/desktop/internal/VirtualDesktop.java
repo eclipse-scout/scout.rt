@@ -708,12 +708,12 @@ public class VirtualDesktop implements IDesktop {
   }
 
   @Override
-  public String getApplicationLogoId() {
+  public String getLogoId() {
     return null;
   }
 
   @Override
-  public void setApplicationLogoId(String id) {
+  public void setLogoId(String id) {
   }
 
   @Override

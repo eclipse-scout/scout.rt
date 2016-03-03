@@ -77,7 +77,7 @@ scout.Desktop.prototype._render = function($parent) {
   this._renderNavigationVisible();
   this._renderHeaderVisible();
   this._renderBenchVisible();
-  this._renderApplicationLogoUrl();
+  this._renderLogoUrl();
   this._renderSplitter();
   this._setSplitterPosition();
   this.addOns.forEach(function(addOn) {
@@ -231,9 +231,9 @@ scout.Desktop.prototype._renderHeaderVisible = function() {
   }
 };
 
-scout.Desktop.prototype._renderApplicationLogoUrl = function() {
+scout.Desktop.prototype._renderLogoUrl = function() {
   if (this.header) {
-    this.header.setApplicationLogoUrl(this.applicationLogoUrl);
+    this.header.setLogoUrl(this.logoUrl);
   }
 };
 

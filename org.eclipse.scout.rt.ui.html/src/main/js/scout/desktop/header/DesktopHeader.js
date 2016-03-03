@@ -41,7 +41,7 @@ scout.DesktopHeader.prototype._render = function($parent) {
   this._$viewTabBar = this.$container.appendDiv('desktop-view-tabs');
   this._$toolBar = this.$container.appendDiv('header-tools');
   this._renderToolMenus();
-  this._renderApplicationLogoUrl();
+  this._renderLogoUrl();
 
   this.session.keyStrokeManager.installKeyStrokeContext(this.desktopKeyStrokeContext);
 };
@@ -66,38 +66,38 @@ scout.DesktopHeader.prototype._renderToolMenus = function() {
   }
 };
 
-scout.DesktopHeader.prototype.setApplicationLogoUrl = function(applicationLogoUrl) {
-  this.applicationLogoUrl = applicationLogoUrl;
+scout.DesktopHeader.prototype.setLogoUrl = function(logoUrl) {
+  this.logoUrl = logoUrl;
   if (this.rendered) {
-    this._renderApplicationLogoUrl();
+    this._renderLogoUrl();
   }
 };
 
-scout.DesktopHeader.prototype._renderApplicationLogoUrl = function() {
-  if (this.applicationLogoUrl) {
-    this._renderApplicationLogo();
+scout.DesktopHeader.prototype._renderLogoUrl = function() {
+  if (this.logoUrl) {
+    this._renderLogo();
   } else {
-    this._removeApplicationLogo();
+    this._removeLogo();
   }
   this.invalidateLayoutTree();
 };
 
-scout.DesktopHeader.prototype._renderApplicationLogo = function() {
-  if (!this.applicationLogo) {
-    this.applicationLogo = scout.create('ApplicationLogo', {
+scout.DesktopHeader.prototype._renderLogo = function() {
+  if (!this.logo) {
+    this.logo = scout.create('DesktopLogo', {
       parent: this,
-      url: this.applicationLogoUrl
+      url: this.logoUrl
     });
-    this.applicationLogo.render(this.$container);
+    this.logo.render(this.$container);
   } else {
-    this.applicationLogo.setUrl(this.applicationLogoUrl);
+    this.logo.setUrl(this.logoUrl);
   }
 };
 
-scout.DesktopHeader.prototype._removeApplicationLogo = function() {
-  if (!this.applicationLogo) {
+scout.DesktopHeader.prototype._removeLogo = function() {
+  if (!this.logo) {
     return;
   }
-  this.applicationLogo.remove();
-  this.applicationLogo = null;
+  this.logo.remove();
+  this.logo = null;
 };

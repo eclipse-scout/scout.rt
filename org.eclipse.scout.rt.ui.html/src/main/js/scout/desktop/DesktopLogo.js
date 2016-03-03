@@ -8,18 +8,18 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-scout.ApplicationLogo = function() {
-  scout.ApplicationLogo.parent.call(this);
+scout.DesktopLogo = function() {
+  scout.DesktopLogo.parent.call(this);
 };
-scout.inherits(scout.ApplicationLogo, scout.Widget);
+scout.inherits(scout.DesktopLogo, scout.Widget);
 
-scout.ApplicationLogo.prototype._init = function(model) {
-  scout.ApplicationLogo.parent.prototype._init.call(this, model);
+scout.DesktopLogo.prototype._init = function(model) {
+  scout.DesktopLogo.parent.prototype._init.call(this, model);
   this.url = model.url;
 };
 
-scout.ApplicationLogo.prototype._render = function($parent) {
-  this.$container = $parent.appendDiv('application-logo');
+scout.DesktopLogo.prototype._render = function($parent) {
+  this.$container = $parent.appendDiv('desktop-logo');
 
   // in memory of the first one...
   this.$container.dblclick(function(event) {
@@ -31,15 +31,15 @@ scout.ApplicationLogo.prototype._render = function($parent) {
   });
 };
 
-scout.ApplicationLogo.prototype._renderProperties = function() {
+scout.DesktopLogo.prototype._renderProperties = function() {
   this._renderUrl();
 };
 
-scout.ApplicationLogo.prototype._renderUrl = function() {
+scout.DesktopLogo.prototype._renderUrl = function() {
   this.$container.css('backgroundImage', 'url(' + this.url + ')');
 };
 
-scout.ApplicationLogo.prototype.setUrl = function(url) {
+scout.DesktopLogo.prototype.setUrl = function(url) {
   this.url = url;
   if (this.rendered) {
     this._renderUrl();
