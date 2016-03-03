@@ -8,27 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-@view-buttons-height: 50px;
-
-.desktop-navigation {
-  position: relative;
-  height: 100%;
-  width: @desktop-navigation-width;
-  background-color: @navigation-background-color;
-  color: @navigation-color;
-}
-
-.desktop-navigation-breadcrumb {
-  width: @desktop-navigation-breadcrumb-width;
-}
-
-.navigation-body {
-  position: relative;
-  width: 100%;
-  height: calc(~'100%' - @view-buttons-height);
-}
-
-.desktop-navigation > .header-tools {
-  background-color: @palette-white;
-  text-align: right;
+.view-buttons {
+  display: inline-block;
+  height: @view-buttons-height;
+  white-space: nowrap;
+  #scout.font-text-large();
+  overflow: hidden;
 }
