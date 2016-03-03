@@ -362,7 +362,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
    * </ul>
    * <p>
    * Subclasses can override this method. The default is {@link ITree#DISPLAY_STYLE_DEFAULT}.
-   * 
+   *
    * @see #getConfiguredAutoToggleBreadcrumbStyle()
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
@@ -376,7 +376,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
    * when getting bigger. The threshold is determined by the GUI.
    * <p>
    * Subclasses can override this method. The default is false.
-   * 
+   *
    * @see #getConfiguredDisplayStyle()
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
@@ -733,14 +733,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   }
 
   protected void disposeTreeInternal() {
-    for (IMenu menu : getMenus()) {
-      try {
-        menu.dispose();
-      }
-      catch (RuntimeException e) {
-        LOG.warn("Exception while disposing menu.", e);
-      }
-    }
+    ActionUtility.disposeActions(getMenus());
     getRootNode().dispose();
     clearDeletedNodes();
   }

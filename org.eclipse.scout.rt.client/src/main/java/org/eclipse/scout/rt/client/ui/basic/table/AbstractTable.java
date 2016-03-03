@@ -1045,9 +1045,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   private void disposeMenus() {
-    for (IMenu menu : getMenus()) {
-      menu.dispose();
-    }
+    ActionUtility.disposeActions(getMenus());
   }
 
   private void createTableControlsInternal() {

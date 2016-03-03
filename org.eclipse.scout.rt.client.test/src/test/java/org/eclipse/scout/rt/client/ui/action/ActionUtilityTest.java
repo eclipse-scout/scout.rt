@@ -14,6 +14,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
@@ -64,7 +65,6 @@ public class ActionUtilityTest {
 
   @Test
   public void testCleanupWithEndingSeparators() {
-
     IMenu s1 = createMenu("s1", true, true);
     IMenu s2 = createMenu("s2", true, true);
     IMenu s3 = createMenu("s3", true, true);
@@ -92,10 +92,34 @@ public class ActionUtilityTest {
     assertEquals("m4", cleanList.get(0).getText());
     assertEquals("s5", cleanList.get(1).getText());
     assertEquals("m8", cleanList.get(2).getText());
-
   }
 
-  private IMenu createMenu(String label, boolean separator, boolean visible) {
+  @Test
+  public void testDispose() {
+    Menu m0 = createMenu("m0");
+    Menu m1 = createMenu("m1");
+    Menu m2 = createMenu("m2");
+    Menu m3 = createMenu("m3");
+    Menu m4 = createMenu("m4");
+    m1.addChildAction(m2);
+    m2.addChildAction(m3);
+    m2.addChildAction(m4);
+    List<IMenu> rootActions = new LinkedList<>();
+    rootActions.add(m0);
+    rootActions.add(m1);
+    ActionUtility.disposeActions(rootActions);
+    assertTrue(m0.isExecDisposeCalled());
+    assertTrue(m1.isExecDisposeCalled());
+    assertTrue(m2.isExecDisposeCalled());
+    assertTrue(m3.isExecDisposeCalled());
+    assertTrue(m4.isExecDisposeCalled());
+  }
+
+  private Menu createMenu(String label) {
+    return new Menu(label);
+  }
+
+  private Menu createMenu(String label, boolean separator, boolean visible) {
     return new Menu(label, separator, visible);
   }
 
@@ -103,6 +127,11 @@ public class ActionUtilityTest {
     private String m_label;
     private boolean m_separator;
     private boolean m_visible;
+    private boolean m_execDisposeCalled;
+
+    public Menu(String label) {
+      this(label, false, true);
+    }
 
     public Menu(String label, boolean separator, boolean visible) {
       super(false);
@@ -130,6 +159,16 @@ public class ActionUtilityTest {
     @Override
     protected void execOwnerValueChanged(Object newOwnerValue) {
 
+    }
+
+    @Override
+    protected void execDispose() {
+      super.execDispose();
+      m_execDisposeCalled = true;
+    }
+
+    public boolean isExecDisposeCalled() {
+      return m_execDisposeCalled;
     }
   }
 }

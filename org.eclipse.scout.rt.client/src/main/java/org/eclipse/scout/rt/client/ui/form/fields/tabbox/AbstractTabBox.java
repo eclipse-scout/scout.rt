@@ -21,6 +21,7 @@ import org.eclipse.scout.rt.client.extension.ui.action.tree.MoveActionNodesHandl
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.tabbox.ITabBoxExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.tabbox.TabBoxChains.TabBoxTabSelectedChain;
+import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IFormFieldContextMenu;
@@ -273,14 +274,7 @@ public abstract class AbstractTabBox extends AbstractCompositeField implements I
   @Override
   protected void disposeFieldInternal() {
     super.disposeFieldInternal();
-    for (IMenu menu : getMenus()) {
-      try {
-        menu.dispose();
-      }
-      catch (RuntimeException e) {
-        LOG.warn("Exception while disposing menu.", e);
-      }
-    }
+    ActionUtility.disposeActions(getMenus());
   }
 
   protected class P_UIFacade implements ITabBoxUIFacade {

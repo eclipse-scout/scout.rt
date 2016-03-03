@@ -1872,14 +1872,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
       }
     }
 
-    for (IAction action : getActions()) {
-      try {
-        action.dispose();
-      }
-      catch (RuntimeException e) {
-        LOG.warn("Exception while disposing action.", e);
-      }
-    }
+    ActionUtility.disposeActions(getActions());
 
     fireDesktopClosed();
   }

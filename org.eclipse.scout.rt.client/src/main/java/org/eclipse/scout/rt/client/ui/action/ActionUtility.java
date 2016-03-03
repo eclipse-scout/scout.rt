@@ -19,8 +19,11 @@ import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 import org.eclipse.scout.rt.client.ui.action.tree.IActionNode;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class ActionUtility {
+  private static final Logger LOG = LoggerFactory.getLogger(ActionUtility.class);
 
   private ActionUtility() {
   }
@@ -119,7 +122,14 @@ public final class ActionUtility {
     v.handleResult();
   }
 
-  private static class InitActionVisitor implements IActionVisitor {
+  public static void disposeActions(List<? extends IAction> actions) {
+    DisposeActionVisitor v = new DisposeActionVisitor();
+    for (IAction a : actions) {
+      a.acceptVisitor(v);
+    }
+  }
+
+  public static class InitActionVisitor implements IActionVisitor {
     private RuntimeException m_firstEx;
 
     @Override
@@ -139,6 +149,19 @@ public final class ActionUtility {
       if (m_firstEx != null) {
         throw m_firstEx;
       }
+    }
+  }
+
+  public static class DisposeActionVisitor implements IActionVisitor {
+    @Override
+    public int visit(IAction action) {
+      try {
+        action.dispose();
+      }
+      catch (Exception t) {
+        LOG.warn("Could not dispose action '{}'", action, t);
+      }
+      return CONTINUE;
     }
   }
 
