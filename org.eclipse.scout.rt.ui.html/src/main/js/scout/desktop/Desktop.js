@@ -46,7 +46,7 @@ scout.Desktop.prototype._init = function(model) {
   this._resizeHandler = this.onResize.bind(this);
   this.navigationVisible = scout.nvl(model.navigationVisible, this.desktopStyle === scout.DesktopStyle.DEFAULT);
   this.headerVisible = scout.nvl(model.headerVisible, this.desktopStyle === scout.DesktopStyle.DEFAULT);
-  this.benchVisible = scout.nvl(model.benchVisible, this.desktopStyle === scout.DesktopStyle.DEFAULT);
+  this.benchVisible = scout.nvl(model.benchVisible, true);
 };
 
 scout.Desktop.prototype._initKeyStrokeContext = function(keyStrokeContext) {
