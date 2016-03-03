@@ -235,13 +235,12 @@ public class OutlineMenuWrapper extends AbstractPropertyObserver implements IMen
 
   @Override
   public void initAction() {
-    m_wrappedMenu.initAction();
+    // NOP
   }
 
   @Override
   public void dispose() {
     m_wrappedMenu.removePropertyChangeListener(m_wrappedMenuPropertyChangeListener);
-    m_wrappedMenu.dispose();
   }
 
   @Override
