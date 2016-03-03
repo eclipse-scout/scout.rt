@@ -216,6 +216,9 @@ scout.Menu.prototype._openPopup = function(event) {
   this.popup.on('close', function(event) {
     this.setSelected(false);
   }.bind(this));
+  if (this._customCssClasses) {
+    this.popup.$container.addClass(this._customCssClasses);
+  }
 };
 
 scout.Menu.prototype._createPopup = function(event) {

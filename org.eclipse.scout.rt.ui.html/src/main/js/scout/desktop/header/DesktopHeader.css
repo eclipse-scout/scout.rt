@@ -86,7 +86,6 @@
   height: @desktop-header-height - 1px;
   border-left: 1px solid @border-color;
   border-right: 1px solid @border-color;
-  background-color: @background-color;
   cursor: pointer;
   /*padding: 16px 20px 0 20px;*/
   box-shadow: none;

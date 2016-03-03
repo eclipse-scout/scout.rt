@@ -8,6 +8,16 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-.form-tool-popup > .popup-body > .form > .root-group-box > .main-menubar {
-  background-color: @form-tool-popup-main-menubar-background-color;
+.form-tool-popup {
+  & > .popup-head {
+    background-color: @form-background-color;
+  }
+
+  & > .popup-body > .form > .root-group-box > .main-menubar {
+    background-color: @form-tool-popup-main-menubar-background-color;
+  }
+
+  & > .popup-deco {
+    background-color: @form-background-color;
+  }
 }
