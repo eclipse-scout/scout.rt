@@ -485,8 +485,8 @@ scout.SmartField.prototype._sendCancelProposal = function() {
  */
 scout.SmartField.prototype._openProposal = function(browseAll) {
   var displayText = this._readDisplayText(),
-    searchText = (browseAll && !this.errorStatus) ? '' : this._readDisplayText(),
-    selectCurrentValue = browseAll;
+    searchText = '' ,
+    selectCurrentValue = browseAll && !this.errorStatus;
   this.displayText = displayText;
 
   if (this._requestedProposal) {
