@@ -84,6 +84,7 @@ scout.TableControl.prototype._renderContent = function($parent) {
   this.form.$container.width($parent.width());
   this.form.htmlComp.pixelBasedSizing = true;
   this.form.htmlComp.validateRoot = true;
+  this.form.htmlComp.validateLayout();
   this.session.keyStrokeManager.installKeyStrokeContext(this.tableControlKeyStrokeContext);
 };
 
