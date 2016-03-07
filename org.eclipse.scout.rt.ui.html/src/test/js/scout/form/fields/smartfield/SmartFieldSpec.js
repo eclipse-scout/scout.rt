@@ -1,4 +1,4 @@
-/*******************************************************************************
+ /*******************************************************************************
  * Copyright (c) 2014-2015 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -91,7 +91,7 @@ describe('SmartField', function() {
       smartField.errorStatus = {};
       smartField._openProposal(true);
       expect(events[0].searchText).toBe('');
-      expect(events[0].selectCurrentValue).toBe(true);
+      expect(events[0].selectCurrentValue).toBe(false);
     });
   });
 
