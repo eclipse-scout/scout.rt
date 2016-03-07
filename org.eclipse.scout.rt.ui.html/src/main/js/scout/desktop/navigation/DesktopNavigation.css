@@ -23,9 +23,7 @@
 }
 
 .navigation-body {
-  position: relative;
-  width: 100%;
-  height: calc(~'100%' - @view-buttons-height);
+  position: absolute
 }
 
 .desktop-navigation > .header-tools {

@@ -39,4 +39,5 @@ scout.DesktopNavigationLayout.prototype.layout = function($container) {
   bodySize = new scout.Dimension(containerSize.width, containerSize.height - viewButtonsHeight)
     .subtract(htmlContainer.getMargins());
   htmlBody.setSize(bodySize);
+  htmlBody.$comp.cssTop(viewButtonsHeight);
 };
