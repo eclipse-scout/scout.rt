@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.client.ui.basic.table;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -55,18 +54,18 @@ public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
    */
   protected void removeObsolete(List<TableEvent> events) {
     //traverse the list in reversed order
-    //previous events may be deleted from the list
+    // previous events may be deleted from the list
     for (int j = 0; j < events.size() - 1; j++) {
       int i = events.size() - 1 - j;
       TableEvent event = events.get(i);
 
       int type = event.getType();
       if (type == TableEvent.TYPE_ALL_ROWS_DELETED) {
-        //remove all previous row related events (or clear their row list if they don't require rows)
+        // remove all previous row related events (or clear their row list if they don't require rows)
         applyAllRowsDeletedToPreviousEvents(events.subList(0, i));
       }
       else if (type == TableEvent.TYPE_COLUMN_STRUCTURE_CHANGED) {
-        //ignore all previous aggregate function changes.
+        // ignore all previous aggregate function changes.
         List<Integer> typesToDelete = CollectionUtility.arrayList(
             TableEvent.TYPE_COLUMN_AGGREGATION_CHANGED,
             TableEvent.TYPE_COLUMN_BACKGROUND_EFFECT_CHANGED);
@@ -76,12 +75,15 @@ public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
         remove(typesToDelete, events.subList(0, i));
       }
       else if (isIgnorePrevious(type)) {
-        //remove all previous events of the same type
+        // remove all previous events of the same type
         remove(type, events.subList(0, i));
       }
       else if (type == TableEvent.TYPE_ROWS_DELETED) {
-        List<ITableRow> remainingRows = removeRowsFromPreviousEvents(event.getRows(), events.subList(0, i), TableEvent.TYPE_ROWS_INSERTED);
+        List<ITableRow> remainingRows = removeRowsFromPreviousEventsWhenDeleted(event.getRows(), events.subList(0, i));
         event.setRows(remainingRows);
+      }
+      else if (type == TableEvent.TYPE_ROWS_INSERTED) {
+        removeRowsFromPreviousEventsWhenInserted(event.getRows(), events.subList(0, i));
       }
     }
   }
@@ -126,25 +128,29 @@ public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
    *         matches one of the 'creationTypes'. This allows for completely removing a row that was created and deleted
    *         in the same request.
    */
-  protected List<ITableRow> removeRowsFromPreviousEvents(List<ITableRow> rowsToRemove, List<TableEvent> events, Integer... creationTypes) {
-    List<Integer> creationTypesList = Arrays.asList(creationTypes);
+  protected List<ITableRow> removeRowsFromPreviousEventsWhenDeleted(List<ITableRow> rowsToRemove, List<TableEvent> events) {
     List<ITableRow> remainingRows = new ArrayList<ITableRow>();
 
     for (ITableRow rowToRemove : rowsToRemove) {
-      boolean rowRemovedFromCreationEvent = false;
+      boolean rowRemovedFromInsertEvent = false;
 
       for (ListIterator<TableEvent> it = events.listIterator(events.size()); it.hasPrevious();) {
         TableEvent event = it.previous();
-        boolean removed = removeRow(event, rowToRemove);
-        if (removed && creationTypesList.contains(event.getType())) {
-          rowRemovedFromCreationEvent = true;
+        boolean removed = false;
+        // never remove rows from a previous row order changed / checked event. Even when the row is deleted later,
+        // the UI expects the row to be still available at the point where the row order / checked state is changed.
+        if (TableEvent.TYPE_ROW_ORDER_CHANGED != event.getType()) {
+          removed = removeRow(event, rowToRemove);
+        }
+        if (removed && TableEvent.TYPE_ROWS_INSERTED == event.getType()) {
+          rowRemovedFromInsertEvent = true;
         }
         if (!isRowOrderUnchanged(event.getType())) {
           break;
         }
       }
 
-      if (!rowRemovedFromCreationEvent) {
+      if (!rowRemovedFromInsertEvent) {
         remainingRows.add(rowToRemove);
       }
     }
@@ -166,6 +172,17 @@ public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
     return removed;
   }
 
+  protected void removeRowsFromPreviousEventsWhenInserted(List<ITableRow> rowsToRemove, List<TableEvent> events) {
+    List<Integer> typesList = getRowRelatedEvents();
+    for (TableEvent event : events) {
+      if (typesList.contains(event.getType())) {
+        for (ITableRow rowToRemove : rowsToRemove) {
+          removeRow(event, rowToRemove);
+        }
+      }
+    }
+  }
+
   /**
    * Update a previous event of given type and removes a newer one of another type.
    */
@@ -175,7 +192,7 @@ public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
       TableEvent event = events.get(i);
 
       if (event.getType() == newType) {
-        //merge current update event with previous insert event of the same row
+        // merge current update event with previous insert event of the same row
         updatePreviousRow(event, events.subList(0, i), oldType);
       }
     }
