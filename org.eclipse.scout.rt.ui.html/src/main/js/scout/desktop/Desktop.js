@@ -82,7 +82,7 @@ scout.Desktop.prototype._render = function($parent) {
   this._setSplitterPosition();
   this.addOns.forEach(function(addOn) {
     addOn.render(this.$container);
-  });
+  }, this);
   this.$container.window().on('resize', this._resizeHandler);
 
   // prevent general drag and drop, dropping a file anywhere in the application must not open this file in browser
