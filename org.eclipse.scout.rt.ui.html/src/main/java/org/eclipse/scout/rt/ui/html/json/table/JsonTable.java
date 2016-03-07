@@ -1044,12 +1044,22 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
       return;
     }
     List<TableEvent> coalescedEvents = m_eventBuffer.consumeAndCoalesceEvents();
+    boolean ignoreAccepted = containsInsertOrDelete(coalescedEvents);
     for (TableEvent event : coalescedEvents) {
-      processEvent(event);
+      processEvent(event, ignoreAccepted);
     }
   }
 
-  protected void processEvent(TableEvent event) {
+  private boolean containsInsertOrDelete(List<TableEvent> events) {
+    for (TableEvent event : events) {
+      if (TableEvent.TYPE_ROWS_INSERTED == event.getType() || TableEvent.TYPE_ROWS_DELETED == event.getType()) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  protected void processEvent(TableEvent event, boolean ignoreAccepted) {
     switch (event.getType()) {
       case TableEvent.TYPE_ROWS_INSERTED:
         handleModelRowsInserted(event.getRows());
@@ -1067,7 +1077,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
         handleModelRowsSelected(event.getRows());
         break;
       case TableEvent.TYPE_ROW_ORDER_CHANGED:
-        handleModelRowOrderChanged(event.getRows());
+        handleModelRowOrderChanged(event.getRows(), ignoreAccepted);
         break;
       case TableEvent.TYPE_COLUMN_STRUCTURE_CHANGED:
         handleModelColumnStructureChanged();
@@ -1203,17 +1213,23 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     addActionEvent(EVENT_ROWS_CHECKED, jsonEvent);
   }
 
-  protected void handleModelRowOrderChanged(Collection<ITableRow> modelRows) {
+  protected void handleModelRowOrderChanged(Collection<ITableRow> modelRows, boolean ignoreAccepted) {
+    // Note: when a insert or delete event is in the event-buffer, we must preserve the chronological
+    // order of the events. That's why we can not always check isRowAccepted() since this only looks
+    // at the current (final) state of the row and not on the state the JavaScript UI has. Without this
+    // flag, Table.js would throw an error because the number of rows in the event differs from the
+    // number of rows in the (JS-) model.
     JSONArray jsonRowIds = new JSONArray();
     for (ITableRow row : modelRows) {
-      if (!isRowAccepted(row)) {
-        continue;
+      if (ignoreAccepted || isRowAccepted(row)) {
+        jsonRowIds.put(getTableRowId(row));
       }
-      jsonRowIds.put(getTableRowId(row));
     }
+
     if (jsonRowIds.length() == 0) {
       return;
     }
+
     JSONObject jsonEvent = new JSONObject();
     putProperty(jsonEvent, PROP_ROW_IDS, jsonRowIds);
     addActionEvent("rowOrderChanged", jsonEvent);
