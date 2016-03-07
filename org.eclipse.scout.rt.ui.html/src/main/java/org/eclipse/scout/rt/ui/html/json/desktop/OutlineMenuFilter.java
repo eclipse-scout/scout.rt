@@ -13,13 +13,13 @@ package org.eclipse.scout.rt.ui.html.json.desktop;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.TreeMenuType;
-import org.eclipse.scout.rt.platform.filter.IFilter;
+import org.eclipse.scout.rt.ui.html.json.action.DisplayableActionFilter;
 
-public class OutlineMenuFilter<T extends IAction> implements IFilter<T> {
+public class OutlineMenuFilter<T extends IAction> extends DisplayableActionFilter<T> {
 
   @Override
   public boolean accept(T element) {
-    if (element instanceof IMenu) {
+    if (super.accept(element) && element instanceof IMenu) {
       return ((IMenu) element).getMenuTypes().contains(TreeMenuType.Header);
     }
     return false;

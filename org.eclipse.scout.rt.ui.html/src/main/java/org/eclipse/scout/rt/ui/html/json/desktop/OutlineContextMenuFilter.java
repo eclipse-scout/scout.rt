@@ -14,15 +14,18 @@ import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.TreeMenuType;
-import org.eclipse.scout.rt.platform.filter.IFilter;
+import org.eclipse.scout.rt.ui.html.json.action.DisplayableActionFilter;
 
-public class OutlineContextMenuFilter<T extends IMenu> implements IFilter<T> {
+public class OutlineContextMenuFilter<T extends IMenu> extends DisplayableActionFilter<T> {
 
   @Override
   public boolean accept(T element) {
+    if (!super.accept(element)) {
+      return false;
+    }
     List<IMenu> childActions = element.getChildActions();
     for (IMenu childAction : childActions) {
-      if (childAction.getMenuTypes().contains(TreeMenuType.Header)) {
+      if (childAction.getMenuTypes().contains(TreeMenuType.Header) && childAction.isVisibleGranted()) {
         return true;
       }
     }
