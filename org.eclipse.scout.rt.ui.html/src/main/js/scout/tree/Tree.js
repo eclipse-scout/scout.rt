@@ -86,6 +86,12 @@ scout.Tree.prototype._initTreeKeyStrokeContext = function(keyStrokeContext) {
 
 scout.Tree.prototype._syncMenus = function(newMenus, oldMenus) {
   this._keyStrokeSupport.syncMenus(newMenus, oldMenus);
+  this._updateMenuBar();
+};
+
+scout.Tree.prototype._updateMenuBar = function() {
+  var menuItems = this._filterMenus(this.menus, scout.MenuDestinations.MENU_BAR, false, true);
+  this.menuBar.setMenuItems(menuItems);
 };
 
 scout.Tree.prototype._syncKeyStrokes = function(newKeyStrokes, oldKeyStrokes) {
@@ -401,8 +407,11 @@ scout.Tree.prototype._renderNodeFilterAccepted = function(node, animated) {
 };
 
 scout.Tree.prototype._renderMenus = function() {
-  var menuItems = this._filterMenus(this.menus, scout.MenuDestinations.MENU_BAR, false, true);
-  this.menuBar.updateItems(menuItems);
+  // NOP
+};
+
+scout.Tree.prototype._removeMenus = function() {
+  // menubar takes care about removal
 };
 
 scout.Tree.prototype._filterMenus = function(menus, destination, onlyVisible, enableDisableKeyStroke) {
@@ -959,9 +968,9 @@ scout.Tree.prototype.selectNodes = function(nodes, notifyServer, debounceSend) {
     this.expandNode(this.selectedNodes[0]);
   }
 
+  this._updateMenuBar();
   if (this.rendered) {
     this._renderSelection();
-    this._renderMenus();
   }
 };
 

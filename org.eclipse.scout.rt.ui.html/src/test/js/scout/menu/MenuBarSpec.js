@@ -18,7 +18,7 @@ describe("MenuBar", function() {
     helper = new MenuSpecHelper(session);
   });
 
-  describe('updateItems', function() {
+  describe('setMenuItems', function() {
 
     it('prefers EmptySpace for the left position if menu has multiple menuTypes', function() {
       var menu1 = helper.createMenu(helper.createModel('multi')),
@@ -34,7 +34,7 @@ describe("MenuBar", function() {
       menu2.menuTypes = ['Table.SingleSelection'];
 
       menuBar.render(session.$entryPoint);
-      menuBar.updateItems(menus);
+      menuBar.setMenuItems(menus);
 
       expect(menuBar.menuItems.length).toBe(3); // 2 + separator
       expect(menuBar.menuItems[0]).toBe(menu1);
@@ -56,7 +56,7 @@ describe("MenuBar", function() {
       menu2.menuTypes = ['Table.SingleSelection'];
 
       menuBar.render(session.$entryPoint);
-      menuBar.updateItems(menus);
+      menuBar.setMenuItems(menus);
 
       // a separator must be added between EmptySpace and Selection Menus
       expect(menuBar.menuItems.length).toBe(3);
@@ -67,7 +67,7 @@ describe("MenuBar", function() {
       // when menu-bar is updated, the old separator must be destroyed
       // and a new separator with different ID should be created
       menus = [menu1, menu3];
-      menuBar.updateItems(menus);
+      menuBar.setMenuItems(menus);
       expect(separator.destroyed).toBe(true);
       expect(separator.id).not.toBe(menuBar.menuItems[1].id);
     });
@@ -87,7 +87,7 @@ describe("MenuBar", function() {
         menus = [menu1, menu2];
 
       menuBar.render(session.$entryPoint);
-      menuBar.updateItems(menus);
+      menuBar.setMenuItems(menus);
 
       // <fix for layout issues>
       // Menu item DIVs are too wide, because in Jasmine tests there are no CSS rules. Therefore, all
@@ -122,7 +122,7 @@ describe("MenuBar", function() {
       menu2.visible = false;
 
       menuBar.render(session.$entryPoint);
-      menuBar.updateItems(menus);
+      menuBar.setMenuItems(menus);
 
       expect(menuBar.menuItems.length).toBe(2);
       expect(menuBar.menuItems[0]).toBe(menu1);
@@ -148,7 +148,7 @@ describe("MenuBar", function() {
       menu2.visible = true;
 
       menuBar.render(session.$entryPoint);
-      menuBar.updateItems(menus);
+      menuBar.setMenuItems(menus);
 
       expect(menuBar.menuItems.length).toBe(2);
       expect(menuBar.menuItems[0]).toBe(menu1);

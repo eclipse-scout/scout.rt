@@ -16,6 +16,9 @@ describe("MenuItemsOrder", function() {
     setFixtures(sandbox());
     session = sandboxSession();
     menuItemsOrder = new scout.MenuItemsOrder(session, 'Table');
+    var nullWidget = new scout.NullWidget();
+    nullWidget.session = session;
+    menuItemsOrder.menuBar = nullWidget;
   });
 
   it("_createSeparator", function() {

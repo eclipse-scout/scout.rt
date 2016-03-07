@@ -30,7 +30,6 @@ scout.ImageField.prototype._renderProperties = function() {
   scout.ImageField.parent.prototype._renderProperties.call(this);
   this._renderImageUrl();
   this._renderAutoFit();
-  this._renderMenus();
   this._renderScrollBarEnabled();
   this._renderDropType();
 };

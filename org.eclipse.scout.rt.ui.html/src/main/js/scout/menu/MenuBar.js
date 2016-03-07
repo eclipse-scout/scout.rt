@@ -18,7 +18,10 @@ scout.MenuBar = function() {
   this.tabbable = true;
   this._internalMenuItems = []; // original list of menuItems that was passed to updateItems(), only used to check if menubar has changed
   this.menuItems = []; // list of menuItems (ordered, may contain additional UI separators, some menus may not be rendered)
-  this._orderedMenuItems = null; // Object containing "left" and "right" menus
+  this._orderedMenuItems = {
+    left: [],
+    right: []
+  }; // Object containing "left" and "right" menus
   this._defaultMenu = null;
   this.visible = false;
 
@@ -54,6 +57,7 @@ scout.MenuBar.prototype._init = function(options) {
   scout.MenuBar.parent.prototype._init.call(this, options);
 
   this.menuSorter = options.menuOrder;
+  this.menuSorter.menuBar = this;
   this.menuFilter = options.menuFilter;
 };
 
@@ -86,6 +90,7 @@ scout.MenuBar.prototype._render = function($parent) {
     this.$container.addClass('bottom');
     $parent.append(this.$container);
   }
+  this.rebuildItemsInternal();
 };
 
 scout.MenuBar.prototype.bottom = function() {
@@ -103,25 +108,23 @@ scout.MenuBar.prototype.large = function() {
 scout.MenuBar.prototype._remove = function() {
   scout.MenuBar.parent.prototype._remove.call(this);
   this._removeMenuItems();
-  // Reset internal state (don't do it inside _removeMenuItems, because that is also called from _updateItems())
-  this._internalMenuItems = [];
-  this.menuItems = [];
-  this._orderedMenuItems = null;
   this.visibleMenuItems = [];
   this.visible = false;
+};
+
+scout.MenuBar.prototype._destroyMenuSorterSeparators = function() {
+  this.menuItems.forEach(function(item) {
+    if (item.createdBy === this.menuSorter) {
+      item.destroy();
+    }
+  }, this);
 };
 
 scout.MenuBar.prototype._removeMenuItems = function() {
   this.menuItems.forEach(function(item) {
     item.off('propertyChange', this._menuItemPropertyChangeListener);
-    // remove DOM for existing menu items and destroy items that have
-    // been created by the menuSorter (e.g. separators).
-    if (item.createdBy === this.menuSorter) {
-      item.destroy();
-    } else {
-      item.overflow = false;
-      item.remove();
-    }
+    item.overflow = false;
+    item.remove();
   }, this);
 };
 
@@ -137,38 +140,45 @@ scout.MenuBar.prototype.rebuildItems = function(revalidateLayoutTree) {
  * Do not call this internal method from outside (except from the MenuBarLayout).
  */
 scout.MenuBar.prototype.rebuildItemsInternal = function() {
-  this._updateItems(this._internalMenuItems);
+  this._updateItems();
 };
 
-scout.MenuBar.prototype.updateItems = function(menuItems) {
+scout.MenuBar.prototype.setMenuItems = function(menuItems) {
   menuItems = scout.arrays.ensure(menuItems);
-
   // Only update if list of menus changed. Don't compare this.menuItems, because that list
   // may contain additional UI separators, and may not be in the same order
   var sameMenuItems = scout.arrays.equals(this._internalMenuItems, menuItems);
-  var hasUnrenderedMenuItems = menuItems.some(function(elem) {
-    return !elem.rendered;
-  });
-  if (!sameMenuItems || hasUnrenderedMenuItems) {
+
+  if (!sameMenuItems) {
+    if (this.rendered) {
+      this._removeMenuItems();
+    }
+
+    // The menuSorter may add separators to the list of items -> destroy the old ones first
+    this._destroyMenuSorterSeparators();
     this._internalMenuItems = menuItems;
-    this.rebuildItems(); // Re-layout menubar
-  } else {
-    // Don't rebuild menubar, but update "markers"
-    this.updateVisibility();
-    this.updateDefaultMenu();
-    this.updateLastItemMarker();
+    this._orderedMenuItems = this.menuSorter.order(menuItems, this);
+    this.menuItems = this._orderedMenuItems.left.concat(this._orderedMenuItems.right);
+  }
+
+  if (this.rendered) {
+    var hasUnrenderedMenuItems = this.menuItems.some(function(elem) {
+      return !elem.rendered;
+    });
+    if (!sameMenuItems || hasUnrenderedMenuItems) {
+      this.rebuildItems(); // Re-layout menubar
+    } else {
+      // Don't rebuild menubar, but update "markers"
+      this.updateVisibility();
+      this.updateDefaultMenu();
+      this.updateLastItemMarker();
+    }
   }
 };
 
-scout.MenuBar.prototype._updateItems = function(menuItems) {
+scout.MenuBar.prototype._updateItems = function() {
   this._removeMenuItems();
 
-  // The menuSorter may add separators to the list of items, that's why we
-  // store the return value of menuSorter in this.menuItems and not the
-  // menuItems passed to the updateItems method. We must do this because
-  // otherwise we could not remove the added separator later.
-  this._orderedMenuItems = this.menuSorter.order(menuItems, this);
-  this.menuItems = this._orderedMenuItems.left.concat(this._orderedMenuItems.right);
   this.visibleMenuItems = this.menuItems;
   this._lastVisibleItemLeft = null;
   this._lastVisibleItemRight = null;

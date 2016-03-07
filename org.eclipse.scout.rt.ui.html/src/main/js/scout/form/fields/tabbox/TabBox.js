@@ -31,6 +31,7 @@ scout.TabBox.prototype._init = function(model) {
     parent: this,
     menuOrder: new scout.GroupBoxMenuItemsOrder()
   });
+  this._updateMenuBar(this.menus);
 };
 
 scout.TabBox.prototype._render = function($parent) {
@@ -57,7 +58,6 @@ scout.TabBox.prototype._renderProperties = function() {
   scout.TabBox.parent.prototype._renderProperties.call(this);
   this._renderTabs();
   this._renderTabContent();
-  this._renderMenus();
 };
 
 /**
@@ -212,14 +212,25 @@ scout.TabBox.prototype._renderTabContent = function() {
   }
 };
 
-scout.TabBox.prototype._renderMenus = function() {
-  this.updateMenuBar();
-  // TODO [5.2] bsh: Key strokes?
+scout.TabBox.prototype._syncMenus = function(menus, oldMenus) {
+  scout.TabBox.parent.prototype._syncMenus.call(this, menus, oldMenus);
+  if (this.menuBar) {
+    // updateMenuBar is required because menuBar is not created yet when synMenus is called initially
+    this._updateMenuBar(menus, oldMenus);
+  }
 };
 
-scout.TabBox.prototype.updateMenuBar = function() {
+scout.FormField.prototype._renderMenus = function() {
+  // NOP
+};
+
+scout.FormField.prototype._removeMenus = function() {
+  // menubar takes care about removal
+};
+
+scout.TabBox.prototype._updateMenuBar = function(menus, oldMenus) {
   var menuItems = scout.menus.filter(this.menus, ['TabBox.Header']);
-  this.menuBar.updateItems(menuItems);
+  this.menuBar.setMenuItems(menuItems);
 };
 
 /**

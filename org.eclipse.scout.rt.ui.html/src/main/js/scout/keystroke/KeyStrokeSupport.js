@@ -28,16 +28,20 @@ scout.KeyStrokeSupport.prototype.syncMenus = function(newMenus, oldMenus) {
 };
 
 scout.KeyStrokeSupport.prototype._updateKeyStrokes = function(newKeyStrokes, oldKeyStrokes) {
-  // 1st: unregister all old key-strokes
-  if (oldKeyStrokes && Array.isArray(oldKeyStrokes)) {
-    oldKeyStrokes.forEach(function(keyStroke) {
-      this.keyStrokeContext.unregisterKeyStroke(keyStroke);
-    }, this._adapter);
-  }
-  // 2nd: register all new key-strokes
-  if (newKeyStrokes && Array.isArray(newKeyStrokes)) {
-    newKeyStrokes.forEach(function(keyStroke) {
-      this.keyStrokeContext.registerKeyStroke(keyStroke);
-    }, this._adapter);
-  }
+  this.unregisterKeyStrokes(oldKeyStrokes);
+  this.registerKeyStrokes(newKeyStrokes);
+};
+
+scout.KeyStrokeSupport.prototype.registerKeyStrokes = function(keyStrokes) {
+  keyStrokes = scout.arrays.ensure(keyStrokes);
+  keyStrokes.forEach(function(keyStroke) {
+    this.keyStrokeContext.registerKeyStroke(keyStroke);
+  }, this._adapter);
+};
+
+scout.KeyStrokeSupport.prototype.unregisterKeyStrokes = function(keyStrokes) {
+  keyStrokes = scout.arrays.ensure(keyStrokes);
+  keyStrokes.forEach(function(keyStroke) {
+    this.keyStrokeContext.unregisterKeyStroke(keyStroke);
+  }, this._adapter);
 };

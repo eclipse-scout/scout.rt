@@ -30,8 +30,8 @@ scout.Planner = function() {
     return t;
   };
 
-  // additional modes; should be stored in model
   this.yearPanelVisible = false;
+  this._keyStrokeSupport = new scout.KeyStrokeSupport(this);
   this._addAdapterProperties(['menus']);
 };
 scout.inherits(scout.Planner, scout.ModelAdapter);
@@ -73,6 +73,11 @@ scout.Planner.prototype._init = function(model) {
   this._header.on('previousClick', this._onPreviousClick.bind(this));
   this._header.on('nextClick', this._onNextClick.bind(this));
   this._header.on('displayModeClick', this._onDisplayModeClick.bind(this));
+  this.menuBar = scout.create('MenuBar', {
+    parent: this,
+    menuOrder: new scout.PlannerMenuItemsOrder(this.session, 'Planner')
+  });
+  this.menuBar.bottom();
   for (var i = 0; i < this.resources.length; i++) {
     this._initResource(this.resources[i]);
   }
@@ -81,17 +86,13 @@ scout.Planner.prototype._init = function(model) {
   this._syncViewRange(this.viewRange);
   this._syncSelectedResources(this.selectedResources);
   this._syncSelectionRange(this.selectionRange);
+  this._syncMenus(this.menus);
 
   this._tooltipSupport = new scout.TooltipSupport({
     parent: this,
     arrowPosition: 50
   });
 
-  this.menuBar = scout.create('MenuBar', {
-    parent: this,
-    menuOrder: new scout.PlannerMenuItemsOrder(this.session, 'Planner')
-  });
-  this.menuBar.bottom();
 };
 
 scout.Planner.prototype._initResource = function(resource) {
@@ -152,7 +153,6 @@ scout.Planner.prototype._renderProperties = function() {
 
   this._renderViewRange();
   this._renderHeaderVisible();
-  this._renderMenus();
   this._renderYearPanelVisible(false);
   this._renderResources();
   this._renderSelectedResources();
@@ -912,13 +912,22 @@ scout.Planner.prototype._afterYearPanelWidthChange = function() {
   }
 };
 
-scout.Planner.prototype._renderMenus = function() {
+scout.Planner.prototype._syncMenus = function(menus, oldMenus) {
+  this._keyStrokeSupport.syncMenus(menus, oldMenus);
   this._updateMenuBar();
 };
 
 scout.Planner.prototype._updateMenuBar = function() {
   var menuItems = this._filterMenus(['Planner.EmptySpace', 'Planner.Resource', 'Planner.Activity', 'Planner.Range'], true);
-  this.menuBar.updateItems(menuItems);
+  this.menuBar.setMenuItems(menuItems);
+};
+
+scout.Planner.prototype._renderMenus = function() {
+  // NOP
+};
+
+scout.Planner.prototype._removeMenus = function() {
+  // menubar takes care about removal
 };
 
 scout.Planner.prototype._filterMenus = function(allowedTypes, enableDisableKeyStroke) {
@@ -976,10 +985,12 @@ scout.Planner.prototype._syncSelectionRange = function(selectionRange) {
     from: scout.dates.parseJsonDate(selectionRange.from),
     to: scout.dates.parseJsonDate(selectionRange.to)
   };
+  this._updateMenuBar();
 };
 
 scout.Planner.prototype._syncSelectedResources = function(selectedResources) {
   this.selectedResources = this._resourcesByIds(selectedResources);
+  this._updateMenuBar();
 };
 
 scout.Planner.prototype._renderSelectedResources = function(newIds, oldSelectedResources) {
@@ -992,11 +1003,6 @@ scout.Planner.prototype._renderSelectedResources = function(newIds, oldSelectedR
   this.selectedResources.forEach(function(resource) {
     resource.$resource.select(true);
   });
-
-  // Only call update menubar on property change, not necessary to call it when initializing
-  if (this.rendered) {
-    this._updateMenuBar();
-  }
 };
 
 scout.Planner.prototype._renderSelectionRange = function() {
@@ -1037,18 +1043,10 @@ scout.Planner.prototype._renderSelectionRange = function() {
       $item.addClass('selected');
     }
   }
-
-  // Only call update menubar on property change, not necessary to call it when initializing
-  if (this.rendered) {
-    this._updateMenuBar();
-  }
 };
 
 scout.Planner.prototype._renderSelectedActivity = function() {
-  // Only call update menubar on property change, not necessary to call it when initializing
-  if (this.rendered) {
-    this._updateMenuBar();
-  }
+  this._updateMenuBar();
 };
 
 scout.Planner.prototype._renderLabel = function() {
@@ -1131,6 +1129,7 @@ scout.Planner.prototype.selectRange = function(range, notifyServer) {
   if (this.rendered) {
     this._renderSelectionRange();
   }
+  this._updateMenuBar();
 };
 
 scout.Planner.prototype.selectResources = function(resources, notifyServer) {
@@ -1146,6 +1145,7 @@ scout.Planner.prototype.selectResources = function(resources, notifyServer) {
   if (this.rendered) {
     this._renderSelectedResources('', oldSelection);
   }
+  this._updateMenuBar();
 };
 
 /**

@@ -12,20 +12,23 @@ scout.GroupBox = function() {
   scout.GroupBox.parent.call(this);
   this.fields = [];
   this.menus = [];
+  this.menuBarVisible = true;
   this.staticMenus = [];
   this._addAdapterProperties(['fields', 'menus']);
   this.$body;
-  this._$groupBoxTitle;
+  this.$title;
 
   this.controls = [];
   this.systemButtons = [];
   this.customButtons = [];
   this.processButtons = [];
+  this.processMenus = [];
 };
 scout.inherits(scout.GroupBox, scout.CompositeField);
 
 scout.GroupBox.prototype._init = function(model) {
   scout.GroupBox.parent.prototype._init.call(this, model);
+  this._prepareFields();
   this.menuBar = scout.create('MenuBar', {
     parent: this,
     menuOrder: new scout.GroupBoxMenuItemsOrder()
@@ -33,6 +36,7 @@ scout.GroupBox.prototype._init = function(model) {
   if (this.mainBox) {
     this.menuBar.large();
   }
+  this._updateMenuBar();
 };
 
 /**
@@ -67,14 +71,9 @@ scout.GroupBox.prototype._render = function($parent) {
     this.htmlComp.layoutData = null;
   }
 
-  this._$groupBoxTitle = this.$container.appendDiv('group-box-title');
+  this.$title = this.$container.appendDiv('group-box-title');
   this.addLabel();
   this.addStatus();
-  if (this.menuBar.position === 'top') {
-    this.menuBar.render(this.$container);
-    // move after title
-    this.menuBar.$container.appendTo(this.$container);
-  }
   this.$body = this.$container.appendDiv('group-box-body');
   htmlBody = new scout.HtmlComponent(this.$body, this.session);
   htmlBody.setLayout(new scout.LogicalGridLayout(env.formColumnGap, env.formRowGap));
@@ -84,21 +83,26 @@ scout.GroupBox.prototype._render = function($parent) {
       axis: 'y'
     });
   }
-  this._prepareFields();
+
   this.controls.forEach(function(control) {
     control.render(this.$body);
   }, this);
-  if (this.menuBar.position === 'bottom') {
-    this.menuBar.render(this.$container);
+};
+
+scout.GroupBox.prototype._remove = function() {
+  scout.GroupBox.parent.prototype._remove.call(this);
+  if (this.scrollable) {
+    scout.scrollbars.uninstall(this.$body);
   }
 };
 
 scout.GroupBox.prototype._renderProperties = function() {
   scout.GroupBox.parent.prototype._renderProperties.call(this);
 
-  this._renderBorderVisible(this.borderVisible);
-  this._renderExpandable(this.expandable);
-  this._renderExpanded(this.expanded);
+  this._renderBorderVisible();
+  this._renderExpandable();
+  this._renderExpanded();
+  this._renderMenuBarVisible();
 };
 
 scout.GroupBox.prototype._createLayout = function() {
@@ -109,28 +113,21 @@ scout.GroupBox.prototype.addLabel = function() {
   if (this.$label) {
     return;
   }
-  this.$label = this._$groupBoxTitle.appendSpan();
+  this.$label = this.$title.appendSpan();
 };
 
 scout.GroupBox.prototype._renderLabel = function() {
   this.$label.textOrNbsp(this.label);
 };
 
-scout.GroupBox.prototype._remove = function() {
-  scout.GroupBox.parent.prototype._remove.call(this);
-  if (this.menuBar) {
-    this.menuBar.remove();
-  }
-  if (this.scrollable) {
-    scout.scrollbars.uninstall(this.$body);
-  }
-};
-
 scout.GroupBox.prototype._prepareFields = function() {
+  this._keyStrokeSupport.unregisterKeyStrokes(this.processButtons);
+
   this.controls = [];
   this.systemButtons = [];
   this.customButtons = [];
   this.processButtons = [];
+  this.processMenus = [];
 
   var i, field, res;
   for (i = 0; i < this.fields.length; i++) {
@@ -159,6 +156,17 @@ scout.GroupBox.prototype._prepareFields = function() {
       this.controls.push(field);
     }
   }
+
+  // Create menu for each process button
+  this.processButtons.forEach(function(button) {
+    var menu = scout.create('ButtonAdapterMenu',
+      scout.ButtonAdapterMenu.adaptButtonProperties(button, {
+        parent: this,
+        button: button
+      }));
+    this.processMenus.push(menu);
+  }, this);
+  this._keyStrokeSupport.registerKeyStrokes(this.processMenus);
 };
 
 scout.GroupBox.prototype._registerButtonKeyStrokes = function(button) {
@@ -184,7 +192,8 @@ scout.GroupBox.prototype.getFields = function() {
   return this.controls;
 };
 
-scout.GroupBox.prototype._renderBorderVisible = function(borderVisible) {
+scout.GroupBox.prototype._renderBorderVisible = function() {
+  var borderVisible = this.borderVisible;
   if (this.borderDecoration === 'auto') {
     borderVisible = this._computeBorderVisible(borderVisible);
   }
@@ -194,9 +203,33 @@ scout.GroupBox.prototype._renderBorderVisible = function(borderVisible) {
   }
 };
 
-//Don't include in renderProperties, it is not necessary to execute it initially because renderBorderVisible is executed already
+// Don't include in renderProperties, it is not necessary to execute it initially because renderBorderVisible is executed already
 scout.GroupBox.prototype._renderBorderDecoration = function() {
-  this._renderBorderVisible(this.borderVisible);
+  this._renderBorderVisible();
+};
+
+scout.GroupBox.prototype.setMenuBarVisible = function(visible) {
+  this.menuBarVisible = visible;
+  if (this.rendered) {
+    this._renderMenuBarVisible();
+  }
+};
+
+scout.GroupBox.prototype._renderMenuBarVisible = function() {
+  if (this.menuBarVisible) {
+    this._renderMenuBar();
+  } else {
+    this.menuBar.remove();
+  }
+  this.invalidateLayoutTree();
+};
+
+scout.GroupBox.prototype._renderMenuBar = function() {
+  this.menuBar.render(this.$container);
+  if (this.menuBar.position === 'top') {
+    // move after title
+    this.menuBar.$container.insertAfter(this.$title);
+  }
 };
 
 /**
@@ -217,28 +250,30 @@ scout.GroupBox.prototype._computeBorderVisible = function(borderVisible) {
   return borderVisible;
 };
 
-scout.GroupBox.prototype._renderExpandable = function(expandable) {
-  var $control = this._$groupBoxTitle.children('.group-box-control');
+scout.GroupBox.prototype._renderExpandable = function() {
+  var expandable = this.expandable;
+  var $control = this.$title.children('.group-box-control');
 
   if (expandable) {
     if ($control.length === 0) {
       // Create control if necessary
       $control = this.$container.makeDiv('group-box-control')
-        .on('click', this._onGroupBoxControlClick.bind(this))
-        .prependTo(this._$groupBoxTitle);
+        .on('click', this._onControlClick.bind(this))
+        .prependTo(this.$title);
     }
-    this._$groupBoxTitle
+    this.$title
       .addClass('expandable')
-      .on('click.group-box-control', this._onGroupBoxControlClick.bind(this));
+      .on('click.group-box-control', this._onControlClick.bind(this));
   } else {
     $control.remove();
-    this._$groupBoxTitle
+    this.$title
       .removeClass('expandable')
       .off('.group-box-control');
   }
 };
 
-scout.GroupBox.prototype._renderExpanded = function(expanded) {
+scout.GroupBox.prototype._renderExpanded = function() {
+  var expanded = this.expanded;
   this.$container.toggleClass('collapsed', !expanded);
   if (this.borderDecoration === 'line') {
     this.$container.toggleClass('with-line', !expanded);
@@ -272,61 +307,58 @@ scout.GroupBox.prototype._renderExpanded = function(expanded) {
  * @override
  */
 scout.GroupBox.prototype._renderLabelVisible = function(visible) {
-  this._$groupBoxTitle.setVisible(visible && this.label && !this.mainBox);
+  this.$title.setVisible(visible && this.label && !this.mainBox);
+};
+
+scout.GroupBox.prototype._syncMenus = function(menus, oldMenus) {
+  scout.GroupBox.parent.prototype._syncMenus.call(this, menus, oldMenus);
+
+  if (this.menuBar) {
+    // updateMenuBar is required because menuBar is not created yet when synMenus is called initially
+    this._updateMenuBar();
+  }
+};
+
+scout.GroupBox.prototype._updateMenuBar = function() {
+  var menus = this.staticMenus
+    .concat(this.processMenus)
+    .concat(this.menus);
+
+  this.menuBar.setMenuItems(menus);
 };
 
 scout.GroupBox.prototype._renderMenus = function() {
-  var menu,
-    menus = this.menus,
-    menuItems = this.staticMenus.concat(menus);
-
-  // create a menu-adapter for each process button
-  this.processButtons.forEach(function(button) {
-    menu = scout.create('ButtonAdapterMenu',
-      scout.ButtonAdapterMenu.adaptButtonProperties(button, {
-        parent: this,
-        button: button
-      }));
-    menuItems.push(menu);
-  }, this);
-
-  // register keystrokes on root group-box
-  menuItems.forEach(function(menuItem) {
-    this.keyStrokeContext.registerKeyStroke(menuItem);
-    this._registerButtonKeyStrokes(menuItem);
-  }, this);
-
-  this.menuBar.updateItems(menuItems);
+  // NOP
 };
 
-scout.GroupBox.prototype._removeMenus = function(menus) {
-  menus.forEach(function(menu) {
-    menu.remove();
-  });
+scout.GroupBox.prototype._removeMenus = function() {
+  // menubar takes care about removal
 };
 
 scout.GroupBox.prototype.setStaticMenus = function(staticMenus) {
   this.staticMenus = staticMenus;
-  if (this.rendered) {
-    this._renderMenus();
-  }
+  this._updateMenuBar();
 };
 
-scout.GroupBox.prototype._onGroupBoxControlClick = function(event) {
+scout.GroupBox.prototype._onControlClick = function(event) {
   if (this.expandable) {
-    this.setGroupBoxExpanded(!this.expanded);
+    this.setExpanded(!this.expanded);
   }
   $.suppressEvent(event); // otherwise, the event would be triggered twice sometimes (by group-box-control and group-box-title)
 };
 
-scout.GroupBox.prototype.setGroupBoxExpanded = function(expanded) {
+scout.GroupBox.prototype.setExpanded = function(expanded) {
   if (this.expanded !== expanded) {
     this.expanded = expanded;
-    this._send('expanded', {
-      expanded: expanded
-    });
+    this._sendExpanded();
   }
   if (this.rendered) {
-    this._renderExpanded(expanded);
+    this._renderExpanded();
   }
+};
+
+scout.GroupBox.prototype._sendExpanded = function() {
+  this._send('expanded', {
+    expanded: this.expanded
+  });
 };

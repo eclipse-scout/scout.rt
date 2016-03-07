@@ -21,7 +21,6 @@ scout.MenuItemsOrder.prototype.order = function(items) {
     selectionItems = [],
     rightItems = [];
 
-
   var isEmptyspaceMenuVisible = false,
   isSelectionMenuVisible =false;
   items.forEach(function(item) {
@@ -72,7 +71,7 @@ scout.MenuItemsOrder.prototype._menuTypes = function(types) {
  */
 scout.MenuItemsOrder.prototype._createSeparator = function() {
   return scout.create('Menu', {
-    parent: this.session.desktop, // TODO [5.2] cgu: this is not correct, menubar should be the parent
+    parent: this.menuBar,
     createdBy: this,
     separator: true
   });

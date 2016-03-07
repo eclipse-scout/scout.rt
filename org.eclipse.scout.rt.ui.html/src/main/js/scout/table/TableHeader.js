@@ -31,6 +31,7 @@ scout.TableHeader.prototype._init = function(options) {
   });
   this.menuBar.tabbable = false;
   this.menuBar.bottom();
+  this.updateMenuBar();
 };
 
 scout.TableHeader.prototype._render = function($parent) {
@@ -47,8 +48,6 @@ scout.TableHeader.prototype._render = function($parent) {
   this.menuBar.render(this.$menuBarContainer);
   this._$window = this.$container.window();
   this._$body = this.$container.body();
-
-  this.updateMenuBar();
 
   this._renderColumns();
 
@@ -416,7 +415,7 @@ scout.TableHeader.prototype._adjustColumnMinWidth = function(column) {
 
 scout.TableHeader.prototype.updateMenuBar = function() {
   var menuItems = this.table._filterMenus(this.table.menus, scout.MenuDestinations.HEADER);
-  this.menuBar.updateItems(menuItems);
+  this.menuBar.setMenuItems(menuItems);
 };
 
 scout.TableHeader.prototype._onTableColumnResized = function(event) {

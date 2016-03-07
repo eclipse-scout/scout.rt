@@ -336,12 +336,12 @@ scout.FormField.prototype._updateMenus = function() {
   this.$container.toggleClass('has-menus', this._hasMenus() && this.menusVisible);
 };
 
-scout.FormField.prototype._syncKeyStrokes = function(newKeyStrokes, oldKeyStrokes) {
-  this._keyStrokeSupport.syncKeyStrokes(newKeyStrokes, oldKeyStrokes);
+scout.FormField.prototype._syncKeyStrokes = function(keyStrokes, oldKeyStrokes) {
+  this._keyStrokeSupport.syncKeyStrokes(keyStrokes, oldKeyStrokes);
 };
 
-scout.FormField.prototype._syncMenus = function(newMenus, oldMenus) {
-  this._keyStrokeSupport.syncMenus(newMenus, oldMenus);
+scout.FormField.prototype._syncMenus = function(menus, oldMenus) {
+  this._keyStrokeSupport.syncMenus(menus, oldMenus);
 };
 
 scout.FormField.prototype._syncErrorStatus = function(errorStatus) {

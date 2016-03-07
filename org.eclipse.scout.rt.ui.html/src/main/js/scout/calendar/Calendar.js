@@ -120,6 +120,12 @@ scout.Calendar.prototype._syncViewRange = function(viewRange) {
     scout.dates.parseJsonDate(viewRange.to));
 };
 
+scout.Calendar.prototype._syncMenus = function(menus, oldMenus) {
+  this.menus = menus;
+  // FIXME awe: (calendar) here we should update the menu-bar (see Table.js)
+  $.log.debug('(Calendar#_syncMenus) impl.');
+};
+
 scout.Calendar.prototype._render = function($parent) {
   this.$container = $parent.appendDiv('calendar');
 
@@ -230,8 +236,11 @@ scout.Calendar.prototype._renderSelectedDate = function() {
 };
 
 scout.Calendar.prototype._renderMenus = function() {
-  // FIXME awe: (calendar) here we should update the menu-bar (see Table.js)
-  $.log.debug('(Calendar#_renderMenus) impl.');
+  // NOP
+};
+
+scout.Calendar.prototype._removeMenus = function() {
+  // menubar takes care about removal
 };
 
 /* -- basics, events -------------------------------------------- */

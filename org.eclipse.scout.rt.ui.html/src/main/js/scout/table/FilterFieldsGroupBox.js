@@ -42,4 +42,5 @@ scout.FilterFieldsGroupBox.prototype.addFilterField = function(objectType, text,
 // Added '0' to the name to avoid temporarily to avoid naming conflict with FormField#addField
 scout.FilterFieldsGroupBox.prototype.addField0 = function(field) {
   this.fields.push(field);
+  this._prepareFields();
 };

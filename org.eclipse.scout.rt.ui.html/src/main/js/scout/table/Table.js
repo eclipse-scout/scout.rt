@@ -1392,23 +1392,15 @@ scout.Table.prototype._filterMenus = function(menus, destination, onlyVisible, e
 
 scout.Table.prototype.setStaticMenus = function(staticMenus) {
   this.staticMenus = staticMenus;
-  if (this.rendered) {
-    this._renderMenus();
-  }
+  this._updateMenuBar();
 };
 
 scout.Table.prototype._renderMenus = function() {
-  this._updateMenuBar();
-  if (this.header) {
-    this.header.updateMenuBar();
-  }
+  // NOP
 };
 
-scout.Table.prototype._updateMenuBar = function() {
-  var notAllowedTypes = ['Header'];
-  var menuItems = this._filterMenus(this.menus, scout.MenuDestinations.MENU_BAR, false, true, notAllowedTypes);
-  menuItems = this.staticMenus.concat(menuItems);
-  this.menuBar.updateItems(menuItems);
+scout.Table.prototype._removeMenus = function() {
+  // menubar takes care about removal
 };
 
 scout.Table.prototype.notifyRowSelectionFinished = function() {
@@ -2379,12 +2371,12 @@ scout.Table.prototype.selectRows = function(rows, notifyServer, debounceSend) {
   }
   this._triggerRowsSelected();
 
+  this._updateMenuBar();
   if (this.rendered) {
     this._renderSelection();
     if (this.scrollToSelection) {
       this.revealSelection();
     }
-    this._updateMenuBar();
   }
 };
 
@@ -3006,6 +2998,18 @@ scout.Table.prototype._syncSelectedRows = function(selectedRowIds) {
 
 scout.Table.prototype._syncMenus = function(newMenus, oldMenus) {
   this._keyStrokeSupport.syncMenus(newMenus, oldMenus);
+  this._updateMenuBar();
+
+  if (this.header) {
+    this.header.updateMenuBar();
+  }
+};
+
+scout.Table.prototype._updateMenuBar = function() {
+  var notAllowedTypes = ['Header'];
+  var menuItems = this._filterMenus(this.menus, scout.MenuDestinations.MENU_BAR, false, true, notAllowedTypes);
+  menuItems = this.staticMenus.concat(menuItems);
+  this.menuBar.setMenuItems(menuItems);
 };
 
 scout.Table.prototype._syncKeyStrokes = function(newKeyStrokes, oldKeyStrokes) {

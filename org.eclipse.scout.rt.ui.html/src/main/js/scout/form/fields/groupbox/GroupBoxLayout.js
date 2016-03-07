@@ -24,7 +24,7 @@ scout.GroupBoxLayout.prototype.layout = function($container) {
     htmlContainer = this._groupBox.htmlComp,
     htmlGbBody = this._htmlGbBody(),
     htmlMenuBar = this._htmlMenuBar(),
-    $groupBoxTitle = this._groupBox._$groupBoxTitle,
+    $groupBoxTitle = this._groupBox.$title,
     $status = this._groupBox.$status,
     containerSize = htmlContainer.getAvailableSize()
     .subtract(htmlContainer.getInsets());
@@ -85,7 +85,7 @@ scout.GroupBoxLayout.prototype._layoutStatus = function() {
     }),
     top = containerPadding.top,
     right = containerPadding.right,
-    $groupBoxTitle = this._groupBox._$groupBoxTitle,
+    $groupBoxTitle = this._groupBox.$title,
     titleInnerHeight = $groupBoxTitle.innerHeight(),
     $status = this._groupBox.$status,
     statusMargins = scout.graphics.getMargins($status);
@@ -133,7 +133,7 @@ scout.GroupBoxLayout.prototype.preferredLayoutSize = function($container) {
 };
 
 scout.GroupBoxLayout.prototype._titleHeight = function() {
-  return scout.graphics.prefSize(this._groupBox._$groupBoxTitle, true).height;
+  return scout.graphics.prefSize(this._groupBox.$title, true).height;
 };
 
 scout.GroupBoxLayout.prototype._menuBarSize = function(htmlMenuBar, containerSize, statusWidth) {
@@ -149,7 +149,7 @@ scout.GroupBoxLayout.prototype._menuBarSize = function(htmlMenuBar, containerSiz
  * Return menu-bar when it exists and it is visible.
  */
 scout.GroupBoxLayout.prototype._htmlMenuBar = function() {
-  if (this._groupBox.menuBar) {
+  if (this._groupBox.menuBar && this._groupBox.menuBarVisible) {
     var htmlMenuBar = scout.HtmlComponent.get(this._groupBox.menuBar.$container);
     if (htmlMenuBar.isVisible()) {
       return htmlMenuBar;
