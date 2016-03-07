@@ -34,7 +34,9 @@ import org.apache.commons.fileupload.util.Streams;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
+import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
+import org.eclipse.scout.rt.platform.security.MalwareScanner;
 import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
@@ -150,6 +152,10 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
     }
   }
 
+  /**
+   * Since 5.2 this performs a {@link MalwareScanner#scan(BinaryResource)} on the resources and throws a
+   * {@link PlatformException} if some resources are unsafe
+   */
   protected void readUploadData(HttpServletRequest httpReq, long maxSize, Map<String, String> uploadProperties, List<BinaryResource> uploadResources) throws FileUploadException, IOException {
     ServletFileUpload upload = new ServletFileUpload();
     upload.setHeaderEncoding(StandardCharsets.UTF_8.name());
@@ -176,7 +182,9 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
         // the only thing we could do is to guess the charset (encoding) by reading the byte contents of
         // uploaded text files (for binary file types the encoding is not relevant). However: currently we
         // do not set the charset at all.
-        uploadResources.add(new BinaryResource(filename, contentType, content));
+        BinaryResource res = new BinaryResource(filename, contentType, content);
+        BEANS.get(MalwareScanner.class).scan(res);
+        uploadResources.add(res);
       }
     }
   }
