@@ -87,10 +87,10 @@ describe('SmartField', function() {
       expect(events[0].selectCurrentValue).toBe(false);
     });
 
-    it('must return displayText when field is invalid', function() {
+    it('must "browseAll" when field is invalid', function() {
       smartField.errorStatus = {};
       smartField._openProposal(true);
-      expect(events[0].searchText).toBe('foo');
+      expect(events[0].searchText).toBe('');
       expect(events[0].selectCurrentValue).toBe(true);
     });
   });

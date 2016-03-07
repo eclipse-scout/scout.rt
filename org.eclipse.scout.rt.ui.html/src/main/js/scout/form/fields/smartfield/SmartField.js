@@ -485,9 +485,12 @@ scout.SmartField.prototype._sendCancelProposal = function() {
  */
 scout.SmartField.prototype._openProposal = function(browseAll) {
   var displayText = this._readDisplayText(),
-    searchText = '' ,
-    selectCurrentValue = browseAll && !this.errorStatus;
+    searchText = browseAll ? '' : this._readDisplayText(),
+    selectCurrentValue = browseAll;
   this.displayText = displayText;
+  if(this.errorStatus){
+    selectCurrentValue=false;
+  }
 
   if (this._requestedProposal) {
     $.log.trace('(SmartField#_openProposal) already requested proposal -> do nothing');
