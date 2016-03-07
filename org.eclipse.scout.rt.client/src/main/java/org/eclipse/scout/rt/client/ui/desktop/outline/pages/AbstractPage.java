@@ -613,12 +613,14 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
     if (getConfiguredDetailForm() == null) {
       return null;
     }
-    return ClientRunContexts.copyCurrent().withOutline(getOutline()).withForm(null).call(new Callable<IForm>() {
-      @Override
-      public IForm call() throws Exception {
-        return getConfiguredDetailForm().newInstance();
-      }
-    });
+    return ClientRunContexts.copyCurrent()
+        .withOutline(getOutline(), true)
+        .call(new Callable<IForm>() {
+          @Override
+          public IForm call() throws Exception {
+            return getConfiguredDetailForm().newInstance();
+          }
+        });
   }
 
   /**
@@ -723,18 +725,20 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
 
   @Override
   public void dataChanged(final Object... dataTypes) {
-    ClientRunContexts.copyCurrent().withOutline(getOutline()).withForm(null).run(new IRunnable() {
+    ClientRunContexts.copyCurrent()
+        .withOutline(getOutline(), true)
+        .run(new IRunnable() {
 
-      @Override
-      public void run() throws Exception {
-        try {
-          interceptDataChanged(dataTypes);
-        }
-        catch (Exception e) {
-          BEANS.get(ExceptionHandler.class).handle(e);
-        }
-      }
-    });
+          @Override
+          public void run() throws Exception {
+            try {
+              interceptDataChanged(dataTypes);
+            }
+            catch (Exception e) {
+              BEANS.get(ExceptionHandler.class).handle(e);
+            }
+          }
+        });
   }
 
   /**

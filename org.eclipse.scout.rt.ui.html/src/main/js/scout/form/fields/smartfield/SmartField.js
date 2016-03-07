@@ -42,6 +42,7 @@ scout.SmartField = function() {
   this._acceptedInput = false;
   this._tabPrevented = null;
   this._pendingProposalTyped = null;
+  this._navigating = false;
 };
 scout.inherits(scout.SmartField, scout.ValueField);
 
@@ -208,6 +209,7 @@ scout.SmartField.prototype._onKeyDown = function(e) {
       e.stopPropagation();
     }
     this._closeProposal();
+    this._navigating = false;
     return;
   }
 
@@ -219,6 +221,7 @@ scout.SmartField.prototype._onKeyDown = function(e) {
         directionBack: e.shiftKey
       };
       this._acceptProposal();
+      this._navigating = false;
       return;
     }
   }
@@ -228,10 +231,12 @@ scout.SmartField.prototype._onKeyDown = function(e) {
       e.stopPropagation();
     }
     this._acceptProposal();
+    this._navigating = false;
     return;
   }
 
   if (this._isNavigationKey(e)) {
+    this._navigating = true;
     if (this.proposalChooser) {
       this._delegateToProposalChooser(e);
     } else {
@@ -241,6 +246,8 @@ scout.SmartField.prototype._onKeyDown = function(e) {
       // in the text field.
       this._openProposal(true);
     }
+  } else {
+    this._navigating = false;
   }
 };
 
@@ -390,7 +397,7 @@ scout.SmartField.prototype._acceptProposal = function(forceClose) {
     // and would accept a proposal, since on the model there's still
     // a selected proposal (ticket #168652).
     var textDeleted = scout.strings.empty(searchText) && scout.strings.hasText(this._oldSearchText);
-    if (textDeleted) {
+    if (textDeleted && !this._navigating) {
       this._sendDeleteProposal(searchText);
     } else {
       this._sendAcceptProposal(searchText, true, forceClose);
@@ -481,8 +488,8 @@ scout.SmartField.prototype._sendCancelProposal = function() {
  */
 scout.SmartField.prototype._openProposal = function(browseAll) {
   var displayText = this._readDisplayText(),
-    searchText = (browseAll && !this.errorStatus) ? '' : this._readDisplayText(),
-    selectCurrentValue = browseAll;
+    searchText = '' ,
+    selectCurrentValue = browseAll && !this.errorStatus;
   this.displayText = displayText;
 
   if (this._requestedProposal) {

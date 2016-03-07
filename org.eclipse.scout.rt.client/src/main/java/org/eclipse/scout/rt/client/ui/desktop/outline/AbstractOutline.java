@@ -96,12 +96,14 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
   @Override
   protected void callInitializer() {
     // Run the initialization on behalf of this Outline.
-    ClientRunContexts.copyCurrent().withOutline(this).withForm(null).run(new IRunnable() {
-      @Override
-      public void run() throws Exception {
-        AbstractOutline.super.callInitializer();
-      }
-    });
+    ClientRunContexts.copyCurrent()
+        .withOutline(this, true)
+        .run(new IRunnable() {
+          @Override
+          public void run() throws Exception {
+            AbstractOutline.super.callInitializer();
+          }
+        });
   }
 
   /*
@@ -555,35 +557,37 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
       return;
     }
 
-    ClientRunContexts.copyCurrent().withOutline(this).withForm(null).run(new IRunnable() {
-      @Override
-      public void run() throws Exception {
-        setTreeChanging(true);
-        try {
-          selectNode(null);
-          unloadNode(getRootNode());
-          getRootNode().ensureChildrenLoaded();
-        }
-        finally {
-          setTreeChanging(false);
-        }
+    ClientRunContexts.copyCurrent()
+        .withOutline(this, true)
+        .run(new IRunnable() {
+          @Override
+          public void run() throws Exception {
+            setTreeChanging(true);
+            try {
+              selectNode(null);
+              unloadNode(getRootNode());
+              getRootNode().ensureChildrenLoaded();
+            }
+            finally {
+              setTreeChanging(false);
+            }
 
-        ITreeNode root = getRootNode();
-        if (root instanceof IPageWithTable) {
-          ISearchForm searchForm = ((IPageWithTable) root).getSearchFormInternal();
-          if (searchForm != null) {
-            searchForm.doReset();
+            ITreeNode root = getRootNode();
+            if (root instanceof IPageWithTable) {
+              ISearchForm searchForm = ((IPageWithTable) root).getSearchFormInternal();
+              if (searchForm != null) {
+                searchForm.doReset();
+              }
+            }
+            if (!isRootNodeVisible()) {
+              root.setExpanded(true);
+            }
+            selectFirstNode();
+            if (getSelectedNode() instanceof IPageWithTable) {
+              getSelectedNode().setExpanded(true);
+            }
           }
-        }
-        if (!isRootNodeVisible()) {
-          root.setExpanded(true);
-        }
-        selectFirstNode();
-        if (getSelectedNode() instanceof IPageWithTable) {
-          getSelectedNode().setExpanded(true);
-        }
-      }
-    });
+        });
   }
 
   @Override

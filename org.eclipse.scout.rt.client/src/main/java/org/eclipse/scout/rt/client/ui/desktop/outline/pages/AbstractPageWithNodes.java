@@ -102,13 +102,15 @@ public abstract class AbstractPageWithNodes extends AbstractPage<ITable> impleme
   }
 
   protected void createChildPagesInternal(final List<IPage<?>> pageList) {
-    ClientRunContexts.copyCurrent().withOutline(getOutline()).withForm(null).run(new IRunnable() {
+    ClientRunContexts.copyCurrent()
+        .withOutline(getOutline(), true)
+        .run(new IRunnable() {
 
-      @Override
-      public void run() throws Exception {
-        interceptCreateChildPages(pageList);
-      }
-    });
+          @Override
+          public void run() throws Exception {
+            interceptCreateChildPages(pageList);
+          }
+        });
   }
 
   @Override

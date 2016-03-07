@@ -51,7 +51,7 @@ public class ModelContextProxy {
       public Object invoke(final Object proxy, final Method method, final Object[] args) throws Throwable {
         return ClientRunContexts.copyCurrent()
             .withDesktop(modelContext.getDesktop())
-            .withOutline(modelContext.getOutline())
+            .withOutline(modelContext.getOutline(), false)
             .withForm(modelContext.getForm())
             .call(new Callable<Object>() {
 

@@ -86,7 +86,7 @@ describe('ResponseQueue', function() {
       expect(success).toBe(true);
     });
 
-    it('processes elements in the wrong order', function() {
+    it('does not process elements in the wrong order', function() {
       var session = createSession();
       var rq = session.responseQueue;
       spyOn(session, 'processJsonResponseInternal').and.callFake(function(data) {
@@ -100,14 +100,14 @@ describe('ResponseQueue', function() {
 
       rq.add({'#': 2, id: 1});
       var success = rq.process({'#': 3, id: 2});
-      expect(success).toBe(null);
+      expect(success).toBe(true);
       expect(rq.queue.length).toBe(2); // not processed!
 
       // wait 5s
       jasmine.clock().tick(5000);
 
       success = rq.process({'#': 4, id: 3});
-      expect(success).toBe(null);
+      expect(success).toBe(true);
       expect(rq.queue.length).toBe(3); // still not processed
       expect(rq.nextExpectedSequenceNo).toBe(1);
       expect(rq.forceTimeoutId).not.toBe(null);
@@ -119,26 +119,38 @@ describe('ResponseQueue', function() {
       expect(session.processJsonResponseInternal.calls.count()).toBe(3);
       expect(rq.forceTimeoutId).toBe(null);
       expect(rq.nextExpectedSequenceNo).toBe(5);
+    });
 
-      // add an older element than current seqNo:
+    it('does not process same response twice', function() {
+      var session = createSession();
+      var rq = session.responseQueue;
+      spyOn(session, 'processJsonResponseInternal').and.callFake(function(data) {
+        if (data && data.id === 9) {
+          return true;
+        }
+        return false;
+      });
 
-      success = rq.process({'#': 1, id: 4});
-      expect(success).toBe(null);
-      expect(rq.queue.length).toBe(1); // not processed
+      expect(rq.nextExpectedSequenceNo).toBe(1);
 
-      success = rq.process({'#': 5, id: 5});
-      expect(success).toBe(null);
-      expect(rq.queue.length).toBe(2); // not processed
+      rq.add({'#': 1, id: 4});
+      rq.add({'#': 3, id: 5});
+      rq.add({'#': 2, id: 6});
+      var success = rq.process({'#': 4, id: 9});
+
+      expect(rq.queue.length).toBe(0);
+      expect(rq.lastProcessedSequenceNo).toBe(4);
       expect(rq.nextExpectedSequenceNo).toBe(5);
-      expect(rq.forceTimeoutId).not.toBe(null);
+      expect(session.processJsonResponseInternal.calls.count()).toBe(4);
+      expect(success).toBe(true);
 
-      // wait 11s
-      jasmine.clock().tick(11000);
-
-      expect(rq.queue.length).toBe(0); // should have been forced after 10s
-      expect(session.processJsonResponseInternal.calls.count()).toBe(5);
-      expect(rq.forceTimeoutId).toBe(null);
-      expect(rq.nextExpectedSequenceNo).toBe(6);
+      // add an older element than current seqNo -> ignore
+      success = rq.process({'#': 1, id: 4});
+      expect(success).toBe(true);
+      expect(rq.queue.length).toBe(0);
+      expect(rq.lastProcessedSequenceNo).toBe(4);
+      expect(rq.nextExpectedSequenceNo).toBe(5);
+      expect(session.processJsonResponseInternal.calls.count()).toBe(4);
     });
 
   });
