@@ -50,7 +50,7 @@ scout.SmartFieldMultiline.prototype._render = function($parent) {
 scout.SmartFieldMultiline.prototype._renderDisplayText = function(displayText) {
   var tmp = displayText.split('\n'),
     firstLine = tmp.shift(),
-    additionalLines = tmp.join('<br/>');
+    additionalLines = scout.arrays.formatEncoded(tmp, '<br/>');
   scout.fields.valOrText(this, this.$field, firstLine);
   this._$multilineField.html(additionalLines);
 };

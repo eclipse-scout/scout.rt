@@ -49,6 +49,9 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupRowFetchedCallback;
  */
 public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends AbstractContentAssistField<VALUE, LOOKUP_KEY> implements IMixedSmartField<VALUE, LOOKUP_KEY> {
 
+  public static final int NOT_UNIQUE_ERROR_CODE = 0;
+  public static final int NO_RESULTS_ERROR_CODE = 1;
+
   private final IContentAssistFieldUIFacade m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(new ContentAssistFieldUIFacade<LOOKUP_KEY>(this), ModelContext.copyCurrent());
   private final IBlockingCondition m_contextInstalledCondition = Jobs.newBlockingCondition(false);
   private final AtomicInteger m_valueChangedLookupCounter = new AtomicInteger();
@@ -134,14 +137,14 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
     getLookupRowFetcher().update(searchText, false, true);
     List<? extends ILookupRow<LOOKUP_KEY>> lookupRows = getLookupRowFetcher().getResult().getLookupRows();
     if (lookupRows == null || lookupRows.size() == 0) {
-      setValidationError(text, TEXTS.get("SmartFieldCannotComplete", text));
+      setValidationError(text, TEXTS.get("SmartFieldCannotComplete", text), NO_RESULTS_ERROR_CODE);
       return true;
     }
     else if (lookupRows.size() == 1) {
       acceptProposal(lookupRows.get(0));
     }
     else if (lookupRows.size() > 1) {
-      setValidationError(text, TEXTS.get("SmartFieldNotUnique", text));
+      setValidationError(text, TEXTS.get("SmartFieldNotUnique", text), NOT_UNIQUE_ERROR_CODE);
       return true;
     }
     return false;
@@ -151,11 +154,11 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
     return StringUtility.equalsIgnoreNewLines(StringUtility.emptyIfNull(displayText), StringUtility.emptyIfNull(lookupRowText));
   }
 
-  private void setValidationError(String displayText, String errorMessage) {
+  private void setValidationError(String displayText, String errorMessage, int code) {
     setCurrentLookupRow(null);
     setDisplayText(displayText);
     removeErrorStatus(ValidationFailedStatus.class); // remove existing validation errors first
-    addErrorStatus(new ValidationFailedStatus(errorMessage));
+    addErrorStatus(new ValidationFailedStatus(errorMessage, ValidationFailedStatus.ERROR, code));
   }
 
   @Override

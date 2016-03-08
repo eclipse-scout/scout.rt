@@ -181,7 +181,7 @@ scout.CalendarComponent.prototype._description = function() {
   // subject
   if (scout.strings.hasText(this.item.subject)) {
     descParts.push({
-      text: this.item.subject,
+      text: scout.strings.encode(this.item.subject),
       cssClass: 'calendar-component-title'
     });
   }

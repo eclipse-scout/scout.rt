@@ -234,19 +234,12 @@ $.fn.makeElement = function(element, cssClass, text) {
  * selectable behavior use <code>makeElement('&lt;div&gt;')</code>.
  *
  * @param cssClass (optional) string added to the 'class' attribute
- * @param htmlContent (optional) string used as HTML content
- * @param id (optional) string added to the 'id' attribute
+ * @param text (optional) string used as inner text
  */
-$.fn.makeDiv = function(cssClass, htmlContent, id) {
+$.fn.makeDiv = function(cssClass, text) {
   var unselectable = scout.device.unselectableAttribute,
-    $div = this.makeElement('<div>', cssClass);
+    $div = this.makeElement('<div>', cssClass, text);
 
-  if (id !== undefined) {
-    $div.attr('id', id);
-  }
-  if (htmlContent) {
-    $div.html(htmlContent);
-  }
   if (unselectable.key) {
     $div.attr(unselectable.key, unselectable.value);
   }
@@ -303,13 +296,13 @@ $.fn.entryPoint = function(domElement) {
 };
 
 // prepend - and return new div for chaining
-$.fn.prependDiv = function(cssClass, htmlContent, id) {
-  return this.makeDiv(cssClass, htmlContent, id).prependTo(this);
+$.fn.prependDiv = function(cssClass, text) {
+  return this.makeDiv(cssClass, text).prependTo(this);
 };
 
 // append - and return new div for chaining
-$.fn.appendDiv = function(cssClass, htmlContent, id) {
-  return this.makeDiv(cssClass, htmlContent, id).appendTo(this);
+$.fn.appendDiv = function(cssClass, text) {
+  return this.makeDiv(cssClass, text).appendTo(this);
 };
 
 $.fn.prependElement = function(element, cssClass, text) {
@@ -321,13 +314,13 @@ $.fn.appendElement = function(element, cssClass, text) {
 };
 
 // insert after - and return new div for chaining
-$.fn.afterDiv = function(cssClass, htmlContent, id) {
-  return this.makeDiv(cssClass, htmlContent, id).insertAfter(this);
+$.fn.afterDiv = function(cssClass, text) {
+  return this.makeDiv(cssClass, text).insertAfter(this);
 };
 
 // insert before - and return new div for chaining
-$.fn.beforeDiv = function(cssClass, htmlContent, id) {
-  return this.makeDiv(cssClass, htmlContent, id).insertBefore(this);
+$.fn.beforeDiv = function(cssClass, text) {
+  return this.makeDiv(cssClass, text).insertBefore(this);
 };
 
 $.fn.appendSpan = function(cssClass, text) {
@@ -342,7 +335,7 @@ $.fn.appendTextNode = function(text) {
   return $(this.document(true).createTextNode(text)).appendTo(this);
 };
 
-$.fn.makeSVG = function(type, cssClass, htmlContent, id) {
+$.fn.makeSVG = function(type, cssClass, text, id) {
   var myDocument = this.document(true);
   if (myDocument === undefined || type === undefined) {
     return new Error('missing arguments: document, type');
@@ -351,8 +344,8 @@ $.fn.makeSVG = function(type, cssClass, htmlContent, id) {
   if (cssClass) {
     $svg.attrSVG('class', cssClass);
   }
-  if (htmlContent) {
-    $svg.html(htmlContent);
+    if (text) {
+      $svg.text(text);
   }
   if (id !== undefined) {
     $svg.attrSVG('id', id);
@@ -361,8 +354,8 @@ $.fn.makeSVG = function(type, cssClass, htmlContent, id) {
 };
 
 // append SVG
-$.fn.appendSVG = function(type, cssClass, htmlContent, id) {
-  return this.makeSVG(type, cssClass, htmlContent, id).appendTo(this);
+$.fn.appendSVG = function(type, cssClass, text, id) {
+  return this.makeSVG(type, cssClass, text, id).appendTo(this);
 };
 
 // attr and class handling for svg

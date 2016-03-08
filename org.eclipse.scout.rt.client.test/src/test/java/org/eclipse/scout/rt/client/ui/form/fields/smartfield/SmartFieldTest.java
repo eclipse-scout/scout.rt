@@ -47,7 +47,6 @@ import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.eclipse.scout.rt.testing.shared.services.lookup.TestingLookupService;
 import org.eclipse.scout.testing.client.form.FormHandler;
-
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
