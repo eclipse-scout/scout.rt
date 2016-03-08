@@ -16,7 +16,10 @@ scout.login = {
    * - prepareRedirectUrl: function(s) that is called on the redirectUrl before opening it
    */
   init: function(opts) {
-    var $buttonDiv, texts, defaultOpts = {
+    var logoUrl, $buttonDiv, texts,
+    $parent = $('body'),
+    defaultOpts = {
+      logoUrl: 'res/logo.png',
       texts: {
         'ui.Login': 'Login',
         'ui.LoginFailed': 'Login failed',
@@ -26,31 +29,46 @@ scout.login = {
     };
     this.options = $.extend({}, defaultOpts, opts);
     texts = new scout.Texts(this.options.texts);
+    logoUrl = this.options.logoUrl;
+    this.$container = $('<div>')
+      .addClass('login-box box-with-logo')
+      .appendTo($parent);
+
+    this.$wrapper = $('<div>')
+      .addClass('wrapper')
+      .appendTo(this.$container);
+
+    this.$content = $('<div>')
+      .addClass('login-box-content box-with-logo-content')
+      .appendTo(this.$wrapper);
+
+    if (logoUrl) {
+      this.$header = this.$content.appendDiv('header');
+      this.$logo = $('<img>')
+        .addClass('logo')
+        .attr('src', logoUrl)
+        .appendTo(this.$header);
+    }
     this.$form = $('<form>')
       .attr('action', 'auth')
       .attr('method', 'post')
       .submit(onLoginFormSubmit.bind(this))
-      .appendTo($('body'));
-    this.$container = $('<div>')
-      .attr('id', 'login-box')
-      .addClass('box-with-logo')
-      .appendTo(this.$form);
+      .appendTo(this.$content);
     this.$user = $('<input>')
       .attr('type', 'text')
       .attr('autocapitalize', 'off')
       .attr('autocorrect', 'off')
       .placeholder(texts.get('ui.User'))
-      .appendTo(this.$container);
+      .appendTo(this.$form);
     this.$password = $('<input>')
       .attr('type', 'password')
       .placeholder(texts.get('ui.Password'))
-      .appendTo(this.$container);
+      .appendTo(this.$form);
     this.$button = $('<button>')
-      .attr('id', 'login-button')
       .attr('type', 'submit')
-      .addClass('button default')
+      .addClass('login-button button default')
       .text(texts.get('ui.Login'))
-      .appendTo(this.$container);
+      .appendTo(this.$form);
 
     this.$user.focus();
 
@@ -76,7 +94,7 @@ scout.login = {
       if (scout.device.supportsCssAnimation()) {
         this.$button
           .html('')
-          .append($('<div>').attr('id', 'login-button-loading'));
+          .append($('<div>').addClass('login-button-loading'));
       }
 
       $.post(url, data)

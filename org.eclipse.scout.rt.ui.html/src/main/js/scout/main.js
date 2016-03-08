@@ -158,7 +158,7 @@ scout._checkBrowserCompability = function(options) {
 
   $('.scout').each(function() {
     var $entryPoint = $(this),
-      $box = $entryPoint.appendDiv('box-with-logo small'),
+      $box = $entryPoint.appendDiv(),
       newOptions = scout.objects.valueCopy(options);
 
     newOptions.checkBrowserCompatibility = false;

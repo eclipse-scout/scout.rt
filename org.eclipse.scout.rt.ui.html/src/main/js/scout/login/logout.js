@@ -11,28 +11,49 @@
 scout.logout = {
 
   init: function(opts) {
-    var $container,
+    var logoUrl, options, texts, $container,
+      $parent = $('body'),
       defaultOpts = {
         loginUrl: sessionStorage.getItem('scout:loginUrl') || './',
+        logoUrl: 'res/logo.png',
         texts: {
           'ui.LogoutSuccessful': 'Good bye!',
           'ui.LoginAgain': 'Login again'
         }
       };
-    var options = $.extend({}, defaultOpts, opts);
-    var texts = new scout.Texts(options.texts);
-    var $box = $('<div>')
-      .addClass('box-with-logo small centered')
-      .html(scout.strings.nl2br(texts.get('ui.LogoutSuccessful')))
-      .appendTo($('body'));
-    var $buttonBar = $('<div>')
+    options = $.extend({}, defaultOpts, opts);
+    texts = new scout.Texts(options.texts);
+    logoUrl = options.logoUrl;
+    this.$container = $('<div>')
+      .addClass('login-box box-with-logo')
+      .appendTo($parent);
+
+    this.$wrapper = $('<div>')
+      .addClass('wrapper')
+      .appendTo(this.$container);
+
+    this.$content = $('<div>')
+      .addClass('login-box-content box-with-logo-content small centered')
+      .appendTo(this.$wrapper);
+
+    if (logoUrl) {
+      this.$header = this.$content.appendDiv('header');
+      this.$logo = $('<img>')
+        .addClass('logo')
+        .attr('src', logoUrl)
+        .appendTo(this.$header);
+    }
+
+    this.$content.appendDiv().html(scout.strings.nl2br(texts.get('ui.LogoutSuccessful')));
+
+    this.$buttonBar = $('<div>')
       .addClass('button-bar')
-      .appendTo($box);
+      .appendTo(this.$content);
     $('<button>')
       .addClass('button')
       .text(texts.get('ui.LoginAgain'))
       .on('click', loginAgain)
-      .appendTo($buttonBar);
+      .appendTo(this.$buttonBar);
 
     scout.prepareDOM();
 

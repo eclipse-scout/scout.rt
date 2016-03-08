@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-#login-box {
+.login-box-content > form {
   & > input,
   & > .button {
     width: 100%;
@@ -18,7 +18,7 @@
   }
 }
 
-#login-button {
+.login-button {
   background-color: @default-button-background-color;
   color: @default-button-color;
   border-width: 0;
@@ -42,7 +42,7 @@
   }
 }
 
-#login-button-loading {
+.login-button-loading {
   #scout.animation(rotation 0.9s linear infinite);
   display: inline-block;
   border-radius: 50%;
