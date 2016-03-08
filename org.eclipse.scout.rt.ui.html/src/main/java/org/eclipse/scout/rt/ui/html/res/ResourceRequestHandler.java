@@ -19,6 +19,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.eclipse.scout.rt.client.deeplink.IDeepLinks;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.nls.NlsLocale;
@@ -28,7 +29,6 @@ import org.eclipse.scout.rt.ui.html.UiServlet;
 import org.eclipse.scout.rt.ui.html.cache.HttpCacheKey;
 import org.eclipse.scout.rt.ui.html.cache.HttpCacheObject;
 import org.eclipse.scout.rt.ui.html.cache.IHttpCacheControl;
-import org.eclipse.scout.rt.ui.html.deeplink.DeepLinks;
 import org.eclipse.scout.rt.ui.html.res.loader.IResourceLoader;
 import org.eclipse.scout.rt.ui.html.res.loader.IResourceLoaderFactory;
 import org.slf4j.Logger;
@@ -49,7 +49,7 @@ public class ResourceRequestHandler extends AbstractUiServletRequestHandler {
   // Remember bean instances to save lookups on each GET request
   private List<IResourceLoaderFactory> m_resourceLoaderFactoryList = Collections.unmodifiableList(BEANS.all(IResourceLoaderFactory.class));
   private IHttpCacheControl m_httpCacheControl = BEANS.get(IHttpCacheControl.class);
-  private DeepLinks m_deepLinks = new DeepLinks();
+  private IDeepLinks m_deepLinks = BEANS.get(IDeepLinks.class);
 
   @Override
   public boolean handleGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {

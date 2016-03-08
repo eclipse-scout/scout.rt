@@ -1,9 +1,7 @@
-package org.eclipse.scout.rt.ui.html.deeplink;
+package org.eclipse.scout.rt.client.deeplink;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.eclipse.scout.rt.client.IClientSession;
 
 /**
  * Base class for all classes that provide deep-link logic.
@@ -22,10 +20,10 @@ public abstract class AbstractDeepLinkHandler implements IDeepLinkHandler {
   }
 
   @Override
-  public boolean handle(String path, IClientSession clientSession) throws DeepLinkException {
+  public boolean handle(String path) throws DeepLinkException {
     Matcher matcher = m_pattern.matcher(path);
     if (matcher.matches()) {
-      handleImpl(matcher, clientSession);
+      handleImpl(matcher);
       return true;
     }
     else {
@@ -33,6 +31,6 @@ public abstract class AbstractDeepLinkHandler implements IDeepLinkHandler {
     }
   }
 
-  protected abstract void handleImpl(Matcher matcher, IClientSession clientSession) throws DeepLinkException;
+  protected abstract void handleImpl(Matcher matcher) throws DeepLinkException;
 
 }

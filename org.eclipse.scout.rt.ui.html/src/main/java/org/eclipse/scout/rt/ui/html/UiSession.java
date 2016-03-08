@@ -40,6 +40,7 @@ import javax.servlet.http.HttpSession;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
+import org.eclipse.scout.rt.client.deeplink.IDeepLinks;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
@@ -66,7 +67,6 @@ import org.eclipse.scout.rt.shared.ui.UiDeviceType;
 import org.eclipse.scout.rt.shared.ui.UiLayer;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.rt.shared.ui.UserAgents;
-import org.eclipse.scout.rt.ui.html.deeplink.DeepLinks;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonAdapterRegistry;
@@ -228,11 +228,7 @@ public class UiSession implements IUiSession {
       JsonClientSession<?> jsonClientSessionAdapter = createClientSessionAdapter(m_clientSession);
 
       // Start desktop
-      startDesktop();
-
-      // Handle deep links (if requested)
-      // FIXME AWE: mit J.GU besprechen - in execOpened behandeln?
-      handleDeepLink(jsonStartupReq.getSessionStartupParams());
+      startDesktop(resolveStartupPath(req, jsonStartupReq));
 
       // Fill startupData with everything that is needed to start the session on the UI
       putInitializationStartupData(jsonClientSessionAdapter.getId());
@@ -245,27 +241,25 @@ public class UiSession implements IUiSession {
     }
   }
 
-  private void handleDeepLink(Map<String, String> startupParams) {
-    String urlString = startupParams.get("url");
-    if (urlString == null) {
-      return;
-    }
+  private String resolveStartupPath(HttpServletRequest req, JsonStartupRequest jsonStartupReq) {
+    String startupUrlParam = jsonStartupReq.getSessionStartupParams().get("url");
 
-    String path;
+    // extract path-info
+    String startupPath;
     try {
-      URL url = new URL(urlString);
-      path = url.getPath();
+      startupPath = new URL(startupUrlParam).getPath();
     }
     catch (MalformedURLException e) {
-      return;
+      return null;
     }
 
-    DeepLinks deepLinks = new DeepLinks();
-    if (!deepLinks.isRequestValid(path)) {
-      return;
+    // remove context-path
+    String contextPath = req.getContextPath();
+    if (startupPath.startsWith(contextPath)) {
+      startupPath = startupPath.substring(contextPath.length());
     }
 
-    deepLinks.handleDeepLink(path, m_clientSession);
+    return startupPath;
   }
 
   protected JsonResponse createJsonResponse() {
@@ -390,15 +384,28 @@ public class UiSession implements IUiSession {
     return BEANS.get(UiJobs.class).awaitAndGet(future);
   }
 
-  protected void startDesktop() {
+  protected void startDesktop(final String startupUrl) {
     final IFuture<Void> future = ModelJobs.schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
         IDesktop desktop = m_clientSession.getDesktop();
 
-        if (!desktop.isOpened()) {
+        boolean tryDeepLink = false;
+        IDeepLinks deepLinks = BEANS.get(IDeepLinks.class);
+        if (deepLinks.isRequestValid(startupUrl)) {
+          tryDeepLink = true;
+        }
+        // if the startup URL looks like a deep-link, try to handle the deep-link
+        boolean deepLinkSuccessful = false;
+        if (!desktop.isOpened() && tryDeepLink) {
+          deepLinkSuccessful = deepLinks.handleRequest(startupUrl);
+          LOG.debug("tried to handle deep-link request '{}' success={}", startupUrl, deepLinkSuccessful);
+        }
+        // if deep-link handling failed for some reason, we must execute default desktop open handling
+        if (!desktop.isOpened() && !deepLinkSuccessful) {
           desktop.getUIFacade().fireDesktopOpenedFromUI();
+          LOG.debug("perform default desktopOpened. deepLinkSuccessful={}", deepLinkSuccessful);
         }
         if (!desktop.isGuiAvailable()) {
           desktop.getUIFacade().fireGuiAttached();

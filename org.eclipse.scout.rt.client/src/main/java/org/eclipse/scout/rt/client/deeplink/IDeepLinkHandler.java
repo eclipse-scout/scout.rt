@@ -1,12 +1,14 @@
-package org.eclipse.scout.rt.ui.html.deeplink;
+package org.eclipse.scout.rt.client.deeplink;
 
 import java.util.regex.Matcher;
 
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.platform.ApplicationScoped;
 
 /**
  * Interface for all classes that provide deep-link logic.
  */
+@ApplicationScoped
 public interface IDeepLinkHandler {
 
   /**
@@ -22,6 +24,6 @@ public interface IDeepLinkHandler {
    *           instance the user has no permissions to view the requested resource or the resource is not available
    * @return True if this handler has handled the given path, false otherwise
    */
-  boolean handle(String path, IClientSession clientSession) throws DeepLinkException;
+  boolean handle(String path) throws DeepLinkException;
 
 }

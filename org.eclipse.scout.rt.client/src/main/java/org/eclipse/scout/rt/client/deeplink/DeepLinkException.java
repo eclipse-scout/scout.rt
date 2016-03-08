@@ -1,4 +1,4 @@
-package org.eclipse.scout.rt.ui.html.deeplink;
+package org.eclipse.scout.rt.client.deeplink;
 
 /**
  * A checked exception which indicates that a deep-link URL could not be processed for some (business logic) reason. The
