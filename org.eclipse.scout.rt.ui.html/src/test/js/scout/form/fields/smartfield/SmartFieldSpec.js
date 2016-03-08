@@ -77,7 +77,8 @@ describe('SmartField', function() {
 
     it('must "browse all" when field is valid and browseAll parameter is true', function() {
       smartField._openProposal(true);
-      expect(events[0].searchText).toBe('');
+      expect(events[0].searchText).toBe('foo');
+      expect(events[0].browseAll).toBe(true);
       expect(events[0].selectCurrentValue).toBe(true);
     });
 
@@ -90,7 +91,8 @@ describe('SmartField', function() {
     it('must "browseAll" when field is invalid', function() {
       smartField.errorStatus = {};
       smartField._openProposal(true);
-      expect(events[0].searchText).toBe('');
+      expect(events[0].searchText).toBe('foo');
+      expect(events[0].browseAll).toBe(true);
       expect(events[0].selectCurrentValue).toBe(false);
     });
   });

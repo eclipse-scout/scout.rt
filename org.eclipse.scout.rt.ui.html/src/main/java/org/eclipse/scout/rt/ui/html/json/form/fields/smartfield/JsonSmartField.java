@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.ui.html.json.form.fields.smartfield;
 
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractMixedSmartField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IContentAssistField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IProposalField;
 import org.eclipse.scout.rt.ui.html.IUiSession;
@@ -110,7 +111,14 @@ public class JsonSmartField<VALUE, LOOKUP_KEY, CONTENT_ASSIST_FIELD extends ICon
   }
 
   protected void handleUiOpenProposal(JsonEvent event) {
-    String searchText = getSearchTextAndAddFilter(event);
+    boolean browseAll = event.getData().optBoolean("browseAll");
+    String searchText = event.getData().optString("searchText", null);
+    if (browseAll) {
+      if (getModel().getErrorStatus() == null || (getModel().getErrorStatus() != null && getModel().getErrorStatus().getChildren().get(0).getCode() != AbstractMixedSmartField.NOT_UNIQUE_ERROR_CODE)) {
+        searchText = "*";
+      }
+    }
+    addPropertyEventFilterCondition(IValueField.PROP_DISPLAY_TEXT, searchText);
     boolean selectCurrentValue = event.getData().optBoolean("selectCurrentValue");
     LOG.debug("handle openProposal -> openProposalFromUI. searchText={} selectCurrentValue={}", searchText, selectCurrentValue);
     getModel().getUIFacade().openProposalChooserFromUI(searchText, selectCurrentValue);

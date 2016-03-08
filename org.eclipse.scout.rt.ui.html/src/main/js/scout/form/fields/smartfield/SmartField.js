@@ -485,7 +485,7 @@ scout.SmartField.prototype._sendCancelProposal = function() {
  */
 scout.SmartField.prototype._openProposal = function(browseAll) {
   var displayText = this._readDisplayText(),
-    searchText = browseAll ? '' : this._readDisplayText(),
+    searchText = this._readDisplayText(),
     selectCurrentValue = browseAll;
   this.displayText = displayText;
   if(this.errorStatus){
@@ -499,7 +499,8 @@ scout.SmartField.prototype._openProposal = function(browseAll) {
     $.log.debug('(SmartField#_openProposal) send openProposal. searchText=' + searchText + ' selectCurrentValue=' + selectCurrentValue);
     this._send('openProposal', {
       searchText: searchText,
-      selectCurrentValue: selectCurrentValue
+      selectCurrentValue: selectCurrentValue,
+      browseAll: browseAll
     });
   }
 };
