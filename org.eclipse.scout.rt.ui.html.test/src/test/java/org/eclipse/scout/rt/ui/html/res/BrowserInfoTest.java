@@ -15,11 +15,11 @@ import static org.junit.Assert.assertEquals;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
+import org.eclipse.scout.rt.shared.ui.UiEngineType;
+import org.eclipse.scout.rt.shared.ui.UiSystem;
 import org.eclipse.scout.rt.ui.html.res.BrowserInfo.BrowserVersion;
-import org.eclipse.scout.rt.ui.html.res.BrowserInfo.EngineType;
 import org.junit.Test;
 
 /**
@@ -126,38 +126,38 @@ public class BrowserInfoTest {
     checkBrowserInfoFlags("Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.1; Trident/4.0; SLCC2; .NET CLR 2.0.50727; .NET CLR 3.5.30729; .NET CLR 3.0.30729; Media Center PC 6.0; Maxthon 2.0)", FLAGS_DESKTOP_WINDOWS);
     checkBrowserInfoFlags("Mozilla/5.0 (Windows; U; Windows NT 6.0; en-US) AppleWebKit/533.1 (KHTML, like Gecko) Maxthon/3.0.8.2 Safari/533.1", FLAGS_DESKTOP_WINDOWS);
     checkBrowserInfoFlags("Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.1 (KHTML like Gecko) Maxthon/4.0.0.2000 Chrome/22.0.1229.79 Safari/537.1", FLAGS_DESKTOP_WINDOWS);
-    checkBrowserInfoFlags("Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)", FLAGS_DESKTOP_WINDOWS.copy().engineType(EngineType.IE));
-    checkBrowserInfoFlags("Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0)", FLAGS_DESKTOP_WINDOWS.copy().engineType(EngineType.IE));
+    checkBrowserInfoFlags("Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)", FLAGS_DESKTOP_WINDOWS.copy().engineType(UiEngineType.IE));
+    checkBrowserInfoFlags("Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0)", FLAGS_DESKTOP_WINDOWS.copy().engineType(UiEngineType.IE));
     checkBrowserInfoFlags("Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0; .NET CLR 2.0.50727; .NET CLR 3.0.04506.648; .NET CLR 3.5.21022; .NET CLR 3.0.4506.2152; .NET CLR 3.5.30729)",
-        FLAGS_DESKTOP_WINDOWS.copy().engineType(EngineType.IE));
-    checkBrowserInfoFlags("Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.1; Trident/4.0)", FLAGS_DESKTOP_WINDOWS.copy().engineType(EngineType.IE));
-    checkBrowserInfoFlags("Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; Trident/4.0)", FLAGS_DESKTOP_WINDOWS.copy().engineType(EngineType.IE));
-    checkBrowserInfoFlags("Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.0; Trident/4.0)", FLAGS_DESKTOP_WINDOWS.copy().engineType(EngineType.IE));
-    checkBrowserInfoFlags("Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; Trident/5.0)", FLAGS_DESKTOP_WINDOWS.copy().engineType(EngineType.IE));
-    checkBrowserInfoFlags("Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0)", FLAGS_DESKTOP_WINDOWS.copy().engineType(EngineType.IE));
-    checkBrowserInfoFlags("Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.2; Trident/5.0)", FLAGS_DESKTOP_WINDOWS.copy().engineType(EngineType.IE));
-    checkBrowserInfoFlags("Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.2; WOW64; Trident/5.0)", FLAGS_DESKTOP_WINDOWS.copy().engineType(EngineType.IE));
-    checkBrowserInfoFlags("Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; WOW64; Trident/5.0; SLCC2; Media Center PC 6.0; InfoPath.3; MS-RTC LM 8; Zune 4.7)", FLAGS_DESKTOP_WINDOWS.copy().engineType(EngineType.IE));
-    checkBrowserInfoFlags("Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; WOW64; Trident/6.0)", FLAGS_DESKTOP_WINDOWS.copy().engineType(EngineType.IE));
-    checkBrowserInfoFlags("Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.1; Trident/6.0)", FLAGS_DESKTOP_WINDOWS.copy().engineType(EngineType.IE));
+        FLAGS_DESKTOP_WINDOWS.copy().engineType(UiEngineType.IE));
+    checkBrowserInfoFlags("Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.1; Trident/4.0)", FLAGS_DESKTOP_WINDOWS.copy().engineType(UiEngineType.IE));
+    checkBrowserInfoFlags("Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; Trident/4.0)", FLAGS_DESKTOP_WINDOWS.copy().engineType(UiEngineType.IE));
+    checkBrowserInfoFlags("Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.0; Trident/4.0)", FLAGS_DESKTOP_WINDOWS.copy().engineType(UiEngineType.IE));
+    checkBrowserInfoFlags("Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; Trident/5.0)", FLAGS_DESKTOP_WINDOWS.copy().engineType(UiEngineType.IE));
+    checkBrowserInfoFlags("Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0)", FLAGS_DESKTOP_WINDOWS.copy().engineType(UiEngineType.IE));
+    checkBrowserInfoFlags("Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.2; Trident/5.0)", FLAGS_DESKTOP_WINDOWS.copy().engineType(UiEngineType.IE));
+    checkBrowserInfoFlags("Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.2; WOW64; Trident/5.0)", FLAGS_DESKTOP_WINDOWS.copy().engineType(UiEngineType.IE));
+    checkBrowserInfoFlags("Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; WOW64; Trident/5.0; SLCC2; Media Center PC 6.0; InfoPath.3; MS-RTC LM 8; Zune 4.7)", FLAGS_DESKTOP_WINDOWS.copy().engineType(UiEngineType.IE));
+    checkBrowserInfoFlags("Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; WOW64; Trident/6.0)", FLAGS_DESKTOP_WINDOWS.copy().engineType(UiEngineType.IE));
+    checkBrowserInfoFlags("Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.1; Trident/6.0)", FLAGS_DESKTOP_WINDOWS.copy().engineType(UiEngineType.IE));
     checkBrowserInfoFlags("Mozilla/5.0 (compatible; MSIE 10.6; Windows NT 6.1; Trident/5.0; InfoPath.2; SLCC1; .NET CLR 3.0.4506.2152; .NET CLR 3.5.30729; .NET CLR 2.0.50727) 3gpp-gba UNTRUSTED/1.0",
-        FLAGS_DESKTOP_WINDOWS.copy().engineType(EngineType.IE));
-    checkBrowserInfoFlags("Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko", FLAGS_DESKTOP_WINDOWS.copy().engineType(EngineType.IE));
-    checkBrowserInfoFlags("Mozilla/5.0 (Windows NT 6.3; Trident/7.0; rv:11.0) like Gecko", FLAGS_DESKTOP_WINDOWS.copy().engineType(EngineType.IE));
-    checkBrowserInfoFlags("Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.3; Trident/7.0; .NET4.0E; .NET4.0C)", FLAGS_DESKTOP_WINDOWS.copy().engineType(EngineType.IE));
+        FLAGS_DESKTOP_WINDOWS.copy().engineType(UiEngineType.IE));
+    checkBrowserInfoFlags("Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko", FLAGS_DESKTOP_WINDOWS.copy().engineType(UiEngineType.IE));
+    checkBrowserInfoFlags("Mozilla/5.0 (Windows NT 6.3; Trident/7.0; rv:11.0) like Gecko", FLAGS_DESKTOP_WINDOWS.copy().engineType(UiEngineType.IE));
+    checkBrowserInfoFlags("Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.3; Trident/7.0; .NET4.0E; .NET4.0C)", FLAGS_DESKTOP_WINDOWS.copy().engineType(UiEngineType.IE));
     checkBrowserInfoFlags("Opera/9.80 (Windows NT 6.1; U; en) Presto/2.7.62 Version/11.01", FLAGS_DESKTOP_WINDOWS);
     checkBrowserInfoFlags("Opera/9.80 (Windows NT 6.0) Presto/2.12.388 Version/12.14", FLAGS_DESKTOP_WINDOWS);
     checkBrowserInfoFlags("Opera/9.80 (Windows NT 6.1; WOW64) Presto/2.12.388 Version/12.16", FLAGS_DESKTOP_WINDOWS);
-    checkBrowserInfoFlags("Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/27.0.1453.12 Safari/537.36 OPR/14.0.1116.4", FLAGS_DESKTOP_WINDOWS.copy().engineType(EngineType.CHROME));
+    checkBrowserInfoFlags("Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/27.0.1453.12 Safari/537.36 OPR/14.0.1116.4", FLAGS_DESKTOP_WINDOWS.copy().engineType(UiEngineType.CHROME));
     checkBrowserInfoFlags("Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/28.0.1500.29 Safari/537.36 OPR/15.0.1147.24 (Edition Next)", FLAGS_DESKTOP_WINDOWS);
     checkBrowserInfoFlags("Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.57 Safari/537.36 OPR/18.0.1284.49", FLAGS_DESKTOP_WINDOWS);
     checkBrowserInfoFlags("Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/32.0.1700.76 Safari/537.36 OPR/19.0.1326.56", FLAGS_DESKTOP_WINDOWS);
     checkBrowserInfoFlags("Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/33.0.1750.154 Safari/537.36 OPR/20.0.1387.91", FLAGS_DESKTOP_WINDOWS);
-    checkBrowserInfoFlags("Mozilla/5.0 (Windows; U; Windows NT 5.2; en-US) AppleWebKit/533.17.8 (KHTML, like Gecko) Version/5.0.1 Safari/533.17.8", FLAGS_DESKTOP_WINDOWS.copy().engineType(EngineType.SAFARI));
-    checkBrowserInfoFlags("Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US) AppleWebKit/533.19.4 (KHTML, like Gecko) Version/5.0.2 Safari/533.18.5", FLAGS_DESKTOP_WINDOWS.copy().engineType(EngineType.SAFARI));
+    checkBrowserInfoFlags("Mozilla/5.0 (Windows; U; Windows NT 5.2; en-US) AppleWebKit/533.17.8 (KHTML, like Gecko) Version/5.0.1 Safari/533.17.8", FLAGS_DESKTOP_WINDOWS.copy().engineType(UiEngineType.SAFARI));
+    checkBrowserInfoFlags("Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US) AppleWebKit/533.19.4 (KHTML, like Gecko) Version/5.0.2 Safari/533.18.5", FLAGS_DESKTOP_WINDOWS.copy().engineType(UiEngineType.SAFARI));
     checkBrowserInfoFlags("Mozilla/5.0 (Windows; U; Windows NT 6.2; es-US ) AppleWebKit/540.0 (KHTML like Gecko) Version/6.0 Safari/8900.00", FLAGS_DESKTOP_WINDOWS);
-    checkBrowserInfoFlags("Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.71 (KHTML like Gecko) WebVideo/1.0.1.10 Version/7.0 Safari/537.71", FLAGS_DESKTOP_WINDOWS.copy().engineType(EngineType.SAFARI));
-    checkBrowserInfoFlags("Mozilla/5.0 (Windows; U; Windows NT 6.1; en-GB; rv:1.9.1.17) Gecko/20110123 (like Firefox/3.x) SeaMonkey/2.0.12", FLAGS_DESKTOP_WINDOWS.copy().engineType(EngineType.FIREFOX));
+    checkBrowserInfoFlags("Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.71 (KHTML like Gecko) WebVideo/1.0.1.10 Version/7.0 Safari/537.71", FLAGS_DESKTOP_WINDOWS.copy().engineType(UiEngineType.SAFARI));
+    checkBrowserInfoFlags("Mozilla/5.0 (Windows; U; Windows NT 6.1; en-GB; rv:1.9.1.17) Gecko/20110123 (like Firefox/3.x) SeaMonkey/2.0.12", FLAGS_DESKTOP_WINDOWS.copy().engineType(UiEngineType.FIREFOX));
     checkBrowserInfoFlags("Mozilla/5.0 (Windows NT 5.2; rv:10.0.1) Gecko/20100101 Firefox/10.0.1 SeaMonkey/2.7.1", FLAGS_DESKTOP_WINDOWS);
     checkBrowserInfoFlags("Mozilla/5.0 (Windows NT 6.1; WOW64; rv:12.0) Gecko/20120422 Firefox/12.0 SeaMonkey/2.9", FLAGS_DESKTOP_WINDOWS);
 
@@ -769,7 +769,7 @@ public class BrowserInfoTest {
       return;
     }
 
-    BrowserInfo info = BrowserInfo.createFrom(userAgentString, Locale.getDefault());
+    BrowserInfo info = BrowserInfo.createFrom(userAgentString);
 
     List<String> failedTests = new ArrayList<>();
     if (flags.isMobile() != null && flags.isMobile() != info.isMobile()) {
@@ -778,15 +778,15 @@ public class BrowserInfoTest {
     if (flags.isTablet() != null && flags.m_isTablet != info.isTablet()) {
       failedTests.add("TABLET [expected " + flags.m_isTablet + ", but is " + info.isTablet() + "]");
     }
-    boolean isWindows = (info.getSystem() == BrowserInfo.System.WINDOWS);
+    boolean isWindows = (info.getSystem() == UiSystem.WINDOWS);
     if (flags.isWindows() != null && flags.isWindows() != isWindows) {
       failedTests.add("WINDOWS [expected " + flags.m_isWindows + ", but is " + isWindows + "; system=" + info.getSystem() + "]");
     }
-    boolean isMac = (info.getSystem() == BrowserInfo.System.OSX);
+    boolean isMac = (info.getSystem() == UiSystem.OSX);
     if (flags.isMac() != null && flags.isMac() != isMac) {
       failedTests.add("MAC [expected " + flags.m_isMac + ", but is " + isMac + "; system=" + info.getSystem() + "]");
     }
-    boolean isLinux = (info.getSystem() == BrowserInfo.System.UNIX);
+    boolean isLinux = (info.getSystem() == UiSystem.UNIX);
     if (flags.isLinux() != null && flags.isLinux() != isLinux) {
       failedTests.add("LINUX [expected " + flags.m_isLinux + ", but is " + isLinux + "; system=" + info.getSystem() + "]");
     }
@@ -818,7 +818,7 @@ public class BrowserInfoTest {
     private Boolean m_isWindows;
     private Boolean m_isMac;
     private Boolean m_isLinux;
-    private EngineType m_engineType;
+    private UiEngineType m_engineType;
 
     public P_BrowserTestFlags() {
     }
@@ -858,7 +858,7 @@ public class BrowserInfoTest {
       return m_isLinux;
     }
 
-    public EngineType getEngineType() {
+    public UiEngineType getEngineType() {
       return m_engineType;
     }
 
@@ -912,7 +912,7 @@ public class BrowserInfoTest {
       return this;
     }
 
-    public P_BrowserTestFlags engineType(EngineType engineType) {
+    public P_BrowserTestFlags engineType(UiEngineType engineType) {
       m_engineType = engineType;
       return this;
     }
@@ -927,7 +927,7 @@ public class BrowserInfoTest {
   public void testCreateBrowserInfo() {
     Map<String, BrowserInfo> testMap = initTestMap();
     for (String userAgent : testMap.keySet()) {
-      BrowserInfo createdBrowserInfo = BrowserInfo.createFrom(userAgent, null);
+      BrowserInfo createdBrowserInfo = BrowserInfo.createFrom(userAgent);
       BrowserInfo expectedBrowserInfo = testMap.get(userAgent);
 
       //Ignore versions if not explicitly set
@@ -955,9 +955,9 @@ public class BrowserInfoTest {
   private void putIosBrowsers(Map<String, BrowserInfo> testMap) {
     //iPhone 4S
     String userAgent = "Mozilla/5.0 (iPhone; CPU iPhone OS 6_0 like Mac OS X) AppleWebKit/536.26 (KHTML, like Gecko) Version/6.0 Mobile/10A403 Safari/8536.25";
-    BrowserInfo browserInfo = new BrowserInfo(userAgent, null);
-    browserInfo.setEngineType(BrowserInfo.EngineType.SAFARI);
-    browserInfo.setSystem(BrowserInfo.System.IOS);
+    BrowserInfo browserInfo = new BrowserInfo(userAgent);
+    browserInfo.setEngineType(UiEngineType.SAFARI);
+    browserInfo.setSystem(UiSystem.IOS);
     browserInfo.setWebkit(true);
     browserInfo.setMobile(true);
     browserInfo.setSystemVersion(new BrowserVersion(6, 0, 0));
@@ -965,9 +965,9 @@ public class BrowserInfoTest {
 
     //iPad 3
     userAgent = "Mozilla/5.0 (iPad; CPU OS 5_1 like Mac OS X) AppleWebKit/534.46 (KHTML, like Gecko) Version/5.1 Mobile/9B176 Safari/7534.48.3";
-    browserInfo = new BrowserInfo(userAgent, null);
-    browserInfo.setEngineType(BrowserInfo.EngineType.SAFARI);
-    browserInfo.setSystem(BrowserInfo.System.IOS);
+    browserInfo = new BrowserInfo(userAgent);
+    browserInfo.setEngineType(UiEngineType.SAFARI);
+    browserInfo.setSystem(UiSystem.IOS);
     browserInfo.setWebkit(true);
     browserInfo.setTablet(true);
     browserInfo.setSystemVersion(new BrowserInfo.BrowserVersion(5, 1, 0));
@@ -975,9 +975,9 @@ public class BrowserInfoTest {
 
     //iPad 3 (home screen icon mode)
     userAgent = "Mozilla/5.0 (iPad; CPU OS 5_1 like Mac OS X) AppleWebKit/534.46 (KHTML, like Gecko) Mobile/9B176";
-    browserInfo = new BrowserInfo(userAgent, null);
-    browserInfo.setEngineType(BrowserInfo.EngineType.SAFARI);
-    browserInfo.setSystem(BrowserInfo.System.IOS);
+    browserInfo = new BrowserInfo(userAgent);
+    browserInfo.setEngineType(UiEngineType.SAFARI);
+    browserInfo.setSystem(UiSystem.IOS);
     browserInfo.setWebkit(true);
     browserInfo.setTablet(true);
     browserInfo.setStandalone(true);
@@ -988,9 +988,9 @@ public class BrowserInfoTest {
   private void putAndroidBrowsers(Map<String, BrowserInfo> testMap) {
     //Samsung tablet GT P7500
     String userAgent = "Mozilla/5.0 (Linux; U; Android 3.2; de-de; GT-P7500 Build/HTJ85B) AppleWebKit/534.13 (KHTML, like Gecko) Version/4.0 Safari/534.13";
-    BrowserInfo browserInfo = new BrowserInfo(userAgent, null);
-    browserInfo.setEngineType(BrowserInfo.EngineType.ANDROID);
-    browserInfo.setSystem(BrowserInfo.System.ANDROID);
+    BrowserInfo browserInfo = new BrowserInfo(userAgent);
+    browserInfo.setEngineType(UiEngineType.ANDROID);
+    browserInfo.setSystem(UiSystem.ANDROID);
     browserInfo.setWebkit(true);
     browserInfo.setTablet(true);
     browserInfo.setSystemVersion(new BrowserInfo.BrowserVersion(3, 2, 0));
@@ -998,9 +998,9 @@ public class BrowserInfoTest {
 
     //Samsung Galaxy S2 Android Browser
     userAgent = "Mozilla/5.0 (Linux; U; Android 4.0.3; de-ch; SAMSUNG GT-I9100/I9100BULPD Build/IML74K) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30";
-    browserInfo = new BrowserInfo(userAgent, null);
-    browserInfo.setEngineType(BrowserInfo.EngineType.ANDROID);
-    browserInfo.setSystem(BrowserInfo.System.ANDROID);
+    browserInfo = new BrowserInfo(userAgent);
+    browserInfo.setEngineType(UiEngineType.ANDROID);
+    browserInfo.setSystem(UiSystem.ANDROID);
     browserInfo.setWebkit(true);
     browserInfo.setMobile(true);
     browserInfo.setSystemVersion(new BrowserInfo.BrowserVersion(4, 0, 3));
@@ -1008,9 +1008,9 @@ public class BrowserInfoTest {
 
     //Samsung Galaxy S2 Google Chrome
     userAgent = "Mozilla/5.0 (Linux; Android 4.0.3; GT-I9100 Build/IML74K) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.166 Mobile Safari/535.19";
-    browserInfo = new BrowserInfo(userAgent, null);
-    browserInfo.setEngineType(BrowserInfo.EngineType.CHROME);
-    browserInfo.setSystem(BrowserInfo.System.ANDROID);
+    browserInfo = new BrowserInfo(userAgent);
+    browserInfo.setEngineType(UiEngineType.CHROME);
+    browserInfo.setSystem(UiSystem.ANDROID);
     browserInfo.setWebkit(true);
     browserInfo.setMobile(true);
     browserInfo.setSystemVersion(new BrowserInfo.BrowserVersion(4, 0, 3));
@@ -1018,9 +1018,9 @@ public class BrowserInfoTest {
 
     //Samsung Galaxy S2 Dolphin Browser
     userAgent = "Mozilla/5.0 (Linux; U; Android 4.0.3; de-ch; GT-I9100 Build/IML74K) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30";
-    browserInfo = new BrowserInfo(userAgent, null);
-    browserInfo.setEngineType(BrowserInfo.EngineType.ANDROID);
-    browserInfo.setSystem(BrowserInfo.System.ANDROID);
+    browserInfo = new BrowserInfo(userAgent);
+    browserInfo.setEngineType(UiEngineType.ANDROID);
+    browserInfo.setSystem(UiSystem.ANDROID);
     browserInfo.setWebkit(true);
     browserInfo.setMobile(true);
     browserInfo.setSystemVersion(new BrowserInfo.BrowserVersion(4, 0, 3));
@@ -1028,9 +1028,9 @@ public class BrowserInfoTest {
 
     //Samsung Nexus S Firefox, Android 4.1.2
     userAgent = "Mozilla/5.0 (Android; Mobile; rv:17.0) Gecko/17.0 Firefox/17.0";
-    browserInfo = new BrowserInfo(userAgent, null);
-    browserInfo.setEngineType(BrowserInfo.EngineType.FIREFOX);
-    browserInfo.setSystem(BrowserInfo.System.ANDROID);
+    browserInfo = new BrowserInfo(userAgent);
+    browserInfo.setEngineType(UiEngineType.FIREFOX);
+    browserInfo.setSystem(UiSystem.ANDROID);
     browserInfo.setGecko(true);
     browserInfo.setMobile(true);
     browserInfo.setSystemVersion(null);
@@ -1040,29 +1040,29 @@ public class BrowserInfoTest {
   private void putWindowsBrowsers(Map<String, BrowserInfo> testMap) {
     //Windows 7, IE 9
     String userAgent = "Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; WOW64; Trident/5.0)";
-    BrowserInfo browserInfo = new BrowserInfo(userAgent, null);
-    browserInfo.setEngineType(BrowserInfo.EngineType.IE);
+    BrowserInfo browserInfo = new BrowserInfo(userAgent);
+    browserInfo.setEngineType(UiEngineType.IE);
     browserInfo.setEngineVersion(new BrowserInfo.BrowserVersion(9, 0, 0));
-    browserInfo.setSystem(BrowserInfo.System.WINDOWS);
+    browserInfo.setSystem(UiSystem.WINDOWS);
     browserInfo.setMshtml(true);
     browserInfo.setSystemVersion(new BrowserInfo.BrowserVersion(6, 1, 0));
     testMap.put(userAgent, browserInfo);
 
     //Windows 7, Google Chrome 22.0.1229.94
     userAgent = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.4 (KHTML, like Gecko) Chrome/22.0.1229.94 Safari/537.4";
-    browserInfo = new BrowserInfo(userAgent, null);
-    browserInfo.setEngineType(BrowserInfo.EngineType.CHROME);
-    browserInfo.setSystem(BrowserInfo.System.WINDOWS);
+    browserInfo = new BrowserInfo(userAgent);
+    browserInfo.setEngineType(UiEngineType.CHROME);
+    browserInfo.setSystem(UiSystem.WINDOWS);
     browserInfo.setWebkit(true);
     browserInfo.setSystemVersion(new BrowserInfo.BrowserVersion(6, 1, 0));
     testMap.put(userAgent, browserInfo);
 
     //Nokia Lumia 800
     userAgent = "Mozilla/5.0 (compatible; MSIE 9.0; Windows Phone OS 7.5; Trident/5.0; IEMobile/9.0; NOKIA; Lumia 800)";
-    browserInfo = new BrowserInfo(userAgent, null);
-    browserInfo.setEngineType(BrowserInfo.EngineType.IE);
+    browserInfo = new BrowserInfo(userAgent);
+    browserInfo.setEngineType(UiEngineType.IE);
     browserInfo.setEngineVersion(new BrowserInfo.BrowserVersion(9, 0, 0));
-    browserInfo.setSystem(BrowserInfo.System.WINDOWS);
+    browserInfo.setSystem(UiSystem.WINDOWS);
     browserInfo.setMshtml(true);
     browserInfo.setMobile(true);
     browserInfo.setSystemVersion(new BrowserInfo.BrowserVersion(7, 5, 0));
@@ -1070,10 +1070,10 @@ public class BrowserInfoTest {
 
     //Windows Phone 8 HTC
     userAgent = "Mozilla/5.0 (compatible; MSIE 10.0; Windows Phone 8.0; Trident/6.0; IEMobile/10.0; ARM; Touch; HTC; Windows Phone 8X by HTC)";
-    browserInfo = new BrowserInfo(userAgent, null);
-    browserInfo.setEngineType(BrowserInfo.EngineType.IE);
+    browserInfo = new BrowserInfo(userAgent);
+    browserInfo.setEngineType(UiEngineType.IE);
     browserInfo.setEngineVersion(new BrowserInfo.BrowserVersion(10, 0, 0));
-    browserInfo.setSystem(BrowserInfo.System.WINDOWS);
+    browserInfo.setSystem(UiSystem.WINDOWS);
     browserInfo.setMshtml(true);
     browserInfo.setMobile(true);
     browserInfo.setSystemVersion(new BrowserInfo.BrowserVersion(8, 0, 0));

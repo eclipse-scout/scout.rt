@@ -12,19 +12,16 @@ package org.eclipse.scout.rt.shared.ui;
 
 import java.io.Serializable;
 
-import org.eclipse.scout.rt.platform.config.ConfigUtility;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.Assertions;
 
 /**
  * Holds information about the kind of user interface used on the client side like {@link IUiLayer} and
  * {@link IUiDeviceType}. <br/>
  * There is also a device id ({@link UserAgent#getUiDeviceId()} which holds even more information about the used device.
- * As default it only provides information about the underlying operation system. In case of a web based ui
- * {@link IUiLayer#isWebUi()} it provides the original user agent string containing information about the browser.
  * <p>
  * In order to export the user agent data as string you can use {@link #createIdentifier()} which uses
- * {@link DefaultUserAgentParser}. If you would like to export it in a custom format just create a custom
- * {@link IUserAgentParser} and call {@link #createIdentifier(IUserAgentParser)}.
+ * {@link IUserAgentParser}.
  * </p>
  *
  * @since 3.8.0
@@ -37,14 +34,19 @@ public final class UserAgent implements Serializable {
   public static final ThreadLocal<UserAgent> CURRENT = new ThreadLocal<>();
 
   private static final long serialVersionUID = 6194949468393137650L;
-  private String m_uiDeviceId;
-  private IUiLayer m_uiLayer;
-  private IUiDeviceType m_uiDeviceType;
 
-  private UserAgent(IUiLayer uiLayer, IUiDeviceType uiDeviceType, String uiDeviceId) {
+  private final IUiLayer m_uiLayer;
+  private final IUiDeviceType m_uiDeviceType;
+  private final IUiEngineType m_uiEngineType;
+  private final IUiSystem m_uiSystem;
+  private final String m_uiDeviceId;
+
+  UserAgent(IUiLayer uiLayer, IUiDeviceType uiDeviceType, IUiEngineType uiEngineType, IUiSystem uiSystem, String uiDeviceId) {
     m_uiLayer = Assertions.assertNotNull(uiLayer, "UI Layer must not be null");
     m_uiDeviceType = Assertions.assertNotNull(uiDeviceType, "UI device type must not be null");
     m_uiDeviceId = Assertions.assertNotNull(uiDeviceId, "UI device id must not be null");
+    m_uiEngineType = Assertions.assertNotNull(uiEngineType, "UI engineType must not be null");
+    m_uiSystem = Assertions.assertNotNull(uiSystem, "UI system must not be null");
   }
 
   public IUiDeviceType getUiDeviceType() {
@@ -55,39 +57,16 @@ public final class UserAgent implements Serializable {
     return m_uiLayer;
   }
 
+  public IUiEngineType getUiEngineType() {
+    return m_uiEngineType;
+  }
+
   public String getUiDeviceId() {
     return m_uiDeviceId;
   }
 
-  public void setUiDeviceId(String uiDeviceId) {
-    m_uiDeviceId = uiDeviceId;
-  }
-
-  @Override
-  public boolean equals(Object other) {
-    if (other == this) {
-      return true;
-    }
-
-    if (other == null || other.getClass() != getClass()) {
-      return false;
-    }
-
-    UserAgent otherUserAgent = (UserAgent) other;
-    boolean equal = otherUserAgent.getUiDeviceType().equals(getUiDeviceType());
-    equal &= otherUserAgent.getUiLayer().equals(getUiLayer());
-    equal &= otherUserAgent.getUiDeviceId().equals(getUiDeviceId());
-
-    return equal;
-  }
-
-  @Override
-  public int hashCode() {
-    int hash = 17 + getUiLayer().hashCode();
-    hash = hash * 17 + getUiDeviceType().hashCode();
-    hash = hash * 17 + getUiDeviceId().hashCode();
-
-    return hash;
+  public IUiSystem getUiSystem() {
+    return m_uiSystem;
   }
 
   @Override
@@ -96,32 +75,61 @@ public final class UserAgent implements Serializable {
   }
 
   public String createIdentifier() {
-    return createIdentifier(new DefaultUserAgentParser());
+    return createIdentifier(BEANS.get(IUserAgentParser.class));
   }
 
   public String createIdentifier(IUserAgentParser parser) {
     return parser.createIdentifier(this);
   }
 
+  /**
+   * @deprecated use {@link UserAgents#create()}. will be removed in release 6.1;
+   */
+  @Deprecated
   public static UserAgent create(IUiLayer uiLayer, IUiDeviceType uiDeviceType) {
-    String osName = ConfigUtility.getProperty("os.name");
-    return new UserAgent(uiLayer, uiDeviceType, osName);
+    return UserAgents
+        .create()
+        .withUiLayer(uiLayer)
+        .withUiDeviceType(uiDeviceType)
+        .withDefaultDeviceId()
+        .build();
   }
 
+  /**
+   * @deprecated use {@link UserAgents#create()}. will be removed in release 6.1;
+   */
+  @Deprecated
   public static UserAgent create(IUiLayer uiLayer, IUiDeviceType uiDeviceType, String uiDeviceId) {
-    return new UserAgent(uiLayer, uiDeviceType, uiDeviceId);
+    return UserAgents
+        .create()
+        .withUiLayer(uiLayer)
+        .withUiDeviceType(uiDeviceType)
+        .withDeviceId(uiDeviceId)
+        .build();
   }
 
-  public static UserAgent createDefault() {
-    return create(UiLayer.UNKNOWN, UiDeviceType.UNKNOWN);
-  }
-
+  /**
+   * @deprecated use {@link UserAgents#createByIdentifier(IUserAgentParser, String)}. will be removed in release 6.1;
+   */
+  @Deprecated
   public static UserAgent createByIdentifier(IUserAgentParser parser, String userAgent) {
-    return parser.parseIdentifier(userAgent);
+    return UserAgents.createByIdentifier(parser, userAgent);
   }
 
+  /**
+   * @deprecated use {@link UserAgents#createByIdentifier(String)}. will be removed in release 6.1;
+   */
+  @Deprecated
   public static UserAgent createByIdentifier(String userAgent) {
-    return createByIdentifier(new DefaultUserAgentParser(), userAgent);
+    return UserAgents.createByIdentifier(userAgent);
+  }
+
+  /**
+   * @deprecated use {@link UserAgents#createDefault()}. will be removed in release 6.1;
+   */
+  @Deprecated
+  public static UserAgent createDefault() {
+    return UserAgents.createDefault();
   }
 
   /**
@@ -142,4 +150,72 @@ public final class UserAgent implements Serializable {
   public static UserAgent get() {
     return UserAgent.CURRENT.get();
   }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((m_uiDeviceId == null) ? 0 : m_uiDeviceId.hashCode());
+    result = prime * result + ((m_uiDeviceType == null) ? 0 : m_uiDeviceType.hashCode());
+    result = prime * result + ((m_uiEngineType == null) ? 0 : m_uiEngineType.hashCode());
+    result = prime * result + ((m_uiLayer == null) ? 0 : m_uiLayer.hashCode());
+    result = prime * result + ((m_uiSystem == null) ? 0 : m_uiSystem.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    UserAgent other = (UserAgent) obj;
+    if (m_uiDeviceId == null) {
+      if (other.m_uiDeviceId != null) {
+        return false;
+      }
+    }
+    else if (!m_uiDeviceId.equals(other.m_uiDeviceId)) {
+      return false;
+    }
+    if (m_uiDeviceType == null) {
+      if (other.m_uiDeviceType != null) {
+        return false;
+      }
+    }
+    else if (!m_uiDeviceType.equals(other.m_uiDeviceType)) {
+      return false;
+    }
+    if (m_uiEngineType == null) {
+      if (other.m_uiEngineType != null) {
+        return false;
+      }
+    }
+    else if (!m_uiEngineType.equals(other.m_uiEngineType)) {
+      return false;
+    }
+    if (m_uiLayer == null) {
+      if (other.m_uiLayer != null) {
+        return false;
+      }
+    }
+    else if (!m_uiLayer.equals(other.m_uiLayer)) {
+      return false;
+    }
+    if (m_uiSystem == null) {
+      if (other.m_uiSystem != null) {
+        return false;
+      }
+    }
+    else if (!m_uiSystem.equals(other.m_uiSystem)) {
+      return false;
+    }
+    return true;
+  }
+
 }

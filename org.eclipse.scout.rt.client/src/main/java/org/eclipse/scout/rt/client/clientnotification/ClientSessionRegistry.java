@@ -36,7 +36,7 @@ import org.eclipse.scout.rt.shared.services.common.ping.IPingService;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnel;
 import org.eclipse.scout.rt.shared.session.IGlobalSessionListener;
 import org.eclipse.scout.rt.shared.session.SessionEvent;
-import org.eclipse.scout.rt.shared.ui.UserAgent;
+import org.eclipse.scout.rt.shared.ui.UserAgents;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,7 +76,7 @@ public class ClientSessionRegistry implements IClientSessionRegistry, IGlobalSes
 
     // unregister from remote notifications
     try {
-      ClientRunContexts.empty().withSubject(NOTIFICATION_SUBJECT).withUserAgent(UserAgent.createDefault()).run(new IRunnable() {
+      ClientRunContexts.empty().withSubject(NOTIFICATION_SUBJECT).withUserAgent(UserAgents.createDefault()).run(new IRunnable() {
         @Override
         public void run() throws Exception {
           BEANS.get(IClientNotificationService.class).unregisterSession(INode.ID, sessionId, userId);
@@ -126,7 +126,7 @@ public class ClientSessionRegistry implements IClientSessionRegistry, IGlobalSes
 
   private void registerOnServer(final IClientSession session) {
     try {
-      ClientRunContexts.empty().withSubject(NOTIFICATION_SUBJECT).withUserAgent(UserAgent.createDefault()).run(new IRunnable() {
+      ClientRunContexts.empty().withSubject(NOTIFICATION_SUBJECT).withUserAgent(UserAgents.createDefault()).run(new IRunnable() {
         @Override
         public void run() throws Exception {
           BEANS.get(IClientNotificationService.class).registerSession(INode.ID, session.getId(), session.getUserId());

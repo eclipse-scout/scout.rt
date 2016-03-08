@@ -19,6 +19,7 @@ import org.eclipse.scout.rt.platform.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.util.VerboseUtility;
 import org.eclipse.scout.rt.shared.services.common.context.IRunMonitorCancelService;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
+import org.eclipse.scout.rt.shared.ui.UserAgents;
 
 @Bean
 public class ServiceTunnelRequest implements Serializable {
@@ -99,7 +100,7 @@ public class ServiceTunnelRequest implements Serializable {
 
   /**
    * Represents the user interface on client side.<br/>
-   * To parse an identifier use {@link UserAgent#createByIdentifier(String)}
+   * To parse an identifier use {@link UserAgents#createByIdentifier(String)}
    */
   public String getUserAgent() {
     return m_userAgent;

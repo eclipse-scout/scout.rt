@@ -60,11 +60,10 @@ import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedException;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.job.filter.event.SessionJobEventFilter;
 import org.eclipse.scout.rt.shared.job.filter.future.SessionFutureFilter;
-import org.eclipse.scout.rt.shared.ui.IUiDeviceType;
-import org.eclipse.scout.rt.shared.ui.IUiLayer;
 import org.eclipse.scout.rt.shared.ui.UiDeviceType;
 import org.eclipse.scout.rt.shared.ui.UiLayer;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
+import org.eclipse.scout.rt.shared.ui.UserAgents;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonAdapterRegistry;
@@ -77,6 +76,7 @@ import org.eclipse.scout.rt.ui.html.json.JsonRequestHelper;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.JsonStartupRequest;
 import org.eclipse.scout.rt.ui.html.json.MainJsonObjectFactory;
+import org.eclipse.scout.rt.ui.html.res.BrowserInfo;
 import org.eclipse.scout.rt.ui.html.res.IBinaryResourceConsumer;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -279,22 +279,29 @@ public class UiSession implements IUiSession {
   }
 
   protected UserAgent createUserAgent(JsonStartupRequest jsonStartupReq) {
-    IUiLayer uiLayer = UiLayer.HTML;
-    IUiDeviceType uiDeviceType = UiDeviceType.DESKTOP;
     String browserId = currentHttpRequest().getHeader("User-Agent");
+    BrowserInfo browserInfo = BrowserInfo.createFrom(browserId);
+
+    UserAgents userAgentBuilder = UserAgents
+        .create()
+        .withUiLayer(UiLayer.HTML)
+        .withUiDeviceType(UiDeviceType.DESKTOP)
+        .withUiEngineType(browserInfo.getEngineType())
+        .withUiSystem(browserInfo.getSystem());
+
     JSONObject userAgent = jsonStartupReq.getUserAgent();
     if (userAgent != null) {
       // FIXME cgu: it would be great if UserAgent could be changed dynamically, to switch from mobile to tablet mode on the fly, should be done as event in JsonClientSession
       String uiDeviceTypeStr = userAgent.optString("deviceType", null);
       if (uiDeviceTypeStr != null) {
-        uiDeviceType = UiDeviceType.createByIdentifier(uiDeviceTypeStr);
+        userAgentBuilder.withUiDeviceType(UiDeviceType.createByIdentifier(uiDeviceTypeStr));
       }
       String uiLayerStr = userAgent.optString("uiLayer", null);
       if (uiLayerStr != null) {
-        uiLayer = UiLayer.createByIdentifier(uiLayerStr);
+        userAgentBuilder.withUiLayer(UiLayer.createByIdentifier(uiLayerStr));
       }
     }
-    return UserAgent.create(uiLayer, uiDeviceType, browserId);
+    return userAgentBuilder.build();
   }
 
   protected IClientSession createAndStartClientSession(Locale locale, UserAgent userAgent, Map<String, String> sessionStartupParams) {

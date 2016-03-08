@@ -10,12 +10,15 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.ui;
 
+import org.eclipse.scout.rt.platform.Bean;
+
 /**
  * Is able to create a string representation (identifier) of {@link UserAgent}. It is also able to parse a identifier
  * and create a {@link UserAgent}.
- * 
+ *
  * @since 3.8.0
  */
+@Bean
 public interface IUserAgentParser {
 
   UserAgent parseIdentifier(String userAgent);

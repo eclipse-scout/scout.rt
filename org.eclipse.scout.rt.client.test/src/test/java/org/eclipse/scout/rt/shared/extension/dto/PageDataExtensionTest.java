@@ -24,7 +24,7 @@ import org.eclipse.scout.rt.shared.extension.dto.fixture.OrigPageWithTableData;
 import org.eclipse.scout.rt.shared.extension.dto.fixture.OrigPageWithTableData.OrigPageWithTableRowData;
 import org.eclipse.scout.rt.shared.extension.dto.fixture.ThirdIntegerColumn;
 import org.eclipse.scout.rt.shared.extension.dto.fixture.ThirdIntegerColumnData;
-import org.eclipse.scout.rt.shared.ui.UserAgent;
+import org.eclipse.scout.rt.shared.ui.UserAgents;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -38,7 +38,7 @@ public class PageDataExtensionTest extends AbstractLocalExtensionTestCase {
     final IClientSession session = Mockito.mock(IClientSession.class);
     System.setProperty("user.area", "@user.home/test");
     Mockito.when(session.getUserId()).thenReturn("userid");
-    Mockito.when(session.getUserAgent()).thenReturn(UserAgent.createDefault());
+    Mockito.when(session.getUserAgent()).thenReturn(UserAgents.createDefault());
     ISession.CURRENT.set(session);
   }
 

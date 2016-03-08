@@ -11,13 +11,14 @@
 package org.eclipse.scout.rt.ui.html.res;
 
 import java.util.Enumeration;
-import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.shared.ui.UiEngineType;
+import org.eclipse.scout.rt.shared.ui.UiSystem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,14 +29,6 @@ import org.slf4j.LoggerFactory;
  */
 public class BrowserInfo {
   private static final Logger LOG = LoggerFactory.getLogger(BrowserInfo.class);
-
-  public static enum EngineType {
-    ANDROID, CHROME, SAFARI, FIREFOX, IE, OPERA, KONQUEROR, UNKNOWN
-  }
-
-  public static enum System {
-    WINDOWS, UNIX, OSX, IOS, ANDROID, UNKNOWN
-  }
 
   public static class BrowserVersion implements Comparable<BrowserVersion> {
 
@@ -125,9 +118,8 @@ public class BrowserInfo {
   }
 
   private final String m_userAgent;
-  private final Locale m_locale;
 
-  private EngineType m_engineType = EngineType.UNKNOWN;
+  private UiEngineType m_engineType = UiEngineType.UNKNOWN;
   private BrowserVersion m_engineVersion;
   // Basic engine types
   private boolean m_isWebkit = false;
@@ -135,7 +127,7 @@ public class BrowserInfo {
   private boolean m_isMshtml = false;
   private boolean m_isOpera = false;
 
-  private System m_system = System.UNKNOWN;
+  private UiSystem m_system = UiSystem.UNKNOWN;
   private BrowserVersion m_systemVersion;
 
   // Flags
@@ -143,9 +135,8 @@ public class BrowserInfo {
   private boolean m_isTablet = false;
   private boolean m_isStandalone = false;
 
-  public BrowserInfo(String userAgent, Locale locale) {
+  public BrowserInfo(String userAgent) {
     m_userAgent = (userAgent == null ? "" : userAgent);
-    m_locale = locale;
 
     initInfos();
   }
@@ -161,7 +152,7 @@ public class BrowserInfo {
     boolean isOpera = StringUtility.contains(m_userAgent, regex);
     if (isOpera) {
       setOpera(true);
-      setEngineType(EngineType.OPERA);
+      setEngineType(UiEngineType.OPERA);
       setEngineVersion(extractVersion(m_userAgent, regex));
       return;
     }
@@ -171,7 +162,7 @@ public class BrowserInfo {
     boolean isKonqueror = StringUtility.contains(m_userAgent, regex);
     if (isKonqueror) {
       setWebkit(true);
-      setEngineType(EngineType.KONQUEROR);
+      setEngineType(UiEngineType.KONQUEROR);
       setEngineVersion(extractVersion(m_userAgent, regex));
       return;
     }
@@ -182,19 +173,19 @@ public class BrowserInfo {
     if (isWebkit) {
       setWebkit(true);
       if (m_userAgent.indexOf("Chrome") != -1) {
-        setEngineType(EngineType.CHROME);
+        setEngineType(UiEngineType.CHROME);
       }
       else if (m_userAgent.indexOf("Safari") != -1) {
         if (m_userAgent.indexOf("Android") != -1) {
-          setEngineType(EngineType.ANDROID);
+          setEngineType(UiEngineType.ANDROID);
         }
         else {
-          setEngineType(EngineType.SAFARI);
+          setEngineType(UiEngineType.SAFARI);
         }
       }
       else if (m_userAgent.indexOf("Mobile") != -1) {
         // iPad reports this in fullscreen mode
-        setEngineType(EngineType.SAFARI);
+        setEngineType(UiEngineType.SAFARI);
         setStandalone(true);
       }
       setEngineVersion(extractVersion(m_userAgent, regex));
@@ -206,7 +197,7 @@ public class BrowserInfo {
     boolean isMshtml = StringUtility.contains(m_userAgent, regex);
     if (isMshtml) {
       setMshtml(true);
-      setEngineType(EngineType.IE);
+      setEngineType(UiEngineType.IE);
       setEngineVersion(extractVersion(m_userAgent, regex));
       return;
     }
@@ -217,7 +208,7 @@ public class BrowserInfo {
     if (isGecko) {
       setGecko(true);
       if (m_userAgent.indexOf("Firefox") != -1) {
-        setEngineType(EngineType.FIREFOX);
+        setEngineType(UiEngineType.FIREFOX);
       }
       setEngineVersion(extractVersion(m_userAgent, regex));
       return;
@@ -226,7 +217,7 @@ public class BrowserInfo {
 
   protected void initSystemInfo() {
     if (m_userAgent.indexOf("Windows") != -1 || m_userAgent.indexOf("Win32") != -1 || m_userAgent.indexOf("Win64") != -1 || m_userAgent.indexOf("Win95") != -1) {
-      setSystem(System.WINDOWS);
+      setSystem(UiSystem.WINDOWS);
       if (m_userAgent.indexOf("Windows Phone") != -1 || m_userAgent.indexOf("IEMobile") != -1) {
         setSystemVersion(parseWindowsPhoneVersion(m_userAgent));
         setMobile(true);
@@ -236,10 +227,10 @@ public class BrowserInfo {
       }
     }
     else if (m_userAgent.indexOf("Macintosh") != -1 || m_userAgent.indexOf("MacPPC") != -1 || m_userAgent.indexOf("MacIntel") != -1 || m_userAgent.indexOf("Mac_PowerPC") != -1) {
-      setSystem(System.OSX);
+      setSystem(UiSystem.OSX);
     }
     else if (m_userAgent.indexOf("Android") != -1) {
-      setSystem(System.ANDROID);
+      setSystem(UiSystem.ANDROID);
       setSystemVersion(parseAndroidVersion(m_userAgent));
 
       // Update mobile/tablet flags based on android version
@@ -260,15 +251,15 @@ public class BrowserInfo {
       }
     }
     else if (m_userAgent.indexOf("X11") != -1 || m_userAgent.indexOf("Linux") != -1 || m_userAgent.indexOf("BSD") != -1 || m_userAgent.indexOf("SunOS") != -1 || m_userAgent.indexOf("DragonFly") != -1) {
-      setSystem(System.UNIX);
+      setSystem(UiSystem.UNIX);
     }
     else if (m_userAgent.indexOf("iPad") != -1) {
-      setSystem(System.IOS);
+      setSystem(UiSystem.IOS);
       setSystemVersion(parseIosVersion(m_userAgent));
       setTablet(true);
     }
     else if (m_userAgent.indexOf("iPhone") != -1 || m_userAgent.indexOf("iPod") != -1) {
-      setSystem(System.IOS);
+      setSystem(UiSystem.IOS);
       setSystemVersion(parseIosVersion(m_userAgent));
       setMobile(true);
     }
@@ -276,10 +267,6 @@ public class BrowserInfo {
 
   public String getUserAgent() {
     return m_userAgent;
-  }
-
-  public Locale getLocale() {
-    return m_locale;
   }
 
   public boolean isWebkit() {
@@ -341,19 +328,19 @@ public class BrowserInfo {
     m_isStandalone = isStandalone;
   }
 
-  public EngineType getEngineType() {
+  public UiEngineType getEngineType() {
     return m_engineType;
   }
 
-  protected void setEngineType(EngineType engineType) {
+  protected void setEngineType(UiEngineType engineType) {
     m_engineType = engineType;
   }
 
-  public System getSystem() {
+  public UiSystem getSystem() {
     return m_system;
   }
 
-  protected void setSystem(System system) {
+  protected void setSystem(UiSystem system) {
     m_system = system;
   }
 
@@ -388,7 +375,6 @@ public class BrowserInfo {
     result = prime * result + (m_isStandalone ? 1231 : 1237);
     result = prime * result + (m_isTablet ? 1231 : 1237);
     result = prime * result + (m_isWebkit ? 1231 : 1237);
-    result = prime * result + ((m_locale == null) ? 0 : m_locale.hashCode());
     result = prime * result + ((m_system == null) ? 0 : m_system.hashCode());
     result = prime * result + ((m_systemVersion == null) ? 0 : m_systemVersion.hashCode());
     result = prime * result + ((m_engineType == null) ? 0 : m_engineType.hashCode());
@@ -430,14 +416,6 @@ public class BrowserInfo {
     if (m_isWebkit != other.m_isWebkit) {
       return false;
     }
-    if (m_locale == null) {
-      if (other.m_locale != null) {
-        return false;
-      }
-    }
-    else if (!m_locale.equals(other.m_locale)) {
-      return false;
-    }
     if (m_system != other.m_system) {
       return false;
     }
@@ -473,7 +451,7 @@ public class BrowserInfo {
 
   @Override
   public String toString() {
-    StringBuffer sb = new StringBuffer("System: ").append(getSystem());
+    StringBuilder sb = new StringBuilder("System: ").append(getSystem());
     sb.append(" / SystemVersion: ").append(getSystemVersion());
     if (isWebkit()) {
       sb.append(" / isWebkit");
@@ -508,12 +486,11 @@ public class BrowserInfo {
     }
 
     String userAgent = request.getHeader("User-Agent");
-    BrowserInfo info = createFrom(userAgent, request.getLocale());
-    return info;
+    return createFrom(userAgent);
   }
 
-  public static BrowserInfo createFrom(String userAgent, Locale locale) {
-    BrowserInfo info = new BrowserInfo(userAgent, locale);
+  public static BrowserInfo createFrom(String userAgent) {
+    BrowserInfo info = new BrowserInfo(userAgent);
 
     if (LOG.isTraceEnabled()) {
       LOG.trace(info.toString());

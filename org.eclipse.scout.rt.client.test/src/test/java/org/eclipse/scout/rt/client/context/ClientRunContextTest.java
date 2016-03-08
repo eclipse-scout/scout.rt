@@ -28,9 +28,8 @@ import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.platform.nls.NlsLocale;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.ScoutTexts;
-import org.eclipse.scout.rt.shared.ui.UiDeviceType;
-import org.eclipse.scout.rt.shared.ui.UiLayer;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
+import org.eclipse.scout.rt.shared.ui.UserAgents;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.After;
 import org.junit.Before;
@@ -68,7 +67,7 @@ public class ClientRunContextTest {
     runContext.getPropertyMap().put("A", "B");
     runContext.withSubject(new Subject());
     runContext.withSession(mock(IClientSession.class), true);
-    runContext.withUserAgent(UserAgent.create(UiLayer.UNKNOWN, UiDeviceType.UNKNOWN, "n/a"));
+    runContext.withUserAgent(UserAgents.create().build());
     runContext.withLocale(Locale.CANADA_FRENCH);
 
     ClientRunContext copy = runContext.copy();
@@ -205,8 +204,8 @@ public class ClientRunContextTest {
   @Test
   public void testCurrentUserAgent() {
     IClientSession session = mock(IClientSession.class);
-    UserAgent userAgent1 = newUserAgent();
-    UserAgent userAgent2 = newUserAgent();
+    UserAgent userAgent1 = UserAgents.create().build();
+    UserAgent userAgent2 = UserAgents.create().build();
 
     // ThreadLocal set, Session set with UserAgent
     ISession.CURRENT.set(session);
@@ -224,8 +223,8 @@ public class ClientRunContextTest {
   @Test
   public void testCurrentUserAgentAndSetNullUserAgent() {
     IClientSession session = mock(IClientSession.class);
-    UserAgent userAgent1 = newUserAgent();
-    UserAgent userAgent2 = newUserAgent();
+    UserAgent userAgent1 = UserAgents.create().build();
+    UserAgent userAgent2 = UserAgents.create().build();
 
     // ThreadLocal set, Session set with UserAgent
     ISession.CURRENT.set(session);
@@ -257,9 +256,9 @@ public class ClientRunContextTest {
   @Test
   public void testCurrentUserAgentAndSetNotNullUserAgent() {
     IClientSession session = mock(IClientSession.class);
-    UserAgent userAgent1 = newUserAgent();
-    UserAgent userAgent2 = newUserAgent();
-    UserAgent userAgent3 = newUserAgent();
+    UserAgent userAgent1 = UserAgents.create().build();
+    UserAgent userAgent2 = UserAgents.create().build();
+    UserAgent userAgent3 = UserAgents.create().build();
 
     // ThreadLocal set, Session set with UserAgent
     ISession.CURRENT.set(session);
@@ -293,9 +292,5 @@ public class ClientRunContextTest {
       set.add(iterator.next());
     }
     return set;
-  }
-
-  private static UserAgent newUserAgent() {
-    return UserAgent.create(UiLayer.UNKNOWN, UiDeviceType.UNKNOWN, "n/a");
   }
 }

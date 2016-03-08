@@ -45,7 +45,7 @@ import org.eclipse.scout.rt.server.session.ServerSessionProvider;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelContentHandler;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
-import org.eclipse.scout.rt.shared.ui.UserAgent;
+import org.eclipse.scout.rt.shared.ui.UserAgents;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -87,7 +87,7 @@ public class ServiceTunnelServlet extends HttpServlet {
       @Override
       public void run() throws Exception {
         ServerRunContext serverRunContext = ServerRunContexts.copyCurrent();
-        serverRunContext.withUserAgent(UserAgent.createDefault());
+        serverRunContext.withUserAgent(UserAgents.createDefault());
         serverRunContext.withSession(lookupServerSessionOnHttpSession(null, serverRunContext));
 
         invokeAdminService(serverRunContext);
@@ -133,7 +133,7 @@ public class ServiceTunnelServlet extends HttpServlet {
     ClientNotificationCollector collector = new ClientNotificationCollector();
     ServerRunContext serverRunContext = ServerRunContexts.copyCurrent()
         .withLocale(serviceRequest.getLocale())
-        .withUserAgent(UserAgent.createByIdentifier(serviceRequest.getUserAgent()))
+        .withUserAgent(UserAgents.createByIdentifier(serviceRequest.getUserAgent()))
         .withClientNotificationCollector(collector)
         .withClientNodeId(serviceRequest.getClientNodeId());
 

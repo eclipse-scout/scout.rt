@@ -13,8 +13,6 @@ package org.eclipse.scout.rt.client.ui.basic.table;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 
-import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.ReplaceTableTest.BaseForm.MainBox.FirstGroupBox;
@@ -32,14 +30,9 @@ import org.eclipse.scout.rt.client.ui.form.fields.tabbox.AbstractTabBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.Replace;
-import org.eclipse.scout.rt.shared.ui.UiDeviceType;
-import org.eclipse.scout.rt.shared.ui.UiLayer;
-import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -50,25 +43,6 @@ import org.junit.runner.RunWith;
 @RunWithSubject("default")
 @RunWithClientSession(TestEnvironmentClientSession.class)
 public class ReplaceTableTest {
-
-  private static UserAgent m_originalUserAgent;
-
-  private static final UserAgent WEB_USER_AGENT = UserAgent.create(UiLayer.HTML, UiDeviceType.DESKTOP);
-
-  @BeforeClass
-  public static void setUpBeforeClass() {
-    // Since AbstractTable adds a different number of menus for web and rich client,
-    // we set a web user agent here, since this will be the default user agent.
-    // see: AbstractTable#addHeaderMenus()
-    IClientSession cs = ClientSessionProvider.currentSession();
-    m_originalUserAgent = cs.getUserAgent();
-    cs.setUserAgent(WEB_USER_AGENT);
-  }
-
-  @AfterClass
-  public static void tearDownAfterClass() throws Exception {
-    ClientSessionProvider.currentSession().setUserAgent(m_originalUserAgent);
-  }
 
   @Test
   public void testColumnId() {

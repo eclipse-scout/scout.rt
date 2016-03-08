@@ -27,7 +27,7 @@ import org.eclipse.scout.rt.server.commons.servlet.IHttpServletRoundtrip;
 import org.eclipse.scout.rt.server.commons.servlet.ServletExceptionTranslator;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
-import org.eclipse.scout.rt.shared.ui.UserAgent;
+import org.eclipse.scout.rt.shared.ui.UserAgents;
 
 public class DiagnosticServlet extends ServiceTunnelServlet {
   private static final long serialVersionUID = 1L;
@@ -51,7 +51,7 @@ public class DiagnosticServlet extends ServiceTunnelServlet {
       @Override
       public void run() throws Exception {
         ServerRunContext serverRunContext = ServerRunContexts.copyCurrent();
-        serverRunContext.withUserAgent(UserAgent.createDefault());
+        serverRunContext.withUserAgent(UserAgents.createDefault());
         serverRunContext.withSession(lookupServerSessionOnHttpSession(null, serverRunContext.copy()));
 
         invokeDiagnosticService(serverRunContext);

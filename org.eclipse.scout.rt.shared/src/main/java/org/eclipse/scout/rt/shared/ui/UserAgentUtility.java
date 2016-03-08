@@ -53,7 +53,7 @@ public final class UserAgentUtility {
     }
     else {
       LOG.warn("No UserAgent in calling context found; using default UserAgent");
-      return UserAgent.createDefault();
+      return UserAgents.createDefault();
     }
   }
 

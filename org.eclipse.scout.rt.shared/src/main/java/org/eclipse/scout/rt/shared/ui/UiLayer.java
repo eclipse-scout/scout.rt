@@ -18,7 +18,7 @@ public enum UiLayer implements IUiLayer {
   HTML(true),
   UNKNOWN;
 
-  boolean m_webUi;
+  final boolean m_webUi;
 
   private UiLayer(boolean webUi) {
     m_webUi = webUi;

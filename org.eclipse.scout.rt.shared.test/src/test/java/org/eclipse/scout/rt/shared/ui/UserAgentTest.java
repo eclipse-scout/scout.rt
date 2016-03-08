@@ -24,9 +24,9 @@ public class UserAgentTest {
 
   @Test
   public void testEqualsAndHashCode() {
-    UserAgent userAgentHtml = UserAgent.create(UiLayer.HTML, UiDeviceType.DESKTOP);
-    UserAgent userAgentHtml2 = UserAgent.create(UiLayer.HTML, UiDeviceType.DESKTOP);
-    UserAgent userAgentHtmlMobile = UserAgent.create(UiLayer.HTML, UiDeviceType.MOBILE);
+    UserAgent userAgentHtml = UserAgents.create().withUiLayer(UiLayer.HTML).withUiDeviceType(UiDeviceType.DESKTOP).build();
+    UserAgent userAgentHtml2 = UserAgents.create().withUiLayer(UiLayer.HTML).withUiDeviceType(UiDeviceType.DESKTOP).build();
+    UserAgent userAgentHtmlMobile = UserAgents.create().withUiLayer(UiLayer.HTML).withUiDeviceType(UiDeviceType.MOBILE).build();
 
     assertEquals(userAgentHtml, userAgentHtml2);
     assertEquals(userAgentHtml.hashCode(), userAgentHtml2.hashCode());
@@ -36,9 +36,9 @@ public class UserAgentTest {
 
     String chromeUserAgentStr = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.162 Safari/535.19";
     String firefoxUserAgentStr = "Mozilla/5.0 .. Firefox ..";
-    UserAgent userAgentHtmlChrome = UserAgent.create(UiLayer.HTML, UiDeviceType.DESKTOP, chromeUserAgentStr);
-    UserAgent userAgentHtmlChrome2 = UserAgent.create(UiLayer.HTML, UiDeviceType.DESKTOP, chromeUserAgentStr);
-    UserAgent userAgentHtmlFirefox = UserAgent.create(UiLayer.HTML, UiDeviceType.DESKTOP, firefoxUserAgentStr);
+    UserAgent userAgentHtmlChrome = UserAgents.create().withUiLayer(UiLayer.HTML).withUiDeviceType(UiDeviceType.DESKTOP).withDeviceId(chromeUserAgentStr).build();
+    UserAgent userAgentHtmlChrome2 = UserAgents.create().withUiLayer(UiLayer.HTML).withUiDeviceType(UiDeviceType.DESKTOP).withDeviceId(chromeUserAgentStr).build();
+    UserAgent userAgentHtmlFirefox = UserAgents.create().withUiLayer(UiLayer.HTML).withUiDeviceType(UiDeviceType.DESKTOP).withDeviceId(firefoxUserAgentStr).build();
 
     assertEquals(userAgentHtmlChrome, userAgentHtmlChrome2);
     assertEquals(userAgentHtmlChrome.hashCode(), userAgentHtmlChrome2.hashCode());

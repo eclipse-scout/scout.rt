@@ -20,7 +20,7 @@ import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
-import org.eclipse.scout.rt.shared.ui.UserAgent;
+import org.eclipse.scout.rt.shared.ui.UserAgents;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.junit.Test;
 
@@ -41,7 +41,7 @@ public class ClientSessionTest {
     try {
       bean = TestingUtility.registerBean(new BeanMetaData(TestEnvironmentClientSession.class));
 
-      IClientSession session = BEANS.get(ClientSessionProvider.class).provide(ClientRunContexts.empty().withUserAgent(UserAgent.createDefault()));
+      IClientSession session = BEANS.get(ClientSessionProvider.class).provide(ClientRunContexts.empty().withUserAgent(UserAgents.createDefault()));
       WeakReference<IClientSession> ref = new WeakReference<IClientSession>(session);
 
       session.stop();

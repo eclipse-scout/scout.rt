@@ -32,7 +32,7 @@ import org.eclipse.scout.rt.shared.SharedConfigProperties.NotificationSubjectPro
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
 import org.eclipse.scout.rt.shared.clientnotification.IClientNotificationService;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnel;
-import org.eclipse.scout.rt.shared.ui.UserAgent;
+import org.eclipse.scout.rt.shared.ui.UserAgents;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,7 +50,7 @@ public class ClientNotificationPoller {
       m_pollerFuture = Jobs.schedule(new P_NotificationPoller(), Jobs.newInput()
           .withRunContext(ClientRunContexts.copyCurrent()
               .withSubject(BEANS.get(NotificationSubjectProperty.class).getValue())
-              .withUserAgent(UserAgent.createDefault())
+              .withUserAgent(UserAgents.createDefault())
               .withSession(null, false))
           .withName(ClientNotificationPoller.class.getSimpleName()));
     }

@@ -27,9 +27,8 @@ import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.transaction.TransactionScope;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.ScoutTexts;
-import org.eclipse.scout.rt.shared.ui.UiDeviceType;
-import org.eclipse.scout.rt.shared.ui.UiLayer;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
+import org.eclipse.scout.rt.shared.ui.UserAgents;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.After;
 import org.junit.Before;
@@ -68,7 +67,7 @@ public class ServerRunContextTest {
     runContext.getPropertyMap().put("A", "B");
     runContext.withSubject(new Subject());
     runContext.withSession(mock(IServerSession.class));
-    runContext.withUserAgent(UserAgent.create(UiLayer.UNKNOWN, UiDeviceType.UNKNOWN, "n/a"));
+    runContext.withUserAgent(UserAgents.create().build());
     runContext.withLocale(Locale.CANADA_FRENCH);
     runContext.withTransactionScope(TransactionScope.MANDATORY);
 

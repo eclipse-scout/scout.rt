@@ -71,6 +71,7 @@ import org.eclipse.scout.rt.shared.session.IGlobalSessionListener;
 import org.eclipse.scout.rt.shared.session.ISessionListener;
 import org.eclipse.scout.rt.shared.session.SessionEvent;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
+import org.eclipse.scout.rt.shared.ui.UserAgents;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -188,7 +189,7 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
   @Override
   public UserAgent getUserAgent() {
     if (m_userAgent == null) {
-      m_userAgent = UserAgent.createDefault();
+      m_userAgent = UserAgents.createDefault();
       LOG.warn("UserAgent not set; using default [default={}]", m_userAgent);
     }
     return m_userAgent;

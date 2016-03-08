@@ -20,6 +20,7 @@ import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedException;
 import org.eclipse.scout.rt.shared.INode;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
+import org.eclipse.scout.rt.shared.ui.UserAgents;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -83,7 +84,7 @@ public abstract class AbstractServiceTunnel implements IServiceTunnel {
     UserAgent userAgent = UserAgent.CURRENT.get();
     if (userAgent == null) {
       LOG.warn("No UserAgent set on calling context; include default in service-request");
-      userAgent = UserAgent.createDefault();
+      userAgent = UserAgents.createDefault();
     }
     request.setUserAgent(userAgent.createIdentifier());
 
