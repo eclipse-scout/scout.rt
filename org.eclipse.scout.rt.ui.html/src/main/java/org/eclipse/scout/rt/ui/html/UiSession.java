@@ -287,7 +287,8 @@ public class UiSession implements IUiSession {
         .withUiLayer(UiLayer.HTML)
         .withUiDeviceType(UiDeviceType.DESKTOP)
         .withUiEngineType(browserInfo.getEngineType())
-        .withUiSystem(browserInfo.getSystem());
+        .withUiSystem(browserInfo.getSystem())
+        .withDeviceId(browserId);
 
     JSONObject userAgent = jsonStartupReq.getUserAgent();
     if (userAgent != null) {
