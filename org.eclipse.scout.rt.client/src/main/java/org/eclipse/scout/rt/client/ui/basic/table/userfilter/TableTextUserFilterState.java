@@ -11,12 +11,11 @@
 package org.eclipse.scout.rt.client.ui.basic.table.userfilter;
 
 import org.eclipse.scout.rt.client.ui.basic.userfilter.AbstractUserFilterState;
-import org.eclipse.scout.rt.client.ui.basic.userfilter.IUserFilterState;
 
 /**
  * @since 5.1
  */
-public class TableTextUserFilterState extends AbstractUserFilterState implements IUserFilterState {
+public class TableTextUserFilterState extends AbstractUserFilterState {
   private static final long serialVersionUID = 1L;
   public static final String TYPE = "text";
   private String m_text;

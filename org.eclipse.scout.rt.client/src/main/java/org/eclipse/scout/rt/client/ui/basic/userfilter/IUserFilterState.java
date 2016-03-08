@@ -25,7 +25,11 @@ public interface IUserFilterState extends Serializable {
    */
   Object createKey();
 
-  void notifyDeserialized(Object obj);
+  /**
+   * @param obj
+   * @return <code>true</code> if the deserialize operation was successful. <code>false</code> otherwise.
+   */
+  boolean notifyDeserialized(Object obj);
 
   String getDisplayText();
 }
