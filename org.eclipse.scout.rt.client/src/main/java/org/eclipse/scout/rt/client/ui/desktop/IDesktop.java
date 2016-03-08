@@ -111,6 +111,8 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent {
 
   String PROP_THEME = "theme";
 
+  String PROP_BROWSER_HISTORY = "browserHistory";
+
   public enum DesktopStyle {
     /**
      * Default desktop style with header, navigation (tree) and bench (forms).
@@ -810,5 +812,18 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent {
    * @since 5.2.0
    */
   void setTheme(String theme);
+
+  /**
+   * @return the current browser history item
+   * @since 6.0
+   */
+  BrowserHistory getBrowserHistory();
+
+  /**
+   * Sets the browser history item. Calling this method will change the URL in the address bar of the browser.
+   *
+   * @since 6.0
+   */
+  void setBrowserHistory(BrowserHistory browserHistory);
 
 }

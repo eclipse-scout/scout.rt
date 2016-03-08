@@ -455,6 +455,14 @@ scout.Desktop.prototype._onModelRemoveNotification = function(event) {
   this.removeNotification(event.id);
 };
 
+scout.Desktop.prototype._renderBrowserHistory = function() {
+  var myWindow = this.$container.window(true),
+    history = this.browserHistory;
+  myWindow.history.pushState({}, history.title, history.path);
+  // FIXME awe: (deep-links) dafür sorgen, dass man bei Klick auf den Back button immer noch auf der letzten Website landet
+  // und nicht einfach nichts passiert, so wie jetzt.
+};
+
 scout.Desktop.prototype.onModelAction = function(event) {
   if (event.type === 'formShow') {
     this._onModelFormShow(event);

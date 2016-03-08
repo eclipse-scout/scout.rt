@@ -28,6 +28,7 @@ import org.eclipse.scout.rt.client.ui.action.tool.IToolButton;
 import org.eclipse.scout.rt.client.ui.action.view.IViewButton;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
+import org.eclipse.scout.rt.client.ui.desktop.BrowserHistory;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktopUIFacade;
@@ -733,4 +734,14 @@ public class VirtualDesktop implements IDesktop {
   @Override
   public void setTheme(String theme) {
   }
+
+  @Override
+  public BrowserHistory getBrowserHistory() {
+    return null;
+  }
+
+  @Override
+  public void setBrowserHistory(BrowserHistory browserHistory) {
+  }
+
 }

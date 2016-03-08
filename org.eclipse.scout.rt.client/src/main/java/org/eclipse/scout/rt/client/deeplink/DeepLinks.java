@@ -12,7 +12,13 @@ import org.slf4j.LoggerFactory;
 /**
  * Handles GET requests having an URL starting with /view/.
  */
-// FIXME awe: (deep-links) versuchen nach deep-link redirect auf / zu machen, sonst bleibt die URL in der Location bar stehen
+// FIXME awe: (deep-links) mit J.GU und C.RU diskutieren. Müssen wir via link den Baum aufklappen können oder reicht
+// das Referenzieren der Outline? Wir haben dann ja auch noch die Bookmarks. RAP hat das auch irgendwie mit Bookmarks
+// gemacht. Aber dort wurde dann das Bookmark über den (i18n) Node-Text aufgelöst, was natürlich auch nicht so gut
+// funktioniert in mehrsprachigen Projekten. Wenn wir das haben wollen sollten wir also den fachlichen Schlüssel ver-
+// wenden, was aber Zusatzaufwand bedeutet. Ich glaube im Moment können wir ohne das leben.
+// Beispiel aus RAP: https://partner.bsiag.com/int/bsicrm_14_2/web#com.bsiag.crm.client.core.desktop.PersonalOutline-
+//   Eigene-Person-%28BSI%29-Firmen-BSI-BADEN-Tickets
 public class DeepLinks implements IDeepLinks {
   private static final Logger LOG = LoggerFactory.getLogger(DeepLinks.class);
 
@@ -21,7 +27,7 @@ public class DeepLinks implements IDeepLinks {
   private List<IDeepLinkHandler> m_handlers;
 
   public DeepLinks() {
-    // FIXME AWE: (deep-links) mit A.BR besprechen - ich finde es ungünstig, dass DeepLinks mehrfach instanziert wird
+    // FIXME awe: (deep-links) mit A.BR besprechen - ich finde es ungünstig, dass DeepLinks mehrfach instanziert wird
     // wenn man als entwickler etwas mit Singleton charakter erwartet ist es gefährlich, wenn der Ctor mehrfach aufgerufen
     // wird. Auch der ctor kann Seiteneffekte haben. Vergleiche @Singleton annotation von Google Guice.
     m_handlers = new ArrayList<>(BEANS.all(IDeepLinkHandler.class));

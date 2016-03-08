@@ -28,6 +28,7 @@ import java.util.Set;
 import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
+import org.eclipse.scout.rt.client.deeplink.OutlineHandler;
 import org.eclipse.scout.rt.client.extension.ui.action.tree.MoveActionNodesHandler;
 import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopAddTrayMenusChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopBeforeClosingChain;
@@ -1029,6 +1030,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
       m_activeOutlineListener = new P_ActiveOutlineListener();
       m_outline.addTreeListener(m_activeOutlineListener);
       m_outline.addPropertyChangeListener(m_activeOutlineListener);
+      setBrowserHistory(OutlineHandler.createBrowserHistory(this, m_outline));
     }
     // <bsh 2010-10-15>
     // Those three "setXyz(null)" statements used to be called unconditionally. Now, they
@@ -1435,6 +1437,16 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   @Override
   public void removeNotification(IDesktopNotification notification) {
     fireNotification(DesktopEvent.TYPE_NOTIFICATION_REMOVED, notification);
+  }
+
+  @Override
+  public BrowserHistory getBrowserHistory() {
+    return (BrowserHistory) propertySupport.getProperty(PROP_BROWSER_HISTORY);
+  }
+
+  @Override
+  public void setBrowserHistory(BrowserHistory browserHistory) {
+    propertySupport.setProperty(PROP_BROWSER_HISTORY, browserHistory);
   }
 
   @Override

@@ -18,6 +18,7 @@ import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.view.IViewButton;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
+import org.eclipse.scout.rt.client.ui.desktop.BrowserHistory;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
@@ -198,6 +199,17 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
       @Override
       protected Object modelValue() {
         return getModel().isCacheSplitterPosition();
+      }
+    });
+    putJsonProperty(new JsonProperty<DESKTOP>(IDesktop.PROP_BROWSER_HISTORY, model) {
+      @Override
+      protected BrowserHistory modelValue() {
+        return getModel().getBrowserHistory();
+      }
+
+      @Override
+      public Object prepareValueForToJson(Object value) {
+        return JsonBrowserHistory.toJson((BrowserHistory) value);
       }
     });
     putJsonProperty(new JsonProperty<DESKTOP>(IDesktop.PROP_LOGO_ID, model) {
