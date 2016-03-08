@@ -21,6 +21,11 @@ import java.lang.annotation.Target;
  * A class annotated with this annotation represents a Bean which is application scoped, meaning that that Bean only
  * exists once per application, or classloader. All classes marked with this annotation (or an annotation that has this
  * annotation) are automatically registered in the {@link IBeanManager}.
+ * <p>
+ * It does not ensure that the bean is constructed only once. For example multiple instances might be created if the
+ * bean is requested at almost the same time by multiple threads. However always the same instance will be used within
+ * the application (all other instances are discarded after construction and never used within the application).
+ * </p>
  */
 @Bean
 @Target({ElementType.TYPE, ElementType.METHOD, ElementType.FIELD})
