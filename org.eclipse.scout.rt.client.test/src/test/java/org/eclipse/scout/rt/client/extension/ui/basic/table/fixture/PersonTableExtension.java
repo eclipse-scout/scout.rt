@@ -26,8 +26,16 @@ public class PersonTableExtension extends AbstractTableExtension<AbstractPersonT
     return getOwner().getColumnSet().getColumnByClass(StreetColumn.class);
   }
 
+  public CityColumn getCityColumn() {
+    return getOwner().getColumnSet().getColumnByClass(CityColumn.class);
+  }
+
   @Order(100)
   public class StreetColumn extends AbstractStringColumn {
+  }
+
+  @Order(200)
+  public class CityColumn extends AbstractStringColumn {
   }
 
   public class NameColumnExtension extends AbstractStringColumnExtension<NameColumn> {
