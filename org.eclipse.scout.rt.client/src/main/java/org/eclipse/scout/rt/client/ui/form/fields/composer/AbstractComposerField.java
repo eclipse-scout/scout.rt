@@ -53,6 +53,7 @@ import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
+import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.XmlUtility;
@@ -394,6 +395,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
 
   @Override
   public void importFormFieldData(AbstractFormFieldData source, boolean valueChangeTriggersEnabled) {
+    Assertions.assertNotNull(source);
     AbstractTreeFieldData treeFieldData = (AbstractTreeFieldData) source;
     if (treeFieldData.isValueSet()) {
       if (m_tree != null) {

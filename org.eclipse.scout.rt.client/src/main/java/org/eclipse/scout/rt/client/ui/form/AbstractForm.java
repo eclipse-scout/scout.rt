@@ -1198,6 +1198,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
 
   @Override
   public void importFormData(AbstractFormData source, boolean valueChangeTriggersEnabled, IPropertyFilter filter, IFormFieldFilter formFieldFilter) {
+    Assertions.assertNotNull(source, "source form data must not be null");
     if (filter == null) {
       filter = new FormDataPropertyFilter();
     }
