@@ -1,8 +1,5 @@
 package org.eclipse.scout.rt.client.deeplink;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.regex.Matcher;
 
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
@@ -10,20 +7,19 @@ import org.eclipse.scout.rt.client.ui.desktop.BrowserHistory;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.platform.Order;
-import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-// FIXME awe: (deep-links) ausprobieren ob wir die angezeigte URL im browser ändern können wenn wir die outline
-// in der applikation wechseln. Andernfalls überlegen ob wir die URL zur Outline im Share Menü öffnen können
 @Order(1000)
 public class OutlineHandler extends AbstractDeepLinkHandler {
+
+  private static final String HANDLER_PREFIX = "outline";
 
   private static final Logger LOG = LoggerFactory.getLogger(OutlineHandler.class);
 
   public OutlineHandler() {
-    super(defaultPattern("outline"));
+    super(defaultPattern(HANDLER_PREFIX));
   }
 
   @Override
@@ -54,29 +50,12 @@ public class OutlineHandler extends AbstractDeepLinkHandler {
     LOG.info("Activate outline " + selectedOutline);
   }
 
-  public static BrowserHistory createBrowserHistory(IDesktop desktop, IOutline outline) {
-    String path = createDeepLinkPath(desktop, outline);
+  public BrowserHistory createBrowserHistory(IDesktop desktop, IOutline outline) {
+    String path = getPathPrefix() + HANDLER_PREFIX + "/" + outlineId(outline) + "/" + toSlug(outline.getTitle());
     String title = desktop.getTitle() + " - " + outline.getTitle();
     return new BrowserHistory(path, title);
   }
 
-  public static String createDeepLinkPath(IDesktop desktop, IOutline outline) {
-    return "/view/outline/" + outlineId(outline) + "/" + urlEncode(outline.getTitle());
-  }
-
-  // FIXME awe: (deep-links) impl. pretty URL encoding
-  protected static String urlEncode(String title) {
-    try {
-      return URLEncoder.encode(title.replaceAll("\\s+", "_"), StandardCharsets.UTF_8.name());
-    }
-    catch (UnsupportedEncodingException e) {
-      throw new ProcessingException("Failed to encode URL", e);
-    }
-  }
-
-  // FIXME awe: (deep-links) Schauen was wir von processAppLink in CRM verwenden können
-  // -> für Forms in CRM gleiches konzept wie in ClientDomain#processAppLink verwenden /view/domain/*
-  // -> IOutline#getOutlineId -> anschauen ob man das handling von forms und outlines in CRM irgendwie vereinheitlichen kann
   private static String outlineId(IOutline outline) {
     int nameChecksum = fletcher16(outline);
     nameChecksum = Math.abs(nameChecksum);

@@ -1038,7 +1038,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
       m_activeOutlineListener = new P_ActiveOutlineListener();
       m_outline.addTreeListener(m_activeOutlineListener);
       m_outline.addPropertyChangeListener(m_activeOutlineListener);
-      setBrowserHistory(OutlineHandler.createBrowserHistory(this, m_outline));
+      setBrowserHistory(BEANS.get(OutlineHandler.class).createBrowserHistory(this, m_outline));
     }
     // <bsh 2010-10-15>
     // Those three "setXyz(null)" statements used to be called unconditionally. Now, they

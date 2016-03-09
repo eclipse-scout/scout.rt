@@ -3,7 +3,6 @@ package org.eclipse.scout.rt.client.deeplink;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.slf4j.Logger;
@@ -21,8 +20,6 @@ import org.slf4j.LoggerFactory;
 //   Eigene-Person-%28BSI%29-Firmen-BSI-BADEN-Tickets
 public class DeepLinks implements IDeepLinks {
   private static final Logger LOG = LoggerFactory.getLogger(DeepLinks.class);
-
-  private static Pattern DEEP_LINK_REGEX = Pattern.compile("^/view/(.*)$");
 
   private List<IDeepLinkHandler> m_handlers;
 

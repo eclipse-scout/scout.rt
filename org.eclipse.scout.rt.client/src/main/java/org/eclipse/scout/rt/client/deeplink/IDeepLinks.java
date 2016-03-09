@@ -1,5 +1,7 @@
 package org.eclipse.scout.rt.client.deeplink;
 
+import java.util.regex.Pattern;
+
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 
 /**
@@ -7,6 +9,10 @@ import org.eclipse.scout.rt.platform.ApplicationScoped;
  */
 @ApplicationScoped
 public interface IDeepLinks {
+
+  String DEEP_LINK_PREFIX = "view";
+
+  Pattern DEEP_LINK_REGEX = Pattern.compile("^/" + DEEP_LINK_PREFIX + "/(.*)$");
 
   /**
    * @return True if the given path is a valid deep-link request (only syntax is checked at this point).
