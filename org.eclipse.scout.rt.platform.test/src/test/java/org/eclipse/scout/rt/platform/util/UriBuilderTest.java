@@ -17,9 +17,9 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 
-import org.eclipse.scout.rt.platform.util.UriBuilder;
 import org.junit.Test;
 
 /**
@@ -29,10 +29,41 @@ import org.junit.Test;
  */
 public class UriBuilderTest {
 
-  static final String SCHEME = "scheme";
-  static final String HOST = "host";
-  static final String PATH_TO_SCHEME = "/path/to";
-  static final String ANCHOR = "anchor";
+  private static final String SCHEME = "scheme";
+  private static final String HOST = "host";
+  private static final String PATH_TO_SCHEME = "/path/to";
+  private static final String ANCHOR = "anchor";
+
+  private static final String TEST_URI_SIMPLE = "http://localhost";
+  private static final String TEST_URI_PATH = "http://acme.com:1234/scout";
+
+  @Test
+  public void testAddPathToSimpleUrl() throws URISyntaxException {
+    UriBuilder builder = new UriBuilder(new URI(TEST_URI_SIMPLE))
+        .addPath("test");
+    assertEquals(TEST_URI_SIMPLE + "/test", builder.createURI().toString());
+  }
+
+  @Test
+  public void testAddPathToSimpleUrl2() throws URISyntaxException {
+    UriBuilder builder = new UriBuilder(new URI(TEST_URI_SIMPLE + "/"))
+        .addPath("test");
+    assertEquals(TEST_URI_SIMPLE + "/test", builder.createURI().toString());
+  }
+
+  @Test
+  public void testAddPathToFullUrl() throws URISyntaxException {
+    UriBuilder builder = new UriBuilder(new URI(TEST_URI_PATH))
+        .addPath("test");
+    assertEquals(TEST_URI_PATH + "/test", builder.createURI().toString());
+  }
+
+  @Test
+  public void testAddPathToFullUrl2() throws URISyntaxException {
+    UriBuilder builder = new UriBuilder(new URI(TEST_URI_PATH + "/"))
+        .addPath("test");
+    assertEquals(TEST_URI_PATH + "/test", builder.createURI().toString());
+  }
 
   @Test
   public void testScheme() throws Exception {
@@ -44,7 +75,7 @@ public class UriBuilderTest {
     builder.scheme("ftp");
     assertEquals("ftp", builder.getScheme());
     //
-    builder = new UriBuilder("http://acme.com:1234/scout");
+    builder = new UriBuilder(TEST_URI_PATH);
     assertEquals("http", builder.getScheme());
   }
 
@@ -59,7 +90,7 @@ public class UriBuilderTest {
     builder.host(host);
     assertEquals(host, builder.getHost());
     //
-    builder = new UriBuilder("http://acme.com:1234/scout");
+    builder = new UriBuilder(TEST_URI_PATH);
     assertEquals("acme.com", builder.getHost());
   }
 

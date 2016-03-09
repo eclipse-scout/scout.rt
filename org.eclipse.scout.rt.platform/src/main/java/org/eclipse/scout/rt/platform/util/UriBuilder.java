@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
 public class UriBuilder {
 
   private static final Logger LOG = LoggerFactory.getLogger(UriBuilder.class);
+  private static final String DEFAULT_ENCODING = UriUtility.ISO_8859_1;
 
   private final Map<String, String> m_parameters = new HashMap<>();
   private String m_scheme;
@@ -42,7 +43,7 @@ public class UriBuilder {
   }
 
   public UriBuilder(String uri) {
-    this(uri, null);
+    this(uri, DEFAULT_ENCODING);
   }
 
   public UriBuilder(String uri, String encoding) {
@@ -50,11 +51,11 @@ public class UriBuilder {
   }
 
   public UriBuilder(URL url) {
-    this(UriUtility.urlToUri(url), null);
+    this(UriUtility.urlToUri(url), DEFAULT_ENCODING);
   }
 
   public UriBuilder(URI uri) {
-    this(uri, null);
+    this(uri, DEFAULT_ENCODING);
   }
 
   public UriBuilder(URL url, String encoding) {
@@ -107,9 +108,16 @@ public class UriBuilder {
 
   public UriBuilder addPath(String path) {
     if (StringUtility.hasText(path)) {
-      m_path = StringUtility.join("/", m_path, path);
+      m_path = StringUtility.join("/", removeTrailingSlash(m_path), path);
     }
     return this;
+  }
+
+  private String removeTrailingSlash(String path) {
+    if (path != null && path.endsWith("/")) {
+      return path.substring(0, path.length() - 1);
+    }
+    return path;
   }
 
   public UriBuilder fragment(String fragment) {
@@ -131,11 +139,11 @@ public class UriBuilder {
   }
 
   public URL createURL() {
-    return createURL(null);
+    return createURL(DEFAULT_ENCODING);
   }
 
   public URI createURI() {
-    return createURI(null);
+    return createURI(DEFAULT_ENCODING);
   }
 
   public URL createURL(String encoding) {
@@ -144,35 +152,48 @@ public class UriBuilder {
 
   public URI createURI(String encoding) {
     try {
-      if (m_parameters == null || m_parameters.isEmpty()) {
-        return new URI(m_scheme, null, m_host, m_port, m_path, null, m_fragment);
-      }
-      if (encoding == null) {
-        encoding = UriUtility.ISO_8859_1;
-      }
-      StringBuilder query = new StringBuilder();
-      for (Map.Entry<String, String> param : m_parameters.entrySet()) {
-        if (!StringUtility.hasText(param.getKey())) {
-          LOG.warn("ignoring parameter with empty key");
-          continue;
-        }
-        if (query.length() > 0) {
-          query.append("&");
-        }
-        try {
-          query.append(URLEncoder.encode(param.getKey(), encoding));
-          query.append("=");
-          query.append(URLEncoder.encode(param.getValue(), encoding));
-        }
-        catch (UnsupportedEncodingException e) {
-          throw new ProcessingException("Unsupported encoding '" + encoding + "'", e);
-        }
-      }
-      return new URI(m_scheme, null, m_host, m_port, m_path, query.toString(), m_fragment);
+      ensureAbsolutePathWithHost();
+      return new URI(m_scheme, null, m_host, m_port, m_path, getQueryString(encoding), m_fragment);
     }
     catch (URISyntaxException e) {
       throw new ProcessingException("error creating URI", e);
     }
+  }
+
+  /**
+   * Ensures, that the path is absolute, if the host is defined
+   */
+  private void ensureAbsolutePathWithHost() {
+    if (m_host != null && !m_host.isEmpty() && m_path != null && !m_path.startsWith("/")) {
+      m_path = "/" + m_path;
+    }
+  }
+
+  private String getQueryString(String encoding) {
+    Assertions.assertNotNull(encoding);
+    if (m_parameters == null || m_parameters.isEmpty()) {
+      return null;
+    }
+
+    StringBuilder query = new StringBuilder();
+    for (Map.Entry<String, String> param : m_parameters.entrySet()) {
+      if (!StringUtility.hasText(param.getKey())) {
+        LOG.warn("ignoring parameter with empty key");
+        continue;
+      }
+      if (query.length() > 0) {
+        query.append("&");
+      }
+      try {
+        query.append(URLEncoder.encode(param.getKey(), encoding));
+        query.append("=");
+        query.append(URLEncoder.encode(param.getValue(), encoding));
+      }
+      catch (UnsupportedEncodingException e) {
+        throw new ProcessingException("Unsupported encoding '" + encoding + "'", e);
+      }
+    }
+    return query.toString();
   }
 
   public String getScheme() {
