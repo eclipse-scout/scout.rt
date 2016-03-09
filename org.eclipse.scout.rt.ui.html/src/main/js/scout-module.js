@@ -15,7 +15,6 @@
   __include("scout/widget/NullWidget.js");
   // Basic utilities
   __include("scout/util/arrays.js");
-  __include("scout/util/Box.js");
   __include("scout/util/BoxButtons.js");
   __include("scout/util/dates.js");
   __include("scout/util/defaultValues.js");
@@ -95,6 +94,7 @@
   __include("scout/util/tooltips.js");
   __include("scout/action/Action.js");
   __include("scout/action/ActionKeyStroke.js");
+  __include("scout/box/Box.js");
   __include("scout/popup/Popup.js");
   __include("scout/popup/PopupLayout.js");
   __include("scout/popup/PopupWithHead.js");

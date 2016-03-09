@@ -7,6 +7,7 @@
 * http://www.eclipse.org/legal/epl-v10.html
 */
 //@include("scout/main.css")
+//@include("scout/box/Box.css")
 //@include("scout/calendar/Calendar.css")
 //@include("scout/calendar/YearPanel.css")
 //@include("scout/datepicker/DatePicker.css")
@@ -82,7 +83,6 @@
 //@include("scout/tooltip/Tooltip.css")
 //@include("scout/tree/Tree.css")
 //@include("scout/tree/CompactTree.css")
-//@include("scout/util/Box.css")
 //@include("scout/util/BoxButtons.css")
 //@include("scout/util/keybox.css")
 //@include("scout/util/ui-mouse.css")
