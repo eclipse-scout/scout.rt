@@ -4,7 +4,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.desktop.BrowserHistory;
@@ -24,7 +23,7 @@ public class OutlineHandler extends AbstractDeepLinkHandler {
   private static final Logger LOG = LoggerFactory.getLogger(OutlineHandler.class);
 
   public OutlineHandler() {
-    super(Pattern.compile("^outline/(\\d+)/(.*)$"));
+    super(defaultPattern("outline"));
   }
 
   @Override

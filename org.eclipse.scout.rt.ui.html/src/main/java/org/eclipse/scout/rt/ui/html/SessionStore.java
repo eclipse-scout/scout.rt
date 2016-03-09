@@ -235,6 +235,9 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
         map.remove(uiSession);
       }
 
+      // inform the model the UI has been detached
+      clientSession.getDesktop().getUIFacade().fireGuiDetached();
+
       // Start housekeeping
       LOG.debug("{} UI sessions remaining for client session {}", (map == null ? 0 : map.size()), clientSession.getId());
       if (map == null || map.isEmpty()) {
@@ -379,8 +382,8 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
   }
 
   /**
-   * Stops the given session if it is active. To stop it, {@link IDesktopUIFacade#fireDesktopClosingFromUI(boolean)} is
-   * called, which forces the desktop to close without opening any more forms (which could be the case when using
+   * Stops the given session if it is active. To stop it, {@link IDesktopUIFacade#closeFromUI(boolean)} is called, which
+   * forces the desktop to close without opening any more forms (which could be the case when using
    * {@link IClientSession#stop()}).
    * <p>
    * If the client session is still active after that, a warning is printed to the log.
@@ -396,7 +399,7 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
     }
     else {
       LOG.debug("Forcing session with ID {} to shut down...", clientSession.getId());
-      desktop.getUIFacade().fireDesktopClosingFromUI(true); // true = force
+      desktop.getUIFacade().closeFromUI(true); // true = force
       if (clientSession.isActive()) {
         LOG.warn("Client session with ID {} is still {} after forcing it to shutdown!", clientSession.getId(), (clientSession.isStopping() ? "stopping" : "active"));
       }

@@ -14,6 +14,10 @@ public abstract class AbstractDeepLinkHandler implements IDeepLinkHandler {
     m_pattern = pattern;
   }
 
+  protected static Pattern defaultPattern(String handlerName) {
+    return Pattern.compile("^" + handlerName + "/(\\d+)/(.*)$");
+  }
+
   @Override
   public boolean matches(String path) {
     return m_pattern.matcher(path).matches();

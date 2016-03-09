@@ -60,8 +60,8 @@ public abstract class AbstractDesktopExtension implements IDesktopExtension {
   }
 
   @Override
-  public ContributionCommand guiAttachedDelegate() {
-    return execGuiAttached();
+  public ContributionCommand guiAttachedDelegate(String pathInfo) {
+    return execGuiAttached(pathInfo);
   }
 
   @Override
@@ -208,7 +208,7 @@ public abstract class AbstractDesktopExtension implements IDesktopExtension {
    */
   @ConfigOperation
   @Order(20)
-  protected ContributionCommand execGuiAttached() {
+  protected ContributionCommand execGuiAttached(String pathInfo) {
     return ContributionCommand.Continue;
   }
 

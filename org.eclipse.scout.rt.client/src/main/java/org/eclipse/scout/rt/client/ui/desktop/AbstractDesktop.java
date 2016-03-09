@@ -28,6 +28,7 @@ import java.util.Set;
 import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
+import org.eclipse.scout.rt.client.deeplink.IDeepLinks;
 import org.eclipse.scout.rt.client.deeplink.OutlineHandler;
 import org.eclipse.scout.rt.client.extension.ui.action.tree.MoveActionNodesHandler;
 import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopAddTrayMenusChain;
@@ -355,13 +356,20 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   /**
-   * Called after a UI has been attached to this desktop. This desktop must not necessarily be open.
+   * Called after a UI has been attached to this desktop. The desktop is opened at this point. Typically you will open
+   * and activate the outline and forms which must be visible on start-up in this method. This method may be called more
+   * than once. It is called immediately after the desktop has been opened and also in case of a reload, when a new
+   * UiSession has been created.
    * <p>
    * Subclasses can override this method. The default does nothing.
+   *
+   * @param pathInfo
+   *          The part of the URL which started the Scout application. You can use the pathInfo to perform deep-link
+   *          actions. See: {@link IDeepLinks}.
    */
   @ConfigOperation
   @Order(50)
-  protected void execGuiAttached() {
+  protected void execGuiAttached(String pathInfo) {
   }
 
   /**
@@ -1891,7 +1899,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     fireDesktopClosed();
   }
 
-  private void attachGui() {
+  private void attachGui(String pathInfo) {
     if (isGuiAvailable()) {
       return;
     }
@@ -1900,7 +1908,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     //extensions
     for (IDesktopExtension ext : getDesktopExtensions()) {
       try {
-        ContributionCommand cc = ext.guiAttachedDelegate();
+        ContributionCommand cc = ext.guiAttachedDelegate(pathInfo);
         if (cc == ContributionCommand.Stop) {
           break;
         }
@@ -2044,8 +2052,8 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     }
 
     @Override
-    public ContributionCommand guiAttachedDelegate() {
-      interceptGuiAttached();
+    public ContributionCommand guiAttachedDelegate(String pathInfo) {
+      interceptGuiAttached(pathInfo);
       return ContributionCommand.Continue;
     }
 
@@ -2101,8 +2109,8 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   protected class P_UIFacade implements IDesktopUIFacade {
 
     @Override
-    public void fireGuiAttached() {
-      attachGui();
+    public void fireGuiAttached(String pathInfo) {
+      attachGui(pathInfo);
     }
 
     @Override
@@ -2111,7 +2119,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     }
 
     @Override
-    public void fireDesktopOpenedFromUI() {
+    public void openFromUI() {
       setOpenedInternal(true);
       //extensions
       for (IDesktopExtension ext : getDesktopExtensions()) {
@@ -2128,7 +2136,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     }
 
     @Override
-    public void fireDesktopClosingFromUI(boolean forcedClosing) {
+    public void closeFromUI(boolean forcedClosing) {
       setForcedClosing(forcedClosing);
       // necessary so that no forms can be opened anymore.
       if (forcedClosing) {
@@ -2316,8 +2324,8 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     }
 
     @Override
-    public void execGuiAttached(DesktopGuiAttachedChain chain) {
-      getOwner().execGuiAttached();
+    public void execGuiAttached(DesktopGuiAttachedChain chain, String pathInfo) {
+      getOwner().execGuiAttached(pathInfo);
     }
 
     @Override
@@ -2387,10 +2395,10 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     chain.execPageDetailTableChanged(oldTable, newTable);
   }
 
-  protected final void interceptGuiAttached() {
+  protected final void interceptGuiAttached(String pathInfo) {
     List<? extends org.eclipse.scout.rt.client.extension.ui.desktop.IDesktopExtension<? extends AbstractDesktop>> extensions = getAllExtensions();
     DesktopGuiAttachedChain chain = new DesktopGuiAttachedChain(extensions);
-    chain.execGuiAttached();
+    chain.execGuiAttached(pathInfo);
   }
 
   protected final void interceptGuiDetached() {

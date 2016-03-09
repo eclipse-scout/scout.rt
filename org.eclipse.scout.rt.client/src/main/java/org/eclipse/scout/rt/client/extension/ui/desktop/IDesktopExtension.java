@@ -60,7 +60,7 @@ public interface IDesktopExtension<DESKTOP extends AbstractDesktop> extends IExt
 
   void execPageDetailTableChanged(DesktopPageDetailTableChangedChain chain, ITable oldTable, ITable newTable);
 
-  void execGuiAttached(DesktopGuiAttachedChain chain);
+  void execGuiAttached(DesktopGuiAttachedChain chain, String pathInfo);
 
   void execGuiDetached(DesktopGuiDetachedChain chain);
 

@@ -226,11 +226,11 @@ public final class DesktopChains {
       super(extensions);
     }
 
-    public void execGuiAttached() {
+    public void execGuiAttached(final String pathInfo) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
         protected void callMethod(IDesktopExtension<? extends AbstractDesktop> next) {
-          next.execGuiAttached(DesktopGuiAttachedChain.this);
+          next.execGuiAttached(DesktopGuiAttachedChain.this, pathInfo);
         }
       };
       callChain(methodInvocation);

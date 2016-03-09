@@ -18,7 +18,12 @@ public interface IDeepLinks {
    * Handles the deep-link request.
    *
    * @path The path-info of the HTTP request (URL without protocol, host, port and context-path)
+   * @return whether or not a handler has handled the request
+   * @throws IllegalArgumentException
+   *           when path is not a valid deep-link (check with isRequestValid() before you call this method)
+   * @throws DeepLinkException
+   *           when the deep-link couldn't be processed for some reasons (e.g. missing permissions)
    */
-  boolean handleRequest(String path);
+  boolean handleRequest(String path) throws DeepLinkException;
 
 }

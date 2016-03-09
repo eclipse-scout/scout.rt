@@ -40,7 +40,6 @@ import javax.servlet.http.HttpSession;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
-import org.eclipse.scout.rt.client.deeplink.IDeepLinks;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
@@ -384,32 +383,16 @@ public class UiSession implements IUiSession {
     return BEANS.get(UiJobs.class).awaitAndGet(future);
   }
 
-  protected void startDesktop(final String startupUrl) {
+  protected void startDesktop(final String pathInfo) {
     final IFuture<Void> future = ModelJobs.schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
         IDesktop desktop = m_clientSession.getDesktop();
-
-        boolean tryDeepLink = false;
-        IDeepLinks deepLinks = BEANS.get(IDeepLinks.class);
-        if (deepLinks.isRequestValid(startupUrl)) {
-          tryDeepLink = true;
+        if (!desktop.isOpened()) {
+          desktop.getUIFacade().openFromUI();
         }
-        // if the startup URL looks like a deep-link, try to handle the deep-link
-        boolean deepLinkSuccessful = false;
-        if (!desktop.isOpened() && tryDeepLink) {
-          deepLinkSuccessful = deepLinks.handleRequest(startupUrl);
-          LOG.debug("tried to handle deep-link request '{}' success={}", startupUrl, deepLinkSuccessful);
-        }
-        // if deep-link handling failed for some reason, we must execute default desktop open handling
-        if (!desktop.isOpened() && !deepLinkSuccessful) {
-          desktop.getUIFacade().fireDesktopOpenedFromUI();
-          LOG.debug("perform default desktopOpened. deepLinkSuccessful={}", deepLinkSuccessful);
-        }
-        if (!desktop.isGuiAvailable()) {
-          desktop.getUIFacade().fireGuiAttached();
-        }
+        desktop.getUIFacade().fireGuiAttached(pathInfo);
       }
     }, ModelJobs.newInput(ClientRunContexts.copyCurrent()
         .withSession(m_clientSession, true))

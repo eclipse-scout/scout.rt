@@ -93,7 +93,7 @@ public interface IDesktopExtension {
    * @return {@code ContributionCommand.Continue} if further extensions should be processed,
    *         {@code ContributionCommand.Stop} otherwise
    */
-  ContributionCommand guiAttachedDelegate();
+  ContributionCommand guiAttachedDelegate(String pathInfo);
 
   /**
    * Called after a UI has been detached from the core desktop. The desktop must not necessarily be open.

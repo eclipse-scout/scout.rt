@@ -28,7 +28,7 @@ public interface IDesktopUIFacade {
   /**
    * GUI fires this event as soon as the desktop was completely setup and displayed
    */
-  void fireDesktopOpenedFromUI();
+  void openFromUI();
 
   /**
    * GUI fires this event when it is in the process of closing the workbench / application
@@ -40,12 +40,16 @@ public interface IDesktopUIFacade {
    *          {@link AbstractDesktop#doBeforeClosingInternal()} will be ignored. Otherwise if set to <code>false</code>
    *          vetos are accepted.
    */
-  void fireDesktopClosingFromUI(boolean forcedClosing);
+  void closeFromUI(boolean forcedClosing);
 
   /**
-   * GUI fires this event as soon as a gui is available
+   * GUI fires this event when a UiSession has been attached to the desktop. The desktop is open at this point. The
+   * event occurs after openFromUI().
+   *
+   * @param pathInfo
+   *          The part of the URL which started the Scout application
    */
-  void fireGuiAttached();
+  void fireGuiAttached(String pathInfo);
 
   /**
    * GUI fires this event when the application/workbench is closing

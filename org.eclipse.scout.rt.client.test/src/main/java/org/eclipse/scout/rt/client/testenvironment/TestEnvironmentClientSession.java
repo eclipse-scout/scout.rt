@@ -83,7 +83,7 @@ public class TestEnvironmentClientSession extends AbstractClientSession {
    * Simulates that the desktop has been opened.
    */
   protected void simulateDesktopOpened(IDesktop desktop) {
-    desktop.getUIFacade().fireGuiAttached();
-    desktop.getUIFacade().fireDesktopOpenedFromUI();
+    desktop.getUIFacade().openFromUI();
+    desktop.getUIFacade().fireGuiAttached("/");
   }
 }

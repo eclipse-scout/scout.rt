@@ -30,6 +30,8 @@ public class DeepLinks implements IDeepLinks {
     // FIXME awe: (deep-links) mit A.BR besprechen - ich finde es ungünstig, dass DeepLinks mehrfach instanziert wird
     // wenn man als entwickler etwas mit Singleton charakter erwartet ist es gefährlich, wenn der Ctor mehrfach aufgerufen
     // wird. Auch der ctor kann Seiteneffekte haben. Vergleiche @Singleton annotation von Google Guice.
+    // FIXME awe: auch mit A.BR besprechen: wenn etwas mit Bean annotiert ist und auf der Klasse kein geeigneter Ctor
+    // gefunden wird, bitte eine Exception werfen, nicht einfach silent verschlucken!
     m_handlers = new ArrayList<>(BEANS.all(IDeepLinkHandler.class));
     if (LOG.isInfoEnabled()) {
       StringBuilder sb = new StringBuilder();
@@ -56,27 +58,15 @@ public class DeepLinks implements IDeepLinks {
   }
 
   @Override
-  public boolean handleRequest(String path) {
+  public boolean handleRequest(String path) throws DeepLinkException {
     String deepLinkPath = getDeepLinkPath(path);
     if (deepLinkPath == null) {
       throw new IllegalArgumentException("Called handleRequest but path is not a valid deep-link: " + path);
     }
 
     for (IDeepLinkHandler handler : m_handlers) {
-      try {
-        if (handler.handle(deepLinkPath)) {
-          return true;
-        }
-      }
-      catch (DeepLinkException e) {
-        // FIXME awe: (deep-links) mit J.GU besprechen: wie machen wir error-handling? Vorschlag:
-        // - beim validieren (GET) -> 404
-        // - beim handle (POST/Startup) -> message-box o.ä.
-        // clientSession.getDesktop().showMessageBox(messageBox); --> messagebox
-        // -> so machen
-        // im fehlerfall müssen wir aber zuerst open-deskop (default) machen... und _dann_ erst
-        // die message-box anzeigen, das ist etwas komplizierter
-        LOG.warn("Failed to handle deep-link", e);
+      if (handler.handle(deepLinkPath)) {
+        return true;
       }
     }
 
