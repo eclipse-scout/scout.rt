@@ -15,6 +15,7 @@
   __include("scout/widget/NullWidget.js");
   // Basic utilities
   __include("scout/util/arrays.js");
+  __include("scout/util/Box.js");
   __include("scout/util/BoxButtons.js");
   __include("scout/util/dates.js");
   __include("scout/util/defaultValues.js");

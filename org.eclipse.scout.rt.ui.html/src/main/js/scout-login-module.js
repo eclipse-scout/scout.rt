@@ -10,10 +10,13 @@
 (function(scout, $, undefined) {
   __include("jquery/jquery-scout.js");
   __include("scout/main.js");
+  __include("scout/util/Box.js");
   __include("scout/text/Texts.js");
   __include("scout/util/strings.js");
   __include("scout/util/Device.js");
   __include("scout/util/strings.js");
   __include("scout/login/login.js");
+  __include("scout/login/LoginBox.js");
   __include("scout/login/logout.js");
+  __include("scout/login/LogoutBox.js");
 }(window.scout = window.scout || {}, jQuery));

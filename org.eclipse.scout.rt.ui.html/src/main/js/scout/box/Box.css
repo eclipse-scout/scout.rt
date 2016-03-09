@@ -1,0 +1,93 @@
+/*******************************************************************************
+ * Copyright (c) 2014-2015 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
+/**
+ * Used for static pages like login, logout, unsupported-browser and noscript section.
+ * Note: This box must not depend on javascript because it is used for the noscript section as well.
+ */
+@box-width: 420px;
+@box-margin-top: 15px;
+.box {
+  display: table;
+  position: absolute;
+  height: 75%;
+  width: 100%;
+  margin-top: @box-margin-top;
+
+  & > .wrapper {
+    display: table-cell;
+    vertical-align: middle;
+  }
+}
+
+
+.box-content {
+  border: 1px solid @palette-gray-5;
+  background-color: @background-color;
+  max-width: @box-width;
+  margin: 0 auto;
+  padding: 40px 70px;
+  #scout.drop-shadow();
+
+  & > .header {
+    text-align: center;
+
+    & > .logo {
+      margin-top: 5px;
+      margin-bottom: 40px;
+    }
+  }
+
+  & > .button-bar {
+    padding-top: 32px;
+    text-align: center;
+
+    & > .button {
+      padding: 7px @button-padding-x;
+    }
+  }
+
+  &.small > .header > .logo {
+    width: 50%;
+  }
+
+  &.centered {
+    text-align: center;
+  }
+}
+
+@media (max-width: (@box-width + 40px)) {
+  .box-content {
+    & > .header > .logo {
+      margin-bottom: 20px;
+    }
+
+    padding: 20px;
+    margin-left: 10px;
+    margin-right: 10px;
+  }
+}
+
+@media (max-height: 400px) {
+  .box-content {
+    & > .header > .logo {
+      margin-bottom: 20px;
+    }
+
+    padding-top: 20px;
+    padding-bottom: 20px;
+  }
+}
+
+@media (max-height: 700px) {
+  .box {
+    height: calc(100% - (@box-margin-top / 2));
+  }
+}

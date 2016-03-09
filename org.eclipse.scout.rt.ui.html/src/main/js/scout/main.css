@@ -428,93 +428,10 @@ a,
   z-index: 0;
 }
 
-@box-with-logo-width: 420px;
-@box-with-logo-margin-top: 15px;
-.box-with-logo {
-  display: table;
-  position: absolute;
-  height: 75%;
-  width: 100%;
-  margin-top: @box-with-logo-margin-top;
-
-  & > .wrapper {
-    display: table-cell;
-    vertical-align: middle;
-  }
-}
-
-/*
- * Used for static pages like login, logout, unsupported-browser and noscript section.
- * Beside custom elements it may contain a header with a logo and a button bar.
- */
-.box-with-logo-content {
-  border: 1px solid @palette-gray-5;
-  background-color: @background-color;
-  max-width: @box-with-logo-width;
-  margin: 0 auto;
-  padding: 40px 70px;
-  #scout.drop-shadow();
-
-  & > .header {
-    text-align: center;
-
-    & > .logo {
-      margin-top: 5px;
-      margin-bottom: 40px;
-    }
-  }
-
-  & > .button-bar {
-    padding-top: 32px;
-    text-align: center;
-
-    & > .button {
-      padding: 7px @button-padding-x;
-    }
-  }
-
-  &.small > .header > .logo {
-    width: 50%;
-  }
-
-  &.centered {
-    text-align: center;
-  }
-}
-
 noscript {
   display: block;
 
-  & > .wrapper > .box-with-logo-content > h1 {
+  & > .wrapper > .box-content > h1 {
     #scout.font-text-normal(bold);
-  }
-}
-
-@media (max-width: (@box-with-logo-width + 40px)) {
-  .box-with-logo-content {
-    & > .header > .logo {
-      margin-bottom: 20px;
-    }
-
-    padding: 20px;
-    margin-left: 10px;
-    margin-right: 10px;
-  }
-}
-
-@media (max-height: 400px) {
-  .box-with-logo-content {
-    & > .header > .logo {
-      margin-bottom: 20px;
-    }
-
-    padding-top: 20px;
-    padding-bottom: 20px;
-  }
-}
-
-@media (max-height: 700px) {
-  .box-with-logo {
-    height: calc(100% - (@box-with-logo-margin-top / 2));
   }
 }
