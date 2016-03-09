@@ -52,11 +52,11 @@ public final class UserAgents {
     return withDeviceId(ConfigUtility.getProperty("os.name"));
   }
 
-  public static final UserAgents create() {
+  public static UserAgents create() {
     return new UserAgents();
   }
 
-  public static final UserAgents create(UserAgent other) {
+  public static UserAgents create(UserAgent other) {
     return new UserAgents()
         .withUiDeviceType(other.getUiDeviceType())
         .withUiEngineType(other.getUiEngineType())
@@ -69,7 +69,7 @@ public final class UserAgents {
     return new UserAgent(m_uiLayer, m_uiDeviceType, m_uiEngineType, m_uiSystem, m_uiDeviceId);
   }
 
-  public static final UserAgent createDefault() {
+  public static UserAgent createDefault() {
     return create()
         .withDefaultDeviceId()
         .build();
@@ -82,7 +82,7 @@ public final class UserAgents {
     catch (RuntimeException e) {
       LOG.error("UserAgentIdentifier could not be parsed. Exception occured while parsing. UserAgent: {}", userAgent, e);
     }
-    return UserAgents.createDefault();
+    return createDefault();
   }
 
   public static UserAgent createByIdentifier(String userAgent) {

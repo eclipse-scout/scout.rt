@@ -66,8 +66,8 @@ public class DefaultUserAgentParser implements IUserAgentParser {
   public String createIdentifier(UserAgent userAgent) {
     String uiDeviceId = userAgent.getUiDeviceId();
     if (uiDeviceId.contains(DELIMITER)) {
-      String newDeviceId = uiDeviceId.replaceAll(DELIMITER, "_");
-      LOG.warn("Character which is used as delimiter has been found in uiDeviceId. Replaced with '_'. Old uiDeviceId: {}. New uiDeviceId: {}", userAgent.getUiDeviceId(), newDeviceId);
+      uiDeviceId = uiDeviceId.replaceAll("\\" + DELIMITER, "_");
+      LOG.warn("Character which is used as delimiter has been found in uiDeviceId. Replaced with '_'. Old uiDeviceId: {}. New uiDeviceId: {}", userAgent.getUiDeviceId(), uiDeviceId);
     }
     return StringUtility.concatenateTokens(
         userAgent.getUiLayer().getIdentifier(), DELIMITER,

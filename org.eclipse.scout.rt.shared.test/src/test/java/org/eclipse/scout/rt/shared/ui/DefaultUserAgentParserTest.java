@@ -53,4 +53,23 @@ public class DefaultUserAgentParserTest {
     assertEquals(testUserAgent, parsedAgent);
   }
 
+  @Test
+  public void testParseInvalidDeviceId() {
+    UserAgent testUserAgent = UserAgents
+        .create()
+        .withUiLayer(UiLayer.HTML)
+        .withUiDeviceType(UiDeviceType.MOBILE)
+        .withUiEngineType(UiEngineType.ANDROID)
+        .withUiSystem(UiSystem.ANDROID)
+        .withDeviceId("xxx|yyy")
+        .build();
+    DefaultUserAgentParser parser = new DefaultUserAgentParser();
+    String id = testUserAgent.createIdentifier(parser);
+
+    UserAgent parsedAgent = UserAgents.createByIdentifier(parser, id);
+    assertEquals(testUserAgent.getUiDeviceType(), parsedAgent.getUiDeviceType());
+    assertEquals(testUserAgent.getUiLayer(), parsedAgent.getUiLayer());
+
+  }
+
 }

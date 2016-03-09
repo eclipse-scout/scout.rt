@@ -65,5 +65,5 @@ public interface IIndex<INDEX, ELEMENT> extends Iterable<ELEMENT> {
    * Iterator to iterate over indexed elements.
    */
   @Override
-  public Iterator<ELEMENT> iterator();
+  Iterator<ELEMENT> iterator();
 }
