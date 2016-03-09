@@ -15,10 +15,57 @@ scout.PopupLayout = function(popup) {
 scout.inherits(scout.PopupLayout, scout.AbstractLayout);
 
 scout.PopupLayout.prototype.layout = function($container) {
-  var htmlComp = this.popup.htmlComp,
-    popupSize = new scout.Dimension(),
-    prefSize = this.preferredLayoutSize($container),
-    maxSizes = this._calcMaxSizes();
+  var popupSize,
+    htmlComp = this.popup.htmlComp,
+    prefSize = this.preferredLayoutSize($container);
+
+  if (this.popup.boundToAnchor) {
+    popupSize = this._adjustSizeWithAnchor(prefSize);
+  } else {
+    popupSize = this._adjustSize(prefSize);
+  }
+
+  scout.graphics.setSize(htmlComp.$comp, popupSize);
+};
+
+scout.PopupLayout.prototype._adjustSize = function(prefSize) {
+  var popupSize = new scout.Dimension(),
+    maxSize = this._calcMaxSize();
+
+  // Ensure the popup is not larger than max size
+  popupSize.width = Math.min(maxSize.width, prefSize.width);
+  popupSize.height = Math.min(maxSize.height, prefSize.height);
+
+  return popupSize;
+};
+
+/**
+ * Considers window boundaries.
+ *
+ * @returns {scout.Dimension}
+ */
+scout.PopupLayout.prototype._calcMaxSize = function() {
+  // Position the popup at the desired location before doing any calculations to consider the preferred bounds
+  this.popup.position(false);
+
+  var maxWidth, maxHeight,
+    htmlComp = this.popup.htmlComp,
+    windowPaddingX = this.popup.windowPaddingX,
+    windowPaddingY = this.popup.windowPaddingY,
+    popupMargins = htmlComp.getMargins(),
+    popupBounds = htmlComp.getBounds(),
+    $window = this.popup.$container.window(),
+    windowSize = new scout.Dimension($window.width(), $window.height());
+
+  maxWidth = (windowSize.width - popupMargins.horizontal() - popupBounds.x - windowPaddingX);
+  maxHeight = (windowSize.height - popupMargins.vertical() - popupBounds.y - windowPaddingY);
+
+  return new scout.Dimension(maxWidth, maxHeight);
+};
+
+scout.PopupLayout.prototype._adjustSizeWithAnchor = function(prefSize) {
+  var popupSize = new scout.Dimension(),
+    maxSize = this._calcMaxSizeAroundAnchor();
   // Decide whether the prefSize can be used or the popup needs to be shrinked so that it fits into the viewport
   // The decision is based on the preferred opening direction
   // Example: The popup would like to be opened right and down
@@ -30,33 +77,32 @@ scout.PopupLayout.prototype.layout = function($container) {
   popupSize.width = prefSize.width;
   if (this.popup.trimWidth) {
     if (this.popup.openingDirectionX === 'right' &&
-      prefSize.width > maxSizes.right && prefSize.width > maxSizes.left) {
-      popupSize.width = Math.max(maxSizes.right, maxSizes.left);
+      prefSize.width > maxSize.right && prefSize.width > maxSize.left) {
+      popupSize.width = Math.max(maxSize.right, maxSize.left);
     } else if (this.popup.openingDirectionX === 'left' &&
-      prefSize.width > maxSizes.left && prefSize.width > maxSizes.right) {
-      popupSize.width = Math.max(maxSizes.right, maxSizes.left);
+      prefSize.width > maxSize.left && prefSize.width > maxSize.right) {
+      popupSize.width = Math.max(maxSize.right, maxSize.left);
     }
   }
   popupSize.height = prefSize.height;
   if (this.popup.trimHeight) {
     if (this.popup.openingDirectionY === 'down' &&
-      prefSize.height > maxSizes.bottom && prefSize.height > maxSizes.top) {
-      popupSize.height = Math.max(maxSizes.bottom, maxSizes.top);
+      prefSize.height > maxSize.bottom && prefSize.height > maxSize.top) {
+      popupSize.height = Math.max(maxSize.bottom, maxSize.top);
     } else if (this.popup.openingDirectionY === 'up' &&
-      prefSize.height > maxSizes.top && prefSize.height > maxSizes.bottom) {
-      popupSize.height = Math.max(maxSizes.bottom, maxSizes.top);
+      prefSize.height > maxSize.top && prefSize.height > maxSize.bottom) {
+      popupSize.height = Math.max(maxSize.bottom, maxSize.top);
     }
   }
-
-  scout.graphics.setSize(htmlComp.$comp, popupSize);
+  return popupSize;
 };
 
 /**
- * Calculates the available space around the anchor.
+ * Considers window boundaries.
  *
- * @returns {scout.Insets}
+ * @returns {scout.Dimension}
  */
-scout.PopupLayout.prototype._calcMaxSizes = function() {
+scout.PopupLayout.prototype._calcMaxSizeAroundAnchor = function() {
   var maxWidthLeft, maxWidthRight, maxHeightDown, maxHeightUp,
     htmlComp = this.popup.htmlComp,
     windowPaddingX = this.popup.windowPaddingX,

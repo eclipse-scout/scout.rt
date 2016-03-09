@@ -68,6 +68,7 @@ scout.SmartField.prototype.addPopup = function() {
     this._popup = scout.create(popupType, {
       parent: this,
       $anchor: this.$field,
+      boundToAnchor: !this.touch,
       field: this
     });
   }

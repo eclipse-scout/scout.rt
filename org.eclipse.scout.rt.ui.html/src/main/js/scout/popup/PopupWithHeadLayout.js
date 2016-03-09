@@ -40,7 +40,7 @@ scout.PopupWithHeadLayout.prototype.layout = function($container) {
 /**
  * @override
  */
-scout.PopupWithHeadLayout.prototype._calcMaxSizes = function() {
+scout.PopupWithHeadLayout.prototype._calcMaxSizeAroundAnchor = function() {
   // Position the popup at the desired location before doing any calculations,
   // but do no try to switch the position if there is not enough space
   this.popup.position(false);

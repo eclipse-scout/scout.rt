@@ -29,6 +29,8 @@ scout.Popup = function() {
   // hints for the layout to control whether the size should be adjusted if the popup does not fit into the window
   this.trimWidth;
   this.trimHeight;
+  // If true, anchor is considered when computing the position and size of the popup
+  this.boundToAnchor;
 };
 scout.inherits(scout.Popup, scout.Widget);
 
@@ -58,6 +60,7 @@ scout.Popup.prototype._init = function(options) {
   });
   this.focusableContainer = scout.nvl(options.focusableContainer, false);
   this.scrollType = options.scrollType || 'remove';
+  this.boundToAnchor = scout.nvl(options.boundToAnchor, true);
 };
 
 scout.Popup.prototype._initKeyStrokeContext = function(keyStrokeContext) {
@@ -163,7 +166,7 @@ scout.Popup.prototype._attachCloseHandler = function() {
   this.session.desktop.on('popupopen', this._popupOpenHandler);
 
   // Install scroll close handler
-  if (this.$anchor && this.scrollType) {
+  if (this.$anchor && this.boundToAnchor && this.scrollType) {
     this._scrollHandler = this._onAnchorScroll.bind(this);
     scout.scrollbars.onScroll(this.$anchor, this._scrollHandler);
   }
@@ -274,7 +277,7 @@ scout.Popup.prototype._onKeyStrokeExecuted = function(event) {
 
 scout.Popup.prototype.prefLocation = function($container, openingDirectionY) {
   var x, y, anchorBounds, height, openingDirectionX;
-  if (!this.anchorBounds && !this.$anchor) {
+  if (!this.boundToAnchor || (!this.anchorBounds && !this.$anchor)) {
     return;
   }
   openingDirectionX = 'right'; // always use right at the moment
@@ -384,7 +387,7 @@ scout.Popup.prototype.setLocation = function(location) {
  * Popups with an anchor must only be visible if the anchor is in view (prevents that the popup points at an invisible anchor)
  */
 scout.Popup.prototype._validateVisibility = function() {
-  if (!this.$anchor) {
+  if (this.boundToAnchor && !this.$anchor) {
     return;
   }
   var inView = this._isInView();
@@ -396,7 +399,7 @@ scout.Popup.prototype._validateVisibility = function() {
 };
 
 scout.Popup.prototype._isInView = function() {
-  if (!this.$anchor) {
+  if (this.boundToAnchor && !this.$anchor) {
     return;
   }
   var anchorBounds = this.getAnchorBounds();
