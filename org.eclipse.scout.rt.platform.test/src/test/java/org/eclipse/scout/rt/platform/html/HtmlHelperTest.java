@@ -111,4 +111,21 @@ public class HtmlHelperTest {
     assertEquals("key:\tvalue\r\nline2", helper.unescape("key:\tvalue\r\nline2"));
     assertEquals("hell&ouml;", helper.unescape("hell&ouml;"));
   }
+
+  @Test
+  public void testNewLineToBr() {
+    HtmlHelper helper = BEANS.get(HtmlHelper.class);
+
+    assertEquals(null, helper.newLineToBr(null));
+    assertEquals("", helper.newLineToBr(""));
+    assertEquals(" ", helper.newLineToBr(" "));
+    assertEquals("hello", helper.newLineToBr("hello"));
+    assertEquals("<br>", helper.newLineToBr("<br>"));
+
+    assertEquals("foo\rbar", helper.newLineToBr("foo\rbar"));
+    assertEquals("foo<br>bar", helper.newLineToBr("foo\r\nbar"));
+    assertEquals("foo<br>bar", helper.newLineToBr("foo\nbar"));
+    assertEquals("foo<br>bar", helper.newLineToBr("foo\r\nbar"));
+    assertEquals("foo<br>bar<br>foo", helper.newLineToBr("foo\nbar\r\nfoo"));
+  }
 }
