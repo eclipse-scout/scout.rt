@@ -18,16 +18,20 @@
   }
 }
 
+/*
+ * Login button is a default button -> styles are defined in main.css.
+ * Difference to regular default button is the disabled style and the ability to turn red.
+ */
 .login-button {
-  background-color: @default-button-background-color;
-  color: @default-button-color;
-  border-width: 0;
 
-  &:active {
-    background-color: @default-button-active-background-color;
+  &:disabled {
+    color: @default-button-color;
+    border-color: @default-button-background-color;
+    background-color: @default-button-background-color;
   }
 
-  &.login-error {
+  &.login-error:not(.disabled) {
+    border-color: @palette-red-4;
     background-color: @palette-red-4;
 
     /* Also change color of focus glow */
@@ -36,7 +40,12 @@
       #scout.glow(@palette-red-4);
     }
 
+    &:hover {
+      background-color: @palette-red-4;
+    }
+
     &:active {
+      border-color: @palette-red-4;
       background-color: darken(@palette-red-4, 5%);
     }
   }

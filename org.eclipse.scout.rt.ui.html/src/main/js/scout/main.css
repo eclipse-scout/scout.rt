@@ -217,6 +217,31 @@ button {
     }
   }
 
+  &.default:not(.disabled) {
+    background-color: @default-button-background-color;
+    /* border is necessary to align the text with text from buttons with a real border */
+    border-color: @default-button-background-color;
+    color: @default-button-color;
+
+    &:focus {
+      color: @default-button-color;
+    }
+
+    &:hover {
+      background-color: @default-button-hover-background-color;
+    }
+
+    &:active {
+      background-color: @default-button-active-background-color;
+      border-color: @default-button-active-background-color;
+    }
+
+    & > .font-icon {
+      font-weight: normal;
+      color: @icon-inverted-color;
+    }
+  }
+
   &:disabled {
     background-color: @button-disabled-background-color;
     border-color: @button-disabled-border-color;
