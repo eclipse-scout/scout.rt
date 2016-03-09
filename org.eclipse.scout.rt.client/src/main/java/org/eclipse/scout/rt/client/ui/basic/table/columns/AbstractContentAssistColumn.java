@@ -321,29 +321,18 @@ public abstract class AbstractContentAssistColumn<VALUE, LOOKUP_TYPE> extends Ab
       tableRow.setRowChanging(true);
       //
       Cell cell = tableRow.getCellForUpdate(this);
-      if (result.size() == 1) {
-        cell.setText(result.get(0).getText());
-        cell.setTooltipText(result.get(0).getTooltipText());
-      }
-      else if (result.size() > 1) {
-        String separator = getResultRowSeparator();
+      String separator = getResultRowSeparator();
 
-        List<String> texts = CollectionUtility.emptyArrayList();
-        List<String> tooltipTexts = CollectionUtility.emptyArrayList();
+      List<String> texts = CollectionUtility.emptyArrayList();
+      List<String> tooltipTexts = CollectionUtility.emptyArrayList();
 
-        for (int i = 0; i < result.size(); i++) {
-          ILookupRow<?> row = result.get(i);
-          texts.add(row.getText());
-          tooltipTexts.add(row.getTooltipText());
-        }
+      for (ILookupRow<?> row : result) {
+        texts.add(row.getText());
+        tooltipTexts.add(row.getTooltipText());
+      }
 
-        cell.setText(StringUtility.join(separator, texts));
-        cell.setTooltipText(StringUtility.join(separator, tooltipTexts));
-      }
-      else {
-        cell.setText("");
-        cell.setTooltipText("");
-      }
+      cell.setText(StringUtility.join(separator, texts));
+      cell.setTooltipText(StringUtility.join(separator, tooltipTexts));
     }
     finally {
       tableRow.setRowPropertiesChanged(false);
