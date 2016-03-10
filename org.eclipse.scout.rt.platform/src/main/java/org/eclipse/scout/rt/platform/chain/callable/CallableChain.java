@@ -164,7 +164,6 @@ public class CallableChain<RESULT> {
       // List of decorators invoked in this round.
       final List<IUndecorator> undecorators = new ArrayList<>();
 
-      Throwable throwable = null;
       try {
         while (m_iterator.hasNext()) {
           final IChainable next = m_iterator.next();
@@ -185,21 +184,17 @@ public class CallableChain<RESULT> {
         // Invoke the command because all handlers participated in the processing.
         return m_command.call();
       }
-      catch (final Exception | Error t) {
-        throwable = t;
-        throw t;
-      }
       finally {
         // Let the decorators to perform some 'after-execution' actions in reverse order.
         for (int i = undecorators.size() - 1; i >= 0; i--) {
-          undecorateSafe(undecorators.get(i), throwable);
+          undecorateSafe(undecorators.get(i));
         }
       }
     }
 
-    private void undecorateSafe(final IUndecorator undecorator, final Throwable throwable) {
+    private void undecorateSafe(final IUndecorator undecorator) {
       try {
-        undecorator.undecorate(throwable);
+        undecorator.undecorate();
       }
       catch (final RuntimeException e) {
         LOG.error("Unexpected error during the undecoration of a command's execution. [undecorator={}, command={}]", undecorator.getClass().getName(), m_command, e);

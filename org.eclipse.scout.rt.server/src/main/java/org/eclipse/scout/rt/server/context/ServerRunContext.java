@@ -83,7 +83,7 @@ public class ServerRunContext extends RunContext {
         .add(new ThreadLocalProcessor<>(IClientNodeId.CURRENT, m_clientNodeId))
         .add(new ThreadLocalProcessor<>(ClientNotificationCollector.CURRENT, m_clientNotificationCollector))
         .add(new ThreadLocalProcessor<>(ScoutTexts.CURRENT, (m_session != null ? m_session.getTexts() : ScoutTexts.CURRENT.get())))
-        .add(new TransactionProcessor(getTransaction(), m_transactionScope));
+        .add(new TransactionProcessor<RESULT>(getTransaction(), m_transactionScope));
   }
 
   @Override

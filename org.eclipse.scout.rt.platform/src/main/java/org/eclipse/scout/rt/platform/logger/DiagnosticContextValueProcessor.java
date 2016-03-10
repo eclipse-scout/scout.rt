@@ -46,7 +46,7 @@ public class DiagnosticContextValueProcessor implements ICallableDecorator {
     return new IUndecorator() {
 
       @Override
-      public void undecorate(final Throwable throwable) {
+      public void undecorate() {
         if (originValue != null) {
           MDC.put(m_mdcKey, originValue);
         }

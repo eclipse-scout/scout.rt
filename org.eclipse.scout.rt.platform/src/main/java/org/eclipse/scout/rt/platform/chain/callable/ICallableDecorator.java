@@ -40,10 +40,7 @@ public interface ICallableDecorator extends IChainable {
 
     /**
      * Method invoked after executed the {@link Callable}, and is invoked regardless of success or failure.
-     *
-     * @param throwable
-     *          if the callable returned with an exception, else <code>null</code>.
      */
-    void undecorate(Throwable throwable);
+    void undecorate();
   }
 }

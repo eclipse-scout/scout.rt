@@ -14,15 +14,15 @@ import java.util.concurrent.Callable;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.chain.callable.CallableChain;
-import org.eclipse.scout.rt.platform.chain.callable.ICallableDecorator;
+import org.eclipse.scout.rt.platform.chain.callable.CallableChain.Chain;
+import org.eclipse.scout.rt.platform.chain.callable.ICallableInterceptor;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
+import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.server.transaction.TransactionRequiredException;
 import org.eclipse.scout.rt.server.transaction.TransactionScope;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Depending on the {@link TransactionScope} and the existence of a caller transaction, this processor starts a new
@@ -36,9 +36,7 @@ import org.slf4j.LoggerFactory;
  *
  * @since 5.1
  */
-public class TransactionProcessor implements ICallableDecorator {
-
-  private static final Logger LOG = LoggerFactory.getLogger(TransactionProcessor.class);
+public class TransactionProcessor<RESULT> implements ICallableInterceptor<RESULT> {
 
   protected final TransactionScope m_transactionScope;
   protected final ITransaction m_callerTransaction;
@@ -49,70 +47,86 @@ public class TransactionProcessor implements ICallableDecorator {
   }
 
   @Override
-  public IUndecorator decorate() {
-    switch (m_transactionScope) {
-      case REQUIRES_NEW:
-        return requiresNew();
-      case REQUIRED:
-        return required(m_callerTransaction);
-      case MANDATORY:
-        return mandatory(m_callerTransaction);
-      default:
-        return Assertions.fail("Unsupported transaction scope [{}]", m_transactionScope);
+  public RESULT intercept(Chain<RESULT> chain) throws Exception {
+    try {
+      switch (m_transactionScope) {
+        case REQUIRES_NEW:
+          return requiresNew(chain);
+        case REQUIRED:
+          return required(chain);
+        case MANDATORY:
+          return mandatory(chain);
+        default:
+          return Assertions.fail("Unsupported transaction scope [{}]", m_transactionScope);
+      }
     }
+    catch (Throwable t) {
+      throw BEANS.get(DefaultExceptionTranslator.class).translate(t);
+    }
+  }
+
+  @Override
+  public boolean isEnabled() {
+    return true;
   }
 
   /**
    * Decorates the calling context to run in a new transaction, which upon completion is committed or rolled back.
    */
-  protected IUndecorator requiresNew() {
+  protected RESULT requiresNew(Chain<RESULT> chain) throws Throwable {
     final ITransaction newTransaction = BEANS.get(ITransaction.class);
     final IRegistrationHandle threadLocalRegistration = registerTransactionInThreadLocal(newTransaction);
     final IRegistrationHandle monitorRegistration = registerTransactionInRunMonitor(newTransaction);
+    try {
+      return chain.continueChain();
+    }
+    catch (Throwable t) {
+      newTransaction.addFailure(t);
+      throw t;
+    }
+    finally {
+      BEANS.get(ITransactionCommitProtocol.class).commitOrRollback(newTransaction);
+      threadLocalRegistration.dispose();
+      monitorRegistration.dispose();
 
-    return new IUndecorator() {
-
-      @Override
-      public void undecorate(final Throwable throwable) {
-        addTransactionalFailureIfNotNull(throwable);
-        BEANS.get(ITransactionCommitProtocol.class).commitOrRollback(ITransaction.CURRENT.get());
-        threadLocalRegistration.dispose();
-        monitorRegistration.dispose();
+      if (newTransaction.hasFailures()) {
+        throw newTransaction.getFailures()[0];
       }
-    };
+    }
   }
 
   /**
    * Decorates the calling context to run on behalf of the current caller transaction. If not available, a new
    * transaction is started and upon completion, that transaction is committed or rolled back.
    */
-  protected IUndecorator required(final ITransaction callerTransaction) {
-    if (callerTransaction != null) {
-      return mandatory(callerTransaction);
+  protected RESULT required(Chain<RESULT> chain) throws Throwable {
+    if (m_callerTransaction != null) {
+      return mandatory(chain);
     }
     else {
-      return requiresNew();
+      return requiresNew(chain);
     }
   }
 
   /**
    * Ensures a caller transaction to exist and decorates the calling context to run on behalf of that transaction.
    */
-  protected IUndecorator mandatory(final ITransaction callerTransaction) {
-    if (callerTransaction == null) {
+  protected RESULT mandatory(Chain<RESULT> chain) throws Throwable {
+    if (m_callerTransaction == null) {
       throw new TransactionRequiredException();
     }
 
-    final IRegistrationHandle threadLocalRegistration = registerTransactionInThreadLocal(callerTransaction);
-
-    return new IUndecorator() {
-
-      @Override
-      public void undecorate(final Throwable throwable) {
-        addTransactionalFailureIfNotNull(throwable);
-        threadLocalRegistration.dispose();
-      }
-    };
+    final IRegistrationHandle threadLocalRegistration = registerTransactionInThreadLocal(m_callerTransaction);
+    try {
+      return chain.continueChain();
+    }
+    catch (Throwable t) {
+      m_callerTransaction.addFailure(t);
+      throw t;
+    }
+    finally {
+      threadLocalRegistration.dispose();
+    }
   }
 
   /**
@@ -156,22 +170,5 @@ public class TransactionProcessor implements ICallableDecorator {
         }
       }
     };
-  }
-
-  /**
-   * In case the given failure is not <code>null</code>, that failure is added to the current transaction as
-   * transactional failure. Upon completion, that causes a roll back of the transaction.
-   */
-  protected void addTransactionalFailureIfNotNull(final Throwable failure) {
-    if (failure == null) {
-      return;
-    }
-
-    try {
-      ITransaction.CURRENT.get().addFailure(failure);
-    }
-    catch (final RuntimeException e) {
-      LOG.error("Unexpected: Failed to register failure on transaction", e);
-    }
   }
 }

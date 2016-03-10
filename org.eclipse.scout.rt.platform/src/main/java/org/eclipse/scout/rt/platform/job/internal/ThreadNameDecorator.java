@@ -31,7 +31,7 @@ public class ThreadNameDecorator implements ICallableDecorator {
     return new IUndecorator() {
 
       @Override
-      public void undecorate(final Throwable throwable) {
+      public void undecorate() {
         threadInfo.reset(); // Restore to the original thread name.
       }
     };
