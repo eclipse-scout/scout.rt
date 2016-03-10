@@ -39,7 +39,6 @@ public class IconLoader extends AbstractResourceLoader {
       // cache: use max-age caching for at most 4 hours
       BinaryResource content = BinaryResources.create()
           .withFilename(iconSpec.getName())
-          .withContentType(detectContentType(pathInfo))
           .withContent(iconSpec.getContent())
           .withLastModified(System.currentTimeMillis())
           .build();

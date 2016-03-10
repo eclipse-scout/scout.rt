@@ -14,6 +14,7 @@ import java.io.File;
 import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.zip.Adler32;
 
@@ -53,7 +54,7 @@ public final class BinaryResource implements Serializable {
    *          to ensure that the argument <i>filename</i> has a valid file extension, which can then be used to
    *          determine the MIME type.
    *          <p>
-   *          null contentType is replaced by {@link FileUtility#getContentTypeForExtension(String)}
+   *          null contentType is replaced by {@link FileUtility#getMimeType(java.nio.file.Path)}
    * @param content
    *          The resource's content as byte array. The fingerprint for the given content is calculated automatically.
    * @param lastModified
@@ -63,9 +64,18 @@ public final class BinaryResource implements Serializable {
   @Deprecated
   public BinaryResource(String filename, String contentType, String charset, byte[] content, long lastModified) {
     m_filename = filename;
-    if (contentType == null && filename != null) {
-      String fileExtension = FileUtility.getFileExtension(filename);
-      contentType = FileUtility.getContentTypeForExtension(fileExtension);
+    if (contentType == null) {
+      if (filename != null) {
+        contentType = FileUtility.getMimeType(Paths.get(filename));
+      }
+      else if (content != null && content.length > 0) {
+        File f = IOUtility.createTempFile("file", content);
+        contentType = FileUtility.getMimeType(f.toPath());
+        f.delete();
+      }
+      else {
+        contentType = MimeType.APPLICATION_OCTET_STREAM.getType();
+      }
     }
     m_contentType = contentType;
     m_charset = charset;
@@ -153,8 +163,7 @@ public final class BinaryResource implements Serializable {
   }
 
   /**
-   * @return the content type (MIME type), as passed to the constructor. May be <code>null</code>. In this case, the
-   *         filename extension might give a hint to determine the content type.
+   * @return the content type (MIME type), as passed to the constructor. Is never null.
    */
   public String getContentType() {
     return m_contentType;

@@ -48,7 +48,6 @@ public class JsonFileLoader extends AbstractResourceLoader {
     json = JsonUtility.stripCommentsFromJson(json);
     BinaryResource content = BinaryResources.create()
         .withFilename(pathInfo)
-        .withContentType(detectContentType(pathInfo))
         .withCharset(StandardCharsets.UTF_8)
         .withContent(json.getBytes(StandardCharsets.UTF_8))
         .withLastModifiedNow()

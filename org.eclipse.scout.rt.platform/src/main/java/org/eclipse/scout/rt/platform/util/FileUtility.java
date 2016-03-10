@@ -19,19 +19,19 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.channels.FileChannel;
-import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Locale;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.JarOutputStream;
 import java.util.zip.ZipEntry;
 
-import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.resource.MimeType;
 
 /**
  * Utility class for managing directories and files
@@ -43,193 +43,6 @@ public final class FileUtility {
   private static final int KILO_BYTE = 1024;
 
   private FileUtility() {
-  }
-
-  /**
-   * Static extension to mimetype mapper (and reverse)
-   */
-  private static final Map<String, String> EXT_TO_MIME_TYPE_MAP;
-
-  static {
-    EXT_TO_MIME_TYPE_MAP = new HashMap<String, String>();
-    EXT_TO_MIME_TYPE_MAP.put("ai", "application/postscript");
-    EXT_TO_MIME_TYPE_MAP.put("aif", "audio/x-aiff");
-    EXT_TO_MIME_TYPE_MAP.put("aifc", "audio/x-aiff");
-    EXT_TO_MIME_TYPE_MAP.put("aiff", "audio/x-aiff");
-    EXT_TO_MIME_TYPE_MAP.put("asc", "text/plain");
-    EXT_TO_MIME_TYPE_MAP.put("au", "audio/basic");
-    EXT_TO_MIME_TYPE_MAP.put("avi", "video/x-msvideo");
-    EXT_TO_MIME_TYPE_MAP.put("bcpio", "application/x-bcpio");
-    EXT_TO_MIME_TYPE_MAP.put("bin", "application/octet-stream");
-    EXT_TO_MIME_TYPE_MAP.put("c", "text/plain");
-    EXT_TO_MIME_TYPE_MAP.put("cc", "text/plain");
-    EXT_TO_MIME_TYPE_MAP.put("ccad", "application/clariscad");
-    EXT_TO_MIME_TYPE_MAP.put("cdf", "application/x-netcdf");
-    EXT_TO_MIME_TYPE_MAP.put("class", "application/octet-stream");
-    EXT_TO_MIME_TYPE_MAP.put("cpio", "application/x-cpio");
-    EXT_TO_MIME_TYPE_MAP.put("cpt", "application/mac-compactpro");
-    EXT_TO_MIME_TYPE_MAP.put("csh", "application/x-csh");
-    EXT_TO_MIME_TYPE_MAP.put("css", "text/css");
-    EXT_TO_MIME_TYPE_MAP.put("dcr", "application/x-director");
-    EXT_TO_MIME_TYPE_MAP.put("dir", "application/x-director");
-    EXT_TO_MIME_TYPE_MAP.put("dms", "application/octet-stream");
-    EXT_TO_MIME_TYPE_MAP.put("doc", "application/msword");
-    EXT_TO_MIME_TYPE_MAP.put("drw", "application/drafting");
-    EXT_TO_MIME_TYPE_MAP.put("dvi", "application/x-dvi");
-    EXT_TO_MIME_TYPE_MAP.put("dwg", "application/acad");
-    EXT_TO_MIME_TYPE_MAP.put("dxf", "application/dxf");
-    EXT_TO_MIME_TYPE_MAP.put("dxr", "application/x-director");
-    EXT_TO_MIME_TYPE_MAP.put("eml", "message/rfc822");
-    EXT_TO_MIME_TYPE_MAP.put("eps", "application/postscript");
-    EXT_TO_MIME_TYPE_MAP.put("etx", "text/x-setext");
-    EXT_TO_MIME_TYPE_MAP.put("exe", "application/octet-stream");
-    EXT_TO_MIME_TYPE_MAP.put("ez", "application/andrew-inset");
-    EXT_TO_MIME_TYPE_MAP.put("f", "text/plain");
-    EXT_TO_MIME_TYPE_MAP.put("f90", "text/plain");
-    EXT_TO_MIME_TYPE_MAP.put("fli", "video/x-fli");
-    EXT_TO_MIME_TYPE_MAP.put("gif", "image/gif");
-    EXT_TO_MIME_TYPE_MAP.put("gtar", "application/x-gtar");
-    EXT_TO_MIME_TYPE_MAP.put("gz", "application/x-gzip");
-    EXT_TO_MIME_TYPE_MAP.put("h", "text/plain");
-    EXT_TO_MIME_TYPE_MAP.put("hdf", "application/x-hdf");
-    EXT_TO_MIME_TYPE_MAP.put("hh", "text/plain");
-    EXT_TO_MIME_TYPE_MAP.put("hqx", "application/mac-binhex40");
-    EXT_TO_MIME_TYPE_MAP.put("htm", "text/html");
-    EXT_TO_MIME_TYPE_MAP.put("html", "text/html");
-    EXT_TO_MIME_TYPE_MAP.put("ice", "x-conference/x-cooltalk");
-    EXT_TO_MIME_TYPE_MAP.put("ief", "image/ief");
-    EXT_TO_MIME_TYPE_MAP.put("iges", "model/iges");
-    EXT_TO_MIME_TYPE_MAP.put("igs", "model/iges");
-    EXT_TO_MIME_TYPE_MAP.put("ini", "text/plain");
-    EXT_TO_MIME_TYPE_MAP.put("ips", "application/x-ipscript");
-    EXT_TO_MIME_TYPE_MAP.put("ipx", "application/x-ipix");
-    EXT_TO_MIME_TYPE_MAP.put("jpe", "image/jpeg");
-    EXT_TO_MIME_TYPE_MAP.put("jpeg", "image/jpeg");
-    EXT_TO_MIME_TYPE_MAP.put("jpg", "image/jpeg");
-    EXT_TO_MIME_TYPE_MAP.put("js", "application/javascript");
-    EXT_TO_MIME_TYPE_MAP.put("json", "application/json");
-    EXT_TO_MIME_TYPE_MAP.put("kar", "audio/midi");
-    EXT_TO_MIME_TYPE_MAP.put("latex", "application/x-latex");
-    EXT_TO_MIME_TYPE_MAP.put("lha", "application/octet-stream");
-    EXT_TO_MIME_TYPE_MAP.put("lsp", "application/x-lisp");
-    EXT_TO_MIME_TYPE_MAP.put("lzh", "application/octet-stream");
-    EXT_TO_MIME_TYPE_MAP.put("m", "text/plain");
-    EXT_TO_MIME_TYPE_MAP.put("man", "application/x-troff-man");
-    EXT_TO_MIME_TYPE_MAP.put("me", "application/x-troff-me");
-    EXT_TO_MIME_TYPE_MAP.put("mesh", "model/mesh");
-    EXT_TO_MIME_TYPE_MAP.put("mid", "audio/midi");
-    EXT_TO_MIME_TYPE_MAP.put("midi", "audio/midi");
-    EXT_TO_MIME_TYPE_MAP.put("mif", "application/vnd.mif");
-    EXT_TO_MIME_TYPE_MAP.put("mime", "www/mime");
-    EXT_TO_MIME_TYPE_MAP.put("mov", "video/quicktime");
-    EXT_TO_MIME_TYPE_MAP.put("movie", "video/x-sgi-movie");
-    EXT_TO_MIME_TYPE_MAP.put("mp2", "audio/mpeg");
-    EXT_TO_MIME_TYPE_MAP.put("mp3", "audio/mpeg");
-    EXT_TO_MIME_TYPE_MAP.put("mpe", "video/mpeg");
-    EXT_TO_MIME_TYPE_MAP.put("mpeg", "video/mpeg");
-    EXT_TO_MIME_TYPE_MAP.put("mpg", "video/mpeg");
-    EXT_TO_MIME_TYPE_MAP.put("mpga", "audio/mpeg");
-    EXT_TO_MIME_TYPE_MAP.put("ms", "application/x-troff-ms");
-    EXT_TO_MIME_TYPE_MAP.put("msg", "application/vnd.ms-outlook");
-    EXT_TO_MIME_TYPE_MAP.put("msh", "model/mesh");
-    EXT_TO_MIME_TYPE_MAP.put("nc", "application/x-netcdf");
-    EXT_TO_MIME_TYPE_MAP.put("oda", "application/oda");
-    EXT_TO_MIME_TYPE_MAP.put("pbm", "image/x-portable-bitmap");
-    EXT_TO_MIME_TYPE_MAP.put("pdb", "chemical/x-pdb");
-    EXT_TO_MIME_TYPE_MAP.put("pdf", "application/pdf");
-    EXT_TO_MIME_TYPE_MAP.put("pgm", "image/x-portable-graymap");
-    EXT_TO_MIME_TYPE_MAP.put("pgn", "application/x-chess-pgn");
-    EXT_TO_MIME_TYPE_MAP.put("png", "image/png");
-    EXT_TO_MIME_TYPE_MAP.put("pnm", "image/x-portable-anymap");
-    EXT_TO_MIME_TYPE_MAP.put("pot", "application/mspowerpoint");
-    EXT_TO_MIME_TYPE_MAP.put("ppm", "image/x-portable-pixmap");
-    EXT_TO_MIME_TYPE_MAP.put("pps", "application/mspowerpoint");
-    EXT_TO_MIME_TYPE_MAP.put("ppt", "application/mspowerpoint");
-    EXT_TO_MIME_TYPE_MAP.put("ppz", "application/mspowerpoint");
-    EXT_TO_MIME_TYPE_MAP.put("pre", "application/x-freelance");
-    EXT_TO_MIME_TYPE_MAP.put("prt", "application/pro_eng");
-    EXT_TO_MIME_TYPE_MAP.put("ps", "application/postscript");
-    EXT_TO_MIME_TYPE_MAP.put("qt", "video/quicktime");
-    EXT_TO_MIME_TYPE_MAP.put("ra", "audio/x-realaudio");
-    EXT_TO_MIME_TYPE_MAP.put("ram", "audio/x-pn-realaudio");
-    EXT_TO_MIME_TYPE_MAP.put("ras", "image/cmu-raster");
-    EXT_TO_MIME_TYPE_MAP.put("rgb", "image/x-rgb");
-    EXT_TO_MIME_TYPE_MAP.put("rm", "audio/x-pn-realaudio");
-    EXT_TO_MIME_TYPE_MAP.put("roff", "application/x-troff");
-    EXT_TO_MIME_TYPE_MAP.put("rpm", "audio/x-pn-realaudio-plugin");
-    EXT_TO_MIME_TYPE_MAP.put("rtf", "text/rtf");
-    EXT_TO_MIME_TYPE_MAP.put("rtx", "text/richtext");
-    EXT_TO_MIME_TYPE_MAP.put("scm", "application/x-lotusscreencam");
-    EXT_TO_MIME_TYPE_MAP.put("set", "application/set");
-    EXT_TO_MIME_TYPE_MAP.put("sgm", "text/sgml");
-    EXT_TO_MIME_TYPE_MAP.put("sgml", "text/sgml");
-    EXT_TO_MIME_TYPE_MAP.put("sh", "application/x-sh");
-    EXT_TO_MIME_TYPE_MAP.put("shar", "application/x-shar");
-    EXT_TO_MIME_TYPE_MAP.put("silo", "model/mesh");
-    EXT_TO_MIME_TYPE_MAP.put("sit", "application/x-stuffit");
-    EXT_TO_MIME_TYPE_MAP.put("skd", "application/x-koan");
-    EXT_TO_MIME_TYPE_MAP.put("skm", "application/x-koan");
-    EXT_TO_MIME_TYPE_MAP.put("skp", "application/x-koan");
-    EXT_TO_MIME_TYPE_MAP.put("skt", "application/x-koan");
-    EXT_TO_MIME_TYPE_MAP.put("smi", "application/smil");
-    EXT_TO_MIME_TYPE_MAP.put("smil", "application/smil");
-    EXT_TO_MIME_TYPE_MAP.put("snd", "audio/basic");
-    EXT_TO_MIME_TYPE_MAP.put("sol", "application/solids");
-    EXT_TO_MIME_TYPE_MAP.put("spl", "application/x-futuresplash");
-    EXT_TO_MIME_TYPE_MAP.put("src", "application/x-wais-source");
-    EXT_TO_MIME_TYPE_MAP.put("step", "application/STEP");
-    EXT_TO_MIME_TYPE_MAP.put("stl", "application/SLA");
-    EXT_TO_MIME_TYPE_MAP.put("stp", "application/STEP");
-    EXT_TO_MIME_TYPE_MAP.put("sv4cpio", "application/x-sv4cpio");
-    EXT_TO_MIME_TYPE_MAP.put("sv4crc", "application/x-sv4crc");
-    EXT_TO_MIME_TYPE_MAP.put("swf", "application/x-shockwave-flash");
-    EXT_TO_MIME_TYPE_MAP.put("t", "application/x-troff");
-    EXT_TO_MIME_TYPE_MAP.put("tar", "application/x-tar");
-    EXT_TO_MIME_TYPE_MAP.put("tcl", "application/x-tcl");
-    EXT_TO_MIME_TYPE_MAP.put("tex", "application/x-tex");
-    EXT_TO_MIME_TYPE_MAP.put("texi", "application/x-texinfo");
-    EXT_TO_MIME_TYPE_MAP.put("texinfo", "application/x-texinfo");
-    EXT_TO_MIME_TYPE_MAP.put("tif", "image/tiff");
-    EXT_TO_MIME_TYPE_MAP.put("tiff", "image/tiff");
-    EXT_TO_MIME_TYPE_MAP.put("tr", "application/x-troff");
-    EXT_TO_MIME_TYPE_MAP.put("tsi", "audio/TSP-audio");
-    EXT_TO_MIME_TYPE_MAP.put("tsp", "application/dsptype");
-    EXT_TO_MIME_TYPE_MAP.put("tsv", "text/tab-separated-values");
-    EXT_TO_MIME_TYPE_MAP.put("txt", "text/plain");
-    EXT_TO_MIME_TYPE_MAP.put("unv", "application/i-deas");
-    EXT_TO_MIME_TYPE_MAP.put("ustar", "application/x-ustar");
-    EXT_TO_MIME_TYPE_MAP.put("vcd", "application/x-cdlink");
-    EXT_TO_MIME_TYPE_MAP.put("vda", "application/vda");
-    EXT_TO_MIME_TYPE_MAP.put("viv", "video/vnd.vivo");
-    EXT_TO_MIME_TYPE_MAP.put("vivo", "video/vnd.vivo");
-    EXT_TO_MIME_TYPE_MAP.put("vrml", "model/vrml");
-    EXT_TO_MIME_TYPE_MAP.put("wav", "audio/x-wav");
-    EXT_TO_MIME_TYPE_MAP.put("woff", "application/font-woff");
-    EXT_TO_MIME_TYPE_MAP.put("wrl", "model/vrml");
-    EXT_TO_MIME_TYPE_MAP.put("xbm", "image/x-xbitmap");
-    EXT_TO_MIME_TYPE_MAP.put("xlc", "application/vnd.ms-excel");
-    EXT_TO_MIME_TYPE_MAP.put("xll", "application/vnd.ms-excel");
-    EXT_TO_MIME_TYPE_MAP.put("xlm", "application/vnd.ms-excel");
-    EXT_TO_MIME_TYPE_MAP.put("xls", "application/vnd.ms-excel");
-    EXT_TO_MIME_TYPE_MAP.put("xlw", "application/vnd.ms-excel");
-    EXT_TO_MIME_TYPE_MAP.put("xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-    EXT_TO_MIME_TYPE_MAP.put("xltx", "application/vnd.openxmlformats-officedocument.spreadsheetml.template");
-    EXT_TO_MIME_TYPE_MAP.put("potx", "application/vnd.openxmlformats-officedocument.presentationml.template");
-    EXT_TO_MIME_TYPE_MAP.put("ppsx", "application/vnd.openxmlformats-officedocument.presentationml.slideshow");
-    EXT_TO_MIME_TYPE_MAP.put("pptx", "application/vnd.openxmlformats-officedocument.presentationml.presentation");
-    EXT_TO_MIME_TYPE_MAP.put("xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-    EXT_TO_MIME_TYPE_MAP.put("sldx", "application/vnd.openxmlformats-officedocument.presentationml.slide");
-    EXT_TO_MIME_TYPE_MAP.put("docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
-    EXT_TO_MIME_TYPE_MAP.put("xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-    EXT_TO_MIME_TYPE_MAP.put("dotx", "application/vnd.openxmlformats-officedocument.wordprocessingml.template");
-    EXT_TO_MIME_TYPE_MAP.put("xlam", "application/vnd.ms-excel.addin.macroEnabled.12");
-    EXT_TO_MIME_TYPE_MAP.put("xlsb", "application/vnd.ms-excel.sheet.binary.macroEnabled.12");
-    EXT_TO_MIME_TYPE_MAP.put("vsto", "application/x-ms-vsto");
-    EXT_TO_MIME_TYPE_MAP.put("xml", "text/xml");
-    EXT_TO_MIME_TYPE_MAP.put("xpm", "image/x-xpixmap");
-    EXT_TO_MIME_TYPE_MAP.put("xwd", "image/x-xwindowdump");
-    EXT_TO_MIME_TYPE_MAP.put("xyz", "chemical/x-pdb");
-    EXT_TO_MIME_TYPE_MAP.put("zip", "application/zip");
   }
 
   public static void extractArchive(File archiveFile, File destinationDir) throws IOException {
@@ -497,13 +310,13 @@ public final class FileUtility {
    */
   public static String getContentTypeForExtension(String ext) {
     if (ext == null) {
-      return null;
+      return getMimeType(null);
     }
     if (ext.length() > 0 && ext.charAt(0) == '.') {
       ext = ext.substring(1);
     }
-    ext = ext.toLowerCase();
-    return EXT_TO_MIME_TYPE_MAP.get(ext);
+    ext = ext.toLowerCase(Locale.US).trim();
+    return getMimeType(Paths.get("file." + ext));
   }
 
   /**
@@ -520,26 +333,38 @@ public final class FileUtility {
    */
   public static String getContentType(File f) {
     if (f == null || !f.exists()) {
-      return null;
+      return getMimeType(null);
     }
+    return getMimeType(Paths.get(f.toURI()));
+  }
 
-    try {
-      String contentType = Files.probeContentType(Paths.get(f.toURI()));
-      if (contentType != null) {
-        return contentType;
+  /**
+   * Finds the mime type of the given path.
+   * <p>
+   * The return value of this method is the string form of the value of a Multipurpose Internet Mail Extension (MIME)
+   * content type as defined by <a href="http://www.ietf.org/rfc/rfc2045.txt"><i>RFC&nbsp;2045: Multipurpose Internet
+   * Mail Extensions (MIME) Part One: Format of Internet Message Bodies</i></a>. The string is guaranteed to be parsable
+   * according to the grammar in the RFC.
+   * <p>
+   * Loops over all {@link IMimeTypeDetector} and returns the first that decides.
+   * <p>
+   * If path is null or none of the {@link IMimeTypeDetector} decides then application/octet-stream is returned.
+   *
+   * @param path
+   *          The path for which the content type should be returned (including content inspection).
+   * @return The content type, never null
+   */
+  public static String getMimeType(Path path) {
+    if (path == null) {
+      return MimeType.APPLICATION_OCTET_STREAM.getType();
+    }
+    for (IMimeTypeDetector d : BEANS.all(IMimeTypeDetector.class)) {
+      String m = d.getMimeType(path);
+      if (m != null) {
+        return m;
       }
-
-      String fileName = f.getName();
-      int i = fileName.lastIndexOf('.');
-      if (i >= 0) {
-        return FileUtility.getContentTypeForExtension(fileName.substring(i + 1));
-      }
-
-      return null;
     }
-    catch (IOException e) {
-      throw new ProcessingException("Unable to read content type of file '" + f.getAbsolutePath() + "'.", e);
-    }
+    return MimeType.APPLICATION_OCTET_STREAM.getType();
   }
 
   /**

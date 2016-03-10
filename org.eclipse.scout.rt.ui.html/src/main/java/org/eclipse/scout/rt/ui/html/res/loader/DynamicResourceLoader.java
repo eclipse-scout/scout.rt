@@ -19,7 +19,6 @@ import javax.servlet.http.HttpSession;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
-import org.eclipse.scout.rt.platform.resource.BinaryResources;
 import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.ui.html.HttpSessionHelper;
@@ -77,25 +76,15 @@ public class DynamicResourceLoader extends AbstractResourceLoader {
       return null;
     }
     IBinaryResourceProvider provider = (IBinaryResourceProvider) jsonAdapter;
-    BinaryResourceHolder binaryResourceHolder = provider.provideBinaryResource(filename);
-    if (binaryResourceHolder == null || binaryResourceHolder.get() == null) {
+    BinaryResourceHolder localResourceHolder = provider.provideBinaryResource(filename);
+    if (localResourceHolder == null || localResourceHolder.get() == null) {
       return null;
     }
-    BinaryResource binaryResource = binaryResourceHolder.get();
-    String contentType = binaryResource.getContentType();
-    if (contentType == null) {
-      contentType = detectContentType(binaryResource.getFilename());
-    }
-
-    BinaryResource content = BinaryResources
-        .create(binaryResource)
-        .withFilename(pathInfo)
-        .withContentType(contentType)
-        .build();
-
-    HttpCacheObject httpCacheObject = new HttpCacheObject(cacheKey, content.getLastModified() > 0, IHttpCacheControl.MAX_AGE_4_HOURS, content);
-    if (binaryResourceHolder.isDownload()) {
-      addResponseHeaderForDownload(httpCacheObject, binaryResource.getFilename());
+    BinaryResource localResource = localResourceHolder.get();
+    BinaryResource httpResource = localResource.createAlias(pathInfo);
+    HttpCacheObject httpCacheObject = new HttpCacheObject(cacheKey, httpResource.getLastModified() > 0, IHttpCacheControl.MAX_AGE_4_HOURS, httpResource);
+    if (localResourceHolder.isDownload()) {
+      addResponseHeaderForDownload(httpCacheObject, localResource.getFilename());
     }
     return httpCacheObject;
   }

@@ -772,6 +772,12 @@ scout.Session.prototype._processErrorJsonResponse = function(jsonError) {
       this.optText('ui.InternalProcessingErrorMsg', boxOptions.body, ' (' + this.optText('ui.ErrorCodeX', 'Code 20', '20') + ')'),
       this.optText('ui.UiInconsistentMsg', ''));
     boxOptions.noButtonText = this.optText('ui.Ignore', 'Ignore');
+  } else if (jsonError.code === 30) { // JsonResponse.ERR_UNSAFE_UPLOAD
+    boxOptions.header = this.optText('ui.UnsafeUpload', boxOptions.header);
+    boxOptions.body = this.optText('ui.UnsafeUploadMsg', boxOptions.body);
+    boxOptions.yesButtonText = this.optText('ui.Ok', 'Ok');
+    boxOptions.yesButtonAction = function() {
+    };
   }
   this.showFatalMessage(boxOptions, jsonError.code);
 };

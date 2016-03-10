@@ -46,7 +46,6 @@ public class BinaryFileLoader extends AbstractResourceLoader {
     URLConnection connection = url.openConnection();
     BinaryResource content = BinaryResources.create()
         .withFilename(pathInfo)
-        .withContentType(detectContentType(pathInfo))
         .withContent(bytes)
         .withLastModified(connection.getLastModified())
         .build();

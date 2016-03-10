@@ -15,7 +15,6 @@ import java.util.Locale;
 import javax.servlet.http.HttpServletRequest;
 
 import org.eclipse.scout.rt.platform.util.Assertions;
-import org.eclipse.scout.rt.platform.util.FileUtility;
 import org.eclipse.scout.rt.ui.html.UiHints;
 import org.eclipse.scout.rt.ui.html.cache.HttpCacheKey;
 
@@ -31,22 +30,6 @@ public abstract class AbstractResourceLoader implements IResourceLoader {
   @Override
   public HttpCacheKey createCacheKey(String resourcePath, Locale locale) {
     return new HttpCacheKey(resourcePath);
-  }
-
-  protected String detectContentType(String path) {
-    if (path == null) {
-      return null;
-    }
-    int lastSlash = path.lastIndexOf('/');
-    String fileName = lastSlash >= 0 ? path.substring(lastSlash + 1) : path;
-    // Prefer mime type mapping from container
-    String contentType = m_req.getServletContext().getMimeType(fileName);
-    if (contentType != null) {
-      return contentType;
-    }
-    int lastDot = path.lastIndexOf('.');
-    String fileExtension = lastDot >= 0 ? path.substring(lastDot + 1) : path;
-    return FileUtility.getContentTypeForExtension(fileExtension);
   }
 
   protected boolean isMinify() {

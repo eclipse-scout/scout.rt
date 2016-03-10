@@ -15,6 +15,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.file.Paths;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
@@ -92,7 +93,7 @@ public class ResourceServlet extends HttpServlet {
       ServletContext servletContext = getServletContext();
       String resourcePath = m_warPath + pathInfo;
       url = servletContext.getResource(resourcePath);
-      contentType = servletContext.getMimeType(resourcePath);
+      contentType = FileUtility.getMimeType(Paths.get(resourcePath));
     }
     //
     if (url == null) {

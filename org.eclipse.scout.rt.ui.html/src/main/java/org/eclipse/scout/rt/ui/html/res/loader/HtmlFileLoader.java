@@ -61,7 +61,6 @@ public class HtmlFileLoader extends AbstractResourceLoader {
     byte[] parsedDocument = parser.parseDocument(document);
     BinaryResource content = BinaryResources.create()
         .withFilename(pathInfo)
-        .withContentType(detectContentType(pathInfo))
         .withCharset(StandardCharsets.UTF_8)
         .withContent(parsedDocument)
         .withLastModifiedNow()
