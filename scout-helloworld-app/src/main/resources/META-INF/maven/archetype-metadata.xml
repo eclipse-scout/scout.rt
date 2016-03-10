@@ -20,16 +20,16 @@
       <defaultValue>My Application</defaultValue>
     </requiredProperty>
     <requiredProperty key="scoutAuthPublicKey">
-      <defaultValue>TODO (use org.eclipse.scout.rt.platform.security.SecurityUtility.generateKeyPair())</defaultValue>
+      <defaultValue>TODO (use org.eclipse.scout.rt.platform.security.SecurityUtility.main(String[]))</defaultValue>
     </requiredProperty>
     <requiredProperty key="scoutAuthPrivateKey">
-      <defaultValue>TODO (use org.eclipse.scout.rt.platform.security.SecurityUtility.generateKeyPair())</defaultValue>
+      <defaultValue>TODO (use org.eclipse.scout.rt.platform.security.SecurityUtility.main(String[]))</defaultValue>
     </requiredProperty>
     <requiredProperty key="scoutAuthPublicKeyDev">
-      <defaultValue>TODO (use org.eclipse.scout.rt.platform.security.SecurityUtility.generateKeyPair())</defaultValue>
+      <defaultValue>TODO (use org.eclipse.scout.rt.platform.security.SecurityUtility.main(String[]))</defaultValue>
     </requiredProperty>
     <requiredProperty key="scoutAuthPrivateKeyDev">
-      <defaultValue>TODO (use org.eclipse.scout.rt.platform.security.SecurityUtility.generateKeyPair())</defaultValue>
+      <defaultValue>TODO (use org.eclipse.scout.rt.platform.security.SecurityUtility.main(String[]))</defaultValue>
     </requiredProperty>
     <requiredProperty key="userName">
       <defaultValue>Scout Robot</defaultValue>
