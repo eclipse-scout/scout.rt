@@ -19,6 +19,7 @@ import javax.servlet.http.HttpSession;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
+import org.eclipse.scout.rt.platform.resource.BinaryResources;
 import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.ui.html.HttpSessionHelper;
@@ -86,7 +87,12 @@ public class DynamicResourceLoader extends AbstractResourceLoader {
       contentType = detectContentType(binaryResource.getFilename());
     }
 
-    BinaryResource content = new BinaryResource(pathInfo, contentType, binaryResource.getCharset(), binaryResource.getContent(), binaryResource.getLastModified());
+    BinaryResource content = BinaryResources
+        .create(binaryResource)
+        .withFilename(pathInfo)
+        .withContentType(contentType)
+        .build();
+
     HttpCacheObject httpCacheObject = new HttpCacheObject(cacheKey, content.getLastModified() > 0, IHttpCacheControl.MAX_AGE_4_HOURS, content);
     if (binaryResourceHolder.isDownload()) {
       addResponseHeaderForDownload(httpCacheObject, binaryResource.getFilename());

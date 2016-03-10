@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
+import org.eclipse.scout.rt.platform.resource.BinaryResources;
 import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.ui.html.UiThemeUtility;
 import org.eclipse.scout.rt.ui.html.cache.HttpCacheKey;
@@ -58,7 +59,14 @@ public class HtmlFileLoader extends AbstractResourceLoader {
     HtmlDocumentParserParameters params = createHtmlDocumentParserParameters(cacheKey);
     HtmlDocumentParser parser = createHtmlDocumentParser(params);
     byte[] parsedDocument = parser.parseDocument(document);
-    BinaryResource content = new BinaryResource(pathInfo, detectContentType(pathInfo), StandardCharsets.UTF_8.name(), parsedDocument, System.currentTimeMillis());
+    BinaryResource content = BinaryResources.create()
+        .withFilename(pathInfo)
+        .withContentType(detectContentType(pathInfo))
+        .withCharset(StandardCharsets.UTF_8)
+        .withContent(parsedDocument)
+        .withLastModifiedNow()
+        .build();
+
     // no cache-control, only E-Tag checks to make sure that a session with timeout is correctly
     // forwarded to the login using a GET request BEFORE the first json POST request
     HttpCacheObject httpCacheObject = new HttpCacheObject(cacheKey, true, -1, content);

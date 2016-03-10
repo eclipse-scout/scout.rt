@@ -10,6 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.resource;
 
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.util.date.IDateProvider;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -19,9 +24,6 @@ public class BinaryResourceTest {
   @Test
   public void testConstructor() {
     String filename = "file.dat";
-    MimeType mimeType = MimeType.TEXT_PLAIN;
-    String contentType = "application/binary";
-    long modified = System.currentTimeMillis();
     byte[] emptyContent = new byte[0];
     byte[] content = new byte[]{'a', 'b', 'c'};
 
@@ -31,36 +33,67 @@ public class BinaryResourceTest {
     new BinaryResource(filename, null);
     new BinaryResource(filename, content);
     new BinaryResource(filename, emptyContent);
-
-    new BinaryResource((MimeType) null, null);
-    new BinaryResource((MimeType) null, content);
-    new BinaryResource(mimeType, null);
-    new BinaryResource(mimeType, content);
-
-    new BinaryResource(null, null, null);
-    new BinaryResource(null, null, content);
-    new BinaryResource(null, null, emptyContent);
-    new BinaryResource(null, contentType, null);
-    new BinaryResource(null, contentType, content);
-    new BinaryResource(null, contentType, emptyContent);
-    new BinaryResource(filename, contentType, null);
-    new BinaryResource(filename, contentType, content);
-    new BinaryResource(filename, contentType, emptyContent);
-
-    new BinaryResource(null, null, null, modified);
-    new BinaryResource(null, null, content, modified);
-    new BinaryResource(null, null, emptyContent, modified);
-    new BinaryResource(null, contentType, null, modified);
-    new BinaryResource(null, contentType, content, modified);
-    new BinaryResource(null, contentType, emptyContent, modified);
-    new BinaryResource(filename, contentType, null, modified);
-    new BinaryResource(filename, contentType, content, modified);
-    new BinaryResource(filename, contentType, emptyContent, modified);
   }
 
-  @Test(expected = NullPointerException.class)
-  public void testFileConstructor() {
-    new BinaryResource(null);
+  @Test
+  public void testBuilder() {
+    String filename = "file.dat";
+    String contentType = "application/binary";
+    long modified = System.currentTimeMillis();
+    byte[] emptyContent = new byte[0];
+    byte[] content = new byte[]{'a', 'b', 'c'};
+    BinaryResources.create().withLastModified(modified).build();
+    BinaryResources.create().withLastModified(modified).withContent(content).build();
+    BinaryResources.create().withLastModified(modified).withContent(emptyContent).build();
+    BinaryResources.create().withLastModified(modified).withContentType(contentType).build();
+    BinaryResources.create().withLastModified(modified).withContent(content).withContentType(contentType).build();
+    BinaryResources.create().withLastModified(modified).withContent(emptyContent).withContentType(contentType).build();
+
+    BinaryResources.create().withLastModified(modified).withContentType(contentType).withFilename(filename).build();
+    BinaryResources.create().withLastModified(modified).withContent(content).withContentType(contentType).withFilename(filename).build();
+    BinaryResources.create().withLastModified(modified).withContent(emptyContent).withContentType(contentType).withFilename(filename).build();
+  }
+
+  @Test
+  public void testLastModified() {
+    Assert.assertEquals(-1, BinaryResources.create().withFilename("document.txt").build().getLastModified());
+    Assert.assertEquals(-1, BinaryResources.create().withFilename("document.txt").withLastModified(-1).build().getLastModified());
+
+    long now = BEANS.get(IDateProvider.class).currentMillis().getTime();
+    Assert.assertTrue(BinaryResources.create().withFilename("document.txt").withLastModifiedNow().build().getLastModified() >= now);
+  }
+
+  @Test
+  public void testFullBuilder() {
+    final String filename = "document.txt";
+    final Charset charset = StandardCharsets.UTF_8;
+    final byte[] content = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua".getBytes(charset);
+    final String contentType = MimeType.TEXT_PLAIN.getType();
+    final long lastModified = BEANS.get(IDateProvider.class).currentMillis().getTime();
+
+    BinaryResource res = BinaryResources.create()
+        .withFilename(filename)
+        .withContent(content)
+        .withContentType(contentType)
+        .withCharset(charset)
+        .withLastModified(lastModified)
+        .build();
+
+    Assert.assertEquals(filename, res.getFilename());
+    Assert.assertEquals("UTF-8", res.getCharset());
+    Assert.assertEquals(content, res.getContent());
+    Assert.assertEquals(contentType, res.getContentType());
+    Assert.assertEquals(lastModified, res.getLastModified());
+    Assert.assertEquals(content.length, res.getContentLength());
+
+    final byte[] newContent = "New content".getBytes(charset);
+    BinaryResource newRes = BinaryResources.create(res).withContent(newContent).build();
+    Assert.assertEquals(filename, newRes.getFilename());
+    Assert.assertEquals("UTF-8", newRes.getCharset());
+    Assert.assertEquals(newContent, newRes.getContent());
+    Assert.assertEquals(contentType, newRes.getContentType());
+    Assert.assertEquals(lastModified, newRes.getLastModified());
+    Assert.assertEquals(newContent.length, newRes.getContentLength());
   }
 
   @Test

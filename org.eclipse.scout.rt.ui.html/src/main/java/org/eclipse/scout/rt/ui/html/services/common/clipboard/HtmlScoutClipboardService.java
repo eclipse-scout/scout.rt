@@ -20,6 +20,7 @@ import org.eclipse.scout.rt.client.ui.dnd.TransferObject;
 import org.eclipse.scout.rt.client.ui.form.clipboard.ClipboardForm;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
+import org.eclipse.scout.rt.platform.resource.BinaryResources;
 import org.eclipse.scout.rt.platform.resource.MimeType;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 
@@ -50,7 +51,12 @@ public class HtmlScoutClipboardService implements IClipboardService {
   public void setTextContents(String textContents) {
     ClipboardForm form = new ClipboardForm();
     form.setMimeTypes(MimeType.TEXT_PLAIN);
-    BinaryResource binaryResource = new BinaryResource(MimeType.TEXT_PLAIN, StringUtility.nvl(textContents, "").getBytes(StandardCharsets.UTF_8));
+    // anonymous text paste, no filename
+    BinaryResource binaryResource = BinaryResources.create()
+        .withContentType(MimeType.TEXT_PLAIN.getType())
+        .withContent(StringUtility.nvl(textContents, "").getBytes(StandardCharsets.UTF_8))
+        .build();
+
     form.getClipboardField().setValue(Collections.singleton(binaryResource));
     form.startCopy();
   }

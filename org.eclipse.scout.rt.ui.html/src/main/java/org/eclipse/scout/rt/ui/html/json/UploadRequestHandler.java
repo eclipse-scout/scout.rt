@@ -36,6 +36,7 @@ import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
+import org.eclipse.scout.rt.platform.resource.BinaryResources;
 import org.eclipse.scout.rt.platform.security.MalwareScanner;
 import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
@@ -182,7 +183,11 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
         // the only thing we could do is to guess the charset (encoding) by reading the byte contents of
         // uploaded text files (for binary file types the encoding is not relevant). However: currently we
         // do not set the charset at all.
-        BinaryResource res = new BinaryResource(filename, contentType, content);
+        BinaryResource res = BinaryResources.create()
+            .withFilename(filename)
+            .withContentType(contentType)
+            .withContent(content)
+            .build();
         BEANS.get(MalwareScanner.class).scan(res);
         uploadResources.add(res);
       }

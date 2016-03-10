@@ -18,6 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
+import org.eclipse.scout.rt.platform.resource.BinaryResources;
 import org.eclipse.scout.rt.ui.html.UiThemeUtility;
 import org.eclipse.scout.rt.ui.html.cache.HttpCacheKey;
 import org.eclipse.scout.rt.ui.html.cache.HttpCacheObject;
@@ -61,7 +62,14 @@ public class ScriptFileLoader extends AbstractResourceLoader {
     String resourcePath = cacheKey.getResourcePath();
     ScriptOutput out = builder.buildScript(resourcePath);
     if (out != null) {
-      BinaryResource content = new BinaryResource(out.getPathInfo(), detectContentType(resourcePath), StandardCharsets.UTF_8.name(), out.getContent(), out.getLastModified());
+      BinaryResource content = BinaryResources.create()
+          .withFilename(out.getPathInfo())
+          .withContentType(detectContentType(resourcePath))
+          .withCharset(StandardCharsets.UTF_8.name())
+          .withContent(out.getContent())
+          .withLastModified(out.getLastModified())
+          .build();
+
       return new HttpCacheObject(cacheKey, true, IHttpCacheControl.MAX_AGE_ONE_YEAR, content);
     }
     return null;

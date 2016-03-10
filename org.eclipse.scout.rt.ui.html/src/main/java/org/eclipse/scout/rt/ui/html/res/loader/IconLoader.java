@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.eclipse.scout.rt.client.services.common.icon.IconLocator;
 import org.eclipse.scout.rt.client.services.common.icon.IconSpec;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
+import org.eclipse.scout.rt.platform.resource.BinaryResources;
 import org.eclipse.scout.rt.ui.html.cache.HttpCacheKey;
 import org.eclipse.scout.rt.ui.html.cache.HttpCacheObject;
 import org.eclipse.scout.rt.ui.html.cache.IHttpCacheControl;
@@ -36,7 +37,13 @@ public class IconLoader extends AbstractResourceLoader {
     IconSpec iconSpec = IconLocator.instance().getIconSpec(imageId);
     if (iconSpec != null) {
       // cache: use max-age caching for at most 4 hours
-      BinaryResource content = new BinaryResource(iconSpec.getName(), detectContentType(pathInfo), iconSpec.getContent(), System.currentTimeMillis());
+      BinaryResource content = BinaryResources.create()
+          .withFilename(iconSpec.getName())
+          .withContentType(detectContentType(pathInfo))
+          .withContent(iconSpec.getContent())
+          .withLastModified(System.currentTimeMillis())
+          .build();
+
       return new HttpCacheObject(cacheKey, true, IHttpCacheControl.MAX_AGE_4_HOURS, content);
     }
     return null;
