@@ -23,9 +23,12 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Result;
 import javax.xml.transform.Transformer;
@@ -36,6 +39,8 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.serialization.SerializationUtility;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -50,10 +55,75 @@ import org.xml.sax.SAXException;
  * @since 5.1
  */
 public final class XmlUtility {
+  private static final Logger LOG = LoggerFactory.getLogger(XmlUtility.class);
 
   public static final String INDENT_AMOUNT_TRANSFORMER_PROPERTY = "{http://xml.apache.org/xslt}indent-amount";
 
   private XmlUtility() {
+  }
+
+  /**
+   * @return a new secure {@link DocumentBuilder} with disabled xml-external-entity
+   * @throws ParserConfigurationException
+   */
+  public static DocumentBuilder newDocumentBuilder() throws ParserConfigurationException {
+    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+    try {
+      factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+    }
+    catch (ParserConfigurationException e) {
+      LOG.warn("Could not set feature disallow-doctype-decl", e);
+      try {
+        factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+      }
+      catch (ParserConfigurationException e1) {
+        LOG.warn("Could not disable feature external-general-entities", e1);
+      }
+      try {
+        factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+      }
+      catch (ParserConfigurationException e1) {
+        LOG.warn("Could not disable feature external-parameter-entities", e1);
+      }
+    }
+    factory.setXIncludeAware(false);
+    factory.setExpandEntityReferences(false);
+    factory.setIgnoringComments(true);
+    factory.setCoalescing(false);
+    factory.setValidating(false);
+    factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+    return factory.newDocumentBuilder();
+  }
+
+  /**
+   * @return a new secure {@link SAXParser} with disabled xml-external-entity
+   * @throws SAXException
+   * @throws ParserConfigurationException
+   */
+  public static SAXParser newSAXParser() throws ParserConfigurationException, SAXException {
+    SAXParserFactory factory = SAXParserFactory.newInstance();
+    try {
+      factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+    }
+    catch (ParserConfigurationException e) {
+      LOG.warn("Could not set feature disallow-doctype-decl", e);
+      try {
+        factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+      }
+      catch (ParserConfigurationException e1) {
+        LOG.warn("Could not disable feature external-general-entities", e1);
+      }
+      try {
+        factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+      }
+      catch (ParserConfigurationException e1) {
+        LOG.warn("Could not disable feature external-parameter-entities", e1);
+      }
+    }
+    factory.setXIncludeAware(false);
+    factory.setValidating(false);
+    factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+    return factory.newSAXParser();
   }
 
   /**
@@ -266,7 +336,7 @@ public final class XmlUtility {
    */
   public static Document createNewXmlDocument(String rootTagName) {
     try {
-      DocumentBuilder docBuilder = getDocumentBuilder();
+      DocumentBuilder docBuilder = newDocumentBuilder();
       Document document = docBuilder.newDocument();
       document.appendChild(document.createElement(rootTagName));
       return document;
@@ -287,7 +357,7 @@ public final class XmlUtility {
    */
   public static Document getXmlDocument(InputStream is) {
     try {
-      return getDocumentBuilder().parse(is);
+      return newDocumentBuilder().parse(is);
     }
     catch (IOException | SAXException | ParserConfigurationException e) {
       throw new ProcessingException("Unable to load xml document.", e);
@@ -305,7 +375,7 @@ public final class XmlUtility {
    */
   public static Document getXmlDocument(File f) {
     try {
-      return getDocumentBuilder().parse(f);
+      return newDocumentBuilder().parse(f);
     }
     catch (IOException | SAXException | ParserConfigurationException e) {
       throw new ProcessingException("Unable to load xml document.", e);
@@ -341,17 +411,11 @@ public final class XmlUtility {
    */
   public static Document getXmlDocument(String rawXml) {
     try {
-      return getDocumentBuilder().parse(new InputSource(new StringReader(rawXml)));
+      return newDocumentBuilder().parse(new InputSource(new StringReader(rawXml)));
     }
     catch (IOException | SAXException | ParserConfigurationException e) {
       throw new ProcessingException("Unable to load xml document.", e);
     }
-  }
-
-  private static DocumentBuilder getDocumentBuilder() throws ParserConfigurationException {
-    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-    DocumentBuilder docBuilder = factory.newDocumentBuilder();
-    return docBuilder;
   }
 
   /**
