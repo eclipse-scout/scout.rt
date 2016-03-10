@@ -137,6 +137,10 @@ public class HtmlDocumentParser {
     if (StringUtility.isNullOrEmpty(contextPath)) {
       contextPath = "/";
     }
+    else if (contextPath.lastIndexOf('/') != contextPath.length() - 1) {
+      // add / at end of string (unless it already has a slash at the end)
+      contextPath += "/";
+    }
     String baseTag = "<base href=\"" + contextPath + "\">";
     m_workingContent = m_workingContent.replaceAll(PATTERN_BASE_TAG, baseTag);
   }
