@@ -63,16 +63,16 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
 
   @Override
   public boolean handlePost(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
+    // serve only /json
+    String pathInfo = req.getPathInfo();
+    if (CompareUtility.notEquals(pathInfo, "/json")) {
+      return false;
+    }
     //check contenttype
     Matcher m = ALLOWED_CONTENT_TYPE_PATTERN.matcher(req.getContentType());
     if (!m.find()) {
       LOG.error("Someone tries to attack json endpoint with wrong contenttype. ip:{} request:{}", req.getRemoteAddr(), req);
       resp.sendError(415);
-    }
-    // serve only /json
-    String pathInfo = req.getPathInfo();
-    if (CompareUtility.notEquals(pathInfo, "/json")) {
-      return false;
     }
 
     final long startNanos = System.nanoTime();
