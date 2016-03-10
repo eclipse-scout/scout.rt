@@ -396,7 +396,10 @@ scout.Session.prototype._sendRequest = function(request) {
     // - http://stackoverflow.com/questions/15479103/can-beforeunload-unload-be-used-to-send-xmlhttprequests-reliably
     // - https://groups.google.com/a/chromium.org/forum/#!topic/blink-dev/7nKMdg_ALcc
     // - https://developer.mozilla.org/en-US/docs/Web/API/Navigator/sendBeacon
-    navigator.sendBeacon(this._decorateUrl(this.url, request), JSON.stringify(request));
+    var msg = new Blob([JSON.stringify(request)], {
+      type: 'application/json; charset=UTF-8'
+    });
+    navigator.sendBeacon(this._decorateUrl(this.url, request), msg);
     return;
   }
 
@@ -435,7 +438,6 @@ scout.Session.prototype._handleSendWhenOffline = function(request) {
   }
   this.layoutValidator.validate();
 };
-
 
 scout.Session.prototype.defaultAjaxOptions = function(request) {
   request = request || {};
@@ -925,7 +927,7 @@ scout.Session.prototype.goOffline = function() {
 scout.Session.prototype.goOnline = function() {
   this.offline = false;
 
-  var request ={
+  var request = {
     uiSessionId: this.uiSessionId,
     syncResponseQueue: true
   };
