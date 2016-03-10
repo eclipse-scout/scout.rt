@@ -50,7 +50,7 @@ public class ColumnUserFilterState extends AbstractUserFilterState {
 
   @Override
   public Object createKey() {
-    return getColumn();
+    return m_columnId;
   }
 
   @Override

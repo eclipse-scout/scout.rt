@@ -766,7 +766,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     String type = data.getString("filterType");
     if ("column".equals(type)) {
       IColumn column = extractColumn(data);
-      return getModel().getUserFilterManager().getFilter(column);
+      return getModel().getUserFilterManager().getFilter(column.getColumnId());
     }
 
     return getModel().getUserFilterManager().getFilter(type);

@@ -3501,7 +3501,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       return;
     }
     for (IColumn<?> col : getColumns()) {
-      IUserFilterState filter = getUserFilterManager().getFilter(col);
+      IUserFilterState filter = getUserFilterManager().getFilter(col.getColumnId());
       if (filter == null) {
         continue;
       }
