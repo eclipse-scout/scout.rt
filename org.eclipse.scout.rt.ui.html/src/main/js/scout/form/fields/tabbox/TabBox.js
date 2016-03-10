@@ -220,11 +220,11 @@ scout.TabBox.prototype._syncMenus = function(menus, oldMenus) {
   }
 };
 
-scout.FormField.prototype._renderMenus = function() {
+scout.TabBox.prototype._renderMenus = function() {
   // NOP
 };
 
-scout.FormField.prototype._removeMenus = function() {
+scout.TabBox.prototype._removeMenus = function() {
   // menubar takes care about removal
 };
 
