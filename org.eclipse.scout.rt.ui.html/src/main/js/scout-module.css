@@ -8,6 +8,7 @@
 */
 //@include("scout/main.css")
 //@include("scout/box/Box.css")
+//@include("scout/boxbuttons/BoxButtons.css")
 //@include("scout/calendar/Calendar.css")
 //@include("scout/calendar/YearPanel.css")
 //@include("scout/datepicker/DatePicker.css")
@@ -58,6 +59,7 @@
 //@include("scout/form/fields/treefield/TreeField.css")
 //@include("scout/form/fields/wizard/WizardProgressField.css")
 //@include("scout/form/fields/wrappedform/WrappedFormField.css")
+//@include("scout/keystroke/keybox.css")
 //@include("scout/menu/Menu.css")
 //@include("scout/menu/MenuBar.css")
 //@include("scout/messagebox/MessageBox.css")
@@ -83,7 +85,5 @@
 //@include("scout/tooltip/Tooltip.css")
 //@include("scout/tree/Tree.css")
 //@include("scout/tree/CompactTree.css")
-//@include("scout/util/BoxButtons.css")
-//@include("scout/util/keybox.css")
 //@include("scout/util/ui-mouse.css")
 //@include("scout/util/ui-resizable.css")

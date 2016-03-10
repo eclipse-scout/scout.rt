@@ -10,15 +10,14 @@
 (function(scout, $, undefined) {
   __include("jquery/jquery-scout.js");
   __include("scout/main.js");
+  __include("scout/ObjectFactory.js");
   __include("scout/objectFactories.js");
   __include("scout/widget/Widget.js");
   __include("scout/widget/NullWidget.js");
   // Basic utilities
   __include("scout/util/arrays.js");
-  __include("scout/util/BoxButtons.js");
   __include("scout/util/dates.js");
   __include("scout/util/defaultValues.js");
-  __include("scout/util/DeferredGlassPaneTarget.js");
   __include("scout/util/DetachHelper.js");
   __include("scout/util/Device.js");
   __include("scout/util/DoubleClickSupport.js");
@@ -26,16 +25,10 @@
   __include("scout/util/EventSupport.js");
   __include("scout/util/fonts.js");
   __include("scout/util/icons.js");
-  __include("scout/util/FocusManager.js");
-  __include("scout/util/FocusContext.js");
-  __include("scout/util/focusUtils.js");
-  __include("scout/util/focusRule.js");
   __include("scout/util/inspector.js");
   __include("scout/util/logging.js");
   __include("scout/util/mimeTypes.js");
-  __include("scout/util/ModelAdapter.js");
   __include("scout/util/numbers.js");
-  __include("scout/util/ObjectFactory.js");
   __include("scout/util/objects.js");
   __include("scout/util/polyfills.js");
   __include("scout/util/Range.js");
@@ -43,7 +36,6 @@
   __include("scout/util/strings.js");
   __include("scout/util/styles.js");
   __include("scout/util/URL.js");
-  __include("scout/util/GlassPaneRenderer.js");
   __include("scout/util/filters.js");
   __include("scout/util/hAlign.js");
   __include("scout/util/aggregation.js");
@@ -52,6 +44,7 @@
   __include("scout/session/BusyIndicator.js");
   __include("scout/session/Event.js");
   __include("scout/session/Locale.js");
+  __include("scout/session/ModelAdapter.js");
   __include("scout/session/Reconnector.js");
   __include("scout/session/ResponseQueue.js");
   __include("scout/session/Session.js");
@@ -84,6 +77,13 @@
   __include("scout/keystroke/FocusAdjacentElementKeyStroke.js");
   __include("scout/keystroke/CloseKeyStroke.js");
   // Misc. elements
+  __include("scout/boxbuttons/BoxButtons.js");
+  __include("scout/focus/FocusManager.js");
+  __include("scout/focus/FocusContext.js");
+  __include("scout/focus/focusUtils.js");
+  __include("scout/focus/focusRule.js");
+  __include("scout/glasspane/DeferredGlassPaneTarget.js");
+  __include("scout/glasspane/GlassPaneRenderer.js");
   __include("scout/scrollbar/Scrollbar.js");
   __include("scout/scrollbar/scrollbars.js");
   __include("scout/splitter/Splitter.js");
@@ -91,7 +91,7 @@
   __include("scout/text/DecimalFormat.js");
   __include("scout/text/Texts.js");
   __include("scout/tooltip/Tooltip.js");
-  __include("scout/util/tooltips.js");
+  __include("scout/tooltip/tooltips.js");
   __include("scout/action/Action.js");
   __include("scout/action/ActionKeyStroke.js");
   __include("scout/box/Box.js");
