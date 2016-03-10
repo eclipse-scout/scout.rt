@@ -161,6 +161,13 @@ public final class SandboxClassLoaderBuilder {
    * Writes the content from the url output stream to the provided file.
    */
   protected static void writeContent(URL url, File f) throws IOException {
+    // ensure folder exists
+    File folder = f.getParentFile();
+    if (!folder.exists() && !folder.mkdirs()) {
+      throw new IOException("unable to create folder '" + folder.getAbsolutePath() + "'.");
+    }
+
+    // write content
     try (InputStream in = url.openStream(); FileOutputStream out = new FileOutputStream(f)) {
       byte[] buf = new byte[ANY_SIZE];
       int n;
