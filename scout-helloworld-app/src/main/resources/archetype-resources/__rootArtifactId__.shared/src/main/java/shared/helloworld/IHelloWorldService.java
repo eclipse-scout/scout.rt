@@ -9,11 +9,11 @@ import org.eclipse.scout.rt.shared.TunnelToServer;
 import ${package}.shared.helloworld.HelloWorldFormData;
 
 /**
- * <h3>{@link IHelloWorldFormService}</h3>
+ * <h3>{@link IHelloWorldService}</h3>
  *
  * @author ${userName}
  */
 @TunnelToServer
-public interface IHelloWorldFormService extends IService {
+public interface IHelloWorldService extends IService {
       HelloWorldFormData load(HelloWorldFormData input);
 }

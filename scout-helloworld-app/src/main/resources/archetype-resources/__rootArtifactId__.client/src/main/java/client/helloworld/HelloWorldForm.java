@@ -16,7 +16,7 @@ import org.eclipse.scout.rt.shared.TEXTS;
 import ${package}.client.helloworld.HelloWorldForm.MainBox.TopBox;
 import ${package}.client.helloworld.HelloWorldForm.MainBox.TopBox.MessageField;
 import ${package}.shared.helloworld.HelloWorldFormData;
-import ${package}.shared.helloworld.IHelloWorldFormService;
+import ${package}.shared.helloworld.IHelloWorldService;
 
 /**
  * <h3>{@link HelloWorldForm}</h3>
@@ -92,7 +92,7 @@ public class HelloWorldForm extends AbstractForm {
 
     @Override
     protected void execLoad() {
-      IHelloWorldFormService service = BEANS.get(IHelloWorldFormService.class);
+      IHelloWorldService service = BEANS.get(IHelloWorldService.class);
       HelloWorldFormData formData = new HelloWorldFormData();
       exportFormData(formData);
       formData = service.load(formData);

@@ -17,7 +17,7 @@ import org.mockito.Mockito;
 
 import ${package}.client.helloworld.HelloWorldForm.MainBox.TopBox.MessageField;
 import ${package}.shared.helloworld.HelloWorldFormData;
-import ${package}.shared.helloworld.IHelloWorldFormService;
+import ${package}.shared.helloworld.IHelloWorldService;
 
 /**
  * <h3>{@link HelloWorldFormTest}</h3>
@@ -32,11 +32,11 @@ public class HelloWorldFormTest {
 
   private static final String MESSAGE_VALUE = "testData";
 
-  // Register a mock service for {@link IHelloWorldFormService}
-  @BeanMock private IHelloWorldFormService m_mockSvc;
+  // Register a mock service for {@link IHelloWorldService}
+  @BeanMock private IHelloWorldService m_mockSvc;
 
   /**
-   * Return a reference {@link HelloWorldFormData} on method {@link IHelloWorldFormService${symbol_pound}load(HelloWorldFormData)}.
+   * Return a reference {@link HelloWorldFormData} on method {@link IHelloWorldService${symbol_pound}load(HelloWorldFormData)}.
    */
   @Before
   public void setup() {

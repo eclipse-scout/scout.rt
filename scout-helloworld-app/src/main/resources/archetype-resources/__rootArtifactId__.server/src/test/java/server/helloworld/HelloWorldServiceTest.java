@@ -13,23 +13,23 @@ import org.junit.runner.RunWith;
 
 import ${package}.server.ServerSession;
 import ${package}.shared.helloworld.HelloWorldFormData;
-import ${package}.shared.helloworld.IHelloWorldFormService;
+import ${package}.shared.helloworld.IHelloWorldService;
 
 /**
- * <h3>{@link HelloWorldFormServiceTest}</h3>
+ * <h3>{@link HelloWorldServiceTest}</h3>
  *
  * @author ${userName}
  */
 @RunWith(ServerTestRunner.class)
-@RunWithSubject(HelloWorldFormServiceTest.SUBJECT_NAME)
+@RunWithSubject(HelloWorldServiceTest.SUBJECT_NAME)
 @RunWithServerSession(ServerSession.class)
-public class HelloWorldFormServiceTest {
+public class HelloWorldServiceTest {
   public static final String SUBJECT_NAME = "test_subject";
 
   @Test
   public void testMessageContainsSubjectName() {
     HelloWorldFormData input = new HelloWorldFormData();
-    input = BEANS.get(IHelloWorldFormService.class).load(input);
+    input = BEANS.get(IHelloWorldService.class).load(input);
 
     Assert.assertNotNull(input.getMessage());
     Assert.assertEquals("Hello " + SUBJECT_NAME + "!", input.getMessage().getValue());
