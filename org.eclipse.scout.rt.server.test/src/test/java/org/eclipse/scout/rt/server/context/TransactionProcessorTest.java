@@ -120,7 +120,7 @@ public class TransactionProcessorTest {
 
   @Test
   public void testMandatoryWithExistingTransactionAndError() throws Exception {
-    final RuntimeException exception = new RuntimeException();
+    final RuntimeException exception = new RuntimeException("Expected JUnit exception");
     ITransaction callingTransaction = mock(ITransaction.class);
 
     final Holder<ITransaction> actualTransaction = new Holder<>();
@@ -181,7 +181,7 @@ public class TransactionProcessorTest {
 
   @Test
   public void testRequiresNewWithoutExistingTransactionAndError() throws Exception {
-    final RuntimeException exception = new RuntimeException();
+    final RuntimeException exception = new RuntimeException("Expected JUnit exception");
 
     final Holder<ITransaction> actualTransaction = new Holder<>();
 
@@ -214,7 +214,7 @@ public class TransactionProcessorTest {
 
   @Test
   public void testRequiresNewWithoutExistingTransactionAndErrorOnCommit() throws Exception {
-    final RuntimeException exception = new RuntimeException();
+    final RuntimeException exception = new RuntimeException("Expected JUnit exception");
 
     m_transaction.registerMember(new TestTransactionMember(exception));
 
@@ -280,7 +280,7 @@ public class TransactionProcessorTest {
   @Test
   public void testRequiresNewWithExistingTransactionAndError() throws Exception {
     ITransaction callingTransaction = mock(ITransaction.class);
-    final RuntimeException exception = new RuntimeException();
+    final RuntimeException exception = new RuntimeException("Expected JUnit exception");
 
     final Holder<ITransaction> actualTransaction = new Holder<>();
 
@@ -344,7 +344,7 @@ public class TransactionProcessorTest {
 
   @Test
   public void testRequiredWithoutExistingTransactionAndError() throws Exception {
-    final RuntimeException exception = new RuntimeException();
+    final RuntimeException exception = new RuntimeException("Expected JUnit exception");
 
     final Holder<ITransaction> actualTransaction = new Holder<>();
 
@@ -378,7 +378,7 @@ public class TransactionProcessorTest {
 
   @Test
   public void testRequiredWithoutExistingTransactionAndErrorOnCommit() throws Exception {
-    final RuntimeException exception = new RuntimeException();
+    final RuntimeException exception = new RuntimeException("Expected JUnit exception");
 
     ITransactionMember m = new TestTransactionMember(exception);
 
@@ -444,7 +444,7 @@ public class TransactionProcessorTest {
   public void testRequiredWithExistingTransactionAndError() throws Exception {
     ITransaction callingTransaction = mock(ITransaction.class);
 
-    final RuntimeException exception = new RuntimeException();
+    final RuntimeException exception = new RuntimeException("Expected JUnit exception");
 
     final Holder<ITransaction> actualTransaction = new Holder<>();
 

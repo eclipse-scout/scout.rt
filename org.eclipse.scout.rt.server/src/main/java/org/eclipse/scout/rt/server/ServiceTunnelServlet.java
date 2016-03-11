@@ -15,7 +15,6 @@ import java.io.InterruptedIOException;
 import java.net.SocketException;
 import java.security.AccessController;
 import java.util.Locale;
-import java.util.concurrent.Callable;
 
 import javax.security.auth.Subject;
 import javax.servlet.ServletException;
@@ -185,13 +184,7 @@ public class ServiceTunnelServlet extends HttpServlet {
    * Method invoked to delegate the HTTP request to the 'process service'.
    */
   protected ServiceTunnelResponse invokeService(final ServerRunContext serverRunContext, final ServiceTunnelRequest serviceTunnelRequest) {
-    return serverRunContext.call(new Callable<ServiceTunnelResponse>() {
-
-      @Override
-      public ServiceTunnelResponse call() throws Exception {
-        return BEANS.get(ServiceOperationInvoker.class).invoke(serviceTunnelRequest);
-      }
-    });
+    return BEANS.get(ServiceOperationInvoker.class).invoke(serverRunContext, serviceTunnelRequest);
   }
 
   // === MESSAGE UNMARSHALLING / MARSHALLING ===

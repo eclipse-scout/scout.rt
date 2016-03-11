@@ -12,11 +12,13 @@ package org.eclipse.scout.rt.server;
 
 import java.lang.reflect.Method;
 import java.util.Date;
+import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.context.RunMonitor;
+import org.eclipse.scout.rt.platform.context.RunContext;
+import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
@@ -27,7 +29,6 @@ import org.eclipse.scout.rt.server.admin.inspector.CallInspector;
 import org.eclipse.scout.rt.server.admin.inspector.ProcessInspector;
 import org.eclipse.scout.rt.server.admin.inspector.SessionInspector;
 import org.eclipse.scout.rt.server.session.ServerSessionProvider;
-import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.security.RemoteServiceAccessPermission;
 import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
@@ -50,12 +51,17 @@ public class ServiceOperationInvoker {
    * Invoke the service associated with the {@link ServiceTunnelRequest}. <br>
    * Must be called within a transaction.
    */
-  public ServiceTunnelResponse invoke(ServiceTunnelRequest serviceReq) {
-    long t0 = System.nanoTime();
-
+  public ServiceTunnelResponse invoke(final RunContext runContext, final ServiceTunnelRequest serviceReq) {
+    final long t0 = System.nanoTime();
     ServiceTunnelResponse response;
     try {
-      response = invokeInternal(serviceReq);
+      response = runContext.call(new Callable<ServiceTunnelResponse>() {
+
+        @Override
+        public ServiceTunnelResponse call() throws Exception {
+          return invokeInternal(serviceReq);
+        }
+      }, DefaultExceptionTranslator.class);
     }
     catch (Throwable t) {
       // Associate the exception with context information about the service call.
@@ -65,21 +71,19 @@ public class ServiceOperationInvoker {
             .withContextInfo("service.operation", serviceReq.getOperation());
       }
 
-      // Mark the transaction for rollback.
-      ITransaction.CURRENT.get().addFailure(t);
-
       // Handle the exception.
       handleException(t);
 
       // Prepare ServiceTunnelResponse.
       response = new ServiceTunnelResponse(interceptException(t));
     }
+
     response.setProcessingDuration(TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - t0));
     LOG.debug("TIME {}.{} {}ms", serviceReq.getServiceInterfaceClassName(), serviceReq.getOperation(), response.getProcessingDuration());
     return response;
   }
 
-  protected ServiceTunnelResponse invokeInternal(ServiceTunnelRequest serviceReq) throws Throwable {
+  protected ServiceTunnelResponse invokeInternal(ServiceTunnelRequest serviceReq) throws Exception {
     IServerSession serverSession = ServerSessionProvider.currentSession();
     if (LOG.isDebugEnabled()) {
       String userId = serverSession != null ? serverSession.getUserId() : "";
@@ -241,9 +245,7 @@ public class ServiceOperationInvoker {
    * not cancelled.
    */
   protected void handleException(Throwable t) {
-    if (!RunMonitor.CURRENT.get().isCancelled()) {
-      BEANS.get(ExceptionHandler.class).handle(t);
-    }
+    BEANS.get(ExceptionHandler.class).handle(t);
   }
 
   /**
