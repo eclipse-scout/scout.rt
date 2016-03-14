@@ -32,4 +32,13 @@ public interface IDeepLinks {
    */
   boolean handleRequest(String path) throws DeepLinkException;
 
+  /**
+   * @param webRoot
+   *          including protocol, host, port and context-path (without trailing slash). Example:
+   *          http://scout.eclipse.org:8080/widgets
+   */
+  void setWebRoot(String webRoot);
+
+  String getWebRoot();
+
 }

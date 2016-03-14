@@ -1,5 +1,6 @@
 package org.eclipse.scout.rt.client.deeplink;
 
+import java.net.URL;
 import java.util.regex.Matcher;
 
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
@@ -8,6 +9,7 @@ import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.platform.util.UriUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,9 +53,9 @@ public class OutlineHandler extends AbstractDeepLinkHandler {
   }
 
   public BrowserHistory createBrowserHistory(IDesktop desktop, IOutline outline) {
-    String path = getPathPrefix() + HANDLER_PREFIX + "/" + outlineId(outline) + "/" + toSlug(outline.getTitle());
+    URL url = UriUtility.toUrl(getUrlPrefix() + HANDLER_PREFIX + "/" + outlineId(outline) + "/" + toSlug(outline.getTitle()));
     String title = desktop.getTitle() + " - " + outline.getTitle();
-    return new BrowserHistory(path, title);
+    return new BrowserHistory(url.toString(), title);
   }
 
   private static String outlineId(IOutline outline) {

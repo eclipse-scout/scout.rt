@@ -23,6 +23,8 @@ public class DeepLinks implements IDeepLinks {
 
   private List<IDeepLinkHandler> m_handlers;
 
+  private String m_webRoot;
+
   public DeepLinks() {
     // FIXME awe: (deep-links) mit A.BR besprechen - ich finde es ungünstig, dass DeepLinks mehrfach instanziert wird
     // wenn man als entwickler etwas mit Singleton charakter erwartet ist es gefährlich, wenn der Ctor mehrfach aufgerufen
@@ -85,6 +87,16 @@ public class DeepLinks implements IDeepLinks {
     }
 
     return matcher.group(1);
+  }
+
+  @Override
+  public void setWebRoot(String webRoot) {
+    m_webRoot = webRoot;
+  }
+
+  @Override
+  public String getWebRoot() {
+    return m_webRoot;
   }
 
 }

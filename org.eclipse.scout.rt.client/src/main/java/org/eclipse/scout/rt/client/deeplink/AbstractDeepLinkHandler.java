@@ -6,6 +6,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 
@@ -38,19 +39,12 @@ public abstract class AbstractDeepLinkHandler implements IDeepLinkHandler {
   }
 
   /**
-   * @return The path prefix. Example: "/view/".
-   */
-  protected String getPathPrefix() {
-    return "/" + DeepLinks.DEEP_LINK_PREFIX + "/";
-  }
-
-  /**
-   * @return The prefix required to generate an absolute URL. Example: "http://localhost:8082/view/".
+   * @return The prefix required to generate an absolute URL (including trailing slash). Example:
+   *         "http://scou.eclipse.org:8080/widgets/view/".
    */
   protected String getUrlPrefix() {
-    // FIXME awe: (deep-links) must set that on DeepLinks when wep-app starts up
-    String webAppContext = "http://localhost:8082";
-    return webAppContext + getPathPrefix();
+    String webRoot = BEANS.get(IDeepLinks.class).getWebRoot();
+    return webRoot + "/" + DeepLinks.DEEP_LINK_PREFIX + "/";
   }
 
   @Override

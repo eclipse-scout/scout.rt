@@ -40,6 +40,7 @@ import javax.servlet.http.HttpSession;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
+import org.eclipse.scout.rt.client.deeplink.IDeepLinks;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
@@ -56,6 +57,7 @@ import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledException;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedException;
@@ -257,6 +259,22 @@ public class UiSession implements IUiSession {
     if (startupPath.startsWith(contextPath)) {
       startupPath = startupPath.substring(contextPath.length());
     }
+
+    // FIXME awe: (deep-links) only do this once, when platform starts up? same for all requests
+    StringBuilder webRoot = new StringBuilder();
+    webRoot.append(req.getScheme()).append("://");
+    webRoot.append(req.getServerName());
+    int port = req.getServerPort();
+    if (port != 80) {
+      webRoot.append(":").append(port);
+    }
+    if (StringUtility.isNullOrEmpty(contextPath)) {
+      webRoot.append("/");
+    }
+    else {
+      webRoot.append(contextPath);
+    }
+    BEANS.get(IDeepLinks.class).setWebRoot(webRoot.toString());
 
     return startupPath;
   }
