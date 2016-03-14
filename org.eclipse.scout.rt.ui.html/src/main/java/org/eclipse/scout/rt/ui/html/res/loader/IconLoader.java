@@ -41,9 +41,11 @@ public class IconLoader extends AbstractResourceLoader {
           .withFilename(iconSpec.getName())
           .withContent(iconSpec.getContent())
           .withLastModified(System.currentTimeMillis())
+          .withCachingAllowed(true)
+          .withCacheMaxAge(IHttpCacheControl.MAX_AGE_4_HOURS)
           .build();
 
-      return new HttpCacheObject(cacheKey, true, IHttpCacheControl.MAX_AGE_4_HOURS, content);
+      return new HttpCacheObject(cacheKey, content);
     }
     return null;
   }

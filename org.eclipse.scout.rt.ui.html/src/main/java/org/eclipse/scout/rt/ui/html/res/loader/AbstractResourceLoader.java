@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.res.loader;
 
-import java.util.Locale;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.eclipse.scout.rt.platform.util.Assertions;
@@ -28,7 +26,7 @@ public abstract class AbstractResourceLoader implements IResourceLoader {
   }
 
   @Override
-  public HttpCacheKey createCacheKey(String resourcePath, Locale locale) {
+  public HttpCacheKey createCacheKey(String resourcePath) {
     return new HttpCacheKey(resourcePath);
   }
 

@@ -34,15 +34,16 @@ public class DefaultHttpCacheControl implements IHttpCacheControl {
   }
 
   @Override
-  public void putCacheObject(HttpServletRequest req, HttpCacheObject obj) {
+  public boolean putCacheObject(HttpServletRequest req, HttpCacheObject obj) {
     if (!UiHints.isCacheHint(req)) {
-      return;
+      return false;
     }
     if (!obj.isCachingAllowed()) {
-      return;
+      return false;
     }
     m_cache.put(obj.getCacheKey(), obj);
     LOG.debug("Stored object in cache: {}", obj.getCacheKey());
+    return true;
   }
 
   @Override
@@ -64,14 +65,28 @@ public class DefaultHttpCacheControl implements IHttpCacheControl {
   }
 
   @Override
-  public boolean checkAndUpdateCacheHeaders(HttpServletRequest req, HttpServletResponse resp, HttpCacheObject obj) {
+  public boolean checkAndSetCacheHeaders(HttpServletRequest req, HttpServletResponse resp, String pathInfo, HttpCacheObject obj) {
+    // Check is only done if the request still processes the requested resource
+    // and hasn't been forwarded to another one (using req.getRequestDispatcher().forward)
+    if (pathInfo == null) {
+      pathInfo = req.getPathInfo();
+    }
+    String originalPathInfo = (String) req.getAttribute("javax.servlet.forward.path_info");
+    if (originalPathInfo != null && !pathInfo.equals(originalPathInfo)) {
+      //nop
+      return false;
+    }
+
     if (!UiHints.isCacheHint(req)) {
-      disableCacheHeaders(req, resp);
+      disableCaching(req, resp);
       return false;
     }
-    if (!obj.isCachingAllowed()) {
+
+    if (obj == null || !obj.isCachingAllowed()) {
+      disableCaching(req, resp);
       return false;
     }
+
     int maxAge = obj.getCacheMaxAge();
     if (maxAge > 0) {
       // "private"
@@ -81,7 +96,7 @@ public class DefaultHttpCacheControl implements IHttpCacheControl {
       //   is basically the same, but for proxies (s = shared). This overrides any default value
       //   the proxy may use internally.
       // Note: Because "must-revalidate" is not present, a cache MAY use a stale resource longer than max-age.
-      resp.setHeader("cache-control", "private, max-age=" + maxAge + ", s-maxage=" + maxAge);
+      resp.setHeader(CACHE_CONTROL, "private, max-age=" + maxAge + ", s-maxage=" + maxAge);
     }
     else {
       // "private"
@@ -91,7 +106,7 @@ public class DefaultHttpCacheControl implements IHttpCacheControl {
       // "max-age=0"
       //   A resource will become stale immediately (after 0 seconds).
       // Note: "max-age=0, must-revalidate" would be the same as "no-cache"
-      resp.setHeader("cache-control", "private, max-age=0, must-revalidate");
+      resp.setHeader(CACHE_CONTROL, "private, max-age=0, must-revalidate");
     }
 
     String etag = obj.createETag();
@@ -112,7 +127,6 @@ public class DefaultHttpCacheControl implements IHttpCacheControl {
     // Check If-Modified-Since
     else {
       long ifModifiedSince = req.getDateHeader(IF_MODIFIED_SINCE);
-      // for purposes of comparison we add 999 to ifModifiedSince since the fidelity of the IMS header generally doesn't include milli-seconds
       if (notModifiedSince(ifModifiedSince, obj.getResource().getLastModified())) {
         if (LOG.isDebugEnabled()) {
           LOG.debug("Use http cached object (If-Modified-Since): {}", req.getPathInfo());
@@ -132,17 +146,18 @@ public class DefaultHttpCacheControl implements IHttpCacheControl {
     return false;
   }
 
-  @Override
-  public void disableCacheHeaders(HttpServletRequest req, HttpServletResponse resp) {
+  protected void disableCaching(HttpServletRequest req, HttpServletResponse resp) {
     // "private"
     //   Only browsers may cache this resource.
+    // "no-store"
+    //   A cache MUST NOT store this resource.
     // "no-cache"
     //   A cache MUST NOT re-use this resource for subsequent requests.
     // "max-age=0"
     //   Should not be necessary here, but because some browser apparently imply a
     //   short caching time with "no-cache" (http://stackoverflow.com/a/19938619),
     //   we explicitly set it to 0.
-    resp.setHeader("cache-control", "private, no-cache, max-age=0");
+    resp.setHeader(CACHE_CONTROL, "private, no-store, no-cache, max-age=0");
   }
 
   protected boolean notModified(String ifNoneMatch, String etag) {
@@ -150,6 +165,7 @@ public class DefaultHttpCacheControl implements IHttpCacheControl {
   }
 
   protected boolean notModifiedSince(long ifModifiedSince, long lastModified) {
+    // for purposes of comparison we add 999 to ifModifiedSince since the fidelity of the IMS header generally doesn't include milli-seconds
     return (ifModifiedSince > -1 && lastModified > 0 && lastModified <= (ifModifiedSince + IF_MODIFIED_SINCE_FIDELITY));
   }
 }

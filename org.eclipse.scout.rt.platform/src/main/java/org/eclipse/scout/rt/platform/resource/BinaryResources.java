@@ -18,6 +18,8 @@ public final class BinaryResources {
   private String m_charset;
   private byte[] m_content;
   private long m_lastModified = -1; // default
+  private boolean m_cachingAllowed = false; // default
+  private int m_cacheMaxAge = 0; // default
 
   private BinaryResources() {
   }
@@ -107,11 +109,29 @@ public final class BinaryResources {
   }
 
   /**
+   * Enables / disables caching of this resource, default is false
+   */
+  public BinaryResources withCachingAllowed(boolean enabled) {
+    m_cachingAllowed = enabled;
+    return this;
+  }
+
+  /**
+   * Set cacheMaxAge. Ignored if {@link #withCachingAllowed(boolean)} is false.
+   * <p>
+   * see IHttpCacheControl constants
+   */
+  public BinaryResources withCacheMaxAge(int cacheMaxAge) {
+    m_cacheMaxAge = cacheMaxAge;
+    return this;
+  }
+
+  /**
    * @return Built binary resource
    */
   @SuppressWarnings("deprecation")
   public BinaryResource build() {
     // constructor will be changed to package private in 6.0, thus suppress deprecation warning in 5.2
-    return new BinaryResource(m_filename, m_contentType, m_charset, m_content, m_lastModified);
+    return new BinaryResource(m_filename, m_contentType, m_charset, m_content, m_lastModified, m_cachingAllowed, m_cacheMaxAge);
   }
 }

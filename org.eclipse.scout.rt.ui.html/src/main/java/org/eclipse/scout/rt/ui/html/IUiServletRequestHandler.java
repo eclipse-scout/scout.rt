@@ -17,9 +17,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.ui.html.cache.IHttpCacheControl;
 
 /**
  * Interface for handlers contributing to the {@link UiServlet}.
+ * <p>
+ * Make sure to call
+ * {@link IHttpCacheControl#checkAndSetCacheHeaders(HttpServletRequest, HttpServletResponse, String, org.eclipse.scout.rt.ui.html.cache.HttpCacheObject)}
+ * on the {@link IHttpCacheControl} bean in the handling of the request. Otherwise cache response headers may be missing
+ * and could lead to unexpected caching of sensitive information.
  */
 @ApplicationScoped
 public interface IUiServletRequestHandler {

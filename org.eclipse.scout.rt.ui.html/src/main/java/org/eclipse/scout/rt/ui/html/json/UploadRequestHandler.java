@@ -46,6 +46,7 @@ import org.eclipse.scout.rt.ui.html.ISessionStore;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.UiRunContexts;
 import org.eclipse.scout.rt.ui.html.UiServlet;
+import org.eclipse.scout.rt.ui.html.cache.IHttpCacheControl;
 import org.eclipse.scout.rt.ui.html.res.IBinaryResourceConsumer;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -61,6 +62,7 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
   private static final Pattern PATTERN_UPLOAD_ADAPTER_RESOURCE_PATH = Pattern.compile("^/upload/([^/]*)/([^/]*)$");
 
   private final HttpSessionHelper m_httpSessionHelper = BEANS.get(HttpSessionHelper.class);
+  private final IHttpCacheControl m_httpCacheControl = BEANS.get(IHttpCacheControl.class);
   private final JsonRequestHelper m_jsonRequestHelper = BEANS.get(JsonRequestHelper.class);
 
   @Override
@@ -84,6 +86,9 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
     if (LOG.isDebugEnabled()) {
       LOG.debug("File upload started");
     }
+
+    // disable caching
+    m_httpCacheControl.checkAndSetCacheHeaders(req, resp, null, null);
 
     try {
       // Get and validate existing UI session
@@ -129,7 +134,7 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
     Map<String, String> uploadProperties = new HashMap<String, String>();
     List<BinaryResource> uploadResources = new ArrayList<>();
     try {
-    readUploadData(httpServletRequest, binaryResourceConsumer.getMaximumBinaryResourceUploadSize(), uploadProperties, uploadResources);
+      readUploadData(httpServletRequest, binaryResourceConsumer.getMaximumBinaryResourceUploadSize(), uploadProperties, uploadResources);
     }
     catch (PlatformException ex) {
       writeJsonResponse(httpServletResponse, m_jsonRequestHelper.createUnsafeUploadResponse());
@@ -177,10 +182,10 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
       byte[] content = IOUtility.getContent(stream);
       String contentType = item.getContentType();
       BinaryResource res = BinaryResources.create()
-            .withFilename(filename)
-            .withContentType(contentType)
-            .withContent(content)
-            .build();
+          .withFilename(filename)
+          .withContentType(contentType)
+          .withContent(content)
+          .build();
       verifyFileSafety(res);
 
       if (item.isFormField()) {

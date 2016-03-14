@@ -11,15 +11,24 @@
 package org.eclipse.scout.rt.ui.html.res.loader;
 
 import java.io.IOException;
-import java.util.Locale;
 
 import org.eclipse.scout.rt.ui.html.cache.HttpCacheKey;
 import org.eclipse.scout.rt.ui.html.cache.HttpCacheObject;
 
 public interface IResourceLoader {
 
-  HttpCacheKey createCacheKey(String resourcePath, Locale locale);
+  /**
+   * @param resourcePath
+   *          may be null
+   * @return the {@link HttpCacheKey} for the resourcePath or null if the resourcePath is not handled
+   */
+  HttpCacheKey createCacheKey(String resourcePath);
 
+  /**
+   * @param cacheKey
+   *          not null
+   * @return the {@link HttpCacheObject} for the cacheKey or null if the cacheKey is not handled
+   */
   HttpCacheObject loadResource(HttpCacheKey cacheKey) throws IOException;
 
 }

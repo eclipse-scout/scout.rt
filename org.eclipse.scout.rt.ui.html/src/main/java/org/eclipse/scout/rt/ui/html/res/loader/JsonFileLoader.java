@@ -51,9 +51,11 @@ public class JsonFileLoader extends AbstractResourceLoader {
         .withCharset(StandardCharsets.UTF_8)
         .withContent(json.getBytes(StandardCharsets.UTF_8))
         .withLastModifiedNow()
+        .withCachingAllowed(true)
+        .withCacheMaxAge(IHttpCacheControl.MAX_AGE_4_HOURS)
         .build();
 
-    return new HttpCacheObject(cacheKey, true, IHttpCacheControl.MAX_AGE_4_HOURS, content);
+    return new HttpCacheObject(cacheKey, content);
   }
 
 }
