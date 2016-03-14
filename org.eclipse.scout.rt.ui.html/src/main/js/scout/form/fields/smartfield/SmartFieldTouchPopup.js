@@ -13,15 +13,19 @@ scout.SmartFieldTouchPopup = function() {
 };
 scout.inherits(scout.SmartFieldTouchPopup, scout.TouchPopup);
 
-scout.SmartFieldTouchPopup.prototype._postRender = function() {
-  scout.SmartFieldTouchPopup.parent.prototype._postRender.call(this);
-  this._field._openProposal(true);
+scout.SmartFieldTouchPopup.prototype._fieldOverrides = function() {
+  var obj = scout.SmartFieldTouchPopup.parent.prototype._fieldOverrides.call(this);
+  // Make sure proposal chooser does not get cloned, because it would not work (e.g. because selectedRows may not be cloned)
+  // It would also generate a loop because field would try to render the chooser and the popup
+  // -> The original smart field has to control the chooser
+  obj.proposalChooser = null;
+  return obj;
 };
 
 scout.SmartFieldTouchPopup.prototype._renderProposalChooser = function(proposalChooser) {
   proposalChooser.render(this._$widgetContainer);
   proposalChooser.setParent(this);
-  this._widgetContainerHtmlComp.revalidateLayout();
+  this._widgetContainerHtmlComp.invalidateLayoutTree();
 };
 
 /**

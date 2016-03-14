@@ -31,16 +31,20 @@ scout.TouchPopup.prototype._init = function(options) {
 
   // clone original touch field
   // original and clone both point to the same _popup instance
-  this._field = this._touchField.cloneAdapter({
+  this._field = this._touchField.cloneAdapter(this._fieldOverrides());
+
+  this._initWidget(options);
+};
+
+scout.TouchPopup.prototype._fieldOverrides = function() {
+  return {
     parent: this,
     popup: this,
     labelPosition: scout.FormField.LABEL_POSITION_ON_FIELD,
     statusVisible: false,
     embedded: true,
     touch: false
-  });
-
-  this._initWidget(options);
+  };
 };
 
 scout.TouchPopup.prototype._initWidget = function(options) {

@@ -163,27 +163,50 @@ describe('SmartField', function() {
 
   describe('touch = true', function() {
 
-    it('opens a touch popup', function() {
+    it('opens a touch popup when smart field gets touched', function() {
+      var proposalChooser = scout.create('Table', {parent: new scout.NullWidget(), session: session, _register: true});
+
       smartField.touch = true;
-      smartField.proposalChooser = scout.create('Table', {parent: smartField});
       smartField.render(session.$entryPoint);
       smartField.$field.click();
+      smartField.onModelPropertyChange(createPropertyChangeEvent(smartField, {
+        proposalChooser: proposalChooser.id
+      }));
       expect(smartField._popup.rendered).toBe(true);
       expect(smartField._popup._$widgetContainer.has(smartField.proposalChooser.$container));
       expect($('.touch-popup').length).toBe(1);
       expect($('.smart-field-popup').length).toBe(0);
 
       smartField._popup.close();
+      smartField.onModelPropertyChange(createPropertyChangeEvent(smartField, {
+        proposalChooser: null
+      }));
       expect(smartField._popup.rendered).toBe(false);
       expect($('.touch-popup').length).toBe(0);
       expect($('.smart-field-popup').length).toBe(0);
 
       // Expect same behavior after a second click
       smartField.$field.click();
+      smartField.onModelPropertyChange(createPropertyChangeEvent(smartField, {
+        proposalChooser: proposalChooser.id
+      }));
       expect(smartField._popup.rendered).toBe(true);
       expect(smartField._popup._$widgetContainer.has(smartField.proposalChooser.$container));
       expect($('.touch-popup').length).toBe(1);
       expect($('.smart-field-popup').length).toBe(0);
+      smartField._popup.close();
+    });
+
+    it('opens a touch popup if there already is a proposal chooser while rendering', function() {
+      smartField.proposalChooser = scout.create('Table', {parent: new scout.NullWidget(), session: session, _register: true});
+      smartField.touch = true;
+      smartField.render(session.$entryPoint);
+      expect(smartField._popup.rendered).toBe(true);
+      expect(smartField._popup._$widgetContainer.has(smartField.proposalChooser.$container));
+      expect($('.touch-popup').length).toBe(1);
+      expect($('.smart-field-popup').length).toBe(0);
+      expect($('.smart-field-popup').length).toBe(0);
+      smartField._popup.close();
     });
 
   });

@@ -140,8 +140,14 @@ scout.SmartField.prototype._renderDisplayText = function(displayText) {
  */
 scout.SmartField.prototype._syncProposalChooser = function(proposalChooser) {
   $.log.debug('(SmartField#_syncProposalChooser) set _requestedProposal to false');
-  this.proposalChooser = proposalChooser;
   this._requestedProposal = false;
+  if (this.embedded) {
+    // Never hold the proposal chooser in embedded mode, original smart field takes care of it
+    // This makes sure proposal chooser does not get rendered twice.
+    // Prevent rendering as well, original smart field will render it into the popup
+    return false;
+  }
+  this.proposalChooser = proposalChooser;
 };
 
 /**
@@ -149,7 +155,7 @@ scout.SmartField.prototype._syncProposalChooser = function(proposalChooser) {
  */
 scout.SmartField.prototype._renderProposalChooser = function() {
   $.log.debug('(SmartField#_renderProposalChooser) proposalChooser=' + this.proposalChooser + ' touch=' + this.touch);
-  if (!this.proposalChooser || this.touch) {
+  if (!this.proposalChooser) {
     return;
   }
   this._renderPopup();
@@ -161,9 +167,6 @@ scout.SmartField.prototype._renderProposalChooser = function() {
  */
 scout.SmartField.prototype._removeProposalChooser = function() {
   $.log.trace('(SmartField#_removeProposalChooser) proposalChooser=' + this.proposalChooser);
-  if (this.touch) {
-    return;
-  }
   this._closeProposal(false);
 };
 
@@ -180,22 +183,14 @@ scout.SmartField.prototype._isFunctionKey = function(e) {
 
 scout.SmartField.prototype._onClick = function(event) {
   if (scout.fields.handleOnClick(this)) {
-    if (this.touch) {
-      this._popup.open();
-    } else {
-      this._openProposal(true);
-    }
+    this._openProposal(true);
   }
 };
 
 scout.SmartField.prototype._onIconClick = function(event) {
   if (scout.fields.handleOnClick(this)) {
-    if (this.touch) {
-      this._popup.open();
-    } else {
-      scout.SmartField.parent.prototype._onIconClick.call(this, event);
-      this._openProposal(true);
-    }
+    scout.SmartField.parent.prototype._onIconClick.call(this, event);
+    this._openProposal(true);
   }
 };
 
@@ -330,7 +325,10 @@ scout.SmartField.prototype._proposalTyped = function() {
     });
   }.bind(this);
   id = setTimeout(func, this.DEBOUNCE_DELAY);
-  this._pendingProposalTyped = {func: func, id: id};
+  this._pendingProposalTyped = {
+    func: func,
+    id: id
+  };
 };
 
 /**
@@ -494,8 +492,8 @@ scout.SmartField.prototype._openProposal = function(browseAll) {
     searchText = this._readDisplayText(),
     selectCurrentValue = browseAll;
   this.displayText = displayText;
-  if(this.errorStatus){
-    selectCurrentValue=false;
+  if (this.errorStatus) {
+    selectCurrentValue = false;
   }
 
   if (this._requestedProposal) {
@@ -512,8 +510,7 @@ scout.SmartField.prototype._openProposal = function(browseAll) {
 };
 
 scout.SmartField.prototype._renderPopup = function() {
-  if (this._popup.rendered || this.embedded) {
-    // never render a popup for embedded smartfields to prevent a loop (in case of embedded mode popup is the container of the smartfield)
+  if (this._popup.rendered) {
     return;
   }
   this._popup.open();
