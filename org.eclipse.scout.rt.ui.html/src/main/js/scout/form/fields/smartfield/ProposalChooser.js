@@ -12,8 +12,8 @@ scout.ProposalChooser = function() {
   scout.ProposalChooser.parent.call(this);
   this._addAdapterProperties(['model']);
   this.$container;
-  this._$status;
-  this._$activeFilter;
+  this.$status;
+  this.$activeFilter;
   this.htmlComp;
 };
 scout.inherits(scout.ProposalChooser, scout.ModelAdapter);
@@ -28,11 +28,11 @@ scout.ProposalChooser.prototype._render = function($parent) {
     this.model._onNodeControlMouseDownDoFocus = function() {};
   }
 
-  this._$status = this.$container.appendDiv('status');
+  this.$status = this.$container.appendDiv('status');
 
   // support for activeFilter
   if (this.activeFilter) {
-    this._$activeFilter = this.$container.appendDiv('active-filter');
+    this.$activeFilter = this.$container.appendDiv('active-filter');
     var group = scout.create('RadioButtonGroup', {
       parent: this
     });
@@ -41,7 +41,7 @@ scout.ProposalChooser.prototype._render = function($parent) {
     this._appendOption(group, 'TRUE', this.activeFilterLabels[2], false);
     this._appendOption(group, 'FALSE', this.activeFilterLabels[1], false);
 
-    group.render(this._$activeFilter);
+    group.render(this.$activeFilter);
   }
 };
 
@@ -69,11 +69,11 @@ scout.ProposalChooser.prototype._renderStatusVisible = function() {
 
 scout.ProposalChooser.prototype._updateStatus = function() {
   $.log.debug('_updateStatus status=' + this.status + ' statusVisible=' + this.statusVisible);
-  this._$status.setVisible(this.statusVisible && this.status);
+  this.$status.setVisible(this.statusVisible && this.status);
   if (this.status) {
     this._setStatusMessage(this.status.message);
   } else {
-    this._$status.text('');
+    this.$status.text('');
   }
 };
 
@@ -81,7 +81,7 @@ scout.ProposalChooser.prototype._updateStatus = function() {
  * Replaces an ellipsis (...) at the end of the message-text with a CSS animation.
  */
 scout.ProposalChooser.prototype._setStatusMessage = function(message) {
-  scout.Status.animateStatusMessage(this._$status, message);
+  scout.Status.animateStatusMessage(this.$status, message);
 };
 
 scout.ProposalChooser.prototype._appendOption = function(group, value, text, selected) {

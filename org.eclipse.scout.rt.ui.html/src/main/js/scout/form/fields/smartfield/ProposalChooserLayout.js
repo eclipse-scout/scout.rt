@@ -108,20 +108,20 @@ scout.ProposalChooserLayout.prototype.layout = function($container) {
   var htmlContainer = scout.HtmlComponent.get($container),
     htmlModel = scout.HtmlComponent.get($container.children(this._typeHandler.cssSelector)),
     size = htmlContainer.getSize().subtract(htmlContainer.getInsets()),
-    $status = $container.children('.status:visible'),
-    $activeFilter = $container.children('.active-filter:visible');
+    $status = this._proposalChooser.$status,
+    $activeFilter = this._proposalChooser.$activeFilter;
 
-  if ($status.length) {
+  if ($status && $status.isVisible()) {
     size.height -= scout.graphics.getSize($status).height;
   }
-  if ($activeFilter.length) {
+  if ($activeFilter && $activeFilter.isVisible()) {
     size.height -= scout.graphics.getSize($activeFilter).height;
   }
 
   // when status or active-filter is available we must explicitly set the
   // height of the model (table or tree) in pixel. Otherwise we'd rely on
   // the CSS height which is set to 100%.
-  if ($status.length || $activeFilter.length) {
+  if (($status && $status.isVisible()) || ($activeFilter && $activeFilter.isVisible())) {
     htmlModel.pixelBasedSizing = true;
   }
 
@@ -136,8 +136,8 @@ scout.ProposalChooserLayout.prototype.layout = function($container) {
 scout.ProposalChooserLayout.prototype.preferredLayoutSize = function($container) {
   var oldDisplay, prefSize, modelSize, statusSize, activeFilterSize,
     htmlContainer = this._proposalChooser.htmlComp,
-    $status = this._proposalChooser._$status,
-    $activeFilter = this._proposalChooser._$activeFilter;
+    $status = this._proposalChooser.$status,
+    $activeFilter = this._proposalChooser.$activeFilter;
 
   this._typeHandler.prepare($container, this);
 

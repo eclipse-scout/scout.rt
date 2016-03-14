@@ -80,5 +80,6 @@ scout.TouchPopup.prototype._render = function($parent) {
   }
 
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
+  this.htmlComp.validateRoot = true;
   this.htmlComp.setLayout(this._createLayout());
 };
