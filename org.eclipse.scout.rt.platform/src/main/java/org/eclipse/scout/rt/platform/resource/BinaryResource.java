@@ -59,10 +59,9 @@ public final class BinaryResource implements Serializable {
    *          The resource's content as byte array. The fingerprint for the given content is calculated automatically.
    * @param lastModified
    *          "Last modified" timestamp of the resource (in milliseconds a.k.a. UNIX time). <code>-1</code> if unknown.
-   * @deprecated Use {@link BinaryResources} instead. Constructor will be package private in 6.0.
    */
-  @Deprecated
-  public BinaryResource(String filename, String contentType, String charset, byte[] content, long lastModified) {
+  // explicitly package private, only called by BinaryResources and second constructor
+  BinaryResource(String filename, String contentType, String charset, byte[] content, long lastModified) {
     m_filename = filename;
     if (contentType == null) {
       if (filename != null) {
@@ -92,39 +91,6 @@ public final class BinaryResource implements Serializable {
   }
 
   /**
-   * Convenience constructor which assumes <code>filename = empty, lastModified = -1</code>.
-   *
-   * @see #BinaryResource(String, String, String, byte[], long)
-   * @deprecated Use {@link BinaryResources} instead (use contentType.getType() for string content type).
-   */
-  @Deprecated
-  public BinaryResource(MimeType contentType, byte[] content) {
-    this(null, contentType != null ? contentType.getType() : null, null, content, -1);
-  }
-
-  /**
-   * Convenience constructor which assumes <code>charset = null</code>.
-   *
-   * @see #BinaryResource(String, String, String, byte[], long)
-   * @deprecated Use {@link BinaryResources} instead.
-   */
-  @Deprecated
-  public BinaryResource(String filename, String contentType, byte[] content, long lastModified) {
-    this(filename, contentType, null, content, lastModified);
-  }
-
-  /**
-   * Convenience constructor which assumes <code>lastModified = -1</code>.
-   *
-   * @see #BinaryResource(String, String, String, byte[], long)
-   * @deprecated Use {@link BinaryResources} instead.
-   */
-  @Deprecated
-  public BinaryResource(String filename, String contentType, byte[] content) {
-    this(filename, contentType, null, content, -1);
-  }
-
-  /**
    * Convenience constructor which assumes <code>contentType = null</code> and <code>lastModified = -1</code>
    * <p>
    * null contentType is replaced by {@link FileUtility#getContentTypeForExtension(String)}
@@ -133,19 +99,6 @@ public final class BinaryResource implements Serializable {
    */
   public BinaryResource(String filename, byte[] content) {
     this(filename, null, null, content, -1);
-  }
-
-  /**
-   * Reads the contents of the given file into a new {@link BinaryResource}. This constructor is intended to read from
-   * temporary files only. If the file is not accessible, the constructor will fail.
-   *
-   * @deprecated Use {@link BinaryResources} to build resource instead and load properties manually (filename:
-   *             file.getName(), content type: FileUtility.getContentType(file), content: IOUtility.getContent(file),
-   *             last modified: file.lastModified()).
-   */
-  @Deprecated
-  public BinaryResource(File file) {
-    this(file.getName(), FileUtility.getContentType(file), null, IOUtility.getContent(file), file.lastModified());
   }
 
   /**

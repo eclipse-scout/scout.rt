@@ -109,7 +109,6 @@ public final class BinaryResources {
   /**
    * @return Built binary resource
    */
-  @SuppressWarnings("deprecation")
   public BinaryResource build() {
     // constructor will be changed to package private in 6.0, thus suppress deprecation warning in 5.2
     return new BinaryResource(m_filename, m_contentType, m_charset, m_content, m_lastModified);
