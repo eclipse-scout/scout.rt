@@ -12,6 +12,8 @@ package org.eclipse.scout.rt.shared.csv;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.anyListOf;
@@ -26,6 +28,7 @@ import java.io.Reader;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -44,7 +47,7 @@ public class CsvHelperTest {
 
   private CsvHelper m_csvHelper;
   private File m_testFile;
-  private List<String> columnNames = Arrays.asList(new String[]{"col1", "col2", "col3", "col4", "col5"});
+  private List<String> m_columnNames = Arrays.asList(new String[]{"col1", "col2", "col3", "col4", "col5"});
 
   @Before
   public void setUp() throws Exception {
@@ -144,7 +147,7 @@ public class CsvHelperTest {
   }
 
   private void export(Object[][] data) {
-    m_csvHelper.exportData(data, m_testFile, StandardCharsets.UTF_8.name(), columnNames, true, null, false);
+    m_csvHelper.exportData(data, m_testFile, StandardCharsets.UTF_8.name(), m_columnNames, true, null, false);
   }
 
   /**
@@ -206,5 +209,38 @@ public class CsvHelperTest {
     writer = new StringWriter();
     csvHelper.exportDataRow(new Object[]{"\nab", "b\nc", "cd\n"}, writer, true);
     assertEquals("\"\nab\",\"b\nc\",\"cd\n\"\n", writer.toString());
+  }
+
+  @Test
+  public void testGetIgnoredColumns() {
+    // ignored column is null -> returned ignored list is empty
+    List<Boolean> ignoredColumns = m_csvHelper.getIgnoredColumns();
+    assertTrue(ignoredColumns.isEmpty());
+
+    // empty list
+    m_csvHelper.setColumnNames(Collections.<String> emptyList());
+    ignoredColumns = m_csvHelper.getIgnoredColumns();
+    assertNotNull(ignoredColumns);
+    assertTrue(ignoredColumns.isEmpty());
+
+    // multiple without ignored columns
+    m_csvHelper.setColumnNames(m_columnNames);
+    ignoredColumns = m_csvHelper.getIgnoredColumns();
+    assertEquals(m_columnNames.size(), ignoredColumns.size());
+    for (Boolean column : ignoredColumns) {
+      assertFalse(column);
+    }
+
+    // multiple with ignored columns
+    List<String> columnNames = Arrays.asList("col1", CsvHelper.IGNORED_COLUMN_NAME, "col2", CsvHelper.IGNORED_COLUMN_NAME, CsvHelper.IGNORED_COLUMN_NAME, "col3");
+    m_csvHelper.setColumnNames(columnNames);
+    ignoredColumns = m_csvHelper.getIgnoredColumns();
+    assertEquals(columnNames.size(), ignoredColumns.size());
+    assertFalse(ignoredColumns.get(0));
+    assertTrue(ignoredColumns.get(1));
+    assertFalse(ignoredColumns.get(2));
+    assertTrue(ignoredColumns.get(3));
+    assertTrue(ignoredColumns.get(4));
+    assertFalse(ignoredColumns.get(5));
   }
 }

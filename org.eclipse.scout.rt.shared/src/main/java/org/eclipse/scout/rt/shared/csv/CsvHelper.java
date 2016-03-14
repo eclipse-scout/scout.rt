@@ -34,6 +34,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -176,6 +177,21 @@ public class CsvHelper {
       m_colFormat.add(f);
     }
     m_colCount = Math.max(m_colCount, m_colTypes.size());
+  }
+
+  /**
+   * @return a copy of the ignored columns as a list
+   */
+  public List<Boolean> getIgnoredColumns() {
+    if (m_ignoredColumns == null) {
+      return Collections.emptyList();
+    }
+
+    List<Boolean> ignoredColumns = new ArrayList<Boolean>(m_ignoredColumns.length);
+    for (int i = 0; i < m_ignoredColumns.length; i++) {
+      ignoredColumns.add(m_ignoredColumns[i]);
+    }
+    return ignoredColumns;
   }
 
   public Object[][] importData(Reader reader, int headerRowCount, List<String> columnTypes, int rowCount) {
