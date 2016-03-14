@@ -25,6 +25,7 @@ scout.SmartFieldTouchPopup.prototype._fieldOverrides = function() {
 scout.SmartFieldTouchPopup.prototype._renderProposalChooser = function(proposalChooser) {
   proposalChooser.render(this._$widgetContainer);
   proposalChooser.setParent(this);
+  proposalChooser.$container.addClass('touch');
   this._widgetContainerHtmlComp.invalidateLayoutTree();
 };
 

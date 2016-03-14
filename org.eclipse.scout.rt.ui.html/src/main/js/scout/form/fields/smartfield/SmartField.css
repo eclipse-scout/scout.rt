@@ -132,7 +132,11 @@
         background-color: @item-selection-background-color;
         border-color: @item-selection-border-color;
       }
+    }
+  }
 
+  &:not(.touch) > .table {
+    & > .table-data > .table-row {
       &.selected.last {
         /* Change color of last element to avoid double-border effect */
         border-bottom-color: @item-selection-background-color;
