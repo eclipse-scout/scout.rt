@@ -16,11 +16,9 @@ import org.eclipse.scout.rt.client.services.common.bookmark.internal.BookmarkUti
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.userfilter.AbstractUserFilterState;
-import org.eclipse.scout.rt.client.ui.basic.userfilter.IUserFilterState;
-import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 
-public class ColumnUserFilterState extends AbstractUserFilterState implements IUserFilterState {
+public class ColumnUserFilterState extends AbstractUserFilterState {
   private static final long serialVersionUID = 1L;
   public static final String TYPE = "column";
 
@@ -52,7 +50,7 @@ public class ColumnUserFilterState extends AbstractUserFilterState implements IU
 
   @Override
   public Object createKey() {
-    return getColumn();
+    return m_columnId;
   }
 
   @Override
@@ -61,13 +59,10 @@ public class ColumnUserFilterState extends AbstractUserFilterState implements IU
   }
 
   @Override
-  public void notifyDeserialized(Object obj) {
+  public boolean notifyDeserialized(Object obj) {
     ITable table = (ITable) obj;
-    IColumn<?> col = BookmarkUtility.resolveColumn(table.getColumns(), m_columnId);
-    if (col == null) {
-      throw new ProcessingException("Column could not be restored. " + m_columnId);
-    }
-    m_column = col;
+    m_column = BookmarkUtility.resolveColumn(table.getColumns(), m_columnId);
+    return m_column != null;
   }
 
 }

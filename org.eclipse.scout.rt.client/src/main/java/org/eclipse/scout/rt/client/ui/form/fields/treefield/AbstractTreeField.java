@@ -40,6 +40,7 @@ import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
+import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 import org.eclipse.scout.rt.shared.data.form.fields.treefield.AbstractTreeFieldData;
@@ -200,6 +201,7 @@ public abstract class AbstractTreeField extends AbstractFormField implements ITr
 
   @Override
   public void importFormFieldData(AbstractFormFieldData source, boolean valueChangeTriggersEnabled) {
+    Assertions.assertNotNull(source);
     AbstractTreeFieldData treeFieldData = (AbstractTreeFieldData) source;
     if (treeFieldData.isValueSet()) {
       if (m_tree != null) {

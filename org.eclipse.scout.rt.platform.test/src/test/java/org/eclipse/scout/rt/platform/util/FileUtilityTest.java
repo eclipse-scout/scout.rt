@@ -17,6 +17,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.InputStream;
+import java.nio.file.Paths;
 
 import org.junit.Test;
 
@@ -88,4 +89,23 @@ public class FileUtilityTest {
     // other tests already covered by testGetFileExtension_File
   }
 
+  @Test
+  public void testGetContentTypeForExtension_xml() {
+    assertEquals("text/xml", FileUtility.getContentTypeForExtension("xml"));
+  }
+
+  @Test
+  public void testGetContentTypeForExtension_XML() {
+    assertEquals("text/xml", FileUtility.getContentTypeForExtension("XML"));
+  }
+
+  @Test
+  public void testGetContentTypeForExtension_m4v() {
+    assertEquals("application/octet-stream", FileUtility.getMimeType(Paths.get("m4v")));
+  }
+
+  @Test
+  public void testFileMagic() {
+
+  }
 }

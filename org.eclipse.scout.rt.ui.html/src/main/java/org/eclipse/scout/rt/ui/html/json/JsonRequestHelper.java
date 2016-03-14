@@ -60,6 +60,15 @@ public class JsonRequestHelper {
   }
 
   /**
+   * @return {@link JSONObject} to indicate that the file upload is unsafe.
+   */
+  public JSONObject createUnsafeUploadResponse() {
+    final JsonResponse response = new JsonResponse();
+    response.markAsError(JsonResponse.ERR_UNSAFE_UPLOAD, "Unsafe file upload.");
+    return response.toJson();
+  }
+
+  /**
    * @return {@link JSONObject} to indicate that the session expired.
    */
   public JSONObject createSessionTimeoutResponse() {

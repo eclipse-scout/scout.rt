@@ -1398,7 +1398,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
     if (table != null) {
       TableUserFilterManager m = table.getUserFilterManager();
       if (m != null) {
-        return m.getFilter(this) != null;
+        return m.getFilter(getColumnId()) != null;
       }
     }
     return false;

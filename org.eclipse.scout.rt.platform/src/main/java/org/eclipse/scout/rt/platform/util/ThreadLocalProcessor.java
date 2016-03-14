@@ -42,7 +42,7 @@ public class ThreadLocalProcessor<THREAD_LOCAL> implements ICallableDecorator {
     return new IUndecorator() {
 
       @Override
-      public void undecorate(final Throwable throwable) {
+      public void undecorate() {
         if (originValue == null) {
           m_threadLocal.remove();
         }

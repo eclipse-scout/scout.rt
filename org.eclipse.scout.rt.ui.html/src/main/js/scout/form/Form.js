@@ -153,18 +153,23 @@ scout.Form.prototype._updateTitleForWindow = function() {
 };
 
 scout.Form.prototype._updateTitleForDom = function() {
-  if (this.title || this.subTitle) {
+  var titleText = this.title;
+  if (!titleText && this.closable) {
+    // Add '&nbsp;' to prevent title-box of a closable form from collapsing if title is empty;
+    titleText = scout.strings.plainText('&nbsp;');
+  }
+  if (titleText || this.subTitle) {
     var $titles = getOrAppendChildDiv(this.$container, 'title-box');
     // Render title
-    if (this.title) {
+    if (titleText) {
       getOrAppendChildDiv($titles, 'title')
-        .text(this.title)
+        .text(titleText)
         .icon(this.iconId);
     } else {
       removeChildDiv($titles, 'title');
     }
     // Render subTitle
-    if (this.title) {
+    if (scout.strings.hasText(titleText)) {
       getOrAppendChildDiv($titles, 'sub-title').text(this.subTitle);
     } else {
       removeChildDiv($titles, 'sub-title');

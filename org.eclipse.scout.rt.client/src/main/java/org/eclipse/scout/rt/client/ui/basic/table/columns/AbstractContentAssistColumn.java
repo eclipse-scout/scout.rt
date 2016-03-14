@@ -28,6 +28,8 @@ import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 import org.eclipse.scout.rt.shared.services.lookup.BatchLookupCall;
@@ -319,32 +321,18 @@ public abstract class AbstractContentAssistColumn<VALUE, LOOKUP_TYPE> extends Ab
       tableRow.setRowChanging(true);
       //
       Cell cell = tableRow.getCellForUpdate(this);
-      if (result.size() == 1) {
-        cell.setText(result.get(0).getText());
-        cell.setTooltipText(result.get(0).getTooltipText());
-      }
-      else if (result.size() > 1) {
-        StringBuilder buf = new StringBuilder();
-        StringBuilder bufTooltip = new StringBuilder();
+      String separator = getResultRowSeparator();
 
-        String separator = getResultRowSeparator();
+      List<String> texts = CollectionUtility.emptyArrayList();
+      List<String> tooltipTexts = CollectionUtility.emptyArrayList();
 
-        for (int i = 0; i < result.size(); i++) {
-          if (i > 0) {
-            buf.append(separator);
-            bufTooltip.append(separator);
-          }
-          ILookupRow<?> row = result.get(i);
-          buf.append(row.getText());
-          bufTooltip.append(row.getTooltipText());
-        }
-        cell.setText(buf.toString());
-        cell.setTooltipText(bufTooltip.toString());
+      for (ILookupRow<?> row : result) {
+        texts.add(row.getText());
+        tooltipTexts.add(row.getTooltipText());
       }
-      else {
-        cell.setText("");
-        cell.setTooltipText("");
-      }
+
+      cell.setText(StringUtility.join(separator, texts));
+      cell.setTooltipText(StringUtility.join(separator, tooltipTexts));
     }
     finally {
       tableRow.setRowPropertiesChanged(false);

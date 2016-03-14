@@ -40,7 +40,8 @@ public class AbstractUserFilterState implements IUserFilterState {
   }
 
   @Override
-  public void notifyDeserialized(Object obj) {
+  public boolean notifyDeserialized(Object obj) {
+    return true;
   }
 
 }

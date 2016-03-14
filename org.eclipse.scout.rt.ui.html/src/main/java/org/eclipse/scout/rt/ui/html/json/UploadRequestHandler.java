@@ -30,12 +30,12 @@ import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.apache.commons.fileupload.util.Streams;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
+import org.eclipse.scout.rt.platform.resource.BinaryResources;
 import org.eclipse.scout.rt.platform.security.MalwareScanner;
 import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
@@ -128,7 +128,13 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
     // Read uploaded data
     Map<String, String> uploadProperties = new HashMap<String, String>();
     List<BinaryResource> uploadResources = new ArrayList<>();
+    try {
     readUploadData(httpServletRequest, binaryResourceConsumer.getMaximumBinaryResourceUploadSize(), uploadProperties, uploadResources);
+    }
+    catch (PlatformException ex) {
+      writeJsonResponse(httpServletResponse, m_jsonRequestHelper.createUnsafeUploadResponse());
+      return;
+    }
 
     if (uploadProperties.containsKey("legacyFormTextPlainAnswer")) {
       httpServletResponse.setContentType("text/plain");
@@ -162,28 +168,32 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
     upload.setSizeMax(maxSize);
     for (FileItemIterator it = upload.getItemIterator(httpReq); it.hasNext();) {
       FileItemStream item = it.next();
-      String name = item.getFieldName();
+      String filename = item.getName();
+      if (StringUtility.hasText(filename)) {
+        String[] parts = StringUtility.split(filename, "[/\\\\]");
+        filename = parts[parts.length - 1];
+      }
       InputStream stream = item.openStream();
+      byte[] content = IOUtility.getContent(stream);
+      String contentType = item.getContentType();
+      BinaryResource res = BinaryResources.create()
+            .withFilename(filename)
+            .withContentType(contentType)
+            .withContent(content)
+            .build();
+      verifyFileSafety(res);
 
       if (item.isFormField()) {
         // Handle non-file fields (interpreted as properties)
-        uploadProperties.put(name, Streams.asString(stream, StandardCharsets.UTF_8.name()));
+        String name = item.getFieldName();
+        uploadProperties.put(name, new String(content, StandardCharsets.UTF_8.name()));
       }
       else {
         // Handle files
-        String filename = item.getName();
-        if (StringUtility.hasText(filename)) {
-          String[] parts = StringUtility.split(filename, "[/\\\\]");
-          filename = parts[parts.length - 1];
-        }
-        String contentType = item.getContentType();
-        byte[] content = IOUtility.getContent(stream);
         // Info: we cannot set the charset property for uploaded files here, because we simply don't know it.
         // the only thing we could do is to guess the charset (encoding) by reading the byte contents of
         // uploaded text files (for binary file types the encoding is not relevant). However: currently we
         // do not set the charset at all.
-        BinaryResource res = new BinaryResource(filename, contentType, content);
-        BEANS.get(MalwareScanner.class).scan(res);
         uploadResources.add(res);
       }
     }
@@ -221,4 +231,17 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
   protected void writeJsonResponse(ServletResponse servletResponse, JSONObject jsonObject) throws IOException {
     m_jsonRequestHelper.writeResponse(servletResponse, jsonObject);
   }
+
+  /**
+   * Checks the resource to be uploaed for malware
+   *
+   * @param res
+   * @throws PlatformException
+   *           when unsafe
+   */
+  protected void verifyFileSafety(BinaryResource res) {
+    //do malware scan
+    BEANS.get(MalwareScanner.class).scan(res);
+  }
+
 }

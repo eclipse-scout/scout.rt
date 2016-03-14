@@ -18,6 +18,7 @@ import java.util.Map.Entry;
 
 import org.eclipse.scout.rt.client.ui.form.fields.clipboardfield.IClipboardField;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
+import org.eclipse.scout.rt.platform.resource.BinaryResources;
 import org.eclipse.scout.rt.platform.resource.MimeType;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
@@ -73,7 +74,11 @@ public class JsonClipboardField<T extends IClipboardField> extends JsonValueFiel
     for (Entry<String, String> property : uploadProperties.entrySet()) {
       if (property.getKey().matches("textTransferObject\\d+")) {
         byte[] bytes = property.getValue().getBytes(StandardCharsets.UTF_8);
-        binaryResources.add(new BinaryResource(MimeType.TEXT_PLAIN, bytes));
+        // anonymous text paste, no filename
+        binaryResources.add(BinaryResources.create()
+            .withContentType(MimeType.TEXT_PLAIN.getType())
+            .withContent(bytes)
+            .build());
       }
     }
     // Pass binary resources to clipboard field

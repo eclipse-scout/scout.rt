@@ -74,6 +74,8 @@ public class UiTextContributor implements IUiTextContributor {
         "ui.ServerError",
         "ui.SessionTimeout",
         "ui.SessionExpiredMsg",
+        "ui.UnsafeUpload",
+        "ui.UnsafeUploadMsg",
         "ui.Move",
         "ui.toBegin",
         "ui.forward",

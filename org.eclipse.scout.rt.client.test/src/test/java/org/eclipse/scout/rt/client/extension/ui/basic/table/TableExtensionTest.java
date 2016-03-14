@@ -80,7 +80,7 @@ public class TableExtensionTest extends AbstractLocalExtensionTestCase {
   }
 
   protected void verifyExtendedAllPersonTable(AllPersonTable allPersonTable) {
-    assertEquals(4, allPersonTable.getColumnCount());
+    assertEquals(5, allPersonTable.getColumnCount());
     assertSame(allPersonTable.getNameColumn(), allPersonTable.getColumnSet().getColumn(0));
     assertSame(allPersonTable.getCityColumn(), allPersonTable.getColumnSet().getColumn(1));
     assertSame(allPersonTable.getAgeColumn(), allPersonTable.getColumnSet().getColumn(2));
@@ -88,13 +88,14 @@ public class TableExtensionTest extends AbstractLocalExtensionTestCase {
     PersonTableExtension extension = allPersonTable.getExtension(PersonTableExtension.class);
     assertNotNull(extension);
     assertSame(extension.getStreetColumn(), allPersonTable.getColumnSet().getColumn(3));
+    assertSame(extension.getCityColumn(), allPersonTable.getColumnSet().getColumn(4));
 
     NameColumnExtension columnExtension = allPersonTable.getNameColumn().getExtension(NameColumnExtension.class);
     assertNotNull(columnExtension);
   }
 
   protected void verifyExtendedOtherPersonTable(OtherPersonTable otherPersonTable) {
-    assertEquals(4, otherPersonTable.getColumnCount());
+    assertEquals(5, otherPersonTable.getColumnCount());
     assertSame(otherPersonTable.getNameColumn(), otherPersonTable.getColumnSet().getColumn(0));
     assertSame(otherPersonTable.getAgeColumn(), otherPersonTable.getColumnSet().getColumn(1));
     assertSame(otherPersonTable.getPhoneNumberColumn(), otherPersonTable.getColumnSet().getColumn(2));
@@ -102,6 +103,7 @@ public class TableExtensionTest extends AbstractLocalExtensionTestCase {
     PersonTableExtension extension = otherPersonTable.getExtension(PersonTableExtension.class);
     assertNotNull(extension);
     assertSame(extension.getStreetColumn(), otherPersonTable.getColumnSet().getColumn(3));
+    assertSame(extension.getCityColumn(), otherPersonTable.getColumnSet().getColumn(4));
 
     NameColumnExtension columnExtension = otherPersonTable.getNameColumn().getExtension(NameColumnExtension.class);
     assertNotNull(columnExtension);

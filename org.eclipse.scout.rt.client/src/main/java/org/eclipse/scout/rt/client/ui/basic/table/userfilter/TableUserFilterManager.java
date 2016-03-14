@@ -116,8 +116,13 @@ public class TableUserFilterManager {
     try {
       Collection<IUserFilterState> filterStates = SerializationUtility.createObjectSerializer().deserialize(data, null);
       for (IUserFilterState filterState : filterStates) {
-        filterState.notifyDeserialized(m_table);
-        addFilter(filterState);
+        boolean success = filterState.notifyDeserialized(m_table);
+        if (success) {
+          addFilter(filterState);
+        }
+        else {
+          LOG.info("User filter state of table '{}' cannot be deserialized because the column could not be found. Ignoring element.", m_table.getClass().getName());
+        }
       }
     }
     catch (IOException | ClassNotFoundException e) {

@@ -18,6 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
+import org.eclipse.scout.rt.platform.resource.BinaryResources;
 import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.ui.html.cache.HttpCacheKey;
 import org.eclipse.scout.rt.ui.html.cache.HttpCacheObject;
@@ -45,7 +46,13 @@ public class JsonFileLoader extends AbstractResourceLoader {
     // FIXME bsh: Maybe optimize memory consumption (unnecessary conversion of byte[] to String)
     String json = new String(IOUtility.readFromUrl(url), StandardCharsets.UTF_8.name());
     json = JsonUtility.stripCommentsFromJson(json);
-    BinaryResource content = new BinaryResource(pathInfo, detectContentType(pathInfo), StandardCharsets.UTF_8.name(), json.getBytes(StandardCharsets.UTF_8.name()), System.currentTimeMillis());
+    BinaryResource content = BinaryResources.create()
+        .withFilename(pathInfo)
+        .withCharset(StandardCharsets.UTF_8)
+        .withContent(json.getBytes(StandardCharsets.UTF_8))
+        .withLastModifiedNow()
+        .build();
+
     return new HttpCacheObject(cacheKey, true, IHttpCacheControl.MAX_AGE_4_HOURS, content);
   }
 

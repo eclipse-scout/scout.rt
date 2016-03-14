@@ -41,6 +41,7 @@ import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.holders.IHolder;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.status.IStatus;
+import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CompareUtility;
 import org.eclipse.scout.rt.platform.util.EventListenerList;
 import org.eclipse.scout.rt.platform.util.StringUtility;
@@ -195,6 +196,7 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
   @SuppressWarnings("unchecked")
   @Override
   public void importFormFieldData(AbstractFormFieldData source, boolean valueChangeTriggersEnabled) {
+    Assertions.assertNotNull(source);
     AbstractValueFieldData<VALUE> v = (AbstractValueFieldData<VALUE>) source;
     if (v.isValueSet()) {
       try {

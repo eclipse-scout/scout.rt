@@ -39,6 +39,7 @@ import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.status.IStatus;
+import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.BooleanUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.XmlUtility;
@@ -272,6 +273,7 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
 
   @Override
   public void importFormFieldData(AbstractFormFieldData source, boolean valueChangeTriggersEnabled) {
+    Assertions.assertNotNull(source);
     if (source.isValueSet()) {
       if (m_table != null) {
         try {

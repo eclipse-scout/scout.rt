@@ -56,7 +56,7 @@ public class CallableChainTest {
             return new IUndecorator() {
 
               @Override
-              public void undecorate(Throwable throwable) {
+              public void undecorate() {
                 protocol.add("decorator1:onAfter");
               }
             };
@@ -78,7 +78,7 @@ public class CallableChainTest {
             return new IUndecorator() {
 
               @Override
-              public void undecorate(Throwable throwable) {
+              public void undecorate() {
                 protocol.add("decorator3:onAfter");
               }
             };
@@ -118,7 +118,7 @@ public class CallableChainTest {
               return new IUndecorator() {
 
                 @Override
-                public void undecorate(Throwable throwable) {
+                public void undecorate() {
                   protocol.add("decorator1:onAfter");
                   throw new RuntimeException("expected JUnit test exception");
                 }
@@ -139,7 +139,7 @@ public class CallableChainTest {
               return new IUndecorator() {
 
                 @Override
-                public void undecorate(Throwable throwable) {
+                public void undecorate() {
                   protocol.add("decorator3:onAfter");
                 }
               };
@@ -488,7 +488,7 @@ public class CallableChainTest {
             return new IUndecorator() {
 
               @Override
-              public void undecorate(Throwable throwable) {
+              public void undecorate() {
                 protocol.add("decorator1:onAfter");
               }
             };
@@ -501,7 +501,7 @@ public class CallableChainTest {
             return new IUndecorator() {
 
               @Override
-              public void undecorate(Throwable throwable) {
+              public void undecorate() {
                 protocol.add("decorator2:onAfter");
               }
             };
@@ -531,7 +531,7 @@ public class CallableChainTest {
             return new IUndecorator() {
 
               @Override
-              public void undecorate(Throwable throwable) {
+              public void undecorate() {
                 protocol.add("decorator3:onAfter");
               }
             };
@@ -544,7 +544,7 @@ public class CallableChainTest {
             return new IUndecorator() {
 
               @Override
-              public void undecorate(Throwable throwable) {
+              public void undecorate() {
                 protocol.add("decorator4:onAfter");
               }
             };
@@ -574,7 +574,7 @@ public class CallableChainTest {
             return new IUndecorator() {
 
               @Override
-              public void undecorate(Throwable throwable) {
+              public void undecorate() {
                 protocol.add("decorator5:onAfter");
               }
             };
@@ -623,7 +623,7 @@ public class CallableChainTest {
               return new IUndecorator() {
 
                 @Override
-                public void undecorate(Throwable throwable) {
+                public void undecorate() {
                   protocol.add("decorator1:onAfter");
                 }
               };
@@ -636,7 +636,7 @@ public class CallableChainTest {
               return new IUndecorator() {
 
                 @Override
-                public void undecorate(Throwable throwable) {
+                public void undecorate() {
                   protocol.add("decorator2:onAfter");
                 }
               };
@@ -666,7 +666,7 @@ public class CallableChainTest {
               return new IUndecorator() {
 
                 @Override
-                public void undecorate(Throwable throwable) {
+                public void undecorate() {
                   protocol.add("decorator3:onAfter");
                 }
               };
@@ -679,7 +679,7 @@ public class CallableChainTest {
               return new IUndecorator() {
 
                 @Override
-                public void undecorate(Throwable throwable) {
+                public void undecorate() {
                   protocol.add("decorator4:onAfter");
                 }
               };
@@ -709,7 +709,7 @@ public class CallableChainTest {
               return new IUndecorator() {
 
                 @Override
-                public void undecorate(Throwable throwable) {
+                public void undecorate() {
                   protocol.add("decorator5:onAfter");
                 }
               };

@@ -71,7 +71,7 @@ public class DevelopmentThreadNameDecorator extends ThreadNameDecorator {
     return new IUndecorator() {
 
       @Override
-      public void undecorate(final Throwable throwable) {
+      public void undecorate() {
         // Restore to the original thread name.
         listenerRegistration.dispose();
         threadInfo.reset();

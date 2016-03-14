@@ -20,6 +20,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
+import org.eclipse.scout.rt.platform.resource.BinaryResources;
 import org.eclipse.scout.rt.platform.util.FileUtility;
 import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.json.JSONObject;
@@ -157,7 +158,12 @@ public class DefaultValuesFilterService implements IDefaultValuesFilterService {
   public synchronized BinaryResource getCombinedDefaultValuesConfigurationFile(String targetFilename) {
     ensureLoaded();
     byte[] content = (m_combinedDefaultValuesConfiguration == null ? null : m_combinedDefaultValuesConfiguration.getBytes(StandardCharsets.UTF_8));
-    BinaryResource res = new BinaryResource(targetFilename, FileUtility.getContentTypeForExtension("json"), content, m_lastModified);
+    BinaryResource res = BinaryResources.create()
+        .withFilename(targetFilename)
+        .withContentType(FileUtility.getContentTypeForExtension("json"))
+        .withContent(content)
+        .withLastModified(m_lastModified)
+        .build();
     return res;
   }
 }

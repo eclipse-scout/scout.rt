@@ -11,6 +11,8 @@
 package org.eclipse.scout.rt.ui.html.json;
 
 import java.io.IOException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletResponse;
@@ -57,6 +59,7 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
   private final HttpSessionHelper m_httpSessionHelper = BEANS.get(HttpSessionHelper.class);
   private final IHttpCacheControl m_httpCacheControl = BEANS.get(IHttpCacheControl.class);
   private final JsonRequestHelper m_jsonRequestHelper = BEANS.get(JsonRequestHelper.class);
+  private static final Pattern ALLOWED_CONTENT_TYPE_PATTERN = Pattern.compile("^(application|text)/(json|javascript)");
 
   @Override
   public boolean handlePost(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
@@ -64,6 +67,12 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
     String pathInfo = req.getPathInfo();
     if (CompareUtility.notEquals(pathInfo, "/json")) {
       return false;
+    }
+    //check contenttype
+    Matcher m = ALLOWED_CONTENT_TYPE_PATTERN.matcher(req.getContentType());
+    if (!m.find()) {
+      LOG.error("Someone tries to attack json endpoint with wrong contenttype. ip:{} request:{}", req.getRemoteAddr(), req);
+      resp.sendError(415);
     }
 
     final long startNanos = System.nanoTime();

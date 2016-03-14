@@ -14,34 +14,101 @@ import java.util.Arrays;
 import java.util.Collection;
 
 /**
- * Enumeration for a few well-known mime types.
+ * Enumeration for a few well-known extensions and their mime types.
  */
 public enum MimeType {
+  //by file extension
+  APPCACHE("text/cache-manifest", "appcache"),
+  CSS("text/css", "css"),
+  DOCX("application/vnd.openxmlformats-officedocument.wordprocessingml.document", "docx"),
+  DOTX("application/vnd.openxmlformats-officedocument.wordprocessingml.template", "dotx"),
+  EML("message/rfc822", "eml"),
+  GIF("image/gif", "gif"),
+  GZ("application/gzip", "gz"),
+  HTM("text/html", "htm"),
+  HTML("text/html", "html"),
+  ICO("image/vnd.microsoft.icon", "ico"),
+  ICS("text/calendar", "ics"),
+  IFB("text/calendar", "ifb"),
+  JAR("application/java-archive", "jar"),
+  JPE("image/jpeg", "jpe"),
+  JPEG("image/jpeg", "jpeg"),
+  JPG("image/jpeg", "jpg"),
+  JS("application/javascript", "js"),
+  JSON("application/json", "json"),
+  JSONML("application/jsonml+json", "jsonml"),
+  LOG("text/x-log", "log"),
+  MIME("message/rfc822", "mime"),
+  MSG("application/vnd.ms-outlook", "msg"),
+  ONEPKG("application/onenote", "onepkg"),
+  ONETMP("application/onenote", "onetmp"),
+  ONETOC("application/onenote", "onetoc"),
+  ONETOC2("application/onenote", "onetoc2"),
+  PDF("application/pdf", "pdf"),
+  PNG("image/png", "png"),
+  POTX("application/vnd.openxmlformats-officedocument.presentationml.template", "potx"),
+  PPSX("application/vnd.openxmlformats-officedocument.presentationml.slideshow", "ppsx"),
+  PPTX("application/vnd.openxmlformats-officedocument.presentationml.presentation", "pptx"),
+  RSS("application/rss+xml", "rss"),
+  SLDX("application/vnd.openxmlformats-officedocument.presentationml.slide", "sldx"),
+  SVG("image/svg+xml", "svg"),
+  THMX("application/vnd.openxmlformats-officedocument.presentationml.presentation", "thmx"),
+  TIF("image/tiff", "tif"),
+  TIFF("image/tiff", "tiff"),
+  TXT("text/plain", "txt"),
+  VCARD("text/vcard", "vcard"),
+  VCF("text/x-vcard", "vcf"),
+  VCS("text/x-vcalendar", "vcs"),
+  WOFF("application/font-woff", "woff"),
+  XLSX("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "xlsx"),
+  XLTX("application/vnd.openxmlformats-officedocument.spreadsheetml.template", "xltx"),
+  XML("text/xml", "xml"),
+  ZIP("application/zip", "zip"),
+  //by mime type name
   TEXT_PLAIN("text/plain", "txt"),
   IMAGE_PNG("image/png", "png"),
-  IMAGE_JPG("image/jpg", "jpg"),
   IMAGE_JPEG("image/jpeg", "jpg"),
-  IMAGE_GIF("image/gif", "gif");
+  IMAGE_GIF("image/gif", "gif"),
+  APPLICATION_OCTET_STREAM("application/octet-stream", "bin");
 
   private final String m_type;
-  private final String m_preferedFileExtension;
+  private final String m_fileExtension;
 
-  MimeType(String type, String preferedFileExtension) {
+  MimeType(String type, String fileExtension) {
     m_type = type;
-    m_preferedFileExtension = preferedFileExtension;
+    m_fileExtension = fileExtension;
   }
 
   public String getType() {
     return m_type;
   }
 
-  public String getPreferedFileExtension() {
-    return m_preferedFileExtension;
+  public String getFileExtension() {
+    return m_fileExtension;
   }
 
-  public static MimeType convertToMimeType(String input) {
+  /**
+   * This method will be removed in 6.0, it contains a typo and the name semantics is ambiguous
+   * 
+   * @deprecated use {@link #getFileExtension()} instead
+   */
+  @Deprecated
+  public String getPreferedFileExtension() {
+    return getFileExtension();
+  }
+
+  public static MimeType findByFileExtension(String fileExtension) {
     for (MimeType mimeType : values()) {
-      if (mimeType.getType().equals(input)) {
+      if (mimeType.getFileExtension().equalsIgnoreCase(fileExtension)) {
+        return mimeType;
+      }
+    }
+    return null;
+  }
+
+  public static MimeType convertToMimeType(String mimeTypeText) {
+    for (MimeType mimeType : values()) {
+      if (mimeType.getType().equals(mimeTypeText)) {
         return mimeType;
       }
     }
@@ -59,7 +126,7 @@ public enum MimeType {
    * Common image mime types.
    */
   public static MimeType[] getCommonImageTypesAsArray() {
-    return new MimeType[]{IMAGE_GIF, IMAGE_JPG, IMAGE_JPEG, IMAGE_PNG};
+    return new MimeType[]{GIF, JPG, JPE, JPEG, PNG, SVG, TIF, TIFF};
   }
 
   public static boolean isOneOf(Collection<MimeType> mimeTypes, String input) {

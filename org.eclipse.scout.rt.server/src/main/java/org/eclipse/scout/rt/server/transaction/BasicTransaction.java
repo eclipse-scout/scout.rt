@@ -118,6 +118,7 @@ public class BasicTransaction implements ITransaction {
         }
       }
       catch (Throwable t) {
+        allSuccessful = false;
         addFailure(t);
         LOG.error("commit phase 1 failed with exception for transaction member '{}'.", mem.getMemberId(), t);
         break;

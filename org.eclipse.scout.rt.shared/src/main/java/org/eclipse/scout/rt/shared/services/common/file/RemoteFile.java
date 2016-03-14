@@ -34,6 +34,7 @@ import java.util.Map;
 
 import org.eclipse.scout.rt.platform.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
+import org.eclipse.scout.rt.platform.resource.BinaryResources;
 import org.eclipse.scout.rt.platform.util.FileUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 
@@ -163,7 +164,12 @@ public class RemoteFile implements Serializable {
 
   public BinaryResource toBinaryResource() {
     try {
-      return new BinaryResource(getName(), getContentType(), extractData(), getLastModified());
+      return BinaryResources.create()
+          .withFilename(getName())
+          .withContentType(getContentType())
+          .withContent(extractData())
+          .withLastModified(getLastModified())
+          .build();
     }
     catch (IOException e) {
       throw new IllegalArgumentException("Cannot write binary data");

@@ -393,7 +393,10 @@ scout.Session.prototype._sendRequest = function(request) {
     // - http://stackoverflow.com/questions/15479103/can-beforeunload-unload-be-used-to-send-xmlhttprequests-reliably
     // - https://groups.google.com/a/chromium.org/forum/#!topic/blink-dev/7nKMdg_ALcc
     // - https://developer.mozilla.org/en-US/docs/Web/API/Navigator/sendBeacon
-    navigator.sendBeacon(this._decorateUrl(this.url, request), JSON.stringify(request));
+    var msg = new Blob([JSON.stringify(request)], {
+      type: 'application/json; charset=UTF-8'
+    });
+    navigator.sendBeacon(this._decorateUrl(this.url, request), msg);
     return;
   }
 
@@ -432,7 +435,6 @@ scout.Session.prototype._handleSendWhenOffline = function(request) {
   }
   this.layoutValidator.validate();
 };
-
 
 scout.Session.prototype.defaultAjaxOptions = function(request) {
   request = request || {};
@@ -767,6 +769,12 @@ scout.Session.prototype._processErrorJsonResponse = function(jsonError) {
       this.optText('ui.InternalProcessingErrorMsg', boxOptions.body, ' (' + this.optText('ui.ErrorCodeX', 'Code 20', '20') + ')'),
       this.optText('ui.UiInconsistentMsg', ''));
     boxOptions.noButtonText = this.optText('ui.Ignore', 'Ignore');
+  } else if (jsonError.code === 30) { // JsonResponse.ERR_UNSAFE_UPLOAD
+    boxOptions.header = this.optText('ui.UnsafeUpload', boxOptions.header);
+    boxOptions.body = this.optText('ui.UnsafeUploadMsg', boxOptions.body);
+    boxOptions.yesButtonText = this.optText('ui.Ok', 'Ok');
+    boxOptions.yesButtonAction = function() {
+    };
   }
   this.showFatalMessage(boxOptions, jsonError.code);
 };
@@ -922,7 +930,7 @@ scout.Session.prototype.goOffline = function() {
 scout.Session.prototype.goOnline = function() {
   this.offline = false;
 
-  var request ={
+  var request = {
     uiSessionId: this.uiSessionId,
     syncResponseQueue: true
   };
