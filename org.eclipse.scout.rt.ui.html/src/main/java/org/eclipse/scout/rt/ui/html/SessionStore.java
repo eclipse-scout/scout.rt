@@ -235,9 +235,6 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
         map.remove(uiSession);
       }
 
-      // inform the model the UI has been detached
-      clientSession.getDesktop().getUIFacade().fireGuiDetached();
-
       // Start housekeeping
       LOG.debug("{} UI sessions remaining for client session {}", (map == null ? 0 : map.size()), clientSession.getId());
       if (map == null || map.isEmpty()) {

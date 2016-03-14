@@ -268,10 +268,7 @@ public class UiSession implements IUiSession {
     if (port != 80) {
       webRoot.append(":").append(port);
     }
-    if (StringUtility.isNullOrEmpty(contextPath)) {
-      webRoot.append("/");
-    }
-    else {
+    if (StringUtility.hasText(contextPath)) {
       webRoot.append(contextPath);
     }
     BEANS.get(IDeepLinks.class).setWebRoot(webRoot.toString());
@@ -493,6 +490,15 @@ public class UiSession implements IUiSession {
 
   @Override
   public void dispose() {
+
+    // Inform the model the UI has been detached. There are different cases we handle here:
+    // 1. page reload (unload event) dispose method is called once
+    // 2. logout (Session.stop()) dispose methid is called _twice_, 1st call sets the disposing flag,
+    //    on the 2nd call, the desktop is already gone.
+    if (!m_disposing) {
+      getClientSession().getDesktop().getUIFacade().fireGuiDetached();
+    }
+
     if (isProcessingJsonRequest()) {
       // If there is a request in progress just mark the session as being disposed.
       // The actual disposing happens before returning to the client, see processJsonRequest().
