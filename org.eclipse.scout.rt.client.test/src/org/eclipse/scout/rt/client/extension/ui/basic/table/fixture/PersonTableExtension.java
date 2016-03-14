@@ -12,6 +12,8 @@ package org.eclipse.scout.rt.client.extension.ui.basic.table.fixture;
 
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.AbstractTableExtension;
+import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.AbstractStringColumnExtension;
+import org.eclipse.scout.rt.client.extension.ui.basic.table.fixture.AbstractPersonTable.NameColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 
 public class PersonTableExtension extends AbstractTableExtension<AbstractPersonTable> {
@@ -24,7 +26,21 @@ public class PersonTableExtension extends AbstractTableExtension<AbstractPersonT
     return getOwner().getColumnSet().getColumnByClass(StreetColumn.class);
   }
 
+  public CityColumn getCityColumn() {
+    return getOwner().getColumnSet().getColumnByClass(CityColumn.class);
+  }
+
   @Order(100)
   public class StreetColumn extends AbstractStringColumn {
+  }
+
+  @Order(200)
+  public class CityColumn extends AbstractStringColumn {
+  }
+
+  public class NameColumnExtension extends AbstractStringColumnExtension<NameColumn> {
+    public NameColumnExtension(NameColumn owner) {
+      super(owner);
+    }
   }
 }

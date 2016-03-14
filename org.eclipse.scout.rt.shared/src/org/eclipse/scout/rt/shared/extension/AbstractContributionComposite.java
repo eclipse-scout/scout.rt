@@ -16,6 +16,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -74,10 +75,10 @@ public abstract class AbstractContributionComposite implements IContributionOwne
 
   public <T> void resetContributionsByClass(Object o, Class<T> type) {
     m_contributionsByType.remove(type);
-    Collection<Object> values = m_contributionsByClass.values();
-    for (Object obj : values) {
+    for (Iterator<Object> it = m_contributionsByClass.values().iterator(); it.hasNext();) {
+      Object obj = it.next();
       if (type.isAssignableFrom(obj.getClass())) {
-        m_contributionsByClass.remove(obj.getClass());
+        it.remove();
       }
     }
     IInternalExtensionRegistry extensionRegistry = SERVICES.getService(IInternalExtensionRegistry.class);
