@@ -100,7 +100,9 @@ scout.SmartField.prototype._render = function($parent) {
 
 scout.SmartField.prototype._remove = function() {
   scout.SmartField.parent.prototype._remove.call(this);
-  if (this._popup) {
+  // popup may not be reused because $anchor would point to a removed field
+  // Don't set to null in case of embedded mode to make sure not another popup gets created by the field itself when touch popup get rendered
+  if (this._popup && !this.embedded) {
     this._popup = null;
   }
 };
@@ -510,7 +512,8 @@ scout.SmartField.prototype._openProposal = function(browseAll) {
 };
 
 scout.SmartField.prototype._renderPopup = function() {
-  if (this._popup.rendered) {
+  if (this._popup.rendered || this.embedded) {
+    // never render a popup for embedded smartfields to prevent a loop (in case of embedded mode popup is the container of the smartfield)
     return;
   }
   this._popup.open();

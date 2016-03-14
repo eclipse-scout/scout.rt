@@ -100,7 +100,9 @@ scout.DateField.prototype._remove = function() {
   this.$timeFieldIcon = null;
   this._$predictDateField = null;
   this._$predictTimeField = null;
-  if (this._popup) {
+  // popup may not be reused because $anchor would point to a removed field
+  // Don't set to null in case of embedded mode to make sure not another popup gets created by the field itself when touch popup get rendered!
+  if (this._popup && !this.embedded) {
     this._popup = null;
   }
 };

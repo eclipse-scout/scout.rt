@@ -8,27 +8,38 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
+/* global FormSpecHelper */
 describe('SmartField', function() {
-
+  var session;
   var smartField;
+  var helper;
 
   beforeEach(function() {
+    setFixtures(sandbox());
+    session = sandboxSession();
+    helper = new FormSpecHelper(session);
+    jasmine.Ajax.install();
+    jasmine.clock().install();
+  });
+
+  afterEach(function() {
+    session = null;
+    jasmine.Ajax.uninstall();
+    jasmine.clock().uninstall();
+    $('.smart-field-popup').remove();
+    $('.touch-popup').remove();
+  });
+
+  beforeEach(function() {
+    var model = helper.createFieldModel('SmartField');
     smartField = new scout.SmartField();
-    smartField.$field = $('<input>');
-    smartField.session = {
-      listen: function() {
-        return {
-          done: function(func) {
-          }
-        };
-      }
-    };
-    smartField.remoteHandler = function() {};
+    smartField.init(model);
   });
 
   describe('_onKeyUp', function() {
 
     it('doesn not call _openProposal() when TAB has been pressed', function() {
+      smartField.render(session.$entryPoint);
       smartField._openProposal = function(searchText, selectCurrentValue) {};
       var event = {
         which: scout.keys.TAB
@@ -39,6 +50,7 @@ describe('SmartField', function() {
     });
 
     it('calls _openProposal() when a character key has been pressed', function() {
+      smartField.render(session.$entryPoint);
       smartField._browseOnce = true;
       smartField._popup = {};
       smartField._openProposal = function(searchText, selectCurrentValue) {};
@@ -55,6 +67,7 @@ describe('SmartField', function() {
   describe('_syncProposalChooser', function() {
 
     it('must reset _requestProposal property', function() {
+      smartField.render(session.$entryPoint);
       expect(smartField._requestedProposal).toBe(false);
       smartField._openProposal(true);
       expect(smartField._requestedProposal).toBe(true);
@@ -69,6 +82,7 @@ describe('SmartField', function() {
     var events = [null];
 
     beforeEach(function() {
+      smartField.render(session.$entryPoint);
       smartField.$field.val('foo');
       smartField.remoteHandler = function(event, delay) {
         events[0] = event;
@@ -100,12 +114,14 @@ describe('SmartField', function() {
   describe('_acceptProposal', function() {
 
     it('must set displayText', function() {
+      smartField.render(session.$entryPoint);
       smartField.$field.val('foo');
       smartField._acceptProposal();
       expect(smartField.displayText).toBe('foo');
     });
 
     it('must call clearTimeout() for pending typedProposal events', function() {
+      smartField.render(session.$entryPoint);
       smartField._sendTimeoutId = null;
       smartField.$field.val('bar');
       smartField._proposalTyped();
@@ -115,6 +131,7 @@ describe('SmartField', function() {
     });
 
     it('dont send _acceptProposal when searchText has not changed', function() {
+      smartField.render(session.$entryPoint);
       smartField._oldSearchText = 'foo';
       smartField.$field.val('foo');
       spyOn(smartField, 'remoteHandler');
@@ -123,6 +140,7 @@ describe('SmartField', function() {
     });
 
     it('send _acceptProposal when searchText has changed', function() {
+      smartField.render(session.$entryPoint);
       smartField._oldSearchText = 'foo';
       smartField.$field.val('bar');
       spyOn(smartField, 'remoteHandler');
@@ -132,6 +150,7 @@ describe('SmartField', function() {
 
     // test for ticket #168652
     it('send deleteProposal when searchText has been deleted quickly', function() {
+      smartField.render(session.$entryPoint);
       smartField._oldSearchText = 'foo';
       smartField.$field.val('');
       smartField.proposalChooser = {}; // fake proposal-chooser is open
@@ -141,5 +160,33 @@ describe('SmartField', function() {
     });
 
   });
+
+  describe('touch = true', function() {
+
+    it('opens a touch popup', function() {
+      smartField.touch = true;
+      smartField.proposalChooser = scout.create('Table', {parent: smartField});
+      smartField.render(session.$entryPoint);
+      smartField.$field.click();
+      expect(smartField._popup.rendered).toBe(true);
+      expect(smartField._popup._$widgetContainer.has(smartField.proposalChooser.$container));
+      expect($('.touch-popup').length).toBe(1);
+      expect($('.smart-field-popup').length).toBe(0);
+
+      smartField._popup.close();
+      expect(smartField._popup.rendered).toBe(false);
+      expect($('.touch-popup').length).toBe(0);
+      expect($('.smart-field-popup').length).toBe(0);
+
+      // Expect same behavior after a second click
+      smartField.$field.click();
+      expect(smartField._popup.rendered).toBe(true);
+      expect(smartField._popup._$widgetContainer.has(smartField.proposalChooser.$container));
+      expect($('.touch-popup').length).toBe(1);
+      expect($('.smart-field-popup').length).toBe(0);
+    });
+
+  });
+
 
 });

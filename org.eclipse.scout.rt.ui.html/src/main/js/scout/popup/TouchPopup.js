@@ -64,11 +64,16 @@ scout.TouchPopup.prototype.prefLocation = function($container, openingDirectionY
 scout.TouchPopup.prototype._render = function($parent) {
   this.$container = $parent.appendDiv('touch-popup');
     //    .on('mousedown', this._onContainerMouseDown.bind(this)) // FIXME awe: (popups) is this line required?
-  this._field.render(this.$container);
 
   this._$widgetContainer = this.$container.appendDiv('widget-container');
   this._widgetContainerHtmlComp = new scout.HtmlComponent(this._$widgetContainer, this.session);
   this._widgetContainerHtmlComp.setLayout(new scout.SingleLayout());
+
+  // field may render something into the widget container -> render after widget container and move to correct place
+  this._field.render(this.$container);
+
+  // Move to top
+  this._field.$container.insertBefore(this._$widgetContainer);
 
   if (this._widget) {
     this._widget.render(this._$widgetContainer);

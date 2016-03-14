@@ -49,7 +49,7 @@ describe("DateField", function() {
   }
 
   function createModel() {
-    var model = helper.createFieldModel('scout.DateField');
+    var model = helper.createFieldModel('DateField');
     model.hasDate = true;
     model.timeFormatPattern = 'HH:mm';
     model.dateFormatPattern = 'dd.MM.yyyy';
