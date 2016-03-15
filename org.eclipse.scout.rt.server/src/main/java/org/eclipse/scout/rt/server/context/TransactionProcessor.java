@@ -15,11 +15,13 @@ import java.util.concurrent.Callable;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.chain.callable.CallableChain;
 import org.eclipse.scout.rt.platform.chain.callable.CallableChain.Chain;
+import org.eclipse.scout.rt.platform.chain.callable.ICallableDecorator.IUndecorator;
 import org.eclipse.scout.rt.platform.chain.callable.ICallableInterceptor;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
+import org.eclipse.scout.rt.platform.util.ThreadLocalProcessor;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.server.transaction.TransactionRequiredException;
 import org.eclipse.scout.rt.server.transaction.TransactionScope;
@@ -47,21 +49,16 @@ public class TransactionProcessor<RESULT> implements ICallableInterceptor<RESULT
   }
 
   @Override
-  public RESULT intercept(Chain<RESULT> chain) throws Exception {
-    try {
-      switch (m_transactionScope) {
-        case REQUIRES_NEW:
-          return requiresNew(chain);
-        case REQUIRED:
-          return required(chain);
-        case MANDATORY:
-          return mandatory(chain);
-        default:
-          return Assertions.fail("Unsupported transaction scope [{}]", m_transactionScope);
-      }
-    }
-    catch (Throwable t) {
-      throw BEANS.get(DefaultExceptionTranslator.class).translate(t);
+  public RESULT intercept(final Chain<RESULT> chain) throws Exception {
+    switch (m_transactionScope) {
+      case REQUIRES_NEW:
+        return runTxRequiresNew(chain);
+      case REQUIRED:
+        return runTxRequired(chain);
+      case MANDATORY:
+        return runTxMandatory(chain);
+      default:
+        return Assertions.fail("Unsupported transaction scope [{}]", m_transactionScope);
     }
   }
 
@@ -71,56 +68,57 @@ public class TransactionProcessor<RESULT> implements ICallableInterceptor<RESULT
   }
 
   /**
-   * Decorates the calling context to run in a new transaction, which upon completion is committed or rolled back.
+   * Continues the chain in a new transaction, which upon completion is committed or rolled back.
    */
-  protected RESULT requiresNew(Chain<RESULT> chain) throws Throwable {
+  protected RESULT runTxRequiresNew(final Chain<RESULT> chain) throws Exception {
+    // Create and register the new transaction.
     final ITransaction newTransaction = BEANS.get(ITransaction.class);
-    final IRegistrationHandle threadLocalRegistration = registerTransactionInThreadLocal(newTransaction);
-    final IRegistrationHandle monitorRegistration = registerTransactionInRunMonitor(newTransaction);
+    final IRegistrationHandle currentTransactionRegistration = registerAsCurrentTransaction(newTransaction);
+    final IRegistrationHandle cancellationRegistration = registerTransactionForCancellation(newTransaction);
     try {
-      return chain.continueChain();
-    }
-    catch (Throwable t) {
-      newTransaction.addFailure(t);
-      throw t;
-    }
-    finally {
-      BEANS.get(ITransactionCommitProtocol.class).commitOrRollback(newTransaction);
-      threadLocalRegistration.dispose();
-      monitorRegistration.dispose();
-
-      if (newTransaction.hasFailures()) {
-        throw newTransaction.getFailures()[0];
+      try {
+        return chain.continueChain();
+      }
+      catch (final Throwable t) { // NOSONAR
+        newTransaction.addFailure(t); // Register failure to rollback transaction.
+        throw BEANS.get(DefaultExceptionTranslator.class).translate(t);
+      }
+      finally {
+        BEANS.get(ITransactionCommitProtocol.class).commitOrRollback(newTransaction);
       }
     }
+    finally {
+      currentTransactionRegistration.dispose();
+      cancellationRegistration.dispose();
+    }
   }
 
   /**
-   * Decorates the calling context to run on behalf of the current caller transaction. If not available, a new
-   * transaction is started and upon completion, that transaction is committed or rolled back.
+   * Continues the chain on behalf of the current caller transaction. If not available, a new transaction is started and
+   * upon completion, that transaction is committed or rolled back.
    */
-  protected RESULT required(Chain<RESULT> chain) throws Throwable {
+  protected RESULT runTxRequired(final Chain<RESULT> chain) throws Exception {
     if (m_callerTransaction != null) {
-      return mandatory(chain);
+      return runTxMandatory(chain);
     }
     else {
-      return requiresNew(chain);
+      return runTxRequiresNew(chain);
     }
   }
 
   /**
-   * Ensures a caller transaction to exist and decorates the calling context to run on behalf of that transaction.
+   * Ensures a caller transaction to exist and continues the chain on behalf of that caller transaction.
    */
-  protected RESULT mandatory(Chain<RESULT> chain) throws Throwable {
+  protected RESULT runTxMandatory(final Chain<RESULT> chain) throws Exception {
     if (m_callerTransaction == null) {
       throw new TransactionRequiredException();
     }
 
-    final IRegistrationHandle threadLocalRegistration = registerTransactionInThreadLocal(m_callerTransaction);
+    final IRegistrationHandle threadLocalRegistration = registerAsCurrentTransaction(m_callerTransaction);
     try {
       return chain.continueChain();
     }
-    catch (Throwable t) {
+    catch (final Throwable t) { // NOSONAR
       m_callerTransaction.addFailure(t);
       throw t;
     }
@@ -130,12 +128,11 @@ public class TransactionProcessor<RESULT> implements ICallableInterceptor<RESULT
   }
 
   /**
-   * Registers the given transaction in the current {@link RunMonitor}, so it is cancelled once the monitor gets
-   * cancelled.
+   * Registers the given transaction for cancellation in the current {@link RunMonitor}.
    *
    * @return the 'undo-action' to unregister the transaction from the monitor.
    */
-  protected IRegistrationHandle registerTransactionInRunMonitor(final ITransaction transaction) {
+  protected IRegistrationHandle registerTransactionForCancellation(final ITransaction transaction) {
     RunMonitor.CURRENT.get().registerCancellable(transaction);
 
     // Return the 'undo-action' to unregister the transaction from the monitor.
@@ -152,22 +149,16 @@ public class TransactionProcessor<RESULT> implements ICallableInterceptor<RESULT
    * Registers the given transaction in {@link ITransaction#CURRENT} thread-local, so it becomes the active transaction.
    *
    * @return the 'undo-action' to restore the thread-local value.
+   * @throws Exception
    */
-  protected IRegistrationHandle registerTransactionInThreadLocal(final ITransaction transaction) {
-    final ITransaction oldTransaction = ITransaction.CURRENT.get();
-    ITransaction.CURRENT.set(transaction);
+  protected IRegistrationHandle registerAsCurrentTransaction(final ITransaction transaction) throws Exception {
+    final IUndecorator decoration = new ThreadLocalProcessor<>(ITransaction.CURRENT, transaction).decorate();
 
-    // Return the 'undo-action' to restore the thread-local value.
     return new IRegistrationHandle() {
 
       @Override
       public void dispose() {
-        if (oldTransaction == null) {
-          ITransaction.CURRENT.remove();
-        }
-        else {
-          ITransaction.CURRENT.set(oldTransaction);
-        }
+        decoration.undecorate();
       }
     };
   }

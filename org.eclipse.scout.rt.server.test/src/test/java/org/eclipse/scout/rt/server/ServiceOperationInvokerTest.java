@@ -20,8 +20,6 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
 
-import java.util.concurrent.Callable;
-
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.server.admin.inspector.ProcessInspector;
@@ -109,14 +107,9 @@ public class ServiceOperationInvokerTest {
   }
 
   private ServiceTunnelResponse invokePingService(final ServerRunContext runcontext) {
-    return runcontext.call(new Callable<ServiceTunnelResponse>() {
-      @Override
-      public ServiceTunnelResponse call() {
-        ServiceOperationInvoker s = new ServiceOperationInvoker();
-        ServiceTunnelRequest request = new ServiceTunnelRequest(IPingService.class.getName(), "ping", new Class[]{String.class}, new Object[]{"hello"});
-        return s.invoke(request);
-      }
-    });
+    ServiceOperationInvoker s = new ServiceOperationInvoker();
+    ServiceTunnelRequest request = new ServiceTunnelRequest(IPingService.class.getName(), "ping", new Class[]{String.class}, new Object[]{"hello"});
+    return s.invoke(runcontext, request);
   }
 
   private void assertValidResponse(ServiceTunnelResponse res, String data) {

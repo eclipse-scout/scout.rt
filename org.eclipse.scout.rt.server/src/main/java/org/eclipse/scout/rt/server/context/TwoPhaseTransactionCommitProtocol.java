@@ -30,83 +30,78 @@ public class TwoPhaseTransactionCommitProtocol implements ITransactionCommitProt
 
   @Override
   public void commitOrRollback(final ITransaction tx) {
-    boolean commitSuccess = false;
-    if (tx.hasFailures()) {
-      commitSuccess = false;
-    }
-    else {
+    try {
+      // Immediately rollback the TX in case of failures.
+      if (tx.hasFailures()) {
+        rollback(tx);
+        return;
+      }
+
       // Commit the XA transaction in 2PC-style.
-      commitSuccess = (commitPhase1Safe(tx) && commitPhase2Safe(tx));
-    }
+      // Phase 1: Vote for final commit.
+      try {
+        if (!commitPhase1(tx)) {
+          rollback(tx);
+          return;
+        }
+      }
+      catch (RuntimeException | Error e) {
+        LOG.error("Unexpected error during commit of XA transaction [2PC-phase='voting', tx={}]", tx, e);
+        tx.addFailure(e);
+        rollback(tx);
+        throw e;
+      }
 
-    if (!commitSuccess) {
-      // Rollback the XA transaction because at least one XA member rejected the voting for commit or the final commit failed unexpectedly.
-      rollbackSafe(tx);
+      // Phase 2: Commit the transaction.
+      try {
+        commitPhase2(tx);
+      }
+      catch (RuntimeException | Error e) {
+        LOG.error("Unexpected error during commit of XA transaction [2PC-phase='commit', tx={}]", tx, e);
+        tx.addFailure(e);
+        rollback(tx);
+        throw e;
+      }
     }
-
-    releaseSafe(tx);
+    finally {
+      release(tx);
+    }
   }
 
   /**
    * @return <code>true</code> on success, or <code>false</code> on failure.
+   * @throws RuntimeException
+   *           if an error occurs during commit phase 1.
    * @see ITransaction#commitPhase1()
    */
   @Internal
-  protected boolean commitPhase1Safe(final ITransaction tx) {
-    try {
-      return tx.commitPhase1();
-    }
-    catch (final RuntimeException e) {
-      LOG.error("Failed to commit XA transaction [2PC-phase='voting', tx={}]", tx, e);
-      return false;
-    }
+  protected boolean commitPhase1(final ITransaction tx) {
+    return tx.commitPhase1();
   }
 
   /**
-   * @return <code>true</code> on success, or <code>false</code> on failure.
    * @see ITransaction#commitPhase2()
+   * @throws RuntimeException
+   *           if an error occurs during commit phase 2.
    */
   @Internal
-  protected boolean commitPhase2Safe(final ITransaction tx) {
-    try {
-      tx.commitPhase2();
-      return true;
-    }
-    catch (final RuntimeException e) {
-      LOG.error("Failed to commit XA transaction [2PC-phase='commit', tx={}]", tx, e);
-      return false;
-    }
+  protected void commitPhase2(final ITransaction tx) {
+    tx.commitPhase2();
   }
 
   /**
-   * @return <code>true</code> on success, or <code>false</code> on failure.
    * @see ITransaction#rollback()
    */
   @Internal
-  protected boolean rollbackSafe(final ITransaction tx) {
-    try {
-      tx.rollback();
-      return true;
-    }
-    catch (final RuntimeException e) {
-      LOG.error("Failed to rollback XA transaction [tx={}]", tx, e);
-      return false;
-    }
+  protected void rollback(final ITransaction tx) {
+    tx.rollback();
   }
 
   /**
-   * @return <code>true</code> on success, or <code>false</code> on failure.
    * @see ITransaction#release()
    */
   @Internal
-  protected boolean releaseSafe(final ITransaction tx) {
-    try {
-      tx.release();
-      return true;
-    }
-    catch (final RuntimeException e) {
-      LOG.error("Failed to release XA transaction members [tx={}]", tx, e);
-      return false;
-    }
+  protected void release(final ITransaction tx) {
+    tx.release();
   }
 }

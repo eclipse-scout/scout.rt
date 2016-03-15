@@ -104,27 +104,17 @@ public class BasicTransaction implements ITransaction {
       }
       m_commitPhase = true;
     }
-    boolean allSuccessful = true;
     for (ITransactionMember mem : getMembers()) {
-      try {
-        if (mem.needsCommit()) {
-          LOG.debug("commit phase 1 of transaction member '{}'.", mem.getMemberId());
-          boolean b = mem.commitPhase1();
-          allSuccessful = allSuccessful && b;
-          if (!allSuccessful) {
-            LOG.error("commit phase 1 failed for transaction member '{}'.", mem.getMemberId());
-            break;
-          }
+      if (mem.needsCommit()) {
+        LOG.debug("commit phase 1 of transaction member '{}'.", mem.getMemberId());
+
+        if (!mem.commitPhase1()) {
+          LOG.error("commit phase 1 failed for transaction member '{}'.", mem.getMemberId());
+          return false;
         }
       }
-      catch (Throwable t) {
-        allSuccessful = false;
-        addFailure(t);
-        LOG.error("commit phase 1 failed with exception for transaction member '{}'.", mem.getMemberId(), t);
-        break;
-      }
     }
-    return allSuccessful && !hasFailures();
+    return true;
   }
 
   @Override
@@ -189,7 +179,9 @@ public class BasicTransaction implements ITransaction {
 
   @Override
   public void addFailure(Throwable t) {
-    m_failures.add(t);
+    if (!m_failures.contains(t)) {
+      m_failures.add(t);
+    }
   }
 
   @Override
