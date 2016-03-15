@@ -22,10 +22,6 @@ public abstract class AbstractDeepLinkHandler implements IDeepLinkHandler {
     m_pattern = pattern;
   }
 
-  protected static Pattern defaultPattern(String handlerName) {
-    return Pattern.compile("^" + handlerName + "/(\\d+)/(.*)$");
-  }
-
   /**
    * Slug implementation as proposed from Stackoverflow.
    *

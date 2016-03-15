@@ -2,6 +2,7 @@ package org.eclipse.scout.rt.client.deeplink;
 
 import java.net.URL;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.desktop.BrowserHistory;
@@ -16,12 +17,12 @@ import org.slf4j.LoggerFactory;
 @Order(1000)
 public class OutlineHandler extends AbstractDeepLinkHandler {
 
-  private static final String HANDLER_PREFIX = "outline";
+  private static final String HANDLER_NAME = "outline";
 
   private static final Logger LOG = LoggerFactory.getLogger(OutlineHandler.class);
 
   public OutlineHandler() {
-    super(defaultPattern(HANDLER_PREFIX));
+    super(Pattern.compile("^" + HANDLER_NAME + "/(\\d+)/?(.*)$"));
   }
 
   @Override
@@ -53,9 +54,20 @@ public class OutlineHandler extends AbstractDeepLinkHandler {
   }
 
   public BrowserHistory createBrowserHistory(IDesktop desktop, IOutline outline) {
-    URL url = UriUtility.toUrl(getUrlPrefix() + HANDLER_PREFIX + "/" + outlineId(outline) + "/" + toSlug(outline.getTitle()));
-    String title = desktop.getTitle() + " - " + outline.getTitle();
-    return new BrowserHistory(url.toString(), title);
+    StringBuilder sb = new StringBuilder();
+    sb.append(getUrlPrefix());
+    sb.append(HANDLER_NAME);
+    sb.append("/");
+    sb.append(outlineId(outline));
+
+    if (StringUtility.hasText(outline.getTitle())) {
+      sb.append("/");
+      sb.append(toSlug(outline.getTitle()));
+    }
+
+    URL url = UriUtility.toUrl(sb.toString());
+    String historyTitle = desktop.getTitle() + " - " + outline.getTitle();
+    return new BrowserHistory(url.toString(), historyTitle);
   }
 
   private static String outlineId(IOutline outline) {
