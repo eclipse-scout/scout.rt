@@ -12,9 +12,11 @@ package org.eclipse.scout.rt.client.testenvironment;
 
 import org.eclipse.scout.rt.client.AbstractClientSession;
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.deeplink.IDeepLinks;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.testenvironment.ui.desktop.TestEnvironmentDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IgnoreBean;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 
@@ -41,7 +43,10 @@ public class TestEnvironmentClientSession extends AbstractClientSession {
 
   @Override
   protected void execLoadSession() {
-    //do not enable client notifications, do not add service tunnel
+    // set web-root (as it would happen in deployed system, FIXME awe: (deep-links) review this when
+    // we found a good place to init DeepLinks web-root
+    BEANS.get(IDeepLinks.class).setWebRoot("http://localhost:8082");
+    // do not enable client notifications, do not add service tunnel
     final TestEnvironmentDesktop d = new TestEnvironmentDesktop();
     setDesktop(d);
     simulateDesktopOpened(d);
