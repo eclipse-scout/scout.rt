@@ -45,6 +45,12 @@ scout.Session = function($entryPoint, options) {
 
   // Prepare clientSessionId
   var clientSessionId = options.clientSessionId || sessionStorage.getItem('scout:clientSessionId');
+
+  this.scoutUrl = new scout.URL();
+  if (this.scoutUrl.getParameter('forceNewClientSession')) {
+    options.forceNewClientSession = true;
+  }
+
   if (options.forceNewClientSession) {
     clientSessionId = null;
   }
@@ -251,11 +257,9 @@ scout.Session.prototype._sendStartupRequest = function() {
  */
 scout.Session.prototype._createSessionStartupParams = function() {
   var params = {};
+  params.url = this.scoutUrl.baseUrlRaw;
 
-  var scoutUrl = new scout.URL();
-  params.url = scoutUrl.baseUrlRaw;
-
-  var urlParameterMap = scoutUrl.parameterMap;
+  var urlParameterMap = this.scoutUrl.parameterMap;
   for (var prop in urlParameterMap) {
     params[prop] = urlParameterMap[prop];
   }
