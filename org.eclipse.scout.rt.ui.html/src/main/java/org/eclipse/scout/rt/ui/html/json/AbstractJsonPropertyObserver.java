@@ -80,7 +80,11 @@ public abstract class AbstractJsonPropertyObserver<T extends IPropertyObserver> 
    * a property change event occurs with the same value, the event is not sent back to the client (=filtered).
    */
   protected void addPropertyEventFilterCondition(String propertyName, Object value) {
-    m_propertyEventFilter.addCondition(new PropertyChangeEventFilterCondition(propertyName, value));
+    addPropertyEventFilterCondition(new PropertyChangeEventFilterCondition(propertyName, value));
+  }
+
+  protected void addPropertyEventFilterCondition(IPropertyChangeEventFilterCondition condition) {
+    m_propertyEventFilter.addCondition(condition);
   }
 
   @Override

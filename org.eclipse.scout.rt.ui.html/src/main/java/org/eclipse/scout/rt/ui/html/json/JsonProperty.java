@@ -88,14 +88,6 @@ public abstract class JsonProperty<MODEL_ELEMENT> {
     return true;
   }
 
-  public boolean shouldAddEvent() {
-    return hasModelValue() && accept() && !isValueSent();
-  }
-
-  protected boolean hasModelValue() {
-    return modelValue() != null;
-  }
-
   /**
    * Returns the <i>raw</i> model value.
    * <p>

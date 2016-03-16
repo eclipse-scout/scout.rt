@@ -112,7 +112,7 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent {
 
   String PROP_THEME = "theme";
 
-  String PROP_BROWSER_HISTORY = "browserHistory";
+  String PROP_BROWSER_HISTORY_ENTRY = "browserHistoryEntry";
 
   String PROP_UI_BASE_URL = "uiBaseUrl";
 
@@ -820,14 +820,14 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent {
    * @return the current browser history item
    * @since 6.0
    */
-  BrowserHistory getBrowserHistory();
+  BrowserHistoryEntry getBrowserHistoryEntry();
 
   /**
    * Sets the browser history item. Calling this method will change the URL in the address bar of the browser.
    *
    * @since 6.0
    */
-  void setBrowserHistory(BrowserHistory browserHistory);
+  void setBrowserHistoryEntry(BrowserHistoryEntry browserHistory);
 
   /**
    * Sets the base URL from where the Scout application has been started. Note that this URL may be different from the

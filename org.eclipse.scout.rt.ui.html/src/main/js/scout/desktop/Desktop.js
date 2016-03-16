@@ -44,6 +44,7 @@ scout.Desktop.prototype._init = function(model) {
   this.fileChooserController = new scout.FileChooserController(this, this.session);
   this._addNullOutline(model.outline);
   this._resizeHandler = this.onResize.bind(this);
+  this._popstateHandler = this.onPopstate.bind(this);
   this.navigationVisible = scout.nvl(model.navigationVisible, this.desktopStyle === scout.DesktopStyle.DEFAULT);
   this.headerVisible = scout.nvl(model.headerVisible, this.desktopStyle === scout.DesktopStyle.DEFAULT);
   this.benchVisible = scout.nvl(model.benchVisible, true);
@@ -83,7 +84,10 @@ scout.Desktop.prototype._render = function($parent) {
   this.addOns.forEach(function(addOn) {
     addOn.render(this.$container);
   }, this);
-  this.$container.window().on('resize', this._resizeHandler);
+
+  this.$container.window()
+    .on('resize', this._resizeHandler)
+    .on('popstate', this._popstateHandler);
 
   // prevent general drag and drop, dropping a file anywhere in the application must not open this file in browser
   this._setupDragAndDrop();
@@ -92,7 +96,9 @@ scout.Desktop.prototype._render = function($parent) {
 };
 
 scout.Desktop.prototype._remove = function() {
-  this.$container.window().off('resize', this._resizeHandler);
+  this.$container.window()
+    .off('resize', this._resizeHandler)
+    .off('popstate', this._popstateHandler);
   scout.Desktop.parent.prototype._remove.call(this);
 };
 
@@ -291,6 +297,13 @@ scout.Desktop.prototype.onResize = function(event) {
   this.revalidateLayout();
 };
 
+scout.Desktop.prototype.onPopstate = function(event) {
+  var historyState = event.originalEvent.state;
+  if (historyState && historyState.deepLinkPath) {
+    this._send('historyChanged', historyState);
+  }
+};
+
 scout.Desktop.prototype.revalidateHeaderLayout = function() {
   if (this.header) {
     this.header.revalidateLayout();
@@ -455,12 +468,10 @@ scout.Desktop.prototype._onModelRemoveNotification = function(event) {
   this.removeNotification(event.id);
 };
 
-scout.Desktop.prototype._renderBrowserHistory = function() {
+scout.Desktop.prototype._renderBrowserHistoryEntry = function() {
   var myWindow = this.$container.window(true),
-    history = this.browserHistory;
-  myWindow.history.pushState({}, history.title, history.path);
-  // FIXME awe: (deep-links) dafür sorgen, dass man bei Klick auf den Back button immer noch auf der letzten Website landet
-  // und nicht einfach nichts passiert, so wie jetzt.
+    history = this.browserHistoryEntry;
+  myWindow.history.pushState({deepLinkPath: history.deepLinkPath}, history.title, history.path);
 };
 
 scout.Desktop.prototype.onModelAction = function(event) {

@@ -61,4 +61,9 @@ public interface IDesktopUIFacade {
    */
   void fireGuiDetached();
 
+  /**
+   * @param deepLinkPath
+   */
+  void historyChangedFromUI(String deepLinkPath);
+
 }

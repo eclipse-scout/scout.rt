@@ -3,7 +3,7 @@ package org.eclipse.scout.rt.client.deeplink;
 import java.util.regex.Matcher;
 
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
-import org.eclipse.scout.rt.client.ui.desktop.BrowserHistory;
+import org.eclipse.scout.rt.client.ui.desktop.BrowserHistoryEntry;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.platform.Order;
@@ -50,14 +50,15 @@ public class OutlineHandler extends AbstractDeepLinkHandler {
     LOG.info("Activate outline " + selectedOutline);
   }
 
-  public BrowserHistory createBrowserHistory(IDesktop desktop, IOutline outline) {
+  public BrowserHistoryEntry createBrowserHistoryEntry(IDesktop desktop, IOutline outline) {
     UriBuilder uri = new UriBuilder("./");
     if (StringUtility.hasText(outline.getTitle())) {
       uri.parameter(IDeepLinks.PARAM_NAME_INFO, toSlug(outline.getTitle()));
     }
-    uri.parameter(IDeepLinks.PARAM_NAME_DEEP_LINK, toParameter(outlineId(outline)));
+    String deepLinkPath = toDeepLinkPath(outlineId(outline));
+    uri.parameter(IDeepLinks.PARAM_NAME_DEEP_LINK, deepLinkPath);
     String historyTitle = desktop.getTitle() + " - " + outline.getTitle();
-    return new BrowserHistory(uri.createURI().toString(), historyTitle);
+    return new BrowserHistoryEntry(uri.createURI().toString(), historyTitle, deepLinkPath);
   }
 
   private static String outlineId(IOutline outline) {

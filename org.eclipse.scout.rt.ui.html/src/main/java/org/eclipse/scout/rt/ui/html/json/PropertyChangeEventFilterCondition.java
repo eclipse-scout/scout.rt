@@ -10,7 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json;
 
-public class PropertyChangeEventFilterCondition {
+import java.beans.PropertyChangeEvent;
+
+public class PropertyChangeEventFilterCondition implements IPropertyChangeEventFilterCondition {
+
   private String m_propertyName;
   private Object m_value;
 
@@ -19,18 +22,28 @@ public class PropertyChangeEventFilterCondition {
     m_value = value;
   }
 
+  @Override
   public String getPropertyName() {
     return m_propertyName;
   }
 
-  public Object getValue() {
-    return m_value;
-  }
+  @Override
+  public boolean accept(PropertyChangeEvent event) {
+    Object newValue = event.getNewValue();
 
-  /**
-   * Used to update the filtered value of this condition.
-   */
-  public void updateValue(Object value) {
-    m_value = value;
+    // Ignore if null == null
+    if (m_value == null) {
+      if (newValue == null) {
+        return false;
+      }
+    }
+    // Ignore if value is the same
+    else if (m_value.equals(newValue)) {
+      return false;
+    }
+
+    // When value is not ignored, we update the value to filter
+    m_value = newValue;
+    return true;
   }
 }

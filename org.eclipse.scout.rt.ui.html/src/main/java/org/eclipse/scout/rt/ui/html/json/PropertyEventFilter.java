@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.ui.html.json;
 
 import java.beans.PropertyChangeEvent;
 
-public class PropertyEventFilter extends AbstractEventFilter<PropertyChangeEvent, PropertyChangeEventFilterCondition> {
+public class PropertyEventFilter extends AbstractEventFilter<PropertyChangeEvent, IPropertyChangeEventFilterCondition> {
 
   public PropertyEventFilter() {
   }
@@ -22,20 +22,11 @@ public class PropertyEventFilter extends AbstractEventFilter<PropertyChangeEvent
    */
   @Override
   public PropertyChangeEvent filter(PropertyChangeEvent event) {
-    for (PropertyChangeEventFilterCondition condition : getConditions()) {
+    for (IPropertyChangeEventFilterCondition condition : getConditions()) {
       if (condition.getPropertyName().equals(event.getPropertyName())) {
-        // Ignore if null == null
-        if (condition.getValue() == null) {
-          if (event.getNewValue() == null) {
-            return null;
-          }
-        }
-        // Ignore if value is the same
-        else if (condition.getValue().equals(event.getNewValue())) {
+        if (!condition.accept(event)) {
           return null;
         }
-        // When value is not ignored, we update the value to filter
-        condition.updateValue(event.getNewValue());
       }
     }
     return event;

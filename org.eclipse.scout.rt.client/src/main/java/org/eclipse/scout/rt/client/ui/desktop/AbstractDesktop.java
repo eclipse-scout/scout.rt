@@ -1039,7 +1039,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
       m_activeOutlineListener = new P_ActiveOutlineListener();
       m_outline.addTreeListener(m_activeOutlineListener);
       m_outline.addPropertyChangeListener(m_activeOutlineListener);
-      setBrowserHistory(BEANS.get(OutlineHandler.class).createBrowserHistory(this, m_outline));
+      setBrowserHistoryEntry(BEANS.get(OutlineHandler.class).createBrowserHistoryEntry(this, m_outline));
     }
     // <bsh 2010-10-15>
     // Those three "setXyz(null)" statements used to be called unconditionally. Now, they
@@ -1449,13 +1449,13 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   @Override
-  public BrowserHistory getBrowserHistory() {
-    return (BrowserHistory) propertySupport.getProperty(PROP_BROWSER_HISTORY);
+  public BrowserHistoryEntry getBrowserHistoryEntry() {
+    return (BrowserHistoryEntry) propertySupport.getProperty(PROP_BROWSER_HISTORY_ENTRY);
   }
 
   @Override
-  public void setBrowserHistory(BrowserHistory browserHistory) {
-    propertySupport.setProperty(PROP_BROWSER_HISTORY, browserHistory);
+  public void setBrowserHistoryEntry(BrowserHistoryEntry browserHistory) {
+    propertySupport.setProperty(PROP_BROWSER_HISTORY_ENTRY, browserHistory);
   }
 
   @Override
@@ -2117,11 +2117,21 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     }
   }
 
+  
+  protected void execDeepLink(String deepLinkPath) {
+    // FIXME awe: (deep-links) review with J.GU
+  }
+
   protected class P_UIFacade implements IDesktopUIFacade {
 
     @Override
     public void setBaseUrl(URL baseUrl) {
       setUiBaseUrl(baseUrl);
+    }
+
+    @Override
+    public void historyChangedFromUI(String deepLinkPath) {
+      execDeepLink(deepLinkPath); // FIXME awe: (deep-links) intercept/chains and stuff, discuss with J.GU
     }
 
     @Override

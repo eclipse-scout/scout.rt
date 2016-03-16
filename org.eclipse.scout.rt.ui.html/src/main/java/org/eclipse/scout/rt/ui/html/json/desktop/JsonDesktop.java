@@ -18,7 +18,7 @@ import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.view.IViewButton;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
-import org.eclipse.scout.rt.client.ui.desktop.BrowserHistory;
+import org.eclipse.scout.rt.client.ui.desktop.BrowserHistoryEntry;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
@@ -52,6 +52,7 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
   private static final String EVENT_OUTLINE_CHANGED = "outlineChanged";
   private static final String EVENT_OUTLINE_CONTENT_ACTIVATE = "outlineContentActivate";
   private static final String EVENT_FORM_ACTIVATED = "formActivated";
+  private static final String EVENT_HISTORY_CHANGED = "historyChanged";
 
   public static final String PROP_OUTLINE = "outline";
   public static final String PROP_DISPLAY_PARENT = "displayParent";
@@ -66,6 +67,7 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
   private final DownloadHandlerStorage m_downloads;
   private DesktopListener m_desktopListener;
   private DesktopEventFilter m_desktopEventFilter;
+  private BooleanPropertyChangeFilter m_browserHistoryFilter = new BooleanPropertyChangeFilter(IDesktop.PROP_BROWSER_HISTORY_ENTRY, false);
 
   public JsonDesktop(DESKTOP desktop, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(desktop, uiSession, id, parent);
@@ -103,9 +105,18 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
     if (EVENT_FORM_ACTIVATED.equals(event.getType())) {
       handleUiFormActivated(event);
     }
+    else if (EVENT_HISTORY_CHANGED.equals(event.getType())) {
+      handleUiHistoryChanged(event);
+    }
     else {
       super.handleUiEvent(event);
     }
+  }
+
+  private void handleUiHistoryChanged(JsonEvent event) {
+    addPropertyEventFilterCondition(m_browserHistoryFilter);
+    String deepLinkPath = event.getData().optString("deepLinkPath");
+    getModel().getUIFacade().historyChangedFromUI(deepLinkPath);
   }
 
   protected void handleUiFormActivated(JsonEvent event) {
@@ -201,15 +212,15 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
         return getModel().isCacheSplitterPosition();
       }
     });
-    putJsonProperty(new JsonProperty<DESKTOP>(IDesktop.PROP_BROWSER_HISTORY, model) {
+    putJsonProperty(new JsonProperty<DESKTOP>(IDesktop.PROP_BROWSER_HISTORY_ENTRY, model) {
       @Override
-      protected BrowserHistory modelValue() {
-        return getModel().getBrowserHistory();
+      protected BrowserHistoryEntry modelValue() {
+        return getModel().getBrowserHistoryEntry();
       }
 
       @Override
       public Object prepareValueForToJson(Object value) {
-        return JsonBrowserHistory.toJson((BrowserHistory) value);
+        return JsonBrowserHistoryEntry.toJson((BrowserHistoryEntry) value);
       }
     });
     putJsonProperty(new JsonProperty<DESKTOP>(IDesktop.PROP_LOGO_ID, model) {

@@ -40,13 +40,13 @@ public abstract class AbstractDeepLinkHandler implements IDeepLinkHandler {
   }
 
   /**
-   * This method creates a value to be used in the deep-link URL parameter. The returned value has the format:
-   * <code>[handler name]-[data]</code>.
+   * This method creates a deep-link path to be used in the URL parameter. The returned value has the format:
+   * <code>[handler name]-[handler data]</code>. Example <code>outline-12345</code>.
    *
    * @param handlerData
    * @return
    */
-  protected String toParameter(String handlerData) {
+  protected String toDeepLinkPath(String handlerData) {
     return getName() + "-" + handlerData;
   }
 
