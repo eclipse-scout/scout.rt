@@ -227,9 +227,6 @@
   __include("scout/desktop/viewtab/ViewTabsController.js");
   __include("scout/desktop/viewtab/ViewTabSelectKeyStroke.js");
   __include("scout/desktop/outline/DetailTableTreeFilter.js");
-  __include("scout/desktop/outline/NavigateButton.js"); // requires Menu.js
-  __include("scout/desktop/outline/NavigateDownButton.js");
-  __include("scout/desktop/outline/NavigateUpButton.js");
   __include("scout/desktop/outline/Outline.js");
   __include("scout/desktop/outline/OutlineOverview.js");
   __include("scout/desktop/outline/OutlineLayout.js");
@@ -237,6 +234,9 @@
   __include("scout/desktop/outline/PageLayout.js");
   __include("scout/desktop/outline/SearchOutline.js");
   __include("scout/desktop/outline/SearchOutlineLayout.js");
+  __include("scout/desktop/outline/navigation/NavigateButton.js"); // requires Menu.js
+  __include("scout/desktop/outline/navigation/NavigateDownButton.js");
+  __include("scout/desktop/outline/navigation/NavigateUpButton.js");
   __include("scout/desktop/outline/keystrokes/AbstractOutlineNavigationKeyStroke.js");
   __include("scout/desktop/outline/keystrokes/OutlineCollapseOrDrillUpKeyStroke.js");
   __include("scout/desktop/outline/keystrokes/OutlineExpandOrDrillDownKeyStroke.js");
