@@ -589,7 +589,7 @@ scout.Outline.prototype.updateDetailMenus = function() {
   var menuItems = [];
   // get menus from detail form
   if (this.detailForm) {
-    menuItems = this.detailForm.rootGroupBox.menus;
+    menuItems = this.detailForm.rootGroupBox.processMenus.concat(this.detailForm.rootGroupBox.menus);
     this.detailForm.rootGroupBox.setMenuBarVisible(false);
   }
   // get menus from detail table
