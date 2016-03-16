@@ -26,4 +26,9 @@ public interface IDeepLinkHandler {
    */
   boolean handle(String path) throws DeepLinkException;
 
+  /**
+   * @return the name of this handler as used in the deep-link URL.
+   */
+  String getName();
+
 }

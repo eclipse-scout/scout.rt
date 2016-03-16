@@ -1,7 +1,5 @@
 package org.eclipse.scout.rt.client.deeplink;
 
-import java.util.regex.Pattern;
-
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 
 /**
@@ -10,15 +8,21 @@ import org.eclipse.scout.rt.platform.ApplicationScoped;
 @ApplicationScoped
 public interface IDeepLinks {
 
-  String DEEP_LINK_PREFIX = "view";
+  /**
+   * Name of the URL parameter which contains the deep-link in the format <code>[handler name]-[handler data]</code>.
+   */
+  String PARAM_NAME_DEEP_LINK = "deeplink";
 
-  Pattern DEEP_LINK_REGEX = Pattern.compile("^/" + DEEP_LINK_PREFIX + "/(.*)$");
+  /**
+   * Name of the optional URL parameter which contains a human readable, informative text about the deep-link.
+   */
+  String PARAM_NAME_INFO = "info";
 
   /**
    * @return True if the given path is a valid deep-link request (only syntax is checked at this point).
    * @path The path-info of the HTTP request (URL without protocol, host, port and context-path)
    */
-  boolean isRequestValid(String path);
+  boolean canHandleDeepLink(String deepLinkPath);
 
   /**
    * Handles the deep-link request.
@@ -30,7 +34,7 @@ public interface IDeepLinks {
    * @throws DeepLinkException
    *           when the deep-link couldn't be processed for some reasons (e.g. missing permissions)
    */
-  boolean handleRequest(String path) throws DeepLinkException;
+  boolean handleDeepLink(String deepLinkPath) throws DeepLinkException;
 
   /**
    * @param webRoot

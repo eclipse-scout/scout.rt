@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.ui.html;
 
 import java.math.BigInteger;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.AccessController;
 import java.security.SecureRandom;
@@ -44,6 +43,7 @@ import org.eclipse.scout.rt.client.deeplink.IDeepLinks;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
+import org.eclipse.scout.rt.client.ui.desktop.IDesktopUIFacade;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IPlatform;
 import org.eclipse.scout.rt.platform.Platform;
@@ -57,7 +57,7 @@ import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
-import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.platform.util.UriUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledException;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedException;
@@ -229,7 +229,7 @@ public class UiSession implements IUiSession {
       JsonClientSession<?> jsonClientSessionAdapter = createClientSessionAdapter(m_clientSession);
 
       // Start desktop
-      startDesktop(resolveStartupPath(req, jsonStartupReq));
+      startDesktop(jsonStartupReq.getSessionStartupParams());
 
       // Fill startupData with everything that is needed to start the session on the UI
       putInitializationStartupData(jsonClientSessionAdapter.getId());
@@ -240,40 +240,6 @@ public class UiSession implements IUiSession {
       m_httpContext.clear();
       m_currentJsonRequest = null;
     }
-  }
-
-  private String resolveStartupPath(HttpServletRequest req, JsonStartupRequest jsonStartupReq) {
-    String startupUrlParam = jsonStartupReq.getSessionStartupParams().get("url");
-
-    // extract path-info
-    String startupPath;
-    try {
-      startupPath = new URL(startupUrlParam).getPath();
-    }
-    catch (MalformedURLException e) {
-      return null;
-    }
-
-    // remove context-path
-    String contextPath = req.getContextPath();
-    if (startupPath.startsWith(contextPath)) {
-      startupPath = startupPath.substring(contextPath.length());
-    }
-
-    // FIXME awe: (deep-links) only do this once, when platform starts up? same for all requests
-    StringBuilder webRoot = new StringBuilder();
-    webRoot.append(req.getScheme()).append("://");
-    webRoot.append(req.getServerName());
-    int port = req.getServerPort();
-    if (port != 80) {
-      webRoot.append(":").append(port);
-    }
-    if (StringUtility.hasText(contextPath)) {
-      webRoot.append(contextPath);
-    }
-    BEANS.get(IDeepLinks.class).setWebRoot(webRoot.toString());
-
-    return startupPath;
   }
 
   protected JsonResponse createJsonResponse() {
@@ -398,16 +364,20 @@ public class UiSession implements IUiSession {
     return BEANS.get(UiJobs.class).awaitAndGet(future);
   }
 
-  protected void startDesktop(final String pathInfo) {
+  protected void startDesktop(Map<String, String> startupParams) {
+    final URL baseUrl = UriUtility.toUrl(startupParams.get("url"));
+    final String deepLinkPath = startupParams.get(IDeepLinks.PARAM_NAME_DEEP_LINK);
     final IFuture<Void> future = ModelJobs.schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
         IDesktop desktop = m_clientSession.getDesktop();
+        IDesktopUIFacade uiFacade = desktop.getUIFacade();
         if (!desktop.isOpened()) {
-          desktop.getUIFacade().openFromUI();
+          uiFacade.openFromUI();
         }
-        desktop.getUIFacade().fireGuiAttached(pathInfo);
+        uiFacade.setBaseUrl(baseUrl);
+        uiFacade.fireGuiAttached(deepLinkPath);
       }
     }, ModelJobs.newInput(ClientRunContexts.copyCurrent()
         .withSession(m_clientSession, true))

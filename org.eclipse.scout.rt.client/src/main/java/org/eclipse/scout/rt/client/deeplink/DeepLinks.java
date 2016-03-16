@@ -2,9 +2,9 @@ package org.eclipse.scout.rt.client.deeplink;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
 
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,12 +42,10 @@ public class DeepLinks implements IDeepLinks {
   }
 
   @Override
-  public boolean isRequestValid(String path) {
-    String deepLinkPath = getDeepLinkPath(path);
-    if (deepLinkPath == null) {
+  public boolean canHandleDeepLink(String deepLinkPath) {
+    if (StringUtility.isNullOrEmpty(deepLinkPath)) {
       return false;
     }
-
     for (IDeepLinkHandler handler : m_handlers) {
       if (handler.matches(deepLinkPath)) {
         return true;
@@ -57,36 +55,13 @@ public class DeepLinks implements IDeepLinks {
   }
 
   @Override
-  public boolean handleRequest(String path) throws DeepLinkException {
-    String deepLinkPath = getDeepLinkPath(path);
-    if (deepLinkPath == null) {
-      throw new IllegalArgumentException("Called handleRequest but path is not a valid deep-link: " + path);
-    }
-
+  public boolean handleDeepLink(String deepLinkPath) throws DeepLinkException {
     for (IDeepLinkHandler handler : m_handlers) {
       if (handler.handle(deepLinkPath)) {
         return true;
       }
     }
-
     return false;
-  }
-
-  /**
-   * @return The deep-link path without the deep-link prefix. Example path '/view/outline/123' will return
-   *         'outline/123'.
-   */
-  protected String getDeepLinkPath(String path) {
-    if (path == null) {
-      return null;
-    }
-
-    Matcher matcher = DEEP_LINK_REGEX.matcher(path);
-    if (!matcher.matches()) {
-      return null;
-    }
-
-    return matcher.group(1);
   }
 
   @Override

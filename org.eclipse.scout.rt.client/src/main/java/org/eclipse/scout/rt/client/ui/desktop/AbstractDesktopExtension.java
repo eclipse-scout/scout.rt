@@ -60,8 +60,8 @@ public abstract class AbstractDesktopExtension implements IDesktopExtension {
   }
 
   @Override
-  public ContributionCommand guiAttachedDelegate(String pathInfo) {
-    return execGuiAttached(pathInfo);
+  public ContributionCommand guiAttachedDelegate(String deepLinkPath) {
+    return execGuiAttached(deepLinkPath);
   }
 
   @Override
@@ -208,7 +208,7 @@ public abstract class AbstractDesktopExtension implements IDesktopExtension {
    */
   @ConfigOperation
   @Order(20)
-  protected ContributionCommand execGuiAttached(String pathInfo) {
+  protected ContributionCommand execGuiAttached(String deepLinkPath) {
     return ContributionCommand.Continue;
   }
 

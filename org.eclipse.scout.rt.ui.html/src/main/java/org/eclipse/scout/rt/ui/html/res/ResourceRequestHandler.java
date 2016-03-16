@@ -19,7 +19,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.eclipse.scout.rt.client.deeplink.IDeepLinks;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.nls.NlsLocale;
@@ -49,7 +48,6 @@ public class ResourceRequestHandler extends AbstractUiServletRequestHandler {
   // Remember bean instances to save lookups on each GET request
   private List<IResourceLoaderFactory> m_resourceLoaderFactoryList = Collections.unmodifiableList(BEANS.all(IResourceLoaderFactory.class));
   private IHttpCacheControl m_httpCacheControl = BEANS.get(IHttpCacheControl.class);
-  private IDeepLinks m_deepLinks = BEANS.get(IDeepLinks.class);
 
   @Override
   public boolean handleGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -148,15 +146,10 @@ public class ResourceRequestHandler extends AbstractUiServletRequestHandler {
     if (pathInfo == null) {
       return null;
     }
-    if ("/".equals(pathInfo) || isDeepLinkRequest(pathInfo)) {
+    if ("/".equals(pathInfo)) {
       pathInfo = resolveIndexHtml(req);
     }
-
     return pathInfo;
-  }
-
-  private boolean isDeepLinkRequest(String pathInfo) {
-    return m_deepLinks.isRequestValid(pathInfo);
   }
 
   protected String resolveIndexHtml(HttpServletRequest request) {

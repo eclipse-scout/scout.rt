@@ -6,8 +6,6 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.eclipse.scout.rt.platform.BEANS;
-
 /**
  * Base class for all classes that provide deep-link logic.
  */
@@ -23,6 +21,13 @@ public abstract class AbstractDeepLinkHandler implements IDeepLinkHandler {
   }
 
   /**
+   * Creates a regexp pattern to validate/parse the value of the deep-link URL parameter.
+   */
+  protected static Pattern defaultPattern(String handlerName, String dataGroup) {
+    return Pattern.compile("^" + handlerName + "-(" + dataGroup + ")$");
+  }
+
+  /**
    * Slug implementation as proposed from Stackoverflow.
    *
    * @see http://stackoverflow.com/questions/1657193/java-code-library-for-generating-slugs-for-use-in-pretty-urls
@@ -35,12 +40,14 @@ public abstract class AbstractDeepLinkHandler implements IDeepLinkHandler {
   }
 
   /**
-   * @return The prefix required to generate an absolute URL (including trailing slash). Example:
-   *         "http://scou.eclipse.org:8080/widgets/view/".
+   * This method creates a value to be used in the deep-link URL parameter. The returned value has the format:
+   * <code>[handler name]-[data]</code>.
+   *
+   * @param handlerData
+   * @return
    */
-  protected String getUrlPrefix() {
-    String webRoot = BEANS.get(IDeepLinks.class).getWebRoot();
-    return webRoot + "/" + DeepLinks.DEEP_LINK_PREFIX + "/";
+  protected String toParameter(String handlerData) {
+    return getName() + "-" + handlerData;
   }
 
   @Override

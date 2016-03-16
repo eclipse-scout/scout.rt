@@ -95,8 +95,8 @@ public abstract class AbstractDesktopExtension<DESKTOP extends AbstractDesktop> 
   }
 
   @Override
-  public void execGuiAttached(DesktopGuiAttachedChain chain, String pathInfo) {
-    chain.execGuiAttached(pathInfo);
+  public void execGuiAttached(DesktopGuiAttachedChain chain, String deepLinkPath) {
+    chain.execGuiAttached(deepLinkPath);
   }
 
   @Override

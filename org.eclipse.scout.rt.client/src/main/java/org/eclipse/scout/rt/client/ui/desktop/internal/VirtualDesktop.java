@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.ui.desktop.internal;
 
 import java.beans.PropertyChangeListener;
+import java.net.URL;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -742,6 +743,15 @@ public class VirtualDesktop implements IDesktop {
 
   @Override
   public void setBrowserHistory(BrowserHistory browserHistory) {
+  }
+
+  @Override
+  public void setUiBaseUrl(URL baseUrl) {
+  }
+
+  @Override
+  public URL getUiBaseUrl() {
+    return null;
   }
 
 }

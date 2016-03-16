@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.desktop;
 
+import java.net.URL;
+
 /**
  * The desktop model (may) consist of
  * <ul>
@@ -24,6 +26,8 @@ package org.eclipse.scout.rt.client.ui.desktop;
  * </ul>
  */
 public interface IDesktopUIFacade {
+
+  void setBaseUrl(URL baseUrl);
 
   /**
    * GUI fires this event as soon as the desktop was completely setup and displayed
@@ -46,10 +50,11 @@ public interface IDesktopUIFacade {
    * GUI fires this event when a UiSession has been attached to the desktop. The desktop is open at this point. The
    * event occurs after openFromUI().
    *
-   * @param pathInfo
-   *          The part of the URL which started the Scout application
+   * @param deepLinkPath
+   *          The deep-link path which was passed as URL parameter to the Scout application (if available). This
+   *          parameter may be null.
    */
-  void fireGuiAttached(String pathInfo);
+  void fireGuiAttached(String deepLinkPath);
 
   /**
    * GUI fires this event when the application/workbench is closing

@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.ui.desktop;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -363,13 +364,13 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
    * <p>
    * Subclasses can override this method. The default does nothing.
    *
-   * @param pathInfo
-   *          The part of the URL which started the Scout application. You can use the pathInfo to perform deep-link
-   *          actions. See: {@link IDeepLinks}.
+   * @param deepLinkPath
+   *          The deep-link path which was passed as URL parameter to the Scout application (if available). This
+   *          parameter may be null. See: {@link IDeepLinks}.
    */
   @ConfigOperation
   @Order(50)
-  protected void execGuiAttached(String pathInfo) {
+  protected void execGuiAttached(String deepLinkPath) {
   }
 
   /**
@@ -1899,7 +1900,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     fireDesktopClosed();
   }
 
-  private void attachGui(String pathInfo) {
+  private void attachGui(String deepLinkPath) {
     if (isGuiAvailable()) {
       return;
     }
@@ -1908,7 +1909,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     //extensions
     for (IDesktopExtension ext : getDesktopExtensions()) {
       try {
-        ContributionCommand cc = ext.guiAttachedDelegate(pathInfo);
+        ContributionCommand cc = ext.guiAttachedDelegate(deepLinkPath);
         if (cc == ContributionCommand.Stop) {
           break;
         }
@@ -1990,6 +1991,16 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     m_isForcedClosing = forcedClosing;
   }
 
+  @Override
+  public void setUiBaseUrl(URL baseUrl) {
+    propertySupport.setProperty(PROP_UI_BASE_URL, baseUrl);
+  }
+
+  @Override
+  public URL getUiBaseUrl() {
+    return (URL) propertySupport.getProperty(PROP_UI_BASE_URL);
+  }
+
   /**
    * local desktop extension that calls local exec methods and returns local contributions in this class itself
    */
@@ -2052,8 +2063,8 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     }
 
     @Override
-    public ContributionCommand guiAttachedDelegate(String pathInfo) {
-      interceptGuiAttached(pathInfo);
+    public ContributionCommand guiAttachedDelegate(String deepLinkPath) {
+      interceptGuiAttached(deepLinkPath);
       return ContributionCommand.Continue;
     }
 
@@ -2109,8 +2120,13 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   protected class P_UIFacade implements IDesktopUIFacade {
 
     @Override
-    public void fireGuiAttached(String pathInfo) {
-      attachGui(pathInfo);
+    public void setBaseUrl(URL baseUrl) {
+      setUiBaseUrl(baseUrl);
+    }
+
+    @Override
+    public void fireGuiAttached(String deepLinkPath) {
+      attachGui(deepLinkPath);
     }
 
     @Override
@@ -2324,8 +2340,8 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     }
 
     @Override
-    public void execGuiAttached(DesktopGuiAttachedChain chain, String pathInfo) {
-      getOwner().execGuiAttached(pathInfo);
+    public void execGuiAttached(DesktopGuiAttachedChain chain, String deepLinkPath) {
+      getOwner().execGuiAttached(deepLinkPath);
     }
 
     @Override
@@ -2395,10 +2411,10 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     chain.execPageDetailTableChanged(oldTable, newTable);
   }
 
-  protected final void interceptGuiAttached(String pathInfo) {
+  protected final void interceptGuiAttached(String deepLinkPath) {
     List<? extends org.eclipse.scout.rt.client.extension.ui.desktop.IDesktopExtension<? extends AbstractDesktop>> extensions = getAllExtensions();
     DesktopGuiAttachedChain chain = new DesktopGuiAttachedChain(extensions);
-    chain.execGuiAttached(pathInfo);
+    chain.execGuiAttached(deepLinkPath);
   }
 
   protected final void interceptGuiDetached() {
