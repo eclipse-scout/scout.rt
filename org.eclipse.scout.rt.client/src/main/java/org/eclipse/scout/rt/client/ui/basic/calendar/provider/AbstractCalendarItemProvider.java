@@ -26,6 +26,7 @@ import org.eclipse.scout.rt.client.extension.ui.basic.calendar.provider.Calendar
 import org.eclipse.scout.rt.client.extension.ui.basic.calendar.provider.ICalendarItemProviderExtension;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
+import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.platform.Order;
@@ -237,14 +238,7 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
    */
   @Override
   public void disposeProvider() {
-    for (IMenu menu : getMenus()) {
-      try {
-        menu.dispose();
-      }
-      catch (RuntimeException e) {
-        LOG.warn("Exception while disposing menu.", e);
-      }
-    }
+    ActionUtility.disposeActions(getMenus());
     IFuture<Void> job = m_reloadJob;
     if (job != null) {
       job.cancel(true);

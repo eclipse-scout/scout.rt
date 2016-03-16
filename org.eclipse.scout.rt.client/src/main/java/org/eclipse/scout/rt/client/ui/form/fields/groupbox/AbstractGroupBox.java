@@ -632,14 +632,7 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
   @Override
   protected void disposeFieldInternal() {
     super.disposeFieldInternal();
-    for (IMenu menu : getMenus()) {
-      try {
-        menu.dispose();
-      }
-      catch (RuntimeException e) {
-        LOG.warn("Exception while disposing menu.", e);
-      }
-    }
+    ActionUtility.disposeActions(getMenus());
   }
 
   protected class P_UIFacade implements IGroupBoxUIFacade {

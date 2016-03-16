@@ -1194,13 +1194,6 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
     for (ITreeNode childNode : getChildNodes()) {
       childNode.dispose();
     }
-    for (IMenu menu : getMenus()) {
-      try {
-        menu.dispose();
-      }
-      catch (RuntimeException e) {
-        LOG.warn("Exception while disposing menu.", e);
-      }
-    }
+    ActionUtility.disposeActions(getMenus());
   }
 }
