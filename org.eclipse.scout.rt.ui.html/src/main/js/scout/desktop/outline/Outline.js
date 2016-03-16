@@ -519,7 +519,8 @@ scout.Outline.prototype._renderDetailForm = function() {
 
   var page = this.selectedNodes[0];
   this.detailForm.render(page.$node);
-  this.detailForm.validateRoot = true;
+  this.detailForm.htmlComp.validateRoot = false;
+  this.detailForm.htmlComp.pixelBasedSizing = true;
   this._ensurePageLayout(page);
 };
 

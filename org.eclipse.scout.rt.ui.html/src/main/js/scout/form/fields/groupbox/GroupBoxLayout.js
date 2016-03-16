@@ -109,7 +109,7 @@ scout.GroupBoxLayout.prototype.preferredLayoutSize = function($container) {
 
     htmlMenuBar = this._htmlMenuBar();
     if (htmlMenuBar) {
-      prefSize.height += htmlMenuBar.getPreferredSize(true).height;
+      prefSize.height += htmlMenuBar.getPreferredSize().height;
       //in this case there is no padding. add some padding to width.
       if (!this._groupBox.borderVisible) {
         prefSize.height += this._groupBox.menuBar.position === 'top' ? 14 : 16;

@@ -16,45 +16,49 @@ scout.PageLayout = function(outline, page) {
 scout.inherits(scout.PageLayout, scout.AbstractLayout);
 
 scout.PageLayout.prototype.layout = function($container) {
-  var containerSize, detailMenuBarSize, formTop,
+  var containerSize, menuBarSize, formTop,
     htmlContainer = this.page.htmlComp,
-    detailMenuBar = this.outline.detailMenuBar,
-    htmlDetailMenuBar = detailMenuBar.htmlComp;
+    $title = this.page.$node.children('.text'),
+    titleHeight = 0,
+    menuBar = this.outline.detailMenuBar,
+    menuBarHeight = 0,
+    htmlMenuBar = menuBar.htmlComp;
 
   containerSize = htmlContainer.getAvailableSize()
     .subtract(htmlContainer.getInsets());
 
-  if (detailMenuBar.visible) {
-    detailMenuBarSize = scout.MenuBarLayout.size(htmlDetailMenuBar, containerSize);
-    htmlDetailMenuBar.setSize(detailMenuBarSize);
+  if (menuBar.visible) {
+    menuBarHeight = htmlMenuBar.getPreferredSize().height;
+    menuBarSize = new scout.Dimension(containerSize.width, menuBarHeight)
+      .subtract(htmlMenuBar.getMargins());
+    htmlMenuBar.setSize(menuBarSize);
   }
 
   if (this.page.detailForm && this.page.detailForm === this.outline.detailForm) {
-    formTop = this.page.detailForm.$container.position().top;
-    this.page.detailForm.htmlComp.setSize(new scout.Dimension(containerSize.width, containerSize.height - formTop));
+    titleHeight = $title.outerHeight(true);
+    this.page.detailForm.htmlComp.setSize(new scout.Dimension(containerSize.width, containerSize.height - titleHeight - menuBarHeight));
   }
 };
 
 scout.PageLayout.prototype.preferredLayoutSize = function($container) {
   var prefSize,
     htmlContainer = this.page.htmlComp,
-    detailMenuBar = this.outline.detailMenuBar,
-    htmlDetailMenuBar = detailMenuBar.htmlComp,
     formPrefSize = new scout.Dimension(),
-    formTop = 0,
-    detailMenuBarPrefSize= new scout.Dimension(),
-    detailMenuBarTop = 0;
+    $title = this.page.$node.children('.text'),
+    titleHeight = 0,
+    menuBar = this.outline.detailMenuBar,
+    menuBarPrefSize= new scout.Dimension(),
+    htmlMenuBar = menuBar.htmlComp;
 
+  titleHeight = $title.outerHeight(true);
+  if (menuBar.visible) {
+    menuBarPrefSize = htmlMenuBar.getPreferredSize();
+  }
   if (this.page.detailForm && this.page.detailForm === this.outline.detailForm) {
     formPrefSize = this.page.detailForm.htmlComp.getPreferredSize();
-    formTop = this.page.detailForm.$container.position().top;
-  } else if (detailMenuBar.visible) {
-    detailMenuBarPrefSize = htmlDetailMenuBar.getPreferredSize(true);
-    detailMenuBarTop = detailMenuBar.$container.position().top;
   }
 
-  prefSize = new scout.Dimension(Math.max(formPrefSize.width, detailMenuBarPrefSize.width), detailMenuBarTop + detailMenuBarPrefSize.height + formTop + formPrefSize.height);
+  prefSize = new scout.Dimension(Math.max(formPrefSize.width, menuBarPrefSize.width), titleHeight + menuBarPrefSize.height + formPrefSize.height);
   prefSize = prefSize.add(htmlContainer.getInsets());
-  prefSize.height = prefSize.height - htmlContainer.getInsets().top; //TODO CGU remove after $node has a $text node, then we can properly measure $text instead of using top
   return prefSize;
 };

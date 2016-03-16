@@ -280,6 +280,7 @@ scout.Tree.prototype._$buildNode = function(node, $parent) {
     .attr('data-level', level)
     .css('padding-left', this._computeTreeItemPaddingLeft(level));
   node.$node = $node;
+  $node.appendSpan('text');
 
   this._decorateNode(node);
   this._renderTreeItemControl($node);
@@ -324,15 +325,7 @@ scout.Tree.prototype._decorateNode = function(node) {
     $node.addClass('child-of-selected');
   }
 
-  // Replace only the "text part" of the node, leave control and checkbox untouched
-  var preservedChildren = $node.children('.tree-node-control,.tree-node-checkbox').detach();
-  $node.empty();
-  if (node.htmlEnabled) {
-    $node.html(node.text);
-  } else {
-    $node.textOrNbsp(node.text);
-  }
-  $node.prepend(preservedChildren);
+  this._renderNodeText(node);
 
   scout.styles.legacyStyle(node, $node);
 
@@ -383,6 +376,16 @@ scout.Tree.prototype._renderTreeItemCheckbox = function(node) {
     $checkboxDiv.toggleClass('children-checked', true);
   } else {
     $checkboxDiv.toggleClass('children-checked', false);
+  }
+};
+
+scout.Tree.prototype._renderNodeText = function(node) {
+  var $node = node.$node,
+    $text = $node.children('.text');
+  if (node.htmlEnabled) {
+    $text.html(node.text);
+  } else {
+    $text.textOrNbsp(node.text);
   }
 };
 
@@ -798,7 +801,7 @@ scout.Tree.prototype._nodeTooltipText = function($node) {
   if (node.tooltipText) {
     return node.tooltipText;
   } else if (this._isTruncatedNodeTooltipEnabled() && $node.isContentTruncated()) {
-    return $node.text();
+    return $node.children('.text').text();
   }
 };
 
