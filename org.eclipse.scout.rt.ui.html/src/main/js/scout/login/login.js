@@ -110,9 +110,13 @@ scout.login = {
           .html('')
           .text(texts.get('ui.LoginFailed'))
           .addClass('login-error');
-        this.$user.focus();
-        this.$user.one('input.resetLoginError', resetButtonText.bind(this));
-        this.$password.one('input.resetLoginError', resetButtonText.bind(this));
+        this.$user
+          .val('')
+          .focus()
+          .one('input.resetLoginError', resetButtonText.bind(this));
+        this.$password
+          .val('')
+          .one('input.resetLoginError', resetButtonText.bind(this));
       }.bind(this), 300);
     }
 
