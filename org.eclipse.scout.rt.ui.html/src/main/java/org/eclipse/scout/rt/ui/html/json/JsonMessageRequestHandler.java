@@ -11,8 +11,6 @@
 package org.eclipse.scout.rt.ui.html.json;
 
 import java.io.IOException;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletResponse;
@@ -26,6 +24,7 @@ import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
+import org.eclipse.scout.rt.platform.resource.MimeType;
 import org.eclipse.scout.rt.platform.util.CompareUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
@@ -59,7 +58,6 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
   private final HttpSessionHelper m_httpSessionHelper = BEANS.get(HttpSessionHelper.class);
   private final IHttpCacheControl m_httpCacheControl = BEANS.get(IHttpCacheControl.class);
   private final JsonRequestHelper m_jsonRequestHelper = BEANS.get(JsonRequestHelper.class);
-  private static final Pattern ALLOWED_CONTENT_TYPE_PATTERN = Pattern.compile("^(application|text)/(json|javascript)");
 
   @Override
   public boolean handlePost(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
@@ -68,11 +66,13 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
     if (CompareUtility.notEquals(pathInfo, "/json")) {
       return false;
     }
-    //check contenttype
-    Matcher m = ALLOWED_CONTENT_TYPE_PATTERN.matcher(req.getContentType());
-    if (!m.find()) {
-      LOG.error("Someone tries to attack json endpoint with wrong contenttype. ip:{} request:{}", req.getRemoteAddr(), req);
-      resp.sendError(415);
+
+    // only accept requests with mime type = application/json
+    String contentType = req.getContentType();
+    if (contentType == null || !contentType.contains(MimeType.JSON.getType())) {
+      LOG.info("Request with wrong content type received, ignoring. ContentType: {}, IP:{}", contentType, req.getRemoteAddr());
+      resp.sendError(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
+      return true;
     }
 
     final long startNanos = System.nanoTime();
