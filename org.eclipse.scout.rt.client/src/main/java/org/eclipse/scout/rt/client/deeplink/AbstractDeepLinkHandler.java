@@ -6,11 +6,15 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Base class for all classes that provide deep-link logic.
  */
 public abstract class AbstractDeepLinkHandler implements IDeepLinkHandler {
 
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractDeepLinkHandler.class);
   private static final Pattern NONLATIN = Pattern.compile("[^\\w-]");
   private static final Pattern WHITESPACE = Pattern.compile("[\\s]");
 
@@ -59,6 +63,7 @@ public abstract class AbstractDeepLinkHandler implements IDeepLinkHandler {
   public boolean handle(String path) throws DeepLinkException {
     Matcher matcher = m_pattern.matcher(path);
     if (matcher.matches()) {
+      LOG.debug("Handling deep-link name={} path={}", getName(), path);
       handleImpl(matcher);
       return true;
     }

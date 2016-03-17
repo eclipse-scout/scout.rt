@@ -9,15 +9,11 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.UriBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Order(1000)
 public class OutlineHandler extends AbstractDeepLinkHandler {
 
   private static final String HANDLER_NAME = "outline";
-
-  private static final Logger LOG = LoggerFactory.getLogger(OutlineHandler.class);
 
   public OutlineHandler() {
     super(defaultPattern(HANDLER_NAME, "\\d+"));
@@ -26,8 +22,6 @@ public class OutlineHandler extends AbstractDeepLinkHandler {
   @Override
   public void handleImpl(Matcher matcher) throws DeepLinkException {
     String outlineId = matcher.group(1);
-    LOG.info("Handling deep-link request for outline id=" + outlineId);
-
     IOutline selectedOutline = null;
     IDesktop desktop = ClientSessionProvider.currentSession().getDesktop();
     for (IOutline outline : desktop.getAvailableOutlines()) {
@@ -41,13 +35,10 @@ public class OutlineHandler extends AbstractDeepLinkHandler {
     if (selectedOutline == null) {
       throw new DeepLinkException();
     }
-
     if (!selectedOutline.isVisible() || !selectedOutline.isEnabled()) {
       throw new DeepLinkException();
     }
-
     desktop.activateOutline(selectedOutline);
-    LOG.info("Activate outline " + selectedOutline);
   }
 
   public BrowserHistoryEntry createBrowserHistoryEntry(IDesktop desktop, IOutline outline) {
