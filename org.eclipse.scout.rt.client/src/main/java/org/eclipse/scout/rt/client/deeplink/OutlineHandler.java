@@ -31,7 +31,6 @@ public class OutlineHandler extends AbstractDeepLinkHandler {
         break;
       }
     }
-
     if (selectedOutline == null) {
       throw new DeepLinkException();
     }
@@ -63,7 +62,6 @@ public class OutlineHandler extends AbstractDeepLinkHandler {
     short sum2 = 0;
     short modulus = 255;
     String data = outline.getClass().getName();
-
     for (int i = 0; i < data.length(); i++) {
       sum1 = (short) ((sum1 + data.charAt(i)) % modulus);
       sum2 = (short) ((sum2 + sum1) % modulus);

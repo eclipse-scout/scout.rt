@@ -1931,7 +1931,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
    */
   protected void showDeepLinkError(DeepLinkException e) {
     String errorMessage = TEXTS.get("DeepLinkError");
-    MessageBoxes.createOk().withBody(errorMessage);
+    MessageBoxes.createOk().withBody(errorMessage).show();
   }
 
   private void detachGui() {
