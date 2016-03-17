@@ -924,7 +924,11 @@ public final class StringUtility {
       return s;
     }
 
+    // Protected whitespace
     s = s.replace("&nbsp;", " ");
+    s = s.replace("&#160;", " ");
+    s = s.replace("&#xa0;", " ");
+
     s = s.replace("&quot;", "\"");
     s = s.replace("&apos;", "'");
     s = s.replace("&#39;", "'");
