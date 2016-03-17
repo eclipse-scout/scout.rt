@@ -87,7 +87,7 @@
     cursor: pointer;
     display: inline-block;
     position: relative;
-    font-size: 13px;
+    font-size: @font-size-normal;
 
     &.disabled {
       cursor: default;

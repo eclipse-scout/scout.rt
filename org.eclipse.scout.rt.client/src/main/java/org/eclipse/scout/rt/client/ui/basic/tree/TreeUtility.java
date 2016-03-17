@@ -134,4 +134,35 @@ public final class TreeUtility {
     }
     return node;
   }
+
+  public static void visitNodes(Collection<ITreeNode> nodes, ITreeVisitor v) {
+    for (ITreeNode node : nodes) {
+      visitNode(node, v);
+    }
+  }
+
+  public static boolean visitNode(ITreeNode node, ITreeVisitor v) {
+    return visitNodeRec(node, v);
+  }
+
+  public static boolean visitNodeRec(ITreeNode node, ITreeVisitor v) {
+    if (node == null) {
+      return true;
+    }
+    boolean b = v.visit(node);
+    if (!b) {
+      return b;
+    }
+    List<ITreeNode> a = node.getChildNodes();
+    for (ITreeNode childNode : a) {
+      // it might be that the visit of a node detached the node from the tree
+      if (childNode.getTree() != null) {
+        b = visitNodeRec(childNode, v);
+        if (!b) {
+          return b;
+        }
+      }
+    }
+    return true;
+  }
 }

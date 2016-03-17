@@ -17,6 +17,7 @@ scout.Outline = function() {
   this._treeItemPaddingLevel = 20;
   this._detailTableListener;
   this.inBackground = false;
+  this.embedDetailContent = false;
   this.formController;
   this.messageBoxController;
   this.fileChooserController;
@@ -33,7 +34,6 @@ scout.Outline.prototype._init = function(model) {
   this.addFilter(new scout.DetailTableTreeFilter());
   this.titleVisible = true;
   this._syncDefaultDetailForm(this.defaultDetailForm);
-  this.updateDetailForm();
   this.titleMenuBar = scout.create('MenuBar', {
     parent: this,
     menuOrder: new scout.GroupBoxMenuItemsOrder()
@@ -44,6 +44,7 @@ scout.Outline.prototype._init = function(model) {
     menuOrder: new scout.GroupBoxMenuItemsOrder(this.session)
   });
   this.detailMenuBar.bottom();
+  this.updateDetailContent();
 };
 
 scout.Outline.prototype._createKeyStrokeContext = function() {
@@ -84,7 +85,8 @@ scout.Outline.prototype._render = function($parent) {
   if (this.mobile) {
     this.$container.addClass('mobile');
   }
-  this._renderDetailForm();
+  this._renderEmbedDetailContent();
+  this._renderDetailContent();
   this._renderDetailMenuBarVisible();
 };
 
@@ -329,7 +331,7 @@ scout.Outline.prototype.selectNodes = function(nodes, notifyServer, debounceSend
     }
   }
   scout.Outline.parent.prototype.selectNodes.call(this, nodes, notifyServer, debounceSend);
-  this.updateDetailForm();
+  this.updateDetailContent();
 };
 
 scout.Outline.prototype._renderDefaultDetailForm = function() {
@@ -512,15 +514,22 @@ scout.Outline.prototype._renderInBackground = function() {
   this.$container.toggleClass('in-background', this.inBackground);
 };
 
-scout.Outline.prototype._renderDetailForm = function() {
-  if (!this.detailForm) {
+
+scout.Outline.prototype._renderEmbedDetailContent = function() {
+  this.$data.toggleClass('has-detail-content', this.embedDetailContent);
+};
+
+scout.Outline.prototype._renderDetailContent = function() {
+  if (!this.detailContent) {
     return;
   }
 
   var page = this.selectedNodes[0];
-  this.detailForm.render(page.$node);
-  this.detailForm.htmlComp.validateRoot = false;
-  this.detailForm.htmlComp.pixelBasedSizing = true;
+  this.detailContent.render(page.$node);
+  if (this.detailContent.htmlComp) {
+    this.detailContent.htmlComp.validateRoot = false;
+    this.detailContent.htmlComp.pixelBasedSizing = true;
+  }
   this._ensurePageLayout(page);
 };
 
@@ -531,47 +540,44 @@ scout.Outline.prototype._ensurePageLayout = function(page) {
   page.htmlComp.setLayout(new scout.PageLayout(this, page));
 };
 
-scout.Outline.prototype._removeDetailForm = function() {
-  if (!this.detailForm) {
+scout.Outline.prototype._removeDetailContent = function() {
+  if (!this.detailContent) {
     return;
   }
-  this.detailForm.remove();
+  this.detailContent.remove();
 };
 
-scout.Outline.prototype.setEmbedDetailForm = function(embed) {
-  this.embedDetailForm = embed;
-  this.updateDetailForm();
+scout.Outline.prototype.setEmbedDetailContent = function(embed) {
+  this.embedDetailContent = embed;
+  if (this.rendered) {
+    this._renderEmbedDetailContent();
+  }
+  this.updateDetailContent();
 };
 
-scout.Outline.prototype.setDetailForm = function(content) {
-  if (this.detailForm === content) {
+scout.Outline.prototype.setDetailContent = function(content) {
+  if (this.detailContent === content) {
     return;
   }
   if (this.rendered) {
-    this._removeDetailForm();
+    this._removeDetailContent();
   }
-  this.detailForm = content;
+  this.detailContent = content;
   if (this.rendered) {
-    this._renderDetailForm();
+    this._renderDetailContent();
   }
   this.invalidateLayoutTree();
 };
 
-scout.Outline.prototype.updateDetailForm = function() {
-  var detailForm = null,
-    selectedPage = this.selectedNodes[0];
-  if (!this.embedDetailForm) {
+scout.Outline.prototype.updateDetailContent = function() {
+  if (!this.embedDetailContent) {
+    this.setDetailContent(null);
+    this.setDetailMenus([]);
     return;
   }
 
   this.setDetailMenuBarVisible(false);
-  if (selectedPage) {
-    // Outline does not support multi selection -> [0]
-    if (selectedPage.detailForm && selectedPage.detailFormVisible && selectedPage.detailFormVisibleByUi) {
-      detailForm = selectedPage.detailForm;
-    }
-  }
-  this.setDetailForm(detailForm);
+  this.setDetailContent(this._computeDetailContent());
   this.updateDetailMenus();
 
   // Layout immediate to prevent 'laggy' form visualization,
@@ -581,20 +587,53 @@ scout.Outline.prototype.updateDetailForm = function() {
   }
 };
 
+scout.Outline.prototype._computeDetailContent = function() {
+  var selectedPage = this.selectedNodes[0];
+  if (!selectedPage) {
+    // Detail content is shown for the selected node only
+    return null;
+  }
+  if (selectedPage.nodeType === 'virtual') {
+    // If node is virtual it is not known yet whether there is a detail form or not -> wait until node gets resolved
+    return null;
+  }
+
+  // if there is a detail form, use this
+  if (selectedPage.detailForm && selectedPage.detailFormVisible && selectedPage.detailFormVisibleByUi) {
+    return selectedPage.detailForm;
+    // otherwise show the content of the table row
+    // but never if parent is a node page -> the table contains only one column with no essential information
+  } else if (selectedPage.row && selectedPage.parentNode.nodeType === 'table') {
+    return scout.create('TableRowDetail', {
+      parent: this,
+      table: selectedPage.parentNode.detailTable,
+      tableRow: selectedPage.row
+    });
+  }
+  return null;
+};
+
 scout.Outline.prototype.updateDetailMenus = function() {
-  if (!this.embedDetailForm) {
+  if (!this.embedDetailContent) {
     return;
   }
   var selectedPages = this.selectedNodes;
+  var selectedPage = selectedPages[0];
   var menuItems = [];
-  // get menus from detail form
-  if (this.detailForm) {
-    menuItems = this.detailForm.rootGroupBox.processMenus.concat(this.detailForm.rootGroupBox.menus);
-    this.detailForm.rootGroupBox.setMenuBarVisible(false);
+  if (this.detailContent) {
+    // get menus from detail form
+    if (this.detailContent instanceof scout.Form) {
+      var rootGroupBox = this.detailContent.rootGroupBox;
+      menuItems = rootGroupBox.processMenus.concat(rootGroupBox.menus);
+      rootGroupBox.setMenuBarVisible(false);
+    } else {
+      // get single selection menus from detail table for table row detail
+      menuItems = selectedPage.parentNode.detailTable.menus;
+      menuItems = scout.menus.filter(menuItems, ['Table.SingleSelection'], false, true);
+    }
   }
-  // get menus from detail table
+  // get empty space menus from detail table
   else if (selectedPages.length > 0) {
-    var selectedPage = selectedPages[0];
     if (selectedPage.detailTable) {
       menuItems = selectedPage.detailTable.menus;
       menuItems = scout.menus.filter(menuItems, ['Table.EmptySpace'], false, true);
@@ -627,9 +666,9 @@ scout.Outline.prototype._renderDetailMenuBar = function() {
 
   var node = this.selectedNodes[0];
   this.detailMenuBar.render(node.$node);
-  if (this.detailForm && this.detailForm.rendered) {
-    // move before form
-    this.detailMenuBar.$container.insertBefore(this.detailForm.$container);
+  if (this.detailContent && this.detailContent.rendered) {
+    // move before content (e.g. form)
+    this.detailMenuBar.$container.insertBefore(this.detailContent.$container);
   }
   this._ensurePageLayout(node);
 };
@@ -738,7 +777,7 @@ scout.Outline.prototype._onPageChanged = function(event) {
 
   var selectedPage = this.selectedNodes[0];
   if (!node && !selectedPage || node === selectedPage) {
-    this.updateDetailForm();
+    this.updateDetailContent();
   }
 
   this._triggerPageChanged(node);

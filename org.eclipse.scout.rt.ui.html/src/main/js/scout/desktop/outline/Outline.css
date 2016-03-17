@@ -44,7 +44,6 @@
 
     & > .tree-node,
     & > .animation-wrapper > .tree-node {
-      #scout.font-text-plus();
       cursor: pointer;
       border: 0;
 
@@ -54,12 +53,6 @@
       padding-top: 8px;
       padding-bottom: 8px;
 
-      & > .menubar {
-        border: 0;
-        padding-top: 10px;
-        background-color: @outline-selection-background-color;
-      }
-
       &.group {
         background-color: @outline-group-background-color;
       }
@@ -68,6 +61,16 @@
         color: @outline-selection-color;
         background-color: @outline-selection-background-color;
         border: 0;
+      }
+
+      & > .text {
+        font-size: @font-size-plus;
+      }
+
+      & > .menubar {
+        border: 0;
+        padding-top: 10px;
+        background-color: @outline-selection-background-color;
       }
 
       & > .tree-node-control {
@@ -149,7 +152,6 @@
       &.ancestor-of-selected,
       &.child-of-selected,
       &.selected {
-        #scout.font-text-plus();
         background-color: @outline-group-background-color;
       }
 
@@ -179,6 +181,15 @@
 
       &.selected::after {
         border: 0;
+      }
+    }
+
+    &.has-detail-content > .tree-node.selected,
+    &.has-detail-content > .animation-wrapper > .tree-node.selected {
+      & > .text {
+        font-weight: bold;
+        display: block;
+        padding-bottom: 3px;
       }
     }
   }

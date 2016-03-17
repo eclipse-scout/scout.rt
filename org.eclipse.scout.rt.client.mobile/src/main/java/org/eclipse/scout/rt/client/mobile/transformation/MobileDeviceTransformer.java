@@ -31,8 +31,11 @@ import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
+import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
+import org.eclipse.scout.rt.client.ui.basic.tree.ITreeVisitor;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeAdapter;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
+import org.eclipse.scout.rt.client.ui.basic.tree.TreeUtility;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineEvent;
@@ -56,7 +59,8 @@ import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
  * @since 3.9.0
  */
 public class MobileDeviceTransformer implements IDeviceTransformer {
-  private final Map<IForm, WeakReference<IForm>> m_modifiedForms = new WeakHashMap<IForm, WeakReference<IForm>>();
+  private final Map<IForm, WeakReference<IForm>> m_transformedForms = new WeakHashMap<>();
+  private final Map<IOutline, WeakReference<IOutline>> m_transformedOutlines = new WeakHashMap<>();
   private IDesktop m_desktop;
   private P_OutlineListener m_outlineListener;
   private List<IOutline> m_outlines;
@@ -82,6 +86,8 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
     if (breadCrumbsNavigation != null) {
       breadCrumbsNavigation.trackDisplayViewId(IForm.VIEW_ID_CENTER);
     }
+    // FIXME CGU use this instead of insert and update filter, because update event is fired too late. Why does the extension not work the first time?
+//    BEANS.get(IExtensionRegistry.class).register(MobilePageWithTableExtension.class);
   }
 
   public MobileDeviceTransformer() {
@@ -215,6 +221,11 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
     if (outline == null || outline.getRootNode() == null) {
       return;
     }
+    WeakReference<IOutline> outlineRef = m_transformedOutlines.get(outline);
+    if (outlineRef != null) {
+      // Already transformed
+      return;
+    }
 
     if (getDeviceTransformationConfig().isTransformationEnabled(MobileDeviceTransformation.DISPLAY_OUTLINE_ROOT_NODE)) {
       // Necessary to enable drilldown from top of the outline
@@ -224,6 +235,26 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
     outline.setLazyExpandingEnabled(false);
     outline.setAutoToggleBreadcrumbStyle(false);
     outline.setDisplayStyle(ITree.DISPLAY_STYLE_BREADCRUMB);
+
+    outline.visitTree(new ITreeVisitor() {
+      @Override
+      public boolean visit(ITreeNode node) {
+        transformPage((IPage) node);
+        return true;
+      }
+    });
+    m_transformedOutlines.put(outline, new WeakReference<IOutline>(outline));
+  }
+
+  public void transformPage(IPage page) {
+    if (page instanceof IPageWithTable) {
+      transformPageWithTable((IPageWithTable) page);
+    }
+  }
+
+  public void transformPageWithTable(IPageWithTable page) {
+    page.setLeaf(false);
+    page.setAlwaysCreateChildPage(true);
   }
 
   @Override
@@ -265,7 +296,7 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
   }
 
   protected void transformFormFields(IForm form) {
-    WeakReference<IForm> formRef = m_modifiedForms.get(form);
+    WeakReference<IForm> formRef = m_transformedForms.get(form);
     if (formRef != null) {
       return;
     }
@@ -288,7 +319,7 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
     }
 
     //mark form as modified
-    m_modifiedForms.put(form, new WeakReference<IForm>(form));
+    m_transformedForms.put(form, new WeakReference<IForm>(form));
   }
 
   protected void transformFormField(IFormField field) {
@@ -482,11 +513,39 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
       if (OutlineEvent.TYPE_PAGE_CHANGED == e.getType()) {
         onPageChanged((OutlineEvent) e);
       }
+      else if (TreeEvent.TYPE_NODES_INSERTED == e.getType()) {
+        onNodesInserted((TreeEvent) e);
+      }
+      else if (TreeEvent.TYPE_NODES_UPDATED == e.getType()) {
+        onNodesUpdated((TreeEvent) e);
+      }
     }
 
     protected void onPageChanged(OutlineEvent e) {
       IPage page = (IPage) e.getChildNode();
       transformPageDetailForm(page);
+    }
+
+    protected void onNodesInserted(TreeEvent e) {
+      TreeUtility.visitNodes(e.getNodes(), new ITreeVisitor() {
+        @Override
+        public boolean visit(ITreeNode node) {
+          transformPage((IPage) node);
+          return true;
+        }
+      });
+    }
+
+    protected void onNodesUpdated(TreeEvent e) {
+      TreeUtility.visitNodes(e.getNodes(), new ITreeVisitor() {
+        @Override
+        public boolean visit(ITreeNode node) {
+          // if a virtual page gets resolved, update node is fired.
+          // If a table page has table pages as children we do not get a node inserted event for the real nodes -> need to transform them in update nodes
+          transformPage((IPage) node);
+          return true;
+        }
+      });
     }
   }
 }

@@ -14,26 +14,19 @@ import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 
-// FIXME cgu: is AutoLeafPageWithNodes still needed? currently not used by CRM or somewhere else.
 public class AutoLeafPageWithNodes extends AbstractPageWithNodes {
   private ITableRow m_tableRow;
-  private IPage<?> m_actualParentPage;
 
-  public AutoLeafPageWithNodes(ITableRow row, IPage<?> parentPage) {
+  public AutoLeafPageWithNodes(ITableRow row) {
     if (row == null) {
       throw new IllegalArgumentException("Row must not be null");
     }
 
     m_tableRow = row;
-    m_actualParentPage = parentPage;
   }
 
   public ITableRow getTableRow() {
     return m_tableRow;
-  }
-
-  public IPage<?> getActualParentPage() {
-    return m_actualParentPage;
   }
 
   @Override
@@ -47,7 +40,7 @@ public class AutoLeafPageWithNodes extends AbstractPageWithNodes {
     }
   }
 
-  private String findAppropriateTitle() {
+  protected String findAppropriateTitle() {
     for (IColumn<?> column : m_tableRow.getTable().getColumns()) {
       if (column.isVisible()) {
         return m_tableRow.getTable().getCell(m_tableRow, column).getText();
@@ -59,6 +52,11 @@ public class AutoLeafPageWithNodes extends AbstractPageWithNodes {
 
   @Override
   protected boolean getConfiguredTableVisible() {
+    return false;
+  }
+
+  @Override
+  protected boolean getConfiguredDetailFormVisible() {
     return false;
   }
 

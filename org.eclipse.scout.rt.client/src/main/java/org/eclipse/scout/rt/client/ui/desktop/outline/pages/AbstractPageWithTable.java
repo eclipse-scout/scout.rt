@@ -84,6 +84,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
   private boolean m_searchRequired;
   private boolean m_searchActive;
   private boolean m_limitedResult;
+  private boolean m_alwaysCreateChildPage;
 
   public AbstractPageWithTable() {
     this(true, null);
@@ -164,7 +165,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
    * <p>
    * Subclasses can override this method. Default is {@code true}.
    *
-   * @since 5.1.0
+   * @since 5.1
    * @see ITable#setTableStatusVisible(boolean)
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
@@ -177,6 +178,22 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
   protected boolean getConfiguredLazyExpandingEnabled() {
     // Override default value for all table pages
     return true;
+  }
+
+  /**
+   * Configures whether a default child page should be created for each table row if no page is created by
+   * {@link #execCreateChildPage(ITableRow)}.
+   * <p>
+   * Subclasses can override this method. Default is {@code false}.
+   *
+   * @since 6.0
+   * @see #execCreateChildPage(ITableRow)
+   * @see #createDefaultChildPage(ITableRow)
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(140)
+  protected boolean getConfiguredAlwaysCreateChildPage() {
+    return false;
   }
 
   /**
@@ -276,6 +293,10 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
     return null;
   }
 
+  protected IPage<?> createDefaultChildPage(ITableRow row) {
+    return new AutoLeafPageWithNodes(row);
+  }
+
   protected IPage<?> createChildPageInternal(final ITableRow row) {
     return ClientRunContexts.copyCurrent()
         .withOutline(getOutline(), true)
@@ -283,7 +304,11 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
 
           @Override
           public IPage<?> call() throws Exception {
-            return interceptCreateChildPage(row);
+            IPage<?> childPage = interceptCreateChildPage(row);
+            if (childPage == null && isAlwaysCreateChildPage()) {
+              childPage = createDefaultChildPage(row);
+            }
+            return childPage;
           }
         });
   }
@@ -308,10 +333,22 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
   @ConfigOperation
   @Order(111)
   protected IPage<?> execCreateVirtualChildPage(ITableRow row) {
-    if (ConfigurationUtility.isMethodOverwrite(AbstractPageWithTable.class, "execCreateChildPage", new Class[]{ITableRow.class}, AbstractPageWithTable.this.getClass())) {
-      return new VirtualPage();
+    if (!isLeaf()) {
+      return createVirtualChildPage(row);
     }
     return null;
+  }
+
+  protected IPage<?> createVirtualChildPageInternal(ITableRow row) {
+    IPage<?> virtualPage = interceptCreateVirtualChildPage(row);
+    if (virtualPage == null && isAlwaysCreateChildPage()) {
+      virtualPage = createVirtualChildPage(row);
+    }
+    return virtualPage;
+  }
+
+  protected IPage<?> createVirtualChildPage(ITableRow row) {
+    return new VirtualPage();
   }
 
   /**
@@ -360,6 +397,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
     super.initConfig();
     m_searchActive = true;
     setSearchRequired(getConfiguredSearchRequired());
+    setAlwaysCreateChildPage(getConfiguredAlwaysCreateChildPage());
   }
 
   @Override
@@ -663,6 +701,16 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
   }
 
   @Override
+  public boolean isAlwaysCreateChildPage() {
+    return m_alwaysCreateChildPage;
+  }
+
+  @Override
+  public void setAlwaysCreateChildPage(boolean alwaysCreateChildPage) {
+    m_alwaysCreateChildPage = alwaysCreateChildPage;
+  }
+
+  @Override
   public void pageActivatedNotify() {
     ensureInitialized();
     ensureSearchFormCreated();
@@ -923,7 +971,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
             List<ITableRow> tableRows = e.getRows();
             for (ITableRow element : tableRows) {
               try {
-                IPage<?> childPage = interceptCreateVirtualChildPage(element);
+                IPage<?> childPage = createVirtualChildPageInternal(element);
                 if (childPage != null) {
                   ICell tableCell = getTable().getSummaryCell(element);
                   updateCellFromTableCell(childPage.getCellForUpdate(), tableCell);

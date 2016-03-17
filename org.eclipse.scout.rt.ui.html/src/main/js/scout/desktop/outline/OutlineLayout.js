@@ -21,7 +21,7 @@ scout.OutlineLayout.prototype.layout = function($container) {
   containerSize = htmlContainer.getAvailableSize()
     .subtract(htmlContainer.getInsets());
 
-  if (this.outline.embedDetailForm) {
+  if (this.outline.embedDetailContent) {
     var selectedNode = this.outline.selectedNodes[0];
     if (selectedNode) {
       var pageHtmlComp = selectedNode.htmlComp;

@@ -50,6 +50,16 @@ public interface IPageWithTable<T extends ITable> extends IPage<T> {
   void setSearchActive(boolean b);
 
   /**
+   * @since 6.0
+   */
+  boolean isAlwaysCreateChildPage();
+
+  /**
+   * @since 6.0
+   */
+  void setAlwaysCreateChildPage(boolean autoCreateLeafPage);
+
+  /**
    * Convenience for getting the search filter from the page's search form
    *
    * @return life reference to the filter (never null)

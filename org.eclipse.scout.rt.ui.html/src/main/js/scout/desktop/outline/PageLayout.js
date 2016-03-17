@@ -34,9 +34,9 @@ scout.PageLayout.prototype.layout = function($container) {
     htmlMenuBar.setSize(menuBarSize);
   }
 
-  if (this.page.detailForm && this.page.detailForm === this.outline.detailForm) {
+  if (this.outline.detailContent) {
     titleHeight = $title.outerHeight(true);
-    this.page.detailForm.htmlComp.setSize(new scout.Dimension(containerSize.width, containerSize.height - titleHeight - menuBarHeight));
+    this.outline.detailContent.htmlComp.setSize(new scout.Dimension(containerSize.width, containerSize.height - titleHeight - menuBarHeight));
   }
 };
 
@@ -54,8 +54,8 @@ scout.PageLayout.prototype.preferredLayoutSize = function($container) {
   if (menuBar.visible) {
     menuBarPrefSize = htmlMenuBar.getPreferredSize();
   }
-  if (this.page.detailForm && this.page.detailForm === this.outline.detailForm) {
-    formPrefSize = this.page.detailForm.htmlComp.getPreferredSize();
+  if (this.outline.detailContent) {
+    formPrefSize = this.outline.detailContent.htmlComp.getPreferredSize();
   }
 
   prefSize = new scout.Dimension(Math.max(formPrefSize.width, menuBarPrefSize.width), titleHeight + menuBarPrefSize.height + formPrefSize.height);

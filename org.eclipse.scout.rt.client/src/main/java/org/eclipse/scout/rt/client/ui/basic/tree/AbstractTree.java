@@ -1848,33 +1848,12 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
 
   @Override
   public boolean visitTree(ITreeVisitor v) {
-    return visitNodeRec(getRootNode(), v);
+    return TreeUtility.visitNodeRec(getRootNode(), v);
   }
 
   @Override
   public boolean visitNode(ITreeNode node, ITreeVisitor v) {
-    return visitNodeRec(node, v);
-  }
-
-  private boolean visitNodeRec(ITreeNode node, ITreeVisitor v) {
-    if (node == null) {
-      return true;
-    }
-    boolean b = v.visit(node);
-    if (!b) {
-      return b;
-    }
-    List<ITreeNode> a = node.getChildNodes();
-    for (ITreeNode childNode : a) {
-      // it might be that the visit of a node detached the node from the tree
-      if (childNode.getTree() != null) {
-        b = visitNodeRec(childNode, v);
-        if (!b) {
-          return b;
-        }
-      }
-    }
-    return true;
+    return TreeUtility.visitNode(node, v);
   }
 
   @Override

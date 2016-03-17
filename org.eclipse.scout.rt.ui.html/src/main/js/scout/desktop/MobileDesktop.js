@@ -75,7 +75,7 @@ scout.MobileDesktop.prototype.setOutline = function(outline) {
 
 scout.MobileDesktop.prototype._adaptOutline = function(outline) {
   if (outline) {
-    outline.setEmbedDetailForm(true);
+    outline.setEmbedDetailContent(true);
     outline.mobile = true;
   }
 };
