@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.client.ui.desktop;
 
 import java.util.Collection;
-import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
@@ -93,7 +92,7 @@ public interface IDesktopExtension {
    * @return {@code ContributionCommand.Continue} if further extensions should be processed,
    *         {@code ContributionCommand.Stop} otherwise
    */
-  ContributionCommand guiAttachedDelegate(String pathInfo);
+  ContributionCommand guiAttachedDelegate();
 
   /**
    * Called after a UI has been detached from the core desktop. The desktop must not necessarily be open.
@@ -173,20 +172,6 @@ public interface IDesktopExtension {
    *         {@code ContributionCommand.Stop} otherwise
    */
   ContributionCommand tablePageLoadedDelegate(IPageWithTable<?> tablePage);
-
-  /**
-   * Called while the tray popup is being built. This method may call {@code getMenu(Class)} on the core desktop to find
-   * an existing menu on the core desktop by class type.
-   * <p>
-   * The (potential) menus added to the {@code menus} list will be post processed. {@link IMenu#prepareAction()} is
-   * called on each and then checked if the menu is visible.
-   *
-   * @param menus
-   *          a live list to add menus to the tray
-   * @return {@code ContributionCommand.Continue} if further extensions should be processed,
-   *         {@code ContributionCommand.Stop} otherwise
-   */
-  ContributionCommand addTrayMenusDelegate(List<IMenu> menus);
 
   /**
    * Adds the outlines configured with this extension to the {@code outlines} collection. This is a live list of

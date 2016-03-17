@@ -52,7 +52,7 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
   private static final String EVENT_OUTLINE_CHANGED = "outlineChanged";
   private static final String EVENT_OUTLINE_CONTENT_ACTIVATE = "outlineContentActivate";
   private static final String EVENT_FORM_ACTIVATED = "formActivated";
-  private static final String EVENT_HISTORY_CHANGED = "historyChanged";
+  private static final String EVENT_HISTORY_ENTRY_ACTIVATED = "historyEntryActivated";
 
   public static final String PROP_OUTLINE = "outline";
   public static final String PROP_DISPLAY_PARENT = "displayParent";
@@ -105,18 +105,18 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
     if (EVENT_FORM_ACTIVATED.equals(event.getType())) {
       handleUiFormActivated(event);
     }
-    else if (EVENT_HISTORY_CHANGED.equals(event.getType())) {
-      handleUiHistoryChanged(event);
+    else if (EVENT_HISTORY_ENTRY_ACTIVATED.equals(event.getType())) {
+      handleUiHistoryEntryActivated(event);
     }
     else {
       super.handleUiEvent(event);
     }
   }
 
-  private void handleUiHistoryChanged(JsonEvent event) {
+  private void handleUiHistoryEntryActivated(JsonEvent event) {
     addPropertyEventFilterCondition(m_browserHistoryFilter);
     String deepLinkPath = event.getData().optString("deepLinkPath");
-    getModel().getUIFacade().historyChangedFromUI(deepLinkPath);
+    getModel().getUIFacade().historyEntryActivatedFromUI(deepLinkPath);
   }
 
   protected void handleUiFormActivated(JsonEvent event) {

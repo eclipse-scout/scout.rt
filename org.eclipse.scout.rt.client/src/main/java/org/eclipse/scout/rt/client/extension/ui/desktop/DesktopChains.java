@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.client.extension.ui.desktop;
 
 import java.util.List;
 
-import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.desktop.AbstractDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
@@ -63,23 +62,6 @@ public final class DesktopChains {
         }
       };
       callChain(methodInvocation);
-    }
-  }
-
-  public static class DesktopAddTrayMenusChain extends AbstractDesktopChain {
-
-    public DesktopAddTrayMenusChain(List<? extends IDesktopExtension<? extends AbstractDesktop>> extensions) {
-      super(extensions);
-    }
-
-    public void execAddTrayMenus(final List<IMenu> menus) {
-      MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
-        @Override
-        protected void callMethod(IDesktopExtension<? extends AbstractDesktop> next) {
-          next.execAddTrayMenus(DesktopAddTrayMenusChain.this, menus);
-        }
-      };
-      callChain(methodInvocation, menus);
     }
   }
 
@@ -226,11 +208,11 @@ public final class DesktopChains {
       super(extensions);
     }
 
-    public void execGuiAttached(final String deepLinkPath) {
+    public void execGuiAttached() {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
         protected void callMethod(IDesktopExtension<? extends AbstractDesktop> next) {
-          next.execGuiAttached(DesktopGuiAttachedChain.this, deepLinkPath);
+          next.execGuiAttached(DesktopGuiAttachedChain.this);
         }
       };
       callChain(methodInvocation);
@@ -248,6 +230,23 @@ public final class DesktopChains {
         @Override
         protected void callMethod(IDesktopExtension<? extends AbstractDesktop> next) {
           next.execGuiDetached(DesktopGuiDetachedChain.this);
+        }
+      };
+      callChain(methodInvocation);
+    }
+  }
+
+  public static class DesktopDefaultViewChain extends AbstractDesktopChain {
+
+    public DesktopDefaultViewChain(List<? extends IDesktopExtension<? extends AbstractDesktop>> extensions) {
+      super(extensions);
+    }
+
+    public void execDefaultView() {
+      MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
+        @Override
+        protected void callMethod(IDesktopExtension<? extends AbstractDesktop> next) {
+          next.execDefaultView(DesktopDefaultViewChain.this);
         }
       };
       callChain(methodInvocation);

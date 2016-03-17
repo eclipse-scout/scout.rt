@@ -197,15 +197,6 @@ public class VirtualDesktop implements IDesktop {
    */
 
   @Override
-  public boolean isTrayVisible() {
-    return false;
-  }
-
-  @Override
-  public void setTrayVisible(boolean b) {
-  }
-
-  @Override
   public boolean isAutoPrefixWildcardForTextSearch() {
     throw createUnsupportedOperationException();
   }

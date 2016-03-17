@@ -14,7 +14,6 @@ import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.action.IAction;
-import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
@@ -60,8 +59,8 @@ public abstract class AbstractDesktopExtension implements IDesktopExtension {
   }
 
   @Override
-  public ContributionCommand guiAttachedDelegate(String deepLinkPath) {
-    return execGuiAttached(deepLinkPath);
+  public ContributionCommand guiAttachedDelegate() {
+    return execGuiAttached();
   }
 
   @Override
@@ -97,11 +96,6 @@ public abstract class AbstractDesktopExtension implements IDesktopExtension {
   @Override
   public ContributionCommand tablePageLoadedDelegate(IPageWithTable<?> tablePage) {
     return execTablePageLoaded(tablePage);
-  }
-
-  @Override
-  public ContributionCommand addTrayMenusDelegate(List<IMenu> menus) {
-    return execAddTrayMenus(menus);
   }
 
   @Override
@@ -208,7 +202,7 @@ public abstract class AbstractDesktopExtension implements IDesktopExtension {
    */
   @ConfigOperation
   @Order(20)
-  protected ContributionCommand execGuiAttached(String deepLinkPath) {
+  protected ContributionCommand execGuiAttached() {
     return ContributionCommand.Continue;
   }
 
@@ -328,26 +322,6 @@ public abstract class AbstractDesktopExtension implements IDesktopExtension {
   @Order(62)
   @ConfigOperation
   protected ContributionCommand execTablePageLoaded(IPageWithTable<?> tablePage) {
-    return ContributionCommand.Continue;
-  }
-
-  /**
-   * Called while the tray popup is being built. This method may call {@code getMenu(Class)} on the core desktop to find
-   * an existing menu on the core desktop by class type.
-   * <p>
-   * The (potential) menus added to the {@code menus} list will be post processed. {@link IMenu#prepareAction()} is
-   * called on each and then checked if the menu is visible.
-   * <p>
-   * Subclasses can override this method. The default simply returns {@link ContributionCommand.Continue}.
-   *
-   * @param menus
-   *          a live list to add menus to the tray
-   * @return {@code ContributionCommand.Continue} if further extensions should be processed,
-   *         {@code ContributionCommand.Stop} otherwise
-   */
-  @Order(70)
-  @ConfigOperation
-  protected ContributionCommand execAddTrayMenus(List<IMenu> menus) {
     return ContributionCommand.Continue;
   }
 

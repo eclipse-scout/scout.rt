@@ -10,11 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.extension.ui.desktop;
 
-import java.util.List;
-
-import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopAddTrayMenusChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopBeforeClosingChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopClosingChain;
+import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopDefaultViewChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopFormAboutToShowChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopGuiAttachedChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopGuiDetachedChain;
@@ -25,7 +23,6 @@ import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopPag
 import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopPageDetailTableChangedChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopPageSearchFormChangedChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopTablePageLoadedChain;
-import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.desktop.AbstractDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
@@ -47,11 +44,6 @@ public abstract class AbstractDesktopExtension<DESKTOP extends AbstractDesktop> 
   @Override
   public void execOpened(DesktopOpenedChain chain) {
     chain.execOpened();
-  }
-
-  @Override
-  public void execAddTrayMenus(DesktopAddTrayMenusChain chain, List<IMenu> menus) {
-    chain.execAddTrayMenus(menus);
   }
 
   @Override
@@ -95,12 +87,17 @@ public abstract class AbstractDesktopExtension<DESKTOP extends AbstractDesktop> 
   }
 
   @Override
-  public void execGuiAttached(DesktopGuiAttachedChain chain, String deepLinkPath) {
-    chain.execGuiAttached(deepLinkPath);
+  public void execGuiAttached(DesktopGuiAttachedChain chain) {
+    chain.execGuiAttached();
   }
 
   @Override
   public void execGuiDetached(DesktopGuiDetachedChain chain) {
     chain.execGuiDetached();
+  }
+
+  @Override
+  public void execDefaultView(DesktopDefaultViewChain chain) {
+    chain.execDefaultView();
   }
 }

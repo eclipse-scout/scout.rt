@@ -160,10 +160,6 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent {
    */
   <T extends IViewButton> T findViewButton(Class<T> viewButtonType);
 
-  boolean isTrayVisible();
-
-  void setTrayVisible(boolean b);
-
   /**
    * Returns all registered Views of the same class and with the same exclusive key, except the current Search- or
    * Detail Form.

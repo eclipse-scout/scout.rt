@@ -62,8 +62,11 @@ public interface IDesktopUIFacade {
   void fireGuiDetached();
 
   /**
+   * GUI fires this event when user clicks on back/forward button in the navigation history of the browser.
+   *
    * @param deepLinkPath
+   *          The deep-link path which belongs to the activated history entry. This parameter may be null.
    */
-  void historyChangedFromUI(String deepLinkPath);
+  void historyEntryActivatedFromUI(String deepLinkPath);
 
 }

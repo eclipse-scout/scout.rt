@@ -300,7 +300,7 @@ scout.Desktop.prototype.onResize = function(event) {
 scout.Desktop.prototype.onPopstate = function(event) {
   var historyState = event.originalEvent.state;
   if (historyState && historyState.deepLinkPath) {
-    this._send('historyChanged', historyState);
+    this._send('historyEntryActivated', historyState);
   }
 };
 

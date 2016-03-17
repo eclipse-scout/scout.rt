@@ -29,12 +29,13 @@ import java.util.Set;
 import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
+import org.eclipse.scout.rt.client.deeplink.DeepLinkException;
 import org.eclipse.scout.rt.client.deeplink.IDeepLinks;
 import org.eclipse.scout.rt.client.deeplink.OutlineHandler;
 import org.eclipse.scout.rt.client.extension.ui.action.tree.MoveActionNodesHandler;
-import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopAddTrayMenusChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopBeforeClosingChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopClosingChain;
+import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopDefaultViewChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopFormAboutToShowChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopGuiAttachedChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopGuiDetachedChain;
@@ -74,6 +75,7 @@ import org.eclipse.scout.rt.client.ui.form.IFormHandler;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
+import org.eclipse.scout.rt.client.ui.messagebox.MessageBoxes;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.OrderedComparator;
@@ -92,6 +94,7 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.EventListenerList;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
+import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 import org.eclipse.scout.rt.shared.extension.ContributionComposite;
 import org.eclipse.scout.rt.shared.extension.ExtensionUtility;
@@ -145,7 +148,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   private List<IToolButton> m_toolButtons;
   private boolean m_autoPrefixWildcardForTextSearch;
   private boolean m_desktopInited;
-  private boolean m_trayVisible;
   private boolean m_isForcedClosing = false;
   private final List<Object> m_addOns;
   private IContributionOwner m_contributionHolder;
@@ -214,22 +216,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   @Order(10)
   protected String getConfiguredTitle() {
     return null;
-  }
-
-  /**
-   * Configures whether this Scout application should be represented within the OS system tray. Representations in the
-   * system tray might differ for different operating systems or different UI. A system tray may not be available at
-   * all.
-   * <p>
-   * Subclasses can override this method. Default is {@code false}.
-   *
-   * @return {@code true} if this application should be visible in the system tray, {@code false} otherwise
-   * @see #interceptAddTrayMenus(List)
-   */
-  @ConfigProperty(ConfigProperty.BOOLEAN)
-  @Order(15)
-  protected boolean getConfiguredTrayVisible() {
-    return false;
   }
 
   /**
@@ -357,20 +343,15 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   /**
-   * Called after a UI has been attached to this desktop. The desktop is opened at this point. Typically you will open
-   * and activate the outline and forms which must be visible on start-up in this method. This method may be called more
-   * than once. It is called immediately after the desktop has been opened and also in case of a reload, when a new
+   * Called after a UI has been attached to this desktop. The desktop is opened at this point. This method may be called
+   * more than once. It is called immediately after the desktop has been opened and also in case of a reload, when a new
    * UiSession has been created.
    * <p>
    * Subclasses can override this method. The default does nothing.
-   *
-   * @param deepLinkPath
-   *          The deep-link path which was passed as URL parameter to the Scout application (if available). This
-   *          parameter may be null. See: {@link IDeepLinks}.
    */
   @ConfigOperation
   @Order(50)
-  protected void execGuiAttached(String deepLinkPath) {
+  protected void execGuiAttached() {
   }
 
   /**
@@ -482,20 +463,12 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   /**
-   * Called while the tray popup is being built. This method may call {@link #getMenu(Class)} to find an existing menu
-   * on this desktop by class type.
-   * <p>
-   * The (potential) menus added to the {@code menus} list will be post processed. {@link IMenu#prepareAction()} is
-   * called on each and then checked if the menu is visible.
-   * <p>
-   * Subclasses can override this method. The default does nothing.
-   *
-   * @param menus
-   *          a live list to add menus to the tray
+   * Called by activateDefaultView when Scout application was not started with a deep-link or when deep-link could not
+   * be executed. The default implementation does nothing.
    */
   @Order(130)
   @ConfigOperation
-  protected void execAddTrayMenus(List<IMenu> menus) {
+  protected void execDefaultView() {
   }
 
   public List<IDesktopExtension> getDesktopExtensions() {
@@ -535,7 +508,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   protected void initConfig() {
     initDesktopExtensions();
     setTitle(getConfiguredTitle());
-    setTrayVisible(getConfiguredTrayVisible());
     setSelectViewTabsKeyStrokesEnabled(getConfiguredSelectViewTabsKeyStrokesEnabled());
     setSelectViewTabsKeyStrokeModifier(getConfiguredSelectViewTabsKeyStrokeModifier());
     setDesktopStyle(getConfiguredDesktopStyle());
@@ -675,16 +647,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
       ActionUtility.initActions(getToolButtons());
       ActionUtility.initActions(getViewButtons());
     }
-  }
-
-  @Override
-  public boolean isTrayVisible() {
-    return m_trayVisible;
-  }
-
-  @Override
-  public void setTrayVisible(boolean b) {
-    m_trayVisible = b;
   }
 
   @Override
@@ -1906,10 +1868,10 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     }
     setGuiAvailableInternal(true);
 
-    //extensions
+    // extensions
     for (IDesktopExtension ext : getDesktopExtensions()) {
       try {
-        ContributionCommand cc = ext.guiAttachedDelegate(deepLinkPath);
+        ContributionCommand cc = ext.guiAttachedDelegate();
         if (cc == ContributionCommand.Stop) {
           break;
         }
@@ -1918,6 +1880,58 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
         BEANS.get(ExceptionHandler.class).handle(e);
       }
     }
+
+    activateDefaultView(deepLinkPath);
+  }
+
+  /**
+   * Activates the initial, default view of the Desktop. This method checks whether the Scout application has been
+   * started with a deep-link. If this applies, the deep-link is executed. Otherwise or if the deep-link has caused an
+   * error execDefaultView is called.
+   *
+   * @param deepLinkPath
+   *          The deep-link path which was passed as URL parameter to the Scout application (if available). This
+   *          parameter may be null. See: {@link IDeepLinks}.
+   */
+  protected void activateDefaultView(String deepLinkPath) {
+    try {
+      if (!handleDeepLink(deepLinkPath)) {
+        interceptDefaultView();
+      }
+    }
+    catch (DeepLinkException e) {
+      LOG.warn("Failed to execute deep-link '{}'", deepLinkPath, e);
+      interceptDefaultView();
+      showDeepLinkError(e);
+    }
+  }
+
+  /**
+   * Checks whether the given path is a valid deep-link. If that is the case the deep-link is handled. When an error
+   * occurs while handling the deep-link a {@link DeepLinkException} is thrown, usually this exception is thrown when
+   * the business-logic failed to find the resource addressed by the deep-link (similar to the 404 HTTP error status).
+   *
+   * @param deepLinkPath
+   * @return
+   * @throws DeepLinkException
+   *           when deep-link could not be executed
+   */
+  protected boolean handleDeepLink(String deepLinkPath) throws DeepLinkException {
+    // FIXME awe: (deep-links) we should check if a dekstop-modal dialog or message-box prevents executing the deep-link
+    boolean handled = false;
+    IDeepLinks deepLinks = BEANS.get(IDeepLinks.class);
+    if (deepLinks.canHandleDeepLink(deepLinkPath)) {
+      handled = deepLinks.handleDeepLink(deepLinkPath);
+    }
+    return handled;
+  }
+
+  /**
+   * Displays a message box showing a generic message that the deep-link could not be executed.
+   */
+  protected void showDeepLinkError(DeepLinkException e) {
+    String errorMessage = TEXTS.get("DeepLinkError");
+    MessageBoxes.createOk().withBody(errorMessage);
   }
 
   private void detachGui() {
@@ -1926,7 +1940,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     }
     setGuiAvailableInternal(false);
 
-    //extensions
+    // extensions
     for (IDesktopExtension ext : getDesktopExtensions()) {
       try {
         ContributionCommand cc = ext.guiDetachedDelegate();
@@ -2012,7 +2026,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
 
     @Override
     public void setCoreDesktop(IDesktop desktop) {
-      //nop
+      // NOP
     }
 
     @Override
@@ -2063,8 +2077,8 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     }
 
     @Override
-    public ContributionCommand guiAttachedDelegate(String deepLinkPath) {
-      interceptGuiAttached(deepLinkPath);
+    public ContributionCommand guiAttachedDelegate() {
+      interceptGuiAttached();
       return ContributionCommand.Continue;
     }
 
@@ -2109,17 +2123,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
       interceptTablePageLoaded(tablePage);
       return ContributionCommand.Continue;
     }
-
-    @Override
-    public ContributionCommand addTrayMenusDelegate(List<IMenu> menus) {
-      interceptAddTrayMenus(menus);
-      return ContributionCommand.Continue;
-    }
-  }
-
-  
-  protected void execDeepLink(String deepLinkPath) {
-    // FIXME awe: (deep-links) review with J.GU
   }
 
   protected class P_UIFacade implements IDesktopUIFacade {
@@ -2130,8 +2133,13 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     }
 
     @Override
-    public void historyChangedFromUI(String deepLinkPath) {
-      execDeepLink(deepLinkPath); // FIXME awe: (deep-links) intercept/chains and stuff, discuss with J.GU
+    public void historyEntryActivatedFromUI(String deepLinkPath) {
+      try {
+        handleDeepLink(deepLinkPath);
+      }
+      catch (DeepLinkException e) {
+        showDeepLinkError(e);
+      }
     }
 
     @Override
@@ -2305,11 +2313,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     }
 
     @Override
-    public void execAddTrayMenus(DesktopAddTrayMenusChain chain, List<IMenu> menus) {
-      getOwner().execAddTrayMenus(menus);
-    }
-
-    @Override
     public void execBeforeClosing(DesktopBeforeClosingChain chain) {
       getOwner().execBeforeClosing();
     }
@@ -2350,13 +2353,18 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     }
 
     @Override
-    public void execGuiAttached(DesktopGuiAttachedChain chain, String deepLinkPath) {
-      getOwner().execGuiAttached(deepLinkPath);
+    public void execGuiAttached(DesktopGuiAttachedChain chain) {
+      getOwner().execGuiAttached();
     }
 
     @Override
     public void execGuiDetached(DesktopGuiDetachedChain chain) {
       getOwner().execGuiDetached();
+    }
+
+    @Override
+    public void execDefaultView(DesktopDefaultViewChain chain) {
+      getOwner().execDefaultView();
     }
 
   }
@@ -2365,12 +2373,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     List<? extends org.eclipse.scout.rt.client.extension.ui.desktop.IDesktopExtension<? extends AbstractDesktop>> extensions = getAllExtensions();
     DesktopOpenedChain chain = new DesktopOpenedChain(extensions);
     chain.execOpened();
-  }
-
-  protected final void interceptAddTrayMenus(List<IMenu> menus) {
-    List<? extends org.eclipse.scout.rt.client.extension.ui.desktop.IDesktopExtension<? extends AbstractDesktop>> extensions = getAllExtensions();
-    DesktopAddTrayMenusChain chain = new DesktopAddTrayMenusChain(extensions);
-    chain.execAddTrayMenus(menus);
   }
 
   protected final void interceptBeforeClosing() {
@@ -2421,16 +2423,22 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     chain.execPageDetailTableChanged(oldTable, newTable);
   }
 
-  protected final void interceptGuiAttached(String deepLinkPath) {
+  protected final void interceptGuiAttached() {
     List<? extends org.eclipse.scout.rt.client.extension.ui.desktop.IDesktopExtension<? extends AbstractDesktop>> extensions = getAllExtensions();
     DesktopGuiAttachedChain chain = new DesktopGuiAttachedChain(extensions);
-    chain.execGuiAttached(deepLinkPath);
+    chain.execGuiAttached();
   }
 
   protected final void interceptGuiDetached() {
     List<? extends org.eclipse.scout.rt.client.extension.ui.desktop.IDesktopExtension<? extends AbstractDesktop>> extensions = getAllExtensions();
     DesktopGuiDetachedChain chain = new DesktopGuiDetachedChain(extensions);
     chain.execGuiDetached();
+  }
+
+  protected final void interceptDefaultView() {
+    List<? extends org.eclipse.scout.rt.client.extension.ui.desktop.IDesktopExtension<? extends AbstractDesktop>> extensions = getAllExtensions();
+    DesktopDefaultViewChain chain = new DesktopDefaultViewChain(extensions);
+    chain.execDefaultView();
   }
 
 }
