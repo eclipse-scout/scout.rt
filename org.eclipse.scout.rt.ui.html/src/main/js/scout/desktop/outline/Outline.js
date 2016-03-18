@@ -26,12 +26,13 @@ scout.Outline = function() {
 scout.inherits(scout.Outline, scout.Tree);
 
 scout.Outline.prototype._init = function(model) {
+  //add filter before first traversal of tree-> tree is only traversed once.
+  this.addFilterNoInitialFiltering(new scout.DetailTableTreeFilter());
   scout.Outline.parent.prototype._init.call(this, model);
 
   this.formController = new scout.FormController(this, this.session);
   this.messageBoxController = new scout.MessageBoxController(this, this.session);
   this.fileChooserController = new scout.FileChooserController(this, this.session);
-  this.addFilter(new scout.DetailTableTreeFilter());
   this.titleVisible = true;
   this._syncDefaultDetailForm(this.defaultDetailForm);
   this.titleMenuBar = scout.create('MenuBar', {

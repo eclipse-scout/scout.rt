@@ -28,20 +28,20 @@ scout.AbstractTreeNavigationKeyStroke.prototype._accept = function(event) {
     return false;
   }
 
-  var $currentNode = this.field.$selectedNodes().eq(0);
-  event._$treeCurrentNode = $currentNode;
-  event._treeCurrentNode = $currentNode.data('node');
+  if (this.field.selectedNodes.length > 0) {
+    event._treeCurrentNode = this.field.selectedNodes[0];
+  }
   return true;
 };
 
 scout.AbstractTreeNavigationKeyStroke.prototype.handle = function(event) {
-  var newNodeSelection = this._handleInternal(event._$treeCurrentNode, event._treeCurrentNode);
+  var newNodeSelection = this._handleInternal(event._treeCurrentNode);
   if (newNodeSelection) {
     this.field.selectNodes(newNodeSelection);
     this.field.scrollTo(newNodeSelection);
   }
 };
 
-scout.AbstractTreeNavigationKeyStroke.prototype._handleInternal = function($currentNode, currentNode) {
+scout.AbstractTreeNavigationKeyStroke.prototype._handleInternal = function(currentNode) {
   throw new Error('method must be overwritten by subclass');
 };

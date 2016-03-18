@@ -23,7 +23,7 @@ scout.TreeExpandOrDrillDownKeyStroke.prototype._accept = function(event) {
   return accepted && event._treeCurrentNode;
 };
 
-scout.TreeExpandOrDrillDownKeyStroke.prototype._handleInternal = function($currentNode, currentNode) {
+scout.TreeExpandOrDrillDownKeyStroke.prototype._handleInternal = function(currentNode) {
   if (!currentNode.expanded && !currentNode.leaf) {
     this.field.expandNode(currentNode);
     return null;

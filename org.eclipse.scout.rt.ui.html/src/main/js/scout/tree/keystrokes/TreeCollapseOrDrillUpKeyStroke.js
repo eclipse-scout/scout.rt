@@ -23,7 +23,7 @@ scout.TreeCollapseOrDrillUpKeyStroke.prototype._accept = function(event) {
   return accepted && event._treeCurrentNode;
 };
 
-scout.TreeCollapseOrDrillUpKeyStroke.prototype._handleInternal = function($currentNode, currentNode) {
+scout.TreeCollapseOrDrillUpKeyStroke.prototype._handleInternal = function(currentNode) {
   if (currentNode.expanded) {
     this.field.collapseNode(currentNode);
     return null;

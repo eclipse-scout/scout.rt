@@ -22,9 +22,13 @@ scout.TreeNavigationDownKeyStroke = function(tree, modifierBitMask) {
 };
 scout.inherits(scout.TreeNavigationDownKeyStroke, scout.AbstractTreeNavigationKeyStroke);
 
-scout.TreeNavigationDownKeyStroke.prototype._handleInternal = function($currentNode, currentNode) {
-  if ($currentNode.length === 0) {
-    return this.field.$nodes().first().data('node');
+scout.TreeNavigationDownKeyStroke.prototype._handleInternal = function(currentNode) {
+  var nodes = this.field.visibleNodesFlat;
+  if (nodes.length === 0) {
+    return null;
   }
-  return $currentNode.nextAll('.tree-node:not(.hidden):first').data('node');
+  if (!currentNode) {
+    return nodes[0];
+  }
+  return nodes[nodes.indexOf(currentNode) + 1];
 };
