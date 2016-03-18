@@ -32,10 +32,10 @@ public class OutlineHandler extends AbstractDeepLinkHandler {
       }
     }
     if (selectedOutline == null) {
-      throw new DeepLinkException();
+      throw new DeepLinkException("No outline with ID " + outlineId + " found");
     }
     if (!selectedOutline.isVisible() || !selectedOutline.isEnabled()) {
-      throw new DeepLinkException();
+      throw new DeepLinkException("Outline ID " + outlineId + " is not enabled or visible");
     }
     desktop.activateOutline(selectedOutline);
   }

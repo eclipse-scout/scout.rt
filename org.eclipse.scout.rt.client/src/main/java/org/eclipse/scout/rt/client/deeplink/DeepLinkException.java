@@ -8,4 +8,11 @@ public class DeepLinkException extends Exception {
 
   private static final long serialVersionUID = 1L;
 
+  public DeepLinkException() {
+  }
+
+  public DeepLinkException(String message) {
+    super(message);
+  }
+
 }

@@ -1900,7 +1900,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
       }
     }
     catch (DeepLinkException e) {
-      LOG.warn("Failed to execute deep-link '{}'", deepLinkPath, e);
+      LOG.warn("Failed to execute deep-link '{}', reason: {}", deepLinkPath, e.getMessage());
       interceptDefaultView();
       showDeepLinkError(e);
     }
@@ -1917,13 +1917,27 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
    *           when deep-link could not be executed
    */
   protected boolean handleDeepLink(String deepLinkPath) throws DeepLinkException {
-    // FIXME awe: (deep-links) we should check if a dekstop-modal dialog or message-box prevents executing the deep-link
+    if (hasApplicationModalElement()) {
+      LOG.debug("Could not handle deep-link because modal element prevents changes on UI state. deepLinkPath={}", deepLinkPath);
+      return false;
+    }
+
     boolean handled = false;
     IDeepLinks deepLinks = BEANS.get(IDeepLinks.class);
     if (deepLinks.canHandleDeepLink(deepLinkPath)) {
       handled = deepLinks.handleDeepLink(deepLinkPath);
     }
     return handled;
+  }
+
+  protected boolean hasApplicationModalElement() {
+    if (m_messageBoxStore.containsApplicationModalMessageBoxes()) {
+      return true;
+    }
+    if (m_formStore.containsApplicationModalDialogs()) {
+      return true;
+    }
+    return m_fileChooserStore.containsApplicationModalFileChoosers();
   }
 
   /**
