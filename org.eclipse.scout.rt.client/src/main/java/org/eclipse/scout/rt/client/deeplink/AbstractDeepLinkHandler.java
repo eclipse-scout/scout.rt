@@ -1,8 +1,5 @@
 package org.eclipse.scout.rt.client.deeplink;
 
-import java.text.Normalizer;
-import java.text.Normalizer.Form;
-import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -15,8 +12,6 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractDeepLinkHandler implements IDeepLinkHandler {
 
   private static final Logger LOG = LoggerFactory.getLogger(AbstractDeepLinkHandler.class);
-  private static final Pattern NONLATIN = Pattern.compile("[^\\w-]");
-  private static final Pattern WHITESPACE = Pattern.compile("[\\s]");
 
   private final Pattern m_pattern;
 
@@ -29,18 +24,6 @@ public abstract class AbstractDeepLinkHandler implements IDeepLinkHandler {
    */
   protected static Pattern defaultPattern(String handlerName, String dataGroup) {
     return Pattern.compile("^" + handlerName + "-(" + dataGroup + ")$");
-  }
-
-  /**
-   * Slug implementation as proposed from Stackoverflow.
-   *
-   * @see http://stackoverflow.com/questions/1657193/java-code-library-for-generating-slugs-for-use-in-pretty-urls
-   */
-  protected static String toSlug(String input) {
-    String nowhitespace = WHITESPACE.matcher(input).replaceAll("-");
-    String normalized = Normalizer.normalize(nowhitespace, Form.NFD);
-    String slug = NONLATIN.matcher(normalized).replaceAll("");
-    return slug.toLowerCase(Locale.ENGLISH);
   }
 
   /**

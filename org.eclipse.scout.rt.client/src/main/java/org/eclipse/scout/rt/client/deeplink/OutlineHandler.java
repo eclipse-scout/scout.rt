@@ -8,7 +8,6 @@ import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.util.StringUtility;
-import org.eclipse.scout.rt.platform.util.UriBuilder;
 
 @Order(1000)
 public class OutlineHandler extends AbstractDeepLinkHandler {
@@ -40,15 +39,11 @@ public class OutlineHandler extends AbstractDeepLinkHandler {
     desktop.activateOutline(selectedOutline);
   }
 
-  public BrowserHistoryEntry createBrowserHistoryEntry(IDesktop desktop, IOutline outline) {
-    UriBuilder uri = new UriBuilder("./");
-    if (StringUtility.hasText(outline.getTitle())) {
-      uri.parameter(IDeepLinks.PARAM_NAME_INFO, toSlug(outline.getTitle()));
-    }
-    String deepLinkPath = toDeepLinkPath(outlineId(outline));
-    uri.parameter(IDeepLinks.PARAM_NAME_DEEP_LINK, deepLinkPath);
-    String historyTitle = desktop.getTitle() + " - " + outline.getTitle();
-    return new BrowserHistoryEntry(uri.createURI().toString(), historyTitle, deepLinkPath);
+  public BrowserHistoryEntry createBrowserHistoryEntry(IOutline outline) {
+    return DeepLinkUriBuilder.createRelative()
+        .parameterInfo(outline.getTitle())
+        .parameterPath(toDeepLinkPath(outlineId(outline)))
+        .createBrowserHistoryEntry();
   }
 
   private static String outlineId(IOutline outline) {
