@@ -9,6 +9,13 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 
+/**
+ * Deep-link handler for outlines.
+ * <ul>
+ * <li>Format: <code>outline-[outlineId]</code>, Outline ID is checksum generated from the absolute class name</li>
+ * <li>Example: <code>outline-1234567</code></li>
+ * </ul>
+ */
 @Order(1000)
 public class OutlineHandler extends AbstractDeepLinkHandler {
 
