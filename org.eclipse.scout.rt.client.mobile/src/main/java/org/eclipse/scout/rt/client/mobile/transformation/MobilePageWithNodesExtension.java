@@ -1,15 +1,14 @@
 package org.eclipse.scout.rt.client.mobile.transformation;
 
-import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.AbstractPageWithTableExtension;
+import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.AbstractPageWithNodesExtension;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PageInitPageChain;
-import org.eclipse.scout.rt.client.ui.basic.table.ITable;
-import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithTable;
+import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithNodes;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.ui.UserAgentUtility;
 
-public class MobilePageWithTableExtension extends AbstractPageWithTableExtension<ITable, AbstractPageWithTable<ITable>> {
+public class MobilePageWithNodesExtension extends AbstractPageWithNodesExtension<AbstractPageWithNodes> {
 
-  public MobilePageWithTableExtension(AbstractPageWithTable<ITable> owner) {
+  public MobilePageWithNodesExtension(AbstractPageWithNodes owner) {
     super(owner);
   }
 

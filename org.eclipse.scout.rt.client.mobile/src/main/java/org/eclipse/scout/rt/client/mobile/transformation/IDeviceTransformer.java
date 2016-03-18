@@ -17,6 +17,7 @@ import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
+import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
@@ -32,6 +33,8 @@ public interface IDeviceTransformer {
   void transformForm(IForm form);
 
   void transformOutline(IOutline outline);
+
+  void transformPage(IPage<?> page);
 
   void transformPageDetailTable(ITable table);
 
