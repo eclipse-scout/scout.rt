@@ -82,16 +82,16 @@ public class FormBasedAccessController implements IAccessController {
    * requested resource.
    */
   protected boolean handleAuthRequest(final HttpServletRequest request, final HttpServletResponse response) throws IOException, ServletException {
+    // Never cache authentication requests.
+    response.setHeader("Cache-Control", "private, no-store, no-cache, max-age=0"); // HTTP 1.1
+    response.setHeader("Pragma", "no-cache"); // HTTP 1.0
+    response.setDateHeader("Expires", 0); // prevents caching at the proxy server
+
     final Entry<String, char[]> credentials = readCredentials(request);
     if (credentials == null) {
       handleForbidden(ICredentialVerifier.AUTH_CREDENTIALS_REQUIRED, response);
       return true;
     }
-
-    // Never cache authentication requests.
-    response.setHeader("Cache-Control", "no-cache"); // HTTP 1.1
-    response.setHeader("Pragma", "no-cache"); // HTTP 1.0
-    response.setDateHeader("Expires", 0); // prevents caching at the proxy server
 
     final int status = m_config.getCredentialVerifier().verify(credentials.getKey(), credentials.getValue());
     if (status != ICredentialVerifier.AUTH_OK) {
@@ -114,6 +114,10 @@ public class FormBasedAccessController implements IAccessController {
   /**
    * Method invoked if the user could not be verified. The default implementation waits some time to address brute-force
    * attacks, and sets a 403 HTTP status code.
+   *
+   * @param status
+   *          is a {@link ICredentialVerifier} AUTH_* constant
+   * @param response
    */
   protected void handleForbidden(final int status, final HttpServletResponse response) throws IOException, ServletException {
     if (m_config.get403WaitMillis() > 0L) {

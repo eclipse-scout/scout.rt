@@ -33,7 +33,7 @@ public interface IHttpCacheControl extends Serializable {
   int IF_MODIFIED_SINCE_FIDELITY = 999;
   String IF_NONE_MATCH = "If-None-Match"; //$NON-NLS-1$
   String ETAG = "ETag"; //$NON-NLS-1$
-  String CACHE_CONTROL = "cache-control"; //$NON-NLS-1$
+  String CACHE_CONTROL = "Cache-Control"; //$NON-NLS-1$
 
   /**
    * default value (in seconds) used for js and css
