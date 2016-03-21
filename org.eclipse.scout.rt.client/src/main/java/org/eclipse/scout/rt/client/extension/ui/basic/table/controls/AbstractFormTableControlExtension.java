@@ -8,14 +8,21 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.extension.ui.basic.table.control;
+package org.eclipse.scout.rt.client.extension.ui.basic.table.controls;
 
-import org.eclipse.scout.rt.client.extension.ui.action.IActionExtension;
-import org.eclipse.scout.rt.client.extension.ui.basic.table.control.TableControlChains.TableControlInitFormChain;
+import org.eclipse.scout.rt.client.extension.ui.action.AbstractActionExtension;
+import org.eclipse.scout.rt.client.extension.ui.basic.table.controls.FormTableControlChains.TableControlInitFormChain;
 import org.eclipse.scout.rt.client.ui.basic.table.controls.AbstractTableControl;
 
-public interface ITableControlExtension<OWNER extends AbstractTableControl> extends IActionExtension<OWNER> {
+public abstract class AbstractFormTableControlExtension<OWNER extends AbstractTableControl> extends AbstractActionExtension<OWNER> implements IFormTableControlExtension<OWNER> {
 
-  void execInitForm(TableControlInitFormChain chain);
+  public AbstractFormTableControlExtension(OWNER owner) {
+    super(owner);
+  }
+
+  @Override
+  public void execInitForm(TableControlInitFormChain chain) {
+    chain.execInitForm();
+  }
 
 }

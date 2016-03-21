@@ -163,9 +163,10 @@
   __include("scout/table/columns/IconColumn.js"); //requires Column.js
   __include("scout/table/columns/NumberColumn.js"); //requires Column.js
   __include("scout/table/controls/TableControl.js");
-  __include("scout/table/controls/TableControlAdapterMenu.js");
-  __include("scout/table/controls/TableControlLayout.js");
+  __include("scout/table/controls/TableControlAdapterMenu.js"); // requires FormToolButton and TableControl
   __include("scout/table/controls/AggregateTableControl.js"); // requires TableControl.js
+  __include("scout/table/controls/FormTableControl.js"); // requires TableControl.js
+  __include("scout/table/controls/FormTableControlLayout.js");
   __include("scout/table/editor/CellEditorPopup.js");
   __include("scout/table/editor/CellEditorPopupLayout.js");
   __include("scout/table/editor/CellEditorCancelEditKeyStroke.js");

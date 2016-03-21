@@ -50,7 +50,7 @@ import org.eclipse.scout.rt.ui.html.json.menu.JsonContextMenu;
 import org.eclipse.scout.rt.ui.html.json.menu.JsonMenu;
 import org.eclipse.scout.rt.ui.html.json.menu.fixtures.Menu;
 import org.eclipse.scout.rt.ui.html.json.table.fixtures.Table;
-import org.eclipse.scout.rt.ui.html.json.table.fixtures.TableControl;
+import org.eclipse.scout.rt.ui.html.json.table.fixtures.FormTableControl;
 import org.eclipse.scout.rt.ui.html.json.table.fixtures.TableWith3Cols;
 import org.eclipse.scout.rt.ui.html.json.table.fixtures.TableWithNonDisplayableMenu;
 import org.eclipse.scout.rt.ui.html.json.table.fixtures.TableWithNonDisplayableMenu.DisplayableMenu;
@@ -493,7 +493,7 @@ public class JsonTableTest {
 
     // ----------
 
-    TableControl control = new TableControl();
+    FormTableControl control = new FormTableControl();
     table.addTableControl(control);
     assertNotNull(jsonTable.getAdapter(control));
     assertTrue(jsonTable.getAdapter(control).isInitialized());
@@ -511,8 +511,8 @@ public class JsonTableTest {
 
     // ----------
 
-    TableControl tableControl1 = new TableControl();
-    TableControl tableControl2 = new TableControl();
+    FormTableControl tableControl1 = new FormTableControl();
+    FormTableControl tableControl2 = new FormTableControl();
     table.addTableControl(tableControl1);
     table.addTableControl(tableControl2);
     assertNotNull(jsonTable.getAdapter(tableControl1));

@@ -8,13 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-scout.TableControlLayout = function(control) {
-  scout.TableControlLayout.parent.call(this);
+scout.FormTableControlLayout = function(control) {
+  scout.FormTableControlLayout.parent.call(this);
   this.control = control;
 };
-scout.inherits(scout.TableControlLayout, scout.AbstractLayout);
+scout.inherits(scout.FormTableControlLayout, scout.AbstractLayout);
 
-scout.TableControlLayout.prototype.layout = function($container) {
+scout.FormTableControlLayout.prototype.layout = function($container) {
   if (!this.control.contentRendered) {
     return;
   }

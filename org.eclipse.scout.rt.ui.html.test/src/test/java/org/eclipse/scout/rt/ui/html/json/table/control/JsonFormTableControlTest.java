@@ -25,7 +25,7 @@ import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.fixtures.UiSessionMock;
 import org.eclipse.scout.rt.ui.html.json.form.fixtures.FormWithOneField;
 import org.eclipse.scout.rt.ui.html.json.table.fixtures.Table;
-import org.eclipse.scout.rt.ui.html.json.table.fixtures.TableControl;
+import org.eclipse.scout.rt.ui.html.json.table.fixtures.FormTableControl;
 import org.eclipse.scout.rt.ui.html.json.testing.JsonTestUtility;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -36,7 +36,7 @@ import org.junit.runner.RunWith;
 @RunWith(ClientTestRunner.class)
 @RunWithSubject("default")
 @RunWithClientSession(TestEnvironmentClientSession.class)
-public class JsonTableControlTest {
+public class JsonFormTableControlTest {
 
   private UiSessionMock m_uiSession;
 
@@ -49,7 +49,7 @@ public class JsonTableControlTest {
   public void testLazyLoadingForm_onModelSelectionChanged() throws JSONException {
     FormWithOneField form = new FormWithOneField();
     form.setShowOnStart(false);
-    TableControl control = new TableControl();
+    FormTableControl control = new FormTableControl();
     control.setTable(new Table());
     control.setForm(form);
     control.decorateForm();
@@ -67,7 +67,7 @@ public class JsonTableControlTest {
   @Test
   public void testLazyLoadingForm_onUiSelectionChanged() throws Exception {
     FormWithOneField form = new FormWithOneField();
-    TableControl control = new TableControl();
+    FormTableControl control = new FormTableControl();
     control.setTable(new Table());
     control.setForm(form);
     control.decorateForm();
@@ -102,7 +102,7 @@ public class JsonTableControlTest {
   public void testLazyLoadingForm_onModelFormChanged() throws JSONException {
     FormWithOneField form = new FormWithOneField();
     form.setShowOnStart(false);
-    TableControl control = new TableControl();
+    FormTableControl control = new FormTableControl();
     control.setTable(new Table());
     control.setForm(form);
     control.decorateForm();
@@ -131,7 +131,7 @@ public class JsonTableControlTest {
   @Test
   public void testNonLazyLoadingFormWhenSelected() throws JSONException {
     FormWithOneField form = new FormWithOneField();
-    TableControl control = new TableControl();
+    FormTableControl control = new FormTableControl();
     control.setTable(new Table());
     control.setForm(form);
     control.decorateForm();

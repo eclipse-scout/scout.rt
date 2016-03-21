@@ -8,11 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.ui.html.json.form;
+package org.eclipse.scout.rt.ui.html.json.desktop;
 
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
+import org.eclipse.scout.rt.ui.html.json.form.JsonForm;
 import org.json.JSONObject;
 
 public class JsonSearchForm<SEARCH_FORM extends ISearchForm> extends JsonForm<SEARCH_FORM> {

@@ -10,8 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.table.fixtures;
 
-import org.eclipse.scout.rt.client.ui.basic.table.controls.AbstractTableControl;
+import org.eclipse.scout.rt.client.ui.basic.table.controls.AbstractFormTableControl;
 
-public class TableControl extends AbstractTableControl {
+public class FormTableControl extends AbstractFormTableControl {
 
 }

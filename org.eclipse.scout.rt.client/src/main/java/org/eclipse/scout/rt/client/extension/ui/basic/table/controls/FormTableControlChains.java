@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.extension.ui.basic.table.control;
+package org.eclipse.scout.rt.client.extension.ui.basic.table.controls;
 
 import java.util.List;
 
@@ -17,15 +17,15 @@ import org.eclipse.scout.rt.client.ui.action.AbstractAction;
 import org.eclipse.scout.rt.client.ui.basic.table.controls.AbstractTableControl;
 import org.eclipse.scout.rt.shared.extension.AbstractExtensionChain;
 
-public final class TableControlChains {
+public final class FormTableControlChains {
 
-  private TableControlChains() {
+  private FormTableControlChains() {
   }
 
-  protected abstract static class AbstractTableControlChain extends AbstractExtensionChain<ITableControlExtension<? extends AbstractTableControl>> {
+  protected abstract static class AbstractTableControlChain extends AbstractExtensionChain<IFormTableControlExtension<? extends AbstractTableControl>> {
 
     public AbstractTableControlChain(List<? extends IActionExtension<? extends AbstractAction>> extensions) {
-      super(extensions, ITableControlExtension.class);
+      super(extensions, IFormTableControlExtension.class);
     }
   }
 
@@ -39,7 +39,7 @@ public final class TableControlChains {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
 
         @Override
-        protected void callMethod(ITableControlExtension<? extends AbstractTableControl> next) throws Exception {
+        protected void callMethod(IFormTableControlExtension<? extends AbstractTableControl> next) throws Exception {
           next.execInitForm(TableControlInitFormChain.this);
         }
       };

@@ -38,23 +38,9 @@ describe("TableControl", function() {
     return model;
   }
 
-  function createFormMock() {
-    var form = {
-      render: function() {},
-      remove: function() {},
-      $container: $('<div>'),
-      rootGroupBox: {
-        fields: []
-      }
-    };
-    form.htmlComp = new scout.HtmlComponent(form.$container, session);
-    return form;
-  }
-
   function createAction(model) {
     var action = new scout.TableControl();
     action.init(model);
-    action.form = createFormMock();
     return action;
   }
 

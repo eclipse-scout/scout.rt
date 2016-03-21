@@ -31,6 +31,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.IIconColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.INumberColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IStringColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.controls.IAggregateTableControl;
+import org.eclipse.scout.rt.client.ui.basic.table.controls.IFormTableControl;
 import org.eclipse.scout.rt.client.ui.basic.table.controls.ITableControl;
 import org.eclipse.scout.rt.client.ui.basic.table.userfilter.ColumnUserFilterState;
 import org.eclipse.scout.rt.client.ui.basic.table.userfilter.DateColumnUserFilterState;
@@ -96,10 +97,10 @@ import org.eclipse.scout.rt.ui.html.json.desktop.JsonDesktop;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonFormToolButton;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonOutline;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonOutlineViewButton;
+import org.eclipse.scout.rt.ui.html.json.desktop.JsonSearchForm;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonSearchOutline;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonViewButton;
 import org.eclipse.scout.rt.ui.html.json.form.JsonForm;
-import org.eclipse.scout.rt.ui.html.json.form.JsonSearchForm;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonDateField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.beanfield.JsonBeanField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.browserfield.JsonBrowserField;
@@ -145,6 +146,7 @@ import org.eclipse.scout.rt.ui.html.json.table.JsonOutlineTable;
 import org.eclipse.scout.rt.ui.html.json.table.JsonStringColumn;
 import org.eclipse.scout.rt.ui.html.json.table.JsonTable;
 import org.eclipse.scout.rt.ui.html.json.table.control.JsonAggregateTableControl;
+import org.eclipse.scout.rt.ui.html.json.table.control.JsonFormTableControl;
 import org.eclipse.scout.rt.ui.html.json.table.control.JsonTableControl;
 import org.eclipse.scout.rt.ui.html.json.table.userfilter.JsonColumnUserFilter;
 import org.eclipse.scout.rt.ui.html.json.table.userfilter.JsonDateColumnUserFilter;
@@ -328,6 +330,9 @@ public class JsonObjectFactory extends AbstractJsonObjectFactory {
     }
     if (model instanceof IAggregateTableControl) { // needs to be before ITableControl
       return new JsonAggregateTableControl<IAggregateTableControl>((IAggregateTableControl) model, session, id, parent);
+    }
+    if (model instanceof IFormTableControl) { // needs to be before ITableControl
+      return new JsonFormTableControl<IFormTableControl>((IFormTableControl) model, session, id, parent);
     }
     if (model instanceof ITableControl) {
       return new JsonTableControl<ITableControl>((ITableControl) model, session, id, parent);

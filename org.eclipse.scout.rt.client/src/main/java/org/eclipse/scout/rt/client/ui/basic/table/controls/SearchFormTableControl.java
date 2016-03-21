@@ -18,7 +18,7 @@ import org.eclipse.scout.rt.shared.TEXTS;
 /**
  * @since 5.1.0
  */
-public class SearchFormTableControl extends AbstractTableControl {
+public class SearchFormTableControl extends AbstractFormTableControl {
 
   @Override
   protected void initConfig() {
