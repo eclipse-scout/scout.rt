@@ -71,7 +71,7 @@
 
       & > .menubar {
         border: 0;
-        background-color: @outline-selection-background-color;
+        background-color: inherit;
       }
 
       & > .tree-node-control {
@@ -237,7 +237,15 @@
         padding: @mobile-outline-node-padding-v @mobile-outline-node-padding-h;
       }
 
-      & > .menubar {
+      & > .node-menubar {
+        position: absolute;
+        right: 0;
+        top: 0;
+        width: auto;
+        padding: @mobile-outline-node-padding-v - 3px @mobile-outline-node-padding-h 0 0;
+      }
+
+      & > .detail-menubar {
         padding: 0 @mobile-outline-node-padding-h @mobile-outline-node-padding-v @mobile-outline-node-padding-h;
       }
 

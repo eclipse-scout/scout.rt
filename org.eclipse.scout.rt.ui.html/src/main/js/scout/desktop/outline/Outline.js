@@ -39,9 +39,14 @@ scout.Outline.prototype._init = function(model) {
     menuOrder: new scout.GroupBoxMenuItemsOrder()
   });
   this._updateTitleMenuBar();
+  this.nodeMenuBar = scout.create('MenuBar', {
+    parent: this,
+    menuOrder: new scout.GroupBoxMenuItemsOrder()
+  });
+  this.nodeMenuBar.bottom();
   this.detailMenuBar = scout.create('MenuBar', {
     parent: this,
-    menuOrder: new scout.GroupBoxMenuItemsOrder(this.session)
+    menuOrder: new scout.GroupBoxMenuItemsOrder()
   });
   this.detailMenuBar.bottom();
   this.updateDetailContent();
@@ -88,6 +93,7 @@ scout.Outline.prototype._render = function($parent) {
   this._renderEmbedDetailContent();
   this._renderDetailContent();
   this._renderDetailMenuBarVisible();
+  this._renderNodeMenuBarVisible();
 };
 
 scout.Outline.prototype._renderProperties = function() {
@@ -579,6 +585,7 @@ scout.Outline.prototype.updateDetailContent = function() {
   }
 
   this.setDetailMenuBarVisible(false);
+  this.setNodeMenuBarVisible(false);
   this.setDetailContent(this._computeDetailContent());
   this.updateDetailMenus();
 
@@ -641,7 +648,17 @@ scout.Outline.prototype.updateDetailMenus = function() {
       menuItems = scout.menus.filter(menuItems, ['Table.EmptySpace'], false, true);
     }
   }
-  this.setDetailMenus(menuItems);
+  var nodeMenus = [];
+  var detailMenus = [];
+  menuItems.forEach(function(menuItem) {
+    if (menuItem.horizontalAlignment === 1) {
+      nodeMenus.push(menuItem);
+    } else {
+      detailMenus.push(menuItem);
+    }
+  }, this);
+  this.setNodeMenus(nodeMenus);
+  this.setDetailMenus(detailMenus);
 };
 
 scout.Outline.prototype.setDetailMenus = function(detailMenus) {
@@ -668,6 +685,7 @@ scout.Outline.prototype._renderDetailMenuBar = function() {
 
   var node = this.selectedNodes[0];
   this.detailMenuBar.render(node.$node);
+  this.detailMenuBar.$container.addClass('detail-menubar');
   if (this.detailContent && this.detailContent.rendered) {
     // move before content (e.g. form)
     this.detailMenuBar.$container.insertBefore(this.detailContent.$container);
@@ -686,6 +704,49 @@ scout.Outline.prototype.setDetailMenuBarVisible = function(visible) {
   this.detailMenuBarVisible = visible;
   if (this.rendered) {
     this._renderDetailMenuBarVisible();
+  }
+};
+
+scout.Outline.prototype.setNodeMenus = function(nodeMenus) {
+  this.nodeMenuBar.setMenuItems(nodeMenus);
+  this.setNodeMenuBarVisible(this.nodeMenuBar.menuItems.length > 0);
+};
+
+scout.Outline.prototype._renderNodeMenuBarVisible = function() {
+  if (this.nodeMenuBarVisible) {
+    this._renderNodeMenuBar();
+  } else {
+    this._removeNodeMenuBar();
+  }
+  this.invalidateLayoutTree();
+};
+
+scout.Outline.prototype._renderNodeMenuBar = function() {
+  if (this.nodeMenuBar.rendered) {
+    return;
+  }
+  if (this.selectedNodes.length === 0) {
+    return;
+  }
+
+  var node = this.selectedNodes[0];
+  var $text = node.$node.children('.text');
+  this.nodeMenuBar.render(node.$node);
+  this.nodeMenuBar.$container.addClass('node-menubar');
+  this.nodeMenuBar.$container.insertAfter($text);
+};
+
+scout.Outline.prototype._removeNodeMenuBar = function() {
+  if (!this.nodeMenuBar.rendered) {
+    return;
+  }
+  this.nodeMenuBar.remove();
+};
+
+scout.Outline.prototype.setNodeMenuBarVisible = function(visible) {
+  this.nodeMenuBarVisible = visible;
+  if (this.rendered) {
+    this._renderNodeMenuBarVisible();
   }
 };
 
