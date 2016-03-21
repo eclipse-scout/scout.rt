@@ -21,10 +21,6 @@ scout.login = {
 
     var loginBox = new scout.LoginBox(opts);
     loginBox.render($('body'));
-          .one('input.resetLoginError', resetButtonText.bind(this));
-        this.$password
-          .val('')
-          .one('input.resetLoginError', resetButtonText.bind(this));
   }
 
 };
