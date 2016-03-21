@@ -30,6 +30,8 @@ import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
+import org.eclipse.scout.rt.client.ui.basic.table.controls.ITableControl;
+import org.eclipse.scout.rt.client.ui.basic.table.controls.SearchFormTableControl;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeAdapter;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
@@ -243,6 +245,13 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
   public void transformPageWithTable(IPageWithTable page) {
     page.setLeaf(false);
     page.setAlwaysCreateChildPage(true);
+
+    for (ITableControl control : page.getTable().getTableControls()) {
+      if (!(control instanceof SearchFormTableControl)) {
+        // TODO CGU Maybe some controls could be useful, like group ware or tile preview, how to distinguish?
+        control.setVisibleGranted(false);
+      }
+    }
   }
 
   @Override

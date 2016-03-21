@@ -200,7 +200,7 @@ scout.TableControl.prototype.setSelected = function(selected, closeWhenUnselecte
 
   // Instead of calling parent.setSelected(), we manually execute the required code. Otherwise
   // we would not be able to pass 'closeWhenUnselected' to _renderSelected().
-  this.selected = selected;
+  this._setProperty('selected', selected);
   if (this.rendered) {
     this._renderSelected(selected, closeWhenUnselected);
   }

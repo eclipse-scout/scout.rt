@@ -520,7 +520,6 @@ scout.Outline.prototype._renderInBackground = function() {
   this.$container.toggleClass('in-background', this.inBackground);
 };
 
-
 scout.Outline.prototype._renderEmbedDetailContent = function() {
   this.$data.toggleClass('has-detail-content', this.embedDetailContent);
 };
@@ -626,9 +625,13 @@ scout.Outline.prototype.updateDetailMenus = function() {
   if (!this.embedDetailContent) {
     return;
   }
-  var selectedPages = this.selectedNodes;
-  var selectedPage = selectedPages[0];
-  var menuItems = [];
+  var selectedPages = this.selectedNodes,
+    selectedPage = selectedPages[0],
+    menuItems = [],
+    tableControls = [],
+    nodeMenus = [],
+    detailMenus = [];
+
   if (this.detailContent) {
     // get menus from detail form
     if (this.detailContent instanceof scout.Form) {
@@ -641,15 +644,27 @@ scout.Outline.prototype.updateDetailMenus = function() {
       menuItems = scout.menus.filter(menuItems, ['Table.SingleSelection'], false, true);
     }
   }
-  // get empty space menus from detail table
+  // get empty space menus and table controls from detail table
   else if (selectedPages.length > 0) {
     if (selectedPage.detailTable) {
       menuItems = selectedPage.detailTable.menus;
       menuItems = scout.menus.filter(menuItems, ['Table.EmptySpace'], false, true);
+      tableControls = selectedPage.detailTable.tableControls;
     }
   }
-  var nodeMenus = [];
-  var detailMenus = [];
+
+  // Add table controls to nodeMenus
+  tableControls.forEach(function(tableControl) {
+    var menu = scout.create('TableControlAdapterMenu',
+      scout.TableControlAdapterMenu.adaptTableControlProperties(tableControl, {
+        parent: this,
+        tableControl: tableControl,
+        horizontalAlignment: 1
+      }));
+    nodeMenus.push(menu);
+  }, this);
+
+  // Add right aligned menus to node menus, other to detail menus
   menuItems.forEach(function(menuItem) {
     if (menuItem.horizontalAlignment === 1) {
       nodeMenus.push(menuItem);
@@ -657,6 +672,7 @@ scout.Outline.prototype.updateDetailMenus = function() {
       detailMenus.push(menuItem);
     }
   }, this);
+
   this.setNodeMenus(nodeMenus);
   this.setDetailMenus(detailMenus);
 };

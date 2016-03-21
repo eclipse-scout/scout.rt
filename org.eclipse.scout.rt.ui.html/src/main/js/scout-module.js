@@ -130,6 +130,13 @@
   __include("scout/planner/PlannerMenuItemsOrder.js");
   __include("scout/filechooser/FileChooser.js");
   __include("scout/filechooser/FileChooserController.js");
+  // Form
+  __include("scout/form/Form.js");
+  __include("scout/form/FormLayout.js");
+  __include("scout/form/FormToolButton.js");
+  __include("scout/form/FormToolPopup.js");
+  __include("scout/form/FormToolPopupLayout.js");
+  __include("scout/form/DialogLayout.js");
   // Table
   __include("scout/table/Table.js");
   __include("scout/table/TableMatrix.js");
@@ -156,6 +163,7 @@
   __include("scout/table/columns/IconColumn.js"); //requires Column.js
   __include("scout/table/columns/NumberColumn.js"); //requires Column.js
   __include("scout/table/controls/TableControl.js");
+  __include("scout/table/controls/TableControlAdapterMenu.js");
   __include("scout/table/controls/TableControlLayout.js");
   __include("scout/table/controls/AggregateTableControl.js"); // requires TableControl.js
   __include("scout/table/editor/CellEditorPopup.js");
@@ -246,12 +254,6 @@
   __include("scout/desktop/outline/keystrokes/OutlineNavigateToTopKeyStroke.js");
   __include("scout/desktop/outline/keystrokes/OutlineNavigationDownKeyStroke.js");
   // Basics for form fields
-  __include("scout/form/Form.js");
-  __include("scout/form/FormLayout.js");
-  __include("scout/form/FormToolButton.js");
-  __include("scout/form/FormToolPopup.js");
-  __include("scout/form/FormToolPopupLayout.js");
-  __include("scout/form/DialogLayout.js");
   __include("scout/form/fields/fields.js");
   __include("scout/form/fields/AppLinkKeyStroke.js");
   __include("scout/form/fields/DefaultFieldLoadingSupport.js");
