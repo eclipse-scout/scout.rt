@@ -45,8 +45,8 @@ public class Desktop extends AbstractDesktop {
   }
 
   @Override
-  protected void execGuiAttached(String pathInfo) {
-    super.execGuiAttached(pathInfo);
+  protected void execGuiAttached() {
+    super.execGuiAttached();
     selectFirstVisibleOutline();
   }
 
