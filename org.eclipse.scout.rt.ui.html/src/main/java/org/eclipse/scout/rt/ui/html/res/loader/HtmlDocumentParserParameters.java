@@ -14,7 +14,6 @@ import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.eclipse.scout.rt.platform.nls.NlsLocale;
 import org.eclipse.scout.rt.ui.html.cache.HttpCacheKey;
 import org.eclipse.scout.rt.ui.html.cache.HttpCacheObject;
 import org.eclipse.scout.rt.ui.html.scriptprocessor.ScriptProcessor;
@@ -68,7 +67,7 @@ public class HtmlDocumentParserParameters {
 
   public HttpCacheObject loadScriptFile(String resourcePath) throws IOException {
     ScriptFileLoader scriptLoader = new ScriptFileLoader(m_req, m_scriptProcessor);
-    HttpCacheKey cacheKey = scriptLoader.createCacheKey(resourcePath, NlsLocale.getOrElse(null));
+    HttpCacheKey cacheKey = scriptLoader.createCacheKey(resourcePath);
     return scriptLoader.loadResource(cacheKey);
   }
 

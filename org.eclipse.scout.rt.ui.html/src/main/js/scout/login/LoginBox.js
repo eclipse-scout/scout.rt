@@ -113,9 +113,13 @@ scout.LoginBox.prototype._onPostFail = function(jqXHR, textStatus, errorThrown) 
       .html('')
       .text(this.texts.get('ui.LoginFailed'))
       .addClass('login-error');
-    this.$user.focus();
-    this.$user.one('input.resetLoginError', this._resetButtonText.bind(this));
-    this.$password.one('input.resetLoginError', this._resetButtonText.bind(this));
+	this.$user
+	  .val('')
+	  .focus()
+	  .one('input.resetLoginError', this._resetButtonText.bind(this));
+	this.$password
+	  .val('')
+	  .one('input.resetLoginError', this._resetButtonText.bind(this));
   }.bind(this), 300);
 };
 

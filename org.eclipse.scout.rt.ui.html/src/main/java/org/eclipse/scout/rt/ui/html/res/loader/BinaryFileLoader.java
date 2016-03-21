@@ -48,9 +48,11 @@ public class BinaryFileLoader extends AbstractResourceLoader {
         .withFilename(pathInfo)
         .withContent(bytes)
         .withLastModified(connection.getLastModified())
+        .withCachingAllowed(true)
+        .withCacheMaxAge(IHttpCacheControl.MAX_AGE_4_HOURS)
         .build();
 
-    return new HttpCacheObject(cacheKey, true, IHttpCacheControl.MAX_AGE_4_HOURS, content);
+    return new HttpCacheObject(cacheKey, content);
   }
 
 }

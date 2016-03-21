@@ -18,23 +18,28 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
+import org.eclipse.scout.rt.platform.util.Assertions;
 
 /**
- * Used in {@link IHttpCacheControl}
+ * Used in {@link IHttpCacheControl} in order to decide caching strategy and set caching headers
  */
 public class HttpCacheObject implements Serializable {
   private static final long serialVersionUID = 1L;
 
   private final HttpCacheKey m_cacheKey;
-  private final boolean m_cachingAllowed;
-  private final int m_cacheMaxAge;
   private final BinaryResource m_resource;
   private final Set<IHttpResponseInterceptor> m_httpResponseInterceptors = new HashSet<>();
 
-  public HttpCacheObject(HttpCacheKey cacheKey, boolean cachingAllowed, int cacheMaxAge, BinaryResource resource) {
+  /**
+   * @param cacheKey
+   *          not null
+   * @param resource
+   *          not null
+   */
+  public HttpCacheObject(HttpCacheKey cacheKey, BinaryResource resource) {
+    Assertions.assertNotNull(cacheKey);
+    Assertions.assertNotNull(resource);
     m_cacheKey = cacheKey;
-    m_cachingAllowed = cachingAllowed;
-    m_cacheMaxAge = cacheMaxAge;
     m_resource = resource;
   }
 
@@ -43,11 +48,11 @@ public class HttpCacheObject implements Serializable {
   }
 
   public boolean isCachingAllowed() {
-    return m_cachingAllowed;
+    return m_resource.isCachingAllowed();
   }
 
   public int getCacheMaxAge() {
-    return m_cacheMaxAge;
+    return m_resource.getCacheMaxAge();
   }
 
   public BinaryResource getResource() {

@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.ui.html.res.loader;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.Locale;
+import java.util.Collections;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -33,6 +33,7 @@ import org.eclipse.scout.rt.ui.html.scriptprocessor.ScriptProcessor;
  * This class loads and parses CSS and JS files from WebContent/ folder.
  */
 public class ScriptFileLoader extends AbstractResourceLoader {
+  private static final String THEME_KEY = "ui.theme";
 
   private ScriptProcessor m_scriptProcessor;
 
@@ -42,15 +43,14 @@ public class ScriptFileLoader extends AbstractResourceLoader {
   }
 
   @Override
-  public HttpCacheKey createCacheKey(String resourcePath, Locale locale) {
+  public HttpCacheKey createCacheKey(String resourcePath) {
     if (FileType.JS == FileType.resolveFromFilename(resourcePath)) {
       // JavaScript files are always the same, no matter what the theme or the locale is
-      return new HttpCacheKey(resourcePath);
+      return super.createCacheKey(resourcePath);
     }
     else {
       // CSS files are different for depending on the current theme (but don't depend on the locale)
-      Object[] cacheAttributes = new Object[]{UiThemeUtility.getThemeForLookup(getRequest())};
-      return new HttpCacheKey(resourcePath, null, cacheAttributes);
+      return new HttpCacheKey(resourcePath, Collections.singletonMap(THEME_KEY, UiThemeUtility.getThemeForLookup(getRequest())));
     }
   }
 
@@ -67,19 +67,16 @@ public class ScriptFileLoader extends AbstractResourceLoader {
           .withCharset(StandardCharsets.UTF_8.name())
           .withContent(out.getContent())
           .withLastModified(out.getLastModified())
+          .withCachingAllowed(true)
+          .withCacheMaxAge(IHttpCacheControl.MAX_AGE_ONE_YEAR)
           .build();
 
-      return new HttpCacheObject(cacheKey, true, IHttpCacheControl.MAX_AGE_ONE_YEAR, content);
+      return new HttpCacheObject(cacheKey, content);
     }
     return null;
   }
 
   protected String getTheme(HttpCacheKey cacheKey) {
-    Object[] cacheAttributes = cacheKey.getCacheAttributes();
-    if (cacheAttributes != null && cacheAttributes.length > 0) {
-      // TODO [5.2] awe: Can we find a better way to retrieve the theme than "knowing" that the first element will be the theme? Maybe a map? (BSH)
-      return UiThemeUtility.getThemeName((String) cacheAttributes[0]);
-    }
-    return null;
+    return UiThemeUtility.getThemeName(cacheKey.getAttribute(THEME_KEY));
   }
 }

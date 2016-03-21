@@ -13,12 +13,14 @@ package org.eclipse.scout.rt.ui.html.res.loader;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.resource.BinaryResources;
 import org.eclipse.scout.rt.platform.util.IOUtility;
@@ -34,6 +36,8 @@ import org.eclipse.scout.rt.ui.html.scriptprocessor.ScriptProcessor;
  * This class loads and parses HTML files from WebContent/ folder.
  */
 public class HtmlFileLoader extends AbstractResourceLoader {
+  private static final String THEME_KEY = "ui.theme";
+  private static final String LOCALE_KEY = "ui.locale";
 
   private ScriptProcessor m_scriptProcessor;
 
@@ -43,8 +47,14 @@ public class HtmlFileLoader extends AbstractResourceLoader {
   }
 
   @Override
-  public HttpCacheKey createCacheKey(String pathInfo, Locale locale) {
-    return new HttpCacheKey(pathInfo, locale, new Object[]{UiThemeUtility.getThemeForLookup(getRequest())});
+  public HttpCacheKey createCacheKey(String pathInfo) {
+    HashMap<String, String> atts = new HashMap<>();
+    Locale locale = NlsLocale.getOrElse(null);
+    if (locale != null) {
+      atts.put(LOCALE_KEY, locale.toString());
+    }
+    atts.put(THEME_KEY, UiThemeUtility.getThemeForLookup(getRequest()));
+    return new HttpCacheKey(pathInfo, atts);
   }
 
   @Override
@@ -64,11 +74,12 @@ public class HtmlFileLoader extends AbstractResourceLoader {
         .withCharset(StandardCharsets.UTF_8)
         .withContent(parsedDocument)
         .withLastModifiedNow()
+        .withCachingAllowed(true)
         .build();
 
     // no cache-control, only E-Tag checks to make sure that a session with timeout is correctly
     // forwarded to the login using a GET request BEFORE the first json POST request
-    HttpCacheObject httpCacheObject = new HttpCacheObject(cacheKey, true, -1, content);
+    HttpCacheObject httpCacheObject = new HttpCacheObject(cacheKey, content);
     // Suppress automatic "compatibility mode" in IE in intranet zone
     httpCacheObject.addHttpResponseInterceptor(new HttpResponseHeaderContributor("X-UA-Compatible", "IE=edge") {
       private static final long serialVersionUID = 1L;

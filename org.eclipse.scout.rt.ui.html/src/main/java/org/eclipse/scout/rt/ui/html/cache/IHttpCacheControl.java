@@ -12,10 +12,12 @@ package org.eclipse.scout.rt.ui.html.cache;
 
 import java.io.Serializable;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.platform.resource.BinaryResources;
 
 /**
  * Support for automatic caching of html resources.
@@ -31,20 +33,39 @@ public interface IHttpCacheControl extends Serializable {
   int IF_MODIFIED_SINCE_FIDELITY = 999;
   String IF_NONE_MATCH = "If-None-Match"; //$NON-NLS-1$
   String ETAG = "ETag"; //$NON-NLS-1$
+  String CACHE_CONTROL = "Cache-Control"; //$NON-NLS-1$
 
   /**
-   * default value (in seconds) used for js and css in
-   * {@link DefaultHttpCacheControl#interceptCacheMaxAge(HttpServletRequest, HttpServletResponse, HttpCacheInfo)}
+   * default value (in seconds) used for js and css
    */
   int MAX_AGE_ONE_YEAR = 365 * 24 * 3600;
+
   /**
-   * default value (in seconds) used for html, jpg, gif etc. in
-   * {@link DefaultHttpCacheControl#interceptCacheMaxAge(HttpServletRequest, HttpServletResponse, HttpCacheInfo)}
+   * default value (in seconds) used for html, jpg, gif etc.
    */
   int MAX_AGE_4_HOURS = 4 * 3600;
 
-  void putCacheObject(HttpServletRequest req, HttpCacheObject obj);
+  /**
+   * value used to disable cache-control, only e-tag and if-modified-since may further be used
+   */
+  int MAX_AGE_NONE = 0;
 
+  /**
+   * Put an object into the internal servlet cache if {@link HttpCacheObject#isCachingAllowed()} is true.
+   *
+   * @param req
+   * @param obj
+   * @return true if the object was cached or null if it was not cached
+   */
+  boolean putCacheObject(HttpServletRequest req, HttpCacheObject obj);
+
+  /**
+   * Remove an object from the internal servlet cache.
+   *
+   * @param req
+   * @param cacheKey
+   * @return the object from the internal servlet cache or null
+   */
   HttpCacheObject getCacheObject(HttpServletRequest req, HttpCacheKey cacheKey);
 
   /**
@@ -53,21 +74,27 @@ public interface IHttpCacheControl extends Serializable {
   HttpCacheObject removeCacheObject(HttpServletRequest req, HttpCacheKey cacheKey);
 
   /**
-   * Checks whether the file needs to be returned or not, depending on the request headers and file modification state.
-   * Also writes cache headers (last modified and etag) if the file needs to be returned.
+   * Checks whether a cached response (304) can be returned or not, depending on the request headers and
+   * {@link BinaryResources}.
    * <p>
-   * If info is null, then this method does nothing
+   * Writes cache headers (last modified and etag) if the obj can safely be returned as cached object.
+   * <p>
+   * Writes disbaled cache headers if the obj is null or cannot safely be returned resp. should not be cached at all.
+   * <p>
+   * Does nothing if this request is a forward such as
+   * {@link RequestDispatcher#forward(javax.servlet.ServletRequest, javax.servlet.ServletResponse)}
    *
-   * @return true if the file hasn't changed in the meantime. The {@link HttpServletResponse#SC_NOT_MODIFIED} response
-   *         is then sent by this method and the caller should end its processing of this request.
+   * @param req
+   * @param resp
+   * @param pathInfo
+   *          optional resolved pathInfo. If null then {@link HttpServletRequest#getPathInfo()} is used as default.
+   * @param obj
+   *          is the cache object that decides if cache is to be used or not, may be null to disable caching
+   * @return true if the obj hasn't changed in the meantime. The {@link HttpServletResponse#SC_NOT_MODIFIED} response is
+   *         sent to the http response by this method and the caller should end its processing of this request.
    *         <p>
-   *         false if the content of the file needs to be returned, Etag, IfModifiedSince and MaxAge headers were set if
-   *         appropriate.
+   *         false if the obj again needs to be fully returned, Etag, IfModifiedSince and MaxAge headers were set if
+   *         appropriate. If no caching is desired then the disable headers were set.
    */
-  boolean checkAndUpdateCacheHeaders(HttpServletRequest req, HttpServletResponse resp, HttpCacheObject obj);
-
-  /**
-   * Disable cache for this resource
-   */
-  void disableCacheHeaders(HttpServletRequest req, HttpServletResponse resp);
+  boolean checkAndSetCacheHeaders(HttpServletRequest req, HttpServletResponse resp, String pathInfo, HttpCacheObject obj);
 }

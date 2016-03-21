@@ -23,6 +23,7 @@ import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.resource.BinaryResources;
 import org.eclipse.scout.rt.platform.util.FileUtility;
 import org.eclipse.scout.rt.platform.util.IOUtility;
+import org.eclipse.scout.rt.ui.html.cache.IHttpCacheControl;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -163,6 +164,8 @@ public class DefaultValuesFilterService implements IDefaultValuesFilterService {
         .withContentType(FileUtility.getContentTypeForExtension("json"))
         .withContent(content)
         .withLastModified(m_lastModified)
+        .withCachingAllowed(true)
+        .withCacheMaxAge(IHttpCacheControl.MAX_AGE_4_HOURS)
         .build();
     return res;
   }
