@@ -531,6 +531,7 @@ scout.Outline.prototype._renderDetailContent = function() {
     this.detailContent.htmlComp.pixelBasedSizing = true;
   }
   this._ensurePageLayout(page);
+  this.$data.addClass('detail-content-visible');
 };
 
 scout.Outline.prototype._ensurePageLayout = function(page) {
@@ -545,6 +546,7 @@ scout.Outline.prototype._removeDetailContent = function() {
     return;
   }
   this.detailContent.remove();
+  this.$data.removeClass('detail-content-visible');
 };
 
 scout.Outline.prototype.setEmbedDetailContent = function(embed) {

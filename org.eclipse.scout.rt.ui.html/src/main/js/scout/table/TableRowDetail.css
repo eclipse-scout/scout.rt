@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 .table-row-detail {
-  padding: 7px 0 7px 0;
+  padding: @mobile-outline-node-padding-v @mobile-outline-node-padding-h;
   line-height: 25px;
 }
 
