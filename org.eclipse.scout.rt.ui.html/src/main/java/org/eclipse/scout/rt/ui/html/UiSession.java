@@ -18,7 +18,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Random;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -96,7 +95,7 @@ public class UiSession implements IUiSession {
   private static final long ADDITIONAL_POLLING_DELAY = 100;
   private static final int MAX_RESPONSE_HISTORY_SIZE = 10;
 
-  private static final Random RANDOM = new SecureRandom();
+  private static final SecureRandom RANDOM = new SecureRandom();
 
   private final JsonAdapterRegistry m_jsonAdapterRegistry;
   private final JsonEventProcessor m_jsonEventProcessor;

@@ -12,10 +12,10 @@ package org.eclipse.scout.rt.platform.util;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Locale;
-import java.util.Random;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.nls.NlsLocale;
@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
 
 public final class NumberUtility {
   private static final Logger LOG = LoggerFactory.getLogger(NumberUtility.class);
-  private static final Random RANDOMIZER = new Random();
+  private static final SecureRandom RANDOMIZER = new SecureRandom();
 
   private NumberUtility() {
   }
