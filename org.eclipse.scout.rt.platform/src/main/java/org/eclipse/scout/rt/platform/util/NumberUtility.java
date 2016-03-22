@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
 
 public final class NumberUtility {
   private static final Logger LOG = LoggerFactory.getLogger(NumberUtility.class);
-  private static final Random RANDOMIZER = new Random();
+  private static final Random UNSECURE_RANDOM = new Random();
 
   private NumberUtility() {
   }
@@ -247,32 +247,40 @@ public final class NumberUtility {
   }
 
   /**
-   * @return a random long using <code>RANDOMIZER.nextLong()</code>
+   * @return an unsecure random long using <code>{@link Random#nextLong()}</code>
+   *         <p>
+   *         for secure random numbers see SecureRandom
    */
   public static long randomLong() {
-    return RANDOMIZER.nextLong();
+    return UNSECURE_RANDOM.nextLong();
   }
 
   /**
-   * @return a random int using <code>RANDOMIZER.nextInt()</code>
+   * @return an unsecure random int using <code>{@link Random#nextInt()</code>
+   *         <p>
+   *         for secure random numbers see SecureRandom
    */
   public static int randomInt() {
-    return RANDOMIZER.nextInt();
+    return UNSECURE_RANDOM.nextInt();
   }
 
   /**
    * @param size
-   * @return a random int using <code>RANDOMIZER.nextInt(size)</code>
+   * @return an unsecure random int using <code>{@link Random#nextInt(size)</code>
+   *         <p>
+   *         for secure random numbers see SecureRandom
    */
   public static int randomInt(int size) {
-    return RANDOMIZER.nextInt(size);
+    return UNSECURE_RANDOM.nextInt(size);
   }
 
   /**
-   * @return a random double using <code>RANDOMIZER.nextDouble()</code>
+   * @return an unsecure random double using <code>{@link Random#nextDouble()</code>
+   *         <p>
+   *         for secure random numbers see SecureRandom
    */
   public static double randomDouble() {
-    return RANDOMIZER.nextDouble();
+    return UNSECURE_RANDOM.nextDouble();
   }
 
   /**
