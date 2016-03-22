@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.platform.security;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
+import java.util.Random;
 
 import org.eclipse.scout.rt.platform.util.Base64Utility;
 
@@ -102,7 +102,7 @@ public final class EncryptionUtility {
    * @return a new random 24 byte triple des key
    */
   public static byte[] createTripleDesKey() {
-    SecureRandom r = new SecureRandom();
+    Random r = new Random();
     byte[] key = new byte[24];
     r.nextBytes(key);
     return key;
