@@ -210,7 +210,6 @@
   __include("scout/tree/keystrokes/CompactTreeLeftKeyStroke.js");
   __include("scout/tree/keystrokes/CompactTreeRightKeyStroke.js");
   // Desktop
-  __include("scout/desktop/BaseDesktop.js");
   __include("scout/desktop/Desktop.js");
   __include("scout/desktop/DesktopLayout.js");
   __include("scout/desktop/DesktopLogo.js");

@@ -9,7 +9,6 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 describe('Desktop', function() {
-
   var session, desktop;
 
   beforeEach(function() {
@@ -38,6 +37,51 @@ describe('Desktop', function() {
       expect(desktop.viewButtons.length).toBe(0);
     });
 
+  });
+
+  describe('notification', function() {
+    var ntfc,
+      parent = new scout.Widget();
+
+    beforeEach(function() {
+      parent.session = session;
+      ntfc = scout.create('DesktopNotification', {
+        id: 'theID',
+        parent: desktop,
+        status: {}
+      });
+    });
+
+    it('addNotification', function() {
+      spyOn(ntfc, 'fadeIn');
+      desktop.addNotification(ntfc);
+      expect(ntfc.fadeIn).toHaveBeenCalled();
+      expect(desktop.notifications.indexOf(ntfc)).toBe(0);
+      expect(desktop.$container.find('.notifications').length).toBe(1);
+      expect(desktop.$notification).not.toBe(null);
+    });
+
+    it('removeNotification with object', function() {
+      spyOn(ntfc, 'fadeOut');
+      desktop.addNotification(ntfc); // first add -> create $notifications DIV
+      desktop.removeNotification(ntfc);
+      expect(ntfc.fadeOut).toHaveBeenCalled();
+    });
+
+    it('removeNotification with (string) ID', function() {
+      spyOn(ntfc, 'fadeOut');
+      desktop.addNotification(ntfc); // first add -> create $notifications DIV
+      desktop.removeNotification('theID');
+      expect(ntfc.fadeOut).toHaveBeenCalled();
+    });
+
+    it('_onNotificationRemoved - last notifications removes $notifications DIV', function() {
+      desktop.addNotification(ntfc); // first add -> create $notifications DIV
+      desktop._onNotificationRemoved(ntfc);
+      expect(desktop.notifications.length).toBe(0);
+      expect(desktop.$container.find('.notifications').length).toBe(0);
+      expect(desktop.$notifications).toBe(null);
+    });
   });
 
 });

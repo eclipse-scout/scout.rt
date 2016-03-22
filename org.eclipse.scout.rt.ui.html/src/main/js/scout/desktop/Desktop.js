@@ -28,8 +28,10 @@ scout.Desktop = function() {
   this.messageBoxController;
   this.fileChooserController;
   this.initialFormRendering = false;
+  this.offline = false;
+  this.notifications = [];
 };
-scout.inherits(scout.Desktop, scout.BaseDesktop);
+scout.inherits(scout.Desktop, scout.ModelAdapter);
 
 scout.DesktopStyle = {
   DEFAULT: 'DEFAULT',
@@ -78,6 +80,7 @@ scout.Desktop.prototype._render = function($parent) {
   this._renderNavigationVisible();
   this._renderHeaderVisible();
   this._renderBenchVisible();
+  this._renderTitle();
   this._renderLogoUrl();
   this._renderSplitter();
   this._setSplitterPosition();
@@ -100,29 +103,6 @@ scout.Desktop.prototype._remove = function() {
     .off('resize', this._resizeHandler)
     .off('popstate', this._popstateHandler);
   scout.Desktop.parent.prototype._remove.call(this);
-};
-
-scout.Desktop.prototype._disableContextMenu = function() {
-  // Switch off browser's default context menu for the entire scout desktop (except input fields)
-  this.$container.on('contextmenu', function(event) {
-    if (event.target.nodeName !== 'INPUT' && event.target.nodeName !== 'TEXTAREA' && !event.target.isContentEditable) {
-      event.preventDefault();
-    }
-  });
-};
-
-/**
- * Goes up in display hierarchy to find the form to select on desktop. null if outline is selected.
- */
-scout.Desktop.prototype._findActiveSelectablePart = function(form) {
-  if (form.parent.isView && form.parent.isDialog) {
-    if (form.parent.isView()) {
-      return form.parent;
-    } else if (form.parent.isDialog()) {
-      return this._findActiveSelectablePart(form.parent);
-    }
-  }
-  return null;
 };
 
 scout.Desktop.prototype._postRender = function() {
@@ -149,6 +129,17 @@ scout.Desktop.prototype._postRender = function() {
     this.viewTabsController.selectViewTab(this.viewTabsController.viewTab(selectable));
   }
   this.initialFormRendering = false;
+};
+
+scout.Desktop.prototype._renderTitle = function() {
+  var title = this.title;
+  if (title === undefined || title === null) {
+    return;
+  }
+  var $scoutDivs = $('div.scout');
+  if ($scoutDivs.length <= 1) { // only set document title in non-portlet case
+    $scoutDivs.document(true).title = title;
+  }
 };
 
 scout.Desktop.prototype._renderActiveForm = function() {
@@ -243,22 +234,6 @@ scout.Desktop.prototype._renderLogoUrl = function() {
   }
 };
 
-scout.Desktop.prototype._setupDragAndDrop = function() {
-  var dragEnterOrOver = function(event) {
-    event.stopPropagation();
-    event.preventDefault();
-    // change cursor to forbidden (no dropping allowed)
-    event.originalEvent.dataTransfer.dropEffect = 'none';
-  };
-
-  this.$container.on('dragenter', dragEnterOrOver);
-  this.$container.on('dragover', dragEnterOrOver);
-  this.$container.on('drop', function(event) {
-    event.stopPropagation();
-    event.preventDefault();
-  });
-};
-
 scout.Desktop.prototype._renderSplitter = function() {
   if (!this.navigation) {
     return;
@@ -273,6 +248,36 @@ scout.Desktop.prototype._renderSplitter = function() {
   this.splitter.$container.insertBefore(this.$overlaySeparator);
   this.splitter.on('resize', this._onSplitterResize.bind(this));
   this.splitter.on('resizeend', this._onSplitterResizeEnd.bind(this));
+};
+
+scout.Desktop.prototype._renderBenchDropShadow = function() {
+  if (this.navigation && this.bench) {
+    this.bench.$container.toggleClass('drop-shadow', this.outline.inBackground);
+  }
+};
+
+scout.Desktop.prototype._renderBrowserHistoryEntry = function() {
+  var myWindow = this.$container.window(true),
+    history = this.browserHistoryEntry;
+  myWindow.history.pushState({
+    deepLinkPath: history.deepLinkPath
+  }, history.title, history.path);
+};
+
+scout.Desktop.prototype._setupDragAndDrop = function() {
+  var dragEnterOrOver = function(event) {
+    event.stopPropagation();
+    event.preventDefault();
+    // change cursor to forbidden (no dropping allowed)
+    event.originalEvent.dataTransfer.dropEffect = 'none';
+  };
+
+  this.$container.on('dragenter', dragEnterOrOver);
+  this.$container.on('dragover', dragEnterOrOver);
+  this.$container.on('drop', function(event) {
+    event.stopPropagation();
+    event.preventDefault();
+  });
 };
 
 scout.Desktop.prototype._setSplitterPosition = function() {
@@ -293,6 +298,276 @@ scout.Desktop.prototype._setSplitterPosition = function() {
   }
 };
 
+scout.Desktop.prototype._disableContextMenu = function() {
+  // Switch off browser's default context menu for the entire scout desktop (except input fields)
+  this.$container.on('contextmenu', function(event) {
+    if (event.target.nodeName !== 'INPUT' && event.target.nodeName !== 'TEXTAREA' && !event.target.isContentEditable) {
+      event.preventDefault();
+    }
+  });
+};
+
+/**
+ * Goes up in display hierarchy to find the form to select on desktop. null if outline is selected.
+ */
+scout.Desktop.prototype._findActiveSelectablePart = function(form) {
+  if (form.parent.isView && form.parent.isDialog) {
+    if (form.parent.isView()) {
+      return form.parent;
+    } else if (form.parent.isDialog()) {
+      return this._findActiveSelectablePart(form.parent);
+    }
+  }
+  return null;
+};
+
+scout.Desktop.prototype.setOutline = function(outline) {
+  this.outline = outline;
+  if (this.navigation) {
+    this.navigation.setOutline(this.outline);
+  }
+  this.trigger('outlineChanged');
+};
+
+scout.Desktop.prototype.setNavigationVisible = function(visible) {
+  this.navigationVisible = visible;
+  if (this.rendered) {
+    this._renderNavigationVisible();
+  }
+};
+
+scout.Desktop.prototype.setBenchVisible = function(visible) {
+  this.benchVisible = visible;
+  if (this.rendered) {
+    this._renderBenchVisible();
+  }
+};
+
+scout.Desktop.prototype.revalidateHeaderLayout = function() {
+  if (this.header) {
+    this.header.revalidateLayout();
+  }
+};
+
+scout.Desktop.prototype._goOffline = function() {
+  if (this.offline) {
+    return;
+  }
+  this.offline = true;
+  this._offlineNotification = scout.create('DesktopNotification.Offline', {
+    parent: this,
+    closeable: false,
+    duration: scout.DesktopNotification.INFINITE,
+    status: {
+      message: this.session.text('ui.ConnectionInterrupted'),
+      severity: scout.Status.Severity.ERROR
+    }
+  });
+  this._offlineNotification.show();
+};
+
+scout.Desktop.prototype._goOnline = function() {
+  if (!this._hideOfflineMessagePending) {
+    this.hideOfflineMessage();
+  }
+};
+
+scout.Desktop.prototype.hideOfflineMessage = function() {
+  this._hideOfflineMessagePending = false;
+  this.removeNotification(this._offlineNotification);
+  this._offlineNotification = null;
+};
+
+scout.Desktop.prototype.addNotification = function(notification) {
+  if (!notification) {
+    return;
+  }
+  this.notifications.push(notification);
+  if (this.$notifications) {
+    // Bring to front
+    this.$notifications.appendTo(this.$container);
+  } else {
+    this.$notifications = this.$container.appendDiv('notifications');
+  }
+  notification.fadeIn(this.$notifications);
+};
+
+/**
+ * Removes the given notification.
+ * @param notification Either an instance of scout.DesktopNavigation or a String containing an ID of a notification instance.
+ */
+scout.Desktop.prototype.removeNotification = function(notification) {
+  if (typeof notification === 'string') {
+    var notificationId = notification;
+    notification = scout.arrays.find(this.notifications, function(n) {
+      return notificationId === n.id;
+    });
+  }
+  if (!notification) {
+    return;
+  }
+  if (this.$notifications) {
+    notification.fadeOut(this._onNotificationRemoved.bind(this, notification));
+  } else {
+    scout.arrays.remove(this.notifications, notification);
+  }
+};
+
+scout.Desktop.prototype._openUriInIFrame = function(uri) {
+  // Create a hidden iframe and set the URI as src attribute value
+  var $iframe = this.session.$entryPoint.appendElement('<iframe>', 'download-frame')
+    .attr('tabindex', -1)
+    .attr('src', uri);
+
+  // Remove the iframe again after 10s (should be enough to get the download started)
+  setTimeout(function() {
+    $iframe.remove();
+  }, 10 * 1000);
+};
+
+scout.Desktop.prototype._openUriAsNewWindow = function(uri) {
+  var popupBlockerHandler = new scout.PopupBlockerHandler(this.session),
+    popup = popupBlockerHandler.openWindow(uri);
+
+  if (!popup) {
+    popupBlockerHandler.showNotification(uri);
+  }
+};
+
+scout.Desktop.prototype.bringOutlineToFront = function() {
+  this.viewTabsController.deselectViewTab();
+
+  if (this.outline.inBackground) {
+    if (this.navigation) {
+      this.navigation.bringToFront();
+    }
+    if (this.bench) {
+      this.bench.bringToFront();
+    }
+  }
+
+  this._renderBenchDropShadow();
+  // Set active form to null because outline is active form.
+  this._setOutlineActivated();
+};
+
+scout.Desktop.prototype.sendOutlineToBack = function() {
+  if (this.outline.inBackground) {
+    return;
+  }
+
+  if (this.navigation) {
+    this.navigation.sendToBack();
+  }
+  if (this.bench) {
+    this.bench.sendToBack();
+  }
+  this._renderBenchDropShadow();
+};
+
+/**
+ * === Method required for objects that act as 'displayParent' ===
+ *
+ * Returns 'true' if the Desktop is currently accessible to the user.
+ */
+scout.Desktop.prototype.inFront = function() {
+  return true; // Desktop is always available to the user.
+};
+
+/**
+ * === Method required for objects that act as 'displayParent' ===
+ *
+ * Returns the DOM elements to paint a glassPanes over, once a modal Form, message-box, file-chooser or wait-dialog is showed with the Desktop as its 'displayParent'.
+ */
+scout.Desktop.prototype.glassPaneTargets = function() {
+  // Do not return $container, because this is the parent of all forms and message boxes. Otherwise, no form could gain focus, even the form requested desktop modality.
+  var glassPaneTargets = $.makeArray(this.$container
+    .children()
+    .not('.splitter') // exclude splitter to be locked
+    .not('.notifications')); // exclude notification box like 'connection interrupted' to be locked
+
+  // When a popup-window is opened its container must also be added to the result
+  this._pushPopupWindowGlassPaneTargets(glassPaneTargets);
+
+  return glassPaneTargets;
+};
+
+/**
+ * This 'deferred' object is used because popup windows are not immediately usable when they're opened.
+ * That's why we must render the glass-pane of a popup window later. Which means, at the point in time
+ * when its $container is created and ready for usage. To avoid race conditions we must also wait until
+ * the glass pane renderer is ready. Only when both conditions are fullfilled, we can render the glass
+ * pane.
+ */
+scout.Desktop.prototype._deferredGlassPaneTarget = function(popupWindow) {
+  var deferred = new scout.DeferredGlassPaneTarget();
+  popupWindow.one('initialized', function() {
+    deferred.ready([popupWindow.$container]);
+  });
+  return deferred;
+};
+
+scout.Desktop.prototype._pushPopupWindowGlassPaneTargets = function(glassPaneTargets) {
+  this.formController._popupWindows.forEach(function(popupWindow) {
+    glassPaneTargets.push(popupWindow.initialized ?
+      popupWindow.$container[0] : this._deferredGlassPaneTarget(popupWindow));
+  }, this);
+};
+
+/**
+ * Creates a local "null-outline" and an OutlineViewButton which is used, when no outline is available.
+ * This avoids a lot of if/else code. The OVB adds a property 'visibleInMenu' which is only used in
+ * the UI to decide whether or not the OVB will be shown in the ViewMenuPopup.js.
+ */
+scout.Desktop.prototype._addNullOutline = function(outline) {
+  if (outline) {
+    return;
+  }
+  var nullOutline = scout.create('Outline', {
+      parent: this
+    }),
+    ovb = scout.create('OutlineViewButton', {
+      parent: this,
+      displayStyle: 'MENU',
+      selected: true,
+      text: this.session.text('ui.Outlines'),
+      desktop: this,
+      visibleInMenu: false
+    });
+
+  ovb.outline = nullOutline;
+  this.outline = nullOutline;
+  this.viewButtons.push(ovb);
+};
+
+scout.Desktop.prototype._setOutlineActivated = function() {
+  this._setFormActivated();
+};
+
+scout.Desktop.prototype._setFormActivated = function(form, suppressSend) {
+  // If desktop is in rendering process the can not set a new active for. instead the active form from the model is set selected.
+  if (!this.rendered || this.initialFormRendering) {
+    return;
+  }
+
+  if ((form && this.activeForm !== form.id) || (!form && this.activeForm)) {
+    this.activeForm = form ? form.id : null;
+    if (!suppressSend) {
+      this._sendFormActivated(form);
+    }
+  }
+};
+
+scout.Desktop.prototype._sendFormActivated = function(form) {
+  var eventData = {
+    formId: form ? form.id : null
+  };
+
+  this._send('formActivated', eventData, 0, function(previous) {
+    return this.type === previous.type;
+  });
+};
+
 scout.Desktop.prototype.onResize = function(event) {
   this.revalidateLayout();
 };
@@ -301,12 +576,6 @@ scout.Desktop.prototype.onPopstate = function(event) {
   var historyState = event.originalEvent.state;
   if (historyState && historyState.deepLinkPath) {
     this._send('historyEntryActivated', historyState);
-  }
-};
-
-scout.Desktop.prototype.revalidateHeaderLayout = function() {
-  if (this.header) {
-    this.header.revalidateLayout();
   }
 };
 
@@ -348,28 +617,6 @@ scout.Desktop.prototype._onSplitterResizeEnd = function(event) {
     });
   } else {
     this.resizing = false;
-  }
-};
-
-scout.Desktop.prototype.setOutline = function(outline) {
-  this.outline = outline;
-  if (this.navigation) {
-    this.navigation.setOutline(this.outline);
-  }
-  this.trigger('outlineChanged');
-};
-
-scout.Desktop.prototype.setNavigationVisible = function(visible) {
-  this.navigationVisible = visible;
-  if (this.rendered) {
-    this._renderNavigationVisible();
-  }
-};
-
-scout.Desktop.prototype.setBenchVisible = function(visible) {
-  this.benchVisible = visible;
-  if (this.rendered) {
-    this._renderBenchVisible();
   }
 };
 
@@ -468,10 +715,36 @@ scout.Desktop.prototype._onModelRemoveNotification = function(event) {
   this.removeNotification(event.id);
 };
 
-scout.Desktop.prototype._renderBrowserHistoryEntry = function() {
-  var myWindow = this.$container.window(true),
-    history = this.browserHistoryEntry;
-  myWindow.history.pushState({deepLinkPath: history.deepLinkPath}, history.title, history.path);
+scout.Desktop.prototype._onNotificationRemoved = function(notification) {
+  scout.arrays.remove(this.notifications, notification);
+  if (this.notifications.length === 0) {
+    this.$notifications.remove();
+    this.$notifications = null;
+  }
+};
+
+scout.Desktop.prototype.onReconnecting = function() {
+  if (!this.offline) {
+    return;
+  }
+  this._offlineNotification.reconnect();
+};
+
+scout.Desktop.prototype.onReconnectingSucceeded = function() {
+  if (!this.offline) {
+    return;
+  }
+  this.offline = false;
+  this._offlineNotification.reconnectSucceeded();
+  this._hideOfflineMessagePending = true;
+  setTimeout(this.hideOfflineMessage.bind(this), 3000);
+};
+
+scout.Desktop.prototype.onReconnectingFailed = function() {
+  if (!this.offline) {
+    return;
+  }
+  this._offlineNotification.reconnectFailed();
 };
 
 scout.Desktop.prototype.onModelAction = function(event) {
@@ -502,165 +775,4 @@ scout.Desktop.prototype.onModelAction = function(event) {
   } else {
     scout.Desktop.parent.prototype.onModelAction.call(this, event);
   }
-};
-
-scout.Desktop.prototype._openUriInIFrame = function(uri) {
-  // Create a hidden iframe and set the URI as src attribute value
-  var $iframe = this.session.$entryPoint.appendElement('<iframe>', 'download-frame')
-    .attr('tabindex', -1)
-    .attr('src', uri);
-
-  // Remove the iframe again after 10s (should be enough to get the download started)
-  setTimeout(function() {
-    $iframe.remove();
-  }, 10 * 1000);
-};
-
-scout.Desktop.prototype._openUriAsNewWindow = function(uri) {
-  var popupBlockerHandler = new scout.PopupBlockerHandler(this.session),
-    popup = popupBlockerHandler.openWindow(uri);
-
-  if (!popup) {
-    popupBlockerHandler.showNotification(uri);
-  }
-};
-
-scout.Desktop.prototype.bringOutlineToFront = function() {
-  this.viewTabsController.deselectViewTab();
-
-  if (this.outline.inBackground) {
-    if (this.navigation) {
-      this.navigation.bringToFront();
-    }
-    if (this.bench) {
-      this.bench.bringToFront();
-    }
-  }
-
-  this._renderBenchDropShadow();
-  // Set active form to null because outline is active form.
-  this._setOutlineActivated();
-};
-
-scout.Desktop.prototype.sendOutlineToBack = function() {
-  if (this.outline.inBackground) {
-    return;
-  }
-
-  if (this.navigation) {
-    this.navigation.sendToBack();
-  }
-  if (this.bench) {
-    this.bench.sendToBack();
-  }
-  this._renderBenchDropShadow();
-};
-
-/**
- * === Method required for objects that act as 'displayParent' ===
- *
- * Returns 'true' if the Desktop is currently accessible to the user.
- */
-scout.Desktop.prototype.inFront = function() {
-  return true; // Desktop is always available to the user.
-};
-
-scout.Desktop.prototype._renderBenchDropShadow = function() {
-  if (this.navigation && this.bench) {
-    this.bench.$container.toggleClass('drop-shadow', this.outline.inBackground);
-  }
-};
-
-/**
- * === Method required for objects that act as 'displayParent' ===
- *
- * Returns the DOM elements to paint a glassPanes over, once a modal Form, message-box, file-chooser or wait-dialog is showed with the Desktop as its 'displayParent'.
- */
-scout.Desktop.prototype.glassPaneTargets = function() {
-  // Do not return $container, because this is the parent of all forms and message boxes. Otherwise, no form could gain focus, even the form requested desktop modality.
-  var glassPaneTargets = $.makeArray(this.$container
-    .children()
-    .not('.splitter') // exclude splitter to be locked
-    .not('.notifications')); // exclude notification box like 'connection interrupted' to be locked
-
-  // When a popup-window is opened its container must also be added to the result
-  this._pushPopupWindowGlassPaneTargets(glassPaneTargets);
-
-  return glassPaneTargets;
-};
-
-/**
- * This 'deferred' object is used because popup windows are not immediately usable when they're opened.
- * That's why we must render the glass-pane of a popup window later. Which means, at the point in time
- * when its $container is created and ready for usage. To avoid race conditions we must also wait until
- * the glass pane renderer is ready. Only when both conditions are fullfilled, we can render the glass
- * pane.
- */
-scout.Desktop.prototype._deferredGlassPaneTarget = function(popupWindow) {
-  var deferred = new scout.DeferredGlassPaneTarget();
-  popupWindow.one('initialized', function() {
-    deferred.ready([popupWindow.$container]);
-  });
-  return deferred;
-};
-
-scout.Desktop.prototype._pushPopupWindowGlassPaneTargets = function(glassPaneTargets) {
-  this.formController._popupWindows.forEach(function(popupWindow) {
-    glassPaneTargets.push(popupWindow.initialized ?
-      popupWindow.$container[0] : this._deferredGlassPaneTarget(popupWindow));
-  }, this);
-};
-
-/**
- * Creates a local "null-outline" and an OutlineViewButton which is used, when no outline is available.
- * This avoids a lot of if/else code. The OVB adds a property 'visibleInMenu' which is only used in
- * the UI to decide whether or not the OVB will be shown in the ViewMenuPopup.js.
- */
-scout.Desktop.prototype._addNullOutline = function(outline) {
-  if (outline) {
-    return;
-  }
-  var nullOutline = scout.create('Outline', {
-      parent: this
-    }),
-    ovb = scout.create('OutlineViewButton', {
-      parent: this,
-      displayStyle: 'MENU',
-      selected: true,
-      text: this.session.text('ui.Outlines'),
-      desktop: this,
-      visibleInMenu: false
-    });
-
-  ovb.outline = nullOutline;
-  this.outline = nullOutline;
-  this.viewButtons.push(ovb);
-};
-
-scout.Desktop.prototype._setOutlineActivated = function() {
-  this._setFormActivated();
-};
-
-scout.Desktop.prototype._setFormActivated = function(form, suppressSend) {
-  // If desktop is in rendering process the can not set a new active for. instead the active form from the model is set selected.
-  if (!this.rendered || this.initialFormRendering) {
-    return;
-  }
-
-  if ((form && this.activeForm !== form.id) || (!form && this.activeForm)) {
-    this.activeForm = form ? form.id : null;
-    if (!suppressSend) {
-      this._sendFormActivated(form);
-    }
-  }
-};
-
-scout.Desktop.prototype._sendFormActivated = function(form) {
-  var eventData = {
-    formId: form ? form.id : null
-  };
-
-  this._send('formActivated', eventData, 0, function(previous) {
-    return this.type === previous.type;
-  });
 };
