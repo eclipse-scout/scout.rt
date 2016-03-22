@@ -143,7 +143,7 @@ scout.Desktop.prototype._renderTitle = function() {
 };
 
 scout.Desktop.prototype._renderActiveForm = function() {
-  // NOP -> is handled in _setFormActivated when ui changes active form or if model changes form in _onModelFormShow/_onModelFormActivate
+  // NOP -> is handled in _setFormActivated when ui changes active form or if model changes form in _onFormShow/_onFormActivate
 };
 
 scout.Desktop.prototype._renderBench = function() {
@@ -620,7 +620,7 @@ scout.Desktop.prototype._onSplitterResizeEnd = function(event) {
   }
 };
 
-scout.Desktop.prototype._onModelFormShow = function(event) {
+scout.Desktop.prototype._onFormShow = function(event) {
   var form, displayParent = this.session.getModelAdapter(event.displayParent);
   if (displayParent) {
     form = this.session.getOrCreateModelAdapter(event.form, displayParent.formController.displayParent);
@@ -630,14 +630,14 @@ scout.Desktop.prototype._onModelFormShow = function(event) {
   }
 };
 
-scout.Desktop.prototype._onModelFormHide = function(event) {
+scout.Desktop.prototype._onFormHide = function(event) {
   var displayParent = this.session.getModelAdapter(event.displayParent);
   if (displayParent) {
     displayParent.formController.unregisterAndRemove(event.form);
   }
 };
 
-scout.Desktop.prototype._onModelFormActivate = function(event) {
+scout.Desktop.prototype._onFormActivate = function(event) {
   var displayParent = this.session.getModelAdapter(event.displayParent);
   if (displayParent) {
     displayParent.formController.activateForm(event.form);
@@ -645,36 +645,36 @@ scout.Desktop.prototype._onModelFormActivate = function(event) {
   }
 };
 
-scout.Desktop.prototype._onModelMessageBoxShow = function(event) {
+scout.Desktop.prototype._onMessageBoxShow = function(event) {
   var displayParent = this.session.getModelAdapter(event.displayParent);
   if (displayParent) {
     displayParent.messageBoxController.registerAndRender(event.messageBox);
   }
 };
 
-scout.Desktop.prototype._onModelMessageBoxHide = function(event) {
+scout.Desktop.prototype._onMessageBoxHide = function(event) {
   var displayParent = this.session.getModelAdapter(event.displayParent);
   if (displayParent) {
     displayParent.messageBoxController.unregisterAndRemove(event.messageBox);
   }
 };
 
-scout.Desktop.prototype._onModelFileChooserShow = function(event) {
+scout.Desktop.prototype._onFileChooserShow = function(event) {
   var displayParent = this.session.getModelAdapter(event.displayParent);
   if (displayParent) {
     displayParent.fileChooserController.registerAndRender(event.fileChooser);
   }
 };
 
-scout.Desktop.prototype._onModelFileChooserHide = function(event) {
+scout.Desktop.prototype._onFileChooserHide = function(event) {
   var displayParent = this.session.getModelAdapter(event.displayParent);
   if (displayParent) {
     displayParent.fileChooserController.unregisterAndRemove(event.fileChooser);
   }
 };
 
-scout.Desktop.prototype._onModelOpenUri = function(event) {
-  $.log.debug('(Desktop#_onModelOpenUri) uri=' + event.uri + ' action=' + event.action);
+scout.Desktop.prototype._onOpenUri = function(event) {
+  $.log.debug('(Desktop#_onOpenUri) uri=' + event.uri + ' action=' + event.action);
   if (!event.uri) {
     return;
   }
@@ -689,19 +689,19 @@ scout.Desktop.prototype._onModelOpenUri = function(event) {
   }
 };
 
-scout.Desktop.prototype._onModelOutlineChanged = function(event) {
+scout.Desktop.prototype._onOutlineChanged = function(event) {
   if (scout.DesktopStyle.DEFAULT === this.desktopStyle) {
     this.setOutline(this.session.getOrCreateModelAdapter(event.outline, this));
   }
 };
 
-scout.Desktop.prototype._onModelOutlineContentActivate = function(event) {
+scout.Desktop.prototype._onOutlineContentActivate = function(event) {
   if (scout.DesktopStyle.DEFAULT === this.desktopStyle) {
     this.bringOutlineToFront();
   }
 };
 
-scout.Desktop.prototype._onModelAddNotification = function(event) {
+scout.Desktop.prototype._onAddNotification = function(event) {
   scout.create('DesktopNotification', {
     parent: this,
     id: event.id,
@@ -711,7 +711,7 @@ scout.Desktop.prototype._onModelAddNotification = function(event) {
   }).show();
 };
 
-scout.Desktop.prototype._onModelRemoveNotification = function(event) {
+scout.Desktop.prototype._onRemoveNotification = function(event) {
   this.removeNotification(event.id);
 };
 
@@ -749,29 +749,29 @@ scout.Desktop.prototype.onReconnectingFailed = function() {
 
 scout.Desktop.prototype.onModelAction = function(event) {
   if (event.type === 'formShow') {
-    this._onModelFormShow(event);
+    this._onFormShow(event);
   } else if (event.type === 'formHide') {
-    this._onModelFormHide(event);
+    this._onFormHide(event);
   } else if (event.type === 'formActivate') {
-    this._onModelFormActivate(event);
+    this._onFormActivate(event);
   } else if (event.type === 'messageBoxShow') {
-    this._onModelMessageBoxShow(event);
+    this._onMessageBoxShow(event);
   } else if (event.type === 'messageBoxHide') {
-    this._onModelMessageBoxHide(event);
+    this._onMessageBoxHide(event);
   } else if (event.type === 'fileChooserShow') {
-    this._onModelFileChooserShow(event);
+    this._onFileChooserShow(event);
   } else if (event.type === 'fileChooserHide') {
-    this._onModelFileChooserHide(event);
+    this._onFileChooserHide(event);
   } else if (event.type === 'openUri') {
-    this._onModelOpenUri(event);
+    this._onOpenUri(event);
   } else if (event.type === 'outlineChanged') {
-    this._onModelOutlineChanged(event);
+    this._onOutlineChanged(event);
   } else if (event.type === 'outlineContentActivate') {
-    this._onModelOutlineContentActivate(event);
+    this._onOutlineContentActivate(event);
   } else if (event.type === 'addNotification') {
-    this._onModelAddNotification(event);
+    this._onAddNotification(event);
   } else if (event.type === 'removeNotification') {
-    this._onModelRemoveNotification(event);
+    this._onRemoveNotification(event);
   } else {
     scout.Desktop.parent.prototype.onModelAction.call(this, event);
   }
