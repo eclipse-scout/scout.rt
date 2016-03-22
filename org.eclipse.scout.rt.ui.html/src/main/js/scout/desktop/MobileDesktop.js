@@ -37,6 +37,18 @@ scout.MobileDesktop.prototype._render = function($parent) {
   $parent.window().on('resize', this.onResize.bind(this));
 };
 
+scout.MobileDesktop.prototype._renderHeader = function() {
+  if (this.header) {
+    return;
+  }
+  this.header = scout.create('DesktopHeader', {
+    parent: this,
+    toolBarVisible: false
+  });
+  this.header.render(this.$container);
+  this.header.$container.insertBefore(this.$overlaySeparator);
+};
+
 scout.MobileDesktop.prototype._renderNavigation = function() {
   if (this.navigation) {
     return;
@@ -86,7 +98,7 @@ scout.MobileViewTabsController = function(desktop) {
 scout.inherits(scout.MobileViewTabsController, scout.ViewTabsController);
 
 scout.MobileViewTabsController.prototype.createAndRenderViewTab = function(view, position) {
-  // Make sure bench is visible
+  this._desktop.setHeaderVisible(true);
   this._desktop.setBenchVisible(true);
   this._desktop.setNavigationVisible(false);
 
@@ -98,6 +110,7 @@ scout.MobileViewTabsController.prototype._removeViewTab = function(viewTab, view
   if (this._viewTabs.length === 0) {
     // Hide bench if no view forms are open -> show navigation
     this._desktop.setNavigationVisible(true);
+    this._desktop.setHeaderVisible(false);
     this._desktop.setBenchVisible(false);
   }
 };

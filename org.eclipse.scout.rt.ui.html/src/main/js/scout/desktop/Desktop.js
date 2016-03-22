@@ -343,6 +343,13 @@ scout.Desktop.prototype.setBenchVisible = function(visible) {
   }
 };
 
+scout.Desktop.prototype.setHeaderVisible = function(visible) {
+  this.headerVisible = visible;
+  if (this.rendered) {
+    this._renderHeaderVisible();
+  }
+};
+
 scout.Desktop.prototype.revalidateHeaderLayout = function() {
   if (this.header) {
     this.header.revalidateLayout();

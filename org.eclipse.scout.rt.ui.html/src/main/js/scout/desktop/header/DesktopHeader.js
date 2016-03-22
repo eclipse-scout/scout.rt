@@ -16,6 +16,7 @@ scout.inherits(scout.DesktopHeader, scout.Widget);
 scout.DesktopHeader.prototype._init = function(model) {
   scout.DesktopHeader.parent.prototype._init.call(this, model);
   this.desktop = this.session.desktop;
+  this.toolBarVisible = scout.nvl(model.toolBarVisible, true);
 };
 
 scout.DesktopHeader.prototype._initKeyStrokeContext = function(keyStrokeContext) {
@@ -40,7 +41,7 @@ scout.DesktopHeader.prototype._render = function($parent) {
   this.htmlComp.pixelBasedSizing = false;
   this._$viewTabBar = this.$container.appendDiv('desktop-view-tabs');
   this._$toolBar = this.$container.appendDiv('header-tools');
-  this._renderToolMenus();
+  this._renderToolBarVisible();
   this._renderLogoUrl();
 
   this.session.keyStrokeManager.installKeyStrokeContext(this.desktopKeyStrokeContext);
@@ -51,7 +52,7 @@ scout.DesktopHeader.prototype._remove = function() {
   scout.DesktopHeader.parent.prototype._remove.call(this);
 };
 
-scout.DesktopHeader.prototype._renderToolMenus = function() {
+scout.DesktopHeader.prototype._renderToolBar = function() {
   // we set the menuStyle property to render a menu with a different style
   // depending on where the menu is located (header VS menubar).
   this.desktop.actions.forEach(function(action) {
@@ -66,11 +67,12 @@ scout.DesktopHeader.prototype._renderToolMenus = function() {
   }
 };
 
-scout.DesktopHeader.prototype.setLogoUrl = function(logoUrl) {
-  this.logoUrl = logoUrl;
-  if (this.rendered) {
-    this._renderLogoUrl();
+scout.DesktopHeader.prototype._removeToolBar = function() {
+  if (!this._$toolBar) {
+    return;
   }
+  this._$toolBar.remove();
+  this._$toolBar = null;
 };
 
 scout.DesktopHeader.prototype._renderLogoUrl = function() {
@@ -100,4 +102,26 @@ scout.DesktopHeader.prototype._removeLogo = function() {
   }
   this.logo.remove();
   this.logo = null;
+};
+
+scout.DesktopHeader.prototype._renderToolBarVisible = function() {
+  if (this.toolBarVisible) {
+    this._renderToolBar();
+  } else {
+    this._removeToolBar();
+  }
+};
+
+scout.DesktopHeader.prototype.setLogoUrl = function(logoUrl) {
+  this.logoUrl = logoUrl;
+  if (this.rendered) {
+    this._renderLogoUrl();
+  }
+};
+
+scout.DesktopHeader.prototype.setToolBarVisible = function(toolBarVisible) {
+  this.toolBarVisible = toolBarVisible;
+  if (this.rendered) {
+    this._renderToolBarVisible();
+  }
 };
