@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.platform.util;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Locale;
@@ -249,7 +250,8 @@ public final class NumberUtility {
   /**
    * @return an unsecure random long using <code>{@link Random#nextLong()}</code>
    *         <p>
-   *         for secure random numbers see SecureRandom
+   *         for secure random numbers see SecureRandom TODO imo 7.0 or java 1.8: make sure to use
+   *         {@link SecureRandom#getInstanceStrong()}
    */
   public static long randomLong() {
     return UNSECURE_RANDOM.nextLong();
