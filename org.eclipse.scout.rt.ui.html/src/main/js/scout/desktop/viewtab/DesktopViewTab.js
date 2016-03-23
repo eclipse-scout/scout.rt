@@ -12,7 +12,7 @@ scout.DesktopViewTab = function() {
   scout.DesktopViewTab.parent.call(this);
 
   this._view;
-  this._$bench;
+  this._bench;
   this._mouseListener;
   this.viewTabController;
 
@@ -40,9 +40,8 @@ scout.inherits(scout.DesktopViewTab, scout.Widget);
 scout.DesktopViewTab.prototype._init = function(options) {
   scout.DesktopViewTab.parent.prototype._init.call(this, options);
   this._view = options.view;
-  this._view.setParent(this);
   this.viewTabController = options.viewTabController;
-  this._$bench = options.$bench;
+  this._bench = options.bench;
 
   this._installListeners();
 };
@@ -78,7 +77,8 @@ scout.DesktopViewTab.prototype._renderView = function($parent) {
   if (this._view.rendered) {
     throw new Error('view already rendered');
   }
-  this._view.render(this._$bench);
+  this._view.render(this._bench.$container);
+  this._view.setParent(this._bench);
   this._view.$container.addClass('view');
   this._view.validateRoot = true;
   this._view.invalidateLayoutTree(false);

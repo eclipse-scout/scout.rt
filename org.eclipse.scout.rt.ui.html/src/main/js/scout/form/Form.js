@@ -231,6 +231,10 @@ scout.Form.prototype.appendTo = function($parent) {
 };
 
 scout.Form.prototype._remove = function() {
+  this.formController.remove();
+  this.messageBoxController.remove();
+  this.fileChooserController.remove();
+
   // FIXME awe: call acceptInput() when form is removed
   // test-case: SimpleWidgets outline, detail-forms, switch between nodes
   this._glassPaneRenderer.removeGlassPanes();

@@ -23,8 +23,7 @@ scout.FormController = function(displayParent, session) {
  * position is only used if form is a view. this position determines at which position the tab is placed.
  * if select view is set the view rendered in _renderView is also selected.
  */
-scout.FormController.prototype.registerAndRender = function(formAdapterId, position, selectView) {
-  var form = this.session.getOrCreateModelAdapter(formAdapterId, this.displayParent);
+scout.FormController.prototype.registerAndRender = function(form, position, selectView) {
   form._setProperty('displayParent', this.displayParent);
   if (form.isPopupWindow()) {
     this._renderPopupWindow(form);
@@ -42,8 +41,7 @@ scout.FormController.prototype._renderPopupWindow = function(formAdapterId, posi
 /**
  * Removes the given view or dialog from this controller and DOM. However, the form's adapter is not destroyed. That only happens once the Form is closed.
  */
-scout.FormController.prototype.unregisterAndRemove = function(formAdapterId) {
-  var form = this.session.getModelAdapter(formAdapterId);
+scout.FormController.prototype.unregisterAndRemove = function(form) {
   if (!form) {
     return;
   }
@@ -76,11 +74,22 @@ scout.FormController.prototype.render = function() {
 };
 
 /**
+ * Removes all dialogs and views registered with this controller.
+ */
+scout.FormController.prototype.remove = function() {
+  this.displayParent.dialogs.forEach(function(dialog) {
+    this._removeDialog(dialog, false);
+  }.bind(this));
+  this.displayParent.views.forEach(function(view, position) {
+    this._removeView(view, false, position);
+  }.bind(this));
+};
+
+/**
  * Activates the given view or dialog.
  */
-scout.FormController.prototype.activateForm = function(formAdapterId) {
-  var form = this.session.getOrCreateModelAdapter(formAdapterId, this.displayParent);
-  //if form is not rendered it could not be activated.
+scout.FormController.prototype.activateForm = function(form) {
+  // if form is not rendered it could not be activated.
   if (!form.rendered) {
     return;
   }
@@ -159,15 +168,21 @@ scout.FormController.prototype._renderDialog = function(dialog, register) {
   }
 };
 
-scout.FormController.prototype._removeView = function(view) {
-  scout.arrays.remove(this.displayParent.views, view);
+scout.FormController.prototype._removeView = function(view, unregister) {
+  unregister = scout.nvl(unregister, true);
+  if (unregister) {
+    scout.arrays.remove(this.displayParent.views, view);
+  }
   if (view.rendered) {
     view.remove();
   }
 };
 
-scout.FormController.prototype._removeDialog = function(dialog) {
-  scout.arrays.remove(this.displayParent.dialogs, dialog);
+scout.FormController.prototype._removeDialog = function(dialog, unregister) {
+  unregister = scout.nvl(unregister, true);
+  if (unregister) {
+    scout.arrays.remove(this.displayParent.dialogs, dialog);
+  }
   if (dialog.rendered) {
     dialog.remove();
   }

@@ -32,7 +32,7 @@ scout.ViewTabsController.prototype.createAndRenderViewTab = function(view, posit
     viewTab = scout.create('DesktopViewTab', {
       parent: view.displayParent,
       view: view,
-      $bench: this._desktop.bench.$container,
+      bench: this._desktop.bench,
       viewTabController: this
     });
 

@@ -30,6 +30,8 @@ scout.MobileDesktop.prototype._render = function($parent) {
   this.$container.addClass('desktop');
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
   this.htmlComp.setLayout(new scout.DesktopLayout(this));
+  // Desktop elements are added before this separator, all overlays are opened after (dialogs, popups, tooltips etc.)
+  this.$overlaySeparator = this.$container.appendDiv().setVisible(false);
   this._renderNavigationVisible();
   this._renderHeaderVisible();
   this._renderBenchVisible();
@@ -92,25 +94,36 @@ scout.MobileDesktop.prototype._adaptOutline = function(outline) {
   }
 };
 
+scout.MobileDesktop.prototype.switchToBench = function() {
+  this.setHeaderVisible(true);
+  this.setBenchVisible(true);
+  this.setNavigationVisible(false);
+};
+
+scout.MobileDesktop.prototype.switchToNavigation = function() {
+  this.setNavigationVisible(true);
+  this.setHeaderVisible(false);
+  this.setBenchVisible(false);
+};
+
+scout.MobileDesktop.prototype._hideForm = function(form) {
+  if (form.isView() && this.viewTabsController._viewTabs.length === 1) {
+    // Hide bench and show navigation if this is the last view to be hidden
+    this.switchToNavigation();
+  }
+  scout.MobileDesktop.parent.prototype._hideForm.call(this, form);
+};
+
 scout.MobileViewTabsController = function(desktop) {
   scout.MobileViewTabsController.parent.call(this, desktop);
 };
 scout.inherits(scout.MobileViewTabsController, scout.ViewTabsController);
 
 scout.MobileViewTabsController.prototype.createAndRenderViewTab = function(view, position) {
-  this._desktop.setHeaderVisible(true);
-  this._desktop.setBenchVisible(true);
-  this._desktop.setNavigationVisible(false);
+  if (this._viewTabs.length === 0) {
+    // Show bench and hide navigation if this is the first view to be shown
+    this._desktop.switchToBench();
+  }
 
   return scout.MobileViewTabsController.parent.prototype.createAndRenderViewTab.call(this, view, position);
-};
-
-scout.MobileViewTabsController.prototype._removeViewTab = function(viewTab, viewId) {
-  scout.MobileViewTabsController.parent.prototype._removeViewTab.call(this, viewTab, viewId);
-  if (this._viewTabs.length === 0) {
-    // Hide bench if no view forms are open -> show navigation
-    this._desktop.setNavigationVisible(true);
-    this._desktop.setBenchVisible(false);
-    this._desktop.setHeaderVisible(false);
-  }
 };

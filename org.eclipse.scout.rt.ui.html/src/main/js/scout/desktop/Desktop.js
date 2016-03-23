@@ -99,6 +99,9 @@ scout.Desktop.prototype._render = function($parent) {
 };
 
 scout.Desktop.prototype._remove = function() {
+  this.formController.remove();
+  this.messageBoxController.remove();
+  this.fileChooserController.remove();
   this.$container.window()
     .off('resize', this._resizeHandler)
     .off('popstate', this._popstateHandler);
@@ -166,12 +169,24 @@ scout.Desktop.prototype._removeBench = function() {
 };
 
 scout.Desktop.prototype._renderBenchVisible = function() {
+  var benchClone;
   if (this.benchVisible) {
     this._renderBench();
   } else {
-    if (!this.animateLayoutChange) {
-      this._removeBench();
+    if (this.animateLayoutChange) {
+      // The bench should still be visible during the hide animation -> add clone which will be removed when the animation finishes
+      // This avoids the need to delay hiding and disposing of the form, the removal can be done as without animations
+      benchClone = scout.create('CloneWidget', {
+        parent: this,
+        $container: this.bench.$container.clone()
+      });
+      benchClone.rendered = true;
+      benchClone.$container.insertBefore(this.$overlaySeparator);
     }
+    // Remove real bench
+    this._removeBench();
+    // Set clone which gets removed when animation finishes
+    this.bench = benchClone;
   }
   this.invalidateLayoutTree();
 };
@@ -227,12 +242,24 @@ scout.Desktop.prototype._removeHeader = function() {
 };
 
 scout.Desktop.prototype._renderHeaderVisible = function() {
+  var headerClone;
   if (this.headerVisible) {
     this._renderHeader();
   } else {
-    if (!this.animateLayoutChange) {
-      this._removeHeader();
+    if (this.animateLayoutChange) {
+      // The header should still be visible during the hide animation -> add clone which will be removed when the animation finishes
+      // This avoids the need to delay hiding and disposing of the form, the removal can be done as without animations
+      headerClone = scout.create('CloneWidget', {
+        parent: this,
+        $container: this.header.$container.clone()
+      });
+      headerClone.rendered = true;
+      headerClone.$container.insertBefore(this.$overlaySeparator);
     }
+    // Remove real header
+    this._removeHeader();
+    // Set clone which gets removed when animation finishes
+    this.header = headerClone;
   }
   this.invalidateLayoutTree();
 };
@@ -260,7 +287,7 @@ scout.Desktop.prototype._renderSplitter = function() {
 };
 
 scout.Desktop.prototype._renderBenchDropShadow = function() {
-  if (this.navigation && this.bench) {
+  if (this.navigationVisible && this.benchVisible) {
     this.bench.$container.toggleClass('drop-shadow', this.outline.inBackground);
   }
 };
@@ -567,11 +594,26 @@ scout.Desktop.prototype._addNullOutline = function(outline) {
   this.viewButtons.push(ovb);
 };
 
+scout.Desktop.prototype._showForm = function(form, displayParent, position, notifyServer) {
+  this._setFormActivated(form, notifyServer);
+  // register listener to recover active form when child dialog is removed
+  displayParent.formController.registerAndRender(form, position, true);
+};
+
+scout.Desktop.prototype._hideForm = function(form) {
+  form.displayParent.formController.unregisterAndRemove(form);
+};
+
+scout.Desktop.prototype._activateForm = function(form, notifyServer) {
+  form.displayParent.formController.activateForm(form);
+  this._setFormActivated(form, notifyServer);
+};
+
 scout.Desktop.prototype._setOutlineActivated = function() {
   this._setFormActivated();
 };
 
-scout.Desktop.prototype._setFormActivated = function(form, suppressSend) {
+scout.Desktop.prototype._setFormActivated = function(form, notifyServer) {
   // If desktop is in rendering process the can not set a new active for. instead the active form from the model is set selected.
   if (!this.rendered || this.initialFormRendering) {
     return;
@@ -579,7 +621,8 @@ scout.Desktop.prototype._setFormActivated = function(form, suppressSend) {
 
   if ((form && this.activeForm !== form.id) || (!form && this.activeForm)) {
     this.activeForm = form ? form.id : null;
-    if (!suppressSend) {
+    notifyServer = scout.nvl(notifyServer, true);
+    if (notifyServer) {
       this._sendFormActivated(form);
     }
   }
@@ -593,6 +636,22 @@ scout.Desktop.prototype._sendFormActivated = function(form) {
   this._send('formActivated', eventData, 0, function(previous) {
     return this.type === previous.type;
   });
+};
+
+/**
+ * Called when the animation triggered by animationLayoutChange is complete (e.g. navigation or bench got visible/invisible)
+ */
+scout.Desktop.prototype.onLayoutAnimationComplete = function() {
+  if (!this.headerVisible) {
+    this._removeHeader();
+  }
+  if (!this.navigationVisible) {
+    this._removeNavigation();
+  }
+  if (!this.benchVisible) {
+    this._removeBench();
+  }
+  this.animateLayoutChange = false;
 };
 
 scout.Desktop.prototype.onResize = function(event) {
@@ -648,55 +707,65 @@ scout.Desktop.prototype._onSplitterResizeEnd = function(event) {
 };
 
 scout.Desktop.prototype._onFormShow = function(event) {
-  var form, displayParent = this.session.getModelAdapter(event.displayParent);
+  var form,
+    displayParent = this.session.getModelAdapter(event.displayParent);
   if (displayParent) {
-    form = this.session.getOrCreateModelAdapter(event.form, displayParent.formController.displayParent);
-    this._setFormActivated(form, true);
-    // register listener to recover active form when child dialog is removed
-    displayParent.formController.registerAndRender(event.form, event.position, true);
+    form = this.session.getOrCreateModelAdapter(event.form, displayParent);
+    this._showForm(form, displayParent, event.position, false);
   }
 };
 
 scout.Desktop.prototype._onFormHide = function(event) {
-  var displayParent = this.session.getModelAdapter(event.displayParent);
+  var form,
+    displayParent = this.session.getModelAdapter(event.displayParent);
   if (displayParent) {
-    displayParent.formController.unregisterAndRemove(event.form);
+    form = this.session.getModelAdapter(event.form);
+    this._hideForm(form);
   }
 };
 
 scout.Desktop.prototype._onFormActivate = function(event) {
-  var displayParent = this.session.getModelAdapter(event.displayParent);
+  var form,
+    displayParent = this.session.getModelAdapter(event.displayParent);
   if (displayParent) {
-    displayParent.formController.activateForm(event.form);
-    this._setFormActivated(this.session.getOrCreateModelAdapter(event.form, displayParent.formController.displayParent), true);
+    form = this.session.getOrCreateModelAdapter(event.form, displayParent);
+    this._activateForm(form, false);
   }
 };
 
 scout.Desktop.prototype._onMessageBoxShow = function(event) {
-  var displayParent = this.session.getModelAdapter(event.displayParent);
+  var messageBox,
+    displayParent = this.session.getModelAdapter(event.displayParent);
   if (displayParent) {
-    displayParent.messageBoxController.registerAndRender(event.messageBox);
+    messageBox = this.session.getOrCreateModelAdapter(event.messageBox, displayParent);
+    displayParent.messageBoxController.registerAndRender(messageBox);
   }
 };
 
 scout.Desktop.prototype._onMessageBoxHide = function(event) {
-  var displayParent = this.session.getModelAdapter(event.displayParent);
+  var messageBox,
+    displayParent = this.session.getModelAdapter(event.displayParent);
   if (displayParent) {
-    displayParent.messageBoxController.unregisterAndRemove(event.messageBox);
+    messageBox = this.session.getModelAdapter(event.messageBox);
+    displayParent.messageBoxController.unregisterAndRemove(messageBox);
   }
 };
 
 scout.Desktop.prototype._onFileChooserShow = function(event) {
-  var displayParent = this.session.getModelAdapter(event.displayParent);
+  var fileChooser,
+    displayParent = this.session.getModelAdapter(event.displayParent);
   if (displayParent) {
-    displayParent.fileChooserController.registerAndRender(event.fileChooser);
+    fileChooser = this.session.getOrCreateModelAdapter(event.fileChooser, displayParent);
+    displayParent.fileChooserController.registerAndRender(fileChooser);
   }
 };
 
 scout.Desktop.prototype._onFileChooserHide = function(event) {
-  var displayParent = this.session.getModelAdapter(event.displayParent);
+  var fileChooser,
+    displayParent = this.session.getModelAdapter(event.displayParent);
   if (displayParent) {
-    displayParent.fileChooserController.unregisterAndRemove(event.fileChooser);
+    fileChooser = this.session.getModelAdapter(event.fileChooser);
+    displayParent.fileChooserController.unregisterAndRemove(fileChooser);
   }
 };
 

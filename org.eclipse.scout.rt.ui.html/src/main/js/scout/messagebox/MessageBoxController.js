@@ -21,8 +21,7 @@ scout.MessageBoxController = function(displayParent, session) {
 /**
  * Adds the given message box to this controller and renders it.
  */
-scout.MessageBoxController.prototype.registerAndRender = function(messageBoxAdapterId) {
-  var messageBox = this.session.getOrCreateModelAdapter(messageBoxAdapterId, this.displayParent);
+scout.MessageBoxController.prototype.registerAndRender = function(messageBox) {
   messageBox._setProperty('displayParent', this.displayParent);
   this.displayParent.messageBoxes.push(messageBox);
   this._render(messageBox);
@@ -31,8 +30,7 @@ scout.MessageBoxController.prototype.registerAndRender = function(messageBoxAdap
 /**
  * Removes the given message box from this controller and DOM. However, the message box's adapter is not destroyed. That only happens once the message box is closed.
  */
-scout.MessageBoxController.prototype.unregisterAndRemove = function(messageBoxAdapterId) {
-  var messageBox = this.session.getModelAdapter(messageBoxAdapterId);
+scout.MessageBoxController.prototype.unregisterAndRemove = function(messageBox) {
   if (messageBox) {
     scout.arrays.remove(this.displayParent.messageBoxes, messageBox);
     this._remove(messageBox);

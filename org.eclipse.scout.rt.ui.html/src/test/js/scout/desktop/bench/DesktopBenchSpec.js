@@ -14,7 +14,11 @@ describe("DesktopBenchSpec", function() {
 
   beforeEach(function() {
     setFixtures(sandbox());
-    helper = new OutlineSpecHelper(sandboxSession());
+    helper = new OutlineSpecHelper(sandboxSession({
+      desktop: {
+        benchVisible: true
+      }
+    }));
     jasmine.Ajax.install();
     jasmine.clock().install();
   });

@@ -105,6 +105,10 @@ scout.Outline.prototype._renderProperties = function() {
  * @override
  */
 scout.Outline.prototype._remove = function() {
+  this.formController.remove();
+  this.messageBoxController.remove();
+  this.fileChooserController.remove();
+
   scout.Outline.parent.prototype._remove.call(this);
   this._removeTitle();
 };

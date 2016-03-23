@@ -27,6 +27,7 @@
 
 .desktop-bench {
   position: absolute;
+  top: 0;
   background-color: @background-color;
 
   &.drop-shadow::before {

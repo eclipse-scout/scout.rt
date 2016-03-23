@@ -21,8 +21,7 @@ scout.FileChooserController = function(displayParent, session) {
 /**
  * Adds the given file chooser to this controller and renders it.
  */
-scout.FileChooserController.prototype.registerAndRender = function(fileChooserAdapterId) {
-  var fileChooser = this.session.getOrCreateModelAdapter(fileChooserAdapterId, this.displayParent);
+scout.FileChooserController.prototype.registerAndRender = function(fileChooser) {
   fileChooser._setProperty('displayParent', this.displayParent);
   this.displayParent.fileChoosers.push(fileChooser);
   this._render(fileChooser);
@@ -31,8 +30,7 @@ scout.FileChooserController.prototype.registerAndRender = function(fileChooserAd
 /**
  * Removes the given file chooser from this controller and DOM. However, the file chooser's adapter is not destroyed. That only happens once the file chooser is closed.
  */
-scout.FileChooserController.prototype.unregisterAndRemove = function(fileChooserAdapterId) {
-  var fileChooser = this.session.getModelAdapter(fileChooserAdapterId);
+scout.FileChooserController.prototype.unregisterAndRemove = function(fileChooser) {
   if (fileChooser) {
     scout.arrays.remove(this.displayParent.fileChoosers, fileChooser);
     this._remove(fileChooser);

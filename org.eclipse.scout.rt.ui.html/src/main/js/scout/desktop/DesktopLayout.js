@@ -50,7 +50,7 @@ scout.DesktopLayout.prototype.layout = function($container) {
         left: left
       }, {
         queue: false,
-        complete: this._onBenchAnimationComplete.bind(this)
+        complete: this.desktop.onLayoutAnimationComplete.bind(this.desktop)
       });
     }
 
@@ -80,7 +80,7 @@ scout.DesktopLayout.prototype.layout = function($container) {
         left: left
       }, {
         queue: false,
-        complete: this._onBenchAnimationComplete.bind(this)
+        complete: this.desktop.onLayoutAnimationComplete.bind(this.desktop)
       });
     }
 
@@ -92,19 +92,6 @@ scout.DesktopLayout.prototype.layout = function($container) {
       htmlBench.setSize(htmlBenchSize);
     }
   }
-};
-
-scout.DesktopLayout.prototype._onBenchAnimationComplete = function() {
-  if (!this.desktop.headerVisible) {
-    this.desktop._removeHeader();
-  }
-  if (!this.desktop.navigationVisible) {
-    this.desktop._removeNavigation();
-  }
-  if (!this.desktop.benchVisible) {
-    this.desktop._removeBench();
-  }
-  this.desktop.animateLayoutChange = false;
 };
 
 scout.DesktopLayout.prototype.containerSize = function() {
