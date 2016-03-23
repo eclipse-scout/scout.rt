@@ -14,7 +14,6 @@ import java.io.File;
 import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.zip.Adler32;
 
@@ -75,7 +74,7 @@ public final class BinaryResource implements Serializable {
     m_filename = filename;
     if (contentType == null) {
       if (filename != null) {
-        contentType = FileUtility.getMimeType(Paths.get(filename));
+        contentType = FileUtility.getMimeType(filename);
       }
       else if (content != null && content.length > 0) {
         File f = IOUtility.createTempFile("file", content);
