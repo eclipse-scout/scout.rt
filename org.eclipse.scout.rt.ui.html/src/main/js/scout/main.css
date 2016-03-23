@@ -28,6 +28,8 @@ body {
   -moz-user-select: -moz-none;
   cursor: default;
   color: @text-color;
+  /* prevent mobile safari from adjusting text, due to our dynamic layouting it will be always wrong */
+  -webkit-text-size-adjust: none;
 }
 
 /* -moz variant is required, see https://bugzilla.mozilla.org/show_bug.cgi?id=509958 */
