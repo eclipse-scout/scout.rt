@@ -1157,6 +1157,10 @@ describe("Table", function() {
       });
 
       it("uses non sort columns as fallback", function() {
+        if (!scout.device.supportsInternationalization()) {
+          return;
+        }
+
         var model = helper.createModelFixture(2, 4);
         var table = helper.createTable(model);
         model.rows[0].cells[0].value = 'zzz';
