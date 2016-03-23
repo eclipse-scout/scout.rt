@@ -22,6 +22,7 @@ scout.TreeSpaceKeyStroke.prototype._accept = function(event) {
 };
 
 scout.TreeSpaceKeyStroke.prototype.handle = function(event) {
+  //TODO nbu refactor
   var $currentNode = this.field.$selectedNodes().eq(0);
   if ($currentNode.length === 0) {
     return;

@@ -30,6 +30,9 @@ scout.Tree = function() {
   this._$animationWrapper; // used by _renderExpansion()
   this._filterMenusHandler = this._filterMenus.bind(this);
 
+  this.viewRangeRendered = new scout.Range(0, 0);
+  this.viewRangeSize = 10;
+
   this.nodeHeight = 0;
 };
 scout.inherits(scout.Tree, scout.ModelAdapter);
@@ -52,6 +55,7 @@ scout.Tree.prototype._init = function(model) {
     menuFilter: this._filterMenusHandler
   });
   this.menuBar.bottom();
+  this._updateItemPath(true);
   this._syncDisplayStyle(this.displayStyle);
   this._syncKeyStrokes(this.keyStrokes);
   this._syncMenus(this.menus);
@@ -137,7 +141,7 @@ scout.Tree.prototype._initTreeNode = function(node, parentNode) {
   this._applyFiltersForNode(node);
 
   //add visible nodes to visible nodes array when they are initialized
-  this._addToVisibleFlatList(node);
+  this._addToVisibleFlatList(node, false);
 
   this._updateMarkChildrenChecked(node, true, node.checked);
 };
@@ -150,7 +154,7 @@ scout.Tree.prototype.destroy = function() {
 scout.Tree.prototype._destroyTreeNode = function(node, parentNode) {
   delete this.nodesMap[node.id];
   scout.arrays.remove(this.selectedNodes, node); // ensure deleted node is not in selection list anymore (in case the model does not update the selection)
-  this._removeFromFlatList(node); //ensure node is not longer in visible nodes list.
+  this._removeFromFlatList(node, false); //ensure node is not longer in visible nodes list.
 
   if (this._onNodeDeleted) { // Necessary for subclasses
     this._onNodeDeleted(node);
@@ -190,7 +194,8 @@ scout.Tree.prototype._render = function($parent) {
     .on('dblclick', '.tree-node', this._onNodeDoubleClick.bind(this))
     .on('mousedown', '.tree-node-control', this._onNodeControlMouseDown.bind(this))
     .on('mouseup', '.tree-node-control', this._onNodeControlMouseUp.bind(this))
-    .on('dblclick', '.tree-node-control', this._onNodeControlDoubleClick.bind(this));
+    .on('dblclick', '.tree-node-control', this._onNodeControlDoubleClick.bind(this))
+    .on('scroll', this._onDataScroll.bind(this));
 
   scout.scrollbars.install(this.$data, {
     parent: this,
@@ -198,11 +203,264 @@ scout.Tree.prototype._render = function($parent) {
   });
   this._installNodeTooltipSupport();
   this.menuBar.render(this.$container);
-  this._addNodes(this.nodes);
+  this._updateNodeHeight();
+  this._renderViewport();
+  this.invalidateLayoutTree();
 };
 
+
+scout.Tree.prototype._onDataScroll = function() {
+  var scrollTop = this.$data[0].scrollTop;
+  if (this.scrollTop === scrollTop) {
+    return;
+  }
+  this._renderViewport();
+  this.scrollTop = scrollTop;
+};
+
+scout.Table.prototype.setScrollTop = function(scrollTop) {
+  scout.scrollbars.scrollTop(this.$data, scrollTop);
+  this.scrollTop = scrollTop;
+
+  // call _renderViewport to make sure nodes are rendered immediately. The browser fires the scroll event handled by onDataScroll delayed
+  this._renderViewport();
+};
+
+scout.Tree.prototype.storeScrollPosition = function() {
+  //TODO nbu check used
+  this.storedScrollTop = this.scrollTop;
+};
+
+scout.Tree.prototype.restoreScrollPosition = function() {
+//TODO nbu check used
+  if (this.storedScrollTop) {
+    this.setScrollTop(this.storedScrollTop);
+    this.storedScrollTop = null;
+  }
+};
+
+
+
+
 scout.Tree.prototype._renderViewport = function() {
-  //TODO
+  var viewRange = this._calculateCurrentViewRange();
+  this._renderViewRange(viewRange);
+};
+
+scout.Tree.prototype._calculateCurrentViewRange = function() {
+  var node,
+    scrollTop = this.$data[0].scrollTop,
+    maxScrollTop = this.$data[0].scrollHeight - this.$data[0].clientHeight;
+
+  if (maxScrollTop === 0 && this.visibleNodesFlat.length>0) {
+    // no scrollbars visible
+    node = this.visibleNodesFlat[0];
+  } else {
+    node = this._nodeAtScrollTop(scrollTop);
+  }
+
+  return this._calculateViewRangeForNode(node);
+};
+
+scout.Tree.prototype._rerenderViewport = function() {
+  this._removeRenderedNodes();
+  this._renderFiller();
+  this._renderViewport();
+};
+
+scout.Tree.prototype._removeRenderedNodes = function(){
+  var $nodes = this.$data.find('.tree-node');
+  $nodes.each(function(i, elem) {
+    var $node = $(elem),
+      node = $node.data('node');
+    if ($node.hasClass('hiding')) {
+      // Do not remove nodes which are removed using an animation
+      return;
+    }
+    this._removeNode(node);
+  }.bind(this));
+  this.viewRangeRendered = new scout.Range(0, 0);
+};
+
+scout.Tree.prototype._renderViewRangeForNodeIndex = function(node) {
+  var viewRange = this._calculateViewRangeForNode(node);
+  this._renderViewRange(viewRange);
+};
+
+scout.Tree.prototype._renderNodesInRange = function(range) {
+  var $nodes,
+    numNodesRendered = 0,
+    prepend = false;
+
+  var nodes = this.visibleNodesFlat;
+  if (nodes.length === 0) {
+    return;
+  }
+
+  var maxRange = new scout.Range(0, nodes.length);
+  range = maxRange.intersect(range);
+  if (!range.intersect(this.viewRangeRendered).equals(new scout.Range(0, 0))) {
+    throw new Error('New range must not intersect with existing.');
+  }
+  if (range.to <= this.viewRangeRendered.from) {
+    prepend = true;
+  }
+  var newRange = this.viewRangeRendered.union(range);
+  if (newRange.length === 2) {
+    throw new Error('Can only prepend or append rows to the existing range. Existing: ' + this.viewRangeRendered + '. New: ' + newRange);
+  }
+  this.viewRangeRendered = newRange[0];
+
+  for (var r = range.from; r < range.to; r++) {
+    var node = nodes[r];
+    this._insertNodeInDOM(node);
+    numNodesRendered++;
+  }
+
+  if ($.log.isTraceEnabled()) {
+    $.log.trace(numNodesRendered + ' new nodes rendered from ' + range);
+  }
+};
+
+scout.Tree.prototype._renderFiller = function() {
+  if (!this.$fillBefore) {
+    this.$fillBefore = this.$data.prependDiv('tree-data-fill');
+  }
+
+  var fillBeforeHeight = this._calculateFillerHeight(new scout.Range(0, this.viewRangeRendered.from));
+  this.$fillBefore.cssHeight(fillBeforeHeight);
+  //TODO nbu
+//  this.$fillBefore.cssWidth(this.rowWidth);
+  $.log.trace('FillBefore height: ' + fillBeforeHeight);
+
+  if (!this.$fillAfter) {
+    this.$fillAfter = this.$data.appendDiv('tree-data-fill');
+  }
+
+  var fillAfterHeight = 0;
+  if(this.viewRangeRendered.to !== 0 ){
+    fillAfterHeight = this._calculateFillerHeight(new scout.Range(this.viewRangeRendered.to, this.visibleNodesFlat.length));
+  }
+  this.$fillAfter.cssHeight(fillAfterHeight);
+  //TODO nbu
+//  this.$fillAfter.cssWidth(this.rowWidth);
+  $.log.trace('FillAfter height: ' + fillAfterHeight);
+};
+
+scout.Tree.prototype._calculateFillerHeight = function(range) {
+  var totalHeight = 0;
+  for (var i = range.from; i < range.to; i++) {
+    var node = this.visibleNodesFlat[i];
+    totalHeight += this._heightForNode(node);
+  }
+  return totalHeight;
+};
+
+scout.Tree.prototype._removeNodesInRange = function(range) {
+  var fromNode, toNode, node, i,
+    numNodesRemoved = 0,
+    nodes = this.visibleNodesFlat;
+
+  var maxRange = new scout.Range(0, nodes.length);
+  range = maxRange.intersect(range);
+  fromNode = nodes[range.from];
+  toNode = nodes[range.to];
+
+  var newRange = this.viewRangeRendered.subtract(range);
+  if (newRange.length === 2) {
+    throw new Error('Can only remove nodes at the beginning or end of the existing range. ' + this.viewRangeRendered + '. New: ' + newRange);
+  }
+  this.viewRangeRendered = newRange[0];
+
+  for (i = range.from; i < range.to; i++) {
+    node = nodes[i];
+    this._removeNode(node);
+    numNodesRemoved++;
+  }
+
+  if ($.log.isTraceEnabled()) {
+    $.log.trace(numNodesRemoved + ' nodes removed from ' + range + '.');
+  }
+};
+
+/**
+ * Just removes the node, does NOT adjust this.viewRangeRendered
+ */
+scout.Tree.prototype._removeNode = function(node) {
+  var $node = node.$node;
+  if (!$node) {
+    return;
+  }
+  if ($node.hasClass('hiding')) {
+    // Do not remove nodes which are removed using an animation
+    return;
+  }
+    //only remove node
+    $node.detach();
+    node.rendered = false;
+};
+
+/**
+ * Renders the rows visible in the viewport and removes the other rows
+ */
+scout.Tree.prototype._renderViewRange = function(viewRange) {
+  if (viewRange.from === this.viewRangeRendered.from && viewRange.to === this.viewRangeRendered.to && !this.viewRangeDirty) {
+    // Range already rendered -> do nothing
+    return;
+  }
+  var scrollTop = this.$data[0].scrollTop;
+  var rangesToRender = viewRange.subtract(this.viewRangeRendered);
+  var rangesToRemove = this.viewRangeRendered.subtract(viewRange);
+  rangesToRemove.forEach(function(range) {
+    this._removeNodesInRange(range);
+  }.bind(this));
+  rangesToRender.forEach(function(range) {
+    this._renderNodesInRange(range);
+  }.bind(this));
+
+  // check if at least last and first row in range got correctly rendered
+  if (this.viewRangeRendered.size() > 0) {
+    var nodes = this.visibleNodesFlat;
+    var firstNode = nodes[this.viewRangeRendered.from];
+    var lastNode = nodes[this.viewRangeRendered.to - 1];
+    if (!firstNode.rendered || !lastNode.rendered) {
+      throw new Error('Nodes not rendered as expected. ' + this.viewRangeRendered + '. First: ' + firstNode.$node + '. Last: ' + lastNode.$node);
+    }
+  }
+
+  this._renderFiller();
+  this._renderSelection();
+  this.$data[0].scrollTop = scrollTop;
+  this.viewRangeDirty = false;
+};
+
+/**
+ * Returns the index of the node which is at position scrollTop.
+ */
+scout.Tree.prototype._nodeAtScrollTop = function(scrollTop) {
+  var height = 0,
+    nodeTop;
+  this.visibleNodesFlat.some(function(node, i) {
+    height += this._heightForNode(node);
+    if (scrollTop < height) {
+      nodeTop = node;
+      return true;
+    }
+  }.bind(this));
+  if(scrollTop>height){
+    this.$data[0].scrollTop = height;
+  }
+  return nodeTop;
+};
+
+scout.Tree.prototype._heightForNode = function(node) {
+  var height = 0;
+  if (node.height) {
+    height = node.height;
+  } else {
+    height = this.nodeHeight;
+  }
+  return height;
 };
 
 /**
@@ -212,13 +470,12 @@ scout.Tree.prototype._renderViewport = function() {
  */
 scout.Tree.prototype._calculateViewRangeForNode = function(node) {
   var viewRange = new scout.Range(),
-    quarterRange = Math.floor(this.viewRangeSize / 4),
-    nodeIndex = this.visibleNodesFlat.indexOf(node),
-    diff;
+  quarterRange = Math.floor(this.viewRangeSize / 4),
+  diff;
 
-  if(nodeIndex === -1){
-    //TODO nbu check return
-    return;
+  var nodeIndex = this.visibleNodesFlat.indexOf(node);
+  if(!node || nodeIndex === -1){
+    return viewRange;
   }
 
   viewRange.from = Math.max(nodeIndex - quarterRange, 0);
@@ -275,6 +532,8 @@ scout.Tree.prototype._remove = function() {
   });
   scout.scrollbars.uninstall(this.$data, this.session);
   this._uninstallNodeTooltipSupport();
+  this.$fillBefore = null;
+  this.$fillAfter = null;
   scout.Tree.parent.prototype._remove.call(this);
 };
 
@@ -286,30 +545,6 @@ scout.Tree.prototype._renderProperties = function() {
   this._renderDropType();
 };
 
-scout.Tree.prototype._addNodes = function(nodes, addedNodes) {
-  //TODO nbu renderviewport
-  if (!nodes || nodes.length === 0) {
-    return;
-  }
-  addedNodes = addedNodes || [];
-
-  for (var i = 0; i < nodes.length; i++) {
-    var node = nodes[i];
-    if (!node.rendered) {
-
-      this._insertNodeInDOM(node);
-
-      addedNodes.push(node);
-      // if model demands children, create them
-      if (node.expanded && node.childNodes.length > 0) {
-        this._addNodes(node.childNodes, addedNodes);
-      }
-    }
-  }
-
-  this.invalidateLayoutTree();
-  return addedNodes;
-};
 
 /**
  * @param parentNode optional. If provided, this node's state will be updated (e.g. it will be collapsed)
@@ -374,15 +609,13 @@ scout.Tree.prototype._decorateNode = function(node) {
   if ($node.isSelected()) {
     formerClasses += ' selected';
   }
-  if ($node.hasClass('group')) {
-    formerClasses += ' group';
-  }
   $node.removeClass();
   $node.addClass(formerClasses);
   $node.addClass(node.cssClass);
   $node.toggleClass('leaf', !!node.leaf);
   $node.toggleClass('expanded', (!!node.expanded && node.childNodes.length > 0));
   $node.toggleClass('lazy', $node.hasClass('expanded') && node.expandedLazy);
+  $node.toggleClass('group', !!node.group);
   $node.setEnabled(!!node.enabled);
   $node.children('.tree-node-checkbox')
     .children('.check-box')
@@ -458,15 +691,6 @@ scout.Tree.prototype._renderNodeChecked = function(node) {
     .children('.tree-node-checkbox')
     .children('.check-box')
     .toggleClass('checked', node.checked);
-};
-
-scout.Tree.prototype._renderNodeFilterAccepted = function(node, animated) {
-  //TODO nbu check range
-  if (node.filterAccepted) {
-    this.showNode(node, animated);
-  } else {
-    this.hideNode(node, animated);
-  }
 };
 
 scout.Tree.prototype._renderMenus = function() {
@@ -551,7 +775,6 @@ scout.Tree.prototype._renderDisplayStyle = function() {
 };
 
 scout.Tree.prototype._renderExpansion = function(node, animate, options) {
-  //TODO nbu renderviewport
   var opts = {
     expandLazyChanged: false,
     expansionChanged: false
@@ -578,70 +801,10 @@ scout.Tree.prototype._renderExpansion = function(node, animate, options) {
     return;
   }
 
-  // If there is already an animation is already going on for this node, stop it immediately
-  if (this._$animationWrapper) {
-    // Note: Do _not_ use finish() here! Although documentation states that it is "similar" to stop(true, true),
-    // this does not seem to be the case. Implementations differ slightly in details. The effect is, that when
-    // calling stop() the animation stops and the 'complete' callback is executed immediately. However, when calling
-    // finish(), the callback is _not_ executed! (This may or may not be a bug in jQuery, I cannot tell...)
-    this._$animationWrapper.stop(false, true);
-  }
-
   if (expanded) {
-    this._addNodes(node.childNodes);
-    this._updateItemPath();
-
-    // animate opening
-    animate = animate && this.rendered; // don't animate while rendering (not necessary, or may even lead to timing issues)
-    animate = animate && !$node.hasClass('leaf') && !$node.hasClass('expanded') && !this.displayStyle;
-    if (animate) {
-      //TODO nbu single animation and skip already added nodes
-      var $newNodes = scout.Tree.collectSubtree($node, false);
-      if ($newNodes.length) {
-        this._$animationWrapper = $newNodes.wrapAll('<div class="animation-wrapper">').parent();
-        var h = this._$animationWrapper.outerHeight();
-        this._$animationWrapper
-          .css('height', 0)
-          .animateAVCSD('height', h, onAnimationComplete.bind(this, true, $newNodes), this.revalidateLayoutTree.bind(this), 200);
-      }
-    }
     $node.addClass('expanded');
   } else {
     $node.removeClass('expanded');
-
-    // animate closing
-    if (this.rendered) { // don't animate while rendering (not necessary, or may even lead to timing issues)
-      var $existingNodes = scout.Tree.collectSubtree($node, false);
-      if ($existingNodes.length) {
-        $existingNodes.each(function() {
-          // set not rendered.
-          var node = $(this).data('node');
-          if (node) { // FIXME bsh: Tree | This if should not be necessary! 'node' should not be undefined, but is sometimes... Check why!
-            node.rendered = false;
-          }
-        });
-        if (animate) {
-          this._$animationWrapper = $existingNodes.wrapAll('<div class="animation-wrapper">)').parent();
-          this._$animationWrapper
-            .animateAVCSD('height', 0, onAnimationComplete.bind(this, false, $existingNodes), this.revalidateLayoutTree.bind(this), 200);
-        } else {
-          $existingNodes.detach();
-          this.invalidateLayoutTree();
-        }
-      }
-    }
-  }
-
-  // ----- Helper functions -----
-
-  function onAnimationComplete(expanding, $affectedNodes) {
-    if (expanding) {
-      this._$animationWrapper.replaceWith(this._$animationWrapper.contents());
-    } else {
-      $affectedNodes.detach();
-      this._$animationWrapper.remove();
-    }
-    this._$animationWrapper = null;
   }
 };
 
@@ -661,9 +824,11 @@ scout.Tree.prototype._renderSelection = function() {
     // If $node is currently not displayed (due to a collapsed parent node), expand the parents
     if (!node.rendered) {
       this._expandAllParentNodes(node);
-      $node = node.$node;
-      if (!$node || $node.length === 0) {
-        throw new Error('Still no node found. node=' + node);
+      if(this.visibleNodesMap[node.id]){
+        $node = node.$node;
+        if (!$node || $node.length === 0) {
+          return;
+        }
       }
     }
 
@@ -693,10 +858,18 @@ scout.Tree.prototype._renderSelection = function() {
     }
   }, this);
 
-  this._updateItemPath();
   if (this.scrollToSelection) {
     // Execute delayed because tree may be not layouted yet
     setTimeout(this.revealSelection.bind(this));
+  }
+  this._redecorateViewRange();
+};
+
+scout.Tree.prototype._redecorateViewRange = function() {
+  if(this.rendered){
+    for(var i = this.viewRangeRendered.from; i<this.viewRangeRendered.to; i++){
+      this._decorateNode(this.visibleNodesFlat[i]);
+    }
   }
 };
 
@@ -704,7 +877,9 @@ scout.Tree.prototype._removeSelection = function() {
   // Remove children class on root nodes if no nodes were selected
   if (this.selectedNodes.length === 0) {
     this.nodes.forEach(function(childNode) {
-      childNode.$node.removeClass('child-of-selected');
+      if(childNode.$node){
+        childNode.$node.removeClass('child-of-selected');
+      }
     }, this);
   }
 
@@ -967,12 +1142,16 @@ scout.Tree.prototype.setNodeExpanded = function(node, expanded, opts) {
     expansionChanged: false,
     expandLazyChanged: false
   };
+
   // Set expansion state
   if (node.expanded !== expanded || node.expandedLazy !== lazy) {
     renderExpansionOpts.expansionChanged = node.expanded !== expanded;
     renderExpansionOpts.expandLazyChanged = node.expandedLazy !== lazy;
     node.expanded = expanded;
     node.expandedLazy = lazy;
+    if(node.group){
+      this._updateItemPath(false, node);
+    }
     var filterStateChanged = this._applyFiltersForNode(node);
     if (filterStateChanged) {
       if (renderExpansionOpts.expansionChanged) {
@@ -995,9 +1174,9 @@ scout.Tree.prototype.setNodeExpanded = function(node, expanded, opts) {
     }
 
     if (node.expanded) {
-      this._addChildsToFlatList(node);
+      this._addChildsToFlatList(node, null, true);
     } else {
-      this._removeChildsFromFlatList(node);
+      this._removeChildsFromFlatList(node, true);
     }
     if (notifyServer) {
       this._send('nodeExpanded', {
@@ -1006,6 +1185,8 @@ scout.Tree.prototype.setNodeExpanded = function(node, expanded, opts) {
         expandedLazy: lazy
       });
     }
+    //TODO check if can be moved to add to visible list or remove from visible list
+    this.viewRangeDirty = true;
   }
 
   // Render expansion
@@ -1016,12 +1197,11 @@ scout.Tree.prototype.setNodeExpanded = function(node, expanded, opts) {
 
 scout.Tree.prototype._rebuildParent = function(node, opts) {
   if (node.expanded || node.expandedLazy) {
-    this._addChildsToFlatList(node);
+    this._addChildsToFlatList(node,null, false);
   } else {
-    this._removeChildsFromFlatList(node);
+    this._removeChildsFromFlatList(node, false);
   }
   //Render expansion
-
   if (this.rendered && scout.nvl(opts.renderExpansion, true)) {
     var renderExpansionOpts = {
       expansionChanged: true
@@ -1030,43 +1210,82 @@ scout.Tree.prototype._rebuildParent = function(node, opts) {
   }
 };
 
-scout.Tree.prototype._removeChildsFromFlatList = function(parentNode) {
+scout.Tree.prototype._removeChildsFromFlatList = function(parentNode, animatedRemove) {
   //Only if a parent is available the childs are available.
   if (this.visibleNodesMap[parentNode.id]) {
     var parentIndex = this.visibleNodesFlat.indexOf(parentNode);
     var elementsToDelete = 0;
     var parentLevel = parentNode.level;
+    var removedNodes = [];
+    if(animatedRemove){
+      this._$animationWrapper = $('<div class="animation-wrapper">').insertAfter(parentNode.$node);
+    }
     for (var i = parentIndex + 1; i < this.visibleNodesFlat.length; i++) {
       if (this.visibleNodesFlat[i].level > parentLevel) {
+        var node = this.visibleNodesFlat[i];
         delete this.visibleNodesMap[this.visibleNodesFlat[i].id];
         elementsToDelete++;
+        if(node.rendered){
+          removedNodes.push(node);
+        }
+        this.hideNode(node, false, animatedRemove);
       } else {
         break;
       }
     }
+  if(!animatedRemove){
     this.visibleNodesFlat.splice(parentIndex + 1, elementsToDelete);
   }
+
+    // animate closing
+  if (this.rendered && animatedRemove) { // don't animate while rendering (not necessary, or may even lead to timing issues)
+    if (elementsToDelete>0) {
+      if (elementsToDelete) {
+        this._$animationWrapper
+          .animateAVCSD('height', 0, onAnimationComplete.bind(this, removedNodes), function(){}, 200);
+      }
+    }
+  }
+  }
+
+//----- Helper functions -----
+  function onAnimationComplete(affectedNodes) {
+    affectedNodes.forEach(function(node){
+      if(node.rendered){
+        node.$node.detach();
+        node.rendered = false;
+      }
+    });
+    this.visibleNodesFlat.splice(parentIndex + 1, elementsToDelete);
+    this._$animationWrapper.remove();
+    this._$animationWrapper = null;
+    this._rerenderViewport();
+    this.revalidateLayoutTree();
+  }
+
 };
 
-scout.Tree.prototype._removeFromFlatList = function(node) {
+scout.Tree.prototype._removeFromFlatList = function(node, animatedRemove) {
+  //TODO nbu handle animations for childs
   if (this.visibleNodesMap[node.id]) {
     var index = this.visibleNodesFlat.indexOf(node);
-    this._removeChildsFromFlatList(node);
+    this._removeChildsFromFlatList(node, animatedRemove);
     this.visibleNodesFlat.splice(index, 1);
     delete this.visibleNodesMap[node.id];
+    this.hideNode(node, animatedRemove);
   }
 };
 
-scout.Tree.prototype._addToVisibleFlatList = function(node) {
+scout.Tree.prototype._addToVisibleFlatList = function(node, renderingAnimated) {
   //if node already in visible list don't do anything. if no parentNode is available this node is on toplevel, if a parent is available
   // it has to be in visible list and also be expanded
   if (!this.visibleNodesMap[node.id] && node.filterAccepted && (!node.parentNode ||
       (node.parentNode.expanded && this.visibleNodesMap[node.parentNode.id]))) {
     if (this.initialTraversing) {
       //for faster index calculation
-      this._addToVisibleFlatListNoCheck(node, this.visibleNodesFlat.length);
+      this._addToVisibleFlatListNoCheck(node, this.visibleNodesFlat.length, renderingAnimated);
     } else {
-      this._addToVisibleFlatListNoCheck(node, this._findIndexToInsertNode(node));
+      this._addToVisibleFlatListNoCheck(node, this._findIndexToInsertNode(node), renderingAnimated);
     }
   }
 };
@@ -1117,34 +1336,107 @@ scout.Tree.prototype._findIndexToInsertNode = function(node) {
   }
 };
 
-scout.Tree.prototype._addChildsToFlatList = function(parentNode, parentIndex) {
+scout.Tree.prototype._addChildsToFlatList = function(parentNode, parentIndex, animatedRendering, insertBatch) {
   //add nodes recursively
   if (this.visibleNodesMap[parentNode.id]) {
-    parentIndex = parentIndex === undefined ? this.visibleNodesFlat.indexOf(parentNode) : parentIndex;
+    var isSubAdding = !!parentIndex;
+    parentIndex = parentIndex ? parentIndex:this.visibleNodesFlat.indexOf(parentNode);
+    animatedRendering = animatedRendering && this.rendered && parentNode.rendered; // don't animate while rendering (not necessary, or may even lead to timing issues)
+    animatedRendering = animatedRendering && !parentNode.$node.hasClass('leaf') && !parentNode.$node.hasClass('expanded');
+    // If there is already an animation is already going on for this node, stop it immediately
+    if (this._$animationWrapper && !isSubAdding) {
+      // Note: Do _not_ use finish() here! Although documentation states that it is "similar" to stop(true, true),
+      // this does not seem to be the case. Implementations differ slightly in details. The effect is, that when
+      // calling stop() the animation stops and the 'complete' callback is executed immediately. However, when calling
+      // finish(), the callback is _not_ executed! (This may or may not be a bug in jQuery, I cannot tell...)
+      this._$animationWrapper.stop(false, true);
+    }
+    if (animatedRendering && !isSubAdding) {
+      this._$animationWrapper = $('<div class="animation-wrapper">').insertAfter(parentNode.$node);
+    }
     var insertIndex = parentIndex + 1;
+    var animationDone = false;
+    insertBatch = insertBatch ? insertBatch : setUpInsertBatch(insertIndex);
     parentNode.childNodes.forEach(function(node, index) {
       var isAlreadyAdded = this.visibleNodesMap[node.id];
       if (node.filterAccepted && !isAlreadyAdded) {
-        this._addToVisibleFlatListNoCheck(node, insertIndex);
+        insertBatch.push(node);
+        this.visibleNodesMap[node.id] = true;
         if (node.expanded) {
-          insertIndex = this._addChildsToFlatList(node, insertIndex);
+          insertIndex = this._addChildsToFlatList(node, insertIndex, false, insertBatch);
         }
         insertIndex++;
       } else if (isAlreadyAdded) {
-        if (node.expanded) {
-          insertIndex = this._addChildsToFlatList(node, insertIndex);
-        }
-        insertIndex++;
+        throw new Error('Illegal state, if child nodes are added as batch there should none of the childs already exist in visible list. parentNode: ' + parentNode);
+      }
+      if(this.viewRangeRendered.from-1 === insertIndex-1){
+        //do immediate rendering because list could be longer
+        this.insertBatchInVisibleNodes(insertBatch, false, false);
+        insertBatch = setUpInsertBatch(insertIndex);
+      }
+      if(this.viewRangeRendered.from + this.viewRangeSize === insertIndex-1){
+        //do immediate rendering because list could be longer
+        this.insertBatchInVisibleNodes(insertBatch, true, animatedRendering ? onAnimationComplete:null);
+        insertBatch = setUpInsertBatch(insertIndex);
       }
     }.bind(this));
+
+      if (!isSubAdding) {
+        // animation is not done yet and all added nodes are in visible range
+        this.insertBatchInVisibleNodes(insertBatch, this.viewRangeRendered.from + this.viewRangeSize >= insertIndex-1 && this.viewRangeRendered.from <= insertIndex-1, animatedRendering ? onAnimationComplete:null);
+      }
+
+
     return insertIndex - 1;
   }
   return 0;
+
+//----- Helper functions ----- //
+
+  function onAnimationComplete() {
+      this._$animationWrapper.replaceWith(this._$animationWrapper.contents());
+      this._$animationWrapper = null;
+      this._rerenderViewport();
+      this.revalidateLayoutTree();
+  }
+
+  function setUpInsertBatch(insertIndex){
+    return [insertIndex, 0];
+  }
+
 };
 
-scout.Tree.prototype._addToVisibleFlatListNoCheck = function(node, insertIndex) {
+scout.Tree.prototype.insertBatchInVisibleNodes = function(insertBatch, showNodes, onAnimationCompleteFunc){
+  if(insertBatch.length<2){
+    //nothing to add
+    return;
+  }
+  this.visibleNodesFlat.splice.apply(this.visibleNodesFlat, insertBatch);
+  if(showNodes){
+    var indexHint = insertBatch[0];
+    for(var i = 2; i<insertBatch.length; i++){
+      var node = insertBatch[i];
+      this.showNode(node, false, true, indexHint);
+      if(this._$animationWrapper){
+        this._$animationWrapper.append(node.$node);
+      }
+      indexHint++;
+    }
+    if(onAnimationCompleteFunc && this._$animationWrapper){
+      var h = this._$animationWrapper.outerHeight();
+      this._$animationWrapper
+      .css('height', 0)
+      .animateAVCSD('height', h, onAnimationCompleteFunc.bind(this), function(){}, 200);
+    }
+  }
+};
+
+scout.Tree.prototype._addToVisibleFlatListNoCheck = function(node, insertIndex, animatedRendering, suppressTreeInvalidation) {
   scout.arrays.insert(this.visibleNodesFlat, node, insertIndex);
   this.visibleNodesMap[node.id] = true;
+  if(this.rendered){
+    this.showNode(node, animatedRendering, suppressTreeInvalidation);
+  }
 };
 
 scout.Tree.prototype.scrollTo = function(node) {
@@ -1196,6 +1488,7 @@ scout.Tree.prototype.selectNodes = function(nodes, notifyServer, debounceSend) {
     this.expandNode(this.selectedNodes[0]);
   }
 
+  this._updateItemPath(true);
   this._updateMenuBar();
   if (this.rendered) {
     this._renderSelection();
@@ -1243,8 +1536,9 @@ scout.Tree.prototype._expandAllParentNodes = function(node) {
 
   for (i = parentNodes.length - 1; i >= 0; i--) {
     if (nodesToInsert.indexOf(parentNodes[i]) !== -1) {
-      this._addToVisibleFlatList(parentNodes[i]);
-      this._addNodes([parentNodes[i]]);
+      this._addToVisibleFlatList(parentNodes[i], false);
+      this._renderViewport();
+      this.invalidateLayoutTree();
     }
     if (!parentNodes[i].expanded) {
       $parentNode = parentNodes[i].$node;
@@ -1265,7 +1559,6 @@ scout.Tree.prototype._updateChildNodeIndex = function(nodes, startIndex) {
 };
 
 scout.Tree.prototype.insertNodes = function(nodes, parentNode) {
-  var $parentNode;
 
   // Append continuous node blocks
   nodes.sort(function(a, b) {
@@ -1284,21 +1577,16 @@ scout.Tree.prototype.insertNodes = function(nodes, parentNode) {
     }
     //initialize node and add to visible list if node is visible
     this._visitNodes(nodes, this._initTreeNode.bind(this), parentNode);
-    if (this.rendered && parentNode.$node) {
-      $parentNode = parentNode.$node;
-      if (parentNode.expanded) {
-        // If parent is already expanded just add the nodes at the end.
-        // Otherwise render the expansion
-        if ($parentNode.hasClass('expanded')) {
-          this._addNodes(nodes);
-          this._updateItemPath();
-        } else {
+    if(parentNode.group){
+      this._updateItemPath(false, parentNode);
+    }
+    if (this.rendered ) {
+      if (!parentNode.expanded){
           var opts = {
             expansionChanged: true
           };
           this._renderExpansion(parentNode, null, opts);
         }
-      }
     }
   } else {
     if (this.nodes && this.nodes.length > 0) {
@@ -1311,13 +1599,11 @@ scout.Tree.prototype.insertNodes = function(nodes, parentNode) {
     }
     //initialize node and add to visible list if node is visible
     this._visitNodes(nodes, this._initTreeNode.bind(this), parentNode);
-
-    if (this.rendered) {
-      this._addNodes(nodes);
-      this._updateItemPath();
-    }
   }
-
+  if (this.rendered) {
+    this._renderViewport();
+    this.invalidateLayoutTree();
+  }
   this.trigger('nodesInserted', {
     nodes: nodes,
     parentNode: parentNode
@@ -1338,20 +1624,16 @@ scout.Tree.prototype.updateNodes = function(nodes) {
       if (this._applyFiltersForNode(oldNode)) {
         if (!oldNode.filterAccepted) {
           this._nodesFiltered([oldNode]);
-          this._removeFromFlatList(oldNode);
+          this._removeFromFlatList(oldNode, false);
         } else {
-          this._addToVisibleFlatList(oldNode);
+          this._addToVisibleFlatList(oldNode, false);
         }
       }
+      this._updateItemPath(false, oldNode.parentNode);
       if (this.rendered) {
         this._decorateNode(oldNode);
-        this._renderNodeFilterAccepted(oldNode);
       }
     }
-  }
-
-  if (this.rendered && anyPropertiesChanged) {
-    this._updateItemPath();
   }
 
   this.trigger('nodesUpdated', {
@@ -1668,7 +1950,7 @@ scout.Tree.prototype._showAllNodes = function(parentNode) {
     }
 
     // only animate small trees
-    if (parentNode.childNodes.length < 100) {
+    if (parentNode.childNodes.length < this._animationNodeLimit) {
       var h = childNode.$node.outerHeight(),
         p = childNode.$node.css('padding-top');
 
@@ -1700,60 +1982,56 @@ scout.Tree.prototype._showAllNodes = function(parentNode) {
   this.revealSelection();
 };
 
-scout.Tree.prototype._updateItemPath = function() {
-  var $selectedNodes, $node, level;
-
-  // first remove and select selected
-  this.$data.find('.tree-node').removeClass('group');
-
-  // find direct children
-  $selectedNodes = this.$selectedNodes();
-  $node = $selectedNodes.next();
-  level = parseFloat($selectedNodes.attr('data-level'));
-
-  // find grouping end (ultimate parent)
-  var $ultimate;
-  if ($selectedNodes.parent().hasClass('animation-wrapper')) {
-    //If node expansion animation is in progress, the nodes are wrapped by a div
-    $node = $selectedNodes.parent().prev();
-  } else {
-    $node = $selectedNodes.prev();
+scout.Tree.prototype._updateItemPath = function(selectionChanged, ultimate) {
+  var selectedNodes, node, level;
+  if(selectionChanged){
+    // first remove and select selected
+    this.trigger('prepareUpdateItemPath', {
+      node: node
+    });
   }
-  while ($node.length > 0) {
-    var k = parseFloat($node.attr('data-level'));
-    if (k < level) {
-      if (this._isGroupingEnd($node.data('node'))) {
+
+  if(!ultimate){
+    // find direct children
+    selectedNodes = this.selectedNodes;
+    if(selectedNodes.length===0){
+      return;
+    }
+    node = selectedNodes[0];
+    level = node.level;
+
+    // find grouping end (ultimate parent)
+    while (node.parentNode) {
+      var parent = node.parentNode;
+      if (this._isGroupingEnd(parent)) {
+        ultimate = node;
         break;
       }
-
-      level = k;
-      $ultimate = $node;
+      node = parent;
     }
-    if ($node.parent().hasClass('animation-wrapper')) {
-      $node = $node.parent();
-    }
-    $node = $node.prev();
+    // find group with same ultimate parent
+    ultimate = ultimate || selectedNodes[0];
+    ultimate.group = true;
+    this.one('prepareUpdateItemPath', function(){
+      ultimate.group = false;
+    });
   }
+  node = ultimate;
+  if(node && node.expanded && node.group){
+    addToGroup.call(this,node.childNodes);
+  }
+  //------ helper function ------//
 
-  // find group with same ultimate parent
-  $ultimate = $ultimate || $selectedNodes;
-  $node = $ultimate;
-  level = $node.attr('data-level');
-  while ($node.length > 0) {
-    $node.addClass('group');
-    if ($node.next().length === 0 && $node.parent().hasClass('animation-wrapper')) {
-      // If there is no next node but we are inside an animationWrapper, step out the wrapper
-      $node = $node.parent();
-    }
-    $node = $node.next();
-    if ($node.hasClass('animation-wrapper')) {
-      $node = $node.children().first();
-    }
-
-    var m = parseFloat($node.attr('data-level'));
-    if (m <= level) {
-      break;
-    }
+  function addToGroup(nodes){
+        nodes.forEach(function(node){
+          node.group = true;
+          this.one('prepareUpdateItemPath', function(){
+            node.group = false;
+          });
+          if(node.expanded && node.filterAccepted){
+            addToGroup.call(this,node.childNodes);
+          }
+        }.bind(this));
   }
 };
 
@@ -1797,29 +2075,23 @@ scout.Tree.prototype.filter = function() {
     changedNodes = [],
     newHiddenNodes = [];
   // Filter nodes
+  //TODO nbu animation
   this._visitNodes(this.nodes, function(node) {
     var changed = this._applyFiltersForNode(node);
     if (changed) {
       changedNodes.push(node);
       if (!node.filterAccepted) {
         newHiddenNodes.push(node);
-        this._removeFromFlatList(node);
+        this._removeFromFlatList(node, false);
       } else {
-        this._addToVisibleFlatList(node);
+        this._addToVisibleFlatList(node, false);
       }
     }
   }.bind(this));
 
-  if (changedNodes.length === 0) {
-    return;
-  }
-
   //Show / hide rows that changed their state during filtering
   if (this.rendered) {
     useAnimation = changedNodes.length <= this._animationNodeLimit;
-    changedNodes.forEach(function(node) {
-      this._renderNodeFilterAccepted(node, useAnimation);
-    }, this);
   }
 
   this._nodesFiltered(newHiddenNodes);
@@ -1858,55 +2130,90 @@ scout.Tree.prototype._applyFiltersForNode = function(node) {
   return false;
 };
 
-scout.Tree.prototype._insertNodeInDOM = function(node) {
-  var index = this.visibleNodesFlat.indexOf(node);
-  if (index === -1) {
+/**
+ * Just insert node in DOM. NO check if in viewRange
+ */
+scout.Tree.prototype._insertNodeInDOM = function(node, indexHint) {
+  var index = indexHint===undefined ? this.visibleNodesFlat.indexOf(node): indexHint;
+  if (index === -1 || !(this.viewRangeRendered.from + this.viewRangeSize >= index && this.viewRangeRendered.from <= index) || node.rendered) {
     //node is not visible
     return;
   }
   if (!node.$node) {
     this._$buildNode(node);
-    this._decorateNode(node);
   }
+  //TODO nbu check if we can set decoration dirty
+  this._decorateNode(node);
 
   var $node = node.$node;
   if (index === 0) {
-    //add as first node in DOM
-    this.$data.prepend($node);
+    if(this.$fillBefore){
+      added = true;
+      $node.insertAfter(this.$fillBefore);
+    } else {
+      added = true;
+      this.$data.prepend($node);
+    }
   } else {
     //append after index
-    var $nodeBefore = this.visibleNodesFlat[index - 1].$node;
-    if ($nodeBefore) {
-      $node.insertAfter($nodeBefore);
+    var added =false,
+    nodeBefore = this.visibleNodesFlat[index - 1];
+    if (nodeBefore.rendered) {
+      $node.insertAfter(nodeBefore.$node);
+      added = true;
+    } else if (index+1<this.visibleNodesFlat.length){
+      var nodeAfter = this.visibleNodesFlat[index + 1];
+      if(nodeAfter.rendered){
+        added = true;
+        $node.insertBefore(nodeAfter.$node);
+      }
     }
+
+    if(!added && this.$fillBefore){
+      $node.insertAfter(this.$fillBefore);
+    } else if(!added){
+      this.$data.prepend($node);
+    }
+
   }
   node.rendered = true;
 };
 
-scout.Tree.prototype.showNode = function(node, useAnimation) {
+scout.Tree.prototype.showNode = function(node, useAnimation, suppressTreeInvalidation, indexHint) {
+  this._insertNodeInDOM(node, indexHint);
   if (node.rendered) {
     return;
   }
-  this._insertNodeInDOM(node);
-  if (node.$node && !node.$node.is(':animated')) {
+  var $node = node.$node;
+  if ($node.is('.showing')) {
     return;
   }
+  $node.showFast();
+  $node.addClass('showing');
+  $node.removeClass('hiding');
   var that = this;
   if (useAnimation) {
-    node.$node.stop().slideDown({
+    $node.setVisible(false);
+    $node.data('oldStyle', $node.attr('style'));
+    $node.stop().slideDown({
       duration: 250,
       complete: function() {
         that.invalidateLayoutTree();
+        var oldStyle = $node.data('oldStyle');
+        if (oldStyle) {
+          $node.removeData('oldStyle');
+          $node.attrOrRemove('style', oldStyle);
+        }
       }
     });
-  } else {
-    node.$node.showFast();
+  } else if(!suppressTreeInvalidation){
+    this._rerenderViewport();
     that.invalidateLayoutTree();
   }
 
 };
 
-scout.Tree.prototype.hideNode = function(node, useAnimation) {
+scout.Tree.prototype.hideNode = function(node, useAnimation, suppressDetachHandling) {
   var that = this,
     $node = node.$node;
   if (!$node) {
@@ -1914,19 +2221,33 @@ scout.Tree.prototype.hideNode = function(node, useAnimation) {
     return;
   }
 
+  if ($node.is('.hiding')) {
+    return;
+  }
+
+  $node.addClass('hiding');
+  $node.removeClass('showing');
+
   if (useAnimation) {
+    $node.data('oldStyle', $node.attr('style'));
     $node.stop().slideUp({
       duration: 250,
       complete: function() {
         that.invalidateLayoutTree();
         $node.detach();
         node.rendered = false;
+        var oldStyle = $node.data('oldStyle');
+        if (oldStyle) {
+          $node.removeData('oldStyle');
+          $node.attrOrRemove('style', oldStyle);
+        }
       }
     });
-  } else {
+  } else if (!suppressDetachHandling){
     $node.hideFast();
     $node.detach();
     node.rendered = false;
+    this._rerenderViewport();
     that.invalidateLayoutTree();
   }
 };
@@ -2106,15 +2427,14 @@ scout.Tree.prototype._onNodeChanged = function(nodeId, cell) {
 
   if (this._applyFiltersForNode(node)) {
     if (node.filterAccepted) {
-      this._addToVisibleFlatList(node);
+      this._addToVisibleFlatList(node, false);
     } else {
-      this._removeFromFlatList(node);
+      this._removeFromFlatList(node, false);
     }
   }
 
   if (this.rendered) {
     this._decorateNode(node);
-    this._renderNodeFilterAccepted(node);
   }
 
   this.trigger('nodeChanged', {
@@ -2157,18 +2477,13 @@ scout.Tree.prototype._onChildNodeOrderChanged = function(parentNodeId, childNode
     newPositionsMap[childNodeIds[i]] = i;
   }
   parentNode.childNodes.sort(compare.bind(this));
-  this._removeChildsFromFlatList(parentNode);
-  this._addChildsToFlatList(parentNode);
+  this._removeChildsFromFlatList(parentNode, false);
+  this._addChildsToFlatList(parentNode, null, false);
 
   // Render sorted nodes
   if (this.rendered && $lastChildNode) {
     // Find the last affected node DIV
     $lastChildNode = scout.Tree.collectSubtree($lastChildNode).last();
-
-    if (this._$animationWrapper) {
-      // Stop the animation wrapper
-      this._$animationWrapper.stop(false, true);
-    }
 
     // Insert a marker DIV
     var $marker = $lastChildNode.afterDiv();
@@ -2200,6 +2515,8 @@ scout.Tree.prototype._onChildNodeOrderChanged = function(parentNodeId, childNode
     return 0;
   }
 };
+
+
 
 scout.Tree.prototype.onModelAction = function(event) {
   if (event.type === 'nodesInserted') {
