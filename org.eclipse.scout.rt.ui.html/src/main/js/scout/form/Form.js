@@ -154,7 +154,7 @@ scout.Form.prototype._updateTitleForWindow = function() {
 scout.Form.prototype._updateTitleForDom = function() {
   var titleText = this.title;
   if (!titleText && this.closable) {
-    // Add '&nbsp;' to prevent title-box of a closable form from collapsing if title is empty;
+    // Add '&nbsp;' to prevent title-box of a closable form from collapsing if title is empty
     titleText = scout.strings.plainText('&nbsp;');
   }
   if (titleText || this.subTitle) {
