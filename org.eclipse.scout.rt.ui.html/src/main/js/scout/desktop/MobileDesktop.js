@@ -62,7 +62,7 @@ scout.MobileDesktop.prototype._renderNavigation = function() {
     }
   });
   this.navigation.render(this.$container);
-  this.navigation.$container.insertBefore(this.$overlaySeparator);
+  this.navigation.$container.prependTo(this.$container);
 };
 
 scout.MobileDesktop.prototype._renderBench = function() {
@@ -110,7 +110,7 @@ scout.MobileViewTabsController.prototype._removeViewTab = function(viewTab, view
   if (this._viewTabs.length === 0) {
     // Hide bench if no view forms are open -> show navigation
     this._desktop.setNavigationVisible(true);
-    this._desktop.setHeaderVisible(false);
     this._desktop.setBenchVisible(false);
+    this._desktop.setHeaderVisible(false);
   }
 };

@@ -12,9 +12,7 @@
 
 .desktop-header {
   position: absolute;
-  left: 0;
   top: 0;
-  right: 0;
   height: @desktop-header-height;
   background-color: @desktop-header-background-color;
   #scout.vertical-align-helper-after();

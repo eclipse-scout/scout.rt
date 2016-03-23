@@ -15,48 +15,106 @@ scout.DesktopLayout = function(desktop) {
 scout.inherits(scout.DesktopLayout, scout.AbstractLayout);
 
 scout.DesktopLayout.prototype.layout = function($container) {
-  var navigationSize, headerSize, htmlHeader, htmlBench, htmlBenchSize, htmlNavigation,
+  var navigationSize, headerSize, htmlHeader, htmlBench, htmlBenchSize, htmlNavigation, left,
     navigationWidth = 0,
     headerHeight = 0,
-    htmlContainer = this.desktop.htmlComp,
-    containerSize = htmlContainer.getAvailableSize();
+    animated = this.desktop.animateLayoutChange,
+    containerSize = this.containerSize();
 
-  containerSize = containerSize.subtract(htmlContainer.getInsets());
   if (this.desktop.navigation) {
-    navigationWidth = this._calculateNavigationWidth(containerSize);
+    navigationWidth = this.calculateNavigationWidth(containerSize);
     if (this.desktop.splitter) {
       this.desktop.splitter.updatePosition(navigationWidth);
     }
 
-    htmlNavigation = this.desktop.navigation.htmlComp;
-    navigationSize = new scout.Dimension(navigationWidth, containerSize.height)
-      .subtract(htmlNavigation.getMargins());
-    htmlNavigation.setSize(navigationSize);
+    if (this.desktop.navigationVisible) {
+      htmlNavigation = this.desktop.navigation.htmlComp;
+      navigationSize = new scout.Dimension(navigationWidth, containerSize.height)
+        .subtract(htmlNavigation.getMargins());
+      htmlNavigation.setSize(navigationSize);
+    }
   }
 
   if (this.desktop.header) {
-    this.desktop.header.$container.cssLeft(navigationWidth);
+    // positioning
+    if (!animated) {
+      this.desktop.header.$container.cssLeft(navigationWidth);
+    } else {
+      if (this.desktop.headerVisible) {
+        this.desktop.header.$container.cssLeft(containerSize.width);
+        left = navigationWidth;
+      } else {
+        left = containerSize.width;
+      }
+      this.desktop.header.$container.animate({
+        left: left
+      }, {
+        queue: false,
+        complete: this._onBenchAnimationComplete.bind(this)
+      });
+    }
 
+    // sizing
     htmlHeader = this.desktop.header.htmlComp;
     headerHeight = htmlHeader.$comp.outerHeight(true);
-    headerSize = new scout.Dimension(containerSize.width - navigationWidth, headerHeight)
-      .subtract(htmlHeader.getMargins());
-    htmlHeader.setSize(headerSize);
+    if (this.desktop.headerVisible) {
+      headerSize = new scout.Dimension(containerSize.width - navigationWidth, headerHeight)
+        .subtract(htmlHeader.getMargins());
+      htmlHeader.setSize(headerSize);
+    }
   }
 
   if (this.desktop.bench) {
-    this.desktop.bench.$container
-      .cssLeft(navigationWidth)
-      .cssTop(headerHeight);
+    // positioning
+    this.desktop.bench.$container.cssTop(headerHeight);
+    if (!animated) {
+      this.desktop.bench.$container.cssLeft(navigationWidth);
+    } else {
+      if (this.desktop.benchVisible) {
+        this.desktop.bench.$container.cssLeft(containerSize.width);
+        left = navigationWidth;
+      } else {
+        left = containerSize.width;
+      }
+      this.desktop.bench.$container.animate({
+        left: left
+      }, {
+        queue: false,
+        complete: this._onBenchAnimationComplete.bind(this)
+      });
+    }
 
-    htmlBench = this.desktop.bench.htmlComp;
-    htmlBenchSize = new scout.Dimension(containerSize.width - navigationWidth, containerSize.height - headerHeight)
-      .subtract(htmlBench.getMargins());
-    htmlBench.setSize(htmlBenchSize);
+    // sizing
+    if (this.desktop.benchVisible) {
+      htmlBench = this.desktop.bench.htmlComp;
+      htmlBenchSize = new scout.Dimension(containerSize.width - navigationWidth, containerSize.height - headerHeight)
+        .subtract(htmlBench.getMargins());
+      htmlBench.setSize(htmlBenchSize);
+    }
   }
 };
 
-scout.DesktopLayout.prototype._calculateNavigationWidth = function(containerSize) {
+scout.DesktopLayout.prototype._onBenchAnimationComplete = function() {
+  if (!this.desktop.headerVisible) {
+    this.desktop._removeHeader();
+  }
+  if (!this.desktop.navigationVisible) {
+    this.desktop._removeNavigation();
+  }
+  if (!this.desktop.benchVisible) {
+    this.desktop._removeBench();
+  }
+  this.desktop.animateLayoutChange = false;
+};
+
+scout.DesktopLayout.prototype.containerSize = function() {
+  var htmlContainer = this.desktop.htmlComp,
+    containerSize = htmlContainer.getAvailableSize();
+
+  return containerSize.subtract(htmlContainer.getInsets());
+};
+
+scout.DesktopLayout.prototype.calculateNavigationWidth = function(containerSize) {
   if (!this.desktop.navigationVisible) {
     return 0;
   }

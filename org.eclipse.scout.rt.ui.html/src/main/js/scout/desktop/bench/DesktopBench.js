@@ -38,7 +38,6 @@ scout.DesktopBench.prototype._render = function($parent) {
   this.$container = $parent.appendDiv('desktop-bench');
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
   this.htmlComp.setLayout(new scout.DesktopBenchLayout(this));
-  this.htmlComp.pixelBasedSizing = false;
   this.setOutline(this.desktop.outline); //TODO CGU maybe better create destroy(), call setOutline in init and attach outline listener in init/destroy
   this._renderOrAttachOutlineContent();
 

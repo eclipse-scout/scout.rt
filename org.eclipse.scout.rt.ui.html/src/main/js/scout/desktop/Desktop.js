@@ -169,8 +169,11 @@ scout.Desktop.prototype._renderBenchVisible = function() {
   if (this.benchVisible) {
     this._renderBench();
   } else {
-    this._removeBench();
+    if (!this.animateLayoutChange) {
+      this._removeBench();
+    }
   }
+  this.invalidateLayoutTree();
 };
 
 scout.Desktop.prototype._renderNavigation = function() {
@@ -182,7 +185,7 @@ scout.Desktop.prototype._renderNavigation = function() {
     outline: this.outline
   });
   this.navigation.render(this.$container);
-  this.navigation.$container.insertBefore(this.$overlaySeparator);
+  this.navigation.$container.prependTo(this.$container);
 };
 
 scout.Desktop.prototype._removeNavigation = function() {
@@ -197,8 +200,11 @@ scout.Desktop.prototype._renderNavigationVisible = function() {
   if (this.navigationVisible) {
     this._renderNavigation();
   } else {
-    this._removeNavigation();
+    if (!this.animateLayoutChange) {
+      this._removeNavigation();
+    }
   }
+  this.invalidateLayoutTree();
 };
 
 scout.Desktop.prototype._renderHeader = function() {
@@ -224,8 +230,11 @@ scout.Desktop.prototype._renderHeaderVisible = function() {
   if (this.headerVisible) {
     this._renderHeader();
   } else {
-    this._removeHeader();
+    if (!this.animateLayoutChange) {
+      this._removeHeader();
+    }
   }
+  this.invalidateLayoutTree();
 };
 
 scout.Desktop.prototype._renderLogoUrl = function() {
@@ -330,20 +339,31 @@ scout.Desktop.prototype.setOutline = function(outline) {
 };
 
 scout.Desktop.prototype.setNavigationVisible = function(visible) {
+  if (this.navigationVisible === visible) {
+    return;
+  }
   this.navigationVisible = visible;
   if (this.rendered) {
     this._renderNavigationVisible();
+    this.animateLayoutChange = true;
   }
 };
 
 scout.Desktop.prototype.setBenchVisible = function(visible) {
+  if (this.benchVisible === visible) {
+    return;
+  }
   this.benchVisible = visible;
   if (this.rendered) {
     this._renderBenchVisible();
+    this.animateLayoutChange = true;
   }
 };
 
 scout.Desktop.prototype.setHeaderVisible = function(visible) {
+  if (this.headerVisible === visible) {
+    return;
+  }
   this.headerVisible = visible;
   if (this.rendered) {
     this._renderHeaderVisible();

@@ -38,7 +38,6 @@ scout.DesktopHeader.prototype._render = function($parent) {
   this.$container = $parent.appendDiv('desktop-header');
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
   this.htmlComp.setLayout(new scout.DesktopHeaderLayout(this));
-  this.htmlComp.pixelBasedSizing = false;
   this._$viewTabBar = this.$container.appendDiv('desktop-view-tabs');
   this._$toolBar = this.$container.appendDiv('header-tools');
   this._renderToolBarVisible();
