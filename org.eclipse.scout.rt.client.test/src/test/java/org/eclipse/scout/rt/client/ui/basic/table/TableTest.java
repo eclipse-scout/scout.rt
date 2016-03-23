@@ -368,10 +368,33 @@ public class TableTest {
     assertEquals("rows size", 5, rows.size());
     int i = 0;
     assertRowEquals(10, "Lorem", 1, table, rows, i++);
-    assertRowEquals(30, "Ipsum", 1, table, rows, i++);
-    assertRowEquals(25, "Lorem", 1, table, rows, i++);
     assertRowEquals(20, "Ipsum", 1, table, rows, i++);
+    assertRowEquals(25, "Lorem", 1, table, rows, i++);
+    assertRowEquals(30, "Ipsum", 1, table, rows, i++);
     assertRowEquals(1, "A Total", 2, table, rows, i++);
+
+    // remove third column from sorting
+    table.getColumnSet().getColumnByClass(P_Table.ThirdColumn.class).setInitialAlwaysIncludeSortAtBegin(false);
+    table.getColumnSet().getColumnByClass(P_Table.ThirdColumn.class).setInitialSortIndex(-1);
+
+    // add second column to sorting
+    table.getColumnSet().getColumnByClass(P_Table.SecondColumn.class).setInitialSortIndex(0);
+
+    // sortAscending of a column with sortActive = false shouldn't have any effect
+    table.getColumnSet().getColumnByClass(P_Table.FirstColumn.class).setInitialSortAscending(false);
+
+    table.getColumnSet().resetSortingAndGrouping();
+    table.sort();
+
+    // check the sort order of the rows:
+    rows = table.getRows();
+    assertEquals("rows size", 5, rows.size());
+    i = 0;
+    assertRowEquals(1, "A Total", 2, table, rows, i++);
+    assertRowEquals(20, "Ipsum", 1, table, rows, i++);
+    assertRowEquals(30, "Ipsum", 1, table, rows, i++);
+    assertRowEquals(10, "Lorem", 1, table, rows, i++);
+    assertRowEquals(25, "Lorem", 1, table, rows, i++);
   }
 
   @Test

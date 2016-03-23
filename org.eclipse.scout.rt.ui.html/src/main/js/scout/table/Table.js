@@ -585,6 +585,9 @@ scout.Table.prototype._sort = function(animateAggregateRows) {
     return true;
   }
 
+  // add all visible columns as fallback sorting to guarantee same sorting as in Java.
+  sortColumns = scout.arrays.union(sortColumns, this.columns);
+
   this._sortImpl(sortColumns);
   this._filteredRowsDirty = true; // order has been changed
   this._triggerRowOrderChanged();
@@ -616,13 +619,15 @@ scout.Table.prototype._sortImpl = function(sortColumns) {
   function compare(row1, row2) {
     for (var s = 0; s < sortColumns.length; s++) {
       var column = sortColumns[s];
-      var direction = column.sortActive && column.sortAscending ? -1 : 1;
-
       var result = column.compare(row1, row2);
-      if (result < 0) {
-        return direction;
-      } else if (result > 0) {
-        return -1 * direction;
+      if (column.sortActive && !column.sortAscending) {
+        // only consider sortAscending flag when sort is active
+        // columns with !sortActive are always sorted ascending (sortAscending represents last state for those, thus not considered)
+        result = -result;
+      }
+
+      if (result !== 0) {
+        return result;
       }
     }
 

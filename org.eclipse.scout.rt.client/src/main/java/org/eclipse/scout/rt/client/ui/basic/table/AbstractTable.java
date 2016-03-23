@@ -3391,12 +3391,16 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         // This is to support reverse (implicit) sorting of columns, meaning that multiple column sort is done
         // without CTRL-key held. In contrast to explicit multiple column sort, the first clicked column
         // is the least significant sort column.
-        List<IColumn<?>> sortCols = getColumnSet().getSortColumns();
+        LinkedHashSet<IColumn<?>> sortCols = new LinkedHashSet<>(getColumnSet().getSortColumns());
         if (!sortCols.isEmpty() && !getRows().isEmpty()) {
+          // add all visible columns (not already added, thus LinkedHashSet)
+          // as fallback sorting to guarantee same sorting as in JS.
+          sortCols.addAll(getColumnSet().getVisibleColumns());
+
           // first make sure decorations and lookups are up-to-date
           processDecorationBuffer();
           List<ITableRow> a = new ArrayList<ITableRow>(getRows());
-          Collections.sort(a, new TableRowComparator(sortCols));
+          Collections.sort(a, new TableRowComparator(new ArrayList<>(sortCols)));
           sortInternal(a);
         }
       }
