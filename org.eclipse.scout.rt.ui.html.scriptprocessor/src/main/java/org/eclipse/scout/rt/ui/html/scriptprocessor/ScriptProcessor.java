@@ -57,7 +57,7 @@ public class ScriptProcessor implements AutoCloseable {
   }
 
   public String compileCss(String content) throws IOException {
-    return runInClassLoader(m_lessLoader, CompileCssWithLess.class.getName(), content);
+    return runInClassLoader(m_lessLoader, CompileCssWithLess.class.getName(), new Class[]{String.class}, new Object[]{content});
   }
 
   public String compileJs(String content) throws IOException {
@@ -79,7 +79,7 @@ public class ScriptProcessor implements AutoCloseable {
     sb = null; // free memory early
 
     // 2. Run YUI compressor
-    content = runInClassLoader(m_yuiLoader, MinifyCssWithYui.class.getName(), content);
+    content = runInClassLoader(m_yuiLoader, MinifyCssWithYui.class.getName(), new Class[]{String.class}, new Object[]{content});
 
     // 3. Restore protected whitespace
     content = content.replaceAll("___YUICSSMIN_SPACE_IN_CALC___", " ");
@@ -88,15 +88,19 @@ public class ScriptProcessor implements AutoCloseable {
   }
 
   public String minifyJs(String content) throws IOException {
-    return runInClassLoader(m_yuiLoader, MinifyJsWithYui.class.getName(), content);
+    return runInClassLoader(m_yuiLoader, MinifyJsWithYui.class.getName(), new Class[]{String.class, boolean.class}, new Object[]{content, obfuscateJS()});
   }
 
-  protected String runInClassLoader(ClassLoader loader, String classname, String arg0) throws IOException {
+  protected boolean obfuscateJS() {
+    return false;
+  }
+
+  protected String runInClassLoader(ClassLoader loader, String classname, Class<?>[] types, Object[] args) throws IOException {
     try {
       Class<?> c = loader.loadClass(classname);
       Object o = c.newInstance();
-      Method m = c.getMethod("run", String.class);
-      Object result = m.invoke(o, arg0);
+      Method m = c.getMethod("run", types);
+      Object result = m.invoke(o, args);
       return (String) result;
     }
     catch (InvocationTargetException e0) {
