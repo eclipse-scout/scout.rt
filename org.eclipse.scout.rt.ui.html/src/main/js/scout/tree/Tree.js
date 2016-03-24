@@ -817,7 +817,7 @@ scout.Tree.prototype.setDisplayStyle = function(displayStyle, notifyServer) {
   this.displayStyle = displayStyle;
   notifyServer = scout.nvl(notifyServer, true);
   if (notifyServer) {
-    this._sendDisplayStyleChange();
+    this._sendProperty('displayStyle');
   }
 
   if (displayStyle && this.selectedNodes.length > 0) {
@@ -1324,12 +1324,6 @@ scout.Tree.prototype._sendNodesChecked = function(nodes) {
   }
 
   this._send('nodesChecked', data);
-};
-
-scout.Tree.prototype._sendDisplayStyleChange = function() {
-  this._send('displayStyle', {
-    displayStyle: this.displayStyle
-  });
 };
 
 scout.Tree.prototype._triggerNodesSelected = function(debounce) {

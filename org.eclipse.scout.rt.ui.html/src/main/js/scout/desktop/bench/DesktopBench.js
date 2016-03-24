@@ -73,6 +73,7 @@ scout.DesktopBench.prototype._renderOutlineContent = function() {
   }
   this.outlineContent.render(this.$container);
   this.outlineContent.htmlComp.validateRoot = true;
+  this.outlineContent.setParent(this);
   this.outlineContent.invalidateLayoutTree(false);
 
   // Layout immediate to prevent 'laggy' form visualization,

@@ -15,83 +15,114 @@ scout.DesktopLayout = function(desktop) {
 scout.inherits(scout.DesktopLayout, scout.AbstractLayout);
 
 scout.DesktopLayout.prototype.layout = function($container) {
-  var navigationSize, headerSize, htmlHeader, htmlBench, htmlBenchSize, htmlNavigation, left,
+  var navigationSize, headerSize, htmlHeader, htmlBench, benchSize, htmlNavigation, animationProps,
     navigationWidth = 0,
     headerHeight = 0,
+    navigation = this.desktop.navigation,
+    header = this.desktop.header,
+    bench = this.desktop.bench,
+    // Animation moves header and bench to the left when navigation gets invisible or moves bench to the right if bench gets invisible (used for mobile)
     animated = this.desktop.animateLayoutChange,
-    containerSize = this.containerSize();
+    containerSize = this.containerSize(),
+    fullWidthNavigation = navigation && navigation.htmlComp.layoutData.fullWidth;
 
-  if (this.desktop.navigation) {
+  if (navigation) {
     navigationWidth = this.calculateNavigationWidth(containerSize);
     if (this.desktop.splitter) {
       this.desktop.splitter.updatePosition(navigationWidth);
     }
 
     if (this.desktop.navigationVisible) {
-      htmlNavigation = this.desktop.navigation.htmlComp;
+      htmlNavigation = navigation.htmlComp;
       navigationSize = new scout.Dimension(navigationWidth, containerSize.height)
         .subtract(htmlNavigation.getMargins());
       htmlNavigation.setSize(navigationSize);
     }
   }
 
-  if (this.desktop.header) {
-    // positioning
-    if (!animated) {
-      this.desktop.header.$container.cssLeft(navigationWidth);
-    } else {
-      if (this.desktop.headerVisible) {
-        this.desktop.header.$container.cssLeft(containerSize.width);
-        left = navigationWidth;
-      } else {
-        left = containerSize.width;
-      }
-      this.desktop.header.$container.animate({
-        left: left
-      }, {
-        queue: false,
-        complete: this.desktop.onLayoutAnimationComplete.bind(this.desktop)
-      });
-    }
-
-    // sizing
-    htmlHeader = this.desktop.header.htmlComp;
+  if (header) {
+    htmlHeader = header.htmlComp;
     headerHeight = htmlHeader.$comp.outerHeight(true);
     if (this.desktop.headerVisible) {
+      // positioning
+      if (!animated) {
+        header.$container.cssLeft(navigationWidth);
+      }
+
+      // sizing
       headerSize = new scout.Dimension(containerSize.width - navigationWidth, headerHeight)
         .subtract(htmlHeader.getMargins());
-      htmlHeader.setSize(headerSize);
-    }
-  }
-
-  if (this.desktop.bench) {
-    // positioning
-    this.desktop.bench.$container.cssTop(headerHeight);
-    if (!animated) {
-      this.desktop.bench.$container.cssLeft(navigationWidth);
-    } else {
-      if (this.desktop.benchVisible) {
-        this.desktop.bench.$container.cssLeft(containerSize.width);
-        left = navigationWidth;
-      } else {
-        left = containerSize.width;
+      if (!animated || fullWidthNavigation) {
+        htmlHeader.setSize(headerSize);
       }
-      this.desktop.bench.$container.animate({
-        left: left
-      }, {
-        queue: false,
-        complete: this.desktop.onLayoutAnimationComplete.bind(this.desktop)
-      });
     }
 
-    // sizing
-    if (this.desktop.benchVisible) {
-      htmlBench = this.desktop.bench.htmlComp;
-      htmlBenchSize = new scout.Dimension(containerSize.width - navigationWidth, containerSize.height - headerHeight)
-        .subtract(htmlBench.getMargins());
-      htmlBench.setSize(htmlBenchSize);
+    if (animated) {
+      animationProps = {
+        left: containerSize.width
+      };
+      if (this.desktop.headerVisible) {
+        prepareAnimate(animationProps, htmlHeader, headerSize);
+      }
+      this._animate(animationProps, htmlHeader, headerSize);
     }
   }
+
+  if (bench) {
+    htmlBench = bench.htmlComp;
+    if (this.desktop.benchVisible) {
+      // positioning
+      bench.$container.cssTop(headerHeight);
+      if (!animated) {
+        bench.$container.cssLeft(navigationWidth);
+      }
+
+      // sizing
+      benchSize = new scout.Dimension(containerSize.width - navigationWidth, containerSize.height - headerHeight)
+        .subtract(htmlBench.getMargins());
+      if (!animated || fullWidthNavigation) {
+        htmlBench.setSize(benchSize);
+      }
+    }
+
+    if (animated) {
+      animationProps = {
+        left: containerSize.width
+      };
+      if (this.desktop.benchVisible) {
+        prepareAnimate(animationProps, htmlBench, benchSize);
+      }
+      this._animate(animationProps, htmlBench, benchSize);
+    }
+  }
+
+  function prepareAnimate (animationProps, htmlComp, size) {
+    if (fullWidthNavigation) {
+      // Slide bench in from right to left, don't resize
+      htmlComp.$comp.cssLeft(containerSize.width);
+    } else {
+      // Resize bench
+      animationProps.width = size.width;
+    }
+    // Move to new point (=0, if navigation is invisible)
+    animationProps.left = navigationWidth;
+  }
+};
+
+/**
+ * Used to animate bench and header
+ */
+scout.DesktopLayout.prototype._animate = function(animationProps, htmlComp, size) {
+  htmlComp.$comp.animate(animationProps, {
+    queue: false,
+    step: function(now, tween) {
+      if (tween.prop === 'width') {
+        size.width = tween.now;
+        htmlComp.setSize(size);
+      }
+    },
+    complete: this.desktop.onLayoutAnimationComplete.bind(this.desktop)
+  });
 };
 
 scout.DesktopLayout.prototype.containerSize = function() {

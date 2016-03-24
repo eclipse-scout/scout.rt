@@ -8,12 +8,14 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
+/* global OutlineSpecHelper */
 describe('Desktop', function() {
-  var session, desktop;
+  var session, desktop, outlineHelper;
 
   beforeEach(function() {
     setFixtures(sandbox());
-    session = sandboxSession();
+    session = sandboxSession({desktop: {navigationVisible: true, headerVisible: true, benchVisible: true}});
+    outlineHelper = new OutlineSpecHelper(session);
     desktop = session.desktop;
     desktop.viewButtons = [];
   });
@@ -82,6 +84,103 @@ describe('Desktop', function() {
       expect(desktop.$container.find('.notifications').length).toBe(0);
       expect(desktop.$notifications).toBe(null);
     });
+  });
+
+  describe('outline', function() {
+    it('gets displayed in desktop navigation ', function() {
+      var model = outlineHelper.createModelFixture(3, 2);
+      var outline = outlineHelper.createOutline(model);
+
+      expect(desktop.outline.nullOutline).toBe(true);
+      expect(outline.rendered).toBe(false);
+
+      desktop.setOutline(outline);
+      expect(desktop.outline).toBe(outline);
+      expect(outline.rendered).toBe(true);
+      expect(outline.$container.parent()[0]).toBe(desktop.navigation.$body[0]);
+    });
+
+  });
+
+  describe('benchVisible', function() {
+    it('controls visibility of the bench', function() {
+      expect(desktop.benchVisible).toBe(true);
+      expect(desktop.bench.rendered).toBe(true);
+
+      desktop.setBenchVisible(false);
+      expect(desktop.benchVisible).toBe(false);
+      // Force removal of bench
+      desktop.onLayoutAnimationComplete();
+      expect(desktop.bench).toBeFalsy();
+
+      desktop.setBenchVisible(true);
+      expect(desktop.benchVisible).toBe(true);
+      expect(desktop.bench.rendered).toBe(true);
+    });
+
+  });
+
+  describe('navigationVisible', function() {
+    it('controls visibility of the navigation', function() {
+      expect(desktop.navigationVisible).toBe(true);
+      expect(desktop.navigation.rendered).toBe(true);
+
+      desktop.setNavigationVisible(false);
+      // Force removal of navigation
+      desktop.onLayoutAnimationComplete();
+      expect(desktop.navigationVisible).toBe(false);
+      expect(desktop.navigation).toBeFalsy();
+
+      desktop.setNavigationVisible(true);
+      expect(desktop.navigationVisible).toBe(true);
+      expect(desktop.navigation.rendered).toBe(true);
+    });
+
+    it('only affects content in navigation, not in bench or header', function() {
+      var outline = outlineHelper.createOutlineWithOneDetailForm();
+      var detailForm = outline.nodes[0].detailForm;
+      // because outline is the owner, it is parent as well if created by server -> simulate this
+      detailForm.setParent(outline);
+
+      desktop.setOutline(outline);
+      outline.selectNodes(outline.nodes[0]);
+
+      expect(desktop.navigationVisible).toBe(true);
+      expect(desktop.navigation.rendered).toBe(true);
+      expect(outline.rendered).toBe(true);
+      expect(outline.$container.parent()[0]).toBe(desktop.navigation.$body[0]);
+      expect(detailForm.rendered).toBe(true);
+      expect(detailForm.$container.parent()[0]).toBe(desktop.bench.$container[0]);
+
+      // Outline is not visible anymore, but detail form is
+      desktop.setNavigationVisible(false);
+      // Force removal of navigation
+      desktop.onLayoutAnimationComplete();
+      expect(desktop.navigationVisible).toBe(false);
+      expect(desktop.navigation).toBeFalsy();
+      expect(outline.rendered).toBe(false);
+      expect(detailForm.rendered).toBe(true);
+      expect(detailForm.$container.parent()[0]).toBe(desktop.bench.$container[0]);
+    });
+
+  });
+
+  describe('headerVisible', function() {
+    it('controls visibility of the header', function() {
+      expect(desktop.headerVisible).toBe(true);
+      expect(desktop.header.rendered).toBe(true);
+
+      desktop.setHeaderVisible(false);
+      // Force removal of header
+      desktop.onLayoutAnimationComplete();
+      expect(desktop.headerVisible).toBe(false);
+      expect(desktop.header).toBeFalsy();
+
+      desktop.setHeaderVisible(true);
+      expect(desktop.headerVisible).toBe(true);
+      expect(desktop.header.rendered).toBe(true);
+    });
+
   });
 
 });

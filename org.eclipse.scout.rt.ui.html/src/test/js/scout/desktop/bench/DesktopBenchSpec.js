@@ -8,17 +8,20 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-/* global OutlineSpecHelper */
-describe("DesktopBenchSpec", function() {
-  var helper;
+/* global OutlineSpecHelper, FormSpecHelper */
+describe("DesktopBench", function() {
+  var helper, session, desktop, formHelper;
 
   beforeEach(function() {
     setFixtures(sandbox());
-    helper = new OutlineSpecHelper(sandboxSession({
+    session = sandboxSession({
       desktop: {
         benchVisible: true
       }
-    }));
+    });
+    desktop = session.desktop;
+    helper = new OutlineSpecHelper(session);
+    formHelper = new FormSpecHelper(session);
     jasmine.Ajax.install();
     jasmine.clock().install();
   });
@@ -29,13 +32,14 @@ describe("DesktopBenchSpec", function() {
   });
 
   describe("updateOutlineContent", function() {
-    var outline, bench, model, node, desktop;
+    var outline, bench, model, node;
 
     beforeEach(function() {
       model = helper.createModelFixture(3, 2, true);
       outline = helper.createOutline(model);
       node = model.nodes[0];
-      desktop = helper.session.desktop;
+      node.detailForm = formHelper.createFormWithOneField();
+      node.detailFormVisible = true;
       bench = desktop.bench;
       desktop.setOutline(outline);
     });
@@ -59,6 +63,21 @@ describe("DesktopBenchSpec", function() {
 
       outline.selectNodes([]);
       expect(bench.updateOutlineContent.calls.count()).toEqual(2);
+    });
+
+    it("sets detailForm as outlineContent if node gets selected", function() {
+      // node 0 has a detail form
+      outline.selectNodes(outline.nodes[1]);
+      expect(outline.selectedNodes[0].detailForm).toBeFalsy();
+      expect(bench.outlineContent).toBeFalsy();
+
+      outline.selectNodes(outline.nodes[0]);
+      expect(outline.selectedNodes[0].detailForm).toBeTruthy();
+      expect(bench.outlineContent).toBe(outline.selectedNodes[0].detailForm);
+
+      outline.selectNodes(outline.nodes[1]);
+      expect(outline.selectedNodes[0].detailForm).toBeFalsy();
+      expect(bench.outlineContent).toBeFalsy();
     });
   });
 

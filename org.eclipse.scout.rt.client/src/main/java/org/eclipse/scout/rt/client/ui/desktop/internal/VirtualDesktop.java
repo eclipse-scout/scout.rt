@@ -735,4 +735,31 @@ public class VirtualDesktop implements IDesktop {
   public void setBrowserHistoryEntry(BrowserHistoryEntry browserHistory) {
   }
 
+  @Override
+  public void setNavigationVisible(boolean visible) {
+  }
+
+  @Override
+  public boolean isNavigationVisible() {
+    return false;
+  }
+
+  @Override
+  public void setBenchVisible(boolean visible) {
+  }
+
+  @Override
+  public boolean isBenchVisible() {
+    return false;
+  }
+
+  @Override
+  public void setHeaderVisible(boolean visible) {
+  }
+
+  @Override
+  public boolean isHeaderVisible() {
+    return false;
+  }
+
 }

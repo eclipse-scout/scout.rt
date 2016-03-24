@@ -108,15 +108,42 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
     else if (EVENT_HISTORY_ENTRY_ACTIVATED.equals(event.getType())) {
       handleUiHistoryEntryActivated(event);
     }
+    else if (IDesktop.PROP_NAVIGATION_VISIBLE.equals(event.getType())) {
+      handleUiFormActivated(event);
+    }
+    else if (IDesktop.PROP_BENCH_VISIBLE.equals(event.getType())) {
+      handleUiFormActivated(event);
+    }
+    else if (IDesktop.PROP_HEADER_VISIBLE.equals(event.getType())) {
+      handleUiFormActivated(event);
+    }
     else {
       super.handleUiEvent(event);
     }
   }
 
-  private void handleUiHistoryEntryActivated(JsonEvent event) {
+  protected void handleUiHistoryEntryActivated(JsonEvent event) {
     addPropertyEventFilterCondition(m_browserHistoryFilter);
     String deepLinkPath = event.getData().optString("deepLinkPath");
     getModel().getUIFacade().historyEntryActivatedFromUI(deepLinkPath);
+  }
+
+  protected void handleUiNavigationVisible(JsonEvent event) {
+    boolean visible = event.getData().getBoolean(IAction.PROP_SELECTED);
+    addPropertyEventFilterCondition(IDesktop.PROP_NAVIGATION_VISIBLE, visible);
+    getModel().getUIFacade().setNavigationVisibleFromUI(visible);
+  }
+
+  protected void handleUiBenchVisible(JsonEvent event) {
+    boolean visible = event.getData().getBoolean(IAction.PROP_SELECTED);
+    addPropertyEventFilterCondition(IDesktop.PROP_BENCH_VISIBLE, visible);
+    getModel().getUIFacade().setBenchVisibleFromUI(visible);
+  }
+
+  protected void handleUiHeaderVisible(JsonEvent event) {
+    boolean visible = event.getData().getBoolean(IAction.PROP_SELECTED);
+    addPropertyEventFilterCondition(IDesktop.PROP_HEADER_VISIBLE, visible);
+    getModel().getUIFacade().setHeaderVisibleFromUI(visible);
   }
 
   protected void handleUiFormActivated(JsonEvent event) {
@@ -237,6 +264,24 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
       @Override
       public String jsonPropertyName() {
         return "logoUrl";
+      }
+    });
+    putJsonProperty(new JsonProperty<DESKTOP>(IDesktop.PROP_NAVIGATION_VISIBLE, model) {
+      @Override
+      protected Object modelValue() {
+        return getModel().isNavigationVisible();
+      }
+    });
+    putJsonProperty(new JsonProperty<DESKTOP>(IDesktop.PROP_BENCH_VISIBLE, model) {
+      @Override
+      protected Object modelValue() {
+        return getModel().isBenchVisible();
+      }
+    });
+    putJsonProperty(new JsonProperty<DESKTOP>(IDesktop.PROP_HEADER_VISIBLE, model) {
+      @Override
+      protected Object modelValue() {
+        return getModel().isHeaderVisible();
       }
     });
   }

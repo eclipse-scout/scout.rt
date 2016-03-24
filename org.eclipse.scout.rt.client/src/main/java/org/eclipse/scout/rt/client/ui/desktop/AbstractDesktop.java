@@ -294,6 +294,24 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     return true;
   }
 
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(70)
+  protected boolean getConfiguredNavigationVisible() {
+    return true;
+  }
+
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(80)
+  protected boolean getConfiguredHeaderVisible() {
+    return true;
+  }
+
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(90)
+  protected boolean getConfiguredBenchVisible() {
+    return true;
+  }
+
   private List<Class<? extends IAction>> getConfiguredActions() {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
     List<Class<IAction>> fca = ConfigurationUtility.filterClasses(dca, IAction.class);
@@ -510,8 +528,11 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     setTitle(getConfiguredTitle());
     setSelectViewTabsKeyStrokesEnabled(getConfiguredSelectViewTabsKeyStrokesEnabled());
     setSelectViewTabsKeyStrokeModifier(getConfiguredSelectViewTabsKeyStrokeModifier());
-    setDesktopStyle(getConfiguredDesktopStyle());
     setLogoId(getConfiguredLogoId());
+    setNavigationVisible(getConfiguredNavigationVisible());
+    setBenchVisible(getConfiguredBenchVisible());
+    setHeaderVisible(getConfiguredHeaderVisible());
+    setDesktopStyle(getConfiguredDesktopStyle());
     setCacheSplitterPosition(getConfiguredCacheSplitterPosition());
     List<IDesktopExtension> extensions = getDesktopExtensions();
     m_contributionHolder = new ContributionComposite(this);
@@ -555,7 +576,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
         menus.addOrdered(menu);
       }
     }
-//    menus.addAllOrdered(allMenus);
     new MoveActionNodesHandler<IMenu>(menus).moveModelObjects();
     m_menus = menus.getOrderedList();
 
@@ -591,6 +611,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
         LOG.error("Could not init outline {}", o, e);
       }
     }
+    addPropertyChangeListener(new P_LocalPropertyChangeListener());
   }
 
   protected final void interceptInit() {
@@ -647,6 +668,11 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
       ActionUtility.initActions(getToolButtons());
       ActionUtility.initActions(getViewButtons());
     }
+  }
+
+  protected void initDesktopStyle(DesktopStyle style) {
+    setNavigationVisible(DesktopStyle.DEFAULT.equals(style));
+    setHeaderVisible(DesktopStyle.DEFAULT.equals(style));
   }
 
   @Override
@@ -2030,6 +2056,36 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     m_isForcedClosing = forcedClosing;
   }
 
+  @Override
+  public void setNavigationVisible(boolean visible) {
+    propertySupport.setProperty(PROP_NAVIGATION_VISIBLE, visible);
+  }
+
+  @Override
+  public boolean isNavigationVisible() {
+    return (boolean) propertySupport.getProperty(PROP_NAVIGATION_VISIBLE);
+  }
+
+  @Override
+  public void setBenchVisible(boolean visible) {
+    propertySupport.setProperty(PROP_BENCH_VISIBLE, visible);
+  }
+
+  @Override
+  public boolean isBenchVisible() {
+    return (boolean) propertySupport.getProperty(PROP_BENCH_VISIBLE);
+  }
+
+  @Override
+  public void setHeaderVisible(boolean visible) {
+    propertySupport.setProperty(PROP_HEADER_VISIBLE, visible);
+  }
+
+  @Override
+  public boolean isHeaderVisible() {
+    return (boolean) propertySupport.getProperty(PROP_HEADER_VISIBLE);
+  }
+
   /**
    * local desktop extension that calls local exec methods and returns local contributions in this class itself
    */
@@ -2187,6 +2243,21 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
         setOpenedInternal(false);
       }
       ClientSessionProvider.currentSession().stop();
+    }
+
+    @Override
+    public void setNavigationVisibleFromUI(boolean visible) {
+      setNavigationVisible(visible);
+    }
+
+    @Override
+    public void setHeaderVisibleFromUI(boolean visible) {
+      setHeaderVisible(visible);
+    }
+
+    @Override
+    public void setBenchVisibleFromUI(boolean visible) {
+      setBenchVisible(visible);
     }
   }
 
@@ -2451,4 +2522,14 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     chain.execDefaultView();
   }
 
+  protected class P_LocalPropertyChangeListener implements PropertyChangeListener {
+
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+      if (evt.getPropertyName() == PROP_DESKTOP_STYLE) {
+        initDesktopStyle((DesktopStyle) evt.getNewValue());
+      }
+    }
+
+  }
 }

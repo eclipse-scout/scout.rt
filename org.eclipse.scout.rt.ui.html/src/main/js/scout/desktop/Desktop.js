@@ -47,9 +47,6 @@ scout.Desktop.prototype._init = function(model) {
   this._addNullOutline(model.outline);
   this._resizeHandler = this.onResize.bind(this);
   this._popstateHandler = this.onPopstate.bind(this);
-  this.navigationVisible = scout.nvl(model.navigationVisible, this.desktopStyle === scout.DesktopStyle.DEFAULT);
-  this.headerVisible = scout.nvl(model.headerVisible, this.desktopStyle === scout.DesktopStyle.DEFAULT);
-  this.benchVisible = scout.nvl(model.benchVisible, true);
 };
 
 scout.Desktop.prototype._initKeyStrokeContext = function(keyStrokeContext) {
@@ -170,6 +167,7 @@ scout.Desktop.prototype._removeBench = function() {
 
 scout.Desktop.prototype._renderBenchVisible = function() {
   var benchClone;
+  this.animateLayoutChange = this.rendered;
   if (this.benchVisible) {
     this._renderBench();
   } else {
@@ -212,6 +210,7 @@ scout.Desktop.prototype._removeNavigation = function() {
 };
 
 scout.Desktop.prototype._renderNavigationVisible = function() {
+  this.animateLayoutChange = this.rendered;
   if (this.navigationVisible) {
     this._renderNavigation();
   } else {
@@ -369,10 +368,10 @@ scout.Desktop.prototype.setNavigationVisible = function(visible) {
   if (this.navigationVisible === visible) {
     return;
   }
-  this.navigationVisible = visible;
+  this._setProperty('navigationVisible', visible);
+  this._sendProperty('navigationVisible');
   if (this.rendered) {
     this._renderNavigationVisible();
-    this.animateLayoutChange = true;
   }
 };
 
@@ -380,10 +379,10 @@ scout.Desktop.prototype.setBenchVisible = function(visible) {
   if (this.benchVisible === visible) {
     return;
   }
-  this.benchVisible = visible;
+  this._setProperty('benchVisible', visible);
+  this._sendProperty('benchVisible');
   if (this.rendered) {
     this._renderBenchVisible();
-    this.animateLayoutChange = true;
   }
 };
 
@@ -391,7 +390,8 @@ scout.Desktop.prototype.setHeaderVisible = function(visible) {
   if (this.headerVisible === visible) {
     return;
   }
-  this.headerVisible = visible;
+  this._setProperty('headerVisible', visible);
+  this._sendProperty('headerVisible');
   if (this.rendered) {
     this._renderHeaderVisible();
   }
@@ -578,7 +578,8 @@ scout.Desktop.prototype._addNullOutline = function(outline) {
     return;
   }
   var nullOutline = scout.create('Outline', {
-      parent: this
+      parent: this,
+      nullOutline: true
     }),
     ovb = scout.create('OutlineViewButton', {
       parent: this,

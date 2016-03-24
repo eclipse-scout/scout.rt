@@ -113,6 +113,12 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent {
 
   String PROP_BROWSER_HISTORY_ENTRY = "browserHistoryEntry";
 
+  String PROP_NAVIGATION_VISIBLE = "navigationVisible";
+
+  String PROP_HEADER_VISIBLE = "headerVisible";
+
+  String PROP_BENCH_VISIBLE = "benchVisible";
+
   public enum DesktopStyle {
     /**
      * Default desktop style with header, navigation (tree) and bench (forms).
@@ -821,5 +827,35 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent {
    * @since 6.0
    */
   void setBrowserHistoryEntry(BrowserHistoryEntry browserHistory);
+
+  /**
+   * @since 6.0
+   */
+  void setNavigationVisible(boolean visible);
+
+  /**
+   * @since 6.0
+   */
+  boolean isNavigationVisible();
+
+  /**
+   * @since 6.0
+   */
+  void setBenchVisible(boolean visible);
+
+  /**
+   * @since 6.0
+   */
+  boolean isBenchVisible();
+
+  /**
+   * @since 6.0
+   */
+  void setHeaderVisible(boolean visible);
+
+  /**
+   * @since 6.0
+   */
+  boolean isHeaderVisible();
 
 }

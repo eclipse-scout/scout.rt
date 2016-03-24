@@ -8,6 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
+/* global FormSpecHelper */
 var OutlineSpecHelper = function(session) {
   this.session = session;
 };
@@ -65,4 +66,16 @@ OutlineSpecHelper.prototype.createOutline = function(model) {
   var tree = new scout.Outline();
   tree.init(model);
   return tree;
+};
+
+/**
+ * Creates an outline with 3 nodes, the first node has a visible detail form
+ */
+OutlineSpecHelper.prototype.createOutlineWithOneDetailForm = function() {
+  var model = this.createModelFixture(3, 2, true);
+  var outline = this.createOutline(model);
+  var node = model.nodes[0];
+  node.detailForm = new FormSpecHelper(this.session).createFormWithOneField();
+  node.detailFormVisible = true;
+  return outline;
 };

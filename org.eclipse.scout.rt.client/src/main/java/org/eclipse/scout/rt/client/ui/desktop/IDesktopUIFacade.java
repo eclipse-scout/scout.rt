@@ -65,4 +65,9 @@ public interface IDesktopUIFacade {
    */
   void historyEntryActivatedFromUI(String deepLinkPath);
 
+  void setNavigationVisibleFromUI(boolean visible);
+
+  void setHeaderVisibleFromUI(boolean visible);
+
+  void setBenchVisibleFromUI(boolean visible);
 }

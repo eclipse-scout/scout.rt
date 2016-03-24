@@ -115,6 +115,15 @@ scout.ModelAdapter.prototype._send = function(type, data, delay, coalesceFunc) {
   this.trigger('send', event);
 };
 
+/**
+ * Sends the current state of the given property to the server.
+ */
+scout.ModelAdapter.prototype._sendProperty = function(propertyName) {
+  var data = {};
+  data[propertyName] = this[propertyName];
+  this._send(propertyName, data);
+};
+
 scout.ModelAdapter.prototype.render = function($parent) {
   scout.ModelAdapter.parent.prototype.render.call(this, $parent);
   if (this.session.offline) {
