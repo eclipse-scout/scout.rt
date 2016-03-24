@@ -19,15 +19,14 @@ import javax.servlet.http.HttpServletRequest;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.resource.BinaryResources;
+import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheControl;
+import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheKey;
+import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheObject;
 import org.eclipse.scout.rt.ui.html.UiThemeUtility;
-import org.eclipse.scout.rt.ui.html.cache.HttpCacheKey;
-import org.eclipse.scout.rt.ui.html.cache.HttpCacheObject;
-import org.eclipse.scout.rt.ui.html.cache.IHttpCacheControl;
 import org.eclipse.scout.rt.ui.html.res.IWebContentService;
 import org.eclipse.scout.rt.ui.html.script.ScriptFileBuilder;
 import org.eclipse.scout.rt.ui.html.script.ScriptOutput;
 import org.eclipse.scout.rt.ui.html.script.ScriptSource.FileType;
-import org.eclipse.scout.rt.ui.html.scriptprocessor.ScriptProcessor;
 
 /**
  * This class loads and parses CSS and JS files from WebContent/ folder.
@@ -35,11 +34,8 @@ import org.eclipse.scout.rt.ui.html.scriptprocessor.ScriptProcessor;
 public class ScriptFileLoader extends AbstractResourceLoader {
   private static final String THEME_KEY = "ui.theme";
 
-  private ScriptProcessor m_scriptProcessor;
-
-  public ScriptFileLoader(HttpServletRequest req, ScriptProcessor scriptProcessor) {
+  public ScriptFileLoader(HttpServletRequest req) {
     super(req);
-    m_scriptProcessor = scriptProcessor;
   }
 
   @Override
@@ -56,7 +52,7 @@ public class ScriptFileLoader extends AbstractResourceLoader {
 
   @Override
   public HttpCacheObject loadResource(HttpCacheKey cacheKey) throws IOException {
-    ScriptFileBuilder builder = new ScriptFileBuilder(BEANS.get(IWebContentService.class), m_scriptProcessor);
+    ScriptFileBuilder builder = new ScriptFileBuilder(BEANS.get(IWebContentService.class));
     builder.setMinifyEnabled(isMinify());
     builder.setTheme(getTheme(cacheKey));
     String resourcePath = cacheKey.getResourcePath();
@@ -68,7 +64,7 @@ public class ScriptFileLoader extends AbstractResourceLoader {
           .withContent(out.getContent())
           .withLastModified(out.getLastModified())
           .withCachingAllowed(true)
-          .withCacheMaxAge(IHttpCacheControl.MAX_AGE_ONE_YEAR)
+          .withCacheMaxAge(HttpCacheControl.MAX_AGE_ONE_YEAR)
           .build();
 
       return new HttpCacheObject(cacheKey, content);

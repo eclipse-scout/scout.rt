@@ -22,13 +22,13 @@ import javax.servlet.http.HttpServletResponse;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
+import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheKey;
+import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheObject;
+import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheControl;
 import org.eclipse.scout.rt.ui.html.AbstractUiServletRequestHandler;
 import org.eclipse.scout.rt.ui.html.UiServlet;
-import org.eclipse.scout.rt.ui.html.cache.HttpCacheKey;
-import org.eclipse.scout.rt.ui.html.cache.HttpCacheObject;
-import org.eclipse.scout.rt.ui.html.cache.IHttpCacheControl;
 import org.eclipse.scout.rt.ui.html.res.loader.IResourceLoader;
-import org.eclipse.scout.rt.ui.html.res.loader.IResourceLoaderFactory;
+import org.eclipse.scout.rt.ui.html.res.loader.ResourceLoaders;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,8 +45,8 @@ public class ResourceRequestHandler extends AbstractUiServletRequestHandler {
   public static final String MOBILE_INDEX_HTML = "/index-mobile.html";
 
   // Remember bean instances to save lookups on each GET request
-  private final List<IResourceLoaderFactory> m_resourceLoaderFactoryList = Collections.unmodifiableList(BEANS.all(IResourceLoaderFactory.class));
-  private final IHttpCacheControl m_httpCacheControl = BEANS.get(IHttpCacheControl.class);
+  private final List<ResourceLoaders> m_resourceLoaderFactoryList = Collections.unmodifiableList(BEANS.all(ResourceLoaders.class));
+  private final HttpCacheControl m_httpCacheControl = BEANS.get(HttpCacheControl.class);
 
   @Override
   public boolean handleGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -54,8 +54,8 @@ public class ResourceRequestHandler extends AbstractUiServletRequestHandler {
 
     // Create loader for the requested resource type
     IResourceLoader resourceLoader = null;
-    for (IResourceLoaderFactory f : m_resourceLoaderFactoryList) {
-      resourceLoader = f.createResourceLoader(req, pathInfoEx);
+    for (ResourceLoaders f : m_resourceLoaderFactoryList) {
+      resourceLoader = f.create(req, pathInfoEx);
       if (resourceLoader != null) {
         break;
       }
@@ -123,11 +123,11 @@ public class ResourceRequestHandler extends AbstractUiServletRequestHandler {
     }
   }
 
-  protected List<IResourceLoaderFactory> resourceLoaderFactoryList() {
+  protected List<ResourceLoaders> resourceLoaderFactoryList() {
     return m_resourceLoaderFactoryList;
   }
 
-  protected IHttpCacheControl httpCacheControl() {
+  protected HttpCacheControl httpCacheControl() {
     return m_httpCacheControl;
   }
 

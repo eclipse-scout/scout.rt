@@ -17,6 +17,7 @@ import java.net.URLClassLoader;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.ui.html.scriptprocessor.internal.impl.CompileCssWithLess;
 import org.eclipse.scout.rt.ui.html.scriptprocessor.internal.impl.MinifyCssWithYui;
 import org.eclipse.scout.rt.ui.html.scriptprocessor.internal.impl.MinifyJsWithYui;
@@ -25,6 +26,7 @@ import org.eclipse.scout.rt.ui.html.scriptprocessor.internal.loader.SandboxClass
 /**
  * Default wrapper for YUI and LESS used to compile and minify javscript and css.
  */
+@ApplicationScoped
 public class ScriptProcessor implements AutoCloseable {
   private URLClassLoader m_yuiLoader;
   private URLClassLoader m_lessLoader;

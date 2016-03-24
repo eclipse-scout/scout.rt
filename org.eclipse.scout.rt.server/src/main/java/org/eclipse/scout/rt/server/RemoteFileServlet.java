@@ -23,6 +23,10 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.server.commons.servlet.HttpServletControl;
+import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheControl;
+import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheKey;
+import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheObject;
 import org.eclipse.scout.rt.shared.services.common.file.IRemoteFileService;
 import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
 import org.slf4j.Logger;
@@ -38,10 +42,6 @@ public class RemoteFileServlet extends HttpServlet {
 
   private static final long serialVersionUID = 1L;
   private static final Logger LOG = LoggerFactory.getLogger(RemoteFileServlet.class);
-  private static final String LAST_MODIFIED = "Last-Modified"; //$NON-NLS-1$
-  private static final String IF_MODIFIED_SINCE = "If-Modified-Since"; //$NON-NLS-1$
-  private static final String IF_NONE_MATCH = "If-None-Match"; //$NON-NLS-1$
-  private static final String ETAG = "ETag"; //$NON-NLS-1$
 
   private String m_folder;
 
@@ -88,6 +88,8 @@ public class RemoteFileServlet extends HttpServlet {
   }
 
   protected void handleHttpRequest(final HttpServletRequest req, final HttpServletResponse res) throws ServletException, IOException {
+    BEANS.get(HttpServletControl.class).doDefaults(this, req, res);
+
     String pathInfo = extractPathInfo(req);
 
     // will try to get all files in fileList.
@@ -156,58 +158,12 @@ public class RemoteFileServlet extends HttpServlet {
       return false;
     }
 
-    long lastModified = remoteFile.getLastModified();
-    int contentLength = remoteFile.getContentLength();
-    if (setResponseParameters(req, resp, resourcePath, remoteFile.getContentType(), lastModified, contentLength) == HttpServletResponse.SC_NOT_MODIFIED) {
+    HttpCacheObject obj = new HttpCacheObject(new HttpCacheKey(resourcePath), remoteFile.toBinaryResource());
+    if (BEANS.get(HttpCacheControl.class).checkAndSetCacheHeaders(req, resp, resourcePath, obj)) {
       return true;
     }
     rfs.streamRemoteFile(remoteFile, resp.getOutputStream());
     return true;
-  }
-
-  protected int setResponseParameters(final HttpServletRequest req, final HttpServletResponse resp, final String resourcePath, String contentType, long lastModified, int contentLength) {
-    String etag = null;
-    if (lastModified != -1 && contentLength != -1) {
-      etag = "W/\"" + contentLength + "-" + lastModified + "\""; //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$
-    }
-
-    // Check for cache revalidation.
-    // We should prefer ETag validation as the guarantees are stronger and all
-    // HTTP 1.1 clients should be using it
-    String ifNoneMatch = req.getHeader(IF_NONE_MATCH);
-    if (ifNoneMatch != null && etag != null && ifNoneMatch.indexOf(etag) != -1) {
-      resp.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
-      return HttpServletResponse.SC_NOT_MODIFIED;
-    }
-    else {
-      long ifModifiedSince = req.getDateHeader(IF_MODIFIED_SINCE);
-      // for purposes of comparison we add 999 to ifModifiedSince since the
-      // fidelity
-      // of the IMS header generally doesn't include milli-seconds
-      if (ifModifiedSince > -1 && lastModified > 0 && lastModified <= (ifModifiedSince + 999)) {
-        resp.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
-        return HttpServletResponse.SC_NOT_MODIFIED;
-      }
-    }
-
-    // return the full contents regularly
-    if (contentLength != -1) {
-      resp.setContentLength(contentLength);
-    }
-
-    if (contentType != null) {
-      resp.setContentType(contentType);
-    }
-
-    if (lastModified > 0) {
-      resp.setDateHeader(LAST_MODIFIED, lastModified);
-    }
-
-    if (etag != null) {
-      resp.setHeader(ETAG, etag);
-    }
-
-    return HttpServletResponse.SC_ACCEPTED;
   }
 
 }

@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.ui.html.cache;
+package org.eclipse.scout.rt.server.commons.servlet.cache;
 
 import java.io.Serializable;
 

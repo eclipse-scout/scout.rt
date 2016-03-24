@@ -34,8 +34,10 @@ import org.eclipse.scout.rt.server.clientnotification.ClientNotificationCollecto
 import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
 import org.eclipse.scout.rt.server.commons.context.ServletRunContext;
 import org.eclipse.scout.rt.server.commons.context.ServletRunContexts;
+import org.eclipse.scout.rt.server.commons.servlet.HttpServletControl;
 import org.eclipse.scout.rt.server.commons.servlet.IHttpServletRoundtrip;
 import org.eclipse.scout.rt.server.commons.servlet.ServletExceptionTranslator;
+import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheControl;
 import org.eclipse.scout.rt.server.context.RunMonitorCancelRegistry;
 import org.eclipse.scout.rt.server.context.RunMonitorCancelRegistry.IRegistrationHandle;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
@@ -200,12 +202,14 @@ public class ServiceTunnelServlet extends HttpServlet {
    * Method invoked to serialize a service response to be sent back to the client.
    */
   protected void serializeServiceResponse(ServiceTunnelResponse serviceResponse) throws Exception {
-    HttpServletResponse servletResponse = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.get();
-    servletResponse.setDateHeader("Expires", -1);
-    servletResponse.setHeader("Cache-Control", "no-cache");
-    servletResponse.setHeader("pragma", "no-cache");
-    servletResponse.setContentType(m_contentHandler.getContentType());
-    m_contentHandler.writeResponse(servletResponse.getOutputStream(), serviceResponse);
+    HttpServletRequest req = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.get();
+    HttpServletResponse resp = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.get();
+
+    BEANS.get(HttpServletControl.class).doDefaults(this, req, resp);
+
+    BEANS.get(HttpCacheControl.class).checkAndSetCacheHeaders(req, resp, null, null);
+    resp.setContentType(m_contentHandler.getContentType());
+    m_contentHandler.writeResponse(resp.getOutputStream(), serviceResponse);
   }
 
   // === INITIALIZATION ===

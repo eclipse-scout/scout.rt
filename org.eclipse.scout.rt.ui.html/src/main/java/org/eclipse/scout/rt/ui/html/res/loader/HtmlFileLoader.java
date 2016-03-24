@@ -24,13 +24,12 @@ import org.eclipse.scout.rt.platform.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.resource.BinaryResources;
 import org.eclipse.scout.rt.platform.util.IOUtility;
+import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheKey;
+import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheObject;
+import org.eclipse.scout.rt.server.commons.servlet.cache.HttpResponseHeaderContributor;
 import org.eclipse.scout.rt.ui.html.UiThemeUtility;
-import org.eclipse.scout.rt.ui.html.cache.HttpCacheKey;
-import org.eclipse.scout.rt.ui.html.cache.HttpCacheObject;
-import org.eclipse.scout.rt.ui.html.cache.HttpResponseHeaderContributor;
 import org.eclipse.scout.rt.ui.html.res.BrowserInfo;
 import org.eclipse.scout.rt.ui.html.res.IWebContentService;
-import org.eclipse.scout.rt.ui.html.scriptprocessor.ScriptProcessor;
 
 /**
  * This class loads and parses HTML files from WebContent/ folder.
@@ -39,11 +38,8 @@ public class HtmlFileLoader extends AbstractResourceLoader {
   private static final String THEME_KEY = "ui.theme";
   private static final String LOCALE_KEY = "ui.locale";
 
-  private ScriptProcessor m_scriptProcessor;
-
-  public HtmlFileLoader(HttpServletRequest req, ScriptProcessor scriptProcessor) {
+  public HtmlFileLoader(HttpServletRequest req) {
     super(req);
-    m_scriptProcessor = scriptProcessor;
   }
 
   @Override
@@ -102,7 +98,6 @@ public class HtmlFileLoader extends AbstractResourceLoader {
     params.setCacheEnabled(isCacheEnabled());
     params.setRequest(getRequest());
     params.setCacheKey(cacheKey);
-    params.setScriptProcessor(m_scriptProcessor);
     return params;
   }
 

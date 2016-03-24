@@ -3,6 +3,7 @@ package org.eclipse.scout.rt.ui.html.cache;
 import java.util.Collections;
 import java.util.Map;
 
+import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheKey;
 import org.junit.Assert;
 import org.junit.Test;
 

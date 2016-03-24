@@ -26,6 +26,11 @@
   <name>${project.groupId}:${project.artifactId}</name>
 
   <dependencies>
+    <dependency>
+      <groupId>org.eclipse.scout.rt</groupId>
+      <artifactId>org.eclipse.scout.rt.platform</artifactId>
+    </dependency>
+
     <!-- Build Dependencies (Provided) -->
     <dependency>
       <groupId>com.yahoo.platform.yui</groupId>
@@ -77,6 +82,7 @@
               <overWriteReleases>false</overWriteReleases>
               <overWriteSnapshots>true</overWriteSnapshots>
               <stripVersion>true</stripVersion>
+              <excludeArtifactIds>org.eclipse.scout.rt.platform</excludeArtifactIds>
             </configuration>
           </execution>
         </executions>

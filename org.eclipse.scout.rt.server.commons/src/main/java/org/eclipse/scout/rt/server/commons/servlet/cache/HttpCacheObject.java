@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.ui.html.cache;
+package org.eclipse.scout.rt.server.commons.servlet.cache;
 
 import java.io.Serializable;
 import java.util.HashSet;
@@ -21,7 +21,7 @@ import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.util.Assertions;
 
 /**
- * Used in {@link IHttpCacheControl} in order to decide caching strategy and set caching headers
+ * Used in {@link HttpCacheControl} in order to decide caching strategy and set caching headers
  */
 public class HttpCacheObject implements Serializable {
   private static final long serialVersionUID = 1L;

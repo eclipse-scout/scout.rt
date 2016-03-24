@@ -12,9 +12,13 @@ package org.eclipse.scout.rt.ui.html.res.loader;
 
 import java.io.IOException;
 
-import org.eclipse.scout.rt.ui.html.cache.HttpCacheKey;
-import org.eclipse.scout.rt.ui.html.cache.HttpCacheObject;
+import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheKey;
+import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheObject;
 
+/**
+ * This is the interface for all individual resource loaders that are collected by
+ * {@link ResourceLoaders#create(javax.servlet.http.HttpServletRequest, String)}
+ */
 public interface IResourceLoader {
 
   /**

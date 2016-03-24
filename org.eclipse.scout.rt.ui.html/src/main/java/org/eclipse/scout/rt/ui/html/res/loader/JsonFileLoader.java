@@ -20,9 +20,9 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.resource.BinaryResources;
 import org.eclipse.scout.rt.platform.util.IOUtility;
-import org.eclipse.scout.rt.ui.html.cache.HttpCacheKey;
-import org.eclipse.scout.rt.ui.html.cache.HttpCacheObject;
-import org.eclipse.scout.rt.ui.html.cache.IHttpCacheControl;
+import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheControl;
+import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheKey;
+import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheObject;
 import org.eclipse.scout.rt.ui.html.json.JsonUtility;
 import org.eclipse.scout.rt.ui.html.res.IWebContentService;
 
@@ -52,7 +52,7 @@ public class JsonFileLoader extends AbstractResourceLoader {
         .withContent(json.getBytes(StandardCharsets.UTF_8))
         .withLastModifiedNow()
         .withCachingAllowed(true)
-        .withCacheMaxAge(IHttpCacheControl.MAX_AGE_4_HOURS)
+        .withCacheMaxAge(HttpCacheControl.MAX_AGE_4_HOURS)
         .build();
 
     return new HttpCacheObject(cacheKey, content);
