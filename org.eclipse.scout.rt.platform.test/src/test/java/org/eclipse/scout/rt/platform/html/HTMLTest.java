@@ -11,24 +11,16 @@
 package org.eclipse.scout.rt.platform.html;
 
 import static org.eclipse.scout.rt.platform.html.HTML.bold;
-import static org.eclipse.scout.rt.platform.html.HTML.td;
 import static org.eclipse.scout.rt.platform.html.HTML.div;
 import static org.eclipse.scout.rt.platform.html.HTML.italic;
 import static org.eclipse.scout.rt.platform.html.HTML.link;
+import static org.eclipse.scout.rt.platform.html.HTML.td;
 import static org.eclipse.scout.rt.platform.html.HTML.tr;
 import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.scout.rt.platform.html.HTML;
-import org.eclipse.scout.rt.platform.html.HtmlBinds;
-import org.eclipse.scout.rt.platform.html.IHtmlContent;
-import org.eclipse.scout.rt.platform.html.IHtmlDocument;
-import org.eclipse.scout.rt.platform.html.IHtmlElement;
-import org.eclipse.scout.rt.platform.html.IHtmlInput;
-import org.eclipse.scout.rt.platform.html.IHtmlTable;
-import org.eclipse.scout.rt.platform.html.IHtmlTableRow;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.junit.Test;
@@ -270,6 +262,21 @@ public class HTMLTest {
   public void testSpecialCharacters() {
     assertEquals("<p>Test$Class</p>", HTML.p("Test$Class").toEncodedHtml());
     assertEquals("<p>C:\\Temp\\config.properties</p>", HTML.p("C:\\Temp\\config.properties").toEncodedHtml());
+  }
+
+  @Test
+  public void testIconFromScoutFont() {
+    assertEquals("<span class=\"font-icon\">\uE002</span>", HTML.icon("font:\uE002").toEncodedHtml());
+  }
+
+  @Test
+  public void testIconFromCustomFont() {
+    assertEquals("<span class=\"font-crmIcons\">\uE100</span>", HTML.icon("font:crmIcons \uE100").toEncodedHtml());
+  }
+
+  @Test
+  public void testIconFromImage() {
+    assertEquals("<img src=\"iconId:logo\">", HTML.icon("logo").toEncodedHtml());
   }
 
   private String createTableString(String prefix) {

@@ -12,6 +12,8 @@ package org.eclipse.scout.rt.platform.html;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.scout.rt.platform.html.internal.EmptyHtmlNodeBuilder;
 import org.eclipse.scout.rt.platform.html.internal.HtmlContentBuilder;
@@ -32,6 +34,9 @@ import org.eclipse.scout.rt.platform.html.internal.StyleElementBuilder;
  * Only the most common cases are supported, not intended to be complete.
  */
 public final class HTML {
+
+  // pattern for Scout font icon 'font:CHAR', pattern for custom font icon: 'font:FONT-NAME CHAR'
+  private static final Pattern FONT_ICON_PATTERN = Pattern.compile("font:([^ ]+)(?:$| (.+$))");
 
   /**
    * Utility class
@@ -307,6 +312,30 @@ public final class HTML {
    */
   public static IHtmlElement imgByIconId(CharSequence iconId) {
     return new HtmlImageBuilder("iconId:" + iconId);
+  }
+
+  /**
+   * Creates a HTML representation for the given icon. For a font icon, a 'span' element is returned, or an 'img'
+   * element otherwise.
+   *
+   * @param icon
+   *          icon like {@link AbstractIcons#Info}
+   */
+  public static IHtmlElement icon(final CharSequence icon) {
+    final Matcher matcher = FONT_ICON_PATTERN.matcher(icon);
+    if (matcher.find()) {
+      // font icon
+      if (matcher.group(2) == null) {
+        return HTML.span(matcher.group(1)).cssClass("font-icon"); // icon from Scout font
+      }
+      else {
+        return HTML.span(matcher.group(2)).cssClass("font-" + matcher.group(1)); // icon from custom font
+      }
+    }
+    else {
+      // image icon
+      return HTML.imgByIconId(icon);
+    }
   }
 
   /**
