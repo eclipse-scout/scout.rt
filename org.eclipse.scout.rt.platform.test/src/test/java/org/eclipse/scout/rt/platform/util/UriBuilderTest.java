@@ -228,14 +228,30 @@ public class UriBuilderTest {
     //
     builder = new UriBuilder();
     builder.scheme(SCHEME).host(HOST).path(PATH_TO_SCHEME).fragment(ANCHOR).parameter("key", "äöü");
-    assertEquals("scheme://host/path/to?key=%25E4%25F6%25FC#anchor", builder.createURI().toASCIIString());
+    assertEquals("scheme://host/path/to?key=%C3%A4%C3%B6%C3%BC#anchor", builder.createURI().toASCIIString());
     //
     builder = new UriBuilder();
     builder.scheme(SCHEME).host(HOST).path(PATH_TO_SCHEME).fragment(ANCHOR).parameter("key", "äöü");
-    assertEquals("scheme://host/path/to?key=%25C3%25A4%25C3%25B6%25C3%25BC#anchor", builder.createURI(StandardCharsets.UTF_8.name()).toASCIIString());
+    assertEquals("scheme://host/path/to?key=%E4%F6%FC#anchor", builder.createURI(StandardCharsets.ISO_8859_1.name()).toASCIIString());
     //
     URI baseUri = new URI("http://www.eclipse.org/scout");
     builder = new UriBuilder(baseUri);
     assertEquals(baseUri, builder.createURI());
+  }
+
+  /**
+   * This tests checks whether
+   */
+  @Test
+  public void testQueryString() throws Exception {
+    UriBuilder builder = new UriBuilder(TEST_URI_PATH);
+    builder.parameter("key", "value"); // simple key/value
+    builder.parameter("k&y", "=alue"); // contains an equals sign (invalid value for url parameter)
+    builder.parameter("ke2", "va ue"); // contains a space
+
+    String s = builder.createURL().toString();
+    assertTrue(s.contains("key=value"));
+    assertTrue(s.contains("k%26y=%3Dalue"));
+    assertTrue(s.contains("ke2=va+ue"));
   }
 }

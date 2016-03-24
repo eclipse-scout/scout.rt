@@ -17,11 +17,11 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
  * </ul>
  */
 @Order(1000)
-public class OutlineHandler extends AbstractDeepLinkHandler {
+public class OutlineDeepLinkHandler extends AbstractDeepLinkHandler {
 
   private static final String HANDLER_NAME = "outline";
 
-  public OutlineHandler() {
+  public OutlineDeepLinkHandler() {
     super(defaultPattern(HANDLER_NAME, "\\d+"));
   }
 
