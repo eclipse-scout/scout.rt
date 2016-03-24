@@ -20,8 +20,8 @@ scout.inherits(scout.TreeCollapseAllKeyStroke, scout.AbstractTreeNavigationKeySt
 
 scout.TreeCollapseAllKeyStroke.prototype._handleInternal = function(currentNode) {
   this.field.collapseAll();
-  if (this.field.nodes.length === 0) {
+  if (this.field.visibleNodesFlat.length === 0) {
     return null;
   }
-  return this.field.nodes[0];
+  return this.field.visibleNodesFlat[0];
 };
