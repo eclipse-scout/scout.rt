@@ -344,50 +344,6 @@ scout.ModelAdapter.prototype.onModelPropertyChange = function(event) {
   this._fireBulkPropertyChange(oldProperties, event.properties);
 };
 
-scout.ModelAdapter.prototype._fireBulkPropertyChange = function(oldProperties, newProperties) {
-  var propertyChangeEvent = {
-    newProperties: newProperties,
-    oldProperties: oldProperties,
-    changedProperties: []
-  };
-  // To allow a listener to react only to properties that have really changed their value, we
-  // calculate the list of "changedProperties". This may be relevant, when the value on the model
-  // changes from A to B and back to A, which emits a property change event when in fact, the
-  // property has not really changed for the UI.
-  for (var prop in newProperties) {
-    if (newProperties[prop] !== oldProperties[prop]) {
-      propertyChangeEvent.changedProperties.push(prop);
-    }
-  }
-  this.trigger('propertyChange', propertyChangeEvent);
-};
-
-/**
- * Fires a property change for a single property.
- */
-scout.ModelAdapter.prototype._firePropertyChange = function(propertyName, oldValue, newValue) {
-  if (!propertyName) {
-    return;
-  }
-  var oldProperties = {},
-    newProperties = {};
-  oldProperties[propertyName] = oldValue;
-  newProperties[propertyName] = newValue;
-  this._fireBulkPropertyChange(oldProperties, newProperties);
-};
-
-/**
- * Sets the value of the property 'propertyName' to 'newValue' and then fires a propertyChange event for that property.
- */
-scout.ModelAdapter.prototype._setProperty = function(propertyName, newValue) {
-  if (!propertyName) {
-    return;
-  }
-  var oldValue = this[propertyName];
-  this[propertyName] = newValue;
-  this._firePropertyChange(propertyName, oldValue, newValue);
-};
-
 /**
  * The default impl. only logs a warning that the event is not supported.
  */
