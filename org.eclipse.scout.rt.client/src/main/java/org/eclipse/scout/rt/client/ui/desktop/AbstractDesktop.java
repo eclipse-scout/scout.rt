@@ -1944,8 +1944,15 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
    * Displays a message box showing a generic message that the deep-link could not be executed.
    */
   protected void showDeepLinkError(DeepLinkException e) {
-    String errorMessage = TEXTS.get("DeepLinkError");
-    MessageBoxes.createOk().withBody(errorMessage).show();
+    if (e.getCause() instanceof VetoException) {
+      // permission problems
+      BEANS.get(ExceptionHandler.class).handle(e.getCause());
+    }
+    else {
+      // other problems
+      String errorMessage = TEXTS.get("DeepLinkError");
+      MessageBoxes.createOk().withBody(errorMessage).show();
+    }
   }
 
   private void detachGui() {
