@@ -22,6 +22,7 @@ import org.eclipse.scout.rt.shared.TEXTS;
 import ${package}.client.search.SearchOutline;
 import ${package}.client.settings.SettingsOutline;
 import ${package}.client.work.WorkOutline;
+import ${package}.shared.Icons;
 
 /**
  * <h3>{@link Desktop}</h3>
@@ -36,7 +37,7 @@ public class Desktop extends AbstractDesktop {
 
   @Override
   protected String getConfiguredLogoId() {
-    return "application_logo";
+    return Icons.AppLogo;
   }
 
   @Override
