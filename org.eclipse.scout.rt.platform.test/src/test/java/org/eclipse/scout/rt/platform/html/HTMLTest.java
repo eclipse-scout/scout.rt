@@ -277,17 +277,17 @@ public class HTMLTest {
 
   @Test
   public void testIconFromScoutFont() {
-    assertEquals("<span class=\"font-icon\">\uE002</span>", HTML.icon("font:\uE002").toEncodedHtml());
+    assertEquals("<span class=\"font-icon\">\uE002</span>", HTML.icon("font:\uE002").toHtml());
   }
 
   @Test
   public void testIconFromCustomFont() {
-    assertEquals("<span class=\"font-crmIcons\">\uE100</span>", HTML.icon("font:crmIcons \uE100").toEncodedHtml());
+    assertEquals("<span class=\"font-crmIcons\">\uE100</span>", HTML.icon("font:crmIcons \uE100").toHtml());
   }
 
   @Test
   public void testIconFromImage() {
-    assertEquals("<img src=\"iconId:logo\">", HTML.icon("logo").toEncodedHtml());
+    assertEquals("<img src=\"iconId:logo\">", HTML.icon("logo").toHtml());
   }
 
   private String createTableString(String prefix) {
