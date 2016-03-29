@@ -857,15 +857,6 @@ scout.Tree.prototype.collapseNode = function(node, opts) {
 };
 
 scout.Tree.prototype.collapseAll = function() {
-  var that = this;
-
-  // Collapse root nodes
-  this.$data.find('[data-level="0"]').each(function() {
-    var $node = $(this);
-    that.collapseNode($node.data('node'));
-  });
-
-  // Collapse all expanded child nodes (only model)
   this._visitNodes(this.nodes, function(node) {
     this.collapseNode(node);
   }.bind(this));
@@ -923,7 +914,9 @@ scout.Tree.prototype.setNodeExpanded = function(node, expanded, opts) {
 };
 
 scout.Tree.prototype.scrollTo = function(node) {
-  scout.scrollbars.scrollTo(this.$data, node.$node);
+  if (this.rendered) {
+    scout.scrollbars.scrollTo(this.$data, node.$node);
+  }
 };
 
 scout.Tree.prototype.revealSelection = function() {
