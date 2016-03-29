@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.desktop;
 
-import java.net.URL;
-
 /**
  * The desktop model (may) consist of
  * <ul>
@@ -26,8 +24,6 @@ import java.net.URL;
  * </ul>
  */
 public interface IDesktopUIFacade {
-
-  void setBaseUrl(URL baseUrl);
 
   /**
    * GUI fires this event as soon as the desktop was completely setup and displayed

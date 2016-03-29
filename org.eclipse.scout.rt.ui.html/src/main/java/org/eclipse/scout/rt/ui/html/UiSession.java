@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.ui.html;
 
 import java.math.BigInteger;
-import java.net.URL;
 import java.security.AccessController;
 import java.security.SecureRandom;
 import java.util.Collections;
@@ -57,7 +56,6 @@ import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
-import org.eclipse.scout.rt.platform.util.UriUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledException;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedException;
@@ -365,7 +363,6 @@ public class UiSession implements IUiSession {
   }
 
   protected void startDesktop(Map<String, String> startupParams) {
-    final URL baseUrl = UriUtility.toUrl(startupParams.get("url"));
     final String deepLinkPath = startupParams.get(IDeepLinks.PARAM_NAME_DEEP_LINK);
     final IFuture<Void> future = ModelJobs.schedule(new IRunnable() {
 
@@ -376,7 +373,6 @@ public class UiSession implements IUiSession {
         if (!desktop.isOpened()) {
           uiFacade.openFromUI();
         }
-        uiFacade.setBaseUrl(baseUrl);
         uiFacade.fireGuiAttached(deepLinkPath);
       }
     }, ModelJobs.newInput(ClientRunContexts.copyCurrent()

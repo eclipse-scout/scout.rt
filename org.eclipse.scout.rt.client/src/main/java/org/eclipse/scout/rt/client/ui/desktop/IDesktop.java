@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.client.ui.desktop;
 
 import java.beans.PropertyChangeListener;
-import java.net.URL;
 import java.text.Normalizer.Form;
 import java.util.Collection;
 import java.util.List;
@@ -113,8 +112,6 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent {
   String PROP_THEME = "theme";
 
   String PROP_BROWSER_HISTORY_ENTRY = "browserHistoryEntry";
-
-  String PROP_UI_BASE_URL = "uiBaseUrl";
 
   public enum DesktopStyle {
     /**
@@ -824,21 +821,5 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent {
    * @since 6.0
    */
   void setBrowserHistoryEntry(BrowserHistoryEntry browserHistory);
-
-  /**
-   * Sets the base URL from where the Scout application has been started. Note that this URL may be different from the
-   * URL that your app-server returns for the Scout servlet, because a proxy may provide the Scout application under a
-   * different URL.
-   *
-   * @param baseUrl
-   */
-  void setUiBaseUrl(URL baseUrl);
-
-  /**
-   * @return the base URL from where the Scout application has been started. Note that this URL may be different from
-   *         the URL that your app-server returns for the Scout servlet, because a proxy may provide the Scout
-   *         application under a different URL.
-   */
-  URL getUiBaseUrl();
 
 }

@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.client.ui.desktop;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -2026,16 +2025,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     m_isForcedClosing = forcedClosing;
   }
 
-  @Override
-  public void setUiBaseUrl(URL baseUrl) {
-    propertySupport.setProperty(PROP_UI_BASE_URL, baseUrl);
-  }
-
-  @Override
-  public URL getUiBaseUrl() {
-    return (URL) propertySupport.getProperty(PROP_UI_BASE_URL);
-  }
-
   /**
    * local desktop extension that calls local exec methods and returns local contributions in this class itself
    */
@@ -2147,11 +2136,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   protected class P_UIFacade implements IDesktopUIFacade {
-
-    @Override
-    public void setBaseUrl(URL baseUrl) {
-      setUiBaseUrl(baseUrl);
-    }
 
     @Override
     public void historyEntryActivatedFromUI(String deepLinkPath) {

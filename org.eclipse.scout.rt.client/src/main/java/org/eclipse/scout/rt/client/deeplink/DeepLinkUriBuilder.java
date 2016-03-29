@@ -7,6 +7,7 @@ package org.eclipse.scout.rt.client.deeplink;
 import java.net.URI;
 import java.net.URL;
 
+import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.desktop.BrowserHistoryEntry;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
@@ -26,7 +27,8 @@ public class DeepLinkUriBuilder {
   }
 
   public static DeepLinkUriBuilder createAbsolute() {
-    return new DeepLinkUriBuilder(new UriBuilder(getDesktop().getUiBaseUrl()));
+    IClientSession clientSession = ClientSessionProvider.currentSession();
+    return new DeepLinkUriBuilder(new UriBuilder(clientSession.getBrowserURI()));
   }
 
   public static DeepLinkUriBuilder createRelative() {
@@ -65,15 +67,12 @@ public class DeepLinkUriBuilder {
     if (m_path == null) {
       throw new IllegalStateException("Cannot create BrowserHistoryEntry without deep-link path");
     }
-    StringBuilder title = new StringBuilder(getDesktop().getTitle());
+    IDesktop desktop = ClientSessionProvider.currentSession().getDesktop();
+    StringBuilder title = new StringBuilder(desktop.getTitle());
     if (StringUtility.hasText(m_info)) {
       title.append(" - ").append(m_info);
     }
     return new BrowserHistoryEntry(m_builder.createURI(), title.toString(), m_path);
-  }
-
-  private static IDesktop getDesktop() {
-    return ClientSessionProvider.currentSession().getDesktop();
   }
 
   public URL createURL() {
