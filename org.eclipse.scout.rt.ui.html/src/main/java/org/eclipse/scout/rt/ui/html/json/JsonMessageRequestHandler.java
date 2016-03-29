@@ -28,6 +28,7 @@ import org.eclipse.scout.rt.platform.resource.MimeType;
 import org.eclipse.scout.rt.platform.util.CompareUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
+import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheControl;
 import org.eclipse.scout.rt.ui.html.AbstractUiServletRequestHandler;
 import org.eclipse.scout.rt.ui.html.HttpSessionHelper;
 import org.eclipse.scout.rt.ui.html.ISessionStore;
@@ -35,7 +36,6 @@ import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.MaxUserIdleTimeProperty;
 import org.eclipse.scout.rt.ui.html.UiRunContexts;
 import org.eclipse.scout.rt.ui.html.UiServlet;
-import org.eclipse.scout.rt.ui.html.cache.IHttpCacheControl;
 import org.eclipse.scout.rt.ui.html.json.JsonRequest.RequestType;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -56,7 +56,7 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
   private final int m_maxUserIdleTime = CONFIG.getPropertyValue(MaxUserIdleTimeProperty.class).intValue();
 
   private final HttpSessionHelper m_httpSessionHelper = BEANS.get(HttpSessionHelper.class);
-  private final IHttpCacheControl m_httpCacheControl = BEANS.get(IHttpCacheControl.class);
+  private final HttpCacheControl m_httpCacheControl = BEANS.get(HttpCacheControl.class);
   private final JsonRequestHelper m_jsonRequestHelper = BEANS.get(JsonRequestHelper.class);
 
   @Override

@@ -46,7 +46,7 @@ import org.slf4j.LoggerFactory;
  * <p/>
  * Example of hashed passwords: <code>scott:SALT.PASSWORD-HASH;jack:SALT.PASSWORD-HASH;john:SALT.PASSWORD-HASH</code>
  * <br/>
- * Example of plain-text passwords: <code>scott:XXXX;jack:XXXX;john:XXXX</code>
+ * Example of plain-text passwords: <code>scott:*****;jack:*****;john:*****</code>
  */
 @Bean
 public class ConfigFileCredentialVerifier implements ICredentialVerifier {
@@ -138,7 +138,7 @@ public class ConfigFileCredentialVerifier implements ICredentialVerifier {
    * <p>
    * Multiple credentials are separated with a semicolon, username and password with the 'colon' sign.
    * <p/>
-   * Example: <code>scott:XXXX;jack:XXXX;john:XXXX</code>
+   * Example: <code>scott:*****;jack:*****;john:*****</code>
    */
   public static class CredentialsProperty extends AbstractStringConfigProperty {
 

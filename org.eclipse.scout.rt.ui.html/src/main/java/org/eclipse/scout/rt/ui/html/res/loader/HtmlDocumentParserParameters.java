@@ -14,15 +14,14 @@ import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.eclipse.scout.rt.ui.html.cache.HttpCacheKey;
-import org.eclipse.scout.rt.ui.html.cache.HttpCacheObject;
-import org.eclipse.scout.rt.ui.html.scriptprocessor.ScriptProcessor;
+import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheKey;
+import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheObject;
 
 public class HtmlDocumentParserParameters {
 
   private boolean m_minify;
   private boolean m_cacheEnabled;
-  private ScriptProcessor m_scriptProcessor;
+
   /**
    * Cache key of HTML document.
    */
@@ -45,10 +44,6 @@ public class HtmlDocumentParserParameters {
     m_cacheEnabled = cacheEnabled;
   }
 
-  public void setScriptProcessor(ScriptProcessor scriptProcessor) {
-    m_scriptProcessor = scriptProcessor;
-  }
-
   public void setRequest(HttpServletRequest request) {
     m_req = request;
   }
@@ -66,7 +61,7 @@ public class HtmlDocumentParserParameters {
   }
 
   public HttpCacheObject loadScriptFile(String resourcePath) throws IOException {
-    ScriptFileLoader scriptLoader = new ScriptFileLoader(m_req, m_scriptProcessor);
+    ScriptFileLoader scriptLoader = new ScriptFileLoader(m_req);
     HttpCacheKey cacheKey = scriptLoader.createCacheKey(resourcePath);
     return scriptLoader.loadResource(cacheKey);
   }

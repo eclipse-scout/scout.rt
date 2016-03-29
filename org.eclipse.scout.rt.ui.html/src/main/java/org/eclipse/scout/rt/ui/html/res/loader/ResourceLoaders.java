@@ -13,26 +13,11 @@ package org.eclipse.scout.rt.ui.html.res.loader;
 import javax.servlet.http.HttpServletRequest;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
-import org.eclipse.scout.rt.ui.html.scriptprocessor.ScriptProcessor;
 
 @ApplicationScoped
-public class DefaultResourceLoaderFactory implements IResourceLoaderFactory {
+public class ResourceLoaders {
 
-  private ScriptProcessor m_scriptProcessor;
-
-  /**
-   * Since creating a new instance of ScriptProcessor is an expensive operation we take care that only one instance
-   * exists.
-   */
-  protected synchronized ScriptProcessor getScriptProcessor() {
-    if (m_scriptProcessor == null) {
-      m_scriptProcessor = new ScriptProcessor();
-    }
-    return m_scriptProcessor;
-  }
-
-  @Override
-  public IResourceLoader createResourceLoader(HttpServletRequest req, String resourcePath) {
+  public IResourceLoader create(HttpServletRequest req, String resourcePath) {
     if (resourcePath.matches("^/icon/.*")) {
       return new IconLoader(req);
     }
@@ -40,10 +25,10 @@ public class DefaultResourceLoaderFactory implements IResourceLoaderFactory {
       return new DynamicResourceLoader(req);
     }
     if ((resourcePath.endsWith(".js") || resourcePath.endsWith(".css"))) {
-      return new ScriptFileLoader(req, getScriptProcessor());
+      return new ScriptFileLoader(req);
     }
     if (resourcePath.endsWith(".html")) {
-      return new HtmlFileLoader(req, getScriptProcessor());
+      return new HtmlFileLoader(req);
     }
     if (resourcePath.matches("^/defaultValues$")) {
       return new DefaultValuesLoader(req);

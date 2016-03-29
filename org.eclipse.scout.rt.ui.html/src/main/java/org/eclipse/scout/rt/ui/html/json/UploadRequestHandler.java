@@ -40,13 +40,13 @@ import org.eclipse.scout.rt.platform.security.MalwareScanner;
 import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
+import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheControl;
 import org.eclipse.scout.rt.ui.html.AbstractUiServletRequestHandler;
 import org.eclipse.scout.rt.ui.html.HttpSessionHelper;
 import org.eclipse.scout.rt.ui.html.ISessionStore;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.UiRunContexts;
 import org.eclipse.scout.rt.ui.html.UiServlet;
-import org.eclipse.scout.rt.ui.html.cache.IHttpCacheControl;
 import org.eclipse.scout.rt.ui.html.res.IBinaryResourceConsumer;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -62,7 +62,7 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
   private static final Pattern PATTERN_UPLOAD_ADAPTER_RESOURCE_PATH = Pattern.compile("^/upload/([^/]*)/([^/]*)$");
 
   private final HttpSessionHelper m_httpSessionHelper = BEANS.get(HttpSessionHelper.class);
-  private final IHttpCacheControl m_httpCacheControl = BEANS.get(IHttpCacheControl.class);
+  private final HttpCacheControl m_httpCacheControl = BEANS.get(HttpCacheControl.class);
   private final JsonRequestHelper m_jsonRequestHelper = BEANS.get(JsonRequestHelper.class);
 
   @Override

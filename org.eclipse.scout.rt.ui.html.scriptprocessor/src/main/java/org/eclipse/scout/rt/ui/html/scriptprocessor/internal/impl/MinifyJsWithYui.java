@@ -22,6 +22,10 @@ import com.yahoo.platform.yui.compressor.JavaScriptCompressor;
 public class MinifyJsWithYui {
 
   public String run(String content) throws IOException {
+    return run(content, false);
+  }
+
+  public String run(String content, boolean munge) throws IOException {
     try (
         StringReader reader = new StringReader(content);
         StringWriter writer = new StringWriter();) {
@@ -46,7 +50,6 @@ public class MinifyJsWithYui {
         }
       };
       JavaScriptCompressor compressor = new JavaScriptCompressor(reader, errorReporter);
-      boolean munge = false;
       boolean verbose = false;
       boolean preserveAllSemicolons = false;
       boolean disableOptimizations = false;

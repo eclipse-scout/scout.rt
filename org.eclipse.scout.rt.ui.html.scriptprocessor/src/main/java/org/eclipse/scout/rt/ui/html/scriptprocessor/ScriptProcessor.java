@@ -17,6 +17,7 @@ import java.net.URLClassLoader;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.ui.html.scriptprocessor.internal.impl.CompileCssWithLess;
 import org.eclipse.scout.rt.ui.html.scriptprocessor.internal.impl.MinifyCssWithYui;
 import org.eclipse.scout.rt.ui.html.scriptprocessor.internal.impl.MinifyJsWithYui;
@@ -25,6 +26,7 @@ import org.eclipse.scout.rt.ui.html.scriptprocessor.internal.loader.SandboxClass
 /**
  * Default wrapper for YUI and LESS used to compile and minify javscript and css.
  */
+@ApplicationScoped
 public class ScriptProcessor implements AutoCloseable {
   private URLClassLoader m_yuiLoader;
   private URLClassLoader m_lessLoader;
@@ -55,7 +57,7 @@ public class ScriptProcessor implements AutoCloseable {
   }
 
   public String compileCss(String content) throws IOException {
-    return runInClassLoader(m_lessLoader, CompileCssWithLess.class.getName(), content);
+    return runInClassLoader(m_lessLoader, CompileCssWithLess.class.getName(), new Class[]{String.class}, new Object[]{content});
   }
 
   public String compileJs(String content) throws IOException {
@@ -77,7 +79,7 @@ public class ScriptProcessor implements AutoCloseable {
     sb = null; // free memory early
 
     // 2. Run YUI compressor
-    content = runInClassLoader(m_yuiLoader, MinifyCssWithYui.class.getName(), content);
+    content = runInClassLoader(m_yuiLoader, MinifyCssWithYui.class.getName(), new Class[]{String.class}, new Object[]{content});
 
     // 3. Restore protected whitespace
     content = content.replaceAll("___YUICSSMIN_SPACE_IN_CALC___", " ");
@@ -86,15 +88,19 @@ public class ScriptProcessor implements AutoCloseable {
   }
 
   public String minifyJs(String content) throws IOException {
-    return runInClassLoader(m_yuiLoader, MinifyJsWithYui.class.getName(), content);
+    return runInClassLoader(m_yuiLoader, MinifyJsWithYui.class.getName(), new Class[]{String.class, boolean.class}, new Object[]{content, obfuscateJS()});
   }
 
-  protected String runInClassLoader(ClassLoader loader, String classname, String arg0) throws IOException {
+  protected boolean obfuscateJS() {
+    return false;
+  }
+
+  protected String runInClassLoader(ClassLoader loader, String classname, Class<?>[] types, Object[] args) throws IOException {
     try {
       Class<?> c = loader.loadClass(classname);
       Object o = c.newInstance();
-      Method m = c.getMethod("run", String.class);
-      Object result = m.invoke(o, arg0);
+      Method m = c.getMethod("run", types);
+      Object result = m.invoke(o, args);
       return (String) result;
     }
     catch (InvocationTargetException e0) {

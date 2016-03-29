@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.ui.html;
+package org.eclipse.scout.rt.server.commons.servlet;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -19,7 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Helper to manage url param hints for the {@link UiServlet}.
+ * Helper to manage url param hints for servlets
  * <p>
  * The following hints are supported:
  * <ul>
@@ -31,8 +31,8 @@ import org.slf4j.LoggerFactory;
  * </ul>
  * All values are <code>true</code> by default, unless the application is run in development mode.
  */
-public final class UiHints {
-  private static final Logger LOG = LoggerFactory.getLogger(UiHints.class);
+public final class UrlHints {
+  private static final Logger LOG = LoggerFactory.getLogger(UrlHints.class);
 
   /**
    * Enables/disables cache, compress, minify. Also decides if scoutClass attribute is added to the DOM for form-fields.
@@ -42,11 +42,11 @@ public final class UiHints {
   private static final String URL_PARAM_MINIFY_HINT = "minify";
   private static final String URL_PARAM_INSPECTOR_HINT = "inspector";
 
-  private static final String SESSION_ATTRIBUTE_CACHE_HINT = UiHints.class.getName() + "#cache";
-  private static final String SESSION_ATTRIBUTE_MINIFY_HINT = UiHints.class.getName() + "#minify";
-  private static final String SESSION_ATTRIBUTE_INSPECTOR_HINT = UiHints.class.getName() + "#inspector";
+  private static final String SESSION_ATTRIBUTE_CACHE_HINT = UrlHints.class.getName() + "#cache";
+  private static final String SESSION_ATTRIBUTE_MINIFY_HINT = UrlHints.class.getName() + "#minify";
+  private static final String SESSION_ATTRIBUTE_INSPECTOR_HINT = UrlHints.class.getName() + "#inspector";
 
-  private UiHints() {
+  private UrlHints() {
     // static access only
   }
 
@@ -70,9 +70,12 @@ public final class UiHints {
     if (value == null) {
       return;
     }
-    HttpSession session = req.getSession();
+    HttpSession session = req.getSession(false);
+    if (session == null) {
+      return;
+    }
     for (String attName : sessionAttributeNameToStoreTo) {
-      LOG.info("Set UiHint: {}={}", attName, value);
+      LOG.info("Set UrlHint: {}={}", attName, value);
       session.setAttribute(attName, value);
     }
   }

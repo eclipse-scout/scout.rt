@@ -16,9 +16,9 @@ import org.eclipse.scout.rt.client.services.common.icon.IconLocator;
 import org.eclipse.scout.rt.client.services.common.icon.IconSpec;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.resource.BinaryResources;
-import org.eclipse.scout.rt.ui.html.cache.HttpCacheKey;
-import org.eclipse.scout.rt.ui.html.cache.HttpCacheObject;
-import org.eclipse.scout.rt.ui.html.cache.IHttpCacheControl;
+import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheControl;
+import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheKey;
+import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheObject;
 
 /**
  * This class loads static icon images from {@link IconLocator} (<code>/resource/icons</code> folders of all jars on the
@@ -42,7 +42,7 @@ public class IconLoader extends AbstractResourceLoader {
           .withContent(iconSpec.getContent())
           .withLastModified(System.currentTimeMillis())
           .withCachingAllowed(true)
-          .withCacheMaxAge(IHttpCacheControl.MAX_AGE_4_HOURS)
+          .withCacheMaxAge(HttpCacheControl.MAX_AGE_4_HOURS)
           .build();
 
       return new HttpCacheObject(cacheKey, content);

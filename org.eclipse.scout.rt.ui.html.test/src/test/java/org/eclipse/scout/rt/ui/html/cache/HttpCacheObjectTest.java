@@ -2,6 +2,8 @@ package org.eclipse.scout.rt.ui.html.cache;
 
 import org.eclipse.scout.rt.platform.resource.BinaryResources;
 import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheKey;
+import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheObject;
 import org.junit.Test;
 
 public class HttpCacheObjectTest {

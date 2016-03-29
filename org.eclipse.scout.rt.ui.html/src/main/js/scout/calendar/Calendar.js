@@ -689,7 +689,7 @@ scout.Calendar.prototype.layoutAxis = function() {
     $parent.appendDiv('calendar-week-axis').attr('data-axis-name', '12:00').css('top', this._dayPosition(12) + '%');
     $parent.appendDiv('calendar-week-axis').attr('data-axis-name', '13:00').css('top', this._dayPosition(13) + '%');
     $parent.appendDiv('calendar-week-axis').attr('data-axis-name', '17:00').css('top', this._dayPosition(17) + '%');
-    $parent.appendDiv('calendar-week-task').attr('data-axis-name', 'Tasks').css('top', this._dayPosition(-1) + '%');
+    $parent.appendDiv('calendar-week-task').attr('data-axis-name', session.text('ui.CalendarDay')).css('top', this._dayPosition(-1) + '%');
   }
 };
 
