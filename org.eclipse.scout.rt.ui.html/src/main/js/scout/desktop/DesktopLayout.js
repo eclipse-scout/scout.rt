@@ -140,7 +140,10 @@ scout.DesktopLayout.prototype.calculateNavigationWidth = function(containerSize)
   if (navigationLayoutData.fullWidth) {
     return containerSize.width;
   }
-  var splitterPosition = this.desktop.splitter.position;
+  var splitterPosition = 0;
+  if (this.desktop.splitterVisible) {
+    splitterPosition = this.desktop.splitter.position;
+  }
   var outline = this.desktop.outline;
   if (!this.desktop.resizing && outline && outline.autoToggleBreadcrumbStyle) {
     // If autoToggleBreadcrumbStyle is true, BREADCRUMB_STYLE_WIDTH triggers the toggling between the two modes.

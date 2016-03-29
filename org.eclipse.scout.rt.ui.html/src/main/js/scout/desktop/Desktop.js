@@ -14,6 +14,7 @@ scout.Desktop = function() {
   this.navigation;
   this.header;
   this.bench;
+  this.splitter;
 
   /**
    * FIXME dwi: (activeForm): selected tool form action wird nun auch als 'activeForm' verwendet (siehe TableKeystrokeContext.js)
@@ -47,6 +48,7 @@ scout.Desktop.prototype._init = function(model) {
   this._addNullOutline(model.outline);
   this._resizeHandler = this.onResize.bind(this);
   this._popstateHandler = this.onPopstate.bind(this);
+  this.updateSplitterVisibility();
 };
 
 scout.Desktop.prototype._initKeyStrokeContext = function(keyStrokeContext) {
@@ -79,8 +81,7 @@ scout.Desktop.prototype._render = function($parent) {
   this._renderBenchVisible();
   this._renderTitle();
   this._renderLogoUrl();
-  this._renderSplitter();
-  this._setSplitterPosition();
+  this._renderSplitterVisible();
   this.addOns.forEach(function(addOn) {
     addOn.render(this.$container);
   }, this);
@@ -269,8 +270,16 @@ scout.Desktop.prototype._renderLogoUrl = function() {
   }
 };
 
+scout.Desktop.prototype._renderSplitterVisible = function() {
+  if (this.splitterVisible) {
+    this._renderSplitter();
+  } else {
+    this._removeSplitter();
+  }
+};
+
 scout.Desktop.prototype._renderSplitter = function() {
-  if (!this.navigation) {
+  if (this.splitter || !this.navigation) {
     return;
   }
   this.splitter = scout.create('Splitter', {
@@ -280,9 +289,18 @@ scout.Desktop.prototype._renderSplitter = function() {
     maxRatio: 0.5
   });
   this.splitter.render(this.$container);
-  this.splitter.$container.insertBefore(this.$overlaySeparator);
+  this.splitter.$container.insertAfter(this.navigation.$container);
   this.splitter.on('resize', this._onSplitterResize.bind(this));
   this.splitter.on('resizeend', this._onSplitterResizeEnd.bind(this));
+  this.updateSplitterPosition();
+};
+
+scout.Desktop.prototype._removeSplitter = function() {
+  if (!this.splitter) {
+    return;
+  }
+  this.splitter.remove();
+  this.splitter = null;
 };
 
 scout.Desktop.prototype._renderBenchDropShadow = function() {
@@ -315,8 +333,23 @@ scout.Desktop.prototype._setupDragAndDrop = function() {
   });
 };
 
-scout.Desktop.prototype._setSplitterPosition = function() {
-  if (!this.navigation) {
+scout.Desktop.prototype.updateSplitterVisibility = function() {
+  // TODO CGU add check for displayStyle compact
+  this.setSplitterVisible(this.navigationVisible && this.benchVisible);
+};
+
+scout.Desktop.prototype.setSplitterVisible = function(visible) {
+  if (this.splitterVisible === visible) {
+    return;
+  }
+  this._setProperty('splitterVisible', visible);
+  if (this.rendered) {
+    this._renderSplitterVisible();
+  }
+};
+
+scout.Desktop.prototype.updateSplitterPosition = function() {
+  if (!this.splitter) {
     return;
   }
   // FIXME awe: (user-prefs) Use user-preferences instead of sessionStorage
@@ -364,34 +397,55 @@ scout.Desktop.prototype.setOutline = function(outline) {
   this.trigger('outlineChanged');
 };
 
-scout.Desktop.prototype.setNavigationVisible = function(visible) {
+scout.Desktop.prototype._syncNavigationVisible = function(visible) {
+  this.setNavigationVisible(visible, false);
+  return false;
+};
+
+scout.Desktop.prototype.setNavigationVisible = function(visible, notifyServer) {
   if (this.navigationVisible === visible) {
     return;
   }
   this._setProperty('navigationVisible', visible);
-  this._sendProperty('navigationVisible');
+  notifyServer = scout.nvl(notifyServer, true);
+  if (notifyServer) {
+    this._sendProperty('navigationVisible');
+  }
   if (this.rendered) {
     this._renderNavigationVisible();
   }
+  this.updateSplitterVisibility();
 };
 
-scout.Desktop.prototype.setBenchVisible = function(visible) {
+scout.Desktop.prototype._syncBenchVisible = function(visible) {
+  this.setBenchVisible(visible, false);
+  return false;
+};
+
+scout.Desktop.prototype.setBenchVisible = function(visible, notifyServer) {
   if (this.benchVisible === visible) {
     return;
   }
   this._setProperty('benchVisible', visible);
-  this._sendProperty('benchVisible');
+  notifyServer = scout.nvl(notifyServer, true);
+  if (notifyServer) {
+    this._sendProperty('benchVisible');
+  }
   if (this.rendered) {
     this._renderBenchVisible();
   }
+  this.updateSplitterVisibility();
 };
 
-scout.Desktop.prototype.setHeaderVisible = function(visible) {
+scout.Desktop.prototype.setHeaderVisible = function(visible, notifyServer) {
   if (this.headerVisible === visible) {
     return;
   }
   this._setProperty('headerVisible', visible);
-  this._sendProperty('headerVisible');
+  notifyServer = scout.nvl(notifyServer, true);
+  if (notifyServer) {
+    this._sendProperty('headerVisible');
+  }
   if (this.rendered) {
     this._renderHeaderVisible();
   }
