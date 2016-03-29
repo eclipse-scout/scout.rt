@@ -220,7 +220,7 @@
 
 .main-menubar {
   padding-left: @bench-padding-x;
-  padding-right: @bench-padding-x; // - @desktop-table-header-menubar-padding-right;
+  padding-right: @bench-padding-x;
   height: 52px;
   background-color: @main-menubar-background-color;
 

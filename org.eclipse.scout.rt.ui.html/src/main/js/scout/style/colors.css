@@ -161,6 +161,10 @@
 @form-background-color: @background-color;
 @form-tool-popup-main-menubar-background-color: @menubar-background-color;
 @group-box-title-border-color: @border-color;
+@header-view-button-tab-active-background-color: @view-tab-active-background-color;
+@header-view-button-tab-active-color: @view-tab-active-color;
+@header-view-button-tab-background-color: @palette-bluegray-3;
+@header-view-button-tab-color: @view-button-tab-active-color;
 @key-box-background-color: @palette-orange-2;
 @key-box-border-color: @key-box-background-color;
 @key-box-color: @palette-black;

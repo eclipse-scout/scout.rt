@@ -45,13 +45,15 @@ scout.DesktopHeaderLayout.prototype._toolsWidth = function($tools, cssClasses) {
  * @override AbstractLayout.js
  */
 scout.DesktopHeaderLayout.prototype.layout = function($container) {
-  var $tabs = $container.find('.desktop-view-tabs'),
+  var viewButtonsSize, toolsWidth, tabsWidth,
+    $tabs = $container.find('.desktop-view-tabs'),
     $tools = $container.find('.header-tools'),
+    viewButtons = this.header.viewButtons,
     contWidth = scout.graphics.getSize($container).width,
     numTabs = this.desktop.viewTabsController.viewTabCount(),
     smallPrefTabsWidth = numTabs * this.TAB_WIDTH_SMALL,
     logoWidth = 0,
-    toolsWidth, tabsWidth;
+    viewButtonsWidth = 0;
 
   if (this.header.logo) {
     logoWidth = scout.graphics.getSize(this.header.logo.$container, true).width;
@@ -63,6 +65,12 @@ scout.DesktopHeaderLayout.prototype.layout = function($container) {
   }
 
   $tabs.find('.desktop-view-tab').setVisible(true);
+  if (viewButtons) {
+    viewButtonsSize = viewButtons.htmlComp.getSize();
+    viewButtonsWidth = viewButtonsSize.width;
+    viewButtons.htmlComp.setSize(viewButtonsSize.subtract(viewButtons.htmlComp.getMargins()));
+  }
+  $tabs.cssLeft(viewButtonsWidth);
 
   $tools.find('.header-tool-item').each(function() {
     var $item = $(this);
@@ -75,7 +83,7 @@ scout.DesktopHeaderLayout.prototype.layout = function($container) {
   });
 
   toolsWidth = this._toolsWidth($tools);
-  tabsWidth = contWidth - toolsWidth - logoWidth;
+  tabsWidth = contWidth - toolsWidth - logoWidth - viewButtonsWidth;
   $tools.cssLeft(contWidth - toolsWidth - logoWidth);
 
   this._overflowTabsIndizes = [];
@@ -95,7 +103,7 @@ scout.DesktopHeaderLayout.prototype.layout = function($container) {
     });
 
     toolsWidth = scout.graphics.getSize($tools, true).width;
-    tabsWidth = contWidth - toolsWidth - logoWidth;
+    tabsWidth = contWidth - toolsWidth - logoWidth - viewButtonsWidth;
     $tools.cssLeft(contWidth - toolsWidth - logoWidth);
 
     if (smallPrefTabsWidth <= tabsWidth) {
@@ -116,7 +124,7 @@ scout.DesktopHeaderLayout.prototype.layout = function($container) {
     });
 
     toolsWidth = scout.graphics.getSize($tools, true).width;
-    tabsWidth = contWidth - toolsWidth - logoWidth;
+    tabsWidth = contWidth - toolsWidth - logoWidth - viewButtonsWidth;
     $tools.cssLeft(contWidth - toolsWidth - logoWidth);
 
     if (smallPrefTabsWidth <= tabsWidth) {

@@ -10,6 +10,7 @@
  ******************************************************************************/
 scout.ViewButton = function() {
   scout.ViewButton.parent.call(this);
+  this.inBackground = false;
 };
 scout.inherits(scout.ViewButton, scout.Action);
 
@@ -19,6 +20,12 @@ scout.ViewButton.prototype._render = function($parent) {
   } else {
     this._renderAsTab($parent);
   }
+};
+
+scout.ViewButton.prototype._renderProperties = function() {
+  scout.ViewButton.parent.prototype._renderProperties.call(this);
+
+  this._renderInBackground();
 };
 
 scout.ViewButton.prototype._isMenu = function() {
@@ -58,8 +65,26 @@ scout.ViewButton.prototype._renderIconId = function() {
   }
 };
 
+scout.ViewButton.prototype._renderInBackground = function() {
+  this.$container.toggleClass('in-background', this.inBackground);
+};
+
 scout.ViewButton.prototype.last = function() {
   this.$container.addClass('last');
+};
+
+scout.ViewButton.prototype.sendToBack = function() {
+  this.inBackground = true;
+  if (this.rendered) {
+    this._renderInBackground();
+  }
+};
+
+scout.ViewButton.prototype.bringToFront = function() {
+  this.inBackground = false;
+  if (this.rendered) {
+    this._renderInBackground();
+  }
 };
 
 scout.ViewButton.prototype._onMouseEvent = function(event) {

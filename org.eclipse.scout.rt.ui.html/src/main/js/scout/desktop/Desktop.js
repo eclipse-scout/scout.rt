@@ -31,6 +31,7 @@ scout.Desktop = function() {
   this.initialFormRendering = false;
   this.offline = false;
   this.notifications = [];
+  this.inBackground = false;
 };
 scout.inherits(scout.Desktop, scout.ModelAdapter);
 
@@ -82,6 +83,7 @@ scout.Desktop.prototype._render = function($parent) {
   this._renderTitle();
   this._renderLogoUrl();
   this._renderSplitterVisible();
+  this._renderInBackground();
   this.addOns.forEach(function(addOn) {
     addOn.render(this.$container);
   }, this);
@@ -303,9 +305,9 @@ scout.Desktop.prototype._removeSplitter = function() {
   this.splitter = null;
 };
 
-scout.Desktop.prototype._renderBenchDropShadow = function() {
+scout.Desktop.prototype._renderInBackground = function() {
   if (this.navigationVisible && this.benchVisible) {
-    this.bench.$container.toggleClass('drop-shadow', this.outline.inBackground);
+    this.bench.$container.toggleClass('drop-shadow', this.inBackground);
   }
 };
 
@@ -543,34 +545,42 @@ scout.Desktop.prototype._openUriAsNewWindow = function(uri) {
 };
 
 scout.Desktop.prototype.bringOutlineToFront = function() {
+  if (!this.inBackground) {
+    return;
+  }
+  this.inBackground = false;
   this.viewTabsController.deselectViewTab();
 
-  if (this.outline.inBackground) {
-    if (this.navigation) {
-      this.navigation.bringToFront();
-    }
-    if (this.bench) {
-      this.bench.bringToFront();
-    }
+  if (this.navigationVisible) {
+    this.navigation.bringToFront();
+  }
+  if (this.benchVisible) {
+    this.bench.bringToFront();
+  }
+  if (this.headerVisible) {
+    this.header.bringToFront();
   }
 
-  this._renderBenchDropShadow();
+  this._renderInBackground();
   // Set active form to null because outline is active form.
   this._setOutlineActivated();
 };
 
 scout.Desktop.prototype.sendOutlineToBack = function() {
-  if (this.outline.inBackground) {
+  if (this.inBackground) {
     return;
   }
-
-  if (this.navigation) {
+  this.inBackground = true;
+  if (this.navigationVisible) {
     this.navigation.sendToBack();
   }
-  if (this.bench) {
+  if (this.benchVisible) {
     this.bench.sendToBack();
   }
-  this._renderBenchDropShadow();
+  if (this.headerVisible) {
+    this.header.sendToBack();
+  }
+  this._renderInBackground();
 };
 
 /**
@@ -706,6 +716,7 @@ scout.Desktop.prototype.onLayoutAnimationComplete = function() {
   if (!this.benchVisible) {
     this._removeBench();
   }
+  this._trigger('animationEnd');
   this.animateLayoutChange = false;
 };
 

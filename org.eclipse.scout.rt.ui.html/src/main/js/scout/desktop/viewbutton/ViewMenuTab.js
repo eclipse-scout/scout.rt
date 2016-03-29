@@ -21,7 +21,7 @@ scout.ViewMenuTab = function() {
   this.outlineViewButton = null;
   this.selected = false;
   this.iconId;
-  this._inBackground = false;
+  this.inBackground = false;
 
   this.defaultIconId = scout.icons.OUTLINE;
 };
@@ -67,6 +67,7 @@ scout.ViewMenuTab.prototype._render = function($parent) {
 scout.ViewMenuTab.prototype._renderProperties = function() {
   this._renderIconId();
   this._renderSelected();
+  this._renderInBackground();
 };
 
 scout.ViewMenuTab.prototype._renderSelected = function() {
@@ -78,8 +79,12 @@ scout.ViewMenuTab.prototype._renderIconId = function() {
   this.$container.icon(this.iconId);
 };
 
+scout.ViewMenuTab.prototype._renderInBackground = function() {
+  this.$container.toggleClass('in-background', this.inBackground);
+};
+
 scout.ViewMenuTab.prototype._updateArrowIconVisibility = function() {
-  this.$arrowIcon.toggleClass('hidden', !this.selected || this._inBackground);
+  this.$arrowIcon.toggleClass('hidden', !this.selected || this.inBackground);
 };
 
 /**
@@ -105,15 +110,17 @@ scout.ViewMenuTab.prototype._findOutlineViewButton = function(onlySelected) {
  */
 scout.ViewMenuTab.prototype.togglePopup = function(event) {
   if (this.selected) {
-    if (this._inBackground) {
+    if (this.inBackground) {
       this.session.desktop.bringOutlineToFront(this.outlineViewButton.outline);
     } else {
       // Open or close the popup.
       if (this.popup) {
         this.popup.close(event);
       } else {
+        this.$container.addClass('popup-open');
         this.popup = this._openPopup(event);
         this.popup.on('remove', function(event) {
+          this.$container.removeClass('popup-open');
           this.popup = null;
         }.bind(this));
       }
@@ -127,7 +134,7 @@ scout.ViewMenuTab.prototype.togglePopup = function(event) {
 scout.ViewMenuTab.prototype._openPopup = function(event) {
   var naviBounds = scout.graphics.bounds(this.$container.parent(), true);
   var popup = scout.create('ViewMenuPopup', {
-    parent: this.session.desktop,
+    parent: this,
     $tab: this.$container,
     viewMenus: this._popupViewMenus(),
     naviBounds: naviBounds
@@ -174,11 +181,13 @@ scout.ViewMenuTab.prototype.onOutlineChanged = function(outline) {
 };
 
 scout.ViewMenuTab.prototype.sendToBack = function() {
-  this._inBackground = true;
+  this.inBackground = true;
+  this._renderInBackground();
   this._renderSelected();
 };
 
 scout.ViewMenuTab.prototype.bringToFront = function() {
-  this._inBackground = false;
+  this.inBackground = false;
+  this._renderInBackground();
   this._renderSelected();
 };

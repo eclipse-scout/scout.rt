@@ -79,6 +79,7 @@ scout.DesktopNavigation.prototype.setOutline = function(outline) {
   this.outline = outline;
   if (this.outline) {
     this.outline.setBreadcrumbTogglingThreshold(scout.DesktopNavigation.BREADCRUMB_STYLE_WIDTH);
+    this.outline.inBackground = this.desktop.inBackground;
     if (this.rendered) {
       this._renderOutline();
     }
@@ -86,12 +87,12 @@ scout.DesktopNavigation.prototype.setOutline = function(outline) {
 };
 
 scout.DesktopNavigation.prototype.sendToBack = function() {
-  this.viewButtons.viewMenuTab.sendToBack();
+  this.viewButtons.sendToBack();
   this.outline.sendToBack();
 };
 
 scout.DesktopNavigation.prototype.bringToFront = function() {
-  this.viewButtons.viewMenuTab.bringToFront();
+  this.viewButtons.bringToFront();
   this.outline.bringToFront();
 };
 

@@ -14,6 +14,7 @@ scout.DesktopBench = function() {
   this._outlineNodesSelectedHandler = this._onOutlineNodesSelected.bind(this);
   this._outlinePageChangedHandler = this._onOutlinePageChanged.bind(this);
   this._outlinePropertyChangeHandler = this._onOutlinePropertyChange.bind(this);
+  this._addEventSupport();
 };
 scout.inherits(scout.DesktopBench, scout.Widget);
 
@@ -121,7 +122,12 @@ scout.DesktopBench.prototype.setOutlineContent = function(content) {
   if (this.rendered) {
     this._removeOutlineContent();
   }
-  this.outlineContent = content;
+  this._setProperty('outlineContent', content);
+  // Inform header that outline content has changed
+  // (having a listener in the header is quite complex due to initialization phase, a direct call here is much easier to implement)
+  if (this.desktop.header) {
+    this.desktop.header.onBenchOutlineContentChange();
+  }
   if (this.rendered) {
     this._renderOrAttachOutlineContent();
   }

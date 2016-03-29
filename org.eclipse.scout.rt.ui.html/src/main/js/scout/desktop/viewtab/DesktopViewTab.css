@@ -20,7 +20,6 @@
   background-color: @view-tab-background-color;
   color: @text-color;
   border-right: 1px solid @border-color;
-  transition: background-color 200ms linear;
 
   &.small {
     width: 130px;
@@ -41,7 +40,6 @@
     color: @view-tab-active-color;
     /* full size of header to draw over the border-bottom */
     height: 100%;
-    transition: off;
 
     &::before {
       .desktop-bench-drop-shadow();
