@@ -114,6 +114,7 @@ scout.Desktop.prototype._postRender = function() {
   this.formController.render();
   this.messageBoxController.render();
   this.fileChooserController.render();
+  this._renderDisplayChildsOfOutline();
 
   // find active form and set selected.
   var selectable;
@@ -132,6 +133,28 @@ scout.Desktop.prototype._postRender = function() {
     this.viewTabsController.selectViewTab(this.viewTabsController.viewTab(selectable));
   }
   this.initialFormRendering = false;
+};
+
+/**
+ * Displays attached forms, message boxes and file choosers.
+ * Outline does not need to be rendered to show the child elements, it needs to be active (necessary if navigation is invisible)
+ */
+scout.Desktop.prototype._renderDisplayChildsOfOutline = function() {
+  if (!this.outline) {
+    return;
+  }
+  this.outline.formController.render();
+  this.outline.messageBoxController.render();
+  this.outline.fileChooserController.render();
+};
+
+scout.Desktop.prototype._removeDisplayChildsOfOutline = function() {
+  if (!this.outline) {
+    return;
+  }
+  this.outline.formController.remove();
+  this.outline.messageBoxController.remove();
+  this.outline.fileChooserController.remove();
 };
 
 scout.Desktop.prototype._renderTitle = function() {
@@ -392,10 +415,19 @@ scout.Desktop.prototype._findActiveSelectablePart = function(form) {
 };
 
 scout.Desktop.prototype.setOutline = function(outline) {
+  if (this.rendered) {
+    this._removeDisplayChildsOfOutline();
+  }
+
   this.outline = outline;
   if (this.navigation) {
     this.navigation.setOutline(this.outline);
   }
+
+  if (this.rendered) {
+    this._renderDisplayChildsOfOutline();
+  }
+
   this.trigger('outlineChanged');
 };
 

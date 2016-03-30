@@ -101,6 +101,15 @@ scout.FormController.prototype.activateForm = function(form) {
   }
 };
 
+scout.FormController.prototype.acceptView = function(view, register, position, selectView) {
+  // Only render view if 'displayParent' is rendered yet; if not, the view will be rendered once 'displayParent' is rendered.
+  if (!this.displayParent.rendered) {
+    return false;
+  }
+
+  return true;
+};
+
 scout.FormController.prototype._renderView = function(view, register, position, selectView) {
   if (register) {
     if (position !== undefined) {
@@ -110,14 +119,18 @@ scout.FormController.prototype._renderView = function(view, register, position, 
     }
   }
 
-  // Only render view if 'displayParent' is rendered yet; if not, the view will be rendered once 'displayParent' is rendered.
-  // Except when Desktop is in initial rendering-> the tab has to be rendered to exist in overview
-  if (!this.displayParent.rendered && !this.session.desktop.initialFormRendering) {
+  // Display parent may implement acceptView, if not implemented -> use default
+  if (this.displayParent.acceptView) {
+    if (!this.displayParent.acceptView(view)) {
+      return;
+    }
+  } else if (!this.acceptView(view)){
     return;
   }
+
   // Prevent "Already rendered" errors / FIXME bsh, dwi: Remove this hack! Fix in on model if possible. See #162954.
   if (view.rendered) {
-    return;
+    return false;
   }
 
   var viewTabsController = this.session.desktop.viewTabsController;
@@ -129,36 +142,51 @@ scout.FormController.prototype._renderView = function(view, register, position, 
   }
 };
 
+scout.FormController.prototype.acceptDialog = function(dialog) {
+  // Only render dialog if 'displayParent' is rendered yet; if not, the dialog will be rendered once 'displayParent' is rendered.
+  if (!this.displayParent.rendered) {
+    return false;
+  }
+  return true;
+};
+
 scout.FormController.prototype._renderDialog = function(dialog, register) {
+  var desktop = this.session.desktop;
   if (register) {
     this.displayParent.dialogs.push(dialog);
   }
+
+  // Display parent may implement acceptDialog, if not implemented -> use default
+  if (this.displayParent.acceptDialog) {
+    if (!this.displayParent.acceptDialog(dialog)) {
+      return;
+    }
+  } else if (!this.acceptDialog(dialog)){
+    return;
+  }
+
+  // Prevent "Already rendered" errors / FIXME bsh, dwi: Remove this hack! Fix in on model if possible. See #162954.
+  if (dialog.rendered) {
+    return false;
+  }
+
   if (this.displayParent instanceof scout.Form) {
     dialog.on('remove', function() {
       if (this.displayParent.dialogs.length > 0) {
-        this.session.desktop._setFormActivated(this.displayParent.dialogs[this.displayParent.dialogs.length - 1]);
-      } else if (this.displayParent.parent instanceof scout.Outline) {
-        // if displayParent is a page
-        this.session.desktop._setOutlineActivated();
+        desktop._setFormActivated(this.displayParent.dialogs[this.displayParent.dialogs.length - 1]);
+      } else if (this.displayParent.detailForm) {
+        // if displayParent is the detail form of a page -> activate outline
+        desktop._setOutlineActivated();
       } else {
-        this.session.desktop._setFormActivated(this.displayParent);
+        desktop._setFormActivated(this.displayParent);
       }
     }.bind(this));
-  }
-
-  // Only render dialog if 'displayParent' is rendered yet; if not, the dialog will be rendered once 'displayParent' is rendered.
-  if (!this.displayParent.rendered) {
-    return;
-  }
-  // Prevent "Already rendered" errors / FIXME bsh, dwi: Remove this hack! Fix in on model if possible. See #162954.
-  if (dialog.rendered) {
-    return;
   }
 
   if (dialog.isPopupWindow()) {
     this._renderPopupWindow(dialog);
   } else {
-    dialog.render(this.session.desktop.$container);
+    dialog.render(desktop.$container);
     this._layoutDialog(dialog);
 
     // Only display the dialog if its 'displayParent' is visible to the user.

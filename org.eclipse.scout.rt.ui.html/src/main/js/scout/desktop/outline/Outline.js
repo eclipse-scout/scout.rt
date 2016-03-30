@@ -105,10 +105,6 @@ scout.Outline.prototype._renderProperties = function() {
  * @override
  */
 scout.Outline.prototype._remove = function() {
-  this.formController.remove();
-  this.messageBoxController.remove();
-  this.fileChooserController.remove();
-
   scout.Outline.parent.prototype._remove.call(this);
   this._removeTitle();
 };
@@ -160,11 +156,6 @@ scout.Outline.prototype._postRender = function() {
   //used to render glasspane
   this._trigger('rendered');
   scout.Outline.parent.prototype._postRender.call(this);
-
-  // Display attached forms, message boxes and file choosers.
-  this.formController.render();
-  this.messageBoxController.render();
-  this.fileChooserController.render();
 };
 
 /**
@@ -227,6 +218,9 @@ scout.Outline.prototype._initDetailForm = function(node) {
   if (this.navigateButtonsVisible) {
     this._appendNavigateButtonsForDetailForm(node);
   }
+
+  // Mark form as detail form
+  node.detailForm.detailForm = true;
 
   node.detailForm.one('destroy', function() {
     // Unlink detail form if it was closed. May happen in the following case:
@@ -509,15 +503,6 @@ scout.Outline.prototype.bringToFront = function() {
   this.formController.attachDialogs();
   this.messageBoxController.attach();
   this.fileChooserController.attach();
-};
-
-/**
- * === Method required for objects that act as 'displayParent' ===
- *
- * Returns 'true' if this Outline is currently accessible to the user.
- */
-scout.Outline.prototype.inFront = function() {
-  return this.rendered && !this.inBackground;
 };
 
 scout.Outline.prototype._renderInBackground = function() {
@@ -807,6 +792,31 @@ scout.Outline.prototype.glassPaneTargets = function() {
   }
 };
 
+/**
+ * === Method required for objects that act as 'displayParent' ===
+ *
+ * Returns true if this outline is active and not in background.
+ */
+scout.Outline.prototype.inFront = function() {
+  return this.session.desktop.outline === this && !this.inBackground;
+};
+
+/**
+ * Called if outline acts as display parent.<p>
+ * Returns true if outline is active, even if it is not rendered (e.g. when navigation is invisible)
+ */
+scout.Outline.prototype.acceptDialog = function(dialog) {
+  return this.session.desktop.outline === this;
+};
+
+/**
+ * Called if outline acts as display parent.<p>
+ * Returns true if outline is active, even if it is not rendered (e.g. when navigation is invisible)
+ */
+scout.Outline.prototype.acceptView = function(view) {
+  return this.session.desktop.outline === this;
+};
+
 scout.Outline.prototype._syncMenus = function(menus, oldMenus) {
   this._keyStrokeSupport.syncMenus(menus, oldMenus);
   if (this.titleMenuBar) {
@@ -818,6 +828,12 @@ scout.Outline.prototype._syncMenus = function(menus, oldMenus) {
 scout.Outline.prototype._updateTitleMenuBar = function() {
   var menuItems = scout.menus.filter(this.menus, ['Tree.Header']);
   this.titleMenuBar.setMenuItems(menuItems);
+};
+
+scout.Outline.prototype._triggerPageChanged = function(page) {
+  this.trigger('pageChanged', {
+    page: page
+  });
 };
 
 /* event handling */
@@ -864,12 +880,6 @@ scout.Outline.prototype._onPageChanged = function(event) {
   }
 
   this._triggerPageChanged(node);
-};
-
-scout.Outline.prototype._triggerPageChanged = function(page) {
-  this.trigger('pageChanged', {
-    page: page
-  });
 };
 
 scout.Outline.prototype.onModelAction = function(event) {

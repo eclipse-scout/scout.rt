@@ -234,6 +234,8 @@
   __include("scout/desktop/viewbutton/ViewMenuPopup.js");
   __include("scout/desktop/viewbutton/ViewMenuTab.js");
   __include("scout/desktop/viewtab/DesktopViewTab.js");
+  __include("scout/desktop/viewtab/DesktopViewTabs.js");
+  __include("scout/desktop/viewtab/DesktopViewTabsLayout.js");
   __include("scout/desktop/viewtab/ViewTabsController.js");
   __include("scout/desktop/viewtab/ViewTabSelectKeyStroke.js");
   __include("scout/desktop/outline/DetailTableTreeFilter.js");

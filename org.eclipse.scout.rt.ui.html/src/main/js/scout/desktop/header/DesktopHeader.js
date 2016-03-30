@@ -42,9 +42,8 @@ scout.DesktopHeader.prototype._render = function($parent) {
   this.$container = $parent.appendDiv('desktop-header');
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
   this.htmlComp.setLayout(new scout.DesktopHeaderLayout(this));
-  this._$viewTabBar = this.$container.appendDiv('desktop-view-tabs');
-  this._$toolBar = this.$container.appendDiv('header-tools');
   this._renderViewButtonsVisible();
+  this._renderViewTabs();
   this._renderToolBarVisible();
   this._renderLogoUrl();
   this.desktop.on('propertyChange', this._desktopPropertyChangeHandler);
@@ -59,14 +58,28 @@ scout.DesktopHeader.prototype._remove = function() {
   scout.DesktopHeader.parent.prototype._remove.call(this);
 };
 
+scout.DesktopHeader.prototype._renderViewTabs = function() {
+  if (this.viewTabs) {
+    return;
+  }
+  this.viewTabs = scout.create('DesktopViewTabs', {
+    parent: this
+  });
+  this.viewTabs.render(this.$container);
+};
+
 scout.DesktopHeader.prototype._renderToolBar = function() {
+  if (this._$toolbar) {
+    return;
+  }
+  this.$toolBar = this.$container.appendDiv('header-tools');
   // we set the menuStyle property to render a menu with a different style
   // depending on where the menu is located (header VS menubar).
   this.desktop.actions.forEach(function(action) {
     action._customCssClasses = "header-tool-item";
     action.popupOpeningDirectionX = 'left';
     action.setParent(this);
-    action.render(this._$toolBar);
+    action.render(this.$toolBar);
   }.bind(this));
 
   if (this.desktop.actions.length) {
@@ -75,11 +88,11 @@ scout.DesktopHeader.prototype._renderToolBar = function() {
 };
 
 scout.DesktopHeader.prototype._removeToolBar = function() {
-  if (!this._$toolBar) {
+  if (!this.$toolBar) {
     return;
   }
-  this._$toolBar.remove();
-  this._$toolBar = null;
+  this.$toolBar.remove();
+  this.$toolBar = null;
 };
 
 scout.DesktopHeader.prototype._renderLogoUrl = function() {
