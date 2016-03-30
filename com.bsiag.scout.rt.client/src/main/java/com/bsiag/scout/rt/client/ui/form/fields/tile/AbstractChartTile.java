@@ -96,8 +96,8 @@ public abstract class AbstractChartTile extends AbstractTile<ChartField> {
   }
 
   @Override
-  protected void initFileFieldInternal() {
-    super.initFileFieldInternal();
+  protected void initTileFieldInternal() {
+    super.initTileFieldInternal();
 
     if (getConfiguredChartType() != null) {
       getTileField().getChart().setChartType(getConfiguredChartType());
