@@ -170,24 +170,23 @@ scout.FormController.prototype._renderDialog = function(dialog, register) {
     return false;
   }
 
-  if (this.displayParent instanceof scout.Form) {
-    dialog.on('remove', function() {
-      if (this.displayParent.dialogs.length > 0) {
-        desktop._setFormActivated(this.displayParent.dialogs[this.displayParent.dialogs.length - 1]);
-      } else if (this.displayParent.detailForm) {
-        // if displayParent is the detail form of a page -> activate outline
-        desktop._setOutlineActivated();
-      } else {
-        desktop._setFormActivated(this.displayParent);
-      }
-    }.bind(this));
-  }
+  dialog.on('remove', function() {
+    if (this.displayParent.dialogs.length > 0) {
+      desktop._setFormActivated(this.displayParent.dialogs[this.displayParent.dialogs.length - 1]);
+    } else if (this.displayParent instanceof scout.Form && !this.displayParent.detailForm) {
+      // activate display parent, but not if it is the detail form
+      desktop._setFormActivated(this.displayParent);
+    } else {
+      desktop._setOutlineActivated();
+    }
+  }.bind(this));
 
   if (dialog.isPopupWindow()) {
     this._renderPopupWindow(dialog);
   } else {
     dialog.render(desktop.$container);
     this._layoutDialog(dialog);
+    desktop._setFormActivated(dialog);
 
     // Only display the dialog if its 'displayParent' is visible to the user.
     if (!this.displayParent.inFront()) {

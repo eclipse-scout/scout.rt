@@ -420,6 +420,7 @@ scout.Desktop.prototype.setOutline = function(outline) {
   }
 
   this.outline = outline;
+  this._setOutlineActivated();
   if (this.navigation) {
     this.navigation.setOutline(this.outline);
   }
@@ -582,6 +583,7 @@ scout.Desktop.prototype.bringOutlineToFront = function() {
   }
   this.inBackground = false;
   this.viewTabsController.deselectViewTab();
+  this._setOutlineActivated();
 
   if (this.navigationVisible) {
     this.navigation.bringToFront();
@@ -594,8 +596,6 @@ scout.Desktop.prototype.bringOutlineToFront = function() {
   }
 
   this._renderInBackground();
-  // Set active form to null because outline is active form.
-  this._setOutlineActivated();
 };
 
 scout.Desktop.prototype.sendOutlineToBack = function() {
