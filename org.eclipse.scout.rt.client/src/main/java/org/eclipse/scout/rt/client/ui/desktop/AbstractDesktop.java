@@ -91,6 +91,7 @@ import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.EventListenerList;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.shared.TEXTS;
@@ -1918,6 +1919,10 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   protected boolean handleDeepLink(String deepLinkPath) throws DeepLinkException {
     if (hasApplicationModalElement()) {
       LOG.debug("Could not handle deep-link because modal element prevents changes on UI state. deepLinkPath={}", deepLinkPath);
+      return false;
+    }
+
+    if (StringUtility.isNullOrEmpty(deepLinkPath)) {
       return false;
     }
 
