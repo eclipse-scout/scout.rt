@@ -533,6 +533,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     setBenchVisible(getConfiguredBenchVisible());
     setHeaderVisible(getConfiguredHeaderVisible());
     setDesktopStyle(getConfiguredDesktopStyle());
+    initDesktopStyle(getDesktopStyle());
     setCacheSplitterPosition(getConfiguredCacheSplitterPosition());
     List<IDesktopExtension> extensions = getDesktopExtensions();
     m_contributionHolder = new ContributionComposite(this);
