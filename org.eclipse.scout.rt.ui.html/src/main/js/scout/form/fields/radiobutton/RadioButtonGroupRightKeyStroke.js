@@ -17,14 +17,15 @@ scout.RadioButtonGroupRightKeyStroke = function(radioButtonGroup) {
 scout.inherits(scout.RadioButtonGroupRightKeyStroke, scout.KeyStroke);
 
 scout.RadioButtonGroupRightKeyStroke.prototype.handle = function(event) {
-  var fieldBefore;
+  var fieldBefore,
+    focusedButton = $(event.target).data('radiobutton');
   this.field.radioButtons.some(function(radioButton) {
     if (fieldBefore && radioButton.enabled && radioButton.visible) {
       radioButton.select();
       this.field.session.focusManager.requestFocus(radioButton.$field);
       return true;
     }
-    if (radioButton === this.field.selectedButton && radioButton.enabled && radioButton.visible) {
+    if (radioButton === focusedButton && radioButton.enabled && radioButton.visible) {
       fieldBefore = radioButton;
     }
   }, this);

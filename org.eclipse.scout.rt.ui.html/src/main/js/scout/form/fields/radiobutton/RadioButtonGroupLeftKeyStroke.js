@@ -17,9 +17,10 @@ scout.RadioButtonGroupLeftKeyStroke = function(radioButtonGroup) {
 scout.inherits(scout.RadioButtonGroupLeftKeyStroke, scout.KeyStroke);
 
 scout.RadioButtonGroupLeftKeyStroke.prototype.handle = function(event) {
-  var fieldBefore;
+  var fieldBefore,
+    focusedButton = $(event.target).data('radiobutton');
   this.field.radioButtons.some(function(radioButton) {
-    if (fieldBefore && radioButton === this.field.selectedButton) {
+    if (fieldBefore && radioButton === focusedButton) {
       fieldBefore.select();
       this.field.session.focusManager.requestFocus(fieldBefore.$field);
       return true;

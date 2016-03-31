@@ -17,6 +17,7 @@ scout.RadioButton.prototype._render = function($parent) {
   this.addContainer($parent, 'radio-button', new scout.ButtonLayout(this));
   this.addField($parent.makeDiv()
     .on('mousedown', this._mouseDown.bind(this)));
+  this.$field.data('radiobutton', this);
   this.addStatus();
 
   scout.tooltips.installForEllipsis(this.$field, {

@@ -71,38 +71,33 @@ scout.RadioButtonGroup.prototype._renderEnabled = function() {
 
 scout.RadioButtonGroup.prototype._provideTabIndex = function() {
   var tabSet;
-  this.formFields.forEach(function(formField) {
-    if (formField instanceof scout.RadioButton) {
-      if (formField.enabled && this.enabled && !tabSet) {
-        formField.setTabbable(true);
-        tabSet = formField;
-      } else if (tabSet && this.enabled && formField.enabled && formField.selected) {
-        tabSet.setTabbable(false);
-        formField.setTabbable(true);
-        tabSet = formField;
-      } else {
-        formField.setTabbable(false);
-      }
+  this.radioButtons.forEach(function(radioButton) {
+    if (radioButton.enabled && this.enabled && !tabSet) {
+      radioButton.setTabbable(true);
+      tabSet = radioButton;
+    } else if (tabSet && this.enabled && radioButton.enabled && radioButton.selected) {
+      tabSet.setTabbable(false);
+      radioButton.setTabbable(true);
+      tabSet = radioButton;
+    } else {
+      radioButton.setTabbable(false);
     }
   }, this);
 };
 
-scout.RadioButtonGroup.prototype.selectButton = function(radioButton) {
-  if (!(radioButton instanceof scout.RadioButton)) {
-    throw new Error('RadioButton expected');
-  }
+scout.RadioButtonGroup.prototype.selectButton = function(radioButtonToSelect) {
   this.selectedButton = null;
-  this.formFields.forEach(function(formField) {
-    if (formField === radioButton) {
-      if (!formField.enabled) {
+  this.radioButtons.forEach(function(radioButton) {
+    if (radioButton === radioButtonToSelect) {
+      if (!radioButton.enabled) {
         return;
       }
-      formField.setSelected(true);
-      formField.setTabbable(true);
-      this.selectedButton = formField;
+      radioButton.setSelected(true);
+      radioButton.setTabbable(true);
+      this.selectedButton = radioButton;
     } else {
-      formField.setSelected(false);
-      formField.setTabbable(false);
+      radioButton.setSelected(false);
+      radioButton.setTabbable(false);
     }
   }, this);
 };
