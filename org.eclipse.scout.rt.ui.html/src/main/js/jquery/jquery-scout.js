@@ -1143,3 +1143,24 @@ $.fn.selectAllText = function() {
 $.fn.isContentTruncated = function() {
   return this[0].scrollWidth > this[0].clientWidth;
 };
+
+$.fn.onSingleOrDoubleClick = function(singleClickFunc, doubleClickFunc, timeout) {
+  return this.each(function() {
+    var that = this,
+      numClicks = 0,
+      timeout = timeout || 300;
+    $(this).on('click', function(event) {
+      numClicks++;
+      if (numClicks == 1) {
+        setTimeout(function() {
+          if (numClicks == 1) {
+            singleClickFunc.call(that, event);
+          } else {
+            doubleClickFunc.call(that, event);
+          }
+          numClicks = 0;
+        }, timeout);
+      }
+    });
+  });
+};
