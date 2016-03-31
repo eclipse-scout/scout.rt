@@ -14,7 +14,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.IRadioButton;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
-import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.button.JsonButton;
 
 public class JsonRadioButton<RADIO_BUTTON extends IRadioButton> extends JsonButton<RADIO_BUTTON> {
@@ -31,25 +30,21 @@ public class JsonRadioButton<RADIO_BUTTON extends IRadioButton> extends JsonButt
   }
 
   @Override
-  protected void initJsonProperties(RADIO_BUTTON model) {
-    super.initJsonProperties(model);
-    putJsonProperty(new JsonProperty<IRadioButton>(IRadioButton.PROP_RADIOVALUE, model) {
-      @Override
-      protected Object modelValue() {
-        return getModel().getRadioValue();
-      }
-    });
-  }
-
-  @Override
   public void handleUiEvent(JsonEvent event) {
     if (SELECTED.equals(event.getType())) {
-      addPropertyEventFilterCondition(IRadioButton.PROP_SELECTED, true);
-      getModel().getUIFacade().setSelectedFromUI(true);
-      getModel().getUIFacade().fireButtonClickedFromUI();
+      handleUiSelected(event);
     }
     else {
       super.handleUiEvent(event);
+    }
+  }
+
+  protected void handleUiSelected(JsonEvent event) {
+    boolean selected = event.getData().getBoolean(IRadioButton.PROP_SELECTED);
+    addPropertyEventFilterCondition(IRadioButton.PROP_SELECTED, selected);
+    getModel().getUIFacade().setSelectedFromUI(selected);
+    if (selected) {
+      getModel().getUIFacade().fireButtonClickedFromUI();
     }
   }
 }
