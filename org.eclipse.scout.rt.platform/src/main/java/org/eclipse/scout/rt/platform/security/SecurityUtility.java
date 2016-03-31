@@ -462,7 +462,7 @@ public final class SecurityUtility {
    */
   public static void main(String[] args) {
     KeyPairBytes keyPair = generateKeyPair();
-    System.out.format("base64 encoded key pair:\n  priavte key: %s\n  public key:  %s\n",
+    System.out.format("base64 encoded key pair:\n  private key: %s\n  public key:  %s\n",
         Base64Utility.encode(keyPair.getPrivateKey()),
         Base64Utility.encode(keyPair.getPublicKey()));
   }
