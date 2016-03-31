@@ -11,7 +11,7 @@
 @check-box-size: 18px;
 
 .check-box-field > .field {
-  padding: @borderless-field-padding-y 0px @borderless-field-padding-y 25px;
+  padding: @borderless-field-padding-y 0px @borderless-field-padding-y @check-box-size;
   outline: none;
 
   & > .check-box,
@@ -26,7 +26,11 @@
   }
 
   & > .label {
+    padding-left: 7px;
     #scout.overflow-ellipsis-nowrap();
+    /* only the label should be clickable, not the whole field */
+    display: inline-block;
+    max-width: 100%;
   }
 
   &.disabled > .label {
