@@ -93,7 +93,7 @@ scout.ProposalChooser.prototype._appendOption = function(group, value, text, sel
     }),
     that = this;
   radio._mouseDown = function(event) {
-    this._toggleChecked();
+    this.select();
   };
   radio._send = function() {
     that._onActiveFilterChanged(this.radioValue);
