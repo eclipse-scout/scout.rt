@@ -116,6 +116,7 @@ scout.DesktopBench.prototype.setOutline = function(outline) {
 };
 
 scout.DesktopBench.prototype.setOutlineContent = function(content) {
+  var oldContent = this.outlineContent;
   if (this.outlineContent === content) {
     return;
   }
@@ -126,7 +127,7 @@ scout.DesktopBench.prototype.setOutlineContent = function(content) {
   // Inform header that outline content has changed
   // (having a listener in the header is quite complex due to initialization phase, a direct call here is much easier to implement)
   if (this.desktop.header) {
-    this.desktop.header.onBenchOutlineContentChange();
+    this.desktop.header.onBenchOutlineContentChange(content, oldContent);
   }
   if (this.rendered) {
     this._renderOrAttachOutlineContent();

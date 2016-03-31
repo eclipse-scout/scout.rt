@@ -12,6 +12,7 @@ scout.DesktopHeader = function() {
   scout.DesktopHeader.parent.call(this);
   this._desktopPropertyChangeHandler = this._onDesktopPropertyChange.bind(this);
   this._desktopAnimationEndHandler = this._onDesktopAnimationEnd.bind(this);
+  this._outlineContentMenuBarPropertyChangeHandler = this._onOutlineContentMenuBarPropertyChange.bind(this);
 };
 scout.inherits(scout.DesktopHeader, scout.Widget);
 
@@ -200,20 +201,11 @@ scout.DesktopHeader.prototype.updateViewButtonsVisibility = function() {
   this.setViewButtonsVisible(!this.desktop.navigationVisible && this.desktop.benchVisible && this.desktop.bench && this.desktop.bench.outlineContentVisible);
 };
 
-scout.DesktopHeader.prototype._onDesktopNavigationVisibleChange = function(event) {
-  // If navigation gets visible: Hide view buttons immediately
-  // If navigation gets hidden using animation: Show view buttons when animation ends
-  if (this.desktop.navigationVisible) {
-    this.updateViewButtonsVisibility();
+scout.DesktopHeader.prototype._outlineContentMenuBar = function(outlineContent) {
+  if (outlineContent instanceof scout.Form) {
+    return outlineContent.rootGroupBox.menuBar;
   }
-};
-
-scout.DesktopHeader.prototype._onDesktopAnimationEnd = function(event) {
-  this.updateViewButtonsVisibility();
-};
-
-scout.DesktopHeader.prototype.onBenchOutlineContentChange = function() {
-  this.updateViewButtonStyling();
+  return outlineContent.menuBar;
 };
 
 scout.DesktopHeader.prototype.updateViewButtonStyling = function() {
@@ -233,13 +225,48 @@ scout.DesktopHeader.prototype.updateViewButtonStyling = function() {
     hasMenuBar = outlineContent.menuBar && outlineContent.menuBar.visible;
   }
   this.viewButtons.viewTabs.forEach(function(tab) {
-    tab.$container.toggleClass('outline-content-has-menubar');
+    tab.$container.toggleClass('outline-content-has-menubar', !!hasMenuBar);
   }, this);
-  this.viewButtons.viewMenuTab.$container.toggleClass('outline-content-has-menubar');
+  this.viewButtons.viewMenuTab.$container.toggleClass('outline-content-has-menubar', !!hasMenuBar);
+};
+
+scout.DesktopHeader.prototype._onDesktopNavigationVisibleChange = function(event) {
+  // If navigation gets visible: Hide view buttons immediately
+  // If navigation gets hidden using animation: Show view buttons when animation ends
+  if (this.desktop.navigationVisible) {
+    this.updateViewButtonsVisibility();
+  }
+};
+
+scout.DesktopHeader.prototype._onDesktopAnimationEnd = function(event) {
+  this.updateViewButtonsVisibility();
+};
+
+scout.DesktopHeader.prototype.onBenchOutlineContentChange = function(content, oldContent) {
+  var menuBar;
+  if (oldContent) {
+    menuBar = this._outlineContentMenuBar(oldContent);
+    if (menuBar) {
+      menuBar.off('propertyChange', this._outlineContentMenuBarPropertyChangeHandler);
+    }
+  }
+  this.updateViewButtonStyling();
+  if (content) {
+    menuBar = this._outlineContentMenuBar(content);
+    if (menuBar) {
+      menuBar.on('propertyChange', this._outlineContentMenuBarPropertyChangeHandler);
+    }
+  }
 };
 
 scout.DesktopHeader.prototype._onDesktopPropertyChange = function(event) {
   if (event.changedProperties.indexOf('navigationVisible') !== -1) {
     this._onDesktopNavigationVisibleChange();
+  }
+};
+
+scout.DesktopHeader.prototype._onOutlineContentMenuBarPropertyChange = function(event) {
+  if (event.changedProperties.indexOf('visible') !== -1) {
+    this.updateViewButtonStyling();
   }
 };
