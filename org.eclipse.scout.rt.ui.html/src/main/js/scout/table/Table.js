@@ -308,9 +308,7 @@ scout.Table.prototype._syncTableControls = function(controls) {
   }
   this.tableControls = controls;
   for (i = 0; i < this.tableControls.length; i++) {
-    if (this.tableControls[i].enabled) {
-      this.keyStrokeContext.registerKeyStroke(this.tableControls[i]);
-    }
+    this.keyStrokeContext.registerKeyStroke(this.tableControls[i]);
   }
   this._updateFooterVisibility();
   this.tableControls.forEach(function(control) {

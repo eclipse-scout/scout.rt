@@ -23,8 +23,6 @@ scout.Action = function() {
    * - button: menu looks like a button
    */
   this.actionStyle = scout.Action.ActionStyle.DEFAULT;
-
-  this.actionKeyStroke = this._createActionKeyStroke();
   this.textVisible = true;
 };
 scout.inherits(scout.Action, scout.ModelAdapter);
@@ -36,6 +34,7 @@ scout.Action.ActionStyle = {
 
 scout.Action.prototype._init = function(model) {
   scout.Action.parent.prototype._init.call(this, model);
+  this.actionKeyStroke = this._createActionKeyStroke();
   this._syncKeyStroke(this.keyStroke);
 };
 
