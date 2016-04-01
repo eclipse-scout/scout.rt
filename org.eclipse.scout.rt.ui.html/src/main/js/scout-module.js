@@ -131,6 +131,7 @@
   __include("scout/planner/PlannerMenuItemsOrder.js");
   __include("scout/filechooser/FileChooser.js");
   __include("scout/filechooser/FileChooserController.js");
+  __include("scout/slider/Slider.js");
   // Form
   __include("scout/form/Form.js");
   __include("scout/form/FormLayout.js");
@@ -301,6 +302,7 @@
   __include("scout/form/fields/radiobutton/RadioButtonGroupLeftKeyStroke.js");
   __include("scout/form/fields/radiobutton/RadioButtonGroupRightKeyStroke.js");
   __include("scout/form/fields/sequencebox/SequenceBox.js");
+  __include("scout/form/fields/slider/SliderField.js");
   __include("scout/form/fields/smartfield/SmartField.js");
   __include("scout/form/fields/smartfield/SmartFieldTouchPopup.js");
   __include("scout/form/fields/smartfield/SmartFieldLayout.js");

@@ -1144,6 +1144,13 @@ $.fn.isContentTruncated = function() {
   return this[0].scrollWidth > this[0].clientWidth;
 };
 
+// FIXME awe: (graph) consider moving this function to DoubleClickHandler.js
+/**
+ * This function is used to distinct between single and double clicks.
+ * Instead of executing a handler immediately when the first click occurs,
+ * we wait for a given timeout (or by default 300 ms) to check if it is followed by a second click.
+ * This will delay the execution of a single click a bit, so you should use this function wisely.
+ */
 $.fn.onSingleOrDoubleClick = function(singleClickFunc, doubleClickFunc, timeout) {
   return this.each(function() {
     var that = this,
