@@ -11,7 +11,7 @@
 package org.eclipse.scout.rt.platform.util;
 
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Field;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -33,9 +33,6 @@ public class UriBuilder {
 
   private static final Logger LOG = LoggerFactory.getLogger(UriBuilder.class);
 
-  // FIXME awe: (deep-links) review with J.GU: we should switch to UTF-8 here (was ISO-8599-1 before)
-  // See: https://docs.oracle.com/javase/7/docs/api/java/net/URLEncoder.html
-  // Adjust javadoc comments in UriUtility
   private static final String DEFAULT_ENCODING = StandardCharsets.UTF_8.name();
 
   private final Map<String, String> m_parameters = new HashMap<>();
@@ -116,6 +113,7 @@ public class UriBuilder {
     if (StringUtility.hasText(path)) {
       m_path = StringUtility.join("/", removeTrailingSlash(m_path), path);
     }
+    ensureAbsolutePathWithHost();
     return this;
   }
 
@@ -159,15 +157,13 @@ public class UriBuilder {
 
   public URI createURI(String encoding) {
     try {
-      ensureAbsolutePathWithHost();
       return createURIInternal(encoding);
     }
-    catch (URISyntaxException e) {
+    catch (MalformedURLException | URISyntaxException e) {
       throw new ProcessingException("error creating URI", e);
     }
   }
 
-  // FIXME awe: (deep-links) review with J.GU
   // Inspired by: https://blog.stackhunter.com/2014/03/31/encode-special-characters-java-net-uri/
   // See also: http://stackoverflow.com/questions/19917079/java-net-uri-and-percent-in-query-parameter-value
   // It seems that the URI class knows nothing about key/value pairs used by most webservers.
@@ -175,26 +171,11 @@ public class UriBuilder {
   // Thus: we can and should not use URI as an object to store query-parameters. Maybe we should replace our own
   // API with a custom GetRequest implementation.
   // Another approach would be to use URL instead of URI since, the URL class does not change the query string.
-  private URI createURIInternal(String encoding) throws URISyntaxException {
-    String query = getQueryString(encoding);
-    URI uri = new URI(m_scheme, null, m_host, m_port, m_path, null, m_fragment);
-
-    try {
-      // sets the internal query field
-      Field field = URI.class.getDeclaredField("query");
-      field.setAccessible(true);
-      field.set(uri, query);
-
-      // resets the internal string cache (so it is rebuilt)
-      field = URI.class.getDeclaredField("string");
-      field.setAccessible(true);
-      field.set(uri, null);
-    }
-    catch (ReflectiveOperationException e) {
-      System.err.println(e);
-    }
-
-    return uri;
+  private URI createURIInternal(String encoding) throws MalformedURLException, URISyntaxException {
+    final URI uri = new URI(m_scheme, null, m_host, m_port, m_path, null, null);
+    final String urlWithQuery = StringUtility.join("?", uri.toString(), getQueryString(encoding));
+    final String fullUrl = StringUtility.join("#", urlWithQuery, m_fragment);
+    return new URI(fullUrl);
   }
 
   /**
