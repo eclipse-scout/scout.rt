@@ -449,27 +449,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   /**
-   * Configures the row height hint. This is a hint for the UI if and only if it is not capable of having variable table
-   * row height based on cell contents.
-   * <p>
-   * This property is interpreted in different manner for each GUI port:
-   * <ul>
-   * <li>Swing: The property is ignored.
-   * </ul>
-   * This hint defines the table row height in pixels being used as the fixed row height for all table rows of this
-   * table.
-   * </p>
-   * Subclasses can override this method. Default is {@code -1}.
-   *
-   * @return Table row height hint in pixels.
-   */
-  @ConfigProperty(ConfigProperty.INTEGER)
-  @Order(92)
-  protected int getConfiguredRowHeightHint() {
-    return -1;
-  }
-
-  /**
    * Configures whether the table is checkable.
    * <p>
    * Subclasses can override this method. Default is {@code false}.
@@ -886,7 +865,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     setMultiSelect(getConfiguredMultiSelect());
     setInitialMultilineText(getConfiguredMultilineText());
     setMultilineText(getConfiguredMultilineText());
-    setRowHeightHint(getConfiguredRowHeightHint());
     setKeyboardNavigation(getConfiguredKeyboardNavigation());
     setDragType(getConfiguredDragType());
     setDropType(getConfiguredDropType());
@@ -1485,16 +1463,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   @Override
   public void setMultilineText(boolean on) {
     propertySupport.setPropertyBool(PROP_MULTILINE_TEXT, on);
-  }
-
-  @Override
-  public int getRowHeightHint() {
-    return propertySupport.getPropertyInt(PROP_ROW_HEIGHT_HINT);
-  }
-
-  @Override
-  public void setRowHeightHint(int h) {
-    propertySupport.setPropertyInt(PROP_ROW_HEIGHT_HINT, h);
   }
 
   @Override

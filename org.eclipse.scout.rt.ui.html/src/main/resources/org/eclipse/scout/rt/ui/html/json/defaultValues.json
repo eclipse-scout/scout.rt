@@ -125,7 +125,6 @@
       "multiCheck": true,
       "multiSelect": true,
       "multilineText": false,
-      "rowHeightHint": -1,
       "rows": [],
       "scrollToSelection": false,
       "selectedRows": [],

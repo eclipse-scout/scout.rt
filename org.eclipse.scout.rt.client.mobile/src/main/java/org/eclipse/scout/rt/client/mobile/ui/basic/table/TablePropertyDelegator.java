@@ -40,7 +40,6 @@ public class TablePropertyDelegator<SENDER extends ITable, RECEIVER extends ITab
     getReceiver().setMultiCheck(getSender().isMultiCheck());
     getReceiver().setMultilineText(getSender().isMultilineText());
     getReceiver().setMultiSelect(getSender().isMultiSelect());
-    getReceiver().setRowHeightHint(getSender().getRowHeightHint());
     getReceiver().setScrollToSelection(getSender().isScrollToSelection());
     getReceiver().setSortEnabled(getSender().isSortEnabled());
   }
@@ -75,9 +74,6 @@ public class TablePropertyDelegator<SENDER extends ITable, RECEIVER extends ITab
     }
     else if (name.equals(ITable.PROP_MULTI_SELECT)) {
       getReceiver().setMultiSelect(getSender().isMultiSelect());
-    }
-    else if (name.equals(ITable.PROP_ROW_HEIGHT_HINT)) {
-      getReceiver().setRowHeightHint(getSender().getRowHeightHint());
     }
     else if (name.equals(ITable.PROP_SCROLL_TO_SELECTION)) {
       getReceiver().setScrollToSelection(getSender().isScrollToSelection());

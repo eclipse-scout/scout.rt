@@ -15,7 +15,6 @@
     /* test
     "Table": {
       "enabled": true,
-      "rowHeightHint": -1,
       "rows": []
     },
     // nothing

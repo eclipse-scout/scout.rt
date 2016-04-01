@@ -78,10 +78,6 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
    * Boolean
    */
   String PROP_MULTILINE_TEXT = "multilineText";
-  /**
-   * Integer default -1
-   */
-  String PROP_ROW_HEIGHT_HINT = "rowHeightHint";
 
   /**
    * Boolean
@@ -462,28 +458,6 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
   boolean isMultilineText();
 
   void setMultilineText(boolean on);
-
-  /**
-   * This is a hint for the UI iff it is not capable of having variable table row height based on cell contents.
-   * <p>
-   * This property is interpreted in different manner for each GUI port:
-   * <ul>
-   * <li>Swing: The property is ignored.
-   * </ul>
-   * </p>
-   * <p>
-   * This hint defines the table row height in pixels being used as the row height for all table rows of this table
-   * dependent of the GUI port.
-   * </p>
-   *
-   * @return the hint in pixels, default is -1
-   */
-  int getRowHeightHint();
-
-  /**
-   * see {@link #getRowHeightHint()}
-   */
-  void setRowHeightHint(int h);
 
   /**
    * other than isMultilineText this property reflects the default multiLine state of the table that is used when
@@ -1102,11 +1076,11 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
    * The reload handler is triggered when the user uses the ui tools to reload the table (reload button, reload
    * keystroke).
    * <p>
-   * The existence of a reload handler controls the availability of these tools, meaning if no reload handler is set
-   * the user may not reload the table.
+   * The existence of a reload handler controls the availability of these tools, meaning if no reload handler is set the
+   * user may not reload the table.
    * <p>
    * Default is null.
-   * 
+   *
    * @since 5.1.0
    */
   IReloadHandler getReloadHandler();
