@@ -333,6 +333,4 @@
   // More misc. elements
   __include("scout/desktop/DesktopFormController.js");
   __include("scout/table/FilterFieldsGroupBox.js"); // requires GroupBox.js
-
-  __include("scout/table/MobileTable.js");
 }(window.scout = window.scout || {}, jQuery));

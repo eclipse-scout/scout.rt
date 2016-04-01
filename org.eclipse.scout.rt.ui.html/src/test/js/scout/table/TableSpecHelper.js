@@ -175,12 +175,6 @@ TableSpecHelper.prototype.createTable = function(model) {
   return table;
 };
 
-TableSpecHelper.prototype.createMobileTable = function(model) {
-  var table = new scout.MobileTable();
-  table.init(model);
-  return table;
-};
-
 TableSpecHelper.prototype.createColumnFilter = function(model) {
   var filter = new scout.TextColumnUserFilter();
   filter.init(model);

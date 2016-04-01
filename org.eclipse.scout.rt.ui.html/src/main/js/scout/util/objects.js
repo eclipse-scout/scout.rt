@@ -110,8 +110,7 @@ scout.objects = {
     var whitelist = [
       'ModelAdapter.init',
       'ModelAdapter._init',
-      'Calendar.init',
-      'MobileTable.init'
+      'Calendar.init'
     ];
     var result1 = [
       'Legend:',
