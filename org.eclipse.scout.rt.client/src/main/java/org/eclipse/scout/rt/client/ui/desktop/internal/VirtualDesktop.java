@@ -695,8 +695,8 @@ public class VirtualDesktop implements IDesktop {
   }
 
   @Override
-  public DesktopStyle getDesktopStyle() {
-    return DesktopStyle.DEFAULT;
+  public String getDisplayStyle() {
+    return DISPLAY_STYLE_DEFAULT;
   }
 
   @Override

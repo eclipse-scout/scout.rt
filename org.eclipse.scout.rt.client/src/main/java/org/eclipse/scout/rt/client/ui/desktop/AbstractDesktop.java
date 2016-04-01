@@ -260,12 +260,12 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
    * Configures the desktop style which defines the basic layout of the application in the UI. Currently the desktop
    * style cannot be changed at runtime.
    * <p>
-   * Subclasses can override this method. Default is {@code DesktopStyle.DEFAULT}.
+   * Subclasses can override this method. Default is {@link IDesktop#DISPLAY_STYLE_DEFAULT}
    */
-  @ConfigProperty(ConfigProperty.OBJECT)
+  @ConfigProperty(ConfigProperty.STRING)
   @Order(50)
-  protected DesktopStyle getConfiguredDesktopStyle() {
-    return DesktopStyle.DEFAULT;
+  protected String getConfiguredDisplayStyle() {
+    return DISPLAY_STYLE_DEFAULT;
   }
 
   /**
@@ -532,8 +532,8 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     setNavigationVisible(getConfiguredNavigationVisible());
     setBenchVisible(getConfiguredBenchVisible());
     setHeaderVisible(getConfiguredHeaderVisible());
-    setDesktopStyle(getConfiguredDesktopStyle());
-    initDesktopStyle(getDesktopStyle());
+    setDisplayStyle(getConfiguredDisplayStyle());
+    initDisplayStyle(getDisplayStyle());
     setCacheSplitterPosition(getConfiguredCacheSplitterPosition());
     List<IDesktopExtension> extensions = getDesktopExtensions();
     m_contributionHolder = new ContributionComposite(this);
@@ -671,9 +671,9 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     }
   }
 
-  protected void initDesktopStyle(DesktopStyle style) {
-    setNavigationVisible(DesktopStyle.DEFAULT.equals(style));
-    setHeaderVisible(DesktopStyle.DEFAULT.equals(style));
+  protected void initDisplayStyle(String style) {
+    setNavigationVisible(DISPLAY_STYLE_DEFAULT.equals(style));
+    setHeaderVisible(DISPLAY_STYLE_DEFAULT.equals(style));
   }
 
   @Override
@@ -767,12 +767,12 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   @Override
-  public DesktopStyle getDesktopStyle() {
-    return (DesktopStyle) propertySupport.getProperty(PROP_DESKTOP_STYLE);
+  public String getDisplayStyle() {
+    return propertySupport.getPropertyString(PROP_DISPLAY_STYLE);
   }
 
-  protected void setDesktopStyle(DesktopStyle desktopStyle) {
-    propertySupport.setProperty(PROP_DESKTOP_STYLE, desktopStyle);
+  protected void setDisplayStyle(String displayStyle) {
+    propertySupport.setProperty(PROP_DISPLAY_STYLE, displayStyle);
   }
 
   @Override
@@ -2527,8 +2527,8 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-      if (evt.getPropertyName() == PROP_DESKTOP_STYLE) {
-        initDesktopStyle((DesktopStyle) evt.getNewValue());
+      if (evt.getPropertyName() == PROP_DISPLAY_STYLE) {
+        initDisplayStyle((String) evt.getNewValue());
       }
     }
 

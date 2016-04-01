@@ -22,7 +22,6 @@ import org.eclipse.scout.rt.client.ui.desktop.BrowserHistoryEntry;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
-import org.eclipse.scout.rt.client.ui.desktop.IDesktop.DesktopStyle;
 import org.eclipse.scout.rt.client.ui.desktop.IOpenUriAction;
 import org.eclipse.scout.rt.client.ui.desktop.notification.IDesktopNotification;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
@@ -97,7 +96,7 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
   }
 
   protected boolean hasDefaultStyle() {
-    return DesktopStyle.DEFAULT == getModel().getDesktopStyle();
+    return IDesktop.DISPLAY_STYLE_DEFAULT == getModel().getDisplayStyle();
   }
 
   @Override
@@ -289,7 +288,7 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
   @Override
   public JSONObject toJson() {
     JSONObject json = super.toJson();
-    json.put(IDesktop.PROP_DESKTOP_STYLE, getModel().getDesktopStyle());
+    json.put(IDesktop.PROP_DISPLAY_STYLE, getModel().getDisplayStyle());
     putAdapterIdProperty(json, IDesktop.PROP_ACTIVE_FORM, getModel().getActiveForm());
     putAdapterIdsProperty(json, "views", getModel().getViews(getModel()));
     putAdapterIdsProperty(json, "dialogs", getModel().getDialogs(getModel(), false));

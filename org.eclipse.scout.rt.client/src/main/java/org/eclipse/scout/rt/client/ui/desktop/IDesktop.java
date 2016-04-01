@@ -105,7 +105,7 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent {
    */
   String PROP_CACHE_SPLITTER_POSITION = "cacheSplitterPosition";
 
-  String PROP_DESKTOP_STYLE = "desktopStyle";
+  String PROP_DISPLAY_STYLE = "displayStyle";
 
   String PROP_ACTIVE_FORM = "activeForm";
 
@@ -119,17 +119,15 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent {
 
   String PROP_BENCH_VISIBLE = "benchVisible";
 
-  public enum DesktopStyle {
-    /**
-     * Default desktop style with header, navigation (tree) and bench (forms).
-     */
-    DEFAULT,
+  /**
+   * Default style with header, navigation (tree) and bench (forms).
+   */
+  String DISPLAY_STYLE_DEFAULT = "default";
 
-    /**
-     * Reduced desktop style. Only bench is visible.
-     */
-    BENCH
-  }
+  /**
+   * Reduced style. Only bench is visible.
+   */
+  String DISPLAY_STYLE_BENCH = "bench";
 
   void initDesktop();
 
@@ -787,10 +785,10 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent {
   boolean isOutlineChanging();
 
   /**
-   * @return the desktop style. Default value is <code>DesktopStyle.DEFAULT</code>.
+   * @return the display style. Default value is <code>DISPLAY_STYLE_DEFAULT</code>.
    * @since 5.2.0
    */
-  DesktopStyle getDesktopStyle();
+  String getDisplayStyle();
 
   /***
    * @since 6.0

@@ -35,9 +35,9 @@ scout.Desktop = function() {
 };
 scout.inherits(scout.Desktop, scout.ModelAdapter);
 
-scout.DesktopStyle = {
-  DEFAULT: 'DEFAULT',
-  BENCH: 'BENCH'
+scout.Desktop.DisplayStyle = {
+  DEFAULT: 'default',
+  BENCH: 'bench'
 };
 
 scout.Desktop.prototype._init = function(model) {
@@ -884,13 +884,13 @@ scout.Desktop.prototype._onOpenUri = function(event) {
 };
 
 scout.Desktop.prototype._onOutlineChanged = function(event) {
-  if (scout.DesktopStyle.DEFAULT === this.desktopStyle) {
+  if (scout.Desktop.DisplayStyle.DEFAULT === this.displayStyle) {
     this.setOutline(this.session.getOrCreateModelAdapter(event.outline, this));
   }
 };
 
 scout.Desktop.prototype._onOutlineContentActivate = function(event) {
-  if (scout.DesktopStyle.DEFAULT === this.desktopStyle) {
+  if (scout.Desktop.DisplayStyle.DEFAULT === this.displayStyle) {
     this.bringOutlineToFront();
   }
 };
