@@ -442,7 +442,7 @@ scout.Widget.prototype._firePropertyChange = function(propertyName, oldValue, ne
 /**
  * Sets the value of the property 'propertyName' to 'newValue' and then fires a propertyChange event for that property.
  */
-scout.Widget.prototype._setProperty = function(propertyName, newValue) {
+scout.Widget.prototype._setProperty = function(propertyName, newValue) { // FIXME awe: (graph) refactor to event with type='property' see JsonEventType
   if (!propertyName) {
     return;
   }

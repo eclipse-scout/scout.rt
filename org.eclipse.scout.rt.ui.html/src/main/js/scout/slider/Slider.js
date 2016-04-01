@@ -9,6 +9,8 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 scout.Slider = function() {
+  scout.Slider.parent.call(this);
+
   this.value;
   this.minValue;
   this.maxValue;
@@ -78,15 +80,12 @@ scout.Slider.prototype._onValueChange = function(event) {
 };
 
 scout.Slider.prototype.setValue = function(value) {
-  var oldValue = this.value;
-  this.value = value;
+  if (value === this.value) {
+    return;
+  }
+  this._setProperty('value', value);
   if (this.rendered) {
     this._renderValue();
-  }
-  if (oldValue !== value) {
-    this.trigger('valueChanged', {
-      newValue: value,
-      oldValue: oldValue});
   }
 };
 

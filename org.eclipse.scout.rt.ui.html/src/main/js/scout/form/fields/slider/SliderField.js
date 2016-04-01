@@ -31,3 +31,11 @@ scout.SliderField.prototype._renderSlider = function() {
   this.slider.render(this.$container);
   this.addField(this.slider.$container);
 };
+
+scout.SliderField.prototype.setValue = function(value) {
+  this.slider.setValue(value);
+};
+
+scout.SliderField.prototype.getValue = function() {
+  return this.slider.value;
+};
