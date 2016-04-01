@@ -82,6 +82,15 @@ describe("DesktopHeader", function() {
       expect(detailForm1MenuBar.events._eventListeners.length).toBe(0);
     });
 
+    it("removes listener when getting removed", function() {
+      var detailForm0MenuBar = node0.detailForm.rootGroupBox.menuBar;
+      outline.selectNodes(node0);
+      expect(detailForm0MenuBar.events._eventListeners.length).toBe(1);
+
+      desktop.setHeaderVisible(false);
+      expect(detailForm0MenuBar.events._eventListeners.length).toBe(0);
+    });
+
   });
 
 });

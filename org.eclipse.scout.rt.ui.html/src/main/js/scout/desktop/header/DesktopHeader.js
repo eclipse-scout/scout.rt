@@ -49,6 +49,10 @@ scout.DesktopHeader.prototype._render = function($parent) {
   this._renderLogoUrl();
   this.desktop.on('propertyChange', this._desktopPropertyChangeHandler);
   this.desktop.on('animationEnd', this._desktopAnimationEndHandler);
+  if (this.desktop.bench) {
+    this.outlineContent = this.desktop.bench.outlineContent;
+  }
+  this._attachOutlineContentMenuBarHandler();
   this.session.keyStrokeManager.installKeyStrokeContext(this.desktopKeyStrokeContext);
 };
 
@@ -56,6 +60,8 @@ scout.DesktopHeader.prototype._remove = function() {
   this.session.keyStrokeManager.uninstallKeyStrokeContext(this.desktopKeyStrokeContext);
   this.desktop.off('propertyChange', this._desktopPropertyChangeHandler);
   this.desktop.off('animationEnd', this._desktopAnimationEndHandler);
+  this._detachOutlineContentMenuBarHandler();
+  this.outlineContent = null;
   scout.DesktopHeader.parent.prototype._remove.call(this);
 };
 
@@ -201,6 +207,26 @@ scout.DesktopHeader.prototype.updateViewButtonsVisibility = function() {
   this.setViewButtonsVisible(!this.desktop.navigationVisible && this.desktop.benchVisible && this.desktop.bench && this.desktop.bench.outlineContentVisible);
 };
 
+scout.DesktopHeader.prototype._attachOutlineContentMenuBarHandler = function() {
+  if (!this.outlineContent) {
+    return;
+  }
+  var menuBar = this._outlineContentMenuBar(this.outlineContent);
+  if (menuBar) {
+    menuBar.on('propertyChange', this._outlineContentMenuBarPropertyChangeHandler);
+  }
+};
+
+scout.DesktopHeader.prototype._detachOutlineContentMenuBarHandler = function() {
+  if (!this.outlineContent) {
+    return;
+  }
+  var menuBar = this._outlineContentMenuBar(this.outlineContent);
+  if (menuBar) {
+    menuBar.off('propertyChange', this._outlineContentMenuBarPropertyChangeHandler);
+  }
+};
+
 scout.DesktopHeader.prototype._outlineContentMenuBar = function(outlineContent) {
   if (outlineContent instanceof scout.Form) {
     return outlineContent.rootGroupBox.menuBar;
@@ -242,21 +268,11 @@ scout.DesktopHeader.prototype._onDesktopAnimationEnd = function(event) {
   this.updateViewButtonsVisibility();
 };
 
-scout.DesktopHeader.prototype.onBenchOutlineContentChange = function(content, oldContent) {
-  var menuBar;
-  if (oldContent) {
-    menuBar = this._outlineContentMenuBar(oldContent);
-    if (menuBar) {
-      menuBar.off('propertyChange', this._outlineContentMenuBarPropertyChangeHandler);
-    }
-  }
+scout.DesktopHeader.prototype.onBenchOutlineContentChange = function(content) {
+  this._detachOutlineContentMenuBarHandler();
+  this.outlineContent = content;
   this.updateViewButtonStyling();
-  if (content) {
-    menuBar = this._outlineContentMenuBar(content);
-    if (menuBar) {
-      menuBar.on('propertyChange', this._outlineContentMenuBarPropertyChangeHandler);
-    }
-  }
+  this._attachOutlineContentMenuBarHandler();
 };
 
 scout.DesktopHeader.prototype._onDesktopPropertyChange = function(event) {
