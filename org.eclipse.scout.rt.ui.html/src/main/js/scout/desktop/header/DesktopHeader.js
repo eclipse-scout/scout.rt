@@ -182,6 +182,9 @@ scout.DesktopHeader.prototype.bringToFront = function() {
 };
 
 scout.DesktopHeader.prototype.setLogoUrl = function(logoUrl) {
+  if (this.logoUrl === logoUrl) {
+    return;
+  }
   this.logoUrl = logoUrl;
   if (this.rendered) {
     this._renderLogoUrl();
@@ -189,6 +192,9 @@ scout.DesktopHeader.prototype.setLogoUrl = function(logoUrl) {
 };
 
 scout.DesktopHeader.prototype.setToolBarVisible = function(visible) {
+  if (this.toolBarVisible === visible) {
+    return;
+  }
   this.toolBarVisible = visible;
   if (this.rendered) {
     this._renderToolBarVisible();
@@ -196,6 +202,9 @@ scout.DesktopHeader.prototype.setToolBarVisible = function(visible) {
 };
 
 scout.DesktopHeader.prototype.setViewButtonsVisible = function(visible) {
+  if (this.viewButtonsVisible === visible) {
+    return;
+  }
   this.viewButtonsVisible = visible;
   if (this.rendered) {
     this._renderViewButtonsVisible();
@@ -203,8 +212,9 @@ scout.DesktopHeader.prototype.setViewButtonsVisible = function(visible) {
 };
 
 scout.DesktopHeader.prototype.updateViewButtonsVisibility = function() {
-  // TODO CGU add check for displayStyle compact, check for bench necessary atm because bench is not ready when header gets rendered, check for outlineContentVisible due to missing displayStyle check
-  this.setViewButtonsVisible(!this.desktop.navigationVisible && this.desktop.benchVisible && this.desktop.bench && this.desktop.bench.outlineContentVisible);
+  // View buttons are visible in the header if the navigation is not visible
+  // With displayStyle is set to compact, the view buttons should never be visible in the header
+  this.setViewButtonsVisible(!this.desktop.navigationVisible && this.desktop.displayStyle !== scout.Desktop.DisplayStyle.COMPACT);
 };
 
 scout.DesktopHeader.prototype._attachOutlineContentMenuBarHandler = function() {

@@ -257,8 +257,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   /**
-   * Configures the desktop style which defines the basic layout of the application in the UI. Currently the desktop
-   * style cannot be changed at runtime.
+   * Configures the desktop style which defines the basic layout of the application in the UI.
    * <p>
    * Subclasses can override this method. Default is {@link IDesktop#DISPLAY_STYLE_DEFAULT}
    */
@@ -672,8 +671,21 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   protected void initDisplayStyle(String style) {
-    setNavigationVisible(DISPLAY_STYLE_DEFAULT.equals(style));
-    setHeaderVisible(DISPLAY_STYLE_DEFAULT.equals(style));
+    if (DISPLAY_STYLE_BENCH.equals(style)) {
+      setNavigationVisible(false);
+      setHeaderVisible(false);
+      setBenchVisible(true);
+    }
+    else if (DISPLAY_STYLE_COMPACT.equals(style)) {
+      setNavigationVisible(true);
+      setHeaderVisible(false);
+      setBenchVisible(false);
+    }
+    else {
+      setNavigationVisible(true);
+      setHeaderVisible(true);
+      setBenchVisible(true);
+    }
   }
 
   @Override
@@ -771,7 +783,8 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     return propertySupport.getPropertyString(PROP_DISPLAY_STYLE);
   }
 
-  protected void setDisplayStyle(String displayStyle) {
+  @Override
+  public void setDisplayStyle(String displayStyle) {
     propertySupport.setProperty(PROP_DISPLAY_STYLE, displayStyle);
   }
 

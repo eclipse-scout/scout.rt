@@ -37,7 +37,8 @@ scout.inherits(scout.Desktop, scout.ModelAdapter);
 
 scout.Desktop.DisplayStyle = {
   DEFAULT: 'default',
-  BENCH: 'bench'
+  BENCH: 'bench',
+  COMPACT: 'compact'
 };
 
 scout.Desktop.prototype._init = function(model) {
@@ -46,7 +47,6 @@ scout.Desktop.prototype._init = function(model) {
   this.formController = new scout.DesktopFormController(this, this.session);
   this.messageBoxController = new scout.MessageBoxController(this, this.session);
   this.fileChooserController = new scout.FileChooserController(this, this.session);
-  this._addNullOutline(model.outline);
   this._resizeHandler = this.onResize.bind(this);
   this._popstateHandler = this.onPopstate.bind(this);
   this.updateSplitterVisibility();
@@ -84,6 +84,7 @@ scout.Desktop.prototype._render = function($parent) {
   this._renderLogoUrl();
   this._renderSplitterVisible();
   this._renderInBackground();
+  this._renderDisplayStyle();
   this.addOns.forEach(function(addOn) {
     addOn.render(this.$container);
   }, this);
@@ -135,6 +136,28 @@ scout.Desktop.prototype._postRender = function() {
   this.initialFormRendering = false;
 };
 
+scout.Desktop.prototype._renderDisplayStyle = function() {
+  var DisplayStyle = scout.Desktop.DisplayStyle,
+    isCompact = this.displayStyle === DisplayStyle.COMPACT;
+
+  if (this.header) {
+    this.header.setToolBarVisible(!isCompact);
+  }
+  if (this.navigation) {
+    this.navigation.setToolBarVisible(isCompact);
+    this.navigation.htmlComp.layoutData.fullWidth = isCompact;
+  }
+  if (this.bench) {
+    this.bench.setOutlineContentVisible(!isCompact);
+  }
+  if (this.outline) {
+    this.outline.setEmbedDetailContent(isCompact);
+    this.outline.setCompact(isCompact);
+  }
+
+  this.invalidateLayoutTree();
+};
+
 /**
  * Displays attached forms, message boxes and file choosers.
  * Outline does not need to be rendered to show the child elements, it needs to be active (necessary if navigation is invisible)
@@ -177,7 +200,8 @@ scout.Desktop.prototype._renderBench = function() {
     return;
   }
   this.bench = scout.create('DesktopBench', {
-    parent: this
+    parent: this,
+    outlineContentVisible: this.displayStyle !== scout.Desktop.DisplayStyle.COMPACT
   });
   this.bench.render(this.$container);
   this.bench.$container.insertBefore(this.$overlaySeparator);
@@ -221,7 +245,11 @@ scout.Desktop.prototype._renderNavigation = function() {
   }
   this.navigation = scout.create('DesktopNavigation', {
     parent: this,
-    outline: this.outline
+    outline: this.outline,
+    toolBarVisible: this.displayStyle === scout.Desktop.DisplayStyle.COMPACT,
+    layoutData: {
+      fullWidth: this.displayStyle === scout.Desktop.DisplayStyle.COMPACT
+    }
   });
   this.navigation.render(this.$container);
   this.navigation.$container.prependTo(this.$container);
@@ -252,7 +280,8 @@ scout.Desktop.prototype._renderHeader = function() {
     return;
   }
   this.header = scout.create('DesktopHeader', {
-    parent: this
+    parent: this,
+    toolBarVisible: this.displayStyle !== scout.Desktop.DisplayStyle.COMPACT
   });
   this.header.render(this.$container);
   this.header.$container.insertBefore(this.$overlaySeparator);
@@ -359,8 +388,8 @@ scout.Desktop.prototype._setupDragAndDrop = function() {
 };
 
 scout.Desktop.prototype.updateSplitterVisibility = function() {
-  // TODO CGU add check for displayStyle compact
-  this.setSplitterVisible(this.navigationVisible && this.benchVisible);
+  // Splitter should only be visible if navigation and bench are visible, but never in compact mode (to prevent unnecessary splitter rendering)
+  this.setSplitterVisible(this.navigationVisible && this.benchVisible && this.displayStyle !== scout.Desktop.DisplayStyle.COMPACT);
 };
 
 scout.Desktop.prototype.setSplitterVisible = function(visible) {
@@ -427,6 +456,7 @@ scout.Desktop.prototype.setOutline = function(outline) {
 
   if (this.rendered) {
     this._renderDisplayChildsOfOutline();
+    this._renderDisplayStyle();
   }
 
   this.trigger('outlineChanged');
@@ -484,6 +514,18 @@ scout.Desktop.prototype.setHeaderVisible = function(visible, notifyServer) {
   if (this.rendered) {
     this._renderHeaderVisible();
   }
+};
+
+scout.Desktop.prototype.switchToBench = function() {
+  this.setHeaderVisible(true);
+  this.setBenchVisible(true);
+  this.setNavigationVisible(false);
+};
+
+scout.Desktop.prototype.switchToNavigation = function() {
+  this.setNavigationVisible(true);
+  this.setHeaderVisible(false);
+  this.setBenchVisible(false);
 };
 
 scout.Desktop.prototype.revalidateHeaderLayout = function() {
@@ -578,7 +620,7 @@ scout.Desktop.prototype._openUriAsNewWindow = function(uri) {
 };
 
 scout.Desktop.prototype.bringOutlineToFront = function() {
-  if (!this.inBackground) {
+  if (!this.inBackground || this.displayStyle === scout.Desktop.DisplayStyle.BENCH) {
     return;
   }
   this.inBackground = false;
@@ -664,33 +706,6 @@ scout.Desktop.prototype._pushPopupWindowGlassPaneTargets = function(glassPaneTar
   }, this);
 };
 
-/**
- * Creates a local "null-outline" and an OutlineViewButton which is used, when no outline is available.
- * This avoids a lot of if/else code. The OVB adds a property 'visibleInMenu' which is only used in
- * the UI to decide whether or not the OVB will be shown in the ViewMenuPopup.js.
- */
-scout.Desktop.prototype._addNullOutline = function(outline) {
-  if (outline) {
-    return;
-  }
-  var nullOutline = scout.create('Outline', {
-      parent: this,
-      nullOutline: true
-    }),
-    ovb = scout.create('OutlineViewButton', {
-      parent: this,
-      displayStyle: 'MENU',
-      selected: true,
-      text: this.session.text('ui.Outlines'),
-      desktop: this,
-      visibleInMenu: false
-    });
-
-  ovb.outline = nullOutline;
-  this.outline = nullOutline;
-  this.viewButtons.push(ovb);
-};
-
 scout.Desktop.prototype._showForm = function(form, displayParent, position, notifyServer) {
   this._setFormActivated(form, notifyServer);
   // register listener to recover active form when child dialog is removed
@@ -698,6 +713,10 @@ scout.Desktop.prototype._showForm = function(form, displayParent, position, noti
 };
 
 scout.Desktop.prototype._hideForm = function(form) {
+  if (this.displayStyle === scout.Desktop.DisplayStyle.COMPACT && form.isView() && this.viewTabsController._viewTabs.length === 1) {
+    // Hide bench and show navigation if this is the last view to be hidden
+    this.switchToNavigation();
+  }
   form.displayParent.formController.unregisterAndRemove(form);
 };
 
@@ -884,15 +903,11 @@ scout.Desktop.prototype._onOpenUri = function(event) {
 };
 
 scout.Desktop.prototype._onOutlineChanged = function(event) {
-  if (scout.Desktop.DisplayStyle.DEFAULT === this.displayStyle) {
-    this.setOutline(this.session.getOrCreateModelAdapter(event.outline, this));
-  }
+  this.setOutline(this.session.getOrCreateModelAdapter(event.outline, this));
 };
 
 scout.Desktop.prototype._onOutlineContentActivate = function(event) {
-  if (scout.Desktop.DisplayStyle.DEFAULT === this.displayStyle) {
-    this.bringOutlineToFront();
-  }
+  this.bringOutlineToFront();
 };
 
 scout.Desktop.prototype._onAddNotification = function(event) {

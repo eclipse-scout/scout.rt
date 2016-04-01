@@ -26,6 +26,12 @@ scout.ViewTabsController.prototype.createAndRenderViewTab = function(view, posit
   // Tab is already existing.
   var viewTab = this._viewTabMap[viewId],
     newViewTab = !viewTab;
+
+  if (this._desktop.displayStyle === scout.Desktop.DisplayStyle.COMPACT && this._viewTabs.length === 0) {
+    // Show bench and hide navigation if this is the first view to be shown
+    this._desktop.switchToBench();
+  }
+
   if (newViewTab) {
 
     // Create the view tab.

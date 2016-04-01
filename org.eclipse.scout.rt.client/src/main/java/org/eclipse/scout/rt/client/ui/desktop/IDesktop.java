@@ -129,6 +129,11 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent {
    */
   String DISPLAY_STYLE_BENCH = "bench";
 
+  /**
+   * Compact style. Navigation and bench are never visible simultaneously.
+   */
+  String DISPLAY_STYLE_COMPACT = "compact";
+
   void initDesktop();
 
   /**
@@ -789,6 +794,8 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent {
    * @since 5.2.0
    */
   String getDisplayStyle();
+
+  void setDisplayStyle(String displayStyle);
 
   /***
    * @since 6.0

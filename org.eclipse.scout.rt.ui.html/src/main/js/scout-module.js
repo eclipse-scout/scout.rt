@@ -335,5 +335,4 @@
   __include("scout/table/FilterFieldsGroupBox.js"); // requires GroupBox.js
 
   __include("scout/table/MobileTable.js");
-  __include("scout/desktop/MobileDesktop.js");
 }(window.scout = window.scout || {}, jQuery));

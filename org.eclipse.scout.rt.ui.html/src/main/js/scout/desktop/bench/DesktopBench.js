@@ -53,7 +53,7 @@ scout.DesktopBench.prototype._remove = function() {
 };
 
 scout.DesktopBench.prototype._renderOrAttachOutlineContent = function() {
-  if (!this.outlineContent || this.outline.inBackground) {
+  if (!this.outlineContent || this.desktop.inBackground) {
     return;
   }
   if (!this.outlineContent.rendered) {
@@ -64,7 +64,7 @@ scout.DesktopBench.prototype._renderOrAttachOutlineContent = function() {
 };
 
 scout.DesktopBench.prototype._renderOutlineContent = function() {
-  if (!this.outlineContent || this.outline.inBackground) {
+  if (!this.outlineContent || this.desktop.inBackground) {
     return;
   }
 
@@ -135,6 +135,9 @@ scout.DesktopBench.prototype.setOutlineContent = function(content) {
 };
 
 scout.DesktopBench.prototype.setOutlineContentVisible = function(visible) {
+  if (visible === this.outlineContentVisible) {
+    return;
+  }
   this.outlineContentVisible = visible;
   this.updateOutlineContent();
 };
@@ -173,7 +176,7 @@ scout.DesktopBench.prototype._showDetailContentForPage = function(node) {
 };
 
 scout.DesktopBench.prototype.updateOutlineContent = function() {
-  if (!this.outlineContentVisible) {
+  if (!this.outlineContentVisible || !this.outline) {
     return;
   }
   var selectedPages = this.outline.selectedNodes;

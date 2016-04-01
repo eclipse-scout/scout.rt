@@ -18,6 +18,7 @@ scout.Outline = function() {
   this._detailTableListener;
   this.inBackground = false;
   this.embedDetailContent = false;
+  this.compact = false;
   this.formController;
   this.messageBoxController;
   this.fileChooserController;
@@ -87,9 +88,7 @@ scout.Outline.prototype._render = function($parent) {
 
   // Override layout
   this.htmlComp.setLayout(new scout.OutlineLayout(this));
-  if (this.mobile) {
-    this.$container.addClass('mobile');
-  }
+  this._renderCompact();
   this._renderEmbedDetailContent();
   this._renderDetailContent();
   this._renderDetailMenuBarVisible();
@@ -509,6 +508,10 @@ scout.Outline.prototype._renderInBackground = function() {
   this.$container.toggleClass('in-background', this.inBackground);
 };
 
+scout.Outline.prototype._renderCompact = function() {
+  this.$container.toggleClass('compact', this.compact);
+};
+
 scout.Outline.prototype._renderEmbedDetailContent = function() {
   this.$data.toggleClass('has-detail-content', this.embedDetailContent);
 };
@@ -541,6 +544,13 @@ scout.Outline.prototype._removeDetailContent = function() {
   }
   this.detailContent.remove();
   this.$data.removeClass('detail-content-visible');
+};
+
+scout.Outline.prototype.setCompact = function(compact) {
+  this.compact = compact;
+  if (this.rendered) {
+    this._renderCompact();
+  }
 };
 
 scout.Outline.prototype.setEmbedDetailContent = function(embed) {

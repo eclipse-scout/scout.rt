@@ -14,8 +14,8 @@
 @outline-title-margin-left: 12px;
 @outline-title-margin-right: 12px;
 @outline-title-margin-bottom: 12px;
-@mobile-outline-node-padding-h: 16px;
-@mobile-outline-node-padding-v: @outline-breadcrumb-node-padding-v;
+@compact-outline-node-padding-h: 16px;
+@compact-outline-node-padding-v: @outline-breadcrumb-node-padding-v;
 
 .outline {
 
@@ -217,12 +217,12 @@
   }
 }
 
-.mobile.outline.breadcrumb {
+.compact.outline.breadcrumb {
   & > .outline-title {
     text-align: left;
 
     & > .outline-title-text {
-      padding-left: @mobile-outline-node-padding-h;
+      padding-left: @compact-outline-node-padding-h;
     }
   }
 
@@ -234,7 +234,7 @@
 
       & > .text {
         display: inline-block;
-        padding: @mobile-outline-node-padding-v @mobile-outline-node-padding-h;
+        padding: @compact-outline-node-padding-v @compact-outline-node-padding-h;
       }
 
       & > .node-menubar {
@@ -242,16 +242,16 @@
         right: 0;
         top: 0;
         width: auto;
-        padding: @mobile-outline-node-padding-v - 3px @mobile-outline-node-padding-h 0 0;
+        padding: @compact-outline-node-padding-v - 3px @compact-outline-node-padding-h 0 0;
       }
 
       & > .detail-menubar {
-        padding: 0 @mobile-outline-node-padding-h @mobile-outline-node-padding-v @mobile-outline-node-padding-h;
+        padding: 0 @compact-outline-node-padding-h @compact-outline-node-padding-v @compact-outline-node-padding-h;
       }
 
       & > .form > .root-group-box > .group-box-body {
-        padding-left: @mobile-outline-node-padding-h - @mandatory-indicator-width;
-        padding-right: @mobile-outline-node-padding-h;
+        padding-left: @compact-outline-node-padding-h - @mandatory-indicator-width;
+        padding-right: @compact-outline-node-padding-h;
       }
     }
 

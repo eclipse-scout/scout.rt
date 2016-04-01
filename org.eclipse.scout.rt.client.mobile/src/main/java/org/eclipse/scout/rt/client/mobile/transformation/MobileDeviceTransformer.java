@@ -176,6 +176,7 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
 
   @Override
   public void transformDesktop() {
+    getDesktop().setDisplayStyle(IDesktop.DISPLAY_STYLE_COMPACT);
   }
 
   @Override

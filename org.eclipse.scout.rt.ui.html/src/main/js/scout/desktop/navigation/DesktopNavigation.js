@@ -49,6 +49,9 @@ scout.DesktopNavigation.prototype._render = function($parent) {
 };
 
 scout.DesktopNavigation.prototype._renderOutline = function() {
+  if (!this.outline) {
+    return;
+  }
   this.outline.setParent(this);
   this.outline.render(this.$body);
   this.outline.invalidateLayoutTree();
@@ -88,12 +91,16 @@ scout.DesktopNavigation.prototype.setOutline = function(outline) {
 
 scout.DesktopNavigation.prototype.sendToBack = function() {
   this.viewButtons.sendToBack();
-  this.outline.sendToBack();
+  if (this.outline) {
+    this.outline.sendToBack();
+  }
 };
 
 scout.DesktopNavigation.prototype.bringToFront = function() {
   this.viewButtons.bringToFront();
-  this.outline.bringToFront();
+  if (this.outline) {
+    this.outline.bringToFront();
+  }
 };
 
 scout.DesktopNavigation.prototype.setToolBarVisible = function(toolBarVisible) {
@@ -139,7 +146,5 @@ scout.DesktopNavigation.prototype._removeToolBar = function() {
 };
 
 scout.DesktopNavigation.prototype._onNavigationBodyMousedown = function(event) {
-  if (this.outline.inBackground) {
-    this.desktop.bringOutlineToFront(this.outline);
-  }
+  this.desktop.bringOutlineToFront();
 };

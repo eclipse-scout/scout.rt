@@ -89,14 +89,8 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
     attachAdapters(filterModelActions(), new DisplayableActionFilter<IAction>());
     attachAdapters(getModel().getAddOns());
     attachAdapters(getModel().getKeyStrokes(), new DisplayableActionFilter<IKeyStroke>());
-    if (hasDefaultStyle()) {
-      attachAdapters(getModel().getViewButtons(), new DisplayableActionFilter<IViewButton>());
-      attachGlobalAdapter(getModel().getOutline(), new DisplayableOutlineFilter<IOutline>());
-    }
-  }
-
-  protected boolean hasDefaultStyle() {
-    return IDesktop.DISPLAY_STYLE_DEFAULT == getModel().getDisplayStyle();
+    attachAdapters(getModel().getViewButtons(), new DisplayableActionFilter<IViewButton>());
+    attachGlobalAdapter(getModel().getOutline(), new DisplayableOutlineFilter<IOutline>());
   }
 
   @Override
@@ -297,11 +291,8 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
     putAdapterIdsProperty(json, "actions", filterModelActions(), new DisplayableActionFilter<IAction>());
     putAdapterIdsProperty(json, "addOns", getModel().getAddOns());
     putAdapterIdsProperty(json, "keyStrokes", getModel().getKeyStrokes(), new DisplayableActionFilter<IKeyStroke>());
-    if (hasDefaultStyle()) {
-      // FIXME cgu: view and tool buttons should be removed from desktop by device transformer
-      putAdapterIdsProperty(json, "viewButtons", getModel().getViewButtons(), new DisplayableActionFilter<IViewButton>());
-      putAdapterIdProperty(json, "outline", getModel().getOutline(), new DisplayableOutlineFilter<IOutline>());
-    }
+    putAdapterIdsProperty(json, "viewButtons", getModel().getViewButtons(), new DisplayableActionFilter<IViewButton>());
+    putAdapterIdProperty(json, "outline", getModel().getOutline(), new DisplayableOutlineFilter<IOutline>());
     return json;
   }
 
@@ -408,17 +399,11 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
   }
 
   protected void handleModelOutlineChanged(IOutline outline) {
-    if (!hasDefaultStyle()) {
-      return;
-    }
     IJsonAdapter<?> jsonAdapter = attachGlobalAdapter(outline);
     addActionEvent(EVENT_OUTLINE_CHANGED, new JSONObject().put(PROP_OUTLINE, jsonAdapter.getId()));
   }
 
   protected void handleModelOutlineContentActivate() {
-    if (!hasDefaultStyle()) {
-      return;
-    }
     addActionEvent(EVENT_OUTLINE_CONTENT_ACTIVATE);
   }
 

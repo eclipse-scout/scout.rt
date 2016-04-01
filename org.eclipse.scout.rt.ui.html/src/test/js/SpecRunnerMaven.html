@@ -16,7 +16,6 @@
   You can use it too while developing by executing
   mvn jasmine:bdd and connecting to http://localhost:8234/ with your browser.
   When using mvn verify, the server is started on http://localhost:64600/.
-  //FIXME we need to find a better way to manage dependencies. At the moment we have to include the files at 3 different places.
   //FIXME Encoding in embedded jetty (started by jasmine-maven-plugin) is wrong!
  -->
 <html>
@@ -54,7 +53,6 @@
   <script type="text/javascript" src="src/main/js/jasmine/JasmineMavenReporter.js"></script>
   <script type="text/javascript" src="src/main/js/jasmine/boot.ext.js"></script>
   <script type="text/javascript">loadDynamicScript('src/main/js/scout-module.js');</script>
-  <script type="text/javascript" src="src/main/js/scout/desktop/MobileDesktop.js"></script>
   <script type="text/javascript" src="src/main/js/scout/table/MobileTable.js"></script>
 </head>
 <body>

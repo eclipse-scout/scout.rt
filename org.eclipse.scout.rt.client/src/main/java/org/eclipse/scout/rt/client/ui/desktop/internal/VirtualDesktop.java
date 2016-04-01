@@ -700,6 +700,10 @@ public class VirtualDesktop implements IDesktop {
   }
 
   @Override
+  public void setDisplayStyle(String displayStyle) {
+  }
+
+  @Override
   public String getLogoId() {
     return null;
   }
