@@ -8,13 +8,22 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.shared.services.lookup;
+package org.eclipse.scout.rt.server.services.lookup;
 
 import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.scout.rt.shared.services.lookup.BatchLookupCall;
+import org.eclipse.scout.rt.shared.services.lookup.BatchLookupResultCache;
+import org.eclipse.scout.rt.shared.services.lookup.IBatchLookupService;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupService;
+import org.eclipse.scout.rt.shared.services.lookup.LocalLookupCall;
+import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
+import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 import org.eclipse.scout.rt.testing.platform.mock.BeanMock;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Before;

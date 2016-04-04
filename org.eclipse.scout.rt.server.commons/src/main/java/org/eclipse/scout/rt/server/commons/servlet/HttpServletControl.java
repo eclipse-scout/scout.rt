@@ -22,12 +22,17 @@ import org.eclipse.scout.rt.platform.ApplicationScoped;
  * Make sure to call {@link #doDefaults(HttpServletRequest, HttpServletResponse)} in every servlet at the beginning of
  * each doGet and doPost
  *
- * @since 5.1
+ * @since 5.2
  */
 @ApplicationScoped
 public class HttpServletControl {
   public static final String HTTP_HEADER_X_FRAME_OPTIONS = "X-Frame-Options";
   public static final String SAMEORIGIN = "SAMEORIGIN";
+
+  public static final String HTTP_HEADER_CSP = "Content-Security-Policy";//final version, mozilla und firefox
+  public static final String HTTP_HEADER_CSP_LEGACY_CHROME = "X-WebKit-CSP";//chrome
+  public static final String HTTP_HEADER_CSP_LEGACY_IE = "X-Content-Security-Policy";//ie
+  private static final String TYPICAL_CSP_RULE = "allow self; object-src 'self'; options inlinescript; report-uri csp.cgi";//see ContentSecurityPolicyReportHandler
 
   /**
    * Every servlet should call this method to make sure the defaults are applied
@@ -45,5 +50,16 @@ public class HttpServletControl {
 
   protected void setResponseHeaders(HttpServlet servlet, HttpServletRequest req, HttpServletResponse resp) {
     resp.setHeader(HTTP_HEADER_X_FRAME_OPTIONS, SAMEORIGIN);
+    resp.setHeader(HTTP_HEADER_CSP, cspRule());
+    resp.setHeader(HTTP_HEADER_CSP_LEGACY_IE, cspRule());
+    resp.setHeader(HTTP_HEADER_CSP_LEGACY_CHROME, cspRule());
   }
+
+  /**
+   * see also ContentSecurityPolicyReportHandler
+   */
+  protected String cspRule() {
+    return TYPICAL_CSP_RULE;
+  }
+
 }

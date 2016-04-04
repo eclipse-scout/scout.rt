@@ -8,16 +8,23 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.shared.services.lookup;
+package org.eclipse.scout.rt.server.services.lookup;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.shared.services.lookup.BatchLookupCall;
+import org.eclipse.scout.rt.shared.services.lookup.BatchLookupResultCache;
+import org.eclipse.scout.rt.shared.services.lookup.IBatchLookupService;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
+import org.eclipse.scout.rt.shared.services.lookup.IServerBatchLookupService;
 
 /**
- * Implementation of {@link IBatchLookupService} that can be used in a server or in a client-only application. See Bug
- * 447592.
+ * Implementation of {@link IBatchLookupService} that can be used in a server. It is not implemented for client-only
+ * application, bug 447592 is not relevant anymore.<br>
+ * If you want to use {@link IBatchLookupService} in a client-only application, copy this service to your client code.
  *
  * @since 4.3.0 (Mars-M5)
  */
