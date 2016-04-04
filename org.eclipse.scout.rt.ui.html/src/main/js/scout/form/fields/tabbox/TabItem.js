@@ -46,6 +46,7 @@ scout.TabItem.prototype.renderTab = function($parent) {
   this.$tabContainer = $parent.appendDiv('tab-item')
     .data('tabItem', this)
     .on('mousedown', this._onTabMouseDown.bind(this));
+  this.tabHtmlComp = new scout.HtmlComponent(this.$tabContainer, this.session);
 
   this.addLabel();
   this.addStatus();
@@ -165,7 +166,7 @@ scout.TabItem.prototype._renderLabel = function() {
 };
 
 scout.TabItem.prototype._renderLabelVisible = function() {
-  // Tab items never have a label
+  // Never make the title of the group box visible -> label is rendered into tabContainer
   scout.TabItem.parent.prototype._renderLabelVisible.call(this, false);
 };
 
@@ -217,6 +218,15 @@ scout.TabItem.prototype._renderErrorStatus = function() {
     this._showStatusMessage();
   } else {
     this._hideStatusMessage();
+  }
+};
+
+scout.TabItem.prototype._renderStatusVisible = function() {
+  var wasVisible = this.$status.isVisible();
+  scout.TabItem.parent.prototype._renderStatusVisible.call(this);
+  if (this.rendered && wasVisible !== this._computeStatusVisible()) {
+    // Make sure tab area gets re layouted on status visibility changes, it may necessary to show ellipsis now if status got visible
+    this.tabHtmlComp.invalidateLayoutTree();
   }
 };
 
