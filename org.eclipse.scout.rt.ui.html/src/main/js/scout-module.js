@@ -132,6 +132,7 @@
   __include("scout/filechooser/FileChooser.js");
   __include("scout/filechooser/FileChooserController.js");
   __include("scout/slider/Slider.js");
+  __include("scout/slider/SliderLayout.js");
   // Form
   __include("scout/form/Form.js");
   __include("scout/form/FormLayout.js");

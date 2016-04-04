@@ -8,4 +8,6 @@
   vertical-align: middle;
   color: @control-color;
   padding-left: 6px;
+  padding-top: @borderless-field-padding-y;
+  padding-bottom: @borderless-field-padding-y;
 }
