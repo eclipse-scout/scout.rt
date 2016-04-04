@@ -164,6 +164,11 @@ scout.TabItem.prototype._renderLabel = function() {
   this.$label.textOrNbsp(scout.strings.removeAmpersand(this.label));
 };
 
+scout.TabItem.prototype._renderLabelVisible = function() {
+  // Tab items never have a label
+  scout.TabItem.parent.prototype._renderLabelVisible.call(this, false);
+};
+
 scout.TabItem.prototype.addLabel = function() {
   if (this.$label) {
     return;

@@ -80,10 +80,6 @@ scout.WizardProgressField.prototype._renderSteps = function() {
         position: 'bottom'
       });
     }
-    scout.FormField.prototype._renderCssClass = function(cssClass, oldCssClass) {
-      this.$container.removeClass(oldCssClass);
-      this.$container.addClass(cssClass);
-    };
     this._updateStepClasses(step);
 
     // Inspector info

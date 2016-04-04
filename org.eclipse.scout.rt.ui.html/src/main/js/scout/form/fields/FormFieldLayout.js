@@ -82,7 +82,7 @@ scout.FormFieldLayout.prototype.layout = function($container) {
     if (formField.statusPosition === scout.FormField.STATUS_POSITION_TOP && labelHasFieldWidth) {
       var statusHeight = scout.graphics.prefSize(formField.$status).height;
       // Vertically center status with label
-      var statusTop = containerPadding.top + (formField.$label.height() / 2) - (statusHeight / 2);
+      var statusTop = containerPadding.top + formField.$label.cssPaddingTop() + (formField.$label.height() / 2) - (statusHeight / 2);
       formField.$status
         .cssTop(statusTop)
         .cssRight(right + formField.$label.cssMarginRight())

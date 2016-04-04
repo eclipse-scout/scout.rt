@@ -49,7 +49,6 @@
   margin-top: @group-margin-top;
   margin-left: @mandatory-indicator-width;
   border-bottom: 3px solid @group-box-title-border-color;
-  padding: @group-title-padding-y 0;
   #scout.overflow-ellipsis-nowrap();
 
   .group-box.collapsed:not(.with-line) > & {
@@ -96,9 +95,37 @@
     }
   }
 
-  & > span {
+  & > .label {
     #scout.font-text-normal(@font-weight-bold);
+    display: inline-block;
+    vertical-align: middle;
     color: @title-color;
+    padding: @group-title-padding-y 0;
+    #scout.overflow-ellipsis();
+  }
+
+  & > .status {
+    margin-left: @field-status-margin-left;
+    padding: 4px 0;
+    display: inline-block;
+    vertical-align: middle;
+    #scout.status();
+  }
+
+  .group-box.has-tooltip > & > .status {
+    #scout.tooltip-status();
+  }
+
+  .group-box.has-info > & > .status {
+    #scout.info-status();
+  }
+
+  .group-box.has-warning > & > .status {
+    #scout.warning-status();
+  }
+
+  .group-box.has-error > & > .status {
+    #scout.error-status();
   }
 
   &.expandable {
@@ -107,7 +134,7 @@
   }
 
   /* Move title span to right when control is rendered */
-  & > .group-box-control ~ span {
+  & > .group-box-control ~ .label {
     padding-left: @group-box-control-size + 5px;
   }
 }

@@ -44,6 +44,7 @@ import org.eclipse.scout.rt.client.ui.form.FormUtility;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.IFormFieldVisitor;
 import org.eclipse.scout.rt.client.ui.form.fields.GridData;
+import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
@@ -336,6 +337,14 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
       makeFieldScalable(field);
     }
 
+    if ((field instanceof ICompositeField)) {
+      ((ICompositeField) field).setStatusVisible(false, false);
+    }
+    else {
+      field.setStatusVisible(false);
+    }
+    field.setStatusPosition(IFormField.STATUS_POSITION_TOP);
+
     if (field instanceof IGroupBox) {
       transformGroupBox((IGroupBox) field);
     }
@@ -378,7 +387,7 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
       return;
     }
 
-    //Do not modify the labels inside a sequencebox
+    // Do not modify the labels inside a sequencebox
     if (field.getParentField() instanceof ISequenceBox) {
       return;
     }

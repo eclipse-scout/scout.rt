@@ -464,14 +464,21 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
   }
 
   /**
-   * Sets the property on the field and on every child.
+   * Sets the property on the field and on every child. <br>
+   * During the initialization phase the children are not informed.
    *
    * @see #getConfiguredStatusVisible()
    */
   @Override
   public void setStatusVisible(boolean statusVisible) {
+    setStatusVisible(statusVisible, isInitialized());
+  }
+
+  @Override
+  public void setStatusVisible(boolean statusVisible, boolean recursive) {
     super.setStatusVisible(statusVisible);
-    if (isInitialized()) {
+
+    if (recursive) {
       for (IFormField f : m_fields) {
         f.setStatusVisible(statusVisible);
       }

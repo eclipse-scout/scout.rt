@@ -24,85 +24,6 @@
   white-space: nowrap;
   position: relative;
 
-  & > .tab-item {
-    position: relative;
-    display: inline-block;
-    vertical-align: middle;
-    #scout.font-text-normal(@font-weight-bold);
-    color: @title-color;
-    border: none;
-    background-color: transparent;
-    padding: 0 @tabbox-padding-x;
-    border-bottom: solid @tabbox-border-width transparent;
-    cursor: pointer;
-
-    &.selected {
-      color: @active-color;
-      border-bottom-color: @active-color;
-    }
-
-    &.marked:not(.selected) {
-      border-bottom-color: @palette-gray-6;
-    }
-
-    &:hover {
-      color: @hover-color;
-    }
-
-    &:focus {
-      outline: none;
-    }
-
-    &:focus::before {
-      #scout.font-icon();
-      content: @icon-angle-right;
-      color: @active-color;
-      position: absolute;
-      top: @group-title-padding-y;
-      left: @tabbox-padding-x - @tabbox-focus-arrow-width;
-      width: @tabbox-focus-arrow-width;
-      text-align: center;
-    }
-
-    & > .label {
-      padding: @group-title-padding-y 0;
-      display: inline-block;
-      vertical-align: middle;
-    }
-
-    & > .status {
-      margin-left: @field-status-margin-left;
-      padding: 4px 0;
-      display: inline-block;
-      vertical-align: middle;
-
-      #scout.status();
-    }
-
-    &.has-tooltip,
-    &.has-info,
-    &.has-warning,
-    &.has-error {
-      padding-right: @field-status-margin-left;
-    }
-
-    &.has-tooltip > .status {
-      #scout.tooltip-status();
-    }
-
-    &.has-info > .status {
-      #scout.info-status();
-    }
-
-    &.has-warning > .status {
-      #scout.warning-status();
-    }
-
-    &.has-error > .status {
-      #scout.error-status();
-    }
-  }
-
   &::after {
     width: 100%;
     height: @tabbox-border-width;
@@ -110,23 +31,6 @@
     background-color: @palette-gray-5;
     content: '';
     display: block;
-  }
-
-  & > .overflow-tab-item {
-    position: relative;
-    display: inline-block;
-    text-align: center;
-    cursor: pointer;
-    padding: 0px 0px;
-
-    &::before {
-      #scout.font-icon();
-      position: relative;
-      bottom: -2px;
-      font-size: 17px;
-      color: @icon-color;
-      content: @icon-ellipsis-v;
-    }
   }
 
   & > .menubar {
@@ -153,5 +57,100 @@
         margin-right: 10px;
       }
     }
+  }
+}
+
+.tab-item {
+  position: relative;
+  display: inline-block;
+  vertical-align: middle;
+  #scout.font-text-normal(@font-weight-bold);
+  color: @title-color;
+  border: none;
+  background-color: transparent;
+  padding: 0 @tabbox-padding-x;
+  border-bottom: solid @tabbox-border-width transparent;
+  cursor: pointer;
+
+  &.selected {
+    color: @active-color;
+    border-bottom-color: @active-color;
+  }
+
+  &.marked:not(.selected) {
+    border-bottom-color: @palette-gray-6;
+  }
+
+  &:hover {
+    color: @hover-color;
+  }
+
+  &:focus {
+    outline: none;
+  }
+
+  &:focus::before {
+    #scout.font-icon();
+    content: @icon-angle-right;
+    color: @active-color;
+    position: absolute;
+    top: @group-title-padding-y;
+    left: @tabbox-padding-x - @tabbox-focus-arrow-width;
+    width: @tabbox-focus-arrow-width;
+    text-align: center;
+  }
+
+  & > .label {
+    padding: @group-title-padding-y 0;
+    display: inline-block;
+    vertical-align: middle;
+  }
+
+  & > .status {
+    margin-left: @field-status-margin-left;
+    padding: 4px 0;
+    display: inline-block;
+    vertical-align: middle;
+    #scout.status();
+  }
+
+  &.has-tooltip,
+  &.has-info,
+  &.has-warning,
+  &.has-error {
+    padding-right: @field-status-margin-left;
+  }
+
+  &.has-tooltip > .status {
+    #scout.tooltip-status();
+  }
+
+  &.has-info > .status {
+    #scout.info-status();
+  }
+
+  &.has-warning > .status {
+    #scout.warning-status();
+  }
+
+  &.has-error > .status {
+    #scout.error-status();
+  }
+}
+
+.overflow-tab-item {
+  position: relative;
+  display: inline-block;
+  text-align: center;
+  cursor: pointer;
+  padding: 0px 0px;
+
+  &::before {
+    #scout.font-icon();
+    position: relative;
+    bottom: -2px;
+    font-size: 17px;
+    color: @icon-color;
+    content: @icon-ellipsis-v;
   }
 }

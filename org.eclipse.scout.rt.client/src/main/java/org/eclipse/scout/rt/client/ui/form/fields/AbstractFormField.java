@@ -685,6 +685,19 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     return true;
   }
 
+  /**
+   * Configures the position of the status.
+   * <p>
+   * Subclasses can override this method. Default is {@value IFormField#STATUS_POSITION_DEFAULT}.
+   *
+   * @since 6.0
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(200)
+  protected String getConfiguredStatusPosition() {
+    return STATUS_POSITION_DEFAULT;
+  }
+
   private List<Class<? extends IKeyStroke>> getConfiguredKeyStrokes() {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
     List<Class<IKeyStroke>> fca = ConfigurationUtility.filterClasses(dca, IKeyStroke.class);
@@ -795,6 +808,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     setLabelHorizontalAlignment(getConfiguredLabelHorizontalAlignment());
     setLabelVisible(getConfiguredLabelVisible());
     setStatusVisible(getConfiguredStatusVisible());
+    setStatusPosition(getConfiguredStatusPosition());
     setCssClass((getConfiguredCssClass()));
     if (getConfiguredBackgroundColor() != null) {
       setBackgroundColor((getConfiguredBackgroundColor()));
@@ -1941,6 +1955,16 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   @Override
   public void setStatusVisible(boolean statusVisible) {
     propertySupport.setPropertyBool(PROP_STATUS_VISIBLE, statusVisible);
+  }
+
+  @Override
+  public String getStatusPosition() {
+    return propertySupport.getPropertyString(PROP_STATUS_POSITION);
+  }
+
+  @Override
+  public void setStatusPosition(String statusPosition) {
+    propertySupport.setPropertyString(PROP_STATUS_POSITION, statusPosition);
   }
 
   @Override

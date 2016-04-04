@@ -20,6 +20,7 @@
       "loading": false,
       "mandatory": false,
       "statusVisible": true,
+      "statusPosition": "default",
       "menus": [],
       "menusVisible": false,
       "gridData": {

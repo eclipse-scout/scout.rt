@@ -804,6 +804,10 @@ $.fn.cssMarginY = function(value) {
   this.cssMarginBottom(value);
 };
 
+$.fn.cssPaddingTop = function(value) {
+  return this.cssPxValue('padding-top', value);
+};
+
 $.fn.cssBorderBottomWidth = function(value) {
   return this.cssPxValue('border-bottom-width', value);
 };

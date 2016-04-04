@@ -86,6 +86,7 @@ public interface IFormField extends IPropertyObserver, ITypeWithClassId, IOrdere
   String PROP_LABEL_VISIBLE = "labelVisible";
   String PROP_KEY_STROKES = "keyStrokes";
   String PROP_STATUS_VISIBLE = "statusVisible";
+  String PROP_STATUS_POSITION = "statusPosition";
   String PROP_GRID_DATA = "gridData";
 
   /**
@@ -146,6 +147,10 @@ public interface IFormField extends IPropertyObserver, ITypeWithClassId, IOrdere
    * use the systemwide default label alignment
    */
   int LABEL_HORIZONTAL_ALIGNMENT_DEFAULT = 1000;
+
+  String STATUS_POSITION_DEFAULT = "default";
+
+  String STATUS_POSITION_TOP = "top";
 
   IForm getForm();
 
@@ -611,6 +616,10 @@ public interface IFormField extends IPropertyObserver, ITypeWithClassId, IOrdere
    *          {@code true} if status icon should be visible, {@code false} otherwise
    */
   void setStatusVisible(boolean statusVisible);
+
+  String getStatusPosition();
+
+  void setStatusPosition(String statusPosition);
 
   /**
    * @return true, if the mandatory property is fulfilled (a value set or not mandatory)
