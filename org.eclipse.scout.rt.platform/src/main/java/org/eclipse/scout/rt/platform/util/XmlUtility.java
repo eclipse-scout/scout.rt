@@ -81,12 +81,24 @@ public final class XmlUtility {
         factory.setFeature(feature, enabled);
       }
       catch (ParserConfigurationException e) {
-        LOG.warn("Feature '{}' is not supported in the current XML parser.", feature, e);
+        LOG.warn("Feature '{}' is not supported in the current XML parser: {}", feature, factory.getClass().getName(), e);
       }
     }
 
-    factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
-    factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+    try {
+      factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+    }
+    catch (IllegalArgumentException e) {
+      LOG.debug("Attribute '{}' is not supported in the current DocumentBuilderFactory: {}", XMLConstants.ACCESS_EXTERNAL_DTD, factory.getClass().getName(), e);
+    }
+
+    try {
+      factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+    }
+    catch (IllegalArgumentException e) {
+      LOG.debug("Attribute '{}' is not supported in the current DocumentBuilderFactory: {}", XMLConstants.ACCESS_EXTERNAL_SCHEMA, factory.getClass().getName(), e);
+    }
+
     factory.setXIncludeAware(false);
     factory.setExpandEntityReferences(false);
     factory.setIgnoringComments(true);
@@ -108,8 +120,18 @@ public final class XmlUtility {
    */
   public static XMLInputFactory newXMLInputFactory() {
     XMLInputFactory factory = XMLInputFactory.newInstance();
-    factory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
-    factory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
+    try {
+      factory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
+    }
+    catch (IllegalArgumentException e) {
+      LOG.debug("Attribute '{}' is not supported in the current XMLInputFactory: {}", XMLInputFactory.SUPPORT_DTD, factory.getClass().getName(), e);
+    }
+    try {
+      factory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
+    }
+    catch (IllegalArgumentException e) {
+      LOG.debug("Attribute '{}' is not supported in the current XMLInputFactory: {}", XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, factory.getClass().getName(), e);
+    }
     return factory;
   }
 
@@ -119,8 +141,26 @@ public final class XmlUtility {
    */
   public static Transformer newTransformer() throws TransformerConfigurationException {
     TransformerFactory tf = TransformerFactory.newInstance();
-    tf.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
-    tf.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
+    try {
+      tf.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+    }
+    catch (TransformerConfigurationException e) {
+      LOG.debug("Feature '{}' is not supported in the current TransformerFactory: {}", XMLConstants.FEATURE_SECURE_PROCESSING, tf.getClass().getName(), e);
+    }
+    try {
+      tf.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+    }
+    catch (IllegalArgumentException e) {
+      // some factories (e.g. xalan) throw this exception if they do not support this attribute
+      LOG.debug("Attribute '{}' is not supported in the current TransformerFactory: {}", XMLConstants.ACCESS_EXTERNAL_DTD, tf.getClass().getName(), e);
+    }
+    try {
+      // some factories (e.g. xalan) throw this exception if they do not support this attribute
+      tf.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
+    }
+    catch (IllegalArgumentException e) {
+      LOG.debug("Attribute '{}' is not supported in the current TransformerFactory: {}", XMLConstants.ACCESS_EXTERNAL_DTD, tf.getClass().getName(), e);
+    }
     return tf.newTransformer();
   }
 
@@ -139,7 +179,7 @@ public final class XmlUtility {
         factory.setFeature(feature, enabled);
       }
       catch (ParserConfigurationException e) {
-        LOG.warn("Feature '{}' is not supported in the current XML parser.", feature, e);
+        LOG.warn("Feature '{}' is not supported in the current XML parser: {}", feature, factory.getClass().getName(), e);
       }
     }
 
