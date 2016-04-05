@@ -27,6 +27,12 @@ import org.eclipse.scout.rt.shared.servicetunnel.RegisterTunnelToServerPlatformL
  */
 @Replace
 public class RegisterTunnelToServerBridgePlatformListener extends RegisterTunnelToServerPlatformListener {
+
+  @Override
+  protected boolean isEnabled() {
+    return true;
+  }
+
   @Override
   protected void registerTunnelToServerProxy(IBeanManager beanManager, Class<?> c) {
     List<? extends IBean<?>> beans = beanManager.getBeans(c);

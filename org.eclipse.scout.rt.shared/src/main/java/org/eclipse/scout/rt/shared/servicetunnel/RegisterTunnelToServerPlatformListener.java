@@ -37,7 +37,7 @@ public class RegisterTunnelToServerPlatformListener implements IPlatformListener
   @Override
   public void stateChanged(PlatformEvent event) throws PlatformException {
     if (event.getState() == IPlatform.State.BeanManagerPrepared) {
-      if (!CONFIG.getPropertyValue(CreateTunnelToServerBeansProperty.class)) {
+      if (!isEnabled()) {
         return;
       }
       //register all tunnels to server
@@ -45,6 +45,10 @@ public class RegisterTunnelToServerPlatformListener implements IPlatformListener
       final IClassInventory classInventory = ClassInventory.get();
       registerTunnelToServerProxies(beanManager, classInventory);
     }
+  }
+
+  protected boolean isEnabled() {
+    return CONFIG.getPropertyValue(CreateTunnelToServerBeansProperty.class);
   }
 
   protected void registerTunnelToServerProxies(final IBeanManager beanManager, final IClassInventory classInventory) {
