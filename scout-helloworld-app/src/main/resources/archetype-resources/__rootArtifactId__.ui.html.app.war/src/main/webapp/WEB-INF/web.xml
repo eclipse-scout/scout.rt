@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app
-    xmlns="http://java.sun.com/xml/ns/javaee"
+    xmlns="http://xmlns.jcp.org/xml/ns/javaee"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
-    version="2.5">
+    xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
+    version="3.1">
 
   <display-name>${displayName} HTML UI</display-name>
 
@@ -46,6 +46,11 @@
   <session-config>
     <!-- Session timeout in minutes -->
     <session-timeout>5</session-timeout>
+    <cookie-config>
+      <http-only>true</http-only>
+      <!-- TODO: enable 'secure' element below if an encrypted channel (https) is used: -->
+      <!-- <secure>true</secure>  -->
+    </cookie-config>
   </session-config>
 
 </web-app>
