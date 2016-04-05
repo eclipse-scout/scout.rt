@@ -33,11 +33,8 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.controls.ITableControl;
 import org.eclipse.scout.rt.client.ui.basic.table.controls.SearchFormTableControl;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
-import org.eclipse.scout.rt.client.ui.basic.tree.TreeAdapter;
-import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
-import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineEvent;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.form.FormUtility;
@@ -62,8 +59,6 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
   private final Map<IForm, WeakReference<IForm>> m_transformedForms = new WeakHashMap<>();
   private final Map<IOutline, WeakReference<IOutline>> m_transformedOutlines = new WeakHashMap<>();
   private IDesktop m_desktop;
-  private P_OutlineListener m_outlineListener;
-  private List<IOutline> m_outlines;
   private ToolFormHandler m_toolFormHandler;
   private boolean m_gridDataDirty;
   private DeviceTransformationConfig m_deviceTransformationConfig;
@@ -157,22 +152,10 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
 
   @Override
   public void adaptDesktopOutlines(OrderedCollection<IOutline> outlines) {
-    m_outlines = outlines.getOrderedList();
-    m_outlineListener = new P_OutlineListener();
-    for (IOutline outline : m_outlines) {
-      outline.addTreeListener(m_outlineListener);
-    }
   }
 
   @Override
   public void notifyDesktopClosing() {
-    if (m_outlines != null) {
-      for (IOutline outline : m_outlines) {
-        outline.removeTreeListener(m_outlineListener);
-      }
-      m_outlineListener = null;
-      m_outlines.clear();
-    }
   }
 
   @Override
@@ -263,12 +246,6 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
         // Do not allow closing the outline table because it breaks the navigation
         makeSurePageDetailTableIsVisible();
       }
-    }
-  }
-
-  public void transformPageDetailForm(IPage page) {
-    if (page.isDetailFormVisible() && page.getDetailForm() != null) {
-      transformForm(page.getDetailForm());
     }
   }
 
@@ -510,22 +487,6 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
   }
 
   private class P_BackAction extends AbstractMobileBackAction {
-
-  }
-
-  private class P_OutlineListener extends TreeAdapter {
-
-    @Override
-    public void treeChanged(TreeEvent e) {
-      if (OutlineEvent.TYPE_PAGE_CHANGED == e.getType()) {
-        onPageChanged((OutlineEvent) e);
-      }
-    }
-
-    protected void onPageChanged(OutlineEvent e) {
-      IPage page = (IPage) e.getChildNode();
-      transformPageDetailForm(page);
-    }
 
   }
 }
