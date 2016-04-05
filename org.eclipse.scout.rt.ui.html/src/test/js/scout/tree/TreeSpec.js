@@ -80,7 +80,7 @@ describe("Tree", function() {
 
       it("updates html document if parent is expanded", function() {
         tree.render(session.$entryPoint);
-
+        tree.revalidateLayoutTree();
         var newNode0Child3 = helper.createModelNode('0_3', 'newNode0Child3', 3);
         expect(helper.findAllNodes(tree).length).toBe(12);
 
@@ -320,6 +320,7 @@ describe("Tree", function() {
       });
 
       it("updates html document", function() {
+        tree.setViewRangeSize(40);
         tree.render(session.$entryPoint);
 
         var node2Child0 = node2.childNodes[0];
@@ -348,11 +349,13 @@ describe("Tree", function() {
       });
 
       it("updates html document", function() {
+        tree.setViewRangeSize(30);
         tree.render(session.$entryPoint);
 
         tree.deleteNodes([node0]);
         expect(helper.findAllNodes(tree).length).toBe(26);
         expect(node0.$node).toBeUndefined();
+        expect(tree.nodes.indexOf(node0)).toBe(-1);
         expect(node0.childNodes[0].$node).toBeUndefined();
         expect(node0.childNodes[1].$node).toBeUndefined();
         expect(node0.childNodes[2].$node).toBeUndefined();
@@ -370,12 +373,14 @@ describe("Tree", function() {
         });
 
         it("updates html document", function() {
+          tree.setViewRangeSize(30);
           tree.setNodeExpanded(node0, false);
           tree.render(session.$entryPoint);
 
           tree.deleteNodes([node0]);
           expect(helper.findAllNodes(tree).length).toBe(26);
           expect(node0.$node).toBeUndefined();
+          expect(tree.nodes.indexOf(node0)).toBe(-1);
           expect(node0.childNodes[0].$node).toBeUndefined();
           expect(node0.childNodes[1].$node).toBeUndefined();
           expect(node0.childNodes[2].$node).toBeUndefined();
