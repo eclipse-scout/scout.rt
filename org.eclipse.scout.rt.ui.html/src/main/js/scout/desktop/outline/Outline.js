@@ -550,6 +550,7 @@ scout.Outline.prototype.setCompact = function(compact) {
   this.compact = compact;
   if (this.rendered) {
     this._renderCompact();
+    this.invalidateLayoutTree();
   }
 };
 
@@ -557,6 +558,7 @@ scout.Outline.prototype.setEmbedDetailContent = function(embed) {
   this.embedDetailContent = embed;
   if (this.rendered) {
     this._renderEmbedDetailContent();
+    this.invalidateLayoutTree();
   }
   this.updateDetailContent();
 };

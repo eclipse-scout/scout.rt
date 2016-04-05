@@ -151,8 +151,8 @@ scout.Desktop.prototype._renderDisplayStyle = function() {
     this.bench.setOutlineContentVisible(!isCompact);
   }
   if (this.outline) {
-    this.outline.setEmbedDetailContent(isCompact);
     this.outline.setCompact(isCompact);
+    this.outline.setEmbedDetailContent(isCompact);
   }
 
   this.invalidateLayoutTree();
