@@ -96,28 +96,7 @@
     }
 
     & > .loading-indicator {
-      @loading-animation-size: 30px;
-      display: inline-block;
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      margin-top: -(@loading-animation-size / 2);
-      margin-left: -(@loading-animation-size / 2);
-      #scout.animation(fadeIn 0.15s);
-
-      &::before {
-        #scout.animation(rotation 0.9s linear infinite);
-        content: '';
-        display: inline-block;
-        vertical-align: middle;
-        border-radius: 50%;
-        border: 2px solid rgba(0, 0, 0, 0);
-        border-top-color: @border-color;
-        border-left-color: @border-color;
-        border-bottom-color: @border-color;
-        width: @loading-animation-size;
-        height: @loading-animation-size;
-      }
+      #scout.loading-indicator();
     }
   }
 

@@ -1,6 +1,25 @@
 .slider-input {
   display: inline-block;
   vertical-align: middle;
+  border: none;
+
+  &:focus {
+    &::-webkit-slider-runnable-track {
+      background: @active-color;
+    }
+    border: none;
+    box-shadow: none;
+  }
+
+  &::-webkit-slider-runnable-track {
+    height: 3px;
+    cursor: pointer;
+    background: @slider-track-color;
+  }
+
+  &::-webkit-slider-thumb {
+    margin-top: -8px;
+  }
 }
 
 .slider-value {

@@ -8,9 +8,25 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-scout.DefaultFieldLoadingSupport = function(field, loadingIndicatorDelay) {
-  this.field = field;
-  this.loadingIndicatorDelay = scout.nvl(loadingIndicatorDelay, 250); // ms
+
+
+/**
+ * @param options The following properties are supported:
+ *  [field] mandatory
+ *  [containerProperty] optional, if not set: '$container' is used. This property points to the JQuery element that
+ *      should be hidden when the field is in loading state. We cannot reference the property in the Ctor of this
+ *      class, because the property is not set until the render() method runs.
+ *  [loadingIndicatorDelay] optional, if not set: 250 ms
+ */
+scout.DefaultFieldLoadingSupport = function(options) {
+  if (!options.field) {
+    throw new Error('Option \'field\' not set');
+  }
+  this.field = options.field;
+  this.$container = options.$container || function() {
+    return this.field.$container;
+  }.bind(this);
+  this.loadingIndicatorDelay = scout.nvl(options.loadingIndicatorDelay, 250); // ms
 
   this._loadingIndicatorTimeoutId;
 };
@@ -29,9 +45,9 @@ scout.DefaultFieldLoadingSupport.prototype.renderLoading = function() {
     var renderLoading = function() {
       if (this.field.rendered) {
         // Hide field content
-        this.field.$container.addClass('loading');
+        this.$container().addClass('loading');
         // Create loading indicator
-        this._$loadingIndicator = this.field.$container.appendDiv('loading-indicator');
+        this._$loadingIndicator = this.$container().appendDiv('loading-indicator');
       }
     }.bind(this);
 
@@ -49,7 +65,7 @@ scout.DefaultFieldLoadingSupport.prototype.renderLoading = function() {
       this._$loadingIndicator = null;
       if (this.field.rendered) {
         // Show field's content (layout if necessary)
-        this.field.$container.removeClass('loading');
+        this.$container().removeClass('loading');
         this.field.invalidateLayoutTree();
       }
     }.bind(this));
