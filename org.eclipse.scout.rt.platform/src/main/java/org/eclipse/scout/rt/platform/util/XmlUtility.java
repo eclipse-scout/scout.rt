@@ -20,8 +20,11 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
@@ -29,9 +32,11 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
+import javax.xml.stream.XMLInputFactory;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Result;
 import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
@@ -68,31 +73,55 @@ public final class XmlUtility {
    */
   public static DocumentBuilder newDocumentBuilder() throws ParserConfigurationException {
     DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-    try {
-      factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
-    }
-    catch (ParserConfigurationException e) {
-      LOG.warn("Could not set feature disallow-doctype-decl", e);
+
+    for (Entry<String, Boolean> a : getXmlFeaturesMap().entrySet()) {
+      String feature = a.getKey();
+      boolean enabled = a.getValue().booleanValue();
       try {
-        factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+        factory.setFeature(feature, enabled);
       }
-      catch (ParserConfigurationException e1) {
-        LOG.warn("Could not disable feature external-general-entities", e1);
-      }
-      try {
-        factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
-      }
-      catch (ParserConfigurationException e1) {
-        LOG.warn("Could not disable feature external-parameter-entities", e1);
+      catch (ParserConfigurationException e) {
+        LOG.warn("Feature '{}' is not supported in the current XML parser.", feature, e);
       }
     }
+
+    factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+    factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
     factory.setXIncludeAware(false);
     factory.setExpandEntityReferences(false);
     factory.setIgnoringComments(true);
-    factory.setCoalescing(false);
-    factory.setValidating(false);
-    factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
     return factory.newDocumentBuilder();
+  }
+
+  private static Map<String, Boolean> getXmlFeaturesMap() {
+    Map<String, Boolean> features = new HashMap<>(5);
+    features.put("http://apache.org/xml/features/disallow-doctype-decl", Boolean.TRUE);
+    features.put("http://xml.org/sax/features/external-general-entities", Boolean.FALSE);
+    features.put("http://xml.org/sax/features/external-parameter-entities", Boolean.FALSE);
+    features.put("http://apache.org/xml/features/nonvalidating/load-external-dtd", Boolean.FALSE);
+    features.put(XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE);
+    return features;
+  }
+
+  /**
+   * @return A new {@link XMLInputFactory} without support for DTD and external entities.
+   */
+  public static XMLInputFactory newXMLInputFactory() {
+    XMLInputFactory factory = XMLInputFactory.newInstance();
+    factory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
+    factory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
+    return factory;
+  }
+
+  /**
+   * @return A new secure {@link Transformer} with disabled external DTDs and style sheets to prevent XXE.
+   * @throws TransformerConfigurationException
+   */
+  public static Transformer newTransformer() throws TransformerConfigurationException {
+    TransformerFactory tf = TransformerFactory.newInstance();
+    tf.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+    tf.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
+    return tf.newTransformer();
   }
 
   /**
@@ -102,27 +131,20 @@ public final class XmlUtility {
    */
   public static SAXParser newSAXParser() throws ParserConfigurationException, SAXException {
     SAXParserFactory factory = SAXParserFactory.newInstance();
-    try {
-      factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
-    }
-    catch (ParserConfigurationException e) {
-      LOG.warn("Could not set feature disallow-doctype-decl", e);
+
+    for (Entry<String, Boolean> a : getXmlFeaturesMap().entrySet()) {
+      String feature = a.getKey();
+      boolean enabled = a.getValue().booleanValue();
       try {
-        factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+        factory.setFeature(feature, enabled);
       }
-      catch (ParserConfigurationException e1) {
-        LOG.warn("Could not disable feature external-general-entities", e1);
-      }
-      try {
-        factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
-      }
-      catch (ParserConfigurationException e1) {
-        LOG.warn("Could not disable feature external-parameter-entities", e1);
+      catch (ParserConfigurationException e) {
+        LOG.warn("Feature '{}' is not supported in the current XML parser.", feature, e);
       }
     }
+
     factory.setXIncludeAware(false);
     factory.setValidating(false);
-    factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
     return factory.newSAXParser();
   }
 
