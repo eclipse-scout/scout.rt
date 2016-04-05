@@ -16,9 +16,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
-import org.eclipse.scout.rt.ui.html.cache.HttpCacheKey;
-import org.eclipse.scout.rt.ui.html.cache.HttpCacheObject;
-import org.eclipse.scout.rt.ui.html.cache.IHttpCacheControl;
+import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheKey;
+import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheObject;
 import org.eclipse.scout.rt.ui.html.json.IDefaultValuesFilterService;
 
 /**
@@ -34,6 +33,6 @@ public class DefaultValuesLoader extends AbstractResourceLoader {
   public HttpCacheObject loadResource(HttpCacheKey cacheKey) throws IOException {
     String pathInfo = cacheKey.getResourcePath();
     BinaryResource res = BEANS.get(IDefaultValuesFilterService.class).getCombinedDefaultValuesConfigurationFile(pathInfo);
-    return new HttpCacheObject(cacheKey, true, IHttpCacheControl.MAX_AGE_4_HOURS, res);
+    return new HttpCacheObject(cacheKey, res);
   }
 }

@@ -15,48 +15,124 @@ scout.DesktopLayout = function(desktop) {
 scout.inherits(scout.DesktopLayout, scout.AbstractLayout);
 
 scout.DesktopLayout.prototype.layout = function($container) {
-  var navigationSize, headerSize, htmlHeader, htmlBench, htmlBenchSize, htmlNavigation,
+  var navigationSize, headerSize, htmlHeader, htmlBench, benchSize, htmlNavigation, animationProps,
     navigationWidth = 0,
     headerHeight = 0,
-    htmlContainer = this.desktop.htmlComp,
-    containerSize = htmlContainer.getAvailableSize();
+    navigation = this.desktop.navigation,
+    header = this.desktop.header,
+    bench = this.desktop.bench,
+    // Animation moves header and bench to the left when navigation gets invisible or moves bench to the right if bench gets invisible (used for mobile)
+    animated = this.desktop.animateLayoutChange,
+    containerSize = this.containerSize(),
+    fullWidthNavigation = navigation && navigation.htmlComp.layoutData.fullWidth;
 
-  containerSize = containerSize.subtract(htmlContainer.getInsets());
-  if (this.desktop.navigation) {
-    navigationWidth = this._calculateNavigationWidth(containerSize);
+  if (navigation) {
+    navigationWidth = this.calculateNavigationWidth(containerSize);
     if (this.desktop.splitter) {
       this.desktop.splitter.updatePosition(navigationWidth);
     }
 
-    htmlNavigation = this.desktop.navigation.htmlComp;
-    navigationSize = new scout.Dimension(navigationWidth, containerSize.height)
-      .subtract(htmlNavigation.getMargins());
-    htmlNavigation.setSize(navigationSize);
+    if (this.desktop.navigationVisible) {
+      htmlNavigation = navigation.htmlComp;
+      navigationSize = new scout.Dimension(navigationWidth, containerSize.height)
+        .subtract(htmlNavigation.getMargins());
+      htmlNavigation.setSize(navigationSize);
+    }
   }
 
-  if (this.desktop.header) {
-    this.desktop.header.$container.cssLeft(navigationWidth);
-
-    htmlHeader = this.desktop.header.htmlComp;
+  if (header) {
+    htmlHeader = header.htmlComp;
     headerHeight = htmlHeader.$comp.outerHeight(true);
-    headerSize = new scout.Dimension(containerSize.width - navigationWidth, headerHeight)
-      .subtract(htmlHeader.getMargins());
-    htmlHeader.setSize(headerSize);
+    if (this.desktop.headerVisible) {
+      // positioning
+      if (!animated) {
+        header.$container.cssLeft(navigationWidth);
+      }
+
+      // sizing
+      headerSize = new scout.Dimension(containerSize.width - navigationWidth, headerHeight)
+        .subtract(htmlHeader.getMargins());
+      if (!animated || fullWidthNavigation) {
+        htmlHeader.setSize(headerSize);
+      }
+    }
+
+    if (animated) {
+      animationProps = {
+        left: containerSize.width
+      };
+      if (this.desktop.headerVisible) {
+        prepareAnimate(animationProps, htmlHeader, headerSize);
+      }
+      this._animate(animationProps, htmlHeader, headerSize);
+    }
   }
 
-  if (this.desktop.bench) {
-    this.desktop.bench.$container
-      .cssLeft(navigationWidth)
-      .cssTop(headerHeight);
+  if (bench) {
+    htmlBench = bench.htmlComp;
+    if (this.desktop.benchVisible) {
+      // positioning
+      bench.$container.cssTop(headerHeight);
+      if (!animated) {
+        bench.$container.cssLeft(navigationWidth);
+      }
 
-    htmlBench = this.desktop.bench.htmlComp;
-    htmlBenchSize = new scout.Dimension(containerSize.width - navigationWidth, containerSize.height - headerHeight)
-      .subtract(htmlBench.getMargins());
-    htmlBench.setSize(htmlBenchSize);
+      // sizing
+      benchSize = new scout.Dimension(containerSize.width - navigationWidth, containerSize.height - headerHeight)
+        .subtract(htmlBench.getMargins());
+      if (!animated || fullWidthNavigation) {
+        htmlBench.setSize(benchSize);
+      }
+    }
+
+    if (animated) {
+      animationProps = {
+        left: containerSize.width
+      };
+      if (this.desktop.benchVisible) {
+        prepareAnimate(animationProps, htmlBench, benchSize);
+      }
+      this._animate(animationProps, htmlBench, benchSize);
+    }
+  }
+
+  function prepareAnimate (animationProps, htmlComp, size) {
+    if (fullWidthNavigation) {
+      // Slide bench in from right to left, don't resize
+      htmlComp.$comp.cssLeft(containerSize.width);
+    } else {
+      // Resize bench
+      animationProps.width = size.width;
+    }
+    // Move to new point (=0, if navigation is invisible)
+    animationProps.left = navigationWidth;
   }
 };
 
-scout.DesktopLayout.prototype._calculateNavigationWidth = function(containerSize) {
+/**
+ * Used to animate bench and header
+ */
+scout.DesktopLayout.prototype._animate = function(animationProps, htmlComp, size) {
+  htmlComp.$comp.animate(animationProps, {
+    queue: false,
+    step: function(now, tween) {
+      if (tween.prop === 'width') {
+        size.width = tween.now;
+        htmlComp.setSize(size);
+      }
+    },
+    complete: this.desktop.onLayoutAnimationComplete.bind(this.desktop)
+  });
+};
+
+scout.DesktopLayout.prototype.containerSize = function() {
+  var htmlContainer = this.desktop.htmlComp,
+    containerSize = htmlContainer.getAvailableSize();
+
+  return containerSize.subtract(htmlContainer.getInsets());
+};
+
+scout.DesktopLayout.prototype.calculateNavigationWidth = function(containerSize) {
   if (!this.desktop.navigationVisible) {
     return 0;
   }
@@ -64,7 +140,10 @@ scout.DesktopLayout.prototype._calculateNavigationWidth = function(containerSize
   if (navigationLayoutData.fullWidth) {
     return containerSize.width;
   }
-  var splitterPosition = this.desktop.splitter.position;
+  var splitterPosition = 0;
+  if (this.desktop.splitterVisible) {
+    splitterPosition = this.desktop.splitter.position;
+  }
   var outline = this.desktop.outline;
   if (!this.desktop.resizing && outline && outline.autoToggleBreadcrumbStyle) {
     // If autoToggleBreadcrumbStyle is true, BREADCRUMB_STYLE_WIDTH triggers the toggling between the two modes.

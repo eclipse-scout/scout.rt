@@ -11,8 +11,6 @@
 scout.TableControl = function() {
   scout.TableControl.parent.call(this);
   this.tableFooter;
-  this.form;
-  this._addAdapterProperties('form');
   this.contentRendered = false;
   this.height = scout.TableControl.CONTAINER_SIZE;
   this.animateDuration = scout.TableControl.CONTAINER_ANIMATE_DURATION;
@@ -22,11 +20,6 @@ scout.inherits(scout.TableControl, scout.Action);
 
 scout.TableControl.CONTAINER_SIZE = 345;
 scout.TableControl.CONTAINER_ANIMATE_DURATION = 350;
-
-scout.TableControl.prototype._init = function(model) {
-  scout.TableControl.parent.prototype._init.call(this, model);
-  this._syncForm(this.form);
-};
 
 /**
  * @override ModelAdapter.js
@@ -49,9 +42,8 @@ scout.TableControl.prototype._createKeyStrokeContextForTableControl = function()
   return keyStrokeContext;
 };
 
-
 scout.TableControl.prototype._createLayout = function() {
-  return new scout.TableControlLayout(this);
+  return new scout.NullLayout();
 };
 
 scout.TableControl.prototype._render = function($parent) {
@@ -72,25 +64,11 @@ scout.TableControl.prototype.remove = function() {
 };
 
 scout.TableControl.prototype._renderContent = function($parent) {
-  this.form.render($parent);
-
-  // Tab box gets a special style if it is the first field in the root group box
-  var rootGroupBox = this.form.rootGroupBox;
-  if (rootGroupBox.fields[0] instanceof scout.TabBox) {
-    rootGroupBox.fields[0].$container.addClass('in-table-control');
-  }
-
-  this.form.$container.height($parent.height());
-  this.form.$container.width($parent.width());
-  this.form.htmlComp.pixelBasedSizing = true;
-  this.form.htmlComp.validateRoot = true;
-  this.form.htmlComp.validateLayout();
-  this.session.keyStrokeManager.installKeyStrokeContext(this.tableControlKeyStrokeContext);
+  // to be implemented by subclass
 };
 
 scout.TableControl.prototype._removeContent = function() {
-  this.session.keyStrokeManager.uninstallKeyStrokeContext(this.tableControlKeyStrokeContext);
-  this.form.remove();
+  // to be implemented by subclass
 };
 
 scout.TableControl.prototype.removeContent = function() {
@@ -100,6 +78,7 @@ scout.TableControl.prototype.removeContent = function() {
       this.tableFooter.$controlContainer.removeClass(this.cssClass + '-table-control-container');
       this.tableFooter.$controlContent.removeClass(this.cssClass + '-table-control-content');
     }
+    this.session.keyStrokeManager.uninstallKeyStrokeContext(this.tableControlKeyStrokeContext);
     this.contentRendered = false;
   }
 };
@@ -114,11 +93,6 @@ scout.TableControl.prototype.renderContent = function() {
     return;
   }
 
-  // do not set initial focus as form, form is not visible during animation of control container, otherwise browser might scroll document
-  if (this.form) {
-    this.form.renderInitialFocusEnabled = false;
-  }
-
   if (!this.tableFooter.open) {
     this.tableFooter.openControlContainer(this);
   }
@@ -129,19 +103,12 @@ scout.TableControl.prototype.renderContent = function() {
       this.tableFooter.$controlContent.addClass(this.cssClass + '-table-control-content');
     }
     this._renderContent(this.tableFooter.$controlContent);
+    this.session.keyStrokeManager.installKeyStrokeContext(this.tableControlKeyStrokeContext);
     if (this.htmlComp) {
       this.htmlComp.invalidateLayoutTree(false);
     }
     this.contentRendered = true;
   }
-};
-
-scout.TableControl.prototype._removeForm = function() {
-  this.removeContent();
-};
-
-scout.TableControl.prototype._renderForm = function(form) {
-  this.renderContent();
 };
 
 scout.TableControl.prototype._renderSelected = function(selected, closeWhenUnselected) {
@@ -175,7 +142,7 @@ scout.TableControl.prototype._renderSelected = function(selected, closeWhenUnsel
  * Returns true if the table control may be displayed (opened).
  */
 scout.TableControl.prototype.isContentAvailable = function() {
-  return !!this.form;
+  return true;
 };
 
 scout.TableControl.prototype.toggle = function() {
@@ -200,7 +167,7 @@ scout.TableControl.prototype.setSelected = function(selected, closeWhenUnselecte
 
   // Instead of calling parent.setSelected(), we manually execute the required code. Otherwise
   // we would not be able to pass 'closeWhenUnselected' to _renderSelected().
-  this.selected = selected;
+  this._setProperty('selected', selected);
   if (this.rendered) {
     this._renderSelected(selected, closeWhenUnselected);
   }
@@ -211,13 +178,6 @@ scout.TableControl.prototype._configureTooltip = function() {
   var options = scout.TableControl.parent.prototype._configureTooltip.call(this);
   options.cssClass = 'table-control-tooltip';
   return options;
-};
-
-scout.TableControl.prototype._syncForm = function(form) {
-  if (form) {
-    form.rootGroupBox.menuBar.bottom();
-  }
-  this.form = form;
 };
 
 scout.TableControl.prototype._goOffline = function() {
@@ -237,10 +197,7 @@ scout.TableControl.prototype._onMouseDown = function() {
 };
 
 scout.TableControl.prototype.onControlContainerOpened = function() {
-  if (this.form) {
-    // TODO [5.2] dwi: temporary solution; set focus to last known position
-    this.form.renderInitialFocus();
-  }
+  // nop
 };
 
 scout.TableControl.prototype.onControlContainerClosed = function() {

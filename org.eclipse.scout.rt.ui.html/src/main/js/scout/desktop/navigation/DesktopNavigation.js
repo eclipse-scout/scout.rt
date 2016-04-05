@@ -49,12 +49,15 @@ scout.DesktopNavigation.prototype._render = function($parent) {
 };
 
 scout.DesktopNavigation.prototype._renderOutline = function() {
+  if (!this.outline) {
+    return;
+  }
   this.outline.setParent(this);
   this.outline.render(this.$body);
   this.outline.invalidateLayoutTree();
   // Layout immediate to prevent flickering when breadcrumb mode is enabled
   // but not initially while desktop gets rendered because it will be done at the end anyway
-  if (this.desktop.rendered) {
+  if (this.rendered) {
     this.outline.validateLayoutTree();
     this.outline.validateFocus();
   }
@@ -79,6 +82,7 @@ scout.DesktopNavigation.prototype.setOutline = function(outline) {
   this.outline = outline;
   if (this.outline) {
     this.outline.setBreadcrumbTogglingThreshold(scout.DesktopNavigation.BREADCRUMB_STYLE_WIDTH);
+    this.outline.inBackground = this.desktop.inBackground;
     if (this.rendered) {
       this._renderOutline();
     }
@@ -86,13 +90,17 @@ scout.DesktopNavigation.prototype.setOutline = function(outline) {
 };
 
 scout.DesktopNavigation.prototype.sendToBack = function() {
-  this.viewButtons.viewMenuTab.sendToBack();
-  this.outline.sendToBack();
+  this.viewButtons.sendToBack();
+  if (this.outline) {
+    this.outline.sendToBack();
+  }
 };
 
 scout.DesktopNavigation.prototype.bringToFront = function() {
-  this.viewButtons.viewMenuTab.bringToFront();
-  this.outline.bringToFront();
+  this.viewButtons.bringToFront();
+  if (this.outline) {
+    this.outline.bringToFront();
+  }
 };
 
 scout.DesktopNavigation.prototype.setToolBarVisible = function(toolBarVisible) {
@@ -138,7 +146,5 @@ scout.DesktopNavigation.prototype._removeToolBar = function() {
 };
 
 scout.DesktopNavigation.prototype._onNavigationBodyMousedown = function(event) {
-  if (this.outline.inBackground) {
-    this.desktop.bringOutlineToFront(this.outline);
-  }
+  this.desktop.bringOutlineToFront();
 };

@@ -34,6 +34,7 @@ function sandboxSession(options) {
   var desktop = options.desktop || {};
   desktop.navigationVisible = scout.nvl(desktop.navigationVisible, false);
   desktop.headerVisible = scout.nvl(desktop.headerVisible, false);
+  desktop.benchVisible = scout.nvl(desktop.benchVisible, false);
   desktop.parent = scout.nvl(desktop.parent, session.rootAdapter);
   session.desktop = scout.create('Desktop', desktop);
   session._renderDesktop();

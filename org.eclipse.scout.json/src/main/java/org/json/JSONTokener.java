@@ -26,6 +26,7 @@ package org.json;
  * Changes to the original code:
  * -----------------------------
  * - Applied Scout code formatting rules
+ * - Added lenient mode to allow parsing of certain invalid JSON strings (missing null value)
  *
  * Copyright (c) 2015 BSI Business Systems Integration AG.
  */
@@ -70,6 +71,7 @@ public class JSONTokener {
 
   /** The input JSON. */
   private final String in;
+  private final boolean lenient;
 
   /**
    * The index of the next character to be returned by {@link #next}. When the input is exhausted, this equals the
@@ -88,6 +90,23 @@ public class JSONTokener {
       in = in.substring(1);
     }
     this.in = in;
+    this.lenient = false;
+  }
+
+  /**
+   * @param in
+   *          JSON encoded string. Null is not permitted and will yield a tokener that throws
+   *          {@code NullPointerExceptions} when methods are called.
+   * @param lenient
+   *          allow parsing of invalid JSON strings with missing null values
+   */
+  public JSONTokener(String in, boolean lenient) {
+    // consume an optional byte order mark (BOM) if it exists
+    if (in != null && in.startsWith("\ufeff")) {
+      in = in.substring(1);
+    }
+    this.in = in;
+    this.lenient = lenient;
   }
 
   /**
@@ -287,6 +306,9 @@ public class JSONTokener {
     String literal = nextToInternal("{}[]/\\:,=;# \t\f");
 
     if (literal.length() == 0) {
+      if (lenient) {
+        return JSONObject.NULL;
+      }
       throw syntaxError("Expected literal value");
     }
     else if ("null".equalsIgnoreCase(literal)) {

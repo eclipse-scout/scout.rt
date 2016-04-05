@@ -16,12 +16,20 @@ import static org.junit.Assert.assertTrue;
 import java.util.Collections;
 import java.util.List;
 
+import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
+import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
+import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
+import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 
+@RunWith(ClientTestRunner.class)
+@RunWithSubject("default")
+@RunWithClientSession(TestEnvironmentClientSession.class)
 public class AbstractDesktopTest {
 
   private IOutline m_outline;

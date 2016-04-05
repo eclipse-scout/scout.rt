@@ -1156,6 +1156,42 @@ describe("Table", function() {
         helper.assertDatesInCells(table.rows, 0, [new Date('1999-01-10'), new Date('2012-08-10'), new Date('2014-03-01')]);
       });
 
+      it("uses non sort columns as fallback", function() {
+        if (!scout.device.supportsInternationalization()) {
+          return;
+        }
+
+        var model = helper.createModelFixture(2, 4);
+        var table = helper.createTable(model);
+        model.rows[0].cells[0].value = 'zzz';
+        model.rows[0].cells[1].value = 'same';
+        model.rows[1].cells[0].value = 'aaa';
+        model.rows[1].cells[1].value = 'other';
+        model.rows[2].cells[0].value = 'ccc';
+        model.rows[2].cells[1].value = 'other';
+        model.rows[3].cells[0].value = 'qqq';
+        model.rows[3].cells[1].value = 'same';
+
+        column0 = model.columns[0];
+        column1 = model.columns[1];
+        table.render(session.$entryPoint);
+
+        expect(column0.sortAscending).toBe(true);
+        table.sort(column1, 'asc');
+        helper.assertValuesInCells(table.rows, 0, ['aaa', 'ccc', 'qqq', 'zzz']);
+        helper.assertValuesInCells(table.rows, 1, ['other', 'other', 'same', 'same']);
+
+        table.sort(column1, 'desc');
+        helper.assertValuesInCells(table.rows, 0, ['qqq', 'zzz', 'aaa', 'ccc']);
+        helper.assertValuesInCells(table.rows, 1, ['same', 'same', 'other', 'other']);
+
+        // sortAscending of a column with sortActive = false shouldn't have any effect
+        column0.sortAscending = false;
+        table.sort(column1, 'asc');
+        helper.assertValuesInCells(table.rows, 0, ['aaa', 'ccc', 'qqq', 'zzz']);
+        helper.assertValuesInCells(table.rows, 1, ['other', 'other', 'same', 'same']);
+      });
+
     });
 
   });

@@ -50,7 +50,6 @@
 .tree-node {
   display: block;
   position: relative;
-  #scout.overflow-ellipsis-nowrap();
   border: 1px solid transparent;
   border-left: 0px solid transparent;
   border-right: 0px solid transparent;
@@ -70,6 +69,11 @@
   /*first child is the scrollbar*/
   &:nth-of-type(1).selected {
     border-top-color: @item-selection-nonfocus-background-color;
+  }
+
+  & > .text {
+    width: 100%;
+    #scout.overflow-ellipsis-nowrap();
   }
 }
 
@@ -179,7 +183,6 @@
     & > .tree-node,
     & > .animation-wrapper > .tree-node {
       overflow: visible;
-      white-space: normal;
       text-align: center;
 
       display: none;
@@ -242,6 +245,10 @@
 
       & > .tree-node-control {
         display: none;
+      }
+
+      & > .text {
+        white-space: normal;
       }
     }
   }

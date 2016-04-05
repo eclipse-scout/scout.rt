@@ -36,6 +36,8 @@ public class HtmlHelperTest {
     assertEquals("one\ttwo", helper.toPlainText("one&#9;two"));
     assertEquals("one \t two", helper.toPlainText("one &#9; two"));
     assertEquals("one\ttwo", helper.toPlainText("one" + StringUtility.HTML_ENCODED_TAB + "two"));
+    assertEquals("one    two", helper.toPlainText("one&#160;&#xa0;&#Xa0;&#xA0;two")); // HTML5 spec allows for mixed case hex values.
+    assertEquals("one\t\ttwo", helper.toPlainText("one&#x9;&#X9;two")); // HTML5 spec allows for mixed case hex values.
 
     // Simple documents
     assertEquals("", helper.toPlainText("<html>"));
@@ -100,11 +102,14 @@ public class HtmlHelperTest {
     assertEquals("><script>alert('hacker attack');</script><", helper.unescape("&gt;&lt;script&gt;alert(&#39;hacker attack&#39;);&lt;/script&gt;&lt;"));
     assertEquals("one&nbsp;&nbsp; two", helper.unescape("one&amp;nbsp;&amp;nbsp; two"));
     assertEquals("this is \"good\"", helper.unescape("this is &quot;good&quot;"));
-    assertEquals("http://www.example.com/~myapp/script?q=search%20query&time=now&x=17263.23", helper.unescape("http://www.example.com/~myapp/script?q=search%20query&amp;time=now&amp;x=17263.23"));
+    assertEquals("http://www.example.com/~myapp/script?q=search%20query&time=now&x=17263.23",
+        helper.unescape("http://www.example.com/~myapp/script?q=search%20query&amp;time=now&amp;x=17263.23"));
     assertEquals("<div><span style=\"color: red; content: '\\u39';\">Alert!</span><br/>Line2</div>",
         helper.unescape("&lt;div&gt;&lt;span style=&quot;color: red; content: &#39;\\u39&#39;;&quot;&gt;Alert!&lt;/span&gt;&lt;br/&gt;Line2&lt;/div&gt;"));
     assertEquals("hell&ouml;", helper.unescape("hell&amp;ouml;"));
     assertEquals("one/two/end", helper.unescape("one&#47;two&#47;end"));
+    assertEquals("one&two<three>four\"five/six'seven'eight&nine>ten", // HTML5 spec allows for mixed case hex values.
+        helper.unescape("one&#x26;two&#X3c;three&#x3E;four&#x22;five&#X2F;six&#x27;seven&#X27;eight&#X26;nine&#X3E;ten"));
 
     // Things that should NOT be unescaped
     assertEquals("one\ntwo  end", helper.unescape("one\ntwo  end"));

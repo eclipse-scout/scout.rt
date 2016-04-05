@@ -13,6 +13,7 @@
   __include("scout/ObjectFactory.js");
   __include("scout/objectFactories.js");
   __include("scout/widget/Widget.js");
+  __include("scout/widget/CloneWidget.js");
   __include("scout/widget/NullWidget.js");
   // Basic utilities
   __include("scout/util/arrays.js");
@@ -130,6 +131,15 @@
   __include("scout/planner/PlannerMenuItemsOrder.js");
   __include("scout/filechooser/FileChooser.js");
   __include("scout/filechooser/FileChooserController.js");
+  __include("scout/slider/Slider.js");
+  __include("scout/slider/SliderLayout.js");
+  // Form
+  __include("scout/form/Form.js");
+  __include("scout/form/FormLayout.js");
+  __include("scout/form/FormToolButton.js");
+  __include("scout/form/FormToolPopup.js");
+  __include("scout/form/FormToolPopupLayout.js");
+  __include("scout/form/DialogLayout.js");
   // Table
   __include("scout/table/Table.js");
   __include("scout/table/TableMatrix.js");
@@ -156,8 +166,10 @@
   __include("scout/table/columns/IconColumn.js"); //requires Column.js
   __include("scout/table/columns/NumberColumn.js"); //requires Column.js
   __include("scout/table/controls/TableControl.js");
-  __include("scout/table/controls/TableControlLayout.js");
+  __include("scout/table/controls/TableControlAdapterMenu.js"); // requires FormToolButton and TableControl
   __include("scout/table/controls/AggregateTableControl.js"); // requires TableControl.js
+  __include("scout/table/controls/FormTableControl.js"); // requires TableControl.js
+  __include("scout/table/controls/FormTableControlLayout.js");
   __include("scout/table/editor/CellEditorPopup.js");
   __include("scout/table/editor/CellEditorPopupLayout.js");
   __include("scout/table/editor/CellEditorCancelEditKeyStroke.js");
@@ -202,7 +214,6 @@
   __include("scout/tree/keystrokes/CompactTreeLeftKeyStroke.js");
   __include("scout/tree/keystrokes/CompactTreeRightKeyStroke.js");
   // Desktop
-  __include("scout/desktop/BaseDesktop.js");
   __include("scout/desktop/Desktop.js");
   __include("scout/desktop/DesktopLayout.js");
   __include("scout/desktop/DesktopLogo.js");
@@ -226,6 +237,8 @@
   __include("scout/desktop/viewbutton/ViewMenuPopup.js");
   __include("scout/desktop/viewbutton/ViewMenuTab.js");
   __include("scout/desktop/viewtab/DesktopViewTab.js");
+  __include("scout/desktop/viewtab/DesktopViewTabs.js");
+  __include("scout/desktop/viewtab/DesktopViewTabsLayout.js");
   __include("scout/desktop/viewtab/ViewTabsController.js");
   __include("scout/desktop/viewtab/ViewTabSelectKeyStroke.js");
   __include("scout/desktop/outline/DetailTableTreeFilter.js");
@@ -247,12 +260,6 @@
   __include("scout/desktop/outline/keystrokes/OutlineNavigateToTopKeyStroke.js");
   __include("scout/desktop/outline/keystrokes/OutlineNavigationDownKeyStroke.js");
   // Basics for form fields
-  __include("scout/form/Form.js");
-  __include("scout/form/FormLayout.js");
-  __include("scout/form/FormToolButton.js");
-  __include("scout/form/FormToolPopup.js");
-  __include("scout/form/FormToolPopupLayout.js");
-  __include("scout/form/DialogLayout.js");
   __include("scout/form/fields/fields.js");
   __include("scout/form/fields/AppLinkKeyStroke.js");
   __include("scout/form/fields/DefaultFieldLoadingSupport.js");
@@ -297,6 +304,7 @@
   __include("scout/form/fields/radiobutton/RadioButtonGroupLeftKeyStroke.js");
   __include("scout/form/fields/radiobutton/RadioButtonGroupRightKeyStroke.js");
   __include("scout/form/fields/sequencebox/SequenceBox.js");
+  __include("scout/form/fields/slider/SliderField.js");
   __include("scout/form/fields/smartfield/SmartField.js");
   __include("scout/form/fields/smartfield/SmartFieldTouchPopup.js");
   __include("scout/form/fields/smartfield/SmartFieldLayout.js");
@@ -327,7 +335,4 @@
   // More misc. elements
   __include("scout/desktop/DesktopFormController.js");
   __include("scout/table/FilterFieldsGroupBox.js"); // requires GroupBox.js
-
-  __include("scout/table/MobileTable.js");
-  __include("scout/desktop/MobileDesktop.js");
 }(window.scout = window.scout || {}, jQuery));

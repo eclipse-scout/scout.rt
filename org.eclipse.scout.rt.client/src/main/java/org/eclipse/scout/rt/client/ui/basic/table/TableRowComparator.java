@@ -29,9 +29,12 @@ public class TableRowComparator implements Comparator<ITableRow> {
   public int compare(ITableRow row1, ITableRow row2) {
     for (IColumn col : m_columns) {
       int c = col.compareTableRows(row1, row2);
-      if (!col.getHeaderCell().isSortAscending()) {
+      if (col.isSortActive() && !col.getHeaderCell().isSortAscending()) {
+        // only consider sortAscending flag when sort is active
+        // columns with !sortActive are always sorted ascending (sortAscending represents last state for those, thus not considered)
         c = -c;
       }
+
       if (c != 0) {
         return c;
       }

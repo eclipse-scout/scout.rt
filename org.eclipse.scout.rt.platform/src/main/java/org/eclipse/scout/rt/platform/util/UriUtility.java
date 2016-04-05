@@ -16,6 +16,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,13 +32,13 @@ import org.slf4j.LoggerFactory;
 public final class UriUtility {
 
   private static final Logger LOG = LoggerFactory.getLogger(UriUtility.class);
-  public static final String ISO_8859_1 = "ISO-8859-1";
+  private static final String DEFAULT_ENCODING = StandardCharsets.UTF_8.name();
 
   private UriUtility() {
   }
 
   /**
-   * Parses the given URL's query string using encoding ISO-8859-1 and extracts the query parameter.
+   * Parses the given URL's query string using encoding UTF_8 and extracts the query parameter.
    *
    * @param uri
    * @return map with parsed query parameters. Never <code>null</code>.
@@ -51,7 +52,7 @@ public final class UriUtility {
    *
    * @param uri
    * @param encoding
-   *          encoding of the query parameter. If <code>null</code> ISO-8859-1 is used.
+   *          encoding of the query parameter. If <code>null</code> UTF_8 is used.
    * @return map with parsed query parameters. Never <code>null</code>.
    */
   public static Map<String, String> getQueryParameters(URL url, String encoding) {
@@ -62,7 +63,7 @@ public final class UriUtility {
   }
 
   /**
-   * Parses the given URI's query string using encoding ISO-8859-1 and extracts the query parameter.
+   * Parses the given URI's query string using encoding UTF_8 and extracts the query parameter.
    *
    * @param uri
    * @return map with parsed query parameters. Never <code>null</code>.
@@ -76,14 +77,18 @@ public final class UriUtility {
    *
    * @param uri
    * @param encoding
-   *          encoding of the query parameter. If <code>null</code> ISO-8859-1 is used.
+   *          encoding of the query parameter. If <code>null</code> UTF-8 is used.
    * @return map with parsed query parameters. Never <code>null</code>.
    */
   public static Map<String, String> getQueryParameters(URI uri, String encoding) {
     if (uri == null || uri.getQuery() == null) {
       return new HashMap<>(0);
     }
-    String[] params = uri.getQuery().split("&");
+    if (encoding == null) {
+      encoding = DEFAULT_ENCODING;
+    }
+
+    String[] params = getQueryString(uri).split("&");
     Map<String, String> result = new HashMap<>(params.length);
     for (String param : params) {
       String[] parts = StringUtility.split(param, "=");
@@ -91,9 +96,6 @@ public final class UriUtility {
         throw new ProcessingException("invalid query parameter: '" + param + "'");
       }
       try {
-        if (encoding == null) {
-          encoding = ISO_8859_1;
-        }
         String key = URLDecoder.decode(parts[0], encoding);
         String value = URLDecoder.decode(parts[1], encoding);
         String existingMapping = result.put(key, value);
@@ -106,6 +108,21 @@ public final class UriUtility {
       }
     }
     return result;
+  }
+
+  /**
+   * Find exact query string instead of decoded query string from {@link URI#getQuery()} to allow for encoded characters
+   * like '=' in query values.
+   */
+  private static String getQueryString(URI uri) {
+    final String uriString = Assertions.assertNotNull(uri).toString();
+    final int start = uriString.indexOf("?");
+    if (start > 0) {
+      final int fragmentStart = uriString.indexOf("#", start);
+      final int end = fragmentStart > 0 ? fragmentStart : uriString.length();
+      return uriString.substring(start + 1, end);
+    }
+    return "";
   }
 
   /**

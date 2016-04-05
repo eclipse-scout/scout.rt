@@ -60,19 +60,19 @@ public class RemoteFileService implements IRemoteFileService {
 
   @Override
   public RemoteFile getRemoteFile(RemoteFile spec) {
-    return getRemoteFileInternal(spec, null, 0, -1);
+    return getRemoteFileInternal(spec, true, 0, -1);
   }
 
   public RemoteFile getRemoteFile(RemoteFile spec, long maxBlockSize) {
-    return getRemoteFileInternal(spec, null, 0, maxBlockSize);
+    return getRemoteFileInternal(spec, true, 0, maxBlockSize);
   }
 
   @Override
   public RemoteFile getRemoteFilePart(RemoteFile spec, long blockNumber) {
-    return getRemoteFileInternal(spec, null, blockNumber * RemoteFile.DEFAULT_MAX_BLOCK_SIZE, RemoteFile.DEFAULT_MAX_BLOCK_SIZE);
+    return getRemoteFileInternal(spec, true, blockNumber * RemoteFile.DEFAULT_MAX_BLOCK_SIZE, RemoteFile.DEFAULT_MAX_BLOCK_SIZE);
   }
 
-  private RemoteFile getRemoteFileInternal(RemoteFile spec, Boolean includeContent, long startPosition, long maxBlockSize) {
+  private RemoteFile getRemoteFileInternal(RemoteFile spec, boolean includeContent, long startPosition, long maxBlockSize) {
     File file = getFileInternal(spec);
     RemoteFile result = new RemoteFile(spec.getDirectory(), file.getName(), spec.getLocale(), -1, spec.getCharsetName());
     result.setContentType(spec.getContentType());
@@ -99,7 +99,7 @@ public class RemoteFileService implements IRemoteFileService {
         }
       }
       result.setContentLength((int) partLength);
-      if (includeContent != null && (!includeContent)) {
+      if (!includeContent) {
         // no content requested
       }
       else if (CompareUtility.equals(spec.getName(), result.getName()) && result.getLastModified() <= spec.getLastModified() && result.getPartStartPosition() == spec.getPartStartPosition()) {

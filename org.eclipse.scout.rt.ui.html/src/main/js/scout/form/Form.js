@@ -155,7 +155,7 @@ scout.Form.prototype._updateTitleForWindow = function() {
 scout.Form.prototype._updateTitleForDom = function() {
   var titleText = this.title;
   if (!titleText && this.closable) {
-    // Add '&nbsp;' to prevent title-box of a closable form from collapsing if title is empty;
+    // Add '&nbsp;' to prevent title-box of a closable form from collapsing if title is empty
     titleText = scout.strings.plainText('&nbsp;');
   }
   if (titleText || this.subTitle) {
@@ -231,6 +231,10 @@ scout.Form.prototype.appendTo = function($parent) {
 };
 
 scout.Form.prototype._remove = function() {
+  this.formController.remove();
+  this.messageBoxController.remove();
+  this.fileChooserController.remove();
+
   // FIXME awe: call acceptInput() when form is removed
   // test-case: SimpleWidgets outline, detail-forms, switch between nodes
   this._glassPaneRenderer.removeGlassPanes();
@@ -286,12 +290,7 @@ scout.Form.prototype._attach = function() {
   this.session.detachHelper.afterAttach(this.$container);
 
   // form is attached even if children are not yet
-  var outlineContent;
-  if (this.session.desktop.bench) {
-    //FIXME CGU what if bench is not available, e.g. on mobile?
-    outlineContent = this.session.desktop.bench.outlineContent;
-  }
-  if ((this.isView() || this.isDialog()) && outlineContent !== this) {
+  if ((this.isView() || this.isDialog()) && !this.detailForm) {
     //notify model this form is active
     this.session.desktop._setFormActivated(this);
   }

@@ -31,8 +31,8 @@ describe("TableFooterSpec", function() {
 
     it("attaches listener to the table but only once", function() {
       var model = helper.createModelFixture(2);
+      model.tableStatusVisible = true;
       var table = helper.createTable(model);
-      table.tableStatusVisible = true;
       table.render(session.$entryPoint);
       expect(table.footer).not.toBeUndefined();
       var listenerCount = table.events._eventListeners.length;

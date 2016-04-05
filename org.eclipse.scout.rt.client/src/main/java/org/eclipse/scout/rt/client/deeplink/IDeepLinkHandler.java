@@ -11,6 +11,8 @@ import org.eclipse.scout.rt.platform.ApplicationScoped;
 @ApplicationScoped
 public interface IDeepLinkHandler {
 
+  String NUMERIC_REGEX = "\\d+";
+
   /**
    * @return True if this handler can handle the given path, false otherwise
    */

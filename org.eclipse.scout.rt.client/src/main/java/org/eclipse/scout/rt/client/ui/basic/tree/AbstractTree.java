@@ -3133,6 +3133,11 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
       }
     }
 
+    @Override
+    public void setDisplayStyleFromUI(String style) {
+      setDisplayStyle(style);
+    }
+
   }// end private class
 
   /**

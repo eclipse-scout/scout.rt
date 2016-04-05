@@ -14,6 +14,7 @@ scout.DesktopBench = function() {
   this._outlineNodesSelectedHandler = this._onOutlineNodesSelected.bind(this);
   this._outlinePageChangedHandler = this._onOutlinePageChanged.bind(this);
   this._outlinePropertyChangeHandler = this._onOutlinePropertyChange.bind(this);
+  this._addEventSupport();
 };
 scout.inherits(scout.DesktopBench, scout.Widget);
 
@@ -38,7 +39,6 @@ scout.DesktopBench.prototype._render = function($parent) {
   this.$container = $parent.appendDiv('desktop-bench');
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
   this.htmlComp.setLayout(new scout.DesktopBenchLayout(this));
-  this.htmlComp.pixelBasedSizing = false;
   this.setOutline(this.desktop.outline); //TODO CGU maybe better create destroy(), call setOutline in init and attach outline listener in init/destroy
   this._renderOrAttachOutlineContent();
 
@@ -53,7 +53,7 @@ scout.DesktopBench.prototype._remove = function() {
 };
 
 scout.DesktopBench.prototype._renderOrAttachOutlineContent = function() {
-  if (!this.outlineContent || this.outline.inBackground) {
+  if (!this.outlineContent || this.desktop.inBackground) {
     return;
   }
   if (!this.outlineContent.rendered) {
@@ -64,7 +64,7 @@ scout.DesktopBench.prototype._renderOrAttachOutlineContent = function() {
 };
 
 scout.DesktopBench.prototype._renderOutlineContent = function() {
-  if (!this.outlineContent || this.outline.inBackground) {
+  if (!this.outlineContent || this.desktop.inBackground) {
     return;
   }
 
@@ -74,6 +74,7 @@ scout.DesktopBench.prototype._renderOutlineContent = function() {
   }
   this.outlineContent.render(this.$container);
   this.outlineContent.htmlComp.validateRoot = true;
+  this.outlineContent.setParent(this);
   this.outlineContent.invalidateLayoutTree(false);
 
   // Layout immediate to prevent 'laggy' form visualization,
@@ -115,19 +116,28 @@ scout.DesktopBench.prototype.setOutline = function(outline) {
 };
 
 scout.DesktopBench.prototype.setOutlineContent = function(content) {
+  var oldContent = this.outlineContent;
   if (this.outlineContent === content) {
     return;
   }
   if (this.rendered) {
     this._removeOutlineContent();
   }
-  this.outlineContent = content;
+  this._setProperty('outlineContent', content);
+  // Inform header that outline content has changed
+  // (having a listener in the header is quite complex due to initialization phase, a direct call here is much easier to implement)
+  if (this.desktop.header) {
+    this.desktop.header.onBenchOutlineContentChange(content, oldContent);
+  }
   if (this.rendered) {
     this._renderOrAttachOutlineContent();
   }
 };
 
 scout.DesktopBench.prototype.setOutlineContentVisible = function(visible) {
+  if (visible === this.outlineContentVisible) {
+    return;
+  }
   this.outlineContentVisible = visible;
   this.updateOutlineContent();
 };
@@ -166,7 +176,7 @@ scout.DesktopBench.prototype._showDetailContentForPage = function(node) {
 };
 
 scout.DesktopBench.prototype.updateOutlineContent = function() {
-  if (!this.outlineContentVisible) {
+  if (!this.outlineContentVisible || !this.outline) {
     return;
   }
   var selectedPages = this.outline.selectedNodes;

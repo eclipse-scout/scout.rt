@@ -70,11 +70,11 @@ public class HtmlHelper {
     // space
     s = StringUtility.replace(s, "&nbsp;", " ");
     s = StringUtility.replace(s, "&#160;", " ");
-    s = StringUtility.replace(s, "&#xa0;", " ");
+    s = StringUtility.replaceNoCase(s, "&#xa0;", " ");
 
     // tab
     s = StringUtility.replace(s, "&#9;", "\t");
-    s = StringUtility.replace(s, "&#x9;", "\t");
+    s = StringUtility.replaceNoCase(s, "&#x9;", "\t");
 
     s = s.trim();
     return s;
@@ -122,26 +122,26 @@ public class HtmlHelper {
 
     String decoded = StringUtility.replace(html, "&amp;", "&");
     decoded = StringUtility.replace(decoded, "&#38;", "&");
-    decoded = StringUtility.replace(decoded, "&#x26;", "&");
+    decoded = StringUtility.replaceNoCase(decoded, "&#x26;", "&");
 
     decoded = StringUtility.replace(decoded, "&lt;", "<");
     decoded = StringUtility.replace(decoded, "&#60;", "<");
-    decoded = StringUtility.replace(decoded, "&#x3c;", "<");
+    decoded = StringUtility.replaceNoCase(decoded, "&#x3c;", "<");
 
     decoded = StringUtility.replace(decoded, "&gt;", ">");
     decoded = StringUtility.replace(decoded, "&#62;", ">");
-    decoded = StringUtility.replace(decoded, "&#x3e;", ">");
+    decoded = StringUtility.replaceNoCase(decoded, "&#x3e;", ">");
 
     decoded = StringUtility.replace(decoded, "&quot;", "\"");
     decoded = StringUtility.replace(decoded, "&#34;", "\"");
-    decoded = StringUtility.replace(decoded, "&#x22;", "\"");
+    decoded = StringUtility.replaceNoCase(decoded, "&#x22;", "\"");
 
     decoded = StringUtility.replace(decoded, "&#47;", "/"); // no named entity for the slash
-    decoded = StringUtility.replace(decoded, "&#x2f;", "/");
+    decoded = StringUtility.replaceNoCase(decoded, "&#x2f;", "/");
 
     decoded = StringUtility.replace(decoded, "&apos;", "'");
     decoded = StringUtility.replace(decoded, "&#39;", "'");
-    decoded = StringUtility.replace(decoded, "&#x27;", "'");
+    decoded = StringUtility.replaceNoCase(decoded, "&#x27;", "'");
     return decoded;
   }
 

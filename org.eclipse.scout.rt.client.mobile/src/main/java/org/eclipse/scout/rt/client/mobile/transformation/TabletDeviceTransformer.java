@@ -20,6 +20,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
+import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
@@ -57,6 +58,10 @@ public class TabletDeviceTransformer implements IDeviceTransformer {
   @Override
   public void transformOutline(IOutline outline) {
     outline.setDisplayStyle(ITree.DISPLAY_STYLE_BREADCRUMB);
+  }
+
+  @Override
+  public void transformPage(IPage<?> page) {
   }
 
   @Override

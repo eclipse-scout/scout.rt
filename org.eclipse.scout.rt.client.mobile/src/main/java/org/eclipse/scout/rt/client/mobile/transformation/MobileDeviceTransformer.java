@@ -30,12 +30,11 @@ import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
+import org.eclipse.scout.rt.client.ui.basic.table.controls.ITableControl;
+import org.eclipse.scout.rt.client.ui.basic.table.controls.SearchFormTableControl;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
-import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
-import org.eclipse.scout.rt.client.ui.basic.tree.ITreeVisitor;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeAdapter;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
-import org.eclipse.scout.rt.client.ui.basic.tree.TreeUtility;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineEvent;
@@ -86,8 +85,6 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
     if (breadCrumbsNavigation != null) {
       breadCrumbsNavigation.trackDisplayViewId(IForm.VIEW_ID_CENTER);
     }
-    // FIXME CGU use this instead of insert and update filter, because update event is fired too late. Why does the extension not work the first time?
-//    BEANS.get(IExtensionRegistry.class).register(MobilePageWithTableExtension.class);
   }
 
   public MobileDeviceTransformer() {
@@ -179,6 +176,7 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
 
   @Override
   public void transformDesktop() {
+    getDesktop().setDisplayStyle(IDesktop.DISPLAY_STYLE_COMPACT);
   }
 
   @Override
@@ -235,17 +233,10 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
     outline.setLazyExpandingEnabled(false);
     outline.setAutoToggleBreadcrumbStyle(false);
     outline.setDisplayStyle(ITree.DISPLAY_STYLE_BREADCRUMB);
-
-    outline.visitTree(new ITreeVisitor() {
-      @Override
-      public boolean visit(ITreeNode node) {
-        transformPage((IPage) node);
-        return true;
-      }
-    });
     m_transformedOutlines.put(outline, new WeakReference<IOutline>(outline));
   }
 
+  @Override
   public void transformPage(IPage page) {
     if (page instanceof IPageWithTable) {
       transformPageWithTable((IPageWithTable) page);
@@ -255,6 +246,13 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
   public void transformPageWithTable(IPageWithTable page) {
     page.setLeaf(false);
     page.setAlwaysCreateChildPage(true);
+
+    for (ITableControl control : page.getTable().getTableControls()) {
+      if (!(control instanceof SearchFormTableControl)) {
+        // TODO CGU Maybe some controls could be useful, like group ware or tile preview, how to distinguish?
+        control.setVisibleGranted(false);
+      }
+    }
   }
 
   @Override
@@ -513,12 +511,6 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
       if (OutlineEvent.TYPE_PAGE_CHANGED == e.getType()) {
         onPageChanged((OutlineEvent) e);
       }
-      else if (TreeEvent.TYPE_NODES_INSERTED == e.getType()) {
-        onNodesInserted((TreeEvent) e);
-      }
-      else if (TreeEvent.TYPE_NODES_UPDATED == e.getType()) {
-        onNodesUpdated((TreeEvent) e);
-      }
     }
 
     protected void onPageChanged(OutlineEvent e) {
@@ -526,26 +518,5 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
       transformPageDetailForm(page);
     }
 
-    protected void onNodesInserted(TreeEvent e) {
-      TreeUtility.visitNodes(e.getNodes(), new ITreeVisitor() {
-        @Override
-        public boolean visit(ITreeNode node) {
-          transformPage((IPage) node);
-          return true;
-        }
-      });
-    }
-
-    protected void onNodesUpdated(TreeEvent e) {
-      TreeUtility.visitNodes(e.getNodes(), new ITreeVisitor() {
-        @Override
-        public boolean visit(ITreeNode node) {
-          // if a virtual page gets resolved, update node is fired.
-          // If a table page has table pages as children we do not get a node inserted event for the real nodes -> need to transform them in update nodes
-          transformPage((IPage) node);
-          return true;
-        }
-      });
-    }
   }
 }

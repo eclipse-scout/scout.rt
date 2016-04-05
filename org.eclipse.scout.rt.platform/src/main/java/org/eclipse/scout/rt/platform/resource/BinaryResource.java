@@ -14,7 +14,6 @@ import java.io.File;
 import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.zip.Adler32;
 
@@ -44,6 +43,8 @@ public final class BinaryResource implements Serializable {
   private final byte[] m_content;
   private final long m_lastModified;
   private final long m_fingerprint;
+  private final boolean m_cachingAllowed;
+  private final int m_cacheMaxAge;
 
   /**
    * @param filename
@@ -55,17 +56,24 @@ public final class BinaryResource implements Serializable {
    *          determine the MIME type.
    *          <p>
    *          null contentType is replaced by {@link FileUtility#getMimeType(java.nio.file.Path)}
+   * @param charset
    * @param content
    *          The resource's content as byte array. The fingerprint for the given content is calculated automatically.
    * @param lastModified
+   *          default -1
+   *          <p>
    *          "Last modified" timestamp of the resource (in milliseconds a.k.a. UNIX time). <code>-1</code> if unknown.
+   * @param cachingAllowed
+   *          default false
+   * @param cacheMaxAge
+   *          default 0
    */
   // explicitly package private, only called by BinaryResources and second constructor
-  BinaryResource(String filename, String contentType, String charset, byte[] content, long lastModified) {
+  BinaryResource(String filename, String contentType, String charset, byte[] content, long lastModified, boolean cachingAllowed, int cacheMaxAge) {
     m_filename = filename;
     if (contentType == null) {
       if (filename != null) {
-        contentType = FileUtility.getMimeType(Paths.get(filename));
+        contentType = FileUtility.getMimeType(filename);
       }
       else if (content != null && content.length > 0) {
         File f = IOUtility.createTempFile("file", content);
@@ -88,6 +96,8 @@ public final class BinaryResource implements Serializable {
     else {
       m_fingerprint = -1;
     }
+    m_cachingAllowed = cachingAllowed;
+    m_cacheMaxAge = cacheMaxAge;
   }
 
   /**
@@ -98,7 +108,7 @@ public final class BinaryResource implements Serializable {
    * @see BinaryResources
    */
   public BinaryResource(String filename, byte[] content) {
-    this(filename, null, null, content, -1);
+    this(filename, null, null, content, -1, false, 0);
   }
 
   /**
@@ -173,6 +183,14 @@ public final class BinaryResource implements Serializable {
    */
   public long getFingerprint() {
     return m_fingerprint;
+  }
+
+  public boolean isCachingAllowed() {
+    return m_cachingAllowed;
+  }
+
+  public int getCacheMaxAge() {
+    return m_cacheMaxAge;
   }
 
   /**

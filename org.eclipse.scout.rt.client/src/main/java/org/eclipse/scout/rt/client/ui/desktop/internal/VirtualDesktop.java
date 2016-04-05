@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.client.ui.desktop.internal;
 
 import java.beans.PropertyChangeListener;
-import java.net.URL;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -696,8 +695,12 @@ public class VirtualDesktop implements IDesktop {
   }
 
   @Override
-  public DesktopStyle getDesktopStyle() {
-    return DesktopStyle.DEFAULT;
+  public String getDisplayStyle() {
+    return DISPLAY_STYLE_DEFAULT;
+  }
+
+  @Override
+  public void setDisplayStyle(String displayStyle) {
   }
 
   @Override
@@ -737,12 +740,30 @@ public class VirtualDesktop implements IDesktop {
   }
 
   @Override
-  public void setUiBaseUrl(URL baseUrl) {
+  public void setNavigationVisible(boolean visible) {
   }
 
   @Override
-  public URL getUiBaseUrl() {
-    return null;
+  public boolean isNavigationVisible() {
+    return false;
+  }
+
+  @Override
+  public void setBenchVisible(boolean visible) {
+  }
+
+  @Override
+  public boolean isBenchVisible() {
+    return false;
+  }
+
+  @Override
+  public void setHeaderVisible(boolean visible) {
+  }
+
+  @Override
+  public boolean isHeaderVisible() {
+    return false;
   }
 
 }

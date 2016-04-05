@@ -90,7 +90,7 @@ describe("AggregateTableControl", function() {
 
       tableControl = createAggregateTC(createModel(table));
       tableControl.selected = true;
-      table.tableControls = [tableControl];
+      table._syncTableControls([tableControl]);
 
       column0 = model.columns[0];
       column1 = model.columns[1];
@@ -175,7 +175,7 @@ describe("AggregateTableControl", function() {
       tcModel.enabled = true;
       tcModel.selected = true;
       tableControl = createAggregateTC(createModel(table));
-      table.tableControls = [tableControl];
+      table._syncTableControls([tableControl]);
       table.render(session.$entryPoint);
 
       expect(tableControl.enabled).toBe(false);
@@ -198,7 +198,7 @@ describe("AggregateTableControl", function() {
       tcModel.enabled = false;
       tcModel.selected = true;
       tableControl = createAggregateTC(tcModel);
-      table.tableControls = [tableControl];
+      table._syncTableControls([tableControl]);
       table.render(session.$entryPoint);
 
       expect(tableControl.enabled).toBe(true);

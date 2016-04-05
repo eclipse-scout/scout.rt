@@ -12,9 +12,7 @@
 
 .desktop-header {
   position: absolute;
-  left: 0;
   top: 0;
-  right: 0;
   height: @desktop-header-height;
   background-color: @desktop-header-background-color;
   #scout.vertical-align-helper-after();
@@ -105,39 +103,6 @@
   &.selected > .font-icon {
     font-size: 17px;
     /*vertical-align: 0;*/
-  }
-}
-
-.desktop-view-tabs {
-  position: absolute;
-  top: 0;
-  height: 100%;
-
-  & > .overflow-tab-item {
-    border-right: 1px solid @border-color;
-    display: inline-block;
-    height: 50px;
-    width: 30px;
-    padding-top: 17px;
-    text-align: center;
-    cursor: pointer;
-    vertical-align: top;
-
-    &::before {
-      #scout.font-icon();
-      color: @icon-color;
-      content: @icon-chevron-right;
-    }
-
-    & .num-tabs {
-      color: @disabled-color;
-      font-size: 10px;
-      margin-top: -4px;
-    }
-
-    &.modality-highlight {
-      #scout.animation-flash-gray();
-    }
   }
 }
 

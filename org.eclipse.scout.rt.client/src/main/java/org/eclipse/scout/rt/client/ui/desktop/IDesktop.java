@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.client.ui.desktop;
 
 import java.beans.PropertyChangeListener;
-import java.net.URL;
 import java.text.Normalizer.Form;
 import java.util.Collection;
 import java.util.List;
@@ -106,7 +105,7 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent {
    */
   String PROP_CACHE_SPLITTER_POSITION = "cacheSplitterPosition";
 
-  String PROP_DESKTOP_STYLE = "desktopStyle";
+  String PROP_DISPLAY_STYLE = "displayStyle";
 
   String PROP_ACTIVE_FORM = "activeForm";
 
@@ -114,19 +113,26 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent {
 
   String PROP_BROWSER_HISTORY_ENTRY = "browserHistoryEntry";
 
-  String PROP_UI_BASE_URL = "uiBaseUrl";
+  String PROP_NAVIGATION_VISIBLE = "navigationVisible";
 
-  public enum DesktopStyle {
-    /**
-     * Default desktop style with header, navigation (tree) and bench (forms).
-     */
-    DEFAULT,
+  String PROP_HEADER_VISIBLE = "headerVisible";
 
-    /**
-     * Reduced desktop style. Only bench is visible.
-     */
-    BENCH
-  }
+  String PROP_BENCH_VISIBLE = "benchVisible";
+
+  /**
+   * Default style with header, navigation (tree) and bench (forms).
+   */
+  String DISPLAY_STYLE_DEFAULT = "default";
+
+  /**
+   * Reduced style. Only bench is visible.
+   */
+  String DISPLAY_STYLE_BENCH = "bench";
+
+  /**
+   * Compact style. Navigation and bench are never visible simultaneously.
+   */
+  String DISPLAY_STYLE_COMPACT = "compact";
 
   void initDesktop();
 
@@ -784,10 +790,12 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent {
   boolean isOutlineChanging();
 
   /**
-   * @return the desktop style. Default value is <code>DesktopStyle.DEFAULT</code>.
+   * @return the display style. Default value is <code>DISPLAY_STYLE_DEFAULT</code>.
    * @since 5.2.0
    */
-  DesktopStyle getDesktopStyle();
+  String getDisplayStyle();
+
+  void setDisplayStyle(String displayStyle);
 
   /***
    * @since 6.0
@@ -826,19 +834,33 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent {
   void setBrowserHistoryEntry(BrowserHistoryEntry browserHistory);
 
   /**
-   * Sets the base URL from where the Scout application has been started. Note that this URL may be different from the
-   * URL that your app-server returns for the Scout servlet, because a proxy may provide the Scout application under a
-   * different URL.
-   *
-   * @param baseUrl
+   * @since 6.0
    */
-  void setUiBaseUrl(URL baseUrl);
+  void setNavigationVisible(boolean visible);
 
   /**
-   * @return the base URL from where the Scout application has been started. Note that this URL may be different from
-   *         the URL that your app-server returns for the Scout servlet, because a proxy may provide the Scout
-   *         application under a different URL.
+   * @since 6.0
    */
-  URL getUiBaseUrl();
+  boolean isNavigationVisible();
+
+  /**
+   * @since 6.0
+   */
+  void setBenchVisible(boolean visible);
+
+  /**
+   * @since 6.0
+   */
+  boolean isBenchVisible();
+
+  /**
+   * @since 6.0
+   */
+  void setHeaderVisible(boolean visible);
+
+  /**
+   * @since 6.0
+   */
+  boolean isHeaderVisible();
 
 }

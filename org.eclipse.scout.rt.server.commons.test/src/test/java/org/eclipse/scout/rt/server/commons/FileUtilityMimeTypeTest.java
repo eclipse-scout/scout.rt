@@ -2,7 +2,6 @@ package org.eclipse.scout.rt.server.commons;
 
 import static org.junit.Assert.assertEquals;
 
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,16 +41,21 @@ public class FileUtilityMimeTypeTest {
 
   @Test
   public void testGetMimeType_xml() {
-    assertEquals("text/xml", FileUtility.getMimeType(Paths.get("file.xml")));
+    assertEquals("text/xml", FileUtility.getMimeType("file.xml"));
   }
 
   @Test
   public void testGetMimeType_XML() {
-    assertEquals("text/xml", FileUtility.getMimeType(Paths.get("file.XML")));
+    assertEquals("text/xml", FileUtility.getMimeType("file.XML"));
   }
 
   @Test
   public void testGetMimeType_m4v() {
-    assertEquals("video/mp4", FileUtility.getMimeType(Paths.get("file.m4v")));
+    assertEquals("video/mp4", FileUtility.getMimeType("file.m4v"));
+  }
+
+  @Test
+  public void testGetMimeType_invalidPath() {
+    assertEquals("text/xml", FileUtility.getMimeType("*.xml"));
   }
 }

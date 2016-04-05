@@ -12,8 +12,9 @@ scout.RadioButtonGroup = function() {
   scout.RadioButtonGroup.parent.call(this);
   this._addAdapterProperties('formFields');
   this.formFields = [];
-  this._$body;
-  this._radioButtonMap = {};
+  this.radioButtons = [];
+  this.selectedButton = null;
+  this.$body;
 };
 
 scout.inherits(scout.RadioButtonGroup, scout.ValueField);
@@ -30,27 +31,36 @@ scout.RadioButtonGroup.prototype._initKeyStrokeContext = function(keyStrokeConte
   ]);
 };
 
+scout.RadioButtonGroup.prototype._init = function(model) {
+  scout.RadioButtonGroup.parent.prototype._init.call(this, model);
+
+  this.formFields.forEach(function(formField) {
+    if (formField instanceof scout.RadioButton) {
+      this.radioButtons.push(formField);
+      if (formField.selected) {
+        this.selectedButton = formField;
+      }
+    }
+  }, this);
+};
+
 scout.RadioButtonGroup.prototype._render = function($parent) {
   var env = scout.HtmlEnvironment,
     htmlBodyContainer;
 
   this.addContainer($parent, 'radiobutton-group');
 
-  this._$body = this.$container.appendDiv('radiobutton-group-body');
-  htmlBodyContainer = new scout.HtmlComponent(this._$body, this.session);
+  this.$body = this.$container.appendDiv('radiobutton-group-body');
+  htmlBodyContainer = new scout.HtmlComponent(this.$body, this.session);
   htmlBodyContainer.setLayout(new scout.LogicalGridLayout(env.smallColumnGap, env.formRowGap));
 
-  for (var i = 0; i < this.formFields.length; i++) {
-    this.formFields[i].render(this._$body);
-    if (this.formFields[i] instanceof scout.RadioButton) {
-      this.formFields[i].$field.attr('name', this.id);
-      this._radioButtonMap[this.formFields[i].radioValue] = this.formFields[i];
-    }
-  }
+  this.formFields.forEach(function(formField) {
+    formField.render(this.$body);
+  }, this);
 
   this.addLabel();
   this.addMandatoryIndicator();
-  this.addField(this._$body);
+  this.addField(this.$body);
   this.addStatus();
 };
 
@@ -61,39 +71,33 @@ scout.RadioButtonGroup.prototype._renderEnabled = function() {
 
 scout.RadioButtonGroup.prototype._provideTabIndex = function() {
   var tabSet;
-  for (var i = 0; i < this.formFields.length; i++) {
-    if (this.formFields[i] instanceof scout.RadioButton) {
-      if (this.formFields[i].enabled && this.enabled && !tabSet) {
-        this.formFields[i]._renderTabbable(true);
-        tabSet = this.formFields[i];
-      } else if (tabSet && this.enabled && this.formFields[i].enabled && this.formFields[i].selected && this.formFields[i].$field.hasClass('checked')) {
-        tabSet._renderTabbable(false);
-        this.formFields[i]._renderTabbable(true);
-        tabSet = this.formFields[i];
-      } else {
-        this.formFields[i]._renderTabbable(false);
-      }
+  this.radioButtons.forEach(function(radioButton) {
+    if (radioButton.enabled && this.enabled && !tabSet) {
+      radioButton.setTabbable(true);
+      tabSet = radioButton;
+    } else if (tabSet && this.enabled && radioButton.enabled && radioButton.selected) {
+      tabSet.setTabbable(false);
+      radioButton.setTabbable(true);
+      tabSet = radioButton;
+    } else {
+      radioButton.setTabbable(false);
     }
-  }
+  }, this);
 };
 
-scout.RadioButtonGroup.prototype.setNewSelection = function(formField) {
-  for (var i = 0; i < this.formFields.length; i++) {
-    if (this.formFields[i] instanceof scout.RadioButton) {
-      if (this.formFields[i] === formField) {
-        if (!formField.enabled) {
-          return;
-        }
-        this.formFields[i].selected = true;
-        this.formFields[i].$field.toggleClass('checked', true);
-        this.formFields[i]._send('selected');
-        this.formFields[i]._renderTabbable(true);
-        this.$field.focus();
-      } else {
-        this.formFields[i].selected = false;
-        this.formFields[i].$field.toggleClass('checked', false);
-        this.formFields[i]._renderTabbable(false);
+scout.RadioButtonGroup.prototype.selectButton = function(radioButtonToSelect) {
+  this.selectedButton = null;
+  this.radioButtons.forEach(function(radioButton) {
+    if (radioButton === radioButtonToSelect) {
+      if (!radioButton.enabled) {
+        return;
       }
+      radioButton.setSelected(true);
+      radioButton.setTabbable(true);
+      this.selectedButton = radioButton;
+    } else {
+      radioButton.setSelected(false);
+      radioButton.setTabbable(false);
     }
-  }
+  }, this);
 };

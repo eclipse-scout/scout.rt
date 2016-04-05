@@ -21,13 +21,12 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheKey;
+import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheObject;
+import org.eclipse.scout.rt.server.commons.servlet.cache.HttpResponseHeaderContributor;
 import org.eclipse.scout.rt.ui.html.HttpSessionHelper;
 import org.eclipse.scout.rt.ui.html.ISessionStore;
 import org.eclipse.scout.rt.ui.html.IUiSession;
-import org.eclipse.scout.rt.ui.html.cache.HttpCacheKey;
-import org.eclipse.scout.rt.ui.html.cache.HttpCacheObject;
-import org.eclipse.scout.rt.ui.html.cache.HttpResponseHeaderContributor;
-import org.eclipse.scout.rt.ui.html.cache.IHttpCacheControl;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.res.BinaryResourceHolder;
 import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
@@ -82,7 +81,7 @@ public class DynamicResourceLoader extends AbstractResourceLoader {
     }
     BinaryResource localResource = localResourceHolder.get();
     BinaryResource httpResource = localResource.createAlias(pathInfo);
-    HttpCacheObject httpCacheObject = new HttpCacheObject(cacheKey, httpResource.getLastModified() > 0, IHttpCacheControl.MAX_AGE_4_HOURS, httpResource);
+    HttpCacheObject httpCacheObject = new HttpCacheObject(cacheKey, httpResource);
     if (localResourceHolder.isDownload()) {
       addResponseHeaderForDownload(httpCacheObject, localResource.getFilename());
     }

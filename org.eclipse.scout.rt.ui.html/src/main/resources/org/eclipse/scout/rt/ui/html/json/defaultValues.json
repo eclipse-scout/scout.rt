@@ -125,7 +125,6 @@
       "multiCheck": true,
       "multiSelect": true,
       "multilineText": false,
-      "rowHeightHint": -1,
       "rows": [],
       "scrollToSelection": false,
       "selectedRows": [],
@@ -269,6 +268,7 @@
         "SmartField": {
           "SmartFieldMultiline": null
         },
+        "SliderField": null,
         "StringField": null,
         "RadioButtonGroup": null
       },

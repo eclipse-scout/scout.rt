@@ -17,7 +17,6 @@
     },
     "Table": {
       "enabled": true,
-      "rowHeightHint": -1,
       "rows": []
     },
     "Cell": {

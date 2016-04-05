@@ -174,12 +174,6 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
         return getModel().isMultilineText();
       }
     });
-    putJsonProperty(new JsonProperty<ITable>(ITable.PROP_ROW_HEIGHT_HINT, model) {
-      @Override
-      protected Integer modelValue() {
-        return getModel().getRowHeightHint();
-      }
-    });
     putJsonProperty(new JsonProperty<ITable>(ITable.PROP_CHECKABLE, model) {
       @Override
       protected Boolean modelValue() {

@@ -10,13 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.res.loader;
 
-import java.util.Locale;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.eclipse.scout.rt.platform.util.Assertions;
-import org.eclipse.scout.rt.ui.html.UiHints;
-import org.eclipse.scout.rt.ui.html.cache.HttpCacheKey;
+import org.eclipse.scout.rt.server.commons.servlet.UrlHints;
+import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheKey;
 
 public abstract class AbstractResourceLoader implements IResourceLoader {
 
@@ -28,16 +26,16 @@ public abstract class AbstractResourceLoader implements IResourceLoader {
   }
 
   @Override
-  public HttpCacheKey createCacheKey(String resourcePath, Locale locale) {
+  public HttpCacheKey createCacheKey(String resourcePath) {
     return new HttpCacheKey(resourcePath);
   }
 
   protected boolean isMinify() {
-    return UiHints.isMinifyHint(m_req);
+    return UrlHints.isMinifyHint(m_req);
   }
 
   protected boolean isCacheEnabled() {
-    return UiHints.isCacheHint(m_req);
+    return UrlHints.isCacheHint(m_req);
   }
 
   protected HttpServletRequest getRequest() {

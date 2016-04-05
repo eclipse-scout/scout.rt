@@ -13,16 +13,16 @@ package org.eclipse.scout.rt.platform.util;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
-import org.eclipse.scout.rt.platform.util.UriBuilder;
-import org.eclipse.scout.rt.platform.util.UriUtility;
 import org.junit.Test;
 
 /**
@@ -33,15 +33,22 @@ import org.junit.Test;
 public class UriUtilityTest {
 
   @Test
-  public void testGetQueryParametersNull() throws Exception {
+  public void testGetQueryParametersNull() {
     assertEquals(Collections.emptyMap(), UriUtility.getQueryParameters((URI) null));
     assertEquals(Collections.emptyMap(), UriUtility.getQueryParameters((URI) null, null));
     assertEquals(Collections.emptyMap(), UriUtility.getQueryParameters((URI) null, StandardCharsets.UTF_8.name()));
-    assertEquals(Collections.singletonMap("value", "1"), UriUtility.getQueryParameters(URI.create("scheme://test.com/path?value=1"), null));
     assertEquals(Collections.emptyMap(), UriUtility.getQueryParameters((URL) null));
     assertEquals(Collections.emptyMap(), UriUtility.getQueryParameters((URL) null, null));
     assertEquals(Collections.emptyMap(), UriUtility.getQueryParameters((URL) null, StandardCharsets.UTF_8.name()));
-    assertEquals(Collections.singletonMap("value", "1"), UriUtility.getQueryParameters(new URL("http://test.com/path?value=1"), null));
+  }
+
+  @Test
+  public void testQueryParameters() throws MalformedURLException {
+    assertEquals(Collections.singletonMap("value", "1"), UriUtility.getQueryParameters(URI.create("scheme://test.com/path?value=1")));
+    assertEquals(Collections.singletonMap("value", "1"), UriUtility.getQueryParameters(new URL("http://test.com/path?value=1")));
+    assertEquals(Collections.singletonMap("value", "1"), UriUtility.getQueryParameters(URI.create("http://test.com/path?value=1#fragment")));
+    assertEquals(Collections.singletonMap("x", "20D"), UriUtility.getQueryParameters(URI.create("http://localhost/?x=20D")));
+    assertTrue(UriUtility.getQueryParameters(URI.create("scheme://test.com/path/path2")).isEmpty());
   }
 
   @Test
@@ -83,4 +90,5 @@ public class UriUtilityTest {
       // ok
     }
   }
+
 }

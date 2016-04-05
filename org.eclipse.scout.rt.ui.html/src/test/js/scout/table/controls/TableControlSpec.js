@@ -38,23 +38,9 @@ describe("TableControl", function() {
     return model;
   }
 
-  function createFormMock() {
-    var form = {
-      render: function() {},
-      remove: function() {},
-      $container: $('<div>'),
-      rootGroupBox: {
-        fields: []
-      }
-    };
-    form.htmlComp = new scout.HtmlComponent(form.$container, session);
-    return form;
-  }
-
   function createAction(model) {
     var action = new scout.TableControl();
     action.init(model);
-    action.form = createFormMock();
     return action;
   }
 
@@ -83,7 +69,7 @@ describe("TableControl", function() {
 
       it("opens and closes the control container", function() {
         var action = createAction(createModel());
-        table.tableControls = [action];
+        table._syncTableControls([action]);
         table.render(session.$entryPoint);
         var $controlContainer = table.footer.$controlContainer;
 
@@ -105,7 +91,7 @@ describe("TableControl", function() {
       it("removes the content of the previous selected control without closing the container", function() {
         var action = createAction(createModel());
         var action2 = createAction(createModel());
-        table.tableControls = [action, action2];
+        table._syncTableControls([action, action2]);
 
         action.selected = true;
         table.render(session.$entryPoint);
@@ -155,7 +141,7 @@ describe("TableControl", function() {
     it("removes the content of the previous selected control without closing the container", function() {
       var action = createAction(createModel());
       var action2 = createAction(createModel());
-      table.tableControls = [action, action2];
+      table._syncTableControls([action, action2]);
 
       action.selected = true;
       table.render(session.$entryPoint);
@@ -177,7 +163,7 @@ describe("TableControl", function() {
     it("sends selected events (for current and previous selection)", function() {
       var action = createAction(createModel());
       var action2 = createAction(createModel());
-      table.tableControls = [action, action2];
+      table._syncTableControls([action, action2]);
 
       action.selected = true;
       table.render(session.$entryPoint);

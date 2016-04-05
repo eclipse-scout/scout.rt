@@ -43,7 +43,6 @@ import org.eclipse.scout.rt.platform.util.concurrent.OptimisticLock;
  * @since 3.9.0
  */
 public class MobileTable extends AbstractMobileTable implements IMobileTable {
-  private static final int ROW_HEIGHT = 18;
   private int m_maxCellDetailColumns;
   private OptimisticLock m_selectionLock;
   private MobileTablePropertyDelegator m_propertyDelegator;
@@ -53,7 +52,6 @@ public class MobileTable extends AbstractMobileTable implements IMobileTable {
     super(false);
     Set<String> filter = new HashSet<String>();
     filter.add(ITable.PROP_AUTO_RESIZE_COLUMNS);
-    filter.add(ITable.PROP_ROW_HEIGHT_HINT);
     filter.add(ITable.PROP_DEFAULT_ICON);
     filter.add(ITable.PROP_HEADER_VISIBLE);
     m_propertyDelegator = new MobileTablePropertyDelegator(originalTable, this, filter);
@@ -83,11 +81,6 @@ public class MobileTable extends AbstractMobileTable implements IMobileTable {
     setHeaderVisible(false);
 
     m_maxCellDetailColumns = 2;
-    if (getOriginalTable().getRowHeightHint() == -1) {
-      //+1 stands for the cell header row
-      setRowHeightHint((m_maxCellDetailColumns + 1) * ROW_HEIGHT);
-    }
-
     getContentColumn().setDefaultDrillDownStyle(getDefaultDrillDownStyle());
   }
 

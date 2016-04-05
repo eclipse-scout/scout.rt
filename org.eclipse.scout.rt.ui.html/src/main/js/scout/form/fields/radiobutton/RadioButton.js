@@ -16,8 +16,8 @@ scout.inherits(scout.RadioButton, scout.Button);
 scout.RadioButton.prototype._render = function($parent) {
   this.addContainer($parent, 'radio-button', new scout.ButtonLayout(this));
   this.addField($parent.makeDiv()
-    .attr('value', this.radioValue)
     .on('mousedown', this._mouseDown.bind(this)));
+  this.$field.data('radiobutton', this);
   this.addStatus();
 
   scout.tooltips.installForEllipsis(this.$field, {
@@ -31,25 +31,47 @@ scout.RadioButton.prototype._remove = function($parent) {
 };
 
 scout.RadioButton.prototype._mouseDown = function(event) {
-  this._toggleChecked();
+  this.select();
   if (scout.device.supportsFocusEmptyBeforeDiv) {
     this.session.focusManager.requestFocus(this.$field);
     event.preventDefault();
   }
 };
 
-scout.RadioButton.prototype._toggleChecked = function() {
+scout.RadioButton.prototype.select = function() {
   if (!this.enabled) {
     return;
   }
   if (this.parent instanceof scout.RadioButtonGroup) {
-    this.parent.setNewSelection(this);
+    this.parent.selectButton(this);
   } else {
-    this.selected = true;
-    this.$field.toggleClass('checked', true);
-    this._send('selected');
+    this.setSelected(true);
+  }
+};
+
+scout.RadioButton.prototype.setSelected = function(selected) {
+  if (selected === this.selected) {
+    return;
+  }
+  this._setProperty('selected', selected);
+  this._sendProperty('selected');
+  if (this.rendered) {
+    this._renderSelected();
     this.$field.focus();
   }
+};
+
+/**
+ * @override Button.js
+ */
+scout.RadioButton.prototype.doAction = function(event) {
+  // Since RadioButton extends Button, doAction should do something useful because it may be called (and actually is by ButtonKeyStroke)
+  this.select();
+  return true;
+};
+
+scout.RadioButton.prototype.setTabbable = function(tabbable) {
+  this.$field.setTabbable(tabbable);
 };
 
 /**
@@ -57,38 +79,16 @@ scout.RadioButton.prototype._toggleChecked = function() {
  */
 scout.RadioButton.prototype._renderProperties = function() {
   scout.RadioButton.parent.prototype._renderProperties.call(this);
-  this._renderSelected(this.selected);
+  this._renderSelected();
 };
 
 /**
  * @override
  */
 scout.RadioButton.prototype._renderLabel = function() {
-  if (this.$field) {
-    this.$field.textOrNbsp(scout.strings.removeAmpersand(this.label));
-  }
-
+  this.$field.textOrNbsp(scout.strings.removeAmpersand(this.label));
 };
 
-scout.RadioButton.prototype._renderRadioValue = function(radioValue) {
-  this.$field.attr('value', radioValue);
-};
-
-scout.RadioButton.prototype._renderTabbable = function(tabbable) {
-  if (tabbable) {
-    this.$field.attr('tabindex', '0');
-  } else {
-    this.$field.removeAttr('tabindex');
-  }
-};
-
-scout.RadioButton.prototype._handleTabIndex = function() {
-  if (this.parent instanceof scout.RadioButtonGroup) {
-    return;
-  }
-  this._renderTabbable(this.enabled);
-};
-
-scout.RadioButton.prototype._renderSelected = function(selected) {
-  this.$field.toggleClass('checked', selected);
+scout.RadioButton.prototype._renderSelected = function() {
+  this.$field.toggleClass('checked', this.selected);
 };

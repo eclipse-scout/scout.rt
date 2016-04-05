@@ -58,8 +58,12 @@ scout.FocusContext.prototype._onKeyDown = function(event) {
         $.suppressEvent(event);
         this._validateAndSetFocus(firstFocusableElement);
         focusedElement = firstFocusableElement;
-      } else {
+      } else if($focusableElements.length>0){
         focusedElement = $focusableElements.get($focusableElements.index(activeElement) + 1);
+      }
+      else{
+        $.suppressEvent(event);
+        return;
       }
     }
     // Backward Tab (Shift+TAB)
@@ -69,11 +73,13 @@ scout.FocusContext.prototype._onKeyDown = function(event) {
         $.suppressEvent(event);
         this._validateAndSetFocus(lastFocusableElement);
         focusedElement = firstFocusableElement;
-      } else {
+      } else if($focusableElements.length>0){
         focusedElement = $focusableElements.get($focusableElements.index(activeElement) - 1);
+      } else{
+        $.suppressEvent(event);
+        return;
       }
     }
-
     var $focusableElement = $(focusedElement),
       containerBounds = scout.graphics.offsetBounds($focusableElement),
       $scrollable = $focusableElement.scrollParent();

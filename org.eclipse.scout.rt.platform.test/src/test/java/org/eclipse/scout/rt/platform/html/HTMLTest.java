@@ -275,6 +275,21 @@ public class HTMLTest {
     assertEquals("<p>C:\\Temp\\config.properties</p>", HTML.p("C:\\Temp\\config.properties").toHtml());
   }
 
+  @Test
+  public void testIconFromScoutFont() {
+    assertEquals("<span class=\"font-icon\">\uE002</span>", HTML.icon("font:\uE002").toHtml());
+  }
+
+  @Test
+  public void testIconFromCustomFont() {
+    assertEquals("<span class=\"font-crmIcons\">\uE100</span>", HTML.icon("font:crmIcons \uE100").toHtml());
+  }
+
+  @Test
+  public void testIconFromImage() {
+    assertEquals("<img src=\"iconId:logo\">", HTML.icon("logo").toHtml());
+  }
+
   private String createTableString(String prefix) {
     List<String> rows = new ArrayList<String>();
     for (int i = 0; i < 1; i++) {

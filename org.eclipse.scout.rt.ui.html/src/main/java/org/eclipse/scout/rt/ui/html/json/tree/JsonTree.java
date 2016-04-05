@@ -861,7 +861,9 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
   }
 
   protected void handleUiDisplayStyleChange(JsonEvent event) {
-    getModel().setDisplayStyle(event.getData().getString(ITree.PROP_DISPLAY_STYLE));
+    String displayStyle = event.getData().getString(ITree.PROP_DISPLAY_STYLE);
+    addPropertyEventFilterCondition(ITree.PROP_DISPLAY_STYLE, displayStyle);
+    getModel().getUIFacade().setDisplayStyleFromUI(displayStyle);
   }
 
   protected void handleUiNodesChecked(JsonEvent event) {

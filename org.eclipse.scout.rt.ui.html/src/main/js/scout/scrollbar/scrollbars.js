@@ -87,7 +87,13 @@ scout.scrollbars = {
       nativeScrollbars = scout.device.hasPrettyScrollbars();
     }
     if (nativeScrollbars) {
-      installNativeScrollbars();
+      if (scout.device.isIos()) {
+        // On ios, container sometimes is not scrollable when installing too early
+        // Happens often with nested scrollable containers (e.g. scrollable table inside a form inside a scrollable tree data)
+        setTimeout(installNativeScrollbars);
+      } else {
+        installNativeScrollbars();
+      }
     } else {
       installJsScrollbars();
     }

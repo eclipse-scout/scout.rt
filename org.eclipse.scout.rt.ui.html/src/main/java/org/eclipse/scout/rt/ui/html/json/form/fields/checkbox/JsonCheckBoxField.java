@@ -15,7 +15,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
-import org.eclipse.scout.rt.ui.html.json.JsonEventType;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonValueField;
 
@@ -42,20 +41,22 @@ public class JsonCheckBoxField<CHECK_BOX_FIELD extends IBooleanField> extends Js
         return getModel().getValue();
       }
     });
+    // No need to send display text for check box
+    removeJsonProperty(IBooleanField.PROP_DISPLAY_TEXT);
   }
 
   @Override
   public void handleUiEvent(JsonEvent event) {
-    if (JsonEventType.CLICKED.matches(event)) {
-      handleUiClicked(event);
+    if (IBooleanField.PROP_VALUE.equals(event.getType())) {
+      handleUiValueChange(event);
     }
     else {
       super.handleUiEvent(event);
     }
   }
 
-  protected void handleUiClicked(JsonEvent event) {
-    boolean uiChecked = event.getData().getBoolean("checked");
+  protected void handleUiValueChange(JsonEvent event) {
+    boolean uiChecked = event.getData().getBoolean(IBooleanField.PROP_VALUE);
     addPropertyEventFilterCondition(IBooleanField.PROP_VALUE, uiChecked);
     getModel().getUIFacade().setCheckedFromUI(uiChecked);
 

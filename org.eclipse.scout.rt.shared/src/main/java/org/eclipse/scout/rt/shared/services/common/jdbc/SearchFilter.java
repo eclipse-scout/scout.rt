@@ -12,8 +12,9 @@ package org.eclipse.scout.rt.shared.services.common.jdbc;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.List;
 
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
 
 /**
@@ -24,9 +25,10 @@ public class SearchFilter implements Serializable, Cloneable {
 
   private boolean m_completed;
   private AbstractFormData m_formData;
-  private ArrayList<String> m_displayTexts = new ArrayList<String>();
+  private List<String> m_displayTexts;
 
   public SearchFilter() {
+    m_displayTexts = new ArrayList<String>();
   }
 
   /**
@@ -54,25 +56,26 @@ public class SearchFilter implements Serializable, Cloneable {
   }
 
   public String[] getDisplayTexts() {
-    return m_displayTexts.toArray(new String[0]);
+    return m_displayTexts.toArray(new String[m_displayTexts.size()]);
   }
 
   public void setDisplayTexts(String[] displayTexts) {
-    if (displayTexts == null) {
-      displayTexts = new String[0];
-    }
-    m_displayTexts = new ArrayList<String>(Arrays.asList(displayTexts));
+    m_displayTexts = CollectionUtility.arrayList(displayTexts);
   }
 
   public String getDisplayTextsPlain() {
-    StringBuffer buf = new StringBuffer();
+    StringBuilder buf = new StringBuilder();
+    char nl = '\n';
     for (String s : getDisplayTexts()) {
       if (s != null) {
         buf.append(s.trim());
-        buf.append("\n");
+        buf.append(nl);
       }
     }
-    return buf.toString().trim();
+    if (buf.length() > 0 && buf.charAt(buf.length() - 1) == nl) {
+      buf.deleteCharAt(buf.length() - 1);
+    }
+    return buf.toString();
   }
 
   public boolean isCompleted() {
@@ -102,13 +105,57 @@ public class SearchFilter implements Serializable, Cloneable {
 
   @Override
   public String toString() {
-    StringBuffer buf = new StringBuffer();
+    StringBuilder buf = new StringBuilder();
     buf.append(getClass().getSimpleName());
-    buf.append("[");
+    buf.append('[');
     if (m_formData != null) {
       buf.append(m_formData.toString());
     }
-    buf.append("]");
+    buf.append(']');
     return buf.toString();
+  }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + (m_completed ? 1231 : 1237);
+    result = prime * result + ((m_displayTexts == null) ? 0 : m_displayTexts.hashCode());
+    result = prime * result + ((m_formData == null) ? 0 : m_formData.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    SearchFilter other = (SearchFilter) obj;
+    if (m_completed != other.m_completed) {
+      return false;
+    }
+    if (m_displayTexts == null) {
+      if (other.m_displayTexts != null) {
+        return false;
+      }
+    }
+    else if (!m_displayTexts.equals(other.m_displayTexts)) {
+      return false;
+    }
+    if (m_formData == null) {
+      if (other.m_formData != null) {
+        return false;
+      }
+    }
+    else if (!m_formData.equals(other.m_formData)) {
+      return false;
+    }
+    return true;
   }
 }

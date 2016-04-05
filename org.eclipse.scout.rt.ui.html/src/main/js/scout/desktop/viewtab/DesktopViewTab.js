@@ -11,8 +11,7 @@
 scout.DesktopViewTab = function() {
   scout.DesktopViewTab.parent.call(this);
 
-  this._view;
-  this._$bench;
+  this.view;
   this._mouseListener;
   this.viewTabController;
 
@@ -39,22 +38,20 @@ scout.inherits(scout.DesktopViewTab, scout.Widget);
 
 scout.DesktopViewTab.prototype._init = function(options) {
   scout.DesktopViewTab.parent.prototype._init.call(this, options);
-  this._view = options.view;
-  this._view.setParent(this);
+  this.view = options.view;
   this.viewTabController = options.viewTabController;
-  this._$bench = options.$bench;
 
   this._installListeners();
 };
 
 scout.DesktopViewTab.prototype._installListeners = function() {
-  this._view.on('propertyChange', this._propertyChangeListener);
-  this._view.on('remove', this._removeListener);
+  this.view.on('propertyChange', this._propertyChangeListener);
+  this.view.on('remove', this._removeListener);
 };
 
 scout.DesktopViewTab.prototype._uninstallListeners = function() {
-  this._view.off('propertyChange', this._propertyChangeListener);
-  this._view.off('remove', this._removeListener);
+  this.view.off('propertyChange', this._propertyChangeListener);
+  this.view.off('remove', this._removeListener);
 };
 
 scout.DesktopViewTab.prototype._render = function($parent) {
@@ -64,42 +61,17 @@ scout.DesktopViewTab.prototype._render = function($parent) {
   } else if (position > 0) {
     var previousTab = this.viewTabController.viewTabs()[position - 1];
     this.$container = previousTab.$container.afterDiv('desktop-view-tab');
-
   }
   this._mouseListener = this._onMouseDown.bind(this);
   this.$container.on('mousedown', this._mouseListener);
   this._$title = this.$container.appendDiv('title');
   this._$subTitle = this.$container.appendDiv('sub-title');
   this._titlesUpdated();
-  this._cssClassUpdated(this._view.cssClass, null);
-};
-
-scout.DesktopViewTab.prototype._renderView = function($parent) {
-  if (this._view.rendered) {
-    throw new Error('view already rendered');
-  }
-  this._view.render(this._$bench);
-  this._view.$container.addClass('view');
-  this._view.validateRoot = true;
-  this._view.invalidateLayoutTree(false);
-  // Layout immediate to prevent 'laggy' form visualization,
-  // but not initially while desktop gets rendered because it will be done at the end anyway
-  if (this.rendered) {
-    this._view.validateLayoutTree();
-  }
+  this._cssClassUpdated(this.view.cssClass, null);
 };
 
 scout.DesktopViewTab.prototype.select = function() {
   this._cssSelect(true);
-  if (this._view.rendered) {
-    this._view.attach();
-  } else {
-    this._renderView();
-    if (this.session.desktop.bench.outlineContent !== this._view) {
-      // Notify model that this form is active
-      this.session.desktop._setFormActivated(this._view);
-    }
-  }
 };
 
 scout.DesktopViewTab.prototype._cssSelect = function(selected) {
@@ -109,9 +81,6 @@ scout.DesktopViewTab.prototype._cssSelect = function(selected) {
 };
 
 scout.DesktopViewTab.prototype.deselect = function() {
-  if (this._view.rendered) {
-    this._view.detach();
-  }
   this._cssSelect(false);
 };
 
@@ -125,11 +94,11 @@ scout.DesktopViewTab.prototype._titlesUpdated = function() {
   }
 
   // Titles
-  setTitle(this._$title, this._view.title);
-  setTitle(this._$subTitle, this._view.subTitle);
+  setTitle(this._$title, this.view.title);
+  setTitle(this._$subTitle, this.view.subTitle);
 
   // Icon
-  this.$container.icon(this._view.iconId);
+  this.$container.icon(this.view.iconId);
 
   // ----- Helper functions -----
 
@@ -162,9 +131,9 @@ scout.DesktopViewTab.prototype._onViewRemoved = function() {
 };
 
 scout.DesktopViewTab.prototype.getMenuText = function() {
-  var text = this._view.title;
-  if (this._view.subTitle) {
-    text += ' (' + this._view.subTitle + ')';
+  var text = this.view.title;
+  if (this.view.subTitle) {
+    text += ' (' + this.view.subTitle + ')';
   }
   return text;
 };

@@ -13,6 +13,8 @@ scout.Table = function(model) {
   this.$container;
   this.$data;
   this.header;
+  this.footer;
+  this.footerVisible = false;
   this.selectionHandler;
   this.columns = [];
   this.tableControls = [];
@@ -83,6 +85,7 @@ scout.Table.prototype._init = function(model) {
   this._syncFilters(this.filters);
   this._syncKeyStrokes(this.keyStrokes);
   this._syncMenus(this.menus);
+  this._syncTableControls(this.tableControls);
   this._syncTableStatus(this.tableStatus);
   this._applyFilters(this.rows);
   this._calculateValuesForBackgroundEffect();
@@ -158,9 +161,7 @@ scout.Table.prototype._initTableKeyStrokeContext = function(keyStrokeContext) {
       new scout.TableCopyKeyStroke(this),
       new scout.ContextMenuKeyStroke(this, this.onContextMenu, this),
       new scout.AppLinkKeyStroke(this, this.handleAppLinkAction)
-    ]
-    .concat(this.tableControls)
-    .concat(this.menus));
+    ]);
 
   // Prevent default action and do not propagate ↓ or ↑ keys if ctrl- or alt-modifier is not pressed.
   // Otherwise, an '↑-event' on the first row, or an '↓-event' on the last row will bubble up (because not consumed by table navigation keystrokes) and cause a superior table to move its selection.
@@ -266,7 +267,7 @@ scout.Table.prototype._render = function($parent) {
 scout.Table.prototype._renderProperties = function() {
   scout.Table.parent.prototype._renderProperties.call(this);
   this._renderTableHeader();
-  this._renderTableFooter();
+  this._renderFooterVisible();
   this._renderMenus();
   this._renderEnabled();
   this._renderDropType();
@@ -275,9 +276,8 @@ scout.Table.prototype._renderProperties = function() {
 
 scout.Table.prototype._remove = function() {
   scout.scrollbars.uninstall(this.$data, this.session);
-  // FIXME CGU do not delete header and footer!
+  // FIXME CGU do not delete header, implement according to footer
   this.header = null;
-  this.footer = null;
   this._removeAggregateRows();
   this._uninstallCellTooltipSupport();
   this._removeRows();
@@ -290,7 +290,6 @@ scout.Table.prototype._remove = function() {
 // reason: the property on this is already synced at this point, the argument may contain
 // just a data-model value (and not a adpater).
 scout.Table.prototype._renderTableControls = function() {
-  this._renderTableFooter();
   if (this.footer) {
     this.footer._renderControls();
   }
@@ -309,10 +308,12 @@ scout.Table.prototype._syncTableControls = function(controls) {
   }
   this.tableControls = controls;
   for (i = 0; i < this.tableControls.length; i++) {
-    if (this.tableControls[i].enabled) {
-      this.keyStrokeContext.registerKeyStroke(this.tableControls[i]);
-    }
+    this.keyStrokeContext.registerKeyStroke(this.tableControls[i]);
   }
+  this._updateFooterVisibility();
+  this.tableControls.forEach(function(control) {
+    control.tableFooter = this.footer;
+  }, this);
 };
 
 scout.Table.prototype._onRowMouseDown = function(event) {
@@ -433,15 +434,11 @@ scout.Table.prototype._onChildAdapterCreation = function(propertyName, model) {
 };
 
 scout.Table.prototype._renderTableStatusVisible = function() {
-  this._renderTableFooter();
+  // nop
 };
 
 scout.Table.prototype._renderTableStatus = function() {
   this.trigger('statusChanged');
-};
-
-scout.Table.prototype._isFooterVisible = function() {
-  return this.tableStatusVisible || this._hasVisibleTableControls();
 };
 
 scout.Table.prototype._hasVisibleTableControls = function() {
@@ -586,6 +583,9 @@ scout.Table.prototype._sort = function(animateAggregateRows) {
     return true;
   }
 
+  // add all visible columns as fallback sorting to guarantee same sorting as in Java.
+  sortColumns = scout.arrays.union(sortColumns, this.columns);
+
   this._sortImpl(sortColumns);
   this._filteredRowsDirty = true; // order has been changed
   this._triggerRowOrderChanged();
@@ -617,13 +617,15 @@ scout.Table.prototype._sortImpl = function(sortColumns) {
   function compare(row1, row2) {
     for (var s = 0; s < sortColumns.length; s++) {
       var column = sortColumns[s];
-      var direction = column.sortActive && column.sortAscending ? -1 : 1;
-
       var result = column.compare(row1, row2);
-      if (result < 0) {
-        return direction;
-      } else if (result > 0) {
-        return -1 * direction;
+      if (column.sortActive && !column.sortAscending) {
+        // only consider sortAscending flag when sort is active
+        // columns with !sortActive are always sorted ascending (sortAscending represents last state for those, thus not considered)
+        result = -result;
+      }
+
+      if (result !== 0) {
+        return result;
       }
     }
 
@@ -3040,6 +3042,28 @@ scout.Table.prototype._syncTableStatus = function(tableStatus) {
   }
 };
 
+scout.Table.prototype._syncTableStatusVisible = function(tableStatusVisible) {
+  this.tableStatusVisible = tableStatusVisible;
+  this._updateFooterVisibility();
+};
+
+scout.Table.prototype._updateFooterVisibility = function() {
+  this.setFooterVisible(this.tableStatusVisible || this._hasVisibleTableControls());
+};
+
+scout.Table.prototype.setFooterVisible = function(visible) {
+  this.footerVisible = visible;
+  if (visible && !this.footer) {
+    this.footer = this._createFooter();
+  }
+  if (this.rendered) {
+    this._renderFooterVisible();
+  }
+  if (!visible && this.footer) {
+    this.footer = null;
+  }
+};
+
 /**
  * Renders the background effect of every column, if column.backgroundEffect is set
  */
@@ -3142,28 +3166,31 @@ scout.Table.prototype._removeEmptyData = function() {
   }
 };
 
-scout.Table.prototype._renderTableFooter = function() {
-  var footerVisible = this._isFooterVisible(),
-    changed = false;
-  if (footerVisible && !this.footer) {
-    this.footer = this._createFooter();
-    this.footer.render();
-    changed = true;
-  } else if (!footerVisible && this.footer) {
-    this._removeTableFooter();
-    changed = true;
+scout.Table.prototype._renderFooterVisible = function() {
+  if (!this.footer) {
+    return;
   }
-  if (changed) {
-    this.invalidateLayoutTree();
+  if (this.footerVisible) {
+    this._renderFooter();
+  } else {
+    this._removeFooter();
   }
+  this.invalidateLayoutTree();
 };
 
-scout.Table.prototype._removeTableFooter = function() {
-  if (this.footer) {
-    this.footer.remove();
-    this.removeChild(this.footer);
-    this.footer = null;
+scout.Table.prototype._renderFooter = function() {
+  if (this.footer.rendered) {
+    return;
   }
+
+  this.footer.render();
+};
+
+scout.Table.prototype._removeFooter = function() {
+  if (!this.footer.rendered) {
+    return;
+  }
+  this.footer.remove();
 };
 
 scout.Table.prototype._renderEnabled = function() {

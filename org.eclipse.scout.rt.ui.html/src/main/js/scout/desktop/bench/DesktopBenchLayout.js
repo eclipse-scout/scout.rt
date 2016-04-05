@@ -29,7 +29,7 @@ scout.DesktopBenchLayout.prototype.layout = function($container) {
 
   var selectedViewTab = desktop.viewTabsController.selectedViewTab();
   if (selectedViewTab) {
-    htmlView = selectedViewTab._view.htmlComp;
+    htmlView = selectedViewTab.view.htmlComp;
     viewSize = containerSize.subtract(htmlView.getMargins());
     htmlView.setSize(viewSize);
   }

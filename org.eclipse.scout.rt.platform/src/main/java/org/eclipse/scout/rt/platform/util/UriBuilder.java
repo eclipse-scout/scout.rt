@@ -11,10 +11,12 @@
 package org.eclipse.scout.rt.platform.util;
 
 import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,7 +32,8 @@ import org.slf4j.LoggerFactory;
 public class UriBuilder {
 
   private static final Logger LOG = LoggerFactory.getLogger(UriBuilder.class);
-  private static final String DEFAULT_ENCODING = UriUtility.ISO_8859_1;
+
+  private static final String DEFAULT_ENCODING = StandardCharsets.UTF_8.name();
 
   private final Map<String, String> m_parameters = new HashMap<>();
   private String m_scheme;
@@ -110,6 +113,7 @@ public class UriBuilder {
     if (StringUtility.hasText(path)) {
       m_path = StringUtility.join("/", removeTrailingSlash(m_path), path);
     }
+    ensureAbsolutePathWithHost();
     return this;
   }
 
@@ -147,17 +151,31 @@ public class UriBuilder {
   }
 
   public URL createURL(String encoding) {
-    return UriUtility.uriToUrl(createURI(encoding));
+    URI uri = createURI(encoding);
+    return UriUtility.uriToUrl(uri);
   }
 
   public URI createURI(String encoding) {
     try {
-      ensureAbsolutePathWithHost();
-      return new URI(m_scheme, null, m_host, m_port, m_path, getQueryString(encoding), m_fragment);
+      return createURIInternal(encoding);
     }
-    catch (URISyntaxException e) {
+    catch (MalformedURLException | URISyntaxException e) {
       throw new ProcessingException("error creating URI", e);
     }
+  }
+
+  // Inspired by: https://blog.stackhunter.com/2014/03/31/encode-special-characters-java-net-uri/
+  // See also: http://stackoverflow.com/questions/19917079/java-net-uri-and-percent-in-query-parameter-value
+  // It seems that the URI class knows nothing about key/value pairs used by most webservers.
+  // the URI class just makes sure that the query-string is correct according to the rules defined by the RFC.
+  // Thus: we can and should not use URI as an object to store query-parameters. Maybe we should replace our own
+  // API with a custom GetRequest implementation.
+  // Another approach would be to use URL instead of URI since, the URL class does not change the query string.
+  private URI createURIInternal(String encoding) throws MalformedURLException, URISyntaxException {
+    final URI uri = new URI(m_scheme, null, m_host, m_port, m_path, null, null);
+    final String urlWithQuery = StringUtility.join("?", uri.toString(), getQueryString(encoding));
+    final String fullUrl = StringUtility.join("#", urlWithQuery, m_fragment);
+    return new URI(fullUrl);
   }
 
   /**

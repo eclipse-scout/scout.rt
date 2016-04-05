@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.client.ui.desktop;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -31,7 +30,7 @@ import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.deeplink.DeepLinkException;
 import org.eclipse.scout.rt.client.deeplink.IDeepLinks;
-import org.eclipse.scout.rt.client.deeplink.OutlineHandler;
+import org.eclipse.scout.rt.client.deeplink.OutlineDeepLinkHandler;
 import org.eclipse.scout.rt.client.extension.ui.action.tree.MoveActionNodesHandler;
 import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopBeforeClosingChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopClosingChain;
@@ -92,6 +91,7 @@ import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.EventListenerList;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.shared.TEXTS;
@@ -257,15 +257,14 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   /**
-   * Configures the desktop style which defines the basic layout of the application in the UI. Currently the desktop
-   * style cannot be changed at runtime.
+   * Configures the desktop style which defines the basic layout of the application in the UI.
    * <p>
-   * Subclasses can override this method. Default is {@code DesktopStyle.DEFAULT}.
+   * Subclasses can override this method. Default is {@link IDesktop#DISPLAY_STYLE_DEFAULT}
    */
-  @ConfigProperty(ConfigProperty.OBJECT)
+  @ConfigProperty(ConfigProperty.STRING)
   @Order(50)
-  protected DesktopStyle getConfiguredDesktopStyle() {
-    return DesktopStyle.DEFAULT;
+  protected String getConfiguredDisplayStyle() {
+    return DISPLAY_STYLE_DEFAULT;
   }
 
   /**
@@ -291,6 +290,24 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(60)
   protected boolean getConfiguredCacheSplitterPosition() {
+    return true;
+  }
+
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(70)
+  protected boolean getConfiguredNavigationVisible() {
+    return true;
+  }
+
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(80)
+  protected boolean getConfiguredHeaderVisible() {
+    return true;
+  }
+
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(90)
+  protected boolean getConfiguredBenchVisible() {
     return true;
   }
 
@@ -510,8 +527,12 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     setTitle(getConfiguredTitle());
     setSelectViewTabsKeyStrokesEnabled(getConfiguredSelectViewTabsKeyStrokesEnabled());
     setSelectViewTabsKeyStrokeModifier(getConfiguredSelectViewTabsKeyStrokeModifier());
-    setDesktopStyle(getConfiguredDesktopStyle());
     setLogoId(getConfiguredLogoId());
+    setNavigationVisible(getConfiguredNavigationVisible());
+    setBenchVisible(getConfiguredBenchVisible());
+    setHeaderVisible(getConfiguredHeaderVisible());
+    setDisplayStyle(getConfiguredDisplayStyle());
+    initDisplayStyle(getDisplayStyle());
     setCacheSplitterPosition(getConfiguredCacheSplitterPosition());
     List<IDesktopExtension> extensions = getDesktopExtensions();
     m_contributionHolder = new ContributionComposite(this);
@@ -555,7 +576,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
         menus.addOrdered(menu);
       }
     }
-//    menus.addAllOrdered(allMenus);
     new MoveActionNodesHandler<IMenu>(menus).moveModelObjects();
     m_menus = menus.getOrderedList();
 
@@ -591,6 +611,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
         LOG.error("Could not init outline {}", o, e);
       }
     }
+    addPropertyChangeListener(new P_LocalPropertyChangeListener());
   }
 
   protected final void interceptInit() {
@@ -646,6 +667,24 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
       ActionUtility.initActions(getMenus());
       ActionUtility.initActions(getToolButtons());
       ActionUtility.initActions(getViewButtons());
+    }
+  }
+
+  protected void initDisplayStyle(String style) {
+    if (DISPLAY_STYLE_BENCH.equals(style)) {
+      setNavigationVisible(false);
+      setHeaderVisible(false);
+      setBenchVisible(true);
+    }
+    else if (DISPLAY_STYLE_COMPACT.equals(style)) {
+      setNavigationVisible(true);
+      setHeaderVisible(false);
+      setBenchVisible(false);
+    }
+    else {
+      setNavigationVisible(true);
+      setHeaderVisible(true);
+      setBenchVisible(true);
     }
   }
 
@@ -740,12 +779,13 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   @Override
-  public DesktopStyle getDesktopStyle() {
-    return (DesktopStyle) propertySupport.getProperty(PROP_DESKTOP_STYLE);
+  public String getDisplayStyle() {
+    return propertySupport.getPropertyString(PROP_DISPLAY_STYLE);
   }
 
-  protected void setDesktopStyle(DesktopStyle desktopStyle) {
-    propertySupport.setProperty(PROP_DESKTOP_STYLE, desktopStyle);
+  @Override
+  public void setDisplayStyle(String displayStyle) {
+    propertySupport.setProperty(PROP_DISPLAY_STYLE, displayStyle);
   }
 
   @Override
@@ -1001,7 +1041,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
       m_activeOutlineListener = new P_ActiveOutlineListener();
       m_outline.addTreeListener(m_activeOutlineListener);
       m_outline.addPropertyChangeListener(m_activeOutlineListener);
-      setBrowserHistoryEntry(BEANS.get(OutlineHandler.class).createBrowserHistoryEntry(this, m_outline));
+      setBrowserHistoryEntry(BEANS.get(OutlineDeepLinkHandler.class).createBrowserHistoryEntry(m_outline));
     }
     // <bsh 2010-10-15>
     // Those three "setXyz(null)" statements used to be called unconditionally. Now, they
@@ -1900,7 +1940,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
       }
     }
     catch (DeepLinkException e) {
-      LOG.warn("Failed to execute deep-link '{}'", deepLinkPath, e);
+      LOG.warn("Failed to execute deep-link '{}', reason: {}", deepLinkPath, e.getMessage());
       interceptDefaultView();
       showDeepLinkError(e);
     }
@@ -1917,7 +1957,15 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
    *           when deep-link could not be executed
    */
   protected boolean handleDeepLink(String deepLinkPath) throws DeepLinkException {
-    // FIXME awe: (deep-links) we should check if a dekstop-modal dialog or message-box prevents executing the deep-link
+    if (hasApplicationModalElement()) {
+      LOG.debug("Could not handle deep-link because modal element prevents changes on UI state. deepLinkPath={}", deepLinkPath);
+      return false;
+    }
+
+    if (StringUtility.isNullOrEmpty(deepLinkPath)) {
+      return false;
+    }
+
     boolean handled = false;
     IDeepLinks deepLinks = BEANS.get(IDeepLinks.class);
     if (deepLinks.canHandleDeepLink(deepLinkPath)) {
@@ -1926,12 +1974,29 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     return handled;
   }
 
+  protected boolean hasApplicationModalElement() {
+    if (m_messageBoxStore.containsApplicationModalMessageBoxes()) {
+      return true;
+    }
+    if (m_formStore.containsApplicationModalDialogs()) {
+      return true;
+    }
+    return m_fileChooserStore.containsApplicationModalFileChoosers();
+  }
+
   /**
    * Displays a message box showing a generic message that the deep-link could not be executed.
    */
   protected void showDeepLinkError(DeepLinkException e) {
-    String errorMessage = TEXTS.get("DeepLinkError");
-    MessageBoxes.createOk().withBody(errorMessage).show();
+    if (e.getCause() instanceof VetoException) {
+      // permission problems
+      BEANS.get(ExceptionHandler.class).handle(e.getCause());
+    }
+    else {
+      // other problems
+      String errorMessage = TEXTS.get("DeepLinkError");
+      MessageBoxes.createOk().withBody(errorMessage).show();
+    }
   }
 
   private void detachGui() {
@@ -2006,13 +2071,33 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   @Override
-  public void setUiBaseUrl(URL baseUrl) {
-    propertySupport.setProperty(PROP_UI_BASE_URL, baseUrl);
+  public void setNavigationVisible(boolean visible) {
+    propertySupport.setProperty(PROP_NAVIGATION_VISIBLE, visible);
   }
 
   @Override
-  public URL getUiBaseUrl() {
-    return (URL) propertySupport.getProperty(PROP_UI_BASE_URL);
+  public boolean isNavigationVisible() {
+    return (boolean) propertySupport.getProperty(PROP_NAVIGATION_VISIBLE);
+  }
+
+  @Override
+  public void setBenchVisible(boolean visible) {
+    propertySupport.setProperty(PROP_BENCH_VISIBLE, visible);
+  }
+
+  @Override
+  public boolean isBenchVisible() {
+    return (boolean) propertySupport.getProperty(PROP_BENCH_VISIBLE);
+  }
+
+  @Override
+  public void setHeaderVisible(boolean visible) {
+    propertySupport.setProperty(PROP_HEADER_VISIBLE, visible);
+  }
+
+  @Override
+  public boolean isHeaderVisible() {
+    return (boolean) propertySupport.getProperty(PROP_HEADER_VISIBLE);
   }
 
   /**
@@ -2128,11 +2213,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   protected class P_UIFacade implements IDesktopUIFacade {
 
     @Override
-    public void setBaseUrl(URL baseUrl) {
-      setUiBaseUrl(baseUrl);
-    }
-
-    @Override
     public void historyEntryActivatedFromUI(String deepLinkPath) {
       try {
         handleDeepLink(deepLinkPath);
@@ -2177,6 +2257,21 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
         setOpenedInternal(false);
       }
       ClientSessionProvider.currentSession().stop();
+    }
+
+    @Override
+    public void setNavigationVisibleFromUI(boolean visible) {
+      setNavigationVisible(visible);
+    }
+
+    @Override
+    public void setHeaderVisibleFromUI(boolean visible) {
+      setHeaderVisible(visible);
+    }
+
+    @Override
+    public void setBenchVisibleFromUI(boolean visible) {
+      setBenchVisible(visible);
     }
   }
 
@@ -2441,4 +2536,14 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     chain.execDefaultView();
   }
 
+  protected class P_LocalPropertyChangeListener implements PropertyChangeListener {
+
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+      if (evt.getPropertyName() == PROP_DISPLAY_STYLE) {
+        initDisplayStyle((String) evt.getNewValue());
+      }
+    }
+
+  }
 }

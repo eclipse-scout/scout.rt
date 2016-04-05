@@ -20,9 +20,9 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.resource.BinaryResources;
 import org.eclipse.scout.rt.platform.util.IOUtility;
-import org.eclipse.scout.rt.ui.html.cache.HttpCacheKey;
-import org.eclipse.scout.rt.ui.html.cache.HttpCacheObject;
-import org.eclipse.scout.rt.ui.html.cache.IHttpCacheControl;
+import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheControl;
+import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheKey;
+import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheObject;
 import org.eclipse.scout.rt.ui.html.res.IWebContentService;
 
 /**
@@ -48,9 +48,11 @@ public class BinaryFileLoader extends AbstractResourceLoader {
         .withFilename(pathInfo)
         .withContent(bytes)
         .withLastModified(connection.getLastModified())
+        .withCachingAllowed(true)
+        .withCacheMaxAge(HttpCacheControl.MAX_AGE_4_HOURS)
         .build();
 
-    return new HttpCacheObject(cacheKey, true, IHttpCacheControl.MAX_AGE_4_HOURS, content);
+    return new HttpCacheObject(cacheKey, content);
   }
 
 }

@@ -11,25 +11,21 @@
 package org.eclipse.scout.rt.server.jms;
 
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import javax.jms.Connection;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageConsumer;
+import javax.jms.MessageListener;
 import javax.jms.MessageProducer;
 import javax.jms.Session;
 
-import org.eclipse.scout.rt.platform.config.CONFIG;
-import org.eclipse.scout.rt.platform.context.RunMonitor;
-import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.exception.PlatformExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
-import org.eclipse.scout.rt.platform.job.IFuture;
-import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
-import org.eclipse.scout.rt.server.jms.JmsConfigProperties.JmsRequestTimeoutProperty;
 import org.eclipse.scout.rt.server.jms.context.JmsRunContexts;
 import org.eclipse.scout.rt.server.jms.transactional.AbstractTransactionalJmsService;
 import org.eclipse.scout.rt.server.transaction.ITransactionMember;
@@ -50,12 +46,7 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractSimpleJmsService<T> extends AbstractJmsService<T> {
   private static Logger LOG = LoggerFactory.getLogger(AbstractSimpleJmsService.class);
 
-  private final long m_receiveTimeout;
-  private volatile IFuture<Void> m_messageConsumerFuture;
-
-  protected AbstractSimpleJmsService() {
-    m_receiveTimeout = CONFIG.getPropertyValue(JmsRequestTimeoutProperty.class);
-  }
+  private volatile JmsMessageConsumer m_messageConsumer;
 
   protected Session createSession(Connection connection) throws JMSException {
     return connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
@@ -76,7 +67,7 @@ public abstract class AbstractSimpleJmsService<T> extends AbstractJmsService<T> 
     }
     Connection connection = getConnection();
     if (!isEnabled() || connection == null) {
-      LOG.warn("Tried to send messages on a not active or enabled JMS message service");
+      LOG.warn("Tried to send messages on inactive or disabled JMS message service {}", getClass().getSimpleName());
       return;
     }
     Session session = null;
@@ -106,34 +97,38 @@ public abstract class AbstractSimpleJmsService<T> extends AbstractJmsService<T> 
   }
 
   protected boolean isMessageConsumerRunning() {
-    final IFuture<Void> future = m_messageConsumerFuture;
-    return future != null && !future.isFinished();
+    return m_messageConsumer != null;
   }
 
   protected synchronized void startMessageConsumer() {
     LOG.debug("starting message consumer for {}", getClass().getSimpleName(), LOG.isTraceEnabled() ? new Exception("stack trace") : null);
     stopMessageConsumer();
-    m_messageConsumerFuture = Jobs.schedule(createMessageConsumerRunnable(), Jobs.newInput()
-        .withName("JmsMessageConsumer-{}", getClass().getSimpleName()));
+    JmsMessageConsumer messageConsumer = createMessageConsumer();
+    try {
+      messageConsumer.subscribe();
+      m_messageConsumer = messageConsumer;
+    }
+    catch (JMSException e) {
+      throw BEANS.get(PlatformExceptionTranslator.class).translate(e);
+    }
   }
 
   protected synchronized void stopMessageConsumer() {
-    if (m_messageConsumerFuture != null) {
-      // 1. Cancel the message consumer.
-      m_messageConsumerFuture.cancel(true);
-
-      // 2. Wait for the message consumer to be stopped.
+    if (m_messageConsumer != null) {
       try {
-        m_messageConsumerFuture.awaitFinished(m_receiveTimeout * 3, TimeUnit.MILLISECONDS);
+        m_messageConsumer.unsubscribe();
+      }
+      catch (JMSException e) {
+        LOG.warn("Could not stop JMS message listener", e);
       }
       finally {
-        m_messageConsumerFuture = null;
+        m_messageConsumer = null;
       }
     }
   }
 
-  protected MessageConsumerRunnable createMessageConsumerRunnable() {
-    return new MessageConsumerRunnable(getConnection(), getDestination(), createMessageSerializer(), m_receiveTimeout);
+  protected JmsMessageConsumer createMessageConsumer() {
+    return new JmsMessageConsumer(getConnection(), getDestination(), createMessageSerializer());
   }
 
   /**
@@ -149,21 +144,20 @@ public abstract class AbstractSimpleJmsService<T> extends AbstractJmsService<T> 
   }
 
   /**
-   * Runnable to wait for incoming JMS-messages.
+   * This class wraps a {@link MessageListener}, keeps track of the JMS subscription and delegates any messages to
+   * {@link AbstractSimpleJmsService#execOnMessage(Object, Session)}.
    */
-  protected class MessageConsumerRunnable implements IRunnable {
+  protected class JmsMessageConsumer {
 
     private final Connection m_connection;
     private final IJmsMessageSerializer<T> m_messageSerializer;
-    private final long m_receiveTimeout;
 
     private final Session m_session;
     private final MessageConsumer m_consumer;
 
-    public MessageConsumerRunnable(final Connection connection, final Destination destination, final IJmsMessageSerializer<T> messageSerializer, final long receiveTimeout) {
+    public JmsMessageConsumer(final Connection connection, final Destination destination, final IJmsMessageSerializer<T> messageSerializer) {
       m_connection = Assertions.assertNotNull(connection, "JMS-connection must not be null");
       m_messageSerializer = Assertions.assertNotNull(messageSerializer, "Message serializer must not be null");
-      m_receiveTimeout = receiveTimeout;
 
       try {
         m_session = createSession(connection);
@@ -174,59 +168,54 @@ public abstract class AbstractSimpleJmsService<T> extends AbstractJmsService<T> 
       }
     }
 
-    @Override
-    public void run() throws Exception {
-      LOG.info("JMS message consumer started.");
+    protected final IJmsMessageSerializer<T> getMessageSerializer() {
+      return m_messageSerializer;
+    }
 
+    protected final Session getSession() {
+      return m_session;
+    }
+
+    public void subscribe() throws JMSException {
+      m_consumer.setMessageListener(createMessageListener());
       m_connection.start();
-      try {
-        while (!RunMonitor.CURRENT.get().isCancelled()) {
-          try {
-            final Message jmsMessage = m_consumer.receive(m_receiveTimeout);
-            if (jmsMessage == null) {
-              continue;
-            }
+      LOG.info("JMS message consumer started for {}.", AbstractSimpleJmsService.this.getClass().getSimpleName());
+    }
 
+    public void unsubscribe() throws JMSException {
+      try {
+        m_connection.stop();
+      }
+      catch (Exception e) {
+        LOG.info("Unable to stop connection, possibly because of running in J2EE container", LOG.isTraceEnabled() ? e : null);
+      }
+      m_session.close(); // only need to close session, producer must then not be closed.
+      LOG.info("JMS message consumer stopped for {}.", AbstractSimpleJmsService.this.getClass().getSimpleName());
+    }
+
+    protected MessageListener createMessageListener() {
+      return new MessageListener() {
+        @Override
+        public void onMessage(final Message jmsMessage) {
+          try {
             JmsRunContexts.empty()
                 .withJmsMessage(jmsMessage)
                 .withCorrelationId(jmsMessage.getJMSCorrelationID())
                 .run(new IRunnable() {
-
-                  @Override
-                  public void run() throws Exception {
-                    onMessage(jmsMessage);
-                  }
-                }, DefaultExceptionTranslator.class);
+              @Override
+              public void run() throws Exception {
+                final T message = getMessageSerializer().extractMessage(jmsMessage);
+                if (message != null) {
+                  execOnMessage(message, getSession());
+                }
+              }
+            });
           }
-          catch (final Exception e) {
-            LOG.error("Failed to process JMS-message", e);
+          catch (RuntimeException | JMSException e) {
+            LOG.warn("Could not process JMS message for {}", AbstractSimpleJmsService.this.getClass().getSimpleName(), e);
           }
         }
-      }
-      finally {
-        try {
-          m_connection.stop();
-        }
-        catch (Exception e) {
-          LOG.info("Unable to stop connection, possibly because of running in J2EE container: {}", LOG.isTraceEnabled() ? e : null);
-          LOG.trace("Full Exception:", e);
-        }
-        m_session.close(); // only need to close session, producer must then not be closed.
-      }
-      LOG.info("JMS message consumer stopped.");
-    }
-
-    /**
-     * Method invoked once a JMS-message is received.
-     *
-     * @param jmsMessage
-     *          JMS-message; is not <code>null</code>.
-     */
-    protected void onMessage(final Message jmsMessage) throws Exception {
-      final T message = m_messageSerializer.extractMessage(jmsMessage);
-      if (message != null) {
-        execOnMessage(message, m_session);
-      }
+      };
     }
   }
 }

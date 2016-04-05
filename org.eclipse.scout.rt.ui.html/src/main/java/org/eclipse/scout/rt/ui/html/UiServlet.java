@@ -28,6 +28,7 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.server.commons.context.ServletRunContext;
 import org.eclipse.scout.rt.server.commons.context.ServletRunContexts;
+import org.eclipse.scout.rt.server.commons.servlet.HttpServletControl;
 import org.eclipse.scout.rt.ui.html.json.JsonMessageRequestHandler;
 import org.eclipse.scout.rt.ui.html.res.ResourceRequestHandler;
 import org.slf4j.Logger;
@@ -77,6 +78,7 @@ public class UiServlet extends HttpServlet {
 
   @Override
   protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
+    BEANS.get(HttpServletControl.class).doDefaults(this, req, resp);
     try {
       createServletRunContext(req, resp).run(new IRunnable() {
         @Override
@@ -93,6 +95,7 @@ public class UiServlet extends HttpServlet {
 
   @Override
   protected void doPost(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
+    BEANS.get(HttpServletControl.class).doDefaults(this, req, resp);
     try {
       createServletRunContext(req, resp).run(new IRunnable() {
         @Override
@@ -171,9 +174,6 @@ public class UiServlet extends HttpServlet {
         resp.sendRedirect(req.getRequestURI() + "/");
         return;
       }
-
-      UiHints.updateHints(req);
-
       super.handleRequest(req, resp);
     }
 

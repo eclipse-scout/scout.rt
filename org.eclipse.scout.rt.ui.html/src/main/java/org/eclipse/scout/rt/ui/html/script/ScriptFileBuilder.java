@@ -17,10 +17,11 @@ import java.nio.charset.StandardCharsets;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.FileUtility;
 import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
-import org.eclipse.scout.rt.ui.html.UiHints;
+import org.eclipse.scout.rt.server.commons.servlet.UrlHints;
 import org.eclipse.scout.rt.ui.html.res.IWebContentService;
 import org.eclipse.scout.rt.ui.html.res.loader.HtmlFileLoader;
 import org.eclipse.scout.rt.ui.html.script.ScriptSource.FileType;
@@ -39,7 +40,7 @@ import org.slf4j.LoggerFactory;
  * If the fingerprint is the text "fingerprint" then {@link HtmlFileLoader} replaces it with the effective hex
  * fingerprint.
  * <p>
- * The js and css minify can be turned on and off using the url param ?minify=true, see {@link UiHints}
+ * The js and css minify can be turned on and off using the url param ?minify=true, see {@link UrlHints}
  */
 public class ScriptFileBuilder {
   private static final Logger LOG = LoggerFactory.getLogger(ScriptFileBuilder.class);
@@ -71,14 +72,12 @@ public class ScriptFileBuilder {
   public static final Pattern SCRIPT_URL_PATTERN = Pattern.compile("([^\"']*/)([-_\\.\\w\\d]+?)(?:\\-([a-f0-9]+))?(?:\\.min)?\\.(js|css)");
 
   private final IWebContentService m_resourceLocator;
-  private final ScriptProcessor m_scriptProcessor;
   private final ScriptFileLocator m_scriptLocator;
   private boolean m_minifyEnabled;
   private String m_theme;
 
-  public ScriptFileBuilder(IWebContentService locator, ScriptProcessor scriptProcessor) {
+  public ScriptFileBuilder(IWebContentService locator) {
     m_resourceLocator = locator;
-    m_scriptProcessor = scriptProcessor;
     m_scriptLocator = new ScriptFileLocator(m_resourceLocator);
   }
 
@@ -288,9 +287,9 @@ public class ScriptFileBuilder {
   protected String compileContent(ScriptSource.FileType fileType, String content) throws IOException {
     switch (fileType) {
       case JS:
-        return m_scriptProcessor.compileJs(content);
+        return BEANS.get(ScriptProcessor.class).compileJs(content);
       case CSS:
-        return m_scriptProcessor.compileCss(content);
+        return BEANS.get(ScriptProcessor.class).compileCss(content);
       default:
         return content;
     }
@@ -299,9 +298,9 @@ public class ScriptFileBuilder {
   protected String minifyContent(ScriptSource.FileType fileType, String content) throws IOException {
     switch (fileType) {
       case JS:
-        return m_scriptProcessor.minifyJs(content);
+        return BEANS.get(ScriptProcessor.class).minifyJs(content);
       case CSS:
-        return m_scriptProcessor.minifyCss(content);
+        return BEANS.get(ScriptProcessor.class).minifyCss(content);
       default:
         return content;
     }

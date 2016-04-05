@@ -62,9 +62,9 @@
   }
 }
 
-.mobile.outline.breadcrumb > .search-outline-panel {
+.compact.outline.breadcrumb > .search-outline-panel {
   & > .search-outline-status {
-    padding-left: @mobile-outline-title-text-padding-left;
+    padding-left: @compact-outline-node-padding-h;
     text-align: left;
   }
 }

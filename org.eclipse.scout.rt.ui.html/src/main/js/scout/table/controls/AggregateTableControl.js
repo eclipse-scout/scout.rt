@@ -154,10 +154,6 @@ scout.AggregateTableControl.prototype.setEnabled = function(enabled) {
   }
 };
 
-scout.AggregateTableControl.prototype.isContentAvailable = function() {
-  return true;
-};
-
 scout.AggregateTableControl.prototype._syncEnabled = function(enabled) {
   this.enabled = enabled;
   this._updateEnabledAndSelectedState();

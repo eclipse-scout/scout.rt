@@ -9,11 +9,13 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 @outline-breadcrumb-border-color: @outline-selection-background-color;
+@outline-breadcrumb-node-padding-v: 12px;
 @outline-title-border-color: @outline-selection-background-color;
 @outline-title-margin-left: 12px;
 @outline-title-margin-right: 12px;
 @outline-title-margin-bottom: 12px;
-@mobile-outline-title-text-padding-left: 16px;
+@compact-outline-node-padding-h: 16px;
+@compact-outline-node-padding-v: @outline-breadcrumb-node-padding-v;
 
 .outline {
 
@@ -69,8 +71,7 @@
 
       & > .menubar {
         border: 0;
-        padding-top: 10px;
-        background-color: @outline-selection-background-color;
+        background-color: inherit;
       }
 
       & > .tree-node-control {
@@ -147,7 +148,7 @@
       border-bottom: 1px solid @outline-breadcrumb-border-color;
 
       /* !important is necessary here to override the element specific left-padding (calculated by Tree.js for level indentation). */
-      padding: 12px 2px !important;
+      padding: @outline-breadcrumb-node-padding-v 2px !important;
 
       &.ancestor-of-selected,
       &.child-of-selected,
@@ -188,8 +189,6 @@
     &.has-detail-content > .animation-wrapper > .tree-node.selected {
       & > .text {
         font-weight: bold;
-        display: block;
-        padding-bottom: 3px;
       }
     }
   }
@@ -218,18 +217,46 @@
   }
 }
 
-.mobile.outline.breadcrumb {
+.compact.outline.breadcrumb {
   & > .outline-title {
     text-align: left;
 
     & > .outline-title-text {
-      padding-left: @mobile-outline-title-text-padding-left;
+      padding-left: @compact-outline-node-padding-h;
     }
   }
 
-  & > .tree-data > .tree-node  {
-    text-align: left;
-    padding-left: 16px !important;
-    padding-right: 16px !important;
+  & > .tree-data {
+
+    & > .tree-node  {
+      text-align: left;
+      padding: 0 !important;
+
+      & > .text {
+        display: inline-block;
+        padding: @compact-outline-node-padding-v @compact-outline-node-padding-h;
+      }
+
+      & > .node-menubar {
+        position: absolute;
+        right: 0;
+        top: 0;
+        width: auto;
+        padding: @compact-outline-node-padding-v - 3px @compact-outline-node-padding-h 0 0;
+      }
+
+      & > .detail-menubar {
+        padding: 0 @compact-outline-node-padding-h @compact-outline-node-padding-v @compact-outline-node-padding-h;
+      }
+
+      & > .form > .root-group-box > .group-box-body {
+        padding-left: @compact-outline-node-padding-h - @mandatory-indicator-width;
+        padding-right: @compact-outline-node-padding-h;
+      }
+    }
+
+    &.detail-content-visible > .tree-node > .menubar {
+      padding-bottom: 0;
+    }
   }
 }

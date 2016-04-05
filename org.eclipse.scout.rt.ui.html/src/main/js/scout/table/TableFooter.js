@@ -110,6 +110,8 @@ scout.TableFooter.prototype._render = function($parent) {
 scout.TableFooter.prototype._remove = function() {
   this.session.keyStrokeManager.uninstallKeyStrokeContext(this.searchFieldKeyStrokeContext);
   this._hideTableStatusTooltip();
+  this.$resizer = null;
+  this.open = false;
 
   this.table.off('rowsInserted', this._tableRowsChangedHandler);
   this.table.off('rowsDeleted', this._tableRowsChangedHandler);
@@ -181,7 +183,6 @@ scout.TableFooter.prototype._renderControls = function() {
   var controls = this.table.tableControls;
   if (controls) {
     controls.forEach(function(control) {
-      control.tableFooter = this;
       control.setParent(this);
       control.render(this._$controls);
     }.bind(this));

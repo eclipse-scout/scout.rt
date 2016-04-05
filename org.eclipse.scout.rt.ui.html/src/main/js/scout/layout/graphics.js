@@ -80,7 +80,7 @@ scout.graphics = {
    */
   /**
    * Returns the size of the component, insets included.
-   * @param includeMargin when set to true, returned dimensions include margins of component
+   * @param includeMargin when set to true, returned dimensions include margins of component, default is <code>false</code>.
    */
   getSize: function($comp, includeMargin) {
     includeMargin = scout.nvl(includeMargin, false);

@@ -21,7 +21,7 @@ scout.ViewButtonsLayout.prototype.layout = function($container) {
     tabWidth = (containerBounds.width / tabs);
   $container.children().each(function() {
     var $tab = $(this);
-    $tab.removeAttr('style');
-    scout.graphics.setSize($tab, new scout.Dimension(tabWidth, containerBounds.height));
+    // only set width, use css height
+    $tab.cssWidth(tabWidth);
   });
 };

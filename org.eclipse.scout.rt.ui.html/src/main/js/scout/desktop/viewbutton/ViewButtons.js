@@ -11,6 +11,7 @@
 scout.ViewButtons = function() {
   scout.ViewButtons.parent.call(this);
   this.viewMenuTab;
+  this.viewTabs;
   this._desktopOutlineChangedHandler = this._onDesktopOutlineChanged.bind(this);
 };
 scout.inherits(scout.ViewButtons, scout.Widget);
@@ -34,8 +35,6 @@ scout.ViewButtons.prototype._initKeyStrokeContext = function(keyStrokeContext) {
 };
 
 scout.ViewButtons.prototype._render = function($parent) {
-  var viewTabs;
-
   this.$container = $parent.appendDiv('view-buttons');
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
   this.htmlComp.setLayout(new scout.ViewButtonsLayout(this));
@@ -44,11 +43,11 @@ scout.ViewButtons.prototype._render = function($parent) {
   });
   this.viewMenuTab.render(this.$container);
 
-  viewTabs = this._viewButtons('TAB');
-  this._viewButtons('TAB').forEach(function(viewTab, i) {
+  this.viewTabs = this._viewButtons('TAB');
+  this.viewTabs.forEach(function(viewTab, i) {
     viewTab.setParent(this);
     viewTab.render(this.$container);
-    if (i === viewTabs.length - 1) {
+    if (i === this.viewTabs.length - 1) {
       viewTab.last();
     }
   }, this);
@@ -77,6 +76,20 @@ scout.ViewButtons.prototype._viewButtons = function(displayStyle) {
 
 scout.ViewButtons.prototype.doViewMenuAction = function(event) {
   this.viewMenuTab.togglePopup(event);
+};
+
+scout.ViewButtons.prototype.sendToBack = function() {
+  this.viewMenuTab.sendToBack();
+  this.viewTabs.forEach(function(button) {
+    button.sendToBack();
+  }, this);
+};
+
+scout.ViewButtons.prototype.bringToFront = function() {
+  this.viewMenuTab.bringToFront();
+  this.viewTabs.forEach(function(button) {
+    button.bringToFront();
+  }, this);
 };
 
 /**

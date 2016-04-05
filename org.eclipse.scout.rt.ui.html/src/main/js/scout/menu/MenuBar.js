@@ -12,6 +12,7 @@ scout.MenuBar = function() {
   scout.MenuBar.parent.call(this);
 
   this._addKeyStrokeContextSupport();
+  this._addEventSupport();
   this.menuSorter;
   this.position = 'top'; // or 'bottom'
   this.size = 'small'; // or 'large'
@@ -45,9 +46,9 @@ scout.MenuBar = function() {
         return;
       }
       if (event.changedProperties.indexOf('visible') > -1) {
-        this.updateVisibility(true);
+        this.updateVisibility();
       }
-      this.htmlComp.invalidateLayoutTree();
+      this.invalidateLayoutTree();
     }
   }.bind(this);
 };
@@ -59,6 +60,7 @@ scout.MenuBar.prototype._init = function(options) {
   this.menuSorter = options.menuOrder;
   this.menuSorter.menuBar = this;
   this.menuFilter = options.menuFilter;
+  this.updateVisibility();
 };
 
 scout.MenuBar.prototype._initKeyStrokeContext = function(keyStrokeContext) {
@@ -72,8 +74,6 @@ scout.MenuBar.prototype._initKeyStrokeContext = function(keyStrokeContext) {
  * @override Widget.js
  */
 scout.MenuBar.prototype._render = function($parent) {
-  // Visibility may change when updateItems() function is called, see updateVisibility().
-  this.visible = (this.menuItems.length > 0);
   this.$container = $parent.makeDiv('menubar')
     .attr('id', 'MenuBar-' + scout.objectFactory.createUniqueId())
     .toggleClass('main-menubar', this.size === 'large')
@@ -93,6 +93,23 @@ scout.MenuBar.prototype._render = function($parent) {
   this.rebuildItemsInternal();
 };
 
+scout.MenuBar.prototype._remove = function() {
+  scout.MenuBar.parent.prototype._remove.call(this);
+  this._removeMenuItems();
+  this.visibleMenuItems = [];
+  this.visible = false;
+};
+
+scout.MenuBar.prototype._renderProperties = function() {
+  scout.MenuBar.parent.prototype._renderProperties.call(this);
+  this._renderVisible();
+};
+
+scout.MenuBar.prototype._renderVisible = function() {
+  this.$container.setVisible(this.visible);
+  this.invalidateLayoutTree();
+};
+
 scout.MenuBar.prototype.bottom = function() {
   this.position = 'bottom';
 };
@@ -105,26 +122,11 @@ scout.MenuBar.prototype.large = function() {
   this.size = 'large';
 };
 
-scout.MenuBar.prototype._remove = function() {
-  scout.MenuBar.parent.prototype._remove.call(this);
-  this._removeMenuItems();
-  this.visibleMenuItems = [];
-  this.visible = false;
-};
-
 scout.MenuBar.prototype._destroyMenuSorterSeparators = function() {
   this.menuItems.forEach(function(item) {
     if (item.createdBy === this.menuSorter) {
       item.destroy();
     }
-  }, this);
-};
-
-scout.MenuBar.prototype._removeMenuItems = function() {
-  this.menuItems.forEach(function(item) {
-    item.off('propertyChange', this._menuItemPropertyChangeListener);
-    item.overflow = false;
-    item.remove();
   }, this);
 };
 
@@ -159,6 +161,9 @@ scout.MenuBar.prototype.setMenuItems = function(menuItems) {
     this._internalMenuItems = menuItems;
     this._orderedMenuItems = this.menuSorter.order(menuItems, this);
     this.menuItems = this._orderedMenuItems.left.concat(this._orderedMenuItems.right);
+    this.menuItems.forEach(function(menuItem) {
+      menuItem.setParent(this);
+    }, this);
   }
 
   if (this.rendered) {
@@ -243,18 +248,19 @@ scout.MenuBar.prototype.updateLastItemMarker = function() {
   }
 };
 
-scout.MenuBar.prototype.updateVisibility = function(suppressLayout) {
-  var oldVisible = this.visible;
-  this.visible = !this.hiddenByUi && this.menuItems.some(function(m) {
+scout.MenuBar.prototype.updateVisibility = function() {
+  this.setVisible(!this.hiddenByUi && this.menuItems.some(function(m) {
     return m.visible;
-  });
+  }));
+};
 
-  // Update visibility, layout
-  if (this.visible !== oldVisible) {
-    this.$container.setVisible(this.visible);
-    if (!suppressLayout) {
-      this.htmlComp.invalidateLayoutTree();
-    }
+scout.MenuBar.prototype.setVisible = function(visible) {
+  if (this.visible === visible) {
+    return;
+  }
+  this._setProperty('visible', visible);
+  if (this.rendered) {
+    this._renderVisible();
   }
 };
 
@@ -322,4 +328,12 @@ scout.MenuBar.prototype._renderMenuItems = function(menuItems, right) {
     // its items changes (e.g. visible, keystroke etc.)
     item.on('propertyChange', this._menuItemPropertyChangeListener);
   }.bind(this));
+};
+
+scout.MenuBar.prototype._removeMenuItems = function() {
+  this.menuItems.forEach(function(item) {
+    item.off('propertyChange', this._menuItemPropertyChangeListener);
+    item.overflow = false;
+    item.remove();
+  }, this);
 };

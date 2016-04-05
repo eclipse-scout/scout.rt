@@ -18,6 +18,7 @@ scout.Outline = function() {
   this._detailTableListener;
   this.inBackground = false;
   this.embedDetailContent = false;
+  this.compact = false;
   this.formController;
   this.messageBoxController;
   this.fileChooserController;
@@ -40,9 +41,14 @@ scout.Outline.prototype._init = function(model) {
     menuOrder: new scout.GroupBoxMenuItemsOrder()
   });
   this._updateTitleMenuBar();
+  this.nodeMenuBar = scout.create('MenuBar', {
+    parent: this,
+    menuOrder: new scout.GroupBoxMenuItemsOrder()
+  });
+  this.nodeMenuBar.bottom();
   this.detailMenuBar = scout.create('MenuBar', {
     parent: this,
-    menuOrder: new scout.GroupBoxMenuItemsOrder(this.session)
+    menuOrder: new scout.GroupBoxMenuItemsOrder()
   });
   this.detailMenuBar.bottom();
   this.updateDetailContent();
@@ -83,12 +89,11 @@ scout.Outline.prototype._render = function($parent) {
 
   // Override layout
   this.htmlComp.setLayout(new scout.OutlineLayout(this));
-  if (this.mobile) {
-    this.$container.addClass('mobile');
-  }
+  this._renderCompact();
   this._renderEmbedDetailContent();
   this._renderDetailContent();
   this._renderDetailMenuBarVisible();
+  this._renderNodeMenuBarVisible();
 };
 
 scout.Outline.prototype._renderProperties = function() {
@@ -151,11 +156,6 @@ scout.Outline.prototype._postRender = function() {
   //used to render glasspane
   this._trigger('rendered');
   scout.Outline.parent.prototype._postRender.call(this);
-
-  // Display attached forms, message boxes and file choosers.
-  this.formController.render();
-  this.messageBoxController.render();
-  this.fileChooserController.render();
 };
 
 /**
@@ -218,6 +218,9 @@ scout.Outline.prototype._initDetailForm = function(node) {
   if (this.navigateButtonsVisible) {
     this._appendNavigateButtonsForDetailForm(node);
   }
+
+  // Mark form as detail form
+  node.detailForm.detailForm = true;
 
   node.detailForm.one('destroy', function() {
     // Unlink detail form if it was closed. May happen in the following case:
@@ -502,19 +505,13 @@ scout.Outline.prototype.bringToFront = function() {
   this.fileChooserController.attach();
 };
 
-/**
- * === Method required for objects that act as 'displayParent' ===
- *
- * Returns 'true' if this Outline is currently accessible to the user.
- */
-scout.Outline.prototype.inFront = function() {
-  return this.rendered && !this.inBackground;
-};
-
 scout.Outline.prototype._renderInBackground = function() {
   this.$container.toggleClass('in-background', this.inBackground);
 };
 
+scout.Outline.prototype._renderCompact = function() {
+  this.$container.toggleClass('compact', this.compact);
+};
 
 scout.Outline.prototype._renderEmbedDetailContent = function() {
   this.$data.toggleClass('has-detail-content', this.embedDetailContent);
@@ -532,6 +529,7 @@ scout.Outline.prototype._renderDetailContent = function() {
     this.detailContent.htmlComp.pixelBasedSizing = true;
   }
   this._ensurePageLayout(page);
+  this.$data.addClass('detail-content-visible');
 };
 
 scout.Outline.prototype._ensurePageLayout = function(page) {
@@ -546,6 +544,14 @@ scout.Outline.prototype._removeDetailContent = function() {
     return;
   }
   this.detailContent.remove();
+  this.$data.removeClass('detail-content-visible');
+};
+
+scout.Outline.prototype.setCompact = function(compact) {
+  this.compact = compact;
+  if (this.rendered) {
+    this._renderCompact();
+  }
 };
 
 scout.Outline.prototype.setEmbedDetailContent = function(embed) {
@@ -578,6 +584,7 @@ scout.Outline.prototype.updateDetailContent = function() {
   }
 
   this.setDetailMenuBarVisible(false);
+  this.setNodeMenuBarVisible(false);
   this.setDetailContent(this._computeDetailContent());
   this.updateDetailMenus();
 
@@ -618,9 +625,13 @@ scout.Outline.prototype.updateDetailMenus = function() {
   if (!this.embedDetailContent) {
     return;
   }
-  var selectedPages = this.selectedNodes;
-  var selectedPage = selectedPages[0];
-  var menuItems = [];
+  var selectedPages = this.selectedNodes,
+    selectedPage = selectedPages[0],
+    menuItems = [],
+    tableControls = [],
+    nodeMenus = [],
+    detailMenus = [];
+
   if (this.detailContent) {
     // get menus from detail form
     if (this.detailContent instanceof scout.Form) {
@@ -633,14 +644,37 @@ scout.Outline.prototype.updateDetailMenus = function() {
       menuItems = scout.menus.filter(menuItems, ['Table.SingleSelection'], false, true);
     }
   }
-  // get empty space menus from detail table
+  // get empty space menus and table controls from detail table
   else if (selectedPages.length > 0) {
     if (selectedPage.detailTable) {
       menuItems = selectedPage.detailTable.menus;
       menuItems = scout.menus.filter(menuItems, ['Table.EmptySpace'], false, true);
+      tableControls = selectedPage.detailTable.tableControls;
     }
   }
-  this.setDetailMenus(menuItems);
+
+  // Add table controls to nodeMenus
+  tableControls.forEach(function(tableControl) {
+    var menu = scout.create('TableControlAdapterMenu',
+      scout.TableControlAdapterMenu.adaptTableControlProperties(tableControl, {
+        parent: this,
+        tableControl: tableControl,
+        horizontalAlignment: 1
+      }));
+    nodeMenus.push(menu);
+  }, this);
+
+  // Add right aligned menus to node menus, other to detail menus
+  menuItems.forEach(function(menuItem) {
+    if (menuItem.horizontalAlignment === 1) {
+      nodeMenus.push(menuItem);
+    } else {
+      detailMenus.push(menuItem);
+    }
+  }, this);
+
+  this.setNodeMenus(nodeMenus);
+  this.setDetailMenus(detailMenus);
 };
 
 scout.Outline.prototype.setDetailMenus = function(detailMenus) {
@@ -667,6 +701,7 @@ scout.Outline.prototype._renderDetailMenuBar = function() {
 
   var node = this.selectedNodes[0];
   this.detailMenuBar.render(node.$node);
+  this.detailMenuBar.$container.addClass('detail-menubar');
   if (this.detailContent && this.detailContent.rendered) {
     // move before content (e.g. form)
     this.detailMenuBar.$container.insertBefore(this.detailContent.$container);
@@ -685,6 +720,49 @@ scout.Outline.prototype.setDetailMenuBarVisible = function(visible) {
   this.detailMenuBarVisible = visible;
   if (this.rendered) {
     this._renderDetailMenuBarVisible();
+  }
+};
+
+scout.Outline.prototype.setNodeMenus = function(nodeMenus) {
+  this.nodeMenuBar.setMenuItems(nodeMenus);
+  this.setNodeMenuBarVisible(this.nodeMenuBar.menuItems.length > 0);
+};
+
+scout.Outline.prototype._renderNodeMenuBarVisible = function() {
+  if (this.nodeMenuBarVisible) {
+    this._renderNodeMenuBar();
+  } else {
+    this._removeNodeMenuBar();
+  }
+  this.invalidateLayoutTree();
+};
+
+scout.Outline.prototype._renderNodeMenuBar = function() {
+  if (this.nodeMenuBar.rendered) {
+    return;
+  }
+  if (this.selectedNodes.length === 0) {
+    return;
+  }
+
+  var node = this.selectedNodes[0];
+  var $text = node.$node.children('.text');
+  this.nodeMenuBar.render(node.$node);
+  this.nodeMenuBar.$container.addClass('node-menubar');
+  this.nodeMenuBar.$container.insertAfter($text);
+};
+
+scout.Outline.prototype._removeNodeMenuBar = function() {
+  if (!this.nodeMenuBar.rendered) {
+    return;
+  }
+  this.nodeMenuBar.remove();
+};
+
+scout.Outline.prototype.setNodeMenuBarVisible = function(visible) {
+  this.nodeMenuBarVisible = visible;
+  if (this.rendered) {
+    this._renderNodeMenuBarVisible();
   }
 };
 
@@ -725,6 +803,31 @@ scout.Outline.prototype.glassPaneTargets = function() {
   }
 };
 
+/**
+ * === Method required for objects that act as 'displayParent' ===
+ *
+ * Returns true if this outline is active and not in background.
+ */
+scout.Outline.prototype.inFront = function() {
+  return this.session.desktop.outline === this && !this.inBackground;
+};
+
+/**
+ * Called if outline acts as display parent.<p>
+ * Returns true if outline is active, even if it is not rendered (e.g. when navigation is invisible)
+ */
+scout.Outline.prototype.acceptDialog = function(dialog) {
+  return this.session.desktop.outline === this;
+};
+
+/**
+ * Called if outline acts as display parent.<p>
+ * Returns true if outline is active, even if it is not rendered (e.g. when navigation is invisible)
+ */
+scout.Outline.prototype.acceptView = function(view) {
+  return this.session.desktop.outline === this;
+};
+
 scout.Outline.prototype._syncMenus = function(menus, oldMenus) {
   this._keyStrokeSupport.syncMenus(menus, oldMenus);
   if (this.titleMenuBar) {
@@ -736,6 +839,12 @@ scout.Outline.prototype._syncMenus = function(menus, oldMenus) {
 scout.Outline.prototype._updateTitleMenuBar = function() {
   var menuItems = scout.menus.filter(this.menus, ['Tree.Header']);
   this.titleMenuBar.setMenuItems(menuItems);
+};
+
+scout.Outline.prototype._triggerPageChanged = function(page) {
+  this.trigger('pageChanged', {
+    page: page
+  });
 };
 
 /* event handling */
@@ -782,12 +891,6 @@ scout.Outline.prototype._onPageChanged = function(event) {
   }
 
   this._triggerPageChanged(node);
-};
-
-scout.Outline.prototype._triggerPageChanged = function(page) {
-  this.trigger('pageChanged', {
-    page: page
-  });
 };
 
 scout.Outline.prototype.onModelAction = function(event) {

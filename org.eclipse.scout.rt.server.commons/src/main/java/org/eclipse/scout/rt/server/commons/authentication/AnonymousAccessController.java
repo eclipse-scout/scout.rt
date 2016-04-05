@@ -19,6 +19,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.config.AbstractBooleanConfigProperty;
+import org.eclipse.scout.rt.platform.config.CONFIG;
 
 /**
  * Access controller to always continue filter-chain with a fixed user. By default, the user's name is 'anonymous'.
@@ -64,7 +66,7 @@ public class AnonymousAccessController implements IAccessController {
    */
   public static class AnonymousAuthConfig {
 
-    private boolean m_enabled = true;
+    private boolean m_enabled = CONFIG.getPropertyValue(EnabledProperty.class);
     private IPrincipalProducer m_principalProducer = BEANS.get(SimplePrincipalProducer.class);
     private String m_username = "anonymous";
 
@@ -95,4 +97,20 @@ public class AnonymousAccessController implements IAccessController {
       return this;
     }
   }
+
+  /**
+   * @since 5.2
+   */
+  public static class EnabledProperty extends AbstractBooleanConfigProperty {
+    @Override
+    public String getKey() {
+      return "scout.auth.anonymous.enabled";
+    }
+
+    @Override
+    protected Boolean getDefaultValue() {
+      return true;
+    }
+  }
+
 }

@@ -115,6 +115,15 @@ scout.ModelAdapter.prototype._send = function(type, data, delay, coalesceFunc) {
   this.trigger('send', event);
 };
 
+/**
+ * Sends the current state of the given property to the server.
+ */
+scout.ModelAdapter.prototype._sendProperty = function(propertyName) {
+  var data = {};
+  data[propertyName] = this[propertyName];
+  this._send(propertyName, data);
+};
+
 scout.ModelAdapter.prototype.render = function($parent) {
   scout.ModelAdapter.parent.prototype.render.call(this, $parent);
   if (this.session.offline) {
@@ -333,50 +342,6 @@ scout.ModelAdapter.prototype.onModelPropertyChange = function(event) {
   // to make sure the DOM is in the right state, when the propertyChange event is consumed.)
   // Note: A new event object has to be created, because it is altered in EventSuppor.trigger().
   this._fireBulkPropertyChange(oldProperties, event.properties);
-};
-
-scout.ModelAdapter.prototype._fireBulkPropertyChange = function(oldProperties, newProperties) {
-  var propertyChangeEvent = {
-    newProperties: newProperties,
-    oldProperties: oldProperties,
-    changedProperties: []
-  };
-  // To allow a listener to react only to properties that have really changed their value, we
-  // calculate the list of "changedProperties". This may be relevant, when the value on the model
-  // changes from A to B and back to A, which emits a property change event when in fact, the
-  // property has not really changed for the UI.
-  for (var prop in newProperties) {
-    if (newProperties[prop] !== oldProperties[prop]) {
-      propertyChangeEvent.changedProperties.push(prop);
-    }
-  }
-  this.trigger('propertyChange', propertyChangeEvent);
-};
-
-/**
- * Fires a property change for a single property.
- */
-scout.ModelAdapter.prototype._firePropertyChange = function(propertyName, oldValue, newValue) {
-  if (!propertyName) {
-    return;
-  }
-  var oldProperties = {},
-    newProperties = {};
-  oldProperties[propertyName] = oldValue;
-  newProperties[propertyName] = newValue;
-  this._fireBulkPropertyChange(oldProperties, newProperties);
-};
-
-/**
- * Sets the value of the property 'propertyName' to 'newValue' and then fires a propertyChange event for that property.
- */
-scout.ModelAdapter.prototype._setProperty = function(propertyName, newValue) {
-  if (!propertyName) {
-    return;
-  }
-  var oldValue = this[propertyName];
-  this[propertyName] = newValue;
-  this._firePropertyChange(propertyName, oldValue, newValue);
 };
 
 /**

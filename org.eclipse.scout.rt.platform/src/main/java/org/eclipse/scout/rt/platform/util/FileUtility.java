@@ -310,13 +310,13 @@ public final class FileUtility {
    */
   public static String getContentTypeForExtension(String ext) {
     if (ext == null) {
-      return getMimeType(null);
+      return getMimeType((Path) null);
     }
     if (ext.length() > 0 && ext.charAt(0) == '.') {
       ext = ext.substring(1);
     }
     ext = ext.toLowerCase(Locale.US).trim();
-    return getMimeType(Paths.get("file." + ext));
+    return getMimeType("file." + ext);
   }
 
   /**
@@ -333,9 +333,29 @@ public final class FileUtility {
    */
   public static String getContentType(File f) {
     if (f == null || !f.exists()) {
-      return getMimeType(null);
+      return getMimeType((Path) null);
     }
     return getMimeType(Paths.get(f.toURI()));
+  }
+
+  /**
+   * @param path
+   *          may also be an invalid path
+   *          <p>
+   *          see {@link #getMimeType(Path)}
+   */
+  public static String getMimeType(String path) {
+    try {
+      return getMimeType(Paths.get(path));
+    }
+    catch (Exception e1) {
+      try {
+        return getMimeType(Paths.get("file." + getFileExtension(path)));
+      }
+      catch (Exception e2) {
+        return getMimeType((Path) null);
+      }
+    }
   }
 
   /**

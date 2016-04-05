@@ -56,4 +56,6 @@ public interface ITreeUIFacade {
   void fireNodeDropTargetChangedFromUI(ITreeNode node);
 
   void fireAppLinkActionFromUI(String ref);
+
+  void setDisplayStyleFromUI(String style);
 }

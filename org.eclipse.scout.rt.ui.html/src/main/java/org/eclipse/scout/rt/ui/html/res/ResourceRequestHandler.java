@@ -21,15 +21,14 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
-import org.eclipse.scout.rt.platform.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
+import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheKey;
+import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheObject;
+import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheControl;
 import org.eclipse.scout.rt.ui.html.AbstractUiServletRequestHandler;
 import org.eclipse.scout.rt.ui.html.UiServlet;
-import org.eclipse.scout.rt.ui.html.cache.HttpCacheKey;
-import org.eclipse.scout.rt.ui.html.cache.HttpCacheObject;
-import org.eclipse.scout.rt.ui.html.cache.IHttpCacheControl;
 import org.eclipse.scout.rt.ui.html.res.loader.IResourceLoader;
-import org.eclipse.scout.rt.ui.html.res.loader.IResourceLoaderFactory;
+import org.eclipse.scout.rt.ui.html.res.loader.ResourceLoaders;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,17 +45,17 @@ public class ResourceRequestHandler extends AbstractUiServletRequestHandler {
   public static final String MOBILE_INDEX_HTML = "/index-mobile.html";
 
   // Remember bean instances to save lookups on each GET request
-  private List<IResourceLoaderFactory> m_resourceLoaderFactoryList = Collections.unmodifiableList(BEANS.all(IResourceLoaderFactory.class));
-  private IHttpCacheControl m_httpCacheControl = BEANS.get(IHttpCacheControl.class);
+  private final List<ResourceLoaders> m_resourceLoaderFactoryList = Collections.unmodifiableList(BEANS.all(ResourceLoaders.class));
+  private final HttpCacheControl m_httpCacheControl = BEANS.get(HttpCacheControl.class);
 
   @Override
   public boolean handleGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-    String resourcePath = resolveResourcePath(req);
+    String pathInfoEx = resolvePathInfoEx(req);
 
     // Create loader for the requested resource type
     IResourceLoader resourceLoader = null;
-    for (IResourceLoaderFactory f : m_resourceLoaderFactoryList) {
-      resourceLoader = f.createResourceLoader(req, resourcePath);
+    for (ResourceLoaders f : m_resourceLoaderFactoryList) {
+      resourceLoader = f.create(req, pathInfoEx);
       if (resourceLoader != null) {
         break;
       }
@@ -67,7 +66,7 @@ public class ResourceRequestHandler extends AbstractUiServletRequestHandler {
     }
 
     // Create cache key for resource and check if resource exists in cache
-    HttpCacheKey cacheKey = resourceLoader.createCacheKey(resourcePath, NlsLocale.getOrElse(null));
+    HttpCacheKey cacheKey = resourceLoader.createCacheKey(pathInfoEx);
     HttpCacheObject resource = m_httpCacheControl.getCacheObject(req, cacheKey);
     if (resource == null) {
       // Resource not found in cache --> load it
@@ -83,13 +82,8 @@ public class ResourceRequestHandler extends AbstractUiServletRequestHandler {
     }
 
     // cached in browser? -> returns 304 if the resource has not been modified
-    // Important: Check is only done if the request still processes the requested resource
-    // and hasn't been forwarded to another one (using req.getRequestDispatcher().forward)
-    String originalPathInfo = (String) req.getAttribute("javax.servlet.forward.path_info");
-    if (originalPathInfo == null || resourcePath.equals(originalPathInfo)) {
-      if (m_httpCacheControl.checkAndUpdateCacheHeaders(req, resp, resource)) {
-        return true;
-      }
+    if (m_httpCacheControl.checkAndSetCacheHeaders(req, resp, pathInfoEx, resource)) {
+      return true;
     }
 
     BinaryResource binaryResource = resource.getResource();
@@ -129,11 +123,11 @@ public class ResourceRequestHandler extends AbstractUiServletRequestHandler {
     }
   }
 
-  protected List<IResourceLoaderFactory> resourceLoaderFactoryList() {
+  protected List<ResourceLoaders> resourceLoaderFactoryList() {
     return m_resourceLoaderFactoryList;
   }
 
-  protected IHttpCacheControl httpCacheControl() {
+  protected HttpCacheControl httpCacheControl() {
     return m_httpCacheControl;
   }
 
@@ -141,7 +135,7 @@ public class ResourceRequestHandler extends AbstractUiServletRequestHandler {
    * @return index.html for requests on root (empty or /) and also for deep-link requests, for all other requests the
    *         pathInfo from the given request
    */
-  protected String resolveResourcePath(HttpServletRequest req) {
+  protected String resolvePathInfoEx(HttpServletRequest req) {
     String pathInfo = req.getPathInfo();
     if (pathInfo == null) {
       return null;
