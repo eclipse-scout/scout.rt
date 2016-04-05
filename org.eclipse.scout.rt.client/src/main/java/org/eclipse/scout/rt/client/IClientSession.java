@@ -58,7 +58,7 @@ public interface IClientSession extends ISession, IPropertyObserver {
    * @return the public {@link URI} in the browser which hosts this application (typically ending in /index.html or
    *         similar)
    */
-  URI getBrowserURI(); // FIXME awe: (deep-links) merge with IDesktop#getUiBaseUrl
+  URI getBrowserURI();
 
   /**
    * Monitor can be used to wait for changes of the states 'active' and 'loaded'

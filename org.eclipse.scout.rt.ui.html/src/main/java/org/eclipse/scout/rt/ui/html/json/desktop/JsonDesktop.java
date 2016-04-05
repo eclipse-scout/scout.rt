@@ -121,23 +121,43 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
     getModel().getUIFacade().historyEntryActivatedFromUI(deepLinkPath);
   }
 
-  protected void handleUiNavigationVisible(JsonEvent event) {
-    boolean visible = event.getData().getBoolean(IAction.PROP_SELECTED);
-    addPropertyEventFilterCondition(IDesktop.PROP_NAVIGATION_VISIBLE, visible);
-    getModel().getUIFacade().setNavigationVisibleFromUI(visible);
+  @Override
+  protected void handleUiPropertyChange(String propertyName, JSONObject data) {
+    if (IDesktop.PROP_NAVIGATION_VISIBLE.equals(propertyName)) {
+      boolean visible = data.getBoolean(propertyName);
+      addPropertyEventFilterCondition(IDesktop.PROP_NAVIGATION_VISIBLE, visible);
+      getModel().getUIFacade().setNavigationVisibleFromUI(visible);
+    }
+    else if (IDesktop.PROP_BENCH_VISIBLE.equals(propertyName)) {
+      boolean visible = data.getBoolean(propertyName);
+      addPropertyEventFilterCondition(IDesktop.PROP_BENCH_VISIBLE, visible);
+      getModel().getUIFacade().setBenchVisibleFromUI(visible);
+    }
+    else if (IDesktop.PROP_HEADER_VISIBLE.equals(propertyName)) {
+      boolean visible = data.getBoolean(propertyName);
+      addPropertyEventFilterCondition(IDesktop.PROP_HEADER_VISIBLE, visible);
+      getModel().getUIFacade().setHeaderVisibleFromUI(visible);
+    }
   }
 
-  protected void handleUiBenchVisible(JsonEvent event) {
-    boolean visible = event.getData().getBoolean(IAction.PROP_SELECTED);
-    addPropertyEventFilterCondition(IDesktop.PROP_BENCH_VISIBLE, visible);
-    getModel().getUIFacade().setBenchVisibleFromUI(visible);
-  }
-
-  protected void handleUiHeaderVisible(JsonEvent event) {
-    boolean visible = event.getData().getBoolean(IAction.PROP_SELECTED);
-    addPropertyEventFilterCondition(IDesktop.PROP_HEADER_VISIBLE, visible);
-    getModel().getUIFacade().setHeaderVisibleFromUI(visible);
-  }
+// FIXME awe: check with C.GU ... property stuff below looks a bit weird
+//  protected void handleUiNavigationVisible(JsonEvent event) {
+//    boolean visible = event.getData().getBoolean(IAction.PROP_SELECTED);
+//    addPropertyEventFilterCondition(IDesktop.PROP_NAVIGATION_VISIBLE, visible);
+//    getModel().getUIFacade().setNavigationVisibleFromUI(visible);
+//  }
+//
+//  protected void handleUiBenchVisible(JsonEvent event) {
+//    boolean visible = event.getData().getBoolean(IAction.PROP_SELECTED);
+//    addPropertyEventFilterCondition(IDesktop.PROP_BENCH_VISIBLE, visible);
+//    getModel().getUIFacade().setBenchVisibleFromUI(visible);
+//  }
+//
+//  protected void handleUiHeaderVisible(JsonEvent event) {
+//    boolean visible = event.getData().getBoolean(IAction.PROP_SELECTED);
+//    addPropertyEventFilterCondition(IDesktop.PROP_HEADER_VISIBLE, visible);
+//    getModel().getUIFacade().setHeaderVisibleFromUI(visible);
+//  }
 
   protected void handleUiFormActivated(JsonEvent event) {
     String formId = event.getData().optString("formId", null);

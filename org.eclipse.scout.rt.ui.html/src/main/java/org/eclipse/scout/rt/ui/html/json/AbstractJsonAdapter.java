@@ -149,7 +149,27 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
 
   @Override
   public void handleUiEvent(JsonEvent event) {
-    throw new IllegalStateException("Event not handled. " + event);
+    if (JsonEventType.PROPERTY.matches(event)) {
+      handleUiPropertyChange(event);
+    }
+    else {
+      throw new IllegalStateException("Event not handled. " + event);
+    }
+  }
+
+  protected void handleUiPropertyChange(JsonEvent event) {
+    JSONObject data = event.getData();
+    for (String propertyName : data.keySet()) {
+      handleUiPropertyChange(propertyName, data);
+    }
+  }
+
+  /**
+   * Override this method to handle property changes from the UI. You should use the get[Type] methods of the data
+   * JSONObject to retrieve the value. The default impl. does nothing.
+   */
+  protected void handleUiPropertyChange(String propertyName, JSONObject data) {
+
   }
 
   public final <A extends IJsonAdapter<?>, M> A attachAdapter(M model) {

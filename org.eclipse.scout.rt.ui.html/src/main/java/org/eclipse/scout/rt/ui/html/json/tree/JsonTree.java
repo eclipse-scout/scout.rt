@@ -852,18 +852,9 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
     else if (EVENT_NODES_CHECKED.equals(event.getType())) {
       handleUiNodesChecked(event);
     }
-    else if (ITree.PROP_DISPLAY_STYLE.equals(event.getType())) {
-      handleUiDisplayStyleChange(event);
-    }
     else {
       super.handleUiEvent(event);
     }
-  }
-
-  protected void handleUiDisplayStyleChange(JsonEvent event) {
-    String displayStyle = event.getData().getString(ITree.PROP_DISPLAY_STYLE);
-    addPropertyEventFilterCondition(ITree.PROP_DISPLAY_STYLE, displayStyle);
-    getModel().getUIFacade().setDisplayStyleFromUI(displayStyle);
   }
 
   protected void handleUiNodesChecked(JsonEvent event) {
@@ -915,6 +906,15 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
     int eventType = expanded ? TreeEvent.TYPE_NODE_EXPANDED : TreeEvent.TYPE_NODE_COLLAPSED;
     addTreeEventFilterCondition(eventType, CollectionUtility.arrayList(node));
     getModel().getUIFacade().setNodeExpandedFromUI(node, expanded, lazy);
+  }
+
+  @Override
+  protected void handleUiPropertyChange(String propertyName, JSONObject data) {
+    if (ITree.PROP_DISPLAY_STYLE.equals(propertyName)) {
+      String displayStyle = data.getString(ITree.PROP_DISPLAY_STYLE);
+      addPropertyEventFilterCondition(ITree.PROP_DISPLAY_STYLE, displayStyle);
+      getModel().getUIFacade().setDisplayStyleFromUI(displayStyle);
+    }
   }
 
   /**
