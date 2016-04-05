@@ -23,7 +23,8 @@ scout.TabBoxLayout.prototype.layout = function($container) {
     tabAreaWidth = 0,
     tabAreaHeight = 0,
     tabAreaSize = new scout.Dimension(),
-    $status = this._tabBox.$status;
+    $status = this._tabBox.$status,
+    statusPosition = this._tabBox.statusPosition;
 
   containerSize = htmlContainer.getAvailableSize()
     .subtract(htmlContainer.getInsets());
@@ -34,7 +35,9 @@ scout.TabBoxLayout.prototype.layout = function($container) {
     tabAreaWidth = containerSize.subtract(tabAreaMargins).width;
     if ($status && $status.isVisible()) {
       this._layoutStatus();
-      tabAreaWidth -= $status.outerWidth(true);
+      if (statusPosition === scout.FormField.STATUS_POSITION_DEFAULT) {
+        tabAreaWidth -= $status.outerWidth(true);
+      }
     }
     innerTabAreaSize = new scout.Dimension(tabAreaWidth, tabAreaHeight);
     htmlTabArea.setSize(innerTabAreaSize);
@@ -56,13 +59,22 @@ scout.TabBoxLayout.prototype._layoutStatus = function() {
     $tabArea = this._tabBox._$tabArea,
     tabAreaInnerHeight = $tabArea.innerHeight(),
     $status = this._tabBox.$status,
-    statusMargins = scout.graphics.getMargins($status);
+    statusMargins = scout.graphics.getMargins($status),
+    statusTop = top,
+    statusPosition = this._tabBox.statusPosition,
+    statusHeight = tabAreaInnerHeight - statusMargins.vertical();
+
+  if (statusPosition === scout.FormField.STATUS_POSITION_DEFAULT) {
+    statusTop += $tabArea.cssMarginTop();
+  } else {
+    statusHeight -= $status.cssBorderWidthY(); // status has a transparent border to align icon with text
+  }
 
   $status.cssWidth(this._statusWidth)
-    .cssTop(top + $tabArea.cssMarginTop())
+    .cssTop(statusTop)
     .cssRight(right)
-    .cssHeight(tabAreaInnerHeight - statusMargins.vertical())
-    .cssLineHeight(tabAreaInnerHeight - statusMargins.vertical());
+    .cssHeight(statusHeight)
+    .cssLineHeight(statusHeight);
 };
 
 /**

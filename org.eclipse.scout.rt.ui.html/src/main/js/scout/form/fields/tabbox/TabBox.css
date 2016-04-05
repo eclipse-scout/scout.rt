@@ -58,6 +58,29 @@
       }
     }
   }
+
+  & > .status {
+    position: absolute;
+    margin-left: @field-status-margin-left;
+    #scout.status();
+    border-bottom: @tabbox-border-width solid transparent;
+  }
+
+  .tab-box.has-tooltip > & > .status {
+    #scout.tooltip-status();
+  }
+
+  .tab-box.has-info > & > .status {
+    #scout.info-status();
+  }
+
+  .tab-box.has-warning > & > .status {
+    #scout.warning-status();
+  }
+
+  .tab-box.has-error > & > .status {
+    #scout.error-status();
+  }
 }
 
 .tab-item {
@@ -141,6 +164,7 @@
 .overflow-tab-item {
   position: relative;
   display: inline-block;
+  vertical-align: middle;
   text-align: center;
   cursor: pointer;
   padding: 0px 0px;
@@ -148,7 +172,6 @@
   &::before {
     #scout.font-icon();
     position: relative;
-    bottom: -2px;
     font-size: 17px;
     color: @icon-color;
     content: @icon-ellipsis-v;

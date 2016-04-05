@@ -242,8 +242,8 @@ scout.FormField.prototype._updateStatusVisible = function() {
  */
 scout.FormField.prototype._computeStatusVisible = function() {
   var statusVisible = this.statusVisible,
-    hasStatus = !!(this.errorStatus),
-    hasTooltip = this.tooltipText;
+    hasStatus = !!this.errorStatus,
+    hasTooltip = !!this.tooltipText;
 
   return !this.suppressStatus && (statusVisible || hasStatus || hasTooltip || (this._hasMenus() && this.menusVisible));
 };
