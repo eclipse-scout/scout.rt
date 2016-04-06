@@ -48,8 +48,8 @@
     <session-timeout>5</session-timeout>
     <cookie-config>
       <http-only>true</http-only>
-      <!-- TODO: enable 'secure' element below if an encrypted channel (https) is used: -->
-      <!-- <secure>true</secure>  -->
+      <!-- disable 'secure' flag below if an unencrypted channel (no https) is used -->
+      <secure>true</secure>
     </cookie-config>
   </session-config>
 
