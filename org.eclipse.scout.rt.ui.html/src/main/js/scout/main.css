@@ -306,6 +306,11 @@ textarea {
   resize: none;
   /* Override default overflow value 'scroll' in IE */
   overflow: auto;
+
+  /* remove platform specific styling, mainly used to remove shadow on ios safari */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
 }
 
 /* cursor handling */
