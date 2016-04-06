@@ -104,8 +104,45 @@ public class FileUtilityTest {
     assertEquals("application/octet-stream", FileUtility.getMimeType(Paths.get("m4v")));
   }
 
+  /**
+   * Test {@link FileUtility#toValidFilename(String)}.
+   */
   @Test
-  public void testFileMagic() {
+  public void testToValidFilename() {
+    // filename is only changed if necessary
+    assertEquals("document.docx", FileUtility.toValidFilename("document.docx"));
+    assertEquals("()+§#&~¨$¬€.docx", FileUtility.toValidFilename("\\/:()+§#&*?\"<>~¨$¬€|.docx"));
+    assertEquals("愛", FileUtility.toValidFilename("愛"));
+    assertEquals("☃𐒄𐐝𠂊.𠆡", FileUtility.toValidFilename("☃𐒄𐐝𠂊.𠆡"));
+    assertEquals("♕  ☢  ☣  ☠  ☤  ♍  ☀  ♯   . t x t", FileUtility.toValidFilename(" ♕  ☢  ☣  ☠  ☤  ♍  ☀  ♯   . t x t "));
+    assertEquals("♕☢☣☠☤.. . .♍☀♯", FileUtility.toValidFilename(".♕☢☣☠☤.. . .♍☀♯."));
+    assertEquals("_", FileUtility.toValidFilename("*?:"));
+    assertEquals("_", FileUtility.toValidFilename("   "));
+    assertEquals("_", FileUtility.toValidFilename(" . "));
+    assertEquals("_", FileUtility.toValidFilename("..."));
+    assertEquals("_", FileUtility.toValidFilename(". ."));
 
+    // tests from former CoreUtility.cleanStringForFileName
+    assertEquals("_", FileUtility.toValidFilename(" "));
+    assertEquals("_", FileUtility.toValidFilename("\t"));
+    assertEquals("_", FileUtility.toValidFilename("\n"));
+    assertEquals("_", FileUtility.toValidFilename("\n \t"));
+    assertEquals("_", FileUtility.toValidFilename("/"));
+    assertEquals("_", FileUtility.toValidFilename(":"));
+    assertEquals("_", FileUtility.toValidFilename("*"));
+    assertEquals("_", FileUtility.toValidFilename("\\"));
+    assertEquals("_", FileUtility.toValidFilename("?"));
+    assertEquals("_", FileUtility.toValidFilename("\""));
+    assertEquals("_", FileUtility.toValidFilename("?"));
+    assertEquals("_", FileUtility.toValidFilename("<"));
+    assertEquals("_", FileUtility.toValidFilename(">"));
+    assertEquals("_", FileUtility.toValidFilename("|"));
+    assertEquals("test .doc", FileUtility.toValidFilename("test\n \t\\/:*?\"<>|.doc"));
+    assertEquals(
+        "someReallyLongName01234567890123456789.01234567890123456789.01234567890123456789.01234567890123456789.01234567890123456789.01234567890123456789.01234567890123456789.01234567890123456789.01234567890123456789.01234567890123456789.012345678901234567.doc",
+        FileUtility
+            .toValidFilename(
+                "someReallyLongName01234567890123456789.01234567890123456789.01234567890123456789.01234567890123456789.01234567890123456789.01234567890123456789.01234567890123456789.01234567890123456789.01234567890123456789.01234567890123456789.01234567890123456789.01234567890123.doc"));
   }
+
 }
