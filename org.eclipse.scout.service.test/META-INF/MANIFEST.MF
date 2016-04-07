@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Scout Services Test
 Bundle-SymbolicName: org.eclipse.scout.service.test;singleton:=true
-Bundle-Version: 5.0.200.qualifier
+Bundle-Version: 5.0.300.qualifier
 Bundle-Vendor: Eclipse Scout Project
 Fragment-Host: org.eclipse.scout.service
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7

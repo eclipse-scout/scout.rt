@@ -2,11 +2,11 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Scout Extension Client Test Fragment
 Bundle-SymbolicName: org.eclipse.scout.rt.extension.client.test;singleton:=true
-Bundle-Version: 5.0.200.qualifier
+Bundle-Version: 5.0.300.qualifier
 Bundle-Vendor: Eclipse Scout Project
-Fragment-Host: org.eclipse.scout.rt.extension.client;bundle-version="[5.0.200,5.1.0)"
-Require-Bundle: org.eclipse.scout.rt.testing.client;bundle-version="[5.0.200,5.1.0)",
- org.eclipse.scout.rt.client.testenvironment;bundle-version="[5.0.200,5.1.0)"
+Fragment-Host: org.eclipse.scout.rt.extension.client;bundle-version="[5.0.300,5.1.0)"
+Require-Bundle: org.eclipse.scout.rt.testing.client;bundle-version="[5.0.300,5.1.0)",
+ org.eclipse.scout.rt.client.testenvironment;bundle-version="[5.0.300,5.1.0)"
 Import-Package: org.hamcrest.core;version="[1.1.0,2.0.0)",
  org.junit;version="[4.9.0,5.0.0)",
  org.junit.runner;version="[4.9.0,5.0.0)",

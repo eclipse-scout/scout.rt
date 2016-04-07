@@ -2,13 +2,13 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Scout RAP Runtime  Testing
 Bundle-SymbolicName: org.eclipse.scout.rt.testing.ui.rap;singleton:=true
-Bundle-Version: 5.0.200.qualifier
+Bundle-Version: 5.0.300.qualifier
 Bundle-Activator: org.eclipse.scout.rt.testing.ui.rap.Activator
 Bundle-Vendor: Eclipse Scout Project
 Require-Bundle: org.eclipse.core.runtime;bundle-version="[3.6.0,4.0.0)",
- org.eclipse.scout.rt.testing.client;bundle-version="[5.0.200,5.1.0)";visibility:=reexport,
- org.eclipse.scout.rt.testing.shared;bundle-version="[5.0.200,5.1.0)";visibility:=reexport,
- org.eclipse.scout.rt.ui.rap;bundle-version="[5.0.200,5.1.0)";visibility:=reexport
+ org.eclipse.scout.rt.testing.client;bundle-version="[5.0.300,5.1.0)";visibility:=reexport,
+ org.eclipse.scout.rt.testing.shared;bundle-version="[5.0.300,5.1.0)";visibility:=reexport,
+ org.eclipse.scout.rt.ui.rap;bundle-version="[5.0.300,5.1.0)";visibility:=reexport
 Import-Package: com.google.common.base;version="[15.0.0,16.0.0)",
  com.thoughtworks.selenium;version="[2.25.0,3.0.0)",
  org.openqa.selenium;version="[2.25.0,3.0.0)",

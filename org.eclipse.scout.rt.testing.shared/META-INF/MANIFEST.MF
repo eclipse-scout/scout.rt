@@ -2,12 +2,12 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Scout Shared Testing
 Bundle-SymbolicName: org.eclipse.scout.rt.testing.shared;singleton:=true
-Bundle-Version: 5.0.200.qualifier
+Bundle-Version: 5.0.300.qualifier
 Bundle-Activator: org.eclipse.scout.rt.testing.shared.Activator
 Bundle-Vendor: Eclipse Scout Project
 Require-Bundle: org.eclipse.core.runtime;bundle-version="[3.6.0,4.0.0)",
- org.eclipse.scout.rt.shared;bundle-version="[5.0.200,5.1.0)",
- org.eclipse.scout.rt.testing.commons;bundle-version="[5.0.200,5.1.0)"
+ org.eclipse.scout.rt.shared;bundle-version="[5.0.300,5.1.0)",
+ org.eclipse.scout.rt.testing.commons;bundle-version="[5.0.300,5.1.0)"
 Export-Package: org.eclipse.scout.extension,
  org.eclipse.scout.rt.testing.shared,
  org.eclipse.scout.rt.testing.shared.runner,

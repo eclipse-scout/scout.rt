@@ -2,9 +2,9 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Scout Html field using the SWT Browser native component
 Bundle-SymbolicName: org.eclipse.scout.rt.ui.swing.browser.swt.fragment;singleton:=true
-Bundle-Version: 5.0.200.qualifier
+Bundle-Version: 5.0.300.qualifier
 Bundle-Vendor: Eclipse Scout Project
-Fragment-Host: org.eclipse.scout.rt.ui.swing;bundle-version="[5.0.200,5.1.0)"
+Fragment-Host: org.eclipse.scout.rt.ui.swing;bundle-version="[5.0.300,5.1.0)"
 Require-Bundle: org.eclipse.swt;bundle-version="[3.4.0,4.0.0)"
 Export-Package: org.eclipse.scout.rt.ui.swing.form.fields.browserfield,
  org.eclipse.scout.rt.ui.swing.form.fields.browserfield.internal

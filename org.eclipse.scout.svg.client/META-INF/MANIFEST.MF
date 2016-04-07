@@ -2,11 +2,11 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Scout Client SVG Field
 Bundle-SymbolicName: org.eclipse.scout.svg.client;singleton:=true
-Bundle-Version: 5.0.200.qualifier
+Bundle-Version: 5.0.300.qualifier
 Bundle-Vendor: Eclipse Scout Project
 Require-Bundle: org.eclipse.core.runtime;bundle-version="[3.4.0,4.0.0)",
- org.eclipse.scout.commons;bundle-version="[5.0.200,5.1.0)";visibility:=reexport,
- org.eclipse.scout.rt.client;bundle-version="[5.0.200,5.1.0)";visibility:=reexport
+ org.eclipse.scout.commons;bundle-version="[5.0.300,5.1.0)";visibility:=reexport,
+ org.eclipse.scout.rt.client;bundle-version="[5.0.300,5.1.0)";visibility:=reexport
 Export-Package: org.eclipse.scout.svg.client,
  org.eclipse.scout.svg.client.extension.svgfield,
  org.eclipse.scout.svg.client.svgfield

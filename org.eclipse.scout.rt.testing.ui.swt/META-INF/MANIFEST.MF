@@ -2,14 +2,14 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Scout UI SWT Testing
 Bundle-SymbolicName: org.eclipse.scout.rt.testing.ui.swt;singleton:=true
-Bundle-Version: 5.0.200.qualifier
+Bundle-Version: 5.0.300.qualifier
 Bundle-Activator: org.eclipse.scout.rt.testing.ui.swt.Activator
 Bundle-Vendor: Eclipse Scout Project
-Require-Bundle: org.eclipse.scout.rt.testing.shared;bundle-version="[5.0.200,5.1.0)",
- org.eclipse.scout.rt.client;bundle-version="[5.0.200,5.1.0)",
- org.eclipse.scout.rt.ui.swt;bundle-version="[5.0.200,5.1.0)",
- org.eclipse.scout.rt.testing.commons;bundle-version="[5.0.200,5.1.0)",
- org.eclipse.scout.rt.testing.client;bundle-version="[5.0.200,5.1.0)"
+Require-Bundle: org.eclipse.scout.rt.testing.shared;bundle-version="[5.0.300,5.1.0)",
+ org.eclipse.scout.rt.client;bundle-version="[5.0.300,5.1.0)",
+ org.eclipse.scout.rt.ui.swt;bundle-version="[5.0.300,5.1.0)",
+ org.eclipse.scout.rt.testing.commons;bundle-version="[5.0.300,5.1.0)",
+ org.eclipse.scout.rt.testing.client;bundle-version="[5.0.300,5.1.0)"
 Export-Package: org.eclipse.scout.rt.testing.ui.swt
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy

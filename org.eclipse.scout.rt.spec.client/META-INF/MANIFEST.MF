@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Scout Client Specification
 Bundle-SymbolicName: org.eclipse.scout.rt.spec.client;singleton:=true
-Bundle-Version: 5.0.200.qualifier
+Bundle-Version: 5.0.300.qualifier
 Bundle-Activator: org.eclipse.scout.rt.spec.client.internal.Activator
 Bundle-Vendor: Eclipse Scout Project
 Export-Package: org.eclipse.scout.rt.spec.client,
