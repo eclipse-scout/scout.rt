@@ -26,7 +26,7 @@ describe('DesktopNotification', function() {
       parent: parent,
       id: 'foo',
       duration: 123,
-      closeable: true,
+      closable: true,
       status: {
         message: 'bar',
         severity: scout.Status.Severity.OK
@@ -34,17 +34,17 @@ describe('DesktopNotification', function() {
     });
     expect(ntfc.id).toBe('foo');
     expect(ntfc.duration).toBe(123);
-    expect(ntfc.closeable).toBe(true);
+    expect(ntfc.closable).toBe(true);
     expect(ntfc.status.message).toBe('bar');
     expect(ntfc.status.severity).toBe(scout.Status.Severity.OK);
   });
 
-  it('has close-icon when notification is closeable', function() {
+  it('has close-icon when notification is closable', function() {
     var ntfc = scout.create('DesktopNotification', {
       parent: parent,
       id: 'foo',
       duration: 123,
-      closeable: true,
+      closable: true,
       status: {
         message: 'bar',
         severity: scout.Status.Severity.OK

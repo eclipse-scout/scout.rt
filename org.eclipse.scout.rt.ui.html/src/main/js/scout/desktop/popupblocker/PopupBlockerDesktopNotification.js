@@ -8,7 +8,7 @@ scout.PopupBlockerDesktopNotification.prototype._init = function(model) {
   scout.PopupBlockerDesktopNotification.parent.prototype._init.call(this, model);
   this.linkUrl = model.linkUrl;
   this.linkText = this.session.text('ui.OpenManually');
-  this.closeable = true;
+  this.closable = true;
   this.duration = scout.DesktopNotification.INFINITE;
   this.status = {
     message: this.session.text('ui.PopupBlockerDetected'),

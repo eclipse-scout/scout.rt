@@ -541,7 +541,7 @@ scout.Desktop.prototype._goOffline = function() {
   this.offline = true;
   this._offlineNotification = scout.create('DesktopNotification.Offline', {
     parent: this,
-    closeable: false,
+    closable: false,
     duration: scout.DesktopNotification.INFINITE,
     status: {
       message: this.session.text('ui.ConnectionInterrupted'),
@@ -916,7 +916,7 @@ scout.Desktop.prototype._onAddNotification = function(event) {
     id: event.id,
     duration: event.duration,
     status: event.status,
-    closeable: event.closeable
+    closable: event.closable
   }).show();
 };
 

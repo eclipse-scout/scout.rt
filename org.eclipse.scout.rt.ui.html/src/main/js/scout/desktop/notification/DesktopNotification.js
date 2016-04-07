@@ -1,6 +1,6 @@
 scout.DesktopNotification = function() {
   scout.DesktopNotification.parent.call(this);
-  this.closeable = true;
+  this.closable = true;
   this._removeTimeout;
   this._removing = false;
 };
@@ -16,7 +16,7 @@ scout.DesktopNotification.prototype._init = function(model) {
   this.id = model.id;
   this.duration = model.duration;
   this.status = model.status;
-  this.closeable = scout.nvl(model.closeable, true);
+  this.closable = scout.nvl(model.closable, true);
   this.desktop = this.parent;
 };
 
@@ -25,7 +25,7 @@ scout.DesktopNotification.prototype._init = function(model) {
  */
 scout.DesktopNotification.prototype._renderProperties = function() {
   this._renderMessage();
-  this._renderCloseable();
+  this._renderClosable();
 };
 
 scout.DesktopNotification.prototype._render = function($parent) {
@@ -57,8 +57,8 @@ scout.DesktopNotification.prototype._renderMessage = function() {
       this.status.message : '');
 };
 
-scout.DesktopNotification.prototype._renderCloseable = function() {
-  if (this.closeable) {
+scout.DesktopNotification.prototype._renderClosable = function() {
+  if (this.closable) {
     this.$content
       .appendDiv('closer')
       .on('click', this._onCloseIconClick.bind(this));
