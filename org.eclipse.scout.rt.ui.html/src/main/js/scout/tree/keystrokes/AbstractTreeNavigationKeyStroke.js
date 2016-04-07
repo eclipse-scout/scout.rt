@@ -30,6 +30,7 @@ scout.AbstractTreeNavigationKeyStroke.prototype._accept = function(event) {
 
   if (this.field.selectedNodes.length > 0) {
     event._treeCurrentNode = this.field.selectedNodes[0];
+    event._$treeCurrentNode = event._treeCurrentNode.$node;
   }
   return true;
 };
