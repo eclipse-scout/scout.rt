@@ -34,20 +34,6 @@ scout.DatePickerPopup.prototype._render = function($parent) {
 };
 
 /**
- * @override Popup.js
- */
-scout.DatePickerPopup.prototype._onMouseDown = function(event) {
-  // when user clicks on DateField input-field, cannot prevent default
-  // because text-selection would not work anymore
-  if (this.$anchor.isOrHas(event.target)) {
-    return;
-  }
-
-  // or else: clicked somewhere else on the document -> close
-  scout.DatePickerPopup.parent.prototype._onMouseDown.call(this, event);
-};
-
-/**
  * @implements DatePickerPopup
  */
 scout.DatePickerPopup.prototype.getDatePicker = function() {

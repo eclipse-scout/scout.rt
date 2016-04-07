@@ -122,7 +122,7 @@ scout.Button.prototype._remove = function() {
  *          <code>true</code> if the action has been performed or <code>false</code> if it
  *          has not been performed (e.g. when the button is not enabled).
  */
-scout.Button.prototype.doAction = function(event) {
+scout.Button.prototype.doAction = function() {
   if (!this.enabled || !this.visible) {
     return false;
   }
@@ -130,33 +130,34 @@ scout.Button.prototype.doAction = function(event) {
   if (this.displayStyle === scout.Button.DisplayStyle.TOGGLE) {
     this.setSelected(!this.selected);
   } else if (this.menus.length > 0) {
-    this.togglePopup(event);
+    this.togglePopup();
   } else {
     this._send('clicked');
   }
   return true;
 };
 
-scout.Button.prototype.togglePopup = function(event) {
+scout.Button.prototype.togglePopup = function() {
   if (this.popup) {
     this.popup.close();
   } else {
-    this.popup = this._openPopup(event);
+    this.popup = this._openPopup();
     this.popup.on('remove', function(event) {
       this.popup = null;
     }.bind(this));
   }
 };
 
-scout.Button.prototype._openPopup = function(event) {
+scout.Button.prototype._openPopup = function() {
   // FIXME bsh: Improve this
   var popup = scout.create('ContextMenuPopup', {
     parent: this,
     menuItems: this.menus,
     cloneMenuItems: false,
+    closeOnAnchorMousedown: false,
     $anchor: this.$field
   });
-  popup.open(null, event);
+  popup.open();
   return popup;
 };
 scout.Button.prototype._doActionTogglesSubMenu = function() {
@@ -261,6 +262,6 @@ scout.Button.prototype._syncKeyStroke = function(keyStroke) {
 
 scout.Button.prototype._onClick = function(event) {
   if (this.enabled) {
-    this.doAction(event);
+    this.doAction();
   }
 };

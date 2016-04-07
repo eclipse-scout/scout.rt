@@ -43,16 +43,16 @@ scout.FormToolButton.prototype.cloneAdapter = function(modelOverride) {
   var cloneAdapter = scout.FormToolButton.parent.prototype.cloneAdapter.call(this);
   cloneAdapter.formChangeListener = this._handleOriginalFormChange.bind(cloneAdapter);
   this.on('propertyChange', cloneAdapter.formChangeListener);
-  cloneAdapter.visible=false;
+  cloneAdapter.visible = false;
   return cloneAdapter;
 };
 
-scout.FormToolButton.prototype._handleOriginalFormChange = function(event){
-  if(event.newProperties.form){
-    this.form =  this.session.getModelAdapter(event.newProperties.form).cloneAdapter({
+scout.FormToolButton.prototype._handleOriginalFormChange = function(event) {
+  if (event.newProperties.form) {
+    this.form = this.session.getModelAdapter(event.newProperties.form).cloneAdapter({
       parent: this
     });
-  } else if (event.newProperties.form === null){
+  } else if (event.newProperties.form === null) {
     this.form = null;
   }
 };
@@ -61,7 +61,7 @@ scout.FormToolButton.prototype._handleOriginalFormChange = function(event){
  * @override
  */
 scout.FormToolButton.prototype._remove = function() {
-  if(this.cloneOf){
+  if (this.cloneOf) {
     this.cloneOf.off('propertyChange', this.formChangeListener);
   }
   scout.FormToolButton.parent.prototype._remove.call(this);
@@ -91,12 +91,11 @@ scout.FormToolButton.prototype._doActionTogglesPopup = function() {
  */
 scout.FormToolButton.prototype._doAction = function(event) {
   //clones in submenus and contextmenues do not execute any action
-  if(this.formToolButton.form.cloneOf){
+  if (this.formToolButton.form.cloneOf) {
     return false;
   }
-  scout.FormToolButton.parent.prototype._doAction.call(this,event);
+  scout.FormToolButton.parent.prototype._doAction.call(this, event);
 };
-
 
 /**
  * @override
@@ -114,7 +113,7 @@ scout.FormToolButtonActionKeyStroke = function(action) {
 scout.inherits(scout.FormToolButtonActionKeyStroke, scout.ActionKeyStroke);
 
 scout.FormToolButtonActionKeyStroke.prototype.handle = function(event) {
-  this.field.toggle(event);
+  this.field.toggle();
 };
 
 scout.FormToolButtonActionKeyStroke.prototype._postRenderKeyBox = function($drawingArea) {

@@ -395,11 +395,15 @@ scout.FormField.prototype.setMenusVisible = function(menusVisible) {
 };
 
 scout.FormField.prototype._onStatusMousedown = function(event) {
+  // showing menus is more important than showing tooltips
   if (this.menusVisible && this._hasMenus()) {
     var func = function func(event) {
       var menus = this._getCurrentMenus();
-      // showing menus is more important than showing tooltips
-      if (!this.contextPopup || !this.contextPopup.rendered) {
+      // Toggle menu
+      if (this.contextPopup && this.contextPopup.rendered) {
+        this.contextPopup.close();
+        this.contextPopup = null;
+      } else {
         if (!menus.some(function(menuItem) {
             return menuItem.visible;
           })) {
@@ -407,11 +411,12 @@ scout.FormField.prototype._onStatusMousedown = function(event) {
         }
         this.contextPopup = scout.create('ContextMenuPopup', {
           parent: this,
+          $anchor: this.$status,
           menuItems: menus,
           cloneMenuItems: false,
-          $anchor: this.$status
+          closeOnAnchorMousedown: false
         });
-        this.contextPopup.open(undefined, event);
+        this.contextPopup.open();
       }
     }.bind(this);
 

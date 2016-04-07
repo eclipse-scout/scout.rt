@@ -69,6 +69,7 @@ scout.SmartField.prototype.addPopup = function() {
       parent: this,
       $anchor: this.$field,
       boundToAnchor: !this.touch,
+      closeOnAnchorMousedown: false,
       field: this
     });
   }

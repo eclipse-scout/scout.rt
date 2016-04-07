@@ -87,8 +87,8 @@ scout.NavigateButton.prototype._setDetailVisible = function() {
 /**
  * @override Menu.js
  */
-scout.NavigateButton.prototype.doAction = function(event) {
-  if (!this.prepareDoAction(event)) {
+scout.NavigateButton.prototype.doAction = function() {
+  if (!this.prepareDoAction()) {
     return false;
   }
   this._onClickFunc();

@@ -368,15 +368,6 @@ scout.ContextMenuPopup.prototype._remove = function() {
   scout.ContextMenuPopup.parent.prototype._remove.call(this);
 };
 
-scout.ContextMenuPopup.prototype.close = function(event) {
-  if ((event && this.openEvent && event.originalEvent !== this.openEvent.originalEvent) || !event || !this.openEvent) {
-    if (this.$container) {
-      this.$container.stop(true);
-    }
-    scout.ContextMenuPopup.parent.prototype.close.call(this, event);
-  }
-};
-
 /**
  * @override PopupWithHead.js
  */

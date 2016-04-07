@@ -49,6 +49,7 @@ scout.Menu.prototype._render = function($parent) {
     this._renderItem($parent);
   }
   this.$container.unfocusable();
+  this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
 };
 
 scout.Menu.prototype._remove = function() {
@@ -83,7 +84,7 @@ scout.Menu.prototype._renderItem = function($parent) {
   }
 };
 
-scout.Menu.prototype._renderSelected = function(event) {
+scout.Menu.prototype._renderSelected = function() {
   if (!this._doActionTogglesPopup()) {
     scout.Menu.parent.prototype._renderSelected.call(this);
   }
@@ -91,13 +92,13 @@ scout.Menu.prototype._renderSelected = function(event) {
     if (this._doActionTogglesSubMenu()) {
       this._renderSubMenuItems(this, this.childActions);
     } else if (this._doActionTogglesPopup()) {
-      this._openPopup(event);
+      this._openPopup();
     }
   } else {
     if (this._doActionTogglesSubMenu() && this.rendered) {
       this._removeSubMenuItems(this);
     } else {
-      this._closePopup(event);
+      this._closePopup();
       this._closeSubMenues();
     }
   }
@@ -149,9 +150,9 @@ scout.Menu.prototype._onMouseEvent = function(event) {
   // the impression of a faster UI, open the popup already on 'mousedown', not
   // on 'click'. All other actions are handled on 'click'.
   if (event.type === 'mousedown' && this._doActionTogglesPopup()) {
-    this.doAction(event);
+    this.doAction();
   } else if ((event.type === 'click' || event.type === 'contextmenu') && !this._doActionTogglesPopup()) {
-    this.doAction(event);
+    this.doAction();
   }
 };
 
@@ -169,11 +170,18 @@ scout.Menu.prototype._renderText = function(text) {
     this.$submenuIcon.appendTo(this.$container);
   }
   this._updateIconAndTextStyle();
+  this.invalidateLayoutTree();
 };
 
 scout.Menu.prototype._renderIconId = function() {
   scout.Menu.parent.prototype._renderIconId.call(this);
   this._updateIconAndTextStyle();
+  this.invalidateLayoutTree();
+};
+
+scout.Menu.prototype._renderVisible = function() {
+  scout.Menu.parent.prototype._renderVisible.call(this);
+  this.invalidateLayoutTree();
 };
 
 scout.Menu.prototype.isTabTarget = function() {
@@ -187,25 +195,19 @@ scout.Menu.prototype._updateIconAndTextStyle = function() {
   this.$container.toggleClass('menu-icononly', !hasText);
 };
 
-scout.Menu.prototype._closePopup = function(event) {
+scout.Menu.prototype._closePopup = function() {
   if (this.popup) {
-    this.popup.close(event);
+    this.popup.close();
   }
 };
 
-/**
- * @param event
- *          UI event that triggered the popup (e.g. 'mouse clicked'). This argument
- *          is passed to the MenuBarPopup  as 'ignoreEvent'. It prevents the popup
- *          from being closed again by the same event that bubbled to other elements.
- */
-scout.Menu.prototype._openPopup = function(event) {
+scout.Menu.prototype._openPopup = function() {
   if (this.popup) {
     // already open
     return;
   }
-  this.popup = this._createPopup(event);
-  this.popup.open(null, event);
+  this.popup = this._createPopup();
+  this.popup.open();
   this.popup.on('remove', function(event) {
     this.popup = null;
   }.bind(this));

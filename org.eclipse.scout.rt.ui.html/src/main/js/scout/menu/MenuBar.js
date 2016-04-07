@@ -41,14 +41,10 @@ scout.MenuBar = function() {
     // because the layout calls rebuildItemsInternal().
     if (event.changedProperties.length > 0) {
       if (event.changedProperties.length === 1 && event.changedProperties[0] === 'enabled') {
-        // Optimization: don't invalidate layout when only the enabled state has changed (this should not affect the layout).
         this.updateDefaultMenu();
-        return;
-      }
-      if (event.changedProperties.indexOf('visible') > -1) {
+      } else if (event.changedProperties.indexOf('visible') > -1) {
         this.updateVisibility();
       }
-      this.invalidateLayoutTree();
     }
   }.bind(this);
 };
