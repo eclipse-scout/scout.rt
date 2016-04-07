@@ -26,6 +26,7 @@ import org.eclipse.scout.rt.platform.context.CorrelationId;
 import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
+import org.eclipse.scout.rt.server.commons.authentication.SessionCookieValidator;
 import org.eclipse.scout.rt.server.commons.context.ServletRunContext;
 import org.eclipse.scout.rt.server.commons.context.ServletRunContexts;
 import org.eclipse.scout.rt.server.commons.servlet.HttpServletControl;
@@ -52,10 +53,14 @@ public class UiServlet extends HttpServlet {
 
   private final P_AbstractRequestHandler m_requestHandlerGet;
   private final P_AbstractRequestHandler m_requestHandlerPost;
+  private final HttpServletControl m_httpServletControl;
+  private final SessionCookieValidator m_sessionCookieValidator;
 
   public UiServlet() {
     m_requestHandlerGet = createRequestHandlerGet();
     m_requestHandlerPost = createRequestHandlerPost();
+    m_httpServletControl = BEANS.get(HttpServletControl.class);
+    m_sessionCookieValidator = BEANS.get(SessionCookieValidator.class);
   }
 
   protected P_AbstractRequestHandler createRequestHandlerGet() {
@@ -78,7 +83,7 @@ public class UiServlet extends HttpServlet {
 
   @Override
   protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
-    BEANS.get(HttpServletControl.class).doDefaults(this, req, resp);
+    m_httpServletControl.doDefaults(this, req, resp);
     try {
       createServletRunContext(req, resp).run(new IRunnable() {
         @Override
@@ -91,11 +96,14 @@ public class UiServlet extends HttpServlet {
       LOG.error("Failed to process HTTP-GET request from UI", e);
       resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
     }
+    finally {
+      m_sessionCookieValidator.validate(req, resp);
+    }
   }
 
   @Override
   protected void doPost(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
-    BEANS.get(HttpServletControl.class).doDefaults(this, req, resp);
+    m_httpServletControl.doDefaults(this, req, resp);
     try {
       createServletRunContext(req, resp).run(new IRunnable() {
         @Override
@@ -107,6 +115,9 @@ public class UiServlet extends HttpServlet {
     catch (Exception e) {
       LOG.error("Failed to process HTTP-POST request from UI", e);
       resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+    }
+    finally {
+      m_sessionCookieValidator.validate(req, resp);
     }
   }
 

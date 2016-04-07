@@ -91,7 +91,7 @@ public class CookieAccessController implements IAccessController {
     if (p == null) {
       p = loadPrincipalFromCookie(req);
       if (p != null) {
-        helper.putPrincipalOnSession(req, p);
+        helper.putPrincipalOnSession(req, resp, p);
         return false;
       }
     }
