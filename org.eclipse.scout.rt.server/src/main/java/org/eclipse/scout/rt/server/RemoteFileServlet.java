@@ -153,9 +153,6 @@ public class RemoteFileServlet extends HttpServlet {
   private boolean writeResource(final HttpServletRequest req, final HttpServletResponse resp, final String resourcePath) throws IOException {
     IRemoteFileService rfs = BEANS.get(getConfiguredRemoteFileServiceClass());
     RemoteFile spec = new RemoteFile((resourcePath == null) ? null : StringUtility.join("", m_folder, resourcePath), -1);
-    // FIXME imo: handle correctly when binary resource supports direct reading from file
-    // getRemoteFileHeader was used, resulting in a NPE when calling toBinaryResource()
-    // because extractData uses m_compressedData which is null
     RemoteFile remoteFile = rfs.getRemoteFile(spec);
     if (!remoteFile.exists()) {
       return false;
