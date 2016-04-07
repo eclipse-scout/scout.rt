@@ -60,7 +60,7 @@ scout.DesktopNotification.prototype._renderMessage = function() {
 scout.DesktopNotification.prototype._renderCloseable = function() {
   if (this.closeable) {
     this.$content
-      .appendDiv('close')
+      .appendDiv('closer')
       .on('click', this._onCloseIconClick.bind(this));
   }
 };

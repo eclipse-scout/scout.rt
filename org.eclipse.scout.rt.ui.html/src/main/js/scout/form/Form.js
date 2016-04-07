@@ -84,7 +84,7 @@ scout.Form.prototype._renderForm = function($parent) {
 
     if (this.closable) {
       this.$container
-        .appendDiv('closable')
+        .appendDiv('closer')
         .on('click', this.close.bind(this));
     }
     var $myWindow = this.$container.window();

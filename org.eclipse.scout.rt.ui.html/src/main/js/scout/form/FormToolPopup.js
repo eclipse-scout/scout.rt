@@ -21,7 +21,6 @@ scout.FormToolPopup.prototype._init = function(options) {
   this.$formToolButton = this.formToolButton.$container;
   this.$headBlueprint = this.$formToolButton;
   this.form = this.formToolButton.form;
-  this.form.rootGroupBox.menuBar.bottom();
 };
 
 scout.FormToolPopup.prototype._createLayout = function() {

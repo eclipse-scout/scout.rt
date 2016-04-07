@@ -71,6 +71,17 @@ scout.FormToolButton.prototype._remove = function() {
  * @override
  */
 scout.FormToolButton.prototype._createPopup = function() {
+  // Menu bar should always be on the bottom
+  this.form.rootGroupBox.menuBar.bottom();
+
+  if (this.session.userAgent.deviceType === scout.Device.Type.MOBILE) {
+    return scout.create('MobilePopup', {
+      parent: this,
+      widget: this.form,
+      title: this.form.title
+    });
+  }
+
   return scout.create('FormToolPopup', {
     parent: this,
     formToolButton: this,

@@ -359,6 +359,21 @@ button::-moz-focus-inner {
   cursor: move;
 }
 
+.closer {
+  #scout.font-icon();
+  font-size: 17px;
+  cursor: pointer;
+  color: @icon-light-color;
+
+  &::before {
+    content: @icon-remove;
+  }
+
+  &:hover {
+    color: @hover-color;
+  }
+}
+
 /* Used to display errors from server when desktop is not available */
 .fatal-error {
   margin: 10px;

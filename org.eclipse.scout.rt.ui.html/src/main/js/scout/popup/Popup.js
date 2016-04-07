@@ -387,7 +387,7 @@ scout.Popup.prototype.setLocation = function(location) {
  * Popups with an anchor must only be visible if the anchor is in view (prevents that the popup points at an invisible anchor)
  */
 scout.Popup.prototype._validateVisibility = function() {
-  if (this.boundToAnchor && !this.$anchor) {
+  if (!this.boundToAnchor || !this.$anchor) {
     return;
   }
   var inView = this._isInView();
@@ -399,7 +399,7 @@ scout.Popup.prototype._validateVisibility = function() {
 };
 
 scout.Popup.prototype._isInView = function() {
-  if (this.boundToAnchor && !this.$anchor) {
+  if (!this.boundToAnchor || !this.$anchor) {
     return;
   }
   var anchorBounds = this.getAnchorBounds();

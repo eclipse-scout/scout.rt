@@ -251,6 +251,10 @@ scout.Point.prototype.equals = function(o) {
   return (this.x === o.x && this.y === o.y);
 };
 
+scout.Point.prototype.clone = function(o) {
+  return new scout.Point(this.x, this.y);
+};
+
 /**
  * JavaScript port from java.awt.Dimension.
  * @param vararg width (number) or otherDimension (scout.Dimension)
@@ -275,6 +279,10 @@ scout.Dimension.prototype.equals = function(o) {
     return false;
   }
   return (this.width === o.width && this.height === o.height);
+};
+
+scout.Dimension.prototype.clone = function() {
+  return new scout.Dimension(this.width, this.height);
 };
 
 scout.Dimension.prototype.subtract = function(insets) {
@@ -308,6 +316,10 @@ scout.Rectangle.prototype.equals = function(o) {
 
 scout.Rectangle.prototype.toString = function() {
   return 'Rectangle[x=' + this.x + ' y=' + this.y + ' width=' + this.width + ' height=' + this.height + ']';
+};
+
+scout.Rectangle.prototype.clone = function(o) {
+  return new scout.Rectangle(this.x, this.y, this.width, this.height);
 };
 
 scout.Rectangle.prototype.center = function() {
@@ -404,6 +416,10 @@ scout.Insets.prototype.vertical = function() {
 
 scout.Insets.prototype.toString = function() {
   return 'Insets[top=' + this.top + ' right=' + this.right + ' bottom=' + this.bottom + ' left=' + this.left + ']';
+};
+
+scout.Insets.prototype.clone = function() {
+  return new scout.Insets(this.top, this.right, this.bottom, this.left);
 };
 
 /**

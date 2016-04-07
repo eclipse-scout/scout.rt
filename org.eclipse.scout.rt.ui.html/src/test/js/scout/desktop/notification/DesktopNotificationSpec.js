@@ -51,7 +51,7 @@ describe('DesktopNotification', function() {
       }
     });
     ntfc.render($sandbox);
-    expect(ntfc.$container.find('.close').length).toBe(1);
+    expect(ntfc.$container.find('.closer').length).toBe(1);
     expect(ntfc.$container.find('.notification-content').text()).toBe('bar');
     expect(ntfc.$container.hasClass('ok')).toBe(true);
   });
