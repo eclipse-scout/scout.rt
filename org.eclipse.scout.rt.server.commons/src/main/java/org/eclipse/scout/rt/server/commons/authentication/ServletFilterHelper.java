@@ -39,7 +39,6 @@ public class ServletFilterHelper {
   private static final Logger LOG = LoggerFactory.getLogger(ServletFilterHelper.class);
 
   public static final String SESSION_ATTRIBUTE_FOR_PRINCIPAL = Principal.class.getName();
-
   public static final String HTTP_HEADER_WWW_AUTHENTICATE = "WWW-Authenticate";
   public static final String HTTP_HEADER_AUTHORIZATION = "Authorization";
   public static final String HTTP_HEADER_AUTHORIZED = "Authorized";
@@ -65,6 +64,11 @@ public class ServletFilterHelper {
 
   /**
    * put a principal to the {@link HttpSession} as {@link #SESSION_ATTRIBUTE_FOR_PRINCIPAL}
+   *
+   * @param req
+   *          The request holding the {@link HttpSession} on which the principal should be stored.
+   * @param principal
+   *          The principal to put on the session of the given request.
    */
   public void putPrincipalOnSession(HttpServletRequest req, Principal principal) {
     HttpSession session = req.getSession();

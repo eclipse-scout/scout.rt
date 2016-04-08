@@ -36,10 +36,12 @@ import org.slf4j.LoggerFactory;
 public class ContentSecurityPolicyReportHandler extends AbstractUiServletRequestHandler {
   private static final Logger LOG = LoggerFactory.getLogger(ContentSecurityPolicyReportHandler.class);
 
+  private static final String HANDLER_PATH = "/csp.cgi";
+
   @Override
   public boolean handlePost(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
     //serve only /csp
-    if (!CompareUtility.equals("/csp.cgi", req.getPathInfo())) {
+    if (!CompareUtility.equals(HANDLER_PATH, req.getPathInfo())) {
       return false;
     }
     final String jsonData = IOUtility.getContent(req.getReader());

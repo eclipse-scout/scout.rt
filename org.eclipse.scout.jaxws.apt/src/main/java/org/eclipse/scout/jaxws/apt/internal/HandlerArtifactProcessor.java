@@ -25,7 +25,6 @@ import javax.annotation.processing.ProcessingEnvironment;
 import javax.jws.HandlerChain;
 import javax.tools.StandardLocation;
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.ws.handler.LogicalHandler;
 import javax.xml.ws.handler.LogicalMessageContext;
 import javax.xml.ws.handler.MessageContext;
@@ -207,7 +206,7 @@ public class HandlerArtifactProcessor {
   }
 
   protected String createAndPersistHandlerXmlFile(final JClass portTypeEntryPoint, final EntryPointDefinition entryPointDefinition, final List<String> handlers, final Filer filer) throws Exception {
-    final DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+    final DocumentBuilder builder = XmlUtility.newDocumentBuilder();
 
     // Create the comment.
     final StringWriter comment = new StringWriter();

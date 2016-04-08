@@ -48,7 +48,9 @@ public class JsonTabBoxTest {
     UiSessionMock uiSession = new UiSessionMock();
     m_tabBoxModel = Mockito.mock(ITabBox.class);
     m_groupBox1 = Mockito.mock(IGroupBox.class);
+    Mockito.when(m_groupBox1.isVisibleGranted()).thenReturn(true);
     m_groupBox2 = Mockito.mock(IGroupBox.class);
+    Mockito.when(m_groupBox2.isVisibleGranted()).thenReturn(true);
     m_uiFacade = Mockito.mock(ITabBoxUIFacade.class);
     Mockito.when(m_tabBoxModel.getGroupBoxes()).thenReturn(Arrays.asList(m_groupBox1, m_groupBox2));
     Mockito.when(m_tabBoxModel.getUIFacade()).thenReturn(m_uiFacade);

@@ -16,6 +16,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerConfigurationException;
 
 import org.apache.batik.util.SVGConstants;
 import org.eclipse.scout.rt.platform.util.XmlUtility;
@@ -70,6 +71,18 @@ public class SVGUtilityTest {
     d2.normalizeDocument();
 
     return d1.isEqualNode(d2);
+  }
+
+  /**
+   * Batik which is used for SVG includes its own XML factories (e.g. xalan). Also test the XmlUtility methods using
+   * these factories.
+   */
+  @Test
+  public void testXmlUtilityWithBatikClasspath() throws ParserConfigurationException, SAXException, TransformerConfigurationException {
+    Assert.assertNotNull(XmlUtility.newDocumentBuilder());
+    Assert.assertNotNull(XmlUtility.newSAXParser());
+    Assert.assertNotNull(XmlUtility.newTransformer());
+    Assert.assertNotNull(XmlUtility.newXMLInputFactory());
   }
 
   @Test

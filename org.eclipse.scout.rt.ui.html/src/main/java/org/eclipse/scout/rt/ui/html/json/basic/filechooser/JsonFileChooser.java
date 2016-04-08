@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.basic.filechooser;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -18,8 +17,8 @@ import java.util.Set;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.FileChooserEvent;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.FileChooserListener;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
-import org.eclipse.scout.rt.platform.util.FileUtility;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
@@ -68,20 +67,15 @@ public class JsonFileChooser<FILE_CHOOSER extends IFileChooser> extends Abstract
   public JSONObject toJson() {
     JSONObject json = super.toJson();
     putProperty(json, "multiSelect", getModel().isMultiSelect());
-    putProperty(json, "contentTypes", new JSONArray(getFileExtensionsAsContentTypes()));
+    putProperty(json, "acceptTypes", new JSONArray(collectAcceptTypes()));
     putProperty(json, "maximumUploadSize", getModel().getMaximumUploadSize());
     return json;
   }
 
-  protected Set<String> getFileExtensionsAsContentTypes() {
-    Set<String> contentTypes = new HashSet<>();
-    for (String extension : getModel().getFileExtensions()) {
-      String contentType = FileUtility.getContentTypeForExtension(extension);
-      if (contentType != null) {
-        contentTypes.add(contentType);
-      }
-    }
-    return contentTypes;
+  protected Set<String> collectAcceptTypes() {
+    return BEANS.get(JsonFileChooserAcceptAttributeBuilder.class)
+        .withTypes(getModel().getFileExtensions())
+        .build();
   }
 
   protected void handleModelFileChooserEvent(FileChooserEvent event) {
