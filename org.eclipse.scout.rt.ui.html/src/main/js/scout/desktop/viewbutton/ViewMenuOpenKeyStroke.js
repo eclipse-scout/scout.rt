@@ -28,7 +28,7 @@ scout.inherits(scout.ViewMenuOpenKeyStroke, scout.KeyStroke);
  * @override KeyStroke.js
  */
 scout.ViewMenuOpenKeyStroke.prototype.handle = function(event) {
-  this.field.doViewMenuAction(event);
+  this.field.doViewMenuAction();
 };
 
 scout.ViewMenuOpenKeyStroke.prototype._postRenderKeyBox = function($drawingArea) {

@@ -74,8 +74,8 @@ scout.ViewButtons.prototype._viewButtons = function(displayStyle) {
   return viewButtons;
 };
 
-scout.ViewButtons.prototype.doViewMenuAction = function(event) {
-  this.viewMenuTab.togglePopup(event);
+scout.ViewButtons.prototype.doViewMenuAction = function() {
+  this.viewMenuTab.togglePopup();
 };
 
 scout.ViewButtons.prototype.sendToBack = function() {
