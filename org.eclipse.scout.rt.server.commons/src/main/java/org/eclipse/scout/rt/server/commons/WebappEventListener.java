@@ -35,13 +35,16 @@ public class WebappEventListener implements ServletContextListener {
 
   @Override
   public void contextInitialized(ServletContextEvent sce) {
-    ServletContextRegistration.servletContext = sce.getServletContext();
+    ServletContext servletContext = sce.getServletContext();
+    ServletContextRegistration.servletContext = servletContext;
+
     // Accessing the class activates the platform if it is not yet initialized
     IPlatform platform = Platform.get();
     platform.awaitPlatformStarted();
+
     //double check
     if (BEANS.opt(ServletContext.class) == null) {
-      BEANS.getBeanManager().registerBean(new BeanMetaData(ServletContext.class, sce.getServletContext()).withApplicationScoped(true));
+      registerServletContext(BEANS.getBeanManager(), servletContext);
     }
   }
 
@@ -54,14 +57,18 @@ public class WebappEventListener implements ServletContextListener {
     }
   }
 
+  protected static void registerServletContext(IBeanManager manager, ServletContext servletContext) {
+    manager.registerBean(new BeanMetaData(ServletContext.class, servletContext).withApplicationScoped(true));
+  }
+
   public static final class ServletContextRegistration implements IPlatformListener {
-    private static ServletContext servletContext;
+    private static volatile ServletContext servletContext;
 
     @Override
     public void stateChanged(PlatformEvent event) {
       switch (event.getState()) {
         case BeanManagerPrepared: {
-          event.getSource().getBeanManager().registerBean(new BeanMetaData(ServletContext.class, servletContext).withApplicationScoped(true));
+          registerServletContext(event.getSource().getBeanManager(), servletContext);
           break;
         }
       }
