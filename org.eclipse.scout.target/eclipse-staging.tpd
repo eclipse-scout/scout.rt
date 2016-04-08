@@ -4,7 +4,7 @@ include "_eclipse-orbit.tpd"
 include "_eclipse-rap.tpd"
 include "_eclipse-testing_license.tpd"
 
-location eclipse_maintenance "http://download.eclipse.org/eclipse/updates/4.5/R-4.5.2-201602121500" {
+location eclipse_maintenance "http://download.eclipse.org/releases/mars" {
   org.eclipse.platform.feature.group lazy
   org.eclipse.platform.source.feature.group lazy
   org.eclipse.pde.feature.group lazy
