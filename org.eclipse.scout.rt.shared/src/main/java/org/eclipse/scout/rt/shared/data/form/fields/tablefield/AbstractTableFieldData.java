@@ -20,12 +20,9 @@ public abstract class AbstractTableFieldData extends AbstractFormFieldData imple
 
   private ArrayList<Object[]> m_rowList = new ArrayList<Object[]>();
 
-  public AbstractTableFieldData() {
-  }
-
   @Override
-  protected void initConfig() {
-    super.initConfig();
+  public Class<?> getFieldStopClass() {
+    return AbstractTableFieldData.class;
   }
 
   @Override

@@ -23,8 +23,9 @@ public abstract class AbstractBrowserFieldData extends AbstractFormFieldData imp
   private BinaryResource m_binaryResource;
   private Set<BinaryResource> m_attachments;
 
-  public AbstractBrowserFieldData() {
-    super();
+  @Override
+  public Class<?> getFieldStopClass() {
+    return AbstractBrowserFieldData.class;
   }
 
   public String getLocation() {
@@ -33,6 +34,7 @@ public abstract class AbstractBrowserFieldData extends AbstractFormFieldData imp
 
   public void setLocation(String location) {
     m_location = location;
+    setValueSet(true);
   }
 
   public BinaryResource getBinaryResource() {
@@ -41,6 +43,7 @@ public abstract class AbstractBrowserFieldData extends AbstractFormFieldData imp
 
   public void setBinaryResource(BinaryResource binaryResource) {
     m_binaryResource = binaryResource;
+    setValueSet(true);
   }
 
   public Set<BinaryResource> getAttachments() {
@@ -49,5 +52,6 @@ public abstract class AbstractBrowserFieldData extends AbstractFormFieldData imp
 
   public void setAttachments(Set<BinaryResource> attachments) {
     m_attachments = attachments;
+    setValueSet(true);
   }
 }

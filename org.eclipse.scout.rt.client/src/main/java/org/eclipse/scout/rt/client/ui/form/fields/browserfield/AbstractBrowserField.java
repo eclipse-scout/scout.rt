@@ -34,8 +34,10 @@ import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.annotations.Internal;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
+import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CompareUtility;
 import org.eclipse.scout.rt.platform.util.EventListenerList;
+import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 import org.eclipse.scout.rt.shared.data.form.fields.browserfield.AbstractBrowserFieldData;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 import org.slf4j.Logger;
@@ -120,6 +122,30 @@ public abstract class AbstractBrowserField extends AbstractFormField implements 
     setScrollBarEnabled(getConfiguredScrollBarEnabled());
     setSandboxEnabled(getConfiguredSandboxEnabled());
     setSandboxPermissions(getConfiguredSandboxPermissions());
+  }
+
+  @Override
+  public void importFormFieldData(AbstractFormFieldData source, boolean valueChangeTriggersEnabled) {
+    Assertions.assertNotNull(source);
+    AbstractBrowserFieldData fd = (AbstractBrowserFieldData) source;
+
+    if (source.isValueSet()) {
+      try {
+        if (!valueChangeTriggersEnabled) {
+          setValueChangeTriggerEnabled(false);
+        }
+
+        setLocationInternal(fd.getLocation());
+        setBinaryResourceInternal(fd.getBinaryResource());
+        setAttachmentsInternal(fd.getAttachments());
+        fireContentChanged();
+      }
+      finally {
+        if (!valueChangeTriggersEnabled) {
+          setValueChangeTriggerEnabled(true);
+        }
+      }
+    }
   }
 
   @Override
