@@ -42,7 +42,7 @@ public class ServletConnection extends WSHTTPConnection {
   private final HttpServletResponse m_response;
   private final ServletContext m_context;
   private final WebServiceContextDelegate m_contextDelegate;
-  private int m_status;
+  private int m_status = HttpServletResponse.SC_OK;
 
   private final Map<String, List<String>> m_responseHeaderMap;
 
@@ -75,7 +75,12 @@ public class ServletConnection extends WSHTTPConnection {
 
   @Override
   public void setStatus(int status) {
-    m_status = status;
+    if (status > 0) {
+      m_status = status;
+    }
+    else {
+      throw new IllegalArgumentException("Invalid status code: " + status);
+    }
   }
 
   @Override
