@@ -92,7 +92,7 @@ public class ScriptProcessor implements AutoCloseable {
   }
 
   protected boolean obfuscateJS() {
-    return false;
+    return true;
   }
 
   protected String runInClassLoader(ClassLoader loader, String classname, Class<?>[] types, Object[] args) throws IOException {
