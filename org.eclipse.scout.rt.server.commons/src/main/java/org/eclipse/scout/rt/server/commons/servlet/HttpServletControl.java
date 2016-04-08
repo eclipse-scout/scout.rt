@@ -29,6 +29,9 @@ public class HttpServletControl {
   public static final String HTTP_HEADER_X_FRAME_OPTIONS = "X-Frame-Options";
   public static final String SAMEORIGIN = "SAMEORIGIN";
 
+  public static final String HTTP_HEADER_X_XSS_PROTECTION = "X-XSS-Protection";
+  public static final String XSS_MODE_BLOCK = "1; mode=block";
+
   public static final String HTTP_HEADER_CSP = "Content-Security-Policy";//final version, mozilla und firefox
   public static final String HTTP_HEADER_CSP_LEGACY_CHROME = "X-WebKit-CSP";//chrome
   public static final String HTTP_HEADER_CSP_LEGACY_IE = "X-Content-Security-Policy";//ie
@@ -50,6 +53,7 @@ public class HttpServletControl {
 
   protected void setResponseHeaders(HttpServlet servlet, HttpServletRequest req, HttpServletResponse resp) {
     resp.setHeader(HTTP_HEADER_X_FRAME_OPTIONS, SAMEORIGIN);
+    resp.setHeader(HTTP_HEADER_X_XSS_PROTECTION, XSS_MODE_BLOCK);
     resp.setHeader(HTTP_HEADER_CSP, cspRule());
     resp.setHeader(HTTP_HEADER_CSP_LEGACY_IE, cspRule());
     resp.setHeader(HTTP_HEADER_CSP_LEGACY_CHROME, cspRule());
