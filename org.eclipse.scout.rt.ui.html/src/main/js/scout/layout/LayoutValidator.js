@@ -76,7 +76,11 @@ scout.LayoutValidator.prototype.validate = function() {
   }, this);
 };
 
-scout.LayoutValidator.prototype.cleanupInvalidObjects = function($parentContainer){
+/**
+ * Removes those components from this._invalidComponents which have the given container as ancestor.
+ * The idea is to remove all components whose ancestor is about to be removed from the DOM.
+ */
+scout.LayoutValidator.prototype.cleanupInvalidComponents = function($parentContainer){
   this._invalidComponents.slice().forEach(function(comp){
     if (comp.$comp.closest($parentContainer).length > 0){
       scout.arrays.remove(this._invalidComponents, comp);

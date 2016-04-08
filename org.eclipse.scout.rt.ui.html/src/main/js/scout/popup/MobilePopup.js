@@ -22,7 +22,8 @@ scout.MobilePopup.prototype._init = function(options) {
     boundToAnchor: false,
     windowPaddingX: 0,
     windowPaddingY: 0,
-    closable: true
+    closable: true,
+    animateRemoval: true
   };
   $.extend(this, defaults, options);
 };

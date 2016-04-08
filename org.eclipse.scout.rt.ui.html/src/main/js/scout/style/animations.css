@@ -95,9 +95,9 @@
   @-webkit-keyframes fadeOut { .keyframes-fade-out(); }
   @keyframes fadeOut { .keyframes-fade-out(); }
 
-  /*** Fade In Top ***/
+  /*** Fade with Short Drop ***/
 
-  .keyframes-fade-slidein-top() {
+  .keyframes-fade-short-drop() {
     0% {
       margin-top: -40px;
       opacity: 0;
@@ -112,8 +112,32 @@
     }
   }
 
-  @-webkit-keyframes fade-slidein-top { .keyframes-fade-slidein-top(); }
-  @keyframes fade-slidein-top { .keyframes-fade-slidein-top(); }
+  @-webkit-keyframes fade-short-drop { .keyframes-fade-short-drop(); }
+  @keyframes fade-short-drop { .keyframes-fade-short-drop(); }
+
+  /*** Slide In Bottom ***
+       Moves the element into screen from bottom up */
+
+  .keyframes-slidein-bottom() {
+    0% {
+      #scout.transform(translateY(100%));
+    }
+  }
+
+  @-webkit-keyframes slidein-bottom { .keyframes-slidein-bottom(); }
+  @keyframes slidein-bottom { .keyframes-slidein-bottom(); }
+
+  /*** Slide Out Bottom ***
+       Moves the element out of bottom screen border */
+
+  .keyframes-slideout-bottom() {
+    100% {
+      #scout.transform(translateY(100%));
+    }
+  }
+
+  @-webkit-keyframes slideout-bottom { .keyframes-slideout-bottom(); }
+  @keyframes slideout-bottom { .keyframes-slideout-bottom(); }
 
   /*** Zoom Bounce ***/
 

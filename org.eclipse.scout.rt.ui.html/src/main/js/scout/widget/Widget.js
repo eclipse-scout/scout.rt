@@ -16,6 +16,10 @@ scout.Widget = function() {
   this.attached = false;
   this.destroyed = false;
   this.$container;
+  // If set to true, remove won't remove the element immediately but after the animation has been finished
+  // This expects a css animation which may be triggered by the class 'removed'
+  // If browser does not support css animation, remove will be executed immediately
+  this.animateRemoval;
 };
 
 scout.Widget.prototype.init = function(options) {
@@ -43,6 +47,7 @@ scout.Widget.prototype._init = function(options) {
   if (!this.session) {
     throw new Error('Session expected: ' + this);
   }
+  this.animateRemoval = scout.nvl(options.animateRemoval, false);
 };
 
 scout.Widget.prototype._initKeyStrokeContext = function(keyStrokeContext) {
@@ -108,6 +113,19 @@ scout.Widget.prototype.remove = function() {
   if (!this.rendered) {
     return;
   }
+
+  if (this.animateRemoval) {
+    this._removeAnimated();
+  } else {
+    this._removeInternal();
+  }
+};
+
+scout.Widget.prototype._removeInternal = function() {
+  if (!this.rendered) {
+    return;
+  }
+
   $.log.trace('Removing widget: ' + this);
 
   // remove children in reverse order.
@@ -115,6 +133,7 @@ scout.Widget.prototype.remove = function() {
     child.remove();
   });
   this.session.keyStrokeManager.uninstallKeyStrokeContext(this.keyStrokeContext);
+  this._cleanup();
   this._remove();
   this.rendered = false;
   this.attached = false;
@@ -122,6 +141,23 @@ scout.Widget.prototype.remove = function() {
     this.parent.removeChild(this);
   }
   this._trigger('remove');
+};
+
+/**
+ * Adds class 'removed' to container which can be used to trigger the animation.
+ * After the animation is executed, the element gets removed using this._removeInternal.
+ */
+scout.Widget.prototype._removeAnimated = function() {
+  if (!scout.device.supportsCssAnimation() || !this.$container) {
+    // Cannot remove animated, remove regularly
+    this._removeInternal();
+    return;
+  }
+
+  this.$container.addClass('removed');
+  this.$container.oneAnimationEnd(function() {
+    this._removeInternal();
+  }.bind(this));
 };
 
 /**
@@ -141,9 +177,18 @@ scout.Widget.prototype._trigger = function(type, event) {
   }
 };
 
+/**
+ * Called right before _remove is called.
+ * Default calls LayoutValidator.cleanupInvalidComponents to make sure that child components are removed from the invalid components list.
+ */
+scout.Widget.prototype._cleanup = function() {
+  if (this.$container) {
+    this.session.layoutValidator.cleanupInvalidComponents(this.$container);
+  }
+};
+
 scout.Widget.prototype._remove = function() {
   if (this.$container) {
-    this.session.layoutValidator.cleanupInvalidObjects(this.$container);
     this.$container.remove();
     this.$container = null;
   }
