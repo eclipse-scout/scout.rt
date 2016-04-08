@@ -60,22 +60,29 @@ scout.CheckBoxField.prototype._renderDisplayText = function(displayText) {
 };
 
 scout.CheckBoxField.prototype._onMouseDown = function(event) {
-  this._toggleChecked();
+  this.toggleChecked();
   if (scout.device.supportsFocusEmptyBeforeDiv) {
     this.session.focusManager.requestFocus(this.$checkBox);
     event.preventDefault();
   }
 };
 
-scout.CheckBoxField.prototype._toggleChecked = function() {
+scout.CheckBoxField.prototype.toggleChecked = function() {
   if (!this.enabled) {
     return;
   }
-  this.$checkBox.toggleClass('checked');
-  var uiChecked = this.$checkBox.hasClass('checked');
-  this._send('clicked', {
-    checked: uiChecked
-  });
+  this.setValue(!this.value);
+};
+
+scout.CheckBoxField.prototype.setValue = function(value) {
+  if (this.value === value) {
+    return;
+  }
+  this._setProperty('value', value);
+  this._sendProperty('value');
+  if (this.rendered) {
+    this._renderValue();
+  }
 };
 
 /**
