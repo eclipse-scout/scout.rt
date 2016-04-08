@@ -1046,15 +1046,18 @@ describe("Tree", function() {
       expect($parents.length).toBe(0);
 
       tree.selectNodes(node1);
+      jasmine.clock().tick(1);
       $parents = tree.$data.find('.tree-node.ancestor-of-selected');
       expect($parents.length).toBe(0);
 
       tree.selectNodes(child1);
+      jasmine.clock().tick(1);
       $parents = tree.$data.find('.tree-node.ancestor-of-selected');
       expect($parents.length).toBe(1);
       expect($parents.eq(0)[0]).toBe(nodes[1].$node[0]);
 
       tree.selectNodes(grandchild1);
+      jasmine.clock().tick(1);
       $parents = tree.$data.find('.tree-node.ancestor-of-selected');
       expect($parents.length).toBe(2);
       expect($parents.eq(0)[0]).toBe(nodes[1].$node[0]);
@@ -1066,12 +1069,11 @@ describe("Tree", function() {
     });
 
     it("sets css class child-of-selected on direct children of the selected element", function() {
-      var model = helper.createModelFixture(3, 3, true);
+      var model = helper.createModelFixture(3, 1, true);
       var tree = helper.createTree(model);
       var nodes = tree.nodes;
       var node1 = nodes[1];
       var child1 = node1.childNodes[1];
-      var grandchild1 = child1.childNodes[1];
 
       tree.render(session.$entryPoint);
 
@@ -1581,8 +1583,7 @@ describe("Tree", function() {
       });
 
       it("preserves group css class when nodes get updated", function() {
-        tree.selectedNodes = [node1];
-        node1.expanded = false;
+        tree.selectNode(node1, false);
         tree.render(session.$entryPoint);
 
         tree._isGroupingEnd = function(node) {

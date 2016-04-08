@@ -621,6 +621,12 @@ scout.Tree.prototype._decorateNode = function(node) {
   if ($node.isSelected()) {
     formerClasses += ' selected';
   }
+  if ($node.hasClass('ancestor-of-selected')) {
+    formerClasses += ' ancestor-of-selected';
+  }
+  if ($node.hasClass('parent-of-selected')) {
+    formerClasses += ' parent-of-selected';
+  }
   $node.removeClass();
   $node.addClass(formerClasses);
   $node.addClass(node.cssClass);
@@ -877,6 +883,9 @@ scout.Tree.prototype._renderSelection = function() {
 scout.Tree.prototype._redecorateViewRange = function() {
   if (this.rendered) {
     for (var i = this.viewRangeRendered.from; i < this.viewRangeRendered.to; i++) {
+      if (i >= this.visibleNodesFlat.length) {
+        break;
+      }
       this._decorateNode(this.visibleNodesFlat[i]);
     }
   }
@@ -1259,6 +1268,7 @@ scout.Tree.prototype._removeChildsFromFlatList = function(parentNode, animatedRe
       }
     }
 
+    this.visibleNodesFlat.splice(parentIndex + 1, elementsToDelete);
     // animate closing
     if (animatedRemove) { // don't animate while rendering (not necessary, or may even lead to timing issues)
       this._renderViewportBlocked = true;
@@ -1271,8 +1281,6 @@ scout.Tree.prototype._removeChildsFromFlatList = function(parentNode, animatedRe
         onAnimationComplete.call(this, removedNodes);
       }
     }
-    this.visibleNodesFlat.splice(parentIndex + 1, elementsToDelete);
-
   }
 
   //----- Helper functions -----
@@ -1284,7 +1292,6 @@ scout.Tree.prototype._removeChildsFromFlatList = function(parentNode, animatedRe
       this._$animationWrapper.remove();
       this._$animationWrapper = null;
     }
-    //    this.visibleNodesFlat.splice(parentIndex + 1, elementsToDelete);
     this.runningAnimationsFinishFunc();
   }
 
@@ -1373,7 +1380,6 @@ scout.Tree.prototype._addChildsToFlatList = function(parentNode, parentIndex, an
       // this does not seem to be the case. Implementations differ slightly in details. The effect is, that when
       // calling stop() the animation stops and the 'complete' callback is executed immediately. However, when calling
       // finish(), the callback is _not_ executed! (This may or may not be a bug in jQuery, I cannot tell...)
-      //TODO nbu check parent
       this._$animationWrapper.stop(false, true);
     }
     var insertIndex = parentIndex + 1;
@@ -1427,7 +1433,7 @@ scout.Tree.prototype._addChildsToFlatList = function(parentNode, parentIndex, an
 
 };
 
-scout.Tree.prototype.checkAndHandleBatchAnimationWrapper = function(insertIndex,  parentNode, animatedRendering, onAnimationComplete) {
+scout.Tree.prototype.checkAndHandleBatchAnimationWrapper = function(insertIndex, parentNode, animatedRendering, onAnimationComplete) {
   if (animatedRendering && this.viewRangeRendered.from <= insertIndex && this.viewRangeRendered.to >= insertIndex && !this._$animationWrapper) {
     //we are in visible area so we need a animation wrapper
     //if parent is in visible area insert after parent else insert before first node.
@@ -1450,14 +1456,14 @@ scout.Tree.prototype.checkAndHandleBatch = function(insertIndex, insertBatch, pa
   if (this.viewRangeRendered.from - 1 === insertIndex) {
     //do immediate rendering because list could be longer
     this.insertBatchInVisibleNodes(insertBatch, false, false);
-    insertBatch = [insertIndex+1, 0];
+    insertBatch = [insertIndex + 1, 0];
   }
   this.checkAndHandleBatchAnimationWrapper(insertIndex, parentNode, animatedRendering, onAnimationComplete);
 
   if (this.viewRangeRendered.from + this.viewRangeSize === insertIndex) {
     //do immediate rendering because list could be longer
     this.insertBatchInVisibleNodes(insertBatch, true, animatedRendering ? onAnimationComplete : null);
-    insertBatch = [insertIndex+1, 0];
+    insertBatch = [insertIndex + 1, 0];
   }
   return insertBatch;
 };
@@ -1642,10 +1648,10 @@ scout.Tree.prototype.insertNodes = function(nodes, parentNode) {
       this._updateItemPath(false, parentNode);
     }
     if (this.rendered) {
-        var opts = {
-          expansionChanged: true
-        };
-        this._renderExpansion(parentNode, opts);
+      var opts = {
+        expansionChanged: true
+      };
+      this._renderExpansion(parentNode, opts);
     }
   } else {
     if (this.nodes && this.nodes.length > 0) {
@@ -2211,7 +2217,7 @@ scout.Tree.prototype.showNode = function(node, useAnimation, indexHint) {
       duration: 250,
       start: that.startAnimationFunc,
       complete: function() {
-        that.runningAnimationsFinishFunct();
+        that.runningAnimationsFinishFunc();
         var oldStyle = $node.data('oldStyle');
         if (oldStyle) {
           $node.removeData('oldStyle');
