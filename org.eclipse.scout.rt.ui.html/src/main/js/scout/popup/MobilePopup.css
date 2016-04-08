@@ -1,0 +1,47 @@
+/*******************************************************************************
+ * Copyright (c) 2014-2015 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
+ @mobile-popup-title-margin-right: 30px;
+
+.mobile-popup {
+  background-color: @background-color;
+  border-top: 5px solid @active-color; /*FIXME CGU extract color var*/
+  border-top-left-radius: @border-radius;
+  border-top-right-radius: @border-radius;
+  margin-top: 30px;
+}
+
+.mobile-popup-header {
+  position: absolute;
+  width: 100%;
+
+  padding-top: 10px;
+  padding-left: 20px;
+
+  & > .title {
+    #scout.overflow-ellipsis-nowrap();
+    #scout.font-text-large();
+    color: @active-color; /*FIXME CGU extract color var, mit dialog vereinheitlichen*/
+    width: 100%;
+  }
+
+  & > .closer {
+    position: absolute;
+    top: 0;
+    right: 5px;
+    padding: 8px;
+  }
+
+  .mobile-popup.closable > & > .title {
+    margin-right: @mobile-popup-title-margin-right;
+    width: calc(~'100%' - @mobile-popup-title-margin-right);
+  }
+}
+

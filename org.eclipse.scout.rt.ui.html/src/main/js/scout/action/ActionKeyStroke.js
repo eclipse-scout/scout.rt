@@ -26,5 +26,5 @@ scout.ActionKeyStroke.prototype._isEnabled = function() {
 };
 
 scout.ActionKeyStroke.prototype.handle = function(event) {
-  this.field.doAction(event);
+  this.field.doAction();
 };

@@ -1927,7 +1927,7 @@ scout.Tree.prototype._showContextMenu = function(event) {
       $anchor: $part,
       menuFilter: this._filterMenusHandler
     });
-    popup.open(null, event);
+    popup.open();
 
     // Set table style to focused, so that it looks as it still has the focus.
     // Must be called after open(), because opening the popup might cause another

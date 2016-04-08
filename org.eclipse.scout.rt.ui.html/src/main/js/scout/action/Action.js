@@ -91,7 +91,7 @@ scout.Action.prototype._renderVisible = function() {
   this.$container.setVisible(this.visible);
 };
 
-scout.Action.prototype._renderSelected = function(event) {
+scout.Action.prototype._renderSelected = function() {
   this.$container.select(this.selected);
   this._updateTooltip();
 };
@@ -160,31 +160,26 @@ scout.Action.prototype._goOnline = function() {
 };
 
 /**
- * @param event
- *          UI event that triggered the action (e.g. 'mouse down'). This argument
- *          may be used by action implementors to check if the action should really
- *          be performed. E.g. the MenuBarPopup uses it to prevent the popup from
- *          being closed again by the same event when it bubbles to other elements.
  * @return {Boolean}
  *          <code>true</code> if the action has been performed or <code>false</code> if it
  *          has not been performed (e.g. when the button is not enabled).
  */
-scout.Action.prototype.doAction = function(event) {
-  if (!this.prepareDoAction(event)) {
+scout.Action.prototype.doAction = function() {
+  if (!this.prepareDoAction()) {
     return false;
   }
 
   if (this.isToggleAction()) {
-    this.setSelected(!this.selected, event);
+    this.setSelected(!this.selected);
   } else {
     this.sendDoAction();
   }
   return true;
 };
 
-scout.Action.prototype.toggle = function(event) {
+scout.Action.prototype.toggle = function() {
   if (this.isToggleAction()) {
-    this.setSelected(!this.selected, event);
+    this.setSelected(!this.selected);
   }
 };
 
@@ -195,26 +190,9 @@ scout.Action.prototype.isToggleAction = function() {
 /**
  * @returns {Boolean} <code>true</code> if the action may be executed, <code>false</code> if it should be ignored.
  */
-scout.Action.prototype.prepareDoAction = function(event) {
+scout.Action.prototype.prepareDoAction = function() {
   if (!this.enabled || !this.visible) {
     return false;
-  }
-
-  // This is required for key-stroke actions. When they are triggered on
-  // key-down, the active field is still focused and its blur-event is not
-  // triggered, which means the acceptInput() is never executed so
-  // the executed action works with a wrong value for the active field.
-  // --> Same check in Button.doAction()
-  if (event && event.target) {
-    var $activeElement = $(event.target.ownerDocument.activeElement),
-      activeValueField = $activeElement.data('valuefield');
-    if (activeValueField === undefined) {
-      // try parent, some times the value field is the parent of the input field (e.g. DateField.js)
-      activeValueField = $activeElement.parent().data('valuefield');
-    }
-    if (activeValueField) {
-      activeValueField.acceptInput();
-    }
   }
 
   return true;
@@ -242,13 +220,13 @@ scout.Action.prototype.afterSendDoAction = function() {
   // NOP
 };
 
-scout.Action.prototype.setSelected = function(selected, event) {
+scout.Action.prototype.setSelected = function(selected) {
   if (selected === this.selected) {
     return;
   }
   this._setProperty('selected', selected);
   if (this.rendered) {
-    this._renderSelected(event);
+    this._renderSelected();
   }
   this.sendSelected();
 };

@@ -113,11 +113,21 @@ scout.GroupBox.prototype.addLabel = function() {
   if (this.$label) {
     return;
   }
-  this.$label = this.$title.appendSpan();
+  this.$label = this.$title.appendSpan('label');
 };
 
 scout.GroupBox.prototype._renderLabel = function() {
   this.$label.textOrNbsp(this.label);
+};
+
+scout.GroupBox.prototype._renderStatusPosition = function() {
+  if (this.statusPosition === scout.FormField.STATUS_POSITION_TOP) {
+    // move into title
+    this.$status.appendTo(this.$title);
+  } else {
+    this.$status.appendTo(this.$container);
+  }
+  this.invalidateLayoutTree();
 };
 
 scout.GroupBox.prototype._prepareFields = function() {
@@ -307,6 +317,7 @@ scout.GroupBox.prototype._renderExpanded = function() {
  * @override
  */
 scout.GroupBox.prototype._renderLabelVisible = function(visible) {
+  visible = scout.nvl(visible, this.visible);
   this.$title.setVisible(visible && this.label && !this.mainBox);
 };
 

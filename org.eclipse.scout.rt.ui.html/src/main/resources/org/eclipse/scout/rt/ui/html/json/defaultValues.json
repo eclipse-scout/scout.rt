@@ -20,6 +20,7 @@
       "loading": false,
       "mandatory": false,
       "statusVisible": true,
+      "statusPosition": "default",
       "menus": [],
       "menusVisible": false,
       "gridData": {
@@ -69,6 +70,10 @@
       "displayStyle": 0,
       "keyStroke": null,
       "statusVisible": false
+    },
+    "Graph": {
+      "graphDepth": 1,
+      "toolbarVisible": false
     },
     "GroupBox": {
       "borderDecoration": "auto",

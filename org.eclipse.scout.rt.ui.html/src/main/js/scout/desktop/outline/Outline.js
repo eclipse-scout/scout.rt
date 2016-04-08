@@ -551,6 +551,7 @@ scout.Outline.prototype.setCompact = function(compact) {
   this.compact = compact;
   if (this.rendered) {
     this._renderCompact();
+    this.invalidateLayoutTree();
   }
 };
 
@@ -558,6 +559,7 @@ scout.Outline.prototype.setEmbedDetailContent = function(embed) {
   this.embedDetailContent = embed;
   if (this.rendered) {
     this._renderEmbedDetailContent();
+    this.invalidateLayoutTree();
   }
   this.updateDetailContent();
 };
@@ -630,26 +632,30 @@ scout.Outline.prototype.updateDetailMenus = function() {
     menuItems = [],
     tableControls = [],
     nodeMenus = [],
+    detailTable,
     detailMenus = [];
 
-  if (this.detailContent) {
+  if (this.detailContent && this.detailContent instanceof scout.Form) {
     // get menus from detail form
-    if (this.detailContent instanceof scout.Form) {
-      var rootGroupBox = this.detailContent.rootGroupBox;
-      menuItems = rootGroupBox.processMenus.concat(rootGroupBox.menus);
-      rootGroupBox.setMenuBarVisible(false);
-    } else {
-      // get single selection menus from detail table for table row detail
-      menuItems = selectedPage.parentNode.detailTable.menus;
-      menuItems = scout.menus.filter(menuItems, ['Table.SingleSelection'], false, true);
-    }
+    var rootGroupBox = this.detailContent.rootGroupBox;
+    menuItems = rootGroupBox.processMenus.concat(rootGroupBox.menus);
+    rootGroupBox.setMenuBarVisible(false);
   }
-  // get empty space menus and table controls from detail table
-  else if (selectedPages.length > 0) {
+  else if (selectedPage) {
+    // get empty space menus and table controls from detail table
     if (selectedPage.detailTable) {
-      menuItems = selectedPage.detailTable.menus;
-      menuItems = scout.menus.filter(menuItems, ['Table.EmptySpace'], false, true);
+      detailTable = selectedPage.detailTable;
+      menuItems = scout.menus.filter(detailTable.menus, ['Table.EmptySpace'], false, true);
+      menuItems = menuItems.filter(function(menu) {
+        // Don't accept outline wrapper menus to prevent duplicate menus. The original menu is a single selection menu of the parent table and will be added below
+        return !menu.outlineMenuWrapper;
+      }, this);
       tableControls = selectedPage.detailTable.tableControls;
+    }
+    // get single selection menus from parent detail table
+    if (selectedPage.parentNode && selectedPage.parentNode.detailTable) {
+      detailTable = selectedPage.parentNode.detailTable;
+      menuItems = menuItems.concat(scout.menus.filter(detailTable.menus, ['Table.SingleSelection'], false, true));
     }
   }
 

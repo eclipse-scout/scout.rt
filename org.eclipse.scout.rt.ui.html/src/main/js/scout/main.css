@@ -306,6 +306,11 @@ textarea {
   resize: none;
   /* Override default overflow value 'scroll' in IE */
   overflow: auto;
+
+  /* remove platform specific styling, mainly used to remove shadow on ios safari */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
 }
 
 /* cursor handling */
@@ -352,6 +357,21 @@ button::-moz-focus-inner {
   left: 0px;
   margin-top: -5px;
   cursor: move;
+}
+
+.closer {
+  #scout.font-icon();
+  font-size: 17px;
+  cursor: pointer;
+  color: @icon-light-color;
+
+  &::before {
+    content: @icon-remove;
+  }
+
+  &:hover {
+    color: @hover-color;
+  }
 }
 
 /* Used to display errors from server when desktop is not available */

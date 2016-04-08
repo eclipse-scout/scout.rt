@@ -14,9 +14,9 @@ import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
-import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonValueField;
+import org.json.JSONObject;
 
 /**
  * This class creates JSON output for an IBooleanField used as a check-box.
@@ -46,26 +46,19 @@ public class JsonCheckBoxField<CHECK_BOX_FIELD extends IBooleanField> extends Js
   }
 
   @Override
-  public void handleUiEvent(JsonEvent event) {
-    if (IBooleanField.PROP_VALUE.equals(event.getType())) {
-      handleUiValueChange(event);
-    }
-    else {
-      super.handleUiEvent(event);
-    }
-  }
+  protected void handleUiPropertyChange(String propertyName, JSONObject data) {
+    if (IBooleanField.PROP_VALUE.equals(propertyName)) {
+      boolean uiChecked = data.getBoolean(IBooleanField.PROP_VALUE);
+      addPropertyEventFilterCondition(IBooleanField.PROP_VALUE, uiChecked);
+      getModel().getUIFacade().setCheckedFromUI(uiChecked);
 
-  protected void handleUiValueChange(JsonEvent event) {
-    boolean uiChecked = event.getData().getBoolean(IBooleanField.PROP_VALUE);
-    addPropertyEventFilterCondition(IBooleanField.PROP_VALUE, uiChecked);
-    getModel().getUIFacade().setCheckedFromUI(uiChecked);
-
-    // In some cases the widget in the UI is clicked, which causes the check-box to be de-/selected, but the model rejects the value-change.
-    // in that case we must "revert" the click in the UI, so that UI and model are in-sync again. This may happen, when the model-field throws
-    // a VetoExeception in its execValidateValue() method.
-    boolean modelChecked = getModel().isChecked();
-    if (uiChecked != modelChecked) {
-      addPropertyChangeEvent(IValueField.PROP_VALUE, modelChecked);
+      // In some cases the widget in the UI is clicked, which causes the check-box to be de-/selected, but the model rejects the value-change.
+      // in that case we must "revert" the click in the UI, so that UI and model are in-sync again. This may happen, when the model-field throws
+      // a VetoExeception in its execValidateValue() method.
+      boolean modelChecked = getModel().isChecked();
+      if (uiChecked != modelChecked) {
+        addPropertyChangeEvent(IValueField.PROP_VALUE, modelChecked);
+      }
     }
   }
 }

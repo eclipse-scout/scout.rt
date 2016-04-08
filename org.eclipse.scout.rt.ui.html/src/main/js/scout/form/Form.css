@@ -68,21 +68,9 @@
     }
   }
 
-  & > .closable {
+  & > .closer {
     position: absolute;
     right: 5px;
     margin: 8px;
-    #scout.font-icon();
-    font-size: 17px;
-    cursor: pointer;
-    color: @icon-light-color;
-
-    &::before {
-      content: @icon-remove;
-    }
-
-    &:hover {
-      color: @hover-color;
-    }
   }
 }

@@ -22,10 +22,6 @@
  *     (which is the default case), the clientSessionId is taken from the browser's
  *     session storage (per browser window, survives F5 refresh of page). If no
  *     clientSessionId can be found, a new one is generated on the server.
- *   [forceNewClientSession]
- *     Optional, default is false. If this argument is true, any existing
- *     "clientSessionId" is ignored, which causes the server to always create a
- *     new client session.
  *   [userAgent]
  *     Default: DESKTOP
  *   [backgroundJobPollingEnabled]
@@ -48,12 +44,10 @@ scout.Session = function($entryPoint, options) {
 
   this.scoutUrl = new scout.URL();
   if (this.scoutUrl.getParameter('forceNewClientSession')) {
-    options.forceNewClientSession = true;
+    clientSessionId = null;
+    this._forceNewClientSession = true;
   }
 
-  if (options.forceNewClientSession) {
-    clientSessionId = null;
-  }
 
   // Set members
   this.$entryPoint = $entryPoint;
@@ -1180,14 +1174,18 @@ scout.Session.prototype._onLogout = function(event) {
 
 scout.Session.prototype.logout = function(logoutUrl) {
   this._loggedOut = true;
-  // remember current url to not lose query parameters
-  sessionStorage.setItem('scout:loginUrl', window.location.href);
-  // Clear everything and reload the page. We wrap that in setTimeout() to allow other events to be executed normally before.
-  setTimeout(function() {
-    scout.reloadPage({
-      redirectUrl: logoutUrl
-    });
-  }.bind(this));
+  if (this._forceNewClientSession) {
+    this.desktop.$container.window(true).close();
+  } else {
+    // remember current url to not lose query parameters
+    sessionStorage.setItem('scout:loginUrl', window.location.href);
+    // Clear everything and reload the page. We wrap that in setTimeout() to allow other events to be executed normally before.
+    setTimeout(function() {
+      scout.reloadPage({
+        redirectUrl: logoutUrl
+      });
+    }.bind(this));
+  }
 };
 
 scout.Session.prototype._onDisposeAdapter = function(event) {

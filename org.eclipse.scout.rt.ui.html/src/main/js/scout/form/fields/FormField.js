@@ -37,7 +37,6 @@ scout.FormField = function() {
   this.mode = scout.FormField.MODE_DEFAULT;
   this._keyStrokeSupport = new scout.KeyStrokeSupport(this);
   this.loadingSupport; // Object to handle the 'loading' property (different for tile fields)
-  this.statusPosition = scout.FormField.STATUS_POSITION_DEFAULT; // (currently?) an UI-only property
 
   /**
    * Set this property to true when the form-field should stay enabled in offline case.
@@ -106,16 +105,17 @@ scout.FormField.prototype._renderProperties = function() {
   this._renderErrorStatus();
   this._renderMenus();
   this._renderLabel();
-  this._renderLabelVisible(this.labelVisible);
-  this._renderStatusVisible(this.statusVisible);
-  this._renderCssClass(this.cssClass);
-  this._renderFont(this.font);
-  this._renderForegroundColor(this.foregroundColor);
-  this._renderBackgroundColor(this.backgroundColor);
-  this._renderLabelFont(this.labelFont);
-  this._renderLabelForegroundColor(this.labelForegroundColor);
-  this._renderLabelBackgroundColor(this.labelBackgroundColor);
-  this._renderGridData(this.gridData);
+  this._renderLabelVisible();
+  this._renderStatusVisible();
+  this._renderStatusPosition();
+  this._renderCssClass();
+  this._renderFont();
+  this._renderForegroundColor();
+  this._renderBackgroundColor();
+  this._renderLabelFont();
+  this._renderLabelForegroundColor();
+  this._renderLabelBackgroundColor();
+  this._renderGridData();
   this._renderLoading();
 };
 
@@ -204,12 +204,14 @@ scout.FormField.prototype._removePlaceholder = function($field) {
   }
 };
 
-scout.FormField.prototype._renderLabelVisible = function(visible) {
+scout.FormField.prototype._renderLabelVisible = function() {
+  var visible = this.labelVisible;
   this._renderChildVisible(this.$label, visible);
   this.$container.toggleClass('label-hidden', !visible);
 };
 
-scout.FormField.prototype._renderStatusVisible = function(statusVisible) {
+scout.FormField.prototype._renderStatusVisible = function() {
+  var statusVisible = this.statusVisible;
   this._renderChildVisible(this.$status, this._computeStatusVisible());
   // Pseudo status is only for layouting purpose, therefore tooltip, errorStatus etc. must not influence its visibility -> not necessary to use _computeStatusVisible
   this._renderChildVisible(this.$pseudoStatus, statusVisible);
@@ -218,6 +220,10 @@ scout.FormField.prototype._renderStatusVisible = function(statusVisible) {
   if (this.$status && !this.$status.isVisible() && this.tooltip) {
     this.tooltip.remove();
   }
+};
+
+scout.FormField.prototype._renderStatusPosition = function() {
+  this.invalidateLayoutTree();
 };
 
 /**
@@ -236,8 +242,8 @@ scout.FormField.prototype._updateStatusVisible = function() {
  */
 scout.FormField.prototype._computeStatusVisible = function() {
   var statusVisible = this.statusVisible,
-    hasStatus = !!(this.errorStatus),
-    hasTooltip = this.tooltipText;
+    hasStatus = !!this.errorStatus,
+    hasTooltip = !!this.tooltipText;
 
   return !this.suppressStatus && (statusVisible || hasStatus || hasTooltip || (this._hasMenus() && this.menusVisible));
 };
@@ -268,6 +274,7 @@ scout.FormField.prototype._renderEnabled = function(enabled) {
 };
 
 scout.FormField.prototype._renderCssClass = function(cssClass, oldCssClass) {
+  cssClass = cssClass || this.cssClass;
   this.$container.removeClass(oldCssClass);
   this.$container.addClass(cssClass);
 };
@@ -296,7 +303,7 @@ scout.FormField.prototype._renderLabelBackgroundColor = function() {
   scout.styles.legacyStyle(this, this.$label, 'label');
 };
 
-scout.FormField.prototype._renderGridData = function(gridData) {
+scout.FormField.prototype._renderGridData = function() {
   // NOP
 };
 
@@ -388,11 +395,15 @@ scout.FormField.prototype.setMenusVisible = function(menusVisible) {
 };
 
 scout.FormField.prototype._onStatusMousedown = function(event) {
+  // showing menus is more important than showing tooltips
   if (this.menusVisible && this._hasMenus()) {
     var func = function func(event) {
       var menus = this._getCurrentMenus();
-      // showing menus is more important than showing tooltips
-      if (!this.contextPopup || !this.contextPopup.rendered) {
+      // Toggle menu
+      if (this.contextPopup && this.contextPopup.rendered) {
+        this.contextPopup.close();
+        this.contextPopup = null;
+      } else {
         if (!menus.some(function(menuItem) {
             return menuItem.visible;
           })) {
@@ -400,11 +411,12 @@ scout.FormField.prototype._onStatusMousedown = function(event) {
         }
         this.contextPopup = scout.create('ContextMenuPopup', {
           parent: this,
+          $anchor: this.$status,
           menuItems: menus,
           cloneMenuItems: false,
-          $anchor: this.$status
+          closeOnAnchorMousedown: false
         });
-        this.contextPopup.open(undefined, event);
+        this.contextPopup.open();
       }
     }.bind(this);
 

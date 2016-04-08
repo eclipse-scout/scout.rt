@@ -227,6 +227,7 @@
 @table-row-checked-background-color: @palette-blue-5;
 @table-row-checked-selected-focus-background-color: lighten(@palette-blue-5, 22%);
 @table-row-checked-selected-background-color: greyscale(@table-row-checked-selected-focus-background-color);
+@slider-track-color: @palette-gray-5;
 @text-field-icon-color: @palette-gray-6;
 @text-field-icon-error-color: @error-border-color;
 @text-field-icon-focus-color: @focus-border-color;

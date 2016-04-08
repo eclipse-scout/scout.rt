@@ -21,10 +21,13 @@ scout.inherits(scout.GroupBoxLayout, scout.AbstractLayout);
 scout.GroupBoxLayout.prototype.layout = function($container) {
   var titleMarginX, menuBarSize, gbBodySize,
     statusWidth = 0,
+    statusPosition = this._groupBox.statusPosition,
+    labelMarginX = 0,
     htmlContainer = this._groupBox.htmlComp,
     htmlGbBody = this._htmlGbBody(),
     htmlMenuBar = this._htmlMenuBar(),
     $groupBoxTitle = this._groupBox.$title,
+    $label = this._groupBox.$label,
     $status = this._groupBox.$status,
     containerSize = htmlContainer.getAvailableSize()
     .subtract(htmlContainer.getInsets());
@@ -50,8 +53,13 @@ scout.GroupBoxLayout.prototype.layout = function($container) {
   gbBodySize.height -= menuBarSize.height;
 
   if (statusWidth > 0) {
-    titleMarginX = $groupBoxTitle.cssMarginX() + statusWidth;
-    $groupBoxTitle.css('width', 'calc(100% - ' + titleMarginX + 'px');
+    if (statusPosition === scout.FormField.STATUS_POSITION_TOP) {
+      labelMarginX = $label.cssMarginX() + statusWidth;
+      $label.css('width', 'calc(100% - ' + labelMarginX + 'px');
+    } else {
+      titleMarginX = $groupBoxTitle.cssMarginX() + statusWidth;
+      $groupBoxTitle.css('width', 'calc(100% - ' + titleMarginX + 'px');
+    }
   }
 
   // When max. content width should be enforced, add a padding to the group box body
@@ -88,13 +96,17 @@ scout.GroupBoxLayout.prototype._layoutStatus = function() {
     $groupBoxTitle = this._groupBox.$title,
     titleInnerHeight = $groupBoxTitle.innerHeight(),
     $status = this._groupBox.$status,
-    statusMargins = scout.graphics.getMargins($status);
+    statusMargins = scout.graphics.getMargins($status),
+    statusPosition = this._groupBox.statusPosition;
 
-  $status.cssWidth(this._statusWidth)
-    .cssTop(top + $groupBoxTitle.cssMarginTop())
-    .cssRight(right)
-    .cssHeight(titleInnerHeight - statusMargins.vertical())
-    .cssLineHeight(titleInnerHeight - statusMargins.vertical());
+  $status.cssWidth(this._statusWidth);
+  if (statusPosition === scout.FormField.STATUS_POSITION_DEFAULT) {
+    $status
+      .cssTop(top + $groupBoxTitle.cssMarginTop())
+      .cssRight(right)
+      .cssHeight(titleInnerHeight - statusMargins.vertical())
+      .cssLineHeight(titleInnerHeight - statusMargins.vertical());
+  }
 };
 
 scout.GroupBoxLayout.prototype.preferredLayoutSize = function($container) {

@@ -482,6 +482,28 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
    */
 
   /**
+   * Sets the property on the field and on every child. <br>
+   * During the initialization phase the children are not informed.
+   *
+   * @see #getConfiguredStatusVisible()
+   */
+  @Override
+  public void setStatusVisible(boolean statusVisible) {
+    setStatusVisible(statusVisible, isInitialized());
+  }
+
+  @Override
+  public void setStatusVisible(boolean statusVisible, boolean recursive) {
+    super.setStatusVisible(statusVisible);
+
+    if (recursive) {
+      for (IFormField f : m_fields) {
+        f.setStatusVisible(statusVisible);
+      }
+    }
+  }
+
+  /**
    * broadcast this change to all children
    */
   @Override

@@ -108,17 +108,17 @@ scout.ViewMenuTab.prototype._findOutlineViewButton = function(onlySelected) {
 /**
  * Toggles the 'view menu popup', or brings the outline content to the front if in background.
  */
-scout.ViewMenuTab.prototype.togglePopup = function(event) {
+scout.ViewMenuTab.prototype.togglePopup = function() {
   if (this.selected) {
     if (this.inBackground) {
       this.session.desktop.bringOutlineToFront(this.outlineViewButton.outline);
     } else {
       // Open or close the popup.
       if (this.popup) {
-        this.popup.close(event);
+        this.popup.close();
       } else {
         this.$container.addClass('popup-open');
-        this.popup = this._openPopup(event);
+        this.popup = this._openPopup();
         this.popup.on('remove', function(event) {
           this.$container.removeClass('popup-open');
           this.popup = null;
@@ -127,11 +127,11 @@ scout.ViewMenuTab.prototype.togglePopup = function(event) {
       return false; // menu won't open if we didn't abort the mousedown-event
     }
   } else {
-    this.outlineViewButton.doAction(event);
+    this.outlineViewButton.doAction();
   }
 };
 
-scout.ViewMenuTab.prototype._openPopup = function(event) {
+scout.ViewMenuTab.prototype._openPopup = function() {
   var naviBounds = scout.graphics.bounds(this.$container.parent(), true);
   var popup = scout.create('ViewMenuPopup', {
     parent: this,
@@ -140,7 +140,7 @@ scout.ViewMenuTab.prototype._openPopup = function(event) {
     naviBounds: naviBounds
   });
   popup.headText = this.text;
-  popup.open(null, event);
+  popup.open();
   return popup;
 };
 

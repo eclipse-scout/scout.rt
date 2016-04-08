@@ -228,6 +228,14 @@ scout.HtmlComponent.prototype.offsetBounds = function() {
   return scout.graphics.offsetBounds(this.$comp);
 };
 
+/**
+ * Delegation to scout.graphics.setLocation
+ * @param location scout.Point
+ */
+scout.HtmlComponent.prototype.setLocation = function(location) {
+  scout.graphics.setLocation(this.$comp, location);
+};
+
 scout.HtmlComponent.prototype.setBounds = function(bounds) {
   if (!this.isAttachedAndVisible()) {
     // don't invalidate the layout if component is invisible because sizes may not be read correctly and therefore prefSize will be wrong

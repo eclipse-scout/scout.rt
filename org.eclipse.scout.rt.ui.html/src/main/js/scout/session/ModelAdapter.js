@@ -121,7 +121,7 @@ scout.ModelAdapter.prototype._send = function(type, data, delay, coalesceFunc) {
 scout.ModelAdapter.prototype._sendProperty = function(propertyName) {
   var data = {};
   data[propertyName] = this[propertyName];
-  this._send(propertyName, data);
+  this._send('property', data);
 };
 
 scout.ModelAdapter.prototype.render = function($parent) {

@@ -13,13 +13,13 @@
  * Note: This box must not depend on javascript because it is used for the noscript section as well.
  */
 @box-width: 420px;
-@box-margin-top: 15px;
+@box-margin-v: 15px;
 .box {
   display: table;
   position: absolute;
   height: 75%;
   width: 100%;
-  margin-top: @box-margin-top;
+  margin: @box-margin-v 0;
 
   & > .wrapper {
     display: table-cell;
@@ -88,6 +88,6 @@
 
 @media (max-height: 700px) {
   .box {
-    height: calc(100% - (@box-margin-top / 2));
+    height: calc(~'100%' - @box-margin-v * 2);
   }
 }

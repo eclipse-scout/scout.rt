@@ -190,6 +190,15 @@ scout.Widget.prototype.hasWidget = function(widget) {
   return false;
 };
 
+/**
+ * Adds default loading support to the widget. The default loading support hides
+ * the whole field $container when the field is in loading state. Override this
+ * method if you want to hide something else for a special field.
+ */
+scout.Widget.prototype.addLoadingSupport = function() {
+  this.loadingSupport = new scout.DefaultFieldLoadingSupport({field: this});
+};
+
 //--- Layouting / HtmlComponent methods ---
 
 scout.Widget.prototype.pack = function() {
@@ -442,7 +451,7 @@ scout.Widget.prototype._firePropertyChange = function(propertyName, oldValue, ne
 /**
  * Sets the value of the property 'propertyName' to 'newValue' and then fires a propertyChange event for that property.
  */
-scout.Widget.prototype._setProperty = function(propertyName, newValue) { // FIXME awe: (graph) refactor to event with type='property' see JsonEventType
+scout.Widget.prototype._setProperty = function(propertyName, newValue) {
   if (!propertyName) {
     return;
   }

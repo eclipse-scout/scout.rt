@@ -133,7 +133,7 @@ scout.PopupWithHead.prototype._copyCssClassToHead = function(className) {
 
 scout.PopupWithHead.prototype._onHeadMouseDown = function(event) {
   if (this.$head && this.$head.isOrHas(event.target)) {
-    this.close(event);
+    this.close();
   }
 };
 
@@ -144,7 +144,7 @@ scout.PopupWithHead.prototype._onKeyStrokeExecuted = function(event) {
   // check if target of key stroke is inside popup. If not-> close
   var $target = event.$target;
   if ($target && !($target === this.$container || this.$container.find($target).length > 0)) {
-    this.close(event.keyStrokeEvent);
+    this.close();
   }
 };
 

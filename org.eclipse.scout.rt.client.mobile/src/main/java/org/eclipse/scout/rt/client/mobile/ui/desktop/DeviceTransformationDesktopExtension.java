@@ -27,7 +27,6 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
-import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.holders.IHolder;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 import org.eclipse.scout.rt.shared.ui.UserAgentUtility;
@@ -137,13 +136,6 @@ public class DeviceTransformationDesktopExtension extends AbstractDesktopExtensi
     IForm form = formHolder.getValue();
     if (form == null) {
       return ContributionCommand.Stop;
-    }
-
-    try {
-      getDeviceTransformer().transformForm(form);
-    }
-    catch (RuntimeException e) {
-      BEANS.get(ExceptionHandler.class).handle(e);
     }
 
     if (!getDeviceTransformer().acceptFormAddingToDesktop(form)) {

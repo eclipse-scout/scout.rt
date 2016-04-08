@@ -55,7 +55,7 @@ scout.PageLayout.prototype.preferredLayoutSize = function($container) {
     detailMenuBar = this.outline.detailMenuBar,
     detailMenuBarPrefSize = new scout.Dimension();
 
-  titleHeight = $text.outerHeight(true);
+  titleHeight = scout.graphics.prefSize($text, true).height;
   if (detailMenuBar.visible) {
     detailMenuBarPrefSize = detailMenuBar.htmlComp.getPreferredSize();
   }

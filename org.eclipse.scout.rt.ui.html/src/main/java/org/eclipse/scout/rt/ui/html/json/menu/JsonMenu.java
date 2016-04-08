@@ -15,6 +15,7 @@ import java.util.Set;
 
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
+import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineMenuWrapper;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
@@ -43,6 +44,13 @@ public class JsonMenu<MENU extends IMenu> extends JsonAction<MENU> {
       @Override
       protected Boolean modelValue() {
         return getModel().isSeparator();
+      }
+    });
+
+    putJsonProperty(new JsonProperty<MENU>("outlineMenuWrapper", model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel() instanceof OutlineMenuWrapper;
       }
     });
 

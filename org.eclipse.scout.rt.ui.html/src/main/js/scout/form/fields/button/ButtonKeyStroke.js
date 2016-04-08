@@ -34,5 +34,5 @@ scout.ButtonKeyStroke.prototype._accept = function(event) {
  * @override KeyStroke.js
  */
 scout.ButtonKeyStroke.prototype.handle = function(event) {
-  this.field.doAction(event);
+  this.field.doAction();
 };

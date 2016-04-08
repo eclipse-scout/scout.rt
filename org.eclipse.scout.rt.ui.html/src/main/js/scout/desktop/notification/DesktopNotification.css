@@ -79,27 +79,17 @@
   &.error {
     border-left-color: @palette-red-3;
   }
+}
 
-  & > .notification-content {
-    border: 1px solid @border-color;
-    border-left-width: 0;
-    padding: 10px;
+.notification-content {
+  border: 1px solid @border-color;
+  border-left-width: 0;
+  padding: 10px;
 
-    & > .close {
-      position: absolute;
-      right: 10px;
-      top: 10px;
-      color: @icon-light-color;
-
-      &:hover {
-        color: @icon-color;
-        cursor: pointer;
-      }
-      &::before {
-        #scout.font-icon();
-        content: @icon-remove;
-      }
-    }
+  & > .closer {
+    position: absolute;
+    right: 10px;
+    top: 10px;
   }
 }
 

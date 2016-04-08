@@ -857,6 +857,28 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
  * Implementation of ICompositeField
  */
 
+  /**
+   * Sets the property on the field and on every child. <br>
+   * During the initialization phase the children are not informed.
+   *
+   * @see #getConfiguredStatusVisible()
+   */
+  @Override
+  public void setStatusVisible(boolean statusVisible) {
+    setStatusVisible(statusVisible, isInitialized());
+  }
+
+  @Override
+  public void setStatusVisible(boolean statusVisible, boolean recursive) {
+    super.setStatusVisible(statusVisible);
+
+    if (recursive) {
+      for (IFormField f : m_fields) {
+        f.setStatusVisible(statusVisible);
+      }
+    }
+  }
+
   @Override
   public <F extends IFormField> F getFieldByClass(Class<F> c) {
     return CompositeFieldUtility.getFieldByClass(this, c);

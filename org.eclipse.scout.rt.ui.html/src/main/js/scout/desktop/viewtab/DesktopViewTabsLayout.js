@@ -144,5 +144,5 @@ scout.DesktopViewTabsLayout.prototype._onMouseDownOverflow = function(event) {
       y: event.pageY
     }
   });
-  popup.open(undefined, event);
+  popup.open();
 };

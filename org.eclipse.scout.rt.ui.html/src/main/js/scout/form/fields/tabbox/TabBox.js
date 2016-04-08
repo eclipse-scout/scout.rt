@@ -205,7 +205,6 @@ scout.TabBox.prototype._renderTabContent = function() {
     // I decided to simplify this and always set the title of the first group-box
     // to invisible.
     selectedTabItem.render(this._$tabContent);
-    selectedTabItem._renderLabelVisible(false);
   }
   if (this.rendered) {
     scout.HtmlComponent.get(this._$tabContent).revalidateLayoutTree();
@@ -231,6 +230,16 @@ scout.TabBox.prototype._removeMenus = function() {
 scout.TabBox.prototype._updateMenuBar = function(menus, oldMenus) {
   var menuItems = scout.menus.filter(this.menus, ['TabBox.Header']);
   this.menuBar.setMenuItems(menuItems);
+};
+
+scout.TabBox.prototype._renderStatusPosition = function() {
+  if (this.statusPosition === scout.FormField.STATUS_POSITION_TOP) {
+    // move into title
+    this.$status.appendTo(this._$tabArea);
+  } else {
+    this.$status.appendTo(this.$container);
+  }
+  this.invalidateLayoutTree();
 };
 
 /**

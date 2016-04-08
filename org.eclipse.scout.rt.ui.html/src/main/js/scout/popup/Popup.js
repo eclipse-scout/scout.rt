@@ -16,7 +16,6 @@ scout.Popup = function() {
   this._mouseDownHandler;
   this._scrollHandler;
   this._popupOpenHandler;
-  this.openEvent;
   this.anchorBounds;
   this.$anchor;
   this.windowPaddingX;
@@ -31,6 +30,10 @@ scout.Popup = function() {
   this.trimHeight;
   // If true, anchor is considered when computing the position and size of the popup
   this.boundToAnchor;
+  // If true, the attached mouse down handler will NOT close the popup if the anchor was clicked, the anchor is responsible to close it.
+  // This is necessary because the mousedown listener is attached to the capture phase and therefore executed before any other.
+  // If anchor was clicked, popup would already be closed and then opened again -> popup could never be closed by clicking the anchor
+  this.closeOnAnchorMousedown;
 };
 scout.inherits(scout.Popup, scout.Widget);
 
@@ -61,6 +64,7 @@ scout.Popup.prototype._init = function(options) {
   this.focusableContainer = scout.nvl(options.focusableContainer, false);
   this.scrollType = options.scrollType || 'remove';
   this.boundToAnchor = scout.nvl(options.boundToAnchor, true);
+  this.closeOnAnchorMousedown = scout.nvl(options.closeOnAnchorMousedown, true);
 };
 
 scout.Popup.prototype._initKeyStrokeContext = function(keyStrokeContext) {
@@ -71,10 +75,10 @@ scout.Popup.prototype._createLayout = function() {
   return new scout.PopupLayout(this);
 };
 
-scout.Popup.prototype.open = function($parent, event) {
+scout.Popup.prototype.open = function($parent) {
   this._triggerPopupOpenEvent();
 
-  this._open($parent, event);
+  this._open($parent);
 
   // Focus the popup
   // It is important that this happens after layouting and positioning, otherwise we'd focus an element
@@ -103,14 +107,13 @@ scout.Popup.prototype._uninstallAllChildScrollbars = function() {
   return handledScrollables;
 };
 
-scout.Popup.prototype._open = function($parent, event) {
-  this.render($parent, event);
+scout.Popup.prototype._open = function($parent) {
+  this.render($parent);
   this.revalidateLayout();
   this.position();
 };
 
-scout.Popup.prototype.render = function($parent, event) {
-  this.openEvent = event;
+scout.Popup.prototype.render = function($parent) {
   var $popupParent = $parent || this.entryPoint(this.parent.$container);
   scout.Popup.parent.prototype.render.call(this, $popupParent);
 };
@@ -142,14 +145,9 @@ scout.Popup.prototype._remove = function() {
   scout.Popup.parent.prototype._remove.call(this);
 };
 
-scout.Popup.prototype.close = function(event) {
-  if ((event && this.openEvent && event.originalEvent !== this.openEvent.originalEvent) || !event || !this.openEvent) {
-    if (event && event.originalEvent) { //only add removed widget when event has a originalEvent-> mouse or key events. no custom events.
-      event.originalEvent.scoutOriginalTargetWidget = this;
-    }
-    this._trigger('close', event);
-    this.remove();
-  }
+scout.Popup.prototype.close = function() {
+  this._trigger('close');
+  this.remove();
 };
 
 /**
@@ -158,8 +156,9 @@ scout.Popup.prototype.close = function(event) {
  */
 scout.Popup.prototype._attachCloseHandler = function() {
   // Install mouse close handler
+  // The listener needs to be executed in the capturing phase -> prevents that _onMouseDown will be executed right after the popup gets opened using mouse down, otherwise the popup would be closed immediately
   this._mouseDownHandler = this._onMouseDown.bind(this);
-  this.$container.document().on('mousedown', this._mouseDownHandler);
+  this.$container.document(true).addEventListener('mousedown', this._mouseDownHandler, true); // true=the event handler is executed in the capturing phase
 
   // Install popup open close handler
   this._popupOpenHandler = this._onPopupOpen.bind(this);
@@ -187,7 +186,7 @@ scout.Popup.prototype._detachCloseHandler = function() {
 
   // Uninstall mouse close handler
   if (this._mouseDownHandler) {
-    this.$container.document().off('mousedown', this._mouseDownHandler);
+    this.$container.document(true).removeEventListener('mousedown', this._mouseDownHandler, true);
     this._mouseDownHandler = null;
   }
 };
@@ -209,13 +208,14 @@ scout.Popup.prototype._onMouseDown = function(event) {
 scout.Popup.prototype._isMouseDownOutside = function(event) {
   var $target = $(event.target),
     targetWidget;
-  //sometimes the Jquery object is removed due to layouting or similar operations in this cases the widget should be set in scoutOriginalTargetWidget to the
-  // original event to resolve hierarchy inside the popup.
-  if (event.originalEvent && event.originalEvent.scoutOriginalTargetWidget) {
-    targetWidget = event.originalEvent.scoutOriginalTargetWidget;
-  } else {
-    targetWidget = scout.Widget.getWidgetFor($target);
+
+  if (!this.closeOnAnchorMousedown && this.$anchor && this.$anchor.isOrHas(event.target)) {
+    // 1. Often times, click on the anchor opens and 2. click closes the popup
+    // If we were closing the popup here, it would not be possible to achieve the described behavior anymore -> let anchor handle open and close.
+    return false;
   }
+
+  targetWidget = scout.Widget.getWidgetFor($target);
 
   // close the popup only if the click happened outside of the popup and its children
   // It is not sufficient to check the dom hierarchy using $container.has($target)
@@ -228,7 +228,7 @@ scout.Popup.prototype._isMouseDownOutside = function(event) {
  * Method invoked once a mouse down event occurs outside the popup.
  */
 scout.Popup.prototype._onMouseDownOutside = function(event) {
-  this.close(event);
+  this.close();
 };
 
 /**
@@ -245,7 +245,7 @@ scout.Popup.prototype._onAnchorScroll = function(event) {
     this.revalidateLayout();
     this.position();
   } else if (this.scrollType === 'remove') {
-    this.close(event);
+    this.close();
   }
 };
 
@@ -260,7 +260,7 @@ scout.Popup.prototype._onPopupOpen = function(event) {
   if (!this.isOrHasWidget(event.popup) &&
     !event.popup.isOrHasWidget(this) &&
     !this.session.focusManager.isElementCovertByGlassPane(this.$container[0])) {
-    this.close(event);
+    this.close();
   }
 };
 
@@ -387,7 +387,7 @@ scout.Popup.prototype.setLocation = function(location) {
  * Popups with an anchor must only be visible if the anchor is in view (prevents that the popup points at an invisible anchor)
  */
 scout.Popup.prototype._validateVisibility = function() {
-  if (this.boundToAnchor && !this.$anchor) {
+  if (!this.boundToAnchor || !this.$anchor) {
     return;
   }
   var inView = this._isInView();
@@ -399,7 +399,7 @@ scout.Popup.prototype._validateVisibility = function() {
 };
 
 scout.Popup.prototype._isInView = function() {
-  if (this.boundToAnchor && !this.$anchor) {
+  if (!this.boundToAnchor || !this.$anchor) {
     return;
   }
   var anchorBounds = this.getAnchorBounds();

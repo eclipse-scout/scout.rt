@@ -23,12 +23,25 @@ scout.TabAreaLayout.prototype.layout = function($container) {
   var bounds,
     tabArea = $container[0],
     clientWidth = tabArea.clientWidth,
-    scrollWidth = tabArea.scrollWidth;
+    scrollWidth = tabArea.scrollWidth,
+    menuBar = this._tabBox.menuBar,
+    $status = this._tabBox.$status,
+    statusWidth = 0,
+    statusPosition = this._tabBox.statusPosition;
 
   // If tab area contains a menubar, less space is available
-  var menubar = $container.children('.menubar')[0];
-  if (menubar) {
-    clientWidth -= menubar.clientWidth;
+  clientWidth -= menuBar.$container[0].clientWidth;
+
+  if (statusPosition === scout.FormField.STATUS_POSITION_TOP) {
+    // Status on top means it is inside the tab area
+    if ($status && $status.isVisible()) {
+      statusWidth = $status.outerWidth(true);
+    }
+    if (statusWidth > 0) {
+      clientWidth -= statusWidth;
+      // Status is on the right of the menuBar
+      menuBar.$container.cssRight(statusWidth);
+    }
   }
 
   this._overflowTabs = [];

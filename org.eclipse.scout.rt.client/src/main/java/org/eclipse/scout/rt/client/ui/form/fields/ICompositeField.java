@@ -63,6 +63,13 @@ public interface ICompositeField extends IFormField {
   <T extends IFormField> T getFieldByClass(Class<T> c);
 
   /**
+   * @param statusVisible
+   * @param recursive
+   *          true, if statusVisible property of the children should be changed as well
+   */
+  void setStatusVisible(boolean statusVisible, boolean recursive);
+
+  /**
    * for recursion
    */
   @Override
