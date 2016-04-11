@@ -21,8 +21,11 @@ import static org.junit.Assert.assertEquals;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.util.CloneUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -304,4 +307,51 @@ public class HTMLTest {
     return HTML.tr(HTML.td("A" + prefix + i), HTML.td("B" + prefix + i));
   }
 
+  @Test(expected = ProcessingException.class)
+  public void testNonSerializableRaw() {
+    HTML.raw("1", "2", new NonSerializableCharSequence(), "3");
+  }
+
+  @Test(expected = ProcessingException.class)
+  public void testNonSerializableFragment() {
+    HTML.fragment("1", "2", new NonSerializableCharSequence(), "3");
+  }
+
+  @Test
+  public void testSerializability() throws Exception {
+    IHtmlDocument htmlDocument = HTML.html5(
+        null,
+        HTML.body(
+            HTML.p("Lorem ipsum"),
+            HTML.bold(" dolor sit amet,"),
+            HTML.div(" consetetur sadipscing elitr,"),
+            HTML.fragment(" sed", " diam", " nonumy", "eirmod"),
+            HTML.italic(HTML.raw("<p>tempor invidunt ut labore et dolore magna aliquyam erat.</p>"))));
+
+    String htmlBeforeSerialization = htmlDocument.toEncodedHtml();
+    String plainTextBeforeSerialization = htmlDocument.toPlainText();
+
+    IHtmlDocument clonedHtmlDocument = CloneUtility.createDeepCopyBySerializing(htmlDocument);
+
+    Assert.assertEquals(htmlBeforeSerialization, clonedHtmlDocument.toEncodedHtml());
+    Assert.assertEquals(plainTextBeforeSerialization, clonedHtmlDocument.toPlainText());
+  }
+
+  protected static class NonSerializableCharSequence implements CharSequence {
+
+    @Override
+    public int length() {
+      return 0;
+    }
+
+    @Override
+    public char charAt(int index) {
+      return 0;
+    }
+
+    @Override
+    public CharSequence subSequence(int start, int end) {
+      return null;
+    }
+  }
 }

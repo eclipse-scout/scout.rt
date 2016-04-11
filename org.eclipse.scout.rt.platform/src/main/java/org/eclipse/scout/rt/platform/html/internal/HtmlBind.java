@@ -17,6 +17,7 @@ import org.eclipse.scout.rt.platform.util.Assertions;
 
 public class HtmlBind implements IHtmlBind {
 
+  private static final long serialVersionUID = 1L;
   private String m_name;
 
   public HtmlBind(String name) {

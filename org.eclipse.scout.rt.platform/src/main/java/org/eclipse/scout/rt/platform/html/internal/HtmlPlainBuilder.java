@@ -10,13 +10,18 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.html.internal;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.html.IHtmlContent;
 
 public class HtmlPlainBuilder extends AbstractExpressionBuilder {
+
+  private static final long serialVersionUID = 1L;
+
   private final List<? extends CharSequence> m_texts;
 
   public HtmlPlainBuilder(CharSequence... texts) {
@@ -33,6 +38,10 @@ public class HtmlPlainBuilder extends AbstractExpressionBuilder {
       if (text == null) {
         continue;
       }
+      if (!(text instanceof Serializable)) {
+        throw new ProcessingException("At least one provided char sequence is not serializable: " + text);
+      }
+
       if (text instanceof IHtmlContent) {
         bindTexts.add(importHtml((IHtmlContent) text));
       }

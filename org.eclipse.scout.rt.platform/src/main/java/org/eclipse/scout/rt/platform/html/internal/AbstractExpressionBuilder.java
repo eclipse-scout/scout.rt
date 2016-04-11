@@ -29,6 +29,8 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class AbstractExpressionBuilder implements CharSequence, IHtmlContent {
   private static final Logger LOG = LoggerFactory.getLogger(AbstractExpressionBuilder.class);
+  private static final long serialVersionUID = 1L;
+  
   private StringBuilder m_buf;
   private HtmlBinds m_binds = new HtmlBinds();
 
@@ -109,6 +111,7 @@ public abstract class AbstractExpressionBuilder implements CharSequence, IHtmlCo
     }
     return res;
   }
+  
 
   @Override
   public String toPlainText() {

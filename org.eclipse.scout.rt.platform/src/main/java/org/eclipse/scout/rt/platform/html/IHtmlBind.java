@@ -10,9 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.html;
 
+import java.io.Serializable;
 import java.util.Map;
 
-public interface IHtmlBind extends CharSequence {
+public interface IHtmlBind extends CharSequence, Serializable {
 
   void replaceBinds(Map<String, String> bindMap);
 

@@ -10,11 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.html.internal;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.html.IHtmlBind;
 import org.eclipse.scout.rt.platform.html.IHtmlContent;
 
@@ -22,6 +24,7 @@ import org.eclipse.scout.rt.platform.html.IHtmlContent;
  * Empty node for HTML fragments: Creates a node that may contain other html content, but does not have a tag name.
  */
 public class HtmlContentBuilder extends AbstractExpressionBuilder implements IHtmlContent {
+  private static final long serialVersionUID = 1L;
   private final List<? extends IHtmlBind> m_texts;
 
   public HtmlContentBuilder(CharSequence... texts) {
@@ -38,6 +41,10 @@ public class HtmlContentBuilder extends AbstractExpressionBuilder implements IHt
       if (text == null) {
         continue;
       }
+      if (!(text instanceof Serializable)) {
+        throw new ProcessingException("At least one provided char sequence is not serializable: {}", text);
+      }
+
       else if (text instanceof IHtmlContent) {
         bindTexts.add(importHtml((IHtmlContent) text));
       }

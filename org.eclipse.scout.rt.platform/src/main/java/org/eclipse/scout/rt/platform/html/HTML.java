@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.html;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -32,6 +33,9 @@ import org.eclipse.scout.rt.platform.html.internal.StyleElementBuilder;
 /**
  * Convenience for building a html document or parts of it with encoded binds. <br>
  * Only the most common cases are supported, not intended to be complete.
+ * <p>
+ * Because {@link IHtmlContent} extends {@link Serializable}, all {@link CharSequence} provided as arguments must be
+ * serializable (constraint verified by constructor of {@link HtmlPlainBuilder} and {@link HtmlContentBuilder}.
  */
 public final class HTML {
 

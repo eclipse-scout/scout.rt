@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.html;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -27,7 +28,9 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
 /**
  * HTML Binds <br>
  */
-public class HtmlBinds {
+public class HtmlBinds implements Serializable {
+
+  private static final long serialVersionUID = 1L;
 
   /**
    * Internal map to store bind variables.

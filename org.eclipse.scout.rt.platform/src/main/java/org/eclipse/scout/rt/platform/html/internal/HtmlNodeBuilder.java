@@ -24,6 +24,7 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
  */
 public class HtmlNodeBuilder extends HtmlContentBuilder implements IHtmlElement {
 
+  private static final long serialVersionUID = 1L;
   private final List<IHtmlBind> m_attributes = new ArrayList<>();
   private String m_tag;
 
