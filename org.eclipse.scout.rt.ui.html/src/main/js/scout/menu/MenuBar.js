@@ -75,7 +75,9 @@ scout.MenuBar.prototype._render = function($parent) {
     .toggleClass('main-menubar', this.size === 'large')
     .setVisible(this.visible);
   this.$left = this.$container.appendDiv('menubox left');
+  new scout.HtmlComponent(this.$left, this.session);
   this.$right = this.$container.appendDiv('menubox right');
+  new scout.HtmlComponent(this.$right, this.session);
 
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
   this.htmlComp.setLayout(new scout.MenuBarLayout(this));
