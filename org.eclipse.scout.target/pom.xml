@@ -79,11 +79,6 @@
                   <type>target</type>
                   <classifier>eclipse-mars-integration</classifier>
                 </artifact>
-                <artifact>
-                  <file>eclipse-staging.target</file>
-                  <type>target</type>
-                  <classifier>eclipse-staging</classifier>
-                </artifact>
               </artifacts>
             </configuration>
           </execution>
@@ -117,7 +112,6 @@
                     <param>eclipse-luna.target</param>
                     <param>eclipse-mars.target</param>
                     <param>eclipse-mars-integration.target</param>
-                    <param>eclipse-staging.target</param>
                   </targetFiles>
                   <failOnError>true</failOnError>
                 </configuration>
