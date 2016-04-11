@@ -11,6 +11,22 @@ package com.bsiag.scout.rt.client.ui.basic.table.controls;
 
 import org.eclipse.scout.rt.client.ui.basic.table.controls.ITableControl;
 
+import com.bsiag.scout.rt.shared.data.basic.chart.IChartType;
+
 public interface IChartTableControl extends ITableControl {
+  String PROP_CHART_TYPE = "chartType";
+
+  /**
+   * Sets the chart type
+   *
+   * @see IChartType
+   */
+  void setChartType(int chartType);
+
+  /**
+   * @return chart type
+   * @see IChartType
+   */
+  int getChartType();
 
 }
