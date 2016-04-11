@@ -284,6 +284,7 @@ __include("jquery/jquery-scout.js");
   __include("scout/form/fields/radiobutton/RadioButtonGroup.js");
   __include("scout/form/fields/radiobutton/RadioButtonGroupLeftKeyStroke.js");
   __include("scout/form/fields/radiobutton/RadioButtonGroupRightKeyStroke.js");
+  __include("scout/form/fields/radiobutton/RadioButtonKeyStroke.js");
   __include("scout/form/fields/sequencebox/SequenceBox.js");
   __include("scout/form/fields/smartfield/SmartField.js");
   __include("scout/form/fields/smartfield/SmartFieldTouchPopup.js");

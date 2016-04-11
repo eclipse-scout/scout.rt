@@ -45,10 +45,7 @@ scout.Button.prototype._init = function(model) {
 scout.Button.prototype._initKeyStrokeContext = function(keyStrokeContext) {
   scout.Button.parent.prototype._initKeyStrokeContext.call(this, keyStrokeContext);
 
-  keyStrokeContext.registerKeyStroke([
-    new scout.ButtonKeyStroke(this, 'ENTER'),
-    new scout.ButtonKeyStroke(this, 'SPACE')
-  ]);
+  this._initDefaultKeyStrokes(keyStrokeContext);
 
   this.formKeyStrokeContext = new scout.KeyStrokeContext();
   this.formKeyStrokeContext.invokeAcceptInputOnActiveValueField = true;
@@ -63,6 +60,13 @@ scout.Button.prototype._initKeyStrokeContext = function(keyStrokeContext) {
     //failsave if scope is not set use form
     return this.getForm().$container;
   }.bind(this);
+};
+
+scout.Button.prototype._initDefaultKeyStrokes = function(keyStrokeContext) {
+  keyStrokeContext.registerKeyStroke([
+    new scout.ButtonKeyStroke(this, 'ENTER'),
+    new scout.ButtonKeyStroke(this, 'SPACE')
+  ]);
 };
 
 /**
