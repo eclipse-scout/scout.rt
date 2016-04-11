@@ -10,10 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.html;
 
+import java.io.Serializable;
+
 /**
  * Marker Interface for any Html Content that may contain bind variables.
  */
-public interface IHtmlContent extends CharSequence {
+public interface IHtmlContent extends CharSequence, Serializable {
 
   String toHtml();
 

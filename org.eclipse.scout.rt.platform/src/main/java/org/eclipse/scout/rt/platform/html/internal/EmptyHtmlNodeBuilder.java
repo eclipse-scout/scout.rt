@@ -19,6 +19,8 @@ import java.util.List;
  */
 public class EmptyHtmlNodeBuilder extends HtmlNodeBuilder {
 
+  private static final long serialVersionUID = 1L;
+
   public EmptyHtmlNodeBuilder(String tag, CharSequence... texts) {
     this(tag, Arrays.asList(texts));
   }

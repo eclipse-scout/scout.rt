@@ -14,6 +14,8 @@ import org.eclipse.scout.rt.platform.html.IHtmlListElement;
 
 public class HtmlListElement extends HtmlNodeBuilder implements IHtmlListElement {
 
+  private static final long serialVersionUID = 1L;
+
   public HtmlListElement(CharSequence text) {
     super("li", text);
   }

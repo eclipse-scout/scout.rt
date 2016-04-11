@@ -20,8 +20,9 @@ import org.eclipse.scout.rt.platform.html.IHtmlContent;
  */
 public abstract class AbstractExpressionBuilder implements CharSequence, IHtmlContent {
 
+  private static final long serialVersionUID = 1L;
+
   private StringBuilder m_buf;
-  private final HtmlHelper m_htmlHelper = BEANS.get(HtmlHelper.class);
 
   protected StringBuilder validate() {
     if (m_buf == null) {
@@ -78,13 +79,13 @@ public abstract class AbstractExpressionBuilder implements CharSequence, IHtmlCo
 
   @Override
   public String toPlainText() {
-    return m_htmlHelper.toPlainText(toHtml());
+    return BEANS.get(HtmlHelper.class).toPlainText(toHtml());
   }
 
   /**
    * @return the encoded bind value.
    */
   protected String escape(Object value) {
-    return m_htmlHelper.escape(value.toString());
+    return BEANS.get(HtmlHelper.class).escape(value.toString());
   }
 }

@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.eclipse.scout.rt.platform.html.IHtmlContent;
 import org.eclipse.scout.rt.platform.html.IHtmlElement;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
@@ -23,7 +24,9 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
  */
 public class HtmlNodeBuilder extends HtmlContentBuilder implements IHtmlElement {
 
-  private final List<CharSequence> m_attributes = new ArrayList<>();
+  private static final long serialVersionUID = 1L;
+
+  private final List<IHtmlContent> m_attributes = new ArrayList<>();
   private String m_tag;
 
   protected String getTag() {
@@ -115,5 +118,4 @@ public class HtmlNodeBuilder extends HtmlContentBuilder implements IHtmlElement 
     addAttribute("data-ref", ref);
     return this;
   }
-
 }

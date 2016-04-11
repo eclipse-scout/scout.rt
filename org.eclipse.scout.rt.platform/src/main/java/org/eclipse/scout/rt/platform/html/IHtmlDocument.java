@@ -14,7 +14,7 @@ public interface IHtmlDocument extends IHtmlElement {
 
   String HTML5_DOCTYPE = "<!DOCTYPE html>";
 
-  IHtmlDocument doctype(CharSequence type);
+  IHtmlDocument doctype(String type);
 
   /**
    * @return HTML document with HTML5 doctype {@value IHtmlDocument#HTML5_DOCTYPE}

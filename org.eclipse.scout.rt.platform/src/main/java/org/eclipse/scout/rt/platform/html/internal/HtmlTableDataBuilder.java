@@ -19,6 +19,8 @@ import org.eclipse.scout.rt.platform.html.IHtmlTableCell;
  */
 public class HtmlTableDataBuilder extends HtmlNodeBuilder implements IHtmlTableCell {
 
+  private static final long serialVersionUID = 1L;
+
   public HtmlTableDataBuilder(List<? extends CharSequence> text) {
     super("td", text);
   }

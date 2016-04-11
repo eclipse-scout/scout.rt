@@ -20,6 +20,8 @@ import org.eclipse.scout.rt.platform.html.IHtmlTableRow;
  */
 public class HtmlTableBuilder extends HtmlNodeBuilder implements IHtmlTable {
 
+  private static final long serialVersionUID = 1L;
+
   public HtmlTableBuilder(List<IHtmlTableRow> rows) {
     super("table", rows);
   }

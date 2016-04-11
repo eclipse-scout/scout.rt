@@ -14,6 +14,8 @@ import org.eclipse.scout.rt.platform.html.IStyleElement;
 
 public class StyleElementBuilder extends HtmlNodeBuilder implements IStyleElement {
 
+  private static final long serialVersionUID = 1L;
+
   public StyleElementBuilder(CharSequence... elements) {
     super("style", elements);
   }
@@ -50,5 +52,4 @@ public class StyleElementBuilder extends HtmlNodeBuilder implements IStyleElemen
   public IStyleElement appLink(CharSequence ref) {
     return (IStyleElement) super.appLink(ref);
   }
-
 }
