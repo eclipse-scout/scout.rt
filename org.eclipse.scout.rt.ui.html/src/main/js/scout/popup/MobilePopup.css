@@ -12,7 +12,7 @@
 
 .mobile-popup {
   background-color: @background-color;
-  border-top: 5px solid @active-color; /*FIXME CGU extract color var*/
+  border-top: 5px solid @active-color;
   border-top-left-radius: @border-radius;
   border-top-right-radius: @border-radius;
   margin-top: 30px;
@@ -39,7 +39,7 @@
   & > .title {
     #scout.overflow-ellipsis-nowrap();
     #scout.font-text-large();
-    color: @active-color; /*FIXME CGU extract color var, mit dialog vereinheitlichen*/
+    color: @active-color;
     width: 100%;
   }
 

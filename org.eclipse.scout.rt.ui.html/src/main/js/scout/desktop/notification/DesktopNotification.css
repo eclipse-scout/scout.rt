@@ -18,9 +18,9 @@
  * notifications.
  */
 .keyframes-notification-slide-in() {
-  0%   { left: 250px; margin-bottom: 0;   }
-  80%  { left: 15px;                      }
-  100% { left: 0;     margin-bottom: 20px;}
+  00%   { left: 250px; margin-bottom: 0; }
+  80%  { left: 15px; }
+  100% { left: 0; margin-bottom: 20px; }
 }
 
 .animation-notification-slide-in() {
@@ -40,8 +40,8 @@
 @keyframes notification-fade-out { .keyframes-notification-fade-out(); }
 
 .keyframes-notification-fade-out() {
-  0%   { opacity: 1.0; margin-bottom:  20px; }
-  100% { opacity:   0; margin-bottom: -37px; }
+  00%   { opacity: 1.0; margin-bottom: 20px; }
+  100% { opacity: 0; margin-bottom: -37px; }
 }
 
 .animation-notification-fade-out() {
