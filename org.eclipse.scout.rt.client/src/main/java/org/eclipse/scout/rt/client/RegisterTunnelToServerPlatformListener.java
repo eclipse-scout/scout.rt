@@ -14,7 +14,6 @@ import java.util.List;
 
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
-import org.eclipse.scout.rt.platform.IBeanDecorationFactory;
 import org.eclipse.scout.rt.platform.IBeanManager;
 import org.eclipse.scout.rt.platform.IPlatform;
 import org.eclipse.scout.rt.platform.IPlatformListener;
@@ -30,7 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Default client-side {@link IBeanDecorationFactory} used in {@link IPlatform#getBeanManager()}
+ * Platform listener that registers proxy instances for interfaces annotated with {@link TunnelToServer}.
  */
 public class RegisterTunnelToServerPlatformListener implements IPlatformListener {
   private static final Logger LOG = LoggerFactory.getLogger(RegisterTunnelToServerPlatformListener.class);
