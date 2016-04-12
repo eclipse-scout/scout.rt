@@ -28,7 +28,7 @@ scout.inherits(scout.Outline, scout.Tree);
 
 scout.Outline.prototype._init = function(model) {
   //add filter before first traversal of tree-> tree is only traversed once.
-  this.addFilterNoInitialFiltering(new scout.DetailTableTreeFilter());
+  this.addFilter(new scout.DetailTableTreeFilter(), true);
   scout.Outline.parent.prototype._init.call(this, model);
 
   this.formController = new scout.FormController(this, this.session);

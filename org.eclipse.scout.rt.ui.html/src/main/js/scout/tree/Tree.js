@@ -58,7 +58,7 @@ scout.Tree.DisplayStyle = {
 
 scout.Tree.prototype._init = function(model) {
   scout.Tree.parent.prototype._init.call(this, model);
-  this.addFilterNoInitialFiltering(new scout.LazyNodeFilter(this));
+  this.addFilter(new scout.LazyNodeFilter(this), true);
   this.initialTraversing = true;
   this._visitNodes(this.nodes, this._initTreeNode.bind(this));
   this.initialTraversing = false;
@@ -864,11 +864,9 @@ scout.Tree.prototype._renderSelection = function() {
     // Mark all child nodes
     if (node.expanded) {
       node.childNodes.forEach(function(childNode) {
-        if (childNode.$node) {
           if (childNode.rendered) {
             childNode.$node.addClass('child-of-selected');
           }
-        }
       }, this);
     }
   }, this);
@@ -895,7 +893,7 @@ scout.Tree.prototype._removeSelection = function() {
   // Remove children class on root nodes if no nodes were selected
   if (this.selectedNodes.length === 0) {
     this.nodes.forEach(function(childNode) {
-      if (childNode.$node) {
+      if (childNode.rendered) {
         childNode.$node.removeClass('child-of-selected');
       }
     }, this);
@@ -917,7 +915,7 @@ scout.Tree.prototype._removeSelection = function() {
       }
       if (node.expanded) {
         node.childNodes.forEach(function(childNode) {
-          if (childNode.$node) {
+          if (childNode.rendered) {
             childNode.$node.removeClass('child-of-selected');
           }
         }, this);
@@ -1079,7 +1077,7 @@ scout.Tree.prototype.setDisplayStyle = function(displayStyle, notifyServer) {
   this.displayStyle = displayStyle;
   notifyServer = scout.nvl(notifyServer, true);
   if (notifyServer) {
-    this._sendDisplayStyleChange();
+    this._sendProperty('displayStyle');
   }
 
   if (displayStyle && this.selectedNodes.length > 0) {
@@ -1174,17 +1172,8 @@ scout.Tree.prototype.setNodeExpanded = function(node, expanded, opts) {
       this._updateItemPath(false, node);
     }
     var filterStateChanged = this._applyFiltersForNode(node);
-    if (filterStateChanged) {
-      if (renderExpansionOpts.expansionChanged) {
+    if (filterStateChanged && renderExpansionOpts.expansionChanged) {
         this._rebuildParent(node.parentNode, opts);
-        if (notifyServer) {
-          this._send('nodeExpanded', {
-            nodeId: node.id,
-            expanded: expanded,
-            expandedLazy: lazy
-          });
-        }
-      }
     } else if (renderExpansionOpts.expandLazyChanged) {
       node.childNodes.forEach(function(child) {
         this._applyFiltersForNode(child);
@@ -1816,7 +1805,7 @@ scout.Tree.prototype.checkNodes = function(nodes, options) {
   };
   $.extend(opts, options);
   var updatedNodes = [];
-  if (!this.enabled || (!this.checkable && opts.checkOnlyEnabled)) {
+  if (!this.checkable || (!this.enabled && opts.checkOnlyEnabled)) {
     return updatedNodes;
   }
   nodes = scout.arrays.ensure(nodes);
@@ -1894,12 +1883,6 @@ scout.Tree.prototype._sendNodesChecked = function(nodes) {
   }
 
   this._send('nodesChecked', data);
-};
-
-scout.Tree.prototype._sendDisplayStyleChange = function() {
-  this._send('displayStyle', {
-    displayStyle: this.displayStyle
-  });
 };
 
 scout.Tree.prototype._triggerNodesSelected = function(debounce) {
@@ -2062,15 +2045,12 @@ scout.Tree.prototype.$nodes = function() {
 /**
  * @param filter object with createKey() and accept()
  */
-scout.Tree.prototype.addFilter = function(filter) {
-  if (this.addFilterNoInitialFiltering(filter)) {
-    this.filter();
-  }
-};
-
-scout.Tree.prototype.addFilterNoInitialFiltering = function(filter) {
+scout.Tree.prototype.addFilter = function(filter, doNotFilter) {
   if (this._filters.indexOf(filter) < 0) {
     this._filters.push(filter);
+    if(!doNotFilter){
+      this.filter();
+    }
     return true;
   }
   return false;
