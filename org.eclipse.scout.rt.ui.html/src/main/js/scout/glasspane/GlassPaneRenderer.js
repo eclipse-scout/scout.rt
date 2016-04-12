@@ -116,8 +116,7 @@ scout.GlassPaneRenderer.prototype._onMousedown = function(event) {
   if ($animationTarget) {
     $animationTarget.addClassForAnimation('modality-highlight', {
       // remove shown as well, user may click the glasspane before the widget itself was able to remove the shown class
-      classesToRemove: 'modality-highlight shown',
-      delay: 500
+      classesToRemove: 'modality-highlight shown'
     });
   }
 };

@@ -17,9 +17,10 @@ import org.eclipse.scout.rt.platform.html.IHtmlElement;
  */
 public class HtmlLinkBuilder extends HtmlNodeBuilder implements IHtmlElement {
 
+  private static final long serialVersionUID = 1L;
+
   public HtmlLinkBuilder(CharSequence url, CharSequence text) {
     super("a", text);
     addAttribute("href", url);
   }
-
 }

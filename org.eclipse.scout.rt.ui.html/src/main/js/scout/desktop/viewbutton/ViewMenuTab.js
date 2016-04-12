@@ -24,6 +24,7 @@ scout.ViewMenuTab = function() {
   this.inBackground = false;
 
   this.defaultIconId = scout.icons.OUTLINE;
+  this._addEventSupport();
 };
 scout.inherits(scout.ViewMenuTab, scout.Widget);
 
@@ -115,14 +116,9 @@ scout.ViewMenuTab.prototype.togglePopup = function() {
     } else {
       // Open or close the popup.
       if (this.popup) {
-        this.popup.close();
+        this._closePopup();
       } else {
-        this.$container.addClass('popup-open');
-        this.popup = this._openPopup();
-        this.popup.on('remove', function(event) {
-          this.$container.removeClass('popup-open');
-          this.popup = null;
-        }.bind(this));
+        this._openPopup();
       }
       return false; // menu won't open if we didn't abort the mousedown-event
     }
@@ -132,16 +128,50 @@ scout.ViewMenuTab.prototype.togglePopup = function() {
 };
 
 scout.ViewMenuTab.prototype._openPopup = function() {
+  if (this.popup) {
+    // already open
+    return;
+  }
   var naviBounds = scout.graphics.bounds(this.$container.parent(), true);
-  var popup = scout.create('ViewMenuPopup', {
+  this.popup = scout.create('ViewMenuPopup', {
     parent: this,
     $tab: this.$container,
     viewMenus: this._popupViewMenus(),
     naviBounds: naviBounds
   });
-  popup.headText = this.text;
-  popup.open();
-  return popup;
+  this.popup.headText = this.text;
+  this.popup.open();
+  this.$container.addClass('popup-open');
+  this.popup.on('remove', function(event) {
+    this.$container.removeClass('popup-open');
+    this.popup = null;
+  }.bind(this));
+};
+
+scout.ViewMenuTab.prototype._closePopup = function() {
+  if (this.popup) {
+    this.popup.close();
+  }
+};
+
+scout.ViewMenuTab.prototype.setSelected = function(selected) {
+  if (selected === this.selected) {
+    return;
+  }
+  this._setProperty('selected', selected);
+  if (this.rendered) {
+    this._renderSelected();
+  }
+};
+
+scout.ViewMenuTab.prototype.setIconId = function(iconId) {
+  if (iconId === this.iconId) {
+    return;
+  }
+  this._setProperty('iconId', iconId);
+  if (this.rendered) {
+    this._renderIconId();
+  }
 };
 
 /**
@@ -171,19 +201,19 @@ scout.ViewMenuTab.prototype.onOutlineChanged = function(outline) {
 
   if (ovb) {
     this.outlineViewButton = ovb;
-    this.iconId = ovb.iconId || this.defaultIconId;
-    this.selected = true;
+    this.setIconId(ovb.iconId || this.defaultIconId);
+    this.setSelected(true);
   } else {
-    this.selected = false;
+    this.setSelected(false);
   }
-
-  this._renderProperties();
+  this._closePopup();
 };
 
 scout.ViewMenuTab.prototype.sendToBack = function() {
   this.inBackground = true;
   this._renderInBackground();
   this._renderSelected();
+  this._closePopup();
 };
 
 scout.ViewMenuTab.prototype.bringToFront = function() {

@@ -12,10 +12,21 @@
 
 .mobile-popup {
   background-color: @background-color;
-  border-top: 5px solid @active-color; /*FIXME CGU extract color var*/
+  border-top: 5px solid @active-color;
   border-top-left-radius: @border-radius;
   border-top-right-radius: @border-radius;
   margin-top: 30px;
+  #scout.drop-shadow(@x: 0px, @y: 0px, @blur: 30px, @spread: 5px, @alpha: 0.5);
+
+  &.shown {
+    #scout.animation-name(slidein-bottom);
+    #scout.animation-duration(0.5s);
+  }
+
+  &.removed {
+    #scout.animation-name(slideout-bottom);
+    #scout.animation-duration(0.5s);
+  }
 }
 
 .mobile-popup-header {
@@ -28,7 +39,7 @@
   & > .title {
     #scout.overflow-ellipsis-nowrap();
     #scout.font-text-large();
-    color: @active-color; /*FIXME CGU extract color var, mit dialog vereinheitlichen*/
+    color: @active-color;
     width: 100%;
   }
 

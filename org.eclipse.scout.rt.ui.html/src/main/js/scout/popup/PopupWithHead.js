@@ -81,28 +81,6 @@ scout.PopupWithHead.prototype._renderHead = function() {
 };
 
 /**
- * @override Popup.js
- */
-scout.PopupWithHead.prototype._attachCloseHandler = function() {
-  scout.PopupWithHead.parent.prototype._attachCloseHandler.call(this);
-  //The popup should be able to close when keystroke is consumed outside of popup.
-  this._popupKeyStrokeCloseHandler = this._onKeyStrokeExecuted.bind(this);
-  this.session.desktop.on('keystrokeConsumed', this._popupKeyStrokeCloseHandler);
-};
-
-/**
- * @override Popup.js
- */
-scout.PopupWithHead.prototype._detachCloseHandler = function() {
-  scout.PopupWithHead.parent.prototype._detachCloseHandler.call(this);
-  //Uninstall popup open close handler
-  if (this._popupKeyStrokeCloseHandler) {
-    this.session.desktop.off('keystrokeConsumed', this._popupKeyStrokeCloseHandler);
-    this._popupOpenHandler = null;
-  }
-};
-
-/**
  * Sets CSS classes or CSS-properties on the copied children in the head.
  */
 scout.PopupWithHead.prototype._modifyHeadChildren = function() {
@@ -133,17 +111,6 @@ scout.PopupWithHead.prototype._copyCssClassToHead = function(className) {
 
 scout.PopupWithHead.prototype._onHeadMouseDown = function(event) {
   if (this.$head && this.$head.isOrHas(event.target)) {
-    this.close();
-  }
-};
-
-/**
- * Method invoked when a KeyStroke is consumed
- */
-scout.PopupWithHead.prototype._onKeyStrokeExecuted = function(event) {
-  // check if target of key stroke is inside popup. If not-> close
-  var $target = event.$target;
-  if ($target && !($target === this.$container || this.$container.find($target).length > 0)) {
     this.close();
   }
 };

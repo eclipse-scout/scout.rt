@@ -103,12 +103,27 @@ public class JsonTabBox<TAB_BOX extends ITabBox> extends JsonCompositeField<TAB_
 
   protected void handleUiTabSelected(JsonEvent event) {
     int tabIndex = event.getData().optInt("tabIndex");
-    List<IGroupBox> groupBoxes = getModel().getGroupBoxes();
-    if (tabIndex >= 0 && tabIndex < groupBoxes.size()) {
-      IGroupBox groupBox = groupBoxes.get(tabIndex);
-      addPropertyEventFilterCondition(ITabBox.PROP_SELECTED_TAB, groupBox);
-      getModel().getUIFacade().setSelectedTabFromUI(groupBox);
+    IGroupBox selectedTabBox = getGroupBoxForIndex(tabIndex);
+    if (selectedTabBox != null) {
+      addPropertyEventFilterCondition(ITabBox.PROP_SELECTED_TAB, selectedTabBox);
+      getModel().getUIFacade().setSelectedTabFromUI(selectedTabBox);
     }
+  }
+
+  protected IGroupBox getGroupBoxForIndex(int index) {
+    DisplayableFormFieldFilter<IFormField> filter = new DisplayableFormFieldFilter<>();
+    int i = 0;
+    for (IGroupBox gb : getModel().getGroupBoxes()) {
+      // Don't count invisible group boxes (they are not sent to the UI, see JsonCompositeField)
+      if (!filter.accept(gb)) {
+        continue;
+      }
+      if (i == index) {
+        return gb;
+      }
+      i++;
+    }
+    return null;
   }
 
   protected int getIndexForGroupBox(IGroupBox groupBox) {

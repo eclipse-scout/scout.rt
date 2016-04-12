@@ -15,6 +15,8 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
 
 public class HtmlInputBuilder extends EmptyHtmlNodeBuilder implements IHtmlInput {
 
+  private static final long serialVersionUID = 1L;
+
   public HtmlInputBuilder() {
     super("input");
   }

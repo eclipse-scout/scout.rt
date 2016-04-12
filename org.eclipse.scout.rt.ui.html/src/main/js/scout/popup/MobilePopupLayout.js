@@ -32,6 +32,11 @@ scout.MobilePopupLayout.prototype.layout = function($container) {
   widgetSize.height -= headerSize.height;
   htmlWidget.setLocation(new scout.Point(0, headerSize.height));
   htmlWidget.setSize(widgetSize.subtract(htmlWidget.getMargins()));
+
+  // The first time it gets layouted, add shown class to be able to animate
+  if (!htmlPopup.layouted) {
+    htmlPopup.$comp.addClassForAnimation('shown');
+  }
 };
 
 /**

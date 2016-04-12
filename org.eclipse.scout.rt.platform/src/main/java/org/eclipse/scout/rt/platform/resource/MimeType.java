@@ -20,7 +20,7 @@ public enum MimeType {
   //by file extension
   APPCACHE("text/cache-manifest", "appcache"),
   CSS("text/css", "css"),
-  CSV("text/comma-separated-values", "csv"),
+  CSV("text/csv", "csv"),
   DOCX("application/vnd.openxmlformats-officedocument.wordprocessingml.document", "docx"),
   DOTX("application/vnd.openxmlformats-officedocument.wordprocessingml.template", "dotx"),
   EML("message/rfc822", "eml"),

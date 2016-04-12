@@ -1774,7 +1774,7 @@ describe("Table", function() {
 
     afterEach(function() {
       // Close context menus
-      $('body').triggerClick();
+      removePopups(session);
     });
 
     it("opens context menu", function() {

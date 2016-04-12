@@ -28,6 +28,7 @@ import java.util.Locale;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.JarOutputStream;
+import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 
 import org.eclipse.scout.rt.platform.BEANS;
@@ -466,4 +467,82 @@ public final class FileUtility {
       };
     }
   }
+
+  private static final Pattern PAT_FILENAME_REMOVE_INVALID_CHARACTERS = Pattern.compile("[<>:\"/\\\\|?*\\x00-\\x1F]");
+  private static final Pattern PAT_FILENAME_REMOVE_LEADING_CHARACTERS = Pattern.compile("^[\\s.]+([^\\s.].*)$");
+  private static final Pattern PAT_FILENAME_REMOVE_TRAILING_CHARACTERS = Pattern.compile("^(.*[^\\s.])[\\s.]+$");
+  private static final Pattern PAT_FILENAME_TRIM = Pattern.compile("^[\\s.]*$");
+  private static final String DEFAULT_FILENAME = "_";
+
+  /**
+   * Validate a file name based on the <tt>filename</tt> by removing illegal characters, leading/trailing
+   * dots/whitespace and omitting the file name being one of the reserved file names.
+   * <p>
+   * Never returns an empty String or null.
+   * <p>
+   * Chops filename to max length of 250 characters.
+   *
+   * @since 5.1
+   */
+  public static String toValidFilename(final String filename) {
+    if (filename == null) {
+      return DEFAULT_FILENAME;
+    }
+    String s = filename;
+    s = PAT_FILENAME_REMOVE_INVALID_CHARACTERS.matcher(s).replaceAll("");
+    try {
+      Paths.get(s);
+      //ok
+    }
+    catch (Exception ex) {
+      //nok, check every character in sandwich test
+      StringBuilder buf = new StringBuilder();
+      for (char ch : s.toCharArray()) {
+        try {
+          Paths.get("a" + ch + "a");
+          buf.append(ch);
+        }
+        catch (Exception ex2) {
+          //skip ch
+        }
+      }
+      s = buf.toString();
+    }
+
+    //remove leading and trailing dots, whitespace
+    s = PAT_FILENAME_REMOVE_LEADING_CHARACTERS.matcher(s).replaceAll("$1");
+    s = PAT_FILENAME_REMOVE_TRAILING_CHARACTERS.matcher(s).replaceAll("$1");
+    s = PAT_FILENAME_TRIM.matcher(s).replaceAll("");
+
+    if (s.isEmpty()) {
+      return DEFAULT_FILENAME;
+    }
+
+    // on some operating systems, the name may not be longer than 250 characters
+    if (s.length() > 250) {
+      int dot = s.lastIndexOf('.');
+      String suffix = (dot > 0 ? s.substring(dot) : "");
+      //suffix is at most 32 chars
+      if (suffix.length() > 32) {
+        suffix = "";
+      }
+      s = s.substring(0, 250 - suffix.length()) + suffix;
+    }
+
+    return s;
+  }
+
+  /**
+   * Is the given <tt>filename</tt> a valid file name
+   * <p>
+   * Uses {@link #toValidFilename(String)} to check
+   *
+   * @param filename
+   * @return <tt>false</tt> if <tt>filename</tt> is not a valid filename<br/>
+   *         <tt>true</tt> if <tt>filename</tt> is a valid filename
+   */
+  public static boolean isValidFilename(String filename) {
+    return toValidFilename(filename).equals(filename);
+  }
+
 }

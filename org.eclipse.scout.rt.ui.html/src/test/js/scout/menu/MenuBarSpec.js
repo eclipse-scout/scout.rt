@@ -158,4 +158,35 @@ describe("MenuBar", function() {
 
   });
 
+  describe('layout', function() {
+    it('gets invalidated if a menu changes its visibility', function() {
+      var menu1 = helper.createMenu(helper.createModel('foo')),
+        menu2 = helper.createMenu(helper.createModel('bar')),
+        menuBar = scout.create('MenuBar', {
+          parent: new scout.NullWidget(),
+          session: session,
+          menuOrder: new scout.MenuItemsOrder(session, 'Table')
+        }),
+        menus = [menu1, menu2];
+
+      menu1.visible = true;
+      menu2.visible = true;
+      menuBar.setMenuItems(menus);
+      menuBar.render(session.$entryPoint);
+      menuBar.$right.setVisible(false); // Right box should not influence the layout (due to missing css)
+      menuBar.htmlComp.setSize(new scout.Dimension(500, 50));
+
+      expect(menu1.$container.isVisible()).toBe(true);
+      expect(scout.HtmlComponent.get(menuBar.$container).valid).toBe(true);
+
+      var event = createPropertyChangeEvent(menu1, {
+        "visible": false
+      });
+      menu1.onModelPropertyChange(event);
+
+      expect(menu1.$container.isVisible()).toBe(false);
+      expect(scout.HtmlComponent.get(menuBar.$container).valid).toBe(false);
+    });
+  });
+
 });

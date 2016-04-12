@@ -54,6 +54,17 @@ public interface IFileChooser {
 
   void removeFileChooserListener(FileChooserListener listener);
 
+  /**
+   * @return a list containing any of media types, mime types and file extensions.
+   *         <p>
+   *         media and mime types are specified using at least a subtype (such containing a '/')
+   *         <p>
+   *         File extensions are specified without leading '.'
+   *         <p>
+   *         Example 1: [txt, csv, text/xml]
+   *         <p>
+   *         Example 2: [text/plain, text/csv, xml]
+   */
   List<String> getFileExtensions();
 
   boolean isMultiSelect();

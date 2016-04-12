@@ -22,8 +22,9 @@ public abstract class AbstractValueFieldData<T> extends AbstractFormFieldData im
 
   private T m_value;
 
-  public AbstractValueFieldData() {
-    super();
+  @Override
+  public Class<?> getFieldStopClass() {
+    return AbstractValueFieldData.class;
   }
 
   @Override

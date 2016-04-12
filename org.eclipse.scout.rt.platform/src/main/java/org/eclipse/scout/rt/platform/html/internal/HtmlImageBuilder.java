@@ -17,9 +17,10 @@ import org.eclipse.scout.rt.platform.html.IHtmlElement;
  */
 public class HtmlImageBuilder extends EmptyHtmlNodeBuilder implements IHtmlElement {
 
+  private static final long serialVersionUID = 1L;
+
   public HtmlImageBuilder(CharSequence path) {
     super("img");
     addAttribute("src", path);
   }
-
 }

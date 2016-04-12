@@ -19,7 +19,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.TransformerException;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
@@ -33,6 +33,7 @@ import org.apache.batik.util.SVGConstants;
 import org.apache.batik.util.XMLConstants;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.platform.util.XmlUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Attr;
@@ -149,14 +150,13 @@ public final class SVGUtility {
     try {
       DOMSource domSource = new DOMSource(doc);
       StreamResult streamResult = new StreamResult(out);
-      Transformer t = TransformerFactory.newInstance().newTransformer();
+      Transformer t = XmlUtility.newTransformer();
       if (encoding != null) {
         t.setOutputProperty("encoding", encoding);
       }
       t.transform(domSource, streamResult);
-      out.close();
     }
-    catch (Exception e) {
+    catch (TransformerException e) {
       throw new ProcessingException("Writing SVG Failed", e);
     }
   }

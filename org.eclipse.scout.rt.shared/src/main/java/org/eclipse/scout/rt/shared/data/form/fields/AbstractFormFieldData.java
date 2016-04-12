@@ -17,6 +17,7 @@ import java.util.Map;
 
 import org.eclipse.scout.rt.platform.Replace;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
+import org.eclipse.scout.rt.platform.util.BeanUtility;
 import org.eclipse.scout.rt.shared.data.form.FormDataUtility;
 import org.eclipse.scout.rt.shared.data.form.IPropertyHolder;
 import org.eclipse.scout.rt.shared.data.form.properties.AbstractPropertyData;
@@ -30,9 +31,6 @@ public abstract class AbstractFormFieldData extends AbstractContributionComposit
   private Map<Class<? extends AbstractFormFieldData>, AbstractFormFieldData> m_fieldMap;
   private boolean m_valueSet;
 
-  public AbstractFormFieldData() {
-  }
-
   private List<Class<AbstractPropertyData>> getConfiguredPropertyDatas() {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
     return ConfigurationUtility.filterClasses(dca, AbstractPropertyData.class);
@@ -42,6 +40,18 @@ public abstract class AbstractFormFieldData extends AbstractContributionComposit
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
     List<Class<AbstractFormFieldData>> fca = ConfigurationUtility.filterClasses(dca, AbstractFormFieldData.class);
     return ConfigurationUtility.removeReplacedClasses(fca);
+  }
+
+  /**
+   * When importing form data, this class is used as a stop class for
+   * {@link BeanUtility#getProperties(Object, Class, org.eclipse.scout.rt.platform.reflect.IPropertyFilter)}.
+   * <p>
+   * If a subclass of {@link AbstractFormFieldData} implements this method, it must return its own class. When
+   * implementing, the class must make sure that it handles the import of properties itself by providing an appropriate
+   * implementation of 'AbstractFormField#importFormFieldData' (if required).
+   */
+  public Class<?> getFieldStopClass() {
+    return AbstractFormFieldData.class;
   }
 
   @Override

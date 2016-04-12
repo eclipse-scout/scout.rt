@@ -37,8 +37,10 @@ public class LogoutService implements ILogoutService {
 
       BEANS.get(IHttpSessionCacheService.class).remove(IServerSession.class.getName(), httpRequest, httpResponse);
       BEANS.get(IHttpSessionCacheService.class).remove(Subject.class.getName(), httpRequest, httpResponse);
-      HttpSession session = httpRequest.getSession();
-      session.invalidate();
+      HttpSession session = httpRequest.getSession(false);
+      if (session != null) {
+        session.invalidate();
+      }
     }
     catch (IllegalStateException e) {
       //already invalid

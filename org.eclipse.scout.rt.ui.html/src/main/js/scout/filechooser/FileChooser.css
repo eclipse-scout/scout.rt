@@ -100,7 +100,7 @@
   }
 
   &.shown {
-    #scout.animation-name(fade-slidein-top);
+    #scout.animation-name(fade-short-drop);
     #scout.animation-duration(0.5s);
   }
 

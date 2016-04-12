@@ -56,7 +56,7 @@ scout.FileChooser.prototype._render = function($parent) {
   this.$fileInputField = $parent.makeElement('<input>')
     .attr('type', 'file')
     .prop('multiple', this.multiSelect)
-    .attr('accept', this.contentTypes)
+    .attr('accept', this.acceptTypes)
     .on('change', this._onFileChange.bind(this));
 
   if (scout.device.supportsFile()) {

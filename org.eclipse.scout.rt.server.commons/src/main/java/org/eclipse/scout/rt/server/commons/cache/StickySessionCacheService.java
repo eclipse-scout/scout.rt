@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.server.commons.cache;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.eclipse.scout.rt.platform.Order;
 
@@ -33,7 +34,10 @@ public class StickySessionCacheService extends AbstractHttpSessionCacheService {
 
   @Override
   public void remove(String key, HttpServletRequest req, HttpServletResponse res) {
-    req.getSession(true).removeAttribute(key);
+    HttpSession session = req.getSession(false);
+    if (session != null) {
+      session.removeAttribute(key);
+    }
   }
 
   @Override

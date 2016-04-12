@@ -648,17 +648,20 @@ $.fn.animateSVG = function(attr, endValue, duration, complete, withoutTabIndex) 
 
 $.fn.addClassForAnimation = function(className, options) {
   var defaultOptions = {
-    delay: 1000,
     classesToRemove: className
   };
   options = $.extend({}, defaultOptions, options);
   this.addClass(className);
-  setTimeout(function() {
+  this.oneAnimationEnd(function() {
     // remove class, otherwise animation will be executed each time the element changes it's visibility (attach/rerender),
     // and even each time when the css classes change
     this.removeClass(options.classesToRemove);
     // delay must be greater than css animation duration
-  }.bind(this), options.delay);
+  }.bind(this));
+};
+
+$.fn.oneAnimationEnd = function(selector, data, handler) {
+  this.one('animationend webkitAnimationEnd', selector, data, handler);
 };
 
 /**

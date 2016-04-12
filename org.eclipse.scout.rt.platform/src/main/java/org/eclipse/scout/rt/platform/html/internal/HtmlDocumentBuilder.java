@@ -13,7 +13,10 @@ package org.eclipse.scout.rt.platform.html.internal;
 import org.eclipse.scout.rt.platform.html.IHtmlDocument;
 
 public class HtmlDocumentBuilder extends HtmlNodeBuilder implements IHtmlDocument {
-  private CharSequence m_docType;
+
+  private static final long serialVersionUID = 1L;
+
+  private String m_docType;
 
   public HtmlDocumentBuilder(CharSequence... texts) {
     super("html", texts);
@@ -28,7 +31,7 @@ public class HtmlDocumentBuilder extends HtmlNodeBuilder implements IHtmlDocumen
   }
 
   @Override
-  public IHtmlDocument doctype(CharSequence doctype) {
+  public IHtmlDocument doctype(String doctype) {
     m_docType = doctype;
     return this;
   }
@@ -37,5 +40,4 @@ public class HtmlDocumentBuilder extends HtmlNodeBuilder implements IHtmlDocumen
   public IHtmlDocument doctype() {
     return doctype(IHtmlDocument.HTML5_DOCTYPE);
   }
-
 }

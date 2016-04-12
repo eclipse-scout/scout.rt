@@ -75,7 +75,7 @@ describe("ValueField", function() {
 
     afterEach(function() {
       // Close context menus
-      $('body').triggerClick();
+      removePopups(session);
     });
 
     it("context menu only shows visible menus", function() {

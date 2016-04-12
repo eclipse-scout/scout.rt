@@ -128,8 +128,6 @@ import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
 import org.eclipse.scout.rt.shared.data.form.IPropertyHolder;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
-import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
-import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldData;
 import org.eclipse.scout.rt.shared.data.form.properties.AbstractPropertyData;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 import org.eclipse.scout.rt.shared.extension.ContributionComposite;
@@ -1148,15 +1146,10 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   }
 
   private static Class<?> getFieldStopClass(Object data) {
-    if (data instanceof AbstractTableFieldData) {
-      return AbstractTableFieldData.class;
+    if (data instanceof AbstractFormFieldData) {
+      return ((AbstractFormFieldData) data).getFieldStopClass();
     }
-    else if (data instanceof AbstractValueFieldData) {
-      return AbstractValueFieldData.class;
-    }
-    else {
-      return AbstractFormFieldData.class;
-    }
+    return AbstractFormFieldData.class;
   }
 
   @Override

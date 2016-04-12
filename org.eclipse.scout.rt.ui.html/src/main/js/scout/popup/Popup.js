@@ -264,17 +264,6 @@ scout.Popup.prototype._onPopupOpen = function(event) {
   }
 };
 
-/**
- * Method invoked when a KeyStroke is consumed
- */
-scout.Popup.prototype._onKeyStrokeExecuted = function(event) {
-  // check if target of key stroke is inside popup. If not-> close
-  var $target = event.$target;
-  if ($target && !$.contains(this.$container, $target)) {
-    this.close();
-  }
-};
-
 scout.Popup.prototype.prefLocation = function($container, openingDirectionY) {
   var x, y, anchorBounds, height, openingDirectionX;
   if (!this.boundToAnchor || (!this.anchorBounds && !this.$anchor)) {
