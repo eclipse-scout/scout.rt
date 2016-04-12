@@ -129,6 +129,9 @@ public abstract class JsonAction<ACTION extends IAction> extends AbstractJsonPro
     else if (IAction.PROP_SELECTED.equals(event.getType())) {
       handleUiSelected(event);
     }
+    else {
+      super.handleUiEvent(event);
+    }
   }
 
   protected void handleUiDoAction(JsonEvent event) {
