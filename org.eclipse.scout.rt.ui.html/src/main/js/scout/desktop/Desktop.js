@@ -193,7 +193,7 @@ scout.Desktop.prototype._renderBench = function() {
   if (this.bench) {
     return;
   }
-  this.bench = scout.create('DesktopBench', {
+  this.bench = scout.create('DesktopGridBench', {
     parent: this,
     outlineContentVisible: this.displayStyle !== scout.Desktop.DisplayStyle.COMPACT
   });

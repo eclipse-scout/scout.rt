@@ -1,0 +1,38 @@
+/*******************************************************************************
+ * Copyright (c) 2014-2015 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
+
+@desktop-table-header-padding-y: @table-header-padding-y + 5;
+@desktop-table-row-padding-y: @table-row-padding-y + 5;
+@desktop-table-header-padding-x: @bench-padding-x - @table-header-padding-left;
+@desktop-table-data-padding-x: @bench-padding-x - @table-cell-padding-left;
+@desktop-table-header-menubar-padding-right: 10px;
+
+.desktop-grid-bench-drop-shadow() {
+  position: absolute;
+  content: '';
+  left: 0;
+  top: 3px;
+  width: 10px;
+  height: 100%;
+  box-shadow: -10px 0px 10px 0px rgba(0,0,0,0.4);
+}
+
+.desktop-grid-bench {
+  position: absolute;
+
+  top: 0;
+  background-color: @background-color;
+
+  &.drop-shadow::before {
+    .desktop-grid-bench-drop-shadow();
+  }
+
+}

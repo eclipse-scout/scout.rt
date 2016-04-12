@@ -111,6 +111,7 @@ scout.FormController.prototype.acceptView = function(view, register, position, s
 };
 
 scout.FormController.prototype._renderView = function(view, register, position, selectView) {
+
   if (register) {
     if (position !== undefined) {
       scout.arrays.insert(this.displayParent.views, view, position);
@@ -124,7 +125,7 @@ scout.FormController.prototype._renderView = function(view, register, position, 
     if (!this.displayParent.acceptView(view)) {
       return;
     }
-  } else if (!this.acceptView(view)){
+  } else if (!this.acceptView(view)) {
     return;
   }
 
@@ -161,7 +162,7 @@ scout.FormController.prototype._renderDialog = function(dialog, register) {
     if (!this.displayParent.acceptDialog(dialog)) {
       return;
     }
-  } else if (!this.acceptDialog(dialog)){
+  } else if (!this.acceptDialog(dialog)) {
     return;
   }
 

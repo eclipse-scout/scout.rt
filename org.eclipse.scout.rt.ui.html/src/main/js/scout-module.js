@@ -226,6 +226,11 @@
   __include("scout/desktop/PopupWindow.js");
   __include("scout/desktop/bench/DesktopBench.js");
   __include("scout/desktop/bench/DesktopBenchLayout.js");
+  __include("scout/desktop/view/ViewArea.js");
+  __include("scout/desktop/grid/DesktopGridBench.js");
+  __include("scout/desktop/grid/DesktopGridBenchLayout.js");
+  __include("scout/desktop/grid/ViewAreaColumn.js");
+  __include("scout/desktop/grid/ViewAreaColumnLayout.js");
   __include("scout/desktop/header/DesktopHeader.js");
   __include("scout/desktop/header/DesktopHeaderLayout.js");
   __include("scout/desktop/navigation/DesktopNavigation.js");

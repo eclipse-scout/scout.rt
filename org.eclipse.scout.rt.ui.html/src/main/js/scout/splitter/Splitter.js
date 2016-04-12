@@ -90,17 +90,22 @@ scout.Splitter.prototype._onMouseDown = function(event) {
 scout.Splitter.prototype._ratio = function(event) {
   var splitterBounds = scout.graphics.offsetBounds(this.$container),
     rootBounds = scout.graphics.offsetBounds(this._$root);
-  var ratio, rootSize;
+  var ratio, rootSize, position;
   if (this.splitHorizontal) {
     rootSize = rootBounds.width;
     ratio = (event ? event.pageX + this._cursorOffset.left : splitterBounds.x) / rootBounds.width;
+    position = Math.floor(ratio * rootSize) - rootBounds.x;
   } else {
     rootSize = rootBounds.height;
+    console.log('root bounds: ', rootBounds);
     ratio = (event ? event.pageY + this._cursorOffset.top : splitterBounds.y) / rootBounds.height;
+    position =  Math.floor(ratio * rootSize) - rootBounds.y;
   }
+
   return {
     ratio: ratio,
-    rootSize: rootSize
+    rootSize: rootSize,
+    position : position
   };
 };
 
@@ -111,10 +116,9 @@ scout.Splitter.prototype._onMouseMove = function(event) {
     ratio = this._maxRatio;
   }
   if (ratio !== this._oldRatio) {
-    var newPosition = Math.floor(ratio * obj.rootSize);
-    this.updatePosition(newPosition);
+    this.updatePosition(obj.position);
     this.trigger('resize', {
-      data: newPosition
+      data: obj.position
     });
     this._oldRatio = ratio;
   }
