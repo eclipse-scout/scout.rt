@@ -25,3 +25,8 @@ scout.ViewButtonsLayout.prototype.layout = function($container) {
     $tab.cssWidth(tabWidth);
   });
 };
+
+scout.ViewButtonsLayout.prototype.preferredLayoutSize = function($container) {
+  // View buttons have an absolute css height set -> useCssSize = true
+  return scout.graphics.prefSize($container, false, true);
+};

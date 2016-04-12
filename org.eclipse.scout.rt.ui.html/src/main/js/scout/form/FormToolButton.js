@@ -27,44 +27,22 @@ scout.FormToolButton.prototype._renderForm = function() {
  */
 scout.FormToolButton.prototype._renderText = function() {
   scout.FormToolButton.parent.prototype._renderText.call(this);
-  if (this.rendered && this.popup) {
+  if (this.rendered && this.popup && this.popup instanceof scout.FormToolPopup) {
     this.popup.rerenderHead();
     this.popup.position();
   }
 };
 
 /**
- *
  * @override
- * form of a formToolbutton can be set to null and is set to a real form by model
- * so we have to update and clone it after it set.
  */
 scout.FormToolButton.prototype.cloneAdapter = function(modelOverride) {
-  var cloneAdapter = scout.FormToolButton.parent.prototype.cloneAdapter.call(this);
-  cloneAdapter.formChangeListener = this._handleOriginalFormChange.bind(cloneAdapter);
-  this.on('propertyChange', cloneAdapter.formChangeListener);
-  cloneAdapter.visible = false;
-  return cloneAdapter;
-};
-
-scout.FormToolButton.prototype._handleOriginalFormChange = function(event) {
-  if (event.newProperties.form) {
-    this.form = this.session.getModelAdapter(event.newProperties.form).cloneAdapter({
-      parent: this
-    });
-  } else if (event.newProperties.form === null) {
-    this.form = null;
-  }
-};
-
-/**
- * @override
- */
-scout.FormToolButton.prototype._remove = function() {
-  if (this.cloneOf) {
-    this.cloneOf.off('propertyChange', this.formChangeListener);
-  }
-  scout.FormToolButton.parent.prototype._remove.call(this);
+  modelOverride = modelOverride || {};
+  // If the FormToolButton is put into a context menu it will be cloned.
+  // Cloning a form is not possible because it may non clonable components (Table, TabBox, etc.) -> exclude
+  // Luckily, it is not necessary to clone it since the form is never shown multiple times at once -> Just use the same instance
+  modelOverride.form = this.form;
+  return scout.FormToolButton.parent.prototype.cloneAdapter.call(this, modelOverride);
 };
 
 /**
@@ -95,17 +73,6 @@ scout.FormToolButton.prototype._createPopup = function() {
  */
 scout.FormToolButton.prototype._doActionTogglesPopup = function() {
   return !!this.form;
-};
-
-/**
- * @override
- */
-scout.FormToolButton.prototype._doAction = function(event) {
-  //clones in submenus and contextmenues do not execute any action
-  if (this.formToolButton.form.cloneOf) {
-    return false;
-  }
-  scout.FormToolButton.parent.prototype._doAction.call(this, event);
 };
 
 /**

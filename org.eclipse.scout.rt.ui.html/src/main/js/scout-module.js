@@ -94,6 +94,8 @@
   __include("scout/tooltip/Tooltip.js");
   __include("scout/tooltip/tooltips.js");
   __include("scout/action/Action.js");
+  __include("scout/action/ActionBox.js");
+  __include("scout/action/ActionBoxLayout.js");
   __include("scout/action/ActionKeyStroke.js");
   __include("scout/box/Box.js");
   __include("scout/popup/Popup.js");
@@ -231,6 +233,7 @@
   __include("scout/desktop/notification/OfflineDesktopNotification.js");
   __include("scout/desktop/popupblocker/PopupBlockerHandler.js");
   __include("scout/desktop/popupblocker/PopupBlockerDesktopNotification.js");
+  __include("scout/desktop/toolbar/DesktopToolBar.js");
   __include("scout/desktop/viewbutton/ViewButton.js");
   __include("scout/desktop/viewbutton/ViewButtons.js");
   __include("scout/desktop/viewbutton/ViewButtonsLayout.js");

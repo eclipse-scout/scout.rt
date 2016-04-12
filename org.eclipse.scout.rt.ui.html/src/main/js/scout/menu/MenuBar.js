@@ -72,8 +72,8 @@ scout.MenuBar.prototype._initKeyStrokeContext = function(keyStrokeContext) {
 scout.MenuBar.prototype._render = function($parent) {
   this.$container = $parent.makeDiv('menubar')
     .attr('id', 'MenuBar-' + scout.objectFactory.createUniqueId())
-    .toggleClass('main-menubar', this.size === 'large')
-    .setVisible(this.visible);
+    .toggleClass('main-menubar', this.size === 'large');
+
   this.$left = this.$container.appendDiv('menubox left');
   new scout.HtmlComponent(this.$left, this.session);
   this.$right = this.$container.appendDiv('menubox right');

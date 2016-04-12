@@ -24,6 +24,7 @@ scout.Action = function() {
    */
   this.actionStyle = scout.Action.ActionStyle.DEFAULT;
   this.textVisible = true;
+  this.compact = false;
 };
 scout.inherits(scout.Action, scout.ModelAdapter);
 
@@ -49,6 +50,7 @@ scout.Action.prototype._renderProperties = function() {
   this._renderSelected();
   this._renderVisible();
   this._renderTabbable();
+  this._renderCompact();
 };
 
 scout.Action.prototype._remove = function() {
@@ -138,6 +140,11 @@ scout.Action.prototype._renderHorizontalAlignment = function() {
 
 scout.Action.prototype._renderToggleAction = function() {
   // nop
+};
+
+scout.Action.prototype._renderCompact = function() {
+  this.$container.toggleClass('compact', this.compact);
+  this.invalidateLayoutTree();
 };
 
 scout.Action.prototype._configureTooltip = function() {
@@ -253,6 +260,16 @@ scout.Action.prototype.setTextVisible = function(textVisible) {
   this.textVisible = textVisible;
   if (this.rendered) {
     this._renderText();
+  }
+};
+
+scout.Action.prototype.setCompact = function(compact) {
+  if (this.compact === compact) {
+    return;
+  }
+  this.compact = compact;
+  if (this.rendered) {
+    this._renderCompact();
   }
 };
 

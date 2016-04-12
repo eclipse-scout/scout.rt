@@ -206,7 +206,7 @@ scout.PopupWithHead.prototype._positionImpl = function(openingDirectionX, openin
   this.$head.children().each(function(i) {
     var $headChild = $(this);
     var $blueprintChild = $blueprintChildren.eq(i);
-    $headChild.copyCss($blueprintChild, 'margin padding line-height border vertical-align font-size');
+    $headChild.copyCss($blueprintChild, 'margin padding line-height border vertical-align font-size display');
   });
 
   headSize = scout.graphics.getSize(this.$head, true);

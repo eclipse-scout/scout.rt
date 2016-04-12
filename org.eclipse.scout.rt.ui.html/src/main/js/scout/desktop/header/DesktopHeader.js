@@ -76,30 +76,22 @@ scout.DesktopHeader.prototype._renderViewTabs = function() {
 };
 
 scout.DesktopHeader.prototype._renderToolBar = function() {
-  if (this._$toolbar) {
+  if (this.toolBar) {
     return;
   }
-  this.$toolBar = this.$container.appendDiv('header-tools');
-  // we set the menuStyle property to render a menu with a different style
-  // depending on where the menu is located (header VS menubar).
-  this.desktop.actions.forEach(function(action) {
-    action._customCssClasses = "header-tool-item";
-    action.popupOpeningDirectionX = 'left';
-    action.setParent(this);
-    action.render(this.$toolBar);
-  }.bind(this));
-
-  if (this.desktop.actions.length) {
-    this.desktop.actions[this.desktop.actions.length - 1].$container.addClass('last');
-  }
+  this.toolBar = scout.create('DesktopToolBar', {
+    parent: this,
+    actions: this.desktop.actions
+  });
+  this.toolBar.render(this.$container);
 };
 
 scout.DesktopHeader.prototype._removeToolBar = function() {
-  if (!this.$toolBar) {
+  if (!this.toolBar) {
     return;
   }
-  this.$toolBar.remove();
-  this.$toolBar = null;
+  this.toolBar.remove();
+  this.toolBar = null;
 };
 
 scout.DesktopHeader.prototype._renderLogoUrl = function() {

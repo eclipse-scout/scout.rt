@@ -11,13 +11,15 @@
 scout.DesktopViewTabsLayout = function(viewTabs) {
   scout.DesktopViewTabsLayout.parent.call(this);
 
-  this.TAB_WIDTH_LARGE = 220;
-  this.TAB_WIDTH_SMALL = 130;
   this.viewTabs = viewTabs;
   this._$overflowTab;
   this._overflowTabsIndizes = [];
 };
 scout.inherits(scout.DesktopViewTabsLayout, scout.AbstractLayout);
+
+scout.DesktopViewTabsLayout.TAB_WIDTH_LARGE = 220;
+scout.DesktopViewTabsLayout.TAB_WIDTH_SMALL = 130;
+scout.DesktopViewTabsLayout.OVERFLOW_MENU_WIDTH = 30;
 
 /**
  * @override AbstractLayout.js
@@ -40,9 +42,9 @@ scout.DesktopViewTabsLayout.prototype.layout = function($container) {
   $tabs.setVisible(true);
   this._overflowTabsIndizes = [];
 
-  // All tabs with in container
+  // All tabs in container
   if (smallPrefSize.width <= containerSize.width) {
-    tabWidth = Math.min(this.TAB_WIDTH_LARGE, Math.floor(containerSize.width / numTabs));
+    tabWidth = Math.min(scout.DesktopViewTabsLayout.TAB_WIDTH_LARGE, Math.floor(containerSize.width / numTabs));
     // 2nd - all Tabs fit when they have small size
     $tabs.each(function() {
       $(this).outerWidth(tabWidth);
@@ -51,10 +53,10 @@ scout.DesktopViewTabsLayout.prototype.layout = function($container) {
   }
 
   // Not all tabs fit in container -> put tabs into overflow menu
-  containerSize.width -= 30;
+  containerSize.width -= scout.DesktopViewTabsLayout.OVERFLOW_MENU_WIDTH;
 
   // check how many tabs fit into remaining containerSize.width
-  var numVisibleTabs = Math.floor(containerSize.width / this.TAB_WIDTH_SMALL),
+  var numVisibleTabs = Math.floor(containerSize.width / scout.DesktopViewTabsLayout.TAB_WIDTH_SMALL),
     numOverflowTabs = numTabs - numVisibleTabs;
 
   var i = 0,
@@ -87,7 +89,7 @@ scout.DesktopViewTabsLayout.prototype.layout = function($container) {
   }
 
   var that = this;
-  tabWidth = this.TAB_WIDTH_SMALL;
+  tabWidth = scout.DesktopViewTabsLayout.TAB_WIDTH_SMALL;
   i = 0;
   $tabs.each(function() {
     if (i >= leftEnd && i <= rightEnd) {
@@ -102,12 +104,12 @@ scout.DesktopViewTabsLayout.prototype.layout = function($container) {
 
 scout.DesktopViewTabsLayout.prototype.smallPrefSize = function() {
   var numTabs = this.viewTabs.viewTabs().length;
-  return new scout.Dimension(numTabs * this.TAB_WIDTH_SMALL, this.viewTabs.htmlComp.$comp.outerHeight(true));
+  return new scout.Dimension(numTabs * scout.DesktopViewTabsLayout.TAB_WIDTH_SMALL, this.viewTabs.htmlComp.$comp.outerHeight(true));
 };
 
 scout.DesktopViewTabsLayout.prototype.preferredLayoutSize = function($container) {
   var numTabs = this.viewTabs.viewTabs().length;
-  return new scout.Dimension(numTabs * this.TAB_WIDTH_LARGE, this.viewTabs.htmlComp.$comp.outerHeight(true));
+  return new scout.Dimension(numTabs * scout.DesktopViewTabsLayout.TAB_WIDTH_LARGE, this.viewTabs.htmlComp.$comp.outerHeight(true));
 };
 
 scout.DesktopViewTabsLayout.prototype._onMouseDownOverflow = function(event) {

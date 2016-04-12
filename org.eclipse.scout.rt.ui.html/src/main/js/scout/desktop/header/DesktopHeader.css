@@ -34,6 +34,10 @@
   position: absolute;
   top: 0;
   white-space: nowrap;
+
+  &.compact {
+    padding-right: 5px;
+  }
 }
 
 .header-tool-item.menu-item {
@@ -56,8 +60,12 @@
   }
 
   &.compact {
-    margin-left: 4px;
-    margin-right: 4px;
+    margin-left: 10px;
+    margin-right: 10px;
+
+    & > .submenu-icon {
+      display: none;
+    }
   }
 
   & > .font-icon {

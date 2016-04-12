@@ -15,7 +15,7 @@
   color: @view-button-tab-color;
   border-right: solid 1px @border-color;
   white-space: nowrap;
-  min-width: 60px;
+  min-width: 50px;
   position: relative;
   text-align: center;
   #scout.vertical-align-helper-before();

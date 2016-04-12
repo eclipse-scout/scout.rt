@@ -85,7 +85,7 @@ scout.Menu.prototype._renderItem = function($parent) {
 };
 
 scout.Menu.prototype._renderSelected = function() {
-  if (!this._doActionTogglesPopup()) {
+  if (!this._doActionTogglesSubMenu()) {
     scout.Menu.parent.prototype._renderSelected.call(this);
   }
   if (this.selected) {
@@ -131,7 +131,7 @@ scout.Menu.prototype._renderSubMenuItems = function(parentMenu, menus) {
 };
 
 scout.Menu.prototype._doActionTogglesSubMenu = function() {
-  return this.parent instanceof scout.ContextMenuPopup || this.parent instanceof scout.Menu;
+  return this.childActions.length > 0 && (this.parent instanceof scout.ContextMenuPopup || this.parent instanceof scout.Menu);
 };
 
 scout.Menu.prototype._getSubMenuLevel = function() {
@@ -189,7 +189,7 @@ scout.Menu.prototype.isTabTarget = function() {
 };
 
 scout.Menu.prototype._updateIconAndTextStyle = function() {
-  var hasText = scout.strings.hasText(this.text);
+  var hasText = scout.strings.hasText(this.text) && this.textVisible;
   var hasTextAndIcon = !!(hasText && this.iconId);
   this.$container.toggleClass('menu-textandicon', hasTextAndIcon);
   this.$container.toggleClass('menu-icononly', !hasText);
