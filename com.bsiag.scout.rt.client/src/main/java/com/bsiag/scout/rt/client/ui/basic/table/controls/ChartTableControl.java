@@ -40,7 +40,7 @@ public class ChartTableControl extends AbstractTableControl implements IChartTab
    * <ul>
    * <li>{@link IChartType#PIE}</li>
    * <li>{@link IChartType#LINE}</li>
-   * <li>{@link IChartType#BAR}</li>
+   * <li>{@link IChartType#BAR_VERTICAL}</li>
    * <li>{@link IChartType#BAR_HORIZONTAL}</li>
    * <li>{@link IChartType#SCATTER}</li>
    * </ul>
@@ -48,7 +48,7 @@ public class ChartTableControl extends AbstractTableControl implements IChartTab
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(100)
   protected int getConfiguredChartType() {
-    return IChartType.BAR;
+    return IChartType.BAR_VERTICAL;
   }
 
   @Override
