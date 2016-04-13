@@ -15,6 +15,8 @@ import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.table.control.JsonTableControl;
 import org.json.JSONObject;
 
+import com.bsiag.scout.rt.client.ui.basic.table.controls.ChartColumnParam;
+import com.bsiag.scout.rt.client.ui.basic.table.controls.IChartColumnParam;
 import com.bsiag.scout.rt.client.ui.basic.table.controls.IChartTableControl;
 
 public class JsonChartTableControl<CHART_TABLE_CONTROL extends IChartTableControl> extends JsonTableControl<CHART_TABLE_CONTROL> {
@@ -37,6 +39,17 @@ public class JsonChartTableControl<CHART_TABLE_CONTROL extends IChartTableContro
         return getModel().getChartType();
       }
     });
+    putJsonProperty(new JsonProperty<CHART_TABLE_CONTROL>(IChartTableControl.PROP_CHART_AGGRAGATION, model) {
+      @Override
+      protected IChartColumnParam modelValue() {
+        return getModel().getAggregation();
+      }
+
+      @Override
+      public Object prepareValueForToJson(Object value) {
+        return JsonChartColumnParam.toJson((IChartColumnParam) value);
+      }
+    });
   }
 
   @Override
@@ -44,7 +57,14 @@ public class JsonChartTableControl<CHART_TABLE_CONTROL extends IChartTableContro
     if (IChartTableControl.PROP_CHART_TYPE.equals(propertyName)) {
       int chartType = data.getInt(propertyName);
       addPropertyEventFilterCondition(IChartTableControl.PROP_CHART_TYPE, chartType);
-      getModel().setProperty(IChartTableControl.PROP_CHART_TYPE, chartType);
+      getModel().setChartType(chartType);
+    }
+    else if (IChartTableControl.PROP_CHART_AGGRAGATION.equals(propertyName)) {
+      JSONObject chartAggregation = data.getJSONObject(propertyName);
+      int index = chartAggregation.getInt("index");
+      int modifier = chartAggregation.getInt("modifier");
+      addPropertyEventFilterCondition(IChartTableControl.PROP_CHART_AGGRAGATION, chartAggregation);
+      getModel().setAggregation(new ChartColumnParam(index, modifier));
     }
   }
 

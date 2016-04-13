@@ -15,6 +15,9 @@ import com.bsiag.scout.rt.shared.data.basic.chart.IChartType;
 
 public interface IChartTableControl extends ITableControl {
   String PROP_CHART_TYPE = "chartType";
+  String PROP_CHART_GROUP_1 = "chartGroup1";
+  String PROP_CHART_GROUP_2 = "chartGroup2";
+  String PROP_CHART_AGGRAGATION = "chartAggregation";
 
   /**
    * Sets the chart type
@@ -28,5 +31,35 @@ public interface IChartTableControl extends ITableControl {
    * @see IChartType
    */
   int getChartType();
+
+  /**
+   * set the configuration parameters for the first group for the chart
+   */
+  void setGroup1(IChartColumnParam param);
+
+  /**
+   * configuration parameters for the first group for the chart
+   */
+  IChartColumnParam getGroup1();
+
+  /**
+   * set the configuration parameters for the second group for the chart (optional)
+   */
+  void setGroup2(IChartColumnParam param);
+
+  /**
+   * configuration parameters for the second group for the chart
+   */
+  IChartColumnParam getGroup2();
+
+  /**
+   * set the configuration parameters for the aggregation for the chart
+   */
+  void setAggregation(IChartColumnParam param);
+
+  /**
+   * configuration parameters for the aggregation for the chart
+   */
+  IChartColumnParam getAggregation();
 
 }

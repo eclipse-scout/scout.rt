@@ -33,6 +33,7 @@ public class ChartTableControl extends AbstractTableControl implements IChartTab
     setTooltipText(TEXTS.get("ui.Chart"));
     setIconId(AbstractIcons.Chart);
     setChartType(getConfiguredChartType());
+    setAggregation(getConfiguredAggregation());
   }
 
   /**
@@ -51,6 +52,12 @@ public class ChartTableControl extends AbstractTableControl implements IChartTab
     return IChartType.BAR_VERTICAL;
   }
 
+  @ConfigProperty(ConfigProperty.OBJECT)
+  @Order(200)
+  protected IChartColumnParam getConfiguredAggregation() {
+    return new ChartColumnParam(-1, IChartColumnParam.AGGREGATION_COUNT);
+  }
+
   @Override
   public void setChartType(int chartType) {
     propertySupport.setPropertyInt(PROP_CHART_TYPE, chartType);
@@ -60,4 +67,35 @@ public class ChartTableControl extends AbstractTableControl implements IChartTab
   public int getChartType() {
     return propertySupport.getPropertyInt(PROP_CHART_TYPE);
   }
+
+  @Override
+  public void setGroup1(IChartColumnParam param) {
+    propertySupport.setProperty(PROP_CHART_GROUP_1, param);
+  }
+
+  @Override
+  public IChartColumnParam getGroup1() {
+    return (IChartColumnParam) propertySupport.getProperty(PROP_CHART_GROUP_1);
+  }
+
+  @Override
+  public void setGroup2(IChartColumnParam param) {
+    propertySupport.setProperty(PROP_CHART_GROUP_2, param);
+  }
+
+  @Override
+  public IChartColumnParam getGroup2() {
+    return (IChartColumnParam) propertySupport.getProperty(PROP_CHART_GROUP_2);
+  }
+
+  @Override
+  public void setAggregation(IChartColumnParam param) {
+    propertySupport.setProperty(PROP_CHART_AGGRAGATION, param);
+  }
+
+  @Override
+  public IChartColumnParam getAggregation() {
+    return (IChartColumnParam) propertySupport.getProperty(PROP_CHART_AGGRAGATION);
+  }
+
 }
