@@ -907,7 +907,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     return jsonColumnIds;
   }
 
-  protected IColumn optColumn(String columnId) {
+  public IColumn optColumn(String columnId) {
     return m_columns.get(columnId);
   }
 
