@@ -12,6 +12,7 @@ scout.arrays = {
 
   /**
    * Ensures the given parameter is an array
+   * @memberOf scout.arrays
    */
   ensure: function(array) {
     if (array === undefined || array === null) {
