@@ -864,9 +864,9 @@ scout.Tree.prototype._renderSelection = function() {
     // Mark all child nodes
     if (node.expanded) {
       node.childNodes.forEach(function(childNode) {
-          if (childNode.rendered) {
-            childNode.$node.addClass('child-of-selected');
-          }
+        if (childNode.rendered) {
+          childNode.$node.addClass('child-of-selected');
+        }
       }, this);
     }
   }, this);
@@ -1173,7 +1173,7 @@ scout.Tree.prototype.setNodeExpanded = function(node, expanded, opts) {
     }
     var filterStateChanged = this._applyFiltersForNode(node);
     if (filterStateChanged && renderExpansionOpts.expansionChanged) {
-        this._rebuildParent(node.parentNode, opts);
+      this._rebuildParent(node.parentNode, opts);
     } else if (renderExpansionOpts.expandLazyChanged) {
       node.childNodes.forEach(function(child) {
         this._applyFiltersForNode(child);
@@ -1247,6 +1247,7 @@ scout.Tree.prototype._removeChildsFromFlatList = function(parentNode, animatedRe
             this._$animationWrapper.append(node.$node);
           }
           node.rendered = false;
+          node.displayBackup = node.$node.css('display');
           removedNodes.push(node);
         } else if (!animatedRemove) {
           this.hideNode(node, false, false);
@@ -1276,6 +1277,8 @@ scout.Tree.prototype._removeChildsFromFlatList = function(parentNode, animatedRe
   function onAnimationComplete(affectedNodes) {
     affectedNodes.forEach(function(node) {
       node.$node.detach();
+      node.$node.css('display', node.displayBackup);
+      node.displayBackup = null;
     });
     if (this._$animationWrapper) {
       this._$animationWrapper.remove();
@@ -2048,7 +2051,7 @@ scout.Tree.prototype.$nodes = function() {
 scout.Tree.prototype.addFilter = function(filter, doNotFilter) {
   if (this._filters.indexOf(filter) < 0) {
     this._filters.push(filter);
-    if(!doNotFilter){
+    if (!doNotFilter) {
       this.filter();
     }
     return true;
