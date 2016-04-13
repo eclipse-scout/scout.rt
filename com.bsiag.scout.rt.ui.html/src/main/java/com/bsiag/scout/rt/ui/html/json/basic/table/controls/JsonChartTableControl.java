@@ -53,13 +53,41 @@ public class JsonChartTableControl<CHART_TABLE_CONTROL extends IChartTableContro
         return createJsonObject((IChartColumnParam) value);
       }
     });
+    putJsonProperty(new JsonProperty<CHART_TABLE_CONTROL>(IChartTableControl.PROP_CHART_GROUP_1, model) {
+      @Override
+      protected IChartColumnParam modelValue() {
+        return getModel().getGroup1();
+      }
+
+      @Override
+      public Object prepareValueForToJson(Object value) {
+        return createJsonObject((IChartColumnParam) value);
+      }
+    });
+    putJsonProperty(new JsonProperty<CHART_TABLE_CONTROL>(IChartTableControl.PROP_CHART_GROUP_2, model) {
+      @Override
+      protected IChartColumnParam modelValue() {
+        return getModel().getGroup2();
+      }
+
+      @Override
+      public Object prepareValueForToJson(Object value) {
+        return createJsonObject((IChartColumnParam) value);
+      }
+    });
   }
 
   private JSONObject createJsonObject(IChartColumnParam columnParam) {
     JSONObject json = new JSONObject();
-    json.put("id", getColumnId(columnParam.getColumnIndex()));
-    json.put("modifier", columnParam.getColumnModifier());
-    return json;
+    if (columnParam != null) {
+
+      String columnId = getColumnId(columnParam.getColumnIndex());
+      int columnModifier = columnParam.getColumnModifier();
+      json.put("id", columnId);
+      json.put("modifier", columnModifier);
+      return json;
+    }
+    return null;
   }
 
   private JsonTable getTableAdapter() {
@@ -96,13 +124,26 @@ public class JsonChartTableControl<CHART_TABLE_CONTROL extends IChartTableContro
     }
     else if (IChartTableControl.PROP_CHART_AGGRAGATION.equals(propertyName)) {
       JSONObject chartAggregation = data.getJSONObject(propertyName);
-
-      String id = chartAggregation.optString("id");
-      int modifier = chartAggregation.getInt("modifier");
-
       addPropertyEventFilterCondition(IChartTableControl.PROP_CHART_AGGRAGATION, chartAggregation);
-      getModel().setAggregation(new ChartColumnParam(getColumnIndex(id), modifier));
+      getModel().setAggregation(createColumnParam(chartAggregation));
     }
+    else if (IChartTableControl.PROP_CHART_GROUP_1.equals(propertyName)) {
+      JSONObject chartGroup1 = data.getJSONObject(propertyName);
+      addPropertyEventFilterCondition(IChartTableControl.PROP_CHART_GROUP_1, chartGroup1);
+      getModel().setGroup1(createColumnParam(chartGroup1));
+    }
+    else if (IChartTableControl.PROP_CHART_GROUP_2.equals(propertyName)) {
+      JSONObject chartGroup2 = data.getJSONObject(propertyName);
+      addPropertyEventFilterCondition(IChartTableControl.PROP_CHART_GROUP_2, chartGroup2);
+      getModel().setGroup2(createColumnParam(chartGroup2));
+    }
+  }
+
+  private ChartColumnParam createColumnParam(JSONObject jsonValue) {
+    String id = jsonValue.optString("id");
+    int modifier = jsonValue.optInt("modifier");
+    final ChartColumnParam param = new ChartColumnParam(getColumnIndex(id), modifier);
+    return param;
   }
 
 }
