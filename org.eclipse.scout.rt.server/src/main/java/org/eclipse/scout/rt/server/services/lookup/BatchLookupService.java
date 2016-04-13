@@ -22,8 +22,8 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.IServerBatchLookupService;
 
 /**
- * Implementation of {@link IBatchLookupService} that can be used in a server. It is not implemented for client-only
- * application, bug 447592 is not relevant anymore.<br>
+ * Implementation of {@link IBatchLookupService} that can be used in a server.<br>
+ * It is not implemented for client-only application, bug 447592 is not relevant anymore.<br>
  * If you want to use {@link IBatchLookupService} in a client-only application, copy this service to your client code.
  *
  * @since 4.3.0 (Mars-M5)
