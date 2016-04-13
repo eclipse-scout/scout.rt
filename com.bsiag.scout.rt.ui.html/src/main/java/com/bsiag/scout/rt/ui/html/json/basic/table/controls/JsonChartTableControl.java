@@ -9,9 +9,12 @@
  ******************************************************************************/
 package com.bsiag.scout.rt.ui.html.json.basic.table.controls;
 
+import org.eclipse.scout.rt.client.ui.basic.table.ITable;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
+import org.eclipse.scout.rt.ui.html.json.table.JsonTable;
 import org.eclipse.scout.rt.ui.html.json.table.control.JsonTableControl;
 import org.json.JSONObject;
 
@@ -47,9 +50,41 @@ public class JsonChartTableControl<CHART_TABLE_CONTROL extends IChartTableContro
 
       @Override
       public Object prepareValueForToJson(Object value) {
-        return JsonChartColumnParam.toJson((IChartColumnParam) value);
+        return createJsonObject((IChartColumnParam) value);
       }
     });
+  }
+
+  private JSONObject createJsonObject(IChartColumnParam columnParam) {
+    JSONObject json = new JSONObject();
+    json.put("id", getColumnId(columnParam.getColumnIndex()));
+    json.put("modifier", columnParam.getColumnModifier());
+    return json;
+  }
+
+  private JsonTable getTableAdapter() {
+    return (JsonTable) getAdapter(getModel().getTable());
+  }
+
+  private String getColumnId(int index) {
+    if (index > 0) {
+      final ITable table = getModel().getTable();
+      IColumn column = table.getColumns().get(index);
+      return getTableAdapter().getColumnId(column);
+    }
+    else {
+      return null;
+    }
+  }
+
+  private int getColumnIndex(String id) {
+    final IColumn column = getTableAdapter().optColumn(id);
+    if (column != null) {
+      return column.getColumnIndex();
+    }
+    else {
+      return -1; //TODO [jgu] necessary, use column instead?
+    }
   }
 
   @Override
@@ -61,10 +96,12 @@ public class JsonChartTableControl<CHART_TABLE_CONTROL extends IChartTableContro
     }
     else if (IChartTableControl.PROP_CHART_AGGRAGATION.equals(propertyName)) {
       JSONObject chartAggregation = data.getJSONObject(propertyName);
-      int index = chartAggregation.getInt("index");
+
+      String id = chartAggregation.optString("id");
       int modifier = chartAggregation.getInt("modifier");
+
       addPropertyEventFilterCondition(IChartTableControl.PROP_CHART_AGGRAGATION, chartAggregation);
-      getModel().setAggregation(new ChartColumnParam(index, modifier));
+      getModel().setAggregation(new ChartColumnParam(getColumnIndex(id), modifier));
     }
   }
 
