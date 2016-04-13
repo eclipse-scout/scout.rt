@@ -254,24 +254,6 @@ scout.Form.prototype._renderIconId = function() {
   this._updateTitle();
 };
 
-scout.Form.prototype._onRequestFocus = function(formFieldId) {
-  var formField = this.session.getOrCreateModelAdapter(formFieldId, this);
-  if (formField) {
-    // FIXME awe, nbu: (focus) hier darf focus nicht direkt aufgerufen werden. Es muss geprüft werden ob
-    // der focuscontext überhaupt "aktivierbar" ist, auch die modalität muss hier berücksichtigt werden
-    // je nach dem kann es sein, dass das field gar nicht den fokus kriegt.
-    formField.$field.focus();
-  }
-};
-
-scout.Form.prototype.onModelAction = function(event) {
-  if (event.type === 'requestFocus') {
-    this._onRequestFocus(event.formField);
-  } else {
-    scout.Form.parent.prototype.onModelAction.call(this, event);
-  }
-};
-
 /**
  * Method invoked when:
  *  - this is a 'detailForm' and the outline content is displayed;
@@ -375,4 +357,25 @@ scout.Form.prototype.glassPaneTargets = function() {
  */
 scout.Form.prototype.inFront = function() {
   return this.rendered && this.attached;
+};
+
+scout.Form.prototype.requestFocus = function(formField) {
+  if (!formField) {
+    return;
+  }
+
+  formField.focus();
+};
+
+scout.Form.prototype._onRequestFocus = function(formFieldId) {
+  var formField = this.session.getOrCreateModelAdapter(formFieldId, this);
+  this.requestFocus(formField);
+};
+
+scout.Form.prototype.onModelAction = function(event) {
+  if (event.type === 'requestFocus') {
+    this._onRequestFocus(event.formField);
+  } else {
+    scout.Form.parent.prototype.onModelAction.call(this, event);
+  }
 };

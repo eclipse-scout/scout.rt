@@ -15,7 +15,7 @@ var FormSpecHelper = function(session) {
 FormSpecHelper.prototype.createFormWithOneField = function(parentId) {
   var form = this.createFormModel();
   var rootGroupBox = this.createGroupBoxModel();
-  var field = this.createFieldModel('StringField', form);
+  var field = this.createFieldModel('StringField');
 
   form.rootGroupBox = rootGroupBox.id;
   rootGroupBox.mainBox = true;
@@ -23,6 +23,16 @@ FormSpecHelper.prototype.createFormWithOneField = function(parentId) {
   rootGroupBox.fields = [field.id];
 
   return createAdapter(form, this.session, [rootGroupBox, field]);
+};
+
+FormSpecHelper.prototype.createGroupBoxWithOneField = function(parentId) {
+  var groupBox = this.createGroupBoxModel();
+  var field = this.createFieldModel('StringField');
+
+  groupBox.owner = parentId || this.session.rootAdapter.id;
+  groupBox.fields = [field.id];
+
+  return createAdapter(groupBox, this.session, [field]);
 };
 
 FormSpecHelper.prototype.createFormModel = function() {
@@ -43,7 +53,7 @@ FormSpecHelper.prototype.createFormModel = function() {
   return form;
 };
 
-FormSpecHelper.prototype.createFieldModel = function(objectType, form) {
+FormSpecHelper.prototype.createFieldModel = function(objectType) {
   var session = this.session;
   var model = createSimpleModel(objectType || 'StringField', session);
   model.enabled = true;

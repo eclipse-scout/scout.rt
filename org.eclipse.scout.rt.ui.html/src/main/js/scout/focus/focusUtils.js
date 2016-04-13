@@ -15,6 +15,7 @@ scout.focusUtils = {
 
   /**
    * @return whether the given element is focusable by mouse.
+   * @memberOf scout.focusUtils
    */
   isFocusableByMouse: function(element) {
     var $element = $(element);

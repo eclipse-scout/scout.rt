@@ -394,6 +394,15 @@ scout.FormField.prototype.setMenusVisible = function(menusVisible) {
   }
 };
 
+scout.FormField.prototype.focus = function() {
+  if (this.$field) {
+    this.session.focusManager.requestFocus(this.$field[0]);
+  } else {
+    var element =  this.session.focusManager.findFirstFocusableElement(this.$container);
+    this.session.focusManager.requestFocus(element);
+  }
+};
+
 scout.FormField.prototype._onStatusMousedown = function(event) {
   // showing menus is more important than showing tooltips
   if (this.menusVisible && this._hasMenus()) {

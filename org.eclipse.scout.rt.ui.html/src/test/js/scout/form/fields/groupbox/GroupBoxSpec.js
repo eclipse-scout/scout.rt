@@ -83,6 +83,19 @@ describe("GroupBox", function() {
       expect(formAdapter.rootGroupBox.$container.cssHeight()).toBe(123);
       expect(formAdapter.rootGroupBox.$container.cssWidth()).toBe(97);
     });
+
+  });
+
+  describe("focus", function() {
+
+    it("focus first focusable field in groupBox", function() {
+      var groupBox = helper.createGroupBoxWithOneField();
+      groupBox.render(session.$entryPoint);
+      expect(scout.focusUtils.isActiveElement(groupBox.fields[0].$field[0])).toBe(false);
+      groupBox.focus();
+      expect(scout.focusUtils.isActiveElement(groupBox.fields[0].$field[0])).toBe(true);
+    });
+
   });
 
 });
