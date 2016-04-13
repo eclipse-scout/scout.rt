@@ -132,7 +132,6 @@ scout.TabAreaLayout.prototype._onClickEllipsis = function(event) {
       parent: tabBox,
       text: scout.strings.removeAmpersand(tabItem.label),
       tabItem: tabItem,
-      enabled: tabItem.enabled,
       visible: tabItem.visible
     });
     menu.remoteHandler = function(event) {
