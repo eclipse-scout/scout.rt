@@ -20,7 +20,8 @@ scout.DatePickerPopup.prototype._init = function(options) {
 
   this.picker = scout.create('DatePicker', {
     parent: this,
-    dateFormat: options.dateFormat
+    dateFormat: options.dateFormat,
+    allowedDates: options.allowedDates
   });
 };
 

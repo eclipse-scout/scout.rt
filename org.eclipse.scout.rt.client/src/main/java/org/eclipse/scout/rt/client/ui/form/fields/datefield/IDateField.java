@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.ui.form.fields.datefield;
 
 import java.text.DateFormat;
 import java.util.Date;
+import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 
@@ -22,6 +23,7 @@ public interface IDateField extends IValueField<Date> {
   String PROP_DATE_FORMAT_PATTERN = "dateFormatPattern";
   String PROP_TIME_FORMAT_PATTERN = "timeFormatPattern";
   String PROP_AUTO_DATE = "autoDate";
+  String PROP_ALLOWED_DATES = "allowedDates";
 
   IDateFieldUIFacade getUIFacade();
 
@@ -76,12 +78,22 @@ public interface IDateField extends IValueField<Date> {
   Date getAutoDate();
 
   /**
-   * @return the time value as a double in the range from [0..1[ for 00:00 - 23:59:59
+   * @return the time value as a double in the range from [0..1[ for 00:00 - 23:59:59.
    */
   Double getTimeValue();
 
   /**
-   * set the time value as a double in the range from [0..1[ for 00:00 - 23:59:59
+   * Set the time value as a double in the range from [0..1[ for 00:00 - 23:59:59.
    */
   void setTimeValue(Double d);
+
+  /**
+   * Sets a list of allowed dates. When the given list is not empty or null only the dates contained in the list can be
+   * chosen in the date-picker or entered manually in the date-field. All other dates are disabled. When the list is
+   * empty or null all dates are available again.
+   */
+  void setAllowedDates(List<Date> allowedDates);
+
+  List<Date> getAllowedDates();
+
 }

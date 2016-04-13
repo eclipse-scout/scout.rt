@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.ui.html.json.form.fields;
 
 import java.beans.PropertyChangeEvent;
 import java.util.Date;
+import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
@@ -27,6 +28,7 @@ import org.eclipse.scout.rt.ui.html.json.JsonDate;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.JsonStatus;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class JsonDateField<T extends IDateField> extends JsonValueField<T> {
@@ -128,6 +130,26 @@ public class JsonDateField<T extends IDateField> extends JsonValueField<T> {
       @Override
       protected String modelValue() {
         return getModel().getTimeFormatPattern();
+      }
+    });
+    putJsonProperty(new JsonProperty<T>(IDateField.PROP_ALLOWED_DATES, model) {
+      @Override
+      protected List<Date> modelValue() {
+        return getModel().getAllowedDates();
+      }
+
+      @Override
+      @SuppressWarnings("unchecked")
+      public Object prepareValueForToJson(Object value) {
+        List<Date> allowedDates = (List<Date>) value;
+        if (allowedDates == null || allowedDates.isEmpty()) {
+          return null;
+        }
+        JSONArray dateArray = new JSONArray();
+        for (Date date : allowedDates) { // FIXME awe: (date-field) order dates!
+          dateArray.put(dateToJson(date));
+        }
+        return dateArray;
       }
     });
   }

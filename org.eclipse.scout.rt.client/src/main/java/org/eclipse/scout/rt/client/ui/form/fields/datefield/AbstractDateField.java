@@ -12,7 +12,10 @@ package org.eclipse.scout.rt.client.ui.form.fields.datefield;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 
 import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
@@ -165,6 +168,7 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
     setDateFormatPattern(getConfiguredDateFormatPattern());
     setTimeFormatPattern(getConfiguredTimeFormatPattern());
     setFormat(getConfiguredFormat());
+    setAllowedDates(Collections.<Date> emptyList());
   }
 
   @Override
@@ -373,6 +377,29 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
       }
     }
     return null;
+  }
+
+  @Override
+  public void setAllowedDates(List<Date> allowedDates) {
+    if (allowedDates == null) {
+      allowedDates = Collections.emptyList();
+    }
+    else {
+      // Make sure each date is truncated and the list of dates is ordered by date
+      List<Date> sortedTruncatedDates = new ArrayList<>(allowedDates.size());
+      for (Date date : allowedDates) {
+        sortedTruncatedDates.add(DateUtility.truncDate(date));
+      }
+      Collections.sort(sortedTruncatedDates);
+      allowedDates = sortedTruncatedDates;
+    }
+    propertySupport.setProperty(PROP_ALLOWED_DATES, allowedDates);
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public List<Date> getAllowedDates() {
+    return new ArrayList<>((List<Date>) propertySupport.getProperty(PROP_ALLOWED_DATES));
   }
 
   protected class P_UIFacade implements IDateFieldUIFacade {

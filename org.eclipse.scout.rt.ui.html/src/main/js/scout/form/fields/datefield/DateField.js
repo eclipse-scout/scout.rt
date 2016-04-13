@@ -47,6 +47,7 @@ scout.DateField.prototype._init = function(model) {
   scout.DateField.parent.prototype._init.call(this, model);
   scout.fields.initTouch(this, model);
   this._popup = model.popup;
+  this._syncAllowedDates(model.allowedDates);
 };
 
 scout.DateField.prototype.addPopup = function() {
@@ -57,7 +58,8 @@ scout.DateField.prototype.addPopup = function() {
       $anchor: this.$field,
       boundToAnchor: !this.touch,
       closeOnAnchorMousedown: false,
-      field: this
+      field: this,
+      allowedDates: this.allowedDates
     });
   }
 };
@@ -236,6 +238,22 @@ scout.DateField.prototype._renderTimestamp = function() {
 
 scout.DateField.prototype._renderAutoTimestamp = function() {
   this.autoTimestampAsDate = scout.dates.parseJsonDate(this.autoTimestamp);
+};
+
+scout.DateField.prototype._syncAllowedDates = function(allowedDates) {
+  if (Array.isArray(allowedDates)) {
+    var convAllowedDates = [];
+    allowedDates.forEach(function(dateString) {
+      convAllowedDates.push(scout.dates.parseJsonDate(dateString));
+    });
+    this.allowedDates = convAllowedDates;
+  } else {
+    this.allowedDates = null;
+  }
+};
+
+scout.DateField.prototype._renderAllowedDates = function() {
+  this.getDatePicker().allowedDates = this.allowedDates;
 };
 
 /**

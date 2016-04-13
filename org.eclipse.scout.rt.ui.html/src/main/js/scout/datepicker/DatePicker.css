@@ -49,7 +49,7 @@
   border-radius: 50%;
   border: 1px solid transparent;
 
-  &:hover {
+  &:hover:not(.date-picker-disabled) {
     border-color: @item-selection-border-color;
     background-color:  @palette-blue-0;
 
@@ -76,8 +76,8 @@
     font-weight: bold;
   }
 
-  &.date-picker-preselected:not(:hover) {
-    border-color:  @item-selection-border-color;
+  &.date-picker-preselected {
+    border-color: @item-selection-border-color;
     border-style: dashed;
 
     &.date-picker-now {
@@ -93,6 +93,11 @@
       background-color:  @highlight-color;
       color: @palette-white;
     }
+  }
+
+  /* Must be after other style definitions, because 'disabled' should overrule other definitions */
+  &.date-picker-disabled {
+    color: @palette-gray-5;
   }
 }
 
