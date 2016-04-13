@@ -127,6 +127,11 @@ scout.Tree.prototype._syncDisplayStyle = function(newValue) {
   this.setDisplayStyle(newValue, false);
 };
 
+scout.Tree.prototype._resetTreeNode = function(node, parentNode){
+  node.rendered = false;
+  delete node.$node;
+};
+
 scout.Tree.prototype._initTreeNode = function(node, parentNode) {
   this.nodesMap[node.id] = node;
   if (parentNode) {
@@ -540,13 +545,14 @@ scout.Tree.prototype._postRender = function() {
 
 scout.Tree.prototype._remove = function() {
   // Detach nodes from jQuery objects (because those will be removed)
-  this.nodes.forEach(function(node) {
-    delete node.$node;
-  });
+  this._visitNodes(this.nodes, this._resetTreeNode.bind(this));
+
   scout.scrollbars.uninstall(this.$data, this.session);
   this._uninstallNodeTooltipSupport();
   this.$fillBefore = null;
   this.$fillAfter = null;
+  //reset rendered view range because now range is rendered
+  this.viewRangeRendered = new scout.Range(0, 0);
   scout.Tree.parent.prototype._remove.call(this);
 };
 
