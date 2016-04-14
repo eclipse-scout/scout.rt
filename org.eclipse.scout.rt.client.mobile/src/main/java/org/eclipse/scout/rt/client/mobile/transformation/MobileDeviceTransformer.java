@@ -22,7 +22,6 @@ import org.eclipse.scout.rt.client.mobile.navigation.AbstractMobileBackAction;
 import org.eclipse.scout.rt.client.mobile.navigation.IBreadCrumbsNavigation;
 import org.eclipse.scout.rt.client.mobile.navigation.IBreadCrumbsNavigationService;
 import org.eclipse.scout.rt.client.mobile.ui.action.ButtonWrappingAction;
-import org.eclipse.scout.rt.client.mobile.ui.desktop.MobileDesktopUtility;
 import org.eclipse.scout.rt.client.mobile.ui.form.AbstractMobileForm;
 import org.eclipse.scout.rt.client.mobile.ui.form.fields.button.IMobileButton;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
@@ -59,7 +58,6 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
   private final Map<IForm, WeakReference<IForm>> m_transformedForms = new WeakHashMap<>();
   private final Map<IOutline, WeakReference<IOutline>> m_transformedOutlines = new WeakHashMap<>();
   private IDesktop m_desktop;
-  private ToolFormHandler m_toolFormHandler;
   private boolean m_gridDataDirty;
   private DeviceTransformationConfig m_deviceTransformationConfig;
 
@@ -75,8 +73,6 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
     m_deviceTransformationConfig = createDeviceTransformationConfig();
     initTransformationConfig();
 
-    m_toolFormHandler = createToolFormHandler(desktop);
-
     IBreadCrumbsNavigation breadCrumbsNavigation = BEANS.get(IBreadCrumbsNavigationService.class).getBreadCrumbsNavigation();
     if (breadCrumbsNavigation != null) {
       breadCrumbsNavigation.trackDisplayViewId(IForm.VIEW_ID_CENTER);
@@ -85,14 +81,6 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
 
   public MobileDeviceTransformer() {
     this(null);
-  }
-
-  protected ToolFormHandler createToolFormHandler(IDesktop desktop) {
-    return new ToolFormHandler(getDesktop());
-  }
-
-  public ToolFormHandler getToolFormHandler() {
-    return m_toolFormHandler;
   }
 
   protected DeviceTransformationConfig createDeviceTransformationConfig() {
@@ -132,9 +120,6 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
 
   @Override
   public void notifyTablePageLoaded(IPageWithTable<?> tablePage) {
-    if (m_toolFormHandler != null) {
-      m_toolFormHandler.notifyTablePageLoaded(tablePage);
-    }
   }
 
   /**
@@ -439,10 +424,6 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
    */
   @Override
   public void adaptFormHeaderLeftActions(IForm form, List<IMenu> menuList) {
-    if (MobileDesktopUtility.isToolForm(form) && !containsCloseAction(menuList)) {
-      menuList.add(new ToolFormCloseAction(form));
-    }
-
     if (getDeviceTransformationConfig().isTransformationEnabled(MobileDeviceTransformation.ADD_MISSING_BACK_ACTION_TO_FORM_HEADER, form) && !containsCloseAction(menuList)) {
       menuList.add(new P_BackAction());
     }
@@ -458,10 +439,7 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
     }
 
     for (IMenu action : menuList) {
-      if (action instanceof ToolFormCloseAction) {
-        return true;
-      }
-      else if (action instanceof ButtonWrappingAction) {
+      if (action instanceof ButtonWrappingAction) {
         IButton wrappedButton = ((ButtonWrappingAction) action).getWrappedButton();
         switch (wrappedButton.getSystemType()) {
           case IButton.SYSTEM_TYPE_CANCEL:

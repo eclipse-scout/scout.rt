@@ -31,7 +31,7 @@ scout.ViewButtons.prototype._initKeyStrokeContext = function(keyStrokeContext) {
   this.desktopKeyStrokeContext.$scopeTarget = this.$container;
   this.desktopKeyStrokeContext.registerKeyStroke([
     new scout.ViewMenuOpenKeyStroke(this)
-  ].concat(this.desktop.viewButtons));
+  ]);
 };
 
 scout.ViewButtons.prototype._render = function($parent) {

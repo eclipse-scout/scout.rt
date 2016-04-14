@@ -8,27 +8,14 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.mobile.transformation;
+package org.eclipse.scout.rt.client.extension.ui.form;
 
-import org.eclipse.scout.rt.client.mobile.ui.desktop.MobileDesktopUtility;
-import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
+import org.eclipse.scout.rt.client.extension.ui.action.menu.IMenuExtension;
+import org.eclipse.scout.rt.client.extension.ui.form.FormMenuChains.FormMenuInitFormChain;
+import org.eclipse.scout.rt.client.ui.form.AbstractFormMenu;
 import org.eclipse.scout.rt.client.ui.form.IForm;
-import org.eclipse.scout.rt.shared.TEXTS;
 
-public class ToolFormCloseAction extends AbstractMenu {
-  private IForm m_form;
+public interface IFormMenuExtension<FORM extends IForm, OWNER extends AbstractFormMenu<FORM>> extends IMenuExtension<OWNER> {
 
-  public ToolFormCloseAction(IForm form) {
-    m_form = form;
-  }
-
-  @Override
-  protected String getConfiguredText() {
-    return TEXTS.get("CloseButton");
-  }
-
-  @Override
-  protected void execAction() {
-    MobileDesktopUtility.closeToolForm(m_form);
-  }
+  void execInitForm(FormMenuInitFormChain<FORM> chain, FORM form);
 }

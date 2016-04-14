@@ -10,21 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.desktop.outline;
 
-import org.eclipse.scout.rt.client.ui.action.tool.IToolButton;
 import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.client.ui.form.IFormMenu;
 
 /**
  * @since 3.8.1
+ * @deprecated use IFormMenu instead.
  */
-public interface IFormToolButton<FORM extends IForm> extends IToolButton {
-  String PROP_FORM = "form";
-
-  FORM getForm();
-
-  /**
-   * Set a new <b>started</b> form to the tool.
-   * <p>
-   * The form is shown whenever the tool button is activated.
-   */
-  void setForm(FORM f);
+@Deprecated
+public interface IFormToolButton<FORM extends IForm> extends IFormMenu<FORM> {
 }

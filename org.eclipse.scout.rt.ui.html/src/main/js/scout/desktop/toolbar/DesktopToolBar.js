@@ -11,20 +11,20 @@
 scout.DesktopToolBar = function(menuBar) {
   scout.DesktopToolBar.parent.call(this);
 };
-scout.inherits(scout.DesktopToolBar, scout.ActionBox);
+scout.inherits(scout.DesktopToolBar, scout.MenuBox);
 
 scout.DesktopToolBar.prototype._init = function(options) {
-  options.customActionCssClasses = options.customActionCssClasses || '';
-  options.customActionCssClasses += ' header-tool-item';
+  options.customMenuCssClasses = options.customMenuCssClasses || '';
+  options.customMenuCssClasses += ' header-tool-item';
   scout.DesktopToolBar.parent.prototype._init.call(this, options);
 };
 
 /**
  * @override
  */
-scout.DesktopToolBar.prototype._initAction = function(action) {
-  scout.DesktopToolBar.parent.prototype._initAction.call(this, action);
-  action.popupOpeningDirectionX = 'left';
+scout.DesktopToolBar.prototype._initMenu = function(menu) {
+  scout.DesktopToolBar.parent.prototype._initMenu.call(this, menu);
+  menu.popupOpeningDirectionX = 'left';
 };
 
 /**

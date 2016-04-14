@@ -19,7 +19,6 @@ import java.util.Set;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.ui.DataChangeListener;
 import org.eclipse.scout.rt.client.ui.IDisplayParent;
-import org.eclipse.scout.rt.client.ui.action.ActionFinder;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -58,6 +57,7 @@ import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
  * <li>top-level menus (menu tree)
  * </ul>
  */
+@SuppressWarnings("deprecation")
 public interface IDesktop extends IPropertyObserver, IDisplayParent {
 
   /**
@@ -151,14 +151,17 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent {
    */
   <T extends IOutline> T findOutline(Class<T> outlineType);
 
-  /**
-   * Find a toolButton or a viewButton in the desktop
-   */
   <T extends IAction> T findAction(Class<T> actionType);
 
   /**
    * Convenience alias for {@link #findAction(Class)}
    */
+  <T extends IMenu> T findMenu(Class<T> menuType);
+  
+  /**
+   * @deprecated use {@link #getMenuByClass(Class)} instead
+   */
+  @Deprecated
   <T extends IToolButton> T findToolButton(Class<T> toolButtonType);
 
   /**
@@ -515,9 +518,6 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent {
    */
   List<IMenu> getMenus();
 
-  /**
-   * Convenience to find a menu in the desktop, uses {@link ActionFinder}
-   */
   <T extends IMenu> T getMenu(Class<? extends T> searchType);
 
   /**
@@ -526,18 +526,17 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent {
   List<IAction> getActions();
 
   /**
-   * Convenience to find a toolbutton in the desktop, uses {@link ActionFinder}
+   * @deprecated use {@link #getMenu(Class)} instead
    */
+  @Deprecated
   <T extends IToolButton> T getToolButton(Class<? extends T> searchType);
 
   /**
-   * @return all {@link IToolButton} actions
+   * @deprecated use {@link #getMenus()} instead
    */
-  List<IToolButton> getToolButtons();
+  @Deprecated
+  List<IMenu> getToolButtons();
 
-  /**
-   * Convenience to find a menu in the desktop, uses {@link ActionFinder}
-   */
   <T extends IViewButton> T getViewButton(Class<? extends T> searchType);
 
   /**

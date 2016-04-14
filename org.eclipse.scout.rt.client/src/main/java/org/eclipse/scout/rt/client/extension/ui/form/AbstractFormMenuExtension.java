@@ -8,19 +8,21 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.ui.desktop.outline;
+package org.eclipse.scout.rt.client.extension.ui.form;
 
-import org.eclipse.scout.rt.client.ui.action.tool.IToolButton;
-import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
+import org.eclipse.scout.rt.client.extension.ui.action.menu.AbstractMenuExtension;
+import org.eclipse.scout.rt.client.extension.ui.form.FormMenuChains.FormMenuInitFormChain;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormMenu;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 
-/**
- * A tool button that can be used in the {@link IDesktop} to toggle a form in the tools area.
- *
- * @deprecated use AbstractFormMenu instead.
- */
-@SuppressWarnings("deprecation")
-@Deprecated
-public abstract class AbstractFormToolButton<FORM extends IForm> extends AbstractFormMenu<FORM> implements IToolButton {
+public abstract class AbstractFormMenuExtension<FORM extends IForm, OWNER extends AbstractFormMenu<FORM>> extends AbstractMenuExtension<OWNER> implements IFormMenuExtension<FORM, OWNER> {
+
+  public AbstractFormMenuExtension(OWNER owner) {
+    super(owner);
+  }
+
+  @Override
+  public void execInitForm(FormMenuInitFormChain<FORM> chain, FORM form) {
+    chain.execInitForm(form);
+  }
 }

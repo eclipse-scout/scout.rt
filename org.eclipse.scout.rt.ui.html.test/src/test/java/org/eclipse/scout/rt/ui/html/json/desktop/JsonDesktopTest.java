@@ -23,10 +23,10 @@ import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.OpenUriAction;
-import org.eclipse.scout.rt.client.ui.desktop.outline.IFormToolButton;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineViewButton;
 import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.client.ui.form.IFormMenu;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
@@ -237,14 +237,14 @@ public class JsonDesktopTest {
 
     JsonMenu<IMenu> jsonDisplayableMenu = jsonDesktop.getAdapter(desktop.getMenu(DesktopWithNonDisplayableActions.DisplayableMenu.class));
     JsonMenu<IMenu> jsonNonDisplayableMenu = jsonDesktop.getAdapter(desktop.getMenu(DesktopWithNonDisplayableActions.NonDisplayableMenu.class));
-    JsonFormToolButton<IFormToolButton<IForm>> jsonDisplayableToolButton = jsonDesktop.getAdapter(desktop.getToolButton(DesktopWithNonDisplayableActions.DisplayableFormToolButton.class));
-    JsonFormToolButton<IFormToolButton<IForm>> jsonNonDisplayableToolButton = jsonDesktop.getAdapter(desktop.getToolButton(DesktopWithNonDisplayableActions.NonDisplayableFormToolButton.class));
+    JsonFormMenu<IFormMenu<IForm>> jsonDisplayableFormMenu = jsonDesktop.getAdapter(desktop.getMenu(DesktopWithNonDisplayableActions.DisplayableFormMenu.class));
+    JsonFormMenu<IFormMenu<IForm>> jsonNonDisplayableFormMenu = jsonDesktop.getAdapter(desktop.getMenu(DesktopWithNonDisplayableActions.NonDisplayableFormMenu.class));
 
-    // Adapter for NonDisplayableMenu/ToolButton must not exist
+    // Adapter for NonDisplayableMenu/Menu must not exist
     assertNull(jsonNonDisplayableMenu);
-    assertNull(jsonNonDisplayableToolButton);
+    assertNull(jsonNonDisplayableFormMenu);
 
-    // Json response must not contain NonDisplayableMenu/ToolButton
+    // Json response must not contain NonDisplayableMenu/FormMenu
     JSONObject json = jsonDesktop.toJson();
     JSONArray jsonActions = json.getJSONArray("actions");
     assertEquals(2, jsonActions.length());
@@ -252,7 +252,7 @@ public class JsonDesktopTest {
     ids.add(jsonActions.getString(0));
     ids.add(jsonActions.getString(1));
     assertTrue(ids.contains(jsonDisplayableMenu.getId()));
-    assertTrue(ids.contains(jsonDisplayableToolButton.getId()));
+    assertTrue(ids.contains(jsonDisplayableFormMenu.getId()));
   }
 
   /**

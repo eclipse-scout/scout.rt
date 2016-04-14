@@ -20,20 +20,6 @@ scout.inherits(scout.DesktopHeaderLayout, scout.AbstractLayout);
  * @override AbstractLayout.js
  */
 scout.DesktopHeaderLayout.prototype.layout = function($container) {
-  this._layout($container);
-
-  // Make sure open popups are at the correct position after layouting
-  this.desktop.actions
-    .filter(function(action) {
-      return action.selected && action.popup;
-    })
-    .some(function(action) {
-      action.popup.position();
-      return true;
-    });
-};
-
-scout.DesktopHeaderLayout.prototype._layout = function($container) {
   var viewButtonsPrefSize, toolBarPrefSize,
     htmlContainer = this.header.htmlComp,
     containerSize = htmlContainer.getSize(),

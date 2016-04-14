@@ -40,13 +40,13 @@ import org.eclipse.scout.rt.client.ui.basic.table.userfilter.TableTextUserFilter
 import org.eclipse.scout.rt.client.ui.basic.table.userfilter.TextColumnUserFilterState;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
-import org.eclipse.scout.rt.client.ui.desktop.outline.IFormToolButton;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineViewButton;
 import org.eclipse.scout.rt.client.ui.desktop.outline.ISearchOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm;
 import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.client.ui.form.IFormMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.beanfield.IBeanField;
 import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField;
 import org.eclipse.scout.rt.client.ui.form.fields.browserfield.IBrowserField;
@@ -94,7 +94,7 @@ import org.eclipse.scout.rt.ui.html.json.basic.planner.JsonPlanner;
 import org.eclipse.scout.rt.ui.html.json.calendar.JsonCalendar;
 import org.eclipse.scout.rt.ui.html.json.calendar.JsonCalendarComponent;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonDesktop;
-import org.eclipse.scout.rt.ui.html.json.desktop.JsonFormToolButton;
+import org.eclipse.scout.rt.ui.html.json.desktop.JsonFormMenu;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonOutline;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonOutlineViewButton;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonSearchForm;
@@ -272,8 +272,8 @@ public class JsonObjectFactory extends AbstractJsonObjectFactory {
     if (model instanceof IContextMenu) {
       return new JsonContextMenu<IContextMenu>((IContextMenu) model, session, id, parent);
     }
-    if (model instanceof IFormToolButton<?>) {
-      return new JsonFormToolButton((IFormToolButton<?>) model, session, id, parent);
+    if (model instanceof IFormMenu<?>) {
+      return new JsonFormMenu((IFormMenu<?>) model, session, id, parent);
     }
     if (model instanceof IMenu) {
       return new JsonMenu<IMenu>((IMenu) model, session, id, parent);

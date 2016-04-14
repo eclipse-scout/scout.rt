@@ -10,8 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.desktop;
 
-import org.eclipse.scout.rt.client.ui.desktop.outline.IFormToolButton;
 import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.client.ui.form.IFormMenu;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterProperty;
@@ -19,22 +19,22 @@ import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterPropertyConfig;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterPropertyConfigBuilder;
 import org.eclipse.scout.rt.ui.html.json.menu.JsonMenu;
 
-public class JsonFormToolButton<FORM_TOOL_BUTTON extends IFormToolButton<IForm>> extends JsonMenu<FORM_TOOL_BUTTON> {
+public class JsonFormMenu<FORM_MENU extends IFormMenu<IForm>> extends JsonMenu<FORM_MENU> {
 
-  public JsonFormToolButton(FORM_TOOL_BUTTON model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+  public JsonFormMenu(FORM_MENU model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
   }
 
   @Override
   public String getObjectType() {
-    return "FormToolButton";
+    return "FormMenu";
   }
 
   @Override
-  protected void initJsonProperties(FORM_TOOL_BUTTON model) {
+  protected void initJsonProperties(FORM_MENU model) {
     super.initJsonProperties(model);
 
-    putJsonProperty(new JsonAdapterProperty<IFormToolButton<IForm>>(IFormToolButton.PROP_FORM, model, getUiSession()) {
+    putJsonProperty(new JsonAdapterProperty<IFormMenu<IForm>>(IFormMenu.PROP_FORM, model, getUiSession()) {
       @Override
       protected IForm modelValue() {
         return getModel().getForm();

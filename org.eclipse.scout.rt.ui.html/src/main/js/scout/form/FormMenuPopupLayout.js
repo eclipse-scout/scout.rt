@@ -8,17 +8,17 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-scout.FormToolPopupLayout = function(popup) {
-  scout.FormToolPopupLayout.parent.call(this, popup);
+scout.FormMenuPopupLayout = function(popup) {
+  scout.FormMenuPopupLayout.parent.call(this, popup);
   this.popup = popup;
 };
-scout.inherits(scout.FormToolPopupLayout, scout.PopupWithHeadLayout);
+scout.inherits(scout.FormMenuPopupLayout, scout.PopupWithHeadLayout);
 
-scout.FormToolPopupLayout.prototype.layout = function($container) {
+scout.FormMenuPopupLayout.prototype.layout = function($container) {
   var popupSize,
     htmlForm = this.popup.form.htmlComp;
 
-  scout.FormToolPopupLayout.parent.prototype.layout.call(this, $container);
+  scout.FormMenuPopupLayout.parent.prototype.layout.call(this, $container);
 
   popupSize = scout.graphics.getSize(this.popup.$body);
 
@@ -27,7 +27,7 @@ scout.FormToolPopupLayout.prototype.layout = function($container) {
   htmlForm.setSize(popupSize);
 };
 
-scout.FormToolPopupLayout.prototype.preferredLayoutSize = function($container) {
+scout.FormMenuPopupLayout.prototype.preferredLayoutSize = function($container) {
   var htmlComp = this.popup.htmlComp,
     htmlForm = this.popup.form.htmlComp,
     prefSize;

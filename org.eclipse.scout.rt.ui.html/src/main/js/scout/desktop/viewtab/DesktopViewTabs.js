@@ -13,6 +13,20 @@ scout.DesktopViewTabs = function() {
 };
 scout.inherits(scout.DesktopViewTabs, scout.Widget);
 
+scout.DesktopViewTabs.prototype._initKeyStrokeContext = function(keyStrokeContext) {
+  scout.DesktopHeader.parent.prototype._initKeyStrokeContext.call(this, keyStrokeContext);
+
+  // Bound to desktop
+  this.desktopKeyStrokeContext = new scout.KeyStrokeContext();
+  this.desktopKeyStrokeContext.invokeAcceptInputOnActiveValueField = true;
+  this.desktopKeyStrokeContext.$bindTarget = this.session.desktop.$container;
+  this.desktopKeyStrokeContext.$scopeTarget = this.$container;
+  this.desktopKeyStrokeContext.registerKeyStroke([
+    new scout.ViewTabSelectKeyStroke(this.session.desktop),
+    new scout.DisableBrowserTabSwitchingKeyStroke(this.session.desktop)
+  ]);
+};
+
 scout.DesktopViewTabs.prototype._render = function($parent) {
   this.viewTabsController = this.session.desktop.viewTabsController;
 
@@ -26,6 +40,12 @@ scout.DesktopViewTabs.prototype._render = function($parent) {
       viewTab.render(this.$container);
     }
   }, this);
+  this.session.keyStrokeManager.installKeyStrokeContext(this.desktopKeyStrokeContext);
+};
+
+scout.DesktopViewTabs.prototype._remove = function() {
+  this.session.keyStrokeManager.uninstallKeyStrokeContext(this.desktopKeyStrokeContext);
+  scout.DesktopViewTabs.parent.prototype._remove.call(this);
 };
 
 scout.DesktopViewTabs.prototype.viewTabs = function() {

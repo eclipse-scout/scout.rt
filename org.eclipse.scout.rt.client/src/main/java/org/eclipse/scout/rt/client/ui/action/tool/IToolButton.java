@@ -14,6 +14,9 @@ import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 
 /**
  * Interface for menus that appear in the gui as tool-button
+ * 
+ * @deprecated use {@link IMenu} instead
  */
+@Deprecated
 public interface IToolButton extends IMenu {
 }

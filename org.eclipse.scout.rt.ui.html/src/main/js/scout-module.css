@@ -7,7 +7,6 @@
 * http://www.eclipse.org/legal/epl-v10.html
 */
 //@include("scout/main.css")
-//@include("scout/action/ActionBox.css")
 //@include("scout/box/Box.css")
 //@include("scout/boxbuttons/BoxButtons.css")
 //@include("scout/calendar/Calendar.css")
@@ -30,7 +29,7 @@
 //@include("scout/desktop/viewtab/DesktopViewTabs.css")
 //@include("scout/filechooser/FileChooser.css")
 //@include("scout/form/Form.css")
-//@include("scout/form/FormToolPopup.css")
+//@include("scout/form/FormMenuPopup.css")
 //@include("scout/form/ScoutInfoForm.css")
 //@include("scout/form/fields/FormField.css")
 //@include("scout/form/fields/button/Button.css")
@@ -62,7 +61,7 @@
 //@include("scout/form/fields/wrappedform/WrappedFormField.css")
 //@include("scout/keystroke/keybox.css")
 //@include("scout/menu/Menu.css")
-//@include("scout/menu/MenuBar.css")
+//@include("scout/menu/menubar/MenuBar.css")
 //@include("scout/messagebox/MessageBox.css")
 //@include("scout/planner/Planner.css")
 //@include("scout/planner/PlannerHeader.css")

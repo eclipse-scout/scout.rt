@@ -18,16 +18,16 @@ scout.KeyStrokeSupport = function(adapter) {
 };
 
 scout.KeyStrokeSupport.prototype.syncKeyStrokes = function(newKeyStrokes, oldKeyStrokes) {
-  this._updateKeyStrokes(newKeyStrokes, oldKeyStrokes);
+  this.updateKeyStrokes(newKeyStrokes, oldKeyStrokes);
   this._adapter.keyStrokes = newKeyStrokes;
 };
 
 scout.KeyStrokeSupport.prototype.syncMenus = function(newMenus, oldMenus) {
-  this._updateKeyStrokes(newMenus, oldMenus);
+  this.updateKeyStrokes(newMenus, oldMenus);
   this._adapter.menus = newMenus;
 };
 
-scout.KeyStrokeSupport.prototype._updateKeyStrokes = function(newKeyStrokes, oldKeyStrokes) {
+scout.KeyStrokeSupport.prototype.updateKeyStrokes = function(newKeyStrokes, oldKeyStrokes) {
   this.unregisterKeyStrokes(oldKeyStrokes);
   this.registerKeyStrokes(newKeyStrokes);
 };

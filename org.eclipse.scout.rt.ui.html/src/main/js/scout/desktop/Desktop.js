@@ -22,7 +22,7 @@ scout.Desktop = function() {
    * mit dem Server synchronisiert werden, damit auch das server-seitige desktop.getActiveForm() stimmt.
    * Auch im zusammenhang mit focus-handling nochmals überdenken.
    */
-  this._addAdapterProperties(['viewButtons', 'actions', 'views', 'dialogs', 'outline', 'messageBoxes', 'fileChoosers', 'addOns', 'keyStrokes']);
+  this._addAdapterProperties(['viewButtons', 'menus', 'views', 'dialogs', 'outline', 'messageBoxes', 'fileChoosers', 'addOns', 'keyStrokes']);
 
   this.viewTabsController;
   this.formController;
@@ -32,6 +32,7 @@ scout.Desktop = function() {
   this.offline = false;
   this.notifications = [];
   this.inBackground = false;
+  this._keyStrokeSupport = new scout.KeyStrokeSupport(this);
 };
 scout.inherits(scout.Desktop, scout.ModelAdapter);
 
@@ -50,6 +51,8 @@ scout.Desktop.prototype._init = function(model) {
   this._resizeHandler = this.onResize.bind(this);
   this._popstateHandler = this.onPopstate.bind(this);
   this.updateSplitterVisibility();
+  this._syncViewButtons(this.viewButtons);
+  this._syncMenus(this.menus);
 };
 
 scout.Desktop.prototype._initKeyStrokeContext = function(keyStrokeContext) {
@@ -62,7 +65,7 @@ scout.Desktop.prototype._initKeyStrokeContext = function(keyStrokeContext) {
 scout.Desktop.prototype._onChildAdapterCreation = function(propertyName, model) {
   if (propertyName === 'viewButtons') {
     model.desktop = this;
-  } else if (propertyName === 'actions') {
+  } else if (propertyName === 'menus') {
     model.desktop = this;
   }
 };
@@ -460,6 +463,15 @@ scout.Desktop.prototype.setOutline = function(outline) {
   }
 
   this.trigger('outlineChanged');
+};
+
+scout.Desktop.prototype._syncViewButtons = function(viewButtons, oldViewButtons) {
+  this._keyStrokeSupport.updateKeyStrokes(viewButtons, oldViewButtons);
+  this.viewButtons = viewButtons;
+};
+
+scout.Desktop.prototype._syncMenus = function(menus, oldMenus) {
+  this._keyStrokeSupport.syncMenus(menus, oldMenus);
 };
 
 scout.Desktop.prototype._syncNavigationVisible = function(visible) {

@@ -8,20 +8,21 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.ui.html.json.desktop;
+package org.eclipse.scout.rt.ui.html.json.form;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
-import org.eclipse.scout.rt.client.ui.desktop.outline.IFormToolButton;
 import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.client.ui.form.IFormMenu;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.ui.html.IUiSession;
-import org.eclipse.scout.rt.ui.html.json.desktop.fixtures.FormToolButton;
+import org.eclipse.scout.rt.ui.html.json.desktop.JsonFormMenu;
 import org.eclipse.scout.rt.ui.html.json.fixtures.UiSessionMock;
+import org.eclipse.scout.rt.ui.html.json.form.fixtures.FormMenu;
 import org.eclipse.scout.rt.ui.html.json.form.fixtures.FormWithOneField;
 import org.junit.Before;
 import org.junit.Test;
@@ -30,7 +31,7 @@ import org.junit.runner.RunWith;
 @RunWith(ClientTestRunner.class)
 @RunWithSubject("default")
 @RunWithClientSession(TestEnvironmentClientSession.class)
-public class JsonFormToolButtonTest {
+public class JsonFormMenuTest {
   private IUiSession m_uiSession;
 
   @Before
@@ -43,20 +44,20 @@ public class JsonFormToolButtonTest {
    */
   @Test
   public void testPreventFormDisposal() {
-    FormToolButton button = new FormToolButton();
+    FormMenu button = new FormMenu();
     FormWithOneField form = new FormWithOneField();
     form.start();
     button.setForm(form);
 
-    JsonFormToolButton<IFormToolButton<IForm>> jsonFormToolButton = m_uiSession.createJsonAdapter(button, null);
+    JsonFormMenu<IFormMenu<IForm>> jsonFormMenu = m_uiSession.createJsonAdapter(button, null);
 
-    assertNotNull(jsonFormToolButton.getAdapter(form));
-    jsonFormToolButton.dispose();
+    assertNotNull(jsonFormMenu.getAdapter(form));
+    jsonFormMenu.dispose();
 
     // Form has not been closed yet -> must still be registered
-    assertNotNull(jsonFormToolButton.getAdapter(form));
+    assertNotNull(jsonFormMenu.getAdapter(form));
 
     form.doClose();
-    assertNull(jsonFormToolButton.getAdapter(form));
+    assertNull(jsonFormMenu.getAdapter(form));
   }
 }

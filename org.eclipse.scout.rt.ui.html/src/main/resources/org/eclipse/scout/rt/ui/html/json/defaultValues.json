@@ -142,7 +142,7 @@
     },
     "Desktop": {
       "desktopStyle": "DEFAULT",
-      "actions": [],
+      "menus": [],
       "addOns": [],
       "dialogs": [],
       "views": [],

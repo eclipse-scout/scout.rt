@@ -31,7 +31,6 @@ import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.deeplink.DeepLinkException;
 import org.eclipse.scout.rt.client.deeplink.IDeepLinks;
 import org.eclipse.scout.rt.client.deeplink.OutlineDeepLinkHandler;
-import org.eclipse.scout.rt.client.extension.ui.action.tree.MoveActionNodesHandler;
 import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopBeforeClosingChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopClosingChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopDefaultViewChain;
@@ -64,13 +63,13 @@ import org.eclipse.scout.rt.client.ui.basic.tree.TreeAdapter;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.client.ui.desktop.notification.IDesktopNotification;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutlineViewButton;
-import org.eclipse.scout.rt.client.ui.desktop.outline.IFormToolButton;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.IFormHandler;
+import org.eclipse.scout.rt.client.ui.form.IFormMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
@@ -122,6 +121,7 @@ import org.slf4j.LoggerFactory;
  * </ul>
  * The Eclipse Scout SDK creates a subclass of this class that can be used as initial desktop.
  */
+@SuppressWarnings("deprecation")
 public abstract class AbstractDesktop extends AbstractPropertyObserver implements IDesktop, IContributionOwner, IExtensibleObject {
 
   private static final Logger LOG = LoggerFactory.getLogger(AbstractDesktop.class);
@@ -145,9 +145,8 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   private final FileChooserStore m_fileChooserStore;
   private List<IMenu> m_menus;
   private List<IViewButton> m_viewButtons;
-  private List<IToolButton> m_toolButtons;
   private boolean m_autoPrefixWildcardForTextSearch;
-  private boolean m_desktopInited;
+  private boolean m_desktopInitialized;
   private boolean m_isForcedClosing = false;
   private final List<Object> m_addOns;
   private IContributionOwner m_contributionHolder;
@@ -537,7 +536,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     List<IDesktopExtension> extensions = getDesktopExtensions();
     m_contributionHolder = new ContributionComposite(this);
 
-    //outlines
+    // outlines
     OrderedCollection<IOutline> outlines = new OrderedCollection<IOutline>();
     for (IDesktopExtension ext : extensions) {
       try {
@@ -554,7 +553,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     ExtensionUtility.moveModelObjects(outlines);
     m_availableOutlines = outlines.getOrderedList();
 
-    //actions (keyStroke, menu, viewButton, toolButton)
+    // actions (keyStroke, menu, viewButton, toolButton)
     List<IAction> actionList = new ArrayList<IAction>();
     for (IDesktopExtension ext : extensions) {
       try {
@@ -564,33 +563,23 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
         LOG.error("contributing actions by {}", ext, t);
       }
     }
-
     List<IAction> contributedActions = m_contributionHolder.getContributionsByClass(IAction.class);
     actionList.addAll(contributedActions);
-    //build completed menu, viewButton, toolButton lists
-    // only top level menus
-    OrderedCollection<IMenu> menus = new OrderedCollection<IMenu>();
-    List<IMenu> allMenus = new ActionFinder().findActions(actionList, IMenu.class, false);
-    for (IMenu menu : allMenus) {
-      if (!(menu instanceof IToolButton)) {
-        menus.addOrdered(menu);
-      }
-    }
-    new MoveActionNodesHandler<IMenu>(menus).moveModelObjects();
-    m_menus = menus.getOrderedList();
 
+    // build complete menu and viewButton lists
+    // only top level menus
     OrderedComparator orderedComparator = new OrderedComparator();
+    List<IMenu> menuList = new ActionFinder().findActions(actionList, IMenu.class, false);
+    ExtensionUtility.moveModelObjects(menuList);
+    Collections.sort(menuList, orderedComparator);
+    m_menus = menuList;
+
     List<IViewButton> viewButtonList = new ActionFinder().findActions(actionList, IViewButton.class, false);
     ExtensionUtility.moveModelObjects(viewButtonList);
     Collections.sort(viewButtonList, orderedComparator);
     m_viewButtons = viewButtonList;
 
-    List<IToolButton> toolButtonList = new ActionFinder().findActions(actionList, IToolButton.class, false);
-    ExtensionUtility.moveModelObjects(toolButtonList);
-    Collections.sort(toolButtonList, orderedComparator);
-    m_toolButtons = toolButtonList;
-
-    //add dynamic keyStrokes
+    // add dynamic keyStrokes
     List<IKeyStroke> ksList = new ActionFinder().findActions(actionList, IKeyStroke.class, true);
     for (IKeyStroke ks : ksList) {
       try {
@@ -602,7 +591,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     }
     addKeyStrokes(ksList.toArray(new IKeyStroke[ksList.size()]));
 
-    //init outlines
+    // init outlines
     for (IOutline o : m_availableOutlines) {
       try {
         o.initTree();
@@ -649,25 +638,23 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
 
   @Override
   public void initDesktop() {
-    if (!m_desktopInited) {
-      m_desktopInited = true;
-      // extensions
-      for (IDesktopExtension ext : getDesktopExtensions()) {
-        try {
-          ContributionCommand cc = ext.initDelegate();
-          if (cc == ContributionCommand.Stop) {
-            break;
-          }
-        }
-        catch (Exception t) {
-          LOG.error("extension {} failed", ext, t);
+    if (m_desktopInitialized) {
+      return;
+    }
+    // extensions
+    for (IDesktopExtension ext : getDesktopExtensions()) {
+      try {
+        ContributionCommand cc = ext.initDelegate();
+        if (cc == ContributionCommand.Stop) {
+          break;
         }
       }
-      // init actions
-      ActionUtility.initActions(getMenus());
-      ActionUtility.initActions(getToolButtons());
-      ActionUtility.initActions(getViewButtons());
+      catch (Exception t) {
+        LOG.error("extension {} failed", ext, t);
+      }
     }
+    ActionUtility.initActions(getActions());
+    m_desktopInitialized = true;
   }
 
   protected void initDisplayStyle(String style) {
@@ -709,9 +696,9 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
       return true;
     }
 
-    // active tool-button Form
-    for (IToolButton toolButton : getToolButtons()) {
-      if (toolButton instanceof IFormToolButton && toolButton.isSelected() && ((IFormToolButton) toolButton).getForm() == form) {
+    // active menu Form
+    for (IMenu menu : getMenus()) {
+      if (menu instanceof IFormMenu && menu.isSelected() && ((IFormMenu) menu).getForm() == form) {
         return true;
       }
     }
@@ -769,8 +756,14 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   @Override
+  @Deprecated
   public <T extends IToolButton> T findToolButton(Class<T> toolButtonType) {
     return findAction(toolButtonType);
+  }
+
+  @Override
+  public <T extends IMenu> T findMenu(Class<T> menuType) {
+    return findAction(menuType);
   }
 
   @Override
@@ -813,17 +806,10 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   @Override
-  public <T extends IMenu> T getMenu(Class<? extends T> searchType) {
-    // ActionFinder performs instance-of checks. Hence the menu replacement mapping is not required
-    return new ActionFinder().findAction(getMenus(), searchType);
-  }
-
-  @Override
   public List<IForm> getForms(IDisplayParent displayParent) {
     return m_formStore.getByDisplayParent(displayParent);
   }
 
-  @SuppressWarnings("deprecation")
   @Override
   public List<IForm> getViewStack() {
     return getViews();
@@ -871,7 +857,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     return CollectionUtility.firstElement(findAllOpenViews(formClass, handlerClass, exclusiveKey));
   }
 
-  @SuppressWarnings("deprecation")
   @Override
   public List<IForm> getDialogStack() {
     return getDialogs();
@@ -899,7 +884,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     return dialogs;
   }
 
-  @SuppressWarnings("deprecation")
   @Override
   public List<IMessageBox> getMessageBoxStack() {
     return getMessageBoxes();
@@ -963,7 +947,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   @Override
-  @SuppressWarnings("deprecation")
+
   public void ensureVisible(IForm form) {
     activateForm(form);
   }
@@ -1081,7 +1065,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     m_outline.makeActivePageToContextPage();
   }
 
-  @SuppressWarnings("deprecation")
   @Override
   public void addForm(IForm form) {
     showForm(form);
@@ -1128,7 +1111,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     fireFormShow(form);
   }
 
-  @SuppressWarnings("deprecation")
   @Override
   public void removeForm(IForm form) {
     hideForm(form);
@@ -1149,7 +1131,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     fireFormHide(form);
   }
 
-  @SuppressWarnings("deprecation")
   @Override
   public void addMessageBox(final IMessageBox messageBox) {
     showMessageBox(messageBox);
@@ -1168,7 +1149,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     fireMessageBoxShow(messageBox);
   }
 
-  @SuppressWarnings("deprecation")
   @Override
   public void removeMessageBox(IMessageBox messageBox) {
     hideMessageBox(messageBox);
@@ -1210,7 +1190,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     return m_outlineChanging;
   }
 
-  @SuppressWarnings("deprecation")
   @Override
   public void setOutline(IOutline outline) {
     activateOutline(outline);
@@ -1305,19 +1284,25 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     result.addAll(getKeyStrokes());
     result.addAll(getMenus());
     result.addAll(getViewButtons());
-    result.addAll(getToolButtons());
     return result;
   }
 
   @Override
+  public <T extends IMenu> T getMenu(Class<? extends T> searchType) {
+    // ActionFinder performs instance-of checks. Hence the menu replacement mapping is not required
+    return new ActionFinder().findAction(getMenus(), searchType);
+  }
+
+  @Deprecated
+  @Override
   public <T extends IToolButton> T getToolButton(Class<? extends T> searchType) {
     // ActionFinder performs instance-of checks. Hence the toolbutton replacement mapping is not required
-    return new ActionFinder().findAction(getToolButtons(), searchType);
+    return new ActionFinder().findAction(getMenus(), searchType);
   }
 
   @Override
-  public List<IToolButton> getToolButtons() {
-    return CollectionUtility.arrayList(m_toolButtons);
+  public List<IMenu> getToolButtons() {
+    return getMenus();
   }
 
   @Override
@@ -1470,7 +1455,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     propertySupport.setPropertyBool(PROP_CACHE_SPLITTER_POSITION, b);
   }
 
-  @SuppressWarnings("deprecation")
   @Override
   public List<IFileChooser> getFileChooserStack() {
     return getFileChoosers();
@@ -1486,7 +1470,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     return m_fileChooserStore.getByDisplayParent(displayParent);
   }
 
-  @SuppressWarnings("deprecation")
   @Override
   public void addFileChooser(final IFileChooser fileChooser) {
     showFileChooser(fileChooser);

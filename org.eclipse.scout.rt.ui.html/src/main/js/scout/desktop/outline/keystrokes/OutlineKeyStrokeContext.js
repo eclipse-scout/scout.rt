@@ -19,12 +19,12 @@ scout.inherits(scout.OutlineKeyStrokeContext, scout.KeyStrokeContext);
  * Returns true if this event is handled by this context, and if so sets the propagation flags accordingly.
  */
 scout.OutlineKeyStrokeContext.prototype.accept = function(event) {
-  return !this._outline.inBackground && !this.isFormToolOpened() && scout.OutlineKeyStrokeContext.parent.prototype.accept.call(this, event);
+  return !this._outline.inBackground && !this.isFormMenuOpen() && scout.OutlineKeyStrokeContext.parent.prototype.accept.call(this, event);
 };
 
-scout.OutlineKeyStrokeContext.prototype.isFormToolOpened = function() {
-  var popupButtons = this._outline.session.desktop.actions;
-  return popupButtons.some(function(button) {
-    return button.popup && button.popup.$container && button.popup.$container.isAttached();
+scout.OutlineKeyStrokeContext.prototype.isFormMenuOpen = function() {
+  var menus = this._outline.session.desktop.menus;
+  return menus.some(function(menu) {
+    return menu.popup && menu.popup.$container && menu.popup.$container.isAttached();
   }, this);
 };

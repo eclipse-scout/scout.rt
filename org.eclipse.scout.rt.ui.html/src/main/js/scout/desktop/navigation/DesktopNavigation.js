@@ -136,7 +136,7 @@ scout.DesktopNavigation.prototype._renderToolBar = function() {
   }
   this.toolBar = scout.create('DesktopToolBar', {
     parent: this,
-    actions: this.desktop.actions
+    menus: this.desktop.menus
   });
   this.toolBar.render(this.$container);
 };

@@ -24,21 +24,6 @@ scout.DesktopHeader.prototype._init = function(model) {
   this.updateViewButtonsVisibility();
 };
 
-scout.DesktopHeader.prototype._initKeyStrokeContext = function(keyStrokeContext) {
-  scout.DesktopHeader.parent.prototype._initKeyStrokeContext.call(this, keyStrokeContext);
-
-  // Bound to desktop
-  this.desktopKeyStrokeContext = new scout.KeyStrokeContext();
-  this.desktopKeyStrokeContext.invokeAcceptInputOnActiveValueField = true;
-  this.desktopKeyStrokeContext.$bindTarget = this.desktop.$container;
-  this.desktopKeyStrokeContext.$scopeTarget = this.$container;
-  this.desktopKeyStrokeContext.registerKeyStroke([
-    new scout.ViewTabSelectKeyStroke(this),
-
-    new scout.DisableBrowserTabSwitchingKeyStroke(this)
-  ].concat(this.desktop.actions));
-};
-
 scout.DesktopHeader.prototype._render = function($parent) {
   this.$container = $parent.appendDiv('desktop-header');
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
@@ -53,11 +38,9 @@ scout.DesktopHeader.prototype._render = function($parent) {
     this.outlineContent = this.desktop.bench.outlineContent;
   }
   this._attachOutlineContentMenuBarHandler();
-  this.session.keyStrokeManager.installKeyStrokeContext(this.desktopKeyStrokeContext);
 };
 
 scout.DesktopHeader.prototype._remove = function() {
-  this.session.keyStrokeManager.uninstallKeyStrokeContext(this.desktopKeyStrokeContext);
   this.desktop.off('propertyChange', this._desktopPropertyChangeHandler);
   this.desktop.off('animationEnd', this._desktopAnimationEndHandler);
   this._detachOutlineContentMenuBarHandler();
@@ -81,7 +64,7 @@ scout.DesktopHeader.prototype._renderToolBar = function() {
   }
   this.toolBar = scout.create('DesktopToolBar', {
     parent: this,
-    actions: this.desktop.actions
+    menus: this.desktop.menus
   });
   this.toolBar.render(this.$container);
 };

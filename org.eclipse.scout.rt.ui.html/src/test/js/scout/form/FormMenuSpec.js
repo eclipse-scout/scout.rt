@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 /* global FormSpecHelper */
-describe("FormToolButton", function() {
+describe("FormMenu", function() {
   var session, desktop, helper;
 
   beforeEach(function() {
@@ -26,7 +26,7 @@ describe("FormToolButton", function() {
     model.form = helper.createFormWithOneField();
     model.desktop = desktop;
 
-    var action = new scout.FormToolButton();
+    var action = new scout.FormMenu();
     action.init(model);
     action.position = function() {};
     return action;
@@ -41,7 +41,7 @@ describe("FormToolButton", function() {
     describe("selected", function() {
 
       it("opens and closes the tool container", function() {
-        var action = createAction(createSimpleModel('FormToolButton', session));
+        var action = createAction(createSimpleModel('FormMenu', session));
         action.render(session.$entryPoint);
         expect(findToolContainer()).not.toExist();
 
