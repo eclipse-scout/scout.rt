@@ -225,15 +225,29 @@ scout.DateField.prototype._renderEnabled = function() {
 };
 
 /**
- * @override
+ * @override ValueField.js
  */
-scout.DateField.prototype._renderDisplayText = function() {
-  //nop -> handled in _renderTimestamp
+scout.DateField.prototype._renderDisplayText = function(displayText) {
+  var tmp,
+    dateText = '',
+    timeText = '';
+  if (scout.strings.hasText(displayText)) {
+    tmp = displayText.split('\n');
+    dateText = tmp[0];
+    timeText = tmp[1];
+  }
+  if (this.hasDate) {
+    this._setDateDisplayText(dateText);
+  }
+  if (this.hasTime) {
+    this._setTimeDisplayText(timeText);
+  }
+  this._removePredictionFields();
 };
 
+// Does not render anything, only sets the timestamp property
 scout.DateField.prototype._renderTimestamp = function() {
   this.timestampAsDate = scout.dates.parseJsonDate(this.timestamp);
-  this.renderDate(this.timestampAsDate);
 };
 
 scout.DateField.prototype._renderAutoTimestamp = function() {
@@ -726,7 +740,7 @@ scout.DateField.prototype._setTimeDisplayText = function(displayText) {
 scout.DateField.prototype._updateDisplayTextProperty = function() {
   var dateText = this.$dateField ? this.$dateField.val() : '',
     timeText = this.$timeField ? this.$timeField.val() : '';
-  this.displayText = scout.strings.join(' ', dateText, timeText);
+  this.displayText = scout.strings.join('\n', dateText, timeText);
 };
 
 /**
@@ -798,7 +812,33 @@ scout.DateField.prototype._newTimestampAsDate = function(date, time) {
  * - the current date/time
  */
 scout.DateField.prototype._referenceDate = function() {
-  return this.autoTimestampAsDate || scout.dates.trunc(new Date());
+  var referenceDate = this.autoTimestampAsDate || scout.dates.trunc(new Date());
+  if (this.allowedDates) {
+    referenceDate = this._findAllowedReferenceDate(referenceDate);
+  }
+  return referenceDate;
+};
+
+/**
+ * Find nearest allowed date which is equals or greater than the current referenceDate.
+ */
+scout.DateField.prototype._findAllowedReferenceDate = function(referenceDate) {
+  var i, allowedDate;
+  // 1st: try to find a date which is equals or greater than the referenceDate (today)
+  for (i = 0; i < this.allowedDates.length; i++) {
+    allowedDate = this.allowedDates[i];
+    if (scout.dates.compare(allowedDate, referenceDate) >= 0) {
+      return allowedDate;
+    }
+  }
+  // 2nd: try to find an allowed date in the past
+  for (i = this.allowedDates.length - 1; i >= 0; i--) {
+    allowedDate = this.allowedDates[i];
+    if (scout.dates.compare(allowedDate, referenceDate) <= 0) {
+      return allowedDate;
+    }
+  }
+  return referenceDate;
 };
 
 scout.DateField.prototype.updateTimestamp = function(timestampAsDate, syncToServer) {

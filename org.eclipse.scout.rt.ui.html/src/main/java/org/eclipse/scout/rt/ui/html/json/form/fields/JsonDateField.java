@@ -55,10 +55,6 @@ public class JsonDateField<T extends IDateField> extends JsonValueField<T> {
   protected void initJsonProperties(T model) {
     super.initJsonProperties(model);
 
-    // Don't send the displayText to the UI. Formatting and parsing is done completely on the UI,
-    // the JSON layer only needs to send the format and the time stamp.
-    removeJsonProperty(IValueField.PROP_DISPLAY_TEXT);
-
     putJsonProperty(new JsonProperty<T>(IFormField.PROP_ERROR_STATUS, model) {
       @Override
       protected IStatus modelValue() {
@@ -146,7 +142,7 @@ public class JsonDateField<T extends IDateField> extends JsonValueField<T> {
           return null;
         }
         JSONArray dateArray = new JSONArray();
-        for (Date date : allowedDates) { // FIXME awe: (date-field) order dates!
+        for (Date date : allowedDates) {
           dateArray.put(dateToJson(date));
         }
         return dateArray;
