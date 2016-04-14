@@ -8,8 +8,6 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-@header-menu-textandicon-padding-right: 11px;
-
 .desktop-header {
   position: absolute;
   top: 0;
@@ -27,99 +25,5 @@
     position: absolute;
     top: calc(~'100% - 1px');
     left: 0;
-  }
-}
-
-.header-tools {
-  position: absolute;
-  top: 0;
-  white-space: nowrap;
-
-  &.compact {
-    padding-right: 5px;
-  }
-}
-
-.header-tool-item.menu-item {
-  position: relative;
-  height: @desktop-header-height - 1px;
-  color: @text-color;
-  #scout.font-text-plus();
-  border-left: 1px solid transparent;
-  border-right: 1px solid transparent;
-  margin-left: 20px;
-  margin-right: 20px;
-
-  &:hover {
-    color: @hover-color;
-  }
-
-  &.disabled {
-    color: @disabled-color;
-    cursor: default;
-  }
-
-  &.compact {
-    margin-left: 10px;
-    margin-right: 10px;
-
-    & > .submenu-icon {
-      display: none;
-    }
-  }
-
-  & > .font-icon {
-    color: @icon-color;
-    font-size: 17px;
-  }
-
-  &:hover > .font-icon {
-    color: @hover-color;
-  }
-
-  &.disabled > .font-icon {
-    color: @disabled-color;
-  }
-
-  &.menu-textandicon > .icon {
-    padding-right: @header-menu-textandicon-padding-right;
-  }
-}
-
-/* header: tools popup */
-
-.header-tool-item.popup-head {
-  height: @desktop-header-height - 1px;
-  border-left: 1px solid @border-color;
-  border-right: 1px solid @border-color;
-  cursor: pointer;
-  /*padding: 16px 20px 0 20px;*/
-  box-shadow: none;
-  border-top: none;
-  /*line-height: normal;*/
-  //#scout.vertical-align-helper-before();
-  /* OVERRIDE .header-tool-item.menu-item */
-  margin-left: 0;
-  margin-right: 0;
-  position: absolute;
-
-  .popup.down > & {
-    /* above selector is too less specific */
-    padding-top: 0;
-  }
-
-  &.selected > .font-icon {
-    font-size: 17px;
-    /*vertical-align: 0;*/
-  }
-}
-
-/* key boxes */
-
-.header-tool-item.menu-item .key-box {
-  bottom: 4px;
-
-  &.disabled {
-    background-color: @disabled-color;
   }
 }
