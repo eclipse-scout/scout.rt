@@ -71,6 +71,7 @@ scout.Outline.prototype._initTreeKeyStrokeContext = function(keyStrokeContext) {
       new scout.TreeSpaceKeyStroke(this),
       new scout.OutlineNavigationUpKeyStroke(this),
       new scout.OutlineNavigationDownKeyStroke(this),
+      new scout.OutlineNavigationEndKeyStroke(this),
       new scout.OutlineNavigateToTopKeyStroke(this),
       new scout.OutlineCollapseOrDrillUpKeyStroke(this),
       new scout.OutlineExpandOrDrillDownKeyStroke(this)

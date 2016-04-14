@@ -93,6 +93,7 @@ scout.Tree.prototype._initTreeKeyStrokeContext = function(keyStrokeContext) {
       new scout.TreeNavigationDownKeyStroke(this, modifierBitMask),
       new scout.TreeCollapseAllKeyStroke(this, modifierBitMask),
       new scout.TreeCollapseOrDrillUpKeyStroke(this, modifierBitMask),
+      new scout.TreeNavigationEndKeyStroke(this, modifierBitMask),
       new scout.TreeExpandOrDrillDownKeyStroke(this, modifierBitMask)
     ]
     .concat(this.menus));

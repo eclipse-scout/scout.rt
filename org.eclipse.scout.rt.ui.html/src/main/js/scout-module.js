@@ -205,6 +205,7 @@
   __include("scout/tree/keystrokes/TreeSpaceKeyStroke.js");
   __include("scout/tree/keystrokes/TreeNavigationUpKeyStroke.js");
   __include("scout/tree/keystrokes/TreeNavigationDownKeyStroke.js");
+  __include("scout/tree/keystrokes/TreeNavigationEndKeyStroke.js");
   __include("scout/tree/keystrokes/TreeCollapseAllKeyStroke.js");
   __include("scout/tree/keystrokes/TreeCollapseOrDrillUpKeyStroke.js");
   __include("scout/tree/keystrokes/TreeExpandOrDrillDownKeyStroke.js");
@@ -261,6 +262,7 @@
   __include("scout/desktop/outline/keystrokes/OutlineNavigationUpKeyStroke.js");
   __include("scout/desktop/outline/keystrokes/OutlineNavigateToTopKeyStroke.js");
   __include("scout/desktop/outline/keystrokes/OutlineNavigationDownKeyStroke.js");
+  __include("scout/desktop/outline/keystrokes/OutlineNavigationEndKeyStroke.js");
   // Basics for form fields
   __include("scout/form/fields/fields.js");
   __include("scout/form/fields/AppLinkKeyStroke.js");
