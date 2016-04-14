@@ -79,6 +79,11 @@ scout.ViewArea.prototype.activateView = function(view) {
 };
 
 scout.ViewArea.prototype.showView = function(view) {
+  // render
+  if (!this.rendered) {
+    this.render(this.parent.$container);
+  }
+
   view.render(this.$container);
   view.setParent(this);
   view.$container.addClass('view');
@@ -98,6 +103,12 @@ scout.ViewArea.prototype.removeView = function(view) {
     if (view.rendered) {
       view.remove();
     }
+
+    // remove if empty
+    if (!this.hasViews() && this.rendered) {
+      this.remove();
+    }
+
     this.htmlComp.invalidateLayoutTree();
     this.htmlComp.validateLayoutTree();
   }

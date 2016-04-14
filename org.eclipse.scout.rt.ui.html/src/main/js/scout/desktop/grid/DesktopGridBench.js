@@ -23,10 +23,10 @@ scout.DesktopGridBench = function() {
   //    right: undefined
   //  };
   this._viewTabMap = {}; // [key=viewId, value=ViewArea instance]
-  //  this._desktopOutlineChangedHandler = this._onDesktopOutlineChanged.bind(this);
-  //  this._outlineNodesSelectedHandler = this._onOutlineNodesSelected.bind(this);
-  //  this._outlinePageChangedHandler = this._onOutlinePageChanged.bind(this);
-  //  this._outlinePropertyChangeHandler = this._onOutlinePropertyChange.bind(this);
+  this._desktopOutlineChangedHandler = this._onDesktopOutlineChanged.bind(this);
+  this._outlineNodesSelectedHandler = this._onOutlineNodesSelected.bind(this);
+  this._outlinePageChangedHandler = this._onOutlinePageChanged.bind(this);
+  this._outlinePropertyChangeHandler = this._onOutlinePropertyChange.bind(this);
   this._addEventSupport();
 };
 scout.inherits(scout.DesktopGridBench, scout.Widget);
@@ -57,12 +57,11 @@ scout.DesktopGridBench.prototype._render = function($parent) {
   this.$container = $parent.appendDiv('desktop-grid-bench');
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
   this.htmlComp.setLayout(new scout.DesktopGridBenchLayout(this));
-  //  this.setOutline(this.desktop.outline); //TODO CGU maybe better create destroy(), call setOutline in init and attach outline listener in init/destroy
-  //  this._renderOrAttachOutlineContent();
-  //  this._renderOrAttachViewAreaColumns();
-  //  this._revalidateSplitters(true);
+  this.setOutline(this.desktop.outline); //TODO CGU maybe better create destroy(), call setOutline in init and attach outline listener in init/destroy
+  this._renderOrAttachOutlineContent();
+
   this.session.keyStrokeManager.installKeyStrokeContext(this.desktopKeyStrokeContext);
-  //  this.desktop.on('outlineChanged', this._desktopOutlineChangedHandler);
+  this.desktop.on('outlineChanged', this._desktopOutlineChangedHandler);
 };
 
 scout.DesktopGridBench.prototype._remove = function() {
@@ -71,10 +70,179 @@ scout.DesktopGridBench.prototype._remove = function() {
   scout.DesktopGridBench.parent.prototype._remove.call(this);
 };
 
-scout.DesktopGridBench.prototype.setOutlineContentVisible = function(outlineContentVisible) {
-
+scout.DesktopGridBench.prototype._renderOrAttachOutlineContent = function() {
+  if (!this.outlineContent || this.desktop.inBackground) {
+    return;
+  }
+  if (!this.outlineContent.rendered) {
+    this._renderOutlineContent();
+  } else if (!this.outlineContent.attached) {
+    this.outlineContent.attach();
+  }
 };
 
+scout.DesktopGridBench.prototype._renderOutlineContent = function() {
+  if (!this.outlineContent || this.desktop.inBackground) {
+    return;
+  }
+
+  if (this.outlineContent instanceof scout.Table) {
+    this.outlineContent.menuBar.top();
+    this.outlineContent.menuBar.large();
+  }
+  this.outlineContent.render(this.$container);
+  this.outlineContent.htmlComp.validateRoot = true;
+  this.outlineContent.setParent(this);
+  this.outlineContent.invalidateLayoutTree(false);
+
+  // Layout immediate to prevent 'laggy' form visualization,
+  // but not initially while desktop gets rendered because it will be done at the end anyway
+  if (this.desktop.rendered) {
+    this.outlineContent.validateLayoutTree();
+
+    // Request focus on first element in outline content
+    this.session.focusManager.validateFocus();
+  }
+  if (this.outlineContent instanceof scout.Table) {
+    this.outlineContent.restoreScrollPosition();
+  }
+};
+
+scout.DesktopGridBench.prototype._removeOutlineContent = function() {
+  if (!this.outlineContent) {
+    return;
+  }
+  if (this.outlineContent instanceof scout.Table) {
+    this.outlineContent.storeScrollPosition();
+  }
+  this.outlineContent.remove();
+};
+
+scout.DesktopGridBench.prototype.setOutline = function(outline) {
+  if (this.outline) {
+    this.outline.off('nodesSelected', this._outlineNodesSelectedHandler);
+    this.outline.off('pageChanged', this._outlinePageChangedHandler);
+    this.outline.off('propertyChange', this._outlinePropertyChangeHandler);
+  }
+  this.outline = outline;
+  if (this.outline) {
+    this.outline.on('nodesSelected', this._outlineNodesSelectedHandler);
+    this.outline.on('pageChanged', this._outlinePageChangedHandler);
+    this.outline.on('propertyChange', this._outlinePropertyChangeHandler);
+  }
+  this.updateOutlineContent();
+};
+
+scout.DesktopGridBench.prototype.setOutlineContent = function(content) {
+  var oldContent = this.outlineContent;
+  if (this.outlineContent === content) {
+    return;
+  }
+  if (this.rendered) {
+    this._removeOutlineContent();
+  }
+  this._setProperty('outlineContent', content);
+  // Inform header that outline content has changed
+  // (having a listener in the header is quite complex due to initialization phase, a direct call here is much easier to implement)
+  if (this.desktop.header) {
+    this.desktop.header.onBenchOutlineContentChange(content, oldContent);
+  }
+  if (this.rendered) {
+    this._renderOrAttachOutlineContent();
+  }
+};
+
+scout.DesktopGridBench.prototype.setOutlineContentVisible = function(visible) {
+  if (visible === this.outlineContentVisible) {
+    return;
+  }
+  this.outlineContentVisible = visible;
+  this.updateOutlineContent();
+};
+
+scout.DesktopGridBench.prototype.bringToFront = function() {
+  this._renderOrAttachOutlineContent();
+};
+
+scout.DesktopGridBench.prototype.sendToBack = function() {
+  if (this.outlineContent) {
+    this.outlineContent.detach();
+  }
+};
+
+scout.DesktopGridBench.prototype._showDefaultDetailForm = function() {
+  this.setOutlineContent(this.outline.defaultDetailForm, true);
+};
+
+scout.DesktopGridBench.prototype._showOutlineOverview = function() {
+  this.setOutlineContent(this.outline.outlineOverview, true);
+};
+
+scout.DesktopGridBench.prototype._showDetailContentForPage = function(node) {
+  if (!node) {
+    throw new Error('called _showDetailContentForPage without node');
+  }
+
+  var content;
+  if (node.detailForm && node.detailFormVisible && node.detailFormVisibleByUi) {
+    content = node.detailForm;
+  } else if (node.detailTable && node.detailTableVisible) {
+    content = node.detailTable;
+  }
+
+  this.setOutlineContent(content);
+};
+
+
+scout.DesktopGridBench.prototype.updateOutlineContent = function() {
+  if (!this.outlineContentVisible || !this.outline) {
+    return;
+  }
+  var selectedPages = this.outline.selectedNodes;
+  if (selectedPages.length === 0) {
+    if (this.outline.defaultDetailForm) {
+      this._showDefaultDetailForm();
+    } else if (this.outline.outlineOverview) {
+      this._showOutlineOverview();
+    }
+  } else {
+    // Outline does not support multi selection -> [0]
+    var selectedPage = selectedPages[0];
+    this._showDetailContentForPage(selectedPage);
+  }
+};
+
+scout.DesktopGridBench.prototype.updateOutlineContentDebounced = function() {
+  clearTimeout(this._updateOutlineContentTimeout);
+  this._updateOutlineContentTimeout = setTimeout(function() {
+    this.updateOutlineContent();
+  }.bind(this), 300);
+};
+
+scout.DesktopGridBench.prototype._onDesktopOutlineChanged = function(event) {
+  this.setOutline(this.desktop.outline);
+};
+
+scout.DesktopGridBench.prototype._onOutlineNodesSelected = function(event) {
+  if (event.debounce) {
+    this.updateOutlineContentDebounced();
+  } else {
+    this.updateOutlineContent();
+  }
+};
+
+scout.DesktopGridBench.prototype._onOutlinePageChanged = function(event) {
+  var selectedPage = this.outline.selectedNodes[0];
+  if (!event.page && !selectedPage || event.page === selectedPage) {
+    this.updateOutlineContent();
+  }
+};
+
+scout.DesktopGridBench.prototype._onOutlinePropertyChange = function(event) {
+  if (event.changedProperties.indexOf('defaultDetailForm') !== -1) {
+    this.updateOutlineContent();
+  }
+};
 
 scout.DesktopGridBench.prototype._revalidateSplitters = function(clearPosition) {
   // remove old splitters
@@ -98,6 +266,7 @@ scout.DesktopGridBench.prototype._revalidateSplitters = function(clearPosition) 
         maxRatio: 1
       });
       splitter.render(splitterParent.$container);
+      splitter.$container.addClass('line');
       //      splitter.$container.insertAfter(this.viewAreaColumns.LEFT.$container);
       splitter.on('resize', splitterParent._onSplitterResize.bind(splitterParent));
       arr.push(splitter);
@@ -106,7 +275,10 @@ scout.DesktopGridBench.prototype._revalidateSplitters = function(clearPosition) 
     return arr;
   }, []);
   // well order the dom elements (reduce is used for simple code reasons, the result of reduce is not of interest).
-  this.components.reduce(function(c1, c2, index) {
+  this.components.filter(function(comp) {
+    return comp instanceof scout.ViewAreaColumn;
+  })
+  .reduce(function(c1, c2, index) {
     if (index > 0) {
       c2.$container.insertAfter(c1.$container);
     }

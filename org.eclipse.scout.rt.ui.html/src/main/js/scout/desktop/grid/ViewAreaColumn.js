@@ -16,7 +16,7 @@ scout.ViewAreaColumn = function() {
     CENTER: 1,
     BOTTOM: 2
   };
-  this.viewAreas =[];
+  this.viewAreas = [];
   this._viewToViewArea = {}; // [key=viewId, value=ViewArea instance]
   this.components;
 
@@ -57,18 +57,7 @@ scout.ViewAreaColumn.prototype._render = function($parent) {
 
   this.$container = $parent.appendDiv('viewColumn');
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
-  this._renderOrAttachViewAreas();
   this.htmlComp.setLayout(this._createLayout());
-};
-
-scout.ViewAreaColumn.prototype._renderOrAttachViewAreas = function() {
-
-  for (var viewArea in this.viewAreas) {
-    if (this.viewAreas.hasOwnProperty(viewArea)) {
-      this.viewAreas[viewArea].attach();
-      this.viewAreas[viewArea].render(this.$container);
-    }
-  }
 };
 
 scout.ViewAreaColumn.prototype._remove = function() {
@@ -127,7 +116,7 @@ scout.ViewAreaColumn.prototype._revalidateSplitters = function(clearPosition) {
         maxRatio: 1
       });
       splitter.render(splitterParent.$container);
-      //      splitter.$container.insertAfter(this.viewAreaColumns.LEFT.$container);
+      splitter.$container.addClass('line');
       splitter.on('resize', splitterParent._onSplitterResize.bind(splitterParent));
       arr.push(splitter);
     }
@@ -135,12 +124,15 @@ scout.ViewAreaColumn.prototype._revalidateSplitters = function(clearPosition) {
     return arr;
   }, []);
   // well order the dom elements (reduce is used for simple code reasons, the result of reduce is not of interest).
-  this.components.reduce(function(c1, c2, index) {
-    if (index > 0) {
-      c2.$container.insertAfter(c1.$container);
-    }
-    return c2;
-  }, undefined);
+  this.components.filter(function(comp) {
+      return comp instanceof scout.ViewArea;
+    })
+    .reduce(function(c1, c2, index) {
+      if (index > 0) {
+        c2.$container.insertAfter(c1.$container);
+      }
+      return c2;
+    }, undefined);
 
   this.htmlComp.invalidateLayoutTree();
   // Layout immediate to prevent 'laggy' form visualization,
@@ -211,7 +203,6 @@ scout.ViewAreaColumn.prototype.viewCount = function() {
 scout.ViewAreaColumn.prototype.hasViews = function() {
   return this.viewCount() > 0;
 };
-
 
 scout.ViewAreaColumn.prototype.getComponents = function() {
   return this.components;
