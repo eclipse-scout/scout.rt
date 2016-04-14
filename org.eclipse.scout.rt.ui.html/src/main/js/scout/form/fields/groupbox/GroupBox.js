@@ -314,11 +314,11 @@ scout.GroupBox.prototype._renderExpanded = function() {
 };
 
 /**
- * @override
+ * @override FormField.js
  */
-scout.GroupBox.prototype._renderLabelVisible = function(visible) {
-  visible = scout.nvl(visible, this.visible);
-  this.$title.setVisible(visible && this.label && !this.mainBox);
+scout.GroupBox.prototype._renderLabelVisible = function(labelVisible) {
+  labelVisible = scout.nvl(labelVisible, this.labelVisible);
+  this.$title.setVisible(labelVisible && this.label && !this.mainBox);
 };
 
 scout.GroupBox.prototype._syncMenus = function(menus, oldMenus) {
