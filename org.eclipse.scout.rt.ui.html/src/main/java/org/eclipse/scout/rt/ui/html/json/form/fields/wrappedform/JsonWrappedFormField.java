@@ -14,6 +14,7 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.wrappedform.IWrappedFormField;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
+import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterPropertyConfig;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterPropertyConfigBuilder;
@@ -42,6 +43,12 @@ public class JsonWrappedFormField<WRAPPED_FORM_FIELD extends IWrappedFormField<?
       @Override
       protected IForm modelValue() {
         return getModel().getInnerForm();
+      }
+    });
+    putJsonProperty(new JsonProperty<WRAPPED_FORM_FIELD>(IWrappedFormField.PROP_INITIAL_FOCUS_ENABLED, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isInitialFocusEnabled();
       }
     });
   }

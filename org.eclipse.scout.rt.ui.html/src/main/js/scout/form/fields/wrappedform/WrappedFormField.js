@@ -29,15 +29,26 @@ scout.WrappedFormField.prototype._renderProperties = function() {
  * Will also be called by model adapter on property change event
  */
 scout.WrappedFormField.prototype._renderInnerForm = function() {
-  if (this.innerForm) {
-    this.innerForm.displayHint = scout.Form.DisplayHint.VIEW; // by definition, an inner form is a view.
-    this.innerForm.modal = false; // by definition, an inner form is not modal.
-    this.innerForm.renderInitialFocusEnabled = false; // do not render initial focus of form
+  if (!this.innerForm) {
+    return;
+  }
 
-    this.innerForm.render(this.$container);
+  this.innerForm.displayHint = scout.Form.DisplayHint.VIEW; // by definition, an inner form is a view.
+  this.innerForm.modal = false; // by definition, an inner form is not modal.
+  this.innerForm.renderInitialFocusEnabled = this.initialFocusEnabled; // do not render initial focus of form if disabled.
 
-    this.addField(this.innerForm.$container);
-    this.innerForm.invalidateLayoutTree();
+  this.innerForm.render(this.$container);
+
+  this.addField(this.innerForm.$container);
+  this.innerForm.invalidateLayoutTree();
+
+  // required because active element is lost when 'addField' is called.
+  this._renderInitialFocusEnabled();
+};
+
+scout.WrappedFormField.prototype._renderInitialFocusEnabled = function() {
+  if (this.innerForm && this.initialFocusEnabled) {
+    this.innerForm.renderInitialFocus();
   }
 };
 

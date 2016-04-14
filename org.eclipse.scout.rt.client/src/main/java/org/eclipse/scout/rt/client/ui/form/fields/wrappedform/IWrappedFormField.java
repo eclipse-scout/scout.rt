@@ -25,6 +25,7 @@ public interface IWrappedFormField<T extends IForm> extends IFormField {
    * {@link IForm}
    */
   String PROP_INNER_FORM = "innerForm";
+  String PROP_INITIAL_FOCUS_ENABLED = "initialFocusEnabled";
 
   /**
    * @return the current inner form.
@@ -53,6 +54,13 @@ public interface IWrappedFormField<T extends IForm> extends IFormField {
    *          inner form is set. If <code>false</code>, the caller is responsible for starting and closing the Form.
    */
   void setInnerForm(T form, boolean manageFormLifeCycle);
+
+  /**
+   * @return {@code true} if the inner form should request the initial focus once loaded, {@code false} otherwise.
+   */
+  boolean isInitialFocusEnabled();
+
+  void setInitialFocusEnabled(boolean initialFocusEnabled);
 
   boolean visitFields(IFormFieldVisitor visitor, int startLevel);
 }
