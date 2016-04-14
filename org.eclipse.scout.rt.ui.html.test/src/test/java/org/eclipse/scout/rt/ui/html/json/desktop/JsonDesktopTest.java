@@ -224,13 +224,13 @@ public class JsonDesktopTest {
   }
 
   /**
-   * Tests whether non displayable actions are sent.
+   * Tests whether non displayable menus are sent.
    * <p>
    * This reduces response size and also leverages security because the menus are never visible to the user, not even
    * with the dev tools of the browser
    */
   @Test
-  public void testDontSendNonDisplayableActions() throws Exception {
+  public void testDontSendNonDisplayableMenus() throws Exception {
     IDesktop desktop = new DesktopWithNonDisplayableActions();
     desktop.initDesktop();
     JsonDesktop<IDesktop> jsonDesktop = createJsonDesktop(desktop);
@@ -246,7 +246,7 @@ public class JsonDesktopTest {
 
     // Json response must not contain NonDisplayableMenu/FormMenu
     JSONObject json = jsonDesktop.toJson();
-    JSONArray jsonActions = json.getJSONArray("actions");
+    JSONArray jsonActions = json.getJSONArray("menus");
     assertEquals(2, jsonActions.length());
     List<String> ids = new ArrayList<String>();
     ids.add(jsonActions.getString(0));
