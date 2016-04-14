@@ -153,7 +153,7 @@ scout.Outline.prototype._renderTitleVisible = function() {
 
 scout.Outline.prototype._postRender = function() {
   //used to render glasspane
-  this._trigger('rendered');
+  this.trigger('rendered');
   scout.Outline.parent.prototype._postRender.call(this);
 };
 
@@ -790,7 +790,7 @@ scout.Outline.prototype.glassPaneTargets = function() {
   } else {
     var deferred = new scout.DeferredGlassPaneTarget();
     var renderedHandler = function(event) {
-      var desktop = event.eventOn.session.desktop;
+      var desktop = event.source.session.desktop;
       var elements = [];
       if (desktop.navigation) {
         elements.push(desktop.navigation.$body);

@@ -771,7 +771,7 @@ scout.Desktop.prototype.onLayoutAnimationComplete = function() {
   if (!this.benchVisible) {
     this._removeBench();
   }
-  this._trigger('animationEnd');
+  this.trigger('animationEnd');
   this.animateLayoutChange = false;
 };
 

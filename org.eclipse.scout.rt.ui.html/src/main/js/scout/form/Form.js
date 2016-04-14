@@ -125,7 +125,7 @@ scout.Form.prototype.close = function() {
 };
 
 scout.Form.prototype._postRender = function() {
-  this._trigger('rendered');
+  this.trigger('rendered');
   this._installFocusContext();
 
   if (this.renderInitialFocusEnabled) {
@@ -339,7 +339,7 @@ scout.Form.prototype.glassPaneTargets = function() {
     return [this.$container];
   } else {
     var renderedHandler = function(event) {
-      deferred.ready([event.eventOn.$container]);
+      deferred.ready([event.source.$container]);
     };
     var deferred = new scout.DeferredGlassPaneTarget();
     this.one('rendered', renderedHandler);

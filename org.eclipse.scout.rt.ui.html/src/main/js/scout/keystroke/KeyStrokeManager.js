@@ -169,7 +169,7 @@ scout.KeyStrokeManager.prototype._handleKeyStrokeEvent = function(keyStrokeConte
     // Handle the keystroke.
     keyStroke.handle(event);
     if (this.session.desktop) { // check that desktop is ready (may be undefined on "Initialization failed" message, would cause an error when the user presses Enter)
-      this.session.desktop._trigger('keystrokeConsumed', {
+      this.session.desktop.trigger('keystrokeConsumed', {
         keyStrokeEvent: event,
         $target: keyStrokeContext.$getBindTarget(),
         keyStroke: keyStroke
