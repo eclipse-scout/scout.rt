@@ -15,15 +15,6 @@ scout.Desktop = function() {
   this.header;
   this.bench;
   this.splitter;
-
-  /**
-   * FIXME dwi: (activeForm): selected tool form action wird nun auch als 'activeForm' verwendet (siehe TableKeystrokeContext.js)
-   * Wahrscheinlich müssen wir das refactoren und eine activeForm property verwenden.  Diese Property muss
-   * mit dem Server synchronisiert werden, damit auch das server-seitige desktop.getActiveForm() stimmt.
-   * Auch im zusammenhang mit focus-handling nochmals überdenken.
-   */
-  this._addAdapterProperties(['viewButtons', 'menus', 'views', 'dialogs', 'outline', 'messageBoxes', 'fileChoosers', 'addOns', 'keyStrokes']);
-
   this.viewTabsController;
   this.formController;
   this.messageBoxController;
@@ -32,7 +23,7 @@ scout.Desktop = function() {
   this.offline = false;
   this.notifications = [];
   this.inBackground = false;
-  this._keyStrokeSupport = new scout.KeyStrokeSupport(this);
+  this._addAdapterProperties(['viewButtons', 'menus', 'views', 'dialogs', 'outline', 'messageBoxes', 'fileChoosers', 'addOns', 'keyStrokes']);
 };
 scout.inherits(scout.Desktop, scout.ModelAdapter);
 
@@ -466,12 +457,13 @@ scout.Desktop.prototype.setOutline = function(outline) {
 };
 
 scout.Desktop.prototype._syncViewButtons = function(viewButtons, oldViewButtons) {
-  this._keyStrokeSupport.updateKeyStrokes(viewButtons, oldViewButtons);
+  this.updateKeyStrokes(viewButtons, oldViewButtons);
   this.viewButtons = viewButtons;
 };
 
 scout.Desktop.prototype._syncMenus = function(menus, oldMenus) {
-  this._keyStrokeSupport.syncMenus(menus, oldMenus);
+  this.updateKeyStrokes(menus, oldMenus);
+  this.menus = menus;
 };
 
 scout.Desktop.prototype._syncNavigationVisible = function(visible) {

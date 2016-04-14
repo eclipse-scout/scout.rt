@@ -834,7 +834,8 @@ scout.Outline.prototype.acceptView = function(view) {
 };
 
 scout.Outline.prototype._syncMenus = function(menus, oldMenus) {
-  this._keyStrokeSupport.syncMenus(menus, oldMenus);
+  this.updateKeyStrokes(menus, oldMenus);
+  this.menus = menus;
   if (this.titleMenuBar) {
     // menuBar is not created yet when synMenus is called initially
     this._updateTitleMenuBar();

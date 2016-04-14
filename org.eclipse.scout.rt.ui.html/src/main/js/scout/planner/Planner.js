@@ -31,7 +31,6 @@ scout.Planner = function() {
   };
 
   this.yearPanelVisible = false;
-  this._keyStrokeSupport = new scout.KeyStrokeSupport(this);
   this._addAdapterProperties(['menus']);
 };
 scout.inherits(scout.Planner, scout.ModelAdapter);
@@ -913,7 +912,8 @@ scout.Planner.prototype._afterYearPanelWidthChange = function() {
 };
 
 scout.Planner.prototype._syncMenus = function(menus, oldMenus) {
-  this._keyStrokeSupport.syncMenus(menus, oldMenus);
+  this.updateKeyStrokes(menus, oldMenus);
+  this.menus = menus;
   this._updateMenuBar();
 };
 

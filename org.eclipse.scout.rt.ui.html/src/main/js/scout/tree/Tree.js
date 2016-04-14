@@ -23,7 +23,6 @@ scout.Tree = function() {
   this.checkedNodes = [];
   this._filters = [];
   this._animationNodeLimit = 25;
-  this._keyStrokeSupport = new scout.KeyStrokeSupport(this);
   this._doubleClickSupport = new scout.DoubleClickSupport();
   this._$animationWrapper; // used by _renderExpansion()
   this._filterMenusHandler = this._filterMenus.bind(this);
@@ -84,8 +83,9 @@ scout.Tree.prototype._initTreeKeyStrokeContext = function(keyStrokeContext) {
   });
 };
 
-scout.Tree.prototype._syncMenus = function(newMenus, oldMenus) {
-  this._keyStrokeSupport.syncMenus(newMenus, oldMenus);
+scout.Tree.prototype._syncMenus = function(menus, oldMenus) {
+  this.updateKeyStrokes(menus, oldMenus);
+  this.menus = menus;
   this._updateMenuBar();
 };
 
@@ -94,8 +94,9 @@ scout.Tree.prototype._updateMenuBar = function() {
   this.menuBar.setMenuItems(menuItems);
 };
 
-scout.Tree.prototype._syncKeyStrokes = function(newKeyStrokes, oldKeyStrokes) {
-  this._keyStrokeSupport.syncKeyStrokes(newKeyStrokes, oldKeyStrokes);
+scout.Tree.prototype._syncKeyStrokes = function(keyStrokes, oldKeyStrokes) {
+  this.updateKeyStrokes(keyStrokes, oldKeyStrokes);
+  this.keyStrokes = keyStrokes;
 };
 
 scout.Tree.prototype._syncDisplayStyle = function(newValue) {

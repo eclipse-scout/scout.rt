@@ -160,7 +160,7 @@ scout.GroupBox.prototype._renderStatusPosition = function() {
 };
 
 scout.GroupBox.prototype._prepareFields = function() {
-  this._keyStrokeSupport.unregisterKeyStrokes(this.processButtons);
+  this.unregisterKeyStrokes(this.processButtons);
 
   this.controls = [];
   this.systemButtons = [];
@@ -205,7 +205,7 @@ scout.GroupBox.prototype._prepareFields = function() {
       }));
     this.processMenus.push(menu);
   }, this);
-  this._keyStrokeSupport.registerKeyStrokes(this.processMenus);
+  this.registerKeyStrokes(this.processMenus);
 };
 
 scout.GroupBox.prototype._registerButtonKeyStrokes = function(button) {

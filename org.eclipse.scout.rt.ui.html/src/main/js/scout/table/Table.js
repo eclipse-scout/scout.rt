@@ -27,7 +27,6 @@ scout.Table = function(model) {
   this.rowBorderRightWidth = 0; // read-only, set by _calculateRowBorderWidth(), also used in TableHeader.js
   this.staticMenus = [];
   this.selectionHandler = new scout.TableSelectionHandler(this);
-  this._keyStrokeSupport = new scout.KeyStrokeSupport(this);
   this._filterMap = {};
   this._filteredRows = [];
   this._filteredRowsDirty = true;
@@ -2998,8 +2997,9 @@ scout.Table.prototype._syncSelectedRows = function(selectedRowIds) {
   this.selectionHandler.clearLastSelectedRowMarker();
 };
 
-scout.Table.prototype._syncMenus = function(newMenus, oldMenus) {
-  this._keyStrokeSupport.syncMenus(newMenus, oldMenus);
+scout.Table.prototype._syncMenus = function(menus, oldMenus) {
+  this.updateKeyStrokes(menus, oldMenus);
+  this.menus = menus;
   this._updateMenuBar();
 
   if (this.header) {
@@ -3014,8 +3014,9 @@ scout.Table.prototype._updateMenuBar = function() {
   this.menuBar.setMenuItems(menuItems);
 };
 
-scout.Table.prototype._syncKeyStrokes = function(newKeyStrokes, oldKeyStrokes) {
-  this._keyStrokeSupport.syncKeyStrokes(newKeyStrokes, oldKeyStrokes);
+scout.Table.prototype._syncKeyStrokes = function(keyStrokes, oldKeyStrokes) {
+  this.updateKeyStrokes(keyStrokes, oldKeyStrokes);
+  this.keyStrokes = keyStrokes;
 };
 
 scout.Table.prototype._syncFilters = function(filters) {

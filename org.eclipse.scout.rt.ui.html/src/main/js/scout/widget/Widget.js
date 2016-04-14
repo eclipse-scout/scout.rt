@@ -325,29 +325,6 @@ scout.Widget.prototype._addEventSupport = function() {
   this.events = new scout.EventSupport();
 };
 
-/**
- * Call this function in the constructor of your widget if you need keystroke context support.
- **/
-scout.Widget.prototype._addKeyStrokeContextSupport = function() {
-  this.keyStrokeContext = this._createKeyStrokeContext();
-  if (this.keyStrokeContext) {
-    this.keyStrokeContext.$scopeTarget = function() {
-      return this.$container;
-    }.bind(this);
-    this.keyStrokeContext.$bindTarget = function() {
-      return this.$container;
-    }.bind(this);
-  }
-};
-
-/**
- * Creates a new keystroke context.
- * This method is intended to be overwritten by subclasses to provide another keystroke context.
- */
-scout.Widget.prototype._createKeyStrokeContext = function() {
-  return new scout.KeyStrokeContext();
-};
-
 scout.Widget.prototype.trigger = function(type, event) {
   if (event) {
     // create a shallow copy of the given event. Otherwise this function would
@@ -459,6 +436,48 @@ scout.Widget.prototype._triggerChildrenBeforeDetach = function(parent) {
 
 scout.Widget.prototype._beforeDetach = function(parent) {
   // NOP
+};
+
+/**
+ * Call this function in the constructor of your widget if you need keystroke context support.
+ **/
+scout.Widget.prototype._addKeyStrokeContextSupport = function() {
+  this.keyStrokeContext = this._createKeyStrokeContext();
+  if (this.keyStrokeContext) {
+    this.keyStrokeContext.$scopeTarget = function() {
+      return this.$container;
+    }.bind(this);
+    this.keyStrokeContext.$bindTarget = function() {
+      return this.$container;
+    }.bind(this);
+  }
+};
+
+/**
+ * Creates a new keystroke context.
+ * This method is intended to be overwritten by subclasses to provide another keystroke context.
+ */
+scout.Widget.prototype._createKeyStrokeContext = function() {
+  return new scout.KeyStrokeContext();
+};
+
+scout.Widget.prototype.updateKeyStrokes = function(newKeyStrokes, oldKeyStrokes) {
+  this.unregisterKeyStrokes(oldKeyStrokes);
+  this.registerKeyStrokes(newKeyStrokes);
+};
+
+scout.Widget.prototype.registerKeyStrokes = function(keyStrokes) {
+  keyStrokes = scout.arrays.ensure(keyStrokes);
+  keyStrokes.forEach(function(keyStroke) {
+    this.keyStrokeContext.registerKeyStroke(keyStroke);
+  }, this);
+};
+
+scout.Widget.prototype.unregisterKeyStrokes = function(keyStrokes) {
+  keyStrokes = scout.arrays.ensure(keyStrokes);
+  keyStrokes.forEach(function(keyStroke) {
+    this.keyStrokeContext.unregisterKeyStroke(keyStroke);
+  }, this);
 };
 
 scout.Widget.prototype._fireBulkPropertyChange = function(oldProperties, newProperties) {
