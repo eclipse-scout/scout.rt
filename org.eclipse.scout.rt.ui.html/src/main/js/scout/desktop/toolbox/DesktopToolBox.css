@@ -10,7 +10,7 @@
  ******************************************************************************/
 @header-menu-textandicon-padding-right: 11px;
 
-.header-tools {
+.desktop-tool-box {
   position: absolute;
   top: 0;
   white-space: nowrap;
@@ -20,7 +20,7 @@
   }
 }
 
-.header-tool-item.menu-item {
+.desktop-tool-box-item.menu-item {
   position: relative;
   height: @desktop-header-height - 1px;
   color: @text-color;
@@ -68,7 +68,7 @@
 
 /* header: tools popup */
 
-.header-tool-item.popup-head {
+.desktop-tool-box-item.popup-head {
   height: @desktop-header-height - 1px;
   border-left: 1px solid @border-color;
   border-right: 1px solid @border-color;
@@ -78,7 +78,7 @@
   border-top: none;
   /*line-height: normal;*/
   //#scout.vertical-align-helper-before();
-  /* OVERRIDE .header-tool-item.menu-item */
+  /* OVERRIDE .desktop-tool-box-item.menu-item */
   margin-left: 0;
   margin-right: 0;
   position: absolute;
@@ -90,13 +90,12 @@
 
   &.selected > .font-icon {
     font-size: 17px;
-    /*vertical-align: 0;*/
   }
 }
 
 /* key boxes */
 
-.header-tool-item.menu-item .key-box {
+.desktop-tool-box-item.menu-item .key-box {
   bottom: 4px;
 
   &.disabled {

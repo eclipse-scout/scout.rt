@@ -231,7 +231,7 @@
   __include("scout/desktop/notification/OfflineDesktopNotification.js");
   __include("scout/desktop/popupblocker/PopupBlockerHandler.js");
   __include("scout/desktop/popupblocker/PopupBlockerDesktopNotification.js");
-  __include("scout/desktop/toolbar/DesktopToolBar.js");
+  __include("scout/desktop/toolbox/DesktopToolBox.js");
   __include("scout/desktop/viewbutton/ViewButton.js");
   __include("scout/desktop/viewbutton/ViewButtons.js");
   __include("scout/desktop/viewbutton/ViewButtonsLayout.js");

@@ -8,31 +8,31 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-scout.DesktopToolBar = function(menuBar) {
-  scout.DesktopToolBar.parent.call(this);
+scout.DesktopToolBox = function(menuBar) {
+  scout.DesktopToolBox.parent.call(this);
 };
-scout.inherits(scout.DesktopToolBar, scout.MenuBox);
+scout.inherits(scout.DesktopToolBox, scout.MenuBox);
 
-scout.DesktopToolBar.prototype._init = function(options) {
+scout.DesktopToolBox.prototype._init = function(options) {
   options.customMenuCssClasses = options.customMenuCssClasses || '';
-  options.customMenuCssClasses += ' header-tool-item';
-  scout.DesktopToolBar.parent.prototype._init.call(this, options);
+  options.customMenuCssClasses += ' desktop-tool-box-item';
+  scout.DesktopToolBox.parent.prototype._init.call(this, options);
 };
 
 /**
  * @override
  */
-scout.DesktopToolBar.prototype._initMenu = function(menu) {
-  scout.DesktopToolBar.parent.prototype._initMenu.call(this, menu);
+scout.DesktopToolBox.prototype._initMenu = function(menu) {
+  scout.DesktopToolBox.parent.prototype._initMenu.call(this, menu);
   menu.popupOpeningDirectionX = 'left';
 };
 
 /**
  * @override
  */
-scout.DesktopToolBar.prototype._render = function($parent) {
-  scout.DesktopToolBar.parent.prototype._render.call(this, $parent);
-  this.$container.addClass('header-tools');
+scout.DesktopToolBox.prototype._render = function($parent) {
+  scout.DesktopToolBox.parent.prototype._render.call(this, $parent);
+  this.$container.addClass('desktop-tool-box');
 };
 
 
