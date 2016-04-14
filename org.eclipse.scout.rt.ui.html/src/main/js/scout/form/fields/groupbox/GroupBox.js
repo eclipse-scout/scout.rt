@@ -49,6 +49,33 @@ scout.GroupBox.prototype._initKeyStrokeContext = function(keyStrokeContext) {
 };
 
 /**
+ * @override FormField.js
+ */
+scout.GroupBox.prototype._syncKeyStrokes = function(keyStrokes, oldKeyStrokes) {
+  var groupBoxRenderingHints = {
+    render: function() {
+      return true;
+    },
+    offset: 0,
+    hAlign: scout.hAlign.RIGHT,
+    $drawingArea: function($drawingArea, event) {
+      if (this.labelVisible) {
+        return this.$title;
+      } else {
+        return this.$body;
+      }
+    }.bind(this)
+  };
+
+  keyStrokes
+    .forEach(function(keyStroke) {
+      keyStroke.actionKeyStroke.renderingHints = $.extend({}, keyStroke.actionKeyStroke.renderingHints, groupBoxRenderingHints);
+    }, this);
+
+  scout.GroupBox.parent.prototype._syncKeyStrokes.call(this, keyStrokes, oldKeyStrokes);
+};
+
+/**
  * Returns a $container used as a bind target for the key-stroke context of the group-box.
  * By default this function returns the container of the form, or when group-box is has no
  * form as a parent the container of the group-box.
