@@ -52,6 +52,8 @@ scout.GroupBox.prototype._initKeyStrokeContext = function(keyStrokeContext) {
  * @override FormField.js
  */
 scout.GroupBox.prototype._syncKeyStrokes = function(keyStrokes, oldKeyStrokes) {
+  keyStrokes = scout.arrays.ensure(keyStrokes);
+
   var groupBoxRenderingHints = {
     render: function() {
       return true;
