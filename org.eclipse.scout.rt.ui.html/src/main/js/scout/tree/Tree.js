@@ -28,6 +28,7 @@ scout.Tree = function() {
   this._keyStrokeSupport = new scout.KeyStrokeSupport(this);
   this._doubleClickSupport = new scout.DoubleClickSupport();
   this._$animationWrapper; // used by _renderExpansion()
+  this._$expandAnimationWrappers = [];
   this._filterMenusHandler = this._filterMenus.bind(this);
 
   this.viewRangeRendered = new scout.Range(0, 0);
@@ -44,24 +45,12 @@ scout.Tree = function() {
       this._renderViewportBlocked = false;
       this._rerenderViewport();
       this.invalidateLayoutTree();
-      if(!this.rebuildSuppressed && this.scrollPositionInvalid && this.selectedNodes.length>0){
-        this.handleScrollAnimationSave();
-      }
     }
   }.bind(this);
 
   this.nodeHeight = 0;
 };
 scout.inherits(scout.Tree, scout.ModelAdapter);
-
-scout.Tree.prototype.handleScrollAnimationSave = function(){
-  if (this.runningAnimations > 0) {
-    this.scrollPositionInvalid = true;
-  } else if(this.selectedNodes.length>0) {
-    this.scrollTo(this.selectedNodes[0]);
-    this.scrollPositionInvalid = false;
-  }
-};
 
 scout.Tree.DisplayStyle = {
   DEFAULT: 'default',
@@ -1142,7 +1131,7 @@ scout.Tree.prototype.collapseAll = function() {
     this.collapseNode(node);
   }.bind(this));
   //ensure correct rendering
-  this.invalidateLayoutTree();
+  this._rerenderViewport();
   this.rebuildSuppressed = false;
 };
 
@@ -1253,6 +1242,9 @@ scout.Tree.prototype._removeChildsFromFlatList = function(parentNode, animatedRe
       // finish(), the callback is _not_ executed! (This may or may not be a bug in jQuery, I cannot tell...)
       this._$animationWrapper.stop(false, true);
     }
+    this._$expandAnimationWrappers.forEach(function($wrapper){
+      $wrapper.stop(false, true);
+    });
     for (var i = parentIndex + 1; i < this.visibleNodesFlat.length; i++) {
       if (this.visibleNodesFlat[i].level > parentLevel) {
         var node = this.visibleNodesFlat[i];
@@ -1276,9 +1268,8 @@ scout.Tree.prototype._removeChildsFromFlatList = function(parentNode, animatedRe
         break;
       }
     }
-    var rangeToRemove = new scout.Range(parentIndex + 1, parentIndex+elementsToDelete);
-    this.visibleNodesFlat.splice(rangeToRemove.from, elementsToDelete);
-    this.viewRangeRendered = this.viewRangeRendered.shrink(rangeToRemove);
+
+    this.visibleNodesFlat.splice(parentIndex + 1, elementsToDelete);
     // animate closing
     if (animatedRemove) { // don't animate while rendering (not necessary, or may even lead to timing issues)
       this._renderViewportBlocked = true;
@@ -1314,8 +1305,6 @@ scout.Tree.prototype._removeFromFlatList = function(node, animatedRemove) {
     var index = this.visibleNodesFlat.indexOf(node);
     this._removeChildsFromFlatList(node, false);
     this.visibleNodesFlat.splice(index, 1);
-    var rangeToRemove = new scout.Range(index, index);
-    this.viewRangeRendered = this.viewRangeRendered.shrink(rangeToRemove);
     delete this.visibleNodesMap[node.id];
     this.hideNode(node, animatedRemove);
   }
@@ -1386,36 +1375,27 @@ scout.Tree.prototype._addChildsToFlatList = function(parentNode, parentIndex, an
   if (this.visibleNodesMap[parentNode.id]) {
     var isSubAdding = !!parentIndex;
     parentIndex = parentIndex ? parentIndex : this.visibleNodesFlat.indexOf(parentNode);
-    animatedRendering = animatedRendering && this.rendered && parentNode.rendered; // don't animate while rendering (not necessary, or may even lead to timing issues)
-    animatedRendering = animatedRendering && !parentNode.$node.hasClass('leaf') && !parentNode.$node.hasClass('expanded');
-    // If there is already an animation is already going on for this node, stop it immediately
-    if (this._$animationWrapper && !isSubAdding) {
-      // Note: Do _not_ use finish() here! Although documentation states that it is "similar" to stop(true, true),
-      // this does not seem to be the case. Implementations differ slightly in details. The effect is, that when
-      // calling stop() the animation stops and the 'complete' callback is executed immediately. However, when calling
-      // finish(), the callback is _not_ executed! (This may or may not be a bug in jQuery, I cannot tell...)
-      this._$animationWrapper.stop(false, true);
-    }
+    animatedRendering = animatedRendering && this.rendered; // don't animate while rendering (not necessary, or may even lead to timing issues)
     var insertIndex = parentIndex + 1;
     var animationDone = false;
-    insertBatch = insertBatch ? insertBatch : setUpInsertBatch(insertIndex);
+    insertBatch = insertBatch ? insertBatch : this.setUpInsertBatch(insertIndex);
     parentNode.childNodes.forEach(function(node, index) {
       var isAlreadyAdded = this.visibleNodesMap[node.id];
       var insertedAtIndex = insertIndex;
       if (node.isFilterAccepted() && !isAlreadyAdded) {
-        insertBatch.push(node);
+        insertBatch.insertNodes.push(node);
         this.visibleNodesMap[node.id] = true;
-        insertBatch = this.checkAndHandleBatch(insertIndex, insertBatch, parentNode, animatedRendering, onAnimationComplete);
+        insertBatch = this.checkAndHandleBatch(insertIndex, insertBatch, parentNode, animatedRendering);
         if (node.expanded) {
-          insertIndex = this._addChildsToFlatList(node, insertIndex, false, insertBatch);
+          insertIndex = this._addChildsToFlatList(node, insertIndex, animatedRendering, insertBatch);
         }
         insertIndex++;
       } else if (node.isFilterAccepted() && isAlreadyAdded) {
-        this.insertBatchInVisibleNodes(insertBatch, this.viewRangeRendered.from + this.viewRangeSize >= insertIndex - 1 && this.viewRangeRendered.from <= insertIndex - 1, animatedRendering ? onAnimationComplete : null);
-        this.checkAndHandleBatchAnimationWrapper(insertIndex, parentNode, animatedRendering, onAnimationComplete);
-        insertBatch = setUpInsertBatch(insertIndex);
+        this.insertBatchInVisibleNodes(insertBatch, this.viewRangeRendered.from + this.viewRangeSize >= insertIndex - 1 && this.viewRangeRendered.from <= insertIndex - 1, animatedRendering);
+        this.checkAndHandleBatchAnimationWrapper(insertIndex, parentNode, animatedRendering, insertBatch);
+        insertBatch = this.setUpInsertBatch(insertIndex);
         if (node.expanded) {
-          insertIndex = this._addChildsToFlatList(node, insertIndex, false, insertBatch);
+          insertIndex = this._addChildsToFlatList(node, insertIndex, animatedRendering, insertBatch);
         }
         insertIndex++;
         //do not animate following
@@ -1425,7 +1405,7 @@ scout.Tree.prototype._addChildsToFlatList = function(parentNode, parentIndex, an
 
     if (!isSubAdding) {
       // animation is not done yet and all added nodes are in visible range
-      this.insertBatchInVisibleNodes(insertBatch, this.viewRangeRendered.from + this.viewRangeSize >= insertIndex - 1 && this.viewRangeRendered.from <= insertIndex - 1, animatedRendering ? onAnimationComplete : null);
+      this.insertBatchInVisibleNodes(insertBatch, this.viewRangeRendered.from + this.viewRangeSize >= insertIndex - 1 && this.viewRangeRendered.from <= insertIndex - 1, animatedRendering);
       this.invalidateLayoutTree();
     }
 
@@ -1433,76 +1413,78 @@ scout.Tree.prototype._addChildsToFlatList = function(parentNode, parentIndex, an
   }
   return 0;
 
-  //----- Helper functions ----- //
-
-  function onAnimationComplete() {
-    this._$animationWrapper.replaceWith(this._$animationWrapper.contents());
-    this._$animationWrapper = null;
-    this.runningAnimationsFinishFunc();
-  }
-
-  function setUpInsertBatch(insertIndex) {
-    return [insertIndex, 0];
-  }
-
 };
 
-scout.Tree.prototype.checkAndHandleBatchAnimationWrapper = function(insertIndex, parentNode, animatedRendering, onAnimationComplete) {
-  if (animatedRendering && this.viewRangeRendered.from <= insertIndex && this.viewRangeRendered.to >= insertIndex && !this._$animationWrapper) {
+scout.Tree.prototype.setUpInsertBatch = function (insertIndex) {
+  return {insertNodes: [insertIndex,0],
+          $animationWrapper: null};
+};
+
+scout.Tree.prototype.checkAndHandleBatchAnimationWrapper = function(insertIndex, parentNode, animatedRendering, insertBatch) {
+  if (animatedRendering && this.viewRangeRendered.from <= insertIndex && this.viewRangeRendered.to >= insertIndex && !insertBatch.$animationWrapper) {
     //we are in visible area so we need a animation wrapper
     //if parent is in visible area insert after parent else insert before first node.
     var nodeBefore = this.viewRangeRendered.from == insertIndex ? null : this.visibleNodesFlat[insertIndex - 1];
     if (nodeBefore && nodeBefore.rendered && nodeBefore.$node) {
-      this._$animationWrapper = $('<div class="animation-wrapper">').insertAfter(nodeBefore.$node);
-    } else if (parentNode.rendered) {
-      this._$animationWrapper = $('<div class="animation-wrapper">').insertAfter(parentNode.$node);
+      insertBatch.$animationWrapper = $('<div class="animation-wrapper">').insertAfter(nodeBefore.$node);
+    } else if (parentNode.attached) {
+      insertBatch.$animationWrapper = $('<div class="animation-wrapper">').insertAfter(parentNode.$node);
     } else if (this.$fillBefore) {
-      this._$animationWrapper = $('<div class="animation-wrapper">').insertAfter(this.$fillBefore);
+      insertBatch.$animationWrapper = $('<div class="animation-wrapper">').insertAfter(this.$fillBefore);
     } else {
       var nodeAfter = this.visibleNodesFlat[insertIndex];
-      this._$animationWrapper = $('<div class="animation-wrapper">').insertBefore(nodeAfter.$node);
+      insertBatch.$animationWrapper = $('<div class="animation-wrapper">').insertBefore(nodeAfter.$node);
     }
-    this._$animationWrapper.data('parentNode', parentNode);
+    insertBatch.animationCompleteFunc = onAnimationComplete;
+    this._$expandAnimationWrappers.push(insertBatch.$animationWrapper);
+  }
+  //----- Helper functions ----- //
+
+  function onAnimationComplete() {
+    insertBatch.$animationWrapper.replaceWith(insertBatch.$animationWrapper.contents());
+    scout.arrays.remove(this._$expandAnimationWrappers, insertBatch.$animationWrapper);
+    insertBatch.$animationWrapper = null;
+    this.runningAnimationsFinishFunc();
   }
 };
 
-scout.Tree.prototype.checkAndHandleBatch = function(insertIndex, insertBatch, parentNode, animatedRendering, onAnimationComplete) {
+scout.Tree.prototype.checkAndHandleBatch = function(insertIndex, insertBatch, parentNode, animatedRendering) {
   if (this.viewRangeRendered.from - 1 === insertIndex) {
     //do immediate rendering because list could be longer
     this.insertBatchInVisibleNodes(insertBatch, false, false);
-    insertBatch = [insertIndex + 1, 0];
+    this.setUpInsertBatch(insertIndex+1);
   }
-  this.checkAndHandleBatchAnimationWrapper(insertIndex, parentNode, animatedRendering, onAnimationComplete);
+  this.checkAndHandleBatchAnimationWrapper(insertIndex, parentNode, animatedRendering, insertBatch);
 
   if (this.viewRangeRendered.from + this.viewRangeSize === insertIndex) {
     //do immediate rendering because list could be longer
-    this.insertBatchInVisibleNodes(insertBatch, true, animatedRendering ? onAnimationComplete : null);
-    insertBatch = [insertIndex + 1, 0];
+    this.insertBatchInVisibleNodes(insertBatch, true, animatedRendering);
+    this.setUpInsertBatch(insertIndex+1);
   }
   return insertBatch;
 };
 
-scout.Tree.prototype.insertBatchInVisibleNodes = function(insertBatch, showNodes, onAnimationCompleteFunc) {
-  if (insertBatch.length < 2) {
+scout.Tree.prototype.insertBatchInVisibleNodes = function(insertBatch, showNodes, animate) {
+  if (insertBatch.insertNodes < 2) {
     //nothing to add
     return;
   }
-  this.visibleNodesFlat.splice.apply(this.visibleNodesFlat, insertBatch);
+  this.visibleNodesFlat.splice.apply(this.visibleNodesFlat,insertBatch.insertNodes);
   if (showNodes) {
-    var indexHint = insertBatch[0];
-    for (var i = 2; i < insertBatch.length; i++) {
-      var node = insertBatch[i];
+    var indexHint = insertBatch.insertNodes[0];
+    for (var i = 2; i < insertBatch.insertNodes.length; i++) {
+      var node = insertBatch.insertNodes[i];
       this.showNode(node, false, indexHint);
-      if (this._$animationWrapper && node.isChildOf(this._$animationWrapper.data('parentNode'))) {
-        this._$animationWrapper.append(node.$node);
+      if (insertBatch.$animationWrapper) {
+        insertBatch.$animationWrapper.append(node.$node);
       }
       indexHint++;
     }
-    if (onAnimationCompleteFunc && this._$animationWrapper) {
-      var h = this._$animationWrapper.outerHeight();
-      this._$animationWrapper
+    if (insertBatch.$animationWrapper) {
+      var h = insertBatch.$animationWrapper.outerHeight();
+      insertBatch.$animationWrapper
         .css('height', 0)
-        .animateAVSCSD('height', h, this.startAnimationFunc, onAnimationCompleteFunc.bind(this), function() {}, 200);
+        .animateAVSCSD('height', h, this.startAnimationFunc, insertBatch.animationCompleteFunc.bind(this), function() {}, 200);
     }
   }
 };
@@ -1516,11 +1498,6 @@ scout.Tree.prototype._addToVisibleFlatListNoCheck = function(node, insertIndex, 
 };
 
 scout.Tree.prototype.scrollTo = function(node) {
-  if (this.viewRangeRendered.size() === 0) {
-    // Cannot scroll to a row if no row is rendered
-    return;
-  }
-  this._renderViewRangeForNode(node);
   scout.scrollbars.scrollTo(this.$data, node.$node);
 };
 
