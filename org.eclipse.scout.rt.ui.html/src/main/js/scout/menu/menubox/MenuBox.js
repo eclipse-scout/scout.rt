@@ -26,9 +26,9 @@ scout.MenuBox.prototype._initMenus = function(menus) {
   menus.forEach(this._initMenu.bind(this));
 };
 
-scout.MenuBox.prototype._initMenu = function(menuItem) {
-  menuItem.setParent(this);
-  menuItem._customCssClasses = this.customMenuCssClasses;
+scout.MenuBox.prototype._initMenu = function(menu) {
+  menu.setParent(this);
+  menu._customCssClasses = this.customMenuCssClasses;
 };
 
 /**
@@ -42,13 +42,13 @@ scout.MenuBox.prototype._render = function($parent) {
 };
 
 scout.MenuBox.prototype._renderProperties = function() {
-this._renderMenus();
+  this._renderMenus();
   this._renderCompact();
 };
 
 scout.MenuBox.prototype._renderMenus = function() {
-  this.menus.forEach(function(menuItem) {
-    menuItem.render(this.$container);
+  this.menus.forEach(function(menu) {
+    menu.render(this.$container);
   }, this);
 };
 

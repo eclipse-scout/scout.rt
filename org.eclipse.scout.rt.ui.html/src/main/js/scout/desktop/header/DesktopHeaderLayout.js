@@ -78,7 +78,7 @@ scout.DesktopHeaderLayout.prototype.layout = function($container) {
 
   // 2nd remove text from tool-bar items, only show icon
   if (toolBar) {
-    toolBarPrefSize = toolBar.htmlComp.layout.smallPrefSize();
+    toolBarPrefSize = toolBar.htmlComp.layout.shrinkPrefSize();
     toolBarWidth = toolBarPrefSize.width;
     setToolBarSize();
     setToolBarLocation();
@@ -95,7 +95,7 @@ scout.DesktopHeaderLayout.prototype.layout = function($container) {
     setToolBarSize();
 
     // update size of the toolBar again with the actual width to make it correctly right aligned
-    toolBarWidth = toolBar.htmlComp.layout.actualSize().width;
+    toolBarWidth = toolBar.htmlComp.layout.actualPrefSize().width;
     setToolBarSize();
     setToolBarLocation();
   }

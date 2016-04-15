@@ -34,5 +34,3 @@ scout.DesktopToolBox.prototype._render = function($parent) {
   scout.DesktopToolBox.parent.prototype._render.call(this, $parent);
   this.$container.addClass('desktop-tool-box');
 };
-
-

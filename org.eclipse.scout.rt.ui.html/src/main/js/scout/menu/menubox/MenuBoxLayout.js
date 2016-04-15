@@ -37,7 +37,7 @@ scout.MenuBoxLayout.prototype._layout = function($container) {
   this.undoCollapse(menus);
   this.undoCompact(menus);
   this.undoShrink(menus);
-  menusWidth = this.actualSize(menus).width;
+  menusWidth = this.actualPrefSize(menus).width;
   if (menusWidth <= containerSize.width) {
     // OK, every menu fits into container
     return;
@@ -47,7 +47,7 @@ scout.MenuBoxLayout.prototype._layout = function($container) {
 
   // First approach: Set menuBox into compact mode
   this.compact(menus);
-  menusWidth = this.actualSize(menus).width;
+  menusWidth = this.actualPrefSize(menus).width;
   if (menusWidth <= containerSize.width) {
     // OK, every menu fits into container
     return;
@@ -55,7 +55,7 @@ scout.MenuBoxLayout.prototype._layout = function($container) {
 
   // Second approach: Make text invisible and only show the icon (if available)
   this.shrink(menus);
-  menusWidth = this.actualSize(menus).width;
+  menusWidth = this.actualPrefSize(menus).width;
   if (menusWidth <= containerSize.width) {
     // OK, every menu fits into container
     return;
@@ -72,7 +72,7 @@ scout.MenuBoxLayout.prototype.preferredLayoutSize = function($container) {
   this.undoCompact(menus);
   this.undoShrink(menus);
 
-  return this.actualSize();
+  return this.actualPrefSize();
 };
 
 scout.MenuBoxLayout.prototype.compact = function(menus) {
@@ -246,7 +246,7 @@ scout.MenuBoxLayout.prototype._removeMenusFromEllipsis = function(menus) {
   }, this);
 };
 
-scout.MenuBoxLayout.prototype.actualSize = function(menus) {
+scout.MenuBoxLayout.prototype.actualPrefSize = function(menus) {
   var menusWidth, prefSize;
 
   menus = menus || this.visibleMenus();
@@ -281,17 +281,17 @@ scout.MenuBoxLayout.prototype.compactPrefSize = function(menus) {
   this.undoShrink(menus);
   this.compact(menus);
 
-  return this.actualSize();
+  return this.actualPrefSize();
 };
 
-scout.MenuBoxLayout.prototype.smallPrefSize = function(menus) {
+scout.MenuBoxLayout.prototype.shrinkPrefSize = function(menus) {
   menus = menus || this.visibleMenus();
 
   this.undoCollapse(menus);
   this.compact(menus);
   this.shrink(menus);
 
-  return this.actualSize();
+  return this.actualPrefSize();
 };
 
 scout.MenuBoxLayout.prototype.visibleMenus = function() {
