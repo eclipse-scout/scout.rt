@@ -44,12 +44,24 @@ scout.Tree = function() {
       this._renderViewportBlocked = false;
       this._rerenderViewport();
       this.invalidateLayoutTree();
+      if(!this.rebuildSuppressed && this.scrollPositionInvalid && this.selectedNodes.length>0){
+        this.handleScrollAnimationSave();
+      }
     }
   }.bind(this);
 
   this.nodeHeight = 0;
 };
 scout.inherits(scout.Tree, scout.ModelAdapter);
+
+scout.Tree.prototype.handleScrollAnimationSave = function(){
+  if (this.runningAnimations > 0) {
+    this.scrollPositionInvalid = true;
+  } else if(this.selectedNodes.length>0) {
+    this.scrollTo(this.selectedNodes[0]);
+    this.scrollPositionInvalid = false;
+  }
+};
 
 scout.Tree.DisplayStyle = {
   DEFAULT: 'default',
@@ -301,7 +313,7 @@ scout.Tree.prototype._removeRenderedNodes = function() {
   this.viewRangeRendered = new scout.Range(0, 0);
 };
 
-scout.Tree.prototype._renderViewRangeForNodeIndex = function(node) {
+scout.Tree.prototype._renderViewRangeForNode = function(node) {
   var viewRange = this._calculateViewRangeForNode(node);
   this._renderViewRange(viewRange);
 };
@@ -1124,14 +1136,14 @@ scout.Tree.prototype.collapseNode = function(node, opts) {
 };
 
 scout.Tree.prototype.collapseAll = function() {
-  this.rebuildParentSuppressed = true;
+  this.rebuildSuppressed = true;
   // Collapse all expanded child nodes (only model)
   this._visitNodes(this.nodes, function(node) {
     this.collapseNode(node);
   }.bind(this));
   //ensure correct rendering
-  this._rerenderViewport();
-  this.rebuildParentSuppressed = false;
+  this.invalidateLayoutTree();
+  this.rebuildSuppressed = false;
 };
 
 scout.Tree.prototype.setNodeExpanded = function(node, expanded, opts) {
@@ -1209,7 +1221,7 @@ scout.Tree.prototype.setNodeExpanded = function(node, expanded, opts) {
 };
 
 scout.Tree.prototype._rebuildParent = function(node, opts) {
-  if (this.rebuildParentSuppressed) {
+  if (this.rebuildSuppressed) {
     return;
   }
   if (node.expanded || node.expandedLazy) {
@@ -1264,8 +1276,9 @@ scout.Tree.prototype._removeChildsFromFlatList = function(parentNode, animatedRe
         break;
       }
     }
-
-    this.visibleNodesFlat.splice(parentIndex + 1, elementsToDelete);
+    var rangeToRemove = new scout.Range(parentIndex + 1, parentIndex+elementsToDelete);
+    this.visibleNodesFlat.splice(rangeToRemove.from, elementsToDelete);
+    this.viewRangeRendered = this.viewRangeRendered.shrink(rangeToRemove);
     // animate closing
     if (animatedRemove) { // don't animate while rendering (not necessary, or may even lead to timing issues)
       this._renderViewportBlocked = true;
@@ -1301,6 +1314,8 @@ scout.Tree.prototype._removeFromFlatList = function(node, animatedRemove) {
     var index = this.visibleNodesFlat.indexOf(node);
     this._removeChildsFromFlatList(node, false);
     this.visibleNodesFlat.splice(index, 1);
+    var rangeToRemove = new scout.Range(index, index);
+    this.viewRangeRendered = this.viewRangeRendered.shrink(rangeToRemove);
     delete this.visibleNodesMap[node.id];
     this.hideNode(node, animatedRemove);
   }
@@ -1501,6 +1516,11 @@ scout.Tree.prototype._addToVisibleFlatListNoCheck = function(node, insertIndex, 
 };
 
 scout.Tree.prototype.scrollTo = function(node) {
+  if (this.viewRangeRendered.size() === 0) {
+    // Cannot scroll to a row if no row is rendered
+    return;
+  }
+  this._renderViewRangeForNode(node);
   scout.scrollbars.scrollTo(this.$data, node.$node);
 };
 

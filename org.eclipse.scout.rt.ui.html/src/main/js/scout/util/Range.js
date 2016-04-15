@@ -53,6 +53,36 @@ scout.Range.prototype.subtract = function(other) {
   return [new scout.Range(this.from, this.to)];
 };
 
+
+scout.Range.prototype.shrink = function(other) {
+  // other is empty
+  if (other.size() === 0) {
+    return new scout.Range(this.from, this.to);
+  }
+  // other is greater
+  if (this.from >= other.from && this.to <= other.to) {
+    return new scout.Range(0, 0);
+  }
+  // other is contained completely
+  if (other.from >= this.from && other.to <= this.to) {
+    return new scout.Range(this.from, other.to);
+  }
+  // other overlaps on the bottom
+  if (other.from >= this.from && other.from < this.to) {
+    return new scout.Range(this.from, other.from);
+  }
+  // other overlaps on the top
+  if (this.from > other.from && this.from < other.to) {
+    return new scout.Range(other.to, this.to);
+  }
+  if(other.to<this.from){
+    return new scout.Range(this.from-other.size()-1, this.to-other.size()-1);
+  }
+  // other is outside
+  return new scout.Range(this.from, this.to);
+};
+
+
 scout.Range.prototype.union = function(other) {
   if (this.to < other.from || other.to < this.from) {
     var range1 = new scout.Range(this.from, this.to);

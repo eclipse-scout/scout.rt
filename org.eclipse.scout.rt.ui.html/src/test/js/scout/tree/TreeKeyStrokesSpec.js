@@ -231,9 +231,9 @@ describe("TreeKeyStrokes", function() {
     });
   });
 
-  describe("collapse", function() {
+  describe("Subtract", function() {
 
-    it(" a node", function() {
+    it(" collapses a node", function() {
       var model = helper.model = helper.createModelFixture(3, 1, true);
       var tree = helper.createTree(model);
 
@@ -247,7 +247,7 @@ describe("TreeKeyStrokes", function() {
       expect(node0.expanded).toBeFalsy();
     });
 
-    it(" a node and drill up", function() {
+    it(" collapses a node and drill up", function() {
       var model = helper.model = helper.createModelFixture(3, 1, true);
       var tree = helper.createTree(model);
 
@@ -269,8 +269,8 @@ describe("TreeKeyStrokes", function() {
 
   });
 
-  describe("expand", function() {
-    it(" a node", function() {
+  describe("Add", function() {
+    it(" expands a node", function() {
       var model = helper.model = helper.createModelFixture(3, 1, false);
       var tree = helper.createTree(model);
 
@@ -284,7 +284,7 @@ describe("TreeKeyStrokes", function() {
       expect(node0.expanded).toBeTruthy();
     });
 
-    it(" and drill down", function() {
+    it(" expands a node and drill down", function() {
       var model = helper.model = helper.createModelFixture(3, 1, false);
       var tree = helper.createTree(model);
 
@@ -299,6 +299,24 @@ describe("TreeKeyStrokes", function() {
       tree.$data.triggerKeyDown(scout.keys.ADD);
       helper.assertSelection(tree, [node0.childNodes[0]]);
     });
+  });
+
+  describe("End", function() {
+    it(" jumps to last node", function() {
+      var model = helper.model = helper.createModelFixture(3, 1, false);
+      var tree = helper.createTree(model);
+
+      var node0 = model.nodes[0];
+      var node2 = model.nodes[2];
+
+      tree.render(session.$entryPoint);
+      helper.selectNodesAndAssert(tree, [node0]);
+      expect(node0.expanded).toBeFalsy();
+
+      tree.$data.triggerKeyDown(scout.keys.END);
+      helper.assertSelection(tree, [node2]);
+    });
+
   });
 
   describe("space", function() {
