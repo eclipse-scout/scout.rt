@@ -34,6 +34,8 @@ public class ChartTableControl extends AbstractTableControl implements IChartTab
     setIconId(AbstractIcons.Chart);
     setChartType(getConfiguredChartType());
     setAggregation(getConfiguredAggregation());
+    setGroup1(getConfiguredGroup1());
+    setGroup2(getConfiguredGroup2());
   }
 
   /**
@@ -56,6 +58,18 @@ public class ChartTableControl extends AbstractTableControl implements IChartTab
   @Order(200)
   protected IChartColumnParam getConfiguredAggregation() {
     return new ChartColumnParam(-1, IChartColumnParam.AGGREGATION_COUNT);
+  }
+
+  @ConfigProperty(ConfigProperty.OBJECT)
+  @Order(200)
+  protected IChartColumnParam getConfiguredGroup1() {
+    return null;
+  }
+
+  @ConfigProperty(ConfigProperty.OBJECT)
+  @Order(200)
+  protected IChartColumnParam getConfiguredGroup2() {
+    return null;
   }
 
   @Override

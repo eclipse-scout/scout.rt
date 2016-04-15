@@ -33,32 +33,33 @@ public interface IChartTableControl extends ITableControl {
   int getChartType();
 
   /**
-   * set the configuration parameters for the first group for the chart
+   * set the configuration parameters for the first group represented by the first axis in the chart
    */
   void setGroup1(IChartColumnParam param);
 
   /**
-   * configuration parameters for the first group for the chart
+   * configuration parameters for the first group represented by the first axis in the chart
    */
   IChartColumnParam getGroup1();
 
   /**
-   * set the configuration parameters for the second group for the chart (optional)
+   * set the configuration parameters for the (optional) second group represented for the chart (necessary for bubble
+   * chart)
    */
   void setGroup2(IChartColumnParam param);
 
   /**
-   * configuration parameters for the second group for the chart
+   * configuration parameters for the (optional) second group for the chart (necessary for bubble chart)
    */
   IChartColumnParam getGroup2();
 
   /**
-   * set the configuration parameters for the aggregation for the chart
+   * set the configuration parameters for the aggregated data for the chart
    */
   void setAggregation(IChartColumnParam param);
 
   /**
-   * configuration parameters for the aggregation for the chart
+   * configuration for the aggregated data for the chart
    */
   IChartColumnParam getAggregation();
 
