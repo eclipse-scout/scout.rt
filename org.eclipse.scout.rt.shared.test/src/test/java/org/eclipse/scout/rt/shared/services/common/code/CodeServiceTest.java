@@ -10,20 +10,26 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.services.common.code;
 
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.scout.rt.platform.internal.BeanInstanceUtil;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.shared.services.common.code.fixture.TestCodeType3;
+import org.eclipse.scout.rt.shared.services.common.code.fixture.TestCodeType4;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -207,6 +213,34 @@ public class CodeServiceTest {
 
     ICodeType<Object, ?> r = service.findCodeTypeById(null);
     assertNull(r);
+  }
+
+  @Test
+  public void testReplaceLookupUsingCodeService() {
+    ICodeService service = newCodeServiceInstance();
+
+    assertThat(service.getCodeType(TestCodeType3.class), instanceOf(TestCodeType4.class));
+    assertThat(service.getCodeType(TestCodeType4.class), instanceOf(TestCodeType4.class));
+  }
+
+  @Test
+  public void testReplaceCodeServiceGetCodeTypes() {
+    ICodeService service = newCodeServiceInstance();
+
+    List<ICodeType<?, ?>> codeTypes = service.getCodeTypes(Arrays.<Class<? extends ICodeType<?, ?>>> asList(TestCodeType3.class, TestCodeType4.class));
+    assertEquals(2, codeTypes.size());
+    assertThat(codeTypes.get(0), instanceOf(TestCodeType4.class));
+    assertThat(codeTypes.get(1), instanceOf(TestCodeType4.class));
+  }
+
+  @Test
+  public void testReplaceCodeServiceGetCodeTypeMap() {
+    ICodeService service = newCodeServiceInstance();
+
+    Map<Class<? extends ICodeType<?, ?>>, ICodeType<?, ?>> codeTypes = service.getCodeTypeMap(Arrays.<Class<? extends ICodeType<?, ?>>> asList(TestCodeType3.class, TestCodeType4.class));
+    assertEquals(2, codeTypes.size());
+    assertThat(codeTypes.get(TestCodeType3.class), instanceOf(TestCodeType4.class));
+    assertThat(codeTypes.get(TestCodeType4.class), instanceOf(TestCodeType4.class));
   }
 
   protected ICodeService newCodeServiceInstance() {

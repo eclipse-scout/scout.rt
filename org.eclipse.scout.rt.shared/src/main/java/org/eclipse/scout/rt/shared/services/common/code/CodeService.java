@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
@@ -25,6 +26,7 @@ import javax.annotation.PostConstruct;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.CreateImmediately;
+import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.PlatformExceptionTranslator;
@@ -99,7 +101,7 @@ public class CodeService implements ICodeService {
     if (type == null) {
       return null;
     }
-    return new CodeTypeCacheKey(type);
+    return new CodeTypeCacheKey(resolveCodeTypeClass(type));
   }
 
   @SuppressWarnings("unchecked")
@@ -152,15 +154,30 @@ public class CodeService implements ICodeService {
 
   @Override
   public Map<Class<? extends ICodeType<?, ?>>, ICodeType<?, ?>> getCodeTypeMap(Collection<Class<? extends ICodeType<?, ?>>> types) {
+    Map<Class<? extends ICodeType<?, ?>>, ICodeType<?, ?>> result = new HashMap<>();
+    if (CollectionUtility.isEmpty(types)) {
+      return result;
+    }
     // we perform a batch lookup in the cache in order to minimize calls to the cache
     List<CodeTypeCacheKey> keys = new ArrayList<>();
+    Map<CodeTypeCacheKey, Set<Class<? extends ICodeType<?, ?>>>> requestedCodeTypesByCacheKey = new HashMap<>();
     for (Class<? extends ICodeType<?, ?>> type : types) {
-      keys.add(createCacheKey(type));
+      CodeTypeCacheKey cacheKey = createCacheKey(type);
+      Set<Class<? extends ICodeType<?, ?>>> requestedCodeTypes = requestedCodeTypesByCacheKey.get(cacheKey);
+      if (requestedCodeTypes == null) {
+        requestedCodeTypes = new HashSet<>();
+        requestedCodeTypesByCacheKey.put(cacheKey, requestedCodeTypes);
+      }
+      requestedCodeTypes.add(type);
+      keys.add(cacheKey);
     }
     Map<CodeTypeCacheKey, ICodeType<?, ?>> valueMap = getCache().getAll(keys);
-    Map<Class<? extends ICodeType<?, ?>>, ICodeType<?, ?>> result = new HashMap<>();
     for (Entry<CodeTypeCacheKey, ICodeType<?, ?>> entry : valueMap.entrySet()) {
-      result.put(entry.getKey().getCodeTypeClass(), entry.getValue());
+      CodeTypeCacheKey cacheKey = entry.getKey();
+      Set<Class<? extends ICodeType<?, ?>>> requestedCodeTypes = requestedCodeTypesByCacheKey.get(cacheKey);
+      for (Class<? extends ICodeType<?, ?>> requestedCodeType : requestedCodeTypes) {
+        result.put(requestedCodeType, entry.getValue());
+      }
     }
     return result;
   }
@@ -222,13 +239,13 @@ public class CodeService implements ICodeService {
     if (type == null) {
       return null;
     }
-    getCache().invalidate(new CodeTypeCacheEntryFilter(type), true);
+    getCache().invalidate(new CodeTypeCacheEntryFilter(resolveCodeTypeClass(type)), true);
     return getCodeType(type);
   }
 
   @Override
   public List<ICodeType<?, ?>> reloadCodeTypes(List<Class<? extends ICodeType<?, ?>>> types) {
-    CodeTypeCacheEntryFilter filter = new CodeTypeCacheEntryFilter(types);
+    CodeTypeCacheEntryFilter filter = new CodeTypeCacheEntryFilter(resolveCodeTypeClasses(types));
     if (filter.getCodeTypeClasses().isEmpty()) {
       return Collections.emptyList();
     }
@@ -258,5 +275,29 @@ public class CodeService implements ICodeService {
     Set<Class<? extends ICodeType<?, ?>>> allCodeTypeClasses = getAllCodeTypeClasses(classPrefix);
     List<Class<? extends ICodeType<?, ?>>> list = CollectionUtility.arrayList(allCodeTypeClasses);
     return getCodeTypes(list);
+  }
+
+  protected <T extends ICodeType<?, ?>> Class<T> resolveCodeTypeClass(Class<T> type) {
+    if (type == null) {
+      return null;
+    }
+    final IBean<T> bean = BEANS.getBeanManager().optBean(type);
+    if (bean == null || bean.getBeanClazz() == null) {
+      return type;
+    }
+    @SuppressWarnings("unchecked")
+    Class<T> activeCodeTypeClass = (Class<T>) bean.getBeanClazz();
+    return (Class<T>) activeCodeTypeClass;
+  }
+
+  protected List<Class<? extends ICodeType<?, ?>>> resolveCodeTypeClasses(List<Class<? extends ICodeType<?, ?>>> types) {
+    List<Class<? extends ICodeType<?, ?>>> result = new ArrayList<>();
+    if (types == null) {
+      return result;
+    }
+    for (Class<? extends ICodeType<?, ?>> type : types) {
+      result.add(resolveCodeTypeClass(type));
+    }
+    return result;
   }
 }
