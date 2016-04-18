@@ -142,7 +142,7 @@ scout.DesktopLayout.prototype.calculateNavigationWidth = function(containerSize)
     return containerSize.width;
   }
   var splitterPosition = 0;
-  if (this.desktop.splitterVisible) {
+  if (this.desktop.splitterVisible && this.desktop.splitter) {
     splitterPosition = this.desktop.splitter.position;
   }
   var outline = this.desktop.outline;

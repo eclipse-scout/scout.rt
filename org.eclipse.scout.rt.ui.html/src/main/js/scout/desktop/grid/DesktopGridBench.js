@@ -62,9 +62,9 @@ scout.DesktopGridBench.prototype._initKeyStrokeContext = function(keyStrokeConte
 scout.DesktopGridBench.prototype._render = function($parent) {
   this.$container = $parent.appendDiv('desktop-grid-bench');
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
-  this.htmlComp.setLayout(new scout.DesktopGridBenchLayout(this));
   this.setOutline(this.desktop.outline); //TODO CGU maybe better create destroy(), call setOutline in init and attach outline listener in init/destroy
   this._renderOrAttachOutlineContent();
+  this.htmlComp.setLayout(new scout.DesktopGridBenchLayout(this));
 
   this.session.keyStrokeManager.installKeyStrokeContext(this.desktopKeyStrokeContext);
   this.desktop.on('outlineChanged', this._desktopOutlineChangedHandler);
@@ -96,15 +96,17 @@ scout.DesktopGridBench.prototype._renderOutlineContent = function() {
     this.outlineContent.menuBar.top();
     this.outlineContent.menuBar.large();
   }
-  this.outlineContent.render(this.$container);
-  this.outlineContent.htmlComp.validateRoot = true;
-  this.outlineContent.setParent(this);
-  this.outlineContent.invalidateLayoutTree(false);
+  this.outlineContent.displayViewId = 'C';
+  this.renderView(this.outlineContent);
+//  this.outlineContent.render(this.$container);
+//  this.outlineContent.htmlComp.validateRoot = true;
+//  this.outlineContent.setParent(this);
+//  this.outlineContent.invalidateLayoutTree(false);
 
   // Layout immediate to prevent 'laggy' form visualization,
   // but not initially while desktop gets rendered because it will be done at the end anyway
   if (this.desktop.rendered) {
-    this.outlineContent.validateLayoutTree();
+//    this.outlineContent.validateLayoutTree();
 
     // Request focus on first element in outline content
     this.session.focusManager.validateFocus();
