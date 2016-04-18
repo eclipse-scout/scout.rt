@@ -12,6 +12,7 @@
 scout.DesktopGridBenchLayout = function(bench) {
   scout.DesktopGridBenchLayout.parent.call(this);
   this.bench = bench;
+  this.containerSize;
 };
 scout.inherits(scout.DesktopGridBenchLayout, scout.AbstractLayout);
 
@@ -25,30 +26,45 @@ scout.DesktopGridBenchLayout.prototype.layout = function($container) {
   containerSize = containerSize.subtract(htmlContainer.getInsets());
 
   if (components) {
-    layoutBySplitterPosition = components.filter(function(comp) {
-      return comp instanceof scout.Splitter;
-    }).map(function(splitter) {
-      return $.isNumeric(splitter.position);
-    }).reduce(function(b1, b2, index) {
-      if (index === 0) {
-        return b2;
-      }
-      return b1 && b2;
-    }, false);
-    if (layoutBySplitterPosition) {
-      this._layoutBySplitterPosition(components, containerSize);
+    if (!containerSize.equals(this.containerSize)) {
+      this._layoutByRatio(components, containerSize);
     } else {
-      this._layoutInitial(components, containerSize);
+      layoutBySplitterPosition = components.filter(function(comp) {
+        return comp instanceof scout.Splitter;
+      }).map(function(splitter) {
+        return $.isNumeric(splitter.position);
+      }).reduce(function(b1, b2, index) {
+        if (index === 0) {
+          return b2;
+        }
+        return b1 && b2;
+      }, false);
+      if (layoutBySplitterPosition) {
+        this._layoutBySplitterPosition(components, containerSize);
+      } else {
+        this._layoutInitial(components, containerSize);
+      }
     }
+    this.containerSize = containerSize;
   }
 
+};
+
+scout.DesktopGridBenchLayout.prototype._layoutByRatio = function(components, containerSize) {
+  // set positions from ratio
+  components.forEach(function(comp) {
+    if (comp instanceof scout.Splitter) {
+      comp.setPosition(Math.floor(comp.getRatio() * containerSize.width));
+    }
+  });
+  this._layoutBySplitterPosition(components, containerSize);
 };
 
 scout.DesktopGridBenchLayout.prototype._layoutBySplitterPosition = function(components, containerSize) {
   var x = 0;
   components.forEach(function(comp, index) {
     if (comp instanceof scout.Splitter) {
-      comp.updatePosition(x);
+      //      comp.updatePosition(x);
     } else {
       var bounds = new scout.Rectangle(x, 0, 0, containerSize.height);
       if ((components.length - 1) > index) {
@@ -73,7 +89,7 @@ scout.DesktopGridBenchLayout.prototype._layoutInitial = function(components, con
   var x = 0;
   components.forEach(function(comp, index) {
     if (comp instanceof scout.Splitter) {
-      comp.updatePosition(x);
+      comp.setPosition(x, true);
     } else {
       var bounds = new scout.Rectangle(x, 0, columnWidth, containerSize.height);
       comp.htmlComp.setBounds(bounds);

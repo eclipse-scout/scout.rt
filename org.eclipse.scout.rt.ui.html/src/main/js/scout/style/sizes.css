@@ -9,9 +9,12 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 @desktop-navigation-width: 290px;
+@desktop-navigation-min-width: 49px; /* not 50px because last pixel is the border (would not look good)*/
 @desktop-navigation-breadcrumb-width: 240px;
 @desktop-header-height: 51px;
 @bench-padding-x: 20px;
+@bench-view-min-width: 50px;
+@bench-view-min-height: 50px;
 
 @text-field-padding-y: 7px;
 @text-field-padding-x: 10px;

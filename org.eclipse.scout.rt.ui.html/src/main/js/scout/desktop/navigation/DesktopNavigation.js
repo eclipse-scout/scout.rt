@@ -20,10 +20,11 @@ scout.inherits(scout.DesktopNavigation, scout.Widget);
 
 scout.DesktopNavigation.DEFAULT_STYLE_WIDTH; // Configured in sizes.css
 scout.DesktopNavigation.BREADCRUMB_STYLE_WIDTH; // Configured in sizes.css
-scout.DesktopNavigation.MIN_SPLITTER_SIZE = 49; // not 50px because last pixel is the border (would not look good)
+scout.DesktopNavigation.MIN_WIDTH; // Configured in sizes.css
 
 scout.DesktopNavigation.prototype._init = function(model) {
   scout.DesktopNavigation.parent.prototype._init.call(this, model);
+  scout.DesktopNavigation.MIN_WIDTH = $.pxToNumber(scout.styles.get('desktop-navigation', 'min-width').minWidth);
   scout.DesktopNavigation.DEFAULT_STYLE_WIDTH = $.pxToNumber(scout.styles.get('desktop-navigation', 'width').width);
   scout.DesktopNavigation.BREADCRUMB_STYLE_WIDTH = $.pxToNumber(scout.styles.get('desktop-navigation-breadcrumb', 'width').width);
   this.desktop = this.parent;

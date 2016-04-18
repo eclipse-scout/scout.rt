@@ -30,7 +30,7 @@ scout.DesktopLayout.prototype.layout = function($container) {
   if (navigation) {
     navigationWidth = this.calculateNavigationWidth(containerSize);
     if (desktop.splitter) {
-      desktop.splitter.updatePosition(navigationWidth);
+      desktop.splitter.setPosition(navigationWidth,true);
     }
 
     if (desktop.navigationVisible) {
@@ -155,5 +155,5 @@ scout.DesktopLayout.prototype.calculateNavigationWidth = function(containerSize)
       splitterPosition = scout.DesktopNavigation.DEFAULT_STYLE_WIDTH;
     }
   }
-  return Math.max(splitterPosition, scout.DesktopNavigation.MIN_SPLITTER_SIZE); // ensure newSize is not negative
+  return Math.max(splitterPosition, scout.DesktopNavigation.MIN_WIDTH); // ensure newSize is not negative
 };

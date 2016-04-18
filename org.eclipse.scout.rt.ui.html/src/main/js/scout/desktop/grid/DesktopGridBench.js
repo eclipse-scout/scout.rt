@@ -31,9 +31,15 @@ scout.DesktopGridBench = function() {
 };
 scout.inherits(scout.DesktopGridBench, scout.Widget);
 
-scout.DesktopGridBench.prototype._init = function(model) {
+scout.DesktopGridBench.VIEW_MIN_HEIGHT; // Configured in sizes.css
+scout.DesktopGridBench.VIEW_MIN_WIDTH; // Configured in sizes.css
 
+scout.DesktopGridBench.prototype._init = function(model) {
   scout.DesktopGridBench.parent.prototype._init.call(this, model);
+
+  scout.DesktopGridBench.VIEW_MIN_HEIGHT = $.pxToNumber(scout.styles.get('viewArea', 'min-height').minHeight);
+  scout.DesktopGridBench.VIEW_MIN_WIDTH = $.pxToNumber(scout.styles.get('viewArea', 'min-width').minWidth);
+
   this._createViewAreaColumns();
   this.desktop = this.session.desktop;
   this.outlineContentVisible = scout.nvl(model.outlineContentVisible, true);
@@ -193,7 +199,6 @@ scout.DesktopGridBench.prototype._showDetailContentForPage = function(node) {
   this.setOutlineContent(content);
 };
 
-
 scout.DesktopGridBench.prototype.updateOutlineContent = function() {
   if (!this.outlineContentVisible || !this.outline) {
     return;
@@ -267,8 +272,8 @@ scout.DesktopGridBench.prototype._revalidateSplitters = function(clearPosition) 
       });
       splitter.render(splitterParent.$container);
       splitter.$container.addClass('line');
-      //      splitter.$container.insertAfter(this.viewAreaColumns.LEFT.$container);
-      splitter.on('resize', splitterParent._onSplitterResize.bind(splitterParent));
+      splitter.on('splitterMove', splitterParent._onSplitterMove.bind(splitterParent));
+      splitter.on('splitterPositionChanged', splitterParent._onSplitterPositionChanged.bind(splitterParent));
       arr.push(splitter);
     }
     arr.push(col);
@@ -276,14 +281,14 @@ scout.DesktopGridBench.prototype._revalidateSplitters = function(clearPosition) 
   }, []);
   // well order the dom elements (reduce is used for simple code reasons, the result of reduce is not of interest).
   this.components.filter(function(comp) {
-    return comp instanceof scout.ViewAreaColumn;
-  })
-  .reduce(function(c1, c2, index) {
-    if (index > 0) {
-      c2.$container.insertAfter(c1.$container);
-    }
-    return c2;
-  }, undefined);
+      return comp instanceof scout.ViewAreaColumn;
+    })
+    .reduce(function(c1, c2, index) {
+      if (index > 0) {
+        c2.$container.insertAfter(c1.$container);
+      }
+      return c2;
+    }, undefined);
 
   this.htmlComp.invalidateLayoutTree();
   // Layout immediate to prevent 'laggy' form visualization,
@@ -291,7 +296,23 @@ scout.DesktopGridBench.prototype._revalidateSplitters = function(clearPosition) 
   this.htmlComp.validateLayoutTree();
 };
 
-scout.DesktopGridBench.prototype._onSplitterResize = function() {
+scout.DesktopGridBench.prototype._onSplitterMove = function(event) {
+  var splitterIndex = this.components.indexOf(event.source);
+  if (splitterIndex > 0 /*cannot be 0 since first element is a ViewAreaColumn*/ ) {
+    var $before = this.components[splitterIndex - 1].$container,
+      $after = this.components[splitterIndex + 1].$container,
+      diff = event.position - event.source.position;
+
+    if (($before.width() + diff) < scout.DesktopGridBench.VIEW_MIN_WIDTH) {
+      // set to min
+      event.setPosition($before.position().left + scout.DesktopGridBench.VIEW_MIN_WIDTH);
+    }
+    if (($after.position().left + $after.width() - event.position) < scout.DesktopGridBench.VIEW_MIN_WIDTH) {
+      event.setPosition($after.position().left + $after.width() - scout.DesktopGridBench.VIEW_MIN_WIDTH);
+    }
+  }
+};
+scout.DesktopGridBench.prototype._onSplitterPositionChanged = function(event) {
   this.revalidateLayout();
 };
 
@@ -344,7 +365,6 @@ scout.DesktopGridBench.prototype.removeView = function(view) {
   }
 
 };
-
 
 scout.DesktopGridBench.prototype.getComponents = function() {
   return this.components;

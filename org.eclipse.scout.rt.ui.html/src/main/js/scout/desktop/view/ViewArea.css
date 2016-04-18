@@ -1,3 +1,5 @@
-.viewArea{
+.viewArea {
   position: absolute;
+  min-width: @bench-view-min-width;
+  min-height: @bench-view-min-height;
 }

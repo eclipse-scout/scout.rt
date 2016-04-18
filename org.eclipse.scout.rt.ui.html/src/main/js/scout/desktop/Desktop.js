@@ -337,13 +337,13 @@ scout.Desktop.prototype._renderSplitter = function() {
   this.splitter = scout.create('Splitter', {
     parent: this,
     $anchor: this.navigation.$container,
-    $root: this.$container,
-    maxRatio: 0.5
+    $root: this.$container
   });
   this.splitter.render(this.$container);
-  this.splitter.$container.insertAfter(this.navigation.$container);
-  this.splitter.on('resize', this._onSplitterResize.bind(this));
-  this.splitter.on('resizeend', this._onSplitterResizeEnd.bind(this));
+  this.splitter.$container.insertBefore(this.$overlaySeparator);
+  this.splitter.on('splitterMove', this._onSplitterResize.bind(this));
+  this.splitter.on('splitterPositionChanged', this._onPositionChanged.bind(this));
+  this.splitter.on('splitterMoveEnd', this._onSplitterResizeEnd.bind(this));
   this.updateSplitterPosition();
 };
 
@@ -409,11 +409,11 @@ scout.Desktop.prototype.updateSplitterPosition = function() {
   if (storedSplitterPosition) {
     // Restore splitter position
     var splitterPosition = parseInt(storedSplitterPosition, 10);
-    this.splitter.updatePosition(splitterPosition);
+    this.splitter.setPosition(splitterPosition);
     this.invalidateLayoutTree();
   } else {
     // Set initial splitter position (default defined by css)
-    this.splitter.updatePosition();
+    this.splitter.setPosition();
     this.invalidateLayoutTree();
   }
 };
@@ -816,6 +816,15 @@ scout.Desktop.prototype.onPopstate = function(event) {
 };
 
 scout.Desktop.prototype._onSplitterResize = function(event) {
+  // disallow wider than 50%
+
+  var max = Math.floor(this.$container.outerWidth(true)/2);
+  if(event.position > max){
+    event.position = max;
+  }
+};
+
+scout.Desktop.prototype._onPositionChanged = function(event) {
   this.resizing = true;
   this.revalidateLayout();
 };
@@ -838,13 +847,13 @@ scout.Desktop.prototype._onSplitterResizeEnd = function(event) {
     }, {
       progress: function() {
         this.resizing = true;
-        this.splitter.updatePosition();
+        this.splitter.setPosition();
         this.revalidateLayout();
         this.resizing = false; // progress seems to be called after complete again -> layout requires flag to be properly set
       }.bind(this),
       complete: function() {
         this.resizing = true;
-        this.splitter.updatePosition();
+        this.splitter.setPosition();
         // Store size
         sessionStorage.setItem('scout:desktopSplitterPosition', this.splitter.position);
         this.revalidateLayout();

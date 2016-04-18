@@ -12,6 +12,7 @@
 scout.ViewAreaColumnLayout = function(viewAreaColumn) {
   scout.ViewAreaColumnLayout.parent.call(this);
   this.viewAreaColumn = viewAreaColumn;
+  this.containerSize;
 };
 scout.inherits(scout.ViewAreaColumnLayout, scout.AbstractLayout);
 
@@ -22,32 +23,46 @@ scout.ViewAreaColumnLayout.prototype.layout = function($container) {
     layoutBySplitterPosition;
 
   containerSize = containerSize.subtract(htmlContainer.getInsets());
+
   if (components) {
-    layoutBySplitterPosition = components.filter(function(comp) {
-      return comp instanceof scout.Splitter;
-    }).map(function(splitter) {
-      return $.isNumeric(splitter.position);
-    }).reduce(function(b1, b2, index) {
-      if (index === 0) {
-        return b2;
-      }
-      return b1 && b2;
-    }, false);
-    if (layoutBySplitterPosition) {
-      this._layoutBySplitterPosition(components, containerSize);
+    if (!containerSize.equals(this.containerSize)) {
+      this._layoutByRatio(components, containerSize);
     } else {
-      this._layoutInitial(components, containerSize);
+      layoutBySplitterPosition = components.filter(function(comp) {
+        return comp instanceof scout.Splitter;
+      }).map(function(splitter) {
+        return $.isNumeric(splitter.position);
+      }).reduce(function(b1, b2, index) {
+        if (index === 0) {
+          return b2;
+        }
+        return b1 && b2;
+      }, false);
+      if (layoutBySplitterPosition) {
+        this._layoutBySplitterPosition(components, containerSize);
+      } else {
+        this._layoutInitial(components, containerSize);
+      }
     }
+    this.containerSize = containerSize;
   }
 
+};
+
+scout.ViewAreaColumnLayout.prototype._layoutByRatio = function(components, containerSize) {
+  // set positions from ratio
+  components.forEach(function(comp) {
+    if (comp instanceof scout.Splitter) {
+      comp.setPosition(Math.floor(comp.getRatio() * containerSize.height));
+    }
+  });
+  this._layoutBySplitterPosition(components, containerSize);
 };
 
 scout.ViewAreaColumnLayout.prototype._layoutBySplitterPosition = function(components, containerSize) {
   var y = 0;
   components.forEach(function(comp, index) {
-    if (comp instanceof scout.Splitter) {
-      comp.updatePosition(y);
-    } else {
+    if (comp instanceof scout.ViewArea) {
       var bounds = new scout.Rectangle(0, y, containerSize.width, 0);
       if ((components.length - 1) > index) {
         bounds.height = components[index + 1].position - y;
@@ -71,7 +86,7 @@ scout.ViewAreaColumnLayout.prototype._layoutInitial = function(components, conta
   var y = 0;
   components.forEach(function(comp, index) {
     if (comp instanceof scout.Splitter) {
-      comp.updatePosition(y);
+      comp.setPosition(y, true);
     } else {
       var bounds = new scout.Rectangle(0, y, containerSize.width, rowHeight);
       comp.htmlComp.setBounds(bounds);

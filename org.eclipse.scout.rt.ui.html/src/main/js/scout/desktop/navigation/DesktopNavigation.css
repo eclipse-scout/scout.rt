@@ -14,6 +14,7 @@
   position: relative;
   height: 100%;
   width: @desktop-navigation-width;
+  min-width: @desktop-navigation-min-width;
   background-color: @navigation-background-color;
   color: @navigation-color;
 }

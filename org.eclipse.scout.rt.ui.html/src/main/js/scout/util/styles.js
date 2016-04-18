@@ -41,10 +41,16 @@ scout.styles = {
 
     properties = scout.arrays.ensure(properties);
     properties.forEach(function(property) {
-      style[property] = computedStyle[property];
+
+      var propertyName = property.replace(/\-(.)/g,
+        function a(match, p1) {
+          return p1.toUpperCase();
+        });
+      style[propertyName] = computedStyle[property];
     });
 
-    scout.styles.put(key, style);
+    // TODO CGU do not cache single prop values!!!
+    //    scout.styles.put(key, style);
     elem.className = '';
     return style;
   },
