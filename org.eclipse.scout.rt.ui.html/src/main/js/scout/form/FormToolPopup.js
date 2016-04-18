@@ -43,5 +43,8 @@ scout.FormToolPopup.prototype._renderHead = function() {
   if (this.formToolButton._customCssClasses) {
     this._copyCssClassToHead(this.formToolButton._customCssClasses);
   }
+  if (this.formToolButton.cssClass) {
+    this._copyCssClassToHead(this.formToolButton.cssClass);
+  }
   this._copyCssClassToHead('unfocusable');
 };

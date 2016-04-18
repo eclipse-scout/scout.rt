@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.ui.action;
 
 import java.security.Permission;
 
+import org.eclipse.scout.rt.client.ui.IStyleable;
 import org.eclipse.scout.rt.platform.IOrdered;
 import org.eclipse.scout.rt.platform.classid.ITypeWithClassId;
 import org.eclipse.scout.rt.platform.reflect.IPropertyObserver;
@@ -25,7 +26,7 @@ import org.eclipse.scout.rt.platform.reflect.IPropertyObserver;
  * A typical NEW menu on a table that is only visible on the empty space of the table and only when the table field is
  * enabled would have emptySpaceAction=false;
  */
-public interface IAction extends IPropertyObserver, ITypeWithClassId, IOrdered {
+public interface IAction extends IPropertyObserver, ITypeWithClassId, IOrdered, IStyleable {
 
   String PROP_CONTAINER = "container";
   String PROP_ICON_ID = "iconId";

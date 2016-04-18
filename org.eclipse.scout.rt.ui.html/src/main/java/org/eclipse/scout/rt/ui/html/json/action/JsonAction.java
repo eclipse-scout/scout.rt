@@ -105,6 +105,13 @@ public abstract class JsonAction<ACTION extends IAction> extends AbstractJsonPro
       }
     });
 
+    putJsonProperty(new JsonProperty<ACTION>(IAction.PROP_CSS_CLASS, model) {
+      @Override
+      protected String modelValue() {
+        return getModel().getCssClass();
+      }
+    });
+
     putJsonProperty(new JsonAdapterProperty<ACTION>(IActionNode.PROP_CHILD_ACTIONS, model, getUiSession()) {
       @Override
       protected JsonAdapterPropertyConfig createConfig() {
