@@ -57,6 +57,7 @@ import org.eclipse.scout.jaxws.apt.internal.util.AptUtil;
 import org.eclipse.scout.jaxws.apt.internal.util.Assertions;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.annotations.Internal;
+import org.eclipse.scout.rt.platform.context.CorrelationId;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
 import org.eclipse.scout.rt.platform.util.StringUtility;
@@ -286,12 +287,28 @@ public class JaxWsAnnotationProcessor extends AbstractProcessor {
   protected void addEntryPointMethodImplementation(final JCodeModel model, final JFieldVar webServiceContext, final JMethod method, final List<JClass> throwTypes, final boolean voidMethod, final String endpointInterfaceName) {
     final JBlock methodBody = method.body();
 
+    // Declare correlationId variable
+    final JVar cid = methodBody
+        .decl(model.ref(String.class), "cid", model.ref(MessageContexts.class)
+            .staticInvoke("getCorrelationId")
+            .arg(webServiceContext.invoke("getMessageContext")));
+    methodBody
+        ._if(cid.eq(JExpr._null()))
+        ._then()
+        .assign(cid, model
+            .ref(BEANS.class)
+            .staticInvoke("get")
+            .arg(model.ref(CorrelationId.class).dotclass())
+            .invoke("newCorrelationId"));
+
     // Declare RunContext variables.
     final JVar servletRunContext = methodBody
         .decl(JMod.FINAL, model.ref(RunContext.class), SERVLET_RUN_CONTEXT_FIELD_NAME, model.ref(JaxWsServletRunContexts.class)
             .staticInvoke("copyCurrent")
             .invoke("withWebServiceContext")
-            .arg(webServiceContext));
+            .arg(webServiceContext)
+            .invoke("withCorrelationId")
+            .arg(cid));
     final JVar runContext = methodBody
         .decl(JMod.FINAL, model.ref(RunContext.class), RUN_CONTEXT_FIELD_NAME, model.ref(MessageContexts.class)
             .staticInvoke("getRunContext")
@@ -369,7 +386,9 @@ public class JaxWsAnnotationProcessor extends AbstractProcessor {
     final JExpression exceptionTranslator = model.ref(DefaultExceptionTranslator.class).dotclass();
 
     final JInvocation servletRunContextInvocation = servletRunContext.invoke(runMethodName).arg(JExpr._new(servletRunContextCallable)).arg(exceptionTranslator);
-    final JInvocation runContextInvocation = runContext.invoke(runMethodName).arg(JExpr._new(runContextCallable)).arg(exceptionTranslator);
+    final JInvocation runContextInvocation = runContext
+        .invoke("withCorrelationId").arg(model.ref(CorrelationId.class).staticRef("CURRENT").invoke("get"))
+        .invoke(runMethodName).arg(JExpr._new(runContextCallable)).arg(exceptionTranslator);
 
     // Implement ServletRunContext callable.
     final JMethod servletRunContextRunMethod = servletRunContextCallable.method(JMod.PUBLIC | JMod.FINAL, returnType, runMethodName)._throws(Exception.class);

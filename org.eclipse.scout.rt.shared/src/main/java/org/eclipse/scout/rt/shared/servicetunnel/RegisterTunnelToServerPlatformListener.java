@@ -29,7 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * {@link IPlatformListener} to register proxy beans for interfaces annotated with {@link TunnelToServer}.
+ * {@link IPlatformListener} to register proxy instances for interfaces annotated with {@link TunnelToServer}.
  */
 public class RegisterTunnelToServerPlatformListener implements IPlatformListener {
   private static final Logger LOG = LoggerFactory.getLogger(RegisterTunnelToServerPlatformListener.class);

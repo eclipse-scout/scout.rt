@@ -32,6 +32,7 @@ import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 public final class MessageContexts {
 
   public static final String PROP_RUNCONTEXT = MessageContexts.class.getName() + ".RunContext";
+  public static final String PROP_CORRELATION_ID = MessageContexts.class.getName() + ".CorrelationId";
 
   private MessageContexts() {
   }
@@ -102,6 +103,35 @@ public final class MessageContexts {
     }
     else {
       return defaultSubject;
+    }
+  }
+
+  /**
+   * Puts the given correlation id on {@link MessageContext} to be used in subsequent handlers and port type.
+   */
+  public static void putCorrelationId(final MessageContext context, final String cid) {
+    if (cid == null) {
+      context.remove(PROP_CORRELATION_ID);
+    }
+    else {
+      context.put(PROP_CORRELATION_ID, cid);
+      context.setScope(PROP_CORRELATION_ID, Scope.APPLICATION); // APPLICATION-SCOPE to be accessible in port type.
+    }
+  }
+
+  /**
+   * Returns the correlation id of the ongoing request, or <code>null</code> if not set.
+   */
+  public static String getCorrelationId(final MessageContext context) {
+    Object cid = context.get(PROP_CORRELATION_ID);
+    if (cid instanceof String) {
+      return (String) cid;
+    }
+    else if (cid == null) {
+      return null;
+    }
+    else {
+      throw new WebServiceException(String.format("Invalid 'CorrelationId' on '%s' [actual=%s, expected=%s]", MessageContext.class.getName(), cid.getClass().getName(), String.class.getName()));
     }
   }
 }

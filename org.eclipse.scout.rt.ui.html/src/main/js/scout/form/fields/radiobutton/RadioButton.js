@@ -13,6 +13,16 @@ scout.RadioButton = function() {
 };
 scout.inherits(scout.RadioButton, scout.Button);
 
+/**
+ * @override Button.js
+ */
+scout.RadioButton.prototype._initDefaultKeyStrokes = function(keyStrokeContext) {
+  keyStrokeContext.registerKeyStroke([
+    new scout.RadioButtonKeyStroke(this, 'ENTER'),
+    new scout.RadioButtonKeyStroke(this, 'SPACE')
+  ]);
+};
+
 scout.RadioButton.prototype._render = function($parent) {
   this.addContainer($parent, 'radio-button', new scout.ButtonLayout(this));
   this.addField($parent.makeDiv()

@@ -85,12 +85,13 @@ public class LogHandler implements SOAPHandler<SOAPMessageContext> {
     final QName service = (QName) context.get(SOAPMessageContext.WSDL_SERVICE);
     final QName port = (QName) context.get(SOAPMessageContext.WSDL_PORT);
     final QName operation = (QName) context.get(SOAPMessageContext.WSDL_OPERATION);
+    final String correlationId = MessageContexts.getCorrelationId(context);
 
     if (m_logDebug) {
-      LOG.debug("WS SOAP [service={}, port={}, operation={}, direction={}, message={}]", service, port, operation, direction, soapMessage);
+      LOG.debug("WS SOAP [service={}, port={}, operation={}, direction={}, correlationId={}, message={}]", service, port, operation, direction, correlationId, soapMessage);
     }
     else {
-      LOG.info("WS SOAP [service={}, port={}, operation={}, direction={}, message={}]", service, port, operation, direction, soapMessage);
+      LOG.info("WS SOAP [service={}, port={}, operation={}, direction={}, correlationId={}, message={}]", service, port, operation, direction, correlationId, soapMessage);
     }
   }
 
