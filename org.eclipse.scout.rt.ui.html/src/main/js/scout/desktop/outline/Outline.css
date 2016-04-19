@@ -8,9 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-@outline-breadcrumb-border-color: @outline-selection-background-color;
 @outline-breadcrumb-node-padding-v: 12px;
-@outline-title-border-color: @outline-selection-background-color;
 @outline-title-margin-left: 12px;
 @outline-title-margin-right: 12px;
 @outline-title-margin-bottom: 12px;

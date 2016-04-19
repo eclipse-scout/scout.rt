@@ -520,6 +520,29 @@ scout.Desktop.prototype.setHeaderVisible = function(visible, notifyServer) {
   }
 };
 
+scout.Desktop.prototype.outlineDisplayStyle = function() {
+  if (this.outline) {
+    return this.outline.displayStyle;
+  }
+};
+
+scout.Desktop.prototype.shrinkNavigation = function() {
+  if (this.navigationVisible && this.outlineDisplayStyle() === scout.Tree.DisplayStyle.DEFAULT) {
+    this.outline.setDisplayStyle(scout.Tree.DisplayStyle.BREADCRUMB);
+  } else {
+    this.setNavigationVisible(false);
+  }
+};
+
+scout.Desktop.prototype.enlargeNavigation = function() {
+  if (this.navigationVisible && this.outlineDisplayStyle() === scout.Tree.DisplayStyle.BREADCRUMB) {
+    this.outline.setDisplayStyle(scout.Tree.DisplayStyle.DEFAULT);
+  } else {
+    this.setNavigationVisible(true);
+  }
+};
+
+
 scout.Desktop.prototype.switchToBench = function() {
   this.setHeaderVisible(true);
   this.setBenchVisible(true);

@@ -13,6 +13,7 @@ scout.DesktopNavigation = function() {
   this.$container;
   this.$body;
   this.viewButtons;
+  this._outlinePropertyChangeHandler = this._onOutlinePropertyChange.bind(this);
 };
 scout.inherits(scout.DesktopNavigation, scout.Widget);
 
@@ -46,6 +47,7 @@ scout.DesktopNavigation.prototype._render = function($parent) {
   this.htmlCompBody.setLayout(new scout.SingleLayout());
   this._renderToolBarVisible();
   this._renderOutline();
+  this._renderHandle();
 };
 
 scout.DesktopNavigation.prototype._renderOutline = function() {
@@ -77,12 +79,15 @@ scout.DesktopNavigation.prototype.setOutline = function(outline) {
       var displayStyle = this.outline.displayStyle;
       outline.setDisplayStyle(displayStyle);
     }
+    this.outline.off('propertyChange', this._outlinePropertyChangeHandler);
   }
 
   this.outline = outline;
   if (this.outline) {
     this.outline.setBreadcrumbTogglingThreshold(scout.DesktopNavigation.BREADCRUMB_STYLE_WIDTH);
     this.outline.inBackground = this.desktop.inBackground;
+    this.outline.on('propertyChange', this._outlinePropertyChangeHandler);
+    this._updateHandle();
     if (this.rendered) {
       this._renderOutline();
     }
@@ -107,6 +112,12 @@ scout.DesktopNavigation.prototype.setToolBarVisible = function(toolBarVisible) {
   this.toolBarVisible = toolBarVisible;
   if (this.rendered) {
     this._renderToolBarVisible();
+  }
+};
+
+scout.DesktopNavigation.prototype._updateHandle = function() {
+  if (this.handle) {
+    this.handle.setRightVisible(this.desktop.outlineDisplayStyle() === scout.Tree.DisplayStyle.BREADCRUMB);
   }
 };
 
@@ -149,6 +160,33 @@ scout.DesktopNavigation.prototype._removeToolBar = function() {
   this.toolBar = null;
 };
 
+scout.DesktopNavigation.prototype._renderHandle = function() {
+  if (this.handle) {
+    return;
+  }
+  this.handle = scout.create('DesktopNavigationHandle', {
+    parent: this
+  });
+  this.handle.render(this.$container);
+  this.handle.$container.addClass('navigation-open');
+  this.handle.on('action', this._onHandleAction.bind(this));
+  this._updateHandle();
+};
+
 scout.DesktopNavigation.prototype._onNavigationBodyMousedown = function(event) {
   this.desktop.bringOutlineToFront();
+};
+
+scout.DesktopNavigation.prototype._onOutlinePropertyChange = function(event) {
+  if (event.changedProperties.indexOf('displayStyle') !== -1) {
+    this._updateHandle();
+  }
+};
+
+scout.DesktopNavigation.prototype._onHandleAction = function(event) {
+  if (event.left) {
+    this.desktop.shrinkNavigation();
+  } else {
+    this.desktop.enlargeNavigation();
+  }
 };

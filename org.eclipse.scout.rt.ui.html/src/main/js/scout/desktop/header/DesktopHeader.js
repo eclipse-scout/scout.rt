@@ -77,6 +77,15 @@ scout.DesktopHeader.prototype._removeToolBar = function() {
   this.toolBar = null;
 };
 
+scout.DesktopHeader.prototype._renderToolBarVisible = function() {
+  if (this.toolBarVisible) {
+    this._renderToolBar();
+  } else {
+    this._removeToolBar();
+  }
+  this.invalidateLayoutTree();
+};
+
 scout.DesktopHeader.prototype._renderLogoUrl = function() {
   if (this.logoUrl) {
     this._renderLogo();
@@ -104,15 +113,6 @@ scout.DesktopHeader.prototype._removeLogo = function() {
   }
   this.logo.remove();
   this.logo = null;
-};
-
-scout.DesktopHeader.prototype._renderToolBarVisible = function() {
-  if (this.toolBarVisible) {
-    this._renderToolBar();
-  } else {
-    this._removeToolBar();
-  }
-  this.invalidateLayoutTree();
 };
 
 scout.DesktopHeader.prototype._renderViewButtons = function() {

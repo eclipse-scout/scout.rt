@@ -815,7 +815,7 @@ scout.Tree.prototype.setDisplayStyle = function(displayStyle, notifyServer) {
     return;
   }
 
-  this.displayStyle = displayStyle;
+  this._setProperty('displayStyle', displayStyle);
   notifyServer = scout.nvl(notifyServer, true);
   if (notifyServer) {
     this._sendProperty('displayStyle');

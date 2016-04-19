@@ -15,7 +15,7 @@
 
 .scrollbar {
   position: absolute;
-  z-index: 10;
+  z-index: 1;
   cursor: pointer;
 
   &.y-axis {
@@ -43,7 +43,6 @@
 
 .scrollbar-thumb {
   position: absolute;
-  z-index: 11;
   cursor: pointer;
   border-radius: 4px;
   background-color: fade(@scrollbar-thumb-color, 30%);
