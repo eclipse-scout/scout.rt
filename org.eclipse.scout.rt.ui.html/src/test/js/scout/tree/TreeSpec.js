@@ -1169,22 +1169,26 @@ describe("Tree", function() {
       };
 
       tree.selectNodes([]);
+      tree._renderViewport();
       var $groupNodes = tree.$data.find('.tree-node.group');
       expect($groupNodes.length).toBe(0);
 
       tree.selectNodes(node1);
+      tree._renderViewport();
       $groupNodes = tree.$data.find('.tree-node.group');
       expect($groupNodes.length).toBe(1);
       expect($groupNodes.eq(0)[0]).toBe(node1.$node[0]);
 
       node1.nodeType = 'groupingParent';
       tree.selectNodes(child1);
+      tree._renderViewport();
       $groupNodes = tree.$data.find('.tree-node.group');
       expect($groupNodes.length).toBe(1);
       expect($groupNodes.eq(0)[0]).toBe(child1.$node[0]);
 
       node1.nodeType = 'groupingParent';
       tree.selectNodes(grandchild1);
+      tree._renderViewport();
       $groupNodes = tree.$data.find('.tree-node.group');
       expect($groupNodes.length).toBe(4);
       expect($groupNodes.eq(0)[0]).toBe(child1.$node[0]);
@@ -1863,7 +1867,6 @@ describe("Tree", function() {
       });
 
       it("insert expanded node to expanded parent", function() {
-        //TODO nbu check order
         var newNode0Child3 = helper.createModelNode('0_3', 'newNode0Child3', 3);
         newNode0Child3.expanded = true;
         var event = helper.createNodesInsertedEvent(model, [newNode0Child3], model.nodes[0].id);

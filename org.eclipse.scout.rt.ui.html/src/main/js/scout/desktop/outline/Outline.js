@@ -170,8 +170,8 @@ scout.Outline.prototype._renderEnabled = function() {
 /**
  * @override
  */
-scout.Outline.prototype._initTreeNode = function(node, parentNode) {
-  scout.Outline.parent.prototype._initTreeNode.call(this, node, parentNode);
+scout.Outline.prototype._initTreeNodeInternal = function(node, parentNode) {
+  scout.Outline.parent.prototype._initTreeNodeInternal.call(this, node, parentNode);
   node.detailFormVisibleByUi = true;
   if (node.detailTable) {
     node.detailTable = this.session.getOrCreateModelAdapter(node.detailTable, this);
@@ -641,8 +641,7 @@ scout.Outline.prototype.updateDetailMenus = function() {
     var rootGroupBox = this.detailContent.rootGroupBox;
     menuItems = rootGroupBox.processMenus.concat(rootGroupBox.menus);
     rootGroupBox.setMenuBarVisible(false);
-  }
-  else if (selectedPage) {
+  } else if (selectedPage) {
     // get empty space menus and table controls from detail table
     if (selectedPage.detailTable) {
       detailTable = selectedPage.detailTable;
