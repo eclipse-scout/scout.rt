@@ -322,14 +322,7 @@ scout.Widget.prototype.trigger = function(type, event) {
     return;
   }
 
-  if (event) {
-    // create a shallow copy of the given event. Otherwise this function would
-    // have a side-effect on the given event because it adds the 'source' property
-    // which causes problems in some cases.
-    event = $.extend({}, event);
-  } else {
-    event = {};
-  }
+  event = event || {};
   event.source = this;
   this.events.trigger(type, event);
 };
