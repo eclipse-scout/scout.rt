@@ -744,7 +744,6 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     IUserFilterState filterState = createFilterState(data);
     TableEventFilterCondition condition = addTableEventFilterCondition(TableEvent.TYPE_USER_FILTER_ADDED);
     condition.setUserFilter(filterState);
-    condition.checkUserFilter();
     getModel().getUIFacade().fireFilterAddedFromUI(filterState);
   }
 
@@ -776,7 +775,6 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     IUserFilterState filter = getFilterState(event.getData());
     TableEventFilterCondition condition = addTableEventFilterCondition(TableEvent.TYPE_USER_FILTER_REMOVED);
     condition.setUserFilter(filter);
-    condition.checkUserFilter();
     getModel().getUIFacade().fireFilterRemovedFromUI(filter);
   }
 
