@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-/* global LocaleSpecHelper*/
+/* global scout.LocaleSpecHelper*/
 describe('ObjectFactory', function() {
 
   beforeEach(function() {
@@ -82,7 +82,7 @@ describe('ObjectFactory', function() {
   it('creates objects which are registered in scout.objectFactories', function() {
     setFixtures(sandbox());
     var session = new scout.Session($('#sandbox'), '1.1');
-    session.locale = new LocaleSpecHelper().createLocale(LocaleSpecHelper.DEFAULT_LOCALE);
+    session.locale = new scout.LocaleSpecHelper().createLocale(scout.LocaleSpecHelper.DEFAULT_LOCALE);
 
     // When this test fails with a message like 'TypeError: scout.[ObjectType] is not a constructor...'
     // you should check if the required .js File is registered in SpecRunnerMaven.html.

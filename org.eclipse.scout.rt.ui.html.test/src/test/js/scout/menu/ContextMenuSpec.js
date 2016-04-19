@@ -15,7 +15,7 @@ describe("ContextMenuSpec", function() {
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
-    helper = new MenuSpecHelper(session);
+    helper = new scout.MenuSpecHelper(session);
   });
 
   describe('renderMenuItems', function() {

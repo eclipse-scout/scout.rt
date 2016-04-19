@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-/* global FormSpecHelper, MenuSpecHelper */
+/* global FormSpecHelper, scout.MenuSpecHelper */
 describe("ValueField", function() {
   var session, helper, menuHelper;
 
@@ -16,7 +16,7 @@ describe("ValueField", function() {
     setFixtures(sandbox());
     session = sandboxSession();
     helper = new FormSpecHelper(session);
-    menuHelper = new MenuSpecHelper(session);
+    menuHelper = new scout.MenuSpecHelper(session);
     jasmine.Ajax.install();
     jasmine.clock().install();
   });

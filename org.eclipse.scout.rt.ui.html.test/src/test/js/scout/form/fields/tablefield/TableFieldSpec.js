@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-/* global TableSpecHelper, FormSpecHelper */
+/* global scout.TableSpecHelper, FormSpecHelper */
 describe("TableField", function() {
   var session;
   var helper;
@@ -17,7 +17,7 @@ describe("TableField", function() {
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
-    tableHelper = new TableSpecHelper(session);
+    tableHelper = new scout.TableSpecHelper(session);
     helper = new FormSpecHelper(session);
     jasmine.Ajax.install();
     jasmine.clock().install();

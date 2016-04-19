@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-/* global TableSpecHelper*/
+/* global scout.TableSpecHelper*/
 describe("Table Filter", function() {
   var session;
   var helper;
@@ -16,7 +16,7 @@ describe("Table Filter", function() {
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
-    helper = new TableSpecHelper(session);
+    helper = new scout.TableSpecHelper(session);
     jasmine.Ajax.install();
     jasmine.clock().install();
   });

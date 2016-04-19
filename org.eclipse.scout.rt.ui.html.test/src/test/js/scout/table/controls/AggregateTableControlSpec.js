@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-/* global TableSpecHelper, LocaleSpecHelper */
+/* global scout.TableSpecHelper, scout.LocaleSpecHelper */
 describe("AggregateTableControl", function() {
   var session;
   var helper;
@@ -16,8 +16,8 @@ describe("AggregateTableControl", function() {
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
-    session.locale = new LocaleSpecHelper().createLocale(LocaleSpecHelper.DEFAULT_LOCALE);
-    helper = new TableSpecHelper(session);
+    session.locale = new scout.LocaleSpecHelper().createLocale(scout.LocaleSpecHelper.DEFAULT_LOCALE);
+    helper = new scout.TableSpecHelper(session);
 
     jasmine.Ajax.install();
     jasmine.clock().install();

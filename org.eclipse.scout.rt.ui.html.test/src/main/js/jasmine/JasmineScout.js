@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 /* exported mostRecentJsonRequest  */
-/* global LocaleSpecHelper */
+/* global scout.LocaleSpecHelper */
 function mostRecentJsonRequest() {
   var req = jasmine.Ajax.requests.mostRecent();
   if (req) {
@@ -30,7 +30,7 @@ function sandboxSession(options) {
   // Simulate successful session initialization
   session.uiSessionId = '1.1';
   session.modelAdapterRegistry[session.uiSessionId] = session;
-  session.locale = new LocaleSpecHelper().createLocale(LocaleSpecHelper.DEFAULT_LOCALE);
+  session.locale = new scout.LocaleSpecHelper().createLocale(scout.LocaleSpecHelper.DEFAULT_LOCALE);
   var desktop = options.desktop || {};
   desktop.navigationVisible = scout.nvl(desktop.navigationVisible, false);
   desktop.headerVisible = scout.nvl(desktop.headerVisible, false);

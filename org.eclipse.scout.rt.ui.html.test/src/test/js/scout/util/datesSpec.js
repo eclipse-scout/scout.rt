@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-/* global LocaleSpecHelper */
+/* global scout.LocaleSpecHelper */
 describe("scout.dates", function() {
 
   describe("shift", function() {
@@ -417,16 +417,16 @@ describe("scout.dates", function() {
         scout.dates.format('gugus');
       }).toThrow();
 
-      var helper = new LocaleSpecHelper();
-      var locale = helper.createLocale(LocaleSpecHelper.DEFAULT_LOCALE);
+      var helper = new scout.LocaleSpecHelper();
+      var locale = helper.createLocale(scout.LocaleSpecHelper.DEFAULT_LOCALE);
 
       expect(scout.dates.format(null, locale)).toBe('');
       expect(scout.dates.format(scout.dates.create('2014-11-21'), locale)).toBe('21.11.2014');
     });
 
     it("can format valid dates", function() {
-      var helper = new LocaleSpecHelper();
-      var locale = helper.createLocale(LocaleSpecHelper.DEFAULT_LOCALE);
+      var helper = new scout.LocaleSpecHelper();
+      var locale = helper.createLocale(scout.LocaleSpecHelper.DEFAULT_LOCALE);
 
       expect(scout.dates.format(scout.dates.create('2014-11-21'), locale, 'yy')).toBe('14');
     });

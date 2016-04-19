@@ -8,11 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-var MenuSpecHelper = function(session) {
+scout.MenuSpecHelper = function(session) {
   this.session = session;
 };
 
-MenuSpecHelper.prototype.createModel = function(text, iconId, menuTypes) {
+scout.MenuSpecHelper.prototype.createModel = function(text, iconId, menuTypes) {
   var model = createSimpleModel('Menu', this.session);
   $.extend(model, {
     text: text,
@@ -23,7 +23,7 @@ MenuSpecHelper.prototype.createModel = function(text, iconId, menuTypes) {
   return model;
 };
 
-MenuSpecHelper.prototype.createMenu = function(model) {
+scout.MenuSpecHelper.prototype.createMenu = function(model) {
   model.objectType = model.objectType || 'Menu';
   model.session = this.session;
   model.parent = this.session.desktop;

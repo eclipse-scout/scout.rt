@@ -8,14 +8,14 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-/* global MenuSpecHelper */
+/* global scout.MenuSpecHelper */
 describe("menus", function() {
   var helper, session;
 
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
-    helper = new MenuSpecHelper(session);
+    helper = new scout.MenuSpecHelper(session);
   });
 
   describe("filter", function() {

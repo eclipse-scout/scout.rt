@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-/* global FormSpecHelper,LocaleSpecHelper */
+/* global FormSpecHelper,scout.LocaleSpecHelper */
 describe("NumberField", function() {
   var session;
   var helper;
@@ -19,10 +19,10 @@ describe("NumberField", function() {
     setFixtures(sandbox());
     session = sandboxSession();
     helper = new FormSpecHelper(session);
-    localeHelper = new LocaleSpecHelper();
+    localeHelper = new scout.LocaleSpecHelper();
     jasmine.Ajax.install();
     jasmine.clock().install();
-    locale = localeHelper.createLocale(LocaleSpecHelper.DEFAULT_LOCALE);
+    locale = localeHelper.createLocale(scout.LocaleSpecHelper.DEFAULT_LOCALE);
   });
 
   afterEach(function() {

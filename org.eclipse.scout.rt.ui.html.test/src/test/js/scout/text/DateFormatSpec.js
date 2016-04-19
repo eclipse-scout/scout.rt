@@ -8,15 +8,15 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-/* global LocaleSpecHelper */
+/* global scout.LocaleSpecHelper */
 describe("DateFormat", function() {
   var locale;
   var helper;
 
   beforeEach(function() {
     setFixtures(sandbox());
-    helper = new LocaleSpecHelper();
-    locale = helper.createLocale(LocaleSpecHelper.DEFAULT_LOCALE);
+    helper = new scout.LocaleSpecHelper();
+    locale = helper.createLocale(scout.LocaleSpecHelper.DEFAULT_LOCALE);
   });
 
   afterEach(function() {

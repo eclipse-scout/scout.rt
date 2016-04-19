@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-/* global TableSpecHelper, LocaleSpecHelper */
+/* global scout.TableSpecHelper, scout.LocaleSpecHelper */
 describe("Table", function() {
   var session;
   var helper;
@@ -16,8 +16,8 @@ describe("Table", function() {
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
-    session.locale = new LocaleSpecHelper().createLocale(LocaleSpecHelper.DEFAULT_LOCALE);
-    helper = new TableSpecHelper(session);
+    session.locale = new scout.LocaleSpecHelper().createLocale(scout.LocaleSpecHelper.DEFAULT_LOCALE);
+    helper = new scout.TableSpecHelper(session);
     jasmine.Ajax.install();
     jasmine.clock().install();
   });
@@ -1120,7 +1120,7 @@ describe("Table", function() {
 
         // In order to change Collator at runtime, we must reset the "static" property
         // since it is set only once
-        session.locale = new LocaleSpecHelper().createLocale('sv');
+        session.locale = new scout.LocaleSpecHelper().createLocale('sv');
         helper.resetIntlCollator();
 
         table.sort(column0, 'desc');
