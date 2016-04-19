@@ -214,13 +214,13 @@ describe("Tree", function() {
 
         // Make sure child0 is not visible anymore
         tree.setNodeExpanded(node0, false);
-        expect(child0.rendered).toBeFalsy();
+        expect(child0.attached).toBeFalsy();
 
         tree.updateNodes([child0Update]);
 
         // Mode state needs to be updated, $node is still node visible
         expect(child0.enabled).toBe(false);
-        expect(child0.rendered).toBeFalsy();
+        expect(child0.attached).toBeFalsy();
 
         // Expand node -> node gets visible and needs to be disabled
         tree.setNodeExpanded(node0, true);
@@ -272,14 +272,14 @@ describe("Tree", function() {
 
         // Make sure child0 is not visible anymore
         tree.setNodeExpanded(node0, false);
-        expect(child0.rendered).toBeFalsy();
+        expect(child0.attached).toBeFalsy();
         expect(child0.enabled).toBe(true);
 
         tree.updateNodes([child0Update]);
 
         // Mode state needs to be updated, $node is still node visible
         expect(child0.enabled).toBe(false);
-        expect(child0.rendered).toBeFalsy();
+        expect(child0.attached).toBeFalsy();
 
         // Expand node -> node gets visible and needs to be disabled
         tree.setNodeExpanded(node0, true);
@@ -1268,8 +1268,8 @@ describe("Tree", function() {
       tree.addFilter(filter);
       tree.render(session.$entryPoint);
 
-      expect(tree.nodes[0].rendered).toBe(true);
-      expect(tree.nodes[1].rendered).toBe(false);
+      expect(tree.nodes[0].attached).toBe(true);
+      expect(tree.nodes[1].attached).toBe(false);
 
       var event = helper.createNodeChangedEvent(model, tree.nodes[0].id);
       event.text = 'new Text';
@@ -1280,8 +1280,8 @@ describe("Tree", function() {
 
       expect(tree.nodes[0].text).toBe(event.text);
       // text has changed -> filter condition returns false -> must not be visible anymore
-      expect(tree.nodes[0].rendered).toBe(false);
-      expect(tree.nodes[1].rendered).toBe(false);
+      expect(tree.nodes[0].attached).toBe(false);
+      expect(tree.nodes[1].attached).toBe(false);
     });
 
     it("applies filter if a node gets inserted", function() {

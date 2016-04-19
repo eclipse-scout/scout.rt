@@ -29,6 +29,7 @@ scout.OutlineLayout.prototype.layout = function($container) {
       if (pageHtmlComp) {
         var prefSize = pageHtmlComp.getPreferredSize();
         pageHtmlComp.setSize(new scout.Dimension(containerSize.width, prefSize.height));
+        selectedNode.height = prefSize.height;
       }
     }
     // Remove width and height from non selected nodes
@@ -37,6 +38,8 @@ scout.OutlineLayout.prototype.layout = function($container) {
       if (!$elem.isSelected()) {
         $elem.css('height', 'auto')
           .css('width', 'auto');
+        var node = $elem.data('node');
+        node.height = $elem.outerHeight();
       }
     });
   }

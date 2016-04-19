@@ -23,6 +23,5 @@ scout.TreeCollapseAllKeyStroke.prototype._handleInternal = function(currentNode)
   if(this.field.visibleNodesFlat.length>0){
     this.field.selectNodes(this.field.visibleNodesFlat[0]);
   }
-  this.field.handleScrollAnimationSave();
-  return null;
+  return this.field.visibleNodesFlat[0];
 };
