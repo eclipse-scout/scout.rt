@@ -431,7 +431,7 @@ public abstract class AbstractSequenceBox extends AbstractCompositeField impleme
 
   @Override
   public String getFullyQualifiedLabel(String separator) {
-    StringBuffer b = new StringBuffer();
+    StringBuilder b = new StringBuilder();
     IFormField p = getParentField();
     if (p != null) {
       String s = p.getFullyQualifiedLabel(separator);

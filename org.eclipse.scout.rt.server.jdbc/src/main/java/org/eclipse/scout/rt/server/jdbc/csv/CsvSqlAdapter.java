@@ -182,7 +182,7 @@ public class CsvSqlAdapter {
         base = params.getBindBase();
       }
       else {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append("SELECT ");
         for (Iterator<String> it = cols.iterator(); it.hasNext();) {
           String colName = it.next();
@@ -283,7 +283,7 @@ public class CsvSqlAdapter {
         cols.add(params.getLineNumberColumnName());
       }
       cols.addAll(params.getCsvColumnNames()); //
-      StringBuffer buf = new StringBuffer();
+      StringBuilder buf = new StringBuilder();
       buf.append("INSERT INTO ");
       buf.append(params.getTableName());
       buf.append("(");

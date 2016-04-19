@@ -27,7 +27,7 @@ public class SharedContextChangedNotification implements Serializable {
 
   @Override
   public String toString() {
-    StringBuffer b = new StringBuffer(getClass().getSimpleName());
+    StringBuilder b = new StringBuilder(getClass().getSimpleName());
     b.append("[");
     b.append("]");
     return b.toString();

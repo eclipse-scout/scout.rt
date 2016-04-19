@@ -112,7 +112,7 @@ public abstract class AbstractSqlStyle implements ISqlStyle {
         array = value;
       }
       int n = Array.getLength(array);
-      StringBuffer buf = new StringBuffer();
+      StringBuilder buf = new StringBuilder();
       buf.append("(");
       if (n > 0) {
         for (int i = 0; i < n; i++) {
@@ -945,7 +945,7 @@ public abstract class AbstractSqlStyle implements ISqlStyle {
       return createNull(attribute);
     }
     int max = getMaxListSize();
-    StringBuffer buf = new StringBuffer();
+    StringBuilder buf = new StringBuilder();
     buf.append("(");// bracket 1
     for (int i = 0; i < values.length; i = i + max) {
       if (i > 0) {
@@ -980,7 +980,7 @@ public abstract class AbstractSqlStyle implements ISqlStyle {
       return createNotNull(attribute);
     }
     int max = getMaxListSize();
-    StringBuffer buf = new StringBuffer();
+    StringBuilder buf = new StringBuilder();
     buf.append("(");// bracket 1
     for (int i = 0; i < values.length; i = i + max) {
       if (i > 0) {

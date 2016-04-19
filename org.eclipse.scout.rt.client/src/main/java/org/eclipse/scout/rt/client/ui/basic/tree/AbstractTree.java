@@ -1080,7 +1080,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   public String getPathText(ITreeNode selectedNode, String delimiter) {
     // construct the path to the data
     ITreeNode root = getRootNode();
-    StringBuffer pathStr = new StringBuffer("");
+    StringBuilder pathStr = new StringBuilder("");
     ITreeNode node = selectedNode;
     while (node != null) {
       if (node != root || isRootNodeVisible()) {

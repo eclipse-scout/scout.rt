@@ -119,7 +119,7 @@ public class DynamicResourceLoader extends AbstractResourceLoader {
     String isoFilename = originalFilename;
     CharsetEncoder iso8859Encoder = StandardCharsets.ISO_8859_1.newEncoder();
     if (!iso8859Encoder.canEncode(originalFilename)) {
-      StringBuffer sb = new StringBuffer();
+      StringBuilder sb = new StringBuilder();
       for (char c : originalFilename.toCharArray()) {
         if (iso8859Encoder.canEncode(String.valueOf(c))) {
           sb.append(c);

@@ -39,7 +39,7 @@ public class BrowserFieldEvent extends EventObject implements IModelEvent {
 
   @Override
   public String toString() {
-    StringBuffer buf = new StringBuffer();
+    StringBuilder buf = new StringBuilder();
     buf.append(getClass().getSimpleName() + "[");
     // decode type
     try {

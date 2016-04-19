@@ -78,7 +78,7 @@ public class ValueOutputToken implements IToken {
 
   @Override
   public String toString() {
-    StringBuffer b = new StringBuffer();
+    StringBuilder b = new StringBuilder();
     b.append(getClass().getSimpleName() + "[");
     b.append(m_name);
     b.append(" ");
