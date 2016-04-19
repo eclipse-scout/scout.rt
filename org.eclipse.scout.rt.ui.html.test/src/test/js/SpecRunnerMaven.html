@@ -37,22 +37,22 @@
       }
     };
   </script>
-  <link rel="shortcut icon" type="image/png" href="src/main/resources/WebContent/res/jasmine-2.0.0/jasmine_favicon.png">
-  <link rel="stylesheet" type="text/css" href="src/main/resources/WebContent/res/jasmine-2.0.0/jasmine.css">
+  <link rel="shortcut icon" type="image/png" href="ext/WebContent/res/jasmine-2.0.0/jasmine_favicon.png">
+  <link rel="stylesheet" type="text/css" href="ext/WebContent/res/jasmine-2.0.0/jasmine.css">
 
-  <script type="text/javascript" src="src/main/resources/WebContent/res/jquery-2.1.4.js"></script>
-  <script type="text/javascript" src="src/main/resources/WebContent/res/jquery-ui-1.11.2.js"></script>
-  <script type="text/javascript" src="src/main/resources/WebContent/res/log4javascript.js"></script>
-  <script type="text/javascript" src="src/main/resources/WebContent/res/jasmine-2.0.0/jasmine.js"></script>
-  <script type="text/javascript" src="src/main/resources/WebContent/res/jasmine-2.0.0/jasmine-html.js"></script>
-  <script type="text/javascript" src="src/main/resources/WebContent/res/jasmine-2.0.0/boot.js"></script>
-  <script type="text/javascript" src="src/main/resources/WebContent/res/jasmine-2.0.0/plugins/jasmine-jquery.js"></script>
-  <script type="text/javascript" src="src/main/resources/WebContent/res/jasmine-2.0.0/plugins/mock-ajax.js"></script>
+  <script type="text/javascript" src="ext/WebContent/res/jquery-2.1.4.js"></script>
+  <script type="text/javascript" src="ext/WebContent/res/jquery-ui-1.11.2.js"></script>
+  <script type="text/javascript" src="ext/WebContent/res/log4javascript.js"></script>
+  <script type="text/javascript" src="ext/WebContent/res/jasmine-2.0.0/jasmine.js"></script>
+  <script type="text/javascript" src="ext/WebContent/res/jasmine-2.0.0/jasmine-html.js"></script>
+  <script type="text/javascript" src="ext/WebContent/res/jasmine-2.0.0/boot.js"></script>
+  <script type="text/javascript" src="ext/WebContent/res/jasmine-2.0.0/plugins/jasmine-jquery.js"></script>
+  <script type="text/javascript" src="ext/WebContent/res/jasmine-2.0.0/plugins/mock-ajax.js"></script>
   <script type="text/javascript" src="src/main/js/jasmine/JasmineScoutModuleUtil.js"></script>
   <script type="text/javascript" src="src/main/js/jasmine/JasmineScout.js"></script>
   <script type="text/javascript" src="src/main/js/jasmine/JasmineMavenReporter.js"></script>
   <script type="text/javascript" src="src/main/js/jasmine/boot.ext.js"></script>
-  <script type="text/javascript">loadDynamicScript('src/main/js/scout-module.js');</script>
+  <script type="text/javascript">loadDynamicScript('ext/scout-module.js');</script>
 </head>
 <body>
   <!-- Test for UTF-8 encoding: äöü -->
@@ -66,7 +66,7 @@
         dataType: 'text',
         contentType: 'text/plain; charset=UTF-8',
         cache: false,
-        url: 'src/main/resources/org/eclipse/scout/rt/ui/html/json/defaultValues.json',
+        url: 'ext/org/eclipse/scout/rt/ui/html/json/defaultValues.json',
         data: ''
       }).done(function(data) {
         var dataWithoutComments = stripCommentsFromJson(data), dataObj = JSON.parse(dataWithoutComments);
