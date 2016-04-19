@@ -8,7 +8,6 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-/* global FormSpecHelper */
 describe('DesktopFormController', function() {
 
   var ctrl, session, $sandbox, popupWindow,

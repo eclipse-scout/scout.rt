@@ -8,14 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-/* global FormSpecHelper */
 describe("BasicField", function() {
   var session, helper, field;
 
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
-    helper = new FormSpecHelper(session);
+    helper = new scout.FormSpecHelper(session);
     field = createField(createModel());
     jasmine.Ajax.install();
     jasmine.clock().install();

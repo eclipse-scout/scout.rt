@@ -8,14 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-/* global FormSpecHelper, scout.MenuSpecHelper */
 describe("SequenceBox", function() {
   var session, helper, menuHelper;
 
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
-    helper = new FormSpecHelper(session);
+    helper = new scout.FormSpecHelper(session);
     menuHelper = new scout.MenuSpecHelper(session);
   });
 

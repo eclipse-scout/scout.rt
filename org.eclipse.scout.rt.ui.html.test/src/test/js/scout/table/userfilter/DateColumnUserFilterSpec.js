@@ -8,7 +8,6 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-/* global scout.TableSpecHelper*/
 describe('DateColumnUserFilter', function() {
   var session;
   var helper;

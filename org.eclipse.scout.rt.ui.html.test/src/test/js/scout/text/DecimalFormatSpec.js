@@ -8,7 +8,6 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-/* global scout.LocaleSpecHelper */
 describe("DecimalFormat", function() {
   var locale;
   var helper;

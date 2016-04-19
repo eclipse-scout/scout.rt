@@ -8,7 +8,6 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-/* global FormSpecHelper */
 describe("scout.tooltips", function() {
 
   var session, helper, formField, model;
@@ -18,7 +17,7 @@ describe("scout.tooltips", function() {
 
     setFixtures(sandbox());
     session = sandboxSession();
-    helper = new FormSpecHelper(session);
+    helper = new scout.FormSpecHelper(session);
 
     // Add class desktop to sandbox, tooltip will be added to closest desktop
     session.$entryPoint.addClass('desktop');

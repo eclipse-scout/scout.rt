@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-/* global FormSpecHelper, FocusManagerSpecHelper */
+/* global FocusManagerSpecHelper */
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;
 describe('scout.Focusmanager', function() {
   var session, formHelper, focusHelper, form;
@@ -18,7 +18,7 @@ describe('scout.Focusmanager', function() {
     jasmine.Ajax.install();
     session = sandboxSession();
     session.init();
-    formHelper = new FormSpecHelper(session);
+    formHelper = new scout.FormSpecHelper(session);
     focusHelper = new FocusManagerSpecHelper();
     jasmine.clock().install();
     uninstallUnloadHandlers(session);

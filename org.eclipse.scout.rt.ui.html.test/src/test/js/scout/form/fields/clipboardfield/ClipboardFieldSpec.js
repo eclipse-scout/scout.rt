@@ -8,7 +8,6 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-/* global FormSpecHelper */
 describe('ClipboardField', function() {
   var session, helper, $sandbox, origDevice;
 
@@ -16,7 +15,7 @@ describe('ClipboardField', function() {
     setFixtures(sandbox());
     session = sandboxSession();
     $sandbox = $('#sandbox');
-    helper = new FormSpecHelper(session);
+    helper = new scout.FormSpecHelper(session);
     jasmine.Ajax.install();
     jasmine.clock().install();
     origDevice = scout.device;

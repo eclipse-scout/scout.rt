@@ -8,7 +8,6 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-/* global OutlineSpecHelper, FormSpecHelper */
 describe("DesktopBench", function() {
   var helper, session, desktop, formHelper;
 
@@ -20,8 +19,8 @@ describe("DesktopBench", function() {
       }
     });
     desktop = session.desktop;
-    helper = new OutlineSpecHelper(session);
-    formHelper = new FormSpecHelper(session);
+    helper = new scout.OutlineSpecHelper(session);
+    formHelper = new scout.FormSpecHelper(session);
     jasmine.Ajax.install();
     jasmine.clock().install();
   });

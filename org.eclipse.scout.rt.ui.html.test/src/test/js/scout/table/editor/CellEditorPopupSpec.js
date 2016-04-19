@@ -8,7 +8,6 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-/* global scout.TableSpecHelper, FormSpecHelper */
 describe("CellEditor", function() {
   var session;
   var helper;
@@ -18,7 +17,7 @@ describe("CellEditor", function() {
     setFixtures(sandboxDesktop());
     session = sandboxSession();
     helper = new scout.TableSpecHelper(session);
-    formHelper = new FormSpecHelper(session);
+    formHelper = new scout.FormSpecHelper(session);
     jasmine.Ajax.install();
     jasmine.clock().install();
   });

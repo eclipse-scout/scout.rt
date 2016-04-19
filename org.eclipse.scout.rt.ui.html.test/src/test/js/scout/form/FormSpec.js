@@ -8,7 +8,6 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-/* global FormSpecHelper */
 describe("Form", function() {
   var session, helper;
 
@@ -18,7 +17,7 @@ describe("Form", function() {
     jasmine.clock().install();
     session = sandboxSession();
     session.init();
-    helper = new FormSpecHelper(session);
+    helper = new scout.FormSpecHelper(session);
     uninstallUnloadHandlers(session);
   });
 

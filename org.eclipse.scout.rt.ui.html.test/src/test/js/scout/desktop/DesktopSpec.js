@@ -8,14 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-/* global OutlineSpecHelper */
 describe('Desktop', function() {
   var session, desktop, outlineHelper;
 
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession({desktop: {navigationVisible: true, headerVisible: true, benchVisible: true}});
-    outlineHelper = new OutlineSpecHelper(session);
+    outlineHelper = new scout.OutlineSpecHelper(session);
     desktop = session.desktop;
     desktop.viewButtons = [];
   });

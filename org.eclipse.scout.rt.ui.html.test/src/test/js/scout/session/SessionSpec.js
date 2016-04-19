@@ -8,6 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
+/*global receiveResponseForAjaxCall */
 describe('Session', function() {
 
   beforeEach(function() {

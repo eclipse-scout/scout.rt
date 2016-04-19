@@ -8,7 +8,6 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-/* global FormSpecHelper */
 describe('PopupWindow', function() {
   var session, helper, $sandbox, origDevice, myForm, myWindow,
     myErrorHandler = function() {};

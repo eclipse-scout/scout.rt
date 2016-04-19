@@ -8,7 +8,6 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-/* global FormSpecHelper */
 describe('DesktopNotification', function() {
   var session, helper, $sandbox,
     parent = new scout.Widget();

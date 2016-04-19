@@ -8,7 +8,6 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-/* global FormSpecHelper */
 describe("WrappedForm", function() {
   var session;
   var helper;
@@ -16,7 +15,7 @@ describe("WrappedForm", function() {
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
-    helper = new FormSpecHelper(session);
+    helper = new scout.FormSpecHelper(session);
   });
 
   function createField(model) {

@@ -8,14 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-/* global FormSpecHelper */
 describe("FormMenu", function() {
   var session, desktop, helper;
 
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
-    helper = new FormSpecHelper(session);
+    helper = new scout.FormSpecHelper(session);
     desktop = {
       $parent: session.$entryPoint,
       $toolContainer: session.$entryPoint.appendDiv('desktop-tool-box').hide()

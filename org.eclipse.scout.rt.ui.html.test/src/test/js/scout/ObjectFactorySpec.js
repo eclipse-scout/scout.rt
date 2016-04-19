@@ -8,7 +8,6 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-/* global scout.LocaleSpecHelper*/
 describe('ObjectFactory', function() {
 
   beforeEach(function() {

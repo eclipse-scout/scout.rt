@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-/* global scout.TableSpecHelper, scout.LocaleSpecHelper */
+/* global removePopups */
 describe("Table", function() {
   var session;
   var helper;

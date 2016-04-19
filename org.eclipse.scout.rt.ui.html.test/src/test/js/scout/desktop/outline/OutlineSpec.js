@@ -8,14 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-/* global OutlineSpecHelper */
 describe("Outline", function() {
   var helper, session;
 
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
-    helper = new OutlineSpecHelper(session);
+    helper = new scout.OutlineSpecHelper(session);
     jasmine.Ajax.install();
     jasmine.clock().install();
   });

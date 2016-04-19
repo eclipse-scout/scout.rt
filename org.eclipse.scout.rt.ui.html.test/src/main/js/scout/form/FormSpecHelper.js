@@ -8,11 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-var FormSpecHelper = function(session) {
+scout.FormSpecHelper = function(session) {
   this.session = session;
 };
 
-FormSpecHelper.prototype.createFormWithOneField = function(parentId) {
+scout.FormSpecHelper.prototype.createFormWithOneField = function(parentId) {
   var form = this.createFormModel();
   var rootGroupBox = this.createGroupBoxModel();
   var field = this.createFieldModel('StringField');
@@ -25,7 +25,7 @@ FormSpecHelper.prototype.createFormWithOneField = function(parentId) {
   return createAdapter(form, this.session, [rootGroupBox, field]);
 };
 
-FormSpecHelper.prototype.createGroupBoxWithOneField = function(parentId) {
+scout.FormSpecHelper.prototype.createGroupBoxWithOneField = function(parentId) {
   var groupBox = this.createGroupBoxModel();
   var field = this.createFieldModel('StringField');
 
@@ -35,7 +35,7 @@ FormSpecHelper.prototype.createGroupBoxWithOneField = function(parentId) {
   return createAdapter(groupBox, this.session, [field]);
 };
 
-FormSpecHelper.prototype.createFormModel = function() {
+scout.FormSpecHelper.prototype.createFormModel = function() {
   var form = createSimpleModel('Form', this.session);
   // By definition, a Form must have a 'displayParent'. That is why a mocked parent is set.
   form.parent = {
@@ -53,7 +53,7 @@ FormSpecHelper.prototype.createFormModel = function() {
   return form;
 };
 
-FormSpecHelper.prototype.createFieldModel = function(objectType) {
+scout.FormSpecHelper.prototype.createFieldModel = function(objectType) {
   var session = this.session;
   var model = createSimpleModel(objectType || 'StringField', session);
   model.enabled = true;
@@ -61,11 +61,11 @@ FormSpecHelper.prototype.createFieldModel = function(objectType) {
   return model;
 };
 
-FormSpecHelper.prototype.createGroupBoxModel = function() {
+scout.FormSpecHelper.prototype.createGroupBoxModel = function() {
   return this.createFieldModel('GroupBox');
 };
 
-FormSpecHelper.prototype.createFormXFields = function(x, isModal, parentId) {
+scout.FormSpecHelper.prototype.createFormXFields = function(x, isModal, parentId) {
   var form = isModal ? this.createFormModelWithDisplayHint('dialog') : this.createFormModelWithDisplayHint('view');
   var rootGroupBox = this.createGroupBoxModel();
   var fields = [];
@@ -83,7 +83,7 @@ FormSpecHelper.prototype.createFormXFields = function(x, isModal, parentId) {
   return createAdapter(form, this.session, fields);
 };
 
-FormSpecHelper.prototype.createFormModelWithDisplayHint = function(displayHint) {
+scout.FormSpecHelper.prototype.createFormModelWithDisplayHint = function(displayHint) {
   var model = this.createFormModel();
   model.displayHint = displayHint;
   return model;
@@ -94,7 +94,7 @@ FormSpecHelper.prototype.createFormModelWithDisplayHint = function(displayHint) 
  * Expects model.fields to be set, creates an adapter for each field.
  * Also replaces model.fields with the ids of the fields.
  */
-FormSpecHelper.prototype.createCompositeField = function(session, model) {
+scout.FormSpecHelper.prototype.createCompositeField = function(session, model) {
   var fields = model.fields || [];
   model.fields = [];
   fields.forEach(function(field) {

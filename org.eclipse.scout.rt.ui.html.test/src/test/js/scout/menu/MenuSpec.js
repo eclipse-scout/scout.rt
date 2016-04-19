@@ -8,7 +8,6 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-/* global scout.MenuSpecHelper */
 describe("Menu", function() {
 
   var helper, session, $sandbox, modelMenu1, modelMenu2, menu1, menu2;

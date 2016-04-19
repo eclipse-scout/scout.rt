@@ -8,16 +8,15 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-/* global FormSpecHelper */
-var OutlineSpecHelper = function(session) {
+scout.OutlineSpecHelper = function(session) {
   this.session = session;
 };
 
-OutlineSpecHelper.prototype.createModelFixture = function(nodeCount, depth, expanded) {
+scout.OutlineSpecHelper.prototype.createModelFixture = function(nodeCount, depth, expanded) {
   return this.createModel(this.createModelNodes(nodeCount, depth, expanded));
 };
 
-OutlineSpecHelper.prototype.createModel = function(nodes) {
+scout.OutlineSpecHelper.prototype.createModel = function(nodes) {
   var model = createSimpleModel('Outline', this.session);
 
   if (nodes) {
@@ -27,18 +26,18 @@ OutlineSpecHelper.prototype.createModel = function(nodes) {
   return model;
 };
 
-OutlineSpecHelper.prototype.createModelNode = function (id, text) {
+scout.OutlineSpecHelper.prototype.createModelNode = function (id, text) {
   return {
     "id": id,
     "text": text
   };
 };
 
-OutlineSpecHelper.prototype.createModelNodes = function (nodeCount, depth, expanded) {
+scout.OutlineSpecHelper.prototype.createModelNodes = function (nodeCount, depth, expanded) {
   return this.createModelNodesInternal(nodeCount, depth, expanded);
 };
 
-OutlineSpecHelper.prototype.createModelNodesInternal = function(nodeCount, depth, expanded, parentNode) {
+scout.OutlineSpecHelper.prototype.createModelNodesInternal = function(nodeCount, depth, expanded, parentNode) {
   if (!nodeCount) {
     return;
   }
@@ -62,7 +61,7 @@ OutlineSpecHelper.prototype.createModelNodesInternal = function(nodeCount, depth
   return nodes;
 };
 
-OutlineSpecHelper.prototype.createOutline = function(model) {
+scout.OutlineSpecHelper.prototype.createOutline = function(model) {
   var tree = new scout.Outline();
   tree.init(model);
   return tree;
@@ -71,11 +70,11 @@ OutlineSpecHelper.prototype.createOutline = function(model) {
 /**
  * Creates an outline with 3 nodes, the first node has a visible detail form
  */
-OutlineSpecHelper.prototype.createOutlineWithOneDetailForm = function() {
+scout.OutlineSpecHelper.prototype.createOutlineWithOneDetailForm = function() {
   var model = this.createModelFixture(3, 2, true);
   var outline = this.createOutline(model);
   var node = model.nodes[0];
-  node.detailForm = new FormSpecHelper(this.session).createFormWithOneField();
+  node.detailForm = new scout.FormSpecHelper(this.session).createFormWithOneField();
   node.detailFormVisible = true;
   return outline;
 };
