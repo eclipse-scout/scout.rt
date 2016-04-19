@@ -11,9 +11,8 @@
 /**
  * Composite keystroke to provide a numeric keystroke to select view tabs.
  */
-scout.ViewTabSelectKeyStroke = function(header) {
+scout.ViewTabSelectKeyStroke = function(desktop) {
   scout.ViewTabSelectKeyStroke.parent.call(this);
-  var desktop = header.desktop;
   this.field = desktop;
   this._viewTabsController = desktop.viewTabsController;
 

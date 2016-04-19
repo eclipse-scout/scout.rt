@@ -43,7 +43,6 @@ import org.eclipse.scout.rt.client.services.common.icon.IIconProviderService;
 import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
 import org.eclipse.scout.rt.client.ui.MouseButton;
-import org.eclipse.scout.rt.client.ui.action.ActionFinder;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.keystroke.KeyStroke;
@@ -786,8 +785,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   @Deprecated
   @Override
   public <T extends IMenu> T getMenu(Class<T> menuType) {
-    // ActionFinder performs instance-of checks. Hence the menu replacement mapping is not required
-    return new ActionFinder().findAction(getMenus(), menuType);
+    return getMenuByClass(menuType);
   }
 
   @Override

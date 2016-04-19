@@ -68,7 +68,6 @@
   __include("scout/keystroke/VirtualKeyStrokeEvent.js");
   __include("scout/keystroke/KeyStrokeManager.js");
   __include("scout/keystroke/KeyStrokeContext.js");
-  __include("scout/keystroke/KeyStrokeSupport.js");
   __include("scout/keystroke/InputFieldKeyStrokeContext.js");
   __include("scout/keystroke/KeyStroke.js");
   __include("scout/keystroke/RangeKeyStroke.js");
@@ -111,16 +110,18 @@
   __include("scout/menu/menus.js");
   __include("scout/menu/Menu.js");
   __include("scout/menu/MenuKeyStroke.js");
-  __include("scout/menu/MenuBar.js");
-  __include("scout/menu/MenuBarLeftKeyStroke.js");
-  __include("scout/menu/MenuBarRightKeyStroke.js");
-  __include("scout/menu/MenuBarLayout.js");
   __include("scout/menu/MenuExecKeyStroke.js");
   __include("scout/menu/MenuItemsOrder.js");
   __include("scout/menu/ContextMenuPopup.js");
   __include("scout/menu/menuNavigationKeyStrokes.js");
-  __include("scout/menu/MenuBarPopup.js");
   __include("scout/menu/ButtonAdapterMenu.js");
+  __include("scout/menu/menubox/MenuBox.js");
+  __include("scout/menu/menubox/MenuBoxLayout.js");
+  __include("scout/menu/menubar/MenuBar.js");
+  __include("scout/menu/menubar/MenuBarLayout.js");
+  __include("scout/menu/menubar/MenuBarLeftKeyStroke.js");
+  __include("scout/menu/menubar/MenuBarRightKeyStroke.js");
+  __include("scout/menu/menubar/MenuBarPopup.js");
   __include("scout/calendar/Calendar.js");
   __include("scout/calendar/CalendarComponent.js");
   __include("scout/calendar/CalendarListComponent.js");
@@ -138,9 +139,9 @@
   // Form
   __include("scout/form/Form.js");
   __include("scout/form/FormLayout.js");
-  __include("scout/form/FormToolButton.js");
-  __include("scout/form/FormToolPopup.js");
-  __include("scout/form/FormToolPopupLayout.js");
+  __include("scout/form/FormMenu.js");
+  __include("scout/form/FormMenuPopup.js");
+  __include("scout/form/FormMenuPopupLayout.js");
   __include("scout/form/DialogLayout.js");
   // Table
   __include("scout/table/Table.js");
@@ -168,7 +169,7 @@
   __include("scout/table/columns/IconColumn.js"); //requires Column.js
   __include("scout/table/columns/NumberColumn.js"); //requires Column.js
   __include("scout/table/controls/TableControl.js");
-  __include("scout/table/controls/TableControlAdapterMenu.js"); // requires FormToolButton and TableControl
+  __include("scout/table/controls/TableControlAdapterMenu.js"); // requires FormMenu and TableControl
   __include("scout/table/controls/AggregateTableControl.js"); // requires TableControl.js
   __include("scout/table/controls/FormTableControl.js"); // requires TableControl.js
   __include("scout/table/controls/FormTableControlLayout.js");
@@ -226,13 +227,13 @@
   __include("scout/desktop/bench/DesktopBenchLayout.js");
   __include("scout/desktop/header/DesktopHeader.js");
   __include("scout/desktop/header/DesktopHeaderLayout.js");
-  __include("scout/desktop/header/DisableBrowserTabSwitchingKeyStroke.js");
   __include("scout/desktop/navigation/DesktopNavigation.js");
   __include("scout/desktop/navigation/DesktopNavigationLayout.js");
   __include("scout/desktop/notification/DesktopNotification.js");
   __include("scout/desktop/notification/OfflineDesktopNotification.js");
   __include("scout/desktop/popupblocker/PopupBlockerHandler.js");
   __include("scout/desktop/popupblocker/PopupBlockerDesktopNotification.js");
+  __include("scout/desktop/toolbox/DesktopToolBox.js");
   __include("scout/desktop/viewbutton/ViewButton.js");
   __include("scout/desktop/viewbutton/ViewButtons.js");
   __include("scout/desktop/viewbutton/ViewButtonsLayout.js");
@@ -242,6 +243,7 @@
   __include("scout/desktop/viewtab/DesktopViewTab.js");
   __include("scout/desktop/viewtab/DesktopViewTabs.js");
   __include("scout/desktop/viewtab/DesktopViewTabsLayout.js");
+  __include("scout/desktop/viewtab/DisableBrowserTabSwitchingKeyStroke.js");
   __include("scout/desktop/viewtab/ViewTabsController.js");
   __include("scout/desktop/viewtab/ViewTabSelectKeyStroke.js");
   __include("scout/desktop/outline/DetailTableTreeFilter.js");
@@ -307,6 +309,7 @@
   __include("scout/form/fields/radiobutton/RadioButtonGroup.js");
   __include("scout/form/fields/radiobutton/RadioButtonGroupLeftKeyStroke.js");
   __include("scout/form/fields/radiobutton/RadioButtonGroupRightKeyStroke.js");
+  __include("scout/form/fields/radiobutton/RadioButtonKeyStroke.js");
   __include("scout/form/fields/sequencebox/SequenceBox.js");
   __include("scout/form/fields/slider/SliderField.js");
   __include("scout/form/fields/smartfield/SmartField.js");

@@ -85,7 +85,7 @@ scout.DesktopViewTab.prototype.deselect = function() {
 };
 
 scout.DesktopViewTab.prototype._onMouseDown = function(event) {
-  this.events.trigger('tabClicked', this);
+  this.trigger('tabClicked', this);
 };
 
 scout.DesktopViewTab.prototype._titlesUpdated = function() {
@@ -126,7 +126,7 @@ scout.DesktopViewTab.prototype._onViewRemoved = function() {
   if (this.rendered) {
     this.remove();
   } else {
-    this._trigger('remove');
+    this.trigger('remove');
   }
 };
 

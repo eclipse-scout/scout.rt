@@ -115,6 +115,9 @@
       "updateDisplayTextOnModify": false,
       "maxLength": 4000
     },
+    "WrappedFormField": {
+      "initialFocusEnabled": false
+    },
     "DateField": {
       "hasDate": true,
       "hasTime": false
@@ -139,7 +142,7 @@
     },
     "Desktop": {
       "desktopStyle": "DEFAULT",
-      "actions": [],
+      "menus": [],
       "addOns": [],
       "dialogs": [],
       "views": [],

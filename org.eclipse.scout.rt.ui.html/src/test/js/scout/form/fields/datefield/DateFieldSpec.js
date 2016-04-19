@@ -60,6 +60,19 @@ describe("DateField", function() {
     return $('.date-picker');
   }
 
+
+  // Used to expect a date.
+  // Deals with the akward 0=january behavior of the Date#getMonth() method,
+  // which means month=1 is january
+  function expectDate(date, year, month, day) {
+    if (month === 0) {
+      throw new Error('invalid month 0. Months start at 1=january');
+    }
+    expect(date.getFullYear()).toBe(year);
+    expect(date.getMonth()).toBe(month - 1);
+    expect(date.getDate()).toBe(day);
+  }
+
   describe("Clicking the field", function() {
 
     it("opens the datepicker", function() {
@@ -71,6 +84,21 @@ describe("DateField", function() {
       dateField.$dateField.triggerMouseDown();
 
       expect(findPicker().length).toBe(1);
+    });
+
+  });
+
+  describe("Rendering", function() {
+
+    it("the displayText correctly", function() {
+      var model = createModel();
+      model.displayText = '14.04.2016\n12:28';
+      model.hasDate = true;
+      model.hasTime = true;
+      var dateField = createField(model);
+      dateField.render(session.$entryPoint);
+      expect(dateField.$dateField.val()).toBe('14.04.2016');
+      expect(dateField.$timeField.val()).toBe('12:28');
     });
 
   });
@@ -94,9 +122,7 @@ describe("DateField", function() {
       // Set reference date, so result is reliable for testing
       dateField.autoTimestampAsDate = new Date(2015, 10, 1);
       dateField.$dateField.val('02');
-
       dateField._onDateFieldBlur();
-
       expect(dateField.$dateField.val()).toBe('02.11.2015');
     });
 
@@ -106,9 +132,7 @@ describe("DateField", function() {
       var dateField = createFieldAndFocusAndOpenPicker(model);
 
       dateField.$dateField.val('02');
-
       dateField._onDateFieldBlur();
-
       expect(dateField.$dateField.val()).toBe('02.10.1999');
     });
 
@@ -117,21 +141,15 @@ describe("DateField", function() {
       model.timestamp = '2014-10-01';
       var dateField = createFieldAndFocusAndOpenPicker(model);
       var dateBefore = dateField.timestampAsDate;
-      expect(dateBefore.getFullYear()).toBe(2014);
-      expect(dateBefore.getMonth()).toBe(9);
-      expect(dateBefore.getDate()).toBe(1);
+      expectDate(dateBefore, 2014, 10, 1);
 
       dateField.$dateField.val('11.02.2015');
       dateBefore = dateField.timestampAsDate;
-      expect(dateBefore.getFullYear()).toBe(2014);
-      expect(dateBefore.getMonth()).toBe(9);
-      expect(dateBefore.getDate()).toBe(1);
+      expectDate(dateBefore, 2014, 10, 1);
 
       dateField._onDateFieldBlur();
-      var date= dateField.timestampAsDate;
-      expect(date.getFullYear()).toBe(2015);
-      expect(date.getMonth()).toBe(1);
-      expect(date.getDate()).toBe(11);
+      var date = dateField.timestampAsDate;
+      expectDate(date, 2015, 2, 11);
     });
 
   });
@@ -183,23 +201,15 @@ describe("DateField", function() {
         model.timestamp = '2014-10-01';
         var dateField = createFieldAndFocusAndOpenPicker(model);
         var dateBefore = dateField.timestampAsDate;
-        expect(dateBefore.getFullYear()).toBe(2014);
-        expect(dateBefore.getMonth()).toBe(9);
-        expect(dateBefore.getDate()).toBe(1);
-
+        expectDate(dateBefore, 2014, 10, 1);
 
         dateField.$dateField.val('11.02.2015');
         dateBefore=dateField.timestampAsDate;
-        expect(dateBefore.getFullYear()).toBe(2014);
-        expect(dateBefore.getMonth()).toBe(9);
-        expect(dateBefore.getDate()).toBe(1);
-
+        expectDate(dateBefore, 2014, 10, 1);
 
         dateField.$dateField.triggerKeyDown(scout.keys.ENTER);
         var date= dateField.timestampAsDate;
-        expect(date.getFullYear()).toBe(2015);
-        expect(date.getMonth()).toBe(1);
-        expect(date.getDate()).toBe(11);
+        expectDate(date, 2015, 2, 11);
         expect(findPicker().length).toBe(0);
       });
 
@@ -207,58 +217,46 @@ describe("DateField", function() {
 
     describe("DOWN", function() {
 
-      it("increases day by one", function() {
-        var model = createModel();
+      var model;
+
+      beforeEach(function() {
+        model = createModel();
         model.timestamp = '2014-10-01';
+        model.displayText = '01.10.2014\n';
+      });
+
+      it("increases day by one", function() {
         var dateField = createFieldAndFocusAndOpenPicker(model);
         var dateBefore = dateField.timestampAsDate;
-        expect(dateBefore.getFullYear()).toBe(2014);
-        expect(dateBefore.getMonth()).toBe(9);
-        expect(dateBefore.getDate()).toBe(1);
+        expectDate(dateBefore, 2014, 10, 1);
 
         dateField.$dateField.triggerKeyDown(scout.keys.DOWN);
 
         dateBefore = dateField.timestampAsDate;
-        expect(dateBefore.getFullYear()).toBe(2014);
-        expect(dateBefore.getMonth()).toBe(9);
-        expect(dateBefore.getDate()).toBe(1);
+        expectDate(dateBefore, 2014, 10, 1);
         expect(dateField.$dateField.val()).toBe('02.10.2014');
       });
 
       it("increases month by one if shift is used as modifier", function() {
-        var model = createModel();
-        model.timestamp = '2014-10-01';
         var dateField = createFieldAndFocusAndOpenPicker(model);
         var dateBefore = dateField.timestampAsDate;
-        expect(dateBefore.getFullYear()).toBe(2014);
-        expect(dateBefore.getMonth()).toBe(9);
-        expect(dateBefore.getDate()).toBe(1);
+        expectDate(dateBefore, 2014, 10, 1);
 
         dateField.$dateField.triggerKeyDown(scout.keys.DOWN, 'shift');
         dateBefore = dateField.timestampAsDate;
-        expect(dateBefore.getFullYear()).toBe(2014);
-        expect(dateBefore.getMonth()).toBe(9);
-        expect(dateBefore.getDate()).toBe(1);
-
+        expectDate(dateBefore, 2014, 10, 1);
         expect(dateField.$dateField.val()).toBe('01.11.2014');
       });
 
       it("increases year by one if ctrl is used as modifier", function() {
-        var model = createModel();
-        model.timestamp = '2014-10-01';
         var dateField = createFieldAndFocusAndOpenPicker(model);
         var dateBefore = dateField.timestampAsDate;
-        expect(dateBefore.getFullYear()).toBe(2014);
-        expect(dateBefore.getMonth()).toBe(9);
-        expect(dateBefore.getDate()).toBe(1);
+        expectDate(dateBefore, 2014, 10, 1);
 
         dateField.$dateField.triggerKeyDown(scout.keys.DOWN, 'ctrl');
 
         dateBefore = dateField.timestampAsDate;
-        expect(dateBefore.getFullYear()).toBe(2014);
-        expect(dateBefore.getMonth()).toBe(9);
-        expect(dateBefore.getDate()).toBe(1);
-
+        expectDate(dateBefore, 2014, 10, 1);
         expect(dateField.$dateField.val()).toBe('01.10.2015');
       });
 
@@ -266,57 +264,47 @@ describe("DateField", function() {
 
     describe("UP", function() {
 
-      it("decreases day by one", function() {
-        var model = createModel();
+      var model;
+
+      beforeEach(function() {
+        model = createModel();
         model.timestamp = '2014-10-01';
+        model.displayText = '01.10.2014\n';
+      });
+
+      it("decreases day by one", function() {
         var dateField = createFieldAndFocusAndOpenPicker(model);
         var dateBefore = dateField.timestampAsDate;
-        expect(dateBefore.getFullYear()).toBe(2014);
-        expect(dateBefore.getMonth()).toBe(9);
-        expect(dateBefore.getDate()).toBe(1);
+        expectDate(dateBefore, 2014, 10, 1);
 
         dateField.$dateField.triggerKeyDown(scout.keys.UP);
 
         dateBefore = dateField.timestampAsDate;
-        expect(dateBefore.getFullYear()).toBe(2014);
-        expect(dateBefore.getMonth()).toBe(9);
-        expect(dateBefore.getDate()).toBe(1);
+        expectDate(dateBefore, 2014, 10, 1);
         expect(dateField.$dateField.val()).toBe('30.09.2014');
       });
 
       it("decreases month by one if shift is used as modifier", function() {
-        var model = createModel();
-        model.timestamp = '2014-10-01';
         var dateField = createFieldAndFocusAndOpenPicker(model);
         var dateBefore = dateField.timestampAsDate;
-        expect(dateBefore.getFullYear()).toBe(2014);
-        expect(dateBefore.getMonth()).toBe(9);
-        expect(dateBefore.getDate()).toBe(1);
+        expectDate(dateBefore, 2014, 10, 1);
 
         dateField.$dateField.triggerKeyDown(scout.keys.UP, 'shift');
 
         dateBefore = dateField.timestampAsDate;
-        expect(dateBefore.getFullYear()).toBe(2014);
-        expect(dateBefore.getMonth()).toBe(9);
-        expect(dateBefore.getDate()).toBe(1);
+        expectDate(dateBefore, 2014, 10, 1);
         expect(dateField.$dateField.val()).toBe('01.09.2014');
       });
 
       it("decreases year by one if ctrl is used as modifier", function() {
-        var model = createModel();
-        model.timestamp = '2014-10-01';
         var dateField = createFieldAndFocusAndOpenPicker(model);
         var dateBefore = dateField.timestampAsDate;
-        expect(dateBefore.getFullYear()).toBe(2014);
-        expect(dateBefore.getMonth()).toBe(9);
-        expect(dateBefore.getDate()).toBe(1);
+        expectDate(dateBefore, 2014, 10, 1);
 
         dateField.$dateField.triggerKeyDown(scout.keys.UP, 'ctrl');
 
         dateBefore = dateField.timestampAsDate;
-        expect(dateBefore.getFullYear()).toBe(2014);
-        expect(dateBefore.getMonth()).toBe(9);
-        expect(dateBefore.getDate()).toBe(1);
+        expectDate(dateBefore, 2014, 10, 1);
         expect(dateField.$dateField.val()).toBe('01.10.2013');
       });
 
@@ -372,6 +360,42 @@ describe("DateField", function() {
       expectPrediction('0', '01.' + ('0' + (now.getMonth() + 1)).slice(-2) + '.' + now.getFullYear());
       expectPrediction('1', '1.' + ('0' + (now.getMonth() + 1)).slice(-2) + '.' + now.getFullYear());
       expectPrediction('2', '2.' + ('0' + (now.getMonth() + 1)).slice(-2) + '.' + now.getFullYear());
+    });
+
+  });
+
+  describe("Allowed dates", function() {
+
+    it("_referenceDate returns only allowed date - only one date", function() {
+      var model = createModel();
+      model.allowedDates = ["2016-04-15"];
+      var dateField = createField(model);
+      var date = dateField._referenceDate();
+      expectDate(date, 2016, 4, 15);
+    });
+
+    it("_referenceDate returns only allowed date - choose nearest date in the future", function() {
+      var model = createModel();
+      model.allowedDates = ["2016-03-14", "2016-04-16", "2016-04-17"];
+      model.autoTimestampAsDate = new Date(2016, 3, 15);
+      var dateField = createField(model);
+      var date = dateField._referenceDate();
+      expectDate(date, 2016, 4, 16);
+    });
+
+    it("_referenceDate returns only allowed date - when no date in future is available, choose nearest date in past", function() {
+      var model = createModel();
+      model.allowedDates = ["2016-02-14", "2016-03-16", "2016-04-03"];
+      model.autoTimestampAsDate = new Date(2016, 3, 15);
+      var dateField = createField(model);
+      var date = dateField._referenceDate();
+      expectDate(date, 2016, 4, 3);
+    });
+
+    it("_syncAllowedDates must convert date strings into Dates", function() {
+      var dateField = createField(createModel());
+      dateField._syncAllowedDates(["2016-02-14"]);
+      expectDate(dateField.allowedDates[0], 2016, 2, 14);
     });
 
   });

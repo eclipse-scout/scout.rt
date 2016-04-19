@@ -151,7 +151,7 @@ scout.CalendarComponent.prototype.setSelected = function(selected) {
   var oldSelected = this._selected;
   this._selected = selected;
   if (oldSelected !== selected) {
-    this.events.trigger('selected', {
+    this.trigger('selected', {
       selected: selected
     });
     this._renderSelected();

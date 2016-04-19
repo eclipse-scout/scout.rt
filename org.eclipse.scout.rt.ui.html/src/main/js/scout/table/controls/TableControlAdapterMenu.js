@@ -14,7 +14,7 @@ scout.TableControlAdapterMenu = function() {
   this._tableControlPropertyChangeHandler = this._onTableControlPropertyChange.bind(this);
   this._tableControlDestroyHandler = this._onTableControlDestroy.bind(this);
 };
-scout.inherits(scout.TableControlAdapterMenu, scout.FormToolButton);
+scout.inherits(scout.TableControlAdapterMenu, scout.FormMenu);
 
 /**
  * @override Action.js

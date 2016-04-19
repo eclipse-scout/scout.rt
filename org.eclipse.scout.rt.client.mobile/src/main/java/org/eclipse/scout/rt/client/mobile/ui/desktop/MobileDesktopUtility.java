@@ -11,10 +11,10 @@
 package org.eclipse.scout.rt.client.mobile.ui.desktop;
 
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
-import org.eclipse.scout.rt.client.ui.action.tool.IToolButton;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
-import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractFormToolButton;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
+import org.eclipse.scout.rt.client.ui.form.AbstractFormMenu;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.GridData;
 
@@ -40,19 +40,19 @@ public class MobileDesktopUtility {
   }
 
   public static boolean isToolForm(IForm form) {
-    if (getToolButtonFor(form) != null) {
+    if (getMenuFor(form) != null) {
       return true;
     }
 
     return false;
   }
 
-  public static IToolButton getToolButtonFor(IForm form) {
-    for (IToolButton toolButton : getDesktop().getToolButtons()) {
-      if (toolButton instanceof AbstractFormToolButton) {
-        IForm toolForm = ((AbstractFormToolButton<?>) toolButton).getForm();
+  public static IMenu getMenuFor(IForm form) {
+    for (IMenu menu : getDesktop().getMenus()) {
+      if (menu instanceof AbstractFormMenu) {
+        IForm toolForm = ((AbstractFormMenu<?>) menu).getForm();
         if (form == toolForm) {
-          return toolButton;
+          return menu;
         }
       }
     }
@@ -61,9 +61,9 @@ public class MobileDesktopUtility {
   }
 
   public static void openToolForm(IForm form) {
-    IToolButton toolButton = getToolButtonFor(form);
-    if (toolButton != null) {
-      toolButton.setSelected(true);
+    IMenu menu = getMenuFor(form);
+    if (menu != null) {
+      menu.setSelected(true);
     }
     //Double check to make sure it really will be added
     if (!getDesktop().isShowing(form)) {
@@ -72,9 +72,9 @@ public class MobileDesktopUtility {
   }
 
   public static void closeToolForm(IForm form) {
-    IToolButton toolButton = getToolButtonFor(form);
-    if (toolButton != null) {
-      toolButton.setSelected(false);
+    IMenu menu = getMenuFor(form);
+    if (menu != null) {
+      menu.setSelected(false);
     }
     //Double check to make sure it really will be removed
     if (getDesktop().isShowing(form)) {
@@ -83,9 +83,9 @@ public class MobileDesktopUtility {
   }
 
   public static void closeAllToolForms() {
-    for (IToolButton toolButton : getDesktop().getToolButtons()) {
-      if (toolButton.isVisible()) {
-        toolButton.setSelected(false);
+    for (IMenu menu : getDesktop().getMenus()) {
+      if (menu.isVisible()) {
+        menu.setSelected(false);
       }
     }
   }

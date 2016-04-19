@@ -79,5 +79,4 @@ public abstract class AbstractLookupService<LOOKUP_ROW_KEY_TYPE> implements ILoo
     }
     return list;
   }
-
 }

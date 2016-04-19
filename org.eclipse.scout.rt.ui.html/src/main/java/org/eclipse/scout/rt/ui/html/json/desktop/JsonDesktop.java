@@ -10,12 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.desktop;
 
-import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.eclipse.scout.rt.client.ui.IDisplayParent;
-import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.view.IViewButton;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
 import org.eclipse.scout.rt.client.ui.desktop.BrowserHistoryEntry;
@@ -28,9 +27,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
-import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
@@ -86,7 +83,7 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
     attachGlobalAdapters(getModel().getDialogs(getModel(), false));
     attachGlobalAdapters(getModel().getMessageBoxes(getModel()));
     attachGlobalAdapters(getModel().getFileChoosers(getModel()));
-    attachAdapters(filterModelActions(), new DisplayableActionFilter<IAction>());
+    attachAdapters(getModel().getMenus(), new DisplayableActionFilter<IMenu>());
     attachAdapters(getModel().getAddOns());
     attachAdapters(getModel().getKeyStrokes(), new DisplayableActionFilter<IKeyStroke>());
     attachAdapters(getModel().getViewButtons(), new DisplayableActionFilter<IViewButton>());
@@ -168,22 +165,6 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
   public void cleanUpEventFilters() {
     super.cleanUpEventFilters();
     m_desktopEventFilter.removeAllConditions();
-  }
-
-  /**
-   * Returns all filtered list of all {@link IAction}s provided by the desktop. The list does <b>not</b> include
-   * {@link IKeyStroke}s and {@link IViewButton}s, because those action types are handled separately. The returned list
-   * is ordered according to the actions {@link Order} annotation.
-   */
-  protected List<IAction> filterModelActions() {
-    OrderedCollection<IAction> result = new OrderedCollection<>();
-    for (IAction action : getModel().getActions()) {
-      if (action instanceof IKeyStroke || action instanceof IViewButton) {
-        continue; // skip
-      }
-      result.addOrdered(action);
-    }
-    return result.getOrderedList();
   }
 
   @Override
@@ -289,7 +270,7 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
     putAdapterIdsProperty(json, "dialogs", getModel().getDialogs(getModel(), false));
     putAdapterIdsProperty(json, "messageBoxes", getModel().getMessageBoxes(getModel()));
     putAdapterIdsProperty(json, "fileChoosers", getModel().getFileChoosers(getModel()));
-    putAdapterIdsProperty(json, "actions", filterModelActions(), new DisplayableActionFilter<IAction>());
+    putAdapterIdsProperty(json, "menus", getModel().getMenus(), new DisplayableActionFilter<IMenu>());
     putAdapterIdsProperty(json, "addOns", getModel().getAddOns());
     putAdapterIdsProperty(json, "keyStrokes", getModel().getKeyStrokes(), new DisplayableActionFilter<IKeyStroke>());
     putAdapterIdsProperty(json, "viewButtons", getModel().getViewButtons(), new DisplayableActionFilter<IViewButton>());

@@ -98,16 +98,9 @@ scout.ModelAdapter.prototype._init = function(model) {
  * @param coalesceFunc (optional) coalesce function added to event-object
  */
 scout.ModelAdapter.prototype._send = function(type, data, delay, coalesceFunc) {
-  var adapter = this,
-    adapterId = this.id;
-
   // If adapter is a clone, get original adapter and get its id
-  while (adapter.cloneOf) {
-    adapter = adapter.cloneOf;
-    adapterId = adapter.id;
-  }
-
-  var event = new scout.Event(adapterId, type, data);
+  var adapter = this.original();
+  var event = new scout.Event(adapter.id, type, data);
   if (coalesceFunc) {
     event.coalesce = coalesceFunc;
   }
@@ -573,6 +566,17 @@ scout.ModelAdapter.prototype.cloneAdapter = function(modelOverride) {
 
   this.session.registerAdapterClone(this, cloneAdapter);
   return cloneAdapter;
+};
+
+/**
+ * @returns the original adapter from which this one was cloned. If it is not a clone, itself is returned.
+ */
+scout.ModelAdapter.prototype.original = function() {
+  var original = this;
+  while (original.cloneOf) {
+    original = original.cloneOf;
+  }
+  return original;
 };
 
 scout.ModelAdapter.prototype._isModelProperty = function(propertyName) {

@@ -12,7 +12,10 @@ package org.eclipse.scout.rt.client.ui.form.fields.datefield;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 
 import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
@@ -23,11 +26,15 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
+import org.eclipse.scout.rt.platform.exception.ProcessingStatus;
+import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.nls.NlsLocale;
+import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.date.DateFormatProvider;
 import org.eclipse.scout.rt.platform.util.date.DateUtility;
 import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.shared.TEXTS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -165,6 +172,7 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
     setDateFormatPattern(getConfiguredDateFormatPattern());
     setTimeFormatPattern(getConfiguredTimeFormatPattern());
     setFormat(getConfiguredFormat());
+    setAllowedDates(Collections.<Date> emptyList());
   }
 
   @Override
@@ -288,15 +296,45 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
     return m_uiFacade;
   }
 
-  // format value for display
   @Override
   protected String formatValueInternal(Date validValue) {
     if (validValue == null) {
       return "";
     }
-    DateFormat df = getDateFormat();
-    String displayValue = df.format(validValue);
-    return displayValue;
+    DateFormat dateFormat;
+    StringBuilder sb = new StringBuilder();
+    dateFormat = getIsolatedDateFormat();
+    sb.append(dateFormat == null ? "" : dateFormat.format(validValue));
+    sb.append("\n");
+    dateFormat = getIsolatedTimeFormat();
+    sb.append(dateFormat == null ? "" : dateFormat.format(validValue));
+    return sb.toString();
+  }
+
+  @Override
+  protected Date validateValueInternal(Date rawValue) {
+    rawValue = super.validateValueInternal(rawValue);
+
+    if (rawValue == null) {
+      return null;
+    }
+
+    // Check if date is allowed (if allowed dates are set)
+    if (getAllowedDates().size() > 0) {
+      Date truncDate = DateUtility.truncDate(rawValue);
+      boolean found = false;
+      for (Date allowedDate : getAllowedDates()) {
+        if (allowedDate.compareTo(truncDate) == 0) {
+          found = true;
+          break;
+        }
+      }
+      if (!found) {
+        throw new VetoException(new ProcessingStatus(TEXTS.get("DateIsNotAllowed"), IStatus.ERROR));
+      }
+    }
+
+    return rawValue;
   }
 
   @Override
@@ -307,15 +345,6 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
   @Override
   public void setTimeValue(Double d) {
     setValue(DateUtility.convertDoubleTimeToDate(d));
-  }
-
-  /**
-   * Should only be used by scout itself. Setting the display text does not trigger a change in the UI. Only the value
-   * is used and formatted in the UI.
-   */
-  @Override
-  public void setDisplayText(String s) {
-    super.setDisplayText(s); // NOSONAR override for javadoc
   }
 
   protected Date applyAutoDate(Date d) {
@@ -373,6 +402,29 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
       }
     }
     return null;
+  }
+
+  @Override
+  public void setAllowedDates(List<Date> allowedDates) {
+    if (allowedDates == null) {
+      allowedDates = Collections.emptyList();
+    }
+    else {
+      // Make sure each date is truncated and the list of dates is ordered by date
+      List<Date> sortedTruncatedDates = new ArrayList<>(allowedDates.size());
+      for (Date date : allowedDates) {
+        sortedTruncatedDates.add(DateUtility.truncDate(date));
+      }
+      Collections.sort(sortedTruncatedDates);
+      allowedDates = sortedTruncatedDates;
+    }
+    propertySupport.setProperty(PROP_ALLOWED_DATES, allowedDates);
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public List<Date> getAllowedDates() {
+    return new ArrayList<>((List<Date>) propertySupport.getProperty(PROP_ALLOWED_DATES));
   }
 
   protected class P_UIFacade implements IDateFieldUIFacade {

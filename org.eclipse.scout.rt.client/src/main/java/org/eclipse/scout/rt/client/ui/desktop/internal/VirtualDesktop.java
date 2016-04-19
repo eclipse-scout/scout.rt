@@ -56,6 +56,8 @@ import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
  * forms, fields, pages that must be done while the desktop is loading. This pattern solves the bird/egg problem in
  * initialization of an object with self-references.
  */
+
+@SuppressWarnings("deprecation")
 public class VirtualDesktop implements IDesktop {
 
   private final EventListenerList m_listenerList;
@@ -240,7 +242,6 @@ public class VirtualDesktop implements IDesktop {
     throw createUnsupportedOperationException();
   }
 
-  @SuppressWarnings("deprecation")
   @Override
   public List<IFileChooser> getFileChooserStack() {
     throw createUnsupportedOperationException();
@@ -256,7 +257,6 @@ public class VirtualDesktop implements IDesktop {
     throw createUnsupportedOperationException();
   }
 
-  @SuppressWarnings("deprecation")
   @Override
   public void addFileChooser(IFileChooser fc) {
     throw createUnsupportedOperationException();
@@ -282,7 +282,6 @@ public class VirtualDesktop implements IDesktop {
     throw createUnsupportedOperationException();
   }
 
-  @SuppressWarnings("deprecation")
   @Override
   public void addForm(IForm form) {
     throw createUnsupportedOperationException();
@@ -293,7 +292,6 @@ public class VirtualDesktop implements IDesktop {
     throw createUnsupportedOperationException();
   }
 
-  @SuppressWarnings("deprecation")
   @Override
   public void removeForm(IForm form) {
     throw createUnsupportedOperationException();
@@ -309,7 +307,6 @@ public class VirtualDesktop implements IDesktop {
     throw createUnsupportedOperationException();
   }
 
-  @SuppressWarnings("deprecation")
   @Override
   public void addMessageBox(IMessageBox mb) {
     throw createUnsupportedOperationException();
@@ -320,7 +317,6 @@ public class VirtualDesktop implements IDesktop {
     throw createUnsupportedOperationException();
   }
 
-  @SuppressWarnings("deprecation")
   @Override
   public void removeMessageBox(IMessageBox messageBox) {
     throw createUnsupportedOperationException();
@@ -367,7 +363,7 @@ public class VirtualDesktop implements IDesktop {
   }
 
   @Override
-  @SuppressWarnings("deprecation")
+
   public void ensureVisible(IForm form) {
     throw createUnsupportedOperationException();
   }
@@ -427,7 +423,6 @@ public class VirtualDesktop implements IDesktop {
     throw createUnsupportedOperationException();
   }
 
-  @SuppressWarnings("deprecation")
   @Override
   public List<IForm> getDialogStack() {
     throw createUnsupportedOperationException();
@@ -468,7 +463,6 @@ public class VirtualDesktop implements IDesktop {
     throw createUnsupportedOperationException();
   }
 
-  @SuppressWarnings("deprecation")
   @Override
   public List<IMessageBox> getMessageBoxStack() {
     throw createUnsupportedOperationException();
@@ -544,13 +538,14 @@ public class VirtualDesktop implements IDesktop {
     throw createUnsupportedOperationException();
   }
 
+  @Deprecated
   @Override
   public <T extends IToolButton> T getToolButton(Class<? extends T> searchType) {
     throw createUnsupportedOperationException();
   }
 
   @Override
-  public List<IToolButton> getToolButtons() {
+  public List<IMenu> getToolButtons() {
     throw createUnsupportedOperationException();
   }
 
@@ -569,7 +564,6 @@ public class VirtualDesktop implements IDesktop {
     throw createUnsupportedOperationException();
   }
 
-  @SuppressWarnings("deprecation")
   @Override
   public List<IForm> getViewStack() {
     throw createUnsupportedOperationException();
@@ -640,7 +634,6 @@ public class VirtualDesktop implements IDesktop {
     throw createUnsupportedOperationException();
   }
 
-  @SuppressWarnings("deprecation")
   @Override
   public void setOutline(IOutline outline) {
     throw createUnsupportedOperationException();
@@ -764,6 +757,11 @@ public class VirtualDesktop implements IDesktop {
   @Override
   public boolean isHeaderVisible() {
     return false;
+  }
+
+  @Override
+  public <T extends IMenu> T findMenu(Class<T> menuType) {
+    return null;
   }
 
 }

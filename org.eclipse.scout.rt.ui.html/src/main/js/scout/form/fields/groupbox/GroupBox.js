@@ -49,6 +49,35 @@ scout.GroupBox.prototype._initKeyStrokeContext = function(keyStrokeContext) {
 };
 
 /**
+ * @override FormField.js
+ */
+scout.GroupBox.prototype._syncKeyStrokes = function(keyStrokes, oldKeyStrokes) {
+  keyStrokes = scout.arrays.ensure(keyStrokes);
+
+  var groupBoxRenderingHints = {
+    render: function() {
+      return true;
+    },
+    offset: 0,
+    hAlign: scout.hAlign.RIGHT,
+    $drawingArea: function($drawingArea, event) {
+      if (this.labelVisible) {
+        return this.$title;
+      } else {
+        return this.$body;
+      }
+    }.bind(this)
+  };
+
+  keyStrokes
+    .forEach(function(keyStroke) {
+      keyStroke.actionKeyStroke.renderingHints = $.extend({}, keyStroke.actionKeyStroke.renderingHints, groupBoxRenderingHints);
+    }, this);
+
+  scout.GroupBox.parent.prototype._syncKeyStrokes.call(this, keyStrokes, oldKeyStrokes);
+};
+
+/**
  * Returns a $container used as a bind target for the key-stroke context of the group-box.
  * By default this function returns the container of the form, or when group-box is has no
  * form as a parent the container of the group-box.
@@ -131,7 +160,7 @@ scout.GroupBox.prototype._renderStatusPosition = function() {
 };
 
 scout.GroupBox.prototype._prepareFields = function() {
-  this._keyStrokeSupport.unregisterKeyStrokes(this.processButtons);
+  this.unregisterKeyStrokes(this.processButtons);
 
   this.controls = [];
   this.systemButtons = [];
@@ -176,7 +205,7 @@ scout.GroupBox.prototype._prepareFields = function() {
       }));
     this.processMenus.push(menu);
   }, this);
-  this._keyStrokeSupport.registerKeyStrokes(this.processMenus);
+  this.registerKeyStrokes(this.processMenus);
 };
 
 scout.GroupBox.prototype._registerButtonKeyStrokes = function(button) {
@@ -314,11 +343,11 @@ scout.GroupBox.prototype._renderExpanded = function() {
 };
 
 /**
- * @override
+ * @override FormField.js
  */
-scout.GroupBox.prototype._renderLabelVisible = function(visible) {
-  visible = scout.nvl(visible, this.visible);
-  this.$title.setVisible(visible && this.label && !this.mainBox);
+scout.GroupBox.prototype._renderLabelVisible = function(labelVisible) {
+  labelVisible = scout.nvl(labelVisible, this.labelVisible);
+  this.$title.setVisible(labelVisible && this.label && !this.mainBox);
 };
 
 scout.GroupBox.prototype._syncMenus = function(menus, oldMenus) {

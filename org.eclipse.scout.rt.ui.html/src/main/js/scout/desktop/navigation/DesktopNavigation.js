@@ -118,31 +118,35 @@ scout.DesktopNavigation.prototype._renderToolBarVisible = function() {
   }
 };
 
-scout.DesktopNavigation.prototype._renderToolBar = function() {
-  if (this._$toolBar) {
-    return;
-  }
-  this._$toolBar = this.$body.beforeDiv('header-tools');
-  this.desktop.actions.forEach(function(action) {
-    action._customCssClasses = "header-tool-item compact";
-    action.popupOpeningDirectionX = 'left';
-    action.textVisible = false;
-    action.subMenuIconVisible = false;
-    action.setParent(this);
-    action.render(this._$toolBar);
-  }.bind(this));
-
-  if (this.desktop.actions) {
-    this.desktop.actions[this.desktop.actions.length - 1].$container.addClass('last');
+scout.DesktopHeader.prototype._renderLogo = function() {
+  if (!this.logo) {
+    this.logo = scout.create('DesktopLogo', {
+      parent: this,
+      url: this.logoUrl
+    });
+    this.logo.render(this.$container);
+  } else {
+    this.logo.setUrl(this.logoUrl);
   }
 };
 
-scout.DesktopNavigation.prototype._removeToolBar = function() {
-  if (!this._$toolBar) {
+scout.DesktopNavigation.prototype._renderToolBar = function() {
+  if (this.toolBar) {
     return;
   }
-  this._$toolBar.remove();
-  this._$toolBar = null;
+  this.toolBar = scout.create('DesktopToolBox', {
+    parent: this,
+    menus: this.desktop.menus
+  });
+  this.toolBar.render(this.$container);
+};
+
+scout.DesktopNavigation.prototype._removeToolBar = function() {
+  if (!this.toolBar) {
+    return;
+  }
+  this.toolBar.remove();
+  this.toolBar = null;
 };
 
 scout.DesktopNavigation.prototype._onNavigationBodyMousedown = function(event) {

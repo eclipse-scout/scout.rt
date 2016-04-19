@@ -82,7 +82,7 @@ scout.BusyIndicator.prototype._render = function($parent) {
 };
 
 scout.BusyIndicator.prototype._onClickCancel = function(event) {
-  this.events.trigger('cancel', event);
+  this.trigger('cancel', event);
 };
 
 scout.BusyIndicator.prototype._postRender = function() {

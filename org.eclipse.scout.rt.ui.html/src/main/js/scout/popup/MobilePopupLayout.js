@@ -44,10 +44,7 @@ scout.MobilePopupLayout.prototype.layout = function($container) {
  */
 scout.MobilePopupLayout.prototype.preferredLayoutSize = function($container) {
   var $window = this.popup.$container.window(),
-    windowSize = new scout.Dimension($window.width(), $window.height()),
-    htmlWidget = this.popup.widget.htmlComp,
-    popupWidth = windowSize.width,
-    popupHeight = htmlWidget.getPreferredSize().height;
+    windowSize = new scout.Dimension($window.width(), $window.height());
 
-  return new scout.Dimension(popupWidth, popupHeight);
+  return windowSize;
 };

@@ -35,7 +35,6 @@ scout.FormField = function() {
   this._addAdapterProperties(['keyStrokes', 'menus']);
   this.refFieldId;
   this.mode = scout.FormField.MODE_DEFAULT;
-  this._keyStrokeSupport = new scout.KeyStrokeSupport(this);
   this.loadingSupport; // Object to handle the 'loading' property (different for tile fields)
 
   /**
@@ -344,11 +343,13 @@ scout.FormField.prototype._updateMenus = function() {
 };
 
 scout.FormField.prototype._syncKeyStrokes = function(keyStrokes, oldKeyStrokes) {
-  this._keyStrokeSupport.syncKeyStrokes(keyStrokes, oldKeyStrokes);
+  this.updateKeyStrokes(keyStrokes, oldKeyStrokes);
+  this.keyStrokes = keyStrokes;
 };
 
 scout.FormField.prototype._syncMenus = function(menus, oldMenus) {
-  this._keyStrokeSupport.syncMenus(menus, oldMenus);
+  this.updateKeyStrokes(menus, oldMenus);
+  this.menus = menus;
 };
 
 scout.FormField.prototype._syncErrorStatus = function(errorStatus) {
@@ -391,6 +392,15 @@ scout.FormField.prototype.setMenusVisible = function(menusVisible) {
   this._setProperty('menusVisible', menusVisible);
   if (this.rendered) {
     this._renderMenusVisible();
+  }
+};
+
+scout.FormField.prototype.focus = function() {
+  if (this.$field) {
+    this.session.focusManager.requestFocus(this.$field[0]);
+  } else {
+    var element =  this.session.focusManager.findFirstFocusableElement(this.$container);
+    this.session.focusManager.requestFocus(element);
   }
 };
 

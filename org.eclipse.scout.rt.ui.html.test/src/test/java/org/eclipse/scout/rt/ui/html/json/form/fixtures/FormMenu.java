@@ -8,11 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.ui.html.json.desktop.fixtures;
+package org.eclipse.scout.rt.ui.html.json.form.fixtures;
 
-import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractFormToolButton;
+import org.eclipse.scout.rt.client.ui.form.AbstractFormMenu;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 
-public class FormToolButton extends AbstractFormToolButton<IForm> {
+public class FormMenu extends AbstractFormMenu<IForm> {
 
 }

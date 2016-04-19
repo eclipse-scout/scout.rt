@@ -17,13 +17,13 @@ import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.organizer.IOrganizeColumnsForm;
 import org.eclipse.scout.rt.client.ui.basic.table.organizer.IOrganizeColumnsFormProvider;
-import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractFormToolButton;
+import org.eclipse.scout.rt.client.ui.form.AbstractFormMenu;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.TEXTS;
 
-public class OrganizeColumnsMenu extends AbstractFormToolButton<IOrganizeColumnsForm> {
+public class OrganizeColumnsMenu extends AbstractFormMenu<IOrganizeColumnsForm> {
   private final ITable m_table;
 
   public OrganizeColumnsMenu(ITable table) {

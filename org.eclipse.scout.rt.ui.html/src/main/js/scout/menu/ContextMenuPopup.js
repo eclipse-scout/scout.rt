@@ -304,7 +304,7 @@ scout.ContextMenuPopup.prototype._renderMenuItems = function(menus, initialSubMe
       menu.setParent(this);
     }
     var menuRemoveHandler = function(event) {
-      var removedMenu = event.eventOn;
+      var removedMenu = event.source;
       if (removedMenu.cloneOf) {
         this.session.unregisterAllAdapterClones(removedMenu.cloneOf);
       }

@@ -39,6 +39,11 @@ public abstract class AbstractTableControl extends AbstractAction implements ITa
   }
 
   @Override
+  public ITable getTable() {
+    return m_table;
+  }
+
+  @Override
   protected void execSelectionChanged(boolean selected) {
     if (!selected) {
       return;

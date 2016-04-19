@@ -43,4 +43,39 @@ describe("WrappedForm", function() {
 
   });
 
+  describe("test initial focus disabled", function() {
+    it("string field in inner form hasn't focus", function() {
+      var model = createModel();
+      var innerForm = helper.createFormWithOneField();
+
+      model.innerForm = innerForm;
+
+      var field = createField(model);
+      expect(field.initialFocusEnabled).toBe(false);
+
+      field.render(session.$entryPoint);
+
+      var $stringField = innerForm.rootGroupBox.fields[0].$field;
+      expect(scout.focusUtils.isActiveElement($stringField)).toBe(false);
+    });
+  });
+
+  describe("test initial focus enabled", function() {
+    it("string field in inner form has focus", function() {
+      var model = createModel();
+      var innerForm = helper.createFormWithOneField();
+
+      model.initialFocusEnabled = true;
+      model.innerForm = innerForm;
+
+      var field = createField(model);
+      expect(field.initialFocusEnabled).toBe(true);
+
+      field.render(session.$entryPoint);
+
+      var $stringField = innerForm.rootGroupBox.fields[0].$field;
+      expect(scout.focusUtils.isActiveElement($stringField)).toBe(true);
+    });
+  });
+
 });

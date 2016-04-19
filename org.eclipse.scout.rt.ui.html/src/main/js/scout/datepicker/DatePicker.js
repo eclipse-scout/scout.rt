@@ -18,6 +18,7 @@ scout.DatePicker = function() {
   this.selectedDate;
   this.dateFormat;
   this.viewDate;
+  this.allowedDates;
   this.$container;
   this.$currentBox;
   this.$scrollable;
@@ -30,6 +31,7 @@ scout.DatePicker.prototype._init = function(options) {
   scout.DatePicker.parent.prototype._init.call(this, options);
   options = options || {};
   this.dateFormat = options.dateFormat;
+  this.allowedDates = options.allowedDates;
 };
 
 scout.DatePicker.prototype._render = function($parent) {
@@ -86,7 +88,6 @@ scout.DatePicker.prototype.show = function(viewDate, selectedDate, animated) {
   this._updateHeader(viewDate);
 
   var $box = this._build$DateBox();
-  $box.find('.date-picker-day').click(this._onDayClick.bind(this));
   $box[0].addEventListener('mousewheel', this._onMouseWheel.bind(this), false);
 
   if (animated && this.$currentBox && viewDateDiff) {
@@ -189,8 +190,17 @@ scout.DatePicker.prototype.shiftViewDate = function(years, months, days) {
 
 scout.DatePicker.prototype.shiftSelectedDate = function(years, months, days) {
   var date = this.preselectedDate;
+
   if (this.selectedDate) {
-    date = scout.dates.shift(this.selectedDate, years, months, days);
+    if (this.allowedDates) {
+      date = this._findNextAllowedDate(years, months, days);
+    } else {
+      date = scout.dates.shift(this.selectedDate, years, months, days);
+    }
+  }
+
+  if (!date) {
+    return; // do nothing when no date was found
   }
 
   this.trigger('dateSelect', {
@@ -200,9 +210,42 @@ scout.DatePicker.prototype.shiftSelectedDate = function(years, months, days) {
   this.selectDate(date, true);
 };
 
+scout.DatePicker.prototype._findNextAllowedDate = function(years, months, days) {
+  var i, date,
+    sum = years + months + days,
+    dir = sum > 0 ? 1 : -1,
+    now = this.selectedDate || scout.dates.trunc(new Date());
+
+  // if we shift by year or month, shift the 'now' date and then use that date as starting point
+  // to find the next allowed date.
+  if (years !== 0) {
+    now = scout.dates.shift(now, years, 0, 0);
+  } else if (months !== 0) {
+    now = scout.dates.shift(now, 0, months, 0);
+  }
+
+  if (dir === 1) { // find next allowed date, starting from currently selected date
+    for (i = 0; i < this.allowedDates.length; i++) {
+      date = this.allowedDates[i];
+      if (scout.dates.compare(now, date) < 0) {
+        return date;
+      }
+    }
+  } else if (dir === -1) { // find previous allowed date, starting from currently selected date
+    for (i = this.allowedDates.length - 1; i >= 0; i--) {
+      date = this.allowedDates[i];
+      if (scout.dates.compare(now, date) > 0) {
+        return date;
+      }
+    }
+  }
+
+  return null;
+};
+
 scout.DatePicker.prototype._build$DateBox = function() {
   var cl, i, now = new Date();
-  var day, dayInMonth, $day;
+  var day, dayEnabled, dayInMonth, $day;
   var weekdays = this.dateFormat.symbols.weekdaysShortOrdered;
   var start = new Date(this.viewDate);
 
@@ -245,14 +288,37 @@ scout.DatePicker.prototype._build$DateBox = function() {
       cl += ' date-picker-selected';
     }
 
+    dayEnabled = this._isDateAllowed(start);
+    if (!dayEnabled) {
+      cl += ' date-picker-disabled';
+    }
+
     day = (dayInMonth <= 9 ? '0' + dayInMonth : dayInMonth);
     $day = $box
       .appendDiv('date-picker-day' + cl, day)
       .data('dayInMonth', dayInMonth)
       .data('date', new Date(start));
+
+    if (dayEnabled) {
+      $day.on('click', this._onDayClick.bind(this));
+    }
   }
 
   return $box;
+};
+
+scout.DatePicker.prototype._isDateAllowed = function(date) {
+  // when allowedDates is empty or not set, any date is allowed
+  if (!this.allowedDates || this.allowedDates.length === 0) {
+    return true;
+  }
+  // when allowedDates is set, only dates contained in this array are allowed
+  var allowedDateAsTimestamp,
+    dateAsTimestamp = date.getTime();
+  return this.allowedDates.some(function(allowedDate) {
+    allowedDateAsTimestamp = allowedDate.getTime();
+    return allowedDateAsTimestamp === dateAsTimestamp;
+  });
 };
 
 scout.DatePicker.prototype._append$Header = function() {

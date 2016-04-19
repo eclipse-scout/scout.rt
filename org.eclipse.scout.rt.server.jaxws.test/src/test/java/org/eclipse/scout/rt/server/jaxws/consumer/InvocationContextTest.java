@@ -10,7 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.jaxws.consumer;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.anyString;
@@ -44,6 +46,7 @@ import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.server.jaxws.JaxWsTestServerSession;
+import org.eclipse.scout.rt.server.jaxws.MessageContexts;
 import org.eclipse.scout.rt.server.jaxws.implementor.JaxWsImplementorSpecifics;
 import org.eclipse.scout.rt.server.session.ServerSessionProvider;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
@@ -67,6 +70,7 @@ import org.mockito.stubbing.Answer;
 @RunWithSubject("jaxws-user")
 public class InvocationContextTest {
 
+  private static final String TESTING_CORRELATION_ID = "testingCorrelationId";
   private TestPort m_port;
   private ICommitListener m_commitListener;
   private IRollbackListener m_rollbackListener;
@@ -98,34 +102,38 @@ public class InvocationContextTest {
     final Holder<ITransaction> invocationTransaction = new Holder<>();
     final Holder<IServerSession> invocationServerSession = new Holder<>();
 
-    ServerRunContexts.copyCurrent().withTransactionScope(TransactionScope.REQUIRES_NEW).run(new IRunnable() { // set transaction boundary
-
-      @Override
-      public void run() throws Exception {
-        currentTransaction.setValue(ITransaction.CURRENT.get());
-
-        InvocationContext<TestPort> invocationContext = new InvocationContext<>(m_port, "name");
-        invocationContext.withEndpointUrl("http://localhost");
-        invocationContext.whenCommit(m_commitListener);
-        invocationContext.whenRollback(m_rollbackListener);
-        invocationContext.whenInvoke(new InvocationHandler() {
+    ServerRunContexts.copyCurrent()
+        .withCorrelationId(TESTING_CORRELATION_ID)
+        .withTransactionScope(TransactionScope.REQUIRES_NEW) // set transaction boundary
+        .run(new IRunnable() {
 
           @Override
-          public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-            invocationTransaction.setValue(ITransaction.CURRENT.get());
-            invocationServerSession.setValue(ServerSessionProvider.currentSession());
+          public void run() throws Exception {
+            currentTransaction.setValue(ITransaction.CURRENT.get());
 
-            return method.invoke(proxy, args);
+            InvocationContext<TestPort> invocationContext = new InvocationContext<>(m_port, "name");
+            invocationContext.withEndpointUrl("http://localhost");
+            invocationContext.whenCommit(m_commitListener);
+            invocationContext.whenRollback(m_rollbackListener);
+            invocationContext.whenInvoke(new InvocationHandler() {
+
+              @Override
+              public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+                invocationTransaction.setValue(ITransaction.CURRENT.get());
+                invocationServerSession.setValue(ServerSessionProvider.currentSession());
+
+                return method.invoke(proxy, args);
+              }
+            });
+
+            // run the test
+            invocationContext.getPort().webMethod();
           }
         });
 
-        // run the test
-        invocationContext.getPort().webMethod();
-      }
-    });
-
     assertSame(currentTransaction.getValue(), invocationTransaction.getValue());
     assertSame(ISession.CURRENT.get(), invocationServerSession.getValue());
+    assertEquals(TESTING_CORRELATION_ID, m_port.getRequestContext().get(MessageContexts.PROP_CORRELATION_ID));
 
     verify(m_port).webMethod();
     verify(m_commitListener).onCommitPhase1();
@@ -142,44 +150,46 @@ public class InvocationContextTest {
     final Holder<ITransaction> invocationTransaction = new Holder<>();
     final Holder<IServerSession> invocationServerSession = new Holder<>();
     final Holder<Exception> callableException = new Holder<>();
-
     // simulate that 'webMethod' throws an exception.
     final RuntimeException exception = new RuntimeException();
     doThrow(exception).when(m_port).webMethod();
 
     try {
-      ServerRunContexts.copyCurrent().withTransactionScope(TransactionScope.REQUIRES_NEW).run(new IRunnable() { // set transaction boundary
-
-        @Override
-        public void run() throws Exception {
-          currentTransaction.setValue(ITransaction.CURRENT.get());
-
-          InvocationContext<TestPort> invocationContext = new InvocationContext<>(m_port, "name");
-          invocationContext.withEndpointUrl("http://localhost");
-
-          invocationContext.whenCommit(m_commitListener);
-          invocationContext.whenRollback(m_rollbackListener);
-          invocationContext.whenInvoke(new InvocationHandler() {
+      ServerRunContexts.copyCurrent()
+          .withCorrelationId(TESTING_CORRELATION_ID)
+          .withTransactionScope(TransactionScope.REQUIRES_NEW) // set transaction boundary
+          .run(new IRunnable() {
 
             @Override
-            public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-              invocationTransaction.setValue(ITransaction.CURRENT.get());
-              invocationServerSession.setValue(ServerSessionProvider.currentSession());
+            public void run() throws Exception {
+              currentTransaction.setValue(ITransaction.CURRENT.get());
 
-              return method.invoke(proxy, args);
+              InvocationContext<TestPort> invocationContext = new InvocationContext<>(m_port, "name");
+              invocationContext.withEndpointUrl("http://localhost");
+
+              invocationContext.whenCommit(m_commitListener);
+              invocationContext.whenRollback(m_rollbackListener);
+              invocationContext.whenInvoke(new InvocationHandler() {
+
+                @Override
+                public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+                  invocationTransaction.setValue(ITransaction.CURRENT.get());
+                  invocationServerSession.setValue(ServerSessionProvider.currentSession());
+
+                  return method.invoke(proxy, args);
+                }
+              });
+
+              // run the test
+              try {
+                invocationContext.getPort().webMethod();
+              }
+              catch (Exception e) {
+                callableException.setValue(e);
+                throw e;
+              }
             }
           });
-
-          // run the test
-          try {
-            invocationContext.getPort().webMethod();
-          }
-          catch (Exception e) {
-            callableException.setValue(e);
-            throw e;
-          }
-        }
-      });
 
       fail("RuntimeException expected");
     }
@@ -189,6 +199,7 @@ public class InvocationContextTest {
 
     assertSame(currentTransaction.getValue(), invocationTransaction.getValue());
     assertSame(ISession.CURRENT.get(), invocationServerSession.getValue());
+    assertEquals(TESTING_CORRELATION_ID, m_port.getRequestContext().get(MessageContexts.PROP_CORRELATION_ID));
 
     verify(m_port).webMethod();
     verify(m_commitListener, never()).onCommitPhase1();
@@ -201,19 +212,30 @@ public class InvocationContextTest {
   public void testInvokeNotWebMethod() {
     final BooleanHolder intercepted = new BooleanHolder(false);
 
-    InvocationContext<TestPort> invocationContext = new InvocationContext<>(m_port, "name");
-    invocationContext.withEndpointUrl("http://localhost");
-    invocationContext.whenInvoke(new InvocationHandler() {
+    ServerRunContexts.copyCurrent()
+        .withCorrelationId(TESTING_CORRELATION_ID)
+        .run(new IRunnable() {
 
-      @Override
-      public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        intercepted.setValue(true);
-        return method.invoke(proxy, args);
-      }
-    });
+          @Override
+          public void run() throws Exception {
+            InvocationContext<TestPort> invocationContext = new InvocationContext<>(m_port, "name");
+            invocationContext.withEndpointUrl("http://localhost");
+            invocationContext.whenInvoke(new InvocationHandler() {
 
-    invocationContext.getPort().notWebMethod(); // invoke method which is not annotated with @WebMethod
+              @Override
+              public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+                intercepted.setValue(true);
+                return method.invoke(proxy, args);
+              }
+            });
+
+            invocationContext.getPort().notWebMethod(); // invoke method which is not annotated with @WebMethod
+          }
+        });
+
     assertFalse(intercepted.getValue()); // only methods annotated with @WebMethod are intercepted
+    assertNull(m_port.getRequestContext().get(MessageContexts.PROP_CORRELATION_ID)); // correlationId is not propagated other than web methods
+
     verify(m_port).notWebMethod();
   }
 

@@ -35,6 +35,7 @@ import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
  * <li>actions (menu, keyStroke, toolButton, viewButton)</li>
  * </ul>
  */
+@SuppressWarnings("deprecation")
 @Bean
 public interface IDesktopExtension {
 

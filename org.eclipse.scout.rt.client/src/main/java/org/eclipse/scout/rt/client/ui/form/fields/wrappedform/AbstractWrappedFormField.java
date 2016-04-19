@@ -69,6 +69,16 @@ public abstract class AbstractWrappedFormField<FORM extends IForm> extends Abstr
     return null;
   }
 
+  /**
+   * @return {@code true} if the inner form should request the initial focus once loaded, {@code false} otherwise.
+   *         Default is {@code false}.
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(210)
+  protected boolean getConfiguredInitialFocusEnabled() {
+    return false;
+  }
+
   @Override
   protected double getConfiguredGridWeightY() {
     return 1;
@@ -91,6 +101,7 @@ public abstract class AbstractWrappedFormField<FORM extends IForm> extends Abstr
     m_innerFormPropertyListener = new P_InnerFormPropertyChangeListener();
     m_innerFormSubtreePropertyListener = new P_InnerFormSubtreePropertyChangeListener();
     m_innerFormListener = new P_InnerFormListener();
+    setInitialFocusEnabled(getConfiguredInitialFocusEnabled());
     if (getConfiguredInnerForm() != null) {
       try {
         setInnerForm((FORM) getConfiguredInnerForm().newInstance(), true);
@@ -166,6 +177,16 @@ public abstract class AbstractWrappedFormField<FORM extends IForm> extends Abstr
     }
 
     interceptInnerFormChanged(oldInnerForm, m_innerForm);
+  }
+
+  @Override
+  public boolean isInitialFocusEnabled() {
+    return propertySupport.getPropertyBool(PROP_INITIAL_FOCUS_ENABLED);
+  }
+
+  @Override
+  public void setInitialFocusEnabled(boolean initialFocusEnabled) {
+    propertySupport.setPropertyBool(PROP_INITIAL_FOCUS_ENABLED, initialFocusEnabled);
   }
 
   protected void installInnerForm() {

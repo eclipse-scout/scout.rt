@@ -16,39 +16,22 @@ scout.DesktopHeaderLayout = function(header) {
 };
 scout.inherits(scout.DesktopHeaderLayout, scout.AbstractLayout);
 
-// create a clone to measure pref. width
-scout.DesktopHeaderLayout.prototype._toolsWidth = function($tools, cssClasses) {
-  var $clone = $tools.clone(),
-    $items = $clone.find('.header-tool-item');
-
-  $items
-    .removeClass('compact')
-    .removeClass('icon-only');
-
-  if (cssClasses) {
-    $items.addClass(cssClasses);
-  }
-  $clone.width('auto').appendTo(this.desktop.$container);
-  var toolsWidth = scout.graphics.getSize($clone, true).width;
-  $clone.remove();
-  return toolsWidth;
-};
-
 /**
  * @override AbstractLayout.js
  */
 scout.DesktopHeaderLayout.prototype.layout = function($container) {
-  var viewButtonsSize, toolsWidth, tabsWidth,
+  var viewButtonsPrefSize, toolBarPrefSize,
     htmlContainer = this.header.htmlComp,
     containerSize = htmlContainer.getSize(),
-    $tools = this.header.$toolBar || $(), // toolbar may be invisible and therefore null
-    $toolItems = $tools.find('.header-tool-item'),
+    toolBar = this.header.toolBar,
     viewButtons = this.header.viewButtons,
     viewTabs = this.header.viewTabs,
     smallTabsPrefSize = viewTabs.htmlComp.layout.smallPrefSize(),
     tabsPrefSize = viewTabs.htmlComp.getPreferredSize(),
+    tabsWidth = 0,
     logoWidth = 0,
-    viewButtonsWidth = 0;
+    viewButtonsWidth = 0,
+    toolBarWidth = 0;
 
   containerSize = containerSize.subtract(htmlContainer.getInsets());
 
@@ -56,78 +39,80 @@ scout.DesktopHeaderLayout.prototype.layout = function($container) {
     logoWidth = scout.graphics.getSize(this.header.logo.$container, true).width;
   }
 
-  // reset tabs and tool-items
-  if (this._$overflowTab) {
-    this._$overflowTab.remove();
-  }
-
   if (viewButtons) {
-    viewButtonsSize = viewButtons.htmlComp.getSize();
-    viewButtonsWidth = viewButtonsSize.width;
-    viewButtons.htmlComp.setSize(viewButtonsSize.subtract(viewButtons.htmlComp.getMargins()));
+    viewButtonsPrefSize = viewButtons.htmlComp.getPreferredSize();
+    viewButtonsWidth = viewButtonsPrefSize.width;
+    viewButtons.htmlComp.setSize(viewButtonsPrefSize.subtract(viewButtons.htmlComp.getMargins()));
   }
   viewTabs.htmlComp.$comp.cssLeft(viewButtonsWidth);
 
-  $toolItems.each(function() {
-    var $item = $(this);
-    $item.removeClass('compact');
-    var dataText = $item.data('item-text');
-    if (dataText) {
-      var $title = $item.find('.text');
-      $title.text(dataText);
-    }
-  });
+  if (toolBar) {
+    toolBarPrefSize = toolBar.htmlComp.getPreferredSize();
+    toolBarWidth = toolBarPrefSize.width;
+    setToolBarSize();
+    setToolBarLocation();
+  }
 
-  toolsWidth = this._toolsWidth($tools);
-  tabsWidth = containerSize.width - toolsWidth - logoWidth - viewButtonsWidth;
-  $tools.cssLeft(containerSize.width - toolsWidth - logoWidth);
-
-  this._overflowTabsIndizes = [];
+  tabsWidth = calcTabsWidth();
   if (smallTabsPrefSize.width <= tabsWidth) {
     // All tabs fit when they have small size -> use available size but max the pref size -> prefSize = size of maximumtabs if tabs use their large (max) size
     tabsWidth = Math.min(tabsPrefSize.width, tabsWidth);
-    viewTabs.htmlComp.setSize(new scout.Dimension(tabsWidth, tabsPrefSize.height));
-  } else {
-
-    // 1st try to minimize padding around tool-bar items
-    // re-calculate tabsWidth with reduced padding on the tool-bar-items
-    $toolItems.each(function() {
-      $(this).addClass('compact');
-    });
-
-    toolsWidth = scout.graphics.getSize($tools, true).width;
-    tabsWidth = containerSize.width - toolsWidth - logoWidth - viewButtonsWidth;
-    $tools.cssLeft(containerSize.width - toolsWidth - logoWidth);
-
-    if (smallTabsPrefSize.width <= tabsWidth) {
-      viewTabs.htmlComp.setSize(smallTabsPrefSize);
-      return;
-    }
-
-    // 2nd remove text from tool-bar items, only show icon
-    $toolItems.each(function() {
-      var $item = $(this),
-        $title = $item.find('.text'),
-        text = $title.text();
-      $title.empty();
-      $item.data('item-text', text);
-    });
-
-    toolsWidth = scout.graphics.getSize($tools, true).width;
-    tabsWidth = containerSize.width - toolsWidth - logoWidth - viewButtonsWidth;
-    $tools.cssLeft(containerSize.width - toolsWidth - logoWidth);
-
-    tabsWidth = Math.min(smallTabsPrefSize.width, tabsWidth);
-    viewTabs.htmlComp.setSize(new scout.Dimension(tabsWidth, tabsPrefSize.height));
+    setTabsSize();
+    return;
   }
 
-  // Make sure open popups are at the correct position after layouting
-  this.desktop.actions
-    .filter(function(action) {
-      return action.selected && action.popup;
-    })
-    .some(function(action) {
-      action.popup.position();
-      return true;
-    });
+  // 1st try to minimize padding around tool-bar items -> compact mode
+  if (toolBar) {
+    toolBarPrefSize = toolBar.htmlComp.layout.compactPrefSize();
+    toolBarWidth = toolBarPrefSize.width;
+    setToolBarSize();
+    setToolBarLocation();
+  }
+
+  tabsWidth = calcTabsWidth();
+  if (smallTabsPrefSize.width <= tabsWidth) {
+    tabsWidth = smallTabsPrefSize.width;
+    setTabsSize();
+    return;
+  }
+
+  // 2nd remove text from tool-bar items, only show icon
+  if (toolBar) {
+    toolBarPrefSize = toolBar.htmlComp.layout.shrinkPrefSize();
+    toolBarWidth = toolBarPrefSize.width;
+    setToolBarSize();
+    setToolBarLocation();
+  }
+
+  tabsWidth = calcTabsWidth();
+  tabsWidth = Math.max(Math.min(smallTabsPrefSize.width, tabsWidth), scout.DesktopViewTabsLayout.OVERFLOW_MENU_WIDTH);
+  setTabsSize();
+
+  // 3rd if only the overflow menu is shown make toolBar smaller so that ellipsis may be displayed
+  if (toolBar && tabsWidth <= scout.DesktopViewTabsLayout.OVERFLOW_MENU_WIDTH) {
+    // layout toolBar, now an ellipsis menu may be shown
+    toolBarWidth = containerSize.width - tabsWidth - logoWidth - viewButtonsWidth;
+    setToolBarSize();
+
+    // update size of the toolBar again with the actual width to make it correctly right aligned
+    toolBarWidth = toolBar.htmlComp.layout.actualPrefSize().width;
+    setToolBarSize();
+    setToolBarLocation();
+  }
+
+  function calcTabsWidth() {
+    return containerSize.width - toolBarWidth - logoWidth - viewButtonsWidth;
+  }
+
+  function setTabsSize() {
+    viewTabs.htmlComp.setSize(new scout.Dimension(tabsWidth, tabsPrefSize.height).subtract(viewTabs.htmlComp.getMargins()));
+  }
+
+  function setToolBarSize() {
+    toolBar.htmlComp.setSize(new scout.Dimension(toolBarWidth, toolBarPrefSize.height).subtract(toolBar.htmlComp.getMargins()));
+  }
+
+  function setToolBarLocation() {
+    toolBar.htmlComp.$comp.cssLeft(containerSize.width - toolBarWidth - logoWidth);
+  }
 };

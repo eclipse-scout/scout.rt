@@ -65,7 +65,6 @@ import org.eclipse.scout.rt.client.ui.DataChangeListener;
 import org.eclipse.scout.rt.client.ui.IDisplayParent;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
 import org.eclipse.scout.rt.client.ui.WeakDataChangeListener;
-import org.eclipse.scout.rt.client.ui.action.tool.IToolButton;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.FileChooser;
 import org.eclipse.scout.rt.client.ui.desktop.AbstractDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
@@ -587,11 +586,6 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   private List<Class<IFormField>> getConfiguredInjectedFields() {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
     return ConfigurationUtility.filterClassesWithInjectFieldAnnotation(dca, IFormField.class);
-  }
-
-  protected List<Class<IToolButton>> getConfiguredToolButtons() {
-    Class<?>[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
-    return ConfigurationUtility.filterClasses(dca, IToolButton.class);
   }
 
   protected final void interceptInitConfig() {

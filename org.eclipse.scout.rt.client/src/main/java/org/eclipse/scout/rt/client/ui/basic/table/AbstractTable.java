@@ -55,13 +55,10 @@ import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
 import org.eclipse.scout.rt.client.ui.MouseButton;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
-import org.eclipse.scout.rt.client.ui.action.IAction;
-import org.eclipse.scout.rt.client.ui.action.IActionVisitor;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.keystroke.KeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
-import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.ITableContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.internal.TableContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
@@ -99,7 +96,6 @@ import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ITypeWithClassId;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
-import org.eclipse.scout.rt.platform.holders.Holder;
 import org.eclipse.scout.rt.platform.html.HTML;
 import org.eclipse.scout.rt.platform.reflect.AbstractPropertyObserver;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
@@ -1806,24 +1802,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   @Deprecated
   @Override
   public <T extends IMenu> T getMenu(final Class<T> menuType) {
-    IContextMenu contextMenu = getContextMenu();
-    if (contextMenu != null) {
-      final Holder<T> resultHolder = new Holder<T>();
-      contextMenu.acceptVisitor(new IActionVisitor() {
-
-        @SuppressWarnings("unchecked")
-        @Override
-        public int visit(IAction action) {
-          if (menuType.isAssignableFrom(action.getClass())) {
-            resultHolder.setValue((T) action);
-            return CANCEL;
-          }
-          return CONTINUE;
-        }
-      });
-      return resultHolder.getValue();
-    }
-    return null;
+    return getMenuByClass(menuType);
   }
 
   @Override

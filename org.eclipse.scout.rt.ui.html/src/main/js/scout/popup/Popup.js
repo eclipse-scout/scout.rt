@@ -146,7 +146,7 @@ scout.Popup.prototype._remove = function() {
 };
 
 scout.Popup.prototype.close = function() {
-  this._trigger('close');
+  this.trigger('close');
   this.remove();
 };
 
@@ -403,7 +403,7 @@ scout.Popup.prototype._triggerLocationChanged = function() {
  * Fire event that this popup is about to open.
  */
 scout.Popup.prototype._triggerPopupOpenEvent = function() {
-  this.session.desktop._trigger('popupopen', {
+  this.session.desktop.trigger('popupopen', {
     popup: this
   });
 };
