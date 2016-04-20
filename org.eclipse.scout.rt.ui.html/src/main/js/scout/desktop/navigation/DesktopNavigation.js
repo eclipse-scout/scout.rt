@@ -161,7 +161,7 @@ scout.DesktopNavigation.prototype._removeToolBar = function() {
 };
 
 scout.DesktopNavigation.prototype._renderHandle = function() {
-  if (this.handle) {
+  if (this.handle || this.desktop.displayStyle === scout.Desktop.DisplayStyle.COMPACT) {
     return;
   }
   this.handle = scout.create('DesktopNavigationHandle', {

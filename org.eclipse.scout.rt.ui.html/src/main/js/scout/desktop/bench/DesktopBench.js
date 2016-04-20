@@ -248,7 +248,7 @@ scout.DesktopBench.prototype.updateOutlineContentDebounced = function() {
 };
 
 scout.DesktopBench.prototype.updateNavigationHandleVisibility = function(event) {
-  this.setNavigationHandleVisible(!this.desktop.navigationVisible);
+  this.setNavigationHandleVisible(!this.desktop.navigationVisible && this.desktop.displayStyle !== scout.Desktop.DisplayStyle.COMPACT);
 };
 
 scout.DesktopBench.prototype._onDesktopOutlineChanged = function(event) {
