@@ -52,8 +52,9 @@ scout.DesktopHeader.prototype._renderViewTabs = function() {
   if (this.viewTabs) {
     return;
   }
-  this.viewTabs = scout.create('DesktopViewTabs', {
+  this.viewTabs = scout.create('ViewTabArea', {
     parent: this
+//    controller: this.desktop.viewTabsController
   });
   this.viewTabs.render(this.$container);
 };

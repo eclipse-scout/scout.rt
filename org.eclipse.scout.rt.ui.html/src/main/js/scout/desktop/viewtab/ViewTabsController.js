@@ -15,7 +15,7 @@ scout.ViewTabsController = function(desktop) {
   this._desktop = desktop;
   this._selectedViewTab;
   this._viewTabs = [];
-  this._viewTabMap = {}; // [key=viewId, value=DesktopViewTab instance]
+  this._viewTabMap = {}; // [key=viewId, value=ViewTab instance]
 };
 
 /**
@@ -35,7 +35,7 @@ scout.ViewTabsController.prototype.createAndRenderViewTab = function(view, posit
   if (newViewTab) {
 
     // Create the view tab.
-    viewTab = scout.create('DesktopViewTab', {
+    viewTab = scout.create('ViewTab', {
       parent: view.displayParent,
       view: view,
       viewTabController: this

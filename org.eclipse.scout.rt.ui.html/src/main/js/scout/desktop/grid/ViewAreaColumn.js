@@ -19,6 +19,15 @@ scout.ViewAreaColumn = function() {
   this.viewAreas = [];
   this._viewToViewArea = {}; // [key=viewId, value=ViewArea instance]
   this.components;
+  this.viewActivationListener = function(view){
+    this.trigger('viewActivated', view);
+  }.bind(this);
+
+  this.viewDeactivationListener = function(view){
+    this.trigger('viewDeactivated', view);
+  }.bind(this);
+
+  this._addEventSupport();
 
 };
 scout.inherits(scout.ViewAreaColumn, scout.ModelAdapter);
@@ -55,7 +64,7 @@ scout.ViewAreaColumn.prototype._render = function($parent) {
   var htmlBody, i,
     env = scout.HtmlEnvironment;
 
-  this.$container = $parent.appendDiv('viewColumn');
+  this.$container = $parent.appendDiv('view-area-column');
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
   this.htmlComp.setLayout(this._createLayout());
 };
@@ -87,9 +96,12 @@ scout.ViewAreaColumn.prototype.activateView = function(view) {
 
 scout.ViewAreaColumn.prototype._createViewAreas = function() {
   for (var i = 0; i < 3; i++) {
-    this.viewAreas.push(scout.create('ViewArea', {
+    var viewArea=scout.create('ViewArea', {
       parent: this
-    }));
+    });
+    viewArea.on('viewActivated', this.viewActivationListener);
+    viewArea.on('viewDeactivated', this.viewDeactivationListener);
+    this.viewAreas.push(viewArea);
   }
 };
 
@@ -219,6 +231,11 @@ scout.ViewAreaColumn.prototype.viewCount = function() {
 
 scout.ViewAreaColumn.prototype.hasViews = function() {
   return this.viewCount() > 0;
+};
+scout.ViewAreaColumn.prototype.getViews = function(displayViewId) {
+  return this.viewAreas.flatMap(function(viewArea){
+    return viewArea.getViews(displayViewId);
+  });
 };
 
 scout.ViewAreaColumn.prototype.getComponents = function() {

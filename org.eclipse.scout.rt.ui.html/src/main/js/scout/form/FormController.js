@@ -134,13 +134,13 @@ scout.FormController.prototype._renderView = function(view, register, position, 
     return false;
   }
 
-  var viewTabsController = this.session.desktop.viewTabsController;
-
-  // Create the view-tab.
-  var viewTab = viewTabsController.createAndRenderViewTab(view, this.displayParent.views.indexOf(view));
-  if (selectView) {
-    viewTabsController.selectViewTab(viewTab);
-  }
+//  var viewTabsController = this.session.desktop.viewTabsController;
+//
+//  // Create the view-tab.
+//  var viewTab = viewTabsController.createAndRenderViewTab(view, this.displayParent.views.indexOf(view));
+//  if (selectView) {
+//    viewTabsController.selectViewTab(viewTab);
+//  }
 };
 
 scout.FormController.prototype.acceptDialog = function(dialog) {
@@ -217,10 +217,11 @@ scout.FormController.prototype._removeDialog = function(dialog, unregister) {
 };
 
 scout.FormController.prototype._activateView = function(view) {
-  var viewTabsController = this.session.desktop.viewTabsController;
-
-  var viewTab = viewTabsController.viewTab(view);
-  viewTabsController.selectViewTab(viewTab);
+  console.log('TODO: activate VIEW!!!')
+//  var viewTabsController = this.session.desktop.viewTabsController;
+//
+//  var viewTab = viewTabsController.viewTab(view);
+//  viewTabsController.selectViewTab(viewTab);
 };
 
 scout.FormController.prototype._activateDialog = function(dialog) {

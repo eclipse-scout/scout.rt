@@ -1,5 +1,9 @@
-.viewArea {
+.view-box {
   position: absolute;
   min-width: @bench-view-min-width;
   min-height: @bench-view-min-height;
+
+  > .view-tab-area{
+    position: static;
+  }
 }

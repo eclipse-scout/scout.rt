@@ -21,13 +21,34 @@ scout.styles = {
    * The style is cached. Subsequent calls with the same css class will return the same style object.
    */
   get: function(cssClass, properties) {
-    var key = cssClass;
-    var style = scout.styles.styleMap[key];
-    if (style) {
+    var style = scout.styles.styleMap[cssClass];
+    // ensure array
+    properties = scout.arrays.ensure(properties);
+    properties = properties.map(function(prop) {
+      return {
+        name: prop,
+        // replace property names like 'max-width' in 'maxWidth'
+        nameCamelCase: prop.replace(/\-(.)/g,
+          function a(match, p1) {
+            return p1.toUpperCase();
+          })
+      };
+    });
+
+    // ensure style
+    if (!style) {
+      style = {};
+      scout.styles.put(cssClass, style);
+    }
+
+    var notResolvedProperties = properties.filter(function(prop) {
+      return !(prop.nameCamelCase in style);
+    });
+    if (notResolvedProperties.length === 0) {
       return style;
     }
-    style = {};
 
+    // resolve missing properties
     var elem = scout.styles.element;
     if (!elem) {
       elem = window.document.createElement('div');
@@ -35,23 +56,13 @@ scout.styles = {
       window.document.body.appendChild(elem);
       scout.styles.element = elem;
     }
-
     elem.className = cssClass;
     var computedStyle = window.getComputedStyle(elem);
-
-    properties = scout.arrays.ensure(properties);
-    properties.forEach(function(property) {
-
-      var propertyName = property.replace(/\-(.)/g,
-        function a(match, p1) {
-          return p1.toUpperCase();
-        });
-      style[propertyName] = computedStyle[property];
+    notResolvedProperties.forEach(function(property) {
+      style[property.nameCamelCase] = computedStyle[property.name];
     });
-
-    // TODO CGU do not cache single prop values!!!
-    //    scout.styles.put(key, style);
     elem.className = '';
+
     return style;
   },
 

@@ -33,6 +33,38 @@ scout.objects = {
     return count;
   },
 
+  /**
+   * returns
+   *  - true if the obj has at least one of the given properties.
+   *  - false if the obj has none of the given properties.
+   *
+   * @param obj
+   * @param properties a single property or an array of properties
+   * @returns {Boolean}
+   */
+  someOwnProperties : function(obj, properties) {
+    var propArr = scout.arrays.ensure(properties);
+    return propArr.some(function (prop){
+      return obj.hasOwnProperty(prop);
+    });
+  },
+
+  /**
+   * returns
+   *  - true if the obj or its prototypes have at least one of the given properties.
+   *  - false if the obj or its prototypes have none of the given properties.
+   *
+   * @param obj
+   * @param properties a single property or an array of properties
+   * @returns {Boolean}
+   */
+  someProperties : function(obj, properties) {
+    var propArr = scout.arrays.ensure(properties);
+    return propArr.some(function (prop){
+      return prop in obj;
+    });
+  },
+
   valueCopy: function(obj) {
     // Nothing to be done for immutable things
     if (obj === undefined || obj === null || typeof obj !== 'object') {

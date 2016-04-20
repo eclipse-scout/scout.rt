@@ -142,6 +142,7 @@ scout.DesktopLayout.prototype.calculateNavigationWidth = function(containerSize)
     return containerSize.width;
   }
   var splitterPosition = 0;
+  // TODO AHO: ensure first layout when spliter rendered (REMOVE: && this.desktop.splitter)
   if (this.desktop.splitterVisible && this.desktop.splitter) {
     splitterPosition = this.desktop.splitter.position;
   }

@@ -50,7 +50,7 @@ scout.DesktopFormController.prototype._renderView = function(view, register, pos
     return false;
   }
   // NEW
-  this.displayParent.bench.renderView(view);
+  this.displayParent.bench.showView(view);
 };
 
 scout.DesktopFormController.prototype._removeView = function(view, unregister) {

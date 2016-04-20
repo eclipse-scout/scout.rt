@@ -227,6 +227,7 @@
   __include("scout/desktop/bench/DesktopBench.js");
   __include("scout/desktop/bench/DesktopBenchLayout.js");
   __include("scout/desktop/view/ViewArea.js");
+  __include("scout/desktop/view/ViewAreaLayout.js");
   __include("scout/desktop/grid/DesktopGridBench.js");
   __include("scout/desktop/grid/DesktopGridBenchLayout.js");
   __include("scout/desktop/grid/ViewAreaColumn.js");
@@ -249,9 +250,10 @@
   __include("scout/desktop/viewbutton/ViewMenuOpenKeyStroke.js");
   __include("scout/desktop/viewbutton/ViewMenuPopup.js");
   __include("scout/desktop/viewbutton/ViewMenuTab.js");
+  __include("scout/desktop/viewtab/ViewTab.js");
   __include("scout/desktop/viewtab/DesktopViewTab.js");
-  __include("scout/desktop/viewtab/DesktopViewTabs.js");
-  __include("scout/desktop/viewtab/DesktopViewTabsLayout.js");
+  __include("scout/desktop/viewtab/ViewTabArea.js");
+  __include("scout/desktop/viewtab/ViewTabAreaLayout.js");
   __include("scout/desktop/viewtab/DisableBrowserTabSwitchingKeyStroke.js");
   __include("scout/desktop/viewtab/ViewTabsController.js");
   __include("scout/desktop/viewtab/ViewTabSelectKeyStroke.js");

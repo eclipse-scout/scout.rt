@@ -14,7 +14,7 @@
 scout.ViewTabSelectKeyStroke = function(desktop) {
   scout.ViewTabSelectKeyStroke.parent.call(this);
   this.field = desktop;
-  this._viewTabsController = desktop.viewTabsController;
+//  this._viewTabsController = desktop.viewTabsController;
 
   // modifier
   this.parseAndSetKeyStroke(desktop.selectViewTabsKeyStrokeModifier);
@@ -41,7 +41,8 @@ scout.inherits(scout.ViewTabSelectKeyStroke, scout.RangeKeyStroke);
  */
 scout.ViewTabSelectKeyStroke.prototype._isEnabled = function() {
   var enabled = scout.ViewTabSelectKeyStroke.parent.prototype._isEnabled.call(this);
-  return enabled && this.field.selectViewTabsKeyStrokesEnabled && this._viewTabs().length > 0;
+//  return enabled && this.field.selectViewTabsKeyStrokesEnabled && this._viewTabs().length > 0;
+  return false;
 };
 
 /**
@@ -50,12 +51,13 @@ scout.ViewTabSelectKeyStroke.prototype._isEnabled = function() {
 scout.ViewTabSelectKeyStroke.prototype.handle = function(event) {
   var viewIndex = event.which - scout.keys['1'];
 
-  if (this._viewTabs().length && (viewIndex < this._viewTabs().length)) {
-    var viewTab = this._viewTabs()[viewIndex];
-    this._viewTabsController.selectViewTab(viewTab);
-  }
+  console.log('TODO KEYSTROKE');
+//  if (this._viewTabs().length && (viewIndex < this._viewTabs().length)) {
+//    var viewTab = this._viewTabs()[viewIndex];
+//    this._viewTabsController.selectViewTab(viewTab);
+//  }
 };
 
-scout.ViewTabSelectKeyStroke.prototype._viewTabs = function() {
-  return this._viewTabsController.viewTabs();
-};
+//scout.ViewTabSelectKeyStroke.prototype._viewTabs = function() {
+//  return this._viewTabsController.viewTabs();
+//};
