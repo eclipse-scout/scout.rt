@@ -124,6 +124,9 @@ scout.DesktopHeader.prototype._renderViewButtons = function() {
   });
   this.viewButtons.render(this.$container);
   this.viewButtons.$container.prependTo(this.$container);
+  if (this.desktop.inBackground) {
+    this.viewButtons.sendToBack();
+  }
   this.updateViewButtonStyling();
 };
 

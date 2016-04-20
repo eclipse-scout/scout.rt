@@ -10,6 +10,7 @@
  ******************************************************************************/
 .view-buttons {
   display: inline-block;
+  vertical-align: top;
   height: @view-buttons-height;
   white-space: nowrap;
   #scout.font-text-large();
