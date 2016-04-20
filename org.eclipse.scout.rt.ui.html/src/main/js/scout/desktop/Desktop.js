@@ -539,6 +539,8 @@ scout.Desktop.prototype.enlargeNavigation = function() {
     this.outline.setDisplayStyle(scout.Tree.DisplayStyle.DEFAULT);
   } else {
     this.setNavigationVisible(true);
+    // Layout immediately to have view tabs positioned correctly before animation starts
+    this.validateLayoutTree();
   }
 };
 

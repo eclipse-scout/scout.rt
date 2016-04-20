@@ -11,6 +11,7 @@
 scout.DesktopBench = function() {
   scout.DesktopBench.parent.call(this);
   this._desktopOutlineChangedHandler = this._onDesktopOutlineChanged.bind(this);
+  this._desktopPropertyChangeHandler = this._onDesktopPropertyChange.bind(this);
   this._outlineNodesSelectedHandler = this._onOutlineNodesSelected.bind(this);
   this._outlinePageChangedHandler = this._onOutlinePageChanged.bind(this);
   this._outlinePropertyChangeHandler = this._onOutlinePropertyChange.bind(this);
@@ -46,11 +47,13 @@ scout.DesktopBench.prototype._render = function($parent) {
   this._renderNavigationHandleVisible();
 
   this.session.keyStrokeManager.installKeyStrokeContext(this.desktopKeyStrokeContext);
+  this.desktop.on('propertyChange', this._desktopPropertyChangeHandler);
   this.desktop.on('outlineChanged', this._desktopOutlineChangedHandler);
   this.desktop.on('animationEnd', this._desktopAnimationEndHandler);
 };
 
 scout.DesktopBench.prototype._remove = function() {
+  this.desktop.off('propertyChange', this._desktopPropertyChangeHandler);
   this.desktop.off('outlineChanged', this._desktopOutlineChangedHandler);
   this.desktop.off('animationEnd', this._desktopAnimationEndHandler);
   this.session.keyStrokeManager.uninstallKeyStrokeContext(this.desktopKeyStrokeContext);
@@ -273,8 +276,24 @@ scout.DesktopBench.prototype._onOutlinePropertyChange = function(event) {
   }
 };
 
+scout.DesktopBench.prototype._onDesktopNavigationVisibleChange = function(event) {
+  // If navigation gets visible: Hide handle immediately
+  // If navigation gets hidden using animation: Show handle when animation ends
+  if (this.desktop.navigationVisible) {
+    this.updateNavigationHandleVisibility();
+  }
+};
+
 scout.DesktopBench.prototype._onDesktopAnimationEnd = function(event) {
-  this.updateNavigationHandleVisibility();
+  if (!this.desktop.navigationVisible) {
+    this.updateNavigationHandleVisibility();
+  }
+};
+
+scout.DesktopBench.prototype._onDesktopPropertyChange = function(event) {
+  if (event.changedProperties.indexOf('navigationVisible') !== -1) {
+    this._onDesktopNavigationVisibleChange();
+  }
 };
 
 scout.DesktopBench.prototype._onNavigationHandleAction = function(event) {
