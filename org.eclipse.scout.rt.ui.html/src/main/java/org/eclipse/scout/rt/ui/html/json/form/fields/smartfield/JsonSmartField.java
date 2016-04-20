@@ -14,6 +14,8 @@ import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractMixedSmartField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IContentAssistField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IProposalField;
+import org.eclipse.scout.rt.platform.status.IMultiStatus;
+import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
@@ -114,7 +116,7 @@ public class JsonSmartField<VALUE, LOOKUP_KEY, CONTENT_ASSIST_FIELD extends ICon
     boolean browseAll = event.getData().optBoolean("browseAll");
     String searchText = event.getData().optString("searchText", null);
     if (browseAll) {
-      if (getModel().getErrorStatus() == null || (getModel().getErrorStatus() != null && getModel().getErrorStatus().getChildren().get(0).getCode() != AbstractMixedSmartField.NOT_UNIQUE_ERROR_CODE)) {
+      if (getModel().getErrorStatus() == null || (getModel().getErrorStatus() != null && !checkStatusContainsCode(getModel().getErrorStatus(), AbstractMixedSmartField.NOT_UNIQUE_ERROR_CODE))) {
         searchText = "*";
       }
     }
@@ -133,5 +135,17 @@ public class JsonSmartField<VALUE, LOOKUP_KEY, CONTENT_ASSIST_FIELD extends ICon
   @Override
   public JSONObject toJson() {
     return putProperty(super.toJson(), PROP_PROPOSAL, m_proposal);
+  }
+
+  private boolean checkStatusContainsCode(IMultiStatus status, int code) {
+    for (IStatus child : status.getChildren()) {
+      if (child instanceof IMultiStatus && checkStatusContainsCode((IMultiStatus) child, code)) {
+        return true;
+      }
+      if (child.getCode() == code) {
+        return true;
+      }
+    }
+    return false;
   }
 }

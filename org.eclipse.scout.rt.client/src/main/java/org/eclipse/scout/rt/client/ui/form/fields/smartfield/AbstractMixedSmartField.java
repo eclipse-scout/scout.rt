@@ -49,8 +49,8 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupRowFetchedCallback;
  */
 public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends AbstractContentAssistField<VALUE, LOOKUP_KEY> implements IMixedSmartField<VALUE, LOOKUP_KEY> {
 
-  public static final int NOT_UNIQUE_ERROR_CODE = 0;
-  public static final int NO_RESULTS_ERROR_CODE = 1;
+  public static final int NOT_UNIQUE_ERROR_CODE = 1;
+  public static final int NO_RESULTS_ERROR_CODE = 2;
 
   private final IContentAssistFieldUIFacade m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(new ContentAssistFieldUIFacade<LOOKUP_KEY>(this), ModelContext.copyCurrent());
   private final IBlockingCondition m_contextInstalledCondition = Jobs.newBlockingCondition(false);
