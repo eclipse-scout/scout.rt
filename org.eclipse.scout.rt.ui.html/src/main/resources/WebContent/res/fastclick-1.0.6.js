@@ -1,6 +1,13 @@
 ;(function () {
   'use strict';
 
+  /* BSI Changes:
+   * - Synthesize mouse down and mouse up events as well
+   * - Make content editable elements work
+   *
+   * To find the changes in the code, look for ==== MODIFIED
+   */
+
   /**
    * @preserve FastClick: polyfill to remove click delays on browsers with touch UIs.
    *
@@ -301,9 +308,21 @@
 
     touch = event.changedTouches[0];
 
+    // ==== MODIFIED
     // Synthesise a click event, with an extra attribute so it can be tracked
     clickEvent = document.createEvent('MouseEvents');
-    clickEvent.initMouseEvent(this.determineEventType(targetElement), true, true, window, 1, touch.screenX, touch.screenY, touch.clientX, touch.clientY, false, false, false, false, 0, null);
+    clickEvent.initMouseEvent('mousedown', true, true, window, 1, touch.screenX, touch.screenY, touch.clientX, touch.clientY, false, false, false, false, 0, null);
+    clickEvent.forwardedTouchEvent = true;
+    targetElement.dispatchEvent(clickEvent);
+
+    clickEvent = document.createEvent('MouseEvents');
+    clickEvent.initMouseEvent('mouseup', true, true, window, 1, touch.screenX, touch.screenY, touch.clientX, touch.clientY, false, false, false, false, 0, null);
+    clickEvent.forwardedTouchEvent = true;
+    targetElement.dispatchEvent(clickEvent);
+    // ==== MODIFIED
+
+    clickEvent = document.createEvent('MouseEvents');
+    clickEvent.initMouseEvent('click', true, true, window, 1, touch.screenX, touch.screenY, touch.clientX, touch.clientY, false, false, false, false, 0, null);
     clickEvent.forwardedTouchEvent = true;
     targetElement.dispatchEvent(clickEvent);
   };
@@ -398,6 +417,13 @@
 
     targetElement = this.getTargetElementFromEventTarget(event.target);
     touch = event.targetTouches[0];
+
+    // ==== MODIFIED
+    // Ignore touch on content editable elements to make them work as expected
+    if (targetElement.isContentEditable) {
+      return true;
+    }
+    // ==== MODIFIED
 
     if (deviceIsIOS) {
 

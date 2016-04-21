@@ -88,20 +88,28 @@ scout.Device.prototype.bootstrap = function() {
   if (this.isIos()) {
     // We use Fastclick to prevent the 300ms delay when touching an element.
     // With Chrome 32 the issue is solved, so no need to load the script for other devices than iOS
-    deferreds.push(this._loadScriptDeferred('res/fastclickmod-1.0.1.min.js', function() {
-      FastClick.attach(document.body);
-      $.log.info('FastClick script loaded and attached');
-    }));
+    deferreds.push(this._loadFastClickDeferred());
   }
 
   if (this.hasOnScreenKeyboard()) {
     // Auto focusing of elements is bad with on screen keyboards -> deactivate to prevent unwanted popping up of the keyboard
     this.focusManagerActive = false;
-    deferreds.push(this._loadScriptDeferred('res/jquery.mobile.custom-1.4.5.min.js', function() {
-      $.log.info('JQuery Mobile script loaded');
-    }));
+    deferreds.push(this._loadJQueryMobileDeferred());
   }
   return deferreds;
+};
+
+scout.Device.prototype._loadFastClickDeferred = function() {
+  return this._loadScriptDeferred('res/fastclick-1.0.6.min.js', function() {
+    FastClick.attach(document.body);
+    $.log.info('FastClick script loaded and attached');
+  });
+};
+
+scout.Device.prototype._loadJQueryMobileDeferred = function() {
+  return this._loadScriptDeferred('res/jquery.mobile.custom-1.4.5.min.js', function() {
+    $.log.info('JQuery Mobile script loaded');
+  });
 };
 
 scout.Device.prototype._loadScriptDeferred = function(scriptUrl, doneFunc) {
