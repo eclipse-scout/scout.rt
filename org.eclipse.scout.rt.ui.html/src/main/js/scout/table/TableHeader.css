@@ -102,9 +102,13 @@
     }
   }
 
-  &:not(.disabled):hover,
-  &.moving {
+  &:not(.disabled):hover {
     color: @hover-color;
+  }
+
+  &:not(.disabled):active,
+  &.moving {
+    color: @active-color;
   }
 
   &.moving > .table-header-item-state {

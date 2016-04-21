@@ -154,6 +154,10 @@
         background-color: @outline-group-background-color;
       }
 
+      &:active {
+        background-color: @navigation-background-color;
+      }
+
       &.selected {
         background-color: @outline-selection-background-color;
         color: @outline-selection-color;

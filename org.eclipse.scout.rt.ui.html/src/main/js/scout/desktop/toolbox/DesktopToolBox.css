@@ -32,11 +32,27 @@
 
   &:hover {
     color: @hover-color;
+
+    & > .font-icon {
+      color: @hover-color;
+    }
+  }
+
+  &:active {
+    color: @active-color;
+
+    & > .font-icon {
+      color: @active-color;
+    }
   }
 
   &.disabled {
     color: @disabled-color;
     cursor: default;
+
+    & > .font-icon {
+      color: @disabled-color;
+    }
   }
 
   &.compact {
@@ -51,14 +67,6 @@
   & > .font-icon {
     color: @icon-color;
     font-size: 17px;
-  }
-
-  &:hover > .font-icon {
-    color: @hover-color;
-  }
-
-  &.disabled > .font-icon {
-    color: @disabled-color;
   }
 
   &.menu-textandicon > .icon {

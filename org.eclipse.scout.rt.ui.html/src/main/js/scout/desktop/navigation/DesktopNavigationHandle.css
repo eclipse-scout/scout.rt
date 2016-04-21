@@ -33,8 +33,8 @@
   &.one-visible {
     cursor: pointer;
 
-    &:hover > .desktop-navigation-handle-body {
-      background-color: @navigation-handle-hover-background-color;
+    &:active > .desktop-navigation-handle-body {
+      background-color: @navigation-handle-active-background-color;
     }
   }
 }
@@ -80,8 +80,8 @@
     }
   }
 
-  &:hover {
-    background-color: @navigation-handle-hover-background-color;
+  &:active {
+    background-color: @navigation-handle-active-background-color;
   }
 
 }

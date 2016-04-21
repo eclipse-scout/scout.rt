@@ -32,6 +32,12 @@
     }
   }
 
+  &:active {
+    &:not(.selected) > .font-icon {
+      color: @active-color;
+    }
+  }
+
   &.selected {
     background-color: @view-button-tab-active-background-color;
     color: @view-button-tab-active-color;

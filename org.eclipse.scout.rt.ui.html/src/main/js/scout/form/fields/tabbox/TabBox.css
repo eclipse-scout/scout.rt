@@ -108,6 +108,10 @@
     color: @hover-color;
   }
 
+  &:active {
+    color: @active-color;
+  }
+
   &:focus {
     outline: none;
   }
