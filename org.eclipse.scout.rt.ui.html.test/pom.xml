@@ -142,8 +142,46 @@
           </execution>
         </executions>
       </plugin>
+
     </plugins>
   </build>
+
+  <profiles>
+    <profile>
+      <id>dev</id>
+      <build>
+        <!-- Jasmine testing in development mode: reverence js files in workspace -->
+        <!-- JS testing with Jasmine -->
+        <plugins>
+          <plugin>
+            <groupId>com.github.searls</groupId>
+            <artifactId>jasmine-maven-plugin</artifactId>
+            <configuration>
+              <additionalContexts>
+                <additionalContext>
+                  <contextRoot>ext</contextRoot>
+                  <directory>${project.basedir}/../org.eclipse.scout.rt.ui.html/src/main/resources/</directory>
+                </additionalContext>
+                <additionalContext>
+                  <contextRoot>ext</contextRoot>
+                  <directory>${project.basedir}/../org.eclipse.scout.rt.ui.html/src/main/js</directory>
+                </additionalContext>
+              </additionalContexts>
+            </configuration>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>test</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+
+      </build>
+    </profile>
+  </profiles>
+
 
   <!-- primarily for license header generation -->
   <inceptionYear>2014</inceptionYear>
