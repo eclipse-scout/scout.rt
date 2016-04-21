@@ -35,6 +35,8 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.userfilter.UserTableRowFilter;
 import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
+import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
@@ -49,6 +51,7 @@ import org.eclipse.scout.rt.ui.html.json.fixtures.UiSessionMock;
 import org.eclipse.scout.rt.ui.html.json.menu.JsonContextMenu;
 import org.eclipse.scout.rt.ui.html.json.menu.JsonMenu;
 import org.eclipse.scout.rt.ui.html.json.menu.fixtures.Menu;
+import org.eclipse.scout.rt.ui.html.json.table.fixtures.ListBoxTable;
 import org.eclipse.scout.rt.ui.html.json.table.fixtures.Table;
 import org.eclipse.scout.rt.ui.html.json.table.fixtures.TableControl;
 import org.eclipse.scout.rt.ui.html.json.table.fixtures.TableWith3Cols;
@@ -1081,6 +1084,47 @@ public class JsonTableTest {
     JsonTestUtility.endRequest(m_uiSession);
     events = response.optJSONArray("events");
     assertNull(events); // No events should be emitted
+  }
+
+  @Test
+  public void testTableEventCoalesceInUi_ReplaceRows() throws Exception {
+
+    ListBoxTable listbox = new ListBoxTable();
+    ILookupRow<Long> row1 = new LookupRow<Long>(1L, "Row1");
+    ILookupRow<Long> row2 = new LookupRow<Long>(2L, "Row2").withActive(false);
+    ILookupRow<Long> row3 = new LookupRow<Long>(3L, "Row3");
+    ILookupRow<Long> row4 = new LookupRow<Long>(4L, "Row4");
+
+    ArrayList<ITableRow> rowsInitial = new ArrayList<ITableRow>();
+
+    rowsInitial.add(listbox.getTableRowBuilder().createTableRow(row1));
+    rowsInitial.add(listbox.getTableRowBuilder().createTableRow(row2));
+    rowsInitial.add(listbox.getTableRowBuilder().createTableRow(row3));
+
+    ITable table = listbox.getTable();
+    table.addRows(rowsInitial);
+
+    JsonTable<ITable> jsonTable = UiSessionTestUtility.newJsonAdapter(m_uiSession, table, null);
+    m_uiSession.currentJsonResponse().addAdapter(jsonTable);
+    JSONObject response = m_uiSession.currentJsonResponse().toJson();
+    JsonTestUtility.endRequest(m_uiSession);
+    JSONArray events = response.optJSONArray("events");
+
+    ArrayList<ITableRow> rowsUpdate = new ArrayList<ITableRow>();
+    rowsUpdate.add(listbox.getTableRowBuilder().createTableRow(row1));
+    rowsUpdate.add(listbox.getTableRowBuilder().createTableRow(row2));
+    rowsUpdate.add(listbox.getTableRowBuilder().createTableRow(row3));
+    rowsUpdate.add(listbox.getTableRowBuilder().createTableRow(row4));
+
+    table.replaceRows(rowsUpdate);
+
+    response = m_uiSession.currentJsonResponse().toJson();
+    JsonTestUtility.endRequest(m_uiSession);
+    events = response.optJSONArray("events");
+    JSONObject lastEvent = events.optJSONObject(events.length() - 1);
+    assertEquals(lastEvent.optString("type"), "rowOrderChanged");
+    JSONArray rowIds = lastEvent.optJSONArray("rowIds");
+    assertTrue(rowIds.length() == 3);
   }
 
   @Test

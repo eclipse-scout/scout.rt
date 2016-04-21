@@ -1049,8 +1049,12 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   }
 
   private boolean containsInsertOrDelete(List<TableEvent> events) {
+    boolean rowOrderChangedFound = false;
     for (TableEvent event : events) {
-      if (TableEvent.TYPE_ROWS_INSERTED == event.getType() || TableEvent.TYPE_ROWS_DELETED == event.getType()) {
+      if (TableEvent.TYPE_ROW_ORDER_CHANGED == event.getType()) {
+        rowOrderChangedFound = true;
+      }
+      else if (rowOrderChangedFound && (TableEvent.TYPE_ROWS_INSERTED == event.getType() || TableEvent.TYPE_ROWS_DELETED == event.getType())) {
         return true;
       }
     }
