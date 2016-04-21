@@ -10,27 +10,25 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.clientnotification;
 
-import static org.mockito.Mockito.verify;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
+import java.util.List;
+
 import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.shared.clientnotification.IClientNotificationService;
-import org.eclipse.scout.rt.testing.platform.mock.BeanMock;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 
 /**
  * Tests for {@link ClientSessionRegistry}
  */
 @RunWith(PlatformTestRunner.class)
 public class ClientSessionRegistryTest {
-
-  @BeanMock
-  private IClientNotificationService m_mockService;
 
   @Mock
   private IClientSession m_clientSession;
@@ -42,20 +40,32 @@ public class ClientSessionRegistryTest {
   }
 
   /**
-   * Tests that the client session is registered on the Back-End, when the session is started.
+   * Tests that the client session is registered on the client, after it is started.
    */
   @Test
-  public void testRegisteredOnBackendWhenSessionStarted() {
+  public void testRegisteredWhenSessionStarted() {
     ClientSessionRegistry reg = new TestClientSessionRegistry();
-    reg.sessionStarted(m_clientSession);
-    verify(m_mockService).registerSession(Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
+    startSession(reg);
+
+    final List<IClientSession> userSessions = reg.getClientSessionsForUser(m_clientSession.getUserId());
+    assertEquals(m_clientSession, reg.getClientSession(m_clientSession.getId()));
+    assertEquals(1, userSessions.size());
+    assertEquals(m_clientSession, userSessions.get(0));
   }
 
   @Test
   public void testUnRegisteredWhenSessionStopped() {
     ClientSessionRegistry reg = new TestClientSessionRegistry();
+    startSession(reg);
     reg.sessionStopped(m_clientSession);
-    verify(m_mockService).unregisterSession(Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
+    final List<IClientSession> userSessions = reg.getClientSessionsForUser(m_clientSession.getUserId());
+    assertNull(reg.getClientSession(m_clientSession.getId()));
+    assertTrue(userSessions.isEmpty());
+  }
+
+  private void startSession(ClientSessionRegistry reg) {
+    reg.register(m_clientSession, m_clientSession.getId());
+    reg.sessionStarted(m_clientSession);
   }
 
   class TestClientSessionRegistry extends ClientSessionRegistry {

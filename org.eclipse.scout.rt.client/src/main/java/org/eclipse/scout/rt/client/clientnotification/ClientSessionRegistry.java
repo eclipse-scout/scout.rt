@@ -20,23 +20,18 @@ import java.util.Map.Entry;
 
 import javax.security.auth.Subject;
 
-import org.eclipse.scout.rt.client.IClientNode;
 import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.CompareUtility;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.SharedConfigProperties.NotificationSubjectProperty;
-import org.eclipse.scout.rt.shared.clientnotification.IClientNotificationService;
 import org.eclipse.scout.rt.shared.services.common.ping.IPingService;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnel;
 import org.eclipse.scout.rt.shared.session.IGlobalSessionListener;
 import org.eclipse.scout.rt.shared.session.SessionEvent;
-import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,7 +43,7 @@ public class ClientSessionRegistry implements IClientSessionRegistry, IGlobalSes
    */
   protected final Subject NOTIFICATION_SUBJECT = CONFIG.getPropertyValue(NotificationSubjectProperty.class);
 
-  private Object m_cacheLock = new Object();
+  private final Object m_cacheLock = new Object();
   private final Map<String /*sessionId*/, WeakReference<IClientSession>> m_sessionIdToSession = new HashMap<>();
   private final Map<String /*userId*/, List<WeakReference<IClientSession>>> m_userToSessions = new HashMap<>();
 
@@ -73,19 +68,6 @@ public class ClientSessionRegistry implements IClientSessionRegistry, IGlobalSes
     final String sessionId = session.getId();
     final String userId = session.getUserId();
     LOG.debug("Unregister client session [sessionid={}, userId={}].", sessionId, userId);
-
-    // unregister from remote notifications
-    try {
-      ClientRunContexts.empty().withSubject(NOTIFICATION_SUBJECT).withUserAgent(UserAgent.createDefault()).run(new IRunnable() {
-        @Override
-        public void run() throws Exception {
-          BEANS.get(IClientNotificationService.class).unregisterSession(IClientNode.ID, sessionId, userId);
-        }
-      });
-    }
-    catch (RuntimeException e) {
-      LOG.warn("Could not unregister session[{}] for remote notifications.", session, e);
-    }
     // client session household
     synchronized (m_cacheLock) {
       m_sessionIdToSession.remove(session.getId());
@@ -115,8 +97,7 @@ public class ClientSessionRegistry implements IClientSessionRegistry, IGlobalSes
     ensureUserIdAvailable(session);
     checkSession(session);
     LOG.debug("Register client session [sessionid={}, userId={}].", session.getId(), session.getUserId());
-    registerOnClient(session);
-    registerOnServer(session);
+    registerUser(session);
   }
 
   private void checkSession(final IClientSession session) {
@@ -124,24 +105,10 @@ public class ClientSessionRegistry implements IClientSessionRegistry, IGlobalSes
     Assertions.assertNotNull(session.getUserId(), "No userId available");
   }
 
-  private void registerOnServer(final IClientSession session) {
-    try {
-      ClientRunContexts.empty().withSubject(NOTIFICATION_SUBJECT).withUserAgent(UserAgent.createDefault()).run(new IRunnable() {
-        @Override
-        public void run() throws Exception {
-          BEANS.get(IClientNotificationService.class).registerSession(IClientNode.ID, session.getId(), session.getUserId());
-        }
-      });
-    }
-    catch (RuntimeException e) {
-      LOG.warn("Could not register session[{}] for remote notifications.", session, e);
-    }
-  }
-
   /**
    * local linking
    */
-  private void registerOnClient(final IClientSession session) {
+  private void registerUser(final IClientSession session) {
     synchronized (m_cacheLock) {
       List<WeakReference<IClientSession>> sessionRefs = m_userToSessions.get(session.getUserId());
       if (sessionRefs != null) {

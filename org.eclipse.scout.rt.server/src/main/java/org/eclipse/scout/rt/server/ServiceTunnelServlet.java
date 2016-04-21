@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.server;
 
 import java.io.IOException;
 import java.io.InterruptedIOException;
+import java.io.Serializable;
 import java.net.SocketException;
 import java.security.AccessController;
 import java.util.Locale;
@@ -43,6 +44,7 @@ import org.eclipse.scout.rt.server.context.RunMonitorCancelRegistry.IRegistratio
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.server.session.ServerSessionProvider;
+import org.eclipse.scout.rt.shared.clientnotification.IClientNotificationService;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelContentHandler;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
@@ -250,24 +252,41 @@ public class ServiceTunnelServlet extends HttpServlet {
         if (serverSession == null) {
           final IServerSession newServerSession = createServerSession(sessionId, serverRunContext);
 
-          servletRequest.getSession(true).setAttribute("scout.httpsession.binding.listener", new HttpSessionBindingListener() {
-            @Override
-            public void valueBound(final HttpSessionBindingEvent event) {
-              // NOOP
-            }
-
-            @Override
-            public void valueUnbound(final HttpSessionBindingEvent event) {
-              newServerSession.stop();
-            }
-          });
+          servletRequest.getSession(true)
+              .setAttribute("scout.httpsession.binding.listener", new ScoutSessionBindingListener(newServerSession, serverRunContext.getClientNodeId()));
 
           cacheService.put(IServerSession.class.getName(), newServerSession, servletRequest, servletResponse);
+          BEANS.get(IClientNotificationService.class).registerSession(serverRunContext.getClientNodeId(), newServerSession.getId(), newServerSession.getUserId());
+
           return newServerSession;
         }
+
       }
     }
     return serverSession;
+  }
+
+  private class ScoutSessionBindingListener implements HttpSessionBindingListener, Serializable {
+    private static final long serialVersionUID = 1L;
+
+    private final IServerSession m_session;
+    private final String m_clientNodeId;
+
+    public ScoutSessionBindingListener(IServerSession session, String clientNodeId) {
+      m_session = session;
+      m_clientNodeId = clientNodeId;
+    }
+
+    @Override
+    public void valueBound(final HttpSessionBindingEvent event) {
+      // NOOP
+    }
+
+    @Override
+    public void valueUnbound(final HttpSessionBindingEvent event) {
+      m_session.stop();
+      BEANS.get(IClientNotificationService.class).unregisterSession(m_clientNodeId, m_session.getId(), m_session.getUserId());
+    }
   }
 
   /**
