@@ -37,6 +37,8 @@ scout.ViewArea.prototype._init = function(model) {
   this.viewTabArea = scout.create('ViewTabArea', {
     parent: this
   });
+  // link
+  this.localViewTabAreaController = new scout.ViewTabAreaController(this, this.viewTabArea);
 };
 
 /**
@@ -97,7 +99,7 @@ scout.ViewArea.prototype._renderProperties = function() {
 };
 
 scout.ViewArea.prototype.activateView = function(view) {
-  if(view === this.currentView){
+  if (view === this.currentView) {
     return;
   }
   if (!view) {
@@ -110,7 +112,9 @@ scout.ViewArea.prototype.activateView = function(view) {
 
   if (this.currentView) {
     this.currentView.detach();
-    this.trigger('viewDeactivated', this.currentView);
+    this.trigger('viewDeactivated', {
+      view: this.currentView
+    });
     this.currentView = null;
   }
   // ensure rendered
@@ -119,10 +123,10 @@ scout.ViewArea.prototype.activateView = function(view) {
     view.attach();
   }
   this.currentView = view;
-  // select view tab
-  var viewTab = this.viewTabMap[view.id];
-  this.viewTabArea.selectViewTab(viewTab);
-  this.trigger('viewActivated', view);
+
+  this.trigger('viewActivated', {
+    view: view
+  });
 
   this.viewContent.invalidateLayoutTree();
   // Layout immediate to prevent 'laggy' form visualization,
@@ -144,9 +148,10 @@ scout.ViewArea.prototype.showView = function(view) {
   }
   // add to view stack
   var siblingView = this._addToViewStack(view);
-  var siblingViewTab = (siblingView) ? (this.viewTabMap[siblingView.id]) : undefined;
-
-  this._createViewTab(view, siblingViewTab);
+  this.trigger('viewAdded', {
+    view: view,
+    siblingView: siblingView
+  });
 
   this.activateView(view);
 };
@@ -157,27 +162,23 @@ scout.ViewArea.prototype.showView = function(view) {
  * @return the view which is gonna be the sibling to insert the new view tab after.
  */
 scout.ViewArea.prototype._addToViewStack = function(view) {
-  if (!scout.objects.someProperties(view, ['title', 'subTitle', 'iconId'])) {
+  var sibling;
+  if (!scout.ViewTabAreaController.hasViewTab(view)) {
     // first
     this.viewStack.unshift(view);
-    return;
+    return sibling;
   }
-  var selectedTab = this.viewTabArea.getSelectedViewTab();
-  if (!selectedTab) {
+  if (!this.currentView) {
     // end
+    sibling = this.viewStack[this.viewStack.length - 1];
     this.viewStack.push(view);
-    if (this.viewStack.lengh > 1) {
-      return this.viewStack[this.viewStack.length - 2];
-    }
     return;
   }
-  var selectedIndex = this.viewStack.indexOf(selectedTab.view);
+  var currentIndex = this.viewStack.indexOf(this.currentView);
+  sibling = this.viewStack[currentIndex];
   // it does not matter when index is -1 will be inserted at first position
-  this.viewStack.splice(selectedIndex + 1, 0, view);
-  if (selectedIndex > -1) {
-    return this.viewStack[selectedIndex];
-  }
-
+  this.viewStack.splice(currentIndex + 1, 0, view);
+  return sibling;
 };
 
 scout.ViewArea.prototype._renderView = function(view) {
@@ -188,20 +189,6 @@ scout.ViewArea.prototype._renderView = function(view) {
   view.setParent(this);
   view.$container.addClass('view');
   view.validateRoot = true;
-};
-
-scout.ViewArea.prototype._createViewTab = function(view, siblingViewTab) {
-  if (!scout.objects.someProperties(view, ['title', 'subTitle', 'iconId'])) {
-    return;
-  }
-  var viewTab = scout.create('DesktopViewTab', {
-    parent: this.viewTabArea,
-    view: view
-  });
-  viewTab.on('tabClicked', this.viewTabListener);
-  this.viewTabMap[view.id] = viewTab;
-  this.viewTabArea.addTab(viewTab, siblingViewTab);
-  return viewTab;
 };
 
 scout.ViewArea.prototype.removeView = function(view) {
@@ -222,7 +209,9 @@ scout.ViewArea.prototype.removeView = function(view) {
     if (view.rendered) {
       view.remove();
     }
-    this._removeViewTab(view);
+    this.trigger('viewRemoved', {
+      view: view
+    });
 
     // remove if empty
     if (!this.hasViews() && this.rendered) {
@@ -231,15 +220,6 @@ scout.ViewArea.prototype.removeView = function(view) {
 
     this.viewContent.invalidateLayoutTree();
     this.viewContent.validateLayoutTree();
-  }
-};
-
-scout.ViewArea.prototype._removeViewTab = function(view) {
-  var viewTab = this.viewTabMap[view.id];
-  if (viewTab) {
-    viewTab.off('tabClicked', this.viewTabListener);
-    this.viewTabArea.removeTab(viewTab);
-    delete this.viewTabMap[view.id];
   }
 };
 

@@ -41,7 +41,7 @@ scout.ViewTab.prototype.renderAfter = function($parent, sibling) {
 };
 
 scout.ViewTab.prototype._render = function($parent) {
-  this.$container = $parent.appendDiv('desktop-view-tab');
+  this.$container = $parent.prependDiv('desktop-view-tab');
   this._mouseListener = this._onMouseDown.bind(this);
   this.$container.on('mousedown', this._mouseListener);
   this._$title = this.$container.appendDiv('title');
@@ -51,21 +51,26 @@ scout.ViewTab.prototype._render = function($parent) {
 };
 
 scout.ViewTab.prototype.select = function() {
-  this._cssSelect(true);
-};
 
-scout.ViewTab.prototype._cssSelect = function(selected) {
-  if (this.$container) {
-    this.$container.select(selected);
-  }
+  this._cssSelect(true);
 };
 
 scout.ViewTab.prototype.deselect = function() {
   this._cssSelect(false);
 };
 
+scout.ViewTab.prototype._cssSelect = function(selected) {
+  if (this.$container) {
+    if(this.$container.select() === selected){
+      return;
+    }
+    this.$container.select(selected);
+  }
+};
+
+
 scout.ViewTab.prototype._onMouseDown = function(event) {
-  this.events.trigger('tabClicked', this);
+  this.trigger('tabClicked');
 };
 
 scout.ViewTab.prototype.setTitle = function(title) {

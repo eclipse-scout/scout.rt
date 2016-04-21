@@ -4,6 +4,18 @@
   min-height: @bench-view-min-height;
 
   > .view-tab-area{
-    position: static;
+    position: relative;
+
+    /* Has the same effect as "border-bottom: 1px solid @border-color", but is over-drawable by child */
+    /* elements (such as the selected view-tab). The border would not be, because of "overflow: hidden". */
+    &::before {
+      content: '';
+      background-color: @border-color;
+      width: 100%;
+      height: 1px;
+      position: absolute;
+      top: calc(~'100% - 1px');
+      left: 0;
+    }
   }
 }

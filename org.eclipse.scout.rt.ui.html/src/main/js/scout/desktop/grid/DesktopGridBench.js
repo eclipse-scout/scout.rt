@@ -100,15 +100,15 @@ scout.DesktopGridBench.prototype._renderOutlineContent = function() {
   }
   this.outlineContent.displayViewId = 'C';
   this.showView(this.outlineContent);
-//  this.outlineContent.render(this.$container);
-//  this.outlineContent.htmlComp.validateRoot = true;
-//  this.outlineContent.setParent(this);
-//  this.outlineContent.invalidateLayoutTree(false);
+  //  this.outlineContent.render(this.$container);
+  //  this.outlineContent.htmlComp.validateRoot = true;
+  //  this.outlineContent.setParent(this);
+  //  this.outlineContent.invalidateLayoutTree(false);
 
   // Layout immediate to prevent 'laggy' form visualization,
   // but not initially while desktop gets rendered because it will be done at the end anyway
   if (this.desktop.rendered) {
-//    this.outlineContent.validateLayoutTree();
+    //    this.outlineContent.validateLayoutTree();
 
     // Request focus on first element in outline content
     this.session.focusManager.validateFocus();
@@ -159,9 +159,9 @@ scout.DesktopGridBench.prototype.setOutlineContent = function(content) {
   this._setProperty('outlineContent', content);
   // Inform header that outline content has changed
   // (having a listener in the header is quite complex due to initialization phase, a direct call here is much easier to implement)
-//  if (this.desktop.header) {
-//    this.desktop.header.onBenchOutlineContentChange(content, oldContent);
-//  }
+  //  if (this.desktop.header) {
+  //    this.desktop.header.onBenchOutlineContentChange(content, oldContent);
+  //  }
   if (this.rendered) {
     this._renderOrAttachOutlineContent();
   }
@@ -180,7 +180,7 @@ scout.DesktopGridBench.prototype.bringToFront = function() {
     return;
   }
   this.showView(this.outlineContent);
-//  this._renderOrAttachOutlineContent();
+  //  this._renderOrAttachOutlineContent();
 };
 
 scout.DesktopGridBench.prototype.sendToBack = function() {
@@ -330,39 +330,34 @@ scout.DesktopGridBench.prototype._onSplitterPositionChanged = function(event) {
   this.revalidateLayout();
 };
 
-scout.DesktopGridBench.prototype._onViewActivated = function(view) {
-  if(this.outlineContent === view){
+scout.DesktopGridBench.prototype._onViewActivated = function(event) {
+  if (this.outlineContent === event.view) {
     this.desktop.bringOutlineToFront(this.desktop.outline);
-
   }
 };
 
-scout.DesktopGridBench.prototype._onViewDeactivated = function(view) {
-  if(this.outlineContent === view){
+scout.DesktopGridBench.prototype._onViewDeactivated = function(event) {
+  if (this.outlineContent === event.view) {
     this.desktop.sendOutlineToBack();
   }
 };
 
-
 scout.DesktopGridBench.prototype._createViewAreaColumns = function() {
   for (var i = 0; i < 3; i++) {
-    var viewAreaCol=scout.create('ViewAreaColumn', {
+    var viewAreaCol = scout.create('ViewAreaColumn', {
       parent: this
     });
-    viewAreaCol.on('viewActivated',this._viewActivatedHandler);
-    viewAreaCol.on('viewDeactivated',this._viewDeactivatedHandler);
+    viewAreaCol.on('viewActivated', this._viewActivatedHandler);
+    viewAreaCol.on('viewDeactivated', this._viewDeactivatedHandler);
     this.viewAreaColumns.push(viewAreaCol);
   }
 };
 
 scout.DesktopGridBench.prototype.showView = function(view) {
-//  if (view.rendered) {
-//    throw new Error('view already rendered');
-//  }
-  //  if (!this._desktop.bench) {
-  //    throw new Error('Bench not available');
-  //  }
   var viewAreaColumn;
+  if(!view.displayViewId || view.displayViewId === ''){
+    view.displayViewId = 'C';
+  }
   switch (view.displayViewId) {
     case 'NW':
     case 'W':
@@ -384,6 +379,7 @@ scout.DesktopGridBench.prototype.showView = function(view) {
     this._revalidateSplitters();
   }
   // update view tabs
+  this._revalidateCenterTabArea();
 
 };
 
@@ -396,7 +392,20 @@ scout.DesktopGridBench.prototype.removeView = function(view) {
       this._revalidateSplitters(true);
     }
   }
+  // update view tabs
+  this._revalidateCenterTabArea();
+};
 
+scout.DesktopGridBench.prototype._revalidateCenterTabArea = function() {
+  var some=this.getViews().some(function(view) {
+    console.log('some with viewID: '+view.displayViewId);
+      return 'C' !== view.displayViewId;
+    });
+  if (!some) {
+    console.log('only centerViews!!!');
+  }else{
+  console.log('NOt only centerViews!!!');
+  }
 };
 
 scout.DesktopGridBench.prototype.getComponents = function() {
@@ -404,7 +413,8 @@ scout.DesktopGridBench.prototype.getComponents = function() {
 };
 
 scout.DesktopGridBench.prototype.getViews = function(displayViewId) {
-  return this.viewAreaColumns.flatMap(function(column){
-    return column.getViews(displayViewId);
-  });
+  return this.viewAreaColumns.reduce(function(arr, column) {
+    Array.prototype.push.apply(arr, column.getViews(displayViewId));
+    return arr;
+  }, []);
 };

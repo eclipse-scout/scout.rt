@@ -226,6 +226,7 @@
   __include("scout/desktop/PopupWindow.js");
   __include("scout/desktop/bench/DesktopBench.js");
   __include("scout/desktop/bench/DesktopBenchLayout.js");
+  __include("scout/desktop/viewtab/ViewTabAreaController.js");
   __include("scout/desktop/view/ViewArea.js");
   __include("scout/desktop/view/ViewAreaLayout.js");
   __include("scout/desktop/grid/DesktopGridBench.js");

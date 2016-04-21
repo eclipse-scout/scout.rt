@@ -233,9 +233,10 @@ scout.ViewAreaColumn.prototype.hasViews = function() {
   return this.viewCount() > 0;
 };
 scout.ViewAreaColumn.prototype.getViews = function(displayViewId) {
-  return this.viewAreas.flatMap(function(viewArea){
-    return viewArea.getViews(displayViewId);
-  });
+  return this.viewAreas.reduce(function(arr, viewArea){
+     Array.prototype.push.apply(arr, viewArea.getViews(displayViewId));
+     return arr;
+  },[]);
 };
 
 scout.ViewAreaColumn.prototype.getComponents = function() {
