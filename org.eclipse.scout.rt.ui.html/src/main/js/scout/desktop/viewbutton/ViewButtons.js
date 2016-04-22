@@ -13,6 +13,7 @@ scout.ViewButtons = function() {
   this.viewMenuTab;
   this.viewTabs;
   this._desktopOutlineChangedHandler = this._onDesktopOutlineChanged.bind(this);
+  this._viewButtonPropertyChangeHandler = this._onViewButtonPropertyChange.bind(this);
 };
 scout.inherits(scout.ViewButtons, scout.Widget);
 
@@ -54,11 +55,17 @@ scout.ViewButtons.prototype._render = function($parent) {
   this.session.keyStrokeManager.installKeyStrokeContext(this.desktopKeyStrokeContext);
 
   this._onDesktopOutlineChanged();
+  this.desktop.viewButtons.forEach(function(viewButton) {
+    viewButton.on('propertyChange', this._viewButtonPropertyChangeHandler);
+  }, this);
   this.desktop.on('outlineChanged', this._desktopOutlineChangedHandler);
 };
 
 scout.ViewButtons.prototype._remove = function() {
   this.desktop.off('outlineChanged', this._desktopOutlineChangedHandler);
+  this.desktop.viewButtons.forEach(function(viewButton) {
+    viewButton.off('selected', this._viewButtonPropertyChangeHandler);
+  }, this);
   this.session.keyStrokeManager.uninstallKeyStrokeContext(this.desktopKeyStrokeContext);
   scout.ViewButtons.parent.prototype._remove.call(this);
 };
@@ -98,10 +105,27 @@ scout.ViewButtons.prototype.bringToFront = function() {
  */
 scout.ViewButtons.prototype._onDesktopOutlineChanged = function(event) {
   var outline = this.desktop.outline;
-  this.viewMenuTab.onOutlineChanged(outline);
   this._viewButtons().forEach(function(viewTab) {
     if (viewTab instanceof scout.OutlineViewButton) {
       viewTab.onOutlineChanged(outline);
     }
   });
+};
+
+scout.ViewButtons.prototype._onViewButtonSelected = function(event) {
+  // Deselect other togglable view buttons
+  this.desktop.viewButtons.forEach(function(viewButton) {
+    if (viewButton !== event.source && viewButton.isToggleAction()) {
+      viewButton.setSelected(false);
+    }
+  }, this);
+
+  // Inform viewMenu tab about new selection
+  this.viewMenuTab.onViewButtonSelected();
+};
+
+scout.ViewButtons.prototype._onViewButtonPropertyChange = function(event) {
+  if (event.changedProperties.indexOf('selected') !== -1) {
+    this._onViewButtonSelected(event);
+  }
 };

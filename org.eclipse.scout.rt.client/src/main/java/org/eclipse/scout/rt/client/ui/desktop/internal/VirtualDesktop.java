@@ -764,4 +764,13 @@ public class VirtualDesktop implements IDesktop {
     return null;
   }
 
+  @Override
+  public void setNavigationHandleVisible(boolean visible) {
+  }
+
+  @Override
+  public boolean isNavigationHandleVisible() {
+    return false;
+  }
+
 }

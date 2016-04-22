@@ -224,6 +224,7 @@ scout.DesktopBench.prototype._showDetailContentForPage = function(node) {
 
 scout.DesktopBench.prototype.updateOutlineContent = function() {
   if (!this.outlineContentVisible || !this.outline) {
+    this.setOutlineContent(null);
     return;
   }
   var selectedPages = this.outline.selectedNodes;
@@ -247,12 +248,15 @@ scout.DesktopBench.prototype.updateOutlineContentDebounced = function() {
   }.bind(this), 300);
 };
 
-scout.DesktopBench.prototype.updateNavigationHandleVisibility = function(event) {
-  this.setNavigationHandleVisible(!this.desktop.navigationVisible && this.desktop.displayStyle !== scout.Desktop.DisplayStyle.COMPACT);
+scout.DesktopBench.prototype.updateNavigationHandleVisibility = function() {
+  // Don't show handle if desktop says handle must not be visible
+  // Only show handle if navigation is invisible
+  this.setNavigationHandleVisible(this.desktop.navigationHandleVisible && !this.desktop.navigationVisible);
 };
 
 scout.DesktopBench.prototype._onDesktopOutlineChanged = function(event) {
   this.setOutline(this.desktop.outline);
+  this.updateNavigationHandleVisibility();
 };
 
 scout.DesktopBench.prototype._onOutlineNodesSelected = function(event) {
@@ -284,6 +288,10 @@ scout.DesktopBench.prototype._onDesktopNavigationVisibleChange = function(event)
   }
 };
 
+scout.DesktopBench.prototype._onDesktopNavigationHandleVisibleChange = function(event) {
+  this.updateNavigationHandleVisibility();
+};
+
 scout.DesktopBench.prototype._onDesktopAnimationEnd = function(event) {
   if (!this.desktop.navigationVisible) {
     this.updateNavigationHandleVisibility();
@@ -293,6 +301,8 @@ scout.DesktopBench.prototype._onDesktopAnimationEnd = function(event) {
 scout.DesktopBench.prototype._onDesktopPropertyChange = function(event) {
   if (event.changedProperties.indexOf('navigationVisible') !== -1) {
     this._onDesktopNavigationVisibleChange();
+  } else if (event.changedProperties.indexOf('navigationHandleVisible') !== -1) {
+    this._onDesktopNavigationHandleVisibleChange();
   }
 };
 

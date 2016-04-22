@@ -18,7 +18,7 @@ scout.ViewMenuTab = function() {
   this.$container;
   this.$arrowIcon; // small "arrow down" icon at the right side of the icon
 
-  this.outlineViewButton = null;
+  this.viewButton = null;
   this.selected = false;
   this.iconId;
   this.inBackground = false;
@@ -38,19 +38,19 @@ scout.ViewMenuTab.prototype._init = function(model) {
 };
 
 /**
- * 1. look for a selected outline-view-button
- * 2. look for any outline-view-button
- * 3. in rare cases there will be no outline-view-button at all
+ * 1. look for a selected view-button
+ * 2. look for any view-button
+ * 3. in rare cases there will be no view-button at all
  */
 scout.ViewMenuTab.prototype._update = function() {
-  var ovb = this._findOutlineViewButton(true);
-  if (ovb) {
+  var viewButton = this._findSelectedViewButton();
+  if (viewButton) {
     this.selected = true;
   } else {
-    ovb = this._findOutlineViewButton(false);
+    viewButton = this.viewMenus[0];
     this.selected = false;
   }
-  this.outlineViewButton = ovb;
+  this.viewButton = viewButton;
 
   // Use iconId from outline view button (defaultIconId as fallback)
   this.iconId = (this.outlineViewButton && this.outlineViewButton.iconId) || this.defaultIconId;
@@ -88,19 +88,12 @@ scout.ViewMenuTab.prototype._updateArrowIconVisibility = function() {
   this.$arrowIcon.toggleClass('hidden', !this.selected || this.inBackground);
 };
 
-/**
- * @param onlySelected when false -> function returns the first viewMenu which is an OutlineViewButton
- *                     when true  -> function returns the first viewMenu which is an OutlineViewButton AND also selected
- */
-scout.ViewMenuTab.prototype._findOutlineViewButton = function(onlySelected) {
+scout.ViewMenuTab.prototype._findSelectedViewButton = function() {
   var viewMenu;
   for (var i = 0; i < this.viewMenus.length; i++) {
     viewMenu = this.viewMenus[i];
-    if (viewMenu instanceof scout.OutlineViewButton) {
-      if (!onlySelected ||
-        onlySelected && viewMenu.selected) {
-        return viewMenu;
-      }
+    if (viewMenu.selected) {
+      return viewMenu;
     }
   }
   return null;
@@ -112,7 +105,7 @@ scout.ViewMenuTab.prototype._findOutlineViewButton = function(onlySelected) {
 scout.ViewMenuTab.prototype.togglePopup = function() {
   if (this.selected) {
     if (this.inBackground) {
-      this.session.desktop.bringOutlineToFront(this.outlineViewButton.outline);
+      this.session.desktop.bringOutlineToFront(this.viewButton.outline);
     } else {
       // Open or close the popup.
       if (this.popup) {
@@ -123,7 +116,7 @@ scout.ViewMenuTab.prototype.togglePopup = function() {
       return false; // menu won't open if we didn't abort the mousedown-event
     }
   } else {
-    this.outlineViewButton.doAction();
+    this.viewButton.doAction();
   }
 };
 
@@ -190,19 +183,13 @@ scout.ViewMenuTab.prototype._popupViewMenus = function() {
   return popupMenus;
 };
 
-scout.ViewMenuTab.prototype.onOutlineChanged = function(outline) {
-  var i, viewMenu, ovb = null;
-  for (i = 0; i < this.viewMenus.length; i++) {
-    viewMenu = this.viewMenus[i];
-    if (viewMenu instanceof scout.OutlineViewButton && viewMenu.outline === outline) {
-      ovb = viewMenu;
-      break;
-    }
-  }
-
-  if (ovb) {
-    this.outlineViewButton = ovb;
-    this.setIconId(ovb.iconId || this.defaultIconId);
+scout.ViewMenuTab.prototype.onViewButtonSelected = function() {
+  var viewButton = this._findSelectedViewButton();
+  if (viewButton) {
+    // only change if a new viewMenu was selected, otherwise keep old viewButton in order to reselect it when the viewMenu gets selected again
+    this.viewButton = viewButton;
+    // Use iconId from selected view button or defaultIconId as fallback
+    this.setIconId(this.viewButton.iconId || this.defaultIconId);
     this.setSelected(true);
   } else {
     this.setSelected(false);

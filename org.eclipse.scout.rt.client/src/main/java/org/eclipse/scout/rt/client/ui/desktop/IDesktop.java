@@ -115,6 +115,8 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent {
 
   String PROP_NAVIGATION_VISIBLE = "navigationVisible";
 
+  String PROP_NAVIGATION_HANDLE_VISIBLE = "navigationHandleVisible";
+
   String PROP_HEADER_VISIBLE = "headerVisible";
 
   String PROP_BENCH_VISIBLE = "benchVisible";
@@ -157,7 +159,7 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent {
    * Convenience alias for {@link #findAction(Class)}
    */
   <T extends IMenu> T findMenu(Class<T> menuType);
-  
+
   /**
    * @deprecated use {@link #getMenuByClass(Class)} instead
    */
@@ -841,6 +843,16 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent {
    * @since 6.0
    */
   boolean isNavigationVisible();
+
+  /**
+   * @since 6.0
+   */
+  void setNavigationHandleVisible(boolean visible);
+
+  /**
+   * @since 6.0
+   */
+  boolean isNavigationHandleVisible();
 
   /**
    * @since 6.0

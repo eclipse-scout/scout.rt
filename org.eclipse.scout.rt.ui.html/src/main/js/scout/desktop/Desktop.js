@@ -269,6 +269,10 @@ scout.Desktop.prototype._renderNavigationVisible = function() {
   this.invalidateLayoutTree();
 };
 
+scout.Desktop.prototype._renderNavigationHandleVisible = function() {
+  // NOP
+};
+
 scout.Desktop.prototype._renderHeader = function() {
   if (this.header) {
     return;
