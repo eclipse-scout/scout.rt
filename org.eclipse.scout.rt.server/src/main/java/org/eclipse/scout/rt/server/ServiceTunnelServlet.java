@@ -266,7 +266,7 @@ public class ServiceTunnelServlet extends HttpServlet {
     return serverSession;
   }
 
-  private class ScoutSessionBindingListener implements HttpSessionBindingListener, Serializable {
+  private static class ScoutSessionBindingListener implements HttpSessionBindingListener, Serializable {
     private static final long serialVersionUID = 1L;
 
     private final IServerSession m_session;
