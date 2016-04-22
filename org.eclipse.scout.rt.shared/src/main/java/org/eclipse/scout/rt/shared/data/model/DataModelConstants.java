@@ -676,7 +676,17 @@ public interface DataModelConstants {
    * </p>
    */
   int OPERATOR_LIKE = 46;
-  //max is 60
+  /**
+   * <p>
+   * Is a string not like another string?
+   * </p>
+   * <p>
+   * When using the SqlService, this corresponds to
+   * {@link org.eclipse.scout.rt.server.services.common.jdbc.style.ISqlStyle#createNotLike(String, String)}
+   * </p>
+   */
+  int OPERATOR_NOT_LIKE = 61;
+  //max is 61
 
   int AGGREGATION_NONE = 0;
   int AGGREGATION_COUNT = 1;
