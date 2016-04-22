@@ -15,8 +15,8 @@ import java.security.PermissionCollection;
 
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.Replace;
+import org.eclipse.scout.rt.shared.services.common.security.AbstractAccessControlService;
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
-import org.eclipse.scout.rt.shared.services.common.security.UserIdAccessControlService;
 
 /**
  * {@link IAccessControlService} service for testing using {@link AllPermission}
@@ -25,7 +25,12 @@ import org.eclipse.scout.rt.shared.services.common.security.UserIdAccessControlS
  */
 @Order(4500)
 @Replace
-public class AllAccessControlService extends UserIdAccessControlService {
+public class AllAccessControlService extends AbstractAccessControlService<String> {
+
+  @Override
+  protected String getCurrentUserCacheKey() {
+    return getUserIdOfCurrentUser();
+  }
 
   @Override
   protected PermissionCollection execLoadPermissions(String userId) {

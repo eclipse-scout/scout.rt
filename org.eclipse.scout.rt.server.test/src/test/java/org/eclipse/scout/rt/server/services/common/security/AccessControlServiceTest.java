@@ -32,7 +32,6 @@ import org.eclipse.scout.rt.shared.clientnotification.IClientNotificationService
 import org.eclipse.scout.rt.shared.security.RemoteServiceAccessPermission;
 import org.eclipse.scout.rt.shared.services.common.security.AbstractAccessControlService;
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
-import org.eclipse.scout.rt.shared.services.common.security.UserIdAccessControlService;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.testing.server.runner.RunWithServerSession;
 import org.eclipse.scout.rt.testing.server.runner.ServerTestRunner;
@@ -113,7 +112,12 @@ public class AccessControlServiceTest {
    * An access control service with {@link TestPermission1} for testing
    */
   @IgnoreBean
-  private static class TestAccessControlService extends UserIdAccessControlService {
+  private static class TestAccessControlService extends AbstractAccessControlService<String> {
+
+    @Override
+    protected String getCurrentUserCacheKey() {
+      return getUserIdOfCurrentUser();
+    }
 
     @Override
     protected PermissionCollection execLoadPermissions(String userId) {
