@@ -75,7 +75,7 @@ scout.Device.Type = {
  * Called during bootstrap by index.html before the session startup.<p>
  * Precalculates the value of some attributes to store them
  * in a static way (and prevent many repeating function calls within loops).<p>
- * Also loads device specific scripts (fast click for ios devices)
+ * Also loads device specific scripts (e.g. fast click for ios devices)
  */
 scout.Device.prototype.bootstrap = function() {
   var deferreds = [];
@@ -89,6 +89,8 @@ scout.Device.prototype.bootstrap = function() {
   if (this._needsFastClick()) {
     // We use Fastclick to prevent the 300ms delay when touching an element.
     deferreds.push(this._loadFastClickDeferred());
+  } else if (this.isIos()){
+    this._installActiveHandler();
   }
 
   if (this.hasOnScreenKeyboard()) {
@@ -138,6 +140,15 @@ scout.Device.prototype._loadScriptDeferred = function(scriptUrl, doneFunc) {
   return $
     .getCachedScript(scriptUrl)
     .done(doneFunc);
+};
+
+/**
+ * IOs does only trigger :active when touching an element if a touchstart listener is attached
+ * Unfortunately, the :active is also triggered when scrolling, there is no delay.
+ * To fix this we would have to work with a custom active class which will be toggled on touchstart/end
+ */
+scout.Device.prototype._installActiveHandler = function() {
+  document.addEventListener('touchstart', function() {}, false);
 };
 
 scout.Device.prototype.hasOnScreenKeyboard = function() {
