@@ -35,7 +35,7 @@ scout.ViewTab.prototype._init = function(options) {
 
 scout.ViewTab.prototype.renderAfter = function($parent, sibling) {
   this.render($parent);
-  if(sibling){
+  if (sibling) {
     this.$container.insertAfter(sibling.$container);
   }
 };
@@ -61,13 +61,12 @@ scout.ViewTab.prototype.deselect = function() {
 
 scout.ViewTab.prototype._cssSelect = function(selected) {
   if (this.$container) {
-    if(this.$container.select() === selected){
+    if (this.$container.select() === selected) {
       return;
     }
     this.$container.select(selected);
   }
 };
-
 
 scout.ViewTab.prototype._onMouseDown = function(event) {
   this.trigger('tabClicked');

@@ -72,6 +72,8 @@ scout.ViewArea.prototype._render = function($parent) {
   // render content
   this.$viewContent = this.$container.appendDiv('tab-content');
   this.viewContent = new scout.HtmlComponent(this.$viewContent, this.session);
+
+  this._renderView(this.currentView);
 };
 
 scout.ViewArea.prototype._renderviewTabArea = function() {
@@ -80,6 +82,19 @@ scout.ViewArea.prototype._renderviewTabArea = function() {
   }
   this.viewTabArea.render(this.$container);
   this.$viewTabArea = this.viewTabArea.$container;
+};
+
+scout.ViewArea.prototype._renderView = function(view) {
+  if (!view) {
+    return;
+  }
+  if (view.rendered) {
+    return;
+  }
+  view.render(this.$viewContent);
+  view.setParent(this);
+  view.$container.addClass('view');
+  view.validateRoot = true;
 };
 
 scout.ViewArea.prototype._remove = function() {
@@ -102,13 +117,6 @@ scout.ViewArea.prototype.activateView = function(view) {
   if (view === this.currentView) {
     return;
   }
-  if (!view) {
-    return;
-  }
-  // render
-  if (!this.rendered) {
-    this.render(this.parent.$container);
-  }
 
   if (this.currentView) {
     this.currentView.detach();
@@ -118,7 +126,9 @@ scout.ViewArea.prototype.activateView = function(view) {
     this.currentView = null;
   }
   // ensure rendered
-  this._renderView(view);
+  if (this.rendered) {
+    this._renderView(view);
+  }
   if (!view.attached) {
     view.attach();
   }
@@ -128,20 +138,15 @@ scout.ViewArea.prototype.activateView = function(view) {
     view: view
   });
 
-  this.viewContent.invalidateLayoutTree();
-  // Layout immediate to prevent 'laggy' form visualization,
-  // but not initially while desktop gets rendered because it will be done at the end anyway
-  this.viewContent.validateLayoutTree();
+  if (this.rendered) {
+    this.viewContent.invalidateLayoutTree();
+    // Layout immediate to prevent 'laggy' form visualization,
+    // but not initially while desktop gets rendered because it will be done at the end anyway
+    this.viewContent.validateLayoutTree();
+  }
 };
 
 scout.ViewArea.prototype.showView = function(view) {
-  // render
-  if (!this.rendered) {
-    this.render(this.parent.$container);
-  }
-  if (!view) {
-    return;
-  }
   if (this.viewStack.indexOf(view) > -1) {
     this.activateView(view);
     return;
@@ -181,27 +186,21 @@ scout.ViewArea.prototype._addToViewStack = function(view) {
   return sibling;
 };
 
-scout.ViewArea.prototype._renderView = function(view) {
-  if (view.rendered) {
-    return;
-  }
-  view.render(this.$viewContent);
-  view.setParent(this);
-  view.$container.addClass('view');
-  view.validateRoot = true;
-};
+scout.ViewArea.prototype.removeView = function(view, showSiblingView) {
 
-scout.ViewArea.prototype.removeView = function(view) {
   if (!view) {
     return;
   }
+  showSiblingView = scout.nvl(showSiblingView, true);
   var index = this.viewStack.indexOf(view);
   if (index > -1) {
     // activate previous
-    if (index - 1 >= 0) {
-      this.activateView(this.viewStack[index - 1]);
-    } else if (index + 1 < this.viewStack.length) {
-      this.activateView(this.viewStack[index + 1]);
+    if (showSiblingView) {
+      if (index - 1 >= 0) {
+        this.activateView(this.viewStack[index - 1]);
+      } else if (index + 1 < this.viewStack.length) {
+        this.activateView(this.viewStack[index + 1]);
+      }
     }
 
     // remove
@@ -213,13 +212,11 @@ scout.ViewArea.prototype.removeView = function(view) {
       view: view
     });
 
-    // remove if empty
-    if (!this.hasViews() && this.rendered) {
-      this.remove();
-    }
+    if (this.rendered) {
 
-    this.viewContent.invalidateLayoutTree();
-    this.viewContent.validateLayoutTree();
+      this.viewContent.invalidateLayoutTree();
+      this.viewContent.validateLayoutTree();
+    }
   }
 };
 

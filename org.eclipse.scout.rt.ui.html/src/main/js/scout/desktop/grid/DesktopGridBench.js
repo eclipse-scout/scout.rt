@@ -27,8 +27,13 @@ scout.DesktopGridBench = function() {
   this._outlineNodesSelectedHandler = this._onOutlineNodesSelected.bind(this);
   this._outlinePageChangedHandler = this._onOutlinePageChanged.bind(this);
   this._outlinePropertyChangeHandler = this._onOutlinePropertyChange.bind(this);
+
+  // event listener functions
+  this._viewAddedHandler = this._onViewAdded.bind(this);
+  this._viewRemovedHandler = this._onViewRemoved.bind(this);
   this._viewActivatedHandler = this._onViewActivated.bind(this);
   this._viewDeactivatedHandler = this._onViewDeactivated.bind(this);
+
   this._addEventSupport();
 };
 scout.inherits(scout.DesktopGridBench, scout.Widget);
@@ -44,7 +49,24 @@ scout.DesktopGridBench.prototype._init = function(model) {
 
   this._createViewAreaColumns();
   this.desktop = this.session.desktop;
+  this.headerViewTabBox = model.headerViewTabBox;
   this.outlineContentVisible = scout.nvl(model.outlineContentVisible, true);
+  this.setOutline(this.desktop.outline);
+  // controller for headerViewTabBox
+  this.headerViewTabBoxController = new scout.HeaderViewTabBoxController(this, this.headerViewTabBox);
+};
+
+scout.DesktopGridBench.prototype._createViewAreaColumns = function() {
+  for (var i = 0; i < 3; i++) {
+    var viewAreaCol = scout.create('ViewAreaColumn', {
+      parent: this
+    });
+    viewAreaCol.on('viewAdded', this._viewAddedHandler);
+    viewAreaCol.on('viewRemoved', this._viewRemovedHandler);
+    viewAreaCol.on('viewActivated', this._viewActivatedHandler);
+    viewAreaCol.on('viewDeactivated', this._viewDeactivatedHandler);
+    this.viewAreaColumns.push(viewAreaCol);
+  }
 };
 
 scout.DesktopGridBench.prototype._initKeyStrokeContext = function(keyStrokeContext) {
@@ -64,24 +86,46 @@ scout.DesktopGridBench.prototype._initKeyStrokeContext = function(keyStrokeConte
 scout.DesktopGridBench.prototype._render = function($parent) {
   this.$container = $parent.appendDiv('desktop-grid-bench');
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
-  this.setOutline(this.desktop.outline); //TODO CGU maybe better create destroy(), call setOutline in init and attach outline listener in init/destroy
-  this._renderOrAttachOutlineContent();
+
+  //  this._renderOrAttachOutlineContent();
   this.htmlComp.setLayout(new scout.DesktopGridBenchLayout(this));
 
+  this._renderViewColumns();
+  this._revalidateSplitters();
   this.session.keyStrokeManager.installKeyStrokeContext(this.desktopKeyStrokeContext);
+  //TODO CGU maybe better create destroy(), call setOutline in init and attach outline listener in init/destroy
   this.desktop.on('outlineChanged', this._desktopOutlineChangedHandler);
+};
+
+scout.DesktopGridBench.prototype._renderViewColumns = function() {
+  this.viewAreaColumns.forEach(function(column) {
+    if (column.viewCount() > 0) {
+      this._renderViewColumn(column);
+
+    }
+  }.bind(this));
+};
+
+scout.DesktopGridBench.prototype._renderViewColumn = function(viewColumn) {
+  if (!viewColumn || viewColumn.rendered) {
+    return;
+  }
+
+  viewColumn.render(this.$container);
 };
 
 scout.DesktopGridBench.prototype._remove = function() {
   this.desktop.off('outlineChanged', this._desktopOutlineChangedHandler);
   this.session.keyStrokeManager.uninstallKeyStrokeContext(this.desktopKeyStrokeContext);
   scout.DesktopGridBench.parent.prototype._remove.call(this);
+
 };
 
 scout.DesktopGridBench.prototype._renderOrAttachOutlineContent = function() {
   if (!this.outlineContent || this.desktop.inBackground) {
     return;
   }
+  //  this.showView(this.outlineContent);
   if (!this.outlineContent.rendered) {
     this._renderOutlineContent();
   } else if (!this.outlineContent.attached) {
@@ -94,11 +138,6 @@ scout.DesktopGridBench.prototype._renderOutlineContent = function() {
     return;
   }
 
-  if (this.outlineContent instanceof scout.Table) {
-    this.outlineContent.menuBar.top();
-    this.outlineContent.menuBar.large();
-  }
-  this.outlineContent.displayViewId = 'C';
   this.showView(this.outlineContent);
   //  this.outlineContent.render(this.$container);
   //  this.outlineContent.htmlComp.validateRoot = true;
@@ -125,7 +164,7 @@ scout.DesktopGridBench.prototype._removeOutlineContent = function() {
   if (this.outlineContent instanceof scout.Table) {
     this.outlineContent.storeScrollPosition();
   }
-  this.removeView(this.outlineContent);
+  this.removeView(this.outlineContent, false);
 
 };
 
@@ -149,22 +188,28 @@ scout.DesktopGridBench.prototype.setOutlineContent = function(content) {
   if (this.outlineContent === content) {
     return;
   }
+
   if (this.rendered) {
     this._removeOutlineContent();
   }
   // reset view tab relevant properties.
-  delete content.title;
-  delete content.subTitle;
-  delete content.iconId;
+  if (content) {
+    delete content.title;
+    delete content.subTitle;
+    delete content.iconId;
+  }
   this._setProperty('outlineContent', content);
   // Inform header that outline content has changed
   // (having a listener in the header is quite complex due to initialization phase, a direct call here is much easier to implement)
   //  if (this.desktop.header) {
   //    this.desktop.header.onBenchOutlineContentChange(content, oldContent);
   //  }
-  if (this.rendered) {
-    this._renderOrAttachOutlineContent();
+  if (content) {
+    this.showView(content);
   }
+  //  if (this.rendered) {
+  //    this._renderOrAttachOutlineContent();
+  //  }
 };
 
 scout.DesktopGridBench.prototype.setOutlineContentVisible = function(visible) {
@@ -189,16 +234,15 @@ scout.DesktopGridBench.prototype.sendToBack = function() {
   }
 };
 
-scout.DesktopGridBench.prototype._showDefaultDetailForm = function() {
-
-  this.setOutlineContent(this.outline.defaultDetailForm, true);
+scout.DesktopGridBench.prototype._computeDefaultDetailForm = function() {
+  return this.outline.defaultDetailForm;
 };
 
-scout.DesktopGridBench.prototype._showOutlineOverview = function() {
-  this.setOutlineContent(this.outline.outlineOverview, true);
+scout.DesktopGridBench.prototype._computeOutlineOverview = function() {
+  return this.outline.outlineOverview;
 };
 
-scout.DesktopGridBench.prototype._showDetailContentForPage = function(node) {
+scout.DesktopGridBench.prototype._computeDetailContentForPage = function(node) {
   if (!node) {
     throw new Error('called _showDetailContentForPage without node');
   }
@@ -210,25 +254,36 @@ scout.DesktopGridBench.prototype._showDetailContentForPage = function(node) {
     content = node.detailTable;
   }
 
-  this.setOutlineContent(content);
+  return content;
+
 };
 
 scout.DesktopGridBench.prototype.updateOutlineContent = function() {
   if (!this.outlineContentVisible || !this.outline) {
     return;
   }
+  var content;
   var selectedPages = this.outline.selectedNodes;
   if (selectedPages.length === 0) {
     if (this.outline.defaultDetailForm) {
-      this._showDefaultDetailForm();
+      content = this._computeDefaultDetailForm();
     } else if (this.outline.outlineOverview) {
-      this._showOutlineOverview();
+      content = this._computeOutlineOverview();
     }
   } else {
     // Outline does not support multi selection -> [0]
     var selectedPage = selectedPages[0];
-    this._showDetailContentForPage(selectedPage);
+    content = this._computeDetailContentForPage(selectedPage);
+
   }
+  if (content) {
+    if (content instanceof scout.Table) {
+      content.menuBar.top();
+      content.menuBar.large();
+    }
+    content.displayViewId = 'C';
+  }
+  this.setOutlineContent(content);
 };
 
 scout.DesktopGridBench.prototype.updateOutlineContentDebounced = function() {
@@ -330,35 +385,56 @@ scout.DesktopGridBench.prototype._onSplitterPositionChanged = function(event) {
   this.revalidateLayout();
 };
 
+scout.DesktopGridBench.prototype._onViewAdded = function(event) {
+  this.trigger('viewAdded', {
+    view: event.view
+  });
+};
+
+scout.DesktopGridBench.prototype._onViewRemoved = function(event) {
+  this.trigger('viewRemoved', {
+    view: event.view
+  });
+};
+
 scout.DesktopGridBench.prototype._onViewActivated = function(event) {
   if (this.outlineContent === event.view) {
     this.desktop.bringOutlineToFront(this.desktop.outline);
   }
+  this.trigger('viewActivated', {
+    view: event.view
+  });
 };
 
 scout.DesktopGridBench.prototype._onViewDeactivated = function(event) {
   if (this.outlineContent === event.view) {
     this.desktop.sendOutlineToBack();
   }
-};
-
-scout.DesktopGridBench.prototype._createViewAreaColumns = function() {
-  for (var i = 0; i < 3; i++) {
-    var viewAreaCol = scout.create('ViewAreaColumn', {
-      parent: this
-    });
-    viewAreaCol.on('viewActivated', this._viewActivatedHandler);
-    viewAreaCol.on('viewDeactivated', this._viewDeactivatedHandler);
-    this.viewAreaColumns.push(viewAreaCol);
-  }
+  this.trigger('viewDeactivated', {
+    view: event.view
+  });
 };
 
 scout.DesktopGridBench.prototype.showView = function(view) {
-  var viewAreaColumn;
-  if(!view.displayViewId || view.displayViewId === ''){
+  if (!view.displayViewId || view.displayViewId === '') {
     view.displayViewId = 'C';
   }
-  switch (view.displayViewId) {
+  var viewAreaColumn = this._getViewColumn(view.displayViewId);
+  this._viewTabMap[view.id] = viewAreaColumn;
+  viewAreaColumn.showView(view);
+
+  if (this.rendered) {
+    if (viewAreaColumn.viewCount() === 1) {
+      this._renderViewColumn(viewAreaColumn);
+      this._revalidateSplitters();
+    }
+  }
+};
+
+scout.DesktopGridBench.prototype._getViewColumn = function(displayViewId) {
+  var viewAreaColumn;
+
+  switch (displayViewId) {
     case 'NW':
     case 'W':
     case 'SW':
@@ -373,43 +449,31 @@ scout.DesktopGridBench.prototype.showView = function(view) {
       viewAreaColumn = this.viewAreaColumns[this.VIEW_AREA_COLUMN_INDEX.CENTER];
       break;
   }
-  this._viewTabMap[view.id] = viewAreaColumn;
-  viewAreaColumn.showView(view);
-  if (viewAreaColumn.viewCount() === 1) {
-    this._revalidateSplitters();
-  }
-  // update view tabs
-  this._revalidateCenterTabArea();
-
+  return viewAreaColumn;
 };
-
-scout.DesktopGridBench.prototype.removeView = function(view) {
+scout.DesktopGridBench.prototype.removeView = function(view, showSiblingView) {
   var viewAreaColumn = this._viewTabMap[view.id];
   if (viewAreaColumn) {
-    viewAreaColumn.removeView(view);
+    viewAreaColumn.removeView(view, showSiblingView);
     delete this._viewTabMap[view.id];
-    if (viewAreaColumn.viewCount() === 0) {
+    // remove if empty
+    if (this.rendered && viewAreaColumn.viewCount() === 0) {
+      viewAreaColumn.remove();
       this._revalidateSplitters(true);
     }
-  }
-  // update view tabs
-  this._revalidateCenterTabArea();
-};
-
-scout.DesktopGridBench.prototype._revalidateCenterTabArea = function() {
-  var some=this.getViews().some(function(view) {
-    console.log('some with viewID: '+view.displayViewId);
-      return 'C' !== view.displayViewId;
-    });
-  if (!some) {
-    console.log('only centerViews!!!');
-  }else{
-  console.log('NOt only centerViews!!!');
   }
 };
 
 scout.DesktopGridBench.prototype.getComponents = function() {
   return this.components;
+};
+
+scout.DesktopGridBench.prototype.getViewArea = function(displayViewId) {
+  var viewColumn = this._getViewColumn(displayViewId);
+  if (!viewColumn) {
+    return;
+  }
+  return viewColumn.getViewArea(displayViewId);
 };
 
 scout.DesktopGridBench.prototype.getViews = function(displayViewId) {

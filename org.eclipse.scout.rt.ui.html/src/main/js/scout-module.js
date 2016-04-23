@@ -234,6 +234,7 @@
   __include("scout/desktop/grid/ViewAreaColumn.js");
   __include("scout/desktop/grid/ViewAreaColumnLayout.js");
   __include("scout/desktop/header/DesktopHeader.js");
+  __include("scout/desktop/header/HeaderViewTabBoxController.js");
   __include("scout/desktop/header/DesktopHeaderLayout.js");
   __include("scout/desktop/navigation/DesktopNavigation.js");
   __include("scout/desktop/navigation/DesktopNavigationHandle.js");

@@ -25,9 +25,9 @@ scout.DesktopHeaderLayout.prototype.layout = function($container) {
     containerSize = htmlContainer.getSize(),
     toolBar = this.header.toolBar,
     viewButtons = this.header.viewButtons,
-    viewTabs = this.header.viewTabs,
-    smallTabsPrefSize = viewTabs.htmlComp.layout.smallPrefSize(),
-    tabsPrefSize = viewTabs.htmlComp.getPreferredSize(),
+    viewTabBox = this.header.viewTabBox,
+    smallTabsPrefSize = viewTabBox.htmlComp.layout.smallPrefSize(),
+    tabsPrefSize = viewTabBox.htmlComp.getPreferredSize(),
     tabsWidth = 0,
     logoWidth = 0,
     viewButtonsWidth = 0,
@@ -44,7 +44,7 @@ scout.DesktopHeaderLayout.prototype.layout = function($container) {
     viewButtonsWidth = viewButtonsPrefSize.width;
     viewButtons.htmlComp.setSize(viewButtonsPrefSize.subtract(viewButtons.htmlComp.getMargins()));
   }
-  viewTabs.htmlComp.$comp.cssLeft(viewButtonsWidth);
+  viewTabBox.htmlComp.$comp.cssLeft(viewButtonsWidth);
 
   if (toolBar) {
     toolBarPrefSize = toolBar.htmlComp.getPreferredSize();
@@ -57,7 +57,7 @@ scout.DesktopHeaderLayout.prototype.layout = function($container) {
   if (smallTabsPrefSize.width <= tabsWidth) {
     // All tabs fit when they have small size -> use available size but max the pref size -> prefSize = size of maximumtabs if tabs use their large (max) size
     tabsWidth = Math.min(tabsPrefSize.width, tabsWidth);
-    setTabsSize();
+    viewTabBox.htmlComp.setSize(new scout.Dimension(tabsWidth, tabsPrefSize.height));
     return;
   }
 
@@ -71,7 +71,7 @@ scout.DesktopHeaderLayout.prototype.layout = function($container) {
 
   tabsWidth = calcTabsWidth();
   if (smallTabsPrefSize.width <= tabsWidth) {
-    tabsWidth = smallTabsPrefSize.width;
+      viewTabBox.htmlComp.setSize(smallTabsPrefSize);
     setTabsSize();
     return;
   }
@@ -105,7 +105,7 @@ scout.DesktopHeaderLayout.prototype.layout = function($container) {
   }
 
   function setTabsSize() {
-    viewTabs.htmlComp.setSize(new scout.Dimension(tabsWidth, tabsPrefSize.height).subtract(viewTabs.htmlComp.getMargins()));
+    viewTabBox.htmlComp.setSize(new scout.Dimension(tabsWidth, tabsPrefSize.height));
   }
 
   function setToolBarSize() {

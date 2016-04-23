@@ -10,6 +10,7 @@
  ******************************************************************************/
 scout.DesktopHeader = function() {
   scout.DesktopHeader.parent.call(this);
+  this.viewTabBox;
   this._desktopPropertyChangeHandler = this._onDesktopPropertyChange.bind(this);
   this._desktopAnimationEndHandler = this._onDesktopAnimationEnd.bind(this);
   this._outlineContentMenuBarPropertyChangeHandler = this._onOutlineContentMenuBarPropertyChange.bind(this);
@@ -22,6 +23,10 @@ scout.DesktopHeader.prototype._init = function(model) {
   this.toolBarVisible = scout.nvl(model.toolBarVisible, true);
   this.viewButtonsVisible = scout.nvl(model.viewButtonsVisible, false);
   this.updateViewButtonsVisibility();
+  // create view tab box
+  this.viewTabBox = scout.create('ViewTabArea', {
+    parent: this
+  });
 };
 
 scout.DesktopHeader.prototype._render = function($parent) {
@@ -49,13 +54,7 @@ scout.DesktopHeader.prototype._remove = function() {
 };
 
 scout.DesktopHeader.prototype._renderViewTabs = function() {
-  if (this.viewTabs) {
-    return;
-  }
-  this.viewTabs = scout.create('ViewTabArea', {
-    parent: this
-  });
-  this.viewTabs.render(this.$container);
+   this.viewTabBox.render(this.$container);
 };
 
 scout.DesktopHeader.prototype._renderToolBar = function() {

@@ -44,6 +44,7 @@ scout.DesktopViewTab.prototype._init = function(options) {
 
   scout.DesktopViewTab.parent.prototype._init.call(this, options);
 
+
   this._installListeners();
 };
 

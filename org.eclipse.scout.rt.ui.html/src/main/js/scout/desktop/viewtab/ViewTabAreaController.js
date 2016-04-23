@@ -61,7 +61,7 @@ scout.ViewTabAreaController.prototype._onViewAdded = function(event) {
 
 scout.ViewTabAreaController.prototype._onViewRemoved = function(event) {
   var view = event.view;
-  if(!view){
+  if (!view) {
     return;
   }
   var viewTab = this._getViewTab(view);
@@ -83,10 +83,10 @@ scout.ViewTabAreaController.prototype._onViewDeactivated = function(event) {
 };
 
 scout.ViewTabAreaController.prototype._onViewTabSelected = function(event) {
-  var view;
-  if(event.viewTab){
-    view = event.viewTab.view;
+  if (!event.viewTab) {
+    return;
   }
+  var view = event.viewTab.view;
   this.viewArea.activateView(view);
 };
 

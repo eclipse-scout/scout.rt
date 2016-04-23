@@ -17,37 +17,66 @@ scout.inherits(scout.ViewAreaLayout, scout.AbstractLayout);
 scout.ViewAreaLayout.prototype.layout = function($container) {
   var containerSize, viewContentSize, viewTabsMargins, innerViewTabsSize,
     htmlContainer = scout.HtmlComponent.get($container),
-    htmlViewTabs = scout.HtmlComponent.get(this.viewArea.$viewTabArea),
+
     htmlViewContent = scout.HtmlComponent.get(this.viewArea.$viewContent),
     viewTabsWidth = 0,
     viewTabsHeight = 0,
-    viewTabsSize = new scout.Dimension();
-//    $status = this._tabBox.$status,
-//    statusPosition = this._tabBox.statusPosition;
+    tabAreaSize ;
+  //    $status = this._tabBox.$status,
+  //    statusPosition = this._tabBox.statusPosition;
 
   containerSize = htmlContainer.getAvailableSize()
     .subtract(htmlContainer.getInsets());
 
-  if (htmlViewTabs.isVisible()) {
-    viewTabsMargins = htmlViewTabs.getMargins();
-    viewTabsHeight = htmlViewTabs.getPreferredSize().height;
-    viewTabsWidth = containerSize.subtract(viewTabsMargins).width;
-//    if ($status && $status.isVisible()) {
-//      this._layoutStatus();
-//      if (statusPosition === scout.FormField.STATUS_POSITION_DEFAULT) {
-//        viewTabsWidth -= $status.outerWidth(true);
-//      }
-//    }
-    innerViewTabsSize = new scout.Dimension(viewTabsWidth, viewTabsHeight);
-    htmlViewTabs.setSize(innerViewTabsSize);
-    viewTabsSize = innerViewTabsSize.add(viewTabsMargins);
-  }
+  tabAreaSize = this._layoutTabArea(containerSize);
 
   viewContentSize = containerSize.subtract(htmlViewContent.getMargins());
-  viewContentSize.height -= viewTabsSize.height;
+  viewContentSize.height -= tabAreaSize.height;
   htmlViewContent.setSize(viewContentSize);
+
+//  if(tabAreaSize ){
+//    htmlViewContent.$comp.marginTop = tabAreaSize.height;
+//  }
+//
+//  if (htmlViewTabs.isVisible()) {
+//    viewTabsMargins = htmlViewTabs.getMargins();
+//    viewTabsHeight = htmlViewTabs.getPreferredSize().height;
+//    viewTabsWidth = containerSize.subtract(viewTabsMargins).width;
+//    //    if ($status && $status.isVisible()) {
+//    //      this._layoutStatus();
+//    //      if (statusPosition === scout.FormField.STATUS_POSITION_DEFAULT) {
+//    //        viewTabsWidth -= $status.outerWidth(true);
+//    //      }
+//    //    }
+//    innerViewTabsSize = new scout.Dimension(viewTabsWidth, viewTabsHeight);
+//    htmlViewTabs.setSize(innerViewTabsSize);
+//    viewTabsSize = innerViewTabsSize.add(viewTabsMargins);
+//  }
+//
+//  viewContentSize = containerSize.subtract(htmlViewContent.getMargins());
+//  viewContentSize.height -= viewTabsSize.height;
+//  htmlViewContent.setSize(viewContentSize);
 };
 
+/**
+ *
+ * @param containerSize
+ * @returns {@link {@link scout.Dimension}} used of the tab area
+ */
+scout.ViewAreaLayout.prototype._layoutTabArea = function(containerSize) {
+  if (!this.viewArea.rendered) {
+    return new scout.Dimension(0,0);
+  }
+  // exprected the tab area is layouted dynamically only
+  var htmlViewTabs = scout.HtmlComponent.get(this.viewArea.$viewTabArea),
+    prefSize = htmlViewTabs.getPreferredSize(),
+    margins = htmlViewTabs.getMargins();
+  var size = new scout.Dimension(containerSize.width, prefSize.height + margins.top + margins.bottom);
+  // TODO
+  htmlViewTabs.setSize(size);
+  return  size;
+
+};
 //scout.ViewAreaLayout.prototype._layoutStatus = function() {
 //  var htmlContainer = this._tabBox.htmlComp,
 //    containerPadding = htmlContainer.getInsets({

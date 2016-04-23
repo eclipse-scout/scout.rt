@@ -19,13 +19,12 @@ scout.ViewAreaColumn = function() {
   this.viewAreas = [];
   this._viewToViewArea = {}; // [key=viewId, value=ViewArea instance]
   this.components;
-  this.viewActivationListener = function(view){
-    this.trigger('viewActivated', view);
-  }.bind(this);
 
-  this.viewDeactivationListener = function(view){
-    this.trigger('viewDeactivated', view);
-  }.bind(this);
+  // event listener functions
+  this._viewAddedHandler = this._onViewAdded.bind(this);
+  this._viewRemovedHandler = this._onViewRemoved.bind(this);
+  this._viewActivatedHandler = this._onViewActivated.bind(this);
+  this._viewDeactivatedHandler = this._onViewDeactivated.bind(this);
 
   this._addEventSupport();
 
@@ -67,6 +66,25 @@ scout.ViewAreaColumn.prototype._render = function($parent) {
   this.$container = $parent.appendDiv('view-area-column');
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
   this.htmlComp.setLayout(this._createLayout());
+
+  this._renderViewAreas();
+  this._revalidateSplitters();
+};
+
+scout.ViewAreaColumn.prototype._renderViewAreas = function() {
+  this.viewAreas.forEach(function(viewArea) {
+    if (viewArea.viewCount() > 0) {
+
+      this._renderViewArea(viewArea);
+    }
+  }.bind(this));
+
+};
+
+scout.ViewAreaColumn.prototype._renderViewArea = function(viewArea) {
+  if (!viewArea.rendered) {
+    viewArea.render(this.$container);
+  }
 };
 
 scout.ViewAreaColumn.prototype._remove = function() {
@@ -90,17 +108,43 @@ scout.ViewAreaColumn.prototype._createLayout = function() {
   return new scout.ViewAreaColumnLayout(this);
 };
 
+scout.ViewAreaColumn.prototype._onViewAdded = function(event) {
+  this.trigger('viewAdded', {
+    view: event.view
+  });
+};
+
+scout.ViewAreaColumn.prototype._onViewRemoved = function(event) {
+  this.trigger('viewRemoved', {
+    view: event.view
+  });
+};
+
+scout.ViewAreaColumn.prototype._onViewActivated = function(event) {
+  this.trigger('viewActivated', {
+    view: event.view
+  });
+};
+
+scout.ViewAreaColumn.prototype._onViewDeactivated = function(event) {
+  this.trigger('viewDeactivated', {
+    view: event.view
+  });
+};
+
 scout.ViewAreaColumn.prototype.activateView = function(view) {
 
 };
 
 scout.ViewAreaColumn.prototype._createViewAreas = function() {
   for (var i = 0; i < 3; i++) {
-    var viewArea=scout.create('ViewArea', {
+    var viewArea = scout.create('ViewArea', {
       parent: this
     });
-    viewArea.on('viewActivated', this.viewActivationListener);
-    viewArea.on('viewDeactivated', this.viewDeactivationListener);
+    viewArea.on('viewAdded', this._viewAddedHandler);
+    viewArea.on('viewRemoved', this._viewRemovedHandler);
+    viewArea.on('viewActivated', this._viewActivatedHandler);
+    viewArea.on('viewDeactivated', this._viewDeactivatedHandler);
     this.viewAreas.push(viewArea);
   }
 };
@@ -174,13 +218,26 @@ scout.ViewAreaColumn.prototype._onSplitterPositionChanged = function() {
 };
 
 scout.ViewAreaColumn.prototype.showView = function(view) {
-  // render
-  if (!this.rendered) {
-    this.render(this.parent.$container);
-  }
 
+  var viewArea = this.getViewArea(view.displayViewId);
+  this._viewToViewArea[view.id] = viewArea;
+
+  viewArea.showView(view);
+
+  if (viewArea.viewCount() === 1) {
+    if (this.rendered) {
+      if (!viewArea.rendered) {
+        // lazy render if the first view is added.
+        viewArea.render(this.$container);
+      }
+      this._revalidateSplitters(true);
+    }
+  }
+};
+
+scout.ViewAreaColumn.prototype.getViewArea = function(displayViewId) {
   var viewArea;
-  switch (view.displayViewId) {
+  switch (displayViewId) {
     case 'NW':
     case 'N':
     case 'NE':
@@ -195,29 +252,21 @@ scout.ViewAreaColumn.prototype.showView = function(view) {
       viewArea = this.viewAreas[this.VIEW_AREA_INDEX.CENTER];
       break;
   }
-  this._viewToViewArea[view.id] = viewArea;
-
-  viewArea.showView(view);
-
-  if (viewArea.viewCount() === 1) {
-    this._revalidateSplitters(true);
-  }
+  return viewArea;
 };
 
-scout.ViewAreaColumn.prototype.removeView = function(view) {
+scout.ViewAreaColumn.prototype.removeView = function(view, showSiblingView) {
   var viewArea = this._viewToViewArea[view.id];
   if (viewArea) {
-    viewArea.removeView(view);
+    viewArea.removeView(view, showSiblingView);
     delete this._viewToViewArea[view.id];
-  }
-
-  if (viewArea.viewCount() === 0) {
-    this._revalidateSplitters(true);
-  }
-
-  // remove if empty
-  if (!this.hasViews() && this.rendered) {
-    this.remove();
+    if (this.rendered) {
+      if (viewArea.viewCount() === 0) {
+        // remove view area if no view is left.
+        viewArea.remove();
+        this._revalidateSplitters(true);
+      }
+    }
   }
 };
 
@@ -233,10 +282,10 @@ scout.ViewAreaColumn.prototype.hasViews = function() {
   return this.viewCount() > 0;
 };
 scout.ViewAreaColumn.prototype.getViews = function(displayViewId) {
-  return this.viewAreas.reduce(function(arr, viewArea){
-     Array.prototype.push.apply(arr, viewArea.getViews(displayViewId));
-     return arr;
-  },[]);
+  return this.viewAreas.reduce(function(arr, viewArea) {
+    Array.prototype.push.apply(arr, viewArea.getViews(displayViewId));
+    return arr;
+  }, []);
 };
 
 scout.ViewAreaColumn.prototype.getComponents = function() {

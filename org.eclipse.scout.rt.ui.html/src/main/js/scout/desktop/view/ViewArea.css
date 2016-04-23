@@ -5,6 +5,7 @@
 
   > .view-tab-area{
     position: relative;
+    height: auto;
 
     /* Has the same effect as "border-bottom: 1px solid @border-color", but is over-drawable by child */
     /* elements (such as the selected view-tab). The border would not be, because of "overflow: hidden". */
@@ -17,5 +18,9 @@
       top: calc(~'100% - 1px');
       left: 0;
     }
+  }
+
+  > .tab-content {
+    height: 100%;
   }
 }

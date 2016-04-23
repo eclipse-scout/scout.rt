@@ -16,6 +16,7 @@ scout.inherits(scout.ViewTabArea, scout.Widget);
 
 scout.ViewTabArea.prototype._init = function(model) {
   scout.ViewTabArea.parent.prototype._init.call(this, model);
+  this.visible = true;
   this._selectedViewTab;
 
   //  this.menuBar = scout.create('MenuBar', {
@@ -28,10 +29,55 @@ scout.ViewTabArea.prototype._init = function(model) {
 };
 
 scout.ViewTabArea.prototype._render = function($parent) {
-
   this.$container = $parent.appendDiv('view-tab-area');
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
   this.htmlComp.setLayout(new scout.ViewTabAreaLayout(this));
+  this._renderVisible();
+};
+
+scout.ViewTabArea.prototype._renderVisible = function() {
+  if(this.visible && this.viewTabs.length > 0){
+    if (!this.attached) {
+      this.attach();
+    }
+  }else{
+    if (this.attached) {
+      this.detach();
+    }
+  }
+};
+
+scout.ViewTabArea.prototype._attach = function() {
+  this._$parent.prepend(this.$container);
+  this.session.detachHelper.afterAttach(this.$container);
+  // If the parent was resized while this view was detached, the view has a wrong size.
+  this.invalidateLayoutTree(false);
+  scout.ViewTabArea.parent.prototype._attach.call(this);
+};
+
+/**
+ * @override Widget.js
+ */
+scout.ViewTabArea.prototype._detach = function() {
+
+  this.session.detachHelper.beforeDetach(this.$container);
+  this.$container.detach();
+  scout.ViewTabArea.parent.prototype._detach.call(this);
+  this.invalidateLayoutTree(false);
+};
+
+scout.ViewTabArea.prototype._onTabSelection = function(event) {
+  this.selectViewTab(event.source);
+};
+
+
+scout.ViewTabArea.prototype.setVisible = function(visible) {
+  if(this.visible === visible){
+    return;
+  }
+  this.visible = visible;
+  this._renderVisible();
+  this.invalidateLayoutTree();
 };
 
 scout.ViewTabArea.prototype.getViewTabs = function() {
@@ -77,6 +123,8 @@ scout.ViewTabArea.prototype.addTab = function(tab, sibling) {
   this.viewTabs.splice(insertPosition + 1, 0, tab);
   tab.renderAfter(this.$container, sibling);
   tab.on('tabClicked', this._viewTabSelectionHandler);
+  this._renderVisible();
+  this.invalidateLayoutTree();
 };
 
 scout.ViewTabArea.prototype.removeTab = function(tab) {
@@ -85,9 +133,8 @@ scout.ViewTabArea.prototype.removeTab = function(tab) {
     this.viewTabs.splice(index, 1);
     tab.remove();
     tab.off('tabClicked', this._viewTabSelectionHandler);
+    this._renderVisible();
+    this.invalidateLayoutTree();
   }
 };
 
-scout.ViewTabArea.prototype._onTabSelection = function(event) {
-  this.selectViewTab(event.source);
-};

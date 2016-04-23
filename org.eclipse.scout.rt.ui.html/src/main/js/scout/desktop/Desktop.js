@@ -195,6 +195,7 @@ scout.Desktop.prototype._renderBench = function() {
   }
   this.bench = scout.create('DesktopGridBench', {
     parent: this,
+    headerViewTabBox : this.header.viewTabBox,
     outlineContentVisible: this.displayStyle !== scout.Desktop.DisplayStyle.COMPACT
   });
   this.bench.render(this.$container);
