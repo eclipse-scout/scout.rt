@@ -1850,6 +1850,12 @@ public class FormDataStatementBuilder implements DataModelConstants {
         }
         return m_sqlStyle.createLike(sql, names[0]);
       }
+      case OPERATOR_NOT_LIKE: {
+        if (!plainBind) {
+          addBind(names[0], m_sqlStyle.toLikePattern(values[0]));
+        }
+        return m_sqlStyle.createNotLike(sql, names[0]);
+      }
       case OPERATOR_NOT_IN: {
         if (!plainBind) {
           addBinds(names, values);

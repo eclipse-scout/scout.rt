@@ -28,14 +28,17 @@ public class StyleHelper {
    * Adds a class to a given class string if not contained yet.
    */
   public String addCssClass(String cssClasses, String cssClass) {
-    if (StringUtility.hasText(cssClasses)
-        && StringUtility.hasText(cssClass)
+    boolean hasCssClasses = StringUtility.hasText(cssClasses);
+    boolean hasCssClass = StringUtility.hasText(cssClass);
+    if (hasCssClasses
+        && hasCssClass
         && !cssClasses.matches("(.* |^)" + Pattern.quote(cssClass) + "( .*|$)")) {
       return cssClasses + " " + cssClass;
     }
-    else {
-      return cssClasses;
+    if (!hasCssClasses && hasCssClass) {
+      return cssClass;
     }
+    return cssClasses;
   }
 
   /**

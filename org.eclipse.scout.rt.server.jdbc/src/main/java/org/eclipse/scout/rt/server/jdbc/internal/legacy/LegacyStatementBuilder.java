@@ -248,6 +248,10 @@ public class LegacyStatementBuilder {
         getBindMap().put(bindName, value);
         return m_sqlStyle.createLike(attribute, bindName);
       }
+      case DataModelConstants.OPERATOR_NOT_LIKE: {
+        getBindMap().put(bindName, value);
+        return m_sqlStyle.createNotLike(attribute, bindName);
+      }
       case DataModelConstants.OPERATOR_NOT_IN: {
         getBindMap().put(bindName, value);
         return m_sqlStyle.createNotIn(attribute, bindName);

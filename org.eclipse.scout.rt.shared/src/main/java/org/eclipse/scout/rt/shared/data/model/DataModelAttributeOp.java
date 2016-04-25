@@ -113,6 +113,8 @@ public final class DataModelAttributeOp implements DataModelConstants {
         return new Contains(OPERATOR_CONTAINS, (shortText == null) ? (ScoutTexts.get("LogicLike")) : (shortText), (text == null) ? (ScoutTexts.get("LogicLike")) : text);
       case OPERATOR_LIKE:
         return new Like(OPERATOR_LIKE, (shortText == null) ? (ScoutTexts.get("LogicEQ")) : (shortText), (text == null) ? (ScoutTexts.get("LogicEQ")) : text);
+      case OPERATOR_NOT_LIKE:
+        return new Like(OPERATOR_NOT_LIKE, (shortText == null) ? (ScoutTexts.get("LogicNEQ")) : (shortText), (text == null) ? (ScoutTexts.get("LogicNEQ")) : text);
       case OPERATOR_NOT_IN:
         return new NotIn(OPERATOR_NOT_IN, (shortText == null) ? (ScoutTexts.get("LogicNotIn")) : (shortText), (text == null) ? (ScoutTexts.get("LogicNotIn")) : text);
       case OPERATOR_NOT_CONTAINS:

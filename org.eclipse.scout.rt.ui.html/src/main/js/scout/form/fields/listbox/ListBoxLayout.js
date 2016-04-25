@@ -26,9 +26,8 @@ scout.ListBoxLayout.prototype.layout = function($container) {
   this.pixelBasedSizing = true;
 
   if (this.filterBox && this.filterBox.rendered && this.filterBox.$container.isVisible()) {
-    minHeight = this.filterBox.children.length * scout.HtmlEnvironment.formRowHeight + ((this.filterBox.children.length - 1) * scout.HtmlEnvironment.formRowGap);
-    heightCalculated = scout.HtmlComponent.get(this.filterBox.$container).getPreferredSize().height * (height / this.preferredLayoutSize($container).height);
-    height -= Math.max(minHeight, heightCalculated);
+    heightCalculated = scout.HtmlComponent.get(this.filterBox.$container).getPreferredSize().height ;
+    height -= heightCalculated;
   }
   height = Math.max(height, 20);
   var htmlTable = scout.HtmlComponent.get(this.table.$container);

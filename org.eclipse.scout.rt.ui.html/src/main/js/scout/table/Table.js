@@ -2399,17 +2399,18 @@ scout.Table.prototype._filterCount = function() {
 };
 
 scout.Table.prototype.filteredRows = function() {
-  if (this._filterCount() === 0) {
-    return this.rows;
-  }
   // filtered rows are cached to avoid unnecessary loops
   if (this._filteredRowsDirty) {
-    this._filteredRows = [];
-    this.rows.forEach(function(row) {
-      if (row.filterAccepted) {
-        this._filteredRows.push(row);
-      }
-    }, this);
+    if (this._filterCount() === 0) {
+      this._filteredRows = this.rows;
+    } else {
+      this._filteredRows = [];
+      this.rows.forEach(function(row) {
+        if (row.filterAccepted) {
+          this._filteredRows.push(row);
+        }
+      }, this);
+    }
     this._filteredRowsDirty = false;
   }
   return this._filteredRows;

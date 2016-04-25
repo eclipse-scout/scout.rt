@@ -738,7 +738,6 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     IUserFilterState filterState = createFilterState(data);
     TableEventFilterCondition condition = addTableEventFilterCondition(TableEvent.TYPE_USER_FILTER_ADDED);
     condition.setUserFilter(filterState);
-    condition.checkUserFilter();
     getModel().getUIFacade().fireFilterAddedFromUI(filterState);
   }
 
@@ -770,7 +769,6 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     IUserFilterState filter = getFilterState(event.getData());
     TableEventFilterCondition condition = addTableEventFilterCondition(TableEvent.TYPE_USER_FILTER_REMOVED);
     condition.setUserFilter(filter);
-    condition.checkUserFilter();
     getModel().getUIFacade().fireFilterRemovedFromUI(filter);
   }
 
@@ -1045,8 +1043,12 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   }
 
   private boolean containsInsertOrDelete(List<TableEvent> events) {
+    boolean rowOrderChangedFound = false;
     for (TableEvent event : events) {
-      if (TableEvent.TYPE_ROWS_INSERTED == event.getType() || TableEvent.TYPE_ROWS_DELETED == event.getType()) {
+      if (TableEvent.TYPE_ROW_ORDER_CHANGED == event.getType()) {
+        rowOrderChangedFound = true;
+      }
+      else if (rowOrderChangedFound && (TableEvent.TYPE_ROWS_INSERTED == event.getType() || TableEvent.TYPE_ROWS_DELETED == event.getType())) {
         return true;
       }
     }

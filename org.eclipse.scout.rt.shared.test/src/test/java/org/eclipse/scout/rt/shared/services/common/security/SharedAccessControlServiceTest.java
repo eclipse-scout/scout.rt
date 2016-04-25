@@ -149,7 +149,12 @@ public class SharedAccessControlServiceTest {
   }
 
   @IgnoreBean
-  private static class P_SharedAccessControlService extends UserIdAccessControlService {
+  private static class P_SharedAccessControlService extends AbstractAccessControlService<String> {
+
+    @Override
+    protected String getCurrentUserCacheKey() {
+      return getUserIdOfCurrentUser();
+    }
 
     @Override
     protected PermissionCollection execLoadPermissions(String userId) {

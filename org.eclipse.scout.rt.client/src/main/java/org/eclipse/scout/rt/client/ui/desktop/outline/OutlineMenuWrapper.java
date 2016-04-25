@@ -509,6 +509,16 @@ public class OutlineMenuWrapper extends AbstractPropertyObserver implements IMen
   }
 
   @Override
+  public String getCssClass() {
+    return m_wrappedMenu.getCssClass();
+  }
+
+  @Override
+  public void setCssClass(String cssClass) {
+    m_wrappedMenu.setCssClass(cssClass);
+  }
+
+  @Override
   public void setView(boolean visible, boolean enabled) {
     unsupported();
   }
