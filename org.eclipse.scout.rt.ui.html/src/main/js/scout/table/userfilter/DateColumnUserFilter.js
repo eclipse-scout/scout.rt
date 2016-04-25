@@ -61,7 +61,9 @@ scout.DateColumnUserFilter.prototype.acceptByFields = function(key, normKey, row
   var
     keyValue = key.valueOf(),
     fromValue = this.dateFrom ? this.dateFrom.valueOf() : null,
-    toValue = this.dateTo ? this.dateTo.valueOf() : null;
+    // Shift the toValue to 1ms before midnight/next day. Thus any time of the selected day is accepted.
+    toValue = this.dateTo ? scout.dates.shift(this.dateTo, 0, 0, 1).valueOf() - 1 : null;
+
   if (fromValue && toValue) {
     return keyValue >= fromValue && keyValue <= toValue;
   } else if (fromValue) {
