@@ -6,7 +6,7 @@ package ${package}.server.security;
 import java.security.AllPermission;
 import java.security.Permissions;
 
-import ${package}.shared.security.UserIdAccessControlService;
+import ${package}.shared.security.AccessControlService;
 import org.eclipse.scout.rt.platform.Replace;
 import org.eclipse.scout.rt.shared.security.RemoteServiceAccessPermission;
 
@@ -16,7 +16,7 @@ import org.eclipse.scout.rt.shared.security.RemoteServiceAccessPermission;
  * @author ${userName}
  */
 @Replace
-public class AccessControlService extends UserIdAccessControlService {
+public class ServerAccessControlService extends AccessControlService {
 
   @Override
   protected Permissions execLoadPermissions(String userId) {

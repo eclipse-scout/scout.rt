@@ -20,7 +20,7 @@ import org.eclipse.scout.rt.shared.services.common.security.IAccessControlServic
  *
  * @author ${userName}
  */
-public class UserIdAccessControlService extends AbstractAccessControlService<String> {
+public class AccessControlService extends AbstractAccessControlService<String> {
 
   @Override
   protected String getCurrentUserCacheKey() {
