@@ -59,9 +59,8 @@ scout.EventSupport.prototype.off = function(type, func) {
     return;
   }
 
-  var listeners = this._eventListeners.slice();
-  for (var i = 0; i < listeners.length; i++) {
-    var listener = listeners[i];
+  for (var i =  this._eventListeners.length -1; i >= 0; i--) {
+    var listener = this._eventListeners[i];
     var funcMatches = (func === listener.func || func === listener.origFunc);
     var typeMatches = (type === listener.type);
     var remove = false;
@@ -74,7 +73,7 @@ scout.EventSupport.prototype.off = function(type, func) {
     }
 
     if (remove) {
-      scout.arrays.remove(this._eventListeners, listener);
+      this._eventListeners.splice(i, 1);
     }
   }
 };
