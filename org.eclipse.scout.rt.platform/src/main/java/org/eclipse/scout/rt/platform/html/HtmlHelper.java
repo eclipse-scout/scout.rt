@@ -153,4 +153,11 @@ public class HtmlHelper {
     String result = StringUtility.replace(input, "\r\n", "<br>");
     return StringUtility.replace(result, "\n", "<br>");
   }
+
+  /**
+   * Combined called, first {@link #escape(String)} and then {@link #newLineToBr(String)}.
+   */
+  public String escapeAndNewLineToBr(String text) {
+    return newLineToBr(escape(text));
+  }
 }

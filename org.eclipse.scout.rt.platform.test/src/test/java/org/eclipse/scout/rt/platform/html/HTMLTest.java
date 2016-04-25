@@ -318,6 +318,43 @@ public class HTMLTest {
     return HTML.tr(HTML.td("A" + prefix + i), HTML.td("B" + prefix + i));
   }
 
+  @Test
+  public void testNewLineToBr() {
+    assertEquals("one &amp; two<br>three &amp; four", HTML.fragment("one & two\nthree & four").toHtml());
+    assertEquals("one &amp; two\nthree &amp; four", HTML.fragment("one & two\nthree & four").withNewLineToBr(false).toHtml());
+
+    assertEquals("<span>one &amp; two<br>three &amp; four</span>", HTML.span("one & two\nthree & four").toHtml());
+    assertEquals("<span>one &amp; two\nthree &amp; four</span>", HTML.span("one & two\nthree & four").withNewLineToBr(false).toHtml());
+
+    assertEquals("<i>one &amp; two<br>three &amp; four</i>", HTML.italic("one & two\nthree & four").toHtml());
+    assertEquals("<i>one &amp; two\nthree &amp; four</i>", HTML.italic("one & two\nthree & four").withNewLineToBr(false).toHtml());
+
+    assertEquals("<b>one &amp; two<br>three &amp; four</b>", HTML.bold("one & two\nthree & four").toHtml());
+    assertEquals("<b>one &amp; two\nthree &amp; four</b>", HTML.bold("one & two\nthree & four").withNewLineToBr(false).toHtml());
+
+    assertEquals("<div>one &amp; two<br>three &amp; four</div>", HTML.div("one & two\nthree & four").toHtml());
+    assertEquals("<div>one &amp; two\nthree &amp; four</div>", HTML.div("one & two\nthree & four").withNewLineToBr(false).toHtml());
+
+    assertEquals("<h1>one &amp; two<br>three &amp; four</h1>", HTML.h1("one & two\nthree & four").toHtml());
+    assertEquals("<h1>one &amp; two\nthree &amp; four</h1>", HTML.h1("one & two\nthree & four").withNewLineToBr(false).toHtml());
+
+    assertEquals("<p>one &amp; two<br>three &amp; four</p>", HTML.p("one & two\nthree & four").toHtml());
+    assertEquals("<p>one &amp; two\nthree &amp; four</p>", HTML.p("one & two\nthree & four").withNewLineToBr(false).toHtml());
+
+    // for app links, only 2 argument (text) is escaped and new lines are replaced
+    assertEquals("<span class=\"app-link\" data-ref=\"one & two\nthree & four\">one &amp; two<br>three &amp; four</span>", HTML.appLink("one & two\nthree & four", "one & two\nthree & four").toHtml());
+    assertEquals("<span class=\"app-link\" data-ref=\"one & two\nthree & four\">one &amp; two\nthree &amp; four</span>", HTML.appLink("one & two\nthree & four", "one & two\nthree & four").withNewLineToBr(false).toHtml());
+  }
+
+  @Test
+  public void testEquality() {
+    assertEquals(BEANS.get(HtmlHelper.class).escapeAndNewLineToBr("one & two\nthree & four"), HTML.fragment("one & two\nthree & four").toHtml());
+    assertEquals(BEANS.get(HtmlHelper.class).escape("one & two\nthree & four"), HTML.fragment("one & two\nthree & four").withNewLineToBr(false).toHtml());
+
+    assertEquals(HTML.raw(BEANS.get(HtmlHelper.class).escapeAndNewLineToBr("one & two\nthree & four")).toHtml(), HTML.fragment("one & two\nthree & four").toHtml());
+    assertEquals(HTML.raw(BEANS.get(HtmlHelper.class).escape("one & two\nthree & four")).toHtml(), HTML.fragment("one & two\nthree & four").withNewLineToBr(false).toHtml());
+  }
+
   @Test(expected = ProcessingException.class)
   public void testNonSerializableRaw() {
     HTML.raw("1", "2", new NonSerializableCharSequence(), "3");

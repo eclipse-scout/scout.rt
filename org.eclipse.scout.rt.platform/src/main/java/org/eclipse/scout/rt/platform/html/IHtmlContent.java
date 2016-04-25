@@ -21,4 +21,15 @@ public interface IHtmlContent extends CharSequence, Serializable {
 
   String toPlainText();
 
+  /**
+   * See {@link #withNewLineToBr(boolean)}.
+   */
+  boolean isNewLineToBr();
+
+  /**
+   * @param newLineToBr
+   *          {@code true} if new lines should be replaced by <b>br</b> tags, {@code false} otherwise (default is
+   *          {@code true}).
+   */
+  IHtmlContent withNewLineToBr(boolean newLineToBr);
 }

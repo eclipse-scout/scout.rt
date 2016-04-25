@@ -133,4 +133,16 @@ public class HtmlHelperTest {
     assertEquals("foo<br>bar", helper.newLineToBr("foo\r\nbar"));
     assertEquals("foo<br>bar<br>foo", helper.newLineToBr("foo\nbar\r\nfoo"));
   }
+
+  @Test
+  public void testEscapeAndNewLineToBr() {
+    HtmlHelper helper = BEANS.get(HtmlHelper.class);
+
+    assertEquals(null, helper.escapeAndNewLineToBr(null));
+    assertEquals("", helper.escapeAndNewLineToBr(""));
+    assertEquals(" ", helper.escapeAndNewLineToBr(" "));
+
+    assertEquals("one &amp; two<br>three &amp; four", helper.escapeAndNewLineToBr("one & two\nthree & four"));
+    assertEquals("&gt;&lt;script&gt;alert(&#39;hacker<br>attack&#39;);&lt;&#47;script&gt;&lt;", helper.escapeAndNewLineToBr("><script>alert('hacker\r\nattack');</script><"));
+  }
 }
