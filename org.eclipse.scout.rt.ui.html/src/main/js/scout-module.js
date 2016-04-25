@@ -202,6 +202,7 @@
   __include("scout/tree/Tree.js");
   __include("scout/tree/TreeLayout.js");
   __include("scout/tree/LazyNodeFilter.js");
+  __include("scout/tree/TreeBreadcrumbFilter.js");
   __include("scout/tree/keystrokes/AbstractTreeNavigationKeyStroke.js");
   __include("scout/tree/keystrokes/TreeSpaceKeyStroke.js");
   __include("scout/tree/keystrokes/TreeNavigationUpKeyStroke.js");
