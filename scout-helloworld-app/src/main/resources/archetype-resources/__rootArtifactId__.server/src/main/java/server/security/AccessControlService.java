@@ -1,27 +1,22 @@
 #set( $symbol_pound = '#' )
 #set( $symbol_dollar = '$' )
 #set( $symbol_escape = '\' )
-package ${package}.server.permission;
+package ${package}.server.security;
 
 import java.security.AllPermission;
 import java.security.Permissions;
 
-import org.eclipse.scout.rt.platform.Order;
+import ${package}.shared.security.UserIdAccessControlService;
+import org.eclipse.scout.rt.platform.Replace;
 import org.eclipse.scout.rt.shared.security.RemoteServiceAccessPermission;
-import org.eclipse.scout.rt.shared.services.common.security.AbstractAccessControlService;
 
 /**
  * <h3>{@link AccessControlService}</h3>
  *
  * @author ${userName}
  */
-@Order(-1)
-public class AccessControlService extends AbstractAccessControlService<String> {
-
-  @Override
-  protected String getCurrentUserCacheKey() {
-    return getUserIdOfCurrentUser();
-  }
+@Replace
+public class AccessControlService extends UserIdAccessControlService {
 
   @Override
   protected Permissions execLoadPermissions(String userId) {
