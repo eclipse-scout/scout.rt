@@ -657,6 +657,7 @@ scout.Tree.prototype._removeNodes = function(nodes, parentNode) {
   }
 
   nodes.forEach(function(node) {
+    this._removeFromFlatList(node, true);
     if (node.childNodes.length > 0) {
       this._removeNodes(node.childNodes, node);
     }
@@ -2216,6 +2217,9 @@ scout.Tree.prototype.filter = function(notAnimated) {
       return false;
     }
     //don't process children->optimize performance
+    node.childNodes.forEach(function(child){
+      child.filterDirty=true;
+    });
     return true;
   }.bind(this));
 

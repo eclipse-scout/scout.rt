@@ -353,7 +353,7 @@ describe("Tree", function() {
         tree.render(session.$entryPoint);
 
         tree.deleteNodes([node0]);
-        expect(helper.findAllNodes(tree).length).toBe(26);
+        expect(tree.visibleNodesFlat.length).toBe(26);
         expect(node0.$node).toBeUndefined();
         expect(tree.nodes.indexOf(node0)).toBe(-1);
         expect(node0.childNodes[0].$node).toBeUndefined();
