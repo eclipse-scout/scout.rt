@@ -28,19 +28,37 @@ scout.ViewTabArea.prototype._init = function(model) {
   this._addEventSupport();
 };
 
+
 scout.ViewTabArea.prototype._render = function($parent) {
   this.$container = $parent.appendDiv('view-tab-area');
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
   this.htmlComp.setLayout(new scout.ViewTabAreaLayout(this));
-  this._renderVisible();
+  this._renderTabs();
+  if(!this.visible || this.viewTabs.length < 1){
+    this._triggerChildrenBeforeDetach(this);
+    this._detach();
+
+  }
+};
+
+scout.ViewTabArea.prototype._renderTabs = function() {
+  // reverse since tabs rendered without a sibling will be prepended.
+  this.viewTabs.reverse()
+    .forEach(function(tab) {
+      this._renderTab(tab);
+    }.bind(this));
+};
+
+scout.ViewTabArea.prototype._renderTab = function(tab) {
+  tab.renderAfter(this.$container);
 };
 
 scout.ViewTabArea.prototype._renderVisible = function() {
-  if(this.visible && this.viewTabs.length > 0){
+  if (this.visible && this.viewTabs.length > 0) {
     if (!this.attached) {
       this.attach();
     }
-  }else{
+  } else {
     if (this.attached) {
       this.detach();
     }
@@ -70,11 +88,7 @@ scout.ViewTabArea.prototype._onTabSelection = function(event) {
   this.selectViewTab(event.source);
 };
 
-
 scout.ViewTabArea.prototype.setVisible = function(visible) {
-  if(this.visible === visible){
-    return;
-  }
   this.visible = visible;
   this._renderVisible();
   this.invalidateLayoutTree();
@@ -101,13 +115,13 @@ scout.ViewTabArea.prototype.selectViewTab = function(viewTab) {
 };
 
 scout.ViewTabArea.prototype.deselectViewTab = function(viewTab) {
-  if(!viewTab){
+  if (!viewTab) {
     return;
   }
   if (this._selectedViewTab !== viewTab) {
     return;
   }
-    this._selectedViewTab.deselect();
+  this._selectedViewTab.deselect();
 
 };
 
@@ -121,10 +135,12 @@ scout.ViewTabArea.prototype.addTab = function(tab, sibling) {
     insertPosition = this.viewTabs.indexOf(sibling);
   }
   this.viewTabs.splice(insertPosition + 1, 0, tab);
-  tab.renderAfter(this.$container, sibling);
   tab.on('tabClicked', this._viewTabSelectionHandler);
-  this._renderVisible();
-  this.invalidateLayoutTree();
+  if(this.rendered){
+    this._renderVisible();
+    tab.renderAfter(this.$container, sibling);
+    this.invalidateLayoutTree();
+  }
 };
 
 scout.ViewTabArea.prototype.removeTab = function(tab) {
@@ -137,4 +153,3 @@ scout.ViewTabArea.prototype.removeTab = function(tab) {
     this.invalidateLayoutTree();
   }
 };
-

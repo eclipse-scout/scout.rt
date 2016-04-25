@@ -11,7 +11,6 @@
 .view-tab-area {
   position: absolute;
   top: 0;
-  height: 100%;
 
   & > .overflow-tab-item {
     border-right: 1px solid @border-color;

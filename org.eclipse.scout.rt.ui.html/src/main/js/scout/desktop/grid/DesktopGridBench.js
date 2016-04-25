@@ -50,10 +50,10 @@ scout.DesktopGridBench.prototype._init = function(model) {
   this._createViewAreaColumns();
   this.desktop = this.session.desktop;
   this.headerViewTabBox = model.headerViewTabBox;
-  this.outlineContentVisible = scout.nvl(model.outlineContentVisible, true);
-  this.setOutline(this.desktop.outline);
   // controller for headerViewTabBox
   this.headerViewTabBoxController = new scout.HeaderViewTabBoxController(this, this.headerViewTabBox);
+  this.outlineContentVisible = scout.nvl(model.outlineContentVisible, true);
+  this.setOutline(this.desktop.outline);
 };
 
 scout.DesktopGridBench.prototype._createViewAreaColumns = function() {
@@ -252,6 +252,8 @@ scout.DesktopGridBench.prototype._computeDetailContentForPage = function(node) {
     content = node.detailForm;
   } else if (node.detailTable && node.detailTableVisible) {
     content = node.detailTable;
+    // add ui css class
+    content.uiCssClasses = ['desktop-table'];
   }
 
   return content;
@@ -398,11 +400,15 @@ scout.DesktopGridBench.prototype._onViewRemoved = function(event) {
 };
 
 scout.DesktopGridBench.prototype._onViewActivated = function(event) {
-  if (this.outlineContent === event.view) {
+  var view = event.view;
+  if (this.outlineContent === view) {
     this.desktop.bringOutlineToFront(this.desktop.outline);
+  }else  if (!view.detailForm) {
+    // Notify model that this form is active (only for regular views, not detail forms)
+    this.desktop._setFormActivated(view);
   }
   this.trigger('viewActivated', {
-    view: event.view
+    view: view
   });
 };
 

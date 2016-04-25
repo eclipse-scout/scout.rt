@@ -85,11 +85,11 @@ scout.DesktopHeaderLayout.prototype.layout = function($container) {
   }
 
   tabsWidth = calcTabsWidth();
-  tabsWidth = Math.max(Math.min(smallTabsPrefSize.width, tabsWidth), scout.DesktopViewTabsLayout.OVERFLOW_MENU_WIDTH);
+  tabsWidth = Math.max(Math.min(smallTabsPrefSize.width, tabsWidth), scout.ViewTabAreaLayout.OVERFLOW_MENU_WIDTH);
   setTabsSize();
 
   // 3rd if only the overflow menu is shown make toolBar smaller so that ellipsis may be displayed
-  if (toolBar && tabsWidth <= scout.DesktopViewTabsLayout.OVERFLOW_MENU_WIDTH) {
+  if (toolBar && tabsWidth <= scout.ViewTabAreaLayout.OVERFLOW_MENU_WIDTH) {
     // layout toolBar, now an ellipsis menu may be shown
     toolBarWidth = containerSize.width - tabsWidth - logoWidth - viewButtonsWidth;
     setToolBarSize();

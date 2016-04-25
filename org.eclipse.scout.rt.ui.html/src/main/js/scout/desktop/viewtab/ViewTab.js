@@ -30,6 +30,7 @@ scout.ViewTab.prototype._init = function(options) {
   this.title = options.title;
   this.subTitle = options.subTitle;
   this.iconId = options.iconId;
+  this.selected = false;
 
 };
 
@@ -47,26 +48,29 @@ scout.ViewTab.prototype._render = function($parent) {
   this._$title = this.$container.appendDiv('title');
   this._$subTitle = this.$container.appendDiv('sub-title');
   this._titlesUpdated();
+  this._renderSelection();
   this._cssClassUpdated(this.view.cssClass, null);
 };
 
-scout.ViewTab.prototype.select = function() {
+scout.ViewTab.prototype._renderSelection = function() {
+  if (this.$container) {
+    if (this.$container.select() === this.selected) {
+      return;
+    }
+    this.$container.select(this.selected);
+  }
+};
 
-  this._cssSelect(true);
+scout.ViewTab.prototype.select = function() {
+  this.selected = true;
+  this._renderSelection();
 };
 
 scout.ViewTab.prototype.deselect = function() {
-  this._cssSelect(false);
+  this.selected = false;
+  this._renderSelection();
 };
 
-scout.ViewTab.prototype._cssSelect = function(selected) {
-  if (this.$container) {
-    if (this.$container.select() === selected) {
-      return;
-    }
-    this.$container.select(selected);
-  }
-};
 
 scout.ViewTab.prototype._onMouseDown = function(event) {
   this.trigger('tabClicked');

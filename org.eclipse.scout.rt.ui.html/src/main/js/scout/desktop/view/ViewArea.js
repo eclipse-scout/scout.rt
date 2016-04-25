@@ -14,6 +14,7 @@ scout.ViewArea = function() {
   this.$title;
   this.htmlComp;
   this.viewTabArea;
+  this.viewTabAreaVisible = true;
   this.viewStack = [];
   this.viewTabMap = {}; // [key=viewId, value=ViewTab instance]
 
@@ -77,9 +78,6 @@ scout.ViewArea.prototype._render = function($parent) {
 };
 
 scout.ViewArea.prototype._renderviewTabArea = function() {
-  if (this.viewTabArea.rendered) {
-    return;
-  }
   this.viewTabArea.render(this.$container);
   this.$viewTabArea = this.viewTabArea.$container;
 };
@@ -94,6 +92,11 @@ scout.ViewArea.prototype._renderView = function(view) {
   view.render(this.$viewContent);
   view.setParent(this);
   view.$container.addClass('view');
+  if (view.uiCssClasses) {
+    scout.arrays.ensure(view.uiCssClasses).forEach(function(cssClass) {
+      view.$container.addClass(cssClass);
+    }.bind(this));
+  }
   view.validateRoot = true;
 };
 
