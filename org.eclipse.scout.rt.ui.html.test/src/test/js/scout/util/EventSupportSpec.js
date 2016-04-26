@@ -78,4 +78,59 @@ describe('EventSupport', function() {
 
   });
 
+  describe('off', function() {
+
+    function fooListener1() {
+      count++;
+    }
+    function fooListener2() {
+      count++;
+    }
+    function fooListener3() {
+      count++;
+    }
+    function fooListener4() {
+      count++;
+    }
+    function fooListener5() {
+      count++;
+    }
+    function fooListener6() {
+      count++;
+    }
+    function fooListener7() {
+      count++;
+    }
+
+    beforeEach(function() {
+      events = new scout.EventSupport();
+      count = 0;
+    });
+
+    it('remove all with same type', function() {
+      events.one('foo', fooListener);
+      events.one('foo', fooListener1);
+      events.one('asdf', fooListener2);
+      events.one('asdf', fooListener3);
+      events.one('asdf', fooListener4);
+      events.one('asdf', fooListener5);
+      events.one('asdf', fooListener6);
+      events.one('asdf', fooListener7);
+      events.off('foo');
+      expect(events._eventListeners.length).toBe(6);
+    });
+
+    it('remove specific listener', function() {
+      events.one('foo', fooListener);
+      events.one('foo', fooListener1);
+      events.one('asdf', fooListener2);
+      events.one('asdf', fooListener3);
+      events.one('asdf', fooListener4);
+      events.one('asdf', fooListener5);
+      events.one('asdf', fooListener6);
+      events.one('asdf', fooListener7);
+      events.off('foo', fooListener);
+      expect(events._eventListeners.length).toBe(7);
+    });
+  });
 });
