@@ -24,6 +24,9 @@ scout.Desktop = function() {
   this.notifications = [];
   this.inBackground = false;
   this._addAdapterProperties(['viewButtons', 'menus', 'views', 'dialogs', 'outline', 'messageBoxes', 'fileChoosers', 'addOns', 'keyStrokes']);
+
+  // event listeners
+  this._benchActiveViewChangedHandler = this._onBenchActivateViewChanged.bind(this);
 };
 scout.inherits(scout.Desktop, scout.ModelAdapter);
 
@@ -60,6 +63,19 @@ scout.Desktop.prototype._onChildAdapterCreation = function(propertyName, model) 
     model.desktop = this;
   }
 };
+
+
+scout.Desktop.prototype._onBenchActivateViewChanged = function(event) {
+  if(this.initialFormRendering){
+    return;
+  }
+  var view = event.view;
+  if (this.bench.outlineContent !== view && !view.detailForm) {
+    // Notify model that this form is active (only for regular views, not detail forms)
+    this._setFormActivated(view);
+  }
+};
+
 
 scout.Desktop.prototype._render = function($parent) {
   this.$container = $parent;
@@ -182,6 +198,7 @@ scout.Desktop.prototype._renderBench = function() {
     headerViewTabBox : (this.header)?(this.header.viewTabBox):(undefined),
     outlineContentVisible: this.displayStyle !== scout.Desktop.DisplayStyle.COMPACT
   });
+  this.bench.on('viewActivated',this._benchActiveViewChangedHandler);
   this.bench.render(this.$container);
   this.bench.$container.insertBefore(this.$overlaySeparator);
 };

@@ -43,20 +43,25 @@ scout.ViewTabAreaController.prototype._installListeners = function() {
 };
 
 scout.ViewTabAreaController.prototype._onViewAdded = function(event) {
-  var view = event.view;
+  var view = event.view,
+  siblingView = event.siblingView,
+  viewTab,
   // the sibling to insert the tab after.
-  var siblingView = event.siblingView;
+  siblingViewTab;
 
   if (!scout.ViewTabAreaController.hasViewTab(view)) {
     return;
   }
-  var siblingViewTab = this._getViewTab(siblingView);
+  viewTab = this._getViewTab(view);
+  if(!viewTab){
+    siblingViewTab = this._getViewTab(siblingView);
+    viewTab = scout.create('DesktopViewTab', {
+      parent: this.viewTabArea,
+      view: view
+    });
+    this.viewTabArea.addTab(viewTab, siblingViewTab);
+  }
 
-  var viewTab = scout.create('DesktopViewTab', {
-    parent: this.viewTabArea,
-    view: view
-  });
-  this.viewTabArea.addTab(viewTab, siblingViewTab);
 };
 
 scout.ViewTabAreaController.prototype._onViewRemoved = function(event) {

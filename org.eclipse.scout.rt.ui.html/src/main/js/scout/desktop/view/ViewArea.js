@@ -100,6 +100,12 @@ scout.ViewArea.prototype._renderView = function(view) {
   view.validateRoot = true;
 };
 
+scout.ViewArea.prototype.postRender = function() {
+  if(this.viewStack.length > 0 && !this.currentView){
+    this.activateView(this.viewStack[this.viewStack.length -1]);
+  }
+};
+
 scout.ViewArea.prototype._remove = function() {
   scout.ViewArea.parent.prototype._remove.call(this);
   if (this.scrollable) {
@@ -149,12 +155,8 @@ scout.ViewArea.prototype.activateView = function(view) {
   }
 };
 
-scout.ViewArea.prototype.showView = function(view, activate) {
+scout.ViewArea.prototype.addView = function(view, activate) {
   activate = scout.nvl(activate, true);
-  if (this.viewStack.indexOf(view) > -1) {
-    this.activateView(view);
-    return;
-  }
   // add to view stack
   var siblingView = this._addToViewStack(view);
   this.trigger('viewAdded', {
@@ -174,6 +176,11 @@ scout.ViewArea.prototype.showView = function(view, activate) {
  */
 scout.ViewArea.prototype._addToViewStack = function(view) {
   var sibling;
+  var index = this.viewStack.indexOf(view);
+  if(index > -1){
+    return this.viewStack[index-1];
+  }
+
   if (!scout.ViewTabAreaController.hasViewTab(view)) {
     // first
     this.viewStack.unshift(view);
@@ -233,6 +240,7 @@ scout.ViewArea.prototype.viewCount = function() {
 scout.ViewArea.prototype.hasViews = function() {
   return this.viewStack.length > 0;
 };
+
 
 scout.ViewArea.prototype.getViews = function(displayViewId) {
   return this.viewStack.filter(function(view) {

@@ -93,7 +93,6 @@ scout.DesktopGridBench.prototype._render = function($parent) {
   this.$container = $parent.appendDiv('desktop-grid-bench');
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
 
-  //  this._renderOrAttachOutlineContent();
   this.htmlComp.setLayout(new scout.DesktopGridBenchLayout(this));
 
   this._renderViewColumns();
@@ -133,33 +132,15 @@ scout.DesktopGridBench.prototype._remove = function() {
 
 };
 
-scout.DesktopGridBench.prototype._renderOrAttachOutlineContent = function() {
-  if (!this.outlineContent || this.desktop.inBackground) {
-    return;
-  }
-  //  this.showView(this.outlineContent);
-  if (!this.outlineContent.rendered) {
-    this._renderOutlineContent();
-  } else if (!this.outlineContent.attached) {
-    this.outlineContent.attach();
-  }
-};
 
 scout.DesktopGridBench.prototype._renderOutlineContent = function() {
   if (!this.outlineContent || this.desktop.inBackground) {
     return;
   }
 
-  this.showView(this.outlineContent);
-  //  this.outlineContent.render(this.$container);
-  //  this.outlineContent.htmlComp.validateRoot = true;
-  //  this.outlineContent.setParent(this);
-  //  this.outlineContent.invalidateLayoutTree(false);
+  this.addView(this.outlineContent);
 
-  // Layout immediate to prevent 'laggy' form visualization,
-  // but not initially while desktop gets rendered because it will be done at the end anyway
   if (this.desktop.rendered) {
-    //    this.outlineContent.validateLayoutTree();
 
     // Request focus on first element in outline content
     this.session.focusManager.validateFocus();
@@ -208,6 +189,16 @@ scout.DesktopGridBench.prototype._renderNavigationHandleVisible = function() {
     this._removeNavigationHandle();
   }
 };
+
+/**
+ * is called in post render of desktop used to initialize the ui state. E.g. show default views
+ */
+scout.DesktopGridBench.prototype.postRender = function() {
+  this.viewAreaColumns.forEach(function(column) {
+     column.postRender();
+  });
+};
+
 
 scout.DesktopGridBench.prototype.setNavigationHandleVisible = function(visible) {
   if (this.navigationHandleVisible === visible) {
@@ -260,7 +251,7 @@ scout.DesktopGridBench.prototype.setOutlineContent = function(content) {
 
 scout.DesktopGridBench.prototype._showOutlineContent = function() {
   if (this.outlineContent) {
-    this.showView(this.outlineContent);
+    this.addView(this.outlineContent);
 
     if (this.desktop.rendered) {
       // Request focus on first element in outline content
@@ -285,8 +276,6 @@ scout.DesktopGridBench.prototype.bringToFront = function() {
     return;
   }
   this._showOutlineContent();
-//  this.showView(this.outlineContent);
-  //  this._renderOrAttachOutlineContent();
 };
 
 scout.DesktopGridBench.prototype.sendToBack = function() {
@@ -505,9 +494,6 @@ scout.DesktopGridBench.prototype._onViewActivated = function(event) {
   var view = event.view;
   if (this.outlineContent === view) {
     this.desktop.bringOutlineToFront(this.desktop.outline);
-  } else if (!view.detailForm) {
-    // Notify model that this form is active (only for regular views, not detail forms)
-    this.desktop._setFormActivated(view);
   }
   this.trigger('viewActivated', {
     view: view
@@ -523,13 +509,13 @@ scout.DesktopGridBench.prototype._onViewDeactivated = function(event) {
   });
 };
 
-scout.DesktopGridBench.prototype.showView = function(view, activate) {
+scout.DesktopGridBench.prototype.addView = function(view, activate) {
   if (!view.displayViewId || view.displayViewId === '') {
     view.displayViewId = 'C';
   }
   var viewAreaColumn = this._getViewColumn(view.displayViewId);
   this._viewTabMap[view.id] = viewAreaColumn;
-  viewAreaColumn.showView(view, activate);
+  viewAreaColumn.addView(view, activate);
 
   if (this.rendered) {
     if (viewAreaColumn.viewCount() === 1) {

@@ -133,8 +133,11 @@ scout.FormController.prototype._renderView = function(view, register, position, 
   if (view.rendered) {
     return false;
   }
-
-  this.session.desktop.bench.showView(view, selectView);
+  if (this.session.desktop.displayStyle === scout.Desktop.DisplayStyle.COMPACT && !this.session.desktop.bench) {
+    // Show bench and hide navigation if this is the first view to be shown
+    this.session.desktop.switchToBench();
+  }
+  this.session.desktop.bench.addView(view, selectView);
 };
 
 scout.FormController.prototype.acceptDialog = function(dialog) {
@@ -195,7 +198,10 @@ scout.FormController.prototype._removeView = function(view, unregister) {
   if (unregister) {
     scout.arrays.remove(this.displayParent.views, view);
   }
-  this.session.desktop.bench.removeView(view);
+  // in COMPACT case views are already removed.
+  if(view.rendered){
+    this.session.desktop.bench.removeView(view);
+  }
 };
 
 scout.FormController.prototype._removeDialog = function(dialog, unregister) {

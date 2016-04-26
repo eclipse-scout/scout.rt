@@ -104,6 +104,12 @@ scout.ViewAreaColumn.prototype._renderProperties = function() {
   //  this._renderMenuBarVisible();
 };
 
+scout.ViewAreaColumn.prototype.postRender = function() {
+  this.viewAreas.forEach(function(viewArea){
+    viewArea.postRender();
+  });
+};
+
 scout.ViewAreaColumn.prototype._createLayout = function() {
   return new scout.ViewAreaColumnLayout(this);
 };
@@ -218,11 +224,11 @@ scout.ViewAreaColumn.prototype._onSplitterPositionChanged = function() {
   this.revalidateLayout();
 };
 
-scout.ViewAreaColumn.prototype.showView = function(view, activate) {
+scout.ViewAreaColumn.prototype.addView = function(view, activate) {
   var viewArea = this.getViewArea(view.displayViewId);
   this._viewToViewArea[view.id] = viewArea;
 
-  viewArea.showView(view, activate);
+  viewArea.addView(view, activate);
 
   if (viewArea.viewCount() === 1) {
     if (this.rendered) {

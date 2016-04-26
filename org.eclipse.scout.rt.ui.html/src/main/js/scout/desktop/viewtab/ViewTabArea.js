@@ -29,16 +29,16 @@ scout.ViewTabArea.prototype._init = function(model) {
 };
 
 
+scout.ViewTabArea.prototype.render = function($parent) {
+  scout.ViewTabArea.parent.prototype.render.call(this, $parent);
+  this._renderVisible();
+};
+
 scout.ViewTabArea.prototype._render = function($parent) {
   this.$container = $parent.appendDiv('view-tab-area');
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
   this.htmlComp.setLayout(new scout.ViewTabAreaLayout(this));
   this._renderTabs();
-  if(!this.visible || this.viewTabs.length < 1){
-    this._triggerChildrenBeforeDetach(this);
-    this._detach();
-
-  }
 };
 
 scout.ViewTabArea.prototype._renderTabs = function() {
