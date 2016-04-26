@@ -174,6 +174,8 @@ public class ServiceTunnelServlet extends HttpServlet {
         final HttpServletRequest servletRequest = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.get();
         final HttpServletResponse servletResponse = IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.get();
 
+        BEANS.get(HttpServletControl.class).doDefaults(ServiceTunnelServlet.this, servletRequest, servletResponse);
+
         AdminSession adminSession = (AdminSession) BEANS.get(IHttpSessionCacheService.class).getAndTouch(ADMIN_SESSION_KEY, servletRequest, servletResponse);
         if (adminSession == null) {
           adminSession = new AdminSession();
