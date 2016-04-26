@@ -36,8 +36,7 @@ scout.CompactTree.prototype._render = function($parent) {
   this.menuBar.render(this.$container);
 
   this.$nodesContainer = this.$data.appendDiv('nodes');
-  //TODO nbu check this.
-  this._updateNodeHeight();
+  this._updateNodeDimensions();
   this._renderViewport();
   this.invalidateLayoutTree();
 

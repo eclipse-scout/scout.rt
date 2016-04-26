@@ -49,6 +49,7 @@ scout.Tree = function() {
   }.bind(this);
 
   this.nodeHeight = 0;
+  this.nodeWidth = 0;
 };
 scout.inherits(scout.Tree, scout.ModelAdapter);
 
@@ -286,7 +287,7 @@ scout.Tree.prototype._render = function($parent) {
   });
   this._installNodeTooltipSupport();
   this.menuBar.render(this.$container);
-  this._updateNodeHeight();
+  this._updateNodeDimensions();
   this._renderViewport();
   this.invalidateLayoutTree();
   this.isRendering = false;
@@ -408,31 +409,39 @@ scout.Tree.prototype._renderFiller = function() {
   if (!this.$fillBefore) {
     this.$fillBefore = this.$data.prependDiv('tree-data-fill');
   }
-  //TODO nbu render filler to add scrollbar if its
 
-  var fillBeforeHeight = this._calculateFillerHeight(new scout.Range(0, this.viewRangeRendered.from));
-  this.$fillBefore.cssHeight(fillBeforeHeight);
-  $.log.trace('FillBefore height: ' + fillBeforeHeight);
+  var fillBeforeDimensions = this._calculateFillerDimension(new scout.Range(0, this.viewRangeRendered.from));
+  this.$fillBefore.cssHeight(fillBeforeDimensions.height);
+  this.$fillBefore.cssWidth(fillBeforeDimensions.width);
+  $.log.trace('FillBefore height: ' + fillBeforeDimensions.height);
 
   if (!this.$fillAfter) {
     this.$fillAfter = this.$data.appendDiv('tree-data-fill');
   }
 
-  var fillAfterHeight = 0;
+  var fillAfterDimensions = {
+    height: 0,
+    width: 0
+  };
   if (this.viewRangeRendered.to !== 0) {
-    fillAfterHeight = this._calculateFillerHeight(new scout.Range(this.viewRangeRendered.to, this.visibleNodesFlat.length));
+    fillAfterDimensions = this._calculateFillerDimension(new scout.Range(this.viewRangeRendered.to, this.visibleNodesFlat.length));
   }
-  this.$fillAfter.cssHeight(fillAfterHeight);
-  $.log.trace('FillAfter height: ' + fillAfterHeight);
+  this.$fillAfter.cssHeight(fillAfterDimensions.height);
+  this.$fillAfter.cssWidth(fillAfterDimensions.width);
+  $.log.trace('FillAfter height: ' + fillAfterDimensions.heigth);
 };
 
-scout.Tree.prototype._calculateFillerHeight = function(range) {
-  var totalHeight = 0;
+scout.Tree.prototype._calculateFillerDimension = function(range) {
+  var dimension = {
+    height: 0,
+    width: 0
+  };
   for (var i = range.from; i < range.to; i++) {
     var node = this.visibleNodesFlat[i];
-    totalHeight += this._heightForNode(node);
+    dimension.height += this._heightForNode(node);
+    dimension.width = Math.max(dimension.width, this._widthForNode(node));
   }
-  return totalHeight;
+  return dimension;
 };
 
 scout.Tree.prototype._removeNodesInRange = function(range) {
@@ -562,6 +571,16 @@ scout.Tree.prototype._heightForNode = function(node) {
   return height;
 };
 
+scout.Tree.prototype._widthForNode = function(node) {
+  var width = 0;
+  if (node.width) {
+    width = node.width;
+  } else {
+    width = this.nodeWidth;
+  }
+  return width;
+};
+
 /**
  * Returns a range of size this.viewRangeSize. Start of range is rowIndex - viewRangeSize / 4.
  * -> 1/4 of the nodes are before the viewport 2/4 in the viewport 1/4 after the viewport,
@@ -595,7 +614,7 @@ scout.Tree.prototype._calculateViewRangeForNode = function(node) {
  */
 scout.Tree.prototype.calculateViewRangeSize = function() {
   // Make sure row height is up to date (row height may be different after zooming)
-  this._updateNodeHeight();
+  this._updateNodeDimensions();
 
   if (this.nodeHeight === 0) {
     throw new Error('Cannot calculate view range with nodeHeight = 0');
@@ -613,10 +632,11 @@ scout.Tree.prototype.setViewRangeSize = function(viewRangeSize) {
   }
 };
 
-scout.Tree.prototype._updateNodeHeight = function() {
+scout.Tree.prototype._updateNodeDimensions = function() {
   var $emptyNode = this.$data.appendDiv('tree-node');
   $emptyNode.html('&nbsp;');
   this.nodeHeight = $emptyNode.outerHeight(true);
+  this.nodeWidth = $emptyNode.outerWidth(true);
   $emptyNode.remove();
 };
 
@@ -2304,6 +2324,7 @@ scout.Tree.prototype._insertNodeInDOM = function(node, indexHint) {
   this._insertNodeInDOMAtPlace(node, index);
 
   node.height = node.$node.outerHeight();
+  node.width = node.$node.outerWidth();
   node.rendered = true;
   node.attached = true;
 };
