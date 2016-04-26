@@ -30,7 +30,7 @@ scout.DesktopFormController.prototype.render = function() {
     var form = this.session.getModelAdapter(this.desktop.activeForm);
     if (form.isDialog()) {
       // find ui selectable part
-      selectable = this.desktop._findActiveSelectablePart(form);
+      selectable = this._findActiveSelectablePart(form);
     } else if (form.isView()) {
       selectable = form;
     }
@@ -40,6 +40,21 @@ scout.DesktopFormController.prototype.render = function() {
   } else {
     this.desktop.bench.activateView(selectable);
   }
+};
+
+
+/**
+ * Goes up in display hierarchy to find the form to select on desktop. null if outline is selected.
+ */
+scout.DesktopFormController.prototype._findActiveSelectablePart = function(form) {
+  if (form.parent.isView && form.parent.isDialog) {
+    if (form.parent.isView()) {
+      return form.parent;
+    } else if (form.parent.isDialog()) {
+      return this._findActiveSelectablePart(form.parent);
+    }
+  }
+  return null;
 };
 
 /**

@@ -24,6 +24,7 @@ scout.DesktopGridBench = function() {
   //  };
   this._viewTabMap = {}; // [key=viewId, value=ViewArea instance]
   this._desktopOutlineChangedHandler = this._onDesktopOutlineChanged.bind(this);
+  this._desktopPropertyChangeHandler = this._onDesktopPropertyChange.bind(this);
   this._outlineNodesSelectedHandler = this._onOutlineNodesSelected.bind(this);
   this._outlinePageChangedHandler = this._onOutlinePageChanged.bind(this);
   this._outlinePropertyChangeHandler = this._onOutlinePropertyChange.bind(this);
@@ -33,6 +34,8 @@ scout.DesktopGridBench = function() {
   this._viewRemovedHandler = this._onViewRemoved.bind(this);
   this._viewActivatedHandler = this._onViewActivated.bind(this);
   this._viewDeactivatedHandler = this._onViewDeactivated.bind(this);
+
+  this._desktopAnimationEndHandler = this._onDesktopAnimationEnd.bind(this);
 
   this._addEventSupport();
 };
@@ -56,6 +59,7 @@ scout.DesktopGridBench.prototype._init = function(model) {
   }
   this.outlineContentVisible = scout.nvl(model.outlineContentVisible, true);
   this.setOutline(this.desktop.outline);
+    this.updateNavigationHandleVisibility();
 };
 
 scout.DesktopGridBench.prototype._createViewAreaColumns = function() {
@@ -94,9 +98,12 @@ scout.DesktopGridBench.prototype._render = function($parent) {
 
   this._renderViewColumns();
   this._revalidateSplitters();
+   this._renderNavigationHandleVisible();
+
   this.session.keyStrokeManager.installKeyStrokeContext(this.desktopKeyStrokeContext);
-  //TODO CGU maybe better create destroy(), call setOutline in init and attach outline listener in init/destroy
+    this.desktop.on('propertyChange', this._desktopPropertyChangeHandler);
   this.desktop.on('outlineChanged', this._desktopOutlineChangedHandler);
+this.desktop.on('animationEnd', this._desktopAnimationEndHandler);
 };
 
 scout.DesktopGridBench.prototype._renderViewColumns = function() {
@@ -117,7 +124,10 @@ scout.DesktopGridBench.prototype._renderViewColumn = function(viewColumn) {
 };
 
 scout.DesktopGridBench.prototype._remove = function() {
-  this.desktop.off('outlineChanged', this._desktopOutlineChangedHandler);
+
+  this.desktop.off('propertyChange', this._desktopPropertyChangeHandler);
+    this.desktop.off('outlineChanged', this._desktopOutlineChangedHandler);
+    this.desktop.off('animationEnd', this._desktopAnimationEndHandler);
   this.session.keyStrokeManager.uninstallKeyStrokeContext(this.desktopKeyStrokeContext);
   scout.DesktopGridBench.parent.prototype._remove.call(this);
 
@@ -170,6 +180,45 @@ scout.DesktopGridBench.prototype._removeOutlineContent = function() {
 
 };
 
+scout.DesktopGridBench.prototype._renderNavigationHandle = function() {
+  if (this.navigationHandle) {
+    return;
+  }
+  this.navigationHandle = scout.create('DesktopNavigationHandle', {
+    parent: this,
+    leftVisible: false
+  });
+  this.navigationHandle.render(this.$container);
+  this.navigationHandle.$container.addClass('navigation-closed');
+  this.navigationHandle.on('action', this._onNavigationHandleAction.bind(this));
+};
+
+scout.DesktopGridBench.prototype._removeNavigationHandle = function() {
+  if (!this.navigationHandle) {
+    return;
+  }
+  this.navigationHandle.remove();
+  this.navigationHandle = null;
+};
+
+scout.DesktopGridBench.prototype._renderNavigationHandleVisible = function() {
+  if (this.navigationHandleVisible) {
+    this._renderNavigationHandle();
+  } else {
+    this._removeNavigationHandle();
+  }
+};
+
+scout.DesktopGridBench.prototype.setNavigationHandleVisible = function(visible) {
+  if (this.navigationHandleVisible === visible) {
+    return;
+  }
+  this.navigationHandleVisible = visible;
+  if (this.rendered) {
+    this._renderNavigationHandleVisible();
+  }
+};
+
 scout.DesktopGridBench.prototype.setOutline = function(outline) {
   if (this.outline) {
     this.outline.off('nodesSelected', this._outlineNodesSelectedHandler);
@@ -206,12 +255,21 @@ scout.DesktopGridBench.prototype.setOutlineContent = function(content) {
     if (this.desktop.header) {
       this.desktop.header.onBenchOutlineContentChange(content, oldContent);
     }
-  if (content) {
-    this.showView(content);
+    this._showOutlineContent();
+};
+
+scout.DesktopGridBench.prototype._showOutlineContent = function() {
+  if (this.outlineContent) {
+    this.showView(this.outlineContent);
+
+    if (this.desktop.rendered) {
+      // Request focus on first element in outline content
+      this.session.focusManager.validateFocus();
+    }
+    if (this.outlineContent instanceof scout.Table) {
+      this.outlineContent.restoreScrollPosition();
+    }
   }
-  //  if (this.rendered) {
-  //    this._renderOrAttachOutlineContent();
-  //  }
 };
 
 scout.DesktopGridBench.prototype.setOutlineContentVisible = function(visible) {
@@ -226,13 +284,14 @@ scout.DesktopGridBench.prototype.bringToFront = function() {
   if (!this.outlineContent) {
     return;
   }
-  this.showView(this.outlineContent);
+  this._showOutlineContent();
+//  this.showView(this.outlineContent);
   //  this._renderOrAttachOutlineContent();
 };
 
 scout.DesktopGridBench.prototype.sendToBack = function() {
   if (this.outlineContent) {
-    this.outlineContent.detach();
+//    this.outlineContent.detach();
   }
 };
 
@@ -297,8 +356,15 @@ scout.DesktopGridBench.prototype.updateOutlineContentDebounced = function() {
   }.bind(this), 300);
 };
 
+scout.DesktopGridBench.prototype.updateNavigationHandleVisibility = function() {
+  // Don't show handle if desktop says handle must not be visible
+  // Only show handle if navigation is invisible
+  this.setNavigationHandleVisible(this.desktop.navigationHandleVisible && !this.desktop.navigationVisible);
+};
+
 scout.DesktopGridBench.prototype._onDesktopOutlineChanged = function(event) {
   this.setOutline(this.desktop.outline);
+  this.updateNavigationHandleVisibility();
 };
 
 scout.DesktopGridBench.prototype._onOutlineNodesSelected = function(event) {
@@ -321,6 +387,40 @@ scout.DesktopGridBench.prototype._onOutlinePropertyChange = function(event) {
     this.updateOutlineContent();
   }
 };
+
+scout.DesktopGridBench.prototype._onDesktopNavigationVisibleChange = function(event) {
+  // If navigation gets visible: Hide handle immediately
+  // If navigation gets hidden using animation: Show handle when animation ends
+  if (this.desktop.navigationVisible) {
+    this.updateNavigationHandleVisibility();
+  }
+};
+
+scout.DesktopGridBench.prototype._onDesktopNavigationHandleVisibleChange = function(event) {
+  this.updateNavigationHandleVisibility();
+};
+
+scout.DesktopGridBench.prototype._onDesktopAnimationEnd = function(event) {
+  if (!this.desktop.navigationVisible) {
+    this.updateNavigationHandleVisibility();
+  }
+};
+
+scout.DesktopGridBench.prototype._onDesktopPropertyChange = function(event) {
+  if (event.changedProperties.indexOf('navigationVisible') !== -1) {
+    this._onDesktopNavigationVisibleChange();
+  } else if (event.changedProperties.indexOf('navigationHandleVisible') !== -1) {
+    this._onDesktopNavigationHandleVisibleChange();
+  }
+};
+
+scout.DesktopGridBench.prototype._onNavigationHandleAction = function(event) {
+  this.desktop.enlargeNavigation();
+};
+
+
+
+
 
 scout.DesktopGridBench.prototype._revalidateSplitters = function() {
   // remove old splitters
@@ -345,8 +445,8 @@ scout.DesktopGridBench.prototype._revalidateSplitters = function() {
       });
       splitter.render(splitterParent.$container);
       splitter.$container.addClass('line');
-      splitter.on('splitterMove', splitterParent._onSplitterMove.bind(splitterParent));
-      splitter.on('splitterPositionChanged', splitterParent._onSplitterPositionChanged.bind(splitterParent));
+      splitter.on('move', splitterParent._onSplitterMove.bind(splitterParent));
+      splitter.on('positionChanged', splitterParent._onSplitterPositionChanged.bind(splitterParent));
       arr.push(splitter);
     }
     arr.push(col);

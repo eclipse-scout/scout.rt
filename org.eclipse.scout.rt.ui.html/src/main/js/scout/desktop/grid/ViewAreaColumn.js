@@ -174,8 +174,8 @@ scout.ViewAreaColumn.prototype._revalidateSplitters = function(clearPosition) {
       });
       splitter.render(splitterParent.$container);
       splitter.$container.addClass('line');
-      splitter.on('splitterMove', splitterParent._onSplitterMove.bind(splitterParent));
-      splitter.on('splitterPositionChanged', splitterParent._onSplitterPositionChanged.bind(splitterParent));
+      splitter.on('move', splitterParent._onSplitterMove.bind(splitterParent));
+      splitter.on('positionChanged', splitterParent._onSplitterPositionChanged.bind(splitterParent));
       arr.push(splitter);
     }
     arr.push(col);

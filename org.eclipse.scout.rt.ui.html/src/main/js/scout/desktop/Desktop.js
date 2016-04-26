@@ -326,9 +326,9 @@ scout.Desktop.prototype._renderSplitter = function() {
   });
   this.splitter.render(this.$container);
   this.splitter.$container.insertBefore(this.$overlaySeparator);
-  this.splitter.on('splitterMove', this._onSplitterResize.bind(this));
-  this.splitter.on('splitterPositionChanged', this._onPositionChanged.bind(this));
-  this.splitter.on('splitterMoveEnd', this._onSplitterResizeEnd.bind(this));
+  this.splitter.on('move', this._onSplitterMove.bind(this));
+  this.splitter.on('positionChanged', this._onSplitterPositionChanged.bind(this));
+  this.splitter.on('moveEnd', this._onSplitterMoveEnd.bind(this));
   this.updateSplitterPosition();
 };
 
@@ -410,20 +410,6 @@ scout.Desktop.prototype._disableContextMenu = function() {
       event.preventDefault();
     }
   });
-};
-
-/**
- * Goes up in display hierarchy to find the form to select on desktop. null if outline is selected.
- */
-scout.Desktop.prototype._findActiveSelectablePart = function(form) {
-  if (form.parent.isView && form.parent.isDialog) {
-    if (form.parent.isView()) {
-      return form.parent;
-    } else if (form.parent.isDialog()) {
-      return this._findActiveSelectablePart(form.parent);
-    }
-  }
-  return null;
 };
 
 scout.Desktop.prototype.setOutline = function(outline) {
@@ -801,22 +787,22 @@ scout.Desktop.prototype.onPopstate = function(event) {
   }
 };
 
-scout.Desktop.prototype._onSplitterResize = function(event) {
+scout.Desktop.prototype._onSplitterMove = function(event) {
   // disallow wider than 50%
-
+  this.resizing = true;
   var max = Math.floor(this.$container.outerWidth(true)/2);
   if(event.position > max){
     event.position = max;
   }
+
 };
 
-scout.Desktop.prototype._onPositionChanged = function(event) {
-  this.resizing = true;
+scout.Desktop.prototype._onSplitterPositionChanged = function(event) {
   this.revalidateLayout();
 };
 
-scout.Desktop.prototype._onSplitterResizeEnd = function(event) {
-  var splitterPosition = event.data;
+scout.Desktop.prototype._onSplitterMoveEnd = function(event) {
+  var splitterPosition = event.position;
 
   // Store size
   if (this.cacheSplitterPosition) {
