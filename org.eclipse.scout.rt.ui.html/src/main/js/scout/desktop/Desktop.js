@@ -926,11 +926,21 @@ scout.Desktop.prototype._onOpenUri = function(event) {
   }
 
   if (event.action === 'download') {
-    this._openUriInIFrame(event.uri);
+    if (scout.device.isIos()) {
+      // The iframe trick does not work for ios
+      // Since the file cannot be stored on the file system it will be shown in the browser if possible
+      // -> create a new window to not replace the existing content.
+      // Drawback: Popup-Blocker will show up
+      this._openUriAsNewWindow(event.uri);
+    } else {
+      this._openUriInIFrame(event.uri);
+    }
   } else if (event.action === 'open') {
-    // TODO [5.2] bsh: Does that really work on all platforms?
-    this._openUriInIFrame(event.uri);
-  } else if (event.action === 'new-window') {
+    // Open in same window.
+    // Don't call _openUriInIFrame here, if action is set to open, an url is expected to be opened in the same window
+    // Additionally, some url types require to be opened in the same window like tel or mailto, at least on mobile devices
+    window.location.href = event.uri;
+  } else if (event.action === 'newWindow') {
     this._openUriAsNewWindow(event.uri);
   }
 };

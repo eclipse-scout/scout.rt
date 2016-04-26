@@ -44,7 +44,7 @@ public enum OpenUriAction implements IOpenUriAction {
    * opened to show this content. The application's location does not change. Note that this action may be prevented by
    * the browser's popup blocker mechanism.
    */
-  NEW_WINDOW("new-window");
+  NEW_WINDOW("newWindow");
 
   private final String m_identifier;
 
