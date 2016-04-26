@@ -327,7 +327,6 @@ scout.Desktop.prototype._renderSplitter = function() {
   this.splitter.render(this.$container);
   this.splitter.$container.insertBefore(this.$overlaySeparator);
   this.splitter.on('move', this._onSplitterMove.bind(this));
-  this.splitter.on('positionChanged', this._onSplitterPositionChanged.bind(this));
   this.splitter.on('moveEnd', this._onSplitterMoveEnd.bind(this));
   this.updateSplitterPosition();
 };
@@ -718,6 +717,7 @@ scout.Desktop.prototype._showForm = function(form, displayParent, position, noti
 
 scout.Desktop.prototype._hideForm = function(form) {
   if (this.displayStyle === scout.Desktop.DisplayStyle.COMPACT && form.isView() ) {
+    // TODO Aho
 //  if (this.displayStyle === scout.Desktop.DisplayStyle.COMPACT && form.isView() && this.viewTabsController._viewTabs.length === 1) {
     // Hide bench and show navigation if this is the last view to be hidden
     this.switchToNavigation();
@@ -794,12 +794,10 @@ scout.Desktop.prototype._onSplitterMove = function(event) {
   if(event.position > max){
     event.position = max;
   }
-
-};
-
-scout.Desktop.prototype._onSplitterPositionChanged = function(event) {
   this.revalidateLayout();
+
 };
+
 
 scout.Desktop.prototype._onSplitterMoveEnd = function(event) {
   var splitterPosition = event.position;
