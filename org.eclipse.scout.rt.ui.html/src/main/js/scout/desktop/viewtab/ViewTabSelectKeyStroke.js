@@ -41,8 +41,7 @@ scout.inherits(scout.ViewTabSelectKeyStroke, scout.RangeKeyStroke);
  */
 scout.ViewTabSelectKeyStroke.prototype._isEnabled = function() {
   var enabled = scout.ViewTabSelectKeyStroke.parent.prototype._isEnabled.call(this);
-//  return enabled && this.field.selectViewTabsKeyStrokesEnabled && this._viewTabs().length > 0;
-  return false;
+  return enabled && this.field.selectViewTabsKeyStrokesEnabled && this._viewTabs().length > 0;
 };
 
 /**
@@ -51,13 +50,17 @@ scout.ViewTabSelectKeyStroke.prototype._isEnabled = function() {
 scout.ViewTabSelectKeyStroke.prototype.handle = function(event) {
   var viewIndex = event.which - scout.keys['1'];
 
-  console.log('TODO KEYSTROKE');
-//  if (this._viewTabs().length && (viewIndex < this._viewTabs().length)) {
-//    var viewTab = this._viewTabs()[viewIndex];
-//    this._viewTabsController.selectViewTab(viewTab);
-//  }
+  if (this._viewTabs().length && (viewIndex < this._viewTabs().length)) {
+    var viewTab = this._viewTabs()[viewIndex];
+    if(this.field.bench){
+      this.field.bench.activateView(viewTab.view);
+    }
+  }
 };
 
-//scout.ViewTabSelectKeyStroke.prototype._viewTabs = function() {
-//  return this._viewTabsController.viewTabs();
-//};
+scout.ViewTabSelectKeyStroke.prototype._viewTabs = function() {
+  if(this.field.bench){
+  return this.field.bench.getViewTabs();
+  }
+  return[];
+};

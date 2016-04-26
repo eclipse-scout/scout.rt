@@ -232,6 +232,10 @@ scout.ViewArea.prototype.removeView = function(view, showSiblingView) {
     }
   }
 };
+scout.ViewArea.prototype.getController = function() {
+  return this.localViewTabAreaController;
+};
+
 
 scout.ViewArea.prototype.viewCount = function() {
   return this.viewStack.length;

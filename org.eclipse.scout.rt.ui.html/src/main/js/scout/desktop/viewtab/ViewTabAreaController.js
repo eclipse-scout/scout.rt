@@ -110,6 +110,10 @@ scout.ViewTabAreaController.prototype._getViewTab = function(view) {
   return viewTab;
 };
 
+scout.ViewTabAreaController.prototype.getViewTabs = function() {
+  return this.viewTabArea.getViewTabs();
+};
+
 /** static functions **/
 scout.ViewTabAreaController.hasViewTab = function(view) {
   return scout.objects.someProperties(view, ['title', 'subTitle', 'iconId']);

@@ -87,6 +87,7 @@ scout.DesktopGridBench.prototype._initKeyStrokeContext = function(keyStrokeConte
   //  };
   this.desktopKeyStrokeContext.$scopeTarget = this.$container;
   this.desktopKeyStrokeContext.registerKeyStroke(this.desktop.keyStrokes);
+//  this.desktopKeyStrokeContext.registerKeyStroke(new scout.ViewTabSelectKeyStroke(this));
 };
 
 scout.DesktopGridBench.prototype._render = function($parent) {
@@ -583,4 +584,20 @@ scout.DesktopGridBench.prototype.getViews = function(displayViewId) {
     Array.prototype.push.apply(arr, column.getViews(displayViewId));
     return arr;
   }, []);
+};
+
+
+scout.DesktopGridBench.prototype.getViewTabs = function() {
+  var tabs = [];
+  // consider right order
+  tabs = tabs.concat(this.getViewArea('NW').getController().getViewTabs());
+  tabs = tabs.concat(this.getViewArea('N').getController().getViewTabs());
+  tabs = tabs.concat(this.getViewArea('NE').getController().getViewTabs());
+  tabs = tabs.concat(this.getViewArea('W').getController().getViewTabs());
+  tabs = tabs.concat(this.headerViewTabBoxController.getViewTabs());
+  tabs = tabs.concat(this.getViewArea('E').getController().getViewTabs());
+  tabs = tabs.concat(this.getViewArea('SW').getController().getViewTabs());
+  tabs = tabs.concat(this.getViewArea('S').getController().getViewTabs());
+  tabs = tabs.concat(this.getViewArea('SE').getController().getViewTabs());
+  return tabs;
 };

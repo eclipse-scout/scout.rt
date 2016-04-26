@@ -57,3 +57,12 @@ scout.HeaderViewTabBoxController.prototype._setViewTabAreaInHeader = function(in
   this.viewTabAreaCenter.setVisible(!inHeader);
   this.viewTabArea.setVisible(inHeader);
 };
+
+
+scout.HeaderViewTabBoxController.prototype.getViewTabs = function() {
+  if(this.viewTabAreaInHeader){
+    return this.viewTabArea.getViewTabs();
+  }
+  return this.viewTabAreaCenter.getViewTabs();
+
+};

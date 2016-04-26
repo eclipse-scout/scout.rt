@@ -54,6 +54,7 @@ scout.Desktop.prototype._initKeyStrokeContext = function(keyStrokeContext) {
 
   // Keystroke on the top-level DOM element which works as a catch-all when the busy indicator is active
   keyStrokeContext.registerKeyStroke(new scout.DesktopKeyStroke(this.session));
+  keyStrokeContext.registerKeyStroke(new scout.ViewTabSelectKeyStroke(this));
 };
 
 scout.Desktop.prototype._onChildAdapterCreation = function(propertyName, model) {
