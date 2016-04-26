@@ -455,7 +455,7 @@ scout.dates = {
       return false;
     }
     var date = new Date(0);
-    date.setYear(year);
+    date.setFullYear(year);
     date.setMonth(1);
     date.setDate(29);
     return (date.getDate() === 29);
