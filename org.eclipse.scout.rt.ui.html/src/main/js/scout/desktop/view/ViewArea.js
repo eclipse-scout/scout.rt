@@ -149,7 +149,8 @@ scout.ViewArea.prototype.activateView = function(view) {
   }
 };
 
-scout.ViewArea.prototype.showView = function(view) {
+scout.ViewArea.prototype.showView = function(view, activate) {
+  activate = scout.nvl(activate, true);
   if (this.viewStack.indexOf(view) > -1) {
     this.activateView(view);
     return;
@@ -161,7 +162,9 @@ scout.ViewArea.prototype.showView = function(view) {
     siblingView: siblingView
   });
 
-  this.activateView(view);
+  if(activate){
+    this.activateView(view);
+  }
 };
 
 /**

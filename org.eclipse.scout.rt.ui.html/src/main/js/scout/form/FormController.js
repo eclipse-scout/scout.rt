@@ -69,7 +69,7 @@ scout.FormController.prototype.render = function() {
   }.bind(this));
   this.displayParent.views.forEach(function(view, position) {
     view._setProperty('displayParent', this.displayParent);
-    this._renderView(view, false, position);
+    this._renderView(view, false, position, false);
   }.bind(this));
 };
 
@@ -134,13 +134,7 @@ scout.FormController.prototype._renderView = function(view, register, position, 
     return false;
   }
 
-//  var viewTabsController = this.session.desktop.viewTabsController;
-//
-//  // Create the view-tab.
-//  var viewTab = viewTabsController.createAndRenderViewTab(view, this.displayParent.views.indexOf(view));
-//  if (selectView) {
-//    viewTabsController.selectViewTab(viewTab);
-//  }
+  this.session.desktop.bench.showView(view, selectView);
 };
 
 scout.FormController.prototype.acceptDialog = function(dialog) {
@@ -201,9 +195,7 @@ scout.FormController.prototype._removeView = function(view, unregister) {
   if (unregister) {
     scout.arrays.remove(this.displayParent.views, view);
   }
-  if (view.rendered) {
-    view.remove();
-  }
+  this.session.desktop.bench.removeView(view);
 };
 
 scout.FormController.prototype._removeDialog = function(dialog, unregister) {
@@ -217,11 +209,7 @@ scout.FormController.prototype._removeDialog = function(dialog, unregister) {
 };
 
 scout.FormController.prototype._activateView = function(view) {
-  console.log('TODO: activate VIEW!!!')
-//  var viewTabsController = this.session.desktop.viewTabsController;
-//
-//  var viewTab = viewTabsController.viewTab(view);
-//  viewTabsController.selectViewTab(viewTab);
+  this.session.desktop.bench.activateView(view);
 };
 
 scout.FormController.prototype._activateDialog = function(dialog) {

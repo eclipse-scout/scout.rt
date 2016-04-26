@@ -111,22 +111,6 @@ scout.Desktop.prototype._postRender = function() {
   this.fileChooserController.render();
   this._renderDisplayChildsOfOutline();
 
-  // find active form and set selected.
-  var selectable;
-  if (this.activeForm) {
-    var form = this.session.getModelAdapter(this.activeForm);
-    if (form.isDialog()) {
-      // find ui selectable part
-      selectable = this._findActiveSelectablePart(form);
-    } else if (form.isView()) {
-      selectable = form;
-    }
-  }
-  if (!selectable) {
-    this.bringOutlineToFront();
-  } else {
-//    this.viewTabsController.selectViewTab(this.viewTabsController.viewTab(selectable));
-  }
   this.initialFormRendering = false;
 };
 

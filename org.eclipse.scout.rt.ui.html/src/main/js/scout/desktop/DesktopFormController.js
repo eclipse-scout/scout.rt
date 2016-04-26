@@ -8,9 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-scout.DesktopFormController = function(displayParent,  session) {
+scout.DesktopFormController = function(displayParent, session) {
   scout.DesktopFormController.parent.call(this, displayParent, session);
-
+  this.desktop = displayParent;
   this._popupWindows = [];
   this._documentPopupWindowReadyHandler = this._onDocumentPopupWindowReady.bind(this);
 
@@ -22,44 +22,24 @@ scout.inherits(scout.DesktopFormController, scout.FormController);
 
 scout.DesktopFormController.instanceCounter = 0;
 
-/**
- * TODO move to FormController
- * @override FormController.js
- */
-scout.DesktopFormController.prototype._renderView = function(view, register, position, selectView) {
-
-  if (register) {
-    if (position !== undefined) {
-      scout.arrays.insert(this.displayParent.views, view, position);
-    } else {
-      this.displayParent.views.push(view);
+scout.DesktopFormController.prototype.render = function() {
+  scout.DesktopFormController.parent.prototype.render.call(this);
+  // find active form and set selected.
+  var selectable;
+  if (this.desktop.activeForm) {
+    var form = this.session.getModelAdapter(this.desktop.activeForm);
+    if (form.isDialog()) {
+      // find ui selectable part
+      selectable = this.desktop._findActiveSelectablePart(form);
+    } else if (form.isView()) {
+      selectable = form;
     }
   }
-
-  // Display parent may implement acceptView, if not implemented -> use default
-  if (this.displayParent.acceptView) {
-    if (!this.displayParent.acceptView(view)) {
-      return;
-    }
-  } else if (!this.acceptView(view)) {
-    return;
+  if (!selectable) {
+    this.desktop.bringOutlineToFront();
+  } else {
+    this.desktop.bench.activateView(selectable);
   }
-
-  // Prevent "Already rendered" errors / FIXME bsh, dwi: Remove this hack! Fix in on model if possible. See #162954.
-  if (view.rendered) {
-    return false;
-  }
-  // NEW
-  this.session.desktop.bench.showView(view);
-};
-
-scout.DesktopFormController.prototype._removeView = function(view, unregister) {
-  unregister = scout.nvl(unregister, true);
-  if (unregister) {
-    scout.arrays.remove(this.displayParent.views, view);
-  }
-  this.displayParent.bench.removeView(view);
-
 };
 
 /**

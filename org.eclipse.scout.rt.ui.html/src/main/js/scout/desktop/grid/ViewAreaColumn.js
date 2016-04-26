@@ -133,7 +133,8 @@ scout.ViewAreaColumn.prototype._onViewDeactivated = function(event) {
 };
 
 scout.ViewAreaColumn.prototype.activateView = function(view) {
-
+  var viewArea = this.getViewArea(view.displayViewId);
+  viewArea.activateView(view);
 };
 
 scout.ViewAreaColumn.prototype._createViewAreas = function() {
@@ -217,12 +218,11 @@ scout.ViewAreaColumn.prototype._onSplitterPositionChanged = function() {
   this.revalidateLayout();
 };
 
-scout.ViewAreaColumn.prototype.showView = function(view) {
-
+scout.ViewAreaColumn.prototype.showView = function(view, activate) {
   var viewArea = this.getViewArea(view.displayViewId);
   this._viewToViewArea[view.id] = viewArea;
 
-  viewArea.showView(view);
+  viewArea.showView(view, activate);
 
   if (viewArea.viewCount() === 1) {
     if (this.rendered) {
