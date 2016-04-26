@@ -57,10 +57,6 @@ public class BinaryResourceUrlUtility {
    */
   public static final Pattern PATTERN_DYNAMIC_ADAPTER_RESOURCE_PATH = Pattern.compile("^/dynamic/([^/]*)/([^/]*)/(.*)$");
 
-  // FIXME awe: (font icons) extend syntax for icon-ID so a font-name can be configured
-  // font:[char] --> uses default scoutIcons.ttf (CSS class .font-icon)
-  // font.crm:[char] --> uses crmIcons.ttf (CSS class .crm-font-icon)
-
   /**
    * @return a relative URL for a configured logical icon-name or a font-based icon. For instance:
    *         <ul>
