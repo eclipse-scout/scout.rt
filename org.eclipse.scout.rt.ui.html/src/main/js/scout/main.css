@@ -23,13 +23,14 @@ body {
   width: 100%;
   margin: 0px;
   overflow: hidden;
-  -webkit-touch-callout: none;
-  #scout.user-select(none);
-  -moz-user-select: -moz-none;
   cursor: default;
   color: @text-color;
-  /* prevent mobile safari from adjusting text, due to our dynamic layouting it will be always wrong */
+  #scout.user-select(none);
+  -moz-user-select: -moz-none;
+  /* Prevent mobile safari from adjusting text, due to our dynamic layouting it will be always wrong */
   -webkit-text-size-adjust: none;
+  /* Disable highlight color. May be enabled for specific elements if required */
+  -webkit-tap-highlight-color: rgba(0,0,0,0);
 }
 
 /* -moz variant is required, see https://bugzilla.mozilla.org/show_bug.cgi?id=509958 */
@@ -369,6 +370,10 @@ button::-moz-focus-inner {
     content: @icon-remove;
   }
 
+  &:active {
+    color: @active-color;
+  }
+
   &:hover {
     color: @hover-color;
   }
@@ -412,6 +417,10 @@ a,
   color: @applink-color;
   text-decoration: underline;
   cursor: pointer;
+
+  &:active {
+    color: @text-color;
+  }
 
   &:focus {
     outline-color: @applink-color;

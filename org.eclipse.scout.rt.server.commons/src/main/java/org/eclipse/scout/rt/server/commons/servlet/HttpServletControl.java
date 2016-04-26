@@ -32,10 +32,26 @@ public class HttpServletControl {
   public static final String HTTP_HEADER_X_XSS_PROTECTION = "X-XSS-Protection";
   public static final String XSS_MODE_BLOCK = "1; mode=block";
 
-  public static final String HTTP_HEADER_CSP = "Content-Security-Policy";//final version, mozilla und firefox
-  public static final String HTTP_HEADER_CSP_LEGACY_CHROME = "X-WebKit-CSP";//chrome
-  public static final String HTTP_HEADER_CSP_LEGACY_IE = "X-Content-Security-Policy";//ie
-  private static final String TYPICAL_CSP_RULE = "allow self; object-src 'self'; options inlinescript; report-uri csp.cgi";//see ContentSecurityPolicyReportHandler
+  public static final String HTTP_HEADER_CSP = "Content-Security-Policy";
+  public static final String HTTP_HEADER_CSP_LEGACY = "X-Content-Security-Policy";
+
+  /**
+   * <ul>
+   * <li><b>default-src 'self'</b><br>
+   * Only accept 'self' sources by default.</li>
+   * <li><b>script-src 'self' 'unsafe-inline' 'unsafe-eval'</b><br>
+   * Unsafe-inline is necessary for the bootstrapping process (index.html uses an inline script block).<br>
+   * Unsafe-eval is necessary for the number field.</li>
+   * <li><b>style-src 'self' 'unsafe-inline'</b><br>
+   * Without inline styling many widgets would not work as expected.</li>
+   * <li><b>frame-src *; child-src *</b><br>
+   * Everything is allowed because the iframes created by the browser field run in the sandbox mode and therefore handle
+   * the security policy by their own.</li>
+   * <li><b>report-uri csp.cgi</b><br>
+   * Report errors to csp.cgi, see ContentSecurityPolicyReportHandler</li>
+   * </ul>
+   */
+  public static final String DEFAULT_CSP_RULE = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; frame-src *; child-src *; report-uri csp.cgi";
 
   /**
    * Every servlet should call this method to make sure the defaults are applied
@@ -55,15 +71,14 @@ public class HttpServletControl {
     resp.setHeader(HTTP_HEADER_X_FRAME_OPTIONS, SAMEORIGIN);
     resp.setHeader(HTTP_HEADER_X_XSS_PROTECTION, XSS_MODE_BLOCK);
     resp.setHeader(HTTP_HEADER_CSP, cspRule());
-    resp.setHeader(HTTP_HEADER_CSP_LEGACY_IE, cspRule());
-    resp.setHeader(HTTP_HEADER_CSP_LEGACY_CHROME, cspRule());
+    resp.setHeader(HTTP_HEADER_CSP_LEGACY, cspRule());
   }
 
   /**
    * see also ContentSecurityPolicyReportHandler
    */
   protected String cspRule() {
-    return TYPICAL_CSP_RULE;
+    return DEFAULT_CSP_RULE;
   }
 
 }

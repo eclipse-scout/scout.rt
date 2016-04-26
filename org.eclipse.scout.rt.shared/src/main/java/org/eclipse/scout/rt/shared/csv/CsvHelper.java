@@ -78,7 +78,7 @@ public class CsvHelper {
     m_separatorChar = separatorChar != 0x00 ? separatorChar : ';';
     m_textDelimiterChar = textDelimiterChar != 0x00 ? textDelimiterChar : '"';
     m_lineSeparator = lineSeparator != null ? lineSeparator : "\n";
-    m_colFormat = new ArrayList<Format>();
+    m_colFormat = new ArrayList<>();
   }
 
   public Locale getLocale() {
@@ -421,7 +421,7 @@ public class CsvHelper {
   protected List<String> importRow(Reader reader) throws IOException {
     List<String> cellList = new ArrayList<String>(Math.max(m_colCount, 2));
     boolean inString = false;
-    StringBuffer curBuf = new StringBuffer();
+    StringBuilder curBuf = new StringBuilder();
     String token;
     int ch = reader.read();
 
@@ -487,7 +487,7 @@ public class CsvHelper {
   }
 
   protected String exportRow(Collection<String> strings) {
-    StringBuffer buf = new StringBuffer();
+    StringBuilder buf = new StringBuilder();
     if (strings != null) {
       for (Iterator<String> it = strings.iterator(); it.hasNext();) {
         buf.append(encodeText(it.next()));
@@ -556,7 +556,7 @@ public class CsvHelper {
     if (s == null || sOld == null) {
       return s;
     }
-    StringBuffer buf = new StringBuffer();
+    StringBuilder buf = new StringBuilder();
     int oldLen = sOld.length();
     int pos = 0;
     int i = s.indexOf(sOld);

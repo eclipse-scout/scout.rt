@@ -18,21 +18,22 @@ scout.DesktopLayout.prototype.layout = function($container) {
   var navigationSize, headerSize, htmlHeader, htmlBench, benchSize, htmlNavigation, animationProps,
     navigationWidth = 0,
     headerHeight = 0,
-    navigation = this.desktop.navigation,
-    header = this.desktop.header,
-    bench = this.desktop.bench,
+    desktop = this.desktop,
+    navigation = desktop.navigation,
+    header = desktop.header,
+    bench = desktop.bench,
     // Animation moves header and bench to the left when navigation gets invisible or moves bench to the right if bench gets invisible (used for mobile)
-    animated = this.desktop.animateLayoutChange,
+    animated = desktop.animateLayoutChange,
     containerSize = this.containerSize(),
     fullWidthNavigation = navigation && navigation.htmlComp.layoutData.fullWidth;
 
   if (navigation) {
     navigationWidth = this.calculateNavigationWidth(containerSize);
-    if (this.desktop.splitter) {
-      this.desktop.splitter.updatePosition(navigationWidth);
+    if (desktop.splitter) {
+      desktop.splitter.updatePosition(navigationWidth);
     }
 
-    if (this.desktop.navigationVisible) {
+    if (desktop.navigationVisible) {
       htmlNavigation = navigation.htmlComp;
       navigationSize = new scout.Dimension(navigationWidth, containerSize.height)
         .subtract(htmlNavigation.getMargins());
@@ -43,7 +44,7 @@ scout.DesktopLayout.prototype.layout = function($container) {
   if (header) {
     htmlHeader = header.htmlComp;
     headerHeight = htmlHeader.$comp.outerHeight(true);
-    if (this.desktop.headerVisible) {
+    if (desktop.headerVisible) {
       // positioning
       if (!animated) {
         header.$container.cssLeft(navigationWidth);
@@ -61,7 +62,7 @@ scout.DesktopLayout.prototype.layout = function($container) {
       animationProps = {
         left: containerSize.width
       };
-      if (this.desktop.headerVisible) {
+      if (desktop.headerVisible) {
         prepareAnimate(animationProps, htmlHeader, headerSize);
       }
       this._animate(animationProps, htmlHeader, headerSize);
@@ -70,7 +71,7 @@ scout.DesktopLayout.prototype.layout = function($container) {
 
   if (bench) {
     htmlBench = bench.htmlComp;
-    if (this.desktop.benchVisible) {
+    if (desktop.benchVisible) {
       // positioning
       bench.$container.cssTop(headerHeight);
       if (!animated) {
@@ -89,20 +90,23 @@ scout.DesktopLayout.prototype.layout = function($container) {
       animationProps = {
         left: containerSize.width
       };
-      if (this.desktop.benchVisible) {
+      if (desktop.benchVisible) {
         prepareAnimate(animationProps, htmlBench, benchSize);
       }
       this._animate(animationProps, htmlBench, benchSize);
     }
   }
 
-  function prepareAnimate (animationProps, htmlComp, size) {
+  function prepareAnimate(animationProps, htmlComp, size) {
     if (fullWidthNavigation) {
       // Slide bench in from right to left, don't resize
       htmlComp.$comp.cssLeft(containerSize.width);
     } else {
       // Resize bench
       animationProps.width = size.width;
+      // Layout once before animation begins
+      // Resizing on every step/progress would result in poor performance (e.g. when a form is open in the bench)
+      htmlComp.setSize(size);
     }
     // Move to new point (=0, if navigation is invisible)
     animationProps.left = navigationWidth;
@@ -113,16 +117,13 @@ scout.DesktopLayout.prototype.layout = function($container) {
  * Used to animate bench and header
  */
 scout.DesktopLayout.prototype._animate = function(animationProps, htmlComp, size) {
-  htmlComp.$comp.animate(animationProps, {
-    queue: false,
-    step: function(now, tween) {
-      if (tween.prop === 'width') {
-        size.width = tween.now;
-        htmlComp.setSize(size);
-      }
-    },
-    complete: this.desktop.onLayoutAnimationComplete.bind(this.desktop)
-  });
+  // schedule animation to have a smoother start
+  setTimeout(function() {
+    htmlComp.$comp.animate(animationProps, {
+      queue: false,
+      complete: this.desktop.onLayoutAnimationComplete.bind(this.desktop)
+    });
+  }.bind(this));
 };
 
 scout.DesktopLayout.prototype.containerSize = function() {

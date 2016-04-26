@@ -58,7 +58,7 @@ public class EntityNode extends AbstractComposerNode {
 
   @Override
   protected void execDecorateCell(Cell cell) {
-    StringBuffer label = new StringBuffer();
+    StringBuilder label = new StringBuilder();
     if (getSiblingBefore() != null) {
       label.append(ScoutTexts.get("ExtendedSearchAnd") + " ");
     }

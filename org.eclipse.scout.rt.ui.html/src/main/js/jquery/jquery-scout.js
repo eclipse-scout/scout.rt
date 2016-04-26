@@ -344,8 +344,8 @@ $.fn.makeSVG = function(type, cssClass, text, id) {
   if (cssClass) {
     $svg.attrSVG('class', cssClass);
   }
-    if (text) {
-      $svg.text(text);
+  if (text) {
+    $svg.text(text);
   }
   if (id !== undefined) {
     $svg.attrSVG('id', id);
@@ -746,6 +746,20 @@ $.fn.widthToContent = function(opts) {
 
   this.cssWidthAnimated(oldW, newW, opts);
   return this;
+};
+
+/**
+ * Offset to a specific ancestor and not to the document as offset() would do.
+ * Not the same as position() which returns the position relative to the offset parent.
+ */
+$.fn.offsetTo = function($to) {
+  var toOffset = $to.offset(),
+    offset = this.offset();
+
+  return {
+    top: offset.top - toOffset.top,
+    left: offset.left - toOffset.left
+  };
 };
 
 $.fn.cssLeft = function(position) {

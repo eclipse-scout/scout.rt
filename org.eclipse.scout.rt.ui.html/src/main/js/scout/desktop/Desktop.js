@@ -269,6 +269,10 @@ scout.Desktop.prototype._renderNavigationVisible = function() {
   this.invalidateLayoutTree();
 };
 
+scout.Desktop.prototype._renderNavigationHandleVisible = function() {
+  // NOP
+};
+
 scout.Desktop.prototype._renderHeader = function() {
   if (this.header) {
     return;
@@ -519,6 +523,31 @@ scout.Desktop.prototype.setHeaderVisible = function(visible, notifyServer) {
     this._renderHeaderVisible();
   }
 };
+
+scout.Desktop.prototype.outlineDisplayStyle = function() {
+  if (this.outline) {
+    return this.outline.displayStyle;
+  }
+};
+
+scout.Desktop.prototype.shrinkNavigation = function() {
+  if (this.navigationVisible && this.outlineDisplayStyle() === scout.Tree.DisplayStyle.DEFAULT) {
+    this.outline.setDisplayStyle(scout.Tree.DisplayStyle.BREADCRUMB);
+  } else {
+    this.setNavigationVisible(false);
+  }
+};
+
+scout.Desktop.prototype.enlargeNavigation = function() {
+  if (this.navigationVisible && this.outlineDisplayStyle() === scout.Tree.DisplayStyle.BREADCRUMB) {
+    this.outline.setDisplayStyle(scout.Tree.DisplayStyle.DEFAULT);
+  } else {
+    this.setNavigationVisible(true);
+    // Layout immediately to have view tabs positioned correctly before animation starts
+    this.validateLayoutTree();
+  }
+};
+
 
 scout.Desktop.prototype.switchToBench = function() {
   this.setHeaderVisible(true);

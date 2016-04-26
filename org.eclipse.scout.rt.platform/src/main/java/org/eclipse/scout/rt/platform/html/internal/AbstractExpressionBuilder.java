@@ -24,6 +24,8 @@ public abstract class AbstractExpressionBuilder implements CharSequence, IHtmlCo
 
   private StringBuilder m_buf;
 
+  private boolean m_newLineToBr = true;
+
   protected StringBuilder validate() {
     if (m_buf == null) {
       m_buf = new StringBuilder();
@@ -34,6 +36,17 @@ public abstract class AbstractExpressionBuilder implements CharSequence, IHtmlCo
 
   protected void invalidate() {
     m_buf = null;
+  }
+
+  @Override
+  public boolean isNewLineToBr() {
+    return m_newLineToBr;
+  }
+
+  @Override
+  public IHtmlContent withNewLineToBr(boolean newLineToBr) {
+    m_newLineToBr = newLineToBr;
+    return this;
   }
 
   protected abstract void build();
@@ -64,7 +77,12 @@ public abstract class AbstractExpressionBuilder implements CharSequence, IHtmlCo
       toAppend = "";
     }
     else if (escape) {
-      toAppend = escape(arg);
+      if (isNewLineToBr()) {
+        toAppend = escapeAndNewLineToBr(arg);
+      }
+      else {
+        toAppend = escape(arg);
+      }
     }
     else {
       toAppend = arg.toString();
@@ -87,5 +105,9 @@ public abstract class AbstractExpressionBuilder implements CharSequence, IHtmlCo
    */
   protected String escape(Object value) {
     return BEANS.get(HtmlHelper.class).escape(value.toString());
+  }
+
+  protected String escapeAndNewLineToBr(Object value) {
+    return BEANS.get(HtmlHelper.class).escapeAndNewLineToBr(value.toString());
   }
 }

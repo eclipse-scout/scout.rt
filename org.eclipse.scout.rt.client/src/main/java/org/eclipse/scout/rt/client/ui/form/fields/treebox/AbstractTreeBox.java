@@ -615,7 +615,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
     if (validValue == null || validValue.size() == 0) {
       return "";
     }
-    StringBuffer b = new StringBuffer();
+    StringBuilder b = new StringBuilder();
     Collection<ITreeNode> nodes = getTree().findNodes(validValue);
     if (nodes != null && !nodes.isEmpty()) {
       Iterator<ITreeNode> nodeIt = nodes.iterator();

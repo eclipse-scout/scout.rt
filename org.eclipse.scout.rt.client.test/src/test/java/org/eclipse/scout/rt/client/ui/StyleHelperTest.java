@@ -25,9 +25,11 @@ import org.junit.runner.RunWith;
 @RunWith(PlatformTestRunner.class)
 public class StyleHelperTest {
 
+  public static final String CLASS = "class";
   public static final String INITIAL_FIRST_CLASS = "first-class";
   public static final String INITIAL_LAST_CLASS = "last-class";
-  public static final String INITIAL_CLASSES = INITIAL_FIRST_CLASS + " class " + INITIAL_LAST_CLASS;
+  public static final String INITIAL_CLASSES = INITIAL_FIRST_CLASS + " " + CLASS + " " + INITIAL_LAST_CLASS;
+  public static final String ADDED_CLASS = "added-class";
 
   @Test
   public void testAddCssClassNull() {
@@ -43,8 +45,8 @@ public class StyleHelperTest {
 
   @Test
   public void testAddCssClass() {
-    String newClasses = BEANS.get(StyleHelper.class).addCssClass(INITIAL_CLASSES, "added-class");
-    Assert.assertEquals(INITIAL_CLASSES + " added-class", newClasses);
+    String newClasses = BEANS.get(StyleHelper.class).addCssClass(INITIAL_CLASSES, ADDED_CLASS);
+    Assert.assertEquals(INITIAL_CLASSES + " " + ADDED_CLASS, newClasses);
   }
 
   @Test
@@ -61,16 +63,30 @@ public class StyleHelperTest {
 
   @Test
   public void testAddCssClassAlreadyContained() {
-    String newClasses = BEANS.get(StyleHelper.class).addCssClass(INITIAL_CLASSES, "class");
+    String newClasses = BEANS.get(StyleHelper.class).addCssClass(INITIAL_CLASSES, CLASS);
     Assert.assertEquals(INITIAL_CLASSES, newClasses);
+  }
+
+  @Test
+  public void testAddCssClassToNullCssClasses() {
+    String nullClasses = null;
+    String newClasses = BEANS.get(StyleHelper.class).addCssClass(nullClasses, ADDED_CLASS);
+    Assert.assertEquals(ADDED_CLASS, newClasses);
+  }
+
+  @Test
+  public void testAddCssClassToEmptyCssClasses() {
+    String emptyClasses = "";
+    String newClasses = BEANS.get(StyleHelper.class).addCssClass(emptyClasses, ADDED_CLASS);
+    Assert.assertEquals(ADDED_CLASS, newClasses);
   }
 
   @Test
   public void testAddCssClassStylable() {
     IStyleable stylable = new Cell();
     stylable.setCssClass(INITIAL_CLASSES);
-    BEANS.get(StyleHelper.class).addCssClass(stylable, "added-class");
-    Assert.assertEquals(INITIAL_CLASSES + " added-class", stylable.getCssClass());
+    BEANS.get(StyleHelper.class).addCssClass(stylable, ADDED_CLASS);
+    Assert.assertEquals(INITIAL_CLASSES + " " + ADDED_CLASS, stylable.getCssClass());
   }
 
   @Test
@@ -82,12 +98,12 @@ public class StyleHelperTest {
   @Test
   public void testRemoveCssClassLast() {
     String newClasses = BEANS.get(StyleHelper.class).removeCssClass(INITIAL_CLASSES, INITIAL_LAST_CLASS);
-    Assert.assertEquals(INITIAL_FIRST_CLASS + " class", newClasses);
+    Assert.assertEquals(INITIAL_FIRST_CLASS + " " + CLASS, newClasses);
   }
 
   @Test
   public void testRemoveCssClass() {
-    String newClasses = BEANS.get(StyleHelper.class).removeCssClass(INITIAL_CLASSES, "class");
+    String newClasses = BEANS.get(StyleHelper.class).removeCssClass(INITIAL_CLASSES, CLASS);
     Assert.assertEquals(INITIAL_FIRST_CLASS + " " + INITIAL_LAST_CLASS, newClasses);
   }
 
@@ -95,17 +111,17 @@ public class StyleHelperTest {
   public void testRemoveCssClassStylable() {
     IStyleable stylable = new Cell();
     stylable.setCssClass(INITIAL_CLASSES);
-    BEANS.get(StyleHelper.class).removeCssClass(stylable, "class");
+    BEANS.get(StyleHelper.class).removeCssClass(stylable, CLASS);
     Assert.assertEquals(INITIAL_FIRST_CLASS + " " + INITIAL_LAST_CLASS, stylable.getCssClass());
   }
 
   @Test
   public void testToggleCssClass() {
-    String newClasses = BEANS.get(StyleHelper.class).toggleCssClass(INITIAL_CLASSES, "added-class", true);
-    Assert.assertEquals(INITIAL_CLASSES + " added-class", newClasses);
-    newClasses = BEANS.get(StyleHelper.class).toggleCssClass(INITIAL_CLASSES, "added-class", true);
-    Assert.assertEquals(INITIAL_CLASSES + " added-class", newClasses);
-    newClasses = BEANS.get(StyleHelper.class).toggleCssClass(INITIAL_CLASSES, "added-class", false);
+    String newClasses = BEANS.get(StyleHelper.class).toggleCssClass(INITIAL_CLASSES, ADDED_CLASS, true);
+    Assert.assertEquals(INITIAL_CLASSES + " " + ADDED_CLASS, newClasses);
+    newClasses = BEANS.get(StyleHelper.class).toggleCssClass(INITIAL_CLASSES, ADDED_CLASS, true);
+    Assert.assertEquals(INITIAL_CLASSES + " " + ADDED_CLASS, newClasses);
+    newClasses = BEANS.get(StyleHelper.class).toggleCssClass(INITIAL_CLASSES, ADDED_CLASS, false);
     Assert.assertEquals(INITIAL_CLASSES, newClasses);
   }
 
@@ -113,11 +129,11 @@ public class StyleHelperTest {
   public void testToggleCssClassStylable() {
     IStyleable stylable = new Cell();
     stylable.setCssClass(INITIAL_CLASSES);
-    BEANS.get(StyleHelper.class).toggleCssClass(stylable, "added-class", true);
-    Assert.assertEquals(INITIAL_CLASSES + " added-class", stylable.getCssClass());
-    BEANS.get(StyleHelper.class).toggleCssClass(stylable, "added-class", true);
-    Assert.assertEquals(INITIAL_CLASSES + " added-class", stylable.getCssClass());
-    BEANS.get(StyleHelper.class).toggleCssClass(stylable, "added-class", false);
+    BEANS.get(StyleHelper.class).toggleCssClass(stylable, ADDED_CLASS, true);
+    Assert.assertEquals(INITIAL_CLASSES + " " + ADDED_CLASS, stylable.getCssClass());
+    BEANS.get(StyleHelper.class).toggleCssClass(stylable, ADDED_CLASS, true);
+    Assert.assertEquals(INITIAL_CLASSES + " " + ADDED_CLASS, stylable.getCssClass());
+    BEANS.get(StyleHelper.class).toggleCssClass(stylable, ADDED_CLASS, false);
     Assert.assertEquals(INITIAL_CLASSES, stylable.getCssClass());
   }
 }

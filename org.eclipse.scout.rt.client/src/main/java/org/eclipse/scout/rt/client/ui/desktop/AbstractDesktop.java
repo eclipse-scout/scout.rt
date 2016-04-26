@@ -299,6 +299,12 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(75)
+  protected boolean getConfiguredNavigationHandleVisible() {
+    return true;
+  }
+
+  @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(80)
   protected boolean getConfiguredHeaderVisible() {
     return true;
@@ -528,6 +534,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     setSelectViewTabsKeyStrokeModifier(getConfiguredSelectViewTabsKeyStrokeModifier());
     setLogoId(getConfiguredLogoId());
     setNavigationVisible(getConfiguredNavigationVisible());
+    setNavigationHandleVisible(getConfiguredNavigationHandleVisible());
     setBenchVisible(getConfiguredBenchVisible());
     setHeaderVisible(getConfiguredHeaderVisible());
     setDisplayStyle(getConfiguredDisplayStyle());
@@ -660,16 +667,19 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   protected void initDisplayStyle(String style) {
     if (DISPLAY_STYLE_BENCH.equals(style)) {
       setNavigationVisible(false);
+      setNavigationHandleVisible(false);
       setHeaderVisible(false);
       setBenchVisible(true);
     }
     else if (DISPLAY_STYLE_COMPACT.equals(style)) {
       setNavigationVisible(true);
+      setNavigationHandleVisible(false);
       setHeaderVisible(false);
       setBenchVisible(false);
     }
     else {
       setNavigationVisible(true);
+      setNavigationHandleVisible(true);
       setHeaderVisible(true);
       setBenchVisible(true);
     }
@@ -2061,6 +2071,16 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   @Override
   public boolean isNavigationVisible() {
     return (boolean) propertySupport.getProperty(PROP_NAVIGATION_VISIBLE);
+  }
+
+  @Override
+  public void setNavigationHandleVisible(boolean visible) {
+    propertySupport.setProperty(PROP_NAVIGATION_HANDLE_VISIBLE, visible);
+  }
+
+  @Override
+  public boolean isNavigationHandleVisible() {
+    return (boolean) propertySupport.getProperty(PROP_NAVIGATION_HANDLE_VISIBLE);
   }
 
   @Override

@@ -77,6 +77,15 @@ scout.DesktopHeader.prototype._removeToolBar = function() {
   this.toolBar = null;
 };
 
+scout.DesktopHeader.prototype._renderToolBarVisible = function() {
+  if (this.toolBarVisible) {
+    this._renderToolBar();
+  } else {
+    this._removeToolBar();
+  }
+  this.invalidateLayoutTree();
+};
+
 scout.DesktopHeader.prototype._renderLogoUrl = function() {
   if (this.logoUrl) {
     this._renderLogo();
@@ -106,15 +115,6 @@ scout.DesktopHeader.prototype._removeLogo = function() {
   this.logo = null;
 };
 
-scout.DesktopHeader.prototype._renderToolBarVisible = function() {
-  if (this.toolBarVisible) {
-    this._renderToolBar();
-  } else {
-    this._removeToolBar();
-  }
-  this.invalidateLayoutTree();
-};
-
 scout.DesktopHeader.prototype._renderViewButtons = function() {
   if (this.viewButtons) {
     return;
@@ -124,6 +124,9 @@ scout.DesktopHeader.prototype._renderViewButtons = function() {
   });
   this.viewButtons.render(this.$container);
   this.viewButtons.$container.prependTo(this.$container);
+  if (this.desktop.inBackground) {
+    this.viewButtons.sendToBack();
+  }
   this.updateViewButtonStyling();
 };
 

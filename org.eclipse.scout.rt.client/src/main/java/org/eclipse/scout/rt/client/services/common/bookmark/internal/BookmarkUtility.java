@@ -607,7 +607,7 @@ public final class BookmarkUtility {
     }
     b.setTitle(buf.toString());
     // text
-    StringBuffer text = new StringBuffer();
+    StringBuilder text = new StringBuilder();
     // add constraints texts
     String prefix = "";
     for (int i = 0; i < path.size(); i++) {

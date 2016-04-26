@@ -29,8 +29,8 @@ public final class VerboseUtility {
   }
 
   public static String dumpGenerics(Type... types) {
-    HashMap<Type, String> longDesc = new HashMap<Type, String>();
-    StringBuffer buf = new StringBuffer();
+    HashMap<Type, String> longDesc = new HashMap<>();
+    StringBuilder buf = new StringBuilder();
     buf.append(dumpGenericsRec(new HashMap<Type, String>(), longDesc, types));
     longDesc.remove(Object.class);
     if (longDesc.size() > 0) {
@@ -50,7 +50,7 @@ public final class VerboseUtility {
     if (types.length == 1) {
       return dumpGenericsImpl(shortDecl, longDecl, types[0]);
     }
-    StringBuffer buf = new StringBuffer();
+    StringBuilder buf = new StringBuilder();
     buf.append("{");
     for (Type t : types) {
       if (buf.length() > 1) {
@@ -146,7 +146,7 @@ public final class VerboseUtility {
       return "null";
     }
     if (o.getClass().isArray()) {
-      StringBuffer buf = new StringBuffer();
+      StringBuilder buf = new StringBuilder();
       buf.append("[");
       int n = Array.getLength(o);
       if (n > 100) {
@@ -198,7 +198,7 @@ public final class VerboseUtility {
     if (args == null) {
       return "";
     }
-    StringBuffer buf = new StringBuffer();
+    StringBuilder buf = new StringBuilder();
     for (int i = 0; i < args.length; i++) {
       buf.append(dumpObject(args[i]));
       if (i + 1 < args.length) {

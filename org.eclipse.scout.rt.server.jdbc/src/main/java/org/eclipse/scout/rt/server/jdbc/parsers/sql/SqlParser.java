@@ -865,7 +865,7 @@ public class SqlParser {
   }
 
   private String flatten(List<IToken> list) {
-    StringBuffer buf = new StringBuffer();
+    StringBuilder buf = new StringBuilder();
     for (IToken item : list) {
       if (buf.length() > 0) {
         buf.append(" ");

@@ -641,7 +641,7 @@ public class RecurrencePattern implements java.io.Serializable {
 
   @Override
   public String toString() {
-    StringBuffer buf = new StringBuffer("Pattern[");
+    StringBuilder buf = new StringBuilder("Pattern[");
     buf.append("startTimeMinutes=" + m_startTimeMinutes + ",");
     buf.append("endTimeMinutes=" + m_endTimeMinutes + ",");
     buf.append("durationMinutes=" + m_durationMinutes + ",");

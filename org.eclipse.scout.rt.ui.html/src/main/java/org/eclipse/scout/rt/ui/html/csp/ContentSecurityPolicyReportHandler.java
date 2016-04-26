@@ -29,9 +29,13 @@ import org.slf4j.LoggerFactory;
  * <p>
  * It is used to collect Content-Security-Policy violations.
  * <p>
+ * If you get a violation for content you need, make sure all your content is provided from the same origin. If this is
+ * not possible you can adjust the CSP rule to your own needs by replacing {@link HttpServletControl} and overriding
+ * {@link HttpServletControl#cspRule}.
+ * <p>
  * see {@link HttpServletControl}
  *
- * @since 5.s
+ * @since 5.2
  */
 public class ContentSecurityPolicyReportHandler extends AbstractUiServletRequestHandler {
   private static final Logger LOG = LoggerFactory.getLogger(ContentSecurityPolicyReportHandler.class);

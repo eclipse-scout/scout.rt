@@ -172,8 +172,8 @@
     color: @hover-color;
   }
 
-  &:hover > .table-info-button {
-    color: @hover-color;
+  &:active > .table-info-button {
+    color: @active-color;
   }
 }
 

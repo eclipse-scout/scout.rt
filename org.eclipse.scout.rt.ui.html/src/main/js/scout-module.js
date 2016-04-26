@@ -229,7 +229,10 @@
   __include("scout/desktop/header/DesktopHeader.js");
   __include("scout/desktop/header/DesktopHeaderLayout.js");
   __include("scout/desktop/navigation/DesktopNavigation.js");
+  __include("scout/desktop/navigation/DesktopNavigationHandle.js");
   __include("scout/desktop/navigation/DesktopNavigationLayout.js");
+  __include("scout/desktop/navigation/ShrinkNavigationKeyStroke.js");
+  __include("scout/desktop/navigation/EnlargeNavigationKeyStroke.js");
   __include("scout/desktop/notification/DesktopNotification.js");
   __include("scout/desktop/notification/OfflineDesktopNotification.js");
   __include("scout/desktop/popupblocker/PopupBlockerHandler.js");

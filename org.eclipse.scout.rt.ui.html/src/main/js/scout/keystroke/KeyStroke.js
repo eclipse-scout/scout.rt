@@ -170,14 +170,14 @@ scout.KeyStroke.prototype.renderKeyBox = function($drawingArea, event) {
     return null;
   }
 
-  scout.keyStrokeBox.drawSingleKeyBoxItem(
+  var $keyBox = scout.keyStrokeBox.drawSingleKeyBoxItem(
     this.renderingHints.offset,
     this.renderingHints.text || scout.codesToKeys[event.which],
     $drawingArea,
     this.ctrl, this.alt, this.shift,
     this.renderingHints.hAlign === scout.hAlign.RIGHT);
 
-  this._postRenderKeyBox($drawingArea);
+  this._postRenderKeyBox($drawingArea, $keyBox);
   return $drawingArea;
 };
 

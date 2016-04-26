@@ -1,0 +1,99 @@
+/*******************************************************************************
+ * Copyright (c) 2014-2015 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
+.desktop-navigation-handle {
+  position: absolute;
+  display: table;
+  z-index: 10;
+  bottom: 0;
+  margin-bottom: 9px;
+  box-shadow: 2px 3px 7px 0px rgba(0, 0, 0, 0.4);
+
+  &.navigation-open {
+    left: auto;
+    margin-right: 5px;
+    right: 0;
+  }
+
+  &.navigation-closed {
+    left: 0;
+    right: auto;
+    padding-left: 1px;
+    margin-bottom: 36px;
+    border-color: @navigation-handle-border-color;
+  }
+
+  &.one-visible {
+    cursor: pointer;
+
+    &:active > .desktop-navigation-handle-body {
+      background-color: @navigation-handle-active-background-color;
+    }
+  }
+}
+
+.desktop-navigation-handle-body {
+  position: relative;
+  display: table-cell;
+  padding: 8px;
+  background-color: @navigation-handle-background-color;
+  color: fade(@navigation-handle-color, 75%);
+  border: 1px solid fade(@navigation-handle-border-color, 75%);
+  border-radius: 3px;
+  cursor: pointer;
+
+  &::before {
+    #scout.font-icon();
+    display: table-cell;
+    vertical-align: middle;
+    text-align: center;
+    padding-right: 1px;
+  }
+
+  &.left {
+    &.both-visible {
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+    }
+
+    &::before {
+      content: @icon-angle-left;
+    }
+  }
+
+  &.right {
+    &.both-visible {
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+      border-left: none;
+    }
+
+    &::before {
+      content: @icon-angle-right;
+    }
+  }
+
+  &:active {
+    background-color: @navigation-handle-active-background-color;
+  }
+
+}
+
+.navigation-handle-key-box {
+  margin-top: -6px;
+
+  &.left {
+    margin-right: -4px;
+  }
+
+  &.right {
+    margin-left: -4px;
+  }
+}

@@ -150,6 +150,10 @@
   &:hover {
     color: @hover-color;
   }
+
+  &:active {
+    color: @active-color;
+  }
 }
 
 .date-picker-left-y,

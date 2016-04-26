@@ -1,0 +1,18 @@
+FONTLOG for the ScoutIcons fonts
+
+This file provides detailed information on the ScoutIcons Font Software.
+This information should be distributed along with the ScoutIcons fonts
+and any derivative works.
+
+Basic Font Information
+
+ScoutIcons is used for graphical font icons within the Eclipse Scout
+user interface. Some characters in the fonts are imported from
+Font Awesome (http://fontawesome.io/).
+
+ChangeLog
+
+20 October 2014 (Claudio Guglielmo)
+- Initial release
+
+

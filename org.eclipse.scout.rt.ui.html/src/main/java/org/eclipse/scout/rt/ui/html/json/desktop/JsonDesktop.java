@@ -247,6 +247,12 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
         return getModel().isNavigationVisible();
       }
     });
+    putJsonProperty(new JsonProperty<DESKTOP>(IDesktop.PROP_NAVIGATION_HANDLE_VISIBLE, model) {
+      @Override
+      protected Object modelValue() {
+        return getModel().isNavigationHandleVisible();
+      }
+    });
     putJsonProperty(new JsonProperty<DESKTOP>(IDesktop.PROP_BENCH_VISIBLE, model) {
       @Override
       protected Object modelValue() {
@@ -381,8 +387,12 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
   }
 
   protected void handleModelOutlineChanged(IOutline outline) {
-    IJsonAdapter<?> jsonAdapter = attachGlobalAdapter(outline);
-    addActionEvent(EVENT_OUTLINE_CHANGED, new JSONObject().put(PROP_OUTLINE, jsonAdapter.getId()));
+    String jsonOutlineId = null;
+    if (outline != null) {
+      IJsonAdapter<?> jsonOutline = attachGlobalAdapter(outline);
+      jsonOutlineId = jsonOutline.getId();
+    }
+    addActionEvent(EVENT_OUTLINE_CHANGED, new JSONObject().put(PROP_OUTLINE, jsonOutlineId));
   }
 
   protected void handleModelOutlineContentActivate() {

@@ -280,7 +280,7 @@ public final class DataModelUtility {
     if (map == null || map.size() == 0) {
       return "";
     }
-    StringBuffer buf = new StringBuffer(16);
+    StringBuilder buf = new StringBuilder(16);
     for (Map.Entry<String, String> e : map.entrySet()) {
       buf.append(";");
       buf.append(e.getKey());

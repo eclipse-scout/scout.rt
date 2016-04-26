@@ -36,6 +36,7 @@ scout.Device = function(userAgent) {
 
   if (userAgent) {
     this._parseSystem(userAgent);
+    this._parseSystemVersion(userAgent);
     this._parseBrowser(userAgent);
     this._parseBrowserVersion(userAgent);
   }
@@ -74,7 +75,7 @@ scout.Device.Type = {
  * Called during bootstrap by index.html before the session startup.<p>
  * Precalculates the value of some attributes to store them
  * in a static way (and prevent many repeating function calls within loops).<p>
- * Also loads device specific scripts (fast click for ios devices)
+ * Also loads device specific scripts (e.g. fast click for ios devices)
  */
 scout.Device.prototype.bootstrap = function() {
   var deferreds = [];
@@ -85,29 +86,69 @@ scout.Device.prototype.bootstrap = function() {
   this.scrollbarWidth = this._detectScrollbarWidth();
   this.type = this._detectType(this.userAgent);
 
-  if (this.isIos()) {
+  if (this._needsFastClick()) {
     // We use Fastclick to prevent the 300ms delay when touching an element.
-    // With Chrome 32 the issue is solved, so no need to load the script for other devices than iOS
-    deferreds.push(this._loadScriptDeferred('res/fastclickmod-1.0.1.min.js', function() {
-      FastClick.attach(document.body);
-      $.log.info('FastClick script loaded and attached');
-    }));
+    deferreds.push(this._loadFastClickDeferred());
+  } else if (this.isIos()){
+    this._installActiveHandler();
   }
 
   if (this.hasOnScreenKeyboard()) {
     // Auto focusing of elements is bad with on screen keyboards -> deactivate to prevent unwanted popping up of the keyboard
     this.focusManagerActive = false;
-    deferreds.push(this._loadScriptDeferred('res/jquery.mobile.custom-1.4.5.min.js', function() {
-      $.log.info('JQuery Mobile script loaded');
-    }));
+    deferreds.push(this._loadJQueryMobileDeferred());
   }
   return deferreds;
+};
+
+/**
+ * The 300ms delay exists because the browser does not know whether the user wants to just tab or wants to zoom using double tab.
+ * Therefore most browsers add the delay only if zoom is enabled. This works for firefox, chrome (>=32) and safari/ios (>=9.3).
+ * It does not work if safari is opened in standalone/homescreen mode. For IE (and safari since ios 9.3) it can be disabled using a css property called touch-action.
+ *
+ * By default, zooming is disabled and home screen mode is enabled, see meta tags viewport and apple-mobile-web-app-capable in head.html
+ */
+scout.Device.prototype._needsFastClick = function() {
+  if (!this.isIos()) {
+    // Currently only IOS still has the issue -> don't load the script for other systems and browsers
+    return false;
+  }
+
+  if (this.systemVersion >= 9.3 && !this.isStandalone()) {
+    // With Safari >= 9.3 the delay is gone if zooming is disabled, but not for the home screen / web app mode.
+    return false;
+  }
+
+  // -> load only for older IOS devices or if standalone mode is enabled
+  return true;
+};
+
+scout.Device.prototype._loadFastClickDeferred = function() {
+  return this._loadScriptDeferred('res/fastclick-1.0.6.min.js', function() {
+    FastClick.attach(document.body);
+    $.log.info('FastClick script loaded and attached');
+  });
+};
+
+scout.Device.prototype._loadJQueryMobileDeferred = function() {
+  return this._loadScriptDeferred('res/jquery.mobile.custom-1.4.5.min.js', function() {
+    $.log.info('JQuery Mobile script loaded');
+  });
 };
 
 scout.Device.prototype._loadScriptDeferred = function(scriptUrl, doneFunc) {
   return $
     .getCachedScript(scriptUrl)
     .done(doneFunc);
+};
+
+/**
+ * IOs does only trigger :active when touching an element if a touchstart listener is attached
+ * Unfortunately, the :active is also triggered when scrolling, there is no delay.
+ * To fix this we would have to work with a custom active class which will be toggled on touchstart/end
+ */
+scout.Device.prototype._installActiveHandler = function() {
+  document.addEventListener('touchstart', function() {}, false);
 };
 
 scout.Device.prototype.hasOnScreenKeyboard = function() {
@@ -142,6 +183,13 @@ scout.Device.prototype.isWindowsTablet = function() {
 };
 
 /**
+ * @returns true if navigator.standalone is true which is the case for iOS home screen mode
+ */
+scout.Device.prototype.isStandalone = function() {
+  return !!window.navigator.standalone;
+};
+
+/**
  * This method returns false for very old browsers. Basically we check for the first version
  * that supports ECMAScript 5. This methods excludes all browsers that are known to be
  * unsupported, all others (e.g. unknown engines) are allowed by default.
@@ -157,14 +205,6 @@ scout.Device.prototype.isSupportedBrowser = function(browser, version) {
     return false;
   }
   return true;
-};
-
-scout.Device.prototype._parseSystem = function(userAgent) {
-  if (userAgent.indexOf('iPhone') > -1 || userAgent.indexOf('iPad') > -1) {
-    this.system = scout.Device.System.IOS;
-  } else if (userAgent.indexOf('Android') > -1) {
-    this.system = scout.Device.System.ANDROID;
-  }
 };
 
 /**
@@ -189,6 +229,30 @@ scout.Device.prototype._detectType = function(userAgent) {
   return scout.Device.Type.DESKTOP;
 };
 
+scout.Device.prototype._parseSystem = function(userAgent) {
+  if (userAgent.indexOf('iPhone') > -1 || userAgent.indexOf('iPad') > -1) {
+    this.system = scout.Device.System.IOS;
+  } else if (userAgent.indexOf('Android') > -1) {
+    this.system = scout.Device.System.ANDROID;
+  }
+};
+
+/**
+ * Currently only supports IOS
+ */
+scout.Device.prototype._parseSystemVersion = function(userAgent) {
+  var versionRegex,
+    System = scout.Device.System;
+  if (this.system === System.IOS) {
+    versionRegex = / OS ([0-9]+\.?[0-9]*)/;
+    // replace all _ with .
+    userAgent = userAgent.replace(/_/g, '.');
+  }
+  if (versionRegex) {
+    this.systemVersion = this._parseVersion(userAgent, versionRegex);
+  }
+};
+
 scout.Device.prototype._parseBrowser = function(userAgent) {
   if (userAgent.indexOf('Firefox') > -1) {
     this.browser = scout.Device.Browser.FIREFOX;
@@ -202,6 +266,45 @@ scout.Device.prototype._parseBrowser = function(userAgent) {
     this.browser = scout.Device.Browser.CHROME;
   } else if (userAgent.indexOf('Safari') > -1) {
     this.browser = scout.Device.Browser.SAFARI;
+  }
+};
+
+/**
+ * Version regex only matches the first number pair
+ * but not the revision-version. Example:
+ * - 21     match: 21
+ * - 21.1   match: 21.1
+ * - 21.1.3 match: 21.1
+ */
+scout.Device.prototype._parseBrowserVersion = function(userAgent) {
+  var versionRegex, browsers = scout.Device.Browser;
+  if (this.browser === browsers.INTERNET_EXPLORER) {
+    // with internet explorer 11 user agent string does not contain the 'MSIE' string anymore
+    // additionally in new version the version-number after Trident/ is not the browser-version
+    // but the engine-version.
+    if (userAgent.indexOf('MSIE') > -1) {
+      versionRegex = /MSIE ([0-9]+\.?[0-9]*)/;
+    } else {
+      versionRegex = /rv:([0-9]+\.?[0-9]*)/;
+    }
+  } else if (this.browser === browsers.EDGE) {
+    versionRegex = /Edge\/([0-9]+\.?[0-9]*)/;
+  } else if (this.browser === browsers.SAFARI) {
+    versionRegex = /Version\/([0-9]+\.?[0-9]*)/;
+  } else if (this.browser === browsers.FIREFOX) {
+    versionRegex = /Firefox\/([0-9]+\.?[0-9]*)/;
+  } else if (this.browser === browsers.CHROME) {
+    versionRegex = /Chrome\/([0-9]+\.?[0-9]*)/;
+  }
+  if (versionRegex) {
+    this.browserVersion = this._parseVersion(userAgent, versionRegex);
+  }
+};
+
+scout.Device.prototype._parseVersion = function(userAgent, versionRegex) {
+  var matches = versionRegex.exec(userAgent);
+  if (Array.isArray(matches) && matches.length === 2) {
+    return parseFloat(matches[1]);
   }
 };
 
@@ -360,42 +463,6 @@ scout.Device.prototype.requiresIframeSecurityAttribute = function() {
       return ('security' in test);
     }
   }.bind(this));
-};
-
-/**
- * Currently the browserVersion is only set for IE. Because the only version-check we do,
- * is whether or not we use an old IE version. Version regex only matches the first number pair
- * but not the revision-version. Example:
- * - 21     match: 21
- * - 21.1   match: 21.1
- * - 21.1.3 match: 21.1
- */
-scout.Device.prototype._parseBrowserVersion = function(userAgent) {
-  var versionRegex, browsers = scout.Device.Browser;
-  if (this.browser === browsers.INTERNET_EXPLORER) {
-    // with internet explorer 11 user agent string does not contain the 'MSIE' string anymore
-    // additionally in new version the version-number after Trident/ is not the browser-version
-    // but the engine-version.
-    if (userAgent.indexOf('MSIE') > -1) {
-      versionRegex = /MSIE ([0-9]+\.?[0-9]*)/;
-    } else {
-      versionRegex = /rv:([0-9]+\.?[0-9]*)/;
-    }
-  } else if (this.browser === browsers.EDGE) {
-    versionRegex = /Edge\/([0-9]+\.?[0-9]*)/;
-  } else if (this.browser === browsers.SAFARI) {
-    versionRegex = /Version\/([0-9]+\.?[0-9]*)/;
-  } else if (this.browser === browsers.FIREFOX) {
-    versionRegex = /Firefox\/([0-9]+\.?[0-9]*)/;
-  } else if (this.browser === browsers.CHROME) {
-    versionRegex = /Chrome\/([0-9]+\.?[0-9]*)/;
-  }
-  if (versionRegex) {
-    var matches = versionRegex.exec(userAgent);
-    if (Array.isArray(matches) && matches.length === 2) {
-      this.browserVersion = parseFloat(matches[1]);
-    }
-  }
 };
 
 scout.Device.prototype._detectScrollbarWidth = function(userAgent) {

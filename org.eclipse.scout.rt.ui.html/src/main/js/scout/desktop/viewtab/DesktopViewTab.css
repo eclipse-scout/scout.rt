@@ -29,6 +29,10 @@
     color: @hover-color;
   }
 
+  &:active {
+    color: @active-color;
+  }
+
   &.disabled {
     color: @disabled-color;
     cursor: default;

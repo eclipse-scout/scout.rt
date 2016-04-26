@@ -183,7 +183,7 @@ public class GridCell {
 
   @Override
   public String toString() {
-    StringBuffer buf = new StringBuffer();
+    StringBuilder buf = new StringBuilder();
     buf.append(getClass().getSimpleName());
     buf.append("[");
     buf.append(data);

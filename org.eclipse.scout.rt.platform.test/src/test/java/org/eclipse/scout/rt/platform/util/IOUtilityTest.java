@@ -167,18 +167,23 @@ public class IOUtilityTest {
   public void testDeleteDirectory() throws IOException {
     File tempFile = File.createTempFile("tempFile", "tmp");
     File tempDir = new File(tempFile.getParent(), "FileUtilityTestTempDir");
-    File tempDirWithSubs = new File(tempDir, "sub" + File.separator + "sub" + File.separator + "sub");
-    tempFile.delete();
-    if (!tempDir.exists()) {
-      tempDirWithSubs.mkdirs();
+    try {
+      File tempDirWithSubs = new File(tempDir, "sub" + File.separator + "sub" + File.separator + "sub");
+      tempFile.delete();
+      if (!tempDirWithSubs.exists()) {
+        tempDirWithSubs.mkdirs();
+      }
+      tempFile = new File(tempDirWithSubs.getParent(), "tempFile.tmp");
+      tempFile.createNewFile();
+      assertTrue("Temp dir was not successfully created.", tempDir.exists());
+      assertTrue("Temp file was not successfully created.", tempFile.exists());
     }
-    tempFile = new File(tempDirWithSubs.getParent(), "tempFile.tmp");
-    tempFile.createNewFile();
-    assertTrue("Temp dir was not successfully created.", tempDir.exists());
-    assertTrue("Temp file was not successfully created.", tempFile.exists());
-    IOUtility.deleteDirectory(tempDir);
-    assertFalse("Temp dir was not deleted.", tempDir.exists());
-    assertFalse("Temp file was not deleted.", tempFile.exists());
+    finally {
+      boolean deleted = IOUtility.deleteDirectory(tempDir);
+      assertTrue(deleted);
+      assertFalse("Temp dir was not deleted.", tempDir.exists());
+      assertFalse("Temp file was not deleted.", tempFile.exists());
+    }
   }
 
   @Test

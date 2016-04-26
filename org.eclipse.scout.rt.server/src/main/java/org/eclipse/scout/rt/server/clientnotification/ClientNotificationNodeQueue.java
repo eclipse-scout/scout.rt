@@ -86,7 +86,7 @@ public class ClientNotificationNodeQueue {
       m_sessions.add(sessionId);
       Set<String> userSessions = m_userToSessions.get(sessionId);
       if (userSessions == null) {
-        userSessions = new HashSet<String>();
+        userSessions = new HashSet<>();
         m_userToSessions.put(userId, userSessions);
       }
       userSessions.add(sessionId);
@@ -206,7 +206,7 @@ public class ClientNotificationNodeQueue {
   public Set<String /*sessionId*/> getAllSessionIds() {
     m_sessionUserCacheLock.readLock().lock();
     try {
-      return new HashSet<String>(m_sessions);
+      return new HashSet<>(m_sessions);
     }
     finally {
       m_sessionUserCacheLock.readLock().unlock();
@@ -216,7 +216,7 @@ public class ClientNotificationNodeQueue {
   public Set<String> getAllUserIds() {
     m_sessionUserCacheLock.readLock().lock();
     try {
-      return new HashSet<String>(m_userToSessions.keySet());
+      return new HashSet<>(m_userToSessions.keySet());
     }
     finally {
       m_sessionUserCacheLock.readLock().unlock();

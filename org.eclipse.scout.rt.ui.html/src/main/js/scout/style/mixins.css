@@ -154,6 +154,10 @@
     &:hover::before {
       color: @icon-color;
     }
+
+    &:active::before {
+      color: @icon-color;
+    }
   }
 
   .tooltip-status,
@@ -167,6 +171,10 @@
     }
 
     &:hover::before {
+      color: @status-info-hover-color;
+    }
+
+    &:active::before {
       color: @status-info-hover-color;
     }
   }
@@ -183,6 +191,10 @@
     &:hover::before {
       color: @status-warning-hover-color;
     }
+
+    &:active::before {
+      color: @status-warning-hover-color;
+    }
   }
 
   .error-status {
@@ -195,6 +207,10 @@
     }
 
     &:hover::before {
+      color: @status-error-hover-color;
+    }
+
+    &:active::before {
       color: @status-error-hover-color;
     }
   }

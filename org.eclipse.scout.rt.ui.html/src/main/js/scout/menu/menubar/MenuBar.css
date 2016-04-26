@@ -83,6 +83,14 @@
         color: @menubar-item-color;
       }
 
+      &:not(.disabled):hover {
+        color: @hover-color;
+      }
+
+      &:not(.disabled):active {
+        color: @active-color;
+      }
+
       &:focus {
         outline: none;
 

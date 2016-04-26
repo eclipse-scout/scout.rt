@@ -185,10 +185,16 @@
 @navigate-up-button-color: @menubar-button-color;
 @navigation-background-color: @palette-bluegray-4;
 @navigation-color: @palette-gray-3;
+@navigation-handle-active-background-color: @outline-group-background-color;;
+@navigation-handle-background-color: @navigation-background-color;
+@navigation-handle-border-color: @navigation-handle-color;
+@navigation-handle-color: @navigation-color;
+@outline-breadcrumb-border-color: @outline-selection-background-color;
 @outline-group-background-color: @palette-bluegray-3;
 @outline-in-background-selection-background-color: @palette-bluegray-2;
 @outline-selection-background-color: @background-color;
 @outline-selection-color: @text-color;
+@outline-title-border-color: @outline-selection-background-color;
 @planner-mode-active-text-color: @palette-blue-7;
 @planner-timeline-background-color: @panel-background-color;
 @popup-border-color: @palette-blue-6;

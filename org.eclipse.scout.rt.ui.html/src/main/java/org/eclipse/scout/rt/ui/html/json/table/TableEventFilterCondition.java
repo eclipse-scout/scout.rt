@@ -62,6 +62,7 @@ public class TableEventFilterCondition {
 
   public void setUserFilter(IUserFilterState userFilter) {
     m_userFilter = userFilter;
+    m_checkUserFilter = true;
   }
 
   public boolean checkRows() {

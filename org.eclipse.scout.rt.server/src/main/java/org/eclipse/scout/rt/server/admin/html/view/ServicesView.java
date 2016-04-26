@@ -381,7 +381,7 @@ public class ServicesView extends DefaultView {
   }
 
   private String createSignature(Class[] a) {
-    StringBuffer sig = new StringBuffer();
+    StringBuilder sig = new StringBuilder();
     for (Class c : a) {
       if (sig.length() > 0) {
         sig.append(", ");

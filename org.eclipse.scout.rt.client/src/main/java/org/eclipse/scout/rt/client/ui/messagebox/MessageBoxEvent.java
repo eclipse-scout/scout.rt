@@ -39,7 +39,7 @@ public class MessageBoxEvent extends EventObject implements IModelEvent {
 
   @Override
   public String toString() {
-    StringBuffer buf = new StringBuffer();
+    StringBuilder buf = new StringBuilder();
     buf.append("MessageBoxEvent[");
     // decode type
     try {

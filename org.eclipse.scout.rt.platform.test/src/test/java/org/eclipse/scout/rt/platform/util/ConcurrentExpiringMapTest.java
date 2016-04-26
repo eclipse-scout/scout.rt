@@ -32,7 +32,7 @@ import org.mockito.Mockito;
  * @since 5.2
  */
 public class ConcurrentExpiringMapTest {
-  private static final long TIME_TO_LIVE_MILLISECONDS = 40;
+  private static final long TIME_TO_LIVE_MILLISECONDS = 10000;
 
   private TestConcurrentExpiringMap createMap(boolean expired) {
     if (expired) {

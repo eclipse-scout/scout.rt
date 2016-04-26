@@ -1,0 +1,91 @@
+<!--
+
+    Copyright (c) 2014-2015 BSI Business Systems Integration AG.
+    All rights reserved. This program and the accompanying materials
+    are made available under the terms of the Eclipse Public License v1.0
+    which accompanies this distribution, and is available at
+    http://www.eclipse.org/legal/epl-v10.html
+
+    Contributors:
+        BSI Business Systems Integration AG - initial API and implementation
+
+-->
+<!DOCTYPE html>
+<!--
+  This spec runner is used by the maven build.
+  You can use it too while developing by executing
+  mvn jasmine:bdd and connecting to http://localhost:8234/ with your browser.
+  When using mvn verify, the server is started on http://localhost:64600/.
+  //FIXME Encoding in embedded jetty (started by jasmine-maven-plugin) is wrong!
+ -->
+<html>
+<head>
+  <meta charset="UTF-8">
+  $if(autoRefresh)$
+  <meta http-equiv="refresh" content="$autoRefreshInterval$">
+  $endif$
+  <title>Jasmine Spec Runner</title>
+  <script type="text/javascript">
+    window.onerror = function(msg,url,line) {
+      if (document.head) {
+        var jserror = document.head.getAttribute('jmp_jserror') || '';
+        if (jserror) {
+          jserror += ':!:';
+        }
+        jserror += msg;
+        document.head.setAttribute('jmp_jserror',jserror);
+      }
+    };
+  </script>
+  <link rel="shortcut icon" type="image/png" href="ext/WebContent/res/jasmine-2.0.0/jasmine_favicon.png">
+  <link rel="stylesheet" type="text/css" href="ext/WebContent/res/jasmine-2.0.0/jasmine.css">
+
+  <script type="text/javascript" src="ext/WebContent/res/jquery-2.1.4.js"></script>
+  <script type="text/javascript" src="ext/WebContent/res/jquery-ui-1.11.2.js"></script>
+  <script type="text/javascript" src="ext/WebContent/res/log4javascript.js"></script>
+  <script type="text/javascript" src="ext/WebContent/res/jasmine-2.0.0/jasmine.js"></script>
+  <script type="text/javascript" src="ext/WebContent/res/jasmine-2.0.0/jasmine-html.js"></script>
+  <script type="text/javascript" src="ext/WebContent/res/jasmine-2.0.0/boot.js"></script>
+  <script type="text/javascript" src="ext/WebContent/res/jasmine-2.0.0/plugins/jasmine-jquery.js"></script>
+  <script type="text/javascript" src="ext/WebContent/res/jasmine-2.0.0/plugins/mock-ajax.js"></script>
+  <script type="text/javascript" src="src/main/js/jasmine/JasmineScoutModuleUtil.js"></script>
+  <script type="text/javascript" src="src/main/js/jasmine/JasmineScout.js"></script>
+  <script type="text/javascript" src="src/main/js/jasmine/JasmineMavenReporter.js"></script>
+  <script type="text/javascript" src="src/main/js/jasmine/boot.ext.js"></script>
+
+  <script type="text/javascript">loadDynamicScript('ext/scout-module.js');</script>
+  <script type="text/javascript">loadDynamicScript('src/main/js/scout-test-module.js');</script>
+
+</head>
+<body>
+  <!-- Test for UTF-8 encoding: äöü -->
+  <script type="text/javascript">
+    // Scout Bootstrap, see main.js
+    // To load default-values in Jasmine test suite we need another implementation
+    scout.defaultValues.bootstrap = function loadDefaultValues() {
+      jQuery.ajax({
+        async: false,
+        type: 'GET',
+        dataType: 'text',
+        contentType: 'text/plain; charset=UTF-8',
+        cache: false,
+        url: 'ext/org/eclipse/scout/rt/ui/html/json/defaultValues.json',
+        data: ''
+      }).done(function(data) {
+        var dataWithoutComments = stripCommentsFromJson(data), dataObj = JSON.parse(dataWithoutComments);
+        scout.defaultValues._loadDefaultsConfiguration(dataObj);
+      }).fail(function(jqXHR, textStatus, errorThrown) {
+        throw new Error('Error while loading default values: ' + errorThrown);
+      });
+    }
+    // breaks scrollbarsSpec in phantomjs
+    scout.device.isTableAdditionalDivRequired = function() {
+      return false;
+    }
+    scout._bootstrap();
+  </script>
+
+  $specScriptTags$
+
+</body>
+</html>

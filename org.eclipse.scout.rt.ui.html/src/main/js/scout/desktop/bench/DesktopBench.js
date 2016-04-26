@@ -11,9 +11,11 @@
 scout.DesktopBench = function() {
   scout.DesktopBench.parent.call(this);
   this._desktopOutlineChangedHandler = this._onDesktopOutlineChanged.bind(this);
+  this._desktopPropertyChangeHandler = this._onDesktopPropertyChange.bind(this);
   this._outlineNodesSelectedHandler = this._onOutlineNodesSelected.bind(this);
   this._outlinePageChangedHandler = this._onOutlinePageChanged.bind(this);
   this._outlinePropertyChangeHandler = this._onOutlinePropertyChange.bind(this);
+  this._desktopAnimationEndHandler = this._onDesktopAnimationEnd.bind(this);
   this._addEventSupport();
 };
 scout.inherits(scout.DesktopBench, scout.Widget);
@@ -22,6 +24,7 @@ scout.DesktopBench.prototype._init = function(model) {
   scout.DesktopBench.parent.prototype._init.call(this, model);
   this.desktop = this.session.desktop;
   this.outlineContentVisible = scout.nvl(model.outlineContentVisible, true);
+  this.updateNavigationHandleVisibility();
 };
 
 scout.DesktopBench.prototype._initKeyStrokeContext = function(keyStrokeContext) {
@@ -41,13 +44,18 @@ scout.DesktopBench.prototype._render = function($parent) {
   this.htmlComp.setLayout(new scout.DesktopBenchLayout(this));
   this.setOutline(this.desktop.outline); //TODO CGU maybe better create destroy(), call setOutline in init and attach outline listener in init/destroy
   this._renderOrAttachOutlineContent();
+  this._renderNavigationHandleVisible();
 
   this.session.keyStrokeManager.installKeyStrokeContext(this.desktopKeyStrokeContext);
+  this.desktop.on('propertyChange', this._desktopPropertyChangeHandler);
   this.desktop.on('outlineChanged', this._desktopOutlineChangedHandler);
+  this.desktop.on('animationEnd', this._desktopAnimationEndHandler);
 };
 
 scout.DesktopBench.prototype._remove = function() {
+  this.desktop.off('propertyChange', this._desktopPropertyChangeHandler);
   this.desktop.off('outlineChanged', this._desktopOutlineChangedHandler);
+  this.desktop.off('animationEnd', this._desktopAnimationEndHandler);
   this.session.keyStrokeManager.uninstallKeyStrokeContext(this.desktopKeyStrokeContext);
   scout.DesktopBench.parent.prototype._remove.call(this);
 };
@@ -98,6 +106,45 @@ scout.DesktopBench.prototype._removeOutlineContent = function() {
     this.outlineContent.storeScrollPosition();
   }
   this.outlineContent.remove();
+};
+
+scout.DesktopBench.prototype._renderNavigationHandle = function() {
+  if (this.navigationHandle) {
+    return;
+  }
+  this.navigationHandle = scout.create('DesktopNavigationHandle', {
+    parent: this,
+    leftVisible: false
+  });
+  this.navigationHandle.render(this.$container);
+  this.navigationHandle.$container.addClass('navigation-closed');
+  this.navigationHandle.on('action', this._onNavigationHandleAction.bind(this));
+};
+
+scout.DesktopBench.prototype._removeNavigationHandle = function() {
+  if (!this.navigationHandle) {
+    return;
+  }
+  this.navigationHandle.remove();
+  this.navigationHandle = null;
+};
+
+scout.DesktopBench.prototype._renderNavigationHandleVisible = function() {
+  if (this.navigationHandleVisible) {
+    this._renderNavigationHandle();
+  } else {
+    this._removeNavigationHandle();
+  }
+};
+
+scout.DesktopBench.prototype.setNavigationHandleVisible = function(visible) {
+  if (this.navigationHandleVisible === visible) {
+    return;
+  }
+  this.navigationHandleVisible = visible;
+  if (this.rendered) {
+    this._renderNavigationHandleVisible();
+  }
 };
 
 scout.DesktopBench.prototype.setOutline = function(outline) {
@@ -177,6 +224,7 @@ scout.DesktopBench.prototype._showDetailContentForPage = function(node) {
 
 scout.DesktopBench.prototype.updateOutlineContent = function() {
   if (!this.outlineContentVisible || !this.outline) {
+    this.setOutlineContent(null);
     return;
   }
   var selectedPages = this.outline.selectedNodes;
@@ -200,8 +248,15 @@ scout.DesktopBench.prototype.updateOutlineContentDebounced = function() {
   }.bind(this), 300);
 };
 
+scout.DesktopBench.prototype.updateNavigationHandleVisibility = function() {
+  // Don't show handle if desktop says handle must not be visible
+  // Only show handle if navigation is invisible
+  this.setNavigationHandleVisible(this.desktop.navigationHandleVisible && !this.desktop.navigationVisible);
+};
+
 scout.DesktopBench.prototype._onDesktopOutlineChanged = function(event) {
   this.setOutline(this.desktop.outline);
+  this.updateNavigationHandleVisibility();
 };
 
 scout.DesktopBench.prototype._onOutlineNodesSelected = function(event) {
@@ -223,4 +278,34 @@ scout.DesktopBench.prototype._onOutlinePropertyChange = function(event) {
   if (event.changedProperties.indexOf('defaultDetailForm') !== -1) {
     this.updateOutlineContent();
   }
+};
+
+scout.DesktopBench.prototype._onDesktopNavigationVisibleChange = function(event) {
+  // If navigation gets visible: Hide handle immediately
+  // If navigation gets hidden using animation: Show handle when animation ends
+  if (this.desktop.navigationVisible) {
+    this.updateNavigationHandleVisibility();
+  }
+};
+
+scout.DesktopBench.prototype._onDesktopNavigationHandleVisibleChange = function(event) {
+  this.updateNavigationHandleVisibility();
+};
+
+scout.DesktopBench.prototype._onDesktopAnimationEnd = function(event) {
+  if (!this.desktop.navigationVisible) {
+    this.updateNavigationHandleVisibility();
+  }
+};
+
+scout.DesktopBench.prototype._onDesktopPropertyChange = function(event) {
+  if (event.changedProperties.indexOf('navigationVisible') !== -1) {
+    this._onDesktopNavigationVisibleChange();
+  } else if (event.changedProperties.indexOf('navigationHandleVisible') !== -1) {
+    this._onDesktopNavigationHandleVisibleChange();
+  }
+};
+
+scout.DesktopBench.prototype._onNavigationHandleAction = function(event) {
+  this.desktop.enlargeNavigation();
 };

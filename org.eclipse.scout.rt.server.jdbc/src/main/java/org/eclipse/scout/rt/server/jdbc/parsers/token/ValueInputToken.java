@@ -120,7 +120,7 @@ public class ValueInputToken implements IToken {
 
   @Override
   public String toString() {
-    StringBuffer b = new StringBuffer();
+    StringBuilder b = new StringBuilder();
     b.append(getClass().getSimpleName() + "[");
     b.append("parsed '");
     if (getParsedAttribute() != null) {

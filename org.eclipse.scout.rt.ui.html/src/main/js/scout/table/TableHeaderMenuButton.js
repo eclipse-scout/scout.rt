@@ -31,6 +31,7 @@ scout.TableHeaderMenuButton.prototype._initKeyStrokeContext = function(keyStroke
 
 scout.TableHeaderMenuButton.prototype._render = function($parent) {
   this.$container = $parent.appendDiv('table-header-menu-command')
+    .unfocusable()
     .on('click', this._onClick.bind(this))
     .on('mouseenter click', this._onMouseOver.bind(this))
     .on('mouseleave', this._onMouseOut.bind(this));

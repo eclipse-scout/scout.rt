@@ -26,8 +26,8 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.exception.PlatformExceptionTranslator;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.holders.BeanArrayHolderFilter;
 import org.eclipse.scout.rt.platform.holders.IBeanArrayHolder;
 import org.eclipse.scout.rt.platform.holders.IHolder;
@@ -672,7 +672,7 @@ public class StatementProcessor implements IStatementProcessor {
         debugBindBuf.append("\n");
       }
     }
-    StringBuffer buf = new StringBuffer();
+    StringBuilder buf = new StringBuilder();
     if (statementWithBinds) {
       buf.append("SQL with binds:\n");
       buf.append(SqlFormatter.wellform(m_originalStm).trim());

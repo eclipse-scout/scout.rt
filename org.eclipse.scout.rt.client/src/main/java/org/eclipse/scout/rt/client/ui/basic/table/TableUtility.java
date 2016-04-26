@@ -141,7 +141,7 @@ public final class TableUtility {
         cell.setText(result.get(0).getText());
       }
       else if (result.size() > 1) {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         for (int i = 0; i < result.size(); i++) {
           if (i > 0) {
             if (multilineText) {

@@ -103,7 +103,8 @@ scout.keys = {
   OPEN_BRACKET: 219, //'
   BACK_SLASH: 220, //ä
   CLOSE_BRACKET: 221, //^
-  SINGLE_QUOTE: 222 //ö
+  SINGLE_QUOTE: 222, //ö,
+  ANGULAR_BRACKET: 226
 };
 
 scout.codesToKeys = {
@@ -200,7 +201,8 @@ scout.codesToKeys = {
   219: '\'',
   220: 'ä',
   221: '^',
-  222: 'ö'
+  222: 'ö',
+  226: '<'
 };
 
 scout.keyStrokeBox = {
@@ -232,11 +234,11 @@ scout.keyStrokeBox = {
       keyBoxText = 'Ctrl ' + keyBoxText;
     }
     if ($container.css('position') === 'absolute' || $container.css('position') === 'relative' || ($container.css('position') === 'static' && $existingKeyBoxes.length > 0)) {
-      $container.prependDiv('key-box ', keyBoxText).css(align, '' + offset + 'px');
+      return $container.prependDiv('key-box ', keyBoxText).css(align, '' + offset + 'px');
     } else {
       var pos = $container.position();
       if (pos) {
-        $container.prependDiv('key-box ', keyBoxText).css(align, '' + (pos.left + offset) + 'px');
+        return $container.prependDiv('key-box ', keyBoxText).css(align, '' + (pos.left + offset) + 'px');
       } else {
         // FIXME nbu: (key-strokes) check why sometimes pos is undefined even though we have a valid $container
         $.log.warn('(keys#drawSingleKeyBoxItem) pos is undefined. $container=' + $container);

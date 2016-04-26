@@ -117,7 +117,8 @@ public class ServiceTunnelServletTest {
 
           @Override
           public void run() throws Exception {
-            IServerSession session = m_testServiceTunnelServlet.lookupServerSessionOnHttpSession("testid", ServerRunContexts.empty());
+            final ServerRunContext runcontext = ServerRunContexts.copyCurrent().withClientNodeId("testNodeId");
+            IServerSession session = m_testServiceTunnelServlet.lookupServerSessionOnHttpSession("testid", runcontext);
             assertNotNull(session);
           }
         });
@@ -149,9 +150,12 @@ public class ServiceTunnelServletTest {
    */
   @Test
   public void testLookupScoutServerSessionOnHttpSessionMultipleThreads() throws ServletException {
-    final Map<String, ICacheEntry<?>> cache = new HashMap<String, ICacheEntry<?>>();
+    final Map<String, ICacheEntry<?>> cache = new HashMap<>();
 
     final TestServerSession testServerSession = new TestServerSession();
+    testServerSession.start("testSessionId");
+    testServerSession.setSharedContextVariable("userId", String.class, "testUser");
+
     HttpServletRequest requestMock = mock(HttpServletRequest.class);
     HttpSession testHttpSession = mock(HttpSession.class);
     when(requestMock.getSession()).thenReturn(testHttpSession);
@@ -261,7 +265,7 @@ public class ServiceTunnelServletTest {
 
         @Override
         public IServerSession call() throws Exception {
-          return m_serviceTunnelServlet.lookupServerSessionOnHttpSession(null, ServerRunContexts.empty());
+          return m_serviceTunnelServlet.lookupServerSessionOnHttpSession(null, ServerRunContexts.empty().withClientNodeId("testNodeId"));
         }
       });
     }

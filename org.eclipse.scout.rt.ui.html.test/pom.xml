@@ -1,17 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-
-    Copyright (c) 2014-2015 BSI Business Systems Integration AG.
-    All rights reserved. This program and the accompanying materials
-    are made available under the terms of the Eclipse Public License v1.0
-    which accompanies this distribution, and is available at
-    http://www.eclipse.org/legal/epl-v10.html
-
-    Contributors:
-        BSI Business Systems Integration AG - initial API and implementation
-
--->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<!-- Copyright (c) 2014-2015 BSI Business Systems Integration AG. All rights
+  reserved. This program and the accompanying materials are made available
+  under the terms of the Eclipse Public License v1.0 which accompanies this
+  distribution, and is available at http://www.eclipse.org/legal/epl-v10.html
+  Contributors: BSI Business Systems Integration AG - initial API and implementation -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -27,6 +21,8 @@
 
   <properties>
     <scout.script.version>5.0.0</scout.script.version>
+    <sonar.sources>src/main,pom.xml</sonar.sources>
+    <sonar.tests>src/test</sonar.tests>
   </properties>
 
   <dependencies>
@@ -55,6 +51,137 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <!-- Ignore copy-dependencies in eclipse workspace, because they are
+          unpacked -->
+        <plugin>
+          <groupId>org.eclipse.m2e</groupId>
+          <artifactId>lifecycle-mapping</artifactId>
+          <version>1.0.0</version>
+          <configuration>
+            <lifecycleMappingMetadata>
+              <pluginExecutions>
+                <pluginExecution>
+                  <pluginExecutionFilter>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-dependency-plugin</artifactId>
+                    <versionRange>[2.0,)</versionRange>
+                    <goals>
+                      <goal>unpack-dependencies</goal>
+                    </goals>
+                  </pluginExecutionFilter>
+                  <action>
+                    <ignore></ignore>
+                  </action>
+                </pluginExecution>
+              </pluginExecutions>
+            </lifecycleMappingMetadata>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+
+    <plugins>
+
+      <plugin>
+        <!-- Loads phantomjs executable, necessary for jasmine plugin -->
+        <groupId>com.github.klieber</groupId>
+        <artifactId>phantomjs-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>install</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- Prepare JS test dependencies with Jasmine -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>copy</id>
+            <goals>
+              <goal>unpack-dependencies</goal>
+            </goals>
+            <phase>generate-test-sources</phase>
+            <configuration>
+              <outputDirectory>${project.build.directory}/ext</outputDirectory>
+              <overWriteReleases>false</overWriteReleases>
+              <overWriteSnapshots>true</overWriteSnapshots>
+              <includes>**/*.js, **/*.css, **/*.png, **/*.json</includes>
+              <stripVersion>true</stripVersion>
+              <includeArtifactIds>org.eclipse.scout.rt.ui.html</includeArtifactIds>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- JS testing with Jasmine -->
+      <plugin>
+        <groupId>com.github.searls</groupId>
+        <artifactId>jasmine-maven-plugin</artifactId>
+        <configuration>
+          <additionalContexts>
+            <additionalContext>
+              <contextRoot>ext</contextRoot>
+              <directory>${project.build.directory}/ext</directory>
+            </additionalContext>
+          </additionalContexts>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>test</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+    </plugins>
+  </build>
+
+  <profiles>
+    <profile>
+      <id>dev</id>
+      <build>
+        <!-- Jasmine testing in development mode: reverence js files in workspace -->
+        <!-- JS testing with Jasmine -->
+        <plugins>
+          <plugin>
+            <groupId>com.github.searls</groupId>
+            <artifactId>jasmine-maven-plugin</artifactId>
+            <configuration>
+              <additionalContexts>
+                <additionalContext>
+                  <contextRoot>ext</contextRoot>
+                  <directory>${project.basedir}/../org.eclipse.scout.rt.ui.html/src/main/resources/</directory>
+                </additionalContext>
+                <additionalContext>
+                  <contextRoot>ext</contextRoot>
+                  <directory>${project.basedir}/../org.eclipse.scout.rt.ui.html/src/main/js</directory>
+                </additionalContext>
+              </additionalContexts>
+            </configuration>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>test</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+
+      </build>
+    </profile>
+  </profiles>
+
 
   <!-- primarily for license header generation -->
   <inceptionYear>2014</inceptionYear>

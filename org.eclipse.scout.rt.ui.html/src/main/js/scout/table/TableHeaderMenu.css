@@ -158,6 +158,11 @@
     border-color: @palette-blue-6;
   }
 
+  &:active {
+    color: @button-active-color;
+    background-color: @button-active-background-color;
+  }
+
   &.disabled {
     cursor: default;
   }
