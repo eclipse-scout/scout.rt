@@ -17,6 +17,7 @@ scout.CompactTree.prototype._initTreeKeyStrokeContext = function(keyStrokeContex
 };
 
 scout.CompactTree.prototype._render = function($parent) {
+  this.isRendering = true;
   this.$container = $parent.appendDiv('compact-tree');
 
   var layout = new scout.TreeLayout(this);
@@ -35,13 +36,32 @@ scout.CompactTree.prototype._render = function($parent) {
   this.menuBar.render(this.$container);
 
   this.$nodesContainer = this.$data.appendDiv('nodes');
-  this._addNodes(this.nodes);
+  //TODO nbu check this.
+  this._updateNodeHeight();
+  this._renderViewport();
+  this.invalidateLayoutTree();
 
-  if (this.selectedNodes.length > 0) {
-    this._renderSelection();
-  }
+  this.isRendering =false;
 };
 
+/**
+ * @override
+ */
+scout.CompactTree.prototype._calculateCurrentViewRange = function() {
+  this.viewRangeSize=this.visibleNodesFlat.length;
+  return new scout.Range(0, this.visibleNodesFlat.length-1);
+};
+
+/**
+ * @override
+ */
+scout.CompactTree.prototype.calculateViewRangeSize = function(){
+  return this.visibleNodesFlat.length;
+};
+
+/**
+ * @override
+ */
 scout.CompactTree.prototype._remove = function() {
   scout.scrollbars.uninstall(this.$data, this.session);
   scout.CompactTree.parent.prototype._remove.call(this);
@@ -50,57 +70,56 @@ scout.CompactTree.prototype._remove = function() {
 /**
  * @override
  */
-scout.CompactTree.prototype._addNodes = function(nodes, $parent, $predecessor) {
-  if (!nodes || nodes.length === 0) {
-    return;
-  }
-  for (var i = 0; i < nodes.length; i++) {
-    var node = nodes[i];
-    if (!$parent) {
-      // Sections (only draw if they have child nodes)
-      if (node.childNodes.length > 0) {
-        var $section = this.$container.makeDiv('section expanded')
-          .data('node', node);
-        $section.appendDiv('title')
-          .text(node.text);
+scout.CompactTree.prototype._$buildNode = function(node) {
+  if (node.level === 0) {
+    // Sections (only draw if they have child nodes)
+    if (node.childNodes.length > 0) {
+      var $section = this.$container.makeDiv('section expanded')
+        .data('node', node);
+      $section.appendDiv('title')
+        .text(node.text);
 
-        node.$node = $section;
-        if ($predecessor) {
-          if ($predecessor.hasClass('section-node')) {
-            $predecessor = $predecessor.parent();
-          }
-          $section.insertAfter($predecessor);
-        } else {
-          $section.prependTo(this.$nodesContainer);
-        }
+      node.$node = $section;
 
-        this._addNodes(node.childNodes, $section);
-        $predecessor = $section;
-      }
-    } else {
-      // Sections nodes
-      var $sectionNode = $parent.makeDiv('section-node')
-        .data('node', node)
-        .on('mousedown', this._onNodeMouseDown.bind(this))
-        .on('mouseup', this._onNodeMouseUp.bind(this));
-
-      node.$node = $sectionNode;
-      if ($predecessor) {
-        if ($predecessor.hasClass('section')) {
-          $predecessor = $predecessor.children('.title');
-        }
-        $sectionNode.insertAfter($predecessor);
-      } else {
-        $sectionNode.insertAfter($parent.children('.title'));
-      }
-      $predecessor = $sectionNode;
     }
-    this._decorateNode(node);
-  }
-  this.invalidateLayoutTree();
+  } else {
+    var $parent = node.parentNode.$node;
+    // Sections nodes
+    var $sectionNode = $parent.makeDiv('section-node')
+      .data('node', node)
+      .on('mousedown', this._onNodeMouseDown.bind(this))
+      .on('mouseup', this._onNodeMouseUp.bind(this));
 
-  // return the last created node
-  return $predecessor;
+    node.$node = $sectionNode;
+
+  }
+
+  return node.$node;
+};
+
+/**
+ * @override
+ */
+scout.CompactTree.prototype._insertNodeInDOMAtPlace = function(node, index) {
+  //get node before
+  var $visibleNodeBefore;
+  for(var i = index-1; i>=0; i--){
+    var possibleNode =  this.visibleNodesFlat[i];
+    if(node.level === 0 && possibleNode.level === 0){
+      $visibleNodeBefore = possibleNode.$node;
+    } else if(node.level>0 && possibleNode.level === 0){
+      $visibleNodeBefore = possibleNode.$node.children('.title');
+      break;
+    } else if(node.level>0){
+      $visibleNodeBefore=possibleNode.$node;
+      break;
+    }
+  }
+  if (!$visibleNodeBefore)  {
+    node.$node.prependTo(this.$nodesContainer);
+  } else {
+    node.$node.insertAfter($visibleNodeBefore);
+  }
 };
 
 /**

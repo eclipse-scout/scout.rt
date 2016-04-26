@@ -2299,7 +2299,15 @@ scout.Tree.prototype._insertNodeInDOM = function(node, indexHint) {
   }
   this._decorateNode(node);
 
-  var $node = node.$node;
+  this._insertNodeInDOMAtPlace(node, index);
+
+  node.height = node.$node.outerHeight();
+  node.rendered = true;
+  node.attached = true;
+};
+
+scout.Tree.prototype._insertNodeInDOMAtPlace = function(node, index) {
+  var $node  = node.$node;
   if (index === 0) {
     if (this.$fillBefore) {
       added = true;
@@ -2328,12 +2336,9 @@ scout.Tree.prototype._insertNodeInDOM = function(node, indexHint) {
     } else if (!added) {
       this.$data.prepend($node);
     }
-
   }
-  node.height = node.$node.outerHeight();
-  node.rendered = true;
-  node.attached = true;
 };
+
 
 scout.Tree.prototype.showNode = function(node, useAnimation, indexHint) {
   if (node.attached || !this.rendered) {
