@@ -51,7 +51,9 @@ scout.DesktopGridBench.prototype._init = function(model) {
   this.desktop = this.session.desktop;
   this.headerViewTabBox = model.headerViewTabBox;
   // controller for headerViewTabBox
-  this.headerViewTabBoxController = new scout.HeaderViewTabBoxController(this, this.headerViewTabBox);
+  if (this.headerViewTabBox) {
+    this.headerViewTabBoxController = new scout.HeaderViewTabBoxController(this, this.headerViewTabBox);
+  }
   this.outlineContentVisible = scout.nvl(model.outlineContentVisible, true);
   this.setOutline(this.desktop.outline);
 };
@@ -201,9 +203,9 @@ scout.DesktopGridBench.prototype.setOutlineContent = function(content) {
   this._setProperty('outlineContent', content);
   // Inform header that outline content has changed
   // (having a listener in the header is quite complex due to initialization phase, a direct call here is much easier to implement)
-  //  if (this.desktop.header) {
-  //    this.desktop.header.onBenchOutlineContentChange(content, oldContent);
-  //  }
+    if (this.desktop.header) {
+      this.desktop.header.onBenchOutlineContentChange(content, oldContent);
+    }
   if (content) {
     this.showView(content);
   }
@@ -403,7 +405,7 @@ scout.DesktopGridBench.prototype._onViewActivated = function(event) {
   var view = event.view;
   if (this.outlineContent === view) {
     this.desktop.bringOutlineToFront(this.desktop.outline);
-  }else  if (!view.detailForm) {
+  } else if (!view.detailForm) {
     // Notify model that this form is active (only for regular views, not detail forms)
     this.desktop._setFormActivated(view);
   }

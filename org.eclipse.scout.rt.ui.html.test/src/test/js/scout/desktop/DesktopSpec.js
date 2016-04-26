@@ -128,7 +128,7 @@ describe('Desktop', function() {
       expect(outline.rendered).toBe(true);
       expect(outline.$container.parent()[0]).toBe(desktop.navigation.$body[0]);
       expect(detailForm.rendered).toBe(true);
-      expect(detailForm.$container.parent()[0]).toBe(desktop.bench.$container[0]);
+      expect(detailForm.$container.parent()[0]).toBe(desktop.bench.getViewArea('C').$viewContent[0]);
 
       // Outline is not visible anymore, but detail form is
       desktop.setNavigationVisible(false);
@@ -138,7 +138,7 @@ describe('Desktop', function() {
       expect(desktop.navigation).toBeFalsy();
       expect(outline.rendered).toBe(false);
       expect(detailForm.rendered).toBe(true);
-      expect(detailForm.$container.parent()[0]).toBe(desktop.bench.$container[0]);
+      expect(detailForm.$container.parent()[0]).toBe(desktop.bench.getViewArea('C').$viewContent[0]);
     });
 
   });
