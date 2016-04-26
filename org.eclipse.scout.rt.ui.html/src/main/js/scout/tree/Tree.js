@@ -177,7 +177,7 @@ scout.Tree.prototype._initTreeNode = function(node, parentNode) {
         this._addToVisibleFlatList(p, false);
 
         //process children
-        this._addChildsToFlatList(p, this.visibleNodesFlat.length-1, false);
+        this._addChildsToFlatList(p, this.visibleNodesFlat.length-1, false, null, true);
       }
     }
       p = p.parentNode;
@@ -205,8 +205,8 @@ scout.Tree.prototype._initTreeNode = function(node, parentNode) {
 
   this._initTreeNodeInternal(node, parentNode);
 
-  node.isFilterAccepted = function() {
-    if (this.filterDirty) {
+  node.isFilterAccepted = function(forceFilter) {
+    if (this.filterDirty || forceFilter) {
       that._applyFiltersForNode(this);
     }
     return this.filterAccepted;
@@ -545,9 +545,6 @@ scout.Tree.prototype._nodeAtScrollTop = function(scrollTop) {
       return true;
     }
   }.bind(this));
-  //  if (scrollTop > height) {
-  //    this.$data[0].scrollTop = height;
-  //  }
   var visibleNodesLength = this.visibleNodesFlat.length;
   if (!nodeTop && visibleNodesLength > 0) {
     nodeTop = this.visibleNodesFlat[visibleNodesLength - 1];
@@ -1284,7 +1281,7 @@ scout.Tree.prototype.setNodeExpanded = function(node, expanded, opts) {
     }
 
     if (node.expanded) {
-      this._addChildsToFlatList(node, null, true);
+      this._addChildsToFlatList(node, null, true, null, true);
     } else {
       this._removeChildsFromFlatList(node, true);
     }
@@ -1309,7 +1306,7 @@ scout.Tree.prototype._rebuildParent = function(node, opts) {
     return;
   }
   if (node.expanded || node.expandedLazy) {
-    this._addChildsToFlatList(node, null, false);
+    this._addChildsToFlatList(node, null, false, null, true);
   } else {
     this._removeChildsFromFlatList(node, false);
   }
@@ -1470,7 +1467,7 @@ scout.Tree.prototype._findIndexToInsertNode = function(node) {
   }
 };
 
-scout.Tree.prototype._addChildsToFlatList = function(parentNode, parentIndex, animatedRendering, insertBatch) {
+scout.Tree.prototype._addChildsToFlatList = function(parentNode, parentIndex, animatedRendering, insertBatch, forceFilter) {
   //add nodes recursively
   if (!this.visibleNodesMap[parentNode.id]) {
     return 0;
@@ -1488,19 +1485,19 @@ scout.Tree.prototype._addChildsToFlatList = function(parentNode, parentIndex, an
   insertBatch = insertBatch ? insertBatch : this.setUpInsertBatch(parentIndex + 1);
   parentNode.childNodes.forEach(function(node, index) {
     var isAlreadyAdded = this.visibleNodesMap[node.id];
-    if (node.initialized && node.isFilterAccepted() && !isAlreadyAdded) {
+    if (node.initialized && node.isFilterAccepted(forceFilter) && !isAlreadyAdded) {
       insertBatch.insertNodes.push(node);
       this.visibleNodesMap[node.id] = true;
       insertBatch = this.checkAndHandleBatch(insertBatch, parentNode, animatedRendering);
       if (node.expanded) {
-        insertBatch = this._addChildsToFlatList(node, insertBatch.lastBatchInsertIndex(), animatedRendering, insertBatch);
+        insertBatch = this._addChildsToFlatList(node, insertBatch.lastBatchInsertIndex(), animatedRendering, insertBatch, forceFilter);
       }
-    } else if (node.initialized && node.isFilterAccepted() && isAlreadyAdded) {
+    } else if (node.initialized && node.isFilterAccepted(forceFilter) && isAlreadyAdded) {
       this.insertBatchInVisibleNodes(insertBatch, this.viewRangeRendered.from + this.viewRangeSize >= insertBatch.lastBatchInsertIndex() && this.viewRangeRendered.from <= insertBatch.lastBatchInsertIndex(), animatedRendering);
       this.checkAndHandleBatchAnimationWrapper(parentNode, animatedRendering, insertBatch);
       insertBatch = this.setUpInsertBatch(insertBatch.lastBatchInsertIndex());
       if (node.expanded) {
-        insertBatch = this._addChildsToFlatList(node, insertBatch.lastBatchInsertIndex(), animatedRendering, insertBatch);
+        insertBatch = this._addChildsToFlatList(node, insertBatch.lastBatchInsertIndex(), animatedRendering, insertBatch, forceFilter);
       }
       //do not animate following
       animatedRendering = false;
@@ -2217,9 +2214,6 @@ scout.Tree.prototype.filter = function(notAnimated) {
       return false;
     }
     //don't process children->optimize performance
-    node.childNodes.forEach(function(child){
-      child.filterDirty=true;
-    });
     return true;
   }.bind(this));
 
