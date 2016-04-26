@@ -160,29 +160,29 @@ scout.Tree.prototype._initTreeNode = function(node, parentNode) {
   node.rendered = false;
   node.attached = false;
   //if this node is selected all parent nodes has to be added to selectionPath
-   if (this._isSelectedNode(node) && node.parentNode && !this.visibleNodesMap[node.parentNode.id]) {
+  if (this._isSelectedNode(node) && node.parentNode && !this.visibleNodesMap[node.parentNode.id]) {
     var p = node;
     while (p) {
       this._inSelectionPathList[p.id] = true;
       p.filterDirty = true;
 
-      if(p !== node){
+      if (p !== node) {
         //ensure node is expanded
         node.expanded = true;
-      //if parent was filtered before, try refilter after adding to selection path.
-      if(p.level === 0){
-        this._applyFiltersForNode(p);
+        //if parent was filtered before, try refilter after adding to selection path.
+        if (p.level === 0) {
+          this._applyFiltersForNode(p);
 
-        //add visible nodes to visible nodes array when they are initialized
-        this._addToVisibleFlatList(p, false);
+          //add visible nodes to visible nodes array when they are initialized
+          this._addToVisibleFlatList(p, false);
 
-        //process children
-        this._addChildsToFlatList(p, this.visibleNodesFlat.length-1, false, null, true);
+          //process children
+          this._addChildsToFlatList(p, this.visibleNodesFlat.length - 1, false, null, true);
+        }
       }
-    }
       p = p.parentNode;
     }
-  } else if(node.parentNode && this._isSelectedNode(node.parentNode)){
+  } else if (node.parentNode && this._isSelectedNode(node.parentNode)) {
     this._inSelectionPathList[node.id] = true;
   }
   //create function to check if node is in hierarchy of a parent. is used on removal from flat list.
@@ -1159,10 +1159,11 @@ scout.Tree.prototype._isTruncatedNodeTooltipEnabled = function() {
 };
 
 scout.Tree.prototype.setDisplayStyle = function(displayStyle, notifyServer) {
+  this._renderViewportBlocked = true;
   if (this.displayStyle === displayStyle) {
     return;
   }
-
+  var oldDisplayStyle = this.displayStyle;
   this._setProperty('displayStyle', displayStyle);
   notifyServer = scout.nvl(notifyServer, true);
   if (notifyServer) {
@@ -1176,24 +1177,26 @@ scout.Tree.prototype.setDisplayStyle = function(displayStyle, notifyServer) {
     }
   }
 
+  if (this.displayStyle === scout.Tree.DisplayStyle.BREADCRUMB) {
+    this.addFilter(this.breadcrumbFilter, true);
+    this.filterVisibleNodes();
+  } else if (oldDisplayStyle === scout.Tree.DisplayStyle.BREADCRUMB) {
+    this.removeFilter(this.breadcrumbFilter);
+    this.filter();
+  }
+
+  this._renderViewportBlocked = false;
   if (this.rendered) {
     this._renderDisplayStyle();
   }
 };
 
 scout.Tree.prototype.setBreadcrumbStyleActive = function(active, notifyServer) {
-  //TODO nbu move to setDisplayStyle
-  this._renderViewportBlocked = true;
-  if (active && this.displayStyle !== scout.Tree.DisplayStyle.BREADCRUMB) {
+  if (active) {
     this.setDisplayStyle(scout.Tree.DisplayStyle.BREADCRUMB, notifyServer);
-    this.addFilter(this.breadcrumbFilter, true);
-    this.filterVisibleNodes();
-  } else if (!active && this.displayStyle !== scout.Tree.DisplayStyle.DEFAULT) {
+  } else if (!active) {
     this.setDisplayStyle(scout.Tree.DisplayStyle.DEFAULT, notifyServer);
-    this.removeFilter(this.breadcrumbFilter);
-    this.filter();
   }
-  this._renderViewportBlocked = false;
 };
 
 scout.Tree.prototype.isNodeInBreadcrumbVisible = function(node) {
@@ -1637,7 +1640,6 @@ scout.Tree.prototype.selectNodes = function(nodes, notifyServer, debounceSend) {
   if (this.rendered) {
     this._removeSelection();
   }
-
 
   // Make a copy so that original array stays untouched
   this.selectedNodes = nodes.slice();
@@ -2307,7 +2309,7 @@ scout.Tree.prototype._insertNodeInDOM = function(node, indexHint) {
 };
 
 scout.Tree.prototype._insertNodeInDOMAtPlace = function(node, index) {
-  var $node  = node.$node;
+  var $node = node.$node;
   if (index === 0) {
     if (this.$fillBefore) {
       added = true;
@@ -2338,7 +2340,6 @@ scout.Tree.prototype._insertNodeInDOMAtPlace = function(node, index) {
     }
   }
 };
-
 
 scout.Tree.prototype.showNode = function(node, useAnimation, indexHint) {
   if (node.attached || !this.rendered) {
