@@ -1,4 +1,4 @@
-package org.eclipse.scout.rt.client;
+package org.eclipse.scout.rt.shared.servicetunnel;
 
 import java.lang.reflect.Method;
 
@@ -8,24 +8,23 @@ import org.eclipse.scout.rt.platform.IBeanInstanceProducer;
 import org.eclipse.scout.rt.platform.interceptor.DecoratingProxy;
 import org.eclipse.scout.rt.platform.interceptor.IInstanceInvocationHandler;
 import org.eclipse.scout.rt.platform.util.VerboseUtility;
-import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * <h3>{@link TunnelToServerProxyProducer}</h3>
+ * <h3>{@link ServiceTunnelProxyProducer}</h3>
  *
  * @author Matthias Villiger
  */
-public class TunnelToServerProxyProducer<T> implements IBeanInstanceProducer<T>, IInstanceInvocationHandler<T> {
+public class ServiceTunnelProxyProducer<T> implements IBeanInstanceProducer<T>, IInstanceInvocationHandler<T> {
 
-  private static final Logger LOG = LoggerFactory.getLogger(TunnelToServerProxyProducer.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ServiceTunnelProxyProducer.class);
 
   private final DecoratingProxy<T> m_proxy;
 
   private final Class<?> m_interfaceClass;
 
-  public TunnelToServerProxyProducer(Class<?> interfaceClass) {
+  public ServiceTunnelProxyProducer(Class<?> interfaceClass) {
     m_interfaceClass = interfaceClass;
     m_proxy = DecoratingProxy.newInstance(this, interfaceClass);
   }
