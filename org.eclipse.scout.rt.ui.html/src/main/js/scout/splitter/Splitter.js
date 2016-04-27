@@ -78,7 +78,11 @@ scout.Splitter.prototype._setPosition = function(newPosition, updateRatio, fireP
     return;
   }
   if (updateRatio) {
-    this.ratio = newPosition / this._$root.outerWidth(true);
+    if (this.splitHorizontal) {
+      this.ratio = newPosition / this._$root.outerWidth(true);
+    } else {
+      this.ratio = newPosition / this._$root.outerHeight(true);
+    }
   }
   this.position = newPosition;
   var positionChangedEvent = {
@@ -152,6 +156,6 @@ scout.Splitter.prototype._onMouseUp = function(event) {
   this._$window.off('mousemove.splitter');
   this._$body.removeClass((this.splitHorizontal ? 'col-resize' : 'row-resize'));
   this.trigger('moveEnd', {
-    position : this.position
+    position: this.position
   });
 };
