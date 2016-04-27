@@ -12,7 +12,7 @@ scout.DesktopNavigation = function() {
   scout.DesktopNavigation.parent.call(this);
   this.$container;
   this.$body;
-  this.viewButtons;
+  this.viewButtonBox;
   this._outlinePropertyChangeHandler = this._onOutlinePropertyChange.bind(this);
   this._desktopPropertyChangeHandler = this._onDesktopPropertyChange.bind(this);
 };
@@ -39,24 +39,36 @@ scout.DesktopNavigation.prototype._render = function($parent) {
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
   this.htmlComp.setLayout(new scout.DesktopNavigationLayout(this));
   this.htmlComp.layoutData = this.layoutData;
-  this.viewButtons = scout.create('ViewButtons', {
-    parent: this
-  });
-  this.viewButtons.render(this.$container);
 
   this.$body = this.$container.appendDiv('navigation-body')
     .on('mousedown', this._onNavigationBodyMousedown.bind(this));
   this.htmlCompBody = new scout.HtmlComponent(this.$body, this.session);
   this.htmlCompBody.setLayout(new scout.SingleLayout());
-  this._renderToolBarVisible();
-  this._renderOutline();
-  this._renderHandleVisible();
+
   this.desktop.on('propertyChange', this._desktopPropertyChangeHandler);
 };
 
 scout.DesktopNavigation.prototype._remove = function() {
   this.desktop.off('propertyChange', this._desktopPropertyChangeHandler);
   scout.DesktopNavigation.parent.prototype._remove.call(this);
+};
+
+scout.DesktopNavigation.prototype._renderProperties = function() {
+  this._renderViewButtonBox();
+  this._renderToolBarVisible();
+  this._renderOutline();
+  this._renderHandleVisible();
+};
+
+scout.DesktopNavigation.prototype._renderViewButtonBox = function() {
+  if (this.desktop.viewButtons.length === 0) {
+    return;
+  }
+  this.viewButtonBox = scout.create('ViewButtonBox', {
+    parent: this,
+    viewButtons: this.desktop.viewButtons
+  });
+  this.viewButtonBox.render(this.$container);
 };
 
 scout.DesktopNavigation.prototype._renderOutline = function() {
@@ -103,14 +115,14 @@ scout.DesktopNavigation.prototype.setOutline = function(outline) {
 };
 
 scout.DesktopNavigation.prototype.sendToBack = function() {
-  this.viewButtons.sendToBack();
+  this.viewButtonBox.sendToBack();
   if (this.outline) {
     this.outline.sendToBack();
   }
 };
 
 scout.DesktopNavigation.prototype.bringToFront = function() {
-  this.viewButtons.bringToFront();
+  this.viewButtonBox.bringToFront();
   if (this.outline) {
     this.outline.bringToFront();
   }

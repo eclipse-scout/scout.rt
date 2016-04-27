@@ -131,7 +131,8 @@
 }
 
 .outline-title-text {
-  padding: 21px 2px 13px 6px;
+  /* outline title height should be the same as main menubar and desktop header height (if there are no view buttons visible) */
+  padding: 20px 2px 12px 6px;
   cursor: pointer;
   display: block;
   width: auto;

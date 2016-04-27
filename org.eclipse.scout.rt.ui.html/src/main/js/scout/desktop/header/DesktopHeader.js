@@ -21,8 +21,8 @@ scout.DesktopHeader.prototype._init = function(model) {
   scout.DesktopHeader.parent.prototype._init.call(this, model);
   this.desktop = this.session.desktop;
   this.toolBarVisible = scout.nvl(model.toolBarVisible, true);
-  this.viewButtonsVisible = scout.nvl(model.viewButtonsVisible, false);
-  this.updateViewButtonsVisibility();
+  this.viewButtonBoxVisible = scout.nvl(model.viewButtonBoxVisible, false);
+  this.updateViewButtonBoxVisibility();
   // create view tab box
   this.viewTabBox = scout.create('ViewTabArea', {
     parent: this
@@ -33,7 +33,7 @@ scout.DesktopHeader.prototype._render = function($parent) {
   this.$container = $parent.appendDiv('desktop-header');
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
   this.htmlComp.setLayout(new scout.DesktopHeaderLayout(this));
-  this._renderViewButtonsVisible();
+  this._renderViewButtonBoxVisible();
   this._renderViewTabs();
   this._renderToolBarVisible();
   this._renderLogoUrl();
@@ -114,47 +114,48 @@ scout.DesktopHeader.prototype._removeLogo = function() {
   this.logo = null;
 };
 
-scout.DesktopHeader.prototype._renderViewButtons = function() {
-  if (this.viewButtons) {
+scout.DesktopHeader.prototype._renderViewButtonBox = function() {
+  if (this.viewButtonBox) {
     return;
   }
-  this.viewButtons = scout.create('ViewButtons', {
-    parent: this
+  this.viewButtonBox = scout.create('ViewButtonBox', {
+    parent: this,
+    viewButtons: this.desktop.viewButtons
   });
-  this.viewButtons.render(this.$container);
-  this.viewButtons.$container.prependTo(this.$container);
+  this.viewButtonBox.render(this.$container);
+  this.viewButtonBox.$container.prependTo(this.$container);
   if (this.desktop.inBackground) {
-    this.viewButtons.sendToBack();
+    this.viewButtonBox.sendToBack();
   }
   this.updateViewButtonStyling();
 };
 
-scout.DesktopHeader.prototype._removeViewButtons = function() {
-  if (!this.viewButtons) {
+scout.DesktopHeader.prototype._removeViewButtonBox = function() {
+  if (!this.viewButtonBox) {
     return;
   }
-  this.viewButtons.remove();
-  this.viewButtons = null;
+  this.viewButtonBox.remove();
+  this.viewButtonBox = null;
 };
 
-scout.DesktopHeader.prototype._renderViewButtonsVisible = function() {
-  if (this.viewButtonsVisible) {
-    this._renderViewButtons();
+scout.DesktopHeader.prototype._renderViewButtonBoxVisible = function() {
+  if (this.viewButtonBoxVisible) {
+    this._renderViewButtonBox();
   } else {
-    this._removeViewButtons();
+    this._removeViewButtonBox();
   }
   this.invalidateLayoutTree();
 };
 
 scout.DesktopHeader.prototype.sendToBack = function() {
-  if (this.viewButtons) {
-    this.viewButtons.sendToBack();
+  if (this.viewButtonBox) {
+    this.viewButtonBox.sendToBack();
   }
 };
 
 scout.DesktopHeader.prototype.bringToFront = function() {
-  if (this.viewButtons) {
-    this.viewButtons.bringToFront();
+  if (this.viewButtonBox) {
+    this.viewButtonBox.bringToFront();
   }
 };
 
@@ -178,20 +179,21 @@ scout.DesktopHeader.prototype.setToolBarVisible = function(visible) {
   }
 };
 
-scout.DesktopHeader.prototype.setViewButtonsVisible = function(visible) {
-  if (this.viewButtonsVisible === visible) {
+scout.DesktopHeader.prototype.setViewButtonBoxVisible = function(visible) {
+  if (this.viewButtonBoxVisible === visible) {
     return;
   }
-  this.viewButtonsVisible = visible;
+  this.viewButtonBoxVisible = visible;
   if (this.rendered) {
-    this._renderViewButtonsVisible();
+    this._renderViewButtonBoxVisible();
   }
 };
 
-scout.DesktopHeader.prototype.updateViewButtonsVisibility = function() {
+scout.DesktopHeader.prototype.updateViewButtonBoxVisibility = function() {
   // View buttons are visible in the header if the navigation is not visible
+  // If there are no view buttons at all, don't show the box
   // With displayStyle is set to compact, the view buttons should never be visible in the header
-  this.setViewButtonsVisible(!this.desktop.navigationVisible && this.desktop.displayStyle !== scout.Desktop.DisplayStyle.COMPACT);
+  this.setViewButtonBoxVisible(this.desktop.viewButtons.length > 0 && !this.desktop.navigationVisible && this.desktop.displayStyle !== scout.Desktop.DisplayStyle.COMPACT);
 };
 
 scout.DesktopHeader.prototype._attachOutlineContentMenuBarHandler = function() {
@@ -222,7 +224,7 @@ scout.DesktopHeader.prototype._outlineContentMenuBar = function(outlineContent) 
 };
 
 scout.DesktopHeader.prototype.updateViewButtonStyling = function() {
-  if (!this.viewButtonsVisible || !this.desktop.bench || !this.desktop.bench.outlineContentVisible) {
+  if (!this.viewButtonBoxVisible || !this.desktop.bench || !this.desktop.bench.outlineContentVisible) {
     return;
   }
   var outlineContent = this.desktop.bench.outlineContent;
@@ -237,22 +239,22 @@ scout.DesktopHeader.prototype.updateViewButtonStyling = function() {
   } else {
     hasMenuBar = outlineContent.menuBar && outlineContent.menuBar.visible;
   }
-  this.viewButtons.viewTabs.forEach(function(tab) {
+  this.viewButtonBox.viewTabs.forEach(function(tab) {
     tab.$container.toggleClass('outline-content-has-menubar', !!hasMenuBar);
   }, this);
-  this.viewButtons.viewMenuTab.$container.toggleClass('outline-content-has-menubar', !!hasMenuBar);
+  this.viewButtonBox.viewMenuTab.$container.toggleClass('outline-content-has-menubar', !!hasMenuBar);
 };
 
 scout.DesktopHeader.prototype._onDesktopNavigationVisibleChange = function(event) {
   // If navigation gets visible: Hide view buttons immediately
   // If navigation gets hidden using animation: Show view buttons when animation ends
   if (this.desktop.navigationVisible) {
-    this.updateViewButtonsVisibility();
+    this.updateViewButtonBoxVisibility();
   }
 };
 
 scout.DesktopHeader.prototype._onDesktopAnimationEnd = function(event) {
-  this.updateViewButtonsVisibility();
+  this.updateViewButtonBoxVisibility();
 };
 
 scout.DesktopHeader.prototype.onBenchOutlineContentChange = function(content) {

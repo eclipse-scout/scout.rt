@@ -10,8 +10,8 @@
  ******************************************************************************/
 /**
  * Shows a list of view buttons with displayStyle=MENU
- * and shows the title of the active outline, if the outline is one
- * of the outline-view-buttons contained in the menu.
+ * and shows the title of the active view button, if the view button is one
+ * of the view buttons contained in the menu.
  */
 scout.ViewMenuTab = function() {
   scout.ViewMenuTab.parent.call(this);
@@ -22,25 +22,42 @@ scout.ViewMenuTab = function() {
   this.selected = false;
   this.iconId;
   this.inBackground = false;
+  this.visible = true;
 
   this.defaultIconId = scout.icons.OUTLINE;
   this._addEventSupport();
+  this._viewMenuPropertyChangeHandler = this._onViewMenuPropertyChange.bind(this);
 };
 scout.inherits(scout.ViewMenuTab, scout.Widget);
 
 scout.ViewMenuTab.prototype._init = function(model) {
-  scout.ViewButtons.parent.prototype._init.call(this, model);
+  scout.ViewMenuTab.parent.prototype._init.call(this, model);
   this.viewMenus = model.viewMenus;
   this.viewMenus.forEach(function(viewMenu) {
     viewMenu.setParent(this);
+    viewMenu.on('propertyChange', this._viewMenuPropertyChangeHandler);
   }, this);
   this._update();
+  this.updateVisibility();
+};
+
+scout.ViewMenuTab.prototype._initKeyStrokeContext = function(keyStrokeContext) {
+  scout.ViewMenuTab.parent.prototype._initKeyStrokeContext.call(this, keyStrokeContext);
+
+  // Bound to desktop
+  this.desktopKeyStrokeContext = new scout.KeyStrokeContext();
+  this.desktopKeyStrokeContext.invokeAcceptInputOnActiveValueField = true;
+  this.desktopKeyStrokeContext.$bindTarget = this.session.desktop.$container;
+  this.desktopKeyStrokeContext.$scopeTarget = this.$container;
+  this.desktopKeyStrokeContext.registerKeyStroke([
+    new scout.ViewMenuOpenKeyStroke(this)
+  ]);
 };
 
 /**
  * 1. look for a selected view-button
  * 2. look for any view-button
- * 3. in rare cases there will be no view-button at all
+ * 3. if there is no view-button menu should not be visible
  */
 scout.ViewMenuTab.prototype._update = function() {
   var viewButton = this._findSelectedViewButton();
@@ -60,15 +77,30 @@ scout.ViewMenuTab.prototype._render = function($parent) {
   this.$container = $parent.appendDiv('view-button-tab')
     .unfocusable()
     .on('mousedown', this.togglePopup.bind(this));
+  this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
+
   this.$arrowIcon = this.$container
     .appendSpan('arrow-icon')
     .on('mousedown', this.togglePopup.bind(this));
+
+  this.session.keyStrokeManager.installKeyStrokeContext(this.desktopKeyStrokeContext);
+};
+
+scout.ViewMenuTab.prototype._remove = function() {
+  this.session.keyStrokeManager.uninstallKeyStrokeContext(this.desktopKeyStrokeContext);
+  scout.ViewMenuTab.parent.prototype._remove.call(this);
 };
 
 scout.ViewMenuTab.prototype._renderProperties = function() {
+  this._renderVisible();
   this._renderIconId();
   this._renderSelected();
   this._renderInBackground();
+};
+
+scout.ViewMenuTab.prototype._renderVisible = function() {
+  this.$container.setVisible(this.visible);
+  this.invalidateLayoutTree();
 };
 
 scout.ViewMenuTab.prototype._renderSelected = function() {
@@ -129,7 +161,7 @@ scout.ViewMenuTab.prototype._openPopup = function() {
   this.popup = scout.create('ViewMenuPopup', {
     parent: this,
     $tab: this.$container,
-    viewMenus: this._popupViewMenus(),
+    viewMenus: this.viewMenus,
     naviBounds: naviBounds
   });
   // The class needs to be added to the container before the popup gets opened so that the modified style may be copied to the head.
@@ -168,19 +200,39 @@ scout.ViewMenuTab.prototype.setIconId = function(iconId) {
   }
 };
 
-/**
- * An OutlineViewButton for a null-outline shouldn't be added to the menus
- * displayed in the popup-menu. We recognize the null-outline be checking
- * the 'visibleInMenu' property.
- */
-scout.ViewMenuTab.prototype._popupViewMenus = function() {
-  var popupMenus = [];
-  this.viewMenus.forEach(function(viewMenu) {
-    if (scout.nvl(viewMenu.visibleInMenu, true)) {
-      popupMenus.push(viewMenu);
-    }
-  });
-  return popupMenus;
+scout.ViewMenuTab.prototype.setVisible = function(visible) {
+  if (this.visible === visible) {
+    return;
+  }
+  this._setProperty('visible', visible);
+  if (this.rendered) {
+    this._renderVisible();
+  }
+};
+
+scout.ViewMenuTab.prototype.updateVisibility = function() {
+  this.setVisible(this.viewMenus.some(function(viewMenu) {
+    return viewMenu.visible;
+  }));
+};
+
+scout.ViewMenuTab.prototype.sendToBack = function() {
+  this.inBackground = true;
+  this._renderInBackground();
+  this._renderSelected();
+  this._closePopup();
+};
+
+scout.ViewMenuTab.prototype.bringToFront = function() {
+  this.inBackground = false;
+  this._renderInBackground();
+  this._renderSelected();
+};
+
+scout.ViewMenuTab.prototype._onViewMenuPropertyChange = function(event) {
+  if (event.changedProperties.indexOf('visible') !== -1) {
+    this.updateVisibility();
+  }
 };
 
 scout.ViewMenuTab.prototype.onViewButtonSelected = function() {
@@ -195,17 +247,4 @@ scout.ViewMenuTab.prototype.onViewButtonSelected = function() {
     this.setSelected(false);
   }
   this._closePopup();
-};
-
-scout.ViewMenuTab.prototype.sendToBack = function() {
-  this.inBackground = true;
-  this._renderInBackground();
-  this._renderSelected();
-  this._closePopup();
-};
-
-scout.ViewMenuTab.prototype.bringToFront = function() {
-  this.inBackground = false;
-  this._renderInBackground();
-  this._renderSelected();
 };

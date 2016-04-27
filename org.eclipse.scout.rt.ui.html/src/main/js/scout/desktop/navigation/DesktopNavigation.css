@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-@view-buttons-height: 50px;
+@view-button-box-height: 50px;
 
 .desktop-navigation {
   position: relative;

@@ -247,8 +247,8 @@
   __include("scout/desktop/popupblocker/PopupBlockerDesktopNotification.js");
   __include("scout/desktop/toolbox/DesktopToolBox.js");
   __include("scout/desktop/viewbutton/ViewButton.js");
-  __include("scout/desktop/viewbutton/ViewButtons.js");
-  __include("scout/desktop/viewbutton/ViewButtonsLayout.js");
+  __include("scout/desktop/viewbutton/ViewButtonBox.js");
+  __include("scout/desktop/viewbutton/ViewButtonBoxLayout.js");
   __include("scout/desktop/viewbutton/ViewMenuOpenKeyStroke.js");
   __include("scout/desktop/viewbutton/ViewMenuPopup.js");
   __include("scout/desktop/viewbutton/ViewMenuTab.js");

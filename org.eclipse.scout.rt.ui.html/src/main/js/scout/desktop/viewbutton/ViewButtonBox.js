@@ -8,37 +8,25 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-scout.ViewButtons = function() {
-  scout.ViewButtons.parent.call(this);
+scout.ViewButtonBox = function() {
+  scout.ViewButtonBox.parent.call(this);
   this.viewMenuTab;
   this.viewTabs;
   this._desktopOutlineChangedHandler = this._onDesktopOutlineChanged.bind(this);
   this._viewButtonPropertyChangeHandler = this._onViewButtonPropertyChange.bind(this);
 };
-scout.inherits(scout.ViewButtons, scout.Widget);
+scout.inherits(scout.ViewButtonBox, scout.Widget);
 
-scout.ViewButtons.prototype._init = function(model) {
-  scout.ViewButtons.parent.prototype._init.call(this, model);
+scout.ViewButtonBox.prototype._init = function(model) {
+  scout.ViewButtonBox.parent.prototype._init.call(this, model);
   this.desktop = this.session.desktop;
+  this.viewButtons = model.viewButtons || [];
 };
 
-scout.ViewButtons.prototype._initKeyStrokeContext = function(keyStrokeContext) {
-  scout.DesktopHeader.parent.prototype._initKeyStrokeContext.call(this, keyStrokeContext);
-
-  // Bound to desktop
-  this.desktopKeyStrokeContext = new scout.KeyStrokeContext();
-  this.desktopKeyStrokeContext.invokeAcceptInputOnActiveValueField = true;
-  this.desktopKeyStrokeContext.$bindTarget = this.desktop.$container;
-  this.desktopKeyStrokeContext.$scopeTarget = this.$container;
-  this.desktopKeyStrokeContext.registerKeyStroke([
-    new scout.ViewMenuOpenKeyStroke(this)
-  ]);
-};
-
-scout.ViewButtons.prototype._render = function($parent) {
-  this.$container = $parent.appendDiv('view-buttons');
+scout.ViewButtonBox.prototype._render = function($parent) {
+  this.$container = $parent.appendDiv('view-button-box');
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
-  this.htmlComp.setLayout(new scout.ViewButtonsLayout(this));
+  this.htmlComp.setLayout(new scout.ViewButtonBoxLayout(this));
   this.viewMenuTab = scout.create('ViewMenuTab', {parent: this,
     viewMenus: this._viewButtons('MENU')
   });
@@ -52,27 +40,26 @@ scout.ViewButtons.prototype._render = function($parent) {
       viewTab.last();
     }
   }, this);
-  this.session.keyStrokeManager.installKeyStrokeContext(this.desktopKeyStrokeContext);
 
   this._onDesktopOutlineChanged();
-  this.desktop.viewButtons.forEach(function(viewButton) {
+  this.viewButtons.forEach(function(viewButton) {
     viewButton.on('propertyChange', this._viewButtonPropertyChangeHandler);
   }, this);
   this.desktop.on('outlineChanged', this._desktopOutlineChangedHandler);
 };
 
-scout.ViewButtons.prototype._remove = function() {
+scout.ViewButtonBox.prototype._remove = function() {
   this.desktop.off('outlineChanged', this._desktopOutlineChangedHandler);
-  this.desktop.viewButtons.forEach(function(viewButton) {
+  this.viewButtons.forEach(function(viewButton) {
     viewButton.off('selected', this._viewButtonPropertyChangeHandler);
   }, this);
-  this.session.keyStrokeManager.uninstallKeyStrokeContext(this.desktopKeyStrokeContext);
-  scout.ViewButtons.parent.prototype._remove.call(this);
+
+  scout.ViewButtonBox.parent.prototype._remove.call(this);
 };
 
-scout.ViewButtons.prototype._viewButtons = function(displayStyle) {
+scout.ViewButtonBox.prototype._viewButtons = function(displayStyle) {
   var viewButtons = [];
-  this.desktop.viewButtons.forEach(function(viewButton) {
+  this.viewButtons.forEach(function(viewButton) {
     if (displayStyle === undefined ||
       displayStyle === viewButton.displayStyle) {
       viewButtons.push(viewButton);
@@ -81,18 +68,14 @@ scout.ViewButtons.prototype._viewButtons = function(displayStyle) {
   return viewButtons;
 };
 
-scout.ViewButtons.prototype.doViewMenuAction = function() {
-  this.viewMenuTab.togglePopup();
-};
-
-scout.ViewButtons.prototype.sendToBack = function() {
+scout.ViewButtonBox.prototype.sendToBack = function() {
   this.viewMenuTab.sendToBack();
   this.viewTabs.forEach(function(button) {
     button.sendToBack();
   }, this);
 };
 
-scout.ViewButtons.prototype.bringToFront = function() {
+scout.ViewButtonBox.prototype.bringToFront = function() {
   this.viewMenuTab.bringToFront();
   this.viewTabs.forEach(function(button) {
     button.bringToFront();
@@ -100,10 +83,10 @@ scout.ViewButtons.prototype.bringToFront = function() {
 };
 
 /**
- * This method updates the state of the view-menu-tab and the selected state of outline-view-buttons.
+ * This method updates the state of the view-menu-tab and the selected state of outline-view-button-box.
  * This method must also work in offline mode.
  */
-scout.ViewButtons.prototype._onDesktopOutlineChanged = function(event) {
+scout.ViewButtonBox.prototype._onDesktopOutlineChanged = function(event) {
   var outline = this.desktop.outline;
   this._viewButtons().forEach(function(viewTab) {
     if (viewTab instanceof scout.OutlineViewButton) {
@@ -112,9 +95,9 @@ scout.ViewButtons.prototype._onDesktopOutlineChanged = function(event) {
   });
 };
 
-scout.ViewButtons.prototype._onViewButtonSelected = function(event) {
+scout.ViewButtonBox.prototype._onViewButtonSelected = function(event) {
   // Deselect other togglable view buttons
-  this.desktop.viewButtons.forEach(function(viewButton) {
+  this.viewButtons.forEach(function(viewButton) {
     if (viewButton !== event.source && viewButton.isToggleAction()) {
       viewButton.setSelected(false);
     }
@@ -124,7 +107,7 @@ scout.ViewButtons.prototype._onViewButtonSelected = function(event) {
   this.viewMenuTab.onViewButtonSelected();
 };
 
-scout.ViewButtons.prototype._onViewButtonPropertyChange = function(event) {
+scout.ViewButtonBox.prototype._onViewButtonPropertyChange = function(event) {
   if (event.changedProperties.indexOf('selected') !== -1) {
     this._onViewButtonSelected(event);
   }

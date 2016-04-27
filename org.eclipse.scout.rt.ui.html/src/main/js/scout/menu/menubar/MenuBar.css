@@ -40,8 +40,8 @@
   width: 100%;
   background-color: @menubar-background-color;
   display: table;
-  padding-top: 3px;
-  padding-bottom: 3px;
+  padding-top: 2px;
+  padding-bottom: 2px;
   /* default style is 'top' */
   border-bottom: 1px solid @border-color;
 
@@ -229,7 +229,7 @@
 .main-menubar {
   padding-left: @bench-padding-x;
   padding-right: @bench-padding-x;
-  height: 52px;
+  height: 50px;
   background-color: @main-menubar-background-color;
 
   & > .menubox {

@@ -20,17 +20,17 @@ scout.inherits(scout.DesktopHeaderLayout, scout.AbstractLayout);
  * @override AbstractLayout.js
  */
 scout.DesktopHeaderLayout.prototype.layout = function($container) {
-  var viewButtonsPrefSize, toolBarPrefSize,
+  var viewButtonBoxPrefSize, toolBarPrefSize,
     htmlContainer = this.header.htmlComp,
     containerSize = htmlContainer.getSize(),
     toolBar = this.header.toolBar,
-    viewButtons = this.header.viewButtons,
+    viewButtonBox = this.header.viewButtonBox,
     viewTabBox = this.header.viewTabBox,
     smallTabsPrefSize = viewTabBox.htmlComp.layout.smallPrefSize(),
     tabsPrefSize = viewTabBox.htmlComp.getPreferredSize(),
     tabsWidth = 0,
     logoWidth = 0,
-    viewButtonsWidth = 0,
+    viewButtonBoxWidth = 0,
     toolBarWidth = 0;
 
   containerSize = containerSize.subtract(htmlContainer.getInsets());
@@ -39,12 +39,12 @@ scout.DesktopHeaderLayout.prototype.layout = function($container) {
     logoWidth = scout.graphics.getSize(this.header.logo.$container, true).width;
   }
 
-  if (viewButtons) {
-    viewButtonsPrefSize = viewButtons.htmlComp.getPreferredSize();
-    viewButtonsWidth = viewButtonsPrefSize.width;
-    viewButtons.htmlComp.setSize(viewButtonsPrefSize.subtract(viewButtons.htmlComp.getMargins()));
+  if (viewButtonBox) {
+    viewButtonBoxPrefSize = viewButtonBox.htmlComp.getPreferredSize();
+    viewButtonBoxWidth = viewButtonBoxPrefSize.width;
+    viewButtonBox.htmlComp.setSize(viewButtonBoxPrefSize.subtract(viewButtonBox.htmlComp.getMargins()));
   }
-  viewTabBox.htmlComp.$comp.cssLeft(viewButtonsWidth);
+  viewTabBox.htmlComp.$comp.cssLeft(viewButtonBoxWidth);
 
   if (toolBar) {
     toolBarPrefSize = toolBar.htmlComp.getPreferredSize();
@@ -91,7 +91,7 @@ scout.DesktopHeaderLayout.prototype.layout = function($container) {
   // 3rd if only the overflow menu is shown make toolBar smaller so that ellipsis may be displayed
   if (toolBar && tabsWidth <= scout.ViewTabAreaLayout.OVERFLOW_MENU_WIDTH) {
     // layout toolBar, now an ellipsis menu may be shown
-    toolBarWidth = containerSize.width - tabsWidth - logoWidth - viewButtonsWidth;
+    toolBarWidth = containerSize.width - tabsWidth - logoWidth - viewButtonBoxWidth;
     setToolBarSize();
 
     // update size of the toolBar again with the actual width to make it correctly right aligned
@@ -101,7 +101,7 @@ scout.DesktopHeaderLayout.prototype.layout = function($container) {
   }
 
   function calcTabsWidth() {
-    return containerSize.width - toolBarWidth - logoWidth - viewButtonsWidth;
+    return containerSize.width - toolBarWidth - logoWidth - viewButtonBoxWidth;
   }
 
   function setTabsSize() {

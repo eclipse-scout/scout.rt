@@ -8,25 +8,27 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-scout.ViewButtonsLayout = function(viewButtons) {
-  scout.ViewButtonsLayout.parent.call(this);
-  this.viewButtons = viewButtons;
+scout.ViewButtonBoxLayout = function(viewButtonBox) {
+  scout.ViewButtonBoxLayout.parent.call(this);
+  this.viewButtonBox = viewButtonBox;
 };
-scout.inherits(scout.ViewButtonsLayout, scout.AbstractLayout);
+scout.inherits(scout.ViewButtonBoxLayout, scout.AbstractLayout);
 
-scout.ViewButtonsLayout.prototype.layout = function($container) {
-  var htmlComp = this.viewButtons.htmlComp,
+scout.ViewButtonBoxLayout.prototype.layout = function($container) {
+  var htmlComp = this.viewButtonBox.htmlComp,
     containerBounds = htmlComp.getBounds(),
-    tabs = $container.children().length,
-    tabWidth = (containerBounds.width / tabs);
-  $container.children().each(function() {
+    $visibleTabs = $container.children(':visible'),
+    tabCount = $visibleTabs.length,
+    tabWidth = (containerBounds.width / tabCount);
+
+  $visibleTabs.each(function() {
     var $tab = $(this);
     // only set width, use css height
     $tab.cssWidth(tabWidth);
   });
 };
 
-scout.ViewButtonsLayout.prototype.preferredLayoutSize = function($container) {
+scout.ViewButtonBoxLayout.prototype.preferredLayoutSize = function($container) {
   // View buttons have an absolute css height set -> useCssSize = true
   return scout.graphics.prefSize($container, false, true);
 };

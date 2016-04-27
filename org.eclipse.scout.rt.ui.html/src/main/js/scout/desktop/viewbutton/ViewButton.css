@@ -10,7 +10,7 @@
  ******************************************************************************/
 .view-button-tab {
   display: inline-block;
-  height: @view-buttons-height;
+  height: @view-button-box-height;
   background-color: @view-button-tab-background-color;
   color: @view-button-tab-color;
   border-right: solid 1px @border-color;

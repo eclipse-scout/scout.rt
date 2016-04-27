@@ -15,31 +15,37 @@ scout.DesktopNavigationLayout = function(navigation) {
 scout.inherits(scout.DesktopNavigationLayout, scout.AbstractLayout);
 
 scout.DesktopNavigationLayout.prototype.layout = function($container) {
-  var bodySize, viewButtonsSize, viewButtonsHeight, viewButtonsWidth,
+  var bodySize, viewButtonBoxSize, viewButtonBoxPrefSize,
     htmlContainer = this.navigation.htmlComp,
     containerSize = htmlContainer.getSize(),
     htmlBody = this.navigation.htmlCompBody,
-    htmlViewButtons = this.navigation.viewButtons.htmlComp,
-    viewButtonsPrefSize = htmlViewButtons.getPreferredSize();
+    toolBar = this.navigation.toolBar,
+    viewButtonBox = this.navigation.viewButtonBox,
+    viewButtonBoxHeight = 0,
+    viewButtonBoxWidth = 0;
 
   containerSize = containerSize.subtract(htmlContainer.getInsets());
-  viewButtonsHeight = viewButtonsPrefSize.height;
-  viewButtonsWidth = containerSize.width;
-  if (this.navigation.toolBarVisible) {
-    viewButtonsWidth = viewButtonsPrefSize.width;
+
+  if (viewButtonBox) {
+    viewButtonBoxPrefSize = viewButtonBox.htmlComp.getPreferredSize();
+    viewButtonBoxHeight = viewButtonBoxPrefSize.height;
+    viewButtonBoxWidth = containerSize.width;
+    if (toolBar) {
+      viewButtonBoxWidth = viewButtonBoxPrefSize.width;
+    }
+
+    viewButtonBoxSize = new scout.Dimension(viewButtonBoxWidth, viewButtonBoxHeight)
+      .subtract(viewButtonBox.htmlComp.getMargins());
+    viewButtonBox.htmlComp.setSize(viewButtonBoxSize);
   }
 
-  viewButtonsSize = new scout.Dimension(viewButtonsWidth, viewButtonsHeight)
-    .subtract(htmlViewButtons.getMargins());
-  htmlViewButtons.setSize(viewButtonsSize);
-
-  if (this.navigation.toolBarVisible) {
-    this.navigation.toolBar.$container.cssLeft(viewButtonsWidth);
-    this.navigation.toolBar.htmlComp.setSize(new scout.Dimension(containerSize.width - viewButtonsWidth, viewButtonsHeight));
+  if (toolBar) {
+    toolBar.$container.cssLeft(viewButtonBoxWidth);
+    toolBar.htmlComp.setSize(new scout.Dimension(containerSize.width - viewButtonBoxWidth, viewButtonBoxHeight));
   }
 
-  bodySize = new scout.Dimension(containerSize.width, containerSize.height - viewButtonsHeight)
+  bodySize = new scout.Dimension(containerSize.width, containerSize.height - viewButtonBoxHeight)
     .subtract(htmlBody.getMargins());
   htmlBody.setSize(bodySize);
-  htmlBody.$comp.cssTop(viewButtonsHeight);
+  htmlBody.$comp.cssTop(viewButtonBoxHeight);
 };

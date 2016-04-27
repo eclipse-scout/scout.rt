@@ -8,10 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-.view-buttons {
+.view-button-box {
   display: inline-block;
   vertical-align: top;
-  height: @view-buttons-height;
+  height: @view-button-box-height;
   white-space: nowrap;
   #scout.font-text-large();
   overflow: hidden;

@@ -44,7 +44,7 @@
   }
 }
 
-.desktop-header > .view-buttons  {
+.desktop-header > .view-button-box  {
   height: 100%;
 
   & > .view-button-tab {

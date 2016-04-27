@@ -11,15 +11,15 @@
 /**
  * Keystroke to open the 'ViewMenuPopup' on 'F2'.
  */
-scout.ViewMenuOpenKeyStroke = function(viewButtons, keyStroke) {
+scout.ViewMenuOpenKeyStroke = function(viewMenuTab) {
   scout.ViewMenuOpenKeyStroke.parent.call(this);
-  this.field = viewButtons;
+  this.field = viewMenuTab;
 
   this.which = [scout.keys.F2];
   this.stopPropagation = true;
 
   this.renderingHints.$drawingArea = function($drawingArea, event) {
-    return this.field.viewMenuTab.$container;
+    return this.field.$container;
   }.bind(this);
 };
 scout.inherits(scout.ViewMenuOpenKeyStroke, scout.KeyStroke);
@@ -28,7 +28,7 @@ scout.inherits(scout.ViewMenuOpenKeyStroke, scout.KeyStroke);
  * @override KeyStroke.js
  */
 scout.ViewMenuOpenKeyStroke.prototype.handle = function(event) {
-  this.field.doViewMenuAction();
+  this.field.togglePopup();
 };
 
 scout.ViewMenuOpenKeyStroke.prototype._postRenderKeyBox = function($drawingArea) {

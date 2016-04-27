@@ -26,20 +26,26 @@ function sandboxSession(options) {
   options.portletPartId = options.portletPartId || '0';
   options.backgroundJobPollingEnabled = false;
   options.suppressErrors = true;
+  options.renderDesktop = scout.nvl(options.renderDesktop, true);
+
   session = new scout.Session($sandbox, options);
   // Simulate successful session initialization
   session.uiSessionId = '1.1';
   session.modelAdapterRegistry[session.uiSessionId] = session;
   session.locale = new scout.LocaleSpecHelper().createLocale(scout.LocaleSpecHelper.DEFAULT_LOCALE);
+
   var desktop = options.desktop || {};
   desktop.navigationVisible = scout.nvl(desktop.navigationVisible, false);
   desktop.headerVisible = scout.nvl(desktop.headerVisible, false);
   desktop.benchVisible = scout.nvl(desktop.benchVisible, false);
   desktop.parent = scout.nvl(desktop.parent, session.rootAdapter);
   session.desktop = scout.create('Desktop', desktop);
-  session._renderDesktop();
+  if (options.renderDesktop) {
+    session._renderDesktop();
+  }
+
   // Prevent exception when test window gets resized
-  session.desktop.$container.window().off('resize', session.desktop._resizeHandler);
+  $sandbox.window().off('resize', session.desktop._resizeHandler);
   return session;
 }
 
