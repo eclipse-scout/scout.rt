@@ -1,4 +1,4 @@
-=== Transient Dependencies
+=== Transitive Dependencies
 
 :doctype: article
 :revnumber: {project-version}
@@ -9,14 +9,14 @@ This can result to a classpath with two version of the same dependency.
 
 ==== Solution
 
-To work around this problem we define every transient dependency in the dependency management exactly once with a defined version.
+To work around this problem we define every transitive dependency in the dependency management exactly once with a defined version.
 To search for all dependencies this script can be used:
 
     mvn org.apache.maven.plugins:maven-dependency-plugin:2.10:resolve | grep '\[INFO\]    ' | cut -d':' -f1-4 | sort | uniq | cut -c11- | grep -v none | grep -v org.eclipse | sed -r 's/(.*):(.*):(.*):(.*)/      \<dependency\>\n        \<groupId\>\1\<\/groupId\>\n        \<artifactId>\2\<\/artifactId\>\n        \<version\>\4\<\/version\>\n      \<\/dependency\>/'
 
 It prints out the dependencies as maven dependencies.
-Before this script is used the transient section in the org.eclipse.scout.rt/pom.xml at the end of the dependencyManagement section should be commented or removed.
+Before this script is used the transitive section in the org.eclipse.scout.rt/pom.xml at the end of the dependencyManagement section should be commented or removed.
 So we get all dependencies in their intended version.
 
 The output can be pasted to the org.eclipse.scout.rt/pom.xml at the end of the dependencyManagement section.
-Then remove duplicates from the transient section.
+Then remove duplicates from the transitive section.
