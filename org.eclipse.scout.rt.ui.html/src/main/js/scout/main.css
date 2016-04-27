@@ -445,3 +445,11 @@ noscript {
     #scout.font-text-normal(bold);
   }
 }
+
+/* Internet explorer applies the -ms-user-select setting: none (inherited from body) also to iframe contents.
+ * Other browsers do not, websites within an iframe should decide on their own if they are selectable (or not).
+ * Reset to default.
+ */
+iframe {
+  -ms-user-select: element;
+}
