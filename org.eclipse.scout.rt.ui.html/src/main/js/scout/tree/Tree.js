@@ -1394,6 +1394,8 @@ scout.Tree.prototype._removeChildsFromFlatList = function(parentNode, animatedRe
         this._$animationWrapper.remove();
         this._$animationWrapper = null;
         onAnimationComplete.call(this, removedNodes);
+      } else {
+        this._renderViewportBlocked = false;
       }
     }
     return removedNodes;
@@ -2214,7 +2216,7 @@ scout.Tree.prototype.removeFilter = function(filter) {
 };
 
 scout.Tree.prototype.filter = function(notAnimated) {
-  var useAnimation = true && !!!notAnimated,
+  var useAnimation = !!!notAnimated,
     changedNodes = [],
     newHiddenNodes = [];
   // Filter nodes
