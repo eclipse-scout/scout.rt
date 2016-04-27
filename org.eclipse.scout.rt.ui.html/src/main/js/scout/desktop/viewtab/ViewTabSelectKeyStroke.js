@@ -14,7 +14,6 @@
 scout.ViewTabSelectKeyStroke = function(desktop) {
   scout.ViewTabSelectKeyStroke.parent.call(this);
   this.field = desktop;
-//  this._viewTabsController = desktop.viewTabsController;
 
   // modifier
   this.parseAndSetKeyStroke(desktop.selectViewTabsKeyStrokeModifier);
@@ -52,15 +51,15 @@ scout.ViewTabSelectKeyStroke.prototype.handle = function(event) {
 
   if (this._viewTabs().length && (viewIndex < this._viewTabs().length)) {
     var viewTab = this._viewTabs()[viewIndex];
-    if(this.field.bench){
+    if (this.field.bench) {
       this.field.bench.activateView(viewTab.view);
     }
   }
 };
 
 scout.ViewTabSelectKeyStroke.prototype._viewTabs = function() {
-  if(this.field.bench){
-  return this.field.bench.getViewTabs();
+  if (this.field.bench) {
+    return this.field.bench.getViewTabs();
   }
-  return[];
+  return [];
 };
