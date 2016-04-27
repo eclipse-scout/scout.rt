@@ -48,6 +48,7 @@ scout.ProposalChooser.prototype._render = function($parent) {
 scout.ProposalChooser.prototype._renderProperties = function() {
   scout.ProposalChooser.parent.prototype._renderProperties.call(this);
   this._updateStatus();
+  this.htmlComp.revalidateLayout();
 };
 
 /**
@@ -61,10 +62,12 @@ scout.ProposalChooser.prototype.delegateEvent = function(event) {
 
 scout.ProposalChooser.prototype._renderStatus = function() {
   this._updateStatus();
+  this.htmlComp.revalidateLayout();
 };
 
 scout.ProposalChooser.prototype._renderStatusVisible = function() {
   this._updateStatus();
+  this.htmlComp.revalidateLayout();
 };
 
 scout.ProposalChooser.prototype._updateStatus = function() {

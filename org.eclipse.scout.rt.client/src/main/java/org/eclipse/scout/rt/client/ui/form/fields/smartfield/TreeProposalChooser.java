@@ -15,6 +15,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import org.eclipse.scout.rt.client.context.ClientRunContexts;
+import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.MouseButton;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
@@ -30,6 +32,8 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
+import org.eclipse.scout.rt.platform.job.DoneEvent;
+import org.eclipse.scout.rt.platform.job.IDoneHandler;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.status.Status;
@@ -37,11 +41,14 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.CompareUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.TriState;
+import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRowFetchedCallback;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Proposal chooser with a tree to choose hierarchical proposals. You can provide your own tree implementation when your
@@ -53,6 +60,7 @@ import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
  * @param <LOOKUP_KEY>
  */
 public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITree, LOOKUP_KEY> {
+  private static final Logger LOG = LoggerFactory.getLogger(TreeProposalChooser.class);
 
   private P_ActiveNodesFilter m_activeNodesFilter;
   private P_MatchingNodesFilter m_matchingNodesFilter;
@@ -137,7 +145,6 @@ public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITr
       m_model.setTreeChanging(false);
     }
     setStatus(null);
-    setStatusVisible(false);
   }
 
   /**
@@ -150,15 +157,11 @@ public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITr
   @Override
   protected void init() {
     if (m_contentAssistField.isBrowseLoadIncremental()) {
-      // Load lookup rows synchronously.
+      // Load lookup rows asynchronously
       loadRootNode();
-      commitPopulateInitialTree();
     }
     else {
-      // Indicate that lookup rows are loading
       setStatus(new Status(ScoutTexts.get("searchingProposals"), IStatus.OK));
-      setStatusVisible(true);
-
       // Load lookup rows asynchronously
       m_initialPolulatorFuture = m_contentAssistField.callBrowseLookupInBackground(m_contentAssistField.getWildcard(), 100000, TriState.UNDEFINED, new ILookupRowFetchedCallback<LOOKUP_KEY>() {
 
@@ -166,7 +169,6 @@ public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITr
         public void onSuccess(List<? extends ILookupRow<LOOKUP_KEY>> rows) {
           m_initialPolulatorFuture = null;
 
-          setStatusVisible(false);
           List<ITreeNode> subTree = new P_TreeNodeBuilder().createTreeNodes(rows, ITreeNode.STATUS_NON_CHANGED, true);
 
           m_model.setTreeChanging(true);
@@ -176,10 +178,10 @@ public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITr
               m_model.expandAll(m_model.getRootNode());
             }
             commitPopulateInitialTree();
+            setStatus(null);
           }
           catch (RuntimeException e) {
             setStatus(new Status(TEXTS.get("RequestProblem"), IStatus.ERROR));
-            setStatusVisible(true);
           }
           finally {
             m_model.setTreeChanging(false);
@@ -191,7 +193,6 @@ public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITr
           m_initialPolulatorFuture = null;
 
           setStatus(new Status(TEXTS.get("RequestProblem"), IStatus.ERROR));
-          setStatusVisible(true);
         }
       });
       m_initialPolulatorFuture.addExecutionHint(IContentAssistField.EXECUTION_HINT_INITIAL_LOOKUP);
@@ -356,20 +357,43 @@ public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITr
   @ConfigOperation
   @Order(10)
   @SuppressWarnings("unchecked")
-  protected void execLoadChildNodes(ITreeNode parentNode) {
+  protected void execLoadChildNodes(final ITreeNode parentNode) {
     if (m_contentAssistField.isBrowseLoadIncremental()) {
-      //show loading status
-      boolean statusWasVisible = isStatusVisible();
+      final IStatus originalStatus = getStatus();
       setStatus(new Status(ScoutTexts.get("searchingProposals"), IStatus.OK));
-      setStatusVisible(true);
+
       //load node
       ILookupRow<LOOKUP_KEY> b = (LookupRow) (parentNode != null ? parentNode.getCell().getValue() : null);
-      List<? extends ILookupRow<LOOKUP_KEY>> data = m_contentAssistField.callSubTreeLookup(b != null ? b.getKey() : null, TriState.UNDEFINED);
-      List<ITreeNode> subTree = new P_TreeNodeBuilder().createTreeNodes(data, ITreeNode.STATUS_NON_CHANGED, false);
-      updateSubTree(m_model, parentNode, subTree);
-      // hide loading status
-      setStatusVisible(statusWasVisible);
+      LOOKUP_KEY parentKey = b != null ? b.getKey() : null;
+      m_contentAssistField.callSubTreeLookupInBackground(parentKey, TriState.UNDEFINED)
+          .whenDone(new IDoneHandler<List<? extends ILookupRow<LOOKUP_KEY>>>() {
+            @Override
+            public void onDone(DoneEvent<List<? extends ILookupRow<LOOKUP_KEY>>> event) {
+              final List<? extends ILookupRow<LOOKUP_KEY>> result = event.getResult();
+              final Throwable exception = event.getException();
+
+              ModelJobs.schedule(new IRunnable() {
+
+                @Override
+                public void run() {
+                  if (result != null) {
+                    List<ITreeNode> subTree = new P_TreeNodeBuilder().createTreeNodes(result, ITreeNode.STATUS_NON_CHANGED, false);
+                    updateSubTree(m_model, parentNode, subTree);
+                    commitPopulateInitialTree();
+
+                    // hide loading status
+                    setStatus(originalStatus);
+                  }
+                  else if (exception != null) {
+                    LOG.error("Error in subtree lookup", exception);
+                    setStatus(new Status(TEXTS.get("RequestProblem"), IStatus.ERROR));
+                  }
+                }
+              }, ModelJobs.newInput(ClientRunContexts.copyCurrent()));
+            }
+          }, ClientRunContexts.copyCurrent());
     }
+
   }
 
   /**
@@ -508,7 +532,7 @@ public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITr
     @Override
     protected ITreeNode createEmptyTreeNode() {
       ITreeNode node = TreeProposalChooser.this.createTreeNode();
-      if (m_model.getDefaultIconId() != null) {
+      if (m_model != null && m_model.getDefaultIconId() != null) {
         Cell cell = node.getCellForUpdate();
         cell.setIconId(m_model.getDefaultIconId());
       }

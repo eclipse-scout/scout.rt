@@ -249,6 +249,8 @@ public interface IContentAssistField<VALUE, LOOKUP_KEY> extends IValueField<VALU
 
   List<? extends ILookupRow<LOOKUP_KEY>> callSubTreeLookup(LOOKUP_KEY parentKey, TriState activeState);
 
+  IFuture<List<? extends ILookupRow<LOOKUP_KEY>>> callSubTreeLookupInBackground(final LOOKUP_KEY parentKey, final TriState activeState);
+
   IContentAssistFieldUIFacade getUIFacade();
 
   LOOKUP_KEY getValueAsLookupKey();

@@ -104,7 +104,7 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
 
   private ILookupRow<LOOKUP_KEY> m_currentLookupRow;
 
-  private volatile IFuture<Void> m_lookupFuture;
+  private volatile IFuture<?> m_lookupFuture;
 
   private Class<? extends IContentAssistFieldTable<VALUE>> m_contentAssistTableClazz;
 
@@ -1038,14 +1038,32 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
   }
 
   @Override
-  public List<? extends ILookupRow<LOOKUP_KEY>> callSubTreeLookup(LOOKUP_KEY parentKey, TriState activeState) {
-    LookupRowCollector<LOOKUP_KEY> collector = new LookupRowCollector<>();
-    fetchLookupRows(newByRecLookupRowProvider(parentKey, activeState), collector, false, getBrowseMaxRowCount());
-    return collector.get();
+  public List<? extends ILookupRow<LOOKUP_KEY>> callSubTreeLookup(final LOOKUP_KEY parentKey, final TriState activeState) {
+    final ILookupRowProvider<LOOKUP_KEY> provider = newByRecLookupRowProvider(parentKey, activeState);
+    return BEANS.get(LookupRowHelper.class).lookup(provider, cloneLookupCall());
+  }
+
+  /**
+   * Load child rows for a given parent key in background
+   *
+   * @param parentKey
+   *          key of the parent node
+   */
+  @Override
+  public IFuture<List<? extends ILookupRow<LOOKUP_KEY>>> callSubTreeLookupInBackground(final LOOKUP_KEY parentKey, final TriState activeState) {
+    cancelPotentialLookup();
+    final ILookupRowProvider<LOOKUP_KEY> provider = newByRecLookupRowProvider(parentKey, activeState);
+    IFuture<List<? extends ILookupRow<LOOKUP_KEY>>> futureResult = BEANS.get(LookupRowHelper.class).scheduleLookup(provider, cloneLookupCall());
+    m_lookupFuture = futureResult;
+    return futureResult;
+  }
+
+  private ILookupCall<LOOKUP_KEY> cloneLookupCall() {
+    return BEANS.get(ILookupCallProvisioningService.class).newClonedInstance(getLookupCall(), new FormFieldProvisioningContext(AbstractContentAssistField.this));
   }
 
   protected void cleanupResultList(final List<ILookupRow<LOOKUP_KEY>> list) {
-    final Iterator<ILookupRow<LOOKUP_KEY>> iterator = list.iterator();
+    final Iterator<? extends ILookupRow<LOOKUP_KEY>> iterator = list.iterator();
     while (iterator.hasNext()) {
       final ILookupRow<LOOKUP_KEY> candidate = iterator.next();
       if (candidate == null) {
@@ -1282,12 +1300,17 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
 
       @Override
       public void provideSync(ILookupCall<LOOKUP_KEY> lookupCall, ILookupRowFetchedCallback<LOOKUP_KEY> callback) {
-        callback.onSuccess(lookupCall.getDataByKey());
+        callback.onSuccess(provide(lookupCall));
       }
 
       @Override
       public IFuture<Void> provideAsync(ILookupCall<LOOKUP_KEY> lookupCall, ILookupRowFetchedCallback<LOOKUP_KEY> callback, ClientRunContext clientRunContext) {
         return lookupCall.getDataByKeyInBackground(clientRunContext, callback);
+      }
+
+      @Override
+      public List<? extends ILookupRow<LOOKUP_KEY>> provide(ILookupCall<LOOKUP_KEY> lookupCall) {
+        return lookupCall.getDataByKey();
       }
     };
   }
@@ -1315,12 +1338,17 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
 
       @Override
       public void provideSync(ILookupCall<LOOKUP_KEY> lookupCall, ILookupRowFetchedCallback<LOOKUP_KEY> callback) {
-        callback.onSuccess(lookupCall.getDataByAll());
+        callback.onSuccess(provide(lookupCall));
       }
 
       @Override
       public IFuture<Void> provideAsync(ILookupCall<LOOKUP_KEY> lookupCall, ILookupRowFetchedCallback<LOOKUP_KEY> callback, ClientRunContext clientRunContext) {
         return lookupCall.getDataByAllInBackground(clientRunContext, callback);
+      }
+
+      @Override
+      public List<? extends ILookupRow<LOOKUP_KEY>> provide(ILookupCall<LOOKUP_KEY> lookupCall) {
+        return lookupCall.getDataByAll();
       }
     };
   }
@@ -1348,24 +1376,31 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
 
       @Override
       public void provideSync(ILookupCall<LOOKUP_KEY> lookupCall, ILookupRowFetchedCallback<LOOKUP_KEY> callback) {
-        callback.onSuccess(lookupCall.getDataByText());
+        callback.onSuccess(provide(lookupCall));
       }
 
       @Override
       public IFuture<Void> provideAsync(ILookupCall<LOOKUP_KEY> lookupCall, ILookupRowFetchedCallback<LOOKUP_KEY> callback, ClientRunContext clientRunContext) {
         return lookupCall.getDataByTextInBackground(clientRunContext, callback);
       }
+
+      @Override
+      public List<? extends ILookupRow<LOOKUP_KEY>> provide(ILookupCall<LOOKUP_KEY> lookupCall) {
+        return lookupCall.getDataByText();
+      }
     };
   }
 
   /**
-   * Creates a {@link ILookupRowProvider} to fetch rows recursively.
-   *
    * @see LookupCall#getDataByRec()
-   * @see LookupCall#getDataByRecInBackground(ILookupRowFetchedCallback)
    */
   protected ILookupRowProvider<LOOKUP_KEY> newByRecLookupRowProvider(final LOOKUP_KEY parentKey, final TriState activeState) {
     return new ILookupRowProvider<LOOKUP_KEY>() {
+
+      @Override
+      public List<? extends ILookupRow<LOOKUP_KEY>> provide(ILookupCall<LOOKUP_KEY> lookupCall) {
+        return lookupCall.getDataByRec();
+      }
 
       @Override
       public void beforeProvide(ILookupCall<LOOKUP_KEY> lookupCall) {
@@ -1381,12 +1416,12 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
 
       @Override
       public void provideSync(ILookupCall<LOOKUP_KEY> lookupCall, ILookupRowFetchedCallback<LOOKUP_KEY> callback) {
-        callback.onSuccess(lookupCall.getDataByRec());
+        throw new UnsupportedOperationException("Legacy calls not supported");
       }
 
       @Override
       public IFuture<Void> provideAsync(ILookupCall<LOOKUP_KEY> lookupCall, ILookupRowFetchedCallback<LOOKUP_KEY> callback, ClientRunContext clientRunContext) {
-        return lookupCall.getDataByRecInBackground(clientRunContext, callback);
+        throw new UnsupportedOperationException("Legacy calls not supported");
       }
     };
   }
@@ -1407,7 +1442,7 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
     }
 
     // Prepare the lookup call.
-    final ILookupCall<LOOKUP_KEY> lookupCall = BEANS.get(ILookupCallProvisioningService.class).newClonedInstance(getLookupCall(), new FormFieldProvisioningContext(AbstractContentAssistField.this));
+    final ILookupCall<LOOKUP_KEY> lookupCall = cloneLookupCall();
     lookupCall.setMaxRowCount(maxRowCount > 0 ? maxRowCount : getBrowseMaxRowCount());
 
     // Prepare processing of the fetched rows.
@@ -1462,52 +1497,23 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
     };
 
     // Start fetching lookup rows.
+    IFuture<Void> asyncLookupFuture = null;
     try {
       dataProvider.beforeProvide(lookupCall);
       if (asynchronousFetching) {
-        m_lookupFuture = dataProvider.provideAsync(lookupCall, internalCallback, ClientRunContexts.copyCurrent());
+        asyncLookupFuture = dataProvider.provideAsync(lookupCall, internalCallback, ClientRunContexts.copyCurrent());
       }
       else {
         dataProvider.provideSync(lookupCall, internalCallback);
-        m_lookupFuture = null;
+        asyncLookupFuture = null;
       }
     }
     catch (final RuntimeException e) {
       internalCallback.onFailure(e);
-      m_lookupFuture = null;
+      asyncLookupFuture = null;
     }
-    return m_lookupFuture;
-  }
-
-  /**
-   * Represents a strategy to fetch lookup rows.
-   */
-  protected static interface ILookupRowProvider<LOOKUP_KEY> {
-
-    /**
-     * Method invoked before fetching lookup rows.
-     */
-    void beforeProvide(ILookupCall<LOOKUP_KEY> lookupCall);
-
-    /**
-     * Method invoked after fetching lookup rows, but before the result is returned.
-     */
-    void afterProvide(ILookupCall<LOOKUP_KEY> lookupCall, List<ILookupRow<LOOKUP_KEY>> result);
-
-    /**
-     * Invoke to load lookup rows synchronously in the current thread. This method must be called from within a session
-     * aware {@link ClientRunContext}.
-     * <p>
-     * Upon loading finished, the given callback is notified, either in the current thread if being the model thread, or
-     * in the model thread as specified by the current {@link ClientRunContext}.
-     */
-    void provideSync(ILookupCall<LOOKUP_KEY> lookupCall, ILookupRowFetchedCallback<LOOKUP_KEY> callback);
-
-    /**
-     * Invoke to load lookup rows asynchronously. Upon loading finished, the given callback is notified in the model
-     * thread as specified by the given session aware {@link ClientRunContext}.
-     */
-    IFuture<Void> provideAsync(ILookupCall<LOOKUP_KEY> lookupCall, ILookupRowFetchedCallback<LOOKUP_KEY> callback, ClientRunContext clientRunContext);
+    m_lookupFuture = asyncLookupFuture;
+    return asyncLookupFuture;
   }
 
   /**
