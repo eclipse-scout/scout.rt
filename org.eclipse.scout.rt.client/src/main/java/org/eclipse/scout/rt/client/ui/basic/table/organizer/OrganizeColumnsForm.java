@@ -69,9 +69,6 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
-import org.eclipse.scout.rt.shared.security.CreateCustomColumnPermission;
-import org.eclipse.scout.rt.shared.security.DeleteCustomColumnPermission;
-import org.eclipse.scout.rt.shared.security.UpdateCustomColumnPermission;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -728,10 +725,6 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
 
             @Override
             protected void execInitTable() {
-              getMenuByClass(AddColumnMenu.class).setVisiblePermission(new CreateCustomColumnPermission());
-              getMenuByClass(AddColumnEmptySpaceMenu.class).setVisiblePermission(new CreateCustomColumnPermission());
-              getMenuByClass(ModifyCustomColumnMenu.class).setVisiblePermission(new UpdateCustomColumnPermission());
-              getMenuByClass(RemoveMenu.class).setVisiblePermission(new DeleteCustomColumnPermission());
               getWidthColumn().setVisible(!m_organizedTable.isAutoResizeColumns());
             }
 
