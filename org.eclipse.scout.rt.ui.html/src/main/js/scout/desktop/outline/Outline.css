@@ -117,6 +117,11 @@
 
     & > .menubox > .menu-item:not(.disabled) {
       color: @navigation-color;
+
+      &:hover,
+      &:active {
+        color: @navigation-color;
+      }
     }
 
     & > .menubox > .menu-item:not(.menu-textandicon):focus::after  {
