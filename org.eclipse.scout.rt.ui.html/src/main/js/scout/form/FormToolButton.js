@@ -34,6 +34,18 @@ scout.FormToolButton.prototype._renderText = function() {
 };
 
 /**
+ * @override
+ */
+scout.FormToolButton.prototype._renderCssClass = function() {
+  scout.FormToolButton.parent.prototype._renderCssClass.call(this);
+  if (this.rendered && this.popup && this.popup instanceof scout.FormToolPopup) {
+    this.popup.rerenderHead();
+    this.popup.position();
+  }
+};
+
+
+/**
  *
  * @override
  * form of a formToolbutton can be set to null and is set to a real form by model
