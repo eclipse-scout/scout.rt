@@ -283,7 +283,8 @@ scout.Tree.prototype._render = function($parent) {
 
   scout.scrollbars.install(this.$data, {
     parent: this,
-    axis: 'both'
+    axis: 'y'
+      //TODO nbu axis: 'both'
   });
   this._installNodeTooltipSupport();
   this.menuBar.render(this.$container);
@@ -1179,11 +1180,10 @@ scout.Tree.prototype._isTruncatedNodeTooltipEnabled = function() {
 };
 
 scout.Tree.prototype.setDisplayStyle = function(displayStyle, notifyServer) {
-  this._renderViewportBlocked = true;
   if (this.displayStyle === displayStyle) {
     return;
   }
-  var oldDisplayStyle = this.displayStyle;
+  this._renderViewportBlocked = true;
   this._setProperty('displayStyle', displayStyle);
   notifyServer = scout.nvl(notifyServer, true);
   if (notifyServer) {
@@ -1200,15 +1200,15 @@ scout.Tree.prototype.setDisplayStyle = function(displayStyle, notifyServer) {
   if (this.displayStyle === scout.Tree.DisplayStyle.BREADCRUMB) {
     this.addFilter(this.breadcrumbFilter, true);
     this.filterVisibleNodes();
-  } else if (oldDisplayStyle === scout.Tree.DisplayStyle.BREADCRUMB) {
+  } else if (this.displayStyle !== scout.Tree.DisplayStyle.BREADCRUMB) {
     this.removeFilter(this.breadcrumbFilter);
     this.filter();
   }
 
-  this._renderViewportBlocked = false;
   if (this.rendered) {
     this._renderDisplayStyle();
   }
+  this._renderViewportBlocked = false;
 };
 
 scout.Tree.prototype.setBreadcrumbStyleActive = function(active, notifyServer) {
