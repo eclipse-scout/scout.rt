@@ -54,6 +54,7 @@
   border-left: 0px solid transparent;
   border-right: 0px solid transparent;
   padding: @tree-node-padding;
+  #scout.overflow-ellipsis-nowrap();
 
   &.selected {
     background-color: @item-selection-nonfocus-background-color;
