@@ -505,8 +505,22 @@ scout.DesktopGridBench.prototype._onViewDeactivated = function(event) {
 };
 
 scout.DesktopGridBench.prototype.addView = function(view, activate) {
-  if (!view.displayViewId || view.displayViewId === '') {
-    view.displayViewId = 'C';
+  // normalize displayViewId
+  switch (view.displayViewId) {
+    case 'NW':
+    case 'W':
+    case 'SW':
+    case 'N':
+    case 'C':
+    case 'S':
+    case 'NE':
+    case 'E':
+    case 'SE':
+      break;
+    default:
+      // map all other displayViewIds to center
+      view.displayViewId = 'C';
+      break;
   }
   var viewAreaColumn = this._getViewColumn(view.displayViewId);
   this._viewTabMap[view.id] = viewAreaColumn;
