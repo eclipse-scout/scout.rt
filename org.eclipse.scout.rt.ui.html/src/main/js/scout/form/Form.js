@@ -338,10 +338,10 @@ scout.Form.prototype.glassPaneTargets = function() {
   if (this.$container) {
     return [this.$container];
   } else {
+    var deferred = new scout.DeferredGlassPaneTarget();
     var renderedHandler = function(event) {
       deferred.ready([event.source.$container]);
     };
-    var deferred = new scout.DeferredGlassPaneTarget();
     this.one('rendered', renderedHandler);
     this.one('destroy', function() {
       this.off('rendered', renderedHandler);

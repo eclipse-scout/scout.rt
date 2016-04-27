@@ -364,8 +364,7 @@ scout.Tree.prototype._renderViewRangeForNode = function(node) {
 };
 
 scout.Tree.prototype._renderNodesInRange = function(range) {
-  var $nodes,
-    prepend = false;
+  var prepend = false;
 
   var nodes = this.visibleNodesFlat;
   if (nodes.length === 0) {
@@ -1551,7 +1550,7 @@ scout.Tree.prototype.checkAndHandleBatchAnimationWrapper = function(parentNode, 
   if (animatedRendering && this.viewRangeRendered.from <= insertBatch.lastBatchInsertIndex() && this.viewRangeRendered.to >= insertBatch.lastBatchInsertIndex() && !insertBatch.$animationWrapper) {
     //we are in visible area so we need a animation wrapper
     //if parent is in visible area insert after parent else insert before first node.
-    var nodeBefore = this.viewRangeRendered.from == insertBatch.lastBatchInsertIndex() ? null : this.visibleNodesFlat[insertBatch.lastBatchInsertIndex() - 1];
+    var nodeBefore = this.viewRangeRendered.from === insertBatch.lastBatchInsertIndex() ? null : this.visibleNodesFlat[insertBatch.lastBatchInsertIndex() - 1];
     if (nodeBefore && nodeBefore.attached) {
       insertBatch.$animationWrapper = $('<div class="animation-wrapper">').insertAfter(nodeBefore.$node);
     } else if (parentNode.attached) {
@@ -1726,10 +1725,8 @@ scout.Tree.prototype._expandAllParentNodes = function(node) {
   var nodesToInsert = [];
   while (currNode.parentNode) {
     parentNodes.push(currNode.parentNode);
-    if (!this.visibleNodesMap[currNode.id] && !currNode.isFilterAccepted()) {
-      if (this._applyFiltersForNode(currNode)) {
-        nodesToInsert.push(currNode);
-      }
+    if (!this.visibleNodesMap[currNode.id] && !currNode.isFilterAccepted() && this._applyFiltersForNode(currNode)) {
+      nodesToInsert.push(currNode);
     }
     currNode = currNode.parentNode;
   }
@@ -2039,7 +2036,7 @@ scout.Tree.prototype._triggerNodesSelected = function(debounce) {
 };
 
 scout.Tree.prototype._showContextMenu = function(event) {
-  var func = function func(event) {
+  var func = function(event) {
     event.preventDefault();
 
     var filteredMenus = this._filterMenus(this.menus, scout.MenuDestinations.CONTEXT_MENU, true),
@@ -2330,7 +2327,8 @@ scout.Tree.prototype._insertNodeInDOM = function(node, indexHint) {
 };
 
 scout.Tree.prototype._insertNodeInDOMAtPlace = function(node, index) {
-  var $node = node.$node;
+  var $node = node.$node,
+  added = false;
   if (index === 0) {
     if (this.$fillBefore) {
       added = true;
@@ -2341,8 +2339,7 @@ scout.Tree.prototype._insertNodeInDOMAtPlace = function(node, index) {
     }
   } else {
     //append after index
-    var added = false,
-      nodeBefore = this.visibleNodesFlat[index - 1];
+    var nodeBefore = this.visibleNodesFlat[index - 1];
     if (nodeBefore.attached) {
       $node.insertAfter(nodeBefore.$node);
       added = true;
@@ -2422,7 +2419,6 @@ scout.Tree.prototype.hideNode = function(node, useAnimation, suppressDetachHandl
       duration: 250,
       start: that.startAnimationFunc,
       complete: function() {
-        //        that.invalidateLayoutTree();
         that.runningAnimationsFinishFunc();
         $node.detach();
         node.attached = false;

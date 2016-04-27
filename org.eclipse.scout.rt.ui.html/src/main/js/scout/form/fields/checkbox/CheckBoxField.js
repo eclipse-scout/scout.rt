@@ -52,11 +52,11 @@ scout.CheckBoxField.prototype._remove = function($parent) {
 };
 
 scout.CheckBoxField.prototype.acceptInput = function(whileTyping, forceSend) {
-  //nop;
+  //nop
 };
 
 scout.CheckBoxField.prototype._renderDisplayText = function(displayText) {
-  //nop;
+  //nop
 };
 
 scout.CheckBoxField.prototype._onMouseDown = function(event) {

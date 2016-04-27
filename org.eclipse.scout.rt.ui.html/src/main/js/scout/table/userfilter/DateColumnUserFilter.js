@@ -119,16 +119,12 @@ scout.DateColumnUserFilter.prototype.modifyFilterFields = function() {
 
 scout.DateColumnUserFilter.prototype._onInput = function(event) {
   var datePrediction = this.dateFromField._predictDate(this.dateFromField.$dateField.val()); // this also updates the errorStatus
-  if (datePrediction) {
-    if (datePrediction.date) {
-      this.dateFrom = this.dateFromField._newTimestampAsDate(datePrediction.date, this.dateFromField.timestampAsDate);
-    }
+  if (datePrediction && datePrediction.date) {
+    this.dateFrom = this.dateFromField._newTimestampAsDate(datePrediction.date, this.dateFromField.timestampAsDate);
   }
   var datePredictionTo = this.dateToField._predictDate(this.dateToField.$dateField.val()); // this also updates the errorStatus
-  if (datePredictionTo) {
-    if (datePredictionTo.date) {
-      this.dateTo = this.dateToField._newTimestampAsDate(datePredictionTo.date, this.dateToField.timestampAsDate);
-    }
+  if (datePredictionTo && datePredictionTo.date) {
+    this.dateTo = this.dateToField._newTimestampAsDate(datePredictionTo.date, this.dateToField.timestampAsDate);
   }
   this.triggerFilterFieldsChanged(event);
 };

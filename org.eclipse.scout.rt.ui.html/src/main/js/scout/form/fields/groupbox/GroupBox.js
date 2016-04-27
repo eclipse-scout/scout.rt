@@ -168,7 +168,7 @@ scout.GroupBox.prototype._prepareFields = function() {
   this.processButtons = [];
   this.processMenus = [];
 
-  var i, field, res;
+  var i, field;
   for (i = 0; i < this.fields.length; i++) {
     field = this.fields[i];
     if (field instanceof scout.Button) {
