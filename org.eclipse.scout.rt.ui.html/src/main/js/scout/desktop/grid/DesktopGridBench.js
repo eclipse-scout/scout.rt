@@ -579,6 +579,18 @@ scout.DesktopGridBench.prototype.getViews = function(displayViewId) {
   }, []);
 };
 
+scout.DesktopGridBench.prototype.getViewTab = function(view) {
+  var viewTab;
+  this.getViewTabs().some(function (vt){
+    if(vt.view === view){
+      viewTab = vt;
+      return true;
+    }
+    return false;
+  });
+  return viewTab;
+};
+
 scout.DesktopGridBench.prototype.getViewTabs = function() {
   var tabs = [];
   // consider right order

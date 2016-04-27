@@ -105,7 +105,8 @@ scout.GlassPaneRenderer.prototype._onMousedown = function(event) {
   if (this._element instanceof scout.Form && this._element.isView()) {
     // If the blocking element is a view, the $container cannot be animated (this only works for dialogs). Instead,
     // highlight the view tab (or the overflow item, if the view tab is not visible).
-    $animationTarget = this.session.desktop.viewTabsController.viewTab(this._element).$container;
+
+    $animationTarget = this.session.desktop.bench.getViewTab(this._element).$container;
     if (!$animationTarget.isVisible()) {
       $animationTarget = $animationTarget.siblings('.overflow-tab-item');
     }
