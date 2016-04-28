@@ -79,8 +79,7 @@ scout.numbers = {
         result += letters[Math.floor(Math.random() * letters.length)];
       }
     }
-    result += '/' + (this._correlationCounter++);
-    return result;
+    return result + '/' + (this._correlationCounter++);
   },
 
   /**
@@ -144,8 +143,7 @@ scout.numbers = {
         }
     }
 
-    number = this.shiftDecimalPoint(number, -decimalPlaces);
-    return number;
+    return this.shiftDecimalPoint(number, -decimalPlaces);
   },
 
   /**
