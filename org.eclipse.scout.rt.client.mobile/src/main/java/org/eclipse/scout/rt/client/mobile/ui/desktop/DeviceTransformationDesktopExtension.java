@@ -12,9 +12,6 @@ package org.eclipse.scout.rt.client.mobile.ui.desktop;
 
 import java.util.Collection;
 
-import org.eclipse.scout.rt.client.mobile.navigation.AbstractMobileBackAction;
-import org.eclipse.scout.rt.client.mobile.navigation.AbstractMobileHomeAction;
-import org.eclipse.scout.rt.client.mobile.navigation.IBreadCrumbsNavigationService;
 import org.eclipse.scout.rt.client.mobile.transformation.IDeviceTransformationService;
 import org.eclipse.scout.rt.client.mobile.transformation.IDeviceTransformer;
 import org.eclipse.scout.rt.client.ui.action.IAction;
@@ -26,7 +23,6 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.holders.IHolder;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 import org.eclipse.scout.rt.shared.ui.UserAgentUtility;
@@ -52,7 +48,6 @@ public class DeviceTransformationDesktopExtension extends AbstractDesktopExtensi
     super.setCoreDesktop(desktop);
 
     if (isActive()) {
-      BEANS.get(IBreadCrumbsNavigationService.class).install(getCoreDesktop());
       BEANS.get(IDeviceTransformationService.class).install(getCoreDesktop());
     }
   }
@@ -155,26 +150,6 @@ public class DeviceTransformationDesktopExtension extends AbstractDesktopExtensi
     getDeviceTransformer().notifyTablePageLoaded(tablePage);
 
     return ContributionCommand.Continue;
-  }
-
-  @Order(10)
-  public class BackAction extends AbstractMobileBackAction {
-
-    @Override
-    protected boolean getConfiguredVisible() {
-      return false;
-    }
-
-  }
-
-  @Order(20)
-  public class HomeAction extends AbstractMobileHomeAction {
-
-    @Override
-    protected boolean getConfiguredVisible() {
-      return false;
-    }
-
   }
 
 }

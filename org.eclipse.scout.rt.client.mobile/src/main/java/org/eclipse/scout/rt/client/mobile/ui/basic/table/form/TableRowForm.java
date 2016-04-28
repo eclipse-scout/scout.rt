@@ -17,15 +17,13 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.scout.rt.client.mobile.ui.basic.table.form.fields.ColumnFieldBuilder;
-import org.eclipse.scout.rt.client.mobile.ui.form.AbstractMobileForm;
-import org.eclipse.scout.rt.client.mobile.ui.form.IActionFetcher;
-import org.eclipse.scout.rt.client.mobile.ui.form.fields.button.AbstractBackButton;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.TableAdapter;
 import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
 import org.eclipse.scout.rt.client.ui.basic.table.TableRowMapper;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
+import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
@@ -40,7 +38,7 @@ import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
  *
  * @since 3.9.0
  */
-public class TableRowForm extends AbstractMobileForm implements ITableRowForm {
+public class TableRowForm extends AbstractForm implements ITableRowForm {
   private ITable m_table;
   private ITableRow m_row;
   private IFormField m_rowField;
@@ -105,11 +103,6 @@ public class TableRowForm extends AbstractMobileForm implements ITableRowForm {
     return VIEW_ID_PAGE_DETAIL;
   }
 
-  @Override
-  protected IActionFetcher createHeaderActionFetcher() {
-    return new TableRowFormHeaderActionFetcher(this, getTable());
-  }
-
   @Order(10)
   public class MainBox extends AbstractGroupBox {
 
@@ -122,11 +115,6 @@ public class TableRowForm extends AbstractMobileForm implements ITableRowForm {
         fields.addLast(new P_ColumnFieldsGroupBox());
       }
       super.injectFieldsInternal(fields);
-    }
-
-    @Order(5)
-    public class BackButton extends AbstractBackButton {
-
     }
 
   }

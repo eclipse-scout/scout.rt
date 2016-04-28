@@ -18,12 +18,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 
-import org.eclipse.scout.rt.client.mobile.navigation.AbstractMobileBackAction;
-import org.eclipse.scout.rt.client.mobile.navigation.IBreadCrumbsNavigation;
-import org.eclipse.scout.rt.client.mobile.navigation.IBreadCrumbsNavigationService;
-import org.eclipse.scout.rt.client.mobile.ui.action.ButtonWrappingAction;
-import org.eclipse.scout.rt.client.mobile.ui.form.AbstractMobileForm;
-import org.eclipse.scout.rt.client.mobile.ui.form.fields.button.IMobileButton;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
@@ -43,12 +37,10 @@ import org.eclipse.scout.rt.client.ui.form.fields.GridData;
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField;
-import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.placeholder.IPlaceholderField;
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.ISequenceBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
-import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 
 /**
@@ -72,11 +64,6 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
 
     m_deviceTransformationConfig = createDeviceTransformationConfig();
     initTransformationConfig();
-
-    IBreadCrumbsNavigation breadCrumbsNavigation = BEANS.get(IBreadCrumbsNavigationService.class).getBreadCrumbsNavigation();
-    if (breadCrumbsNavigation != null) {
-      breadCrumbsNavigation.trackDisplayViewId(IForm.VIEW_ID_CENTER);
-    }
   }
 
   public MobileDeviceTransformer() {
@@ -101,9 +88,6 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
     transformations.add(MobileDeviceTransformation.REDUCE_GROUPBOX_COLUMNS_TO_ONE);
     transformations.add(MobileDeviceTransformation.HIDE_PLACEHOLDER_FIELD);
     transformations.add(MobileDeviceTransformation.DISABLE_FORM_CANCEL_CONFIRMATION);
-    transformations.add(MobileDeviceTransformation.DISPLAY_FORM_HEADER);
-    transformations.add(MobileDeviceTransformation.ADD_MISSING_BACK_ACTION_TO_FORM_HEADER);
-    transformations.add(MobileDeviceTransformation.DISPLAY_PAGE_TABLE);
 
     for (IDeviceTransformation transformation : transformations) {
       getDeviceTransformationConfig().enableTransformation(transformation);
@@ -165,9 +149,6 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
     if (getDeviceTransformationConfig().isTransformationEnabled(MobileDeviceTransformation.DISABLE_FORM_CANCEL_CONFIRMATION)) {
       form.setAskIfNeedSave(false);
     }
-    if (getDeviceTransformationConfig().isTransformationEnabled(MobileDeviceTransformation.DISPLAY_FORM_HEADER)) {
-      AbstractMobileForm.setHeaderVisible(form, true);
-    }
     if (form.getDisplayHint() == IForm.DISPLAY_HINT_VIEW) {
       transformView(form);
     }
@@ -194,10 +175,6 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
       return;
     }
 
-    if (getDeviceTransformationConfig().isTransformationEnabled(MobileDeviceTransformation.DISPLAY_OUTLINE_ROOT_NODE)) {
-      // Necessary to enable drilldown from top of the outline
-      outline.setRootNodeVisible(true);
-    }
     outline.setNavigateButtonsVisible(false);
     outline.setLazyExpandingEnabled(false);
     outline.setAutoToggleBreadcrumbStyle(false);
@@ -226,34 +203,11 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
 
   @Override
   public void transformPageDetailTable(ITable table) {
-    if (table == null) {
-      if (getDeviceTransformationConfig().isTransformationEnabled(MobileDeviceTransformation.DISPLAY_PAGE_TABLE)) {
-        // Do not allow closing the outline table because it breaks the navigation
-        makeSurePageDetailTableIsVisible();
-      }
-    }
   }
 
   @Override
   public boolean acceptFormAddingToDesktop(IForm form) {
     return true;
-  }
-
-  private void makeSurePageDetailTableIsVisible() {
-    final IOutline outline = getDesktop().getOutline();
-    if (outline == null) {
-      return;
-    }
-    final IPage<?> activePage = outline.getActivePage();
-    if (activePage == null || activePage.isTableVisible() || isPageDetailTableAllowedToBeClosed(activePage)) {
-      return;
-    }
-    activePage.setTableVisible(true);
-    outline.setDetailTable(activePage.getTable());
-  }
-
-  protected boolean isPageDetailTableAllowedToBeClosed(IPage<?> activePage) {
-    return activePage.isLeaf();
   }
 
   protected void transformFormFields(IForm form) {
@@ -424,36 +378,10 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
    */
   @Override
   public void adaptFormHeaderLeftActions(IForm form, List<IMenu> menuList) {
-    if (getDeviceTransformationConfig().isTransformationEnabled(MobileDeviceTransformation.ADD_MISSING_BACK_ACTION_TO_FORM_HEADER, form) && !containsCloseAction(menuList)) {
-      menuList.add(new P_BackAction());
-    }
   }
 
   @Override
   public void adaptFormHeaderRightActions(IForm form, List<IMenu> menuList) {
-  }
-
-  protected boolean containsCloseAction(List<IMenu> menuList) {
-    if (menuList == null) {
-      return false;
-    }
-
-    for (IMenu action : menuList) {
-      if (action instanceof ButtonWrappingAction) {
-        IButton wrappedButton = ((ButtonWrappingAction) action).getWrappedButton();
-        switch (wrappedButton.getSystemType()) {
-          case IButton.SYSTEM_TYPE_CANCEL:
-          case IButton.SYSTEM_TYPE_CLOSE:
-          case IButton.SYSTEM_TYPE_OK:
-          case IMobileButton.SYSTEM_TYPE_BACK:
-            if (wrappedButton.isVisible() && wrappedButton.isEnabled()) {
-              return true;
-            }
-        }
-      }
-    }
-
-    return false;
   }
 
   protected boolean isGridDataDirty() {
@@ -464,7 +392,4 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
     m_gridDataDirty = true;
   }
 
-  private class P_BackAction extends AbstractMobileBackAction {
-
-  }
 }

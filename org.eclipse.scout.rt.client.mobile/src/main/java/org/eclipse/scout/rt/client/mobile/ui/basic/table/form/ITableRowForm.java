@@ -10,10 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.mobile.ui.basic.table.form;
 
-import org.eclipse.scout.rt.client.mobile.ui.form.IMobileForm;
+import org.eclipse.scout.rt.client.ui.form.IForm;
 
 /**
  * @since 3.10.0 M3
  */
-public interface ITableRowForm extends IMobileForm {
+public interface ITableRowForm extends IForm {
 }
