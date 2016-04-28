@@ -136,10 +136,10 @@ scout.Desktop.prototype._renderDisplayStyle = function() {
     isCompact = this.displayStyle === DisplayStyle.COMPACT;
 
   if (this.header) {
-    this.header.setToolBarVisible(!isCompact);
+    this.header.setToolBoxVisible(!isCompact);
   }
   if (this.navigation) {
-    this.navigation.setToolBarVisible(isCompact);
+    this.navigation.setToolBoxVisible(isCompact);
     this.navigation.htmlComp.layoutData.fullWidth = isCompact;
   }
   if (this.bench) {
@@ -243,7 +243,7 @@ scout.Desktop.prototype._renderNavigation = function() {
   this.navigation = scout.create('DesktopNavigation', {
     parent: this,
     outline: this.outline,
-    toolBarVisible: this.displayStyle === scout.Desktop.DisplayStyle.COMPACT,
+    toolBoxVisible: this.displayStyle === scout.Desktop.DisplayStyle.COMPACT,
     layoutData: {
       fullWidth: this.displayStyle === scout.Desktop.DisplayStyle.COMPACT
     }
@@ -282,7 +282,7 @@ scout.Desktop.prototype._renderHeader = function() {
   }
   this.header = scout.create('DesktopHeader', {
     parent: this,
-    toolBarVisible: this.displayStyle !== scout.Desktop.DisplayStyle.COMPACT
+    toolBoxVisible: this.displayStyle !== scout.Desktop.DisplayStyle.COMPACT
   });
   this.header.render(this.$container);
   this.header.$container.insertBefore(this.$overlaySeparator);

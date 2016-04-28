@@ -20,10 +20,10 @@ scout.inherits(scout.DesktopHeaderLayout, scout.AbstractLayout);
  * @override AbstractLayout.js
  */
 scout.DesktopHeaderLayout.prototype.layout = function($container) {
-  var viewButtonBoxPrefSize, toolBarPrefSize,
+  var viewButtonBoxPrefSize, toolBoxPrefSize,
     htmlContainer = this.header.htmlComp,
     containerSize = htmlContainer.getSize(),
-    toolBar = this.header.toolBar,
+    toolBox = this.header.toolBox,
     viewButtonBox = this.header.viewButtonBox,
     viewTabBox = this.header.viewTabBox,
     smallTabsPrefSize = viewTabBox.htmlComp.layout.smallPrefSize(),
@@ -31,7 +31,7 @@ scout.DesktopHeaderLayout.prototype.layout = function($container) {
     tabsWidth = 0,
     logoWidth = 0,
     viewButtonBoxWidth = 0,
-    toolBarWidth = 0;
+    toolBoxWidth = 0;
 
   containerSize = containerSize.subtract(htmlContainer.getInsets());
 
@@ -46,11 +46,11 @@ scout.DesktopHeaderLayout.prototype.layout = function($container) {
   }
   viewTabBox.htmlComp.$comp.cssLeft(viewButtonBoxWidth);
 
-  if (toolBar) {
-    toolBarPrefSize = toolBar.htmlComp.getPreferredSize();
-    toolBarWidth = toolBarPrefSize.width;
-    setToolBarSize();
-    setToolBarLocation();
+  if (toolBox) {
+    toolBoxPrefSize = toolBox.htmlComp.getPreferredSize();
+    toolBoxWidth = toolBoxPrefSize.width;
+    setToolBoxSize();
+    setToolBoxLocation();
   }
 
   tabsWidth = calcTabsWidth();
@@ -62,11 +62,11 @@ scout.DesktopHeaderLayout.prototype.layout = function($container) {
   }
 
   // 1st try to minimize padding around tool-bar items -> compact mode
-  if (toolBar) {
-    toolBarPrefSize = toolBar.htmlComp.layout.compactPrefSize();
-    toolBarWidth = toolBarPrefSize.width;
-    setToolBarSize();
-    setToolBarLocation();
+  if (toolBox) {
+    toolBoxPrefSize = toolBox.htmlComp.layout.compactPrefSize();
+    toolBoxWidth = toolBoxPrefSize.width;
+    setToolBoxSize();
+    setToolBoxLocation();
   }
 
   tabsWidth = calcTabsWidth();
@@ -77,42 +77,42 @@ scout.DesktopHeaderLayout.prototype.layout = function($container) {
   }
 
   // 2nd remove text from tool-bar items, only show icon
-  if (toolBar) {
-    toolBarPrefSize = toolBar.htmlComp.layout.shrinkPrefSize();
-    toolBarWidth = toolBarPrefSize.width;
-    setToolBarSize();
-    setToolBarLocation();
+  if (toolBox) {
+    toolBoxPrefSize = toolBox.htmlComp.layout.shrinkPrefSize();
+    toolBoxWidth = toolBoxPrefSize.width;
+    setToolBoxSize();
+    setToolBoxLocation();
   }
 
   tabsWidth = calcTabsWidth();
   tabsWidth = Math.max(Math.min(smallTabsPrefSize.width, tabsWidth), scout.ViewTabAreaLayout.OVERFLOW_MENU_WIDTH);
   setTabsSize();
 
-  // 3rd if only the overflow menu is shown make toolBar smaller so that ellipsis may be displayed
-  if (toolBar && tabsWidth <= scout.ViewTabAreaLayout.OVERFLOW_MENU_WIDTH) {
-    // layout toolBar, now an ellipsis menu may be shown
-    toolBarWidth = containerSize.width - tabsWidth - logoWidth - viewButtonBoxWidth;
-    setToolBarSize();
+  // 3rd if only the overflow menu is shown make toolBox smaller so that ellipsis may be displayed
+  if (toolBox && tabsWidth <= scout.ViewTabAreaLayout.OVERFLOW_MENU_WIDTH) {
+    // layout toolBox, now an ellipsis menu may be shown
+    toolBoxWidth = containerSize.width - tabsWidth - logoWidth - viewButtonBoxWidth;
+    setToolBoxSize();
 
-    // update size of the toolBar again with the actual width to make it correctly right aligned
-    toolBarWidth = toolBar.htmlComp.layout.actualPrefSize().width;
-    setToolBarSize();
-    setToolBarLocation();
+    // update size of the toolBox again with the actual width to make it correctly right aligned
+    toolBoxWidth = toolBox.htmlComp.layout.actualPrefSize().width;
+    setToolBoxSize();
+    setToolBoxLocation();
   }
 
   function calcTabsWidth() {
-    return containerSize.width - toolBarWidth - logoWidth - viewButtonBoxWidth;
+    return containerSize.width - toolBoxWidth - logoWidth - viewButtonBoxWidth;
   }
 
   function setTabsSize() {
     viewTabBox.htmlComp.setSize(new scout.Dimension(tabsWidth, tabsPrefSize.height));
   }
 
-  function setToolBarSize() {
-    toolBar.htmlComp.setSize(new scout.Dimension(toolBarWidth, toolBarPrefSize.height).subtract(toolBar.htmlComp.getMargins()));
+  function setToolBoxSize() {
+    toolBox.htmlComp.setSize(new scout.Dimension(toolBoxWidth, toolBoxPrefSize.height).subtract(toolBox.htmlComp.getMargins()));
   }
 
-  function setToolBarLocation() {
-    toolBar.htmlComp.$comp.cssLeft(containerSize.width - toolBarWidth - logoWidth);
+  function setToolBoxLocation() {
+    toolBox.htmlComp.$comp.cssLeft(containerSize.width - toolBoxWidth - logoWidth);
   }
 };

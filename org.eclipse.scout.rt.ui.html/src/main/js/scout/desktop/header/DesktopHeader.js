@@ -20,7 +20,7 @@ scout.inherits(scout.DesktopHeader, scout.Widget);
 scout.DesktopHeader.prototype._init = function(model) {
   scout.DesktopHeader.parent.prototype._init.call(this, model);
   this.desktop = this.session.desktop;
-  this.toolBarVisible = scout.nvl(model.toolBarVisible, true);
+  this.toolBoxVisible = scout.nvl(model.toolBoxVisible, true);
   this.viewButtonBoxVisible = scout.nvl(model.viewButtonBoxVisible, false);
   this.updateViewButtonBoxVisibility();
   // create view tab box
@@ -35,7 +35,7 @@ scout.DesktopHeader.prototype._render = function($parent) {
   this.htmlComp.setLayout(new scout.DesktopHeaderLayout(this));
   this._renderViewButtonBoxVisible();
   this._renderViewTabs();
-  this._renderToolBarVisible();
+  this._renderToolBoxVisible();
   this._renderLogoUrl();
   this.desktop.on('propertyChange', this._desktopPropertyChangeHandler);
   this.desktop.on('animationEnd', this._desktopAnimationEndHandler);
@@ -57,30 +57,30 @@ scout.DesktopHeader.prototype._renderViewTabs = function() {
    this.viewTabBox.render(this.$container);
 };
 
-scout.DesktopHeader.prototype._renderToolBar = function() {
-  if (this.toolBar) {
+scout.DesktopHeader.prototype._renderToolBox = function() {
+  if (this.toolBox) {
     return;
   }
-  this.toolBar = scout.create('DesktopToolBox', {
+  this.toolBox = scout.create('DesktopToolBox', {
     parent: this,
     menus: this.desktop.menus
   });
-  this.toolBar.render(this.$container);
+  this.toolBox.render(this.$container);
 };
 
-scout.DesktopHeader.prototype._removeToolBar = function() {
-  if (!this.toolBar) {
+scout.DesktopHeader.prototype._removeToolBox = function() {
+  if (!this.toolBox) {
     return;
   }
-  this.toolBar.remove();
-  this.toolBar = null;
+  this.toolBox.remove();
+  this.toolBox = null;
 };
 
-scout.DesktopHeader.prototype._renderToolBarVisible = function() {
-  if (this.toolBarVisible) {
-    this._renderToolBar();
+scout.DesktopHeader.prototype._renderToolBoxVisible = function() {
+  if (this.toolBoxVisible) {
+    this._renderToolBox();
   } else {
-    this._removeToolBar();
+    this._removeToolBox();
   }
   this.invalidateLayoutTree();
 };
@@ -169,13 +169,13 @@ scout.DesktopHeader.prototype.setLogoUrl = function(logoUrl) {
   }
 };
 
-scout.DesktopHeader.prototype.setToolBarVisible = function(visible) {
-  if (this.toolBarVisible === visible) {
+scout.DesktopHeader.prototype.setToolBoxVisible = function(visible) {
+  if (this.toolBoxVisible === visible) {
     return;
   }
-  this.toolBarVisible = visible;
+  this.toolBoxVisible = visible;
   if (this.rendered) {
-    this._renderToolBarVisible();
+    this._renderToolBoxVisible();
   }
 };
 
