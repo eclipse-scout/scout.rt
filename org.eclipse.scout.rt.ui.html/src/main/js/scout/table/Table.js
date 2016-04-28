@@ -369,6 +369,7 @@ scout.Table.prototype._onRowMouseUp = function(event) {
 scout.Table.prototype._onRowDoubleClick = function(event) {
   var $row = $(event.currentTarget),
     column = this._columnAtX(event.pageX);
+
   this.doRowAction($row.data('row'), column);
 };
 
@@ -1952,6 +1953,12 @@ scout.Table.prototype.uncheckRows = function(rows, options) {
 };
 
 scout.Table.prototype.doRowAction = function(row, column) {
+  if (this.selectedRows.length !== 1 || this.selectedRows[0] !== row) {
+    // Only allow row action if the selected row was double clicked because the handler of the event expects a selected row.
+    // This may happen if the user modifies the selection using ctrl or shift while double clicking.
+    return;
+  }
+
   column = column || this.columns[0];
   if (column && column.guiOnly) {
     column = scout.arrays.find(this.columns, function(col) {

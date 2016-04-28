@@ -660,6 +660,87 @@ describe("Table", function() {
     });
   });
 
+  describe("doRowAction", function() {
+
+    it("sends rowAction event with row and column", function() {
+      var model = helper.createModelFixture(2, 5);
+      var table = helper.createTable(model);
+      var row0 = table.rows[0];
+      var column0 = table.columns[0];
+
+      table.selectedRows = [row0];
+      table.render(session.$entryPoint);
+      table.doRowAction(row0, column0);
+
+      sendQueuedAjaxCalls();
+
+      expect(jasmine.Ajax.requests.count()).toBe(1);
+      expect(mostRecentJsonRequest().events.length).toBe(1);
+
+      var event = new scout.Event(table.id, 'rowAction', {
+        columnId: column0.id,
+        rowId: row0.id
+      });
+      expect(mostRecentJsonRequest()).toContainEvents(event);
+    });
+
+    it("does not send rowAction event if the row is not selected", function() {
+      var model = helper.createModelFixture(2, 5);
+      var table = helper.createTable(model);
+      var row0 = table.rows[0];
+      var column0 = table.columns[0];
+
+      // no selection at all
+      table.selectedRows = [];
+      table.render(session.$entryPoint);
+      table.doRowAction(row0, column0);
+
+      sendQueuedAjaxCalls();
+
+      expect(jasmine.Ajax.requests.count()).toBe(0);
+
+      // other row selected
+      table.selectedRows = [table.rows[1]];
+      table.doRowAction(row0, column0);
+
+      sendQueuedAjaxCalls();
+
+      expect(jasmine.Ajax.requests.count()).toBe(0);
+
+      // correct row selected -> expect event
+      table.selectedRows = [row0];
+      table.doRowAction(row0, column0);
+
+      sendQueuedAjaxCalls();
+
+      expect(jasmine.Ajax.requests.count()).toBe(1);
+      expect(mostRecentJsonRequest().events.length).toBe(1);
+
+      var event = new scout.Event(table.id, 'rowAction', {
+        columnId: column0.id,
+        rowId: row0.id
+      });
+      expect(mostRecentJsonRequest()).toContainEvents(event);
+    });
+
+    it("does not send rowAction event if it is not the only one selected row", function() {
+      var model = helper.createModelFixture(2, 5);
+      var table = helper.createTable(model);
+      var row0 = table.rows[0];
+      var column0 = table.columns[0];
+
+      // no selection at all
+      table.selectedRows = [row0, table.rows[1]];
+      table.render(session.$entryPoint);
+      table.doRowAction(row0, column0);
+
+      sendQueuedAjaxCalls();
+
+      expect(jasmine.Ajax.requests.count()).toBe(0);
+    });
+
+  });
+
   describe("resizeColumn", function() {
 
     it("updates column model and sends resize event ", function() {
