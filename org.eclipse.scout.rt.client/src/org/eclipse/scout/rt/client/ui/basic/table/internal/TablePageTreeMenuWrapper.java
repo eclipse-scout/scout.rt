@@ -32,7 +32,6 @@ import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 public class TablePageTreeMenuWrapper implements IMenu {
 
   private IMenu m_wrappedMenu;
-  private List<IMenu> m_childMenus;
   private boolean m_localEnabled = true;
   private boolean m_localEnabledInheritAccessibility = true;
   private Set<IMenuType> m_menuTypes;
@@ -51,26 +50,11 @@ public class TablePageTreeMenuWrapper implements IMenu {
     }
     m_wrappedMenu = wrappedMenu;
     m_menuTypes = menuTypeSet;
-    setup();
   }
 
   public TablePageTreeMenuWrapper(IMenu wrappedMenu, Set<? extends IMenuType> menuTypes) {
     m_wrappedMenu = wrappedMenu;
     m_menuTypes = CollectionUtility.hashSet(menuTypes);
-    setup();
-  }
-
-  /**
-   *
-   */
-  protected void setup() {
-    List<IMenu> childActions = m_wrappedMenu.getChildActions();
-    List<IMenu> wrappedChildActions = new ArrayList<IMenu>(childActions.size());
-    // create child wrapper
-    for (IMenu m : childActions) {
-      wrappedChildActions.add(new TablePageTreeMenuWrapper(m, getMenuTypes()));
-    }
-    m_childMenus = wrappedChildActions;
   }
 
   public IMenu getWrappedMenu() {
@@ -104,17 +88,22 @@ public class TablePageTreeMenuWrapper implements IMenu {
 
   @Override
   public boolean hasChildActions() {
-    return m_childMenus.size() > 0;
+    return m_wrappedMenu.hasChildActions();
+
   }
 
   @Override
   public int getChildActionCount() {
-    return m_childMenus.size();
+    return m_wrappedMenu.getChildActionCount();
   }
 
   @Override
   public List<IMenu> getChildActions() {
-    return m_childMenus;
+    List<IMenu> wrappedChildMenus = new ArrayList<IMenu>();
+    for (IMenu m : m_wrappedMenu.getChildActions()) {
+      wrappedChildMenus.add(new TablePageTreeMenuWrapper(m, getMenuTypes()));
+    }
+    return wrappedChildMenus;
   }
 
   @Override
