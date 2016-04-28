@@ -101,3 +101,8 @@ scout.RadioButtonGroup.prototype.selectButton = function(radioButtonToSelect) {
     }
   }, this);
 };
+
+scout.RadioButtonGroup.prototype.addButton = function(radioButton) {
+  this.formFields.push(radioButton);
+  this.radioButtons.push(radioButton);
+};
