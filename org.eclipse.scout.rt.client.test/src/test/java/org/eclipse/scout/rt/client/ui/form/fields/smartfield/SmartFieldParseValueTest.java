@@ -64,6 +64,7 @@ public class SmartFieldParseValueTest {
   public void setUp() {
     m_smartField = new SmartField();
     m_smartField.registerProposalChooserInternal();
+    LookupRows.ROW_1.withEnabled(true);
   }
 
   /**
@@ -178,6 +179,20 @@ public class SmartFieldParseValueTest {
     assertFalse(openProposalChooser);
     assertSame(currentLookupRow, m_smartField.getCurrentLookupRow());
     assertNull(m_smartField.getErrorStatus());
+  }
+
+  /**
+   * Test case for #172835. When one of the lookup rows is disabled and the user types accepts exactly that row by
+   * display text, the row cannot be accepted.
+   */
+  @Test
+  public void testHandleAcceptByDisplayText_InactiveLookupRow() throws Exception {
+    String displayText = "aName";
+    LookupRows.ROW_1.withEnabled(false);
+    boolean openProposalChooser = m_smartField.handleAcceptByDisplayText(displayText);
+    assertTrue(openProposalChooser);
+    assertNull(m_smartField.getCurrentLookupRow());
+    assertNotNull(m_smartField.getErrorStatus());
   }
 
   int getProposalTableRowCount() {

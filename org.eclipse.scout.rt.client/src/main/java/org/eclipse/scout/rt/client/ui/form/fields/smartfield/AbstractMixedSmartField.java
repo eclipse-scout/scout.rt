@@ -34,6 +34,7 @@ import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.platform.util.TriState;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
@@ -141,13 +142,46 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
       return true;
     }
     else if (lookupRows.size() == 1) {
-      acceptProposal(lookupRows.get(0));
+      lookupRow = lookupRows.get(0);
+      if (lookupRowAccepted(lookupRow)) {
+        acceptProposal(lookupRow);
+      }
+      else {
+        setValidationError(text, TEXTS.get("SmartFieldInactiveRow", text), NO_RESULTS_ERROR_CODE);
+        return true;
+      }
     }
     else if (lookupRows.size() > 1) {
       setValidationError(text, TEXTS.get("SmartFieldNotUnique", text), NOT_UNIQUE_ERROR_CODE);
       return true;
     }
     return false;
+  }
+
+  private boolean lookupRowAccepted(ILookupRow<LOOKUP_KEY> lookupRow) {
+    if (!lookupRow.isEnabled()) {
+      // when row is disabled, dont allow
+      return false;
+    }
+    if (lookupRow.isActive()) {
+      // when row is active, allow
+      return true;
+    }
+    else if (!isProposalChooserRegistered()) {
+      // when proposal chooser is not opened, only allow active rows
+      return false;
+    }
+    else if (!getProposalChooser().isActiveFilterEnabled()) {
+      // when proposal chooser is openend, it depends on the settings of the active filter
+      // whether or not the row is allowed
+      return false;
+    }
+    else {
+      // when we active-filter is enabled, inactive rows are only allowed when filter
+      // is set to ALL (undefined) or INACTIVE (false)
+      TriState activeFilter = getProposalChooser().getActiveFilter();
+      return !activeFilter.isTrue();
+    }
   }
 
   private boolean textEquals(String displayText, String lookupRowText) {
