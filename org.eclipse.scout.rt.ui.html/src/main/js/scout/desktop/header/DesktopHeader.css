@@ -26,7 +26,7 @@
     top: calc(~'100% - 1px');
     left: 0;
   }
-  > .view-tab-area {
+  > .simple-tab-area {
     height: @desktop-header-height;
 
     > .desktop-view-tab.selected {

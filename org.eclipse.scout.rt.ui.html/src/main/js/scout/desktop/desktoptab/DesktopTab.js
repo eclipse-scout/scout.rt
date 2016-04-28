@@ -9,8 +9,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-scout.DesktopViewTab = function() {
-  scout.DesktopViewTab.parent.call(this);
+scout.DesktopTab = function() {
+  scout.DesktopTab.parent.call(this);
 
   this.view;
 
@@ -27,38 +27,38 @@ scout.DesktopViewTab = function() {
   }.bind(this);
 
   // FIXME awe: problem ist, dass Widegt#remove prüft ob rendered ist
-  // im bench mode ist der DesktopViewTab nicht gerendet, _remove wird
+  // im bench mode ist der DesktopTab nicht gerendet, _remove wird
   // darum nicht aufgerufen und das 'remove event vom tab nie getriggert
   this._removeListener = this._onViewRemoved.bind(this);
 
   this._addEventSupport();
 };
 
-scout.inherits(scout.DesktopViewTab, scout.ViewTab);
+scout.inherits(scout.DesktopTab, scout.SimpleTab);
 
-scout.DesktopViewTab.prototype._init = function(options) {
+scout.DesktopTab.prototype._init = function(options) {
   this.view = options.view;
   options.title = this.view.title;
   options.subTitle = this.view.subTitle;
   options.iconId = this.view.iconId;
 
-  scout.DesktopViewTab.parent.prototype._init.call(this, options);
+  scout.DesktopTab.parent.prototype._init.call(this, options);
 
 
   this._installListeners();
 };
 
-scout.DesktopViewTab.prototype._installListeners = function() {
+scout.DesktopTab.prototype._installListeners = function() {
   this.view.on('propertyChange', this._propertyChangeListener);
   this.view.on('remove', this._removeListener);
 };
 
-scout.DesktopViewTab.prototype._uninstallListeners = function() {
+scout.DesktopTab.prototype._uninstallListeners = function() {
   this.view.off('propertyChange', this._propertyChangeListener);
   this.view.off('remove', this._removeListener);
 };
 
-scout.DesktopViewTab.prototype._cssClassUpdated = function(cssClass, oldCssClass) {
+scout.DesktopTab.prototype._cssClassUpdated = function(cssClass, oldCssClass) {
   if (!this.$container) {
     return;
   }
@@ -69,10 +69,9 @@ scout.DesktopViewTab.prototype._cssClassUpdated = function(cssClass, oldCssClass
 /**
  * We cannot not bind the 'remove' event of the view to the remove function
  * of the this tab, because in bench-mode we the tab is never rendered
- * and thus the _remove function is never called. However, we must still
- * trigger the 'remove' event because the ViewTabsController depends on it.
+ * and thus the _remove function is never called.
  */
-scout.ViewTab.prototype._onViewRemoved = function() {
+scout.DesktopTab.prototype._onViewRemoved = function() {
   this._uninstallListeners();
   if (this.rendered) {
     this.remove();

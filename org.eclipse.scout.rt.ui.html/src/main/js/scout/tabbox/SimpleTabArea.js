@@ -8,53 +8,53 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-scout.ViewTabArea = function() {
-  scout.ViewTabArea.parent.call(this);
-  this.viewTabs = [];
+scout.SimpleTabArea = function() {
+  scout.SimpleTabArea.parent.call(this);
+  this.tabs = [];
 };
-scout.inherits(scout.ViewTabArea, scout.Widget);
+scout.inherits(scout.SimpleTabArea, scout.Widget);
 
-scout.ViewTabArea.prototype._init = function(model) {
-  scout.ViewTabArea.parent.prototype._init.call(this, model);
+scout.SimpleTabArea.prototype._init = function(model) {
+  scout.SimpleTabArea.parent.prototype._init.call(this, model);
   this.visible = true;
   this._selectedViewTab;
 
-  //  this.menuBar = scout.create('MenuBar', {
-  //    parent: this,
-  //    menuOrder: new scout.GroupBoxMenuItemsOrder()
-  //  });
   this._viewTabSelectionHandler = this._onTabSelection.bind(this);
 
   this._addEventSupport();
 };
 
-
-scout.ViewTabArea.prototype.render = function($parent) {
-  scout.ViewTabArea.parent.prototype.render.call(this, $parent);
+scout.SimpleTabArea.prototype.render = function($parent) {
+  scout.SimpleTabArea.parent.prototype.render.call(this, $parent);
   this._renderVisible();
 };
 
-scout.ViewTabArea.prototype._render = function($parent) {
-  this.$container = $parent.appendDiv('view-tab-area');
+scout.SimpleTabArea.prototype._render = function($parent) {
+  this.$container = $parent.appendDiv('simple-tab-area');
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
-  this.htmlComp.setLayout(new scout.ViewTabAreaLayout(this));
+  this.htmlComp.setLayout(new scout.SimpleTabAreaLayout(this));
+
+};
+
+scout.SimpleTabArea.prototype._renderProperties = function() {
+  scout.SimpleTabArea.parent.prototype._renderProperties.call(this);
   this._renderTabs();
 };
 
-scout.ViewTabArea.prototype._renderTabs = function() {
+scout.SimpleTabArea.prototype._renderTabs = function() {
   // reverse since tabs rendered without a sibling will be prepended.
-  this.viewTabs.reverse()
+  this.tabs.reverse()
     .forEach(function(tab) {
       this._renderTab(tab);
     }.bind(this));
 };
 
-scout.ViewTabArea.prototype._renderTab = function(tab) {
+scout.SimpleTabArea.prototype._renderTab = function(tab) {
   tab.renderAfter(this.$container);
 };
 
-scout.ViewTabArea.prototype._renderVisible = function() {
-  if (this.visible && this.viewTabs.length > 0) {
+scout.SimpleTabArea.prototype._renderVisible = function() {
+  if (this.visible && this.tabs.length > 0) {
     if (!this.attached) {
       this.attach();
     }
@@ -65,44 +65,45 @@ scout.ViewTabArea.prototype._renderVisible = function() {
   }
 };
 
-scout.ViewTabArea.prototype._attach = function() {
+scout.SimpleTabArea.prototype._attach = function() {
   this._$parent.prepend(this.$container);
   this.session.detachHelper.afterAttach(this.$container);
   // If the parent was resized while this view was detached, the view has a wrong size.
   this.invalidateLayoutTree(false);
-  scout.ViewTabArea.parent.prototype._attach.call(this);
+  scout.SimpleTabArea.parent.prototype._attach.call(this);
 };
 
 /**
  * @override Widget.js
  */
-scout.ViewTabArea.prototype._detach = function() {
-
+scout.SimpleTabArea.prototype._detach = function() {
   this.session.detachHelper.beforeDetach(this.$container);
   this.$container.detach();
-  scout.ViewTabArea.parent.prototype._detach.call(this);
+  scout.SimpleTabArea.parent.prototype._detach.call(this);
   this.invalidateLayoutTree(false);
 };
 
-scout.ViewTabArea.prototype._onTabSelection = function(event) {
-  this.selectViewTab(event.source);
+scout.SimpleTabArea.prototype._onTabSelection = function(event) {
+  this.selectTab(event.source);
 };
 
-scout.ViewTabArea.prototype.setVisible = function(visible) {
+scout.SimpleTabArea.prototype.setVisible = function(visible) {
   this.visible = visible;
-  this._renderVisible();
-  this.invalidateLayoutTree();
+  if (this.rendered) {
+    this._renderVisible();
+    this.invalidateLayoutTree();
+  }
 };
 
-scout.ViewTabArea.prototype.getViewTabs = function() {
-  return this.viewTabs;
+scout.SimpleTabArea.prototype.getTabs = function() {
+  return this.tabs;
 };
 
-scout.ViewTabArea.prototype.selectViewTab = function(viewTab) {
+scout.SimpleTabArea.prototype.selectTab = function(viewTab) {
   if (this._selectedViewTab === viewTab) {
     return;
   }
-  this.deselectViewTab(this._selectedViewTab);
+  this.deselectTab(this._selectedViewTab);
 
   this._selectedViewTab = viewTab;
   if (viewTab) {
@@ -114,7 +115,7 @@ scout.ViewTabArea.prototype.selectViewTab = function(viewTab) {
   });
 };
 
-scout.ViewTabArea.prototype.deselectViewTab = function(viewTab) {
+scout.SimpleTabArea.prototype.deselectTab = function(viewTab) {
   if (!viewTab) {
     return;
   }
@@ -125,28 +126,28 @@ scout.ViewTabArea.prototype.deselectViewTab = function(viewTab) {
 
 };
 
-scout.ViewTabArea.prototype.getSelectedViewTab = function() {
+scout.SimpleTabArea.prototype.getSelectedTab = function() {
   return this._selectedViewTab;
 };
 
-scout.ViewTabArea.prototype.addTab = function(tab, sibling) {
+scout.SimpleTabArea.prototype.addTab = function(tab, sibling) {
   var insertPosition = -1;
   if (sibling) {
-    insertPosition = this.viewTabs.indexOf(sibling);
+    insertPosition = this.tabs.indexOf(sibling);
   }
-  this.viewTabs.splice(insertPosition + 1, 0, tab);
+  this.tabs.splice(insertPosition + 1, 0, tab);
   tab.on('tabClicked', this._viewTabSelectionHandler);
-  if(this.rendered){
+  if (this.rendered) {
     this._renderVisible();
     tab.renderAfter(this.$container, sibling);
     this.invalidateLayoutTree();
   }
 };
 
-scout.ViewTabArea.prototype.removeTab = function(tab) {
-  var index = this.viewTabs.indexOf(tab);
+scout.SimpleTabArea.prototype.removeTab = function(tab) {
+  var index = this.tabs.indexOf(tab);
   if (index > -1) {
-    this.viewTabs.splice(index, 1);
+    this.tabs.splice(index, 1);
     tab.remove();
     tab.off('tabClicked', this._viewTabSelectionHandler);
     this._renderVisible();

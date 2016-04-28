@@ -11,8 +11,8 @@
 /**
  * Composite keystroke to provide a numeric keystroke to select view tabs.
  */
-scout.ViewTabSelectKeyStroke = function(desktop) {
-  scout.ViewTabSelectKeyStroke.parent.call(this);
+scout.DesktopTabSelectKeyStroke = function(desktop) {
+  scout.DesktopTabSelectKeyStroke.parent.call(this);
   this.field = desktop;
 
   // modifier
@@ -33,20 +33,20 @@ scout.ViewTabSelectKeyStroke = function(desktop) {
     return this._viewTabs()[viewIndex].$container;
   }.bind(this);
 };
-scout.inherits(scout.ViewTabSelectKeyStroke, scout.RangeKeyStroke);
+scout.inherits(scout.DesktopTabSelectKeyStroke, scout.RangeKeyStroke);
 
 /**
  * @override KeyStroke.js
  */
-scout.ViewTabSelectKeyStroke.prototype._isEnabled = function() {
-  var enabled = scout.ViewTabSelectKeyStroke.parent.prototype._isEnabled.call(this);
+scout.DesktopTabSelectKeyStroke.prototype._isEnabled = function() {
+  var enabled = scout.DesktopTabSelectKeyStroke.parent.prototype._isEnabled.call(this);
   return enabled && this.field.selectViewTabsKeyStrokesEnabled && this._viewTabs().length > 0;
 };
 
 /**
  * @override KeyStroke.js
  */
-scout.ViewTabSelectKeyStroke.prototype.handle = function(event) {
+scout.DesktopTabSelectKeyStroke.prototype.handle = function(event) {
   var viewIndex = event.which - scout.keys['1'];
 
   if (this._viewTabs().length && (viewIndex < this._viewTabs().length)) {
@@ -57,9 +57,9 @@ scout.ViewTabSelectKeyStroke.prototype.handle = function(event) {
   }
 };
 
-scout.ViewTabSelectKeyStroke.prototype._viewTabs = function() {
+scout.DesktopTabSelectKeyStroke.prototype._viewTabs = function() {
   if (this.field.bench) {
-    return this.field.bench.getViewTabs();
+    return this.field.bench.getTabs();
   }
   return [];
 };

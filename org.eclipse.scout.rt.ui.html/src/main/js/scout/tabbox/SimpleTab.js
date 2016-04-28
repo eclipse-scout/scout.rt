@@ -9,8 +9,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-scout.ViewTab = function() {
-  scout.ViewTab.parent.call(this);
+scout.SimpleTab = function() {
+  scout.SimpleTab.parent.call(this);
 
   this.title;
   this.subTitle;
@@ -23,10 +23,10 @@ scout.ViewTab = function() {
 
   this._addEventSupport();
 };
-scout.inherits(scout.ViewTab, scout.Widget);
+scout.inherits(scout.SimpleTab, scout.Widget);
 
-scout.ViewTab.prototype._init = function(options) {
-  scout.ViewTab.parent.prototype._init.call(this, options);
+scout.SimpleTab.prototype._init = function(options) {
+  scout.SimpleTab.parent.prototype._init.call(this, options);
   this.title = options.title;
   this.subTitle = options.subTitle;
   this.iconId = options.iconId;
@@ -34,14 +34,14 @@ scout.ViewTab.prototype._init = function(options) {
 
 };
 
-scout.ViewTab.prototype.renderAfter = function($parent, sibling) {
+scout.SimpleTab.prototype.renderAfter = function($parent, sibling) {
   this.render($parent);
   if (sibling) {
     this.$container.insertAfter(sibling.$container);
   }
 };
 
-scout.ViewTab.prototype._render = function($parent) {
+scout.SimpleTab.prototype._render = function($parent) {
   this.$container = $parent.prependDiv('desktop-view-tab');
   this._mouseListener = this._onMouseDown.bind(this);
   this.$container.on('mousedown', this._mouseListener);
@@ -52,7 +52,9 @@ scout.ViewTab.prototype._render = function($parent) {
   this._cssClassUpdated(this.view.cssClass, null);
 };
 
-scout.ViewTab.prototype._renderSelection = function() {
+
+
+scout.SimpleTab.prototype._renderSelection = function() {
   if (this.$container) {
     if (this.$container.select() === this.selected) {
       return;
@@ -61,22 +63,22 @@ scout.ViewTab.prototype._renderSelection = function() {
   }
 };
 
-scout.ViewTab.prototype.select = function() {
+scout.SimpleTab.prototype.select = function() {
   this.selected = true;
   this._renderSelection();
 };
 
-scout.ViewTab.prototype.deselect = function() {
+scout.SimpleTab.prototype.deselect = function() {
   this.selected = false;
   this._renderSelection();
 };
 
 
-scout.ViewTab.prototype._onMouseDown = function(event) {
+scout.SimpleTab.prototype._onMouseDown = function(event) {
   this.trigger('tabClicked');
 };
 
-scout.ViewTab.prototype.setTitle = function(title) {
+scout.SimpleTab.prototype.setTitle = function(title) {
   if (this.title === title) {
     return;
   }
@@ -84,7 +86,7 @@ scout.ViewTab.prototype.setTitle = function(title) {
   this._titlesUpdated();
 };
 
-scout.ViewTab.prototype.setSubTitle = function(subTitle) {
+scout.SimpleTab.prototype.setSubTitle = function(subTitle) {
   if (this.subTitle === subTitle) {
     return;
   }
@@ -92,7 +94,7 @@ scout.ViewTab.prototype.setSubTitle = function(subTitle) {
   this._titlesUpdated();
 };
 
-scout.ViewTab.prototype.setIconId = function(iconId) {
+scout.SimpleTab.prototype.setIconId = function(iconId) {
   if (this.iconId === iconId) {
     return;
   }
@@ -100,7 +102,7 @@ scout.ViewTab.prototype.setIconId = function(iconId) {
   this._titlesUpdated();
 };
 
-scout.ViewTab.prototype._titlesUpdated = function() {
+scout.SimpleTab.prototype._titlesUpdated = function() {
   if (!this.$container) {
     return;
   }
@@ -119,7 +121,7 @@ scout.ViewTab.prototype._titlesUpdated = function() {
   }
 };
 
-scout.ViewTab.prototype.getMenuText = function() {
+scout.SimpleTab.prototype.getMenuText = function() {
   var text = this.title;
   if (this.subTitle) {
     text += ' (' + this.subTitle + ')';

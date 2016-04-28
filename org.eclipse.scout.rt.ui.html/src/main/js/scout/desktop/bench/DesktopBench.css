@@ -27,10 +27,104 @@
 
 .desktop-bench {
   position: absolute;
+
   top: 0;
   background-color: @background-color;
 
   &.drop-shadow::before {
     .desktop-bench-drop-shadow();
+  }
+
+}
+
+.desktop-table.table {
+
+  & > .table-header {
+    padding-left: @desktop-table-header-padding-x;
+    padding-right: @desktop-table-header-padding-x;
+
+    & > .table-header-item {
+      padding-top: @desktop-table-header-padding-y;
+      padding-bottom: @desktop-table-header-padding-y;
+
+      & > .table-header-item-state {
+        top: 9px;
+      }
+    }
+
+    & > .menubar-container {
+      padding-left: 6px;
+      padding-right: @desktop-table-header-menubar-padding-right;
+
+      & > .menubar > .menubox > .menu-item {
+        margin-right: 12px;
+      }
+    }
+  }
+
+  & > .table-data {
+    padding-left: @desktop-table-data-padding-x;
+    padding-right: @desktop-table-data-padding-x;
+  }
+
+  & .table-aggregate {
+    margin-left: @bench-padding-x;
+    margin-right: @bench-padding-x;
+
+    & > .table-cell {
+      padding-top: @desktop-table-row-padding-y;
+      padding-bottom: @desktop-table-row-padding-y;
+    }
+  }
+
+  & > .table-data {
+    & > .scrollbar.x-axis {
+      margin-top: 2px;
+      margin-bottom: 2px;
+    }
+
+    & > .table-row,
+    & > .table-aggregate-row {
+      /* Desktop table has a 2px border. Top and bottom border are added to the table cell. */
+      border-left-width: 2px;
+      border-right-width: 2px;
+
+      &.selected {
+        background-color: @item-selection-background-color;
+        border-color: @item-selection-border-color;
+      }
+
+      & > .table-cell {
+        /* Replace first and last pixel of specified row padding by a transparent border. This border will be */
+        /* set to the selection color when the row is selected, thus creating the illusion that the 2px selection */
+        /* border is drawn around the cell. See CSS rules below. */
+        padding-top: @desktop-table-row-padding-y - 1px;
+        padding-bottom: @desktop-table-row-padding-y - 1px;
+        border-top: 1px solid transparent;
+        border-bottom: 1px solid transparent;
+
+        &.checkable {
+          padding-top: @desktop-table-row-padding-y - @checkable-cell-padding-adjustment - 1px;
+          padding-bottom: @desktop-table-row-padding-y - @checkable-cell-padding-adjustment - 1px;
+        }
+      }
+
+      &.select-top > .table-cell {
+        border-top-color: @item-selection-border-color;
+      }
+
+      &.select-bottom > .table-cell {
+        border-bottom-color: @item-selection-border-color;
+      }
+
+      &.select-single > .table-cell {
+        border-top-color: @item-selection-border-color;
+        border-bottom-color: @item-selection-border-color;
+      }
+    }
+
+    & > .cell-editor-popup > .check-box-field > .cell-editor-field {
+      padding-top: @desktop-table-row-padding-y - @checkable-cell-padding-adjustment - 1px;
+    }
   }
 }

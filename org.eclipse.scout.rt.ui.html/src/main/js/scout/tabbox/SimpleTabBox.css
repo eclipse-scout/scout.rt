@@ -1,9 +1,9 @@
-.view-box {
+.view-tab-box {
   position: absolute;
   min-width: @bench-view-min-width;
   min-height: @bench-view-min-height;
 
-  > .view-tab-area{
+  > .simple-tab-area{
     position: relative;
     height: @desktop-header-height;
 

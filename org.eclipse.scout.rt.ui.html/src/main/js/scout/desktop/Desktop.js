@@ -15,7 +15,6 @@ scout.Desktop = function() {
   this.header;
   this.bench;
   this.splitter;
-//  this.viewTabsController;
   this.formController;
   this.messageBoxController;
   this.fileChooserController;
@@ -38,7 +37,6 @@ scout.Desktop.DisplayStyle = {
 
 scout.Desktop.prototype._init = function(model) {
   scout.Desktop.parent.prototype._init.call(this, model);
-//  this.viewTabsController = new scout.ViewTabsController(this);
   this.formController = new scout.DesktopFormController(this, this.session);
   this.messageBoxController = new scout.MessageBoxController(this, this.session);
   this.fileChooserController = new scout.FileChooserController(this, this.session);
@@ -54,7 +52,8 @@ scout.Desktop.prototype._initKeyStrokeContext = function(keyStrokeContext) {
 
   // Keystroke on the top-level DOM element which works as a catch-all when the busy indicator is active
   keyStrokeContext.registerKeyStroke(new scout.DesktopKeyStroke(this.session));
-  keyStrokeContext.registerKeyStroke(new scout.ViewTabSelectKeyStroke(this));
+  keyStrokeContext.registerKeyStroke(new scout.DesktopTabSelectKeyStroke(this));
+  keyStrokeContext.registerKeyStroke(new scout.DisableBrowserTabSwitchingKeyStroke(this));
 };
 
 scout.Desktop.prototype._onChildAdapterCreation = function(propertyName, model) {
@@ -194,9 +193,9 @@ scout.Desktop.prototype._renderBench = function() {
   if (this.bench) {
     return;
   }
-  this.bench = scout.create('DesktopGridBench', {
+  this.bench = scout.create('DesktopBench', {
     parent: this,
-    headerViewTabBox : (this.header)?(this.header.viewTabBox):(undefined),
+    headerTabArea : (this.header)?(this.header.tabArea):(undefined),
     outlineContentVisible: this.displayStyle !== scout.Desktop.DisplayStyle.COMPACT
   });
   this.bench.on('viewActivated',this._benchActiveViewChangedHandler);
@@ -645,7 +644,6 @@ scout.Desktop.prototype.bringOutlineToFront = function() {
     return;
   }
   this.inBackground = false;
-//  this.viewTabsController.deselectViewTab();
   this._setOutlineActivated();
 
   if (this.navigationVisible) {
@@ -735,8 +733,6 @@ scout.Desktop.prototype._showForm = function(form, displayParent, position, noti
 
 scout.Desktop.prototype._hideForm = function(form) {
   if (this.displayStyle === scout.Desktop.DisplayStyle.COMPACT && form.isView() ) {
-    // TODO Aho
-//  if (this.displayStyle === scout.Desktop.DisplayStyle.COMPACT && form.isView() && this.viewTabsController._viewTabs.length === 1) {
     // Hide bench and show navigation if this is the last view to be hidden
     this.switchToNavigation();
   }

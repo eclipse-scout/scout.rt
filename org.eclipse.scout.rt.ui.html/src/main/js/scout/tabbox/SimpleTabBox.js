@@ -8,81 +8,72 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-scout.ViewArea = function() {
-  scout.ViewArea.parent.call(this);
+scout.SimpleTabBox = function() {
+  scout.SimpleTabBox.parent.call(this);
   this.$body;
   this.$title;
   this.htmlComp;
-  this.viewTabArea;
-  this.viewTabAreaVisible = true;
+  this.tabArea;
   this.viewStack = [];
-  this.viewTabMap = {}; // [key=viewId, value=ViewTab instance]
-
   this.currentView;
-
-  this.viewTabListener = function(viewTab) {
-    this.activateView(viewTab.view);
-  }.bind(this);
 
   this._addEventSupport();
 };
-scout.inherits(scout.ViewArea, scout.Widget);
+scout.inherits(scout.SimpleTabBox, scout.Widget);
 
-scout.ViewArea.prototype._init = function(model) {
-  scout.ViewArea.parent.prototype._init.call(this, model);
-  //  this.menuBar = scout.create('MenuBar', {
-  //    parent: this,
-  //    menuOrder: new scout.GroupBoxMenuItemsOrder()
-  //  });
+scout.SimpleTabBox.prototype._init = function(model) {
+  scout.SimpleTabBox.parent.prototype._init.call(this, model);
+
   // create view tabs
-  this.viewTabArea = scout.create('ViewTabArea', {
+  this.tabArea = scout.create('SimpleTabArea', {
     parent: this
   });
   // link
-  this.localViewTabAreaController = new scout.ViewTabAreaController(this, this.viewTabArea);
+  this.controller = new scout.SimpleTabBoxController(this, this.tabArea);
 };
 
-/**
- * @override ModelAdapter.js
- */
-scout.ViewArea.prototype._initKeyStrokeContext = function(keyStrokeContext) {
-  scout.ViewArea.parent.prototype._initKeyStrokeContext.call(this, this.keyStrokeContext);
-  //  this.keyStrokeContext.invokeAcceptInputOnActiveValueField = true;
-  //  this.keyStrokeContext.$bindTarget = this._keyStrokeBindTarget.bind(this);
-};
 
 /**
  * Returns a $container used as a bind target for the key-stroke context of the group-box.
  * By default this function returns the container of the form, or when group-box is has no
  * form as a parent the container of the group-box.
  */
-scout.ViewArea.prototype._keyStrokeBindTarget = function() {
+scout.SimpleTabBox.prototype._keyStrokeBindTarget = function() {
   return this.$container;
 };
 
-scout.ViewArea.prototype._render = function($parent) {
+scout.SimpleTabBox.prototype._render = function($parent) {
   var htmlBody, i,
     env = scout.HtmlEnvironment;
 
-  this.$container = $parent.appendDiv('view-box');
+  this.$container = $parent.appendDiv('view-tab-box');
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
   this.htmlComp.validateRoot = true;
-  this.htmlComp.setLayout(new scout.ViewAreaLayout(this));
-  // render viewTabArea
-  this._renderviewTabArea();
+  this.htmlComp.setLayout(new scout.SimpleTabBoxLayout(this));
+
   // render content
   this.$viewContent = this.$container.appendDiv('tab-content');
   this.viewContent = new scout.HtmlComponent(this.$viewContent, this.session);
 
+};
+
+scout.SimpleTabBox.prototype._renderProperties = function() {
+  scout.SimpleTabBox.parent.prototype._renderProperties.call(this);
+  // render tabArea
+  this._renderTabArea();
   this._renderView(this.currentView);
+
 };
 
-scout.ViewArea.prototype._renderviewTabArea = function() {
-  this.viewTabArea.render(this.$container);
-  this.$viewTabArea = this.viewTabArea.$container;
+scout.SimpleTabBox.prototype._renderTabArea = function() {
+  this.tabArea.render(this.$container);
+  this.$tabArea = this.tabArea.$container;
+  if (this.tabArea.attached) {
+    this.$tabArea.insertBefore(this.$viewContent);
+  }
 };
 
-scout.ViewArea.prototype._renderView = function(view) {
+scout.SimpleTabBox.prototype._renderView = function(view) {
   if (!view) {
     return;
   }
@@ -100,29 +91,22 @@ scout.ViewArea.prototype._renderView = function(view) {
   view.validateRoot = true;
 };
 
-scout.ViewArea.prototype.postRender = function() {
+scout.SimpleTabBox.prototype.postRender = function() {
   if(this.viewStack.length > 0 && !this.currentView){
     this.activateView(this.viewStack[this.viewStack.length -1]);
   }
 };
 
-scout.ViewArea.prototype._remove = function() {
-  scout.ViewArea.parent.prototype._remove.call(this);
+scout.SimpleTabBox.prototype._remove = function() {
+  scout.SimpleTabBox.parent.prototype._remove.call(this);
   if (this.scrollable) {
     scout.scrollbars.uninstall(this.$body);
   }
 };
 
-scout.ViewArea.prototype._renderProperties = function() {
-  scout.ViewArea.parent.prototype._renderProperties.call(this);
 
-  //  this._renderBorderVisible();
-  //  this._renderExpandable();
-  //  this._renderExpanded();
-  //  this._renderMenuBarVisible();
-};
 
-scout.ViewArea.prototype.activateView = function(view) {
+scout.SimpleTabBox.prototype.activateView = function(view) {
   if (view === this.currentView) {
     return;
   }
@@ -155,7 +139,7 @@ scout.ViewArea.prototype.activateView = function(view) {
   }
 };
 
-scout.ViewArea.prototype.addView = function(view, activate) {
+scout.SimpleTabBox.prototype.addView = function(view, activate) {
   activate = scout.nvl(activate, true);
   // add to view stack
   var siblingView = this._addToViewStack(view);
@@ -174,14 +158,14 @@ scout.ViewArea.prototype.addView = function(view, activate) {
  * @param view
  * @return the view which is gonna be the sibling to insert the new view tab after.
  */
-scout.ViewArea.prototype._addToViewStack = function(view) {
+scout.SimpleTabBox.prototype._addToViewStack = function(view) {
   var sibling;
   var index = this.viewStack.indexOf(view);
   if(index > -1){
     return this.viewStack[index-1];
   }
 
-  if (!scout.ViewTabAreaController.hasViewTab(view)) {
+  if (!scout.SimpleTabBoxController.hasViewTab(view)) {
     // first
     this.viewStack.unshift(view);
     return sibling;
@@ -199,7 +183,7 @@ scout.ViewArea.prototype._addToViewStack = function(view) {
   return sibling;
 };
 
-scout.ViewArea.prototype.removeView = function(view, showSiblingView) {
+scout.SimpleTabBox.prototype.removeView = function(view, showSiblingView) {
 
   if (!view) {
     return;
@@ -232,21 +216,21 @@ scout.ViewArea.prototype.removeView = function(view, showSiblingView) {
     }
   }
 };
-scout.ViewArea.prototype.getController = function() {
-  return this.localViewTabAreaController;
+scout.SimpleTabBox.prototype.getController = function() {
+  return this.controller;
 };
 
 
-scout.ViewArea.prototype.viewCount = function() {
+scout.SimpleTabBox.prototype.viewCount = function() {
   return this.viewStack.length;
 };
 
-scout.ViewArea.prototype.hasViews = function() {
+scout.SimpleTabBox.prototype.hasViews = function() {
   return this.viewStack.length > 0;
 };
 
 
-scout.ViewArea.prototype.getViews = function(displayViewId) {
+scout.SimpleTabBox.prototype.getViews = function(displayViewId) {
   return this.viewStack.filter(function(view) {
     if (!displayViewId) {
       return true;

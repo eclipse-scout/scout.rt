@@ -8,28 +8,28 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-scout.ViewTabAreaLayout = function(viewTabs) {
-  scout.ViewTabAreaLayout.parent.call(this);
+scout.SimpleTabAreaLayout = function(tabArea) {
+  scout.SimpleTabAreaLayout.parent.call(this);
 
-  this.viewTabs = viewTabs;
+  this.tabArea = tabArea;
   this._$overflowTab;
   this._overflowTabsIndizes = [];
 };
-scout.inherits(scout.ViewTabAreaLayout, scout.AbstractLayout);
+scout.inherits(scout.SimpleTabAreaLayout, scout.AbstractLayout);
 
-scout.ViewTabAreaLayout.TAB_WIDTH_LARGE = 220;
-scout.ViewTabAreaLayout.TAB_WIDTH_SMALL = 130;
-scout.ViewTabAreaLayout.OVERFLOW_MENU_WIDTH = 30;
+scout.SimpleTabAreaLayout.TAB_WIDTH_LARGE = 220;
+scout.SimpleTabAreaLayout.TAB_WIDTH_SMALL = 130;
+scout.SimpleTabAreaLayout.OVERFLOW_MENU_WIDTH = 30;
 
 /**
  * @override AbstractLayout.js
  */
-scout.ViewTabAreaLayout.prototype.layout = function($container) {
+scout.SimpleTabAreaLayout.prototype.layout = function($container) {
   var tabWidth,
-    htmlContainer = this.viewTabs.htmlComp,
+    htmlContainer = this.tabArea.htmlComp,
     containerSize = htmlContainer.getSize(),
     $tabs = htmlContainer.$comp.find('.desktop-view-tab'),
-    numTabs = this.viewTabs.getViewTabs().length,
+    numTabs = this.tabArea.getTabs().length,
     smallPrefSize = this.smallPrefSize();
 
   containerSize = containerSize.subtract(htmlContainer.getInsets());
@@ -44,7 +44,7 @@ scout.ViewTabAreaLayout.prototype.layout = function($container) {
 
   // All tabs in container
   if (smallPrefSize.width <= containerSize.width) {
-    tabWidth = Math.min(scout.ViewTabAreaLayout.TAB_WIDTH_LARGE, Math.floor(containerSize.width / numTabs));
+    tabWidth = Math.min(scout.SimpleTabAreaLayout.TAB_WIDTH_LARGE, Math.floor(containerSize.width / numTabs));
     // 2nd - all Tabs fit when they have small size
     $tabs.each(function() {
       $(this).outerWidth(tabWidth);
@@ -53,10 +53,10 @@ scout.ViewTabAreaLayout.prototype.layout = function($container) {
   }
 
   // Not all tabs fit in container -> put tabs into overflow menu
-  containerSize.width -= scout.ViewTabAreaLayout.OVERFLOW_MENU_WIDTH;
+  containerSize.width -= scout.SimpleTabAreaLayout.OVERFLOW_MENU_WIDTH;
 
   // check how many tabs fit into remaining containerSize.width
-  var numVisibleTabs = Math.floor(containerSize.width / scout.ViewTabAreaLayout.TAB_WIDTH_SMALL),
+  var numVisibleTabs = Math.floor(containerSize.width / scout.SimpleTabAreaLayout.TAB_WIDTH_SMALL),
     numOverflowTabs = numTabs - numVisibleTabs;
 
   var i = 0,
@@ -89,7 +89,7 @@ scout.ViewTabAreaLayout.prototype.layout = function($container) {
   }
 
   var that = this;
-  tabWidth = scout.ViewTabAreaLayout.TAB_WIDTH_SMALL;
+  tabWidth = scout.SimpleTabAreaLayout.TAB_WIDTH_SMALL;
   i = 0;
   $tabs.each(function() {
     if (i >= leftEnd && i <= rightEnd) {
@@ -102,19 +102,19 @@ scout.ViewTabAreaLayout.prototype.layout = function($container) {
   });
 };
 
-scout.ViewTabAreaLayout.prototype.smallPrefSize = function() {
-  var numTabs = this.viewTabs.getViewTabs().length;
-  return new scout.Dimension(numTabs * scout.ViewTabAreaLayout.TAB_WIDTH_SMALL, this.viewTabs.htmlComp.$comp.outerHeight(true));
+scout.SimpleTabAreaLayout.prototype.smallPrefSize = function() {
+  var numTabs = this.tabArea.getTabs().length;
+  return new scout.Dimension(numTabs * scout.SimpleTabAreaLayout.TAB_WIDTH_SMALL, this.tabArea.htmlComp.$comp.outerHeight(true));
 };
 
-scout.ViewTabAreaLayout.prototype.preferredLayoutSize = function($container) {
-  var numTabs = this.viewTabs.getViewTabs().length;
-  return new scout.Dimension(numTabs *  scout.ViewTabAreaLayout.TAB_WIDTH_LARGE, scout.graphics.prefSize(this.viewTabs.htmlComp.$comp, true,true).height);
+scout.SimpleTabAreaLayout.prototype.preferredLayoutSize = function($container) {
+  var numTabs = this.tabArea.getTabs().length;
+  return new scout.Dimension(numTabs *  scout.SimpleTabAreaLayout.TAB_WIDTH_LARGE, scout.graphics.prefSize(this.tabArea.htmlComp.$comp, true,true).height);
 };
 
-scout.ViewTabAreaLayout.prototype._onMouseDownOverflow = function(event) {
+scout.SimpleTabAreaLayout.prototype._onMouseDownOverflow = function(event) {
   var menu, tab, popup,
-    viewTabs = this.viewTabs,
+    tabArea = this.tabArea,
     overflowMenus = [];
 
   this._overflowTabsIndizes.forEach(function(i) {
@@ -122,23 +122,23 @@ scout.ViewTabAreaLayout.prototype._onMouseDownOverflow = function(event) {
     // - 1. menu schliesst nicht
     // - 2. manchmal verschwindet ein (noch offener) Tab - wenn nur einer sichtbar ist
     // - 3. add selenium tests
-    tab = this.viewTabs.getViewTabs()[i];
+    tab = this.tabArea.getTabs()[i];
     menu = scout.create('Menu', {
-      parent: this.viewTabs,
+      parent: this.tabArea,
       text: tab.getMenuText(),
       tab: tab
     });
     menu.remoteHandler = function(event) {
       if ('doAction' === event.type) {
-        $.log.debug('(ViewTabAreaLayout#_onMouseDownOverflow) tab=' + this);
-        viewTabs.selectViewTab(this);
+        $.log.debug('(SimpleTabAreaLayout#_onMouseDownOverflow) tab=' + this);
+        tabArea.selectTab(this);
       }
     }.bind(tab);
     overflowMenus.push(menu);
   }, this);
 
   popup = scout.create('ContextMenuPopup', {
-    parent: this.viewTabs,
+    parent: this.tabArea,
     menuItems: overflowMenus,
     cloneMenuItems: false,
     location: {

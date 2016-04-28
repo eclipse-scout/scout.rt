@@ -10,21 +10,65 @@
  ******************************************************************************/
 scout.DesktopBench = function() {
   scout.DesktopBench.parent.call(this);
+  this.htmlComp;
+  this.VIEW_AREA_COLUMN_INDEX = {
+    LEFT: 0,
+    CENTER: 1,
+    RIGHT: 2
+  };
+  this.columns = [];
+  this.components;
+  this.tabBoxMap = {}; // [key=viewId, value=SimpleTabBox instance]
   this._desktopOutlineChangedHandler = this._onDesktopOutlineChanged.bind(this);
   this._desktopPropertyChangeHandler = this._onDesktopPropertyChange.bind(this);
   this._outlineNodesSelectedHandler = this._onOutlineNodesSelected.bind(this);
   this._outlinePageChangedHandler = this._onOutlinePageChanged.bind(this);
   this._outlinePropertyChangeHandler = this._onOutlinePropertyChange.bind(this);
+
+  // event listener functions
+  this._viewAddedHandler = this._onViewAdded.bind(this);
+  this._viewRemovedHandler = this._onViewRemoved.bind(this);
+  this._viewActivatedHandler = this._onViewActivated.bind(this);
+  this._viewDeactivatedHandler = this._onViewDeactivated.bind(this);
+
   this._desktopAnimationEndHandler = this._onDesktopAnimationEnd.bind(this);
+
   this._addEventSupport();
 };
 scout.inherits(scout.DesktopBench, scout.Widget);
 
+scout.DesktopBench.VIEW_MIN_HEIGHT; // Configured in sizes.css
+scout.DesktopBench.VIEW_MIN_WIDTH; // Configured in sizes.css
+
 scout.DesktopBench.prototype._init = function(model) {
   scout.DesktopBench.parent.prototype._init.call(this, model);
+
+  scout.DesktopBench.VIEW_MIN_HEIGHT = $.pxToNumber(scout.styles.get('view-tab-box', 'min-height').minHeight);
+  scout.DesktopBench.VIEW_MIN_WIDTH = $.pxToNumber(scout.styles.get('view-tab-box', 'min-width').minWidth);
+
+  this._createColumns();
   this.desktop = this.session.desktop;
+  this.headerTabArea = model.headerTabArea;
+  // controller for headerTabArea
+  if (this.headerTabArea) {
+    this.headerTabAreaController = new scout.HeaderTabBoxController(this, this.headerTabArea);
+  }
   this.outlineContentVisible = scout.nvl(model.outlineContentVisible, true);
+  this.setOutline(this.desktop.outline);
   this.updateNavigationHandleVisibility();
+};
+
+scout.DesktopBench.prototype._createColumns = function() {
+  for (var i = 0; i < 3; i++) {
+    var column = scout.create('BenchColumn', {
+      parent: this
+    });
+    column.on('viewAdded', this._viewAddedHandler);
+    column.on('viewRemoved', this._viewRemovedHandler);
+    column.on('viewActivated', this._viewActivatedHandler);
+    column.on('viewDeactivated', this._viewDeactivatedHandler);
+    this.columns.push(column);
+  }
 };
 
 scout.DesktopBench.prototype._initKeyStrokeContext = function(keyStrokeContext) {
@@ -41,9 +85,11 @@ scout.DesktopBench.prototype._initKeyStrokeContext = function(keyStrokeContext) 
 scout.DesktopBench.prototype._render = function($parent) {
   this.$container = $parent.appendDiv('desktop-bench');
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
+
   this.htmlComp.setLayout(new scout.DesktopBenchLayout(this));
-  this.setOutline(this.desktop.outline); //TODO CGU maybe better create destroy(), call setOutline in init and attach outline listener in init/destroy
-  this._renderOrAttachOutlineContent();
+
+  this._renderColumns();
+  this._revalidateSplitters();
   this._renderNavigationHandleVisible();
 
   this.session.keyStrokeManager.installKeyStrokeContext(this.desktopKeyStrokeContext);
@@ -52,23 +98,31 @@ scout.DesktopBench.prototype._render = function($parent) {
   this.desktop.on('animationEnd', this._desktopAnimationEndHandler);
 };
 
+scout.DesktopBench.prototype._renderColumns = function() {
+  this.columns.forEach(function(column) {
+    if (column.viewCount() > 0) {
+      this._renderColumn(column);
+
+    }
+  }.bind(this));
+};
+
+scout.DesktopBench.prototype._renderColumn = function(column) {
+  if (!column || column.rendered) {
+    return;
+  }
+
+  column.render(this.$container);
+};
+
 scout.DesktopBench.prototype._remove = function() {
+
   this.desktop.off('propertyChange', this._desktopPropertyChangeHandler);
   this.desktop.off('outlineChanged', this._desktopOutlineChangedHandler);
   this.desktop.off('animationEnd', this._desktopAnimationEndHandler);
   this.session.keyStrokeManager.uninstallKeyStrokeContext(this.desktopKeyStrokeContext);
   scout.DesktopBench.parent.prototype._remove.call(this);
-};
 
-scout.DesktopBench.prototype._renderOrAttachOutlineContent = function() {
-  if (!this.outlineContent || this.desktop.inBackground) {
-    return;
-  }
-  if (!this.outlineContent.rendered) {
-    this._renderOutlineContent();
-  } else if (!this.outlineContent.attached) {
-    this.outlineContent.attach();
-  }
 };
 
 scout.DesktopBench.prototype._renderOutlineContent = function() {
@@ -76,19 +130,9 @@ scout.DesktopBench.prototype._renderOutlineContent = function() {
     return;
   }
 
-  if (this.outlineContent instanceof scout.Table) {
-    this.outlineContent.menuBar.top();
-    this.outlineContent.menuBar.large();
-  }
-  this.outlineContent.render(this.$container);
-  this.outlineContent.htmlComp.validateRoot = true;
-  this.outlineContent.setParent(this);
-  this.outlineContent.invalidateLayoutTree(false);
+  this.addView(this.outlineContent);
 
-  // Layout immediate to prevent 'laggy' form visualization,
-  // but not initially while desktop gets rendered because it will be done at the end anyway
   if (this.desktop.rendered) {
-    this.outlineContent.validateLayoutTree();
 
     // Request focus on first element in outline content
     this.session.focusManager.validateFocus();
@@ -105,7 +149,8 @@ scout.DesktopBench.prototype._removeOutlineContent = function() {
   if (this.outlineContent instanceof scout.Table) {
     this.outlineContent.storeScrollPosition();
   }
-  this.outlineContent.remove();
+  this.removeView(this.outlineContent, false);
+
 };
 
 scout.DesktopBench.prototype._renderNavigationHandle = function() {
@@ -135,6 +180,15 @@ scout.DesktopBench.prototype._renderNavigationHandleVisible = function() {
   } else {
     this._removeNavigationHandle();
   }
+};
+
+/**
+ * is called in post render of desktop used to initialize the ui state. E.g. show default views
+ */
+scout.DesktopBench.prototype.postRender = function() {
+  this.columns.forEach(function(column) {
+    column.postRender();
+  });
 };
 
 scout.DesktopBench.prototype.setNavigationHandleVisible = function(visible) {
@@ -167,8 +221,15 @@ scout.DesktopBench.prototype.setOutlineContent = function(content) {
   if (this.outlineContent === content) {
     return;
   }
+
   if (this.rendered) {
     this._removeOutlineContent();
+  }
+  // reset view tab relevant properties.
+  if (content) {
+    delete content.title;
+    delete content.subTitle;
+    delete content.iconId;
   }
   this._setProperty('outlineContent', content);
   // Inform header that outline content has changed
@@ -176,8 +237,20 @@ scout.DesktopBench.prototype.setOutlineContent = function(content) {
   if (this.desktop.header) {
     this.desktop.header.onBenchOutlineContentChange(content, oldContent);
   }
-  if (this.rendered) {
-    this._renderOrAttachOutlineContent();
+  this._showOutlineContent();
+};
+
+scout.DesktopBench.prototype._showOutlineContent = function() {
+  if (this.outlineContent) {
+    this.addView(this.outlineContent);
+
+    if (this.desktop.rendered) {
+      // Request focus on first element in outline content
+      this.session.focusManager.validateFocus();
+    }
+    if (this.outlineContent instanceof scout.Table) {
+      this.outlineContent.restoreScrollPosition();
+    }
   }
 };
 
@@ -190,24 +263,25 @@ scout.DesktopBench.prototype.setOutlineContentVisible = function(visible) {
 };
 
 scout.DesktopBench.prototype.bringToFront = function() {
-  this._renderOrAttachOutlineContent();
+  if (!this.outlineContent) {
+    return;
+  }
+  this._showOutlineContent();
 };
 
 scout.DesktopBench.prototype.sendToBack = function() {
-  if (this.outlineContent) {
-    this.outlineContent.detach();
-  }
+
 };
 
-scout.DesktopBench.prototype._showDefaultDetailForm = function() {
-  this.setOutlineContent(this.outline.defaultDetailForm, true);
+scout.DesktopBench.prototype._computeDefaultDetailForm = function() {
+  return this.outline.defaultDetailForm;
 };
 
-scout.DesktopBench.prototype._showOutlineOverview = function() {
-  this.setOutlineContent(this.outline.outlineOverview, true);
+scout.DesktopBench.prototype._computeOutlineOverview = function() {
+  return this.outline.outlineOverview;
 };
 
-scout.DesktopBench.prototype._showDetailContentForPage = function(node) {
+scout.DesktopBench.prototype._computeDetailContentForPage = function(node) {
   if (!node) {
     throw new Error('called _showDetailContentForPage without node');
   }
@@ -217,28 +291,40 @@ scout.DesktopBench.prototype._showDetailContentForPage = function(node) {
     content = node.detailForm;
   } else if (node.detailTable && node.detailTableVisible) {
     content = node.detailTable;
+    // add ui css class
+    content.uiCssClasses = ['desktop-table'];
   }
 
-  this.setOutlineContent(content);
+  return content;
+
 };
 
 scout.DesktopBench.prototype.updateOutlineContent = function() {
   if (!this.outlineContentVisible || !this.outline) {
-    this.setOutlineContent(null);
     return;
   }
+  var content;
   var selectedPages = this.outline.selectedNodes;
   if (selectedPages.length === 0) {
     if (this.outline.defaultDetailForm) {
-      this._showDefaultDetailForm();
+      content = this._computeDefaultDetailForm();
     } else if (this.outline.outlineOverview) {
-      this._showOutlineOverview();
+      content = this._computeOutlineOverview();
     }
   } else {
     // Outline does not support multi selection -> [0]
     var selectedPage = selectedPages[0];
-    this._showDetailContentForPage(selectedPage);
+    content = this._computeDetailContentForPage(selectedPage);
+
   }
+  if (content) {
+    if (content instanceof scout.Table) {
+      content.menuBar.top();
+      content.menuBar.large();
+    }
+    content.displayViewId = 'C';
+  }
+  this.setOutlineContent(content);
 };
 
 scout.DesktopBench.prototype.updateOutlineContentDebounced = function() {
@@ -308,4 +394,227 @@ scout.DesktopBench.prototype._onDesktopPropertyChange = function(event) {
 
 scout.DesktopBench.prototype._onNavigationHandleAction = function(event) {
   this.desktop.enlargeNavigation();
+};
+
+scout.DesktopBench.prototype._revalidateSplitters = function() {
+  // remove old splitters
+  if (this.components) {
+    this.components.forEach(function(comp) {
+      if (comp instanceof scout.Splitter) {
+        comp.remove();
+      }
+    });
+  }
+  var splitterParent = this;
+  this.components = this.columns.filter(function(column) {
+    return column.hasViews();
+  }).reduce(function(arr, col) {
+    if (arr.length > 0) {
+      // add sep
+      var splitter = scout.create('Splitter', {
+        parent: splitterParent,
+        $anchor: arr[arr.length - 1].$container,
+        $root: splitterParent.$container,
+        maxRatio: 1
+      });
+      splitter.render(splitterParent.$container);
+      splitter.$container.addClass('line');
+      splitter.on('move', splitterParent._onSplitterMove.bind(splitterParent));
+      splitter.on('positionChanged', splitterParent._onSplitterPositionChanged.bind(splitterParent));
+      arr.push(splitter);
+    }
+    arr.push(col);
+    return arr;
+  }, []);
+  // well order the dom elements (reduce is used for simple code reasons, the result of reduce is not of interest).
+  this.components.filter(function(comp) {
+      return comp instanceof scout.BenchColumn;
+    })
+    .reduce(function(c1, c2, index) {
+      if (index > 0) {
+        c2.$container.insertAfter(c1.$container);
+      }
+      return c2;
+    }, undefined);
+
+
+};
+
+scout.DesktopBench.prototype._onSplitterMove = function(event) {
+  var splitterIndex = this.components.indexOf(event.source);
+  if (splitterIndex > 0 /*cannot be 0 since first element is a BenchColumn*/ ) {
+    var $before = this.components[splitterIndex - 1].$container,
+      $after = this.components[splitterIndex + 1].$container,
+      diff = event.position - event.source.position;
+
+    if (($before.width() + diff) < scout.DesktopBench.VIEW_MIN_WIDTH) {
+      // set to min
+      event.setPosition($before.position().left + scout.DesktopBench.VIEW_MIN_WIDTH);
+    }
+    if (($after.position().left + $after.width() - event.position) < scout.DesktopBench.VIEW_MIN_WIDTH) {
+      event.setPosition($after.position().left + $after.width() - scout.DesktopBench.VIEW_MIN_WIDTH);
+    }
+  }
+};
+scout.DesktopBench.prototype._onSplitterPositionChanged = function(event) {
+  this.revalidateLayout();
+};
+
+scout.DesktopBench.prototype._onViewAdded = function(event) {
+  this.trigger('viewAdded', {
+    view: event.view
+  });
+};
+
+scout.DesktopBench.prototype._onViewRemoved = function(event) {
+  this.trigger('viewRemoved', {
+    view: event.view
+  });
+};
+
+scout.DesktopBench.prototype._onViewActivated = function(event) {
+  var view = event.view;
+  if (this.outlineContent === view) {
+    this.desktop.bringOutlineToFront(this.desktop.outline);
+  }
+  this.trigger('viewActivated', {
+    view: view
+  });
+};
+
+scout.DesktopBench.prototype._onViewDeactivated = function(event) {
+  if (this.outlineContent === event.view) {
+    this.desktop.sendOutlineToBack();
+  }
+  this.trigger('viewDeactivated', {
+    view: event.view
+  });
+};
+
+scout.DesktopBench.prototype.addView = function(view, activate) {
+  // normalize displayViewId
+  switch (view.displayViewId) {
+    case 'NW':
+    case 'W':
+    case 'SW':
+    case 'N':
+    case 'C':
+    case 'S':
+    case 'NE':
+    case 'E':
+    case 'SE':
+      break;
+    default:
+      // map all other displayViewIds to center
+      view.displayViewId = 'C';
+      break;
+  }
+  var column = this._getColumn(view.displayViewId);
+  this.tabBoxMap[view.id] = column;
+  column.addView(view, activate);
+
+  if (this.rendered) {
+    if (column.viewCount() === 1) {
+      this._renderColumn(column);
+      this._revalidateSplitters();
+      this.htmlComp.invalidateLayoutTree();
+      // Layout immediate to prevent 'laggy' form visualization,
+      // but not initially while desktop gets rendered because it will be done at the end anyway
+      this.htmlComp.validateLayoutTree();
+    }
+  }
+};
+
+scout.DesktopBench.prototype.activateView = function(view) {
+  var column = this._getColumn(view.displayViewId);
+  if (column) {
+    column.activateView(view);
+  }
+};
+
+scout.DesktopBench.prototype._getColumn = function(displayViewId) {
+  var column;
+
+  switch (displayViewId) {
+    case 'NW':
+    case 'W':
+    case 'SW':
+      column = this.columns[this.VIEW_AREA_COLUMN_INDEX.LEFT];
+      break;
+    case 'NE':
+    case 'E':
+    case 'SE':
+      column = this.columns[this.VIEW_AREA_COLUMN_INDEX.RIGHT];
+      break;
+    default:
+      column = this.columns[this.VIEW_AREA_COLUMN_INDEX.CENTER];
+      break;
+  }
+  return column;
+};
+scout.DesktopBench.prototype.removeView = function(view, showSiblingView) {
+  var column = this.tabBoxMap[view.id];
+  if (column) {
+    column.removeView(view, showSiblingView);
+    delete this.tabBoxMap[view.id];
+    // remove if empty
+    if (this.rendered && column.viewCount() === 0) {
+      column.remove();
+      this._revalidateSplitters(true);
+      this.htmlComp.invalidateLayoutTree();
+      // Layout immediate to prevent 'laggy' form visualization,
+      // but not initially while desktop gets rendered because it will be done at the end anyway
+      this.htmlComp.validateLayoutTree();
+    }
+  }
+};
+
+scout.DesktopBench.prototype.getComponents = function() {
+  return this.components;
+};
+
+scout.DesktopBench.prototype.getTabBox = function(displayViewId) {
+  var viewColumn = this._getColumn(displayViewId);
+  if (!viewColumn) {
+    return;
+  }
+  return viewColumn.getTabBox(displayViewId);
+};
+
+scout.DesktopBench.prototype.getViews = function(displayViewId) {
+  return this.columns.reduce(function(arr, column) {
+    Array.prototype.push.apply(arr, column.getViews(displayViewId));
+    return arr;
+  }, []);
+};
+
+scout.DesktopBench.prototype.getViewTab = function(view) {
+  var viewTab;
+  this.getTabs().some(function (vt){
+    if(vt.view === view){
+      viewTab = vt;
+      return true;
+    }
+    return false;
+  });
+  return viewTab;
+};
+
+scout.DesktopBench.prototype.getTabs = function() {
+  var tabs = [];
+  // consider right order
+  tabs = tabs.concat(this.getTabBox('NW').getController().getTabs());
+  tabs = tabs.concat(this.getTabBox('W').getController().getTabs());
+  tabs = tabs.concat(this.getTabBox('SW').getController().getTabs());
+  tabs = tabs.concat(this.getTabBox('N').getController().getTabs());
+  if (this.headerTabAreaController) {
+    tabs = tabs.concat(this.headerTabAreaController.getTabs());
+  } else {
+    tabs = tabs.concat(this.getTabBox('C').getController().getTabs());
+  }
+  tabs = tabs.concat(this.getTabBox('S').getController().getTabs());
+  tabs = tabs.concat(this.getTabBox('NE').getController().getTabs());
+  tabs = tabs.concat(this.getTabBox('E').getController().getTabs());
+  tabs = tabs.concat(this.getTabBox('SE').getController().getTabs());
+  return tabs;
 };

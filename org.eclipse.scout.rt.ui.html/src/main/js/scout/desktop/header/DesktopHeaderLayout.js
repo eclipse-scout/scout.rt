@@ -25,9 +25,9 @@ scout.DesktopHeaderLayout.prototype.layout = function($container) {
     containerSize = htmlContainer.getSize(),
     toolBox = this.header.toolBox,
     viewButtonBox = this.header.viewButtonBox,
-    viewTabBox = this.header.viewTabBox,
-    smallTabsPrefSize = viewTabBox.htmlComp.layout.smallPrefSize(),
-    tabsPrefSize = viewTabBox.htmlComp.getPreferredSize(),
+    tabArea = this.header.tabArea,
+    smallTabsPrefSize = tabArea.htmlComp.layout.smallPrefSize(),
+    tabsPrefSize = tabArea.htmlComp.getPreferredSize(),
     tabsWidth = 0,
     logoWidth = 0,
     viewButtonBoxWidth = 0,
@@ -44,7 +44,7 @@ scout.DesktopHeaderLayout.prototype.layout = function($container) {
     viewButtonBoxWidth = viewButtonBoxPrefSize.width;
     viewButtonBox.htmlComp.setSize(viewButtonBoxPrefSize.subtract(viewButtonBox.htmlComp.getMargins()));
   }
-  viewTabBox.htmlComp.$comp.cssLeft(viewButtonBoxWidth);
+  tabArea.htmlComp.$comp.cssLeft(viewButtonBoxWidth);
 
   if (toolBox) {
     toolBoxPrefSize = toolBox.htmlComp.getPreferredSize();
@@ -57,7 +57,7 @@ scout.DesktopHeaderLayout.prototype.layout = function($container) {
   if (smallTabsPrefSize.width <= tabsWidth) {
     // All tabs fit when they have small size -> use available size but max the pref size -> prefSize = size of maximumtabs if tabs use their large (max) size
     tabsWidth = Math.min(tabsPrefSize.width, tabsWidth);
-    viewTabBox.htmlComp.setSize(new scout.Dimension(tabsWidth, tabsPrefSize.height));
+    tabArea.htmlComp.setSize(new scout.Dimension(tabsWidth, tabsPrefSize.height));
     return;
   }
 
@@ -71,7 +71,7 @@ scout.DesktopHeaderLayout.prototype.layout = function($container) {
 
   tabsWidth = calcTabsWidth();
   if (smallTabsPrefSize.width <= tabsWidth) {
-      viewTabBox.htmlComp.setSize(smallTabsPrefSize);
+      tabArea.htmlComp.setSize(smallTabsPrefSize);
     setTabsSize();
     return;
   }
@@ -85,11 +85,11 @@ scout.DesktopHeaderLayout.prototype.layout = function($container) {
   }
 
   tabsWidth = calcTabsWidth();
-  tabsWidth = Math.max(Math.min(smallTabsPrefSize.width, tabsWidth), scout.ViewTabAreaLayout.OVERFLOW_MENU_WIDTH);
+  tabsWidth = Math.max(Math.min(smallTabsPrefSize.width, tabsWidth), scout.SimpleTabAreaLayout.OVERFLOW_MENU_WIDTH);
   setTabsSize();
 
   // 3rd if only the overflow menu is shown make toolBox smaller so that ellipsis may be displayed
-  if (toolBox && tabsWidth <= scout.ViewTabAreaLayout.OVERFLOW_MENU_WIDTH) {
+  if (toolBox && tabsWidth <= scout.SimpleTabAreaLayout.OVERFLOW_MENU_WIDTH) {
     // layout toolBox, now an ellipsis menu may be shown
     toolBoxWidth = containerSize.width - tabsWidth - logoWidth - viewButtonBoxWidth;
     setToolBoxSize();
@@ -105,7 +105,7 @@ scout.DesktopHeaderLayout.prototype.layout = function($container) {
   }
 
   function setTabsSize() {
-    viewTabBox.htmlComp.setSize(new scout.Dimension(tabsWidth, tabsPrefSize.height));
+    tabArea.htmlComp.setSize(new scout.Dimension(tabsWidth, tabsPrefSize.height));
   }
 
   function setToolBoxSize() {
