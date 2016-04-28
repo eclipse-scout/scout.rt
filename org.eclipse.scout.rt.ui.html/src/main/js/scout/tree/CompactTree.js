@@ -48,7 +48,7 @@ scout.CompactTree.prototype._render = function($parent) {
  */
 scout.CompactTree.prototype._calculateCurrentViewRange = function() {
   this.viewRangeSize=this.visibleNodesFlat.length;
-  return new scout.Range(0, this.visibleNodesFlat.length-1);
+  return new scout.Range(0, Math.max(this.visibleNodesFlat.length-1, 0));
 };
 
 /**
