@@ -30,7 +30,6 @@ scout.SimpleTabBoxController = function(tabBox, tabArea) {
 
   this._installListeners();
 
-  // TODO add initial tabs
 };
 
 scout.SimpleTabBoxController.prototype._installListeners = function() {

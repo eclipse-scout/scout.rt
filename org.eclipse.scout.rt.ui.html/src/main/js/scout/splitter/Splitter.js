@@ -139,7 +139,7 @@ scout.Splitter.prototype._onMouseMove = function(event) {
     preventDefault: function() {
       this.defaultPrevented = true;
     },
-    setPosition: function setPosition(newPosition) {
+    setPosition: function (newPosition) {
       this.position = newPosition;
     }
 

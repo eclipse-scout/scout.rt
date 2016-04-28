@@ -64,9 +64,7 @@ scout.DesktopBenchLayout.prototype._layoutByRatio = function(components, contain
 scout.DesktopBenchLayout.prototype._layoutBySplitterPosition = function(components, containerSize) {
   var x = 0;
   components.forEach(function(comp, index) {
-    if (comp instanceof scout.Splitter) {
-      //      comp.updatePosition(x);
-    } else {
+    if (!(comp instanceof scout.Splitter)) {
       var bounds = new scout.Rectangle(x, 0, 0, containerSize.height);
       if ((components.length - 1) > index) {
         bounds.width = components[index + 1].position - x;

@@ -29,7 +29,7 @@ scout.styles = {
         name: prop,
         // replace property names like 'max-width' in 'maxWidth'
         nameCamelCase: prop.replace(/\-(.)/g,
-          function a(match, p1) {
+          function(match, p1) {
             return p1.toUpperCase();
           })
       };
