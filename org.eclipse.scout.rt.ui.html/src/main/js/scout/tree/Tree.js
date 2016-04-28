@@ -290,7 +290,6 @@ scout.Tree.prototype._render = function($parent) {
   this.menuBar.render(this.$container);
   this._updateNodeDimensions();
   this._renderViewport();
-  this.invalidateLayoutTree();
   this.isRendering = false;
 };
 
@@ -500,8 +499,13 @@ scout.Tree.prototype._renderViewRange = function(viewRange) {
   if (!this.viewRangeDirty) {
     var rangesToRender = viewRange.subtract(this.viewRangeRendered);
     var rangesToRemove = this.viewRangeRendered.subtract(viewRange);
+    var maxRange = new scout.Range(0, this.visibleNodesFlat.length);
+
     rangesToRemove.forEach(function(range) {
       this._removeNodesInRange(range);
+      if(maxRange.to<range.to){
+        this.viewRangeRendered = viewRange;
+      }
     }.bind(this));
     rangesToRender.forEach(function(range) {
       this._renderNodesInRange(range);
@@ -1804,7 +1808,6 @@ scout.Tree.prototype.insertNodes = function(nodes, parentNode) {
     this._visitNodes(nodes, this._initTreeNode.bind(this), parentNode);
   }
   if (this.rendered) {
-    this._renderViewport();
     this.invalidateLayoutTree();
   }
   this.trigger('nodesInserted', {
