@@ -442,7 +442,7 @@ scout.Planner.prototype._renderScale = function() {
       if ((loop.getDate() < 8) || first === true) {
         if ((loop.getMonth() === 0) || first === true) {
           if (loop.getDate() > 11) {
-            $divLarge = $timelineLarge.appendDiv('scale-item', '&nbsp').data('count', 0);
+            $divLarge = $timelineLarge.appendDiv('scale-item').html('&nbsp;').data('count', 0);
             first = 2;
           } else {
             $divLarge = $timelineLarge.appendDiv('scale-item', this._dateFormat(loop, 'MMMM yyyy')).data('count', 0);
