@@ -45,12 +45,24 @@ public abstract class AbstractProposalField<LOOKUP_KEY> extends AbstractContentA
   @Override
   protected void initConfig() {
     super.initConfig();
+    setAutoCloseChooser(getConfiguredAutoCloseChooser());
     m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(new ContentAssistFieldUIFacade<LOOKUP_KEY>(this), ModelContext.copyCurrent());
   }
 
   @Override
   public IContentAssistFieldUIFacade getUIFacade() {
     return m_uiFacade;
+  }
+
+  /**
+   * Configures whether the proposal chooser should automatically be closed when there are no proposals available.
+   * <p>
+   * Subclasses can override this method. Default is true.
+   *
+   * @since 6.0
+   */
+  protected boolean getConfiguredAutoCloseChooser() {
+    return true;
   }
 
   @Override
@@ -60,6 +72,16 @@ public abstract class AbstractProposalField<LOOKUP_KEY> extends AbstractContentA
   @Override
   public LOOKUP_KEY getValueAsLookupKey() {
     return null;
+  }
+
+  @Override
+  public void setAutoCloseChooser(boolean autoCloseChooser) {
+    propertySupport.setProperty(PROP_AUTO_CLOSE_CHOOSER, autoCloseChooser);
+  }
+
+  @Override
+  public boolean isAutoCloseChooser() {
+    return propertySupport.getPropertyBool(PROP_AUTO_CLOSE_CHOOSER);
   }
 
   @Override
@@ -163,7 +185,7 @@ public abstract class AbstractProposalField<LOOKUP_KEY> extends AbstractContentA
     }
     IProposalChooser<?, LOOKUP_KEY> proposalChooser = getProposalChooser();
     Collection<? extends ILookupRow<LOOKUP_KEY>> rows = result.getLookupRows();
-    if (rows == null || rows.isEmpty()) {
+    if (isAutoCloseChooser() && (rows == null || rows.isEmpty())) {
       unregisterProposalChooserInternal();
     }
     else {

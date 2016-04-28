@@ -14,11 +14,6 @@ public class FormExtension extends AbstractFormExtension<AbstractForm> {
   @Override
   public void execInitForm(FormInitFormChain chain) {
     super.execInitForm(chain);
-    IDeviceTransformer deviceTransformer = BEANS.get(IDeviceTransformationService.class).getDeviceTransformer();
-    if (deviceTransformer == null) {
-      return;
-    }
-
     BEANS.get(IDeviceTransformationService.class).getDeviceTransformer().transformForm(getOwner());
   }
 

@@ -19,6 +19,7 @@ public final class UserAgents {
   private IUiEngineType m_uiEngineType = UiEngineType.UNKNOWN;
   private IUiSystem m_uiSystem = UiSystem.UNKNOWN;
   private String m_uiDeviceId = "n/a";
+  private boolean m_touch = false;
 
   private UserAgents() {
   }
@@ -52,6 +53,11 @@ public final class UserAgents {
     return withDeviceId(ConfigUtility.getProperty("os.name"));
   }
 
+  public UserAgents withTouch(boolean touch) {
+    m_touch = touch;
+    return this;
+  }
+
   public static UserAgents create() {
     return new UserAgents();
   }
@@ -62,11 +68,12 @@ public final class UserAgents {
         .withUiEngineType(other.getUiEngineType())
         .withUiLayer(other.getUiLayer())
         .withUiSystem(other.getUiSystem())
-        .withDeviceId(other.getUiDeviceId());
+        .withDeviceId(other.getUiDeviceId())
+        .withTouch(other.isTouch());
   }
 
   public UserAgent build() {
-    return new UserAgent(m_uiLayer, m_uiDeviceType, m_uiEngineType, m_uiSystem, m_uiDeviceId);
+    return new UserAgent(m_uiLayer, m_uiDeviceType, m_uiEngineType, m_uiSystem, m_uiDeviceId, m_touch);
   }
 
   public static UserAgent createDefault() {

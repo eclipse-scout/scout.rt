@@ -35,7 +35,7 @@ public final class UserAgentUtility {
   }
 
   public static boolean isTouchDevice() {
-    return getCurrentUiDeviceType().isTouchDevice();
+    return getCurrentUserAgent().isTouch();
   }
 
   public static IUiDeviceType getCurrentUiDeviceType() {

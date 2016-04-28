@@ -10,18 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.mobile.transformation;
 
-import java.lang.ref.WeakReference;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.WeakHashMap;
 
-import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
-import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.controls.ITableControl;
 import org.eclipse.scout.rt.client.ui.basic.table.controls.SearchFormTableControl;
@@ -30,9 +25,7 @@ import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
-import org.eclipse.scout.rt.client.ui.form.FormUtility;
 import org.eclipse.scout.rt.client.ui.form.IForm;
-import org.eclipse.scout.rt.client.ui.form.IFormFieldVisitor;
 import org.eclipse.scout.rt.client.ui.form.fields.GridData;
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
@@ -40,34 +33,24 @@ import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.placeholder.IPlaceholderField;
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.ISequenceBox;
-import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
-import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
+import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.shared.ui.UserAgentUtility;
 
 /**
  * @since 3.9.0
  */
-public class MobileDeviceTransformer implements IDeviceTransformer {
-  private final Map<IForm, WeakReference<IForm>> m_transformedForms = new WeakHashMap<>();
-  private final Map<IOutline, WeakReference<IOutline>> m_transformedOutlines = new WeakHashMap<>();
-  private IDesktop m_desktop;
-  private boolean m_gridDataDirty;
+@Order(5200)
+public class MobileDeviceTransformer extends AbstractDeviceTransformer {
   private DeviceTransformationConfig m_deviceTransformationConfig;
 
-  public MobileDeviceTransformer(IDesktop desktop) {
-    if (desktop == null) {
-      desktop = ClientSessionProvider.currentSession().getDesktop();
-    }
-    m_desktop = desktop;
-    if (m_desktop == null) {
-      throw new IllegalArgumentException("No desktop found. Cannot create device transformer.");
-    }
-
+  public MobileDeviceTransformer() {
     m_deviceTransformationConfig = createDeviceTransformationConfig();
     initTransformationConfig();
   }
 
-  public MobileDeviceTransformer() {
-    this(null);
+  @Override
+  public boolean isActive() {
+    return UserAgentUtility.isMobileDevice();
   }
 
   protected DeviceTransformationConfig createDeviceTransformationConfig() {
@@ -95,14 +78,6 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
   }
 
   @Override
-  public List<String> getAcceptedViewIds() {
-    List<String> viewIds = new LinkedList<String>();
-    viewIds.add(IForm.VIEW_ID_CENTER);
-
-    return viewIds;
-  }
-
-  @Override
   public void notifyTablePageLoaded(IPageWithTable<?> tablePage) {
   }
 
@@ -120,10 +95,6 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
   }
 
   @Override
-  public void adaptDesktopOutlines(OrderedCollection<IOutline> outlines) {
-  }
-
-  @Override
   public void notifyDesktopClosing() {
   }
 
@@ -137,6 +108,7 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
     if (getDeviceTransformationConfig().isFormExcluded(form)) {
       return;
     }
+    //FIXME CGU still needed?
     List<IDeviceTransformationHook> hooks = DeviceTransformationHooks.getFormTransformationHooks(form.getClass());
     if (hooks != null) {
       for (IDeviceTransformationHook hook : hooks) {
@@ -144,20 +116,13 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
       }
     }
 
-    m_gridDataDirty = false;
-
     if (getDeviceTransformationConfig().isTransformationEnabled(MobileDeviceTransformation.DISABLE_FORM_CANCEL_CONFIRMATION)) {
       form.setAskIfNeedSave(false);
     }
     if (form.getDisplayHint() == IForm.DISPLAY_HINT_VIEW) {
       transformView(form);
     }
-    transformFormFields(form);
 
-    if (isGridDataDirty()) {
-      FormUtility.rebuildFieldGrid(form, true);
-      m_gridDataDirty = false;
-    }
   }
 
   protected void transformView(IForm form) {
@@ -166,20 +131,10 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
 
   @Override
   public void transformOutline(IOutline outline) {
-    if (outline == null || outline.getRootNode() == null) {
-      return;
-    }
-    WeakReference<IOutline> outlineRef = m_transformedOutlines.get(outline);
-    if (outlineRef != null) {
-      // Already transformed
-      return;
-    }
-
     outline.setNavigateButtonsVisible(false);
     outline.setLazyExpandingEnabled(false);
     outline.setAutoToggleBreadcrumbStyle(false);
     outline.setDisplayStyle(ITree.DISPLAY_STYLE_BREADCRUMB);
-    m_transformedOutlines.put(outline, new WeakReference<IOutline>(outline));
   }
 
   @Override
@@ -210,34 +165,8 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
     return true;
   }
 
-  protected void transformFormFields(IForm form) {
-    WeakReference<IForm> formRef = m_transformedForms.get(form);
-    if (formRef != null) {
-      return;
-    }
-
-    form.visitFields(new IFormFieldVisitor() {
-      @Override
-      public boolean visitField(IFormField field, int level, int fieldIndex) {
-        if (getDeviceTransformationConfig().isFieldExcluded(field)) {
-          return true;
-        }
-
-        transformFormField(field);
-
-        return true;
-      }
-    });
-
-    if (!getDeviceTransformationConfig().isFieldExcluded(form.getRootGroupBox())) {
-      transformMainBox(form.getRootGroupBox());
-    }
-
-    //mark form as modified
-    m_transformedForms.put(form, new WeakReference<IForm>(form));
-  }
-
-  protected void transformFormField(IFormField field) {
+  @Override
+  public void transformFormField(IFormField field) {
     List<IDeviceTransformationHook> hooks = DeviceTransformationHooks.getFormFieldTransformationHooks(field.getClass());
     if (hooks != null) {
       for (IDeviceTransformationHook hook : hooks) {
@@ -279,18 +208,18 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
    * all the fields in the groupBox.
    */
   protected void makeFieldScalable(IFormField field) {
-    //Since a sequencebox contains several fields it's very risky to modify the gridData because it could make the fields too big or too small.
+    // Since a sequencebox contains several fields it's very risky to modify the gridData because it could make the fields too big or too small.
     if (field.getParentField() instanceof ISequenceBox) {
       return;
     }
 
-    //Make sure weightX is set to 1 so the field grows and shrinks and does not break the 1 column layout
+    // Make sure weightX is set to 1 so the field grows and shrinks and does not break the 1 column layout
     GridData gridDataHints = field.getGridDataHints();
     if (gridDataHints.weightX == 0) {
       gridDataHints.weightX = 1;
       field.setGridDataHints(gridDataHints);
 
-      markGridDataDirty();
+      markGridDataDirty(field.getForm());
     }
   }
 
@@ -324,12 +253,13 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
   }
 
   protected void makeGroupBoxScrollable(IGroupBox groupBox) {
-    //Detail forms will be displayed as inner forms on page forms.
-    //Make sure these inner forms are not scrollable because the page form already is
+    // Detail forms will be displayed as inner forms on page forms.
+    // Make sure these inner forms are not scrollable because the page form already is
+    //FIXME CGU verify this
     if (groupBox.getForm() == getDesktop().getPageDetailForm()) {
       if (groupBox.isScrollable().isTrue()) {
         groupBox.setScrollable(false);
-        markGridDataDirty();
+        markGridDataDirty(groupBox.getForm());
       }
       return;
     }
@@ -337,12 +267,15 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
     if (!groupBox.isScrollable().isTrue()) {
       groupBox.setScrollable(true);
 
-      //GridDataHints have been modified by setScrollable. Update the actual gridData with those hints.
-      markGridDataDirty();
+      // GridDataHints have been modified by setScrollable. Update the actual gridData with those hints.
+      markGridDataDirty(groupBox.getForm());
     }
   }
 
   protected void transformGroupBox(IGroupBox groupBox) {
+    if (groupBox.isMainBox()) {
+      transformMainBox(groupBox);
+    }
     if (getDeviceTransformationConfig().isTransformationEnabled(MobileDeviceTransformation.REDUCE_GROUPBOX_COLUMNS_TO_ONE, groupBox)) {
       groupBox.setGridColumnCountHint(1);
     }
@@ -355,41 +288,6 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
     if (getDeviceTransformationConfig().isTransformationEnabled(MobileDeviceTransformation.HIDE_PLACEHOLDER_FIELD, field)) {
       field.setVisible(false);
     }
-  }
-
-  protected IDesktop getDesktop() {
-    return m_desktop;
-  }
-
-  @Override
-  public boolean acceptMobileTabBoxTransformation(ITabBox tabBox) {
-    IGroupBox mainBox = tabBox.getForm().getRootGroupBox();
-    if (tabBox.getParentField() == mainBox) {
-      return !(mainBox.getControlFields().get(0) == tabBox);
-    }
-
-    return false;
-  }
-
-  /**
-   * Adds a close button to the tool form.
-   * <p>
-   * Adds a back button if there is no other button on the left side which is able to close the form.
-   */
-  @Override
-  public void adaptFormHeaderLeftActions(IForm form, List<IMenu> menuList) {
-  }
-
-  @Override
-  public void adaptFormHeaderRightActions(IForm form, List<IMenu> menuList) {
-  }
-
-  protected boolean isGridDataDirty() {
-    return m_gridDataDirty;
-  }
-
-  protected void markGridDataDirty() {
-    m_gridDataDirty = true;
   }
 
 }

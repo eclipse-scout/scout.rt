@@ -40,13 +40,15 @@ public final class UserAgent implements Serializable {
   private final IUiEngineType m_uiEngineType;
   private final IUiSystem m_uiSystem;
   private final String m_uiDeviceId;
+  private final boolean m_touch;
 
-  UserAgent(IUiLayer uiLayer, IUiDeviceType uiDeviceType, IUiEngineType uiEngineType, IUiSystem uiSystem, String uiDeviceId) {
+  UserAgent(IUiLayer uiLayer, IUiDeviceType uiDeviceType, IUiEngineType uiEngineType, IUiSystem uiSystem, String uiDeviceId, boolean touch) {
     m_uiLayer = Assertions.assertNotNull(uiLayer, "UI Layer must not be null");
     m_uiDeviceType = Assertions.assertNotNull(uiDeviceType, "UI device type must not be null");
     m_uiDeviceId = Assertions.assertNotNull(uiDeviceId, "UI device id must not be null");
     m_uiEngineType = Assertions.assertNotNull(uiEngineType, "UI engineType must not be null");
     m_uiSystem = Assertions.assertNotNull(uiSystem, "UI system must not be null");
+    m_touch = touch;
   }
 
   public IUiDeviceType getUiDeviceType() {
@@ -67,6 +69,10 @@ public final class UserAgent implements Serializable {
 
   public IUiSystem getUiSystem() {
     return m_uiSystem;
+  }
+
+  public boolean isTouch() {
+    return m_touch;
   }
 
   @Override
@@ -155,6 +161,7 @@ public final class UserAgent implements Serializable {
   public int hashCode() {
     final int prime = 31;
     int result = 1;
+    result = prime * result + (m_touch ? 1231 : 1237);
     result = prime * result + ((m_uiDeviceId == null) ? 0 : m_uiDeviceId.hashCode());
     result = prime * result + ((m_uiDeviceType == null) ? 0 : m_uiDeviceType.hashCode());
     result = prime * result + ((m_uiEngineType == null) ? 0 : m_uiEngineType.hashCode());
@@ -175,6 +182,9 @@ public final class UserAgent implements Serializable {
       return false;
     }
     UserAgent other = (UserAgent) obj;
+    if (m_touch != other.m_touch) {
+      return false;
+    }
     if (m_uiDeviceId == null) {
       if (other.m_uiDeviceId != null) {
         return false;

@@ -15,24 +15,9 @@ package org.eclipse.scout.rt.shared.ui;
  */
 public enum UiDeviceType implements IUiDeviceType {
   DESKTOP,
-  TABLET(true),
-  MOBILE(true),
+  TABLET,
+  MOBILE,
   UNKNOWN;
-
-  boolean m_touchDevice;
-
-  private UiDeviceType(boolean touchDevice) {
-    m_touchDevice = touchDevice;
-  }
-
-  private UiDeviceType() {
-    this(false);
-  }
-
-  @Override
-  public boolean isTouchDevice() {
-    return m_touchDevice;
-  }
 
   @Override
   public String getIdentifier() {

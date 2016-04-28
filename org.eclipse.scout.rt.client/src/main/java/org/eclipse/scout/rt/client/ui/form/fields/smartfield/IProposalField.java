@@ -11,5 +11,18 @@
 package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 
 public interface IProposalField<LOOKUP_KEY> extends IContentAssistField<String, LOOKUP_KEY> {
+  /**
+   * {@link Boolean}
+   */
+  String PROP_AUTO_CLOSE_CHOOSER = "autoCloseChooser";
 
+  /**
+   * @since 6.0
+   */
+  void setAutoCloseChooser(boolean autoCloseChooser);
+
+  /**
+   * @since 6.0
+   */
+  boolean isAutoCloseChooser();
 }

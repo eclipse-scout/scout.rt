@@ -297,7 +297,7 @@ public class UiSession implements IUiSession {
 
     JSONObject userAgent = jsonStartupReq.getUserAgent();
     if (userAgent != null) {
-      // FIXME cgu: it would be great if UserAgent could be changed dynamically, to switch from mobile to tablet mode on the fly, should be done as event in JsonClientSession
+      // TODO [7.0] cgu: it would be great if UserAgent could be changed dynamically, to switch from mobile to tablet mode on the fly, should be done as event in JsonClientSession
       String uiDeviceTypeStr = userAgent.optString("deviceType", null);
       if (uiDeviceTypeStr != null) {
         userAgentBuilder.withUiDeviceType(UiDeviceType.createByIdentifier(uiDeviceTypeStr));
@@ -306,6 +306,8 @@ public class UiSession implements IUiSession {
       if (uiLayerStr != null) {
         userAgentBuilder.withUiLayer(UiLayer.createByIdentifier(uiLayerStr));
       }
+      boolean touch = userAgent.optBoolean("touch", false);
+      userAgentBuilder.withTouch(touch);
     }
     return userAgentBuilder.build();
   }

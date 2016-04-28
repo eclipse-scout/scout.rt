@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.client.mobile.transformation;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
-import org.eclipse.scout.rt.shared.ui.UserAgentUtility;
+import org.eclipse.scout.rt.platform.BEANS;
 
 /**
  * @since 3.9.0
@@ -31,9 +31,13 @@ public class DeviceTransformationService implements IDeviceTransformationService
     if (getDeviceTransformer() != null) {
       return;
     }
+    if (desktop == null) {
+      throw new IllegalArgumentException("Desktop must not be null");
+    }
 
     IClientSession session = ClientSessionProvider.currentSession();
-    IDeviceTransformer data = createDeviceTransformer(desktop);
+    IDeviceTransformer data = createDeviceTransformer();
+    data.setDesktop(desktop);
     session.setData(SESSION_DATA_KEY, data);
   }
 
@@ -43,13 +47,8 @@ public class DeviceTransformationService implements IDeviceTransformationService
     session.setData(SESSION_DATA_KEY, null);
   }
 
-  protected IDeviceTransformer createDeviceTransformer(IDesktop desktop) {
-    if (UserAgentUtility.isTabletDevice()) {
-      return new TabletDeviceTransformer(desktop);
-    }
-    else {
-      return new MobileDeviceTransformer(desktop);
-    }
+  protected IDeviceTransformer createDeviceTransformer() {
+    return BEANS.get(MainDeviceTransformer.class);
   }
 
   @Override

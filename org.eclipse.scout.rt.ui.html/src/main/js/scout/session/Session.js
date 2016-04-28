@@ -54,7 +54,7 @@ scout.Session = function($entryPoint, options) {
   this.uiSessionId; // assigned by server on session init (OWASP recommendation, see https://www.owasp.org/index.php/Cross-Site_Request_Forgery_%28CSRF%29_Prevention_Cheat_Sheet#General_Recommendation:_Synchronizer_Token_Pattern).
   this.partId = scout.nvl(options.portletPartId, 0);
   this.clientSessionId = clientSessionId;
-  this.userAgent = options.userAgent || new scout.UserAgent(scout.device.type);
+  this.userAgent = options.userAgent || new scout.UserAgent(scout.device.type, scout.device.supportsTouch());
   this.suppressErrors = scout.nvl(options.suppressErrors, false);
   this.modelAdapterRegistry = {};
   this._clonedModelAdapterRegistry = {}; // key = adapter-ID, value = array of clones for that adapter
@@ -222,9 +222,7 @@ scout.Session.prototype._sendStartupRequest = function() {
   if (this.clientSessionId) {
     request.clientSessionId = this.clientSessionId;
   }
-  if (this.userAgent.deviceType !== scout.Device.Type.DESKTOP) {
-    request.userAgent = this.userAgent;
-  }
+  request.userAgent = this.userAgent;
   request.sessionStartupParams = this._createSessionStartupParams();
 
   // Send request

@@ -14,10 +14,6 @@ public class PageExtension extends AbstractPageExtension<AbstractPage> {
   @Override
   public void execInitPage(PageInitPageChain chain) {
     super.execInitPage(chain);
-    IDeviceTransformer deviceTransformer = BEANS.get(IDeviceTransformationService.class).getDeviceTransformer();
-    if (deviceTransformer == null) {
-      return;
-    }
     BEANS.get(IDeviceTransformationService.class).getDeviceTransformer().transformPage(getOwner());
   }
 

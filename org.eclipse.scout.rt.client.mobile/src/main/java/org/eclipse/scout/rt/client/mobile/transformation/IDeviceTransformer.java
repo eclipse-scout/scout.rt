@@ -11,26 +11,32 @@
 package org.eclipse.scout.rt.client.mobile.transformation;
 
 import java.util.Collection;
-import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.action.IAction;
-import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
+import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.form.IForm;
-import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
-import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
+import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import org.eclipse.scout.rt.platform.Bean;
 
 /**
  * @since 3.9.0
  */
+@Bean
 public interface IDeviceTransformer {
+
+  boolean isActive();
+
+  void setDesktop(IDesktop desktop);
 
   void transformDesktop();
 
   void transformForm(IForm form);
+
+  void transformFormField(IFormField field);
 
   void transformOutline(IOutline outline);
 
@@ -38,13 +44,7 @@ public interface IDeviceTransformer {
 
   void transformPageDetailTable(ITable table);
 
-  void adaptFormHeaderLeftActions(IForm form, List<IMenu> menuList);
-
-  void adaptFormHeaderRightActions(IForm form, List<IMenu> menuList);
-
   void adaptDesktopActions(Collection<IAction> actions);
-
-  void adaptDesktopOutlines(OrderedCollection<IOutline> outlines);
 
   void notifyDesktopClosing();
 
@@ -52,13 +52,11 @@ public interface IDeviceTransformer {
 
   boolean acceptFormAddingToDesktop(IForm form);
 
-  boolean acceptMobileTabBoxTransformation(ITabBox tabBox);
+  boolean isFormFieldExcluded(IFormField formField);
 
-  /**
-   * @return a list of accepted view ids (IForm#VIEW_ID_* or null to accept all.
-   * @see {@link IForm}
-   */
-  List<String> getAcceptedViewIds();
+  boolean isGridDataDirty(IForm form);
+
+  void gridDataRebuilt(IForm form);
 
   DeviceTransformationConfig getDeviceTransformationConfig();
 }

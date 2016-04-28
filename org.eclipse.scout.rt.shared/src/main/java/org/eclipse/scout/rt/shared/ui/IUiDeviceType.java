@@ -16,7 +16,5 @@ import java.io.Serializable;
  * @since 3.8.0
  */
 public interface IUiDeviceType extends Serializable {
-  boolean isTouchDevice();
-
   String getIdentifier();
 }
