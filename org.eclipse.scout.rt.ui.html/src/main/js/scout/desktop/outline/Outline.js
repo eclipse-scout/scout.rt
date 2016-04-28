@@ -335,6 +335,10 @@ scout.Outline.prototype._onNodeDeleted = function(node) {
     node.detailTable.destroy();
     node.detailTable = null;
   }
+  // If last node is removed, navigate back to top
+  if (this.nodes && this.nodes.length === 0) {
+    this.navigateToTop();
+  }
 };
 
 scout.Outline.prototype.selectNodes = function(nodes, notifyServer, debounceSend) {
