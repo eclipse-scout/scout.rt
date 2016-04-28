@@ -2406,6 +2406,7 @@ scout.Tree.prototype.hideNode = function(node, useAnimation, suppressDetachHandl
   if (!node.attached) {
     return;
   }
+  this.viewRangeDirty = true;
   var that = this,
     $node = node.$node;
   if (!$node) {
