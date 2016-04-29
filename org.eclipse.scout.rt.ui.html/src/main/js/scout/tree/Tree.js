@@ -63,7 +63,7 @@ scout.Tree.prototype._init = function(model) {
   this.addFilter(new scout.LazyNodeFilter(this), true);
   this.breadcrumbFilter = new scout.TreeBreadcrumbFilter(this);
   if (this.displayStyle === scout.Tree.DisplayStyle.BREADCRUMB) {
-    this.addFilter(this.breadcrumbFilter, true);
+    this.addFilter(this.breadcrumbFilter, true, true);
   }
   this.initialTraversing = true;
   this._visitNodes(this.nodes, this._initTreeNode.bind(this));
@@ -1202,10 +1202,10 @@ scout.Tree.prototype.setDisplayStyle = function(displayStyle, notifyServer) {
   }
 
   if (this.displayStyle === scout.Tree.DisplayStyle.BREADCRUMB) {
-    this.addFilter(this.breadcrumbFilter, true);
+    this.addFilter(this.breadcrumbFilter, true, true);
     this.filterVisibleNodes();
   } else if (this.displayStyle !== scout.Tree.DisplayStyle.BREADCRUMB) {
-    this.removeFilter(this.breadcrumbFilter);
+    this.removeFilter(this.breadcrumbFilter, true);
     this.filter();
   }
 
@@ -2208,20 +2208,20 @@ scout.Tree.prototype.$nodes = function() {
 /**
  * @param filter object with createKey() and accept()
  */
-scout.Tree.prototype.addFilter = function(filter, doNotFilter) {
+scout.Tree.prototype.addFilter = function(filter, doNotFilter, notAnimated) {
   if (this._filters.indexOf(filter) < 0) {
     this._filters.push(filter);
     if (!doNotFilter) {
-      this.filter();
+      this.filter(notAnimated);
     }
     return true;
   }
   return false;
 };
 
-scout.Tree.prototype.removeFilter = function(filter) {
+scout.Tree.prototype.removeFilter = function(filter, notAnimated) {
   scout.arrays.remove(this._filters, filter);
-  this.filter();
+  this.filter(notAnimated);
 };
 
 scout.Tree.prototype.filter = function(notAnimated) {
