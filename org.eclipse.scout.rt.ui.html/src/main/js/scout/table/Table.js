@@ -284,6 +284,7 @@ scout.Table.prototype._remove = function() {
   this._removeRows();
   this.$fillBefore = null;
   this.$fillAfter = null;
+  this.$data = null;
   scout.Table.parent.prototype._remove.call(this);
 };
 
@@ -296,11 +297,17 @@ scout.Table.prototype._renderTableControls = function() {
   }
 };
 
-scout.Table.prototype._renderSortEnabled = function(dummy) {};
+scout.Table.prototype._renderSortEnabled = function() {
+  // nop
+};
 
-scout.Table.prototype._renderUiSortPossible = function(dummy) {};
+scout.Table.prototype._renderUiSortPossible = function() {
+  // nop
+};
 
-scout.Table.prototype._renderColumnAddable = function(dummy) {};
+scout.Table.prototype._renderColumnAddable = function() {
+  // nop
+};
 
 scout.Table.prototype._syncTableControls = function(controls) {
   var i;

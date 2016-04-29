@@ -655,7 +655,8 @@ scout.Tree.prototype._remove = function() {
   this._uninstallNodeTooltipSupport();
   this.$fillBefore = null;
   this.$fillAfter = null;
-  //reset rendered view range because now range is rendered
+  this.$data = null;
+  // reset rendered view range because now range is rendered
   this.viewRangeRendered = new scout.Range(0, 0);
   scout.Tree.parent.prototype._remove.call(this);
 };
@@ -1243,12 +1244,17 @@ scout.Tree.prototype.collapseNode = function(node, opts) {
 
 scout.Tree.prototype.collapseAll = function() {
   this.rebuildSuppressed = true;
+
   // Collapse all expanded child nodes (only model)
   this._visitNodes(this.nodes, function(node) {
     this.collapseNode(node);
   }.bind(this));
-  // ensure correct rendering
-  this._rerenderViewport();
+
+  if (this.rendered) {
+    // ensure correct rendering
+    this._rerenderViewport();
+  }
+
   this.rebuildSuppressed = false;
 };
 
