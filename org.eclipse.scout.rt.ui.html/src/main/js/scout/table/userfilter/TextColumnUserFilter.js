@@ -74,6 +74,5 @@ scout.TextColumnUserFilter.prototype._onDisplayTextChanged = function(event) {
  * @override ColumnUserFilter.js
  */
 scout.TextColumnUserFilter.prototype.modifyFilterFields = function() {
-  this.freeTextField.$mandatory.remove();
-  this.freeTextField.$mandatory = null;
+  this.freeTextField.removeMandatoryIndicator();
 };

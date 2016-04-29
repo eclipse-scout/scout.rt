@@ -603,6 +603,11 @@ scout.FormField.prototype.addMandatoryIndicator = function() {
   this.$mandatory = this.$container.appendSpan('mandatory-indicator');
 };
 
+scout.FormField.prototype.removeMandatoryIndicator = function() {
+  this.$mandatory.remove();
+  this.$mandatory = null;
+};
+
 /**
  * Adds a SPAN element with class 'icon' the the given optional $parent.
  * When $parent is not set, the element is added to this.$container.
@@ -684,10 +689,9 @@ scout.FormField.prototype.updateInnerAlignment = function(opts) {
 scout.FormField.prototype.prepareForCellEdit = function(opts) {
   opts = opts || {};
 
-  //remove mandatory and status indicators (popup should 'fill' the whole cell)
+  // remove mandatory and status indicators (popup should 'fill' the whole cell)
   if (this.$mandatory) {
-    this.$mandatory.remove();
-    this.$mandatory = null;
+    this.removeMandatoryIndicator();
   }
   if (this.$status) {
     this.$status.remove();

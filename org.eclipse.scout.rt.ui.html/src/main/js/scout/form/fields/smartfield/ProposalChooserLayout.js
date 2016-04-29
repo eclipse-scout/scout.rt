@@ -105,27 +105,34 @@ scout.ProposalChooserLayout.prototype._createTypeHandler = function(proposalChoo
 };
 
 scout.ProposalChooserLayout.prototype.layout = function($container) {
-  var htmlContainer = scout.HtmlComponent.get($container),
-    htmlModel = scout.HtmlComponent.get($container.children(this._typeHandler.cssSelector)),
+  var filterPrefSize,
+    htmlContainer = scout.HtmlComponent.get($container),
+    htmlComp = scout.HtmlComponent.get($container.children(this._typeHandler.cssSelector)),
     size = htmlContainer.getSize().subtract(htmlContainer.getInsets()),
     $status = this._proposalChooser.$status,
-    $activeFilter = this._proposalChooser.$activeFilter;
+    hasStatus = $status && $status.isVisible(),
+    filter = this._proposalChooser.activeFilterGroup;
 
-  if ($status && $status.isVisible()) {
+  if (hasStatus) {
     size.height -= scout.graphics.getSize($status).height;
   }
-  if ($activeFilter && $activeFilter.isVisible()) {
-    size.height -= scout.graphics.getSize($activeFilter).height;
+  if (filter) {
+    filterPrefSize = filter.htmlComp.getPreferredSize();
+    size.height -= filterPrefSize.height;
   }
 
   // when status or active-filter is available we must explicitly set the
   // height of the model (table or tree) in pixel. Otherwise we'd rely on
   // the CSS height which is set to 100%.
-  if (($status && $status.isVisible()) || ($activeFilter && $activeFilter.isVisible())) {
-    htmlModel.pixelBasedSizing = true;
+  if (hasStatus || filter) {
+    htmlComp.pixelBasedSizing = true;
   }
 
-  htmlModel.setSize(size);
+  htmlComp.setSize(size);
+
+  if (filter) {
+    filter.htmlComp.setSize(new scout.Dimension(size.width, filterPrefSize.height));
+  }
 };
 
 /**
@@ -134,10 +141,10 @@ scout.ProposalChooserLayout.prototype.layout = function($container) {
  * and doesn't try to find the preferred size by algorithm.
  */
 scout.ProposalChooserLayout.prototype.preferredLayoutSize = function($container) {
-  var oldDisplay, prefSize, modelSize, statusSize, activeFilterSize,
-    htmlContainer = this._proposalChooser.htmlComp,
+  var oldDisplay, prefSize, modelSize, statusSize, activeFilterSize, filterPrefSize,
+    htmlComp = this._proposalChooser.htmlComp,
     $status = this._proposalChooser.$status,
-    $activeFilter = this._proposalChooser.$activeFilter;
+    filter = this._proposalChooser.activeFilterGroup;
 
   this._typeHandler.prepare($container, this);
 
@@ -162,14 +169,11 @@ scout.ProposalChooserLayout.prototype.preferredLayoutSize = function($container)
     prefSize = new scout.Dimension(Math.max(prefSize.width, statusSize.width), prefSize.height + statusSize.height);
   }
 
-  if ($activeFilter && $activeFilter.isVisible()) {
-    oldDisplay = $activeFilter.css('display');
-    $activeFilter.css('display', 'inline-block');
-    activeFilterSize = scout.graphics.prefSize($activeFilter, true, true);
-    $activeFilter.css('display', oldDisplay);
-    prefSize = new scout.Dimension(Math.max(prefSize.width, activeFilterSize.width), prefSize.height + activeFilterSize.height);
+  if (filter) {
+    filterPrefSize = filter.htmlComp.getPreferredSize();
+    prefSize = new scout.Dimension(Math.max(prefSize.width, filterPrefSize.width), prefSize.height + filterPrefSize.height);
   }
 
   $container.toggleClass('empty', modelSize.height === 0);
-  return prefSize.add(htmlContainer.getInsets());
+  return prefSize.add(htmlComp.getInsets());
 };

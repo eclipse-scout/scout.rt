@@ -15,8 +15,15 @@ scout.ProposalChooser = function() {
   this.$status;
   this.$activeFilter;
   this.htmlComp;
+
+  this._updateStatusTimeout;
 };
 scout.inherits(scout.ProposalChooser, scout.ModelAdapter);
+
+/**
+ * @see IContentAssistField#getActiveFilterLabels() - should have the same order.
+ */
+scout.ProposalChooser.ACTIVE_FILTER_VALUES = ['UNDEFINED', 'FALSE', 'TRUE'];
 
 scout.ProposalChooser.prototype._render = function($parent) {
   this.$container = $parent.appendDiv('proposal-chooser');
@@ -28,20 +35,27 @@ scout.ProposalChooser.prototype._render = function($parent) {
     this.model._onNodeControlMouseDownDoFocus = function() {};
   }
 
-  this.$status = this.$container.appendDiv('status');
+  // status
+  this.$status = this.$container
+    .appendDiv('status')
+    .setVisible(false);
 
-  // support for activeFilter
+  // active filter
   if (this.activeFilter) {
-    this.$activeFilter = this.$container.appendDiv('active-filter');
-    var group = scout.create('RadioButtonGroup', {
-      parent: this
+    this.activeFilterGroup = scout.create('RadioButtonGroup', {
+      parent: this,
+      labelVisible: false,
+      statusVisible: false
     });
 
-    this._appendOption(group, 'UNDEFINED', this.activeFilterLabels[0], true);
-    this._appendOption(group, 'TRUE', this.activeFilterLabels[2], false);
-    this._appendOption(group, 'FALSE', this.activeFilterLabels[1], false);
+    // add radio buttons
+    scout.ProposalChooser.ACTIVE_FILTER_VALUES.forEach(function(value, index) {
+      this._renderButton(value, index);
+    }, this);
 
-    group.render(this.$activeFilter);
+    this.activeFilterGroup.render(this.$container);
+    this.activeFilterGroup.$container.addClass('active-filter');
+    this.activeFilterGroup.removeMandatoryIndicator();
   }
 };
 
@@ -71,13 +85,31 @@ scout.ProposalChooser.prototype._renderStatusVisible = function() {
 };
 
 scout.ProposalChooser.prototype._updateStatus = function() {
+  var oldStatusVisible = this.$status.isVisible(),
+    newStatusVisible = this.statusVisible && this.status;
+
+  if (oldStatusVisible === newStatusVisible) {
+    return;
+  }
+
   $.log.debug('_updateStatus status=' + this.status + ' statusVisible=' + this.statusVisible);
-  this.$status.setVisible(this.statusVisible && this.status);
+  var updateStatusFunc = this.rendering ? this._updateStatusImpl : this._updateStatusWithTimeout;
+  updateStatusFunc.call(this, newStatusVisible);
+};
+
+scout.ProposalChooser.prototype._updateStatusImpl = function(visible) {
+  this.$status.setVisible(visible);
   if (this.status) {
     this._setStatusMessage(this.status.message);
   } else {
     this.$status.text('');
   }
+  this.htmlComp.invalidateLayoutTree();
+};
+
+scout.ProposalChooser.prototype._updateStatusWithTimeout = function(visible) {
+  clearTimeout(this._updateStatusTimeout);
+  this._updateStatusTimeout = setTimeout(this._updateStatusImpl.bind(this, visible), 250);
 };
 
 /**
@@ -87,13 +119,18 @@ scout.ProposalChooser.prototype._setStatusMessage = function(message) {
   scout.Status.animateStatusMessage(this.$status, message);
 };
 
-scout.ProposalChooser.prototype._appendOption = function(group, value, text, selected) {
+scout.ProposalChooser.prototype._renderButton = function(value, index) {
   var radio = scout.create('RadioButton', {
-      parent: group,
-      label: text,
-      radioValue: value,
-      selected: selected,
-      focusWhenSelected: false
+      parent: this.activeFilterGroup,
+      label: this.activeFilterLabels[index],
+      radioValue: scout.ProposalChooser.ACTIVE_FILTER_VALUES[index],
+      selected: this.activeFilter === value,
+      focusWhenSelected: false,
+      gridData: {
+        x: index,
+        y: 1,
+        useUiWidth: true
+      }
     });
 
   radio.on('propertyChange', function(event) {
@@ -102,7 +139,7 @@ scout.ProposalChooser.prototype._appendOption = function(group, value, text, sel
     }
   }.bind(this));
 
-  group.addButton(radio);
+  this.activeFilterGroup.addButton(radio);
 };
 
 scout.ProposalChooser.prototype._onActiveFilterChanged = function(radioValue) {

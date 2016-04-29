@@ -240,6 +240,7 @@ scout.Table.prototype._render = function($parent) {
     parent: this,
     axis: 'both'
   });
+  this._installImageListeners();
   this._installCellTooltipSupport();
   this.menuBar.render(this.$container);
 
@@ -278,6 +279,7 @@ scout.Table.prototype._remove = function() {
   // FIXME CGU do not delete header, implement according to footer
   this.header = null;
   this._removeAggregateRows();
+  this._uninstallImageListeners();
   this._uninstallCellTooltipSupport();
   this._removeRows();
   this.$fillBefore = null;
@@ -313,6 +315,10 @@ scout.Table.prototype._syncTableControls = function(controls) {
   this.tableControls.forEach(function(control) {
     control.tableFooter = this.footer;
   }, this);
+};
+
+scout.Table.prototype._onImageLoadOrError = function(event) {
+  this.invalidateLayoutTree();
 };
 
 scout.Table.prototype._onRowMouseDown = function(event) {
@@ -3289,6 +3295,20 @@ scout.Table.prototype._uninstallDragAndDropHandler = function(event) {
   }
   this.dragAndDropHandler.uninstall();
   this.dragAndDropHandler = null;
+};
+
+/**
+ * This listener is used to invalidate table layout when an image icon has been loaded (which happens async in the browser).
+ */
+scout.Table.prototype._installImageListeners = function() {
+  this._imageLoadListener = this._onImageLoadOrError.bind(this);
+  this.$data[0].addEventListener('load', this._imageLoadListener, true);
+  this.$data[0].addEventListener('error', this._imageLoadListener, true);
+};
+
+scout.Table.prototype._uninstallImageListeners = function() {
+  this.$data[0].removeEventListener('load', this._imageLoadListener, true);
+  this.$data[0].removeEventListener('error', this._imageLoadListener, true);
 };
 
 /**
