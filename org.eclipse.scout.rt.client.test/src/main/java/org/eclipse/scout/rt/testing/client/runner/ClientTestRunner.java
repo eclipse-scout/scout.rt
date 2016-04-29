@@ -11,9 +11,15 @@
 package org.eclipse.scout.rt.testing.client.runner;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
+import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
+import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
+import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.platform.reflect.ReflectionUtility;
+import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.testing.client.runner.statement.ClearClientRunContextStatement;
 import org.eclipse.scout.rt.testing.client.runner.statement.ClientRunContextStatement;
 import org.eclipse.scout.rt.testing.client.runner.statement.RunInModelJobStatement;
@@ -21,11 +27,14 @@ import org.eclipse.scout.rt.testing.client.runner.statement.TimeoutClientRunCont
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;
 import org.junit.runners.model.Statement;
+import org.junit.runners.model.TestClass;
 
 /**
  * Use this Runner to run tests which require a session context.
@@ -65,6 +74,14 @@ public class ClientTestRunner extends PlatformTestRunner {
 
   public ClientTestRunner(final Class<?> clazz) throws InitializationError {
     super(clazz);
+  }
+
+  @Override
+  protected Statement classBlock(RunNotifier notifier) {
+    Statement s2 = super.classBlock(notifier);
+    //make sure that the test cleans up the desktop; no leftover forms, messageboxes or filechoosers
+    final Statement s1 = new CheckDesktopCleanupStatement(s2, getTestClass());
+    return s1;
   }
 
   @Override
@@ -122,4 +139,100 @@ public class ClientTestRunner extends PlatformTestRunner {
     }
     return new TimeoutClientRunContextStatement(interceptedAfterStatement, 0);
   }
+
+  protected static class CheckDesktopCleanupStatement extends Statement {
+
+    private final Statement m_statement;
+    private final TestClass m_testClass;
+
+    public CheckDesktopCleanupStatement(Statement statement, TestClass testClass) {
+      m_statement = statement;
+      m_testClass = testClass;
+    }
+
+    @Override
+    public void evaluate() throws Throwable {
+      int messageBoxesBefore = 0;
+      int messageBoxesAfter = 0;
+      int formsBefore = 0;
+      int formsAfter = 0;
+      int fileChoosersBefore = 0;
+      int fileChoosersAfter = 0;
+      IDesktop desktop = IDesktop.CURRENT.get();
+      if (desktop != null) {
+        messageBoxesBefore = desktop.getMessageBoxes().size();
+        formsBefore = desktop.getDialogs().size() + desktop.getViews().size();
+        fileChoosersBefore = desktop.getFileChoosers().size();
+      }
+      m_statement.evaluate();
+      desktop = IDesktop.CURRENT.get();
+      if (desktop != null) {
+        messageBoxesAfter = desktop.getMessageBoxes().size();
+        formsAfter = desktop.getDialogs().size() + desktop.getViews().size();
+        fileChoosersAfter = desktop.getFileChoosers().size();
+      }
+      if (messageBoxesAfter > messageBoxesBefore || formsAfter > formsBefore || fileChoosersAfter > fileChoosersBefore) {
+        try {
+          System.out
+              .println(String.format("DESKTOP_CLEANUP %s: Desktop has leftovers: %d message boxes, %d forms, %d file choosers. Clean up the desktop in a @After method.", m_testClass.toString(),
+                  messageBoxesAfter, formsAfter, fileChoosersAfter));
+          Assert.fail(String.format("Desktop has leftovers: %d message boxes, %d forms, %d file choosers. Clean up the desktop in a @After method.", messageBoxesAfter, formsAfter, fileChoosersAfter));
+        }
+        finally {
+          if (desktop != null) {
+            for (IMessageBox m : desktop.getMessageBoxes()) {
+              dropMessageBox(desktop, m);
+            }
+            for (IForm f : desktop.getDialogs()) {
+              dropForm(desktop, f);
+            }
+            for (IForm f : desktop.getViews()) {
+              dropForm(desktop, f);
+            }
+            for (IFileChooser f : desktop.getFileChoosers()) {
+              dropFileChooser(desktop, f);
+            }
+          }
+        }
+      }
+    }
+
+    private void dropMessageBox(IDesktop desktop, IMessageBox m) {
+      try {
+        m.getUIFacade().setResultFromUI(IMessageBox.CANCEL_OPTION);
+      }
+      catch (Exception ex) {
+        //nop
+      }
+      finally {
+        desktop.hideMessageBox(m);
+      }
+    }
+
+    private void dropForm(IDesktop desktop, IForm f) {
+      try {
+        f.setAskIfNeedSave(false);
+        f.doClose();
+      }
+      catch (Exception ex) {
+        //nop
+      }
+      finally {
+        desktop.hideForm(f);
+      }
+    }
+
+    private void dropFileChooser(IDesktop desktop, IFileChooser f) {
+      try {
+        f.getUIFacade().setResultFromUI(new ArrayList<BinaryResource>());
+      }
+      catch (Exception ex) {
+        //nop
+      }
+      finally {
+        desktop.hideFileChooser(f);
+      }
+    }
+  }
+
 }
