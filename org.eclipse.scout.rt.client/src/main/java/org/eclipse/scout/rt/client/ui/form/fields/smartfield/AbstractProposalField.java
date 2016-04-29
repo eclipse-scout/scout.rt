@@ -147,6 +147,11 @@ public abstract class AbstractProposalField<LOOKUP_KEY> extends AbstractContentA
       public IFuture<Void> provideAsync(final ILookupCall<LOOKUP_KEY> lookupCall, final ILookupRowFetchedCallback<LOOKUP_KEY> callback, final ClientRunContext clientRunContext) {
         return delegate.provideAsync(lookupCall, callback, clientRunContext);
       }
+
+      @Override
+      public List<? extends ILookupRow<LOOKUP_KEY>> provide(ILookupCall<LOOKUP_KEY> lookupCall) {
+        return delegate.provide(lookupCall);
+      }
     };
   }
 

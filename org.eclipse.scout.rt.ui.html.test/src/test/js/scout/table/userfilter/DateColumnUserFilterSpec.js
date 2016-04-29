@@ -53,4 +53,51 @@ describe('DateColumnUserFilter', function() {
     expect(filter.acceptByFields(null)).toBe(false);
   });
 
+  it('acceptByFields works with time', function() {
+    var filter = new scout.DateColumnUserFilter(),
+      filterDateFrom = scout.dates.create('2015-12-21'),
+      filterDateTo = scout.dates.create('2015-12-21'),
+      dateTimePrevDayMax = scout.dates.create('2015-12-20 23:59:59.999'),
+      dateTimeMin = scout.dates.create('2015-12-21 00:00:00.000'),
+      dateTimeMax = scout.dates.create('2015-12-21 23:59:59.999'),
+      dateTimeNextDayMin = scout.dates.create('2015-12-22 00:00:00.000');
+
+    filter.dateFrom = filterDateFrom;
+    filter.dateTo = filterDateTo;
+    expect(filter.acceptByFields(dateTimePrevDayMax)).toBe(false);
+    expect(filter.acceptByFields(dateTimeMin)).toBe(true);
+    expect(filter.acceptByFields(dateTimeMax)).toBe(true);
+    expect(filter.acceptByFields(dateTimeNextDayMin)).toBe(false);
+    expect(filter.acceptByFields(null)).toBe(false);
+
+    filter.dateFrom = filterDateFrom;
+    filter.dateTo = null;
+    expect(filter.acceptByFields(dateTimePrevDayMax)).toBe(false);
+    expect(filter.acceptByFields(dateTimeMin)).toBe(true);
+    expect(filter.acceptByFields(dateTimeMax)).toBe(true);
+    expect(filter.acceptByFields(dateTimeNextDayMin)).toBe(true);
+    expect(filter.acceptByFields(null)).toBe(false);
+
+    filter.dateFrom = null;
+    filter.dateTo = filterDateTo;
+    expect(filter.acceptByFields(dateTimePrevDayMax)).toBe(true);
+    expect(filter.acceptByFields(dateTimeMin)).toBe(true);
+    expect(filter.acceptByFields(dateTimeMax)).toBe(true);
+    expect(filter.acceptByFields(dateTimeNextDayMin)).toBe(false);
+    expect(filter.acceptByFields(null)).toBe(false);
+  });
+
+  it('addFilterFields must not create date fields with time', function() {
+    // In case this test case fails, the date filter fields are created with time.
+    // If this is intended, the acceptByFields() implementation for DateColumnUserFilter has to be checked/adjusted to ensure correct filter functionality.
+    var model = createSimpleModel('DateColumnUserFilter', session),
+      filter = new scout.DateColumnUserFilter(),
+      box = new scout.FilterFieldsGroupBox();
+    model.filter = filter;
+    box._init(model);
+    filter.addFilterFields(box);
+    expect(filter.dateFromField.hasTime).toBe(false);
+    expect(filter.dateToField.hasTime).toBe(false);
+  });
+
 });

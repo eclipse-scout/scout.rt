@@ -10,8 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.servicetunnel;
 
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Proxy;
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.BeanMetaData;
+import org.eclipse.scout.rt.platform.IBean;
+import org.eclipse.scout.rt.platform.IBeanDecorationFactory;
+import org.eclipse.scout.rt.platform.interceptor.IBeanDecorator;
+import org.eclipse.scout.rt.platform.interceptor.internal.BeanProxyImplementor;
+import org.eclipse.scout.rt.platform.internal.BeanImplementor;
 
 /**
  * Creates a service proxy through a tunnel.
@@ -22,18 +27,20 @@ public final class ServiceTunnelUtility {
   }
 
   public static <T> T createProxy(Class<T> serviceInterfaceClass) {
-    return createProxy(serviceInterfaceClass, new ServiceTunnelInvocationHandler(serviceInterfaceClass));
-  }
+    ServiceTunnelProxyProducer<?> tunnelProxyProducer = new ServiceTunnelProxyProducer<>(serviceInterfaceClass);
+    BeanMetaData metaData = new BeanMetaData(serviceInterfaceClass).withApplicationScoped(true).withProducer(tunnelProxyProducer);
+    IBean<T> bean = new BeanImplementor<>(metaData);
 
-  @SuppressWarnings("unchecked")
-  public static <T> T createProxy(Class<T> serviceInterfaceClass, InvocationHandler handler) {
-    if (handler == null) {
-      throw new IllegalArgumentException("handler is null");
+    IBeanDecorationFactory factory = BEANS.opt(IBeanDecorationFactory.class);
+    if (factory == null) {
+      return bean.getInstance();
     }
-    return (T) Proxy.newProxyInstance(
-        serviceInterfaceClass.getClassLoader(),
-        new Class[]{serviceInterfaceClass},
-        handler);
-  }
 
+    IBeanDecorator<T> decorator = factory.decorate(bean, serviceInterfaceClass);
+    if (decorator == null) {
+      return bean.getInstance();
+    }
+
+    return new BeanProxyImplementor<T>(bean, decorator, serviceInterfaceClass).getProxy();
+  }
 }

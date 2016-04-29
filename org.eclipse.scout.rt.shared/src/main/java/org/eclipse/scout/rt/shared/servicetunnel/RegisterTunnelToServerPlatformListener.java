@@ -24,6 +24,7 @@ import org.eclipse.scout.rt.platform.inventory.ClassInventory;
 import org.eclipse.scout.rt.platform.inventory.IClassInfo;
 import org.eclipse.scout.rt.platform.inventory.IClassInventory;
 import org.eclipse.scout.rt.shared.SharedConfigProperties.CreateTunnelToServerBeansProperty;
+import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelProxyProducer;
 import org.eclipse.scout.rt.shared.TunnelToServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -96,7 +97,7 @@ public class RegisterTunnelToServerPlatformListener implements IPlatformListener
    * Creates a new {@link BeanMetaData} for the given class.
    */
   protected BeanMetaData createBeanMetaData(Class<?> c) {
-    TunnelToServerProxyProducer<?> tunnelProxyProducer = new TunnelToServerProxyProducer<>(c);
+    ServiceTunnelProxyProducer<?> tunnelProxyProducer = new ServiceTunnelProxyProducer<>(c);
     return new BeanMetaData(c).withApplicationScoped(true).withProducer(tunnelProxyProducer);
   }
 }

@@ -17,7 +17,7 @@ import org.eclipse.scout.rt.platform.Replace;
 import org.eclipse.scout.rt.platform.internal.BeanManagerImplementor;
 import org.eclipse.scout.rt.platform.service.IService;
 import org.eclipse.scout.rt.shared.TunnelToServer;
-import org.eclipse.scout.rt.shared.servicetunnel.TunnelToServerProxyProducer;
+import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelProxyProducer;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -41,7 +41,7 @@ public class TunnelToServerTest {
 
   @Test
   public void testBeanProxy() {
-    m_beanManager.registerBean(new BeanMetaData(IFixtureTunnelToServer.class).withApplicationScoped(true).withProducer(new TestingTunnelToServerProxyProducer<>(IFixtureTunnelToServer.class)));
+    m_beanManager.registerBean(new BeanMetaData(IFixtureTunnelToServer.class).withApplicationScoped(true).withProducer(new TestingServiceTunnelProxyProducer<>(IFixtureTunnelToServer.class)));
     IFixtureTunnelToServer obj1 = m_beanManager.getBean(IFixtureTunnelToServer.class).getInstance();
     IFixtureTunnelToServer obj2 = m_beanManager.getBean(IFixtureTunnelToServer.class).getInstance();
     m_beanManager.registerBean(new BeanMetaData(IFixtureTunnelToServerEx1.class).withApplicationScoped(true));
@@ -54,11 +54,11 @@ public class TunnelToServerTest {
     Assert.assertEquals("return IFixtureTunnelToServer#ping", obj1.ping());
   }
 
-  private static final class TestingTunnelToServerProxyProducer<T> extends TunnelToServerProxyProducer<T> {
+  private static final class TestingServiceTunnelProxyProducer<T> extends ServiceTunnelProxyProducer<T> {
     /**
      * @param interfaceClass
      */
-    public TestingTunnelToServerProxyProducer(Class<?> interfaceClass) {
+    public TestingServiceTunnelProxyProducer(Class<?> interfaceClass) {
       super(interfaceClass);
     }
 

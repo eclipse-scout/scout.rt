@@ -105,6 +105,9 @@ public class UiSession implements IUiSession {
   private final P_RootAdapter m_rootJsonAdapter;
   private final AtomicLong m_jsonAdapterSeq = new AtomicLong(ROOT_ID);
   private final AtomicLong m_responseSequenceNo = new AtomicLong(1);
+  /**
+   * Synchronized map. When iterating over the map, synchronize on the map object
+   */
   private final SortedMap<Long, JsonResponse> m_responseHistory = Collections.synchronizedSortedMap(new TreeMap<Long, JsonResponse>());
   private final ReentrantLock m_uiSessionLock = new ReentrantLock();
   private final HttpContext m_httpContext = new HttpContext();
@@ -552,11 +555,14 @@ public class UiSession implements IUiSession {
     }
     // Update response history
     int removeCount = 0;
-    for (Iterator<Long> it = m_responseHistory.keySet().iterator(); it.hasNext();) {
-      Long key = it.next();
-      if (key <= sequenceNo) {
-        it.remove();
-        removeCount++;
+    // Synchronize for iteration over Collections.synchronizedList
+    synchronized (m_responseHistory) {
+      for (Iterator<Long> it = m_responseHistory.keySet().iterator(); it.hasNext();) {
+        Long key = it.next();
+        if (key <= sequenceNo) {
+          it.remove();
+          removeCount++;
+        }
       }
     }
     LOG.debug("Cleaned up response history (-{}). New content: {} [#ACK={}, uiSessionId={}]", removeCount, m_responseHistory.keySet(), sequenceNo, m_uiSessionId);
@@ -656,14 +662,16 @@ public class UiSession implements IUiSession {
   protected JSONObject responseToJsonInternal() {
     // Remember response in history
     if (m_currentJsonResponse.getSequenceNo() != null) {
-      if (m_responseHistory.size() > MAX_RESPONSE_HISTORY_SIZE) {
-        // Remove oldest entry to free up memory (protection against malicious clients that send no or wrong #ACKs)
-        Long oldestSeqNo = m_responseHistory.firstKey();
-        LOG.warn("Max. response history size exceeded for UI session {}, dropping oldest response #{}", m_uiSessionId, oldestSeqNo);
-        m_responseHistory.remove(oldestSeqNo);
+      synchronized (m_responseHistory) {
+        if (m_responseHistory.size() > MAX_RESPONSE_HISTORY_SIZE) {
+          // Remove oldest entry to free up memory (protection against malicious clients that send no or wrong #ACKs)
+          Long oldestSeqNo = m_responseHistory.firstKey();
+          LOG.warn("Max. response history size exceeded for UI session {}, dropping oldest response #{}", m_uiSessionId, oldestSeqNo);
+          m_responseHistory.remove(oldestSeqNo);
+        }
+        m_responseHistory.put(m_currentJsonResponse.getSequenceNo(), m_currentJsonResponse);
+        LOG.debug("Added response #{} to history {} for UI session {}", m_currentJsonResponse.getSequenceNo(), m_responseHistory.keySet(), m_uiSessionId);
       }
-      m_responseHistory.put(m_currentJsonResponse.getSequenceNo(), m_currentJsonResponse);
-      LOG.debug("Added response #{} to history {} for UI session {}", m_currentJsonResponse.getSequenceNo(), m_responseHistory.keySet(), m_uiSessionId);
     }
 
     // Convert response to JSON (must be done in model thread due to potential model access inside the toJson() method).
@@ -763,15 +771,17 @@ public class UiSession implements IUiSession {
   @Override
   public JSONObject processSyncResponseQueueRequest(JsonRequest jsonRequest) {
     LOG.debug("Synchronize response queue {} for UI session {}", m_responseHistory.keySet(), m_uiSessionId);
-    if (m_responseHistory.isEmpty()) {
-      return null;
+    synchronized (m_responseHistory) {
+      if (m_responseHistory.isEmpty()) {
+        return null;
+      }
+      Long lastSentSequenceNo = m_responseHistory.lastKey();
+      JsonResponse combinedResponse = new JsonResponse(lastSentSequenceNo);
+      for (JsonResponse response : m_responseHistory.values()) {
+        combinedResponse.combine(response);
+      }
+      return combinedResponse.toJson();
     }
-    Long lastSentSequenceNo = m_responseHistory.lastKey();
-    JsonResponse combinedResponse = new JsonResponse(lastSentSequenceNo);
-    for (JsonResponse response : m_responseHistory.values()) {
-      combinedResponse.combine(response);
-    }
-    return combinedResponse.toJson();
   }
 
   @Override

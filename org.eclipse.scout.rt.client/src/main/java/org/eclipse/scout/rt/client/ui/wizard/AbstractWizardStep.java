@@ -23,6 +23,7 @@ import org.eclipse.scout.rt.client.extension.ui.wizard.WizardStepChains.WizardSt
 import org.eclipse.scout.rt.client.ui.form.FormEvent;
 import org.eclipse.scout.rt.client.ui.form.FormListener;
 import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IOrdered;
 import org.eclipse.scout.rt.platform.Order;
@@ -233,7 +234,7 @@ public abstract class AbstractWizardStep<FORM extends IForm> extends AbstractPro
   @ConfigOperation
   protected void execFormClosed(boolean activation) {
     if (!activation) {
-      if (getForm().isFormStored()) {
+      if (getForm().isFormStored() && getForm().getCloseSystemType() != IButton.SYSTEM_TYPE_CANCEL) {
         getWizard().doNextStep();
       }
     }
