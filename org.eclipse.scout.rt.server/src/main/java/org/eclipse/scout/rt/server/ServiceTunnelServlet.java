@@ -256,7 +256,11 @@ public class ServiceTunnelServlet extends HttpServlet {
               .setAttribute("scout.httpsession.binding.listener", new ScoutSessionBindingListener(newServerSession, serverRunContext.getClientNodeId()));
 
           cacheService.put(IServerSession.class.getName(), newServerSession, servletRequest, servletResponse);
-          BEANS.get(IClientNotificationService.class).registerSession(serverRunContext.getClientNodeId(), newServerSession.getId(), newServerSession.getUserId());
+
+          // only register session for client notifications if client node id is available
+          if (serverRunContext.getClientNodeId() != null) {
+            BEANS.get(IClientNotificationService.class).registerSession(serverRunContext.getClientNodeId(), newServerSession.getId(), newServerSession.getUserId());
+          }
 
           return newServerSession;
         }
