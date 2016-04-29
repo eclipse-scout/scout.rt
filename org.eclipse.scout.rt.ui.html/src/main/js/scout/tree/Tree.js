@@ -1646,6 +1646,9 @@ scout.Tree.prototype.scrollTo = function(node) {
 
 scout.Tree.prototype.revealSelection = function() {
   if (this.selectedNodes.length > 0) {
+    if (!this.visibleNodesMap[this.selectedNodes[0].id]) {
+      this._expandAllParentNodes(this.selectedNodes[0]);
+    }
     this.scrollTo(this.selectedNodes[0]);
   }
 };
