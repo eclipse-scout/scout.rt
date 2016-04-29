@@ -12,6 +12,17 @@ scout.Widget = function() {
   this.session;
   this.children = [];
   this.initialized = false;
+
+  /**
+   * The 'rendering' flag is set the true while the _inital_ rendering is performed.
+   * It is used to to something different in a _render* method when the method is
+   * called for the first time.
+   */
+  this.rendering = false;
+
+  /**
+   * The 'rendered' flag is set the true when initial rendering of the widget is completed.
+   */
   this.rendered = false;
   this.attached = false;
   this.destroyed = false;
@@ -65,12 +76,14 @@ scout.Widget.prototype.render = function($parent) {
   if (this.destroyed) {
     throw new Error('Widget is destroyed: ' + this);
   }
+  this.rendering = true;
   this._renderInternal($parent);
   this._link();
   this.session.keyStrokeManager.installKeyStrokeContext(this.keyStrokeContext);
   if (this.parent) {
     this.parent.addChild(this);
   }
+  this.rendering = false;
   this.rendered = true;
   this.attached = true;
   this._postRender();

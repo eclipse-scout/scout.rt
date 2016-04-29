@@ -10,15 +10,38 @@
  ******************************************************************************/
 describe('Widget', function() {
 
-  var session,
-    widget = new scout.Widget(),
-    parent = new scout.Widget();
-
+  var session, widget, parent;
 
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
     session.init();
+
+    widget = new scout.Widget(),
+    parent = new scout.Widget();
+  });
+
+  describe('rendering', function() {
+
+    it('should set rendering, rendered flags correctly', function() {
+      widget.init({session: session, parent: parent});
+      expect(widget.rendered).toBe(false);
+      expect(widget.rendering).toBe(false);
+      widget.render(session.$entryPoint);
+      expect(widget.rendered).toBe(true);
+      expect(widget.rendering).toBe(false);
+    });
+
+    it('should set rendering flag to true _while_ the component is rendering', function() {
+      var rendering;
+      widget._render = function($parent) {
+        rendering = this.rendering;
+      };
+      widget.init({session: session, parent: parent});
+      widget.render(session.$entryPoint);
+      expect(rendering).toBe(true);
+    });
+
   });
 
   describe('attach/detach', function() {

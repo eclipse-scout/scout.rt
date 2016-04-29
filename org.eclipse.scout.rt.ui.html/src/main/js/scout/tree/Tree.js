@@ -260,7 +260,6 @@ scout.Tree.prototype._visitNodes = function(nodes, func, parentNode) {
 };
 
 scout.Tree.prototype._render = function($parent) {
-  this.isRendering = true;
   this.$container = $parent.appendDiv('tree');
   if (this._additionalContainerClasses) {
     this.$container.addClass(this._additionalContainerClasses);
@@ -290,7 +289,6 @@ scout.Tree.prototype._render = function($parent) {
   this.menuBar.render(this.$container);
   this._updateNodeDimensions();
   this._renderViewport();
-  this.isRendering = false;
 };
 
 scout.Tree.prototype._onDataScroll = function() {
@@ -1249,7 +1247,7 @@ scout.Tree.prototype.collapseAll = function() {
   this._visitNodes(this.nodes, function(node) {
     this.collapseNode(node);
   }.bind(this));
-  //ensure correct rendering
+  // ensure correct rendering
   this._rerenderViewport();
   this.rebuildSuppressed = false;
 };
@@ -2319,7 +2317,7 @@ scout.Tree.prototype._applyFiltersForNode = function(node) {
  * Just insert node in DOM. NO check if in viewRange
  */
 scout.Tree.prototype._insertNodeInDOM = function(node, indexHint) {
-  if (!this.rendered && !this.isRendering) {
+  if (!this.rendered && !this.rendering) {
     return;
   }
   var index = indexHint === undefined ? this.visibleNodesFlat.indexOf(node) : indexHint;
