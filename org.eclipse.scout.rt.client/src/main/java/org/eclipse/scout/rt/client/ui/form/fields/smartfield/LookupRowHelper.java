@@ -23,8 +23,6 @@ import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
 @Bean
 public class LookupRowHelper {
 
-  //TODO test exception cases (before, after, provide)
-
   /**
    * Synchronous lookup
    *
@@ -36,7 +34,7 @@ public class LookupRowHelper {
     }
 
     beforeProvide(provider, lookupCall);
-    List<? extends ILookupRow<T>> result = provider.provide(lookupCall);
+    final List<? extends ILookupRow<T>> result = provider.provide(lookupCall);
     return afterProvide(provider, lookupCall, result);
   }
 
@@ -53,9 +51,9 @@ public class LookupRowHelper {
         if (lookupCall == null) {
           return CollectionUtility.emptyArrayList();
         }
-        scheduleBeforeProvide(provider, lookupCall);
+        beforeProvide(provider, lookupCall);
         final List<? extends ILookupRow<T>> lookupRes = provider.provide(lookupCall);
-        return scheduleAfterProvide(provider, lookupCall, lookupRes);
+        return afterProvide(provider, lookupCall, lookupRes);
       }
 
     }, Jobs.newInput()
@@ -64,40 +62,49 @@ public class LookupRowHelper {
         .withExceptionHandling(null, false));
   }
 
-  private <T> void scheduleBeforeProvide(final ILookupRowProvider<T> provider, final ILookupCall<T> lookupCall) {
-    ModelJobs.schedule(new IRunnable() {
+  private <T> void beforeProvide(final ILookupRowProvider<T> provider, final ILookupCall<T> lookupCall) {
+    runInModelJob(new Runnable() {
 
       @Override
-      public void run() throws Exception {
-        beforeProvide(provider, lookupCall);
+      public void run() {
+        provider.beforeProvide(lookupCall);
       }
-    }, ModelJobs.newInput(ClientRunContexts.copyCurrent())
-        .withName("Before lookup [lookupCall={}]", lookupCall.getClass().getName()))
-        .awaitDone();
+    });
   }
 
-  protected <T> void beforeProvide(final ILookupRowProvider<T> provider, final ILookupCall<T> lookupCall) {
-    provider.beforeProvide(lookupCall);
-  }
-
-  private <T> List<? extends ILookupRow<T>> scheduleAfterProvide(final ILookupRowProvider<T> provider, final ILookupCall<T> lookupCall, final List<? extends ILookupRow<T>> lookupRes) {
-    return ModelJobs.schedule(new Callable<List<? extends ILookupRow<T>>>() {
-
-      @Override
-      public List<? extends ILookupRow<T>> call() throws Exception {
-        return afterProvide(provider, lookupCall, lookupRes);
-      }
-    },
-        ModelJobs.newInput(ClientRunContexts.copyCurrent())
-            .withName("After lookup [lookupCall={}]", lookupCall.getClass().getName()))
-        .awaitDoneAndGet();
-  }
-
-  protected <T> List<? extends ILookupRow<T>> afterProvide(final ILookupRowProvider<T> provider, final ILookupCall<T> lookupCall, final List<? extends ILookupRow<T>> lookupRes) {
-    List<ILookupRow<T>> postProcessingList = new ArrayList<>();
-    postProcessingList.addAll(lookupRes);
+  private <T> List<? extends ILookupRow<T>> afterProvide(final ILookupRowProvider<T> provider, final ILookupCall<T> lookupCall, final List<? extends ILookupRow<T>> result) {
+    final List<ILookupRow<T>> postProcessingList = new ArrayList<>();
+    postProcessingList.addAll(result);
     provider.afterProvide(lookupCall, postProcessingList);
+
+    runInModelJob(new Runnable() {
+
+      @Override
+      public void run() {
+        provider.afterProvide(lookupCall, postProcessingList);
+      }
+    });
     return postProcessingList;
+  }
+
+  /**
+   * Ensures, that the {@link Runnable} is running in a model job
+   */
+  private <T> void runInModelJob(final Runnable runnable) {
+    if (ModelJobs.isModelThread()) {
+      runnable.run();
+    }
+    else {
+      ModelJobs.schedule(new IRunnable() {
+
+        @Override
+        public void run() throws Exception {
+          runnable.run();
+        }
+      }, ModelJobs.newInput(ClientRunContexts.copyCurrent())
+          .withExceptionHandling(null, false))
+          .awaitDoneAndGet();
+    }
   }
 
 }

@@ -7,13 +7,9 @@ import static org.mockito.Matchers.argThat;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
-import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
@@ -21,8 +17,10 @@ import org.eclipse.scout.rt.client.ui.form.fields.smartfield.fixture.ITestLookup
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.fixture.TestLookupCall;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.job.DoneEvent;
+import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IDoneHandler;
 import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.TriState;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
@@ -37,8 +35,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentMatcher;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Tests the lookup in {@link AbstractContentAssistField} <br>
@@ -47,7 +43,6 @@ import org.slf4j.LoggerFactory;
 @RunWithSubject("default")
 @RunWithClientSession(TestEnvironmentClientSession.class)
 public class SmartFieldLookupTest {
-  private static final Logger LOG = LoggerFactory.getLogger(SmartFieldLookupTest.class);
 
   @BeanMock
   private ITestLookupService m_mock_service;
@@ -145,56 +140,32 @@ public class SmartFieldLookupTest {
     m_field.setLookupCall(new TestLookupCall());
     m_field.setMasterField(masterField);
 
-    final CountDownLatch latch = new CountDownLatch(1);
-    IFuture<List<? extends ILookupRow<Long>>> rows = m_field.callSubTreeLookupInBackground(1L, TriState.TRUE);
-
-    final List<Object> resList = Collections.synchronizedList(new ArrayList<>());
-    rows.whenDone(new IDoneHandler<List<? extends ILookupRow<Long>>>() {
-
-      @Override
-      public void onDone(DoneEvent<List<? extends ILookupRow<Long>>> event) {
-        resList.addAll(event.getResult());
-        latch.countDown();
-      }
-    }, ClientRunContexts.copyCurrent());
-
-    awaitResult(latch);
-    assertEquals(2, resList.size());
+    IFuture<List<? extends ILookupRow<Long>>> futureRows = m_field.callSubTreeLookupInBackground(1L, TriState.TRUE);
+    List<? extends ILookupRow<Long>> rows = awaitDoneAndGet(futureRows);
+    assertEquals(2, rows.size());
   }
 
-  private void awaitResult(final CountDownLatch latch) {
-    boolean finished = false;
-    int i = 0;
-    while (!finished && i < 10) {
-      try {
-        ModelJobs.yield();
-        finished = latch.await(20, TimeUnit.MILLISECONDS);
-        System.out.println("finished" + finished);
+  /**
+   * await result while freeing model thread
+   */
+  private <T> T awaitDoneAndGet(IFuture<T> futureRows) {
+    final IBlockingCondition bc = Jobs.newBlockingCondition(true);
+    futureRows.whenDone(new IDoneHandler<T>() {
+
+      @Override
+      public void onDone(DoneEvent<T> event) {
+        bc.setBlocking(false);
       }
-      catch (InterruptedException e) {
-        LOG.debug("interrupted waiting for lookup result", e);
-      }
-      i++;
-    }
+    }, ClientRunContexts.copyCurrent());
+    bc.waitFor();
+    return futureRows.awaitDoneAndGet();
   }
 
   @Test
   public void testSubtreeLookupNoLookupCall_InBackground() throws InterruptedException {
-    final CountDownLatch latch = new CountDownLatch(1);
-    IFuture<List<? extends ILookupRow<Long>>> rows = m_field.callSubTreeLookupInBackground(1L, TriState.TRUE);
-
-    final List<Object> resList = Collections.synchronizedList(new ArrayList<>());
-    rows.whenDone(new IDoneHandler<List<? extends ILookupRow<Long>>>() {
-
-      @Override
-      public void onDone(DoneEvent<List<? extends ILookupRow<Long>>> event) {
-        resList.addAll(event.getResult());
-        latch.countDown();
-      }
-    }, ClientRunContexts.copyCurrent());
-
-    awaitResult(latch);
-    assertEquals(0, resList.size());
+    IFuture<List<? extends ILookupRow<Long>>> futureRows = m_field.callSubTreeLookupInBackground(1L, TriState.TRUE);
+    List<? extends ILookupRow<Long>> rows = awaitDoneAndGet(futureRows);
+    assertEquals(0, rows.size());
   }
 
   @Test(expected = PlatformException.class)
@@ -215,9 +186,10 @@ public class SmartFieldLookupTest {
   @SuppressWarnings("unchecked")
   @Test
   public void testSubtreeLookupExceptions_InBackground() throws InterruptedException {
-    final CountDownLatch latch = new CountDownLatch(1);
+    final IBlockingCondition bc = Jobs.newBlockingCondition(true);
     m_field.setLookupCall(new TestLookupCall());
     when(m_mock_service.getDataByRec(any(ILookupCall.class))).thenThrow(new PlatformException("lookup error"));
+
     IFuture<List<? extends ILookupRow<Long>>> rows = m_field.callSubTreeLookupInBackground(1L, TriState.TRUE);
 
     rows.whenDone(new IDoneHandler<List<? extends ILookupRow<Long>>>() {
@@ -226,38 +198,37 @@ public class SmartFieldLookupTest {
       public void onDone(DoneEvent<List<? extends ILookupRow<Long>>> event) {
         assertTrue(event.getException() instanceof RuntimeException);
         assertEquals("lookup error", event.getException().getMessage());
-        latch.countDown();
+        bc.setBlocking(false);
       }
     }, ClientRunContexts.copyCurrent());
-    awaitResult(latch);
-    System.out.println();
+    bc.waitFor();
   }
 
   @SuppressWarnings("unchecked")
   @Test
   public void testTextLookupExceptions_InBackground() throws InterruptedException {
-    final CountDownLatch latch = new CountDownLatch(1);
     m_field.setLookupCall(new TestLookupCall());
     final String errorText = "lookup error";
     when(m_mock_service.getDataByText(any(ILookupCall.class))).thenThrow(new PlatformException(errorText));
+    final IBlockingCondition bc = Jobs.newBlockingCondition(true);
     ILookupRowFetchedCallback callback = new ILookupRowFetchedCallback<Long>() {
 
       @Override
       public void onSuccess(List<? extends ILookupRow<Long>> rows) {
         Assert.fail("no exception thrown");
-        latch.countDown();
+        bc.setBlocking(false);
       }
 
       @Override
       public void onFailure(RuntimeException exception) {
         assertTrue(exception instanceof PlatformException);
         assertEquals(errorText, exception.getMessage());
-        latch.countDown();
+        bc.setBlocking(false);
       }
     };
 
     m_field.callTextLookupInBackground("", 10, callback);
-    awaitResult(latch);
+    bc.waitFor();
   }
 
   @Test
