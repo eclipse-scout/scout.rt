@@ -61,9 +61,17 @@ scout.SmartFieldPopupLayout.prototype.preferredLayoutSize = function($container)
   prefSize.width = Math.max(fieldBounds.width, prefSize.width);
   prefSize.height = Math.max(15, Math.min(350, prefSize.height)); // at least some pixels height in case there is no data, no status, no active filter
 
+  if(prefSize.width > this._maxWindowSize()){
+    prefSize.width = this._maxWindowSize();
+  }
+
   return prefSize;
 };
 
 scout.SmartFieldPopupLayout.prototype._htmlProposalChooser = function($container) {
   return scout.HtmlComponent.optGet($container.children('.proposal-chooser'));
+};
+
+scout.SmartFieldPopupLayout.prototype._maxWindowSize = function() {
+  return this.popup.$container.window().width()-(2*this.popup.windowPaddingX);
 };
