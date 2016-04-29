@@ -14,11 +14,17 @@ import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.shared.session.ISessionListener;
+import org.eclipse.scout.rt.shared.session.SessionEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @since 3.9.0
  */
 public class DeviceTransformationService implements IDeviceTransformationService {
+  private static final Logger LOG = LoggerFactory.getLogger(DeviceTransformationService.class);
+
   private String SESSION_DATA_KEY = "DeviceTransformationServiceData";
 
   @Override
@@ -39,12 +45,19 @@ public class DeviceTransformationService implements IDeviceTransformationService
     IDeviceTransformer data = createDeviceTransformer();
     data.setDesktop(desktop);
     session.setData(SESSION_DATA_KEY, data);
+    session.addListener(new P_SessionListener());
+    LOG.debug("DeviceTransformationService installed for session {}", session);
   }
 
   @Override
   public void uninstall() {
+    if (getDeviceTransformer() == null) {
+      return;
+    }
     IClientSession session = ClientSessionProvider.currentSession();
+    getDeviceTransformer().dispose();
     session.setData(SESSION_DATA_KEY, null);
+    LOG.debug("DeviceTransformationService uninstalled for session {}", session);
   }
 
   protected IDeviceTransformer createDeviceTransformer() {
@@ -57,4 +70,13 @@ public class DeviceTransformationService implements IDeviceTransformationService
     return (IDeviceTransformer) session.getData(SESSION_DATA_KEY);
   }
 
+  private class P_SessionListener implements ISessionListener {
+    @Override
+    public void sessionChanged(SessionEvent event) {
+      if (event.getType() == SessionEvent.TYPE_STOPPED) {
+        event.getSource().removeListener(this);
+        uninstall();
+      }
+    }
+  }
 }

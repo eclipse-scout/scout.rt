@@ -27,7 +27,7 @@ public class MainDeviceTransformer implements IDeviceTransformer {
   private final Map<IForm, WeakReference<IForm>> m_transformedForms = new WeakHashMap<>();
   private final Map<IOutline, WeakReference<IOutline>> m_transformedOutlines = new WeakHashMap<>();
 
-  private List<IDeviceTransformer> getTransformers() {
+  public List<IDeviceTransformer> getTransformers() {
     if (m_transformers == null) {
       m_transformers = createTransformers();
       LOG.info("Using following device transformers{}", m_transformers);
@@ -35,7 +35,7 @@ public class MainDeviceTransformer implements IDeviceTransformer {
     return m_transformers;
   }
 
-  private List<IDeviceTransformer> createTransformers() {
+  protected List<IDeviceTransformer> createTransformers() {
     return BEANS.all(IDeviceTransformer.class, new IFilter<IDeviceTransformer>() {
       @Override
       public boolean accept(IDeviceTransformer transformer) {
@@ -47,6 +47,21 @@ public class MainDeviceTransformer implements IDeviceTransformer {
   @Override
   public boolean isActive() {
     return !getTransformers().isEmpty();
+  }
+
+  @Override
+  public void dispose() {
+    if (!isActive()) {
+      return;
+    }
+    for (IDeviceTransformer transformer : getTransformers()) {
+      transformer.dispose();
+    }
+    if (!m_transformedForms.isEmpty()) {
+      LOG.warn("Transformed forms map is not empty. Make sure every form gets closed properly to free up memory as quickly as possible. Cleaning up now...");
+      m_transformedForms.clear();
+    }
+    m_transformedOutlines.clear();
   }
 
   @Override
@@ -69,13 +84,14 @@ public class MainDeviceTransformer implements IDeviceTransformer {
 
   @Override
   public void transformForm(IForm form) {
-    if (!isActive()) {
+    if (!isActive() || isFormExcluded(form)) {
       return;
     }
 
     WeakReference<IForm> formRef = m_transformedForms.get(form);
     if (formRef != null) {
       // already transformed
+      // form may be reinitialized any time (e.g. using doReset()) -> don't transform again
       return;
     }
 
@@ -84,13 +100,34 @@ public class MainDeviceTransformer implements IDeviceTransformer {
     }
 
     if (isGridDataDirty(form)) {
-      //FIXME CGU verify functionality and cleanup
       FormUtility.rebuildFieldGrid(form, true);
       gridDataRebuilt(form);
+      if (isGridDataDirty(form)) {
+        throw new IllegalStateException("Potential memory leak: gridData still marked as dirty for form " + form);
+      }
     }
 
     //mark form as transformed
     m_transformedForms.put(form, new WeakReference<IForm>(form));
+  }
+
+  @Override
+  public void notifyFormDisposed(IForm form) {
+    m_transformedForms.remove(form);
+  }
+
+  @Override
+  public boolean isFormExcluded(IForm form) {
+    if (!isActive()) {
+      return false;
+    }
+
+    for (IDeviceTransformer transformer : getTransformers()) {
+      if (transformer.isFormExcluded(form)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   @Override
@@ -99,7 +136,6 @@ public class MainDeviceTransformer implements IDeviceTransformer {
       return false;
     }
 
-    //FIXME CGU verify this
     for (IDeviceTransformer transformer : getTransformers()) {
       if (transformer.isFormFieldExcluded(formField)) {
         return true;
@@ -110,18 +146,14 @@ public class MainDeviceTransformer implements IDeviceTransformer {
 
   @Override
   public void transformFormField(IFormField field) {
-    if (!isActive()) {
+    if (!isActive() || isFormExcluded(field.getForm()) || isFormFieldExcluded(field)) {
       return;
     }
 
     WeakReference<IForm> formRef = m_transformedForms.get(field.getForm());
     if (formRef != null) {
-      //FIXME CGU verify this (search form)
+      // Already transformed
       // fields can only be added during form initialization -> no need to transform again if form has already been initialized
-      return;
-    }
-
-    if (isFormFieldExcluded(field)) {
       return;
     }
 
@@ -158,6 +190,17 @@ public class MainDeviceTransformer implements IDeviceTransformer {
 
     for (IDeviceTransformer transformer : getTransformers()) {
       transformer.transformPage(page);
+    }
+  }
+
+  @Override
+  public void transformPageDetailForm(IForm form) {
+    if (!isActive()) {
+      return;
+    }
+
+    for (IDeviceTransformer transformer : getTransformers()) {
+      transformer.transformPageDetailForm(form);
     }
   }
 

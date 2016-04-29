@@ -16,8 +16,23 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 public abstract class AbstractDeviceTransformer implements IDeviceTransformer {
   private IDesktop m_desktop;
   private Set<IForm> m_dirtyGridData = new HashSet<>();
+  private DeviceTransformationConfig m_deviceTransformationConfig;
 
   public AbstractDeviceTransformer() {
+    m_deviceTransformationConfig = createDeviceTransformationConfig();
+    initTransformationConfig();
+  }
+
+  protected DeviceTransformationConfig createDeviceTransformationConfig() {
+    return new DeviceTransformationConfig();
+  }
+
+  @Override
+  public DeviceTransformationConfig getDeviceTransformationConfig() {
+    return m_deviceTransformationConfig;
+  }
+
+  protected void initTransformationConfig() {
   }
 
   @Override
@@ -33,6 +48,10 @@ public abstract class AbstractDeviceTransformer implements IDeviceTransformer {
   }
 
   @Override
+  public void dispose() {
+  }
+
+  @Override
   public void transformDesktop() {
   }
 
@@ -41,10 +60,16 @@ public abstract class AbstractDeviceTransformer implements IDeviceTransformer {
   }
 
   @Override
+  public void notifyFormDisposed(IForm form) {
+  }
+
+  @Override
+  public boolean isFormExcluded(IForm form) {
+    return getDeviceTransformationConfig().isFormExcluded(form);
+  }
+
+  @Override
   public boolean isFormFieldExcluded(IFormField formField) {
-    if (getDeviceTransformationConfig() == null) {
-      return false;
-    }
     return getDeviceTransformationConfig().isFieldExcluded(formField);
   }
 
@@ -58,6 +83,10 @@ public abstract class AbstractDeviceTransformer implements IDeviceTransformer {
 
   @Override
   public void transformPage(IPage<?> page) {
+  }
+
+  @Override
+  public void transformPageDetailForm(IForm form) {
   }
 
   @Override
@@ -79,11 +108,6 @@ public abstract class AbstractDeviceTransformer implements IDeviceTransformer {
   @Override
   public boolean acceptFormAddingToDesktop(IForm form) {
     return true;
-  }
-
-  @Override
-  public DeviceTransformationConfig getDeviceTransformationConfig() {
-    return null;
   }
 
   @Override

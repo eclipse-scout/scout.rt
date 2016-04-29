@@ -17,7 +17,6 @@ import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
-import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.controls.ITableControl;
 import org.eclipse.scout.rt.client.ui.basic.table.controls.SearchFormTableControl;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
@@ -41,11 +40,7 @@ import org.eclipse.scout.rt.shared.ui.UserAgentUtility;
  */
 @Order(5200)
 public class MobileDeviceTransformer extends AbstractDeviceTransformer {
-  private DeviceTransformationConfig m_deviceTransformationConfig;
-
   public MobileDeviceTransformer() {
-    m_deviceTransformationConfig = createDeviceTransformationConfig();
-    initTransformationConfig();
   }
 
   @Override
@@ -53,15 +48,7 @@ public class MobileDeviceTransformer extends AbstractDeviceTransformer {
     return UserAgentUtility.isMobileDevice();
   }
 
-  protected DeviceTransformationConfig createDeviceTransformationConfig() {
-    return new DeviceTransformationConfig();
-  }
-
   @Override
-  public DeviceTransformationConfig getDeviceTransformationConfig() {
-    return m_deviceTransformationConfig;
-  }
-
   protected void initTransformationConfig() {
     List<IDeviceTransformation> transformations = new LinkedList<IDeviceTransformation>();
 
@@ -75,10 +62,6 @@ public class MobileDeviceTransformer extends AbstractDeviceTransformer {
     for (IDeviceTransformation transformation : transformations) {
       getDeviceTransformationConfig().enableTransformation(transformation);
     }
-  }
-
-  @Override
-  public void notifyTablePageLoaded(IPageWithTable<?> tablePage) {
   }
 
   /**
@@ -95,10 +78,6 @@ public class MobileDeviceTransformer extends AbstractDeviceTransformer {
   }
 
   @Override
-  public void notifyDesktopClosing() {
-  }
-
-  @Override
   public void transformDesktop() {
     getDesktop().setDisplayStyle(IDesktop.DISPLAY_STYLE_COMPACT);
   }
@@ -108,7 +87,7 @@ public class MobileDeviceTransformer extends AbstractDeviceTransformer {
     if (getDeviceTransformationConfig().isFormExcluded(form)) {
       return;
     }
-    //FIXME CGU still needed?
+
     List<IDeviceTransformationHook> hooks = DeviceTransformationHooks.getFormTransformationHooks(form.getClass());
     if (hooks != null) {
       for (IDeviceTransformationHook hook : hooks) {
@@ -157,12 +136,14 @@ public class MobileDeviceTransformer extends AbstractDeviceTransformer {
   }
 
   @Override
-  public void transformPageDetailTable(ITable table) {
-  }
-
-  @Override
-  public boolean acceptFormAddingToDesktop(IForm form) {
-    return true;
+  public void transformPageDetailForm(IForm form) {
+    // Detail forms will be displayed inside a page (tree node)
+    // Make sure these inner forms are not scrollable because the outline already is
+    IGroupBox mainBox = form.getRootGroupBox();
+    if (mainBox.isScrollable().isTrue()) {
+      mainBox.setScrollable(false);
+      markGridDataDirty(mainBox.getForm());
+    }
   }
 
   @Override
@@ -253,17 +234,6 @@ public class MobileDeviceTransformer extends AbstractDeviceTransformer {
   }
 
   protected void makeGroupBoxScrollable(IGroupBox groupBox) {
-    // Detail forms will be displayed as inner forms on page forms.
-    // Make sure these inner forms are not scrollable because the page form already is
-    //FIXME CGU verify this
-    if (groupBox.getForm() == getDesktop().getPageDetailForm()) {
-      if (groupBox.isScrollable().isTrue()) {
-        groupBox.setScrollable(false);
-        markGridDataDirty(groupBox.getForm());
-      }
-      return;
-    }
-
     if (!groupBox.isScrollable().isTrue()) {
       groupBox.setScrollable(true);
 

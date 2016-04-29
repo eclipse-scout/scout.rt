@@ -333,7 +333,7 @@ describe('Session', function() {
       expect(requestData.startup).toBeUndefined();
     });
 
-    it('sends user agent on startup if not desktop', function() {
+    it('sends user agent on startup', function() {
       var session = createSession(new scout.UserAgent(scout.Device.Type.MOBILE));
 
       session.init();
@@ -343,18 +343,8 @@ describe('Session', function() {
       var requestData = mostRecentJsonRequest();
       expect(requestData.userAgent.deviceType).toBe('MOBILE');
 
-      //don't send it on subsequent requests
+      // don't send it on subsequent requests
       send(session, 1, 'nodeClicked');
-      sendQueuedAjaxCalls();
-
-      requestData = mostRecentJsonRequest();
-      expect(requestData.userAgent).toBeUndefined();
-
-      //device type desktop is the default, so don't send it
-      session = createSession(new scout.UserAgent(scout.Device.Type.DESKTOP));
-
-      session.init();
-      uninstallUnloadHandlers(session);
       sendQueuedAjaxCalls();
 
       requestData = mostRecentJsonRequest();

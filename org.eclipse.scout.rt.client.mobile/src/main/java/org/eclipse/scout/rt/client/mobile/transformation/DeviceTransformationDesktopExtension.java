@@ -60,8 +60,18 @@ public class DeviceTransformationDesktopExtension extends AbstractDesktopExtensi
   }
 
   @Override
+  protected ContributionCommand execPageDetailFormChanged(IForm oldForm, IForm newForm) {
+    if (newForm != null) {
+      getDeviceTransformer().transformPageDetailForm(newForm);
+    }
+    return ContributionCommand.Continue;
+  }
+
+  @Override
   protected ContributionCommand execPageDetailTableChanged(ITable oldTable, ITable newTable) {
-    getDeviceTransformer().transformPageDetailTable(newTable);
+    if (newTable != null) {
+      getDeviceTransformer().transformPageDetailTable(newTable);
+    }
     return ContributionCommand.Continue;
   }
 

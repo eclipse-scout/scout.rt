@@ -30,6 +30,8 @@ public interface IDeviceTransformer {
 
   boolean isActive();
 
+  void dispose();
+
   void setDesktop(IDesktop desktop);
 
   void transformDesktop();
@@ -42,15 +44,21 @@ public interface IDeviceTransformer {
 
   void transformPage(IPage<?> page);
 
+  void transformPageDetailForm(IForm form);
+
   void transformPageDetailTable(ITable table);
 
   void adaptDesktopActions(Collection<IAction> actions);
+
+  void notifyFormDisposed(IForm form);
 
   void notifyDesktopClosing();
 
   void notifyTablePageLoaded(IPageWithTable<?> tablePage);
 
   boolean acceptFormAddingToDesktop(IForm form);
+
+  boolean isFormExcluded(IForm form);
 
   boolean isFormFieldExcluded(IFormField formField);
 
