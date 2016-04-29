@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+  Copyright (c) 2015 BSI Business Systems Integration AG.
+  All rights reserved. This program and the accompanying materials
+  are made available under the terms of the Eclipse Public License v1.0
+  which accompanies this distribution, and is available at
+  http://www.eclipse.org/legal/epl-v10.html
+
+  Contributors:
+  BSI Business Systems Integration AG - initial API and implementation
+
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.eclipse.scout</groupId>
+    <artifactId>maven_sdk_plugin_config-master</artifactId>
+    <version>2.0.5</version>
+    <relativePath></relativePath>
+  </parent>
+
+  <groupId>org.eclipse.scout.archetypes</groupId>
+  <artifactId>scout-jaxws-module</artifactId>
+  <version>5.2.0-SNAPSHOT</version>
+  <packaging>maven-archetype</packaging>
+
+  <name>Scout JaxWs Module</name>
+  <description>Maven Archetype which creates an empty Scout JaxWs Module</description>
+  <url>https://eclipse.org/scout</url>
+
+  <properties>
+    <scout.base.version>5.2.0</scout.base.version>
+    <base.version>${scout.base.version}</base.version>
+
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <artifactId>maven-archetype-plugin</artifactId>
+          <version>2.4</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+    <plugins>
+      <plugin>
+        <groupId>com.mycila</groupId>
+        <artifactId>license-maven-plugin</artifactId>
+        <configuration>
+          <skip>true</skip>
+        </configuration>
+      </plugin>
+    </plugins>
+
+    <extensions>
+      <extension>
+        <groupId>org.apache.maven.archetype</groupId>
+        <artifactId>archetype-packaging</artifactId>
+        <version>2.4</version>
+      </extension>
+    </extensions>
+  </build>
+
+  <!-- primarily for license header generation -->
+  <inceptionYear>2015</inceptionYear>
+
+  <organization>
+    <name>Eclipse Scout Project</name>
+    <url>${project.url}</url>
+  </organization>
+
+  <licenses>
+    <license>
+      <name>Eclipse Public License v1.0</name>
+      <url>http://www.eclipse.org/legal/epl-v10.html</url>
+      <comments>All rights reserved.
+
+       This program and the accompanying materials are made
+       available under the terms of the Eclipse Public License v1.0
+       which accompanies this distribution, and is available at
+       http://www.eclipse.org/legal/epl-v10.htm</comments>
+    </license>
+  </licenses>
+
+  <developers>
+    <developer>
+      <id>bsi</id>
+      <name>BSI Business Systems Integration AG</name>
+      <organization>BSI Business Systems Integration AG</organization>
+      <organizationUrl>https://www.bsi-software.com/en/technology/eclipse-scout.html</organizationUrl>
+    </developer>
+  </developers>
+
+  <mailingLists>
+    <mailingList>
+      <name>scout-dev Mailing List</name>
+      <subscribe>https://dev.eclipse.org/mailman/listinfo/scout-dev</subscribe>
+      <unsubscribe>https://dev.eclipse.org/mailman/listinfo/scout-dev</unsubscribe>
+      <post>scout-dev@eclipse.org</post>
+      <archive>http://dev.eclipse.org/mhonarc/lists/scout-dev</archive>
+    </mailingList>
+  </mailingLists>
+
+  <scm>
+    <connection>scm:git:git://git.eclipse.org/gitroot/scout/org.eclipse.scout.sdk.git</connection>
+    <developerConnection>scm:git:ssh://${eclipse_gerrit_username}@git.eclipse.org:29418/scout/org.eclipse.scout.sdk</developerConnection>
+    <tag>releases/5.2.x</tag>
+    <url>http://git.eclipse.org/c/scout/org.eclipse.scout.sdk.git/</url>
+  </scm>
+
+  <issueManagement>
+    <system>Bugzilla</system>
+    <url>https://bugs.eclipse.org/bugs/buglist.cgi?classification=Technology;component=Scout SDK;product=Scout;query_format=advanced</url>
+  </issueManagement>
+
+  <repositories>
+    <repository>
+      <snapshots></snapshots>
+      <id>eclipse.snapshot</id>
+      <name>eclipse-snapshot-repo</name>
+      <url>https://repo.eclipse.org/content/groups/snapshots/</url>
+    </repository>
+  </repositories>
+
+  <pluginRepositories>
+    <pluginRepository>
+      <snapshots></snapshots>
+      <id>eclipse.snapshot</id>
+      <name>eclipse-snapshot-repo</name>
+      <url>https://repo.eclipse.org/content/groups/snapshots/</url>
+    </pluginRepository>
+  </pluginRepositories>
+
+  <distributionManagement>
+    <repository>
+      <id>repo.eclipse.org</id>
+      <name>Scout Repository - Releases</name>
+      <url>https://repo.eclipse.org/content/repositories/scout-releases/</url>
+    </repository>
+    <snapshotRepository>
+      <id>repo.eclipse.org</id>
+      <name>Scout Repository - Snapshots</name>
+      <url>https://repo.eclipse.org/content/repositories/scout-snapshots/</url>
+    </snapshotRepository>
+  </distributionManagement>
+
+</project>
