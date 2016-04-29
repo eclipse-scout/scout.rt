@@ -24,6 +24,11 @@ scout.TreeLayout.prototype.layout = function($container) {
   containerSize = htmlContainer.getAvailableSize()
     .subtract(htmlContainer.getInsets());
 
+  //FIXME CGU/AWE remove this check as soon as HtmlComp.validateLayout checks for invisible components
+  if (!htmlContainer.isAttachedAndVisible() || !htmlContainer.$comp.isEveryParentVisible()) {
+    return;
+  }
+
   if (this.tree.autoToggleBreadcrumbStyle) {
     this.tree.setBreadcrumbStyleActive(containerSize.width <= this.tree.breadcrumbTogglingThreshold);
   }
@@ -49,5 +54,4 @@ scout.TreeLayout.prototype._setDataHeight = function(heightOffset) {
   this.tree.setViewRangeSize(this.tree.calculateViewRangeSize());
   // Always render viewport (not only when viewRangeSize changes), because view range depends on scroll position and data height
   this.tree._renderViewport();
-
 };

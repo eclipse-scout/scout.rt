@@ -294,12 +294,15 @@ scout.Tree.prototype._render = function($parent) {
 };
 
 scout.Tree.prototype._onDataScroll = function() {
+  var scrollToSelectionBackup = this.scrollToSelection;
+  this.scrollToSelection = false;
   var scrollTop = this.$data[0].scrollTop;
   if (this.scrollTop === scrollTop) {
     return;
   }
   this._renderViewport();
   this.scrollTop = scrollTop;
+  this.scrollToSelection = scrollToSelectionBackup;
 };
 
 scout.Table.prototype.setScrollTop = function(scrollTop) {
@@ -422,9 +425,7 @@ scout.Tree.prototype._renderFiller = function() {
     height: 0,
     width: 0
   };
-  if (this.viewRangeRendered.to !== 0) {
-    fillAfterDimensions = this._calculateFillerDimension(new scout.Range(this.viewRangeRendered.to, this.visibleNodesFlat.length));
-  }
+  fillAfterDimensions = this._calculateFillerDimension(new scout.Range(this.viewRangeRendered.to, this.visibleNodesFlat.length));
   this.$fillAfter.cssHeight(fillAfterDimensions.height);
   this.$fillAfter.cssWidth(fillAfterDimensions.width);
   $.log.trace('FillAfter height: ' + fillAfterDimensions.heigth);
@@ -596,12 +597,12 @@ scout.Tree.prototype._calculateViewRangeForNode = function(node) {
     diff;
 
   var nodeIndex = this.visibleNodesFlat.indexOf(node);
+  viewRange.from = Math.max(nodeIndex - quarterRange, 0);
+  viewRange.to = Math.min(viewRange.from + this.viewRangeSize, this.visibleNodesFlat.length);
   if (!node || nodeIndex === -1) {
     return viewRange;
   }
 
-  viewRange.from = Math.max(nodeIndex - quarterRange, 0);
-  viewRange.to = Math.min(viewRange.from + this.viewRangeSize, this.visibleNodesFlat.length);
 
   // Try to use the whole viewRangeSize (extend from if necessary)
   diff = this.viewRangeSize - viewRange.size();
@@ -1808,6 +1809,8 @@ scout.Tree.prototype.insertNodes = function(nodes, parentNode) {
     this._visitNodes(nodes, this._initTreeNode.bind(this), parentNode);
   }
   if (this.rendered) {
+    this.viewRangeDirty = true;
+    this._renderViewport();
     this.invalidateLayoutTree();
   }
   this.trigger('nodesInserted', {
@@ -2317,7 +2320,7 @@ scout.Tree.prototype._insertNodeInDOM = function(node, indexHint) {
     return;
   }
   var index = indexHint === undefined ? this.visibleNodesFlat.indexOf(node) : indexHint;
-  if (index === -1 || !(this.viewRangeRendered.from + this.viewRangeSize >= index && this.viewRangeRendered.from <= index) || node.attached) {
+  if (index === -1 || !(this.viewRangeRendered.from + this.viewRangeSize >= index && this.viewRangeRendered.from <= index && this.viewRangeRendered.size()>0) || node.attached) {
     //node is not visible
     return;
   }
