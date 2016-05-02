@@ -23,11 +23,15 @@ scout.inherits(scout.AbstractOutlineNavigationKeyStroke, scout.KeyStroke);
 
 scout.AbstractOutlineNavigationKeyStroke.prototype._accept = function(event) {
   var accepted = scout.AbstractOutlineNavigationKeyStroke.parent.prototype._accept.call(this, event);
-  if (!accepted) {
+  if (!accepted ) {
     return false;
   }
 
-  var $currentNode = this.field.$selectedNodes().eq(0);
+  var $selectedNodes = this.field.$selectedNodes();
+  if(!$selectedNodes || $selectedNodes.length===0){
+    return;
+  }
+  var $currentNode = $selectedNodes.eq(0);
   event._$treeCurrentNode = $currentNode;
   event._treeCurrentNode = $currentNode.data('node');
   return true;
