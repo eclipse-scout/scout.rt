@@ -6,13 +6,17 @@ package org.eclipse.scout.testing.client;
 
 import java.util.concurrent.TimeUnit;
 
+import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.exception.DefaultRuntimeExceptionTranslator;
+import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.job.IJobManager;
 import org.eclipse.scout.rt.platform.job.JobState;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
@@ -20,6 +24,9 @@ import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.job.listener.JobEventType;
 import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
+import org.eclipse.scout.rt.platform.util.concurrent.TimedOutException;
+import org.eclipse.scout.rt.shared.ISession;
+import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.platform.runner.JUnitExceptionHandler;
 
 /**
@@ -88,4 +95,89 @@ public final class BlockingTestUtility {
       onceBlockedDoneCondition.waitForUninterruptibly(120, TimeUnit.SECONDS);
     }
   }
+
+  /**
+   * Used by {@link ClientTestRunner} to detect unexpected blocking conditions (forms)
+   * <p>
+   * Adds a blocking condition timeout listener on {@link IJobManager} for the current {@link IClientSession}
+   *
+   * @return the handle for the listener containing the first exception caught. Call
+   *         {@link IRegistrationHandle#dispose()} to remove the listener.
+   */
+  public static IBlockingConditionTimeoutHandle addBlockingConditionTimeoutListener(long timeout, TimeUnit unit) {
+    final BlockingConditionTimeoutListener listener = new BlockingConditionTimeoutListener(IClientSession.CURRENT.get(), timeout, unit);
+    final IRegistrationHandle handle = BEANS.get(IJobManager.class).addListener(Jobs.newEventFilterBuilder()
+        .andMatchEventType(JobEventType.JOB_STATE_CHANGED)
+        .andMatchState(JobState.WAITING_FOR_BLOCKING_CONDITION)
+        .toFilter(), listener);
+    return new IBlockingConditionTimeoutHandle() {
+      @Override
+      public Exception getFirstException() {
+        return listener.m_firstException;
+      }
+
+      @Override
+      public void dispose() {
+        handle.dispose();
+      }
+    };
+  }
+
+  public static interface IBlockingConditionTimeoutHandle extends IRegistrationHandle {
+    public Exception getFirstException();
+  }
+
+  private static class BlockingConditionTimeoutListener implements IJobListener {
+    private final ISession m_session;
+    private final long m_timeout;
+    private final TimeUnit m_unit;
+    private Exception m_firstException;
+
+    BlockingConditionTimeoutListener(ISession session, long timeout, TimeUnit unit) {
+      m_session = session;
+      m_timeout = timeout;
+      m_unit = unit;
+    }
+
+    @Override
+    public void changed(final JobEvent event) {
+      final IFuture<?> future = event.getData().getFuture();
+      if (future == null) {
+        return;
+      }
+      final IBlockingCondition blockingCondition = event.getData().getBlockingCondition();
+      if (blockingCondition == null) {
+        return;
+      }
+      RunContext runContext = event.getData().getFuture().getJobInput().getRunContext();
+      if (!(runContext instanceof ClientRunContext)) {
+        return;
+      }
+      ClientRunContext clientRunContext = (ClientRunContext) runContext;
+      if (clientRunContext.getSession() != m_session) {
+        return;
+      }
+      final Exception callerException = new PlatformException(
+          "Testing detected a BlockingCondition that was not released after {} {}. Auto-unlocking the condition. Please check the test code and ensure that especially all forms are handled and closed correctly",
+          m_timeout, m_unit);
+
+      Jobs.schedule(new IRunnable() {
+        @Override
+        public void run() throws Exception {
+          try {
+            blockingCondition.waitFor(m_timeout, m_unit);
+          }
+          catch (TimedOutException ex) {
+            //cancel future and unlock
+            if (m_firstException == null) {
+              m_firstException = callerException;
+            }
+            future.cancel(true);
+            blockingCondition.setBlocking(false);
+          }
+        }
+      }, Jobs.newInput());
+    }
+  }
+
 }

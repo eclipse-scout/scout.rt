@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.testing.client.runner;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
@@ -26,6 +27,8 @@ import org.eclipse.scout.rt.testing.client.runner.statement.RunInModelJobStateme
 import org.eclipse.scout.rt.testing.client.runner.statement.TimeoutClientRunContextStatement;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
+import org.eclipse.scout.testing.client.BlockingTestUtility;
+import org.eclipse.scout.testing.client.BlockingTestUtility.IBlockingConditionTimeoutHandle;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -34,7 +37,6 @@ import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;
 import org.junit.runners.model.Statement;
-import org.junit.runners.model.TestClass;
 
 /**
  * Use this Runner to run tests which require a session context.
@@ -80,7 +82,7 @@ public class ClientTestRunner extends PlatformTestRunner {
   protected Statement classBlock(RunNotifier notifier) {
     Statement s2 = super.classBlock(notifier);
     //make sure that the test cleans up the desktop; no leftover forms, messageboxes or filechoosers
-    final Statement s1 = new CheckDesktopCleanupStatement(s2, getTestClass());
+    final Statement s1 = new CheckDesktopCleanupStatement(s2);
     return s1;
   }
 
@@ -95,14 +97,15 @@ public class ClientTestRunner extends PlatformTestRunner {
 
   @Override
   protected Statement interceptMethodLevelStatement(final Statement next, final Class<?> testClass, final Method testMethod) {
-    final Statement s4;
+    final Statement s5;
     if (hasNoTimeout(testMethod)) {
-      s4 = new RunInModelJobStatement(next);
+      s5 = new RunInModelJobStatement(next);
     }
     else {
       // Three different model jobs are scheduled for all @Before methods, the @Test-annotated method and all @After methods.
-      s4 = next;
+      s5 = next;
     }
+    final Statement s4 = new AddBlockingConditionTimeoutStatement(s5);
     final Statement s3 = new ClientRunContextStatement(s4, ReflectionUtility.getAnnotation(RunWithClientSession.class, testMethod, testClass));
     final Statement s2 = super.interceptMethodLevelStatement(s3, testClass, testMethod);
     final Statement s1 = new ClearClientRunContextStatement(s2);
@@ -140,14 +143,33 @@ public class ClientTestRunner extends PlatformTestRunner {
     return new TimeoutClientRunContextStatement(interceptedAfterStatement, 0);
   }
 
-  protected static class CheckDesktopCleanupStatement extends Statement {
-
+  protected static class AddBlockingConditionTimeoutStatement extends Statement {
     private final Statement m_statement;
-    private final TestClass m_testClass;
 
-    public CheckDesktopCleanupStatement(Statement statement, TestClass testClass) {
+    public AddBlockingConditionTimeoutStatement(Statement statement) {
       m_statement = statement;
-      m_testClass = testClass;
+    }
+
+    @Override
+    public void evaluate() throws Throwable {
+      IBlockingConditionTimeoutHandle reg = BlockingTestUtility.addBlockingConditionTimeoutListener(2, TimeUnit.MINUTES);
+      try {
+        m_statement.evaluate();
+        if (reg.getFirstException() != null) {
+          throw reg.getFirstException();
+        }
+      }
+      finally {
+        reg.dispose();
+      }
+    }
+  }
+
+  protected static class CheckDesktopCleanupStatement extends Statement {
+    private final Statement m_statement;
+
+    public CheckDesktopCleanupStatement(Statement statement) {
+      m_statement = statement;
     }
 
     @Override
@@ -173,9 +195,6 @@ public class ClientTestRunner extends PlatformTestRunner {
       }
       if (messageBoxesAfter > messageBoxesBefore || formsAfter > formsBefore || fileChoosersAfter > fileChoosersBefore) {
         try {
-          System.out
-              .println(String.format("DESKTOP_CLEANUP %s: Desktop has leftovers: %d message boxes, %d forms, %d file choosers. Clean up the desktop in a @After method.", m_testClass.toString(),
-                  messageBoxesAfter, formsAfter, fileChoosersAfter));
           Assert.fail(String.format("Desktop has leftovers: %d message boxes, %d forms, %d file choosers. Clean up the desktop in a @After method.", messageBoxesAfter, formsAfter, fileChoosersAfter));
         }
         finally {
