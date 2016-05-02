@@ -14,7 +14,6 @@ import java.security.AllPermission;
 import java.security.PermissionCollection;
 
 import org.eclipse.scout.rt.platform.Order;
-import org.eclipse.scout.rt.platform.Replace;
 import org.eclipse.scout.rt.shared.services.common.security.AbstractAccessControlService;
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
 
@@ -24,7 +23,6 @@ import org.eclipse.scout.rt.shared.services.common.security.IAccessControlServic
  * This service is ignored by default and needs to be registered explicitly.
  */
 @Order(4500)
-@Replace
 public class AllAccessControlService extends AbstractAccessControlService<String> {
 
   @Override
