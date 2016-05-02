@@ -91,7 +91,7 @@ scout.KeyStrokeManager.prototype.uninstallKeyStrokeContext = function(keyStrokeC
   }
 
   keyStrokeContext._handler.$target.off('keydown', keyStrokeContext._handler);
-  keyStrokeContext._handler.$target.off('up', keyStrokeContext._handler);
+  keyStrokeContext._handler.$target.off('keyup', keyStrokeContext._handler);
   keyStrokeContext._handler.$target = null;
   keyStrokeContext._handler = null;
 };
