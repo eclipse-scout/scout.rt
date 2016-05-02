@@ -647,6 +647,10 @@ scout.Tree.prototype._postRender = function() {
 };
 
 scout.Tree.prototype._remove = function() {
+  //stop all animations
+  if (this._$animationWrapper) {
+    this._$animationWrapper.stop(false, true);
+  }
   // Detach nodes from jQuery objects (because those will be removed)
   this._visitNodes(this.nodes, this._resetTreeNode.bind(this));
 
@@ -682,6 +686,9 @@ scout.Tree.prototype._removeNodes = function(nodes, parentNode) {
       this._removeNodes(node.childNodes, node);
     }
     if (node.$node) {
+      if (this._$animationWrapper && this._$animationWrapper.find(node.$node).length > 0) {
+        this._$animationWrapper.stop(false, true);
+      }
       node.$node.remove();
       node.rendered = false;
       node.attached = false;
@@ -1398,7 +1405,7 @@ scout.Tree.prototype._removeChildsFromFlatList = function(parentNode, animatedRe
       this._renderViewportBlocked = true;
       if (removedNodes.length > 0) {
         this._$animationWrapper
-          .animateAVSCSD('height', 0, this.startAnimationFunc, onAnimationComplete.bind(this, removedNodes), function() {}, 200);
+          .animateAVSCSD('height', 0, this.startAnimationFunc, onAnimationComplete.bind(this, removedNodes), function() {}, 1000);
       } else if (this._$animationWrapper) {
         this._$animationWrapper.remove();
         this._$animationWrapper = null;
@@ -2202,11 +2209,15 @@ scout.Tree.prototype._isGroupingEnd = function(node) {
 };
 
 scout.Tree.prototype.$selectedNodes = function() {
-  return this.$data.find('.selected');
+  if(this.$data){
+    return this.$data.find('.selected');
+  }
 };
 
 scout.Tree.prototype.$nodes = function() {
-  return this.$data.find('.tree-node');
+  if(this.$data){
+    return this.$data.find('.tree-node');
+  }
 };
 
 /**
