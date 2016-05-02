@@ -1261,6 +1261,7 @@ scout.Tree.prototype.setNodeExpanded = function(node, expanded, opts) {
   opts = opts || {};
   var lazy = scout.nvl(opts.lazy, node.lazyExpandingEnabled);
   var notifyServer = scout.nvl(opts.notifyServer, true);
+  var renderAnimated = scout.nvl(opts.renderAnimated, true);
 
   // Never do lazy expansion if it is disabled on the tree
   if (!this.lazyExpandingEnabled) {
@@ -1311,9 +1312,9 @@ scout.Tree.prototype.setNodeExpanded = function(node, expanded, opts) {
     }
 
     if (node.expanded) {
-      this._addChildsToFlatList(node, null, true, null, true);
+      this._addChildsToFlatList(node, null, renderAnimated, null, true);
     } else {
-      this._removeChildsFromFlatList(node, true);
+      this._removeChildsFromFlatList(node, renderAnimated);
     }
     if (notifyServer) {
       this._send('nodeExpanded', {
@@ -1504,7 +1505,7 @@ scout.Tree.prototype._addChildsToFlatList = function(parentNode, parentIndex, an
   if (!this.visibleNodesMap[parentNode.id]) {
     return 0;
   }
-  var isSubAdding = !!parentIndex;
+  var isSubAdding = !!insertBatch;
   parentIndex = parentIndex ? parentIndex : this.visibleNodesFlat.indexOf(parentNode);
   animatedRendering = animatedRendering && this.rendered; // don't animate while rendering (not necessary, or may even lead to timing issues)
   if (this._$animationWrapper && !isSubAdding) {
@@ -1741,7 +1742,7 @@ scout.Tree.prototype._expandAllParentNodes = function(node) {
   var nodesToInsert = [];
   while (currNode.parentNode) {
     parentNodes.push(currNode.parentNode);
-    if (!this.visibleNodesMap[currNode.id] && !currNode.isFilterAccepted() && this._applyFiltersForNode(currNode)) {
+    if (!this.visibleNodesMap[currNode.id]) {
       nodesToInsert.push(currNode);
     }
     currNode = currNode.parentNode;
@@ -1752,12 +1753,9 @@ scout.Tree.prototype._expandAllParentNodes = function(node) {
       this._addToVisibleFlatList(parentNodes[i], false);
     }
     if (!parentNodes[i].expanded) {
-      $parentNode = parentNodes[i].$node;
-      if (!$parentNode) {
-        throw new Error('Illegal state, $parentNode should be displayed. Rendered: ' + this.rendered + ', parentNode: ' + parentNodes[i]);
-      }
       this.expandNode(parentNodes[i], {
-        renderExpansion: false
+        renderExpansion: false,
+        renderAnimated: false
       });
     }
   }
