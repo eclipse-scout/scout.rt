@@ -54,6 +54,9 @@ public class JsonSplitBox<SPLIT_BOX extends ISplitBox> extends JsonFormField<SPL
     return "SplitBox";
   }
 
+  /**
+   *
+   */
   @Override
   protected void initJsonProperties(SPLIT_BOX model) {
     super.initJsonProperties(model);
@@ -73,6 +76,32 @@ public class JsonSplitBox<SPLIT_BOX extends ISplitBox> extends JsonFormField<SPL
       @Override
       protected Boolean modelValue() {
         return getModel().isSplitterEnabled();
+      }
+    });
+    putJsonProperty(new JsonProperty<ISplitBox>(ISplitBox.PROP_COLLAPSIBLE_FIELD, model) {
+      @Override
+      protected IFormField modelValue() {
+        return getModel().getCollapsibleField();
+      }
+
+      @Override
+      public Object prepareValueForToJson(Object value) {
+        if (value == null) {
+          return null;
+        }
+        return getAdapter(value).getId();
+      }
+    });
+    putJsonProperty(new JsonProperty<ISplitBox>(ISplitBox.PROP_FIELD_COLLAPSED, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isFieldCollapsed();
+      }
+    });
+    putJsonProperty(new JsonProperty<ISplitBox>(ISplitBox.PROP_COLLAPSE_KEY_STROKE, model) {
+      @Override
+      protected String modelValue() {
+        return getModel().getCollapseKeyStroke();
       }
     });
   }
@@ -108,6 +137,15 @@ public class JsonSplitBox<SPLIT_BOX extends ISplitBox> extends JsonFormField<SPL
     }
     else {
       super.handleUiEvent(event);
+    }
+  }
+
+  @Override
+  protected void handleUiPropertyChange(String propertyName, JSONObject data) {
+    if (ISplitBox.PROP_FIELD_COLLAPSED.equals(propertyName)) {
+      boolean fieldCollapsed = data.getBoolean("fieldCollapsed");
+      addPropertyEventFilterCondition(ISplitBox.PROP_FIELD_COLLAPSED, fieldCollapsed);
+      getModel().setFieldCollapsed(fieldCollapsed);
     }
   }
 

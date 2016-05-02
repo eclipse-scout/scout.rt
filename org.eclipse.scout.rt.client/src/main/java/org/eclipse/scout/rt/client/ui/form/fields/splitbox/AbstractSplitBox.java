@@ -14,6 +14,7 @@ import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.splitbox.ISplitBoxExtension;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractCompositeField;
+import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.splitbox.internal.SplitBoxGrid;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
@@ -89,6 +90,24 @@ public abstract class AbstractSplitBox extends AbstractCompositeField implements
     return getClass().getName();
   }
 
+  @ConfigProperty(ConfigProperty.OBJECT)
+  @Order(370)
+  protected Class<? extends IFormField> getConfiguredCollapsibleField() {
+    return null;
+  }
+
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(380)
+  protected boolean getConfiguredFieldCollapsed() {
+    return false;
+  }
+
+  @ConfigProperty(ConfigProperty.STRING)
+  @Order(390)
+  protected String getConfiguredCollapseKeyStroke() {
+    return null;
+  }
+
   @Override
   protected void initConfig() {
     m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(new P_UIFacade(), ModelContext.copyCurrent());
@@ -100,6 +119,11 @@ public abstract class AbstractSplitBox extends AbstractCompositeField implements
     setSplitterPositionType(getConfiguredSplitterPositionType());
     setCacheSplitterPosition(getConfiguredCacheSplitterPosition());
     setCacheSplitterPositionPropertyName(getConfiguredCacheSplitterPositionPropertyName());
+    if (getConfiguredCollapsibleField() != null) {
+      setCollapsibleField(getFieldByClass(getConfiguredCollapsibleField()));
+    }
+    setFieldCollapsed(getConfiguredFieldCollapsed());
+    setCollapseKeyStroke(getConfiguredCollapseKeyStroke());
   }
 
   @Override
@@ -188,6 +212,36 @@ public abstract class AbstractSplitBox extends AbstractCompositeField implements
   @Override
   public void setCacheSplitterPositionPropertyName(String propName) {
     m_cacheSplitterPositionPropertyName = propName;
+  }
+
+  @Override
+  public void setCollapsibleField(IFormField field) {
+    propertySupport.setProperty(PROP_COLLAPSIBLE_FIELD, field);
+  }
+
+  @Override
+  public IFormField getCollapsibleField() {
+    return (IFormField) propertySupport.getProperty(PROP_COLLAPSIBLE_FIELD);
+  }
+
+  @Override
+  public void setFieldCollapsed(boolean collapsed) {
+    propertySupport.setProperty(PROP_FIELD_COLLAPSED, collapsed);
+  }
+
+  @Override
+  public boolean isFieldCollapsed() {
+    return propertySupport.getPropertyBool(PROP_FIELD_COLLAPSED);
+  }
+
+  @Override
+  public void setCollapseKeyStroke(String keyStroke) {
+    propertySupport.setProperty(PROP_COLLAPSE_KEY_STROKE, keyStroke);
+  }
+
+  @Override
+  public String getCollapseKeyStroke() {
+    return propertySupport.getPropertyString(PROP_COLLAPSE_KEY_STROKE);
   }
 
   @Override

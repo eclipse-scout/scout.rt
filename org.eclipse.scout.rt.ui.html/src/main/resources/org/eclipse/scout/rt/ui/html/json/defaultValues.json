@@ -104,10 +104,13 @@
       "fields": []
     },
     "SmartField": {
-      "lookupStrategy": "remote",
       "proposal": false
     },
     "SmartFieldMultiline": {
+    },
+    "SplitBox": {
+      "fieldCollapsed": false,
+      "collapsibleField": null
     },
     "StringField": {
       "inputMasked": false,

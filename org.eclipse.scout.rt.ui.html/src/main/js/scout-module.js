@@ -78,6 +78,7 @@
   __include("scout/keystroke/CloseKeyStroke.js");
   // Misc. elements
   __include("scout/boxbuttons/BoxButtons.js");
+  __include("scout/collapsebutton/CollapseButton.js");
   __include("scout/focus/FocusManager.js");
   __include("scout/focus/FocusContext.js");
   __include("scout/focus/focusUtils.js");

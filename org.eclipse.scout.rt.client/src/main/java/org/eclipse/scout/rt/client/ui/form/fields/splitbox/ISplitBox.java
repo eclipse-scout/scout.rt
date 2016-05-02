@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.ui.form.fields.splitbox;
 
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
+import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 
 /**
  * <h3>ISplitBox</h3> ...
@@ -24,6 +25,9 @@ public interface ISplitBox extends ICompositeField {
   String PROP_SPLIT_HORIZONTAL = "splitHorizontal";
   String PROP_SPLITTER_POSITION = "splitterPosition";
   String PROP_SPLITTER_POSITION_TYPE = "splitterPositionType";
+  String PROP_COLLAPSIBLE_FIELD = "collapsibleField";
+  String PROP_FIELD_COLLAPSED = "fieldCollapsed";
+  String PROP_COLLAPSE_KEY_STROKE = "collapseKeyStroke";
 
   /**
    * The splitter position is the size of the <b>first</b> inner box relative to full size of the split box, i.e. it is
@@ -95,6 +99,50 @@ public interface ISplitBox extends ICompositeField {
   String getCacheSplitterPositionPropertyName();
 
   void setCacheSplitterPositionPropertyName(String propName);
+
+  /**
+   * Marks the first or the second field of the split box as collapsible, which displays the according button. Only one
+   * field of the split box can be collapsible.
+   *
+   * @since 6.0
+   */
+  void setCollapsibleField(IFormField field);
+
+  /**
+   * Returns the first or second form-field of the split box which is marked as collapsible or null when no part of the
+   * split box is collapsible.
+   *
+   * @since 6.0
+   */
+  IFormField getCollapsibleField();
+
+  /**
+   * Sets the collapsed state of the collapsible field. When no field is collapsible, the method does nothing.
+   *
+   * @since 6.0
+   */
+  void setFieldCollapsed(boolean collapsed);
+
+  /**
+   * Returns the collapsed state of the collapsible field. When no field is collapsible, the method returns false.
+   *
+   * @since 6.0
+   */
+  boolean isFieldCollapsed();
+
+  /**
+   * Sets the key-stroke used to trigger the collapse button.
+   *
+   * @since 6.0
+   */
+  void setCollapseKeyStroke(String keyStroke);
+
+  /**
+   * Returns the key-stroke used to trigger the collapse button.
+   *
+   * @since 6.0
+   */
+  String getCollapseKeyStroke();
 
   ISplitBoxUIFacade getUIFacade();
 }

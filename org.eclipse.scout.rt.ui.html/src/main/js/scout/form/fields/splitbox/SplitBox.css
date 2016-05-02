@@ -10,6 +10,20 @@
  ******************************************************************************/
 .split-box {
 
+  & > .desktop-navigation-handle {
+    position: absolute;
+
+  &:active > .desktop-navigation-handle-body {
+    background-color: @palette-blue-1;
+  }
+
+    & > .desktop-navigation-handle-body {
+      background-color: @palette-white;
+      border-color: @active-color;
+      color: @active-color;
+    }
+  }
+
   & > .split-area {
     @x-splitter-size: 40px - @mandatory-indicator-width;
     @y-splitter-size: 15px;
@@ -19,6 +33,10 @@
     & > .first-field,
     & > .second-field {
       overflow: hidden;
+
+      &.collapsed {
+        display: none;
+      }
     }
 
     & > .splitter {
