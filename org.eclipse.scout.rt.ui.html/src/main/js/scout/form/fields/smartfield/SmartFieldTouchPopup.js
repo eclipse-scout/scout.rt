@@ -13,6 +13,11 @@ scout.SmartFieldTouchPopup = function() {
 };
 scout.inherits(scout.SmartFieldTouchPopup, scout.TouchPopup);
 
+scout.SmartFieldTouchPopup.prototype._init = function(options) {
+  scout.DatePickerTouchPopup.parent.prototype._init.call(this, options);
+  this._field.on('acceptProposal', this._onFieldAcceptProposal.bind(this));
+};
+
 scout.SmartFieldTouchPopup.prototype._fieldOverrides = function() {
   var obj = scout.SmartFieldTouchPopup.parent.prototype._fieldOverrides.call(this);
   // Make sure proposal chooser does not get cloned, because it would not work (e.g. because selectedRows may not be cloned)
@@ -30,25 +35,14 @@ scout.SmartFieldTouchPopup.prototype._renderProposalChooser = function(proposalC
 };
 
 /**
- * This event handler is called before the mousedown handler on the _document_ is triggered
- * This allows us to prevent the default, which is important for the CellEditorPopup which
- * should stay open when the SmartField popup is closed. It also prevents the focus blur
- * event on the SmartField input-field.
- */
-//TODO [5.2] cgu, awe: this is not required by the cell editor anymore, but we cannot remove it either because mouse down on a row would immediately close the popup, why?
-scout.SmartFieldTouchPopup.prototype._onContainerMouseDown = function(event) {
-  // when user clicks on proposal popup with table or tree (prevent default,
-  // so input-field does not lose the focus, popup will be closed by the
-  // proposal chooser impl.
-  //  return false;
-  // FIXME awe: (popups) durch das prevent default here, wird verhindert, dass ein text-field im popup den fokus bekommen kann
-  // müssen wir für mobile und editierbare tabellen (?) noch lösen
-};
-
-/**
  * @override Popup.js
  */
 scout.SmartFieldTouchPopup.prototype.close = function(event) {
-  this._field._sendCancelProposal();
+  this._touchField.acceptInput();
   scout.SmartFieldTouchPopup.parent.prototype.close.call(this);
+};
+
+scout.SmartFieldTouchPopup.prototype._onFieldAcceptProposal = function(event) {
+  // Delegate to original field
+  this._touchField.setDisplayText(event.displayText);
 };

@@ -39,7 +39,7 @@ describe('SmartField', function() {
 
     it('doesn not call _openProposal() when TAB has been pressed', function() {
       smartField.render(session.$entryPoint);
-      smartField._openProposal = function(searchText, selectCurrentValue) {};
+      smartField._openProposal = function(displayText, selectCurrentValue) {};
       var event = {
         which: scout.keys.TAB
       };
@@ -52,7 +52,7 @@ describe('SmartField', function() {
       smartField.render(session.$entryPoint);
       smartField._browseOnce = true;
       smartField._popup = {};
-      smartField._openProposal = function(searchText, selectCurrentValue) {};
+      smartField._openProposal = function(displayText, selectCurrentValue) {};
       var event = {
         which: scout.keys.A
       };
@@ -90,21 +90,21 @@ describe('SmartField', function() {
 
     it('must "browse all" when field is valid and browseAll parameter is true', function() {
       smartField._openProposal(true);
-      expect(events[0].searchText).toBe('foo');
+      expect(events[0].displayText).toBe('foo');
       expect(events[0].browseAll).toBe(true);
       expect(events[0].selectCurrentValue).toBe(true);
     });
 
     it('must search by display-text when field is valid and browseAll parameter is false', function() {
       smartField._openProposal(false);
-      expect(events[0].searchText).toBe('foo');
+      expect(events[0].displayText).toBe('foo');
       expect(events[0].selectCurrentValue).toBe(false);
     });
 
     it('must "browseAll" when field is invalid', function() {
       smartField.errorStatus = {};
       smartField._openProposal(true);
-      expect(events[0].searchText).toBe('foo');
+      expect(events[0].displayText).toBe('foo');
       expect(events[0].browseAll).toBe(true);
       expect(events[0].selectCurrentValue).toBe(false);
     });
@@ -129,18 +129,18 @@ describe('SmartField', function() {
       expect(smartField._pendingProposalTyped).toBe(null);
     });
 
-    it('dont send _acceptProposal when searchText has not changed', function() {
+    it('dont send _acceptProposal when displayText has not changed', function() {
       smartField.render(session.$entryPoint);
-      smartField._oldSearchText = 'foo';
+      smartField._oldDisplayText = 'foo';
       smartField.$field.val('foo');
       spyOn(smartField, 'remoteHandler');
       smartField._acceptProposal();
       expect(smartField.remoteHandler).not.toHaveBeenCalled();
     });
 
-    it('send _acceptProposal when searchText has changed', function() {
+    it('send _acceptProposal when displayText has changed', function() {
       smartField.render(session.$entryPoint);
-      smartField._oldSearchText = 'foo';
+      smartField._oldDisplayText = 'foo';
       smartField.$field.val('bar');
       spyOn(smartField, 'remoteHandler');
       smartField._acceptProposal();
@@ -148,9 +148,9 @@ describe('SmartField', function() {
     });
 
     // test for ticket #168652
-    it('send deleteProposal when searchText has been deleted quickly', function() {
+    it('send deleteProposal when displayText has been deleted quickly', function() {
       smartField.render(session.$entryPoint);
-      smartField._oldSearchText = 'foo';
+      smartField._oldDisplayText = 'foo';
       smartField.$field.val('');
       smartField.proposalChooser = {}; // fake proposal-chooser is open
       spyOn(smartField, '_sendDeleteProposal');

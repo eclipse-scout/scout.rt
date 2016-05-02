@@ -55,7 +55,7 @@ scout.CheckBoxField.prototype.acceptInput = function(whileTyping, forceSend) {
   //nop
 };
 
-scout.CheckBoxField.prototype._renderDisplayText = function(displayText) {
+scout.CheckBoxField.prototype._renderDisplayText = function() {
   //nop
 };
 

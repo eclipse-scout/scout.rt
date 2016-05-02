@@ -19,11 +19,11 @@ scout.inherits(scout.ValueField, scout.FormField);
 
 scout.ValueField.prototype._renderProperties = function() {
   scout.ValueField.parent.prototype._renderProperties.call(this);
-  this._renderDisplayText(this.displayText);
+  this._renderDisplayText();
 };
 
-scout.ValueField.prototype._renderDisplayText = function(displayText) {
-  this.$field.val(displayText);
+scout.ValueField.prototype._renderDisplayText = function() {
+  this.$field.val(this.displayText);
 };
 
 scout.ValueField.prototype._renderCurrentMenuTypes = function() {
@@ -102,6 +102,20 @@ scout.ValueField.prototype._sendDisplayTextChanged = function(displayText, while
   };
   this._send('displayTextChanged', event);
   this.trigger('displayTextChanged', event);
+};
+
+/**
+ * Not used by acceptInput by purpose, because display text doesn't have to be rendered again.
+ * May be used to just modify the display text without validation
+ */
+scout.ValueField.prototype.setDisplayText = function(displayText) {
+  if (this.displayText === displayText) {
+    return;
+  }
+  this.displayText = displayText;
+  if (this.rendered) {
+    this._renderDisplayText();
+  }
 };
 
 scout.ValueField.prototype.addField = function($field) {

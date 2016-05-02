@@ -178,19 +178,19 @@ scout.StringField.prototype._renderFormat = function(fmt) {
   }
 };
 
-scout.StringField.prototype._renderSpellCheckEnabled = function(spellCheckEnabled) {
-  if (spellCheckEnabled) {
+scout.StringField.prototype._renderSpellCheckEnabled = function() {
+  if (this.spellCheckEnabled) {
     this.$field.attr('spellcheck', 'true');
   } else {
     this.$field.attr('spellcheck', 'false');
   }
 };
 
-scout.StringField.prototype._renderDisplayText = function(displayText) {
-  displayText = scout.strings.nvl(displayText);
+scout.StringField.prototype._renderDisplayText = function() {
+  var displayText = scout.strings.nvl(this.displayText);
   var oldDisplayText = scout.strings.nvl(this.$field.val());
   var oldSelection = this._getSelection();
-  scout.StringField.parent.prototype._renderDisplayText.call(this, displayText);
+  scout.StringField.parent.prototype._renderDisplayText.call(this);
   // Try to keep the current selection for cases where the old and new display
   // text only differ because of the automatic trimming.
   if (this.trimText && oldDisplayText !== displayText) {

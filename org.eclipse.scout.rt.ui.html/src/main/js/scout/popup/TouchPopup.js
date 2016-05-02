@@ -19,7 +19,6 @@ scout.TouchPopup = function() {
   this._widget;
   this._$widgetContainer;
   this._widgetContainerHtmlComp;
-
 };
 scout.inherits(scout.TouchPopup, scout.Popup);
 
@@ -32,7 +31,6 @@ scout.TouchPopup.prototype._init = function(options) {
   // clone original touch field
   // original and clone both point to the same _popup instance
   this._field = this._touchField.cloneAdapter(this._fieldOverrides());
-
   this._initWidget(options);
 };
 

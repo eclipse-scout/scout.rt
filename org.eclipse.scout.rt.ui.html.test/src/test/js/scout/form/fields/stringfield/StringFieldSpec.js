@@ -227,7 +227,7 @@ describe("StringField", function() {
       var selection = field._getSelection();
       expect(selection.start).toBe(0);
       expect(selection.end).toBe(5);
-      field._renderDisplayText('foo');
+      field.setDisplayText('foo');
 
       selection = field._getSelection();
       expect(selection.start).toBe(0);
@@ -245,7 +245,7 @@ describe("StringField", function() {
       field.trimText = true;
       field.render(session.$entryPoint);
       field.$field.val(' ' + longText + ' ');
-      field._renderDisplayText(longText);
+      field.setDisplayText(longText);
       expect(true).toBe(true);
     });
   });

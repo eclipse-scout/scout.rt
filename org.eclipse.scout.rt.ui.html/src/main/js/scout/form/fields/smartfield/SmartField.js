@@ -33,7 +33,7 @@ scout.SmartField = function() {
   /**
    * This property is used to prevent unnecessary requests to the server.
    */
-  this._oldSearchText;
+  this._oldDisplayText;
   this._popup;
   this._requestedProposal = false;
   /**
@@ -123,15 +123,20 @@ scout.SmartField.prototype._renderProperties = function() {
 };
 
 scout.SmartField.prototype._syncDisplayText = function(displayText) {
-  this._oldSearchText = displayText;
+  this._oldDisplayText = displayText;
   this.displayText = displayText;
 };
 
 /**
  * @override ValueField.js
  */
-scout.SmartField.prototype._renderDisplayText = function(displayText) {
-  scout.fields.valOrText(this, this.$field, displayText);
+scout.SmartField.prototype._renderDisplayText = function() {
+  scout.fields.valOrText(this, this.$field, this.displayText);
+};
+
+scout.SmartField.prototype._readDisplayText = function() {
+  // in case of touch mode a 'div' is rendered and not an 'input' -> use text not val
+  return scout.fields.valOrText(this, this.$field);
 };
 
 /**
@@ -293,7 +298,7 @@ scout.SmartField.prototype._onKeyUp = function(e) {
 
   // The typed character is not available until the keyUp event happens
   // That's why we must deal with that event here (and not in keyDown)
-  // We don't use _searchText() here because we always want the text the
+  // We don't use _displayText() here because we always want the text the
   // user has typed.
   if (this._popup.rendered) {
     this._proposalTyped();
@@ -303,26 +308,26 @@ scout.SmartField.prototype._onKeyUp = function(e) {
 };
 
 scout.SmartField.prototype._onFocus = function(e) {
-  this._oldSearchText = this._readSearchText();
+  this._oldDisplayText = this._readDisplayText();
   this._acceptedInput = false;
 };
 
 scout.SmartField.prototype._proposalTyped = function() {
-  var searchText = this._readDisplayText();
-  $.log.trace('(SmartField#_proposalTyped) searchText=' + searchText + ' displayText=' + this.displayText);
-  if (searchText === this.displayText) {
+  var displayText = this._readDisplayText();
+  $.log.trace('(SmartField#_proposalTyped) displayText=' + displayText + ' currentDisplayText=' + this.displayText);
+  if (displayText === this.displayText) {
     return;
   }
-  this.displayText = searchText;
+  this.displayText = displayText;
 
   // debounce send
   var id, func;
   this._clearPendingProposalTyped();
 
   func = function() {
-    $.log.debug('(SmartField#_proposalTyped) send searchText=' + searchText);
+    $.log.debug('(SmartField#_proposalTyped) send displayText=' + displayText);
     this._send('proposalTyped', {
-      searchText: searchText
+      displayText: displayText
     });
   }.bind(this);
   id = setTimeout(func, this.DEBOUNCE_DELAY);
@@ -346,6 +351,8 @@ scout.SmartField.prototype._onFieldBlur = function() {
   this._requestedProposal = false;
 
   if (this.embedded) {
+    // Do not accept input while popup is open
+    // Done button of ios virtual keyboard triggers blur -> don't close the popup when pressing done, popup is closed when pressing enter.
     return;
   }
 
@@ -372,7 +379,7 @@ scout.SmartField.prototype._clearPendingProposalTyped = function() {
 
 /**
  * This method is called when the user presses the TAB or ENTER key in the UI, or when _onFieldBlur()
- * or acceptInput(). In case the field is a proposal-field we must send the current searchText
+ * or acceptInput(). In case the field is a proposal-field we must send the current displayText
  * to the server, even when the popup is not opened (this happens when the user types something which
  * is not in the list of proposals). We must accept the user defined text in that case.
  */
@@ -382,10 +389,11 @@ scout.SmartField.prototype._acceptProposal = function(forceClose) {
   this._clearPendingProposalTyped();
 
   forceClose = scout.nvl(forceClose, false);
-  var proposalChooserOpen = !!this.proposalChooser,
-    searchText = this._readSearchText();
+  // embedded smartfield does not hold a reference to the chooser, but if it is shown touch popup is open and therefore the chooser as well
+  var proposalChooserOpen = !!this.proposalChooser || this.embedded,
+    displayText = this._readDisplayText();
 
-  $.log.debug('(SmartField#_acceptProposal) searchText=' + searchText + ' proposalChooserOpen=' + proposalChooserOpen + ' forceClose=' + forceClose);
+  $.log.debug('(SmartField#_acceptProposal) displayText=' + displayText + ' proposalChooserOpen=' + proposalChooserOpen + ' forceClose=' + forceClose);
   if (proposalChooserOpen) {
     // Always send accept proposal, when proposal chooser is opened,
     // Because user wants to choose the selected proposal from the
@@ -398,20 +406,27 @@ scout.SmartField.prototype._acceptProposal = function(forceClose) {
     // UI Server has not enough information to find out what happened
     // and would accept a proposal, since on the model there's still
     // a selected proposal (ticket #168652).
-    var textDeleted = scout.strings.empty(searchText) && scout.strings.hasText(this._oldSearchText);
+    var textDeleted = scout.strings.empty(displayText) && scout.strings.hasText(this._oldDisplayText);
     if (textDeleted && !this._navigating) {
-      this._sendDeleteProposal(searchText);
+      this._sendDeleteProposal(displayText);
     } else {
-      this._sendAcceptProposal(searchText, true, forceClose);
+      this._triggerAcceptProposal(displayText);
+      this._sendAcceptProposal(displayText, true, forceClose);
+    }
+
+    if (this.embedded) {
+      // Always close popup when user presses 'Enter' on virtual keyboard if touch popup is open
+      this._closeProposal();
     }
   } else {
     // When proposal chooser is closed, only send accept proposal
     // when search text has changed. Prevents unnecessary requests
     // to the server when the user tabs over the smart-field.
-    if (searchText === this._oldSearchText) {
+    if (displayText === this._oldDisplayText) {
       return;
     }
-    this._sendAcceptProposal(searchText, false, forceClose);
+    this._triggerAcceptProposal(displayText);
+    this._sendAcceptProposal(displayText, false, forceClose);
   }
 
   this.session.listen().done(function() {
@@ -422,28 +437,21 @@ scout.SmartField.prototype._acceptProposal = function(forceClose) {
   }.bind(this));
 };
 
-/**
- * Override this method to return the search-text for this smart-field.
- * The implementation is different for single- and multi-line smart-fields.
- */
-scout.SmartField.prototype._readSearchText = function() {
-  return this._readDisplayText();
-};
-
-scout.SmartField.prototype._updateSeachText = function(searchText) {
-  this.displayText = searchText;
-  this._oldSearchText = searchText;
-};
-
-scout.SmartField.prototype._sendDeleteProposal = function(searchText) {
-  this._updateSeachText(searchText);
+scout.SmartField.prototype._sendDeleteProposal = function(displayText) {
+  this._syncDisplayText(displayText);
   this._send('deleteProposal');
 };
 
-scout.SmartField.prototype._sendAcceptProposal = function(searchText, chooser, forceClose) {
-  this._updateSeachText(searchText);
+scout.SmartField.prototype._triggerAcceptProposal = function(displayText) {
+  this.trigger('acceptProposal', {
+    displayText: displayText
+  });
+};
+
+scout.SmartField.prototype._sendAcceptProposal = function(displayText, chooser, forceClose) {
+  this._syncDisplayText(displayText);
   this._send('acceptProposal', {
-    searchText: searchText,
+    displayText: displayText,
     chooser: chooser,
     forceClose: forceClose
   });
@@ -490,7 +498,6 @@ scout.SmartField.prototype._sendCancelProposal = function() {
  */
 scout.SmartField.prototype._openProposal = function(browseAll) {
   var displayText = this._readDisplayText(),
-    searchText = this._readDisplayText(),
     selectCurrentValue = browseAll;
   this.displayText = displayText;
   if (this.errorStatus) {
@@ -501,9 +508,9 @@ scout.SmartField.prototype._openProposal = function(browseAll) {
     $.log.trace('(SmartField#_openProposal) already requested proposal -> do nothing');
   } else {
     this._requestedProposal = true;
-    $.log.debug('(SmartField#_openProposal) send openProposal. searchText=' + searchText + ' selectCurrentValue=' + selectCurrentValue);
+    $.log.debug('(SmartField#_openProposal) send openProposal. displayText=' + displayText + ' selectCurrentValue=' + selectCurrentValue);
     this._send('openProposal', {
-      searchText: searchText,
+      displayText: displayText,
       selectCurrentValue: selectCurrentValue,
       browseAll: browseAll
     });
@@ -515,13 +522,18 @@ scout.SmartField.prototype._renderPopup = function() {
     return;
   }
   this._popup.open();
+  if (this.touch) {
+    this._acceptedInput = false;
+    // Error message is shown on touch popup as well, don't show twice
+    this._hideStatusMessage();
+  }
 };
 
 /**
  * @override ValueField.js
  */
 scout.SmartField.prototype.acceptInput = function(whileTyping) {
-  if (this.mode !== scout.FormField.MODE_CELLEDITOR && !this.embedded && !this._acceptedInput) {
+  if (this.mode !== scout.FormField.MODE_CELLEDITOR && !this._acceptedInput) {
     this._acceptProposal(true);
     this._acceptedInput = true;
   }

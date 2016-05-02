@@ -227,10 +227,12 @@ scout.DateField.prototype._renderEnabled = function() {
 /**
  * @override ValueField.js
  */
-scout.DateField.prototype._renderDisplayText = function(displayText) {
+scout.DateField.prototype._renderDisplayText = function() {
   var tmp,
     dateText = '',
-    timeText = '';
+    timeText = '',
+    displayText = this.displayText;
+
   if (scout.strings.hasText(displayText)) {
     tmp = displayText.split('\n');
     dateText = tmp[0];
@@ -864,7 +866,6 @@ scout.DateField.prototype._syncToServer = function() {
       timestamp: this.timestamp
     };
     this._send('timestampChanged', event);
-    // FIXME AWE: (filter) improv. trigger/send in date-field , sendAndTrigger method
     this.trigger('timestampChanged', event);
   }
 };

@@ -68,7 +68,8 @@ scout.ClipboardField.prototype._createDragAndDropHandler = function() {
   });
 };
 
-scout.ClipboardField.prototype._renderDisplayText = function(displayText) {
+scout.ClipboardField.prototype._renderDisplayText = function() {
+  var displayText = this.displayText;
   if (scout.strings.hasText(displayText)) {
     this.$field.html(scout.strings.nl2br(displayText, true));
     scout.scrollbars.install(this.$field, {

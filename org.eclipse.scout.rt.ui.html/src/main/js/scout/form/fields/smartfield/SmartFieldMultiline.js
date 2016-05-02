@@ -47,8 +47,8 @@ scout.SmartFieldMultiline.prototype._render = function($parent) {
 /**
  * @override ValueField.js
  */
-scout.SmartFieldMultiline.prototype._renderDisplayText = function(displayText) {
-  var tmp = displayText.split('\n'),
+scout.SmartFieldMultiline.prototype._renderDisplayText = function() {
+  var tmp = this.displayText.split('\n'),
     firstLine = tmp.shift(),
     additionalLines = scout.arrays.formatEncoded(tmp, '<br/>');
   scout.fields.valOrText(this, this.$field, firstLine);
@@ -71,7 +71,7 @@ scout.SmartFieldMultiline.prototype._getInputBounds = function() {
  *
  * @override SmartField.js
  */
-scout.SmartFieldMultiline.prototype._readSearchText = function() {
+scout.SmartFieldMultiline.prototype._readDisplayText = function() {
   var i,
     firstLine = scout.fields.valOrText(this, this.$field),
     newDisplayText = [firstLine],

@@ -60,7 +60,7 @@ public class JsonSmartField<VALUE, LOOKUP_KEY, CONTENT_ASSIST_FIELD extends ICon
 
   @Override
   public void handleUiEvent(JsonEvent event) {
-    // NOTE: it's important we always set the submitted 'searchText' as display text
+    // NOTE: it's important we always set the submitted 'displayText' as display text
     // on the model field instance. Otherwise the java client will be out of sync
     // with the browser, which will cause a variety of bugs in the UI. This happens
     // in the UI facade impl.
@@ -85,7 +85,7 @@ public class JsonSmartField<VALUE, LOOKUP_KEY, CONTENT_ASSIST_FIELD extends ICon
   }
 
   protected void handleUiProposalTyped(JsonEvent event) {
-    String text = getSearchTextAndAddFilter(event);
+    String text = getDisplayTextAndAddFilter(event);
     getModel().getUIFacade().proposalTypedFromUI(text);
   }
 
@@ -94,7 +94,7 @@ public class JsonSmartField<VALUE, LOOKUP_KEY, CONTENT_ASSIST_FIELD extends ICon
   }
 
   protected void handleUiAcceptProposal(JsonEvent event) {
-    String text = getSearchTextAndAddFilter(event);
+    String text = getDisplayTextAndAddFilter(event);
     boolean chooser = event.getData().getBoolean("chooser");
     boolean forceClose = event.getData().getBoolean("forceClose");
     getModel().getUIFacade().acceptProposalFromUI(text, chooser, forceClose);
@@ -106,20 +106,20 @@ public class JsonSmartField<VALUE, LOOKUP_KEY, CONTENT_ASSIST_FIELD extends ICon
 
   protected void handleUiOpenProposal(JsonEvent event) {
     boolean browseAll = event.getData().optBoolean("browseAll");
-    String searchText = event.getData().optString("searchText", null);
+    String displayText = event.getData().optString("displayText", null);
     if (browseAll) {
       if (getModel().getErrorStatus() == null || (getModel().getErrorStatus() != null && !checkStatusContainsCode(getModel().getErrorStatus(), AbstractMixedSmartField.NOT_UNIQUE_ERROR_CODE))) {
-        searchText = "*";
+        displayText = "*";
       }
     }
-    addPropertyEventFilterCondition(IValueField.PROP_DISPLAY_TEXT, searchText);
+    addPropertyEventFilterCondition(IValueField.PROP_DISPLAY_TEXT, displayText);
     boolean selectCurrentValue = event.getData().optBoolean("selectCurrentValue");
-    LOG.debug("handle openProposal -> openProposalFromUI. searchText={} selectCurrentValue={}", searchText, selectCurrentValue);
-    getModel().getUIFacade().openProposalChooserFromUI(searchText, selectCurrentValue);
+    LOG.debug("handle openProposal -> openProposalFromUI. displayText={} selectCurrentValue={}", displayText, selectCurrentValue);
+    getModel().getUIFacade().openProposalChooserFromUI(displayText, selectCurrentValue);
   }
 
-  private String getSearchTextAndAddFilter(JsonEvent event) {
-    String text = event.getData().optString("searchText", null);
+  private String getDisplayTextAndAddFilter(JsonEvent event) {
+    String text = event.getData().optString("displayText", null);
     addPropertyEventFilterCondition(IValueField.PROP_DISPLAY_TEXT, text);
     return text;
   }

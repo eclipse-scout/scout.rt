@@ -65,7 +65,7 @@ scout.NumberField.prototype.acceptInput = function(whileTyping) {
 scout.NumberField.prototype.setDisplayText = function(value) {
   this.displayText = scout.objects.isNumber(value) ? value.toString() : '';
   if (this.rendered) {
-    this._renderDisplayText(this.displayText);
+    this._renderDisplayText();
   }
 };
 
