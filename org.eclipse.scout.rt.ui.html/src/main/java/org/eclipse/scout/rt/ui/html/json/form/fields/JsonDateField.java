@@ -177,7 +177,7 @@ public class JsonDateField<T extends IDateField> extends JsonValueField<T> {
     else if (IDateField.PROP_ERROR_STATUS.equals(propertyName)) {
       //if error occured thru wrong input and model is resetting value to null it has to be submitted to client.
       // -> only displayText is changed on model so there will be no event for value changed
-      if (getModel().getValue() == null && getModel().getDisplayText() == "" && event.getNewValue() == null) {
+      if (getModel().getValue() == null && "".equals(getModel().getDisplayText()) && event.getNewValue() == null) {
         addPropertyChangeEvent(PROP_TIMESTAMP, dateToJson((Date) event.getNewValue()));
       }
       super.handleModelPropertyChange(event);
