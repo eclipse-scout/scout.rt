@@ -178,7 +178,7 @@ scout.Tree.prototype._initTreeNode = function(node, parentNode) {
           this._addToVisibleFlatList(p, false);
 
           //process children
-          this._addChildsToFlatList(p, this.visibleNodesFlat.length - 1, false, null, true);
+          this._addChildrenToFlatList(p, this.visibleNodesFlat.length - 1, false, null, true);
         }
       }
       p = p.parentNode;
@@ -252,8 +252,8 @@ scout.Tree.prototype._visitNodes = function(nodes, func, parentNode) {
 
   for (i = 0; i < nodes.length; i++) {
     node = nodes[i];
-    var doNotProcessChilds = func(node, parentNode);
-    if (!doNotProcessChilds && node.childNodes.length > 0) {
+    var doNotProcessChildren = func(node, parentNode);
+    if (!doNotProcessChildren && node.childNodes.length > 0) {
       this._visitNodes(node.childNodes, func, node);
     }
   }
@@ -1322,9 +1322,9 @@ scout.Tree.prototype.setNodeExpanded = function(node, expanded, opts) {
     }
 
     if (node.expanded) {
-      this._addChildsToFlatList(node, null, renderAnimated, null, true);
+      this._addChildrenToFlatList(node, null, renderAnimated, null, true);
     } else {
-      this._removeChildsFromFlatList(node, renderAnimated);
+      this._removeChildrenFromFlatList(node, renderAnimated);
     }
     if (notifyServer) {
       this._send('nodeExpanded', {
@@ -1347,9 +1347,9 @@ scout.Tree.prototype._rebuildParent = function(node, opts) {
     return;
   }
   if (node.expanded || node.expandedLazy) {
-    this._addChildsToFlatList(node, null, false, null, true);
+    this._addChildrenToFlatList(node, null, false, null, true);
   } else {
-    this._removeChildsFromFlatList(node, false);
+    this._removeChildrenFromFlatList(node, false);
   }
   //Render expansion
   if (this.rendered && scout.nvl(opts.renderExpansion, true)) {
@@ -1360,8 +1360,8 @@ scout.Tree.prototype._rebuildParent = function(node, opts) {
   }
 };
 
-scout.Tree.prototype._removeChildsFromFlatList = function(parentNode, animatedRemove) {
-  //Only if a parent is available the childs are available.
+scout.Tree.prototype._removeChildrenFromFlatList = function(parentNode, animatedRemove) {
+  //Only if a parent is available the children are available.
   if (this.visibleNodesMap[parentNode.id]) {
     var parentIndex = this.visibleNodesFlat.indexOf(parentNode);
     var elementsToDelete = 0;
@@ -1440,7 +1440,7 @@ scout.Tree.prototype._removeFromFlatList = function(node, animatedRemove) {
   var removedNodes = [];
   if (this.visibleNodesMap[node.id]) {
     var index = this.visibleNodesFlat.indexOf(node);
-    this._removeChildsFromFlatList(node, false);
+    this._removeChildrenFromFlatList(node, false);
     removedNodes = scout.arrays.ensure(this.visibleNodesFlat.splice(index, 1));
     delete this.visibleNodesMap[node.id];
     this.hideNode(node, animatedRemove);
@@ -1510,7 +1510,7 @@ scout.Tree.prototype._findIndexToInsertNode = function(node) {
   }
 };
 
-scout.Tree.prototype._addChildsToFlatList = function(parentNode, parentIndex, animatedRendering, insertBatch, forceFilter) {
+scout.Tree.prototype._addChildrenToFlatList = function(parentNode, parentIndex, animatedRendering, insertBatch, forceFilter) {
   //add nodes recursively
   if (!this.visibleNodesMap[parentNode.id]) {
     return 0;
@@ -1533,14 +1533,14 @@ scout.Tree.prototype._addChildsToFlatList = function(parentNode, parentIndex, an
       this.visibleNodesMap[node.id] = true;
       insertBatch = this.checkAndHandleBatch(insertBatch, parentNode, animatedRendering);
       if (node.expanded) {
-        insertBatch = this._addChildsToFlatList(node, insertBatch.lastBatchInsertIndex(), animatedRendering, insertBatch, forceFilter);
+        insertBatch = this._addChildrenToFlatList(node, insertBatch.lastBatchInsertIndex(), animatedRendering, insertBatch, forceFilter);
       }
     } else if (node.initialized && node.isFilterAccepted(forceFilter) && isAlreadyAdded) {
       this.insertBatchInVisibleNodes(insertBatch, this.viewRangeRendered.from + this.viewRangeSize >= insertBatch.lastBatchInsertIndex() && this.viewRangeRendered.from <= insertBatch.lastBatchInsertIndex(), animatedRendering);
       this.checkAndHandleBatchAnimationWrapper(parentNode, animatedRendering, insertBatch);
       insertBatch = this.setUpInsertBatch(insertBatch.lastBatchInsertIndex() + 1);
       if (node.expanded) {
-        insertBatch = this._addChildsToFlatList(node, insertBatch.lastBatchInsertIndex(), animatedRendering, insertBatch, forceFilter);
+        insertBatch = this._addChildrenToFlatList(node, insertBatch.lastBatchInsertIndex(), animatedRendering, insertBatch, forceFilter);
       }
       //do not animate following
       animatedRendering = false;
@@ -2692,8 +2692,8 @@ scout.Tree.prototype._onChildNodeOrderChanged = function(parentNodeId, childNode
     newPositionsMap[childNodeIds[i]] = i;
   }
   parentNode.childNodes.sort(compare.bind(this));
-  this._removeChildsFromFlatList(parentNode, false);
-  this._addChildsToFlatList(parentNode, null, false);
+  this._removeChildrenFromFlatList(parentNode, false);
+  this._addChildrenToFlatList(parentNode, null, false);
 
   // Render sorted nodes
   if (this.rendered && $lastChildNode) {
