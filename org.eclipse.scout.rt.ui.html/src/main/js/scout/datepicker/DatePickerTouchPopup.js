@@ -13,6 +13,11 @@ scout.DatePickerTouchPopup = function() {
 };
 scout.inherits(scout.DatePickerTouchPopup, scout.TouchPopup);
 
+scout.DatePickerTouchPopup.prototype._init = function(options) {
+  scout.DatePickerTouchPopup.parent.prototype._init.call(this, options);
+  this._field.on('displayTextChanged', this._onFieldDisplayTextChanged.bind(this));
+};
+
 /**
  * @override TouchPopup.js
  */
@@ -21,8 +26,6 @@ scout.DatePickerTouchPopup.prototype._initWidget = function(options) {
     parent: this,
     dateFormat: options.dateFormat
   });
-
-  this._field._attachDatePickerDateSelectedHandler();
 };
 
 /**
@@ -30,4 +33,11 @@ scout.DatePickerTouchPopup.prototype._initWidget = function(options) {
  */
 scout.DatePickerTouchPopup.prototype.getDatePicker = function() {
   return this._widget;
+};
+
+scout.DatePickerTouchPopup.prototype._onFieldDisplayTextChanged = function(event) {
+  // Delegate to original field
+  this._touchField.dateDisplayText = this._field.dateDisplayText;
+  this._touchField.timeDisplayText = this._field.timeDisplayText;
+  this._touchField.setDisplayText(event.displayText);
 };

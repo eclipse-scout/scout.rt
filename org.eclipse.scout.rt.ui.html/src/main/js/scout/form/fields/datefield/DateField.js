@@ -31,8 +31,10 @@ scout.DateField = function() {
   this._modelErrorStatus = null;
 
   this._popup;
-  this._datePickerDateSelectedHandler;
+  this._datePickerDateSelectHandler;
   this._popupCloseHandler;
+  this.oldDisplayText = '';
+  this.timestamp = null;
 };
 scout.inherits(scout.DateField, scout.ValueField);
 
@@ -47,7 +49,10 @@ scout.DateField.prototype._init = function(model) {
   scout.DateField.parent.prototype._init.call(this, model);
   scout.fields.initTouch(this, model);
   this._popup = model.popup;
-  this._syncAllowedDates(model.allowedDates);
+  this._syncTimestamp(this.timestamp);
+  this._syncAutoTimestamp(this.autoTimestamp);
+  this._syncDisplayText(this.displayText);
+  this._syncAllowedDates(this.allowedDates);
 };
 
 scout.DateField.prototype.addPopup = function() {
@@ -65,8 +70,17 @@ scout.DateField.prototype.addPopup = function() {
 };
 
 scout.DateField.prototype._syncErrorStatus = function(errorStatus) {
+  var invalidTime, invalidDate;
+  if (this.errorStatus) {
+    invalidTime = this.errorStatus.invalidTime;
+    invalidDate = this.errorStatus.invalidDate;
+  }
   scout.DateField.parent.prototype._syncErrorStatus.call(this, errorStatus);
   this._modelErrorStatus = this.errorStatus;
+  if (this.errorStatus) {
+    this.errorStatus.invalidTime = invalidTime;
+    this.errorStatus.invalidDate = invalidDate;
+  }
 };
 
 scout.DateField.prototype._render = function($parent) {
@@ -175,7 +189,7 @@ scout.DateField.prototype._renderHasTime = function() {
  */
 scout.DateField.prototype._renderPlaceholder = function() {
   scout.DateField.parent.prototype._renderPlaceholder.call(this,
-      this._fieldForPlaceholder());
+    this._fieldForPlaceholder());
 };
 
 /**
@@ -183,7 +197,7 @@ scout.DateField.prototype._renderPlaceholder = function() {
  */
 scout.DateField.prototype._removePlaceholder = function() {
   scout.DateField.parent.prototype._removePlaceholder.call(this,
-      this._fieldForPlaceholder());
+    this._fieldForPlaceholder());
 };
 
 scout.DateField.prototype._fieldForPlaceholder = function() {
@@ -198,16 +212,10 @@ scout.DateField.prototype._fieldForPlaceholder = function() {
 scout.DateField.prototype._renderDateFormatPattern = function() {
   this.isolatedDateFormat = new scout.DateFormat(this.session.locale, this.dateFormatPattern);
   this.getDatePicker().dateFormat = this.isolatedDateFormat;
-  if (this.rendered) {
-    this._renderTimestamp();
-  }
 };
 
 scout.DateField.prototype._renderTimeFormatPattern = function() {
   this.isolatedTimeFormat = new scout.DateFormat(this.session.locale, this.timeFormatPattern);
-  if (this.rendered) {
-    this._renderTimestamp();
-  }
 };
 
 /**
@@ -228,32 +236,47 @@ scout.DateField.prototype._renderEnabled = function() {
  * @override ValueField.js
  */
 scout.DateField.prototype._renderDisplayText = function() {
-  var tmp,
-    dateText = '',
-    timeText = '',
-    displayText = this.displayText;
-
-  if (scout.strings.hasText(displayText)) {
-    tmp = displayText.split('\n');
-    dateText = tmp[0];
-    timeText = tmp[1];
-  }
   if (this.hasDate) {
-    this._setDateDisplayText(dateText);
+    this._renderDateDisplayText();
   }
   if (this.hasTime) {
-    this._setTimeDisplayText(timeText);
+    this._renderTimeDisplayText();
   }
   this._removePredictionFields();
 };
 
-// Does not render anything, only sets the timestamp property
-scout.DateField.prototype._renderTimestamp = function() {
-  this.timestampAsDate = scout.dates.parseJsonDate(this.timestamp);
+scout.DateField.prototype._renderDateDisplayText = function() {
+  scout.fields.valOrText(this, this.$dateField, this.dateDisplayText);
 };
 
-scout.DateField.prototype._renderAutoTimestamp = function() {
-  this.autoTimestampAsDate = scout.dates.parseJsonDate(this.autoTimestamp);
+scout.DateField.prototype._renderTimeDisplayText = function() {
+  scout.fields.valOrText(this, this.$timeField, this.timeDisplayText);
+};
+
+scout.DateField.prototype._syncDisplayText = function(displayText) {
+  var dateText = '',
+    timeText = '',
+    parts;
+
+  this.oldDisplayText = this.displayText;
+  this.displayText = displayText;
+
+  if (scout.strings.hasText(this.displayText)) {
+    parts = this.displayText.split('\n');
+    dateText = parts[0];
+    timeText = parts[1];
+  }
+  this.dateDisplayText = dateText;
+  this.timeDisplayText = timeText;
+};
+
+scout.DateField.prototype._syncTimestamp = function(timestamp) {
+  // TODO CGU [6.1] no need to keep two timestamp properties, only hold date based type. Convert to back to string when sending. Also rename to value instead of timestamp
+  this.timestampAsDate = scout.dates.parseJsonDate(timestamp);
+};
+
+scout.DateField.prototype._syncAutoTimestamp = function(autoTimestamp) {
+  this.autoTimestampAsDate = scout.dates.parseJsonDate(autoTimestamp);
 };
 
 scout.DateField.prototype._syncAllowedDates = function(allowedDates) {
@@ -266,6 +289,14 @@ scout.DateField.prototype._syncAllowedDates = function(allowedDates) {
   } else {
     this.allowedDates = null;
   }
+};
+
+scout.DateField.prototype._renderTimestamp = function() {
+  // nop
+};
+
+scout.DateField.prototype._renderAutoTimestamp = function() {
+  // nop
 };
 
 scout.DateField.prototype._renderAllowedDates = function() {
@@ -291,11 +322,6 @@ scout.DateField.prototype._renderErrorStatus = function() {
       this._$predictDateField.removeClass(scout.Status.cssClasses);
       this._$predictDateField.toggleClass(statusClass, hasStatus);
     }
-    // Put invalid input in the field, if the current input differs
-    // (don't do it always, this would alter the cursor position)
-    if (!this._isDateValid() && this.$dateField.val() !== this.errorStatus.invalidDateText) {
-      this._setDateDisplayText(this.errorStatus.invalidDateText);
-    }
   }
 
   // Do the same for the time field
@@ -305,9 +331,6 @@ scout.DateField.prototype._renderErrorStatus = function() {
     if (this._$predictTimeField) {
       this._$predictTimeField.removeClass(scout.Status.cssClasses);
       this._$predictTimeField.toggleClass(statusClass, hasStatus);
-    }
-    if (!this._isTimeValid() && this.$timeField.val() !== this.errorStatus.invalidTimeText) {
-      this._setTimeDisplayText(this.errorStatus.invalidTimeText);
     }
   }
 
@@ -573,14 +596,12 @@ scout.DateField.prototype._onTimeFieldKeydown = function(event) {
   }
 
   if (event.which === scout.keys.ENTER) {
-    if (this._$predictTimeField) {
+    // Timefield is shown in touch popup, so we need to make sure time gets accepted and popup closed, even if the regular time field itself has no popup
+    if (this._popup.isOpen() || this._$predictDateField) {
       // Accept the current prediction (if available)
       this._tempTimeDate = null;
       this._acceptDateTimePrediction(false, true); // accept time part
-      // in embedded mode, we want to close the whole popup when user presses enter and time field is focused
-      if (this.embedded) {
-        this._closeDatePicker();
-      }
+      this._closeDatePicker();
       $.suppressEvent(event);
     }
     return;
@@ -662,12 +683,12 @@ scout.DateField.prototype._onTimeFieldInput = function(event) {
   }
 };
 
-scout.DateField.prototype._onDatePickerDateSelected = function(event) {
+scout.DateField.prototype._onDatePickerDateSelect = function(event) {
   this._setDateValid(true);
   this._setTimeValid(true);
   this.renderDate(event.date);
   if (!event.shifting) {
-    // close popup and write to model
+    this._sendDisplayTextIfChanged();
     this.updateTimestamp(this._newTimestampAsDate(event.date, this.timestampAsDate));
     // closeDatePicker is set to false when date-field is in touch-mode
     // since popup will be closed by the embedded date-field
@@ -701,7 +722,7 @@ scout.DateField.prototype._removePredictionFields = function() {
 
 /**
  * Formats the given date (or this.timestampAsDate) using the specified formats and writes
- * the resulting string to the $dateField and $timeField, respectively. Prediction field
+ * the resulting string to the $dateField and $timeField, respectively. Prediction fields
  * are removed.
  */
 scout.DateField.prototype.renderDate = function(date) {
@@ -727,21 +748,25 @@ scout.DateField.prototype.renderDate = function(date) {
 };
 
 scout.DateField.prototype._setDateDisplayText = function(displayText) {
-  scout.fields.valOrText(this, this.$dateField, displayText);
+  this.dateDisplayText = displayText;
   this._updateDisplayTextProperty();
+  if (this.rendered) {
+    this._renderDateDisplayText();
+  }
 };
 
 scout.DateField.prototype._setTimeDisplayText = function(displayText) {
-  scout.fields.valOrText(this, this.$timeField, displayText);
+  this.timeDisplayText = displayText;
   this._updateDisplayTextProperty();
+  if (this.rendered) {
+    this._renderTimeDisplayText();
+  }
 };
 
-/**
- * Note: this.displayText is only used in the UI (BasicField.js) and is not synchronized with the server.
- */
 scout.DateField.prototype._updateDisplayTextProperty = function() {
-  var dateText = this.$dateField ? this.$dateField.val() : '',
-    timeText = this.$timeField ? this.$timeField.val() : '';
+  var dateText = this.dateDisplayText || '',
+    timeText = this.timeDisplayText || '';
+
   this.displayText = scout.strings.join('\n', dateText, timeText);
 };
 
@@ -779,13 +804,6 @@ scout.DateField.prototype.aboutToBlurByMouseDown = function(target) {
       this._acceptDateTimePrediction(false, true);
     }
   }
-};
-
-/**
- * @Override BasicField.js
- */
-scout.DateField.prototype._onDisplayTextModified = function() {
-  // TODO [5.2] bsh: What to do? Maybe change on server that this method is never called.
 };
 
 /**
@@ -848,25 +866,28 @@ scout.DateField.prototype.updateTimestamp = function(timestampAsDate, syncToServ
   if (timestamp !== this.timestamp || this.errorStatus) {
     this.timestamp = timestamp;
     this.timestampAsDate = timestampAsDate;
-    if (scout.nvl(syncToServer, true)) {
-      this._syncToServer();
+
+    if (!this._hasUiErrorStatus()) {
+      this.trigger('timestampChanged', {
+        timestamp: this.timestamp
+      });
+      if (scout.nvl(syncToServer, true)) {
+        this._send('timestampChanged', {
+          timestamp: this.timestamp
+        });
+      }
     }
   }
 };
 
-scout.DateField.prototype._syncToServer = function() {
-  if (this._hasUiErrorStatus()) {
-    this._send('parsingError', {
-      invalidDisplayText: this.errorStatus.invalidDisplayText,
-      invalidDateText: this.errorStatus.invalidDateText,
-      invalidTimeText: this.errorStatus.invalidTimeText
-    });
-  } else {
-    var event = {
-      timestamp: this.timestamp
-    };
-    this._send('timestampChanged', event);
-    this.trigger('timestampChanged', event);
+scout.DateField.prototype._sendParsingError = function() {
+  this._send('parsingError');
+};
+
+scout.DateField.prototype._sendDisplayTextIfChanged = function() {
+  if (this.oldDisplayText !== this.displayText) {
+    this._sendDisplayTextChanged(this.displayText);
+    this.oldDisplayText = this.displayText;
   }
 };
 
@@ -887,15 +908,8 @@ scout.DateField.prototype._openDatePicker = function(date) {
   // Add popup close handler
   if (!this._popupCloseHandler) {
     this._popupCloseHandler = function() {
-      if (this.touch) {
-        this._onDatePickerDateSelected({
-          date: this._popup._field.timestampAsDate,
-          closeDatePicker: false
-        });
-      } else {
-        this.getDatePicker().off('dateSelect', this._datePickerDateSelectedHandler);
-        this._datePickerDateSelectedHandler = null;
-      }
+      this.getDatePicker().off('dateSelect', this._datePickerDateSelectHandler);
+      this._datePickerDateSelectHandler = null;
       this._popup.off('close', this._popupCloseHandler);
       this._popupCloseHandler = null;
     }.bind(this);
@@ -903,18 +917,13 @@ scout.DateField.prototype._openDatePicker = function(date) {
   }
 
   // Add date-picker dateSelect handler
-  // In touch mode only the date-field in the popup (=embedded) should register a listener
-  // but not the 'touch' date-field. The touch-field is updated when the popup is closed.
-  // In desktop-mode the date-field must register the listener.
-  if (!this.touch) {
-    this._attachDatePickerDateSelectedHandler();
-  }
+  this._attachDatePickerDateSelectHandler();
 };
 
-scout.DateField.prototype._attachDatePickerDateSelectedHandler = function() {
-  if (!this._datePickerDateSelectedHandler) {
-    this._datePickerDateSelectedHandler = this._onDatePickerDateSelected.bind(this);
-    this.getDatePicker().on('dateSelect', this._datePickerDateSelectedHandler);
+scout.DateField.prototype._attachDatePickerDateSelectHandler = function() {
+  if (!this._datePickerDateSelectHandler) {
+    this._datePickerDateSelectHandler = this._onDatePickerDateSelect.bind(this);
+    this.getDatePicker().on('dateSelect', this._datePickerDateSelectHandler);
   }
 };
 
@@ -925,7 +934,9 @@ scout.DateField.prototype._closeDatePicker = function() {
 };
 
 scout.DateField.prototype._acceptDateTimePrediction = function(acceptDate, acceptTime) {
-  var dateText, timeText, datePrediction, timePrediction;
+  var datePrediction, timePrediction,
+    dateText = '',
+    timeText = '';
 
   var success = true;
   if (acceptDate) {
@@ -934,6 +945,7 @@ scout.DateField.prototype._acceptDateTimePrediction = function(acceptDate, accep
     if (!datePrediction) {
       success = false;
     }
+    this._setDateDisplayText(dateText);
   }
   if (acceptTime) {
     timeText = (this._$predictTimeField ? this._$predictTimeField.val() : this.$timeField.val());
@@ -941,8 +953,12 @@ scout.DateField.prototype._acceptDateTimePrediction = function(acceptDate, accep
     if (!timePrediction) {
       success = false;
     }
+    this._setTimeDisplayText(timeText);
   }
   this._removePredictionFields();
+
+  // Send display text before timestamp, otherwise server would create a display text by its own and send it back
+  this._sendDisplayTextIfChanged();
 
   if (success) {
     // parse success -> send new timestamp to server
@@ -955,7 +971,7 @@ scout.DateField.prototype._acceptDateTimePrediction = function(acceptDate, accep
     this.renderDate(this.timestampAsDate);
   } else {
     // parse error -> send error to server
-    this._syncToServer();
+    this._sendParsingError();
   }
 };
 
@@ -971,7 +987,7 @@ scout.DateField.prototype._predictDate = function(inputText) {
     var now = new Date();
     var daysToAdd = Number(m[1] + (m[2] || '0'));
     now.setDate(now.getDate() + daysToAdd);
-    this._setDateValid(true, inputText);
+    this._setDateValid(true);
     return {
       date: now,
       text: inputText
@@ -980,13 +996,13 @@ scout.DateField.prototype._predictDate = function(inputText) {
 
   var analyzeInfo = this.isolatedDateFormat.analyze(inputText, this._referenceDate());
   if (analyzeInfo.error) {
-    this._setDateValid(false, inputText);
+    this._setDateValid(false);
     return null;
   }
 
   // No predicted date? -> return empty string (may happen if inputText is empty)
   if (!analyzeInfo.predictedDate) {
-    this._setDateValid(true, '');
+    this._setDateValid(true);
     return {
       date: null,
       text: ''
@@ -1004,7 +1020,7 @@ scout.DateField.prototype._predictDate = function(inputText) {
     predictedDateFormatted = inputText + m[1];
   }
 
-  this._setDateValid(true, predictedDateFormatted);
+  this._setDateValid(true);
   return {
     date: predictedDate,
     text: predictedDateFormatted
@@ -1019,13 +1035,13 @@ scout.DateField.prototype._predictTime = function(inputText) {
 
   var analyzeInfo = this.isolatedTimeFormat.analyze(inputText, this._referenceDate());
   if (analyzeInfo.error) {
-    this._setTimeValid(false, inputText);
+    this._setTimeValid(false);
     return null;
   }
 
   // No predicted date? -> return empty string (may happen if inputText is empty)
   if (!analyzeInfo.predictedDate) {
-    this._setTimeValid(true, '');
+    this._setTimeValid(true);
     return {
       date: null,
       text: ''
@@ -1043,24 +1059,22 @@ scout.DateField.prototype._predictTime = function(inputText) {
     predictedTimeFormatted = inputText + m[1];
   }
 
-  this._setTimeValid(true, predictedTimeFormatted);
+  this._setTimeValid(true);
   return {
     date: predictedDate,
     text: predictedTimeFormatted
   };
 };
 
-scout.DateField.prototype._setDateValid = function(valid, dateText) {
+scout.DateField.prototype._errorStatus = function(valid) {
   var errorStatus = this.errorStatus;
   if (valid) {
     // Set to valid
     if (errorStatus) {
-      errorStatus.invalidDateText = null;
       // If no other UI error remains, revert to errorStatus from model
       if (!this._hasUiErrorStatus()) {
         errorStatus = this._modelErrorStatus;
       }
-      this.setErrorStatus(errorStatus);
     }
   } else {
     // Set to invalid (this is always a UI error)
@@ -1070,65 +1084,42 @@ scout.DateField.prototype._setDateValid = function(valid, dateText) {
         severity: scout.Status.Severity.ERROR
       });
     }
-    errorStatus.invalidDateText = dateText;
-    errorStatus.invalidDisplayText = scout.strings.join(' ',
-      dateText,
-      this.$timeField && this.$timeField.val());
-    this.setErrorStatus(errorStatus);
   }
-  this.setErrorStatus(errorStatus);
-  // The layout might have been invalidated by setErrorStatus() when showing/hiding the status icon
-  // automatically. Because this is a UI only operation, we have to trigger validation manually.
-  this.validateLayout();
+  return errorStatus;
 };
 
-scout.DateField.prototype._setTimeValid = function(valid, timeText) {
-  var errorStatus = this.errorStatus;
-  if (valid) {
-    // Set to valid
-    if (errorStatus) {
-      errorStatus.invalidTimeText = null;
-      // If no other UI error remains, revert to errorStatus from model
-      if (!this._hasUiErrorStatus()) {
-        errorStatus = this._modelErrorStatus;
-      }
-      this.setErrorStatus(errorStatus);
-    }
-  } else {
-    // Set to invalid (this is always a UI error)
-    if (!this._hasUiErrorStatus()) {
-      errorStatus = new scout.Status({
-        message: this.session.text('ui.InvalidDateFormat'),
-        severity: scout.Status.Severity.ERROR
-      });
-    }
-    errorStatus.invalidTimeText = timeText;
-    errorStatus.invalidDisplayText = scout.strings.join(' ',
-      this.$dateField && this.$dateField.val(),
-      timeText);
-    this.setErrorStatus(errorStatus);
+scout.DateField.prototype._setDateValid = function(valid) {
+  var errorStatus = this._errorStatus(valid);
+  if (errorStatus) {
+    errorStatus.invalidDate = !valid;
   }
-  // The layout might have been invalidated by setErrorStatus() when showing/hiding the status icon
-  // automatically. Because this is a UI only operation, we have to trigger validation manually.
-  this.validateLayout();
+  this.setErrorStatus(errorStatus);
+};
+
+scout.DateField.prototype._setTimeValid = function(valid) {
+  var errorStatus = this._errorStatus(valid);
+  if (errorStatus) {
+    errorStatus.invalidTime = !valid;
+  }
+  this.setErrorStatus(errorStatus);
 };
 
 scout.DateField.prototype._isDateValid = function() {
-  if (this.errorStatus && this.errorStatus.invalidDateText) {
+  if (this.errorStatus && this.errorStatus.invalidDate) {
     return false;
   }
   return true;
 };
 
 scout.DateField.prototype._isTimeValid = function() {
-  if (this.errorStatus && this.errorStatus.invalidTimeText) {
+  if (this.errorStatus && this.errorStatus.invalidTime) {
     return false;
   }
   return true;
 };
 
 scout.DateField.prototype._hasUiErrorStatus = function() {
-  return !!(this.errorStatus && (this.errorStatus.invalidDateText || this.errorStatus.invalidTimeText));
+  return !!(this.errorStatus && (this.errorStatus.invalidDate || this.errorStatus.invalidTime));
 };
 
 /**

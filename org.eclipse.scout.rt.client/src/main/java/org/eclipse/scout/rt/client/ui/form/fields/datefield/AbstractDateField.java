@@ -438,11 +438,22 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
     }
 
     @Override
+    public void setDisplayTextFromUI(String text) {
+      if (!isEnabled() || !isVisible()) {
+        return;
+      }
+      setDisplayText(text);
+    }
+
+    @Override
     public void setParseErrorFromUI(String invalidDisplayText, String invalidDateText, String invalidTimeText) {
-      String invalidText = StringUtility.nvl(invalidDisplayText, StringUtility.join(" ", invalidDateText, invalidTimeText));
-      ParsingFailedStatus status = new ParsingFailedStatus(ScoutTexts.get("InvalidValueMessageX", invalidText), StringUtility.nvl(invalidDateText, "") + "\n" + StringUtility.nvl(invalidTimeText, "")); // don't use join()!
+      // \n is used as technical delimiter between date and time -> don't display it
+//      if (invalidDisplayText == null) {
+//        invalidDisplayText = StringUtility.nvl(invalidDateText, "") + "\n" + StringUtility.nvl(invalidTimeText, "");
+//      }
+      String invalidMessage = getDisplayText().replace("\n", " ");
+      ParsingFailedStatus status = new ParsingFailedStatus(ScoutTexts.get("InvalidValueMessageX", invalidMessage), getDisplayText());
       addErrorStatus(status);
-      setDisplayText(invalidText);
     }
 
     @Override

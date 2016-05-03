@@ -14,22 +14,15 @@ import java.beans.PropertyChangeEvent;
 import java.util.Date;
 import java.util.List;
 
-import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
-import org.eclipse.scout.rt.client.ui.form.fields.ParsingFailedStatus;
 import org.eclipse.scout.rt.client.ui.form.fields.datefield.IDateField;
-import org.eclipse.scout.rt.platform.status.IMultiStatus;
-import org.eclipse.scout.rt.platform.status.IStatus;
-import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.date.DateUtility;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonDate;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
-import org.eclipse.scout.rt.ui.html.json.JsonStatus;
 import org.json.JSONArray;
-import org.json.JSONObject;
 
 public class JsonDateField<T extends IDateField> extends JsonValueField<T> {
 
@@ -54,34 +47,6 @@ public class JsonDateField<T extends IDateField> extends JsonValueField<T> {
   @Override
   protected void initJsonProperties(T model) {
     super.initJsonProperties(model);
-
-    putJsonProperty(new JsonProperty<T>(IFormField.PROP_ERROR_STATUS, model) {
-      @Override
-      protected IStatus modelValue() {
-        return getModel().getErrorStatus();
-      }
-
-      @Override
-      public Object prepareValueForToJson(Object value) {
-        JSONObject jsonStatus = JsonStatus.toJson((IStatus) value);
-        // Override default from JsonFormField: Send invalid input texts back to the UI.
-        if (jsonStatus != null && value instanceof IMultiStatus) {
-          IMultiStatus multiStatus = (IMultiStatus) value;
-          for (IStatus status : multiStatus.getChildren()) {
-            if (status instanceof ParsingFailedStatus) {
-              ParsingFailedStatus parsingFailedStatus = (ParsingFailedStatus) status;
-              String parseInputString = StringUtility.nvl(parsingFailedStatus.getParseInputString(), "");
-              String[] texts = parseInputString.split("\n", -1); // -1 preserves trailing empty strings
-              if (texts.length == 2) {
-                jsonStatus.put(PROP_INVALID_DATE_TEXT, texts[0]);
-                jsonStatus.put(PROP_INVALID_TIME_TEXT, texts[1]);
-              }
-            }
-          }
-        }
-        return jsonStatus;
-      }
-    });
     putJsonProperty(new JsonProperty<T>(PROP_TIMESTAMP, model) {
       @Override
       protected Date modelValue() {
@@ -174,14 +139,6 @@ public class JsonDateField<T extends IDateField> extends JsonValueField<T> {
         addPropertyChangeEvent(PROP_AUTO_TIMESTAMP, dateToJson((Date) event.getNewValue()));
       }
     }
-    else if (IDateField.PROP_ERROR_STATUS.equals(propertyName)) {
-      //if error occured thru wrong input and model is resetting value to null it has to be submitted to client.
-      // -> only displayText is changed on model so there will be no event for value changed
-      if (getModel().getValue() == null && "".equals(getModel().getDisplayText()) && event.getNewValue() == null) {
-        addPropertyChangeEvent(PROP_TIMESTAMP, dateToJson((Date) event.getNewValue()));
-      }
-      super.handleModelPropertyChange(event);
-    }
     else {
       super.handleModelPropertyChange(event);
     }
@@ -224,11 +181,11 @@ public class JsonDateField<T extends IDateField> extends JsonValueField<T> {
 
   @Override
   protected void handleUiDisplayTextChangedWhileTyping(String displayText) {
-    throw new IllegalStateException("DisplayText may not be set manually");
+    throw new IllegalStateException("While typing is not supported by the date field.");
   }
 
   @Override
   protected void handleUiDisplayTextChangedAfterTyping(String displayText) {
-    throw new IllegalStateException("DisplayText may not be set manually");
+    getModel().getUIFacade().setDisplayTextFromUI(displayText);
   }
 }

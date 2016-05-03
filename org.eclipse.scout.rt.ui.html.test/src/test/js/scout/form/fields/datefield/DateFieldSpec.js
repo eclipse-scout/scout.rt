@@ -59,7 +59,6 @@ describe("DateField", function() {
     return $('.date-picker');
   }
 
-
   // Used to expect a date.
   // Deals with the akward 0=january behavior of the Date#getMonth() method,
   // which means month=1 is january
@@ -87,17 +86,35 @@ describe("DateField", function() {
 
   });
 
-  describe("Rendering", function() {
+  describe("displayText", function() {
 
-    it("the displayText correctly", function() {
+    it("is shown correctly after rendering", function() {
       var model = createModel();
       model.displayText = '14.04.2016\n12:28';
       model.hasDate = true;
       model.hasTime = true;
       var dateField = createField(model);
       dateField.render(session.$entryPoint);
+      dateField.dateDisplayText = '14.04.2016';
+      dateField.timeDisplayText = '12:28';
       expect(dateField.$dateField.val()).toBe('14.04.2016');
       expect(dateField.$timeField.val()).toBe('12:28');
+    });
+
+    it("is removed properly when setting to ''", function() {
+      var model = createModel();
+      model.displayText = '14.04.2016\n12:28';
+      model.hasDate = true;
+      model.hasTime = true;
+      var dateField = createField(model);
+      dateField.render(session.$entryPoint);
+
+      dateField._syncDisplayText('');
+      dateField._renderDisplayText();
+      expect(dateField.dateDisplayText).toBe('');
+      expect(dateField.timeDisplayText).toBe('');
+      expect(dateField.$dateField.val()).toBe('');
+      expect(dateField.$timeField.val()).toBe('');
     });
 
   });
@@ -151,6 +168,53 @@ describe("DateField", function() {
       expectDate(date, 2015, 2, 11);
     });
 
+    it("sends timestamp and displayText", function() {
+      var model = createModel();
+      model.timestamp = '2014-10-01';
+      var dateField = createFieldAndFocusAndOpenPicker(model);
+
+      dateField.$dateField.val('11.02.2015');
+      dateField._onDateFieldBlur();
+      sendQueuedAjaxCalls();
+      expect(jasmine.Ajax.requests.count()).toBe(1);
+
+      // Order is important, displayText needs to be before timestamp
+      // Otherwise server would generate a display text as soon as timestamp changes and send it back even if it is the same as the ui is sending
+      var events = [
+        new scout.Event(dateField.id, 'displayTextChanged', {
+          displayText: "11.02.2015"
+        }),
+        new scout.Event(dateField.id, 'timestampChanged', {
+          timestamp: "2015-02-11"
+        })
+      ];
+      expect(mostRecentJsonRequest()).toContainEventsExactly(events);
+    });
+
+    it("does not send timestamp and displayText again if not changed", function() {
+      var model = createModel();
+      model.timestamp = '2014-10-01';
+      var dateField = createFieldAndFocusAndOpenPicker(model);
+
+      dateField.$dateField.val('11.02.2015');
+      dateField._onDateFieldBlur();
+      sendQueuedAjaxCalls();
+      expect(jasmine.Ajax.requests.count()).toBe(1);
+
+      dateField._onDateFieldBlur();
+      sendQueuedAjaxCalls();
+      expect(jasmine.Ajax.requests.count()).toBe(1); // still 1
+    });
+
+    it("does not send timestamp and displayText if no date was entered", function() {
+      var model = createModel();
+      var dateField = createFieldAndFocusAndOpenPicker(model);
+
+      dateField._onDateFieldBlur();
+      sendQueuedAjaxCalls();
+      expect(jasmine.Ajax.requests.count()).toBe(0);
+    });
+
   });
 
   describe("Validation", function() {
@@ -173,6 +237,30 @@ describe("DateField", function() {
       expect(dateField.displayText).toBeFalsy();
 
       expect(mostRecentJsonRequest()).toBeUndefined();
+    });
+
+  });
+
+  describe("Picker", function() {
+
+    it("sends displayText and timestamp if date was selected", function() {
+      var model = createModel();
+      var dateField = createFieldAndFocusAndOpenPicker(model);
+
+      dateField._onDatePickerDateSelect({type: 'dateSelect', date: new Date(2016,1,1)});
+      expect(dateField.$dateField.val()).toBe('01.02.2016');
+      sendQueuedAjaxCalls();
+      expect(jasmine.Ajax.requests.count()).toBe(1);
+
+      var events = [
+        new scout.Event(dateField.id, 'displayTextChanged', {
+          displayText: "01.02.2016"
+        }),
+        new scout.Event(dateField.id, 'timestampChanged', {
+          timestamp: "2016-02-01"
+        })
+      ];
+      expect(mostRecentJsonRequest()).toContainEventsExactly(events);
     });
 
   });
@@ -203,11 +291,11 @@ describe("DateField", function() {
         expectDate(dateBefore, 2014, 10, 1);
 
         dateField.$dateField.val('11.02.2015');
-        dateBefore=dateField.timestampAsDate;
+        dateBefore = dateField.timestampAsDate;
         expectDate(dateBefore, 2014, 10, 1);
 
         dateField.$dateField.triggerKeyDown(scout.keys.ENTER);
-        var date= dateField.timestampAsDate;
+        var date = dateField.timestampAsDate;
         expectDate(date, 2015, 2, 11);
         expect(findPicker().length).toBe(0);
       });
@@ -376,7 +464,7 @@ describe("DateField", function() {
     it("_referenceDate returns only allowed date - choose nearest date in the future", function() {
       var model = createModel();
       model.allowedDates = ["2016-03-14", "2016-04-16", "2016-04-17"];
-      model.autoTimestampAsDate = new Date(2016, 3, 15);
+      model.autoTimestamp = '2016-04-15';
       var dateField = createField(model);
       var date = dateField._referenceDate();
       expectDate(date, 2016, 4, 16);
@@ -385,7 +473,7 @@ describe("DateField", function() {
     it("_referenceDate returns only allowed date - when no date in future is available, choose nearest date in past", function() {
       var model = createModel();
       model.allowedDates = ["2016-02-14", "2016-03-16", "2016-04-03"];
-      model.autoTimestampAsDate = new Date(2016, 3, 15);
+      model.autoTimestamp = '2016-04-15';
       var dateField = createField(model);
       var date = dateField._referenceDate();
       expectDate(date, 2016, 4, 3);
