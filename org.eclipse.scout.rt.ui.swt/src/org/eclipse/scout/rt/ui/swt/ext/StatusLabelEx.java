@@ -230,11 +230,9 @@ public class StatusLabelEx extends Composite implements ILabelComposite {
 
     if (enabled) {
       setForeground(null);
-      setBackground(null);
     }
     else {
       setForeground(getEnvironment().getColor(UiDecorationExtensionPoint.getLookAndFeel().getColorForegroundDisabled()));
-      setBackground(getEnvironment().getColor(UiDecorationExtensionPoint.getLookAndFeel().getColorBackgroundDisabled()));
     }
   }
 
