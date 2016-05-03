@@ -338,6 +338,51 @@ describe("Tree", function() {
         expect(node0.childNodes[2].$node).toBeDefined();
       });
 
+      it("considers view range (distinguishes between rendered and non rendered rows, adjusts viewRangeRendered)", function() {
+        //initial view range
+        model = helper.createModelFixture(6, 0, false);
+        tree = helper.createTree(model);
+        node0 = tree.nodes[0];
+        node1 = tree.nodes[1];
+        var lastNode = tree.nodes[5];
+
+        var spy = spyOn(tree, '_calculateCurrentViewRange').and.returnValue(new scout.Range(1, 4));
+        tree.render(session.$entryPoint);
+        expect(tree.viewRangeRendered).toEqual(new scout.Range(1, 4));
+        expect(tree.$nodes().length).toBe(3);
+        expect(tree.nodes.length).toBe(6);
+
+        // reset spy -> view range now starts from 0
+        spy.and.callThrough();
+        tree.viewRangeSize = 3;
+
+        // delete first (not rendered)
+        tree.deleteNodes([node0]);
+        expect(tree.viewRangeRendered).toEqual(new scout.Range(0, 3));
+        expect(tree.$nodes().length).toBe(3);
+        expect(tree.nodes.length).toBe(5);
+
+        // delete first rendered
+        tree.deleteNodes([node1]);
+        expect(tree.viewRangeRendered).toEqual(new scout.Range(0, 3));
+        expect(tree.$nodes().length).toBe(3);
+        expect(tree.nodes.length).toBe(4);
+
+        // delete last node not rendered
+        tree.deleteNodes([lastNode]);
+        expect(tree.viewRangeRendered).toEqual(new scout.Range(0, 3));
+        expect(tree.$nodes().length).toBe(3);
+        expect(tree.nodes.length).toBe(3);
+
+        // delete remaining (rendered) nodes
+        tree.deleteNodes([tree.nodes[0], tree.nodes[1], tree.nodes[2]]);
+        expect(tree.viewRangeRendered).toEqual(new scout.Range(0, 0));
+        expect(tree.$nodes().length).toBe(0);
+        expect(tree.nodes.length).toBe(0);
+        expect(tree.$fillBefore.height()).toBe(0);
+        expect(tree.$fillAfter.height()).toBe(0);
+      });
+
     });
 
     describe("deleting a root node", function() {

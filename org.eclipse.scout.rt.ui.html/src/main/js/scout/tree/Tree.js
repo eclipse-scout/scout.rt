@@ -706,8 +706,11 @@ scout.Tree.prototype._removeNodes = function(nodes, parentNode) {
       $parentNode.removeClass('lazy');
     }
   }
-
-  this.invalidateLayoutTree();
+  if(this.rendered){
+    this.viewRangeDirty = true;
+    this._renderViewport();
+    this.invalidateLayoutTree();
+  }
 };
 
 scout.Tree.prototype._$buildNode = function(node) {
