@@ -15,7 +15,8 @@ scout.inherits(scout.SmartFieldTouchPopup, scout.TouchPopup);
 
 scout.SmartFieldTouchPopup.prototype._init = function(options) {
   scout.DatePickerTouchPopup.parent.prototype._init.call(this, options);
-  this._field.on('acceptProposal', this._onFieldAcceptProposal.bind(this));
+  this._field.on('acceptProposal', this._onFieldAcceptOrDeleteProposal.bind(this));
+  this._field.on('deleteProposal', this._onFieldAcceptOrDeleteProposal.bind(this));
 };
 
 scout.SmartFieldTouchPopup.prototype._fieldOverrides = function() {
@@ -37,12 +38,14 @@ scout.SmartFieldTouchPopup.prototype._renderProposalChooser = function(proposalC
 /**
  * @override Popup.js
  */
-scout.SmartFieldTouchPopup.prototype.close = function(event) {
+scout.SmartFieldTouchPopup.prototype._onMouseDownOutside = function(event) {
+  // Sync display text first because accept input needs the correct display text
+  this._touchField.setDisplayText(this._field.displayText);
   this._touchField.acceptInput();
-  scout.SmartFieldTouchPopup.parent.prototype.close.call(this);
+  this.close();
 };
 
-scout.SmartFieldTouchPopup.prototype._onFieldAcceptProposal = function(event) {
+scout.SmartFieldTouchPopup.prototype._onFieldAcceptOrDeleteProposal = function(event) {
   // Delegate to original field
   this._touchField.setDisplayText(event.displayText);
 };

@@ -409,9 +409,10 @@ scout.SmartField.prototype._acceptProposal = function(forceClose) {
     var textDeleted = scout.strings.empty(displayText) && scout.strings.hasText(this._oldDisplayText);
     if (textDeleted && !this._navigating) {
       this._sendDeleteProposal(displayText);
+      this._triggerDeleteProposal(displayText);
     } else {
-      this._triggerAcceptProposal(displayText);
       this._sendAcceptProposal(displayText, true, forceClose);
+      this._triggerAcceptProposal(displayText);
     }
 
     if (this.embedded) {
@@ -425,8 +426,8 @@ scout.SmartField.prototype._acceptProposal = function(forceClose) {
     if (displayText === this._oldDisplayText) {
       return;
     }
-    this._triggerAcceptProposal(displayText);
     this._sendAcceptProposal(displayText, false, forceClose);
+    this._triggerAcceptProposal(displayText);
   }
 
   this.session.listen().done(function() {
@@ -435,6 +436,12 @@ scout.SmartField.prototype._acceptProposal = function(forceClose) {
       this._focusNextTabbable();
     }
   }.bind(this));
+};
+
+scout.SmartField.prototype._triggerDeleteProposal = function(displayText) {
+  this.trigger('deleteProposal', {
+    displayText: displayText
+  });
 };
 
 scout.SmartField.prototype._sendDeleteProposal = function(displayText) {
