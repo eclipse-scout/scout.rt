@@ -23,10 +23,8 @@ scout.SplitBoxCollapseKeyStroke.prototype._postRenderKeyBox = function($drawingA
   var handleOffset,
     $collapseHandle = this.field._collapseHandle.$container;
 
-  $keyBox.addClass('collapse-handle-key-box');
-
+  $keyBox.addClass('split-box-collapse-key-box');
   handleOffset = $collapseHandle.offsetTo(this.field.$container);
-
   $keyBox
     .cssLeft(handleOffset.left - $keyBox.outerWidth())
     .cssTop(handleOffset.top);

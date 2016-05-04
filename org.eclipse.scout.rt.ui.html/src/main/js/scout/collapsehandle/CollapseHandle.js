@@ -26,26 +26,12 @@ scout.CollapseHandle.prototype._init = function(model) {
   $.extend(this, defaults, model);
 };
 
-scout.CollapseHandle.prototype._initKeyStrokeContext = function(keyStrokeContext) {
-  scout.CollapseHandle.parent.prototype._initKeyStrokeContext.call(this, keyStrokeContext);
-
-  // Bound to desktop
-  this.desktopKeyStrokeContext = new scout.KeyStrokeContext();
-  this.desktopKeyStrokeContext.invokeAcceptInputOnActiveValueField = true;
-  this.desktopKeyStrokeContext.$bindTarget = function() { return this.$container; }.bind(this); // this.session.desktop.$container; // FIXME awe, cgu: desktop not ready yet?
-  this.desktopKeyStrokeContext.$scopeTarget = function() { return this.$container; }.bind(this);
-  this.desktopKeyStrokeContext.registerKeyStroke([
-    new scout.ShrinkNavigationKeyStroke(this),
-    new scout.EnlargeNavigationKeyStroke(this)
-  ]);
-};
-
 scout.CollapseHandle.prototype._render = function($parent) {
-  this.$container = $parent.appendDiv('desktop-navigation-handle');
+  this.$container = $parent.appendDiv('collapse-handle');
   this.$container.on('mousedown', this._onMouseDown.bind(this));
 
-  this.$left = this.$container.appendDiv('desktop-navigation-handle-body left');
-  this.$right = this.$container.appendDiv('desktop-navigation-handle-body right');
+  this.$left = this.$container.appendDiv('collapse-handle-body left');
+  this.$right = this.$container.appendDiv('collapse-handle-body right');
   this.session.keyStrokeManager.installKeyStrokeContext(this.desktopKeyStrokeContext);
 };
 

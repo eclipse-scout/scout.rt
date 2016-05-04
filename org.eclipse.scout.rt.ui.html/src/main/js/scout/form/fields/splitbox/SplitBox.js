@@ -331,20 +331,15 @@ scout.SplitBox.prototype._updateCollapseHandleButtons = function() {
 };
 
 scout.SplitBox.prototype._renderCollapsibleField = function() {
-  // Collapse XXX awe:
-  // - JS keystroke mit variablem keystroke
-  // - code clean up (desktopNaviHandle + CollapseHandle)
   if (this.firstField) {
     this.firstField.$container.removeClass('collapsed');
   }
   if (this.secondField) {
     this.secondField.$container.removeClass('collapsed');
   }
-
   if (this.collapsibleField && this.fieldCollapsed) {
     this.collapsibleField.$container.addClass('collapsed');
   }
-
   if (this.rendered) { // don't invalidate layout on initial rendering
     this.htmlSplitArea.invalidateLayoutTree(false);
   }

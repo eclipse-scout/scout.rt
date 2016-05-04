@@ -143,6 +143,10 @@
 @calendar-weekend-out-background-color: none;
 @calendar-weekend-out-color: @palette-blue-2;
 @checkbox-disabled-color: @palette-gray-6;
+@collapse-handle-active-background-color: @palette-blue-1;
+@collapse-handle-background-color: @palette-white;
+@collapse-handle-border-color: @active-color;
+@collapse-handle-color: @active-color;
 @column-background-effect-gradient1-start-background-color: @palette-red-2;
 @column-background-effect-gradient1-end-background-color: @palette-green-1;
 @column-background-effect-gradient2-start-background-color: @palette-green-1;
@@ -156,6 +160,10 @@
 @default-button-background-color: @palette-blue-4;
 @default-button-color: @palette-white;
 @default-button-hover-background-color: @default-button-background-color;
+@desktop-navigation-handle-active-background-color: @outline-group-background-color;
+@desktop-navigation-handle-background-color: @navigation-background-color;
+@desktop-navigation-handle-border-color: @desktop-navigation-handle-color;
+@desktop-navigation-handle-color: @navigation-color;
 @desktop-table-header-background-color: @table-header-background-color;
 @desktop-header-background-color: @palette-white;
 @form-background-color: @background-color;
@@ -185,10 +193,6 @@
 @navigate-up-button-color: @menubar-button-color;
 @navigation-background-color: @palette-bluegray-4;
 @navigation-color: @palette-gray-3;
-@navigation-handle-active-background-color: @outline-group-background-color;;
-@navigation-handle-background-color: @navigation-background-color;
-@navigation-handle-border-color: @navigation-handle-color;
-@navigation-handle-color: @navigation-color;
 @outline-breadcrumb-border-color: @outline-selection-background-color;
 @outline-group-background-color: @palette-bluegray-3;
 @outline-in-background-selection-background-color: @palette-bluegray-2;
