@@ -63,6 +63,7 @@ scout.AggregateTableControl.prototype._renderContent = function($parent) {
   this.table.on('rowsFiltered', this._tableRowsFilteredHandler);
   this.table.on('rowsSelected', this._tableRowsSelectedHandler);
   this.table.on('columnResized', this._tableColumnResizedHandler);
+  this.table.on('aggregationFunctionChanged', this._tableAggregationFunctionHandler);
   this.table.on('groupingChanged', this._tableGroupingHandler);
 };
 
