@@ -10,7 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.testing.platform.runner;
 
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import org.eclipse.scout.rt.platform.IgnoreBean;
 import org.eclipse.scout.rt.platform.Replace;
@@ -34,7 +36,7 @@ public class JUnitExceptionHandler extends ExceptionHandler {
 
   private static final Logger LOG = LoggerFactory.getLogger(JUnitExceptionHandler.class);
 
-  private final AtomicReference<Throwable> m_error = new AtomicReference<>(null);
+  private final List<Throwable> m_errors = Collections.synchronizedList(new ArrayList<Throwable>());
 
   @Override
   public void handle(final Throwable t) {
@@ -42,13 +44,21 @@ public class JUnitExceptionHandler extends ExceptionHandler {
       LOG.info("Exception will not be re-thrown for JUnit assertion because already consumed. [exception={}]", t.getMessage());
     }
     else {
-      if (m_error.compareAndSet(null, t)) {
+      m_errors.add(t);
+      if (m_errors.size() == 1) {
         LOG.info("Exception will be re-thrown for JUnit assertion. [exception={}]", t.getMessage());
       }
       else {
-        LOG.info("Exception will not be re-thrown for JUnit assertion because another exception was already handled. [current exception={}, other exception={}]", t, m_error.get().getMessage());
+        LOG.info("Exception will not be re-thrown for JUnit assertion because another exception was already handled. [current exception={}, other exception={}]", t, m_errors.get(0).getMessage());
       }
     }
+  }
+
+  /**
+   * @return the mutable list of collected errors. The list may by modified before {@link #throwOnError()} is called.
+   */
+  public List<Throwable> getErrors() {
+    return m_errors;
   }
 
   /**
@@ -56,9 +66,11 @@ public class JUnitExceptionHandler extends ExceptionHandler {
    * This method call has no effect if no exception was handled.
    */
   public void throwOnError() throws Throwable {
-    final Throwable throwable = m_error.getAndSet(null); // clear the exception.
-    if (throwable != null) {
-      throw throwable;
+    if (m_errors.isEmpty()) {
+      return;
     }
+    final Throwable throwable = m_errors.get(0);
+    m_errors.clear();
+    throw throwable;
   }
 }

@@ -4,6 +4,8 @@
  */
 package org.eclipse.scout.testing.client;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.rt.client.IClientSession;
@@ -14,9 +16,11 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.exception.DefaultRuntimeExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
+import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IJobManager;
+import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.job.JobState;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
@@ -43,6 +47,15 @@ public final class BlockingTestUtility {
   /**
    * Helper method to test code which will enter a blocking condition.
    * <p>
+   * calls {@link #runBlockingAction(IRunnable, IRunnable, boolean)} with awaitBackgroundJobs=false
+   */
+  public static void runBlockingAction(final IRunnable runnableGettingBlocked, final IRunnable runnableOnceBlocked) {
+    runBlockingAction(runnableGettingBlocked, runnableOnceBlocked, false);
+  }
+
+  /**
+   * Helper method to test code which will enter a blocking condition.
+   * <p>
    * If <code>runnableOnceBlocked</code> throws an exception, it is given to {@link JUnitExceptionHandler} to make the
    * JUnit test fail.
    *
@@ -50,21 +63,34 @@ public final class BlockingTestUtility {
    *          {@code IRunnable} that will enter a blocking condition.
    * @param runnableOnceBlocked
    *          {@code IRunnable} to be executed once the 'runnableGettingBlocked' enters a blocking condition.
+   * @param awaitBackgroundJobs
+   *          true waits for background jobs running in the same session to complete before runnableOnceBlocked is
+   *          called
    */
-  public static void runBlockingAction(final IRunnable runnableGettingBlocked, final IRunnable runnableOnceBlocked) {
+  public static void runBlockingAction(final IRunnable runnableGettingBlocked, final IRunnable runnableOnceBlocked, final boolean awaitBackgroundJobs) {
     final ClientRunContext runContext = ClientRunContexts.copyCurrent();
     final IBlockingCondition onceBlockedDoneCondition = Jobs.newBlockingCondition(true);
+
+    //remember the list of client jobs before blocking
+    final Set<IFuture<?>> jobsBefore = new HashSet<>();
+    jobsBefore.addAll(BEANS.get(IJobManager.class).getFutures(new IFilter<IFuture<?>>() {
+      @Override
+      public boolean accept(IFuture<?> cand) {
+        final RunContext candContext = cand.getJobInput().getRunContext();
+        return candContext instanceof ClientRunContext && ((ClientRunContext) candContext).getSession() == runContext.getSession();
+      }
+    }));
 
     final IRegistrationHandle listenerRegistration = IFuture.CURRENT.get().addListener(Jobs.newEventFilterBuilder()
         .andMatchEventType(JobEventType.JOB_STATE_CHANGED)
         .andMatchState(JobState.WAITING_FOR_BLOCKING_CONDITION)
         .andMatchExecutionHint(ModelJobs.EXECUTION_HINT_UI_INTERACTION_REQUIRED)
         .toFilter(), new IJobListener() {
-
           @Override
           public void changed(final JobEvent event) {
-            ModelJobs.schedule(new IRunnable() {
+            //waitFor was entered
 
+            final IRunnable callRunnableOnceBlocked = new IRunnable() {
               @Override
               public void run() throws Exception {
                 try {
@@ -75,10 +101,38 @@ public final class BlockingTestUtility {
                   onceBlockedDoneCondition.setBlocking(false);
                 }
               }
-            }, ModelJobs.newInput(runContext)
+            };
+            final JobInput jobInputForRunnableOnceBlocked = ModelJobs.newInput(runContext)
                 .withExceptionHandling(BEANS.get(JUnitExceptionHandler.class), true)
-                .withName("JUnit: Handling blocked thread because waiting for a blocking condition"));
-          }
+                .withName("JUnit: Handling blocked thread because waiting for a blocking condition");
+
+            if (awaitBackgroundJobs) {
+              //wait until all background jobs finished
+              Jobs.schedule(new IRunnable() {
+                @Override
+                public void run() throws Exception {
+                  jobsBefore.add(IFuture.CURRENT.get());
+                  BEANS.get(IJobManager.class).awaitFinished(new IFilter<IFuture<?>>() {
+                    @Override
+                    public boolean accept(IFuture<?> f) {
+                      RunContext candContext = f.getJobInput().getRunContext();
+                      return candContext instanceof ClientRunContext && ((ClientRunContext) candContext).getSession() == runContext.getSession() && !jobsBefore.contains(f);
+                    }
+                  }, 5, TimeUnit.MINUTES);
+
+                  //call runnableOnceBlocked
+                  ModelJobs.schedule(callRunnableOnceBlocked, jobInputForRunnableOnceBlocked);
+
+                }
+              }, Jobs.newInput().withName("wait until background jobs finished"));
+
+            }
+            else {
+              //call runnableOnceBlocked directly
+              ModelJobs.schedule(callRunnableOnceBlocked, jobInputForRunnableOnceBlocked);
+            }
+
+          }//end JobListener.changed
         });
     try {
       runnableGettingBlocked.run(); // this action will enter a blocking condition which causes the 'runnableOnceBlocked' to be executed.
