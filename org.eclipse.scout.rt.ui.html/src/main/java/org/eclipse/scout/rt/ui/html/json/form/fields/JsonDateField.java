@@ -28,9 +28,6 @@ public class JsonDateField<T extends IDateField> extends JsonValueField<T> {
 
   private static final String PROP_TIMESTAMP = "timestamp";
   private static final String PROP_AUTO_TIMESTAMP = "autoTimestamp";
-  private static final String PROP_INVALID_DISPLAY_TEXT = "invalidDisplayText";
-  private static final String PROP_INVALID_DATE_TEXT = "invalidDateText";
-  private static final String PROP_INVALID_TIME_TEXT = "invalidTimeText";
   // UI events
   private static final String EVENT_TIMESTAMP_CHANGED = "timestampChanged";
   private static final String EVENT_PARSING_ERROR = "parsingError";
@@ -172,11 +169,8 @@ public class JsonDateField<T extends IDateField> extends JsonValueField<T> {
   }
 
   protected void handleUiParsingError(JsonEvent event) {
-    String invalidDisplayText = event.getData().optString(PROP_INVALID_DISPLAY_TEXT, null);
-    String invalidDateText = event.getData().optString(PROP_INVALID_DATE_TEXT, null);
-    String invalidTimeText = event.getData().optString(PROP_INVALID_TIME_TEXT, null);
     getModel().getUIFacade().removeParseErrorFromUI();
-    getModel().getUIFacade().setParseErrorFromUI(invalidDisplayText, invalidDateText, invalidTimeText);
+    getModel().getUIFacade().setParseErrorFromUI();
   }
 
   @Override

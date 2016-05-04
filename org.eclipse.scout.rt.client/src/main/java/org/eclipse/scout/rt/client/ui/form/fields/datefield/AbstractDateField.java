@@ -446,11 +446,7 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
     }
 
     @Override
-    public void setParseErrorFromUI(String invalidDisplayText, String invalidDateText, String invalidTimeText) {
-      // \n is used as technical delimiter between date and time -> don't display it
-//      if (invalidDisplayText == null) {
-//        invalidDisplayText = StringUtility.nvl(invalidDateText, "") + "\n" + StringUtility.nvl(invalidTimeText, "");
-//      }
+    public void setParseErrorFromUI() {
       String invalidMessage = getDisplayText().replace("\n", " ");
       ParsingFailedStatus status = new ParsingFailedStatus(ScoutTexts.get("InvalidValueMessageX", invalidMessage), getDisplayText());
       addErrorStatus(status);

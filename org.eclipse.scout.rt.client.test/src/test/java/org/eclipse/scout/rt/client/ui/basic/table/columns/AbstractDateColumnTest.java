@@ -67,7 +67,8 @@ public class AbstractDateColumnTest {
 
   private void setParseErrorInUI(ITableRow row, AbstractDateColumn column) {
     AbstractDateField field = (AbstractDateField) column.prepareEdit(row);
-    field.getUIFacade().setParseErrorFromUI("invalid", "invalid", null);
+    field.getUIFacade().setDisplayTextFromUI("invalid");
+    field.getUIFacade().setParseErrorFromUI();
     column.completeEdit(row, field);
   }
 

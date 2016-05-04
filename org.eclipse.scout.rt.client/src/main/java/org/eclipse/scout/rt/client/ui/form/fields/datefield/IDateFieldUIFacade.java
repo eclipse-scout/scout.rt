@@ -18,7 +18,7 @@ public interface IDateFieldUIFacade {
 
   void setDisplayTextFromUI(String text);
 
-  void setParseErrorFromUI(String invalidDisplayText, String invalidDateText, String invalidTimeText);
+  void setParseErrorFromUI();
 
   void removeParseErrorFromUI();
 
