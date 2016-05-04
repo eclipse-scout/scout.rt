@@ -81,3 +81,11 @@ scout.SmartFieldMultiline.prototype._readDisplayText = function() {
   }
   return newDisplayText.join('\n');
 };
+
+/**
+ * @override SmartField.js
+ */
+scout.SmartFieldMultiline.prototype._readSearchText = function() {
+  // Only read the first line
+  return scout.fields.valOrText(this, this.$field);
+};

@@ -139,6 +139,10 @@ scout.SmartField.prototype._readDisplayText = function() {
   return scout.fields.valOrText(this, this.$field);
 };
 
+scout.SmartField.prototype._readSearchText = function() {
+  return this._readDisplayText();
+};
+
 /**
  * Sync method is required because when proposal-chooser has never been rendered and the search-string
  * does not return any proposals in a proposal field, neither _renderProposalChooser nor _removeProposalChooser
@@ -313,7 +317,7 @@ scout.SmartField.prototype._onFocus = function(e) {
 };
 
 scout.SmartField.prototype._proposalTyped = function() {
-  var displayText = this._readDisplayText();
+  var displayText = this._readSearchText();
   $.log.trace('(SmartField#_proposalTyped) displayText=' + displayText + ' currentDisplayText=' + this.displayText);
   if (displayText === this.displayText) {
     return;
@@ -391,7 +395,7 @@ scout.SmartField.prototype._acceptProposal = function(forceClose) {
   forceClose = scout.nvl(forceClose, false);
   // embedded smartfield does not hold a reference to the chooser, but if it is shown touch popup is open and therefore the chooser as well
   var proposalChooserOpen = !!this.proposalChooser || this.embedded,
-    displayText = this._readDisplayText();
+    displayText = this._readSearchText();
 
   $.log.debug('(SmartField#_acceptProposal) displayText=' + displayText + ' proposalChooserOpen=' + proposalChooserOpen + ' forceClose=' + forceClose);
   if (proposalChooserOpen) {
@@ -504,7 +508,7 @@ scout.SmartField.prototype._sendCancelProposal = function() {
  * has not changed.
  */
 scout.SmartField.prototype._openProposal = function(browseAll) {
-  var displayText = this._readDisplayText(),
+  var displayText = this._readSearchText(),
     selectCurrentValue = browseAll;
   this.displayText = displayText;
   if (this.errorStatus) {
