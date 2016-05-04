@@ -170,6 +170,10 @@ public class ImapAdapter implements IImapAdapter {
     }
 
     for (Message message : messages) {
+      if (message.isExpunged()) {
+        LOG.debug("Ignoring expunged message {}", message);
+        continue;
+      }
       if (message.getFolder() == null) {
         LOG.warn("Folder is empty for message {}", message);
         continue;
