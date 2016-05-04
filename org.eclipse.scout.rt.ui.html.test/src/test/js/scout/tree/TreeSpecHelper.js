@@ -70,6 +70,12 @@ TreeSpecHelper.prototype.createTree = function(model) {
   return tree;
 };
 
+TreeSpecHelper.prototype.createCompactTree = function(model) {
+  var tree = new scout.CompactTree();
+  tree.init(model);
+  return tree;
+};
+
 TreeSpecHelper.prototype.findAllNodes = function(tree) {
   return tree.$container.find('.tree-node');
 };

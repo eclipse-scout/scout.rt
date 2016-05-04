@@ -71,16 +71,16 @@ scout.CompactTree.prototype._remove = function() {
  */
 scout.CompactTree.prototype._$buildNode = function(node) {
   if (node.level === 0) {
-    // Sections (only draw if they have child nodes)
-    if (node.childNodes.length > 0) {
+//TODO [jgu] sections without child nodes are not visible, never build
+ // Sections (only draw if they have child nodes)
+//    if (node.childNodes.length > 0) {
       var $section = this.$container.makeDiv('section expanded')
         .data('node', node);
       $section.appendDiv('title')
         .text(node.text);
 
       node.$node = $section;
-
-    }
+//    }
   } else {
     var $parent = node.parentNode.$node;
     // Sections nodes
@@ -100,26 +100,22 @@ scout.CompactTree.prototype._$buildNode = function(node) {
  * @override
  */
 scout.CompactTree.prototype._insertNodeInDOMAtPlace = function(node, index) {
-  //get node before
-  var $visibleNodeBefore;
-  for(var i = index-1; i>=0; i--){
-    var possibleNode =  this.visibleNodesFlat[i];
-    if(node.level === 0 && possibleNode.level === 0){
-      $visibleNodeBefore = possibleNode.$node;
-    } else if(node.level>0 && possibleNode.level === 0){
-      $visibleNodeBefore = possibleNode.$node.children('.title');
-      break;
-    } else if(node.level>0){
-      $visibleNodeBefore=possibleNode.$node;
-      break;
-    }
-  }
-  if (!$visibleNodeBefore)  {
+  var visibleNodeBefore = this.visibleNodesFlat[index - 1];
+  var n;
+  if (!visibleNodeBefore) {
     node.$node.prependTo(this.$nodesContainer);
+  } else if (visibleNodeBefore.level < node.level) {
+    node.$node.appendTo(visibleNodeBefore.$node);
   } else {
-    node.$node.insertAfter($visibleNodeBefore);
+    n = visibleNodeBefore.$node;
+    for (var i = 0; i < visibleNodeBefore.level - node.level; i++) {
+      n = n.parent();
+    }
+    node.$node.insertAfter(n);
   }
 };
+
+
 
 /**
  * @override
