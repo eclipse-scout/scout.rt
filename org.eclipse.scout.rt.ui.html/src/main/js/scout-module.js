@@ -78,7 +78,7 @@
   __include("scout/keystroke/CloseKeyStroke.js");
   // Misc. elements
   __include("scout/boxbuttons/BoxButtons.js");
-  __include("scout/collapsebutton/CollapseButton.js");
+  __include("scout/collapsehandle/CollapseHandle.js");
   __include("scout/focus/FocusManager.js");
   __include("scout/focus/FocusContext.js");
   __include("scout/focus/focusUtils.js");
@@ -333,6 +333,7 @@
   __include("scout/form/fields/smartfield/SmartFieldMultiline.js");
   __include("scout/form/fields/smartfield/SmartFieldMultilineLayout.js");
   __include("scout/form/fields/splitbox/SplitBox.js");
+  __include("scout/form/fields/splitbox/SplitBoxCollapseKeyStroke.js");
   __include("scout/form/fields/splitbox/SplitBoxLayout.js");
   __include("scout/form/fields/stringfield/StringField.js");
   __include("scout/form/fields/stringfield/StringFieldEnterKeyStroke.js");

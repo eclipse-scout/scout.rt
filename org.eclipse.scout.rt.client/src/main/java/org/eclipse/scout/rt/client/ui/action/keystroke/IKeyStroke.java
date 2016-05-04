@@ -50,4 +50,7 @@ public interface IKeyStroke extends IAction {
   String F11 = "f11";
   String F12 = "f12";
 
+  String COMMA = "comma";
+  String POINT = "point";
+
 }

@@ -11,10 +11,8 @@
 scout.SplitBox = function() {
   scout.SplitBox.parent.call(this);
   this.splitHorizontal; // true = split x-axis, false = split y-axis
-
-  this._collapsed = [false, false]; // index 0=first-field, 1=second-field
-
   this._addAdapterProperties(['firstField', 'secondField', 'collapsibleField']);
+  this._collapseKeyStroke;
 
   this._$splitArea;
   this._$splitter;
@@ -27,7 +25,8 @@ scout.SplitBox.SPLITTER_POSITION_TYPE_ABSOLUTE_SECOND = 'absoluteSecond';
 
 scout.SplitBox.prototype._init = function(model) {
   scout.SplitBox.parent.prototype._init.call(this, model);
-  this._updateCollapseButton();
+  this._updateCollapseHandle();
+  this._syncCollapseKeyStroke(this.collapseKeyStroke);
 };
 
 scout.SplitBox.prototype._render = function($parent) {
@@ -199,9 +198,8 @@ scout.SplitBox.prototype._renderProperties = function() {
   scout.SplitBox.parent.prototype._renderProperties.call(this);
   this._renderSplitterPosition();
   this._renderSplitterEnabled();
-  this._renderCollapsibleField(); // renders collapsibleField and fieldCollapsed
-  this._renderCollapseKeyStroke();
-  this._renderCollapseButton();
+  this._renderCollapsibleField(); // renders collapsibleField _and_ fieldCollapsed
+  this._renderCollapseHandle(); // renders collapseHandle _and_ collapseKeyStroke
 };
 
 scout.SplitBox.prototype._syncSplitterPosition = function(splitterPosition) {
@@ -279,6 +277,7 @@ scout.SplitBox.prototype.setFieldCollapsed = function(collapsed) {
   }
   this._setProperty('fieldCollapsed', collapsed);
   this._sendProperty('fieldCollapsed');
+  this._updateCollapseHandleButtons();
   if (this.rendered) {
     this._renderFieldCollapsed();
   }
@@ -294,40 +293,47 @@ scout.SplitBox.prototype.setCollapsibleField = function(field) {
   }
   this._setProperty('collapsibleField', field);
   this._sendProperty('collapsibleField');
-  this._updateCollapseButton();
+  this._updateCollapseHandle();
   if (this.rendered) {
     this._renderCollapsibleField();
   }
 };
 
-scout.SplitBox.prototype._updateCollapseButton = function() {
+scout.SplitBox.prototype._updateCollapseHandle = function() {
   if (this.collapsibleField) {
-    var leftVisible, rightVisible;
-    if (!this._collapseButton) {
-      this._collapseButton = scout.create('CollapseButton', {
+    if (!this._collapseHandle) {
+      this._collapseHandle = scout.create('CollapseHandle', {
         parent: this
       });
-      this._collapseButton.on('action', this._onCollapseButtonAction.bind(this));
+      this._collapseHandle.on('action', this.toggleFieldCollapsed.bind(this));
     }
-    if (this.collapsibleField === this.firstField) {
-      leftVisible = true; rightVisible = false;
-    } else {
-      leftVisible = false; rightVisible = true;
-    }
-    this._collapseButton.setLeftVisible(leftVisible);
-    this._collapseButton.setRightVisible(rightVisible);
+    this._updateCollapseHandleButtons();
   } else {
-     if (this._collapseButton) {
-       this._collapseButton.remove();
-       this._collapseButton = null;
+     if (this._collapseHandle) {
+       this._collapseHandle.remove();
+       this._collapseHandle = null;
      }
   }
+};
+
+scout.SplitBox.prototype._updateCollapseHandleButtons = function() {
+  var leftVisible, rightVisible,
+    collapsed = this.fieldCollapsed;
+  if (this.collapsibleField === this.firstField) {
+    leftVisible  = !collapsed;
+    rightVisible =  collapsed;
+  } else {
+    leftVisible  =  collapsed;
+    rightVisible = !collapsed;
+  }
+  this._collapseHandle.setLeftVisible(leftVisible);
+  this._collapseHandle.setRightVisible(rightVisible);
 };
 
 scout.SplitBox.prototype._renderCollapsibleField = function() {
   // Collapse XXX awe:
   // - JS keystroke mit variablem keystroke
-  // - code clean up (desktopNaviHandle + CollapseButton)
+  // - code clean up (desktopNaviHandle + CollapseHandle)
   if (this.firstField) {
     this.firstField.$container.removeClass('collapsed');
   }
@@ -344,26 +350,17 @@ scout.SplitBox.prototype._renderCollapsibleField = function() {
   }
 };
 
-scout.SplitBox.prototype.setCollapseKeyStroke = function(keyStroke) {
-  if (this.collapseKeyStroke === keyStroke) {
-    return;
+scout.SplitBox.prototype._syncCollapseKeyStroke = function(keyStroke) {
+  if (keyStroke) {
+    this.collapseKeyStroke = new scout.SplitBoxCollapseKeyStroke(this, keyStroke);
+    this.registerKeyStrokes(this.collapseKeyStroke);
   }
-  this._setProperty('collapseKeyStroke', keyStroke);
-  this._sendProperty('collapseKeyStroke');
-  if (this.rendered) {
-    this._renderCollapseKeyStroke();
-  }
+  return false;
 };
 
-scout.SplitBox.prototype._renderCollapseKeyStroke = function() {
-  // FIXME awe: impl.
-};
-
-
-// TODO awe: (split-box) discuss with C.GU: wurden children nicht mal automatisch gerendet?
-scout.SplitBox.prototype._renderCollapseButton = function() {
-  if (this._collapseButton) {
-    this._collapseButton.render(this.$container);
+scout.SplitBox.prototype._renderCollapseHandle = function() {
+  if (this._collapseHandle) {
+    this._collapseHandle.render(this.$container);
   }
 };
 
@@ -389,14 +386,7 @@ scout.SplitBox.prototype.newSplitterPosition = function(newSplitterPosition) {
   this.htmlSplitArea.invalidateLayoutTree(false);
 };
 
-scout.SplitBox.prototype._onCollapseButtonAction = function(event) {
-  if (event.left) {
-    this._collapseButton.setLeftVisible(false);
-    this._collapseButton.setRightVisible(true);
-  } else if (event.right) {
-    this._collapseButton.setLeftVisible(true);
-    this._collapseButton.setRightVisible(false);
-  }
+scout.SplitBox.prototype.toggleFieldCollapsed = function() {
   this.setFieldCollapsed(!this.fieldCollapsed);
 };
 

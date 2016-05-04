@@ -114,23 +114,23 @@ scout.SplitBoxLayout.prototype.layout = function($container) {
   }
 
   // Calculate collapse button position
-  if (this._splitBox._collapseButton) {
+  if (this._splitBox._collapseHandle) {
 
     // Horizontal layout:
     // - if 1st field is collapsible -> align button on the right side of the field
     // - if 2nd field is collapsible -> align button on the left side of the field
     var x,
-      $collapseButton = this._splitBox._collapseButton.$container,
-      collapseButtonSize = scout.graphics.getSize($collapseButton);
+      $collapseHandle = this._splitBox._collapseHandle.$container,
+      collapseHandleSize = scout.graphics.getSize($collapseHandle);
 
     if (this._splitBox.collapsibleField === this._splitBox.firstField) {
-      x = hasFirstField ? firstFieldBounds.width - collapseButtonSize.width : 0;
+      x = hasFirstField ? firstFieldBounds.width - collapseHandleSize.width : 0;
     } else { // secondField
-      x = hasSecondField ? availableSize.width - secondFieldBounds.width : availableSize.width - collapseButtonSize.width;
+      x = hasSecondField ? availableSize.width - secondFieldBounds.width : availableSize.width - collapseHandleSize.width;
     }
 
-    var collapseButtonLocation = new scout.Point(x, availableSize.height - collapseButtonSize.height);
-    scout.graphics.setLocation($collapseButton, collapseButtonLocation);
+    var collapseHandleLocation = new scout.Point(x, availableSize.height - collapseHandleSize.height);
+    scout.graphics.setLocation($collapseHandle, collapseHandleLocation);
   }
 };
 

@@ -8,16 +8,16 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-scout.CollapseButton = function() {
-  scout.CollapseButton.parent.call(this);
+scout.CollapseHandle = function() {
+  scout.CollapseHandle.parent.call(this);
   this._addEventSupport();
   this.leftVisible = false;
   this.rightVisible = false;
 };
-scout.inherits(scout.CollapseButton, scout.Widget);
+scout.inherits(scout.CollapseHandle, scout.Widget);
 
-scout.CollapseButton.prototype._init = function(model) {
-  scout.CollapseButton.parent.prototype._init.call(this, model);
+scout.CollapseHandle.prototype._init = function(model) {
+  scout.CollapseHandle.parent.prototype._init.call(this, model);
 
   var defaults = {
     leftVisible: true,
@@ -26,8 +26,8 @@ scout.CollapseButton.prototype._init = function(model) {
   $.extend(this, defaults, model);
 };
 
-scout.CollapseButton.prototype._initKeyStrokeContext = function(keyStrokeContext) {
-  scout.CollapseButton.parent.prototype._initKeyStrokeContext.call(this, keyStrokeContext);
+scout.CollapseHandle.prototype._initKeyStrokeContext = function(keyStrokeContext) {
+  scout.CollapseHandle.parent.prototype._initKeyStrokeContext.call(this, keyStrokeContext);
 
   // Bound to desktop
   this.desktopKeyStrokeContext = new scout.KeyStrokeContext();
@@ -40,7 +40,7 @@ scout.CollapseButton.prototype._initKeyStrokeContext = function(keyStrokeContext
   ]);
 };
 
-scout.CollapseButton.prototype._render = function($parent) {
+scout.CollapseHandle.prototype._render = function($parent) {
   this.$container = $parent.appendDiv('desktop-navigation-handle');
   this.$container.on('mousedown', this._onMouseDown.bind(this));
 
@@ -49,27 +49,27 @@ scout.CollapseButton.prototype._render = function($parent) {
   this.session.keyStrokeManager.installKeyStrokeContext(this.desktopKeyStrokeContext);
 };
 
-scout.CollapseButton.prototype._remove = function() {
-  scout.CollapseButton.parent.prototype._remove.call(this);
+scout.CollapseHandle.prototype._remove = function() {
+  scout.CollapseHandle.parent.prototype._remove.call(this);
   this.session.keyStrokeManager.uninstallKeyStrokeContext(this.desktopKeyStrokeContext);
 };
 
-scout.CollapseButton.prototype._renderProperties = function() {
+scout.CollapseHandle.prototype._renderProperties = function() {
   this._renderLeftVisible();
   this._renderRightVisible();
 };
 
-scout.CollapseButton.prototype._renderLeftVisible = function() {
+scout.CollapseHandle.prototype._renderLeftVisible = function() {
   this.$left.setVisible(this.leftVisible);
   this._updateVisibilityClasses();
 };
 
-scout.CollapseButton.prototype._renderRightVisible = function() {
+scout.CollapseHandle.prototype._renderRightVisible = function() {
   this.$right.setVisible(this.rightVisible);
   this._updateVisibilityClasses();
 };
 
-scout.CollapseButton.prototype._updateVisibilityClasses = function() {
+scout.CollapseHandle.prototype._updateVisibilityClasses = function() {
   var bothVisible = this.leftVisible && this.rightVisible;
   this.$container.toggleClass('both-visible', bothVisible);
   this.$left.toggleClass('both-visible', bothVisible);
@@ -77,7 +77,7 @@ scout.CollapseButton.prototype._updateVisibilityClasses = function() {
   this.$container.toggleClass('one-visible', (this.leftVisible || this.rightVisible) && !bothVisible);
 };
 
-scout.CollapseButton.prototype.setLeftVisible = function(visible) {
+scout.CollapseHandle.prototype.setLeftVisible = function(visible) {
   if (this.leftVisible === visible) {
     return;
   }
@@ -87,7 +87,7 @@ scout.CollapseButton.prototype.setLeftVisible = function(visible) {
   }
 };
 
-scout.CollapseButton.prototype.setRightVisible = function(visible) {
+scout.CollapseHandle.prototype.setRightVisible = function(visible) {
   if (this.rightVisible === visible) {
     return;
   }
@@ -97,19 +97,19 @@ scout.CollapseButton.prototype.setRightVisible = function(visible) {
   }
 };
 
-scout.CollapseButton.prototype._onLeftMouseDown = function(event) {
+scout.CollapseHandle.prototype._onLeftMouseDown = function(event) {
   this.trigger('action', {
     left: true
   });
 };
 
-scout.CollapseButton.prototype._onRightMouseDown = function(event) {
+scout.CollapseHandle.prototype._onRightMouseDown = function(event) {
   this.trigger('action', {
     right: true
   });
 };
 
-scout.CollapseButton.prototype._onMouseDown = function(event) {
+scout.CollapseHandle.prototype._onMouseDown = function(event) {
   var target = event.target;
   if (this.$left.isOrHas(target)) {
     this.trigger('action', {
