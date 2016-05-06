@@ -20,6 +20,11 @@ scout.ShrinkNavigationKeyStroke = function(handle) {
 };
 scout.inherits(scout.ShrinkNavigationKeyStroke, scout.KeyStroke);
 
+scout.ShrinkNavigationKeyStroke.prototype._isEnabled = function() {
+  var enabled = scout.ShrinkNavigationKeyStroke.parent.prototype._isEnabled.call(this);
+  return enabled && this.field.leftVisible;
+};
+
 scout.ShrinkNavigationKeyStroke.prototype.handle = function(event) {
   this.desktop.shrinkNavigation();
 };

@@ -21,6 +21,11 @@ scout.EnlargeNavigationKeyStroke = function(handle) {
 };
 scout.inherits(scout.EnlargeNavigationKeyStroke, scout.KeyStroke);
 
+scout.EnlargeNavigationKeyStroke.prototype._isEnabled = function() {
+  var enabled = scout.EnlargeNavigationKeyStroke.parent.prototype._isEnabled.call(this);
+  return enabled && this.field.rightVisible;
+};
+
 scout.EnlargeNavigationKeyStroke.prototype.handle = function(event) {
   this.desktop.enlargeNavigation();
 };
