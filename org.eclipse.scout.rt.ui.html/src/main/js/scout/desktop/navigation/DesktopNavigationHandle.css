@@ -8,19 +8,32 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
- .desktop-navigation > .collapse-handle {
-   position: absolute;
+ .desktop-navigation-handle.collapse-handle {
+  position: absolute;
 
-   &:active > .collapse-handle-body {
-     background-color: @desktop-navigation-handle-active-background-color;
-   }
+  &.navigation-open {
+    left: auto;
+    margin-right: 5px;
+    right: 0;
+  }
 
-   & > .collapse-handle-body {
-     background-color: @desktop-navigation-handle-background-color;
-     border-color: @desktop-navigation-handle-border-color;
-     color: @desktop-navigation-handle-color;
-   }
- }
+  &.navigation-closed {
+    left: 0;
+    right: auto;
+    padding-left: 1px;
+    margin-bottom: 36px;
+  }
+
+  &:active > .collapse-handle-body {
+    background-color: @desktop-navigation-handle-active-background-color;
+  }
+
+  & > .collapse-handle-body {
+    background-color: @desktop-navigation-handle-background-color;
+    border-color: fade(@desktop-navigation-handle-border-color, 75%);
+    color: fade(@desktop-navigation-handle-color, 75%);
+  }
+}
 
 .navigation-handle-key-box {
   margin-top: -6px;

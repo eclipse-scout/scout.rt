@@ -26,3 +26,8 @@ scout.DesktopNavigationHandle.prototype._initKeyStrokeContext = function(keyStro
     new scout.EnlargeNavigationKeyStroke(this)
   ]);
 };
+
+scout.DesktopNavigationHandle.prototype._render = function($parent) {
+  scout.DesktopNavigationHandle.parent.prototype._render.call(this, $parent);
+  this.$container.addClass('desktop-navigation-handle');
+};

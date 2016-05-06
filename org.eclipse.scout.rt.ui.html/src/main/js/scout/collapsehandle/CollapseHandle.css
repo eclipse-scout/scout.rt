@@ -5,20 +5,7 @@
   bottom: 0;
   margin-bottom: 9px;
   box-shadow: 2px 3px 7px 0px rgba(0, 0, 0, 0.4);
-
-  &.navigation-open {
-    left: auto;
-    margin-right: 5px;
-    right: 0;
-  }
-
-  &.navigation-closed {
-    left: 0;
-    right: auto;
-    padding-left: 1px;
-    margin-bottom: 36px;
-    border-color: @collapse-handle-border-color;
-  }
+  border-radius: @border-radius;
 
   &.one-visible {
     cursor: pointer;
@@ -36,14 +23,12 @@
   background-color: @collapse-handle-background-color;
   color: fade(@collapse-handle-color, 75%);
   border: 1px solid fade(@collapse-handle-border-color, 75%);
-  border-radius: 3px;
+  border-radius: @border-radius;
   cursor: pointer;
 
   &::before {
     #scout.font-icon();
-    display: table-cell;
-    vertical-align: middle;
-    text-align: center;
+    display: block;
     padding-right: 1px;
   }
 
