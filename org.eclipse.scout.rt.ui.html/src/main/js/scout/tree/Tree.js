@@ -706,7 +706,7 @@ scout.Tree.prototype._removeNodes = function(nodes, parentNode) {
       $parentNode.removeClass('lazy');
     }
   }
-  if(this.rendered){
+  if (this.rendered) {
     this.viewRangeDirty = true;
     this._renderViewport();
     this.invalidateLayoutTree();
@@ -1407,8 +1407,14 @@ scout.Tree.prototype._removeChildrenFromFlatList = function(parentNode, animated
     if (animatedRemove) { // don't animate while rendering (not necessary, or may even lead to timing issues)
       this._renderViewportBlocked = true;
       if (removedNodes.length > 0) {
-        this._$animationWrapper
-          .animateAVSCSD('height', 0, this.startAnimationFunc, onAnimationComplete.bind(this, removedNodes), function() {}, 1000);
+        this._$animationWrapper.animate({
+          height: 0
+        }, {
+          start: this.startAnimationFunc,
+          complete: onAnimationComplete.bind(this, removedNodes),
+          duration: 200,
+          queue: false
+        });
       } else if (this._$animationWrapper) {
         this._$animationWrapper.remove();
         this._$animationWrapper = null;
@@ -1634,7 +1640,14 @@ scout.Tree.prototype.insertBatchInVisibleNodes = function(insertBatch, showNodes
       var h = insertBatch.$animationWrapper.outerHeight();
       insertBatch.$animationWrapper
         .css('height', 0)
-        .animateAVSCSD('height', h, this.startAnimationFunc, insertBatch.animationCompleteFunc.bind(this), function() {}, 200);
+        .animate({
+          height: h
+        }, {
+          start: this.startAnimationFunc,
+          complete: insertBatch.animationCompleteFunc.bind(this),
+          duration: 200,
+          queue: false
+        });
     }
   }
 };
@@ -2212,15 +2225,11 @@ scout.Tree.prototype._isGroupingEnd = function(node) {
 };
 
 scout.Tree.prototype.$selectedNodes = function() {
-  if(this.$data){
-    return this.$data.find('.selected');
-  }
+  return this.$data.find('.selected');
 };
 
 scout.Tree.prototype.$nodes = function() {
-  if(this.$data){
-    return this.$data.find('.tree-node');
-  }
+  return this.$data.find('.tree-node');
 };
 
 /**

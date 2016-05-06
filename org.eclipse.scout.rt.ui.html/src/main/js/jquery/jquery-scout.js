@@ -593,19 +593,12 @@ $.fn.scrollParents = function() {
 
 // most used animate
 $.fn.animateAVCSD = function(attr, value, complete, step, duration) {
-  return this.animateAVSCSD(attr, value, null, complete, step, duration);
-};
-
-$.fn.animateAVSCSD = function(attr, value, start,complete, step, duration) {
   var properties = {};
   var options = {};
 
   properties[attr] = value;
   if (complete) {
     options.complete = complete;
-  }
-  if (start) {
-    options.start = start;
   }
   if (step) {
     options.step = step;
@@ -618,7 +611,6 @@ $.fn.animateAVSCSD = function(attr, value, start,complete, step, duration) {
   this.animate(properties, options);
   return this;
 };
-
 
 // SVG animate, array contains attr, endValue + startValue
 $.fn.animateSVG = function(attr, endValue, duration, complete, withoutTabIndex) {
