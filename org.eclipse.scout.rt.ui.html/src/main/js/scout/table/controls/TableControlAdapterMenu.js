@@ -66,11 +66,16 @@ scout.TableControlAdapterMenu.prototype.doAction = function() {
   return this.tableControl.doAction();
 };
 
+scout.TableControlAdapterMenu.prototype._syncSelected = function(selected) {
+  // Don't call super, because super prevents rendering and instead delegates to setSelected. But in this case rendering is needed
+  this.selected = selected;
+};
+
 /**
  * @override Action.js
  */
-scout.TableControlAdapterMenu.prototype.setSelected = function(selected) {
-  this.tableControl.setSelected(selected);
+scout.TableControlAdapterMenu.prototype.setSelected = function(selected, notifyServer) {
+  this.tableControl.setSelected(selected, notifyServer);
 };
 
 /* --- STATIC HELPERS ------------------------------------------------------------- */

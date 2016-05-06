@@ -21,40 +21,101 @@ describe("FormMenu", function() {
     };
   });
 
-  function createAction(model) {
+  function createMenu(model) {
     model.form = helper.createFormWithOneField();
     model.desktop = desktop;
 
-    var action = new scout.FormMenu();
-    action.init(model);
-    action.position = function() {};
-    return action;
+    var menu = new scout.FormMenu();
+    menu.init(model);
+    menu.position = function() {};
+    return menu;
   }
 
-  function findToolContainer() {
+  function findPopup() {
     return $('.popup');
   }
+
+  describe("setSelected", function() {
+
+    it("opens and closes the form popup", function() {
+      var menu = createMenu(createSimpleModel('FormMenu', session));
+      menu.render(session.$entryPoint);
+      expect(findPopup()).not.toExist();
+
+      menu.setSelected(true);
+      expect(findPopup()).toBeVisible();
+
+      menu.setSelected(false);
+      expect(findPopup()).not.toExist();
+    });
+
+    it("opens the popup and the ellipsis if the menu is overflown", function() {
+      var ellipsisMenu = scout.menus.createEllipsisMenu({
+        parent: new scout.NullWidget(),
+        session: session
+      });
+      ellipsisMenu.render(session.$entryPoint);
+
+      var menu = createMenu(createSimpleModel('FormMenu', session));
+      menu.render(session.$entryPoint);
+
+      scout.menus.moveMenuIntoEllipsis(menu, ellipsisMenu);
+      expect(menu.rendered).toBe(false);
+      expect(findPopup()).not.toExist();
+
+      menu.setSelected(true);
+      expect(ellipsisMenu.selected).toBe(true);
+      expect(menu.selected).toBe(true);
+      expect(findPopup()).toBeVisible();
+
+      // cleanup
+      menu.setSelected(false);
+      ellipsisMenu.setSelected(false);
+    });
+
+    it("opens the popup but not the ellipsis if the menu is overflown and mobile popup style is used", function() {
+      var ellipsisMenu = scout.menus.createEllipsisMenu({
+        parent: new scout.NullWidget(),
+        session: session
+      });
+      ellipsisMenu.render(session.$entryPoint);
+
+      var model = createSimpleModel('FormMenu', session);
+      model.popupStyle = scout.FormMenu.PopupStyle.MOBILE;
+      var menu = createMenu(model);
+      menu.render(session.$entryPoint);
+
+      scout.menus.moveMenuIntoEllipsis(menu, ellipsisMenu);
+      expect(menu.rendered).toBe(false);
+      expect(findPopup()).not.toExist();
+
+      menu.setSelected(true);
+      expect(ellipsisMenu.selected).toBe(false);
+      expect(menu.selected).toBe(true);
+      expect(findPopup()).toBeVisible();
+
+      // cleanup
+      menu.setSelected(false);
+    });
+
+  });
 
   describe("onModelPropertyChange", function() {
 
     describe("selected", function() {
 
-      it("opens and closes the tool container", function() {
-        var action = createAction(createSimpleModel('FormMenu', session));
-        action.render(session.$entryPoint);
-        expect(findToolContainer()).not.toExist();
+      it("calls setSelected", function() {
+        var menu = createMenu(createSimpleModel('FormMenu', session));
+        menu.render(session.$entryPoint);
+        expect(findPopup()).not.toExist();
 
-        var event = createPropertyChangeEvent(action, {
+        spyOn(menu, 'setSelected');
+
+        var event = createPropertyChangeEvent(menu, {
           "selected": true
         });
-        action.onModelPropertyChange(event);
-        expect(findToolContainer()).toBeVisible();
-
-        event = createPropertyChangeEvent(action, {
-          "selected": false
-        });
-        action.onModelPropertyChange(event);
-        expect(findToolContainer()).not.toExist();
+        menu.onModelPropertyChange(event);
+        expect(menu.setSelected).toHaveBeenCalled();
       });
 
     });

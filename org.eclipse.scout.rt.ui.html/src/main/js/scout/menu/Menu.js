@@ -34,7 +34,7 @@ scout.Menu = function() {
 scout.inherits(scout.Menu, scout.Action);
 
 /**
- * @override ModelAdapter
+ * @override Widget
  */
 scout.Menu.prototype._initKeyStrokeContext = function(keyStrokeContext) {
   scout.Menu.parent.prototype._initKeyStrokeContext.call(this, keyStrokeContext);
@@ -250,4 +250,25 @@ scout.Menu.prototype.isToggleAction = function() {
 
 scout.Menu.prototype.isButton = function() {
   return scout.Action.ActionStyle.BUTTON === this.actionStyle;
+};
+
+scout.Menu.prototype.setSelected = function(selected, notifyServer) {
+  if (selected === this.selected) {
+    return;
+  }
+  scout.Menu.parent.prototype.setSelected.call(this, selected, notifyServer);
+  if (!this._doActionTogglesSubMenu() && !this._doActionTogglesPopup()) {
+    return;
+  }
+  // If menu toggles a popup and is in an ellipsis menu which is not selected it needs a special treatment
+  if (this.overflowMenu && !this.overflowMenu.selected) {
+    this._handleSelectedInEllipsis();
+  }
+};
+
+scout.Menu.prototype._handleSelectedInEllipsis = function() {
+  // If the selection toggles a popup, open the ellipsis menu as well, otherwise the popup would not be shown
+  if (this.selected) {
+    this.overflowMenu.setSelected(true);
+  }
 };

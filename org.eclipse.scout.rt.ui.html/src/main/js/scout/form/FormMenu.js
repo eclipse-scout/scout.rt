@@ -14,6 +14,23 @@ scout.FormMenu = function() {
 };
 scout.inherits(scout.FormMenu, scout.Menu);
 
+scout.FormMenu.PopupStyle = {
+  DEFAULT: 'default',
+  MOBILE: 'mobile'
+};
+
+scout.FormMenu.prototype._init = function(model) {
+  scout.FormMenu.parent.prototype._init.call(this, model);
+
+  if (!this.popupStyle) {
+    if (this.session.userAgent.deviceType === scout.Device.Type.MOBILE) {
+      this.popupStyle = scout.FormMenu.PopupStyle.MOBILE;
+    } else {
+      this.popupStyle = scout.FormMenu.PopupStyle.DEFAULT;
+    }
+  }
+};
+
 scout.FormMenu.prototype._renderForm = function() {
   if (!this.rendered) {
     // Don't execute initially since _renderSelected will be executed
@@ -52,9 +69,9 @@ scout.FormMenu.prototype._createPopup = function() {
   // Menu bar should always be on the bottom
   this.form.rootGroupBox.menuBar.bottom();
 
-  if (this.session.userAgent.deviceType === scout.Device.Type.MOBILE) {
+  if (this.popupStyle === scout.FormMenu.PopupStyle.MOBILE) {
     return scout.create('MobilePopup', {
-      parent: this,
+      parent: this.session.desktop, // use desktop to make _handleSelectedInEllipsis work (if parent is this and this were not rendered, popup.entryPoint would not work)
       widget: this.form,
       title: this.form.title
     });
@@ -73,6 +90,22 @@ scout.FormMenu.prototype._createPopup = function() {
  */
 scout.FormMenu.prototype._doActionTogglesPopup = function() {
   return !!this.form;
+};
+
+scout.FormMenu.prototype._handleSelectedInEllipsis = function() {
+  if (this.popupStyle !== scout.FormMenu.PopupStyle.MOBILE) {
+    scout.FormMenu.parent.prototype._handleSelectedInEllipsis.call(this);
+    return;
+  }
+  if (!this._doActionTogglesPopup()) {
+    return;
+  }
+  // The mobile popup is not atached to a header -> no need to open the parent menu, just show the poupup
+  if (this.selected) {
+    this._openPopup();
+  } else {
+    this._closePopup();
+  }
 };
 
 /**

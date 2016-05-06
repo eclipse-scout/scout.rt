@@ -139,6 +139,30 @@ scout.menus = {
     function onEventsProcessed() {
       func.apply(this, argumentsArray);
     }
+  },
+
+  createEllipsisMenu: function(options) {
+    var defaults = {
+      iconId: scout.icons.ELLIPSIS_V,
+      tabbable: false
+    };
+    options = $.extend({}, defaults, options);
+    return scout.create('Menu', options);
+  },
+
+  moveMenuIntoEllipsis: function(menu, ellipsis) {
+    menu.remove();
+    menu.overflow = true;
+    menu.overflowMenu = ellipsis;
+    ellipsis.childActions.push(menu);
+  },
+
+  removeMenuFromEllipsis: function(menu, $parent) {
+    menu.overflow = false;
+    menu.overflowMenu = null;
+    if (!menu.rendered) {
+      menu.render($parent);
+    }
   }
 };
 

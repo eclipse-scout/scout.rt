@@ -113,7 +113,7 @@ scout.TableControl.prototype.renderContent = function() {
 
 scout.TableControl.prototype._renderSelected = function(selected, closeWhenUnselected) {
   selected = scout.nvl(selected, this.selected);
-  closeWhenUnselected = closeWhenUnselected !== undefined ? closeWhenUnselected : true;
+  closeWhenUnselected = scout.nvl(closeWhenUnselected, true);
 
   this.$container.select(selected);
 
@@ -147,13 +147,13 @@ scout.TableControl.prototype.isContentAvailable = function() {
 
 scout.TableControl.prototype.toggle = function() {
   if (this.tableFooter.selectedControl === this) {
-    this.setSelected(false, true);
+    this.setSelected(false);
   } else {
-    this.setSelected(true, true);
+    this.setSelected(true);
   }
 };
 
-scout.TableControl.prototype.setSelected = function(selected, closeWhenUnselected) {
+scout.TableControl.prototype.setSelected = function(selected, notifyServer, closeWhenUnselected) {
   if (!this.enabled || !this.visible) {
     return;
   }
@@ -162,7 +162,7 @@ scout.TableControl.prototype.setSelected = function(selected, closeWhenUnselecte
   }
 
   if (this.tableFooter.selectedControl && this.tableFooter.selectedControl !== this) {
-    this.tableFooter.selectedControl.setSelected(false, false);
+    this.tableFooter.selectedControl.setSelected(false, true, false);
   }
 
   // Instead of calling parent.setSelected(), we manually execute the required code. Otherwise
@@ -171,7 +171,9 @@ scout.TableControl.prototype.setSelected = function(selected, closeWhenUnselecte
   if (this.rendered) {
     this._renderSelected(selected, closeWhenUnselected);
   }
-  this.sendSelected();
+  if (scout.nvl(notifyServer, true)) {
+    this.sendSelected();
+  }
 };
 
 scout.TableControl.prototype._configureTooltip = function() {

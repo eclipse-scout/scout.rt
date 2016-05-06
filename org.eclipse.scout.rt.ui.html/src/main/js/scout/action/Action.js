@@ -37,6 +37,7 @@ scout.Action.prototype._init = function(model) {
   scout.Action.parent.prototype._init.call(this, model);
   this.actionKeyStroke = this._createActionKeyStroke();
   this._syncKeyStroke(this.keyStroke);
+  this._syncSelected(this.selected);
 };
 
 scout.Action.prototype._renderProperties = function() {
@@ -233,21 +234,28 @@ scout.Action.prototype.afterSendDoAction = function() {
   // NOP
 };
 
-scout.Action.prototype.setSelected = function(selected) {
+scout.Action.prototype.setSelected = function(selected, notifyServer) {
   if (selected === this.selected) {
     return;
   }
   this._setProperty('selected', selected);
+  if (scout.nvl(notifyServer, true)) {
+    this.sendSelected();
+  }
   if (this.rendered) {
     this._renderSelected();
   }
-  this.sendSelected();
 };
 
 scout.Action.prototype.sendSelected = function() {
   this._send('selected', {
     selected: this.selected
   });
+};
+
+scout.Action.prototype._syncSelected = function(selected) {
+  this.setSelected(selected, false);
+  return false;
 };
 
 scout.Action.prototype._syncKeyStroke = function(keyStroke) {
