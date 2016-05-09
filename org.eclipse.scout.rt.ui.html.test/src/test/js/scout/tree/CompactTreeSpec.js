@@ -37,7 +37,77 @@ describe("Compacttree", function() {
       var tree = helper.createCompactTree(model);
       var spy = spyOn(tree, '_calculateCurrentViewRange').and.returnValue(new scout.Range(0, 1));
       tree.render(session.$entryPoint);
-      expect(tree.$nodes().length).toBe(0);
+      expect(tree.nodes.length).toBe(1);
+//      expect(tree.visibleNodesFlat.length).toBe(0);
+    });
+
+    it("adds a node with child node", function() {
+      var model = helper.createModelFixture(1,1, true);
+      var tree = helper.createCompactTree(model);
+      var spy = spyOn(tree, '_calculateCurrentViewRange').and.returnValue(new scout.Range(0, 4));
+      tree.render(session.$entryPoint);
+      expect(tree.nodes.length).toBe(1);
+      expect(tree.visibleNodesFlat.length).toBe(2);
+    });
+
+    it("adds a node with child nodes in correct order", function() {
+      var model = helper.createModelFixture(2,1,true);
+      var tree = helper.createCompactTree(model);
+      var spy = spyOn(tree, '_calculateCurrentViewRange').and.returnValue(new scout.Range(0, 5));
+      tree.render(session.$entryPoint);
+      expect(tree.nodes.length).toBe(2);
+      expect(tree.visibleNodesFlat.length).toBe(6);
+
+      //check $node
+      var firstNode = tree.nodes[0].$node.children();
+      expect($(firstNode[0]).hasClass("title")).toBe(true);
+      expect($(firstNode[0]).text()).toBe("node 0");
+      expect($(firstNode[1]).hasClass("section-node")).toBe(true);
+      expect($(firstNode[1]).text()).toBe("node 0_0");
+      expect($(firstNode[2]).hasClass("section-node")).toBe(true);
+      expect($(firstNode[2]).text()).toBe("node 0_1");
+    });
+
+    //deletion
+    it("deletes a node", function() {
+      var model = helper.createModelFixture(2,1,true);
+      var tree = helper.createCompactTree(model);
+      var spy = spyOn(tree, '_calculateCurrentViewRange').and.returnValue(new scout.Range(0, 5));
+      tree.render(session.$entryPoint);
+      tree.deleteNodes([tree.nodes[0].childNodes[0]], tree.nodes[0]);
+      expect(tree.nodes.length).toBe(2);
+      expect(tree.visibleNodesFlat.length).toBe(5);
+
+      //check $node
+      var firstNode = tree.nodes[0].$node.children();
+      expect($(firstNode[0]).hasClass("title")).toBe(true);
+      expect($(firstNode[0]).text()).toBe("node 0");
+      expect($(firstNode[1]).hasClass("section-node")).toBe(true);
+      expect($(firstNode[1]).text()).toBe("node 0_1");
+    });
+
+    //insertions
+    it("inserts a child node", function() {
+      var model = helper.createModelFixture(2,1,true);
+      var tree = helper.createCompactTree(model);
+      var parent0 = tree.nodes[0];
+      var child0 = parent0.childNodes[0];
+      var spy = spyOn(tree, '_calculateCurrentViewRange').and.returnValue(new scout.Range(0, 5));
+      tree.render(session.$entryPoint);
+      tree.deleteNodes([child0], parent0);
+      tree.insertNodes([child0], parent0);
+
+      expect(tree.nodes.length).toBe(2);
+      expect(tree.visibleNodesFlat.length).toBe(6);
+
+      //check $node
+      var firstNode = parent0.$node.children();
+      expect($(firstNode[0]).hasClass("title")).toBe(true);
+      expect($(firstNode[0]).text()).toBe("node 0");
+      expect($(firstNode[1]).hasClass("section-node")).toBe(true);
+      expect($(firstNode[1]).text()).toBe("node 0_0");
+      expect($(firstNode[2]).hasClass("section-node")).toBe(true);
+      expect($(firstNode[2]).text()).toBe("node 0_1");
     });
 
   });

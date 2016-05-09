@@ -102,7 +102,8 @@ scout.CompactTree.prototype._insertNodeInDOMAtPlace = function(node, index) {
   if (!visibleNodeBefore) {
     node.$node.prependTo(this.$nodesContainer);
   } else if (visibleNodeBefore.level < node.level) {
-    node.$node.appendTo(visibleNodeBefore.$node);
+    //insert after first child node (title from the level above)
+    node.$node.insertAfter(visibleNodeBefore.$node.children()[0]);
   } else {
     n = visibleNodeBefore.$node;
     for (var i = 0; i < visibleNodeBefore.level - node.level; i++) {
