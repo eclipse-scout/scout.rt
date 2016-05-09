@@ -17,7 +17,6 @@ scout.CompactTree.prototype._initTreeKeyStrokeContext = function(keyStrokeContex
 };
 
 scout.CompactTree.prototype._render = function($parent) {
-  this.isRendering = true;
   this.$container = $parent.appendDiv('compact-tree');
 
   var layout = new scout.TreeLayout(this);
@@ -39,22 +38,20 @@ scout.CompactTree.prototype._render = function($parent) {
   this._updateNodeDimensions();
   this._renderViewport();
   this.invalidateLayoutTree();
-
-  this.isRendering =false;
 };
 
 /**
  * @override
  */
 scout.CompactTree.prototype._calculateCurrentViewRange = function() {
-  this.viewRangeSize=this.visibleNodesFlat.length;
-  return new scout.Range(0, Math.max(this.visibleNodesFlat.length-1, 0));
+  this.viewRangeSize = this.visibleNodesFlat.length;
+  return new scout.Range(0, Math.max(this.visibleNodesFlat.length, 0));
 };
 
 /**
  * @override
  */
-scout.CompactTree.prototype.calculateViewRangeSize = function(){
+scout.CompactTree.prototype.calculateViewRangeSize = function() {
   return this.visibleNodesFlat.length;
 };
 
@@ -71,16 +68,16 @@ scout.CompactTree.prototype._remove = function() {
  */
 scout.CompactTree.prototype._$buildNode = function(node) {
   if (node.level === 0) {
-//TODO [jgu] sections without child nodes are not visible, never build
- // Sections (only draw if they have child nodes)
-//    if (node.childNodes.length > 0) {
-      var $section = this.$container.makeDiv('section expanded')
-        .data('node', node);
-      $section.appendDiv('title')
-        .text(node.text);
+    //TODO [jgu] sections without child nodes are not visible, never build
+    // Sections (only draw if they have child nodes)
+    //    if (node.childNodes.length > 0) {
+    var $section = this.$container.makeDiv('section expanded')
+      .data('node', node);
+    $section.appendDiv('title')
+      .text(node.text);
 
-      node.$node = $section;
-//    }
+    node.$node = $section;
+    //    }
   } else {
     var $parent = node.parentNode.$node;
     // Sections nodes
@@ -114,8 +111,6 @@ scout.CompactTree.prototype._insertNodeInDOMAtPlace = function(node, index) {
     node.$node.insertAfter(n);
   }
 };
-
-
 
 /**
  * @override
