@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <?pde?>
 <!-- generated with https://github.com/mbarbero/fr.obeo.releng.targetplatform -->
-<target name="scout-helios.target" sequenceNumber="1456998700">
+<target name="scout-helios.target" sequenceNumber="1462796526">
   <locations>
     <location includeMode="slicer" includeAllPlatforms="false" includeSource="true" includeConfigurePhase="false" type="InstallableUnit">
       <unit id="javax.jms" version="1.1.0.v201205091237"/>
@@ -43,8 +43,8 @@
       <unit id="org.apache.commons.exec.source" version="1.1.0.v201301240602"/>
       <unit id="org.apache.commons.logging" version="1.1.1.v201101211721"/>
       <unit id="org.apache.commons.logging.source" version="1.1.1.v201101211721"/>
-      <unit id="org.apache.httpcomponents.httpclient" version="4.3.6.v201411290715"/>
-      <unit id="org.apache.httpcomponents.httpclient.source" version="4.3.6.v201411290715"/>
+      <unit id="org.apache.httpcomponents.httpclient" version="4.3.6.v201411290715B"/>
+      <unit id="org.apache.httpcomponents.httpclient.source" version="4.3.6.v201411290715B"/>
       <unit id="org.apache.httpcomponents.httpcore" version="4.3.3.v201411290715"/>
       <unit id="org.apache.httpcomponents.httpcore.source" version="4.3.3.v201411290715"/>
       <unit id="org.apache.xerces" version="2.9.0.v201101211617"/>
@@ -69,7 +69,7 @@
       <unit id="com.thoughtworks.selenium.source" version="2.25.0.v201212071504"/>
       <unit id="com.google.guava" version="15.0.0.v201403281430"/>
       <unit id="com.google.guava.source" version="15.0.0.v201403281430"/>
-      <repository id="orbit_R" location="http://download.eclipse.org/tools/orbit/downloads/drops/R20151221205849/repository"/>
+      <repository id="orbit_R20160221192158" location="http://download.eclipse.org/tools/orbit/downloads/drops/R20160221192158/repository"/>
     </location>
     <location includeMode="slicer" includeAllPlatforms="false" includeSource="true" includeConfigurePhase="false" type="InstallableUnit">
       <unit id="org.eclipse.rap.feature.feature.group" version="0.0.0"/>
