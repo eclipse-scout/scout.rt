@@ -251,14 +251,20 @@ scout.Widget.prototype.removeChild = function(child) {
   scout.arrays.remove(this.children, child);
 };
 
-scout.Widget.prototype.isOrHasWidget = function(widget) {
+/**
+ * @returns true if the given widget is the same as this or a descendant
+ */
+scout.Widget.prototype.isOrHas = function(widget) {
   if (widget === this) {
     return true;
   }
-  return this.hasWidget(widget);
+  return this.has(widget);
 };
 
-scout.Widget.prototype.hasWidget = function(widget) {
+/**
+ * @returns true if the given widget is a descendant
+ */
+scout.Widget.prototype.has = function(widget) {
   while (widget) {
     if (widget.parent === this) {
       return true;

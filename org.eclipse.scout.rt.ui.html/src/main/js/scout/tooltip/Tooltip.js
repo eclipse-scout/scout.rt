@@ -266,7 +266,7 @@ scout.Tooltip.prototype._isMousedownOutside = function(event) {
 
   // Only remove the tooltip if the click is outside of the container or the $anchor (= status icon)
   // Also ignore clicks if the tooltip is covert by a glasspane
-  return !this.isOrHasWidget(targetWidget) &&
+  return !this.isOrHas(targetWidget) &&
     (this.$anchor && !this.$anchor.isOrHas($target[0])) &&
     !this.session.focusManager.isElementCovertByGlassPane(this.$container[0]);
 };

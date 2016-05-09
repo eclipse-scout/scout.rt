@@ -221,7 +221,7 @@ scout.Popup.prototype._isMouseDownOutside = function(event) {
   // It is not sufficient to check the dom hierarchy using $container.has($target)
   // because the popup may open other popups which probably is not a dom child but a sibling
   // Also ignore clicks if the popup is covert by a glasspane
-  return !this.isOrHasWidget(targetWidget) && !this.session.focusManager.isElementCovertByGlassPane(this.$container[0]);
+  return !this.isOrHas(targetWidget) && !this.session.focusManager.isElementCovertByGlassPane(this.$container[0]);
 };
 
 /**
@@ -257,8 +257,8 @@ scout.Popup.prototype._onPopupOpen = function(event) {
   // Use case: Opening of a context menu or cell editor in a form popup
   // Also, popups covered by a glass pane (a modal dialog is open) must never be closed
   // Use case: popup opens a modal dialog. User clicks on a smartfield on this dialog -> underlying popup must not get closed
-  if (!this.isOrHasWidget(event.popup) &&
-    !event.popup.isOrHasWidget(this) &&
+  if (!this.isOrHas(event.popup) &&
+    !event.popup.isOrHas(this) &&
     !this.session.focusManager.isElementCovertByGlassPane(this.$container[0])) {
     this.close();
   }

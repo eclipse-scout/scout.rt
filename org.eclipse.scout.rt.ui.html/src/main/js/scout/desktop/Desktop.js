@@ -609,7 +609,7 @@ scout.Desktop.prototype.removePopupsFor = function(widget) {
     var $popup = $(elem),
       popup = scout.Widget.getWidgetFor($popup);
 
-    if (widget.hasWidget(popup)) {
+    if (widget.has(popup)) {
       popup.remove();
     }
   });
