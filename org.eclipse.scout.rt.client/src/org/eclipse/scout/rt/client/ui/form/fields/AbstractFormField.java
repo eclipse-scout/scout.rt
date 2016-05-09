@@ -1218,7 +1218,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     // compute enclosing field path
     ICompositeField p = getParentField();
     while (p != null) {
-      if (p instanceof AbstractCompositeField && ((AbstractCompositeField) p).isTemplateField()) {
+      if (!(p instanceof AbstractCompositeField) || ((AbstractCompositeField) p).isTemplateField()) {
         enclosingFieldList.add(0, p);
       }
       p = p.getParentField();

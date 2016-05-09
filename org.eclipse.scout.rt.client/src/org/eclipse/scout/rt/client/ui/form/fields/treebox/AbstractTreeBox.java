@@ -1111,6 +1111,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
   }
 
   @Order(1)
+  @ClassId("5cfd2944-5dfd-4b66-ae45-419bb1b71378")
   public class TreeBoxFilterBox extends AbstractTreeBoxFilterBox {
     @Override
     protected ITreeBox getTreeBox() {
