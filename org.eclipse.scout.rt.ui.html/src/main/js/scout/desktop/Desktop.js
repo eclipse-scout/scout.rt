@@ -729,9 +729,13 @@ scout.Desktop.prototype._showForm = function(form, displayParent, position, noti
 };
 
 scout.Desktop.prototype._hideForm = function(form) {
-  if (this.displayStyle === scout.Desktop.DisplayStyle.COMPACT && form.isView()) {
-    // Hide bench and show navigation if this is the last view to be hidden
-    this.switchToNavigation();
+  if (this.displayStyle === scout.Desktop.DisplayStyle.COMPACT && form.isView() && this.benchVisible) {
+    var openViews = this.bench.getViews().slice();
+    scout.arrays.remove(openViews, form);
+    if (openViews.length === 0) {
+      // Hide bench and show navigation if this is the last view to be hidden
+      this.switchToNavigation();
+    }
   }
   form.displayParent.formController.unregisterAndRemove(form);
 };

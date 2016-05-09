@@ -12,6 +12,12 @@ scout.FormSpecHelper = function(session) {
   this.session = session;
 };
 
+scout.FormSpecHelper.prototype.createViewWithOneField = function(parentId) {
+  var form = this.createFormWithOneField(parentId);
+  form.displayHint = scout.Form.DisplayHint.VIEW;
+  return form;
+};
+
 scout.FormSpecHelper.prototype.createFormWithOneField = function(parentId) {
   var form = this.createFormModel();
   var rootGroupBox = this.createGroupBoxModel();

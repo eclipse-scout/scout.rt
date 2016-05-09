@@ -32,7 +32,6 @@ scout.SimpleTabBox.prototype._init = function(model) {
   this.controller = new scout.SimpleTabBoxController(this, this.tabArea);
 };
 
-
 /**
  * Returns a $container used as a bind target for the key-stroke context of the group-box.
  * By default this function returns the container of the form, or when group-box is has no
@@ -92,8 +91,8 @@ scout.SimpleTabBox.prototype._renderView = function(view) {
 };
 
 scout.SimpleTabBox.prototype.postRender = function() {
-  if(this.viewStack.length > 0 && !this.currentView){
-    this.activateView(this.viewStack[this.viewStack.length -1]);
+  if (this.viewStack.length > 0 && !this.currentView) {
+    this.activateView(this.viewStack[this.viewStack.length - 1]);
   }
 };
 
@@ -103,8 +102,6 @@ scout.SimpleTabBox.prototype._remove = function() {
     scout.scrollbars.uninstall(this.$body);
   }
 };
-
-
 
 scout.SimpleTabBox.prototype.activateView = function(view) {
   if (view === this.currentView) {
@@ -148,7 +145,7 @@ scout.SimpleTabBox.prototype.addView = function(view, activate) {
     siblingView: siblingView
   });
 
-  if(activate){
+  if (activate) {
     this.activateView(view);
   }
 };
@@ -161,8 +158,8 @@ scout.SimpleTabBox.prototype.addView = function(view, activate) {
 scout.SimpleTabBox.prototype._addToViewStack = function(view) {
   var sibling;
   var index = this.viewStack.indexOf(view);
-  if(index > -1){
-    return this.viewStack[index-1];
+  if (index > -1) {
+    return this.viewStack[index - 1];
   }
 
   if (!scout.SimpleTabBoxController.hasViewTab(view)) {
@@ -220,7 +217,6 @@ scout.SimpleTabBox.prototype.getController = function() {
   return this.controller;
 };
 
-
 scout.SimpleTabBox.prototype.viewCount = function() {
   return this.viewStack.length;
 };
@@ -228,7 +224,6 @@ scout.SimpleTabBox.prototype.viewCount = function() {
 scout.SimpleTabBox.prototype.hasViews = function() {
   return this.viewStack.length > 0;
 };
-
 
 scout.SimpleTabBox.prototype.getViews = function(displayViewId) {
   return this.viewStack.filter(function(view) {

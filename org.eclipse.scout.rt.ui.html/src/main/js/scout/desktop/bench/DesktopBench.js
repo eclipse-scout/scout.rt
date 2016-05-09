@@ -270,7 +270,7 @@ scout.DesktopBench.prototype.bringToFront = function() {
 };
 
 scout.DesktopBench.prototype.sendToBack = function() {
-
+  // nop
 };
 
 scout.DesktopBench.prototype._computeDefaultDetailForm = function() {
@@ -296,7 +296,6 @@ scout.DesktopBench.prototype._computeDetailContentForPage = function(node) {
   }
 
   return content;
-
 };
 
 scout.DesktopBench.prototype.updateOutlineContent = function() {
@@ -437,7 +436,6 @@ scout.DesktopBench.prototype._revalidateSplitters = function() {
       return c2;
     }, undefined);
 
-
 };
 
 scout.DesktopBench.prototype._onSplitterMove = function(event) {
@@ -456,6 +454,7 @@ scout.DesktopBench.prototype._onSplitterMove = function(event) {
     }
   }
 };
+
 scout.DesktopBench.prototype._onSplitterPositionChanged = function(event) {
   this.revalidateLayout();
 };
@@ -552,6 +551,7 @@ scout.DesktopBench.prototype._getColumn = function(displayViewId) {
   }
   return column;
 };
+
 scout.DesktopBench.prototype.removeView = function(view, showSiblingView) {
   var column = this.tabBoxMap[view.id];
   if (column) {
@@ -583,15 +583,15 @@ scout.DesktopBench.prototype.getTabBox = function(displayViewId) {
 
 scout.DesktopBench.prototype.getViews = function(displayViewId) {
   return this.columns.reduce(function(arr, column) {
-    Array.prototype.push.apply(arr, column.getViews(displayViewId));
+    scout.arrays.pushAll(arr, column.getViews(displayViewId));
     return arr;
   }, []);
 };
 
 scout.DesktopBench.prototype.getViewTab = function(view) {
   var viewTab;
-  this.getTabs().some(function (vt){
-    if(vt.view === view){
+  this.getTabs().some(function(vt) {
+    if (vt.view === view) {
       viewTab = vt;
       return true;
     }

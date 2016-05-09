@@ -27,7 +27,6 @@ scout.BenchColumn = function() {
   this._viewDeactivatedHandler = this._onViewDeactivated.bind(this);
 
   this._addEventSupport();
-
 };
 scout.inherits(scout.BenchColumn, scout.ModelAdapter);
 
@@ -59,7 +58,6 @@ scout.BenchColumn.prototype._render = function($parent) {
   this.$container = $parent.appendDiv('bench-column');
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
   this.htmlComp.setLayout(this._createLayout());
-
 };
 
 scout.BenchColumn.prototype._renderProperties = function() {
@@ -185,8 +183,6 @@ scout.BenchColumn.prototype._revalidateSplitters = function(clearPosition) {
       }
       return c2;
     }, undefined);
-
-
 };
 
 scout.BenchColumn.prototype._onSplitterMove = function(event) {
@@ -278,7 +274,7 @@ scout.BenchColumn.prototype.hasViews = function() {
 };
 scout.BenchColumn.prototype.getViews = function(displayViewId) {
   return this.tabBoxs.reduce(function(arr, tabBox) {
-    Array.prototype.push.apply(arr, tabBox.getViews(displayViewId));
+    scout.arrays.pushAll(arr, tabBox.getViews(displayViewId));
     return arr;
   }, []);
 };

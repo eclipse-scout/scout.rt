@@ -111,7 +111,6 @@ scout.FormController.prototype.acceptView = function(view, register, position, s
 };
 
 scout.FormController.prototype._renderView = function(view, register, position, selectView) {
-
   if (register) {
     if (position !== undefined) {
       scout.arrays.insert(this.displayParent.views, view, position);
@@ -199,7 +198,7 @@ scout.FormController.prototype._removeView = function(view, unregister) {
     scout.arrays.remove(this.displayParent.views, view);
   }
   // in COMPACT case views are already removed.
-  if(view.rendered){
+  if (view.rendered) {
     this.session.desktop.bench.removeView(view);
   }
 };

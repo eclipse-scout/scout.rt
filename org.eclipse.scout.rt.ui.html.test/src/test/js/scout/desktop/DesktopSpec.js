@@ -13,7 +13,14 @@ describe('Desktop', function() {
 
   beforeEach(function() {
     setFixtures(sandbox());
-    session = sandboxSession({desktop: {navigationVisible: true, headerVisible: true, benchVisible: true}});
+    session = sandboxSession({
+      desktop: {
+        navigationVisible: true,
+        headerVisible: true,
+        benchVisible: true
+      },
+      renderDesktop: false
+    });
     outlineHelper = new scout.OutlineSpecHelper(session);
     formHelper = new scout.FormSpecHelper(session);
     desktop = session.desktop;
@@ -30,6 +37,7 @@ describe('Desktop', function() {
       parent = new scout.Widget();
 
     beforeEach(function() {
+      session._renderDesktop();
       parent.session = session;
       ntfc = scout.create('DesktopNotification', {
         id: 'theID',
@@ -71,6 +79,11 @@ describe('Desktop', function() {
   });
 
   describe('outline', function() {
+
+    beforeEach(function() {
+      session._renderDesktop();
+    });
+
     it('gets displayed in desktop navigation ', function() {
       var model = outlineHelper.createModelFixture(3, 2);
       var outline = outlineHelper.createOutline(model);
@@ -87,6 +100,11 @@ describe('Desktop', function() {
   });
 
   describe('benchVisible', function() {
+
+    beforeEach(function() {
+      session._renderDesktop();
+    });
+
     it('controls visibility of the bench', function() {
       expect(desktop.benchVisible).toBe(true);
       expect(desktop.bench.rendered).toBe(true);
@@ -133,6 +151,11 @@ describe('Desktop', function() {
   });
 
   describe('navigationVisible', function() {
+
+    beforeEach(function() {
+      session._renderDesktop();
+    });
+
     it('controls visibility of the navigation', function() {
       expect(desktop.navigationVisible).toBe(true);
       expect(desktop.navigation.rendered).toBe(true);
@@ -178,6 +201,11 @@ describe('Desktop', function() {
   });
 
   describe('headerVisible', function() {
+
+    beforeEach(function() {
+      session._renderDesktop();
+    });
+
     it('controls visibility of the header', function() {
       expect(desktop.headerVisible).toBe(true);
       expect(desktop.header.rendered).toBe(true);
@@ -197,6 +225,10 @@ describe('Desktop', function() {
 
   describe('_showForm', function() {
 
+    beforeEach(function() {
+      session._renderDesktop();
+    });
+
     it('adds a view to the bench if displayHint is View', function() {
       var form = formHelper.createFormWithOneField();
       var tabBox = desktop.bench.getTabBox('C');
@@ -208,6 +240,81 @@ describe('Desktop', function() {
       expect(form.$container.parent()[0]).toBe(tabBox.$viewContent[0]);
     });
 
+  });
+
+  describe('displayStyle', function() {
+
+    describe('COMPACT', function() {
+
+      beforeEach(function() {
+        desktop.displayStyle = scout.Desktop.DisplayStyle.COMPACT;
+        // Flags currently only set by server, therefore we need to set them here as well
+        desktop.navigationVisible = true;
+        desktop.benchVisible = false;
+        desktop.headerVisible = false;
+        session._renderDesktop();
+      });
+
+      it('shows bench and hides navigation if a view is open', function() {
+        var form = formHelper.createViewWithOneField();
+        expect(form.rendered).toBe(false);
+        expect(desktop.navigationVisible).toBe(true);
+        expect(desktop.benchVisible).toBe(false);
+        expect(desktop.headerVisible).toBe(false);
+
+        desktop._showForm(form, desktop);
+        expect(form.rendered).toBe(true);
+        expect(desktop.navigationVisible).toBe(false);
+        expect(desktop.benchVisible).toBe(true);
+        expect(desktop.headerVisible).toBe(true);
+      });
+
+      it('hides bench and shows navigation if the last view gets closed', function() {
+        var form1 = formHelper.createViewWithOneField();
+        var form2 = formHelper.createViewWithOneField();
+        expect(form1.rendered).toBe(false);
+        expect(form2.rendered).toBe(false);
+        expect(desktop.navigationVisible).toBe(true);
+        expect(desktop.benchVisible).toBe(false);
+        expect(desktop.headerVisible).toBe(false);
+
+        // open first form, bench is shown
+        desktop._showForm(form1, desktop);
+        expect(form1.rendered).toBe(true);
+        expect(form2.rendered).toBe(false);
+        expect(desktop.navigationVisible).toBe(false);
+        expect(desktop.benchVisible).toBe(true);
+        expect(desktop.headerVisible).toBe(true);
+
+        // open second form, bench is still shown
+        desktop._showForm(form2, desktop);
+        expect(form1.rendered).toBe(true);
+        expect(form2.rendered).toBe(true);
+        expect(desktop.navigationVisible).toBe(false);
+        expect(desktop.benchVisible).toBe(true);
+        expect(desktop.headerVisible).toBe(true);
+
+        // close first form, bench is still shown
+        desktop._hideForm(form1, desktop);
+        expect(form1.rendered).toBe(false);
+        expect(form2.rendered).toBe(true);
+        expect(desktop.navigationVisible).toBe(false);
+        expect(desktop.benchVisible).toBe(true);
+        expect(desktop.headerVisible).toBe(true);
+
+        // disable remove animation, otherwise form would not be removed immediately
+        desktop.bench.animateRemoval = false;
+
+        // close second form, bench is not shown anymore
+        desktop._hideForm(form2, desktop);
+        expect(form1.rendered).toBe(false);
+        expect(form2.rendered).toBe(false);
+        expect(desktop.navigationVisible).toBe(true);
+        expect(desktop.benchVisible).toBe(false);
+        expect(desktop.headerVisible).toBe(false);
+      });
+
+    });
   });
 
 });
