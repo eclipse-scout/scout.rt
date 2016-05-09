@@ -34,19 +34,22 @@ public class JsonSplitBox<SPLIT_BOX extends ISplitBox> extends JsonFormField<SPL
   public JsonSplitBox(SPLIT_BOX model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
     List<IFormField> fields = model.getFields();
+    int numFields = fields.size();
     IFormField firstField = null;
     IFormField secondField = null;
-    if (fields.size() > 0) {
+
+    if (numFields >= 1) {
       firstField = fields.get(0);
-      if (fields.size() > 1) {
-        secondField = fields.get(1);
-        if (fields.size() > 2) {
-          LOG.warn("Split box only supports two fields. {} surplus fields are ignored in {}.", (fields.size() - 2), model);
-        }
-      }
     }
-    m_firstField = (firstField != null && firstField.isVisibleGranted()) ? firstField : null;
-    m_secondField = (secondField != null && secondField.isVisibleGranted()) ? secondField : null;
+    if (numFields >= 2) {
+      secondField = fields.get(1);
+    }
+    if (numFields > 2) {
+      LOG.warn("Split box only supports two fields. {} surplus fields are ignored in {}.", (numFields - 2), model);
+    }
+
+    m_firstField = getFieldIfVisibleGranted(firstField);
+    m_secondField = getFieldIfVisibleGranted(secondField);
   }
 
   @Override
@@ -54,9 +57,10 @@ public class JsonSplitBox<SPLIT_BOX extends ISplitBox> extends JsonFormField<SPL
     return "SplitBox";
   }
 
-  /**
-   *
-   */
+  protected static IFormField getFieldIfVisibleGranted(IFormField field) {
+    return field != null && field.isVisibleGranted() ? field : null;
+  }
+
   @Override
   protected void initJsonProperties(SPLIT_BOX model) {
     super.initJsonProperties(model);
@@ -86,10 +90,13 @@ public class JsonSplitBox<SPLIT_BOX extends ISplitBox> extends JsonFormField<SPL
 
       @Override
       public Object prepareValueForToJson(Object value) {
-        if (value == null) {
+        // Deals with the case the field is configured as collapsible, but it is not visible (granted)
+        // in that case it has never been attached.
+        IFormField field = getFieldIfVisibleGranted((IFormField) value);
+        if (field == null) {
           return null;
         }
-        return getAdapter(value).getId();
+        return getAdapter(field).getId();
       }
     });
     putJsonProperty(new JsonProperty<ISplitBox>(ISplitBox.PROP_FIELD_COLLAPSED, model) {
