@@ -14,6 +14,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.junit.Test;
 
@@ -76,7 +77,7 @@ public class TargetRwtInjectingHyperlinkProcessorTest {
   public void testConvertLinksWithLocalUrlsInHtmlCellParamsMultiple() {
     String origString = "<html><a href=\"http://local/xy?param=1&param=2\">link</a></html>";
     String expectedString = "<html><a href=\"http://local/xy?param=1&param=2&amp;paramAdded=3&amp;paramAdded2=4\" target=\"_rwt\">link</a></html>";
-    Map<String, String> params = new HashMap<String, String>();
+    Map<String, String> params = new TreeMap<String, String>();
     params.put("paramAdded", "3");
     params.put("paramAdded2", "4");
 
