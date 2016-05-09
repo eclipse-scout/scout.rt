@@ -117,6 +117,7 @@ public abstract class AbstractListBoxFilterBox extends AbstractGroupBox {
   }
 
   @Order(10)
+  @ClassId("e62c300f-f49d-4318-95ce-44a60558cfbf")
   public class CheckedStateRadioButtonGroup extends AbstractRadioButtonGroup<Boolean> {
 
     @Override
@@ -153,6 +154,7 @@ public abstract class AbstractListBoxFilterBox extends AbstractGroupBox {
     }
 
     @Order(10)
+    @ClassId("3e47a9b5-aa90-4e2d-8901-23047d689a59")
     public class CheckedButton extends AbstractRadioButton<Boolean> {
 
       @Override
@@ -177,6 +179,7 @@ public abstract class AbstractListBoxFilterBox extends AbstractGroupBox {
     }
 
     @Order(20)
+    @ClassId("b37f25c6-ab52-4ff2-a167-7980d0f4f71b")
     public class AllButton extends AbstractRadioButton<Boolean> {
 
       @Override
@@ -203,6 +206,7 @@ public abstract class AbstractListBoxFilterBox extends AbstractGroupBox {
   }
 
   @Order(20)
+  @ClassId("2c4e4cf0-7bcf-46f1-a00f-19ecd2719fff")
   public class ActiveStateRadioButtonGroup extends AbstractRadioButtonGroup<TriState> {
 
     @Override
@@ -238,6 +242,7 @@ public abstract class AbstractListBoxFilterBox extends AbstractGroupBox {
     }
 
     @Order(10)
+    @ClassId("ad7425e4-9fa6-4dd6-944b-1f138586eff2")
     public class ActiveButton extends AbstractRadioButton<TriState> {
 
       @Override
@@ -262,6 +267,7 @@ public abstract class AbstractListBoxFilterBox extends AbstractGroupBox {
     }
 
     @Order(20)
+    @ClassId("dd6c5a35-ea0e-459d-919f-9155d46a63eb")
     public class InactiveButton extends AbstractRadioButton<TriState> {
 
       @Override
@@ -286,6 +292,7 @@ public abstract class AbstractListBoxFilterBox extends AbstractGroupBox {
     }
 
     @Order(30)
+    @ClassId("526bc98f-9b10-4285-bf3a-3feb6d560e22")
     public class ActiveAndInactiveButton extends AbstractRadioButton<TriState> {
 
       @Override

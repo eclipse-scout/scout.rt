@@ -930,6 +930,7 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
   }
 
   @Order(1)
+  @ClassId("a2e982d1-ea01-4d11-8655-d10c9935d8b9")
   public class ListBoxFilterBox extends AbstractListBoxFilterBox {
     @Override
     protected IListBox getListBox() {
