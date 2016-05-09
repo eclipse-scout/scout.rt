@@ -26,10 +26,11 @@
     top: calc(~'100% - 1px');
     left: 0;
   }
-  > .simple-tab-area {
+
+  & > .simple-tab-area {
     height: @desktop-header-height;
 
-    > .desktop-view-tab.selected {
+    & > .desktop-view-tab.selected {
       &::before {
         .desktop-bench-drop-shadow();
         top: 0px;
@@ -41,6 +42,11 @@
         box-shadow: -7px 0px 10px 0px rgba(0,0,0,0.4);
       }
     }
+  }
+
+  &.removed {
+    #scout.animation-name(slideout-right);
+    #scout.animation-duration(0.5s);
   }
 }
 

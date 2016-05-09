@@ -142,6 +142,18 @@
   @-webkit-keyframes slideout-bottom { .keyframes-slideout-bottom(); }
   @keyframes slideout-bottom { .keyframes-slideout-bottom(); }
 
+  /*** Slide Out Right ***
+       Moves the element out of right screen border */
+
+  .keyframes-slideout-right() {
+    100% {
+      #scout.transform(translateX(100%));
+    }
+  }
+
+  @-webkit-keyframes slideout-right { .keyframes-slideout-right(); }
+  @keyframes slideout-right { .keyframes-slideout-right(); }
+
   /*** Zoom Bounce ***/
 
   .keyframes-zoom-bounce() {

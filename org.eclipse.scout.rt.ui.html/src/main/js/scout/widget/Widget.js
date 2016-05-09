@@ -37,9 +37,7 @@ scout.Widget.prototype.init = function(options) {
   this._init(options);
   this._initKeyStrokeContext(this.keyStrokeContext);
   this.initialized = true;
-  if (this.events) {
-    this.trigger('initialized');
-  }
+  this.trigger('initialized');
 };
 
 /**
@@ -123,15 +121,36 @@ scout.Widget.prototype._postRender = function() {
 };
 
 scout.Widget.prototype.remove = function() {
-  if (!this.rendered) {
+  if (!this.rendered || this._isRemovalPending()) {
     return;
   }
-
   if (this.animateRemoval) {
     this._removeAnimated();
   } else {
     this._removeInternal();
   }
+};
+
+/**
+ * Returns true if the removal of this or an ancestor widget is pending. Checking the ancestor is omitted if the parent is being removed.
+ * This may be used to prevent a removal if an ancestor will be removed (e.g by an animation)
+ */
+scout.Widget.prototype._isRemovalPending = function() {
+  if (this.removalPending) {
+    return true;
+  }
+  var parent = this.parent;
+  if (!parent || parent.removing) {
+    // If parent is being removed, no need to check the ancestors because removing is already in progress
+    return false;
+  }
+  while (parent) {
+    if (parent.removalPending) {
+      return true;
+    }
+    parent = parent.parent;
+  }
+  return false;
 };
 
 scout.Widget.prototype._removeInternal = function() {
@@ -140,6 +159,7 @@ scout.Widget.prototype._removeInternal = function() {
   }
 
   $.log.trace('Removing widget: ' + this);
+  this.removing = true;
 
   // remove children in reverse order.
   this.children.slice().reverse().forEach(function(child) {
@@ -148,11 +168,12 @@ scout.Widget.prototype._removeInternal = function() {
   this.session.keyStrokeManager.uninstallKeyStrokeContext(this.keyStrokeContext);
   this._cleanup();
   this._remove();
-  this.rendered = false;
-  this.attached = false;
   if (this.parent) {
     this.parent.removeChild(this);
   }
+  this.rendered = false;
+  this.attached = false;
+  this.removing = false;
   this.trigger('remove');
 };
 
@@ -167,9 +188,17 @@ scout.Widget.prototype._removeAnimated = function() {
     return;
   }
 
-  this.$container.addClass('removed');
-  this.$container.oneAnimationEnd(function() {
-    this._removeInternal();
+  // Remove open popups first, they are not animated
+  this.session.desktop.removePopupsFor(this);
+
+  this.removalPending = true;
+  // Don't execute immediately to make sure nothing interferes with the animation (e.g. layouting) which could make it laggy
+  setTimeout(function() {
+    this.$container.addClass('removed');
+    this.$container.oneAnimationEnd(function() {
+      this.removalPending = false;
+      this._removeInternal();
+    }.bind(this));
   }.bind(this));
 };
 
@@ -246,7 +275,9 @@ scout.Widget.prototype.hasWidget = function(widget) {
  * method if you want to hide something else for a special field.
  */
 scout.Widget.prototype.addLoadingSupport = function() {
-  this.loadingSupport = new scout.DefaultFieldLoadingSupport({field: this});
+  this.loadingSupport = new scout.DefaultFieldLoadingSupport({
+    field: this
+  });
 };
 
 //--- Layouting / HtmlComponent methods ---
@@ -407,9 +438,10 @@ scout.Widget.prototype._attach = function(event) {
  * widgets, because when a DOM element is detached - child elements are not notified
  */
 scout.Widget.prototype.detach = function() {
-  if (!this.attached || !this.rendered) {
+  if (!this.attached || !this.rendered || this._isRemovalPending()) {
     return;
   }
+
   this._triggerChildrenBeforeDetach(this);
   this._detach();
 };
@@ -525,7 +557,6 @@ scout.Widget.prototype._setProperty = function(propertyName, newValue) {
   this[propertyName] = newValue;
   this._firePropertyChange(propertyName, oldValue, newValue);
 };
-
 
 scout.Widget.prototype.toString = function() {
   return 'Widget[rendered=' + this.rendered +

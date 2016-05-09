@@ -13,7 +13,6 @@
   __include("scout/ObjectFactory.js");
   __include("scout/objectFactories.js");
   __include("scout/widget/Widget.js");
-  __include("scout/widget/CloneWidget.js");
   __include("scout/widget/NullWidget.js");
   // Basic utilities
   __include("scout/util/arrays.js");

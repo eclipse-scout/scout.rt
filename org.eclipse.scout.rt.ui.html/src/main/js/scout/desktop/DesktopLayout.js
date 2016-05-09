@@ -56,16 +56,14 @@ scout.DesktopLayout.prototype.layout = function($container) {
       if (!animated || fullWidthNavigation) {
         htmlHeader.setSize(headerSize);
       }
-    }
 
-    if (animated) {
-      animationProps = {
-        left: containerSize.width
-      };
-      if (desktop.headerVisible) {
+      if (animated) {
+        animationProps = {
+          left: containerSize.width
+        };
         prepareAnimate(animationProps, htmlHeader, headerSize);
+        this._animate(animationProps, htmlHeader, headerSize);
       }
-      this._animate(animationProps, htmlHeader, headerSize);
     }
   }
 
@@ -84,16 +82,14 @@ scout.DesktopLayout.prototype.layout = function($container) {
       if (!animated || fullWidthNavigation) {
         htmlBench.setSize(benchSize);
       }
-    }
 
-    if (animated) {
-      animationProps = {
-        left: containerSize.width
-      };
-      if (desktop.benchVisible) {
+      if (animated) {
+        animationProps = {
+          left: containerSize.width
+        };
         prepareAnimate(animationProps, htmlBench, benchSize);
+        this._animate(animationProps, htmlBench, benchSize);
       }
-      this._animate(animationProps, htmlBench, benchSize);
     }
   }
 

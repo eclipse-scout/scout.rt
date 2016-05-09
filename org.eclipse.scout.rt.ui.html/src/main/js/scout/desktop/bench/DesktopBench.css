@@ -35,6 +35,10 @@
     .desktop-bench-drop-shadow();
   }
 
+  &.removed {
+    #scout.animation-name(slideout-right);
+    #scout.animation-duration(0.5s);
+  }
 }
 
 .desktop-table.table {

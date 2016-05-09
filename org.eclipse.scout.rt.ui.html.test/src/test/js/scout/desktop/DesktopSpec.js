@@ -9,14 +9,20 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 describe('Desktop', function() {
-  var session, desktop, outlineHelper;
+  var session, desktop, outlineHelper, formHelper;
 
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession({desktop: {navigationVisible: true, headerVisible: true, benchVisible: true}});
     outlineHelper = new scout.OutlineSpecHelper(session);
+    formHelper = new scout.FormSpecHelper(session);
     desktop = session.desktop;
     desktop.viewButtons = [];
+    jasmine.clock().install();
+  });
+
+  afterEach(function() {
+    jasmine.clock().uninstall();
   });
 
   describe('notification', function() {
@@ -85,15 +91,43 @@ describe('Desktop', function() {
       expect(desktop.benchVisible).toBe(true);
       expect(desktop.bench.rendered).toBe(true);
 
+      desktop.bench.animateRemoval = false; // disable animation because there won't be any animationEnd event
       desktop.setBenchVisible(false);
       expect(desktop.benchVisible).toBe(false);
-      // Force removal of bench
-      desktop.onLayoutAnimationComplete();
       expect(desktop.bench).toBeFalsy();
 
       desktop.setBenchVisible(true);
       expect(desktop.benchVisible).toBe(true);
       expect(desktop.bench.rendered).toBe(true);
+    });
+
+    it('removes the content after the animation', function() {
+      var form = formHelper.createFormWithOneField();
+      var tabBox = desktop.bench.getTabBox('C');
+      form.displayHint = scout.Form.DisplayHint.VIEW;
+      desktop._showForm(form, desktop);
+
+      expect(form.rendered).toBe(true);
+      expect(form.parent).toBe(tabBox);
+      expect(form.$container.parent()[0]).toBe(tabBox.$viewContent[0]);
+      expect(desktop.benchVisible).toBe(true);
+      expect(desktop.bench.rendered).toBe(true);
+
+      // Removal is animated -> does not remove it immediately but after the animation so that the content is visible while the animation runs
+      desktop.setBenchVisible(false);
+      expect(desktop.benchVisible).toBe(false);
+      desktop._hideForm(form);
+      // Not removed yet and still linked, will be done after animation
+      expect(desktop.bench.rendered).toBe(true);
+      expect(form.rendered).toBe(true);
+      expect(form.parent).toBe(tabBox);
+
+      // trigger actual remove
+      jasmine.clock().tick();
+      desktop.bench.removalPending = false;
+      desktop.bench._removeInternal();
+      expect(desktop.bench).toBeFalsy();
+      expect(form.rendered).toBe(false);
     });
 
   });
@@ -157,6 +191,21 @@ describe('Desktop', function() {
       desktop.setHeaderVisible(true);
       expect(desktop.headerVisible).toBe(true);
       expect(desktop.header.rendered).toBe(true);
+    });
+
+  });
+
+  describe('_showForm', function() {
+
+    it('adds a view to the bench if displayHint is View', function() {
+      var form = formHelper.createFormWithOneField();
+      var tabBox = desktop.bench.getTabBox('C');
+      form.displayHint = scout.Form.DisplayHint.VIEW;
+      desktop._showForm(form, desktop);
+
+      expect(form.rendered).toBe(true);
+      expect(form.parent).toBe(tabBox);
+      expect(form.$container.parent()[0]).toBe(tabBox.$viewContent[0]);
     });
 
   });

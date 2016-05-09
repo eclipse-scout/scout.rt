@@ -14,6 +14,7 @@ scout.DesktopHeader = function() {
   this._desktopPropertyChangeHandler = this._onDesktopPropertyChange.bind(this);
   this._desktopAnimationEndHandler = this._onDesktopAnimationEnd.bind(this);
   this._outlineContentMenuBarPropertyChangeHandler = this._onOutlineContentMenuBarPropertyChange.bind(this);
+  this._addEventSupport();
 };
 scout.inherits(scout.DesktopHeader, scout.Widget);
 

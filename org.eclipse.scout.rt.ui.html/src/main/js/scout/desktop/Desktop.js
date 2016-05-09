@@ -64,9 +64,8 @@ scout.Desktop.prototype._onChildAdapterCreation = function(propertyName, model) 
   }
 };
 
-
 scout.Desktop.prototype._onBenchActivateViewChanged = function(event) {
-  if(this.initialFormRendering){
+  if (this.initialFormRendering) {
     return;
   }
   var view = event.view;
@@ -75,7 +74,6 @@ scout.Desktop.prototype._onBenchActivateViewChanged = function(event) {
     this._setFormActivated(view);
   }
 };
-
 
 scout.Desktop.prototype._render = function($parent) {
   this.$container = $parent;
@@ -136,6 +134,7 @@ scout.Desktop.prototype._renderDisplayStyle = function() {
 
   if (this.header) {
     this.header.setToolBoxVisible(!isCompact);
+    this.header.animateRemoval = isCompact;
   }
   if (this.navigation) {
     this.navigation.setToolBoxVisible(isCompact);
@@ -195,44 +194,35 @@ scout.Desktop.prototype._renderBench = function() {
   }
   this.bench = scout.create('DesktopBench', {
     parent: this,
-    headerTabArea : (this.header)?(this.header.tabArea):(undefined),
+    animateRemoval: true,
+    headerTabArea: this.header ? this.header.tabArea : undefined,
     outlineContentVisible: this.displayStyle !== scout.Desktop.DisplayStyle.COMPACT
   });
-  this.bench.on('viewActivated',this._benchActiveViewChangedHandler);
+  this.bench.on('viewActivated', this._benchActiveViewChangedHandler);
   this.bench.render(this.$container);
   this.bench.$container.insertBefore(this.$overlaySeparator);
+  this.invalidateLayoutTree();
 };
 
 scout.Desktop.prototype._removeBench = function() {
   if (!this.bench) {
     return;
   }
+  this.bench.off('viewActivated', this._benchActiveViewChangedHandler);
+  this.bench.on('remove', function() {
+    this.bench = null;
+    this.invalidateLayoutTree();
+  }.bind(this));
   this.bench.remove();
-  this.bench = null;
 };
 
 scout.Desktop.prototype._renderBenchVisible = function() {
-  var benchClone;
   this.animateLayoutChange = this.rendered;
   if (this.benchVisible) {
     this._renderBench();
   } else {
-    if (this.animateLayoutChange) {
-      // The bench should still be visible during the hide animation -> add clone which will be removed when the animation finishes
-      // This avoids the need to delay hiding and disposing of the form, the removal can be done as without animations
-      benchClone = scout.create('CloneWidget', {
-        parent: this,
-        $container: this.bench.$container.clone()
-      });
-      benchClone.rendered = true;
-      benchClone.$container.insertBefore(this.$overlaySeparator);
-    }
-    // Remove real bench
     this._removeBench();
-    // Set clone which gets removed when animation finishes
-    this.bench = benchClone;
   }
-  this.invalidateLayoutTree();
 };
 
 scout.Desktop.prototype._renderNavigation = function() {
@@ -249,6 +239,7 @@ scout.Desktop.prototype._renderNavigation = function() {
   });
   this.navigation.render(this.$container);
   this.navigation.$container.prependTo(this.$container);
+  this.invalidateLayoutTree();
 };
 
 scout.Desktop.prototype._removeNavigation = function() {
@@ -257,6 +248,7 @@ scout.Desktop.prototype._removeNavigation = function() {
   }
   this.navigation.remove();
   this.navigation = null;
+  this.invalidateLayoutTree();
 };
 
 scout.Desktop.prototype._renderNavigationVisible = function() {
@@ -266,9 +258,11 @@ scout.Desktop.prototype._renderNavigationVisible = function() {
   } else {
     if (!this.animateLayoutChange) {
       this._removeNavigation();
+    } else {
+      // re layout to trigger animation
+      this.invalidateLayoutTree();
     }
   }
-  this.invalidateLayoutTree();
 };
 
 scout.Desktop.prototype._renderNavigationHandleVisible = function() {
@@ -281,41 +275,31 @@ scout.Desktop.prototype._renderHeader = function() {
   }
   this.header = scout.create('DesktopHeader', {
     parent: this,
+    animateRemoval: this.displayStyle === scout.Desktop.DisplayStyle.COMPACT,
     toolBoxVisible: this.displayStyle !== scout.Desktop.DisplayStyle.COMPACT
   });
   this.header.render(this.$container);
   this.header.$container.insertBefore(this.$overlaySeparator);
+  this.invalidateLayoutTree();
 };
 
 scout.Desktop.prototype._removeHeader = function() {
   if (!this.header) {
     return;
   }
+  this.header.on('remove', function() {
+    this.invalidateLayoutTree();
+    this.header = null;
+  }.bind(this));
   this.header.remove();
-  this.header = null;
 };
 
 scout.Desktop.prototype._renderHeaderVisible = function() {
-  var headerClone;
   if (this.headerVisible) {
     this._renderHeader();
   } else {
-    if (this.animateLayoutChange) {
-      // The header should still be visible during the hide animation -> add clone which will be removed when the animation finishes
-      // This avoids the need to delay hiding and disposing of the form, the removal can be done as without animations
-      headerClone = scout.create('CloneWidget', {
-        parent: this,
-        $container: this.header.$container.clone()
-      });
-      headerClone.rendered = true;
-      headerClone.$container.insertBefore(this.$overlaySeparator);
-    }
-    // Remove real header
     this._removeHeader();
-    // Set clone which gets removed when animation finishes
-    this.header = headerClone;
   }
-  this.invalidateLayoutTree();
 };
 
 scout.Desktop.prototype._renderLogoUrl = function() {
@@ -535,7 +519,6 @@ scout.Desktop.prototype.enlargeNavigation = function() {
   }
 };
 
-
 scout.Desktop.prototype.switchToBench = function() {
   this.setHeaderVisible(true);
   this.setBenchVisible(true);
@@ -616,6 +599,20 @@ scout.Desktop.prototype.removeNotification = function(notification) {
   } else {
     scout.arrays.remove(this.notifications, notification);
   }
+};
+
+/**
+ * Removes every popup which is a descendant of the given widget.
+ */
+scout.Desktop.prototype.removePopupsFor = function(widget) {
+  this.$container.children('.popup').each(function(i, elem) {
+    var $popup = $(elem),
+      popup = scout.Widget.getWidgetFor($popup);
+
+    if (widget.hasWidget(popup)) {
+      popup.remove();
+    }
+  });
 };
 
 scout.Desktop.prototype._openUriInIFrame = function(uri) {
@@ -732,7 +729,7 @@ scout.Desktop.prototype._showForm = function(form, displayParent, position, noti
 };
 
 scout.Desktop.prototype._hideForm = function(form) {
-  if (this.displayStyle === scout.Desktop.DisplayStyle.COMPACT && form.isView() ) {
+  if (this.displayStyle === scout.Desktop.DisplayStyle.COMPACT && form.isView()) {
     // Hide bench and show navigation if this is the last view to be hidden
     this.switchToNavigation();
   }
@@ -804,14 +801,12 @@ scout.Desktop.prototype.onPopstate = function(event) {
 scout.Desktop.prototype._onSplitterMove = function(event) {
   // disallow wider than 50%
   this.resizing = true;
-  var max = Math.floor(this.$container.outerWidth(true)/2);
-  if(event.position > max){
+  var max = Math.floor(this.$container.outerWidth(true) / 2);
+  if (event.position > max) {
     event.position = max;
   }
   this.revalidateLayout();
-
 };
-
 
 scout.Desktop.prototype._onSplitterMoveEnd = function(event) {
   var splitterPosition = event.position;

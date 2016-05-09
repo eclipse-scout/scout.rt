@@ -15,10 +15,7 @@ describe("FormMenu", function() {
     setFixtures(sandbox());
     session = sandboxSession();
     helper = new scout.FormSpecHelper(session);
-    desktop = {
-      $parent: session.$entryPoint,
-      $toolContainer: session.$entryPoint.appendDiv('desktop-tool-box').hide()
-    };
+    desktop = session.desktop;
   });
 
   function createMenu(model) {
