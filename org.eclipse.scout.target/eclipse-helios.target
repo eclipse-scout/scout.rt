@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <?pde?>
 <!-- generated with https://github.com/mbarbero/fr.obeo.releng.targetplatform -->
-<target name="scout-helios.target" sequenceNumber="1442576632">
+<target name="scout-helios.target" sequenceNumber="1462795308">
   <locations>
     <location includeMode="slicer" includeAllPlatforms="false" includeSource="true" includeConfigurePhase="false" type="InstallableUnit">
       <unit id="javax.jms" version="1.1.0.v201205091237"/>
@@ -69,7 +69,7 @@
       <unit id="com.thoughtworks.selenium.source" version="2.25.0.v201212071504"/>
       <unit id="com.google.guava" version="15.0.0.v201403281430"/>
       <unit id="com.google.guava.source" version="15.0.0.v201403281430"/>
-      <repository id="orbit_R" location="http://download.eclipse.org/tools/orbit/downloads/drops/R20150821153341/repository/"/>
+      <repository id="orbit_R20150821153341" location="http://download.eclipse.org/tools/orbit/downloads/drops/R20150821153341/repository/"/>
     </location>
     <location includeMode="slicer" includeAllPlatforms="false" includeSource="true" includeConfigurePhase="false" type="InstallableUnit">
       <unit id="org.eclipse.rap.feature.feature.group" version="0.0.0"/>
@@ -87,18 +87,6 @@
     <location includeMode="slicer" includeAllPlatforms="false" includeSource="true" includeConfigurePhase="false" type="InstallableUnit">
       <unit id="org.eclipse.license.feature.group" version="0.0.0"/>
       <repository id="cbi_license" location="http://download.eclipse.org/cbi/updates/license/"/>
-    </location>
-    <location includeMode="slicer" includeAllPlatforms="false" includeSource="true" includeConfigurePhase="false" type="InstallableUnit">
-      <unit id="org.eclipse.scout.rt.source.feature.group" version="0.0.0"/>
-      <unit id="org.eclipse.scout.rt.testing.source.feature.group" version="0.0.0"/>
-      <unit id="org.eclipse.scout.rt.spec.source.feature.group" version="0.0.0"/>
-      <unit id="org.eclipse.scout.rt.rap.source.feature.group" version="0.0.0"/>
-      <unit id="org.eclipse.scout.rt.rap.testing.source.feature.group" version="0.0.0"/>
-      <unit id="org.eclipse.scout.rt.ui.rap.incubator.filechooser.source.feature.group" version="0.0.0"/>
-      <unit id="org.eclipse.scout.sdk.source.feature.group" version="0.0.0"/>
-      <unit id="org.eclipse.scout.sdk.rap.source.feature.group" version="0.0.0"/>
-      <unit id="org.eclipse.scout.sdk.testing.source.feature.group" version="0.0.0"/>
-      <repository id="scout_nightly_4.2" location="http://download.eclipse.org/scout/nightly/4.2/"/>
     </location>
     <location includeMode="slicer" includeAllPlatforms="false" includeSource="true" includeConfigurePhase="false" type="InstallableUnit">
       <unit id="org.eclipse.platform.feature.group" version="0.0.0"/>
