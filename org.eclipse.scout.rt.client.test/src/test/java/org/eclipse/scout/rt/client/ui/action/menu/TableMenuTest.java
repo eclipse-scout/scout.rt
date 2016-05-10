@@ -93,7 +93,7 @@ public class TableMenuTest {
    * Tests the visibility for a multi selection menu
    */
   @Test
-  public void setMultiSeleciton() {
+  public void setMultiSelection() {
     Table t = new Table();
     t.addRowsByMatrix(TEST_ROWS);
     ITableContextMenu contextMenu = t.getContextMenu();
@@ -110,7 +110,7 @@ public class TableMenuTest {
    * Tests the visibility for a empty space menu
    */
   @Test
-  public void testEmptySeleciton() {
+  public void testEmptySelection() {
     Table t = new Table();
     t.addRowsByMatrix(TEST_ROWS);
     ITableContextMenu contextMenu = t.getContextMenu();
@@ -120,6 +120,72 @@ public class TableMenuTest {
     List<IMenu> visibleMenus = ActionUtility.normalizedActions(contextMenu.getChildActions(), filter);
     assertEquals(1, visibleMenus.size());
     assertEquals("EmptySpaceMenu", visibleMenus.get(0).getClass().getSimpleName());
+  }
+
+  /**
+   * Tests empty space menu disabled if table disabled, empty selection
+   */
+  @Test
+  public void testTableDisabledEmptySelection() {
+    Table t = new Table();
+    t.setEnabled(false);
+    t.addRowsByMatrix(TEST_ROWS);
+    ITableContextMenu contextMenu = t.getContextMenu();
+
+    t.selectRows(CollectionUtility.<ITableRow> emptyArrayList(), false);
+    IActionFilter filter = ActionUtility.createMenuFilterMenuTypes(contextMenu.getCurrentMenuTypes(), true);
+    List<IMenu> visibleMenus = ActionUtility.normalizedActions(contextMenu.getChildActions(), filter);
+    assertEquals(false, visibleMenus.get(0).isEnabled());
+  }
+
+  /**
+   * Tests menu disabled if table disabled, single selection
+   */
+  @Test
+  public void testTableDisabledSingleSelection() {
+    Table t = new Table();
+    t.setEnabled(false);
+    t.addRowsByMatrix(TEST_ROWS);
+    ITableContextMenu contextMenu = t.getContextMenu();
+
+    t.selectRows(CollectionUtility.arrayList(t.getRow(0)), false);
+    IActionFilter filter = ActionUtility.createMenuFilterMenuTypes(contextMenu.getCurrentMenuTypes(), true);
+    List<IMenu> visibleMenus = ActionUtility.normalizedActions(contextMenu.getChildActions(), filter);
+    assertEquals(false, visibleMenus.get(0).isEnabled());
+  }
+
+  /**
+   * Tests menu empty space menu enabled if row disabled, empty selection
+   */
+  @Test
+  public void testRowDisabledEmptySelection() {
+    Table t = new Table();
+    t.addRowsByMatrix(TEST_ROWS);
+    ITableContextMenu contextMenu = t.getContextMenu();
+
+    t.getRow(0).setEnabled(false);
+
+    t.selectRows(CollectionUtility.<ITableRow> emptyArrayList(), false);
+    IActionFilter filter = ActionUtility.createMenuFilterMenuTypes(contextMenu.getCurrentMenuTypes(), true);
+    List<IMenu> visibleMenus = ActionUtility.normalizedActions(contextMenu.getChildActions(), filter);
+    assertEquals(true, visibleMenus.get(0).isEnabled());
+  }
+
+  /**
+   * Tests menu disabled if row disabled, single selection
+   */
+  @Test
+  public void testRowDisabledSingleSelection() {
+    Table t = new Table();
+    t.addRowsByMatrix(TEST_ROWS);
+    ITableContextMenu contextMenu = t.getContextMenu();
+
+    t.getRow(0).setEnabled(false);
+
+    t.selectRows(CollectionUtility.arrayList(t.getRow(0)), false);
+    IActionFilter filter = ActionUtility.createMenuFilterMenuTypes(contextMenu.getCurrentMenuTypes(), true);
+    List<IMenu> visibleMenus = ActionUtility.normalizedActions(contextMenu.getChildActions(), filter);
+    assertEquals(false, visibleMenus.get(0).isEnabled());
   }
 
   /**
@@ -228,6 +294,10 @@ public class TableMenuTest {
         return CollectionUtility.hashSet(TableMenuType.SingleSelection);
       }
 
+      @Override
+      protected void execOwnerValueChanged(Object newOwnerValue) {
+        setEnabled(true);
+      }
     }
 
     @Order(111)
@@ -240,6 +310,7 @@ public class TableMenuTest {
 
       @Override
       protected void execOwnerValueChanged(Object newOwnerValue) {
+        setEnabled(true);
         setVisible(CompareUtility.equals(getPrenameColumn().getSelectedValue(), "Hugo"));
       }
     }
@@ -252,6 +323,10 @@ public class TableMenuTest {
         return CollectionUtility.hashSet(TableMenuType.MultiSelection);
       }
 
+      @Override
+      protected void execOwnerValueChanged(Object newOwnerValue) {
+        setEnabled(true);
+      }
     }
 
     @Order(120)
@@ -260,6 +335,11 @@ public class TableMenuTest {
       @Override
       protected Set<? extends IMenuType> getConfiguredMenuTypes() {
         return CollectionUtility.hashSet(TableMenuType.EmptySpace);
+      }
+
+      @Override
+      protected void execOwnerValueChanged(Object newOwnerValue) {
+        setEnabled(true);
       }
     }
   }

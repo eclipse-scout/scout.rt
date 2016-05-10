@@ -100,11 +100,13 @@ public class TableContextMenu extends AbstractContextMenu<ITable> implements ITa
    * @param ownerValue
    */
   protected void calculateEnableState(List<? extends ITableRow> ownerValue) {
-    boolean enabled = true;
-    for (ITableRow row : ownerValue) {
-      if (!row.isEnabled()) {
-        enabled = false;
-        break;
+    boolean enabled = getContainer().isEnabled();
+    if (enabled) {
+      for (ITableRow row : ownerValue) {
+        if (!row.isEnabled()) {
+          enabled = false;
+          break;
+        }
       }
     }
     final boolean inheritedEnability = enabled;
