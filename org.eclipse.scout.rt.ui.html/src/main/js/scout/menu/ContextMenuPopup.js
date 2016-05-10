@@ -133,7 +133,7 @@ scout.ContextMenuPopup.prototype.removeSubMenuItems = function(parentMenu, anima
 
 scout.ContextMenuPopup.prototype.renderSubMenuItems = function(parentMenu, menus, animated, initialSubMenuRendering) {
   if (!this.session.desktop.rendered && !initialSubMenuRendering) {
-    this.initialSubmenusToRender = {
+    this.initialSubMenusToRender = {
       parentMenu: parentMenu,
       menus: menus
     };
@@ -225,7 +225,7 @@ scout.ContextMenuPopup.prototype.renderSubMenuItems = function(parentMenu, menus
             parent: this
           });
           this._updateFirstLastClass();
-          this.$body.css('box-shadow', "");
+          this.$body.css('box-shadow', '');
         }
       }.bind(this)
     });
@@ -278,71 +278,86 @@ scout.ContextMenuPopup.prototype._renderMenuItems = function(menus, initialSubMe
   }
 
   iconOffset = iconOffset ? iconOffset : 0;
-  menus.some(function(menu) {
+
+  menus.forEach(function(menu) {
     // Invisible menus are rendered as well because their visibility might change dynamically
     if (menu.separator) {
       return;
     }
+
     // prevent loosing original parent
     var parentMenu = menu.parent;
     if (this.options.cloneMenuItems && !menu.cloneOf) {
       menu = menu.cloneAdapter({
         parent: this
       });
-      menu.on('propertyChange', function(event) {
-        if (event.selected) {
-          var propertyChangeEvent = {
-            properties: {
-              selected: event.selected
-            }
-          };
-          menu.cloneOf.onModelPropertyChange(propertyChangeEvent);
-        }
-      });
+      menu.on('propertyChange', this._onMenuPropertyChange.bind(this));
     } else {
-      var oldParent = menu.parent;
+      menu.oldParentMenu = parentMenu;
       menu.setParent(this);
     }
-    var menuRemoveHandler = function(event) {
-      var removedMenu = event.source;
-      if (removedMenu.cloneOf) {
-        this.session.unregisterAllAdapterClones(removedMenu.cloneOf);
-      }
-      removedMenu.setParent(oldParent);
-    }.bind(this);
-    menu.on('remove', menuRemoveHandler);
+    menu.on('remove', this._onMenuRemove.bind(this));
+
     // just set once because on second execution of this menu.parent is set to a popup
     if (!menu.parentMenu) {
       menu.parentMenu = parentMenu;
     }
     menu.render(this.$body);
+    this._updateIconAndText(menu, iconOffset);
     menu.afterSendDoAction = this.close.bind(this);
     menu.on('propertyChange', this._onMenuItemPropertyChange.bind(this));
-    if (menu.iconId && menu.$container.data('$icon').cssWidth() > iconOffset) {
-      iconOffset = menu.$container.data('$icon').cssWidth();
-      // update already rendered menu-items
-      this.$body.children().each(function(index, element) {
-        var $element = $(element);
-        var $icon = $element.data('$icon');
-        if ($icon && $icon.cssWidth() < iconOffset) {
-          $element.find('.text').css('padding-left', iconOffset - $icon.cssWidth());
-        } else if (element !== menu.$container[0]) {
-          $element.find('.text').css('padding-left', iconOffset);
-        }
-      });
-    } else if (iconOffset && !menu.iconId) {
-      menu.$container.find('.text').css('padding-left', iconOffset);
-    } else if (menu.$container.data('$icon') && menu.$container.data('$icon').cssWidth() < iconOffset) {
-      menu.$container.find('.text').css('padding-left', iconOffset - menu.$container.data('$icon').cssWidth());
-    }
   }, this);
-  while (this.initialSubmenusToRender && !initialSubMenuRendering) {
-    var parentMenu = this.initialSubmenusToRender.parentMenu,
-      subMenus = this.initialSubmenusToRender.menus;
-    this.initialSubmenusToRender = undefined;
-    this.renderSubMenuItems(parentMenu, subMenus, false, true);
-  }
+
+  this._handleInitialSubMenus(initialSubMenuRendering);
   this._updateFirstLastClass();
+};
+
+scout.ContextMenuPopup.prototype._handleInitialSubMenus = function(initialSubMenuRendering) {
+  var menusObj;
+  while(this.initialSubMenusToRender && !initialSubMenuRendering) {
+    menusObj = this.initialSubMenusToRender;
+    this.initialSubMenusToRender = undefined;
+    this.renderSubMenuItems(menusObj.parentMenu, menusObj.menus, false, true);
+  }
+};
+
+scout.ContextMenuPopup.prototype._updateIconAndText = function(menu, iconOffset) {
+  if (menu.iconId && menu.$container.data('$icon').cssWidth() > iconOffset) {
+    iconOffset = menu.$container.data('$icon').cssWidth();
+    // update already rendered menu-items
+    this.$body.children().each(function(index, element) {
+      var $element = $(element);
+      var $icon = $element.data('$icon');
+      if ($icon && $icon.cssWidth() < iconOffset) {
+        $element.find('.text').css('padding-left', iconOffset - $icon.cssWidth());
+      } else if (element !== menu.$container[0]) {
+        $element.find('.text').css('padding-left', iconOffset);
+      }
+    });
+  } else if (iconOffset && !menu.iconId) {
+    menu.$container.find('.text').css('padding-left', iconOffset);
+  } else if (menu.$container.data('$icon') && menu.$container.data('$icon').cssWidth() < iconOffset) {
+    menu.$container.find('.text').css('padding-left', iconOffset - menu.$container.data('$icon').cssWidth());
+  }
+};
+
+scout.ContextMenuPopup.prototype._onMenuPropertyChange = function(event) {
+  if (event.selected) {
+    var menu = event.source;
+    menu.cloneOf.onModelPropertyChange({
+      properties: {
+        selected: event.selected
+      }
+    });
+  }
+};
+
+scout.ContextMenuPopup.prototype._onMenuRemove = function(event) {
+  var menu = event.source;
+  if (this.options.cloneMenuItems && menu.cloneOf) {
+    this.session.unregisterAllAdapterClones(menu.cloneOf);
+  }
+  menu.setParent(menu.oldParentMenu);
 };
 
 /**
