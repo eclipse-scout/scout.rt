@@ -106,6 +106,10 @@ public abstract class AbstractDeviceTransformer implements IDeviceTransformer {
   }
 
   @Override
+  public void notifyPageSearchFormInit(IPageWithTable<ITable> page) {
+  }
+
+  @Override
   public boolean acceptFormAddingToDesktop(IForm form) {
     return true;
   }

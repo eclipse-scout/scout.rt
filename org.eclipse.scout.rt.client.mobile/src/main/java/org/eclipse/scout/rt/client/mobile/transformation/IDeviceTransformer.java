@@ -56,6 +56,8 @@ public interface IDeviceTransformer {
 
   void notifyTablePageLoaded(IPageWithTable<?> tablePage);
 
+  void notifyPageSearchFormInit(IPageWithTable<ITable> page);
+
   boolean acceptFormAddingToDesktop(IForm form);
 
   boolean isFormExcluded(IForm form);

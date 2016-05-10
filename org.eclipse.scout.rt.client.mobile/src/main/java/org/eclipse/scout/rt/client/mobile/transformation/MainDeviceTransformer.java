@@ -249,6 +249,17 @@ public class MainDeviceTransformer implements IDeviceTransformer {
   }
 
   @Override
+  public void notifyPageSearchFormInit(IPageWithTable<ITable> page) {
+    if (!isActive()) {
+      return;
+    }
+
+    for (IDeviceTransformer transformer : getTransformers()) {
+      transformer.notifyPageSearchFormInit(page);
+    }
+  }
+
+  @Override
   public boolean isGridDataDirty(IForm form) {
     if (!isActive()) {
       return false;

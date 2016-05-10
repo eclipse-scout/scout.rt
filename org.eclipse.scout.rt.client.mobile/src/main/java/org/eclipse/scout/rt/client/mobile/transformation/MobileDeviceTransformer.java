@@ -17,6 +17,7 @@ import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
+import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.controls.ITableControl;
 import org.eclipse.scout.rt.client.ui.basic.table.controls.SearchFormTableControl;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
@@ -24,6 +25,9 @@ import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
+import org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm;
+import org.eclipse.scout.rt.client.ui.form.FormEvent;
+import org.eclipse.scout.rt.client.ui.form.FormListener;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.GridData;
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
@@ -53,11 +57,14 @@ public class MobileDeviceTransformer extends AbstractDeviceTransformer {
     List<IDeviceTransformation> transformations = new LinkedList<IDeviceTransformation>();
 
     transformations.add(MobileDeviceTransformation.MOVE_FIELD_LABEL_TO_TOP);
+    transformations.add(MobileDeviceTransformation.MOVE_FIELD_STATUS_TO_TOP);
     transformations.add(MobileDeviceTransformation.MAKE_FIELD_SCALEABLE);
     transformations.add(MobileDeviceTransformation.MAKE_MAINBOX_SCROLLABLE);
     transformations.add(MobileDeviceTransformation.REDUCE_GROUPBOX_COLUMNS_TO_ONE);
     transformations.add(MobileDeviceTransformation.HIDE_PLACEHOLDER_FIELD);
+    transformations.add(MobileDeviceTransformation.HIDE_FIELD_STATUS);
     transformations.add(MobileDeviceTransformation.DISABLE_FORM_CANCEL_CONFIRMATION);
+    transformations.add(MobileDeviceTransformation.AUTO_CLOSE_SEARCH_FORM);
 
     for (IDeviceTransformation transformation : transformations) {
       getDeviceTransformationConfig().enableTransformation(transformation);
@@ -147,6 +154,29 @@ public class MobileDeviceTransformer extends AbstractDeviceTransformer {
   }
 
   @Override
+  public void notifyPageSearchFormInit(final IPageWithTable<ITable> page) {
+    if (!getDeviceTransformationConfig().isTransformationEnabled(MobileDeviceTransformation.AUTO_CLOSE_SEARCH_FORM)) {
+      return;
+    }
+    ISearchForm searchForm = page.getSearchFormInternal();
+    searchForm.addFormListener(new FormListener() {
+      @Override
+      public void formChanged(FormEvent e) {
+        if (FormEvent.TYPE_STORE_AFTER == e.getType()) {
+          onSearchFormStored(page);
+        }
+      }
+    });
+  }
+
+  protected void onSearchFormStored(IPageWithTable<ITable> page) {
+    SearchFormTableControl tableControl = page.getTable().getTableControl(SearchFormTableControl.class);
+    if (tableControl != null) {
+      tableControl.setSelected(false);
+    }
+  }
+
+  @Override
   public void transformFormField(IFormField field) {
     List<IDeviceTransformationHook> hooks = DeviceTransformationHooks.getFormFieldTransformationHooks(field.getClass());
     if (hooks != null) {
@@ -158,18 +188,15 @@ public class MobileDeviceTransformer extends AbstractDeviceTransformer {
     if (getDeviceTransformationConfig().isTransformationEnabled(MobileDeviceTransformation.MOVE_FIELD_LABEL_TO_TOP, field)) {
       moveLabelToTop(field);
     }
-
     if (getDeviceTransformationConfig().isTransformationEnabled(MobileDeviceTransformation.MAKE_FIELD_SCALEABLE, field)) {
       makeFieldScalable(field);
     }
-
-    if ((field instanceof ICompositeField)) {
-      ((ICompositeField) field).setStatusVisible(false, false);
+    if (getDeviceTransformationConfig().isTransformationEnabled(MobileDeviceTransformation.HIDE_FIELD_STATUS, field)) {
+      hideStatus(field);
     }
-    else {
-      field.setStatusVisible(false);
+    if (getDeviceTransformationConfig().isTransformationEnabled(MobileDeviceTransformation.MOVE_FIELD_STATUS_TO_TOP, field)) {
+      moveStatusToTop(field);
     }
-    field.setStatusPosition(IFormField.STATUS_POSITION_TOP);
 
     if (field instanceof IGroupBox) {
       transformGroupBox((IGroupBox) field);
@@ -224,6 +251,19 @@ public class MobileDeviceTransformer extends AbstractDeviceTransformer {
     // Removing the label actually removes the place on the left side so that it gets aligned to the other fields.
     if (field instanceof IBooleanField) {
       field.setLabelVisible(false);
+    }
+  }
+
+  protected void moveStatusToTop(IFormField field) {
+    field.setStatusPosition(IFormField.STATUS_POSITION_TOP);
+  }
+
+  protected void hideStatus(IFormField field) {
+    if ((field instanceof ICompositeField)) {
+      ((ICompositeField) field).setStatusVisible(false, false);
+    }
+    else {
+      field.setStatusVisible(false);
     }
   }
 
