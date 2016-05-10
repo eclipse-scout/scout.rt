@@ -1088,34 +1088,42 @@ scout.DateField.prototype._errorStatus = function(valid) {
   return errorStatus;
 };
 
-scout.DateField.prototype._setDateValid = function(valid) {
+/**
+ * This method updates the UI parts (date, time) of the error status. When both UI parts are valid,
+ * we use the error status from the model, which can be null (= no errors).
+ */
+scout.DateField.prototype._setErrorStatusPart = function(property, valid) {
   var errorStatus = this._errorStatus(valid);
   if (errorStatus) {
-    errorStatus.invalidDate = !valid;
+    errorStatus[property] = !valid;
+    if (!errorStatus.invalidDate && !errorStatus.invalidTime) {
+      errorStatus = this._modelErrorStatus;
+    }
   }
   this.setErrorStatus(errorStatus);
+};
+
+scout.DateField.prototype._setDateValid = function(valid) {
+  this._setErrorStatusPart('invalidDate', valid);
 };
 
 scout.DateField.prototype._setTimeValid = function(valid) {
-  var errorStatus = this._errorStatus(valid);
-  if (errorStatus) {
-    errorStatus.invalidTime = !valid;
+  this._setErrorStatusPart('invalidTime', valid);
+};
+
+scout.DateField.prototype._isErrorStatusPartValid = function(property) {
+  if (this.errorStatus && this.errorStatus[property]) {
+    return false;
   }
-  this.setErrorStatus(errorStatus);
+  return true;
 };
 
 scout.DateField.prototype._isDateValid = function() {
-  if (this.errorStatus && this.errorStatus.invalidDate) {
-    return false;
-  }
-  return true;
+  return this._isErrorStatusPartValid('invalidDate');
 };
 
 scout.DateField.prototype._isTimeValid = function() {
-  if (this.errorStatus && this.errorStatus.invalidTime) {
-    return false;
-  }
-  return true;
+  return this._isErrorStatusPartValid('invalidTime');
 };
 
 scout.DateField.prototype._hasUiErrorStatus = function() {
