@@ -278,7 +278,6 @@ scout.ContextMenuPopup.prototype._renderMenuItems = function(menus, initialSubMe
   }
 
   iconOffset = iconOffset ? iconOffset : 0;
-
   menus.forEach(function(menu) {
     // Invisible menus are rendered as well because their visibility might change dynamically
     if (menu.separator) {
@@ -303,9 +302,9 @@ scout.ContextMenuPopup.prototype._renderMenuItems = function(menus, initialSubMe
       menu.parentMenu = parentMenu;
     }
     menu.render(this.$body);
-    this._updateIconAndText(menu, iconOffset);
     menu.afterSendDoAction = this.close.bind(this);
     menu.on('propertyChange', this._onMenuItemPropertyChange.bind(this));
+    iconOffset = this._updateIconAndText(menu, iconOffset);
   }, this);
 
   this._handleInitialSubMenus(initialSubMenuRendering);
@@ -339,6 +338,7 @@ scout.ContextMenuPopup.prototype._updateIconAndText = function(menu, iconOffset)
   } else if (menu.$container.data('$icon') && menu.$container.data('$icon').cssWidth() < iconOffset) {
     menu.$container.find('.text').css('padding-left', iconOffset - menu.$container.data('$icon').cssWidth());
   }
+  return iconOffset;
 };
 
 scout.ContextMenuPopup.prototype._onMenuPropertyChange = function(event) {
