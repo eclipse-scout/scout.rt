@@ -176,6 +176,10 @@ scout._checkBrowserCompability = function(options) {
  * Note: we do not install an error handler on popup-windows because everything is controlled by the main-window
  * so exceptions will also occur in that window. This also means, the fatal message-box will be displayed in the
  * main-window, even when a popup-window is opened and active.
+ *
+ * Caution: The error.stack doesn't look the same in different browsers. Chrome for instance puts the error message
+ * on the first line of the stack. Firefox does only contain the stack lines, without the message, but in return
+ * the stack trace is much longer :)
  */
 scout._installGlobalJavascriptErrorHandler = function() {
   window.onerror = function(errorMessage, fileName, lineNumber, columnNumber, error) {
@@ -183,9 +187,9 @@ scout._installGlobalJavascriptErrorHandler = function() {
       var errorCode = getJsErrorCode(error),
         logStr = errorMessage + ' at ' + fileName + ':' + lineNumber;
       if (error && error.stack) {
-        logStr = error.stack;
+        logStr += '\n' + error.stack;
       }
-      logStr += ' (' + 'Code ' + errorCode + ')';
+      logStr += '\n(' + 'Code ' + errorCode + ')';
       $.log.error(logStr);
       if (window.console) {
         window.console.log(logStr);
