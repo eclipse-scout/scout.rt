@@ -84,7 +84,7 @@ scout.DateColumnUserFilter.prototype.filterFieldsTitle = function() {
 };
 
 /**
- * FIXME AWE: (filter) refactor DateField.js -
+ * TODO awe, cgu: (value-field) refactor DateField.js -
  * rename timestampAsDate to value (also on JsonDateField)
  * use Date object everywhere and todays 'timestamp' date-string
  * only when we communicate with the UI server. Then remove the toJsonDate
@@ -95,11 +95,11 @@ scout.DateColumnUserFilter.prototype.filterFieldsTitle = function() {
  */
 scout.DateColumnUserFilter.prototype.addFilterFields = function(groupBox) {
   this.dateFromField = groupBox.addFilterField('DateField', 'ui.from', 0);
-  this.dateFromField.timestamp = toJsonDate(this.dateFrom);
+  this.dateFromField.setTimestamp(toJsonDate(this.dateFrom));
   this.dateFromField.on('timestampChanged', this._onDisplayTextChanged.bind(this));
 
   this.dateToField = groupBox.addFilterField('DateField', 'ui.to', 1);
-  this.dateToField.timestamp = toJsonDate(this.dateTo);
+  this.dateToField.setTimestamp(toJsonDate(this.dateTo));
   this.dateToField.on('timestampChanged', this._onDisplayTextChanged.bind(this));
 
   function toJsonDate(date) {

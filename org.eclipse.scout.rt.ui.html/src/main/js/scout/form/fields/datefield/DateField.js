@@ -49,6 +49,8 @@ scout.DateField.prototype._init = function(model) {
   scout.DateField.parent.prototype._init.call(this, model);
   scout.fields.initTouch(this, model);
   this._popup = model.popup;
+  this._syncDateFormatPattern(this.dateFormatPattern);
+  this._syncTimeFormatPattern(this.timeFormatPattern);
   this._syncTimestamp(this.timestamp);
   this._syncAutoTimestamp(this.autoTimestamp);
   this._syncDisplayText(this.displayText);
@@ -209,13 +211,22 @@ scout.DateField.prototype._fieldForPlaceholder = function() {
   return null;
 };
 
-scout.DateField.prototype._renderDateFormatPattern = function() {
+scout.DateField.prototype._syncDateFormatPattern = function(dateFormatPattern) {
+  this.dateFormatPattern = dateFormatPattern;
   this.isolatedDateFormat = new scout.DateFormat(this.session.locale, this.dateFormatPattern);
+};
+
+scout.DateField.prototype._renderDateFormatPattern = function() {
   this.getDatePicker().dateFormat = this.isolatedDateFormat;
 };
 
-scout.DateField.prototype._renderTimeFormatPattern = function() {
+scout.DateField.prototype._syncTimeFormatPattern = function(timeFormatPattern) {
+  this.timeFormatPattern = timeFormatPattern;
   this.isolatedTimeFormat = new scout.DateFormat(this.session.locale, this.timeFormatPattern);
+};
+
+scout.DateField.prototype._renderTimeFormatPattern = function() {
+  // nop
 };
 
 /**
@@ -1182,4 +1193,39 @@ scout.DateField.prototype.selectDate = function(date, animated) {
 scout.DateField.prototype.shiftSelectedDate = function(years, months, days) {
   this._popup.ensureOpen();
   this.getDatePicker().shiftSelectedDate(years, months, days);
+};
+
+
+// TODO awe, cgu: (value-field): we should refactor this setTimestamp / formatTimestamp
+// as soon as we have implemented parse/format/validation logic on ValueField.js. This
+// should work like the Java client (AbstractValueField) does.
+scout.DateField.prototype.setTimestamp = function(timestamp) {
+  if (this.timestamp === timestamp) {
+    return;
+  }
+  this._setProperty('timestamp', timestamp);
+  this.timestampAsDate = scout.dates.parseJsonDate(timestamp);
+  this.formatTimestamp(this.timestampAsDate);
+  if (this.rendered) {
+    this._renderDisplayText();
+  }
+};
+
+scout.DateField.prototype.formatTimestamp = function(timestamp) {
+  var
+    dateText = '',
+    timeText = '';
+
+  if (timestamp) {
+    if (this.hasDate) {
+      dateText = this.isolatedDateFormat.format(timestamp);
+    }
+    if (this.hasTime) {
+      timeText = this.isolatedTimeFormat.format(timestamp);
+    }
+  }
+
+  this.dateDisplayText = dateText;
+  this.timeDisplayText = timeText;
+  this._updateDisplayTextProperty();
 };
