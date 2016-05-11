@@ -97,6 +97,16 @@ scout.objects = {
   },
 
   /**
+   * Returns the given property if the object is truthy.
+   */
+  optProperty: function(obj, property) {
+    if (obj) {
+      return obj[property];
+    }
+    return null;
+  },
+
+  /**
    * Returns true if:
    * - obj is not undefined or null
    * - obj not isNaN

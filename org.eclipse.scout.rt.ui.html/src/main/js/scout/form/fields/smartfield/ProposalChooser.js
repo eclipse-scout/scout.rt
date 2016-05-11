@@ -76,28 +76,47 @@ scout.ProposalChooser.prototype.delegateEvent = function(event) {
 
 scout.ProposalChooser.prototype._renderStatus = function() {
   this._updateStatus();
-  this.htmlComp.revalidateLayout();
 };
 
 scout.ProposalChooser.prototype._renderStatusVisible = function() {
   this._updateStatus();
-  this.htmlComp.revalidateLayout();
+};
+
+scout.ProposalChooser.prototype._computeStatusVisible = function() {
+  return !!(this.statusVisible && this.status);
 };
 
 scout.ProposalChooser.prototype._updateStatus = function() {
-  var oldStatusVisible = this.$status.isVisible(),
-    newStatusVisible = this.statusVisible && this.status;
+  // Note: the UI has a special way to deal with the status. When the UI is rendered
+  // we do NOT render an OK status, even when it is set on the model. The status
+  // "Search proposals..." is set to severity OK. That status is only displayed, when
+  // it is still there after 250 ms. Usually a smart-field lookup is fast, so the user
+  // never sees the status message. However: it would be better if the status on the
+  // (Java-)model would implement the behavior described above, but
+  // this would require a timer thread, so it is easier to implement that in the UI.
+  // Status with other severities than OK are displayed immediately.
+  clearTimeout(this._updateStatusTimeout);
+  if (scout.objects.optProperty(this.status, 'severity') === scout.Status.Severity.OK) {
+    // compute statusVisible 250 ms later (status can change in the meantime)
+    this._updateStatusTimeout = setTimeout(
+        this._updateStatusImpl.bind(this), 250);
+  } else {
+    this._updateStatusImpl();
+  }
+};
 
-  if (oldStatusVisible === newStatusVisible) {
+scout.ProposalChooser.prototype._updateStatusImpl = function() {
+  var
+    oldVisible = this.$status.isVisible(),
+    oldMessage = this.$status.text(),
+    visible = this._computeStatusVisible();
+
+  if (oldVisible === visible &&
+      oldMessage === scout.objects.optProperty(this.status, 'message')) {
     return;
   }
 
-  $.log.debug('_updateStatus status=' + this.status + ' statusVisible=' + this.statusVisible);
-  var updateStatusFunc = this.rendering ? this._updateStatusImpl : this._updateStatusWithTimeout;
-  updateStatusFunc.call(this, newStatusVisible);
-};
-
-scout.ProposalChooser.prototype._updateStatusImpl = function(visible) {
+  $.log.debug('_updateStatus statusVisible=' + visible);
   this.$status.setVisible(visible);
   if (this.status) {
     this._setStatusMessage(this.status.message);
@@ -105,11 +124,6 @@ scout.ProposalChooser.prototype._updateStatusImpl = function(visible) {
     this.$status.text('');
   }
   this.htmlComp.invalidateLayoutTree();
-};
-
-scout.ProposalChooser.prototype._updateStatusWithTimeout = function(visible) {
-  clearTimeout(this._updateStatusTimeout);
-  this._updateStatusTimeout = setTimeout(this._updateStatusImpl.bind(this, visible), 250);
 };
 
 /**
