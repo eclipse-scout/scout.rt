@@ -1,6 +1,7 @@
 scout.CompactTree = function() {
   scout.CompactTree.parent.call(this);
   this.$nodesContainer;
+  this._scrolldirections = 'y';
 };
 scout.inherits(scout.CompactTree, scout.Tree);
 
