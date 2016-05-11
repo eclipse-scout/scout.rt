@@ -50,6 +50,10 @@ scout.Tree = function() {
 
   this.nodeHeight = 0;
   this.nodeWidth = 0;
+  this.maxNodeWidth = 0;
+  this.nodeWidthDirty = false;
+
+  this._scrolldirections = 'both';
 };
 scout.inherits(scout.Tree, scout.ModelAdapter);
 
@@ -280,15 +284,22 @@ scout.Tree.prototype._render = function($parent) {
     .on('dblclick', '.tree-node-control', this._onNodeControlDoubleClick.bind(this))
     .on('scroll', this._onDataScroll.bind(this));
 
+  if (this._isHorizontalScrolling()) {
+    this.$data.toggleClass('scrollable-tree', true);
+  }
+
   scout.scrollbars.install(this.$data, {
     parent: this,
-    axis: 'y'
-      //TODO nbu axis: 'both'
+    axis: this._scrolldirections
   });
   this._installNodeTooltipSupport();
   this.menuBar.render(this.$container);
   this._updateNodeDimensions();
   this._renderViewport();
+};
+
+scout.Tree.prototype._isHorizontalScrolling = function() {
+  return this._scrolldirections === 'both' || this._scrolldirections === 'x';
 };
 
 scout.Tree.prototype._onDataScroll = function() {
@@ -341,6 +352,7 @@ scout.Tree.prototype._rerenderViewport = function() {
   }
   this._removeRenderedNodes();
   this._renderFiller();
+  this._updateDomNodeWidth();
   this._renderViewport();
 };
 
@@ -412,7 +424,10 @@ scout.Tree.prototype._renderFiller = function() {
 
   var fillBeforeDimensions = this._calculateFillerDimension(new scout.Range(0, this.viewRangeRendered.from));
   this.$fillBefore.cssHeight(fillBeforeDimensions.height);
-  this.$fillBefore.cssWidth(fillBeforeDimensions.width);
+  if (this._isHorizontalScrolling()) {
+    this.$fillBefore.cssWidth(fillBeforeDimensions.width);
+    this.maxNodeWidth = Math.max(fillBeforeDimensions.width, this.maxNodeWidth);
+  }
   $.log.trace('FillBefore height: ' + fillBeforeDimensions.height);
 
   if (!this.$fillAfter) {
@@ -425,14 +440,17 @@ scout.Tree.prototype._renderFiller = function() {
   };
   fillAfterDimensions = this._calculateFillerDimension(new scout.Range(this.viewRangeRendered.to, this.visibleNodesFlat.length));
   this.$fillAfter.cssHeight(fillAfterDimensions.height);
-  this.$fillAfter.cssWidth(fillAfterDimensions.width);
+  if (this._isHorizontalScrolling()) {
+    this.$fillAfter.cssWidth(fillAfterDimensions.width);
+    this.maxNodeWidth = Math.max(fillAfterDimensions.width, this.maxNodeWidth);
+  }
   $.log.trace('FillAfter height: ' + fillAfterDimensions.heigth);
 };
 
 scout.Tree.prototype._calculateFillerDimension = function(range) {
   var dimension = {
     height: 0,
-    width: 0
+    width: this.maxNodeWidth
   };
   for (var i = range.from; i < range.to; i++) {
     var node = this.visibleNodesFlat[i];
@@ -533,9 +551,23 @@ scout.Tree.prototype._renderViewRange = function(viewRange) {
   }
 
   this._renderFiller();
+  this._updateDomNodeWidth();
   this._renderSelection();
   this.$data[0].scrollTop = scrollTop;
   this.viewRangeDirty = false;
+};
+
+scout.Tree.prototype._updateDomNodeWidth = function($nodes) {
+  if (!this._isHorizontalScrolling()) {
+    return;
+  }
+  if (this.rendered && this.nodeWidthDirty) {
+    for (var i = this.viewRangeRendered.from; i < this.viewRangeRendered.to; i++) {
+      this.maxNodeWidth = Math.max(this.visibleNodesFlat[i].width, this.maxNodeWidth);
+    }
+    this.$data.find('.tree-node').css('width', this.maxNodeWidth);
+    this.nodeWidthDirty = false;
+  }
 };
 
 scout.Tree.prototype._cleanupNodes = function($nodes) {
@@ -638,7 +670,13 @@ scout.Tree.prototype._updateNodeDimensions = function() {
   var $emptyNode = this.$data.appendDiv('tree-node');
   $emptyNode.html('&nbsp;');
   this.nodeHeight = $emptyNode.outerHeight(true);
-  this.nodeWidth = $emptyNode.outerWidth(true);
+  if (this._isHorizontalScrolling()) {
+    var oldNodeWidth = this.nodeWidth;
+    this.nodeWidth = $emptyNode.outerWidth(true);
+    if (oldNodeWidth !== this.nodeWidth) {
+      this.viewRangeDirty = true;
+    }
+  }
   $emptyNode.remove();
 };
 
@@ -1381,6 +1419,13 @@ scout.Tree.prototype._removeChildrenFromFlatList = function(parentNode, animated
     for (var i = parentIndex + 1; i < this.visibleNodesFlat.length; i++) {
       if (this.visibleNodesFlat[i].level > parentLevel) {
         var node = this.visibleNodesFlat[i];
+        if (this._isHorizontalScrolling()) {
+          //if node is the node which defines the widest width then recalculate width for render
+          if (node.width === this.maxNodeWidth) {
+            this.maxNodeWidth = 0;
+            this.nodeWidthDirty = true;
+          }
+        }
         delete this.visibleNodesMap[this.visibleNodesFlat[i].id];
         if (node.attached && animatedRemove) {
           if (!this._$animationWrapper) {
@@ -1447,6 +1492,13 @@ scout.Tree.prototype._removeFromFlatList = function(node, animatedRemove) {
   if (this.visibleNodesMap[node.id]) {
     var index = this.visibleNodesFlat.indexOf(node);
     this._removeChildrenFromFlatList(node, false);
+    if (this._isHorizontalScrolling()) {
+      //if node is the node which defines the widest width then recalculate width for render
+      if (node.width === this.maxNodeWidth) {
+        this.maxNodeWidth = 0;
+        this.nodeWidthDirty = true;
+      }
+    }
     removedNodes = scout.arrays.ensure(this.visibleNodesFlat.splice(index, 1));
     delete this.visibleNodesMap[node.id];
     this.hideNode(node, animatedRemove);
@@ -2359,7 +2411,25 @@ scout.Tree.prototype._insertNodeInDOM = function(node, indexHint) {
   this._insertNodeInDOMAtPlace(node, index);
 
   node.height = node.$node.outerHeight();
-  node.width = node.$node.outerWidth();
+  if (this._isHorizontalScrolling()) {
+    var widthBackup = node.width ? node.width : 0,
+      displayBackup = node.$node.css('display');
+    node.$node.css('width', 'auto');
+    node.$node.css('display', 'inline');
+    var newWidth = node.$node.outerWidth();
+    if (widthBackup === this.maxNodeWidth && newWidth < this.maxNodeWidth) {
+      this.maxNodeWidth = 0;
+      this.nodeWidthDirty = true;
+    } else if (newWidth > this.maxNodeWidth) {
+      this.maxNodeWidth = newWidth;
+      this.nodeWidthDirty = true;
+    }
+    if (!this.nodeWidthDirty) {
+      node.$node.css('width', this.maxNodeWidth);
+    }
+    node.$node.css('display', displayBackup);
+    node.width = newWidth;
+  }
   node.rendered = true;
   node.attached = true;
 };

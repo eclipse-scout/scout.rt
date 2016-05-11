@@ -23,6 +23,8 @@ scout.Outline = function() {
   this.messageBoxController;
   this.fileChooserController;
   this._nodeIdToRowMap = {};
+
+  this._scrolldirections = 'y';
 };
 scout.inherits(scout.Outline, scout.Tree);
 
