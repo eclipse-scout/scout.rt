@@ -40,6 +40,7 @@ describe('TabItem', function() {
 
     beforeEach(function() {
       var groupBox = helper.createFieldModel('TabItem');
+      groupBox.label = 'Foo';
       field = createTabBox([groupBox]);
     });
 

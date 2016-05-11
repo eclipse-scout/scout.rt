@@ -346,9 +346,13 @@ scout.GroupBox.prototype._renderExpanded = function() {
  * @override FormField.js
  */
 scout.GroupBox.prototype._renderLabelVisible = function(labelVisible) {
-  labelVisible = scout.nvl(labelVisible, this.labelVisible);
-  this.$title.setVisible(labelVisible && this.label && !this.mainBox);
+  this.$title.setVisible(this._computeTitleVisible(labelVisible));
   this._updateStatusVisible();
+};
+
+scout.GroupBox.prototype._computeTitleVisible = function(labelVisible) {
+  labelVisible = scout.nvl(labelVisible, this.labelVisible);
+  return !!(labelVisible && this.label && !this.mainBox);
 };
 
 /**
@@ -364,7 +368,7 @@ scout.GroupBox.prototype._updateStatusVisible = function() {
  * Only show the group box status if title is visible.
  */
 scout.GroupBox.prototype._computeStatusVisible = function() {
-  return scout.GroupBox.parent.prototype._computeStatusVisible.call(this) && this.$title.isVisible();
+  return scout.GroupBox.parent.prototype._computeStatusVisible.call(this) && this._computeTitleVisible();
 };
 
 scout.GroupBox.prototype._syncMenus = function(menus, oldMenus) {
