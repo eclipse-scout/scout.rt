@@ -465,31 +465,31 @@ scout.Desktop.prototype.setOutlineContent = function(content, bringToFront) {
   if (bringToFront) {
     this.viewTabsController.deselectViewTab();
     this._bringNavigationToFront();
-  }
+    if (!content.rendered) {
+      if (content instanceof scout.Table) {
+        content.menuBar.top();
+        content.menuBar.large();
+      }
+      content.render(this.$bench);
 
-  if (!content.rendered) {
-    if (content instanceof scout.Table) {
-      content.menuBar.top();
-      content.menuBar.large();
+      // Request focus on first element in new outlineTab.
+      this.session.focusManager.validateFocus();
+
+      content.htmlComp.validateLayout();
+      content.htmlComp.validateRoot = true;
+      if (content instanceof scout.Table) {
+        content.restoreScrollPosition();
+      }
+    } else if (!content.attached) {
+      content.attach();
     }
-    content.render(this.$bench);
 
+    //set active form to null because outline is active form.
+    this._setOutlineActivated();
     // Request focus on first element in new outlineTab.
-    this.session.focusManager.validateFocus();
-
-    content.htmlComp.validateLayout();
-    content.htmlComp.validateRoot = true;
-    if (this._outlineContent instanceof scout.Table) {
-      this._outlineContent.restoreScrollPosition();
-    }
-  } else if (!content.attached) {
-    content.attach();
+    this.session.focusManager.validateFocus(); // TODO [5.2] nbu, dwi: why double validate?
   }
 
-  //set active form to null because outline is active form.
-  this._setOutlineActivated();
-  // Request focus on first element in new outlineTab.
-  this.session.focusManager.validateFocus(); // TODO [5.2] nbu, dwi: why double validate?
 };
 
 scout.Desktop.prototype.setOutline = function(outline, bringToFront) {

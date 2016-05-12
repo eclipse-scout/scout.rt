@@ -73,7 +73,7 @@ scout.Outline.prototype._render = function($parent) {
 
   if (this.selectedNodes.length === 0) {
     if (this.defaultDetailForm) {
-      this._showDefaultDetailForm();
+      this._showDefaultDetailForm(true);
     } else if (this.outlineOverview) {
       this._showOutlineOverview();
     }
@@ -155,7 +155,7 @@ scout.Outline.prototype.handleOutlineContent = function(bringToFront) {
   if (node) {
     this._updateOutlineNode(node, bringToFront);
   } else {
-    this._showDefaultDetailForm();
+    this._showDefaultDetailForm(bringToFront);
   }
 };
 
@@ -308,7 +308,7 @@ scout.Outline.prototype.navigateToTop = function() {
   this.deselectAll();
   this.collapseAll();
   if (this.defaultDetailForm) {
-    this._showDefaultDetailForm();
+    this._showDefaultDetailForm(true);
   } else if (this.outlineOverview) {
     this._showOutlineOverview();
   }
@@ -355,9 +355,7 @@ scout.Outline.prototype.selectNodes = function(nodes, notifyServer, debounceSend
 };
 
 scout.Outline.prototype._renderDefaultDetailForm = function() {
-  if (!this.inBackground) {
-    this._showDefaultDetailForm();
-  }
+    this._showDefaultDetailForm(!this.inBackground);
 };
 
 scout.Outline.prototype._syncDefaultDetailForm = function(defaultDetailForm) {
@@ -378,9 +376,9 @@ scout.Outline.prototype._syncDefaultDetailForm = function(defaultDetailForm) {
   }
 };
 
-scout.Outline.prototype._showDefaultDetailForm = function() {
+scout.Outline.prototype._showDefaultDetailForm = function(bringToFront) {
   if (this.defaultDetailForm && this.session.desktop.outline === this) {
-    this.session.desktop.setOutlineContent(this.defaultDetailForm, true);
+    this.session.desktop.setOutlineContent(this.defaultDetailForm, bringToFront);
   }
 };
 
@@ -524,11 +522,11 @@ scout.Outline.prototype._onPageChanged = function(event) {
     // If the following condition is false, the selection state is not synchronized yet which
     // means there is a selection event in the queue which will be processed right afterwards.
     if (this.selectedNodes.indexOf(node) !== -1) {
-      this._updateOutlineNode(node, false);
+      this._updateOutlineNode(node, this.inFront());
     }
   } else {
     this.defaultDetailForm = this.session.getOrCreateModelAdapter(event.detailForm, this);
-    this._showDefaultDetailForm();
+    this._showDefaultDetailForm(this.inFront());
   }
 };
 
