@@ -13,6 +13,8 @@ import org.eclipse.scout.rt.client.ui.desktop.BrowserHistoryEntry;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.UriBuilder;
+import org.eclipse.scout.rt.shared.deeplink.DeepLinkUrlParameter;
+import org.eclipse.scout.rt.shared.deeplink.DeepLinkUtility;
 
 public class DeepLinkUriBuilder {
 
@@ -37,7 +39,7 @@ public class DeepLinkUriBuilder {
 
   public DeepLinkUriBuilder parameterPath(String path) {
     m_path = path;
-    m_builder.parameter(IDeepLinks.PARAM_NAME_DEEP_LINK, path);
+    m_builder.parameter(DeepLinkUrlParameter.DEEP_LINK, path);
     return this;
   }
 
@@ -53,7 +55,7 @@ public class DeepLinkUriBuilder {
   public DeepLinkUriBuilder parameterInfo(String info) {
     if (StringUtility.hasText(info)) {
       m_info = info;
-      m_builder.parameter(IDeepLinks.PARAM_NAME_INFO, DeepLinkUtility.toSlug(info));
+      m_builder.parameter(DeepLinkUrlParameter.INFO, DeepLinkUtility.toSlug(info));
     }
     return this;
   }

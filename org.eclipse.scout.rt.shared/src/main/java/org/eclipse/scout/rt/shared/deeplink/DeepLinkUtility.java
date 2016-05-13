@@ -2,7 +2,7 @@
  * Copyright (c) BSI Business Systems Integration AG. All rights reserved.
  * http://www.bsiag.com/
  */
-package org.eclipse.scout.rt.client.deeplink;
+package org.eclipse.scout.rt.shared.deeplink;
 
 import java.text.Normalizer;
 import java.text.Normalizer.Form;

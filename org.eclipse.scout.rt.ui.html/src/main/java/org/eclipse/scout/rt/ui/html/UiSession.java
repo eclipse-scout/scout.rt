@@ -38,7 +38,6 @@ import javax.servlet.http.HttpSession;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
-import org.eclipse.scout.rt.client.deeplink.IDeepLinks;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
@@ -60,6 +59,7 @@ import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledException;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedException;
 import org.eclipse.scout.rt.shared.TEXTS;
+import org.eclipse.scout.rt.shared.deeplink.DeepLinkUrlParameter;
 import org.eclipse.scout.rt.shared.job.filter.event.SessionJobEventFilter;
 import org.eclipse.scout.rt.shared.job.filter.future.SessionFutureFilter;
 import org.eclipse.scout.rt.shared.ui.UiDeviceType;
@@ -368,7 +368,7 @@ public class UiSession implements IUiSession {
   }
 
   protected void startDesktop(Map<String, String> startupParams) {
-    final String deepLinkPath = startupParams.get(IDeepLinks.PARAM_NAME_DEEP_LINK);
+    final String deepLinkPath = startupParams.get(DeepLinkUrlParameter.DEEP_LINK);
     final IFuture<Void> future = ModelJobs.schedule(new IRunnable() {
 
       @Override
