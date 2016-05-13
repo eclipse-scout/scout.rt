@@ -50,6 +50,8 @@ scout.TreeLayout.prototype._setDataHeight = function(heightOffset) {
   heightOffset += $data.cssMarginTop() + $data.cssMarginBottom();
 
   $data.css('height', (heightOffset === 0 ? '100%' : 'calc(100% - ' + heightOffset + 'px)'));
+  this.tree.nodeWidthDirty = true;
+  this.tree.maxNodeWidth=0;
 
   this.tree.setViewRangeSize(this.tree.calculateViewRangeSize());
   // Always render viewport (not only when viewRangeSize changes), because view range depends on scroll position and data height
