@@ -1512,7 +1512,6 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
    * behavior is required.
    */
   protected void execAddColumnAction() {
-    //TODO nbu
     if (isCustomizable()) {
       List<String> existingColumns = getVisibleColumnIds();
       m_organizedTable.getTableCustomizer().addColumn(null);
