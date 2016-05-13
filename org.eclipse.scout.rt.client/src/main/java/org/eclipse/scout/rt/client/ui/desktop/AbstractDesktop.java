@@ -1048,8 +1048,28 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
       setPageSearchForm(null, true);
     }
     // </bsh>
+    updateActiveFormOnOutlineChanged();
     fireOutlineChanged(oldOutline, m_outline);
     onOutlineChangedInternal();
+  }
+
+  // FIXME awe: review with C.GU - is it sufficient to set the active form to null?
+  // or do we have to find another suitable active form? I guess the UI will send
+  // the new active form later...
+  protected void updateActiveFormOnOutlineChanged() {
+    // If active form is not set or parent of active form is desktop
+    // we must do nothing
+    IForm activeForm = getActiveForm();
+    if (activeForm == null || activeForm.getDisplayParent() == this) {
+      return;
+    }
+
+    // Does the active form belong to the current outline?
+    // if not, we must set the active form to null otherwise we do nothing
+    List<IForm> formsByOutline = m_formStore.getByDisplayParent(m_outline);
+    if (!formsByOutline.contains(activeForm)) {
+      setActiveForm(null);
+    }
   }
 
   /**
