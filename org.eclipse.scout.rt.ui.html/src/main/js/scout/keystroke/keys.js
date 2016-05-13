@@ -238,7 +238,6 @@ scout.keyStrokeBox = {
       if (pos) {
         $container.prependDiv('key-box ', keyBoxText).css(align, '' + (pos.left + offset) + 'px');
       } else {
-        // FIXME nbu: (key-strokes) check why sometimes pos is undefined even though we have a valid $container
         $.log.warn('(keys#drawSingleKeyBoxItem) pos is undefined. $container=' + $container);
       }
     }
