@@ -24,6 +24,7 @@ import org.eclipse.scout.rt.client.ui.form.clipboard.ClipboardForm.MainBox.Cance
 import org.eclipse.scout.rt.client.ui.form.clipboard.ClipboardForm.MainBox.ClipboardBox.ClipboardField;
 import org.eclipse.scout.rt.client.ui.form.clipboard.ClipboardForm.MainBox.ClipboardLabel;
 import org.eclipse.scout.rt.client.ui.form.clipboard.ClipboardForm.MainBox.OkButton;
+import org.eclipse.scout.rt.client.ui.form.fields.GridData;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCancelButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractOkButton;
 import org.eclipse.scout.rt.client.ui.form.fields.clipboardfield.AbstractClipboardField;
@@ -131,6 +132,11 @@ public class ClipboardForm extends AbstractForm {
       protected boolean getConfiguredLabelVisible() {
         return false;
       }
+
+      @Override
+      protected boolean getConfiguredWrapText() {
+        return true;
+      }
     }
 
     @Order(20)
@@ -211,6 +217,9 @@ public class ClipboardForm extends AbstractForm {
     protected void execLoad() {
       // use setVisibleGranted here because we don't want to send the cancel-button (incl. ESC keyStroke) to the UI
       super.execLoad();
+      GridData gd = getClipboardLabel().getGridDataHints();
+      gd.heightInPixel = 40;
+      getClipboardLabel().setGridDataInternal(gd);
       getClipboardLabel().setValue(TEXTS.get("CopyToClipboardFromFieldBelow"));
       getCancelButton().setVisibleGranted(false);
       checkOkButtonEnabled();
@@ -223,6 +232,9 @@ public class ClipboardForm extends AbstractForm {
     @Override
     protected void execLoad() {
       super.execLoad();
+      GridData gd = getClipboardLabel().getGridDataHints();
+      gd.heightInPixel = 60;
+      getClipboardLabel().setGridDataInternal(gd);
       getClipboardLabel().setValue(TEXTS.get("PasteClipboardContentsInFieldBelow"));
       checkOkButtonEnabled();
       getClipboardField().requestFocus();
