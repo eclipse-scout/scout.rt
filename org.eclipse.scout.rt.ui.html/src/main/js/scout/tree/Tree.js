@@ -450,7 +450,7 @@ scout.Tree.prototype._renderFiller = function() {
 scout.Tree.prototype._calculateFillerDimension = function(range) {
   var dimension = {
     height: 0,
-    width: this.maxNodeWidth
+    width: Math.max(this.$data.outerWidth(), this.maxNodeWidth)
   };
   for (var i = range.from; i < range.to; i++) {
     var node = this.visibleNodesFlat[i];
@@ -565,6 +565,7 @@ scout.Tree.prototype._updateDomNodeWidth = function($nodes) {
     for (var i = this.viewRangeRendered.from; i < this.viewRangeRendered.to; i++) {
       this.maxNodeWidth = Math.max(this.visibleNodesFlat[i].width, this.maxNodeWidth);
     }
+    var width = Math.max(this.maxNodeWidth, this.$data.outerWidth());
     this.$data.find('.tree-node').css('width', this.maxNodeWidth);
     this.nodeWidthDirty = false;
   }
@@ -2415,7 +2416,7 @@ scout.Tree.prototype._insertNodeInDOM = function(node, indexHint) {
     var widthBackup = node.width ? node.width : 0,
       displayBackup = node.$node.css('display');
     node.$node.css('width', 'auto');
-    node.$node.css('display', 'inline');
+    node.$node.css('display', 'inline-block');
     var newWidth = node.$node.outerWidth();
     if (widthBackup === this.maxNodeWidth && newWidth < this.maxNodeWidth) {
       this.maxNodeWidth = 0;
