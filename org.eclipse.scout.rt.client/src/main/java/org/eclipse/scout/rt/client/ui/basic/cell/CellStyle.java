@@ -24,7 +24,7 @@ public class CellStyle implements ICellSpecialization {
   private String m_foregroundColor;
   private FontSpec m_fontSpec;
   private int m_horizontalAlignment;
-  private boolean m_mandatory;
+  private boolean m_htmlEnabled;
 
   public CellStyle() {
     m_horizontalAlignment = -1;
@@ -37,6 +37,7 @@ public class CellStyle implements ICellSpecialization {
     setForegroundColor(cell.getForegroundColor());
     setFont(cell.getFont());
     setHorizontalAlignment(cell.getHorizontalAlignment());
+    setHtmlEnabled(cell.isHtmlEnabled());
   }
 
   @Override
@@ -60,11 +61,6 @@ public class CellStyle implements ICellSpecialization {
   }
 
   @Override
-  public void setHtmlEnabled(boolean enabled) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
   public String getTooltipText() {
     return null;
   }
@@ -81,7 +77,12 @@ public class CellStyle implements ICellSpecialization {
 
   @Override
   public boolean isHtmlEnabled() {
-    return false;
+    return m_htmlEnabled;
+  }
+
+  @Override
+  public void setHtmlEnabled(boolean enabled) {
+    m_htmlEnabled = enabled;
   }
 
   @Override
@@ -156,12 +157,12 @@ public class CellStyle implements ICellSpecialization {
 
   @Override
   public boolean isMandatory() {
-    return m_mandatory;
+    return false;
   }
 
   @Override
   public void setMandatory(boolean mandatory) {
-    m_mandatory = mandatory;
+    throw new UnsupportedOperationException();
   }
 
   @Override
@@ -173,8 +174,8 @@ public class CellStyle implements ICellSpecialization {
     result = prime * result + ((m_fontSpec == null) ? 0 : m_fontSpec.hashCode());
     result = prime * result + ((m_foregroundColor == null) ? 0 : m_foregroundColor.hashCode());
     result = prime * result + m_horizontalAlignment;
+    result = prime * result + (m_htmlEnabled ? 1231 : 1237);
     result = prime * result + ((m_iconId == null) ? 0 : m_iconId.hashCode());
-    result = prime * result + (m_mandatory ? 1231 : 1237);
     return result;
   }
 
@@ -225,6 +226,9 @@ public class CellStyle implements ICellSpecialization {
     if (m_horizontalAlignment != other.m_horizontalAlignment) {
       return false;
     }
+    if (m_htmlEnabled != other.m_htmlEnabled) {
+      return false;
+    }
     if (m_iconId == null) {
       if (other.m_iconId != null) {
         return false;
@@ -233,10 +237,6 @@ public class CellStyle implements ICellSpecialization {
     else if (!m_iconId.equals(other.m_iconId)) {
       return false;
     }
-    if (m_mandatory != other.m_mandatory) {
-      return false;
-    }
     return true;
   }
-
 }

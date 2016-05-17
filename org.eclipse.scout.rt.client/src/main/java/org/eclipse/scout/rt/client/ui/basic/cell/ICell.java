@@ -49,8 +49,6 @@ public interface ICell {
 
   boolean isMandatory();
 
-  void setMandatory(boolean b);
-
   boolean isEditable();
 
   /**

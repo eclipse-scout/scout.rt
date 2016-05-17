@@ -191,12 +191,13 @@ public class Cell implements ICell, IStyleable, IHtmlCapable {
     return m_cellSpecialization.isMandatory();
   }
 
-  @Override
   public void setMandatory(boolean mandatory) {
     if (m_cellSpecialization instanceof CellStyle) {
-      ICellSpecialization newStyle = new CellExtension(m_cellSpecialization);
-      newStyle.setMandatory(mandatory);
-      setValueInternal(MANDATORY_BIT, newStyle);
+      if (mandatory) {
+        ICellSpecialization newStyle = new CellExtension(m_cellSpecialization);
+        newStyle.setMandatory(mandatory);
+        setValueInternal(MANDATORY_BIT, newStyle);
+      }
     }
     else if (CompareUtility.notEquals(m_cellSpecialization.isMandatory(), mandatory)) {
       ICellSpecialization newStyle = m_cellSpecialization.copy();
@@ -279,14 +280,7 @@ public class Cell implements ICell, IStyleable, IHtmlCapable {
 
   @Override
   public void setHtmlEnabled(boolean b) {
-    if (m_cellSpecialization instanceof CellStyle) {
-      if (b) {
-        ICellSpecialization newStyle = new CellExtension(m_cellSpecialization);
-        newStyle.setHtmlEnabled(b);
-        setValueInternal(HTML_ENABLED_BIT, newStyle);
-      }
-    }
-    else if (m_cellSpecialization.isHtmlEnabled() != b) {
+    if (m_cellSpecialization.isHtmlEnabled() != b) {
       ICellSpecialization newStyle = m_cellSpecialization.copy();
       newStyle.setHtmlEnabled(b);
       setValueInternal(HTML_ENABLED_BIT, newStyle);
