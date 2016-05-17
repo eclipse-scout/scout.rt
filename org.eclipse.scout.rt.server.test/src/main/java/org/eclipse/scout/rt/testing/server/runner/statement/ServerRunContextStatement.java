@@ -20,6 +20,8 @@ import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
+import org.eclipse.scout.rt.shared.ui.UserAgent;
+import org.eclipse.scout.rt.shared.ui.UserAgents;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.testing.platform.runner.SafeStatementInvoker;
 import org.eclipse.scout.rt.testing.server.runner.RunWithServerSession;
@@ -57,16 +59,22 @@ public class ServerRunContextStatement extends Statement {
       Assertions.fail("Subject must not be null. Use the annotation '{}' to execute your test under a particular user. ", RunWithSubject.class.getSimpleName());
     }
 
+    UserAgent userAgent = UserAgents.createDefault();
+
     final IBean serverSessionBean = BEANS.getBeanManager().registerBean(new BeanMetaData(m_serverSessionAnnotation.value()).withOrder(-Long.MAX_VALUE));
     try {
       // Obtain the server session for the given subject. Depending on the session provider, a new session is created or a cached session returned.
-      final IServerSession serverSession = BEANS.get(m_serverSessionAnnotation.provider()).provide(ServerRunContexts.copyCurrent().withSubject(currentSubject));
+      final IServerSession serverSession = BEANS.get(m_serverSessionAnnotation.provider()).provide(
+          ServerRunContexts.copyCurrent()
+              .withSubject(currentSubject)
+              .withUserAgent(userAgent));
 
       // Run the test on behalf of a ServerRunContext.
       final SafeStatementInvoker invoker = new SafeStatementInvoker(m_next);
       ServerRunContexts.copyCurrent()
           .withSession(serverSession)
           .withSubject(currentSubject) // set the test subject explicitly in case it is different to the session subject
+          .withUserAgent(userAgent)
           .run(invoker);
       invoker.throwOnError();
     }
