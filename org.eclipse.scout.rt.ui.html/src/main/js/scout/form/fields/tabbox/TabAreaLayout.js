@@ -151,6 +151,9 @@ scout.TabAreaLayout.prototype._onClickEllipsis = function(event) {
       if ('doAction' === event.type) {
         $.log.debug('(TabAreaLayout#_onClickEllipsis) tabItem=' + tabItem);
         tabBox._selectTab(tabItem);
+        popup.one('remove', function(event){
+            tabItem.session.focusManager.requestFocus(tabItem.$tabContainer);
+        });
       }
     };
     overflowMenus.push(menu);

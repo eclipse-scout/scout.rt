@@ -1292,7 +1292,6 @@ scout.Tree.prototype.collapseNode = function(node, opts) {
 
 scout.Tree.prototype.collapseAll = function() {
   this.rebuildSuppressed = true;
-
   // Collapse all expanded child nodes (only model)
   this._visitNodes(this.nodes, function(node) {
     this.collapseNode(node);
