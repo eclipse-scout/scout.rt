@@ -20,3 +20,5 @@ So we get all dependencies in their intended version.
 
 The output can be compared to the effective POM of org.eclipse.scout.rt/pom.xml (with commented out transitive dependencies).
 Duplicates can be removed and the remaining purely transitive dependencies can be added to the transitive section.
+
+Note: c3p0 is an optional transitive dependency from quartz not used in Scout and can be omitted.
