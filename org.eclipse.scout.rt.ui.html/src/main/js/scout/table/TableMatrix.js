@@ -420,5 +420,5 @@ scout.TableMatrix.prototype.columnCount = function() {
 };
 
 scout.TableMatrix.prototype.isEmpty = function() {
-  return this._rows.length === 0;
+  return this._rows.length === 0 || this._columns.length === 0;
 };
