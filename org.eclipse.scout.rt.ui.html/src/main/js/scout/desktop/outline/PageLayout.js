@@ -47,23 +47,37 @@ scout.PageLayout.prototype.layout = function($container) {
 };
 
 scout.PageLayout.prototype.preferredLayoutSize = function($container) {
-  var prefSize,
+  var prefSize, containerSize,
     htmlContainer = this.page.htmlComp,
-    formPrefSize = new scout.Dimension(),
+    detailContentPrefSize = new scout.Dimension(),
     $text = this.page.$node.children('.text'),
-    titleHeight = 0,
+    titlePrefHeight = 0,
     detailMenuBar = this.outline.detailMenuBar,
-    detailMenuBarPrefSize = new scout.Dimension();
+    detailMenuBarPrefSize = new scout.Dimension(),
+    nodeMenuBar = this.outline.nodeMenuBar,
+    nodeMenuBarWidth = 0;
 
-  titleHeight = scout.graphics.prefSize($text, true).height;
+  containerSize = htmlContainer.getSize()
+    .subtract(htmlContainer.getInsets());
+
+  if (nodeMenuBar.visible) {
+    nodeMenuBarWidth = nodeMenuBar.htmlComp.getPreferredSize().width;
+  }
+
+  // needs a width to be able to calculate the pref height -> container width needs to be correct already
+  titlePrefHeight = scout.graphics.prefSize($text, true, {
+    widthHint: containerSize.width - nodeMenuBarWidth
+  }).height;
+
   if (detailMenuBar.visible) {
     detailMenuBarPrefSize = detailMenuBar.htmlComp.getPreferredSize();
   }
   if (this.outline.detailContent) {
-    formPrefSize = this.outline.detailContent.htmlComp.getPreferredSize();
+    // Table row detail may contain wrapped text as well, but since it uses the full width there is no need to give a width hint
+    detailContentPrefSize = this.outline.detailContent.htmlComp.getPreferredSize();
   }
 
-  prefSize = new scout.Dimension(Math.max(formPrefSize.width, detailMenuBarPrefSize.width), titleHeight + detailMenuBarPrefSize.height + formPrefSize.height);
+  prefSize = new scout.Dimension(Math.max(detailContentPrefSize.width, detailMenuBarPrefSize.width), titlePrefHeight + detailMenuBarPrefSize.height + detailContentPrefSize.height);
   prefSize = prefSize.add(htmlContainer.getInsets());
   return prefSize;
 };

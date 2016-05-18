@@ -16,3 +16,7 @@
 .table-row-detail-name {
   font-weight: bold;
 }
+
+.table-row-detail-value {
+  white-space: normal;
+}

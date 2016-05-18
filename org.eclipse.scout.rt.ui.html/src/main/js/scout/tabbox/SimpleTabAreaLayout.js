@@ -109,7 +109,9 @@ scout.SimpleTabAreaLayout.prototype.smallPrefSize = function() {
 
 scout.SimpleTabAreaLayout.prototype.preferredLayoutSize = function($container) {
   var numTabs = this.tabArea.getTabs().length;
-  return new scout.Dimension(numTabs *  scout.SimpleTabAreaLayout.TAB_WIDTH_LARGE, scout.graphics.prefSize(this.tabArea.htmlComp.$comp, true,true).height);
+  return new scout.Dimension(numTabs * scout.SimpleTabAreaLayout.TAB_WIDTH_LARGE, scout.graphics.prefSize(this.tabArea.htmlComp.$comp, true, {
+    useCssSize: true
+  }).height);
 };
 
 scout.SimpleTabAreaLayout.prototype._onMouseDownOverflow = function(event) {

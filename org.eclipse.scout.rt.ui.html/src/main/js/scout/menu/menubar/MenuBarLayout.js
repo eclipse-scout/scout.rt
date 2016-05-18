@@ -35,7 +35,7 @@ scout.MenuBarLayout.prototype.layout = function($container) {
   var rightWidth = this._menuBar.$right.width();
 
   // use availableWidth + 1 because of rounding problems in JQuery
-  if (leftWidth + rightWidth <= availableWidth+1) {
+  if (leftWidth + rightWidth <= availableWidth + 1) {
     // ok, no ellisis required
     this._menuBar.visibleMenuItems = this._menuBar.menuItems;
   } else {
@@ -140,7 +140,9 @@ scout.MenuBarLayout.prototype._destroyEllipsis = function() {
 
 scout.MenuBarLayout.prototype.preferredLayoutSize = function($container) {
   // Menubar has an absolute css height set -> useCssSize = true
-  return scout.graphics.prefSize($container, false, true);
+  return scout.graphics.prefSize($container, false, {
+    useCssSize: true
+  });
 };
 
 /* --- STATIC HELPERS ------------------------------------------------------------- */

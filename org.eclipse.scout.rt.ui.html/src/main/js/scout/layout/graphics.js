@@ -20,12 +20,18 @@ scout.graphics = {
    *
    * @memberOf scout.graphics
    */
-  prefSize: function($elem, includeMargin, useCssSize) {
+  prefSize: function($elem, includeMargin, options) {
     // Return 0/0 if element is not displayed (display: none).
     // We don't use isVisible by purpose because isVisible returns false for elements with visibility: hidden which is wrong here (we would like to be able to measure hidden elements)
     if ($elem.isDisplayNone()) {
       return new scout.Dimension(0, 0);
     }
+
+    var defaults = {
+      useCssSize: false,
+      resetWidth: true
+    };
+    options = $.extend({}, defaults, options);
 
     var oldStyle = $elem.attr('style');
     var oldScrollLeft = $elem.scrollLeft();
@@ -33,19 +39,18 @@ scout.graphics = {
 
     // UseCssSize is necessary if the css rules have a fix height or width set.
     // Otherwise setting the width/height to auto could result in a different size
-    var newWidth = (useCssSize ? '' : 'auto');
-    var newHeight = (useCssSize ? '' : 'auto');
+    var newWidth = (options.useCssSize ? '' : scout.nvl(options.widthHint, 'auto'));
+    var newHeight = (options.useCssSize ? '' : 'auto');
 
     // modify properties which prevent reading the preferred size
     $elem.css({
       'width': newWidth,
-      'height': newHeight,
-      'white-space': 'no-wrap'
+      'height': newHeight
     });
 
     var prefSize;
     // measure
-    if (useCssSize) {
+    if (options.useCssSize) {
       prefSize = scout.graphics.getSize($elem, includeMargin);
     } else {
       prefSize = scout.graphics.getScrollSizes($elem, includeMargin);

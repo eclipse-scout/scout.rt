@@ -30,5 +30,7 @@ scout.ViewButtonBoxLayout.prototype.layout = function($container) {
 
 scout.ViewButtonBoxLayout.prototype.preferredLayoutSize = function($container) {
   // View buttons have an absolute css height set -> useCssSize = true
-  return scout.graphics.prefSize($container, false, true);
+  return scout.graphics.prefSize($container, false, {
+    useCssSize: true
+  });
 };

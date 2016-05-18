@@ -241,7 +241,9 @@ scout.MenuBoxLayout.prototype.actualPrefSize = function(menus) {
 
   menus = menus || this.visibleMenus();
   menusWidth = this._menusWidth(menus);
-  prefSize = scout.graphics.prefSize(this.menuBox.$container, true, true);
+  prefSize = scout.graphics.prefSize(this.menuBox.$container, true, {
+    useCssSize: true
+  });
   prefSize.width = menusWidth + this.menuBox.htmlComp.getInsets().horizontal();
 
   return prefSize;

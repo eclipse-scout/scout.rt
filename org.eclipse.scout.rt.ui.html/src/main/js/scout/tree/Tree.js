@@ -283,6 +283,7 @@ scout.Tree.prototype._render = function($parent) {
     .on('mouseup', '.tree-node-control', this._onNodeControlMouseUp.bind(this))
     .on('dblclick', '.tree-node-control', this._onNodeControlDoubleClick.bind(this))
     .on('scroll', this._onDataScroll.bind(this));
+  new scout.HtmlComponent(this.$data, this.session);
 
   if (this._isHorizontalScrolling()) {
     this.$data.toggleClass('scrollable-tree', true);

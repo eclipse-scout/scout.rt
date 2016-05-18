@@ -27,6 +27,9 @@ scout.OutlineLayout.prototype.layout = function($container) {
       var pageHtmlComp = selectedNode.htmlComp;
       // pageHtmlComp is null if there is no detail form and no detail menubar
       if (pageHtmlComp) {
+        // Fix width so that prefSize returns the appropriate height (necessary for elements with text wrap)
+        pageHtmlComp.$comp.cssWidth(containerSize.width);
+
         var prefSize = pageHtmlComp.getPreferredSize();
         pageHtmlComp.setSize(new scout.Dimension(containerSize.width, prefSize.height));
         selectedNode.height = prefSize.height;
