@@ -1596,7 +1596,8 @@ scout.Tree.prototype._addChildrenToFlatList = function(parentNode, parentIndex, 
     } else if (node.initialized && node.isFilterAccepted(forceFilter) && isAlreadyAdded) {
       this.insertBatchInVisibleNodes(insertBatch, this.viewRangeRendered.from + this.viewRangeSize >= insertBatch.lastBatchInsertIndex() && this.viewRangeRendered.from <= insertBatch.lastBatchInsertIndex(), animatedRendering);
       this.checkAndHandleBatchAnimationWrapper(parentNode, animatedRendering, insertBatch);
-      insertBatch = this.setUpInsertBatch(insertBatch.lastBatchInsertIndex() + 1);
+      var updateIndex = insertBatch.insertedAny() ? 2 : 1;
+      insertBatch = this.setUpInsertBatch(insertBatch.lastBatchInsertIndex() + updateIndex);
       if (node.expanded) {
         insertBatch = this._addChildrenToFlatList(node, insertBatch.lastBatchInsertIndex(), animatedRendering, insertBatch, forceFilter);
       }
@@ -1624,6 +1625,9 @@ scout.Tree.prototype.setUpInsertBatch = function(insertIndex) {
         return this.insertNodes[0];
       }
       return this.insertNodes[0] + this.insertNodes.length - 3;
+    },
+    insertedAny: function(){
+      return this.insertNodes.length>2;
     }
   };
 };
