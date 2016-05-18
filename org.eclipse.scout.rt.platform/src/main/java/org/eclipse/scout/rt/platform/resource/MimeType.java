@@ -19,6 +19,7 @@ import java.util.Collection;
 public enum MimeType {
   //by file extension
   APPCACHE("text/cache-manifest", "appcache"),
+  BMP("image/bmp", "bmp"),
   CSS("text/css", "css"),
   CSV("text/csv", "csv"),
   DOCX("application/vnd.openxmlformats-officedocument.wordprocessingml.document", "docx"),
@@ -127,7 +128,7 @@ public enum MimeType {
    * Common image mime types.
    */
   public static MimeType[] getCommonImageTypesAsArray() {
-    return new MimeType[]{GIF, JPG, JPE, JPEG, PNG, SVG, TIF, TIFF};
+    return new MimeType[]{BMP, GIF, JPG, JPE, JPEG, PNG, SVG, TIF, TIFF};
   }
 
   public static boolean isOneOf(Collection<MimeType> mimeTypes, String input) {
