@@ -41,11 +41,6 @@ import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.IOUtility;
-import org.eclipse.scout.rt.shared.mail.CharsetSafeMimeMessage;
-import org.eclipse.scout.rt.shared.mail.MailAttachment;
-import org.eclipse.scout.rt.shared.mail.MailMessage;
-import org.eclipse.scout.rt.shared.mail.MailParticipant;
-import org.eclipse.scout.rt.shared.mail.MailUtility;
 import org.junit.Assert;
 import org.junit.Test;
 
