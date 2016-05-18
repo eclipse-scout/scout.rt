@@ -247,6 +247,7 @@ public class StatementProcessor implements IStatementProcessor {
    * org.eclipse.scout.rt.
    * server.services.common.sql.internal.exec.PreparedStatementCache)
    */
+  @SuppressWarnings("resource")
   @Override
   public Object[][] processSelect(Connection conn, IStatementCache cache, IStatementProcessorMonitor monitor) {
     PreparedStatement ps = null;
@@ -302,6 +303,7 @@ public class StatementProcessor implements IStatementProcessor {
    * #processSelectInto(java.sql.Connection,org.eclipse.scout.
    * rt.server.services.common.sql.internal.exec.PreparedStatementCache)
    */
+  @SuppressWarnings("resource")
   @Override
   public void processSelectInto(Connection conn, IStatementCache cache, IStatementProcessorMonitor monitor) {
     PreparedStatement ps = null;
@@ -347,6 +349,7 @@ public class StatementProcessor implements IStatementProcessor {
     }
   }
 
+  @SuppressWarnings("resource")
   @Override
   public void processSelectStreaming(Connection conn, IStatementCache cache, ISelectStreamHandler handler) {
     PreparedStatement ps = null;
@@ -411,6 +414,7 @@ public class StatementProcessor implements IStatementProcessor {
    * org.eclipse.scout
    * .rt.server.services.common.sql.internal.exec.PreparedStatementCache)
    */
+  @SuppressWarnings("resource")
   @Override
   public int processModification(Connection conn, IStatementCache cache, IStatementProcessorMonitor monitor) {
     PreparedStatement ps = null;
@@ -449,6 +453,7 @@ public class StatementProcessor implements IStatementProcessor {
    * org.eclipse.
    * scout.rt.server.services.common.sql.internal.exec.PreparedStatementCache)
    */
+  @SuppressWarnings("resource")
   @Override
   public boolean processStoredProcedure(Connection conn, IStatementCache cache, IStatementProcessorMonitor monitor) {
     CallableStatement cs = null;

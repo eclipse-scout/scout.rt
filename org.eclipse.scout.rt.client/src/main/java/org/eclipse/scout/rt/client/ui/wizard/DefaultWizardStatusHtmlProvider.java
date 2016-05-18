@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.ui.wizard;
 
 import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -44,8 +45,8 @@ public class DefaultWizardStatusHtmlProvider implements IWizardStatusHtmlProvide
 
   @Override
   public String initHtmlTemplate() {
-    try {
-      return new String(IOUtility.getContent(org.eclipse.scout.rt.client.ResourceBase.class.getResource("html/defaultWizardStatus.html").openStream()), "iso-8859-1");
+    try (InputStream in = org.eclipse.scout.rt.client.ResourceBase.class.getResource("html/defaultWizardStatus.html").openStream()) {
+      return IOUtility.readString(in, "iso-8859-1");
     }
     catch (Exception t) {
       throw new ProcessingException("Unexpected", t);

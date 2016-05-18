@@ -18,13 +18,19 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.RandomAccessFile;
+import java.io.Reader;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -66,6 +72,7 @@ public class IOUtilityTest {
     }
   }
 
+  @SuppressWarnings("resource")
   private File createTempFile(String name) {
     InputStream inputStream = getClass().getClassLoader().getResourceAsStream(PLATFORM_PATH + name);
     return IOUtility.createTempFile(inputStream, "temp", "zip");
@@ -226,10 +233,9 @@ public class IOUtilityTest {
   }
 
   @Test
-  public void testReadLinesUTF8() throws FileNotFoundException {
+  public void testReadLinesUTF8() throws IOException {
     File tempFile = null;
-    try {
-      InputStream inputStream = getClass().getClassLoader().getResourceAsStream("org/eclipse/scout/rt/platform/ioUtilityTestUtf8.txt");
+    try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("org/eclipse/scout/rt/platform/ioUtilityTestUtf8.txt")) {
       tempFile = IOUtility.createTempFile(inputStream, "temp", "zip");
 
       List<String> readLines = IOUtility.readLines(tempFile, StandardCharsets.UTF_8.name());
@@ -423,4 +429,119 @@ public class IOUtilityTest {
     return combined;
   }
 
+  @Test
+  public void testReadBytes1() {
+    byte[] expected = new byte[]{0, 1, 2, 3};
+    byte[] actual = IOUtility.readBytes(newInputStream(expected));
+    assertArrayEquals(expected, actual);
+  }
+
+  @Test
+  public void testReadBytes2() {
+    byte[] data = new byte[]{0, 1, 2, 3};
+    byte[] expected = Arrays.copyOfRange(data, 0, 3);
+    byte[] actual = IOUtility.readBytes(newInputStream(data), 3);
+    assertArrayEquals(expected, actual);
+  }
+
+  @Test
+  public void testReadStringFromStream1() throws Exception {
+    String expected = "0123äöü";
+    String actual = IOUtility.readString(newInputStream(expected.getBytes("UTF-8")), "UTF-8");
+    assertEquals(expected, actual);
+  }
+
+  @Test
+  public void testReadStringFromStream2() throws Exception {
+    String data = "0123äöü";
+    String expected = data.substring(0, 6);
+    String actual = IOUtility.readString(newInputStream(data.getBytes("UTF-8")), "UTF-8", 6);
+    assertEquals(expected, actual);
+  }
+
+  @Test
+  public void testReadString1() {
+    String expected = "0123";
+    String actual = IOUtility.readString(newReader(expected));
+    assertEquals(expected, actual);
+  }
+
+  @Test
+  public void testReadString2() {
+    String data = "0123";
+    String expected = data.substring(0, 3);
+    String actual = IOUtility.readString(newReader(data), 3);
+    assertEquals(expected, actual);
+  }
+
+  private InputStream newInputStream(byte[] bytes) {
+    return new ByteArrayInputStream(bytes);
+  }
+
+  private Reader newReader(String s) {
+    return new StringReader(s);
+  }
+
+  @Test
+  public void testWriteBytes() {
+    byte[] expected = new byte[]{0, 1, 2, 3};
+    ByteArrayOutputStream out = new ByteArrayOutputStream();
+    IOUtility.writeBytes(out, expected);
+    byte[] actual = out.toByteArray();
+    assertArrayEquals(expected, actual);
+  }
+
+  @Test
+  public void testWriteStringToStream() throws Exception {
+    String expected = "0123äöü";
+    ByteArrayOutputStream out = new ByteArrayOutputStream();
+    IOUtility.writeString(out, "UTF-8", expected);
+    String actual = new String(out.toByteArray(), "UTF-8");
+    assertEquals(expected, actual);
+  }
+
+  @Test
+  public void testWriteString() {
+    String expected = "0123";
+    StringWriter out = new StringWriter();
+    IOUtility.writeString(out, expected);
+    String actual = out.toString();
+    assertEquals(expected, actual);
+  }
+
+  @Test
+  public void testResourceTryNull() throws Exception {
+    try (InputStream res = (System.currentTimeMillis() == 0 ? new ByteArrayInputStream(new byte[15]) : null)) {
+      if (res != null) {
+        System.out.println("null resource: " + res);
+      }
+    }
+  }
+
+  @Test
+  public void testResourceTryError1() throws Exception {
+    try (InputStream res = new FileInputStream("foo/bar/test")) {
+      if (res != null) {
+        System.out.println("null resource: " + res);
+      }
+    }
+    catch (Exception ex) {
+      assertEquals(ex.getClass(), java.io.FileNotFoundException.class);
+      return;
+    }
+    fail("should not go here");
+  }
+
+  @Test
+  public void testResourceTryError2() throws Exception {
+    try (InputStream res = null) {
+      @SuppressWarnings({"resource", "unused"})
+      InputStream tmp = new FileInputStream("foo/bar/test");
+    }
+    catch (Exception ex) {
+      assertEquals(ex.getClass(), java.io.FileNotFoundException.class);
+      return;
+    }
+    fail("should not go here");
+  }
 }

@@ -298,6 +298,7 @@ public class RemoteFile implements Serializable {
     return new DecompressedInputStream(this);
   }
 
+  @SuppressWarnings("resource")
   public long/* crc */ writeData(File f) throws IOException {
     return writeData(new FileOutputStream(f));
   }
@@ -326,6 +327,13 @@ public class RemoteFile implements Serializable {
     return getCRC();
   }
 
+  /**
+   * Write data and close stream
+   *
+   * @param os
+   * @return
+   * @throws IOException
+   */
   public long/* crc */ writeData(OutputStream os) throws IOException {
     InputStream in = null;
     BufferedOutputStream out = null;
@@ -350,10 +358,25 @@ public class RemoteFile implements Serializable {
     return getCRC();
   }
 
+  /**
+   * Read data from file
+   *
+   * @param f
+   * @return
+   * @throws IOException
+   */
+  @SuppressWarnings("resource")
   public long/* crc */ readData(File f) throws IOException {
     return readData(new FileInputStream(f));
   }
 
+  /**
+   * Read data and close stream
+   *
+   * @param f
+   * @return
+   * @throws IOException
+   */
   public long/* crc */ readData(Reader r) throws IOException {
     Writer out = null;
     BufferedReader in = null;
@@ -379,10 +402,26 @@ public class RemoteFile implements Serializable {
     return getCRC();
   }
 
+  /**
+   * Read data and close stream
+   *
+   * @param is
+   * @return
+   * @throws IOException
+   */
   public long/* crc */ readData(InputStream is) throws IOException {
     return readData(is, 0, -1);
   }
 
+  /**
+   * Read data and close stream
+   *
+   * @param is
+   * @param startPosition
+   * @param maxReadSize
+   * @return
+   * @throws IOException
+   */
   public long/* crc */ readData(InputStream is, long startPosition, long maxReadSize) throws IOException {
     OutputStream out = null;
     BufferedInputStream in = null;

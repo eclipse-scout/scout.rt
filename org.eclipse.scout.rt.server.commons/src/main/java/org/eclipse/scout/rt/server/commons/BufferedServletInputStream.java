@@ -26,11 +26,11 @@ public class BufferedServletInputStream extends ServletInputStream {
   private volatile boolean m_finished;
 
   public BufferedServletInputStream(InputStream source, int len) throws IOException {
-    this(IOUtility.getContent(source, len)); // maybe read the data async?
+    this(IOUtility.readBytes(source, len)); // maybe read the data async?
   }
 
   public BufferedServletInputStream(InputStream source) throws IOException {
-    this(IOUtility.getContent(source, -1));
+    this(IOUtility.readBytes(source));
   }
 
   public BufferedServletInputStream(byte[] data) {

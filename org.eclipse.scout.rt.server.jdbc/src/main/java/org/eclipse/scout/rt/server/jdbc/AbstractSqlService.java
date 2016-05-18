@@ -617,6 +617,7 @@ public abstract class AbstractSqlService implements ISqlService, IServiceInvento
 
     SqlTransactionMember member = (SqlTransactionMember) tx.getMember(getTransactionMemberId());
     if (member == null) {
+      @SuppressWarnings("resource")
       Connection connection = leaseConnection();
       member = new SqlTransactionMember(getTransactionMemberId(), connection);
       tx.registerMember(member);

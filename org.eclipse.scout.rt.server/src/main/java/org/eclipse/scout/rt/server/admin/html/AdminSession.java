@@ -71,6 +71,7 @@ public class AdminSession implements Serializable {
     res.setHeader("Cache-Control", "no-cache");
     res.setHeader("pragma", "no-cache");
     // output
+    @SuppressWarnings("resource")
     ServletOutputStream out = res.getOutputStream();
     out.println("<html>");
     out.println("<head>");

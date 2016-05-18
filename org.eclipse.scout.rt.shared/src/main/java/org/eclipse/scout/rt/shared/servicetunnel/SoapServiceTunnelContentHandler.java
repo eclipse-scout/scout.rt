@@ -279,6 +279,7 @@ public class SoapServiceTunnelContentHandler extends AbstractServiceTunnelConten
     return (ServiceTunnelResponse) read(in);
   }
 
+  @SuppressWarnings("resource")
   protected Object/* msg */ read(InputStream in) throws Exception {
     if (LOG.isDebugEnabled()) {
       in = new DebugInputStream(in);

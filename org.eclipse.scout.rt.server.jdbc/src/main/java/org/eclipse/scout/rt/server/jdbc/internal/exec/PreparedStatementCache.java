@@ -43,6 +43,7 @@ public class PreparedStatementCache extends AbstractTransactionMember implements
     };
   }
 
+  @SuppressWarnings("resource")
   @Override
   public PreparedStatement getPreparedStatement(Connection conn, String s) throws SQLException {
     // a statement must be used at least 2 times within 2 minutes in order to be
@@ -79,6 +80,7 @@ public class PreparedStatementCache extends AbstractTransactionMember implements
     }
   }
 
+  @SuppressWarnings("resource")
   @Override
   public CallableStatement getCallableStatement(Connection conn, String s) throws SQLException {
     // a statement must be used at least 2 times within 2 minutes in order to be

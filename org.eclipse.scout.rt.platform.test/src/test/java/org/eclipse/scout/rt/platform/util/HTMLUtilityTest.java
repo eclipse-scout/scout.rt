@@ -15,15 +15,11 @@ import static org.junit.Assert.fail;
 
 import java.awt.Color;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 
 import javax.swing.text.html.HTMLDocument;
 
 import org.eclipse.scout.rt.platform.html.HTMLUtility;
 import org.eclipse.scout.rt.platform.html.HTMLUtility.DefaultFont;
-import org.eclipse.scout.rt.platform.util.ColorUtility;
-import org.eclipse.scout.rt.platform.util.IOUtility;
-import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -798,9 +794,8 @@ public class HTMLUtilityTest {
    * @return
    */
   private String readResourceAsText(String relativeFileName) {
-    InputStream in = ResourceBase.class.getResourceAsStream(relativeFileName);
-    try {
-      return new String(IOUtility.getContent(in), StandardCharsets.UTF_8.name());
+    try (InputStream in = ResourceBase.class.getResourceAsStream(relativeFileName)) {
+      return IOUtility.readStringUTF8(in);
     }
     catch (Exception e) {
       fail("could not read input file: " + ResourceBase.class.getPackage() + "/" + relativeFileName);

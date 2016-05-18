@@ -20,7 +20,6 @@ import java.io.InputStream;
 import java.io.Serializable;
 import java.net.URL;
 
-import org.eclipse.scout.rt.platform.util.CloneUtility;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -202,7 +201,6 @@ public class CloneUtilityTest {
     }
     System.out.println("reading class file: " + resource + "\n\n");
 
-    InputStream in = resource.openStream();
     StringBuilder sb = new StringBuilder();
     sb.append("private static final String CUSTOM_TYPE_CLASS_NAME = \"");
     sb.append(CUSTOM_TYPE_CLASS_NAME);
@@ -212,19 +210,21 @@ public class CloneUtilityTest {
 
     int size;
     byte[] buffer = new byte[512];
-    while ((size = in.read(buffer)) > -1) {
-      for (int i = 0; i < size; i++) {
-        int v = buffer[i] & 0xff;
-        if (counter > 0) {
-          sb.append(", ");
+    try (InputStream in = resource.openStream()) {
+      while ((size = in.read(buffer)) > -1) {
+        for (int i = 0; i < size; i++) {
+          int v = buffer[i] & 0xff;
+          if (counter > 0) {
+            sb.append(", ");
+          }
+          if (counter % 15 == 0) {
+            sb.append("\n    ");
+          }
+          sb.append("0x");
+          sb.append(HEX_ARRAY[v >>> 4]);
+          sb.append(HEX_ARRAY[v & 0x0F]);
+          counter++;
         }
-        if (counter % 15 == 0) {
-          sb.append("\n    ");
-        }
-        sb.append("0x");
-        sb.append(HEX_ARRAY[v >>> 4]);
-        sb.append(HEX_ARRAY[v & 0x0F]);
-        counter++;
       }
     }
     sb.append("};");

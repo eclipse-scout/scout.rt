@@ -172,15 +172,16 @@ public class MailUtility {
 
       if (plainTextPart instanceof MimePart) {
         MimePart mimePart = (MimePart) plainTextPart;
-        byte[] content = IOUtility.getContent(mimePart.getInputStream());
-        if (content != null) {
-          try {
-            text = new String(content, getCharacterEncodingOfMimePart(mimePart));
+        try (InputStream in = mimePart.getInputStream()) {
+          if (in != null) {
+            byte[] content = IOUtility.readBytes(in);
+            try {
+              text = new String(content, getCharacterEncodingOfMimePart(mimePart));
+            }
+            catch (UnsupportedEncodingException e) {
+              text = new String(content);
+            }
           }
-          catch (UnsupportedEncodingException e) {
-            text = new String(content);
-          }
-
         }
       }
     }
@@ -219,12 +220,12 @@ public class MailUtility {
   }
 
   public static DataSource createDataSource(File file) {
-    try {
+    try (InputStream in = new FileInputStream(file)) {
       int indexDot = file.getName().lastIndexOf('.');
       if (indexDot > 0) {
         String fileName = file.getName();
         String ext = fileName.substring(indexDot + 1);
-        return createDataSource(new FileInputStream(file), fileName, ext);
+        return createDataSource(in, fileName, ext);
       }
       else {
         return null;

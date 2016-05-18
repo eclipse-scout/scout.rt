@@ -50,22 +50,22 @@ public class ScoutClasspathResourceLoader extends ClasspathResourceLoader {
     throw new IOException("No such file " + resource);
   }
 
+  @SuppressWarnings("resource")
   private String load(String resourcePath, String charset) throws IOException {
     if (resourcePath != null) {
       InputStream is = openStream(resourcePath);
       if (is != null) {
-        String readStream = readStream(is, charset);
-        return readStream;
+        return readStream(is, charset);
       }
     }
     return null;
   }
 
   private boolean exists(String resourcePath) throws IOException {
-    InputStream stream = openStream(resourcePath);
-    if (stream != null) {
-      stream.close();
-      return true;
+    try (InputStream stream = openStream(resourcePath)) {
+      if (stream != null) {
+        return true;
+      }
     }
     return false;
   }

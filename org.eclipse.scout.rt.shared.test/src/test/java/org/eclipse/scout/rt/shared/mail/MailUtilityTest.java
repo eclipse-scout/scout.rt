@@ -19,6 +19,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -41,11 +42,6 @@ import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.IOUtility;
-import org.eclipse.scout.rt.shared.mail.CharsetSafeMimeMessage;
-import org.eclipse.scout.rt.shared.mail.MailAttachment;
-import org.eclipse.scout.rt.shared.mail.MailMessage;
-import org.eclipse.scout.rt.shared.mail.MailParticipant;
-import org.eclipse.scout.rt.shared.mail.MailUtility;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -82,8 +78,10 @@ public class MailUtilityTest {
     assertTrue(ds instanceof ByteArrayDataSource);
     ByteArrayDataSource bds = (ByteArrayDataSource) ds;
     assertEquals("application/octet-stream", bds.getContentType());
-    byte[] data = IOUtility.getContent(bds.getInputStream());
-    assertArrayEquals(sampleData, data);
+    try (InputStream in = bds.getInputStream()) {
+      byte[] data = IOUtility.readBytes(in);
+      assertArrayEquals(sampleData, data);
+    }
   }
 
   @Test
@@ -97,8 +95,10 @@ public class MailUtilityTest {
     assertTrue(ds instanceof ByteArrayDataSource);
     ByteArrayDataSource bds = (ByteArrayDataSource) ds;
     assertEquals("application/octet-stream", bds.getContentType());
-    byte[] data = IOUtility.getContent(bds.getInputStream());
-    assertArrayEquals(sampleData, data);
+    try (InputStream in = bds.getInputStream()) {
+      byte[] data = IOUtility.readBytes(in);
+      assertArrayEquals(sampleData, data);
+    }
 
     new MailMessage().withBodyPlainText("test").withAttachment(new MailAttachment(ds));
     MimeMessage message = MailUtility.createMimeMessage(new MailMessage().withBodyPlainText("test"));

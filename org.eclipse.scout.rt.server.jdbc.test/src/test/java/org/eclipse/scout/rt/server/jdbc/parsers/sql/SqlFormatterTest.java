@@ -13,6 +13,8 @@ package org.eclipse.scout.rt.server.jdbc.parsers.sql;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
+import java.io.InputStream;
+
 import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.junit.Test;
 
@@ -61,7 +63,10 @@ public class SqlFormatterTest {
   }
 
   protected void check(String resourceName) throws Exception {
-    String s = IOUtility.getContentUtf8(SqlFormatterTest.class.getResourceAsStream(resourceName));
+    String s;
+    try (InputStream in = SqlFormatterTest.class.getResourceAsStream(resourceName)) {
+      s = IOUtility.readStringUTF8(in);
+    }
     String w = SqlFormatter.wellform(s);
     int i = w.toLowerCase().indexOf("unparsed");
     if (i != -1) {

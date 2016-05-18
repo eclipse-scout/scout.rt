@@ -16,6 +16,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Paths;
 
@@ -50,9 +51,10 @@ public class FileUtilityTest {
     }
   }
 
-  private File createTempFile(String name) {
-    InputStream inputStream = getClass().getClassLoader().getResourceAsStream(PLATFORM_PATH + name);
-    return IOUtility.createTempFile(inputStream, "temp", "zip");
+  private File createTempFile(String name) throws IOException {
+    try (InputStream in = getClass().getClassLoader().getResourceAsStream(PLATFORM_PATH + name)) {
+      return IOUtility.createTempFile(in, "temp", "zip");
+    }
   }
 
   @Test

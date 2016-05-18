@@ -14,6 +14,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
+import java.io.IOException;
+import java.io.InputStream;
+
 import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.ui.html.ResourceBase;
 import org.json.JSONArray;
@@ -22,9 +25,11 @@ import org.junit.Test;
 
 public class DefaultValuesFilterTest {
 
-  protected JSONObject readJsonFile(String filename) {
-    String content = IOUtility.getContentUtf8(ResourceBase.class.getResourceAsStream(filename));
-    return new JSONObject(JsonUtility.stripCommentsFromJson(content));
+  protected JSONObject readJsonFile(String filename) throws IOException {
+    try (InputStream in = ResourceBase.class.getResourceAsStream(filename)) {
+      String content = IOUtility.readStringUTF8(in);
+      return new JSONObject(JsonUtility.stripCommentsFromJson(content));
+    }
   }
 
   @Test

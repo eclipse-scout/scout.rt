@@ -178,8 +178,10 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
         String[] parts = StringUtility.split(filename, "[/\\\\]");
         filename = parts[parts.length - 1];
       }
-      InputStream stream = item.openStream();
-      byte[] content = IOUtility.getContent(stream);
+      byte[] content;
+      try (InputStream in = item.openStream()) {
+        content = IOUtility.readBytes(in);
+      }
       String contentType = item.getContentType();
       BinaryResource res = BinaryResources.create()
           .withFilename(filename)

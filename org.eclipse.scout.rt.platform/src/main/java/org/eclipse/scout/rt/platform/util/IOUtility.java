@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.platform.util;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -26,6 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.StringWriter;
@@ -43,6 +43,7 @@ import java.util.List;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
+import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,9 +54,39 @@ public final class IOUtility {
   private IOUtility() {
   }
 
+  public static byte[] getContent(String filename) {
+    return getContent(toFile(filename));
+  }
+
+  public static byte[] getContent(File file) {
+    try (FileInputStream in = new FileInputStream(file)) {
+      return readBytes(in);
+    }
+    catch (IOException e) {
+      throw new ProcessingException("filename: " + file.getAbsolutePath(), e);
+    }
+  }
+
   /**
-   * retrieve content as raw bytes
+   * Reads the content of a file in the specified encoding (charset-name) e.g. "UTF-8"
+   * <p>
+   * If no encoding is provided, the system default encoding is used
    */
+  public static String getContentInEncoding(String filepath, String encoding) {
+    try (FileInputStream in = new FileInputStream(filepath)) {
+      return readString(in, encoding);
+    }
+    catch (IOException e) {
+      throw new ProcessingException(e.getMessage(), e);
+    }
+  }
+
+  /**
+   * retrieve content as raw bytes and close the stream
+   *
+   * @deprecated use {@link #readBytes(InputStream)} within a resource-try statement
+   */
+  @Deprecated
   public static byte[] getContent(InputStream stream) {
     return getContent(stream, true);
   }
@@ -70,13 +101,15 @@ public final class IOUtility {
    * @param charsetName
    *          The name of the {@link Charset}.
    * @return A {@link String} containing the content of the given {@link InputStream}.
+   * @deprecated use {@link #readString(InputStream, String)} within a resource-try statement
    */
+  @Deprecated
   public static String getContent(InputStream stream, String charsetName) {
-    try {
-      return new String(IOUtility.getContent(stream), charsetName);
+    try (InputStream in = stream) {
+      return readString(in, charsetName);
     }
-    catch (UnsupportedEncodingException e) {
-      throw new ProcessingException("Unsupported encoding: '" + charsetName + "'.", e);
+    catch (IOException e) {
+      throw new ProcessingException("input: " + stream, e);
     }
   }
 
@@ -87,27 +120,231 @@ public final class IOUtility {
    * @param stream
    *          The {@link InputStream} to read from.
    * @return The content of the given {@link InputStream}.
+   * @deprecated use {@link #readStringUTF8(InputStream)} within a resource-try statement
    */
+  @Deprecated
   public static String getContentUtf8(InputStream stream) {
-    return getContent(stream, StandardCharsets.UTF_8.name());
+    try (InputStream in = stream) {
+      return readStringUTF8(in);
+    }
+    catch (IOException e) {
+      throw new ProcessingException("input: " + stream, e);
+    }
   }
 
-  public static byte[] getContent(InputStream in, int len) throws IOException {
-    if (len >= 0) {
-      byte[] buf = new byte[len];
-      int count = 0;
-      while (count < len) {
-        count += in.read(buf, count, len - count);
+  /**
+   * @deprecated use {@link #readBytes(InputStream, int)} within a resource-try statement
+   */
+  @Deprecated
+  public static byte[] getContent(InputStream stream, int len) throws IOException {
+    try (InputStream in = stream) {
+      return readBytes(in, len);
+    }
+    catch (IOException e) {
+      throw new ProcessingException("input: " + stream, e);
+    }
+  }
+
+  /**
+   * @deprecated use {@link #readBytes(InputStream)} within a resource-try statement
+   */
+  @Deprecated
+  public static byte[] getContent(InputStream stream, boolean autoClose) {
+    if (autoClose) {
+      try (InputStream in = stream) {
+        return readBytes(in);
       }
-      return buf;
+      catch (IOException e) {
+        throw new ProcessingException("input: " + stream, e);
+      }
     }
     else {
-      ByteArrayOutputStream out = new ByteArrayOutputStream();
-      int b;
-      while ((b = in.read()) >= 0) {
-        out.write(b);
+      return readBytes(stream);
+    }
+  }
+
+  /**
+   * retrieve content as string (correct character conversion)
+   *
+   * @deprecated use {@link #readString(Reader)} within a resource-try statement
+   */
+  @Deprecated
+  public static String getContent(Reader stream) {
+    return getContent(stream, true);
+  }
+
+  /**
+   * @deprecated use {@link #readString(Reader)} within a resource-try statement
+   */
+  @Deprecated
+  public static String getContent(Reader stream, boolean autoClose) {
+    if (stream == null) {
+      return "";
+    }
+    if (autoClose) {
+      try (Reader in = stream) {
+        return readString(in);
       }
-      return out.toByteArray();
+      catch (IOException e) {
+        throw new ProcessingException("input: " + stream, e);
+      }
+    }
+    else {
+      return readString(stream);
+    }
+  }
+
+  /**
+   * Reads bytes.
+   * <p>
+   * Stream is <em>not</em> closed. Use resource-try on streams created by caller.
+   *
+   * @param in
+   * @return the content bytes
+   */
+  public static byte[] readBytes(InputStream in) {
+    return readBytes(in, -1);
+  }
+
+  /**
+   * Reads bytes.
+   * <p>
+   * Stream is <em>not</em> closed. Use resource-try on streams created by caller.
+   *
+   * @param in
+   * @param len
+   *          optional known length or -1 if unknown
+   * @return the content bytes
+   */
+  public static byte[] readBytes(InputStream in, int len) {
+    if (len >= 0) {
+      try {
+        byte[] buf = new byte[len];
+        int count = 0;
+        while (count < len) {
+          count += in.read(buf, count, len - count);
+        }
+        return buf;
+      }
+      catch (IOException e) {
+        throw new ProcessingException("input: " + in, e);
+      }
+    }
+    else {
+      try (ByteArrayOutputStream buffer = new ByteArrayOutputStream()) {
+        byte[] b = new byte[10240];
+        int k;
+        while ((k = in.read(b)) > 0) {
+          buffer.write(b, 0, k);
+        }
+        return buffer.toByteArray();
+      }
+      catch (IOException e) {
+        throw new ProcessingException("input: " + in, e);
+      }
+    }
+  }
+
+  /**
+   * Reads string.
+   * <p>
+   * Stream is <em>not</em> closed. Use resource-try on streams created by caller.
+   *
+   * @param in
+   * @param charset
+   *          optional charset, if null is provided, the system default encoding is used
+   * @return the content string
+   */
+  public static String readString(InputStream in, String charset) {
+    return readString(in, charset, -1);
+  }
+
+  /**
+   * Reads string from UTF-8 encoded stream.
+   * <p>
+   * Stream is <em>not</em> closed. Use resource-try on streams created by caller.
+   *
+   * @param in
+   * @return the content string
+   */
+  public static String readStringUTF8(InputStream in) {
+    return readString(in, StandardCharsets.UTF_8.name(), -1);
+  }
+
+  /**
+   * Reads string.
+   * <p>
+   * Stream is <em>not</em> closed. Use resource-try on streams created by caller.
+   *
+   * @param in
+   * @param charset
+   *          optional charset, if null is provided, the system default encoding is used
+   * @param len
+   *          optional known length in bytes or -1 if unknown
+   * @return the content string
+   */
+  public static String readString(InputStream in, String charset, int len) {
+    if (StringUtility.hasText(charset)) {
+      try {
+        return readString(new InputStreamReader(in, charset), len);
+      }
+      catch (UnsupportedEncodingException e) {
+        throw new PlatformException("charset {}", charset, e);
+      }
+    }
+    else {
+      return readString(new InputStreamReader(in), len);
+    }
+  }
+
+  /**
+   * Reads string.
+   * <p>
+   * Stream is <em>not</em> closed. Use resource-try on streams created by caller.
+   *
+   * @param in
+   * @return the content string
+   */
+  public static String readString(Reader in) {
+    return readString(in, -1);
+  }
+
+  /**
+   * Reads string.
+   * <p>
+   * Stream is <em>not</em> closed. Use resource-try on streams created by caller.
+   *
+   * @param in
+   * @param len
+   *          optional known length in bytes or -1 if unknown
+   * @return the content string
+   */
+  public static String readString(Reader in, int len) {
+    if (len >= 0) {
+      try {
+        char[] buf = new char[len];
+        int count = 0;
+        while (count < len) {
+          count += in.read(buf, count, len - count);
+        }
+        return new String(buf);
+      }
+      catch (IOException e) {
+        throw new ProcessingException("input: " + in, e);
+      }
+    }
+    else {
+      try (StringWriter buffer = new StringWriter()) {
+        char[] b = new char[10240];
+        int k;
+        while ((k = in.read(b)) > 0) {
+          buffer.write(b, 0, k);
+        }
+        return buffer.toString();
+      }
+      catch (IOException e) {
+        throw new ProcessingException("input: " + in, e);
+      }
     }
   }
 
@@ -145,116 +382,23 @@ public final class IOUtility {
     }
   }
 
-  public static byte[] getContent(InputStream stream, boolean autoClose) {
-    BufferedInputStream in = null;
-    try {
-      in = new BufferedInputStream(stream);
-      ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-      byte[] b = new byte[10240];
-      int len;
-      while ((len = in.read(b)) > 0) {
-        buffer.write(b, 0, len);
-      }
-      buffer.close();
-      byte[] data = buffer.toByteArray();
-      return data;
-    }
-    catch (IOException e) {
-      throw new ProcessingException("input: " + stream, e);
-    }
-    finally {
-      try {
-        if (autoClose && in != null) {
-          in.close();
-        }
-      }
-      catch (IOException e) {
-        throw new ProcessingException("input: " + stream, e);
-      }
-    }
-  }
-
-  public static byte[] getContent(File file) {
-    try {
-      return getContent(new FileInputStream(file), true);
-    }
-    catch (FileNotFoundException e) {
-      throw new ProcessingException("filename: " + file.getAbsolutePath(), e);
-    }
-  }
-
-  public static byte[] getContent(String filename) {
-    return getContent(toFile(filename));
-  }
-
-  /**
-   * Reads the content of a file in the specified encoding (charset-name) e.g. "UTF-8" If no encoding is provided, the
-   * system default encoding is used
-   */
-  public static String getContentInEncoding(String filepath, String encoding) {
-    try {
-      FileInputStream in = null;
-      String content = null;
-      try {
-        in = new FileInputStream(filepath);
-        if (StringUtility.hasText(encoding)) {
-          content = getContent(new InputStreamReader(in, encoding));
-        }
-        else {
-          content = getContent(new InputStreamReader(in));
-        }
-      }
-      finally {
-        if (in != null) {
-          in.close();
-        }
-      }
-      return content;
-    }
-    catch (IOException e) {
-      throw new ProcessingException(e.getMessage(), e);
-    }
-  }
-
-  /**
-   * write content as raw bytes
-   */
-  public static void writeContent(OutputStream stream, byte[] data) {
-    writeContent(stream, data, true);
-  }
-
-  public static void writeContent(OutputStream stream, byte[] data, boolean autoClose) {
-    BufferedOutputStream out = null;
-    try {
-      out = new BufferedOutputStream(stream);
-      out.write(data);
-    }
-    catch (IOException e) {
-      throw new ProcessingException("output: " + stream, e);
-    }
-    finally {
-      try {
-        if (autoClose && out != null) {
-          out.close();
-        }
-      }
-      catch (IOException e) {
-        throw new ProcessingException("output: " + stream, e);
-      }
-    }
-  }
-
   public static void writeContent(String filename, Object o) {
     File f = toFile(filename);
     try {
       if (o instanceof byte[]) {
-        writeContent(new FileOutputStream(f), (byte[]) o);
+        try (FileOutputStream out = new FileOutputStream(f)) {
+          writeBytes(out, (byte[]) o);
+        }
       }
       else if (o instanceof char[]) {
-        writeContent(new FileWriter(f), new String((char[]) o));
+        try (FileWriter out = new FileWriter(f)) {
+          writeString(out, new String((char[]) o));
+        }
       }
       else if (o != null) {
-        writeContent(new FileWriter(f), o.toString());
+        try (FileWriter out = new FileWriter(f)) {
+          writeString(out, o.toString());
+        }
       }
     }
     catch (FileNotFoundException n) {
@@ -265,63 +409,123 @@ public final class IOUtility {
     }
   }
 
-  public static void writeContent(Writer stream, String text) {
-    writeContent(stream, text, true);
+  /**
+   * write content as raw bytes
+   *
+   * @deprecated use {@link #writeBytes(OutputStream, byte[])} within a resource-try statement
+   */
+  @Deprecated
+  public static void writeContent(OutputStream stream, byte[] data) {
+    writeContent(stream, data, true);
   }
 
-  public static void writeContent(Writer stream, String text, boolean autoClose) {
-    try {
-      stream.write(text);
-    }
-    catch (IOException e) {
-      throw new ProcessingException("output: " + stream, e);
-    }
-    finally {
-      try {
-        if (autoClose && stream != null) {
-          stream.close();
-        }
+  /**
+   * @deprecated use {@link #writeBytes(OutputStream, byte[])} within a resource-try statement
+   */
+  @Deprecated
+  public static void writeContent(OutputStream stream, byte[] data, boolean autoClose) {
+    if (autoClose) {
+      try (OutputStream out = stream) {
+        writeBytes(out, data);
       }
       catch (IOException e) {
         throw new ProcessingException("output: " + stream, e);
       }
-
+    }
+    else {
+      writeBytes(stream, data);
     }
   }
 
   /**
-   * retrieve content as string (correct character conversion)
+   * @deprecated use {@link #writeString(Writer, String)} within a resource-try statement
    */
-  public static String getContent(Reader stream) {
-    return getContent(stream, true);
+  @Deprecated
+  public static void writeContent(Writer stream, String text) {
+    writeContent(stream, text, true);
   }
 
-  public static String getContent(Reader stream, boolean autoClose) {
-    BufferedReader in = null;
-    try {
-      in = new BufferedReader(stream);
-      StringWriter buffer = new StringWriter();
-      char[] b = new char[10240];
-      int len;
-      while ((len = in.read(b)) > 0) {
-        buffer.write(b, 0, len);
-      }
-      buffer.close();
-      return buffer.toString();
-    }
-    catch (IOException e) {
-      throw new ProcessingException("input: " + stream, e);
-    }
-
-    finally {
-      try {
-        if (autoClose && in != null) {
-          in.close();
-        }
+  /**
+   * @deprecated use {@link #writeString(Writer, String)} within a resource-try statement
+   */
+  @Deprecated
+  public static void writeContent(Writer stream, String text, boolean autoClose) {
+    if (autoClose) {
+      try (Writer out = stream) {
+        writeString(out, text);
       }
       catch (IOException e) {
-        throw new ProcessingException("input: " + stream, e);
+        throw new ProcessingException("output: " + stream, e);
       }
+    }
+    else {
+      writeString(stream, text);
+    }
+  }
+
+  /**
+   * Write string.
+   * <p>
+   * Stream is <em>not</em> closed. Use resource-try on streams created by caller.
+   *
+   * @param out
+   * @param s
+   */
+  public static void writeBytes(OutputStream out, byte[] bytes) {
+    try {
+      out.write(bytes);
+    }
+    catch (IOException e) {
+      throw new ProcessingException("output: " + out, e);
+    }
+  }
+
+  /**
+   * Write string in UTF8 encoding.
+   * <p>
+   * Stream is <em>not</em> closed. Use resource-try on streams created by caller.
+   *
+   * @param out
+   * @param s
+   */
+  public static void writeStringUTF8(OutputStream out, String s) {
+    writeString(out, StandardCharsets.UTF_8.name(), s);
+  }
+
+  /**
+   * Write string.
+   * <p>
+   * Stream is <em>not</em> closed. Use resource-try on streams created by caller.
+   *
+   * @param out
+   * @param charset
+   * @param s
+   */
+  public static void writeString(OutputStream out, String charset, String s) {
+    try {
+      OutputStreamWriter w = new OutputStreamWriter(out, charset);
+      w.write(s);
+      w.flush();
+    }
+    catch (IOException e) {
+      throw new ProcessingException("output: " + out, e);
+    }
+  }
+
+  /**
+   * Write string.
+   * <p>
+   * Stream is <em>not</em> closed. Use resource-try on streams created by caller.
+   *
+   * @param out
+   * @param s
+   */
+  public static void writeString(Writer out, String s) {
+    try {
+      out.write(s);
+    }
+    catch (IOException e) {
+      throw new ProcessingException("output: " + out, e);
     }
   }
 
@@ -396,7 +600,9 @@ public final class IOUtility {
       }
       f2.deleteOnExit();
       if (content != null) {
-        writeContent(new FileOutputStream(f2), content);
+        try (OutputStream out = new FileOutputStream(f2)) {
+          writeBytes(out, content);
+        }
       }
       else {
         f2.createNewFile();
@@ -410,6 +616,8 @@ public final class IOUtility {
 
   /**
    * Creates a temp file from an input stream.
+   * <p>
+   * Content stream is closed automatically.
    *
    * @param content
    * @param filename
@@ -418,27 +626,16 @@ public final class IOUtility {
    * @throws ProcessingException
    */
   public static File createTempFile(InputStream content, String filename, String extension) throws ProcessingException {
-    File temp = null;
-    FileOutputStream fo = null;
     try {
-      temp = File.createTempFile(filename, extension);
-      fo = new FileOutputStream(temp);
-      IOUtility.writeContent(fo, IOUtility.getContent(content));
+      File temp = File.createTempFile(filename, extension);
+      try (InputStream in = content; FileOutputStream out = new FileOutputStream(temp)) {
+        writeBytes(out, readBytes(in));
+      }
+      return temp;
     }
     catch (IOException e) {
       throw new ProcessingException("Error creating temp file", e);
     }
-    finally {
-      if (fo != null) {
-        try {
-          fo.close();
-        }
-        catch (IOException e) {
-          // nop
-        }
-      }
-    }
-    return temp;
   }
 
   /**
@@ -459,7 +656,9 @@ public final class IOUtility {
       f = File.createTempFile(prefix, suffix);
       f.deleteOnExit();
       if (content != null) {
-        writeContent(new FileOutputStream(f), content);
+        try (OutputStream out = new FileOutputStream(f)) {
+          writeBytes(out, content);
+        }
       }
       return f;
     }

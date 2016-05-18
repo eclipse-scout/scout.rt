@@ -66,6 +66,7 @@ public final class SQL {
   public static String getDriverName() {
     String driverName = null;
     try {
+      @SuppressWarnings("resource")
       Connection conn = getConnection();
       driverName = conn.getMetaData().getDriverName();
     }

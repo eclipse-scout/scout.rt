@@ -69,6 +69,7 @@ public class DiagnosticSession {
     String diagnosticXML = getDiagnosticItemsXML(result);
 
     resp.setContentType("text/xml");
+    @SuppressWarnings("resource")
     ServletOutputStream out = resp.getOutputStream();
     out.println("<?xml version='1.0' encoding='UTF-8' ?>");
     out.println("<diagnosticsStatus>");
@@ -107,6 +108,7 @@ public class DiagnosticSession {
     String version = CONFIG.getPropertyValue(ApplicationVersionProperty.class);
 
     resp.setContentType("text/html");
+    @SuppressWarnings("resource")
     ServletOutputStream out = resp.getOutputStream();
     out.println("<html>");
     out.println("<head>");

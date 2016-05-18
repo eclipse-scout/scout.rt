@@ -69,11 +69,10 @@ public class CsvHelperTest {
     };
     export(data);
 
-    Reader reader = new FileReader(m_testFile);
     IDataConsumer dataConsumer = mock(IDataConsumer.class);
     ProcessingException pe = new ProcessingException();
     doThrow(pe).when(dataConsumer).processRow(eq(2), anyListOf(Object.class)); //Throw an exception in the 2nd line
-    try {
+    try (Reader reader = new FileReader(m_testFile)) {
       m_csvHelper.importData(dataConsumer, reader, true, true, 1);
       fail("No exception was thrown! Expected ProcessingException");
     }
@@ -95,8 +94,7 @@ public class CsvHelperTest {
     };
     export(data);
 
-    Reader reader = new FileReader(m_testFile);
-    try {
+    try (Reader reader = new FileReader(m_testFile)) {
       m_csvHelper.importData(reader, 1, Arrays.asList(new String[]{"string", "string", "float", "string", "string"}), 4);
       fail("No exception was thrown! Expected ProcessingException");
     }
@@ -119,9 +117,10 @@ public class CsvHelperTest {
 
     export(data);
 
-    Reader reader = new FileReader(m_testFile);
-    Object[][] result = m_csvHelper.importData(reader, 1, Arrays.asList(new String[]{"string", "string", "string", "string", "string"}), 4);
-    assertArrayEquals(data, result);
+    try (Reader in = new FileReader(m_testFile)) {
+      Object[][] result = m_csvHelper.importData(in, 1, Arrays.asList(new String[]{"string", "string", "string", "string", "string"}), 4);
+      assertArrayEquals(data, result);
+    }
   }
 
   @Test
@@ -135,8 +134,10 @@ public class CsvHelperTest {
 
     export(data);
 
-    String content = IOUtility.getContent(new FileReader(m_testFile));
-    String[] lines = content.split("\n");
+    String[] lines;
+    try (Reader in = new FileReader(m_testFile)) {
+      lines = IOUtility.readString(in).split("\n");
+    }
 
     assertEquals(lines.length, 5);
 

@@ -34,6 +34,7 @@ import org.mockito.Mockito;
  * @since 3.9.0
  * @author awe, msc, kle
  */
+@SuppressWarnings("resource")
 public class AbstractSqlStyleTest {
 
   /**

@@ -39,7 +39,7 @@ public class GzipServletRequestWrapper extends HttpServletRequestWrapper {
 
   protected BufferedServletInputStream ensureBufferedStream() throws IOException {
     if (m_buf == null) {
-      byte[] gzipped = IOUtility.getContent(super.getInputStream(), super.getContentLength());
+      byte[] gzipped = IOUtility.readBytes(super.getInputStream(), super.getContentLength());
       m_compressedLength = gzipped.length;
       m_buf = new BufferedServletInputStream(IOUtility.uncompressGzip(gzipped));
       m_uncompressedLength = m_buf.getLength();

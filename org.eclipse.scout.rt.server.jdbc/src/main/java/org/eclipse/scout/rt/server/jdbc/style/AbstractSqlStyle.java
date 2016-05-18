@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.server.jdbc.style;
 
 import java.io.ByteArrayInputStream;
-import java.io.Reader;
 import java.io.StringReader;
 import java.lang.reflect.Array;
 import java.math.BigDecimal;
@@ -481,17 +480,11 @@ public abstract class AbstractSqlStyle implements ISqlStyle {
             int len = (int) c.length();
             if (len > 0) {
               // fast read
-              char[] ch = new char[len];
-              Reader r = c.getCharacterStream();
-              int processed = 0;
-              while (processed < len) {
-                processed += r.read(ch, processed, len - processed);
-              }
-              o = new String(ch);
+              o = IOUtility.readString(c.getCharacterStream(), len);
             }
             else {
               // dynamic read
-              o = IOUtility.getContent(c.getCharacterStream());
+              o = IOUtility.readString(c.getCharacterStream());
             }
           }
           catch (SQLException e) {

@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.shared.mail;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 
 import javax.activation.DataSource;
@@ -59,8 +60,8 @@ public class MailAttachment {
 
   public byte[] getContent() {
     if (m_content == null) {
-      try {
-        m_content = IOUtility.getContent(m_dataSource.getInputStream());
+      try (InputStream in = m_dataSource.getInputStream()) {
+        m_content = IOUtility.readBytes(in);
       }
       catch (IOException e) {
         throw new ProcessingException("Failed to get content", e);

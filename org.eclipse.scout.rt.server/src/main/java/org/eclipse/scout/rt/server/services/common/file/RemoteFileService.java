@@ -16,6 +16,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -106,8 +107,8 @@ public class RemoteFileService implements IRemoteFileService {
         // no content change, keep null
       }
       else {
-        try {
-          result.readData(new FileInputStream(file), startPosition, maxBlockSize);
+        try (InputStream in = new FileInputStream(file)) {
+          result.readData(in, startPosition, maxBlockSize);
         }
         catch (IOException e) {
           throw new ProcessingException("error reading file: " + file.getAbsolutePath(), e);
@@ -211,9 +212,9 @@ public class RemoteFileService implements IRemoteFileService {
   @RemoteServiceAccessDenied
   public void putRemoteFile(RemoteFile spec) {
     File file = getFileInternal(spec);
-    try {
+    try (FileOutputStream out = new FileOutputStream(file)) {
       file.getParentFile().mkdirs();
-      spec.writeData(new FileOutputStream(file));
+      spec.writeData(out);
       file.setLastModified(file.lastModified());
     }
     catch (Exception e) {

@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.ui.form.fields.htmlfield;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.Reader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collection;
@@ -115,8 +116,8 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
 
   public void setValueFromURL(URL url, String encoding) {
     if (url != null) {
-      try {
-        setValue(IOUtility.getContent(new InputStreamReader(url.openStream(), encoding)));
+      try (Reader in = new InputStreamReader(url.openStream(), encoding)) {
+        setValue(IOUtility.readString(in));
       }
       catch (IOException e) {
         throw new ProcessingException("URL " + url, e);

@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.ui.html.csp;
 
 import java.io.IOException;
+import java.io.Reader;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -48,7 +49,10 @@ public class ContentSecurityPolicyReportHandler extends AbstractUiServletRequest
     if (!CompareUtility.equals(HANDLER_PATH, req.getPathInfo())) {
       return false;
     }
-    final String jsonData = IOUtility.getContent(req.getReader());
+    final String jsonData;
+    try (Reader in = req.getReader()) {
+      jsonData = IOUtility.readString(in);
+    }
     LOG.warn("CSP-REPORT: {}", jsonData);
     return true;
   }

@@ -14,6 +14,8 @@ import java.awt.Color;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.MalformedURLException;
@@ -506,7 +508,9 @@ public final class HTMLUtility {
               // this file is not yet in cache and needs to be copied to cache
               File cacheFile = new File(cacheDir, f.getName());
               if (cacheFile.exists() && cacheFile.length() != f.length()) {
-                IOUtility.writeContent(new FileOutputStream(cacheFile), IOUtility.getContent(new FileInputStream(f)));
+                try (InputStream in = new FileInputStream(f); OutputStream out = new FileOutputStream(cacheFile)) {
+                  IOUtility.writeBytes(out, IOUtility.readBytes(in));
+                }
               }
               // change attribute value
               if (atts instanceof MutableAttributeSet) {

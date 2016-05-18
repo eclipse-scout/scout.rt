@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.services.common.icon;
 
+import java.io.InputStream;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -108,9 +109,9 @@ public abstract class AbstractIconProviderService implements IIconProviderServic
         String iconName = iconNames[i];
         URL url = findResource(relativePath);
         if (url != null) {
-          try {
+          try (InputStream in = url.openStream()) {
             IconSpec iconSpec = new IconSpec();
-            byte[] content = IOUtility.getContent(url.openStream(), true);
+            byte[] content = IOUtility.readBytes(in);
             if (content != null) {
               iconSpec.setContent(content);
             }

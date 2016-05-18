@@ -87,7 +87,9 @@ public class FileService implements IFileService {
           f = getFileLocation(spec.getDirectory(), spec.getName(), false);
         }
         if (spec.exists() && spec.hasContent()) {
-          spec.writeData(new FileOutputStream(f));
+          try (OutputStream out = new FileOutputStream(f)) {
+            spec.writeData(out);
+          }
           f.setLastModified(spec.getLastModified());
         }
         else if (!spec.exists()) {
@@ -169,7 +171,9 @@ public class FileService implements IFileService {
             int counter = 0;
             long fileDate = spec.getLastModified();
             File part = getFileLocation(fileDirectory, spec.getName() + "." + counter, false);
-            spec.writeData(new FileOutputStream(part));
+            try (OutputStream out = new FileOutputStream(part)) {
+              spec.writeData(out);
+            }
             part.setLastModified(fileDate);
             RemoteFile specPart = spec;
             while (specPart.hasMoreParts()) {
@@ -177,7 +181,9 @@ public class FileService implements IFileService {
               part = getFileLocation(fileDirectory, spec.getName() + "." + counter, false);
               if (!part.exists() || fileDate != part.lastModified()) {
                 specPart = svc.getRemoteFilePart(spec, counter);
-                specPart.writeData(new FileOutputStream(part));
+                try (OutputStream out = new FileOutputStream(part)) {
+                  specPart.writeData(out);
+                }
                 part.setLastModified(fileDate);
               }
               else {
@@ -207,7 +213,9 @@ public class FileService implements IFileService {
           }
           else {
             // normal files
-            spec.writeData(new FileOutputStream(f));
+            try (OutputStream out = new FileOutputStream(f)) {
+              spec.writeData(out);
+            }
             f.setLastModified(spec.getLastModified());
           }
         }

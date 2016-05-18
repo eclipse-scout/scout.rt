@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json;
 
+import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
@@ -123,7 +124,10 @@ public class DefaultValuesFilterService implements IDefaultValuesFilterService {
         if (lastModified > newestModified) {
           newestModified = lastModified;
         }
-        String jsonData = IOUtility.getContentUtf8(conn.getInputStream());
+        String jsonData;
+        try (InputStream in = conn.getInputStream()) {
+          jsonData = IOUtility.readStringUTF8(in);
+        }
         jsonData = JsonUtility.stripCommentsFromJson(jsonData);
         JSONObject json = new JSONObject(jsonData);
         defaultValuesConfigurations.add(json);

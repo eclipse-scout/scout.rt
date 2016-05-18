@@ -13,8 +13,9 @@ package org.eclipse.scout.rt.shared.data.model;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 
+import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
+import java.net.URL;
 import java.util.HashSet;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -60,13 +61,13 @@ public class DataModelUtilityTest {
     String s;
     //
     s = visit(dataModel, v, 2);
-    assertEquals(readTextFile(ResourceBase.class.getResourceAsStream("data/model/level2-new.txt")), s.trim());
+    assertEquals(readTextFile(ResourceBase.class.getResource("data/model/level2-new.txt")), s.trim());
     //
     s = visit(dataModel, v, 3);
-    assertEquals(readTextFile(ResourceBase.class.getResourceAsStream("data/model/level3-new.txt")), s.trim());
+    assertEquals(readTextFile(ResourceBase.class.getResource("data/model/level3-new.txt")), s.trim());
     //
     s = visit(dataModel, v, 4);
-    assertEquals(readTextFile(ResourceBase.class.getResourceAsStream("data/model/level4-new.txt")), s.trim());
+    assertEquals(readTextFile(ResourceBase.class.getResource("data/model/level4-new.txt")), s.trim());
   }
 
   @Test
@@ -112,8 +113,10 @@ public class DataModelUtilityTest {
     assertEquals(3545, externaIdSet.size());
   }
 
-  private String readTextFile(InputStream in) throws UnsupportedEncodingException {
-    return IOUtility.getContentUtf8(in).replaceAll("[\\n\\r]+", "\n").trim();
+  private String readTextFile(URL url) throws IOException {
+    try (InputStream in = url.openStream()) {
+      return IOUtility.readStringUTF8(in).replaceAll("[\\n\\r]+", "\n").trim();
+    }
   }
 
   private String visit(IDataModel m, IDataModelVisitor v, int maxLevel) {

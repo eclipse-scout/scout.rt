@@ -114,9 +114,8 @@ public class ResourceServlet extends HttpServlet {
       return true;
     }
 
-    InputStream is = null;
-    try {
-      is = connection.getInputStream();
+    try (InputStream is = connection.getInputStream()) {
+      @SuppressWarnings("resource")
       OutputStream os = resp.getOutputStream();
       byte[] buffer = new byte[8192];
       int bytesRead = is.read(buffer);
@@ -129,13 +128,7 @@ public class ResourceServlet extends HttpServlet {
       if (contentLength == -1 || contentLength != writtenContentLength) {
         resp.setContentLength(writtenContentLength);
       }
-
-      return true;
     }
-    finally {
-      if (is != null) {
-        is.close();
-      }
-    }
+    return true;
   }
 }

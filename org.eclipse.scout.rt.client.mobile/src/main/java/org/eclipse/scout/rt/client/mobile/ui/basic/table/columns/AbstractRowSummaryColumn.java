@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.mobile.ui.basic.table.columns;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -67,8 +68,8 @@ public abstract class AbstractRowSummaryColumn extends AbstractStringColumn impl
   }
 
   protected String initHtmlCellTemplate() {
-    try {
-      return new String(IOUtility.getContent(getClass().getResource("org/eclipse/scout/rt/client/mobile/html/MobileTableCellContent.html").openStream()), "iso-8859-1");
+    try (InputStream in = getClass().getResource("org/eclipse/scout/rt/client/mobile/html/MobileTableCellContent.html").openStream()) {
+      return IOUtility.readString(in, "iso-8859-1");
     }
     catch (IOException e) {
       throw new ProcessingException("Exception while loading html cell template for mobile table", e);
@@ -76,8 +77,8 @@ public abstract class AbstractRowSummaryColumn extends AbstractStringColumn impl
   }
 
   protected String initHtmlDrillDown() {
-    try {
-      return new String(IOUtility.getContent(getClass().getResource("org/eclipse/scout/rt/client/mobile/html/MobileTableDrillDown.html").openStream()), "iso-8859-1");
+    try (InputStream in = getClass().getResource("org/eclipse/scout/rt/client/mobile/html/MobileTableDrillDown.html").openStream()) {
+      return IOUtility.readString(in, "iso-8859-1");
     }
     catch (IOException e) {
       throw new ProcessingException("Exception while loading html cell template for mobile table", e);
@@ -85,8 +86,8 @@ public abstract class AbstractRowSummaryColumn extends AbstractStringColumn impl
   }
 
   protected String initHtmlDrillDownButton() {
-    try {
-      return new String(IOUtility.getContent(getClass().getResource("org/eclipse/scout/rt/client/mobile/html/MobileTableDrillDownButton.html").openStream()), "iso-8859-1");
+    try (InputStream in = getClass().getResource("org/eclipse/scout/rt/client/mobile/html/MobileTableDrillDownButton.html").openStream()) {
+      return IOUtility.readString(in, "iso-8859-1");
     }
     catch (IOException e) {
       throw new ProcessingException("Exception while loading html cell template for mobile table", e);

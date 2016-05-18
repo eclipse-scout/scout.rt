@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.ui.html.json;
 
 import java.io.EOFException;
 import java.io.IOException;
+import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 
 import javax.servlet.ServletRequest;
@@ -146,8 +147,8 @@ public class JsonRequestHelper {
    * Reads the content of {@link ServletRequest} into a {@link JSONObject}.
    */
   public JSONObject readJsonRequest(final ServletRequest servletRequest) {
-    try {
-      final String jsonData = IOUtility.getContent(servletRequest.getReader());
+    try (Reader in = servletRequest.getReader()) {
+      final String jsonData = IOUtility.readString(in);
       LOG.debug("Received: {}", jsonData);
       return (jsonData == null ? new JSONObject() : new JSONObject(jsonData));
     }
