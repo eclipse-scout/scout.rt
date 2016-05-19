@@ -20,6 +20,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.security.IPrincipalProducer;
+import org.eclipse.scout.rt.platform.security.SimplePrincipalProducer;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.shared.servicetunnel.http.DefaultAuthToken;
 import org.eclipse.scout.rt.shared.servicetunnel.http.HttpServiceTunnel;
@@ -104,7 +106,7 @@ public class ServiceTunnelAccessTokenAccessController implements IAccessControll
   public static class ServiceTunnelAccessTokenAuthConfig {
 
     private boolean m_enabled = DefaultAuthToken.isEnabled();
-    private IPrincipalProducer m_principalProducer = BEANS.get(ServiceTunnelPrincipalProducer.class);
+    private IPrincipalProducer m_principalProducer = BEANS.get(SimplePrincipalProducer.class);
 
     public boolean isEnabled() {
       return m_enabled;

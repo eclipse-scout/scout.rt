@@ -23,6 +23,9 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.security.ICredentialVerifier;
+import org.eclipse.scout.rt.platform.security.IPrincipalProducer;
+import org.eclipse.scout.rt.platform.security.SimplePrincipalProducer;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.SleepUtil;
 import org.eclipse.scout.rt.platform.util.StringUtility;

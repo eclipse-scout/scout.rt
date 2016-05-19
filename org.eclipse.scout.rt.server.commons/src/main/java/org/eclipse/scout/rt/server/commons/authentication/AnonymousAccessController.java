@@ -21,6 +21,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.AbstractBooleanConfigProperty;
 import org.eclipse.scout.rt.platform.config.CONFIG;
+import org.eclipse.scout.rt.platform.security.IPrincipalProducer;
+import org.eclipse.scout.rt.platform.security.SimplePrincipalProducer;
 
 /**
  * Access controller to always continue filter-chain with a fixed user. By default, the user's name is 'anonymous'.

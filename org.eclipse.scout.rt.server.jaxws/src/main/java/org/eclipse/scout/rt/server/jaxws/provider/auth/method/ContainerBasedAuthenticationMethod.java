@@ -22,8 +22,8 @@ import javax.xml.namespace.QName;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
 
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.server.commons.authentication.ICredentialVerifier;
-import org.eclipse.scout.rt.server.commons.authentication.IPrincipalProducer;
+import org.eclipse.scout.rt.platform.security.ICredentialVerifier;
+import org.eclipse.scout.rt.platform.security.IPrincipalProducer;
 import org.eclipse.scout.rt.server.commons.authentication.ServletFilterHelper;
 import org.eclipse.scout.rt.server.jaxws.implementor.JaxWsImplementorSpecifics;
 import org.slf4j.Logger;

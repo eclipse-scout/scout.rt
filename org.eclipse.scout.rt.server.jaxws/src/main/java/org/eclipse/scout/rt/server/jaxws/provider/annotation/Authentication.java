@@ -19,8 +19,8 @@ import java.lang.annotation.Target;
 
 import org.eclipse.scout.rt.platform.annotations.Internal;
 import org.eclipse.scout.rt.platform.context.RunContext;
-import org.eclipse.scout.rt.server.commons.authentication.ICredentialVerifier;
-import org.eclipse.scout.rt.server.commons.authentication.SimplePrincipalProducer;
+import org.eclipse.scout.rt.platform.security.ICredentialVerifier;
+import org.eclipse.scout.rt.platform.security.SimplePrincipalProducer;
 import org.eclipse.scout.rt.server.context.ServerRunContextProducer;
 import org.eclipse.scout.rt.server.jaxws.provider.auth.handler.AuthenticationHandler;
 import org.eclipse.scout.rt.server.jaxws.provider.auth.method.IAuthenticationMethod;

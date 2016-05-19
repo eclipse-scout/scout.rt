@@ -8,19 +8,25 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.server.commons.authentication;
+package org.eclipse.scout.rt.platform.security;
 
-import org.eclipse.scout.rt.platform.security.SimplePrincipal;
+import java.security.Principal;
 
 /**
  * Producer for {@link SimplePrincipal} objects to represent authenticated users.
+ * <p>
+ * There are exactly two scenarios for user principals
+ * <ol>
+ * <li>Container manager security with container Subject and Principal: Then this facility is not used at all</li>
+ * <li>Scout based principals: Then this facility is used and by default creates {@link SimplePrincipal} objects</li>
+ * </ol>
  *
  * @since 5.2
  */
 public class SimplePrincipalProducer implements IPrincipalProducer {
 
   @Override
-  public SimplePrincipal produce(final String username) {
+  public Principal produce(String username) {
     return new SimplePrincipal(username);
   }
 }

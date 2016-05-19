@@ -21,6 +21,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.security.IPrincipalProducer;
+import org.eclipse.scout.rt.platform.security.SimplePrincipalProducer;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 
 /**
@@ -151,7 +153,7 @@ public class TrivialAccessController implements IAccessController {
   public static class TrivialAuthConfig {
 
     private boolean m_enabled = true;
-    private IPrincipalProducer m_principalProducer = BEANS.get(RemoteUserPrincipalProducer.class);
+    private IPrincipalProducer m_principalProducer = BEANS.get(SimplePrincipalProducer.class);
     private PathInfoFilter m_exclusionFilter;
     private boolean m_loginPageInstalled = false;
 

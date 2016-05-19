@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.scout.rt.platform.Bean;
+import org.eclipse.scout.rt.platform.security.ICredentialVerifier;
 
 /**
  * Provides functionality to control access to resources only accessible for authenticated users.
