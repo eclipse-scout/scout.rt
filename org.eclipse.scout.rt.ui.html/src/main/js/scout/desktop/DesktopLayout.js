@@ -30,7 +30,7 @@ scout.DesktopLayout.prototype.layout = function($container) {
   if (navigation) {
     navigationWidth = this.calculateNavigationWidth(containerSize);
     if (desktop.splitter) {
-      desktop.splitter.setPosition(navigationWidth,true);
+      desktop.splitter.setPosition(navigationWidth, true);
     }
 
     if (desktop.navigationVisible) {
@@ -113,13 +113,20 @@ scout.DesktopLayout.prototype.layout = function($container) {
  * Used to animate bench and header
  */
 scout.DesktopLayout.prototype._animate = function(animationProps, htmlComp, size) {
-  // schedule animation to have a smoother start
-  setTimeout(function() {
-    htmlComp.$comp.animate(animationProps, {
-      queue: false,
+  // If animation is already running, stop the existing and don't use timeout to schedule the new to have a smoother transition
+  // Concurrent animation of the same element is bad because jquery messes up the overflow style
+  if (htmlComp.$comp.is(':animated')) {
+    htmlComp.$comp.stop().animate(animationProps, {
       complete: this.desktop.onLayoutAnimationComplete.bind(this.desktop)
     });
-  }.bind(this));
+  } else {
+    // schedule animation to have a smoother start
+    setTimeout(function() {
+      htmlComp.$comp.stop().animate(animationProps, {
+        complete: this.desktop.onLayoutAnimationComplete.bind(this.desktop)
+      });
+    }.bind(this));
+  }
 };
 
 scout.DesktopLayout.prototype.containerSize = function() {
@@ -138,7 +145,7 @@ scout.DesktopLayout.prototype.calculateNavigationWidth = function(containerSize)
     return containerSize.width;
   }
   var splitterPosition = 0;
-  if (this.desktop.splitterVisible ) {
+  if (this.desktop.splitterVisible) {
     splitterPosition = this.desktop.splitter.position;
   }
   var outline = this.desktop.outline;
