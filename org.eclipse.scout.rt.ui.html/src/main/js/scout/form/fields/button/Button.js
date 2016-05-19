@@ -121,6 +121,12 @@ scout.Button.prototype._remove = function() {
   this.$submenuIcon = null;
 };
 
+scout.Button.prototype._renderForegroundColor = function() {
+  scout.Button.parent.prototype._renderForegroundColor.call(this);
+  // Color button label as well, otherwise the color would not be visible because button label has already a color set using css
+  this.$buttonLabel.css('color', scout.styles.modelToCssColor(this.foregroundColor));
+};
+
 /**
  * @returns {Boolean}
  *          <code>true</code> if the action has been performed or <code>false</code> if it

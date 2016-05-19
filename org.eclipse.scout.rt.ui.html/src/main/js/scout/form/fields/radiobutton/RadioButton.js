@@ -108,3 +108,8 @@ scout.RadioButton.prototype._renderLabel = function() {
 scout.RadioButton.prototype._renderSelected = function() {
   this.$field.toggleClass('checked', this.selected);
 };
+
+scout.RadioButton.prototype._renderForegroundColor = function() {
+  // Don't call renderForeground of Button.js, $butonLabel does not exist for radio buttons
+  scout.FormField.prototype._renderForegroundColor.call(this);
+};
