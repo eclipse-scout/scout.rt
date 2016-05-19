@@ -748,7 +748,6 @@ scout.Tree.prototype._removeNodes = function(nodes, parentNode) {
   }
   if (this.rendered) {
     this.viewRangeDirty = true;
-    this._renderViewport();
     this.invalidateLayoutTree();
   }
 };
@@ -1627,8 +1626,8 @@ scout.Tree.prototype.setUpInsertBatch = function(insertIndex) {
       }
       return this.insertNodes[0] + this.insertNodes.length - 3;
     },
-    insertedAny: function(){
-      return this.insertNodes.length>2;
+    insertedAny: function() {
+      return this.insertNodes.length > 2;
     }
   };
 };
@@ -1637,7 +1636,12 @@ scout.Tree.prototype.checkAndHandleBatchAnimationWrapper = function(parentNode, 
   if (animatedRendering && this.viewRangeRendered.from <= insertBatch.lastBatchInsertIndex() && this.viewRangeRendered.to >= insertBatch.lastBatchInsertIndex() && !insertBatch.$animationWrapper) {
     //we are in visible area so we need a animation wrapper
     //if parent is in visible area insert after parent else insert before first node.
-    var nodeBefore = this.viewRangeRendered.from === insertBatch.lastBatchInsertIndex() ? null : this.visibleNodesFlat[insertBatch.lastBatchInsertIndex() - 1];
+    var lastNodeIndex = insertBatch.lastBatchInsertIndex() - 1,
+    nodeBefore = this.viewRangeRendered.from === insertBatch.lastBatchInsertIndex() ? null : this.visibleNodesFlat[lastNodeIndex];
+    if(nodeBefore && lastNodeIndex>= this.viewRangeRendered.from && lastNodeIndex<this.viewRangeRendered.to && !nodeBefore.attached){
+      //ensure node before is visible
+      this.showNode(nodeBefore, false, lastNodeIndex);
+    }
     if (nodeBefore && nodeBefore.attached) {
       insertBatch.$animationWrapper = $('<div class="animation-wrapper">').insertAfter(nodeBefore.$node);
     } else if (parentNode.attached) {
@@ -1713,7 +1717,7 @@ scout.Tree.prototype._addToVisibleFlatListNoCheck = function(node, insertIndex, 
   scout.arrays.insert(this.visibleNodesFlat, node, insertIndex);
   this.visibleNodesMap[node.id] = true;
   if (this.rendered) {
-    this.showNode(node, animatedRendering);
+    this.showNode(node, animatedRendering, insertIndex);
   }
 };
 
@@ -1894,7 +1898,6 @@ scout.Tree.prototype.insertNodes = function(nodes, parentNode) {
   }
   if (this.rendered) {
     this.viewRangeDirty = true;
-    this._renderViewport();
     this.invalidateLayoutTree();
   }
   this.trigger('nodesInserted', {
@@ -2439,6 +2442,13 @@ scout.Tree.prototype._insertNodeInDOM = function(node, indexHint) {
   node.attached = true;
 };
 
+scout.Tree.prototype._ensureParentIsInDOM = function(node, useAnimation, indexHint) {
+  var parentNode = node.parentNode;
+  if (parentNode && !parentNode.attached && parentNode === this.visibleNodesFlat[indexHint] && indexHint>= this.viewRangeRendered.from && indexHint<this.viewRangeRendered.to) {
+    this.showNode(parentNode, useAnimation, indexHint);
+  }
+};
+
 scout.Tree.prototype._insertNodeInDOMAtPlace = function(node, index) {
   var $node = node.$node,
     added = false;
@@ -2476,6 +2486,7 @@ scout.Tree.prototype.showNode = function(node, useAnimation, indexHint) {
   if (node.attached || !this.rendered) {
     return;
   }
+  this._ensureParentIsInDOM(node, useAnimation, indexHint-1);
   this._insertNodeInDOM(node, indexHint);
   if (!node.rendered) {
     return;

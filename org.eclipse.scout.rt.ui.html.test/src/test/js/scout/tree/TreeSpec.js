@@ -358,24 +358,36 @@ describe("Tree", function() {
 
         // delete first (not rendered)
         tree.deleteNodes([node0]);
+        expect(tree.viewRangeDirty).toBeTruthy();
+        tree._renderViewport();
+        expect(tree.viewRangeDirty).toBeFalsy();
         expect(tree.viewRangeRendered).toEqual(new scout.Range(0, 3));
         expect(tree.$nodes().length).toBe(3);
         expect(tree.nodes.length).toBe(5);
 
         // delete first rendered
         tree.deleteNodes([node1]);
+        expect(tree.viewRangeDirty).toBeTruthy();
+        tree._renderViewport();
+        expect(tree.viewRangeDirty).toBeFalsy();
         expect(tree.viewRangeRendered).toEqual(new scout.Range(0, 3));
         expect(tree.$nodes().length).toBe(3);
         expect(tree.nodes.length).toBe(4);
 
         // delete last node not rendered
         tree.deleteNodes([lastNode]);
+        expect(tree.viewRangeDirty).toBeTruthy();
+        tree._renderViewport();
+        expect(tree.viewRangeDirty).toBeFalsy();
         expect(tree.viewRangeRendered).toEqual(new scout.Range(0, 3));
         expect(tree.$nodes().length).toBe(3);
         expect(tree.nodes.length).toBe(3);
 
         // delete remaining (rendered) nodes
         tree.deleteNodes([tree.nodes[0], tree.nodes[1], tree.nodes[2]]);
+        expect(tree.viewRangeDirty).toBeTruthy();
+        tree._renderViewport();
+        expect(tree.viewRangeDirty).toBeFalsy();
         expect(tree.viewRangeRendered).toEqual(new scout.Range(0, 0));
         expect(tree.$nodes().length).toBe(0);
         expect(tree.nodes.length).toBe(0);
