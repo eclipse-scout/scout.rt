@@ -212,8 +212,8 @@ public class RemoteFileService implements IRemoteFileService {
   @RemoteServiceAccessDenied
   public void putRemoteFile(RemoteFile spec) {
     File file = getFileInternal(spec);
+    file.getParentFile().mkdirs();
     try (FileOutputStream out = new FileOutputStream(file)) {
-      file.getParentFile().mkdirs();
       spec.writeData(out);
       file.setLastModified(file.lastModified());
     }
