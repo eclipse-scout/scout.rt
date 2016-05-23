@@ -13,8 +13,11 @@ package org.eclipse.scout.rt.server.commons.servlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import org.eclipse.scout.rt.platform.IPlatform;
 import org.eclipse.scout.rt.platform.Platform;
-import org.eclipse.scout.rt.server.commons.servlet.filter.gzip.GzipServletFilter;
+import org.eclipse.scout.rt.platform.config.CONFIG;
+import org.eclipse.scout.rt.server.commons.ServerCommonsConfigProperties;
+import org.eclipse.scout.rt.server.commons.ServerCommonsConfigProperties.UrlHintsEnabledProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,19 +33,41 @@ import org.slf4j.LoggerFactory;
  * <li><b><code>?inspector=(true|false)</code></b>: Enable/disable inspector attributes in DOM ("modelClass", "classId")
  * </ul>
  * All values are <code>true</code> by default, unless the application is run in development mode.
+ * <p>
+ * <b>Security considerations</b>
+ * <p>
+ * cache, compress, minify have the default value <code>not({@link IPlatform#inDevelopmentMode()})</code>. The above URL
+ * parameters can only be changed using URL parameters if the config property
+ * {@link ServerCommonsConfigProperties.UrlHintsEnabledProperty} is set to true.
  */
 public final class UrlHints {
   private static final Logger LOG = LoggerFactory.getLogger(UrlHints.class);
+
+  private static final boolean UPDATE_ENABLED = CONFIG.getPropertyValue(UrlHintsEnabledProperty.class);
 
   /**
    * Enables/disables cache, compress, minify. Also decides if scoutClass attribute is added to the DOM for form-fields.
    */
   private static final String URL_PARAM_DEBUG = "debug";
+  /**
+   * Enables/disables caching.
+   */
   private static final String URL_PARAM_CACHE_HINT = "cache";
+  /**
+   * Enables/disables gzip compression of js and css.
+   */
+  private static final String URL_PARAM_COMPRESS_HINT = "compress";
+  /**
+   * Enables/disables minify of js and css.
+   */
   private static final String URL_PARAM_MINIFY_HINT = "minify";
+  /**
+   * Enables/disables js inspector.
+   */
   private static final String URL_PARAM_INSPECTOR_HINT = "inspector";
 
   private static final String SESSION_ATTRIBUTE_CACHE_HINT = UrlHints.class.getName() + "#cache";
+  private static final String SESSION_ATTRIBUTE_COMPRESS_HINT = UrlHints.class.getName() + "#compress";
   private static final String SESSION_ATTRIBUTE_MINIFY_HINT = UrlHints.class.getName() + "#minify";
   private static final String SESSION_ATTRIBUTE_INSPECTOR_HINT = UrlHints.class.getName() + "#inspector";
 
@@ -51,18 +76,21 @@ public final class UrlHints {
   }
 
   public static void updateHints(HttpServletRequest req) {
+    if (!UPDATE_ENABLED) {
+      return;
+    }
     Boolean debug = getRequestParameterBoolean(req, URL_PARAM_DEBUG);
     if (debug != null) {
       updateHint(req, !debug.booleanValue(),
           SESSION_ATTRIBUTE_CACHE_HINT,
-          GzipServletFilter.SESSION_ATTRIBUTE_COMPRESS_HINT,
+          UrlHints.SESSION_ATTRIBUTE_COMPRESS_HINT,
           SESSION_ATTRIBUTE_MINIFY_HINT);
       updateHint(req, debug.booleanValue(), SESSION_ATTRIBUTE_INSPECTOR_HINT);
     }
 
     updateHint(req, getRequestParameterBoolean(req, URL_PARAM_INSPECTOR_HINT), SESSION_ATTRIBUTE_INSPECTOR_HINT);
     updateHint(req, getRequestParameterBoolean(req, URL_PARAM_CACHE_HINT), SESSION_ATTRIBUTE_CACHE_HINT);
-    updateHint(req, getRequestParameterBoolean(req, GzipServletFilter.URL_PARAM_COMPRESS_HINT), GzipServletFilter.SESSION_ATTRIBUTE_COMPRESS_HINT);
+    updateHint(req, getRequestParameterBoolean(req, UrlHints.URL_PARAM_COMPRESS_HINT), UrlHints.SESSION_ATTRIBUTE_COMPRESS_HINT);
     updateHint(req, getRequestParameterBoolean(req, URL_PARAM_MINIFY_HINT), SESSION_ATTRIBUTE_MINIFY_HINT);
   }
 
@@ -85,6 +113,19 @@ public final class UrlHints {
     return s != null ? ("true".equals(s)) : null;
   }
 
+  private static boolean calculateHint(HttpServletRequest req, String sessionAttr, boolean defaultValue) {
+    if (req != null) {
+      HttpSession session = req.getSession(false);
+      if (session != null) {
+        Boolean hint = (Boolean) session.getAttribute(sessionAttr);
+        if (hint != null) {
+          return hint.booleanValue();
+        }
+      }
+    }
+    return defaultValue;
+  }
+
   public static boolean isInspectorHint(HttpServletRequest req) {
     return calculateHint(req, SESSION_ATTRIBUTE_INSPECTOR_HINT, Platform.get().inDevelopmentMode());
   }
@@ -97,17 +138,8 @@ public final class UrlHints {
     return calculateHint(req, SESSION_ATTRIBUTE_MINIFY_HINT, !Platform.get().inDevelopmentMode());
   }
 
-  private static boolean calculateHint(HttpServletRequest req, String sessionAttr, boolean defaultValue) {
-    if (req != null) {
-      HttpSession session = req.getSession(false);
-      if (session != null) {
-        Boolean hint = (Boolean) session.getAttribute(sessionAttr);
-        if (hint != null) {
-          return hint.booleanValue();
-        }
-      }
-    }
-    return defaultValue;
+  public static boolean isCompressHint(HttpServletRequest req) {
+    return calculateHint(req, SESSION_ATTRIBUTE_COMPRESS_HINT, !Platform.get().inDevelopmentMode());
   }
 
 }

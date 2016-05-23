@@ -21,10 +21,9 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
-import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.server.commons.servlet.UrlHints;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,8 +45,6 @@ public class GzipServletFilter implements Filter {
   public static final String ACCEPT_ENCODING = "Accept-Encoding";
   public static final String CONTENT_ENCODING = "Content-Encoding";
   public static final String GZIP = "gzip";
-  public static final String URL_PARAM_COMPRESS_HINT = "compress";
-  public static final String SESSION_ATTRIBUTE_COMPRESS_HINT = GzipServletFilter.class.getName() + "#compress";
 
   private int m_getMinSize;
   private int m_postMinSize;
@@ -111,7 +108,7 @@ public class GzipServletFilter implements Filter {
   }
 
   protected boolean supportsGzipEncoding(HttpServletRequest req) {
-    if (!isCompressHint(req)) {
+    if (!UrlHints.isCompressHint(req)) {
       return false;
     }
     String pathInfo = req.getPathInfo();
@@ -135,19 +132,6 @@ public class GzipServletFilter implements Filter {
       return m_postMinSize;
     }
     return -1;
-  }
-
-  protected boolean isCompressHint(HttpServletRequest req) {
-    boolean defaultValue = !Platform.get().inDevelopmentMode();
-    HttpSession session = req.getSession(false);
-    if (session == null) {
-      return defaultValue;
-    }
-    Boolean val = (Boolean) session.getAttribute(SESSION_ATTRIBUTE_COMPRESS_HINT);
-    if (val == null) {
-      return defaultValue;
-    }
-    return val.booleanValue();
   }
 
   @Override
