@@ -630,6 +630,19 @@ scout.Outline.prototype._computeDetailContent = function() {
   return null;
 };
 
+/**
+ * Updates node and detail menubar.
+ * Node menubar: Contains the table controls and right aligned menus.
+ * Detail menubar: Contains the other menus.
+ *
+ * The menu items are gathered from various sources:
+ * If the selected page has a detailForm, the menus are taken from there. Otherwise the detail table and the parent detail table provide the menus.
+ * The detail table contributes the empty space menus and the parent detail the the single selection menus.
+ *
+ * The menus of the outline itself are not displayed. In fact the server won't deliver any.
+ * One reason is that no menus are displayed in regular mode, so when switching to compact mode no menus would be available.
+ * Another reason is that it would flicker because the menus are sent anew from the server every time a node gets selected because the menus are added to the outline and not to the node and are therefore not cached.
+ */
 scout.Outline.prototype.updateDetailMenus = function() {
   if (!this.embedDetailContent) {
     return;
@@ -652,14 +665,16 @@ scout.Outline.prototype.updateDetailMenus = function() {
     if (selectedPage.detailTable) {
       detailTable = selectedPage.detailTable;
       menuItems = scout.menus.filter(detailTable.menus, ['Table.EmptySpace'], false, true);
-      menuItems = menuItems.filter(function(menu) {
-        // Don't accept outline wrapper menus to prevent duplicate menus. The original menu is a single selection menu of the parent table and will be added below
-        return !menu.outlineMenuWrapper;
-      }, this);
       tableControls = selectedPage.detailTable.tableControls;
     }
     // get single selection menus from parent detail table
     if (selectedPage.parentNode && selectedPage.parentNode.detailTable) {
+      if (selectedPage.detailTable) {
+        // Remove outline wrapper menus to prevent duplicate menus. The original menu is a single selection menu of the parent table and will be added below
+        menuItems = menuItems.filter(function(menu) {
+          return !menu.outlineMenuWrapper;
+        }, this);
+      }
       detailTable = selectedPage.parentNode.detailTable;
       menuItems = menuItems.concat(scout.menus.filter(detailTable.menus, ['Table.SingleSelection'], false, true));
     }

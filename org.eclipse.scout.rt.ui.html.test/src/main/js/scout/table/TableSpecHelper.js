@@ -169,6 +169,11 @@ scout.TableSpecHelper.prototype.createModelFixture = function(colCount, rowCount
   return this.createModel(this.createModelColumns(colCount), this.createModelRows(colCount, rowCount));
 };
 
+scout.TableSpecHelper.prototype.createTableWithOneColumn = function() {
+  var model = this.createModelFixture(1, 1);
+  return this.createTable(model);
+};
+
 scout.TableSpecHelper.prototype.createTable = function(model) {
   var table = new scout.Table();
   table.init(model);

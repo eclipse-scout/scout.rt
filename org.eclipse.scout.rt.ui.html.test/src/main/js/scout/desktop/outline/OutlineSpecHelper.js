@@ -78,3 +78,15 @@ scout.OutlineSpecHelper.prototype.createOutlineWithOneDetailForm = function() {
   node.detailFormVisible = true;
   return outline;
 };
+
+/**
+ * Creates an outline with 3 nodes, the first node has a visible detail table
+ */
+scout.OutlineSpecHelper.prototype.createOutlineWithOneDetailTable = function() {
+  var model = this.createModelFixture(3, 2, true);
+  var outline = this.createOutline(model);
+  var node = model.nodes[0];
+  node.detailTable = new scout.TableSpecHelper(this.session).createTableWithOneColumn();
+  node.detailTableVisible = true;
+  return outline;
+};
