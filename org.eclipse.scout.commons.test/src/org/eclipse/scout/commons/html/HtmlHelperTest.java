@@ -110,4 +110,14 @@ public class HtmlHelperTest {
     assertEquals("key:\tvalue\r\nline2", HtmlHelper.unescape("key:\tvalue\r\nline2"));
     assertEquals("hell&ouml;", HtmlHelper.unescape("hell&ouml;"));
   }
+
+  @Test
+  public void testEscapeAndNewLineToBr() {
+    assertEquals(null, HtmlHelper.escapeAndNewLineToBr(null));
+    assertEquals("", HtmlHelper.escapeAndNewLineToBr(""));
+    assertEquals(" ", HtmlHelper.escapeAndNewLineToBr(" "));
+
+    assertEquals("one &amp; two<br>three &amp; four", HtmlHelper.escapeAndNewLineToBr("one & two\nthree & four"));
+    assertEquals("&gt;&lt;script&gt;alert(&#39;hacker<br>attack&#39;);&lt;&#47;script&gt;&lt;", HtmlHelper.escapeAndNewLineToBr("><script>alert('hacker\r\nattack');</script><"));
+  }
 }

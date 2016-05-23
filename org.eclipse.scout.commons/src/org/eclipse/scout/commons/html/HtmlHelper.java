@@ -152,4 +152,20 @@ public final class HtmlHelper {
     decoded = StringUtility.replace(decoded, "&#x27;", "'");
     return decoded;
   }
+
+  /**
+   * Replaces all new lines with a HTML line break (&lt;br&gt; tag). In some cases used after an {@link #escape(String)}
+   * operation.
+   */
+  public static String newLineToBr(String input) {
+    String result = StringUtility.replace(input, "\r\n", "<br>");
+    return StringUtility.replace(result, "\n", "<br>");
+  }
+
+  /**
+   * Combined called, first {@link #escape(String)} and then {@link #newLineToBr(String)}.
+   */
+  public static String escapeAndNewLineToBr(String text) {
+    return newLineToBr(escape(text));
+  }
 }
