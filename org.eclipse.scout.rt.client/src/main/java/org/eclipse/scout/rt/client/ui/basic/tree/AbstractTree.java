@@ -52,7 +52,6 @@ import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.root.ITreeContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.internal.TreeContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
-import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.userfilter.IUserFilter;
 import org.eclipse.scout.rt.client.ui.dnd.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.dnd.TransferObject;
@@ -1666,7 +1665,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
           }
           else {
             // The node will be disposed later.
-            child.setStatusInternal(ITableRow.STATUS_DELETED);
+            child.setStatusInternal(ITreeNode.STATUS_DELETED);
             m_deletedNodes.put(child.getPrimaryKey(), child);
           }
         }
@@ -1701,17 +1700,45 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   }
 
   @Override
-  public void clearDeletedNodes() {
-    for (ITreeNode node : m_deletedNodes.values()) {
-      node.setTreeInternal(null, true);
-      try {
-        node.dispose();
-      }
-      catch (RuntimeException e) {
-        LOG.warn("Exception while disposing node.", e);
+  public void discardDeletedNode(ITreeNode node) {
+    discardDeletedNodes(CollectionUtility.arrayList(node));
+  }
+
+  @Override
+  public void discardDeletedNodes(Collection<ITreeNode> nodes) {
+    for (ITreeNode node : nodes) {
+      ITreeNode delNode = m_deletedNodes.get(node.getPrimaryKey());
+      if (delNode == node) {
+        m_deletedNodes.remove(node.getPrimaryKey());
       }
     }
-    m_deletedNodes.clear();
+  }
+
+  @Override
+  public void disposeDeletedNode(ITreeNode node) {
+    disposeDeletedNodes(CollectionUtility.arrayList(node));
+  }
+
+  @Override
+  public void disposeDeletedNodes(Collection<ITreeNode> nodes) {
+    for (ITreeNode node : nodes) {
+      ITreeNode delNode = m_deletedNodes.get(node.getPrimaryKey());
+      if (delNode == node) {
+        node.setTreeInternal(null, true);
+        try {
+          node.dispose();
+        }
+        catch (RuntimeException e) {
+          LOG.warn("Exception while disposing node: {}.", node, e);
+        }
+        discardDeletedNode(node);
+      }
+    }
+  }
+
+  @Override
+  public void clearDeletedNodes() {
+    disposeDeletedNodes(m_deletedNodes.values());
   }
 
   @Override
