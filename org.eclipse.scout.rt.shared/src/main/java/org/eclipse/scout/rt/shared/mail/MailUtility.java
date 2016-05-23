@@ -52,11 +52,15 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.FileUtility;
 import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class MailUtility {
 
+  private static final Logger LOG = LoggerFactory.getLogger(MailUtility.class);
+
   public static final String CONTENT_TYPE_ID = "Content-Type";
+  public static final String CONTENT_ID_ID = "Content-ID";
 
   public static final String CONTENT_TRANSFER_ENCODING_ID = "Content-Transfer-Encoding";
   public static final String QUOTED_PRINTABLE = "quoted-printable";
@@ -64,7 +68,8 @@ public class MailUtility {
   public static final String CONTENT_TYPE_TEXT_HTML = "text/html; charset=\"UTF-8\"";
   public static final String CONTENT_TYPE_TEXT_PLAIN = "text/plain; charset=\"UTF-8\"";
   public static final String CONTENT_TYPE_MESSAGE_RFC822 = "message/rfc822";
-  public static final String CONTENT_TYPE_MULTIPART = "alternative";
+  public static final String CONTENT_TYPE_IMAGE_PREFIX = "image/";
+  public static final String CONTENT_TYPE_MULTIPART_PREFIX = "multipart/";
 
   private MailUtility() {
   }
@@ -120,36 +125,63 @@ public class MailUtility {
           attachmentCollector.add(part);
         }
       }
-      else if (part.getContent() instanceof Multipart) {
-        Multipart multiPart = (Multipart) part.getContent();
-        for (int i = 0; i < multiPart.getCount(); i++) {
-          collectMailParts(multiPart.getBodyPart(i), bodyCollector, attachmentCollector, inlineAttachmentCollector);
-        }
-      }
       else {
-        if (part.isMimeType(CONTENT_TYPE_TEXT_PLAIN)) {
-          if (bodyCollector != null) {
-            bodyCollector.add(part);
+        Object content = null;
+        try {
+          // getContent might throw a MessagingException for legitimate parts (e.g. some images end up in a javax.imageio.IIOException for example).
+          content = part.getContent();
+        }
+        catch (MessagingException | IOException e) {
+          LOG.info("Unable to mime part content", e);
+        }
+
+        if (content instanceof Multipart) {
+          Multipart multiPart = (Multipart) part.getContent();
+          for (int i = 0; i < multiPart.getCount(); i++) {
+            collectMailParts(multiPart.getBodyPart(i), bodyCollector, attachmentCollector, inlineAttachmentCollector);
           }
         }
-        else if (part.isMimeType(CONTENT_TYPE_TEXT_HTML)) {
-          if (bodyCollector != null) {
-            bodyCollector.add(part);
+        else {
+          if (part.isMimeType(CONTENT_TYPE_TEXT_PLAIN)) {
+            if (bodyCollector != null) {
+              bodyCollector.add(part);
+            }
           }
-        }
-        else if (part.isMimeType(CONTENT_TYPE_MESSAGE_RFC822) && part.getContent() instanceof MimeMessage) {
-          // its a MIME message in rfc822 format as attachment therefore we have to set the filename for the attachment correctly.
-          if (attachmentCollector != null) {
-            MimeMessage msg = (MimeMessage) part.getContent();
-            String filteredSubjectText = StringUtility.filterText(msg.getSubject(), "a-zA-Z0-9_-", "");
-            String fileName = (StringUtility.hasText(filteredSubjectText) ? filteredSubjectText : "originalMessage") + ".eml";
-            RFCWrapperPart wrapperPart = new RFCWrapperPart(part, fileName);
-            attachmentCollector.add(wrapperPart);
+          else if (part.isMimeType(CONTENT_TYPE_TEXT_HTML)) {
+            if (bodyCollector != null) {
+              bodyCollector.add(part);
+            }
           }
-        }
-        else if (disp != null && disp.equals(Part.INLINE)) {
-          if (inlineAttachmentCollector != null) {
-            inlineAttachmentCollector.add(part);
+          else if (part.isMimeType(CONTENT_TYPE_MESSAGE_RFC822) && part.getContent() instanceof MimeMessage) {
+            // its a MIME message in rfc822 format as attachment therefore we have to set the filename for the attachment correctly.
+            if (attachmentCollector != null) {
+              MimeMessage msg = (MimeMessage) part.getContent();
+              String filteredSubjectText = StringUtility.filterText(msg.getSubject(), "a-zA-Z0-9_-", "");
+              String fileName = (StringUtility.hasText(filteredSubjectText) ? filteredSubjectText : "originalMessage") + ".eml";
+              RFCWrapperPart wrapperPart = new RFCWrapperPart(part, fileName);
+              attachmentCollector.add(wrapperPart);
+            }
+          }
+          else if (disp != null && disp.equals(Part.INLINE)) {
+            if (inlineAttachmentCollector != null) {
+              inlineAttachmentCollector.add(part);
+            }
+          }
+          else {
+            String[] headerContentId = part.getHeader(CONTENT_ID_ID);
+            if (headerContentId != null && headerContentId.length > 0 && StringUtility.hasText(headerContentId[0]) && part.getContentType() != null && part.getContentType().startsWith(CONTENT_TYPE_IMAGE_PREFIX)) {
+              if (inlineAttachmentCollector != null) {
+                inlineAttachmentCollector.add(part);
+              }
+            }
+            else if (part.getFileName() != null /* assumption: file name = attachment (last resort) */) {
+              if (attachmentCollector != null) {
+                attachmentCollector.add(part);
+              }
+            }
+            else {
+              LOG.debug("Unknown mail message part, headers: [{}]", part.getAllHeaders());
+            }
           }
         }
       }

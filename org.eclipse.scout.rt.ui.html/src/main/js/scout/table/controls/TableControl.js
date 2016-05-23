@@ -146,6 +146,9 @@ scout.TableControl.prototype.isContentAvailable = function() {
 };
 
 scout.TableControl.prototype.toggle = function() {
+  if(!this.enabled){
+    return;
+  }
   if (this.tableFooter.selectedControl === this) {
     this.setSelected(false);
   } else {
@@ -154,7 +157,7 @@ scout.TableControl.prototype.toggle = function() {
 };
 
 scout.TableControl.prototype.setSelected = function(selected, notifyServer, closeWhenUnselected) {
-  if (!this.enabled || !this.visible) {
+  if (selected && !this.visible) {
     return;
   }
   if (selected === this.selected) {

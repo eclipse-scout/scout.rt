@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.shared;
 
 import java.util.Map;
+import java.util.concurrent.Callable;
 
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.shared.session.ISessionListener;
@@ -52,6 +53,8 @@ public interface ISession {
   Object getData(String key);
 
   void setData(String key, Object value);
+
+  Object computeDataIfAbsent(String key, Callable<?> producer);
 
   /**
    * Registers the given listener to be notified about session state changes. Typically, a listener is installed in

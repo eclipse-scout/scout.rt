@@ -32,7 +32,8 @@
   }
 
   &.disabled:hover,
-  &.disabled > .font-icon {
+  &.disabled > .font-icon,
+  &.disabled.selected > .font-icon {
     cursor: default;
     color: @table-control-disabled-color;
   }

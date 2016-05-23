@@ -16,11 +16,11 @@ import java.net.URISyntaxException;
 import java.security.AccessController;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Callable;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
@@ -69,6 +69,7 @@ import org.eclipse.scout.rt.shared.services.common.ping.IPingService;
 import org.eclipse.scout.rt.shared.services.common.security.ILogoutService;
 import org.eclipse.scout.rt.shared.session.IGlobalSessionListener;
 import org.eclipse.scout.rt.shared.session.ISessionListener;
+import org.eclipse.scout.rt.shared.session.SessionData;
 import org.eclipse.scout.rt.shared.session.SessionEvent;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.rt.shared.ui.UserAgents;
@@ -99,7 +100,7 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
   private final SharedVariableMap m_sharedVariableMap;
 
   private IMemoryPolicy m_memoryPolicy;
-  private final Map<String, Object> m_clientSessionData;
+  private final SessionData m_sessionData;
   private ScoutTexts m_scoutTexts;
   private UserAgent m_userAgent;
   private final ObjectExtensions<AbstractClientSession, IClientSessionExtension<? extends AbstractClientSession>> m_objectExtensions;
@@ -107,7 +108,7 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
 
   public AbstractClientSession(boolean autoInitConfig) {
     m_eventListeners = new EventListenerList();
-    m_clientSessionData = new HashMap<String, Object>();
+    m_sessionData = new SessionData();
     m_stateLock = new Object();
     m_userAgent = UserAgent.get();
     m_subject = Subject.getSubject(AccessController.getContext());
@@ -573,18 +574,18 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
   }
 
   @Override
-  public void setData(String key, Object data) {
-    if (data == null) {
-      m_clientSessionData.remove(key);
-    }
-    else {
-      m_clientSessionData.put(key, data);
-    }
+  public void setData(String key, Object value) {
+    m_sessionData.set(key, value);
+  }
+
+  @Override
+  public Object computeDataIfAbsent(String key, Callable<?> producer) {
+    return m_sessionData.computeIfAbsent(key, producer);
   }
 
   @Override
   public Object getData(String key) {
-    return m_clientSessionData.get(key);
+    return m_sessionData.get(key);
   }
 
   /**

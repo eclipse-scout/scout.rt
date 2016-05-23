@@ -17,9 +17,9 @@ import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
@@ -47,6 +47,7 @@ import org.eclipse.scout.rt.shared.services.common.context.SharedVariableMap;
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
 import org.eclipse.scout.rt.shared.session.IGlobalSessionListener;
 import org.eclipse.scout.rt.shared.session.ISessionListener;
+import org.eclipse.scout.rt.shared.session.SessionData;
 import org.eclipse.scout.rt.shared.session.SessionEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,16 +63,14 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
   private String m_id;
   private boolean m_initialized;
   private boolean m_active;
-  private final Map<String, Object> m_attributes;
-  private transient Object m_attributesLock;
+  private final SessionData m_sessionData;
   private final SharedVariableMap m_sharedVariableMap;
   private transient ScoutTexts m_scoutTexts;
   private final ObjectExtensions<AbstractServerSession, IServerSessionExtension<? extends AbstractServerSession>> m_objectExtensions;
 
   public AbstractServerSession(boolean autoInitConfig) {
     m_eventListeners = new EventListenerList();
-    m_attributesLock = new Object();
-    m_attributes = new HashMap<>();
+    m_sessionData = new SessionData();
     m_sharedVariableMap = new SharedVariableMap();
     m_objectExtensions = new ObjectExtensions<>(this);
     m_scoutTexts = new ScoutTexts();
@@ -87,10 +86,6 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
     ois.defaultReadObject();
     if (m_scoutTexts == null) {
       m_scoutTexts = new ScoutTexts();
-    }
-
-    if (m_attributesLock == null) {
-      m_attributesLock = new Object();
     }
   }
 
@@ -152,16 +147,17 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
 
   @Override
   public Object getData(String key) {
-    synchronized (m_attributesLock) {
-      return m_attributes.get(key);
-    }
+    return m_sessionData.get(key);
   }
 
   @Override
   public void setData(String key, Object value) {
-    synchronized (m_attributesLock) {
-      m_attributes.put(key, value);
-    }
+    m_sessionData.set(key, value);
+  }
+
+  @Override
+  public Object computeDataIfAbsent(String key, Callable<?> producer) {
+    return m_sessionData.computeIfAbsent(key, producer);
   }
 
   protected final void interceptInitConfig() {
