@@ -15,6 +15,18 @@ scout.TreeLayout = function(tree) {
 scout.inherits(scout.TreeLayout, scout.AbstractLayout);
 
 scout.TreeLayout.prototype.layout = function($container) {
+  var htmlContainer = this.tree.htmlComp;
+
+  //FIXME CGU/AWE remove this check as soon as HtmlComp.validateLayout checks for invisible components
+  if (!htmlContainer.isAttachedAndVisible() || !htmlContainer.$comp.isEveryParentVisible()) {
+    return;
+  }
+
+  this._layout($container);
+  scout.scrollbars.update(this.tree.$data);
+};
+
+scout.TreeLayout.prototype._layout = function($container) {
   var menuBarSize, containerSize, heightOffset,
     menuBar = this.tree.menuBar,
     htmlMenuBar = menuBar.htmlComp,
@@ -23,11 +35,6 @@ scout.TreeLayout.prototype.layout = function($container) {
 
   containerSize = htmlContainer.getAvailableSize()
     .subtract(htmlContainer.getInsets());
-
-  //FIXME CGU/AWE remove this check as soon as HtmlComp.validateLayout checks for invisible components
-  if (!htmlContainer.isAttachedAndVisible() || !htmlContainer.$comp.isEveryParentVisible()) {
-    return;
-  }
 
   if (this.tree.autoToggleBreadcrumbStyle) {
     this.tree.setBreadcrumbStyleActive(containerSize.width <= this.tree.breadcrumbTogglingThreshold);
@@ -41,7 +48,23 @@ scout.TreeLayout.prototype.layout = function($container) {
   }
 
   this._setDataHeight(heightOffset);
-  scout.scrollbars.update($data);
+
+  // Check if width has changed
+  if (htmlContainer.size && htmlContainer.size.width !== htmlContainer.getSize().width) {
+    if (this.tree.isHorizontalScrollingEnabled()) {
+      // Width is only relevant if horizontal scrolling is enabled -> mark as dirty
+      this.tree.nodeWidthDirty = true;
+      this.tree.maxNodeWidth = 0;
+    } else {
+      // Nodes may contain wrapped text (with breadcrumb style-or if nodes contain html) -> update heights
+      this.tree.updateNodeHeights();
+      this.tree._renderFiller();
+    }
+  }
+
+  this.tree.setViewRangeSize(this.tree.calculateViewRangeSize());
+  // Always render viewport (not only when viewRangeSize changes), because view range depends on scroll position and data height
+  this.tree._renderViewport();
 };
 
 scout.TreeLayout.prototype._setDataHeight = function(heightOffset) {
@@ -50,10 +73,4 @@ scout.TreeLayout.prototype._setDataHeight = function(heightOffset) {
   heightOffset += $data.cssMarginTop() + $data.cssMarginBottom();
 
   $data.css('height', (heightOffset === 0 ? '100%' : 'calc(100% - ' + heightOffset + 'px)'));
-  this.tree.nodeWidthDirty = true;
-  this.tree.maxNodeWidth=0;
-
-  this.tree.setViewRangeSize(this.tree.calculateViewRangeSize());
-  // Always render viewport (not only when viewRangeSize changes), because view range depends on scroll position and data height
-  this.tree._renderViewport();
 };

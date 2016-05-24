@@ -285,7 +285,7 @@ scout.Tree.prototype._render = function($parent) {
     .on('scroll', this._onDataScroll.bind(this));
   new scout.HtmlComponent(this.$data, this.session);
 
-  if (this._isHorizontalScrolling()) {
+  if (this.isHorizontalScrollingEnabled()) {
     this.$data.toggleClass('scrollable-tree', true);
   }
 
@@ -296,10 +296,41 @@ scout.Tree.prototype._render = function($parent) {
   this._installNodeTooltipSupport();
   this.menuBar.render(this.$container);
   this._updateNodeDimensions();
+  // render display style before viewport (not in renderProperties) to have a correct style from the beginning
+  this._renderDisplayStyle();
   this._renderViewport();
 };
 
-scout.Tree.prototype._isHorizontalScrolling = function() {
+scout.Tree.prototype._postRender = function() {
+  this._renderSelection();
+};
+
+scout.Tree.prototype._remove = function() {
+  // stop all animations
+  if (this._$animationWrapper) {
+    this._$animationWrapper.stop(false, true);
+  }
+  // Detach nodes from jQuery objects (because those will be removed)
+  this._visitNodes(this.nodes, this._resetTreeNode.bind(this));
+
+  scout.scrollbars.uninstall(this.$data, this.session);
+  this._uninstallNodeTooltipSupport();
+  this.$fillBefore = null;
+  this.$fillAfter = null;
+  this.$data = null;
+  // reset rendered view range because now range is rendered
+  this.viewRangeRendered = new scout.Range(0, 0);
+  scout.Tree.parent.prototype._remove.call(this);
+};
+
+scout.Tree.prototype._renderProperties = function() {
+  scout.Tree.parent.prototype._renderProperties.call(this);
+  this._renderEnabled();
+  this._renderMenus();
+  this._renderDropType();
+};
+
+scout.Tree.prototype.isHorizontalScrollingEnabled = function() {
   return this._scrolldirections === 'both' || this._scrolldirections === 'x';
 };
 
@@ -425,7 +456,7 @@ scout.Tree.prototype._renderFiller = function() {
 
   var fillBeforeDimensions = this._calculateFillerDimension(new scout.Range(0, this.viewRangeRendered.from));
   this.$fillBefore.cssHeight(fillBeforeDimensions.height);
-  if (this._isHorizontalScrolling()) {
+  if (this.isHorizontalScrollingEnabled()) {
     this.$fillBefore.cssWidth(fillBeforeDimensions.width);
     this.maxNodeWidth = Math.max(fillBeforeDimensions.width, this.maxNodeWidth);
   }
@@ -441,11 +472,11 @@ scout.Tree.prototype._renderFiller = function() {
   };
   fillAfterDimensions = this._calculateFillerDimension(new scout.Range(this.viewRangeRendered.to, this.visibleNodesFlat.length));
   this.$fillAfter.cssHeight(fillAfterDimensions.height);
-  if (this._isHorizontalScrolling()) {
+  if (this.isHorizontalScrollingEnabled()) {
     this.$fillAfter.cssWidth(fillAfterDimensions.width);
     this.maxNodeWidth = Math.max(fillAfterDimensions.width, this.maxNodeWidth);
   }
-  $.log.trace('FillAfter height: ' + fillAfterDimensions.heigth);
+  $.log.trace('FillAfter height: ' + fillAfterDimensions.height);
 };
 
 scout.Tree.prototype._calculateFillerDimension = function(range) {
@@ -540,7 +571,7 @@ scout.Tree.prototype._renderViewRange = function(viewRange) {
     var firstNode = nodes[this.viewRangeRendered.from];
     var lastNode = nodes[this.viewRangeRendered.to - 1];
     if (this.viewRangeDirty) {
-      //cleanup nodes before range and after
+      // cleanup nodes before range and after
       var $nodesBeforFirstNode = firstNode.$node.prevAll('.tree-node');
       var $nodesAfterLastNode = lastNode.$node.nextAll('.tree-node');
       this._cleanupNodes($nodesBeforFirstNode);
@@ -551,15 +582,19 @@ scout.Tree.prototype._renderViewRange = function(viewRange) {
     }
   }
 
-  this._renderFiller();
-  this._updateDomNodeWidth();
-  this._renderSelection();
+  this._postRenderViewRange();
   this.$data[0].scrollTop = scrollTop;
   this.viewRangeDirty = false;
 };
 
+scout.Tree.prototype._postRenderViewRange = function() {
+  this._renderFiller();
+  this._updateDomNodeWidth();
+  this._renderSelection();
+};
+
 scout.Tree.prototype._updateDomNodeWidth = function($nodes) {
-  if (!this._isHorizontalScrolling()) {
+  if (!this.isHorizontalScrollingEnabled()) {
     return;
   }
   if (this.rendered && this.nodeWidthDirty) {
@@ -669,10 +704,13 @@ scout.Tree.prototype.setViewRangeSize = function(viewRangeSize) {
 };
 
 scout.Tree.prototype._updateNodeDimensions = function() {
-  var $emptyNode = this.$data.appendDiv('tree-node');
-  $emptyNode.html('&nbsp;');
+  var node = {
+    level: 0
+  };
+  var $emptyNode = this._$buildNode(node).appendTo(this.$data);
+  this._renderNodeText(node);
   this.nodeHeight = $emptyNode.outerHeight(true);
-  if (this._isHorizontalScrolling()) {
+  if (this.isHorizontalScrollingEnabled()) {
     var oldNodeWidth = this.nodeWidth;
     this.nodeWidth = $emptyNode.outerWidth(true);
     if (oldNodeWidth !== this.nodeWidth) {
@@ -682,34 +720,17 @@ scout.Tree.prototype._updateNodeDimensions = function() {
   $emptyNode.remove();
 };
 
-scout.Tree.prototype._postRender = function() {
-  this._renderSelection();
-};
-
-scout.Tree.prototype._remove = function() {
-  //stop all animations
-  if (this._$animationWrapper) {
-    this._$animationWrapper.stop(false, true);
-  }
-  // Detach nodes from jQuery objects (because those will be removed)
-  this._visitNodes(this.nodes, this._resetTreeNode.bind(this));
-
-  scout.scrollbars.uninstall(this.$data, this.session);
-  this._uninstallNodeTooltipSupport();
-  this.$fillBefore = null;
-  this.$fillAfter = null;
-  this.$data = null;
-  // reset rendered view range because now range is rendered
-  this.viewRangeRendered = new scout.Range(0, 0);
-  scout.Tree.parent.prototype._remove.call(this);
-};
-
-scout.Tree.prototype._renderProperties = function() {
-  scout.Tree.parent.prototype._renderProperties.call(this);
-  this._renderEnabled();
-  this._renderMenus();
-  this._renderDisplayStyle();
-  this._renderDropType();
+/**
+ * Updates the node heights for every visible node and clears the height of the others
+ */
+scout.Tree.prototype.updateNodeHeights = function() {
+  this.visibleNodesFlat.forEach(function(node) {
+    if (!node.attached) {
+      node.height = null;
+    } else {
+      node.height = node.$node.outerHeight(true);
+    }
+  });
 };
 
 /**
@@ -997,18 +1018,9 @@ scout.Tree.prototype._renderSelection = function() {
   }
 
   this.selectedNodes.forEach(function(node) {
-    var $node = node.$node;
-
-    if (this.visibleNodesMap[node.id]) {
-      $node = node.$node;
-      if (!node.rendered) {
-        return;
-      }
-    } else {
+    if (!this.visibleNodesMap[node.id]) {
       return;
     }
-
-    $node.select(true);
 
     // Mark all ancestor nodes, especially necessary for bread crumb mode
     var parentNode = node.parentNode;
@@ -1029,6 +1041,10 @@ scout.Tree.prototype._renderSelection = function() {
           childNode.$node.addClass('child-of-selected');
         }
       }, this);
+    }
+
+    if (node.rendered) {
+      node.$node.select(true);
     }
   }, this);
 
@@ -1060,29 +1076,32 @@ scout.Tree.prototype._removeSelection = function() {
     }, this);
   }
 
-  this.selectedNodes.forEach(function(node) {
-    var $node = node.$node;
-    if ($node) { // TODO [5.2] bsh: Check if $node can be undefined
-      $node.select(false);
+  this.selectedNodes.forEach(this._removeNodeSelection, this);
+};
 
-      // remove ancestor and child classes
-      var parentNode = node.parentNode;
-      if (parentNode) {
-        parentNode.$node.removeClass('parent-of-selected');
+scout.Tree.prototype._removeNodeSelection = function(node) {
+  var $node = node.$node;
+  if (!$node) {
+    return;
+  }
+  $node.select(false);
+
+  // remove ancestor and child classes
+  var parentNode = node.parentNode;
+  if (parentNode) {
+    parentNode.$node.removeClass('parent-of-selected');
+  }
+  while (parentNode) {
+    parentNode.$node.removeClass('ancestor-of-selected');
+    parentNode = parentNode.parentNode;
+  }
+  if (node.expanded) {
+    node.childNodes.forEach(function(childNode) {
+      if (childNode.rendered) {
+        childNode.$node.removeClass('child-of-selected');
       }
-      while (parentNode) {
-        parentNode.$node.removeClass('ancestor-of-selected');
-        parentNode = parentNode.parentNode;
-      }
-      if (node.expanded) {
-        node.childNodes.forEach(function(childNode) {
-          if (childNode.rendered) {
-            childNode.$node.removeClass('child-of-selected');
-          }
-        }, this);
-      }
-    }
-  }, this);
+    }, this);
+  }
 };
 
 scout.Tree.prototype._renderDropType = function() {
@@ -1419,7 +1438,7 @@ scout.Tree.prototype._removeChildrenFromFlatList = function(parentNode, animated
     for (var i = parentIndex + 1; i < this.visibleNodesFlat.length; i++) {
       if (this.visibleNodesFlat[i].level > parentLevel) {
         var node = this.visibleNodesFlat[i];
-        if (this._isHorizontalScrolling()) {
+        if (this.isHorizontalScrollingEnabled()) {
           //if node is the node which defines the widest width then recalculate width for render
           if (node.width === this.maxNodeWidth) {
             this.maxNodeWidth = 0;
@@ -1492,7 +1511,7 @@ scout.Tree.prototype._removeFromFlatList = function(node, animatedRemove) {
   if (this.visibleNodesMap[node.id]) {
     var index = this.visibleNodesFlat.indexOf(node);
     this._removeChildrenFromFlatList(node, false);
-    if (this._isHorizontalScrolling()) {
+    if (this.isHorizontalScrollingEnabled()) {
       //if node is the node which defines the widest width then recalculate width for render
       if (node.width === this.maxNodeWidth) {
         this.maxNodeWidth = 0;
@@ -1508,12 +1527,12 @@ scout.Tree.prototype._removeFromFlatList = function(node, animatedRemove) {
 };
 
 scout.Tree.prototype._addToVisibleFlatList = function(node, renderingAnimated) {
-  //if node already in visible list don't do anything. if no parentNode is available this node is on toplevel, if a parent is available
+  // if node already is in visible list don't do anything. If no parentNode is available this node is on toplevel, if a parent is available
   // it has to be in visible list and also be expanded
   if (!this.visibleNodesMap[node.id] && node.isFilterAccepted() && (!node.parentNode ||
       (node.parentNode.expanded && this.visibleNodesMap[node.parentNode.id]))) {
     if (this.initialTraversing) {
-      //for faster index calculation
+      // for faster index calculation
       this._addToVisibleFlatListNoCheck(node, this.visibleNodesFlat.length, renderingAnimated);
     } else {
       var insertIndex = this._findIndexToInsertNode(node);
@@ -1529,10 +1548,10 @@ scout.Tree.prototype._findIndexToInsertNode = function(node) {
         return siblings[i];
       }
     }
-    //no sibling before
+    // no sibling before
     return null;
   }.bind(this);
-  //function to traverse last child nodes to first child nodes of a parent.
+  // function to traverse last child nodes to first child nodes of a parent.
   var findLastVisibleNodeInParent = function(parent) {
     if (parent.expanded) {
       for (var i = parent.childNodes.length - 1; i >= 0; i--) {
@@ -1551,7 +1570,7 @@ scout.Tree.prototype._findIndexToInsertNode = function(node) {
   var parentNode = node.parentNode,
     siblingBefore, nodeBefore;
   if (!parentNode) {
-    //use toplevel to find index
+    // use toplevel to find index
     siblingBefore = findValidSiblingBefore(node.childNodeIndex, this.nodes);
     if (!siblingBefore) {
       return 0;
@@ -1637,8 +1656,8 @@ scout.Tree.prototype.checkAndHandleBatchAnimationWrapper = function(parentNode, 
     //we are in visible area so we need a animation wrapper
     //if parent is in visible area insert after parent else insert before first node.
     var lastNodeIndex = insertBatch.lastBatchInsertIndex() - 1,
-    nodeBefore = this.viewRangeRendered.from === insertBatch.lastBatchInsertIndex() ? null : this.visibleNodesFlat[lastNodeIndex];
-    if(nodeBefore && lastNodeIndex>= this.viewRangeRendered.from && lastNodeIndex<this.viewRangeRendered.to && !nodeBefore.attached){
+      nodeBefore = this.viewRangeRendered.from === insertBatch.lastBatchInsertIndex() ? null : this.visibleNodesFlat[lastNodeIndex];
+    if (nodeBefore && lastNodeIndex >= this.viewRangeRendered.from && lastNodeIndex < this.viewRangeRendered.to && !nodeBefore.attached) {
       //ensure node before is visible
       this.showNode(nodeBefore, false, lastNodeIndex);
     }
@@ -1750,6 +1769,7 @@ scout.Tree.prototype.selectNode = function(node, notifyServer, debounceSend) {
 };
 
 scout.Tree.prototype.selectNodes = function(nodes, notifyServer, debounceSend) {
+  var scrollTop;
   nodes = scout.arrays.ensure(nodes);
   notifyServer = scout.nvl(notifyServer, true);
 
@@ -1758,6 +1778,9 @@ scout.Tree.prototype.selectNodes = function(nodes, notifyServer, debounceSend) {
   }
 
   if (this.rendered) {
+    if (this.isBreadcrumbStyleActive()) {
+      scrollTop = this.$data[0].scrollTop;
+    }
     this._removeSelection();
   }
 
@@ -1792,6 +1815,10 @@ scout.Tree.prototype.selectNodes = function(nodes, notifyServer, debounceSend) {
   this._updateMenuBar();
   if (this.rendered) {
     this._renderSelection();
+    // restore scrollTop (removeSelection removes all the selection classes which makes a lot of elements invisible and therefore the scrollHeight smaller)
+    if (this.isBreadcrumbStyleActive()) {
+      this.$data[0].scrollTop = scrollTop;
+    }
   }
 };
 
@@ -2418,8 +2445,8 @@ scout.Tree.prototype._insertNodeInDOM = function(node, indexHint) {
 
   this._insertNodeInDOMAtPlace(node, index);
 
-  node.height = node.$node.outerHeight();
-  if (this._isHorizontalScrolling()) {
+  node.height = node.$node.outerHeight(true);
+  if (this.isHorizontalScrollingEnabled()) {
     var widthBackup = node.width ? node.width : 0,
       displayBackup = node.$node.css('display');
     node.$node.css('width', 'auto');
@@ -2444,7 +2471,7 @@ scout.Tree.prototype._insertNodeInDOM = function(node, indexHint) {
 
 scout.Tree.prototype._ensureParentIsInDOM = function(node, useAnimation, indexHint) {
   var parentNode = node.parentNode;
-  if (parentNode && !parentNode.attached && parentNode === this.visibleNodesFlat[indexHint] && indexHint>= this.viewRangeRendered.from && indexHint<this.viewRangeRendered.to) {
+  if (parentNode && !parentNode.attached && parentNode === this.visibleNodesFlat[indexHint] && indexHint >= this.viewRangeRendered.from && indexHint < this.viewRangeRendered.to) {
     this.showNode(parentNode, useAnimation, indexHint);
   }
 };
@@ -2486,7 +2513,7 @@ scout.Tree.prototype.showNode = function(node, useAnimation, indexHint) {
   if (node.attached || !this.rendered) {
     return;
   }
-  this._ensureParentIsInDOM(node, useAnimation, indexHint-1);
+  this._ensureParentIsInDOM(node, useAnimation, indexHint - 1);
   this._insertNodeInDOM(node, indexHint);
   if (!node.rendered) {
     return;

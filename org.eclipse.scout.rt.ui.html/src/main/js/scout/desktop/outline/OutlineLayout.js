@@ -14,16 +14,18 @@ scout.OutlineLayout = function(outline) {
 };
 scout.inherits(scout.OutlineLayout, scout.TreeLayout);
 
-scout.OutlineLayout.prototype.layout = function($container) {
+scout.OutlineLayout.prototype._layout = function($container) {
   var containerSize,
     htmlContainer = this.outline.htmlComp;
+
+  scout.OutlineLayout.parent.prototype._layout.call(this, $container);
 
   containerSize = htmlContainer.getAvailableSize()
     .subtract(htmlContainer.getInsets());
 
   if (this.outline.embedDetailContent) {
     var selectedNode = this.outline.selectedNodes[0];
-    if (selectedNode) {
+    if (selectedNode && selectedNode.rendered) {
       var pageHtmlComp = selectedNode.htmlComp;
       // pageHtmlComp is null if there is no detail form and no detail menubar
       if (pageHtmlComp) {
@@ -32,21 +34,24 @@ scout.OutlineLayout.prototype.layout = function($container) {
 
         var prefSize = pageHtmlComp.getPreferredSize();
         pageHtmlComp.setSize(new scout.Dimension(containerSize.width, prefSize.height));
-        selectedNode.height = prefSize.height;
+        selectedNode.height = prefSize.height + pageHtmlComp.getMargins().vertical();
       }
     }
-    // Remove width and height from non selected nodes
+
+    // Remove width and height from non selected nodes (at this point we don't know the previously selected node anymore, so we need process all rendered)
     this.outline.$nodes().each(function(i, elem) {
-      var $elem = $(elem);
-      if (!$elem.isSelected()) {
-        $elem.css('height', 'auto')
-          .css('width', 'auto');
-        var node = $elem.data('node');
-        node.height = $elem.outerHeight();
+      var $node = $(elem);
+      // check for style.height to prevent unnecessary updates, no need to update nodes without a fixed height
+      if ($node.isSelected() || !$node[0].style.height || $node[0].style.height === 'auto') {
+        return;
       }
+
+      $node.css('height', 'auto')
+        .css('width', 'auto');
+      var node = $node.data('node');
+      node.height = $node.outerHeight(true);
     });
   }
-  scout.OutlineLayout.parent.prototype.layout.call(this, $container);
 };
 
 scout.OutlineLayout.prototype._setDataHeight = function(heightOffset) {
