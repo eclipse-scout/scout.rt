@@ -1721,7 +1721,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
 
   @Override
   public void disposeDeletedNodes(Collection<ITreeNode> nodes) {
-    for (ITreeNode node : nodes) {
+    for (ITreeNode node : CollectionUtility.arrayList(nodes)) {
       ITreeNode delNode = m_deletedNodes.get(node.getPrimaryKey());
       if (delNode == node) {
         node.setTreeInternal(null, true);
