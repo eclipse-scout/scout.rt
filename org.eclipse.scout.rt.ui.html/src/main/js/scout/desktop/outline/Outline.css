@@ -111,7 +111,7 @@
     width: auto;
     position: absolute;
     right: @outline-title-margin-right;
-    top: @outline-title-margin-bottom;
+    top: @outline-title-margin-bottom + 2; /* + 2 necessary to have it aligned with the text*/
     border: none;
     color: @navigation-color;
 
@@ -121,6 +121,16 @@
       &:hover,
       &:active {
         color: @navigation-color;
+      }
+
+      &:focus,
+      &:not(.menu-button):focus {
+        color: @navigation-color;
+
+        &::after {
+          border-color: @navigation-color;
+          #scout.glow(@navigation-color);
+        }
       }
     }
 
