@@ -8,8 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-scout.OutlineNavigateToTopKeyStroke = function(tree) {
-  scout.OutlineNavigateToTopKeyStroke.parent.call(this, tree);
+scout.OutlineNavigateToTopKeyStroke = function(tree, modifierBitMask) {
+  scout.OutlineNavigateToTopKeyStroke.parent.call(this, tree, modifierBitMask);
   this.which = [scout.keys.HOME];
   this.renderingHints.hAlign = scout.hAlign.RIGHT;
 
@@ -17,8 +17,8 @@ scout.OutlineNavigateToTopKeyStroke = function(tree) {
     return this.field.$title || this.field.$data;
   }.bind(this);
 };
-scout.inherits(scout.OutlineNavigateToTopKeyStroke, scout.AbstractOutlineNavigationKeyStroke);
+scout.inherits(scout.OutlineNavigateToTopKeyStroke, scout.AbstractTreeNavigationKeyStroke);
 
-scout.OutlineNavigateToTopKeyStroke.prototype._handleInternal = function($currentNode, currentNode) {
+scout.OutlineNavigateToTopKeyStroke.prototype._handleInternal = function(currentNode) {
   this.field.navigateToTop();
 };

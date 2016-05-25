@@ -267,14 +267,8 @@
   __include("scout/desktop/outline/navigation/NavigateButton.js"); // requires Menu.js
   __include("scout/desktop/outline/navigation/NavigateDownButton.js");
   __include("scout/desktop/outline/navigation/NavigateUpButton.js");
-  __include("scout/desktop/outline/keystrokes/AbstractOutlineNavigationKeyStroke.js");
-  __include("scout/desktop/outline/keystrokes/OutlineCollapseOrDrillUpKeyStroke.js");
-  __include("scout/desktop/outline/keystrokes/OutlineExpandOrDrillDownKeyStroke.js");
   __include("scout/desktop/outline/keystrokes/OutlineKeyStrokeContext.js");
-  __include("scout/desktop/outline/keystrokes/OutlineNavigationUpKeyStroke.js");
   __include("scout/desktop/outline/keystrokes/OutlineNavigateToTopKeyStroke.js");
-  __include("scout/desktop/outline/keystrokes/OutlineNavigationDownKeyStroke.js");
-  __include("scout/desktop/outline/keystrokes/OutlineNavigationEndKeyStroke.js");
   // Basics for form fields
   __include("scout/form/fields/fields.js");
   __include("scout/form/fields/AppLinkKeyStroke.js");

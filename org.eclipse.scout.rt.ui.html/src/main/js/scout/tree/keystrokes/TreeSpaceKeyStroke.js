@@ -18,19 +18,13 @@ scout.inherits(scout.TreeSpaceKeyStroke, scout.KeyStroke);
 
 scout.TreeSpaceKeyStroke.prototype._accept = function(event) {
   var accepted = scout.TreeSpaceKeyStroke.parent.prototype._accept.call(this, event);
-  return accepted && this.field.checkable;
+  return accepted && this.field.checkable && this.field.selectedNodes.length > 0;
 };
 
 scout.TreeSpaceKeyStroke.prototype.handle = function(event) {
-  //TODO nbu refactor
-  var $currentNode = this.field.$selectedNodes().eq(0);
-  if ($currentNode.length === 0) {
-    return;
-  }
-
-  var check = !$($currentNode[0]).data('node').checked;
-  for (var j = 0; j < $currentNode.length; j++) {
-    var node = $($currentNode[j]).data('node');
-    this.field.checkNode(node, check);
-  }
+  var selection = this.field.selectedNodes;
+  var checked = selection[0].checked;
+  selection.forEach(function(node) {
+    this.field.checkNode(node, !checked);
+  }, this);
 };

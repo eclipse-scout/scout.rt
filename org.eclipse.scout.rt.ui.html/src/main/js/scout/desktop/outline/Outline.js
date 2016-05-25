@@ -68,16 +68,17 @@ scout.Outline.prototype._filterMenus = function(menus, destination, onlyVisible,
  * @override Tree.js
  */
 scout.Outline.prototype._initTreeKeyStrokeContext = function(keyStrokeContext) {
+  var modifierBitMask = scout.keyStrokeModifier.CTRL | scout.keyStrokeModifier.SHIFT;
+
   keyStrokeContext.registerKeyStroke([
-      new scout.TreeSpaceKeyStroke(this),
-      new scout.OutlineNavigationUpKeyStroke(this),
-      new scout.OutlineNavigationDownKeyStroke(this),
-      new scout.OutlineNavigationEndKeyStroke(this),
-      new scout.OutlineNavigateToTopKeyStroke(this),
-      new scout.OutlineCollapseOrDrillUpKeyStroke(this),
-      new scout.OutlineExpandOrDrillDownKeyStroke(this)
-    ]
-    .concat(this.menus));
+    new scout.TreeNavigationUpKeyStroke(this, modifierBitMask),
+    new scout.TreeNavigationDownKeyStroke(this, modifierBitMask),
+    new scout.OutlineNavigateToTopKeyStroke(this, modifierBitMask),
+    new scout.TreeNavigationEndKeyStroke(this, modifierBitMask),
+    new scout.TreeCollapseOrDrillUpKeyStroke(this, modifierBitMask),
+    new scout.TreeExpandOrDrillDownKeyStroke(this, modifierBitMask)
+  ]);
+
   keyStrokeContext.$bindTarget = function() {
     return this.session.$entryPoint;
   }.bind(this);

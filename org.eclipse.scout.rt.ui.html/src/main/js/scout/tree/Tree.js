@@ -98,15 +98,14 @@ scout.Tree.prototype._initTreeKeyStrokeContext = function(keyStrokeContext) {
   var modifierBitMask = scout.keyStrokeModifier.NONE;
 
   keyStrokeContext.registerKeyStroke([
-      new scout.TreeSpaceKeyStroke(this),
-      new scout.TreeNavigationUpKeyStroke(this, modifierBitMask),
-      new scout.TreeNavigationDownKeyStroke(this, modifierBitMask),
-      new scout.TreeCollapseAllKeyStroke(this, modifierBitMask),
-      new scout.TreeCollapseOrDrillUpKeyStroke(this, modifierBitMask),
-      new scout.TreeNavigationEndKeyStroke(this, modifierBitMask),
-      new scout.TreeExpandOrDrillDownKeyStroke(this, modifierBitMask)
-    ]
-    .concat(this.menus));
+    new scout.TreeSpaceKeyStroke(this),
+    new scout.TreeNavigationUpKeyStroke(this, modifierBitMask),
+    new scout.TreeNavigationDownKeyStroke(this, modifierBitMask),
+    new scout.TreeCollapseAllKeyStroke(this, modifierBitMask),
+    new scout.TreeCollapseOrDrillUpKeyStroke(this, modifierBitMask),
+    new scout.TreeNavigationEndKeyStroke(this, modifierBitMask),
+    new scout.TreeExpandOrDrillDownKeyStroke(this, modifierBitMask)
+  ]);
 
   // Prevent default action and do not propagate ↓ or ↑ keys if ctrl- or alt-modifier is not pressed.
   // Otherwise, an '↑-event' on the first node, or an '↓-event' on the last row will bubble up (because not consumed by tree navigation keystrokes) and cause a superior tree to move its selection;
