@@ -62,7 +62,9 @@ describe('EventSupport', function() {
       events.one('foo', function(event) {
         receivedEvent = event;
       });
-      events.trigger('foo', {theProp: 'bar'});
+      events.trigger('foo', {
+        theProp: 'bar'
+      });
       // expect the event has been passed to the registered func
       expect(receivedEvent.theProp).toBe('bar');
       // expect the type property is automatically set by EventSupport
@@ -83,21 +85,27 @@ describe('EventSupport', function() {
     function fooListener1() {
       count++;
     }
+
     function fooListener2() {
       count++;
     }
+
     function fooListener3() {
       count++;
     }
+
     function fooListener4() {
       count++;
     }
+
     function fooListener5() {
       count++;
     }
+
     function fooListener6() {
       count++;
     }
+
     function fooListener7() {
       count++;
     }

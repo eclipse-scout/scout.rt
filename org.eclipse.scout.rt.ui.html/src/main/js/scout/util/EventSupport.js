@@ -59,7 +59,7 @@ scout.EventSupport.prototype.off = function(type, func) {
     return;
   }
 
-  for (var i =  this._eventListeners.length -1; i >= 0; i--) {
+  for (var i = this._eventListeners.length - 1; i >= 0; i--) {
     var listener = this._eventListeners[i];
     var funcMatches = (func === listener.func || func === listener.origFunc);
     var typeMatches = (type === listener.type);

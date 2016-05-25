@@ -23,7 +23,6 @@ scout.Outline = function() {
   this.messageBoxController;
   this.fileChooserController;
   this._nodeIdToRowMap = {};
-
   this._scrolldirections = 'y';
 };
 scout.inherits(scout.Outline, scout.Tree);
@@ -318,7 +317,7 @@ scout.Outline.prototype._onNodeDeleted = function(node) {
     node.detailTable = null;
   }
   // If last node is removed, navigate back to top
-  if (this.nodes && this.nodes.length === 0) {
+  if (this.nodes.length === 0) {
     this.navigateToTop();
   }
 };
@@ -675,7 +674,8 @@ scout.Outline.prototype.updateDetailMenus = function() {
     if (selectedPage.detailTable) {
       detailTable = selectedPage.detailTable;
       menuItems = scout.menus.filter(detailTable.menus, ['Table.EmptySpace'], false, true);
-      tableControls = selectedPage.detailTable.tableControls;
+      tableControls = detailTable.tableControls;
+      this._attachDetailMenusListener(detailTable);
     }
     // get single selection menus from parent detail table
     if (selectedPage.parentNode && selectedPage.parentNode.detailTable) {
@@ -687,6 +687,7 @@ scout.Outline.prototype.updateDetailMenus = function() {
       }
       detailTable = selectedPage.parentNode.detailTable;
       menuItems = menuItems.concat(scout.menus.filter(detailTable.menus, ['Table.SingleSelection'], false, true));
+      this._attachDetailMenusListener(detailTable);
     }
   }
 
@@ -712,6 +713,58 @@ scout.Outline.prototype.updateDetailMenus = function() {
 
   this.setNodeMenus(nodeMenus);
   this.setDetailMenus(detailMenus);
+};
+
+/**
+ * Attaches a listener to the given menu container (which is the detail table or the detail table of the parent node)
+ * in order to get dynamic menu changes and update the detailMenus on such a change event.
+ */
+scout.Outline.prototype._attachDetailMenusListener = function(menuContainer) {
+  if (!this._detailMenusChangeHandler) {
+    this._detailMenusChangeHandler = function(event) {
+      if (scout.arrays.containsAny(event.changedProperties, ['menus', 'tableControls'])) {
+        this.updateDetailMenus();
+      }
+    }.bind(this);
+  }
+  if (!this._detailMenusDestroyHandler) {
+    this._detailMenusDestroyHandler = function() {
+      menuContainer.off('propertyChange', this._detailMenusChangeHandler);
+    }.bind(this);
+  }
+
+  menuContainer.off('propertyChange', this._detailMenusChangeHandler);
+  menuContainer.on('propertyChange', this._detailMenusChangeHandler);
+  menuContainer.off('destroy', this._detailMenusDestroyHandler);
+  menuContainer.one('destroy', this._detailMenusDestroyHandler);
+
+  if (!this._detailMenusNodesSelectedHandler) {
+    // This nodes selection listener removes the property change listeners from the old menu containers (detail content) whenever a node gets selected
+    // UpdateDetailMenus is called afterwards and attaches the property change listeners to the new detail content
+    // This guarantees that no events are fired for non selected nodes
+    this._detailMenusNodesSelectedHandler = {
+      outline: this,
+      menuContainers: [],
+      addMenuContainer: function(container) {
+        if (this.menuContainers.indexOf(container) > -1) {
+          return;
+        }
+        this.menuContainers.push(container);
+      },
+      func: function(event) {
+        if (event.type !== 'nodesSelected') {
+          return;
+        }
+        this.menuContainers.forEach(function(container) {
+          container.off('propertyChange', this.outline._detailMenusChangeHandler);
+          container.off('destroy', this.outline._detailMenusDestroyHandler);
+        }, this);
+        this.menuContainers = [];
+      }
+    };
+    this.events.addListener(this._detailMenusNodesSelectedHandler);
+  }
+  this._detailMenusNodesSelectedHandler.addMenuContainer(menuContainer);
 };
 
 scout.Outline.prototype.setDetailMenus = function(detailMenus) {

@@ -1786,19 +1786,12 @@ scout.Tree.prototype.selectNodes = function(nodes, notifyServer, debounceSend) {
 
   // Make a copy so that original array stays untouched
   this.selectedNodes = nodes.slice();
+
   if (notifyServer) {
-    var eventData = {
-      nodeIds: this._nodesToIds(nodes)
-    };
-
-    // send delayed to avoid a lot of requests while selecting
-    // coalesce: only send the latest selection changed event for a field
-    this._send('nodesSelected', eventData, debounceSend ? 250 : 0, function(previous) {
-      return this.id === previous.id && this.type === previous.type;
-    });
+    this._sendNodesSelected(this.selectedNodes, debounceSend);
   }
-
   this._triggerNodesSelected(debounceSend);
+
   if (this.selectedNodes.length > 0 && !this.visibleNodesMap[this.selectedNodes[0].id]) {
     this._expandAllParentNodes(this.selectedNodes[0]);
   }
@@ -2137,6 +2130,18 @@ scout.Tree.prototype.checkChildren = function(node, checked) {
     });
   }
   return updatedNodes;
+};
+
+scout.Tree.prototype._sendNodesSelected = function(nodes, debounceSend) {
+  var eventData = {
+    nodeIds: this._nodesToIds(nodes)
+  };
+
+  // send delayed to avoid a lot of requests while selecting
+  // coalesce: only send the latest selection changed event for a field
+  this._send('nodesSelected', eventData, debounceSend ? 250 : 0, function(previous) {
+    return this.id === previous.id && this.type === previous.type;
+  });
 };
 
 scout.Tree.prototype._sendNodesChecked = function(nodes) {

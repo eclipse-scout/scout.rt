@@ -224,6 +224,56 @@ describe("Outline", function() {
       expect(outline.detailMenuBar.menuItems.length).toBe(1);
       expect(outline.detailMenuBar.menuItems[0]).toBe(node0.detailTable.menus[0]);
     });
+
+    it("attaches a listener to the detail table to get dynamic menu changes", function() {
+      var outline = helper.createOutlineWithOneDetailTable();
+      outline.setCompact(true);
+      outline.setEmbedDetailContent(true);
+      var node0 = outline.nodes[0];
+      expect(outline.detailMenuBarVisible).toBe(false);
+      expect(outline.detailMenuBar.menuItems.length).toBe(0);
+
+      outline.selectNodes(node0);
+      expect(outline.detailMenuBarVisible).toBe(false);
+      expect(outline.detailMenuBar.menuItems.length).toBe(0);
+
+      // Menus change on table -> detail menu bar needs to be updated as well
+      var menu = menuHelper.createModel('menu', '', ['Table.EmptySpace']);
+      var message = {
+        adapterData: createAdapterData([menu]),
+        events: [createPropertyChangeEvent(node0.detailTable, {
+          menus: [menu.id]
+        })]
+      };
+      session._processSuccessResponse(message);
+      expect(outline.detailMenuBarVisible).toBe(true);
+      expect(outline.detailMenuBar.menuItems.length).toBe(1);
+      expect(outline.detailMenuBar.menuItems[0]).toBe(node0.detailTable.menus[0]);
+    });
+
+    it("removes the listener from the detail tables on selection changes and destroy", function() {
+      var outline = helper.createOutlineWithOneDetailTable();
+      outline.setCompact(true);
+      outline.setEmbedDetailContent(true);
+      var node0 = outline.nodes[0];
+      var node1 = outline.nodes[1];
+      var initialListenerCount = node0.detailTable.events._eventListeners.length;
+
+      outline.selectNodes(node0);
+      var selectionListenerCount = node0.detailTable.events._eventListeners.length;
+      expect(selectionListenerCount).toBe(initialListenerCount + 2); // destroy and propertyChange listener
+
+      outline.selectNodes(node1);
+      selectionListenerCount = node0.detailTable.events._eventListeners.length;
+      expect(selectionListenerCount).toBe(initialListenerCount); // listeners removed
+
+      outline.selectNodes(node0);
+      selectionListenerCount = node0.detailTable.events._eventListeners.length;
+      expect(selectionListenerCount).toBe(initialListenerCount + 2); // listeners attached again
+
+      outline.nodes[0].detailTable.destroy();
+      expect(node0.detailTable.events._eventListeners.length).toBe(0); // every listener should be removed now
+    });
   });
 
   describe("onModelAction", function() {
