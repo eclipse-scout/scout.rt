@@ -49,6 +49,7 @@ public abstract class AbstractClipboardField extends AbstractValueField<Collecti
 
     setAllowedMimeTypes(getConfiguredAllowedMimeTypes());
     setMaximumSize(getConfiguredMaximumSize());
+    setReadOnly(getConfiguredReadOnly());
 
     // DND
     setDropType(getConfiguredDropType());
@@ -111,14 +112,27 @@ public abstract class AbstractClipboardField extends AbstractValueField<Collecti
     return null;
   }
 
-  @ConfigOperation
+  /**
+   * Configures the allowed mime types for the clipboard paste event.
+   * <p>
+   * Subclasses can override this method. Default is <code>null</code> which does not restrict the allowed types.
+   *
+   * @return allowed mime types.
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(60)
+  protected boolean getConfiguredReadOnly() {
+    return false;
+  }
+
+  @ConfigOperation
+  @Order(70)
   protected TransferObject execDragRequest() {
     return null;
   }
 
   @ConfigOperation
-  @Order(70)
+  @Order(80)
   protected void execDropRequest(TransferObject transferObject) {
     if (transferObject instanceof ResourceListTransferObject) {
       ResourceListTransferObject resourceListTransferObject = (ResourceListTransferObject) transferObject;
@@ -160,6 +174,16 @@ public abstract class AbstractClipboardField extends AbstractValueField<Collecti
   @Override
   public void setMaximumSize(long maximumSize) {
     propertySupport.setPropertyLong(PROP_MAXIMUM_SIZE, maximumSize);
+  }
+
+  @Override
+  public boolean isReadOnly() {
+    return propertySupport.getPropertyBool(PROP_READ_ONLY);
+  }
+
+  @Override
+  public void setReadOnly(boolean b) {
+    propertySupport.setPropertyBool(PROP_READ_ONLY, b);
   }
 
   @Override

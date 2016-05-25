@@ -32,6 +32,7 @@ public interface IClipboardField extends IValueField<Collection<BinaryResource>>
 
   String PROP_MAXIMUM_SIZE = "maximumSize";
   String PROP_ALLOWED_MIME_TYPES = "allowedMimeTypes";
+  String PROP_READ_ONLY = "readOnly";
 
   /*
    * Runtime
@@ -44,5 +45,9 @@ public interface IClipboardField extends IValueField<Collection<BinaryResource>>
   List<String> getAllowedMimeTypes();
 
   void setAllowedMimeTypes(List<String> allowedMimeTypes);
+
+  boolean isReadOnly();
+
+  void setReadOnly(boolean b);
 
 }
