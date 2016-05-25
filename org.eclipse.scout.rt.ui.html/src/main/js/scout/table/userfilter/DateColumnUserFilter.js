@@ -120,13 +120,22 @@ scout.DateColumnUserFilter.prototype.modifyFilterFields = function() {
 };
 
 scout.DateColumnUserFilter.prototype._onInput = function(event) {
-  var datePrediction = this.dateFromField._predictDate(this.dateFromField.$dateField.val()); // this also updates the errorStatus
-  if (datePrediction && datePrediction.date) {
-    this.dateFrom = this.dateFromField._newTimestampAsDate(datePrediction.date, this.dateFromField.timestampAsDate);
+  if (!this.dateFromField.rendered) {
+    // popup has been closed in the mean time
+    return;
   }
-  var datePredictionTo = this.dateToField._predictDate(this.dateToField.$dateField.val()); // this also updates the errorStatus
-  if (datePredictionTo && datePredictionTo.date) {
-    this.dateTo = this.dateToField._newTimestampAsDate(datePredictionTo.date, this.dateToField.timestampAsDate);
-  }
+  this.dateFrom = this._readDate(this.dateFromField);
+  this.dateTo = this._readDate(this.dateToField);
   this.triggerFilterFieldsChanged(event);
+};
+
+scout.DateColumnUserFilter.prototype._readDate = function(dateField) {
+  var displayText = dateField.$dateField.val();
+  if (!displayText) {
+    return null;
+  }
+  var datePrediction = dateField._predictDate(displayText);
+  if (datePrediction && datePrediction.date) {
+    return dateField._newTimestampAsDate(datePrediction.date, dateField.timestampAsDate);
+  }
 };
