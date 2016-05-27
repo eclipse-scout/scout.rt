@@ -12,6 +12,7 @@ import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 /**
  * Test for {@link IncrementalTreeBuilder}
@@ -48,8 +49,10 @@ public class IncrementalTreeBuilderTest {
 
   @Test
   public void testCreatePaths_NonEmpty() {
+    @SuppressWarnings("unchecked")
+    IKeyLookupProvider<Long> mockProvider = Mockito.mock(IKeyLookupProvider.class);
     ITree tree = createTestTree();
-    IncrementalTreeBuilder<Long> builder = new IncrementalTreeBuilder<Long>(null);
+    IncrementalTreeBuilder<Long> builder = new IncrementalTreeBuilder<Long>(mockProvider);
     ArrayList<ILookupRow<Long>> rows = new ArrayList<>();
     rows.add(new LookupRow<Long>(1L, ""));
     rows.add(new LookupRow<Long>(2L, "").withParentKey(1L));
