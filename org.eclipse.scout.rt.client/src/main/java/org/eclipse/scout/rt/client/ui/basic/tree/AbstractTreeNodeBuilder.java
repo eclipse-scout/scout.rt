@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.ui.basic.tree;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,10 +33,10 @@ public abstract class AbstractTreeNodeBuilder<LOOKUP_ROW_TYPE> {
     return createTreeNode(new LookupRow<LOOKUP_ROW_TYPE>(primaryKey, text), nodeStatus, markChildrenLoaded);
   }
 
-  public List<ITreeNode> createTreeNodes(List<? extends ILookupRow<LOOKUP_ROW_TYPE>> lookupRows, int nodeStatus, boolean markChildrenLoaded) {
-    ArrayList<ITreeNode> rootNodes = new ArrayList<ITreeNode>();
-    HashMap<Object, ITreeNode> nodeMap = new HashMap<Object, ITreeNode>();
-    HashMap<Object, ArrayList<ITreeNode>> parentChildMap = new HashMap<Object, ArrayList<ITreeNode>>();
+  public List<ITreeNode> createTreeNodes(Collection<? extends ILookupRow<LOOKUP_ROW_TYPE>> lookupRows, int nodeStatus, boolean markChildrenLoaded) {
+    ArrayList<ITreeNode> rootNodes = new ArrayList<>();
+    HashMap<Object, ITreeNode> nodeMap = new HashMap<>();
+    HashMap<LOOKUP_ROW_TYPE, ArrayList<ITreeNode>> parentChildMap = new HashMap<>();
     if (lookupRows != null) {
       for (ILookupRow<LOOKUP_ROW_TYPE> row : lookupRows) {
         ITreeNode node = createTreeNode(row, nodeStatus, markChildrenLoaded);
@@ -44,7 +45,7 @@ public abstract class AbstractTreeNodeBuilder<LOOKUP_ROW_TYPE> {
           // child
           ArrayList<ITreeNode> list = parentChildMap.get(row.getParentKey());
           if (list == null) {
-            list = new ArrayList<ITreeNode>();
+            list = new ArrayList<>();
             parentChildMap.put(row.getParentKey(), list);
           }
           list.add(node);
@@ -55,7 +56,7 @@ public abstract class AbstractTreeNodeBuilder<LOOKUP_ROW_TYPE> {
         }
       }
     }
-    for (Map.Entry<Object, ArrayList<ITreeNode>> e : parentChildMap.entrySet()) {
+    for (Map.Entry<LOOKUP_ROW_TYPE, ArrayList<ITreeNode>> e : parentChildMap.entrySet()) {
       Object parentKey = e.getKey();
       ITreeNode parentNode = nodeMap.get(parentKey);
       if (parentNode instanceof AbstractTreeNode) {
