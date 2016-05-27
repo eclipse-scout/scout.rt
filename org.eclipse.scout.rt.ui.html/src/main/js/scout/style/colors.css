@@ -164,8 +164,8 @@
 @desktop-navigation-handle-background-color: @navigation-background-color;
 @desktop-navigation-handle-border-color: @desktop-navigation-handle-color;
 @desktop-navigation-handle-color: @navigation-color;
-@desktop-table-header-background-color: @table-header-background-color;
 @desktop-header-background-color: @palette-white;
+@detail-table-header-background-color: @table-header-background-color;
 @form-background-color: @background-color;
 @form-menu-popup-main-menubar-background-color: @menubar-background-color;
 @group-box-title-border-color: @border-color;

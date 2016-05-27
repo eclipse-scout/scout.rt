@@ -292,7 +292,7 @@ scout.DesktopBench.prototype._computeDetailContentForPage = function(node) {
     content.uiCssClasses = ['detail-form'];
   } else if (node.detailTable && node.detailTableVisible) {
     content = node.detailTable;
-    content.uiCssClasses = ['desktop-table'];
+    content.uiCssClasses = ['detail-table'];
   }
 
   return content;

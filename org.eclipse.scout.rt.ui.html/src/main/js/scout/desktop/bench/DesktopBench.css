@@ -9,11 +9,11 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 
-@desktop-table-header-padding-y: @table-header-padding-y + 5;
-@desktop-table-row-padding-y: @table-row-padding-y + 5;
-@desktop-table-header-padding-x: @bench-padding-x - @table-header-padding-left;
-@desktop-table-data-padding-x: @bench-padding-x - @table-cell-padding-left;
-@desktop-table-header-menubar-padding-right: 10px;
+@detail-table-header-padding-y: @table-header-padding-y + 5;
+@detail-table-row-padding-y: @table-row-padding-y + 5;
+@detail-table-header-padding-x: @bench-padding-x - @table-header-padding-left;
+@detail-table-data-padding-x: @bench-padding-x - @table-cell-padding-left;
+@detail-table-header-menubar-padding-right: 10px;
 
 .desktop-bench-drop-shadow() {
   position: absolute;
@@ -41,15 +41,15 @@
   }
 }
 
-.desktop-table.table {
+.detail-table.table {
 
   & > .table-header {
-    padding-left: @desktop-table-header-padding-x;
-    padding-right: @desktop-table-header-padding-x;
+    padding-left: @detail-table-header-padding-x;
+    padding-right: @detail-table-header-padding-x;
 
     & > .table-header-item {
-      padding-top: @desktop-table-header-padding-y;
-      padding-bottom: @desktop-table-header-padding-y;
+      padding-top: @detail-table-header-padding-y;
+      padding-bottom: @detail-table-header-padding-y;
 
       & > .table-header-item-state {
         top: 9px;
@@ -58,7 +58,7 @@
 
     & > .menubar-container {
       padding-left: 6px;
-      padding-right: @desktop-table-header-menubar-padding-right;
+      padding-right: @detail-table-header-menubar-padding-right;
 
       & > .menubar > .menubox > .menu-item {
         margin-right: 12px;
@@ -67,8 +67,8 @@
   }
 
   & > .table-data {
-    padding-left: @desktop-table-data-padding-x;
-    padding-right: @desktop-table-data-padding-x;
+    padding-left: @detail-table-data-padding-x;
+    padding-right: @detail-table-data-padding-x;
   }
 
   & .table-aggregate {
@@ -76,8 +76,8 @@
     margin-right: @bench-padding-x;
 
     & > .table-cell {
-      padding-top: @desktop-table-row-padding-y;
-      padding-bottom: @desktop-table-row-padding-y;
+      padding-top: @detail-table-row-padding-y;
+      padding-bottom: @detail-table-row-padding-y;
     }
   }
 
@@ -102,14 +102,14 @@
         /* Replace first and last pixel of specified row padding by a transparent border. This border will be */
         /* set to the selection color when the row is selected, thus creating the illusion that the 2px selection */
         /* border is drawn around the cell. See CSS rules below. */
-        padding-top: @desktop-table-row-padding-y - 1px;
-        padding-bottom: @desktop-table-row-padding-y - 1px;
+        padding-top: @detail-table-row-padding-y - 1px;
+        padding-bottom: @detail-table-row-padding-y - 1px;
         border-top: 1px solid transparent;
         border-bottom: 1px solid transparent;
 
         &.checkable {
-          padding-top: @desktop-table-row-padding-y - @checkable-cell-padding-adjustment - 1px;
-          padding-bottom: @desktop-table-row-padding-y - @checkable-cell-padding-adjustment - 1px;
+          padding-top: @detail-table-row-padding-y - @checkable-cell-padding-adjustment - 1px;
+          padding-bottom: @detail-table-row-padding-y - @checkable-cell-padding-adjustment - 1px;
         }
       }
 
@@ -128,7 +128,7 @@
     }
 
     & > .cell-editor-popup > .check-box-field > .cell-editor-field {
-      padding-top: @desktop-table-row-padding-y - @checkable-cell-padding-adjustment - 1px;
+      padding-top: @detail-table-row-padding-y - @checkable-cell-padding-adjustment - 1px;
     }
   }
 }
