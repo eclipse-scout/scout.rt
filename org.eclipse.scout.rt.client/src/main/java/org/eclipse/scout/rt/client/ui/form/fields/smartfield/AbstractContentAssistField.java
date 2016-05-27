@@ -53,6 +53,7 @@ import org.eclipse.scout.rt.platform.util.CompareUtility;
 import org.eclipse.scout.rt.platform.util.EventListenerList;
 import org.eclipse.scout.rt.platform.util.FinalValue;
 import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.platform.util.ToStringBuilder;
 import org.eclipse.scout.rt.platform.util.TriState;
 import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledException;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
@@ -430,9 +431,7 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
       contentAssistTableClazz = (Class<? extends IContentAssistFieldTable<VALUE>>) ContentAssistFieldTable.class;
     }
     setContentAssistTableClass(contentAssistTableClazz);
-    IContentAssistFieldLookupRowFetcher<LOOKUP_KEY> lookupRowFetcher = createLookupRowFetcher();
-    lookupRowFetcher.addPropertyChangeListener(new P_LookupRowFetcherPropertyListener());
-    setLookupRowFetcher(lookupRowFetcher);
+    initLookupRowFetcher();
     // code type
     if (getConfiguredCodeType() != null) {
       setCodeTypeClass(getConfiguredCodeType());
@@ -444,6 +443,12 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
       setLookupCall(call);
     }
     setWildcard(getConfiguredWildcard());
+  }
+
+  private void initLookupRowFetcher() {
+    IContentAssistFieldLookupRowFetcher<LOOKUP_KEY> lookupRowFetcher = createLookupRowFetcher();
+    lookupRowFetcher.addPropertyChangeListener(new P_LookupRowFetcherPropertyListener());
+    setLookupRowFetcher(lookupRowFetcher);
   }
 
   /**
@@ -585,6 +590,7 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
   @Override
   public void setBrowseHierarchy(boolean b) {
     m_browseHierarchy = b;
+    initLookupRowFetcher();
   }
 
   @Override
@@ -829,11 +835,6 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
     return new DefaultProposalChooserProvider<LOOKUP_KEY>();
   }
 
-  @Override
-  public void doSearch(boolean selectCurrentValue, boolean synchronous) {
-    doSearch(getLookupRowFetcher().getLastSearchText(), selectCurrentValue, synchronous);
-  }
-
   @SuppressWarnings("unchecked")
   @Override
   public IProposalChooser<?, LOOKUP_KEY> getProposalChooser() {
@@ -842,14 +843,6 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
 
   protected String toSearchText(String text) {
     return StringUtility.isNullOrEmpty(text) ? getWildcard() : text;
-  }
-
-  @Override
-  public void doSearch(String text, boolean selectCurrentValue, boolean synchronous) {
-    if (isProposalChooserRegistered()) {
-      getProposalChooser().setStatus(new Status(ScoutTexts.get("searchingProposals"), IStatus.WARNING));
-    }
-    getLookupRowFetcher().update(toSearchText(text), selectCurrentValue, synchronous);
   }
 
   public void setCurrentLookupRow(ILookupRow<LOOKUP_KEY> row) {
@@ -986,6 +979,22 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
     return CompareUtility.equals(lookupRow.getKey(), value);
   }
 
+  //search and update the field with the result
+
+  @Override
+  public void doSearch(boolean selectCurrentValue, boolean synchronous) {
+    doSearch(getLookupRowFetcher().getLastSearchText(), selectCurrentValue, synchronous);
+  }
+
+  @Override
+  public void doSearch(String text, boolean selectCurrentValue, boolean synchronous) {
+    if (isProposalChooserRegistered()) {
+      getProposalChooser().setStatus(new Status(ScoutTexts.get("searchingProposals"), IStatus.WARNING));
+    }
+    getLookupRowFetcher().update(text, selectCurrentValue, synchronous);
+  }
+
+  // blocking lookups
   @Override
   public List<? extends ILookupRow<LOOKUP_KEY>> callKeyLookup(LOOKUP_KEY key) {
     LookupRowCollector<LOOKUP_KEY> collector = new LookupRowCollector<>();
@@ -994,20 +1003,10 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
   }
 
   @Override
-  public IFuture<Void> callKeyLookupInBackground(LOOKUP_KEY key, ILookupRowFetchedCallback<LOOKUP_KEY> callback) {
-    return fetchLookupRows(newByKeyLookupRowProvider(key), callback, true, 1);
-  }
-
-  @Override
   public List<? extends ILookupRow<LOOKUP_KEY>> callTextLookup(String text, int maxRowCount) {
     LookupRowCollector<LOOKUP_KEY> collector = new LookupRowCollector<>();
     fetchLookupRows(newByTextLookupRowProvider(text), collector, false, maxRowCount);
     return collector.get();
-  }
-
-  @Override
-  public IFuture<Void> callTextLookupInBackground(String text, int maxRowCount, ILookupRowFetchedCallback<LOOKUP_KEY> callback) {
-    return fetchLookupRows(newByTextLookupRowProvider(text), callback, true, maxRowCount);
   }
 
   @Override
@@ -1023,16 +1022,6 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
   }
 
   @Override
-  public IFuture<Void> callBrowseLookupInBackground(String browseHint, int maxRowCount, ILookupRowFetchedCallback<LOOKUP_KEY> callback) {
-    return callBrowseLookupInBackground(browseHint, maxRowCount, isActiveFilterEnabled() ? getActiveFilter() : TriState.TRUE, callback);
-  }
-
-  @Override
-  public IFuture<Void> callBrowseLookupInBackground(String browseHint, int maxRowCount, TriState activeState, ILookupRowFetchedCallback<LOOKUP_KEY> callback) {
-    return fetchLookupRows(newByAllLookupRowProvider(browseHint, activeState), callback, true, maxRowCount);
-  }
-
-  @Override
   public List<ILookupRow<LOOKUP_KEY>> callSubTreeLookup(LOOKUP_KEY parentKey) {
     return callSubTreeLookup(parentKey, isActiveFilterEnabled() ? getActiveFilter() : TriState.TRUE);
   }
@@ -1043,16 +1032,43 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
     return BEANS.get(LookupRowHelper.class).lookup(provider, cloneLookupCall());
   }
 
-  /**
-   * Load child rows for a given parent key in background
-   *
-   * @param parentKey
-   *          key of the parent node
-   */
+  // non-blocking lookups
+
   @Override
-  public IFuture<List<ILookupRow<LOOKUP_KEY>>> callSubTreeLookupInBackground(final LOOKUP_KEY parentKey, final TriState activeState) {
-    cancelPotentialLookup();
+  public IFuture<List<ILookupRow<LOOKUP_KEY>>> callKeyLookupInBackground(final LOOKUP_KEY key, boolean cancelRunningJobs) {
+    ILookupRowProvider<LOOKUP_KEY> provider = newByKeyLookupRowProvider(key);
+    return callInBackground(provider, cancelRunningJobs);
+  }
+
+  @Override
+  public IFuture<List<ILookupRow<LOOKUP_KEY>>> callTextLookupInBackground(String text, boolean cancelRunningJobs) {
+    final ILookupRowProvider<LOOKUP_KEY> provider = newByTextLookupRowProvider(text);
+    return callInBackground(provider, cancelRunningJobs);
+  }
+
+  @Override
+  public IFuture<List<ILookupRow<LOOKUP_KEY>>> callBrowseLookupInBackground(String browseHint, boolean cancelRunningJobs) {
+    TriState activeState = isActiveFilterEnabled() ? getActiveFilter() : TriState.TRUE;
+    final ILookupRowProvider<LOOKUP_KEY> provider = newByAllLookupRowProvider(browseHint, activeState);
+    return callInBackground(provider, cancelRunningJobs);
+  }
+
+  @Override
+  public IFuture<List<ILookupRow<LOOKUP_KEY>>> callSubTreeLookupInBackground(final LOOKUP_KEY parentKey, boolean cancelRunningJobs) {
+    TriState activeState = isActiveFilterEnabled() ? getActiveFilter() : TriState.TRUE;
+    return callSubTreeLookupInBackground(parentKey, activeState, cancelRunningJobs);
+  }
+
+  @Override
+  public IFuture<List<ILookupRow<LOOKUP_KEY>>> callSubTreeLookupInBackground(final LOOKUP_KEY parentKey, final TriState activeState, boolean cancelRunningJobs) {
     final ILookupRowProvider<LOOKUP_KEY> provider = newByRecLookupRowProvider(parentKey, activeState);
+    return callInBackground(provider, cancelRunningJobs);
+  }
+
+  protected IFuture<List<ILookupRow<LOOKUP_KEY>>> callInBackground(final ILookupRowProvider<LOOKUP_KEY> provider, boolean cancelRunningJobs) {
+    if (cancelRunningJobs) {
+      cancelPotentialLookup();
+    }
     IFuture<List<ILookupRow<LOOKUP_KEY>>> futureResult = BEANS.get(LookupRowHelper.class).scheduleLookup(provider, cloneLookupCall());
     m_lookupFuture = futureResult;
     return futureResult;
@@ -1060,6 +1076,27 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
 
   private ILookupCall<LOOKUP_KEY> cloneLookupCall() {
     return BEANS.get(ILookupCallProvisioningService.class).newClonedInstance(getLookupCall(), new FormFieldProvisioningContext(AbstractContentAssistField.this));
+  }
+
+  // non-blocking lookups using callbacks (legacy)
+  @Override
+  public IFuture<Void> callKeyLookupInBackground(LOOKUP_KEY key, ILookupRowFetchedCallback<LOOKUP_KEY> callback) {
+    return fetchLookupRows(newByKeyLookupRowProvider(key), callback, true, 1);
+  }
+
+  @Override
+  public IFuture<Void> callTextLookupInBackground(String text, int maxRowCount, ILookupRowFetchedCallback<LOOKUP_KEY> callback) {
+    return fetchLookupRows(newByTextLookupRowProvider(text), callback, true, maxRowCount);
+  }
+
+  @Override
+  public IFuture<Void> callBrowseLookupInBackground(String browseHint, int maxRowCount, ILookupRowFetchedCallback<LOOKUP_KEY> callback) {
+    return callBrowseLookupInBackground(browseHint, maxRowCount, isActiveFilterEnabled() ? getActiveFilter() : TriState.TRUE, callback);
+  }
+
+  @Override
+  public IFuture<Void> callBrowseLookupInBackground(String browseHint, int maxRowCount, TriState activeState, ILookupRowFetchedCallback<LOOKUP_KEY> callback) {
+    return fetchLookupRows(newByAllLookupRowProvider(browseHint, activeState), callback, true, maxRowCount);
   }
 
   protected void cleanupResultList(final List<ILookupRow<LOOKUP_KEY>> list) {
@@ -1313,6 +1350,14 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
       public List<ILookupRow<LOOKUP_KEY>> provide(ILookupCall<LOOKUP_KEY> lookupCall) {
         return (List<ILookupRow<LOOKUP_KEY>>) lookupCall.getDataByKey();
       }
+
+      @Override
+      public String toString() {
+        ToStringBuilder sb = new ToStringBuilder(this)
+            .attr("Key Lookup")
+            .attr("key", key);
+        return sb.toString();
+      }
     };
   }
 
@@ -1352,6 +1397,16 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
       public List<ILookupRow<LOOKUP_KEY>> provide(ILookupCall<LOOKUP_KEY> lookupCall) {
         return (List<ILookupRow<LOOKUP_KEY>>) lookupCall.getDataByAll();
       }
+
+      @Override
+      public String toString() {
+        ToStringBuilder sb = new ToStringBuilder(this)
+            .attr("All Lookup")
+            .attr("browseHint", browseHint)
+            .attr("activeState", activeState);
+        return sb.toString();
+      }
+
     };
   }
 
@@ -1391,6 +1446,14 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
       public List<ILookupRow<LOOKUP_KEY>> provide(ILookupCall<LOOKUP_KEY> lookupCall) {
         return (List<ILookupRow<LOOKUP_KEY>>) lookupCall.getDataByText();
       }
+
+      @Override
+      public String toString() {
+        ToStringBuilder sb = new ToStringBuilder(this)
+            .attr("Text Lookup")
+            .attr("text", text);
+        return sb.toString();
+      }
     };
   }
 
@@ -1426,6 +1489,15 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
       @Override
       public IFuture<Void> provideAsync(ILookupCall<LOOKUP_KEY> lookupCall, ILookupRowFetchedCallback<LOOKUP_KEY> callback, ClientRunContext clientRunContext) {
         throw new UnsupportedOperationException("Legacy calls not supported");
+      }
+
+      @Override
+      public String toString() {
+        ToStringBuilder sb = new ToStringBuilder(this)
+            .attr("Rec Lookup")
+            .attr("parentKey", parentKey)
+            .attr("activeState", activeState);
+        return sb.toString();
       }
     };
   }

@@ -177,21 +177,6 @@ public interface IContentAssistField<VALUE, LOOKUP_KEY> extends IValueField<VALU
   void setUniquelyDefinedValue(boolean background);
 
   /**
-   * updates the lookup rows with the same search text as last time.
-   *
-   * @param selectCurrentValue
-   * @param synchronous
-   */
-  void doSearch(boolean selectCurrentValue, boolean synchronous);
-
-  /**
-   * @param searchText
-   * @param selectCurrentValue
-   * @param synchronous
-   */
-  void doSearch(String searchText, boolean selectCurrentValue, boolean synchronous);
-
-  /**
    * Sets the current lookup-row to null and also the accepted proposal from the proposal chooser (if available).
    */
   void clearProposal();
@@ -200,56 +185,6 @@ public interface IContentAssistField<VALUE, LOOKUP_KEY> extends IValueField<VALU
    * This method is normally used by a {@link IContentAssistFieldProposalForm#acceptProposal()}
    */
   void acceptProposal(ILookupRow<LOOKUP_KEY> row);
-
-  List<? extends ILookupRow<LOOKUP_KEY>> callKeyLookup(LOOKUP_KEY key);
-
-  /**
-   * Loads lookup rows asynchronously, and notifies the specified callback upon loading completed.
-   * <p>
-   * The methods of {@link ILookupRowFetchedCallback} are invoked in the model thread.
-   *
-   * @return {@link IFuture} to cancel data fetching
-   */
-  IFuture<Void> callKeyLookupInBackground(LOOKUP_KEY key, ILookupRowFetchedCallback<LOOKUP_KEY> callback);
-
-  List<? extends ILookupRow<LOOKUP_KEY>> callTextLookup(String text, int maxRowCount);
-
-  /**
-   * Loads lookup rows asynchronously, and notifies the specified callback upon loading completed.
-   * <p>
-   * The methods of {@link ILookupRowFetchedCallback} are invoked in the model thread.
-   *
-   * @return {@link IFuture} to cancel data fetching.
-   */
-  IFuture<Void> callTextLookupInBackground(String text, int maxRowCount, ILookupRowFetchedCallback<LOOKUP_KEY> callback);
-
-  List<? extends ILookupRow<LOOKUP_KEY>> callBrowseLookup(String browseHint, int maxRowCount);
-
-  List<? extends ILookupRow<LOOKUP_KEY>> callBrowseLookup(String browseHint, int maxRowCount, TriState activeState);
-
-  /**
-   * Loads lookup rows asynchronously, and notifies the specified callback upon loading completed.
-   * <p>
-   * The methods of {@link ILookupRowFetchedCallback} are invoked in the model thread.
-   *
-   * @return {@link IFuture} to cancel data fetching
-   */
-  IFuture<Void> callBrowseLookupInBackground(String browseHint, int maxRowCount, ILookupRowFetchedCallback<LOOKUP_KEY> callback);
-
-  /**
-   * Loads lookup rows asynchronously, and notifies the specified callback upon loading completed.
-   * <p>
-   * The methods of {@link ILookupRowFetchedCallback} are invoked in the model thread.
-   *
-   * @return {@link IFuture} to cancel data fetching
-   */
-  IFuture<Void> callBrowseLookupInBackground(String browseHint, int maxRowCount, TriState activeState, ILookupRowFetchedCallback<LOOKUP_KEY> callback);
-
-  List<ILookupRow<LOOKUP_KEY>> callSubTreeLookup(LOOKUP_KEY parentKey);
-
-  List<ILookupRow<LOOKUP_KEY>> callSubTreeLookup(LOOKUP_KEY parentKey, TriState activeState);
-
-  IFuture<List<ILookupRow<LOOKUP_KEY>>> callSubTreeLookupInBackground(final LOOKUP_KEY parentKey, final TriState activeState);
 
   IContentAssistFieldUIFacade getUIFacade();
 
@@ -279,5 +214,151 @@ public interface IContentAssistField<VALUE, LOOKUP_KEY> extends IValueField<VALU
   void setWildcard(String wildcard);
 
   String getWildcard();
+
+  //search and update the field with the result
+
+  /**
+   * updates the lookup rows with the same search text as last time.
+   *
+   * @param selectCurrentValue
+   * @param synchronous
+   */
+  void doSearch(boolean selectCurrentValue, boolean synchronous);
+
+  /**
+   * @param searchText
+   * @param selectCurrentValue
+   * @param synchronous
+   */
+  void doSearch(String searchText, boolean selectCurrentValue, boolean synchronous);
+
+  // blocking lookups
+  /**
+   * Lookup rows by key using {@link ILookupCall#getDataByKey()}. Blocks until the result is available.
+   *
+   * @param key
+   *          lookup key
+   * @return rows not <code>null</code>
+   */
+  List<? extends ILookupRow<LOOKUP_KEY>> callKeyLookup(LOOKUP_KEY key);
+
+  /**
+   * Lookup rows by text {@link ILookupCall#getDataByText()}. Blocks until the result is available.
+   *
+   * @param text
+   *          search text
+   * @return rows not <code>null</code>
+   */
+  List<? extends ILookupRow<LOOKUP_KEY>> callTextLookup(String text, int maxRowCount);
+
+  /**
+   * Lookup all rows using {@link ILookupCall#getDataByAll()}. Blocks until the result is available.
+   *
+   * @return rows not <code>null</code>
+   */
+  List<? extends ILookupRow<LOOKUP_KEY>> callBrowseLookup(String browseHint, int maxRowCount);
+
+  /**
+   * Lookup all rows using {@link ILookupCall#getDataByAll()}. Blocks until the result is available.
+   *
+   * @return rows not <code>null</code>
+   */
+  List<? extends ILookupRow<LOOKUP_KEY>> callBrowseLookup(String browseHint, int maxRowCount, TriState activeState);
+
+  /**
+   * Lookup rows of a parent key using {@link ILookupCall#getDataByRec()}. Blocks until the result is available.
+   *
+   * @return rows not <code>null</code>
+   */
+  List<ILookupRow<LOOKUP_KEY>> callSubTreeLookup(LOOKUP_KEY parentKey);
+
+  /**
+   * Lookup rows of a parent key using {@link ILookupCall#getDataByRec()}. Blocks until the result is available.
+   *
+   * @return rows not <code>null</code>
+   */
+  List<ILookupRow<LOOKUP_KEY>> callSubTreeLookup(LOOKUP_KEY parentKey, TriState activeState);
+
+  // non-blocking lookups
+
+  IFuture<List<ILookupRow<LOOKUP_KEY>>> callKeyLookupInBackground(final LOOKUP_KEY key, boolean cancelRunningJobs);
+
+  /**
+   * Lookup rows asynchronously by text {@link ILookupCall#getDataByText()}.
+   *
+   * @param cancelRunningJobs
+   *          if <code>true</code> it automatically cancels already running lookup jobs of this field, before starting
+   *          the new lookup job.
+   * @return {@link IFuture} to cancel data fetching.
+   */
+  IFuture<List<ILookupRow<LOOKUP_KEY>>> callTextLookupInBackground(String text, boolean cancelRunningJobs);
+
+  /**
+   * Lookup rows asynchronously by all {@link ILookupCall#getDataByAll()}. Automatically cancels already running lookup
+   * jobs of this field, before starting the lookup job.
+   *
+   * @param cancelRunningJobs
+   *          if <code>true</code> it automatically cancels already running lookup jobs of this field, before starting
+   *          the new lookup job.
+   * @return {@link IFuture} to cancel data fetching
+   */
+  IFuture<List<ILookupRow<LOOKUP_KEY>>> callBrowseLookupInBackground(String browseHint, boolean cancelRunningJobs);
+
+  /**
+   * Lookup child rows of a given parent key asynchronously using {@link ILookupCall#getDataByRec()}.
+   *
+   * @param cancelRunningJobs
+   *          if <code>true</code> it automatically cancels already running lookup jobs of this field, before starting
+   *          the new lookup job.
+   * @return {@link IFuture} to cancel data fetching
+   */
+  IFuture<List<ILookupRow<LOOKUP_KEY>>> callSubTreeLookupInBackground(final LOOKUP_KEY parentKey, boolean cancelRunningJobs);
+
+  /**
+   * Lookup child rows of a given parent key asynchronously using {@link ILookupCall#getDataByRec()}.
+   *
+   * @param cancelRunningJobs
+   *          if <code>true</code> it automatically cancels already running lookup jobs of this field, before starting
+   *          the new lookup job.
+   * @return {@link IFuture} to cancel data fetching
+   */
+  IFuture<List<ILookupRow<LOOKUP_KEY>>> callSubTreeLookupInBackground(final LOOKUP_KEY parentKey, final TriState activeState, boolean cancelRunningJobs);
+
+  // non-blocking lookups using callbacks (legacy)
+  /**
+   * Loads lookup rows asynchronously, and notifies the specified callback upon loading completed.
+   * <p>
+   * The methods of {@link ILookupRowFetchedCallback} are invoked in the model thread.
+   *
+   * @return {@link IFuture} to cancel data fetching
+   */
+  IFuture<Void> callKeyLookupInBackground(LOOKUP_KEY key, ILookupRowFetchedCallback<LOOKUP_KEY> callback);
+
+  /**
+   * Loads lookup rows asynchronously, and notifies the specified callback upon loading completed.
+   * <p>
+   * The methods of {@link ILookupRowFetchedCallback} are invoked in the model thread.
+   *
+   * @return {@link IFuture} to cancel data fetching.
+   */
+  IFuture<Void> callTextLookupInBackground(String text, int maxRowCount, ILookupRowFetchedCallback<LOOKUP_KEY> callback);
+
+  /**
+   * Loads lookup rows asynchronously, and notifies the specified callback upon loading completed.
+   * <p>
+   * The methods of {@link ILookupRowFetchedCallback} are invoked in the model thread.
+   *
+   * @return {@link IFuture} to cancel data fetching
+   */
+  IFuture<Void> callBrowseLookupInBackground(String browseHint, int maxRowCount, ILookupRowFetchedCallback<LOOKUP_KEY> callback);
+
+  /**
+   * Loads lookup rows asynchronously, and notifies the specified callback upon loading completed.
+   * <p>
+   * The methods of {@link ILookupRowFetchedCallback} are invoked in the model thread.
+   *
+   * @return {@link IFuture} to cancel data fetching
+   */
+  IFuture<Void> callBrowseLookupInBackground(String browseHint, int maxRowCount, TriState activeState, ILookupRowFetchedCallback<LOOKUP_KEY> callback);
 
 }

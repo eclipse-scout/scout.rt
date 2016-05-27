@@ -140,7 +140,7 @@ public class SmartFieldLookupTest {
     m_field.setLookupCall(new TestLookupCall());
     m_field.setMasterField(masterField);
 
-    IFuture<List<ILookupRow<Long>>> futureRows = m_field.callSubTreeLookupInBackground(1L, TriState.TRUE);
+    IFuture<List<ILookupRow<Long>>> futureRows = m_field.callSubTreeLookupInBackground(1L, TriState.TRUE, false);
     List<? extends ILookupRow<Long>> rows = awaitDoneAndGet(futureRows);
     assertEquals(2, rows.size());
   }
@@ -163,7 +163,7 @@ public class SmartFieldLookupTest {
 
   @Test
   public void testSubtreeLookupNoLookupCall_InBackground() throws InterruptedException {
-    IFuture<List<ILookupRow<Long>>> futureRows = m_field.callSubTreeLookupInBackground(1L, TriState.TRUE);
+    IFuture<List<ILookupRow<Long>>> futureRows = m_field.callSubTreeLookupInBackground(1L, TriState.TRUE, false);
     List<? extends ILookupRow<Long>> rows = awaitDoneAndGet(futureRows);
     assertEquals(0, rows.size());
   }
@@ -190,7 +190,7 @@ public class SmartFieldLookupTest {
     m_field.setLookupCall(new TestLookupCall());
     when(m_mock_service.getDataByRec(any(ILookupCall.class))).thenThrow(new PlatformException("lookup error"));
 
-    IFuture<List<ILookupRow<Long>>> rows = m_field.callSubTreeLookupInBackground(1L, TriState.TRUE);
+    IFuture<List<ILookupRow<Long>>> rows = m_field.callSubTreeLookupInBackground(1L, TriState.TRUE, false);
 
     rows.whenDone(new IDoneHandler<List<ILookupRow<Long>>>() {
 
