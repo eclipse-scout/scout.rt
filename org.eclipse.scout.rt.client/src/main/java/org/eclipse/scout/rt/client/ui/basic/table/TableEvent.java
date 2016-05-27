@@ -14,6 +14,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -190,8 +191,60 @@ public class TableEvent extends java.util.EventObject implements IModelEvent {
     m_rows = CollectionUtility.arrayList(rows);
   }
 
+  protected Set<ITableRow> getRowsSet() {
+    return CollectionUtility.hashSet(m_rows);
+  }
+
+  /**
+   * Removes all occurrences of the given row.
+   *
+   * @return Returns <code>true</code> if the given row has been deleted. Otherwise <code>false</code>.
+   */
+  protected boolean removeRow(ITableRow row) {
+    if (row == null || m_rows.isEmpty()) {
+      return false;
+    }
+
+    return removeRows(Collections.singleton(row), null);
+  }
+
+  /**
+   * Removes all occurrences of the given rows. Removed rows are added to the optional row collector.
+   *
+   * @return Returns <code>true</code> if any of the given rows has been deleted. Otherwise <code>false</code>.
+   */
+  protected boolean removeRows(Set<ITableRow> rowsToRemove, Set<ITableRow> removedRowsCollector) {
+    if (rowsToRemove == null || rowsToRemove.isEmpty() || m_rows.isEmpty()) {
+      return false;
+    }
+    boolean removed = false;
+    for (Iterator<? extends ITableRow> it = m_rows.iterator(); it.hasNext();) {
+      final ITableRow row = it.next();
+      if (rowsToRemove.contains(row)) {
+        it.remove();
+        removed = true;
+        if (removedRowsCollector != null) {
+          removedRowsCollector.add(row);
+        }
+      }
+    }
+    return removed;
+  }
+
+  protected void clearRows() {
+    m_rows.clear();
+  }
+
   public int getRowCount() {
     return m_rows.size();
+  }
+
+  public boolean hasRows() {
+    return !m_rows.isEmpty();
+  }
+
+  public boolean containsRow(ITableRow row) {
+    return m_rows.contains(row);
   }
 
   public ITableRow getFirstRow() {
