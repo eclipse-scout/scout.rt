@@ -187,6 +187,7 @@ describe("Outline", function() {
           menuTypes: ['Table.SingleSelection']
         })
       ];
+      node0.nodeType = 'table';
       var childNode0 = node0.childNodes[0];
       childNode0.detailTable = new scout.TableSpecHelper(session).createTableWithOneColumn();
       childNode0.detailTableVisible = true;
@@ -196,6 +197,7 @@ describe("Outline", function() {
           menuTypes: ['Table.EmptySpace']
         })
       ];
+      childNode0.nodeType = 'table';
       expect(outline.detailMenuBarVisible).toBe(false);
       expect(outline.detailMenuBar.menuItems.length).toBe(0);
 
@@ -216,6 +218,7 @@ describe("Outline", function() {
           menuTypes: ['Table.EmptySpace']
         })
       ];
+      node0.nodeType = 'table';
       expect(outline.detailMenuBarVisible).toBe(false);
       expect(outline.detailMenuBar.menuItems.length).toBe(0);
 
