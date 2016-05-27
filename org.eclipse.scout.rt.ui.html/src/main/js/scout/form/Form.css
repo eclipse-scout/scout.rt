@@ -15,7 +15,7 @@
   background-color: @form-background-color;
 }
 
-.view {
+.view:not(.detail-form) {
   & > .root-group-box > .main-menubar {
     #scout.main-menubar-light;
   }

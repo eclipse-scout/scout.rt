@@ -289,9 +289,9 @@ scout.DesktopBench.prototype._computeDetailContentForPage = function(node) {
   var content;
   if (node.detailForm && node.detailFormVisible && node.detailFormVisibleByUi) {
     content = node.detailForm;
+    content.uiCssClasses = ['detail-form'];
   } else if (node.detailTable && node.detailTableVisible) {
     content = node.detailTable;
-    // add ui css class
     content.uiCssClasses = ['desktop-table'];
   }
 
