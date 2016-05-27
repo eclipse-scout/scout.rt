@@ -26,7 +26,7 @@ public interface ILookupRowProvider<LOOKUP_KEY> {
   /**
    * Invoke to load lookup rows. This method must be called from within a session aware {@link ClientRunContext}.
    */
-  List<? extends ILookupRow<LOOKUP_KEY>> provide(ILookupCall<LOOKUP_KEY> lookupCall);
+  List<ILookupRow<LOOKUP_KEY>> provide(ILookupCall<LOOKUP_KEY> lookupCall);
 
   /**
    * For legacy reasons<br>

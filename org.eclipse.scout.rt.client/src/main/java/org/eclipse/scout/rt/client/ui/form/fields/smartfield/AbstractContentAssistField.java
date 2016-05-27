@@ -1033,12 +1033,12 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
   }
 
   @Override
-  public List<? extends ILookupRow<LOOKUP_KEY>> callSubTreeLookup(LOOKUP_KEY parentKey) {
+  public List<ILookupRow<LOOKUP_KEY>> callSubTreeLookup(LOOKUP_KEY parentKey) {
     return callSubTreeLookup(parentKey, isActiveFilterEnabled() ? getActiveFilter() : TriState.TRUE);
   }
 
   @Override
-  public List<? extends ILookupRow<LOOKUP_KEY>> callSubTreeLookup(final LOOKUP_KEY parentKey, final TriState activeState) {
+  public List<ILookupRow<LOOKUP_KEY>> callSubTreeLookup(final LOOKUP_KEY parentKey, final TriState activeState) {
     final ILookupRowProvider<LOOKUP_KEY> provider = newByRecLookupRowProvider(parentKey, activeState);
     return BEANS.get(LookupRowHelper.class).lookup(provider, cloneLookupCall());
   }
@@ -1050,10 +1050,10 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
    *          key of the parent node
    */
   @Override
-  public IFuture<List<? extends ILookupRow<LOOKUP_KEY>>> callSubTreeLookupInBackground(final LOOKUP_KEY parentKey, final TriState activeState) {
+  public IFuture<List<ILookupRow<LOOKUP_KEY>>> callSubTreeLookupInBackground(final LOOKUP_KEY parentKey, final TriState activeState) {
     cancelPotentialLookup();
     final ILookupRowProvider<LOOKUP_KEY> provider = newByRecLookupRowProvider(parentKey, activeState);
-    IFuture<List<? extends ILookupRow<LOOKUP_KEY>>> futureResult = BEANS.get(LookupRowHelper.class).scheduleLookup(provider, cloneLookupCall());
+    IFuture<List<ILookupRow<LOOKUP_KEY>>> futureResult = BEANS.get(LookupRowHelper.class).scheduleLookup(provider, cloneLookupCall());
     m_lookupFuture = futureResult;
     return futureResult;
   }
@@ -1308,9 +1308,10 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
         return lookupCall.getDataByKeyInBackground(clientRunContext, callback);
       }
 
+      @SuppressWarnings("unchecked")
       @Override
-      public List<? extends ILookupRow<LOOKUP_KEY>> provide(ILookupCall<LOOKUP_KEY> lookupCall) {
-        return lookupCall.getDataByKey();
+      public List<ILookupRow<LOOKUP_KEY>> provide(ILookupCall<LOOKUP_KEY> lookupCall) {
+        return (List<ILookupRow<LOOKUP_KEY>>) lookupCall.getDataByKey();
       }
     };
   }
@@ -1346,9 +1347,10 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
         return lookupCall.getDataByAllInBackground(clientRunContext, callback);
       }
 
+      @SuppressWarnings("unchecked")
       @Override
-      public List<? extends ILookupRow<LOOKUP_KEY>> provide(ILookupCall<LOOKUP_KEY> lookupCall) {
-        return lookupCall.getDataByAll();
+      public List<ILookupRow<LOOKUP_KEY>> provide(ILookupCall<LOOKUP_KEY> lookupCall) {
+        return (List<ILookupRow<LOOKUP_KEY>>) lookupCall.getDataByAll();
       }
     };
   }
@@ -1384,9 +1386,10 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
         return lookupCall.getDataByTextInBackground(clientRunContext, callback);
       }
 
+      @SuppressWarnings("unchecked")
       @Override
-      public List<? extends ILookupRow<LOOKUP_KEY>> provide(ILookupCall<LOOKUP_KEY> lookupCall) {
-        return lookupCall.getDataByText();
+      public List<ILookupRow<LOOKUP_KEY>> provide(ILookupCall<LOOKUP_KEY> lookupCall) {
+        return (List<ILookupRow<LOOKUP_KEY>>) lookupCall.getDataByText();
       }
     };
   }
@@ -1397,9 +1400,10 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
   protected ILookupRowProvider<LOOKUP_KEY> newByRecLookupRowProvider(final LOOKUP_KEY parentKey, final TriState activeState) {
     return new ILookupRowProvider<LOOKUP_KEY>() {
 
+      @SuppressWarnings("unchecked")
       @Override
-      public List<? extends ILookupRow<LOOKUP_KEY>> provide(ILookupCall<LOOKUP_KEY> lookupCall) {
-        return lookupCall.getDataByRec();
+      public List<ILookupRow<LOOKUP_KEY>> provide(ILookupCall<LOOKUP_KEY> lookupCall) {
+        return (List<ILookupRow<LOOKUP_KEY>>) lookupCall.getDataByRec();
       }
 
       @Override

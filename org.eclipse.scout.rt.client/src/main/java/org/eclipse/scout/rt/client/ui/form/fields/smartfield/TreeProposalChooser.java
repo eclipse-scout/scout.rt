@@ -366,9 +366,9 @@ public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITr
       ILookupRow<LOOKUP_KEY> b = (LookupRow) (parentNode != null ? parentNode.getCell().getValue() : null);
       LOOKUP_KEY parentKey = b != null ? b.getKey() : null;
       m_contentAssistField.callSubTreeLookupInBackground(parentKey, TriState.UNDEFINED)
-          .whenDone(new IDoneHandler<List<? extends ILookupRow<LOOKUP_KEY>>>() {
+          .whenDone(new IDoneHandler<List<ILookupRow<LOOKUP_KEY>>>() {
             @Override
-            public void onDone(DoneEvent<List<? extends ILookupRow<LOOKUP_KEY>>> event) {
+            public void onDone(DoneEvent<List<ILookupRow<LOOKUP_KEY>>> event) {
               final List<? extends ILookupRow<LOOKUP_KEY>> result = event.getResult();
               final Throwable exception = event.getException();
 
