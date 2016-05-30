@@ -11,13 +11,9 @@
 package org.eclipse.scout.rt.client.mobile.transformation;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.eclipse.scout.rt.client.ui.action.IAction;
-import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
@@ -76,19 +72,6 @@ public class MobileDeviceTransformer extends AbstractDeviceTransformer {
     }
   }
 
-  /**
-   * Remove keystrokes
-   */
-  @Override
-  public void adaptDesktopActions(Collection<IAction> actions) {
-    for (Iterator<IAction> iterator = actions.iterator(); iterator.hasNext();) {
-      IAction action = iterator.next();
-      if (action instanceof IKeyStroke) {
-        iterator.remove();
-      }
-    }
-  }
-
   @Override
   public void transformDesktop() {
     getDesktop().setDisplayStyle(IDesktop.DISPLAY_STYLE_COMPACT);
@@ -98,13 +81,6 @@ public class MobileDeviceTransformer extends AbstractDeviceTransformer {
   public void transformForm(IForm form) {
     if (getDeviceTransformationConfig().isFormExcluded(form)) {
       return;
-    }
-
-    List<IDeviceTransformationHook> hooks = DeviceTransformationHooks.getFormTransformationHooks(form.getClass());
-    if (hooks != null) {
-      for (IDeviceTransformationHook hook : hooks) {
-        hook.beforeFormTransformation(form);
-      }
     }
 
     if (getDeviceTransformationConfig().isTransformationEnabled(MobileDeviceTransformation.DISABLE_FORM_CANCEL_CONFIRMATION)) {
@@ -225,13 +201,6 @@ public class MobileDeviceTransformer extends AbstractDeviceTransformer {
 
   @Override
   public void transformFormField(IFormField field) {
-    List<IDeviceTransformationHook> hooks = DeviceTransformationHooks.getFormFieldTransformationHooks(field.getClass());
-    if (hooks != null) {
-      for (IDeviceTransformationHook hook : hooks) {
-        hook.beforeFormFieldTransformation(field);
-      }
-    }
-
     if (getDeviceTransformationConfig().isTransformationEnabled(MobileDeviceTransformation.MOVE_FIELD_LABEL_TO_TOP, field)) {
       moveLabelToTop(field);
     }

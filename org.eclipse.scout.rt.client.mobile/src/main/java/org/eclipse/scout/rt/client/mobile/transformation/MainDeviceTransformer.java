@@ -1,12 +1,10 @@
 package org.eclipse.scout.rt.client.mobile.transformation;
 
 import java.lang.ref.WeakReference;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 
-import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
@@ -216,17 +214,6 @@ public class MainDeviceTransformer implements IDeviceTransformer {
   }
 
   @Override
-  public void adaptDesktopActions(Collection<IAction> actions) {
-    if (!isActive()) {
-      return;
-    }
-
-    for (IDeviceTransformer transformer : getTransformers()) {
-      transformer.adaptDesktopActions(actions);
-    }
-  }
-
-  @Override
   public void notifyDesktopClosing() {
     if (!isActive()) {
       return;
@@ -234,17 +221,6 @@ public class MainDeviceTransformer implements IDeviceTransformer {
 
     for (IDeviceTransformer transformer : getTransformers()) {
       transformer.notifyDesktopClosing();
-    }
-  }
-
-  @Override
-  public void notifyTablePageLoaded(IPageWithTable<?> tablePage) {
-    if (!isActive()) {
-      return;
-    }
-
-    for (IDeviceTransformer transformer : getTransformers()) {
-      transformer.notifyTablePageLoaded(tablePage);
     }
   }
 
@@ -282,20 +258,6 @@ public class MainDeviceTransformer implements IDeviceTransformer {
     for (IDeviceTransformer transformer : getTransformers()) {
       transformer.gridDataRebuilt(form);
     }
-  }
-
-  @Override
-  public boolean acceptFormAddingToDesktop(IForm form) {
-    if (!isActive()) {
-      return true;
-    }
-
-    for (IDeviceTransformer transformer : getTransformers()) {
-      if (!transformer.acceptFormAddingToDesktop(form)) {
-        return false;
-      }
-    }
-    return true;
   }
 
   @Override

@@ -10,16 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.mobile.transformation;
 
-import java.util.Collection;
-
-import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.desktop.AbstractDesktopExtension;
-import org.eclipse.scout.rt.client.ui.desktop.ContributionCommand;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
-import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
-import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.holders.IHolder;
 
 public class DeviceTransformationDesktopExtension extends AbstractDesktopExtension {
   private IDeviceTransformer m_deviceTransformer;
@@ -35,36 +28,10 @@ public class DeviceTransformationDesktopExtension extends AbstractDesktopExtensi
   public void setCoreDesktop(IDesktop desktop) {
     super.setCoreDesktop(desktop);
 
+    // Install service for this desktop / client session. This needs to be done before initConfig of the desktop runs
     IDeviceTransformationService transformationService = BEANS.get(IDeviceTransformationService.class);
     transformationService.install(getCoreDesktop());
     m_deviceTransformer = transformationService.getDeviceTransformer();
-  }
-
-  @Override
-  public void contributeActions(Collection<IAction> actions) {
-    getDeviceTransformer().adaptDesktopActions(actions);
-    super.contributeActions(actions);
-  }
-
-  @Override
-  protected ContributionCommand execFormAboutToShow(IHolder<IForm> formHolder) {
-    IForm form = formHolder.getValue();
-    if (form == null) {
-      return ContributionCommand.Stop;
-    }
-
-    if (!getDeviceTransformer().acceptFormAddingToDesktop(form)) {
-      formHolder.setValue(null);
-      return ContributionCommand.Stop;
-    }
-
-    return ContributionCommand.Continue;
-  }
-
-  @Override
-  protected ContributionCommand execTablePageLoaded(IPageWithTable<?> tablePage) {
-    getDeviceTransformer().notifyTablePageLoaded(tablePage);
-    return ContributionCommand.Continue;
   }
 
 }

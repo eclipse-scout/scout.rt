@@ -10,9 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.mobile.transformation;
 
-import java.util.Collection;
-
-import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
@@ -48,17 +45,11 @@ public interface IDeviceTransformer {
 
   void transformPageDetailTable(ITable table);
 
-  void adaptDesktopActions(Collection<IAction> actions);
-
   void notifyFormDisposed(IForm form);
 
   void notifyDesktopClosing();
 
-  void notifyTablePageLoaded(IPageWithTable<?> tablePage);
-
   void notifyPageSearchFormInit(IPageWithTable<ITable> page);
-
-  boolean acceptFormAddingToDesktop(IForm form);
 
   boolean isFormExcluded(IForm form);
 

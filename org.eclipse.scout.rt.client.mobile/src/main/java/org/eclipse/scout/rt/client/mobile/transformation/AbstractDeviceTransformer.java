@@ -1,10 +1,8 @@
 package org.eclipse.scout.rt.client.mobile.transformation;
 
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
@@ -94,24 +92,11 @@ public abstract class AbstractDeviceTransformer implements IDeviceTransformer {
   }
 
   @Override
-  public void adaptDesktopActions(Collection<IAction> actions) {
-  }
-
-  @Override
   public void notifyDesktopClosing() {
   }
 
   @Override
-  public void notifyTablePageLoaded(IPageWithTable<?> tablePage) {
-  }
-
-  @Override
   public void notifyPageSearchFormInit(IPageWithTable<ITable> page) {
-  }
-
-  @Override
-  public boolean acceptFormAddingToDesktop(IForm form) {
-    return true;
   }
 
   @Override
