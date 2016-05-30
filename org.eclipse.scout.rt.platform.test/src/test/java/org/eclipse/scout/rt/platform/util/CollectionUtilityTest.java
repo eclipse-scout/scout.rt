@@ -30,8 +30,6 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.eclipse.scout.rt.platform.util.TriState;
 import org.junit.Test;
 
 /**
@@ -39,28 +37,39 @@ import org.junit.Test;
  */
 public class CollectionUtilityTest {
 
-  /**
-   * Test for {@link CollectionUtility#equalsCollection(Collection<? extends T> c1, Collection<? extends T> c2)} and
-   * {@link CollectionUtility#equalsCollection(Collection<? extends T> c1, Collection<? extends T> c2, boolean
-   * considerElementPosition)}
-   */
+  @Test
+  public void testEqualsCollectionNullAndEmpty() {
+    Queue<Object> s = createQueue("a", "b");
+    assertTrue(CollectionUtility.equalsCollection(null, null));
+    assertTrue(CollectionUtility.equalsCollection(s, s));
+    assertFalse(CollectionUtility.equalsCollection(s, null));
+    assertFalse(CollectionUtility.equalsCollection(null, s));
+  }
+
   @Test
   public void testEqualsCollection() {
-    Queue<Object> s = createQueue("a", "b");
-    assertEquals(true, CollectionUtility.equalsCollection(null, null));
-    assertEquals(true, CollectionUtility.equalsCollection(s, s));
-    assertEquals(false, CollectionUtility.equalsCollection(s, null));
-    assertEquals(false, CollectionUtility.equalsCollection(null, s));
+    assertTrue(CollectionUtility.equalsCollection(createQueue("a", "b"), createQueue("a", "b")));
+    assertTrue(CollectionUtility.equalsCollection(createQueue("a", "b"), createQueue("b", "a")));
+    assertFalse(CollectionUtility.equalsCollection(createQueue("a", "b"), createQueue("a")));
+    assertFalse(CollectionUtility.equalsCollection(createQueue("a", "b"), createQueue("x", "y")));
+    assertFalse(CollectionUtility.equalsCollection(createQueue("a", "b"), createQueue("a", "a")));
+    assertFalse(CollectionUtility.equalsCollection(createQueue("a", "a", "b"), createQueue("a", "b", "b")));
+  }
 
-    assertEquals(true, CollectionUtility.equalsCollection(createQueue("a", "b"), createQueue("a", "b")));
-    assertEquals(true, CollectionUtility.equalsCollection(createQueue("a", "b"), createQueue("b", "a")));
-    assertEquals(false, CollectionUtility.equalsCollection(createQueue("a", "b"), createQueue("a")));
-    assertEquals(false, CollectionUtility.equalsCollection(createQueue("a", "b"), createQueue("x", "y")));
+  @Test
+  public void testEqualsCollectionConsinderingElementPosition() {
+    assertTrue(CollectionUtility.equalsCollection(createQueue("a", "b"), createQueue("a", "b"), true));
+    assertFalse(CollectionUtility.equalsCollection(createQueue("a", "b"), createQueue("b", "a"), true));
+    assertFalse(CollectionUtility.equalsCollection(createQueue("a", "b"), createQueue("a"), true));
+    assertFalse(CollectionUtility.equalsCollection(createQueue("a", "b"), createQueue("a", "a"), true));
+    assertFalse(CollectionUtility.equalsCollection(createQueue("a", "b"), createQueue("x", "y"), true));
+    assertFalse(CollectionUtility.equalsCollection(createQueue("a", "a", "b"), createQueue("a", "b", "b"), true));
+  }
 
-    assertEquals(true, CollectionUtility.equalsCollection(createQueue("a", "b"), createQueue("a", "b"), true));
-    assertEquals(false, CollectionUtility.equalsCollection(createQueue("a", "b"), createQueue("b", "a"), true));
-    assertEquals(false, CollectionUtility.equalsCollection(createQueue("a", "b"), createQueue("a"), true));
-    assertEquals(false, CollectionUtility.equalsCollection(createQueue("a", "b"), createQueue("x", "y"), true));
+  @Test
+  public void testEqualsCollectionMixedCollectionTypes() {
+    assertTrue(CollectionUtility.equalsCollection(CollectionUtility.hashSet("a", "b"), createList("a", "b")));
+    assertFalse(CollectionUtility.equalsCollection(CollectionUtility.hashSet("a", "b", "c"), createList("a", "b", "b")));
   }
 
   /**
@@ -69,14 +78,14 @@ public class CollectionUtilityTest {
   @Test
   public void testEqualsCollectionList() {
     List<Object> l = createList("a", "b");
-    assertEquals(true, CollectionUtility.equalsCollection(null, null));
-    assertEquals(true, CollectionUtility.equalsCollection(l, l));
-    assertEquals(false, CollectionUtility.equalsCollection(l, null));
-    assertEquals(false, CollectionUtility.equalsCollection(null, l));
+    assertTrue(CollectionUtility.equalsCollection(null, null));
+    assertTrue(CollectionUtility.equalsCollection(l, l));
+    assertFalse(CollectionUtility.equalsCollection(l, null));
+    assertFalse(CollectionUtility.equalsCollection(null, l));
 
-    assertEquals(true, CollectionUtility.equalsCollection(createList("a", "b"), createList("a", "b")));
-    assertEquals(false, CollectionUtility.equalsCollection(createList("a", "b"), createList("a")));
-    assertEquals(false, CollectionUtility.equalsCollection(createList("a", "b"), createList("b", "a")));
+    assertTrue(CollectionUtility.equalsCollection(createList("a", "b"), createList("a", "b")));
+    assertFalse(CollectionUtility.equalsCollection(createList("a", "b"), createList("a")));
+    assertFalse(CollectionUtility.equalsCollection(createList("a", "b"), createList("b", "a")));
   }
 
   /**

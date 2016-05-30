@@ -24,6 +24,7 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public final class CollectionUtility {
   private CollectionUtility() {
@@ -78,7 +79,28 @@ public final class CollectionUtility {
       return true;
     }
     else {
-      return c1.containsAll(c2);
+      Map<T, AtomicInteger> histogram = new HashMap<>();
+      for (T e1 : c1) {
+        AtomicInteger counter = histogram.get(e1);
+        if (counter == null) {
+          histogram.put(e1, new AtomicInteger(1));
+        }
+        else {
+          counter.incrementAndGet();
+        }
+      }
+
+      for (T e2 : c2) {
+        AtomicInteger counter = histogram.get(e2);
+        if (counter == null) {
+          return false;
+        }
+        else if (counter.decrementAndGet() == 0) {
+          histogram.remove(e2);
+        }
+      }
+
+      return histogram.isEmpty();
     }
   }
 
