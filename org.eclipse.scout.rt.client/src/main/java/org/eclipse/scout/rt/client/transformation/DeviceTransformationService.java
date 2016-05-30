@@ -26,22 +26,22 @@ public class DeviceTransformationService implements IDeviceTransformationService
   private static final Logger LOG = LoggerFactory.getLogger(DeviceTransformationService.class);
 
   private String SESSION_DATA_KEY = "DeviceTransformationServiceData";
-
-  @Override
-  public void install() {
-    install(null);
-  }
+  private IDeviceTransformer m_nullTransformer = new NullDeviceTransformer();
 
   @Override
   public void install(IDesktop desktop) {
-    if (getDeviceTransformer() != null) {
-      return;
+    IClientSession session = ClientSessionProvider.currentSession();
+    if (session == null) {
+      throw new IllegalArgumentException("No current session available");
     }
     if (desktop == null) {
       throw new IllegalArgumentException("Desktop must not be null");
     }
+    if (getDeviceTransformer(session) != null) {
+      // Already installed for the current session
+      return;
+    }
 
-    IClientSession session = ClientSessionProvider.currentSession();
     IDeviceTransformer data = createDeviceTransformer();
     data.setDesktop(desktop);
     session.setData(SESSION_DATA_KEY, data);
@@ -51,11 +51,16 @@ public class DeviceTransformationService implements IDeviceTransformationService
 
   @Override
   public void uninstall() {
-    if (getDeviceTransformer() == null) {
+    uninstall(ClientSessionProvider.currentSession());
+  }
+
+  protected void uninstall(IClientSession session) {
+    IDeviceTransformer transformer = getDeviceTransformer(session);
+    if (transformer == null) {
+      // Not installed for current session
       return;
     }
-    IClientSession session = ClientSessionProvider.currentSession();
-    getDeviceTransformer().dispose();
+    transformer.dispose();
     session.setData(SESSION_DATA_KEY, null);
     LOG.debug("DeviceTransformationService uninstalled for session {}", session);
   }
@@ -66,16 +71,31 @@ public class DeviceTransformationService implements IDeviceTransformationService
 
   @Override
   public IDeviceTransformer getDeviceTransformer() {
-    IClientSession session = ClientSessionProvider.currentSession();
-    return (IDeviceTransformer) session.getData(SESSION_DATA_KEY);
+    IDeviceTransformer transformer = getDeviceTransformer(ClientSessionProvider.currentSession());
+    if (transformer == null) {
+      return m_nullTransformer;
+    }
+    return transformer;
+  }
+
+  protected IDeviceTransformer getDeviceTransformer(IClientSession session) {
+    if (session == null) {
+      return null;
+    }
+    Object data = session.getData(SESSION_DATA_KEY);
+    if (data == null) {
+      return null;
+    }
+    return (IDeviceTransformer) data;
   }
 
   private class P_SessionListener implements ISessionListener {
     @Override
     public void sessionChanged(SessionEvent event) {
       if (event.getType() == SessionEvent.TYPE_STOPPED) {
-        event.getSource().removeListener(this);
-        uninstall();
+        IClientSession session = (IClientSession) event.getSource();
+        session.removeListener(this);
+        uninstall(session);
       }
     }
   }

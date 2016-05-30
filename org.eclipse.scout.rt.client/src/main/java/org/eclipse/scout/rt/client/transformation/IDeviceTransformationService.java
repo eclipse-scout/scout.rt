@@ -18,8 +18,6 @@ import org.eclipse.scout.rt.platform.service.IService;
  */
 public interface IDeviceTransformationService extends IService {
 
-  void install();
-
   void install(IDesktop desktop);
 
   void uninstall();

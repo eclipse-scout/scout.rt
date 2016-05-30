@@ -47,6 +47,7 @@ import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopTab
 import org.eclipse.scout.rt.client.services.common.bookmark.internal.BookmarkUtility;
 import org.eclipse.scout.rt.client.services.common.icon.IIconProviderService;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
+import org.eclipse.scout.rt.client.transformation.IDeviceTransformationService;
 import org.eclipse.scout.rt.client.ui.DataChangeListener;
 import org.eclipse.scout.rt.client.ui.IDisplayParent;
 import org.eclipse.scout.rt.client.ui.action.ActionFinder;
@@ -528,6 +529,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   protected void initConfig() {
+    BEANS.get(IDeviceTransformationService.class).install(this);
     initDesktopExtensions();
     setTitle(getConfiguredTitle());
     setSelectViewTabsKeyStrokesEnabled(getConfiguredSelectViewTabsKeyStrokesEnabled());
