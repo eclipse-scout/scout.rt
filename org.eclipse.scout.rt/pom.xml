@@ -53,8 +53,6 @@
 
     <module>../org.eclipse.scout.rt.client</module>
     <module>../org.eclipse.scout.rt.client.test</module>
-    <module>../org.eclipse.scout.rt.client.mobile</module>
-    <module>../org.eclipse.scout.rt.client.mobile.test</module>
     <module>../org.eclipse.scout.rt.svg.client</module>
     <module>../org.eclipse.scout.rt.svg.client.test</module>
 
@@ -234,12 +232,6 @@
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.client.test</artifactId>
-        <version>6.0.0-SNAPSHOT</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.eclipse.scout.rt</groupId>
-        <artifactId>org.eclipse.scout.rt.client.mobile</artifactId>
         <version>6.0.0-SNAPSHOT</version>
       </dependency>
 
