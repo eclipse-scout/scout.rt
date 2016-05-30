@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.mobile.transformation;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -17,12 +18,15 @@ import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.controls.ITableControl;
 import org.eclipse.scout.rt.client.ui.basic.table.controls.SearchFormTableControl;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
+import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineMenuWrapper;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm;
@@ -37,6 +41,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.placeholder.IPlaceholderField;
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.ISequenceBox;
 import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.shared.ui.UserAgentUtility;
 
 /**
@@ -151,6 +156,48 @@ public class MobileDeviceTransformer extends AbstractDeviceTransformer {
       mainBox.setScrollable(false);
       markGridDataDirty(mainBox.getForm());
     }
+  }
+
+  @Override
+  public void transformPageDetailTable(ITable table) {
+    super.transformPageDetailTable(table);
+    IPage<?> activePage = getDesktop().getOutline().getActivePage();
+    IPage<?> parentPage = activePage.getParentPage();
+    if (parentPage == null) {
+      return;
+    }
+    ITable parentTable = parentPage.getTable();
+    if (parentTable == null) {
+      return;
+    }
+
+    // Remove empty space menus of the current detail table which are already defined on the parent detail table as single selection menus
+    // This prevents duplicate menus because the ui concatenates these menus when a node is shown
+    // It is important to only remove outline wrapper menus which are defined on the parent table because the menu could be defined on a page and therefore needs to be displayed
+    List<IMenu> newMenus = new ArrayList<IMenu>();
+    for (IMenu menu : table.getMenus()) {
+      if ((menu instanceof OutlineMenuWrapper)) {
+        OutlineMenuWrapper menuWrapper = (OutlineMenuWrapper) menu;
+        IMenu originalMenu = unwrapOutlineWrapperMenu(menuWrapper);
+        if (menuWrapper.getMenuTypes().contains(TableMenuType.EmptySpace)
+            && originalMenu.getMenuTypes().contains(TableMenuType.SingleSelection)
+            && parentTable.getMenus().contains(originalMenu)) {
+          // This menu should be removed -> don't add it to the list of new menus
+          continue;
+        }
+      }
+      newMenus.add(menu);
+    }
+    if (!CollectionUtility.equalsCollection(newMenus, table.getContextMenu().getChildActions())) {
+      table.getContextMenu().setChildActions(newMenus);
+    }
+  }
+
+  protected static IMenu unwrapOutlineWrapperMenu(IMenu menu) {
+    while (menu instanceof OutlineMenuWrapper) {
+      menu = ((OutlineMenuWrapper) menu).getWrappedMenu();
+    }
+    return menu;
   }
 
   @Override

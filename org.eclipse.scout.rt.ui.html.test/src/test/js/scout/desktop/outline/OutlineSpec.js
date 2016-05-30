@@ -177,56 +177,6 @@ describe("Outline", function() {
       expect(outline.detailMenuBar.menuItems[0]).toBe(node0.detailTable.menus[0]);
     });
 
-    it("does not display outline wrapper menus if parent node page is a table page as well", function() {
-      var outline = helper.createOutlineWithOneDetailTable();
-      outline.setCompact(true);
-      outline.setEmbedDetailContent(true);
-      var node0 = outline.nodes[0];
-      node0.detailTable.menus = [
-        menuHelper.createMenu({
-          menuTypes: ['Table.SingleSelection']
-        })
-      ];
-      node0.nodeType = 'table';
-      var childNode0 = node0.childNodes[0];
-      childNode0.detailTable = new scout.TableSpecHelper(session).createTableWithOneColumn();
-      childNode0.detailTableVisible = true;
-      childNode0.detailTable.menus = [
-        menuHelper.createMenu({
-          outlineMenuWrapper: true,
-          menuTypes: ['Table.EmptySpace']
-        })
-      ];
-      childNode0.nodeType = 'table';
-      expect(outline.detailMenuBarVisible).toBe(false);
-      expect(outline.detailMenuBar.menuItems.length).toBe(0);
-
-      outline.selectNodes(childNode0);
-      expect(outline.detailMenuBarVisible).toBe(true);
-      expect(outline.detailMenuBar.menuItems.length).toBe(1);
-      expect(outline.detailMenuBar.menuItems[0]).toBe(node0.detailTable.menus[0]);
-    });
-
-    it("does display outline wrapper menus if there is no parent node page", function() {
-      var outline = helper.createOutlineWithOneDetailTable();
-      outline.setCompact(true);
-      outline.setEmbedDetailContent(true);
-      var node0 = outline.nodes[0];
-      node0.detailTable.menus = [
-        menuHelper.createMenu({
-          outlineMenuWrapper: true,
-          menuTypes: ['Table.EmptySpace']
-        })
-      ];
-      node0.nodeType = 'table';
-      expect(outline.detailMenuBarVisible).toBe(false);
-      expect(outline.detailMenuBar.menuItems.length).toBe(0);
-
-      outline.selectNodes(node0);
-      expect(outline.detailMenuBarVisible).toBe(true);
-      expect(outline.detailMenuBar.menuItems.length).toBe(1);
-      expect(outline.detailMenuBar.menuItems[0]).toBe(node0.detailTable.menus[0]);
-    });
 
     it("attaches a listener to the detail table to get dynamic menu changes", function() {
       var outline = helper.createOutlineWithOneDetailTable();

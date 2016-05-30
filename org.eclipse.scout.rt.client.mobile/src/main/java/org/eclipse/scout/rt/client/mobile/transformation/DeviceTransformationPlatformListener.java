@@ -11,6 +11,7 @@ public class DeviceTransformationPlatformListener implements IPlatformListener {
   @Override
   public void stateChanged(PlatformEvent event) {
     if (event.getState() == IPlatform.State.PlatformStarted) {
+      BEANS.get(IExtensionRegistry.class).register(DesktopExtension.class);
       BEANS.get(IExtensionRegistry.class).register(OutlineExtension.class);
       BEANS.get(IExtensionRegistry.class).register(PageExtension.class);
       BEANS.get(IExtensionRegistry.class).register(PageWithTableExtension.class);

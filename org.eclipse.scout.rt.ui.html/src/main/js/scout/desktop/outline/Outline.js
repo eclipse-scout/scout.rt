@@ -681,15 +681,6 @@ scout.Outline.prototype.updateDetailMenus = function() {
     // get single selection menus from parent detail table
     var parentPage = selectedPage.parentNode;
     if (parentPage && parentPage.detailTable) {
-      if (selectedPage.nodeType === 'table' && parentPage.nodeType === 'table') {
-        // Remove outline wrapper menus to prevent duplicate menus. The original menu is a single selection menu of the parent table and will be added below
-        // This is only done if selected and parent page are a table page to prevent unwanted removal of menus which are marked as outline wrapper but are not contained in the parent detail table
-        // This logic is actually based on assumptions, better would be to remove only the menus which are in the parent detail table but this is not known on ui side anymore.
-        // If it turns out that this assumption is wrong we will need to remove the menus on server side.
-        menuItems = menuItems.filter(function(menu) {
-          return !menu.outlineMenuWrapper;
-        }, this);
-      }
       detailTable = parentPage.detailTable;
       menuItems = menuItems.concat(scout.menus.filter(detailTable.menus, ['Table.SingleSelection'], false, true));
       this._attachDetailMenusListener(detailTable);

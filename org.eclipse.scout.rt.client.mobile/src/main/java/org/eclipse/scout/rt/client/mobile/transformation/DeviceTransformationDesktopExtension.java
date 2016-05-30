@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.client.mobile.transformation;
 import java.util.Collection;
 
 import org.eclipse.scout.rt.client.ui.action.IAction;
-import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.desktop.AbstractDesktopExtension;
 import org.eclipse.scout.rt.client.ui.desktop.ContributionCommand;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
@@ -42,37 +41,9 @@ public class DeviceTransformationDesktopExtension extends AbstractDesktopExtensi
   }
 
   @Override
-  protected ContributionCommand execInit() {
-    getDeviceTransformer().transformDesktop();
-    return ContributionCommand.Continue;
-  }
-
-  @Override
-  protected ContributionCommand execClosing() {
-    getDeviceTransformer().notifyDesktopClosing();
-    return ContributionCommand.Continue;
-  }
-
-  @Override
   public void contributeActions(Collection<IAction> actions) {
     getDeviceTransformer().adaptDesktopActions(actions);
     super.contributeActions(actions);
-  }
-
-  @Override
-  protected ContributionCommand execPageDetailFormChanged(IForm oldForm, IForm newForm) {
-    if (newForm != null) {
-      getDeviceTransformer().transformPageDetailForm(newForm);
-    }
-    return ContributionCommand.Continue;
-  }
-
-  @Override
-  protected ContributionCommand execPageDetailTableChanged(ITable oldTable, ITable newTable) {
-    if (newTable != null) {
-      getDeviceTransformer().transformPageDetailTable(newTable);
-    }
-    return ContributionCommand.Continue;
   }
 
   @Override

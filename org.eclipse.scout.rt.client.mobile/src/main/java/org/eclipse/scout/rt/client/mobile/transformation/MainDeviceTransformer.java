@@ -195,7 +195,7 @@ public class MainDeviceTransformer implements IDeviceTransformer {
 
   @Override
   public void transformPageDetailForm(IForm form) {
-    if (!isActive()) {
+    if (!isActive() || form == null || isFormExcluded(form)) {
       return;
     }
 
@@ -206,7 +206,7 @@ public class MainDeviceTransformer implements IDeviceTransformer {
 
   @Override
   public void transformPageDetailTable(ITable table) {
-    if (!isActive()) {
+    if (!isActive() || table == null) {
       return;
     }
 
