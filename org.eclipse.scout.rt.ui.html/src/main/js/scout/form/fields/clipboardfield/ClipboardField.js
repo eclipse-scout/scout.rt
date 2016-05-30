@@ -32,8 +32,11 @@ scout.ClipboardField.prototype._render = function($parent) {
   this.addStatus();
 
   this.$field
-    .attr('contenteditable', 'true')
+    .disableSpellcheck()
+    .attr('contenteditable', true)
     .attr('tabindex', '0')
+    .on('keydown', this._onInput.bind(this))
+    .on('input', this._onInput.bind(this))
     .on('paste', this._onPaste.bind(this))
     .on('copy', this._onCopy.bind(this))
     .on('cut', this._onCopy.bind(this));
@@ -49,7 +52,6 @@ scout.ClipboardField.prototype._render = function($parent) {
 
 scout.ClipboardField.prototype._renderProperties = function() {
   scout.ClipboardField.parent.prototype._renderProperties.call(this);
-
   this._renderDropType();
 };
 
@@ -81,8 +83,46 @@ scout.ClipboardField.prototype._renderDisplayText = function() {
   }
 };
 
+scout.ClipboardField.prototype._getSelection = function() {
+  var selection, myWindow = this.$container.window(true);
+  if (myWindow.getSelection) {
+    selection = myWindow.getSelection();
+  } else if (document.getSelection) {
+    selection = document.getSelection();
+  }
+  if(!selection || selection.toString().length === 0){
+    return null;
+  }
+  return selection;
+};
+
+// do not allow enter something manually some browsers such as IE do not send input events.
+// The 'keydown' event is used in this cases.
+scout.ClipboardField.prototype._onInput = function(event) {
+  if(event.type === 'input'){
+    this._renderDisplayText(this.displayText);
+    return false;
+  }
+  else if(!event['char'] || event['char'] === ''){
+    return;
+  }
+  else if(event.ctrlKey && (event.key === 'c' || event.key === 'x')){
+    return;
+  }
+  else if(!this.readOnly && event.ctrlKey && event.key === 'v'){
+    return;
+  }
+  else if(event.keyCode === scout.keys.ESC || event.keyCode === scout.keys.ENTER){
+    return;
+  }
+  else{
+    this._renderDisplayText(this.displayText);
+    return false;
+  }
+};
+
 scout.ClipboardField.prototype._onCopy = function(event) {
-  var dataTransfer, myWindow = this.$container.window(true);
+  var selection, text, dataTransfer, myWindow = this.$container.window(true);
   if (event.originalEvent.clipboardData) {
     dataTransfer = event.originalEvent.clipboardData;
   } else if (myWindow.clipboardData) {
@@ -95,8 +135,12 @@ scout.ClipboardField.prototype._onCopy = function(event) {
   // scroll bar must not be in field when copying
   scout.scrollbars.uninstall(this.$field, this.session);
 
-  // do not use this.$field.text(), it suppresses new lines
-  var text = scout.strings.plainText(this.$field.html());
+  selection = this._getSelection();
+  if(!selection){
+    return;
+  }
+  text = scout.strings.plainText(selection.toString());
+
   try {
     // Chrome, Firefox - causes an exception in IE
     dataTransfer.setData('text/plain', text);
@@ -114,7 +158,12 @@ scout.ClipboardField.prototype._onCopy = function(event) {
 };
 
 scout.ClipboardField.prototype._onPaste = function(event) {
+  if(this.readOnly){
+    this._renderDisplayText(this.displayText);
+    return;
+  }
   var dataTransfer, myWindow = this.$container.window(true);
+  this.$field.selectAllText();
   if (event.originalEvent.clipboardData) {
     dataTransfer = event.originalEvent.clipboardData;
   } else if (myWindow.clipboardData) {

@@ -65,6 +65,12 @@ public class JsonClipboardField<T extends IClipboardField> extends JsonValueFiel
         return getModel().getDropType();
       }
     });
+    putJsonProperty(new JsonProperty<IClipboardField>(IClipboardField.PROP_READ_ONLY, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isReadOnly();
+      }
+    });
   }
 
   @Override

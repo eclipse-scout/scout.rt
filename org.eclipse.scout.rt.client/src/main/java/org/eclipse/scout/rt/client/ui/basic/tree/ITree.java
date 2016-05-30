@@ -467,6 +467,26 @@ public interface ITree extends IPropertyObserver, IDNDSupport, IAppLinkCapable, 
    */
   void clearDeletedNodes();
 
+  /**
+   * Clears a specific (already deleted) node from cache and disposes it.
+   */
+  void disposeDeletedNode(ITreeNode node);
+
+  /**
+   * Clears specific (already deleted) nodes from cache and disposes them.
+   */
+  void disposeDeletedNodes(Collection<ITreeNode> nodes);
+
+  /**
+   * Removes a node from deleted nodes (does not discard it, it might be re-used afterwards).
+   */
+  void discardDeletedNode(ITreeNode node);
+
+  /**
+   * Removes nodes from deleted nodes (does not discard them, they might be re-used afterwards).
+   */
+  void discardDeletedNodes(Collection<ITreeNode> node);
+
   int getDeletedNodeCount();
 
   Set<ITreeNode> getDeletedNodes();

@@ -98,12 +98,16 @@ public class BeanImplementor<T> implements IBean<T> {
     StringBuilder buf = new StringBuilder();
     buf.append("IBean[");
     for (Annotation a : getBeanAnnotations().values()) {
-      buf.append("@");
+      buf.append('@');
       buf.append(a.annotationType().getSimpleName());
-      buf.append(" ");
+      buf.append(' ');
     }
     buf.append(getBeanClazz().getName());
-    buf.append("]");
+    T instance = getInitialInstance();
+    if (instance != null) {
+      buf.append(" with initial instance ").append(instance.toString());
+    }
+    buf.append(']');
     return buf.toString();
   }
 }

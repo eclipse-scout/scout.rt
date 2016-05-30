@@ -156,7 +156,8 @@ public abstract class AbstractProposalField<LOOKUP_KEY> extends AbstractContentA
         delegate.afterProvide(lookupCall, result);
         // ticket #79027
         if (result.isEmpty()) {
-          result.add(new LookupRow<>(lookupCall.getKey(), String.valueOf(lookupCall.getKey())));
+          LookupRow<LOOKUP_KEY> newRow = new LookupRow<>(lookupCall.getKey(), String.valueOf(lookupCall.getKey()));
+          result.add(newRow);
         }
       }
 
@@ -171,7 +172,7 @@ public abstract class AbstractProposalField<LOOKUP_KEY> extends AbstractContentA
       }
 
       @Override
-      public List<? extends ILookupRow<LOOKUP_KEY>> provide(ILookupCall<LOOKUP_KEY> lookupCall) {
+      public List<ILookupRow<LOOKUP_KEY>> provide(ILookupCall<LOOKUP_KEY> lookupCall) {
         return delegate.provide(lookupCall);
       }
     };
