@@ -16,6 +16,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Collection;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.eclipse.scout.rt.platform.annotations.IgnoreProperty;
 import org.eclipse.scout.rt.platform.annotations.IgnoreProperty.Context;
@@ -97,7 +98,7 @@ public class JsonBean implements IJsonObject {
       throw new IllegalArgumentException("Cannot convert " + type + " to json object");
     }
     try {
-      JSONObject jbean = new JSONObject();
+      TreeMap<String, Object> properties = new TreeMap<>();
       for (Field f : type.getFields()) {
         if (Modifier.isStatic(f.getModifiers())) {
           continue;
@@ -105,7 +106,7 @@ public class JsonBean implements IJsonObject {
         String key = f.getName();
         Object val = f.get(m_bean);
         IJsonObject jsonObject = m_objectFactory.createJsonObject(val);
-        jbean.put(key, jsonObject.toJson());
+        properties.put(key, jsonObject.toJson());
       }
       FastBeanInfo beanInfo = new FastBeanInfo(type, Object.class);
       for (FastPropertyDescriptor desc : beanInfo.getPropertyDescriptors()) {
@@ -121,7 +122,11 @@ public class JsonBean implements IJsonObject {
         String key = desc.getName();
         Object val = m.invoke(m_bean);
         IJsonObject jsonObject = m_objectFactory.createJsonObject(val);
-        jbean.put(key, jsonObject.toJson());
+        properties.put(key, jsonObject.toJson());
+      }
+      JSONObject jbean = new JSONObject();
+      for (Map.Entry<String, Object> e : properties.entrySet()) {
+        jbean.put(e.getKey(), e.getValue());
       }
       return jbean;
     }
