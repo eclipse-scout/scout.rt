@@ -17,15 +17,11 @@ import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.platform.exception.IProcessingStatus;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.exception.VetoException;
-import org.eclipse.scout.rt.platform.job.DoneEvent;
-import org.eclipse.scout.rt.platform.job.IDoneHandler;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.StringUtility;
-import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledException;
 import org.eclipse.scout.rt.platform.util.concurrent.IBiFunction;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,12 +35,12 @@ public class HierachycalContentAssistDataFetcher<LOOKUP_KEY> extends AbstractCon
 
   @Override
   public void update(IContentAssistSearchParam<LOOKUP_KEY> query, boolean blocking) {
-    IFuture<ContentAssistFieldDataFetchResult<LOOKUP_KEY>> fRes =
+    IFuture<Void> fRes =
         scheduleLookup(query)
             .whenDoneSchedule(createResult(query), newJobInput())
-            .whenDone(updateResult(), ClientRunContexts.copyCurrent());
+            .whenDoneSchedule(updateResult(), newModelJobInput());
     if (blocking) {
-      LookupJobHelper.await(fRes);
+      LookupJobHelper.awaitDone(fRes);
     }
   }
 
@@ -58,27 +54,18 @@ public class HierachycalContentAssistDataFetcher<LOOKUP_KEY> extends AbstractCon
     };
   }
 
-  private IDoneHandler<ContentAssistFieldDataFetchResult<LOOKUP_KEY>> updateResult() {
-    return new IDoneHandler<ContentAssistFieldDataFetchResult<LOOKUP_KEY>>() {
+  private IBiFunction<ContentAssistFieldDataFetchResult<LOOKUP_KEY>, Throwable, Void> updateResult() {
+    return new IBiFunction<ContentAssistFieldDataFetchResult<LOOKUP_KEY>, Throwable, Void>() {
 
       @Override
-      public void onDone(DoneEvent<ContentAssistFieldDataFetchResult<LOOKUP_KEY>> event) {
-        setResultInModelJob(event.getResult());
-      }
-    };
-  }
-
-  private IFuture<Void> setResultInModelJob(final ContentAssistFieldDataFetchResult<LOOKUP_KEY> result) {
-    return ModelJobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() {
-        if (result.getException() != null && !(result.getException() instanceof FutureCancelledException)) {
+      public Void apply(ContentAssistFieldDataFetchResult<LOOKUP_KEY> result, Throwable error) {
+        if (result.getException() != null) {
           logException(result.getException());
         }
         setResult(result);
+        return null;
       }
-    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()));
+    };
   }
 
   /**
@@ -110,6 +97,11 @@ public class HierachycalContentAssistDataFetcher<LOOKUP_KEY> extends AbstractCon
     else {
       LOG.error("", e);
     }
+  }
+
+  private JobInput newModelJobInput() {
+    return ModelJobs.newInput(ClientRunContexts.copyCurrent())
+        .withExceptionHandling(null, true);
   }
 
   private JobInput newJobInput() {
