@@ -14,6 +14,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.rt.platform.context.RunContext;
+import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.exception.DefaultRuntimeExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.IExceptionTranslator;
 import org.eclipse.scout.rt.platform.filter.AndFilter;
@@ -25,6 +26,7 @@ import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
 import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledException;
+import org.eclipse.scout.rt.platform.util.concurrent.IBiFunction;
 import org.eclipse.scout.rt.platform.util.concurrent.ICancellable;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedException;
 import org.eclipse.scout.rt.platform.util.concurrent.TimedOutException;
@@ -258,6 +260,32 @@ public interface IFuture<RESULT> extends ICancellable {
    * @return The future to support for method chaining.
    */
   IFuture<RESULT> whenDone(IDoneHandler<RESULT> callback, RunContext runContext);
+
+  /**
+   * Schedules a new job to execute the given function after <code>this</code> future completes. Thereby, the function
+   * is provided with the result or failure of <code>this</code> future, and is invoked only if neither
+   * <code>this</code> future, nor the function's future, nor the {@link RunMonitor} associated with the function's job
+   * input is cancelled. If the evaluation of the function throws an exception, it is relayed to consumers of the
+   * returned future.
+   * <p>
+   * Unlike {@link #whenDone(IDoneHandler, RunContext)}, the future returned does not represent <code>this</code>
+   * future, but the function's future instead.
+   * <p>
+   * If the function's future or {@link RunContext} are cancelled, this does not imply that <code>this</code> future is
+   * cancelled as well. Propagation of cancellation works only the other way round.
+   *
+   * @param function
+   *          the function to be executed upon completion of <code>this</code> future, and is invoked only if neither
+   *          <code>this</code> future, nor the function's future, nor the {@link RunMonitor} associated with the
+   *          function's job input is cancelled.
+   *          <p>
+   *          The function's first argument is provided with <code>this</code> future's result and the second with
+   *          <code>this</code> future's exception (if any).
+   * @param input
+   *          input to schedule the function.
+   * @return the future representing the asynchronous execution of the function.
+   */
+  <FUNCTION_RESULT> IFuture<FUNCTION_RESULT> whenDoneSchedule(IBiFunction<RESULT, Throwable, FUNCTION_RESULT> function, JobInput input);
 
   /**
    * Registers the given listener to be notified about all job lifecycle events related to this Future. If the listener

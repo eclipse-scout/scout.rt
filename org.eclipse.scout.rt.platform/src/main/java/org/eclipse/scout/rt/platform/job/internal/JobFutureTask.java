@@ -23,23 +23,29 @@ import java.util.concurrent.FutureTask;
 import java.util.concurrent.RunnableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.annotations.Internal;
 import org.eclipse.scout.rt.platform.chain.callable.CallableChain;
 import org.eclipse.scout.rt.platform.chain.callable.ICallableDecorator;
 import org.eclipse.scout.rt.platform.context.RunContext;
+import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
+import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.DefaultRuntimeExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.IExceptionTranslator;
+import org.eclipse.scout.rt.platform.exception.NullExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.filter.IFilter;
+import org.eclipse.scout.rt.platform.job.DoneEvent;
 import org.eclipse.scout.rt.platform.job.ExecutionTrigger;
 import org.eclipse.scout.rt.platform.job.IDoneHandler;
 import org.eclipse.scout.rt.platform.job.IExecutionSemaphore;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.job.JobState;
+import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.job.listener.JobEventData;
@@ -47,6 +53,7 @@ import org.eclipse.scout.rt.platform.job.listener.JobEventType;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
 import org.eclipse.scout.rt.platform.util.ToStringBuilder;
+import org.eclipse.scout.rt.platform.util.concurrent.IBiFunction;
 import org.quartz.Calendar;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
@@ -430,6 +437,71 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
   }
 
   @Override
+  public <FUNCTION_RESULT> IFuture<FUNCTION_RESULT> whenDoneSchedule(final IBiFunction<RESULT, Throwable, FUNCTION_RESULT> function, final JobInput input) {
+    Assertions.assertNotNull(input, "Input must not be null");
+    Assertions.assertNotNull(function, "Function must not be null");
+
+    final IFuture<RESULT> currentFuture = this;
+
+    // Create an execution guard to allocate a worker thread only after entering done state of this future.
+    final IExecutionSemaphore executionGuard = Jobs.newExecutionSemaphore(0);
+    whenDone(new IDoneHandler<RESULT>() {
+
+      @Override
+      public void onDone(final DoneEvent<RESULT> event) {
+        executionGuard.withPermits(1);
+      }
+    }, null);
+
+    // Upon cancellation of this future, cancel the function's future as well.
+    final RunMonitor functionRunMonitor = BEANS.get(RunMonitor.class);
+    m_runMonitor.registerCancellable(functionRunMonitor);
+
+    // Upon cancellation of the function's RunMonitor, cancel the function's future as well (to reflect proper cancellation status).
+    if (input.getRunContext() != null) {
+      input.getRunContext().getRunMonitor().registerCancellable(functionRunMonitor);
+    }
+
+    // Schedule the job to be executed upon this future enters done state.
+    // However, the execution guard ensures that a worker thread is only allocated upon this future enters done state.
+    return Jobs.schedule(new Callable<FUNCTION_RESULT>() {
+
+      @Override
+      public FUNCTION_RESULT call() throws Exception {
+        // Sanity check for cancellation because cancellation may not be percolated yet.
+        if (currentFuture.isCancelled()) {
+          IFuture.CURRENT.get().cancel(false);
+          return null;
+        }
+
+        // At this point, the depending future finished without being cancelled.
+        final AtomicReference<RESULT> rRef = new AtomicReference<>();
+        final AtomicReference<Throwable> tRef = new AtomicReference<>();
+        try {
+          rRef.set(currentFuture.awaitDoneAndGet(NullExceptionTranslator.class));
+        }
+        catch (final Throwable t) { // NOSONAR
+          tRef.set(BEANS.get(DefaultExceptionTranslator.class).unwrap(t));
+        }
+
+        // Schedule the job to run the function in the proper context (RunContext, ExecutionSemaphore, ExecutionHints, ...).
+        // However, if the function's RunContext is cancelled, it will not be executed.
+        return Jobs.schedule(new Callable<FUNCTION_RESULT>() {
+
+          @Override
+          public FUNCTION_RESULT call() throws Exception {
+            return function.apply(rRef.get(), tRef.get());
+          }
+        }, input).awaitDoneAndGet(DefaultExceptionTranslator.class);
+      }
+    }, Jobs.newInput()
+        .withName("[jobmanager] Waiting for 'whenDoneFunction' to execute [job={}, function={}, functionJobName={}]", getJobInput().getName(), function, input.getName())
+        .withExceptionHandling(null, false) // propagate a potential exception without handling it
+        .withRunContext(RunContexts.empty().withRunMonitor(functionRunMonitor))
+        .withExecutionSemaphore(executionGuard));
+  }
+
+  @Override
   public IRegistrationHandle addListener(final IJobListener listener) {
     return addListener(null, listener);
   }
@@ -627,7 +699,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
    * Creates the Quartz Trigger to fire execution.
    */
   protected OperableTrigger createQuartzTrigger(final JobInput input) {
-    TriggerBuilder<Trigger> builder = TriggerBuilder.newTrigger()
+    final TriggerBuilder<Trigger> builder = TriggerBuilder.newTrigger()
         .forJob(JobFutureTask.class.getSimpleName());
 
     final ExecutionTrigger executionTrigger = input.getExecutionTrigger();
