@@ -104,8 +104,18 @@ public class JobManager implements IJobManager {
     Assertions.assertNotNull(input, "JobInput must not be null");
     Assertions.assertFalse(isShutdown(), "{} not available because the platform has been shut down.", getClass().getSimpleName());
 
-    // Create the Future to be given to the ExecutorService.
     final JobFutureTask<RESULT> futureTask = createJobFutureTask(callable, input);
+    submit(futureTask);
+
+    return futureTask;
+  }
+
+  /**
+   * Submits the given future for asynchronous execution. Upon expiry of its fire time and the acquisition of a
+   * potential execution permit, the future is given to {@link ExecutorService}. In turn, a worker thread is allocated
+   * and execution commenced.
+   */
+  protected <RESULT> void submit(final JobFutureTask<RESULT> futureTask) {
     try {
       futureTask.changeState(JobState.SCHEDULED);
 
@@ -126,8 +136,6 @@ public class JobManager implements IJobManager {
           }
         }, futureTask.getFirstFireTime());
       }
-
-      return futureTask;
     }
     catch (final RuntimeException | Error e) { // NOSONAR
       futureTask.reject();
@@ -239,7 +247,7 @@ public class JobManager implements IJobManager {
   }
 
   /**
-   * Creates the Future to interact with the executable.
+   * Creates the Future to be given to {@link ExecutorService} and registers it with this job manager.
    *
    * @param callable
    *          callable to be given to the executor for execution.
