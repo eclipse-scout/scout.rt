@@ -43,7 +43,13 @@ class ContentAssistFieldUIFacade<LOOKUP_KEY> implements IContentAssistFieldUIFac
     m_field.clearProposal();
     m_field.setDisplayText(text);
     if (!StringUtility.equalsIgnoreNewLines(m_field.getLookupRowFetcher().getLastSearchText(), toSearchText(text))) {
-      m_field.doSearch(text, false, false);
+      if (m_field.isBrowseLoadIncremental() && m_field.getWildcard().equals(toSearchText(text))) {
+        IContentAssistSearchParam<LOOKUP_KEY> searchParam = ContentAssistSearchParam.createParentParam(null, false);
+        m_field.doSearch(searchParam, false);
+      }
+      else {
+        m_field.doSearch(text, false, false);
+      }
     }
   }
 
@@ -57,9 +63,15 @@ class ContentAssistFieldUIFacade<LOOKUP_KEY> implements IContentAssistFieldUIFac
     m_field.setDisplayText(text);
     String searchText = toSearchText(text);
     IProposalChooser<?, LOOKUP_KEY> proposalChooser = m_field.registerProposalChooserInternal();
-    IContentAssistFieldDataFetchResult<LOOKUP_KEY> newResult = m_field.getLookupRowFetcher().newResult(toSearchText(searchText), selectCurrentValue);
+    IContentAssistFieldDataFetchResult<LOOKUP_KEY> newResult = m_field.getLookupRowFetcher().newResult(toSearchText(searchText), false);
     proposalChooser.dataFetchedDelegate(newResult, m_field.getConfiguredBrowseMaxRowCount());
-    m_field.doSearch(text, selectCurrentValue, false);
+    if (m_field.isBrowseLoadIncremental()) {
+      IContentAssistSearchParam<LOOKUP_KEY> searchParam = ContentAssistSearchParam.createParentParam(null, selectCurrentValue);
+      m_field.doSearch(searchParam, false);
+    }
+    else {
+      m_field.doSearch(text, selectCurrentValue, false);
+    }
   }
 
   @Override
@@ -105,7 +117,7 @@ class ContentAssistFieldUIFacade<LOOKUP_KEY> implements IContentAssistFieldUIFac
       boolean acceptByLookupRow = true;
       String searchText = toSearchText(text);
       String lastSearchText = m_field.getProposalChooser().getSearchText();
-      if (!lastSearchText.equals(m_field.getWildcard())) {
+      if (lastSearchText != null && !lastSearchText.equals(m_field.getWildcard())) {
         acceptByLookupRow = CompareUtility.equals(searchText, lastSearchText);
       }
 

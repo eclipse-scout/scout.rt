@@ -18,11 +18,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
 import org.eclipse.scout.rt.client.ui.basic.table.TableListener;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
-import org.eclipse.scout.rt.platform.exception.ProcessingException;
-import org.eclipse.scout.rt.platform.status.IStatus;
-import org.eclipse.scout.rt.platform.status.Status;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -107,8 +103,8 @@ public class TableProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<IC
     String searchText = null;
     if (result != null) {
       rows = result.getLookupRows();
-      selectCurrentValue = result.isSelectCurrentValue();
-      searchText = result.getSearchText();
+      selectCurrentValue = result.getSearchParam().isSelectCurrentValue();
+      searchText = result.getSearchParam().getSearchText();
     }
     if (rows == null) {
       rows = CollectionUtility.emptyArrayList();
@@ -142,50 +138,6 @@ public class TableProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<IC
     }
     catch (RuntimeException e) {
       LOG.warn("update proposal list", e);
-    }
-  }
-
-  protected void updateStatus(IContentAssistFieldDataFetchResult<LOOKUP_KEY> result) {
-    List<? extends ILookupRow<LOOKUP_KEY>> rows = null;
-    RuntimeException exception = null;
-    String searchText = null;
-    if (result != null) {
-      rows = result.getLookupRows();
-      exception = result.getException();
-      searchText = result.getSearchText();
-    }
-    if (rows == null) {
-      rows = CollectionUtility.emptyArrayList();
-    }
-    String statusText = null;
-    int severity = IStatus.INFO;
-    if (exception != null) {
-      if (exception instanceof ProcessingException) {
-        statusText = ((ProcessingException) exception).getStatus().getMessage();
-      }
-      else {
-        statusText = exception.getMessage();
-      }
-      severity = IStatus.ERROR;
-    }
-    else if (rows.size() <= 0) {
-      if (getContentAssistField().getWildcard().equals(searchText)) {
-        statusText = ScoutTexts.get("SmartFieldNoDataFound");
-      }
-      else {
-        statusText = ScoutTexts.get("SmartFieldCannotComplete", (searchText == null) ? ("") : (searchText));
-      }
-      severity = IStatus.WARNING;
-    }
-    else if (rows.size() > m_contentAssistField.getBrowseMaxRowCount()) {
-      statusText = ScoutTexts.get("SmartFieldMoreThanXRows", "" + m_contentAssistField.getBrowseMaxRowCount());
-      severity = IStatus.INFO;
-    }
-    if (statusText != null) {
-      setStatus(new Status(statusText, severity));
-    }
-    else {
-      setStatus(null);
     }
   }
 

@@ -1020,10 +1020,16 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
 
   @Override
   public void doSearch(String text, boolean selectCurrentValue, boolean synchronous) {
+    IContentAssistSearchParam<LOOKUP_KEY> param = ContentAssistSearchParam.createTextParam(toSearchText(text), selectCurrentValue);
+    doSearch(param, synchronous);
+  }
+
+  @Override
+  public void doSearch(IContentAssistSearchParam<LOOKUP_KEY> param, boolean synchronous) {
     if (isProposalChooserRegistered()) {
       getProposalChooser().setStatus(new Status(ScoutTexts.get("searchingProposals"), IStatus.OK));
     }
-    getLookupRowFetcher().update(text, selectCurrentValue, synchronous);
+    getLookupRowFetcher().update(param, synchronous);
   }
 
   // blocking lookups

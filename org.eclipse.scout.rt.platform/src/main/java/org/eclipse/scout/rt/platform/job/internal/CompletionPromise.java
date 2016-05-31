@@ -85,8 +85,6 @@ class CompletionPromise<RESULT> {
     }
 
     // Notify registered handlers asynchronously.
-    // Notice: Do not notify via Jobs.schedule(...), because for every job, JobManager registers a whenDone handler as well
-    //         in order to unregister the associated Quartz Trigger. Otherwise, that could cause an infinite recursion.
     if (!m_handlers.isEmpty()) {
       m_executor.execute(new Runnable() {
 

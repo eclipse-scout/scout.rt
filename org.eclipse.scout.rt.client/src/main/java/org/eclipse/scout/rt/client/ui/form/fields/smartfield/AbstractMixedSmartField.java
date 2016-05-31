@@ -135,7 +135,8 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
     }
 
     String searchText = toSearchText(text);
-    getLookupRowFetcher().update(searchText, false, true);
+    IContentAssistSearchParam<LOOKUP_KEY> param = ContentAssistSearchParam.createTextParam(searchText, false);
+    getLookupRowFetcher().update(param, true);
     List<? extends ILookupRow<LOOKUP_KEY>> lookupRows = getLookupRowFetcher().getResult().getLookupRows();
     if (lookupRows == null || lookupRows.size() == 0) {
       setValidationError(text, TEXTS.get("SmartFieldCannotComplete", text), NO_RESULTS_ERROR_CODE);

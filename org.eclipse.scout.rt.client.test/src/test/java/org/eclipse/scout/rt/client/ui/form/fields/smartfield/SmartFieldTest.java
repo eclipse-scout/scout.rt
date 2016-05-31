@@ -16,6 +16,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,6 +28,8 @@ import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
+import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCloseButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
@@ -33,6 +37,9 @@ import org.eclipse.scout.rt.client.ui.form.fields.smartfield.SmartFieldTest.Test
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.job.IBlockingCondition;
+import org.eclipse.scout.rt.platform.job.Jobs;
+import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
@@ -309,6 +316,99 @@ public class SmartFieldTest {
   }
 
   @Test
+  public void testHierarchical_UIFacade() {
+    StyleField f = m_styleField;
+    f.setBrowseHierarchy(true);
+    f.getUIFacade().acceptProposalFromUI("Red", false, false);
+    assertRedFieldStyle(f);
+    f.getUIFacade().acceptProposalFromUI("Empty", false, false);
+    assertDefaultFieldStyle(f);
+    f.getUIFacade().acceptProposalFromUI("Yellow", false, false);
+    assertYellowFieldStyle(f);
+    f.getUIFacade().acceptProposalFromUI(null, false, false);
+    assertDefaultFieldStyle(f);
+  }
+
+  @Test
+  public void testHierarchicalOpenProposal() {
+    StyleField f = m_styleField;
+    f.setBrowseHierarchy(true);
+    f.setValue(10L);
+    f.getUIFacade().openProposalChooserFromUI("Red", true);
+    waitForProposalResult(IProposalChooser.PROP_SEARCH_RESULT);
+
+    //single result
+    assertTrue(m_styleField.isProposalChooserRegistered());
+    assertEquals("Red", m_styleField.getDisplayText());
+
+    // verifies tree is loaded containing a single node
+    @SuppressWarnings("unchecked")
+    TreeProposalChooser<Long> treeProposalChooser = (TreeProposalChooser<Long>) f.getProposalChooser();
+    ITree tree = treeProposalChooser.getModel();
+    ITreeNode rootNode = tree.getRootNode();
+    assertEquals(5, rootNode.getChildNodes().size());
+    assertEquals("Red", rootNode.getChildNode(0).getCell().getText());
+    //current value should be selected
+    assertTrue(rootNode.getChildNode(0).isSelectedNode());
+  }
+
+  @Test
+  public void testHierarchicalBrowse() {
+    StyleField f = m_styleField;
+    f.setBrowseHierarchy(true);
+
+    m_styleField.getUIFacade().openProposalChooserFromUI("*", false);
+
+    waitForProposalResult(IProposalChooser.PROP_SEARCH_RESULT);
+    //single result
+    assertTrue(m_styleField.isProposalChooserRegistered());
+    assertEquals("*", m_styleField.getDisplayText());
+
+    // verifies tree is loaded containing a single node
+    @SuppressWarnings("unchecked")
+    TreeProposalChooser<Long> treeProposalChooser = (TreeProposalChooser<Long>) f.getProposalChooser();
+    ITree tree = treeProposalChooser.getModel();
+    ITreeNode rootNode = tree.getRootNode();
+    assertEquals(5, rootNode.getChildNodes().size());
+    assertEquals("Red", rootNode.getChildNode(0).getCell().getText());
+  }
+
+  @Test
+  public void testHierarchyNoResult() {
+    StyleField f = m_styleField;
+    f.setBrowseHierarchy(true);
+
+    m_styleField.getUIFacade().openProposalChooserFromUI("unknown", false);
+
+    waitForProposalResult(IProposalChooser.PROP_STATUS);
+    //single result
+    assertTrue(m_styleField.isProposalChooserRegistered());
+    assertEquals("unknown", m_styleField.getDisplayText());
+
+    // verifies tree is loaded containing a single node
+    @SuppressWarnings("unchecked")
+    TreeProposalChooser<Long> treeProposalChooser = (TreeProposalChooser<Long>) f.getProposalChooser();
+    ITree tree = treeProposalChooser.getModel();
+    ITreeNode rootNode = tree.getRootNode();
+    assertEquals(0, rootNode.getChildNodes().size());
+  }
+
+  @Test
+  public void testThrowingLookupCall() {
+    StyleField f = m_styleField;
+    f.setBrowseHierarchy(true);
+    ((StyleLookupCall) f.getLookupCall()).allowLookup(false);
+    m_styleField.getUIFacade().openProposalChooserFromUI("Red", false);
+    waitForProposalResult(IProposalChooser.PROP_STATUS);
+    @SuppressWarnings("unchecked")
+    TreeProposalChooser<Long> treeProposalChooser = ((TreeProposalChooser<Long>) f.getProposalChooser());
+    ITree tree = treeProposalChooser.getModel();
+    ITreeNode rootNode = tree.getRootNode();
+    assertEquals(0, rootNode.getChildNodes().size());
+    assertEquals(IStatus.ERROR, treeProposalChooser.getStatus().getSeverity());
+  }
+
+  @Test
   public void testStyle_AcceptProposal() throws Throwable {
     StyleField f = m_styleField;
     f.acceptProposal(createRedLookupRow());
@@ -450,5 +550,18 @@ public class SmartFieldTest {
     JobTestUtil.waitForMinimalPermitCompetitors(ModelJobs.newInput(ClientRunContexts.copyCurrent()).getExecutionSemaphore(), 2); // 2:= 'current model job' + 'smartfield fetch model job'
     // Yield the current model job permit, so that the lookup rows can be written into the model.
     ModelJobs.yield();
+  }
+
+  private void waitForProposalResult(String property) {
+    final IBlockingCondition bc = Jobs.newBlockingCondition(true);
+    IProposalChooser<?, ?> chooser = m_styleField.getProposalChooser();
+    chooser.addPropertyChangeListener(property, new PropertyChangeListener() {
+
+      @Override
+      public void propertyChange(PropertyChangeEvent evt) {
+        bc.setBlocking(false);
+      }
+    });
+    bc.waitFor();
   }
 }
