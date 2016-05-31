@@ -35,7 +35,7 @@ scout.ShrinkNavigationKeyStroke.prototype._postRenderKeyBox = function($drawingA
 
   $keyBox.addClass('navigation-handle-key-box left');
 
-  handleOffset = handle.$left.offsetTo(this.desktop.$container),
+  handleOffset = handle.$left.offsetTo(this.desktop.$container);
   keyBoxLeft = handleOffset.left - $keyBox.outerWidth(true);
   keyBoxTop = handleOffset.top;
 

@@ -571,7 +571,6 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
 
   @Override
   public void setSelectedActivityCell(Activity<RI, AI> cell) {
-//    cell = resolveActivityCell(cell);
     propertySupport.setProperty(PROP_SELECTED_ACTIVITY, cell);
   }
 
@@ -693,18 +692,6 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
   public <T extends IMenu> T getMenuByClass(Class<T> menuType) {
     return MenuUtility.getMenuByClass(this, menuType);
   }
-
-//  private void fireCellAction(Resource<RI> resource, Activity<RI, AI> activityCell) {
-//    // single observer
-//    try {
-//      interceptCellAction(resource, activityCell);
-//    }
-//    catch (Exception e) {
-//      BEANS.get(ExceptionHandler.class).handle(e);
-//    }
-//    PlannerEvent e = new PlannerEvent(this, PlannerEvent.TYPE_ACTIVITY_ACTION, resource, activityCell);
-//    firePlannerEventInternal(e);
-//  }
 
   private void fireResourcesInserted(List<Resource<RI>> resources) {
     PlannerEvent e = new PlannerEvent(this, PlannerEvent.TYPE_RESOURCES_INSERTED, resources);

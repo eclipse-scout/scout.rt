@@ -21,7 +21,6 @@ scout.MobilePopupLayout.prototype.layout = function($container) {
     htmlWidget = this.popup.widget.htmlComp,
     widgetSize = 0,
     $header = this.popup.$header,
-    $title = this.popup.$title,
     headerSize = 0;
 
   popupSize = popupSize.subtract(htmlPopup.getInsets());

@@ -92,7 +92,7 @@ scout.GroupBox.prototype._keyStrokeBindTarget = function() {
 };
 
 scout.GroupBox.prototype._render = function($parent) {
-  var htmlBody, i,
+  var htmlBody,
     env = scout.HtmlEnvironment;
 
   this.addContainer($parent, this.mainBox ? 'root-group-box' : 'group-box', this._createLayout());

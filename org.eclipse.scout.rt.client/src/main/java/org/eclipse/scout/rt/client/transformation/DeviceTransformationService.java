@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
 public class DeviceTransformationService implements IDeviceTransformationService {
   private static final Logger LOG = LoggerFactory.getLogger(DeviceTransformationService.class);
 
-  private String SESSION_DATA_KEY = "DeviceTransformationServiceData";
+  private static final String SESSION_DATA_KEY = "DeviceTransformationServiceData";
   private IDeviceTransformer m_nullTransformer = new NullDeviceTransformer();
 
   @Override

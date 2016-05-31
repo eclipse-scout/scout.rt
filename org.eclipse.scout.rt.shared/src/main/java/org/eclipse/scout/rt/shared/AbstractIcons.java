@@ -15,6 +15,7 @@ import java.io.Serializable;
 /**
  * See also icons.css.
  */
+//SONAR:OFF
 public abstract class AbstractIcons implements Serializable {
   private static final long serialVersionUID = 1L;
 

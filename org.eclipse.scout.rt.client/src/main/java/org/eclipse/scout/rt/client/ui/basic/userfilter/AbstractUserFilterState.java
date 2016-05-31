@@ -15,7 +15,7 @@ import org.eclipse.scout.rt.shared.TEXTS;
 /**
  * @since 5.1
  */
-public class AbstractUserFilterState implements IUserFilterState {
+public abstract class AbstractUserFilterState implements IUserFilterState {
   private static final long serialVersionUID = 1L;
   private String m_type;
 

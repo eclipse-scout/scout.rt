@@ -36,11 +36,9 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
  */
 public class VirtualPage extends VirtualTreeNode implements IPage, IVirtualTreeNode {
 
-  public VirtualPage() {
-  }
-
   @Override
   public void initPage() {
+    // NOP
   }
 
   @Override
@@ -70,10 +68,12 @@ public class VirtualPage extends VirtualTreeNode implements IPage, IVirtualTreeN
 
   @Override
   public void pageActivatedNotify() {
+    // NOP
   }
 
   @Override
   public void pageDeactivatedNotify() {
+    // NOP
   }
 
   @Override
@@ -83,14 +83,17 @@ public class VirtualPage extends VirtualTreeNode implements IPage, IVirtualTreeN
 
   @Override
   public void setDetailForm(IForm form) {
+    // NOP
   }
 
   @Override
   public void dataChanged(Object... dataTypes) {
+    // NOP
   }
 
   @Override
   public final void reloadPage() {
+    // NOP
   }
 
   @Override
@@ -105,6 +108,7 @@ public class VirtualPage extends VirtualTreeNode implements IPage, IVirtualTreeN
 
   @Override
   public void setTableVisible(boolean b) {
+    // NOP
   }
 
   @Override
@@ -114,6 +118,7 @@ public class VirtualPage extends VirtualTreeNode implements IPage, IVirtualTreeN
 
   @Override
   public void setTableStatus(IStatus tableStatus) {
+    // NOP
   }
 
   @Override
@@ -123,6 +128,7 @@ public class VirtualPage extends VirtualTreeNode implements IPage, IVirtualTreeN
 
   @Override
   public void setTableStatusVisible(boolean tableStatusVisible) {
+    // NOP
   }
 
   /**
@@ -140,6 +146,7 @@ public class VirtualPage extends VirtualTreeNode implements IPage, IVirtualTreeN
 
   @Override
   public void setDetailFormVisible(boolean visible) {
+    // NOP
   }
 
   @Override
@@ -179,5 +186,6 @@ public class VirtualPage extends VirtualTreeNode implements IPage, IVirtualTreeN
 
   @Override
   public void setLazyExpandingEnabled(boolean lazyAddChildPagesToOutline) {
+    // NOP
   }
 }

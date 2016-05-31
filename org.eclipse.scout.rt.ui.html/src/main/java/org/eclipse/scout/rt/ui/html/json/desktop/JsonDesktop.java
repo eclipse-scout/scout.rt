@@ -98,15 +98,6 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
     else if (EVENT_HISTORY_ENTRY_ACTIVATED.equals(event.getType())) {
       handleUiHistoryEntryActivated(event);
     }
-    else if (IDesktop.PROP_NAVIGATION_VISIBLE.equals(event.getType())) {
-      handleUiFormActivated(event);
-    }
-    else if (IDesktop.PROP_BENCH_VISIBLE.equals(event.getType())) {
-      handleUiFormActivated(event);
-    }
-    else if (IDesktop.PROP_HEADER_VISIBLE.equals(event.getType())) {
-      handleUiFormActivated(event);
-    }
     else {
       super.handleUiEvent(event);
     }

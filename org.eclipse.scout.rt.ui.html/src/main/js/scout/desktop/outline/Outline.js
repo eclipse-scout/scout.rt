@@ -473,7 +473,7 @@ scout.Outline.prototype._applyUpdatedNodeProperties = function(oldNode, updatedN
  * @override
  */
 scout.Outline.prototype._isGroupingEnd = function(node) {
-  return node.nodeType == 'table';
+  return node.nodeType === 'table';
 };
 
 /**

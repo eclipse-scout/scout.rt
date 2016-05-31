@@ -17,6 +17,10 @@ import org.eclipse.scout.rt.platform.BEANS;
  */
 public class DeviceTransformationUtility {
 
+  private DeviceTransformationUtility() {
+
+  }
+
   /**
    * @return a reference to the active device transformation configuration.
    */

@@ -30,8 +30,7 @@ scout.TreeLayout.prototype._layout = function($container) {
   var menuBarSize, containerSize, heightOffset,
     menuBar = this.tree.menuBar,
     htmlMenuBar = menuBar.htmlComp,
-    htmlContainer = this.tree.htmlComp,
-    $data = this.tree.$data;
+    htmlContainer = this.tree.htmlComp;
 
   containerSize = htmlContainer.getAvailableSize()
     .subtract(htmlContainer.getInsets());

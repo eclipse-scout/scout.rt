@@ -240,28 +240,6 @@ public class PlannerEventBuffer extends AbstractEventBuffer<PlannerEvent> {
     return resources;
   }
 
-//  /**
-//   * If a RESOURCE_ORDER_CHANGED event happens directly after RESOURCES_INSERTED, we may removed the RESOURCE_ORDER_CHANGED event
-//   * and send the new order in the RESOURCES_INSERTED event instead.
-//   */
-//  protected void applyResourceOrderChangedToResourcesInserted(List<PlannerEvent> events) {
-//    for (int j = 0; j < events.size() - 1; j++) {
-//      int i = events.size() - 1 - j;
-//      PlannerEvent event = events.get(i);
-//
-//      if (event.getType() == PlannerEvent.TYPE_RESOURCE_ORDER_CHANGED) {
-//        PlannerEvent previous = findInsertionBeforeResourceOrderChanged(events.subList(0, i));
-//        // Check if previous is RESOURCES_INSERTED and they have the same resources
-//        if (previous != null && previous.getType() == PlannerEvent.TYPE_RESOURCES_INSERTED &&
-//            event.getResourceCount() == previous.getResourceCount() && CollectionUtility.equalsCollection(event.getResources(), previous.getResources(), false)) {
-//          // replace resources and remove RESOURCE_ORDER_CHANGED event
-//          previous.setResources(event.getResources());
-//          events.remove(i);
-//        }
-//      }
-//    }
-//  }
-
   /**
    * Finds previous RESOURCES_INSERTED event while ignoring events that don't change resource order (e.g.
    * COLUMN_HEADERS_UPDATED)
@@ -340,7 +318,6 @@ public class PlannerEventBuffer extends AbstractEventBuffer<PlannerEvent> {
   protected List<Integer> getResourceRelatedEvents() {
     List<Integer> res = new ArrayList<>();
     res.add(PlannerEvent.TYPE_ALL_RESOURCES_DELETED);
-//    res.add(PlannerEvent.TYPE_RESOURCE_ORDER_CHANGED);
     res.add(PlannerEvent.TYPE_RESOURCES_DELETED);
     res.add(PlannerEvent.TYPE_RESOURCES_INSERTED);
     res.add(PlannerEvent.TYPE_RESOURCES_UPDATED);
@@ -359,7 +336,6 @@ public class PlannerEventBuffer extends AbstractEventBuffer<PlannerEvent> {
    */
   protected boolean isIgnorePrevious(int type) {
     switch (type) {
-//      case PlannerEvent.TYPE_RESOURCE_ORDER_CHANGED:
       case PlannerEvent.TYPE_RESOURCES_SELECTED:
       case PlannerEvent.TYPE_ALL_RESOURCES_DELETED: {
         return true;
@@ -388,7 +364,6 @@ public class PlannerEventBuffer extends AbstractEventBuffer<PlannerEvent> {
 
   protected boolean isResourcesRequired(int type) {
     switch (type) {
-//      case PlannerEvent.TYPE_RESOURCE_ORDER_CHANGED:
       case PlannerEvent.TYPE_RESOURCES_DELETED:
       case PlannerEvent.TYPE_RESOURCES_INSERTED:
       case PlannerEvent.TYPE_RESOURCES_UPDATED: {

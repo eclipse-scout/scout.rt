@@ -36,8 +36,8 @@ scout.EnlargeNavigationKeyStroke.prototype._postRenderKeyBox = function($drawing
 
   $keyBox.addClass('navigation-handle-key-box right');
 
-  handleOffset = handle.$right.offsetTo(this.desktop.$container),
-  keyBoxLeft = handleOffset.left + handle.$right.outerWidth(),
+  handleOffset = handle.$right.offsetTo(this.desktop.$container);
+  keyBoxLeft = handleOffset.left + handle.$right.outerWidth();
   keyBoxTop = handleOffset.top;
 
   $keyBox.cssLeft(keyBoxLeft)

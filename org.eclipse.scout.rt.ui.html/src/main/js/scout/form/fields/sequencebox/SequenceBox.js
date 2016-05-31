@@ -33,8 +33,7 @@ scout.SequenceBox.prototype._render = function($parent) {
 };
 
 scout.SequenceBox.prototype._onFieldPropertyChange = function(event) {
-  var field = event.source,
-    visibiltyChanged = (event.changedProperties.indexOf('visible') !== -1);
+  var visibiltyChanged = (event.changedProperties.indexOf('visible') !== -1);
   if (scout.arrays.containsAny(event.changedProperties, ['errorStatus', 'tooltipText', 'visible', 'menus', 'menusVisible'])) {
     this._handleStatus(visibiltyChanged);
   }
@@ -74,9 +73,7 @@ scout.SequenceBox.prototype._handleStatus = function(visibilityChanged) {
 };
 
 scout.SequenceBox.prototype._getLastVisibleField = function() {
-  var lastVisibleField, visibleFields;
-
-  visibleFields = this.fields.filter(function(field) {
+  var visibleFields = this.fields.filter(function(field) {
     return field.visible;
   });
   if (visibleFields.length === 0) {

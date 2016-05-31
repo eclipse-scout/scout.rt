@@ -8,6 +8,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 
+//SONAR:OFF
 public class NullDeviceTransformer implements IDeviceTransformer {
 
   @Override

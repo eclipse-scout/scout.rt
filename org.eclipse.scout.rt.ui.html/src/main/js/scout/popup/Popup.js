@@ -327,8 +327,8 @@ scout.Popup.prototype.adjustLocation = function($container, location, switchIfNe
     openingDirection = 'up';
     location = this.prefLocation($container, openingDirection);
   }
-  left = location.x,
-    top = location.y;
+  left = location.x;
+  top = location.y;
   if (overlap.x > 0) {
     // Move popup to the left until it gets fully visible
     left -= overlap.x;

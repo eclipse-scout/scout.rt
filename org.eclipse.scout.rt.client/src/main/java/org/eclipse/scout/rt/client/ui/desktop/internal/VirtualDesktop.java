@@ -646,10 +646,12 @@ public class VirtualDesktop implements IDesktop {
 
   @Override
   public void addNotification(IDesktopNotification notification) {
+    // NOP
   }
 
   @Override
   public void removeNotification(IDesktopNotification notification) {
+    // NOP
   }
 
   @Override
@@ -694,6 +696,7 @@ public class VirtualDesktop implements IDesktop {
 
   @Override
   public void setDisplayStyle(String displayStyle) {
+    // NOP
   }
 
   @Override
@@ -703,6 +706,7 @@ public class VirtualDesktop implements IDesktop {
 
   @Override
   public void setLogoId(String id) {
+    // NOP
   }
 
   @Override
@@ -712,6 +716,7 @@ public class VirtualDesktop implements IDesktop {
 
   @Override
   public void setCacheSplitterPosition(boolean b) {
+    // NOP
   }
 
   @Override
@@ -721,6 +726,7 @@ public class VirtualDesktop implements IDesktop {
 
   @Override
   public void setTheme(String theme) {
+    // NOP
   }
 
   @Override
@@ -734,6 +740,7 @@ public class VirtualDesktop implements IDesktop {
 
   @Override
   public void setNavigationVisible(boolean visible) {
+    // NOP
   }
 
   @Override
@@ -752,6 +759,7 @@ public class VirtualDesktop implements IDesktop {
 
   @Override
   public void setHeaderVisible(boolean visible) {
+    // NOP
   }
 
   @Override
@@ -766,6 +774,7 @@ public class VirtualDesktop implements IDesktop {
 
   @Override
   public void setNavigationHandleVisible(boolean visible) {
+    // NOP
   }
 
   @Override

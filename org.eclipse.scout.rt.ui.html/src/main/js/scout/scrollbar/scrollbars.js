@@ -242,8 +242,7 @@ scout.scrollbars = {
       elementBounds = scout.graphics.offsetBounds($element, false, false),
       scrollableBounds = scout.graphics.offsetBounds($scrollable, false, false),
       elementTop = elementBounds.y - scrollableBounds.y - scrollOffsetUp,
-      elementH = elementBounds.height + scrollOffsetDown,
-      scrollbars;
+      elementH = elementBounds.height + scrollOffsetDown;
 
     //There are some elements which has a hight of 0 (Checkboxes / Radiobuttons) -> try to get field and figure out its height and offset
     if (elementH === scrollOffsetDown && $element.data('valuefield') && $element.data('valuefield').$container) {
@@ -271,8 +270,7 @@ scout.scrollbars = {
       scrollableW = $scrollable.width(),
       elementBounds = scout.graphics.bounds($element, true, true),
       elementLeft = elementBounds.x,
-      elementW = elementBounds.width,
-      scrollbars;
+      elementW = elementBounds.width;
 
     if (elementLeft < 0) {
       scout.scrollbars.scrollLeft($scrollable, $scrollable.scrollLeft() + elementLeft);

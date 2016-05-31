@@ -15,8 +15,6 @@ scout.DetailTableTreeFilter = function() { //
  * Must correspond with logic in P_TableFilterBasedTreeNodeFilter
  */
 scout.DetailTableTreeFilter.prototype.accept = function(node) {
-  var row;
-
   if (!node.parentNode) {
     // top level nodes may not be filtered
     return true;

@@ -901,8 +901,7 @@ scout.Table.prototype.changeAggregation = function(column, func) {
 };
 
 scout.Table.prototype._addGroupColumn = function(column, direction, multiGroup) {
-  var deviation,
-    sortIndex = -1;
+  var sortIndex = -1;
 
   if (!this.isGroupingPossible(column)) {
     return;
@@ -1989,8 +1988,7 @@ scout.Table.prototype.insertRow = function(row) {
 };
 
 scout.Table.prototype.insertRows = function(rows, fromServer) {
-  var newHiddenRows = [],
-    wasEmpty = this.rows.length === 0;
+  var wasEmpty = this.rows.length === 0;
 
   // Update model
   rows.forEach(function(row) {
@@ -3593,7 +3591,6 @@ scout.Table.prototype._onRowsChecked = function(rows) {
 };
 
 scout.Table.prototype._onRowOrderChanged = function(rowIds) {
-  var newPos, rows, row;
   if (rowIds.length !== this.rows.length) {
     throw new Error('Row order changed event may not be processed because lengths of the arrays differ.');
   }

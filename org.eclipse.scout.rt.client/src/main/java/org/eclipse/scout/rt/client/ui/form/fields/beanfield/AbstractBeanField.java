@@ -26,7 +26,7 @@ import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 /**
  * This field may be used if the value is relevant for the gui, and not just the display text.
  */
-public class AbstractBeanField<VALUE> extends AbstractValueField<VALUE> implements IBeanField<VALUE> {
+public abstract class AbstractBeanField<VALUE> extends AbstractValueField<VALUE> implements IBeanField<VALUE> {
   private IBeanFieldUIFacade m_uiFacade;
 
   @Override

@@ -17,7 +17,7 @@ scout.CellEditorPopupLayout = function(cellEditorPopup) {
 scout.inherits(scout.CellEditorPopupLayout, scout.AbstractLayout);
 
 scout.CellEditorPopupLayout.prototype.layout = function($container) {
-  var size, prefSize, popupSize,
+  var size,
     htmlField = this._field.htmlComp;
 
   size = this._htmlContainer.getAvailableSize()

@@ -45,8 +45,6 @@ import org.eclipse.scout.rt.shared.ui.UserAgentUtility;
  */
 @Order(5200)
 public class MobileDeviceTransformer extends AbstractDeviceTransformer {
-  public MobileDeviceTransformer() {
-  }
 
   @Override
   public boolean isActive() {

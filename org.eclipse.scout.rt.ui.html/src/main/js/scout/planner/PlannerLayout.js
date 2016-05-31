@@ -70,7 +70,6 @@ scout.PlannerLayout.prototype.layout = function($container) {
  */
 scout.PlannerLayout.prototype._updateMinWidth = function() {
   var minWidth = this._minWidth(),
-    $scale = this.planner.$scale,
     $scaleTitle = this.planner.$scaleTitle,
     $timeline = this.planner.$timeline;
 
@@ -99,8 +98,8 @@ scout.PlannerLayout.prototype._layoutScaleLines = function() {
     return;
   }
 
-  $smallScaleItems = $timelineSmall.children('.scale-item'),
-    $largeScaleItems = $timelineLarge.children('.scale-item');
+  $smallScaleItems = $timelineSmall.children('.scale-item');
+  $largeScaleItems = $timelineLarge.children('.scale-item');
 
   // First loop through every item and set height to 0 in order to get the correct scrollHeight
   $largeScaleItems.each(function() {
@@ -136,8 +135,7 @@ scout.PlannerLayout.prototype._layoutScaleLines = function() {
 };
 
 scout.PlannerLayout.prototype._minWidth = function() {
-  var $scale = this.planner.$scale,
-    $scaleItemsLarge = this.planner.$timelineLarge.children('.scale-item'),
+  var $scaleItemsLarge = this.planner.$timelineLarge.children('.scale-item'),
     $scaleItemsSmall = this.planner.$timelineSmall.children('.scale-item'),
     numScaleItemsLarge = $scaleItemsLarge.length,
     numScaleItemsSmall = $scaleItemsSmall.length,

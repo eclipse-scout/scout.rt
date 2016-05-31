@@ -14,9 +14,6 @@ import java.beans.PropertyChangeEvent;
 
 public class PropertyEventFilter extends AbstractEventFilter<PropertyChangeEvent, IPropertyChangeEventFilterCondition> {
 
-  public PropertyEventFilter() {
-  }
-
   /**
    * Ignores the event if new value is the same.
    */

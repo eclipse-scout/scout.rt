@@ -27,5 +27,6 @@ public class PlannerAdapter implements PlannerListener {
 
   @Override
   public void plannerChanged(PlannerEvent e) {
+    // NOP
   }
 }
