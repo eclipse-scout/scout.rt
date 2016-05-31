@@ -49,6 +49,7 @@ import org.eclipse.scout.rt.platform.job.listener.JobEventType;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
 import org.eclipse.scout.rt.platform.util.ToStringBuilder;
+import org.eclipse.scout.rt.platform.util.concurrent.IBiConsumer;
 import org.eclipse.scout.rt.platform.util.concurrent.IBiFunction;
 import org.quartz.Calendar;
 import org.quartz.SchedulerException;
@@ -464,6 +465,18 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
     }, null);
 
     return functionFuture;
+  }
+
+  @Override
+  public IFuture<Void> whenDoneSchedule(final IBiConsumer<RESULT, Throwable> function, final JobInput input) {
+    return whenDoneSchedule(new IBiFunction<RESULT, Throwable, Void>() {
+
+      @Override
+      public Void apply(final RESULT result, final Throwable throwable) {
+        function.accept(result, throwable);
+        return null;
+      }
+    }, input);
   }
 
   @Override
