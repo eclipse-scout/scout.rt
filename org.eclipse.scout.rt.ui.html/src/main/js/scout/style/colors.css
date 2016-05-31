@@ -35,17 +35,13 @@
 @palette-green-4: #1F7C5D;
 
 @palette-blue-0: #E9F0F6;
-@palette-blue-1: #D2DDE6;
-@palette-blue-2: #BAC9D5;
-@palette-blue-3: #8CA1B1;
+@palette-blue-1: #C1DEF9;
+@palette-blue-2: #74A8D8;
+@palette-blue-3: #508DC3;
 @palette-blue-4: #2B73B3;
-@palette-blue-5: #256298;
+@palette-blue-5: #1561A7;
 @palette-blue-6: #014786;
 @palette-blue-7: #2F3C45;
-
-@palette-bluegray-2: #647B8C;
-@palette-bluegray-3: #465a6a;
-@palette-bluegray-4: #2F3C45;
 
 @palette-gray-0: #FEFEFE;
 @palette-gray-1: #FAFAFA;
@@ -143,7 +139,7 @@
 @calendar-weekend-out-background-color: none;
 @calendar-weekend-out-color: @palette-blue-2;
 @checkbox-disabled-color: @palette-gray-6;
-@collapse-handle-active-background-color: @palette-blue-1;
+@collapse-handle-active-background-color: @button-active-background-color;
 @collapse-handle-background-color: @palette-white;
 @collapse-handle-border-color: @active-color;
 @collapse-handle-color: @active-color;
@@ -156,7 +152,7 @@
 @command-button-active-color: @active-inverted-color;
 @command-button-active-border-color: @active-inverted-background-color;
 @command-button-active-background-color: @active-inverted-background-color;
-@default-button-active-background-color: @palette-blue-5;
+@default-button-active-background-color: @palette-blue-6;
 @default-button-background-color: @palette-blue-4;
 @default-button-color: @palette-white;
 @default-button-hover-background-color: @default-button-background-color;
@@ -191,11 +187,11 @@
 @menubar-item-color: @text-color;
 @navigate-up-button-border-color: @menubar-button-border-color;
 @navigate-up-button-color: @menubar-button-color;
-@navigation-background-color: @palette-bluegray-4;
+@navigation-background-color: @palette-blue-6;
 @navigation-color: @palette-gray-3;
 @outline-breadcrumb-border-color: @outline-selection-background-color;
-@outline-group-background-color: @palette-bluegray-3;
-@outline-in-background-selection-background-color: @palette-bluegray-2;
+@outline-group-background-color: @palette-blue-5;
+@outline-in-background-selection-background-color: @palette-blue-3;
 @outline-selection-background-color: @background-color;
 @outline-selection-color: @text-color;
 @outline-title-border-color: @outline-selection-background-color;
