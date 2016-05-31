@@ -14,7 +14,7 @@ scout.TreeNavigationUpKeyStroke = function(tree, modifierBitMask) {
   this.renderingHints.text = '↑';
   this.renderingHints.$drawingArea = function($drawingArea, event) {
     var $currentNode = event._$treeCurrentNode;
-    if ($currentNode.length === 0) {
+    if (!$currentNode) {
       return this.field.$nodes().last();
     }
     return $currentNode.prevAll('.tree-node:not(.hidden):first');
