@@ -1021,7 +1021,7 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
   @Override
   public void doSearch(String text, boolean selectCurrentValue, boolean synchronous) {
     if (isProposalChooserRegistered()) {
-      getProposalChooser().setStatus(new Status(ScoutTexts.get("searchingProposals"), IStatus.WARNING));
+      getProposalChooser().setStatus(new Status(ScoutTexts.get("searchingProposals"), IStatus.OK));
     }
     getLookupRowFetcher().update(text, selectCurrentValue, synchronous);
   }
