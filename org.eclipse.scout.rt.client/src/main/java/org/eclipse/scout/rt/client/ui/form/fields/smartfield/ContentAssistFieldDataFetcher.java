@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
@@ -23,7 +24,8 @@ public class ContentAssistFieldDataFetcher<LOOKUP_KEY> extends AbstractContentAs
   }
 
   @Override
-  public void update(final String searchText, boolean selectCurrentValue, boolean synchronous) {
+  public void update(IContentAssistSearchParam<LOOKUP_KEY> query, boolean synchronous) {
+    String searchText = query.getSearchText();
     String text = searchText;
     if (text == null) {
       text = "";
@@ -31,7 +33,7 @@ public class ContentAssistFieldDataFetcher<LOOKUP_KEY> extends AbstractContentAs
 
     final String textNonNull = text;
     final int maxCount = getContentAssistField().getBrowseMaxRowCount();
-    final ILookupRowFetchedCallback<LOOKUP_KEY> callback = new P_LookupCallDataCallback(searchText, selectCurrentValue);
+    final ILookupRowFetchedCallback<LOOKUP_KEY> callback = new P_LookupCallDataCallback(query);
     final int maxRowCount = (maxCount > 0 ? maxCount + 1 : 0);
 
     if (synchronous) {
@@ -58,23 +60,22 @@ public class ContentAssistFieldDataFetcher<LOOKUP_KEY> extends AbstractContentAs
   }
 
   private class P_LookupCallDataCallback implements ILookupRowFetchedCallback<LOOKUP_KEY> {
-    private String m_searchText;
-    private boolean m_selectCurrentValue;
+    private final IContentAssistSearchParam<LOOKUP_KEY> m_param;
 
-    private P_LookupCallDataCallback(String searchText, boolean selectCurrentValue) {
-      m_searchText = searchText;
-      m_selectCurrentValue = selectCurrentValue;
+    private P_LookupCallDataCallback(IContentAssistSearchParam<LOOKUP_KEY> param) {
+      m_param = param;
       setResult(null);
     }
 
     @Override
     public void onSuccess(List<? extends ILookupRow<LOOKUP_KEY>> rows) {
-      setResult(new ContentAssistFieldDataFetchResult<>(rows, null, m_searchText, m_selectCurrentValue));
+      setResult(new ContentAssistFieldDataFetchResult<>(new ArrayList<ILookupRow<LOOKUP_KEY>>(rows), null, m_param));
     }
 
     @Override
     public void onFailure(RuntimeException exception) {
-      setResult(new ContentAssistFieldDataFetchResult<LOOKUP_KEY>(null, exception, m_searchText, m_selectCurrentValue));
+      setResult(new ContentAssistFieldDataFetchResult<LOOKUP_KEY>(null, exception, m_param));
     }
   }
+
 }

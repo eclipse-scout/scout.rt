@@ -3,6 +3,7 @@ package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -25,26 +26,76 @@ public class IncrementalTreeBuilder<LOOKUP_KEY> {
 
   private final IKeyLookupProvider<LOOKUP_KEY> m_provider;
 
+  private final Map<LOOKUP_KEY, ILookupRow<LOOKUP_KEY>> m_keyCache = new HashMap<>();
+
   public IncrementalTreeBuilder(IKeyLookupProvider<LOOKUP_KEY> provider) {
     m_provider = provider;
   }
 
-  public Collection<ILookupRow<LOOKUP_KEY>> getRowsWithParents(List<? extends ILookupRow<LOOKUP_KEY>> lookupRows, ITree existingTree) {
-    Map<LOOKUP_KEY, ILookupRow<LOOKUP_KEY>> allRows = new HashMap<>();
+  /**
+   * @param lookupRows
+   * @param selectedKey
+   *          selected key or null
+   * @param existingTree
+   * @return
+   */
+  public List<ILookupRow<LOOKUP_KEY>> getRowsWithParents(List<ILookupRow<LOOKUP_KEY>> lookupRows, LOOKUP_KEY parent, ITree existingTree) {
+    List<ILookupRow<LOOKUP_KEY>> res = new ArrayList<>();
+
+    cacheKeys(lookupRows);
+    HashSet<LOOKUP_KEY> allRows = new HashSet<>();
+
     List<List<ILookupRow<LOOKUP_KEY>>> paths = createPaths(lookupRows, existingTree);
-    for (List<ILookupRow<LOOKUP_KEY>> path : paths) {
-      for (ILookupRow<LOOKUP_KEY> row : path) {
-        allRows.put(row.getKey(), row);
+    if (parent == null) {
+      //ensure, the path to the root is included for every node
+      for (List<ILookupRow<LOOKUP_KEY>> path : paths) {
+        for (ILookupRow<LOOKUP_KEY> row : path) {
+          if (!allRows.contains(row.getKey())) {
+            allRows.add(row.getKey());
+            res.add(row);
+          }
+
+        }
       }
     }
-    return allRows.values();
+    else {
+      //ensure that rows other then children of the parent are included
+      for (List<ILookupRow<LOOKUP_KEY>> path : paths) {
+        if (contains(parent, path)) {
+          ILookupRow<LOOKUP_KEY> leaf = path.get(path.size() - 1);
+          if (!allRows.contains(leaf.getKey())) {
+            allRows.add(leaf.getKey());
+            res.add(leaf);
+          }
+        }
+      }
+    }
+    return res;
+  }
+
+  private boolean contains(LOOKUP_KEY key, List<ILookupRow<LOOKUP_KEY>> path) {
+    for (ILookupRow<LOOKUP_KEY> row : path) {
+      if (key.equals(row.getKey())) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private ILookupRow<LOOKUP_KEY> getLookupRow(LOOKUP_KEY key) {
+    if (!m_keyCache.containsKey(key)) {
+      ILookupRow<LOOKUP_KEY> row = m_provider.getLookupRow(key);
+      m_keyCache.put(key, row);
+      return row;
+    }
+    return m_keyCache.get(key);
   }
 
   /**
    * Collects the path to the root for each node using the existing tree to lookup parent nodes, if possible. Each path
    * starts with the root node.
    */
-  public List<List<ILookupRow<LOOKUP_KEY>>> createPaths(List<? extends ILookupRow<LOOKUP_KEY>> lookupRows, ITree existingTree) {
+  public List<List<ILookupRow<LOOKUP_KEY>>> createPaths(Collection<? extends ILookupRow<LOOKUP_KEY>> lookupRows, ITree existingTree) {
     Map<LOOKUP_KEY, ILookupRow<LOOKUP_KEY>> parentMap = createParentMap(existingTree);
     List<List<ILookupRow<LOOKUP_KEY>>> paths = new ArrayList<>();
     for (ILookupRow<LOOKUP_KEY> row : lookupRows) {
@@ -54,7 +105,7 @@ public class IncrementalTreeBuilder<LOOKUP_KEY> {
       while (r != null) {
         path.add(0, r);
         if (!parentMap.containsKey(r.getKey())) {
-          ILookupRow<LOOKUP_KEY> parentRow = m_provider.getLookupRow(r.getParentKey());
+          ILookupRow<LOOKUP_KEY> parentRow = getLookupRow(r.getParentKey());
           parentMap.put(r.getKey(), parentRow);
         }
         r = parentMap.get(r.getKey());
@@ -62,6 +113,12 @@ public class IncrementalTreeBuilder<LOOKUP_KEY> {
       paths.add(path);
     }
     return paths;
+  }
+
+  private void cacheKeys(Collection<? extends ILookupRow<LOOKUP_KEY>> lookupRows) {
+    for (ILookupRow<LOOKUP_KEY> row : lookupRows) {
+      m_keyCache.put(row.getKey(), row);
+    }
   }
 
   /**
@@ -85,6 +142,7 @@ public class IncrementalTreeBuilder<LOOKUP_KEY> {
         ILookupRow<LOOKUP_KEY> row = getLookupRow(node);
         if (row != null) {
           LOOKUP_KEY key = row.getKey();
+          m_keyCache.put(key, row);
           map.put(key, getLookupRow(parent));
         }
         return true;

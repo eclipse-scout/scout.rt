@@ -232,6 +232,8 @@ public interface IContentAssistField<VALUE, LOOKUP_KEY> extends IValueField<VALU
    */
   void doSearch(String searchText, boolean selectCurrentValue, boolean synchronous);
 
+  void doSearch(IContentAssistSearchParam<LOOKUP_KEY> param, boolean synchronous);
+
   // blocking lookups
   /**
    * Lookup rows by key using {@link ILookupCall#getDataByKey()}. Blocks until the result is available.

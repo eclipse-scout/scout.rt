@@ -15,11 +15,11 @@ import java.util.List;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 
 public interface IContentAssistFieldDataFetchResult<LOOKUP_KEY> {
-  String getSearchText();
 
-  RuntimeException getException();
+  Throwable getException();
 
-  List<? extends ILookupRow<LOOKUP_KEY>> getLookupRows();
+  List<ILookupRow<LOOKUP_KEY>> getLookupRows();
 
-  boolean isSelectCurrentValue();
+  IContentAssistSearchParam<LOOKUP_KEY> getSearchParam();
+
 }

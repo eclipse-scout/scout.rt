@@ -15,6 +15,7 @@ package org.eclipse.scout.rt.platform.util.concurrent;
  */
 public interface IBiFunction<T, U, R> {
 
+
   /**
    * Applies this function to the given argument.
    */

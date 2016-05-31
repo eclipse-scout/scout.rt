@@ -38,15 +38,7 @@ public interface IContentAssistFieldLookupRowFetcher<LOOKUP_KEY> {
    */
   void removePropertyChangeListener(String propertyName, PropertyChangeListener listener);
 
-  /**
-   * @param searchText
-   * @param selectCurrentValue
-   *          select the current proposal value in the proposal table/tree/custom If necessary in a tree, load the tree
-   *          children until the key is found
-   * @param synchronous
-   *          true to execute the lookup call synchronous
-   */
-  void update(String searchText, boolean selectCurrentValue, boolean synchronous);
+  void update(IContentAssistSearchParam<LOOKUP_KEY> searchParam, boolean synchronous);
 
   IContentAssistFieldDataFetchResult<LOOKUP_KEY> getResult();
 

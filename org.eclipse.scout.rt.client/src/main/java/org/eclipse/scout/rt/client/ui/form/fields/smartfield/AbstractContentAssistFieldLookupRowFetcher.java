@@ -18,7 +18,7 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 
 public abstract class AbstractContentAssistFieldLookupRowFetcher<LOOKUP_KEY> implements IContentAssistFieldLookupRowFetcher<LOOKUP_KEY> {
 
-  private BasicPropertySupport propertySupport;
+  private final BasicPropertySupport propertySupport;
   private final IContentAssistField<?, LOOKUP_KEY> m_contentAssistField;
 
   public AbstractContentAssistFieldLookupRowFetcher(IContentAssistField<?, LOOKUP_KEY> contentAssistField) {
@@ -78,7 +78,8 @@ public abstract class AbstractContentAssistFieldLookupRowFetcher<LOOKUP_KEY> imp
 
   @Override
   public IContentAssistFieldDataFetchResult<LOOKUP_KEY> newResult(String searchText, boolean selectCurrentValue) {
-    return new ContentAssistFieldDataFetchResult<LOOKUP_KEY>(Collections.<ILookupRow<LOOKUP_KEY>> emptyList(), null, searchText, selectCurrentValue);
+    IContentAssistSearchParam<LOOKUP_KEY> param = ContentAssistSearchParam.createTextParam(searchText, selectCurrentValue);
+    return new ContentAssistFieldDataFetchResult<LOOKUP_KEY>(Collections.<ILookupRow<LOOKUP_KEY>> emptyList(), null, param);
   }
 
   protected void setResult(IContentAssistFieldDataFetchResult<LOOKUP_KEY> result) {
@@ -89,7 +90,7 @@ public abstract class AbstractContentAssistFieldLookupRowFetcher<LOOKUP_KEY> imp
   @Override
   public String getLastSearchText() {
     if (getResult() != null) {
-      return getResult().getSearchText();
+      return getResult().getSearchParam().getSearchText();
     }
     return null;
   }

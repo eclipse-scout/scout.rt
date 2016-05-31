@@ -10,10 +10,17 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 
+import java.util.List;
+
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.reflect.AbstractPropertyObserver;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.status.IStatus;
+import org.eclipse.scout.rt.platform.status.Status;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.TriState;
+import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledException;
+import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 
 public abstract class AbstractProposalChooser<T, LOOKUP_KEY> extends AbstractPropertyObserver implements IProposalChooser<T, LOOKUP_KEY> {
@@ -103,7 +110,7 @@ public abstract class AbstractProposalChooser<T, LOOKUP_KEY> extends AbstractPro
   public String getSearchText() {
     IContentAssistFieldDataFetchResult<LOOKUP_KEY> searchResult = getSearchResult();
     if (searchResult != null) {
-      return searchResult.getSearchText();
+      return searchResult.getSearchParam().getSearchText();
     }
     return null;
   }
@@ -176,6 +183,54 @@ public abstract class AbstractProposalChooser<T, LOOKUP_KEY> extends AbstractPro
 
   public IContentAssistField<?, LOOKUP_KEY> getContentAssistField() {
     return m_contentAssistField;
+  }
+
+  protected void updateStatus(IContentAssistFieldDataFetchResult<LOOKUP_KEY> result) {
+    if (result != null && result.getException() instanceof FutureCancelledException) {
+      return;
+    }
+
+    List<? extends ILookupRow<LOOKUP_KEY>> rows = null;
+    Throwable exception = null;
+    String searchText = null;
+    if (result != null) {
+      rows = result.getLookupRows();
+      exception = result.getException();
+      searchText = result.getSearchParam().getSearchText();
+    }
+    if (rows == null) {
+      rows = CollectionUtility.emptyArrayList();
+    }
+    String statusText = null;
+    int severity = IStatus.INFO;
+    if (exception != null) {
+      if (exception instanceof ProcessingException) {
+        statusText = ((ProcessingException) exception).getStatus().getMessage();
+      }
+      else {
+        statusText = exception.getMessage();
+      }
+      severity = IStatus.ERROR;
+    }
+    else if (rows.size() <= 0) {
+      if (getContentAssistField().getWildcard().equals(searchText)) {
+        statusText = ScoutTexts.get("SmartFieldNoDataFound");
+      }
+      else {
+        statusText = ScoutTexts.get("SmartFieldCannotComplete", (searchText == null) ? ("") : (searchText));
+      }
+      severity = IStatus.WARNING;
+    }
+    else if (rows.size() > m_contentAssistField.getBrowseMaxRowCount()) {
+      statusText = ScoutTexts.get("SmartFieldMoreThanXRows", "" + m_contentAssistField.getBrowseMaxRowCount());
+      severity = IStatus.INFO;
+    }
+    if (statusText != null) {
+      setStatus(new Status(statusText, severity));
+    }
+    else {
+      setStatus(null);
+    }
   }
 
 }

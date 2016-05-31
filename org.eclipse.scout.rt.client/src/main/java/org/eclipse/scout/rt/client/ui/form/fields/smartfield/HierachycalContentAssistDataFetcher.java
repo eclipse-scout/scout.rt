@@ -10,19 +10,128 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 
-public class HierachycalContentAssistDataFetcher<LOOKUP_KEY> extends AbstractContentAssistFieldLookupRowFetcher<LOOKUP_KEY> {
+import java.util.List;
 
-  /**
-   * @param contentAssistField
-   */
+import org.eclipse.scout.rt.client.context.ClientRunContexts;
+import org.eclipse.scout.rt.client.job.ModelJobs;
+import org.eclipse.scout.rt.platform.exception.IProcessingStatus;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.exception.VetoException;
+import org.eclipse.scout.rt.platform.job.DoneEvent;
+import org.eclipse.scout.rt.platform.job.IDoneHandler;
+import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.job.JobInput;
+import org.eclipse.scout.rt.platform.job.Jobs;
+import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledException;
+import org.eclipse.scout.rt.platform.util.concurrent.IBiFunction;
+import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class HierachycalContentAssistDataFetcher<LOOKUP_KEY> extends AbstractContentAssistFieldLookupRowFetcher<LOOKUP_KEY> {
+  private static final Logger LOG = LoggerFactory.getLogger(HierachycalContentAssistDataFetcher.class);
+
   public HierachycalContentAssistDataFetcher(IContentAssistField<?, LOOKUP_KEY> contentAssistField) {
     super(contentAssistField);
   }
 
   @Override
-  public void update(String searchText, boolean selectCurrentValue, boolean synchronous) {
-    // in case of hierarchical simply delegate the searchText
-    setResult(newResult(searchText, selectCurrentValue));
+  public void update(IContentAssistSearchParam<LOOKUP_KEY> query, boolean blocking) {
+    IFuture<ContentAssistFieldDataFetchResult<LOOKUP_KEY>> fRes =
+        scheduleLookup(query)
+            .whenDoneSchedule(createResult(query), newJobInput())
+            .whenDone(updateResult(), ClientRunContexts.copyCurrent());
+    if (blocking) {
+      LookupJobHelper.await(fRes);
+    }
+  }
+
+  private IBiFunction<List<ILookupRow<LOOKUP_KEY>>, Throwable, ContentAssistFieldDataFetchResult<LOOKUP_KEY>> createResult(final IContentAssistSearchParam<LOOKUP_KEY> fetchInfo) {
+    return new IBiFunction<List<ILookupRow<LOOKUP_KEY>>, Throwable, ContentAssistFieldDataFetchResult<LOOKUP_KEY>>() {
+
+      @Override
+      public ContentAssistFieldDataFetchResult<LOOKUP_KEY> apply(List<ILookupRow<LOOKUP_KEY>> rows, Throwable error) {
+        return new ContentAssistFieldDataFetchResult<>(rows, error, fetchInfo);
+      }
+    };
+  }
+
+  private IDoneHandler<ContentAssistFieldDataFetchResult<LOOKUP_KEY>> updateResult() {
+    return new IDoneHandler<ContentAssistFieldDataFetchResult<LOOKUP_KEY>>() {
+
+      @Override
+      public void onDone(DoneEvent<ContentAssistFieldDataFetchResult<LOOKUP_KEY>> event) {
+        setResultInModelJob(event.getResult());
+      }
+    };
+  }
+
+  private IFuture<Void> setResultInModelJob(final ContentAssistFieldDataFetchResult<LOOKUP_KEY> result) {
+    return ModelJobs.schedule(new IRunnable() {
+
+      @Override
+      public void run() {
+        if (result.getException() != null && !(result.getException() instanceof FutureCancelledException)) {
+          logException(result.getException());
+        }
+        setResult(result);
+      }
+    }, ModelJobs.newInput(ClientRunContexts.copyCurrent()));
+  }
+
+  /**
+   * Exceptions are handled differently in smartfields (make sure it is logged)
+   */
+  protected void logException(Throwable e) {
+    if (e instanceof VetoException) {
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("", e);
+      }
+      else {
+        LOG.info("{}: {}", e.getClass().getSimpleName(), e.getMessage());
+      }
+    }
+    else if (e instanceof ProcessingException) {
+      switch (((ProcessingException) e).getStatus().getSeverity()) {
+        case IProcessingStatus.INFO:
+        case IProcessingStatus.OK:
+          LOG.info("", e);
+          break;
+        case IProcessingStatus.WARNING:
+          LOG.warn("", e);
+          break;
+        default:
+          LOG.error("", e);
+          break;
+      }
+    }
+    else {
+      LOG.error("", e);
+    }
+  }
+
+  private JobInput newJobInput() {
+    return Jobs.newInput()
+        .withRunContext(ClientRunContexts.copyCurrent())
+        .withExceptionHandling(null, true);
+  }
+
+  protected IFuture<List<ILookupRow<LOOKUP_KEY>>> scheduleLookup(IContentAssistSearchParam<LOOKUP_KEY> query) {
+    if (query.isByParentSearch()) {
+      return getContentAssistField().callSubTreeLookupInBackground(query.getParentKey(), false);
+    }
+    else if (isTextLookup(query.getSearchText()) && !query.isSelectCurrentValue()) {
+      return getContentAssistField().callTextLookupInBackground(query.getSearchText(), true);
+    }
+    else {
+      return getContentAssistField().callBrowseLookupInBackground(null, true);
+    }
+  }
+
+  protected boolean isTextLookup(String searchText) {
+    return !StringUtility.isNullOrEmpty(searchText) && !getContentAssistField().getWildcard().equals(searchText);
   }
 
 }

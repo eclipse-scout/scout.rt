@@ -13,11 +13,7 @@ package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.regex.Pattern;
 
-import org.eclipse.scout.rt.client.context.ClientRunContexts;
-import org.eclipse.scout.rt.client.job.ModelJobs;
-import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.MouseButton;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTree;
@@ -25,27 +21,13 @@ import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTreeNodeBuilder;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
-import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNodeFilter;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeVisitor;
-import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
-import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
-import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
-import org.eclipse.scout.rt.platform.job.DoneEvent;
-import org.eclipse.scout.rt.platform.job.IDoneHandler;
-import org.eclipse.scout.rt.platform.job.IFuture;
-import org.eclipse.scout.rt.platform.status.IStatus;
-import org.eclipse.scout.rt.platform.status.Status;
+import org.eclipse.scout.rt.platform.holders.Holder;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.CompareUtility;
-import org.eclipse.scout.rt.platform.util.StringUtility;
-import org.eclipse.scout.rt.platform.util.TriState;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
-import org.eclipse.scout.rt.shared.ScoutTexts;
-import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
-import org.eclipse.scout.rt.shared.services.lookup.ILookupRowFetchedCallback;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,23 +43,15 @@ import org.slf4j.LoggerFactory;
  */
 public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITree, LOOKUP_KEY> {
   private static final Logger LOG = LoggerFactory.getLogger(TreeProposalChooser.class);
-
-  private P_ActiveNodesFilter m_activeNodesFilter;
-  private P_MatchingNodesFilter m_matchingNodesFilter;
-  private boolean m_selectCurrentValueRequested;
-  private boolean m_populateInitialTreeDone;
-  private volatile IFuture<Void> m_initialPolulatorFuture;
-  private boolean m_modelExternallyManaged = false;
+  private final KeyLookupProvider m_keyLookupProvider;
 
   public TreeProposalChooser(IContentAssistField<?, LOOKUP_KEY> contentAssistField, boolean allowCustomText) {
     super(contentAssistField, allowCustomText);
+    m_keyLookupProvider = new KeyLookupProvider();
   }
 
   @Override
   protected ITree createModel() {
-    m_activeNodesFilter = new P_ActiveNodesFilter();
-    m_matchingNodesFilter = new P_MatchingNodesFilter();
-
     ITree tree = createConfiguredOrDefaultModel(ITree.class);
     tree.setDefaultIconId(m_contentAssistField.getBrowseIconId());
     return tree;
@@ -110,10 +84,6 @@ public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITr
 
   @Override
   public void dispose() {
-    if (m_initialPolulatorFuture != null) {
-      m_initialPolulatorFuture.cancel(false);
-    }
-
     m_model.disposeTree();
     m_model = null;
   }
@@ -125,202 +95,138 @@ public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITr
 
   @Override
   protected void dataFetchedDelegateImpl(IContentAssistFieldDataFetchResult<LOOKUP_KEY> result, int maxCount) {
-    String searchText = null;
-    boolean selectCurrentValue = false;
-    if (result != null) {
-      selectCurrentValue = result.isSelectCurrentValue();
-      searchText = result.getSearchText();
+    if (result.getException() == null) {
+      List<ITreeNode> subTree = getSubtree(result);
+      ITreeNode parentNode = getParent(result);
+
+      try {
+        if (m_model != null) {
+          m_model.setTreeChanging(true);
+          updateSubTree(m_model, parentNode, subTree);
+          expand();
+          selectNode(result);
+        }
+
+      }
+      finally {
+        if (m_model != null) {
+          m_model.setTreeChanging(false);
+        }
+      }
     }
-    if (!m_populateInitialTreeDone) {
-      m_selectCurrentValueRequested = selectCurrentValue;
-      return;
-    }
-    try {
-      m_model.setTreeChanging(true);
-      //
-      m_matchingNodesFilter.update(searchText);
-      m_model.addNodeFilter(m_matchingNodesFilter);
-    }
-    finally {
-      m_model.setTreeChanging(false);
-    }
-    setStatus(null);
+    updateStatus(result);
   }
 
   /**
-   * Populate initial tree using a {@link ClientAsyncJob}. Amount of tree loaded is depending on
-   * {@link IContentAssistField#isBrowseLoadIncremental()}.
-   * <p>
-   * loadIncremnental only loads the roots, whereas !loadIncremental loads the complete tree. Normally the latter is
-   * configured together with {@link IContentAssistField#isBrowseAutoExpandAll()}
+   * Selects a node depending on the search, if available. Selected node must be loaded.
    */
-  @Override
-  protected void init() {
-    if (m_contentAssistField.isBrowseLoadIncremental()) {
-      // Load lookup rows asynchronously
-      loadRootNode();
+  private void selectNode(IContentAssistFieldDataFetchResult<LOOKUP_KEY> result) {
+    if (result.getSearchParam().isSelectCurrentValue()) {
+      ITreeNode currentValueNode = getNode(m_contentAssistField.getValueAsLookupKey());
+      if (currentValueNode != null) {
+        selectValue(currentValueNode);
+      }
     }
     else {
-      setStatus(new Status(ScoutTexts.get("searchingProposals"), IStatus.OK));
-      // Load lookup rows asynchronously
-      m_initialPolulatorFuture = m_contentAssistField.callBrowseLookupInBackground(m_contentAssistField.getWildcard(), 100000, TriState.UNDEFINED, new ILookupRowFetchedCallback<LOOKUP_KEY>() {
-
-        @Override
-        public void onSuccess(List<? extends ILookupRow<LOOKUP_KEY>> rows) {
-          m_initialPolulatorFuture = null;
-
-          List<ITreeNode> subTree = new P_TreeNodeBuilder().createTreeNodes(rows, ITreeNode.STATUS_NON_CHANGED, true);
-
-          m_model.setTreeChanging(true);
-          try {
-            updateSubTree(m_model, m_model.getRootNode(), subTree);
-            if (m_contentAssistField.isBrowseAutoExpandAll()) {
-              m_model.expandAll(m_model.getRootNode());
-            }
-            commitPopulateInitialTree();
-            setStatus(null);
-          }
-          catch (RuntimeException e) {
-            setStatus(new Status(TEXTS.get("RequestProblem"), IStatus.ERROR));
-          }
-          finally {
-            m_model.setTreeChanging(false);
-          }
-        }
-
-        @Override
-        public void onFailure(RuntimeException e) {
-          m_initialPolulatorFuture = null;
-
-          setStatus(new Status(TEXTS.get("RequestProblem"), IStatus.ERROR));
-        }
-      });
-      m_initialPolulatorFuture.addExecutionHint(IContentAssistField.EXECUTION_HINT_INITIAL_LOOKUP);
+      //select first search text
+      selectNodeByText(result.getSearchParam().getSearchText());
     }
   }
 
-  /**
-   * Called when the initial tree has been loaded and the form is therefore ready to accept
-   * {@link #update(boolean, boolean)} requests.
-   */
-  private void commitPopulateInitialTree() {
-    updateActiveFilter();
-    if (m_selectCurrentValueRequested) {
-      if (m_model.getSelectedNodeCount() == 0) {
-        selectCurrentValueInternal();
-      }
+  private void expand() {
+    if (m_contentAssistField.isBrowseAutoExpandAll() && !m_contentAssistField.isBrowseLoadIncremental()) {
+      m_model.expandAll(m_model.getRootNode());
     }
-    m_populateInitialTreeDone = true;
-    m_contentAssistField.doSearch(m_selectCurrentValueRequested, true);
-  }
-
-  private boolean selectCurrentValueInternal() {
-    final LOOKUP_KEY selectedKey = m_contentAssistField.getValueAsLookupKey();
-    if (selectedKey != null) {
-      //check existing tree
-      final ArrayList<ITreeNode> matchingNodes = new ArrayList<ITreeNode>();
-      m_model.visitTree(new ITreeVisitor() {
-        @Override
-        public boolean visit(ITreeNode node) {
-          Object val = node.getCell().getValue();
-          if (val instanceof ILookupRow && CompareUtility.equals(selectedKey, ((ILookupRow) val).getKey())) {
-            matchingNodes.add(node);
-          }
-          return true;
-        }
-      });
-      if (matchingNodes.size() > 0) {
-        selectValue(m_model, matchingNodes.get(0));
-        // ticket 87030
-        for (int i = 1; i < matchingNodes.size(); i++) {
-          ITreeNode node = matchingNodes.get(i);
-          m_model.setNodeExpanded(node, true);
-          m_model.ensureVisible(matchingNodes.get(i));
-        }
-        return true;
-      }
-      else {
-        // load tree
-        ITreeNode node = loadNodeWithKey(selectedKey);
-        if (node != null) {
-          selectValue(m_model, node);
-          return true;
-        }
-      }
-    }
-    return false;
-  }
-
-  private void selectValue(ITree tree, ITreeNode node) {
-    if (tree == null || node == null) {
-      return;
-    }
-    tree.selectNode(node);
-    if (tree.isCheckable()) {
-      tree.setNodeChecked(node, true);
+    else {
+      expandNodesWithChildren();
     }
   }
 
-  private ITreeNode loadNodeWithKey(LOOKUP_KEY key) {
-    ArrayList<ILookupRow<LOOKUP_KEY>> path = new ArrayList<ILookupRow<LOOKUP_KEY>>();
-    LOOKUP_KEY t = key;
-    while (t != null) {
-      ILookupRow<LOOKUP_KEY> row = getLookupRowFor(t);
-      if (row != null) {
-        path.add(0, row);
-        t = row.getParentKey();
+  private ITreeNode getParent(IContentAssistFieldDataFetchResult<LOOKUP_KEY> result) {
+    if (m_model != null) {
+      if (result.getSearchParam().getParentKey() == null) {
+        return m_model.getRootNode();
       }
-      else {
-        t = null;
-      }
-    }
-    ITreeNode parentNode = m_model.getRootNode();
-    for (int i = 0; i < path.size() && parentNode != null; i++) {
-      parentNode.ensureChildrenLoaded();
-      parentNode.setExpanded(true);
-      Object childKey = path.get(i).getKey();
-      ITreeNode nextNode = null;
-      for (ITreeNode n : parentNode.getChildNodes()) {
-        if (n.getCell().getValue() instanceof ILookupRow) {
-          if (CompareUtility.equals(((ILookupRow) n.getCell().getValue()).getKey(), childKey)) {
-            nextNode = n;
-            break;
-          }
-        }
-      }
-      parentNode = nextNode;
-    }
-    return parentNode;
-  }
-
-  private ILookupRow<LOOKUP_KEY> getLookupRowFor(LOOKUP_KEY key) {
-    if (key instanceof Number && ((Number) key).longValue() == 0) {
-      key = null;
-    }
-    if (key != null) {
-      IContentAssistField<?, LOOKUP_KEY> sf = (IContentAssistField<?, LOOKUP_KEY>) m_contentAssistField;
-      for (ILookupRow<LOOKUP_KEY> row : sf.callKeyLookup(key)) {
-        return row;
-      }
+      return getNode(result.getSearchParam().getParentKey());
     }
     return null;
   }
 
-  private void updateActiveFilter() {
-    try {
-      m_model.setTreeChanging(true);
-      //
-      if (m_contentAssistField.isActiveFilterEnabled()) {
-        m_activeNodesFilter.update(m_contentAssistField.getActiveFilter());
-      }
-      else {
-        m_activeNodesFilter.update(TriState.TRUE);
-      }
-      m_model.addNodeFilter(m_activeNodesFilter);
+  private List<ITreeNode> getSubtree(IContentAssistFieldDataFetchResult<LOOKUP_KEY> result) {
+    List<? extends ILookupRow<LOOKUP_KEY>> rows = getRows(result);
+    boolean markChildrenLoaded = !m_contentAssistField.isBrowseLoadIncremental() || !result.getSearchParam().isByParentSearch();
+    return new P_TreeNodeBuilder()
+        .createTreeNodes(rows, ITreeNode.STATUS_NON_CHANGED, markChildrenLoaded);
+  }
+
+  /**
+   * @return all new rows to be inserted (including parents of search result)
+   */
+  private List<? extends ILookupRow<LOOKUP_KEY>> getRows(IContentAssistFieldDataFetchResult<LOOKUP_KEY> result) {
+    LOOKUP_KEY parent = result.getSearchParam().getParentKey();
+    return new IncrementalTreeBuilder<LOOKUP_KEY>(m_keyLookupProvider)
+        .getRowsWithParents(result.getLookupRows(), parent, m_model);
+  }
+
+  /**
+   * find first node with matching text
+   */
+  private void selectNodeByText(final String searchText) {
+    if (searchText != null) {
+      m_model.visitTree(new ITreeVisitor() {
+
+        @Override
+        public boolean visit(ITreeNode node) {
+          if (searchText.equals(node.getCell().getText())) {
+            selectValue(node);
+            return false;
+          }
+          return true;
+        }
+      });
     }
-    finally {
-      m_model.setTreeChanging(false);
+  }
+
+  private void expandNodesWithChildren() {
+    m_model.visitTree(new ITreeVisitor() {
+
+      @Override
+      public boolean visit(ITreeNode node) {
+        if (node.getChildNodeCount() > 0) {
+          node.setChildrenLoaded(true);
+          node.setExpanded(true);
+        }
+        return true;
+      }
+    });
+  }
+
+  private void selectValue(ITreeNode node) {
+    if (node != null) {
+      m_model.selectNode(node);
+      if (m_model.isCheckable()) {
+        m_model.setNodeChecked(node, true);
+      }
     }
+  }
+
+  /**
+   * Node with a given key. Assumes the node is already loaded at this point
+   */
+  private ITreeNode getNode(final LOOKUP_KEY key) {
+    final Holder<ITreeNode> holder = new Holder<ITreeNode>(ITreeNode.class);
+    m_model.visitTree(new ITreeVisitor() {
+
+      @Override
+      public boolean visit(ITreeNode node) {
+        if (node.getCell().getValue() instanceof ILookupRow && CompareUtility.equals(((ILookupRow) node.getCell().getValue()).getKey(), key)) {
+          holder.setValue(node);
+          return false;
+        }
+        return true;
+      }
+    });
+    return holder.getValue();
   }
 
   private void updateSubTree(ITree tree, final ITreeNode parentNode, List<ITreeNode> subTree) {
@@ -329,16 +235,11 @@ public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITr
     }
     tree.removeAllChildNodes(parentNode);
     tree.addChildNodes(parentNode, subTree);
-  }
-
-  public void loadRootNode() {
-    if (m_model != null && !m_modelExternallyManaged) {
-      loadChildNodes(m_model.getRootNode());
-    }
+    parentNode.setChildrenLoaded(true);
   }
 
   public void loadChildNodes(ITreeNode parentNode) {
-    if (m_model != null && !m_modelExternallyManaged) {
+    if (m_model != null) {
       try {
         m_model.setTreeChanging(true);
         //
@@ -359,100 +260,13 @@ public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITr
   @SuppressWarnings("unchecked")
   protected void execLoadChildNodes(final ITreeNode parentNode) {
     if (m_contentAssistField.isBrowseLoadIncremental()) {
-      final IStatus originalStatus = getStatus();
-      setStatus(new Status(ScoutTexts.get("searchingProposals"), IStatus.OK));
-
-      //load node
       ILookupRow<LOOKUP_KEY> b = (LookupRow) (parentNode != null ? parentNode.getCell().getValue() : null);
       LOOKUP_KEY parentKey = b != null ? b.getKey() : null;
-      m_contentAssistField.callSubTreeLookupInBackground(parentKey, TriState.UNDEFINED, false)
-          .whenDone(new IDoneHandler<List<ILookupRow<LOOKUP_KEY>>>() {
-            @Override
-            public void onDone(DoneEvent<List<ILookupRow<LOOKUP_KEY>>> event) {
-              final List<? extends ILookupRow<LOOKUP_KEY>> result = event.getResult();
-              final Throwable exception = event.getException();
-
-              ModelJobs.schedule(new IRunnable() {
-
-                @Override
-                public void run() {
-                  if (result != null) {
-                    List<ITreeNode> subTree = new P_TreeNodeBuilder().createTreeNodes(result, ITreeNode.STATUS_NON_CHANGED, false);
-                    updateSubTree(m_model, parentNode, subTree);
-                    commitPopulateInitialTree();
-
-                    // hide loading status
-                    setStatus(originalStatus);
-                  }
-                  else if (exception != null) {
-                    LOG.error("Error in subtree lookup", exception);
-                    setStatus(new Status(TEXTS.get("RequestProblem"), IStatus.ERROR));
-                  }
-                }
-              }, ModelJobs.newInput(ClientRunContexts.copyCurrent()));
-            }
-          }, ClientRunContexts.copyCurrent());
-    }
-
-  }
-
-  /**
-   * @return the pattern used to filter tree nodes based on the text typed into the smartfield
-   */
-  @ConfigOperation
-  @Order(20)
-  protected Pattern execCreatePatternForTreeFilter(String filterText) {
-    // check pattern
-    String s = filterText;
-    if (s == null) {
-      s = "";
-    }
-    s = s.toLowerCase();
-    IDesktop desktop = ClientSessionProvider.currentSession().getDesktop();
-    if (desktop != null && desktop.isAutoPrefixWildcardForTextSearch()) {
-      s = getContentAssistField().getWildcard() + s;
-    }
-    s = s.replace(getContentAssistField().getWildcard(), "@wildcard@");
-    s = StringUtility.escapeRegexMetachars(s);
-    s = s.replace("@wildcard@", ".*");
-    if (!s.endsWith(".*")) {
-      s = s + ".*";
-    }
-    return Pattern.compile(s, Pattern.DOTALL);
-
-  }
-
-  /**
-   * @return true if the node is accepted by the tree filter pattern defined in
-   *         {@link #execCreatePatternForTreeFilter(String)}
-   */
-  @ConfigOperation
-  @Order(30)
-  protected boolean execAcceptNodeByTreeFilter(Pattern filterPattern, ITreeNode node, int level) {
-    IContentAssistField<?, LOOKUP_KEY> sf = m_contentAssistField;
-    @SuppressWarnings("unchecked")
-    ILookupRow<LOOKUP_KEY> row = (ILookupRow<LOOKUP_KEY>) node.getCell().getValue();
-    if (node.isChildrenLoaded()) {
-      if (row != null) {
-        String q1 = node.getTree().getPathText(node, "\n");
-        String q2 = node.getTree().getPathText(node, " ");
-        if (q1 != null && q2 != null) {
-          String[] path = (q1 + "\n" + q2).split("\n");
-          for (String pathText : path) {
-            if (pathText != null && filterPattern.matcher(pathText.toLowerCase()).matches()) {
-              // use "level-1" because a tree smart field assumes its tree to
-              // have multiple roots, but the ITree model is built as
-              // single-root tree with invisible root node
-              if (sf.acceptBrowseHierarchySelection(row.getKey(), level - 1, node.isLeaf())) {
-                return true;
-              }
-            }
-          }
-        }
-        return false;
+      getContentAssistField().doSearch(ContentAssistSearchParam.createParentParam(parentKey, false), false);
+      if (parentNode != null) {
+        parentNode.setChildrenLoaded(true);
       }
     }
-    return true;
   }
 
   /**
@@ -463,45 +277,26 @@ public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITr
   @Order(40)
   @Override
   protected ILookupRow<LOOKUP_KEY> execGetSingleMatch() {
-    // when load incremental is set, don't visit the tree but use text-to-key
-    // lookup method on smartfield.
-    if (m_contentAssistField.isBrowseLoadIncremental()) {
-      try {
-        List<? extends ILookupRow<LOOKUP_KEY>> rows = m_contentAssistField.callTextLookup(getSearchText(), 2);
-        if (rows != null && rows.size() == 1) {
-          return rows.get(0);
+    final List<ILookupRow<LOOKUP_KEY>> foundLeafs = new ArrayList<>();
+    ITreeVisitor v = new ITreeVisitor() {
+      @Override
+      public boolean visit(ITreeNode node) {
+        if (node.isEnabled() && node.isLeaf()) {
+          @SuppressWarnings("unchecked")
+          ILookupRow<LOOKUP_KEY> row = (ILookupRow<LOOKUP_KEY>) node.getCell().getValue();
+          if (row != null && row.isEnabled()) {
+            foundLeafs.add(row);
+          }
         }
-        else {
-          return null;
-        }
+        return foundLeafs.size() <= 2;
       }
-      catch (RuntimeException e) {
-        BEANS.get(ExceptionHandler.class).handle(e);
-        return null;
-      }
+    };
+    m_model.visitVisibleTree(v);
+    if (foundLeafs.size() == 1) {
+      return foundLeafs.get(0);
     }
     else {
-      final List<ILookupRow<LOOKUP_KEY>> foundLeafs = new ArrayList<ILookupRow<LOOKUP_KEY>>();
-      ITreeVisitor v = new ITreeVisitor() {
-        @Override
-        public boolean visit(ITreeNode node) {
-          if (node.isEnabled() && node.isLeaf()) {
-            @SuppressWarnings("unchecked")
-            ILookupRow<LOOKUP_KEY> row = (ILookupRow<LOOKUP_KEY>) node.getCell().getValue();
-            if (row != null && row.isEnabled()) {
-              foundLeafs.add(row);
-            }
-          }
-          return foundLeafs.size() <= 2;
-        }
-      };
-      m_model.visitVisibleTree(v);
-      if (foundLeafs.size() == 1) {
-        return foundLeafs.get(0);
-      }
-      else {
-        return null;
-      }
+      return null;
     }
   }
 
@@ -551,46 +346,23 @@ public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITr
     }
   }
 
-  private class P_MatchingNodesFilter implements ITreeNodeFilter {
-    private Pattern m_searchPattern;
-
-    public P_MatchingNodesFilter() {
-    }
-
-    public void update(String text) {
-      m_searchPattern = execCreatePatternForTreeFilter(text);
-    }
+  private class KeyLookupProvider implements IKeyLookupProvider<LOOKUP_KEY> {
 
     @Override
-    public boolean accept(ITreeNode node, int level) {
-      return execAcceptNodeByTreeFilter(m_searchPattern, node, level);
+    public ILookupRow<LOOKUP_KEY> getLookupRow(LOOKUP_KEY key) {
+      //do not cancel lookups that are already in progress
+      List<ILookupRow<LOOKUP_KEY>> rows = LookupJobHelper.await(m_contentAssistField.callKeyLookupInBackground(key, false));
+      if (rows.size() == 0) {
+        return null;
+      }
+      else if (rows.size() > 1) {
+        LOG.error("More than one row found for key {}", key);
+        return null;
+      }
+
+      return rows.get(0);
     }
+
   }
 
-  private class P_ActiveNodesFilter implements ITreeNodeFilter {
-    private TriState m_ts;
-
-    public P_ActiveNodesFilter() {
-    }
-
-    public void update(TriState ts) {
-      m_ts = ts;
-    }
-
-    @Override
-    public boolean accept(ITreeNode node, int level) {
-      if (m_ts.isUndefined()) {
-        return true;
-      }
-      else {
-        ILookupRow row = (LookupRow) node.getCell().getValue();
-        if (row != null) {
-          return row.isActive() == m_ts.equals(TriState.TRUE);
-        }
-        else {
-          return true;
-        }
-      }
-    }
-  }
 }

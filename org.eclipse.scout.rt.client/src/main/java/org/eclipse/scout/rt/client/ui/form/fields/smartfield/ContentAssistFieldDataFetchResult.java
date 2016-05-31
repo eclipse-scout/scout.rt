@@ -12,50 +12,43 @@ package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 
 import java.util.List;
 
+import org.eclipse.scout.rt.platform.util.ToStringBuilder;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 
 public class ContentAssistFieldDataFetchResult<LOOKUP_KEY> implements IContentAssistFieldDataFetchResult<LOOKUP_KEY> {
 
-  private final List<? extends ILookupRow<LOOKUP_KEY>> m_lookupRows;
-  private final RuntimeException m_processingException;
-  private final String m_searchText;
-  private final boolean m_selectCurrentValue;
+  private final IContentAssistSearchParam<LOOKUP_KEY> m_searchParam;
+  private final List<ILookupRow<LOOKUP_KEY>> m_lookupRows;
+  private final Throwable m_processingException;
 
-  public ContentAssistFieldDataFetchResult(List<? extends ILookupRow<LOOKUP_KEY>> rows, RuntimeException failed, String searchText, boolean selectCurrentValue) {
+  public ContentAssistFieldDataFetchResult(List<ILookupRow<LOOKUP_KEY>> rows, Throwable failed, IContentAssistSearchParam<LOOKUP_KEY> searchParam) {
     m_lookupRows = rows;
     m_processingException = failed;
-    m_searchText = searchText;
-    m_selectCurrentValue = selectCurrentValue;
+    m_searchParam = searchParam;
   }
 
   @Override
-  public List<? extends ILookupRow<LOOKUP_KEY>> getLookupRows() {
+  public List<ILookupRow<LOOKUP_KEY>> getLookupRows() {
     return m_lookupRows;
   }
 
   @Override
-  public RuntimeException getException() {
+  public Throwable getException() {
     return m_processingException;
   }
 
   @Override
-  public String getSearchText() {
-    return m_searchText;
-  }
-
-  @Override
-  public boolean isSelectCurrentValue() {
-    return m_selectCurrentValue;
+  public IContentAssistSearchParam<LOOKUP_KEY> getSearchParam() {
+    return m_searchParam;
   }
 
   @Override
   public int hashCode() {
     final int prime = 31;
     int result = 1;
+    result = prime * result + ((m_searchParam == null) ? 0 : m_searchParam.hashCode());
     result = prime * result + ((m_lookupRows == null) ? 0 : m_lookupRows.hashCode());
     result = prime * result + ((m_processingException == null) ? 0 : m_processingException.hashCode());
-    result = prime * result + ((m_searchText == null) ? 0 : m_searchText.hashCode());
-    result = prime * result + (m_selectCurrentValue ? 1231 : 1237);
     return result;
   }
 
@@ -71,6 +64,14 @@ public class ContentAssistFieldDataFetchResult<LOOKUP_KEY> implements IContentAs
       return false;
     }
     ContentAssistFieldDataFetchResult other = (ContentAssistFieldDataFetchResult) obj;
+    if (m_searchParam == null) {
+      if (other.m_searchParam != null) {
+        return false;
+      }
+    }
+    else if (!m_searchParam.equals(other.m_searchParam)) {
+      return false;
+    }
     if (m_lookupRows == null) {
       if (other.m_lookupRows != null) {
         return false;
@@ -87,27 +88,16 @@ public class ContentAssistFieldDataFetchResult<LOOKUP_KEY> implements IContentAs
     else if (!m_processingException.equals(other.m_processingException)) {
       return false;
     }
-    if (m_searchText == null) {
-      if (other.m_searchText != null) {
-        return false;
-      }
-    }
-    else if (!m_searchText.equals(other.m_searchText)) {
-      return false;
-    }
-    if (m_selectCurrentValue != other.m_selectCurrentValue) {
-      return false;
-    }
     return true;
   }
 
   @Override
   public String toString() {
-    String s = getClass().getSimpleName() + " {";
-    s += "[searchText: " + (m_searchText == null ? "null" : "'" + m_searchText + "'") + "], ";
-    s += "[lookupRows: " + (getLookupRows() == null ? "null" : getLookupRows().size() + " rows") + "], ";
-    s += "[selectCurrentValue: " + isSelectCurrentValue() + "], ";
-    s += "[processingException: " + getException() + "]}";
-    return s;
+    return new ToStringBuilder(this)
+        .attr(m_searchParam)
+        .attr("lookupRows", m_lookupRows)
+        .attr("exception", m_processingException)
+        .toString();
   }
+
 }
