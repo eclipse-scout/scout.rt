@@ -22,10 +22,10 @@ scout.TreeNavigationDownKeyStroke = function(tree, modifierBitMask) {
 };
 scout.inherits(scout.TreeNavigationDownKeyStroke, scout.AbstractTreeNavigationKeyStroke);
 
-scout.TreeNavigationDownKeyStroke.prototype._handleInternal = function(currentNode) {
+scout.TreeNavigationDownKeyStroke.prototype._computeNewSelection = function(currentNode) {
   var nodes = this.field.visibleNodesFlat;
   if (nodes.length === 0) {
-    return null;
+    return;
   }
   if (!currentNode) {
     return nodes[0];

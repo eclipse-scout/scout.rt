@@ -36,13 +36,17 @@ scout.AbstractTreeNavigationKeyStroke.prototype._accept = function(event) {
 };
 
 scout.AbstractTreeNavigationKeyStroke.prototype.handle = function(event) {
-  var newNodeSelection = this._handleInternal(event._treeCurrentNode);
-  if (newNodeSelection) {
-    this.field.selectNodes(newNodeSelection);
-    this.field.scrollTo(newNodeSelection);
+  var newSelection = this._computeNewSelection(event._treeCurrentNode);
+  if (newSelection) {
+    this.selectNodesAndReveal(newSelection, true);
   }
 };
 
-scout.AbstractTreeNavigationKeyStroke.prototype._handleInternal = function(currentNode) {
-  throw new Error('method must be overwritten by subclass');
+scout.AbstractTreeNavigationKeyStroke.prototype._computeNewSelection = function(currentNode) {
+  return [];
+};
+
+scout.AbstractTreeNavigationKeyStroke.prototype.selectNodesAndReveal = function(newSelection, debounceSend) {
+  this.field.selectNodes(newSelection, true, debounceSend);
+  this.field.revealSelection();
 };

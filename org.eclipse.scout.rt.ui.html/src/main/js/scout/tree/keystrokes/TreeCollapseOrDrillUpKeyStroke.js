@@ -23,11 +23,11 @@ scout.TreeCollapseOrDrillUpKeyStroke.prototype._accept = function(event) {
   return accepted && event._treeCurrentNode;
 };
 
-scout.TreeCollapseOrDrillUpKeyStroke.prototype._handleInternal = function(currentNode) {
+scout.TreeCollapseOrDrillUpKeyStroke.prototype.handle = function(event) {
+  var currentNode = event._treeCurrentNode;
   if (currentNode.expanded) {
     this.field.collapseNode(currentNode);
-    return null;
   } else if (currentNode.parentNode) {
-    return currentNode.parentNode;
+    this.selectNodesAndReveal(currentNode.parentNode, true);
   }
 };

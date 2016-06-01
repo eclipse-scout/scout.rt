@@ -23,13 +23,13 @@ scout.TreeExpandOrDrillDownKeyStroke.prototype._accept = function(event) {
   return accepted && event._treeCurrentNode;
 };
 
-scout.TreeExpandOrDrillDownKeyStroke.prototype._handleInternal = function(currentNode) {
+scout.TreeExpandOrDrillDownKeyStroke.prototype.handle = function(event) {
+  var currentNode = event._treeCurrentNode;
   if (!currentNode.expanded && !currentNode.leaf) {
     this.field.expandNode(currentNode, {
       lazy: false // always show all nodes on node double click
     });
-    return null;
   } else if (currentNode.childNodes.length > 0) {
-    return currentNode.childNodes[0];
+    this.selectNodesAndReveal(currentNode.childNodes[0], true);
   }
 };

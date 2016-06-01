@@ -21,10 +21,17 @@ scout.TreeNavigationEndKeyStroke = function(tree, modifierBitMask) {
 };
 scout.inherits(scout.TreeNavigationEndKeyStroke, scout.AbstractTreeNavigationKeyStroke);
 
-scout.TreeNavigationEndKeyStroke.prototype._handleInternal = function(currentNode) {
+scout.TreeNavigationEndKeyStroke.prototype.handle = function(event) {
+  var newSelection = this._computeNewSelection(event._treeCurrentNode);
+  if (newSelection) {
+    this.selectNodesAndReveal(newSelection);
+  }
+};
+
+scout.TreeNavigationEndKeyStroke.prototype._computeNewSelection = function(currentNode) {
   var nodes = this.field.visibleNodesFlat;
   if (nodes.length === 0) {
-    return null;
+    return;
   }
-    return nodes[nodes.length-1];
+  return scout.arrays.last(nodes);
 };

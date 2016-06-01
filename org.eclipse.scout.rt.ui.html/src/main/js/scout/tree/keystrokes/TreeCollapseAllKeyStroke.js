@@ -18,10 +18,9 @@ scout.TreeCollapseAllKeyStroke = function(tree, keyStrokeModifier) {
 };
 scout.inherits(scout.TreeCollapseAllKeyStroke, scout.AbstractTreeNavigationKeyStroke);
 
-scout.TreeCollapseAllKeyStroke.prototype._handleInternal = function(currentNode) {
+scout.TreeCollapseAllKeyStroke.prototype.handle = function(event) {
   this.field.collapseAll();
-  if(this.field.visibleNodesFlat.length>0){
-    this.field.selectNodes(this.field.visibleNodesFlat[0]);
+  if (this.field.visibleNodesFlat.length > 0) {
+    this.selectNodesAndReveal(this.field.visibleNodesFlat[0]);
   }
-  return this.field.visibleNodesFlat[0];
 };
