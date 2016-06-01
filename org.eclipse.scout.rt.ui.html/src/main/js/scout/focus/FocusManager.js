@@ -17,19 +17,32 @@
  * which is natively focusable and which is not covert by a glass pane. Furthermore, if a context is unintalled,
  * the previously active focus context is activated and its focus position restored.
  */
-scout.FocusManager = function(session, focusManagerActive) {
-  var $mainEntryPoint = session.$entryPoint;
-  this.session = session;
-  this.active = scout.nvl(focusManagerActive, scout.device.focusManagerActive);
+scout.FocusManager = function(options) {
+  var defaults = {
+    // Auto focusing of elements is bad with on screen keyboards -> deactivate to prevent unwanted popping up of the keyboard
+    active: !scout.device.supportsTouch(),
+    // Preventing blur is bad on touch devices because every touch on a non input field is supposed to close the keyboard which does not happen if preventDefault is used on mouse down
+    restrictedFocusGain: !scout.device.supportsTouch()
+  };
+  $.extend(this, defaults, options);
+
+  if (!this.session) {
+    throw new Error('Session expected');
+  }
 
   this._focusContexts = [];
   this._glassPaneTargets = [];
 
   // Make $entryPoint focusable and install focus context.
+  var $mainEntryPoint = this.session.$entryPoint;
   var portletPartId = $mainEntryPoint.data('partid') || '0';
   $mainEntryPoint.attr('tabindex', portletPartId);
 
-  this.installTopLevelMouseHandlers($mainEntryPoint);
+  // Restricted focus gain means that not every click outside of the active element necessarily focuses another element but the active element stays focused
+  // See _acceptFocusChangeOnMouseDown for details
+  if (this.restrictedFocusGain) {
+    this.installTopLevelMouseHandlers($mainEntryPoint);
+  }
   this.installFocusContext($mainEntryPoint, scout.focusRule.AUTO);
 };
 

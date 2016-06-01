@@ -50,6 +50,7 @@ scout.RadioButton.prototype._remove = function($parent) {
 scout.RadioButton.prototype._mouseDown = function(event) {
   this.select();
   if (this.focusWhenSelected) {
+    // FIXME CGU find another solution for this, preventing blur is bad for touch devices. Maybe create separate divs instead of :before. Same in checkboxfield and tree
     this.session.focusManager.requestFocus(this.$field);
     event.preventDefault();
   }

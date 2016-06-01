@@ -10,7 +10,7 @@
  ******************************************************************************/
 /* global FocusManagerSpecHelper */
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;
-describe('scout.Focusmanager', function() {
+describe('scout.FocusManager', function() {
   var session, formHelper, focusHelper, form;
 
   beforeEach(function() {

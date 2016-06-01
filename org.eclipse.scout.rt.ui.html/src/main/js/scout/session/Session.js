@@ -48,7 +48,6 @@ scout.Session = function($entryPoint, options) {
     this._forceNewClientSession = true;
   }
 
-
   // Set members
   this.$entryPoint = $entryPoint;
   this.uiSessionId; // assigned by server on session init (OWASP recommendation, see https://www.owasp.org/index.php/Cross-Site_Request_Forgery_%28CSRF%29_Prevention_Cheat_Sheet#General_Recommendation:_Synchronizer_Token_Pattern).
@@ -89,7 +88,11 @@ scout.Session = function($entryPoint, options) {
   });
 
   // Install focus management for this session.
-  this.focusManager = new scout.FocusManager(this, options.focusManagerActive);
+
+  this.focusManager = new scout.FocusManager({
+    session: this,
+    active: options.focusManagerActive
+  });
   this.keyStrokeManager = new scout.KeyStrokeManager(this);
 };
 
@@ -769,8 +772,7 @@ scout.Session.prototype._processErrorJsonResponse = function(jsonError) {
     boxOptions.header = this.optText('ui.UnsafeUpload', boxOptions.header);
     boxOptions.body = this.optText('ui.UnsafeUploadMsg', boxOptions.body);
     boxOptions.yesButtonText = this.optText('ui.Ok', 'Ok');
-    boxOptions.yesButtonAction = function() {
-    };
+    boxOptions.yesButtonAction = function() {};
   }
   this.showFatalMessage(boxOptions, jsonError.code);
 };

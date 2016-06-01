@@ -96,12 +96,8 @@ scout.Button.prototype._render = function($parent) {
   // FIXME cgu: should we add a label? -> would make it possible to control the space left of the button using labelVisible, like it is possible with checkboxes
   this.addStatus();
 
-  $button
-    .on('click', this._onClick.bind(this))
-    .on('mousedown', function(event) {
-      // prevent focus validation on other field on mouse down. -> Safari workaround
-      event.preventDefault();
-    });
+  $button.on('click', this._onClick.bind(this))
+    .unfocusable();
 
   if (this.menus && this.menus.length > 0) {
     this.menus.forEach(function(menu) {
@@ -111,7 +107,6 @@ scout.Button.prototype._render = function($parent) {
       this.$submenuIcon = (this.$link || $button).appendSpan('submenu-icon');
     }
   }
-  $button.unfocusable();
   this.session.keyStrokeManager.installKeyStrokeContext(this.formKeyStrokeContext);
 };
 

@@ -32,7 +32,6 @@ scout.Device = function(userAgent) {
   // DOM elements by creating a string.
   this.unselectableAttribute = scout.Device.DEFAULT_UNSELECTABLE_ATTRIBUTE;
   this.tableAdditionalDivRequired = false;
-  this.focusManagerActive = true;
 
   if (userAgent) {
     this._parseSystem(userAgent);
@@ -94,8 +93,6 @@ scout.Device.prototype.bootstrap = function() {
   }
 
   if (this.hasOnScreenKeyboard()) {
-    // Auto focusing of elements is bad with on screen keyboards -> deactivate to prevent unwanted popping up of the keyboard
-    this.focusManagerActive = false;
     deferreds.push(this._loadJQueryMobileDeferred());
   }
   return deferreds;
