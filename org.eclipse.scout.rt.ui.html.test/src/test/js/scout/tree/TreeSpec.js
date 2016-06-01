@@ -1124,6 +1124,90 @@ describe("Tree", function() {
       expect($children.eq(1)[0]).toBe(nodes[1].$node[0]);
       expect($children.eq(2)[0]).toBe(nodes[2].$node[0]);
     });
+
+    it("may select a node which is not rendered", function() {
+      var model = helper.createModelFixture(3, 3);
+      var tree = helper.createTree(model);
+      var nodes = tree.nodes;
+      var child0 = nodes[1].childNodes[0];
+      var child1 = nodes[1].childNodes[1];
+      tree.viewRangeSize = 1;
+      tree.render(session.$entryPoint);
+
+      expect(nodes[1].rendered).toBe(false);
+      expect(child0.rendered).toBe(false);
+      expect(child1.rendered).toBe(false);
+
+      tree.selectNodes(child1);
+      expect(child0.rendered).toBe(false);
+      expect(child1.rendered).toBe(false);
+
+      tree._renderViewRangeForNode(child1);
+      expect(child0.rendered).toBe(false);
+      expect(child1.rendered).toBe(true);
+      expect(child1.$node).toHaveClass('selected');
+
+      // Select another not rendered node (makes sure remove selection works well)
+      tree.selectNodes(child0);
+      tree._renderViewRangeForNode(child0);
+      expect(child0.rendered).toBe(true);
+      expect(child0.$node).toHaveClass('selected');
+      expect(child1.attached).toBe(false);
+      expect(child1.$node).not.toHaveClass('selected');
+    });
+
+    it("sets parent and ancestor css classes even if nodes are not rendered", function() {
+      var model = helper.createModelFixture(3, 3);
+      var tree = helper.createTree(model);
+      var nodes = tree.nodes;
+      var child1 = nodes[1].childNodes[1];
+      var grandChild1 = child1.childNodes[1];
+      tree.viewRangeSize = 1;
+      tree.render(session.$entryPoint);
+
+      // Only render one node
+      tree._expandAllParentNodes(grandChild1);
+      tree._renderViewRangeForNode(grandChild1);
+      expect(nodes[1].rendered).toBe(false);
+      expect(grandChild1.rendered).toBe(true);
+
+      // Selected the rendered node -> parent and child nodes won't be updated because they are not rendered
+      tree.selectNodes(grandChild1);
+      expect(grandChild1.$node).toHaveClass('selected');
+
+      // Render range for parent
+      tree._renderViewRangeForNode(child1);
+      expect(child1.$node).toHaveClass('parent-of-selected');
+
+      // Render range for grand parent
+      tree._renderViewRangeForNode(nodes[1]);
+      expect(nodes[1].$node).toHaveClass('ancestor-of-selected');
+    });
+
+    it("sets child-of-selected css class even if nodes are not rendered", function() {
+      var model = helper.createModelFixture(3, 3);
+      var tree = helper.createTree(model);
+      var nodes = tree.nodes;
+      var child1 = nodes[1].childNodes[1];
+      var grandChild1 = child1.childNodes[1];
+      tree.viewRangeSize = 1;
+      tree.render(session.$entryPoint);
+
+      // Only render one node
+      tree._expandAllParentNodes(grandChild1);
+      tree._renderViewRangeForNode(child1);
+      expect(nodes[1].rendered).toBe(false);
+      expect(child1.rendered).toBe(true);
+      expect(grandChild1.rendered).toBe(false);
+
+      // Selected the rendered node -> child nodes won't be updated because they are not rendered
+      tree.selectNodes(child1);
+      expect(child1.$node).toHaveClass('selected');
+
+      // Render range for grandChild
+      tree._renderViewRangeForNode(grandChild1);
+      expect(grandChild1.$node).toHaveClass('child-of-selected');
+    });
   });
 
   describe("expandNode", function() {

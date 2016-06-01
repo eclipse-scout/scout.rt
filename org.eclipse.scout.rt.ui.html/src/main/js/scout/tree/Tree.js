@@ -1079,18 +1079,16 @@ scout.Tree.prototype._removeSelection = function() {
 };
 
 scout.Tree.prototype._removeNodeSelection = function(node) {
-  var $node = node.$node;
-  if (!$node) {
-    return;
+  if (node.rendered) {
+    node.$node.select(false);
   }
-  $node.select(false);
 
   // remove ancestor and child classes
   var parentNode = node.parentNode;
-  if (parentNode) {
+  if (parentNode && parentNode.rendered) {
     parentNode.$node.removeClass('parent-of-selected');
   }
-  while (parentNode) {
+  while (parentNode && parentNode.rendered) {
     parentNode.$node.removeClass('ancestor-of-selected');
     parentNode = parentNode.parentNode;
   }
