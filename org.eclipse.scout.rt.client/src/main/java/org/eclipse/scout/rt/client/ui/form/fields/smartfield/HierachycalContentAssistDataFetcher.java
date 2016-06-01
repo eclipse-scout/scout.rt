@@ -19,9 +19,8 @@ import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.JobInput;
-import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.StringUtility;
-import org.eclipse.scout.rt.platform.util.concurrent.IBiFunction;
+import org.eclipse.scout.rt.platform.util.concurrent.IBiConsumer;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,33 +36,22 @@ public class HierachycalContentAssistDataFetcher<LOOKUP_KEY> extends AbstractCon
   public void update(IContentAssistSearchParam<LOOKUP_KEY> query, boolean blocking) {
     IFuture<Void> fRes =
         scheduleLookup(query)
-            .whenDoneSchedule(createResult(query), newJobInput())
-            .whenDoneSchedule(updateResult(), newModelJobInput());
+            .whenDoneSchedule(updateResult(query), newModelJobInput());
     if (blocking) {
       LookupJobHelper.awaitDone(fRes);
     }
   }
 
-  private IBiFunction<List<ILookupRow<LOOKUP_KEY>>, Throwable, ContentAssistFieldDataFetchResult<LOOKUP_KEY>> createResult(final IContentAssistSearchParam<LOOKUP_KEY> fetchInfo) {
-    return new IBiFunction<List<ILookupRow<LOOKUP_KEY>>, Throwable, ContentAssistFieldDataFetchResult<LOOKUP_KEY>>() {
+  private IBiConsumer<List<ILookupRow<LOOKUP_KEY>>, Throwable> updateResult(final IContentAssistSearchParam<LOOKUP_KEY> query) {
+    return new IBiConsumer<List<ILookupRow<LOOKUP_KEY>>, Throwable>() {
 
       @Override
-      public ContentAssistFieldDataFetchResult<LOOKUP_KEY> apply(List<ILookupRow<LOOKUP_KEY>> rows, Throwable error) {
-        return new ContentAssistFieldDataFetchResult<>(rows, error, fetchInfo);
-      }
-    };
-  }
-
-  private IBiFunction<ContentAssistFieldDataFetchResult<LOOKUP_KEY>, Throwable, Void> updateResult() {
-    return new IBiFunction<ContentAssistFieldDataFetchResult<LOOKUP_KEY>, Throwable, Void>() {
-
-      @Override
-      public Void apply(ContentAssistFieldDataFetchResult<LOOKUP_KEY> result, Throwable error) {
+      public void accept(List<ILookupRow<LOOKUP_KEY>> rows, Throwable error) {
+        ContentAssistFieldDataFetchResult<LOOKUP_KEY> result = new ContentAssistFieldDataFetchResult<>(rows, error, query);
         if (result.getException() != null) {
           logException(result.getException());
         }
         setResult(result);
-        return null;
       }
     };
   }
@@ -101,13 +89,7 @@ public class HierachycalContentAssistDataFetcher<LOOKUP_KEY> extends AbstractCon
 
   private JobInput newModelJobInput() {
     return ModelJobs.newInput(ClientRunContexts.copyCurrent())
-        .withExceptionHandling(null, true);
-  }
-
-  private JobInput newJobInput() {
-    return Jobs.newInput()
-        .withRunContext(ClientRunContexts.copyCurrent())
-        .withExceptionHandling(null, true);
+        .withExceptionHandling(null, false);
   }
 
   protected IFuture<List<ILookupRow<LOOKUP_KEY>>> scheduleLookup(IContentAssistSearchParam<LOOKUP_KEY> query) {
