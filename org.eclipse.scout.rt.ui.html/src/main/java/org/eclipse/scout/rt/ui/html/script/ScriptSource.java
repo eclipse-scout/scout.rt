@@ -12,6 +12,8 @@ package org.eclipse.scout.rt.ui.html.script;
 
 import java.net.URL;
 
+import org.eclipse.scout.rt.platform.util.ToStringBuilder;
+
 public class ScriptSource {
 
   public static enum FileType {
@@ -131,6 +133,11 @@ public class ScriptSource {
 
   @Override
   public String toString() {
-    return m_nodeType + " [" + m_fileType + "] " + m_requestPath + " (at " + m_url + ")";
+    return new ToStringBuilder(this)
+        .attr("requestPath", m_requestPath)
+        .attr("url", m_url)
+        .attr("fileType", m_fileType)
+        .attr("nodeType", m_nodeType)
+        .toString();
   }
 }

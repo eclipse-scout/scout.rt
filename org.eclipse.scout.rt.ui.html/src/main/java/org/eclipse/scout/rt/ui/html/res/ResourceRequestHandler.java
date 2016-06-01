@@ -22,9 +22,9 @@ import javax.servlet.http.HttpServletResponse;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
+import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheControl;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheKey;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheObject;
-import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheControl;
 import org.eclipse.scout.rt.ui.html.AbstractUiServletRequestHandler;
 import org.eclipse.scout.rt.ui.html.UiServlet;
 import org.eclipse.scout.rt.ui.html.res.loader.IResourceLoader;
@@ -68,13 +68,22 @@ public class ResourceRequestHandler extends AbstractUiServletRequestHandler {
     // Create cache key for resource and check if resource exists in cache
     HttpCacheKey cacheKey = resourceLoader.createCacheKey(pathInfoEx);
     HttpCacheObject resource = m_httpCacheControl.getCacheObject(req, cacheKey);
+    String logMsg;
     if (resource == null) {
       // Resource not found in cache --> load it
       resource = resourceLoader.loadResource(cacheKey);
-      if (resource != null) {
+      if (resource == null) {
+        logMsg = "Resource is not cached, could not load resource (not added to the cache)";
+      }
+      else {
         m_httpCacheControl.putCacheObject(req, resource);
+        logMsg = "Resource is not cached, resource loaded and added to the cache";
       }
     }
+    else {
+      logMsg = "Resource found in cache, using cached resource";
+    }
+    LOG.debug("Requested resource with cacheKey={}. Service-side HTTP cache: {}", cacheKey, logMsg);
 
     // check resource existence (also ignore resources without content, to prevent invalid "content-length" header and NPE in write() method)
     if (resource == null || resource.getResource() == null || resource.getResource().getContent() == null) {

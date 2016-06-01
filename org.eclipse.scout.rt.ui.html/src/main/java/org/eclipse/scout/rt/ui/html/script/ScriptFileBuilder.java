@@ -95,6 +95,7 @@ public class ScriptFileBuilder {
 
   public ScriptOutput buildScript(String pathInfo) throws IOException {
     ScriptSource script = locateNonFragmentScript(pathInfo);
+    LOG.info("Building script {} theme={} minifyEnabled={}", script, m_theme, m_minifyEnabled);
     if (script == null) {
       return null; // not found
     }
