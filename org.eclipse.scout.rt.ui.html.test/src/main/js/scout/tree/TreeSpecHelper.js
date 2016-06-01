@@ -8,11 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-var TreeSpecHelper = function(session) {
+scout.TreeSpecHelper = function(session) {
   this.session = session;
 };
 
-TreeSpecHelper.prototype.createModel = function(nodes) {
+scout.TreeSpecHelper.prototype.createModel = function(nodes) {
   var model = createSimpleModel('Tree', this.session);
 
   if (nodes) {
@@ -22,11 +22,11 @@ TreeSpecHelper.prototype.createModel = function(nodes) {
   return model;
 };
 
-TreeSpecHelper.prototype.createModelFixture = function(nodeCount, depth, expanded) {
+scout.TreeSpecHelper.prototype.createModelFixture = function(nodeCount, depth, expanded) {
   return this.createModel(this.createModelNodes(nodeCount, depth, expanded));
 };
 
-TreeSpecHelper.prototype.createModelNode = function(id, text, position) {
+scout.TreeSpecHelper.prototype.createModelNode = function(id, text, position) {
   return {
     id: id + '' || scout.objectFactory.createUniqueId(),
     text: text,
@@ -36,11 +36,11 @@ TreeSpecHelper.prototype.createModelNode = function(id, text, position) {
   };
 };
 
-TreeSpecHelper.prototype.createModelNodes = function(nodeCount, depth, expanded) {
+scout.TreeSpecHelper.prototype.createModelNodes = function(nodeCount, depth, expanded) {
   return this.createModelNodesInternal(nodeCount, depth, expanded);
 };
 
-TreeSpecHelper.prototype.createModelNodesInternal = function(nodeCount, depth, expanded, parentNode) {
+scout.TreeSpecHelper.prototype.createModelNodesInternal = function(nodeCount, depth, expanded, parentNode) {
   if (!nodeCount) {
     return;
   }
@@ -64,23 +64,23 @@ TreeSpecHelper.prototype.createModelNodesInternal = function(nodeCount, depth, e
   return nodes;
 };
 
-TreeSpecHelper.prototype.createTree = function(model) {
+scout.TreeSpecHelper.prototype.createTree = function(model) {
   var tree = new scout.Tree();
   tree.init(model);
   return tree;
 };
 
-TreeSpecHelper.prototype.createCompactTree = function(model) {
+scout.TreeSpecHelper.prototype.createCompactTree = function(model) {
   var tree = new scout.CompactTree();
   tree.init(model);
   return tree;
 };
 
-TreeSpecHelper.prototype.findAllNodes = function(tree) {
+scout.TreeSpecHelper.prototype.findAllNodes = function(tree) {
   return tree.$container.find('.tree-node');
 };
 
-TreeSpecHelper.prototype.createNodeExpandedEvent = function(model, nodeId, expanded) {
+scout.TreeSpecHelper.prototype.createNodeExpandedEvent = function(model, nodeId, expanded) {
   return {
     target: model.id,
     nodeId: nodeId,
@@ -89,12 +89,12 @@ TreeSpecHelper.prototype.createNodeExpandedEvent = function(model, nodeId, expan
   };
 };
 
-TreeSpecHelper.prototype.selectNodesAndAssert = function(tree, nodes) {
+scout.TreeSpecHelper.prototype.selectNodesAndAssert = function(tree, nodes) {
   tree.selectNodes(nodes);
   this.assertSelection(tree, nodes);
 };
 
-TreeSpecHelper.prototype.assertSelection = function(tree, nodes) {
+scout.TreeSpecHelper.prototype.assertSelection = function(tree, nodes) {
   var $selectedNodes = tree.$selectedNodes();
   expect($selectedNodes.length).toBe(nodes.length);
 
@@ -107,7 +107,7 @@ TreeSpecHelper.prototype.assertSelection = function(tree, nodes) {
   expect(scout.arrays.equalsIgnoreOrder(nodes, tree.selectedNodes)).toBeTruthy();
 };
 
-TreeSpecHelper.prototype.createNodesSelectedEvent = function(model, nodeIds) {
+scout.TreeSpecHelper.prototype.createNodesSelectedEvent = function(model, nodeIds) {
   return {
     target: model.id,
     nodeIds: nodeIds,
@@ -115,7 +115,7 @@ TreeSpecHelper.prototype.createNodesSelectedEvent = function(model, nodeIds) {
   };
 };
 
-TreeSpecHelper.prototype.createNodesInsertedEvent = function(model, nodes, commonParentNodeId) {
+scout.TreeSpecHelper.prototype.createNodesInsertedEvent = function(model, nodes, commonParentNodeId) {
   return {
     target: model.id,
     commonParentNodeId: commonParentNodeId,
@@ -124,7 +124,7 @@ TreeSpecHelper.prototype.createNodesInsertedEvent = function(model, nodes, commo
   };
 };
 
-TreeSpecHelper.prototype.createNodesInsertedEventTopNode = function(model, nodes) {
+scout.TreeSpecHelper.prototype.createNodesInsertedEventTopNode = function(model, nodes) {
   return {
     target: model.id,
     nodes: nodes,
@@ -132,7 +132,7 @@ TreeSpecHelper.prototype.createNodesInsertedEventTopNode = function(model, nodes
   };
 };
 
-TreeSpecHelper.prototype.createNodesDeletedEvent = function(model, nodeIds, commonParentNodeId) {
+scout.TreeSpecHelper.prototype.createNodesDeletedEvent = function(model, nodeIds, commonParentNodeId) {
   return {
     target: model.id,
     commonParentNodeId: commonParentNodeId,
@@ -141,7 +141,7 @@ TreeSpecHelper.prototype.createNodesDeletedEvent = function(model, nodeIds, comm
   };
 };
 
-TreeSpecHelper.prototype.createAllChildNodesDeletedEvent = function(model, commonParentNodeId) {
+scout.TreeSpecHelper.prototype.createAllChildNodesDeletedEvent = function(model, commonParentNodeId) {
   return {
     target: model.id,
     commonParentNodeId: commonParentNodeId,
@@ -149,7 +149,7 @@ TreeSpecHelper.prototype.createAllChildNodesDeletedEvent = function(model, commo
   };
 };
 
-TreeSpecHelper.prototype.createNodeChangedEvent = function(model, nodeId) {
+scout.TreeSpecHelper.prototype.createNodeChangedEvent = function(model, nodeId) {
   return {
     target: model.id,
     nodeId: nodeId,
@@ -157,7 +157,7 @@ TreeSpecHelper.prototype.createNodeChangedEvent = function(model, nodeId) {
   };
 };
 
-TreeSpecHelper.prototype.createNodesUpdatedEvent = function(model, nodes) {
+scout.TreeSpecHelper.prototype.createNodesUpdatedEvent = function(model, nodes) {
   return {
     target: model.id,
     nodes: nodes,
@@ -165,7 +165,7 @@ TreeSpecHelper.prototype.createNodesUpdatedEvent = function(model, nodes) {
   };
 };
 
-TreeSpecHelper.prototype.createTreeEnabledEvent = function(model, enabled) {
+scout.TreeSpecHelper.prototype.createTreeEnabledEvent = function(model, enabled) {
   return {
     target: model.id,
     type: 'property',

@@ -12,5 +12,6 @@
     __include("scout/form/FormSpecHelper.js");
     __include("scout/menu/MenuSpecHelper.js");
     __include("scout/table/TableSpecHelper.js");
+    __include("scout/tree/TreeSpecHelper.js");
     __include("scout/text/LocaleSpecHelper.js");
   }(window.scout = window.scout || {}, jQuery));

@@ -2207,6 +2207,10 @@ scout.Tree.prototype._onNodeMouseDown = function(event) {
   }
 
   var $node = $(event.currentTarget);
+  if ($node.parent()[0] !== this.$data[0]) {
+    // if node does not belong to this tree, do nothing (may happen if another tree is embedded inside the node)
+    return;
+  }
   var node = $node.data('node');
   this._$mouseDownNode = $node;
   $node.window().one('mouseup', function() {

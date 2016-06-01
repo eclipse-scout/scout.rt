@@ -8,7 +8,6 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-/* global TreeSpecHelper */
 describe("TreeKeyStrokes", function() {
   var session;
   var helper;
@@ -16,7 +15,7 @@ describe("TreeKeyStrokes", function() {
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
-    helper = new TreeSpecHelper(session);
+    helper = new scout.TreeSpecHelper(session);
     jasmine.Ajax.install();
     jasmine.clock().install();
   });
