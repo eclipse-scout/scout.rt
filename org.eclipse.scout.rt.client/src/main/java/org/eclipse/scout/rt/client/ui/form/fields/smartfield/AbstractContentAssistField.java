@@ -1129,10 +1129,10 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
 
   protected IContentAssistFieldLookupRowFetcher<LOOKUP_KEY> createLookupRowFetcher() {
     if (isBrowseHierarchy()) {
-      return new HierachycalContentAssistDataFetcher<LOOKUP_KEY>(this);
+      return new HierarchicalContentAssistDataFetcher<>(this);
     }
     else {
-      return new ContentAssistFieldDataFetcher<LOOKUP_KEY>(this);
+      return new ContentAssistFieldDataFetcher<>(this);
     }
   }
 

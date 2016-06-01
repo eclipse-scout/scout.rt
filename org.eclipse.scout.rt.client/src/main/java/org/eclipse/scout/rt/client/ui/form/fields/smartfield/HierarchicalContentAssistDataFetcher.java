@@ -25,10 +25,10 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class HierachycalContentAssistDataFetcher<LOOKUP_KEY> extends AbstractContentAssistFieldLookupRowFetcher<LOOKUP_KEY> {
-  private static final Logger LOG = LoggerFactory.getLogger(HierachycalContentAssistDataFetcher.class);
+public class HierarchicalContentAssistDataFetcher<LOOKUP_KEY> extends AbstractContentAssistFieldLookupRowFetcher<LOOKUP_KEY> {
+  private static final Logger LOG = LoggerFactory.getLogger(HierarchicalContentAssistDataFetcher.class);
 
-  public HierachycalContentAssistDataFetcher(IContentAssistField<?, LOOKUP_KEY> contentAssistField) {
+  public HierarchicalContentAssistDataFetcher(IContentAssistField<?, LOOKUP_KEY> contentAssistField) {
     super(contentAssistField);
   }
 
