@@ -12,7 +12,6 @@
 describe("Tree", function() {
   var session;
   var helper;
-  //TODO NBU-> write test for dynamical keystroke(menu) update.
 
   beforeEach(function() {
     setFixtures(sandbox());
@@ -527,130 +526,6 @@ describe("Tree", function() {
 
   });
 
-  describe("node click", function() {
-
-    it("calls tree._onNodeMouseDown", function() {
-      var model = helper.createModelFixture(1);
-      var tree = helper.createTree(model);
-      spyOn(tree, '_onNodeMouseDown');
-      tree.render(session.$entryPoint);
-
-      var $node = tree.$container.find('.tree-node:first');
-      $node.triggerMouseDown();
-
-      expect(tree._onNodeMouseDown).toHaveBeenCalled();
-    });
-
-    it("sends selection and click events in one call in this order", function() {
-      var model = helper.createModelFixture(1);
-      var tree = helper.createTree(model);
-      tree.render(session.$entryPoint);
-
-      var $node = tree.$container.find('.tree-node:first');
-      $node.triggerClick();
-
-      sendQueuedAjaxCalls();
-      expect(jasmine.Ajax.requests.count()).toBe(1);
-
-      var requestData = mostRecentJsonRequest();
-      expect(requestData).toContainEventTypesExactly(['nodesSelected', 'nodeClicked']);
-    });
-
-    it("sends selection, check and click events if tree is checkable and checkbox has been clicked", function() {
-      var model = helper.createModelFixture(1);
-      var tree = helper.createTree(model);
-      tree.checkable = true;
-      tree.render(session.$entryPoint);
-
-      var $checkbox = tree.$container.find('.tree-node:first').children('.tree-node-checkbox')
-        .children('div');
-      $checkbox.triggerClick();
-
-      sendQueuedAjaxCalls();
-      expect(jasmine.Ajax.requests.count()).toBe(1);
-
-      var requestData = mostRecentJsonRequest();
-      expect(requestData).toContainEventTypesExactly(['nodesSelected', 'nodesChecked', 'nodeClicked']);
-    });
-
-    it("updates model (selection)", function() {
-      var model = helper.createModelFixture(1);
-      var tree = helper.createTree(model);
-      tree.render(session.$entryPoint);
-
-      expect(tree.selectedNodes.length).toBe(0);
-
-      var $node = tree.$container.find('.tree-node:first');
-      $node.triggerClick();
-
-      expect(tree.selectedNodes.length).toBe(1);
-      expect(tree.selectedNodes[0].id).toBe(model.nodes[0].id);
-    });
-
-    it("does not send click if mouse down happens on another node than mouseup", function() {
-      var model = helper.createModelFixture(2);
-      var tree = helper.createTree(model);
-      tree.render(session.$entryPoint);
-
-      var $node0 = tree.nodes[0].$node;
-      var $node1 = tree.nodes[1].$node;
-      $node0.triggerMouseDown();
-      $node1.triggerMouseUp();
-
-      sendQueuedAjaxCalls();
-      expect(jasmine.Ajax.requests.count()).toBe(1);
-
-      var requestData = mostRecentJsonRequest();
-      // Must contain only selection event (of first node), no clicked
-      expect(requestData).toContainEventsExactly([{
-        nodeIds: [tree.nodes[0].id],
-        target: tree.id,
-        type: 'nodesSelected'
-      }]);
-    });
-
-    it("does not send click if mouse down does not happen on a node", function() {
-      var model = helper.createModelFixture(1);
-      var tree = helper.createTree(model);
-      var $div = session.$entryPoint.makeDiv().cssHeight(10).cssWidth(10);
-      tree.render(session.$entryPoint);
-
-      var $node0 = tree.nodes[0].$node;
-      $node0.triggerMouseDown();
-      $(window).triggerMouseUp({
-        position: {
-          left: 0,
-          top: 0
-        }
-      });
-
-      sendQueuedAjaxCalls();
-      expect(jasmine.Ajax.requests.count()).toBe(1);
-
-      var requestData = mostRecentJsonRequest();
-      // Must contain only selection event (of first node), no clicked
-      expect(requestData).toContainEventsExactly([{
-        nodeIds: [tree.nodes[0].id],
-        target: tree.id,
-        type: 'nodesSelected'
-      }]);
-
-      jasmine.Ajax.uninstall();
-      jasmine.Ajax.install();
-
-      $(window).triggerMouseDown({
-        position: {
-          left: 0,
-          top: 0
-        }
-      });
-      $node0.triggerMouseUp();
-
-      sendQueuedAjaxCalls();
-      expect(jasmine.Ajax.requests.count()).toBe(0);
-    });
-  });
-
   describe("check nodes", function() {
 
     it("checks a subnode -> mark upper nodes ", function() {
@@ -884,6 +759,130 @@ describe("Tree", function() {
 
   });
 
+  describe("node click", function() {
+
+    it("calls tree._onNodeMouseDown", function() {
+      var model = helper.createModelFixture(1);
+      var tree = helper.createTree(model);
+      spyOn(tree, '_onNodeMouseDown');
+      tree.render(session.$entryPoint);
+
+      var $node = tree.$container.find('.tree-node:first');
+      $node.triggerMouseDown();
+
+      expect(tree._onNodeMouseDown).toHaveBeenCalled();
+    });
+
+    it("sends selection and click events in one call in this order", function() {
+      var model = helper.createModelFixture(1);
+      var tree = helper.createTree(model);
+      tree.render(session.$entryPoint);
+
+      var $node = tree.$container.find('.tree-node:first');
+      $node.triggerClick();
+
+      sendQueuedAjaxCalls();
+      expect(jasmine.Ajax.requests.count()).toBe(1);
+
+      var requestData = mostRecentJsonRequest();
+      expect(requestData).toContainEventTypesExactly(['nodesSelected', 'nodeClicked']);
+    });
+
+    it("sends selection, check and click events if tree is checkable and checkbox has been clicked", function() {
+      var model = helper.createModelFixture(1);
+      var tree = helper.createTree(model);
+      tree.checkable = true;
+      tree.render(session.$entryPoint);
+
+      var $checkbox = tree.$container.find('.tree-node:first').children('.tree-node-checkbox')
+        .children('div');
+      $checkbox.triggerClick();
+
+      sendQueuedAjaxCalls();
+      expect(jasmine.Ajax.requests.count()).toBe(1);
+
+      var requestData = mostRecentJsonRequest();
+      expect(requestData).toContainEventTypesExactly(['nodesSelected', 'nodesChecked', 'nodeClicked']);
+    });
+
+    it("updates model (selection)", function() {
+      var model = helper.createModelFixture(1);
+      var tree = helper.createTree(model);
+      tree.render(session.$entryPoint);
+
+      expect(tree.selectedNodes.length).toBe(0);
+
+      var $node = tree.$container.find('.tree-node:first');
+      $node.triggerClick();
+
+      expect(tree.selectedNodes.length).toBe(1);
+      expect(tree.selectedNodes[0].id).toBe(model.nodes[0].id);
+    });
+
+    it("does not send click if mouse down happens on another node than mouseup", function() {
+      var model = helper.createModelFixture(2);
+      var tree = helper.createTree(model);
+      tree.render(session.$entryPoint);
+
+      var $node0 = tree.nodes[0].$node;
+      var $node1 = tree.nodes[1].$node;
+      $node0.triggerMouseDown();
+      $node1.triggerMouseUp();
+
+      sendQueuedAjaxCalls();
+      expect(jasmine.Ajax.requests.count()).toBe(1);
+
+      var requestData = mostRecentJsonRequest();
+      // Must contain only selection event (of first node), no clicked
+      expect(requestData).toContainEventsExactly([{
+        nodeIds: [tree.nodes[0].id],
+        target: tree.id,
+        type: 'nodesSelected'
+      }]);
+    });
+
+    it("does not send click if mouse down does not happen on a node", function() {
+      var model = helper.createModelFixture(1);
+      var tree = helper.createTree(model);
+      var $div = session.$entryPoint.makeDiv().cssHeight(10).cssWidth(10);
+      tree.render(session.$entryPoint);
+
+      var $node0 = tree.nodes[0].$node;
+      $node0.triggerMouseDown();
+      $(window).triggerMouseUp({
+        position: {
+          left: 0,
+          top: 0
+        }
+      });
+
+      sendQueuedAjaxCalls();
+      expect(jasmine.Ajax.requests.count()).toBe(1);
+
+      var requestData = mostRecentJsonRequest();
+      // Must contain only selection event (of first node), no clicked
+      expect(requestData).toContainEventsExactly([{
+        nodeIds: [tree.nodes[0].id],
+        target: tree.id,
+        type: 'nodesSelected'
+      }]);
+
+      jasmine.Ajax.uninstall();
+      jasmine.Ajax.install();
+
+      $(window).triggerMouseDown({
+        position: {
+          left: 0,
+          top: 0
+        }
+      });
+      $node0.triggerMouseUp();
+
+      sendQueuedAjaxCalls();
+      expect(jasmine.Ajax.requests.count()).toBe(0);
+    });
+  });
+
   describe("node double click", function() {
 
     beforeEach(function() {
@@ -968,35 +967,6 @@ describe("Tree", function() {
 
       // clicked has to be after selected otherwise it is not possible to get the selected row in execNodeClick
       expect(mostRecentJsonRequest()).toContainEventTypesExactly(['nodesSelected', 'nodeClicked', 'nodeAction', 'nodeExpanded']);
-    });
-  });
-
-  describe("collapseAll", function() {
-
-    it("collapses all nodes and updates model", function() {
-      var i;
-      var model = helper.createModelFixture(3, 2, true);
-      var tree = helper.createTree(model);
-      tree.render(session.$entryPoint);
-
-      var allNodes = [];
-      tree._visitNodes(tree.nodes, function(node) {
-        allNodes.push(node);
-      });
-
-      for (i = 0; i < allNodes.length; i++) {
-        expect(allNodes[i].expanded).toBe(true);
-      }
-
-      tree.collapseAll();
-
-      for (i = 0; i < allNodes.length; i++) {
-        expect(allNodes[i].expanded).toBe(false);
-      }
-
-      //A nodeExpanded event must be sent for every node because all nodes were initially expanded
-      sendQueuedAjaxCalls();
-      expect(mostRecentJsonRequest().events.length).toBe(allNodes.length);
     });
   });
 
@@ -1185,6 +1155,42 @@ describe("Tree", function() {
 
   });
 
+  describe("expandAllParentNodes", function() {
+
+    it("expands all parent nodes of the given node (model)", function() {
+      var model = helper.createModelFixture(3, 3);
+      var tree = helper.createTree(model);
+      var nodes = tree.nodes;
+
+      expect(nodes[0].expanded).toBe(false);
+      expect(nodes[0].childNodes[0].expanded).toBe(false);
+      expect(nodes[0].childNodes[0].childNodes[0].expanded).toBe(false);
+
+      tree._expandAllParentNodes(nodes[0].childNodes[0].childNodes[0]);
+      expect(nodes[0].expanded).toBe(true);
+      expect(nodes[0].childNodes[0].expanded).toBe(true);
+      expect(nodes[0].childNodes[0].childNodes[0].expanded).toBe(false);
+    });
+
+    it("expands all parent nodes of the given node (html)", function() {
+      var model = helper.createModelFixture(3, 3);
+      var tree = helper.createTree(model);
+      var nodes = tree.nodes;
+      tree.render(session.$entryPoint);
+
+      expect(nodes[0].$node).not.toHaveClass('expanded');
+      expect(nodes[0].childNodes[0].$node).toBeFalsy();
+      expect(nodes[0].childNodes[0].childNodes[0].$node).toBeFalsy();
+
+      tree._expandAllParentNodes(nodes[0].childNodes[0].childNodes[0]);
+      expect(nodes[0].$node).toHaveClass('expanded');
+      expect(nodes[0].childNodes[0].$node).toHaveClass('expanded');
+      expect(nodes[0].childNodes[0].childNodes[0].$node).not.toHaveClass('expanded');
+    });
+
+  });
+
+
   describe("collapseNode", function() {
 
     it("prevents collapsing in bread crumb mode if node is selected", function() {
@@ -1204,6 +1210,35 @@ describe("Tree", function() {
 
       // Still true
       expect(node0.expanded).toBe(true);
+    });
+  });
+
+  describe("collapseAll", function() {
+
+    it("collapses all nodes and updates model", function() {
+      var i;
+      var model = helper.createModelFixture(3, 2, true);
+      var tree = helper.createTree(model);
+      tree.render(session.$entryPoint);
+
+      var allNodes = [];
+      tree._visitNodes(tree.nodes, function(node) {
+        allNodes.push(node);
+      });
+
+      for (i = 0; i < allNodes.length; i++) {
+        expect(allNodes[i].expanded).toBe(true);
+      }
+
+      tree.collapseAll();
+
+      for (i = 0; i < allNodes.length; i++) {
+        expect(allNodes[i].expanded).toBe(false);
+      }
+
+      //A nodeExpanded event must be sent for every node because all nodes were initially expanded
+      sendQueuedAjaxCalls();
+      expect(mostRecentJsonRequest().events.length).toBe(allNodes.length);
     });
   });
 

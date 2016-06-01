@@ -1862,7 +1862,7 @@ scout.Tree.prototype._expandAllParentNodes = function(node) {
       });
     }
   }
-  if (nodesToInsert.length > 0) {
+  if (this.rendered && nodesToInsert.length > 0) {
     this._rerenderViewport();
     this.invalidateLayoutTree();
   }
