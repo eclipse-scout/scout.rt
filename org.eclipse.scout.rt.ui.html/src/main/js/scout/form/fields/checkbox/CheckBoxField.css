@@ -52,13 +52,15 @@
     }
   }
 
-  & > .check-box {
+  &:focus > .check-box {
+    outline: none;
 
-    &:focus {
-      outline: none;
+    &::before {
+      #scout.checkbox-before-focus();
     }
+  }
 
-    /* ::before */
+  & > .check-box {
 
     &::before {
       #scout.checkbox-before();
@@ -68,10 +70,6 @@
 
     &.checked::before {
       #scout.checkbox-before-checked();
-    }
-
-    &:focus::before {
-      #scout.checkbox-before-focus();
     }
 
     &.disabled::before {

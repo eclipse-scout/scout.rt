@@ -831,7 +831,7 @@ scout.Tree.prototype._decorateNode = function(node) {
 
   scout.styles.legacyStyle(node, $node);
 
-  // TODO [5.2] bsh: More attributes...
+  // TODO [6.1] bsh: More attributes...
   // iconId
 
   // If parent node is marked as 'lazy', check if any visible child nodes remain.
@@ -1051,6 +1051,7 @@ scout.Tree.prototype._renderSelection = function() {
     // Execute delayed because tree may be not layouted yet
     setTimeout(this.revealSelection.bind(this));
   }
+  // TODO [6.1] CGU remove this, it does way too much and renderNodeText prevents that tree can get focus when a node is clicked. It seems that it is only necessary to update the group css class
   this._redecorateViewRange();
 };
 
@@ -2218,7 +2219,7 @@ scout.Tree.prototype._onNodeMouseDown = function(event) {
   this.selectNodes(node);
 
   if (this.checkable && this._isCheckboxClicked(event)) {
-    if (scout.device.supportsFocusEmptyBeforeDiv) {
+    if (!scout.device.supportsFocusEmptyBeforeDiv()) {
       this.session.focusManager.requestFocus(this.$container);
       event.preventDefault();
     }

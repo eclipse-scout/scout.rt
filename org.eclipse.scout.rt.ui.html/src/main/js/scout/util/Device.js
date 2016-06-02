@@ -368,7 +368,9 @@ scout.Device.prototype.supportsCopyFromDisabledInputFields = function() {
 };
 
 scout.Device.prototype.supportsFocusEmptyBeforeDiv = function() {
-  return scout.Device.Browser.FIREFOX !== this.browser;
+  // preventing blur is bad for touch devices because it prevents that the keyboard can close -> return true for touch devices
+  // TODO [6.1] cgu we should look for a better solution which doesn't require preventDefault -> Maybe create separate divs instead of :before for checkbox and radiobuttons
+  return scout.Device.Browser.FIREFOX !== this.browser || this.supportsTouch();
 };
 
 scout.Device.prototype.supportsCssProperty = function(property) {

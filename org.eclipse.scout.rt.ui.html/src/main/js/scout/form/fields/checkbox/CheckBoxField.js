@@ -61,8 +61,8 @@ scout.CheckBoxField.prototype._renderDisplayText = function() {
 
 scout.CheckBoxField.prototype._onMouseDown = function(event) {
   this.toggleChecked();
-  if (scout.device.supportsFocusEmptyBeforeDiv) {
-    this.session.focusManager.requestFocus(this.$checkBox);
+  if (!scout.device.supportsFocusEmptyBeforeDiv()) {
+    this.session.focusManager.requestFocus(this.$field);
     event.preventDefault();
   }
 };
@@ -90,11 +90,8 @@ scout.CheckBoxField.prototype.setValue = function(value) {
  */
 scout.CheckBoxField.prototype._renderEnabled = function(enabled) {
   scout.CheckBoxField.parent.prototype._renderEnabled.call(this);
-  if (this.enabled) {
-    this.$checkBox.attr('tabindex', '0');
-  } else {
-    this.$checkBox.removeAttr('tabindex');
-  }
+  // Make field tabbable instead of checkbox so that clicking on the label gains the focus as well
+  this.$field.setTabbable(this.enabled);
   this.$checkBox.setEnabled(this.enabled);
 };
 
