@@ -251,6 +251,7 @@
   __include("scout/desktop/viewbutton/ViewButtonBoxLayout.js");
   __include("scout/desktop/viewbutton/ViewMenuOpenKeyStroke.js");
   __include("scout/desktop/viewbutton/ViewMenuPopup.js");
+  __include("scout/desktop/viewbutton/ViewMenuPopupLayout.js");
   __include("scout/desktop/viewbutton/ViewMenuTab.js");
   __include("scout/tabbox/SimpleTab.js");
   __include("scout/desktop/desktoptab/DesktopTab.js"); // requires SimpleTab.js

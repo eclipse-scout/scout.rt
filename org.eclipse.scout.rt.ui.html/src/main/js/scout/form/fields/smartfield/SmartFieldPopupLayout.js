@@ -18,8 +18,7 @@
  *  The proposal-chooser DIV is not always present.
  */
 scout.SmartFieldPopupLayout = function(popup) {
-  scout.SmartFieldPopupLayout.parent.call(this);
-  this.popup = popup;
+  scout.SmartFieldPopupLayout.parent.call(this, popup);
 };
 scout.inherits(scout.SmartFieldPopupLayout, scout.PopupLayout);
 

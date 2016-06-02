@@ -16,10 +16,12 @@ scout.ViewMenuPopup = function() {
   this.$tab;
   this.$headBlueprint;
   this.viewMenus;
-  this._naviBounds;
+  this.viewButtonBoxBounds;
   this._tooltip;
 };
 scout.inherits(scout.ViewMenuPopup, scout.PopupWithHead);
+
+scout.ViewMenuPopup.MAX_MENU_WIDTH = 300;
 
 scout.ViewMenuPopup.prototype._init = function(options) {
   options.focusableContainer = true;
@@ -28,10 +30,12 @@ scout.ViewMenuPopup.prototype._init = function(options) {
   this.$tab = options.$tab;
   this.$headBlueprint = this.$tab;
   this.viewMenus = options.viewMenus;
-  this._naviBounds = options.naviBounds;
+  this.viewButtonBoxBounds = options.naviBounds;
 };
 
-scout.ViewMenuPopup.MAX_MENU_WIDTH = 300;
+scout.ViewMenuPopup.prototype._createLayout = function() {
+  return new scout.ViewMenuPopupLayout(this);
+};
 
 /**
  * @override Popup.js
@@ -90,15 +94,9 @@ scout.ViewMenuPopup.prototype.position = function() {
   this.$deco.cssTop(0);
   this.$deco.cssWidth(headSize.width - 1);
 
-  var width = Math.min(scout.ViewMenuPopup.MAX_MENU_WIDTH, this._naviBounds.width);
-  this.$body.cssWidth(width);
-  this.$container.cssWidth(width);
   this.$head.cssTop(-bodyTop);
   this.$body.cssTop(0);
   this.$container.cssMarginTop(headSize.height);
-
-  // make container smaller, otherwise it will overlap other view buttons on top
-  this.$container.cssWidth(headSize.width);
 
   this.setLocation(new scout.Point(0, 0));
 };
