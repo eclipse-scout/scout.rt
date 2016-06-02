@@ -54,6 +54,11 @@ scout.ViewMenuPopup.prototype._render = function($parent) {
     viewMenu.afterSendDoAction = this.close.bind(this);
     viewMenu.setParent(this);
   }, this);
+
+  scout.scrollbars.install(this.$body, {
+    parent: this,
+    axis: 'y'
+  });
 };
 
 /**
