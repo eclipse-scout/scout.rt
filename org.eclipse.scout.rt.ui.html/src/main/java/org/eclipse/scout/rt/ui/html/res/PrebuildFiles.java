@@ -6,12 +6,12 @@ import java.util.ArrayList;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IPlatform.State;
 import org.eclipse.scout.rt.platform.IPlatformListener;
-import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.PlatformEvent;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheKey;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheObject;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpResourceCache;
+import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.UiPrebuildFiles;
 import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.UiPrebuildFilesProperty;
 import org.eclipse.scout.rt.ui.html.UiThemeUtility;
 import org.eclipse.scout.rt.ui.html.res.loader.HtmlFileLoader;
@@ -33,11 +33,10 @@ public class PrebuildFiles implements IPlatformListener {
 
   @Override
   public void stateChanged(PlatformEvent event) {
-    if (Platform.get().inDevelopmentMode()) {
-      return;
-    }
     if (event.getState() == State.PlatformStarted) {
-      buildScripts();
+      if (CONFIG.getPropertyValue(UiPrebuildFiles.class)) {
+        buildScripts();
+      }
     }
   }
 
@@ -53,6 +52,7 @@ public class PrebuildFiles implements IPlatformListener {
    * </ul>
    */
   protected void buildScripts() {
+    LOG.info("Pre-building of web resources enabled");
     String[] files = readPrebuildFilesConfig();
     HttpResourceCache httpResourceCache = BEANS.get(HttpResourceCache.class);
     for (String file : files) {

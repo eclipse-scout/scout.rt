@@ -2,9 +2,14 @@ package org.eclipse.scout.rt.ui.html;
 
 import java.util.concurrent.TimeUnit;
 
+import org.eclipse.scout.rt.platform.Platform;
+import org.eclipse.scout.rt.platform.config.AbstractBooleanConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractPositiveIntegerConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractPositiveLongConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractStringConfigProperty;
+import org.eclipse.scout.rt.ui.html.res.PrebuildFiles;
+import org.eclipse.scout.rt.ui.html.res.loader.HtmlDocumentParser;
+import org.eclipse.scout.rt.ui.html.scriptprocessor.ScriptProcessor;
 
 /**
  * This class provides all properties configured in the config.properties file that affect the HTML UI module.
@@ -27,6 +32,29 @@ public class UiHtmlConfigProperties {
     @Override
     protected String getDefaultValue() {
       return DEFAULT_THEME;
+    }
+  }
+
+  /**
+   * When this property returns true, file pre-building is performed when the UI application server starts up. This
+   * means the application start takes more time, but in return the first user request takes less time. 'File' in this
+   * context means web-resources like HTML, CSS and JS - these files are typically processed by Scout's ScriptProcessor
+   * and HtmlDocumentParser.
+   *
+   * @see PrebuildFiles
+   * @see HtmlDocumentParser
+   * @see ScriptProcessor
+   */
+  public static class UiPrebuildFiles extends AbstractBooleanConfigProperty {
+
+    @Override
+    public String getKey() {
+      return "scout.ui.prebuild.files";
+    }
+
+    @Override
+    protected Boolean getDefaultValue() {
+      return !Platform.get().inDevelopmentMode();
     }
   }
 
