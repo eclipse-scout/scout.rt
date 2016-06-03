@@ -163,7 +163,7 @@ scout.Tree.prototype._initTreeNode = function(node, parentNode) {
   }
   node.rendered = false;
   node.attached = false;
-  //if this node is selected all parent nodes has to be added to selectionPath
+  // if this node is selected all parent nodes have to be added to selectionPath
   if (this._isSelectedNode(node) && ((node.parentNode && !this.visibleNodesMap[node.parentNode.id]) || node.level === 0)) {
     var p = node;
     while (p) {
@@ -653,7 +653,7 @@ scout.Tree.prototype._widthForNode = function(node) {
 };
 
 /**
- * Returns a range of size this.viewRangeSize. Start of range is rowIndex - viewRangeSize / 4.
+ * Returns a range of size this.viewRangeSize. Start of range is nodeIndex - viewRangeSize / 4.
  * -> 1/4 of the nodes are before the viewport 2/4 in the viewport 1/4 after the viewport,
  * assuming viewRangeSize is 2*number of possible nodes in the viewport (see calculateViewRangeSize).
  */
@@ -1406,7 +1406,7 @@ scout.Tree.prototype._rebuildParent = function(node, opts) {
   } else {
     this._removeChildrenFromFlatList(node, false);
   }
-  //Render expansion
+  // Render expansion
   if (this.rendered && scout.nvl(opts.renderExpansion, true)) {
     var renderExpansionOpts = {
       expansionChanged: true
@@ -1416,7 +1416,7 @@ scout.Tree.prototype._rebuildParent = function(node, opts) {
 };
 
 scout.Tree.prototype._removeChildrenFromFlatList = function(parentNode, animatedRemove) {
-  //Only if a parent is available the children are available.
+  // Only if a parent is available the children are available.
   if (this.visibleNodesMap[parentNode.id]) {
     var parentIndex = this.visibleNodesFlat.indexOf(parentNode);
     var elementsToDelete = 0;
@@ -1585,6 +1585,10 @@ scout.Tree.prototype._findIndexToInsertNode = function(node) {
   }
 };
 
+// TODO [6.1] CGU applies to all the add/remove to/from flat list methods:
+// Is it really necessary to update dom on every operation? why not just update the list and renderViewport at the end?
+// The update of the flat list is currently implemented quite complicated -> it should be simplified.
+// And: because add to flat list renders all the children the rendered node count is greater than the viewRangeSize until the layout renders the viewport again -> this must not happen (can be seen when a node gets expanded=
 scout.Tree.prototype._addChildrenToFlatList = function(parentNode, parentIndex, animatedRendering, insertBatch, forceFilter) {
   //add nodes recursively
   if (!this.visibleNodesMap[parentNode.id]) {
@@ -1630,7 +1634,6 @@ scout.Tree.prototype._addChildrenToFlatList = function(parentNode, parentIndex, 
   }
 
   return insertBatch;
-
 };
 
 scout.Tree.prototype.setUpInsertBatch = function(insertIndex) {
@@ -2047,6 +2050,40 @@ scout.Tree.prototype.deleteAllChildNodes = function(parentNode) {
     this._destroyTreeNode(node, parentNode);
     this._updateMarkChildrenChecked(node, false, false);
   }
+};
+
+scout.Tree.prototype.updateNodeOrder = function(childNodes, parentNode) {
+  childNodes = scout.arrays.ensure(childNodes);
+
+  this._updateChildNodeIndex(childNodes);
+  if (parentNode) {
+    if (parentNode.childNodes.length !== childNodes.length) {
+      throw new Error('Node order may not be updated because lengths of the arrays differ.');
+    }
+    // Make a copy so that original array stays untouched
+    parentNode.childNodes = childNodes.slice();
+    this._removeChildrenFromFlatList(parentNode, false);
+    if (parentNode.expanded) {
+      this._addChildrenToFlatList(parentNode, null, false);
+    }
+  } else {
+    if (this.nodes.length !== childNodes.length) {
+      throw new Error('Node order may not be updated because lengths of the arrays differ.');
+    }
+    // Make a copy so that original array stays untouched
+    this.nodes = childNodes.slice();
+    this.nodes.forEach(function(node) {
+      this._removeFromFlatList(node, false);
+      this._addToVisibleFlatList(node, false);
+      if (node.expanded) {
+        this._addChildrenToFlatList(node, null, false);
+      }
+    }, this);
+  }
+
+  this.trigger('childNodeOrderChanged', {
+    parentNode: parentNode
+  });
 };
 
 scout.Tree.prototype.checkNode = function(node, checked, notifyServer) {
@@ -2529,7 +2566,6 @@ scout.Tree.prototype.showNode = function(node, useAnimation, indexHint) {
   if ($node.is('.showing')) {
     return;
   }
-  $node.showFast();
   $node.addClass('showing');
   $node.removeClass('hiding');
   var that = this;
@@ -2589,7 +2625,6 @@ scout.Tree.prototype.hideNode = function(node, useAnimation, suppressDetachHandl
       }
     });
   } else if (!suppressDetachHandling) {
-    $node.hideFast();
     $node.detach();
     node.attached = false;
     that.invalidateLayoutTree();
@@ -2810,54 +2845,10 @@ scout.Tree.prototype._onNodesChecked = function(nodes) {
   });
 };
 
-scout.Tree.prototype._onChildNodeOrderChanged = function(parentNodeId, childNodeIds) {
-  var i,
-    parentNode = this.nodesMap[parentNodeId],
-    $lastChildNode = parentNode.childNodes[parentNode.childNodes.length - 1].$node;
-
-  // Sort model nodes
-  var newPositionsMap = {};
-  for (i = 0; i < childNodeIds.length; i++) {
-    newPositionsMap[childNodeIds[i]] = i;
-  }
-  parentNode.childNodes.sort(compare.bind(this));
-  this._removeChildrenFromFlatList(parentNode, false);
-  this._addChildrenToFlatList(parentNode, null, false);
-
-  // Render sorted nodes
-  if (this.rendered && $lastChildNode) {
-    // Find the last affected node DIV
-    $lastChildNode = scout.Tree.collectSubtree($lastChildNode).last();
-
-    // Insert a marker DIV
-    var $marker = $lastChildNode.afterDiv();
-    for (i = 0; i < parentNode.childNodes.length; i++) {
-      var node = parentNode.childNodes[i];
-      var $node = node.$node;
-      if ($node) {
-        // Move the element in DOM tree. Note: Inserting the element at the new position is sufficient
-        // in jQuery. There is no need to remove() it at the old position. Also, removing would break
-        // the application, because remove() detaches all listeners!
-        scout.Tree.collectSubtree($node).insertBefore($marker);
-      }
-    }
-    $marker.remove();
-  }
-  this.trigger('childNodeOrderChanged', {
-    parentNode: parentNode
-  });
-
-  function compare(node1, node2) {
-    var pos1 = newPositionsMap[node1.id];
-    var pos2 = newPositionsMap[node2.id];
-    if (pos1 < pos2) {
-      return -1;
-    }
-    if (pos1 > pos2) {
-      return 1;
-    }
-    return 0;
-  }
+scout.Tree.prototype._onChildNodeOrderChanged = function(childNodeIds, parentNodeId) {
+  var parentNode = this._nodeById([parentNodeId]);
+  var nodes = this._nodesByIds(childNodeIds);
+  this.updateNodeOrder(nodes, parentNode);
 };
 
 scout.Tree.prototype.onModelAction = function(event) {
@@ -2878,7 +2869,7 @@ scout.Tree.prototype.onModelAction = function(event) {
   } else if (event.type === 'nodesChecked') {
     this._onNodesChecked(event.nodes);
   } else if (event.type === 'childNodeOrderChanged') {
-    this._onChildNodeOrderChanged(event.parentNodeId, event.childNodeIds);
+    this._onChildNodeOrderChanged(event.childNodeIds, event.parentNodeId);
   } else if (event.type === 'requestFocus') {
     this._onRequestFocus();
   } else if (event.type === 'scrollToSelection') {
