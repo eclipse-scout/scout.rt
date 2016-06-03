@@ -14,8 +14,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.resource.BinaryResources;
@@ -29,10 +27,6 @@ import org.eclipse.scout.rt.ui.html.res.IWebContentService;
  * This class loads binary files like png, jpg, woff, pdf, docx from WebContent/ folder.
  */
 public class BinaryFileLoader extends AbstractResourceLoader {
-
-  public BinaryFileLoader(HttpServletRequest req) {
-    super(req);
-  }
 
   @Override
   public HttpCacheObject loadResource(HttpCacheKey cacheKey) throws IOException {

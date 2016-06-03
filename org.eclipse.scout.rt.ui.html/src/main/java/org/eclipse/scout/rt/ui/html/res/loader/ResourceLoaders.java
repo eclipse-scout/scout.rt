@@ -13,29 +13,36 @@ package org.eclipse.scout.rt.ui.html.res.loader;
 import javax.servlet.http.HttpServletRequest;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.server.commons.servlet.UrlHints;
+import org.eclipse.scout.rt.ui.html.UiThemeUtility;
 
 @ApplicationScoped
 public class ResourceLoaders {
 
   public IResourceLoader create(HttpServletRequest req, String resourcePath) {
     if (resourcePath.matches("^/icon/.*")) {
-      return new IconLoader(req);
+      return new IconLoader();
     }
     if (resourcePath.matches("^/dynamic/.*")) {
       return new DynamicResourceLoader(req);
     }
     if ((resourcePath.endsWith(".js") || resourcePath.endsWith(".css"))) {
-      return new ScriptFileLoader(req);
+      String theme = UiThemeUtility.getThemeForLookup(req);
+      boolean minify = UrlHints.isMinifyHint(req);
+      return new ScriptFileLoader(theme, minify);
     }
     if (resourcePath.endsWith(".html")) {
-      return new HtmlFileLoader(req);
+      String theme = UiThemeUtility.getThemeForLookup(req);
+      boolean minify = UrlHints.isMinifyHint(req);
+      boolean cacheEnabled = UrlHints.isCacheHint(req);
+      return new HtmlFileLoader(theme, minify, cacheEnabled);
     }
     if (resourcePath.matches("^/defaultValues$")) {
-      return new DefaultValuesLoader(req);
+      return new DefaultValuesLoader();
     }
     if (resourcePath.endsWith(".json")) {
-      return new JsonFileLoader(req);
+      return new JsonFileLoader();
     }
-    return new BinaryFileLoader(req);
+    return new BinaryFileLoader();
   }
 }

@@ -10,35 +10,25 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.res.loader;
 
-import javax.servlet.http.HttpServletRequest;
-
-import org.eclipse.scout.rt.platform.util.Assertions;
-import org.eclipse.scout.rt.server.commons.servlet.UrlHints;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheKey;
 
+/**
+ * Abstract base class for resource loaders.
+ */
 public abstract class AbstractResourceLoader implements IResourceLoader {
 
-  private final HttpServletRequest m_req;
-
-  public AbstractResourceLoader(HttpServletRequest req) {
-    Assertions.assertNotNull(req, "Argument 'req' must not be null");
-    m_req = req;
+  public AbstractResourceLoader() {
   }
 
+  /**
+   * Override this method if your resource loader must create a special cache key which does not only contain the
+   * resourcePath but also additional elements like locale, theme and so on.
+   * <p>
+   * The default impl. uses the resourcePath as cache key.
+   */
   @Override
   public HttpCacheKey createCacheKey(String resourcePath) {
     return new HttpCacheKey(resourcePath);
   }
 
-  protected boolean isMinify() {
-    return UrlHints.isMinifyHint(m_req);
-  }
-
-  protected boolean isCacheEnabled() {
-    return UrlHints.isCacheHint(m_req);
-  }
-
-  protected HttpServletRequest getRequest() {
-    return m_req;
-  }
 }

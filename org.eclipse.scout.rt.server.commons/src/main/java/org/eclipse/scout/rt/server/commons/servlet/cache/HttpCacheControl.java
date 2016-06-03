@@ -10,10 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.commons.servlet.cache;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
 import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -25,17 +21,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Support for automatic caching of html resources.
+ * Support for caching of HTML resources via HTTP headers.
  * <p>
  * In development mode the cache is disabled.
  * <p>
  * In production it makes heavy use of the max-age concept.
  * <p>
  * Make sure to call {@link #checkAndSetCacheHeaders(HttpServletRequest, HttpServletResponse, String, HttpCacheObject)}
- * in every servlet
+ * in every servlet.
  */
 @ApplicationScoped
 public class HttpCacheControl {
+
   private static final Logger LOG = LoggerFactory.getLogger(HttpCacheControl.class);
 
   public static final String LAST_MODIFIED = "Last-Modified"; //$NON-NLS-1$
@@ -57,57 +54,7 @@ public class HttpCacheControl {
    */
   public static final int MAX_AGE_NONE = 0;
 
-  /**
-   * This cache is servlet-wide (all sessions)
-   */
-  private Map<HttpCacheKey, HttpCacheObject> m_cache = Collections.synchronizedMap(new HashMap<HttpCacheKey, HttpCacheObject>());
-
   public HttpCacheControl() {
-  }
-
-  /**
-   * Put an object into the internal servlet cache if {@link HttpCacheObject#isCachingAllowed()} is true.
-   *
-   * @param req
-   * @param obj
-   * @return true if the object was cached or null if it was not cached
-   */
-  public boolean putCacheObject(HttpServletRequest req, HttpCacheObject obj) {
-    if (!UrlHints.isCacheHint(req)) {
-      return false;
-    }
-    if (!obj.isCachingAllowed()) {
-      return false;
-    }
-    m_cache.put(obj.getCacheKey(), obj);
-    LOG.debug("Stored object in cache: {}", obj.getCacheKey());
-    return true;
-  }
-
-  /**
-   * Remove an object from the internal servlet cache.
-   *
-   * @param req
-   * @param cacheKey
-   * @return the object from the internal servlet cache or null
-   */
-  public HttpCacheObject getCacheObject(HttpServletRequest req, HttpCacheKey cacheKey) {
-    if (!UrlHints.isCacheHint(req)) {
-      return null;
-    }
-    HttpCacheObject obj = m_cache.get(cacheKey);
-    LOG.debug("Lookup object in cache: {} found={}", cacheKey, (obj != null));
-    return obj;
-  }
-
-  /**
-   * @return the removed object or null if it was not cached
-   */
-  public HttpCacheObject removeCacheObject(HttpServletRequest req, HttpCacheKey cacheKey) {
-    if (!UrlHints.isCacheHint(req)) {
-      return null;
-    }
-    return m_cache.remove(cacheKey);
   }
 
   /**
@@ -116,7 +63,7 @@ public class HttpCacheControl {
    * <p>
    * Writes cache headers (last modified and etag) if the obj can safely be returned as cached object.
    * <p>
-   * Writes disbaled cache headers if the obj is null or cannot safely be returned resp. should not be cached at all.
+   * Writes disabled cache headers if the obj is null or cannot safely be returned resp. should not be cached at all.
    * <p>
    * Does nothing if this request is a forward such as
    * {@link RequestDispatcher#forward(javax.servlet.ServletRequest, javax.servlet.ServletResponse)}
@@ -232,8 +179,8 @@ public class HttpCacheControl {
     return (ifNoneMatch != null && etag != null && ifNoneMatch.indexOf(etag) != -1);
   }
 
+  // for purposes of comparison we add 999 to ifModifiedSince since the fidelity of the IMS header generally doesn't include milliseconds
   protected boolean notModifiedSince(long ifModifiedSince, long lastModified) {
-    // for purposes of comparison we add 999 to ifModifiedSince since the fidelity of the IMS header generally doesn't include milli-seconds
     return (ifModifiedSince > -1 && lastModified > 0 && lastModified <= (ifModifiedSince + HttpCacheControl.IF_MODIFIED_SINCE_FIDELITY));
   }
 }

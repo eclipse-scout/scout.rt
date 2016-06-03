@@ -43,8 +43,11 @@ public class DynamicResourceLoader extends AbstractResourceLoader {
 
   private static final String DEFAULT_FILENAME = "Download";
 
+  private final HttpServletRequest m_req;
+
   public DynamicResourceLoader(HttpServletRequest req) {
-    super(req);
+    super();
+    m_req = req;
   }
 
   @Override
@@ -58,7 +61,26 @@ public class DynamicResourceLoader extends AbstractResourceLoader {
     String adapterId = m.group(2);
     String filename = m.group(3);
 
-    HttpSession httpSession = getRequest().getSession(false);
+    IBinaryResourceProvider provider = getBinaryResourceProvider(uiSessionId, adapterId);
+    if (provider == null) {
+      return null;
+    }
+
+    BinaryResourceHolder localResourceHolder = provider.provideBinaryResource(filename);
+    if (localResourceHolder == null || localResourceHolder.get() == null) {
+      return null;
+    }
+    BinaryResource localResource = localResourceHolder.get();
+    BinaryResource httpResource = localResource.createAlias(pathInfo);
+    HttpCacheObject httpCacheObject = new HttpCacheObject(cacheKey, httpResource);
+    if (localResourceHolder.isDownload()) {
+      addResponseHeaderForDownload(httpCacheObject, localResource.getFilename());
+    }
+    return httpCacheObject;
+  }
+
+  protected IBinaryResourceProvider getBinaryResourceProvider(String uiSessionId, String adapterId) {
+    HttpSession httpSession = m_req.getSession(false);
     if (httpSession == null) {
       return null;
     }
@@ -74,18 +96,7 @@ public class DynamicResourceLoader extends AbstractResourceLoader {
     if (!(jsonAdapter instanceof IBinaryResourceProvider)) {
       return null;
     }
-    IBinaryResourceProvider provider = (IBinaryResourceProvider) jsonAdapter;
-    BinaryResourceHolder localResourceHolder = provider.provideBinaryResource(filename);
-    if (localResourceHolder == null || localResourceHolder.get() == null) {
-      return null;
-    }
-    BinaryResource localResource = localResourceHolder.get();
-    BinaryResource httpResource = localResource.createAlias(pathInfo);
-    HttpCacheObject httpCacheObject = new HttpCacheObject(cacheKey, httpResource);
-    if (localResourceHolder.isDownload()) {
-      addResponseHeaderForDownload(httpCacheObject, localResource.getFilename());
-    }
-    return httpCacheObject;
+    return (IBinaryResourceProvider) jsonAdapter;
   }
 
   /**

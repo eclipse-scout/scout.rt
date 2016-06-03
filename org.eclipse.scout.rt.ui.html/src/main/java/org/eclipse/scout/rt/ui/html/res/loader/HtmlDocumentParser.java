@@ -22,8 +22,11 @@ import java.util.regex.Pattern;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.FileUtility;
 import org.eclipse.scout.rt.platform.util.IOUtility;
+import org.eclipse.scout.rt.platform.util.Pair;
 import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheKey;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheObject;
+import org.eclipse.scout.rt.server.commons.servlet.cache.HttpResourceCache;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.ui.html.res.IWebContentService;
 import org.slf4j.Logger;
@@ -43,10 +46,12 @@ public class HtmlDocumentParser {
   private static final String PATTERN_BASE_TAG = "<scout\\:base\\s*/>";
 
   private final HtmlDocumentParserParameters m_params;
+  private final HttpResourceCache m_cache;
   private String m_workingContent;
 
   public HtmlDocumentParser(HtmlDocumentParserParameters params) {
     m_params = params;
+    m_cache = BEANS.get(HttpResourceCache.class);
   }
 
   public byte[] parseDocument(byte[] document) throws IOException {
@@ -64,44 +69,92 @@ public class HtmlDocumentParser {
     Matcher m = pattern.matcher(m_workingContent);
     StringBuffer sb = new StringBuffer();
     while (m.find()) {
-      String srcAttr = m.group(1);
-      String fingerprint = null;
-
-      if (m_params.isCacheEnabled()) {
-        HttpCacheObject script = m_params.loadScriptFile(srcAttr);
-        if (script == null) {
-          LOG.warn("Failed to locate script referenced in html file '{}': {}", m_params.getHtmlPath(), srcAttr);
-        }
-        else {
-          fingerprint = Long.toHexString(script.getResource().getFingerprint());
-        }
-      }
-
-      StringBuffer linkTag = new StringBuffer(tagPrefix);
-      File srcFile = new File(srcAttr);
-      String[] filenameParts = FileUtility.getFilenameParts(srcFile);
-      // append path to file
-      if (srcFile.getParent() != null) {
-        linkTag.append(srcFile.getParent()).append("/");
-      }
-      // append file name without file-extension
-      linkTag.append(getScriptFileName(filenameParts[0]));
-      // append fingerprint
-      if (fingerprint != null) {
-        linkTag.append("-").append(fingerprint);
-      }
-      // append 'min'
-      if (m_params.isMinify()) {
-        linkTag.append(".min");
-      }
-      // append file-extension
-      linkTag.append(".").append(filenameParts[1]);
-      linkTag.append(tagSuffix);
-
-      m.appendReplacement(sb, linkTag.toString());
+      String srcPath = m.group(1);
+      StringBuilder scriptTag = new StringBuilder(tagPrefix);
+      scriptTag.append(createExternalPath(srcPath));
+      scriptTag.append(tagSuffix);
+      m.appendReplacement(sb, scriptTag.toString());
     }
     m.appendTail(sb);
     m_workingContent = sb.toString();
+  }
+
+  /**
+   * Creates the external path of the given resource, including fingerprint and '.min' extensions. This method also
+   * deals with caching, since we must build a script file first, before we can calculate its fingerprint.
+   */
+  protected String createExternalPath(String internalPath) throws IOException {
+    File srcFile = new File(internalPath);
+    String[] filenameParts = FileUtility.getFilenameParts(srcFile);
+    Pair<HttpCacheObject, String> scriptAndFingerprint = null;
+
+    // When caching is enabled we must calculate the fingerprint for the script file
+    if (m_params.isCacheEnabled()) {
+      scriptAndFingerprint = getScriptAndFingerprint(internalPath);
+    }
+
+    // append path to file
+    StringBuilder externalPathSb = new StringBuilder();
+    if (srcFile.getParent() != null) {
+      externalPathSb.append(srcFile.getParent()).append("/");
+    }
+
+    // append file name without file-extension
+    externalPathSb.append(getScriptFileName(filenameParts[0]));
+
+    // append fingerprint
+    if (scriptAndFingerprint != null) {
+      String fingerprint = scriptAndFingerprint.getRight();
+      externalPathSb.append("-").append(fingerprint);
+    }
+
+    // append 'min'
+    if (m_params.isMinify()) {
+      externalPathSb.append(".min");
+    }
+
+    // append file-extension
+    externalPathSb.append(".").append(filenameParts[1]);
+    String externalPath = externalPathSb.toString();
+
+    // we must put the same resource into the cache with two different cache keys:
+    // 1. the 'internal' cache key is the path as it is used when the HTML file is parsed by the HtmlDocumenParser. Example: '/res/scout-all-macro.js'
+    // 2. the 'external' cache key is the path as it is used in the browser. Example: '/res/scout-all-0ac567fe1.min.js'
+    // We have kind of a chicken/egg problem here: in order to get the fingerprint we must first read and parse the file. So when the parser builds
+    // a HTML file it cannot now the fingerprint in advance. That's why we put the 'internal' path into the cache. Later, when the browser requests
+    // the script with the 'external' URL, we want to access the already built and cached file. That's why we must also store the external form of
+    // the path. Additionally the same script may be used in another HTML file, which is also processed by the HtmlDocumentParser, then again we need
+    // want to access the cached file by its internal path.
+    if (scriptAndFingerprint != null) {
+      HttpCacheObject internalCacheObject = scriptAndFingerprint.getLeft();
+      HttpCacheKey externalCacheKey = createScriptFileLoader().createCacheKey("/" + externalPath);
+      HttpCacheObject externalCacheObject = new HttpCacheObject(externalCacheKey, internalCacheObject.getResource());
+      m_cache.put(internalCacheObject);
+      m_cache.put(externalCacheObject);
+    }
+
+    return externalPath;
+  }
+
+  protected ScriptFileLoader createScriptFileLoader() {
+    return new ScriptFileLoader(m_params.getTheme(), m_params.isMinify());
+  }
+
+  protected Pair<HttpCacheObject, String> getScriptAndFingerprint(String internalPath) throws IOException {
+    ScriptFileLoader scriptLoader = createScriptFileLoader();
+    HttpCacheKey cacheKey = scriptLoader.createCacheKey(internalPath);
+    HttpCacheObject script = m_cache.get(cacheKey);
+    if (script == null) {
+      // cache miss: try to load script
+      script = scriptLoader.loadResource(cacheKey);
+    }
+    if (script == null) {
+      // script not found -> no fingerprint
+      LOG.warn("Failed to locate script referenced in html file '{}': {}", m_params.getHtmlPath(), internalPath);
+      return null;
+    }
+    String fingerprint = Long.toHexString(script.getResource().getFingerprint());
+    return new Pair<>(script, fingerprint);
   }
 
   /**
@@ -133,15 +186,15 @@ public class HtmlDocumentParser {
 
   protected void replaceBaseTags() {
     // <scout:base />
-    String contextPath = m_params.getContextPath();
-    if (StringUtility.isNullOrEmpty(contextPath)) {
-      contextPath = "/";
+    String basePath = m_params.getBasePath();
+    if (StringUtility.isNullOrEmpty(basePath)) {
+      basePath = "/";
     }
-    else if (contextPath.lastIndexOf('/') != contextPath.length() - 1) {
+    else if (basePath.lastIndexOf('/') != basePath.length() - 1) {
       // add / at end of string (unless it already has a slash at the end)
-      contextPath += "/";
+      basePath += "/";
     }
-    String baseTag = "<base href=\"" + contextPath + "\">";
+    String baseTag = "<base href=\"" + basePath + "\">";
     m_workingContent = m_workingContent.replaceAll(PATTERN_BASE_TAG, baseTag);
   }
 
@@ -220,4 +273,5 @@ public class HtmlDocumentParser {
     text = text.replaceAll("\r\n", "\\\\n");
     return "'" + text + "'";
   }
+
 }

@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.resource.BinaryResources;
@@ -27,7 +28,7 @@ import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheKey;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheObject;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpResponseHeaderContributor;
-import org.eclipse.scout.rt.ui.html.UiThemeUtility;
+import org.eclipse.scout.rt.shared.SharedConfigProperties.ExternalBaseUrlProperty;
 import org.eclipse.scout.rt.ui.html.res.BrowserInfo;
 import org.eclipse.scout.rt.ui.html.res.IWebContentService;
 
@@ -35,11 +36,18 @@ import org.eclipse.scout.rt.ui.html.res.IWebContentService;
  * This class loads and parses HTML files from WebContent/ folder.
  */
 public class HtmlFileLoader extends AbstractResourceLoader {
+
   private static final String THEME_KEY = "ui.theme";
   private static final String LOCALE_KEY = "ui.locale";
 
-  public HtmlFileLoader(HttpServletRequest req) {
-    super(req);
+  private final String m_theme;
+  private final boolean m_minify;
+  private final boolean m_cacheEnabled;
+
+  public HtmlFileLoader(String theme, boolean minify, boolean cacheEnabled) {
+    m_theme = theme;
+    m_minify = minify;
+    m_cacheEnabled = cacheEnabled;
   }
 
   @Override
@@ -49,7 +57,7 @@ public class HtmlFileLoader extends AbstractResourceLoader {
     if (locale != null) {
       atts.put(LOCALE_KEY, locale.toString());
     }
-    atts.put(THEME_KEY, UiThemeUtility.getThemeForLookup(getRequest()));
+    atts.put(THEME_KEY, m_theme);
     return new HttpCacheKey(pathInfo, atts);
   }
 
@@ -93,15 +101,21 @@ public class HtmlFileLoader extends AbstractResourceLoader {
   }
 
   protected HtmlDocumentParserParameters createHtmlDocumentParserParameters(HttpCacheKey cacheKey) {
-    HtmlDocumentParserParameters params = new HtmlDocumentParserParameters();
-    params.setMinify(isMinify());
-    params.setCacheEnabled(isCacheEnabled());
-    params.setRequest(getRequest());
-    params.setCacheKey(cacheKey);
-    return params;
+    return new HtmlDocumentParserParameters(
+        cacheKey,
+        m_theme,
+        m_minify,
+        m_cacheEnabled,
+        CONFIG.getPropertyValue(ExternalBaseUrlProperty.class));
   }
-
+  
+  /**
+   * Override this method to return a specialized impl. of an HTML document parser.
+   * <p>
+   * The default impl. creates and returns a new instance of {@link HtmlDocumentParser}.
+   */
   protected HtmlDocumentParser createHtmlDocumentParser(HtmlDocumentParserParameters params) {
     return new HtmlDocumentParser(params);
   }
+
 }

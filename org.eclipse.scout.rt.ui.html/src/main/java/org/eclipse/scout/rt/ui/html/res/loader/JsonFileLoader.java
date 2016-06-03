@@ -14,8 +14,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.resource.BinaryResources;
@@ -30,10 +28,6 @@ import org.eclipse.scout.rt.ui.html.res.IWebContentService;
  * This class loads and parses JSON files from WebContent/ folder.
  */
 public class JsonFileLoader extends AbstractResourceLoader {
-
-  public JsonFileLoader(HttpServletRequest req) {
-    super(req);
-  }
 
   @Override
   public HttpCacheObject loadResource(HttpCacheKey cacheKey) throws IOException {
