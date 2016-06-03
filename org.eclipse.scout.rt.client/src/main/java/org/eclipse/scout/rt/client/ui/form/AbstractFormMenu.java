@@ -149,7 +149,7 @@ public abstract class AbstractFormMenu<FORM extends IForm> extends AbstractMenu 
   public void disposeInternal() {
     super.disposeInternal();
     FORM form = getForm();
-    if (form != null) {
+    if (form != null && !form.isFormClosed()) {
       form.doClose();
     }
   }

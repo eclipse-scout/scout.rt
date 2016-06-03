@@ -1,6 +1,7 @@
 package org.eclipse.scout.rt.client.transformation;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -56,7 +57,11 @@ public class MainDeviceTransformer implements IDeviceTransformer {
       transformer.dispose();
     }
     if (!m_transformedForms.isEmpty()) {
-      LOG.warn("Transformed forms map is not empty. Make sure every form gets closed properly to free up memory as quickly as possible. Cleaning up now...");
+      List<IForm> forms = new ArrayList<IForm>();
+      for (WeakReference<IForm> ref : m_transformedForms.values()) {
+        forms.add(ref.get());
+      }
+      LOG.warn("Transformed forms map is not empty. Make sure every form gets closed properly to free up memory as quickly as possible. Cleaning up now... Open forms: " + forms);
       m_transformedForms.clear();
     }
     m_transformedOutlines.clear();
@@ -105,7 +110,7 @@ public class MainDeviceTransformer implements IDeviceTransformer {
       }
     }
 
-    //mark form as transformed
+    // mark form as transformed
     m_transformedForms.put(form, new WeakReference<IForm>(form));
   }
 

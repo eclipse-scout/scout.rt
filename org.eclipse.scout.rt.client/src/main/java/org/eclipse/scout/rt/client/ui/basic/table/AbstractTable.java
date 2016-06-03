@@ -1022,6 +1022,10 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     ActionUtility.disposeActions(getMenus());
   }
 
+  private void disposeTableControls() {
+    ActionUtility.disposeActions(getTableControls());
+  }
+
   private void createTableControlsInternal() {
     List<Class<? extends ITableControl>> tcs = getConfiguredTableControls();
     OrderedCollection<ITableControl> tableControls = new OrderedCollection<ITableControl>();
@@ -1172,6 +1176,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   protected void disposeTableInternal() {
     disposeColumnsInternal();
     disposeMenus();
+    disposeTableControls();
   }
 
   @Override
