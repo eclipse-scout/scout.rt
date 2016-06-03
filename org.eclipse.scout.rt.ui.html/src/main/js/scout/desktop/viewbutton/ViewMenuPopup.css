@@ -49,11 +49,11 @@
     border-top-color: @item-selection-border-color;
   }
 
-  &.selected:last-child {
+  &.selected.last {
     border-color: @item-selection-border-color;
   }
 
-  &:last-child {
+  &.last {
     border-bottom: 1px solid @border-color;
   }
 

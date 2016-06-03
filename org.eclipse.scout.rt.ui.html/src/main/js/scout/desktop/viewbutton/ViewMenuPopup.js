@@ -55,6 +55,12 @@ scout.ViewMenuPopup.prototype._render = function($parent) {
     viewMenu.setParent(this);
   }, this);
 
+  // Add last marker to last visible item
+  var lastVisibleMenu = scout.arrays.findFromPrev(this.viewMenus, this.viewMenus.length - 1, function(viewMenu) {
+    return viewMenu.visible;
+  }, this);
+  lastVisibleMenu.$container.addClass('last');
+
   scout.scrollbars.install(this.$body, {
     parent: this,
     axis: 'y'
