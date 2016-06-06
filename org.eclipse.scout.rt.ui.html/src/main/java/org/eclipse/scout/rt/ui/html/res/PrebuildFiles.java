@@ -8,11 +8,12 @@ import org.eclipse.scout.rt.platform.IPlatform.State;
 import org.eclipse.scout.rt.platform.IPlatformListener;
 import org.eclipse.scout.rt.platform.PlatformEvent;
 import org.eclipse.scout.rt.platform.config.CONFIG;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheKey;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheObject;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpResourceCache;
-import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.UiPrebuildFiles;
 import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.UiPrebuildFilesProperty;
+import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.UiPrebuildProperty;
 import org.eclipse.scout.rt.ui.html.UiThemeUtility;
 import org.eclipse.scout.rt.ui.html.res.loader.HtmlFileLoader;
 import org.slf4j.Logger;
@@ -34,7 +35,7 @@ public class PrebuildFiles implements IPlatformListener {
   @Override
   public void stateChanged(PlatformEvent event) {
     if (event.getState() == State.PlatformStarted) {
-      if (CONFIG.getPropertyValue(UiPrebuildFiles.class)) {
+      if (CONFIG.getPropertyValue(UiPrebuildProperty.class)) {
         buildScripts();
       }
     }
@@ -70,8 +71,10 @@ public class PrebuildFiles implements IPlatformListener {
   private String[] readPrebuildFilesConfig() {
     String filesString = CONFIG.getPropertyValue(UiPrebuildFilesProperty.class);
     ArrayList<String> files = new ArrayList<>();
-    for (String file : filesString.split(",")) {
-      files.add(file);
+    if (!StringUtility.isNullOrEmpty(filesString)) {
+      for (String file : filesString.split(",")) {
+        files.add(file);
+      }
     }
     return files.toArray(new String[files.size()]);
   }

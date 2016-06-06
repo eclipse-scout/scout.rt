@@ -45,11 +45,11 @@ public class UiHtmlConfigProperties {
    * @see HtmlDocumentParser
    * @see ScriptProcessor
    */
-  public static class UiPrebuildFiles extends AbstractBooleanConfigProperty {
+  public static class UiPrebuildProperty extends AbstractBooleanConfigProperty {
 
     @Override
     public String getKey() {
-      return "scout.ui.prebuild.files";
+      return "scout.ui.prebuild";
     }
 
     @Override
@@ -66,8 +66,7 @@ public class UiHtmlConfigProperties {
    * <p>
    * Since CSS and JS files are always referenced by a HTML file, we simply specify the main HTML files in this
    * property.
-   * <p>
-   * Default value of this property is <code>/index.html,/login.html,/logout.html</code>.
+   * </p>
    *
    * @author awe
    */
@@ -76,11 +75,6 @@ public class UiHtmlConfigProperties {
     @Override
     public String getKey() {
       return "scout.ui.prebuild.files";
-    }
-
-    @Override
-    protected String getDefaultValue() {
-      return "/index.html,/login.html,/logout.html,/popup-window.html"; // TODO awe: testen was passiert, wenn es das file nicht gibt
     }
   }
 
