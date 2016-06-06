@@ -41,13 +41,17 @@ public class InteractiveTestSuite extends Runner {
 
   @Override
   public void run(final RunNotifier notifier) {
+    System.out.println("Started interactive test console. (Auto-closing in 30 seconds when no input is entered, assuming it is a ci-test-run)");
     String lastLine = "";
     while (true) {
       try {
         //com.bsiag.bsicrm.server.test.MyTest
         //com.bsiag.bsicrm.server.task.Sql92ExtendedEntityTest
         System.out.println("********");
-        System.out.println("[Enter fully qualified test class name, '.' to exit, enter to repeat last test]");
+        System.out.println("[Enter fully qualified test class name, enter to repeat last test, '.' to exit]");
+        if (!checkIfHumanInterface()) {
+          return;
+        }
         String line = new BufferedReader(new InputStreamReader(System.in)).readLine();
         if (line.isEmpty()) {
           if (!lastLine.isEmpty()) {
@@ -91,6 +95,31 @@ public class InteractiveTestSuite extends Runner {
     }
     finally {
       notifier.removeListener(listener);
+    }
+  }
+
+  private boolean m_humanInterface;
+
+  private boolean checkIfHumanInterface() {
+    if (m_humanInterface) {
+      return true;
+    }
+    try {
+      long ts = System.currentTimeMillis();
+      while (true) {
+        if (System.in.available() > 0) {
+          m_humanInterface = true;
+          return true;
+        }
+        Thread.sleep(100L);
+        if (System.currentTimeMillis() - ts > 30000L) {
+          System.out.println("Auto-close.");
+          throw new InterruptedException();
+        }
+      }
+    }
+    catch (Exception e) {
+      return false;
     }
   }
 
