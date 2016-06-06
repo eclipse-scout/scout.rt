@@ -43,7 +43,7 @@ scout.Session = function($entryPoint, options) {
   var clientSessionId = options.clientSessionId || sessionStorage.getItem('scout:clientSessionId');
 
   this.scoutUrl = new scout.URL();
-  if (this.scoutUrl.getParameter('forceNewClientSession')) {
+  if (this.scoutUrl.getParameter('forceNewClientSession') || options.forceNewClientSession) {
     clientSessionId = null;
     this._forceNewClientSession = true;
   }
