@@ -11,13 +11,14 @@
 @check-box-size: 18px;
 
 .check-box-field > .field {
-  padding: @borderless-field-padding-y 0px @borderless-field-padding-y @check-box-size;
+  padding: 5px 0 @borderless-field-padding-y 0;
   outline: none;
 
   & > .check-box,
   & > .label {
     color: @control-color;
     cursor: pointer;
+    vertical-align: middle;
   }
 
   &.disabled > .check-box,
@@ -27,10 +28,11 @@
 
   & > .label {
     padding-left: 7px;
-    #scout.overflow-ellipsis-nowrap();
     /* only the label should be clickable, not the whole field */
     display: inline-block;
+    line-height: @check-box-size;
     max-width: 100%;
+    #scout.overflow-ellipsis-nowrap();
   }
 
   &.disabled > .label {
@@ -52,44 +54,36 @@
     }
   }
 
-  &:focus > .check-box {
-    outline: none;
-
-    &::before {
-      #scout.checkbox-before-focus();
-    }
-  }
-
   & > .check-box {
+
+    #scout.checkbox();
+
+    &:focus {
+      outline: none;
+      border-color: @focus-border-color;
+    }
 
     &::before {
       #scout.checkbox-before();
-      #scout.checkbox-before-border();
-      top: 5px;
     }
 
     &.checked::before {
       #scout.checkbox-before-checked();
     }
 
-    &.disabled::before {
-      #scout.checkbox-before-disabled();
-    }
-
-    &.disabled:hover::before {
-      #scout.checkbox-before-disabled-border();
+    &.disabled {
+      #scout.checkbox-disabled();
+      &::before {
+        #scout.checkbox-before-disabled();
+      }
+      :hover::before {
+        #scout.checkbox-before-disabled();
+      }
     }
   }
 
-  &.cell-editor-field {
-    /* generate an invisible border to make it easier to work with, since other fields have a border too */
-    border: 1px solid transparent;
-    padding-top: @table-row-padding-y - @checkable-cell-padding-adjustment;
-    padding-left: @table-cell-padding-left - 1px;
-    padding-right: @table-cell-padding-left - 1px;
-
-    & > .check-box::before {
-      position: static;
-    }
+  &.cell-editor-field > .check-box {
+    margin-left: @check-box-size;
+    margin-top: 1px;
   }
 }
