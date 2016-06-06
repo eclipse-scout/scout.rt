@@ -649,7 +649,7 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
   }
 
   /**
-   * @deprecated use {@link #selectResources(List)}
+   * @deprecated use {@link #selectResources(List)}, will be removed in Scout 6.1
    */
   @Deprecated
   @Override

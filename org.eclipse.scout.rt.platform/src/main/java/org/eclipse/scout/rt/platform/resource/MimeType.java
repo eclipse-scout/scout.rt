@@ -90,7 +90,7 @@ public enum MimeType {
   }
 
   /**
-   * This method will be removed in 6.0, it contains a typo and the name semantics is ambiguous
+   * This method will be removed in 6.1, it contains a typo and the name semantics is ambiguous
    *
    * @deprecated use {@link #getFileExtension()} instead
    */

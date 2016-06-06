@@ -17,7 +17,7 @@ import org.eclipse.scout.rt.platform.service.IService;
  * {@link IClusterSynchronizationService#addListener(IClusterNotificationListener)} when the cluster synchronization
  * service is enabled ({@link IClusterSynchronizationService#enable()}).
  *
- * @deprecated use {@link INotificationHandler<>}
+ * @deprecated use {@link INotificationHandler<>}, will be removed in Scout 6.1.
  */
 @Deprecated
 public interface IClusterNotificationListenerService extends IService {

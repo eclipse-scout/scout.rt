@@ -41,7 +41,7 @@ import org.eclipse.scout.rt.shared.ScoutTexts;
  * @since 24.11.2009
  * @deprecated This form uses a HTML provider to indicate the wizard progress. It should be replaced by
  *             {@link DefaultWizardContainerForm} which uses a {@link AbstractWizardProgressField} instead. This class
- *             will be deleted in the O-Release.
+ *             will be removed in Scout 6.1.
  */
 @Deprecated
 public class LegacyHtmlStatusWizardContainerForm extends AbstractWizardContainerForm {

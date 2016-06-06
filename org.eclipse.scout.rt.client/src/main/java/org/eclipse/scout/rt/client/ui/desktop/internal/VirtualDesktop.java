@@ -538,6 +538,9 @@ public class VirtualDesktop implements IDesktop {
     throw createUnsupportedOperationException();
   }
 
+  /**
+   * @deprecated will be removed in Scout 6.1
+   */
   @Deprecated
   @Override
   public <T extends IToolButton> T getToolButton(Class<? extends T> searchType) {

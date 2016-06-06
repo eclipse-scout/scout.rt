@@ -780,6 +780,9 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     return MenuUtility.getMenuByClass(this, menuType);
   }
 
+  /**
+   * @deprecated use {@link #getMenuByClass(Class)}, will be removed in Scout 6.1
+   */
   @SuppressWarnings("deprecation")
   @Deprecated
   @Override

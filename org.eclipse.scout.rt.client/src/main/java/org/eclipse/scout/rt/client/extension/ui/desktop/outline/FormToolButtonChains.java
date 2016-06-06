@@ -19,7 +19,7 @@ import org.eclipse.scout.rt.client.ui.action.AbstractAction;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 
 /**
- * @deprecated use {@link FormMenuChains} instead
+ * @deprecated use {@link FormMenuChains} instead, will be removed in Scout 6.1
  */
 @Deprecated
 public final class FormToolButtonChains {

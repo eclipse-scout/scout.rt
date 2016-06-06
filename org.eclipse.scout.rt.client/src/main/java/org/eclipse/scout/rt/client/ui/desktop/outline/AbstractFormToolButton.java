@@ -18,7 +18,7 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 /**
  * A tool button that can be used in the {@link IDesktop} to toggle a form in the tools area.
  *
- * @deprecated use AbstractFormMenu instead.
+ * @deprecated use AbstractFormMenu instead. Will be removed in Scout 6.1
  */
 @SuppressWarnings("deprecation")
 @Deprecated

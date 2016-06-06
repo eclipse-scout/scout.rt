@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.platform.util.concurrent;
 /**
  * <h3>{@link StoppableThread}</h3>
  *
- * @deprecated will be removed in 'O' release.
+ * @deprecated Will be removed in Scout 6.1
  */
 @Deprecated
 public class StoppableThread extends Thread {

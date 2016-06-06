@@ -31,7 +31,7 @@ public interface DataModelConstants {
   int TYPE_INTEGER = 8;
   int TYPE_LONG = 9;
   /**
-   * @deprecated will be removed with scout 7: use {@link DataModelConstants#TYPE_BIG_DECIMAL} instead
+   * @deprecated will be removed in Scout 6.1: use {@link DataModelConstants#TYPE_BIG_DECIMAL} instead
    */
   @Deprecated
   int TYPE_DOUBLE = 10;
@@ -39,7 +39,7 @@ public interface DataModelConstants {
   int TYPE_PLAIN_INTEGER = 11;
   int TYPE_PLAIN_LONG = 12;
   /**
-   * @deprecated will be removed with scout 7: use {@link DataModelConstants#TYPE_PLAIN_BIG_DECIMAL} instead
+   * @deprecated will be removed in Scout 6.1: use {@link DataModelConstants#TYPE_PLAIN_BIG_DECIMAL} instead
    */
   @Deprecated
   int TYPE_PLAIN_DOUBLE = 13;

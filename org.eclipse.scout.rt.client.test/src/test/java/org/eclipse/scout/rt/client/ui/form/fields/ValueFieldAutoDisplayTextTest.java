@@ -29,7 +29,7 @@ import org.junit.runner.RunWith;
 /**
  * Tests for {@link AbstractValueField#setAutoDisplayText(boolean)}.
  *
- * @deprecated Will be removed with the O-Release.
+ * @deprecated Will be removed in Scout 6.1
  */
 @Deprecated
 @RunWith(PlatformTestRunner.class)

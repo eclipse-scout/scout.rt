@@ -881,7 +881,7 @@ public final class StringUtility {
   }
 
   /**
-   * @deprecated use {@link HexUtility#decode(String)}
+   * @deprecated use {@link HexUtility#decode(String)}, will be removed in Scout 6.1
    */
   @Deprecated
   public static byte[] hexToBytes(String s) {
@@ -889,7 +889,7 @@ public final class StringUtility {
   }
 
   /**
-   * @deprecated use {@link HexUtility#encode(byte[])}
+   * @deprecated use {@link HexUtility#encode(byte[])}, will be removed in Scout 6.1
    */
   @Deprecated
   public static String bytesToHex(byte[] a) {

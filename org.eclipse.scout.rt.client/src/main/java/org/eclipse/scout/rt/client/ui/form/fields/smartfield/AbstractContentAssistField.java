@@ -367,7 +367,7 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
 
   // override to freeze
   /**
-   * @deprecated no replacement. Will be removed in the O-Release.
+   * @deprecated no replacement. Will be removed in Scout 6.1
    */
   @SuppressWarnings("deprecation")
   @Deprecated

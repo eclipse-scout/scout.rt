@@ -294,7 +294,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
    *          {@link URL#getPath()}
    * @param local
    *          true if the url is not a valid external url but a local model url (http://local/...)
-   * @deprecated use {@link #execAppLinkAction(String)} instead
+   * @deprecated use {@link #execAppLinkAction(String)} instead, will be removed in Scout 6.1
    */
   @ConfigOperation
   @Order(230)
