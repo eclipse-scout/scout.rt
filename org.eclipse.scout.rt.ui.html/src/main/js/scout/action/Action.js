@@ -129,11 +129,7 @@ scout.Action.prototype._shouldInstallTooltip = function() {
 };
 
 scout.Action.prototype._renderTabbable = function() {
-  if (this.tabbable) {
-    this.$container.attr('tabindex', 0);
-  } else {
-    this.$container.removeAttr('tabindex');
-  }
+  this.$container.setTabbable(this.tabbable && !scout.device.supportsTouch());
 };
 
 scout.Action.prototype._renderHorizontalAlignment = function() {

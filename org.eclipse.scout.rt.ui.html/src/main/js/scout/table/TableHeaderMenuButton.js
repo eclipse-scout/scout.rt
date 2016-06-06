@@ -112,7 +112,7 @@ scout.TableHeaderMenuButton.prototype._updateEnabled = function() {
 
 scout.TableHeaderMenuButton.prototype._renderEnabled = function() {
   this.$container.toggleClass('disabled', !this.enabled);
-  this.$container.setTabbable(this.enabled);
+  this.$container.setTabbable(this.enabled && !scout.device.supportsTouch());
 };
 
 scout.TableHeaderMenuButton.prototype.setIcon = function(icon) {

@@ -87,7 +87,7 @@ scout.RadioButton.prototype.doAction = function(event) {
 };
 
 scout.RadioButton.prototype.setTabbable = function(tabbable) {
-  this.$field.setTabbable(tabbable);
+  this.$field.setTabbable(tabbable && !scout.device.supportsTouch());
 };
 
 /**

@@ -47,10 +47,13 @@ scout.BoxButtons.prototype.addButton = function(opts) {
 
   var $button = this._$parent.appendDiv()
     .text(scout.strings.removeAmpersand(opts.text))
-    .attr('tabindex', opts.tabIndex || '0')
     .addClass('box-button')
     .unfocusable()
     .setEnabled(scout.nvl(opts.enabled, true));
+
+  if (!scout.device.supportsTouch()) {
+    $button.attr('tabindex', opts.tabIndex || '0');
+  }
 
   if (opts.onClick) {
     var onClick = opts.onClick;

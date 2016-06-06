@@ -97,11 +97,7 @@ scout.TabItem.prototype.setTabActive = function(active) {
 
 scout.TabItem.prototype._renderTabActive = function() {
   this.$tabContainer.select(this._tabActive);
-  if (this._tabActive) {
-    this.$tabContainer.setTabbable(true);
-  } else {
-    this.$tabContainer.attr('tabindex', -1);
-  }
+  this.$tabContainer.setTabbable(this._tabActive && !scout.device.supportsTouch());
 };
 
 /**

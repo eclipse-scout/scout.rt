@@ -90,7 +90,7 @@ scout.CheckBoxField.prototype.setValue = function(value) {
 scout.CheckBoxField.prototype._renderEnabled = function(enabled) {
   scout.CheckBoxField.parent.prototype._renderEnabled.call(this);
   this.$checkBox
-    .setTabbable(this.enabled)
+    .setTabbable(this.enabled && !scout.device.supportsTouch())
     .setEnabled(this.enabled);
 };
 
