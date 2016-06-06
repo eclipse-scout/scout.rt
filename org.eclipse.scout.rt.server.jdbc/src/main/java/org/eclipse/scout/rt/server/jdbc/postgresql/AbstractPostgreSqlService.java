@@ -37,4 +37,9 @@ public abstract class AbstractPostgreSqlService extends AbstractSqlService {
   protected String getConfiguredJdbcMappingName() {
     return "jdbc:postgresql://[host][:port]/[database]";
   }
+
+  @Override
+  protected String getSequenceNextvalStatement(String sequenceName) {
+    return "SELECT nextval('" + sequenceName + "') ";
+  }
 }

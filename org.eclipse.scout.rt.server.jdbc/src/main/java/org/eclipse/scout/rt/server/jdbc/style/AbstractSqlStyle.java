@@ -190,6 +190,16 @@ public abstract class AbstractSqlStyle implements ISqlStyle {
       return new SqlBind(Types.NULL, o);
     }
     //
+
+    return createBindFor(o, c);
+  }
+
+  /**
+   * May be used by specific style if different behavior is required.
+   *
+   * @return A bind or throws a {@link IllegalArgumentException}.
+   */
+  protected SqlBind createBindFor(Object o, Class c) {
     if (Timestamp.class.isAssignableFrom(c)) {
       return new SqlBind(Types.TIMESTAMP, o);
     }
