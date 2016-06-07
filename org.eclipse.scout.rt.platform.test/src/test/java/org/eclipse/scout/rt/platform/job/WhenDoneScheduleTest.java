@@ -603,6 +603,80 @@ public class WhenDoneScheduleTest {
     assertFalse(functionFuture.isCancelled());
   }
 
+  @Test
+  public void testExecutionHints() throws InterruptedException {
+    // Schedule future
+    IFuture<String> future = Jobs.schedule(new Callable<String>() {
+
+      @Override
+      public String call() throws Exception {
+        return "abc";
+      }
+    }, Jobs.newInput()
+        .withExecutionHint(JOB_MARKER));
+
+    final BlockingCountDownLatch hint1AddedLatch = new BlockingCountDownLatch(1);
+    final BlockingCountDownLatch hint1RemovedLatch = new BlockingCountDownLatch(1);
+    final BlockingCountDownLatch hint2AddedLach = new BlockingCountDownLatch(1);
+    final BlockingCountDownLatch hint2RemovedLatch = new BlockingCountDownLatch(1);
+
+    // Schedule function
+    IFuture<String> functionFuture = future.whenDoneSchedule(new IBiFunction<String, Throwable, String>() {
+
+      @Override
+      public String apply(String result, Throwable error) {
+        assertTrue(IFuture.CURRENT.get().containsExecutionHint(JOB_MARKER));
+        try {
+          // Make hint changes to the future
+          IFuture.CURRENT.get().addExecutionHint("HINT1");
+          hint1AddedLatch.countDownAndBlock();
+          IFuture.CURRENT.get().removeExecutionHint("HINT1");
+          hint1RemovedLatch.countDownAndBlock();
+
+          // Verify that external hint changes are reflected
+          assertTrue(hint2AddedLach.await());
+          assertTrue(IFuture.CURRENT.get().containsExecutionHint("HINT2"));
+          hint2AddedLach.unblock();
+
+          assertTrue(hint2RemovedLatch.await());
+          assertFalse(IFuture.CURRENT.get().containsExecutionHint("HINT2"));
+          hint2RemovedLatch.unblock();
+        }
+        catch (InterruptedException e) {
+          throw new ThreadInterruptedException("", e);
+        }
+        return result.toUpperCase();
+      }
+    }, Jobs.newInput()
+        .withExecutionHint(JOB_MARKER));
+
+    try {
+      assertTrue(functionFuture.containsExecutionHint(JOB_MARKER));
+      assertTrue(hint1AddedLatch.await());
+
+      // Verify that internal hint changes are reflected
+      assertTrue(functionFuture.containsExecutionHint("HINT1"));
+      hint1AddedLatch.unblock();
+      assertTrue(hint1RemovedLatch.await());
+      assertFalse(functionFuture.containsExecutionHint("HINT1"));
+      hint1RemovedLatch.unblock();
+
+      // Make hint changes to the future
+      functionFuture.addExecutionHint("HINT2");
+      assertTrue(hint2AddedLach.countDownAndBlock());
+      functionFuture.removeExecutionHint("HINT2");
+      assertTrue(hint2RemovedLatch.countDownAndBlock());
+
+      assertEquals("abc", future.awaitDoneAndGet());
+      assertEquals("ABC", functionFuture.awaitDoneAndGet());
+    }
+    finally {
+      Jobs.getJobManager().cancel(Jobs.newFutureFilterBuilder()
+          .andMatchExecutionHint(JOB_MARKER)
+          .toFilter(), true);
+    }
+  }
+
   private static void assertFutureCancelled(IFuture<?> future) {
     try {
       future.awaitDoneAndGet();

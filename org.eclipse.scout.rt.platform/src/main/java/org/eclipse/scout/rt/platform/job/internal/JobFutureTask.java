@@ -30,12 +30,9 @@ import org.eclipse.scout.rt.platform.annotations.Internal;
 import org.eclipse.scout.rt.platform.chain.callable.CallableChain;
 import org.eclipse.scout.rt.platform.chain.callable.ICallableDecorator;
 import org.eclipse.scout.rt.platform.context.RunContext;
-import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
-import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.DefaultRuntimeExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.IExceptionTranslator;
-import org.eclipse.scout.rt.platform.exception.NullExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.job.DoneEvent;
@@ -45,7 +42,6 @@ import org.eclipse.scout.rt.platform.job.IExecutionSemaphore;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.job.JobState;
-import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.job.listener.JobEventData;
@@ -53,6 +49,7 @@ import org.eclipse.scout.rt.platform.job.listener.JobEventType;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
 import org.eclipse.scout.rt.platform.util.ToStringBuilder;
+import org.eclipse.scout.rt.platform.util.concurrent.IBiConsumer;
 import org.eclipse.scout.rt.platform.util.concurrent.IBiFunction;
 import org.quartz.Calendar;
 import org.quartz.SchedulerException;
@@ -441,64 +438,45 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
     Assertions.assertNotNull(input, "Input must not be null");
     Assertions.assertNotNull(function, "Function must not be null");
 
-    final IFuture<RESULT> currentFuture = this;
+    final AtomicReference<DoneEvent<RESULT>> doneEvent = new AtomicReference<>();
 
-    // Create an execution guard to allocate a worker thread only after entering done state of this future.
-    final IExecutionSemaphore executionGuard = Jobs.newExecutionSemaphore(0);
+    // Create the future to be executed after entering done state.
+    final JobFutureTask<FUNCTION_RESULT> functionFuture = m_jobManager.createJobFutureTask(new Callable<FUNCTION_RESULT>() {
+
+      @Override
+      public FUNCTION_RESULT call() throws Exception {
+        return function.apply(doneEvent.get().getResult(), doneEvent.get().getException());
+      }
+    }, input);
+
+    // Submit the function's future upon entering done state.
     whenDone(new IDoneHandler<RESULT>() {
 
       @Override
       public void onDone(final DoneEvent<RESULT> event) {
-        executionGuard.withPermits(1);
+        doneEvent.set(event);
+        // Propagate cancellation if applicable.
+        // Nevertheless, even if not executed, the future must be submitted to enter done state.
+        if (event.isCancelled()) {
+          functionFuture.cancel(false);
+        }
+        m_jobManager.submit(functionFuture);
       }
     }, null);
 
-    // Upon cancellation of this future, cancel the function's future as well.
-    final RunMonitor functionRunMonitor = BEANS.get(RunMonitor.class);
-    m_runMonitor.registerCancellable(functionRunMonitor);
+    return functionFuture;
+  }
 
-    // Upon cancellation of the function's RunMonitor, cancel the function's future as well (to reflect proper cancellation status).
-    if (input.getRunContext() != null) {
-      input.getRunContext().getRunMonitor().registerCancellable(functionRunMonitor);
-    }
-
-    // Schedule the job to be executed upon this future enters done state.
-    // However, the execution guard ensures that a worker thread is only allocated upon this future enters done state.
-    return Jobs.schedule(new Callable<FUNCTION_RESULT>() {
+  @Override
+  public IFuture<Void> whenDoneSchedule(final IBiConsumer<RESULT, Throwable> function, final JobInput input) {
+    return whenDoneSchedule(new IBiFunction<RESULT, Throwable, Void>() {
 
       @Override
-      public FUNCTION_RESULT call() throws Exception {
-        // Sanity check for cancellation because cancellation may not be percolated yet.
-        if (currentFuture.isCancelled()) {
-          IFuture.CURRENT.get().cancel(false);
-          return null;
-        }
-
-        // At this point, the depending future finished without being cancelled.
-        final AtomicReference<RESULT> rRef = new AtomicReference<>();
-        final AtomicReference<Throwable> tRef = new AtomicReference<>();
-        try {
-          rRef.set(currentFuture.awaitDoneAndGet(NullExceptionTranslator.class));
-        }
-        catch (final Throwable t) { // NOSONAR
-          tRef.set(BEANS.get(DefaultExceptionTranslator.class).unwrap(t));
-        }
-
-        // Schedule the job to run the function in the proper context (RunContext, ExecutionSemaphore, ExecutionHints, ...).
-        // However, if the function's RunContext is cancelled, it will not be executed.
-        return Jobs.schedule(new Callable<FUNCTION_RESULT>() {
-
-          @Override
-          public FUNCTION_RESULT call() throws Exception {
-            return function.apply(rRef.get(), tRef.get());
-          }
-        }, input).awaitDoneAndGet(DefaultExceptionTranslator.class);
+      public Void apply(final RESULT result, final Throwable throwable) {
+        function.accept(result, throwable);
+        return null;
       }
-    }, Jobs.newInput()
-        .withName("[jobmanager] Waiting for 'whenDoneFunction' to execute [job={}, function={}, functionJobName={}]", getJobInput().getName(), function, input.getName())
-        .withExceptionHandling(null, false) // propagate a potential exception without handling it
-        .withRunContext(RunContexts.empty().withRunMonitor(functionRunMonitor))
-        .withExecutionSemaphore(executionGuard));
+    }, input);
   }
 
   @Override
