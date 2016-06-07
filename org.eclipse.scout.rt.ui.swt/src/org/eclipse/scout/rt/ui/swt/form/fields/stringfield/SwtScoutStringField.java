@@ -98,11 +98,9 @@ public class SwtScoutStringField extends SwtScoutStringFieldComposite implements
     };
     getScoutObject().getContextMenu().addPropertyChangeListener(m_contextMenuVisibilityListener);
 
-    m_contextMenu = new SwtScoutContextMenu(getSwtField().getShell(), getScoutObject().getContextMenu(), getEnvironment());
-
-    SwtScoutContextMenu fieldMenu = new SwtScoutContextMenu(getSwtField().getShell(), getScoutObject().getContextMenu(), getEnvironment(),
+    m_contextMenu = new SwtScoutContextMenu(getSwtField().getShell(), getScoutObject().getContextMenu(), getEnvironment(),
         getScoutObject().isAutoAddDefaultMenus() ? new StyledTextAccess(getSwtField()) : null, getScoutObject().isAutoAddDefaultMenus() ? getSwtField() : null);
-    getSwtField().setMenu(fieldMenu.getSwtMenu());
+    getSwtField().setMenu(m_contextMenu.getSwtMenu());
 
     // correction of menu position
     getSwtField().addListener(SWT.MenuDetect, new MenuPositionCorrectionListener(getSwtField()));
