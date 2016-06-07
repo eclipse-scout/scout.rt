@@ -11,9 +11,11 @@
 scout.TreeCollapseAllKeyStroke = function(tree, keyStrokeModifier) {
   scout.TreeCollapseAllKeyStroke.parent.call(this, tree, keyStrokeModifier);
   this.which = [scout.keys.HOME];
-  this.renderingHints.hAlign = scout.hAlign.LEFT;
+  this.renderingHints.hAlign = scout.hAlign.RIGHT;
   this.renderingHints.$drawingArea = function($drawingArea, event) {
-    return this.field.$data;
+    if (this.field.visibleNodesFlat.length > 0) {
+      return this.field.visibleNodesFlat[0].$node;
+    }
   }.bind(this);
 };
 scout.inherits(scout.TreeCollapseAllKeyStroke, scout.AbstractTreeNavigationKeyStroke);

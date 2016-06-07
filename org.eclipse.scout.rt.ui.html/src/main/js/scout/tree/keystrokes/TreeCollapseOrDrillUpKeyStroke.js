@@ -13,14 +13,20 @@ scout.TreeCollapseOrDrillUpKeyStroke = function(tree, modifierBitMask) {
   this.which = [scout.keys.SUBTRACT];
   this.renderingHints.text = '-';
   this.renderingHints.$drawingArea = function($drawingArea, event) {
-    return (event._treeCurrentNode.expanded ? event._$treeCurrentNode : null);
+    var currentNode = event._treeCurrentNode;
+    if (currentNode.expanded) {
+      return currentNode.$node;
+    } else if (currentNode.parentNode) {
+      return currentNode.parentNode.$node;
+    }
   }.bind(this);
 };
 scout.inherits(scout.TreeCollapseOrDrillUpKeyStroke, scout.AbstractTreeNavigationKeyStroke);
 
 scout.TreeCollapseOrDrillUpKeyStroke.prototype._accept = function(event) {
   var accepted = scout.TreeCollapseOrDrillUpKeyStroke.parent.prototype._accept.call(this, event);
-  return accepted && event._treeCurrentNode;
+  var currentNode = event._treeCurrentNode;
+  return accepted && currentNode && (currentNode.expanded || currentNode.parentNode);
 };
 
 scout.TreeCollapseOrDrillUpKeyStroke.prototype.handle = function(event) {
