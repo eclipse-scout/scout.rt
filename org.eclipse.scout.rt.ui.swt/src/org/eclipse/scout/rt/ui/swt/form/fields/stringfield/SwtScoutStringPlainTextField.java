@@ -87,11 +87,9 @@ public class SwtScoutStringPlainTextField extends SwtScoutStringFieldComposite {
     };
     getScoutObject().getContextMenu().addPropertyChangeListener(m_contextMenuVisibilityListener);
 
-    m_contextMenu = new SwtScoutContextMenu(getSwtField().getShell(), getScoutObject().getContextMenu(), getEnvironment());
-
-    SwtScoutContextMenu fieldMenu = new SwtScoutContextMenu(getSwtField().getShell(), getScoutObject().getContextMenu(), getEnvironment(),
+    m_contextMenu = new SwtScoutContextMenu(getSwtField().getShell(), getScoutObject().getContextMenu(), getEnvironment(),
         getScoutObject().isAutoAddDefaultMenus() ? new TextAccess(getSwtField()) : null, null);
-    getSwtField().setMenu(fieldMenu.getSwtMenu());
+    getSwtField().setMenu(m_contextMenu.getSwtMenu());
     // correction of menu position
     getSwtField().addListener(SWT.MenuDetect, new MenuPositionCorrectionListener(getSwtField()));
   }
