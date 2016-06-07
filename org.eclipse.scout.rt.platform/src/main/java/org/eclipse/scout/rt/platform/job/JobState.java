@@ -17,6 +17,10 @@ package org.eclipse.scout.rt.platform.job;
  */
 public enum JobState {
   /**
+   * Indicates that a job was created and not scheduled yet.
+   */
+  NEW,
+  /**
    * Indicates that a job was given to the job manager for execution.
    */
   SCHEDULED,
