@@ -212,7 +212,7 @@ public abstract class AbstractProposalChooser<T, LOOKUP_KEY> extends AbstractPro
       }
       severity = IStatus.ERROR;
     }
-    else if (rows.size() <= 0) {
+    else if (rows.isEmpty()) {
       if (getContentAssistField().getWildcard().equals(searchText)) {
         statusText = ScoutTexts.get("SmartFieldNoDataFound");
       }

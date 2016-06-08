@@ -57,8 +57,15 @@ public abstract class AbstractProposalField<LOOKUP_KEY> extends AbstractContentA
   public void applyLazyStyles() {
   }
 
+  /**
+   * Returns the key, if available, <code>null</code> otherwise.
+   */
   @Override
   public LOOKUP_KEY getValueAsLookupKey() {
+    ILookupRow<LOOKUP_KEY> lookupRow = getCurrentLookupRow();
+    if (lookupRow != null) {
+      return lookupRow.getKey();
+    }
     return null;
   }
 
