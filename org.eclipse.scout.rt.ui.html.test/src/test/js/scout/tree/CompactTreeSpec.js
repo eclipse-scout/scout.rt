@@ -37,7 +37,6 @@ describe("Compacttree", function() {
       var spy = spyOn(tree, '_calculateCurrentViewRange').and.returnValue(new scout.Range(0, 1));
       tree.render(session.$entryPoint);
       expect(tree.nodes.length).toBe(1);
-//      expect(tree.visibleNodesFlat.length).toBe(0);
     });
 
     it("adds a node with child node", function() {
@@ -109,6 +108,19 @@ describe("Compacttree", function() {
       expect($(firstNode[2]).text()).toBe("node 0_1");
     });
 
+  });
+
+  describe("node click", function() {
+
+    it("calls selectNodes", function() {
+      var model = helper.createModelFixture(2,1,true);
+      var tree = helper.createCompactTree(model);
+      spyOn(tree, 'selectNodes');
+      tree.render(session.$entryPoint);
+
+      tree.nodes[0].childNodes[0].$node.triggerMouseDown();
+      expect(tree.selectNodes).toHaveBeenCalled();
+    });
   });
 
 });
