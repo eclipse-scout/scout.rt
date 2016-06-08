@@ -26,6 +26,7 @@ import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IBeanManager;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.Platform;
+import org.eclipse.scout.rt.platform.config.IConfigProperty;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.NumberFormatProvider;
@@ -247,6 +248,13 @@ public final class TestingUtility {
       SleepUtil.sleepSafe(50, TimeUnit.MILLISECONDS);
     }
     Assert.fail("Potential memory leak, object " + ref.get() + "still exists after gc");
+  }
+
+  @SuppressWarnings("unchecked")
+  public static <T> IBean<?> mockConfigProperty(Class<? extends IConfigProperty<T>> propertyClass, T value) {
+    IConfigProperty<?> mock = Mockito.mock(IConfigProperty.class);
+    Mockito.<T> when((T) mock.getValue()).thenReturn(value);
+    return TestingUtility.registerBean(new BeanMetaData(propertyClass, mock));
   }
 
 }
