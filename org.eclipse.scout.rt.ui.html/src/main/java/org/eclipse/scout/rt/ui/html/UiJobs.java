@@ -133,6 +133,7 @@ public class UiJobs {
     Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
         .andMatchNotExecutionHint(ModelJobs.EXECUTION_HINT_UI_INTERACTION_REQUIRED)
         .andAreSingleExecuting() // only wait for 'one-shot' jobs
+        .andMatchNotState(JobState.NEW) // ignore jobs which are not submitted yet (e.g. created via IFuture.whenDoneSchedule)
         .andMatchNotState(JobState.PENDING) // ignore 'one-shot' jobs which are scheduled with an initial delay because consumed by the poller
         .andMatch(filter)
         .toFilter(), AWAIT_TIMEOUT, TimeUnit.MILLISECONDS);

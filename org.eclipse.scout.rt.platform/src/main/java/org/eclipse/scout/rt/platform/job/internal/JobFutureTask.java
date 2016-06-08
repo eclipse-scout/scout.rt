@@ -75,7 +75,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
   protected final CallableChain<RESULT> m_callableChain;
   protected final List<JobListenerWithFilter> m_listeners = new CopyOnWriteArrayList<>();
 
-  protected volatile JobState m_state;
+  protected volatile JobState m_state = JobState.NEW;
 
   protected final CompletionPromise<RESULT> m_completionPromise;
   protected final AtomicBoolean m_finished = new AtomicBoolean(false);

@@ -19,6 +19,7 @@ import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
 import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledException;
+import org.eclipse.scout.rt.platform.util.concurrent.IBiConsumer;
 import org.eclipse.scout.rt.platform.util.concurrent.IBiFunction;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedException;
@@ -122,6 +123,55 @@ public class WhenDoneScheduleTest {
     catch (Exception e) {
       assertSame(exception4, e);
     }
+  }
+
+  @Test
+  public void testFunctionFutureState() throws InterruptedException {
+    final BlockingCountDownLatch jobRunningLatch = new BlockingCountDownLatch(1);
+    final BlockingCountDownLatch functionJobRunningLatch = new BlockingCountDownLatch(1);
+
+    // Schedule future
+    IFuture<Void> future = Jobs.schedule(new IRunnable() {
+
+      @Override
+      public void run() throws Exception {
+        jobRunningLatch.countDownAndBlock();
+      }
+    }, Jobs.newInput()
+        .withExecutionHint(JOB_MARKER));
+
+    // Schedule function
+    IFuture<Void> functionFuture = future.whenDoneSchedule(new IBiConsumer<Void, Throwable>() {
+
+      @Override
+      public void accept(Void result, Throwable u) {
+        try {
+          functionJobRunningLatch.countDownAndBlock();
+        }
+        catch (InterruptedException e) {
+          throw new ThreadInterruptedException("interrupted", e);
+        }
+      }
+    }, Jobs.newInput()
+        .withExecutionHint(JOB_MARKER));
+
+    assertTrue(jobRunningLatch.await());
+    assertEquals(JobState.RUNNING, future.getState());
+    assertEquals(JobState.NEW, functionFuture.getState());
+    jobRunningLatch.unblock();
+
+    assertTrue(functionJobRunningLatch.await());
+    assertEquals(JobState.DONE, future.getState());
+    assertEquals(JobState.RUNNING, functionFuture.getState());
+    functionJobRunningLatch.unblock();
+
+    // Wait until the job jobs are done
+    Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
+        .andMatchExecutionHint(JOB_MARKER)
+        .toFilter(), 5, TimeUnit.SECONDS);
+
+    assertEquals(JobState.DONE, functionFuture.getState());
+    assertEquals(JobState.DONE, future.getState());
   }
 
   @Test
