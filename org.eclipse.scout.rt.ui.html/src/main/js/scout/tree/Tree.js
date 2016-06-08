@@ -2399,11 +2399,20 @@ scout.Tree.prototype.filter = function(notAnimated) {
         this._addToVisibleFlatList(node, useAnimation);
       }
       this.viewRangeDirty = true;
+    } else {
+      // this else branch is required when the filter-state of a node has not changed
+      // for instance Node "Telefon mit Sabrina" is visible for filter "tel" and also
+      // for filter "abr". However, it is possible that the node is _not_ attached, when
+      // we switch from one filter to another, because the node was not in the view-range
+      // with the previous filter. That's why we must make sure, the node is attached to
+      // the DOM, even though the filter state hasn't changed. Otherwise we'd have a
+      // problem when we insert nodes in this._insertNodeInDOMAtPlace.
+      this.showNode(node, useAnimation);
     }
     if ((node.expanded || node.expandedLazy) && node.isFilterAccepted()) {
       return false;
     }
-    //don't process children->optimize performance
+    // don't process children->optimize performance
     return true;
   }.bind(this));
 
@@ -2523,35 +2532,37 @@ scout.Tree.prototype._ensureParentIsInDOM = function(node, useAnimation, indexHi
 };
 
 scout.Tree.prototype._insertNodeInDOMAtPlace = function(node, index) {
-  var $node = node.$node,
-    added = false;
+  var $node = node.$node;
+
   if (index === 0) {
     if (this.$fillBefore) {
-      added = true;
       $node.insertAfter(this.$fillBefore);
     } else {
-      added = true;
       this.$data.prepend($node);
     }
-  } else {
-    //append after index
-    var nodeBefore = this.visibleNodesFlat[index - 1];
-    if (nodeBefore.attached) {
-      $node.insertAfter(nodeBefore.$node);
-      added = true;
-    } else if (index + 1 < this.visibleNodesFlat.length) {
-      var nodeAfter = this.visibleNodesFlat[index + 1];
-      if (nodeAfter.attached) {
-        added = true;
-        $node.insertBefore(nodeAfter.$node);
-      }
-    }
+    return;
+  }
 
-    if (!added && this.$fillBefore) {
-      $node.insertAfter(this.$fillBefore);
-    } else if (!added) {
-      this.$data.prepend($node);
+  // append after index
+  var nodeBefore = this.visibleNodesFlat[index - 1];
+  if (nodeBefore.attached) {
+    $node.insertAfter(nodeBefore.$node);
+    return;
+  }
+
+  if (index + 1 < this.visibleNodesFlat.length) {
+    var nodeAfter = this.visibleNodesFlat[index + 1];
+    if (nodeAfter.attached) {
+      $node.insertBefore(nodeAfter.$node);
+      return;
     }
+  }
+
+  // used when the tree is scrolled
+  if (this.$fillBefore) {
+    $node.insertAfter(this.$fillBefore);
+  } else {
+    this.$data.prepend($node);
   }
 };
 

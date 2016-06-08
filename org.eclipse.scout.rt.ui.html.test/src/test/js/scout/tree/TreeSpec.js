@@ -1715,6 +1715,82 @@ describe("Tree", function() {
       expect(tree.nodes[0].childNodes[3].rendered).toBe(true);
       expect(tree.nodes[0].childNodes[3].filterAccepted).toBe(true);
     });
+
+    /**
+     * This test makes sure the bugfix from ticket #168957 still works.
+     *
+     * Without the bugfix, an exception was thrown on the second call to _renderViewport().
+     * The reason was, that node 'A+B' was initially outside the view-range and when the
+     * filter has changed, the B-nodes below A+B were rendered at the wrong position in
+     * the tree, because A+B was not attached, so later the check in _insertNodeInDOMAtPlace
+     * failed and caused the error. To fix the error, we now make sure the node is attached
+     * by calling showNode in Tree#filter.
+     */
+    it("make sure nodes unchanged by filters are attached. See ticket #168957", function() {
+      var i,
+        topLevelNode3,
+        topLevelNodes = [],
+        childNodes = [],
+        childNodeNames = ['A1','A2','A3','A4','A+B','B1','B2','B3','B4'];
+
+      // child nodes
+      for (i = 0; i < childNodeNames.length; i++) {
+        childNodes.push(helper.createModelNode('', childNodeNames[i], i));
+      }
+
+      // top level nodes
+      topLevelNodes.push(helper.createModelNode('', 'TopLevel 1', 0));
+      topLevelNodes.push(helper.createModelNode('', 'TopLevel 2', 1));
+
+      topLevelNode3 = helper.createModelNode('', 'TopLevel 3', 2);
+      topLevelNode3.childNodes = childNodes;
+      topLevelNodes.push(topLevelNode3);
+
+      topLevelNodes.push(helper.createModelNode('', 'TopLevel 4', 3));
+      topLevelNodes.push(helper.createModelNode('', 'TopLevel 5', 4));
+
+      // filters
+      var model = helper.createModel(topLevelNodes);
+      var tree = helper.createTree(model);
+      var filterA = {
+        accept: function(node) {
+          if (node.level === 0) {
+            return true;
+          } else {
+            return node.text.startsWith('A');
+          }
+        }
+      };
+      var filterB = {
+        accept: function(node) {
+          if (node.level === 0) {
+            return true;
+          } else {
+            return node.text.startsWith('B') || node.text === 'A+B';
+          }
+        }
+      };
+
+      // test
+      tree.setViewRangeSize(5);
+      tree.setNodeExpanded(topLevelNode3, true);
+      tree.render(session.$entryPoint);
+
+      tree.addFilter(filterA);
+      tree._renderViewport();
+
+      tree.addFilter(filterB);
+      tree.removeFilter(filterA);
+      tree._renderViewport();
+
+      // check expected tree state
+      expect(tree.visibleNodesFlat.length).toBe(10); // 5 top level nodes + 5 child nodes
+      expect(tree.visibleNodesFlat[0].text).toBe('TopLevel 1');
+      expect(tree.visibleNodesFlat[1].text).toBe('TopLevel 2');
+      expect(tree.visibleNodesFlat[2].text).toBe('TopLevel 3');
+      expect(tree.visibleNodesFlat[3].text).toBe('A+B');
+      expect(tree.visibleNodesFlat[4].text).toBe('B1');
+    });
   });
 
   describe("onModelAction", function() {
