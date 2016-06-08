@@ -132,51 +132,62 @@ public class CsvHelper {
   }
 
   public void setColumnTypes(List<String> list) {
-    m_colTypes = new ArrayList<String>(list.size());
-    m_colFormat = new ArrayList<Format>(list.size());
-    for (Iterator<String> it = list.iterator(); it.hasNext();) {
-      String s = it.next();
-      String sLow = StringUtility.lowercase(s);
-      Format f = null;
-      if (s == null) {
-        f = null;
-      }
-      else if ("string".equals(sLow)) {
-        f = null;
-      }
-      else if ("integer".startsWith(sLow)) {
-        if (s.length() >= 8) {// integer_<format>
-          f = new DecimalFormat(s.substring(8), new DecimalFormatSymbols(m_locale));
-          ((DecimalFormat) f).setParseIntegerOnly(true);
-        }
-        else {
-          f = BEANS.get(NumberFormatProvider.class).getIntegerInstance(m_locale);
-        }
-      }
-      else if ("float".startsWith(sLow)) {
-        if (s.length() >= 6) {// float_<format>
-          f = new DecimalFormat(s.substring(6), new DecimalFormatSymbols(m_locale));
-        }
-        else {
-          f = BEANS.get(NumberFormatProvider.class).getNumberInstance(m_locale);
-        }
-      }
-      else if ("date".startsWith(sLow)) {
-        if (s.length() >= 5) {
-          f = new SimpleDateFormat(s.substring(5), m_locale);
-        }
-        else {
-          f = BEANS.get(DateFormatProvider.class).getDateInstance(DateFormat.SHORT, m_locale);
-        }
-      }
-      else {
+    m_colTypes = new ArrayList<>(list.size());
+    m_colFormat = new ArrayList<>(list.size());
+    for (String s : list) {
+      Format f = getFormat(s);
+      if (f == null) {
         s = "string";
-        f = null;
       }
       m_colTypes.add(s);
       m_colFormat.add(f);
     }
     m_colCount = Math.max(m_colCount, m_colTypes.size());
+  }
+
+  /**
+   * A format is described by the type optionally followed by _pattern. e.g.
+   * <ul>
+   * <li>integer_<pattern>, see {@link DecimalFormat}</li>
+   * <li>float_<pattern>, see {@link DecimalFormat}</li>
+   * <li>date_<pattern>, see {@link DateFormat}</li>
+   * </ul>
+   */
+  protected Format getFormat(String s) {
+    if (s == null) {
+      return null;
+    }
+    String sLow = StringUtility.lowercase(s);
+
+    if (sLow.startsWith("date")) {// date_<format>
+      if (s.length() >= 5) {
+        return new SimpleDateFormat(s.substring(5), m_locale);
+      }
+      else {
+        return BEANS.get(DateFormatProvider.class).getDateInstance(DateFormat.SHORT, m_locale);
+      }
+    }
+    else if (sLow.startsWith("integer")) {// integer_<format>
+      if (s.length() >= 8) {
+        Format f = new DecimalFormat(s.substring(8), new DecimalFormatSymbols(m_locale));
+        ((DecimalFormat) f).setParseIntegerOnly(true);
+        return f;
+      }
+      else {
+        return BEANS.get(NumberFormatProvider.class).getIntegerInstance(m_locale);
+      }
+    }
+
+    else if (sLow.startsWith("float")) {
+      if (s.length() >= 6) {// float_<format>
+        return new DecimalFormat(s.substring(6), new DecimalFormatSymbols(m_locale));
+      }
+      else {
+        return BEANS.get(NumberFormatProvider.class).getNumberInstance(m_locale);
+      }
+    }
+
+    return null;
   }
 
   /**
