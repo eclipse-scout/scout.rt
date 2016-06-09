@@ -12,13 +12,14 @@ package org.eclipse.scout.rt.shared.servicetunnel.http;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.Replace;
+import org.eclipse.scout.rt.platform.security.ISecurityProvider.KeyPairBytes;
 import org.eclipse.scout.rt.platform.security.SecurityUtility;
-import org.eclipse.scout.rt.platform.security.SecurityUtility.KeyPairBytes;
 import org.eclipse.scout.rt.platform.util.HexUtility;
 import org.eclipse.scout.rt.shared.SharedConfigProperties.AuthTokenPrivateKeyProperty;
 import org.eclipse.scout.rt.shared.SharedConfigProperties.AuthTokenPublicKeyProperty;
@@ -33,7 +34,7 @@ import org.junit.runner.RunWith;
 @RunWith(PlatformTestRunner.class)
 public class DefaultAuthTokenTest {
   private static KeyPairBytes s_pair;
-  private static ArrayList<IBean<?>> s_beans = new ArrayList<>();
+  private static List<IBean<?>> s_beans = new ArrayList<>();
 
   @Replace
   private static class AuthTokenPrivateKeyPropertyEx extends AuthTokenPrivateKeyProperty {

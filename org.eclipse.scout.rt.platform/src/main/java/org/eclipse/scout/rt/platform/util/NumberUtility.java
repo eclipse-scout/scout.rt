@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.platform.util;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Locale;
@@ -20,6 +19,7 @@ import java.util.Random;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.nls.NlsLocale;
+import org.eclipse.scout.rt.platform.security.SecurityUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -248,19 +248,16 @@ public final class NumberUtility {
   }
 
   /**
-   * @return an unsecure random long using <code>{@link Random#nextLong()}</code>
-   *         <p>
-   *         for secure random numbers see SecureRandom TODO imo 7.0 or java 1.8: make sure to use
-   *         {@link SecureRandom#getInstanceStrong()}
+   * @return an insecure random long using <code>{@link Random#nextLong()}</code><br>
+   *         For secure random numbers use {@link SecurityUtility#createSecureRandom()}.
    */
   public static long randomLong() {
     return UNSECURE_RANDOM.nextLong();
   }
 
   /**
-   * @return an unsecure random int using <code>{@link Random#nextInt()</code>
-   *         <p>
-   *         for secure random numbers see SecureRandom
+   * @return an insecure random integer using <code>{@link Random#nextInt()}</code><br>
+   *         For secure random numbers use {@link SecurityUtility#createSecureRandom()}.
    */
   public static int randomInt() {
     return UNSECURE_RANDOM.nextInt();
@@ -268,18 +265,16 @@ public final class NumberUtility {
 
   /**
    * @param size
-   * @return an unsecure random int using <code>{@link Random#nextInt(size)</code>
-   *         <p>
-   *         for secure random numbers see SecureRandom
+   * @return an insecure random integer using <code>{@link Random#nextInt(size)}</code><br>
+   *         For secure random numbers use {@link SecurityUtility#createSecureRandom()}.
    */
   public static int randomInt(int size) {
     return UNSECURE_RANDOM.nextInt(size);
   }
 
   /**
-   * @return an unsecure random double using <code>{@link Random#nextDouble()</code>
-   *         <p>
-   *         for secure random numbers see SecureRandom
+   * @return an insecure random double using <code>{@link Random#nextDouble()}</code><br>
+   *         For secure random numbers use {@link SecurityUtility#createSecureRandom()}.
    */
   public static double randomDouble() {
     return UNSECURE_RANDOM.nextDouble();

@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.platform.inventory.internal.fixture;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.Bean;
+import org.eclipse.scout.rt.platform.IgnoreBean;
 
 @Bean
 public class TestingBean {
@@ -53,5 +54,33 @@ public class TestingBean {
 
   @Bean
   public @interface A1 {
+  }
+
+  @Bean
+  protected class M2 {
+
+  }
+
+  @Bean
+  public static final class S5 {
+    private S5() {
+    }
+  }
+
+  @Bean
+  protected static class S6 {
+    protected S6() {
+    }
+  }
+
+  @IgnoreBean
+  public static class S6Sub1 extends S6 {
+
+  }
+
+  public static class S6Sub2 extends S6 {
+    public S6Sub2(String arg) {
+
+    }
   }
 }

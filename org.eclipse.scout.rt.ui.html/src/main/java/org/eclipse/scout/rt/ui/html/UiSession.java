@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.ui.html;
 
 import java.math.BigInteger;
 import java.security.AccessController;
-import java.security.SecureRandom;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -54,6 +53,8 @@ import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
+import org.eclipse.scout.rt.platform.security.SecurityUtility;
+import org.eclipse.scout.rt.platform.util.FinalValue;
 import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
 import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledException;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
@@ -98,7 +99,7 @@ public class UiSession implements IUiSession {
   private static final long ADDITIONAL_POLLING_DELAY = 100;
   private static final int MAX_RESPONSE_HISTORY_SIZE = 10;
 
-  private static final Random RANDOM = new SecureRandom();
+  private static final FinalValue<Random> RANDOM = new FinalValue<>();
 
   private final JsonAdapterRegistry m_jsonAdapterRegistry;
   private final JsonEventProcessor m_jsonEventProcessor;
@@ -254,7 +255,13 @@ public class UiSession implements IUiSession {
   }
 
   protected String createUiSessionId(JsonStartupRequest jsonStartupReq) {
-    String id = new BigInteger(130, RANDOM).toString(32); // http://stackoverflow.com/questions/29183818/why-use-tostring32-and-not-tostring36
+    Random random = RANDOM.setIfAbsent(new Callable<Random>() {
+      @Override
+      public Random call() throws Exception {
+        return SecurityUtility.createSecureRandom();
+      }
+    });
+    String id = new BigInteger(130, random).toString(32); // http://stackoverflow.com/questions/29183818/why-use-tostring32-and-not-tostring36
     return jsonStartupReq.getPartId() + ":" + id;
   }
 

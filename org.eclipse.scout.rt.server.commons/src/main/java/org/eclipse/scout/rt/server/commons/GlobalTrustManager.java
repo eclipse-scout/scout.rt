@@ -21,7 +21,6 @@ import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
@@ -38,6 +37,7 @@ import javax.net.ssl.X509TrustManager;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.security.SecurityUtility;
 import org.eclipse.scout.rt.shared.services.common.file.IRemoteFileService;
 import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
 import org.slf4j.Logger;
@@ -80,7 +80,7 @@ public class GlobalTrustManager {
       globalTrustManager = createGlobalTrustManager(tmAlgorithm, trustedCerts);
 
       SSLContext sslContext = SSLContext.getInstance(protocol);
-      sslContext.init(null, new TrustManager[]{globalTrustManager}, new SecureRandom());
+      sslContext.init(null, new TrustManager[]{globalTrustManager}, SecurityUtility.createSecureRandom());
       SSLContext.setDefault(sslContext);
     }
     catch (Exception e) {

@@ -10,17 +10,20 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.security;
 
+import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
-import org.eclipse.scout.rt.platform.security.SecurityUtility;
-import org.eclipse.scout.rt.platform.security.SecurityUtility.KeyPairBytes;
+import org.eclipse.scout.rt.platform.security.ISecurityProvider.KeyPairBytes;
 import org.eclipse.scout.rt.platform.util.Base64Utility;
 import org.eclipse.scout.rt.platform.util.CompareUtility;
+import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
+@RunWith(PlatformTestRunner.class)
 public class SecurityUtilityTest {
 
   private static final boolean IS_JAVA_18_OR_NEWER = CompareUtility.compareTo(System.getProperty("java.version"), "1.8") >= 0;
@@ -42,14 +45,18 @@ public class SecurityUtilityTest {
     byte[] encryptData = SecurityUtility.encrypt(inputBytes, PASSWORD, salt, KEY_LEN);
     Assert.assertFalse(Arrays.equals(encryptData, inputBytes));
 
-    byte[] encryptData2 = SecurityUtility.encrypt(null, PASSWORD, salt, KEY_LEN);
-    Assert.assertNull(encryptData2);
-
     byte[] encryptData3 = SecurityUtility.encrypt(new byte[]{}, PASSWORD, salt, KEY_LEN);
-    Assert.assertTrue(Arrays.equals(encryptData3, new byte[]{}));
+    byte[] decryptedEmpty = SecurityUtility.decrypt(encryptData3, PASSWORD, salt, KEY_LEN);
+    Assert.assertTrue(Arrays.equals(decryptedEmpty, new byte[]{}));
 
     String decryptedString = new String(SecurityUtility.decrypt(encryptData, PASSWORD, salt, KEY_LEN), ENCODING);
     Assert.assertEquals(origData, decryptedString);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testEncryptNoData() throws Exception {
+    final byte[] salt = SecurityUtility.createRandomBytes();
+    SecurityUtility.encrypt(null, "pass", salt, KEY_LEN);
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -67,6 +74,41 @@ public class SecurityUtilityTest {
   public void testEncryptWrongKeyLen() throws Exception {
     final byte[] salt = SecurityUtility.createRandomBytes();
     SecurityUtility.encrypt("test".getBytes(ENCODING), "pass", salt, 4);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testCreateSignatureWrongArg1() throws Exception {
+    SecurityUtility.createSignature(null, new byte[]{});
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testCreateSignatureWrongArg2() throws Exception {
+    SecurityUtility.createSignature(new byte[]{}, (byte[]) null);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testCreateSignatureWrongArg3() throws Exception {
+    SecurityUtility.createSignature(new byte[]{}, (InputStream) null);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testVerifySignatureWrongArg1() throws Exception {
+    SecurityUtility.verifySignature(new byte[]{}, (byte[]) null, new byte[]{});
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testVerifySignatureWrongArg2() throws Exception {
+    SecurityUtility.verifySignature(null, new byte[]{}, new byte[]{});
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testVerifySignatureWrongArg3() throws Exception {
+    SecurityUtility.verifySignature(new byte[]{}, new byte[]{}, null);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testVerifySignatureWrongArg4() throws Exception {
+    SecurityUtility.verifySignature(new byte[]{}, (InputStream) null, new byte[]{});
   }
 
   @Test
@@ -111,6 +153,15 @@ public class SecurityUtilityTest {
     }
     Assert.assertTrue(nullNotAllowed);
 
+    nullNotAllowed = false;
+    try {
+      SecurityUtility.hash((InputStream) null, salt, 1);
+    }
+    catch (IllegalArgumentException e) {
+      nullNotAllowed = true;
+    }
+    Assert.assertTrue(nullNotAllowed);
+
     // ensure hashing was executed
     Assert.assertFalse(Arrays.equals(data, hash));
     Assert.assertFalse(Arrays.equals(data, hash2));
@@ -129,6 +180,33 @@ public class SecurityUtilityTest {
 
     // ensure different input -> different output
     Assert.assertFalse(Arrays.equals(hash7, hash8));
+  }
+
+  @Test
+  public void testCreateMac() {
+    byte[] data = "testdata".getBytes();
+    byte[] data2 = "testdata2".getBytes();
+    byte[] mac1 = SecurityUtility.createMac("testpw".getBytes(), data);
+    byte[] mac2 = SecurityUtility.createMac("testpwdiff".getBytes(), data);
+    byte[] mac3 = SecurityUtility.createMac("testpwd".getBytes(), data2);
+
+    Assert.assertFalse(Arrays.equals(mac1, mac2));
+    Assert.assertFalse(Arrays.equals(mac3, mac2));
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testCreateMacWrongArg1() throws Exception {
+    SecurityUtility.createMac(null, new byte[]{});
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testCreateMacWrongArg2() throws Exception {
+    SecurityUtility.createMac(new byte[]{}, (byte[]) null);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testCreateMacWrongArg3() throws Exception {
+    SecurityUtility.createMac(new byte[]{}, (InputStream) null);
   }
 
   @Test

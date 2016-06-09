@@ -8,9 +8,6 @@ import java.io.IOException;
 import java.security.Principal;
 
 import javax.annotation.PostConstruct;
-import javax.crypto.Mac;
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
@@ -24,6 +21,7 @@ import org.eclipse.scout.rt.platform.config.AbstractLongConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractStringConfigProperty;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
+import org.eclipse.scout.rt.platform.security.SecurityUtility;
 import org.eclipse.scout.rt.platform.security.SimplePrincipal;
 import org.eclipse.scout.rt.platform.util.Base64Utility;
 import org.eclipse.scout.rt.shared.SharedConfigProperties.AuthTokenPrivateKeyProperty;
@@ -48,25 +46,22 @@ import org.slf4j.LoggerFactory;
  */
 public class CookieAccessController implements IAccessController {
   private static final Logger LOG = LoggerFactory.getLogger(CookieAccessController.class);
-  private static final String HMAC_SHA256 = "HmacSHA256";
   private static final String SESSION_ATTRIBUTE_COOKIE_SENT = CookieAccessController.class.getName() + "#cookieSent";
 
   private boolean m_enabled;
   private String m_cookieName;
   private long m_maxAge;
-  private SecretKey m_secretKey;
+  private byte[] m_signKey;
 
   @PostConstruct
   protected void init() {
     m_enabled = CONFIG.getPropertyValue(EnabledProperty.class);
     m_cookieName = CONFIG.getPropertyValue(NameProperty.class);
     m_maxAge = CONFIG.getPropertyValue(MaxAgeProperty.class);
-    byte[] signKey = CONFIG.getPropertyValue(AuthTokenPrivateKeyProperty.class);
-    if (signKey == null) {
+    m_signKey = CONFIG.getPropertyValue(AuthTokenPrivateKeyProperty.class);
+    if (m_signKey == null) {
       throw new PlatformException("Missing config.properties entry used for signing auth data: '{}'", BEANS.get(AuthTokenPrivateKeyProperty.class).getKey());
     }
-    m_secretKey = new SecretKeySpec(signKey, 0, signKey.length, HMAC_SHA256);
-
   }
 
   /**
@@ -124,9 +119,7 @@ public class CookieAccessController implements IAccessController {
    */
   protected String signValue(String value) {
     try {
-      Mac mac = Mac.getInstance(HMAC_SHA256);
-      mac.init(m_secretKey);
-      byte[] sig = mac.doFinal(value.getBytes("UTF-8"));
+      byte[] sig = SecurityUtility.createMac(m_signKey, value.getBytes("UTF-8"));
       return Base64Utility.encode(sig) + ":" + value;
     }
     catch (Exception e) {

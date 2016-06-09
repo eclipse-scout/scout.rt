@@ -60,7 +60,7 @@ public class JandexClassInfo implements IClassInfo {
   }
 
   protected boolean hasNoArgsConstructor(Class<?> c) {
-    for (Constructor<?> a : c.getConstructors()) {
+    for (Constructor<?> a : c.getDeclaredConstructors()) {
       if (a.getParameterTypes().length == 0) {
         return true;
       }

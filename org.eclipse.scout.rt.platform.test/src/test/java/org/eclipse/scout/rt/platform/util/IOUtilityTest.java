@@ -173,15 +173,20 @@ public class IOUtilityTest {
   @Test
   public void testDeleteDirectory() throws IOException {
     File tempFile = File.createTempFile("tempFile", "tmp");
-    File tempDir = new File(tempFile.getParent(), "FileUtilityTestTempDir");
+    File tempDir = new File(tempFile.getParent(), "IOUtilityTestTempDir");
     try {
+      IOUtility.deleteDirectory(tempDir); // ensure we have a clean start.
+
       File tempDirWithSubs = new File(tempDir, "sub" + File.separator + "sub" + File.separator + "sub");
       tempFile.delete();
+
+      tempFile = new File(tempDirWithSubs.getParent(), "tempFile.tmp");
       if (!tempDirWithSubs.exists()) {
         tempDirWithSubs.mkdirs();
       }
-      tempFile = new File(tempDirWithSubs.getParent(), "tempFile.tmp");
-      tempFile.createNewFile();
+      if (!tempFile.exists()) {
+        tempFile.createNewFile();
+      }
       assertTrue("Temp dir was not successfully created.", tempDir.exists());
       assertTrue("Temp file was not successfully created.", tempFile.exists());
     }

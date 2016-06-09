@@ -21,12 +21,16 @@ import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.security.SecurityUtility;
 import org.eclipse.scout.rt.platform.util.HexUtility;
-import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.HexUtility.HexOutputStream;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.shared.SharedConfigProperties.AuthTokenPrivateKeyProperty;
 import org.eclipse.scout.rt.shared.SharedConfigProperties.AuthTokenPublicKeyProperty;
 import org.eclipse.scout.rt.shared.SharedConfigProperties.AuthTokenTimeToLiveProperty;
 
+/**
+ * <h3>{@link DefaultAuthToken}</h3> Authentication Token used in {@link HttpServiceTunnel} to tell the backend which
+ * user is making a request.
+ */
 @Bean
 public class DefaultAuthToken {
 

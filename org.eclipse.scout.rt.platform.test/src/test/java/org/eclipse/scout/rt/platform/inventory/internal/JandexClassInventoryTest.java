@@ -36,6 +36,10 @@ public class JandexClassInventoryTest {
         basePath + "$S2",
         basePath + "$S3",
         basePath + "$S4",
+        basePath + "$S5",
+        basePath + "$S6",
+        basePath + "$S6Sub1",
+        basePath + "$S6Sub2",
         basePath + "$S1Sub1",
         basePath + "$M1",
         basePath + "$I1",
@@ -52,6 +56,7 @@ public class JandexClassInventoryTest {
     expected.add(org.eclipse.scout.rt.platform.inventory.internal.fixture.TestingBean.class);
     expected.add(org.eclipse.scout.rt.platform.inventory.internal.fixture.TestingBean.S1.class);
     expected.add(org.eclipse.scout.rt.platform.inventory.internal.fixture.TestingBean.S1Sub1.class);
+    expected.add(org.eclipse.scout.rt.platform.inventory.internal.fixture.TestingBean.S5.class);
 
     Assert.assertEquals(expected, actual);
   }
