@@ -10,15 +10,29 @@
  ******************************************************************************/
 .proposal-field {
 
-  & input, .input-field {
+  & > input,
+  & > .input-field,
+  & > .field > input,
+  & > .field > .input-field {
     #scout.text-field-with-icon(@icon-pencil);
+  }
+
+  & > .input-field[placeholder]:empty::before {
+    #scout.fake-placeholder();
   }
 }
 
 .smart-field {
 
-  & input, .input-field {
+  & > input,
+  & > .input-field,
+  & > .field > input,
+  & > .field > .input-field {
     #scout.text-field-with-icon(@icon-search);
+  }
+
+  & > .input-field[placeholder]:empty::before {
+    #scout.fake-placeholder();
   }
 
   /* Multiline SmartField */

@@ -78,9 +78,16 @@
     color: @text-field-placeholder-color;
     opacity: 1; /* necessary for firefox */
   }
+
   .placeholder-disabled() {
     /* Fade a little to make it distinguishable from real text. Don't use opacity here because it affects background as well (IE). */
     color: fade(@disabled-color, 70%);
+  }
+
+  .fake-placeholder() {
+    /* placeholder only works for input elements -> this fake placeholder is intended for a before element*/
+    #scout.placeholder();
+    content: attr(placeholder);
   }
 
   .overlay(@left: 0px, @top: 0px, @diffW: 0px, @diffH: 0px) {
