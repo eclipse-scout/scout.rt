@@ -1757,7 +1757,7 @@ describe("Tree", function() {
           if (node.level === 0) {
             return true;
           } else {
-            return node.text.startsWith('A');
+            return scout.strings.startsWith(node.text, 'A');
           }
         }
       };
@@ -1766,7 +1766,7 @@ describe("Tree", function() {
           if (node.level === 0) {
             return true;
           } else {
-            return node.text.startsWith('B') || node.text === 'A+B';
+            return scout.strings.startsWith(node.text, 'B') || node.text === 'A+B';
           }
         }
       };
