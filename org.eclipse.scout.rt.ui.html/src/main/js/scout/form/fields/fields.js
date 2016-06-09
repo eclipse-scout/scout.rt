@@ -68,7 +68,7 @@ scout.fields = {
   // however, the DIV element used in touch-mode does process the event anyway, that's
   // why this check is required.
   handleOnClick: function(field) {
-    return field.enabled && !field.embedded && !field._popup.isOpen();
+    return field.enabled && !field.embedded && !field.popup;
   }
 
 };

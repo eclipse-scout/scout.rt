@@ -10,7 +10,7 @@
  ******************************************************************************/
 scout.Action = function() {
   scout.Action.parent.call(this);
-  this._addModelProperties(['text', 'iconId', 'tooltipText', 'keyStroke', 'enabled', 'selected', 'visible', 'tabbable', 'cssClass']);
+  this._addModelProperties(['keyStroke', 'tabbable', 'cssClass']);
 
   /**
    * This property decides whether or not the tabindex attribute is set in the DOM.

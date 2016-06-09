@@ -51,7 +51,6 @@ describe('SmartField', function() {
     it('calls _openProposal() when a character key has been pressed', function() {
       smartField.render(session.$entryPoint);
       smartField._browseOnce = true;
-      smartField._popup = {};
       smartField._openProposal = function(displayText, selectCurrentValue) {};
       var event = {
         which: scout.keys.A
@@ -171,16 +170,16 @@ describe('SmartField', function() {
       smartField.onModelPropertyChange(createPropertyChangeEvent(smartField, {
         proposalChooser: proposalChooser.id
       }));
-      expect(smartField._popup.rendered).toBe(true);
-      expect(smartField._popup._$widgetContainer.has(smartField.proposalChooser.$container));
+      expect(smartField.popup.rendered).toBe(true);
+      expect(smartField.popup._$widgetContainer.has(smartField.proposalChooser.$container));
       expect($('.touch-popup').length).toBe(1);
       expect($('.smart-field-popup').length).toBe(0);
 
-      smartField._popup.close();
+      smartField.popup.close();
       smartField.onModelPropertyChange(createPropertyChangeEvent(smartField, {
         proposalChooser: null
       }));
-      expect(smartField._popup.rendered).toBe(false);
+      expect(smartField.popup).toBe(null);
       expect($('.touch-popup').length).toBe(0);
       expect($('.smart-field-popup').length).toBe(0);
 
@@ -189,23 +188,36 @@ describe('SmartField', function() {
       smartField.onModelPropertyChange(createPropertyChangeEvent(smartField, {
         proposalChooser: proposalChooser.id
       }));
-      expect(smartField._popup.rendered).toBe(true);
-      expect(smartField._popup._$widgetContainer.has(smartField.proposalChooser.$container));
+      expect(smartField.popup.rendered).toBe(true);
+      expect(smartField.popup._$widgetContainer.has(smartField.proposalChooser.$container));
       expect($('.touch-popup').length).toBe(1);
       expect($('.smart-field-popup').length).toBe(0);
-      smartField._popup.close();
+      smartField.popup.close();
     });
 
     it('opens a touch popup if there already is a proposal chooser while rendering', function() {
       smartField.proposalChooser = scout.create('Table', {parent: new scout.NullWidget(), session: session, _register: true});
       smartField.touch = true;
       smartField.render(session.$entryPoint);
-      expect(smartField._popup.rendered).toBe(true);
-      expect(smartField._popup._$widgetContainer.has(smartField.proposalChooser.$container));
+      expect(smartField.popup.rendered).toBe(true);
+      expect(smartField.popup._$widgetContainer.has(smartField.proposalChooser.$container));
       expect($('.touch-popup').length).toBe(1);
       expect($('.smart-field-popup').length).toBe(0);
       expect($('.smart-field-popup').length).toBe(0);
-      smartField._popup.close();
+      smartField.popup.close();
+    });
+
+    it('shows smartfield with same text as clicked smartfield', function() {
+      smartField.proposalChooser = scout.create('Table', {parent: new scout.NullWidget(), session: session, _register: true});
+      smartField.touch = true;
+      smartField.displayText = 'row 1';
+      smartField.render(session.$entryPoint);
+
+      smartField.$field.triggerClick();
+      expect(smartField.popup.rendered).toBe(true);
+      expect(smartField.popup._field.displayText).toBe(smartField.displayText);
+      expect(smartField.popup._field.$field.val()).toBe(smartField.displayText);
+      smartField.popup.close();
     });
 
   });

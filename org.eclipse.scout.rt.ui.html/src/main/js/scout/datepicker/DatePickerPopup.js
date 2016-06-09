@@ -28,8 +28,7 @@ scout.DatePickerPopup.prototype._init = function(options) {
 scout.DatePickerPopup.prototype._render = function($parent) {
   this.picker.render($parent);
   this.$container = this.picker.$container;
-  this.$container
-    .addClass('date-picker-popup');
+  this.$container.addClass('date-picker-popup');
   this.htmlComp = this.picker.htmlComp;
   this.htmlComp.validateRoot = true;
 };
