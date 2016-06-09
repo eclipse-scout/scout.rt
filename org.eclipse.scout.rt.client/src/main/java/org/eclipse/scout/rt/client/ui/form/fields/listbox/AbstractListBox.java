@@ -1029,7 +1029,7 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
     }
   }
 
-  private class P_TableRowBuilder extends AbstractTableRowBuilder<KEY> {
+  protected class P_TableRowBuilder extends AbstractTableRowBuilder<KEY> {
 
     @Override
     protected ITableRow createEmptyTableRow() {
