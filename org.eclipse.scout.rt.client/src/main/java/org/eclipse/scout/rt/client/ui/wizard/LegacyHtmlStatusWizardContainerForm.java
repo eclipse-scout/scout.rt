@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.wizard;
 
-import org.eclipse.scout.rt.client.ui.action.keystroke.AbstractKeyStroke;
+import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
@@ -258,6 +258,11 @@ public class LegacyHtmlStatusWizardContainerForm extends AbstractWizardContainer
       }
 
       @Override
+      protected String getConfiguredKeyStroke() {
+        return IKeyStroke.ENTER;
+      }
+
+      @Override
       protected void execClickAction() {
         getWizard().doNextStep();
       }
@@ -274,6 +279,11 @@ public class LegacyHtmlStatusWizardContainerForm extends AbstractWizardContainer
       @Override
       protected int getConfiguredHorizontalAlignment() {
         return 1;
+      }
+
+      @Override
+      protected String getConfiguredKeyStroke() {
+        return IKeyStroke.ENTER;
       }
 
       @Override
@@ -301,6 +311,11 @@ public class LegacyHtmlStatusWizardContainerForm extends AbstractWizardContainer
       }
 
       @Override
+      protected String getConfiguredKeyStroke() {
+        return IKeyStroke.ESCAPE;
+      }
+
+      @Override
       protected void execClickAction() {
         getWizard().doCancel();
       }
@@ -322,6 +337,11 @@ public class LegacyHtmlStatusWizardContainerForm extends AbstractWizardContainer
       @Override
       protected int getConfiguredHorizontalAlignment() {
         return -1;
+      }
+
+      @Override
+      protected String getConfiguredKeyStroke() {
+        return IKeyStroke.ESCAPE;
       }
 
       @Override
@@ -351,32 +371,6 @@ public class LegacyHtmlStatusWizardContainerForm extends AbstractWizardContainer
       @Override
       protected void execClickAction() {
         getWizard().doReset();
-      }
-    }
-
-    public class EnterKeyStroke extends AbstractKeyStroke {
-
-      @Override
-      protected String getConfiguredKeyStroke() {
-        return "enter";
-      }
-
-      @Override
-      protected void execAction() {
-        handleEnterKey();
-      }
-    }
-
-    public class EscapeKeyStroke extends AbstractKeyStroke {
-
-      @Override
-      protected String getConfiguredKeyStroke() {
-        return "escape";
-      }
-
-      @Override
-      protected void execAction() {
-        handleEscapeKey(false);
       }
     }
   }

@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.wizard;
 
-import org.eclipse.scout.rt.client.ui.action.keystroke.AbstractKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
 import org.eclipse.scout.rt.client.ui.form.IForm;
@@ -20,7 +19,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.wizard.AbstractWizardProgressF
 import org.eclipse.scout.rt.client.ui.form.fields.wrappedform.AbstractWrappedFormField;
 import org.eclipse.scout.rt.client.ui.wizard.DefaultWizardContainerForm.MainBox.ContentBox;
 import org.eclipse.scout.rt.client.ui.wizard.DefaultWizardContainerForm.MainBox.ContentBox.WrappedWizardForm;
-import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.client.ui.wizard.DefaultWizardContainerForm.MainBox.WizardCancelButton;
 import org.eclipse.scout.rt.client.ui.wizard.DefaultWizardContainerForm.MainBox.WizardFinishButton;
 import org.eclipse.scout.rt.client.ui.wizard.DefaultWizardContainerForm.MainBox.WizardNextStepButton;
@@ -28,6 +26,7 @@ import org.eclipse.scout.rt.client.ui.wizard.DefaultWizardContainerForm.MainBox.
 import org.eclipse.scout.rt.client.ui.wizard.DefaultWizardContainerForm.MainBox.WizardProgressField;
 import org.eclipse.scout.rt.client.ui.wizard.DefaultWizardContainerForm.MainBox.WizardResetButton;
 import org.eclipse.scout.rt.client.ui.wizard.DefaultWizardContainerForm.MainBox.WizardSuspendButton;
+import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 
 /**
@@ -221,6 +220,11 @@ public class DefaultWizardContainerForm extends AbstractWizardContainerForm {
       }
 
       @Override
+      protected String getConfiguredKeyStroke() {
+        return IKeyStroke.ESCAPE;
+      }
+
+      @Override
       protected void execClickAction() {
         getWizard().doCancel();
       }
@@ -237,6 +241,11 @@ public class DefaultWizardContainerForm extends AbstractWizardContainerForm {
       @Override
       protected boolean getConfiguredVisible() {
         return false;
+      }
+
+      @Override
+      protected String getConfiguredKeyStroke() {
+        return IKeyStroke.ESCAPE;
       }
 
       @Override
@@ -261,32 +270,6 @@ public class DefaultWizardContainerForm extends AbstractWizardContainerForm {
       @Override
       protected void execClickAction() {
         getWizard().doReset();
-      }
-    }
-
-    public class EnterKeyStroke extends AbstractKeyStroke {
-
-      @Override
-      protected String getConfiguredKeyStroke() {
-        return "enter";
-      }
-
-      @Override
-      protected void execAction() {
-        handleEnterKey();
-      }
-    }
-
-    public class EscapeKeyStroke extends AbstractKeyStroke {
-
-      @Override
-      protected String getConfiguredKeyStroke() {
-        return "escape";
-      }
-
-      @Override
-      protected void execAction() {
-        handleEscapeKey(false);
       }
     }
   }
