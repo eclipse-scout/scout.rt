@@ -436,6 +436,20 @@ public class VirtualTreeNode implements IVirtualTreeNode, ICellObserver {
   }
 
   @Override
+  public boolean containsChildNode(ITreeNode node, boolean recursive) {
+    if (equals(node)) {
+      return true;
+    }
+    if (recursive) {
+      final ITreeNode resolvedNode = getResolvedNode();
+      if (resolvedNode != null) {
+        return resolvedNode.containsChildNode(node, recursive);
+      }
+    }
+    return false;
+  }
+
+  @Override
   public ITreeNode findParentNode(Class interfaceType) {
     ITreeNode test = getParentNode();
     while (test != null) {

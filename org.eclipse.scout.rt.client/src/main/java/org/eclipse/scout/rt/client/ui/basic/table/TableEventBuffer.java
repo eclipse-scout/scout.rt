@@ -572,7 +572,7 @@ public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
     }
 
     /**
-     * Adds rows and columns. Using this method after invoking {@link #merge(TableEvent)} throws an
+     * Merges rows and columns. Using this method after invoking {@link #complete()} throws an
      * {@link IllegalStateException}.
      */
     public void merge(TableEvent event) {

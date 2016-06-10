@@ -35,6 +35,7 @@ import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.CompareUtility;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 import org.eclipse.scout.rt.platform.util.concurrent.OptimisticLock;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
@@ -875,6 +876,25 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
     synchronized (m_childNodeListLock) {
       return CollectionUtility.arrayList(m_childNodeList);
     }
+  }
+
+  @Override
+  public boolean containsChildNode(final ITreeNode node, final boolean recursive) {
+    synchronized (m_childNodeList) {
+      for (ITreeNode childNode : m_childNodeList) {
+        if (CompareUtility.equals(childNode, node)) {
+          return true;
+        }
+      }
+      if (recursive) {
+        for (ITreeNode childNode : m_childNodeList) {
+          if (childNode.containsChildNode(node, recursive)) {
+            return true;
+          }
+        }
+      }
+    }
+    return false;
   }
 
   @Override

@@ -11,8 +11,10 @@
 package org.eclipse.scout.rt.client.ui.basic.tree;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -21,11 +23,12 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
-
 import org.junit.Before;
 import org.junit.Test;
 
@@ -96,11 +99,11 @@ public class TreeEventBufferTest {
     final List<TreeEvent> coalesced = m_testBuffer.consumeAndCoalesceEvents();
     assertEquals(3, coalesced.size());
     assertEquals(TreeEvent.TYPE_NODES_UPDATED, coalesced.get(0).getType());
-    assertEquals(3, coalesced.get(0).getNodes().size());
+    assertEquals(3, coalesced.get(0).getNodeCount());
     assertEquals(TreeEvent.TYPE_CHILD_NODE_ORDER_CHANGED, coalesced.get(1).getType());
-    assertEquals(3, coalesced.get(1).getNodes().size());
+    assertEquals(3, coalesced.get(1).getNodeCount());
     assertEquals(TreeEvent.TYPE_NODES_UPDATED, coalesced.get(2).getType());
-    assertEquals(4, coalesced.get(2).getNodes().size());
+    assertEquals(4, coalesced.get(2).getNodeCount());
   }
 
   /**
@@ -137,7 +140,7 @@ public class TreeEventBufferTest {
     final List<TreeEvent> coalesced = m_testBuffer.consumeAndCoalesceEvents();
     assertEquals(2, coalesced.size());
     assertEquals(TreeEvent.TYPE_NODES_INSERTED, coalesced.get(1).getType());
-    assertEquals(1, coalesced.get(1).getNodes().size());
+    assertEquals(1, coalesced.get(1).getNodeCount());
   }
 
   /**
@@ -166,21 +169,21 @@ public class TreeEventBufferTest {
     final List<TreeEvent> coalesced = m_testBuffer.consumeAndCoalesceEvents();
     assertEquals(8, coalesced.size());
     assertEquals(TreeEvent.TYPE_NODE_CHANGED, coalesced.get(0).getType());
-    assertEquals(1, coalesced.get(0).getNodes().size());
+    assertEquals(1, coalesced.get(0).getNodeCount());
     assertEquals(TreeEvent.TYPE_NODE_CHANGED, coalesced.get(1).getType());
-    assertEquals(1, coalesced.get(1).getNodes().size());
+    assertEquals(1, coalesced.get(1).getNodeCount());
     assertEquals(TreeEvent.TYPE_NODE_CHANGED, coalesced.get(2).getType());
-    assertEquals(1, coalesced.get(2).getNodes().size());
+    assertEquals(1, coalesced.get(2).getNodeCount());
     assertEquals(TreeEvent.TYPE_CHILD_NODE_ORDER_CHANGED, coalesced.get(3).getType());
-    assertEquals(3, coalesced.get(3).getNodes().size());
+    assertEquals(3, coalesced.get(3).getNodeCount());
     assertEquals(TreeEvent.TYPE_NODE_CHANGED, coalesced.get(4).getType());
-    assertEquals(1, coalesced.get(4).getNodes().size());
+    assertEquals(1, coalesced.get(4).getNodeCount());
     assertEquals(TreeEvent.TYPE_NODE_CHANGED, coalesced.get(5).getType());
-    assertEquals(1, coalesced.get(5).getNodes().size());
+    assertEquals(1, coalesced.get(5).getNodeCount());
     assertEquals(TreeEvent.TYPE_NODE_CHANGED, coalesced.get(6).getType());
-    assertEquals(1, coalesced.get(6).getNodes().size());
+    assertEquals(1, coalesced.get(6).getNodeCount());
     assertEquals(TreeEvent.TYPE_NODE_CHANGED, coalesced.get(7).getType());
-    assertEquals(1, coalesced.get(7).getNodes().size());
+    assertEquals(1, coalesced.get(7).getNodeCount());
   }
 
   /**
@@ -199,11 +202,11 @@ public class TreeEventBufferTest {
     final List<TreeEvent> coalesced = m_testBuffer.consumeAndCoalesceEvents();
     assertEquals(3, coalesced.size());
     assertEquals(TreeEvent.TYPE_NODES_INSERTED, coalesced.get(0).getType());
-    assertEquals(3, coalesced.get(0).getNodes().size());
+    assertEquals(3, coalesced.get(0).getNodeCount());
     assertEquals(TreeEvent.TYPE_CHILD_NODE_ORDER_CHANGED, coalesced.get(1).getType());
-    assertEquals(3, coalesced.get(1).getNodes().size());
+    assertEquals(3, coalesced.get(1).getNodeCount());
     assertEquals(TreeEvent.TYPE_NODES_UPDATED, coalesced.get(2).getType());
-    assertEquals(1, coalesced.get(2).getNodes().size());
+    assertEquals(1, coalesced.get(2).getNodeCount());
   }
 
   /**
@@ -222,7 +225,7 @@ public class TreeEventBufferTest {
     final List<TreeEvent> coalesced = m_testBuffer.consumeAndCoalesceEvents();
     assertEquals(1, coalesced.size());
     assertEquals(TreeEvent.TYPE_NODES_DELETED, coalesced.get(0).getType());
-    assertEquals(1, coalesced.get(0).getNodes().size());
+    assertEquals(1, coalesced.get(0).getNodeCount());
   }
 
   /**
@@ -300,7 +303,7 @@ public class TreeEventBufferTest {
     List<TreeEvent> coalesced = m_testBuffer.consumeAndCoalesceEvents();
     assertEquals(1, coalesced.size()); // 1x NODES_INSERTED
     assertEquals(TreeEvent.TYPE_NODES_INSERTED, coalesced.get(0).getType());
-    assertEquals(3, coalesced.get(0).getNodes().size());
+    assertEquals(3, coalesced.get(0).getNodeCount());
 
     // --- Test case 2: NODES_DELETED --------------------------------
 
@@ -316,7 +319,7 @@ public class TreeEventBufferTest {
     coalesced = m_testBuffer.consumeAndCoalesceEvents();
     assertEquals(1, coalesced.size()); // 1x NODES_INSERTED
     assertEquals(TreeEvent.TYPE_NODES_INSERTED, coalesced.get(0).getType());
-    assertEquals(3, coalesced.get(0).getNodes().size());
+    assertEquals(3, coalesced.get(0).getNodeCount());
   }
 
   /**
@@ -550,21 +553,21 @@ public class TreeEventBufferTest {
 
     assertType(TreeEvent.TYPE_NODES_CHECKED, coalesced, 0);
     assertEquals(nodeA, coalesced.get(0).getCommonParentNode());
-    assertEquals(1, coalesced.get(0).getNodes().size());
+    assertEquals(1, coalesced.get(0).getNodeCount());
 
     assertType(TreeEvent.TYPE_NODES_UPDATED, coalesced, 1);
 
     assertType(TreeEvent.TYPE_NODES_CHECKED, coalesced, 2);
     assertEquals(nodeB, coalesced.get(2).getCommonParentNode());
-    assertEquals(1, coalesced.get(2).getNodes().size());
+    assertEquals(1, coalesced.get(2).getNodeCount());
 
     assertType(TreeEvent.TYPE_NODES_CHECKED, coalesced, 3);
     assertEquals(nodeC, coalesced.get(3).getCommonParentNode());
-    assertEquals(1, coalesced.get(3).getNodes().size());
+    assertEquals(1, coalesced.get(3).getNodeCount());
 
     assertType(TreeEvent.TYPE_NODES_CHECKED, coalesced, 4);
     assertEquals(nodeA, coalesced.get(4).getCommonParentNode());
-    assertEquals(2, coalesced.get(4).getNodes().size());
+    assertEquals(2, coalesced.get(4).getNodeCount());
   }
 
   /**
@@ -629,11 +632,197 @@ public class TreeEventBufferTest {
     assertContainsNode(coalesced, 1, nodeA, nodeB);
   }
 
+  @Test
+  public void testCoalesceSameTypeCheckOrderSingleNodeEvents() {
+    ITree tree = mock(ITree.class);
+    final int nodeCount = 10;
+    List<ITreeNode> nodes = new ArrayList<>(nodeCount);
+    LinkedList<TreeEvent> events = new LinkedList<>();
+    for (int i = 0; i < nodeCount; i++) {
+      ITreeNode node = mockNode(String.valueOf(i));
+      nodes.add(node);
+      events.add(new TreeEvent(tree, TreeEvent.TYPE_NODES_INSERTED, Collections.singletonList(node)));
+    }
+
+    assertEquals(nodeCount, events.size());
+    m_testBuffer.coalesceSameType(events);
+
+    assertEquals(1, events.size());
+    assertEquals(nodes, events.get(0).getNodes());
+  }
+
+  @Test
+  public void testCoalesceSameTypeCheckOrderMultipleNodesEvents() {
+    ITree tree = mock(ITree.class);
+    final int nodeCount = 10;
+    List<ITreeNode> nodes = new ArrayList<>(nodeCount);
+    LinkedList<TreeEvent> events = new LinkedList<>();
+    for (int i = 0; i < nodeCount; i++) {
+      ITreeNode node1 = mockNode(String.valueOf(2 * i));
+      ITreeNode node2 = mockNode(String.valueOf(2 * i + 1));
+      nodes.add(node1);
+      nodes.add(node2);
+      events.add(new TreeEvent(tree, TreeEvent.TYPE_NODES_INSERTED, Arrays.asList(node1, node2)));
+    }
+
+    assertEquals(nodeCount, events.size());
+    m_testBuffer.coalesceSameType(events);
+
+    assertEquals(1, events.size());
+    assertEquals(nodes, events.get(0).getNodes());
+  }
+
+  @Test(timeout = 10000)
+  public void testCoalesceSameTypeWithManyInsertEvents() throws Exception {
+    final int eventCount = 10000;
+    ITree tree = mock(ITree.class);
+    ITreeNode parentA = mockNode("parentA");
+    LinkedList<TreeEvent> treeEvents = new LinkedList<>();
+    for (int i = 0; i < eventCount; i++) {
+      treeEvents.add(new TreeEvent(tree, TreeEvent.TYPE_NODES_INSERTED, Collections.singletonList(mockNode(String.valueOf(i), parentA))));
+    }
+
+    assertEquals(eventCount, treeEvents.size());
+    m_testBuffer.coalesceSameType(treeEvents);
+    assertEquals(1, treeEvents.size());
+    assertEquals(eventCount, CollectionUtility.firstElement(treeEvents).getNodeCount());
+  }
+
+  @Test(timeout = 10000)
+  public void testCoalesceSameTypeWithManyInsertHavingDifferentParentsEvents() throws Exception {
+    final int eventCount = 10000;
+    ITree tree = mock(ITree.class);
+    LinkedList<TreeEvent> treeEvents = new LinkedList<>();
+    ITreeNode parentA = mockNode("parentA");
+    ITreeNode parentB = mockNode("parentB");
+    for (int i = 0; i < eventCount; i++) {
+      treeEvents.add(new TreeEvent(tree, TreeEvent.TYPE_NODES_INSERTED, Collections.singletonList(mockNode(String.valueOf(2 * i), parentA))));
+      treeEvents.add(new TreeEvent(tree, TreeEvent.TYPE_NODES_INSERTED, Collections.singletonList(mockNode(String.valueOf(2 * i + 1), parentB))));
+    }
+
+    assertEquals(2 * eventCount, treeEvents.size());
+    m_testBuffer.coalesceSameType(treeEvents);
+    assertEquals(2, treeEvents.size());
+
+    TreeEvent firstEvent = treeEvents.get(0);
+    TreeEvent secondEvent = treeEvents.get(1);
+    assertEquals(eventCount, firstEvent.getNodeCount());
+    assertEquals(eventCount, secondEvent.getNodeCount());
+
+    assertSame(parentA, firstEvent.getCommonParentNode());
+    assertSame(parentB, secondEvent.getCommonParentNode());
+  }
+
+  @Test(timeout = 10000)
+  public void testCoalesceSameTypeWithManyInsertUpdateEvents() throws Exception {
+    final int eventCount = 10000;
+    ITree tree = mock(ITree.class);
+    LinkedList<TreeEvent> treeEvents = new LinkedList<>();
+    ITreeNode parentA = mockNode("parentA");
+    for (int i = 0; i < eventCount; i++) {
+      ITreeNode node = mockNode(String.valueOf(i), parentA);
+      treeEvents.add(new TreeEvent(tree, TreeEvent.TYPE_NODES_INSERTED, Collections.singletonList(node)));
+      treeEvents.add(new TreeEvent(tree, TreeEvent.TYPE_NODES_UPDATED, Collections.singletonList(node)));
+    }
+
+    assertEquals(2 * eventCount, treeEvents.size());
+    m_testBuffer.coalesceSameType(treeEvents);
+    assertEquals(2 * eventCount, treeEvents.size());
+  }
+
+  @Test(timeout = 10000)
+  public void testCoalesceSameTypeWithManyInsertInsertUpdateUpdateEvents() throws Exception {
+    final int eventCount = 10000;
+    ITree tree = mock(ITree.class);
+    LinkedList<TreeEvent> treeEvents = new LinkedList<>();
+    ITreeNode parentA = mockNode("parentA");
+    for (int i = 0; i < eventCount; i++) {
+      ITreeNode node1 = mockNode(String.valueOf(2 * i), parentA);
+      ITreeNode node2 = mockNode(String.valueOf(2 * i + 1), parentA);
+      treeEvents.add(new TreeEvent(tree, TreeEvent.TYPE_NODES_INSERTED, Collections.singletonList(node1)));
+      treeEvents.add(new TreeEvent(tree, TreeEvent.TYPE_NODES_INSERTED, Collections.singletonList(node2)));
+      treeEvents.add(new TreeEvent(tree, TreeEvent.TYPE_NODES_UPDATED, Collections.singletonList(node1)));
+      treeEvents.add(new TreeEvent(tree, TreeEvent.TYPE_NODES_UPDATED, Collections.singletonList(node2)));
+    }
+
+    assertEquals(4 * eventCount, treeEvents.size());
+    m_testBuffer.coalesceSameType(treeEvents);
+    assertEquals(2 * eventCount, treeEvents.size());
+  }
+
+  @Test(expected = AssertionException.class)
+  public void testTreeEventMergerNullInitilaEvent() {
+    new TreeEventBuffer.TreeEventMerger(null);
+  }
+
+  @Test
+  public void testTreeEventMerger() {
+    ITree tree = mock(ITree.class);
+    ITreeNode nodeA = mockNode("a");
+    ITreeNode nodeB = mockNode("b");
+    TreeEvent initialEvent = new TreeEvent(tree, TreeEvent.TYPE_NODE_CHANGED, Arrays.asList(nodeA, nodeB));
+    TreeEventBuffer.TreeEventMerger eventMerger = new TreeEventBuffer.TreeEventMerger(initialEvent);
+
+    // add first event
+    ITreeNode nodeC = mockNode("c");
+    TreeEvent e1 = new TreeEvent(tree, TreeEvent.TYPE_NODE_CHANGED, Arrays.asList(nodeA, nodeB, nodeC));
+    eventMerger.merge(e1);
+
+    // add second, empty event
+    TreeEvent e2 = new TreeEvent(tree, TreeEvent.TYPE_NODE_CHANGED);
+    eventMerger.merge(e2);
+
+    // add third event
+    ITreeNode nodeD = mockNode("d");
+    ITreeNode nodeE = mockNode("e");
+    TreeEvent e3 = new TreeEvent(tree, TreeEvent.TYPE_NODE_CHANGED, Arrays.asList(nodeD, nodeE));
+    eventMerger.merge(e3);
+
+    eventMerger.complete();
+    assertEquals(Arrays.asList(nodeD, nodeE, nodeC, nodeA, nodeB), initialEvent.getNodes());
+    assertNull(initialEvent.getCommonParentNode());
+
+    // invoke complete a second time has no effect
+    eventMerger.complete();
+    assertEquals(Arrays.asList(nodeD, nodeE, nodeC, nodeA, nodeB), initialEvent.getNodes());
+    assertNull(initialEvent.getCommonParentNode());
+  }
+
+  @Test
+  public void testTableEventMergerCompleteWithoutMerge() {
+    ITree tree = mock(ITree.class);
+    ITreeNode nodeA = mockNode("a");
+    ITreeNode nodeB = mockNode("b");
+    TreeEvent initialEvent = new TreeEvent(tree, TreeEvent.TYPE_NODE_CHANGED, Arrays.asList(nodeA, nodeB));
+    TreeEventBuffer.TreeEventMerger eventMerger = new TreeEventBuffer.TreeEventMerger(initialEvent);
+
+    eventMerger.complete();
+
+    assertEquals(Arrays.asList(nodeA, nodeB), initialEvent.getNodes());
+    assertNull(initialEvent.getCommonParentNode());
+  }
+
+  @Test
+  public void testTableEventMergerMergeAfterComplete() {
+    ITree tree = mock(ITree.class);
+    TreeEvent initialEvent = new TreeEvent(tree, TreeEvent.TYPE_NODE_CHANGED, mockNodes("a", "b"));
+    TreeEventBuffer.TreeEventMerger eventMerger = new TreeEventBuffer.TreeEventMerger(initialEvent);
+    eventMerger.complete();
+
+    TreeEvent e1 = new TreeEvent(tree, TreeEvent.TYPE_NODE_CHANGED, mockNodes("c", "d"));
+    try {
+      eventMerger.merge(e1);
+      fail("merge after complete must throw an " + IllegalStateException.class.getSimpleName());
+    }
+    catch (IllegalStateException epxected) {
+    }
+  }
+
   private void assertContainsNode(List<TreeEvent> events, int index, ITreeNode... expectedNodes) {
     TreeEvent event = events.get(index);
-    assertEquals(expectedNodes.length, event.getNodes().size());
+    assertEquals(expectedNodes.length, event.getNodeCount());
     for (ITreeNode node : expectedNodes) {
-      assertTrue(event.getNodes().contains(node));
+      assertTrue(event.containsNode(node));
     }
   }
 
@@ -681,6 +870,10 @@ public class TreeEventBufferTest {
   }
 
   private ITreeNode mockNode(String nodeId) {
+    return mockNode(nodeId, null);
+  }
+
+  private ITreeNode mockNode(String nodeId, ITreeNode parentNode) {
     ITreeNode node = m_mockNodes.get(nodeId);
     if (node != null) {
       return node;
@@ -688,6 +881,7 @@ public class TreeEventBufferTest {
     // Create a new
     node = mock(ITreeNode.class, "MockNode[" + nodeId + "]");
     when(node.getNodeId()).thenReturn(nodeId);
+    when(node.getParentNode()).thenReturn(parentNode);
     m_mockNodes.put(nodeId, node);
     return node;
   }
@@ -700,5 +894,4 @@ public class TreeEventBufferTest {
       when(childNode.getParentNode()).thenReturn(node);
     }
   }
-
 }
