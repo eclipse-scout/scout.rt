@@ -8,7 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
- @mobile-popup-title-margin-right: 30px;
+@mobile-popup-title-margin-top: 10px;
+@mobile-popup-title-margin-right: 30px;
 
 .mobile-popup {
   background-color: @background-color;
@@ -33,7 +34,7 @@
   position: absolute;
   width: 100%;
 
-  padding-top: 10px;
+  padding-top: @mobile-popup-title-margin-top;
   padding-left: 20px;
 
   & > .title {
@@ -46,8 +47,8 @@
   & > .closer {
     position: absolute;
     top: 0;
-    right: 5px;
-    padding: 8px;
+    right: 4px;
+    padding: @mobile-popup-title-margin-top;
   }
 
   .mobile-popup.closable > & > .title {
