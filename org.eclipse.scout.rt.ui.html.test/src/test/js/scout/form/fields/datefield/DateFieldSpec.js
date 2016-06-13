@@ -525,6 +525,22 @@ describe("DateField", function() {
         expect(dateField.popup).toBe(null);
       });
 
+      it('unregisters clone after close', function() {
+        var model = createModel();
+        model.touch = true;
+        var dateField = createField(model);
+        dateField.render(session.$entryPoint);
+
+        dateField.$dateField.triggerClick();
+        expect(dateField.popup.rendered).toBe(true);
+
+        // Popup creates a clone -> validate that it will be unregistered when popup closes
+        expect(session._clonedModelAdapterRegistry[dateField.id][0]).toBe(dateField.popup._field);
+        dateField.popup.close();
+        expect(dateField.popup).toBe(null);
+        expect(session._clonedModelAdapterRegistry[dateField.id].length).toBe(0);
+      });
+
       it('updates displayText and timestamp of datefield if date in picker is selected', function() {
         var model = createModel();
         model.touch = true;
@@ -654,6 +670,7 @@ describe("DateField", function() {
         expect(dateField.popup.rendered).toBe(true);
         expect(dateField.popup._field.$dateField.val()).toBe(dateField.displayText);
       });
+
     });
   });
 

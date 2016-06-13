@@ -220,6 +220,18 @@ describe('SmartField', function() {
       smartField.popup.close();
     });
 
+    it('properly unregisters the field when the popup gets closed', function() {
+      smartField.proposalChooser = scout.create('Table', {parent: new scout.NullWidget(), session: session, _register: true});
+      smartField.touch = true;
+      smartField.render(session.$entryPoint);
+      expect(smartField.popup.rendered).toBe(true);
+
+      // Popup creates a clone -> validate that it will be unregistered when popup closes
+      expect(session._clonedModelAdapterRegistry[smartField.id][0]).toBe(smartField.popup._field);
+      smartField.popup.close();
+      expect(session._clonedModelAdapterRegistry[smartField.id].length).toBe(0);
+    });
+
   });
 
 

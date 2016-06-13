@@ -84,3 +84,9 @@ scout.TouchPopup.prototype._render = function($parent) {
   this.htmlComp.validateRoot = true;
   this.htmlComp.setLayout(this._createLayout());
 };
+
+scout.TouchPopup.prototype._remove = function() {
+  // Because there is no destroy, we unregister the clone here -> popup cannot be used anymore after it was removed.
+  this.session.unregisterAdapterClone(this._field);
+  scout.TouchPopup.parent.prototype._remove.call(this);
+};
