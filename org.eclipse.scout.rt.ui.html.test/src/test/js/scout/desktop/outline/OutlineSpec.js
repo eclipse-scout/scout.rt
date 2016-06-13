@@ -306,7 +306,7 @@ describe("Outline", function() {
         session._processSuccessResponse(message);
 
         expect(tree._onNodeDeleted.calls.count()).toBe(39);
-        expect(scout.objects.countProperties(tree.nodesMap)).toBe(0);
+        expect(scout.objects.countOwnProperties(tree.nodesMap)).toBe(0);
       });
 
     });

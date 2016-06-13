@@ -168,7 +168,7 @@ describe('ModelAdapter', function() {
 
   describe("init", function() {
 
-    it("check if model properties are copied to adapter", function() {
+    it("copies properties to adapter", function() {
       var model = {
           foo: 6
         },
@@ -178,6 +178,19 @@ describe('ModelAdapter', function() {
       model.session = session;
       adapter.init(model);
       expect(adapter.foo).toBe(6);
+    });
+
+    it("sets default values", function() {
+      // model does not contain a property visible
+      var model = createSimpleModel('Button', session);
+      expect(model.visible).toBe(undefined);
+
+      // because visible is a default property, the property is set on the adapter
+      var adapter = createModelAdapter(model);
+      expect(adapter.visible).toBe(true);
+
+      // verify that the original model is not modified
+      expect(model.visible).toBe(undefined);
     });
 
   });
@@ -250,8 +263,8 @@ describe('ModelAdapter', function() {
     it('fires the expected event object', function() {
       firePropertyChange(false, true);
 
-      expect(scout.objects.countProperties(propertyChangeEvent.oldProperties)).toBe(1);
-      expect(scout.objects.countProperties(propertyChangeEvent.newProperties)).toBe(1);
+      expect(scout.objects.countOwnProperties(propertyChangeEvent.oldProperties)).toBe(1);
+      expect(scout.objects.countOwnProperties(propertyChangeEvent.newProperties)).toBe(1);
       expect(propertyChangeEvent.changedProperties.length).toBe(1);
 
       expect(propertyChangeEvent.oldProperties.selected).toBe(false);
@@ -264,8 +277,8 @@ describe('ModelAdapter', function() {
     // event be fired anyway?
     it('changedProperties is only set when new and old value are not equals', function() {
       firePropertyChange(true, true);
-      expect(scout.objects.countProperties(propertyChangeEvent.oldProperties)).toBe(1);
-      expect(scout.objects.countProperties(propertyChangeEvent.newProperties)).toBe(1);
+      expect(scout.objects.countOwnProperties(propertyChangeEvent.oldProperties)).toBe(1);
+      expect(scout.objects.countOwnProperties(propertyChangeEvent.newProperties)).toBe(1);
       expect(propertyChangeEvent.changedProperties.length).toBe(0);
     });
 
@@ -290,6 +303,15 @@ describe('ModelAdapter', function() {
       });
       // but not the $container property (which has been added later)
       expect(adapterClone.$container).toBe(undefined);
+    });
+
+    it('also considers default properties', function() {
+      // change a default property
+      adapter._setProperty('visible', false);
+
+      // expect that this property is correctly copied to the clone
+      var adapterClone = adapter.cloneAdapter();
+      expect(adapterClone.visible).toBe(false);
     });
 
     it('\'label\' must be recognized as model property, but not \'$container\'', function() {

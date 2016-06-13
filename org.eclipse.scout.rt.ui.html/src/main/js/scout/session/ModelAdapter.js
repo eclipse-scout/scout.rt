@@ -66,6 +66,8 @@ scout.ModelAdapter.prototype._init = function(model) {
     this.remoteHandler = this.session.sendEvent.bind(this.session);
   }
 
+  // Make a copy to prevent a modification of the given object
+  model = $.extend({}, model);
   // Fill in the missing default values (has to before copying the properties, so that modelProperties considers default values as well)
   scout.defaultValues.applyTo(model);
 

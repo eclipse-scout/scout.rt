@@ -12,7 +12,7 @@ describe("scout.objects", function() {
 
   describe("copyProperties", function() {
 
-    it("check if all properties are copied", function() {
+    it("copies all properties", function() {
       var dest = {}, source = {
           foo: 6,
           bar: 7
@@ -22,7 +22,7 @@ describe("scout.objects", function() {
       expect(dest.bar).toBe(7);
     });
 
-    it("check if properties from prototype are copied", function() {
+    it("copies the properties from prototype as well", function() {
       var dest = {};
       var TestConstructor = function() {
         this.foo = 6;
@@ -39,9 +39,9 @@ describe("scout.objects", function() {
 
   });
 
-  describe("countProperties", function() {
+  describe("countOwnProperties", function() {
 
-    it("check if all properties are counted", function() {
+    it("counts all own properties", function() {
       var o = {
           first: 1,
           second: 2
@@ -57,10 +57,10 @@ describe("scout.objects", function() {
       scout.objects.copyProperties(x, y);
       y.qux = 9999;
 
-      expect(scout.objects.countProperties(o)).toBe(2); // first, second
-      expect(scout.objects.countProperties(F)).toBe(1); // myProp
-      expect(scout.objects.countProperties(x)).toBe(2); // foo, bar (but not myProp or anotherProp)
-      expect(scout.objects.countProperties(y)).toBe(4); // foo, bar, anotherProp, qux (because copyProperties also copies properties from prototype)
+      expect(scout.objects.countOwnProperties(o)).toBe(2); // first, second
+      expect(scout.objects.countOwnProperties(F)).toBe(1); // myProp
+      expect(scout.objects.countOwnProperties(x)).toBe(2); // foo, bar (but not myProp or anotherProp)
+      expect(scout.objects.countOwnProperties(y)).toBe(4); // foo, bar, anotherProp, qux (because copyProperties also copies properties from prototype)
     });
 
   });

@@ -11,6 +11,7 @@
 scout.objects = {
 
   /**
+   * Copies all the properties (including the ones from the prototype.) from dest to source
    * @memberOf scout.objects
    */
   copyProperties: function(source, dest) {
@@ -21,9 +22,22 @@ scout.objects = {
   },
 
   /**
+   * Copies the own properties (excluding the ones from the prototype) from dest to source
+   * @memberOf scout.objects
+   */
+  copyOwnProperties: function(source, dest) {
+    var propertyName;
+    for (propertyName in source) {
+      if (source.hasOwnProperty(propertyName)) {
+        dest[propertyName] = source[propertyName];
+      }
+    }
+  },
+
+  /**
    * Counts and returns the properties of a given object.
    */
-  countProperties: function(obj) {
+  countOwnProperties: function(obj) {
     var count = 0;
     for (var prop in obj) {
       if (obj.hasOwnProperty(prop)) {
