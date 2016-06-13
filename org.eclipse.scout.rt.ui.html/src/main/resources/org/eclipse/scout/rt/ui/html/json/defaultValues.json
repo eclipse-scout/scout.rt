@@ -51,7 +51,9 @@
       "iconId": "",
       "tooltipText": "",
       "text": "",
-      "toggleAction": false
+      "cssClass": "",
+      "toggleAction": false,
+      "keyStroke": null
     },
     "Menu": {
       "defaultMenu": false,

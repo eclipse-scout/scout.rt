@@ -42,5 +42,8 @@ scout.FormMenuPopup.prototype._renderHead = function() {
   if (this.formMenu._customCssClasses) {
     this._copyCssClassToHead(this.formMenu._customCssClasses);
   }
+  if (this.formMenu.cssClass) {
+    this._copyCssClassToHead(this.formMenu.cssClass);
+  }
   this._copyCssClassToHead('unfocusable');
 };

@@ -10,7 +10,7 @@
  ******************************************************************************/
 scout.Action = function() {
   scout.Action.parent.call(this);
-  this._addModelProperties(['keyStroke', 'tabbable', 'cssClass']);
+  this._addModelProperties(['tabbable']);
 
   /**
    * This property decides whether or not the tabindex attribute is set in the DOM.
@@ -52,7 +52,7 @@ scout.Action.prototype._renderProperties = function() {
   this._renderVisible();
   this._renderTabbable();
   this._renderCompact();
-  this._renderCssClass(this.cssClass);
+  this._renderCssClass();
 };
 
 scout.Action.prototype._remove = function() {
@@ -137,7 +137,9 @@ scout.Action.prototype._renderHorizontalAlignment = function() {
 };
 
 scout.Action.prototype._renderCssClass = function(cssClass, oldCssClass) {
-  this.$container.removeClass(oldCssClass).addClass(cssClass);
+  cssClass = cssClass || this.cssClass;
+  this.$container.removeClass(oldCssClass)
+    .addClass(cssClass);
 };
 
 
