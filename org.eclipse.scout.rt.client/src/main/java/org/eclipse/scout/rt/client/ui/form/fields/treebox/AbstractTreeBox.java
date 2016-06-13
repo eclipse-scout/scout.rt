@@ -1083,7 +1083,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
   /**
    * TreeNode implementation with delegation of loadChildren to this.loadChildNodes()
    */
-  private class P_InternalTreeNode extends AbstractTreeNode {
+  protected class P_InternalTreeNode extends AbstractTreeNode {
     private boolean m_active;
 
     public boolean isActive() {
@@ -1105,7 +1105,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
     }
   }
 
-  private class P_TreeNodeBuilder extends AbstractTreeNodeBuilder<T> {
+  protected class P_TreeNodeBuilder extends AbstractTreeNodeBuilder<T> {
 
     @Override
     protected ITreeNode createEmptyTreeNode() {
