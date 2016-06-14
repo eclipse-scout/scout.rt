@@ -40,12 +40,6 @@ public interface ILookupRow<KEY_TYPE> extends Serializable {
   ILookupRow<KEY_TYPE> withText(String text);
 
   /**
-   * @deprecated use {@link #withText(String)}. will be removed in version 6.1.
-   */
-  @Deprecated
-  void setText(String text);
-
-  /**
    * @return iconId
    */
   String getIconId();
@@ -54,12 +48,6 @@ public interface ILookupRow<KEY_TYPE> extends Serializable {
    * @return {@link ILookupRow} with given icon id
    */
   ILookupRow<KEY_TYPE> withIconId(String iconId);
-
-  /**
-   * @deprecated use {@link #withIconId(String)}. will be removed in version 6.1.
-   */
-  @Deprecated
-  void setIconId(String iconId);
 
   /**
    * @return tooltipText
@@ -72,12 +60,6 @@ public interface ILookupRow<KEY_TYPE> extends Serializable {
   ILookupRow<KEY_TYPE> withTooltipText(String tooltipText);
 
   /**
-   * @deprecated use {@link #withTooltipText(String)}. will be removed in version 6.1.
-   */
-  @Deprecated
-  void setTooltipText(String tooltipText);
-
-  /**
    * @return foregroundColor
    */
   String getForegroundColor();
@@ -86,12 +68,6 @@ public interface ILookupRow<KEY_TYPE> extends Serializable {
    * @return {@link ILookupRow} with given foregroundColor
    */
   ILookupRow<KEY_TYPE> withForegroundColor(String foregroundColor);
-
-  /**
-   * @deprecated use {@link #withForegroundColor(String)}. will be removed in version 6.1.
-   */
-  @Deprecated
-  void setForegroundColor(String foregroundColor);
 
   /**
    * @return backgroundColor
@@ -104,12 +80,6 @@ public interface ILookupRow<KEY_TYPE> extends Serializable {
   ILookupRow<KEY_TYPE> withBackgroundColor(String backgroundColor);
 
   /**
-   * @deprecated use {@link #withBackgroundColor(String)}. will be removed in version 6.1.
-   */
-  @Deprecated
-  void setBackgroundColor(String backgroundColor);
-
-  /**
    * @return font
    */
   FontSpec getFont();
@@ -118,12 +88,6 @@ public interface ILookupRow<KEY_TYPE> extends Serializable {
    * @return {@link ILookupRow} with given font
    */
   ILookupRow<KEY_TYPE> withFont(FontSpec font);
-
-  /**
-   * @deprecated use {@link #withFont(FontSpec)}. will be removed in version 6.1.
-   */
-  @Deprecated
-  void setFont(FontSpec font);
 
   /**
    * @return css class
@@ -146,12 +110,6 @@ public interface ILookupRow<KEY_TYPE> extends Serializable {
   ILookupRow<KEY_TYPE> withActive(boolean active);
 
   /**
-   * @deprecated use {@link #withActive(active)}. will be removed in version 6.1.
-   */
-  @Deprecated
-  void setActive(boolean active);
-
-  /**
    * @return enabled
    */
   boolean isEnabled();
@@ -160,12 +118,6 @@ public interface ILookupRow<KEY_TYPE> extends Serializable {
    * @return {@link ILookupRow} with enabled set to the given value.
    */
   ILookupRow<KEY_TYPE> withEnabled(boolean enabled);
-
-  /**
-   * @deprecated use {@link #withEnabled(boolean)}. will be removed in version 6.1.
-   */
-  @Deprecated
-  void setEnabled(boolean enabled);
 
   /**
    * @return parentKey
@@ -178,12 +130,6 @@ public interface ILookupRow<KEY_TYPE> extends Serializable {
   ILookupRow<KEY_TYPE> withParentKey(KEY_TYPE parentKey);
 
   /**
-   * @deprecated use {@link #withParentKey(Object)}. will be removed in version 6.1.
-   */
-  @Deprecated
-  void setParentKey(KEY_TYPE parentKey);
-
-  /**
    * Some additional data associated with this row.
    */
   AbstractTableRowData getAdditionalTableRowData();
@@ -194,9 +140,9 @@ public interface ILookupRow<KEY_TYPE> extends Serializable {
   ILookupRow<KEY_TYPE> withAdditionalTableRowData(AbstractTableRowData bean);
 
   /**
-   * @deprecated use {@link #withAdditionalTableRowData(AbstractTableRowData)}. will be removed in version 6.1.
+   * @param key
+   * @return This {@link ILookupRow} with given key set.
    */
-  @Deprecated
-  void setAdditionalTableRowData(AbstractTableRowData bean);
+  ILookupRow<KEY_TYPE> withKey(KEY_TYPE key);
 
 }

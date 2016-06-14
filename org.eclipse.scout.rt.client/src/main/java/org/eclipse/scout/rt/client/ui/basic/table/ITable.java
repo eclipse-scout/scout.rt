@@ -344,15 +344,6 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
    */
   void updateTable(AbstractTableFieldData source);
 
-  /**
-   * Convenience to find a menu, uses {@link org.eclipse.scout.rt.client.ui.action.ActionFinder ActionFinder}
-   *
-   * @deprecated Use {@link #getMenuByClass(Class)} instead. This method is error-prone, because it does not throw an
-   *             exception if the given menu type is ambiguous. It will be removed in Scout 6.1
-   */
-  @Deprecated
-  <T extends IMenu> T getMenu(Class<T> menuType);
-
   List<IKeyStroke> getKeyStrokes();
 
   void setKeyStrokes(List<? extends IKeyStroke> keyStrokes);

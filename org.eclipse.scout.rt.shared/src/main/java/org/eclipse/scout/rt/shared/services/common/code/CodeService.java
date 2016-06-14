@@ -15,7 +15,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -38,7 +37,6 @@ import org.eclipse.scout.rt.shared.cache.AbstractCacheValueResolver;
 import org.eclipse.scout.rt.shared.cache.ICache;
 import org.eclipse.scout.rt.shared.cache.ICacheBuilder;
 import org.eclipse.scout.rt.shared.cache.ICacheValueResolver;
-import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 
 /**
  * Common logic for the {@link ICodeService} implementations. Uses {@link ICache} for caching.
@@ -253,20 +251,6 @@ public class CodeService implements ICodeService {
     return getCodeTypes(types);
   }
 
-  @SuppressWarnings("deprecation")
-  @Deprecated
-  @Override
-  public Set<Class<? extends ICodeType<?, ?>>> getAllCodeTypeClasses(String classPrefix) {
-    final Set<Class<? extends ICodeType<?, ?>>> filteredClasses = new LinkedHashSet<>();
-    final Collection<Class<? extends ICodeType<?, ?>>> classes = getAllCodeTypeClasses();
-    for (Class<? extends ICodeType<?, ?>> c : classes) {
-      if (c.getName().startsWith(classPrefix)) {
-        filteredClasses.add(c);
-      }
-    }
-    return filteredClasses;
-  }
-
   @Override
   public Set<Class<? extends ICodeType<?, ?>>> getAllCodeTypeClasses() {
     return BEANS.get(CodeTypeClassInventory.class).getClasses();
@@ -275,16 +259,6 @@ public class CodeService implements ICodeService {
   @Override
   public List<ICodeType<?, ?>> getAllCodeTypes() {
     Set<Class<? extends ICodeType<?, ?>>> allCodeTypeClasses = getAllCodeTypeClasses();
-    List<Class<? extends ICodeType<?, ?>>> list = CollectionUtility.arrayList(allCodeTypeClasses);
-    return getCodeTypes(list);
-  }
-
-  @SuppressWarnings("deprecation")
-  @Override
-  @RemoteServiceAccessDenied
-  @Deprecated
-  public List<ICodeType<?, ?>> getAllCodeTypes(String classPrefix) {
-    Set<Class<? extends ICodeType<?, ?>>> allCodeTypeClasses = getAllCodeTypeClasses(classPrefix);
     List<Class<? extends ICodeType<?, ?>>> list = CollectionUtility.arrayList(allCodeTypeClasses);
     return getCodeTypes(list);
   }

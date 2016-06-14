@@ -15,7 +15,6 @@ import java.util.Collection;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
-import org.eclipse.scout.rt.client.ui.action.tool.IToolButton;
 import org.eclipse.scout.rt.client.ui.action.view.IViewButton;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
@@ -35,7 +34,6 @@ import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
  * <li>actions (menu, keyStroke, toolButton, viewButton)</li>
  * </ul>
  */
-@SuppressWarnings("deprecation")
 @Bean
 public interface IDesktopExtension {
 
@@ -188,8 +186,7 @@ public interface IDesktopExtension {
 
   /**
    * Adds the actions configured with this extension to the {@code actions} collection. This is a live list of
-   * contributed actions ({@link IMenu}, {@link IKeyStroke}, {@link IToolButton}, {@link IViewButton}). They are NOT yet
-   * initialized.
+   * contributed actions ({@link IMenu}, {@link IKeyStroke}, {@link IViewButton}). They are NOT yet initialized.
    * <p>
    * Use the {@link Order} annotation or {@link IAction#setOrder(double)} to define the sort order of the contributed
    * actions.

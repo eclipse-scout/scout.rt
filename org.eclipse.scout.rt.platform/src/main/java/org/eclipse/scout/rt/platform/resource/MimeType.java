@@ -89,16 +89,6 @@ public enum MimeType {
     return m_fileExtension;
   }
 
-  /**
-   * This method will be removed in 6.1, it contains a typo and the name semantics is ambiguous
-   *
-   * @deprecated use {@link #getFileExtension()} instead
-   */
-  @Deprecated
-  public String getPreferedFileExtension() {
-    return getFileExtension();
-  }
-
   public static MimeType findByFileExtension(String fileExtension) {
     for (MimeType mimeType : values()) {
       if (mimeType.getFileExtension().equalsIgnoreCase(fileExtension)) {

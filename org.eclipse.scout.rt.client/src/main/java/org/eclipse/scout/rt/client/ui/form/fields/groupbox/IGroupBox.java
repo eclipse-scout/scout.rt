@@ -62,16 +62,6 @@ public interface IGroupBox extends ICompositeField, IContextMenuOwner {
    * </ul>
    */
   String BORDER_DECORATION_AUTO = "auto";
-  /**
-   * @deprecated This decoration type is obsolete, do not use it anymore. This constant will be removed in Scout 6.1. To
-   *             apply the "section style" to a group box, set its "expandable" property to <code>true</code> and set a
-   *             decoration style that supports expandable group boxes (e.g. {@link #BORDER_DECORATION_LINE}). In most
-   *             cases, {@link #BORDER_DECORATION_AUTO} is also acceptable. (Thus, the easiest way to migrate is
-   *             probably to just remove your <code>getConfiguredBorderDecoration()</code> declaration, thus falling
-   *             back to the default BORDER_DECORATION_AUTO).
-   */
-  @Deprecated
-  String BORDER_DECORATION_SECTION = "section";
 
   /**
    * {@link IContextMenu}

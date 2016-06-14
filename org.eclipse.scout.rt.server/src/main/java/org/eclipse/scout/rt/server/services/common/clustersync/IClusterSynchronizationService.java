@@ -74,16 +74,4 @@ public interface IClusterSynchronizationService extends IService {
    */
   boolean isEnabled();
 
-  /**
-   * @param listener
-   *          {@link IClusterNotificationListener}
-   */
-  void addListener(IClusterNotificationListener listener);
-
-  /**
-   * @param listener
-   *          {@link IClusterNotificationListener}
-   */
-  void removeListener(IClusterNotificationListener listener);
-
 }

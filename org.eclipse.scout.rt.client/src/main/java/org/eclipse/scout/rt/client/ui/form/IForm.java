@@ -217,13 +217,6 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId, IDis
   boolean isFormClosed();
 
   /**
-   * @return true if the form is started with a form handler and therefore active
-   * @deprecated use {@link #isFormStarted()}; will be removed in version 6.1.
-   */
-  @Deprecated
-  boolean isFormOpen();
-
-  /**
    * @return <code>true</code> if this {@link IForm} is started with a {@link IFormHandler}. However, it does not imply
    *         that it is attached to the {@link IDesktop} and displayed in the UI.
    */
@@ -388,28 +381,6 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId, IDis
   void doExportXml(boolean saveAs);
 
   void doImportXml();
-
-  /**
-   * Property is true by default.<br>
-   * This automatically calls {@link org.eclipse.scout.rt.client.ui.desktop.IDesktop#showForm(IForm)} when the form is
-   * started.<br>
-   * When using forms inside pages such as
-   * {@link org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage#setDetailForm(IForm)} and
-   * {@link org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable#getConfiguredSearchForm()} then this
-   * flag is set to false, because then the form should not be displayed unless the page it is contained in is
-   * activated. This activation will then call {@link org.eclipse.scout.rt.client.ui.desktop.IDesktop#showForm(IForm)}
-   *
-   * @deprecated use {@link #isShowOnStart()}; will be removed in version 6.1.
-   */
-  @Deprecated
-  boolean isAutoAddRemoveOnDesktop();
-
-  /**
-   * @see #isAutoAddRemoveOnDesktop()
-   * @deprecated use {@link #setShowOnStart(boolean)}; will be removed in version 6.1.
-   */
-  @Deprecated
-  void setAutoAddRemoveOnDesktop(boolean b);
 
   /**
    * @return <code>true</code> if this {@link IForm} should be displayed once being started.

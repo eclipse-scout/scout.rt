@@ -74,7 +74,7 @@ public class AbstractDesktopTest {
         }
       }
     });
-    m_desktop.setOutline(m_outline);
+    m_desktop.activateOutline(m_outline);
     assertTrue(called[0]);
     assertFalse(m_desktop.isOutlineChanging());
   }

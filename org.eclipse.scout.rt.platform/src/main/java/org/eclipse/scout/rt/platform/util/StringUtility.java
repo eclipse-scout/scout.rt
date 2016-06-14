@@ -881,22 +881,6 @@ public final class StringUtility {
   }
 
   /**
-   * @deprecated use {@link HexUtility#decode(String)}, will be removed in Scout 6.1
-   */
-  @Deprecated
-  public static byte[] hexToBytes(String s) {
-    return HexUtility.decode(s);
-  }
-
-  /**
-   * @deprecated use {@link HexUtility#encode(byte[])}, will be removed in Scout 6.1
-   */
-  @Deprecated
-  public static String bytesToHex(byte[] a) {
-    return HexUtility.encode(a);
-  }
-
-  /**
    * remove all \n, \r, \t and make all multiple spaces single space
    */
   public static String cleanup(String s) {
@@ -922,79 +906,6 @@ public final class StringUtility {
       }
     }
     return null;
-  }
-
-  /**
-   * @return encoded text, ready to be included in a html text <xmp>replaces &, ", ', <, > and all whitespace</xmp>
-   * @deprecated Will be removed in Scout 7.0. Use <code>BEANS.get(HtmlHelper.class).escape(String)</code> instead.
-   */
-  @Deprecated
-  public static String htmlEncode(String s) {
-    return htmlEncode(s, false);
-  }
-
-  /**
-   * @deprecated Will be removed in Scout 7.0. Use <code>BEANS.get(HtmlHelper.class).escape(String)</code> instead.
-   */
-  @Deprecated
-  public static String htmlEncode(String s, boolean replaceSpace) {
-    if (s == null) {
-      return s;
-    }
-    if (s.length() == 0) {
-      return s;
-    }
-    s = s.replace("&", "&amp;");
-    s = s.replace("\"", "&quot;");
-    s = s.replace("'", "&#39;");
-    s = s.replace("<", "&lt;");
-    s = s.replace(">", "&gt;");
-    s = s.replace("\r\n", "<br/>");
-    s = s.replace("\n", "<br/>");
-
-    // temporarily replace tabs with specific tab-identifier to not be replaced by subsequent whitespace pattern
-    String tabIdentifier = "#TAB#";
-    s = s.replace("\t", tabIdentifier);
-
-    if (replaceSpace) {
-      s = s.replaceAll("\\s", "&nbsp;");
-    }
-    s = s.replace(tabIdentifier, HTML_ENCODED_TAB);
-    return s;
-  }
-
-  private static final String ZERO_OR_MORE_WHITESPACES = "\\s*?";
-  private static final Pattern BR = Pattern.compile("<" + ZERO_OR_MORE_WHITESPACES + "br" + ZERO_OR_MORE_WHITESPACES + "/" + ZERO_OR_MORE_WHITESPACES + ">", Pattern.CASE_INSENSITIVE);
-
-  /**
-   * @return decoded text, ready to be printed as text <xmp>replaces &, ", ', <, > and all whitespace</xmp>
-   * @deprecated Will be removed in Scout 7.0. Use <code>BEANS.get(HtmlHelper.class).unescape(String)</code> instead.
-   */
-  @Deprecated
-  public static String htmlDecode(String s) {
-    if (s == null || s.length() == 0) {
-      return s;
-    }
-
-    // Protected whitespace
-    s = s.replace("&nbsp;", " ");
-    s = s.replace("&#160;", " ");
-    s = s.replace("&#xa0;", " ");
-
-    s = s.replace("&quot;", "\"");
-    s = s.replace("&apos;", "'");
-    s = s.replace("&#39;", "'");
-    s = s.replace("&lt;", "<");
-    s = s.replace("&gt;", ">");
-    s = s.replace("&amp;", "&");
-
-    // replace <br/> by \n
-    s = BR.matcher(s).replaceAll("\n");
-    // replace HTML-tabs by \t
-    s = s.replace(HTML_ENCODED_TAB, "\t");
-    s = s.replace("&#9;", "\t");
-
-    return s;
   }
 
   /**

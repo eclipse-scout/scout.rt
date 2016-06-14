@@ -42,44 +42,11 @@ public class DesktopEvent extends EventObject implements IModelEvent {
    */
   public static final int TYPE_OUTLINE_CONTENT_ACTIVATE = 210;
 
-  /**
-   * @deprecated use {@link #TYPE_FORM_SHOW}; will be removed in version 6.1.
-   */
-  @Deprecated
-  public static final int TYPE_FORM_ADDED = 600;
   public static final int TYPE_FORM_SHOW = 600;
-  /**
-   * @deprecated use {@link #TYPE_FORM_HIDE}; will be removed in version 6.1.
-   */
-  @Deprecated
-  public static final int TYPE_FORM_REMOVED = 610;
   public static final int TYPE_FORM_HIDE = 610;
-
-  /**
-   * @deprecated use {@link #TYPE_FORM_ACTIVATE}; will be removed in version 6.1.
-   */
-  @Deprecated
-  public static final int TYPE_FORM_ENSURE_VISIBLE = 620;
   public static final int TYPE_FORM_ACTIVATE = 620;
-
-  /**
-   * @deprecated use {@link #TYPE_MESSAGE_BOX_SHOW}; will be removed in version 6.1.
-   */
-  @Deprecated
-  public static final int TYPE_MESSAGE_BOX_ADDED = 700;
   public static final int TYPE_MESSAGE_BOX_SHOW = 700;
-  /**
-   * @deprecated use {@link #TYPE_MESSAGE_BOX_HIDE}; will be removed in version 6.1.
-   */
-  @Deprecated
-  public static final int TYPE_MESSAGE_BOX_REMOVED = 710;
   public static final int TYPE_MESSAGE_BOX_HIDE = 710;
-
-  /**
-   * @deprecated use {@link #TYPE_FILE_CHOOSER_SHOW}; will be removed in version 6.1.
-   */
-  @Deprecated
-  public static final int TYPE_FILE_CHOOSER_ADDED = 910;
   public static final int TYPE_FILE_CHOOSER_SHOW = 910;
 
   public static final int TYPE_FILE_CHOOSER_HIDE = 915;

@@ -143,15 +143,6 @@ public abstract class AbstractDateField extends AbstractValueField<Date> impleme
   }
 
   /**
-   * @deprecated This method is never called for {@link IDateField}. The UI is responsible for parsing a date.
-   */
-  @Override
-  @Deprecated
-  protected Date execParseValue(String text) {
-    return super.execParseValue(text);
-  }
-
-  /**
    * <b>Important:</b> Make sure that this method only uses formats that are supported by the UI. Otherwise, a formatted
    * date cannot be parsed again.
    */

@@ -12,9 +12,9 @@ package org.eclipse.scout.rt.client.ui.action.tool;
 
 import org.eclipse.scout.rt.client.extension.ui.action.tool.IToolButtonExtension;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 
-@SuppressWarnings("deprecation")
-public abstract class AbstractToolButton extends AbstractMenu implements IToolButton {
+public abstract class AbstractToolButton extends AbstractMenu implements IMenu {
 
   public AbstractToolButton() {
     super();

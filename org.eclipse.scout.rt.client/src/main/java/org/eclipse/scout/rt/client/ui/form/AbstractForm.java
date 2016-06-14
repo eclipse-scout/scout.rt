@@ -2123,12 +2123,6 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     return !isBlockingInternal();
   }
 
-  @SuppressWarnings("deprecation")
-  @Override
-  public boolean isFormOpen() {
-    return isBlockingInternal();
-  }
-
   @Override
   public boolean isFormStartable() {
     return !m_formStarted && !isBlockingInternal();
@@ -2609,18 +2603,6 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
       propertySupport.setPropertyAlwaysFire(PROP_MINIMIZED, b);
 
     }
-  }
-
-  @SuppressWarnings("deprecation")
-  @Override
-  public boolean isAutoAddRemoveOnDesktop() {
-    return isShowOnStart();
-  }
-
-  @SuppressWarnings("deprecation")
-  @Override
-  public void setAutoAddRemoveOnDesktop(boolean b) {
-    setShowOnStart(b);
   }
 
   @Override

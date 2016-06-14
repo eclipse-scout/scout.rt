@@ -471,22 +471,6 @@ public interface IFormField extends IPropertyObserver, ITypeWithClassId, IOrdere
   void setErrorStatus(IMultiStatus status);
 
   /**
-   * @deprecated use {@link #addErrorStatus(String)}, will be removed in Scout 6.1
-   * @param message
-   *          error status of currently set value In order to set a custom icon as the field status, use
-   *          {@link ScoutFieldStatus}
-   */
-  @Deprecated
-  void setErrorStatus(String message);
-
-  /**
-   * @deprecated use {@link #addErrorStatus(IStatus)} or setErrorStatus(IMultiStatus status), will be removed in Scout
-   *             6.1 6.1
-   */
-  @Deprecated
-  void setErrorStatus(IStatus status);
-
-  /**
    * clear all error statuses
    */
   void clearErrorStatus();

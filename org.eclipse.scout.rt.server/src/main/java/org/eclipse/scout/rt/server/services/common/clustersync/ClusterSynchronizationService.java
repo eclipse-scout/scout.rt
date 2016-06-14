@@ -47,7 +47,6 @@ import org.eclipse.scout.rt.server.session.ServerSessionProviderWithCache;
 import org.eclipse.scout.rt.server.transaction.AbstractTransactionMember;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.shared.ISession;
-import org.eclipse.scout.rt.shared.notification.INotificationHandler;
 import org.eclipse.scout.rt.shared.notification.NotificationHandlerRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -123,32 +122,6 @@ public class ClusterSynchronizationService implements IClusterSynchronizationSer
 
   protected EventListenerList getListenerList() {
     return m_listenerList;
-  }
-
-  /**
-   * @deprecated use {@link INotificationHandler}, will be removed in Scout 6.1.
-   */
-  @Deprecated
-  @Override
-  public void addListener(IClusterNotificationListener listener) {
-    m_listenerList.add(IClusterNotificationListener.class, listener);
-  }
-
-  /**
-   * @deprecated use {@link INotificationHandler}, will be removed in Scout 6.1.
-   */
-  @Deprecated
-  @Override
-  public void removeListener(IClusterNotificationListener listener) {
-    m_listenerList.remove(IClusterNotificationListener.class, listener);
-  }
-
-  /**
-   * @deprecated use {@link INotificationHandler}, will be removed in Scout 6.1.
-   */
-  @Deprecated
-  protected IClusterNotificationListener[] getListeners() {
-    return getListenerList().getListeners(IClusterNotificationListener.class);
   }
 
   @Override

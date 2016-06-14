@@ -86,31 +86,13 @@ public interface ICodeRow<KEY_TYPE> extends ILookupRow<KEY_TYPE> {
 
   long getPartitionId();
 
-  /**
-   * @deprecated use {@link #withPartitionId(long)}. will be removed in version 6.1.
-   */
-  @Deprecated
-  void setPartitionId(long partitionId);
-
   ICodeRow<KEY_TYPE> withPartitionId(long partitionId);
 
   Number getValue();
 
-  /**
-   * @deprecated use {@link #withValue(Number)}. will be removed in version 6.1.
-   */
-  @Deprecated
-  void setValue(Number value);
-
   ICodeRow<KEY_TYPE> withValue(Number value);
 
   String getExtKey();
-
-  /**
-   * @deprecated use {@link #withExtKey(String)}. will be removed in version 6.1.
-   */
-  @Deprecated
-  void setExtKey(String extKey);
 
   ICodeRow<KEY_TYPE> withExtKey(String extKey);
 
@@ -118,12 +100,6 @@ public interface ICodeRow<KEY_TYPE> extends ILookupRow<KEY_TYPE> {
    * @return
    */
   double getOrder();
-
-  /**
-   * @deprecated use {@link #withOrder(double)}. will be removed in version 6.1.
-   */
-  @Deprecated
-  void setOrder(double order);
 
   ICodeRow<KEY_TYPE> withOrder(double order);
 

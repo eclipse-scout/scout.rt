@@ -158,10 +158,10 @@ public class CodeRow<ID_TYPE> extends LookupRow<ID_TYPE> implements ICodeRow<ID_
             case 13:
               Double val = TypeCastUtility.castValue(cells[index], Double.class);
               if (val != null) {
-                setOrder(val.doubleValue());
+                withOrder(val.doubleValue());
               }
               else {
-                setOrder(IOrdered.DEFAULT_ORDER);
+                withOrder(IOrdered.DEFAULT_ORDER);
               }
               break;
           }
@@ -284,16 +284,6 @@ public class CodeRow<ID_TYPE> extends LookupRow<ID_TYPE> implements ICodeRow<ID_
     return this;
   }
 
-  /**
-   * @deprecated use {@link #withExtKey(String)}. will be removed in version 6.1.
-   */
-  @SuppressWarnings("deprecation")
-  @Deprecated
-  @Override
-  public void setExtKey(String extKey) {
-    withExtKey(extKey);
-  }
-
   @Override
   public Number getValue() {
     return m_value;
@@ -303,13 +293,6 @@ public class CodeRow<ID_TYPE> extends LookupRow<ID_TYPE> implements ICodeRow<ID_
   public ICodeRow<ID_TYPE> withValue(Number value) {
     m_value = value;
     return this;
-  }
-
-  @SuppressWarnings("deprecation")
-  @Deprecated
-  @Override
-  public void setValue(Number value) {
-    withValue(value);
   }
 
   @Override
@@ -323,13 +306,6 @@ public class CodeRow<ID_TYPE> extends LookupRow<ID_TYPE> implements ICodeRow<ID_
     return this;
   }
 
-  @SuppressWarnings("deprecation")
-  @Deprecated
-  @Override
-  public void setPartitionId(long partitionId) {
-    withPartitionId(partitionId);
-  }
-
   @Override
   public double getOrder() {
     return m_order;
@@ -340,12 +316,4 @@ public class CodeRow<ID_TYPE> extends LookupRow<ID_TYPE> implements ICodeRow<ID_
     m_order = order;
     return this;
   }
-
-  @SuppressWarnings("deprecation")
-  @Deprecated
-  @Override
-  public void setOrder(double order) {
-    withOrder(order);
-  }
-
 }

@@ -22,7 +22,6 @@ import org.eclipse.scout.rt.client.ui.IDisplayParent;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
-import org.eclipse.scout.rt.client.ui.action.tool.IToolButton;
 import org.eclipse.scout.rt.client.ui.action.view.IViewButton;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
@@ -57,7 +56,6 @@ import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
  * <li>top-level menus (menu tree)
  * </ul>
  */
-@SuppressWarnings("deprecation")
 public interface IDesktop extends IPropertyObserver, IDisplayParent {
 
   /**
@@ -161,12 +159,6 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent {
   <T extends IMenu> T findMenu(Class<T> menuType);
 
   /**
-   * @deprecated use {@link #getMenuByClass(Class)} instead
-   */
-  @Deprecated
-  <T extends IToolButton> T findToolButton(Class<T> toolButtonType);
-
-  /**
    * Convenience alias for {@link #findAction(Class)}
    */
   <T extends IViewButton> T findViewButton(Class<T> viewButtonType);
@@ -186,14 +178,6 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent {
    * fires a ensure visible event for every form in viewStack
    */
   void ensureViewStackVisible();
-
-  /**
-   * fires a activate form event
-   *
-   * @deprecated use {@link #activateForm(IForm)}; will be removed in version 6.1.
-   */
-  @Deprecated
-  void ensureVisible(IForm form);
 
   /**
    * fires a activate form event
@@ -229,14 +213,6 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent {
   List<IForm> getForms(IDisplayParent displayParent);
 
   /**
-   * Returns all {@link IForm}s of the type {@link IForm#DISPLAY_HINT_VIEW}.
-   *
-   * @deprecated use {@link #getViews()}; will be removed in version 6.1.
-   */
-  @Deprecated
-  List<IForm> getViewStack();
-
-  /**
    * Returns all displayed Forms of the type {@link IForm#DISPLAY_HINT_VIEW} in the order as registered.
    */
   List<IForm> getViews();
@@ -265,19 +241,6 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent {
    * @return null if no match is found, else the first encountered match
    */
   <F extends IForm, H extends IFormHandler> F findOpenView(Class<? extends F> formClass, Class<? extends H> handlerClass, Object exclusiveKey);
-
-  /**
-   * Returns all {@link IForm}s with dialog character:
-   * <ul>
-   * <li>{@link IForm#DISPLAY_HINT_DIALOG}</li>
-   * <li>{@link IForm#DISPLAY_HINT_POPUP_DIALOG}</li>
-   * <li>{@link IForm#DISPLAY_HINT_POPUP_WINDOW}</li>
-   * </ul>
-   *
-   * @deprecated use {@link #getDialogs()}; will be removed in version 6.1.
-   */
-  @Deprecated
-  List<IForm> getDialogStack();
 
   /**
    * Returns all {@link IForm}s with dialog character in the order as registered.
@@ -317,26 +280,9 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent {
   List<IForm> getUnsavedForms();
 
   /**
-   * Adds the given {@link IForm} to the desktop and notifies attached listeners like the UI.
-   *
-   * @deprecated use {@link #showForm(IForm)}; will be removed in version 6.1.
-   */
-  @Deprecated
-  void addForm(IForm form);
-
-  /**
    * Attaches the given {@link IForm} to its {@link IDisplayParent} and displays it.
    */
   void showForm(IForm form);
-
-  /**
-   * Removes the given {@link IForm} from the Form's {@link IDisplayParent} and hides it. However, the form is not
-   * closed, meaning that it can be added anew in order to be displayed.
-   *
-   * @deprecated use {@link #hideForm(IForm)}; will be removed in version 6.1.
-   */
-  @Deprecated
-  void removeForm(IForm form);
 
   /**
    * Removes the given {@link IForm} from its {@link IDisplayParent} and hides it. However, the form is not closed,
@@ -353,14 +299,6 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent {
   boolean isShowing(IMessageBox messageBox);
 
   /**
-   * Returns all displayed message boxes in the order as attached to the desktop.
-   *
-   * @deprecated use {@link #getMessageBoxes()}; will be removed in version 6.1.
-   */
-  @Deprecated
-  List<IMessageBox> getMessageBoxStack();
-
-  /**
    * Returns all displayed message boxes in the order as registered.
    */
   List<IMessageBox> getMessageBoxes();
@@ -371,26 +309,9 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent {
   List<IMessageBox> getMessageBoxes(IDisplayParent displayParent);
 
   /**
-   * Adds the given {@link IMessageBox} to the desktop and notifies attached listeners like the UI.
-   *
-   * @deprecated use {@link #showMessageBox(IMessageBox)}; will be removed in version 6.1.
-   */
-  @Deprecated
-  void addMessageBox(IMessageBox messageBox);
-
-  /**
    * Attaches the given {@link IMessageBox} to its {@link IDisplayParent} and displays it.
    */
   void showMessageBox(IMessageBox messageBox);
-
-  /**
-   * Removes the given {@link IMessageBox} from desktop and notifies attached listeners like the UI. However, the
-   * message box is not closed, meaning that it can be added to the display anew in order to be displayed.
-   *
-   * @deprecated use {@link #hideMessageBox(IMessageBox)}; will be removed in version 6.1.
-   */
-  @Deprecated
-  void removeMessageBox(IMessageBox messageBox);
 
   /**
    * Removes the given {@link IMessageBox} from its {@link IDisplayParent} and hides it. However, the message box is not
@@ -415,14 +336,6 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent {
    * @return the currently active outline on the desktop
    */
   IOutline getOutline();
-
-  /**
-   * set the given outline on desktop
-   *
-   * @deprecated use {@link #activateOutline(IOutline)}; will be removed in version 6.1.
-   */
-  @Deprecated
-  void setOutline(IOutline outline);
 
   /**
    * set the currently active outline on the desktop using its type
@@ -527,18 +440,6 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent {
    */
   List<IAction> getActions();
 
-  /**
-   * @deprecated use {@link #getMenu(Class)} instead
-   */
-  @Deprecated
-  <T extends IToolButton> T getToolButton(Class<? extends T> searchType);
-
-  /**
-   * @deprecated use {@link #getMenus()} instead
-   */
-  @Deprecated
-  List<IMenu> getToolButtons();
-
   <T extends IViewButton> T getViewButton(Class<? extends T> searchType);
 
   /**
@@ -640,12 +541,6 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent {
   boolean isShowing(IFileChooser fileChooser);
 
   /**
-   * @deprecated use {@link #getFileChoosers()}; will be removed in version 6.1.
-   */
-  @Deprecated
-  List<IFileChooser> getFileChooserStack();
-
-  /**
    * Returns all displayed {@link IFileChooser}s in the order as registered.
    */
   List<IFileChooser> getFileChoosers();
@@ -654,14 +549,6 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent {
    * Returns all file choosers which are attached to the given {@link IDisplayParent} in the order as registered.
    */
   List<IFileChooser> getFileChoosers(IDisplayParent displayParent);
-
-  /**
-   * Retrieve files via a user interface
-   *
-   * @deprecated use {@link #showFileChooser(IFileChooser)}; will be removed in version 6.1.
-   */
-  @Deprecated
-  void addFileChooser(IFileChooser fileChooser);
 
   /**
    * Attaches the given {@link IFileChooser} to its {@link IDisplayParent} and displays it.

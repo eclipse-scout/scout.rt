@@ -648,15 +648,6 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
     }
   }
 
-  /**
-   * @deprecated use {@link #selectResources(List)}, will be removed in Scout 6.1
-   */
-  @Deprecated
-  @Override
-  public void setSelectedResources(List<? extends Resource<RI>> resources) {
-    selectResources(resources);
-  }
-
   @Override
   public void isSelectedResource(Resource<RI> resource) {
     getSelectedResources().contains(resource);

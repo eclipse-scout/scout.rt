@@ -1638,16 +1638,6 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     return (MultiStatus) propertySupport.getProperty(PROP_ERROR_STATUS);
   }
 
-  /**
-   * @deprecated use {@link #addErrorStatus(IStatus)}, will be removed in Scout 6.1
-   */
-  @SuppressWarnings("deprecation")
-  @Deprecated
-  @Override
-  public void setErrorStatus(IStatus status) {
-    addErrorStatus(status);
-  }
-
   @Override
   public void setErrorStatus(IMultiStatus status) {
     setErrorStatusInternal(new MultiStatus(status));
@@ -1660,16 +1650,6 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   @Override
   public void clearErrorStatus() {
     propertySupport.setProperty(PROP_ERROR_STATUS, null);
-  }
-
-  /**
-   * use {@link #addErrorStatus(message)}
-   */
-  @SuppressWarnings("deprecation")
-  @Deprecated
-  @Override
-  public void setErrorStatus(String message) {
-    addErrorStatus(message);
   }
 
   @Override

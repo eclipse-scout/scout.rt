@@ -63,14 +63,6 @@ public class LocalLookupCall<T> extends LookupCall<T> {
     return Pattern.compile(s, Pattern.DOTALL);
   }
 
-  /**
-   * @deprecated: Will be removed in Scout 6.1.
-   */
-  @Deprecated
-  public static Pattern createLowerCaseSearchPattern(String s) {
-    return StringUtility.toRegEx(s, Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
-  }
-
   @Override
   protected final Class<? extends ILookupService<T>> getConfiguredService() {
     return null;

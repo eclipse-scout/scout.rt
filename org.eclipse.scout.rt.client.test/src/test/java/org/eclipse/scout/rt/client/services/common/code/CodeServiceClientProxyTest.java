@@ -41,7 +41,6 @@ import org.junit.runner.RunWith;
 @RunWithClientSession(TestEnvironmentClientSession.class)
 public class CodeServiceClientProxyTest {
 
-  private static final String CLIENT_CODE_TYPE_PREFIX = "org.eclipse.scout.rt.client";
   private CodeService m_service;
 
   @Before
@@ -70,7 +69,6 @@ public class CodeServiceClientProxyTest {
    * Test method for
    * {@link org.eclipse.scout.rt.client.services.common.code.CodeServiceClientProxy#getAllCodeTypes(java.lang.String)}.
    */
-  @SuppressWarnings("deprecation")
   @Test
   public void testGetAllCodeTypes() throws Exception {
     List<ICodeType<?, ?>> codeTypes = m_service.getAllCodeTypes();
@@ -90,9 +88,6 @@ public class CodeServiceClientProxyTest {
     assertEquals("CompanyTypeCodeType class", CompanyTypeCodeType.class, companyTypeCodeType.getClass());
 
     codeTypes = m_service.getAllCodeTypes();
-    assertEquals("size", 2, codeTypes.size());
-
-    codeTypes = m_service.getAllCodeTypes(CLIENT_CODE_TYPE_PREFIX);
     assertEquals("size", 2, codeTypes.size());
   }
 

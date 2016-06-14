@@ -12,8 +12,6 @@ package org.eclipse.scout.rt.client.ui.wizard;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -286,24 +284,6 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
   }
 
   /**
-   * This is a delegate methode that is normally called by the wizard status field (html field) in the
-   * {@link IWizardContainerForm} whenever a link is clicked.
-   *
-   * @param url
-   * @param path
-   *          {@link URL#getPath()}
-   * @param local
-   *          true if the url is not a valid external url but a local model url (http://local/...)
-   * @deprecated use {@link #execAppLinkAction(String)} instead, will be removed in Scout 6.1
-   */
-  @ConfigOperation
-  @Order(230)
-  @Deprecated
-  protected void execHyperlinkAction(URL url, String path, boolean local) {
-    LOG.info("execHyperlinkAction {} (in {})", url, getClass().getName());
-  }
-
-  /**
    * Called when an app link has been clicked.
    * <p>
    * Subclasses can override this method. The default does nothing.
@@ -311,19 +291,6 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
   @ConfigOperation
   @Order(10)
   protected void execAppLinkAction(String ref) {
-    //FIXME cgu: remove this code when execpHyperlinkAction has been removed
-    URL url = null;
-    boolean local = false;
-    if (ref != null) {
-      try {
-        url = new URL(ref);
-        local = "local".equals(url.getHost());
-      }
-      catch (MalformedURLException e) {
-        LOG.error("Malformed URL '{}'", ref, e);
-      }
-    }
-    execHyperlinkAction(url, ref, local);
   }
 
   /**
@@ -1048,14 +1015,6 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
   @Override
   public void doReset() {
     interceptReset();
-  }
-
-  @SuppressWarnings("deprecation")
-  @Override
-  public void doHyperlinkAction(URL url, String path, boolean local) {
-    if (isOpen()) {
-      execHyperlinkAction(url, path, local);
-    }
   }
 
   @Override

@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.client.ui.form.fields.htmlfield;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collection;
 import java.util.List;
@@ -36,12 +35,9 @@ import org.eclipse.scout.rt.platform.html.HtmlHelper;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.IOUtility;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @ClassId("99301bfb-cccc-431f-b687-dc0bf73ff789")
 public abstract class AbstractHtmlField extends AbstractValueField<String> implements IHtmlField {
-  private static final Logger LOG = LoggerFactory.getLogger(AbstractHtmlField.class);
 
   private IHtmlFieldUIFacade m_uiFacade;
   private Set<BinaryResource> m_attachments;
@@ -64,21 +60,6 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
   }
 
   /**
-   * @param url
-   * @param path
-   *          {@link URL#getPath()}
-   * @param local
-   *          true if the url is not a valid external url but a local model url (http://local/...)
-   * @deprecated use {@link #execAppLinkAction(String)} instead, will be removed in Scout 6.1
-   */
-  @ConfigOperation
-  @Order(230)
-  @Deprecated
-  protected void execHyperlinkAction(URL url, String path, boolean local) {
-    LOG.info("execHyperlinkAction {} (in {})", url, getClass().getName());
-  }
-
-  /**
    * Called when an app link has been clicked.
    * <p>
    * Subclasses can override this method. The default does nothing.
@@ -86,19 +67,6 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
   @ConfigOperation
   @Order(230)
   protected void execAppLinkAction(String ref) {
-    //FIXME cgu: remove this code when execpHyperlinkAction has been removed
-    URL url = null;
-    boolean local = false;
-    if (ref != null) {
-      try {
-        url = new URL(ref);
-        local = "local".equals(url.getHost());
-      }
-      catch (MalformedURLException e) {
-        LOG.error("Malformed URL '{}'", ref, e);
-      }
-    }
-    execHyperlinkAction(url, ref, local);
   }
 
   @Override

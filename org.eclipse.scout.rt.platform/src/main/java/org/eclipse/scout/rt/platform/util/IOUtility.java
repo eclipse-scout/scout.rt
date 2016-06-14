@@ -35,7 +35,6 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -78,119 +77,6 @@ public final class IOUtility {
     }
     catch (IOException e) {
       throw new ProcessingException(e.getMessage(), e);
-    }
-  }
-
-  /**
-   * retrieve content as raw bytes and close the stream
-   *
-   * @deprecated use {@link #readBytes(InputStream)} within a resource-try statement
-   */
-  @Deprecated
-  public static byte[] getContent(InputStream stream) {
-    return getContent(stream, true);
-  }
-
-  /**
-   * Gets the content of the given {@link InputStream} as {@link String}. The {@link Byte}s coming from the
-   * {@link InputStream} are interpreted using the given charsetName.<br>
-   * The {@link InputStream} is automatically closed.
-   *
-   * @param stream
-   *          The stream to read from.
-   * @param charsetName
-   *          The name of the {@link Charset}.
-   * @return A {@link String} containing the content of the given {@link InputStream}.
-   * @deprecated use {@link #readString(InputStream, String)} within a resource-try statement
-   */
-  @Deprecated
-  public static String getContent(InputStream stream, String charsetName) {
-    try (InputStream in = stream) {
-      return readString(in, charsetName);
-    }
-    catch (IOException e) {
-      throw new ProcessingException("input: " + stream, e);
-    }
-  }
-
-  /**
-   * Gets the content of the given {@link InputStream} as {@link String}. The content coming from the
-   * {@link InputStream} must have the UTF-8 {@link Charset}.
-   *
-   * @param stream
-   *          The {@link InputStream} to read from.
-   * @return The content of the given {@link InputStream}.
-   * @deprecated use {@link #readStringUTF8(InputStream)} within a resource-try statement
-   */
-  @Deprecated
-  public static String getContentUtf8(InputStream stream) {
-    try (InputStream in = stream) {
-      return readStringUTF8(in);
-    }
-    catch (IOException e) {
-      throw new ProcessingException("input: " + stream, e);
-    }
-  }
-
-  /**
-   * @deprecated use {@link #readBytes(InputStream, int)} within a resource-try statement, will be removed in Scout 6.1
-   */
-  @Deprecated
-  public static byte[] getContent(InputStream stream, int len) throws IOException {
-    try (InputStream in = stream) {
-      return readBytes(in, len);
-    }
-    catch (IOException e) {
-      throw new ProcessingException("input: " + stream, e);
-    }
-  }
-
-  /**
-   * @deprecated use {@link #readBytes(InputStream)} within a resource-try statement, will be removed in Scout 6.1
-   */
-  @Deprecated
-  public static byte[] getContent(InputStream stream, boolean autoClose) {
-    if (autoClose) {
-      try (InputStream in = stream) {
-        return readBytes(in);
-      }
-      catch (IOException e) {
-        throw new ProcessingException("input: " + stream, e);
-      }
-    }
-    else {
-      return readBytes(stream);
-    }
-  }
-
-  /**
-   * retrieve content as string (correct character conversion)
-   *
-   * @deprecated use {@link #readString(Reader)} within a resource-try statement
-   */
-  @Deprecated
-  public static String getContent(Reader stream) {
-    return getContent(stream, true);
-  }
-
-  /**
-   * @deprecated use {@link #readString(Reader)} within a resource-try statement
-   */
-  @Deprecated
-  public static String getContent(Reader stream, boolean autoClose) {
-    if (stream == null) {
-      return "";
-    }
-    if (autoClose) {
-      try (Reader in = stream) {
-        return readString(in);
-      }
-      catch (IOException e) {
-        throw new ProcessingException("input: " + stream, e);
-      }
-    }
-    else {
-      return readString(stream);
     }
   }
 
@@ -370,15 +256,8 @@ public final class IOUtility {
   public static byte[] readFromUrl(URL url) throws IOException {
     URLConnection uc = url.openConnection();
     int len = uc.getContentLength();
-    if (len >= 0) {
-      try (InputStream in = uc.getInputStream()) {
-        return getContent(in, len);
-      }
-    }
-    else {
-      try (BufferedInputStream in = new BufferedInputStream(uc.getInputStream())) {
-        return getContent(in, -1);
-      }
+    try (BufferedInputStream in = new BufferedInputStream(uc.getInputStream())) {
+      return readBytes(in, len);
     }
   }
 
@@ -406,60 +285,6 @@ public final class IOUtility {
     }
     catch (IOException e) {
       throw new ProcessingException("filename: " + filename, e);
-    }
-  }
-
-  /**
-   * write content as raw bytes
-   *
-   * @deprecated use {@link #writeBytes(OutputStream, byte[])} within a resource-try statement
-   */
-  @Deprecated
-  public static void writeContent(OutputStream stream, byte[] data) {
-    writeContent(stream, data, true);
-  }
-
-  /**
-   * @deprecated use {@link #writeBytes(OutputStream, byte[])} within a resource-try statement
-   */
-  @Deprecated
-  public static void writeContent(OutputStream stream, byte[] data, boolean autoClose) {
-    if (autoClose) {
-      try (OutputStream out = stream) {
-        writeBytes(out, data);
-      }
-      catch (IOException e) {
-        throw new ProcessingException("output: " + stream, e);
-      }
-    }
-    else {
-      writeBytes(stream, data);
-    }
-  }
-
-  /**
-   * @deprecated use {@link #writeString(Writer, String)} within a resource-try statement
-   */
-  @Deprecated
-  public static void writeContent(Writer stream, String text) {
-    writeContent(stream, text, true);
-  }
-
-  /**
-   * @deprecated use {@link #writeString(Writer, String)} within a resource-try statement
-   */
-  @Deprecated
-  public static void writeContent(Writer stream, String text, boolean autoClose) {
-    if (autoClose) {
-      try (Writer out = stream) {
-        writeString(out, text);
-      }
-      catch (IOException e) {
-        throw new ProcessingException("output: " + stream, e);
-      }
-    }
-    else {
-      writeString(stream, text);
     }
   }
 

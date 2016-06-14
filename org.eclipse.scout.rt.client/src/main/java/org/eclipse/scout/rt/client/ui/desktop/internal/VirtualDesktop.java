@@ -24,7 +24,6 @@ import org.eclipse.scout.rt.client.ui.IDisplayParent;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
-import org.eclipse.scout.rt.client.ui.action.tool.IToolButton;
 import org.eclipse.scout.rt.client.ui.action.view.IViewButton;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
@@ -56,8 +55,6 @@ import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
  * forms, fields, pages that must be done while the desktop is loading. This pattern solves the bird/egg problem in
  * initialization of an object with self-references.
  */
-
-@SuppressWarnings("deprecation")
 public class VirtualDesktop implements IDesktop {
 
   private final EventListenerList m_listenerList;
@@ -243,22 +240,12 @@ public class VirtualDesktop implements IDesktop {
   }
 
   @Override
-  public List<IFileChooser> getFileChooserStack() {
-    throw createUnsupportedOperationException();
-  }
-
-  @Override
   public List<IFileChooser> getFileChoosers() {
     throw createUnsupportedOperationException();
   }
 
   @Override
   public List<IFileChooser> getFileChoosers(IDisplayParent displayParent) {
-    throw createUnsupportedOperationException();
-  }
-
-  @Override
-  public void addFileChooser(IFileChooser fc) {
     throw createUnsupportedOperationException();
   }
 
@@ -283,17 +270,7 @@ public class VirtualDesktop implements IDesktop {
   }
 
   @Override
-  public void addForm(IForm form) {
-    throw createUnsupportedOperationException();
-  }
-
-  @Override
   public void showForm(IForm form) {
-    throw createUnsupportedOperationException();
-  }
-
-  @Override
-  public void removeForm(IForm form) {
     throw createUnsupportedOperationException();
   }
 
@@ -308,17 +285,7 @@ public class VirtualDesktop implements IDesktop {
   }
 
   @Override
-  public void addMessageBox(IMessageBox mb) {
-    throw createUnsupportedOperationException();
-  }
-
-  @Override
   public void showMessageBox(IMessageBox messageBox) {
-    throw createUnsupportedOperationException();
-  }
-
-  @Override
-  public void removeMessageBox(IMessageBox messageBox) {
     throw createUnsupportedOperationException();
   }
 
@@ -363,12 +330,6 @@ public class VirtualDesktop implements IDesktop {
   }
 
   @Override
-
-  public void ensureVisible(IForm form) {
-    throw createUnsupportedOperationException();
-  }
-
-  @Override
   public void activateForm(IForm form) {
     throw createUnsupportedOperationException();
   }
@@ -409,22 +370,12 @@ public class VirtualDesktop implements IDesktop {
   }
 
   @Override
-  public <T extends IToolButton> T findToolButton(Class<T> toolButtonType) {
-    throw createUnsupportedOperationException();
-  }
-
-  @Override
   public List<IOutline> getAvailableOutlines() {
     throw createUnsupportedOperationException();
   }
 
   @Override
   public void setAvailableOutlines(List<? extends IOutline> availableOutlines) {
-    throw createUnsupportedOperationException();
-  }
-
-  @Override
-  public List<IForm> getDialogStack() {
     throw createUnsupportedOperationException();
   }
 
@@ -460,11 +411,6 @@ public class VirtualDesktop implements IDesktop {
 
   @Override
   public boolean isShowing(IMessageBox messageBox) {
-    throw createUnsupportedOperationException();
-  }
-
-  @Override
-  public List<IMessageBox> getMessageBoxStack() {
     throw createUnsupportedOperationException();
   }
 
@@ -538,20 +484,6 @@ public class VirtualDesktop implements IDesktop {
     throw createUnsupportedOperationException();
   }
 
-  /**
-   * @deprecated will be removed in Scout 6.1
-   */
-  @Deprecated
-  @Override
-  public <T extends IToolButton> T getToolButton(Class<? extends T> searchType) {
-    throw createUnsupportedOperationException();
-  }
-
-  @Override
-  public List<IMenu> getToolButtons() {
-    throw createUnsupportedOperationException();
-  }
-
   @Override
   public IDesktopUIFacade getUIFacade() {
     throw createUnsupportedOperationException();
@@ -564,11 +496,6 @@ public class VirtualDesktop implements IDesktop {
 
   @Override
   public List<IForm> getForms(IDisplayParent displayParent) {
-    throw createUnsupportedOperationException();
-  }
-
-  @Override
-  public List<IForm> getViewStack() {
     throw createUnsupportedOperationException();
   }
 
@@ -634,11 +561,6 @@ public class VirtualDesktop implements IDesktop {
 
   @Override
   public void setKeyStrokes(Collection<? extends IKeyStroke> ks) {
-    throw createUnsupportedOperationException();
-  }
-
-  @Override
-  public void setOutline(IOutline outline) {
     throw createUnsupportedOperationException();
   }
 

@@ -59,30 +59,6 @@ public interface IWizardStep<FORM extends IForm> extends IPropertyObserver, ITyp
 
   void setTooltipText(String tooltipText);
 
-  /**
-   * @deprecated Use getTitle(), will be removed in Scout 6.1
-   */
-  @Deprecated
-  String getTitleHtml();
-
-  /**
-   * @deprecated Use setTitle() and/or setCssClass(), will be removed in Scout 6.1
-   */
-  @Deprecated
-  void setTitleHtml(String s);
-
-  /**
-   * @deprecated Use getSubTitle(), will be removed in Scout 6.1
-   */
-  @Deprecated
-  String getDescriptionHtml();
-
-  /**
-   * @deprecated Use setSubTitle() and/or setCssClass(), will be removed in Scout 6.1
-   */
-  @Deprecated
-  void setDescriptionHtml(String s);
-
   String getIconId();
 
   void setIconId(String iconId);

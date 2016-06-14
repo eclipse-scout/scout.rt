@@ -347,12 +347,6 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
   protected void execStoreSession() {
   }
 
-  @SuppressWarnings("deprecation")
-  @Override
-  public IDesktop getVirtualDesktop() {
-    return getDesktopElseVirtualDesktop();
-  }
-
   @Override
   public IDesktop getDesktop() {
     return m_desktop;

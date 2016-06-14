@@ -43,15 +43,6 @@ public class VetoExceptionTest {
   }
 
   @Test
-  public void testGetMessageIHtmlMessageConstructor() {
-    @SuppressWarnings("deprecation")
-    VetoException vetoException = new VetoException(m_htmlContent);
-    assertEquals(m_htmlContent, vetoException.getHtmlMessage());
-    assertEquals(HTML_CONTENT_PLAIN_TEXT + " [severity=ERROR]", vetoException.getMessage());
-    assertEquals(HTML_CONTENT_PLAIN_TEXT, vetoException.getDisplayMessage());
-  }
-
-  @Test
   public void testGetMessageDefaultConstructor() {
     VetoException vetoException = new VetoException();
     assertNull(vetoException.getHtmlMessage());

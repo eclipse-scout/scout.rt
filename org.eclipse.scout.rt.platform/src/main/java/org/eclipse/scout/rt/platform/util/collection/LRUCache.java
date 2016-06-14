@@ -12,10 +12,8 @@ package org.eclipse.scout.rt.platform.util.collection;
 
 import java.util.Collection;
 import java.util.EventListener;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -35,52 +33,6 @@ public class LRUCache<K, V> extends ConcurrentExpiringMap<K, V> {
 
   public LRUCache(int targetSize, long timeToLive) {
     super(timeToLive, TimeUnit.MILLISECONDS, targetSize);
-  }
-
-  /**
-   * @deprecated timeToLive is now final in order to be thread safe. If you need to change ttl of a
-   *             {@link ConcurrentExpiringMap} simply create a new {@link ConcurrentExpiringMap} using a
-   *             copy-constructor: <br>
-   *             {@code m_ttlMap = new ConcurrentExpiringMap(m_ttlMap, newTimeToLive, timeToLiveUnit);} Important:
-   *             m_ttlMap must be volatile or be guarded by a lock. Will be removed in Scout 6.1
-   */
-  @Deprecated
-  public void setTimeout(long timeout) {
-  }
-
-  /**
-   * @deprecated use {@link #getTimeToLive()} instead. Will be removed in Scout 6.1
-   */
-  @Deprecated
-  public long getTimeout() {
-    return getTimeToLive();
-  }
-
-  /**
-   * @deprecated targetSize is now final in order to be thread safe. If you need to change targetSize of a
-   *             {@link ConcurrentExpiringMap} simply create a new {@link ConcurrentExpiringMap} using a
-   *             copy-constructor: <br>
-   *             {@code m_ttlMap = new ConcurrentExpiringMap(m_ttlMap, targetSize);} Important: m_ttlMap must be
-   *             volatile or be guarded by a lock. Will be removed in Scout 6.1
-   */
-  @Deprecated
-  public void setTargetSize(int size) {
-  }
-
-  /**
-   * @deprecated Will be removed in Scout 6.1
-   */
-  @Deprecated
-  public Map<K, V> entries() {
-    return getCacheContent();
-  }
-
-  /**
-   * @deprecated Will be removed in Scout 6.1
-   */
-  @Deprecated
-  public Map<K, V> getCacheContent() {
-    return new HashMap<K, V>(this);
   }
 
   @Override

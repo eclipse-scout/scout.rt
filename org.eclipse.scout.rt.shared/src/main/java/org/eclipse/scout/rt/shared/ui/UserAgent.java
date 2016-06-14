@@ -89,56 +89,6 @@ public final class UserAgent implements Serializable {
   }
 
   /**
-   * @deprecated use {@link UserAgents#create()}. will be removed in release 6.1;
-   */
-  @Deprecated
-  public static UserAgent create(IUiLayer uiLayer, IUiDeviceType uiDeviceType) {
-    return UserAgents
-        .create()
-        .withUiLayer(uiLayer)
-        .withUiDeviceType(uiDeviceType)
-        .withDefaultDeviceId()
-        .build();
-  }
-
-  /**
-   * @deprecated use {@link UserAgents#create()}. will be removed in release 6.1;
-   */
-  @Deprecated
-  public static UserAgent create(IUiLayer uiLayer, IUiDeviceType uiDeviceType, String uiDeviceId) {
-    return UserAgents
-        .create()
-        .withUiLayer(uiLayer)
-        .withUiDeviceType(uiDeviceType)
-        .withDeviceId(uiDeviceId)
-        .build();
-  }
-
-  /**
-   * @deprecated use {@link UserAgents#createByIdentifier(IUserAgentParser, String)}. will be removed in release 6.1;
-   */
-  @Deprecated
-  public static UserAgent createByIdentifier(IUserAgentParser parser, String userAgent) {
-    return UserAgents.createByIdentifier(parser, userAgent);
-  }
-
-  /**
-   * @deprecated use {@link UserAgents#createByIdentifier(String)}. will be removed in release 6.1;
-   */
-  @Deprecated
-  public static UserAgent createByIdentifier(String userAgent) {
-    return UserAgents.createByIdentifier(userAgent);
-  }
-
-  /**
-   * @deprecated use {@link UserAgents#createDefault()}. will be removed in release 6.1;
-   */
-  @Deprecated
-  public static UserAgent createDefault() {
-    return UserAgents.createDefault();
-  }
-
-  /**
    * Associates the current thread with the given {@link UserAgent}.
    */
   public static void set(final UserAgent userAgent) {

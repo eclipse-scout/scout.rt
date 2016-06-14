@@ -89,17 +89,6 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
    */
 
   /**
-   * @deprecated no replacement. Will be removed in Scout 6.1. Indicates whether setting the field's value results in an
-   *             update of the display text.
-   */
-  @Deprecated
-  @Order(200)
-  @ConfigProperty(ConfigProperty.BOOLEAN)
-  protected boolean getConfiguredAutoDisplayText() {
-    return true;
-  }
-
-  /**
    * Specifies if the default system menus (cut, copy, paste) should be available on this field.
    *
    * @return true if the default system menus should be available, false otherwise.
@@ -114,7 +103,6 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
   protected void initConfig() {
     super.initConfig();
     m_listeningSlaves = new EventListenerList();
-    setAutoDisplayText(getConfiguredAutoDisplayText());
     setAutoAddDefaultMenus(getConfiguredAutoAddDefaultMenus());
 
     // menus
@@ -386,9 +374,7 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
   }
 
   private void updateDisplayText(VALUE rawValue) {
-    if (isAutoDisplayText()) {
-      setDisplayText(interceptFormatValue(rawValue));
-    }
+    setDisplayText(interceptFormatValue(rawValue));
   }
 
   /**
@@ -512,17 +498,6 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
   }
 
   /**
-   * @deprecated use {@link #parseAndSetValue(String)}
-   */
-  @SuppressWarnings("deprecation")
-  @Deprecated
-  @Override
-  public final boolean parseValue(String text) {
-    parseAndSetValue(text);
-    return !hasError();
-  }
-
-  /**
    * Parses and sets either the value or an errorStatus, if parsing or validation fails.
    */
   @Override
@@ -601,24 +576,6 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
   @Override
   public void setDisplayText(String s) {
     propertySupport.setPropertyString(PROP_DISPLAY_TEXT, s);
-  }
-
-  /**
-   * @deprecated no replacement. Will be removed in the O-Release.
-   */
-  @Deprecated
-  @Override
-  public boolean isAutoDisplayText() {
-    return propertySupport.getPropertyBool(PROP_AUTO_DISPLAY_TEXT);
-  }
-
-  /**
-   * @deprecated no replacement. Will be removed in the O-Release.
-   */
-  @Deprecated
-  @Override
-  public void setAutoDisplayText(boolean b) {
-    propertySupport.setPropertyBool(PROP_AUTO_DISPLAY_TEXT, b);
   }
 
   @Override

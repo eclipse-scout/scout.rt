@@ -11,17 +11,12 @@
 package org.eclipse.scout.rt.svg.client.svgfield;
 
 import java.io.Serializable;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.EventObject;
 
 import org.apache.batik.dom.svg.SVGOMPoint;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.w3c.dom.svg.SVGPoint;
 
 public class SvgFieldEvent extends EventObject {
-  private static final Logger LOG = LoggerFactory.getLogger(SvgFieldEvent.class);
   private static final long serialVersionUID = 1L;
 
   private final int m_type;
@@ -68,23 +63,6 @@ public class SvgFieldEvent extends EventObject {
 
   public String getAppLinkRef() {
     return m_appLinkRef;
-  }
-
-  /**
-   * @deprecated use {@link #getAppLinkRef()} instead, will be removed in Scout 6.1.
-   */
-  @Deprecated
-  public URL getURL() {
-    String ref = getAppLinkRef();
-    if (ref != null) {
-      try {
-        return new URL(ref);
-      }
-      catch (MalformedURLException e) {
-        LOG.error("Malformed URL '{}'", ref, e);
-      }
-    }
-    return null;
   }
 
   private class Point implements Serializable {

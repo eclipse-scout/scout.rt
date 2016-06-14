@@ -40,12 +40,9 @@ import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.TriState;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @ClassId("6a093505-c2b1-4df2-84d6-e799f91e6e7c")
 public abstract class AbstractGroupBox extends AbstractCompositeField implements IGroupBox {
-  private static final Logger LOG = LoggerFactory.getLogger(AbstractGroupBox.class);
 
   private IGroupBoxUIFacade m_uiFacade;
   private boolean m_mainBoxFlag = false;
@@ -552,13 +549,8 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
     return propertySupport.getPropertyString(PROP_BORDER_DECORATION);
   }
 
-  @SuppressWarnings("deprecation")
   @Override
   public void setBorderDecoration(String s) {
-    if (BORDER_DECORATION_SECTION.equals(s)) {
-      LOG.warn("Border decoration SECTION is not supported anymore, falling back to LINE [{}]", getClass().getName());
-      s = BORDER_DECORATION_LINE;
-    }
     propertySupport.setPropertyString(PROP_BORDER_DECORATION, s);
   }
 

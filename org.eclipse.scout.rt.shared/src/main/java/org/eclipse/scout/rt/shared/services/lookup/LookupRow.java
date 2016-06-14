@@ -47,89 +47,6 @@ public class LookupRow<ID_TYPE> extends MemoryOptimizedObject implements ILookup
     withKey(key).withText(text);
   }
 
-  /**
-   * @deprecated use {@link #withIconId(String)}. will be removed in version 6.1.
-   */
-  @Deprecated
-  public LookupRow(ID_TYPE key, String text, String iconId) {
-    this(key, text, iconId, null);
-  }
-
-  /**
-   * @deprecated use {@link #withIconId(String)},{@link #withTooltip(String)} . will be removed in version 6.1.
-   */
-  @Deprecated
-  public LookupRow(ID_TYPE key, String text, String iconId, String tooltip) {
-    this(key, text, iconId, tooltip, null);
-  }
-
-  /**
-   * @deprecated use {@link #withIconId(String)},{@link #withTooltip(String)}, {@link #withBackgroundColor(String)}.
-   *             will be removed in version 6.1.
-   */
-  @Deprecated
-  public LookupRow(ID_TYPE key, String text, String iconId, String tooltip, String backgroundColor) {
-    this(key, text, iconId, tooltip, backgroundColor, null);
-  }
-
-  /**
-   * @deprecated use {@link #withIconId(String)},{@link #withTooltip(String)}, {@link #withBackgroundColor(String)},
-   *             {@link #withForegroundColor(String)}. will be removed in version 6.1.
-   */
-  @Deprecated
-  public LookupRow(ID_TYPE key, String text, String iconId, String tooltip, String backgroundColor, String foregroundColor) {
-    this(key, text, iconId, tooltip, backgroundColor, foregroundColor, null);
-  }
-
-  /**
-   * @deprecated use {@link #withIconId(String)},{@link #withTooltip(String)}, {@link #withBackgroundColor(String)},
-   *             {@link #withForegroundColor(String)}, {@link #withFont(FontSpec)(String)}. will be removed in version
-   *             6.1.
-   */
-  @Deprecated
-  public LookupRow(ID_TYPE key, String text, String iconId, String tooltip, String backgroundColor, String foregroundColor, FontSpec font) {
-    this(key, text, iconId, tooltip, backgroundColor, foregroundColor, font, true);
-  }
-
-  /**
-   * @deprecated use {@link #withIconId(String)},{@link #withTooltip(String)}, {@link #withBackgroundColor(String)},
-   *             {@link #withForegroundColor(String)}, {@link #withFont(FontSpec)}, {@link #withEnabled(boolean)}, will
-   *             be removed in version 6.1.
-   */
-  @Deprecated
-  public LookupRow(ID_TYPE key, String text, String iconId, String tooltip, String backgroundColor, String foregroundColor, FontSpec font, boolean enabled) {
-    this(key, text, iconId, tooltip, backgroundColor, foregroundColor, font, enabled, null);
-  }
-
-  /**
-   * @deprecated use {@link #withIconId(String)},{@link #withTooltip(String)}, {@link #withBackgroundColor(String)},
-   *             {@link #withForegroundColor(String)}, {@link #withFont(FontSpec)}, {@link #withEnabled(boolean)},
-   *             {@link #withParentKey(Object)} will be removed in version 6.1.
-   */
-  @Deprecated
-  public LookupRow(ID_TYPE key, String text, String iconId, String tooltip, String backgroundColor, String foregroundColor, FontSpec font, boolean enabled, ID_TYPE parentKey) {
-    this(key, text, iconId, tooltip, backgroundColor, foregroundColor, font, enabled, parentKey, true);
-  }
-
-  /**
-   * @deprecated use {@link #withIconId(String)},{@link #withTooltip(String)}, {@link #withBackgroundColor(String)},
-   *             {@link #withForegroundColor(String)}, {@link #withFont(FontSpec)}, {@link #withEnabled(boolean)},
-   *             {@link #withParentKey(Object)}, {@link #withActive(boolean)} will be removed in version 6.1.
-   */
-  @Deprecated
-  public LookupRow(ID_TYPE key, String text, String iconId, String tooltip, String backgroundColor, String foregroundColor, FontSpec font, boolean enabled, ID_TYPE parentKey, boolean active) {
-    setKey(key);
-    setText(text);
-    setIconId(iconId);
-    setTooltipText(tooltip);
-    setBackgroundColor(backgroundColor);
-    setForegroundColor(foregroundColor);
-    setFont(font);
-    setEnabled(enabled);
-    setParentKey(parentKey);
-    setActive(active);
-  }
-
   public LookupRow(Object[] cells, Class<?> keyClass) {
     this(cells, (cells == null ? -1 : cells.length - 1), keyClass);
   }
@@ -233,14 +150,7 @@ public class LookupRow<ID_TYPE> extends MemoryOptimizedObject implements ILookup
     return (ID_TYPE) getValueInternal(KEY_BIT);
   }
 
-  /**
-   * @deprecated use {@link #withKey(Object)}. will be removed in version 6.1.
-   */
-  @Deprecated
-  public void setKey(ID_TYPE key) {
-    setValueInternal(KEY_BIT, key);
-  }
-
+  @Override
   public ILookupRow<ID_TYPE> withKey(ID_TYPE key) {
     setValueInternal(KEY_BIT, key);
     return this;
@@ -258,16 +168,6 @@ public class LookupRow<ID_TYPE> extends MemoryOptimizedObject implements ILookup
     return this;
   }
 
-  /**
-   * @deprecated use {@link #withParentKey(Object)}. will be removed in version 6.1.
-   */
-  @Deprecated
-  @Override
-  @SuppressWarnings("deprecation")
-  public void setParentKey(ID_TYPE parentKey) {
-    withParentKey(parentKey);
-  }
-
   @Override
   public String getText() {
     char[] c = (char[]) getValueInternal(TEXT_BIT);
@@ -280,16 +180,6 @@ public class LookupRow<ID_TYPE> extends MemoryOptimizedObject implements ILookup
     return this;
   }
 
-  /**
-   * @deprecated use {@link #withText(String)}. will be removed in version 6.1.
-   */
-  @Deprecated
-  @Override
-  @SuppressWarnings("deprecation")
-  public void setText(String text) {
-    withText(text);
-  }
-
   @Override
   public String getIconId() {
     return (String) getValueInternal(ICON_ID_BIT);
@@ -299,16 +189,6 @@ public class LookupRow<ID_TYPE> extends MemoryOptimizedObject implements ILookup
   public ILookupRow<ID_TYPE> withIconId(String iconId) {
     setValueInternal(ICON_ID_BIT, StringUtility.intern(iconId));
     return this;
-  }
-
-  /**
-   * @deprecated use {@link #withIconId(String)}. will be removed in version 6.1.
-   */
-  @Deprecated
-  @Override
-  @SuppressWarnings("deprecation")
-  public void setIconId(String iconId) {
-    withIconId(iconId);
   }
 
   @Override
@@ -323,16 +203,6 @@ public class LookupRow<ID_TYPE> extends MemoryOptimizedObject implements ILookup
     return this;
   }
 
-  /**
-   * @deprecated use {@link #withTooltipText(String)}. will be removed in version 6.1.
-   */
-  @Deprecated
-  @Override
-  @SuppressWarnings("deprecation")
-  public void setTooltipText(String tooltipText) {
-    withTooltipText(tooltipText);
-  }
-
   @Override
   public String getForegroundColor() {
     return (String) getValueInternal(FOREGROUD_COLOR_BIT);
@@ -342,16 +212,6 @@ public class LookupRow<ID_TYPE> extends MemoryOptimizedObject implements ILookup
   public ILookupRow<ID_TYPE> withForegroundColor(String foregroundColor) {
     setValueInternal(FOREGROUD_COLOR_BIT, StringUtility.intern(foregroundColor));
     return this;
-  }
-
-  /**
-   * @deprecated use {@link #withForegroundColor(String)}; will be removed in version 6.1.
-   */
-  @SuppressWarnings("deprecation")
-  @Deprecated
-  @Override
-  public void setForegroundColor(String foregroundColor) {
-    withForegroundColor(foregroundColor);
   }
 
   @Override
@@ -376,16 +236,6 @@ public class LookupRow<ID_TYPE> extends MemoryOptimizedObject implements ILookup
     return this;
   }
 
-  /**
-   * @deprecated use {@link #withBackgroundColor(String)}; will be removed in version 6.1.
-   */
-  @SuppressWarnings("deprecation")
-  @Deprecated
-  @Override
-  public void setBackgroundColor(String backgroundColor) {
-    withBackgroundColor(backgroundColor);
-  }
-
   @Override
   public FontSpec getFont() {
     String s = (String) getValueInternal(FONT_BIT);
@@ -402,16 +252,6 @@ public class LookupRow<ID_TYPE> extends MemoryOptimizedObject implements ILookup
     return this;
   }
 
-  /**
-   * @deprecated use {@link #withFont(FontSpec)}. will be removed in version 6.1.
-   */
-  @Deprecated
-  @Override
-  @SuppressWarnings("deprecation")
-  public void setFont(FontSpec font) {
-    withFont(font);
-  }
-
   @Override
   public boolean isEnabled() {
     return getOrElse(ENABLED_BIT, Boolean.TRUE);
@@ -421,16 +261,6 @@ public class LookupRow<ID_TYPE> extends MemoryOptimizedObject implements ILookup
   public ILookupRow<ID_TYPE> withEnabled(boolean enabled) {
     setIfNotDefault(ENABLED_BIT, enabled, Boolean.TRUE);
     return this;
-  }
-
-  /**
-   * @deprecated use {@link #withEnabled(boolean)}. will be removed in version 6.1.
-   */
-  @SuppressWarnings("deprecation")
-  @Deprecated
-  @Override
-  public void setEnabled(boolean enabled) {
-    withEnabled(enabled);
   }
 
   @Override
@@ -444,16 +274,6 @@ public class LookupRow<ID_TYPE> extends MemoryOptimizedObject implements ILookup
     return this;
   }
 
-  /**
-   * @deprecated use {@link #setActive(boolean)}. will be removed in version 6.1.
-   */
-  @Deprecated
-  @Override
-  @SuppressWarnings("deprecation")
-  public void setActive(boolean active) {
-    withActive(active);
-  }
-
   @Override
   public AbstractTableRowData getAdditionalTableRowData() {
     return (AbstractTableRowData) getValueInternal(ADDITIONAL_TABLE_ROW_DATA);
@@ -463,16 +283,6 @@ public class LookupRow<ID_TYPE> extends MemoryOptimizedObject implements ILookup
   public ILookupRow<ID_TYPE> withAdditionalTableRowData(AbstractTableRowData bean) {
     setValueInternal(ADDITIONAL_TABLE_ROW_DATA, bean);
     return this;
-  }
-
-  /**
-   * @deprecated use {@link #withAdditionalTableRowData(AbstractTableRowData)}. will be removed in version 6.1.
-   */
-  @Deprecated
-  @Override
-  @SuppressWarnings("deprecation")
-  public void setAdditionalTableRowData(AbstractTableRowData bean) {
-    withAdditionalTableRowData(bean);
   }
 
   @Override

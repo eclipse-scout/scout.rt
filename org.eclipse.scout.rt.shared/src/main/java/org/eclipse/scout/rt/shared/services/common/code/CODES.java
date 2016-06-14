@@ -12,7 +12,9 @@ package org.eclipse.scout.rt.shared.services.common.code;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
@@ -23,14 +25,6 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
 public final class CODES {
 
   private CODES() {
-  }
-
-  /**
-   * @deprecated use {@link BEANS#get(Class)} or {@link BEANS#get(Class)} directly. Will be removed in Scout 6.1
-   */
-  @Deprecated
-  public static <T extends ICodeType<?, ?>> T getCodeType(Class<T> type) {
-    return BEANS.get(ICodeService.class).getCodeType(type);
   }
 
   /**
@@ -86,8 +80,20 @@ public final class CODES {
     return BEANS.get(ICodeService.class).reloadCodeTypes(types);
   }
 
-  @SuppressWarnings("deprecation")
   public static Collection<ICodeType<?, ?>> getAllCodeTypes(String classPrefix) {
-    return BEANS.get(ICodeService.class).getAllCodeTypes(classPrefix);
+    Set<Class<? extends ICodeType<?, ?>>> allCodeTypeClasses = getAllCodeTypeClasses(classPrefix);
+    List<Class<? extends ICodeType<?, ?>>> list = CollectionUtility.arrayList(allCodeTypeClasses);
+    return getCodeTypes(list);
+  }
+
+  public static Set<Class<? extends ICodeType<?, ?>>> getAllCodeTypeClasses(String classPrefix) {
+    final Set<Class<? extends ICodeType<?, ?>>> filteredClasses = new LinkedHashSet<>();
+    final Collection<Class<? extends ICodeType<?, ?>>> classes = BEANS.get(ICodeService.class).getAllCodeTypeClasses();
+    for (Class<? extends ICodeType<?, ?>> c : classes) {
+      if (c.getName().startsWith(classPrefix)) {
+        filteredClasses.add(c);
+      }
+    }
+    return filteredClasses;
   }
 }

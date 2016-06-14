@@ -83,17 +83,6 @@ public interface IClientSession extends ISession, IPropertyObserver {
   int getExitCode();
 
   /**
-   * @return a virtual desktop model assiciated with this client session
-   *         <p>
-   *         Before a desktop is set using {@link #setDesktop(IDesktop)} this is a virtual desktop ONLY used to early
-   *         register observers.<br>
-   *         Once a desktop has been set, this is the same as calling {@link #getDesktop()}
-   * @deprecated use {@link #getDesktopElseVirtualDesktop()}; will be removed in version 6.1.
-   */
-  @Deprecated
-  IDesktop getVirtualDesktop();
-
-  /**
    * @return the {@link IDesktop} associated with this {@link IClientSession}, or a virtual {@link IDesktop} with
    *         limited functionality if not set yet.
    */

@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.wizard;
 
-import java.net.URL;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.IAppLinkCapable;
@@ -281,12 +280,6 @@ public interface IWizard extends IPropertyObserver, ITypeWithClassId, IAppLinkCa
    */
   @Override
   void doAppLinkAction(String ref);
-
-  /**
-   * @deprecated use {@link #doAppLinkAction(String)} instead, will be removed in Scout 6.1
-   */
-  @Deprecated
-  void doHyperlinkAction(URL url, String path, boolean local);
 
   void doStepAction(IWizardStep<? extends IForm> step);
 

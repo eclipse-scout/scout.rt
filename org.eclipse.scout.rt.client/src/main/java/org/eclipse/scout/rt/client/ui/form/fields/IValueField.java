@@ -27,7 +27,6 @@ public interface IValueField<VALUE> extends IFormField, IHolder<VALUE>, IContext
    */
   String PROP_DISPLAY_TEXT = "displayText";
   String PROP_VALUE = "value";
-  String PROP_AUTO_DISPLAY_TEXT = "autoDisplayText";
   String PROP_AUTO_ADD_DEFAULT_MENUS = "autoAddDefaultMenus";
   /**
    * {@link IContextMenu}
@@ -88,12 +87,6 @@ public interface IValueField<VALUE> extends IFormField, IHolder<VALUE>, IContext
   void setValue(VALUE o);
 
   /**
-   * @deprecated Will be removed in Scout 6.1. Use {@link IValueField#parseAndSetValue(String)}
-   */
-  @Deprecated
-  boolean parseValue(String text);
-
-  /**
    * Parses and sets either the value or an errorStatus, if parsing or validation fails.
    *
    * @param text
@@ -103,10 +96,6 @@ public interface IValueField<VALUE> extends IFormField, IHolder<VALUE>, IContext
   String getDisplayText();
 
   void setDisplayText(String s);
-
-  boolean isAutoDisplayText();
-
-  void setAutoDisplayText(boolean b);
 
   /**
    * force a fire of valueChanged even if the value has not changed This can be used to manually re-trigger value change

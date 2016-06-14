@@ -12,8 +12,6 @@ package org.eclipse.scout.rt.client.ui.basic.table;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -741,26 +739,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   /**
-   * Called when a hyperlink is used within the table. The hyperlink's table row is the selected row and the column is
-   * the context column ({@link #getContextColumn()}).
-   * <p>
-   * Subclasses can override this method. The default does nothing.
-   *
-   * @param url
-   *          Hyperlink to process.
-   * @param path
-   *          Path of URL ({@link URL#getPath()}).
-   * @param local
-   *          {@code true} if the url is not a valid external url but a local model url (http://local/...)
-   * @{@link Deprecated} use {@link #execAppLinkAction(String)} instead, will be removed in Scout 6.1
-   */
-  @ConfigOperation
-  @Order(120)
-  @Deprecated
-  protected void execHyperlinkAction(URL url, String path, boolean local) {
-  }
-
-  /**
    * Called when an app link has been clicked.
    * <p>
    * Subclasses can override this method. The default does nothing.
@@ -768,19 +746,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   @ConfigOperation
   @Order(120)
   protected void execAppLinkAction(String ref) {
-    //FIXME cgu: remove this code when execpHyperlinkAction has been removed
-    URL url = null;
-    boolean local = false;
-    if (ref != null) {
-      try {
-        url = new URL(ref);
-        local = "local".equals(url.getHost());
-      }
-      catch (MalformedURLException e) {
-        LOG.error("Malformed URL", e);
-      }
-    }
-    execHyperlinkAction(url, ref, local);
   }
 
   /**
@@ -1801,13 +1766,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   @Override
   public <T extends IMenu> T getMenuByClass(Class<T> menuType) {
     return MenuUtility.getMenuByClass(this, menuType);
-  }
-
-  @SuppressWarnings("deprecation")
-  @Deprecated
-  @Override
-  public <T extends IMenu> T getMenu(final Class<T> menuType) {
-    return getMenuByClass(menuType);
   }
 
   @Override

@@ -16,7 +16,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.scout.rt.platform.service.IService;
-import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 
 public interface ICodeService extends IService {
 
@@ -54,23 +53,9 @@ public interface ICodeService extends IService {
   List<ICodeType<?, ?>> reloadCodeTypes(List<Class<? extends ICodeType<?, ?>>> types);
 
   /**
-   * @return all code type classes with classPrefix
-   * @deprecated use {@link #getAllCodeTypeClasses()}. Will be removed in Scout 7.
-   */
-  @Deprecated
-  Set<Class<? extends ICodeType<?, ?>>> getAllCodeTypeClasses(String classPrefix);
-
-  /**
    * @return all code type classes
    */
   Set<Class<? extends ICodeType<?, ?>>> getAllCodeTypeClasses();
-
-  /**
-   * @deprecated use {@link #getAllCodeTypes()}. Will be removed in Scout 7.
-   */
-  @Deprecated
-  @RemoteServiceAccessDenied
-  Collection<ICodeType<?, ?>> getAllCodeTypes(String classPrefix);
 
   Collection<ICodeType<?, ?>> getAllCodeTypes();
 }

@@ -321,24 +321,6 @@ public class Cell implements ICell, IStyleable, IHtmlCapable {
     return m_errorStatus;
   }
 
-  /**
-   * @deprecated use {@link #addErrorStatus(String)}, will be removed in Scout 6.1
-   */
-  @Deprecated
-  public void setErrorStatus(String message) {
-    addErrorStatus(new DefaultFieldStatus(message));
-  }
-
-  /**
-   * Set the error status of the cell or <code>null</code> in case of no error.
-   *
-   * @deprecated use {@link #addErrorStatus(IStatus)}, will be removed in Scout 6.1
-   **/
-  @Deprecated
-  public void setErrorStatus(IStatus status) {
-    setErrorStatusInternal(ensureMultiStatus(status));
-  }
-
   public void clearErrorStatus() {
     setErrorStatusInternal(null);
   }

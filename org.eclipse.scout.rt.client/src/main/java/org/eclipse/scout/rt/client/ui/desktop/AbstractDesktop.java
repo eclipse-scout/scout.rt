@@ -55,7 +55,6 @@ import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
-import org.eclipse.scout.rt.client.ui.action.tool.IToolButton;
 import org.eclipse.scout.rt.client.ui.action.view.IViewButton;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
@@ -122,7 +121,6 @@ import org.slf4j.LoggerFactory;
  * </ul>
  * The Eclipse Scout SDK creates a subclass of this class that can be used as initial desktop.
  */
-@SuppressWarnings("deprecation")
 public abstract class AbstractDesktop extends AbstractPropertyObserver implements IDesktop, IContributionOwner, IExtensibleObject {
 
   private static final Logger LOG = LoggerFactory.getLogger(AbstractDesktop.class);
@@ -767,15 +765,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     return new ActionFinder().findAction(getActions(), actionType);
   }
 
-  /**
-   * @deprecated use {@link #findAction(Class)}, will be removed in Scout 6.1
-   */
-  @Override
-  @Deprecated
-  public <T extends IToolButton> T findToolButton(Class<T> toolButtonType) {
-    return findAction(toolButtonType);
-  }
-
   @Override
   public <T extends IMenu> T findMenu(Class<T> menuType) {
     return findAction(menuType);
@@ -826,11 +815,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   @Override
-  public List<IForm> getViewStack() {
-    return getViews();
-  }
-
-  @Override
   public List<IForm> getViews() {
     return m_formStore.getViews();
   }
@@ -873,11 +857,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   @Override
-  public List<IForm> getDialogStack() {
-    return getDialogs();
-  }
-
-  @Override
   public List<IForm> getDialogs() {
     return m_formStore.getDialogs();
   }
@@ -899,7 +878,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     return dialogs;
   }
 
-  @Override
   public List<IMessageBox> getMessageBoxStack() {
     return getMessageBoxes();
   }
@@ -959,12 +937,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     for (IForm view : m_formStore.getViews()) {
       activateForm(view);
     }
-  }
-
-  @Override
-
-  public void ensureVisible(IForm form) {
-    activateForm(form);
   }
 
   @Override
@@ -1101,11 +1073,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   @Override
-  public void addForm(IForm form) {
-    showForm(form);
-  }
-
-  @Override
   public void showForm(IForm form) {
     // Let the desktop extensions to intercept the given form.
     final IHolder<IForm> formHolder = new Holder<>(form);
@@ -1147,11 +1114,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   @Override
-  public void removeForm(IForm form) {
-    hideForm(form);
-  }
-
-  @Override
   public void hideForm(IForm form) {
     if (form == null || !m_formStore.contains(form)) {
       return;
@@ -1167,11 +1129,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   @Override
-  public void addMessageBox(final IMessageBox messageBox) {
-    showMessageBox(messageBox);
-  }
-
-  @Override
   public void showMessageBox(IMessageBox messageBox) {
     if (messageBox == null || m_messageBoxStore.contains(messageBox)) {
       return;
@@ -1182,11 +1139,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
 
     m_messageBoxStore.add(messageBox);
     fireMessageBoxShow(messageBox);
-  }
-
-  @Override
-  public void removeMessageBox(IMessageBox messageBox) {
-    hideMessageBox(messageBox);
   }
 
   @Override
@@ -1211,7 +1163,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
 
   @Override
   public void setAvailableOutlines(List<? extends IOutline> availableOutlines) {
-    setOutline((IOutline) null);
+    activateOutline((IOutline) null);
     m_availableOutlines = CollectionUtility.arrayList(availableOutlines);
   }
 
@@ -1223,11 +1175,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   @Override
   public boolean isOutlineChanging() {
     return m_outlineChanging;
-  }
-
-  @Override
-  public void setOutline(IOutline outline) {
-    activateOutline(outline);
   }
 
   @Override
@@ -1264,7 +1211,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     }
     for (IOutline o : getAvailableOutlines()) {
       if (outlineType.isInstance(o)) {
-        setOutline(o);
+        activateOutline(o);
         return;
       }
     }
@@ -1326,18 +1273,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   public <T extends IMenu> T getMenu(Class<? extends T> searchType) {
     // ActionFinder performs instance-of checks. Hence the menu replacement mapping is not required
     return new ActionFinder().findAction(getMenus(), searchType);
-  }
-
-  @Deprecated
-  @Override
-  public <T extends IToolButton> T getToolButton(Class<? extends T> searchType) {
-    // ActionFinder performs instance-of checks. Hence the toolbutton replacement mapping is not required
-    return new ActionFinder().findAction(getMenus(), searchType);
-  }
-
-  @Override
-  public List<IMenu> getToolButtons() {
-    return getMenus();
   }
 
   @Override
@@ -1491,11 +1426,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   @Override
-  public List<IFileChooser> getFileChooserStack() {
-    return getFileChoosers();
-  }
-
-  @Override
   public List<IFileChooser> getFileChoosers() {
     return m_fileChooserStore.values();
   }
@@ -1503,11 +1433,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   @Override
   public List<IFileChooser> getFileChoosers(IDisplayParent displayParent) {
     return m_fileChooserStore.getByDisplayParent(displayParent);
-  }
-
-  @Override
-  public void addFileChooser(final IFileChooser fileChooser) {
-    showFileChooser(fileChooser);
   }
 
   @Override

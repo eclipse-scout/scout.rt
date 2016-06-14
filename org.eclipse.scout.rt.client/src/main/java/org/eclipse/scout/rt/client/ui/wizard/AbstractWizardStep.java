@@ -87,26 +87,6 @@ public abstract class AbstractWizardStep<FORM extends IForm> extends AbstractPro
     return null;
   }
 
-  /**
-   * @deprecated use getConfiguredTitle()
-   */
-  @Deprecated
-  @ConfigProperty(ConfigProperty.TEXT)
-  @Order(35)
-  protected String getConfiguredTitleHtml() {
-    return null;
-  }
-
-  /**
-   * @deprecated use getConfiguredSubTitle(), will be removed in Scout 6.1
-   */
-  @Deprecated
-  @ConfigProperty(ConfigProperty.TEXT)
-  @Order(38)
-  protected String getConfiguredDescriptionHtml() {
-    return null;
-  }
-
   @ConfigProperty(ConfigProperty.ICON_ID)
   @Order(40)
   protected String getConfiguredIconId() {
@@ -287,8 +267,6 @@ public abstract class AbstractWizardStep<FORM extends IForm> extends AbstractPro
     setTitle(getConfiguredTitle());
     setSubTitle(getConfiguredSubTitle());
     setTooltipText(getConfiguredTooltipText());
-    setTitleHtml(getConfiguredTitleHtml());
-    setDescriptionHtml(getConfiguredDescriptionHtml());
     setIconId(getConfiguredIconId());
     setEnabled(getConfiguredEnabled());
     setVisible(getConfiguredVisible());
@@ -405,34 +383,6 @@ public abstract class AbstractWizardStep<FORM extends IForm> extends AbstractPro
   @Override
   public void setTooltipText(String tooltipText) {
     propertySupport.setPropertyString(PROP_TOOLTIP_TEXT, tooltipText);
-  }
-
-  @SuppressWarnings("deprecation")
-  @Deprecated
-  @Override
-  public String getTitleHtml() {
-    return propertySupport.getPropertyString(PROP_TITLE_HTML);
-  }
-
-  @SuppressWarnings("deprecation")
-  @Deprecated
-  @Override
-  public void setTitleHtml(String s) {
-    propertySupport.setPropertyString(PROP_TITLE_HTML, s);
-  }
-
-  @SuppressWarnings("deprecation")
-  @Deprecated
-  @Override
-  public String getDescriptionHtml() {
-    return propertySupport.getPropertyString(PROP_DESCRIPTION_HTML);
-  }
-
-  @SuppressWarnings("deprecation")
-  @Deprecated
-  @Override
-  public void setDescriptionHtml(String s) {
-    propertySupport.setPropertyString(PROP_DESCRIPTION_HTML, s);
   }
 
   @Override

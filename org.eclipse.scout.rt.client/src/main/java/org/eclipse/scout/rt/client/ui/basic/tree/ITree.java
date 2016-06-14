@@ -18,9 +18,7 @@ import java.util.Set;
 import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
 import org.eclipse.scout.rt.client.ui.IAppLinkCapable;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
-import org.eclipse.scout.rt.client.ui.action.ActionFinder;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
-import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenuOwner;
 import org.eclipse.scout.rt.client.ui.action.menu.root.ITreeContextMenu;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
@@ -87,15 +85,6 @@ public interface ITree extends IPropertyObserver, IDNDSupport, IAppLinkCapable, 
 
   @Override
   ITreeContextMenu getContextMenu();
-
-  /**
-   * Convenience to find a menu, uses {@link ActionFinder}
-   *
-   * @deprecated Use {@link #getMenuByClass(Class)} instead. This method is error-prone, because it does not throw an
-   *             exception if the given menu type is ambiguous. It will be removed in Scout 6.1
-   */
-  @Deprecated
-  <T extends IMenu> T getMenu(Class<T> menuType);
 
   /**
    * @see #setScrollToSelection()

@@ -219,8 +219,6 @@ public interface IPlanner<RESOURCE_ID, ACTIVITY_ID> extends IPropertyObserver, I
 
   List<RESOURCE_ID> getSelectedResourceIds();
 
-  void setSelectedResources(List<? extends Resource<RESOURCE_ID>> resources);
-
   void isSelectedResource(Resource<RESOURCE_ID> resource);
 
   void selectResource(Resource<RESOURCE_ID> resource);
