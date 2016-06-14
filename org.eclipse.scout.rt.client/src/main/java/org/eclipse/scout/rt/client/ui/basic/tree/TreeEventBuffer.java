@@ -13,9 +13,11 @@ package org.eclipse.scout.rt.client.ui.basic.tree;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Set;
 
 import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
@@ -380,8 +382,8 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
     return identical;
   }
 
-  protected List<Integer> getExpansionRelatedEvents() {
-    List<Integer> res = new ArrayList<>();
+  protected Set<Integer> getExpansionRelatedEvents() {
+    Set<Integer> res = new HashSet<>();
     res.add(TreeEvent.TYPE_NODE_EXPANDED);
     res.add(TreeEvent.TYPE_NODE_EXPANDED_RECURSIVE);
     res.add(TreeEvent.TYPE_NODE_COLLAPSED);

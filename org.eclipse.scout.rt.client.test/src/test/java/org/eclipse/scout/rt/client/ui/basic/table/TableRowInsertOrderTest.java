@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
@@ -58,7 +59,7 @@ public class TableRowInsertOrderTest {
       table.setTableChanging(false);
     }
 
-    assertTrue(CollectionUtility.equalsCollection(table.getRows(), tableListener.getInsertedRows()));
+    assertEquals(table.getRows(), tableListener.getInsertedRows());
     //No order_change_event expected
     assertTrue(tableListener.getOrderedRows() == null);
   }
@@ -87,7 +88,7 @@ public class TableRowInsertOrderTest {
     assertNotSame(table.getRows().get(0), tableListener.getInsertedRows().get(0));
     assertSame(table.getRows().get(table.getRows().size() - 1), tableListener.getInsertedRows().get(0));
     assertTrue(CollectionUtility.equalsCollection(table.getRows(), tableListener.getInsertedRows(), false));
-    assertTrue(CollectionUtility.equalsCollection(table.getRows(), tableListener.getOrderedRows()));
+    assertEquals(table.getRows(), tableListener.getOrderedRows());
   }
 
   private static class P_TableListener extends TableAdapter {

@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.CompareUtility;
@@ -110,7 +111,7 @@ public abstract class AbstractEventBuffer<T extends IModelEvent> {
    *          List to filter. Must not be <code>null</code>.
    */
   protected void remove(int type, List<T> events) {
-    remove(Collections.singletonList(type), events);
+    remove(Collections.singleton(type), events);
   }
 
   /**
@@ -121,7 +122,7 @@ public abstract class AbstractEventBuffer<T extends IModelEvent> {
    * @param events
    *          List to filter. Must not be <code>null</code>.
    */
-  protected void remove(List<Integer> types, List<T> events) {
+  protected void remove(Set<Integer> types, List<T> events) {
     for (Iterator<T> it = events.iterator(); it.hasNext();) {
       T event = it.next();
       if (types.contains(event.getType())) {

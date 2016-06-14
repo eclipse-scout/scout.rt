@@ -15,8 +15,10 @@ import java.beans.PropertyChangeListener;
 import java.util.Set;
 
 import org.eclipse.scout.rt.client.extension.ui.wizard.IWizardContainerFormExtension;
+import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 
@@ -82,36 +84,65 @@ public abstract class AbstractWizardContainerForm extends AbstractForm implement
   }
 
   protected void handleEscapeKey(boolean kill) {
-    if (kill) {
-      if (getWizardSuspendButton() != null && getWizardSuspendButton().isVisible() && getWizardSuspendButton().isEnabled()) {
-        getWizard().doSuspend();
-      }
-      else if (getWizardCancelButton() != null && getWizardCancelButton().isVisible() && getWizardCancelButton().isEnabled()) {
-        getWizard().doCancel();
-      }
-      else {
-        getWizard().doCancel();
-      }
+    IWizardAction action = getEscapeAction(kill);
+    if (action instanceof IAction) {
+      ((IAction) action).doAction();
+    }
+    else if (action instanceof IButton) {
+      ((IButton) action).doClick();
     }
     else {
-      if (getWizardCancelButton() != null && getWizardCancelButton().isVisible() && getWizardCancelButton().isEnabled()) {
-        getWizard().doCancel();
-      }
-      else if (getWizardSuspendButton() != null && getWizardSuspendButton().isVisible() && getWizardSuspendButton().isEnabled()) {
-        getWizard().doSuspend();
-      }
-      else {
-        getWizard().doCancel();
-      }
+      getWizard().doCancel();
     }
   }
 
   protected void handleEnterKey() {
+    IWizardAction action = getEnterAction();
+    if (action instanceof IAction) {
+      ((IAction) action).doAction();
+    }
+    else if (action instanceof IButton) {
+      ((IButton) action).doClick();
+    }
+    else {
+      //skip
+    }
+  }
+
+  protected IWizardAction getEscapeAction(boolean kill) {
+    if (kill) {
+      if (getWizardSuspendButton() != null && getWizardSuspendButton().isVisible() && getWizardSuspendButton().isEnabled()) {
+        return getWizardSuspendButton();
+      }
+      else if (getWizardCancelButton() != null && getWizardCancelButton().isVisible() && getWizardCancelButton().isEnabled()) {
+        return getWizardCancelButton();
+      }
+      else {
+        return null;
+      }
+    }
+    else {
+      if (getWizardCancelButton() != null && getWizardCancelButton().isVisible() && getWizardCancelButton().isEnabled()) {
+        return getWizardCancelButton();
+      }
+      else if (getWizardSuspendButton() != null && getWizardSuspendButton().isVisible() && getWizardSuspendButton().isEnabled()) {
+        return getWizardSuspendButton();
+      }
+      else {
+        return null;
+      }
+    }
+  }
+
+  protected IWizardAction getEnterAction() {
     if (getWizardNextStepButton() != null && getWizardNextStepButton().isVisible() && getWizardNextStepButton().isEnabled()) {
-      getWizard().doNextStep();
+      return getWizardNextStepButton();
     }
     else if (getWizardFinishButton() != null && getWizardFinishButton().isVisible() && getWizardFinishButton().isEnabled()) {
-      getWizard().doFinish();
+      return getWizardFinishButton();
+    }
+    else {
+      return null;
     }
   }
 

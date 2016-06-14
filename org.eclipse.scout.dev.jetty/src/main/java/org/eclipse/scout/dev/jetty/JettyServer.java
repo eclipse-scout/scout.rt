@@ -10,8 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.dev.jetty;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
@@ -80,6 +82,7 @@ public class JettyServer {
     Server server = new Server(port);
     server.setHandler(webApp);
     server.start();
+    startConsoleHandler(server);
     if (LOG.isInfoEnabled()) {
       StringBuilder sb = new StringBuilder();
       sb.append("Server ready. To run the application, open one of the following addresses in a web browser:\n");
@@ -92,8 +95,41 @@ public class JettyServer {
         sb.append("  http://").append(ip).append(":").append(port).append(contextPath).append("\n");
       }
       sb.append("---------------------------------------------------------------------\n");
+      sb.append("To shut the server down, type \"shutdown\" in the console.\n");
       LOG.info(sb.toString());
     }
+  }
+
+  private void startConsoleHandler(final Server server) {
+    Thread t = new Thread("Console input handler") {
+      @Override
+      public void run() {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        try {
+          while (true) {
+            String command = br.readLine();
+            if (command.equalsIgnoreCase("shutdown")) {
+              try {
+                LOG.warn("Shutting down...");
+                server.stop();
+                return;
+              }
+              catch (Exception e) {
+                LOG.error("Shutdown error.", e);
+              }
+            }
+            else {
+              LOG.warn("Unknown command entered on console: {}", command);
+            }
+          }
+        }
+        catch (IOException e1) {
+          LOG.error("Unable to wait for console command.", e1);
+        }
+      }
+    };
+    t.setDaemon(true);
+    t.start();
   }
 
   protected WebAppContext createWebApp(File webappDir, String contextPath) throws Exception {

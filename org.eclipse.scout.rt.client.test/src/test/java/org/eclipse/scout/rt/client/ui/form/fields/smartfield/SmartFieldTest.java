@@ -352,6 +352,21 @@ public class SmartFieldTest {
     assertTrue(rootNode.getChildNode(0).isSelectedNode());
   }
 
+  /**
+   * Opening and closing proposal chooser without selecting a value should not change the state of the field.
+   */
+  @Test
+  public void testCancelledProposal() {
+    Long initialValue = 10L;
+    StyleField f = m_styleField;
+    f.setValue(initialValue);
+    ILookupRow<Long> initialLookupRow = f.getCurrentLookupRow();
+    f.getUIFacade().openProposalChooserFromUI("Red", true);
+    f.getUIFacade().cancelProposalChooserFromUI();
+    assertEquals(initialValue, f.getValue());
+    assertEquals(initialLookupRow, f.getCurrentLookupRow());
+  }
+
   @Test
   public void testHierarchicalBrowse() {
     StyleField f = m_styleField;

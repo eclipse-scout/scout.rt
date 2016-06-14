@@ -81,7 +81,7 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
   /**
    * Null object used for {@link #installLookupRowContext(ILookupRow)}.
    */
-  private final ILookupRow<LOOKUP_KEY> EMPTY_LOOKUP_ROW = new LookupRow<LOOKUP_KEY>(null, "");
+  private final ILookupRow<LOOKUP_KEY> EMPTY_LOOKUP_ROW = new LookupRow<>(null, "");
 
   private final EventListenerList m_listenerList = new EventListenerList();
 

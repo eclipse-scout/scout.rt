@@ -76,11 +76,11 @@ public class TableProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<IC
     if (m_model.isCheckable()) {
       Collection<ITableRow> checkedRows = m_model.getCheckedRows();
       if (CollectionUtility.hasElements(checkedRows)) {
-        row = (ILookupRow<LOOKUP_KEY>) m_model.getCheckedLookupRow();
+        row = m_model.getCheckedLookupRow();
       }
     }
     else {
-      row = (ILookupRow<LOOKUP_KEY>) m_model.getSelectedLookupRow();
+      row = m_model.getSelectedLookupRow();
     }
     return row;
   }

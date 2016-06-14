@@ -22,11 +22,13 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
+import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.junit.Assert;
 import org.junit.Before;
@@ -227,9 +229,9 @@ public class TableEventBufferTest {
     m_testBuffer.add(e2);
     final List<TableEvent> events = m_testBuffer.consumeAndCoalesceEvents();
     assertEquals(3, events.size());
-    assertEquals(1, events.get(0).getRows().size()); // row 1 is removed from update because of the consecutive insert event for row 1
-    assertEquals(1, events.get(1).getRows().size());
-    assertEquals(1, events.get(2).getRows().size()); // row 1 was merged to insert
+    assertEquals(1, events.get(0).getRowCount()); // row 1 is removed from update because of the consecutive insert event for row 1
+    assertEquals(1, events.get(1).getRowCount());
+    assertEquals(1, events.get(2).getRowCount()); // row 1 was merged to insert
   }
 
   ////// REPLACE
@@ -592,6 +594,384 @@ public class TableEventBufferTest {
     assertEquals(TableEvent.TYPE_ROW_ORDER_CHANGED, rowOrderChangedEvent.getType());
     assertEquals(3, rowOrderChangedEvent.getRowCount());
     assertTrue(rowOrderChangedEvent.getRows().contains(rowPrivat));
+  }
+
+  @Test
+  public void testCoalesceSameTypeCheckOrderSingleRowEvents() {
+    ITable table = mock(ITable.class);
+    final int rowCount = 10;
+    List<ITableRow> rows = new ArrayList<>(rowCount);
+    LinkedList<TableEvent> events = new LinkedList<>();
+    for (int i = 0; i < 10; i++) {
+      ITableRow row = mockRow(i);
+      rows.add(row);
+      events.add(new TableEvent(table, TableEvent.TYPE_ROWS_INSERTED, Collections.singletonList(row)));
+    }
+
+    assertEquals(rowCount, events.size());
+    m_testBuffer.coalesceSameType(events);
+
+    assertEquals(1, events.size());
+    assertEquals(rows, events.get(0).getRows());
+  }
+
+  @Test
+  public void testCoalesceSameTypeCheckOrderMultipleRowsEvents() {
+    ITable table = mock(ITable.class);
+    final int rowCount = 10;
+    List<ITableRow> rows = new ArrayList<>(rowCount);
+    LinkedList<TableEvent> events = new LinkedList<>();
+    for (int i = 0; i < 10; i++) {
+      ITableRow row1 = mockRow(2 * i);
+      ITableRow row2 = mockRow(2 * i + 1);
+      rows.add(row1);
+      rows.add(row2);
+      events.add(new TableEvent(table, TableEvent.TYPE_ROWS_INSERTED, Arrays.asList(row1, row2)));
+    }
+
+    assertEquals(rowCount, events.size());
+    m_testBuffer.coalesceSameType(events);
+
+    assertEquals(1, events.size());
+    assertEquals(rows, events.get(0).getRows());
+  }
+
+  @Test
+  public void testCoalesceSameTypeRowAndRowlessEvents() {
+    ITable table = mock(ITable.class);
+    ITableRow r0 = mockRow(0);
+    ITableRow r1 = mockRow(1);
+
+    LinkedList<TableEvent> events = new LinkedList<>();
+    TableEvent e0 = new TableEvent(table, TableEvent.TYPE_ROWS_INSERTED, Collections.singletonList(r0));
+    TableEvent e1 = new TableEvent(table, TableEvent.TYPE_COLUMN_AGGREGATION_CHANGED);
+    TableEvent e2 = new TableEvent(table, TableEvent.TYPE_COLUMN_AGGREGATION_CHANGED);
+    TableEvent e3 = new TableEvent(table, TableEvent.TYPE_COLUMN_AGGREGATION_CHANGED);
+    TableEvent e4 = new TableEvent(table, TableEvent.TYPE_ROWS_INSERTED, Collections.singletonList(r1));
+
+    events.add(e0);
+    events.add(e1);
+    events.add(e2);
+    events.add(e3);
+    events.add(e4);
+
+    assertEquals(5, events.size());
+    m_testBuffer.coalesceSameType(events);
+
+    assertEquals(Arrays.asList(e3, e4), events);
+    assertEquals(Collections.emptyList(), e3.getRows());
+    assertEquals(Arrays.asList(r0, r1), e4.getRows());
+  }
+
+  @Test
+  public void testCoalesceSameTypeInsertInsertUpdateUpdateInsertEvents() {
+    ITable table = mock(ITable.class);
+    ITableRow r0 = mockRow(0);
+    ITableRow r1 = mockRow(1);
+    ITableRow r2 = mockRow(2);
+
+    LinkedList<TableEvent> events = new LinkedList<>();
+    TableEvent e0 = new TableEvent(table, TableEvent.TYPE_ROWS_INSERTED, Collections.singletonList(r0));
+    TableEvent e1 = new TableEvent(table, TableEvent.TYPE_ROWS_INSERTED, Collections.singletonList(r1));
+    TableEvent e2 = new TableEvent(table, TableEvent.TYPE_ROWS_UPDATED, Collections.singletonList(r1));
+    TableEvent e3 = new TableEvent(table, TableEvent.TYPE_ROWS_UPDATED, Collections.singletonList(r0));
+    TableEvent e4 = new TableEvent(table, TableEvent.TYPE_ROWS_INSERTED, Collections.singletonList(r2));
+
+    events.add(e0);
+    events.add(e1);
+    events.add(e2);
+    events.add(e3);
+    events.add(e4);
+
+    assertEquals(5, events.size());
+    m_testBuffer.coalesceSameType(events);
+
+    assertEquals(Arrays.asList(e1, e3, e4), events);
+    assertEquals(Arrays.asList(r0, r1), e1.getRows());
+    assertEquals(Arrays.asList(r1, r0), e3.getRows());
+    assertEquals(Arrays.asList(r2), e4.getRows());
+  }
+
+  @Test
+  public void testCoalesceSameTypeInsertInsertHeaderUpdateInsertRowOrderChangedHeaderUpdateEvents() {
+    ITable table = mock(ITable.class);
+    ITableRow r0 = mockRow(0);
+    ITableRow r1 = mockRow(1);
+    ITableRow r2 = mockRow(2);
+    ITableRow r3 = mockRow(3);
+    ITableRow r4 = mockRow(4);
+    ITableRow r5 = mockRow(5);
+    ITableRow r6 = mockRow(6);
+
+    LinkedList<TableEvent> events = new LinkedList<>();
+    TableEvent e0 = new TableEvent(table, TableEvent.TYPE_ROWS_INSERTED, Arrays.asList(r0, r1));
+    TableEvent e1 = new TableEvent(table, TableEvent.TYPE_ROWS_INSERTED, Arrays.asList(r2, r3, r4));
+    TableEvent e2 = new TableEvent(table, TableEvent.TYPE_COLUMN_HEADERS_UPDATED);
+    TableEvent e3 = new TableEvent(table, TableEvent.TYPE_ROWS_INSERTED, Arrays.asList(r5, r6));
+    TableEvent e4 = new TableEvent(table, TableEvent.TYPE_ROW_ORDER_CHANGED, Arrays.asList(r6, r5, r4, r3, r2, r1, r0));
+    TableEvent e5 = new TableEvent(table, TableEvent.TYPE_COLUMN_HEADERS_UPDATED);
+
+    events.add(e0);
+    events.add(e1);
+    events.add(e2);
+    events.add(e3);
+    events.add(e4);
+    events.add(e5);
+
+    assertEquals(6, events.size());
+    m_testBuffer.coalesceSameType(events);
+
+    assertEquals(Arrays.asList(e3, e4, e5), events);
+    assertEquals(Arrays.asList(r0, r1, r2, r3, r4, r5, r6), e3.getRows());
+    assertEquals(Arrays.asList(r6, r5, r4, r3, r2, r1, r0), e4.getRows());
+    assertEquals(Collections.emptyList(), e5.getRows());
+  }
+
+  @Test(timeout = 2000)
+  public void testCoalesceSameTypeWithManyInsertEvents() throws Exception {
+    final int eventCount = 10000;
+    ITable table = mock(ITable.class);
+    LinkedList<TableEvent> tableEvents = new LinkedList<>();
+    for (int i = 0; i < eventCount; i++) {
+      tableEvents.add(new TableEvent(table, TableEvent.TYPE_ROWS_INSERTED, Collections.singletonList(mockRow(i))));
+    }
+
+    assertEquals(eventCount, tableEvents.size());
+    m_testBuffer.coalesceSameType(tableEvents);
+    assertEquals(1, tableEvents.size());
+    assertEquals(eventCount, CollectionUtility.firstElement(tableEvents).getRowCount());
+  }
+
+  @Test(timeout = 2000)
+  public void testRemoveObsoleteWithManyInsertAndOneDeleteAllRowsEvent() throws Exception {
+    final int insertEventCount = 10000;
+    ITable table = mock(ITable.class);
+    LinkedList<TableEvent> tableEvents = new LinkedList<>();
+    List<ITableRow> allRows = new ArrayList<>(insertEventCount);
+    for (int i = 0; i < insertEventCount; i++) {
+      ITableRow row = mockRow(i);
+      allRows.add(row);
+      tableEvents.add(new TableEvent(table, TableEvent.TYPE_ROWS_INSERTED, Collections.singletonList(row)));
+    }
+    tableEvents.add(new TableEvent(table, TableEvent.TYPE_ALL_ROWS_DELETED, allRows));
+
+    assertEquals(insertEventCount + 1, tableEvents.size());
+    m_testBuffer.removeObsolete(tableEvents);
+    assertEquals(1, tableEvents.size());
+
+  }
+
+  @Test(timeout = 2000)
+  public void testRemoveObsoleteWithManyInsertEvents() throws Exception {
+    final int insertEventCount = 10000;
+    ITable table = mock(ITable.class);
+    LinkedList<TableEvent> tableEvents = new LinkedList<>();
+    for (int i = 0; i < insertEventCount; i++) {
+      tableEvents.add(new TableEvent(table, TableEvent.TYPE_ROWS_INSERTED, Collections.singletonList(mockRow(i))));
+    }
+
+    assertEquals(insertEventCount, tableEvents.size());
+    m_testBuffer.removeObsolete(tableEvents);
+    assertEquals(insertEventCount, tableEvents.size());
+
+  }
+
+  @Test(timeout = 2000)
+  public void testRemoveIdenticalEventsWithManyInsertEvents() throws Exception {
+    final int eventCount = 10000;
+    ITable table = mock(ITable.class);
+    LinkedList<TableEvent> tableEvents = new LinkedList<>();
+    for (int i = 0; i < eventCount; i++) {
+      tableEvents.add(new TableEvent(table, TableEvent.TYPE_ROWS_INSERTED, Collections.singletonList(mockRow(i))));
+    }
+    for (int i = eventCount - 1; i >= 0; i--) {
+      tableEvents.add(new TableEvent(table, TableEvent.TYPE_ROWS_INSERTED, Collections.singletonList(mockRow(i))));
+    }
+    assertEquals(2 * eventCount, tableEvents.size());
+    m_testBuffer.removeIdenticalEvents(tableEvents);
+    assertEquals(eventCount, tableEvents.size());
+  }
+
+  @Test(timeout = 2000)
+  public void testRemoveIdenticalEventsWithManyInsertAndDeleteEvents() throws Exception {
+    final int eventCount = 10000;
+    ITable table = mock(ITable.class);
+    LinkedList<TableEvent> tableEvents = new LinkedList<>();
+    for (int i = 0; i < eventCount; i++) {
+      tableEvents.add(new TableEvent(table, TableEvent.TYPE_ROWS_INSERTED, Collections.singletonList(mockRow(i))));
+      tableEvents.add(new TableEvent(table, TableEvent.TYPE_ROWS_UPDATED, Collections.singletonList(mockRow(i))));
+    }
+    assertEquals(2 * eventCount, tableEvents.size());
+    m_testBuffer.removeIdenticalEvents(tableEvents);
+    assertEquals(2 * eventCount, tableEvents.size());
+  }
+
+  public void testRemoveRowsFromPreviousEventsWhenDeleted() {
+    ITable table = mock(ITable.class);
+    ITableRow r0 = mockRow(0);
+    ITableRow r1 = mockRow(1);
+    ITableRow r2 = mockRow(2);
+
+    TableEvent e0 = new TableEvent(table, TableEvent.TYPE_ROWS_INSERTED, Arrays.asList(r0, r1, r2));
+    TableEvent e1 = new TableEvent(table, TableEvent.TYPE_ROW_ORDER_CHANGED, Arrays.asList(r0, r1, r2));
+    TableEvent e2 = new TableEvent(table, TableEvent.TYPE_ROWS_UPDATED, Collections.singletonList(r0));
+    TableEvent e3 = new TableEvent(table, TableEvent.TYPE_ROWS_UPDATED, Collections.singletonList(r1));
+    TableEvent e4 = new TableEvent(table, TableEvent.TYPE_ROWS_UPDATED, Collections.singletonList(r2));
+    TableEvent e5 = new TableEvent(table, TableEvent.TYPE_ROWS_DELETED, Arrays.asList(r0, r1, r2));
+
+    LinkedList<TableEvent> events = new LinkedList<>();
+    events.add(e0);
+    events.add(e1);
+    events.add(e2);
+    events.add(e3);
+    events.add(e4);
+    events.add(e5);
+
+    m_testBuffer.removeObsolete(events);
+
+    assertEquals(6, events.size());
+    assertSame(Arrays.asList(e0, e1, e2, e3, e4, e5), events.get(0));
+    assertEquals(3, e0.getRowCount());
+    assertEquals(3, e1.getRowCount());
+    assertEquals(0, e2.getRowCount());
+    assertEquals(0, e3.getRowCount());
+    assertEquals(0, e4.getRowCount());
+    assertEquals(3, e5.getRowCount());
+  }
+
+  @Test
+  public void testReplacePreviousInsertUpdateUpdate() {
+    ITable table = mock(ITable.class);
+    ITableRow r0 = mockRow(0);
+    ITableRow r1 = mockRow(1);
+
+    TableEvent e0 = new TableEvent(table, TableEvent.TYPE_ROWS_INSERTED, Arrays.asList(r0, r1));
+    TableEvent e1 = new TableEvent(table, TableEvent.TYPE_ROWS_UPDATED, Collections.singletonList(r0));
+    TableEvent e2 = new TableEvent(table, TableEvent.TYPE_ROWS_UPDATED, Collections.singletonList(r1));
+
+    LinkedList<TableEvent> events = new LinkedList<>();
+    events.add(e0);
+    events.add(e1);
+    events.add(e2);
+
+    m_testBuffer.replacePrevious(events, TableEvent.TYPE_ROWS_INSERTED, TableEvent.TYPE_ROWS_UPDATED);
+    assertEquals(3, events.size());
+    assertEquals(Arrays.asList(r0, r1), events.get(0).getRows());
+    assertEquals(Collections.emptyList(), events.get(1).getRows());
+    assertEquals(Collections.emptyList(), events.get(2).getRows());
+  }
+
+  @Test
+  public void testApplyRowOrderChangedToRowsInsertedTwoRowOrderChangesInARow() {
+    final TableEvent insert = new TableEvent(mock(ITable.class), TableEvent.TYPE_ROWS_INSERTED, mockRows(0, 1, 2, 3, 4));
+    final TableEvent orderChanged1 = new TableEvent(mock(ITable.class), TableEvent.TYPE_ROW_ORDER_CHANGED, mockRows(4, 3, 2, 1, 0));
+    final TableEvent orderChanged2 = new TableEvent(mock(ITable.class), TableEvent.TYPE_ROW_ORDER_CHANGED, mockRows(0, 1, 2, 3, 4));
+
+    LinkedList<TableEvent> events = new LinkedList<>();
+    events.add(insert);
+    events.add(orderChanged1);
+    events.add(orderChanged2);
+
+    m_testBuffer.applyRowOrderChangedToRowsInserted(events);
+    assertEquals(2, events.size());
+
+    assertEquals(TableEvent.TYPE_ROWS_INSERTED, events.get(0).getType());
+    assertEquals(mockRows(4, 3, 2, 1, 0), events.get(0).getRows());
+
+    assertEquals(TableEvent.TYPE_ROW_ORDER_CHANGED, events.get(1).getType());
+    assertEquals(mockRows(0, 1, 2, 3, 4), events.get(1).getRows());
+  }
+
+  @Test
+  public void testApplyRowOrderChangedToRowsInsertedWithInsertUpdateAndRowOrdherchangedEvents() {
+    final TableEvent insert = new TableEvent(mock(ITable.class), TableEvent.TYPE_ROWS_INSERTED, mockRows(0, 1, 2, 3, 4));
+    final TableEvent update = new TableEvent(mock(ITable.class), TableEvent.TYPE_ROWS_UPDATED, mockRows(1, 0, 3, 2, 4));
+    final TableEvent orderChanged = new TableEvent(mock(ITable.class), TableEvent.TYPE_ROW_ORDER_CHANGED, mockRows(4, 3, 2, 1, 0));
+
+    LinkedList<TableEvent> events = new LinkedList<>();
+    events.add(insert);
+    events.add(update);
+    events.add(orderChanged);
+
+    m_testBuffer.applyRowOrderChangedToRowsInserted(events);
+    assertEquals(2, events.size());
+
+    assertEquals(TableEvent.TYPE_ROWS_INSERTED, events.get(0).getType());
+    assertEquals(mockRows(4, 3, 2, 1, 0), events.get(0).getRows());
+
+    assertEquals(TableEvent.TYPE_ROWS_UPDATED, events.get(1).getType());
+    assertEquals(mockRows(1, 0, 3, 2, 4), events.get(1).getRows());
+  }
+
+  @Test(expected = AssertionException.class)
+  public void testTableEventMergerNullInitilaEvent() {
+    new TableEventBuffer.TableEventMerger(null);
+  }
+
+  @Test
+  public void testTableEventMerger() {
+    ITable table = mock(ITable.class);
+    ITableRow r0 = mockRow(0);
+    ITableRow r1 = mockRow(1);
+    ITableRow r2 = mockRow(2);
+
+    TableEvent initialEvent = new TableEvent(table, TableEvent.TYPE_ROWS_INSERTED, Arrays.asList(r0, r1, r2));
+    IColumn<?> c0 = mockColumn(0);
+    IColumn<?> c1 = mockColumn(1);
+    initialEvent.setColumns(Arrays.asList(c0, c1));
+    TableEventBuffer.TableEventMerger eventMerger = new TableEventBuffer.TableEventMerger(initialEvent);
+
+    // add first event
+    ITableRow r3 = mockRow(3);
+    TableEvent e1 = new TableEvent(table, TableEvent.TYPE_ROWS_INSERTED, Arrays.asList(r0, r2, r3));
+    eventMerger.merge(e1);
+
+    // add second event
+    TableEvent e2 = new TableEvent(table, TableEvent.TYPE_ROWS_INSERTED, null);
+    IColumn<?> c2 = mockColumn(2);
+    e2.setColumns(Arrays.asList(c0, c2));
+    eventMerger.merge(e2);
+
+    eventMerger.complete();
+    assertEquals(Arrays.asList(r3, r0, r1, r2), initialEvent.getRows());
+    assertEquals(Arrays.asList(c2, c0, c1), initialEvent.getColumns());
+
+    // invoke complete a second time has no effect
+    eventMerger.complete();
+    assertEquals(Arrays.asList(r3, r0, r1, r2), initialEvent.getRows());
+    assertEquals(Arrays.asList(c2, c0, c1), initialEvent.getColumns());
+  }
+
+  @Test
+  public void testTableEventMergerCompleteWithoutMerge() {
+    ITable table = mock(ITable.class);
+    ITableRow r0 = mockRow(0);
+    ITableRow r1 = mockRow(1);
+    ITableRow r2 = mockRow(2);
+    TableEvent initialEvent = new TableEvent(table, TableEvent.TYPE_ROWS_INSERTED, Arrays.asList(r0, r1, r2));
+    IColumn<?> c0 = mockColumn(0);
+    IColumn<?> c1 = mockColumn(1);
+    initialEvent.setColumns(Arrays.asList(c0, c1));
+    TableEventBuffer.TableEventMerger eventMerger = new TableEventBuffer.TableEventMerger(initialEvent);
+
+    eventMerger.complete();
+
+    assertEquals(3, initialEvent.getRowCount());
+    assertEquals(Arrays.asList(r0, r1, r2), initialEvent.getRows());
+
+    assertEquals(2, initialEvent.getColumns().size());
+    assertEquals(Arrays.asList(c0, c1), initialEvent.getColumns());
+  }
+
+  @Test(expected = IllegalStateException.class)
+  public void testTableEventMergerMergeAfterComplete() {
+    ITable table = mock(ITable.class);
+    TableEvent initialEvent = new TableEvent(table, TableEvent.TYPE_ROWS_INSERTED, mockRows(0, 1, 2));
+    TableEventBuffer.TableEventMerger eventMerger = new TableEventBuffer.TableEventMerger(initialEvent);
+    eventMerger.complete();
+
+    TableEvent e1 = new TableEvent(table, TableEvent.TYPE_ROWS_INSERTED, mockRows(2, 3));
+    eventMerger.merge(e1);
   }
 
   private void assertTableEventDoesNotContainRow(TableEvent tableEvent, ITableRow tableRow) {
