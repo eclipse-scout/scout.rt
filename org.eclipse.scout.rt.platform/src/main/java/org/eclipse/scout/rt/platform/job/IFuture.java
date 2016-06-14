@@ -26,6 +26,7 @@ import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
 import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledException;
+import org.eclipse.scout.rt.platform.util.concurrent.IBiConsumer;
 import org.eclipse.scout.rt.platform.util.concurrent.IBiFunction;
 import org.eclipse.scout.rt.platform.util.concurrent.ICancellable;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedException;
@@ -286,6 +287,14 @@ public interface IFuture<RESULT> extends ICancellable {
    * @return the future representing the asynchronous execution of the function.
    */
   <FUNCTION_RESULT> IFuture<FUNCTION_RESULT> whenDoneSchedule(IBiFunction<RESULT, Throwable, FUNCTION_RESULT> function, JobInput input);
+
+  /**
+   * Provides the same functionality as {@link #whenDoneSchedule(IBiFunction, JobInput)} but is convenience for a job
+   * which does not compute a result.
+   *
+   * @see #whenDoneSchedule(IBiFunction, JobInput)
+   */
+  IFuture<Void> whenDoneSchedule(IBiConsumer<RESULT, Throwable> function, final JobInput input);
 
   /**
    * Registers the given listener to be notified about all job lifecycle events related to this Future. If the listener

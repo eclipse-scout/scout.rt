@@ -165,6 +165,15 @@ scout.TreeSpecHelper.prototype.createNodesUpdatedEvent = function(model, nodes) 
   };
 };
 
+scout.TreeSpecHelper.prototype.createChildNodeOrderChangedEvent = function(model, childNodeIds, parentNodeId) {
+  return {
+    target: model.id,
+    parentNodeId: parentNodeId,
+    childNodeIds: childNodeIds,
+    type: 'childNodeOrderChanged'
+  };
+};
+
 scout.TreeSpecHelper.prototype.createTreeEnabledEvent = function(model, enabled) {
   return {
     target: model.id,

@@ -81,7 +81,7 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
   /**
    * Null object used for {@link #installLookupRowContext(ILookupRow)}.
    */
-  private final ILookupRow<LOOKUP_KEY> EMPTY_LOOKUP_ROW = new LookupRow<LOOKUP_KEY>(null, "");
+  private final ILookupRow<LOOKUP_KEY> EMPTY_LOOKUP_ROW = new LookupRow<>(null, "");
 
   private final EventListenerList m_listenerList = new EventListenerList();
 
@@ -367,7 +367,7 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
 
   // override to freeze
   /**
-   * @deprecated no replacement. Will be removed in the O-Release.
+   * @deprecated no replacement. Will be removed in Scout 6.1
    */
   @SuppressWarnings("deprecation")
   @Deprecated
@@ -1161,10 +1161,10 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
 
   protected IContentAssistFieldLookupRowFetcher<LOOKUP_KEY> createLookupRowFetcher() {
     if (isBrowseHierarchy()) {
-      return new HierachycalContentAssistDataFetcher<LOOKUP_KEY>(this);
+      return new HierarchicalContentAssistDataFetcher<>(this);
     }
     else {
-      return new ContentAssistFieldDataFetcher<LOOKUP_KEY>(this);
+      return new ContentAssistFieldDataFetcher<>(this);
     }
   }
 

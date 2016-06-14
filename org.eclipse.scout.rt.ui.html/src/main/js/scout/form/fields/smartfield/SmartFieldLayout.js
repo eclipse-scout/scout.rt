@@ -27,7 +27,7 @@ scout.SmartFieldLayout.prototype.layout = function($container) {
     return;
   }
 
-  var popup = this._smartField._popup;
+  var popup = this._smartField.popup;
   if (popup && popup.rendered) {
     // Make sure the popup is correctly layouted and positioned
     popup.position();

@@ -34,10 +34,6 @@ public class ExtensionRegistryItem extends AbstractExtensionRegistryItem {
   public <T> T createInstance(Object owner, ExtensionStack extensionStack) {
     Object declaringObject = null;
     if (getDeclaringClass() != null) {
-      if (extensionStack == null) {
-        throw new IllegalStateException("extension stack is null");
-      }
-
       // find declaring class instance on extension stack
       declaringObject = extensionStack.findContextObjectByClass(getDeclaringClass());
     }

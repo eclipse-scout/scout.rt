@@ -14,7 +14,7 @@ scout.SmartFieldTouchPopup = function() {
 scout.inherits(scout.SmartFieldTouchPopup, scout.TouchPopup);
 
 scout.SmartFieldTouchPopup.prototype._init = function(options) {
-  scout.DatePickerTouchPopup.parent.prototype._init.call(this, options);
+  scout.SmartFieldTouchPopup.parent.prototype._init.call(this, options);
   this._field.on('acceptProposal', this._onFieldAcceptOrDeleteProposal.bind(this));
   this._field.on('deleteProposal', this._onFieldAcceptOrDeleteProposal.bind(this));
 };

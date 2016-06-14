@@ -34,7 +34,7 @@ scout.SmartField = function() {
    * This property is used to prevent unnecessary requests to the server.
    */
   this._oldDisplayText;
-  this._popup;
+  this.popup;
   this._requestedProposal = false;
   /**
    * This property is used to prevent multiple acceptProposal request to the server (blur, aboutToBlur, acceptInput from Action).
@@ -59,20 +59,18 @@ scout.SmartField.prototype._createKeyStrokeContext = function() {
 scout.SmartField.prototype._init = function(model) {
   scout.SmartField.parent.prototype._init.call(this, model);
   scout.fields.initTouch(this, model);
-  this._popup = model.popup;
+  this.popup = model.popup;
 };
 
-scout.SmartField.prototype.addPopup = function() {
-  if (!this._popup) {
-    var popupType = this.touch ? 'SmartFieldTouchPopup' : 'SmartFieldPopup';
-    this._popup = scout.create(popupType, {
-      parent: this,
-      $anchor: this.$field,
-      boundToAnchor: !this.touch,
-      closeOnAnchorMousedown: false,
-      field: this
-    });
-  }
+scout.SmartField.prototype.createPopup = function() {
+  var popupType = this.touch ? 'SmartFieldTouchPopup' : 'SmartFieldPopup';
+  return scout.create(popupType, {
+    parent: this,
+    $anchor: this.$field,
+    boundToAnchor: !this.touch,
+    closeOnAnchorMousedown: false,
+    field: this
+  });
 };
 
 scout.SmartField.prototype._render = function($parent) {
@@ -96,16 +94,11 @@ scout.SmartField.prototype._render = function($parent) {
   }
   this.addIcon();
   this.addStatus();
-  this.addPopup();
 };
 
 scout.SmartField.prototype._remove = function() {
   scout.SmartField.parent.prototype._remove.call(this);
-  // popup may not be reused because $anchor would point to a removed field
-  // Don't set to null in case of embedded mode to make sure not another popup gets created by the field itself when touch popup get rendered
-  if (this._popup && !this.embedded) {
-    this._popup = null;
-  }
+  this.popup = null;
 };
 
 /**
@@ -168,8 +161,8 @@ scout.SmartField.prototype._renderProposalChooser = function() {
   if (!this.proposalChooser) {
     return;
   }
-  this._renderPopup();
-  this._popup._renderProposalChooser(this.proposalChooser);
+  this.openPopup();
+  this.popup._renderProposalChooser(this.proposalChooser);
 };
 
 /**
@@ -213,7 +206,7 @@ scout.SmartField.prototype._isPreventDefaultTabHandling = function() {
 // navigate in options
 scout.SmartField.prototype._onKeyDown = function(e) {
   if (e.which === scout.keys.ESCAPE) {
-    if (this._popup.rendered) {
+    if (this.popup) {
       e.stopPropagation();
     }
     this._closeProposal();
@@ -235,7 +228,7 @@ scout.SmartField.prototype._onKeyDown = function(e) {
   }
 
   if (e.which === scout.keys.ENTER) {
-    if (this._popup.rendered) {
+    if (this.popup) {
       e.stopPropagation();
     }
     this._acceptProposal();
@@ -304,7 +297,7 @@ scout.SmartField.prototype._onKeyUp = function(e) {
   // That's why we must deal with that event here (and not in keyDown)
   // We don't use _displayText() here because we always want the text the
   // user has typed.
-  if (this._popup.rendered) {
+  if (this.popup) {
     this._proposalTyped();
   } else {
     this._openProposal(false);
@@ -484,12 +477,14 @@ scout.SmartField.prototype._focusNextTabbable = function() {
 };
 
 scout.SmartField.prototype._closeProposal = function(notifyServer) {
-  if (this._popup.rendered) {
-    if (scout.nvl(notifyServer, true)) {
-      this._sendCancelProposal();
-    }
-    this._popup.close();
+  if (!this.popup) {
+    return;
   }
+
+  if (scout.nvl(notifyServer, true)) {
+    this._sendCancelProposal();
+  }
+  this.popup.close();
 };
 
 scout.SmartField.prototype._sendCancelProposal = function() {
@@ -528,11 +523,17 @@ scout.SmartField.prototype._openProposal = function(browseAll) {
   }
 };
 
-scout.SmartField.prototype._renderPopup = function() {
-  if (this._popup.rendered) {
+scout.SmartField.prototype.openPopup = function() {
+  if (this.popup) {
+    // already open
     return;
   }
-  this._popup.open();
+
+  this.popup = this.createPopup();
+  this.popup.open();
+  this.popup.on('remove', function() {
+    this.popup = null;
+  }.bind(this));
   if (this.touch) {
     this._acceptedInput = false;
     // Error message is shown on touch popup as well, don't show twice
@@ -555,7 +556,7 @@ scout.SmartField.prototype.acceptInput = function(whileTyping) {
  */
 scout.SmartField.prototype.aboutToBlurByMouseDown = function(target) {
   var eventOnField = this.$field.isOrHas(target);
-  var eventOnPopup = this._popup.rendered && this._popup.$container.isOrHas(target);
+  var eventOnPopup = this.popup && this.popup.$container.isOrHas(target);
 
   if (!eventOnField && !eventOnPopup) {
     this.acceptInput(); // event outside this field.

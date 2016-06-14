@@ -1273,7 +1273,6 @@ describe("Tree", function() {
 
   });
 
-
   describe("collapseNode", function() {
 
     it("prevents collapsing in bread crumb mode if node is selected", function() {
@@ -1370,6 +1369,220 @@ describe("Tree", function() {
       expect($groupNodes.eq(1)[0]).toBe(child1.childNodes[0].$node[0]);
       expect($groupNodes.eq(2)[0]).toBe(child1.childNodes[1].$node[0]);
       expect($groupNodes.eq(3)[0]).toBe(child1.childNodes[2].$node[0]);
+    });
+  });
+
+  describe("updateNodeOrder", function() {
+    var model, tree, nodes;
+
+    beforeEach(function() {
+      model = helper.createModelFixture(3, 3);
+      tree = helper.createTree(model);
+      nodes = tree.nodes;
+    });
+
+    it("reorders the child nodes if parent is given (model)", function() {
+      var parentNode = nodes[1];
+      var childNode0 = parentNode.childNodes[0];
+      var childNode1 = parentNode.childNodes[1];
+      var childNode2 = parentNode.childNodes[2];
+
+      tree.updateNodeOrder([childNode2, childNode1, childNode0], parentNode);
+      expect(tree.nodes[1].childNodes.length).toBe(3);
+      expect(tree.nodes[1].childNodes[0]).toBe(childNode2);
+      expect(tree.nodes[1].childNodes[1]).toBe(childNode1);
+      expect(tree.nodes[1].childNodes[2]).toBe(childNode0);
+
+      // verify indices
+      expect(tree.nodes[1].childNodes[0].childNodeIndex).toBe(0);
+      expect(tree.nodes[1].childNodes[1].childNodeIndex).toBe(1);
+      expect(tree.nodes[1].childNodes[2].childNodeIndex).toBe(2);
+
+      // verify flat list (no node is expanded -> only 3 nodes visible)
+      expect(tree.visibleNodesFlat.length).toBe(3);
+      expect(tree.visibleNodesFlat[0]).toBe(nodes[0]);
+      expect(tree.visibleNodesFlat[1]).toBe(nodes[1]);
+      expect(tree.visibleNodesFlat[2]).toBe(nodes[2]);
+    });
+
+    it("reorders the child nodes if parent is given and expanded (model)", function() {
+      var parentNode = nodes[1];
+      var childNode0 = parentNode.childNodes[0];
+      var childNode1 = parentNode.childNodes[1];
+      var childNode2 = parentNode.childNodes[2];
+
+      tree.expandNode(parentNode);
+      tree.updateNodeOrder([childNode2, childNode1, childNode0], parentNode);
+      expect(tree.nodes[1].childNodes.length).toBe(3);
+      expect(tree.nodes[1].childNodes[0]).toBe(childNode2);
+      expect(tree.nodes[1].childNodes[1]).toBe(childNode1);
+      expect(tree.nodes[1].childNodes[2]).toBe(childNode0);
+
+      // verify indices
+      expect(tree.nodes[1].childNodes[0].childNodeIndex).toBe(0);
+      expect(tree.nodes[1].childNodes[1].childNodeIndex).toBe(1);
+      expect(tree.nodes[1].childNodes[2].childNodeIndex).toBe(2);
+
+      // verify flat list
+      expect(tree.visibleNodesFlat.length).toBe(6);
+      expect(tree.visibleNodesFlat[0]).toBe(nodes[0]);
+      expect(tree.visibleNodesFlat[1]).toBe(nodes[1]);
+      expect(tree.visibleNodesFlat[2]).toBe(childNode2);
+      expect(tree.visibleNodesFlat[3]).toBe(childNode1);
+      expect(tree.visibleNodesFlat[4]).toBe(childNode0);
+      expect(tree.visibleNodesFlat[5]).toBe(nodes[2]);
+    });
+
+    it("reorders the child nodes if parent is given (html)", function() {
+      var parentNode = nodes[1];
+      var childNode0 = parentNode.childNodes[0];
+      var childNode1 = parentNode.childNodes[1];
+      var childNode2 = parentNode.childNodes[2];
+      tree.render(session.$entryPoint);
+      tree.expandNode(parentNode);
+
+      tree.updateNodeOrder([childNode2, childNode1, childNode0], parentNode);
+      var $childNodes = parentNode.$node.nextUntil(nodes[2].$node);
+      expect($childNodes.eq(0).data('node').id).toBe(childNode2.id);
+      expect($childNodes.eq(1).data('node').id).toBe(childNode1.id);
+      expect($childNodes.eq(2).data('node').id).toBe(childNode0.id);
+    });
+
+    it("considers view range when updating child node order", function() {
+      var parentNode = nodes[0];
+      var childNode0 = parentNode.childNodes[0];
+      var childNode1 = parentNode.childNodes[1];
+      var childNode2 = parentNode.childNodes[2];
+      tree.viewRangeSize = 3;
+      tree.render(session.$entryPoint);
+      tree.expandNode(parentNode);
+
+      // Needs explicit rendering of the viewport because this would be done later by the layout
+      tree._renderViewport();
+      tree.updateNodeOrder([childNode2, childNode1, childNode0], parentNode);
+      // Needs explicit rendering again...
+      tree._renderViewport();
+
+      expect(tree.viewRangeRendered).toEqual(new scout.Range(0, 3));
+      var $nodes = tree.$nodes();
+      expect($nodes.length).toBe(3);
+      expect(tree.nodes.length).toBe(3);
+      expect(parentNode.childNodes.length).toBe(3);
+      expect($nodes.eq(0).data('node').id).toBe(parentNode.id);
+      expect($nodes.eq(1).data('node').id).toBe(childNode2.id);
+      expect($nodes.eq(2).data('node').id).toBe(childNode1.id);
+    });
+
+    it("reorders expanded child nodes if parent is given (model)", function() {
+      var parentNode = nodes[1];
+      var childNode0 = parentNode.childNodes[0];
+      var childNode1 = parentNode.childNodes[1];
+      var childNode2 = parentNode.childNodes[2];
+
+      tree.expandNode(parentNode);
+      tree.expandNode(childNode1);
+      tree.updateNodeOrder([childNode2, childNode0, childNode1], parentNode);
+      expect(tree.nodes[1].childNodes.length).toBe(3);
+      expect(tree.nodes[1].childNodes[0]).toBe(childNode2);
+      expect(tree.nodes[1].childNodes[1]).toBe(childNode0);
+      expect(tree.nodes[1].childNodes[2]).toBe(childNode1);
+
+      // verify indices
+      expect(tree.nodes[1].childNodes[0].childNodeIndex).toBe(0);
+      expect(tree.nodes[1].childNodes[1].childNodeIndex).toBe(1);
+      expect(tree.nodes[1].childNodes[2].childNodeIndex).toBe(2);
+
+      // verify flat list
+      expect(tree.visibleNodesFlat.length).toBe(9);
+      expect(tree.visibleNodesFlat[0]).toBe(nodes[0]);
+      expect(tree.visibleNodesFlat[1]).toBe(nodes[1]);
+      expect(tree.visibleNodesFlat[2]).toBe(childNode2);
+      expect(tree.visibleNodesFlat[3]).toBe(childNode0);
+      expect(tree.visibleNodesFlat[4]).toBe(childNode1);
+      expect(tree.visibleNodesFlat[5]).toBe(childNode1.childNodes[0]);
+      expect(tree.visibleNodesFlat[6]).toBe(childNode1.childNodes[1]);
+      expect(tree.visibleNodesFlat[7]).toBe(childNode1.childNodes[2]);
+      expect(tree.visibleNodesFlat[8]).toBe(nodes[2]);
+    });
+
+    it("reorders the root nodes if no parent is given (model)", function() {
+      var node0 = nodes[0];
+      var node1 = nodes[1];
+      var node2 = nodes[2];
+
+      tree.updateNodeOrder([node2, node1, node0]);
+      expect(tree.nodes.length).toBe(3);
+      expect(tree.nodes[0]).toBe(node2);
+      expect(tree.nodes[1]).toBe(node1);
+      expect(tree.nodes[2]).toBe(node0);
+
+      // verify indices
+      expect(tree.nodes[0].childNodeIndex).toBe(0);
+      expect(tree.nodes[1].childNodeIndex).toBe(1);
+      expect(tree.nodes[2].childNodeIndex).toBe(2);
+
+      // verify flat list
+      expect(tree.visibleNodesFlat.length).toBe(3);
+      expect(tree.visibleNodesFlat[0]).toBe(node2);
+      expect(tree.visibleNodesFlat[1]).toBe(node1);
+      expect(tree.visibleNodesFlat[2]).toBe(node0);
+    });
+
+    it("reorders the root nodes if no parent is given (html)", function() {
+      var node0 = nodes[0];
+      var node1 = nodes[1];
+      var node2 = nodes[2];
+
+      tree.render(session.$entryPoint);
+      tree.updateNodeOrder([node2, node1, node0]);
+      var $nodes = tree.$nodes();
+      expect($nodes.eq(0).data('node').id).toBe(node2.id);
+      expect($nodes.eq(1).data('node').id).toBe(node1.id);
+      expect($nodes.eq(2).data('node').id).toBe(node0.id);
+    });
+
+    it("reorders expanded root nodes if no parent is given (model)", function() {
+      var node0 = nodes[0];
+      var node1 = nodes[1];
+      var node2 = nodes[2];
+
+      tree.expandNode(node1);
+      tree.updateNodeOrder([node2, node0, node1]);
+      expect(tree.nodes.length).toBe(3);
+      expect(tree.nodes[0]).toBe(node2);
+      expect(tree.nodes[1]).toBe(node0);
+      expect(tree.nodes[2]).toBe(node1);
+
+      // verify indices
+      expect(tree.nodes[0].childNodeIndex).toBe(0);
+      expect(tree.nodes[1].childNodeIndex).toBe(1);
+      expect(tree.nodes[2].childNodeIndex).toBe(2);
+
+      // verify flat list
+      expect(tree.visibleNodesFlat.length).toBe(6);
+      expect(tree.visibleNodesFlat[0]).toBe(node2);
+      expect(tree.visibleNodesFlat[1]).toBe(node0);
+      expect(tree.visibleNodesFlat[2]).toBe(node1);
+      expect(tree.visibleNodesFlat[3]).toBe(node1.childNodes[0]);
+      expect(tree.visibleNodesFlat[4]).toBe(node1.childNodes[1]);
+      expect(tree.visibleNodesFlat[5]).toBe(node1.childNodes[2]);
+    });
+
+    it("reorders expanded root nodes if no parent is given (html)", function() {
+      var node0 = nodes[0];
+      var node1 = nodes[1];
+      var node2 = nodes[2];
+
+      tree.render(session.$entryPoint);
+      tree.expandNode(node1);
+      tree.updateNodeOrder([node2, node0, node1]);
+      var $nodes = tree.$nodes();
+      expect($nodes.eq(0).data('node').id).toBe(node2.id);
+      expect($nodes.eq(1).data('node').id).toBe(node0.id);
+      expect($nodes.eq(2).data('node').id).toBe(node1.id);
+      expect($nodes.eq(3).data('node').id).toBe(node1.childNodes[0].id);
+      expect($nodes.eq(4).data('node').id).toBe(node1.childNodes[1].id);
+      expect($nodes.eq(5).data('node').id).toBe(node1.childNodes[2].id);
     });
   });
 
@@ -1501,6 +1714,82 @@ describe("Tree", function() {
       expect(tree.nodes[0].childNodes[2].filterAccepted).toBe(false);
       expect(tree.nodes[0].childNodes[3].rendered).toBe(true);
       expect(tree.nodes[0].childNodes[3].filterAccepted).toBe(true);
+    });
+
+    /**
+     * This test makes sure the bugfix from ticket #168957 still works.
+     *
+     * Without the bugfix, an exception was thrown on the second call to _renderViewport().
+     * The reason was, that node 'A+B' was initially outside the view-range and when the
+     * filter has changed, the B-nodes below A+B were rendered at the wrong position in
+     * the tree, because A+B was not attached, so later the check in _insertNodeInDOMAtPlace
+     * failed and caused the error. To fix the error, we now make sure the node is attached
+     * by calling showNode in Tree#filter.
+     */
+    it("make sure nodes unchanged by filters are attached. See ticket #168957", function() {
+      var i,
+        topLevelNode3,
+        topLevelNodes = [],
+        childNodes = [],
+        childNodeNames = ['A1','A2','A3','A4','A+B','B1','B2','B3','B4'];
+
+      // child nodes
+      for (i = 0; i < childNodeNames.length; i++) {
+        childNodes.push(helper.createModelNode('', childNodeNames[i], i));
+      }
+
+      // top level nodes
+      topLevelNodes.push(helper.createModelNode('', 'TopLevel 1', 0));
+      topLevelNodes.push(helper.createModelNode('', 'TopLevel 2', 1));
+
+      topLevelNode3 = helper.createModelNode('', 'TopLevel 3', 2);
+      topLevelNode3.childNodes = childNodes;
+      topLevelNodes.push(topLevelNode3);
+
+      topLevelNodes.push(helper.createModelNode('', 'TopLevel 4', 3));
+      topLevelNodes.push(helper.createModelNode('', 'TopLevel 5', 4));
+
+      // filters
+      var model = helper.createModel(topLevelNodes);
+      var tree = helper.createTree(model);
+      var filterA = {
+        accept: function(node) {
+          if (node.level === 0) {
+            return true;
+          } else {
+            return scout.strings.startsWith(node.text, 'A');
+          }
+        }
+      };
+      var filterB = {
+        accept: function(node) {
+          if (node.level === 0) {
+            return true;
+          } else {
+            return scout.strings.startsWith(node.text, 'B') || node.text === 'A+B';
+          }
+        }
+      };
+
+      // test
+      tree.setViewRangeSize(5);
+      tree.setNodeExpanded(topLevelNode3, true);
+      tree.render(session.$entryPoint);
+
+      tree.addFilter(filterA);
+      tree._renderViewport();
+
+      tree.addFilter(filterB);
+      tree.removeFilter(filterA);
+      tree._renderViewport();
+
+      // check expected tree state
+      expect(tree.visibleNodesFlat.length).toBe(10); // 5 top level nodes + 5 child nodes
+      expect(tree.visibleNodesFlat[0].text).toBe('TopLevel 1');
+      expect(tree.visibleNodesFlat[1].text).toBe('TopLevel 2');
+      expect(tree.visibleNodesFlat[2].text).toBe('TopLevel 3');
+      expect(tree.visibleNodesFlat[3].text).toBe('A+B');
+      expect(tree.visibleNodesFlat[4].text).toBe('B1');
     });
   });
 
@@ -1813,6 +2102,33 @@ describe("Tree", function() {
         tree.onModelAction(event);
         expect(tree.updateNodes).toHaveBeenCalledWith([child0Update]);
       });
+    });
+
+    describe("childNodeOrderChanged event", function() {
+      var model;
+      var tree;
+      var node0;
+      var child0;
+
+      beforeEach(function() {
+        model = helper.createModelFixture(3, 3, false);
+        tree = helper.createTree(model);
+        node0 = model.nodes[0];
+        child0 = node0.childNodes[0];
+      });
+
+      it("calls updateNodeOrder", function() {
+        spyOn(tree, 'updateNodeOrder');
+        var parentNode = tree.nodes[1];
+        var childNode0 = parentNode.childNodes[0];
+        var childNode1 = parentNode.childNodes[1];
+        var childNode2 = parentNode.childNodes[2];
+
+        var event = helper.createChildNodeOrderChangedEvent(model, [childNode2.id, childNode1.id, childNode0.id], parentNode.id);
+        tree.onModelAction(event);
+        expect(tree.updateNodeOrder).toHaveBeenCalledWith([childNode2, childNode1, childNode0], parentNode);
+      });
+
     });
 
     describe("multiple events", function() {

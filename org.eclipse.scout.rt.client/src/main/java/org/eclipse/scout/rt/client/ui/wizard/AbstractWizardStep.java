@@ -98,7 +98,7 @@ public abstract class AbstractWizardStep<FORM extends IForm> extends AbstractPro
   }
 
   /**
-   * @deprecated use getConfiguredSubTitle()
+   * @deprecated use getConfiguredSubTitle(), will be removed in Scout 6.1
    */
   @Deprecated
   @ConfigProperty(ConfigProperty.TEXT)

@@ -73,29 +73,19 @@ public class ScriptFileBuilder {
 
   private final IWebContentService m_resourceLocator;
   private final ScriptFileLocator m_scriptLocator;
-  private boolean m_minifyEnabled;
-  private String m_theme;
+  private final boolean m_minify;
+  private final String m_theme;
 
-  public ScriptFileBuilder(IWebContentService locator) {
+  public ScriptFileBuilder(IWebContentService locator, String theme, boolean minify) {
     m_resourceLocator = locator;
     m_scriptLocator = new ScriptFileLocator(m_resourceLocator);
-  }
-
-  public boolean isMinifyEnabled() {
-    return m_minifyEnabled;
-  }
-
-  public void setMinifyEnabled(boolean minifyEnabled) {
-    m_minifyEnabled = minifyEnabled;
-  }
-
-  public void setTheme(String theme) {
     m_theme = theme;
+    m_minify = minify;
   }
 
   public ScriptOutput buildScript(String pathInfo) throws IOException {
     ScriptSource script = locateNonFragmentScript(pathInfo);
-    LOG.info("Building script {} theme={} minifyEnabled={}", script, m_theme, m_minifyEnabled);
+    LOG.info("Building script {} theme={} m_minify={}", script, m_theme, m_minify);
     if (script == null) {
       return null; // not found
     }
@@ -117,7 +107,7 @@ public class ScriptFileBuilder {
   protected ScriptSource locateNonFragmentScript(String requestPath) throws IOException {
     Matcher mat = SCRIPT_URL_PATTERN.matcher(requestPath);
     if (mat.matches()) {
-      return m_scriptLocator.locateFile(requestPath, mat, isMinifyEnabled());
+      return m_scriptLocator.locateFile(requestPath, mat, m_minify);
     }
     else {
       LOG.warn("locate {}: does not match SCRIPT_URL_PATTERN {}", requestPath, SCRIPT_URL_PATTERN.pattern());
@@ -190,7 +180,7 @@ public class ScriptFileBuilder {
         }
       }
       // Add debug information to returned content
-      if (!isMinifyEnabled()) {
+      if (!m_minify) {
         if (script.getFileType() == ScriptSource.FileType.JS) {
           buf.write(("// --- " + (includeScript == null ? "" : includeScript.getNodeType() + " ") + includePath + " ---\n").getBytes(StandardCharsets.UTF_8.name()));
           if (replacement == null) {
@@ -220,7 +210,7 @@ public class ScriptFileBuilder {
 
   protected String compileAndMinifyContent(FileType fileType, String content) throws IOException {
     content = compileContent(fileType, content);
-    if (isMinifyEnabled()) {
+    if (m_minify) {
       content = minifyContent(fileType, content);
     }
     return content;
@@ -254,7 +244,7 @@ public class ScriptFileBuilder {
         }
       }
       // Add debug information to returned content
-      if (!isMinifyEnabled()) {
+      if (!m_minify) {
         if (script.getFileType() == ScriptSource.FileType.JS) {
           if (replacement == null) {
             buf.append("// --- " + (includeFragment == null ? "" : includeFragment.getNodeType() + " ") + includePath + " ---\n");

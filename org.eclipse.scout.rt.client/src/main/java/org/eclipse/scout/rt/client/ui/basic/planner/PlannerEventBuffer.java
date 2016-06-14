@@ -315,8 +315,8 @@ public class PlannerEventBuffer extends AbstractEventBuffer<PlannerEvent> {
     }
   }
 
-  protected List<Integer> getResourceRelatedEvents() {
-    List<Integer> res = new ArrayList<>();
+  protected Set<Integer> getResourceRelatedEvents() {
+    Set<Integer> res = new HashSet<>();
     res.add(PlannerEvent.TYPE_ALL_RESOURCES_DELETED);
     res.add(PlannerEvent.TYPE_RESOURCES_DELETED);
     res.add(PlannerEvent.TYPE_RESOURCES_INSERTED);

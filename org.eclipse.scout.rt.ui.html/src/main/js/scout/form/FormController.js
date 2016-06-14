@@ -198,7 +198,7 @@ scout.FormController.prototype._removeView = function(view, unregister) {
     scout.arrays.remove(this.displayParent.views, view);
   }
   // in COMPACT case views are already removed.
-  if (view.rendered) {
+  if (this.session.desktop.bench) {
     this.session.desktop.bench.removeView(view);
   }
 };

@@ -88,7 +88,7 @@ public interface IValueField<VALUE> extends IFormField, IHolder<VALUE>, IContext
   void setValue(VALUE o);
 
   /**
-   * @deprecated Will be removed with scout 7. Use {@link IValueField#parseAndSetValue(String)}
+   * @deprecated Will be removed in Scout 6.1. Use {@link IValueField#parseAndSetValue(String)}
    */
   @Deprecated
   boolean parseValue(String text);

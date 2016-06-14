@@ -127,8 +127,8 @@
       }
     }
 
-    & > .cell-editor-popup > .check-box-field > .cell-editor-field {
-      padding-top: @detail-table-row-padding-y - @checkable-cell-padding-adjustment - 1px;
+    & > .cell-editor-popup > .check-box-field > .cell-editor-field > .check-box {
+      margin-top: 5px;
     }
   }
 }

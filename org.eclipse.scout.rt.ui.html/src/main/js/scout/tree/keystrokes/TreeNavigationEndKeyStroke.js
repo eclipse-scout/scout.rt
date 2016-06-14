@@ -12,11 +12,10 @@ scout.TreeNavigationEndKeyStroke = function(tree, modifierBitMask) {
   scout.TreeNavigationEndKeyStroke.parent.call(this, tree, modifierBitMask);
   this.which = [scout.keys.END];
   this.renderingHints.$drawingArea = function($drawingArea, event) {
-    var visibleNodesCount = this.field.visibleNodesFlat.length;
-    if(visibleNodesCount>0 && this.field.visibleNodesFlat[visibleNodesCount-1].rendered ){
-      return this.field.visibleNodesFlat[visibleNodesCount-1].$node;
+    var newSelectedNode = this._computeNewSelection(event._treeCurrentNode);
+    if (newSelectedNode) {
+      return newSelectedNode.$node;
     }
-    return null;
   }.bind(this);
 };
 scout.inherits(scout.TreeNavigationEndKeyStroke, scout.AbstractTreeNavigationKeyStroke);

@@ -767,6 +767,9 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     return new ActionFinder().findAction(getActions(), actionType);
   }
 
+  /**
+   * @deprecated use {@link #findAction(Class)}, will be removed in Scout 6.1
+   */
   @Override
   @Deprecated
   public <T extends IToolButton> T findToolButton(Class<T> toolButtonType) {

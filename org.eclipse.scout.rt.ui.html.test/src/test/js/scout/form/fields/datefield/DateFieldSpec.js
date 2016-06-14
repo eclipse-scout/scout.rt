@@ -71,6 +71,13 @@ describe("DateField", function() {
     expect(date.getDate()).toBe(day);
   }
 
+  function selectFirstDayInPicker($picker) {
+    var $day = $picker.find('.date-picker-day').first();
+    var date = $day.data('date');
+    $day.triggerClick();
+    return date;
+  }
+
   describe("Clicking the field", function() {
 
     it("opens the datepicker", function() {
@@ -80,7 +87,6 @@ describe("DateField", function() {
       expect(findPicker().length).toBe(0);
 
       dateField.$dateField.triggerMouseDown();
-
       expect(findPicker().length).toBe(1);
     });
 
@@ -247,7 +253,10 @@ describe("DateField", function() {
       var model = createModel();
       var dateField = createFieldAndFocusAndOpenPicker(model);
 
-      dateField._onDatePickerDateSelect({type: 'dateSelect', date: new Date(2016,1,1)});
+      dateField._onDatePickerDateSelect({
+        type: 'dateSelect',
+        date: new Date(2016, 1, 1)
+      });
       expect(dateField.$dateField.val()).toBe('01.02.2016');
       sendQueuedAjaxCalls();
       expect(jasmine.Ajax.requests.count()).toBe(1);
@@ -275,7 +284,6 @@ describe("DateField", function() {
         expect(findPicker().length).toBe(1);
 
         dateField.$dateField.triggerKeyDown(scout.keys.ESC);
-
         expect(findPicker().length).toBe(0);
       });
 
@@ -485,6 +493,185 @@ describe("DateField", function() {
       expectDate(dateField.allowedDates[0], 2016, 2, 14);
     });
 
+  });
+
+  describe('Touch = true', function() {
+
+    describe('touch popup', function() {
+
+      it('is opened if datefield is touched', function() {
+        var model = createModel();
+        model.touch = true;
+        var dateField = createField(model);
+        dateField.render(session.$entryPoint);
+
+        dateField.$dateField.triggerClick();
+        expect(dateField.popup.rendered).toBe(true);
+        expect($('.touch-popup').length).toBe(1);
+        expect($('.date-picker-popup').length).toBe(0);
+        dateField.popup.close();
+      });
+
+      it('is closed when date in picker is selected', function() {
+        var model = createModel();
+        model.touch = true;
+        var dateField = createField(model);
+        dateField.render(session.$entryPoint);
+
+        dateField.$dateField.triggerClick();
+        expect(dateField.popup.rendered).toBe(true);
+
+        var selectedDate = selectFirstDayInPicker(dateField.popup.$container.find('.date-picker'));
+        expect(dateField.popup).toBe(null);
+      });
+
+      it('unregisters clone after close', function() {
+        var model = createModel();
+        model.touch = true;
+        var dateField = createField(model);
+        dateField.render(session.$entryPoint);
+
+        dateField.$dateField.triggerClick();
+        expect(dateField.popup.rendered).toBe(true);
+
+        // Popup creates a clone -> validate that it will be unregistered when popup closes
+        expect(session._clonedModelAdapterRegistry[dateField.id][0]).toBe(dateField.popup._field);
+        dateField.popup.close();
+        expect(dateField.popup).toBe(null);
+        expect(session._clonedModelAdapterRegistry[dateField.id].length).toBe(0);
+      });
+
+      it('updates displayText and timestamp of datefield if date in picker is selected', function() {
+        var model = createModel();
+        model.touch = true;
+        var dateField = createField(model);
+        dateField.render(session.$entryPoint);
+
+        dateField.$dateField.triggerClick();
+        expect(dateField.popup.rendered).toBe(true);
+
+        var selectedDate = selectFirstDayInPicker(dateField.popup.$container.find('.date-picker'));
+        expect(dateField.popup).toBe(null);
+        expect(dateField.timestampAsDate).toEqual(selectedDate);
+        expect(dateField.displayText).toBe(dateField.isolatedDateFormat.format(selectedDate));
+        expect(dateField.$dateField.text()).toBe(dateField.displayText);
+      });
+
+      it('updates displayText and timestamp of datefield if date in picker is entered', function() {
+        var model = createModel();
+        model.touch = true;
+        var dateField = createField(model);
+        dateField.render(session.$entryPoint);
+
+        dateField.$dateField.triggerClick();
+        expect(dateField.popup.rendered).toBe(true);
+
+        dateField.popup._field.$dateField.val('11.02.2015');
+        dateField.popup._field.$dateField.triggerKeyDown(scout.keys.ENTER);
+        expect(dateField.popup).toBe(null);
+        expectDate(dateField.timestampAsDate, 2015, 02, 11);
+        expect(dateField.displayText).toBe('11.02.2015');
+        expect(dateField.$dateField.text()).toBe(dateField.displayText);
+      });
+
+      it('shows datefield with same date as clicked datefield', function() {
+        var model = createModel();
+        model.touch = true;
+        model.timestamp = '2012-07-01';
+        model.displayText = '01.07.2012';
+        var dateField = createField(model);
+        dateField.render(session.$entryPoint);
+
+        expect(dateField.$dateField.text()).toBe(dateField.displayText);
+        dateField.$dateField.triggerClick();
+        expect(dateField.popup.rendered).toBe(true);
+        expect(dateField.popup._field.timestampAsDate).toEqual(dateField.timestampAsDate);
+        expect(dateField.popup._field.displayText).toBe(dateField.displayText);
+        expect(dateField.popup._field.$dateField.val()).toBe(dateField.displayText);
+      });
+
+      it('shows datefield with same date as clicked datefield, if field empty initially', function() {
+        var model = createModel();
+        model.touch = true;
+        var dateField = createField(model);
+        dateField.render(session.$entryPoint);
+
+        // Open
+        dateField.$dateField.triggerClick();
+        expect(dateField.popup.rendered).toBe(true);
+
+        // Enter date and close
+        dateField.popup._field.$dateField.val('11.02.2015');
+        dateField.popup._field.$dateField.triggerKeyDown(scout.keys.ENTER);
+        expect(dateField.popup).toBe(null);
+        expect(dateField.displayText).toBe('11.02.2015');
+
+        // Reopen and verify
+        dateField.$dateField.triggerClick();
+        expect(dateField.popup.rendered).toBe(true);
+        expect(dateField.popup._field.timestampAsDate).toEqual(dateField.timestampAsDate);
+        expect(dateField.popup._field.displayText).toBe(dateField.displayText);
+        expect(dateField.popup._field.$dateField.val()).toBe(dateField.displayText);
+      });
+
+      it('clears displayText and timestamp of datefield if date in picker was removed', function() {
+        var model = createModel();
+        model.touch = true;
+        model.timestamp = '2012-07-01';
+        model.displayText = '01.07.2012';
+        var dateField = createField(model);
+        dateField.render(session.$entryPoint);
+
+        dateField.$dateField.triggerClick();
+        expect(dateField.popup.rendered).toBe(true);
+        expect(dateField.popup._field.$dateField.val()).toBe(dateField.displayText);
+
+        dateField.popup._field.$dateField.val('');
+        dateField.popup._field.$dateField.triggerKeyDown(scout.keys.ENTER);
+        expect(dateField.popup).toBe(null);
+        expect(dateField.timestampAsDate).toBe(null);
+        expect(dateField.displayText).toBe('');
+        expect(dateField.$dateField.text()).toBe('');
+      });
+
+      it('shows datefield with same date as clicked datefield, even if value was deleted before', function() {
+        var model = createModel();
+        model.touch = true;
+        model.timestamp = '2012-07-01';
+        model.displayText = '01.07.2012';
+        var dateField = createField(model);
+        dateField.render(session.$entryPoint);
+
+        // Open and check display text
+        dateField.$dateField.triggerClick();
+        expect(dateField.popup.rendered).toBe(true);
+        expect(dateField.popup._field.$dateField.val()).toBe(dateField.displayText);
+
+        // Clear text
+        dateField.popup._field.$dateField.val('');
+        dateField.popup._field.$dateField.triggerKeyDown(scout.keys.ENTER);
+        expect(dateField.popup).toBe(null);
+        expect(dateField.$dateField.text()).toBe('');
+
+        // Open again
+        dateField.$dateField.triggerClick();
+        expect(dateField.popup.rendered).toBe(true);
+        expect(dateField.popup._field.$dateField.val()).toBe(dateField.displayText);
+
+        // Select a date
+        var selectedDate = selectFirstDayInPicker(dateField.popup.$container.find('.date-picker'));
+        expect(dateField.popup).toBe(null);
+        expect(dateField.timestampAsDate).toEqual(selectedDate);
+        expect(dateField.displayText).toBe(dateField.isolatedDateFormat.format(selectedDate));
+        expect(dateField.$dateField.text()).toBe(dateField.displayText);
+
+        // Open again and verify
+        dateField.$dateField.triggerClick();
+        expect(dateField.popup.rendered).toBe(true);
+        expect(dateField.popup._field.$dateField.val()).toBe(dateField.displayText);
+      });
+
+    });
   });
 
 });

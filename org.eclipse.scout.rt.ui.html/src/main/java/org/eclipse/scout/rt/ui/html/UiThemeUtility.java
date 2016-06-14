@@ -17,6 +17,7 @@ import javax.servlet.http.HttpSession;
 
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.util.CompareUtility;
+import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.UiThemeProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,7 +41,7 @@ public class UiThemeUtility {
   /**
    * Only read configuration for UI theme once.
    */
-  private static String getConfiguredTheme() {
+  public static String getConfiguredTheme() {
     if (s_configThemeRead) {
       return s_configTheme;
     }

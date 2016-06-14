@@ -10,23 +10,27 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.res.loader;
 
-import java.io.IOException;
-
-import javax.servlet.http.HttpServletRequest;
-
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheKey;
-import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheObject;
 
 public class HtmlDocumentParserParameters {
 
-  private boolean m_minify;
-  private boolean m_cacheEnabled;
+  private final boolean m_minify;
+  private final boolean m_cacheEnabled;
+  private final String m_basePath;
+  private final String m_theme;
 
   /**
    * Cache key of HTML document.
    */
-  private HttpCacheKey m_cacheKey;
-  private HttpServletRequest m_req;
+  private final HttpCacheKey m_cacheKey;
+
+  public HtmlDocumentParserParameters(HttpCacheKey cacheKey, String theme, boolean minify, boolean cacheEnabled, String basePath) {
+    m_minify = minify;
+    m_cacheEnabled = cacheEnabled;
+    m_basePath = basePath;
+    m_theme = theme;
+    m_cacheKey = cacheKey;
+  }
 
   public boolean isMinify() {
     return m_minify;
@@ -36,34 +40,16 @@ public class HtmlDocumentParserParameters {
     return m_cacheEnabled;
   }
 
-  public void setMinify(boolean minify) {
-    m_minify = minify;
-  }
-
-  public void setCacheEnabled(boolean cacheEnabled) {
-    m_cacheEnabled = cacheEnabled;
-  }
-
-  public void setRequest(HttpServletRequest request) {
-    m_req = request;
-  }
-
-  public void setCacheKey(HttpCacheKey cacheKey) {
-    m_cacheKey = cacheKey;
-  }
-
   public String getHtmlPath() {
     return m_cacheKey.getResourcePath();
   }
 
-  public String getContextPath() {
-    return m_req.getServletContext().getContextPath();
+  public String getBasePath() {
+    return m_basePath;
   }
 
-  public HttpCacheObject loadScriptFile(String resourcePath) throws IOException {
-    ScriptFileLoader scriptLoader = new ScriptFileLoader(m_req);
-    HttpCacheKey cacheKey = scriptLoader.createCacheKey(resourcePath);
-    return scriptLoader.loadResource(cacheKey);
+  public String getTheme() {
+    return m_theme;
   }
 
 }

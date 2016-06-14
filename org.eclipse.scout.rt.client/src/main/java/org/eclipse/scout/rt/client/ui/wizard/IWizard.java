@@ -283,7 +283,7 @@ public interface IWizard extends IPropertyObserver, ITypeWithClassId, IAppLinkCa
   void doAppLinkAction(String ref);
 
   /**
-   * @deprecated use {@link #doAppLinkAction(String)} instead
+   * @deprecated use {@link #doAppLinkAction(String)} instead, will be removed in Scout 6.1
    */
   @Deprecated
   void doHyperlinkAction(URL url, String path, boolean local);

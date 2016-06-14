@@ -17,6 +17,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
 
+import org.eclipse.scout.rt.server.jdbc.SqlBind;
 import org.eclipse.scout.rt.server.jdbc.style.AbstractSqlStyle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,6 +55,15 @@ public class PostgreSqlStyle extends AbstractSqlStyle {
       }
     }
     return super.readBind(rs, meta, type, jdbcBindIndex);
+  }
+
+  @Override
+  protected SqlBind createBindFor(Object o, @SuppressWarnings("rawtypes") Class c) {
+    if (Boolean.class.isAssignableFrom(c)) {
+      return new SqlBind(Types.BOOLEAN, o);
+    }
+
+    return super.createBindFor(o, c);
   }
 
   @Override

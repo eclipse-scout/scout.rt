@@ -33,7 +33,7 @@ import org.eclipse.scout.rt.client.session.ClientSessionProvider;
  * MultiClientAuthenticator.setDefaultUser(&quot;alice&quot;);
  * </pre>
  *
- * @deprecated will be removed in 'O' release.
+ * @deprecated will be removed in Scout 6.1.
  */
 @Deprecated
 public class MultiClientAuthenticator extends Authenticator {

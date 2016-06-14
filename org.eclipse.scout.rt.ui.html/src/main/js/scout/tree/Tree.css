@@ -41,11 +41,11 @@
   position: relative;
   overflow: hidden;
   width: 100%; /* expand to outer container, needed for breadcrumb */
-  
+
   &.scrollable-tree >.tree-node{
-  	overflow: visible;
-  	text-overflow: initial;
-  	whitespace: normal;  	
+    overflow: visible;
+    text-overflow: initial;
+    whitespace: normal;
   }
 }
 
@@ -99,6 +99,7 @@
     display: inline-block;
     position: relative;
     font-size: @font-size-normal;
+    #scout.checkbox();
 
     &.disabled {
       cursor: default;
@@ -106,7 +107,6 @@
 
     &::before {
       #scout.checkbox-before();
-      #scout.checkbox-before-border();
       margin-top: -12px;
     }
 
@@ -114,12 +114,14 @@
       #scout.checkbox-before-checked();
     }
 
-    &.disabled::before {
-      #scout.checkbox-before-disabled();
-    }
-
-    &.disabled:hover::before {
-      #scout.checkbox-before-disabled-border();
+    &.disabled {
+      #scout.checkbox-disabled();
+      &::before {
+        #scout.checkbox-before-disabled();
+      }
+      :hover::before {
+        #scout.checkbox-before-disabled();
+      }
     }
 
     &:not(.checked).children-checked::after {

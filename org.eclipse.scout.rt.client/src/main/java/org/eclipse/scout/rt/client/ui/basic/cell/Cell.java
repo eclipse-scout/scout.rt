@@ -322,7 +322,7 @@ public class Cell implements ICell, IStyleable, IHtmlCapable {
   }
 
   /**
-   * @deprecated use {@link #addErrorStatus(String)}
+   * @deprecated use {@link #addErrorStatus(String)}, will be removed in Scout 6.1
    */
   @Deprecated
   public void setErrorStatus(String message) {
@@ -332,7 +332,7 @@ public class Cell implements ICell, IStyleable, IHtmlCapable {
   /**
    * Set the error status of the cell or <code>null</code> in case of no error.
    *
-   * @deprecated use {@link #addErrorStatus(IStatus)}
+   * @deprecated use {@link #addErrorStatus(IStatus)}, will be removed in Scout 6.1
    **/
   @Deprecated
   public void setErrorStatus(IStatus status) {

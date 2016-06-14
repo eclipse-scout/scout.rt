@@ -71,7 +71,7 @@ public class SvgFieldEvent extends EventObject {
   }
 
   /**
-   * @deprecated use {@link #getAppLinkRef()} instead
+   * @deprecated use {@link #getAppLinkRef()} instead, will be removed in Scout 6.1.
    */
   @Deprecated
   public URL getURL() {

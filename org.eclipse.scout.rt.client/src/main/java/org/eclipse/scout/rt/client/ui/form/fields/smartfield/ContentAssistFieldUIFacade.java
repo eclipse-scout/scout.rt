@@ -40,10 +40,14 @@ class ContentAssistFieldUIFacade<LOOKUP_KEY> implements IContentAssistFieldUIFac
       return;
     }
     LOG.debug("proposalTypedFromUI text={}", text);
-    m_field.clearProposal();
+    if (m_field.isProposalChooserRegistered()) {
+      m_field.getProposalChooser().deselect();
+    }
     m_field.setDisplayText(text);
-    if (!StringUtility.equalsIgnoreNewLines(m_field.getLookupRowFetcher().getLastSearchText(), toSearchText(text))) {
-      if (m_field.isBrowseLoadIncremental() && m_field.getWildcard().equals(toSearchText(text))) {
+
+    String searchText = toSearchText(text);
+    if (!StringUtility.equalsIgnoreNewLines(m_field.getLookupRowFetcher().getLastSearchText(), searchText)) {
+      if (m_field.isBrowseLoadIncremental() && m_field.getWildcard().equals(searchText)) {
         IContentAssistSearchParam<LOOKUP_KEY> searchParam = ContentAssistSearchParam.createParentParam(null, false);
         m_field.doSearch(searchParam, false);
       }
@@ -59,7 +63,9 @@ class ContentAssistFieldUIFacade<LOOKUP_KEY> implements IContentAssistFieldUIFac
       return;
     }
     LOG.debug("openProposalChooserFromUI text={} selectCurrentValue={}", text, selectCurrentValue);
-    m_field.clearProposal();
+    if (m_field.isProposalChooserRegistered()) {
+      m_field.getProposalChooser().deselect();
+    }
     m_field.setDisplayText(text);
     String searchText = toSearchText(text);
     IProposalChooser<?, LOOKUP_KEY> proposalChooser = m_field.registerProposalChooserInternal();

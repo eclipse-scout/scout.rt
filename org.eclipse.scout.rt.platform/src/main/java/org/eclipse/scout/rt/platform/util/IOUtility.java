@@ -133,7 +133,7 @@ public final class IOUtility {
   }
 
   /**
-   * @deprecated use {@link #readBytes(InputStream, int)} within a resource-try statement
+   * @deprecated use {@link #readBytes(InputStream, int)} within a resource-try statement, will be removed in Scout 6.1
    */
   @Deprecated
   public static byte[] getContent(InputStream stream, int len) throws IOException {
@@ -146,7 +146,7 @@ public final class IOUtility {
   }
 
   /**
-   * @deprecated use {@link #readBytes(InputStream)} within a resource-try statement
+   * @deprecated use {@link #readBytes(InputStream)} within a resource-try statement, will be removed in Scout 6.1
    */
   @Deprecated
   public static byte[] getContent(InputStream stream, boolean autoClose) {

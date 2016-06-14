@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.res.loader;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.eclipse.scout.rt.client.services.common.icon.IconLocator;
 import org.eclipse.scout.rt.client.services.common.icon.IconSpec;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
@@ -25,10 +23,6 @@ import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheObject;
  * classpath).
  */
 public class IconLoader extends AbstractResourceLoader {
-
-  public IconLoader(HttpServletRequest req) {
-    super(req);
-  }
 
   @Override
   public HttpCacheObject loadResource(HttpCacheKey cacheKey) {

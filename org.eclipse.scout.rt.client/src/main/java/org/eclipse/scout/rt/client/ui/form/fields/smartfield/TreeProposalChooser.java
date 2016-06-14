@@ -214,7 +214,7 @@ public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITr
    * Node with a given key. Assumes the node is already loaded at this point
    */
   private ITreeNode getNode(final LOOKUP_KEY key) {
-    final Holder<ITreeNode> holder = new Holder<ITreeNode>(ITreeNode.class);
+    final Holder<ITreeNode> holder = new Holder<>(ITreeNode.class);
     m_model.visitTree(new ITreeVisitor() {
 
       @Override
@@ -352,7 +352,7 @@ public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITr
     public ILookupRow<LOOKUP_KEY> getLookupRow(LOOKUP_KEY key) {
       //do not cancel lookups that are already in progress
       List<ILookupRow<LOOKUP_KEY>> rows = LookupJobHelper.await(m_contentAssistField.callKeyLookupInBackground(key, false));
-      if (rows.size() == 0) {
+      if (rows.isEmpty()) {
         return null;
       }
       else if (rows.size() > 1) {

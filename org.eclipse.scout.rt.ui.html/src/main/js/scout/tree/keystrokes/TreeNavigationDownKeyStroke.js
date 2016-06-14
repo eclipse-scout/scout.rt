@@ -13,11 +13,10 @@ scout.TreeNavigationDownKeyStroke = function(tree, modifierBitMask) {
   this.which = [scout.keys.DOWN];
   this.renderingHints.text = '↓';
   this.renderingHints.$drawingArea = function($drawingArea, event) {
-    var $currentNode = event._$treeCurrentNode;
-    if (!$currentNode) {
-      return this.field.$nodes().first();
+    var newSelectedNode = this._computeNewSelection(event._treeCurrentNode);
+    if (newSelectedNode) {
+      return newSelectedNode.$node;
     }
-    return $currentNode.nextAll('.tree-node:not(.hidden):first');
   }.bind(this);
 };
 scout.inherits(scout.TreeNavigationDownKeyStroke, scout.AbstractTreeNavigationKeyStroke);

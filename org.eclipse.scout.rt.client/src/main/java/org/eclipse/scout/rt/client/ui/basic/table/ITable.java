@@ -348,7 +348,7 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
    * Convenience to find a menu, uses {@link org.eclipse.scout.rt.client.ui.action.ActionFinder ActionFinder}
    *
    * @deprecated Use {@link #getMenuByClass(Class)} instead. This method is error-prone, because it does not throw an
-   *             exception if the given menu type is ambiguous. It will be removed in the O-Release (7.0).
+   *             exception if the given menu type is ambiguous. It will be removed in Scout 6.1
    */
   @Deprecated
   <T extends IMenu> T getMenu(Class<T> menuType);

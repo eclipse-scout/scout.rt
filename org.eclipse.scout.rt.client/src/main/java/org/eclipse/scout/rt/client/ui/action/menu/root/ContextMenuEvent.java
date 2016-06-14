@@ -32,15 +32,15 @@ public class ContextMenuEvent extends EventObject implements IModelEvent {
   }
 
   /**
-   * @deprecated use #getType()
+   * @deprecated use #getType(), will be removed in Scout 6.1
    */
   @Deprecated
   public int getEventType() {
-    return m_eventType;
+    return getType();
   }
 
   @Override
   public int getType() {
-    return getEventType();
+    return m_eventType;
   }
 }

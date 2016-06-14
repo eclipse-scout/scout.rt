@@ -64,7 +64,7 @@ public class LocalLookupCall<T> extends LookupCall<T> {
   }
 
   /**
-   * @deprecated: Will be removed in the neon release.
+   * @deprecated: Will be removed in Scout 6.1.
    */
   @Deprecated
   public static Pattern createLowerCaseSearchPattern(String s) {

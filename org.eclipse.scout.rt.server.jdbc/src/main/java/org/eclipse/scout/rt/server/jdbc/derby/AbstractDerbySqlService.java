@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.jdbc.derby;
 
-import org.eclipse.scout.rt.platform.util.NumberUtility;
 import org.eclipse.scout.rt.server.jdbc.AbstractSqlService;
 import org.eclipse.scout.rt.server.jdbc.style.ISqlStyle;
 
@@ -38,12 +37,12 @@ public abstract class AbstractDerbySqlService extends AbstractSqlService {
     createStatementProcessor(update, null, 0).processModification(getTransaction(), getStatementCache(), null);
 
     //read
-    String s = "SELECT " + getConfiguredSequenceColumnName() + " FROM " + sequenceName;
-    Object[][] ret = createStatementProcessor(s, null, 0).processSelect(getTransaction(), getStatementCache(), null);
-    if (ret.length == 1) {
-      return NumberUtility.toLong(NumberUtility.nvl((Number) ret[0][0], 0));
-    }
-    return 0L;
+    return super.getSequenceNextval(sequenceName);
+  }
+
+  @Override
+  protected String getSequenceNextvalStatement(String sequenceName) {
+    return "SELECT " + getConfiguredSequenceColumnName() + " FROM " + sequenceName;
   }
 
   @Override

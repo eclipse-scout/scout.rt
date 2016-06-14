@@ -126,7 +126,7 @@ public class ClusterSynchronizationService implements IClusterSynchronizationSer
   }
 
   /**
-   * @deprecated use {@link INotificationHandler}
+   * @deprecated use {@link INotificationHandler}, will be removed in Scout 6.1.
    */
   @Deprecated
   @Override
@@ -135,7 +135,7 @@ public class ClusterSynchronizationService implements IClusterSynchronizationSer
   }
 
   /**
-   * @deprecated use {@link INotificationHandler}
+   * @deprecated use {@link INotificationHandler}, will be removed in Scout 6.1.
    */
   @Deprecated
   @Override
@@ -144,7 +144,7 @@ public class ClusterSynchronizationService implements IClusterSynchronizationSer
   }
 
   /**
-   * @deprecated use {@link INotificationHandler}
+   * @deprecated use {@link INotificationHandler}, will be removed in Scout 6.1.
    */
   @Deprecated
   protected IClusterNotificationListener[] getListeners() {

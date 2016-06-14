@@ -27,6 +27,8 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
+import java.text.Format;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -104,6 +106,31 @@ public class CsvHelperTest {
       assertTrue(contextInfos.contains("colIndex=2"));
       assertTrue(contextInfos.contains("cell=d"));
     }
+  }
+
+  @Test
+  public void testSimpleColumnTypes() {
+    List<String> columnTypes = Arrays.asList(new String[]{null, "string", "float", "date", "invalid", "Date"});
+    m_csvHelper.setColumnTypes(columnTypes);
+    assertEquals("string", m_csvHelper.getColumnTypes().get(0));
+    assertEquals("string", m_csvHelper.getColumnTypes().get(1));
+    assertEquals("float", m_csvHelper.getColumnTypes().get(2));
+    assertEquals("date", m_csvHelper.getColumnTypes().get(3));
+    assertEquals("string", m_csvHelper.getColumnTypes().get(4));
+    assertEquals("Date", m_csvHelper.getColumnTypes().get(5));
+  }
+
+  @Test
+  public void testCustomColumnType() {
+    String formatTypePrefix = "date_";
+    String formatPattern = "yyyy__MM__dd";
+    String typeDesc = formatTypePrefix + formatPattern;
+    List<String> columnTypes = Arrays.asList(new String[]{typeDesc});
+    m_csvHelper.setColumnTypes(columnTypes);
+    Format format = m_csvHelper.getColumnFormat(0);
+    assertEquals(typeDesc, m_csvHelper.getColumnTypes().get(0));
+    assertTrue(format instanceof SimpleDateFormat);
+    assertEquals(formatPattern, ((SimpleDateFormat) format).toPattern());
   }
 
   @Test

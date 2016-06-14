@@ -2173,6 +2173,26 @@ scout.Table.prototype.updateRows = function(rows) {
   this._updateBackgroundEffect();
 };
 
+scout.Table.prototype.updateRowOrder = function(rows) {
+  rows = scout.arrays.ensure(rows);
+  if (rows.length !== this.rows.length) {
+    throw new Error('Row order may not be updated because lengths of the arrays differ.');
+  }
+
+  // update model (make a copy so that original array stays untouched)
+  this.rows = rows.slice();
+  this._filteredRowsDirty = true; // order has changed
+
+  this.clearAggregateRows(this._animateAggregateRows);
+  if (this.rendered) {
+    this._renderRowOrderChanges();
+  }
+  this._triggerRowOrderChanged();
+
+  this._group(this._animateAggregateRows);
+  this._animateAggregateRows = false;
+};
+
 scout.Table.prototype._removeTooltipsForRow = function(row) {
   for (var i = this.tooltips.length - 1; i >= 0; i--) {
     if (this.tooltips[i].row.id === row.id) {
@@ -3591,22 +3611,8 @@ scout.Table.prototype._onRowsChecked = function(rows) {
 };
 
 scout.Table.prototype._onRowOrderChanged = function(rowIds) {
-  if (rowIds.length !== this.rows.length) {
-    throw new Error('Row order changed event may not be processed because lengths of the arrays differ.');
-  }
-
-  // update model
-  this.rows = this._rowsByIds(rowIds);
-  this._filteredRowsDirty = true; // order has been changed
-
-  this.clearAggregateRows(this._animateAggregateRows);
-  if (this.rendered) {
-    this._renderRowOrderChanges();
-  }
-  this._triggerRowOrderChanged();
-
-  this._group(this._animateAggregateRows);
-  this._animateAggregateRows = false;
+  var rows = this._rowsByIds(rowIds);
+  this.updateRowOrder(rows);
 };
 
 /**

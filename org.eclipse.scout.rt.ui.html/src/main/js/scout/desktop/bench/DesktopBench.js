@@ -225,12 +225,6 @@ scout.DesktopBench.prototype.setOutlineContent = function(content) {
   if (this.rendered) {
     this._removeOutlineContent();
   }
-  // reset view tab relevant properties.
-  if (content) {
-    delete content.title;
-    delete content.subTitle;
-    delete content.iconId;
-  }
   this._setProperty('outlineContent', content);
   // Inform header that outline content has changed
   // (having a listener in the header is quite complex due to initialization phase, a direct call here is much easier to implement)
@@ -242,6 +236,11 @@ scout.DesktopBench.prototype.setOutlineContent = function(content) {
 
 scout.DesktopBench.prototype._showOutlineContent = function() {
   if (this.outlineContent) {
+    // Reset view tab relevant properties to make sure no tab is visible for the outline content
+    delete this.outlineContent.title;
+    delete this.outlineContent.subTitle;
+    delete this.outlineContent.iconId;
+
     this.addView(this.outlineContent);
 
     if (this.desktop.rendered) {

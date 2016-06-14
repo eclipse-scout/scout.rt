@@ -398,6 +398,54 @@ describe("Table", function() {
     });
   });
 
+  describe("updateRowOrder", function() {
+    var model, table, row0, row1, row2;
+
+    beforeEach(function() {
+      model = helper.createModelFixture(2, 3);
+      table = helper.createTable(model);
+      row0 = table.rows[0];
+      row1 = table.rows[1];
+      row2 = table.rows[2];
+    });
+
+    it("reorders the model rows", function() {
+      table.updateRowOrder([row2, row1, row0]);
+      expect(table.rows.length).toBe(3);
+      expect(table.rows[0]).toBe(row2);
+      expect(table.rows[1]).toBe(row1);
+      expect(table.rows[2]).toBe(row0);
+    });
+
+    it("reorders the html nodes", function() {
+      table.render(session.$entryPoint);
+      table.updateRowOrder([row2, row1, row0]);
+      var $rows = table.$rows();
+      expect($rows.eq(0).data('row').id).toBe(row2.id);
+      expect($rows.eq(1).data('row').id).toBe(row1.id);
+      expect($rows.eq(2).data('row').id).toBe(row0.id);
+    });
+
+    it("considers view range", function() {
+      table.viewRangeSize = 2;
+      table.render(session.$entryPoint);
+
+      var $rows = table.$rows();
+      expect(table.viewRangeRendered).toEqual(new scout.Range(0, 2));
+      expect($rows.eq(0).data('row').id).toBe(model.rows[0].id);
+      expect($rows.eq(1).data('row').id).toBe(model.rows[1].id);
+      expect(table.$rows().length).toBe(2);
+      expect(table.rows.length).toBe(3);
+
+      table.updateRowOrder([row2, row1, row0]);
+      $rows = table.$rows();
+      expect($rows.eq(0).data('row').id).toBe(model.rows[2].id);
+      expect($rows.eq(1).data('row').id).toBe(model.rows[1].id);
+      expect(table.$rows().length).toBe(2);
+      expect(table.rows.length).toBe(3);
+    });
+  });
+
   describe("checkRow", function() {
 
     function findCheckedRows(rows) {
@@ -2384,30 +2432,12 @@ describe("Table", function() {
         };
       }
 
-      it("reorders the model rows", function() {
-        var message = {
-          events: [createRowOrderChangedEvent(model, [row2.id, row1.id, row0.id])]
-        };
-        session._processSuccessResponse(message);
+      it("calls updateRowOrder", function() {
+        spyOn(table, 'updateRowOrder');
 
-        expect(table.rows.length).toBe(3);
-        expect(table.rows[0]).toBe(row2);
-        expect(table.rows[1]).toBe(row1);
-        expect(table.rows[2]).toBe(row0);
-      });
-
-      it("reorders the html nodes", function() {
-        table.render(session.$entryPoint);
-
-        var message = {
-          events: [createRowOrderChangedEvent(model, [row2.id, row1.id, row0.id])]
-        };
-        session._processSuccessResponse(message);
-
-        var $rows = table.$rows();
-        expect($rows.eq(0).data('row').id).toBe(model.rows[2].id);
-        expect($rows.eq(1).data('row').id).toBe(model.rows[1].id);
-        expect($rows.eq(2).data('row').id).toBe(model.rows[0].id);
+        var event = createRowOrderChangedEvent(model, [row2.id, row1.id, row0.id]);
+        table.onModelAction(event);
+        expect(table.updateRowOrder).toHaveBeenCalledWith([row2, row1, row0]);
       });
 
       it("does not animate ordering for newly inserted rows", function() {
@@ -2445,28 +2475,6 @@ describe("Table", function() {
         });
       });
 
-      it("considers view range", function() {
-        table.viewRangeSize = 2;
-        table.render(session.$entryPoint);
-
-        var $rows = table.$rows();
-        expect(table.viewRangeRendered).toEqual(new scout.Range(0, 2));
-        expect($rows.eq(0).data('row').id).toBe(model.rows[0].id);
-        expect($rows.eq(1).data('row').id).toBe(model.rows[1].id);
-        expect(table.$rows().length).toBe(2);
-        expect(table.rows.length).toBe(3);
-
-        var message = {
-          events: [createRowOrderChangedEvent(model, [row2.id, row1.id, row0.id])]
-        };
-        session._processSuccessResponse(message);
-
-        $rows = table.$rows();
-        expect($rows.eq(0).data('row').id).toBe(model.rows[2].id);
-        expect($rows.eq(1).data('row').id).toBe(model.rows[1].id);
-        expect(table.$rows().length).toBe(2);
-        expect(table.rows.length).toBe(3);
-      });
     });
 
     describe("rowsUpdated event", function() {

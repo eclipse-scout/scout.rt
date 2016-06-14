@@ -89,8 +89,8 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
    */
 
   /**
-   * @deprecated no replacement. Will be removed in the O-Release. Indicates whether setting the field's value results
-   *             in an update of the display text.
+   * @deprecated no replacement. Will be removed in Scout 6.1. Indicates whether setting the field's value results in an
+   *             update of the display text.
    */
   @Deprecated
   @Order(200)

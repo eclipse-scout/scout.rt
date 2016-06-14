@@ -752,7 +752,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    *          Path of URL ({@link URL#getPath()}).
    * @param local
    *          {@code true} if the url is not a valid external url but a local model url (http://local/...)
-   * @{@link Deprecated} use {@link #execAppLinkAction(String)} instead
+   * @{@link Deprecated} use {@link #execAppLinkAction(String)} instead, will be removed in Scout 6.1
    */
   @ConfigOperation
   @Order(120)
@@ -1022,6 +1022,10 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     ActionUtility.disposeActions(getMenus());
   }
 
+  private void disposeTableControls() {
+    ActionUtility.disposeActions(getTableControls());
+  }
+
   private void createTableControlsInternal() {
     List<Class<? extends ITableControl>> tcs = getConfiguredTableControls();
     OrderedCollection<ITableControl> tableControls = new OrderedCollection<ITableControl>();
@@ -1172,6 +1176,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   protected void disposeTableInternal() {
     disposeColumnsInternal();
     disposeMenus();
+    disposeTableControls();
   }
 
   @Override

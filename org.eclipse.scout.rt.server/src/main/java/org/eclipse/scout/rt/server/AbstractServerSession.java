@@ -263,8 +263,9 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
 
   @Override
   public void stop() {
-    m_active = false;
+    fireSessionChangedEvent(new SessionEvent(this, SessionEvent.TYPE_STOPPING));
 
+    m_active = false;
     fireSessionChangedEvent(new SessionEvent(this, SessionEvent.TYPE_STOPPED));
 
     // Cancel globally registered RunMonitors of this session.

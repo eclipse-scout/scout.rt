@@ -66,6 +66,11 @@ scout.ModelAdapter.prototype._init = function(model) {
     this.remoteHandler = this.session.sendEvent.bind(this.session);
   }
 
+  // Make a copy to prevent a modification of the given object
+  model = $.extend({}, model);
+  // Fill in the missing default values (has to before copying the properties, so that modelProperties considers default values as well)
+  scout.defaultValues.applyTo(model);
+
   // copy all properties from model to this adapter
   this._eachProperty(model, function(propertyName, value, isAdapterProp) {
     // if property is not yet in the array of property names -> add property
@@ -81,9 +86,6 @@ scout.ModelAdapter.prototype._init = function(model) {
     }
     this[propertyName] = value;
   }.bind(this));
-
-  // Fill in the missing default values
-  scout.defaultValues.applyTo(this);
 };
 
 /**
@@ -151,7 +153,7 @@ scout.ModelAdapter.prototype._addAdapterProperties = function(properties) {
 /**
  * Adds property name(s) of model properties. They're used when a model adpater is cloned (see #cloneAdapter()).
  * You only need to call this method for UI-only properties. Properties from the server-side model are automatically
- * added in the _init method of the model adpater.
+ * added in the _init method of the model adapter.
  *
  * @param properties String or String-array with property names.
  */

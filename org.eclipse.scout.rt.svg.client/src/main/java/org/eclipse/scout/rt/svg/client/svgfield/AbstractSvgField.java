@@ -73,7 +73,7 @@ public abstract class AbstractSvgField extends AbstractFormField implements ISvg
   /**
    * Called when a SVG hyperlink was clicked.
    *
-   * @deprecated use {@link #execAppLinkAction(SvgFieldEvent)} instead
+   * @deprecated use {@link #execAppLinkAction(SvgFieldEvent)} instead, will be removed in Scout 6.1.
    */
   @ConfigOperation
   @Order(20)

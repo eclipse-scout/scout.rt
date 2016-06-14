@@ -61,9 +61,8 @@ scout.CheckBoxField.prototype._renderDisplayText = function() {
 
 scout.CheckBoxField.prototype._onMouseDown = function(event) {
   this.toggleChecked();
-  if (scout.device.supportsFocusEmptyBeforeDiv) {
+  if (event.currentTarget === this.$checkBoxLabel[0]) {
     this.session.focusManager.requestFocus(this.$checkBox);
-    event.preventDefault();
   }
 };
 
@@ -90,12 +89,9 @@ scout.CheckBoxField.prototype.setValue = function(value) {
  */
 scout.CheckBoxField.prototype._renderEnabled = function(enabled) {
   scout.CheckBoxField.parent.prototype._renderEnabled.call(this);
-  if (this.enabled) {
-    this.$checkBox.attr('tabindex', '0');
-  } else {
-    this.$checkBox.removeAttr('tabindex');
-  }
-  this.$checkBox.setEnabled(this.enabled);
+  this.$checkBox
+    .setTabbable(this.enabled && !scout.device.supportsTouch())
+    .setEnabled(this.enabled);
 };
 
 scout.CheckBoxField.prototype._renderProperties = function() {

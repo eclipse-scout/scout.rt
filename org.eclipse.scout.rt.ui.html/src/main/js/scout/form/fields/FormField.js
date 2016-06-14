@@ -199,7 +199,7 @@ scout.FormField.prototype._renderPlaceholder = function($field) {
 scout.FormField.prototype._removePlaceholder = function($field) {
   $field = scout.nvl($field, this.$field);
   if ($field) {
-    $field.removeAttr('placeholder');
+    $field.placeholder('');
   }
 };
 

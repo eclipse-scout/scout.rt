@@ -55,69 +55,6 @@ public class HttpCacheControlTest {
   }
 
   @Test
-  public void testPutNotCachable() throws Exception {
-    BinaryResource res = BinaryResources.create()
-        .withFilename("a.html")
-        .withContent("<html></html>".getBytes("UTF-8"))
-        .build();
-    HttpCacheKey key = new HttpCacheKey("/");
-    HttpCacheObject obj = new HttpCacheObject(key, res);
-    boolean b = cc.putCacheObject(req, obj);
-    Assert.assertFalse(b);
-  }
-
-  @Test
-  public void testPutCachable() throws Exception {
-    BinaryResource res = BinaryResources.create()
-        .withFilename("a.html")
-        .withContent("<html></html>".getBytes("UTF-8"))
-        .withCachingAllowed(true)
-        .build();
-    HttpCacheObject obj = new HttpCacheObject(new HttpCacheKey("/"), res);
-    boolean b = cc.putCacheObject(req, obj);
-    Assert.assertTrue(b);
-  }
-
-  @Test
-  public void testGet() throws Exception {
-    HttpCacheKey key = new HttpCacheKey("/");
-    HttpCacheObject obj = cc.getCacheObject(req, key);
-    Assert.assertNull(obj);
-  }
-
-  @Test
-  public void testPutGet() throws Exception {
-    BinaryResource res = BinaryResources.create()
-        .withFilename("a.html")
-        .withContent("<html></html>".getBytes("UTF-8"))
-        .withCachingAllowed(true)
-        .build();
-    HttpCacheObject obj = new HttpCacheObject(new HttpCacheKey("/"), res);
-    boolean b = cc.putCacheObject(req, obj);
-    Assert.assertTrue(b);
-
-    HttpCacheObject obj2 = cc.getCacheObject(req, new HttpCacheKey("/"));
-    Assert.assertEquals(obj.getCacheKey(), obj2.getCacheKey());
-  }
-
-  @Test
-  public void testPutRemoveGet() throws Exception {
-    BinaryResource res = BinaryResources.create()
-        .withFilename("a.html")
-        .withContent("<html></html>".getBytes("UTF-8"))
-        .withCachingAllowed(true)
-        .build();
-    HttpCacheObject obj = new HttpCacheObject(new HttpCacheKey("/"), res);
-    boolean b = cc.putCacheObject(req, obj);
-    Assert.assertTrue(b);
-
-    cc.removeCacheObject(req, new HttpCacheKey("/"));
-
-    HttpCacheObject obj2 = cc.getCacheObject(req, new HttpCacheKey("/"));
-    Assert.assertNull(obj2);
-  }
-
-  @Test
   public void testCheckAndSet_DisableCaching_forward() throws Exception {
     Mockito.when(req.getPathInfo()).thenReturn("/subPath");
     Mockito.when(req.getAttribute("javax.servlet.forward.path_info")).thenReturn("/");

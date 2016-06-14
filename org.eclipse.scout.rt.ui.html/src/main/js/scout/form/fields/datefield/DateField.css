@@ -10,7 +10,8 @@
  ******************************************************************************/
 .date-field > .field {
 
-  & > input, .input-field {
+  & > input,
+  & > .input-field {
     position: absolute;
 
     &.date {
@@ -20,6 +21,12 @@
     &.time {
       #scout.text-field-with-icon(@icon-clock, ~'.time');
     }
+  }
+
+  & > .input-field[placeholder]:empty::before {
+    /* placeholder only works for input elements -> fake it */
+    #scout.placeholder();
+    content: attr(placeholder);
   }
 
   /** Prediction input field is in the back of the actual input field -> make actual input field transparent */

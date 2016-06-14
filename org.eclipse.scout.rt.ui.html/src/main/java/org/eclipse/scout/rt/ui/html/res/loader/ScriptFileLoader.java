@@ -14,15 +14,12 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.resource.BinaryResources;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheControl;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheKey;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheObject;
-import org.eclipse.scout.rt.ui.html.UiThemeUtility;
 import org.eclipse.scout.rt.ui.html.res.IWebContentService;
 import org.eclipse.scout.rt.ui.html.script.ScriptFileBuilder;
 import org.eclipse.scout.rt.ui.html.script.ScriptOutput;
@@ -32,10 +29,16 @@ import org.eclipse.scout.rt.ui.html.script.ScriptSource.FileType;
  * This class loads and parses CSS and JS files from WebContent/ folder.
  */
 public class ScriptFileLoader extends AbstractResourceLoader {
+
   private static final String THEME_KEY = "ui.theme";
 
-  public ScriptFileLoader(HttpServletRequest req) {
-    super(req);
+  private final String m_theme;
+  private final boolean m_minify;
+
+  public ScriptFileLoader(String theme, boolean minify) {
+    super();
+    m_theme = theme;
+    m_minify = minify;
   }
 
   @Override
@@ -46,15 +49,13 @@ public class ScriptFileLoader extends AbstractResourceLoader {
     }
     else {
       // CSS files are different for depending on the current theme (but don't depend on the locale)
-      return new HttpCacheKey(resourcePath, Collections.singletonMap(THEME_KEY, UiThemeUtility.getThemeForLookup(getRequest())));
+      return new HttpCacheKey(resourcePath, Collections.singletonMap(THEME_KEY, m_theme));
     }
   }
 
   @Override
   public HttpCacheObject loadResource(HttpCacheKey cacheKey) throws IOException {
-    ScriptFileBuilder builder = new ScriptFileBuilder(BEANS.get(IWebContentService.class));
-    builder.setMinifyEnabled(isMinify());
-    builder.setTheme(getTheme(cacheKey));
+    ScriptFileBuilder builder = new ScriptFileBuilder(BEANS.get(IWebContentService.class), m_theme, m_minify);
     String resourcePath = cacheKey.getResourcePath();
     ScriptOutput out = builder.buildScript(resourcePath);
     if (out != null) {
@@ -72,7 +73,4 @@ public class ScriptFileLoader extends AbstractResourceLoader {
     return null;
   }
 
-  protected String getTheme(HttpCacheKey cacheKey) {
-    return UiThemeUtility.getThemeName(cacheKey.getAttribute(THEME_KEY));
-  }
 }

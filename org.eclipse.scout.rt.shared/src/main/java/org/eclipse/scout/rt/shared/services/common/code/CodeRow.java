@@ -284,6 +284,9 @@ public class CodeRow<ID_TYPE> extends LookupRow<ID_TYPE> implements ICodeRow<ID_
     return this;
   }
 
+  /**
+   * @deprecated use {@link #withExtKey(String)}. will be removed in version 6.1.
+   */
   @SuppressWarnings("deprecation")
   @Deprecated
   @Override

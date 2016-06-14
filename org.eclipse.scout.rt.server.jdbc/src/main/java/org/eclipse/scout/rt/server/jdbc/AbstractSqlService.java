@@ -738,12 +738,16 @@ public abstract class AbstractSqlService implements ISqlService, IServiceInvento
 
   @Override
   public Long getSequenceNextval(String sequenceName) {
-    String s = "SELECT " + sequenceName + ".NEXTVAL FROM DUAL ";
+    String s = getSequenceNextvalStatement(sequenceName);
     Object[][] ret = createStatementProcessor(s, null, 0).processSelect(getTransaction(), getStatementCache(), null);
     if (ret.length == 1) {
       return NumberUtility.toLong(NumberUtility.nvl((Number) ret[0][0], 0));
     }
     return 0L;
+  }
+
+  protected String getSequenceNextvalStatement(String sequenceName) {
+    return "SELECT " + sequenceName + ".NEXTVAL FROM DUAL ";
   }
 
   /**

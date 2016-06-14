@@ -19,6 +19,6 @@ scout.OutlineNavigateToTopKeyStroke = function(tree, modifierBitMask) {
 };
 scout.inherits(scout.OutlineNavigateToTopKeyStroke, scout.AbstractTreeNavigationKeyStroke);
 
-scout.OutlineNavigateToTopKeyStroke.prototype._handleInternal = function(currentNode) {
+scout.OutlineNavigateToTopKeyStroke.prototype.handle = function(event) {
   this.field.navigateToTop();
 };

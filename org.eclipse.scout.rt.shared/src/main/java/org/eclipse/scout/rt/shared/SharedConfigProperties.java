@@ -94,6 +94,30 @@ public final class SharedConfigProperties {
   }
 
   /**
+   * Absolute URL to the deployed http(s):// base of the web-application. The expected 'external' URL should include
+   * proxies, redirects, etc. Example: <code>https://www.bsi-software.com/bsi-crm/</code>.
+   */
+  public static class ExternalBaseUrlProperty extends AbstractStringConfigProperty {
+
+    @Override
+    public String getKey() {
+      return "scout.external.base.url";
+    }
+
+    @Override
+    protected String parse(String value) {
+      if (StringUtility.hasText(value)) {
+        if (!value.endsWith("/")) {
+          value += "/";
+        }
+        return value;
+      }
+      return null;
+    }
+
+  }
+
+  /**
    * Property representing the service tunnel URL.
    * <p>
    * This property is based on convention over configuration, meaning that without an explicit configuration, the URL

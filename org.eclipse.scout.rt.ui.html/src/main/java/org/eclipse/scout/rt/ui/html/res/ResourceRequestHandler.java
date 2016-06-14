@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.ui.html.res;
 
 import java.io.IOException;
-import java.net.URL;
 import java.util.Collections;
 import java.util.List;
 
@@ -22,9 +21,11 @@ import javax.servlet.http.HttpServletResponse;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
+import org.eclipse.scout.rt.server.commons.servlet.UrlHints;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheControl;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheKey;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheObject;
+import org.eclipse.scout.rt.server.commons.servlet.cache.HttpResourceCache;
 import org.eclipse.scout.rt.ui.html.AbstractUiServletRequestHandler;
 import org.eclipse.scout.rt.ui.html.UiServlet;
 import org.eclipse.scout.rt.ui.html.res.loader.IResourceLoader;
@@ -42,10 +43,10 @@ public class ResourceRequestHandler extends AbstractUiServletRequestHandler {
   private static final Logger LOG = LoggerFactory.getLogger(ResourceRequestHandler.class);
 
   public static final String INDEX_HTML = "/index.html";
-  public static final String MOBILE_INDEX_HTML = "/index-mobile.html";
 
   // Remember bean instances to save lookups on each GET request
-  private final List<ResourceLoaders> m_resourceLoaderFactoryList = Collections.unmodifiableList(BEANS.all(ResourceLoaders.class));
+  private final List<ResourceLoaders> m_resourceLoaders = Collections.unmodifiableList(BEANS.all(ResourceLoaders.class));
+  private final HttpResourceCache m_httpResourceCache = BEANS.get(HttpResourceCache.class);
   private final HttpCacheControl m_httpCacheControl = BEANS.get(HttpCacheControl.class);
 
   @Override
@@ -54,7 +55,7 @@ public class ResourceRequestHandler extends AbstractUiServletRequestHandler {
 
     // Create loader for the requested resource type
     IResourceLoader resourceLoader = null;
-    for (ResourceLoaders f : m_resourceLoaderFactoryList) {
+    for (ResourceLoaders f : m_resourceLoaders) {
       resourceLoader = f.create(req, pathInfoEx);
       if (resourceLoader != null) {
         break;
@@ -65,25 +66,7 @@ public class ResourceRequestHandler extends AbstractUiServletRequestHandler {
       return false;
     }
 
-    // Create cache key for resource and check if resource exists in cache
-    HttpCacheKey cacheKey = resourceLoader.createCacheKey(pathInfoEx);
-    HttpCacheObject resource = m_httpCacheControl.getCacheObject(req, cacheKey);
-    String logMsg;
-    if (resource == null) {
-      // Resource not found in cache --> load it
-      resource = resourceLoader.loadResource(cacheKey);
-      if (resource == null) {
-        logMsg = "Resource is not cached, could not load resource (not added to the cache)";
-      }
-      else {
-        m_httpCacheControl.putCacheObject(req, resource);
-        logMsg = "Resource is not cached, resource loaded and added to the cache";
-      }
-    }
-    else {
-      logMsg = "Resource found in cache, using cached resource";
-    }
-    LOG.debug("Requested resource with cacheKey={}. Service-side HTTP cache: {}", cacheKey, logMsg);
+    HttpCacheObject resource = resolveResourceFromCache(req, pathInfoEx, resourceLoader);
 
     // check resource existence (also ignore resources without content, to prevent invalid "content-length" header and NPE in write() method)
     if (resource == null || resource.getResource() == null || resource.getResource().getContent() == null) {
@@ -109,6 +92,39 @@ public class ResourceRequestHandler extends AbstractUiServletRequestHandler {
     return true;
   }
 
+  protected HttpCacheObject resolveResourceFromCache(HttpServletRequest req, String pathInfoEx, IResourceLoader resourceLoader) throws IOException {
+    // Create cache key for resource and check if resource exists in cache
+    HttpCacheKey cacheKey = resourceLoader.createCacheKey(pathInfoEx);
+
+    // When caching is disabled, always load resource
+    if (!UrlHints.isCacheHint(req)) {
+      LOG.debug("Requested resource with cacheKey={}. Caching is disabled by URL hint");
+      return resourceLoader.loadResource(cacheKey);
+    }
+
+    String cacheResultMsg;
+    HttpCacheObject resource = null;
+    resource = m_httpResourceCache.get(cacheKey);
+    if (resource == null) {
+      // Cache miss: resource not found in cache --> load it
+      resource = resourceLoader.loadResource(cacheKey);
+      if (resource == null) {
+        cacheResultMsg = "Resource is not cached (cache miss), could not load resource (not added to the cache)";
+      }
+      else {
+        m_httpResourceCache.put(resource);
+        cacheResultMsg = "Resource is not cached (cache miss), resource loaded and added to the cache";
+      }
+    }
+    else {
+      // Cache hit
+      cacheResultMsg = "Resource found in cache (cache hit), using cached resource";
+    }
+
+    LOG.debug("Requested resource with cacheKey={}. {}", cacheKey, cacheResultMsg);
+    return resource;
+  }
+
   /**
    * Sets HTTP response header fields: content-length, content-type (incl. optional charset).
    */
@@ -132,12 +148,12 @@ public class ResourceRequestHandler extends AbstractUiServletRequestHandler {
     }
   }
 
-  protected List<ResourceLoaders> resourceLoaderFactoryList() {
-    return m_resourceLoaderFactoryList;
+  protected List<ResourceLoaders> resourceLoaders() {
+    return m_resourceLoaders;
   }
 
-  protected HttpCacheControl httpCacheControl() {
-    return m_httpCacheControl;
+  protected HttpResourceCache httpResourceCache() {
+    return m_httpResourceCache;
   }
 
   /**
@@ -150,22 +166,9 @@ public class ResourceRequestHandler extends AbstractUiServletRequestHandler {
       return null;
     }
     if ("/".equals(pathInfo)) {
-      pathInfo = resolveIndexHtml(req);
+      pathInfo = INDEX_HTML;
     }
     return pathInfo;
   }
 
-  protected String resolveIndexHtml(HttpServletRequest request) {
-    BrowserInfo browserInfo = BrowserInfo.createFrom(request);
-    LOG.info("Resolve index html. Browser info: {}", browserInfo);
-    if (browserInfo.isMobile()) {
-      // Return index-mobile.html, but only if index-mobile.html exists (project may decide to always use index.html)
-      URL url = BEANS.get(IWebContentService.class).getWebContentResource(MOBILE_INDEX_HTML);
-      if (url != null) {
-        LOG.info("Return " + MOBILE_INDEX_HTML);
-        return MOBILE_INDEX_HTML;
-      }
-    }
-    return INDEX_HTML;
-  }
 }

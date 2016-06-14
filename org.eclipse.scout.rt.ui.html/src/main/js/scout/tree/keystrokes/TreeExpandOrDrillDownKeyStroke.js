@@ -13,19 +13,29 @@ scout.TreeExpandOrDrillDownKeyStroke = function(tree, modifierBitMask) {
   this.which = [scout.keys.ADD];
   this.renderingHints.text = '+';
   this.renderingHints.$drawingArea = function($drawingArea, event) {
-    return (!event._treeCurrentNode.expanded ? event._$treeCurrentNode : null);
+    var currentNode = event._treeCurrentNode;
+    if (this.isNodeExpandable(currentNode)) {
+      return currentNode.$node;
+    } else if (currentNode.childNodes.length > 0) {
+      return currentNode.childNodes[0].$node;
+    }
   }.bind(this);
 };
 scout.inherits(scout.TreeExpandOrDrillDownKeyStroke, scout.AbstractTreeNavigationKeyStroke);
 
 scout.TreeExpandOrDrillDownKeyStroke.prototype._accept = function(event) {
   var accepted = scout.TreeExpandOrDrillDownKeyStroke.parent.prototype._accept.call(this, event);
-  return accepted && event._treeCurrentNode;
+  var currentNode = event._treeCurrentNode;
+  return accepted && currentNode && (this.isNodeExpandable(currentNode) || currentNode.childNodes.length > 0);
+};
+
+scout.TreeExpandOrDrillDownKeyStroke.prototype.isNodeExpandable = function(node) {
+  return !node.expanded && !node.leaf;
 };
 
 scout.TreeExpandOrDrillDownKeyStroke.prototype.handle = function(event) {
   var currentNode = event._treeCurrentNode;
-  if (!currentNode.expanded && !currentNode.leaf) {
+  if (this.isNodeExpandable(currentNode)) {
     this.field.expandNode(currentNode, {
       lazy: false // always show all nodes on node double click
     });

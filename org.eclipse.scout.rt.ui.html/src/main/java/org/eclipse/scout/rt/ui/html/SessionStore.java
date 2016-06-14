@@ -21,7 +21,6 @@ import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktopUIFacade;
-import org.eclipse.scout.rt.platform.config.AbstractPositiveIntegerConfigProperty;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
@@ -29,6 +28,8 @@ import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedException;
 import org.eclipse.scout.rt.platform.util.concurrent.TimedOutException;
+import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.SessionStoreHousekeepingDelayProperty;
+import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.SessionStoreMaxWaitAllShutdownProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -472,37 +473,4 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
         .withName("Waiting for {} client sessions to shut down", futures.size()));
   }
 
-  /**
-   * Number of seconds before the housekeeping job starts after a UI session has been unregistered from the store.
-   */
-  public static class SessionStoreHousekeepingDelayProperty extends AbstractPositiveIntegerConfigProperty {
-
-    @Override
-    public String getKey() {
-      return "scout.sessionstore.housekeepingDelay";
-    }
-
-    @Override
-    protected Integer getDefaultValue() {
-      return 20;
-    }
-  }
-
-  /**
-   * Maximum time in second to wait for all client sessions to be stopped after the HTTP session has become invalid.
-   * After this amount of time, a "leak detection" test is performed. You are advised to change this value only if your
-   * sessions need an unusual long time to shutdown.
-   */
-  public static class SessionStoreMaxWaitAllShutdownProperty extends AbstractPositiveIntegerConfigProperty {
-
-    @Override
-    public String getKey() {
-      return "scout.sessionStore.maxWaitForAllShutdown";
-    }
-
-    @Override
-    protected Integer getDefaultValue() {
-      return 60; // 1 minute
-    }
-  }
 }

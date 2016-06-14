@@ -161,27 +161,17 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
 
   private boolean lookupRowAccepted(ILookupRow<LOOKUP_KEY> lookupRow) {
     if (!lookupRow.isEnabled()) {
-      // when row is disabled, dont allow
+      // when row is disabled, don't allow
       return false;
     }
-    if (lookupRow.isActive()) {
-      // when row is active, allow
-      return true;
-    }
-    else if (!isProposalChooserRegistered()) {
-      // when proposal chooser is not opened, only allow active rows
-      return false;
-    }
-    else if (!getProposalChooser().isActiveFilterEnabled()) {
-      // when proposal chooser is openend, it depends on the settings of the active filter
-      // whether or not the row is allowed
-      return false;
-    }
-    else {
-      // when we active-filter is enabled, inactive rows are only allowed when filter
-      // is set to ALL (undefined) or INACTIVE (false)
-      TriState activeFilter = getProposalChooser().getActiveFilter();
-      return !activeFilter.isTrue();
+    TriState activeByLookupCall = getLookupCall().getActive();
+    switch (activeByLookupCall) {
+      case TRUE:
+        return lookupRow.isActive();
+      case FALSE:
+        return !lookupRow.isActive();
+      default: // UNDEFINED
+        return true;
     }
   }
 

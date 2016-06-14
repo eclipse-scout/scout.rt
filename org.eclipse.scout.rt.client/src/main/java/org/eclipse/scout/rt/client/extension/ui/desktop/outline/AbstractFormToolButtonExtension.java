@@ -15,7 +15,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractFormToolButton;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 
 /**
- * @deprecated use {@link AbstractFormMenuExtension} instead
+ * @deprecated use {@link AbstractFormMenuExtension} instead, will be removed in Scout 6.1
  */
 @SuppressWarnings("deprecation")
 @Deprecated

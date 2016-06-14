@@ -33,7 +33,7 @@ import org.eclipse.scout.rt.ui.html.AbstractUiServletRequestHandler;
 import org.eclipse.scout.rt.ui.html.HttpSessionHelper;
 import org.eclipse.scout.rt.ui.html.ISessionStore;
 import org.eclipse.scout.rt.ui.html.IUiSession;
-import org.eclipse.scout.rt.ui.html.MaxUserIdleTimeProperty;
+import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.MaxUserIdleTimeProperty;
 import org.eclipse.scout.rt.ui.html.UiRunContexts;
 import org.eclipse.scout.rt.ui.html.UiServlet;
 import org.eclipse.scout.rt.ui.html.json.JsonRequest.RequestType;

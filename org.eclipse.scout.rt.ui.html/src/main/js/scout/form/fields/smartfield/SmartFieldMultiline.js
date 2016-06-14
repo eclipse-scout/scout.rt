@@ -41,7 +41,6 @@ scout.SmartFieldMultiline.prototype._render = function($parent) {
   }
   this.addIcon(this.$fieldContainer);
   this.addStatus();
-  this.addPopup();
 };
 
 /**

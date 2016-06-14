@@ -222,6 +222,19 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
   }
 
   /**
+   * Configures the css class(es) of this action.
+   * <p>
+   * Subclasses can override this method. Default is {@code null}.
+   *
+   * @return a string containing one or more classes separated by space, or null if no class should be set.
+   */
+  @ConfigProperty(ConfigProperty.STRING)
+  @Order(55)
+  protected String getConfiguredCssClass() {
+    return null;
+  }
+
+  /**
    * called by {@link #initAction()}<br>
    * this way a menu can for example add/remove custom child menus
    */
@@ -278,6 +291,7 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
     setSeparator(getConfiguredSeparator());
     setOrder(calculateViewOrder());
     setHorizontalAlignment(getConfiguredHorizontalAlignment());
+    setCssClass(getConfiguredCssClass());
   }
 
   protected IActionUIFacade createUIFacade() {

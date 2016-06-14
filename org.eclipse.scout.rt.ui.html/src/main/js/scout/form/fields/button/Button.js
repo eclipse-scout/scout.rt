@@ -81,7 +81,6 @@ scout.Button.prototype._render = function($parent) {
     // Probably it would be more reasonable to change the configuration (which would lead to additional
     // effort required to change an existing application).
     $button = $parent.makeDiv('link-button');
-    $button.setTabbable(this.enabled);
     // Separate $link element to have a smaller focus border
     this.$link = $button.appendDiv('menu-item link');
     this.$buttonLabel = this.$link.appendSpan('button-label text');
@@ -90,6 +89,10 @@ scout.Button.prototype._render = function($parent) {
     $button = $parent.makeElement('<button>')
       .addClass('button');
     this.$buttonLabel = $button.appendSpan('button-label');
+
+    if (scout.device.supportsTouch()) {
+      $button.setTabbable(false);
+    }
   }
   this.addContainer($parent, 'button-field', new scout.ButtonLayout(this));
   this.addField($button);
@@ -202,7 +205,7 @@ scout.Button.prototype._renderEnabled = function() {
   scout.Button.parent.prototype._renderEnabled.call(this);
   if (this.displayStyle === scout.Button.DisplayStyle.LINK) {
     this.$link.setEnabled(this.enabled);
-    this.$field.setTabbable(this.enabled);
+    this.$field.setTabbable(this.enabled && !scout.device.supportsTouch());
   }
 };
 

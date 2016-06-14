@@ -13,8 +13,8 @@ package org.eclipse.scout.rt.client.ui.basic.table.controls;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.extension.ui.action.IActionExtension;
-import org.eclipse.scout.rt.client.extension.ui.basic.table.controls.IFormTableControlExtension;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.controls.FormTableControlChains.TableControlInitFormChain;
+import org.eclipse.scout.rt.client.extension.ui.basic.table.controls.IFormTableControlExtension;
 import org.eclipse.scout.rt.client.ui.action.AbstractAction;
 import org.eclipse.scout.rt.client.ui.form.FormEvent;
 import org.eclipse.scout.rt.client.ui.form.FormListener;
@@ -147,6 +147,15 @@ public abstract class AbstractFormTableControl extends AbstractTableControl impl
     List<? extends IActionExtension<? extends AbstractAction>> extensions = getAllExtensions();
     TableControlInitFormChain chain = new TableControlInitFormChain(extensions);
     chain.execInitForm();
+  }
+
+  @Override
+  public void disposeInternal() {
+    super.disposeInternal();
+    IForm form = getForm();
+    if (form != null && !form.isFormClosed()) {
+      form.doClose();
+    }
   }
 
   /**

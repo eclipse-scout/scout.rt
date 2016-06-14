@@ -118,14 +118,14 @@ describe('main', function() {
       });
 
       it('session must be set, but adapter should not be registered', function() {
-        var oldNumProperties = scout.objects.countProperties(session.modelAdapterRegistry),
+        var oldNumProperties = scout.objects.countOwnProperties(session.modelAdapterRegistry),
           menu = scout.create('Menu', {
             parent: new scout.NullWidget(),
             session: session
           });
         expect(menu.session === session).toBe(true);
         expect(menu._register).toBe(false);
-        expect(scout.objects.countProperties(session.modelAdapterRegistry)).toBe(oldNumProperties);
+        expect(scout.objects.countOwnProperties(session.modelAdapterRegistry)).toBe(oldNumProperties);
       });
 
     });

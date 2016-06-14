@@ -29,7 +29,7 @@ scout.TouchPopup.prototype._init = function(options) {
   this._touchField = options.field;
 
   // clone original touch field
-  // original and clone both point to the same _popup instance
+  // original and clone both point to the same popup instance
   this._field = this._touchField.cloneAdapter(this._fieldOverrides());
   this._initWidget(options);
 };
@@ -65,7 +65,6 @@ scout.TouchPopup.prototype.prefLocation = function($container, openingDirectionY
 
 scout.TouchPopup.prototype._render = function($parent) {
   this.$container = $parent.appendDiv('touch-popup');
-    //    .on('mousedown', this._onContainerMouseDown.bind(this)) // FIXME awe: (popups) is this line required?
 
   this._$widgetContainer = this.$container.appendDiv('widget-container');
   this._widgetContainerHtmlComp = new scout.HtmlComponent(this._$widgetContainer, this.session);
@@ -84,4 +83,10 @@ scout.TouchPopup.prototype._render = function($parent) {
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
   this.htmlComp.validateRoot = true;
   this.htmlComp.setLayout(this._createLayout());
+};
+
+scout.TouchPopup.prototype._remove = function() {
+  // Because there is no destroy, we unregister the clone here -> popup cannot be used anymore after it was removed.
+  this.session.unregisterAdapterClone(this._field);
+  scout.TouchPopup.parent.prototype._remove.call(this);
 };

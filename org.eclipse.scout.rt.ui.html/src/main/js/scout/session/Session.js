@@ -43,7 +43,7 @@ scout.Session = function($entryPoint, options) {
   var clientSessionId = options.clientSessionId || sessionStorage.getItem('scout:clientSessionId');
 
   this.scoutUrl = new scout.URL();
-  if (this.scoutUrl.getParameter('forceNewClientSession')) {
+  if (this.scoutUrl.getParameter('forceNewClientSession') || options.forceNewClientSession) {
     clientSessionId = null;
     this._forceNewClientSession = true;
   }
@@ -327,8 +327,8 @@ scout.Session.prototype._processStartupResponse = function(data) {
     this.ready = true;
     $.log.info('Session initialized. Detected ' + scout.device);
     if ($.log.isDebugEnabled()) {
-      $.log.debug('size of _adapterDataCache after session has been initialized: ' + scout.objects.countProperties(this._adapterDataCache));
-      $.log.debug('size of modelAdapterRegistry after session has been initialized: ' + scout.objects.countProperties(this.modelAdapterRegistry));
+      $.log.debug('size of _adapterDataCache after session has been initialized: ' + scout.objects.countOwnProperties(this._adapterDataCache));
+      $.log.debug('size of modelAdapterRegistry after session has been initialized: ' + scout.objects.countOwnProperties(this.modelAdapterRegistry));
     }
   }.bind(this);
 
@@ -693,9 +693,9 @@ scout.Session.prototype._processSuccessResponse = function(message) {
   }
 
   if ($.log.isDebugEnabled()) {
-    var cacheSize = scout.objects.countProperties(this._adapterDataCache);
+    var cacheSize = scout.objects.countOwnProperties(this._adapterDataCache);
     $.log.debug('size of _adapterDataCache after response has been processed: ' + cacheSize);
-    cacheSize = scout.objects.countProperties(this.modelAdapterRegistry);
+    cacheSize = scout.objects.countOwnProperties(this.modelAdapterRegistry);
     $.log.debug('size of modelAdapterRegistry after response has been processed: ' + cacheSize);
   }
 };

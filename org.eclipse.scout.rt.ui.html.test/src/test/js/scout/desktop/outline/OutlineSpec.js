@@ -241,7 +241,9 @@ describe("Outline", function() {
 
       // The outline node contains a tree as detail node (real life case would be a form with a tree field, but this is easier to test)
       var treeHelper = new scout.TreeSpecHelper(session);
-      var tree = treeHelper.createTree(treeHelper.createModelFixture(3, 3));
+      var treeModel = treeHelper.createModelFixture(3, 3);
+      treeModel.nodes[0].id = scout.objectFactory.createUniqueId(); // tree helper doesn't use unique ids -> do it here
+      var tree = treeHelper.createTree(treeModel);
       outline.setDetailContent(tree);
 
       spyOn(outline, 'selectNodes');
@@ -304,7 +306,7 @@ describe("Outline", function() {
         session._processSuccessResponse(message);
 
         expect(tree._onNodeDeleted.calls.count()).toBe(39);
-        expect(scout.objects.countProperties(tree.nodesMap)).toBe(0);
+        expect(scout.objects.countOwnProperties(tree.nodesMap)).toBe(0);
       });
 
     });

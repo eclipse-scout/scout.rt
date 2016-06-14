@@ -194,6 +194,7 @@
     /* same padding for left and right, it's by purpose */
     padding: @table-row-padding-y - @checkable-cell-padding-adjustment @table-cell-padding-left 0 @table-cell-padding-left;
     cursor: pointer;
+    text-overflow: clip;
   }
 
   &.checkable.disabled,
@@ -201,21 +202,26 @@
     cursor: default;
   }
 
-  & > .check-box::before {
-    content: '';
-    display: inline-block;
-    width: @check-box-size;
-    height: @check-box-size;
-    #scout.checkbox-before-border();
-    /* vertical-align is necessary to remove the bottom margin */
-    vertical-align: middle;
-  }
-  & > .check-box.checked::before {
-    #scout.checkbox-before-checked();
-  }
-  & > .check-box.disabled::before,
-  .table.disabled > .table-data > .table-row > & > .check-box::before {
-    #scout.checkbox-before-disabled();
+  & > .check-box {
+    #scout.checkbox();
+
+    &.disabled,
+    .table.disabled > .table-data > .table-row > & {
+      #scout.checkbox-disabled();
+
+      &::before,
+      &:hover::before,
+      .table.disabled > .table-data > .table-row > & > .check-box::before {
+        #scout.checkbox-before-disabled();
+      }
+    }
+
+    &::before {
+      #scout.checkbox-before();
+    }
+    &.checked::before {
+      #scout.checkbox-before-checked();
+    }
   }
 
   &.halign-right {

@@ -140,6 +140,18 @@ public class ProposalFieldTest {
     assertNull(m_proposalField.getCurrentLookupRow());
   }
 
+  @Test
+  public void testValueAsLookupKey() {
+    m_proposalField.acceptProposal(new LookupRow<Long>(1L, "aName"));
+    assertEquals(Long.valueOf(1L), m_proposalField.getValueAsLookupKey());
+  }
+
+  @Test
+  public void testValueAsLookupKey_NoValue() {
+    m_proposalField.clearProposal();
+    assertEquals(null, m_proposalField.getValueAsLookupKey());
+  }
+
   int getProposalTableRowCount() {
     return ((ITable) m_proposalField.getProposalChooser().getModel()).getRowCount();
   }

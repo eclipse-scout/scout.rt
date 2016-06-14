@@ -27,7 +27,7 @@ scout.RadioButton.prototype._initDefaultKeyStrokes = function(keyStrokeContext) 
 
 scout.RadioButton.prototype._init = function(model) {
   scout.RadioButton.parent.prototype._init.call(this, model);
-  this.focusWhenSelected = scout.nvl(model.focusWhenSelected, scout.device.supportsFocusEmptyBeforeDiv);
+  this.focusWhenSelected = scout.nvl(model.focusWhenSelected, !scout.device.supportsFocusEmptyBeforeDiv());
 };
 
 scout.RadioButton.prototype._render = function($parent) {
@@ -50,7 +50,6 @@ scout.RadioButton.prototype._remove = function($parent) {
 scout.RadioButton.prototype._mouseDown = function(event) {
   this.select();
   if (this.focusWhenSelected) {
-    // FIXME CGU find another solution for this, preventing blur is bad for touch devices. Maybe create separate divs instead of :before. Same in checkboxfield and tree
     this.session.focusManager.requestFocus(this.$field);
     event.preventDefault();
   }
@@ -88,7 +87,7 @@ scout.RadioButton.prototype.doAction = function(event) {
 };
 
 scout.RadioButton.prototype.setTabbable = function(tabbable) {
-  this.$field.setTabbable(tabbable);
+  this.$field.setTabbable(tabbable && !scout.device.supportsTouch());
 };
 
 /**

@@ -15,7 +15,7 @@ import org.eclipse.scout.rt.client.ui.form.IFormMenu;
 
 /**
  * @since 3.8.1
- * @deprecated use IFormMenu instead.
+ * @deprecated use IFormMenu instead. Will be removed in Scout 6.1
  */
 @Deprecated
 public interface IFormToolButton<FORM extends IForm> extends IFormMenu<FORM> {
