@@ -16,9 +16,6 @@ public interface IChartType {
 
   int PIE = 1;
   int LINE = 2;
-  /** @deprecated use {@link #BAR_VERTICAL} will be removed in Scout 6.1 */
-  @Deprecated
-  int BAR = 3;
   int BAR_VERTICAL = 3;
   int BAR_HORIZONTAL = 4;
   int SCATTER = 5;
