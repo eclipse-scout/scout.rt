@@ -24,6 +24,7 @@ scout.DesktopBench = function() {
   this._outlineNodesSelectedHandler = this._onOutlineNodesSelected.bind(this);
   this._outlinePageChangedHandler = this._onOutlinePageChanged.bind(this);
   this._outlinePropertyChangeHandler = this._onOutlinePropertyChange.bind(this);
+  this._onOutlineContentDestroyedHandler = this._onOutlineContentDestroyed.bind(this);
 
   // event listener functions
   this._viewAddedHandler = this._onViewAdded.bind(this);
@@ -150,7 +151,6 @@ scout.DesktopBench.prototype._removeOutlineContent = function() {
     this.outlineContent.storeScrollPosition();
   }
   this.removeView(this.outlineContent, false);
-
 };
 
 scout.DesktopBench.prototype._renderNavigationHandle = function() {
@@ -221,9 +221,17 @@ scout.DesktopBench.prototype.setOutlineContent = function(content) {
   if (this.outlineContent === content) {
     return;
   }
-
+  if (oldContent) {
+    oldContent.off('destroy', this._onOutlineContentDestroyedHandler);
+  }
   if (this.rendered) {
     this._removeOutlineContent();
+  }
+  // add a destroy listener to the outline-content, so we can reset the property - otherwise we'd work
+  // with a potentially destroyed content which would cause an error later, when we try to render the
+  // bench with the outline-content.
+  if (content) {
+    content.one('destroy', this._onOutlineContentDestroyedHandler);
   }
   this._setProperty('outlineContent', content);
   // Inform header that outline content has changed
@@ -341,6 +349,10 @@ scout.DesktopBench.prototype.updateNavigationHandleVisibility = function() {
 scout.DesktopBench.prototype._onDesktopOutlineChanged = function(event) {
   this.setOutline(this.desktop.outline);
   this.updateNavigationHandleVisibility();
+};
+
+scout.DesktopBench.prototype._onOutlineContentDestroyed = function(event) {
+  this.setOutlineContent(null);
 };
 
 scout.DesktopBench.prototype._onOutlineNodesSelected = function(event) {
