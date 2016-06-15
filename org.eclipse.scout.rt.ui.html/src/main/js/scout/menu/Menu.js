@@ -15,8 +15,6 @@ scout.Menu = function() {
   this._addModelProperties('overflow');
   this.popup;
   this.excludedByFilter = false;
-
-  this.subMenuExpanded = false;
   this.subMenuIconVisible = true;
 
   /**
@@ -122,7 +120,6 @@ scout.Menu.prototype._removeSubMenuItems = function(parentMenu) {
 };
 
 scout.Menu.prototype._renderSubMenuItems = function(parentMenu, menus) {
-  this.subMenuExpanded = true;
   if (this.parent instanceof scout.ContextMenuPopup) {
     this.parent.renderSubMenuItems(parentMenu, menus, true);
   } else if (this.parent instanceof scout.Menu) {
@@ -161,6 +158,19 @@ scout.Menu.prototype._onMouseEvent = function(event) {
  */
 scout.Menu.prototype._doActionTogglesPopup = function() {
   return this.childActions.length > 0;
+};
+
+/**
+ * Overrides the default render logic in ModelAdapter#onChildAdapterChange.
+ * We must only render child actions if the sub-menu popup is opened.
+ */
+scout.Menu.prototype._renderChildActions = function() {
+  if (scout.objects.optProperty(this.popup, 'rendered')) {
+    var $popup = this.popup.$container;
+    this.childActions.forEach(function(menu) {
+      menu.render($popup);
+    });
+  }
 };
 
 scout.Menu.prototype._renderText = function(text) {

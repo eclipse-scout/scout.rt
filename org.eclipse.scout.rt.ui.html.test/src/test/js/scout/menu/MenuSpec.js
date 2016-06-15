@@ -19,7 +19,7 @@ describe("Menu", function() {
     helper = new scout.MenuSpecHelper(session);
     modelMenu1 = helper.createModel('foo');
     menu1 = helper.createMenu(modelMenu1);
-    modelMenu2 = helper.createModel('foo');
+    modelMenu2 = helper.createModel('bar');
     modelMenu2.keyStroke = 'enter';
     menu2 = helper.createMenu(modelMenu2);
   });
@@ -59,6 +59,38 @@ describe("Menu", function() {
       menu1.separator = true;
       menu1.render($sandbox);
       expect(menu1.$container.hasClass('menu-separator')).toBe(true);
+    });
+
+    it('childActions must not be rendered when popup is not opened. See ticket #173734', function() {
+      // render menu1 (sub-menu not opened)
+      menu1.childActions = [menu2];
+      menu1.render($sandbox);
+      expect(menu1.$container).toBeTruthy();
+      expect(menu2.$container).not.toBeTruthy();
+
+      // render menu2 (as clone) when sub-menu is opened
+      // cannot access menu2 because context menu works with a clone, that's why we query the DOM here
+      menu1.remove();
+      menu1.setSelected(true);
+      menu1.render($sandbox);
+      expect(menu1.$container).toBeTruthy();
+      var $subMenu = $sandbox.find('.menu-item > span:contains(\'bar\')');
+      expect($subMenu.length).toBe(1);
+
+      // now the actual test case testing the bug from the ticket:
+      // a property-change on 'childActions' occurs for menu1, when popup is not opened it must not render its submenus
+      var modelMenu3 = helper.createModel('baz');
+      modelMenu3.id = '123';
+      menu1.remove();
+      menu1.setSelected(false);
+      menu1.render($sandbox);
+      session._adapterDataCache['123'] = modelMenu3; // to simulate the server-response we must have the correct adapter data
+      menu1.onModelPropertyChange({properties: {
+        childActions: ['123']
+      }});
+      expect(menu1.$container).toBeTruthy();
+      $subMenu = $sandbox.find('.menu-item > span:contains(\'baz\')');
+      expect($subMenu.length).toBe(0);
     });
 
   });
