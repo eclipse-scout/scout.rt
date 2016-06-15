@@ -1666,7 +1666,7 @@ scout.Table.prototype._forEachColumn = function(funcName, states, row) {
   this.columns.forEach(function(column, i) {
     if (column[funcName]) {
       if (row) {
-        value = that.cellValue(column, row);
+        value = column.cellValueForGrouping(row);
       }
       states[i] = column[funcName](states[i], value);
     }

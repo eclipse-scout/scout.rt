@@ -286,4 +286,22 @@ describe("DecimalFormat", function() {
 
   });
 
+  describe("round", function() {
+    it("can handle rounding modes", function() {
+      locale.decimalFormatSymbols.minusSign = 'M';
+      locale.decimalFormatSymbols.decimalSeparator = '!';
+      locale.decimalFormatSymbols.groupingSeparator = '~';
+
+      var decimalFormat = new scout.DecimalFormat(locale, {
+        pattern: '#,##0.00',
+        roundingMode: scout.numbers.RoundingMode.CEILING
+      });
+
+      expect(decimalFormat.round(0)).toBe(0);
+      expect(decimalFormat.round(1000.1234)).toBe(1000.13);
+      expect(decimalFormat.round(12345.6789)).toBe(12345.68);
+      expect(decimalFormat.round(-1000.1234)).toBe(-1000.12);
+      expect(decimalFormat.round(-12345.6789)).toBe(-12345.67);
+    });
+  });
 });

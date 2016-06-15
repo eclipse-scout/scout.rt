@@ -84,7 +84,7 @@ describe("AggregateTableControl", function() {
       ];
       columns[0].index = 0;
       columns[1].index = 1;
-      rows = helper.createModelRows(2, 3);
+      rows = helper.createModelRows(columns, 3);
       model = helper.createModel(columns, rows);
       table = helper.createTable(model);
 
@@ -153,6 +153,22 @@ describe("AggregateTableControl", function() {
       expect($aggrCell.text()).toBe('4000.00');
     });
 
+    it("sums up numbers in a number column and considers rounded values fo aggregation", function() {
+      prepareTable();
+      rows[0].cells[1].value = 0.005;
+      rows[1].cells[1].value = 0.006;
+      rows[2].cells[1].value = 0.005;
+      column1.decimalFormat = new scout.DecimalFormat(session.locale, {
+        pattern: '#.00'
+      });
+      table.render(session.$entryPoint);
+
+      var $aggrRow = $aggregateRow(tableControl);
+      var $aggrCell = $aggrRow.children('.table-cell').eq(1);
+      $aggrCell.children('.table-cell-icon').remove();
+      expect($aggrCell.text()).toBe('.03');
+    });
+
   });
 
   describe("eanbled state", function() {
@@ -189,7 +205,7 @@ describe("AggregateTableControl", function() {
       ];
       columns[0].index = 0;
       columns[1].index = 1;
-      rows = helper.createModelRows(2, 3);
+      rows = helper.createModelRows(columns, 3);
       model = helper.createModel(columns, rows);
       table = helper.createTable(model);
       table.columns[1].setAggregationFunction('sum');

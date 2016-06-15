@@ -9,14 +9,17 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 /* global TableSpecHelper */
+/* global LocaleSpecHelper */
 describe("Column", function() {
   var session;
   var helper;
+  var locale;
 
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
     helper = new TableSpecHelper(session);
+    locale = new LocaleSpecHelper().createLocale(LocaleSpecHelper.DEFAULT_LOCALE);
     jasmine.Ajax.install();
     jasmine.clock().install();
   });
@@ -315,6 +318,22 @@ describe("Column", function() {
         expect(table.$cell(column0, table.rows[1].$row).css('background-color')).toBe(rgbLevel50);
         expect(table.$cell(column0, table.rows[2].$row).css('background-color')).toBe(rgbLevel100);
       });
+
+      it("colors cells according to rounded values", function() {
+        var model = helper.createModelSingleColumnByValues([0, 0.005, 0.006, 0.02], 'NumberColumn');
+        var table = helper.createTable(model);
+        var column0 = table.columns[0];
+        table.render(session.$entryPoint);
+
+        column0.decimalFormat = new scout.DecimalFormat(locale, {
+          pattern: '#.00'
+        });
+        table.setColumnBackgroundEffect(column0, 'colorGradient1');
+        expect(table.$cell(column0, table.rows[0].$row).css('background-color')).toBe(rgbLevel0);
+        expect(table.$cell(column0, table.rows[1].$row).css('background-color')).toBe(rgbLevel50);
+        expect(table.$cell(column0, table.rows[2].$row).css('background-color')).toBe(rgbLevel50);
+        expect(table.$cell(column0, table.rows[3].$row).css('background-color')).toBe(rgbLevel100);
+      });
     });
 
     it("considers view range -> only colors rendered cells", function() {
@@ -480,6 +499,23 @@ describe("Column", function() {
         });
         expect(mostRecentJsonRequest()).toContainEvents(event);
       });
+    });
+  });
+
+  describe("calculateMinMaxValues", function() {
+    it("calculates the min/max values based on rounded values", function() {
+      var model = helper.createModelSingleColumnByValues([0.005, 0.006], 'NumberColumn');
+      var table = helper.createTable(model);
+      var column0 = table.columns[0];
+      table.render(session.$entryPoint);
+
+      column0.decimalFormat = new scout.DecimalFormat(locale, {
+        pattern: '#.00'
+      });
+
+      column0.calculateMinMaxValues();
+      expect(column0.minValue).toBe(0.01);
+      expect(column0.maxValue).toBe(0.01);
     });
   });
 });

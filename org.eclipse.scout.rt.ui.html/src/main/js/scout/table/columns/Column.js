@@ -184,7 +184,7 @@ scout.Column.prototype._cellStyle = function(cell) {
     if (!this.backgroundEffectFunc) {
       this.backgroundEffectFunc = this._resolveBackgroundEffectFunc();
     }
-    var backgroundStyle = this.backgroundEffectFunc(cell.value);
+    var backgroundStyle = this.backgroundEffectFunc(this._preprocessValueForGrouping(cell.value));
     if (backgroundStyle.backgroundColor) {
       style += 'background-color: ' + backgroundStyle.backgroundColor + ';';
     }
@@ -232,12 +232,16 @@ scout.Column.prototype.startCellEdit = function(row, fieldId) {
 scout.Column.prototype.cellValueForGrouping = function(row) {
   var cell = this.table.cell(this, row);
   if (cell.value !== undefined) {
-    return cell.value;
+    return this._preprocessValueForGrouping(cell.value);
   }
   if (!cell.text) {
     return null;
   }
   return this._preprocessTextForValueGrouping(cell.text, cell.htmlEnabled);
+};
+
+scout.Column.prototype._preprocessValueForGrouping = function(value) {
+  return value;
 };
 
 scout.Column.prototype._preprocessTextForValueGrouping = function(text, htmlEnabled) {
@@ -435,7 +439,7 @@ scout.Column.prototype.calculateMinMaxValues = function() {
 
   for (var i = 0; i < rows.length; i++) {
     row = rows[i];
-    value = this.table.cellValue(this, row);
+    value = this.cellValueForGrouping(row);
 
     if (value < minValue || minValue === undefined) {
       minValue = value;
