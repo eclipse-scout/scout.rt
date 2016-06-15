@@ -172,7 +172,6 @@ scout.MenuBar.prototype._updateItems = function(menuItems) {
   this.visibleMenuItems = this.menuItems;
   this._lastVisibleItemLeft = null;
   this._lastVisibleItemRight = null;
-  this._defaultMenu = null;
 
   // Make sure menubar is visible before the items get rendered
   // especially important for menu items with open popups to position them correctly
@@ -188,7 +187,7 @@ scout.MenuBar.prototype._updateItems = function(menuItems) {
 
   // Make first valid MenuItem tabbable so that it can be focused. All other items
   // are not tabbable. But they can be selected with the arrow keys.
-  if ((!this._defaultMenu || !this._defaultMenu.enabled) && this.tabbable) {
+  if ((!this.defaultMenu || !this.defaultMenu.enabled) && this.tabbable) {
     this.menuItems.some(function(item) {
       if (item.isTabTarget()) {
         this.setTabbableMenu(item);
@@ -252,6 +251,7 @@ scout.MenuBar.prototype.updateVisibility = function(suppressLayout) {
  * First rendered item that is enabled and reacts to ENTER keystroke shall be marked as 'defaultMenu'
  */
 scout.MenuBar.prototype.updateDefaultMenu = function() {
+  this.setDefaultMenu(null);
   if (this._orderedMenuItems) {
     var found = this._updateDefaultMenuInItems(this._orderedMenuItems.right);
     if (!found) {
@@ -264,17 +264,26 @@ scout.MenuBar.prototype._updateDefaultMenuInItems = function(items) {
   var found = false;
   items.some(function(item) {
     if (item.visible && item.enabled && this._isDefaultKeyStroke(item.actionKeyStroke)) {
-      if (this._defaultMenu && this._defaultMenu !== item) {
-        this._defaultMenu.$container.removeClass('default-menu');
-      }
-      this._defaultMenu = item;
-      this._defaultMenu.$container.addClass('default-menu');
-      this.setTabbableMenu(this._defaultMenu);
+      this.setDefaultMenu(item);
+      this.setTabbableMenu(item);
       found = true;
       return true;
     }
   }.bind(this));
   return found;
+};
+
+scout.MenuBar.prototype.setDefaultMenu = function(defaultMenu) {
+  if (this.defaultMenu === defaultMenu) {
+    return;
+  }
+  if (this.defaultMenu && this.defaultMenu.rendered) {
+    this.defaultMenu.$container.removeClass('default-menu');
+  }
+  this.defaultMenu = defaultMenu;
+  if (this.defaultMenu && this.defaultMenu.rendered) {
+    this.defaultMenu.$container.addClass('default-menu');
+  }
 };
 
 scout.MenuBar.prototype._isDefaultKeyStroke = function(keyStroke) {
