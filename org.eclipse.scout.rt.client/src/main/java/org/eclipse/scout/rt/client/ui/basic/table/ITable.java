@@ -179,6 +179,13 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
    */
   String PROP_UI_SORT_POSSIBLE = "uiSortPossible";
 
+  /**
+   * type boolean
+   *
+   * @since 5.2.0
+   */
+  String PROP_LOADING = "loading";
+
   void initTable();
 
   void disposeTable();
@@ -1102,11 +1109,11 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
    * The reload handler is triggered when the user uses the ui tools to reload the table (reload button, reload
    * keystroke).
    * <p>
-   * The existence of a reload handler controls the availability of these tools, meaning if no reload handler is set
-   * the user may not reload the table.
+   * The existence of a reload handler controls the availability of these tools, meaning if no reload handler is set the
+   * user may not reload the table.
    * <p>
    * Default is null.
-   * 
+   *
    * @since 5.1.0
    */
   IReloadHandler getReloadHandler();
@@ -1142,5 +1149,9 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
    * @return True if the table has a table-customizer and the {@link CreateCustomColumnPermission}, false otherwise.
    */
   boolean isCustomizable();
+
+  void setLoading(boolean loading);
+
+  boolean isLoading();
 
 }

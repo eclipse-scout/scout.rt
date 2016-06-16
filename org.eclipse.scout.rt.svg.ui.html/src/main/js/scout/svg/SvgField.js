@@ -19,7 +19,7 @@ scout.SvgField.prototype._render = function($parent) {
   this.addField($parent.makeDiv());
   this.addMandatoryIndicator();
   this.addStatus();
-  this.loadingSupport = new scout.DefaultFieldLoadingSupport(this);
+  this.loadingSupport = new scout.LoadingSupport(this);
 };
 
 scout.SvgField.prototype._renderProperties = function() {

@@ -873,6 +873,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(createUIFacade(), ModelContext.copyCurrent());
     m_contributionHolder = new ContributionComposite(this);
     setEnabled(true);
+    setLoading(false);
     setTitle(getConfiguredTitle());
     setAutoDiscardOnDelete(getConfiguredAutoDiscardOnDelete());
     setSortEnabled(getConfiguredSortEnabled());
@@ -4975,6 +4976,16 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   @Override
   public boolean isCustomizable() {
     return getTableCustomizer() != null;
+  }
+
+  @Override
+  public void setLoading(boolean loading) {
+    propertySupport.setPropertyBool(PROP_LOADING, loading);
+  }
+
+  @Override
+  public boolean isLoading() {
+    return propertySupport.getPropertyBool(PROP_LOADING);
   }
 
 }

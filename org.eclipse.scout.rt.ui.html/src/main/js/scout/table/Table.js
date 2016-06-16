@@ -26,6 +26,7 @@ scout.Table = function(model) {
   this.staticMenus = [];
   this.selectionHandler = new scout.TableSelectionHandler(this);
   this._keyStrokeSupport = new scout.KeyStrokeSupport(this);
+  this.loadingSupport = new scout.LoadingSupport(this);
   this._filterMap = {};
   this._filteredRows = [];
   this._filteredRowsDirty = true;
@@ -271,6 +272,7 @@ scout.Table.prototype._renderProperties = function() {
   this._renderEnabled();
   this._renderDropType();
   this._renderCssClass();
+  this._renderLoading();
 };
 
 scout.Table.prototype._remove = function() {
@@ -438,6 +440,10 @@ scout.Table.prototype._renderTableStatusVisible = function() {
 
 scout.Table.prototype._renderTableStatus = function() {
   this.trigger('statusChanged');
+};
+
+scout.Table.prototype._renderLoading = function() {
+  this.loadingSupport.renderLoading();
 };
 
 scout.Table.prototype._isFooterVisible = function() {

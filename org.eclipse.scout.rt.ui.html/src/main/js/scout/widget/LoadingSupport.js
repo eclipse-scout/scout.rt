@@ -8,30 +8,30 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-scout.DefaultFieldLoadingSupport = function(field, loadingIndicatorDelay) {
-  this.field = field;
+scout.LoadingSupport = function(widget, loadingIndicatorDelay) {
+  this.widget = widget;
   this.loadingIndicatorDelay = scout.nvl(loadingIndicatorDelay, 250); // ms
 
   this._loadingIndicatorTimeoutId;
 };
 
-scout.DefaultFieldLoadingSupport.prototype.renderLoading = function() {
+scout.LoadingSupport.prototype.renderLoading = function() {
   // Clear any pending loading function
   clearTimeout(this._loadingIndicatorTimeoutId);
 
-  if (!this.field) {
+  if (!this.widget) {
     return;
   }
 
-  if (this.field.loading && !this._$loadingIndicator) {
+  if (this.widget.loading && !this._$loadingIndicator) {
     // --- 1. not loading -> loading ---
 
     var renderLoading = function() {
-      if (this.field.rendered) {
-        // Hide field content
-        this.field.$container.addClass('loading');
+      if (this.widget.rendered) {
+        // Hide widget content
+        this.widget.$container.addClass('loading');
         // Create loading indicator
-        this._$loadingIndicator = this.field.$container.appendDiv('loading-indicator');
+        this._$loadingIndicator = this.widget.$container.appendDiv('loading-indicator');
       }
     }.bind(this);
 
@@ -41,16 +41,16 @@ scout.DefaultFieldLoadingSupport.prototype.renderLoading = function() {
       renderLoading();
     }
 
-  } else if (!this.field.loading && this._$loadingIndicator) {
+  } else if (!this.widget.loading && this._$loadingIndicator) {
     // --- 2. loading -> not loading ---
 
     // Remove loading indicator
     this._$loadingIndicator.fadeOutAndRemove(function() {
       this._$loadingIndicator = null;
-      if (this.field.rendered) {
-        // Show field's content (layout if necessary)
-        this.field.$container.removeClass('loading');
-        this.field.invalidateLayoutTree();
+      if (this.widget.rendered) {
+        // Show widget's content (layout if necessary)
+        this.widget.$container.removeClass('loading');
+        this.widget.invalidateLayoutTree();
       }
     }.bind(this));
   }

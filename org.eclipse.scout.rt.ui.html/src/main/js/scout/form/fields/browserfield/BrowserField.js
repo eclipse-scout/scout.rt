@@ -11,7 +11,7 @@
 scout.BrowserField = function() {
   scout.BrowserField.parent.call(this);
   this._postMessageListener;
-  this.loadingSupport = new scout.DefaultFieldLoadingSupport(this);
+  this.loadingSupport = new scout.LoadingSupport(this);
 };
 scout.inherits(scout.BrowserField, scout.ValueField);
 

@@ -280,6 +280,12 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
         return getModel().isUiSortPossible();
       }
     });
+    putJsonProperty(new JsonProperty<ITable>(ITable.PROP_LOADING, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isLoading();
+      }
+    });
     putJsonProperty(new JsonAdapterProperty<ITable>(ITable.PROP_KEY_STROKES, model, getUiSession()) {
       @Override
       protected JsonAdapterPropertyConfig createConfig() {

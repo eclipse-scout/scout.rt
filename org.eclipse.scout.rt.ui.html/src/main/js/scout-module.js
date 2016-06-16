@@ -13,6 +13,7 @@ __include("jquery/jquery-scout.js");
 (function(scout, $, undefined) {
   __include("scout/main.js");
   __include("scout/objectFactories.js");
+  __include("scout/widget/LoadingSupport.js");
   __include("scout/widget/Widget.js");
   __include("scout/widget/NullWidget.js");
   // Basic utilities
@@ -243,7 +244,6 @@ __include("jquery/jquery-scout.js");
   __include("scout/form/DialogLayout.js");
   __include("scout/form/fields/fields.js");
   __include("scout/form/fields/AppLinkKeyStroke.js");
-  __include("scout/form/fields/DefaultFieldLoadingSupport.js");
   __include("scout/form/fields/FormField.js");
   __include("scout/form/fields/FormFieldLayout.js");
   __include("scout/form/fields/CompositeField.js");
