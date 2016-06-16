@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.ui.basic.planner;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
@@ -37,19 +38,6 @@ public interface IPlanner<RESOURCE_ID, ACTIVITY_ID> extends IPropertyObserver, I
   String PROP_SELECTION_RANGE = "selectionRange";
 
   /**
-   * {@link Date}
-   */
-  String PROP_FIRST_HOUR_OF_DAY = "firstHourOfDay";
-  /**
-   * {@link Date}
-   */
-  String PROP_LAST_HOUR_OF_DAY = "lastHourOfDay";
-  /**
-   * {@link Long}
-   */
-  String PROP_INTRADAY_INTERVAL = "intradayInterval";
-
-  /**
    * {@link String}
    */
   String PROP_LABEL = "label";
@@ -60,10 +48,14 @@ public interface IPlanner<RESOURCE_ID, ACTIVITY_ID> extends IPropertyObserver, I
   String PROP_HEADER_VISIBLE = "headerVisible";
 
   /**
-   * {@link #INTRADAY},{@link #DAY}, {@link #WEEK}, {@link #MONTH},
-   * {@link #WORK_WEEK}
+   * {@link #DAY}, {@link #WEEK}, {@link #MONTH}, {@link #WORK_WEEK}
    */
   String PROP_DISPLAY_MODE = "displayMode";
+
+  /**
+   * type {@link IDisplayModeOption}
+   */
+  String PROP_DISPLAY_MODE_OPTIONS = "displayModeOptions";
 
   /**
    * {@link Set}
@@ -128,43 +120,24 @@ public interface IPlanner<RESOURCE_ID, ACTIVITY_ID> extends IPropertyObserver, I
   void setViewRange(Range<Date> dateRange);
 
   /**
-   * @return the first hour of a day<br>
-   *         When a working day starts at 08:00 and ends at 17:00, this value is 8.
-   */
-  int getFirstHourOfDay();
-
-  /**
-   * see {@link #getFirstHourOfDay()}
-   */
-  void setFirstHourOfDay(int i);
-
-  /**
-   * @return the last hour of a day<br>
-   *         When a working day starts at 08:00 and ends at 17:00, this value is 16 since the last hour starts at 16:00
-   *         and ends at 16:59.
-   */
-  int getLastHourOfDay();
-
-  /**
-   * see {@link #getLastHourOfDay()}
-   */
-  void setLastHourOfDay(int i);
-
-  /**
-   * {@link #INTRADAY},{@link #DAY}, {@link #WEEK}, {@link #MONTH},
-   * {@link #WORK_WEEK}
+   * {@link #DAY}, {@link #WEEK}, {@link #MONTH}, {@link #WORK_WEEK}
    */
   int getDisplayMode();
 
   /**
-   * {@link #INTRADAY},{@link #DAY}, {@link #WEEK}, {@link #MONTH},
-   * {@link #WORK_WEEK}
+   * {@link #DAY}, {@link #WEEK}, {@link #MONTH}, {@link #WORK_WEEK}
    */
   void setDisplayMode(int mode);
 
   Set<Integer> getAvailableDisplayModes();
 
   void setAvailableDisplayModes(Set<Integer> displayModes);
+
+  Map<Integer, DisplayModeOptions> getDisplayModeOptions();
+
+  void setDisplayModeOptions(Map<Integer, DisplayModeOptions> displayModeOptions);
+
+  void setDisplayModeOption(int displayMode, DisplayModeOptions displayModeOption);
 
   boolean isHeaderVisible();
 
@@ -173,15 +146,6 @@ public interface IPlanner<RESOURCE_ID, ACTIVITY_ID> extends IPropertyObserver, I
   int getSelectionMode();
 
   void setSelectionMode(int mode);
-
-  /**
-   * milliseconds
-   */
-  long getIntradayInterval();
-
-  void setIntradayInterval(long millis);
-
-  void setIntradayIntervalInMinutes(long minutes);
 
   long getMinimumActivityDuration();
 
