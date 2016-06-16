@@ -41,6 +41,51 @@ describe('scout.FocusManager', function() {
 
   });
 
+  describe('Focus fixes for Internet Explorer (IE)', function() {
+
+    var $sandbox = $('#sandbox');
+
+    beforeEach(function() {
+      // simulate we are an IE
+      scout.device.browser = scout.Device.Browser.INTERNET_EXPLORER;
+    });
+
+    it('Click on table-cell, must focus table', function() {
+      var tableHelper = new scout.TableSpecHelper(session);
+      var tableModel = tableHelper.createModelFixture(2, 1);
+      var table = tableHelper.createTable(tableModel);
+      table.render(session.$entryPoint);
+
+      // we don't really click - just simulate that the method has been called by the FocusManager
+      var event = {
+        target: $('.table-cell')[0],
+        preventDefault: function() {}
+      };
+      spyOn(event, 'preventDefault');
+      session.focusManager._handleIEEvent(event);
+      expect(document.activeElement).toBe(table.$container[0]);
+      expect(event.preventDefault).toHaveBeenCalled();
+    });
+
+    it('Click on tree-node, must focus tree', function() {
+      var treeHelper = new scout.TreeSpecHelper(session);
+      var treeModel = treeHelper.createModelFixture(1);
+      var tree = treeHelper.createTree(treeModel);
+      tree.render(session.$entryPoint);
+
+      // we don't really click - just simulate that the method has been called by the FocusManager
+      var event = {
+        target: $('.tree-node')[0],
+        preventDefault: function() {}
+      };
+      spyOn(event, 'preventDefault');
+      session.focusManager._handleIEEvent(event);
+      expect(document.activeElement).toBe(tree.$container[0]);
+      expect(event.preventDefault).toHaveBeenCalled();
+    });
+
+  });
+
   describe('validateFocus', function() {
 
     it('When nothing else is focusable, focus must be on the Desktop (=sandbox)', function() {
