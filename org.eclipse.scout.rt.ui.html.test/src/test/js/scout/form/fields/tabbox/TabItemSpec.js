@@ -58,5 +58,45 @@ describe('TabItem', function() {
 
   });
 
+  describe('_renderCssClass', function() {
+    var groupBox;
 
+    beforeEach(function() {
+      groupBox = helper.createFieldModel('TabItem');
+      groupBox.cssClass = 'foo1';
+      var field = createTabBox([groupBox]);
+      field.render(session.$entryPoint);
+      groupBox = field.tabItems[0];
+    });
+
+    it('adds CSS class to both, TabItem and GroupBox', function() {
+      // Test initial CSS class
+      expect(groupBox.$tabContainer.hasClass('foo1')).toBe(true);
+      expect(groupBox.$container.hasClass('foo1')).toBe(true);
+
+      // Test adding a CSS class
+      groupBox.onModelPropertyChange({
+        type:'property',
+        properties: {
+          cssClass: 'foo2'
+        }
+      });
+      expect(groupBox.$tabContainer.hasClass('foo1')).toBe(false);
+      expect(groupBox.$container.hasClass('foo1')).toBe(false);
+      expect(groupBox.$tabContainer.hasClass('foo2')).toBe(true);
+      expect(groupBox.$container.hasClass('foo2')).toBe(true);
+
+      // Test adding another CSS class
+      groupBox.onModelPropertyChange({
+        type:'property',
+        properties: {
+          cssClass: 'foo3'
+        }
+      });
+      expect(groupBox.$tabContainer.hasClass('foo2')).toBe(false);
+      expect(groupBox.$container.hasClass('foo2')).toBe(false);
+      expect(groupBox.$tabContainer.hasClass('foo3')).toBe(true);
+      expect(groupBox.$container.hasClass('foo3')).toBe(true);
+    });
+  });
 });
