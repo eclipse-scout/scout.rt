@@ -10,11 +10,19 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.commons.servlet;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 
 /**
  * Add default (security) handling to servlets
@@ -26,6 +34,7 @@ import org.eclipse.scout.rt.platform.ApplicationScoped;
  */
 @ApplicationScoped
 public class HttpServletControl {
+
   public static final String HTTP_HEADER_X_FRAME_OPTIONS = "X-Frame-Options";
   public static final String SAMEORIGIN = "SAMEORIGIN";
 
@@ -34,6 +43,21 @@ public class HttpServletControl {
 
   public static final String HTTP_HEADER_CSP = "Content-Security-Policy";
   public static final String HTTP_HEADER_CSP_LEGACY = "X-Content-Security-Policy";
+
+  public static final String CSP_REPORT_URL = "csp.cgi";
+
+  private String m_cspValue;
+
+  @PostConstruct
+  protected void buildCspValue() {
+    // build csp rule only once to eliminate overhead with each request
+    List<String> cspDirectives = new ArrayList<>();
+    for (Entry<String, String> entry : getCspDirectives().entrySet()) {
+      cspDirectives.add(StringUtility.join(" ", entry.getKey(), entry.getValue()));
+    }
+
+    m_cspValue = StringUtility.join("; ", cspDirectives);
+  }
 
   /**
    * <ul>
@@ -50,8 +74,34 @@ public class HttpServletControl {
    * <li><b>report-uri csp.cgi</b><br>
    * Report errors to csp.cgi, see ContentSecurityPolicyReportHandler</li>
    * </ul>
+   * Override this method to add new or change / remove existing directives.
    */
-  public static final String DEFAULT_CSP_RULE = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; frame-src *; child-src *; report-uri csp.cgi";
+  protected Map<String, String> getCspDirectives() {
+    Map<String, String> cspDirectives = new LinkedHashMap<>();
+    cspDirectives.put("default-src", "'self'");
+    cspDirectives.put("script-src", "'self' 'unsafe-inline' 'unsafe-eval'");
+    cspDirectives.put("style-src", "'self' 'unsafe-inline'");
+    cspDirectives.put("frame-src", "*");
+    cspDirectives.put("child-src", "*");
+    cspDirectives.put("report-uri", CSP_REPORT_URL); // see also ContentSecurityPolicyReportHandler
+    return cspDirectives;
+  }
+
+  /**
+   * Override {@link #getCspDirectives()} to add new or change / remove existing directives.
+   */
+  public String getCspValue() {
+    return cspRule();
+  }
+
+  /**
+   * @deprecated Use {@link #getCspValue()} to get value, override {@link #getCspDirectives()} to add own directives.
+   *             Will be removed with 6.1.
+   */
+  @Deprecated
+  protected String cspRule() {
+    return m_cspValue;
+  }
 
   /**
    * Every servlet should call this method to make sure the defaults are applied
@@ -70,15 +120,8 @@ public class HttpServletControl {
   protected void setResponseHeaders(HttpServlet servlet, HttpServletRequest req, HttpServletResponse resp) {
     resp.setHeader(HTTP_HEADER_X_FRAME_OPTIONS, SAMEORIGIN);
     resp.setHeader(HTTP_HEADER_X_XSS_PROTECTION, XSS_MODE_BLOCK);
-    resp.setHeader(HTTP_HEADER_CSP, cspRule());
-    resp.setHeader(HTTP_HEADER_CSP_LEGACY, cspRule());
-  }
 
-  /**
-   * see also ContentSecurityPolicyReportHandler
-   */
-  protected String cspRule() {
-    return DEFAULT_CSP_RULE;
+    resp.setHeader(HTTP_HEADER_CSP, getCspValue());
+    resp.setHeader(HTTP_HEADER_CSP_LEGACY, getCspValue());
   }
-
 }
