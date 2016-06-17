@@ -1184,6 +1184,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     return result.getValue();
   }
 
+  @SuppressWarnings("deprecation")
   private static Class<?> getFieldStopClass(Object data) {
     if (data instanceof AbstractTableFieldData) {
       return AbstractTableFieldData.class;

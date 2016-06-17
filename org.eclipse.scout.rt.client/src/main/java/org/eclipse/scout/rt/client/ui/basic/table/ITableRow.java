@@ -18,7 +18,6 @@ import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
-import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldData;
 
 /**
  * Note: TableRows are equal-consistent by their rowIndex
@@ -27,25 +26,25 @@ public interface ITableRow {
   /**
    * same number as
    *
-   * @see AbstractTableFieldData
+   * @see org.eclipse.scout.rt.platform.holders.ITableHolder#STATUS_NON_CHANGED
    */
   int STATUS_NON_CHANGED = 0;
   /**
    * same number as
    *
-   * @see AbstractTableFieldData
+   * @see org.eclipse.scout.rt.platform.holders.ITableHolder#STATUS_INSERTED
    */
   int STATUS_INSERTED = 1;
   /**
    * same number as
    *
-   * @see AbstractTableFieldData
+   * @see org.eclipse.scout.rt.platform.holders.ITableHolder#STATUS_UPDATED
    */
   int STATUS_UPDATED = 2;
   /**
    * same number as
    *
-   * @see AbstractTableFieldData
+   * @see org.eclipse.scout.rt.platform.holders.ITableHolder#STATUS_DELETED
    */
   int STATUS_DELETED = 3;
 

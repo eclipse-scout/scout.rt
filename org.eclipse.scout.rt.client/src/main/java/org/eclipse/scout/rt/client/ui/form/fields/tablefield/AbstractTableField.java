@@ -257,6 +257,7 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
   }
 
   @Override
+  @SuppressWarnings("deprecation")
   public void exportFormFieldData(AbstractFormFieldData target) {
     if (m_table != null) {
       if (target instanceof AbstractTableFieldData) {
@@ -272,6 +273,7 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
   }
 
   @Override
+  @SuppressWarnings("deprecation")
   public void importFormFieldData(AbstractFormFieldData source, boolean valueChangeTriggersEnabled) {
     Assertions.assertNotNull(source);
     if (source.isValueSet()) {

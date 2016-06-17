@@ -22,25 +22,25 @@ public interface ITableHolder {
   /**
    * same number as
    *
-   * @see org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData
+   * @see org.eclipse.scout.rt.platform.holders.ITableBeanRowHolder
    */
   int STATUS_NON_CHANGED = 0;
   /**
    * same number as
    *
-   * @see org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData
+   * @see org.eclipse.scout.rt.platform.holders.ITableBeanRowHolder
    */
   int STATUS_INSERTED = 1;
   /**
    * same number as
    *
-   * @see org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData
+   * @see org.eclipse.scout.rt.platform.holders.ITableBeanRowHolder
    */
   int STATUS_UPDATED = 2;
   /**
    * same number as
    *
-   * @see org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData
+   * @see org.eclipse.scout.rt.platform.holders.ITableBeanRowHolder
    */
   int STATUS_DELETED = 3;
 

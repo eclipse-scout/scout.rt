@@ -1746,6 +1746,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   @Override
+  @SuppressWarnings("deprecation")
   public void extractTableData(AbstractTableFieldData target) {
     for (int i = 0, ni = getRowCount(); i < ni; i++) {
       ITableRow row = getRow(i);
@@ -1766,7 +1767,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   @Override
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "deprecation"})
   public void updateTable(AbstractTableFieldData source) {
     if (source.isValueSet()) {
       discardAllDeletedRows();

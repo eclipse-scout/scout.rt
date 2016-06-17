@@ -20,9 +20,10 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 
+import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
 import org.eclipse.scout.rt.shared.data.form.fields.composer.AbstractComposerData;
-import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldData;
+import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldBeanData;
 import org.eclipse.scout.rt.shared.data.form.properties.AbstractPropertyData;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
@@ -166,67 +167,76 @@ public class FormDataCloneTest {
       }
     }
 
-    public class AddressTable extends AbstractTableFieldData {
+    public static class AddressTable extends AbstractTableFieldBeanData {
+
       private static final long serialVersionUID = 1L;
 
-      public AddressTable() {
-      }
-
-      public void setStreet(int row, String street) {
-        setValueInternal(row, 0, street);
-      }
-
-      public String getStreet(int row) {
-        return (String) getValueInternal(row, 0);
-      }
-
-      public void setPoBox(int row, String poBox) {
-        setValueInternal(row, 1, poBox);
-      }
-
-      public String getPoBox(int row) {
-        return (String) getValueInternal(row, 1);
-      }
-
-      public void setCity(int row, Long city) {
-        setValueInternal(row, 2, city);
-      }
-
-      public Long getCity(int row) {
-        return (Long) getValueInternal(row, 2);
+      @Override
+      public AddressTableRowData addRow() {
+        return (AddressTableRowData) super.addRow();
       }
 
       @Override
-      public int getColumnCount() {
-        return 3;
+      public AddressTableRowData addRow(int rowState) {
+        return (AddressTableRowData) super.addRow(rowState);
       }
 
       @Override
-      public Object getValueAt(int row, int column) {
-        switch (column) {
-          case 0:
-            return getStreet(row);
-          case 1:
-            return getPoBox(row);
-          case 2:
-            return getCity(row);
-          default:
-            return null;
+      public AddressTableRowData createRow() {
+        return new AddressTableRowData();
+      }
+
+      @Override
+      public Class<? extends AbstractTableRowData> getRowType() {
+        return AddressTableRowData.class;
+      }
+
+      @Override
+      public AddressTableRowData[] getRows() {
+        return (AddressTableRowData[]) super.getRows();
+      }
+
+      @Override
+      public AddressTableRowData rowAt(int index) {
+        return (AddressTableRowData) super.rowAt(index);
+      }
+
+      public void setRows(AddressTableRowData[] rows) {
+        super.setRows(rows);
+      }
+
+      public static class AddressTableRowData extends AbstractTableRowData {
+
+        private static final long serialVersionUID = 1L;
+        public static final String street = "street";
+        public static final String poBox = "poBox";
+        public static final String city = "city";
+        private String m_street;
+        private String m_poBox;
+        private Long m_city;
+
+        public String getStreet() {
+          return m_street;
         }
-      }
 
-      @Override
-      public void setValueAt(int row, int column, Object value) {
-        switch (column) {
-          case 0:
-            setStreet(row, (String) value);
-            break;
-          case 1:
-            setPoBox(row, (String) value);
-            break;
-          case 2:
-            setCity(row, (Long) value);
-            break;
+        public void setStreet(String newStreet) {
+          m_street = newStreet;
+        }
+
+        public String getPoBox() {
+          return m_poBox;
+        }
+
+        public void setPoBox(String newPoBox) {
+          m_poBox = newPoBox;
+        }
+
+        public Long getCity() {
+          return m_city;
+        }
+
+        public void setCity(Long newCity) {
+          m_city = newCity;
         }
       }
     }
