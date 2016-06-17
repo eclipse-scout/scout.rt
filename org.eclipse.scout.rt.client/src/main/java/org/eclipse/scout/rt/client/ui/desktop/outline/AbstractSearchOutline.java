@@ -12,19 +12,70 @@ package org.eclipse.scout.rt.client.ui.desktop.outline;
 
 import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeUIFacade;
+import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.TEXTS;
 
 public class AbstractSearchOutline extends AbstractOutline implements ISearchOutline {
+
+  private int m_minSearchTokenLength;
 
   @Override
   protected String getConfiguredTitle() {
     return TEXTS.get("Search");
   }
 
+  @ConfigProperty(ConfigProperty.INTEGER)
+  protected int getConfiguredMaxSearchQueryLength() {
+    return 60;
+  }
+
+  @ConfigProperty(ConfigProperty.INTEGER)
+  protected int getConfiguredMinSearchTokenLength() {
+    return 2;
+  }
+
   @Override
   protected String getConfiguredIconId() {
     return AbstractIcons.Search;
+  }
+
+  @Override
+  protected void initConfig() {
+    super.initConfig();
+    setMaxSearchQueryLength(getConfiguredMaxSearchQueryLength());
+    setMinSearchTokenLength(getConfiguredMinSearchTokenLength());
+  }
+
+  @Override
+  public void setMinSearchTokenLength(int len) {
+    if (len > 0) {
+      m_minSearchTokenLength = len;
+    }
+  }
+
+  @Override
+  public int getMinSearchTokenLength() {
+    if (m_minSearchTokenLength <= 0) {
+      return 2;
+    }
+    return m_minSearchTokenLength;
+  }
+
+  @Override
+  public void setMaxSearchQueryLength(int len) {
+    if (len > 0) {
+      propertySupport.setPropertyInt(PROP_MAX_SEARCH_QUERY_LENGTH, len);
+    }
+  }
+
+  @Override
+  public int getMaxSearchQueryLength() {
+    int len = propertySupport.getPropertyInt(PROP_MAX_SEARCH_QUERY_LENGTH);
+    if (len <= 0) {
+      len = 200;
+    }
+    return len;
   }
 
   @Override
