@@ -27,6 +27,7 @@ scout.Table = function(model) {
   this.rowBorderRightWidth = 0; // read-only, set by _calculateRowBorderWidth(), also used in TableHeader.js
   this.staticMenus = [];
   this.selectionHandler = new scout.TableSelectionHandler(this);
+  this.loadingSupport = new scout.LoadingSupport(this);
   this._filterMap = {};
   this._filteredRows = [];
   this._filteredRowsDirty = true;
@@ -276,6 +277,7 @@ scout.Table.prototype._renderProperties = function() {
   this._renderEnabled();
   this._renderDropType();
   this._renderCheckableStyle();
+  this._renderLoading();
 };
 
 scout.Table.prototype._remove = function() {
@@ -456,6 +458,10 @@ scout.Table.prototype._renderTableStatusVisible = function() {
 
 scout.Table.prototype._renderTableStatus = function() {
   this.trigger('statusChanged');
+};
+
+scout.Table.prototype._renderLoading = function() {
+  this.loadingSupport.renderLoading();
 };
 
 scout.Table.prototype._hasVisibleTableControls = function() {
@@ -1677,7 +1683,7 @@ scout.Table.prototype._forEachColumn = function(funcName, states, row) {
   this.columns.forEach(function(column, i) {
     if (column[funcName]) {
       if (row) {
-        value = that.cellValue(column, row);
+        value = column.cellValueForGrouping(row);
       }
       states[i] = column[funcName](states[i], value);
     }

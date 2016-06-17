@@ -324,6 +324,12 @@ public interface ITreeNode {
   List<ITreeNode> getChildNodes();
 
   /**
+   * @return Returns <code>true</code> if this node contains the given child node. Visits child nodes if recursive is
+   *         <code>true</code>.
+   */
+  boolean containsChildNode(ITreeNode node, boolean recursive);
+
+  /**
    * @see ITree#getNodeFilters() This method is Thread-Safe
    */
   List<ITreeNode> getFilteredChildNodes();

@@ -10,13 +10,18 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.tree;
 
+import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
@@ -99,7 +104,7 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
         // Remove the current node from the event and check if was removed from a creation event
         TreeEvent newEvent = removeNode(event, nodeToRemove);
         if (creationTypesList.contains(event.getType())) {
-          boolean removed = (event.getNodes().size() != newEvent.getNodes().size());
+          boolean removed = (event.getNodeCount() != newEvent.getNodeCount());
           if (removed) {
             nodeRemovedFromCreationEvent = true;
           }
@@ -110,7 +115,7 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
             // required anymore (the insertion event does not contain deleted nodes).
             ITreeNode parentToCheck = nodeToRemove.getParentNode();
             while (parentToCheck != null) {
-              if (containsNode(newEvent.getNodes(), parentToCheck)) {
+              if (newEvent.containsNode(parentToCheck)) {
                 nodeRemovedFromCreationEvent = true;
                 break;
               }
@@ -203,7 +208,7 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
     for (Iterator<ITreeNode> it = nodes.iterator(); it.hasNext();) {
       ITreeNode node = it.next();
       for (TreeEvent event : events) {
-        if (event.getType() == oldType && containsNodeRec(event.getNodes(), node)) {
+        if (event.getType() == oldType && event.containsNodeRecursive(node)) {
           it.remove();
           removed = true;
           break; // no need to look further
@@ -211,37 +216,6 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
       }
     }
     return removed;
-  }
-
-  /**
-   * @return <code>true</code> if 'nodes' contains 'nodeToFind'. Children of 'nodes are <b>not</b> considered, use
-   *         {@link #containsNodeRec(Collection, ITreeNode)} if they should be checked as well.
-   */
-  protected boolean containsNode(Collection<ITreeNode> nodes, ITreeNode nodeToFind) {
-    for (ITreeNode node : nodes) {
-      node = TreeUtility.unwrapResolvedNode(node);
-      if (CompareUtility.equals(node, nodeToFind)) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  /**
-   * @return <code>true</code> if 'nodes' contains 'nodeToFind' or one of the children does so.
-   */
-  protected boolean containsNodeRec(Collection<ITreeNode> nodes, ITreeNode nodeToFind) {
-    for (ITreeNode node : nodes) {
-      // Unwrap resolved node to get the real answer to "getChildNodes()"
-      node = TreeUtility.unwrapResolvedNode(node);
-      if (CompareUtility.equals(node, nodeToFind)) {
-        return true;
-      }
-      if (containsNodeRec(node.getChildNodes(), nodeToFind)) {
-        return true;
-      }
-    }
-    return false;
   }
 
   /**
@@ -262,76 +236,65 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
    * Merge previous events of the same type into the current and delete the previous events
    */
   protected void coalesceSameType(List<TreeEvent> events) {
-    for (int j = 0; j < events.size() - 1; j++) {
-      int i = events.size() - 1 - j;
-      TreeEvent event = events.get(i);
+    if (events.size() < 2) {
+      return;
+    }
 
-      if (isCoalesceConsecutivePrevious(event.getType())) {
-        TreeEvent mergedEvent = coalesceConsecutivePrevious(event, events.subList(0, i));
-        if (mergedEvent != event) {
-          // replace in (now shorter) list
-          i = events.size() - 1 - j;
-          events.set(i, mergedEvent);
+    final Map<ITreeNode, TreeEvent> initialEventByPrentNode = new HashMap<>();
+    final Map<ITreeNode, TreeEventMerger> eventMergerByParent = new HashMap<>();
+    int previousEventType = -1;
+
+    for (ListIterator<TreeEvent> it = events.listIterator(events.size()); it.hasPrevious();) {
+      final TreeEvent event = it.previous();
+      final int type = event.getType();
+
+      // clean-up initial event and event merger maps
+      if (previousEventType != type && !initialEventByPrentNode.isEmpty()) {
+        for (TreeEventMerger merger : eventMergerByParent.values()) {
+          merger.complete();
         }
+        initialEventByPrentNode.clear();
+        eventMergerByParent.clear();
       }
-    }
-  }
 
-  /**
-   * Merge events of the same type in the given list into the current and delete the other events from the list.
-   *
-   * @return the updated event (with other events merged into it)
-   */
-  protected TreeEvent coalesceConsecutivePrevious(TreeEvent event, List<TreeEvent> list) {
-    for (ListIterator<TreeEvent> it = list.listIterator(list.size()); it.hasPrevious();) {
-      TreeEvent previous = it.previous();
-      if (event.getType() == previous.getType()) {
-        if (hasSameCommonParentNode(event, previous)) {
-          event = merge(previous, event);
-          it.remove();
-        }
+      if (!isCoalesceConsecutivePrevious(type)) {
+        continue;
       }
-      else {
-        return event;
+
+      previousEventType = type;
+      final ITreeNode parentNode = event.getCommonParentNode();
+
+      final TreeEvent initialEvent = initialEventByPrentNode.get(event.getCommonParentNode());
+      if (initialEvent == null) {
+        // this is the first event with given common parent node.
+        // put it into the initial event cache and continue with the next event
+        initialEventByPrentNode.put(parentNode, event);
+        continue;
       }
-    }
-    return event;
-  }
 
-  protected boolean hasSameCommonParentNode(TreeEvent event1, TreeEvent event2) {
-    ITreeNode node1 = event1.getCommonParentNode();
-    ITreeNode node2 = event2.getCommonParentNode();
-    return CompareUtility.equals(node1, node2);
-  }
-
-  /**
-   * @return a new event with same same property as 'second' but with the nodes of 'first' merged into
-   */
-  protected TreeEvent merge(TreeEvent first, TreeEvent second) {
-    return replaceNodesInEvent(second, mergeNodes(first.getNodes(), second.getNodes()));
-  }
-
-  /**
-   * Merge list of nodes, such that, if the same node is in both lists, only the one of the second list (later event) is
-   * kept.
-   */
-  protected List<ITreeNode> mergeNodes(Collection<ITreeNode> first, Collection<ITreeNode> second) {
-    List<ITreeNode> nodes = new ArrayList<>();
-    for (ITreeNode node : first) {
-      if (!second.contains(node)) {
-        nodes.add(node);
+      // there is already an initial event.
+      // check if there is already an event merger or create one
+      TreeEventMerger eventMerger = eventMergerByParent.get(parentNode);
+      if (eventMerger == null) {
+        eventMerger = new TreeEventMerger(initialEvent);
+        eventMergerByParent.put(parentNode, eventMerger);
       }
+
+      // merge current event and remove it from the original event list
+      eventMerger.merge(event);
+      it.remove();
     }
-    for (ITreeNode node : second) {
-      nodes.add(node);
+
+    // complete "open" event mergers
+    for (TreeEventMerger eventMerger : eventMergerByParent.values()) {
+      eventMerger.complete();
     }
-    return nodes;
   }
 
   protected void removeEmptyEvents(List<TreeEvent> events) {
     for (Iterator<TreeEvent> it = events.iterator(); it.hasNext();) {
       TreeEvent event = it.next();
-      if (isNodesRequired(event.getType()) && event.getNodes().isEmpty()
+      if (isNodesRequired(event.getType()) && !event.hasNodes()
           || isCommonParentNodeRequired(event.getType()) && event.getCommonParentNode() == null) {
         it.remove();
       }
@@ -371,7 +334,7 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
       return false;
     }
     boolean identical = (event1.getType() == event2.getType()
-        && hasSameCommonParentNode(event1, event2)
+        && CompareUtility.equals(event1.getCommonParentNode(), event2.getCommonParentNode())
         && CollectionUtility.equalsCollection(event1.getNodes(), event2.getNodes(), true)
         && CollectionUtility.equalsCollection(event1.getDeselectedNodes(), event2.getDeselectedNodes(), true)
         && CollectionUtility.equalsCollection(event1.getNewSelectedNodes(), event2.getNewSelectedNodes(), true)
@@ -495,6 +458,82 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
       default: {
         return false;
       }
+    }
+  }
+
+  /**
+   * Helper for merging nodes form other {@link TreeEvent}s into the initial target event. <br/>
+   * <b>Note</b>: The {@link #merge(TreeEvent)} method does not check any rules. The given event's nodes are merged in
+   * any case.<br/>
+   * <b>Usage</b>:
+   *
+   * <pre>
+   * TreeEventMerger eventMerger = new TreeEventMerger(targetEvent);
+   * eventMerger.merge(e1);
+   * eventMerger.merge(e2);
+   * eventMerger.complete();
+   * </pre>
+   */
+  protected static class TreeEventMerger {
+
+    private final TreeEvent m_targetEvent;
+    private Collection<ITreeNode> m_targetNodes;
+    private HashSet<ITreeNode> m_targetNodeSet;
+    private List<ITreeNode> m_mergedNodes;
+
+    public TreeEventMerger(TreeEvent targetEvent) {
+      m_targetEvent = assertNotNull(targetEvent, "targetEvent must not be null");
+      m_mergedNodes = new LinkedList<>();
+    }
+
+    /**
+     * Merges nodes. Using this method after invoking {@link #complete()} throws an {@link IllegalStateException}.
+     */
+    public void merge(TreeEvent event) {
+      if (m_mergedNodes == null) {
+        throw new IllegalStateException("Invocations of merge is not allowed after complete has been invoked.");
+      }
+      if (!event.hasNodes()) {
+        return;
+      }
+      ensureInitialized();
+      mergeCollections(event.getNodes(), m_mergedNodes, m_targetNodeSet);
+    }
+
+    protected void ensureInitialized() {
+      if (m_targetNodes != null) {
+        return;
+      }
+      m_targetNodes = m_targetEvent.getNodes();
+      m_targetNodeSet = new HashSet<>(m_targetNodes);
+    }
+
+    /**
+     * Completes the merge process. Subsequent invocations of this method does not have any effects.
+     */
+    public void complete() {
+      if (m_mergedNodes == null) {
+        return;
+      }
+      if (m_targetNodes != null) {
+        m_mergedNodes.addAll(m_targetNodes);
+        m_targetEvent.setNodes(m_mergedNodes);
+      }
+      m_mergedNodes = null;
+    }
+
+    /**
+     * Merge collections, such that, if an element is in both collections, only the one of the second collection (later
+     * event) is kept.
+     */
+    protected <TYPE> void mergeCollections(Collection<TYPE> source, List<TYPE> target, HashSet<TYPE> targetSet) {
+      for (Iterator<TYPE> it = source.iterator(); it.hasNext();) {
+        TYPE sourceElement = it.next();
+        if (!targetSet.add(sourceElement)) { // returns true, if the sourceElement has been added; false, if it was already in the set.
+          it.remove();
+        }
+      }
+      target.addAll(0, source);
     }
   }
 }

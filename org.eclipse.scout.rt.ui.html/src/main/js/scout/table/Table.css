@@ -58,6 +58,11 @@
     }
   }
 
+  &.loading {
+    & > .loading-indicator {
+      #scout.loading-indicator();
+    }
+  }
 }
 
 .table-data {

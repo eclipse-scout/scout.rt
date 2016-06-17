@@ -602,7 +602,7 @@ public class TableEventBufferTest {
     final int rowCount = 10;
     List<ITableRow> rows = new ArrayList<>(rowCount);
     LinkedList<TableEvent> events = new LinkedList<>();
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < rowCount; i++) {
       ITableRow row = mockRow(i);
       rows.add(row);
       events.add(new TableEvent(table, TableEvent.TYPE_ROWS_INSERTED, Collections.singletonList(row)));
@@ -621,7 +621,7 @@ public class TableEventBufferTest {
     final int rowCount = 10;
     List<ITableRow> rows = new ArrayList<>(rowCount);
     LinkedList<TableEvent> events = new LinkedList<>();
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < rowCount; i++) {
       ITableRow row1 = mockRow(2 * i);
       ITableRow row2 = mockRow(2 * i + 1);
       rows.add(row1);
@@ -727,7 +727,7 @@ public class TableEventBufferTest {
     assertEquals(Collections.emptyList(), e5.getRows());
   }
 
-  @Test(timeout = 2000)
+  @Test(timeout = 10000)
   public void testCoalesceSameTypeWithManyInsertEvents() throws Exception {
     final int eventCount = 10000;
     ITable table = mock(ITable.class);
@@ -742,7 +742,7 @@ public class TableEventBufferTest {
     assertEquals(eventCount, CollectionUtility.firstElement(tableEvents).getRowCount());
   }
 
-  @Test(timeout = 2000)
+  @Test(timeout = 10000)
   public void testRemoveObsoleteWithManyInsertAndOneDeleteAllRowsEvent() throws Exception {
     final int insertEventCount = 10000;
     ITable table = mock(ITable.class);
@@ -761,7 +761,7 @@ public class TableEventBufferTest {
 
   }
 
-  @Test(timeout = 2000)
+  @Test(timeout = 10000)
   public void testRemoveObsoleteWithManyInsertEvents() throws Exception {
     final int insertEventCount = 10000;
     ITable table = mock(ITable.class);
@@ -776,7 +776,7 @@ public class TableEventBufferTest {
 
   }
 
-  @Test(timeout = 2000)
+  @Test(timeout = 10000)
   public void testRemoveIdenticalEventsWithManyInsertEvents() throws Exception {
     final int eventCount = 10000;
     ITable table = mock(ITable.class);
@@ -792,7 +792,7 @@ public class TableEventBufferTest {
     assertEquals(eventCount, tableEvents.size());
   }
 
-  @Test(timeout = 2000)
+  @Test(timeout = 10000)
   public void testRemoveIdenticalEventsWithManyInsertAndDeleteEvents() throws Exception {
     final int eventCount = 10000;
     ITable table = mock(ITable.class);

@@ -12,39 +12,39 @@
 
 /**
  * @param options The following properties are supported:
- *  [field] mandatory
+ *  [options] mandatory
  *  [containerProperty] optional, if not set: '$container' is used. This property points to the JQuery element that
  *      should be hidden when the field is in loading state. We cannot reference the property in the Ctor of this
  *      class, because the property is not set until the render() method runs.
  *  [loadingIndicatorDelay] optional, if not set: 250 ms
  */
-scout.DefaultFieldLoadingSupport = function(options) {
-  if (!options.field) {
-    throw new Error('Option \'field\' not set');
+scout.LoadingSupport = function(options) {
+  if (!options.widget) {
+    throw new Error('Option \'widget\' not set');
   }
-  this.field = options.field;
+  this.widget = options.widget;
   this.$container = options.$container || function() {
-    return this.field.$container;
+    return this.widget.$container;
   }.bind(this);
   this.loadingIndicatorDelay = scout.nvl(options.loadingIndicatorDelay, 250); // ms
 
   this._loadingIndicatorTimeoutId;
 };
 
-scout.DefaultFieldLoadingSupport.prototype.renderLoading = function() {
+scout.LoadingSupport.prototype.renderLoading = function() {
   // Clear any pending loading function
   clearTimeout(this._loadingIndicatorTimeoutId);
 
-  if (!this.field) {
+  if (!this.widget) {
     return;
   }
 
-  if (this.field.loading && !this._$loadingIndicator) {
+  if (this.widget.loading && !this._$loadingIndicator) {
     // --- 1. not loading -> loading ---
 
     var renderLoading = function() {
-      if (this.field.rendered) {
-        // Hide field content
+      if (this.widget.rendered) {
+        // Hide widget content
         this.$container().addClass('loading');
         // Create loading indicator
         this._$loadingIndicator = this.$container().appendDiv('loading-indicator');
@@ -57,16 +57,16 @@ scout.DefaultFieldLoadingSupport.prototype.renderLoading = function() {
       renderLoading();
     }
 
-  } else if (!this.field.loading && this._$loadingIndicator) {
+  } else if (!this.widget.loading && this._$loadingIndicator) {
     // --- 2. loading -> not loading ---
 
     // Remove loading indicator
     this._$loadingIndicator.fadeOutAndRemove(function() {
       this._$loadingIndicator = null;
-      if (this.field.rendered) {
-        // Show field's content (layout if necessary)
+      if (this.widget.rendered) {
+        // Show widget's content (layout if necessary)
         this.$container().removeClass('loading');
-        this.field.invalidateLayoutTree();
+        this.widget.invalidateLayoutTree();
       }
     }.bind(this));
   }

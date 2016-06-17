@@ -147,7 +147,7 @@ scout.DecimalFormat.prototype.format = function(number, applyMultiplier) {
   }
 
   // round
-  number = scout.numbers.round(number, this.roundingMode, this.allAfter);
+  number = this.round(number);
 
   // after decimal point
   var after = '';
@@ -185,6 +185,13 @@ scout.DecimalFormat.prototype.format = function(number, applyMultiplier) {
 
   // put together and return
   return prefix + before + after + suffix;
+};
+
+/**
+ * Rounds a number according to the properties of the DecimalFormat.
+ */
+scout.DecimalFormat.prototype.round = function(number) {
+  return scout.numbers.round(number, this.roundingMode, this.allAfter);
 };
 
 /* --- STATIC HELPERS ------------------------------------------------------------- */

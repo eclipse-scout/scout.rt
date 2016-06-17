@@ -12,6 +12,7 @@
   __include("scout/main.js");
   __include("scout/ObjectFactory.js");
   __include("scout/objectFactories.js");
+  __include("scout/widget/LoadingSupport.js");
   __include("scout/widget/Widget.js");
   __include("scout/widget/NullWidget.js");
   // Basic utilities
@@ -273,7 +274,6 @@
   // Basics for form fields
   __include("scout/form/fields/fields.js");
   __include("scout/form/fields/AppLinkKeyStroke.js");
-  __include("scout/form/fields/DefaultFieldLoadingSupport.js");
   __include("scout/form/fields/FormField.js");
   __include("scout/form/fields/FormFieldLayout.js");
   __include("scout/form/fields/CompositeField.js");

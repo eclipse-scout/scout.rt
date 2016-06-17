@@ -22,6 +22,7 @@ import org.eclipse.scout.rt.client.ui.IModelEvent;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.dnd.TransferObject;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.CompareUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -201,12 +202,7 @@ public class TreeEvent extends EventObject implements IModelEvent {
   }
 
   public ITreeNode getDeselectedNode() {
-    if (CollectionUtility.hasElements(m_deselectedNodes)) {
-      return CollectionUtility.firstElement(m_deselectedNodes);
-    }
-    else {
-      return null;
-    }
+    return CollectionUtility.firstElement(m_deselectedNodes);
   }
 
   public Collection<ITreeNode> getDeselectedNodes() {
@@ -218,12 +214,7 @@ public class TreeEvent extends EventObject implements IModelEvent {
   }
 
   public ITreeNode getNewSelectedNode() {
-    if (CollectionUtility.hasElements(m_newSelectedNodes)) {
-      return CollectionUtility.firstElement(m_newSelectedNodes);
-    }
-    else {
-      return null;
-    }
+    return CollectionUtility.firstElement(m_newSelectedNodes);
   }
 
   public Collection<ITreeNode> getNewSelectedNodes() {
@@ -235,16 +226,54 @@ public class TreeEvent extends EventObject implements IModelEvent {
   }
 
   public ITreeNode getNode() {
-    if (CollectionUtility.hasElements(m_nodes)) {
-      return CollectionUtility.firstElement(m_nodes);
-    }
-    else {
-      return null;
-    }
+    return CollectionUtility.firstElement(m_nodes);
   }
 
   public Collection<ITreeNode> getNodes() {
     return CollectionUtility.arrayList(m_nodes);
+  }
+
+  /**
+   * Updates the nodes of this events and computes the new common parent node.
+   */
+  protected void setNodes(Collection<ITreeNode> nodes) {
+    m_nodes = CollectionUtility.arrayList(nodes);
+    m_commonParentNode = TreeUtility.calculateCommonParentNode(nodes);
+  }
+
+  public boolean hasNodes() {
+    return m_nodes == null ? false : !m_nodes.isEmpty();
+  }
+
+  public int getNodeCount() {
+    return m_nodes == null ? 0 : m_nodes.size();
+  }
+
+  public boolean containsNode(ITreeNode nodeToFind) {
+    if (CollectionUtility.isEmpty(m_nodes)) {
+      return false;
+    }
+    for (ITreeNode node : m_nodes) {
+      if (CompareUtility.equals(node, nodeToFind)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  public boolean containsNodeRecursive(ITreeNode nodeToFind) {
+    if (CollectionUtility.isEmpty(m_nodes)) {
+      return false;
+    }
+    if (containsNode(nodeToFind)) {
+      return true;
+    }
+    for (ITreeNode node : m_nodes) {
+      if (node.containsChildNode(nodeToFind, true)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   public ITreeNode getChildNode() {

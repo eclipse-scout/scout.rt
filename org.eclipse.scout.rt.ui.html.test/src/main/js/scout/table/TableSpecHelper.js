@@ -122,29 +122,47 @@ scout.TableSpecHelper.prototype.createModelColumns = function(count, columnType)
 };
 
 /**
- * creates cells with value similar to 'cell0_0' if rowId is given, or 'cell0' if no rowId is given
+ * Creates cells with values.
+ *
+ * If the column is of type NumberColumn a numeric value is set.
+ * Otherwise the value is similar to 'cell0_0' if rowId is given, or 'cell0' if no rowId is given.
  */
-scout.TableSpecHelper.prototype.createModelCells = function(count, rowId) {
+scout.TableSpecHelper.prototype.createModelCells = function(columns, rowId) {
   var cells = [];
   if (rowId === undefined) {
     rowId = '';
   } else {
-    rowId = rowId + '_';
+    rowId = rowId;
   }
-  for (var i = 0; i < count; i++) {
-    cells[i] = this.createModelCell(i + '', 'cell' + rowId + i);
+
+  if (typeof columns === 'number') {
+    for (var i = 0; i < columns; i++) {
+      cells[i] = this.createModelCell(i + '', 'cell' + rowId + '_' + i);
+    }
+  } else {
+    for (var j = 0; j < columns.length; j++) {
+      var value = 'cell' + rowId + j;
+      if (columns[j].objectType === 'NumberColumn') {
+        value = rowId + j;
+      }
+      cells[j] = this.createModelCell(j + '', value);
+    }
   }
   return cells;
 };
 
-scout.TableSpecHelper.prototype.createModelRows = function(colCount, rowCount) {
+/**
+ * Creates #rowCount rows where columns is either the column count or the column objects.
+ * Passing the column objects allows to consider the column type for cell creation.
+ */
+scout.TableSpecHelper.prototype.createModelRows = function(columns, rowCount) {
   if (!rowCount) {
     return;
   }
 
   var rows = [];
   for (var i = 0; i < rowCount; i++) {
-    rows[i] = this.createModelRow(null, this.createModelCells(colCount, i));
+    rows[i] = this.createModelRow(null, this.createModelCells(columns, i));
   }
   return rows;
 };
