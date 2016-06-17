@@ -281,9 +281,7 @@ scout.Widget.prototype.has = function(widget) {
  * method if you want to hide something else for a special field.
  */
 scout.Widget.prototype.addLoadingSupport = function() {
-  this.loadingSupport = new scout.LoadingSupport({
-    field: this
-  });
+  this.loadingSupport = new scout.LoadingSupport({widget: this});
 };
 
 //--- Layouting / HtmlComponent methods ---
