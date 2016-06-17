@@ -39,8 +39,8 @@ scout.FormMenuPopup.prototype._render = function($parent) {
 
 scout.FormMenuPopup.prototype._renderHead = function() {
   scout.FormMenuPopup.parent.prototype._renderHead.call(this);
-  if (this.formMenu._customCssClasses) {
-    this._copyCssClassToHead(this.formMenu._customCssClasses);
+  if (this.formMenu.uiCssClass) {
+    this._copyCssClassToHead(this.formMenu.uiCssClass);
   }
   if (this.formMenu.cssClass) {
     this._copyCssClassToHead(this.formMenu.cssClass);

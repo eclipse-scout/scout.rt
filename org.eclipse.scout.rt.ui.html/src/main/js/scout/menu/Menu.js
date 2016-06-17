@@ -62,8 +62,8 @@ scout.Menu.prototype._renderSeparator = function($parent) {
 
 scout.Menu.prototype._renderItem = function($parent) {
   this.$container = $parent.appendDiv('menu-item');
-  if (this._customCssClasses) {
-    this.$container.addClass(this._customCssClasses);
+  if (this.uiCssClass) {
+    this.$container.addClass(this.uiCssClass);
   }
 
   var mouseEventHandler = this._onMouseEvent.bind(this);
@@ -228,8 +228,9 @@ scout.Menu.prototype._openPopup = function() {
   this.popup.on('close', function(event) {
     this.setSelected(false);
   }.bind(this));
-  if (this._customCssClasses) {
-    this.popup.$container.addClass(this._customCssClasses);
+
+  if (this.uiCssClass) {
+    this.popup.$container.addClass(this.uiCssClass);
   }
 };
 

@@ -226,6 +226,10 @@ scout.Table.prototype._render = function($parent) {
   this.htmlComp.setLayout(new scout.TableLayout(this));
   this.htmlComp.pixelBasedSizing = false;
 
+  if (this.uiCssClass) {
+    this.$container.addClass(this.uiCssClass);
+  }
+
   this.$data = this.$container.appendDiv('table-data');
   this.$data.on('mousedown', '.table-row', this._onRowMouseDown.bind(this))
     .on('mouseup', '.table-row', this._onRowMouseUp.bind(this))
@@ -271,7 +275,7 @@ scout.Table.prototype._renderProperties = function() {
   this._renderMenus();
   this._renderEnabled();
   this._renderDropType();
-  this._renderCssClass();
+  this._renderCheckableStyle();
 };
 
 scout.Table.prototype._remove = function() {
@@ -3274,17 +3278,8 @@ scout.Table.prototype._renderDropType = function() {
   }
 };
 
-scout.Table.prototype._renderCssClass = function() {
-  var cssClass = 'table';
-  if (this.checkableStyle === scout.Table.CheckableStyle.TABLE_ROW) {
-    cssClass += ' checkable';
-  }
-  if (this.cssClass) {
-    cssClass += ' ' + this.cssClass;
-  }
-  this.$container
-    .removeAttr('class')
-    .addClass(cssClass);
+scout.Table.prototype._renderCheckableStyle = function() {
+  this.$container.toggleClass('checkable', this.checkableStyle === scout.Table.CheckableStyle.TABLE_ROW);
 };
 
 scout.Table.prototype._installDragAndDropHandler = function(event) {

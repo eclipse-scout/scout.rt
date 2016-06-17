@@ -74,6 +74,10 @@ scout.Form.prototype._renderForm = function($parent) {
     .addClass(this.isDialog() ? 'dialog' : 'form')
     .data('model', this);
 
+  if (this.uiCssClass) {
+    this.$container.addClass(this.uiCssClass);
+  }
+
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
   this.htmlComp.pixelBasedSizing = false;
   if (this.isDialog()) {

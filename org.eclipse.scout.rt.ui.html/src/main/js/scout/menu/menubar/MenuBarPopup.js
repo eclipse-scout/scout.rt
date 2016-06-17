@@ -57,8 +57,8 @@ scout.MenuBarPopup.prototype._renderHead = function() {
     this.$head.addClass('in-main-menubar');
   }
 
-  if (this.menu._customCssClasses) {
-    this._copyCssClassToHead(this.menu._customCssClasses);
+  if (this.menu.uiCssClass) {
+    this._copyCssClassToHead(this.menu.uiCssClass);
   }
   this._copyCssClassToHead('unfocusable');
   this._copyCssClassToHead('button');

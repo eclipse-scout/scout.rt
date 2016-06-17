@@ -296,10 +296,10 @@ scout.DesktopBench.prototype._computeDetailContentForPage = function(node) {
   var content;
   if (node.detailForm && node.detailFormVisible && node.detailFormVisibleByUi) {
     content = node.detailForm;
-    content.uiCssClasses = ['detail-form'];
+    content.uiCssClass = 'detail-form';
   } else if (node.detailTable && node.detailTableVisible) {
     content = node.detailTable;
-    content.uiCssClasses = ['detail-table'];
+    content.uiCssClass = 'detail-table';
   }
 
   return content;
@@ -321,7 +321,6 @@ scout.DesktopBench.prototype.updateOutlineContent = function() {
     // Outline does not support multi selection -> [0]
     var selectedPage = selectedPages[0];
     content = this._computeDetailContentForPage(selectedPage);
-
   }
   if (content) {
     if (content instanceof scout.Table) {

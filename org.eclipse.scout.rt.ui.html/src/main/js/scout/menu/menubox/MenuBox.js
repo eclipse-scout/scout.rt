@@ -17,8 +17,8 @@ scout.inherits(scout.MenuBox, scout.Widget);
 scout.MenuBox.prototype._init = function(options) {
   scout.MenuBox.parent.prototype._init.call(this, options);
   this.menus = options.menus || [];
-  this.customMenuCssClasses = options.customMenuCssClasses || '';
-  this.customMenuCssClasses += ' ' + 'menu-box-item';
+  this.uiMenuCssClass = options.uiMenuCssClass || '';
+  this.uiMenuCssClass += ' ' + 'menu-box-item';
   this._initMenus(this.menus);
 };
 
@@ -28,7 +28,7 @@ scout.MenuBox.prototype._initMenus = function(menus) {
 
 scout.MenuBox.prototype._initMenu = function(menu) {
   menu.setParent(this);
-  menu._customCssClasses = this.customMenuCssClasses;
+  menu.uiCssClass = this.uiMenuCssClass;
 };
 
 /**
