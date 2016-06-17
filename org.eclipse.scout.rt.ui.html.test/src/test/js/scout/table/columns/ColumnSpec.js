@@ -18,7 +18,7 @@ describe("Column", function() {
     setFixtures(sandbox());
     session = sandboxSession();
     helper = new scout.TableSpecHelper(session);
-    locale = new LocaleSpecHelper().createLocale(LocaleSpecHelper.DEFAULT_LOCALE);
+    locale = new scout.LocaleSpecHelper().createLocale(scout.LocaleSpecHelper.DEFAULT_LOCALE);
     jasmine.Ajax.install();
     jasmine.clock().install();
   });
