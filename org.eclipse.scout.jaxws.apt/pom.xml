@@ -11,7 +11,7 @@
   <parent>
     <groupId>org.eclipse.scout.rt</groupId>
     <artifactId>org.eclipse.scout.rt</artifactId>
-    <version>5.2.0-SNAPSHOT</version>
+    <version>5.2.0.B034</version>
     <relativePath>../org.eclipse.scout.rt/pom.xml</relativePath>
   </parent>
 
