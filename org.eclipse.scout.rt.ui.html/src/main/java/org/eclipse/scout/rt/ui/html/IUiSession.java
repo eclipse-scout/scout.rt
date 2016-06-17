@@ -22,6 +22,7 @@ import javax.servlet.http.HttpSession;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
+import org.eclipse.scout.rt.server.commons.servlet.cache.IHttpResourceCache;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonMessageRequestHandler;
 import org.eclipse.scout.rt.ui.html.json.JsonRequest;
@@ -199,4 +200,9 @@ public interface IUiSession {
    * Sets the new theme (session & cookie) and triggers a reload of the current page in the browser.
    */
   void updateTheme(String theme);
+
+  /**
+   * @return The {@link IHttpResourceCache} to use to cache resources for this {@link IUiSession}.
+   */
+  IHttpResourceCache getHttpResourceCache();
 }

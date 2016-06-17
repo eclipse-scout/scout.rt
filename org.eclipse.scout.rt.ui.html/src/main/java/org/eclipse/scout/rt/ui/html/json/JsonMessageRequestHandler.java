@@ -36,6 +36,7 @@ import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.MaxUserIdleTimeProperty;
 import org.eclipse.scout.rt.ui.html.UiRunContexts;
 import org.eclipse.scout.rt.ui.html.UiServlet;
+import org.eclipse.scout.rt.ui.html.UiSession;
 import org.eclipse.scout.rt.ui.html.json.JsonRequest.RequestType;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -102,7 +103,7 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
       }
       else {
         // Get and validate existing UI session
-        uiSession = getUiSession(req, jsonRequest);
+        uiSession = UiSession.get(req, jsonRequest);
         if (!validateUiSession(uiSession, resp, jsonRequest)) {
           return true;
         }
@@ -352,12 +353,6 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
     LOG.info("Created new UI session with ID {} in {} ms [maxIdleTime={}s, httpSession.maxInactiveInterval={}s]",
         uiSession.getUiSessionId(), StringUtility.formatNanos(System.nanoTime() - startNanos), m_maxUserIdleTime, req.getSession().getMaxInactiveInterval());
     return uiSession;
-  }
-
-  protected IUiSession getUiSession(HttpServletRequest req, JsonRequest jsonReq) throws ServletException, IOException {
-    HttpSession httpSession = req.getSession();
-    ISessionStore sessionStore = m_httpSessionHelper.getSessionStore(httpSession);
-    return sessionStore.getUiSession(jsonReq.getUiSessionId());
   }
 
   /**

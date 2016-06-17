@@ -10,14 +10,29 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.res.loader;
 
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.server.commons.servlet.cache.GlobalHttpResourceCache;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheKey;
+import org.eclipse.scout.rt.server.commons.servlet.cache.IHttpResourceCache;
 
 /**
  * Abstract base class for resource loaders.
  */
 public abstract class AbstractResourceLoader implements IResourceLoader {
 
-  public AbstractResourceLoader() {
+  private final IHttpResourceCache m_cache;
+
+  protected AbstractResourceLoader() {
+    this(BEANS.get(GlobalHttpResourceCache.class));
+  }
+
+  /**
+   * @param cache
+   *          The {@link IHttpResourceCache} to use for this loader. May be <code>null</code> (which means no caching
+   *          for this loader).
+   */
+  protected AbstractResourceLoader(IHttpResourceCache cache) {
+    m_cache = cache; // may also be null
   }
 
   /**
@@ -31,4 +46,8 @@ public abstract class AbstractResourceLoader implements IResourceLoader {
     return new HttpCacheKey(resourcePath);
   }
 
+  @Override
+  public IHttpResourceCache getCache(HttpCacheKey cacheKey) {
+    return m_cache;
+  }
 }

@@ -4,27 +4,21 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.platform.Bean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A server side cache use to store web resources like HTML, CSS and JS. The scope of this cache is servlet-wide (for
- * all sessions).
+ * A server side cache use to store web resources like HTML, CSS and JS.
  */
-@ApplicationScoped
-public class HttpResourceCache {
+@Bean
+public class HttpResourceCache implements IHttpResourceCache {
 
   private static final Logger LOG = LoggerFactory.getLogger(HttpResourceCache.class);
 
-  private Map<HttpCacheKey, HttpCacheObject> m_cache = Collections.synchronizedMap(new HashMap<HttpCacheKey, HttpCacheObject>());
+  private final Map<HttpCacheKey, HttpCacheObject> m_cache = Collections.synchronizedMap(new HashMap<HttpCacheKey, HttpCacheObject>());
 
-  /**
-   * Puts an object into the cache if {@link HttpCacheObject#isCachingAllowed()} is true.
-   *
-   * @param obj
-   * @return true if the object was cached or null if it was not cached
-   */
+  @Override
   public boolean put(HttpCacheObject obj) {
     if (!obj.isCachingAllowed()) {
       return false;
@@ -34,25 +28,23 @@ public class HttpResourceCache {
     return true;
   }
 
-  /**
-   * Returns an object from the cache.
-   *
-   * @param cacheKey
-   * @return cached object or null
-   */
+  @Override
   public HttpCacheObject get(HttpCacheKey cacheKey) {
     HttpCacheObject obj = m_cache.get(cacheKey);
-    LOG.debug("Lookup object in cache: {} found={}", cacheKey, (obj != null));
+    LOG.debug("Lookup object in cache: {} found={}", cacheKey, obj != null);
     return obj;
   }
 
-  /**
-   * Removes a cached object with the given key.
-   *
-   * @return removed object or null, if it was not cached
-   */
+  @Override
   public HttpCacheObject remove(HttpCacheKey cacheKey) {
-    return m_cache.remove(cacheKey);
+    HttpCacheObject obj = m_cache.remove(cacheKey);
+    LOG.debug("Remove object in cache: {} removed={}", cacheKey, obj != null);
+    return obj;
   }
 
+  @Override
+  public void clear() {
+    LOG.debug("Clear resource cache");
+    m_cache.clear();
+  }
 }

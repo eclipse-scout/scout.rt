@@ -24,7 +24,6 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
@@ -42,11 +41,10 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheControl;
 import org.eclipse.scout.rt.ui.html.AbstractUiServletRequestHandler;
-import org.eclipse.scout.rt.ui.html.HttpSessionHelper;
-import org.eclipse.scout.rt.ui.html.ISessionStore;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.UiRunContexts;
 import org.eclipse.scout.rt.ui.html.UiServlet;
+import org.eclipse.scout.rt.ui.html.UiSession;
 import org.eclipse.scout.rt.ui.html.res.IBinaryResourceConsumer;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -61,7 +59,6 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
 
   private static final Pattern PATTERN_UPLOAD_ADAPTER_RESOURCE_PATH = Pattern.compile("^/upload/([^/]*)/([^/]*)$");
 
-  private final HttpSessionHelper m_httpSessionHelper = BEANS.get(HttpSessionHelper.class);
   private final HttpCacheControl m_httpCacheControl = BEANS.get(HttpCacheControl.class);
   private final JsonRequestHelper m_jsonRequestHelper = BEANS.get(JsonRequestHelper.class);
 
@@ -92,18 +89,17 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
 
     try {
       // Get and validate existing UI session
-      IUiSession uiSession = getUiSession(req, uiSessionId);
+      final IUiSession uiSession = UiSession.get(req, uiSessionId);
       if (uiSession == null) {
         throw new IllegalStateException("Could not resolve UI session with ID " + uiSessionId);
       }
 
       // Touch the session
       uiSession.touch();
-      final IUiSession uiSession1 = uiSession;
 
       // Associate subsequent processing with the uiSession.
       UiRunContexts.copyCurrent()
-          .withSession(uiSession1)
+          .withSession(uiSession)
           .run(new IRunnable() {
             @Override
             public void run() throws Exception {
@@ -204,12 +200,6 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
         uploadResources.add(res);
       }
     }
-  }
-
-  protected IUiSession getUiSession(HttpServletRequest req, String uiSessionId) throws ServletException, IOException {
-    HttpSession httpSession = req.getSession();
-    ISessionStore sessionStore = m_httpSessionHelper.getSessionStore(httpSession);
-    return sessionStore.getUiSession(uiSessionId);
   }
 
   /**

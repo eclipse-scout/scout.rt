@@ -9,9 +9,10 @@ import org.eclipse.scout.rt.platform.IPlatformListener;
 import org.eclipse.scout.rt.platform.PlatformEvent;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.server.commons.servlet.cache.GlobalHttpResourceCache;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheKey;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheObject;
-import org.eclipse.scout.rt.server.commons.servlet.cache.HttpResourceCache;
+import org.eclipse.scout.rt.server.commons.servlet.cache.IHttpResourceCache;
 import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.UiPrebuildFilesProperty;
 import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.UiPrebuildProperty;
 import org.eclipse.scout.rt.ui.html.UiThemeUtility;
@@ -25,7 +26,7 @@ import org.slf4j.LoggerFactory;
  * application is NOT in development mode. The list of files which are pre-built by this class is configured with the
  * config property {@link UiPrebuildFilesProperty}.
  *
- * @see HttpResourceCache
+ * @see GlobalHttpResourceCache
  * @since 6.0
  */
 public class PrebuildFiles implements IPlatformListener {
@@ -55,7 +56,7 @@ public class PrebuildFiles implements IPlatformListener {
   protected void buildScripts() {
     LOG.info("Pre-building of web resources enabled");
     String[] files = readPrebuildFilesConfig();
-    HttpResourceCache httpResourceCache = BEANS.get(HttpResourceCache.class);
+    IHttpResourceCache httpResourceCache = BEANS.get(GlobalHttpResourceCache.class);
     for (String file : files) {
       LOG.info("Pre-building resource '{}'", file);
       try {
