@@ -9,10 +9,14 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -25,12 +29,14 @@ public class VirtualTreeNodeTest {
   private VirtualTreeNode m_treeNode;
   private Map<String, ITreeNode> m_mockNodes;
   private ITreeNode m_nodeA;
+  private Set<ITreeNode> m_nodeCollector;
 
   @Before
   public void before() {
     m_treeNode = new VirtualTreeNode();
     m_mockNodes = new HashMap<>();
     m_nodeA = mockNode("a");
+    m_nodeCollector = new HashSet<>();
   }
 
   @Test
@@ -72,29 +78,45 @@ public class VirtualTreeNodeTest {
   }
 
   @Test
-  public void testContainsChildNodeNullNode() {
-    assertFalse(m_treeNode.containsChildNode(null, false));
-    assertFalse(m_treeNode.containsChildNode(null, true));
+  public void testCollectChildNodesUnresolved() {
+    m_treeNode.collectChildNodes(m_nodeCollector, false);
+    assertEquals(Collections.emptySet(), m_nodeCollector);
   }
 
   @Test
-  public void testContainsChildNodeUnresolved() {
-    assertFalse(m_treeNode.containsChildNode(m_nodeA, false));
-    assertFalse(m_treeNode.containsChildNode(m_nodeA, true));
-  }
-
-  @Test
-  public void testContainsChildNodeResolved() {
+  public void testCollectChildNodesResolved() {
     m_treeNode.setResolvedNode(m_nodeA);
-    assertTrue(m_treeNode.containsChildNode(m_nodeA, false));
-    assertTrue(m_treeNode.containsChildNode(m_nodeA, true));
+    m_treeNode.collectChildNodes(m_nodeCollector, false);
+    assertEquals(Collections.singleton(m_nodeA), m_nodeCollector);
   }
 
   @Test
-  public void testContainsChildNodeCascadingResolved() {
-    m_treeNode.setResolvedNode(wrapByVirtualNode(m_nodeA));
-    assertFalse(m_treeNode.containsChildNode(m_nodeA, false));
-    assertTrue(m_treeNode.containsChildNode(m_nodeA, true));
+  public void testCollectChildNodeCascadingResolved() {
+    VirtualTreeNode intermediateVirtualNode = wrapByVirtualNode(m_nodeA);
+    m_treeNode.setResolvedNode(intermediateVirtualNode);
+    m_treeNode.collectChildNodes(m_nodeCollector, false);
+    assertEquals(Collections.singleton(intermediateVirtualNode), m_nodeCollector);
+  }
+
+  @Test
+  public void testCollectChildNodesRecursiveUnresolved() {
+    m_treeNode.collectChildNodes(m_nodeCollector, true);
+    assertEquals(Collections.emptySet(), m_nodeCollector);
+  }
+
+  @Test
+  public void testCollectChildNodesRecursiveResolved() {
+    m_treeNode.setResolvedNode(m_nodeA);
+    m_treeNode.collectChildNodes(m_nodeCollector, true);
+    assertEquals(Collections.singleton(m_nodeA), m_nodeCollector);
+  }
+
+  @Test
+  public void testCollectChildNodeRecursiveCascadingResolved() {
+    VirtualTreeNode intermediateVirtualNode = wrapByVirtualNode(m_nodeA);
+    m_treeNode.setResolvedNode(intermediateVirtualNode);
+    m_treeNode.collectChildNodes(m_nodeCollector, true);
+    assertEquals(CollectionUtility.hashSet(intermediateVirtualNode, m_nodeA), m_nodeCollector);
   }
 
   private VirtualTreeNode wrapByVirtualNode(ITreeNode nodeA) {

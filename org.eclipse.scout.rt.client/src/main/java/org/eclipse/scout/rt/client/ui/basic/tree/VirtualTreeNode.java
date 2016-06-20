@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.ui.basic.tree;
 
 import java.security.Permission;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
@@ -440,17 +441,14 @@ public class VirtualTreeNode implements IVirtualTreeNode, ICellObserver {
   }
 
   @Override
-  public boolean containsChildNode(ITreeNode node, boolean recursive) {
-    if (equals(node)) {
-      return true;
-    }
-    if (recursive) {
-      final ITreeNode resolvedNode = getResolvedNode();
-      if (resolvedNode != null) {
-        return resolvedNode.containsChildNode(node, recursive);
+  public void collectChildNodes(Set<ITreeNode> collector, boolean recursive) {
+    final ITreeNode resolvedNode = getResolvedNode();
+    if (resolvedNode != null) {
+      collector.add(resolvedNode);
+      if (recursive) {
+        resolvedNode.collectChildNodes(collector, recursive);
       }
     }
-    return false;
   }
 
   @Override

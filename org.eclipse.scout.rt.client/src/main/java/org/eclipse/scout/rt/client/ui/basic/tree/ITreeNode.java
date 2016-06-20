@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.ui.basic.tree;
 
 import java.security.Permission;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.scout.rt.client.ui.action.ActionFinder;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -324,10 +325,11 @@ public interface ITreeNode {
   List<ITreeNode> getChildNodes();
 
   /**
-   * @return Returns <code>true</code> if this node contains the given child node. Visits child nodes if recursive is
-   *         <code>true</code>.
+   * Collects child nodes of this node and adds them the given collector. If recursive is <code>true</code>, grand
+   * children are visited as well.<br/>
+   * <b>Note:</b> {@link IVirtualTreeNode} instances are dereferenced if possible.
    */
-  boolean containsChildNode(ITreeNode node, boolean recursive);
+  void collectChildNodes(Set<ITreeNode> collector, boolean recursive);
 
   /**
    * @see ITree#getNodeFilters() This method is Thread-Safe

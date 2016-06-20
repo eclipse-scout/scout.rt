@@ -214,7 +214,7 @@ public class TableEvent extends java.util.EventObject implements IModelEvent {
    * @return Returns <code>true</code> if any of the given rows has been deleted. Otherwise <code>false</code>.
    */
   protected boolean removeRows(Set<ITableRow> rowsToRemove, Set<ITableRow> removedRowsCollector) {
-    if (rowsToRemove == null || rowsToRemove.isEmpty() || m_rows.isEmpty()) {
+    if (CollectionUtility.isEmpty(rowsToRemove) || m_rows.isEmpty()) {
       return false;
     }
     boolean removed = false;
