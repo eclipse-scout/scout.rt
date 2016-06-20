@@ -873,7 +873,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(createUIFacade(), ModelContext.copyCurrent());
     m_contributionHolder = new ContributionComposite(this);
     setEnabled(true);
-//    setLoading(false);
+    setLoading(false);
     setTitle(getConfiguredTitle());
     setAutoDiscardOnDelete(getConfiguredAutoDiscardOnDelete());
     setSortEnabled(getConfiguredSortEnabled());
