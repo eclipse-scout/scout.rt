@@ -48,4 +48,5 @@ public interface ISearchOutline extends IOutline {
 
   @Override
   ISearchOutlineUiFacade getUIFacade();
+
 }
