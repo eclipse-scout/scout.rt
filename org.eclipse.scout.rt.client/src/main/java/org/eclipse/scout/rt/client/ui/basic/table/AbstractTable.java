@@ -620,39 +620,55 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
 
     boolean firstRow = true;
     for (ITableRow row : rows) {
-      if (!firstRow) {
-        plainText.append(System.getProperty("line.separator"));
-      }
-
-      boolean firstColumn = true;
-      for (IColumn<?> column : columns) {
-        String text;
-        if (column instanceof IBooleanColumn) {
-          boolean value = BooleanUtility.nvl(((IBooleanColumn) column).getValue(row), false);
-          text = value ? "X" : "";
-        }
-        else {
-          text = StringUtility.emptyIfNull(row.getCell(column).getText());
-        }
-
-        // special intercept for html
-        if (text != null && row.getCell(column).isHtmlEnabled()) {
-          text = HTML.raw(text).toPlainText();
-        }
-
-        // text/plain
-        if (!firstColumn) {
-          plainText.append("\t");
-        }
-        plainText.append(StringUtility.emptyIfNull(StringUtility.unwrapText(text)));
-
-        firstColumn = false;
-      }
+      appendCopyTextForRow(plainText, row, firstRow, columns);
       firstRow = false;
     }
 
     TextTransferObject transferObject = new TextTransferObject(plainText.toString());
     return transferObject;
+  }
+
+  /**
+   * Called by {@link #execCopy(List)} for each row in case of a <code>CTRL-C</code> event on the table to copy the
+   * given rows into the clipboard.
+   */
+  protected void appendCopyTextForRow(StringBuilder clipboardPlainText, ITableRow row, boolean firstRow, List<IColumn<?>> columns) {
+    if (!firstRow) {
+      clipboardPlainText.append(System.getProperty("line.separator"));
+    }
+
+    boolean firstColumn = true;
+    for (IColumn<?> column : columns) {
+      appendCopyTextForColumn(clipboardPlainText, row, column, firstColumn);
+      firstColumn = false;
+    }
+  }
+
+  /**
+   * Called by {@link #execCopy(List)} for each row and each visible column in case of a <code>CTRL-C</code> event on
+   * the table to copy the given rows into the clipboard.
+   */
+  protected void appendCopyTextForColumn(StringBuilder clipboardPlainText, ITableRow row, IColumn<?> column, boolean firstColumn) {
+    String text;
+    if (column instanceof IBooleanColumn) {
+      boolean value = BooleanUtility.nvl(((IBooleanColumn) column).getValue(row), false);
+      text = value ? "X" : "";
+    }
+    else {
+      text = StringUtility.emptyIfNull(row.getCell(column).getText());
+    }
+
+    // special intercept for html
+    if (text != null && row.getCell(column).isHtmlEnabled()) {
+      text = HTML.raw(text).toPlainText();
+    }
+
+    // text/plain
+    if (!firstColumn) {
+      clipboardPlainText.append("\t");
+    }
+
+    clipboardPlainText.append(StringUtility.emptyIfNull(StringUtility.unwrapText(text)));
   }
 
   /**
