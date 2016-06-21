@@ -25,11 +25,13 @@ public class VirtualTreeNode implements IVirtualTreeNode, ICellObserver {
   private ITreeNode m_resolvedNode;
   private boolean m_filterAccepted;
   private boolean m_rejectedByUser;
+  private boolean m_enabled;
   private final Cell m_cell;
   private int m_childNodeIndex;
 
   public VirtualTreeNode() {
     m_cell = new Cell(this);
+    m_enabled = true;
   }
 
   /**
@@ -274,7 +276,7 @@ public class VirtualTreeNode implements IVirtualTreeNode, ICellObserver {
 
   @Override
   public boolean isEnabled() {
-    return true;
+    return m_enabled;
   }
 
   @Override
@@ -284,6 +286,7 @@ public class VirtualTreeNode implements IVirtualTreeNode, ICellObserver {
 
   @Override
   public void setEnabledInternal(boolean b) {
+    m_enabled = b;
   }
 
   @Override
@@ -296,6 +299,7 @@ public class VirtualTreeNode implements IVirtualTreeNode, ICellObserver {
 
   @Override
   public void setEnabled(boolean b) {
+    setEnabledInternal(b);
   }
 
   @Override
@@ -511,6 +515,9 @@ public class VirtualTreeNode implements IVirtualTreeNode, ICellObserver {
 
   @Override
   public void cellChanged(ICell cell, int changedBit) {
+    if (getTree() != null) {
+      getTree().fireNodeChanged(this);
+    }
   }
 
   @Override
