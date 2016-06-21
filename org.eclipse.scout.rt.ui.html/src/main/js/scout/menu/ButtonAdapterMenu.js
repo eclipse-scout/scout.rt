@@ -25,7 +25,13 @@ scout.ButtonAdapterMenu.prototype._init = function(model) {
   if (!this.button) {
     throw new Error('Cannot adapt to undefined button');
   }
+  this.button.adaptedBy = this;
   this._installListeners();
+};
+
+scout.ButtonAdapterMenu.prototype.destroy = function() {
+  scout.ButtonAdapterMenu.parent.prototype.destroy.call(this);
+  delete this.button.adaptedBy;
 };
 
 scout.ButtonAdapterMenu.prototype._installListeners = function() {
@@ -75,6 +81,16 @@ scout.ButtonAdapterMenu.prototype.doAction = function(srcEvent) {
     this.setSelected(!this.selected);
   }
   return actionExecuted;
+};
+
+/**
+ * @implements FormField.js
+ */
+scout.ButtonAdapterMenu.prototype.getFocusableElement = function() {
+  if (this.rendered) {
+    return this.$container[0];
+  }
+  return null;
 };
 
 /* --- STATIC HELPERS ------------------------------------------------------------- */
