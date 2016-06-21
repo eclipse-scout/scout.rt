@@ -471,6 +471,17 @@ scout.FormField.prototype._hideStatusMessage = function() {
   }
 };
 
+/**
+ * This method returns the HtmlElement to be used as initial focus element.
+ * It can be overridden, in case the FormField needs to return something other than this.$field[0].
+ */
+scout.FormField.prototype.getFocusableElement = function() {
+  if (this.rendered) {
+    return this.$field[0];
+  }
+  return null;
+};
+
 scout.FormField.prototype.getForm = function() {
   var parent = this.parent;
   while (parent && !(parent instanceof scout.Form)) {
