@@ -71,14 +71,26 @@ scout.ClipboardField.prototype._createDragAndDropHandler = function() {
 };
 
 scout.ClipboardField.prototype._renderDisplayText = function(displayText) {
+  // keep old img for firefox upload mechanism.
+  var img;
+  this.$field.children().each(function(idx, elem) {
+    if (!img && elem.nodeName === 'IMG') {
+      img = elem;
+    }
+  });
   if (scout.strings.hasText(displayText)) {
     this.$field.html(scout.strings.nl2br(displayText, true));
     scout.scrollbars.install(this.$field, {
-      parent: this
+      parent : this
     });
     this.$field.selectAllText();
-  } else {
+  }
+  else {
     this.$field.empty();
+  }
+  // restore old img for firefox upload mechanism.
+  if (img) {
+    this.$field.prepend(img);
   }
 };
 
