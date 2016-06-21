@@ -102,8 +102,10 @@ public class InternalTableRow extends TableRow implements ITableRow, ICellObserv
     try {
       setRowChanging(true);
       //
-      super.setEnabled(b);
-      m_rowPropertiesChanged = true;
+      if (isEnabled() != b) {
+        super.setEnabled(b);
+        m_rowPropertiesChanged = true;
+      }
     }
     finally {
       setRowChanging(false);
@@ -373,8 +375,10 @@ public class InternalTableRow extends TableRow implements ITableRow, ICellObserv
     try {
       setRowChanging(true);
       //
-      super.setIconId(id);
-      m_rowPropertiesChanged = true;
+      if (CompareUtility.notEquals(getIconId(), id)) {
+        super.setIconId(id);
+        m_rowPropertiesChanged = true;
+      }
     }
     finally {
       setRowChanging(false);
