@@ -36,6 +36,12 @@ scout.LoginBox.prototype.render = function($parent) {
     .attr('method', 'post')
     .submit(this._onLoginFormSubmit.bind(this))
     .appendTo(this.$content);
+  if (this.options.message) {
+    this.$message = $('<div>')
+      .attr('id', 'message-box')
+      .text(this.options.message)
+      .appendTo(this.$container);
+  }
   this.$user = $('<input>')
     .attr('type', 'text')
     .attr('autocapitalize', 'off')
@@ -113,13 +119,13 @@ scout.LoginBox.prototype._onPostFail = function(jqXHR, textStatus, errorThrown) 
       .html('')
       .text(this.texts.get('ui.LoginFailed'))
       .addClass('login-error');
-	this.$user
-	  .val('')
-	  .focus()
-	  .one('input.resetLoginError', this._resetButtonText.bind(this));
-	this.$password
-	  .val('')
-	  .one('input.resetLoginError', this._resetButtonText.bind(this));
+  this.$user
+    .val('')
+    .focus()
+    .one('input.resetLoginError', this._resetButtonText.bind(this));
+  this.$password
+    .val('')
+    .one('input.resetLoginError', this._resetButtonText.bind(this));
   }.bind(this), 300);
 };
 

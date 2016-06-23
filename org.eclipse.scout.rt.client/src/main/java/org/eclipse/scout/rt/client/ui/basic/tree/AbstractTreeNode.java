@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.scout.rt.client.extension.ui.action.tree.MoveActionNodesHandler;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.ITreeNodeExtension;
@@ -35,7 +36,6 @@ import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.eclipse.scout.rt.platform.util.CompareUtility;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 import org.eclipse.scout.rt.platform.util.concurrent.OptimisticLock;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
@@ -879,22 +879,19 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
   }
 
   @Override
-  public boolean containsChildNode(final ITreeNode node, final boolean recursive) {
-    synchronized (m_childNodeList) {
-      for (ITreeNode childNode : m_childNodeList) {
-        if (CompareUtility.equals(childNode, node)) {
-          return true;
+  public void collectChildNodes(Set<ITreeNode> collector, boolean recursive) {
+    synchronized (m_childNodeListLock) {
+      for (ITreeNode node : m_childNodeList) {
+        if (node == null) {
+          continue;
         }
-      }
-      if (recursive) {
-        for (ITreeNode childNode : m_childNodeList) {
-          if (childNode.containsChildNode(node, recursive)) {
-            return true;
-          }
+        node = TreeUtility.unwrapResolvedNode(node);
+        collector.add(node);
+        if (recursive) {
+          node.collectChildNodes(collector, recursive);
         }
       }
     }
-    return false;
   }
 
   @Override

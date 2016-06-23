@@ -11,6 +11,8 @@
 package org.eclipse.scout.rt.client.ui.basic.table.internal;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Set;
@@ -26,6 +28,8 @@ import org.junit.Test;
  * Tests for {@link InternalTableRow}
  */
 public class InternalTableRowTest {
+
+  private static final String TEST_ICON_ID = "iconId";
 
   @Test
   public void testCreateInternalTableRow() throws Exception {
@@ -94,6 +98,55 @@ public class InternalTableRowTest {
     ir.cellChanged(ir.getCell(0), ICell.VALUE_BIT);
     Set<Integer> changedColumnIdx = ir.getUpdatedColumnIndexes(ICell.TEXT_BIT);
     assertEquals(0, changedColumnIdx.size());
+    ir.setRowChanging(false);
+  }
+
+  @Test
+  public void testSetEnabled() {
+    TestTable table = new TestTable();
+    ITableRow row = table.createRow();
+    InternalTableRow ir = new InternalTableRow(table, row);
+    assertTrue(ir.isEnabled());
+    ir.setRowChanging(true);
+    ir.setEnabled(false);
+    assertTrue(ir.isRowPropertiesChanged());
+    ir.setRowChanging(false);
+  }
+
+  @Test
+  public void testSetEnabled_NoChange() {
+    TestTable table = new TestTable();
+    ITableRow row = table.createRow();
+    InternalTableRow ir = new InternalTableRow(table, row);
+    assertTrue(ir.isEnabled());
+    ir.setRowChanging(true);
+    ir.setEnabled(true);
+    assertFalse(ir.isRowPropertiesChanged());
+    ir.setRowChanging(false);
+  }
+
+  @Test
+  public void testSetIconId() {
+    TestTable table = new TestTable();
+    ITableRow row = table.createRow();
+    InternalTableRow ir = new InternalTableRow(table, row);
+    assertNull(ir.getIconId());
+    ir.setRowChanging(true);
+    ir.setIconId(TEST_ICON_ID);
+    assertTrue(ir.isRowPropertiesChanged());
+    ir.setRowChanging(false);
+  }
+
+  @Test
+  public void testSetIconId_NoChange() {
+    TestTable table = new TestTable();
+    ITableRow row = table.createRow();
+    InternalTableRow ir = new InternalTableRow(table, row);
+    ir.setIconId(TEST_ICON_ID);
+    assertEquals(TEST_ICON_ID, ir.getIconId());
+    ir.setRowChanging(true);
+    ir.setIconId(TEST_ICON_ID);
+    assertFalse(ir.isRowPropertiesChanged());
     ir.setRowChanging(false);
   }
 

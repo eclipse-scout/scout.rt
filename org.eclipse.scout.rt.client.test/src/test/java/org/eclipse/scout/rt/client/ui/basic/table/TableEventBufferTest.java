@@ -773,7 +773,6 @@ public class TableEventBufferTest {
     assertEquals(insertEventCount, tableEvents.size());
     m_testBuffer.removeObsolete(tableEvents);
     assertEquals(insertEventCount, tableEvents.size());
-
   }
 
   @Test(timeout = 10000)

@@ -320,11 +320,9 @@ public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
 
     // Please note: In contrast to all other methods in this class, this method loops through the
     // list in FORWARD direction (so the oldest event will be kept).
-    final ListIterator<TableEvent> it = events.listIterator();
     Map<Integer, List<TableEvent>> predecessorEventsOfSameType = new HashMap<>();
     int currentEventGroupType = -1;
-
-    while (it.hasNext()) {
+    for (ListIterator<TableEvent> it = events.listIterator(); it.hasNext();) {
       final TableEvent event = it.next();
 
       if (event.getType() != currentEventGroupType) {
@@ -340,9 +338,9 @@ public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
       // event belongs to the same group. Check whether it is identical to one of its predecessors.
       boolean removed = false;
       int tableEventHashCode = identicalEventHashCode(event);
-      List<TableEvent> identidalEventList = predecessorEventsOfSameType.get(tableEventHashCode);
-      if (identidalEventList != null) {
-        for (TableEvent predecessorEvent : identidalEventList) {
+      List<TableEvent> identicalEventList = predecessorEventsOfSameType.get(tableEventHashCode);
+      if (identicalEventList != null) {
+        for (TableEvent predecessorEvent : identicalEventList) {
           if (isIdenticalEvent(event, predecessorEvent)) {
             it.remove();
             removed = true;
@@ -351,12 +349,12 @@ public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
         }
       }
       if (!removed) {
-        if (identidalEventList == null && lookAheadEventType(it) == currentEventGroupType) {
-          identidalEventList = new ArrayList<>();
-          predecessorEventsOfSameType.put(tableEventHashCode, identidalEventList);
+        if (identicalEventList == null && lookAheadEventType(it) == currentEventGroupType) {
+          identicalEventList = new ArrayList<>();
+          predecessorEventsOfSameType.put(tableEventHashCode, identicalEventList);
         }
-        if (identidalEventList != null) {
-          identidalEventList.add(event);
+        if (identicalEventList != null) {
+          identicalEventList.add(event);
         }
       }
     }
@@ -676,15 +674,16 @@ public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
       m_deleteEvent = deleteEvent;
     }
 
-    public void removeDeletedRows(TableEvent event) { // never remove rows from a previous row order changed / checked event. Even when the row is deleted later,
+    public void removeDeletedRows(TableEvent event) {
+      // never remove rows from a previous row order changed / checked event. Even when the row is deleted later,
       // the UI expects the row to be still available at the point where the row order / checked state is changed.
       if (TableEvent.TYPE_ROW_ORDER_CHANGED != event.getType()) {
-        ensureInitizlized();
+        ensureInitialized();
         event.removeRows(m_rowsToRemove, event.getType() == TableEvent.TYPE_ROWS_INSERTED ? m_removedRowsCollector : null);
       }
     }
 
-    protected void ensureInitizlized() {
+    protected void ensureInitialized() {
       if (m_removedRowsCollector != null) {
         return;
       }
@@ -698,7 +697,7 @@ public class TableEventBuffer extends AbstractEventBuffer<TableEvent> {
         return;
       }
 
-      List<ITableRow> remainingRows = new ArrayList<ITableRow>();
+      List<ITableRow> remainingRows = new ArrayList<>();
       for (ITableRow row : m_deleteEvent.getRows()) {
         if (!m_removedRowsCollector.contains(row)) {
           remainingRows.add(row);
