@@ -1505,9 +1505,9 @@ scout.Table.prototype._sendRowsFiltered = function(rowIds) {
   }
 
   // send with timeout, mainly for incremental load of a large table
-  // coalesce: only send last event
+  // coalesce: only send last event (don't coalesce remove and 'add' events, the UI server needs both)
   this._send('rowsFiltered', eventData, 250, function(previous) {
-    return this.id === previous.id && this.type === previous.type;
+    return this.id === previous.id && this.type === previous.type && this.remove === previous.remove;
   });
 };
 

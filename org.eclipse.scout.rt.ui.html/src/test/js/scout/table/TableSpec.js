@@ -2820,4 +2820,20 @@ describe("Table", function() {
 
   });
 
+  describe("_sendRowsFiltered", function() {
+
+    // Test case for ticket #175700
+    it("should not coalesce remove and 'add' events", function() {
+      var model = helper.createModelFixture(1, 2);
+      var table = helper.createTable(model);
+      table._sendRowsFiltered(['1','2']); // should create a remove event, because number of rows is equals to the length of rowIds
+      table._sendRowsFiltered(['1']); // should create an 'add' event
+      table._sendRowsFiltered(['2']); // should be coalesced with previous add event
+      expect(session._asyncEvents.length).toBe(2);
+      expect(session._asyncEvents[0].remove).toBe(true);
+      expect(session._asyncEvents[1].remove).toBe(undefined);
+    });
+
+  });
+
 });
