@@ -35,10 +35,10 @@ scout.login = {
       .attr('id', 'login-box')
       .addClass('box-with-logo')
       .appendTo(this.$form);
-    if(this.options.message){
+    if (this.options.message) {
       this.$message = $('<div>')
         .attr('id', 'message-box')
-        .text(this.options.message)
+        .text(texts.get(this.options.message))
         .appendTo(this.$container);
     }
     this.$user = $('<input>')

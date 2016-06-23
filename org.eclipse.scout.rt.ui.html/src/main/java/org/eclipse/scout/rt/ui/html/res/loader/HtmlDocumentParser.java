@@ -164,7 +164,7 @@ public class HtmlDocumentParser {
         String key = m2.group(1);
         String value = m2.group(2);
         if (StringUtility.equalsIgnoreCase(key, "style")) {
-          style = value;
+          style = StringUtility.lowercase(value);
         }
         else if (StringUtility.equalsIgnoreCase(key, "key")) {
           keys.add(value);
@@ -173,22 +173,28 @@ public class HtmlDocumentParser {
       // Generate output
       String text = "";
       if (!keys.isEmpty()) {
-        if (StringUtility.equalsIgnoreCase(style, "javascript")) {
-          // JavaScript style replacement
-          StringBuilder js = new StringBuilder("{");
-          for (String key : keys) {
-            js.append("'").append(key).append("': ");
-            js.append(toJavaScriptString(TEXTS.get(key)));
-            js.append(", ");
-          }
-          int length = js.length();
-          js.delete(length - 2, length);
-          js.append("}");
-          text = js.toString();
-        }
-        else {
-          // Plain normal replacement
-          text = TEXTS.get(keys.get(0));
+        switch (style) {
+          case "javascript":
+            // JavaScript style replacement
+            StringBuilder js = new StringBuilder("{");
+            for (String key : keys) {
+              js.append("'").append(key).append("': ");
+              js.append(toJavaScriptString(TEXTS.get(key)));
+              js.append(", ");
+            }
+            int length = js.length();
+            js.delete(length - 2, length);
+            js.append("}");
+            text = js.toString();
+            break;
+          case "plain":
+            // Plain normal replacement
+            text = TEXTS.get(keys.get(0));
+            break;
+          case "html":
+          default:
+            text = StringUtility.htmlEncode(TEXTS.get(keys.get(0)));
+            break;
         }
       }
       m.appendReplacement(sb, Matcher.quoteReplacement(text));
