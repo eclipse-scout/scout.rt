@@ -219,58 +219,63 @@ public class CodeRow<ID_TYPE> extends LookupRow<ID_TYPE> implements ICodeRow<ID_
    */
 
   @Override
-  public ICodeRow<ID_TYPE> withText(String text) {
-    return (ICodeRow<ID_TYPE>) super.withText(text);
+  public CodeRow<ID_TYPE> withKey(ID_TYPE key) {
+    return (CodeRow<ID_TYPE>) super.withKey(key);
   }
 
   @Override
-  public ICodeRow<ID_TYPE> withIconId(String iconId) {
-    return (ICodeRow<ID_TYPE>) super.withIconId(iconId);
+  public CodeRow<ID_TYPE> withText(String text) {
+    return (CodeRow<ID_TYPE>) super.withText(text);
   }
 
   @Override
-  public ICodeRow<ID_TYPE> withTooltipText(String tooltipText) {
-    return (ICodeRow<ID_TYPE>) super.withTooltipText(tooltipText);
+  public CodeRow<ID_TYPE> withIconId(String iconId) {
+    return (CodeRow<ID_TYPE>) super.withIconId(iconId);
   }
 
   @Override
-  public ICodeRow<ID_TYPE> withForegroundColor(String foregroundColor) {
-    return (ICodeRow<ID_TYPE>) super.withForegroundColor(foregroundColor);
+  public CodeRow<ID_TYPE> withTooltipText(String tooltipText) {
+    return (CodeRow<ID_TYPE>) super.withTooltipText(tooltipText);
   }
 
   @Override
-  public ICodeRow<ID_TYPE> withBackgroundColor(String backgroundColor) {
-    return (ICodeRow<ID_TYPE>) super.withBackgroundColor(backgroundColor);
+  public CodeRow<ID_TYPE> withForegroundColor(String foregroundColor) {
+    return (CodeRow<ID_TYPE>) super.withForegroundColor(foregroundColor);
   }
 
   @Override
-  public ICodeRow<ID_TYPE> withFont(FontSpec font) {
-    return (ICodeRow<ID_TYPE>) super.withFont(font);
+  public CodeRow<ID_TYPE> withBackgroundColor(String backgroundColor) {
+    return (CodeRow<ID_TYPE>) super.withBackgroundColor(backgroundColor);
   }
 
   @Override
-  public ICodeRow<ID_TYPE> withActive(boolean active) {
-    return (ICodeRow<ID_TYPE>) super.withActive(active);
+  public CodeRow<ID_TYPE> withFont(FontSpec font) {
+    return (CodeRow<ID_TYPE>) super.withFont(font);
   }
 
   @Override
-  public ICodeRow<ID_TYPE> withEnabled(boolean enabled) {
-    return (ICodeRow<ID_TYPE>) super.withEnabled(enabled);
+  public CodeRow<ID_TYPE> withActive(boolean active) {
+    return (CodeRow<ID_TYPE>) super.withActive(active);
   }
 
   @Override
-  public ICodeRow<ID_TYPE> withParentKey(ID_TYPE parentKey) {
-    return (ICodeRow<ID_TYPE>) super.withParentKey(parentKey);
+  public CodeRow<ID_TYPE> withEnabled(boolean enabled) {
+    return (CodeRow<ID_TYPE>) super.withEnabled(enabled);
   }
 
   @Override
-  public ICodeRow<ID_TYPE> withAdditionalTableRowData(AbstractTableRowData bean) {
-    return (ICodeRow<ID_TYPE>) super.withAdditionalTableRowData(bean);
+  public CodeRow<ID_TYPE> withParentKey(ID_TYPE parentKey) {
+    return (CodeRow<ID_TYPE>) super.withParentKey(parentKey);
   }
 
   @Override
-  public ICodeRow<ID_TYPE> withCssClass(String cssClass) {
-    return (ICodeRow<ID_TYPE>) super.withCssClass(cssClass);
+  public CodeRow<ID_TYPE> withAdditionalTableRowData(AbstractTableRowData bean) {
+    return (CodeRow<ID_TYPE>) super.withAdditionalTableRowData(bean);
+  }
+
+  @Override
+  public CodeRow<ID_TYPE> withCssClass(String cssClass) {
+    return (CodeRow<ID_TYPE>) super.withCssClass(cssClass);
   }
 
   @Override
@@ -279,7 +284,7 @@ public class CodeRow<ID_TYPE> extends LookupRow<ID_TYPE> implements ICodeRow<ID_
   }
 
   @Override
-  public ICodeRow<ID_TYPE> withExtKey(String extKey) {
+  public CodeRow<ID_TYPE> withExtKey(String extKey) {
     m_extKey = extKey;
     return this;
   }
@@ -290,7 +295,7 @@ public class CodeRow<ID_TYPE> extends LookupRow<ID_TYPE> implements ICodeRow<ID_
   }
 
   @Override
-  public ICodeRow<ID_TYPE> withValue(Number value) {
+  public CodeRow<ID_TYPE> withValue(Number value) {
     m_value = value;
     return this;
   }
@@ -301,7 +306,7 @@ public class CodeRow<ID_TYPE> extends LookupRow<ID_TYPE> implements ICodeRow<ID_
   }
 
   @Override
-  public ICodeRow<ID_TYPE> withPartitionId(long partitionId) {
+  public CodeRow<ID_TYPE> withPartitionId(long partitionId) {
     m_partitionId = partitionId;
     return this;
   }
@@ -312,7 +317,7 @@ public class CodeRow<ID_TYPE> extends LookupRow<ID_TYPE> implements ICodeRow<ID_
   }
 
   @Override
-  public ICodeRow<ID_TYPE> withOrder(double order) {
+  public CodeRow<ID_TYPE> withOrder(double order) {
     m_order = order;
     return this;
   }

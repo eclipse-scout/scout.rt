@@ -12,25 +12,22 @@ package org.eclipse.scout.rt.ui.html.res.loader;
 
 import java.nio.charset.CharsetEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.regex.Matcher;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
-import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheKey;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheObject;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpResponseHeaderContributor;
-import org.eclipse.scout.rt.ui.html.HttpSessionHelper;
-import org.eclipse.scout.rt.ui.html.ISessionStore;
+import org.eclipse.scout.rt.server.commons.servlet.cache.IHttpResourceCache;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.res.BinaryResourceHolder;
-import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
 import org.eclipse.scout.rt.ui.html.res.IBinaryResourceProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class loads resources that are temporary or dynamically registered on the {@link IUiSession}. This includes
@@ -41,37 +38,48 @@ import org.eclipse.scout.rt.ui.html.res.IBinaryResourceProvider;
  */
 public class DynamicResourceLoader extends AbstractResourceLoader {
 
+  private static final Logger LOG = LoggerFactory.getLogger(DynamicResourceLoader.class);
   private static final String DEFAULT_FILENAME = "Download";
 
   private final HttpServletRequest m_req;
 
   public DynamicResourceLoader(HttpServletRequest req) {
-    super();
+    super(null /* no instance required as getCache() is overridden */);
     m_req = req;
   }
 
   @Override
-  public HttpCacheObject loadResource(HttpCacheKey cacheKey) {
-    String pathInfo = cacheKey.getResourcePath();
-    Matcher m = BinaryResourceUrlUtility.PATTERN_DYNAMIC_ADAPTER_RESOURCE_PATH.matcher(pathInfo);
-    if (!m.matches()) {
+  public IHttpResourceCache getCache(HttpCacheKey cacheKey) {
+    DynamicResourceInfo info = createDynamicResourceInfo(cacheKey);
+    if (info == null) {
       return null;
     }
-    String uiSessionId = m.group(1);
-    String adapterId = m.group(2);
-    String filename = m.group(3);
+    return info.getUiSession().getHttpResourceCache();
+  }
 
-    IBinaryResourceProvider provider = getBinaryResourceProvider(uiSessionId, adapterId);
+  protected DynamicResourceInfo createDynamicResourceInfo(HttpCacheKey cacheKey) {
+    return DynamicResourceInfo.fromPath(getRequest(), cacheKey.getResourcePath());
+  }
+
+  @Override
+  public HttpCacheObject loadResource(HttpCacheKey cacheKey) {
+    DynamicResourceInfo info = createDynamicResourceInfo(cacheKey);
+    if (info == null) {
+      LOG.warn("invalid dynamic-resource request received.", new Exception("origin"));
+      return null;
+    }
+
+    IBinaryResourceProvider provider = getBinaryResourceProvider(info.getUiSession(), info.getJsonAdapterId());
     if (provider == null) {
       return null;
     }
 
-    BinaryResourceHolder localResourceHolder = provider.provideBinaryResource(filename);
+    BinaryResourceHolder localResourceHolder = provider.provideBinaryResource(info.getFileName());
     if (localResourceHolder == null || localResourceHolder.get() == null) {
       return null;
     }
     BinaryResource localResource = localResourceHolder.get();
-    BinaryResource httpResource = localResource.createAlias(pathInfo);
+    BinaryResource httpResource = localResource.createAlias(cacheKey.getResourcePath());
     HttpCacheObject httpCacheObject = new HttpCacheObject(cacheKey, httpResource);
     if (localResourceHolder.isDownload()) {
       addResponseHeaderForDownload(httpCacheObject, localResource.getFilename());
@@ -79,19 +87,7 @@ public class DynamicResourceLoader extends AbstractResourceLoader {
     return httpCacheObject;
   }
 
-  protected IBinaryResourceProvider getBinaryResourceProvider(String uiSessionId, String adapterId) {
-    HttpSession httpSession = m_req.getSession(false);
-    if (httpSession == null) {
-      return null;
-    }
-    ISessionStore sessionStore = BEANS.get(HttpSessionHelper.class).getSessionStore(httpSession);
-    if (sessionStore == null) {
-      return null;
-    }
-    IUiSession uiSession = sessionStore.getUiSession(uiSessionId);
-    if (uiSession == null) {
-      return null;
-    }
+  protected IBinaryResourceProvider getBinaryResourceProvider(IUiSession uiSession, String adapterId) {
     IJsonAdapter<?> jsonAdapter = uiSession.getJsonAdapter(adapterId);
     if (!(jsonAdapter instanceof IBinaryResourceProvider)) {
       return null;
@@ -129,15 +125,20 @@ public class DynamicResourceLoader extends AbstractResourceLoader {
   protected String getIsoFilename(String originalFilename) {
     String isoFilename = originalFilename;
     CharsetEncoder iso8859Encoder = StandardCharsets.ISO_8859_1.newEncoder();
-    if (!iso8859Encoder.canEncode(originalFilename)) {
-      StringBuilder sb = new StringBuilder();
-      for (char c : originalFilename.toCharArray()) {
-        if (iso8859Encoder.canEncode(String.valueOf(c))) {
-          sb.append(c);
-        }
-      }
-      isoFilename = sb.toString();
+    if (iso8859Encoder.canEncode(originalFilename)) {
+      return isoFilename;
     }
-    return isoFilename;
+
+    StringBuilder sb = new StringBuilder(originalFilename.length() - 1);
+    for (char c : originalFilename.toCharArray()) {
+      if (c != '"' && iso8859Encoder.canEncode(c)) {
+        sb.append(c);
+      }
+    }
+    return sb.toString();
+  }
+
+  public HttpServletRequest getRequest() {
+    return m_req;
   }
 }

@@ -18,6 +18,13 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
  * @since Scout 4.0.0
  */
 public interface ICodeRow<KEY_TYPE> extends ILookupRow<KEY_TYPE> {
+
+  /**
+   * @return {@link ICodeRow} with given key
+   */
+  @Override
+  ICodeRow<KEY_TYPE> withKey(KEY_TYPE key);
+
   /**
    * @return {@link ICodeRow} with given text
    */

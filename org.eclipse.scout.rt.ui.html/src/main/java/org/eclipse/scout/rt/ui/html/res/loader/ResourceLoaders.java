@@ -23,10 +23,10 @@ public class ResourceLoaders {
     if (resourcePath.matches("^/icon/.*")) {
       return new IconLoader();
     }
-    if (resourcePath.matches("^/dynamic/.*")) {
+    if (resourcePath.matches("^/" + DynamicResourceInfo.PATH_PREFIX + "/.*")) {
       return new DynamicResourceLoader(req);
     }
-    if ((resourcePath.endsWith(".js") || resourcePath.endsWith(".css"))) {
+    if (resourcePath.endsWith(".js") || resourcePath.endsWith(".css")) {
       String theme = UiThemeUtility.getThemeForLookup(req);
       boolean minify = UrlHints.isMinifyHint(req);
       return new ScriptFileLoader(theme, minify);

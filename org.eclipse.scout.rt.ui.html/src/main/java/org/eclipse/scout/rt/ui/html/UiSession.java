@@ -59,6 +59,8 @@ import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
 import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledException;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedException;
+import org.eclipse.scout.rt.server.commons.servlet.cache.HttpResourceCache;
+import org.eclipse.scout.rt.server.commons.servlet.cache.IHttpResourceCache;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.deeplink.DeepLinkUrlParameter;
 import org.eclipse.scout.rt.shared.job.filter.event.SessionJobEventFilter;
@@ -98,7 +100,8 @@ public class UiSession implements IUiSession {
    */
   private static final long ADDITIONAL_POLLING_DELAY = 100;
   private static final int MAX_RESPONSE_HISTORY_SIZE = 10;
-
+  private static final FinalValue<HttpSessionHelper> HTTP_SESSION_HELPER = new FinalValue<>();
+  private static final FinalValue<JsonRequestHelper> JSON_REQUEST_HELPER = new FinalValue<>();
   private static final FinalValue<Random> RANDOM = new FinalValue<>();
 
   private final JsonAdapterRegistry m_jsonAdapterRegistry;
@@ -115,6 +118,7 @@ public class UiSession implements IUiSession {
   private final BlockingQueue<Object> m_pollerQueue = new ArrayBlockingQueue<>(1, true);
   private final Object m_pollerQueueLock = new Object();
   private final Object m_notificationToken = new Object();
+  private final IHttpResourceCache m_httpResourceCache = BEANS.get(HttpResourceCache.class);
 
   private volatile boolean m_initialized;
   private volatile ISessionStore m_sessionStore;
@@ -206,7 +210,7 @@ public class UiSession implements IUiSession {
       m_currentJsonResponse.getStartupData().put("uiSessionId", m_uiSessionId);
 
       // Remember the store here, because getting it from an invalidated httpSession does not work (there might even be dead locks!)
-      m_sessionStore = BEANS.get(HttpSessionHelper.class).getSessionStore(httpSession);
+      m_sessionStore = getHttpSessionHelper().getSessionStore(httpSession);
 
       // Look up the requested client session (create and start a new one if necessary)
       m_clientSession = getOrCreateClientSession(httpSession, req, jsonStartupReq);
@@ -701,7 +705,7 @@ public class UiSession implements IUiSession {
         catch (RuntimeException e) {
           LOG.warn("Error while transforming response to JSON: {}", m_currentJsonResponse, e);
           // Return UI error, with same sequenceNo to keep response queue order consistent
-          return BEANS.get(JsonRequestHelper.class).createUnrecoverableFailureResponse(m_currentJsonResponse.getSequenceNo());
+          return getJsonRequestHelper().createUnrecoverableFailureResponse(m_currentJsonResponse.getSequenceNo());
         }
         finally {
           // Create a new JSON response for future jobs. This is also done in case of an exception, because apparently the
@@ -1095,6 +1099,86 @@ public class UiSession implements IUiSession {
 
   protected void sendReloadPageEvent() {
     m_currentJsonResponse.addActionEvent(getUiSessionId(), EVENT_RELOAD_PAGE);
+  }
+
+  @Override
+  public IHttpResourceCache getHttpResourceCache() {
+    return m_httpResourceCache;
+  }
+
+  protected static HttpSessionHelper getHttpSessionHelper() {
+    return HTTP_SESSION_HELPER.setIfAbsent(new Callable<HttpSessionHelper>() {
+      @Override
+      public HttpSessionHelper call() throws Exception {
+        return BEANS.get(HttpSessionHelper.class);
+      }
+    });
+  }
+
+  protected static JsonRequestHelper getJsonRequestHelper() {
+    return JSON_REQUEST_HELPER.setIfAbsent(new Callable<JsonRequestHelper>() {
+      @Override
+      public JsonRequestHelper call() throws Exception {
+        return BEANS.get(JsonRequestHelper.class);
+      }
+    });
+  }
+
+  /**
+   * Gets the {@link IUiSession} of the given {@link JSONObject}.
+   *
+   * @param req
+   *          The {@link HttpServletRequest} for which the {@link IUiSession} should be returned.
+   * @param jsonObject
+   *          The {@link JSONObject} that contains the content of the request.
+   * @return The {@link IUiSession} of the given {@link HttpServletRequest} or <code>null</code>.
+   */
+  public static IUiSession get(HttpServletRequest req, JSONObject jsonObject) {
+    if (req == null || jsonObject == null) {
+      return null;
+    }
+
+    return get(req, new JsonRequest(jsonObject));
+  }
+
+  /**
+   * Gets the {@link IUiSession} of the given {@link JsonRequest}.
+   *
+   * @param req
+   *          The {@link HttpServletRequest} for which the {@link IUiSession} should be returned.
+   * @param jsonReq
+   *          The {@link JsonRequest}.
+   * @return The {@link IUiSession} of the given {@link HttpServletRequest} or <code>null</code>.
+   */
+  public static IUiSession get(HttpServletRequest req, JsonRequest jsonReq) {
+    if (req == null || jsonReq == null) {
+      return null;
+    }
+    return get(req, jsonReq.getUiSessionId());
+  }
+
+  /**
+   * Gets the {@link IUiSession} with the given id from the given {@link HttpServletRequest}.
+   *
+   * @param req
+   *          The {@link HttpServletRequest} for which the {@link IUiSession} should be returned.
+   * @param uiSessionId
+   *          The id of the UI session.
+   * @return The {@link IUiSession} of the given {@link HttpServletRequest} or <code>null</code>.
+   */
+  public static IUiSession get(HttpServletRequest req, String uiSessionId) {
+    if (req == null || uiSessionId == null) {
+      return null;
+    }
+    HttpSession httpSession = req.getSession(false);
+    if (httpSession == null) {
+      return null;
+    }
+    ISessionStore sessionStore = getHttpSessionHelper().getSessionStore(httpSession);
+    if (sessionStore == null) {
+      return null;
+    }
+    return sessionStore.getUiSession(uiSessionId);
   }
 
   private static class P_RootAdapter extends AbstractJsonAdapter<Object> {

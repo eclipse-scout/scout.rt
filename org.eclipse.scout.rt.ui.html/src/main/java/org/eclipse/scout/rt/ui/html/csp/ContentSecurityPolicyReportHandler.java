@@ -17,7 +17,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.eclipse.scout.rt.platform.util.CompareUtility;
 import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.server.commons.servlet.HttpServletControl;
 import org.eclipse.scout.rt.ui.html.AbstractUiServletRequestHandler;
@@ -32,7 +31,7 @@ import org.slf4j.LoggerFactory;
  * <p>
  * If you get a violation for content you need, make sure all your content is provided from the same origin. If this is
  * not possible you can adjust the CSP rule to your own needs by replacing {@link HttpServletControl} and overriding
- * {@link HttpServletControl#cspRule}.
+ * {@link HttpServletControl#getCspDirectives()}.
  * <p>
  * see {@link HttpServletControl}
  *
@@ -41,18 +40,21 @@ import org.slf4j.LoggerFactory;
 public class ContentSecurityPolicyReportHandler extends AbstractUiServletRequestHandler {
   private static final Logger LOG = LoggerFactory.getLogger(ContentSecurityPolicyReportHandler.class);
 
-  private static final String HANDLER_PATH = "/csp.cgi";
+  private static final String HANDLER_PATH = "/" + HttpServletControl.CSP_REPORT_URL;
 
   @Override
   public boolean handlePost(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
-    //serve only /csp
-    if (!CompareUtility.equals(HANDLER_PATH, req.getPathInfo())) {
+    // serve only if path is ending with /csp.cgi
+    String pathInfo = req.getPathInfo();
+    if (pathInfo == null || !pathInfo.endsWith(HANDLER_PATH)) {
       return false;
     }
+
     final String jsonData;
     try (Reader in = req.getReader()) {
       jsonData = IOUtility.readString(in);
     }
+
     LOG.warn("CSP-REPORT: {}", jsonData);
     return true;
   }

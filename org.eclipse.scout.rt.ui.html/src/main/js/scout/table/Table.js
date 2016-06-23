@@ -27,6 +27,7 @@ scout.Table = function(model) {
   this.rowBorderRightWidth = 0; // read-only, set by _calculateRowBorderWidth(), also used in TableHeader.js
   this.staticMenus = [];
   this.selectionHandler = new scout.TableSelectionHandler(this);
+  this.loadingSupport = new scout.LoadingSupport({widget: this});
   this._filterMap = {};
   this._filteredRows = [];
   this._filteredRowsDirty = true;
@@ -226,6 +227,10 @@ scout.Table.prototype._render = function($parent) {
   this.htmlComp.setLayout(new scout.TableLayout(this));
   this.htmlComp.pixelBasedSizing = false;
 
+  if (this.uiCssClass) {
+    this.$container.addClass(this.uiCssClass);
+  }
+
   this.$data = this.$container.appendDiv('table-data');
   this.$data.on('mousedown', '.table-row', this._onRowMouseDown.bind(this))
     .on('mouseup', '.table-row', this._onRowMouseUp.bind(this))
@@ -271,7 +276,8 @@ scout.Table.prototype._renderProperties = function() {
   this._renderMenus();
   this._renderEnabled();
   this._renderDropType();
-  this._renderCssClass();
+  this._renderCheckableStyle();
+  this._renderLoading();
 };
 
 scout.Table.prototype._remove = function() {
@@ -452,6 +458,10 @@ scout.Table.prototype._renderTableStatusVisible = function() {
 
 scout.Table.prototype._renderTableStatus = function() {
   this.trigger('statusChanged');
+};
+
+scout.Table.prototype._renderLoading = function() {
+  this.loadingSupport.renderLoading();
 };
 
 scout.Table.prototype._hasVisibleTableControls = function() {
@@ -1506,9 +1516,9 @@ scout.Table.prototype._sendRowsFiltered = function(rowIds) {
   }
 
   // send with timeout, mainly for incremental load of a large table
-  // coalesce: only send last event
+  // coalesce: only send last event (don't coalesce remove and 'add' events, the UI server needs both)
   this._send('rowsFiltered', eventData, 250, function(previous) {
-    return this.id === previous.id && this.type === previous.type;
+    return this.id === previous.id && this.type === previous.type && this.remove === previous.remove;
   });
 };
 
@@ -1673,7 +1683,7 @@ scout.Table.prototype._forEachColumn = function(funcName, states, row) {
   this.columns.forEach(function(column, i) {
     if (column[funcName]) {
       if (row) {
-        value = that.cellValue(column, row);
+        value = column.cellValueForGrouping(row);
       }
       states[i] = column[funcName](states[i], value);
     }
@@ -3274,17 +3284,8 @@ scout.Table.prototype._renderDropType = function() {
   }
 };
 
-scout.Table.prototype._renderCssClass = function() {
-  var cssClass = 'table';
-  if (this.checkableStyle === scout.Table.CheckableStyle.TABLE_ROW) {
-    cssClass += ' checkable';
-  }
-  if (this.cssClass) {
-    cssClass += ' ' + this.cssClass;
-  }
-  this.$container
-    .removeAttr('class')
-    .addClass(cssClass);
+scout.Table.prototype._renderCheckableStyle = function() {
+  this.$container.toggleClass('checkable', this.checkableStyle === scout.Table.CheckableStyle.TABLE_ROW);
 };
 
 scout.Table.prototype._installDragAndDropHandler = function(event) {

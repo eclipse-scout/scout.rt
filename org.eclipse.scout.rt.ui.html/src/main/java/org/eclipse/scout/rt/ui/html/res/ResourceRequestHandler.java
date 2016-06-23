@@ -25,7 +25,7 @@ import org.eclipse.scout.rt.server.commons.servlet.UrlHints;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheControl;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheKey;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheObject;
-import org.eclipse.scout.rt.server.commons.servlet.cache.HttpResourceCache;
+import org.eclipse.scout.rt.server.commons.servlet.cache.IHttpResourceCache;
 import org.eclipse.scout.rt.ui.html.AbstractUiServletRequestHandler;
 import org.eclipse.scout.rt.ui.html.UiServlet;
 import org.eclipse.scout.rt.ui.html.res.loader.IResourceLoader;
@@ -46,7 +46,6 @@ public class ResourceRequestHandler extends AbstractUiServletRequestHandler {
 
   // Remember bean instances to save lookups on each GET request
   private final List<ResourceLoaders> m_resourceLoaders = Collections.unmodifiableList(BEANS.all(ResourceLoaders.class));
-  private final HttpResourceCache m_httpResourceCache = BEANS.get(HttpResourceCache.class);
   private final HttpCacheControl m_httpCacheControl = BEANS.get(HttpCacheControl.class);
 
   @Override
@@ -98,13 +97,18 @@ public class ResourceRequestHandler extends AbstractUiServletRequestHandler {
 
     // When caching is disabled, always load resource
     if (!UrlHints.isCacheHint(req)) {
-      LOG.debug("Requested resource with cacheKey={}. Caching is disabled by URL hint");
+      LOG.debug("Requested resource with cacheKey={}. Caching is disabled by URL hint", cacheKey);
+      return resourceLoader.loadResource(cacheKey);
+    }
+
+    IHttpResourceCache resourceCache = resourceLoader.getCache(cacheKey);
+    if (resourceCache == null) {
+      LOG.debug("Loader for resource with cacheKey={} does not support caching.", cacheKey);
       return resourceLoader.loadResource(cacheKey);
     }
 
     String cacheResultMsg;
-    HttpCacheObject resource = null;
-    resource = m_httpResourceCache.get(cacheKey);
+    HttpCacheObject resource = resourceCache.get(cacheKey);
     if (resource == null) {
       // Cache miss: resource not found in cache --> load it
       resource = resourceLoader.loadResource(cacheKey);
@@ -112,7 +116,7 @@ public class ResourceRequestHandler extends AbstractUiServletRequestHandler {
         cacheResultMsg = "Resource is not cached (cache miss), could not load resource (not added to the cache)";
       }
       else {
-        m_httpResourceCache.put(resource);
+        resourceCache.put(resource);
         cacheResultMsg = "Resource is not cached (cache miss), resource loaded and added to the cache";
       }
     }
@@ -150,10 +154,6 @@ public class ResourceRequestHandler extends AbstractUiServletRequestHandler {
 
   protected List<ResourceLoaders> resourceLoaders() {
     return m_resourceLoaders;
-  }
-
-  protected HttpResourceCache httpResourceCache() {
-    return m_httpResourceCache;
   }
 
   /**

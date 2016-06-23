@@ -28,22 +28,17 @@ public final class TreeUtility {
    * If every given node has the same parent, that common parent node will be returned, else null.
    */
   public static ITreeNode calculateCommonParentNode(Collection<? extends ITreeNode> nodes) {
-    if (!CollectionUtility.hasElements(nodes)) {
+    if (CollectionUtility.isEmpty(nodes)) {
       return null;
     }
-
-    if (nodes.size() == 1) {
-      return CollectionUtility.firstElement(nodes).getParentNode();
-    }
     Iterator<? extends ITreeNode> nodeIt = nodes.iterator();
-    ITreeNode test = nodeIt.next().getParentNode();
+    final ITreeNode commonParent = nodeIt.next().getParentNode();
     while (nodeIt.hasNext()) {
-      if (nodeIt.next().getParentNode() != test) {
-        test = null;
-        break;
+      if (nodeIt.next().getParentNode() != commonParent) {
+        return null;
       }
     }
-    return test;
+    return commonParent;
   }
 
   /**

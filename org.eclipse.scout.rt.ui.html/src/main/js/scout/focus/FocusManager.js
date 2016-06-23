@@ -52,24 +52,61 @@ scout.FocusManager.prototype.installTopLevelMouseHandlers = function($container)
     if (!this._acceptFocusChangeOnMouseDown($(event.target))) {
       event.preventDefault();
     } else {
-      // Because in IE divs are focusable also without tabindex we have to handle it here -> select next parent with tabindex.
+      // Because in IE DOM elements are focusable without tabindex we have to handle it here -> select next parent with tabindex.
       this._handleIEEvent(event);
     }
     return true;
   }.bind(this));
 };
 
+/**
+ * Note: this method is a collection of bugfixes for focus problems which only occur on
+ * Internet Explorer. Focus handling in IE is different from focus-handling in Chrome and Firefox.
+ * Basically this method emulates the focus behavior of the other two browsers, by setting the
+ * focus programmatically to the correct element. And yes, the method is ugly since it deals with
+ * a lot of specific cases. However: distributing the IE specific bugfix code over several classes
+ * wouldn't be much better.
+ */
 scout.FocusManager.prototype._handleIEEvent = function(event) {
-  var $element = $(event.target),
-    selectableElements = 'div:not(.desktop),[tabindex]:not([tabindex=-1]), radio, a[href], area[href], input:not([disabled]),select:not([disabled]),textarea:not([disabled]),button:not([disabled]),iframe';
-  if (scout.device.browser === scout.Device.Browser.INTERNET_EXPLORER &&
-    $element.not(selectableElements).length > 0 &&
-    $element.closest('[contenteditable="true"]').length === 0 &&
-    (($element.css('user-select') && $element.css('user-select') === 'none') ||
-      (!$element.css('user-select') && $element.closest('div').not('[unselectable="on"]').length === 0)) //IE 9 has no user-select
-  ) {
-    var $elementToFocus = $element.closest(selectableElements);
-    if ($elementToFocus && $elementToFocus.not('[unselectable="on"]').length>0) {
+  if (scout.device.browser !== scout.Device.Browser.INTERNET_EXPLORER) {
+    return;
+  }
+
+  var
+    $elementToFocus,
+    $element = $(event.target);
+
+  // table fix - required because IE focuses the table-cell element (unlike Chrome and Firefox)
+  // that means in IE, the table-cell is focused. But all our styles apply to a focused table
+  // that's why we must set the focus programmatically to the closest table in the DOM.
+  if ($element.is('.table-cell') || $element.closest('.table-cell').length > 0) {
+    this.requestFocus($element.closest('.table'));
+    event.preventDefault();
+    return;
+  }
+
+  // tree fix - same issue as in table
+  if ($element.is('.tree-node') || $element.closest('.tree-node').length > 0) {
+    this.requestFocus($element.closest('.tree'));
+    event.preventDefault();
+    return;
+  }
+
+  // other fixes (NBU)
+  if ($element.not(selectableElements).length === 0) {
+    return;
+  }
+
+  var userSelect = $element.css('user-select'),
+    selectableElements =
+      'div:not(.desktop),[tabindex]:not([tabindex=-1]),radio,a[href],area[href],input:not([disabled]),' +
+      'select:not([disabled]),textarea:not([disabled]),button:not([disabled]),iframe';
+
+  if ($element.closest('[contenteditable="true"]').length === 0 &&
+    ((userSelect && userSelect === 'none') ||
+    (!userSelect && $element.closest('div').not('[unselectable="on"]').length === 0)) /* IE 9 has no user-select */) {
+    $elementToFocus = $element.closest(selectableElements);
+    if ($elementToFocus && $elementToFocus.not('[unselectable="on"]').length > 0) {
       this.requestFocus($elementToFocus.get(0));
     }
     event.preventDefault();

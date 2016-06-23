@@ -200,7 +200,7 @@ scout.MenuBoxLayout.prototype._createAndRenderEllipsis = function($parent) {
     horizontalAlignment: 1,
     compact: this.menuBox.compact
   });
-  ellipsis._customCssClasses = this.menuBox.customMenuCssClasses;
+  ellipsis.uiCssClass = this.menuBox.uiMenuCssClass;
   ellipsis.render($parent);
   this._ellipsis = ellipsis;
 };

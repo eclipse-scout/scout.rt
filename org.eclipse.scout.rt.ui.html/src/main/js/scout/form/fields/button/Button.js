@@ -273,3 +273,25 @@ scout.Button.prototype._onClick = function(event) {
     this.doAction();
   }
 };
+
+/**
+ * @override FormField.js
+ */
+scout.Button.prototype.getFocusableElement = function() {
+  if (this.adaptedBy) {
+    return this.adaptedBy.getFocusableElement(this);
+  } else {
+    return scout.Button.parent.prototype.focus.getFocusableElement(this);
+  }
+};
+
+/**
+ * @override FormField.js
+ */
+scout.Button.prototype.getFocusableElement = function() {
+  if (this.adaptedBy) {
+    return this.adaptedBy.getFocusableElement(this);
+  } else {
+    return scout.Button.parent.prototype.focus.getFocusableElement(this);
+  }
+};

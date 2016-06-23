@@ -19,6 +19,8 @@ public interface ISearchOutline extends IOutline {
 
   String PROP_SEARCH_QUERY = "searchQuery";
 
+  String PROP_MAX_SEARCH_QUERY_LENGTH = "maxSearchFieldLength";
+
   /**
    * Property to request the focus for a query field on a search outline.
    */
@@ -34,8 +36,17 @@ public interface ISearchOutline extends IOutline {
 
   void setSearchStatus(String searchStatus);
 
+  int getMaxSearchQueryLength();
+
+  void setMaxSearchQueryLength(int len);
+
+  int getMinSearchTokenLength();
+
+  void setMinSearchTokenLength(int len);
+
   void requestFocusQueryField();
 
   @Override
   ISearchOutlineUiFacade getUIFacade();
+
 }

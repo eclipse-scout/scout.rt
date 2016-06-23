@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.scout.rt.client.extension.ui.action.tree.MoveActionNodesHandler;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.ITreeNodeExtension;
@@ -874,6 +875,22 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
   public List<ITreeNode> getChildNodes() {
     synchronized (m_childNodeListLock) {
       return CollectionUtility.arrayList(m_childNodeList);
+    }
+  }
+
+  @Override
+  public void collectChildNodes(Set<ITreeNode> collector, boolean recursive) {
+    synchronized (m_childNodeListLock) {
+      for (ITreeNode node : m_childNodeList) {
+        if (node == null) {
+          continue;
+        }
+        node = TreeUtility.unwrapResolvedNode(node);
+        collector.add(node);
+        if (recursive) {
+          node.collectChildNodes(collector, recursive);
+        }
+      }
     }
   }
 

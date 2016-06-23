@@ -40,25 +40,29 @@ public class DiagnosticContextValueProcessor implements ICallableDecorator {
   @Override
   public IUndecorator decorate() throws Exception {
     final String originValue = MDC.get(m_mdcKey);
-    MDC.put(m_mdcKey, m_mdcValueProvider.value());
+    putOrRemoveMdcValue(m_mdcKey, m_mdcValueProvider.value());
 
     // Restore origin value upon completion of the command.
     return new IUndecorator() {
 
       @Override
       public void undecorate() {
-        if (originValue != null) {
-          MDC.put(m_mdcKey, originValue);
-        }
-        else {
-          MDC.remove(m_mdcKey);
-        }
+        putOrRemoveMdcValue(m_mdcKey, originValue);
       }
     };
   }
 
   public String getMdcKey() {
     return m_mdcKey;
+  }
+
+  private static void putOrRemoveMdcValue(String key, String value) {
+    if (value != null) {
+      MDC.put(key, value);
+    }
+    else {
+      MDC.remove(key);
+    }
   }
 
   /**

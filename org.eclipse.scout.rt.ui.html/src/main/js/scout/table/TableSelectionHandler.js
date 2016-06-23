@@ -49,6 +49,11 @@ scout.TableSelectionHandler.prototype.onMouseDown = function(event) {
 
   this._allRows = this.table.filteredRows();
   if (this.table.multiSelect && event.shiftKey) {
+    // when a selected row in the middle of a selection-block has
+    // been clicked while shift is pressed -> do nothing
+    if (this.table.selectedRows.indexOf(row) > -1) {
+      return;
+    }
     this.fromIndex = this._allRows.indexOf(this.lastActionRow);
   } else if (event.ctrlKey) {
     this.select = !oldSelectedState;

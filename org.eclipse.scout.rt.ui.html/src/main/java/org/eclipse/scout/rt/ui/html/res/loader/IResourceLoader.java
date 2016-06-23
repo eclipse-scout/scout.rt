@@ -14,6 +14,7 @@ import java.io.IOException;
 
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheKey;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheObject;
+import org.eclipse.scout.rt.server.commons.servlet.cache.IHttpResourceCache;
 
 /**
  * This is the interface for all individual resource loaders that are collected by
@@ -35,4 +36,12 @@ public interface IResourceLoader {
    */
   HttpCacheObject loadResource(HttpCacheKey cacheKey) throws IOException;
 
+  /**
+   * Gets the {@link IHttpResourceCache} to be used for this loader.
+   * 
+   * @param cacheKey
+   * @return The {@link IHttpResourceCache} to store the {@link HttpCacheObject}s or <code>null</code> if no caching
+   *         should be supported for this {@link IResourceLoader}.
+   */
+  IHttpResourceCache getCache(HttpCacheKey cacheKey);
 }

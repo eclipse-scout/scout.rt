@@ -74,6 +74,10 @@ scout.Form.prototype._renderForm = function($parent) {
     .addClass(this.isDialog() ? 'dialog' : 'form')
     .data('model', this);
 
+  if (this.uiCssClass) {
+    this.$container.addClass(this.uiCssClass);
+  }
+
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
   this.htmlComp.pixelBasedSizing = false;
   if (this.isDialog()) {
@@ -308,13 +312,24 @@ scout.Form.prototype.renderInitialFocus = function() {
   }
 };
 
+/**
+ * This method returns the HtmlElement (DOM node) which is used by FocusManager/FocusContext/Popup
+ * to focus the initial element. The impl. of these classes relies on HtmlElements, so we can not
+ * easily use the focus() method of scout.FormField here. Furthermore, some classes like scout.Button
+ * are sometimes 'adapted' by a ButtonAdapterMenu, which means the Button itself is not rendered, but
+ * we must know the $container of the adapter menu to focus the correct element. That's why we call
+ * the getFocusableElement() method.
+ */
 scout.Form.prototype._initialFocusElement = function() {
-  var initialFocusField = this.session.getOrCreateModelAdapter(this.initialFocus, this);
+  var focusElement,
+    initialFocusField = this.session.getOrCreateModelAdapter(this.initialFocus, this);
   if (initialFocusField) {
-    return initialFocusField.$field[0];
-  } else {
-    return this.session.focusManager.findFirstFocusableElement(this.$container);
+    focusElement = initialFocusField.getFocusableElement();
   }
+  if (!focusElement) {
+    focusElement = this.session.focusManager.findFirstFocusableElement(this.$container);
+  }
+  return focusElement;
 };
 
 scout.Form.prototype._installFocusContext = function() {

@@ -17,11 +17,13 @@ import java.util.Collection;
 import java.util.EventObject;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.scout.rt.client.ui.IModelEvent;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.dnd.TransferObject;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.CompareUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -201,12 +203,7 @@ public class TreeEvent extends EventObject implements IModelEvent {
   }
 
   public ITreeNode getDeselectedNode() {
-    if (CollectionUtility.hasElements(m_deselectedNodes)) {
-      return CollectionUtility.firstElement(m_deselectedNodes);
-    }
-    else {
-      return null;
-    }
+    return CollectionUtility.firstElement(m_deselectedNodes);
   }
 
   public Collection<ITreeNode> getDeselectedNodes() {
@@ -218,12 +215,7 @@ public class TreeEvent extends EventObject implements IModelEvent {
   }
 
   public ITreeNode getNewSelectedNode() {
-    if (CollectionUtility.hasElements(m_newSelectedNodes)) {
-      return CollectionUtility.firstElement(m_newSelectedNodes);
-    }
-    else {
-      return null;
-    }
+    return CollectionUtility.firstElement(m_newSelectedNodes);
   }
 
   public Collection<ITreeNode> getNewSelectedNodes() {
@@ -235,16 +227,66 @@ public class TreeEvent extends EventObject implements IModelEvent {
   }
 
   public ITreeNode getNode() {
-    if (CollectionUtility.hasElements(m_nodes)) {
-      return CollectionUtility.firstElement(m_nodes);
-    }
-    else {
-      return null;
-    }
+    return CollectionUtility.firstElement(m_nodes);
   }
 
   public Collection<ITreeNode> getNodes() {
     return CollectionUtility.arrayList(m_nodes);
+  }
+
+  protected Set<ITreeNode> getNodesSet() {
+    return CollectionUtility.hashSet(m_nodes);
+  }
+
+  /**
+   * Updates the nodes of this events and computes the new common parent node.
+   */
+  protected void setNodes(Collection<ITreeNode> nodes) {
+    m_nodes = nodes;
+    m_commonParentNode = TreeUtility.calculateCommonParentNode(nodes);
+  }
+
+  /**
+   * Removes all occurrences of the given nodes. Removed nodes are added to the optional node collector.
+   *
+   * @return Returns <code>true</code> if any of the given nodes has been deleted. Otherwise <code>false</code>.
+   */
+  protected boolean removeNodes(Set<ITreeNode> nodesToRemove, Set<ITreeNode> removedNodesCollector) {
+    if (CollectionUtility.isEmpty(nodesToRemove) || CollectionUtility.isEmpty(m_nodes)) {
+      return false;
+    }
+    boolean removed = false;
+    for (Iterator<? extends ITreeNode> it = m_nodes.iterator(); it.hasNext();) {
+      final ITreeNode node = TreeUtility.unwrapResolvedNode(it.next());
+      if (nodesToRemove.contains(node)) {
+        it.remove();
+        removed = true;
+        if (removedNodesCollector != null) {
+          removedNodesCollector.add(node);
+        }
+      }
+    }
+    return removed;
+  }
+
+  public boolean hasNodes() {
+    return m_nodes == null ? false : !m_nodes.isEmpty();
+  }
+
+  public int getNodeCount() {
+    return m_nodes == null ? 0 : m_nodes.size();
+  }
+
+  public boolean containsNode(ITreeNode nodeToFind) {
+    if (CollectionUtility.isEmpty(m_nodes)) {
+      return false;
+    }
+    for (ITreeNode node : m_nodes) {
+      if (CompareUtility.equals(node, nodeToFind)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   public ITreeNode getChildNode() {
@@ -372,5 +414,4 @@ public class TreeEvent extends EventObject implements IModelEvent {
     }
     return "#" + m_type;
   }
-
 }

@@ -24,9 +24,10 @@ import org.eclipse.scout.rt.platform.util.FileUtility;
 import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.Pair;
 import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.server.commons.servlet.cache.GlobalHttpResourceCache;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheKey;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheObject;
-import org.eclipse.scout.rt.server.commons.servlet.cache.HttpResourceCache;
+import org.eclipse.scout.rt.server.commons.servlet.cache.IHttpResourceCache;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.ui.html.res.IWebContentService;
 import org.slf4j.Logger;
@@ -40,18 +41,18 @@ public class HtmlDocumentParser {
 
   private static final Pattern PATTERN_KEY_VALUE = Pattern.compile("([^\"\\s]+)=\"([^\"]*)\"");
   private static final Pattern PATTERN_INCLUDE_TAG = Pattern.compile("<scout\\:include template=\"(.*)\" />", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
-  private static final Pattern PATTERN_MESSAGE_TAG = Pattern.compile("<scout\\:message(.*)/>", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
+  private static final Pattern PATTERN_MESSAGE_TAG = Pattern.compile("<scout\\:message(.*?)/>", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
   private static final Pattern PATTERN_STYLESHEET_TAG = Pattern.compile("<scout\\:stylesheet src=\"(.*?)\"(.*)/>", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
   private static final Pattern PATTERN_SCRIPT_TAG = Pattern.compile("<scout\\:script src=\"(.*?)\"(.*)/>", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
   private static final String PATTERN_BASE_TAG = "<scout\\:base\\s*/>";
 
   private final HtmlDocumentParserParameters m_params;
-  private final HttpResourceCache m_cache;
+  private final IHttpResourceCache m_cache;
   private String m_workingContent;
 
   public HtmlDocumentParser(HtmlDocumentParserParameters params) {
     m_params = params;
-    m_cache = BEANS.get(HttpResourceCache.class);
+    m_cache = BEANS.get(GlobalHttpResourceCache.class);
   }
 
   public byte[] parseDocument(byte[] document) throws IOException {

@@ -175,6 +175,13 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
    */
   String PROP_UI_SORT_POSSIBLE = "uiSortPossible";
 
+  /**
+   * type boolean
+   *
+   * @since 5.2.0
+   */
+  String PROP_LOADING = "loading";
+
   void initTable();
 
   void disposeTable();
@@ -1107,5 +1114,9 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
    * @return True if the table has a table-customizer and the {@link CreateCustomColumnPermission}, false otherwise.
    */
   boolean isCustomizable();
+
+  void setLoading(boolean loading);
+
+  boolean isLoading();
 
 }

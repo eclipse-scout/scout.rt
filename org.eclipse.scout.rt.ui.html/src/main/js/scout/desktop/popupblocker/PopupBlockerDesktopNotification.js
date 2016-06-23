@@ -37,7 +37,7 @@ scout.PopupBlockerDesktopNotification.prototype._renderMessage = function() {
 
 scout.PopupBlockerDesktopNotification.prototype._renderLinkUrl = function() {
   if (this.linkUrl) {
-    this.$link.attr('href', scout.strings.encode(this.linkUrl))
+    this.$link.attr('href', this.linkUrl)
       .attr('target', '_blank');
   } else {
     this.$link.removeAttr('href')

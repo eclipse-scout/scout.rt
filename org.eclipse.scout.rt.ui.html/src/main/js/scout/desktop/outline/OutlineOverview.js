@@ -11,6 +11,8 @@
 scout.OutlineOverview = function() {
   scout.OutlineOverview.parent.call(this);
   this.outline;
+
+  this._addEventSupport();
 };
 scout.inherits(scout.OutlineOverview, scout.Widget);
 

@@ -21,10 +21,10 @@ import org.eclipse.scout.rt.client.services.common.icon.IconSpec;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.security.SecurityUtility;
 import org.eclipse.scout.rt.platform.util.HexUtility;
-import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
+import org.eclipse.scout.rt.ui.html.res.loader.DynamicResourceInfo;
 import org.eclipse.scout.rt.ui.html.res.loader.DynamicResourceLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,13 +49,6 @@ public class BinaryResourceUrlUtility {
    * <li>2. Icon name, in the example <b>some_res</b>
    */
   public static final Pattern BINARY_RESOURCE_REGEX_PATTERN = Pattern.compile("([\"'])binaryResource:([^\"']+)\\1", Pattern.CASE_INSENSITIVE);
-
-  /**
-   * Pattern to determine if the provided url path is a dynamic resource path.
-   *
-   * @see #createDynamicAdapterResourceUrl(IJsonAdapter, String)
-   */
-  public static final Pattern PATTERN_DYNAMIC_ADAPTER_RESOURCE_PATH = Pattern.compile("^/dynamic/([^/]*)/([^/]*)/(.*)$");
 
   /**
    * @return a relative URL for a configured logical icon-name or a font-based icon. For instance:
@@ -103,7 +96,6 @@ public class BinaryResourceUrlUtility {
    * @return a relative URL for a resource handled by an adapter, see {@link DynamicResourceLoader}.
    *         <p>
    *         The calling adapter must implement {@link IBinaryResourceProvider}.
-   * @see #PATTERN_DYNAMIC_ADAPTER_RESOURCE_PATH
    */
   public static String createDynamicAdapterResourceUrl(IJsonAdapter<?> jsonAdapter, String filename) {
     if (jsonAdapter == null) {
@@ -116,16 +108,7 @@ public class BinaryResourceUrlUtility {
     if (filename == null) {
       return null;
     }
-
-    String encodedFilename = IOUtility.urlEncode(filename);
-    // / was encoded by %2F, revert this encoding otherwise filename doesn't look nice in browser download
-    // Example for filesnames containing a /:
-    // - relative reference from a unzipped zip file
-    // - another path segment was explicitly added to distinguish between same filenames
-    encodedFilename = encodedFilename.replace("%2F", "/");
-
-    // do not change this dynamic resource url format without updating the recognition pattern (@see in JavaDoc)
-    return "dynamic/" + jsonAdapter.getUiSession().getUiSessionId() + "/" + jsonAdapter.getId() + "/" + encodedFilename;
+    return new DynamicResourceInfo(jsonAdapter, filename).toPath();
   }
 
   /**

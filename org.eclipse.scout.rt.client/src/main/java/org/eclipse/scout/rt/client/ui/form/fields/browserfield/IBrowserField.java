@@ -28,6 +28,7 @@ public interface IBrowserField extends IFormField {
     AllowForms("allow-forms"),
     AllowPointerLock("allow-pointer-lock"),
     AllowPopups("allow-popups"),
+    AllowPopupsToEscapeSandbox("allow-popups-to-escape-sandbox"),
     AllowSameOrigin("allow-same-origin"),
     AllowScripts("allow-scripts"),
     AllowTopNavigation("allow-top-navigation");

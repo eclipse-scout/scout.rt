@@ -46,3 +46,18 @@ scout.NumberColumn.prototype.createAggrValueCell = function(value) {
     cssClass: 'table-aggregate-cell'
   };
 };
+
+/**
+ * @override Column.js
+ */
+scout.NumberColumn.prototype.cellValueForGrouping = function(row) {
+  var cell = this.table.cell(this, row);
+  return this._preprocessValueForGrouping(cell.value);
+};
+
+/**
+ * @override Column.js
+ */
+scout.NumberColumn.prototype._preprocessValueForGrouping = function(value) {
+  return this.decimalFormat.round(value);
+};

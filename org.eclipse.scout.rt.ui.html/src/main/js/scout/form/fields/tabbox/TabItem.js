@@ -22,6 +22,17 @@ scout.TabItem.prototype._init = function(model) {
   this._syncMenusVisible(this.menusVisible);
 };
 
+scout.TabItem.prototype._renderCssClass = function(cssClass, oldCssClass) {
+  // Call super only if the group-box is rendered or is rendering
+  if (this.$container) {
+    scout.TabItem.parent.prototype._renderCssClass.call(this, cssClass, oldCssClass);
+  }
+
+  cssClass = cssClass || this.cssClass;
+  this.$tabContainer.removeClass(oldCssClass);
+  this.$tabContainer.addClass(cssClass);
+};
+
 scout.TabItem.prototype._render = function($parent) {
   scout.TabItem.parent.prototype._render.call(this, $parent);
   // LogicalGridData.isValidateRoot would always return true which is wrong if the data has not been validated yet.
@@ -54,6 +65,7 @@ scout.TabItem.prototype.renderTab = function($parent) {
   this._renderLabel();
   this._renderMarked();
   this._renderVisible();
+  this._renderCssClass();
   this._renderTooltipText();
   this._renderErrorStatus();
   this._tabRendered = true;
@@ -138,7 +150,7 @@ scout.TabItem.prototype._syncVisible = function(visible) {
 };
 
 scout.TabItem.prototype._renderVisible = function(visible) {
-  // Call super if it is rendered or it is rendering
+  // Call super only if the group-box is rendered or is rendering
   if (this.$container) {
     scout.TabItem.parent.prototype._renderVisible.call(this, visible);
   }
