@@ -552,7 +552,7 @@ scout.Planner.prototype._renderMonthScale = function() {
 
     // hide label
     if (loop.getDate() % labelPeriod !== 0) {
-      $divSmall.addClass('labl-invisible');
+      $divSmall.addClass('label-invisible');
     }
 
     loop = scout.dates.shift(loop, 0, 0, 1);
