@@ -15,12 +15,14 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.planner.Activity;
+import org.eclipse.scout.rt.client.ui.basic.planner.DisplayModeOptions;
 import org.eclipse.scout.rt.client.ui.basic.planner.IPlanner;
 import org.eclipse.scout.rt.client.ui.basic.planner.PlannerAdapter;
 import org.eclipse.scout.rt.client.ui.basic.planner.PlannerEvent;
@@ -36,6 +38,7 @@ import org.eclipse.scout.rt.ui.html.json.JsonDateRange;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
+import org.eclipse.scout.rt.ui.html.json.MainJsonObjectFactory;
 import org.eclipse.scout.rt.ui.html.json.action.DisplayableActionFilter;
 import org.eclipse.scout.rt.ui.html.json.menu.IJsonContextMenuOwner;
 import org.eclipse.scout.rt.ui.html.json.menu.JsonContextMenu;
@@ -129,6 +132,25 @@ public class JsonPlanner<PLANNER extends IPlanner<?, ?>> extends AbstractJsonPro
       @Override
       protected Integer modelValue() {
         return getModel().getDisplayMode();
+      }
+    });
+    putJsonProperty(new JsonProperty<PLANNER>(IPlanner.PROP_DISPLAY_MODE_OPTIONS, model) {
+      @Override
+      protected Map<Integer, DisplayModeOptions> modelValue() {
+        return getModel().getDisplayModeOptions();
+      }
+
+      @SuppressWarnings("unchecked")
+      @Override
+      public Object prepareValueForToJson(Object value) {
+        if (value == null) {
+          return null;
+        }
+        JSONObject options = new JSONObject();
+        for (Entry<Integer, DisplayModeOptions> option : ((Map<Integer, DisplayModeOptions>) value).entrySet()) {
+          options.put(String.valueOf(option.getKey()), MainJsonObjectFactory.get().createJsonObject(option.getValue()).toJson());
+        }
+        return options;
       }
     });
     putJsonProperty(new JsonProperty<PLANNER>(IPlanner.PROP_VIEW_RANGE, model) {

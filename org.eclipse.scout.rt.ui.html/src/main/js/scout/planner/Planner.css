@@ -58,10 +58,6 @@
     white-space: nowrap;
     padding: 0px 5px;
 
-    &.selected {
-      background-color: @item-selection-background-color;
-    }
-
     &.label-invisible {
       color: transparent;
     }
@@ -84,6 +80,12 @@
     & > .timeline-small {
       height: 50%;
       line-height: @planner-scale-height / 2;
+
+      & > .highlight {
+        position: absolute;
+        background-color: @item-selection-background-color;
+        height: 50%;
+      }
     }
   }
 }
