@@ -1019,7 +1019,7 @@ scout.DateFormat.prototype._dateInfoToDate = function(dateInfo, startDate) {
   // due to JavaScript's automatic date correction, e.g. dateInfo = { day: 11, month: 1 }
   // and startDate = 2015-07-29 would result in invalid date 2015-03-11, because February
   // 2015 does not have 29 days and is "corrected" to March.)
-  var result = new Date(0);
+  var result = new Date(1970, 0, 1);
 
   var validMonth = scout.nvl(dateInfo.month, startDate.getMonth());
   var validYear = scout.nvl(dateInfo.year, startDate.getFullYear());
@@ -1039,37 +1039,41 @@ scout.DateFormat.prototype._dateInfoToDate = function(dateInfo, startDate) {
       }
     }
   }
-  result.setFullYear(validYear);
-  result.setMonth(validMonth);
-  result.setDate(scout.nvl(dateInfo.day, startDate.getDate()));
+  result.setFullYear(
+      validYear,
+      validMonth,
+      scout.nvl(dateInfo.day, startDate.getDate())
+  );
 
-  result.setHours(scout.nvl(dateInfo.hours, startDate.getHours()));
-  result.setMinutes(scout.nvl(dateInfo.minutes, startDate.getMinutes()));
-  result.setSeconds(scout.nvl(dateInfo.seconds, startDate.getSeconds()));
-  result.setMilliseconds(scout.nvl(dateInfo.milliseconds, startDate.getMilliseconds()));
+  result.setHours(
+      scout.nvl(dateInfo.hours, startDate.getHours()),
+      scout.nvl(dateInfo.minutes, startDate.getMinutes()),
+      scout.nvl(dateInfo.seconds, startDate.getSeconds()),
+      scout.nvl(dateInfo.milliseconds, startDate.getMilliseconds())
+  );
 
   // Validate. A date is considered valid if the value from the dateInfo did
   // not change (JS date automatically converts illegal values, e.g. day 32 is
   // converted to first day of next month).
-  if (!isValid(result.getUTCFullYear(), dateInfo.year)) {
+  if (!isValid(result.getFullYear(), dateInfo.year)) {
     return null;
   }
-  if (!isValid(result.getUTCMonth(), dateInfo.month)) {
+  if (!isValid(result.getMonth(), dateInfo.month)) {
     return null;
   }
-  if (!isValid(result.getUTCDate(), dateInfo.day)) {
+  if (!isValid(result.getDate(), dateInfo.day)) {
     return null;
   }
-  if (!isValid(result.getUTCHours(), dateInfo.hours)) {
+  if (!isValid(result.getHours(), dateInfo.hours)) {
     return null;
   }
-  if (!isValid(result.getUTCMinutes(), dateInfo.minutes)) {
+  if (!isValid(result.getMinutes(), dateInfo.minutes)) {
     return null;
   }
-  if (!isValid(result.getUTCSeconds(), dateInfo.seconds)) {
+  if (!isValid(result.getSeconds(), dateInfo.seconds)) {
     return null;
   }
-  if (!isValid(result.getUTCMilliseconds(), dateInfo.milliseconds)) {
+  if (!isValid(result.getMilliseconds(), dateInfo.milliseconds)) {
     return null;
   }
 
