@@ -1039,37 +1039,41 @@ scout.DateFormat.prototype._dateInfoToDate = function(dateInfo, startDate) {
       }
     }
   }
-  result.setFullYear(validYear);
-  result.setMonth(validMonth);
-  result.setDate(scout.nvl(dateInfo.day, startDate.getDate()));
+  result.setFullYear(
+      validYear,
+      validMonth,
+      scout.nvl(dateInfo.day, startDate.getDate())
+  );
 
-  result.setHours(scout.nvl(dateInfo.hours, startDate.getHours()));
-  result.setMinutes(scout.nvl(dateInfo.minutes, startDate.getMinutes()));
-  result.setSeconds(scout.nvl(dateInfo.seconds, startDate.getSeconds()));
-  result.setMilliseconds(scout.nvl(dateInfo.milliseconds, startDate.getMilliseconds()));
+  result.setHours(
+      scout.nvl(dateInfo.hours, startDate.getHours()),
+      scout.nvl(dateInfo.minutes, startDate.getMinutes()),
+      scout.nvl(dateInfo.seconds, startDate.getSeconds()),
+      scout.nvl(dateInfo.milliseconds, startDate.getMilliseconds())
+  );
 
   // Validate. A date is considered valid if the value from the dateInfo did
   // not change (JS date automatically converts illegal values, e.g. day 32 is
   // converted to first day of next month).
-  if (!isValid(result.getFullYear(), dateInfo.year)) {
+  if (!isValid(result.getUTCFullYear(), dateInfo.year)) {
     return null;
   }
-  if (!isValid(result.getMonth(), dateInfo.month)) {
+  if (!isValid(result.getUTCMonth(), dateInfo.month)) {
     return null;
   }
-  if (!isValid(result.getDate(), dateInfo.day)) {
+  if (!isValid(result.getUTCDate(), dateInfo.day)) {
     return null;
   }
-  if (!isValid(result.getHours(), dateInfo.hours)) {
+  if (!isValid(result.getUTCHours(), dateInfo.hours)) {
     return null;
   }
-  if (!isValid(result.getMinutes(), dateInfo.minutes)) {
+  if (!isValid(result.getUTCMinutes(), dateInfo.minutes)) {
     return null;
   }
-  if (!isValid(result.getSeconds(), dateInfo.seconds)) {
+  if (!isValid(result.getUTCSeconds(), dateInfo.seconds)) {
     return null;
   }
-  if (!isValid(result.getMilliseconds(), dateInfo.milliseconds)) {
+  if (!isValid(result.getUTCMilliseconds(), dateInfo.milliseconds)) {
     return null;
   }
 
