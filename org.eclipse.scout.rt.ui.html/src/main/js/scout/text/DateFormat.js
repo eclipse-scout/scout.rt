@@ -1039,18 +1039,14 @@ scout.DateFormat.prototype._dateInfoToDate = function(dateInfo, startDate) {
       }
     }
   }
-  result.setFullYear(
-      validYear,
-      validMonth,
-      scout.nvl(dateInfo.day, startDate.getDate())
-  );
+  result.setFullYear(validYear);
+  result.setMonth(validMonth);
+  result.setDate(scout.nvl(dateInfo.day, startDate.getDate()));
 
-  result.setHours(
-      scout.nvl(dateInfo.hours, startDate.getHours()),
-      scout.nvl(dateInfo.minutes, startDate.getMinutes()),
-      scout.nvl(dateInfo.seconds, startDate.getSeconds()),
-      scout.nvl(dateInfo.milliseconds, startDate.getMilliseconds())
-  );
+  result.setHours(scout.nvl(dateInfo.hours, startDate.getHours()));
+  result.setMinutes(scout.nvl(dateInfo.minutes, startDate.getMinutes()));
+  result.setSeconds(scout.nvl(dateInfo.seconds, startDate.getSeconds()));
+  result.setMilliseconds(scout.nvl(dateInfo.milliseconds, startDate.getMilliseconds()));
 
   // Validate. A date is considered valid if the value from the dateInfo did
   // not change (JS date automatically converts illegal values, e.g. day 32 is
