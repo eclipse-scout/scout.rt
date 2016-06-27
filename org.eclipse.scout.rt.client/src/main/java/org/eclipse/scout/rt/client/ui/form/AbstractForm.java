@@ -145,6 +145,7 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+@SuppressWarnings("deprecation")
 @FormData(value = AbstractFormData.class, sdkCommand = SdkCommand.USE)
 public abstract class AbstractForm extends AbstractPropertyObserver implements IForm, IExtensibleObject, IContributionOwner {
 
@@ -1184,7 +1185,6 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     return result.getValue();
   }
 
-  @SuppressWarnings("deprecation")
   private static Class<?> getFieldStopClass(Object data) {
     if (data instanceof AbstractTableFieldData) {
       return AbstractTableFieldData.class;
@@ -2174,7 +2174,6 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     return !isBlockingInternal();
   }
 
-  @SuppressWarnings("deprecation")
   @Override
   public boolean isFormOpen() {
     return isBlockingInternal();
@@ -2662,13 +2661,11 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     }
   }
 
-  @SuppressWarnings("deprecation")
   @Override
   public boolean isAutoAddRemoveOnDesktop() {
     return isShowOnStart();
   }
 
-  @SuppressWarnings("deprecation")
   @Override
   public void setAutoAddRemoveOnDesktop(boolean b) {
     setShowOnStart(b);

@@ -51,6 +51,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 
+@SuppressWarnings("deprecation")
 @ClassId("76887bde-6815-4f7d-9cbd-60409b49488d")
 @FormData(value = AbstractTableFieldBeanData.class, sdkCommand = SdkCommand.USE, defaultSubtypeSdkCommand = DefaultSubtypeSdkCommand.CREATE)
 public abstract class AbstractTableField<T extends ITable> extends AbstractFormField implements ITableField<T> {
@@ -257,7 +258,6 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
   }
 
   @Override
-  @SuppressWarnings("deprecation")
   public void exportFormFieldData(AbstractFormFieldData target) {
     if (m_table != null) {
       if (target instanceof AbstractTableFieldData) {
@@ -273,7 +273,6 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
   }
 
   @Override
-  @SuppressWarnings("deprecation")
   public void importFormFieldData(AbstractFormFieldData source, boolean valueChangeTriggersEnabled) {
     Assertions.assertNotNull(source);
     if (source.isValueSet()) {
