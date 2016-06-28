@@ -24,6 +24,7 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.platform.util.ScoutAssert;
+import org.eclipse.scout.testing.client.form.DynamicStringField;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -61,9 +62,17 @@ public class ListBoxTest extends AbstractListBox<Long> {
   @Test
   public void testGetForm() {
     IForm formMock = mock(IForm.class);
-    setFormInternal(formMock);
-    assertEquals(formMock, getForm());
-    assertEquals(formMock, getListBoxFilterBox().getForm());
+    DynamicStringField stringField = new DynamicStringField("id", "test");
+    addField(stringField);
+    try {
+      setFormInternal(formMock);
+      assertEquals(formMock, getForm());
+      assertEquals(formMock, getListBoxFilterBox().getForm());
+      assertEquals(formMock, stringField.getForm());
+    }
+    finally {
+      removeField(stringField);
+    }
   }
 
   /**

@@ -1067,6 +1067,19 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
           return true;
         }
 
+        final IForm formOfField = field.getForm();
+        if (formOfField == null) {
+          // either form has not been initialized or the field is part of a composite field, that does not override setForminternal -> skip
+          LOG.info("Extension properties are not exported for fields on which getForm() returns null. "
+              + "Ensure that the form is initialized and that the field's parent invokes field.setFormInternal(IForm) [exportingForm={}, field={}]",
+              AbstractForm.this.getClass().getName(), field.getClass().getName());
+          return true;
+        }
+        if (formOfField.getOuterFormField() != null) {
+          // field belongs to a wrapped form and not directly to this form -> skip
+          return true;
+        }
+
         try {
           exportExtensionProperties(field, target);
         }

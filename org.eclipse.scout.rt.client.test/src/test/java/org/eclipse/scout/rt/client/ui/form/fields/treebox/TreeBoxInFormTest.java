@@ -81,4 +81,12 @@ public class TreeBoxInFormTest {
         TREE_BOX_FILTER_BOX_CLASS_ID,
         TreeBoxTestForm.SECOND_TREE_BOX_CLASS_ID), secondClassId);
   }
+
+  @Test
+  public void testGetForm() {
+    assertEquals(m_form, m_form.getFirstTreeBox().getForm());
+    assertEquals(m_form, m_form.getFirstTreeBox().getTreeBoxFilterBox().getForm());
+    assertEquals(m_form, m_form.getFirstTreeBox().getTreeBoxFilterBox().getActiveStateRadioButtonGroup().getForm());
+    assertEquals(m_form, m_form.getFirstTreeBox().getTreeBoxFilterBox().getCheckedStateRadioButtonGroup().getForm());
+  }
 }
