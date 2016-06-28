@@ -36,12 +36,10 @@ public class WrappedFormExtensionTest extends AbstractLocalExtensionTestCase {
     BEANS.get(IExtensionRegistry.class).register(PropertyExtensionData.class, OrigFormData.class);
 
     OrigForm innerForm = new OrigForm();
-    innerForm.initForm();
     innerForm.getMainBox().getExtension(MainBoxPropertyExtension.class).setLongValue(TEST_LONG);
 
     WrappedFormFieldOuterForm outerForm = new WrappedFormFieldOuterForm();
     outerForm.getWrappedFormField().setInnerForm(innerForm);
-    outerForm.initForm();
     outerForm.getStringField().setValue(TEST_STRING);
 
     WrappedFormFieldOuterFormData formData = new WrappedFormFieldOuterFormData();
@@ -52,24 +50,59 @@ public class WrappedFormExtensionTest extends AbstractLocalExtensionTestCase {
   }
 
   @Test
+  public void testExportInnerForm() {
+    BEANS.get(IExtensionRegistry.class).register(MainBoxPropertyExtension.class, MainBox.class);
+    BEANS.get(IExtensionRegistry.class).register(PropertyExtensionData.class, OrigFormData.class);
+
+    OrigForm innerForm = new OrigForm();
+    innerForm.getMainBox().getExtension(MainBoxPropertyExtension.class).setLongValue(TEST_LONG);
+
+    WrappedFormFieldOuterForm outerForm = new WrappedFormFieldOuterForm();
+    outerForm.getWrappedFormField().setInnerForm(innerForm);
+    outerForm.getStringField().setValue(TEST_STRING);
+
+    OrigFormData formData = new OrigFormData();
+    innerForm.exportFormData(formData);
+
+    assertEquals(TEST_LONG, formData.getContribution(PropertyExtensionData.class).getLongValue());
+  }
+
+  @Test
   public void testImportOuterForm() {
     BEANS.get(IExtensionRegistry.class).register(MainBoxPropertyExtension.class, MainBox.class);
     BEANS.get(IExtensionRegistry.class).register(PropertyExtensionData.class, OrigFormData.class);
 
     OrigForm innerForm = new OrigForm();
-    innerForm.initForm();
     innerForm.getFirstStringField().setValue(TEST_STRING);
     innerForm.getMainBox().getExtension(MainBoxPropertyExtension.class).setLongValue(TEST_LONG);
 
     WrappedFormFieldOuterForm outerForm = new WrappedFormFieldOuterForm();
     outerForm.getWrappedFormField().setInnerForm(innerForm);
-    outerForm.initForm();
 
     WrappedFormFieldOuterFormData formData = new WrappedFormFieldOuterFormData();
     formData.getString().setValue(TEST_STRING);
     outerForm.importFormData(formData);
 
-    assertEquals(TEST_STRING, formData.getString().getValue());
+    assertEquals(TEST_STRING, outerForm.getStringField().getValue());
+    assertEquals(TEST_LONG, innerForm.getMainBox().getExtension(MainBoxPropertyExtension.class).getLongValue());
+  }
+
+  @Test
+  public void testImportInnerForm() {
+    BEANS.get(IExtensionRegistry.class).register(MainBoxPropertyExtension.class, MainBox.class);
+    BEANS.get(IExtensionRegistry.class).register(PropertyExtensionData.class, OrigFormData.class);
+
+    OrigForm innerForm = new OrigForm();
+
+    WrappedFormFieldOuterForm outerForm = new WrappedFormFieldOuterForm();
+    outerForm.getWrappedFormField().setInnerForm(innerForm);
+
+    OrigFormData formData = new OrigFormData();
+    formData.getFirstString().setValue(TEST_STRING);
+    formData.getContribution(PropertyExtensionData.class).setLongValue(TEST_LONG);
+    innerForm.importFormData(formData);
+
+    assertEquals(TEST_STRING, innerForm.getFirstStringField().getValue());
     assertEquals(TEST_LONG, innerForm.getMainBox().getExtension(MainBoxPropertyExtension.class).getLongValue());
   }
 }

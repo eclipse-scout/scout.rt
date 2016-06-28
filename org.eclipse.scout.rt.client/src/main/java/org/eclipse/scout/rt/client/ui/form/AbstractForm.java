@@ -1075,8 +1075,8 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
               AbstractForm.this.getClass().getName(), field.getClass().getName());
           return true;
         }
-        if (formOfField.getOuterFormField() != null) {
-          // field belongs to a wrapped form and not directly to this form -> skip
+        if (formOfField != AbstractForm.this) {
+          // field belongs to another form -> skip
           return true;
         }
 
