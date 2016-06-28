@@ -260,6 +260,7 @@
     border: 2px solid @border-color;
     border-radius: 3px;
     background-color: @control-background-color;
+    text-align: center;
   }
 
   .checkbox-disabled() {
