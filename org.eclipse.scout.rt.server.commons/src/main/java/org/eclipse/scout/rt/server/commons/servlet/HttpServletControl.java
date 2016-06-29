@@ -63,9 +63,7 @@ public class HttpServletControl {
    * <ul>
    * <li><b>default-src 'self'</b><br>
    * Only accept 'self' sources by default.</li>
-   * <li><b>script-src 'self' 'unsafe-inline' 'unsafe-eval'</b><br>
-   * Unsafe-inline is necessary for the bootstrapping process (index.html uses an inline script block).<br>
-   * Unsafe-eval is necessary for the number field.</li>
+   * <li><b>script-src 'self'</b><br>
    * <li><b>style-src 'self' 'unsafe-inline'</b><br>
    * Without inline styling many widgets would not work as expected.</li>
    * <li><b>frame-src *; child-src *</b><br>
@@ -79,7 +77,7 @@ public class HttpServletControl {
   protected Map<String, String> getCspDirectives() {
     Map<String, String> cspDirectives = new LinkedHashMap<>();
     cspDirectives.put("default-src", "'self'");
-    cspDirectives.put("script-src", "'self' 'unsafe-inline' 'unsafe-eval'");
+    cspDirectives.put("script-src", "'self'");
     cspDirectives.put("style-src", "'self' 'unsafe-inline'");
     cspDirectives.put("frame-src", "*");
     cspDirectives.put("child-src", "*");
