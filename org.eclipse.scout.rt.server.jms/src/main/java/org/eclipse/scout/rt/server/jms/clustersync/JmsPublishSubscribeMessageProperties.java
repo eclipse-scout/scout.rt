@@ -50,4 +50,20 @@ public final class JmsPublishSubscribeMessageProperties {
       return "jms.publishSubscribeMessageTopic";
     }
   }
+
+  public static class JndiUsername extends AbstractStringConfigProperty {
+
+    @Override
+    public String getKey() {
+      return "jms.jndiUsername";
+    }
+  }
+
+  public static class JndiPassword extends AbstractStringConfigProperty {
+
+    @Override
+    public String getKey() {
+      return "jms.jndiPassword";
+    }
+  }
 }

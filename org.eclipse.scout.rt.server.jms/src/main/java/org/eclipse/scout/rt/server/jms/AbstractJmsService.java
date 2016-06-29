@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.server.jms;
 
 import java.util.Date;
+import java.util.Hashtable;
 
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
@@ -22,9 +23,11 @@ import javax.jms.Session;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
+import org.eclipse.scout.rt.platform.config.IConfigProperty;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.ApplicationVersionProperty;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.service.IService;
+import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 import org.eclipse.scout.rt.platform.util.date.DateUtility;
 import org.eclipse.scout.rt.server.services.common.clustersync.IClusterSynchronizationService;
@@ -124,5 +127,22 @@ public abstract class AbstractJmsService<T> implements IService {
     sb.append("registered at ");
     sb.append(DateUtility.format(new Date(), "yyyy-MM-dd HH:mm:ss,SSS"));
     return sb.toString();
+  }
+
+  /**
+   * Adds the value of a scout configuration property under the given envPropertyname to the environment. If the scout
+   * configuration property resolves to <code>null</code>, the value is not added ({@link Hashtable} requires keys and
+   * values not to be <code>null</code>).
+   *
+   * @return Returns <code>true</code> if the value has been added. Otherwise <code>false</code>.
+   */
+  protected boolean addConfigPropertyToEnvironment(Hashtable<Object, Object> env, Class<? extends IConfigProperty<String>> configPropertyClass, String envPropertyName) {
+    Assertions.assertNotNull(envPropertyName, "envPropertyName must not be null");
+    String value = CONFIG.getPropertyValue(configPropertyClass);
+    if (value == null) {
+      return false;
+    }
+    env.put(envPropertyName, value);
+    return true;
   }
 }

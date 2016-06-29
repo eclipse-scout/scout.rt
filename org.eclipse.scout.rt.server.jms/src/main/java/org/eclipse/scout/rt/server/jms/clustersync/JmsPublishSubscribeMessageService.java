@@ -29,7 +29,9 @@ import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.server.jms.AbstractSimpleJmsService;
 import org.eclipse.scout.rt.server.jms.clustersync.JmsPublishSubscribeMessageProperties.JndiConnectionFactory;
 import org.eclipse.scout.rt.server.jms.clustersync.JmsPublishSubscribeMessageProperties.JndiInitialContextFactory;
+import org.eclipse.scout.rt.server.jms.clustersync.JmsPublishSubscribeMessageProperties.JndiPassword;
 import org.eclipse.scout.rt.server.jms.clustersync.JmsPublishSubscribeMessageProperties.JndiProviderUrl;
+import org.eclipse.scout.rt.server.jms.clustersync.JmsPublishSubscribeMessageProperties.JndiUsername;
 import org.eclipse.scout.rt.server.jms.clustersync.JmsPublishSubscribeMessageProperties.PublishSubscribeTopic;
 import org.eclipse.scout.rt.server.services.common.clustersync.IClusterNotificationMessage;
 import org.eclipse.scout.rt.server.services.common.clustersync.IPublishSubscribeMessageListener;
@@ -58,16 +60,7 @@ public class JmsPublishSubscribeMessageService extends AbstractSimpleJmsService<
   protected void initializeService() {
     try {
       Hashtable<Object, Object> env = new Hashtable<>();
-      String value = CONFIG.getPropertyValue(JndiInitialContextFactory.class);
-      if (value != null) {
-        env.put(Context.INITIAL_CONTEXT_FACTORY, value);
-      }
-
-      value = CONFIG.getPropertyValue(JndiProviderUrl.class);
-      if (value != null) {
-        env.put(Context.PROVIDER_URL, value);
-      }
-
+      setupInitialContextEnvironment(env);
       InitialContext context = new InitialContext(env.isEmpty() ? null : env);
 
       m_connectionFactory = (ConnectionFactory) context.lookup(CONFIG.getPropertyValue(JndiConnectionFactory.class));
@@ -76,6 +69,16 @@ public class JmsPublishSubscribeMessageService extends AbstractSimpleJmsService<
     catch (NamingException e) {
       throw new PlatformException("cannot setup jms", e);
     }
+  }
+
+  /**
+   * Sets-up the environment used for creating an {@link InitialContext}.
+   */
+  protected void setupInitialContextEnvironment(Hashtable<Object, Object> env) {
+    addConfigPropertyToEnvironment(env, JndiInitialContextFactory.class, Context.INITIAL_CONTEXT_FACTORY);
+    addConfigPropertyToEnvironment(env, JndiProviderUrl.class, Context.PROVIDER_URL);
+    addConfigPropertyToEnvironment(env, JndiUsername.class, Context.SECURITY_PRINCIPAL);
+    addConfigPropertyToEnvironment(env, JndiPassword.class, Context.SECURITY_CREDENTIALS);
   }
 
   @Override
