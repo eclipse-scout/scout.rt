@@ -65,7 +65,7 @@ scout.FormFieldLayout.prototype.layout = function($container) {
       left += labelWidth;
     } else if (formField.labelPosition === scout.FormField.LABEL_POSITION_TOP) {
       formField.$label.cssHeight(this.rowHeight);
-      top += this.rowHeight;
+      top += formField.$label.outerHeight(true);
       labelHasFieldWidth = true;
     }
   }
