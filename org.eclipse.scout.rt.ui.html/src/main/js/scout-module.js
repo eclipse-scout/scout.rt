@@ -308,6 +308,7 @@
   __include("scout/form/fields/listbox/ListBox.js");
   __include("scout/form/fields/listbox/ListBoxLayout.js");
   __include("scout/form/fields/numberfield/NumberField.js");
+  __include("scout/form/fields/numberfield/Calculator.js");
   __include("scout/form/fields/placeholder/PlaceholderField.js");
   __include("scout/form/fields/plannerfield/PlannerField.js");
   __include("scout/form/fields/radiobutton/RadioButton.js");

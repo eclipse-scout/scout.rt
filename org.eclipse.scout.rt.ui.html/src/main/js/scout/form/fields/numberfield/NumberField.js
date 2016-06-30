@@ -18,6 +18,7 @@ scout.NumberField.prototype._init = function(model) {
   if (!(this.decimalFormat instanceof scout.DecimalFormat)) {
     this.decimalFormat = new scout.DecimalFormat(this.session.locale, this.decimalFormat);
   }
+  this.calc = new scout.Calculator();
 };
 
 /**
@@ -89,13 +90,11 @@ scout.NumberField.prototype._parse = function() {
       .replace(/\s/g, '');
 
     // if only math symbols are in the input string...
-    if (input.match(/^[\d\(\)\+\-\*\/\.]+$/)) {
-      // Remove leading zeros from numbers to prevent interpretation as octal value (e.g. '00.025+025' --> '0.025+25')
-      input = input.replace(/(^|[^\d\.])0+(\d+)/g, '$1$2');
+    if (this.calc.isFormula(input)) {
       // ...evaluate, reformat the result and set is to the field. If the display text
       // changed, ValueField.js will make sure, the new value is sent to the model.
       try {
-        input = eval(input);
+        input = this.calc.evalFormula(input);
         input = this.decimalFormat.format(input, false);
         this.$field.val(input);
       } catch (err) {
