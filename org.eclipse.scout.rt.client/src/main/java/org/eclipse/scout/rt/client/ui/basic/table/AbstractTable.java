@@ -140,6 +140,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     String SORTING = "sorting";
     String WIDTHS = "widths";
     String BACKGROUND_EFFECTS = "backgroundEffects";
+    String FILTERS = "filters";
   }
 
   private boolean m_initialized;
@@ -1254,6 +1255,21 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       if (m_rowFilters.remove(filter)) {
         applyRowFilters();
       }
+    }
+  }
+
+  public void removeRowFilters() {
+    removeRowFilters(true);
+  }
+
+  public void removeRowFilters(boolean applyRowFilters) {
+    for (ITableRowFilter filter : getRowFilters()) {
+      if (filter instanceof UserTableRowFilter) {
+        m_rowFilters.remove(filter);
+      }
+    }
+    if (applyRowFilters) {
+      applyRowFilters();
     }
   }
 
@@ -3553,13 +3569,19 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   @Override
+  public void resetColumnFilters() {
+    resetColumns(CollectionUtility.hashSet(IResetColumnsOption.FILTERS));
+  }
+
+  @Override
   public void resetColumns() {
     resetColumns(CollectionUtility.hashSet(
         IResetColumnsOption.VISIBILITY,
         IResetColumnsOption.ORDER,
         IResetColumnsOption.SORTING,
         IResetColumnsOption.WIDTHS,
-        IResetColumnsOption.BACKGROUND_EFFECTS));
+        IResetColumnsOption.BACKGROUND_EFFECTS,
+        IResetColumnsOption.FILTERS));
   }
 
   protected void resetColumns(Set<String> options) {
@@ -3622,6 +3644,10 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
           ((INumberColumn) col).setBackgroundEffect(((INumberColumn) col).getInitialBackgroundEffect());
         }
       }
+    }
+
+    if (options.contains(IResetColumnsOption.FILTERS)) {
+      removeRowFilters();
     }
   }
 
@@ -4710,7 +4736,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       try {
         pushUIProcessor();
         // Remove existing filter first, so that only one UserTableRowFilter is active
-        removeUserRowFilters();
+        removeRowFilters(false);
 
         // Create and add a new filter
         UserTableRowFilter filter = new UserTableRowFilter(rows);
@@ -4724,21 +4750,11 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       }
     }
 
-    protected void removeUserRowFilters() {
-      for (ITableRowFilter filter : getRowFilters()) {
-        if (filter instanceof UserTableRowFilter) {
-          // Do not use removeRowFilter to prevent applyRowFilters
-          m_rowFilters.remove(filter);
-        }
-      }
-    }
-
     @Override
     public void removeFilteredRowsFromUI() {
       try {
         pushUIProcessor();
-        removeUserRowFilters();
-        applyRowFilters();
+        removeRowFilters();
       }
       finally {
         popUIProcessor();
