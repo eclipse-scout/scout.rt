@@ -25,7 +25,7 @@ scout.Calculator.prototype.isFormula = function(input) {
 };
 
 scout.Calculator.prototype.evalFormula = function(input) {
-  this.tokens = input
+  this._tokens = input
     .split(/([\d.]+|\(|\)|[\+\-\*\/])/)
     .filter(function(e) {
       return e.length !== 0;
@@ -34,34 +34,20 @@ scout.Calculator.prototype.evalFormula = function(input) {
 };
 
 scout.Calculator.prototype._next = function() {
-  if (this.tokens.length === 0) {
+  if (this._tokens.length === 0) {
     return undefined;
   }
-  return this.tokens[0];
+  return this._tokens[0];
 };
 
 scout.Calculator.prototype._consumeNext = function() {
-  var cur = this.tokens[0];
-  this.tokens = this.tokens.slice(1, this.tokens.length);
+  var cur = this._tokens[0];
+  this._tokens = this._tokens.slice(1, this._tokens.length);
   return cur;
 };
 
 scout.Calculator.prototype._expr = function() {
   return this._sum();
-};
-
-//(a)
-scout.Calculator.prototype._group = function() {
-  if (this._next() == '(') {
-    this._consumeNext();
-    var v = this._expr();
-    if (this._next() != ')') {
-      throw 'missing closing bracket';
-    }
-    this._consumeNext();
-    return v;
-  }
-  return undefined;
 };
 
 //a+b+...
@@ -113,3 +99,18 @@ scout.Calculator.prototype._unary = function() {
   v = this._consumeNext();
   return qualifier * v;
 };
+
+//(a)
+scout.Calculator.prototype._group = function() {
+  if (this._next() == '(') {
+    this._consumeNext();
+    var v = this._expr();
+    if (this._next() != ')') {
+      throw 'missing closing bracket';
+    }
+    this._consumeNext();
+    return v;
+  }
+  return undefined;
+};
+
