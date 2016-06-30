@@ -161,3 +161,10 @@ scout.ProposalChooser.prototype._onActiveFilterChanged = function(radioValue) {
     state: radioValue
   });
 };
+
+scout.ProposalChooser.prototype.setFixedWidth = function(fixedWidth) {
+  this.fixedWidth = fixedWidth;
+  if (this.model instanceof scout.Table) {
+    this.model.setFixedWidth(fixedWidth);
+  }
+};

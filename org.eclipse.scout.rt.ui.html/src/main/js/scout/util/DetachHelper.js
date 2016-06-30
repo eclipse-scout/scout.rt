@@ -40,49 +40,18 @@ scout.DetachHelper.prototype.afterAttach = function($container) {
   this._restoreFocusAndFocusContext($container);
 };
 
+/**
+ * Stores the position of all scrollables that belong to this session.
+ */
 scout.DetachHelper.prototype._storeScrollPositions = function($container) {
-  var scrollTop, scrollLeft, $scrollables = scout.scrollbars.getScrollables(this.session);
-  if (!$scrollables) {
-    return;
-  }
-
-  for (var i = 0; i < $scrollables.length; i++) {
-    if ($container.isOrHas($scrollables[i][0])) {
-      scrollTop = $scrollables[i].scrollTop();
-      $scrollables[i].data('scrollTop', scrollTop);
-      scrollLeft = $scrollables[i].scrollLeft();
-      $scrollables[i].data('scrollLeft', $scrollables[i].scrollLeft());
-
-      $.log.debug('Stored scroll position for ' + $scrollables[i].attr('class') + '. Top: ' + scrollTop + '. Left: ' + scrollLeft);
-    }
-  }
+  scout.scrollbars.storeScrollPositions($container, this.session);
 };
 
+/**
+ * Restores the position of all scrollables that belong to this session.
+ */
 scout.DetachHelper.prototype._restoreScrollPositions = function($container) {
-  var scrollTop, scrollLeft, $scrollables = scout.scrollbars.getScrollables(this.session);
-  if (!$scrollables) {
-    return;
-  }
-
-  for (var i = 0; i < $scrollables.length; i++) {
-    if ($container.isOrHas($scrollables[i][0])) {
-      scrollTop = $scrollables[i].data('scrollTop');
-      if (scrollTop) {
-        $scrollables[i].scrollTop(scrollTop);
-        $scrollables[i].removeData('scrollTop');
-      }
-      scrollLeft = $scrollables[i].data('scrollLeft');
-      if (scrollLeft) {
-        $scrollables[i].scrollLeft(scrollLeft);
-        $scrollables[i].removeData('scrollLeft');
-      }
-      // Also make sure that scroll bar is up to date
-      // Introduced for use case: Open large table page, edit entry, press f5
-      // -> outline tab gets rendered, scrollbar gets updated with set timeout, outline tab gets detached -> update event never had any effect because it executed after detaching (due to set timeout)
-      scout.scrollbars.update($scrollables[i]);
-      $.log.debug('Restored scroll position for ' + $scrollables[i].attr('class') + '. Top: ' + scrollTop + '. Left: ' + scrollLeft);
-    }
-  }
+  scout.scrollbars.restoreScrollPositions($container, this.session);
 };
 
 scout.DetachHelper.prototype._storeTooltips = function($container) {

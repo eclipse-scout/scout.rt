@@ -50,6 +50,7 @@ scout.Table = function(model) {
   this.viewRangeSize = 10;
   this.viewRangeRendered = new scout.Range(0, 0);
   this._filterMenusHandler = this._filterMenus.bind(this);
+  this.fixedWidth = false;
 };
 scout.inherits(scout.Table, scout.ModelAdapter);
 
@@ -330,7 +331,15 @@ scout.Table.prototype._syncTableControls = function(controls) {
   }, this);
 };
 
+/**
+ * When an IMG has been loaded we must update the stored height in the model-row.
+ * Note: we don't change the width of the row or table.
+ */
 scout.Table.prototype._onImageLoadOrError = function(event) {
+  var
+    $row = $(event.target).closest('.table-row'),
+    row = $row.data('row');
+  row.height = $row.outerHeight(true);
   this.invalidateLayoutTree();
 };
 
@@ -1050,9 +1059,11 @@ scout.Table.prototype._calculateRowBorderWidth = function() {
 };
 
 scout.Table.prototype._updateRowWidth = function() {
-  this.rowWidth = this.rowBorderWidth;
-  for (var i = 0; i < this.columns.length; i++) {
-    this.rowWidth += this.columns[i].width;
+  if (!this.fixedWidth) {
+    this.rowWidth = this.rowBorderWidth;
+    for (var i = 0; i < this.columns.length; i++) {
+      this.rowWidth += this.columns[i].width;
+    }
   }
 };
 
@@ -3847,6 +3858,10 @@ scout.Table.prototype._detach = function() {
   // To make it work scrollTop needs to be reseted here otherwise viewport won't be rendered by _onDataScroll
   this.scrollTop = 0;
   scout.Table.parent.prototype._detach.call(this);
+};
+
+scout.Table.prototype.setFixedWidth = function(fixedWidth) {
+  this.fixedWidth = fixedWidth;
 };
 
 /* --- STATIC HELPERS ------------------------------------------------------------- */

@@ -38,6 +38,7 @@ scout.SmartFieldPopup.prototype._renderProposalChooser = function(proposalChoose
   proposalChooser.render(this.$container);
   proposalChooser.setParent(this);
   this.revalidateLayout();
+  proposalChooser.setFixedWidth(true);
 };
 
 /**

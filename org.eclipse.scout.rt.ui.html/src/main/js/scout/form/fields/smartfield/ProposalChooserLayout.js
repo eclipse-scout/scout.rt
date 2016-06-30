@@ -23,6 +23,7 @@ scout.ProposalChooserLayout.TYPE_HANDLER = {
 
   TABLE: {
     _table: null,
+    _fillerWidth: null,
     cssSelector: '.table',
     prepare: function($container, layout) {
       this._table = layout._proposalChooser.model;
@@ -38,12 +39,12 @@ scout.ProposalChooserLayout.TYPE_HANDLER = {
         .css('height', 'auto');
       this._table.$data
         .css('display', 'inline-block');
-      if (this._table.$fillBefore) {
-        this._table.$fillBefore.css('width', '');
+
+      if (!this._table.fixedWidth) {
+        this.modifyFiller(this._table.$fillBefore);
+        this.modifyFiller(this._table.$fillAfter);
       }
-      if (this._table.$fillAfter) {
-        this._table.$fillAfter.css('width', '');
-      }
+
       var $rows = this._table.$rows();
       $rows.each(function(i, elem) {
         var $row = $(elem);
@@ -53,6 +54,14 @@ scout.ProposalChooserLayout.TYPE_HANDLER = {
           .css('max-width', '');
       }.bind(this));
     },
+
+    modifyFiller: function($filler) {
+      if ($filler) {
+        this._fillerWidth = $filler.css('width');
+        $filler.css('width', '');
+      }
+    },
+
     restoreDom: function($container) {
       this._table.$container
         .css('display', 'block')
@@ -60,6 +69,17 @@ scout.ProposalChooserLayout.TYPE_HANDLER = {
         .css('height', '100%');
       this._table.$data
         .css('display', 'block');
+
+      if (!this._table.fixedWidth) {
+        this.restoreFiller(this._table.$fillBefore);
+        this.restoreFiller(this._table.$fillAfter);
+      }
+    },
+
+    restoreFiller: function($filler) {
+      if ($filler) {
+        $filler.css('width', this._fillerWidth);
+      }
     }
   },
 
@@ -136,30 +156,41 @@ scout.ProposalChooserLayout.prototype.layout = function($container) {
 };
 
 /**
- * This preferred size implementation creates a temporary/hidden DIV on which the table/tree is rendered
- * Then the size of this DIV is read. Thus this reads the effective size of the component on the screen
- * and doesn't try to find the preferred size by algorithm.
+ * This preferred size implementation modifies the DIV where the table/tree is rendered
+ * in a way the DIV does not limit the size of the table/tree. Thus we can read the preferred
+ * size of the table/tree. After that the original width and height is restored.
  */
 scout.ProposalChooserLayout.prototype.preferredLayoutSize = function($container) {
   var oldDisplay, prefSize, modelSize, statusSize, activeFilterSize, filterPrefSize,
+    pcWidth, pcHeight,
     htmlComp = this._proposalChooser.htmlComp,
     $status = this._proposalChooser.$status,
-    filter = this._proposalChooser.activeFilterGroup;
+    filter = this._proposalChooser.activeFilterGroup,
+    detachHelper = this._proposalChooser.session.detachHelper;
 
   this._typeHandler.prepare($container, this);
-
   modelSize = this._proposalChooser.model.htmlComp.getPreferredSize();
   prefSize = modelSize;
+  detachHelper._storeScrollPositions($container);
 
   // pref size of table and tree don't return accurate values for width -> measure width
+  pcWidth = $container.css('width');
+  pcHeight = $container.css('height');
+
   this._typeHandler.modifyDom($container);
   $container
     .css('display', 'inline-block')
     .css('width', 'auto')
     .css('height', 'auto');
-  modelSize.width = scout.graphics.prefSize($container).width;
+  modelSize.width = scout.graphics.prefSize($container, undefined, {restoreScrollPositions: false}).width;
+
   this._typeHandler.restoreDom($container);
-  $container.css('display', 'block');
+  $container
+    .css('display', 'block')
+    .css('width', pcWidth)
+    .css('height', pcHeight);
+
+  detachHelper._restoreScrollPositions($container);
 
   if ($status && $status.isVisible()) {
     oldDisplay = $status.css('display');

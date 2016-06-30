@@ -60,7 +60,7 @@ scout.SmartFieldPopupLayout.prototype.preferredLayoutSize = function($container)
   prefSize.width = Math.max(fieldBounds.width, prefSize.width);
   prefSize.height = Math.max(15, Math.min(350, prefSize.height)); // at least some pixels height in case there is no data, no status, no active filter
 
-  if(prefSize.width > this._maxWindowSize()){
+  if (prefSize.width > this._maxWindowSize()) {
     prefSize.width = this._maxWindowSize();
   }
 
@@ -72,5 +72,5 @@ scout.SmartFieldPopupLayout.prototype._htmlProposalChooser = function($container
 };
 
 scout.SmartFieldPopupLayout.prototype._maxWindowSize = function() {
-  return this.popup.$container.window().width()-(2*this.popup.windowPaddingX);
+  return this.popup.$container.window().width() - (2 * this.popup.windowPaddingX);
 };

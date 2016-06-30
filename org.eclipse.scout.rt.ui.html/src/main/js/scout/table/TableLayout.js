@@ -71,7 +71,8 @@ scout.TableLayout.prototype.layout = function($container) {
     this.table.cellEditorPopup.position();
     this.table.cellEditorPopup.pack();
   }
-  scout.scrollbars.update(this.table.$data);
+
+  this.table.updateScrollbars();
 };
 
 /**
