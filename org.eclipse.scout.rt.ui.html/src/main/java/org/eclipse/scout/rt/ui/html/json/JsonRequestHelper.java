@@ -20,6 +20,8 @@ import javax.servlet.ServletResponse;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruption;
+import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruption.IRestorer;
 import org.eclipse.scout.rt.ui.html.UiException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -125,6 +127,10 @@ public class JsonRequestHelper {
       servletResponse.setContentType("application/json");
     }
     servletResponse.setCharacterEncoding(StandardCharsets.UTF_8.name());
+
+    // Clear the current thread's interruption status before writing the response to the output stream.
+    // Otherwise, the stream gets silently corrupted, which makes the client to loose the connection.
+    IRestorer interruption = ThreadInterruption.clear();
     try {
       servletResponse.getOutputStream().write(data);
     }
@@ -138,6 +144,9 @@ public class JsonRequestHelper {
       }
       LOG.warn(sb.toString());
       return;
+    }
+    finally {
+      interruption.restore();
     }
     LOG.debug("Returned: {}", jsonText);
   }
