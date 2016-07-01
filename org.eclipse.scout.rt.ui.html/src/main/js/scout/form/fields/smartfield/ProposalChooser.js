@@ -89,19 +89,20 @@ scout.ProposalChooser.prototype._setStatusMessage = function(message) {
 
 scout.ProposalChooser.prototype._appendOption = function(group, value, text, selected) {
   var radio = scout.create('RadioButton', {
-      parent: group,
-      label: text,
-      radioValue: value,
-      selected: selected
-    }),
-    that = this;
-  radio._mouseDown = function(event) {
-    this.select();
-  };
-  radio._send = function() {
-    that._onActiveFilterChanged(this.radioValue);
-  };
-  group.formFields.push(radio);
+    parent: group,
+    label: text,
+    radioValue: value,
+    selected: this.activeFilter === value,
+    focusWhenSelected: false
+  });
+
+  radio.on('propertyChange', function(event) {
+    if (event.changedProperties.indexOf('selected') !== -1 && event.newProperties.selected === true) {
+      this._onActiveFilterChanged(event.source.radioValue);
+    }
+  }.bind(this));
+
+  group.addButton(radio);
 };
 
 scout.ProposalChooser.prototype._onActiveFilterChanged = function(radioValue) {

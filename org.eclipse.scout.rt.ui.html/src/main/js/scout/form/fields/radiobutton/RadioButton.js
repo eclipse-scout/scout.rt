@@ -10,6 +10,8 @@
  ******************************************************************************/
 scout.RadioButton = function() {
   scout.RadioButton.parent.call(this);
+
+  this.focusWhenSelected;
 };
 scout.inherits(scout.RadioButton, scout.Button);
 
@@ -21,6 +23,11 @@ scout.RadioButton.prototype._initDefaultKeyStrokes = function(keyStrokeContext) 
     new scout.RadioButtonKeyStroke(this, 'ENTER'),
     new scout.RadioButtonKeyStroke(this, 'SPACE')
   ]);
+};
+
+scout.RadioButton.prototype._init = function(model) {
+  scout.RadioButton.parent.prototype._init.call(this, model);
+  this.focusWhenSelected = scout.nvl(model.focusWhenSelected, !scout.device.supportsFocusEmptyBeforeDiv());
 };
 
 scout.RadioButton.prototype._render = function($parent) {
@@ -42,7 +49,7 @@ scout.RadioButton.prototype._remove = function($parent) {
 
 scout.RadioButton.prototype._mouseDown = function(event) {
   this.select();
-  if (scout.device.supportsFocusEmptyBeforeDiv) {
+  if (this.focusWhenSelected) {
     this.session.focusManager.requestFocus(this.$field);
     event.preventDefault();
   }
@@ -67,7 +74,6 @@ scout.RadioButton.prototype.setSelected = function(selected) {
   this._sendProperty('selected');
   if (this.rendered) {
     this._renderSelected();
-    this.$field.focus();
   }
 };
 
