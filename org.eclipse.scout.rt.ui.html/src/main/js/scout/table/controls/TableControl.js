@@ -163,7 +163,7 @@ scout.TableControl.prototype.setSelected = function(selected, notifyServer, clos
   if (selected === this.selected) {
     return;
   }
-//TODO cgu: this.tableFooter can be null
+
   if (this.tableFooter && this.tableFooter.selectedControl && this.tableFooter.selectedControl !== this) {
     this.tableFooter.selectedControl.setSelected(false, true, false);
   }
