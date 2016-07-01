@@ -889,10 +889,30 @@ describe("Table", function() {
       expect(table.columns[1].width).toBe(350);
     });
 
+    it("does not make the column smaller than the initial size", function() {
+      var model = helper.createModelFixture(2);
+      model.columns[0].initialWidth = 100;
+      model.columns[1].initialWidth = 200;
+      var table = helper.createTable(model);
+      table.render(session.$entryPoint);
+      table.$data.width(240);
+
+      var event = createPropertyChangeEvent(table, {
+        "autoResizeColumns": true
+      });
+      table.onModelPropertyChange(event);
+
+      // Triggers TableLayout._layoutColumns()
+      table.revalidateLayout();
+
+      expect(table.columns[0].width).toBe(100); // would be 80, but does not get smaller than initialSize
+      expect(table.columns[1].width).toBe(200); // would be 160, but does not get smaller than initialSize
+    });
+
     it("does not make the column smaller than a minimum size", function() {
       var model = helper.createModelFixture(2);
       model.columns[0].initialWidth = 1000;
-      model.columns[1].initialWidth = 10;
+      model.columns[1].initialWidth = scout.Column.DEFAULT_MIN_WIDTH - 10;
       var table = helper.createTable(model);
       table.render(session.$entryPoint);
       table.$data.width(450);
@@ -905,7 +925,7 @@ describe("Table", function() {
       // Triggers TableLayout._layoutColumns()
       table.revalidateLayout();
 
-      expect(table.columns[0].width).toBe(450 - scout.Column.DEFAULT_MIN_WIDTH);
+      expect(table.columns[0].width).toBe(1000);
       expect(table.columns[1].width).toBe(scout.Column.DEFAULT_MIN_WIDTH);
     });
 
