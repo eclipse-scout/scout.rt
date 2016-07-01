@@ -542,6 +542,17 @@ scout.SmartField.prototype.openPopup = function() {
 };
 
 /**
+ * Returns true if the smart-field lookup returns a lot of rows. In that case
+ * the proposal chooser must create a table with virtual scrolling, which means
+ * only the rows visible in the UI are rendered in the DOM. By default we render
+ * all rows, since this avoids problems with layout-invalidation with rows
+ * that have a bitmap-image (PNG) which is loaded asynchronously.
+ */
+scout.SmartField.prototype.virtual = function() {
+  return this.browseMaxRowCount > 100;
+};
+
+/**
  * @override ValueField.js
  */
 scout.SmartField.prototype.acceptInput = function(whileTyping) {

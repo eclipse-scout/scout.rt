@@ -162,9 +162,8 @@ scout.ProposalChooser.prototype._onActiveFilterChanged = function(radioValue) {
   });
 };
 
-scout.ProposalChooser.prototype.setFixedWidth = function(fixedWidth) {
-  this.fixedWidth = fixedWidth;
+scout.ProposalChooser.prototype.setVirtual = function(virtual) {
   if (this.model instanceof scout.Table) {
-    this.model.setFixedWidth(fixedWidth);
+    this.model.setVirtual(virtual);
   }
 };

@@ -50,7 +50,7 @@ scout.Table = function(model) {
   this.viewRangeSize = 10;
   this.viewRangeRendered = new scout.Range(0, 0);
   this._filterMenusHandler = this._filterMenus.bind(this);
-  this.fixedWidth = false;
+  this.virtual = true;
 };
 scout.inherits(scout.Table, scout.ModelAdapter);
 
@@ -1059,11 +1059,9 @@ scout.Table.prototype._calculateRowBorderWidth = function() {
 };
 
 scout.Table.prototype._updateRowWidth = function() {
-  if (!this.fixedWidth) {
-    this.rowWidth = this.rowBorderWidth;
-    for (var i = 0; i < this.columns.length; i++) {
-      this.rowWidth += this.columns[i].width;
-    }
+  this.rowWidth = this.rowBorderWidth;
+  for (var i = 0; i < this.columns.length; i++) {
+    this.rowWidth += this.columns[i].width;
   }
 };
 
@@ -3432,6 +3430,11 @@ scout.Table.prototype._heightForRow = function(row) {
  * assuming viewRangeSize is 2*number of possible rows in the viewport (see calculateViewRangeSize).
  */
 scout.Table.prototype._calculateViewRangeForRowIndex = function(rowIndex) {
+  // regular / non-virtual scrolling? -> all rows are already rendered in the DOM
+  if (!this.virtual) {
+    return new scout.Range(0, this.filteredRows().length);
+  }
+
   var viewRange = new scout.Range(),
     quarterRange = Math.floor(this.viewRangeSize / 4),
     diff;
@@ -3860,8 +3863,8 @@ scout.Table.prototype._detach = function() {
   scout.Table.parent.prototype._detach.call(this);
 };
 
-scout.Table.prototype.setFixedWidth = function(fixedWidth) {
-  this.fixedWidth = fixedWidth;
+scout.Table.prototype.setVirtual = function(virtual) {
+  this.virtual = virtual;
 };
 
 /* --- STATIC HELPERS ------------------------------------------------------------- */

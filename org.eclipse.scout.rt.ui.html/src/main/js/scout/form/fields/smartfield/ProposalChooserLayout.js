@@ -40,10 +40,8 @@ scout.ProposalChooserLayout.TYPE_HANDLER = {
       this._table.$data
         .css('display', 'inline-block');
 
-      if (!this._table.fixedWidth) {
-        this.modifyFiller(this._table.$fillBefore);
-        this.modifyFiller(this._table.$fillAfter);
-      }
+      this.modifyFiller(this._table.$fillBefore);
+      this.modifyFiller(this._table.$fillAfter);
 
       var $rows = this._table.$rows();
       $rows.each(function(i, elem) {
@@ -70,10 +68,8 @@ scout.ProposalChooserLayout.TYPE_HANDLER = {
       this._table.$data
         .css('display', 'block');
 
-      if (!this._table.fixedWidth) {
-        this.restoreFiller(this._table.$fillBefore);
-        this.restoreFiller(this._table.$fillAfter);
-      }
+      this.restoreFiller(this._table.$fillBefore);
+      this.restoreFiller(this._table.$fillAfter);
     },
 
     restoreFiller: function($filler) {
