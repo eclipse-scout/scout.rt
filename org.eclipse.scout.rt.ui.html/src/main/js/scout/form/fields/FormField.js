@@ -395,7 +395,13 @@ scout.FormField.prototype.setMenusVisible = function(menusVisible) {
   }
 };
 
+/**
+ * Sets the focus on this field if the field is rendered.
+ */
 scout.FormField.prototype.focus = function() {
+  if (!this.rendered) {
+    return;
+  }
   if (this.$field) {
     this.session.focusManager.requestFocus(this.$field[0]);
   } else {
