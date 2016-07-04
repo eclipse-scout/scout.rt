@@ -181,6 +181,7 @@ public class SelectIntoArrayTest {
     assertContainsData(bean.getTableFieldData());
   }
 
+  @SuppressWarnings("deprecation")
   private static void assertContainsData(TableFieldData tableData) {
     assertNotNull(tableData);
     assertEquals(4, tableData.getRowCount());

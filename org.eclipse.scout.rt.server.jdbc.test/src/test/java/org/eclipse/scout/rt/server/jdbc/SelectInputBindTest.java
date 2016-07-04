@@ -168,6 +168,7 @@ public class SelectInputBindTest {
     return tableData;
   }
 
+  @SuppressWarnings("deprecation")
   private void createRow(TableFieldData tableData, int rowStatus, Boolean active, Integer state, String name) {
     int row;
     row = tableData.addRow(rowStatus);

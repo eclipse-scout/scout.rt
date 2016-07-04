@@ -1285,7 +1285,7 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
                 for (ITableRow selectedRow : getSelectedRows()) {
                   IColumn<?> selectedCol = getKeyColumn().getValue(selectedRow);
                   if (selectedCol.isColumnFilterActive()) {
-                    m_organizedTable.getUserFilterManager().removeFilterByKey(selectedCol);
+                    m_organizedTable.getUserFilterManager().removeFilterByKey(selectedCol.getColumnId());
                   }
                 }
                 reloadTableData();

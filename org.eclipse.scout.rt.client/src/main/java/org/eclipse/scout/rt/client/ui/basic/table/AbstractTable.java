@@ -126,6 +126,7 @@ import org.slf4j.LoggerFactory;
  * Columns are defined as inner classes<br>
  * for every inner column class there is a generated getXYColumn method directly on the table
  */
+@SuppressWarnings("deprecation")
 public abstract class AbstractTable extends AbstractPropertyObserver implements ITable, IContributionOwner, IExtensibleObject {
   private static final Logger LOG = LoggerFactory.getLogger(AbstractTable.class);
 
@@ -1734,7 +1735,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   @Override
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked"})
   public void updateTable(AbstractTableFieldData source) {
     if (source.isValueSet()) {
       discardAllDeletedRows();
@@ -1820,7 +1821,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     return MenuUtility.getMenuByClass(this, menuType);
   }
 
-  @SuppressWarnings("deprecation")
   @Deprecated
   @Override
   public <T extends IMenu> T getMenu(final Class<T> menuType) {

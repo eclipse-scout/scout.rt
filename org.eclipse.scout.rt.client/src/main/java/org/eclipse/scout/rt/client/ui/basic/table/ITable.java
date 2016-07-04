@@ -36,7 +36,6 @@ import org.eclipse.scout.rt.platform.reflect.IPropertyObserver;
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldBeanData;
-import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldData;
 import org.eclipse.scout.rt.shared.security.CreateCustomColumnPermission;
 import org.eclipse.scout.rt.shared.services.common.code.ICode;
 
@@ -343,13 +342,25 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
 
   /**
    * extract transfer data to be sent to the backend
+   *
+   * @Deprecated: 'Array based TableData' are not supported by the Scout SDK in Neon. Use
+   *              {@link #exportToTableBeanData(AbstractTableFieldBeanData)} instead. This method will be removed with
+   *              Oxygen. See Bug 496292.
    */
-  void extractTableData(AbstractTableFieldData target);
+  @Deprecated
+  @SuppressWarnings("deprecation")
+  void extractTableData(org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldData target);
 
   /**
    * apply transfer data to this table
+   *
+   * @Deprecated: 'Array based TableData' are not supported by the Scout SDK in Neon. Use
+   *              {@link #importFromTableBeanData(AbstractTableFieldBeanData)} instead. This method will be removed with
+   *              Oxygen. See Bug 496292.
    */
-  void updateTable(AbstractTableFieldData source);
+  @Deprecated
+  @SuppressWarnings("deprecation")
+  void updateTable(org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldData source);
 
   /**
    * Convenience to find a menu, uses {@link org.eclipse.scout.rt.client.ui.action.ActionFinder ActionFinder}

@@ -38,7 +38,7 @@ import org.junit.runner.RunWith;
 /**
  * JUnit tests for {@link AbstractTableField}
  */
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "deprecation"})
 @RunWith(PlatformTestRunner.class)
 public class TableFieldTest {
   private static final Object[] TEST_ROW = new Object[]{1, "Test", false};

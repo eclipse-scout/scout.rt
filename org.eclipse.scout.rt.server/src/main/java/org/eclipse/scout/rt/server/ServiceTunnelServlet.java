@@ -30,6 +30,8 @@ import org.eclipse.scout.rt.platform.annotations.Internal;
 import org.eclipse.scout.rt.platform.context.CorrelationId;
 import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
+import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruption;
+import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruption.IRestorer;
 import org.eclipse.scout.rt.server.admin.html.AdminSession;
 import org.eclipse.scout.rt.server.clientnotification.ClientNotificationCollector;
 import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
@@ -115,9 +117,17 @@ public class ServiceTunnelServlet extends HttpServlet {
         public void run() throws Exception {
           ServiceTunnelRequest serviceRequest = deserializeServiceRequest();
           ServiceTunnelResponse serviceResponse = doPost(serviceRequest);
-          serializeServiceResponse(serviceResponse);
-        }
 
+          // Clear the current thread's interruption status before writing the response to the output stream.
+          // Otherwise, the stream gets silently corrupted, which triggers  a repetition of the current request by Java connection mechanism.
+          IRestorer interruption = ThreadInterruption.clear();
+          try {
+            serializeServiceResponse(serviceResponse);
+          }
+          finally {
+            interruption.restore();
+          }
+        }
       }, DefaultExceptionTranslator.class);
     }
     catch (Exception e) {

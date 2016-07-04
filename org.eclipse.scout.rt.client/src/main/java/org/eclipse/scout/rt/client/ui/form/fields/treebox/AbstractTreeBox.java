@@ -39,6 +39,7 @@ import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNodeFilter;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeVisitor;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeAdapter;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
+import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.IFormFieldVisitor;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
@@ -975,6 +976,14 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
       updateActiveNodesFilter();
     }
     updateCheckedNodesFilter();
+  }
+
+  @Override
+  public void setFormInternal(IForm form) {
+    super.setFormInternal(form);
+    for (IFormField field : m_fields) {
+      field.setFormInternal(form);
+    }
   }
 
 /*

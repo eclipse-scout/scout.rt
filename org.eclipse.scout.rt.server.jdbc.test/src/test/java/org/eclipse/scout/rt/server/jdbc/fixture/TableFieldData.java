@@ -15,6 +15,7 @@ import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFiel
 /**
  * Table generated as {@link AbstractTableFieldData} (before Luna)
  */
+@SuppressWarnings("deprecation")
 public class TableFieldData extends AbstractTableFieldData {
 
   private static final long serialVersionUID = 1L;

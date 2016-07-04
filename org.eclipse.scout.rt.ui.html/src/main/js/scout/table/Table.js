@@ -2228,6 +2228,7 @@ scout.Table.prototype._removeCellEditorForRow = function(row) {
 };
 
 scout.Table.prototype._startCellEdit = function(column, row, fieldId) {
+  this.ensureRowRendered(row);
   var popup = column.startCellEdit(row, fieldId);
   this.cellEditorPopup = popup;
   return popup;
@@ -2235,13 +2236,10 @@ scout.Table.prototype._startCellEdit = function(column, row, fieldId) {
 
 scout.Table.prototype.scrollTo = function(row) {
   if (this.viewRangeRendered.size() === 0) {
-    // Cannot scroll to a row if no row is rendered
+    // Cannot scroll to a row no row is rendered
     return;
   }
-  if (!row.$row) {
-    var rowIndex = this.filteredRows().indexOf(row);
-    this._renderViewRangeForRowIndex(rowIndex);
-  }
+  this.ensureRowRendered(row);
   scout.scrollbars.scrollTo(this.$data, row.$row);
 };
 
@@ -3528,6 +3526,13 @@ scout.Table.prototype._renderRangeMarkers = function() {
   lastRow = this.filteredRows()[this.viewRangeRendered.to - 1];
   firstRow.$row.addClass('first');
   lastRow.$row.addClass('last');
+};
+
+scout.Table.prototype.ensureRowRendered = function(row) {
+  if (!row.$row) {
+    var rowIndex = this.filteredRows().indexOf(row);
+    this._renderViewRangeForRowIndex(rowIndex);
+  }
 };
 
 scout.Table.prototype._renderFiller = function() {

@@ -20,8 +20,12 @@ import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFiel
 /**
  * Convenience Table Field that use an 'Array based TableData' (was the default with Eclipse Luna). See Bug 455282
  *
+ * @Deprecated: 'Array based TableData' are not supported by the Scout SDK in Neon. Use {@link AbstractTableField}
+ *              instead. This class will be removed with Oxygen. See Bug 496292.
  * @since 4.3.0 (Mars-M5)
  */
+@Deprecated
+@SuppressWarnings("deprecation")
 @ClassId("f60194a6-f2a8-4744-947a-21b19f82c723")
 @FormData(value = AbstractTableFieldData.class, sdkCommand = SdkCommand.USE, defaultSubtypeSdkCommand = DefaultSubtypeSdkCommand.CREATE)
 public class AbstractArrayTableField<T extends ITable> extends AbstractTableField<T> {
