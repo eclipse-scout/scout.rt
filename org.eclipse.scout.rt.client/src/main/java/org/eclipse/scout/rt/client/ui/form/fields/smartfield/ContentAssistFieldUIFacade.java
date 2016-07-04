@@ -26,11 +26,15 @@ class ContentAssistFieldUIFacade<LOOKUP_KEY> implements IContentAssistFieldUIFac
     m_field = field;
   }
 
+  protected AbstractContentAssistField<?, LOOKUP_KEY> getField() {
+    return m_field;
+  }
+
   private String toSearchText(String text) {
     return StringUtility.isNullOrEmpty(text) ? m_field.getWildcard() : text;
   }
 
-  private boolean ignoreUiEvent() {
+  protected boolean ignoreUiEvent() {
     return !m_field.isVisible() || !m_field.isEnabled();
   }
 
@@ -105,44 +109,51 @@ class ContentAssistFieldUIFacade<LOOKUP_KEY> implements IContentAssistFieldUIFac
     LOG.debug("acceptProposalFromUI text={} chooser={} forceClose={}", text, chooser, forceClose);
 
     if (chooser) {
-
-      // When the proposal chooser is open, we must check if the display-text has changed
-      // since the last search. When it has changed, we cannot use the accepted proposal
-      // and must perform the lookup again instead. This prevents issues as described in
-      // ticket #162961:
-      // - User types 'Ja' -> matches a lookup-row 'Ja'
-      // - User types an additional 'x' and presses tab -> display-text is now 'Jax'
-      // - the model accepts the lookup-row 'Ja', but the display-text in the UI is still 'Jax'
-      //   and the field looks valid, which is wrong
-      boolean acceptByLookupRow = true;
-      String searchText = toSearchText(text);
-      String lastSearchText = m_field.getProposalChooser().getSearchText();
-      if (lastSearchText != null && !lastSearchText.equals(m_field.getWildcard())) {
-        acceptByLookupRow = CompareUtility.equals(searchText, lastSearchText);
-      }
-
-      boolean openProposalChooser = false;
-      try {
-        // use lookup row selected in proposal chooser or perform lookup by display text?
-        ILookupRow<LOOKUP_KEY> lookupRow = m_field.getProposalChooser().getAcceptedProposal();
-        if (acceptByLookupRow && lookupRow != null) {
-          m_field.acceptProposal(lookupRow);
-        }
-        else {
-          openProposalChooser = acceptByDisplayText(text);
-          openProposalChooserIfNotOpenYet(openProposalChooser, text);
-        }
-      }
-      finally {
-        if (!openProposalChooser || forceClose) {
-          m_field.unregisterProposalChooserInternal();
-        }
-      }
+      handleChangedDisplaytext(text, forceClose);
     }
     else {
-      // perform lookup by display text
-      boolean openProposalChooser = acceptByDisplayText(text);
-      openProposalChooserIfNotOpenYet(openProposalChooser, text);
+      openProposalChooser(text);
+    }
+  }
+
+  protected void openProposalChooser(String text) {
+    // perform lookup by display text
+    boolean openProposalChooser = acceptByDisplayText(text);
+    openProposalChooserIfNotOpenYet(openProposalChooser, text);
+  }
+
+  protected void handleChangedDisplaytext(String text, boolean forceClose) {
+    // When the proposal chooser is open, we must check if the display-text has changed
+    // since the last search. When it has changed, we cannot use the accepted proposal
+    // and must perform the lookup again instead. This prevents issues as described in
+    // ticket #162961:
+    // - User types 'Ja' -> matches a lookup-row 'Ja'
+    // - User types an additional 'x' and presses tab -> display-text is now 'Jax'
+    // - the model accepts the lookup-row 'Ja', but the display-text in the UI is still 'Jax'
+    //   and the field looks valid, which is wrong
+    boolean acceptByLookupRow = true;
+    String searchText = toSearchText(text);
+    String lastSearchText = m_field.getProposalChooser().getSearchText();
+    if (lastSearchText != null && !lastSearchText.equals(m_field.getWildcard())) {
+      acceptByLookupRow = CompareUtility.equals(searchText, lastSearchText);
+    }
+
+    boolean openProposalChooser = false;
+    try {
+      // use lookup row selected in proposal chooser or perform lookup by display text?
+      ILookupRow<LOOKUP_KEY> lookupRow = m_field.getProposalChooser().getAcceptedProposal();
+      if (acceptByLookupRow && lookupRow != null) {
+        m_field.acceptProposal(lookupRow);
+      }
+      else {
+        openProposalChooser = acceptByDisplayText(text);
+        openProposalChooserIfNotOpenYet(openProposalChooser, text);
+      }
+    }
+    finally {
+      if (!openProposalChooser || forceClose) {
+        m_field.unregisterProposalChooserInternal();
+      }
     }
   }
 
