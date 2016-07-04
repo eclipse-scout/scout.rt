@@ -14,14 +14,15 @@
 @detail-table-header-padding-x: @bench-padding-x - @table-header-padding-left;
 @detail-table-data-padding-x: @bench-padding-x - @table-cell-padding-left;
 @detail-table-header-menubar-padding-right: 10px;
+@desktop-bench-drop-shadow-top: 3px;
 
 .desktop-bench-drop-shadow() {
   position: absolute;
   content: '';
   left: 0;
-  top: 3px;
+  top: @desktop-bench-drop-shadow-top;
   width: 10px;
-  height: 100%;
+  height: calc(~'100%' - @desktop-bench-drop-shadow-top);
   box-shadow: -10px 0px 10px 0px rgba(0,0,0,0.4);
 }
 
