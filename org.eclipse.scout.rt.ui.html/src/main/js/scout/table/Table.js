@@ -3479,7 +3479,6 @@ scout.Table.prototype._renderViewRange = function(viewRange) {
     return;
   }
   this._removeRangeMarkers();
-  var scrollTop = this.$data[0].scrollTop;
   var rangesToRender = viewRange.subtract(this.viewRangeRendered);
   var rangesToRemove = this.viewRangeRendered.subtract(viewRange);
   rangesToRemove.forEach(function(range) {
@@ -3506,7 +3505,6 @@ scout.Table.prototype._renderViewRange = function(viewRange) {
   this._renderEmptyData();
   this._renderBackgroundEffect();
   this._renderSelection();
-  this.$data[0].scrollTop = scrollTop;
   this.viewRangeDirty = false;
 };
 
