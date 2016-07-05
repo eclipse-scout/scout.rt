@@ -20,6 +20,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.html.HtmlHelper;
 import org.eclipse.scout.rt.platform.util.FileUtility;
 import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.Pair;
@@ -263,7 +264,7 @@ public class HtmlDocumentParser {
             break;
           case "html":
           default:
-            text = StringUtility.htmlEncode(TEXTS.get(keys.get(0)));
+            text = BEANS.get(HtmlHelper.class).escape(TEXTS.get(keys.get(0)));
             break;
         }
       }
