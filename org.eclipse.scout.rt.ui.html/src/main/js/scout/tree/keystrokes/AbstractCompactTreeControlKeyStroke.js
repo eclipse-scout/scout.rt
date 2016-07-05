@@ -1,7 +1,8 @@
 scout.AbstractCompactTreeControlKeyStroke = function(compactProcessTree) {
   scout.AbstractCompactTreeControlKeyStroke.parent.call(this);
+  this.repeatable = true;
   this.field = compactProcessTree;
-  this.keyStrokeMode = scout.keyStrokeMode.DOWN;
+  this.keyStrokeMode = scout.KeyStrokeMode.DOWN;
 };
 scout.inherits(scout.AbstractCompactTreeControlKeyStroke, scout.KeyStroke);
 

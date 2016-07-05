@@ -11,6 +11,7 @@
 scout.AbstractTreeNavigationKeyStroke = function(tree, modifierBitMask) {
   scout.AbstractTreeNavigationKeyStroke.parent.call(this);
   this.field = tree;
+  this.repeatable = true;
   this.stopPropagation = true;
   this.renderingHints.hAlign = scout.hAlign.RIGHT;
 
@@ -18,7 +19,7 @@ scout.AbstractTreeNavigationKeyStroke = function(tree, modifierBitMask) {
   this.shift = scout.keyStrokeModifier.isShift(modifierBitMask);
   this.alt = scout.keyStrokeModifier.isAlt(modifierBitMask);
 
-  this.keyStrokeMode = scout.keyStrokeMode.DOWN;
+  this.keyStrokeMode = scout.KeyStrokeMode.DOWN;
 };
 scout.inherits(scout.AbstractTreeNavigationKeyStroke, scout.KeyStroke);
 

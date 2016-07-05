@@ -15,7 +15,7 @@ scout.FocusAdjacentElementKeyStroke = function(session, field) {
   this.which = [scout.keys.LEFT, scout.keys.RIGHT];
   this.renderingHints.render = false;
   this.stopPropagation = true;
-  this.keyStrokeMode = scout.keyStrokeMode.DOWN;
+  this.keyStrokeMode = scout.KeyStrokeMode.DOWN;
 };
 scout.inherits(scout.FocusAdjacentElementKeyStroke, scout.KeyStroke);
 
