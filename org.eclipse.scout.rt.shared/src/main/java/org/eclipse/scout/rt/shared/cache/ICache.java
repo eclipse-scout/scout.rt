@@ -14,7 +14,6 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.util.IAdaptable;
 
@@ -44,7 +43,6 @@ import org.eclipse.scout.rt.platform.util.IAdaptable;
  * @see BasicCache
  * @since 5.2
  */
-@ApplicationScoped
 public interface ICache<K, V> extends IAdaptable {
 
   /**

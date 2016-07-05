@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.internal;
 
-import java.lang.reflect.Modifier;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -99,22 +98,13 @@ public class BeanFilter {
       return;
     }
     if (!ci.hasNoArgsConstructor()) {
-      if (LOG.isDebugEnabled()) {
-        LOG.debug("Skipping bean candidate '{}' because it has no empty constructor().", ci.name());
+      if (LOG.isWarnEnabled()) {
+        LOG.warn("Skipping bean candidate '{}' because it has no empty constructor().", ci.name());
       }
       return;
     }
     try {
-      Class<?> resolveClass = ci.resolveClass();
-      if (!Modifier.isPublic(resolveClass.getModifiers())) {
-        // required because sometimes IClassInfo#isPublic returns wrong results for nested classes
-        // see https://issues.jboss.org/projects/JANDEX/issues/JANDEX-37
-        if (LOG.isDebugEnabled()) {
-          LOG.debug("Skipping bean candidate '{}' because it is not public.", ci.name());
-        }
-        return;
-      }
-      collector.add(resolveClass);
+      collector.add(ci.resolveClass());
     }
     catch (Exception ex) {
       LOG.warn("Could not resolve class [{}]", ci.name(), ex);

@@ -94,8 +94,15 @@ public class JandexClassInfo implements IClassInfo {
     try {
       Class<?> clazz = resolveClass();
       // top level or static inner
-      if (clazz.isMemberClass() && !Modifier.isStatic(clazz.getModifiers())) {
-        return false;
+      if (clazz.isMemberClass()) {
+        if (!Modifier.isStatic(clazz.getModifiers())) {
+          return false;
+        }
+        if (!Modifier.isPublic(clazz.getModifiers())) {
+          // required because sometimes IClassInfo#isPublic returns wrong results for nested classes
+          // see https://issues.jboss.org/projects/JANDEX/issues/JANDEX-37
+          return false;
+        }
       }
     }
     catch (Exception ex) {
