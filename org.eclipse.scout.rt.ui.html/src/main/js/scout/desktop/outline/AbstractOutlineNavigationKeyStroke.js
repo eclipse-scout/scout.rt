@@ -17,7 +17,7 @@ scout.AbstractOutlineNavigationKeyStroke = function(tree) {
   this.ctrl = true;
   this.shift = true;
 
-  this.keyStrokeMode = scout.keyStrokeMode.DOWN;
+  this.keyStrokeMode = scout.KeyStrokeMode.DOWN;
 };
 scout.inherits(scout.AbstractOutlineNavigationKeyStroke, scout.KeyStroke);
 
