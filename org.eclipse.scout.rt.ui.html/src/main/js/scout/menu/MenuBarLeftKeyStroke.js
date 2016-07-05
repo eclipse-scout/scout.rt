@@ -14,7 +14,7 @@ scout.MenuBarLeftKeyStroke = function(menuBar) {
   this.which = [scout.keys.LEFT];
   this.renderingHints.render = false;
   this.stopPropagation = true;
-  this.keyStrokeMode = scout.keyStrokeMode.DOWN;
+  this.keyStrokeMode = scout.KeyStrokeMode.DOWN;
 };
 scout.inherits(scout.MenuBarLeftKeyStroke, scout.KeyStroke);
 

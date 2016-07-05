@@ -155,19 +155,20 @@ scout.KeyStrokeManager.prototype._handleKeyStrokeEvent = function(keyStrokeConte
   }
 
   keyStrokeContext.keyStrokes.some(function(keyStroke) {
-    //handle numpad keystroke
+    // Handle numpad keystroke
     event.which = event.which >= 96 && event.which <= 105 ? event.which - 48 : event.which;
     if (!keyStroke.accept(event)) {
       return false;
     }
 
-    // Before handling the keystroke, accept the input of a potential active value field.
+    // Before handling the keystroke, accept the input of a potential active value field
     if (!keyStroke.preventInvokeAcceptInputOnActiveValueField && (keyStroke.invokeAcceptInputOnActiveValueField || keyStrokeContext.invokeAcceptInputOnActiveValueField)) {
       scout.ValueField.invokeValueFieldAcceptInput(event.target);
     }
 
-    // Handle the keystroke.
-    keyStroke.handle(event);
+    // Handle the keystroke
+    keyStroke.invokeHandle(event);
+
     if (this.session.desktop) { // check that desktop is ready (may be undefined on "Initialization failed" message, would cause an error when the user presses Enter)
       this.session.desktop._trigger('keystrokeConsumed', {
         keyStrokeEvent: event,

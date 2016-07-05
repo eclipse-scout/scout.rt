@@ -18,7 +18,9 @@ scout.KeyStroke = function() {
   this.preventDefault = true;
   this.stopPropagation = false;
   this.stopImmediatePropagation = false;
-  this.keyStrokeMode = scout.keyStrokeMode.DOWN;
+  this.keyStrokeMode = scout.KeyStrokeMode.DOWN;
+  this.repeatable = false; // whether or not the handle method is called multiple times while a key is pressed
+  this._handleExecuted = false; // internal flag to remember whether or not the handle method has been executed (reset on keyup)
 
   // Hints to control rendering of the key(s).
   this.renderingHints = {
@@ -83,6 +85,11 @@ scout.KeyStroke.prototype.accept = function(event) {
     return false;
   }
 
+  // Reset handleExecuted flag on keyup event
+  if (event.type === 'keyup') {
+    this._handleExecuted = false;
+  }
+
   // Check whether this event is accepted for execution.
   if (!this._accept(event)) {
     return false;
@@ -99,6 +106,22 @@ scout.KeyStroke.prototype.accept = function(event) {
  */
 scout.KeyStroke.prototype.handle = function(event) {
   throw new Error('keystroke event not handled: ' + event);
+};
+
+scout.KeyStroke.prototype.invokeHandle = function(event) {
+  // if key stroke is repeatable, handle is called each time the key event occurs
+  // which means it is executed multiple times while a key is pressed.
+  if (this.repeatable) {
+    this.handle(event);
+    return;
+  }
+
+  // if key stroke is not repeatable it should only call execute once until
+  // we receive a key up event for that key
+  if (!this._handleExecuted) {
+    this.handle(event);
+    this._handleExecuted = true;
+  }
 };
 
 /**
@@ -196,7 +219,7 @@ scout.KeyStroke.prototype.removeKeyBox = function($drawingArea) {
   }
 };
 
-scout.keyStrokeMode = {
+scout.KeyStrokeMode = {
   UP: 'keyup',
   DOWN: 'keydown'
 };
