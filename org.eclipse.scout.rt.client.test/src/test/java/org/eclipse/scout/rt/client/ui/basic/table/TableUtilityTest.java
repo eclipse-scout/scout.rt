@@ -228,8 +228,8 @@ public class TableUtilityTest {
     Date date = new Date(DATE_IN_MILLIS);
     Date date2 = new Date(DATE_IN_MILLIS_2);
 
-    Object[] row1 = new Object[]{Boolean.TRUE, date, date, date, BigDecimal.valueOf(111.2233D), 111.223D, 3333, 4444L, OBJECT_ROW_1, 555L, "Foo", "<html><body>Hello</body></html>"};
-    Object[] row2 = new Object[]{Boolean.FALSE, date2, date2, date2, BigDecimal.valueOf(9999.8877D), 777.66D, 6666, 5555L, OBJECT_ROW_2, 444L, "Bar", "<html><body>World</body></html>"};
+    Object[] row1 = new Object[]{Boolean.TRUE, date, date, date, BigDecimal.valueOf(111.2233D), 111.223D, 3333, 4444L, OBJECT_ROW_1, 555L, "Foo", "<p>Hello</p>"};
+    Object[] row2 = new Object[]{Boolean.FALSE, date2, date2, date2, BigDecimal.valueOf(9999.8877D), 777.66D, 6666, 5555L, OBJECT_ROW_2, 444L, "Bar", "<h1>World</h1>"};
 
     table.addRowsByMatrix(new Object[][]{row1, row2}, status);
 
@@ -392,6 +392,11 @@ public class TableUtilityTest {
       @Override
       protected String getConfiguredHeaderText() {
         return "TestStringHtmlColumn";
+      }
+
+      @Override
+      protected boolean getConfiguredHtmlEnabled() {
+        return true;
       }
     }
   }

@@ -42,6 +42,7 @@ public interface IContentAssistField<VALUE, LOOKUP_KEY> extends IValueField<VALU
   String PROP_BROWSE_ICON_ID = "browseIconId";
   String PROP_ICON_ID = "iconId";
   String PROP_MULTILINE_TEXT = "multilineText";
+  String PROP_BROWSE_MAX_ROW_COUNT = "browseMaxRowCount";
 
   void addSmartFieldListener(ContentAssistFieldListener listener);
 

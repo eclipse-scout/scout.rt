@@ -239,10 +239,13 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   }
 
   /**
-   * Configures the width of this column. The width of a column is represented by an {@code int}. If the table's auto
-   * resize flag is set (see {@link AbstractTable#getConfiguredAutoResizeColumns()} ), the ratio of the column widths
-   * determines the real column width. If the flag is not set, the column's width is represented by the configured
-   * width.
+   * Configures the width of this column. The width of a column is represented by an {@code int}.
+   * <p>
+   * If the table's auto resize flag is set (see {@link AbstractTable#getConfiguredAutoResizeColumns()}), the ratio of
+   * the column widths determines the real column width. Additionally, these configured column width acts as minimum
+   * width so the calculated real column width will never be smaller than this configured value. This allows the table
+   * to be displayable on small screens. The user can still make the column smaller, though.<br>
+   * If the table's auto resize flag is not set, the column's width is represented by the configured width.
    * <p>
    * Subclasses can override this method. Default is {@code 60}.
    *

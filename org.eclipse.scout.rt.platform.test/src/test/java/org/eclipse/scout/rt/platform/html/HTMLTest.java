@@ -26,6 +26,7 @@ import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.util.CloneUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.junit.Assert;
+import org.junit.Assert;
 import org.junit.Test;
 
 /**

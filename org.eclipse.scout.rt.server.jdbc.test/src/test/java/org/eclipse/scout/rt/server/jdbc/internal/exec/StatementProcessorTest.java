@@ -20,9 +20,10 @@ import org.eclipse.scout.rt.platform.holders.NVPair;
 import org.eclipse.scout.rt.platform.internal.BeanInstanceUtil;
 import org.eclipse.scout.rt.server.TestJdbcServerSession;
 import org.eclipse.scout.rt.server.jdbc.AbstractSqlService;
+import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
-import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldData;
+import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldBeanData;
 import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.testing.server.runner.RunWithServerSession;
@@ -130,53 +131,67 @@ public class StatementProcessorTest {
       private static final long serialVersionUID = 1L;
     }
 
-    public class AddressTable extends AbstractTableFieldData {
+    public static class AddressTable extends AbstractTableFieldBeanData {
 
       private static final long serialVersionUID = 1L;
 
       @Override
-      public int getColumnCount() {
-        return 2;
+      public AddressTableRowData addRow() {
+        return (AddressTableRowData) super.addRow();
       }
 
       @Override
-      public Object getValueAt(int row, int column) {
-        switch (column) {
-          case 0:
-            return getAddressId(row);
-          case 1:
-            return getStreet(row);
-          default:
-            return null;
-        }
+      public AddressTableRowData addRow(int rowState) {
+        return (AddressTableRowData) super.addRow(rowState);
       }
 
       @Override
-      public void setValueAt(int row, int column, Object value) {
-        switch (column) {
-          case 0:
-            setAddressId(row, (Long) value);
-            break;
-          case 1:
-            setStreet(row, (String) value);
-            break;
+      public AddressTableRowData createRow() {
+        return new AddressTableRowData();
+      }
+
+      @Override
+      public Class<? extends AbstractTableRowData> getRowType() {
+        return AddressTableRowData.class;
+      }
+
+      @Override
+      public AddressTableRowData[] getRows() {
+        return (AddressTableRowData[]) super.getRows();
+      }
+
+      @Override
+      public AddressTableRowData rowAt(int index) {
+        return (AddressTableRowData) super.rowAt(index);
+      }
+
+      public void setRows(AddressTableRowData[] rows) {
+        super.setRows(rows);
+      }
+
+      public static class AddressTableRowData extends AbstractTableRowData {
+
+        private static final long serialVersionUID = 1L;
+        public static final String addressId = "addressId";
+        public static final String street = "street";
+        private Long m_addressId;
+        private String m_street;
+
+        public Long getAddressId() {
+          return m_addressId;
         }
-      }
 
-      public Long getAddressId(int row) {
-        return (Long) getValueInternal(row, 0);
-      }
+        public void setAddressId(Long newAddressId) {
+          m_addressId = newAddressId;
+        }
 
-      public void setAddressId(int row, Long addressType) {
-        setValueInternal(row, 0, addressType);
-      }
+        public String getStreet() {
+          return m_street;
+        }
 
-      public String getStreet(int row) {
-        return (String) getValueInternal(row, 1);
-      }
-
-      public void setStreet(int row, String street) {
-        setValueInternal(row, 1, street);
+        public void setStreet(String newStreet) {
+          m_street = newStreet;
+        }
       }
     }
   }

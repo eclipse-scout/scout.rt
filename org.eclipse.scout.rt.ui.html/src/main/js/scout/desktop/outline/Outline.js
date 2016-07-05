@@ -37,6 +37,7 @@ scout.Outline.prototype._init = function(model) {
   this.fileChooserController = new scout.FileChooserController(this, this.session);
   this.titleVisible = true;
   this._syncDefaultDetailForm(this.defaultDetailForm);
+  this._detailContentDestroyHandler = this._onDetailContentDestroy.bind(this);
   this.titleMenuBar = scout.create('MenuBar', {
     parent: this,
     menuOrder: new scout.GroupBoxMenuItemsOrder()
@@ -581,6 +582,11 @@ scout.Outline.prototype.setEmbedDetailContent = function(embed) {
   this.updateDetailContent();
 };
 
+scout.Outline.prototype._onDetailContentDestroy = function(event) {
+  this.setDetailContent(null);
+  this.updateDetailMenus();
+};
+
 scout.Outline.prototype.setDetailContent = function(content) {
   if (this.detailContent === content) {
     return;
@@ -588,7 +594,13 @@ scout.Outline.prototype.setDetailContent = function(content) {
   if (this.rendered) {
     this._removeDetailContent();
   }
+  if (this.detailContent && this.detailContent.events) {
+    this.detailContent.off('destroy', this._detailContentDestroyHandler);
+  }
   this.detailContent = content;
+  if (content && content.events) {
+    content.on('destroy', this._detailContentDestroyHandler);
+  }
   if (this.rendered) {
     this._renderDetailContent();
   }

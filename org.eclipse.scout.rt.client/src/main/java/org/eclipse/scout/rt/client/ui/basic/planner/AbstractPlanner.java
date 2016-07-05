@@ -16,7 +16,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.EventListener;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.scout.rt.client.extension.ui.action.tree.MoveActionNodesHandler;
@@ -43,6 +45,7 @@ import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.reflect.AbstractPropertyObserver;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.CompareUtility;
 import org.eclipse.scout.rt.platform.util.EventListenerList;
 import org.eclipse.scout.rt.platform.util.Range;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
@@ -138,48 +141,22 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
         IPlannerDisplayMode.YEAR);
   }
 
-  /**
-   * Configures the first hour of the day. A value of <code>8</code> will be considered as 8 a.m. - 9 a.m. , so that the
-   * first entry can start at 8 a.m. The very first possible value is <code>0</code> which is considered as 12 a.m.
-   * (beginning of the day)
-   *
-   * @return
-   */
-  @ConfigProperty(ConfigProperty.HOUR_OF_DAY)
-  @Order(110)
-  protected int getConfiguredFirstHourOfDay() {
-    return 8;
-  }
-
-  /**
-   * Configures the last hour of the day. A value of <code>16</code> will be considered as 4 p.m. - 5 p.m. , so that the
-   * last possible entry can last to 5 p.m. The very last possible value is <code>23</code> which is considered as 11
-   * p.m. - 12 a.m. (midnight)
-   */
-  @ConfigProperty(ConfigProperty.HOUR_OF_DAY)
-  @Order(130)
-  protected int getConfiguredLastHourOfDay() {
-    return 16;
-  }
-
-  @ConfigProperty(ConfigProperty.DURATION_MINUTES)
-  @Order(125)
   protected long getConfiguredMinimumActivityDuration() {
     return 1800000L;
   }
 
   @ConfigProperty(ConfigProperty.BOOLEAN)
-  @Order(130)
+  @Order(160)
   protected boolean getConfiguredHeaderVisible() {
     return true;
   }
 
-  @Order(140)
+  @Order(170)
   protected int getConfiguredSelectionMode() {
     return SELECTION_MODE_MULTI_RANGE;
   }
 
-  @Order(150)
+  @Order(180)
   protected int getConfiguredDisplayMode() {
     return IPlannerDisplayMode.CALENDAR_WEEK;
   }
@@ -287,11 +264,11 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
     setLabel(getConfiguredLabel());
     setAvailableDisplayModes(getConfiguredAvailableDisplayModes());
     setDisplayMode(getConfiguredDisplayMode());
+    setDisplayModeOptions(new HashMap<Integer, DisplayModeOptions>());
+    initDisplayModeOptions();
     setHeaderVisible(getConfiguredHeaderVisible());
     setSelectionMode(getConfiguredSelectionMode());
-    setFirstHourOfDay(getConfiguredFirstHourOfDay());
     setMinimumActivityDuration(getConfiguredMinimumActivityDuration());
-    setLastHourOfDay(getConfiguredLastHourOfDay());
     // menus
     List<Class<? extends IMenu>> declaredMenus = getDeclaredMenus();
     OrderedCollection<IMenu> menus = new OrderedCollection<IMenu>();
@@ -370,6 +347,15 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
         }
       }
     });
+  }
+
+  protected void initDisplayModeOptions() {
+    setDisplayModeOption(IPlannerDisplayMode.DAY, new DisplayModeOptions().withInterval(30));
+    setDisplayModeOption(IPlannerDisplayMode.WEEK, new DisplayModeOptions().withInterval(360));
+    setDisplayModeOption(IPlannerDisplayMode.WORK_WEEK, new DisplayModeOptions().withInterval(360));
+    setDisplayModeOption(IPlannerDisplayMode.MONTH, new DisplayModeOptions().withLabelPeriod(2));
+    setDisplayModeOption(IPlannerDisplayMode.CALENDAR_WEEK, new DisplayModeOptions());
+    setDisplayModeOption(IPlannerDisplayMode.YEAR, new DisplayModeOptions());
   }
 
   @Override
@@ -800,26 +786,6 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
   }
 
   @Override
-  public int getFirstHourOfDay() {
-    return propertySupport.getPropertyInt(PROP_FIRST_HOUR_OF_DAY);
-  }
-
-  @Override
-  public void setFirstHourOfDay(int i) {
-    propertySupport.setPropertyInt(PROP_FIRST_HOUR_OF_DAY, i);
-  }
-
-  @Override
-  public int getLastHourOfDay() {
-    return propertySupport.getPropertyInt(PROP_LAST_HOUR_OF_DAY);
-  }
-
-  @Override
-  public void setLastHourOfDay(int i) {
-    propertySupport.setPropertyInt(PROP_LAST_HOUR_OF_DAY, i);
-  }
-
-  @Override
   public long getMinimumActivityDuration() {
     return m_minimumActivityDuration;
   }
@@ -873,6 +839,25 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
   @Override
   public void setAvailableDisplayModes(Set<Integer> modes) {
     propertySupport.setProperty(PROP_AVAILABLE_DISPLAY_MODES, modes);
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public Map<Integer, DisplayModeOptions> getDisplayModeOptions() {
+    return (Map<Integer, DisplayModeOptions>) propertySupport.getProperty(PROP_DISPLAY_MODE_OPTIONS);
+  }
+
+  @Override
+  public void setDisplayModeOptions(Map<Integer, DisplayModeOptions> displayModeOptions) {
+    propertySupport.setProperty(PROP_DISPLAY_MODE_OPTIONS, displayModeOptions);
+  }
+
+  @Override
+  public void setDisplayModeOption(int displayMode, DisplayModeOptions displayModeOption) {
+    DisplayModeOptions previousDisplayModeOption = getDisplayModeOptions().put(displayMode, displayModeOption);
+    if (!CompareUtility.equals(displayModeOption, previousDisplayModeOption)) {
+      propertySupport.firePropertyChange(new PropertyChangeEvent(this, PROP_DISPLAY_MODE_OPTIONS, null, getDisplayModeOptions()));
+    }
   }
 
   @Override

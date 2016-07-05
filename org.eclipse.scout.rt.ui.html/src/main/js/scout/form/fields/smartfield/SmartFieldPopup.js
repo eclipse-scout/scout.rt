@@ -35,6 +35,7 @@ scout.SmartFieldPopup.prototype._render = function($parent) {
 };
 
 scout.SmartFieldPopup.prototype._renderProposalChooser = function(proposalChooser) {
+  proposalChooser.setVirtual(this._field.virtual());
   proposalChooser.render(this.$container);
   proposalChooser.setParent(this);
   this.revalidateLayout();

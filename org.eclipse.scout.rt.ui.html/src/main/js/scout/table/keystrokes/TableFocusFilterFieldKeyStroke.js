@@ -26,7 +26,7 @@ scout.TableFocusFilterFieldKeyStroke = function(table) {
 
   this.virtualKeyStrokeWhich = 'a-Z;a-z;0-9';
   this.preventDefault = false; // false so that the key is inserted into the search field.
-  this.keyStrokeMode = scout.keyStrokeMode.DOWN;
+  this.keyStrokeMode = scout.KeyStrokeMode.DOWN;
 };
 scout.inherits(scout.TableFocusFilterFieldKeyStroke, scout.KeyStroke);
 

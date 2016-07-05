@@ -19,10 +19,14 @@
   }
 
   /* Reset margin set in GroupBox.css */
-  & > .root-group-box > .group-box-body {
-    & > .scrollbar.y-axis {
-      /* position scrollbar as right as possible to prevent overlapping field parts. */
-      margin-right: 0;
+  & > .root-group-box {
+    overflow: visible; /* allow overflow for the root-group-box for wrapped forms */
+
+    & > .group-box-body {
+      & > .scrollbar.y-axis {
+        /* position scrollbar as right as possible to prevent overlapping field parts. */
+        margin-right: 0;
+      }
     }
   }
 

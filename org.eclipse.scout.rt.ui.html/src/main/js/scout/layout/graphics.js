@@ -29,13 +29,18 @@ scout.graphics = {
 
     var defaults = {
       useCssSize: false,
-      resetWidth: true
+      resetWidth: true,
+      restoreScrollPositions: true
     };
     options = $.extend({}, defaults, options);
 
     var oldStyle = $elem.attr('style');
     var oldScrollLeft = $elem.scrollLeft();
     var oldScrollTop = $elem.scrollTop();
+
+    if (options.restoreScrollPositions) {
+      scout.scrollbars.storeScrollPositions($elem);
+    }
 
     // UseCssSize is necessary if the css rules have a fix height or width set.
     // Otherwise setting the width/height to auto could result in a different size
@@ -60,6 +65,10 @@ scout.graphics = {
     $elem.attrOrRemove('style', oldStyle);
     $elem.scrollLeft(oldScrollLeft);
     $elem.scrollTop(oldScrollTop);
+
+    if (options.restoreScrollPositions) {
+      scout.scrollbars.restoreScrollPositions($elem);
+    }
 
     return prefSize;
   },

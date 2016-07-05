@@ -50,6 +50,7 @@ scout.Table = function(model) {
   this.viewRangeSize = 10;
   this.viewRangeRendered = new scout.Range(0, 0);
   this._filterMenusHandler = this._filterMenus.bind(this);
+  this.virtual = true;
 };
 scout.inherits(scout.Table, scout.ModelAdapter);
 
@@ -330,7 +331,15 @@ scout.Table.prototype._syncTableControls = function(controls) {
   }, this);
 };
 
+/**
+ * When an IMG has been loaded we must update the stored height in the model-row.
+ * Note: we don't change the width of the row or table.
+ */
 scout.Table.prototype._onImageLoadOrError = function(event) {
+  var
+    $row = $(event.target).closest('.table-row'),
+    row = $row.data('row');
+  row.height = $row.outerHeight(true);
   this.invalidateLayoutTree();
 };
 
@@ -2219,6 +2228,7 @@ scout.Table.prototype._removeCellEditorForRow = function(row) {
 };
 
 scout.Table.prototype._startCellEdit = function(column, row, fieldId) {
+  this.ensureRowRendered(row);
   var popup = column.startCellEdit(row, fieldId);
   this.cellEditorPopup = popup;
   return popup;
@@ -2226,13 +2236,10 @@ scout.Table.prototype._startCellEdit = function(column, row, fieldId) {
 
 scout.Table.prototype.scrollTo = function(row) {
   if (this.viewRangeRendered.size() === 0) {
-    // Cannot scroll to a row if no row is rendered
+    // Cannot scroll to a row no row is rendered
     return;
   }
-  if (!row.$row) {
-    var rowIndex = this.filteredRows().indexOf(row);
-    this._renderViewRangeForRowIndex(rowIndex);
-  }
+  this.ensureRowRendered(row);
   scout.scrollbars.scrollTo(this.$data, row.$row);
 };
 
@@ -3421,6 +3428,11 @@ scout.Table.prototype._heightForRow = function(row) {
  * assuming viewRangeSize is 2*number of possible rows in the viewport (see calculateViewRangeSize).
  */
 scout.Table.prototype._calculateViewRangeForRowIndex = function(rowIndex) {
+  // regular / non-virtual scrolling? -> all rows are already rendered in the DOM
+  if (!this.virtual) {
+    return new scout.Range(0, this.filteredRows().length);
+  }
+
   var viewRange = new scout.Range(),
     quarterRange = Math.floor(this.viewRangeSize / 4),
     diff;
@@ -3465,7 +3477,6 @@ scout.Table.prototype._renderViewRange = function(viewRange) {
     return;
   }
   this._removeRangeMarkers();
-  var scrollTop = this.$data[0].scrollTop;
   var rangesToRender = viewRange.subtract(this.viewRangeRendered);
   var rangesToRemove = this.viewRangeRendered.subtract(viewRange);
   rangesToRemove.forEach(function(range) {
@@ -3492,7 +3503,6 @@ scout.Table.prototype._renderViewRange = function(viewRange) {
   this._renderEmptyData();
   this._renderBackgroundEffect();
   this._renderSelection();
-  this.$data[0].scrollTop = scrollTop;
   this.viewRangeDirty = false;
 };
 
@@ -3516,6 +3526,13 @@ scout.Table.prototype._renderRangeMarkers = function() {
   lastRow = this.filteredRows()[this.viewRangeRendered.to - 1];
   firstRow.$row.addClass('first');
   lastRow.$row.addClass('last');
+};
+
+scout.Table.prototype.ensureRowRendered = function(row) {
+  if (!row.$row) {
+    var rowIndex = this.filteredRows().indexOf(row);
+    this._renderViewRangeForRowIndex(rowIndex);
+  }
 };
 
 scout.Table.prototype._renderFiller = function() {
@@ -3847,6 +3864,10 @@ scout.Table.prototype._detach = function() {
   // To make it work scrollTop needs to be reseted here otherwise viewport won't be rendered by _onDataScroll
   this.scrollTop = 0;
   scout.Table.parent.prototype._detach.call(this);
+};
+
+scout.Table.prototype.setVirtual = function(virtual) {
+  this.virtual = virtual;
 };
 
 /* --- STATIC HELPERS ------------------------------------------------------------- */

@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields;
 
+import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
 import org.eclipse.scout.rt.platform.status.IStatus;
@@ -41,17 +42,30 @@ public class ValidateFormFieldDescriptor implements IValidateContentDescriptor {
 
   @Override
   public void activateProblemLocation() {
-    //make sure the table is showing (activate parent tabs)
-    IGroupBox g = m_field.getParentGroupBox();
-    while (g != null) {
-      if (g.getParentField() instanceof ITabBox) {
-        ITabBox t = (ITabBox) g.getParentField();
-        if (t.getSelectedTab() != g) {
-          t.setSelectedTab(g);
+    // make sure the field is showing (activate parent tabs)
+    IGroupBox groupBox = m_field.getParentGroupBox();
+    IForm form = m_field.getForm();
+
+    while (groupBox != null) {
+      if (groupBox.getParentField() instanceof ITabBox) {
+        ITabBox t = (ITabBox) groupBox.getParentField();
+        if (t.getSelectedTab() != groupBox) {
+          t.setSelectedTab(groupBox);
         }
       }
-      g = g.getParentGroupBox();
+      groupBox = groupBox.getParentGroupBox();
+
+      // when no tab has been found we must check if we're inside a wrapped form field
+      // in that case we must go further up starting from the wrapped form field
+      if (groupBox == null) {
+        IFormField outerFormField = form.getOuterFormField();
+        if (outerFormField != null) {
+          groupBox = outerFormField.getParentGroupBox();
+          form = outerFormField.getForm();
+        }
+      }
     }
+
     m_field.requestFocus();
   }
 }

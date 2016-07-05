@@ -543,7 +543,6 @@ scout.Tree.prototype._renderViewRange = function(viewRange) {
     // Range already rendered -> do nothing
     return;
   }
-  var scrollTop = this.$data[0].scrollTop;
   if (!this.viewRangeDirty) {
     var rangesToRender = viewRange.subtract(this.viewRangeRendered);
     var rangesToRemove = this.viewRangeRendered.subtract(viewRange);
@@ -582,7 +581,6 @@ scout.Tree.prototype._renderViewRange = function(viewRange) {
   }
 
   this._postRenderViewRange();
-  this.$data[0].scrollTop = scrollTop;
   this.viewRangeDirty = false;
 };
 

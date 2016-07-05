@@ -41,7 +41,11 @@ scout.TableLayout.prototype.layout = function($container) {
     // Layout table footer and add size of footer (including the control content) to 'height'
     footer.revalidateLayout();
     height += scout.graphics.getSize(footer.$container).height;
-    height += scout.graphics.getSize(footer.$controlContainer).height;
+    if (footer.open) {
+      // Layout may be called when container stays open but changes its size using an animation.
+      // At that time the controlContainer has not yet the final size, therefore measuring is not possible, but not necessary anyway.
+      height += footer.selectedControl.height;
+    }
   }
   if (header) {
     height += scout.graphics.getSize(header.$container).height;
@@ -71,7 +75,8 @@ scout.TableLayout.prototype.layout = function($container) {
     this.table.cellEditorPopup.position();
     this.table.cellEditorPopup.pack();
   }
-  scout.scrollbars.update(this.table.$data);
+
+  this.table.updateScrollbars();
 };
 
 /**
@@ -104,24 +109,29 @@ scout.TableLayout.prototype._layoutColumns = function() {
 
   // First, filter columns which would get smaller than their minimal size
   var minWidthColumns = relevantColumns.filter(function(column) {
+    // Use initial width as preferred width for auto resize columns.
+    // This makes sure the column doesn't get too small on small screens. The user can still make the column smaller though.
+    var minWidth = Math.max(column.minWidth, column.initialWidth);
     if (totalInitialWidth === 0) {
       weight = 1 / relevantColumns.length;
     } else {
       weight = column.initialWidth / totalInitialWidth;
     }
     newWidth = Math.floor(weight * remainingWidth);
-    if (newWidth < column.minWidth) {
-      newWidth = column.minWidth;
+    if (newWidth < minWidth) {
+      newWidth = minWidth;
       remainingWidth = Math.max(remainingWidth - newWidth, 0);
       return true;
     }
     return false;
   }.bind(this));
+
   // Resize them to their minimal width
   minWidthColumns.forEach(function(column, index) {
+    var minWidth = Math.max(column.minWidth, column.initialWidth);
     scout.arrays.remove(relevantColumns, column);
 
-    newWidth = column.minWidth;
+    newWidth = minWidth;
     totalInitialWidth -= column.initialWidth;
     // If this is the last column, add remaining space (due to rounding) to this column
     if (index === minWidthColumns.length - 1 && remainingWidth > 0 && relevantColumns.length === 0) {

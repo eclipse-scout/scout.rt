@@ -728,7 +728,9 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
   @Override
   public void setFormInternal(IForm form) {
     super.setFormInternal(form);
-    getListBoxFilterBox().setFormInternal(form);
+    for (IFormField field : m_fields) {
+      field.setFormInternal(form);
+    }
   }
 
   @Override

@@ -276,7 +276,7 @@ public final class TableUtility {
           }
           //special intercept for html
           if (type == String.class) {
-            if (text != null && text.startsWith("<html")) {
+            if (text != null && columns.get(c).isHtmlEnabled()) {
               text = BEANS.get(HtmlHelper.class).toPlainText(text);
             }
           }

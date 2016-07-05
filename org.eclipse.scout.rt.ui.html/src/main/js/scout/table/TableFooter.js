@@ -402,6 +402,11 @@ scout.TableFooter.prototype._revalidateTableLayout = function() {
 };
 
 scout.TableFooter.prototype.openControlContainer = function(control) {
+  if (this.open) {
+    // Calling open again may resize the container -> don't return
+  }
+  this.open = true;
+
   var insets = scout.graphics.getInsets(this.$controlContainer),
     contentHeight = control.height - insets.top - insets.bottom;
 
@@ -412,34 +417,40 @@ scout.TableFooter.prototype.openControlContainer = function(control) {
     this.$controlContainer.outerHeight(0);
   }
 
+  if (this.$controlContainer.outerHeight() > control.height) {
+    // Container gets smaller -> layout first to prevent having a white area
+    this.table.invalidateLayoutTree();
+  }
+
   // open container, stop existing (close) animations before
   // use delay to make sure form is rendered and layouted with new size
   this.$controlContainer.stop(true).show().delay(1).animate({
     height: control.height
   }, {
     duration: this.rendered ? control.animateDuration : 0,
-    progress: this._revalidateTableLayout.bind(this),
     complete: function() {
       control.onControlContainerOpened();
-    }
+      this.table.invalidateLayoutTree();
+    }.bind(this)
   });
-  this.open = true;
 };
 
 scout.TableFooter.prototype.closeControlContainer = function(control) {
+  if (!this.open) {
+    return;
+  }
+  this.open = false;
+  this.table.invalidateLayoutTree();
+
   this.$controlContainer.stop(true).show().animate({
     height: 0
   }, {
     duration: control.animateDuration,
-    progress: this._revalidateTableLayout.bind(this)
+    done: function() {
+      this.$controlContainer.hide();
+      control.onControlContainerClosed();
+    }.bind(this)
   });
-
-  this.$controlContainer.promise().done(function() {
-    this.$controlContainer.hide();
-    control.onControlContainerClosed();
-  }.bind(this));
-
-  this.open = false;
 };
 
 scout.TableFooter.prototype._hideTableStatusTooltip = function() {

@@ -142,6 +142,7 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+@SuppressWarnings("deprecation")
 @FormData(value = AbstractFormData.class, sdkCommand = SdkCommand.USE)
 public abstract class AbstractForm extends AbstractPropertyObserver implements IForm, IExtensibleObject, IContributionOwner {
 
@@ -1018,6 +1019,19 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
       public boolean visitField(IFormField field, int level, int fieldIndex) {
         if (exportedFields.contains(field)) {
           // already exported -> skip
+          return true;
+        }
+
+        final IForm formOfField = field.getForm();
+        if (formOfField == null) {
+          // either form has not been initialized or the field is part of a composite field, that does not override setForminternal -> skip
+          LOG.info("Extension properties are not exported for fields on which getForm() returns null. "
+              + "Ensure that the form is initialized and that the field's parent invokes field.setFormInternal(IForm) [exportingForm={}, field={}]",
+              AbstractForm.this.getClass().getName(), field.getClass().getName());
+          return true;
+        }
+        if (formOfField != AbstractForm.this) {
+          // field belongs to another form -> skip
           return true;
         }
 

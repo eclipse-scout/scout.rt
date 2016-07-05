@@ -24,7 +24,17 @@ scout.scrollbars = {
   _scrollableOptions: {},
 
   getScrollables: function(session) {
-    return this._$scrollables[session] || [];
+    // return scrollables for given session
+    if (session) {
+      return this._$scrollables[session] || [];
+    }
+
+    // return all scrollables, no matter to which session they belong
+    var $scrollables = [];
+    scout.objects.values(this._$scrollables).forEach(function($scrollablesPerSession) {
+      scout.arrays.pushAll($scrollables, $scrollablesPerSession);
+    });
+    return $scrollables;
   },
 
   pushScrollable: function(session, $container) {
@@ -384,5 +394,61 @@ scout.scrollbars = {
         height: ''
       });
     }.bind(this), 50);
+  },
+
+  /**
+   * Stores the position of all scrollables that belong to an optional session.
+   * @param session (optional) when no session is given, scrollables from all sessions are stored
+   */
+  storeScrollPositions: function($container, session) {
+    var $scrollables = this.getScrollables(session);
+    if (!$scrollables) {
+      return;
+    }
+
+    var scrollTop, scrollLeft;
+    $scrollables.forEach(function($scrollable) {
+      if ($container.isOrHas($scrollable[0])) {
+        scrollTop = $scrollable.scrollTop();
+        $scrollable.data('scrollTop', scrollTop);
+        scrollLeft = $scrollable.scrollLeft();
+        $scrollable.data('scrollLeft', $scrollable.scrollLeft());
+        $.log.debug('Stored scroll position for ' + $scrollable.attr('class') + '. Top: ' + scrollTop + '. Left: ' + scrollLeft);
+      }
+    });
+  },
+
+  /**
+   * Restores the position of all scrollables that belong to an optional session.
+   * @param session (optional) when no session is given, scrollables from all sessions are restored
+   */
+  restoreScrollPositions: function($container, session) {
+    var $scrollables = this.getScrollables(this.session);
+    if (!$scrollables) {
+      return;
+    }
+
+    var scrollTop, scrollLeft;
+    $scrollables.forEach(function($scrollable) {
+      if ($container.isOrHas($scrollable[0])) {
+        scrollTop = $scrollable.data('scrollTop');
+        if (scrollTop) {
+          $scrollable.scrollTop(scrollTop);
+          $scrollable.removeData('scrollTop');
+        }
+        scrollLeft = $scrollable.data('scrollLeft');
+        if (scrollLeft) {
+          $scrollable.scrollLeft(scrollLeft);
+          $scrollable.removeData('scrollLeft');
+        }
+        // Also make sure that scroll bar is up to date
+        // Introduced for use case: Open large table page, edit entry, press f5
+        // -> outline tab gets rendered, scrollbar gets updated with set timeout, outline tab gets detached
+        // -> update event never had any effect because it executed after detaching (due to set timeout)
+        scout.scrollbars.update($scrollable);
+        $.log.debug('Restored scroll position for ' + $scrollable.attr('class') + '. Top: ' + scrollTop + '. Left: ' + scrollLeft);
+      }
+    });
   }
+
 };

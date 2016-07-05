@@ -31,6 +31,10 @@
     color: @table-control-hover-color;
   }
 
+  &:active > .font-icon {
+    color: @text-color;
+  }
+
   &.disabled:hover,
   &.disabled > .font-icon,
   &.disabled.selected > .font-icon {

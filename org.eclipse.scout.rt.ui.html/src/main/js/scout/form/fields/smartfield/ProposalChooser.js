@@ -161,3 +161,9 @@ scout.ProposalChooser.prototype._onActiveFilterChanged = function(radioValue) {
     state: radioValue
   });
 };
+
+scout.ProposalChooser.prototype.setVirtual = function(virtual) {
+  if (this.model instanceof scout.Table) {
+    this.model.setVirtual(virtual);
+  }
+};

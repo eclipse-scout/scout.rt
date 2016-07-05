@@ -108,6 +108,21 @@ public class ProposalFieldTest {
     assertNotNull(m_proposalField.getCurrentLookupRow());
   }
 
+  /**
+   * Fast typing issue, proposal chooser is open but was unregistered already, text that was typed already should still
+   * be accepted
+   */
+  @Test
+  public void testAcceptProposalOnUnregisteredChooser() {
+    m_proposalField.getUIFacade().openProposalChooserFromUI("cus", false);
+    m_proposalField.unregisterProposalChooserInternal();
+
+    m_proposalField.getUIFacade().acceptProposalFromUI("customText123", true, false);
+
+    assertEquals("customText123", m_proposalField.getDisplayText());
+    assertEquals("customText123", m_proposalField.getValue());
+  }
+
   @Test
   public void testLookupRowWithNullText() throws Exception {
     LookupRow<Long> nullLookupRow = new LookupRow<Long>(1L, null);

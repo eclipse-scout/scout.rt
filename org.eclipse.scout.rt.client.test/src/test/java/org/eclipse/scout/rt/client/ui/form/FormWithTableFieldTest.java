@@ -20,14 +20,16 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.rt.client.ui.form.FormWithTableFieldTest.TableForm.MainBox.LoremField;
 import org.eclipse.scout.rt.client.ui.form.FormWithTableFieldTest.TableForm.MainBox.LoremField.Table;
 import org.eclipse.scout.rt.client.ui.form.FormWithTableFieldTest.TableFormData.Lorem;
+import org.eclipse.scout.rt.client.ui.form.FormWithTableFieldTest.TableFormData.Lorem.LoremRowData;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCancelButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractOkButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
 import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
-import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldData;
+import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldBeanData;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
@@ -153,8 +155,8 @@ public class FormWithTableFieldTest {
       protected void execLoad() {
         TableFormData formData = new TableFormData();
         Lorem table = formData.getLorem();
-        int i = table.addRow();
-        table.setName(i, "Hello");
+        LoremRowData rowData = table.addRow();
+        rowData.setName("Hello");
         importFormData(formData);
       }
     }
@@ -174,43 +176,56 @@ public class FormWithTableFieldTest {
       return getFieldByClass(Lorem.class);
     }
 
-    public static class Lorem extends AbstractTableFieldData {
+    public static class Lorem extends AbstractTableFieldBeanData {
 
       private static final long serialVersionUID = 1L;
-      public static final int NAME_COLUMN_ID = 0;
 
-      public Lorem() {
-      }
-
-      public String getName(int row) {
-        return (String) getValueInternal(row, NAME_COLUMN_ID);
-      }
-
-      public void setName(int row, String name) {
-        setValueInternal(row, NAME_COLUMN_ID, name);
+      @Override
+      public LoremRowData addRow() {
+        return (LoremRowData) super.addRow();
       }
 
       @Override
-      public int getColumnCount() {
-        return 1;
+      public LoremRowData addRow(int rowState) {
+        return (LoremRowData) super.addRow(rowState);
       }
 
       @Override
-      public Object getValueAt(int row, int column) {
-        switch (column) {
-          case NAME_COLUMN_ID:
-            return getName(row);
-          default:
-            return null;
+      public LoremRowData createRow() {
+        return new LoremRowData();
+      }
+
+      @Override
+      public Class<? extends AbstractTableRowData> getRowType() {
+        return LoremRowData.class;
+      }
+
+      @Override
+      public LoremRowData[] getRows() {
+        return (LoremRowData[]) super.getRows();
+      }
+
+      @Override
+      public LoremRowData rowAt(int index) {
+        return (LoremRowData) super.rowAt(index);
+      }
+
+      public void setRows(LoremRowData[] rows) {
+        super.setRows(rows);
+      }
+
+      public static class LoremRowData extends AbstractTableRowData {
+
+        private static final long serialVersionUID = 1L;
+        public static final String name = "name";
+        private String m_name;
+
+        public String getName() {
+          return m_name;
         }
-      }
 
-      @Override
-      public void setValueAt(int row, int column, Object value) {
-        switch (column) {
-          case NAME_COLUMN_ID:
-            setName(row, (String) value);
-            break;
+        public void setName(String newName) {
+          m_name = newName;
         }
       }
     }

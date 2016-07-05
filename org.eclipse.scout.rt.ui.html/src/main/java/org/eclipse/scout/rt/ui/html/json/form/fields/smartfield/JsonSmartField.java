@@ -126,7 +126,10 @@ public class JsonSmartField<VALUE, LOOKUP_KEY, CONTENT_ASSIST_FIELD extends ICon
 
   @Override
   public JSONObject toJson() {
-    return putProperty(super.toJson(), PROP_PROPOSAL, m_proposal);
+    JSONObject json = super.toJson();
+    putProperty(json, PROP_PROPOSAL, m_proposal);
+    putProperty(json, IContentAssistField.PROP_BROWSE_MAX_ROW_COUNT, getModel().getBrowseMaxRowCount());
+    return json;
   }
 
   private boolean checkStatusContainsCode(IMultiStatus status, int code) {
