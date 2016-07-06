@@ -860,33 +860,33 @@ scout.Outline.prototype.setNodeMenuBarVisible = function(visible) {
 scout.Outline.prototype.glassPaneTargets = function() {
   if (this.rendered) {
     var desktop = this.session.desktop;
-    var elements = [];
-    if (desktop.navigation) {
-      elements.push(desktop.navigation.$body);
-    }
-    if (desktop.bench) {
-      elements.push(desktop.bench.$container);
-    }
+    var elements = this._glassPaneTargets();
     return elements;
   } else {
     var deferred = new scout.DeferredGlassPaneTarget();
     var renderedHandler = function(event) {
-      var desktop = event.source.session.desktop;
-      var elements = [];
-      if (desktop.navigation) {
-        elements.push(desktop.navigation.$body);
-      }
-      if (desktop.bench) {
-        elements.push(desktop.bench.$container);
-      }
+      var elements = this._glassPaneTargets();
       deferred.ready(elements);
-    };
+    }.bind(this);
+
     this.one('rendered', renderedHandler);
     this.one('destroy', function() {
       this.off('rendered', renderedHandler);
     }.bind(this));
     return [deferred];
   }
+};
+
+scout.Outline.prototype._glassPaneTargets = function() {
+  var desktop = this.session.desktop;
+  var elements = [];
+  if (desktop.navigation) {
+    elements.push(desktop.navigation.$body);
+  }
+  if (desktop.bench && desktop.bench.outlineContent.rendered) {
+    elements.push(desktop.bench.outlineContent.$container);
+  }
+  return elements;
 };
 
 /**
