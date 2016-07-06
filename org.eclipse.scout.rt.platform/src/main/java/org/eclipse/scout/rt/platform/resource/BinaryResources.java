@@ -37,7 +37,9 @@ public final class BinaryResources {
         .withContentType(resource.getContentType())
         .withCharset(resource.getCharset())
         .withContent(resource.getContent())
-        .withLastModified(resource.getLastModified());
+        .withLastModified(resource.getLastModified())
+        .withCachingAllowed(resource.isCachingAllowed())
+        .withCacheMaxAge(resource.getCacheMaxAge());
   }
 
   /**
