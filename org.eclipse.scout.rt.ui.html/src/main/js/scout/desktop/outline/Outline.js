@@ -28,16 +28,16 @@ scout.Outline = function() {
 scout.inherits(scout.Outline, scout.Tree);
 
 scout.Outline.prototype._init = function(model) {
-  //add filter before first traversal of tree-> tree is only traversed once.
+  // add filter before first traversal of tree -> tree is only traversed once.
   this.addFilter(new scout.DetailTableTreeFilter(), true);
   scout.Outline.parent.prototype._init.call(this, model);
 
   this.formController = new scout.FormController(this, this.session);
   this.messageBoxController = new scout.MessageBoxController(this, this.session);
   this.fileChooserController = new scout.FileChooserController(this, this.session);
-  this._syncDefaultDetailForm(this.defaultDetailForm);
-  this._syncMenus(this.menus);
   this._detailContentDestroyHandler = this._onDetailContentDestroy.bind(this);
+
+  // menu bars
   this.titleMenuBar = scout.create('MenuBar', {
     parent: this,
     menuOrder: new scout.GroupBoxMenuItemsOrder()
@@ -52,6 +52,9 @@ scout.Outline.prototype._init = function(model) {
     menuOrder: new scout.GroupBoxMenuItemsOrder()
   });
   this.detailMenuBar.bottom();
+
+  this._syncDefaultDetailForm(this.defaultDetailForm);
+  this._syncMenus(this.menus);
   this.updateDetailContent();
 };
 
@@ -911,14 +914,16 @@ scout.Outline.prototype.acceptView = function(view) {
   return this.session.desktop.outline === this;
 };
 
+/**
+ * @override Tree.js (don't call parent)
+ */
 scout.Outline.prototype._syncMenus = function(menus, oldMenus) {
   this.updateKeyStrokes(menus, oldMenus);
   this.menus = menus;
-};
-
-scout.Outline.prototype._renderMenus = function() {
-  var menuItems = scout.menus.filter(this.menus, ['Tree.Header']);
-  this.titleMenuBar.setMenuItems(menuItems);
+  if (this.titleMenuBar) { // _syncMenus is called by parent class Tree.js, at this time titleMenuBar is not yet initialized
+    var menuItems = scout.menus.filter(this.menus, ['Tree.Header']);
+    this.titleMenuBar.setMenuItems(menuItems);
+  }
 };
 
 scout.Outline.prototype._triggerPageChanged = function(page) {
