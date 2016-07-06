@@ -76,6 +76,26 @@ describe("Tree", function() {
         expect(Object.keys(tree.nodesMap).length).toBe(13);
       });
 
+      it("updates model with a complex node containing another node", function() {
+        var node1_1_0 = helper.createModelNode('1_1_0', 'node1_1_0', 0);
+        tree.insertNodes([node1_1_0], node1.childNodes[1]);
+
+        var node2_1_0 = helper.createModelNode('2_1_0', 'node2_1_0', 1);
+        var node2_1_0_0 = helper.createModelNode('2_1_0_0', 'node2_1_0_0', 0);
+        node2_1_0.childNodes = [node2_1_0_0];
+        node2_1_0.expanded = true;
+        tree.insertNodes([node2_1_0], node2.childNodes[1]);
+
+        expect(node2.childNodes.length).toBe(3);
+        expect(node2.childNodes[0].childNodes.length).toBe(0);
+        expect(node2.childNodes[1].childNodes.length).toBe(1);
+        expect(node1.childNodes[1].childNodes[0].childNodes.length).toBe(0);
+        expect(node1.childNodes[1].childNodes[0].text).toBe(node1_1_0.text);
+        expect(node2.childNodes[1].childNodes[0].text).toBe(node2_1_0.text);
+        expect(node2.childNodes[1].childNodes[0].childNodes[0].text).toBe(node2_1_0_0.text);
+        expect(Object.keys(tree.nodesMap).length).toBe(15);
+      });
+
       it("updates html document if parent is expanded", function() {
         tree.render(session.$entryPoint);
         tree.revalidateLayoutTree();

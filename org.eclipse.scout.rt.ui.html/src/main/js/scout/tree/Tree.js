@@ -71,6 +71,7 @@ scout.Tree.prototype._init = function(model) {
   }
   this.initialTraversing = true;
   this._visitNodes(this.nodes, this._initTreeNode.bind(this));
+  this._visitNodes(this.nodes, this._updateFlatListAndSelectionPath.bind(this));
   this.initialTraversing = false;
   this.selectedNodes = this._nodesByIds(this.selectedNodes);
   this.menuBar = scout.create('MenuBar', {
@@ -153,16 +154,7 @@ scout.Tree.prototype._isSelectedNode = function(node) {
   }
 };
 
-scout.Tree.prototype._initTreeNode = function(node, parentNode) {
-  this.nodesMap[node.id] = node;
-  if (parentNode) {
-    node.parentNode = parentNode;
-    node.level = node.parentNode.level + 1;
-  } else {
-    node.level = 0;
-  }
-  node.rendered = false;
-  node.attached = false;
+scout.Tree.prototype._updateFlatListAndSelectionPath = function(node, parentNode) {
   // if this node is selected all parent nodes have to be added to selectionPath
   if (this._isSelectedNode(node) && ((node.parentNode && !this.visibleNodesMap[node.parentNode.id]) || node.level === 0)) {
     var p = node;
@@ -189,6 +181,21 @@ scout.Tree.prototype._initTreeNode = function(node, parentNode) {
   } else if (node.parentNode && this._isSelectedNode(node.parentNode)) {
     this._inSelectionPathList[node.id] = true;
   }
+
+  //add visible nodes to visible nodes array when they are initialized
+  this._addToVisibleFlatList(node, false);
+};
+
+scout.Tree.prototype._initTreeNode = function(node, parentNode) {
+  this.nodesMap[node.id] = node;
+  if (parentNode) {
+    node.parentNode = parentNode;
+    node.level = node.parentNode.level + 1;
+  } else {
+    node.level = 0;
+  }
+  node.rendered = false;
+  node.attached = false;
   //create function to check if node is in hierarchy of a parent. is used on removal from flat list.
   node.isChildOf = function(parentNode) {
     if (parentNode === this.parentNode) {
@@ -216,9 +223,6 @@ scout.Tree.prototype._initTreeNode = function(node, parentNode) {
     return this.filterAccepted;
   };
   this._applyFiltersForNode(node);
-
-  //add visible nodes to visible nodes array when they are initialized
-  this._addToVisibleFlatList(node, false);
 
   this._updateMarkChildrenChecked(node, true, node.checked);
 
@@ -1540,7 +1544,7 @@ scout.Tree.prototype._addToVisibleFlatList = function(node, renderingAnimated) {
 scout.Tree.prototype._findIndexToInsertNode = function(node) {
   var findValidSiblingBefore = function(childNodeIndex, siblings) {
     for (var i = childNodeIndex - 1; i >= 0; i--) {
-      if (siblings[i].isFilterAccepted()) {
+      if (this.visibleNodesMap[siblings[i].id]) {
         return siblings[i];
       }
     }
@@ -1551,12 +1555,8 @@ scout.Tree.prototype._findIndexToInsertNode = function(node) {
   var findLastVisibleNodeInParent = function(parent) {
     if (parent.expanded) {
       for (var i = parent.childNodes.length - 1; i >= 0; i--) {
-        if (parent.childNodes[i].isFilterAccepted()) {
-          if (parent.childNodes[i].expanded) {
-            return findLastVisibleNodeInParent(parent.childNodes[i]);
-          } else if (this.visibleNodesMap[parent.childNodes[i].id]) {
-            return parent.childNodes[i];
-          }
+        if (this.visibleNodesMap[parent.childNodes[i].id]) {
+          return findLastVisibleNodeInParent(parent.childNodes[i]);
         }
       }
     }
@@ -1576,9 +1576,10 @@ scout.Tree.prototype._findIndexToInsertNode = function(node) {
   } else {
     siblingBefore = findValidSiblingBefore(node.childNodeIndex, node.parentNode.childNodes);
     if (!siblingBefore) {
-      return this.visibleNodesFlat.indexOf(parentNode) + 1;
+      nodeBefore = parentNode;
+    } else {
+      nodeBefore = findLastVisibleNodeInParent(siblingBefore);
     }
-    nodeBefore = findLastVisibleNodeInParent(siblingBefore);
     return this.visibleNodesFlat.indexOf(nodeBefore) + 1;
   }
 };
@@ -1894,6 +1895,7 @@ scout.Tree.prototype.insertNodes = function(nodes, parentNode) {
     }
     //initialize node and add to visible list if node is visible
     this._visitNodes(nodes, this._initTreeNode.bind(this), parentNode);
+    this._visitNodes(nodes, this._updateFlatListAndSelectionPath.bind(this), parentNode);
     if (this.groupedNodes[parentNode.id]) {
       this._updateItemPath(false, parentNode);
     }
@@ -1914,6 +1916,7 @@ scout.Tree.prototype.insertNodes = function(nodes, parentNode) {
     }
     //initialize node and add to visible list if node is visible
     this._visitNodes(nodes, this._initTreeNode.bind(this), parentNode);
+    this._visitNodes(nodes, this._updateFlatListAndSelectionPath.bind(this), parentNode);
   }
   if (this.rendered) {
     this.viewRangeDirty = true;
