@@ -35,14 +35,13 @@ scout.Outline.prototype._init = function(model) {
   this.formController = new scout.FormController(this, this.session);
   this.messageBoxController = new scout.MessageBoxController(this, this.session);
   this.fileChooserController = new scout.FileChooserController(this, this.session);
-  this.titleVisible = true;
   this._syncDefaultDetailForm(this.defaultDetailForm);
+  this._syncMenus(this.menus);
   this._detailContentDestroyHandler = this._onDetailContentDestroy.bind(this);
   this.titleMenuBar = scout.create('MenuBar', {
     parent: this,
     menuOrder: new scout.GroupBoxMenuItemsOrder()
   });
-  this._updateTitleMenuBar();
   this.nodeMenuBar = scout.create('MenuBar', {
     parent: this,
     menuOrder: new scout.GroupBoxMenuItemsOrder()
@@ -101,12 +100,13 @@ scout.Outline.prototype._render = function($parent) {
 };
 
 scout.Outline.prototype._renderProperties = function() {
-  this._renderTitleVisible();
   scout.Outline.parent.prototype._renderProperties.call(this);
+  this._renderTitle();
+  this._renderTitleMenuBar();
 };
 
 /**
- * @override
+ * @override Tree.js
  */
 scout.Outline.prototype._remove = function() {
   scout.Outline.parent.prototype._remove.call(this);
@@ -115,49 +115,26 @@ scout.Outline.prototype._remove = function() {
 
 scout.Outline.prototype._renderTitle = function() {
   if (!this.$title) {
-    this.$title = this.$container.prependDiv('outline-title');
+    this.$title = this.$container
+      .prependDiv('outline-title')
+      .on('click', this._onTitleClick.bind(this));
     this.$titleText = this.$title.prependDiv('outline-title-text');
   }
-  this.$titleText.text(this.title).on('click', this._onTitleClick.bind(this));
-  this._renderTitleMenuBar();
-};
-
-scout.Outline.prototype._renderTitleMenuBar = function() {
-  if (this.$title) {
-    this.titleMenuBar.render(this.$title);
-    this.titleMenuBar.$container.toggleClass('prevent-initial-focus', true);
-  }
-};
-
-scout.Outline.prototype._removeTitleMenuBar = function() {
-  this.titleMenuBar.remove();
+  this.$titleText.text(this.title);
 };
 
 scout.Outline.prototype._removeTitle = function() {
-  if (this.$title) {
-    this.$title.remove();
-    this.$title = null;
-    this._removeTitleMenuBar();
-  }
+  this.$title.remove();
+  this.$title = null;
 };
 
-scout.Outline.prototype.setTitleVisible = function(visible) {
-  this.titleVisible = visible;
-  if (this.rendered) {
-    this._renderTitleVisible();
-  }
-};
-
-scout.Outline.prototype._renderTitleVisible = function() {
-  if (this.titleVisible) {
-    this._renderTitle();
-  } else {
-    this._removeTitle();
-  }
+scout.Outline.prototype._renderTitleMenuBar = function() {
+  this.titleMenuBar.render(this.$title);
+  this.titleMenuBar.$container.addClass('prevent-initial-focus');
 };
 
 scout.Outline.prototype._postRender = function() {
-  //used to render glasspane
+  // used to render glasspane
   this.trigger('rendered');
   scout.Outline.parent.prototype._postRender.call(this);
 };
@@ -937,13 +914,9 @@ scout.Outline.prototype.acceptView = function(view) {
 scout.Outline.prototype._syncMenus = function(menus, oldMenus) {
   this.updateKeyStrokes(menus, oldMenus);
   this.menus = menus;
-  if (this.titleMenuBar) {
-    // menuBar is not created yet when synMenus is called initially
-    this._updateTitleMenuBar();
-  }
 };
 
-scout.Outline.prototype._updateTitleMenuBar = function() {
+scout.Outline.prototype._renderMenus = function() {
   var menuItems = scout.menus.filter(this.menus, ['Tree.Header']);
   this.titleMenuBar.setMenuItems(menuItems);
 };
