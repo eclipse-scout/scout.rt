@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.CompareUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
@@ -67,7 +68,7 @@ public final class DataModelUtility {
       buf.append(exportMetaData(e.getMetaDataOfEntity()));
     }
     String externalId = buf.toString();
-    if (LOG.isInfoEnabled()) {
+    if (Platform.get().inDevelopmentMode() || LOG.isDebugEnabled()) {
       EntityPath verify = externalIdToEntityPath(f, externalId);
       if (verify == null) {
         LOG.info("entity externalId {} resolves to null", externalId);
@@ -99,7 +100,7 @@ public final class DataModelUtility {
     buf.append(a.getClass().getSimpleName());
     buf.append(exportMetaData(a.getMetaDataOfAttribute()));
     String externalId = buf.toString();
-    if (LOG.isInfoEnabled()) {
+    if (Platform.get().inDevelopmentMode() || LOG.isDebugEnabled()) {
       AttributePath verify = externalIdToAttributePath(f, externalId);
       if (verify == null) {
         LOG.info("attribute externalId {} resolves to null", externalId);
