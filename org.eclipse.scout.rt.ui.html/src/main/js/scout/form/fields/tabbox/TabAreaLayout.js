@@ -17,6 +17,11 @@ scout.TabAreaLayout = function(tabBox) {
 scout.inherits(scout.TabAreaLayout, scout.AbstractLayout);
 
 scout.TabAreaLayout.prototype.layout = function($container) {
+  if(!this._ellipsisBounds) {
+    this._createAndRenderEllipsis($container);
+    this._ellipsisBounds = scout.graphics.bounds(this._$ellipsis,true,true);
+  }
+
   this._destroyEllipsis();
   this._tabBox.rebuildTabs();
 
@@ -26,9 +31,9 @@ scout.TabAreaLayout.prototype.layout = function($container) {
     scrollWidth = tabArea.scrollWidth;
 
   // If tab area contains a menubar, less space is available
-  var menubar = $container.children('.menubar')[0];
-  if (menubar) {
-    clientWidth -= menubar.clientWidth;
+  var $menubar = $container.children('.menubar');
+  if ($menubar.length === 1) {
+    clientWidth -= scout.graphics.getSize($menubar, true).width;
   }
 
   this._overflowTabs = [];
@@ -63,8 +68,10 @@ scout.TabAreaLayout.prototype.layout = function($container) {
 
     if (clientWidth > bounds.width) {
       // in case of overflow, place selected tab at the left-most position...
+      var horizontalInsets = scout.graphics.getInsets($container).horizontal();
+
       var viewWidth = bounds.width,
-        delta = bounds.x, // delta used to start from x=0
+        delta = bounds.x - horizontalInsets, // delta used to start from x=0
         leftMostTab = selectedTab,
         rightMostTab = selectedTab,
         overflow = false;
@@ -74,7 +81,7 @@ scout.TabAreaLayout.prototype.layout = function($container) {
       if (selectedTab < numTabs - 1) {
         for (i = selectedTab + 1; i < numTabs; i++) {
           bounds = tabBounds[i];
-          viewWidth = bounds.x - delta + bounds.width;
+          viewWidth = bounds.x - delta + bounds.width + this._ellipsisBounds.width;
           if (viewWidth < clientWidth) {
             visibleTabs.push(i);
           } else {
