@@ -741,6 +741,8 @@ scout.Planner.prototype._removeActivititesForResource = function(resource) {
 
 scout.Planner.prototype._buildActivityHtml = function(activity) {
   var i, level = 100 - Math.min(activity.level * 100, 100),
+    backgroundColor = scout.styles.modelToCssColor(activity.backgroundColor),
+    foregroundColor = scout.styles.modelToCssColor(activity.foregroundColor),
     levelColor = scout.styles.modelToCssColor(activity.levelColor),
     begin = activity.beginTime.valueOf(),
     end = activity.endTime.valueOf();
@@ -756,6 +758,13 @@ scout.Planner.prototype._buildActivityHtml = function(activity) {
   if (levelColor) {
     activityStyle += ' background-color: ' + levelColor + ';';
     activityStyle += ' border-color: ' + levelColor + ';';
+  }
+  if(!levelColor && backgroundColor){
+    activityStyle += ' background-color: ' + backgroundColor + ';';
+    activityStyle += ' border-color: ' + backgroundColor + ';';
+  }
+  if(foregroundColor){
+    activityStyle += ' foreground-color: ' + foregroundColor + ';';
   }
 
   // the background-color represents the fill level and not the image. This makes it easier to change the color using a css class
