@@ -81,6 +81,7 @@ scout.DesktopBench.prototype._initKeyStrokeContext = function(keyStrokeContext) 
   this.desktopKeyStrokeContext.$bindTarget = this.desktop.$container;
   this.desktopKeyStrokeContext.$scopeTarget = this.$container;
   this.desktopKeyStrokeContext.registerKeyStroke(this.desktop.keyStrokes);
+  this.desktopKeyStrokeContext.registerKeyStroke(new scout.DesktopTabSelectKeyStroke(this.desktop));
 };
 
 scout.DesktopBench.prototype._render = function($parent) {
