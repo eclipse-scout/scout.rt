@@ -22,11 +22,19 @@ scout.sessions = [];
  * Calls scout._bootstrap and scout._init.<p>
  * During the bootstrap phase additional scripts may get loaded required for a successful session startup.
  * The actual initialization does not get started before these bootstrap scripts are loaded.
+ *
+ * @return a jQuery Deferred object which is notified when (async) initialization has completed. This is the
+ *   right point in time to start your Scout app.
  */
 scout.init = function(options) {
+  var deferredInit = jQuery.Deferred();
+
   var deferreds = scout._bootstrap(options.bootstrap);
   $.when.apply($, deferreds)
-    .done(scout._init.bind(scout, options.session));
+    .done(scout._init.bind(scout, options.session))
+    .done(deferredInit.resolve.bind(deferredInit));
+
+  return deferredInit;
 };
 
 /**
