@@ -27,13 +27,13 @@ scout.sessions = [];
  *   right point in time to start your Scout app.
  */
 scout.init = function(options) {
-  var deferredInit = jQuery.Deferred();
-
+  var deferredInit = $.Deferred();
   var deferreds = scout._bootstrap(options.bootstrap);
   $.when.apply($, deferreds)
-    .done(scout._init.bind(scout, options.session))
-    .done(deferredInit.resolve.bind(deferredInit));
-
+    .done(function() {
+      scout._init.call(scout, options.session);
+      deferredInit.resolve();
+    });
   return deferredInit;
 };
 

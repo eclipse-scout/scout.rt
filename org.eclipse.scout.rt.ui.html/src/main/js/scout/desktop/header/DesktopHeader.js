@@ -190,6 +190,12 @@ scout.DesktopHeader.prototype.setViewButtonBoxVisible = function(visible) {
   }
 };
 
+scout.DesktopHeader.prototype.setMenus = function(menus) {
+  if (this.toolBox) {
+    this.toolBox.setMenus(menus);
+  }
+};
+
 scout.DesktopHeader.prototype.updateViewButtonBoxVisibility = function() {
   // View buttons are visible in the header if the navigation is not visible
   // If there are no view buttons at all, don't show the box

@@ -31,10 +31,13 @@ scout.defaultValues = {
       cache: true,
       url: 'defaultValues',
       data: ''
-    }).done(function(data) {
-      that._loadDefaultsConfiguration(data);
-    }).fail(function(jqXHR, textStatus, errorThrown) {
-      throw new Error('Error while loading default values: ' + errorThrown);
+    }, {
+      done: function(data) {
+        that._loadDefaultsConfiguration(data);
+      },
+      fail: function(jqXHR, textStatus, errorThrown) {
+        throw new Error('Error while loading default values: ' + errorThrown);
+      }
     });
   },
 

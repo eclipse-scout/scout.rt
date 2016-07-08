@@ -1175,6 +1175,7 @@ $.fn.onSingleOrDoubleClick = function(singleClickFunc, doubleClickFunc, timeout)
 };
 
 // FIXME [awe] 6.2 remove this 2 functions when done with Scout refactoring
+// restore old function calls with $.ajax / promises
 $.registerMockAjaxResponse = function(matcherFunc, response) {
   if (!$._mockAjaxResponses) {
     $._mockAjaxResponses = [];
@@ -1184,11 +1185,15 @@ $.registerMockAjaxResponse = function(matcherFunc, response) {
     response: response});
 };
 
-$.mockAjax = function(options) {
+// This is a simple replacement for $.ajax which uses promises. The important part
+// is that it calls the callbacks synchronously (which is afaik not possible using
+// the deferred/promise pattern).
+$.mockAjax = function(options, funcMap) {
   $.log.debug('Mock AJAX request url=' + options.url, options);
+  var response = {};
 
   if ($._mockAjaxResponses) {
-    var i, item, response = {};
+    var i, item;
     for (i = 0; i < $._mockAjaxResponses.length; i++) {
       item = $._mockAjaxResponses[i];
       if (item.func(options)) {
@@ -1198,27 +1203,12 @@ $.mockAjax = function(options) {
     }
   }
 
-  var result = {
-    done: function(func) {
-      this.doneFunc = func;
-      return this;
-    },
-    fail: function(func) {
-      // NOP
-      return this;
-    },
-    always: function(func) {
-      this.alwaysFunc = func;
-      return this;
+  if (funcMap) {
+    if (funcMap.done) {
+      funcMap.done(response);
     }
-  };
-  setTimeout(function() {
-    if (result.doneFunc) {
-      result.doneFunc.call(result, response);
+    if (funcMap.always) {
+      funcMap.always(response);
     }
-    if (result.alwaysFunc) {
-      result.alwaysFunc.call(result, response);
-    }
-  }, options.timeout || 50);
-  return result;
+  }
 };

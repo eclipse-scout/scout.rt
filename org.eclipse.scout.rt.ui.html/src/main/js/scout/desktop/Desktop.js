@@ -440,6 +440,12 @@ scout.Desktop.prototype._syncMenus = function(menus, oldMenus) {
   this.menus = menus;
 };
 
+scout.Desktop.prototype.setMenus = function(menus) {
+  if (this.header) {
+    this.header.setMenus(menus);
+  }
+};
+
 scout.Desktop.prototype._syncNavigationVisible = function(visible) {
   this.setNavigationVisible(visible, false);
   return false;

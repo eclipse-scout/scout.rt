@@ -231,9 +231,10 @@ scout.Session.prototype._sendStartupRequest = function() {
   // Send request
   var ajaxOptions = this.defaultAjaxOptions(request);
 
-  $.mockAjax(ajaxOptions)
-    .done(onAjaxDone.bind(this))
-    .fail(onAjaxFail.bind(this));
+  $.mockAjax(ajaxOptions, {
+    done: onAjaxDone.bind(this),
+    fail: onAjaxFail.bind(this)
+  });
 
   // ----- Helper methods -----
 
@@ -495,10 +496,11 @@ scout.Session.prototype._performUserAjaxRequest = function(ajaxOptions, busyHand
   var jsError = null,
     success = false;
 
-  var xhr = $.mockAjax(ajaxOptions)
-    .done(onAjaxDone.bind(this))
-    .fail(onAjaxFail.bind(this))
-    .always(onAjaxAlways.bind(this));
+  var xhr = $.mockAjax(ajaxOptions, {
+    done: onAjaxDone.bind(this),
+    fail: onAjaxFail.bind(this),
+    always: onAjaxAlways.bind(this)
+  });
   this.registerAjaxRequest(xhr);
 
   // ----- Helper methods -----
@@ -608,10 +610,11 @@ scout.Session.prototype._pollForBackgroundJobs = function() {
 
   var ajaxOptions = this.defaultAjaxOptions(request);
 
-  var xhr = $.mockAjax(ajaxOptions)
-    .done(onAjaxDone.bind(this))
-    .fail(onAjaxFail.bind(this))
-    .always(onAjaxAlways.bind(this));
+  var xhr = $.mockAjax(ajaxOptions, {
+    done: onAjaxDone.bind(this),
+    fail: onAjaxFail.bind(this),
+    always: onAjaxAlways.bind(this)
+  });
   this.registerAjaxRequest(xhr);
 
   // --- Helper methods ---
@@ -1072,8 +1075,9 @@ scout.Session.prototype.sendLogRequest = function(message) {
   // Do not use _sendRequest to make sure a log request has no side effects and will be sent only once
   var ajaxOptions = this.defaultAjaxOptions(request);
 
-  var xhr = $.mockAjax(ajaxOptions)
-    .always(onAjaxAlways.bind(this));
+  var xhr = $.mockAjax(ajaxOptions, {
+    always: onAjaxAlways.bind(this)
+  });
   this.registerAjaxRequest(xhr);
 
   // ----- Helper methods -----

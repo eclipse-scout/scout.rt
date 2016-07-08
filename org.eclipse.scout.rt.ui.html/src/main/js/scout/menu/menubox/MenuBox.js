@@ -66,3 +66,15 @@ scout.MenuBox.prototype.setCompact = function(compact) {
     this._renderCompact();
   }
 };
+
+scout.MenuBox.prototype.setMenus = function(menus) {
+  if (this.menus) {
+    this.menus.forEach(function(menu) {
+      menu.remove();
+    });
+  }
+  this.menus = menus;
+  if (this.rendered) {
+    this._renderMenus();
+  }
+};
