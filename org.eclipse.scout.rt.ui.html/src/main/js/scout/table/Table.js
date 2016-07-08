@@ -285,6 +285,7 @@ scout.Table.prototype._remove = function() {
   this._removeRows();
   this.$fillBefore = null;
   this.$fillAfter = null;
+  this.$emptyData = null;
   scout.Table.parent.prototype._remove.call(this);
 };
 
