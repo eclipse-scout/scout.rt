@@ -116,6 +116,23 @@ public final class WizardChains {
     }
   }
 
+  public static class WizardPostStartChain extends AbstractWizardChain {
+
+    public WizardPostStartChain(List<? extends IWizardExtension<? extends AbstractWizard>> extensions) {
+      super(extensions);
+    }
+
+    public void execPostStart() {
+      MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
+        @Override
+        protected void callMethod(IWizardExtension<? extends AbstractWizard> next) {
+          next.execPostStart(WizardPostStartChain.this);
+        }
+      };
+      callChain(methodInvocation);
+    }
+  }
+
   public static class WizardCreateContainerFormChain extends AbstractWizardChain {
 
     public WizardCreateContainerFormChain(List<? extends IWizardExtension<? extends AbstractWizard>> extensions) {
