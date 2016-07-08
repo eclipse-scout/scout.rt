@@ -23,7 +23,7 @@ scout.defaultValues = {
   bootstrap: function() {
     var that = this;
     // Load default value configuration from server (and cache it)
-    return $.ajax({
+    return $.mockAjax({
       async: true,
       type: 'GET',
       dataType: 'json',

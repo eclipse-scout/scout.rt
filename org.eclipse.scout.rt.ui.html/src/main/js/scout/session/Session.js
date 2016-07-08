@@ -231,7 +231,7 @@ scout.Session.prototype._sendStartupRequest = function() {
   // Send request
   var ajaxOptions = this.defaultAjaxOptions(request);
 
-  $.ajax(ajaxOptions)
+  $.mockAjax(ajaxOptions)
     .done(onAjaxDone.bind(this))
     .fail(onAjaxFail.bind(this));
 
@@ -495,7 +495,7 @@ scout.Session.prototype._performUserAjaxRequest = function(ajaxOptions, busyHand
   var jsError = null,
     success = false;
 
-  var xhr = $.ajax(ajaxOptions)
+  var xhr = $.mockAjax(ajaxOptions)
     .done(onAjaxDone.bind(this))
     .fail(onAjaxFail.bind(this))
     .always(onAjaxAlways.bind(this));
@@ -608,7 +608,7 @@ scout.Session.prototype._pollForBackgroundJobs = function() {
 
   var ajaxOptions = this.defaultAjaxOptions(request);
 
-  var xhr = $.ajax(ajaxOptions)
+  var xhr = $.mockAjax(ajaxOptions)
     .done(onAjaxDone.bind(this))
     .fail(onAjaxFail.bind(this))
     .always(onAjaxAlways.bind(this));
@@ -1072,7 +1072,7 @@ scout.Session.prototype.sendLogRequest = function(message) {
   // Do not use _sendRequest to make sure a log request has no side effects and will be sent only once
   var ajaxOptions = this.defaultAjaxOptions(request);
 
-  var xhr = $.ajax(ajaxOptions)
+  var xhr = $.mockAjax(ajaxOptions)
     .always(onAjaxAlways.bind(this));
   this.registerAjaxRequest(xhr);
 

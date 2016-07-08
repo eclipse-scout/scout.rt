@@ -1173,3 +1173,52 @@ $.fn.onSingleOrDoubleClick = function(singleClickFunc, doubleClickFunc, timeout)
     });
   });
 };
+
+// FIXME [awe] 6.2 remove this 2 functions when done with Scout refactoring
+$.registerMockAjaxResponse = function(matcherFunc, response) {
+  if (!$._mockAjaxResponses) {
+    $._mockAjaxResponses = [];
+  }
+  $._mockAjaxResponses.push({
+    func: matcherFunc,
+    response: response});
+};
+
+$.mockAjax = function(options) {
+  $.log.debug('Mock AJAX request url=' + options.url, options);
+
+  if ($._mockAjaxResponses) {
+    var i, item, response = {};
+    for (i = 0; i < $._mockAjaxResponses.length; i++) {
+      item = $._mockAjaxResponses[i];
+      if (item.func(options)) {
+        response = item.response;
+        break;
+      }
+    }
+  }
+
+  var result = {
+    done: function(func) {
+      this.doneFunc = func;
+      return this;
+    },
+    fail: function(func) {
+      // NOP
+      return this;
+    },
+    always: function(func) {
+      this.alwaysFunc = func;
+      return this;
+    }
+  };
+  setTimeout(function() {
+    if (result.doneFunc) {
+      result.doneFunc.call(result, response);
+    }
+    if (result.alwaysFunc) {
+      result.alwaysFunc.call(result, response);
+    }
+  }, options.timeout || 50);
+  return result;
+};
