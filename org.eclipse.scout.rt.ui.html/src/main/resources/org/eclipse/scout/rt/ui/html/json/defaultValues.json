@@ -147,6 +147,10 @@
     },
     "Desktop": {
       "desktopStyle": "DEFAULT",
+      "navigationVisible": true,
+      "navigationHandleVisible": true,
+      "benchVisible": true,
+      "headerVisible": true,
       "menus": [],
       "addOns": [],
       "dialogs": [],

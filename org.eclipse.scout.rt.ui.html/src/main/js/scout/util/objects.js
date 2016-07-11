@@ -139,6 +139,10 @@ scout.objects = {
     return obj !== null && !isNaN(obj) && isFinite(obj);
   },
 
+  isString: function(obj) {
+    return typeof obj === 'string';
+  },
+
   /**
    * Returns an array containing the values of all object properties. By default, only
    * 'own' properties are returned. The optional argument 'all' can be set to true to

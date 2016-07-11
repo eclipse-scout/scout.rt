@@ -49,6 +49,7 @@ scout._bootstrap = function(options) {
     scout.logging.bootstrap(),
     scout.device.bootstrap(),
     scout.defaultValues.bootstrap(),
+    scout.model.bootstrap(), // FIXME [awe] 6.1 - only bootstrap model in Offline app
     scout.fonts.bootstrap(options.fonts)
   ];
 

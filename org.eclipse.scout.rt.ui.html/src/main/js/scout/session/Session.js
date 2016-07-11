@@ -152,6 +152,10 @@ scout.Session.prototype.getOrCreateModelAdapter = function(id, parent) {
     throw new Error('no adapterData found for id=' + id);
   }
 
+  return this.createModelAdapter(adapterData, parent);
+};
+
+scout.Session.prototype.createModelAdapter = function(adapterData, parent) {
   var owner;
   if (adapterData.owner !== undefined) {
     // Prefer the owner sent by the server
@@ -169,7 +173,7 @@ scout.Session.prototype.getOrCreateModelAdapter = function(id, parent) {
   adapterData.owner = owner;
   adapterData.parent = parent;
   adapterData._register = true;
-  adapter = scout.create(adapterData);
+  var adapter = scout.create(adapterData);
   $.log.trace('created new adapter ' + adapter + '. owner=' + owner + ' parent=' + parent);
 
   owner.addOwnedAdapter(adapter);
@@ -337,7 +341,7 @@ scout.Session.prototype._processStartupResponse = function(data) {
   if (scout.fonts.loadingComplete) {
     renderDesktopImpl();
   } else {
-    scout.fonts.preloader().then(renderDesktopImpl());
+    scout.fonts.preloader().then(renderDesktopImpl);
   }
 };
 

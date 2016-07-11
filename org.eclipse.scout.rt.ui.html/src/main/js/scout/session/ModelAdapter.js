@@ -39,7 +39,7 @@ scout.ModelAdapter = function() {
   this._modelProperties = [];
 
   this._register = true;
-  this.remoteHandler = scout.NullRemoteHandler;
+  this.remoteHandler = scout.EventRemoteHandler; // scout.NullRemoteHandler;
   this._addKeyStrokeContextSupport();
   this._addEventSupport();
 };
@@ -51,6 +51,13 @@ scout.NullRemoteHandler = function() {
   // NOP
 };
 
+// FIXME [awe] 6.1 discuss -> konzept für events / send (Menu.js, MenuProxy.js, MenuRemoteProxy.js?)
+// was machen wir mit param delay? Der gehört eher auf den RemoteProxy
+scout.EventRemoteHandler = function(event, delay) {
+  console.log('trigger', event);
+  this.trigger(event.type, event);
+};
+
 /**
  * @param model expects parent session to be set. Other options:
  *   _register: (optional) when set to true the adapter instance is un-/registered in the modelAdapterRegistry of the session
@@ -60,10 +67,10 @@ scout.ModelAdapter.prototype._init = function(model) {
   scout.ModelAdapter.parent.prototype._init.call(this, model);
   this.id = model.id;
   this.objectType = model.objectType;
-  this._register = scout.nvl(model._register, true);
+  this._register = scout.nvl(model._register, true); // FIXME [awe] 6.1 discuss -> die registry kommt auch in den RemoteProxy
   if (this._register) {
     this.session.registerModelAdapter(this);
-    this.remoteHandler = this.session.sendEvent.bind(this.session);
+    this.remoteHandler = scout.EventRemoteHandler.bind(this); //this.session.sendEvent.bind(this.session);
   }
 
   // Make a copy to prevent a modification of the given object
@@ -256,14 +263,23 @@ scout.ModelAdapter.prototype._createAdapters = function(propertyName, adapterOrI
   return this._processAdapters(adapterOrIds, function(adapterOrId) {
     var adapter, model;
     if (adapterOrId instanceof scout.ModelAdapter) {
+      // Model adapter
       adapter = adapterOrId;
-    } else {
+    } else if (scout.objects.isString(adapterOrId)) {
+      // String (by ID)
       model = this.session.getAdapterData(adapterOrId);
       if (model) {
         // Allow the creator to adapt the model of the child adapter
         this._onChildAdapterCreation(propertyName, model);
       }
       adapter = this.session.getOrCreateModelAdapter(adapterOrId, this);
+    } else if (scout.objects.isPlainObject(adapterOrId)) {
+      // Model object
+      model = adapterOrId;
+      this._onChildAdapterCreation(propertyName, model);
+      adapter = this.session.createModelAdapter(model, this);
+    } else {
+      throw new Error('adapterOrId must be either a scout.ModelAdapter, a string or a (model-) object');
     }
     return adapter;
   }.bind(this));
