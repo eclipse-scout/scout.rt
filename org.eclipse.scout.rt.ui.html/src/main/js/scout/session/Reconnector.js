@@ -39,10 +39,9 @@ scout.Reconnector.prototype.ping = function() {
 
   var ajaxOptions = this.session.defaultAjaxOptions(request);
 
-  $.mockAjax(ajaxOptions, {
-    done: onAjaxDone.bind(this),
-    fail: onAjaxFail.bind(this)
-  });
+  $.ajax(ajaxOptions)
+    .done(onAjaxDone.bind(this))
+    .fail(onAjaxFail.bind(this));
 
   // --- Helper methods ---
 

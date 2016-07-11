@@ -50,6 +50,7 @@ scout.MenuBox.prototype._renderMenus = function() {
   this.menus.forEach(function(menu) {
     menu.render(this.$container);
   }, this);
+  this.invalidateLayoutTree();
 };
 
 scout.MenuBox.prototype._renderCompact = function() {

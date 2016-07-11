@@ -10,6 +10,8 @@
 (function(scout, $, undefined) {
   __include("jquery/jquery-scout.js");
   __include("scout/main.js");
+  __include("scout/App.js");
+  __include("scout/RemoteApp.js");
   __include("scout/ObjectFactory.js");
   __include("scout/objectFactories.js");
   __include("scout/widget/LoadingSupport.js");
@@ -234,7 +236,7 @@
   __include("scout/desktop/bench/DesktopBenchLayout.js");
   __include("scout/desktop/bench/BenchColumn.js");
   __include("scout/desktop/bench/BenchColumnLayout.js");
-  __include("scout/desktop/desktoptab/DesktopTabSelectKeyStroke.js");
+  __include("scout/desktop/bench/DesktopTabSelectKeyStroke.js");
   __include("scout/desktop/desktoptab/DisableBrowserTabSwitchingKeyStroke.js");
   __include("scout/desktop/header/DesktopHeader.js");
   __include("scout/desktop/header/HeaderTabBoxController.js");

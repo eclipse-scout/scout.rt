@@ -235,10 +235,9 @@ scout.Session.prototype._sendStartupRequest = function() {
   // Send request
   var ajaxOptions = this.defaultAjaxOptions(request);
 
-  $.mockAjax(ajaxOptions, {
-    done: onAjaxDone.bind(this),
-    fail: onAjaxFail.bind(this)
-  });
+  $.ajax(ajaxOptions)
+    .done(onAjaxDone.bind(this))
+    .fail(onAjaxFail.bind(this));
 
   // ----- Helper methods -----
 
@@ -337,11 +336,15 @@ scout.Session.prototype._processStartupResponse = function(data) {
     }
   }.bind(this);
 
+  this.render(renderDesktopImpl);
+};
+
+scout.Session.prototype.render = function(renderFunc) {
   // Render desktop after fonts have been preloaded (this fixes initial layouting issues when font icons are not yet ready)
   if (scout.fonts.loadingComplete) {
-    renderDesktopImpl();
+    renderFunc();
   } else {
-    scout.fonts.preloader().then(renderDesktopImpl);
+    scout.fonts.preloader().then(renderFunc);
   }
 };
 
@@ -500,11 +503,10 @@ scout.Session.prototype._performUserAjaxRequest = function(ajaxOptions, busyHand
   var jsError = null,
     success = false;
 
-  var xhr = $.mockAjax(ajaxOptions, {
-    done: onAjaxDone.bind(this),
-    fail: onAjaxFail.bind(this),
-    always: onAjaxAlways.bind(this)
-  });
+  var xhr = $.ajax(ajaxOptions)
+    .done(onAjaxDone.bind(this))
+    .fail(onAjaxFail.bind(this))
+    .always(onAjaxAlways.bind(this));
   this.registerAjaxRequest(xhr);
 
   // ----- Helper methods -----
@@ -614,11 +616,10 @@ scout.Session.prototype._pollForBackgroundJobs = function() {
 
   var ajaxOptions = this.defaultAjaxOptions(request);
 
-  var xhr = $.mockAjax(ajaxOptions, {
-    done: onAjaxDone.bind(this),
-    fail: onAjaxFail.bind(this),
-    always: onAjaxAlways.bind(this)
-  });
+  var xhr = $.ajax(ajaxOptions)
+    .done(onAjaxDone.bind(this))
+    .fail(onAjaxFail.bind(this))
+    .always(onAjaxAlways.bind(this));
   this.registerAjaxRequest(xhr);
 
   // --- Helper methods ---
@@ -1079,9 +1080,8 @@ scout.Session.prototype.sendLogRequest = function(message) {
   // Do not use _sendRequest to make sure a log request has no side effects and will be sent only once
   var ajaxOptions = this.defaultAjaxOptions(request);
 
-  var xhr = $.mockAjax(ajaxOptions, {
-    always: onAjaxAlways.bind(this)
-  });
+  var xhr = $.ajax(ajaxOptions)
+    .always(onAjaxAlways.bind(this));
   this.registerAjaxRequest(xhr);
 
   // ----- Helper methods -----

@@ -23,22 +23,19 @@ scout.defaultValues = {
   bootstrap: function() {
     var that = this;
     // Load default value configuration from server (and cache it)
-    return $.mockAjax({
-      async: true,
-      type: 'GET',
-      dataType: 'json',
-      contentType: 'application/json; charset=UTF-8',
-      cache: true,
-      url: 'defaultValues',
-      data: ''
-    }, {
-      done: function(data) {
+    return $.ajax({
+        async: true,
+        type: 'GET',
+        dataType: 'json',
+        contentType: 'application/json; charset=UTF-8',
+        cache: true,
+        url: 'http://localhost:8082/defaultValues',
+        data: ''
+      }).done(function(data) {
         that._loadDefaultsConfiguration(data);
-      },
-      fail: function(jqXHR, textStatus, errorThrown) {
+      }).fail(function(jqXHR, textStatus, errorThrown) {
         throw new Error('Error while loading default values: ' + errorThrown);
-      }
-    });
+      });
   },
 
   _loadDefaultsConfiguration: function(data) {

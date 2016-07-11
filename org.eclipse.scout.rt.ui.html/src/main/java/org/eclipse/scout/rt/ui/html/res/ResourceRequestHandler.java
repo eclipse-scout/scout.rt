@@ -142,11 +142,6 @@ public class ResourceRequestHandler extends AbstractUiServletRequestHandler {
       resp.setCharacterEncoding(charset);
     }
 
-    // FIXME [awe] 6.2 get rid of this hack for scout icons woff (font)
-    if (resource.getFilename().endsWith(".woff")) {
-      resp.addHeader("Access-Control-Allow-Origin", "http://localhost:8000");
-    }
-
     // content-type
     String contentType = resource.getContentType();
     if (contentType != null) {
