@@ -291,24 +291,41 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     return true;
   }
 
+  /**
+   * @return the value to be assigned initially to the <i>navigationVisible</i> property when <code>displayStyle</code>
+   *         = {@link IDesktop#DISPLAY_STYLE_DEFAULT}. This value is ignored for all other display styles.
+   */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(70)
   protected boolean getConfiguredNavigationVisible() {
     return true;
   }
 
+  /**
+   * @return the value to be assigned initially to the <i>navigationHandleVisible</i> property when
+   *         <code>displayStyle</code> = {@link IDesktop#DISPLAY_STYLE_DEFAULT}. This value is ignored for all other
+   *         display styles.
+   */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(75)
   protected boolean getConfiguredNavigationHandleVisible() {
     return true;
   }
 
+  /**
+   * @return the value to be assigned initially to the <i>headerVisible</i> property when <code>displayStyle</code> =
+   *         {@link IDesktop#DISPLAY_STYLE_DEFAULT}. This value is ignored for all other display styles.
+   */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(80)
   protected boolean getConfiguredHeaderVisible() {
     return true;
   }
 
+  /**
+   * @return the value to be assigned initially to the <i>benchVisible</i> property when <code>displayStyle</code> =
+   *         {@link IDesktop#DISPLAY_STYLE_DEFAULT}. This value is ignored for all other display styles.
+   */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(90)
   protected boolean getConfiguredBenchVisible() {
@@ -533,10 +550,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     setSelectViewTabsKeyStrokesEnabled(getConfiguredSelectViewTabsKeyStrokesEnabled());
     setSelectViewTabsKeyStrokeModifier(getConfiguredSelectViewTabsKeyStrokeModifier());
     setLogoId(getConfiguredLogoId());
-    setNavigationVisible(getConfiguredNavigationVisible());
-    setNavigationHandleVisible(getConfiguredNavigationHandleVisible());
-    setBenchVisible(getConfiguredBenchVisible());
-    setHeaderVisible(getConfiguredHeaderVisible());
     setDisplayStyle(getConfiguredDisplayStyle());
     initDisplayStyle(getDisplayStyle());
     setCacheSplitterPosition(getConfiguredCacheSplitterPosition());
@@ -664,24 +677,29 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     m_desktopInitialized = true;
   }
 
-  protected void initDisplayStyle(String style) {
-    if (DISPLAY_STYLE_BENCH.equals(style)) {
+  /**
+   * Applies values to the following properties, based on the given displayStyle: <i>navigationVisible</i>,
+   * <i>navigationHandleVisible</i>, <i>headerVisible</i>, <i>benchVisible</i>.
+   */
+  protected void initDisplayStyle(String displayStyle) {
+    if (DISPLAY_STYLE_BENCH.equals(displayStyle)) {
       setNavigationVisible(false);
       setNavigationHandleVisible(false);
       setHeaderVisible(false);
       setBenchVisible(true);
     }
-    else if (DISPLAY_STYLE_COMPACT.equals(style)) {
+    else if (DISPLAY_STYLE_COMPACT.equals(displayStyle)) {
       setNavigationVisible(true);
       setNavigationHandleVisible(false);
       setHeaderVisible(false);
       setBenchVisible(false);
     }
     else {
-      setNavigationVisible(true);
-      setNavigationHandleVisible(true);
-      setHeaderVisible(true);
-      setBenchVisible(true);
+      // Default
+      setNavigationVisible(getConfiguredNavigationVisible());
+      setNavigationHandleVisible(getConfiguredNavigationHandleVisible());
+      setHeaderVisible(getConfiguredHeaderVisible());
+      setBenchVisible(getConfiguredBenchVisible());
     }
   }
 
