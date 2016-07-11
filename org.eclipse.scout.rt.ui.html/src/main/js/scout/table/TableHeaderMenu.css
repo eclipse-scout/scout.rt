@@ -8,13 +8,14 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
+ @table-header-menu-group-padding-top: 10px;
+ @table-header-menu-padding: 10px;
+
 .table-header-menu {
   position: absolute;
   width: 447px;
   background-color: @table-header-menu-background-color;
-  padding-bottom: 5px;
   border: 1px solid @border-color;
-  padding: 10px;
   white-space: nowrap;
 
   &:focus {
@@ -30,18 +31,31 @@
   }
 }
 
+.table-header-menu-body {
+  position: relative;
+  height: 100%;
+  width: 100%;
+}
+
 .table-header-menu-actions {
   display: inline-block;
+  padding: @table-header-menu-padding;
 }
 
 .table-header-menu-filters {
   display: inline-block;
   vertical-align: top;
-  height: 100%;
   width: 222px;
   border-left: solid 1px @border-color;
-  padding-left: 10px;
-  margin-left: 10px;
+  padding: 0 @table-header-menu-padding 0 @table-header-menu-padding;
+  margin: @table-header-menu-padding 0 @table-header-menu-padding 0;
+
+  .table-header-menu-body.compact > & {
+    display: block;
+    height: auto;
+    margin-top: 5px;
+    border-left: 0;
+  }
 
   & > .table-header-menu-group > .form-field {
     position: relative;
@@ -102,7 +116,7 @@
 }
 
 .table-header-menu-group {
-  padding-top: 10px;
+  padding-top: @table-header-menu-group-padding-top;
 
   &.first {
     padding-top: 0;

@@ -40,7 +40,7 @@ scout.LoginBox.prototype.render = function($parent) {
     this.$message = $('<div>')
       .attr('id', 'message-box')
       .text(this.texts.get(this.options.message))
-      .appendTo(this.$container);
+      .appendTo(this.$form);
   }
   this.$user = $('<input>')
     .attr('type', 'text')

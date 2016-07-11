@@ -422,13 +422,13 @@ scout.Desktop.prototype.setOutline = function(outline) {
   if (this.navigation) {
     this.navigation.setOutline(this.outline);
   }
+  // call render after triggering event so glasspane rendering taking place can refer to the current outline content
+  this.trigger('outlineChanged');
 
   if (this.rendered) {
     this._renderDisplayChildsOfOutline();
     this._renderDisplayStyle();
   }
-
-  this.trigger('outlineChanged');
 };
 
 scout.Desktop.prototype._syncViewButtons = function(viewButtons, oldViewButtons) {

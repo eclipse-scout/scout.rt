@@ -898,7 +898,13 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
 
         // Notify the UI to display this form.
         if (isShowOnStart()) {
-          getDesktop().showForm(AbstractForm.this);
+          IDesktop desktop = getDesktop();
+          if (desktop == null || !desktop.isOpened()) {
+            throw new ProcessingException("There is no desktop or it is not open in the UI.");
+          }
+          else {
+            desktop.showForm(AbstractForm.this);
+          }
         }
       }
     });

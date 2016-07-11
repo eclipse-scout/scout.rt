@@ -60,6 +60,7 @@
   __include("scout/layout/LogicalGridLayout.js");
   __include("scout/layout/LogicalGridLayoutInfo.js");
   __include("scout/layout/NullLayout.js");
+  __include("scout/layout/RowLayout.js");
   __include("scout/layout/SingleLayout.js");
   // Keystroke handling
   __include("scout/keystroke/keys.js");

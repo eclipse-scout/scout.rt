@@ -895,6 +895,11 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
   void resetColumnOrder();
 
   /**
+   * initialize column filters
+   */
+  void resetColumnFilters();
+
+  /**
    * reset all columns properties to initial state: <br>
    * visible/invisible, order, sorting, grouping, width, backgroundEffects
    */

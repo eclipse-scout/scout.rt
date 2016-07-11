@@ -23,13 +23,16 @@ import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktopUIFacade;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.job.JobState;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedException;
 import org.eclipse.scout.rt.platform.util.concurrent.TimedOutException;
 import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.SessionStoreHousekeepingDelayProperty;
+import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.SessionStoreHousekeepingMaxWaitShutdownProperty;
 import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.SessionStoreMaxWaitAllShutdownProperty;
+import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.SessionStoreMaxWaitWriteLockProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -307,14 +310,22 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
       if (uiSessions == null || uiSessions.isEmpty()) {
         LOG.info("Session housekeeping: Shutting down client session with ID {} because it is not used anymore", clientSession.getId());
         try {
-          ModelJobs.schedule(new IRunnable() {
+          final IFuture<Void> future = ModelJobs.schedule(new IRunnable() {
             @Override
             public void run() throws Exception {
               forceClientSessionShutdown(clientSession);
             }
           }, ModelJobs.newInput(ClientRunContexts.copyCurrent().withSession(clientSession, true))
-              .withName("Force shutting down client session {} by session housekeeping", clientSession.getId()))
-              .awaitDone();
+              .withName("Force shutting down client session {} by session housekeeping", clientSession.getId()));
+
+          int timeout = CONFIG.getPropertyValue(SessionStoreHousekeepingMaxWaitShutdownProperty.class).intValue();
+          try {
+            future.awaitDone(timeout, TimeUnit.SECONDS);
+          }
+          catch (TimedOutException e) {
+            LOG.warn("Client session did no stop within {} seconds. Canceling shutdown job.", timeout);
+            future.cancel(true);
+          }
         }
         catch (ThreadInterruptedException e) {
           LOG.warn("Interruption encountered while waiting for client session {} to stop. Continuing anyway.", clientSession.getId(), e);
@@ -422,22 +433,37 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
     final List<IFuture<?>> futures = new ArrayList<>();
 
     // Stop all client sessions (in parallel model jobs)
-    m_writeLock.lock();
     try {
-      for (final IClientSession clientSession : m_clientSessionMap.values()) {
-        futures.add(ModelJobs.schedule(new IRunnable() {
-          @Override
-          public void run() {
-            LOG.debug("Shutting down client session with ID {} due to invalidation of HTTP session", clientSession.getId());
-            forceClientSessionShutdown(clientSession);
-            removeClientSession(clientSession);
+      int timeout = CONFIG.getPropertyValue(SessionStoreMaxWaitWriteLockProperty.class).intValue();
+      if (m_writeLock.tryLock(timeout, TimeUnit.SECONDS)) {
+        try {
+          for (final IClientSession clientSession : m_clientSessionMap.values()) {
+            futures.add(ModelJobs.schedule(new IRunnable() {
+              @Override
+              public void run() {
+                LOG.debug("Shutting down client session with ID {} due to invalidation of HTTP session", clientSession.getId());
+                forceClientSessionShutdown(clientSession);
+                removeClientSession(clientSession);
+              }
+            }, ModelJobs.newInput(ClientRunContexts.copyCurrent().withSession(clientSession, true))
+                .withName("Closing desktop due to HTTP session invalidation")));
           }
-        }, ModelJobs.newInput(ClientRunContexts.copyCurrent().withSession(clientSession, true))
-            .withName("Closing desktop due to HTTP session invalidation")));
+        }
+        finally {
+          m_writeLock.unlock();
+        }
+      }
+      else {
+        LOG.warn("Could not acquire write lock within {} seconds: [HTTP session: {}, uiSessionMap: {}, clientSessionMap: {}, uiSessionsByClientSession: {}]",
+            timeout, m_uiSessionMap.size(), m_clientSessionMap.size(), m_uiSessionsByClientSession.size());
       }
     }
-    finally {
-      m_writeLock.unlock();
+    catch (InterruptedException e) {
+      LOG.warn("Interrupted while waiting on session store write lock", e);
+    }
+
+    if (futures.isEmpty()) {
+      return;
     }
 
     // After some time, check if everything was cleaned up correctly ("leak detection").
@@ -453,24 +479,29 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
                 .toFilter(), CONFIG.getPropertyValue(SessionStoreMaxWaitAllShutdownProperty.class), TimeUnit.SECONDS);
             LOG.info("Session shutdown complete.");
           }
-          catch (ThreadInterruptedException | TimedOutException e) {
-            LOG.warn("Interruption or timeout encountered while waiting for all client session to stop. Continuing anyway.", e);
+          catch (ThreadInterruptedException e) {
+            LOG.warn("Interruption encountered while waiting for all client session to stop. Continuing anyway.", e);
+          }
+          catch (TimedOutException e) {
+            LOG.warn("Timeout encountered while waiting for all client session to stop. Canceling still running client session shutdown jobs.", e);
+
+            Jobs.getJobManager().cancel(Jobs.newFutureFilterBuilder()
+                .andMatchFuture(futures)
+                .andMatchNotState(JobState.DONE)
+                .toFilter(), true);
           }
         }
 
-        m_readLock.lock();
-        try {
-          if (!isEmpty()) {
-            LOG.warn("Leak detection - Session store not empty after HTTP session invalidation: [uiSessionMap: {}, clientSessionMap: {}, uiSessionsByClientSession: {}]",
-                m_uiSessionMap.size(), m_clientSessionMap.size(), m_uiSessionsByClientSession.size());
-          }
-        }
-        finally {
-          m_readLock.unlock();
+        // Read map sizes outside a lock - dirty reads are acceptable here
+        final int uiSessionMapSize = m_uiSessionMap.size();
+        final int clientSessionMapSize = m_clientSessionMap.size();
+        final int uiSessionsByClientSessionSize = m_uiSessionsByClientSession.size();
+        if (uiSessionMapSize + clientSessionMapSize + uiSessionsByClientSessionSize > 0) {
+          LOG.warn("Leak detection - Session store not empty after HTTP session invalidation: [uiSessionMap: {}, clientSessionMap: {}, uiSessionsByClientSession: {}]",
+              uiSessionMapSize, clientSessionMapSize, uiSessionsByClientSessionSize);
         }
       }
     }, Jobs.newInput()
         .withName("Waiting for {} client sessions to shut down", futures.size()));
   }
-
 }

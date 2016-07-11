@@ -75,16 +75,24 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
   this.$headerItem.select(true);
 
   this.$container = $parent.appendDiv('table-header-menu');
-  this.$columnActions = this.$container.appendDiv('table-header-menu-actions');
+  this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
+  this.htmlComp.setLayout(this._createLayout());
+  this.$body = this.$container.appendDiv('table-header-menu-body');
+  new scout.HtmlComponent(this.$body, this.session);
+  scout.scrollbars.install(this.$body, {
+    parent: this,
+    axis: 'y'
+  });
+  this.$columnActions = this.$body.appendDiv('table-header-menu-actions');
 
   // only add right column if filter has a filter-table or filter-fields
   if (this.hasFilterTable || this.hasFilterFields) {
-    this.$columnFilters = this.$container.appendDiv('table-header-menu-filters');
+    this.$columnFilters = this.$body.appendDiv('table-header-menu-filters');
+    var htmlColumnFiltes = new scout.HtmlComponent(this.$columnFilters, this.session);
+    htmlColumnFiltes.setLayout(new scout.RowLayout());
   }
 
   this.tableHeader.$container.on('scroll', this._tableHeaderScrollHandler);
-  this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
-  this.htmlComp.setLayout(this._createLayout());
   this.$whiter = this.$container.appendDiv('table-header-menu-whiter');
 
   if (this.withFocusContext && this.focusableContainer) {
@@ -161,6 +169,7 @@ scout.TableHeaderMenu.prototype._remove = function() {
   this.$headerItem.select(false);
   this.table.off('addFilter', this._tableFilterHandler);
   this.table.off('removeFilter', this._tableFilterHandler);
+  scout.scrollbars.uninstall(this.$body, this.session);
   scout.TableHeaderMenu.parent.prototype._remove.call(this);
 
   // table may have been removed in the meantime
@@ -549,6 +558,8 @@ scout.TableHeaderMenu.prototype._renderFilterTable = function() {
 
   this.$filterTableGroup = this.$columnFilters
     .appendDiv('table-header-menu-group first');
+  var htmlComp = new scout.HtmlComponent(this.$filterTableGroup, this.session);
+  htmlComp.setLayout(new scout.RowLayout());
 
   $filterActions = this.$filterTableGroup
     .appendDiv('table-header-menu-filter-actions');
@@ -561,6 +572,7 @@ scout.TableHeaderMenu.prototype._renderFilterTable = function() {
   this.$filterTableGroupTitle = this.$filterTableGroup
     .appendDiv('table-header-menu-group-text')
     .text(this._filterByText());
+  new scout.HtmlComponent(this.$filterTableGroupTitle, this.session);
 
   this.filterTable = scout.create('Table', {
     parent: this,
@@ -588,7 +600,6 @@ scout.TableHeaderMenu.prototype._renderFilterTable = function() {
     ]
   });
   this.filterTable.on('rowsChecked', this._filterTableRowsCheckedHandler);
-
   var tableRow, tableRows = [];
   this.filter.availableValues.forEach(function(filterValue) {
     tableRow = {
@@ -607,6 +618,7 @@ scout.TableHeaderMenu.prototype._renderFilterTable = function() {
   }, this);
   this.filterTable.insertRows(tableRows);
   this.filterTable.render(this.$filterTableGroup);
+  this.filterTable.htmlComp.pixelBasedSizing = true;
 
   // must do this in a setTimeout, since table/popup is not visible yet (same as Table#revealSelection).
   setTimeout(this.filterTable.revealChecked.bind(this.filterTable));
@@ -667,9 +679,12 @@ scout.TableHeaderMenu.prototype._renderFilterFields = function() {
     filter: this.filter
   });
   this.$filterFieldsGroup = this.$columnFilters.appendDiv('table-header-menu-group');
-  this.$filterFieldsGroup
+  var htmlComp = new scout.HtmlComponent(this.$filterFieldsGroup, this.session);
+  htmlComp.setLayout(new scout.RowLayout());
+  var $filterFieldsText = this.$filterFieldsGroup
     .appendDiv('table-header-menu-group-text')
     .text(this.filter.filterFieldsTitle());
+  htmlComp = new scout.HtmlComponent($filterFieldsText, this.session);
   this.filterFieldsGroupBox.render(this.$filterFieldsGroup);
   return this.$filterFieldsGroup;
 };
@@ -713,6 +728,21 @@ scout.TableHeaderMenu.prototype._computeWhitherWidth = function() {
     whitherWidth -= clipLeft;
   }
   return whitherWidth;
+};
+
+scout.TableHeaderMenu.prototype._renderCompact = function() {
+  this.$body.toggleClass('compact', this.compact);
+  this.invalidateLayoutTree();
+};
+
+scout.TableHeaderMenu.prototype.setCompact = function(compact) {
+  if (this.compact === compact) {
+    return;
+  }
+  this.compact = compact;
+  if (this.rendered) {
+    this._renderCompact();
+  }
 };
 
 scout.TableHeaderMenu.prototype._onLocationChanged = function(event) {
