@@ -13,6 +13,10 @@ package org.eclipse.scout.rt.client.ui.action.tool;
 import org.eclipse.scout.rt.client.extension.ui.action.tool.IToolButtonExtension;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 
+/**
+ * @deprecated use {@link AbstractMenu} instead, will be removed in Scout 6.1
+ */
+@Deprecated
 @SuppressWarnings("deprecation")
 public abstract class AbstractToolButton extends AbstractMenu implements IToolButton {
 
