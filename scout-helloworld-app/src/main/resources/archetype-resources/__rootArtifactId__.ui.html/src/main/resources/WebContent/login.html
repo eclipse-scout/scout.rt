@@ -7,13 +7,10 @@
     <scout:stylesheet src="res/scout-login-module.css" />
     <scout:script src="res/jquery-all-macro.js" />
     <scout:script src="res/scout-login-module.js" />
-    <script>
-      $(document).ready(function() {
-        scout.login.init({texts: <scout:message style="javascript" key="ui.Login" key="ui.LoginFailed" key="ui.User" key="ui.Password" /> });
-      });
-    </script>
+    <scout:script src="res/login.js" />
   </head>
   <body>
     <scout:include template="no-script.html" />
+    <scout:message style="tag" key="ui.Login" key="ui.LoginFailed" key="ui.User" key="ui.Password" />
   </body>
 </html>
