@@ -328,7 +328,7 @@ scout.Planner.prototype._renderScale = function() {
   if (!this.viewRange.from || !this.viewRange.to) {
     return;
   }
-  var $divLarge, $divSmall, width, newLargeGroup,
+  var width,
     that = this,
     displayMode = scout.Planner.DisplayMode;
 
