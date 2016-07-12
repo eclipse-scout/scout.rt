@@ -567,6 +567,49 @@ scout.Widget.prototype.toString = function() {
     (this.$container ? ' $container=' + scout.graphics.debugOutput(this.$container) : '') + ']';
 };
 
+scout.Widget.prototype.resolveTextKeys = function(properties) {
+  properties.forEach(function(property) {
+    this[property] = scout.textProperties.resolveTextKeys(this[property]);
+  }, this);
+};
+
+scout.Widget.prototype.resolveIconIds = function(properties) {
+  properties.forEach(function(property) {
+    this[property] = scout.icons.resolveIconId(this[property]);
+  }, this);
+};
+
+/**
+ * Traverses the object-tree (children) of this widget and searches for a widget with the given ID.
+ * Returns the widget with the requested ID or null if no widget has been found.
+ * @param widgetId
+ */
+scout.Widget.prototype.getWidgetById = function(widgetId) {
+  return getRecWidgetById(this, widgetId);
+
+  function getRecWidgetById(widget, widgetId) {
+    if (widget.id === widgetId) {
+      return widget;
+    }
+    var i, child;
+    if (widget.children && widget.children.length > 0) {
+      for (i = 0; i < widget.children.length; i++) {
+        child = widget.children[i];
+        if (child.id === widgetId) {
+          return child;
+        } else {
+          child = getRecWidgetById(child, widgetId);
+          if (child) {
+            return child;
+          }
+        }
+      }
+    } else {
+      return null;
+    }
+  }
+};
+
 /* --- STATIC HELPERS ------------------------------------------------------------- */
 
 scout.Widget.getWidgetFor = function($elem) {

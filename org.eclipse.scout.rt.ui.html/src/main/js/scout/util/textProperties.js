@@ -1,5 +1,7 @@
 scout.textProperties = {
 
+  TEXT_KEY_REGEX: /\$\{textKey\:([a-zA-Z0-9\.]*)\}/,
+
   _textMap: {},
 
   bootstrap: function() {
@@ -37,6 +39,16 @@ scout.textProperties = {
 
   getTextMap: function() {
     return this._textMap;
+  },
+
+  resolveTextKeys: function(value) {
+    var textKey,
+      result = this.TEXT_KEY_REGEX.exec(value);
+    if (result && result.length === 2) {
+      textKey = result[1];
+      value = this._textMap[textKey];
+    }
+    return value;
   }
 
 };

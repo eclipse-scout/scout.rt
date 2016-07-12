@@ -43,6 +43,7 @@ scout.Desktop.prototype._init = function(model) {
   this._resizeHandler = this.onResize.bind(this);
   this._popstateHandler = this.onPopstate.bind(this);
   this.updateSplitterVisibility();
+  this.resolveTextKeys(['title']);
   this._syncViewButtons(this.viewButtons);
   this._syncMenus(this.menus);
 };

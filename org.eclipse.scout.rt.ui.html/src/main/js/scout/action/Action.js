@@ -36,46 +36,10 @@ scout.Action.ActionStyle = {
 scout.Action.prototype._init = function(model) {
   scout.Action.parent.prototype._init.call(this, model);
   this.actionKeyStroke = this._createActionKeyStroke();
-  this._resolveTextKeys(['text', 'tooltipText']);
-  this._resolveIconIds(['iconId']);
+  this.resolveTextKeys(['text', 'tooltipText']);
+  this.resolveIconIds(['iconId']);
   this._syncKeyStroke(this.keyStroke);
   this._syncSelected(this.selected);
-};
-
-scout.Action.prototype._resolveTextKeys = function(properties) {
-  var value, result, textKey,
-    pattern = /\$\{textKey\:([a-zA-Z0-9\.]*)\}/;
-  properties.forEach(function(property) {
-    value = this[property];
-    result = pattern.exec(value);
-    if (result && result.length === 2) {
-      textKey = result[1];
-      this[property] = this.session.text(textKey);
-    }
-  }, this);
-};
-
-scout.Action.prototype._resolveIconIds = function(properties) {
-  var value, result, iconId, tmp,
-    pattern = /\$\{iconId\:([a-zA-Z0-9_\.]*)\}/;
-  properties.forEach(function(property) {
-    value = this[property];
-    result = pattern.exec(value);
-    if (result && result.length === 2) {
-      iconId = result[1];
-      tmp = iconId.split('.');
-      if (tmp.length === 1) {
-        // look for icon in scout.icons.[0]
-        this[property] = scout.icons[tmp];
-      } else if (tmp.length === 2) {
-        // look for icon in global object [0].icons.[1]
-        // FIXME [awe] 6.1 register a kind of icon lookup-service instead of this naming convention?
-        this[property] = window[tmp[0]].icons[tmp[1]];
-      } else {
-        $.log.warn('Invalid iconId: ' + value);
-      }
-    }
-  }, this);
 };
 
 scout.Action.prototype._renderProperties = function() {
