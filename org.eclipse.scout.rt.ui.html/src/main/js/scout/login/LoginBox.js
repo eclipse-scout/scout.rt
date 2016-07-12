@@ -12,15 +12,17 @@ scout.LoginBox = function(opts) {
   scout.LoginBox.parent.call(this, opts);
 
   var defaultOpts = {
-    logoUrl: 'res/logo.png',
-    texts: {
-      'ui.Login': 'Login',
-      'ui.LoginFailed': 'Login failed',
-      'ui.User': 'User',
-      'ui.Password': 'Password'
-    }
+    logoUrl: 'res/logo.png'
   };
   this.options = $.extend({}, defaultOpts, opts);
+  var defaultTexts = {
+    'ui.Login': 'Login',
+    'ui.LoginFailed': 'Login failed',
+    'ui.User': 'Username',
+    'ui.Password': 'Password'
+  };
+  this.options.texts = $.extend({}, defaultTexts, opts.texts);
+
   this.texts = new scout.Texts(this.options.texts);
   this.logoUrl = this.options.logoUrl;
 };
@@ -36,10 +38,10 @@ scout.LoginBox.prototype.render = function($parent) {
     .attr('method', 'post')
     .submit(this._onLoginFormSubmit.bind(this))
     .appendTo(this.$content);
-  if (this.options.message) {
+  if (this.options.messageKey) {
     this.$message = $('<div>')
       .attr('id', 'message-box')
-      .text(this.texts.get(this.options.message))
+      .text(this.texts.get(this.options.messageKey))
       .appendTo(this.$form);
   }
   this.$user = $('<input>')
@@ -119,13 +121,13 @@ scout.LoginBox.prototype._onPostFail = function(jqXHR, textStatus, errorThrown) 
       .html('')
       .text(this.texts.get('ui.LoginFailed'))
       .addClass('login-error');
-  this.$user
-    .val('')
-    .focus()
-    .one('input.resetLoginError', this._resetButtonText.bind(this));
-  this.$password
-    .val('')
-    .one('input.resetLoginError', this._resetButtonText.bind(this));
+    this.$user
+      .val('')
+      .focus()
+      .one('input.resetLoginError', this._resetButtonText.bind(this));
+    this.$password
+      .val('')
+      .one('input.resetLoginError', this._resetButtonText.bind(this));
   }.bind(this), 300);
 };
 
@@ -139,4 +141,3 @@ scout.LoginBox.prepareRedirectUrl = function(url) {
     .replace(/logout$/, '');
   return filteredBaseUrl + (urlParts[2] ? urlParts[2] : '') + (urlParts[3] ? urlParts[3] : '');
 };
-

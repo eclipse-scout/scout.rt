@@ -13,13 +13,15 @@ scout.LogoutBox = function(opts) {
 
   var defaultOpts = {
     loginUrl: sessionStorage.getItem('scout:loginUrl') || './',
-    logoUrl: 'res/logo.png',
-    texts: {
-      'ui.LogoutSuccessful': 'Good bye!',
-      'ui.LoginAgain': 'Login again'
-    }
+    logoUrl: 'res/logo.png'
   };
   this.options = $.extend({}, defaultOpts, opts);
+  var defaultTexts = {
+    'ui.LogoutSuccessful': 'Good bye!',
+    'ui.LoginAgain': 'Login again'
+  };
+  this.options.texts = $.extend({}, defaultTexts, opts.texts);
+
   this.texts = new scout.Texts(this.options.texts);
   this.loginUrl = this.options.loginUrl;
   this.logoUrl = this.options.logoUrl;
@@ -40,8 +42,6 @@ scout.LogoutBox.prototype.render = function($parent) {
     .text(this.texts.get('ui.LoginAgain'))
     .on('click', this._loginAgain.bind(this))
     .appendTo(this.$buttonBar);
-
-  scout.prepareDOM();
 };
 
 scout.LogoutBox.prototype._loginAgain = function() {
