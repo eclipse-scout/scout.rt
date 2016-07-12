@@ -44,16 +44,15 @@ public class Desktop extends AbstractDesktop {
   }
 
   @Override
-  protected void execGuiAttached() {
-    super.execGuiAttached();
+  protected void execDefaultView() {
     selectFirstVisibleOutline();
   }
 
   protected void selectFirstVisibleOutline() {
     for (IOutline outline : getAvailableOutlines()) {
       if (outline.isEnabled() && outline.isVisible()) {
-        setOutline(outline);
-        break;
+        setOutline(outline.getClass());
+        return;
       }
     }
   }
