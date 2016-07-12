@@ -50,6 +50,7 @@ scout._bootstrap = function(options) {
     scout.device.bootstrap(),
     scout.defaultValues.bootstrap(),
     scout.model.bootstrap(), // FIXME [awe] 6.1 - only bootstrap model in Offline app
+    scout.textProperties.bootstrap(), // FIXME [awe] 6.1 - only bootstrap model in Offline app, merge with Session.js
     scout.fonts.bootstrap(options.fonts)
   ];
 

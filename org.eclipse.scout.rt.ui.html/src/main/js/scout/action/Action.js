@@ -36,7 +36,7 @@ scout.Action.ActionStyle = {
 scout.Action.prototype._init = function(model) {
   scout.Action.parent.prototype._init.call(this, model);
   this.actionKeyStroke = this._createActionKeyStroke();
-  this._resolveTextKeys(['text', 'tooltip']);
+  this._resolveTextKeys(['text', 'tooltipText']);
   this._resolveIconIds(['iconId']);
   this._syncKeyStroke(this.keyStroke);
   this._syncSelected(this.selected);

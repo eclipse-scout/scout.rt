@@ -37,6 +37,7 @@
   __include("scout/util/Status.js");
   __include("scout/util/strings.js");
   __include("scout/util/styles.js");
+  __include("scout/util/textProperties.js");
   __include("scout/util/URL.js");
   __include("scout/util/filters.js");
   __include("scout/util/hAlign.js");
