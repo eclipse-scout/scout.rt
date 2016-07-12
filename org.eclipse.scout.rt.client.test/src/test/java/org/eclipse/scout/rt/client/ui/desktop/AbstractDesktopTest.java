@@ -17,6 +17,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.Collections;
 import java.util.List;
 
+import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.testenvironment.ui.desktop.TestEnvironmentDesktop;
 import org.eclipse.scout.rt.client.ui.DataChangeListener;
@@ -217,6 +218,7 @@ public class AbstractDesktopTest {
    * {@link AbstractDesktop#doBeforeClosingInternal()}
    */
   @Test
+  @RunWithClientSession(value = TestEnvironmentClientSession.class, provider = ClientSessionProvider.class) // ensures that this test runs with its own clean desktop
   public void testClosingDoBeforeClosingInternal() {
     TestEnvironmentDesktop desktop = (TestEnvironmentDesktop) IDesktop.CURRENT.get();
 
