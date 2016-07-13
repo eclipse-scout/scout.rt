@@ -96,12 +96,16 @@ scout.Tree.prototype._ensureTreeNodes = function(nodeModels) {
     if (nodeModel instanceof scout.TreeNode) {
       treeNode = nodeModel;
     } else {
-      treeNode = new scout.TreeNode(this);
-      $.extend(treeNode, nodeModel);
+      treeNode = this._createTreeNode(nodeModel);
+      $.extend(treeNode, nodeModel); // FIXME [awe] 6.1 - schauen ob wir hier nicht init(model) verwenden können (loadChildren?)
     }
     treeNodes[i] = treeNode;
   }
   return treeNodes;
+};
+
+scout.Tree.prototype._createTreeNode = function(nodeModel) {
+  return new scout.TreeNode(this);
 };
 
 /**
@@ -171,6 +175,7 @@ scout.Tree.prototype._isSelectedNode = function(node) {
 };
 
 scout.Tree.prototype._initTreeNode = function(node, parentNode) {
+  // FIXME [awe] 6.1 move this code to TreeNode#init
   this.nodesMap[node.id] = node;
   node.init();
 
@@ -226,7 +231,9 @@ scout.Tree.prototype._initTreeNode = function(node, parentNode) {
 };
 
 scout.Tree.prototype._initTreeNodeInternal = function(node, parentNode) {
-  // override this if you want a custom node init before filtering.
+  // internal subclasses of tree (e.g. Outline) may override this method
+  // to perform custom node init before filtering. Other subclasses should
+  // not override this method.
 };
 
 scout.Tree.prototype.destroy = function() {
@@ -1876,7 +1883,7 @@ scout.Tree.prototype._updateChildNodeIndex = function(nodes, startIndex) {
 };
 
 scout.Tree.prototype.insertNodes = function(nodes, parentNode) {
-  nodes = this._ensureTreeNodes(nodes);
+  nodes = this._ensureTreeNodes(nodes); // FIXME [awe] 6.1 - wir müssen schauen, wo wir überall das nodeModel in ein TreeNode oder Page konvertieren wollen
 
   // Append continuous node blocks
   nodes.sort(function(a, b) {

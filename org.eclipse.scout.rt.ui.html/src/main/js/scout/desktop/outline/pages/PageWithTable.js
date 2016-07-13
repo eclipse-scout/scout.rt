@@ -8,7 +8,7 @@ scout.inherits(scout.PageWithTable, scout.Page);
 
 scout.PageWithTable.prototype._init = function() {
   scout.PageWithTable.parent.prototype._init.call(this);
-  this.loadChildren();
+  // this.loadChildren();
 };
 
 scout.PageWithTable.prototype._createChildPageInternal = function(tableRow) {
@@ -17,12 +17,6 @@ scout.PageWithTable.prototype._createChildPageInternal = function(tableRow) {
     childPage = this.createDefaultChildPage(tableRow);
   }
   return childPage;
-};
-
-// AbstractPageWithTable#loadChildren -> hier wird die table geladen und der baum neu aufgebaut
-// wird von AbstractTree#P_UIFacade aufgerufen
-scout.PageWithTable.prototype.loadTableData = function() {
-
 };
 
 scout.PageWithTable.prototype.createChildPage = function(tableRow) {
@@ -40,7 +34,7 @@ scout.PageWithTable.prototype.createDefaultChildPage = function(tableRow) {
  * @override TreeNode.js
  */
 scout.PageWithTable.prototype.loadChildren = function() {
-  this.table = this.loadTableData();
+  this.loadTableData();
   var childPage, childNodes = [];
   // FIXME [awe] 6.1 create child nodes for table rows, check how this is done in Java model
   this.table.rows.forEach(function(row) {
@@ -50,4 +44,5 @@ scout.PageWithTable.prototype.loadChildren = function() {
     }
   }, this);
   this.childNodes = childNodes;
+  this.tree._onPageChanged2(this);
 };

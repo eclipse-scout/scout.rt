@@ -57,6 +57,13 @@ scout.Outline.prototype._init = function(model) {
   this.updateDetailContent();
 };
 
+/**
+ * @override Tree.js
+ */
+scout.Outline.prototype._createTreeNode = function(nodeModel) {
+  return new scout.TreeNode(this);
+};
+
 scout.Outline.prototype._createKeyStrokeContext = function() {
   return new scout.OutlineKeyStrokeContext(this);
 };
@@ -971,6 +978,25 @@ scout.Outline.prototype._onDetailTableEvent = function(event) {
   } else if (event.type === 'rowsFiltered') {
     this._onDetailTableRowsFiltered(event);
   }
+};
+
+// FIXME [awe] 6.1 - merge this with online logic in onPageChanged
+scout.Outline.prototype._onPageChanged2 = function(page) {
+  if (page.table) {
+    page.detailTable = page.table;
+    page.detailTableVisible = true;
+  } else {
+    delete page.detailTable;
+    page.detailTableVisible = false;
+  }
+  this._initDetailTable(page);
+
+  var selectedPage = this.selectedNodes[0];
+  if (!page && !selectedPage || page === selectedPage) {
+    this.updateDetailContent();
+  }
+
+  this._triggerPageChanged(page);
 };
 
 scout.Outline.prototype._onPageChanged = function(event) {
