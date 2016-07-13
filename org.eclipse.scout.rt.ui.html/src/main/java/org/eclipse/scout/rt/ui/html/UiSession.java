@@ -957,7 +957,7 @@ public class UiSession implements IUiSession {
   }
 
   @Override
-  public void waitForBackgroundJobs(int pollWaitSeconds) throws InterruptedException {
+  public void waitForBackgroundJobs(final int pollWaitSeconds) throws InterruptedException {
     // If another poller is currently blocking, interrupt it. This ensures that max. 1 polling
     // request is waiting for background jobs at the same time (relevant when the UI reconnects
     // after being offline).
@@ -968,26 +968,28 @@ public class UiSession implements IUiSession {
       m_pollerMonitor = RunMonitor.CURRENT.get();
     }
 
+    LOG.trace("Wait for max. {} seconds until background job terminates or wait timeout occurs...", pollWaitSeconds);
+    final long maxPollWait = pollWaitSeconds * 1000;
+    final long t0 = System.currentTimeMillis();
+    long pollWait = maxPollWait;
     boolean wait = true;
     while (wait) {
-      LOG.trace("Wait for max. {} seconds until background job terminates or wait timeout occurs...", pollWaitSeconds);
-      long t0 = System.currentTimeMillis();
       // Wait until notified by m_modelJobFinishedListener (when a background job has finished) or a timeout occurs
-      Object notificationToken = m_pollerQueue.poll(pollWaitSeconds, TimeUnit.SECONDS);
-      int durationSeconds = (int) Math.round((System.currentTimeMillis() - t0) / 1000d);
-      int newPollWaitSeconds = pollWaitSeconds - durationSeconds;
-      if (notificationToken == null || newPollWaitSeconds <= 0 || m_disposed || !m_currentJsonResponse.isEmpty()) {
+      Object notificationToken = m_pollerQueue.poll(pollWait, TimeUnit.MILLISECONDS);
+      long elapsed = System.currentTimeMillis() - t0;
+      // Calculate remaining poll wait time
+      pollWait = maxPollWait - elapsed;
+      if (notificationToken == null || pollWait < 100 || m_disposed || !m_currentJsonResponse.isEmpty()) {
         // Stop wait loop for one of the following reasons:
         // 1. Timeout has occurred -> return always, even with empty answer
-        // 2. Remaining pollWaitTime would be zero -> same as no. 1
+        // 2. Remaining poll wait time would less than 100 ms -> same as no. 1
         // 3. Session is disposed
         // 4. Poller was waken up by m_modelJobFinishedListener and JsonResponse is not empty
         wait = false;
       }
       else {
         // Continue wait loop, because timeout has not yet elapsed and JsonResponse is empty
-        LOG.trace("Background job terminated, but there is nothing to respond. Going back to sleep.");
-        pollWaitSeconds = newPollWaitSeconds;
+        LOG.trace("Background job terminated, but there is nothing to respond. Going back to sleep for max. {} ms.", pollWait);
       }
     }
     if (!m_disposed) {
