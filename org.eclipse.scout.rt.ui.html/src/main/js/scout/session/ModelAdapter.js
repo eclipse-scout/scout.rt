@@ -39,7 +39,7 @@ scout.ModelAdapter = function() {
   this._modelProperties = [];
 
   this._register = true;
-  this.remoteHandler = scout.EventRemoteHandler; // scout.NullRemoteHandler;
+  this.remoteHandler = scout.NullRemoteHandler;
   this._addKeyStrokeContextSupport();
   this._addEventSupport();
 };
@@ -68,9 +68,14 @@ scout.ModelAdapter.prototype._init = function(model) {
   this.id = model.id;
   this.objectType = model.objectType;
   this._register = scout.nvl(model._register, true); // FIXME [awe] 6.1 discuss -> die registry kommt auch in den RemoteProxy
-  if (this._register) {
+
+  // FIMXE CGU [6.1] rmove EventRemoteHandler
+  if (!this.session.remote) {
+    this.remoteHandler = scout.EventRemoteHandler;
+  }
+  else if (this._register) {
     this.session.registerModelAdapter(this);
-    this.remoteHandler = scout.EventRemoteHandler.bind(this); //this.session.sendEvent.bind(this.session);
+    this.remoteHandler = this.session.sendEvent.bind(this.session);
   }
 
   // Make a copy to prevent a modification of the given object

@@ -16,6 +16,8 @@ scout.RemoteApp.prototype._doBootstrap = function(options) {
  * @override
  */
 scout.RemoteApp.prototype._createSession = function($entryPoint, options) {
+  options = options || {};
+  options.remote = true;
   var session = new scout.Session($entryPoint, options);
   session.init();
   return session;

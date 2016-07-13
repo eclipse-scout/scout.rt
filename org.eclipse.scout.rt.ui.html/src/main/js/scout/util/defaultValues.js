@@ -20,7 +20,12 @@ scout.defaultValues = {
    */
   _objectTypeHierarchyFlat: {},
 
-  bootstrap: function() {
+  bootstrap: function(options) {
+    options = options || {};
+    var defaultOptions = {
+      url: 'defaultValues'
+    };
+    options = $.extend({}, defaultOptions, options);
     var that = this;
     // Load default value configuration from server (and cache it)
     return $.ajax({
@@ -29,7 +34,7 @@ scout.defaultValues = {
         dataType: 'json',
         contentType: 'application/json; charset=UTF-8',
         cache: true,
-        url: 'http://localhost:8082/defaultValues',
+        url: options.url,
         data: ''
       }).done(function(data) {
         that._loadDefaultsConfiguration(data);

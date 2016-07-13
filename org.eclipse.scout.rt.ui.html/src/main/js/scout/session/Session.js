@@ -79,6 +79,9 @@ scout.Session = function($entryPoint, options) {
   this._fatalMessagesOnScreen = {};
   this._loggedOut = false;
 
+  // FIXME CGU [6.1] flag necessary for modeladapter, remove it
+  this.remote = options.remote;
+
   this.rootAdapter = new scout.ModelAdapter();
   this.rootAdapter.init({
     parent: new scout.NullWidget(),
