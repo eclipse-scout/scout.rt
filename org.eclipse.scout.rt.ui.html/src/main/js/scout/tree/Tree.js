@@ -70,6 +70,7 @@ scout.Tree.prototype._init = function(model) {
     this.addFilter(this.breadcrumbFilter, true, true);
   }
   this.initialTraversing = true;
+  this.nodes = this._ensureTreeNodes(this.nodes);
   this._visitNodes(this.nodes, this._initTreeNode.bind(this));
   this.initialTraversing = false;
   this.selectedNodes = this._nodesByIds(this.selectedNodes);
@@ -83,6 +84,24 @@ scout.Tree.prototype._init = function(model) {
   this._syncDisplayStyle(this.displayStyle);
   this._syncKeyStrokes(this.keyStrokes);
   this._syncMenus(this.menus);
+};
+
+/**
+ * Convert the node model to a TreeNode instance.
+ */
+scout.Tree.prototype._ensureTreeNodes = function(nodeModels) {
+  var i, nodeModel, treeNode, treeNodes = [];
+  for (i = 0; i < nodeModels.length; i++) {
+    nodeModel = nodeModels[i];
+    if (nodeModel instanceof scout.TreeNode) {
+      treeNode = nodeModel;
+    } else {
+      treeNode = new scout.TreeNode(this);
+      $.extend(treeNode, nodeModel);
+    }
+    treeNodes[i] = treeNode;
+  }
+  return treeNodes;
 };
 
 /**
@@ -140,9 +159,7 @@ scout.Tree.prototype._syncDisplayStyle = function(newValue) {
 };
 
 scout.Tree.prototype._resetTreeNode = function(node, parentNode) {
-  node.rendered = false;
-  node.attached = false;
-  delete node.$node;
+  node.reset();
 };
 
 scout.Tree.prototype._isSelectedNode = function(node) {
@@ -155,14 +172,15 @@ scout.Tree.prototype._isSelectedNode = function(node) {
 
 scout.Tree.prototype._initTreeNode = function(node, parentNode) {
   this.nodesMap[node.id] = node;
+  node.init();
+
   if (parentNode) {
     node.parentNode = parentNode;
     node.level = node.parentNode.level + 1;
   } else {
     node.level = 0;
   }
-  node.rendered = false;
-  node.attached = false;
+
   // if this node is selected all parent nodes have to be added to selectionPath
   if (this._isSelectedNode(node) && ((node.parentNode && !this.visibleNodesMap[node.parentNode.id]) || node.level === 0)) {
     var p = node;
@@ -171,16 +189,16 @@ scout.Tree.prototype._initTreeNode = function(node, parentNode) {
       p.filterDirty = true;
 
       if (p !== node) {
-        //ensure node is expanded
+        // ensure node is expanded
         node.expanded = true;
-        //if parent was filtered before, try refilter after adding to selection path.
+        // if parent was filtered before, try refilter after adding to selection path.
         if (p.level === 0) {
           this._applyFiltersForNode(p);
 
-          //add visible nodes to visible nodes array when they are initialized
+          // add visible nodes to visible nodes array when they are initialized
           this._addToVisibleFlatList(p, false);
 
-          //process children
+          // process children
           this._addChildrenToFlatList(p, this.visibleNodesFlat.length - 1, false, null, true);
         }
       }
@@ -189,15 +207,6 @@ scout.Tree.prototype._initTreeNode = function(node, parentNode) {
   } else if (node.parentNode && this._isSelectedNode(node.parentNode)) {
     this._inSelectionPathList[node.id] = true;
   }
-  //create function to check if node is in hierarchy of a parent. is used on removal from flat list.
-  node.isChildOf = function(parentNode) {
-    if (parentNode === this.parentNode) {
-      return true;
-    } else if (!this.parentNode) {
-      return false;
-    }
-    return this.parentNode.isChildOf(parentNode);
-  };
   if (node.checked) {
     this.checkedNodes.push(node);
   }
@@ -205,28 +214,19 @@ scout.Tree.prototype._initTreeNode = function(node, parentNode) {
   if (node.childNodes === undefined) {
     node.childNodes = [];
   }
-  var that = this;
 
   this._initTreeNodeInternal(node, parentNode);
-
-  node.isFilterAccepted = function(forceFilter) {
-    if (this.filterDirty || forceFilter) {
-      that._applyFiltersForNode(this);
-    }
-    return this.filterAccepted;
-  };
   this._applyFiltersForNode(node);
 
-  //add visible nodes to visible nodes array when they are initialized
+  // add visible nodes to visible nodes array when they are initialized
   this._addToVisibleFlatList(node, false);
-
   this._updateMarkChildrenChecked(node, true, node.checked);
 
   node.initialized = true;
 };
 
 scout.Tree.prototype._initTreeNodeInternal = function(node, parentNode) {
-  //override this if you want a custom node init before filtering.
+  // override this if you want a custom node init before filtering.
 };
 
 scout.Tree.prototype.destroy = function() {
@@ -1375,6 +1375,7 @@ scout.Tree.prototype.setNodeExpanded = function(node, expanded, opts) {
     }
 
     if (node.expanded) {
+      node.loadChildren();
       this._addChildrenToFlatList(node, null, renderAnimated, null, true);
     } else {
       this._removeChildrenFromFlatList(node, renderAnimated);
@@ -1875,6 +1876,8 @@ scout.Tree.prototype._updateChildNodeIndex = function(nodes, startIndex) {
 };
 
 scout.Tree.prototype.insertNodes = function(nodes, parentNode) {
+  nodes = this._ensureTreeNodes(nodes);
+
   // Append continuous node blocks
   nodes.sort(function(a, b) {
     return a.childNodeIndex - b.childNodeIndex;

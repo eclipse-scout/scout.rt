@@ -205,6 +205,7 @@
   __include("scout/table/userfilter/TableTextUserFilter.js");
   // Tree
   __include("scout/tree/Tree.js");
+  __include("scout/tree/TreeNode.js");
   __include("scout/tree/TreeLayout.js");
   __include("scout/tree/LazyNodeFilter.js");
   __include("scout/tree/TreeBreadcrumbFilter.js");
@@ -258,6 +259,10 @@
   __include("scout/desktop/viewbutton/ViewMenuPopup.js");
   __include("scout/desktop/viewbutton/ViewMenuPopupLayout.js");
   __include("scout/desktop/viewbutton/ViewMenuTab.js");
+  __include("scout/desktop/outline/pages/Page.js");
+  __include("scout/desktop/outline/pages/PageWithNodes.js");
+  __include("scout/desktop/outline/pages/PageWithTable.js");
+  __include("scout/desktop/outline/pages/AutoLeafPageWithNodes.js");
   __include("scout/tabbox/SimpleTab.js");
   __include("scout/desktop/desktoptab/DesktopTab.js"); // requires SimpleTab.js
   __include("scout/tabbox/SimpleTabArea.js");

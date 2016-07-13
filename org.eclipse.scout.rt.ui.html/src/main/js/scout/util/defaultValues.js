@@ -111,6 +111,7 @@ scout.defaultValues = {
       objectType = objectType.replace(/\..*/, '');
       objectTypeHierarchy = this._objectTypeHierarchyFlat[objectType];
     }
+    // FIXME [awe] 6.1 --> hier auf den parent gehen (rekursiv) bis wir einen objectType finden.
     if (!objectTypeHierarchy) {
       // Unknown type, nothing to apply
       return;
