@@ -1,7 +1,7 @@
 scout.Page = function(outline) {
   scout.Page.parent.call(this, outline);
 
-  this.table;
+  this.table; // FIXME [awe] 6.1 - rename to detailTable (heisst auf dem server auch so)
   this.detailForm;
   this.tableVisible = true;
   this.detailFormVisible = true;

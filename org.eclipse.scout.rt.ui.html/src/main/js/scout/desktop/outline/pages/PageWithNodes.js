@@ -13,14 +13,15 @@ scout.PageWithNodes.prototype._init = function() {
  * @override Page.js
  */
 scout.PageWithNodes.prototype._createTable = function() {
-  var singleColumn = {
+  var nodeColumn = scout.create('Column', {
     index: 0,
-    objectType: 'Column'
-  };
+    id: 'NodeColumn'
+  });
   return scout.create('Table', {
     parent: this.tree,
-    columns: [singleColumn],
-    rows: []
+    id: 'PageWithNodesTable',
+    autoResizeColumns: true,
+    columns: [nodeColumn]
   });
 };
 
