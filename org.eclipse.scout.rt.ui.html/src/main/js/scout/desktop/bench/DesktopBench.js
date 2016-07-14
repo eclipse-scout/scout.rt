@@ -87,7 +87,7 @@ scout.DesktopBench.prototype._render = function($parent) {
   this.$container = $parent.appendDiv('desktop-bench');
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
 
-  this.htmlComp.setLayout(new scout.DesktopBenchLayout(this));
+  this.htmlComp.setLayout(this._createLayout());
 
   this._renderColumns();
   this._revalidateSplitters();
@@ -97,6 +97,10 @@ scout.DesktopBench.prototype._render = function($parent) {
   this.desktop.on('propertyChange', this._desktopPropertyChangeHandler);
   this.desktop.on('outlineChanged', this._desktopOutlineChangedHandler);
   this.desktop.on('animationEnd', this._desktopAnimationEndHandler);
+};
+
+scout.DesktopBench.prototype._createLayout = function() {
+  return new scout.DesktopBenchLayout(this);
 };
 
 scout.DesktopBench.prototype._renderColumns = function() {
