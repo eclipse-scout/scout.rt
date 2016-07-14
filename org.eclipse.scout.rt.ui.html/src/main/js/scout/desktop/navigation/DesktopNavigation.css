@@ -11,7 +11,7 @@
 @view-button-box-height: 50px;
 
 .desktop-navigation {
-  position: relative;
+  position: absolute;
   height: 100%;
   width: @desktop-navigation-width;
   min-width: @desktop-navigation-min-width;
