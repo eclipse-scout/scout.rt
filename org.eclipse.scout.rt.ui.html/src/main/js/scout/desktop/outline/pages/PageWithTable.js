@@ -29,7 +29,7 @@ scout.PageWithTable.prototype.createChildPage = function(tableRow) {
 };
 
 scout.PageWithTable.prototype.createDefaultChildPage = function(tableRow) {
-  return new scout.AutoLeafPageWithNodes(this.tree, tableRow);
+  return new scout.AutoLeafPageWithNodes(tableRow);
 };
 
 // AbstractPageWithTable#P_TableListener hat einen listener auf der table, über die listener wird
@@ -49,5 +49,5 @@ scout.PageWithTable.prototype.loadChildren = function() {
     }
   }, this);
   this.childNodes = childNodes;
-  this.tree._onPageChanged2(this); // FIXME 6.1 [awe] - remove this hack
+  this.getTree()._onPageChanged2(this); // FIXME 6.1 [awe] - remove this hack
 };

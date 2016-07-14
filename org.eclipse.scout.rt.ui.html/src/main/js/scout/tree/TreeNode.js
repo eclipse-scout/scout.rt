@@ -32,28 +32,33 @@ scout.TreeNode.prototype._resolveTextKeys = function() {
   this.text = scout.textProperties.resolveTextKeys(this.text);
 };
 
+scout.TreeNode.prototype.getTree = function() {
+  return this.parent;
+};
+
 scout.TreeNode.prototype._init = function(model) {
-  // FIXME [awe] 6.1 ... discuss: wenn wir TreeNode/Pages aus model.json bauen, dann wird nur die property parent "vererbt"
-  // nicht jedoch andere properties wie z.B. tree. Schauen wie wir das machen wollen. Entweder über eine zu implementierende Methode
-  // setParent() auf unseren Objects, oder durch ändern von TreeNode#tree auf TreeNode#parent.
-  if (!model.tree && model.parent) {
-    model.tree = model.parent;
-  }
-  if (!model.tree) {
-    throw new Error('missing property \'tree\'');
+  if (!model.parent) {
+    throw new Error('missing property \'parent\'');
   }
   $.extend(this, model);
   scout.defaultValues.applyTo(this);
-
-  var i, childNode;
-  for (i = 0; i < this.childNodes.length; i++) {
-    childNode = this.childNodes[i];
-    if (childNode instanceof scout.TreeNode) {
-      continue;
-    }
-    childNode.tree = this.tree;
-    this.childNodes[i] = scout.create(childNode);
+  // make sure all nodes are TreeNodes
+  for (var i = 0; i < this.childNodes.length; i++) {
+    this._ensureTreeNode(i);
   }
+};
+
+scout.TreeNode.prototype._ensureTreeNode = function(nodeIndex) {
+  var node = this.childNodes[nodeIndex];
+  if (node instanceof scout.TreeNode) {
+    return;
+  }
+  if (!node.objectType) {
+    node.objectType = 'TreeNode';
+  }
+  node.parent = this.parent;
+  scout.defaultValues.applyTo(node);
+  this.childNodes[nodeIndex] = scout.create(node);
 };
 
 scout.TreeNode.prototype.reset = function() {
@@ -61,7 +66,6 @@ scout.TreeNode.prototype.reset = function() {
   this.attached = false;
   delete this.$node;
 };
-
 
 /**
  * Check if node is in hierarchy of a parent. is used on removal from flat list.
@@ -77,7 +81,7 @@ scout.TreeNode.prototype.isChildOf = function(parentNode) {
 
 scout.TreeNode.prototype.isFilterAccepted = function(forceFilter) {
   if (this.filterDirty || forceFilter) {
-    this.tree._applyFiltersForNode(this);
+    this.getTree()._applyFiltersForNode(this);
   }
   return this.filterAccepted;
 };

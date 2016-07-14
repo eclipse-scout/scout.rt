@@ -8,8 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-scout.AutoLeafPageWithNodes = function(outline, tableRow) {
-  scout.AutoLeafPageWithNodes.parent.call(this, outline);
+scout.AutoLeafPageWithNodes = function(tableRow) {
+  scout.AutoLeafPageWithNodes.parent.call(this);
   this.tableRow = tableRow;
 };
 scout.inherits(scout.AutoLeafPageWithNodes, scout.Page);

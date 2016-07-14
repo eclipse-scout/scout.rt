@@ -96,7 +96,7 @@ scout.Tree.prototype._ensureTreeNodes = function(nodeModels) {
     if (nodeModel instanceof scout.TreeNode) {
       treeNode = nodeModel;
     } else {
-      nodeModel.tree = this;
+      nodeModel.parent = this; // FIXME [awe] 6.1 ... braucht es das noch? Wir haben ja jetzt ensure auf der TreeNode
       treeNode = this._createTreeNode(nodeModel);
       treeNode.init(nodeModel);
     }

@@ -23,7 +23,7 @@ scout.PageWithNodes.prototype._createTable = function() {
     id: 'NodeColumn'
   });
   return scout.create('Table', {
-    parent: this.tree,
+    parent: this.parent,
     id: 'PageWithNodesTable',
     autoResizeColumns: true,
     columns: [nodeColumn]
@@ -47,5 +47,5 @@ scout.PageWithNodes.prototype._loadTableData = function() {
  */
 scout.PageWithNodes.prototype.loadChildren = function() {
   // FIXME 6.1 [awe] - remove this hack
-  this.tree._onPageChanged2(this);
+  this.getTree()._onPageChanged2(this);
 };
