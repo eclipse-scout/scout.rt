@@ -106,7 +106,7 @@ scout.Tree.prototype._ensureTreeNodes = function(nodeModels) {
 };
 
 scout.Tree.prototype._createTreeNode = function(nodeModel) {
-  return new scout.TreeNode(this);
+  return new scout.TreeNode(this); // FIXME [awe] 6.1 ausprobieren ob das auch mit scout.create klappt
 };
 
 /**

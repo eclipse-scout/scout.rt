@@ -53,6 +53,7 @@ scout.Page.prototype.createDetailForm = function() {
 scout.Page.prototype._init = function(model) {
   scout.Page.parent.prototype._init.call(this, model);
   this.table = this._createTable();
+  // FIXME [awe] 6.1 scout.create für detailTable aufrufen, damit man detailTable auch in model.json konfigurieren kann
 };
 
 /**

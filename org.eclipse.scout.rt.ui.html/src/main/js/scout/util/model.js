@@ -12,6 +12,8 @@ scout.model = {
 
   modelMap: {},
 
+  // FIXME [awe] 6.1 als zwischenlösung hier alle einzelnen .json files auflisten und laden
+  // in der finalen lösungen haben wir einen builder analog defaultValues
   bootstrap: function() {
     var that = this;
 
