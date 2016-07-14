@@ -21,8 +21,13 @@ scout.model = {
     throw new Error('Error while loading model: ' + errorThrown);
   },
 
-  getModel: function(modelId) {
-    return this.modelMap[modelId];
+  getModel: function(modelId, parent) {
+    if (!parent) {
+      throw new Error('missing argument parent');
+    }
+    var model = this.modelMap[modelId];
+    model.parent = parent;
+    return model;
   }
 
 };

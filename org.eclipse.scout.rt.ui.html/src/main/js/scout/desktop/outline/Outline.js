@@ -991,6 +991,10 @@ scout.Outline.prototype._onPageChanged2 = function(page) {
   }
   this._initDetailTable(page);
 
+  if (page.detailForm) {
+    this._initDetailForm(page);
+  }
+
   var selectedPage = this.selectedNodes[0];
   if (!page && !selectedPage || page === selectedPage) {
     this.updateDetailContent();

@@ -2,11 +2,40 @@ scout.Page = function(outline) {
   scout.Page.parent.call(this, outline);
 
   this.table; // FIXME [awe] 6.1 - rename to detailTable (heisst auf dem server auch so)
-  this.detailForm;
   this.tableVisible = true;
+  this.detailForm;
   this.detailFormVisible = true;
+
+  /**
+   * This property contains the class-name of the form to be instantiated, when createDetailForm() is called.
+   */
+  this.detailFormType = null;
+
 };
 scout.inherits(scout.Page, scout.TreeNode);
+
+scout.Page.prototype.createDetailForm = function() {
+  if (this.detailFormType) {
+    // FIXME [awe] 6.1 - hier kann folgendes passieren:
+    // 1. im model.json eine Page mit einem Detail-Form 'konfigurieren', das Detail-Form ist ebenfalls konfiguriert
+    // 2. im model.json eine Page mit einem Detail-Form 'konfigurieren', das Detail-Form liegt als .JS implementierung vor
+    // 3. eine Subklasse von Page wurde implementiert und will ein Detail-Form instanzieren, das im model.json konfiguriert ist
+    // 4. eine Subklasse von Page wurde implementiert und will ein Detail-Form instanzieren, das Detail-Form liegt als .JS implementierung vor
+
+    /*
+     * Ideen:
+     *
+     * ${ref:x} könnte so implementiert sein, dass man für Name x zuerst in model.json sucht
+     *   und wenn man dort nichts findet schaut, ob es einen Constructor für x gibt.
+     *
+     * Wenn man selber eine Page implementiert hat, überschreibt man createDetailForm
+     *   und ruft selber scout.create bzw. scout.model.getModel auf.
+     *
+     * Die getModel() method sollte evtl. mit scout.create kombiniert werden (options object?) oder createWithModel() methode?
+     */
+  }
+  return null;
+};
 
 /**
  * @override TreeNode.js
