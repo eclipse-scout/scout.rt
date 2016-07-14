@@ -96,8 +96,9 @@ scout.Tree.prototype._ensureTreeNodes = function(nodeModels) {
     if (nodeModel instanceof scout.TreeNode) {
       treeNode = nodeModel;
     } else {
+      nodeModel.tree = this;
       treeNode = this._createTreeNode(nodeModel);
-      $.extend(treeNode, nodeModel); // FIXME [awe] 6.1 - schauen ob wir hier nicht init(model) verwenden können (loadChildren?)
+      treeNode.init(nodeModel);
     }
     treeNodes[i] = treeNode;
   }
@@ -177,7 +178,6 @@ scout.Tree.prototype._isSelectedNode = function(node) {
 scout.Tree.prototype._initTreeNode = function(node, parentNode) {
   // FIXME [awe] 6.1 move this code to TreeNode#init
   this.nodesMap[node.id] = node;
-  node.init();
 
   if (parentNode) {
     node.parentNode = parentNode;

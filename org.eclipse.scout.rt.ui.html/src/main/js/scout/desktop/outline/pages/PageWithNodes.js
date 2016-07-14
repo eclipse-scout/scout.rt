@@ -1,13 +1,8 @@
-scout.PageWithNodes = function(outline) {
-  scout.PageWithNodes.parent.call(this, outline);
+scout.PageWithNodes = function() {
+  scout.PageWithNodes.parent.call(this);
   this.nodeType = "nodes";
 };
 scout.inherits(scout.PageWithNodes, scout.Page);
-
-scout.PageWithNodes.prototype._init = function() {
-  scout.PageWithNodes.parent.prototype._init.call(this);
-  this.loadTableData();
-};
 
 /**
  * @override Page.js
@@ -41,6 +36,6 @@ scout.PageWithNodes.prototype._loadTableData = function() {
  * @override TreeNode.js
  */
 scout.PageWithNodes.prototype.loadChildren = function() {
-  // NOP
+  // FIXME 6.1 [awe] - remove this hack
   this.tree._onPageChanged2(this);
 };

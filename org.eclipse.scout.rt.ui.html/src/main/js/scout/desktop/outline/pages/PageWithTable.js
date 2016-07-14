@@ -1,15 +1,10 @@
-scout.PageWithTable = function(outline) {
-  scout.PageWithTable.parent.call(this, outline);
+scout.PageWithTable = function() {
+  scout.PageWithTable.parent.call(this);
 
   this.nodeType = "table";
   this.alwaysCreateChildPage = true; // FIXME [awe] 6.1 - change to default 'false'. Check if AutoLeafPageWithNodes work
 };
 scout.inherits(scout.PageWithTable, scout.Page);
-
-scout.PageWithTable.prototype._init = function() {
-  scout.PageWithTable.parent.prototype._init.call(this);
-  // this.loadChildren();
-};
 
 scout.PageWithTable.prototype._createChildPageInternal = function(tableRow) {
   var childPage = this.createChildPage(tableRow);
@@ -44,5 +39,5 @@ scout.PageWithTable.prototype.loadChildren = function() {
     }
   }, this);
   this.childNodes = childNodes;
-  this.tree._onPageChanged2(this);
+  this.tree._onPageChanged2(this); // FIXME 6.1 [awe] - remove this hack
 };

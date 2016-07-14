@@ -1,8 +1,4 @@
-scout.TreeNode = function(tree) {
-  if (!tree) {
-    throw new Error('missing argument tree');
-  }
-
+scout.TreeNode = function() {
   this.id;
   this.initialized;
   this.checked;
@@ -15,16 +11,18 @@ scout.TreeNode = function(tree) {
   this.filterDirty;
   this.expanded = false;
   this.childNodes = [];
-
-  this.tree = tree;
 };
 
-scout.TreeNode.prototype.init = function() {
-  this._init();
+scout.TreeNode.prototype.init = function(model) {
+  this._init(model);
 };
 
-scout.TreeNode.prototype._init = function() {
-  this.reset();
+scout.TreeNode.prototype._init = function(model) {
+  if (!model.tree) {
+    throw new Error('missing property \'tree\'');
+  }
+  $.extend(this, model);
+  scout.defaultValues.applyTo(this);
 };
 
 scout.TreeNode.prototype.reset = function() {
