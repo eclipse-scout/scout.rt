@@ -22,9 +22,17 @@ scout.ObjectFactory = function() {
 };
 
 /**
- * Creates the object from the given model.objectType. Only the constructor is called, but not the init() method.
- * We concat 'scout.' + objectType to find the constructor function. When scout.objectFactories contains a create function
- * for the given objectType, this function is called, otherwise the default logic is applied to find a constructor.
+ * Creates the object from the given model.objectType. Only the constructor is called, but not the init() method.<p>
+ * When scout.objectFactories contains a create function for the given objectType, this function is called.
+ * Otherwise it tries to find the constructor function by the following logic:<br>
+ * If the objectType provides a namespace, it is used. Otherwise it takes the default 'scout' namespace.
+ * If the object type provides a variant, the variant is moved before the actual object type.
+ *
+ * Examples:
+ * Object type is Outline -> constructor scout.Outline is called
+ * Object type is myNamespace.Outline -> constructor myNamespace.Outline is called
+ * Object type is Outline.MyVariant -> constructor scout.MyVariantOutline is called
+ * Object type is myNamespace.Outline.MyVariant -> constructor myNamespace.MyVariantOutline is called
  *
  * @param model needs to contain property objectType
  */
@@ -40,15 +48,24 @@ scout.ObjectFactory.prototype._createObjectByType = function(model) {
   } else {
     // When no factory is registered for the given objectType
     objectTypeParts = objectType.split('.');
-    if (objectTypeParts.length === 2) {
-      // variant + objectType
-      scoutClass = objectTypeParts[1] + objectTypeParts[0];
-    } else {
-      // only objectType
-      scoutClass = objectType;
+
+    var namespace = scout;
+    // Extract namespace
+    if (objectTypeParts.length >= 2 && window.hasOwnProperty(objectTypeParts[0])) {
+      // FIXME CGU [6.1] maybe it would be better to define the namespace in scout.App to avoid name clashes in the window object (if objectType is named after a var in window)
+      namespace = window[objectTypeParts[0]];
+      objectTypeParts = objectTypeParts.slice(1);
     }
+
+    // Extract variant
+    var variant = '';
+    if (objectTypeParts.length === 2) {
+      variant = objectTypeParts[1];
+    }
+
+    scoutClass = variant + objectTypeParts[0];
     try {
-      scoutObject = new scout[scoutClass]();
+      scoutObject = new namespace[scoutClass]();
     } catch (e) {
       // NOP - error handling below
     }
