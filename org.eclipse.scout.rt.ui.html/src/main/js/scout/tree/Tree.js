@@ -10,28 +10,37 @@
  ******************************************************************************/
 scout.Tree = function() {
   scout.Tree.parent.call(this);
-  this.$data;
+
+  this.displayStyle = scout.Tree.DisplayStyle.DEFAULT;
+  this.autoCheckChildren = false;
+  this.checkable = false;
+  this.enabled = true;
+  this.filterEnabled = false;
+  this.lazyExpandingEnabled = true;
+  this.menus = [];
+  this.menuBar;
+  this.keyStrokes = [];
+  this.multiCheck = true;
   this.nodes = []; // top-level nodes
+  this.nodesMap = {}; // all nodes by id
+  this.selectedNodes = [];
+  this.checkedNodes = [];
+  this.groupedNodes = {};
   this.visibleNodesFlat = [];
   this.visibleNodesMap = {};
-  this.nodesMap = {}; // all nodes by id
   this._addAdapterProperties(['menus', 'keyStrokes']);
   this._additionalContainerClasses = ''; // may be used by subclasses to set additional CSS classes
   this._treeItemPaddingLeft = 23;
   this._treeItemCheckBoxPaddingLeft = 29;
   this._treeItemPaddingLevel = 15;
-  this.menus = [];
-  this.menuBar;
-  this.checkedNodes = [];
   this._filters = [];
   this._doubleClickSupport = new scout.DoubleClickSupport();
   this._$animationWrapper; // used by _renderExpansion()
   this._$expandAnimationWrappers = [];
   this._filterMenusHandler = this._filterMenus.bind(this);
-  //contains all parents of a selected node, the selected node and the first level children
-  this._inSelectionPathList = {};
-  this.groupedNodes = {};
 
+  // contains all parents of a selected node, the selected node and the first level children
+  this._inSelectionPathList = {};
   this.viewRangeRendered = new scout.Range(0, 0);
   this.viewRangeSize = 20;
 
@@ -52,7 +61,7 @@ scout.Tree = function() {
   this.nodeWidth = 0;
   this.maxNodeWidth = 0;
   this.nodeWidthDirty = false;
-
+  this.$data;
   this._scrolldirections = 'both';
 };
 scout.inherits(scout.Tree, scout.ModelAdapter);

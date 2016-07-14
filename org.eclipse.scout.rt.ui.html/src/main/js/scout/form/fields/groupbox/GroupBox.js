@@ -10,19 +10,26 @@
  ******************************************************************************/
 scout.GroupBox = function() {
   scout.GroupBox.parent.call(this);
+  this._addAdapterProperties(['fields', 'menus']);
+
   this.fields = [];
   this.menus = [];
   this.menuBarVisible = true;
-  this.staticMenus = [];
-  this._addAdapterProperties(['fields', 'menus']);
-  this.$body;
-  this.$title;
-
+  this.borderDecoration = 'auto';
+  this.borderVisible = true;
+  this.mainBox = false;
+  this.scrollable = false;
+  this.expandable = false;
+  this.expanded = true;
   this.controls = [];
   this.systemButtons = [];
   this.customButtons = [];
   this.processButtons = [];
   this.processMenus = [];
+  this.staticMenus = [];
+
+  this.$body;
+  this.$title;
 };
 scout.inherits(scout.GroupBox, scout.CompositeField);
 

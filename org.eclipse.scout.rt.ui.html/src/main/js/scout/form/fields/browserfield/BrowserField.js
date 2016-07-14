@@ -10,6 +10,7 @@
  ******************************************************************************/
 scout.BrowserField = function() {
   scout.BrowserField.parent.call(this);
+  this.scrollBarEnabled = false;
   this._postMessageListener;
   this.loadingSupport = new scout.LoadingSupport({widget: this});
 };

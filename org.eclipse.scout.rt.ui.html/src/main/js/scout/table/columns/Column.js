@@ -9,6 +9,18 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 scout.Column = function() {
+  this.editable = false;
+  this.fixedWidth = false;
+  this.horizontalAlignment = -1;
+  this.htmlEnabled = false;
+  this.mandatory = false;
+  this.sortActive = false;
+  this.sortAscending = true;
+  this.sortIndex = -1;
+  this.summary = false;
+  this.type = 'text';
+  this.width = 60;
+  this.uiSortPossible = false;
   this.minWidth = scout.Column.DEFAULT_MIN_WIDTH;
   this.showSeparator = true; // currently a UI-only property, defaults to true
   this.filterType = 'TextColumnUserFilter';

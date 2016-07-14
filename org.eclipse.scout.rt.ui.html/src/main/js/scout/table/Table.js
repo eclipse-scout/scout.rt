@@ -10,16 +10,25 @@
  ******************************************************************************/
 scout.Table = function(model) {
   scout.Table.parent.call(this, model);
-  this.$container;
-  this.$data;
-  this.header;
-  this.footer;
-  this.footerVisible = false;
-  this.selectionHandler;
-  this.columns = [];
-  this.tableControls = [];
+
+  this.autoResizeColumns = false;
+  this.checkable = false;
+  this.enabled = true;
+  this.headerVisible = true;
+  this.keyStrokes = [];
+  this.keyboardNavigation = true;
   this.menus = [];
+  this.multiCheck = true;
+  this.multiSelect = true;
+  this.multilineText = false;
   this.rows = [];
+  this.scrollToSelection = false;
+  this.selectedRows = [];
+  this.sortEnabled = true;
+  this.tableControls = [];
+  this.tableStatusVisible = false;
+  this.footerVisible = false;
+  this.columns = [];
   this.rowsMap = {}; // rows by id
   this.rowWidth = 0;
   this.rowBorderWidth; // read-only, set by _calculateRowBorderWidth(), also used in TableLayout.js
@@ -27,7 +36,11 @@ scout.Table = function(model) {
   this.rowBorderRightWidth = 0; // read-only, set by _calculateRowBorderWidth(), also used in TableHeader.js
   this.staticMenus = [];
   this.selectionHandler = new scout.TableSelectionHandler(this);
-  this.loadingSupport = new scout.LoadingSupport({widget: this});
+  this.loadingSupport = new scout.LoadingSupport({
+    widget: this
+  });
+  this.header;
+  this.footer;
   this._filterMap = {};
   this._filteredRows = [];
   this._filteredRowsDirty = true;
@@ -40,6 +53,8 @@ scout.Table = function(model) {
   this._drawDataInProgress = false;
   this._doubleClickSupport = new scout.DoubleClickSupport();
   this.checkableStyle = scout.Table.CheckableStyle.CHECKBOX;
+  this.$container;
+  this.$data;
   this._addAdapterProperties(['tableControls', 'menus', 'keyStrokes']);
 
   this._permanentHeadSortColumns = [];
@@ -53,6 +68,8 @@ scout.Table = function(model) {
   this.virtual = true;
 };
 scout.inherits(scout.Table, scout.ModelAdapter);
+
+//FIXME CGU [6.1] create TableRow.js, Cell.js and StringColumn.js incl. defaultValues from defaultValues.json
 
 scout.Table.CheckableStyle = {
   /**
@@ -147,22 +164,22 @@ scout.Table.prototype._initKeyStrokeContext = function(keyStrokeContext) {
 
 scout.Table.prototype._initTableKeyStrokeContext = function(keyStrokeContext) {
   keyStrokeContext.registerKeyStroke([
-      new scout.TableNavigationUpKeyStroke(this),
-      new scout.TableNavigationDownKeyStroke(this),
-      new scout.TableNavigationPageUpKeyStroke(this),
-      new scout.TableNavigationPageDownKeyStroke(this),
-      new scout.TableNavigationHomeKeyStroke(this),
-      new scout.TableNavigationEndKeyStroke(this),
+    new scout.TableNavigationUpKeyStroke(this),
+    new scout.TableNavigationDownKeyStroke(this),
+    new scout.TableNavigationPageUpKeyStroke(this),
+    new scout.TableNavigationPageDownKeyStroke(this),
+    new scout.TableNavigationHomeKeyStroke(this),
+    new scout.TableNavigationEndKeyStroke(this),
 
-      new scout.TableFocusFilterFieldKeyStroke(this),
-      new scout.TableStartCellEditKeyStroke(this),
-      new scout.TableSelectAllKeyStroke(this),
-      new scout.TableRefreshKeyStroke(this),
-      new scout.TableToggleRowKeyStroke(this),
-      new scout.TableCopyKeyStroke(this),
-      new scout.ContextMenuKeyStroke(this, this.onContextMenu, this),
-      new scout.AppLinkKeyStroke(this, this.handleAppLinkAction)
-    ]);
+    new scout.TableFocusFilterFieldKeyStroke(this),
+    new scout.TableStartCellEditKeyStroke(this),
+    new scout.TableSelectAllKeyStroke(this),
+    new scout.TableRefreshKeyStroke(this),
+    new scout.TableToggleRowKeyStroke(this),
+    new scout.TableCopyKeyStroke(this),
+    new scout.ContextMenuKeyStroke(this, this.onContextMenu, this),
+    new scout.AppLinkKeyStroke(this, this.handleAppLinkAction)
+  ]);
 
   // Prevent default action and do not propagate ↓ or ↑ keys if ctrl- or alt-modifier is not pressed.
   // Otherwise, an '↑-event' on the first row, or an '↓-event' on the last row will bubble up (because not consumed by table navigation keystrokes) and cause a superior table to move its selection.

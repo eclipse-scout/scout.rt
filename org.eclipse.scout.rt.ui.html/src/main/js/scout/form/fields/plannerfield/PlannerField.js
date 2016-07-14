@@ -11,6 +11,8 @@
 scout.PlannerField = function() {
   scout.PlannerField.parent.call(this);
   this._addAdapterProperties(['planner']);
+
+  this.splitterPosition = 168;
 };
 scout.inherits(scout.PlannerField, scout.FormField);
 

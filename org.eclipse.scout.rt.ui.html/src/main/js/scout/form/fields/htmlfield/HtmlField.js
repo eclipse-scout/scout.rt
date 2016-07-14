@@ -10,6 +10,7 @@
  ******************************************************************************/
 scout.HtmlField = function() {
   scout.HtmlField.parent.call(this);
+  this.scrollBarEnabled = false;
 };
 scout.inherits(scout.HtmlField, scout.ValueField);
 

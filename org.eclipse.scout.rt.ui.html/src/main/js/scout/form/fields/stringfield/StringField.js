@@ -10,6 +10,12 @@
  ******************************************************************************/
 scout.StringField = function() {
   scout.StringField.parent.call(this);
+
+  this.inputMasked = false;
+  this.multilineText = false;
+  this.updateDisplayTextOnModify = false;
+  this.maxLength = 4000;
+
   this._onSelectionChangingActionHandler = this._onSelectionChangingAction.bind(this);
 };
 scout.inherits(scout.StringField, scout.BasicField);

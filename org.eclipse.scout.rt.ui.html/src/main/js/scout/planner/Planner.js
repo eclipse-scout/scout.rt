@@ -10,8 +10,14 @@
  ******************************************************************************/
 scout.Planner = function() {
   scout.Planner.parent.call(this);
+
   this.resourceMap = [];
   this.activityMap = [];
+  this.availableDisplayModes = [];
+  this.resources = [];
+  this.viewRange = {};
+  this.selectionRange = {};
+  this.selectedResources = [];
 
   // visual
   this._resourceTitleWidth = 20;

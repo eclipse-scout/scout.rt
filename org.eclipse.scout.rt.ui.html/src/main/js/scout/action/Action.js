@@ -12,6 +12,17 @@ scout.Action = function() {
   scout.Action.parent.call(this);
   this._addModelProperties(['tabbable']);
 
+  this.enabled = true;
+  this.visible = true;
+  this.selected = false;
+  this.horizontalAlignment = -1;
+  this.iconId = '';
+  this.tooltipText = '';
+  this.text = '';
+  this.cssClass = '';
+  this.toggleAction = false;
+  this.keyStroke = null;
+
   /**
    * This property decides whether or not the tabindex attribute is set in the DOM.
    */

@@ -45,7 +45,6 @@ scout.App.prototype._doBootstrap = function(options) {
   return [
     scout.logging.bootstrap(),
     scout.device.bootstrap(),
-    scout.defaultValues.bootstrap(options.defaultValues),
     scout.fonts.bootstrap(options.fonts),
     scout.model.bootstrap(),
     scout.textProperties.bootstrap()

@@ -10,8 +10,11 @@
  ******************************************************************************/
 scout.SplitBox = function() {
   scout.SplitBox.parent.call(this);
-  this.splitHorizontal; // true = split x-axis, false = split y-axis
   this._addAdapterProperties(['firstField', 'secondField', 'collapsibleField']);
+
+  this.fieldCollapsed = false;
+  this.collapsibleField;
+  this.splitHorizontal; // true = split x-axis, false = split y-axis
   this._collapseKeyStroke;
 
   this._$splitArea;

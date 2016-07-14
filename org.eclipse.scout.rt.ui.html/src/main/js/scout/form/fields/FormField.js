@@ -14,6 +14,19 @@
  */
 scout.FormField = function() {
   scout.FormField.parent.call(this);
+  this.enabled = true;
+  this.visible = true;
+  this.keyStrokes = [];
+  this.labelVisible = true;
+  this.labelPosition = scout.FormField.LABEL_POSITION_DEFAULT;
+  this.labelWidthInPixel = 0;
+  this.loading = false;
+  this.mandatory = false;
+  this.statusVisible = true;
+  this.statusPosition = scout.FormField.STATUS_POSITION_DEFAULT;
+  this.menus = [];
+  this.menusVisible = false;
+  this.gridData = new scout.GridData();
   this.$label;
 
   /**

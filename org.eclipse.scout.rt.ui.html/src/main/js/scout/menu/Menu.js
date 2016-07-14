@@ -10,9 +10,13 @@
  ******************************************************************************/
 scout.Menu = function() {
   scout.Menu.parent.call(this);
-  this.childActions = [];
   this._addAdapterProperties('childActions');
   this._addModelProperties('overflow');
+
+  this.defaultMenu = false;
+  this.separator = false;
+  this.childActions = [];
+  this.menuTypes = [];
   this.popup;
   this.excludedByFilter = false;
   this.subMenuIconVisible = true;

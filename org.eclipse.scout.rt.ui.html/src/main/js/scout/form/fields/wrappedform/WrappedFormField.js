@@ -11,6 +11,8 @@
 scout.WrappedFormField = function() {
   scout.WrappedFormField.parent.call(this);
   this._addAdapterProperties(['innerForm']);
+
+  this.initialFocusEnabled = false;
 };
 scout.inherits(scout.WrappedFormField, scout.FormField);
 

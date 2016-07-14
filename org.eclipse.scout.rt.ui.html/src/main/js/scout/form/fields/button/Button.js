@@ -10,9 +10,16 @@
  ******************************************************************************/
 scout.Button = function() {
   scout.Button.parent.call(this);
-  this.$buttonLabel;
   this._addAdapterProperties(['menus']);
 
+  this.systemType = scout.Button.SystemType.NONE;
+  this.processButton = true;
+  this.selected = false;
+  this.displayStyle = scout.Button.DisplayStyle.DEFAULT;
+  this.keyStroke;
+  this.statusVisible = false;
+
+  this.$buttonLabel;
   this.buttonKeyStroke = new scout.ButtonKeyStroke(this, null);
 };
 scout.inherits(scout.Button, scout.FormField);

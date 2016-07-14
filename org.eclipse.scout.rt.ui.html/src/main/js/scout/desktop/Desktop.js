@@ -11,6 +11,18 @@
 scout.Desktop = function() {
   scout.Desktop.parent.call(this);
 
+  this.desktopStyle = scout.Desktop.DisplayStyle.DEFAULT;
+  this.benchVisible = true;
+  this.headerVisible = true;
+  this.navigationVisible = true;
+  this.navigationHandleVisible = true;
+  this.menus = [];
+  this.addOns = [];
+  this.dialogs = [];
+  this.views = [];
+  this.viewButtons = [];
+  this.messageBoxes = [];
+  this.fileChoosers = [];
   this.navigation;
   this.header;
   this.bench;

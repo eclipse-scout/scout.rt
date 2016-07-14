@@ -11,7 +11,8 @@
 scout.TreeNode = function() {
   this.id;
   this.initialized;
-  this.checked;
+  this.enabled = true;
+  this.checked = false;
   this.text;
   this.rendered;
   this.attached;
@@ -20,7 +21,11 @@ scout.TreeNode = function() {
   this.level;
   this.filterDirty;
   this.expanded = false;
+  this.expandedLazy = false;
   this.childNodes = [];
+  this.lazyExpandingEnabled = false;
+  this.leaf = false;
+  this.filterAccepted = true;
 };
 
 scout.TreeNode.prototype.init = function(model) {

@@ -10,8 +10,21 @@
  ******************************************************************************/
 scout.Form = function() {
   scout.Form.parent.call(this);
-  this.rootGroupBox;
   this._addAdapterProperties(['rootGroupBox', 'views', 'dialogs', 'messageBoxes', 'fileChoosers']);
+
+  this.displayHint = scout.Form.DisplayHint.DIALOG;
+  this.maximizeEnabled = true;
+  this.maximized = false;
+  this.minimizeEnabled = true;
+  this.minimized = false;
+  this.modal = true;
+  this.dialogs = [];
+  this.views = [];
+  this.messageBoxes = [];
+  this.fileChoosers = [];
+  this.closable = true;
+  this.cacheBounds = false;
+  this.rootGroupBox;
   this._locked;
   this.formController;
   this.messageBoxController;

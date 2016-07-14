@@ -11,6 +11,13 @@
 scout.Outline = function() {
   scout.Outline.parent.call(this);
   this._addAdapterProperties(['defaultDetailForm', 'views', 'dialogs', 'messageBoxes', 'fileChoosers']);
+
+  this.autoToggleBreadcrumbStyle = true;
+  this.navigateButtonsVisible = true;
+  this.dialogs = [];
+  this.views = [];
+  this.messageBoxes = [];
+  this.fileChoosers = [];
   this.navigateUpInProgress = false; // see NavigateUpButton.js
   this._additionalContainerClasses += ' outline';
   this._treeItemPaddingLeft = 37;

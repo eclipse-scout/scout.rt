@@ -14,6 +14,7 @@
  */
 scout.ValueField = function() {
   scout.ValueField.parent.call(this);
+  this.displayText = '';
 };
 scout.inherits(scout.ValueField, scout.FormField);
 

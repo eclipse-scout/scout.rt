@@ -10,6 +10,9 @@
  ******************************************************************************/
 scout.DateField = function() {
   scout.DateField.parent.call(this);
+
+  this.hasDate = true;
+  this.hasTime = false;
   this.enabledWhenOffline = true;
   this.disabledCopyOverlay = true;
 
