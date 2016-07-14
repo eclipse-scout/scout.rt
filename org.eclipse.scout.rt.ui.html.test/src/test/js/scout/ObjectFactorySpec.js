@@ -9,8 +9,11 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 describe('ObjectFactory', function() {
-
+  var session;
   beforeEach(function() {
+    setFixtures(sandbox());
+    session = sandboxSession();
+    session.locale = new scout.LocaleSpecHelper().createLocale(scout.LocaleSpecHelper.DEFAULT_LOCALE);
     // Needed because some model adapters make JSON calls during initialization (e.g. Calendar.js)
     jasmine.Ajax.install();
     jasmine.clock().install();
@@ -79,10 +82,6 @@ describe('ObjectFactory', function() {
   }
 
   it('creates objects which are registered in scout.objectFactories', function() {
-    setFixtures(sandbox());
-    var session = new scout.Session($('#sandbox'), '1.1');
-    session.locale = new scout.LocaleSpecHelper().createLocale(scout.LocaleSpecHelper.DEFAULT_LOCALE);
-
     // When this test fails with a message like 'TypeError: scout.[ObjectType] is not a constructor...'
     // you should check if the required .js File is registered in SpecRunnerMaven.html.
     var i, model, factory, object, modelAdapter, objectType;
@@ -96,4 +95,45 @@ describe('ObjectFactory', function() {
     }
   });
 
+  describe('finds the correct constructor function if no factory is defined', function() {
+
+    it('uses scout namespace by default', function() {
+      var model = {
+        objectType: 'StringField'
+      };
+      var object = scout.objectFactory._createObjectByType(model);
+      expect(object instanceof scout.StringField).toBe(true);
+    });
+
+    it('uses namespace of given object type if provided', function() {
+      window.my = {};
+      var my = window.my;
+      my.StringField = function() {};
+      var model = {
+        objectType: 'my.StringField'
+      };
+      var object = scout.objectFactory._createObjectByType(model);
+      expect(object instanceof my.StringField).toBe(true);
+    });
+
+    it('considers variants', function() {
+      var model = {
+        objectType: 'StringField.Variant'
+      };
+      scout.VariantStringField = function() {};
+      var object = scout.objectFactory._createObjectByType(model);
+      expect(object instanceof scout.VariantStringField).toBe(true);
+    });
+
+    it('considers variants also within a custom namespace', function() {
+      window.my = {};
+      var my = window.my;
+      my.VariantStringField = function() {};
+      var model = {
+        objectType: 'my.StringField.Variant'
+      };
+      var object = scout.objectFactory._createObjectByType(model);
+      expect(object instanceof my.VariantStringField).toBe(true);
+    });
+  });
 });
