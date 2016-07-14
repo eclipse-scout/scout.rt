@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.res.loader;
 
+import java.io.IOException;
 import java.nio.charset.CharsetEncoder;
 import java.nio.charset.StandardCharsets;
 
@@ -85,6 +86,11 @@ public class DynamicResourceLoader extends AbstractResourceLoader {
       addResponseHeaderForDownload(httpCacheObject, localResource.getFilename());
     }
     return httpCacheObject;
+  }
+
+  @Override
+  public BinaryResource loadResource(String pathInfo) throws IOException {
+    throw new UnsupportedOperationException();
   }
 
   protected IBinaryResourceProvider getBinaryResourceProvider(IUiSession uiSession, String adapterId) {

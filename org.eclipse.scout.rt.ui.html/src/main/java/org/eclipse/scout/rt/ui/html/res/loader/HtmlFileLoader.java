@@ -64,23 +64,10 @@ public class HtmlFileLoader extends AbstractResourceLoader {
   @Override
   public HttpCacheObject loadResource(HttpCacheKey cacheKey) throws IOException {
     String pathInfo = cacheKey.getResourcePath();
-    URL url = BEANS.get(IWebContentService.class).getWebContentResource(pathInfo);
-    if (url == null) {
-      // not handled here
+    BinaryResource content = loadResource(pathInfo);
+    if (content == null) {
       return null;
     }
-    byte[] document = IOUtility.readFromUrl(url);
-    HtmlDocumentParserParameters params = createHtmlDocumentParserParameters(cacheKey);
-    HtmlDocumentParser parser = createHtmlDocumentParser(params);
-    byte[] parsedDocument = parser.parseDocument(document);
-    BinaryResource content = BinaryResources.create()
-        .withFilename(pathInfo)
-        .withCharset(StandardCharsets.UTF_8)
-        .withContent(parsedDocument)
-        .withLastModifiedNow()
-        .withCachingAllowed(true)
-        .build();
-
     // no cache-control, only E-Tag checks to make sure that a session with timeout is correctly
     // forwarded to the login using a GET request BEFORE the first json POST request
     HttpCacheObject httpCacheObject = new HttpCacheObject(cacheKey, content);
@@ -100,15 +87,35 @@ public class HtmlFileLoader extends AbstractResourceLoader {
     return httpCacheObject;
   }
 
-  protected HtmlDocumentParserParameters createHtmlDocumentParserParameters(HttpCacheKey cacheKey) {
+  @Override
+  public BinaryResource loadResource(String pathInfo) throws IOException {
+    HtmlDocumentParserParameters params = createHtmlDocumentParserParameters(pathInfo);
+    URL url = BEANS.get(IWebContentService.class).getWebContentResource(pathInfo);
+    if (url == null) {
+      // not handled here
+      return null;
+    }
+    byte[] document = IOUtility.readFromUrl(url);
+    HtmlDocumentParser parser = createHtmlDocumentParser(params);
+    byte[] parsedDocument = parser.parseDocument(document);
+    return BinaryResources.create()
+        .withFilename(pathInfo)
+        .withCharset(StandardCharsets.UTF_8)
+        .withContent(parsedDocument)
+        .withLastModifiedNow()
+        .withCachingAllowed(true)
+        .build();
+  }
+
+  public HtmlDocumentParserParameters createHtmlDocumentParserParameters(String htmlPath) {
     return new HtmlDocumentParserParameters(
-        cacheKey,
+        htmlPath,
         m_theme,
         m_minify,
         m_cacheEnabled,
         CONFIG.getPropertyValue(ExternalBaseUrlProperty.class));
   }
-  
+
   /**
    * Override this method to return a specialized impl. of an HTML document parser.
    * <p>

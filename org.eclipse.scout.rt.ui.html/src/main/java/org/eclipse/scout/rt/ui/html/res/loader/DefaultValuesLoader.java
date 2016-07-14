@@ -14,8 +14,6 @@ import java.io.IOException;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
-import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheKey;
-import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheObject;
 import org.eclipse.scout.rt.ui.html.json.IDefaultValuesFilterService;
 
 /**
@@ -24,9 +22,8 @@ import org.eclipse.scout.rt.ui.html.json.IDefaultValuesFilterService;
 public class DefaultValuesLoader extends AbstractResourceLoader {
 
   @Override
-  public HttpCacheObject loadResource(HttpCacheKey cacheKey) throws IOException {
-    String pathInfo = cacheKey.getResourcePath();
-    BinaryResource res = BEANS.get(IDefaultValuesFilterService.class).getCombinedDefaultValuesConfigurationFile(pathInfo);
-    return new HttpCacheObject(cacheKey, res);
+  public BinaryResource loadResource(String pathInfo) throws IOException {
+    return BEANS.get(IDefaultValuesFilterService.class).getCombinedDefaultValuesConfigurationFile(pathInfo);
   }
+
 }

@@ -19,8 +19,6 @@ import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.resource.BinaryResources;
 import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheControl;
-import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheKey;
-import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheObject;
 import org.eclipse.scout.rt.ui.html.json.JsonUtility;
 import org.eclipse.scout.rt.ui.html.res.IWebContentService;
 
@@ -30,8 +28,7 @@ import org.eclipse.scout.rt.ui.html.res.IWebContentService;
 public class JsonFileLoader extends AbstractResourceLoader {
 
   @Override
-  public HttpCacheObject loadResource(HttpCacheKey cacheKey) throws IOException {
-    String pathInfo = cacheKey.getResourcePath();
+  public BinaryResource loadResource(String pathInfo) throws IOException {
     URL url = BEANS.get(IWebContentService.class).getWebContentResource(pathInfo);
     if (url == null) {
       // not handled here
@@ -40,7 +37,7 @@ public class JsonFileLoader extends AbstractResourceLoader {
     // FIXME bsh: Maybe optimize memory consumption (unnecessary conversion of byte[] to String)
     String json = new String(IOUtility.readFromUrl(url), StandardCharsets.UTF_8.name());
     json = JsonUtility.stripCommentsFromJson(json);
-    BinaryResource content = BinaryResources.create()
+    return BinaryResources.create()
         .withFilename(pathInfo)
         .withCharset(StandardCharsets.UTF_8)
         .withContent(json.getBytes(StandardCharsets.UTF_8))
@@ -48,8 +45,6 @@ public class JsonFileLoader extends AbstractResourceLoader {
         .withCachingAllowed(true)
         .withCacheMaxAge(HttpCacheControl.MAX_AGE_4_HOURS)
         .build();
-
-    return new HttpCacheObject(cacheKey, content);
   }
 
 }
