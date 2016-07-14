@@ -49,3 +49,30 @@ scout.DesktopNavigationLayout.prototype.layout = function($container) {
   htmlBody.setSize(bodySize);
   htmlBody.$comp.cssTop(viewButtonBoxHeight);
 };
+
+scout.DesktopNavigationLayout.prototype.preferredLayoutSize = function($container) {
+  var htmlContainer = this.navigation.htmlComp,
+    htmlBody = this.navigation.htmlCompBody,
+    toolBox = this.navigation.toolBox,
+    viewButtonBox = this.navigation.viewButtonBox;
+
+  var prefSize = htmlBody.getPreferredSize();
+
+  var prefSizeBoxes = new scout.Dimension(0, 0);
+  if (viewButtonBox) {
+    var prefSizeViewButtonBox = viewButtonBox.htmlComp.getPreferredSize();
+    prefSizeBoxes.width += prefSizeViewButtonBox.width;
+    prefSizeBoxes.height = Math.max(prefSizeBoxes.height, prefSizeViewButtonBox.height);
+  }
+  if (toolBox) {
+    var prefSizeToolBox = viewButtonBox.htmlComp.getPreferredSize();
+    prefSizeBoxes.width += prefSizeToolBox.width;
+    prefSizeBoxes.height = Math.max(prefSizeBoxes.height, prefSizeToolBox.height);
+  }
+
+  prefSize.height += prefSizeBoxes.height;
+  prefSize.width = Math.max(prefSize.width, prefSizeBoxes.width);
+  prefSize.add(htmlContainer.getInsets());
+
+  return prefSize;
+};
