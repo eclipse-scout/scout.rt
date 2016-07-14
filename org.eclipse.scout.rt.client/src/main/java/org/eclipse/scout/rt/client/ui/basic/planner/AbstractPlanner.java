@@ -173,8 +173,12 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
   @Order(30)
   protected void execDisplayModeChanged(int displayMode) {
     Calendar from = Calendar.getInstance();
-    DateUtility.truncCalendar(from);
     Calendar to = Calendar.getInstance();
+    if (getViewRange() != null && getViewRange().getFrom() != null) {
+      from.setTime(getViewRange().getFrom());
+      to.setTime(getViewRange().getFrom());
+    }
+    DateUtility.truncCalendar(from);
     DateUtility.truncCalendar(to);
     switch (displayMode) {
       case IPlannerDisplayMode.DAY:
@@ -914,7 +918,22 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
   @Override
   public void setViewRange(Range<Date> viewRange) {
     LOG.debug("Setting view range to {}", viewRange);
+    if (viewRange != null) {
+      viewRange.setFrom(ensureTruncated(viewRange.getFrom(), "from"));
+      viewRange.setTo(ensureTruncated(viewRange.getTo(), "to"));
+    }
     propertySupport.setProperty(PROP_VIEW_RANGE, viewRange);
+  }
+
+  private Date ensureTruncated(Date date, String fromOrTo) {
+    if (date == null) {
+      return null;
+    }
+    Date truncated = DateUtility.truncDate(date);
+    if (!date.equals(truncated)) {
+      LOG.warn("Had to truncate {} date of range, bacause UI does not support intra day ranges: {}", fromOrTo, date);
+    }
+    return truncated;
   }
 
   @Override
