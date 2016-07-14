@@ -372,9 +372,13 @@ scout.Planner.prototype._renderScale = function() {
     var $scaleItem = $(this);
     $scaleItem.css('width', width + '%');
     if (!$scaleItem.data('first')) {
-      $scaleItem.data('scale-item-line', that.$grid.appendDiv('planner-small-scale-item-line'));
-      $scaleItem.appendDiv('planner-small-scale-item-line')
-        .css('left', 0);
+      var $lineGrid = that.$grid.appendDiv('planner-small-scale-item-line');
+      $scaleItem.data('scale-item-line', $lineGrid);
+      var $lineScale = $scaleItem.appendDiv('planner-small-scale-item-line').css('left', 0);
+      if ($scaleItem.hasClass('label-invisible')) {
+        $lineGrid.addClass('first-in-range');
+        $lineScale.addClass('first-in-range');
+      }
     }
   });
 
@@ -1353,6 +1357,7 @@ scout.Planner.prototype._updateResources = function(resources) {
     if (this.rendered && oldResource.$resource) {
       var $updatedResource = $(this._buildResourceHtml(updatedResource));
       oldResource.$resource.replaceWith($updatedResource);
+      $updatedResource.css('min-width', oldResource.$resource.css('min-width'));
       this._linkResource($updatedResource, updatedResource);
     }
   }.bind(this));
