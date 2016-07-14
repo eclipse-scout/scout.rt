@@ -20,6 +20,9 @@ scout.textProperties = {
     // FIXME [awe] 6.1: load texts with different locales
     // - define which locales are available (or simply try to load a property file, and use default if it does not exist?)
     // - define which local is currently used, because this info is required to load the proper file
+
+    // FIXME [awe] 6.1 sollen wir fallback-logik implementieren (wenn key x nicht vorhanden in *_de.properties, schauen
+    // ob property in *.properties vorhanden ist (würde bedeuten, dass wir auch andere properties files laden müssen)
     return $.ajax({
       url: 'res/texts.properties',
       dataType: 'text',

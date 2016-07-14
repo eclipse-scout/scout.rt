@@ -25,14 +25,35 @@ scout.TreeNode = function() {
 
 scout.TreeNode.prototype.init = function(model) {
   this._init(model);
+  this._resolveTextKeys();
+};
+
+scout.TreeNode.prototype._resolveTextKeys = function() {
+  this.text = scout.textProperties.resolveTextKeys(this.text);
 };
 
 scout.TreeNode.prototype._init = function(model) {
+  // FIXME [awe] 6.1 ... discuss: wenn wir TreeNode/Pages aus model.json bauen, dann wird nur die property parent "vererbt"
+  // nicht jedoch andere properties wie z.B. tree. Schauen wie wir das machen wollen. Entweder über eine zu implementierende Methode
+  // setParent() auf unseren Objects, oder durch ändern von TreeNode#tree auf TreeNode#parent.
+  if (!model.tree && model.parent) {
+    model.tree = model.parent;
+  }
   if (!model.tree) {
     throw new Error('missing property \'tree\'');
   }
   $.extend(this, model);
   scout.defaultValues.applyTo(this);
+
+  var i, childNode;
+  for (i = 0; i < this.childNodes.length; i++) {
+    childNode = this.childNodes[i];
+    if (childNode instanceof scout.TreeNode) {
+      continue;
+    }
+    childNode.tree = this.tree;
+    this.childNodes[i] = scout.create(childNode);
+  }
 };
 
 scout.TreeNode.prototype.reset = function() {
