@@ -229,6 +229,7 @@
   __include("scout/tabbox/SimpleTabBoxController.js");
   __include("scout/tabbox/SimpleTabBox.js");
   __include("scout/tabbox/SimpleTabBoxLayout.js");
+  __include("scout/tabbox/SimpleTabViewContentLayout.js");
   __include("scout/desktop/bench/DesktopBench.js");
   __include("scout/desktop/bench/DesktopBenchLayout.js");
   __include("scout/desktop/bench/BenchColumn.js");

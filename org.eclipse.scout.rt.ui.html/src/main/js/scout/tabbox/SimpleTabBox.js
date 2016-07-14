@@ -53,7 +53,8 @@ scout.SimpleTabBox.prototype._render = function($parent) {
   // render content
   this.$viewContent = this.$container.appendDiv('tab-content');
   this.viewContent = new scout.HtmlComponent(this.$viewContent, this.session);
-
+  this.viewContent.validateRoot = true;
+  this.viewContent.setLayout(new scout.SimpleTabViewContentLayout(this));
 };
 
 scout.SimpleTabBox.prototype._renderProperties = function() {
@@ -61,7 +62,6 @@ scout.SimpleTabBox.prototype._renderProperties = function() {
   // render tabArea
   this._renderTabArea();
   this._renderView(this.currentView);
-
 };
 
 scout.SimpleTabBox.prototype._renderTabArea = function() {
