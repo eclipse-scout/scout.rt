@@ -855,6 +855,10 @@ scout.Planner.prototype._onCellMousemove = function(event) {
 };
 
 scout.Planner.prototype._onResizeMousemove = function(event) {
+  if (!this.rendered) {
+    // planner may be removed in the meantime
+    return;
+  }
   var lastRange = this._findScale(event.pageX);
   if (lastRange) {
     this.lastRange = lastRange;
@@ -864,7 +868,6 @@ scout.Planner.prototype._onResizeMousemove = function(event) {
 };
 
 scout.Planner.prototype._onDocumentMouseup = function(event) {
-  this._select();
   var $target = $(event.target);
   $target.body().removeClass('col-resize');
   if (this._cellMousemoveHandler) {
@@ -874,6 +877,9 @@ scout.Planner.prototype._onDocumentMouseup = function(event) {
   if (this._resizeMousemoveHandler) {
     $target.document().off('mousemove', this._resizeMousemoveHandler);
     this._resizeMousemoveHandler = null;
+  }
+  if (this.rendered) {
+    this._select();
   }
 };
 

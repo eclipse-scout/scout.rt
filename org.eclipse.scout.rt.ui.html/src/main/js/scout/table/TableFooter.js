@@ -151,6 +151,10 @@ scout.TableFooter.prototype._renderResizer = function() {
     this._$body.addClass('row-resize');
 
     function resizeMove(event) {
+      if (!this.rendered) {
+        // footer may be removed in the meantime
+        return;
+      }
       // Calculate position delta
       var x = Math.floor(event.pageY);
       var dx = x - startX;
@@ -165,7 +169,7 @@ scout.TableFooter.prototype._renderResizer = function() {
     }
 
     function resizeEnd() {
-      if (this.$controlContainer.height() < 100) {
+      if (this.rendered && this.$controlContainer.height() < 100) {
         this.selectedControl.setSelected(false);
       }
 

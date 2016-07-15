@@ -21,8 +21,8 @@ scout.Scrollbar = function() {
   this._onScrollHandler = this._onScroll.bind(this);
   this._onScrollbarMousedownHandler = this._onScrollbarMousedown.bind(this);
   this._onThumbMousedownHandler = this._onThumbMousedown.bind(this);
-  this._onThumbMousemoveHandler = this._onThumbMousemove.bind(this);
-  this._onThumbMouseupHandler = this._onThumbMouseup.bind(this);
+  this._onDocumentMousemoveHandler = this._onDocumentMousemove.bind(this);
+  this._onDocumentMouseupHandler = this._onDocumentMouseup.bind(this);
   this._fixScrollbarHandler = this._fixScrollbar.bind(this);
   this._unfixScrollbarHandler = this._unfixScrollbar.bind(this);
 };
@@ -103,19 +103,25 @@ scout.Scrollbar.prototype._onThumbMousedown = function(event) {
   this._begin = (this.axis === 'x' ? event.pageX : event.pageY) - this._$thumb.offset()[this._dir];
   this._$thumb.addClass('scrollbar-thumb-move');
   this._$thumb.document()
-    .on('mousemove', this._onThumbMousemoveHandler)
-    .one('mouseup', this._onThumbMouseupHandler);
+    .on('mousemove', this._onDocumentMousemoveHandler)
+    .one('mouseup', this._onDocumentMouseupHandler);
   return false;
 };
 
-scout.Scrollbar.prototype._onThumbMousemove = function(event) {
+scout.Scrollbar.prototype._onDocumentMousemove = function(event) {
+  if (!this.rendered) {
+    // Scrollbar may be removed in the meantime
+    return;
+  }
   this._scrollTo(event);
 };
 
-scout.Scrollbar.prototype._onThumbMouseup = function() {
-  this._$thumb.removeClass('scrollbar-thumb-move');
-  this._$thumb.document()
-    .off('mousemove', this._onThumbMousemoveHandler);
+scout.Scrollbar.prototype._onDocumentMouseup = function(event) {
+  var $document = $(event.currentTarget);
+  $document.off('mousemove', this._onDocumentMousemoveHandler);
+  if (this.rendered) {
+    this._$thumb.removeClass('scrollbar-thumb-move');
+  }
   this.trigger('scrollend');
   return false;
 };
