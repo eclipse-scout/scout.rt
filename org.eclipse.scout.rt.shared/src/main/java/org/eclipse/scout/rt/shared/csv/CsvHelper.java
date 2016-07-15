@@ -10,10 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.csv;
 
-/**
- * Title: BSI Scout V3
- */
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -43,11 +39,16 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.PlatformExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.nls.NlsLocale;
+import org.eclipse.scout.rt.platform.util.BomInputStreamReader;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.NumberFormatProvider;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.date.DateFormatProvider;
 
+/**
+ * Helper for reading and writing CSV data. <br/>
+ * Consider using {@link BomInputStreamReader} when working with unicode encoded input data.
+ */
 public class CsvHelper {
   /**
    * a column named with "null" will be ignored, its data will not be imported
@@ -145,6 +146,10 @@ public class CsvHelper {
     m_colCount = Math.max(m_colCount, m_colTypes.size());
   }
 
+  protected int getColCount() {
+    return m_colCount;
+  }
+
   /**
    * A format is described by the type optionally followed by _pattern. e.g.
    * <ul>
@@ -161,29 +166,29 @@ public class CsvHelper {
 
     if (sLow.startsWith("date")) {// date_<format>
       if (s.length() >= 5) {
-        return new SimpleDateFormat(s.substring(5), m_locale);
+        return new SimpleDateFormat(s.substring(5), getLocale());
       }
       else {
-        return BEANS.get(DateFormatProvider.class).getDateInstance(DateFormat.SHORT, m_locale);
+        return BEANS.get(DateFormatProvider.class).getDateInstance(DateFormat.SHORT, getLocale());
       }
     }
     else if (sLow.startsWith("integer")) {// integer_<format>
       if (s.length() >= 8) {
-        Format f = new DecimalFormat(s.substring(8), new DecimalFormatSymbols(m_locale));
+        Format f = new DecimalFormat(s.substring(8), new DecimalFormatSymbols(getLocale()));
         ((DecimalFormat) f).setParseIntegerOnly(true);
         return f;
       }
       else {
-        return BEANS.get(NumberFormatProvider.class).getIntegerInstance(m_locale);
+        return BEANS.get(NumberFormatProvider.class).getIntegerInstance(getLocale());
       }
     }
 
     else if (sLow.startsWith("float")) {
       if (s.length() >= 6) {// float_<format>
-        return new DecimalFormat(s.substring(6), new DecimalFormatSymbols(m_locale));
+        return new DecimalFormat(s.substring(6), new DecimalFormatSymbols(getLocale()));
       }
       else {
-        return BEANS.get(NumberFormatProvider.class).getNumberInstance(m_locale);
+        return BEANS.get(NumberFormatProvider.class).getNumberInstance(getLocale());
       }
     }
 
@@ -361,12 +366,12 @@ public class CsvHelper {
       if (writeNames) {
         line = exportRow(m_colNames);
         writer.write(line);
-        writer.write(m_lineSeparator);
+        writer.write(getLineSeparator());
       }
       if (writeTypes) {
         line = exportRow(m_colTypes);
         writer.write(line);
-        writer.write(m_lineSeparator);
+        writer.write(getLineSeparator());
       }
     }
     catch (IOException e) {
@@ -404,7 +409,7 @@ public class CsvHelper {
       }
       line = exportRow(rowStrings);
       writer.write(line);
-      writer.write(m_lineSeparator);
+      writer.write(getLineSeparator());
     }
     catch (IOException e) {
       throw new ProcessingException("line=" + Arrays.asList(row), e);
@@ -430,7 +435,7 @@ public class CsvHelper {
   }
 
   protected List<String> importRow(Reader reader) throws IOException {
-    List<String> cellList = new ArrayList<String>(Math.max(m_colCount, 2));
+    List<String> cellList = new ArrayList<String>(Math.max(getColCount(), 2));
     boolean inString = false;
     StringBuffer curBuf = new StringBuffer();
     String token;
@@ -444,7 +449,7 @@ public class CsvHelper {
     }
     while (true) {
       if (ch >= 0 && inString) {
-        if (ch == m_textDelimiterChar) {
+        if (ch == getTextDelimiterChar()) {
           inString = false;
         }
         else {
@@ -453,14 +458,14 @@ public class CsvHelper {
         curBuf.append((char) ch);
       }
       else {// ch<0 or out of string or end of line
-        if (ch == m_separatorChar || ch < 0 || ch == '\n' || ch == '\r') {
+        if (ch == getSeparatorChar() || ch < 0 || ch == '\n' || ch == '\r') {
           // consume token
           token = curBuf.toString();
           curBuf.setLength(0);
           int tokenLen = token.length();
           if (tokenLen > 0) {
             // remove delimiters
-            if (token.charAt(0) == m_textDelimiterChar && token.charAt(tokenLen - 1) == m_textDelimiterChar) {
+            if (token.charAt(0) == getTextDelimiterChar() && token.charAt(tokenLen - 1) == getTextDelimiterChar()) {
               token = token.substring(1, tokenLen - 1);
             }
             if (token.length() == 0) {
@@ -478,7 +483,7 @@ public class CsvHelper {
             break;
           }
         }
-        else if (ch == m_textDelimiterChar) {
+        else if (ch == getTextDelimiterChar()) {
           inString = true;
           curBuf.append((char) ch);
         }
@@ -503,8 +508,8 @@ public class CsvHelper {
       for (Iterator<String> it = strings.iterator(); it.hasNext();) {
         buf.append(encodeText(it.next()));
         if (it.hasNext()) {
-          if (m_separatorChar != 0x00) {
-            buf.append(m_separatorChar);
+          if (getSeparatorChar() != 0x00) {
+            buf.append(getSeparatorChar());
           }
         }
       }
@@ -539,11 +544,11 @@ public class CsvHelper {
   }
 
   protected String encodeText(String text) {
-    if (m_textDelimiterChar != 0x00) {
+    if (getTextDelimiterChar() != 0x00) {
       if (text != null) {
-        text = stringReplace(text, "" + m_textDelimiterChar, "" + m_textDelimiterChar + m_textDelimiterChar);
-        if (text.indexOf(m_separatorChar) >= 0 || text.indexOf(m_textDelimiterChar) >= 0 || (m_encodeLineSeparator && text.indexOf(m_lineSeparator) >= 0)) {
-          text = m_textDelimiterChar + text + m_textDelimiterChar;
+        text = stringReplace(text, "" + getTextDelimiterChar(), "" + getTextDelimiterChar() + getTextDelimiterChar());
+        if (text.indexOf(getSeparatorChar()) >= 0 || text.indexOf(getTextDelimiterChar()) >= 0 || (isEncodeLineSeparator() && text.indexOf(getLineSeparator()) >= 0)) {
+          text = getTextDelimiterChar() + text + getTextDelimiterChar();
         }
       }
     }
@@ -552,11 +557,11 @@ public class CsvHelper {
 
   protected String decodeText(String text) {
     if (text != null && text.length() > 0) {
-      if (m_textDelimiterChar != 0x00) {
-        if (text.charAt(0) == m_textDelimiterChar && text.charAt(text.length() - 1) == m_textDelimiterChar) {
+      if (getTextDelimiterChar() != 0x00) {
+        if (text.charAt(0) == getTextDelimiterChar() && text.charAt(text.length() - 1) == getTextDelimiterChar()) {
           text = text.substring(1, text.length() - 1);
         }
-        text = stringReplace(text, "" + m_textDelimiterChar + m_textDelimiterChar, "" + m_textDelimiterChar);
+        text = stringReplace(text, "" + getTextDelimiterChar() + getTextDelimiterChar(), "" + getTextDelimiterChar());
       }
     }
     return text;
