@@ -52,7 +52,11 @@ scout.Page.prototype.createDetailForm = function() {
  */
 scout.Page.prototype._init = function(model) {
   scout.Page.parent.prototype._init.call(this, model);
-  this.detailTable = this._createTable();
+  if (model.detailTable) { // FIXME [awe] 6.1 - try to get rid of this switch (required for case when server sends detailTable)
+    this.detailTable = model.detailTable;
+  } else {
+    this.detailTable = this._createTable();
+  }
   // FIXME [awe] 6.1 scout.create für detailTable aufrufen, damit man detailTable auch in model.json konfigurieren kann
 };
 

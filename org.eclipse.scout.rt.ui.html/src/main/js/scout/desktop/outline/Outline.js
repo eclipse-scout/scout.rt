@@ -192,11 +192,15 @@ scout.Outline.prototype._initTreeNodeInternal = function(node, parentNode) {
   scout.Outline.parent.prototype._initTreeNodeInternal.call(this, node, parentNode);
   node.detailFormVisibleByUi = true;
   if (node.detailTable) {
-    node.detailTable = this.session.getOrCreateModelAdapter(node.detailTable, this);
+    if (!(node.detailTable instanceof scout.Table)) {
+      node.detailTable = this.session.getOrCreateModelAdapter(node.detailTable, this);
+    }
     this._initDetailTable(node);
   }
   if (node.detailForm) {
-    node.detailForm = this.session.getOrCreateModelAdapter(node.detailForm, this);
+    if (!(node.detailForm instanceof scout.Form)) {
+      node.detailForm = this.session.getOrCreateModelAdapter(node.detailForm, this);
+    }
     this._initDetailForm(node);
   }
 
@@ -989,14 +993,9 @@ scout.Outline.prototype._onDetailTableEvent = function(event) {
 
 // FIXME [awe] 6.1 - merge this with online logic in onPageChanged
 scout.Outline.prototype._onPageChanged2 = function(page) {
-  if (page.table) {
-    page.detailTable = page.table;
-    page.detailTableVisible = true;
-  } else {
-    delete page.detailTable;
-    page.detailTableVisible = false;
+  if (page.detailTable) {
+    this._initDetailTable(page);
   }
-  this._initDetailTable(page);
 
   if (page.detailForm) {
     this._initDetailForm(page);
