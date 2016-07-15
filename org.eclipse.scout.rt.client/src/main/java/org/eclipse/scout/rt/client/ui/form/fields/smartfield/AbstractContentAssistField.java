@@ -100,6 +100,7 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
   private boolean m_browseAutoExpandAll;
   private boolean m_browseHierarchy;
   private boolean m_loadIncremental;
+  private boolean m_loadParentNodes;
   private int m_proposalFormHeight;
   private String m_wildcard;
 
@@ -155,6 +156,15 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
   @Order(240)
   protected boolean getConfiguredBrowseLoadIncremental() {
     return false;
+  }
+
+  /**
+   * valid when configuredBrowseHierarchy=true
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(240)
+  protected boolean getConfiguredLoadParentNodes() {
+    return true;
   }
 
   /**
@@ -413,6 +423,7 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
     setBrowseAutoExpandAll(getConfiguredBrowseAutoExpandAll());
     setBrowseIconId(getConfiguredBrowseIconId());
     setBrowseLoadIncremental(getConfiguredBrowseLoadIncremental());
+    setLoadParentNodes(getConfiguredLoadParentNodes());
     setMultilineText(getConfiguredMultilineText());
     setBrowseMaxRowCount(getConfiguredBrowseMaxRowCount());
     setBrowseNewText(getConfiguredBrowseNewText());
@@ -580,6 +591,16 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
   @Override
   public void setBrowseLoadIncremental(boolean b) {
     m_loadIncremental = b;
+  }
+
+  @Override
+  public boolean isLoadParentNodes() {
+    return m_loadParentNodes;
+  }
+
+  @Override
+  public void setLoadParentNodes(boolean b) {
+    m_loadParentNodes = b;
   }
 
   @Override
@@ -1050,6 +1071,11 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
   public IFuture<List<ILookupRow<LOOKUP_KEY>>> callTextLookupInBackground(String text, boolean cancelRunningJobs) {
     final ILookupRowProvider<LOOKUP_KEY> provider = newByTextLookupRowProvider(text);
     return callInBackground(provider, cancelRunningJobs);
+  }
+
+  @Override
+  public IFuture<List<ILookupRow<LOOKUP_KEY>>> callBrowseLookupInBackground(boolean cancelRunningJobs) {
+    return callBrowseLookupInBackground(null, cancelRunningJobs);
   }
 
   @Override

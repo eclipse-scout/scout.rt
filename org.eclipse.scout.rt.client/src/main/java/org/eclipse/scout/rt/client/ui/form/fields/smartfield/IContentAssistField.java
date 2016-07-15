@@ -119,6 +119,10 @@ public interface IContentAssistField<VALUE, LOOKUP_KEY> extends IValueField<VALU
 
   void setBrowseLoadIncremental(boolean b);
 
+  boolean isLoadParentNodes();
+
+  void setLoadParentNodes(boolean b);
+
   /**
    * see {@link AbstractSmartField#execBrowseNew(String)}
    */
@@ -294,6 +298,17 @@ public interface IContentAssistField<VALUE, LOOKUP_KEY> extends IValueField<VALU
    * @return {@link IFuture} to cancel data fetching.
    */
   IFuture<List<ILookupRow<LOOKUP_KEY>>> callTextLookupInBackground(String text, boolean cancelRunningJobs);
+
+  /**
+   * Lookup rows asynchronously by all {@link ILookupCall#getDataByAll()}. Automatically cancels already running lookup
+   * jobs of this field, before starting the lookup job.
+   *
+   * @param cancelRunningJobs
+   *          if <code>true</code> it automatically cancels already running lookup jobs of this field, before starting
+   *          the new lookup job.
+   * @return {@link IFuture} to cancel data fetching
+   */
+  IFuture<List<ILookupRow<LOOKUP_KEY>>> callBrowseLookupInBackground(boolean cancelRunningJobs);
 
   /**
    * Lookup rows asynchronously by all {@link ILookupCall#getDataByAll()}. Automatically cancels already running lookup
