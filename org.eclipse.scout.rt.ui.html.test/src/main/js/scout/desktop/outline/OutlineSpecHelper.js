@@ -73,7 +73,7 @@ scout.OutlineSpecHelper.prototype.createOutline = function(model) {
 scout.OutlineSpecHelper.prototype.createOutlineWithOneDetailForm = function() {
   var model = this.createModelFixture(3, 2, true);
   var outline = this.createOutline(model);
-  var node = model.nodes[0];
+  var node = outline.nodes[0];
   node.detailForm = new scout.FormSpecHelper(this.session).createFormWithOneField();
   node.detailFormVisible = true;
   return outline;

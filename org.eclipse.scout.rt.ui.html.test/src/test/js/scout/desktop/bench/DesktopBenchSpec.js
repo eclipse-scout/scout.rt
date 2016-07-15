@@ -36,7 +36,7 @@ describe("DesktopBench", function() {
     beforeEach(function() {
       model = helper.createModelFixture(3, 2, true);
       outline = helper.createOutline(model);
-      node = model.nodes[0];
+      node = outline.nodes[0];
       node.detailForm = formHelper.createFormWithOneField();
       node.detailFormVisible = true;
       bench = desktop.bench;

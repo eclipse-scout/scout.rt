@@ -80,6 +80,16 @@ scout.TreeSpecHelper.prototype.findAllNodes = function(tree) {
   return tree.$container.find('.tree-node');
 };
 
+/**
+ * Finds a node in the tree by the given ID.
+ */
+scout.TreeSpecHelper.prototype.findNodeById = function(tree, nodeId) {
+  if (tree.nodesMap) {
+    return tree.nodesMap[nodeId];
+  }
+  return null;
+};
+
 scout.TreeSpecHelper.prototype.createNodeExpandedEvent = function(model, nodeId, expanded) {
   return {
     target: model.id,

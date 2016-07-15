@@ -2362,13 +2362,18 @@ describe("Tree", function() {
         newNode0Child3.expanded = true;
         var event = helper.createNodesInsertedEvent(model, [newNode0Child3], tree.nodes[0].id);
         tree.onModelAction(event);
+
         var newNode0Child3Child0 = helper.createModelNode('0_3_1', 'newNode0Child3Child0', 0);
         event = helper.createNodesInsertedEvent(model, [newNode0Child3Child0], newNode0Child3.id);
         tree.onModelAction(event);
-        expect(tree.visibleNodesFlat.indexOf(newNode0Child3) > -1).toBeTruthy();
-        expect(tree.visibleNodesMap[newNode0Child3.id]).toBeTruthy();
-        expect(tree.visibleNodesFlat.indexOf(newNode0Child3Child0) > -1).toBeTruthy();
-        expect(tree.visibleNodesMap[newNode0Child3Child0.id]).toBeTruthy();
+
+        var treeNodeC3 = helper.findNodeById(tree, newNode0Child3.id);
+        var treeNodeC3C0 = helper.findNodeById(tree, newNode0Child3Child0.id);
+
+        expect(tree.visibleNodesFlat.indexOf(treeNodeC3) > -1).toBeTruthy();
+        expect(tree.visibleNodesMap[treeNodeC3.id]).toBeTruthy();
+        expect(tree.visibleNodesFlat.indexOf(treeNodeC3C0) > -1).toBeTruthy();
+        expect(tree.visibleNodesMap[treeNodeC3C0.id]).toBeTruthy();
       });
 
       it("insert child node in filtered parent", function() {
@@ -2424,21 +2429,21 @@ describe("Tree", function() {
         var newNode0Child3 = helper.createModelNode('0_3', 'newNode0Child3', 3);
         newNode0Child3.expanded = true;
         var event = helper.createNodesInsertedEvent(model, [newNode0Child3], tree.nodes[0].id);
-
         var filter = {
           accept: function(node) {
             return newNode0Child3.id !== node.id;
           }
         };
         tree.addFilter(filter);
-
         tree._visitNodes(tree.nodes, function(childNode) {
           expect(tree.visibleNodesFlat.indexOf(childNode) > -1).toBeTruthy();
           expect(tree.visibleNodesMap[childNode.id]).toBeTruthy();
         });
         tree.onModelAction(event);
+
+        var treeNode0C3 = helper.findNodeById(tree, newNode0Child3.id);
         tree._visitNodes(tree.nodes, function(node) {
-          if (node === newNode0Child3) {
+          if (node === treeNode0C3) {
             expect(tree.visibleNodesFlat.indexOf(node) > -1).toBeFalsy();
             expect(tree.visibleNodesMap[node.id]).toBeFalsy();
           } else {

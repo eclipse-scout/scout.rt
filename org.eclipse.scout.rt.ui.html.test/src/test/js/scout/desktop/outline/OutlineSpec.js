@@ -80,9 +80,9 @@ describe("Outline", function() {
 
     it("collapses all nodes in bread crumb mode", function() {
       var model = helper.createModelFixture(1, 1);
-      var node0 = model.nodes[0];
-
       var tree = helper.createOutline(model);
+      var node0 = tree.nodes[0];
+
       tree.displayStyle = scout.Tree.DisplayStyle.BREADCRUMB;
       tree.render(session.$entryPoint);
 

@@ -27,13 +27,13 @@ function sandboxSession(options) {
   options.backgroundJobPollingEnabled = false;
   options.suppressErrors = true;
   options.renderDesktop = scout.nvl(options.renderDesktop, true);
+  options.remote = true; // required so adapters will be registered in the adapter registry
 
   session = new scout.Session($sandbox, options);
   // Simulate successful session initialization
   session.uiSessionId = '1.1';
   session.modelAdapterRegistry[session.uiSessionId] = session;
   session.locale = new scout.LocaleSpecHelper().createLocale(scout.LocaleSpecHelper.DEFAULT_LOCALE);
-  session.remote = true; // required so adapters will be registered in the adapter registry
 
   var desktop = options.desktop || {};
   desktop.navigationVisible = scout.nvl(desktop.navigationVisible, false);
