@@ -33,6 +33,7 @@ function sandboxSession(options) {
   session.uiSessionId = '1.1';
   session.modelAdapterRegistry[session.uiSessionId] = session;
   session.locale = new scout.LocaleSpecHelper().createLocale(scout.LocaleSpecHelper.DEFAULT_LOCALE);
+  session.remote = true; // required so adapters will be registered in the adapter registry
 
   var desktop = options.desktop || {};
   desktop.navigationVisible = scout.nvl(desktop.navigationVisible, false);

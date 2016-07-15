@@ -54,7 +54,6 @@ scout.NullRemoteHandler = function() {
 // FIXME [awe] 6.1 discuss -> konzept für events / send (Menu.js, MenuProxy.js, MenuRemoteProxy.js?)
 // was machen wir mit param delay? Der gehört eher auf den RemoteProxy
 scout.EventRemoteHandler = function(event, delay) {
-  console.log('trigger', event);
   this.trigger(event.type, event);
 };
 

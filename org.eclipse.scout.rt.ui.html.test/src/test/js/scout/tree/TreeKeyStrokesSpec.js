@@ -32,9 +32,9 @@ describe("TreeKeyStrokes", function() {
       var model = helper.model = helper.createModelFixture(3, 3, false);
       var tree = helper.createTree(model);
 
-      var node0 = model.nodes[0],
-        node1 = model.nodes[1],
-        node2 = model.nodes[2];
+      var node0 = tree.nodes[0],
+        node1 = tree.nodes[1],
+        node2 = tree.nodes[2];
 
       tree.render(session.$entryPoint);
       helper.selectNodesAndAssert(tree, [node2]);
@@ -51,8 +51,8 @@ describe("TreeKeyStrokes", function() {
       var model = helper.model = helper.createModelFixture(3, 1, true);
       var tree = helper.createTree(model);
 
-      var node0 = model.nodes[0],
-        node1 = model.nodes[1],
+      var node0 = tree.nodes[0],
+        node1 = tree.nodes[1],
         node0Child2 = node0.childNodes[2],
         node1Child0 = node1.childNodes[0],
         node1Child1 = node1.childNodes[1];
@@ -72,7 +72,7 @@ describe("TreeKeyStrokes", function() {
       var model = helper.model = helper.createModelFixture(3, 3, false);
       var tree = helper.createTree(model);
 
-      var node2 = model.nodes[2];
+      var node2 = tree.nodes[2];
 
       tree.render(session.$entryPoint);
       tree.$data.triggerKeyDown(scout.keys.UP);
@@ -83,7 +83,7 @@ describe("TreeKeyStrokes", function() {
       var model = helper.model = helper.createModelFixture(1, 0, false);
       var tree = helper.createTree(model);
 
-      var node0 = model.nodes[0];
+      var node0 = tree.nodes[0];
       tree.render(session.$entryPoint);
       tree.$data.triggerKeyDown(scout.keys.UP);
       helper.assertSelection(tree, [node0]);
@@ -103,7 +103,7 @@ describe("TreeKeyStrokes", function() {
       var tree = helper.createTree(model);
 
       tree.render(session.$entryPoint);
-      var node0 = model.nodes[0];
+      var node0 = tree.nodes[0];
       helper.selectNodesAndAssert(tree, [node0]);
       tree.$data.triggerKeyDown(scout.keys.UP);
       helper.assertSelection(tree, [node0]);
@@ -115,9 +115,9 @@ describe("TreeKeyStrokes", function() {
       var model = helper.model = helper.createModelFixture(3, 3, false);
       var tree = helper.createTree(model);
 
-      var node0 = model.nodes[0],
-        node1 = model.nodes[1],
-        node2 = model.nodes[2];
+      var node0 = tree.nodes[0],
+        node1 = tree.nodes[1],
+        node2 = tree.nodes[2];
 
       tree.render(session.$entryPoint);
       helper.selectNodesAndAssert(tree, [node0]);
@@ -134,7 +134,7 @@ describe("TreeKeyStrokes", function() {
       var model = helper.model = helper.createModelFixture(3, 3, false);
       var tree = helper.createTree(model);
 
-      var node0 = model.nodes[0];
+      var node0 = tree.nodes[0];
 
       tree.render(session.$entryPoint);
 
@@ -146,8 +146,8 @@ describe("TreeKeyStrokes", function() {
       var model = helper.model = helper.createModelFixture(3, 1, true);
       var tree = helper.createTree(model);
 
-      var node0 = model.nodes[0],
-        node1 = model.nodes[1],
+      var node0 = tree.nodes[0],
+        node1 = tree.nodes[1],
         node0Child2 = node0.childNodes[2],
         node1Child0 = node1.childNodes[0],
         node1Child1 = node1.childNodes[1];
@@ -167,7 +167,7 @@ describe("TreeKeyStrokes", function() {
       var model = helper.model = helper.createModelFixture(1, 0, false);
       var tree = helper.createTree(model);
 
-      var node0 = model.nodes[0];
+      var node0 = tree.nodes[0];
       tree.render(session.$entryPoint);
       tree.$data.triggerKeyDown(scout.keys.DOWN);
       helper.assertSelection(tree, [node0]);
@@ -187,7 +187,7 @@ describe("TreeKeyStrokes", function() {
       var model = helper.model = helper.createModelFixture(3, 1, false);
       var tree = helper.createTree(model);
 
-      var node2 = model.nodes[2];
+      var node2 = tree.nodes[2];
 
       tree.render(session.$entryPoint);
       helper.selectNodesAndAssert(tree, [node2]);
@@ -202,8 +202,8 @@ describe("TreeKeyStrokes", function() {
       var model = helper.model = helper.createModelFixture(3, 1, false);
       var tree = helper.createTree(model);
 
-      var node0 = model.nodes[0],
-        node2 = model.nodes[2];
+      var node0 = tree.nodes[0],
+        node2 = tree.nodes[2];
 
       tree.render(session.$entryPoint);
       helper.selectNodesAndAssert(tree, [node2]);
@@ -215,7 +215,7 @@ describe("TreeKeyStrokes", function() {
       var model = helper.model = helper.createModelFixture(3, 1, true);
       var tree = helper.createTree(model);
 
-      var node0 = model.nodes[0],
+      var node0 = tree.nodes[0],
         node0Child2 = node0.childNodes[2];
 
       tree.render(session.$entryPoint);
@@ -236,7 +236,7 @@ describe("TreeKeyStrokes", function() {
       var model = helper.model = helper.createModelFixture(3, 1, true);
       var tree = helper.createTree(model);
 
-      var node0 = model.nodes[0];
+      var node0 = tree.nodes[0];
 
       tree.render(session.$entryPoint);
       helper.selectNodesAndAssert(tree, [node0]);
@@ -250,7 +250,7 @@ describe("TreeKeyStrokes", function() {
       var model = helper.model = helper.createModelFixture(3, 1, true);
       var tree = helper.createTree(model);
 
-      var node0 = model.nodes[0],
+      var node0 = tree.nodes[0],
         node0Child0 = node0.childNodes[0];
 
       tree.render(session.$entryPoint);
@@ -273,7 +273,7 @@ describe("TreeKeyStrokes", function() {
       var model = helper.model = helper.createModelFixture(3, 1, false);
       var tree = helper.createTree(model);
 
-      var node0 = model.nodes[0];
+      var node0 = tree.nodes[0];
 
       tree.render(session.$entryPoint);
       helper.selectNodesAndAssert(tree, [node0]);
@@ -287,7 +287,7 @@ describe("TreeKeyStrokes", function() {
       var model = helper.model = helper.createModelFixture(3, 1, false);
       var tree = helper.createTree(model);
 
-      var node0 = model.nodes[0];
+      var node0 = tree.nodes[0];
 
       tree.render(session.$entryPoint);
       helper.selectNodesAndAssert(tree, [node0]);
@@ -305,8 +305,8 @@ describe("TreeKeyStrokes", function() {
       var model = helper.model = helper.createModelFixture(3, 1, false);
       var tree = helper.createTree(model);
 
-      var node0 = model.nodes[0];
-      var node2 = model.nodes[2];
+      var node0 = tree.nodes[0];
+      var node2 = tree.nodes[2];
 
       tree.render(session.$entryPoint);
       helper.selectNodesAndAssert(tree, [node0]);
@@ -325,7 +325,7 @@ describe("TreeKeyStrokes", function() {
       model.checkable = true;
       var tree = helper.createTree(model);
 
-      var node0 = model.nodes[0];
+      var node0 = tree.nodes[0];
       tree.checkNode(node0, true, false);
       expect(node0.checked).toBeTruthy();
       tree.render(session.$entryPoint);
@@ -345,7 +345,7 @@ describe("TreeKeyStrokes", function() {
       model.checkable = true;
       var tree = helper.createTree(model);
 
-      var node0 = model.nodes[0];
+      var node0 = tree.nodes[0];
       tree.render(session.$entryPoint);
       expect(node0.checked).toBeFalsy();
       helper.selectNodesAndAssert(tree, [node0]);
@@ -366,7 +366,7 @@ describe("TreeKeyStrokes", function() {
       model.checkable = true;
       var tree = helper.createTree(model);
 
-      var node0 = model.nodes[0];
+      var node0 = tree.nodes[0];
       tree.render(session.$entryPoint);
       tree.checkNode(node0, true, false);
       expect(node0.checked).toBeTruthy();

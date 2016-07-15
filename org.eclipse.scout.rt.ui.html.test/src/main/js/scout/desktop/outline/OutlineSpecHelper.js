@@ -85,7 +85,7 @@ scout.OutlineSpecHelper.prototype.createOutlineWithOneDetailForm = function() {
 scout.OutlineSpecHelper.prototype.createOutlineWithOneDetailTable = function() {
   var model = this.createModelFixture(3, 2, true);
   var outline = this.createOutline(model);
-  var node = model.nodes[0];
+  var node = outline.nodes[0];
   node.detailTable = new scout.TableSpecHelper(this.session).createTableWithOneColumn();
   node.detailTableVisible = true;
   return outline;

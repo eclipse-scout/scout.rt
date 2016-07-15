@@ -9,23 +9,23 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 scout.TreeNode = function() {
-  this.id;
-  this.initialized;
-  this.enabled = true;
+  this.$node; // FIXME [awe] 6.1 discuss with CGU... properties without assignment do not exist after ctor call
+  this.attached = false;
   this.checked = false;
-  this.text;
-  this.rendered;
-  this.attached;
-  this.$node;
-  this.parentNode;
-  this.level;
-  this.filterDirty;
+  this.childNodes = [];
+  this.enabled = true;
   this.expanded = false;
   this.expandedLazy = false;
-  this.childNodes = [];
+  this.filterAccepted = true;
+  this.filterDirty;
+  this.id;
+  this.initialized;
   this.lazyExpandingEnabled = false;
   this.leaf = false;
-  this.filterAccepted = true;
+  this.level;
+  this.parentNode;
+  this.rendered = false;
+  this.text;  
 };
 
 scout.TreeNode.prototype.init = function(model) {
@@ -67,9 +67,12 @@ scout.TreeNode.prototype._ensureTreeNode = function(nodeIndex) {
 };
 
 scout.TreeNode.prototype.reset = function() {
+  if (this.$node) {
+    this.$node.remove();
+    delete this.$node;
+  }
   this.rendered = false;
   this.attached = false;
-  delete this.$node;
 };
 
 /**

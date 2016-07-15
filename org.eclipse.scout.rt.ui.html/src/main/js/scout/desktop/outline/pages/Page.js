@@ -11,8 +11,8 @@
 scout.Page = function(outline) {
   scout.Page.parent.call(this, outline);
 
-  this.table; // FIXME [awe] 6.1 - rename to detailTable (heisst auf dem server auch so)
-  this.tableVisible = true;
+  this.detailTable;
+  this.detailTableVisible = true;
   this.detailForm;
   this.detailFormVisible = true;
 
@@ -52,7 +52,7 @@ scout.Page.prototype.createDetailForm = function() {
  */
 scout.Page.prototype._init = function(model) {
   scout.Page.parent.prototype._init.call(this, model);
-  this.table = this._createTable();
+  this.detailTable = this._createTable();
   // FIXME [awe] 6.1 scout.create für detailTable aufrufen, damit man detailTable auch in model.json konfigurieren kann
 };
 
@@ -66,11 +66,11 @@ scout.Page.prototype._createTable = function() {
 // AbstractPageWithTable#loadChildren -> hier wird die table geladen und der baum neu aufgebaut
 // wird von AbstractTree#P_UIFacade aufgerufen
 scout.Page.prototype.loadTableData = function() {
-  if (this.table) {
-    this.table.deleteAllRows();
+  if (this.detailTable) {
+    this.detailTable.deleteAllRows();
     var rows = this._loadTableData();
     if (rows && rows.length > 0) {
-      this.table.insertRows(rows);
+      this.detailTable.insertRows(rows);
     }
   }
 };

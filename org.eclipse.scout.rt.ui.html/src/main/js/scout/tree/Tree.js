@@ -115,7 +115,7 @@ scout.Tree.prototype._ensureTreeNodes = function(nodeModels) {
 };
 
 scout.Tree.prototype._createTreeNode = function(nodeModel) {
-  return new scout.TreeNode(this); // FIXME [awe] 6.1 ausprobieren ob das auch mit scout.create klappt
+  return new scout.TreeNode(); // FIXME [awe] 6.1 ausprobieren ob das auch mit scout.create klappt
 };
 
 /**
@@ -763,10 +763,7 @@ scout.Tree.prototype._removeNodes = function(nodes, parentNode) {
       if (this._$animationWrapper && this._$animationWrapper.find(node.$node).length > 0) {
         this._$animationWrapper.stop(false, true);
       }
-      node.$node.remove();
-      node.rendered = false;
-      node.attached = false;
-      delete node.$node;
+      node.reset();
     }
   }, this);
 

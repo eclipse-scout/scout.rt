@@ -42,7 +42,7 @@ scout.PageWithTable.prototype.loadChildren = function() {
   this.loadTableData();
   var childPage, childNodes = [];
   // FIXME [awe] 6.1 create child nodes for table rows, check how this is done in Java model
-  this.table.rows.forEach(function(row) {
+  this.detailTable.rows.forEach(function(row) {
     childPage = this._createChildPageInternal(row);
     if (childPage !== null) {
       childNodes.push(childPage);
