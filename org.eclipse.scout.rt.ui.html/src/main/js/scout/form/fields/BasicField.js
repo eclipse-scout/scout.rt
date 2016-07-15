@@ -41,7 +41,14 @@ scout.BasicField.prototype._renderUpdateDisplayTextOnModify = function() {
  */
 scout.BasicField.prototype._onDisplayTextModified = function() {
   clearTimeout(this._displayTextModifiedTimeoutId);
-  this._displayTextModifiedTimeoutId = setTimeout(this.acceptInput.bind(this, true), 250);
+  this._displayTextModifiedTimeoutId = setTimeout(function() {
+    if (!this.rendered) {
+      // Field may be removed in the meantime -> accepting input is not possible anymore
+      this._displayTextModifiedTimeoutId = null;
+      return;
+    }
+    this.acceptInput(true);
+  }.bind(this), 250);
 };
 
 scout.BasicField.prototype.acceptInput = function(whileTyping) {
