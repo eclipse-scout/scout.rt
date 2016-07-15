@@ -51,9 +51,8 @@ scout.Planner.DisplayMode = $.extend({
 
 scout.Planner.SelectionMode = {
   NONE: 0,
-  ACTIVITY: 1,
-  SINGLE_RANGE: 2,
-  MULTI_RANGE: 3
+  SINGLE_RANGE: 1,
+  MULTI_RANGE: 2
 };
 
 scout.Planner.prototype._init = function(model) {
@@ -83,6 +82,7 @@ scout.Planner.prototype._init = function(model) {
   this._syncAvailableDisplayModes(this.availableDisplayModes);
   this._syncViewRange(this.viewRange);
   this._syncSelectedResources(this.selectedResources);
+  this._syncSelectedActivity(this.selectedActivity);
   this._syncSelectionRange(this.selectionRange);
   this._syncMenus(this.menus);
 
@@ -153,6 +153,7 @@ scout.Planner.prototype._renderProperties = function() {
   this._renderHeaderVisible();
   this._renderYearPanelVisible(false);
   this._renderResources();
+  this._renderSelectedActivity();
   this._renderSelectedResources();
   // render with setTimeout because the planner needs to be layouted first
   setTimeout(this._renderSelectionRange.bind(this));
@@ -647,7 +648,7 @@ scout.Planner.prototype._incrementTimelineScaleItems = function($largeComp, $sma
   $largeComp.data('count', $largeComp.data('count') + 1);
 
   $smallComp.data('date-to', new Date(newDate.valueOf()))
-  .data('first', newLargeGroup);
+    .data('first', newLargeGroup);
 };
 
 /* -- scale events --------------------------------------------------- */
@@ -692,6 +693,7 @@ scout.Planner.prototype._renderResources = function(resources) {
     var $element = $(element);
     resource = this._resourceById($element.attr('data-id'));
     this._linkResource($element, resource);
+    this._linkActivitiesForResource(resource);
   }.bind(this));
 };
 
@@ -699,6 +701,11 @@ scout.Planner.prototype._linkResource = function($resource, resource) {
   $resource.data('resource', resource);
   resource.$resource = $resource;
   resource.$cells = $resource.children('.resource-cells');
+};
+
+scout.Planner.prototype._linkActivity = function($activity, activity) {
+  $activity.data('activity', activity);
+  activity.$activity = $activity;
 };
 
 scout.Planner.prototype._rerenderActivities = function(resources) {
@@ -719,6 +726,15 @@ scout.Planner.prototype._buildResourceHtml = function(resource) {
 
 scout.Planner.prototype._renderActivititesForResource = function(resource) {
   resource.$cells.html(this._buildActivitiesHtml(resource));
+  this._linkActivitiesForResource(resource);
+};
+
+scout.Planner.prototype._linkActivitiesForResource = function(resource) {
+  resource.$cells.children('.planner-activity').each(function(index, element) {
+    var $element = $(element);
+    var activity = this._activityById($element.attr('data-id'));
+    this._linkActivity($element, activity);
+  }.bind(this));
 };
 
 scout.Planner.prototype._buildActivitiesHtml = function(resource) {
@@ -763,11 +779,11 @@ scout.Planner.prototype._buildActivityHtml = function(activity) {
     activityStyle += ' background-color: ' + levelColor + ';';
     activityStyle += ' border-color: ' + levelColor + ';';
   }
-  if(!levelColor && backgroundColor){
+  if (!levelColor && backgroundColor) {
     activityStyle += ' background-color: ' + backgroundColor + ';';
     activityStyle += ' border-color: ' + backgroundColor + ';';
   }
-  if(foregroundColor){
+  if (foregroundColor) {
     activityStyle += ' foreground-color: ' + foregroundColor + ';';
   }
 
@@ -790,45 +806,42 @@ scout.Planner.prototype._onCellMousedown = function(event) {
     $target = $(event.target),
     selectionMode = scout.Planner.SelectionMode;
 
+  if (this.activitySelectable) {
+    $activity = this._$elementFromPoint(event.pageX, event.pageY);
+    if ($activity.hasClass('planner-activity')) {
+      $resource = $activity.parent().parent();
+      this.selectResources([$resource.data('resource')]);
+      this.selectActivity($activity.data('activity'));
+      this.selectRange(new scout.Range(null, null));
+      return;
+    }
+  }
+
   if (this.selectionMode === selectionMode.NONE) {
     return;
   }
 
-  if (this.selectionMode === selectionMode.ACTIVITY) {
-    $activity = this._$elementFromPoint(event.pageX, event.pageY);
-
-    if ($activity.hasClass('planner-activity')) {
-      $('.selected', this.$grid).removeClass('selected');
-      $activity.addClass('selected');
-
-      $resource = $activity.parent().parent();
-      this.selectResources([$resource.data('resource')]);
-    }
-  } else {
-    if ($target.hasClass('selector')) {
-      if (event.which === 3 || event.which === 1 && event.ctrlKey) {
-        // Right click on the selector must not clear the selection -> context menu will be opened
-        return;
-      }
-    }
-
-    // init selector
-    this.startRow = this._findRow(event.pageY);
-    this.lastRow = this.startRow;
-
-    // find range on scale
-    this.startRange = this._findScale(event.pageX);
-    this.lastRange = this.startRange;
-
-    // draw
-    this._select(true);
-
-    // event
-    this._cellMousemoveHandler = this._onCellMousemove.bind(this);
-    $target.document()
-      .on('mousemove', this._cellMousemoveHandler)
-      .one('mouseup', this._onDocumentMouseup.bind(this));
+  if ($target.hasClass('selector') && (event.which === 3 || event.which === 1 && event.ctrlKey)) {
+    // Right click on the selector must not clear the selection -> context menu will be opened
+    return;
   }
+
+  // init selector
+  this.startRow = this._findRow(event.pageY);
+  this.lastRow = this.startRow;
+
+  // find range on scale
+  this.startRange = this._findScale(event.pageX);
+  this.lastRange = this.startRange;
+
+  // draw
+  this._select(true);
+
+  // event
+  this._cellMousemoveHandler = this._onCellMousemove.bind(this);
+  $target.document()
+    .on('mousemove', this._cellMousemoveHandler)
+    .one('mouseup', this._onDocumentMouseup.bind(this));
 };
 
 scout.Planner.prototype._onResizeMousedown = function(event) {
@@ -940,17 +953,14 @@ scout.Planner.prototype._select = function(whileSelecting) {
   this.selectResources(resources.map(function(i) {
     return $(i).data('resource');
   }), !whileSelecting);
+  this.selectActivity(null);
 
   if (rangeSelected) {
     // left and width
     var from = Math.min(this.lastRange.from, this.startRange.from),
       to = Math.max(this.lastRange.to, this.startRange.to);
 
-    var selectionRange = {
-      from: new Date(from),
-      to: new Date(to)
-    };
-
+    var selectionRange = new scout.Range(new Date(from), new Date(to));
     this.selectRange(selectionRange, !whileSelecting);
   }
 };
@@ -971,10 +981,7 @@ scout.Planner.prototype._findScale = function(x) {
     $scale = this._$elementFromPoint(x, y);
 
   if ($scale.data('date-from') !== undefined) {
-    return {
-      from: $scale.data('date-from').valueOf(),
-      to: $scale.data('date-to').valueOf()
-    };
+    return new scout.Range($scale.data('date-from').valueOf(), $scale.data('date-to').valueOf());
   } else {
     return null;
   }
@@ -1115,10 +1122,7 @@ scout.Planner.prototype._syncAvailableDisplayModes = function(availableDisplayMo
 };
 
 scout.Planner.prototype._syncSelectionRange = function(selectionRange) {
-  this.selectionRange = {
-    from: scout.dates.parseJsonDate(selectionRange.from),
-    to: scout.dates.parseJsonDate(selectionRange.to)
-  };
+  this.selectionRange = new scout.Range(scout.dates.parseJsonDate(selectionRange.from), scout.dates.parseJsonDate(selectionRange.to));
   this._updateMenuBar();
 };
 
@@ -1137,6 +1141,23 @@ scout.Planner.prototype._renderSelectedResources = function(newIds, oldSelectedR
   this.selectedResources.forEach(function(resource) {
     resource.$resource.select(true);
   });
+};
+
+scout.Planner.prototype._renderActivitySelectable = function() {
+  if (this.selectedActivity && this.selectedActivity.$activity) {
+    this.selectedActivity.$activity.toggleClass('selected', this.activitySelectable);
+  }
+};
+
+scout.Planner.prototype._renderSelectionMode = function() {
+  if (this.selectionMode === scout.Planner.SelectionMode.NONE) {
+    if (this.$selector) {
+      this.$selector.remove();
+      this.$highlight.remove();
+    }
+  } else {
+    this._renderSelectionRange();
+  }
 };
 
 scout.Planner.prototype._renderSelectionRange = function() {
@@ -1179,8 +1200,18 @@ scout.Planner.prototype._renderSelectionRange = function() {
     .cssWidth(width);
 };
 
-scout.Planner.prototype._renderSelectedActivity = function() {
+scout.Planner.prototype._syncSelectedActivity = function(selectedActivity) {
+  this.selectedActivity = this._activityById(selectedActivity);
   this._updateMenuBar();
+};
+
+scout.Planner.prototype._renderSelectedActivity = function(selectedActivity, oldSelectedActivity) {
+  if (oldSelectedActivity && oldSelectedActivity.$activity) {
+    oldSelectedActivity.$activity.removeClass('selected');
+  }
+  if (this.selectedActivity && this.selectedActivity.$activity) {
+    this.selectedActivity.$activity.addClass('selected');
+  }
 };
 
 scout.Planner.prototype._renderLabel = function() {
@@ -1250,11 +1281,15 @@ scout.Planner.prototype.setViewRange = function(viewRange) {
   if (this.rendered) {
     this._renderViewRange();
     this._rerenderActivities();
+    this._renderSelectedActivity();
     this.validateLayoutTree();
   }
 };
 
 scout.Planner.prototype.selectRange = function(range, notifyServer) {
+  if (range && range.equals(this.selectionRange)) {
+    return;
+  }
   notifyServer = notifyServer !== undefined ? notifyServer : true;
   this.selectionRange = range;
   if (notifyServer) {
@@ -1266,7 +1301,26 @@ scout.Planner.prototype.selectRange = function(range, notifyServer) {
   this._updateMenuBar();
 };
 
+scout.Planner.prototype.selectActivity = function(activity, notifyServer) {
+  if (activity === this.selectedActivity) {
+    return;
+  }
+  notifyServer = notifyServer !== undefined ? notifyServer : true;
+  var oldSelectedActivity = this.selectedActivity;
+  this.selectedActivity = activity;
+  if (notifyServer) {
+    this._sendSetSelection();
+  }
+  if (this.rendered) {
+    this._renderSelectedActivity('', oldSelectedActivity);
+  }
+  this._updateMenuBar();
+};
+
 scout.Planner.prototype.selectResources = function(resources, notifyServer) {
+  if (scout.arrays.equals(resources, this.selectedResources)) {
+    return;
+  }
   var oldSelection = this.selectedResources;
   notifyServer = notifyServer !== undefined ? notifyServer : true;
   resources = scout.arrays.ensure(resources);
@@ -1314,7 +1368,7 @@ scout.Planner.prototype.insertResources = function(resources) {
 
 scout.Planner.prototype.deleteResources = function(resources) {
   if (this.deselectResources(resources, false)) {
-    this.selectRange({}, false);
+    this.selectRange(new scout.Range(null, null), false);
   }
   resources.forEach(function(resource) {
     // Update model
@@ -1347,7 +1401,7 @@ scout.Planner.prototype.deleteAllResources = function() {
   this.resourceMap = {};
   this.activityMap = {};
   this.selectResources([], false);
-  this.selectRange({}, false);
+  this.selectRange(new scout.Range(null, null), false);
 };
 
 scout.Planner.prototype._updateResources = function(resources) {
@@ -1388,8 +1442,10 @@ scout.Planner.prototype._sendSetSelection = function() {
   var selectionRange = scout.dates.toJsonDateRange(this.selectionRange),
     resourceIds = this.selectedResources.map(function(r) {
       return r.id;
-    });
+    }),
+    activityId = this.selectedActivity ? this.selectedActivity.id : null;
   this._send('setSelection', {
+    activityId: activityId,
     resourceIds: resourceIds,
     selectionRange: selectionRange
   });

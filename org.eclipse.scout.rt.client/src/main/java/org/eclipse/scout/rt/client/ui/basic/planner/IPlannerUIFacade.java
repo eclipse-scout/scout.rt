@@ -21,7 +21,7 @@ public interface IPlannerUIFacade<RI, AI> {
 
   void setViewRangeFromUI(Range<Date> viewRange);
 
-  void setSelectedActivityCellFromUI(Activity<RI, AI> cell);
+  void setSelectedActivityFromUI(Activity<RI, AI> activity);
 
   void setSelectionFromUI(List<? extends Resource<RI>> resources, Range<Date> selectionRange);
 

@@ -62,7 +62,6 @@ public class JsonPlanner<PLANNER extends IPlanner<?, ?>> extends AbstractJsonPro
   private static final String EVENT_SET_DISPLAY_MODE = "setDisplayMode";
   private static final String EVENT_SET_VIEW_RANGE = "setViewRange";
   private static final String EVENT_SET_SELECTION = "setSelection";
-  private static final String EVENT_SET_SELECTED_ACTIVITY_CELLS = "setSelectedActivityCells";
 
   private PlannerListener m_plannerListener;
   private final Map<String, Activity<?, ?>> m_activities;
@@ -205,6 +204,12 @@ public class JsonPlanner<PLANNER extends IPlanner<?, ?>> extends AbstractJsonPro
       @Override
       protected Integer modelValue() {
         return getModel().getSelectionMode();
+      }
+    });
+    putJsonProperty(new JsonProperty<PLANNER>(IPlanner.PROP_ACTIVITY_SELECTABLE, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isActivitySelectable();
       }
     });
 
@@ -423,9 +428,6 @@ public class JsonPlanner<PLANNER extends IPlanner<?, ?>> extends AbstractJsonPro
     else if (EVENT_SET_SELECTION.equals(event.getType())) {
       handleUiSetSelection(event);
     }
-    else if (EVENT_SET_SELECTED_ACTIVITY_CELLS.equals(event.getType())) {
-      handleUiSetSelectedActivityCells(event);
-    }
     else {
       super.handleUiEvent(event);
     }
@@ -453,6 +455,8 @@ public class JsonPlanner<PLANNER extends IPlanner<?, ?>> extends AbstractJsonPro
     addPlannerEventFilterCondition(PlannerEvent.TYPE_RESOURCES_SELECTED).setResources(resources);
     addPropertyEventFilterCondition(IPlanner.PROP_SELECTION_RANGE, selectionRange);
     getModel().getUIFacade().setSelectionFromUI(resources, selectionRange);
+    Activity<?, ?> activity = extractActivity(event.getData());
+    getModel().getUIFacade().setSelectedActivityFromUI(activity);
     LOG.debug("selectionRange={}", selectionRange);
   }
 
@@ -471,14 +475,16 @@ public class JsonPlanner<PLANNER extends IPlanner<?, ?>> extends AbstractJsonPro
   }
 
   protected Date toJavaDate(JSONObject data, String propertyName) {
-    return new JsonDate(data.optString(propertyName, null)).asJavaDate();
+    String dateStr = data.optString(propertyName, null);
+    if (dateStr == null) {
+      return null;
+    }
+    return new JsonDate(dateStr).asJavaDate();
   }
 
-  @SuppressWarnings("unchecked")
-  protected void handleUiSetSelectedActivityCells(JsonEvent event) {
-    Activity<?, ?> activityCell = null;
-    // FIXME cgu: Map data from JSON
-    getModel().getUIFacade().setSelectedActivityCellFromUI(activityCell);
+  protected Activity<?, ?> extractActivity(JSONObject json) {
+    String activityId = json.optString("activityId");
+    return getActivity(activityId);
   }
 
   protected List<Resource<?>> extractResources(JSONObject json) {
