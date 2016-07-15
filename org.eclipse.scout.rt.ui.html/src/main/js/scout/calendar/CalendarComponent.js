@@ -85,7 +85,7 @@ scout.CalendarComponent.prototype._render = function($parent) {
           this._partPosition($part, partFrom, 24)
             .addClass('component-open-bottom');
         } else if (scout.dates.isSameDay(partDay, toDate)) {
-          this._partPosition($part, 0, partFrom)
+          this._partPosition($part, 0, partTo)
             .addClass('component-open-top');
         } else {
           this._partPosition($part, 1, 24)
