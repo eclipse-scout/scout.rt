@@ -222,6 +222,9 @@ scout.Form.prototype._isClosable = function() {
 };
 
 scout.Form.prototype.onResize = function() {
+  if (!this.rendered) {
+    return;
+  }
   $.log.trace('(Form#onResize) window was resized -> layout Form container');
   var htmlComp = scout.HtmlComponent.get(this.$container);
   var $parent = this.$container.parent();

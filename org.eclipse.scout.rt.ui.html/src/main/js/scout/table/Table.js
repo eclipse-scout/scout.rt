@@ -1423,6 +1423,9 @@ scout.Table.prototype.notifyRowSelectionFinished = function() {
 
 // Only necessary if the table is a root html comp (outline table)
 scout.Table.prototype.onResize = function() {
+  if (!this.rendered) {
+    return;
+  }
   this.htmlComp.revalidateLayoutTree();
 };
 
