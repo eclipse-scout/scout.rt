@@ -14,9 +14,6 @@ scout.Range = function(from, to) {
 };
 
 scout.Range.prototype.equals = function(other) {
-  if (other.from === undefined || other.to === undefined) {
-    return false;
-  }
   return this.from === other.from && this.to === other.to;
 };
 
