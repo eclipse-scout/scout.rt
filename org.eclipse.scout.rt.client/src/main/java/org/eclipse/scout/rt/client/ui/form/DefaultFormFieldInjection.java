@@ -38,12 +38,12 @@ public class DefaultFormFieldInjection implements IFormFieldInjection {
   private static final Logger LOG = LoggerFactory.getLogger(DefaultFormFieldInjection.class);
 
   private final Map<IFormField, Set<Class<? extends IFormField>>> m_replacingFormFieldsByContainer;
-  private final Map<Class<?>, Class<? extends IFormField>> m_replacementMapping;
   private final ArrayList<Class<? extends IFormField>> m_injectedFieldList;
   private final Object m_enclosingContext;
 
   private Set<Class<? extends IFormField>> m_injectingFields;
   private Set<Class<? extends IFormField>> m_replacingFields;
+  private Map<Class<?>, Class<? extends IFormField>> m_replacementMapping;
 
   /**
    * Creates a new instance for the given enclosing context (i.e. an {@link IForm} or an {@link ICompositeField}).
@@ -52,7 +52,6 @@ public class DefaultFormFieldInjection implements IFormFieldInjection {
    */
   public DefaultFormFieldInjection(Object enclosingContext) {
     m_replacingFormFieldsByContainer = new HashMap<IFormField, Set<Class<? extends IFormField>>>();
-    m_replacementMapping = new HashMap<Class<?>, Class<? extends IFormField>>();
     m_injectedFieldList = new ArrayList<Class<? extends IFormField>>();
     m_enclosingContext = enclosingContext;
   }
@@ -89,7 +88,7 @@ public class DefaultFormFieldInjection implements IFormFieldInjection {
    * @return Returns the mapping of all replaced fields or <code>null</code>, if no field replacements were performed.
    */
   public Map<Class<?>, Class<? extends IFormField>> getReplacementMapping() {
-    if (m_replacementMapping.isEmpty()) {
+    if (m_replacementMapping == null || m_replacementMapping.isEmpty()) {
       return null;
     }
     return m_replacementMapping;
@@ -104,6 +103,8 @@ public class DefaultFormFieldInjection implements IFormFieldInjection {
   private void prepare() {
     m_injectingFields = new HashSet<Class<? extends IFormField>>();
     m_replacingFields = new HashSet<Class<? extends IFormField>>();
+    m_replacementMapping = new HashMap<Class<?>, Class<? extends IFormField>>();
+
     // 1. separate injected fields by annotation
     for (Class<? extends IFormField> f : m_injectedFieldList) {
       if (f.isAnnotationPresent(Replace.class)) {
@@ -116,7 +117,8 @@ public class DefaultFormFieldInjection implements IFormFieldInjection {
 
     // 2. remove transitive replacements (i.e. compute replacing leaf classes)
     if (!m_replacingFields.isEmpty()) {
-      m_replacingFields = ConfigurationUtility.getReplacingLeafClasses(new ArrayList<Class<? extends IFormField>>(m_replacingFields));
+      m_replacementMapping = ConfigurationUtility.getReplacementMapping(new ArrayList<Class<? extends IFormField>>(m_replacingFields));
+      m_replacingFields = new HashSet<>(m_replacementMapping.values()); // values of all configured mappings correspond to the all leaf classes of replacements
     }
 
     // 3. remove injected fields that are replaced and treat those replacing fields as injected fields
@@ -179,7 +181,6 @@ public class DefaultFormFieldInjection implements IFormFieldInjection {
       for (Class<? extends IFormField> replacingField : replacingFields) {
         // create field
         createAndInsertField(container, fields, replacingField);
-        addReplacementMappings(replacingField);
       }
     }
 
@@ -189,24 +190,12 @@ public class DefaultFormFieldInjection implements IFormFieldInjection {
       while (tmpClass.isAnnotationPresent(Replace.class)) {
         tmpClass = tmpClass.getSuperclass();
       }
-      if (tmpClass.getAnnotation(InjectFieldTo.class).value() == container.getClass()) {
-        createAndInsertField(container, fields, injectedField);
-        addReplacementMappings(injectedField);
-      }
-    }
-  }
 
-  /**
-   * Adds class mappings from replaced classes to the given one. This method does nothing if the given
-   * <code>field</code> is not annotated with {@link Replace}.
-   *
-   * @param field
-   */
-  private void addReplacementMappings(Class<? extends IFormField> field) {
-    Class<?> tmpClass = field;
-    while (tmpClass.isAnnotationPresent(Replace.class)) {
-      tmpClass = tmpClass.getSuperclass();
-      m_replacementMapping.put(tmpClass, field);
+      // insert field if (1) annotated inject-to class is this container OR (2) annotated inject-to class was a container which was replaced by this container
+      Class<?> injectTo = tmpClass.getAnnotation(InjectFieldTo.class).value();
+      if (injectTo == container.getClass() || m_replacementMapping.get(injectTo) == container.getClass()) {
+        createAndInsertField(container, fields, injectedField);
+      }
     }
   }
 
