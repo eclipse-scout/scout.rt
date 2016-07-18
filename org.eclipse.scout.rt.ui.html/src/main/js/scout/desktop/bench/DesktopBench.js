@@ -11,11 +11,6 @@
 scout.DesktopBench = function() {
   scout.DesktopBench.parent.call(this);
   this.htmlComp;
-  this.VIEW_AREA_COLUMN_INDEX = {
-    LEFT: 0,
-    CENTER: 1,
-    RIGHT: 2
-  };
   this.columns = [];
   this.components;
   this.tabBoxMap = {}; // [key=viewId, value=SimpleTabBox instance]
@@ -40,6 +35,11 @@ scout.inherits(scout.DesktopBench, scout.Widget);
 
 scout.DesktopBench.VIEW_MIN_HEIGHT; // Configured in sizes.css
 scout.DesktopBench.VIEW_MIN_WIDTH; // Configured in sizes.css
+scout.DesktopBench.VIEW_AREA_COLUMN_INDEX = {
+  LEFT: 0,
+  CENTER: 1,
+  RIGHT: 2
+};
 
 scout.DesktopBench.prototype._init = function(model) {
   scout.DesktopBench.parent.prototype._init.call(this, model);
@@ -138,7 +138,6 @@ scout.DesktopBench.prototype._renderOutlineContent = function() {
   this.addView(this.outlineContent);
 
   if (this.desktop.rendered) {
-
     // Request focus on first element in outline content
     this.session.focusManager.validateFocus();
   }
@@ -552,15 +551,15 @@ scout.DesktopBench.prototype._getColumn = function(displayViewId) {
     case 'NW':
     case 'W':
     case 'SW':
-      column = this.columns[this.VIEW_AREA_COLUMN_INDEX.LEFT];
+      column = this.columns[scout.DesktopBench.VIEW_AREA_COLUMN_INDEX.LEFT];
       break;
     case 'NE':
     case 'E':
     case 'SE':
-      column = this.columns[this.VIEW_AREA_COLUMN_INDEX.RIGHT];
+      column = this.columns[scout.DesktopBench.VIEW_AREA_COLUMN_INDEX.RIGHT];
       break;
     default:
-      column = this.columns[this.VIEW_AREA_COLUMN_INDEX.CENTER];
+      column = this.columns[scout.DesktopBench.VIEW_AREA_COLUMN_INDEX.CENTER];
       break;
   }
   return column;

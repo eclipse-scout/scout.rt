@@ -33,7 +33,6 @@ scout.SimpleTabBoxLayout.prototype.layout = function($container) {
 };
 
 /**
- *
  * @param containerSize
  * @returns {@link {@link scout.Dimension}} used of the tab area
  */

@@ -8,7 +8,6 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-
 scout.DesktopBenchLayout = function(bench) {
   scout.DesktopBenchLayout.parent.call(this);
   this.bench = bench;
@@ -48,7 +47,6 @@ scout.DesktopBenchLayout.prototype.layout = function($container) {
   }
 
   this.containerSize = containerSize;
-
 };
 
 scout.DesktopBenchLayout.prototype._layoutByRatio = function(components, containerSize) {
