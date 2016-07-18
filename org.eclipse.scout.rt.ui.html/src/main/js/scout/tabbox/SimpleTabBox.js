@@ -146,7 +146,6 @@ scout.SimpleTabBox.prototype.addView = function(view, activate) {
 };
 
 /**
- *
  * @param view
  * @return the view which is gonna be the sibling to insert the new view tab after.
  */
@@ -176,7 +175,6 @@ scout.SimpleTabBox.prototype._addToViewStack = function(view) {
 };
 
 scout.SimpleTabBox.prototype.removeView = function(view, showSiblingView) {
-
   if (!view) {
     return;
   }

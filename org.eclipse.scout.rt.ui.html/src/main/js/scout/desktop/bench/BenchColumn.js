@@ -11,11 +11,6 @@
 scout.BenchColumn = function() {
   scout.BenchColumn.parent.call(this);
   this.htmlComp;
-  this.TAB_BOX_INDEX = {
-    TOP: 0,
-    CENTER: 1,
-    BOTTOM: 2
-  };
   this.tabBoxs = [];
   this._widgetToTabBox = {}; // [key=viewId, value=SimpleTabBox instance]
   this.components;
@@ -30,9 +25,14 @@ scout.BenchColumn = function() {
 };
 scout.inherits(scout.BenchColumn, scout.ModelAdapter);
 
+scout.BenchColumn.TAB_BOX_INDEX = {
+  TOP: 0,
+  CENTER: 1,
+  BOTTOM: 2
+};
+
 scout.BenchColumn.prototype._init = function(model) {
   scout.BenchColumn.parent.prototype._init.call(this, model);
-
   this._createTabBoxes();
 };
 
@@ -230,15 +230,15 @@ scout.BenchColumn.prototype.getTabBox = function(displayViewId) {
     case 'NW':
     case 'N':
     case 'NE':
-      tabBox = this.tabBoxs[this.TAB_BOX_INDEX.TOP];
+      tabBox = this.tabBoxs[scout.BenchColumn.TAB_BOX_INDEX.TOP];
       break;
     case 'SW':
     case 'S':
     case 'SE':
-      tabBox = this.tabBoxs[this.TAB_BOX_INDEX.BOTTOM];
+      tabBox = this.tabBoxs[scout.BenchColumn.TAB_BOX_INDEX.BOTTOM];
       break;
     default:
-      tabBox = this.tabBoxs[this.TAB_BOX_INDEX.CENTER];
+      tabBox = this.tabBoxs[scout.BenchColumn.TAB_BOX_INDEX.CENTER];
       break;
   }
   return tabBox;

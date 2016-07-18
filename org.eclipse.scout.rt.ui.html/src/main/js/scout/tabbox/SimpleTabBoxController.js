@@ -29,7 +29,6 @@ scout.SimpleTabBoxController = function(tabBox, tabArea) {
   this._viewTabSelectedHandler = this._onViewTabSelected.bind(this);
 
   this._installListeners();
-
 };
 
 scout.SimpleTabBoxController.prototype._installListeners = function() {
@@ -113,7 +112,8 @@ scout.SimpleTabBoxController.prototype.getTabs = function() {
   return this.tabArea.getTabs();
 };
 
-/** static functions **/
+/* ----- static functions ----- */
+
 scout.SimpleTabBoxController.hasViewTab = function(view) {
   return scout.objects.someProperties(view, ['title', 'subTitle', 'iconId']);
 };
