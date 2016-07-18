@@ -1446,9 +1446,6 @@ scout.Table.prototype.notifyRowSelectionFinished = function() {
   this._updateMenuBar();
 };
 
-  if (!this.rendered) {
-    return;
-  }
 scout.Table.prototype._sendRowClicked = function($row, mouseButton, columnId) {
   var data = {
     rowId: $row.data('row').id,
