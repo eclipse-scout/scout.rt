@@ -151,6 +151,7 @@ __include("jquery/jquery-scout.js");
   __include("scout/table/TableTooltip.js");
   __include("scout/table/columns/comparators.js");
   __include("scout/table/columns/Column.js");
+  __include("scout/table/columns/AlphanumericSortingStringColumn.js"); // requires Column.js
   __include("scout/table/columns/BeanColumn.js"); // requires Column.js
   __include("scout/table/columns/BooleanColumn.js"); // requires Column.js
   __include("scout/table/columns/DateColumn.js"); // requires Column.js

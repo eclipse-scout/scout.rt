@@ -89,6 +89,27 @@ public class AlphanumericComparatorTest {
   }
 
   @Test
+  public void testCompareFoundBoth() {
+    String s1 = "doc9.doc";
+    String s2 = "doc9.txt";
+    assertTrue("'doc9.doc' < 'doc9.txt'", StringUtility.ALPHANUMERIC_COMPARATOR.compare(s1, s2) < 0);
+  }
+  
+  @Test
+  public void testCompareFoundSecondLower() {
+    String s1 = "doc10";
+    String s2 = "doc9.txt";
+    assertTrue("'doc10' > 'doc9.txt'", StringUtility.ALPHANUMERIC_COMPARATOR.compare(s1, s2) > 0);
+  }
+
+  @Test
+  public void testCompareFoundSecondGreater() {
+    String s1 = "doc9";
+    String s2 = "doc9.txt";
+    assertTrue("'doc9' < 'doc9.txt'", StringUtility.ALPHANUMERIC_COMPARATOR.compare(s1, s2) < 0);
+  }
+
+  @Test
   public void testCompareNumeric() {
     String s1 = "doc9.txt";
     String s2 = "doc10.txt";
