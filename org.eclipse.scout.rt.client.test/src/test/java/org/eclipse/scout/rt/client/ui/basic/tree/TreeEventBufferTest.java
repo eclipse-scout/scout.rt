@@ -680,6 +680,63 @@ public class TreeEventBufferTest {
     assertEquals(nodes, events.get(0).getNodes());
   }
 
+  @Test
+  public void testIgnoreExpandAfterInsert() throws Exception {
+    testIgnoreAfterInsert(TreeEvent.TYPE_NODE_EXPANDED);
+  }
+
+  @Test
+  public void testIgnoreExpandRecursiveAfterInsert() throws Exception {
+    testIgnoreAfterInsert(TreeEvent.TYPE_NODE_EXPANDED_RECURSIVE);
+  }
+
+  @Test
+  public void testIgnoreCollapsedAfterInsert() throws Exception {
+    testIgnoreAfterInsert(TreeEvent.TYPE_NODE_COLLAPSED);
+  }
+
+  @Test
+  public void testIgnoreCollapsedRecursiveAfterInsert() throws Exception {
+    testIgnoreAfterInsert(TreeEvent.TYPE_NODE_COLLAPSED_RECURSIVE);
+  }
+
+  @Test
+  public void testIgnoreChangedAfterInsert() throws Exception {
+    testIgnoreAfterInsert(TreeEvent.TYPE_NODE_CHANGED);
+  }
+
+  @Test
+  public void testIgnoreUpdatedAfterInsert() throws Exception {
+    testIgnoreAfterInsert(TreeEvent.TYPE_NODES_UPDATED);
+  }
+
+  @Test
+  public void testIgnoreInsertedAfterInsert() throws Exception {
+    testIgnoreAfterInsert(TreeEvent.TYPE_NODES_INSERTED);
+  }
+
+  private void testIgnoreAfterInsert(int eventType) {
+    LinkedList<TreeEvent> treeEvents = new LinkedList<>();
+    ITreeNode parentA = mockNode("parent");
+    treeEvents.add(mockEvent(TreeEvent.TYPE_NODES_INSERTED, mockNode("child", parentA)));
+    treeEvents.add(mockEvent(eventType, mockNode("child", parentA)));
+    m_testBuffer.coalesce(treeEvents);
+    assertEquals(1, treeEvents.size());
+  }
+
+  /**
+   * TYPE_NODES_CHECKED must not be ignored after insert, because it might be necessary to say "no node is checked"
+   */
+  @Test
+  public void testNotIgnoreCheckedAfterInsert() throws Exception {
+    LinkedList<TreeEvent> treeEvents = new LinkedList<>();
+    ITreeNode parentA = mockNode("parent");
+    treeEvents.add(mockEvent(TreeEvent.TYPE_NODES_INSERTED, mockNode("child", parentA)));
+    treeEvents.add(mockEvent(TreeEvent.TYPE_NODES_CHECKED, mockNode("child", parentA)));
+    m_testBuffer.coalesce(treeEvents);
+    assertEquals(2, treeEvents.size());
+  }
+
   @Test(timeout = 10000)
   public void testCoalesceSameTypeWithManyInsertEvents() throws Exception {
     final int eventCount = 10000;

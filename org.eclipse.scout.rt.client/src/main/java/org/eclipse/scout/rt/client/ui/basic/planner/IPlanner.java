@@ -63,10 +63,14 @@ public interface IPlanner<RESOURCE_ID, ACTIVITY_ID> extends IPropertyObserver, I
   String PROP_AVAILABLE_DISPLAY_MODES = "availableDisplayModes";
 
   /**
-   * {@link #SELECTION_MODE_NONE}, {@link #SELECTION_MODE_ACTIVITY}, {@link #SELECTION_MODE_SINGLE_RANGE},
-   * {@link #SELECTION_MODE_MULTI_RANGE}
+   * {@link #SELECTION_MODE_NONE}, {@link #SELECTION_MODE_SINGLE_RANGE}, {@link #SELECTION_MODE_MULTI_RANGE}
    */
   String PROP_SELECTION_MODE = "selectionMode";
+
+  /**
+   * {@link Boolean}
+   */
+  String PROP_ACTIVITY_SELECTABLE = "activitySelectable";
 
   /**
    * {@link Activity}
@@ -80,9 +84,8 @@ public interface IPlanner<RESOURCE_ID, ACTIVITY_ID> extends IPropertyObserver, I
   String PROP_CONTEXT_MENU = "contextMenus";
 
   int SELECTION_MODE_NONE = 0;
-  int SELECTION_MODE_ACTIVITY = 1;
-  int SELECTION_MODE_SINGLE_RANGE = 2;
-  int SELECTION_MODE_MULTI_RANGE = 3;
+  int SELECTION_MODE_SINGLE_RANGE = 1;
+  int SELECTION_MODE_MULTI_RANGE = 2;
 
   void initPlanner();
 
@@ -147,6 +150,10 @@ public interface IPlanner<RESOURCE_ID, ACTIVITY_ID> extends IPropertyObserver, I
 
   void setSelectionMode(int mode);
 
+  boolean isActivitySelectable();
+
+  void setActivitySelectable(boolean selectable);
+
   long getMinimumActivityDuration();
 
   void setMinimumActivityDuration(long minDuration);
@@ -183,9 +190,9 @@ public interface IPlanner<RESOURCE_ID, ACTIVITY_ID> extends IPropertyObserver, I
 
   Activity<RESOURCE_ID, ACTIVITY_ID> getSelectedActivity();
 
-  void setSelectedActivityCell(Activity<RESOURCE_ID, ACTIVITY_ID> cell);
+  void setSelectedActivity(Activity<RESOURCE_ID, ACTIVITY_ID> activity);
 
-  boolean isSelectedActivityCell(Activity<RESOURCE_ID, ACTIVITY_ID> cell);
+  boolean isSelectedActivity(Activity<RESOURCE_ID, ACTIVITY_ID> activity);
 
   /**
    * First selected resource

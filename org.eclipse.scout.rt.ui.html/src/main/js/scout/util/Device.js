@@ -333,6 +333,15 @@ scout.Device.prototype.supportsCssAnimation = function() {
   return this.supportsCssProperty('animation');
 };
 
+/**
+ * Used to determine if browser supports full history API.
+ * Note that IE9 only partially supports the API, pushState and replaceState functions are missing.
+ * @see: https://developer.mozilla.org/de/docs/Web/API/Window/history
+ */
+scout.Device.prototype.supportsHistoryApi = function() {
+  return !!(window.history && window.history.pushState);
+};
+
 scout.Device.prototype.supportsCssGradient = function() {
   var testValue = 'linear-gradient(to left, #000 0%, #000 50%, transparent 50%, transparent 100% )';
   return this.supportsFeature('gradient', this.checkCssValue.bind(this, 'backgroundImage', testValue, function(actualValue) {

@@ -351,6 +351,9 @@ scout.Desktop.prototype._renderInBackground = function() {
 };
 
 scout.Desktop.prototype._renderBrowserHistoryEntry = function() {
+  if (!scout.device.supportsHistoryApi()) {
+    return;
+  }
   var myWindow = this.$container.window(true),
     history = this.browserHistoryEntry;
   myWindow.history.pushState({

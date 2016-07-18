@@ -156,6 +156,11 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
     return SELECTION_MODE_MULTI_RANGE;
   }
 
+  @Order(175)
+  protected boolean getConfiguredActivitySelectable() {
+    return false;
+  }
+
   @Order(180)
   protected int getConfiguredDisplayMode() {
     return IPlannerDisplayMode.CALENDAR_WEEK;
@@ -171,8 +176,12 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
   @Order(30)
   protected void execDisplayModeChanged(int displayMode) {
     Calendar from = Calendar.getInstance();
-    DateUtility.truncCalendar(from);
     Calendar to = Calendar.getInstance();
+    if (getViewRange() != null && getViewRange().getFrom() != null) {
+      from.setTime(getViewRange().getFrom());
+      to.setTime(getViewRange().getFrom());
+    }
+    DateUtility.truncCalendar(from);
     DateUtility.truncCalendar(to);
     switch (displayMode) {
       case IPlannerDisplayMode.DAY:
@@ -268,6 +277,7 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
     initDisplayModeOptions();
     setHeaderVisible(getConfiguredHeaderVisible());
     setSelectionMode(getConfiguredSelectionMode());
+    setActivitySelectable(getConfiguredActivitySelectable());
     setMinimumActivityDuration(getConfiguredMinimumActivityDuration());
     // menus
     List<Class<? extends IMenu>> declaredMenus = getDeclaredMenus();
@@ -556,13 +566,13 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
   }
 
   @Override
-  public void setSelectedActivityCell(Activity<RI, AI> cell) {
-    propertySupport.setProperty(PROP_SELECTED_ACTIVITY, cell);
+  public void setSelectedActivity(Activity<RI, AI> activity) {
+    propertySupport.setProperty(PROP_SELECTED_ACTIVITY, activity);
   }
 
   @Override
-  public boolean isSelectedActivityCell(Activity<RI, AI> cell) {
-    return getSelectedActivity() == cell;
+  public boolean isSelectedActivity(Activity<RI, AI> activity) {
+    return getSelectedActivity() == activity;
   }
 
   @Override
@@ -626,7 +636,6 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
         List<Resource<RI>> notificationCopy = CollectionUtility.arrayList(m_selectedResources);
 
         fireResourcesSelected(notificationCopy);
-        //FIXME cgu: implement activity selection (activity may only be selected if it belongs to the selected resource)
       }
     }
     finally {
@@ -875,6 +884,16 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
   }
 
   @Override
+  public boolean isActivitySelectable() {
+    return propertySupport.getPropertyBool(PROP_ACTIVITY_SELECTABLE);
+  }
+
+  @Override
+  public void setActivitySelectable(boolean selectable) {
+    propertySupport.setPropertyBool(PROP_ACTIVITY_SELECTABLE, selectable);
+  }
+
+  @Override
   public Range<Date> getViewRange() {
     @SuppressWarnings("unchecked")
     Range<Date> propValue = (Range<Date>) propertySupport.getProperty(PROP_VIEW_RANGE);
@@ -890,7 +909,22 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
   @Override
   public void setViewRange(Range<Date> viewRange) {
     LOG.debug("Setting view range to {}", viewRange);
+    if (viewRange != null) {
+      viewRange.setFrom(ensureTruncated(viewRange.getFrom(), "from"));
+      viewRange.setTo(ensureTruncated(viewRange.getTo(), "to"));
+    }
     propertySupport.setProperty(PROP_VIEW_RANGE, viewRange);
+  }
+
+  private Date ensureTruncated(Date date, String fromOrTo) {
+    if (date == null) {
+      return null;
+    }
+    Date truncated = DateUtility.truncDate(date);
+    if (!date.equals(truncated)) {
+      LOG.warn("Had to truncate {} date of range, bacause UI does not support intra day ranges: {}", fromOrTo, date);
+    }
+    return truncated;
   }
 
   @Override
@@ -900,7 +934,7 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
 
   @Override
   public void setSelectionRange(Range<Date> selectionRange) {
-    LOG.debug("Seting selection range to {}", selectionRange);
+    LOG.debug("Setting selection range to {}", selectionRange);
     propertySupport.setProperty(PROP_SELECTION_RANGE, selectionRange);
   }
 
@@ -1013,8 +1047,8 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
     }
 
     @Override
-    public void setSelectedActivityCellFromUI(Activity<RI, AI> cell) {
-      setSelectedActivityCell(cell);
+    public void setSelectedActivityFromUI(Activity<RI, AI> activity) {
+      setSelectedActivity(activity);
     }
   }
 

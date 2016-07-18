@@ -24,12 +24,8 @@ import org.eclipse.scout.rt.platform.classid.ClassIdentifier;
 import org.eclipse.scout.rt.shared.extension.IInternalExtensionRegistry;
 import org.eclipse.scout.rt.shared.extension.IMoveModelObjectToRootMarker;
 import org.eclipse.scout.rt.shared.extension.MoveDescriptor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class MoveFormFieldsHandler {
-
-  private static final Logger LOG = LoggerFactory.getLogger(MoveFormFieldsHandler.class);
 
   private final IForm m_form;
   private final IInternalExtensionRegistry m_extensionRegistry;
@@ -119,7 +115,6 @@ public class MoveFormFieldsHandler {
 
     // 6. current container is a template field. Do not exit template scope
     if (container instanceof AbstractCompositeField && ((AbstractCompositeField) container).isTemplateField()) {
-      LOG.warn("Current field is a template. Stop visiting its parent field.");
       return null;
     }
 
