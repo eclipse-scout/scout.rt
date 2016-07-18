@@ -10,6 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.csv;
 
+import static java.nio.charset.StandardCharsets.ISO_8859_1;
+import static java.nio.charset.StandardCharsets.US_ASCII;
+import static java.nio.charset.StandardCharsets.UTF_16BE;
+import static java.nio.charset.StandardCharsets.UTF_16LE;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -21,14 +26,17 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringWriter;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.text.Format;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -36,16 +44,23 @@ import java.util.List;
 import java.util.Set;
 
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.util.BomInputStreamReader;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.IOUtility;
+import org.hamcrest.CoreMatchers;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ErrorCollector;
 
 /**
  * JUnit tests for {@link CsvHelper}
  */
 public class CsvHelperTest {
+
+  @Rule
+  public ErrorCollector m_collector = new ErrorCollector();
 
   private CsvHelper m_csvHelper;
   private File m_testFile;
@@ -270,5 +285,52 @@ public class CsvHelperTest {
     assertTrue(ignoredColumns.get(3));
     assertTrue(ignoredColumns.get(4));
     assertFalse(ignoredColumns.get(5));
+  }
+
+  @Test
+  public void testImportWithoutHeaderRowsAndUtfWithBomEncoding() throws IOException {
+    List<Charset> unicodeCharsets = new ArrayList<>();
+    unicodeCharsets.add(UTF_8);
+    addIfSupported("UTF-16", unicodeCharsets);
+    unicodeCharsets.add(UTF_16BE);
+    unicodeCharsets.add(UTF_16LE);
+    addIfSupported("UTF-32", unicodeCharsets);
+    addIfSupported("UTF-32BE", unicodeCharsets);
+    addIfSupported("UTF-32LE", unicodeCharsets);
+
+    // all character sets
+    List<Charset> allCharsets = new ArrayList<>();
+    allCharsets.addAll(unicodeCharsets);
+    allCharsets.add(US_ASCII);
+    allCharsets.add(ISO_8859_1);
+
+    for (Charset charset : allCharsets) {
+      doTestImportData(false, charset);
+      if (unicodeCharsets.contains(charset)) {
+        doTestImportData(true, charset);
+      }
+    }
+  }
+
+  protected void addIfSupported(String charset, List<Charset> charsets) {
+    if (Charset.isSupported(charset)) {
+      charsets.add(Charset.forName(charset));
+    }
+  }
+
+  protected void doTestImportData(boolean withBom, Charset charset) throws IOException {
+    StringBuilder sb = new StringBuilder();
+    if (withBom) {
+      sb.append(BomInputStreamReader.BOM_CHAR);
+    }
+    sb.append('"').append("value1").append('"').append(',');
+    sb.append('"').append("value2").append('"').append(',');
+    sb.append('"').append("value3").append('"').append('\n');
+
+    try (Reader reader = new BomInputStreamReader(new ByteArrayInputStream(sb.toString().getBytes(charset)), charset)) {
+      Object[][] importedData = m_csvHelper.importData(reader, 0, null, 1);
+      Object[][] expectedData = new Object[][]{{"value1", "value2", "value3"}};
+      m_collector.checkThat(String.format("charset=%s, withBom=%b", charset.name(), withBom), importedData, CoreMatchers.equalTo(expectedData));
+    }
   }
 }

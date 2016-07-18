@@ -226,6 +226,9 @@ scout.Form.prototype._isClosable = function() {
   return false;
 };
 
+  if (!this.rendered) {
+    return;
+  }
 scout.Form.prototype.onMove = function(newOffset) {
   this.trigger('move', newOffset);
 };

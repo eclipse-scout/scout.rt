@@ -107,7 +107,7 @@ public class JettyServer {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         try {
           while (true) {
-            String command = br.readLine();
+            String command = br.readLine().trim();
             if (command.equalsIgnoreCase("shutdown")) {
               try {
                 LOG.warn("Shutting down...");
@@ -118,7 +118,7 @@ public class JettyServer {
                 LOG.error("Shutdown error.", e);
               }
             }
-            else {
+            else if (StringUtility.hasText(command)) {
               LOG.warn("Unknown command entered on console: {}", command);
             }
           }

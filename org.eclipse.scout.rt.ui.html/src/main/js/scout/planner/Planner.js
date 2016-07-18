@@ -371,9 +371,13 @@ scout.Planner.prototype._renderScale = function() {
     var $scaleItem = $(this);
     $scaleItem.css('width', width + '%');
     if (!$scaleItem.data('first')) {
-      $scaleItem.data('scale-item-line', that.$grid.appendDiv('planner-small-scale-item-line'));
-      $scaleItem.appendDiv('planner-small-scale-item-line')
-        .css('left', 0);
+      var $lineGrid = that.$grid.appendDiv('planner-small-scale-item-line');
+      $scaleItem.data('scale-item-line', $lineGrid);
+      var $lineScale = $scaleItem.appendDiv('planner-small-scale-item-line').css('left', 0);
+      if ($scaleItem.hasClass('label-invisible')) {
+        $lineGrid.addClass('first-in-range');
+        $lineScale.addClass('first-in-range');
+      }
     }
   });
 
@@ -863,6 +867,10 @@ scout.Planner.prototype._onCellMousemove = function(event) {
 };
 
 scout.Planner.prototype._onResizeMousemove = function(event) {
+  if (!this.rendered) {
+    // planner may be removed in the meantime
+    return;
+  }
   var lastRange = this._findScale(event.pageX);
   if (lastRange) {
     this.lastRange = lastRange;
@@ -872,7 +880,6 @@ scout.Planner.prototype._onResizeMousemove = function(event) {
 };
 
 scout.Planner.prototype._onDocumentMouseup = function(event) {
-  this._select();
   var $target = $(event.target);
   $target.body().removeClass('col-resize');
   if (this._cellMousemoveHandler) {
@@ -882,6 +889,9 @@ scout.Planner.prototype._onDocumentMouseup = function(event) {
   if (this._resizeMousemoveHandler) {
     $target.document().off('mousemove', this._resizeMousemoveHandler);
     this._resizeMousemoveHandler = null;
+  }
+  if (this.rendered) {
+    this._select();
   }
 };
 
@@ -1356,6 +1366,7 @@ scout.Planner.prototype._updateResources = function(resources) {
     if (this.rendered && oldResource.$resource) {
       var $updatedResource = $(this._buildResourceHtml(updatedResource));
       oldResource.$resource.replaceWith($updatedResource);
+      $updatedResource.css('min-width', oldResource.$resource.css('min-width'));
       this._linkResource($updatedResource, updatedResource);
     }
   }.bind(this));

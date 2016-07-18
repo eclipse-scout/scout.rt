@@ -18,7 +18,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
@@ -33,6 +32,7 @@ import java.util.Locale;
 
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.holders.NVPair;
+import org.eclipse.scout.rt.platform.util.BomInputStreamReader;
 import org.eclipse.scout.rt.server.csv.CsvSettings;
 import org.eclipse.scout.rt.server.jdbc.ISelectStreamHandler;
 import org.eclipse.scout.rt.server.jdbc.ISqlService;
@@ -309,7 +309,7 @@ public class CsvSqlAdapter {
       buf.append(")");
       String stm = buf.toString();
 
-      final Reader reader = new InputStreamReader(new FileInputStream(params.getFile()), params.getEncoding());
+      final Reader reader = new BomInputStreamReader(new FileInputStream(params.getFile()), params.getEncoding());
       try {
         SqlInsertDataConsumer cons = new SqlInsertDataConsumer(stm, params.getGroupKeyValue(), params.getLineNumberColumnName() != null);
         h.importData(cons, reader, false, false, params.getHeaderRowCount(), -1, params.getAllowVariableColumnCount());

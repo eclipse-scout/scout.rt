@@ -160,6 +160,17 @@ describe("BasicField", function() {
       });
       expect(mostRecentJsonRequest()).not.toContainEvents(event);
     });
+
+    it("does not fail if field is removed while acceptInput is still pending", function() {
+      field.updateDisplayTextOnModify = true;
+      field.render(session.$entryPoint);
+      field.$field.val('Test1');
+      field.$field.trigger('input');
+
+      field.remove();
+      jasmine.clock().tick(251); // because of debounce
+      // expect not to fail
+    });
   });
 
 });
