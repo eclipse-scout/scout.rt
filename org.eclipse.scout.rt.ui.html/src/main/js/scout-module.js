@@ -64,6 +64,7 @@
   __include("scout/layout/LogicalGridLayout.js");
   __include("scout/layout/LogicalGridLayoutInfo.js");
   __include("scout/layout/NullLayout.js");
+  __include("scout/layout/RowLayout.js");
   __include("scout/layout/SingleLayout.js");
   // Keystroke handling
   __include("scout/keystroke/keys.js");
@@ -233,6 +234,7 @@
   __include("scout/tabbox/SimpleTabBoxController.js");
   __include("scout/tabbox/SimpleTabBox.js");
   __include("scout/tabbox/SimpleTabBoxLayout.js");
+  __include("scout/tabbox/SimpleTabViewContentLayout.js");
   __include("scout/desktop/bench/DesktopBench.js");
   __include("scout/desktop/bench/DesktopBenchLayout.js");
   __include("scout/desktop/bench/BenchColumn.js");

@@ -91,7 +91,7 @@ scout.Desktop.prototype._render = function($parent) {
   this.$container = $parent;
   this.$container.addClass('desktop');
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
-  this.htmlComp.setLayout(new scout.DesktopLayout(this));
+  this.htmlComp.setLayout(this._createLayout());
   scout.inspector.applyInfo(this, this.$container);
 
   // Desktop elements are added before this separator, all overlays are opened after (dialogs, popups, tooltips etc.)
@@ -161,6 +161,10 @@ scout.Desktop.prototype._renderDisplayStyle = function() {
   }
 
   this.invalidateLayoutTree();
+};
+
+scout.Desktop.prototype._createLayout = function() {
+  return new scout.DesktopLayout(this);
 };
 
 /**
@@ -359,6 +363,9 @@ scout.Desktop.prototype._renderInBackground = function() {
 };
 
 scout.Desktop.prototype._renderBrowserHistoryEntry = function() {
+  if (!scout.device.supportsHistoryApi()) {
+    return;
+  }
   var myWindow = this.$container.window(true),
     history = this.browserHistoryEntry;
   myWindow.history.pushState({
@@ -434,13 +441,13 @@ scout.Desktop.prototype.setOutline = function(outline) {
   if (this.navigation) {
     this.navigation.setOutline(this.outline);
   }
+  // call render after triggering event so glasspane rendering taking place can refer to the current outline content
+  this.trigger('outlineChanged');
 
   if (this.rendered) {
     this._renderDisplayChildsOfOutline();
     this._renderDisplayStyle();
   }
-
-  this.trigger('outlineChanged');
 };
 
 scout.Desktop.prototype._syncViewButtons = function(viewButtons, oldViewButtons) {

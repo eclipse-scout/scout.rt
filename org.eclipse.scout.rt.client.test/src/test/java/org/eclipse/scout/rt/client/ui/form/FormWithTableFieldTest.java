@@ -33,6 +33,8 @@ import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFiel
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -46,16 +48,31 @@ import org.junit.runner.RunWith;
 @RunWithClientSession(TestEnvironmentClientSession.class)
 public class FormWithTableFieldTest {
 
+  private TableForm m_tableForm;
+
+  @Before
+  public void before() {
+    m_tableForm = new TableForm();
+  }
+
+  @After
+  public void after() {
+    if (m_tableForm == null || !m_tableForm.isShowing()) {
+      return;
+    }
+    m_tableForm.doClose();
+  }
+
   @Test
   public void testImportFormData() {
-    TableForm form = new TableForm();
+    TableForm form = m_tableForm;
     form.startModify();
     assertEquals(1, form.getLoremField().getTable().getRowCount());
   }
 
   @Test
   public void testExportFormData() {
-    TableForm form = new TableForm();
+    TableForm form = m_tableForm;
     form.startNew();
     Table table = form.getLoremField().getTable();
     assertEquals(0, table.getRowCount());

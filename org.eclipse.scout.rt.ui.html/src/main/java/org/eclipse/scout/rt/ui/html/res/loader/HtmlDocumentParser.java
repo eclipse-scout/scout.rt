@@ -227,6 +227,7 @@ public class HtmlDocumentParser {
     // <scout:message key="ui.JavaScriptDisabledTitle" />
     Matcher m = PATTERN_MESSAGE_TAG.matcher(m_workingContent);
     StringBuffer sb = new StringBuffer();
+    HtmlHelper htmlHelper = BEANS.get(HtmlHelper.class);
     while (m.find()) {
       Matcher m2 = PATTERN_KEY_VALUE.matcher(m.group(1));
       String style = "";
@@ -262,9 +263,17 @@ public class HtmlDocumentParser {
             // Plain normal replacement
             text = TEXTS.get(keys.get(0));
             break;
+          case "tag":
+            StringBuilder tags = new StringBuilder();
+            for (String key : keys) {
+              tags.append("<scout-text data-key=\"").append(htmlHelper.escape(key)).append("\" ");
+              tags.append("data-value=\"").append(htmlHelper.escape(TEXTS.get(key))).append("\" />");
+            }
+            text = tags.toString();
+            break;
           case "html":
           default:
-            text = BEANS.get(HtmlHelper.class).escape(TEXTS.get(keys.get(0)));
+            text = htmlHelper.escape(TEXTS.get(keys.get(0)));
             break;
         }
       }
@@ -281,5 +290,4 @@ public class HtmlDocumentParser {
     text = text.replaceAll("\r\n", "\\\\n");
     return "'" + text + "'";
   }
-
 }

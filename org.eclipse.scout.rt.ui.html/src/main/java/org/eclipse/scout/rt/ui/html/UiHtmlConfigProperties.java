@@ -112,6 +112,42 @@ public class UiHtmlConfigProperties {
   }
 
   /**
+   * Maximum time in seconds to wait for a client session to be stopped by the housekeeping job.<br/>
+   * The value should be smaller than the session timeout (typically defined in the web.xml) and greater than
+   * {@link org.eclipse.scout.rt.client.ClientConfigProperties.JobCompletionDelayOnSessionShutdown}.
+   */
+  public static class SessionStoreHousekeepingMaxWaitShutdownProperty extends AbstractPositiveIntegerConfigProperty {
+
+    @Override
+    public String getKey() {
+      return "scout.sessionstore.housekeepingMaxWaitForShutdown";
+    }
+
+    @Override
+    protected Integer getDefaultValue() {
+      return 60; // 1 minute
+    }
+  }
+
+  /**
+   * Maximum time in seconds to wait for the write lock when the session store is unbounded from the HTTP session. This
+   * value should not be too large because waiting on the lock might suspend background processes of the application
+   * server.
+   */
+  public static class SessionStoreMaxWaitWriteLockProperty extends AbstractPositiveIntegerConfigProperty {
+
+    @Override
+    public String getKey() {
+      return "scout.sessionStore.valueUnboundMaxWaitForWriteLock";
+    }
+
+    @Override
+    protected Integer getDefaultValue() {
+      return 5;
+    }
+  }
+
+  /**
    * Maximum time in second to wait for all client sessions to be stopped after the HTTP session has become invalid.
    * After this amount of time, a "leak detection" test is performed. You are advised to change this value only if your
    * sessions need an unusual long time to shutdown.

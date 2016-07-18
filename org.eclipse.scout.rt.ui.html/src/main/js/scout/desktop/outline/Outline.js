@@ -35,7 +35,7 @@ scout.Outline = function() {
 scout.inherits(scout.Outline, scout.Tree);
 
 scout.Outline.prototype._init = function(model) {
-  //add filter before first traversal of tree-> tree is only traversed once.
+  // add filter before first traversal of tree -> tree is only traversed once.
   this.addFilter(new scout.DetailTableTreeFilter(), true);
   scout.Outline.parent.prototype._init.call(this, model);
 
@@ -46,11 +46,12 @@ scout.Outline.prototype._init = function(model) {
   this.resolveTextKeys(['title']);
   this._syncDefaultDetailForm(this.defaultDetailForm);
   this._detailContentDestroyHandler = this._onDetailContentDestroy.bind(this);
+
+  // menu bars
   this.titleMenuBar = scout.create('MenuBar', {
     parent: this,
     menuOrder: new scout.GroupBoxMenuItemsOrder()
   });
-  this._updateTitleMenuBar();
   this.nodeMenuBar = scout.create('MenuBar', {
     parent: this,
     menuOrder: new scout.GroupBoxMenuItemsOrder()
@@ -61,6 +62,9 @@ scout.Outline.prototype._init = function(model) {
     menuOrder: new scout.GroupBoxMenuItemsOrder()
   });
   this.detailMenuBar.bottom();
+
+  this._syncDefaultDetailForm(this.defaultDetailForm);
+  this._syncMenus(this.menus);
   this.updateDetailContent();
 };
 
@@ -116,12 +120,13 @@ scout.Outline.prototype._render = function($parent) {
 };
 
 scout.Outline.prototype._renderProperties = function() {
-  this._renderTitleVisible();
   scout.Outline.parent.prototype._renderProperties.call(this);
+  this._renderTitle();
+  this._renderTitleMenuBar();
 };
 
 /**
- * @override
+ * @override Tree.js
  */
 scout.Outline.prototype._remove = function() {
   scout.Outline.parent.prototype._remove.call(this);
@@ -130,49 +135,26 @@ scout.Outline.prototype._remove = function() {
 
 scout.Outline.prototype._renderTitle = function() {
   if (!this.$title) {
-    this.$title = this.$container.prependDiv('outline-title');
+    this.$title = this.$container
+      .prependDiv('outline-title')
+      .on('click', this._onTitleClick.bind(this));
     this.$titleText = this.$title.prependDiv('outline-title-text');
   }
-  this.$titleText.text(this.title).on('click', this._onTitleClick.bind(this));
-  this._renderTitleMenuBar();
-};
-
-scout.Outline.prototype._renderTitleMenuBar = function() {
-  if (this.$title) {
-    this.titleMenuBar.render(this.$title);
-    this.titleMenuBar.$container.toggleClass('prevent-initial-focus', true);
-  }
-};
-
-scout.Outline.prototype._removeTitleMenuBar = function() {
-  this.titleMenuBar.remove();
+  this.$titleText.text(this.title);
 };
 
 scout.Outline.prototype._removeTitle = function() {
-  if (this.$title) {
-    this.$title.remove();
-    this.$title = null;
-    this._removeTitleMenuBar();
-  }
+  this.$title.remove();
+  this.$title = null;
 };
 
-scout.Outline.prototype.setTitleVisible = function(visible) {
-  this.titleVisible = visible;
-  if (this.rendered) {
-    this._renderTitleVisible();
-  }
-};
-
-scout.Outline.prototype._renderTitleVisible = function() {
-  if (this.titleVisible) {
-    this._renderTitle();
-  } else {
-    this._removeTitle();
-  }
+scout.Outline.prototype._renderTitleMenuBar = function() {
+  this.titleMenuBar.render(this.$title);
+  this.titleMenuBar.$container.addClass('prevent-initial-focus');
 };
 
 scout.Outline.prototype._postRender = function() {
-  //used to render glasspane
+  // used to render glasspane
   this.trigger('rendered');
   scout.Outline.parent.prototype._postRender.call(this);
 };
@@ -899,33 +881,33 @@ scout.Outline.prototype.setNodeMenuBarVisible = function(visible) {
 scout.Outline.prototype.glassPaneTargets = function() {
   if (this.rendered) {
     var desktop = this.session.desktop;
-    var elements = [];
-    if (desktop.navigation) {
-      elements.push(desktop.navigation.$body);
-    }
-    if (desktop.bench) {
-      elements.push(desktop.bench.$container);
-    }
+    var elements = this._glassPaneTargets();
     return elements;
   } else {
     var deferred = new scout.DeferredGlassPaneTarget();
     var renderedHandler = function(event) {
-      var desktop = event.source.session.desktop;
-      var elements = [];
-      if (desktop.navigation) {
-        elements.push(desktop.navigation.$body);
-      }
-      if (desktop.bench) {
-        elements.push(desktop.bench.$container);
-      }
+      var elements = this._glassPaneTargets();
       deferred.ready(elements);
-    };
+    }.bind(this);
+
     this.one('rendered', renderedHandler);
     this.one('destroy', function() {
       this.off('rendered', renderedHandler);
     }.bind(this));
     return [deferred];
   }
+};
+
+scout.Outline.prototype._glassPaneTargets = function() {
+  var desktop = this.session.desktop;
+  var elements = [];
+  if (desktop.navigation) {
+    elements.push(desktop.navigation.$body);
+  }
+  if (desktop.bench && desktop.bench.outlineContent.rendered) {
+    elements.push(desktop.bench.outlineContent.$container);
+  }
+  return elements;
 };
 
 /**
@@ -953,18 +935,16 @@ scout.Outline.prototype.acceptView = function(view) {
   return this.session.desktop.outline === this;
 };
 
+/**
+ * @override Tree.js (don't call parent)
+ */
 scout.Outline.prototype._syncMenus = function(menus, oldMenus) {
   this.updateKeyStrokes(menus, oldMenus);
   this.menus = menus;
-  if (this.titleMenuBar) {
-    // menuBar is not created yet when synMenus is called initially
-    this._updateTitleMenuBar();
+  if (this.titleMenuBar) { // _syncMenus is called by parent class Tree.js, at this time titleMenuBar is not yet initialized
+    var menuItems = scout.menus.filter(this.menus, ['Tree.Header']);
+    this.titleMenuBar.setMenuItems(menuItems);
   }
-};
-
-scout.Outline.prototype._updateTitleMenuBar = function() {
-  var menuItems = scout.menus.filter(this.menus, ['Tree.Header']);
-  this.titleMenuBar.setMenuItems(menuItems);
 };
 
 scout.Outline.prototype._triggerPageChanged = function(page) {

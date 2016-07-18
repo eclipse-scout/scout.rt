@@ -33,7 +33,6 @@ scout.SimpleTabBoxLayout.prototype.layout = function($container) {
 };
 
 /**
- *
  * @param containerSize
  * @returns {@link {@link scout.Dimension}} used of the tab area
  */
@@ -55,8 +54,8 @@ scout.SimpleTabBoxLayout.prototype._layoutTabArea = function(containerSize) {
  */
 scout.SimpleTabBoxLayout.prototype.preferredLayoutSize = function($container) {
   var htmlContainer = scout.HtmlComponent.get($container),
-    htmlViewContent = scout.HtmlComponent.get(this._tabBox._$tabContent),
-    htmlViewTabs = scout.HtmlComponent.get(this._tabBox._$tabArea),
+    htmlViewContent = scout.HtmlComponent.get(this.tabBox.$viewContent),
+    htmlViewTabs = scout.HtmlComponent.get(this.tabBox.$tabArea),
     viewTabsSize = new scout.Dimension(),
     viewContentSize = new scout.Dimension();
 

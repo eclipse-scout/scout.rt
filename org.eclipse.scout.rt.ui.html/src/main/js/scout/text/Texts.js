@@ -49,3 +49,24 @@ scout.Texts.prototype.optGet = function(textKey, defaultValue) {
 scout.Texts.prototype.exists = function(textKey) {
   return this._textMap.hasOwnProperty(textKey);
 };
+
+// ----- static methods -----
+
+/**
+ * Extracts NLS texts from the DOM tree. Texts are expected in the following format:
+ *
+ *   <scout-text data-key="..." data-value="..." />
+ *
+ * This method returns a map with all found texts. It must be called before scout.prepareDOM()
+ * is called, as that method removes all <scout-text> tags.
+ */
+scout.Texts.readFromDOM = function() {
+  var textMap = {};
+  $('scout-text').each(function() {
+    // No need to unescape strings (the browser did this already)
+    var key = $(this).data('key');
+    var value = $(this).data('value');
+    textMap[key] = value;
+  });
+  return textMap;
+};

@@ -35,12 +35,28 @@ scout.TableHeaderMenuLayout.prototype.layout = function($container) {
   }
 
   var
-    actionColumnSize,
+    actionColumnSize, filterColumnSize,
     $filterColumn = this.popup.$columnFilters,
-    filterColumnSize = scout.graphics.getSize($filterColumn),
     filterColumnInsets = scout.graphics.getInsets($filterColumn),
+    filterColumnMargins = scout.graphics.getMargins($filterColumn),
     filterFieldGroupSize = new scout.Dimension();
 
+  if (this.popup.$body.hasClass('compact')) {
+    // height is auto -> read pref size
+    filterColumnSize = scout.HtmlComponent.get($filterColumn).getPreferredSize();
+  } else {
+    // make filter column as height as body (since body is scrollable pref size is calculated which takes TABLE_MAX_HEIGHT into account)
+    filterColumnSize = this.preferredLayoutSize($container).subtract(scout.graphics.getInsets($container));
+    filterColumnSize = filterColumnSize.subtract(filterColumnMargins);
+  }
+  // width is always set with css
+  filterColumnSize.width = $filterColumn.cssWidth();
+
+  // Set explicit height, necessary if there is no filter table
+  $filterColumn.cssHeight(filterColumnSize.height);
+
+  // TODO [6.1] cgu this code could be written a lot easier -> replace following code (filter fields, filter table) with scout.HtmlComponent.get($filterColumn).setSize(filterColumnSize);
+  // Same for pref size. To implement max height of table, the RowLayout could read css max-height
   // Filter fields
   if (this.popup.hasFilterFields) {
     var
@@ -67,9 +83,10 @@ scout.TableHeaderMenuLayout.prototype.layout = function($container) {
     filterTableContainerHeight -= this._groupTitleHeight($filterTableGroup);
     // subtract insets of table container
     filterTableContainerHeight -= filterTableContainerInsets.vertical();
+    // limit height of table
+    filterTableContainerHeight = Math.min(filterTableContainerHeight, scout.TableHeaderMenuLayout.TABLE_MAX_HEIGHT);
 
     // Layout filter table
-    filterTableHtmlComp.pixelBasedSizing = true;
     filterTableHtmlComp.setSize(new scout.Dimension(
         filterColumnSize.width - filterColumnInsets.horizontal(),
         filterTableContainerHeight));
@@ -80,6 +97,25 @@ scout.TableHeaderMenuLayout.prototype.layout = function($container) {
   this._setMaxWidth();
   actionColumnSize = scout.graphics.getSize(this.popup.$columnActions);
   this._setMaxWidth(actionColumnSize.width);
+};
+
+scout.TableHeaderMenuLayout.prototype._adjustSizeWithAnchor = function(prefSize) {
+  var maxWidth,
+    htmlComp = this.popup.htmlComp,
+    windowPaddingX = this.popup.windowPaddingX,
+    popupMargins = htmlComp.getMargins(),
+    popupBounds = htmlComp.getBounds(),
+    $window = this.popup.$container.window(),
+    windowWidth = $window.width();
+
+  maxWidth = (windowWidth - popupMargins.horizontal() - popupBounds.x - windowPaddingX);
+  var compact = popupBounds.width > maxWidth;
+  if (compact) {
+    this.popup.$body.addClass('compact', compact);
+    prefSize = this.preferredLayoutSize(this.popup.$container);
+  }
+
+  return scout.TableHeaderMenuLayout.parent.prototype._adjustSizeWithAnchor.call(this, prefSize);
 };
 
 // group title (size used for table + field container)
@@ -98,7 +134,7 @@ scout.TableHeaderMenuLayout.prototype._filterFieldsGroupBoxHeight = function() {
  * + paddings of surrounding containers
  */
 scout.TableHeaderMenuLayout.prototype.preferredLayoutSize = function($container) {
-  var prefSize,
+  var prefSize, filterColumnMargins,
     rightColumnHeight = 0,
     leftColumnHeight = 0,
     containerInsets = scout.graphics.getInsets($container),
@@ -144,9 +180,18 @@ scout.TableHeaderMenuLayout.prototype.preferredLayoutSize = function($container)
     rightColumnHeight += filterFieldContainerHeight;
   }
 
+  if (this.popup.hasFilterFields || this.popup.hasFilterTable) {
+    filterColumnMargins = scout.graphics.getMargins(this.popup.$columnFilters),
+    rightColumnHeight += filterColumnMargins.vertical();
+  }
+
   // Use height of left or right column as preferred size (and add insets of container)
   prefSize = scout.graphics.prefSize($container);
-  prefSize.height = Math.max(leftColumnHeight, rightColumnHeight) + containerInsets.vertical();
+  if (!this.popup.$body.hasClass('compact')) {
+    prefSize.height = Math.max(leftColumnHeight, rightColumnHeight) + containerInsets.vertical();
+  } else {
+    prefSize.height = leftColumnHeight + rightColumnHeight + containerInsets.vertical();
+  }
 
   // restore max-width
   this._setMaxWidth(oldMaxWidth);

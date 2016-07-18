@@ -45,7 +45,17 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
   @Override
   protected List<TreeEvent> coalesce(List<TreeEvent> events) {
     removeObsolete(events);
-    removeNodesContainedInPreviousInsertEvents(events, CollectionUtility.hashSet(TreeEvent.TYPE_NODES_UPDATED, TreeEvent.TYPE_NODE_CHANGED, TreeEvent.TYPE_NODES_INSERTED));
+    removeNodesContainedInPreviousInsertEvents(events, CollectionUtility.hashSet(
+        //why these types? This information is included on each inserted node;
+        //once the event buffer is flushed, the individual inserted tree nodes will be
+        //sent with their current (=latest) state.
+        TreeEvent.TYPE_NODE_EXPANDED,
+        TreeEvent.TYPE_NODE_EXPANDED_RECURSIVE,
+        TreeEvent.TYPE_NODE_COLLAPSED,
+        TreeEvent.TYPE_NODE_COLLAPSED_RECURSIVE,
+        TreeEvent.TYPE_NODE_CHANGED,
+        TreeEvent.TYPE_NODES_UPDATED,
+        TreeEvent.TYPE_NODES_INSERTED));
     removeEmptyEvents(events);
     removeIdenticalEvents(events);
     coalesceSameType(events);
@@ -151,7 +161,7 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
       return;
     }
 
-    final Map<ITreeNode, TreeEvent> initialEventByPrentNode = new HashMap<>();
+    final Map<ITreeNode, TreeEvent> initialEventByParentNode = new HashMap<>();
     final Map<ITreeNode, TreeEventMerger> eventMergerByParent = new HashMap<>();
     int previousEventType = -1;
 
@@ -160,11 +170,11 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
       final int type = event.getType();
 
       // clean-up initial event and event merger maps
-      if (previousEventType != type && !initialEventByPrentNode.isEmpty()) {
+      if (previousEventType != type && !initialEventByParentNode.isEmpty()) {
         for (TreeEventMerger merger : eventMergerByParent.values()) {
           merger.complete();
         }
-        initialEventByPrentNode.clear();
+        initialEventByParentNode.clear();
         eventMergerByParent.clear();
       }
 
@@ -175,11 +185,11 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
       previousEventType = type;
       final ITreeNode parentNode = event.getCommonParentNode();
 
-      final TreeEvent initialEvent = initialEventByPrentNode.get(event.getCommonParentNode());
+      final TreeEvent initialEvent = initialEventByParentNode.get(event.getCommonParentNode());
       if (initialEvent == null) {
         // this is the first event with given common parent node.
         // put it into the initial event cache and continue with the next event
-        initialEventByPrentNode.put(parentNode, event);
+        initialEventByParentNode.put(parentNode, event);
         continue;
       }
 

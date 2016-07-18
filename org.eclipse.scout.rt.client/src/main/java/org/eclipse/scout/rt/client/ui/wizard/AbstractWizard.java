@@ -28,6 +28,7 @@ import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardCreate
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardDecorateContainerFormChain;
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardFinishChain;
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardNextStepChain;
+import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardPostStartChain;
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardPreviousStepChain;
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardRefreshButtonPolicyChain;
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardResetChain;
@@ -190,6 +191,15 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
     if (steps.size() > 0) {
       activateStep(steps.get(0));
     }
+  }
+
+  /**
+   * Invoked after {@link #execStart()} was called and the wizard container form was started (
+   * {@link IWizardContainerForm#startWizard()}).
+   */
+  @Order(15)
+  @ConfigOperation
+  protected void execPostStart() {
   }
 
   /**
@@ -882,6 +892,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
         if (m_containerForm.isFormStartable()) {
           m_containerForm.startWizard();
         }
+        interceptPostStart();
       }
     });
   }
@@ -1098,6 +1109,11 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
     }
 
     @Override
+    public void execPostStart(WizardPostStartChain chain) {
+      getOwner().execPostStart();
+    }
+
+    @Override
     public IWizardContainerForm execCreateContainerForm(WizardCreateContainerFormChain chain) {
       return getOwner().execCreateContainerForm();
     }
@@ -1172,6 +1188,12 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
     List<? extends IWizardExtension<? extends AbstractWizard>> extensions = getAllExtensions();
     WizardStartChain chain = new WizardStartChain(extensions);
     chain.execStart();
+  }
+
+  protected final void interceptPostStart() {
+    List<? extends IWizardExtension<? extends AbstractWizard>> extensions = getAllExtensions();
+    WizardPostStartChain chain = new WizardPostStartChain(extensions);
+    chain.execPostStart();
   }
 
   protected final IWizardContainerForm interceptCreateContainerForm() {

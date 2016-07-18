@@ -121,16 +121,40 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent {
 
   /**
    * Default style with header, navigation (tree) and bench (forms).
+   * <p>
+   * <code>initDisplayStyle({@link #DISPLAY_STYLE_DEFAULT})</code> will assign the following property values:
+   * <ul>
+   * <li><i>navigationVisible</i> = <code>getConfiguredNavigationVisible()</code>
+   * <li><i>navigationHandleVisible</i> = <code>getConfiguredNavigationHandleVisible()</code>
+   * <li><i>headerVisible</i> = <code>getConfiguredHeaderVisible()</code>
+   * <li><i>benchVisible</i> = <code>getConfiguredBenchVisible()</code>
+   * </ul>
    */
   String DISPLAY_STYLE_DEFAULT = "default";
 
   /**
    * Reduced style. Only bench is visible.
+   * <p>
+   * <code>initDisplayStyle({@link #DISPLAY_STYLE_BENCH})</code> will assign the following property values:
+   * <ul>
+   * <li><i>navigationVisible</i> = <b>false</b>
+   * <li><i>navigationHandleVisible</i> = <b>false</b>
+   * <li><i>headerVisible</i> = <b>false</b>
+   * <li><i>benchVisible</i> = <b>true</b>
+   * </ul>
    */
   String DISPLAY_STYLE_BENCH = "bench";
 
   /**
    * Compact style. Navigation and bench are never visible simultaneously.
+   * <p>
+   * <code>initDisplayStyle({@link #DISPLAY_STYLE_COMPACT})</code> will assign the following property values:
+   * <ul>
+   * <li><i>navigationVisible</i> = <b>true</b>
+   * <li><i>navigationHandleVisible</i> = <b>false</b>
+   * <li><i>headerVisible</i> = <b>false</b>
+   * <li><i>benchVisible</i> = <b>false</b>
+   * </ul>
    */
   String DISPLAY_STYLE_COMPACT = "compact";
 

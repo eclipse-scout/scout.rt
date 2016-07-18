@@ -24,6 +24,8 @@ import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.JUnitExceptionHandler;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -36,96 +38,105 @@ import org.junit.runner.RunWith;
 @RunWithClientSession(TestEnvironmentClientSession.class)
 public class FormStoredWithVetoTest {
 
+  private FormToStore m_form;
+
+  @Before
+  public void before() {
+    m_form = new FormToStore();
+  }
+
+  @After
+  public void after() {
+    if (m_form == null || !m_form.isShowing()) {
+      return;
+    }
+    m_form.doClose();
+  }
+
   @Test
   public void testVetoHandlerSave() throws Exception {
-    FormToStore f = new FormToStore();
-    f.setExecStoreHandlerImplementation(MethodImplementation.VETO_EXCEPTION);
-    f.startModify();
-    f.touch();
-    assertEquals("isSaveNeeded [before]", true, f.isSaveNeeded());
+    m_form.setExecStoreHandlerImplementation(MethodImplementation.VETO_EXCEPTION);
+    m_form.startModify();
+    m_form.touch();
+    assertEquals("isSaveNeeded [before]", true, m_form.isSaveNeeded());
 
-    f.clickSave();
+    m_form.clickSave();
 
     // verify
     assertHandledVetoException();
-    f.assertStoreInterrupted();
+    m_form.assertStoreInterrupted();
   }
 
   @Test
   public void testVetoHandlerOk() throws Exception {
-    FormToStore f = new FormToStore();
-    f.setExecStoreHandlerImplementation(MethodImplementation.VETO_EXCEPTION);
-    f.startModify();
-    f.touch();
-    assertEquals("isSaveNeeded [before]", true, f.isSaveNeeded());
+    m_form.setExecStoreHandlerImplementation(MethodImplementation.VETO_EXCEPTION);
+    m_form.startModify();
+    m_form.touch();
+    assertEquals("isSaveNeeded [before]", true, m_form.isSaveNeeded());
 
-    f.clickOk();
+    m_form.clickOk();
 
     // verify
     assertHandledVetoException();
-    f.assertStoreInterrupted();
+    m_form.assertStoreInterrupted();
   }
 
   @Test
   public void testVetoFormSave() throws Exception {
-    FormToStore f = new FormToStore();
-    f.setExecStoredImplementation(MethodImplementation.VETO_EXCEPTION);
-    f.startModify();
-    f.touch();
-    assertEquals("isSaveNeeded [before]", true, f.isSaveNeeded());
+    m_form.setExecStoredImplementation(MethodImplementation.VETO_EXCEPTION);
+    m_form.startModify();
+    m_form.touch();
+    assertEquals("isSaveNeeded [before]", true, m_form.isSaveNeeded());
 
-    f.clickSave();
+    m_form.clickSave();
 
     // verify
     assertHandledVetoException();
-    f.assertStoreInterrupted();
+    m_form.assertStoreInterrupted();
   }
 
   @Test
   public void testVetoFormOk() throws Exception {
-    FormToStore f = new FormToStore();
-    f.setExecStoredImplementation(MethodImplementation.VETO_EXCEPTION);
-    f.startModify();
-    f.touch();
-    assertEquals("isSaveNeeded [before]", true, f.isSaveNeeded());
+    m_form.setExecStoredImplementation(MethodImplementation.VETO_EXCEPTION);
+    m_form.startModify();
+    m_form.touch();
+    assertEquals("isSaveNeeded [before]", true, m_form.isSaveNeeded());
 
-    f.clickOk();
+    m_form.clickOk();
 
     // verify
     assertHandledVetoException();
-    f.assertStoreInterrupted();
+    m_form.assertStoreInterrupted();
   }
 
   @Test
   public void testVetoCombinationSave() throws Exception {
-    FormToStore f = new FormToStore();
-    f.setExecStoreHandlerImplementation(MethodImplementation.MARK_STORED); //no effect because of execStored in the form
-    f.setExecStoredImplementation(MethodImplementation.VETO_EXCEPTION);
-    f.startModify();
-    f.touch();
-    assertEquals("isSaveNeeded [before]", true, f.isSaveNeeded());
+    m_form.setExecStoreHandlerImplementation(MethodImplementation.MARK_STORED); //no effect because of execStored in the form
+    m_form.setExecStoredImplementation(MethodImplementation.VETO_EXCEPTION);
+    m_form.startModify();
+    m_form.touch();
+    assertEquals("isSaveNeeded [before]", true, m_form.isSaveNeeded());
 
-    f.clickSave();
+    m_form.clickSave();
 
     // verify
     assertHandledVetoException();
-    f.assertStoreInterrupted();
+    m_form.assertStoreInterrupted();
   }
 
   @Test
   public void testVetoCombinationOk() throws Exception {
-    FormToStore f = new FormToStore();
-    f.setExecStoreHandlerImplementation(MethodImplementation.MARK_STORED); //no effect because of execStored in the form
-    f.setExecStoredImplementation(MethodImplementation.VETO_EXCEPTION);
-    f.startModify();
-    f.touch();
-    assertEquals("isSaveNeeded [before]", true, f.isSaveNeeded());
+    m_form.setExecStoreHandlerImplementation(MethodImplementation.MARK_STORED); //no effect because of execStored in the form
+    m_form.setExecStoredImplementation(MethodImplementation.VETO_EXCEPTION);
+    m_form.startModify();
+    m_form.touch();
+    assertEquals("isSaveNeeded [before]", true, m_form.isSaveNeeded());
 
-    f.clickOk();
+    m_form.clickOk();
 
     // verify
     assertHandledVetoException();
-    f.assertStoreInterrupted();
+    m_form.assertStoreInterrupted();
   }
 
   private void assertHandledVetoException() {

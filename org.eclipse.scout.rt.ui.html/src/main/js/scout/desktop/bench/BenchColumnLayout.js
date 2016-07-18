@@ -8,7 +8,6 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-
 scout.BenchColumnLayout = function(benchColumn) {
   scout.BenchColumnLayout.parent.call(this);
   this.benchColumn = benchColumn;

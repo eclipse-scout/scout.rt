@@ -492,6 +492,23 @@ public class JsonTreeTest {
     Assert.assertNull(jsonTree.getOrCreateNodeId(null));
   }
 
+  /**
+   * Expected: adding two nodes to a common parent node and actively expanding one node should result in just one event.
+   */
+  @Test
+  public void testInsertionOrderWithExpandEvent() {
+    ITree tree = createTreeWithOneNode();
+    tree.getRootNode().setExpanded(true);
+    JsonTree<ITree> jsonTree = m_uiSession.createJsonAdapter(tree, null);
+    tree.setTreeChanging(true);
+    TreeNode child = new TreeNode();
+    tree.addChildNode(tree.getRootNode(), child);
+    child.setExpanded(true);
+    tree.addChildNode(0, tree.getRootNode(), new TreeNode());
+    tree.setTreeChanging(false);
+    assertEquals(1, jsonTree.eventBuffer().consumeAndCoalesceEvents().size());
+  }
+
   @Test
   public void testTreeExpandedRecursive() throws Exception {
     // (root)

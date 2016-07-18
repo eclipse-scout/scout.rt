@@ -53,7 +53,8 @@ scout.SimpleTabBox.prototype._render = function($parent) {
   // render content
   this.$viewContent = this.$container.appendDiv('tab-content');
   this.viewContent = new scout.HtmlComponent(this.$viewContent, this.session);
-
+  this.viewContent.validateRoot = true;
+  this.viewContent.setLayout(new scout.SimpleTabViewContentLayout(this));
 };
 
 scout.SimpleTabBox.prototype._renderProperties = function() {
@@ -61,7 +62,6 @@ scout.SimpleTabBox.prototype._renderProperties = function() {
   // render tabArea
   this._renderTabArea();
   this._renderView(this.currentView);
-
 };
 
 scout.SimpleTabBox.prototype._renderTabArea = function() {
@@ -146,7 +146,6 @@ scout.SimpleTabBox.prototype.addView = function(view, activate) {
 };
 
 /**
- *
  * @param view
  * @return the view which is gonna be the sibling to insert the new view tab after.
  */
@@ -176,7 +175,6 @@ scout.SimpleTabBox.prototype._addToViewStack = function(view) {
 };
 
 scout.SimpleTabBox.prototype.removeView = function(view, showSiblingView) {
-
   if (!view) {
     return;
   }

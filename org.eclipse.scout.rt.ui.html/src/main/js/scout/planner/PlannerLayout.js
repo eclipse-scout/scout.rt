@@ -139,17 +139,19 @@ scout.PlannerLayout.prototype._minWidth = function() {
     $scaleItemsSmall = this.planner.$timelineSmall.children('.scale-item'),
     numScaleItemsLarge = $scaleItemsLarge.length,
     numScaleItemsSmall = $scaleItemsSmall.length,
-    displayMode = scout.Planner.DisplayMode;
+    displayMode = scout.Planner.DisplayMode,
+    cellInsets = scout.graphics.getInsets($scaleItemsSmall, {includeBorder: false}),
+    minWidth = numScaleItemsSmall*cellInsets.horizontal(); //no matter what, this width must never be deceeded
 
   if (this.planner.displayMode === displayMode.DAY) {
-    return numScaleItemsLarge * 52;
+    return Math.max(minWidth, numScaleItemsLarge * 52);
   } if (scout.isOneOf(this.planner.displayMode, displayMode.WORK_WEEK, displayMode.WEEK)) {
-    return numScaleItemsLarge * 160;
+    return Math.max(minWidth, numScaleItemsLarge * 160);
   } if (this.planner.displayMode === displayMode.MONTH) {
-    return numScaleItemsSmall * 23;
+    return Math.max(minWidth, numScaleItemsSmall * 23);
   } if (this.planner.displayMode === displayMode.CALENDAR_WEEK) {
-    return numScaleItemsSmall * 23;
+    return Math.max(minWidth, numScaleItemsSmall * 23);
   } if (this.planner.displayMode === displayMode.YEAR) {
-    return numScaleItemsSmall * 90;
+    return Math.max(minWidth, numScaleItemsSmall * 90);
   }
 };

@@ -12,7 +12,11 @@ package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Callable;
 
 import org.eclipse.scout.rt.client.ui.MouseButton;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
@@ -27,6 +31,7 @@ import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.holders.Holder;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.CompareUtility;
+import org.eclipse.scout.rt.platform.util.FinalValue;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 import org.slf4j.Logger;
@@ -43,11 +48,11 @@ import org.slf4j.LoggerFactory;
  */
 public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITree, LOOKUP_KEY> {
   private static final Logger LOG = LoggerFactory.getLogger(TreeProposalChooser.class);
-  private final KeyLookupProvider m_keyLookupProvider;
+  private final P_KeyLookupProvider m_keyLookupProvider;
 
   public TreeProposalChooser(IContentAssistField<?, LOOKUP_KEY> contentAssistField, boolean allowCustomText) {
     super(contentAssistField, allowCustomText);
-    m_keyLookupProvider = new KeyLookupProvider();
+    m_keyLookupProvider = new P_KeyLookupProvider();
   }
 
   @Override
@@ -163,9 +168,22 @@ public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITr
    * @return all new rows to be inserted (including parents of search result)
    */
   private List<? extends ILookupRow<LOOKUP_KEY>> getRows(IContentAssistFieldDataFetchResult<LOOKUP_KEY> result) {
-    LOOKUP_KEY parent = result.getSearchParam().getParentKey();
-    return new IncrementalTreeBuilder<LOOKUP_KEY>(m_keyLookupProvider)
-        .getRowsWithParents(result.getLookupRows(), parent, m_model);
+    if (m_contentAssistField.isLoadParentNodes()) {
+      IKeyLookupProvider<LOOKUP_KEY> loopProvider;
+      if (m_contentAssistField.isBrowseLoadIncremental()) {
+        loopProvider = m_keyLookupProvider;
+      }
+      else {
+        loopProvider = new P_AllKeyLookupProvider();
+      }
+
+      LOOKUP_KEY parent = result.getSearchParam().getParentKey();
+      return new IncrementalTreeBuilder<LOOKUP_KEY>(loopProvider)
+          .getRowsWithParents(result.getLookupRows(), parent, m_model);
+    }
+    else {
+      return result.getLookupRows();
+    }
   }
 
   /**
@@ -346,7 +364,7 @@ public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITr
     }
   }
 
-  private class KeyLookupProvider implements IKeyLookupProvider<LOOKUP_KEY> {
+  private class P_KeyLookupProvider implements IKeyLookupProvider<LOOKUP_KEY> {
 
     @Override
     public ILookupRow<LOOKUP_KEY> getLookupRow(LOOKUP_KEY key) {
@@ -361,6 +379,31 @@ public class TreeProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<ITr
       }
 
       return rows.get(0);
+    }
+
+  }
+
+  private class P_AllKeyLookupProvider implements IKeyLookupProvider<LOOKUP_KEY> {
+
+    private final FinalValue<Map<LOOKUP_KEY, ILookupRow<LOOKUP_KEY>>> m_rows = new FinalValue<>();
+
+    @Override
+    public ILookupRow<LOOKUP_KEY> getLookupRow(LOOKUP_KEY key) {
+      m_rows.setIfAbsent(new Callable<Map<LOOKUP_KEY, ILookupRow<LOOKUP_KEY>>>() {
+
+        @Override
+        public Map<LOOKUP_KEY, ILookupRow<LOOKUP_KEY>> call() throws Exception {
+          List<ILookupRow<LOOKUP_KEY>> rows = LookupJobHelper.await(m_contentAssistField.callBrowseLookupInBackground(false));
+          HashMap<LOOKUP_KEY, ILookupRow<LOOKUP_KEY>> rowMap = new HashMap<>();
+          for (ILookupRow<LOOKUP_KEY> r : rows) {
+            rowMap.put(r.getKey(), r);
+          }
+          return Collections.unmodifiableMap(rowMap);
+        }
+
+      });
+
+      return m_rows.get().get(key);
     }
 
   }

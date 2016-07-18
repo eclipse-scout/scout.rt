@@ -18,6 +18,7 @@ import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardCreate
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardDecorateContainerFormChain;
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardFinishChain;
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardNextStepChain;
+import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardPostStartChain;
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardPreviousStepChain;
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardRefreshButtonPolicyChain;
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardChains.WizardResetChain;
@@ -42,6 +43,8 @@ public interface IWizardExtension<OWNER extends AbstractWizard> extends IExtensi
   void execCancel(WizardCancelChain chain);
 
   void execStart(WizardStartChain chain);
+
+  void execPostStart(WizardPostStartChain chain);
 
   IWizardContainerForm execCreateContainerForm(WizardCreateContainerFormChain chain);
 

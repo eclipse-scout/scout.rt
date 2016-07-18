@@ -62,12 +62,14 @@ scout.create = function(vararg, options) {
  *
  * Currently it does the following:
  * - Remove the <noscript> tag (obviously there is no need for it).
+ * - Remove <scout-text> tags (they must have been processed before, see scout.Texts.readFromDOM())
  * - If the browser is Google Chrome, add a special meta header to prevent automatic translation.
  */
 scout.prepareDOM = function(targetDocument) {
   targetDocument = targetDocument || document;
   // Cleanup DOM
   $('noscript', targetDocument).remove();
+  $('scout-text', targetDocument).remove();
 
   // Prevent "Do you want to translate this page?" in Google Chrome
   if (scout.device.browser === scout.Device.Browser.CHROME) {

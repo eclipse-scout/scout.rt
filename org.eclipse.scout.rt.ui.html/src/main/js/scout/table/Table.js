@@ -309,6 +309,7 @@ scout.Table.prototype._remove = function() {
   this.$fillBefore = null;
   this.$fillAfter = null;
   this.$data = null;
+  this.$emptyData = null;
   scout.Table.parent.prototype._remove.call(this);
 };
 

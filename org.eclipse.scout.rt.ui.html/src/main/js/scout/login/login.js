@@ -17,6 +17,9 @@ scout.login = {
    * - logoUrl: default points to 'res/logo.png'
    */
   init: function(opts) {
+    opts = opts || {};
+    opts.texts = $.extend({}, scout.Texts.readFromDOM(), opts.texts);
+
     scout.prepareDOM();
 
     var loginBox = new scout.LoginBox(opts);

@@ -56,7 +56,7 @@
     display: inline-block;
     position: relative;
     white-space: nowrap;
-    padding: 0px 5px;
+    padding: 0px 0px 0px 5px;
 
     &.label-invisible {
       color: transparent;
@@ -188,7 +188,13 @@
   width: 1px;
   top: 0px;
   background-color: rgba(0, 0, 0, 0.07);
+  pointer-events: none;
+
+  &.first-in-range {
+    background-color: rgba(0, 0, 0, 0.2);
+  }
 }
+
 
 .planner-large-scale-item-line {
   position: absolute;
@@ -196,4 +202,5 @@
   width: 1px;
   top: 0px;
   background-color: rgba(0, 0, 0, 0.2);
+  pointer-events: none;
 }

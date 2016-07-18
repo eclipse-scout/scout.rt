@@ -13,5 +13,10 @@ package org.eclipse.scout.rt.client.extension.ui.action.tool;
 import org.eclipse.scout.rt.client.extension.ui.action.menu.IMenuExtension;
 import org.eclipse.scout.rt.client.ui.action.tool.AbstractToolButton;
 
+/**
+ * @deprecated use {@link IMenuExtension} instead, will be removed in Scout 6.1
+ */
+@Deprecated
+@SuppressWarnings("deprecation")
 public interface IToolButtonExtension<OWNER extends AbstractToolButton> extends IMenuExtension<OWNER> {
 }
