@@ -246,8 +246,8 @@ public class ScriptFileBuilder {
       // Add debug information to returned content
       if (!m_minify) {
         if (script.getFileType() == ScriptSource.FileType.JS) {
+          buf.append("// --- " + (includeFragment == null ? "" : includeFragment.getNodeType() + " ") + includePath + " ---\n");
           if (replacement == null) {
-            buf.append("// --- " + (includeFragment == null ? "" : includeFragment.getNodeType() + " ") + includePath + " ---\n");
             buf.append("// !!! NOT PROCESSED\n");
           }
           else {
@@ -297,14 +297,17 @@ public class ScriptFileBuilder {
     }
   }
 
-  protected String insertLineNumbers(String filename, String text) throws IOException {
+  protected String insertLineNumbers(final String path, final String text) throws IOException {
     if (text == null) {
       return null;
     }
-    int i = filename.lastIndexOf('/');
-    if (i >= 0) {
-      filename = filename.substring(i + 1);
-    }
+    // First path segment is the "qualifier"
+    int i = path.indexOf('/');
+    String qualifier = (i >= 0 ? path.substring(0, i) : "");
+    // Last path segment is the filename (inner path segments are ignored)
+    i = path.lastIndexOf('/');
+    String filename = path.substring(i + 1);
+    // Strip file extension
     i = filename.lastIndexOf('.');
     if (i >= 0) {
       filename = filename.substring(0, i);
@@ -315,6 +318,9 @@ public class ScriptFileBuilder {
     String[] lines = text.split("[\\n]");
     for (String line : lines) {
       buf.append((insideBlockComment ? "//" : "/*"));
+      if (qualifier.length() > 0) {
+        buf.append(qualifier).append("|");
+      }
       buf.append(filename).append(":");
       buf.append(String.format("%-" + ((lines.length + "").length()) + "d", lineNo));
       buf.append((insideBlockComment ? "//" : "*/")).append(" ");
