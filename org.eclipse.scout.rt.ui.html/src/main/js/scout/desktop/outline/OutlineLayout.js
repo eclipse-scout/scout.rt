@@ -55,6 +55,9 @@ scout.OutlineLayout.prototype._layout = function($container) {
 };
 
 scout.OutlineLayout.prototype._setDataHeight = function(heightOffset) {
-  var titleSize = scout.graphics.getSize(this.outline.$title, true);
+  var titleSize = 0;
+  if (this.outline.titleVisible) {
+    titleSize = scout.graphics.getSize(this.outline.$title, true);
+  }
   scout.OutlineLayout.parent.prototype._setDataHeight.call(this, heightOffset + titleSize.height);
 };

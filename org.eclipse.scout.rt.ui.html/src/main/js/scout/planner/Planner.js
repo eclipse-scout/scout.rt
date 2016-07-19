@@ -818,7 +818,7 @@ scout.Planner.prototype._onCellMousedown = function(event) {
       $resource = $activity.parent().parent();
       this.selectResources([$resource.data('resource')]);
       this.selectActivity($activity.data('activity'));
-      this.selectRange(new scout.Range(null, null));
+      this.selectRange(new scout.Range());
       return;
     }
   }
@@ -1374,7 +1374,7 @@ scout.Planner.prototype.insertResources = function(resources) {
 
 scout.Planner.prototype.deleteResources = function(resources) {
   if (this.deselectResources(resources, false)) {
-    this.selectRange(new scout.Range(null, null), false);
+    this.selectRange(new scout.Range(), false);
   }
   resources.forEach(function(resource) {
     // Update model
@@ -1407,7 +1407,7 @@ scout.Planner.prototype.deleteAllResources = function() {
   this.resourceMap = {};
   this.activityMap = {};
   this.selectResources([], false);
-  this.selectRange(new scout.Range(null, null), false);
+  this.selectRange(new scout.Range(), false);
 };
 
 scout.Planner.prototype._updateResources = function(resources) {

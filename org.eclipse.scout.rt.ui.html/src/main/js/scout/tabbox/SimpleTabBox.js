@@ -11,7 +11,6 @@
 scout.SimpleTabBox = function() {
   scout.SimpleTabBox.parent.call(this);
   this.$body;
-  this.$title;
   this.htmlComp;
   this.tabArea;
   this.viewStack = [];

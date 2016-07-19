@@ -70,7 +70,9 @@ scout.SearchOutline.prototype._renderProperties = function() {
 scout.SearchOutline.prototype._renderTitle = function() {
   scout.SearchOutline.parent.prototype._renderTitle.call(this);
   // Move before search panel
-  this.$title.insertBefore(this.$searchPanel);
+  if (this.titleVisible) {
+    this.$title.insertBefore(this.$searchPanel);
+  }
 };
 
 scout.SearchOutline.prototype._renderSearchQuery = function(searchQuery) {

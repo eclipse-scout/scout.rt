@@ -182,6 +182,7 @@ scout.FormFieldLayout.prototype.preferredLayoutSize = function($container) {
     htmlContainer = scout.HtmlComponent.get($container),
     height = scout.HtmlEnvironment.formRowHeight,
     labelWidth = this.labelWidth,
+    topLabelHeight = 0, // only set when label is on top
     statusWidth = this.statusWidth,
     formField = this.formField;
 
@@ -198,7 +199,8 @@ scout.FormFieldLayout.prototype.preferredLayoutSize = function($container) {
     if (labelPositionLeft) {
       width += labelWidth;
     } else if (formField.labelPosition === scout.FormField.LABEL_POSITION_TOP) {
-      height += formField.$label.outerHeight(true);
+      topLabelHeight = formField.$label.outerHeight(true);
+      height += topLabelHeight;
     }
   }
   if (formField.$mandatory) {
@@ -214,6 +216,7 @@ scout.FormFieldLayout.prototype.preferredLayoutSize = function($container) {
       prefSize = htmlField.getPreferredSize()
         .add(htmlContainer.getInsets())
         .add(htmlField.getMargins());
+      prefSize.height += topLabelHeight;
     } else {
       prefSize = this.naturalSize(formField);
     }
