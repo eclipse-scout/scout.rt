@@ -208,8 +208,7 @@ public class CsvSqlAdapter {
           base[0] = new NVPair("groupKeyColumnValue", params.getGroupKeyValue());
         }
       }
-      final Writer w = new OutputStreamWriter(new FileOutputStream(params.getFile()), params.getEncoding());
-      try {
+      try (Writer w = new OutputStreamWriter(new FileOutputStream(params.getFile()), params.getEncoding())) {
         h.exportHeaderRows(w, params.getWriteColumnNames(), params.getWriteColumnTypes());
         ISelectStreamHandler handler = new ISelectStreamHandler() {
           @Override
@@ -226,13 +225,6 @@ public class CsvSqlAdapter {
           }
         };
         m_sqlService.selectStreaming(sqlText, handler, base);
-      }
-      finally {
-        try {
-          w.close();
-        }
-        catch (Exception e) {
-        }
       }
     }
     catch (IOException e) {
