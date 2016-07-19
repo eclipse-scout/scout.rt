@@ -169,7 +169,7 @@ public class ClientSessionRegistry implements IClientSessionRegistry, IGlobalSes
           return CollectionUtility.arrayList((IClientSession) IClientSession.CURRENT.get());
         }
         else {
-          LOG.error("No session found for user {}", userId);
+          LOG.debug("No session found for user {}", userId);
           return CollectionUtility.emptyArrayList();
         }
       }
