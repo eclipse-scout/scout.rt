@@ -54,6 +54,9 @@ scout.BrowserField.prototype._render = function($parent) {
 scout.BrowserField.prototype._renderProperties = function() {
   scout.BrowserField.parent.prototype._renderProperties.call(this);
   this._renderIframeProperties();
+  // external window properties
+  this._renderExternalWindowButtonText();
+  this._renderExternalWindowFieldText();
 };
 
 scout.BrowserField.prototype._renderIframeProperties = function() {
