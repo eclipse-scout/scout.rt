@@ -309,13 +309,9 @@ public class CsvSqlAdapter {
       buf.append(")");
       String stm = buf.toString();
 
-      final Reader reader = new BomInputStreamReader(new FileInputStream(params.getFile()), params.getEncoding());
-      try {
+      try (Reader reader = new BomInputStreamReader(new FileInputStream(params.getFile()), params.getEncoding())) {
         SqlInsertDataConsumer cons = new SqlInsertDataConsumer(stm, params.getGroupKeyValue(), params.getLineNumberColumnName() != null);
         h.importData(cons, reader, false, false, params.getHeaderRowCount(), -1, params.getAllowVariableColumnCount());
-      }
-      finally {
-        reader.close();
       }
     }
     catch (IOException e) {
