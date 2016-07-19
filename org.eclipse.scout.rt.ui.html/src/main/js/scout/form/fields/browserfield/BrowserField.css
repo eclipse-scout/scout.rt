@@ -17,4 +17,13 @@
   &.no-scrolling {
     overflow: hidden;
   }
+
+  > .button {
+    display: inline-block;
+  }
+
+  > .button, > .alt  {
+    margin-top: @group-margin-top;
+    margin-left: @mandatory-indicator-width;
+  }
 }

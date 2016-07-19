@@ -31,7 +31,8 @@ public class JsonBrowserField<BROWSER_FIELD extends IBrowserField> extends JsonF
 
   private BrowserFieldListener m_browserFieldListener;
 
-  private static final String EVENT_POST_MESSAGE = "postMessage";
+  public static final String EVENT_POST_MESSAGE = "postMessage";
+  public static final String EVENT_EXTERNAL_WINDOW_STATE = "externalWindowState";
 
   public JsonBrowserField(BROWSER_FIELD model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
@@ -79,6 +80,24 @@ public class JsonBrowserField<BROWSER_FIELD extends IBrowserField> extends JsonF
         return sb.toString();
       }
     });
+    putJsonProperty(new JsonProperty<IBrowserField>(IBrowserField.PROP_SHOW_IN_EXTERNAL_WINDOW, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isShowInExternalWindow();
+      }
+    });
+    putJsonProperty(new JsonProperty<IBrowserField>(IBrowserField.PROP_EXTERNAL_WINDOW_BUTTON_TEXT, model) {
+      @Override
+      protected String modelValue() {
+        return getModel().getExternalWindowButtonText();
+      }
+    });
+    putJsonProperty(new JsonProperty<IBrowserField>(IBrowserField.PROP_EXTERNAL_WINDOW_FIELD_TEXT, model) {
+      @Override
+      protected String modelValue() {
+        return getModel().getExternalWindowFieldText();
+      }
+    });
   }
 
   @Override
@@ -123,6 +142,9 @@ public class JsonBrowserField<BROWSER_FIELD extends IBrowserField> extends JsonF
     if (EVENT_POST_MESSAGE.equals(event.getType())) {
       handleUiPostMessage(event);
     }
+    if (EVENT_EXTERNAL_WINDOW_STATE.equals(event.getType())) {
+      handleUiWindowState(event);
+    }
     else {
       super.handleUiEvent(event);
     }
@@ -132,6 +154,10 @@ public class JsonBrowserField<BROWSER_FIELD extends IBrowserField> extends JsonF
     String data = event.getData().optString("data", null);
     String origin = event.getData().optString("origin", null);
     getModel().getUIFacade().firePostMessageFromUI(data, origin);
+  }
+
+  protected void handleUiWindowState(JsonEvent event) {
+    getModel().getUIFacade().firePostExternalWindowStateFromUI(event.getData().optBoolean("windowState"));
   }
 
   protected String getLocation() {

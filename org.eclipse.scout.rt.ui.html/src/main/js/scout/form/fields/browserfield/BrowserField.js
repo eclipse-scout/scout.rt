@@ -10,16 +10,38 @@
  ******************************************************************************/
 scout.BrowserField = function() {
   scout.BrowserField.parent.call(this);
+
   this._postMessageListener;
+  this._popupWindow;
+  this._externalWindowTextField;
+  this._externalWindowButton;
   this.loadingSupport = new scout.LoadingSupport({widget: this});
 };
 scout.inherits(scout.BrowserField, scout.ValueField);
 
+scout.BrowserField.windowStates = {
+    WINDOW_OPEN: "true",
+    WINDOW_CLOSED: "false"
+  };
+
 scout.BrowserField.prototype._render = function($parent) {
   this.addContainer($parent, 'browser-field');
   this.addLabel();
-  this.addField($parent.makeElement('<iframe>'));
   this.addStatus();
+
+  if (!this.showInExternalWindow) {
+    // mode 1: <iframe>
+    this.addField($parent.makeElement('<iframe>'));
+  } else {
+    // mode 2: separate window
+    this.addField($parent.makeDiv());
+    this._externalWindowTextField = this.$field.appendDiv()
+      .addClass('alt');
+    this._externalWindowButton = this.$field.appendDiv()
+      .addClass('button')
+      .on('click', this._openPopupWindow.bind(this));
+  }
+
   this.myWindow = $parent.window(true);
 
   this._postMessageListener = this._onPostMessage.bind(this);
@@ -42,37 +64,120 @@ scout.BrowserField.prototype._renderIframeProperties = function() {
 
 
 scout.BrowserField.prototype._renderLocation = function() {
-  this.$field.attr('src', this.location);
+  if (!this.showInExternalWindow) {
+    // <iframe>
+    this.$field.attr('src', this.location);
+  } else {
+    // fallback: separate window
+    if (this._popupWindow && !this._popupWindow.closed) {
+      this._popupWindow.location = this.location;
+    } else {
+      // use setTimeout to call method, because _openPopupWindow must be called after layouting
+      window.setTimeout(this._openPopupWindow.bind(this, false), 20);
+    }
+  }
 };
 
 scout.BrowserField.prototype._renderScrollBarEnabled = function() {
-  this.$field.toggleClass('no-scrolling', !this.scrollBarEnabled);
-  // According to http://stackoverflow.com/a/18470016, setting 'overflow: hidden' via
-  // CSS should be enough. However, if the inner page sets 'overflow' to another value,
-  // scroll bars are shown again. Therefore, we add the legacy 'scrolling=no' attribute,
-  // which is deprecated in HTML5, but seems to do the trick.
-  if (this.scrollBarEnabled) {
-    this.$field.removeAttr('scrolling');
-  } else {
-    this.$field.attr('scrolling', 'no');
+  if (!this.showInExternalWindow) {
+    this.$field.toggleClass('no-scrolling', !this.scrollBarEnabled);
+    // According to http://stackoverflow.com/a/18470016, setting 'overflow: hidden' via
+    // CSS should be enough. However, if the inner page sets 'overflow' to another value,
+    // scroll bars are shown again. Therefore, we add the legacy 'scrolling=no' attribute,
+    // which is deprecated in HTML5, but seems to do the trick.
+    if (this.scrollBarEnabled) {
+      this.$field.removeAttr('scrolling');
+    } else {
+      this.$field.attr('scrolling', 'no');
+    }
   }
 };
 
 scout.BrowserField.prototype._renderSandboxEnabled = function() {
-  if (this.sandboxEnabled) {
-    this._renderSandboxPermissions();
-  } else {
-    this.$field.removeAttr('sandbox');
-    this.$field.removeAttr('security');
+  if (!this.showInExternalWindow) {
+    if (this.sandboxEnabled) {
+      this._renderSandboxPermissions();
+    } else {
+      this.$field.removeAttr('sandbox');
+      this.$field.removeAttr('security');
+    }
   }
 };
 
 scout.BrowserField.prototype._renderSandboxPermissions = function() {
-  if (this.sandboxEnabled) {
+  if (!this.showInExternalWindow && this.sandboxEnabled) {
     this.$field.attr('sandbox', scout.nvl(this.sandboxPermissions, ''));
     if (scout.device.requiresIframeSecurityAttribute()) {
       this.$field.attr('security', 'restricted');
     }
+  }
+};
+
+scout.BrowserField.prototype._renderExternalWindowButtonText = function() {
+  if (this.showInExternalWindow) {
+    this._externalWindowButton.text(this.externalWindowButtonText);
+  }
+};
+
+scout.BrowserField.prototype._renderExternalWindowFieldText = function() {
+  if (this.showInExternalWindow) {
+    this._externalWindowTextField .text(this.externalWindowFieldText);
+  }
+};
+
+scout.BrowserField.prototype._openPopupWindow = function(reopenIfClosed) {
+  reopenIfClosed = scout.nvl(reopenIfClosed, true);
+  if (!this.showInExternalWindow) {
+    return;
+  }
+
+  if (!this._popupWindow || (reopenIfClosed && this._popupWindow.closed)) {
+    var popupBlockerHandler = new scout.PopupBlockerHandler(this.session);
+    var windowSpecs = scout.strings.join(',',
+        'directories=no',
+        'location=no',
+        'menubar=no',
+        'resizable=yes,',
+        'status=no',
+        'scrollbars=' + (this.scrollBarEnabled ? 'yes' : 'no'),
+        'toolbar=no',
+        'dependent=yes',
+        // screenLeft might reveal the actual document screen position, screenX is just the browser window screen position
+        'left=' + (scout.nvl(window.screenLeft, window.screenX) + this.$field.offset().left),
+        // screenTop might reveal the actual document screen position, screenY is just the browser window screen position - add 50 px (guessing there is a toolbar of 50 px)
+        'top=' + (scout.nvl(window.screenTop, window.screenY + 50) + this.$field.offset().top),
+        'width=' + this.$field.width(),
+        'height=' + this.$field.height()
+        );
+    this._popupWindow = popupBlockerHandler.openWindow(this.location,
+        undefined,
+        windowSpecs);
+    if (this._popupWindow) {
+      this._popupWindowOpen();
+    } else {
+      $.log.warn('Popup-blocker detected! Show link to open window manually');
+      popupBlockerHandler.showNotification(function() {
+        this._popupWindow = window.open(this.location,
+            undefined,
+            windowSpecs);
+        this._popupWindowOpen();
+      }.bind(this));
+    }
+  }
+  else if (reopenIfClosed) {
+    this._popupWindow.focus();
+  }
+};
+
+scout.BrowserField.prototype._popupWindowOpen = function() {
+  if (this._popupWindow && !this._popupWindow.closed) {
+    this._send('externalWindowState', { 'windowState': scout.BrowserField.windowStates.WINDOW_OPEN });
+    var popupInterval = window.setInterval(function() {
+      if (this._popupWindow === null || this._popupWindow.closed) {
+        window.clearInterval(popupInterval);
+        this._send('externalWindowState', { 'windowState': scout.BrowserField.windowStates.WINDOW_CLOSED });
+      }
+    }.bind(this), 500);
   }
 };
 
@@ -100,7 +205,7 @@ scout.BrowserField.prototype._afterAttach = function(parent) {
   // the security=restricted attribute prevents browsers (IE 9 and below) from
   // sending any cookies a second time
   // as a workaround for IFRAMEs to work, we have to recreate the whole field in that case
-  if (scout.device.requiresIframeSecurityAttribute()) {
+  if (!this.showInExternalWindow && scout.device.requiresIframeSecurityAttribute()) {
     this.$field.remove();
     this._removeField();
     this.addField(parent.$container.makeElement('<iframe>'));

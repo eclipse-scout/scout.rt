@@ -14,6 +14,8 @@ import org.eclipse.scout.rt.platform.resource.BinaryResource;
 
 public interface IBrowserFieldUIFacade {
 
+  void firePostExternalWindowStateFromUI(boolean windowState);
+
   void firePostMessageFromUI(String data, String origin);
 
   BinaryResource requestBinaryResourceFromUI(String filename);

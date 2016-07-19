@@ -24,7 +24,8 @@ import org.eclipse.scout.rt.client.dto.FormData;
 import org.eclipse.scout.rt.client.dto.FormData.DefaultSubtypeSdkCommand;
 import org.eclipse.scout.rt.client.dto.FormData.SdkCommand;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
-import org.eclipse.scout.rt.client.extension.ui.form.fields.browserfield.BrowserFieldChains.BrowserFieldLocationChangedChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.browserfield.BrowserFieldChains.BrowserFieldExternalWindowStateChangedChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.browserfield.BrowserFieldChains.BrowserFieldPostMessageChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.browserfield.IBrowserFieldExtension;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -37,6 +38,7 @@ import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CompareUtility;
 import org.eclipse.scout.rt.platform.util.EventListenerList;
+import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 import org.eclipse.scout.rt.shared.data.form.fields.browserfield.AbstractBrowserFieldData;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
@@ -91,7 +93,45 @@ public abstract class AbstractBrowserField extends AbstractFormField implements 
   }
 
   /**
-   * This callback is invoked when the application has received a post-message from the embedded browser (IFRAME).
+   * Configures the browser field general behavior. By default the content of the browser field is shown inline or in an
+   * inline container (e.g. an &lt;iframe&gt; for the HTML5 UI layer), some very specific web pages (e.g. using
+   * plug-ins, complex frames within the webpage) might not be displayed well or may even lead to a browser crash.
+   * <p>
+   * This property may be used to disable the inline container (&lt;iframe&gt; usage). Fallback behavior for the HTML5
+   * UI layer is a separate browser window to show the content. Other UI layers may offer a different fallback, might
+   * even decide not to offer a fallback behavior at all (property is just a hint for the UI layer).
+   * <p>
+   * Property can only be changed during initialization, it can not be changed during runtime.
+   *
+   * @return <code>true</code> to enable &lt;iframe&gt; usage (default), <code>false</code> otherwise.
+   */
+  @Order(230)
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  protected boolean getConfiguredShowInExternalWindow() {
+    return false;
+  }
+
+  /**
+   * @see IBrowserField#getExternalWindowFieldText()
+   */
+  @Order(230)
+  @ConfigProperty(ConfigProperty.STRING)
+  protected String getConfiguredExternalWindowFieldText() {
+    return TEXTS.get("ExternalWindowFieldText");
+  }
+
+  /**
+   * @see IBrowserField#getExternalWindowButtonText()
+   */
+  @Order(230)
+  @ConfigProperty(ConfigProperty.STRING)
+  protected String getConfiguredExternalWindowButtonText() {
+    return TEXTS.get("ExternalWindowButtonText");
+  }
+
+  /**
+   * This callback is invoked when the application has received a post-message from the embedded browser (IFRAME) or
+   * external window.
    * <p>
    * The default does nothing.
    * <p>
@@ -99,10 +139,16 @@ public abstract class AbstractBrowserField extends AbstractFormField implements 
    * either disable sandbox completely ({@link #getConfiguredSandboxEnabled()} returns false) or grant the required
    * permissions ({@link SandboxPermission#AllowScripts}).
    * <p>
-   * Example java script call:
+   * Example java script call (for &lt;iframe&gt;):
    *
    * <pre>
    * window.parent.postMessage('hello application!', 'http://localhost:8082')
+   * </pre>
+   * <p>
+   * Other example java script call (for external windows, does not work with all browsers):
+   *
+   * <pre>
+   * window.opener.postMessage('hello application!', 'http://localhost:8082')
    * </pre>
    *
    * @param data
@@ -111,8 +157,22 @@ public abstract class AbstractBrowserField extends AbstractFormField implements 
    * @see <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage">Window.postMessage()</a>
    */
   @ConfigOperation
-  @Order(230)
+  @Order(260)
   protected void execPostMessage(String data, String orgin) {
+  }
+
+  /**
+   * If page is opened in an external window this method is called whenever the external window is opened (also
+   * re-opened) and closed.
+   *
+   * @param windowState
+   *          <code>true</code> for external window has been opened (also should be called immediately after the page is
+   *          displayed), <code>false</code> for external window has been closed.
+   * @see #getConfiguredShowInExternalWindow()
+   */
+  @ConfigOperation
+  @Order(270)
+  protected void execExternalWindowStateChanged(boolean windowState) {
   }
 
   @Override
@@ -122,6 +182,9 @@ public abstract class AbstractBrowserField extends AbstractFormField implements 
     setScrollBarEnabled(getConfiguredScrollBarEnabled());
     setSandboxEnabled(getConfiguredSandboxEnabled());
     setSandboxPermissions(getConfiguredSandboxPermissions());
+    setShowInExternalWindow(getConfiguredShowInExternalWindow());
+    setExternalWindowButtonText(getConfiguredExternalWindowButtonText());
+    setExternalWindowFieldText(getConfiguredExternalWindowFieldText());
   }
 
   @Override
@@ -325,7 +388,42 @@ public abstract class AbstractBrowserField extends AbstractFormField implements 
     return (EnumSet<SandboxPermission>) propertySupport.getProperty(PROP_SANDBOX_PERMISSIONS);
   }
 
+  @Override
+  public void setShowInExternalWindow(boolean showInExternalWindow) {
+    propertySupport.setPropertyBool(PROP_SHOW_IN_EXTERNAL_WINDOW, showInExternalWindow);
+  }
+
+  @Override
+  public boolean isShowInExternalWindow() {
+    return propertySupport.getPropertyBool(PROP_SHOW_IN_EXTERNAL_WINDOW);
+  }
+
+  @Override
+  public void setExternalWindowButtonText(String externalWindowButtonText) {
+    propertySupport.setPropertyString(PROP_EXTERNAL_WINDOW_BUTTON_TEXT, externalWindowButtonText);
+  }
+
+  @Override
+  public String getExternalWindowButtonText() {
+    return propertySupport.getPropertyString(PROP_EXTERNAL_WINDOW_BUTTON_TEXT);
+  }
+
+  @Override
+  public void setExternalWindowFieldText(String externalWindowFieldText) {
+    propertySupport.setPropertyString(PROP_EXTERNAL_WINDOW_FIELD_TEXT, externalWindowFieldText);
+  }
+
+  @Override
+  public String getExternalWindowFieldText() {
+    return propertySupport.getPropertyString(PROP_EXTERNAL_WINDOW_FIELD_TEXT);
+  }
+
   protected class P_UIFacade implements IBrowserFieldUIFacade {
+
+    @Override
+    public void firePostExternalWindowStateFromUI(boolean state) {
+      interceptExternalWindowStateChanged(state);
+    }
 
     @Override
     public void firePostMessageFromUI(String data, String origin) {
@@ -343,8 +441,14 @@ public abstract class AbstractBrowserField extends AbstractFormField implements 
 
   protected final void interceptPostMessage(String data, String origin) {
     List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
-    BrowserFieldLocationChangedChain chain = new BrowserFieldLocationChangedChain(extensions);
+    BrowserFieldPostMessageChain chain = new BrowserFieldPostMessageChain(extensions);
     chain.execPostMessage(data, origin);
+  }
+
+  protected final void interceptExternalWindowStateChanged(boolean state) {
+    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
+    BrowserFieldExternalWindowStateChangedChain chain = new BrowserFieldExternalWindowStateChangedChain(extensions);
+    chain.execExternalWindowStateChanged(state);
   }
 
   protected static class LocalBrowserFieldExtension<OWNER extends AbstractBrowserField> extends LocalFormFieldExtension<OWNER> implements IBrowserFieldExtension<OWNER> {
@@ -354,8 +458,13 @@ public abstract class AbstractBrowserField extends AbstractFormField implements 
     }
 
     @Override
-    public void execPostMessage(BrowserFieldLocationChangedChain chain, String data, String origin) {
+    public void execPostMessage(BrowserFieldPostMessageChain chain, String data, String origin) {
       getOwner().execPostMessage(data, origin);
+    }
+
+    @Override
+    public void execExternalWindowStateChanged(BrowserFieldExternalWindowStateChangedChain chain, boolean state) {
+      getOwner().execExternalWindowStateChanged(state);
     }
   }
 
