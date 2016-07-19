@@ -208,6 +208,13 @@ $.pxToNumber = function(pixel) {
 
 // === $.prototype extensions ===
 
+$.fn.nvl = function($element) {
+  if (this.length || !($element instanceof $)) {
+    return this;
+  }
+  return $element;
+};
+
 /**
  * @param element string. Example = &lt;input&gt;
  * @param cssClass (optional) class attribute

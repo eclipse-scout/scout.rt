@@ -231,4 +231,31 @@ describe('jquery-scout', function() {
 
   });
 
+  describe('nvl', function() {
+
+    it('can return alternative element', function() {
+      var $f = $('<div>');
+      $f.appendTo($('#sandbox'));
+      var $g = $('<div>'); // not in DOM
+
+      expect($e.nvl()).toBe($e);
+      expect($e.nvl($f)).toBe($e);
+      expect($e.nvl($g)).toBe($e);
+      expect($g.nvl($e)).toBe($g);
+
+      expect($('.does-not-exist').nvl($e)).toBe($e);
+      expect($('.does-not-exist').nvl($g)).toBe($g);
+
+      var $result = $('.does').nvl($('.not')).nvl(null).nvl($('.exist')).nvl();
+      expect($result instanceof $).toBe(true);
+      expect($result.length).toBe(0);
+      $result = $result.nvl($result).nvl($f).nvl(null);
+      expect($result instanceof $).toBe(true);
+      expect($result.length).toBe(1);
+      expect($result).toBe($f);
+    });
+
+  });
+
+
  });

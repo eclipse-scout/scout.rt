@@ -92,13 +92,18 @@ scout.inherits = function(childCtor, parentCtor) {
 };
 
 /**
- * If 'value' is undefined or null, 'defaultValue' is returned. Otherwise, 'value' is returned.
+ * Returns the first of the given arguments that is not null or undefined. If no such element
+ * is present, the last argument is returned. If no arguments are given, undefined is returned.
  */
-scout.nvl = function(value, defaultValue) {
-  if (value === undefined || value === null) {
-    return defaultValue;
+scout.nvl = function() {
+  var result;
+  for (var i = 0; i < arguments.length; i++) {
+    result = arguments[i];
+    if (result !== undefined && result !== null) {
+      break;
+    }
   }
-  return value;
+  return result;
 };
 
 scout.isOneOf = function() {
