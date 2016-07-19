@@ -14,8 +14,7 @@ scout.DesktopToolBox = function(menuBar) {
 scout.inherits(scout.DesktopToolBox, scout.MenuBox);
 
 scout.DesktopToolBox.prototype._init = function(options) {
-  options.uiMenuCssClass = options.uiMenuCssClass || '';
-  options.uiMenuCssClass += ' desktop-tool-box-item';
+  options.uiMenuCssClass = scout.strings.join(' ', options.uiMenuCssClass, 'desktop-tool-box-item');
   scout.DesktopToolBox.parent.prototype._init.call(this, options);
 };
 
