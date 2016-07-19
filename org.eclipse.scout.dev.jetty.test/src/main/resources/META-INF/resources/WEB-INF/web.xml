@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
 
     Copyright (c) 2010-2015 BSI Business Systems Integration AG.
@@ -10,4 +11,11 @@
         BSI Business Systems Integration AG - initial API and implementation
 
 -->
-This file is used for JUnit test: org.eclipse.scout.dev.jetty.JettyServerTest
+<web-app
+  metadata-complete="true"
+  xmlns="http://java.sun.com/xml/ns/javaee"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+  version="3.0">
+  <display-name>This file is used for JUnit test: org.eclipse.scout.dev.jetty.JettyServerTest</display-name>
+</web-app>
