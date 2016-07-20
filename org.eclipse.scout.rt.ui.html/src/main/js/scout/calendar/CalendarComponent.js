@@ -74,8 +74,8 @@ scout.CalendarComponent.prototype._render = function($parent) {
         var
           fromDate = scout.dates.parseJsonDate(this.fromDate),
           toDate = scout.dates.parseJsonDate(this.toDate),
-          partFrom = fromDate.getHours() + fromDate.getMinutes() / 60,
-          partTo = toDate.getHours() + toDate.getMinutes() / 60;
+          partFrom = this._getHours(this.fromDate),
+          partTo = this._getHours(this.toDate);
 
         // position and height depending on start and end date
         $part.addClass('component-day');
@@ -95,6 +95,11 @@ scout.CalendarComponent.prototype._render = function($parent) {
       }
     }
   }
+};
+
+scout.CalendarComponent.prototype._getHours = function(date){
+  var d = scout.dates.parseJsonDate(date);
+  return d.getHours() + d.getMinutes() / 60;
 };
 
 // FIXME awe: tuning
@@ -124,12 +129,27 @@ scout.CalendarComponent.prototype._isDayPart = function() {
   return !this.parent._isMonth() && !this.fullDay;
 };
 
+scout.CalendarComponent.prototype.getPartDayPosition = function(){
+  var range = new scout.Range(this._getHours(this.fromDate), this._getHours(this.toDate));
+  return this._getDisplayDayPosition(range);
+};
+
+scout.CalendarComponent.prototype._getDisplayDayPosition = function(range){
+  var preferredRange = new scout.Range(this.parent._dayPosition(range.from), this.parent._dayPosition(range.to));
+  var minRangeSize = 2.5;
+  if(preferredRange.size() < minRangeSize){
+    return new scout.Range(preferredRange.from, preferredRange.from + minRangeSize);
+  }
+  return preferredRange;
+};
+
 scout.CalendarComponent.prototype._partPosition = function($part, y1, y2) {
-  var y1Top = this.parent._dayPosition(y1),
-    y2Top = this.parent._dayPosition(y2);
+  var range = new scout.Range(y1, y2);
+  var r = this._getDisplayDayPosition(range);
+
   return $part
-    .css('top', y1Top + '%')
-    .css('height', y2Top - y1Top + '%');
+    .css('top', r.from + '%')
+    .css('height', r.to - r.from  + '%');
 };
 
 scout.CalendarComponent.prototype._renderProperties = function() {

@@ -812,7 +812,7 @@ scout.Calendar.prototype._arrangeComponentInitialX = function($children) {
     stackX = 0;
     for (j = 0; j < i; j++) {
       $test = $children.eq(j);
-      if (this._intersect($child, $test)) {
+      if (this._intersectComp($child, $test)) {
         stackX = $test.data('stackX') + 1;
       }
     }
@@ -857,19 +857,21 @@ scout.Calendar.prototype._arrangeComponentSetPlacement = function($children) {
 /* -- helper ---------------------------------------------------- */
 
 scout.Calendar.prototype._dayPosition = function(hour) {
+  var pos;
   if (hour < 0) {
-    return 85;
+    pos = 85;
   } else if (hour < 8) {
-    return parseInt(hour / 8 * 10 + 5, 10);
+    pos = hour / 8 * 10 + 5;
   } else if (hour < 12) {
-    return parseInt((hour - 8) / 4 * 25 + 15, 10);
+    pos = (hour - 8) / 4 * 25 + 15;
   } else if (hour < 13) {
-    return parseInt((hour - 12) / 1 * 5 + 40, 10);
+    pos = (hour - 12) / 1 * 5 + 40;
   } else if (hour < 17) {
-    return parseInt((hour - 13) / 4 * 25 + 45, 10);
+    pos = (hour - 13) / 4 * 25 + 45;
   } else if (hour <= 24) {
-    return parseInt((hour - 17) / 7 * 10 + 70, 10);
+    pos = (hour - 17) / 7 * 10 + 70;
   }
+  return Math.round(pos * 100) / 100;
 };
 
 scout.Calendar.prototype._hourToNumber = function(hour) {
@@ -877,14 +879,18 @@ scout.Calendar.prototype._hourToNumber = function(hour) {
   return parseFloat(splits[0]) + parseFloat(splits[1]) / 60;
 };
 
-scout.Calendar.prototype._intersect = function($e1, $e2) {
+scout.Calendar.prototype._intersectComp = function($e1, $e2) {
   var comp1 = $e1.data('component'),
-    comp2 = $e2.data('component'),
-    top1 = this._hourToNumber(this._format(scout.dates.parseJsonDate(comp1.fromDate), 'HH:mm')),
-    bottom1 = this._hourToNumber(this._format(scout.dates.parseJsonDate(comp1.toDate), 'HH:mm')),
-    top2 = this._hourToNumber(this._format(scout.dates.parseJsonDate(comp2.fromDate), 'HH:mm')),
-    bottom2 = this._hourToNumber(this._format(scout.dates.parseJsonDate(comp2.toDate), 'HH:mm'));
-  return (top1 >= top2 && top1 <= bottom2) || (bottom1 >= top2 && bottom1 <= bottom2);
+    comp2 = $e2.data('component');
+  return this._intersect(comp1, comp2);
+};
+/**
+ * returns true, if the two components intersect, false otherwise.
+ * */
+scout.Calendar.prototype._intersect = function(comp1, comp2) {
+  var range1 = comp1.getPartDayPosition();
+  var range2 = comp2.getPartDayPosition();
+  return (range1.from >= range2.from && range1.from < range2.to) || (range2.from > range1.from && range1.to > range2.from);
 };
 
 scout.Calendar.prototype._sortTop = function(a, b) {
