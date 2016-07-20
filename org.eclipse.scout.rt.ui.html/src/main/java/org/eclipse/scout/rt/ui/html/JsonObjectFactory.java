@@ -23,6 +23,7 @@ import org.eclipse.scout.rt.client.ui.basic.calendar.ICalendar;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
 import org.eclipse.scout.rt.client.ui.basic.planner.IPlanner;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.IAlphanumericSortingStringColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IBeanColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IBooleanColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
@@ -136,6 +137,7 @@ import org.eclipse.scout.rt.ui.html.json.form.fields.wrappedform.JsonWrappedForm
 import org.eclipse.scout.rt.ui.html.json.menu.JsonContextMenu;
 import org.eclipse.scout.rt.ui.html.json.menu.JsonMenu;
 import org.eclipse.scout.rt.ui.html.json.messagebox.JsonMessageBox;
+import org.eclipse.scout.rt.ui.html.json.table.JsonAlphanumericSortingStringColumn;
 import org.eclipse.scout.rt.ui.html.json.table.JsonBeanColumn;
 import org.eclipse.scout.rt.ui.html.json.table.JsonBooleanColumn;
 import org.eclipse.scout.rt.ui.html.json.table.JsonColumn;
@@ -357,6 +359,9 @@ public class JsonObjectFactory extends AbstractJsonObjectFactory {
     }
     if (object instanceof IBooleanColumn) {
       return new JsonBooleanColumn((IBooleanColumn) object);
+    }
+    if (object instanceof IAlphanumericSortingStringColumn) { // needs to be before IStringColumn
+      return new JsonAlphanumericSortingStringColumn((IAlphanumericSortingStringColumn) object);
     }
     if (object instanceof IStringColumn) {
       return new JsonStringColumn((IStringColumn) object);

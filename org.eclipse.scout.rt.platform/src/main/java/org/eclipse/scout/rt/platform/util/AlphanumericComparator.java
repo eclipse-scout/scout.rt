@@ -84,7 +84,7 @@ public class AlphanumericComparator implements Comparator<String>, Serializable 
       found1 = matcher1.find();
       found2 = matcher2.find();
     }
-    return compareEndsHit(matcher1, matcher2);
+    return compareFound(found1, found2);
   }
 
   /**
@@ -115,13 +115,13 @@ public class AlphanumericComparator implements Comparator<String>, Serializable 
   /**
    * Compares the {@link Matcher}s {@code m1} and {@code m2} by checking if ends have been hit.
    */
-  private int compareEndsHit(Matcher m1, Matcher m2) {
-    if (m1.hitEnd() && !m2.hitEnd()) {
-      // s2 has more parts
+  private int compareFound(boolean f1, boolean f2) {
+    if (!f1 && f2) {
+      // s1 has more parts
       return -1;
     }
-    else if (!m1.hitEnd() && m2.hitEnd()) {
-      // s1 has more parts
+    else if (f1 && !f2) {
+      // s2 has more parts
       return 1;
     }
     // Both are the same
