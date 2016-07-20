@@ -83,7 +83,7 @@ scout.Desktop.prototype._render = function($parent) {
   scout.inspector.applyInfo(this, this.$container);
 
   // Desktop elements are added before this separator, all overlays are opened after (dialogs, popups, tooltips etc.)
-  this.$overlaySeparator = this.$container.appendDiv().setVisible(false);
+  this.$overlaySeparator = this.$container.appendDiv('overlay-separator').setVisible(false);
 
   this._renderNavigationVisible();
   this._renderHeaderVisible();
@@ -699,7 +699,9 @@ scout.Desktop.prototype.glassPaneTargets = function() {
   var glassPaneTargets = $.makeArray(this.$container
     .children()
     .not('.splitter') // exclude splitter to be locked
-    .not('.notifications')); // exclude notification box like 'connection interrupted' to be locked
+    .not('.notifications') // exclude notification box like 'connection interrupted' to be locked
+    .not('.overlay-separator') // exclude overlay separator (marker element)
+  );
 
   // When a popup-window is opened its container must also be added to the result
   this._pushPopupWindowGlassPaneTargets(glassPaneTargets);
