@@ -781,76 +781,124 @@ scout.Calendar.prototype._showContextMenu = function(event, allowedType) {
 
 // FIXME awe, cru: arrange methods should work on the model, not on the DOM
 scout.Calendar.prototype._arrangeComponents = function() {
-  var k, $day, $children,
+  var k, $day, $children, dayComponents, day,
     $days = $('.calendar-day', this.$grid);
 
   for (k = 0; k < $days.length; k++) {
     $day = $days.eq(k);
     $children = $day.children('.calendar-component:not(.component-task)');
+    day = $day.data('date');
 
     if (this._isMonth() && $children.length > 2) {
       $day.addClass('many-items');
     } else if (!this._isMonth() && $children.length > 1) {
-      // sort based on screen position
-      $children.sort(this._sortTop);
-
       // logical placement
-      this._arrangeComponentInitialX($children);
-      this._arrangeComponentInitialW($children);
-      this._arrangeComponentFindPlacement($children);
+      dayComponents = this._getComponents($children);
+      this._arrange(dayComponents, day);
 
       // screen placement
-      this._arrangeComponentSetPlacement($children);
+      this._arrangeComponentSetPlacement($children, day);
     }
   }
 };
 
-scout.Calendar.prototype._arrangeComponentInitialX = function($children) {
-  var i, j, $child, $test, stackX;
+scout.Calendar.prototype._getComponents = function($children) {
+  var i, $child;
+  var components = [];
   for (i = 0; i < $children.length; i++) {
     $child = $children.eq(i);
-    stackX = 0;
-    for (j = 0; j < i; j++) {
-      $test = $children.eq(j);
-      if (this._intersectComp($child, $test)) {
-        stackX = $test.data('stackX') + 1;
-      }
+    components.push($child.data('component'));
+  }
+  return components;
+};
+
+scout.Calendar.prototype._sort = function(components) {
+  components.sort(this._sortComponentDisplayRange);
+};
+
+/**
+ * Arrange components (stack width, stack index) per day
+ * */
+scout.Calendar.prototype._arrange = function(components, day) {
+  var i, j, c, r, k,
+    rows = [];
+
+  //ordered by from, to
+  this._sort(components);
+
+  //clear existing placement
+  for (i = 0; i < components.length; i++) {
+    c = components[i];
+    if (!c.stack) {
+      c.stack = {};
     }
-    $child.data('stackX', stackX);
+    c.stack[day] = {};
+  }
+
+  for (i = 0; i < components.length; i++) {
+    c = components[i];
+    r = c.getPartDayPosition(day);
+
+    //reduce number of rows, if all components end before this one
+    if (rows.length > 0 && this._allEndBefore(rows, r.from, day)) {
+      rows = [];
+    }
+
+    //replace an component that ends before and can be replaced
+    k = this._findReplacableRow(rows, r.from, day);
+
+    //insert
+    if (k >= 0) {
+      rows[k] = c;
+      c.stack[day].x = k;
+    } else {
+      rows.push(c);
+      c.stack[day].x = rows.length - 1;
+    }
+
+    //update stackW
+    for (j = 0; j < rows.length; j++) {
+      rows[j].stack[day].w = rows.length;
+    }
   }
 };
 
-scout.Calendar.prototype._arrangeComponentInitialW = function($children) {
-  var i, stackX, stackMaxX = 0;
-  for (i = 0; i < $children.length; i++) {
-    stackX = $children.eq(i).data('stackX');
-    if (stackMaxX < stackX) {
-      stackMaxX = stackX;
+scout.Calendar.prototype._allEndBefore = function(rows, pos, day) {
+  var i;
+  for (i = 0; i < rows.length; i++) {
+    if (!this._endsBefore(rows[i], pos, day)) {
+      return false;
     }
   }
-  $children.data('stackW', stackMaxX + 1);
+  return true;
 };
 
-scout.Calendar.prototype._arrangeComponentFindPlacement = function($children) {
-  // FIXME awe: placement may be improved, test cases needed
-  // 1: change x if column on the left side free
-  // 2: change w if place on the right side not used
-  // -> then find new w (just use _arrangeComponentInitialW)
+scout.Calendar.prototype._findReplacableRow = function(rows, pos, day) {
+  var j;
+  for (j = 0; j < rows.length; j++) {
+    if (this._endsBefore(rows[j], pos, day)) {
+      return j;
+    }
+  }
+  return -1;
 };
 
-scout.Calendar.prototype._arrangeComponentSetPlacement = function($children) {
-  var i, $child, stackX, stackW;
+scout.Calendar.prototype._endsBefore = function(component, pos, day) {
+  return component.getPartDayPosition(day).to <= pos;
+};
+
+scout.Calendar.prototype._arrangeComponentSetPlacement = function($children, day) {
+  var i, $child, stack;
 
   // loop and place based on data
   for (i = 0; i < $children.length; i++) {
     $child = $children.eq(i);
-    stackX = $child.data('stackX');
-    stackW = $child.data('stackW');
+    stack = $child.data('component').stack[day];
 
     // make last element smaller
     $child
-      .css('width', 100 / stackW + '%')
-      .css('left', stackX * 100 / stackW + '%');
+      .css('width', 100 / stack.w + '%')
+      .css('left', stack.x * 100 / stack.w + '%');
   }
 };
 
@@ -879,24 +927,22 @@ scout.Calendar.prototype._hourToNumber = function(hour) {
   return parseFloat(splits[0]) + parseFloat(splits[1]) / 60;
 };
 
-scout.Calendar.prototype._intersectComp = function($e1, $e2) {
-  var comp1 = $e1.data('component'),
-    comp2 = $e2.data('component');
-  return this._intersect(comp1, comp2);
-};
-/**
- * returns true, if the two components intersect, false otherwise.
- * */
-scout.Calendar.prototype._intersect = function(comp1, comp2) {
-  var range1 = comp1.getPartDayPosition();
-  var range2 = comp2.getPartDayPosition();
-  return (range1.from >= range2.from && range1.from < range2.to) || (range2.from > range1.from && range1.to > range2.from);
-};
-
 scout.Calendar.prototype._sortTop = function(a, b) {
   return parseInt($(a).offset().top, 10) > parseInt($(b).offset().top, 10);
 };
 
 scout.Calendar.prototype._format = function(date, pattern) {
   return scout.dates.format(date, this.session.locale, pattern);
+};
+
+scout.Calendar.prototype._sortComponentDisplayRange = function(c1, c2) {
+  var from1 = new Date(c1.fromDate);
+  var from2 = new Date(c2.fromDate);
+  var dFrom = scout.dates.compare(from1, from2);
+  if (dFrom !== 0) {
+    return dFrom;
+  }
+  var to1 = new Date(c1.toDate);
+  var to2 = new Date(c2.toDate);
+  return scout.dates.compare(to1, to2);
 };

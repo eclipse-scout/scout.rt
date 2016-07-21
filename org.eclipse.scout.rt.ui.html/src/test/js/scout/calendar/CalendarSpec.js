@@ -40,25 +40,26 @@ describe("Calendar", function() {
   describe("dayPosition", function() {
 
     it("calculates the day position", function() {
-    var cal = helper.createCalendar(helper.createSimpleModel());
-    //total size: 80
-    expect(cal._dayPosition(0)).toBe(5);
-    expect(cal._dayPosition(4)).toBe(10);
-    expect(cal._dayPosition(8)).toBe(15);
-    expect(cal._dayPosition(10)).toBe(27.5);
-    expect(cal._dayPosition(12)).toBe(40);
-    expect(cal._dayPosition(12.5)).toBe(42.5);
-    expect(cal._dayPosition(13)).toBe(45);
-    expect(cal._dayPosition(17)).toBe(70);
-    expect(cal._dayPosition(24)).toBe(80);
-    expect(cal._dayPosition(-1)).toBe(85);
+      var cal = helper.createCalendar(helper.createSimpleModel());
+      //fix total size: 80
+      expect(cal._dayPosition(0)).toBe(5);
+      expect(cal._dayPosition(4)).toBe(10);
+      expect(cal._dayPosition(8)).toBe(15);
+      expect(cal._dayPosition(10)).toBe(27.5);
+      expect(cal._dayPosition(12)).toBe(40);
+      expect(cal._dayPosition(12.5)).toBe(42.5);
+      expect(cal._dayPosition(13)).toBe(45);
+      expect(cal._dayPosition(17)).toBe(70);
+      expect(cal._dayPosition(24)).toBe(80);
+      expect(cal._dayPosition(-1)).toBe(85);
     });
+
   });
 
-
-
   describe("component", function() {
-    var cal;
+    var cal, c1, c2, c3, c4, c5, c6, c7, c8;
+    var day = new Date('2016-07-20 00:00:00.000');
+    var day2 = new Date('2016-07-21 00:00:00.000');
     var option1 = {
       fromDate: "2016-07-20 12:00:00.000",
       toDate: "2016-07-20 12:30:00.000"
@@ -85,51 +86,160 @@ describe("Calendar", function() {
       toDate: "2016-07-20 12:00:00.000"
     };
 
+    var option8 = {
+      fromDate: "2016-07-20 12:00:00.000",
+      toDate: "2016-07-21 08:00:00.000"
+    };
 
     beforeEach(function() {
       cal = helper.createCalendar(helper.createSimpleModel());
+      c1 = helper.createCompoment(option1, cal);
+      c2 = helper.createCompoment(option2, cal);
+      c3 = helper.createCompoment(option3, cal);
+      c4 = helper.createCompoment(option4, cal);
+      c5 = helper.createCompoment(option5, cal);
+      c6 = helper.createCompoment(optionSmall1, cal);
+      c7 = helper.createCompoment(optionSmall1, cal);
+      c8 = helper.createCompoment(option8, cal);
     });
 
-    it("intersects with itself", function() {
-      var c1 = helper.createCompoment(option1, cal);
-      expect(cal._intersect(c1, c1)).toBe(true);
+    describe("part day position", function() {
+
+      it("calculates the part day position", function() {
+        var posRange = c1.getPartDayPosition(day);
+        expect(posRange.from).toBe(40);
+        expect(posRange.to).toBe(42.5);
+      });
+
+      it("calculates the part day position for a range smaller than the minimum", function() {
+        var posRange = c7.getPartDayPosition(day);
+        var minRange = 2.5;
+        expect(posRange.from).toBe(39.9);
+        expect(posRange.to).toBe(39.9 + minRange);
+      });
+
+
+      it("calculates the part day position for components larger than a day", function() {
+        var posRange = c7.getPartDayPosition(day);
+        var minRange = 2.5;
+        expect(posRange.from).toBe(39.9);
+        expect(posRange.to).toBe(39.9 + minRange);
+      });
+
     });
 
-    it("does not intersect with an adjacent component ", function() {
-      var c1 = helper.createCompoment(option1, cal);
-      var c2 = helper.createCompoment(option2, cal);
-      expect(cal._intersect(c1, c2)).toBe(false);
-      expect(cal._intersect(c2, c1)).toBe(false);
+    describe("sort", function() {
+      it("sorts first from then to", function() {
+        var components = [c4, c2, c1];
+        cal._sort(components, day);
+        expect(components[0] == c1).toBe(true);
+        expect(components[1] == c2).toBe(true);
+        expect(components[2] == c4).toBe(true);
+      });
     });
 
-    it("does not intersect with a later component", function() {
-      var c1 = helper.createCompoment(option1, cal);
-      var c3 = helper.createCompoment(option3, cal);
-      expect(cal._intersect(c1, c3)).toBe(false);
-      expect(cal._intersect(c3, c1)).toBe(false);
-    });
+    describe("arrangeComponents", function() {
 
-    it("intersects with an included component", function() {
-      var c3 = helper.createCompoment(option3, cal);
-      var c4 = helper.createCompoment(option4, cal);
-      expect(cal._intersect(c3, c4)).toBe(true);
-      expect(cal._intersect(c4, c3)).toBe(true);
-    });
+      it("does nothing for no components", function() {
+        var components = [];
+        cal._arrange(components, day);
+        expect(components).toEqual([]);
+      });
 
-    it("intersects with an intersecting component", function() {
-      var c1 = helper.createCompoment(option1, cal);
-      var c5 = helper.createCompoment(option5, cal);
-      expect(cal._intersect(c1, c5)).toBe(true);
-      expect(cal._intersect(c5, c1)).toBe(true);
-    });
+      it("arranges a single component", function() {
+        var components = [c1];
+        cal._arrange(components, day);
+        expect(components[0]).toEqual(c1);
+        expect(c1.stack[day].x).toEqual(0);
+        expect(c1.stack[day].w).toEqual(1);
+      });
 
-    it("intersects with a small component that is larger when displayed", function() {
-      var c1 = helper.createCompoment(option1, cal);
-      var c2 = helper.createCompoment(optionSmall1, cal);
-      expect(cal._intersect(c1, c2)).toBe(true);
-      expect(cal._intersect(c2, c1)).toBe(true);
-    });
+      it("arranges non intersecting components", function() {
+        var components = [c1, c2];
+        cal._arrange(components, day);
+        expect(components[0]).toEqual(c1);
+        expect(components[1]).toEqual(c2);
+        expect(c1.stack[day].x).toEqual(0);
+        expect(c1.stack[day].w).toEqual(1);
+        expect(c2.stack[day].x).toEqual(0);
+        expect(c2.stack[day].w).toEqual(1);
+      });
 
+      it("arranges intersecting components", function() {
+        var components = [c5, c1];
+        cal._arrange(components, day);
+        expect(components[0]).toEqual(c1);
+        expect(components[1]).toEqual(c5);
+        expect(c1.stack[day].x).toEqual(0);
+        expect(c1.stack[day].w).toEqual(2);
+        expect(c5.stack[day].x).toEqual(1);
+        expect(c5.stack[day].w).toEqual(2);
+      });
+
+      it("arranges equal components", function() {
+        var components = [c6, c7];
+        cal._arrange(components, day);
+        expect(components[0]).toEqual(c6);
+        expect(components[1]).toEqual(c7);
+        expect(c6.stack[day].x).toEqual(0);
+        expect(c6.stack[day].w).toEqual(2);
+        expect(c7.stack[day].x).toEqual(1);
+        expect(c7.stack[day].w).toEqual(2);
+      });
+
+      it("arranges intersecting and non-intersecting components", function() {
+        var components = [c1, c2, c3, c4, c5, c6];
+        cal._arrange(components, day);
+        expect(components[0]).toEqual(c6);
+        expect(components[1]).toEqual(c1);
+        expect(components[2]).toEqual(c5);
+        expect(components[3]).toEqual(c2);
+        expect(components[4]).toEqual(c3);
+        expect(components[5]).toEqual(c4);
+        expect(c1.stack[day].w).toEqual(3);
+        expect(c2.stack[day].w).toEqual(3);
+        expect(c3.stack[day].w).toEqual(3);
+        expect(c4.stack[day].w).toEqual(3);
+        expect(c5.stack[day].w).toEqual(3);
+        expect(c6.stack[day].w).toEqual(3);
+
+        expect(c6.stack[day].x).toEqual(0);
+        expect(c1.stack[day].x).toEqual(1);
+        expect(c5.stack[day].x).toEqual(2);
+        expect(c2.stack[day].x).toEqual(0);
+        expect(c3.stack[day].x).toEqual(0);
+      });
+
+      it("reduces rows when arranging components", function() {
+        var components = [c1, c3, c6];
+        cal._arrange(components, day);
+        expect(components[0]).toEqual(c6);
+        expect(components[1]).toEqual(c1);
+        expect(components[2]).toEqual(c3);
+        expect(c6.stack[day].w).toEqual(2);
+        expect(c1.stack[day].w).toEqual(2);
+        expect(c3.stack[day].w).toEqual(1);
+
+        expect(c6.stack[day].x).toEqual(0);
+        expect(c1.stack[day].x).toEqual(1);
+        expect(c3.stack[day].x).toEqual(0);
+      });
+
+      it("arranges intersecting components spanning more than one day", function() {
+        var day1 = day;
+        var components = [c8, c3];
+
+        cal._arrange(components, day1);
+        expect(components[0]).toEqual(c8);
+        expect(components[1]).toEqual(c3);
+        expect(c8.stack[day1].w).toEqual(2);
+        expect(c3.stack[day1].w).toEqual(2);
+
+        expect(c8.stack[day1].x).toEqual(0);
+        expect(c3.stack[day1].x).toEqual(1);
+      });
+
+    });
   });
 
 });

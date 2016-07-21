@@ -129,9 +129,24 @@ scout.CalendarComponent.prototype._isDayPart = function() {
   return !this.parent._isMonth() && !this.fullDay;
 };
 
-scout.CalendarComponent.prototype.getPartDayPosition = function(){
-  var range = new scout.Range(this._getHours(this.fromDate), this._getHours(this.toDate));
-  return this._getDisplayDayPosition(range);
+scout.CalendarComponent.prototype._getHourRange = function(day){
+  var hourRange = new scout.Range(this._getHours(this.fromDate), this._getHours(this.toDate));
+  var dateRange = new scout.Range(new Date(this.fromDate), new Date(this.toDate));
+
+  if (scout.dates.isSameDay(day, dateRange.from) && scout.dates.isSameDay(day, dateRange.to)) {
+    return new scout.Range(hourRange.from, hourRange.to);
+  } else if (scout.dates.isSameDay(day, dateRange.from)) {
+    return new scout.Range(hourRange.from, 24);
+  } else if (scout.dates.isSameDay(day, dateRange.to)) {
+    return new scout.Range(0, hourRange.to);
+  } else {
+    return new scout.Range(0, 24);
+  }
+  return undefined;
+};
+
+scout.CalendarComponent.prototype.getPartDayPosition = function(day){
+  return this._getDisplayDayPosition(this._getHourRange(day));
 };
 
 scout.CalendarComponent.prototype._getDisplayDayPosition = function(range){
