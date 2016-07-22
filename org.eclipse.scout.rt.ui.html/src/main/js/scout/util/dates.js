@@ -116,6 +116,13 @@ scout.dates = {
   },
 
   /**
+   * @return the difference of the two dates in number of days.
+   */
+  compareDays: function(date1, date2) {
+    return ((scout.dates.trunc(date1) - scout.dates.trunc(date2)) - (date1.getTimezoneOffset() - date2.getTimezoneOffset()) * 60000) / (3600000 * 24);
+  },
+
+  /**
    * Returns the time (with milliseconds) for the given date as a string in the format
    * [year#4][month#2][day#2][hour#2][minute#2][second#2][#millisecond#3]. All characters
    * are guaranteed to be digits. If the date argument is omitted, the current date is
