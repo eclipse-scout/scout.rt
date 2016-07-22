@@ -399,10 +399,12 @@ scout.Planner.prototype._renderScale = function() {
         end = new Date(end);
         var fullRangeMillis = end - begin;
         // remove day component from range for scaling
-        var dayComponentMillis = (t.getDate() - begin.getDate()) * 3600000 * 24;
+        var dayDiffTBegin = scout.dates.compareDays(t, begin);
+        var dayDIffEndBegin = scout.dates.compareDays(end, begin);
+        var dayComponentMillis = dayDiffTBegin * 3600000 * 24;
         var rangeScaling = (24 / (lastHour - firstHour + 1));
         // re-add day component
-        var dayOffset = (t.getDate() - begin.getDate()) / (end.getDate() - begin.getDate());
+        var dayOffset = dayDiffTBegin / dayDIffEndBegin;
         return ((t.valueOf() - (begin.valueOf() + firstHour * 3600000) - dayComponentMillis) * rangeScaling / fullRangeMillis + dayOffset) * 100;
       };
     }(this.viewRange.from, this.viewRange.to, firstHourOfDay, lastHourOfDay, interval);
@@ -413,7 +415,8 @@ scout.Planner.prototype._renderScale = function() {
         t1 = new Date(t1);
         var fullRangeMillis = end - begin;
         var selectedRangeMillis = t1 - t0;
-        var hiddenRangeMillis = ((t1.getDate() - t0.getDate()) * (24 - (lastHour + 1) + firstHour) * 3600000);
+        var dayDiffT1T0 = scout.dates.compareDays(t1, t0);
+        var hiddenRangeMillis = (dayDiffT1T0 * (24 - (lastHour + 1) + firstHour) * 3600000);
         var rangeScaling = (24 / (lastHour - firstHour + 1));
         return ((selectedRangeMillis - hiddenRangeMillis) * rangeScaling) / fullRangeMillis * 100;
       };

@@ -248,6 +248,65 @@ describe("scout.dates", function() {
 
   });
 
+  describe("compareDays", function() {
+    it("returns the differences in number of days", function() {
+      var date = scout.dates.create('2014-11-21');
+      var date2 = scout.dates.create('2014-11-21');
+      expect(scout.dates.compareDays(date, date2)).toBe(0);
+
+      date = scout.dates.create('2014-11-21');
+      date2 = scout.dates.create('2014-11-25');
+      expect(scout.dates.compareDays(date, date2)).toBe(-4);
+
+      date = scout.dates.create('2014-11-21');
+      date2 = scout.dates.create('2014-11-15');
+      expect(scout.dates.compareDays(date, date2)).toBe(6);
+    });
+
+    it("ignores time", function() {
+      var date = scout.dates.create('2014-11-21T23:00');
+      var date2 = scout.dates.create('2014-11-21');
+      expect(scout.dates.compareDays(date, date2)).toBe(0);
+
+      date = scout.dates.create('2014-11-21');
+      date2 = scout.dates.create('2014-11-22T15:15');
+      expect(scout.dates.compareDays(date, date2)).toBe(-1);
+
+      date = scout.dates.create('2014-11-21T20:20');
+      date2 = scout.dates.create('2014-11-20T15:10');
+      expect(scout.dates.compareDays(date, date2)).toBe(1);
+    });
+
+    it("works with different month", function() {
+      var date = scout.dates.create('2014-11-21');
+      var date2 = scout.dates.create('2014-10-21');
+      expect(scout.dates.compareDays(date, date2)).toBe(31);
+
+      date = scout.dates.create('2014-11-21');
+      date2 = scout.dates.create('2014-12-21');
+      expect(scout.dates.compareDays(date, date2)).toBe(-30);
+    });
+
+    it("works with different years", function() {
+      var date = scout.dates.create('2014-11-21');
+      var date2 = scout.dates.create('2013-11-21');
+      expect(scout.dates.compareDays(date, date2)).toBe(365);
+
+      date = scout.dates.create('2014-11-21');
+      date2 = scout.dates.create('2015-11-21');
+      expect(scout.dates.compareDays(date, date2)).toBe(-365);
+
+      date = scout.dates.create('2014-12-31');
+      date2 = scout.dates.create('2015-01-01');
+      expect(scout.dates.compareDays(date, date2)).toBe(-1);
+
+      date = scout.dates.create('2015-01-01');
+      date2 = scout.dates.create('2014-12-31');
+      expect(scout.dates.compareDays(date, date2)).toBe(1);
+    });
+
+  });
+
   describe("timestamp", function() {
 
     it("returns a string of the expected length withonly digits", function() {
