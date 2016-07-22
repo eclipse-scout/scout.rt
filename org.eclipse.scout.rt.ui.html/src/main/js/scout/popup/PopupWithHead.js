@@ -215,6 +215,11 @@ scout.PopupWithHead.prototype._positionImpl = function(openingDirectionX, openin
   bodyWidth = bodySize.width;
 
   pos = this.$headBlueprint.offset();
+  // this.$parent might not be at (0,0) of the document
+  var parentOffset = this.$parent.offset();
+  pos.left -= parentOffset.left;
+  pos.top -= parentOffset.top;
+
   left = pos.left;
   headInsets = scout.graphics.getInsets(this.$head);
   menuInsets = scout.graphics.getInsets(this.$headBlueprint);
