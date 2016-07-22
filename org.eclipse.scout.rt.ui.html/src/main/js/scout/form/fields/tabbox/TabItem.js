@@ -196,6 +196,14 @@ scout.TabItem.prototype._syncStatusVisible = function() {
   this.statusVisible = false;
 };
 
+/**
+ * @Override
+ */
+scout.TabItem.prototype._renderStatusPosition = function() {
+  // Skip implementation of GroupBox.js, because that would move the status to a different place in DOM!
+  scout.TabItem.parent.parent.prototype._renderStatusPosition.call(this);
+};
+
 scout.TabItem.prototype._renderTooltipText = function() {
   if (this.$container) {
     scout.TabItem.parent.prototype._renderTooltipText.call(this);
