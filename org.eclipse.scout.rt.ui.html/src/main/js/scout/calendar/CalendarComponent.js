@@ -235,10 +235,10 @@ scout.CalendarComponent.prototype._description = function() {
     });
   }
 
-  // body
-  if (scout.strings.hasText(this.item.body)) {
+  // description
+  if (scout.strings.hasText(this.item.description)) {
     descParts.push({
-      text: this.item.body
+      text: scout.strings.nl2br(this.item.description)
     });
   }
 

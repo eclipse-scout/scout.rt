@@ -37,7 +37,7 @@ public class JsonCalendarItem implements IJsonObject {
     json.put("itemId", m_item.getItemId());
     json.put("owner", m_item.getOwner());
     json.put("subject", m_item.getSubject());
-    json.put("body", m_item.getBody());
+    json.put("description", m_item.getDescription());
     json.put("cssClass", m_item.getCssClass());
     json.put("recurrencePattern", new JsonRecurrencePattern(m_item.getRecurrencePattern()).toJson());
     return json;
