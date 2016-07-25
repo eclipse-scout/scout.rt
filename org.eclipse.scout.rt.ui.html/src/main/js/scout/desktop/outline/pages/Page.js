@@ -20,7 +20,7 @@ scout.Page = function(outline) {
    * This property contains the class-name of the form to be instantiated, when createDetailForm() is called.
    */
   this.detailFormType = null;
-
+  this.tableStatusVisible = true;
 };
 scout.inherits(scout.Page, scout.TreeNode);
 
@@ -56,6 +56,9 @@ scout.Page.prototype._init = function(model) {
     this.detailTable = model.detailTable;
   } else {
     this.detailTable = this._createTable();
+    if (this.detailTable) {
+      this.detailTable.setTableStatusVisible(this.tableStatusVisible);
+    }
   }
   // FIXME [awe] 6.1 scout.create für detailTable aufrufen, damit man detailTable auch in model.json konfigurieren kann
 };

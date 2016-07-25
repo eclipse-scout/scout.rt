@@ -127,6 +127,7 @@
       "autoResizeColumns": false,
       "checkable": false,
       "enabled": true,
+      "headerEnabled": true,
       "headerVisible": true,
       "keyStrokes": [],
       "keyboardNavigation": true,

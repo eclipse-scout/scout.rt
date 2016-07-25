@@ -83,6 +83,7 @@
   __include("scout/keystroke/CloseKeyStroke.js");
   // Misc. elements
   __include("scout/boxbuttons/BoxButtons.js");
+  __include("scout/cell/Cell.js");
   __include("scout/collapsehandle/CollapseHandle.js");
   __include("scout/focus/FocusManager.js");
   __include("scout/focus/FocusContext.js");
@@ -151,6 +152,7 @@
   __include("scout/form/DialogLayout.js");
   // Table
   __include("scout/table/Table.js");
+  __include("scout/table/TableRow.js");
   __include("scout/table/TableMatrix.js");
   __include("scout/table/TableFooter.js");
   __include("scout/table/TableFooterLayout.js");

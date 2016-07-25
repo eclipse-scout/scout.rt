@@ -9,6 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 scout.Column = function() {
+  this.cssClass;
   this.editable = false;
   this.fixedWidth = false;
   this.horizontalAlignment = -1;
@@ -64,12 +65,15 @@ scout.Column.prototype.initCell = function(cell) {
       text: cell
     };
   }
-  this._initCell(cell);
-  // when cell doesn't define horiz. alignment - use value from column
-  if (cell.horizontalAlignment === undefined) {
-    cell.horizontalAlignment = this.horizontalAlignment;
+  if (!(cell instanceof scout.Cell)) {
+    this._initCell(cell);
+    // when cell doesn't define horiz. alignment - use value from column
+    if (cell.horizontalAlignment === undefined) {
+      cell.horizontalAlignment = this.horizontalAlignment;
+    }
+    cell.parent = this;
+    cell = scout.create('Cell', cell);
   }
-  scout.defaultValues.applyTo(cell, 'Cell');
   return cell;
 };
 

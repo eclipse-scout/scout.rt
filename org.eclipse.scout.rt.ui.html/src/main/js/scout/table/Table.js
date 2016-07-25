@@ -14,6 +14,7 @@ scout.Table = function(model) {
   this.autoResizeColumns = false;
   this.checkable = false;
   this.enabled = true;
+  this.headerEnabled = true;
   this.headerVisible = true;
   this.keyStrokes = [];
   this.keyboardNavigation = true;
@@ -69,7 +70,7 @@ scout.Table = function(model) {
 };
 scout.inherits(scout.Table, scout.ModelAdapter);
 
-//FIXME CGU [6.1] create TableRow.js, Cell.js and StringColumn.js incl. defaultValues from defaultValues.json
+//FIXME CGU [6.1] create StringColumn.js incl. defaultValues from defaultValues.json
 
 scout.Table.CheckableStyle = {
   /**
@@ -88,8 +89,8 @@ scout.Table.prototype._init = function(model) {
   scout.Table.parent.prototype._init.call(this, model);
   this._initColumns();
 
-  this.rows.forEach(function(row) {
-    this._initRow(row);
+  this.rows.forEach(function(row, i) {
+    this.rows[i] = this._initRow(row);
   }, this);
 
   this.menuBar = scout.create('MenuBar', {
@@ -111,12 +112,15 @@ scout.Table.prototype._init = function(model) {
 };
 
 scout.Table.prototype._initRow = function(row) {
-  scout.defaultValues.applyTo(row, 'TableRow');
-  this._initCells(row);
+  if (!(row instanceof scout.TableRow)) {
+    row.parent = this;
+    row = scout.create('TableRow', row);
+  }
   this.rowsMap[row.id] = row;
   this.trigger('rowInitialized', {
     row: row
   });
+  return row;
 };
 
 scout.Table.prototype._initColumns = function() {
@@ -141,16 +145,6 @@ scout.Table.prototype._initColumns = function() {
 
   // Sync head and tail sort columns
   this._syncHeadAndTailSortColumns();
-};
-
-scout.Table.prototype._initCells = function(row) {
-  this.columns.forEach(function(column) {
-    if (!column.guiOnly) {
-      var cell = row.cells[column.index];
-      cell = column.initCell(cell);
-      row.cells[column.index] = cell;
-    }
-  });
 };
 
 /**
@@ -2028,8 +2022,9 @@ scout.Table.prototype.insertRows = function(rows, fromServer) {
   var wasEmpty = this.rows.length === 0;
 
   // Update model
-  rows.forEach(function(row) {
-    this._initRow(row);
+  rows.forEach(function(row, i) {
+    row = this._initRow(row);
+    rows[i] = row;
     // Always insert new rows at the end, if the order is wrong a rowOrderChange event will follow
     this.rows.push(row);
   }, this);
@@ -2164,7 +2159,7 @@ scout.Table.prototype.updateRows = function(rows) {
     }
 
     // Replace old row
-    this._initRow(updatedRow);
+    updatedRow = this._initRow(updatedRow);
     if (this.selectionHandler.lastActionRow === oldRow) {
       this.selectionHandler.lastActionRow = updatedRow;
     }
@@ -3118,8 +3113,20 @@ scout.Table.prototype._syncTableStatus = function(tableStatus) {
   }
 };
 
-scout.Table.prototype._syncTableStatusVisible = function(tableStatusVisible) {
-  this.tableStatusVisible = tableStatusVisible;
+scout.Table.prototype._syncTableStatusVisible = function(visible) {
+  this.setTableStatusVisible(visible, false);
+  return false;
+};
+
+scout.Table.prototype.setTableStatusVisible = function(visible, notifyServer) {
+  if (this.tableStatusVisible === visible) {
+    return;
+  }
+  this._setProperty('tableStatusVisible', visible);
+  notifyServer = scout.nvl(notifyServer, true);
+  if (notifyServer) {
+    this._sendProperty('tableStatusVisible');
+  }
   this._updateFooterVisibility();
 };
 

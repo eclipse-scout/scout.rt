@@ -328,7 +328,7 @@ describe("CellEditor", function() {
     beforeEach(function() {
       model = helper.createModelFixture(2, 3);
       table = helper.createTable(model);
-      row0 = model.rows[0];
+      row0 = table.rows[0];
     });
 
     it("reopens popup if row gets updated", function() {
@@ -348,7 +348,7 @@ describe("CellEditor", function() {
       session._processSuccessResponse(message);
 
       // Check if popup is correctly linked to updated row and new $cell
-      row0 = updatedRows[0];
+      row0 = table.rows[0];
       $cells0 = table.$cellsForRow(row0.$row);
       $cell0_0 = $cells0.eq(0);
       expect($findPopup().length).toBe(1);
