@@ -236,7 +236,7 @@ public class MailUtilityTest {
     MailUtility.addAttachmentsToMimeMessage(message, attachments);
 
     // verify added attachments in java instance
-    verifyMimeMessage(message, plainText, html, "sample1.dat", "sample2.dat", MimeUtility.encodeText("sample3_öüä.dat", StandardCharsets.UTF_8.name(), null));
+    verifyMimeMessage(message, plainText, html, "sample1.dat", "sample2.dat", "sample3_öüä.dat");
 
     // store and recreate mime message (byte[])
     ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -244,7 +244,7 @@ public class MailUtilityTest {
     message = MailUtility.createMessageFromBytes(bos.toByteArray());
 
     // verify new instance
-    verifyMimeMessage(message, plainText, html, "sample1.dat", "sample2.dat", MimeUtility.encodeText("sample3_öüä.dat", StandardCharsets.UTF_8.name(), null));
+    verifyMimeMessage(message, plainText, html, "sample1.dat", "sample2.dat", "sample3_öüä.dat");
   }
 
   @Test
@@ -271,7 +271,7 @@ public class MailUtilityTest {
     MailUtility.addResourcesAsAttachments(message, attachments);
 
     // verify added attachments in java instance
-    verifyMimeMessage(message, plainText, html, "sample1.dat", "sample2.dat", MimeUtility.encodeText("sample3_öüä.dat", StandardCharsets.UTF_8.name(), null));
+    verifyMimeMessage(message, plainText, html, "sample1.dat", "sample2.dat", "sample3_öüä.dat");
 
     // store and recreate mime message (byte[])
     ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -279,7 +279,7 @@ public class MailUtilityTest {
     message = MailUtility.createMessageFromBytes(bos.toByteArray());
 
     // verify new instance
-    verifyMimeMessage(message, plainText, html, "sample1.dat", "sample2.dat", MimeUtility.encodeText("sample3_öüä.dat", StandardCharsets.UTF_8.name(), null));
+    verifyMimeMessage(message, plainText, html, "sample1.dat", "sample2.dat", "sample3_öüä.dat");
   }
 
   @Test

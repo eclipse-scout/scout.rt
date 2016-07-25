@@ -12,6 +12,7 @@ scout.ClipboardField = function() {
   scout.ClipboardField.parent.call(this);
 
   this._fileUploadWaitRetryCountTimeout = 99;
+  this._fullSelectionLength = 0;
 };
 scout.inherits(scout.ClipboardField, scout.ValueField);
 
@@ -81,11 +82,14 @@ scout.ClipboardField.prototype._renderDisplayText = function() {
   if (scout.strings.hasText(displayText)) {
     this.$field.html(scout.strings.nl2br(displayText, true));
     scout.scrollbars.install(this.$field, {
-      parent : this
+      parent: this
     });
+
     this.$field.selectAllText();
-  }
-  else {
+    // store length of full selection, in order to determine if the whole text is selected in "onCopy"
+    var selection = this._getSelection();
+    this._fullSelectionLength = (selection) ? selection.toString().length : 0;
+  } else {
     this.$field.empty();
   }
   // restore old img for firefox upload mechanism.
@@ -101,7 +105,7 @@ scout.ClipboardField.prototype._getSelection = function() {
   } else if (document.getSelection) {
     selection = document.getSelection();
   }
-  if(!selection || selection.toString().length === 0){
+  if (!selection || selection.toString().length === 0) {
     return null;
   }
   return selection;
@@ -110,23 +114,18 @@ scout.ClipboardField.prototype._getSelection = function() {
 // do not allow enter something manually some browsers such as IE do not send input events.
 // The 'keydown' event is used in this cases.
 scout.ClipboardField.prototype._onInput = function(event) {
-  if(event.type === 'input'){
+  if (event.type === 'input') {
     this._renderDisplayText(this.displayText);
     return false;
-  }
-  else if(!event['char'] || event['char'] === ''){
+  } else if (!event['char'] || event['char'] === '') {
     return;
-  }
-  else if(event.ctrlKey && (event.key === 'c' || event.key === 'x')){
+  } else if (event.ctrlKey && (event.key === 'c' || event.key === 'x')) {
     return;
-  }
-  else if(!this.readOnly && event.ctrlKey && event.key === 'v'){
+  } else if (!this.readOnly && event.ctrlKey && event.key === 'v') {
     return;
-  }
-  else if(event.keyCode === scout.keys.ESC || event.keyCode === scout.keys.ENTER){
+  } else if (event.keyCode === scout.keys.ESC || event.keyCode === scout.keys.ENTER) {
     return;
-  }
-  else{
+  } else {
     this._renderDisplayText(this.displayText);
     return false;
   }
@@ -147,10 +146,18 @@ scout.ClipboardField.prototype._onCopy = function(event) {
   scout.scrollbars.uninstall(this.$field, this.session);
 
   selection = this._getSelection();
-  if(!selection){
+  if (!selection) {
     return;
   }
-  text = scout.strings.plainText(selection.toString());
+
+  // if the length of the selection is equals to the length of the (initial) full selection
+  // use the internal 'displayText' value because some browsers are collapsing white spaces
+  // which lead to problems when coping data form tables with empty cells ("\t\t").
+  if (selection.toString().length === this._fullSelectionLength) {
+    text = this.displayText;
+  } else {
+    text = scout.strings.plainText(selection.toString());
+  }
 
   try {
     // Chrome, Firefox - causes an exception in IE
@@ -169,7 +176,7 @@ scout.ClipboardField.prototype._onCopy = function(event) {
 };
 
 scout.ClipboardField.prototype._onPaste = function(event) {
-  if(this.readOnly){
+  if (this.readOnly) {
     this._renderDisplayText(this.displayText);
     return;
   }

@@ -13,6 +13,7 @@
   background-color: @item-selection-background-color;
   padding: @text-field-padding-y @text-field-padding-x;
   #scout.user-select(text);
+  white-space: pre-wrap;
 
   & > img {
     display: none;

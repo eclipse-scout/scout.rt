@@ -721,18 +721,23 @@ scout.Session.prototype._processErrorResponse = function(jqXHR, textStatus, erro
 
   // Status code = 0 -> no connection
   // Status code >= 12000 come from windows, see http://msdn.microsoft.com/en-us/library/aa383770%28VS.85%29.aspx. Not sure if it is necessary for IE >= 9.
-  if (this.ready && (!jqXHR.status || jqXHR.status >= 12000)) {
-    this.goOffline();
-    if (!this._queuedRequest && request && !request.pollForBackgroundJobs) {
-      this._queuedRequest = request;
+  var offline = (!jqXHR.status || jqXHR.status >= 12000);
+  if (offline){
+    if (this.ready) {
+      this.goOffline();
+      if (!this._queuedRequest && request && !request.pollForBackgroundJobs) {
+        this._queuedRequest = request;
+      }
+      return;
     }
-    return;
+    // Not ready yet (startup request)
+    errorThrown = errorThrown || this.optText('ui.ConnectionInterrupted', 'Connection interrupted');
   }
 
   // Show error message
   var boxOptions = {
     header: this.optText('ui.NetworkError', 'Network error'),
-    body: jqXHR.status + ' ' + errorThrown,
+    body: scout.strings.join(' ', (jqXHR.status || ''), errorThrown),
     yesButtonText: this.optText('ui.Reload', 'Reload'),
     yesButtonAction: function() {
       scout.reloadPage();
