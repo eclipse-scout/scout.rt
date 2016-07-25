@@ -40,22 +40,25 @@ CalendarSpecHelper.prototype.createCompomentModel = function(options) {
     c[prop] = options[prop];
   }
 
-  //init covered days
+  this.initCoveredDays(c);
+  return c;
+};
+
+CalendarSpecHelper.prototype.initCoveredDays = function(c){
   c.coveredDays = [];
-  var from = scout.dates.trunc(new Date(c.fromDate));
-  var to = scout.dates.trunc(new Date(c.toDate));
+  var from = scout.dates.trunc(scout.dates.parseJsonDate(c.fromDate));
+  var to = scout.dates.trunc(scout.dates.parseJsonDate(c.toDate));
   var d = from;
   c.coveredDays.push(d);
   while(!scout.dates.isSameDay(d,to)){
     d = this.incDay(d);
     c.coveredDays.push(d);
   }
-  return c;
 };
 
-CalendarSpecHelper.prototype.incDay = function(date) {
-  var newDate = new Date(date);
-  newDate.setDate(date.getDate() + 1);
+CalendarSpecHelper.prototype.incDay = function(d) {
+  var newDate = new Date(d.getTime());
+  newDate.setDate(d.getDate() + 1);
   return newDate;
 };
 

@@ -131,7 +131,7 @@ scout.CalendarComponent.prototype._isDayPart = function() {
 
 scout.CalendarComponent.prototype._getHourRange = function(day){
   var hourRange = new scout.Range(this._getHours(this.fromDate), this._getHours(this.toDate));
-  var dateRange = new scout.Range(new Date(this.fromDate), new Date(this.toDate));
+  var dateRange = new scout.Range(scout.dates.parseJsonDate(this.fromDate), scout.dates.parseJsonDate(this.toDate));
 
   if (scout.dates.isSameDay(day, dateRange.from) && scout.dates.isSameDay(day, dateRange.to)) {
     return new scout.Range(hourRange.from, hourRange.to);
@@ -139,10 +139,8 @@ scout.CalendarComponent.prototype._getHourRange = function(day){
     return new scout.Range(hourRange.from, 24);
   } else if (scout.dates.isSameDay(day, dateRange.to)) {
     return new scout.Range(0, hourRange.to);
-  } else {
-    return new scout.Range(0, 24);
   }
-  return undefined;
+  return new scout.Range(0, 24);
 };
 
 scout.CalendarComponent.prototype.getPartDayPosition = function(day){

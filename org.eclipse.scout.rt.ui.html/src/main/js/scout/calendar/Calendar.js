@@ -936,13 +936,13 @@ scout.Calendar.prototype._format = function(date, pattern) {
 };
 
 scout.Calendar.prototype._sortComponentDisplayRange = function(c1, c2) {
-  var from1 = new Date(c1.fromDate);
-  var from2 = new Date(c2.fromDate);
+  var from1 = scout.dates.parseJsonDate(c1.fromDate);
+  var from2 = scout.dates.parseJsonDate(c2.fromDate);
   var dFrom = scout.dates.compare(from1, from2);
   if (dFrom !== 0) {
     return dFrom;
   }
-  var to1 = new Date(c1.toDate);
-  var to2 = new Date(c2.toDate);
+  var to1 = scout.dates.parseJsonDate(c1.toDate);
+  var to2 = scout.dates.parseJsonDate(c2.toDate);
   return scout.dates.compare(to1, to2);
 };
