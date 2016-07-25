@@ -197,6 +197,7 @@ scout.Calendar.prototype._renderProperties = function() {
 };
 
 scout.Calendar.prototype._renderComponents = function() {
+  this.components.sort(this._sortFromTo);
   this.components.forEach(function(component) {
     component.remove();
     component.render(this.$container);
@@ -732,9 +733,6 @@ scout.Calendar.prototype._renderListPanel = function() {
     return false;
   }
 
-  // FIXME awe: (calendar) sort components in list-panel?
-  // $components.sort(this._sortTop);
-
   components.forEach(function(component) {
     listComponent = new scout.CalendarListComponent(this.selectedDate, component);
     listComponent.render(this.$list);
@@ -813,7 +811,7 @@ scout.Calendar.prototype._getComponents = function($children) {
 };
 
 scout.Calendar.prototype._sort = function(components) {
-  components.sort(this._sortComponentDisplayRange);
+  components.sort(this._sortFromTo);
 };
 
 /**
@@ -927,15 +925,11 @@ scout.Calendar.prototype._hourToNumber = function(hour) {
   return parseFloat(splits[0]) + parseFloat(splits[1]) / 60;
 };
 
-scout.Calendar.prototype._sortTop = function(a, b) {
-  return parseInt($(a).offset().top, 10) > parseInt($(b).offset().top, 10);
-};
-
 scout.Calendar.prototype._format = function(date, pattern) {
   return scout.dates.format(date, this.session.locale, pattern);
 };
 
-scout.Calendar.prototype._sortComponentDisplayRange = function(c1, c2) {
+scout.Calendar.prototype._sortFromTo = function(c1, c2) {
   var from1 = scout.dates.parseJsonDate(c1.fromDate);
   var from2 = scout.dates.parseJsonDate(c2.fromDate);
   var dFrom = scout.dates.compare(from1, from2);
