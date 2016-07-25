@@ -428,6 +428,26 @@ describe("Tree", function() {
         expect(node0.childNodes[2].$node).toBeDefined();
       });
 
+      it("updates child node indices", function() {
+        var node2Child0 = node2.childNodes[0];
+        var node2Child1 = node2.childNodes[1];
+        expect(tree.nodes.length).toBe(3);
+        expect(node2.childNodes.length).toBe(3);
+        expect(node2.childNodes[0].childNodeIndex).toBe(0);
+        expect(node2.childNodes[1].childNodeIndex).toBe(1);
+        expect(node2.childNodes[2].childNodeIndex).toBe(2);
+
+        tree.deleteNodes([node2Child0], node2);
+        expect(node2.childNodes.length).toBe(2);
+        expect(node2.childNodes[0].childNodeIndex).toBe(0);
+        expect(node2.childNodes[1].childNodeIndex).toBe(1);
+
+        tree.deleteNodes([tree.nodes[1]]);
+        expect(tree.nodes.length).toBe(2);
+        expect(tree.nodes[0].childNodeIndex).toBe(0);
+        expect(tree.nodes[1].childNodeIndex).toBe(1);
+      });
+
       it("considers view range (distinguishes between rendered and non rendered rows, adjusts viewRangeRendered)", function() {
         //initial view range
         model = helper.createModelFixture(6, 0, false);

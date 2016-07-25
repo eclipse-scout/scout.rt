@@ -2014,6 +2014,13 @@ scout.Tree.prototype.deleteNodes = function(nodes, parentNode) {
     this._visitNodes(node.childNodes, this._destroyTreeNode.bind(this));
   }, this);
 
+  // update child node indices
+  if (parentNode) {
+    this._updateChildNodeIndex(parentNode.childNodes);
+  } else {
+    this._updateChildNodeIndex(this.nodes);
+  }
+
   // remove node from html document
   if (this.rendered) {
     this._removeNodes(deletedNodes, parentNode);
