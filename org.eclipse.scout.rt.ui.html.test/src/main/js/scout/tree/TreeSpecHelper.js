@@ -55,7 +55,7 @@ scout.TreeSpecHelper.prototype.createModelNodesInternal = function(nodeCount, de
     if (parentNode) {
       nodeId = parentNode.id + '_' + nodeId;
     }
-    nodes[i] = this.createModelNode(nodeId, 'node ' + nodeId);
+    nodes[i] = this.createModelNode(nodeId, 'node ' + nodeId, i);
     nodes[i].expanded = expanded;
     if (depth > 0) {
       nodes[i].childNodes = this.createModelNodesInternal(nodeCount, depth - 1, expanded, nodes[i]);

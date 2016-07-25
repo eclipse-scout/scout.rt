@@ -107,7 +107,7 @@ describe("Tree", function() {
         expect(node0.childNodes[3].$node.text()).toBe(newNode0Child3.text);
       });
 
-      it("updates html document on specific position", function() {
+      it("updates html document at a specific position", function() {
         tree.render(session.$entryPoint);
 
         var newNode0Child3 = helper.createModelNode('0_3', 'newNode0Child3', 2);
@@ -154,6 +154,78 @@ describe("Tree", function() {
       //Check that no dom manipulation happened
       expect(helper.findAllNodes(tree).length).toBe(9);
       expect(node0.childNodes[3].$node).toBeUndefined();
+    });
+
+    it("expands the parent if parent.expanded = true and the new inserted nodes are the first child nodes", function() {
+      model = helper.createModelFixture(3, 0, true);
+      tree = helper.createTree(model);
+      node0 = model.nodes[0];
+      node1 = model.nodes[1];
+      node2 = model.nodes[2];
+      tree.render(session.$entryPoint);
+
+      var newNode0Child3 = helper.createModelNode('0_3', 'newNode0Child3');
+      var $node0 = node0.$node;
+      // Even tough the nodes were created with expanded=true, the $node should not have
+      // been rendered as expanded (because it has no children)
+      expect($node0).not.toHaveClass('expanded');
+      expect(helper.findAllNodes(tree).length).toBe(3);
+
+      tree.insertNodes([newNode0Child3], node0);
+      expect(helper.findAllNodes(tree).length).toBe(4);
+      expect(node0.childNodes[0].$node.text()).toBe(newNode0Child3.text);
+      expect($node0).toHaveClass('expanded');
+    });
+
+    describe("with breadcrumb style", function() {
+
+      beforeEach(function() {
+        tree.setDisplayStyle(scout.Tree.DisplayStyle.BREADCRUMB);
+      });
+
+      it("inserts a html node if the parent node is selected", function() {
+        tree.render(session.$entryPoint);
+        tree.revalidateLayoutTree();
+        var newNode0Child3 = helper.createModelNode('0_3', 'newNode0Child3', 3);
+        expect(helper.findAllNodes(tree).length).toBe(3); // top level nodes are visible
+
+        tree.selectNode(node0);
+        expect(helper.findAllNodes(tree).length).toBe(4); // only node0 and its child nodes are visible
+
+        tree.insertNodes([newNode0Child3], node0);
+        expect(helper.findAllNodes(tree).length).toBe(5);
+        expect(node0.childNodes[3].$node.text()).toBe(newNode0Child3.text);
+      });
+
+      it("only updates model if the parent node is not selected", function() {
+        tree.render(session.$entryPoint);
+        tree.revalidateLayoutTree();
+        var newNode0Child3 = helper.createModelNode('0_3', 'newNode0Child3', 3);
+        expect(helper.findAllNodes(tree).length).toBe(3); // top level nodes are visible
+
+        tree.insertNodes([newNode0Child3], node0);
+        expect(helper.findAllNodes(tree).length).toBe(3); // still 3 because no node is selected
+        expect(node0.childNodes[3].id).toBe(newNode0Child3.id);
+        expect(node0.childNodes[3].rendered).toBe(false);
+        expect(node0.childNodes[3].attached).toBe(false);
+      });
+
+      it("inserts html nodes at a specific position", function() {
+        tree.render(session.$entryPoint);
+
+        var newNode0Child3 = helper.createModelNode('0_3', 'newNode0Child3', 2);
+        var newNode0Child4 = helper.createModelNode('0_4', 'newNode0Child4', 3);
+        tree.selectNode(node0);
+        expect(helper.findAllNodes(tree).length).toBe(4);
+
+        tree.insertNodes([newNode0Child3, newNode0Child4], node0);
+        expect(helper.findAllNodes(tree).length).toBe(6);
+        expect(node0.childNodes[2].$node.text()).toBe(newNode0Child3.text);
+        expect(node0.childNodes[3].$node.text()).toBe(newNode0Child4.text);
+        expect(node0.childNodes[3].$node.attr('data-level')).toBe('1');
+        expect(node0.childNodes[3].$node.next().attr('data-level')).toBe('1');
+        expect(node0.childNodes[3].$node.next().text()).toBe('node 0_2');
+      });
     });
 
     it("expands the parent if parent.expanded = true and the new inserted nodes are the first child nodes", function() {
@@ -1231,13 +1303,16 @@ describe("Tree", function() {
   });
 
   describe("expandNode", function() {
+    var model, tree, nodes, node1;
+
+    beforeEach(function() {
+      model = helper.createModelFixture(3, 3);
+      tree = helper.createTree(model);
+      nodes = tree.nodes;
+      node1 = nodes[1];
+    });
 
     it("sets css class child-of-selected on direct children if the expanded node is selected", function() {
-      var model = helper.createModelFixture(3, 3);
-      var tree = helper.createTree(model);
-      var nodes = tree.nodes;
-      var node1 = nodes[1];
-
       tree.render(session.$entryPoint);
 
       tree.selectNodes(node1);
@@ -1256,6 +1331,42 @@ describe("Tree", function() {
       expect($children.length).toBe(0);
     });
 
+    it("renders the child nodes if parent is expanded", function() {
+      tree.render(session.$entryPoint);
+
+      var $nodes = helper.findAllNodes(tree);
+      expect($nodes.length).toBe(3);
+
+      tree.expandNode(node1);
+      $nodes = helper.findAllNodes(tree);
+      expect($nodes.length).toBe(6);
+      expect(node1.$node[0]).toBe($nodes[1]);
+      expect(node1.childNodes[0].$node[0]).toBe($nodes[2]);
+      expect(node1.childNodes[1].$node[0]).toBe($nodes[3]);
+      expect(node1.childNodes[2].$node[0]).toBe($nodes[4]);
+    });
+
+    describe("with breadcrumb style", function() {
+
+      beforeEach(function() {
+        tree.setDisplayStyle(scout.Tree.DisplayStyle.BREADCRUMB);
+      });
+
+      it("renders the child nodes if parent is expanded", function() {
+        tree.render(session.$entryPoint);
+
+        var $nodes = helper.findAllNodes(tree);
+        expect($nodes.length).toBe(3);
+
+        tree.selectNode(node1); // select node calls expand node
+        $nodes = helper.findAllNodes(tree);
+        expect($nodes.length).toBe(4);
+        expect(node1.$node[0]).toBe($nodes[0]);
+        expect(node1.childNodes[0].$node[0]).toBe($nodes[1]);
+        expect(node1.childNodes[1].$node[0]).toBe($nodes[2]);
+        expect(node1.childNodes[2].$node[0]).toBe($nodes[3]);
+      });
+    });
   });
 
   describe("expandAllParentNodes", function() {
