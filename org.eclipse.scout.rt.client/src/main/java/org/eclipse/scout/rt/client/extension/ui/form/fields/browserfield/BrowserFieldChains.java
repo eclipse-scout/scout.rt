@@ -29,9 +29,9 @@ public final class BrowserFieldChains {
     }
   }
 
-  public static class BrowserFieldLocationChangedChain extends AbstractBrowserFieldChain {
+  public static class BrowserFieldPostMessageChain extends AbstractBrowserFieldChain {
 
-    public BrowserFieldLocationChangedChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
+    public BrowserFieldPostMessageChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
       super(extensions);
     }
 
@@ -39,10 +39,27 @@ public final class BrowserFieldChains {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
         protected void callMethod(IBrowserFieldExtension<? extends AbstractBrowserField> next) {
-          next.execPostMessage(BrowserFieldLocationChangedChain.this, data, origin);
+          next.execPostMessage(BrowserFieldPostMessageChain.this, data, origin);
         }
       };
       callChain(methodInvocation, data, origin);
+    }
+  }
+
+  public static class BrowserFieldExternalWindowStateChangedChain extends AbstractBrowserFieldChain {
+
+    public BrowserFieldExternalWindowStateChangedChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
+      super(extensions);
+    }
+
+    public void execExternalWindowStateChanged(final boolean windowState) {
+      MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
+        @Override
+        protected void callMethod(IBrowserFieldExtension<? extends AbstractBrowserField> next) {
+          next.execExternalWindowStateChanged(BrowserFieldExternalWindowStateChangedChain.this, windowState);
+        }
+      };
+      callChain(methodInvocation, windowState);
     }
   }
 }

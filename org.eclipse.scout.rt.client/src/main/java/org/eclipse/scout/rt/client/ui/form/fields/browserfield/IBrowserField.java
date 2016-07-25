@@ -61,6 +61,9 @@ public interface IBrowserField extends IFormField {
   String PROP_SCROLL_BAR_ENABLED = "scrollBarEnabled";
   String PROP_SANDBOX_ENABLED = "sandboxEnabled";
   String PROP_SANDBOX_PERMISSIONS = "sandboxPermissions";
+  String PROP_SHOW_IN_EXTERNAL_WINDOW = "showInExternalWindow";
+  String PROP_EXTERNAL_WINDOW_FIELD_TEXT = "externalWindowFieldText";
+  String PROP_EXTERNAL_WINDOW_BUTTON_TEXT = "externalWindowButtonText";
 
   IBrowserFieldUIFacade getUIFacade();
 
@@ -161,4 +164,56 @@ public interface IBrowserField extends IFormField {
    * @see #setSandboxPermissions(EnumSet)
    */
   EnumSet<SandboxPermission> getSandboxPermissions();
+
+  /**
+   * Configures the browser field general behavior. By default the content of the browser field is shown inline or in an
+   * inline container (e.g. an &lt;iframe&gt; for the HTML5 UI layer), some very specific web pages (e.g. using
+   * plug-ins, complex frames within the webpage) might not be displayed well or may even lead to a browser crash.
+   * <p>
+   * This property may be used to disable the inline container usage &lt;iframe&gt; usage. Fallback behavior for the
+   * HTML5 UI layer is a separate browser window to show the content. Other UI layers may offer a different fallback,
+   * might even decide not to offer a fallback behavior at all (property is just a hint for the UI layer).
+   * <p>
+   * Property can only be changed during initialization, it can not be changed during runtime.
+   *
+   * @param <code>false</code>
+   *          to disable &lt;iframe&gt; usage, <code>true</code> otherwise.
+   * @see #isShowContentInIFrameEnabled()
+   */
+  void setShowInExternalWindow(boolean showInExternalWindow);
+
+  /**
+   * Returns whether content should be shown inline.
+   *
+   * @return <code>false</code> to disable &lt;iframe&gt; usage, <code>true</code> otherwise.
+   * @see #setShowContentInIFrameEnabled(boolean)
+   */
+  boolean isShowInExternalWindow();
+
+  /**
+   * Fallback text (shown in browser field itself), if content is shown in an external window.
+   *
+   * @see #isShowInExternalWindow()
+   * @see #getExternalWindowButtonText()
+   */
+  String getExternalWindowFieldText();
+
+  /**
+   * @see #getExternalWindowFieldText()
+   */
+  void setExternalWindowFieldText(String externalWindowFieldText);
+
+  /**
+   * Fallback text for button (shown in browser field itself) to reopen external window, if content is shown in an
+   * external window.
+   *
+   * @see #isShowInExternalWindow()
+   * @see #getExternalWindowFieldText()
+   */
+  String getExternalWindowButtonText();
+
+  /**
+   * @see #getExternalWindowButtonText()
+   */
+  void setExternalWindowButtonText(String externalWindowButtonText);
 }

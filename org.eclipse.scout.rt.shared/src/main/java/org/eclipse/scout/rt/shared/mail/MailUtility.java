@@ -43,7 +43,6 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import javax.mail.internet.MimePart;
-import javax.mail.internet.MimeUtility;
 import javax.mail.util.ByteArrayDataSource;
 
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
@@ -427,7 +426,7 @@ public class MailUtility {
         MimeBodyPart bodyPart = new MimeBodyPart();
         DataSource source = new FileDataSource(attachment);
         bodyPart.setDataHandler(new DataHandler(source));
-        bodyPart.setFileName(MimeUtility.encodeText(attachment.getName(), StandardCharsets.UTF_8.name(), null));
+        bodyPart.setFileName(attachment.getName());
         multiPart.addBodyPart(bodyPart);
       }
       msg.saveChanges();
@@ -463,7 +462,7 @@ public class MailUtility {
         MimeBodyPart bodyPart = new MimeBodyPart();
         DataSource source = new BinaryResourceDataSource(attachment);
         bodyPart.setDataHandler(new DataHandler(source));
-        bodyPart.setFileName(MimeUtility.encodeText(attachment.getFilename(), StandardCharsets.UTF_8.name(), null));
+        bodyPart.setFileName(attachment.getFilename());
         multiPart.addBodyPart(bodyPart);
       }
       msg.saveChanges();
@@ -612,6 +611,35 @@ public class MailUtility {
 
   static {
     fixMailcapCommandMap();
+    adjustMailMimeSystemProperties();
+  }
+
+  /**
+   * <p>
+   * Since Java Mail 1.5 <i>mail.mime.encodeparameters</i> has been set to default = <i>true</i> (leading to a RFC-2231
+   * compliant encoding). However some mail clients seem not to handle filename continuations correctly (see RFC-2231,
+   * 3). In this case, long filenames of attachments with special characters might not be displayed correctly (or at
+   * all).
+   * </p>
+   * <p>
+   * Disable <i>mail.mime.encodeparameters</i> for now (pre Java Mail 1.5 setting), the old encoded seem to work better
+   * for all tested mail clients.
+   * </p>
+   *
+   * @see http://www.oracle.com/technetwork/java/javamail/faq/index.html#encodefilename
+   * @see https://javamail.java.net/docs/JavaMail-1.5-changes.txt
+   * @see https://tools.ietf.org/html/rfc2231
+   */
+  private static void adjustMailMimeSystemProperties() {
+    if (System.getProperty("mail.mime.encodeparameters") == null) {
+      System.setProperty("mail.mime.encodeparameters", Boolean.FALSE.toString());
+    }
+    if (System.getProperty("mail.mime.encodefilename") == null) {
+      System.setProperty("mail.mime.encodefilename", Boolean.TRUE.toString());
+    }
+    if (System.getProperty("mail.mime.charset") == null) {
+      System.setProperty("mail.mime.charset", "utf-8");
+    }
   }
 
   /**

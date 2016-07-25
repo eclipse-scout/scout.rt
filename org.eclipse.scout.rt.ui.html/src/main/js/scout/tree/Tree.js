@@ -163,16 +163,16 @@ scout.Tree.prototype._updateFlatListAndSelectionPath = function(node, parentNode
       p.filterDirty = true;
 
       if (p !== node) {
-        //ensure node is expanded
+        // ensure node is expanded
         node.expanded = true;
-        //if parent was filtered before, try refilter after adding to selection path.
+        // if parent was filtered before, try refilter after adding to selection path.
         if (p.level === 0) {
           this._applyFiltersForNode(p);
 
-          //add visible nodes to visible nodes array when they are initialized
+          // add visible nodes to visible nodes array when they are initialized
           this._addToVisibleFlatList(p, false);
 
-          //process children
+          // process children
           this._addChildrenToFlatList(p, this.visibleNodesFlat.length - 1, false, null, true);
         }
       }
@@ -182,7 +182,9 @@ scout.Tree.prototype._updateFlatListAndSelectionPath = function(node, parentNode
     this._inSelectionPathList[node.id] = true;
   }
 
-  //add visible nodes to visible nodes array when they are initialized
+  this._applyFiltersForNode(node);
+
+  // add visible nodes to visible nodes array when they are initialized
   this._addToVisibleFlatList(node, false);
 };
 
@@ -196,7 +198,7 @@ scout.Tree.prototype._initTreeNode = function(node, parentNode) {
   }
   node.rendered = false;
   node.attached = false;
-  //create function to check if node is in hierarchy of a parent. is used on removal from flat list.
+  // create function to check if node is in hierarchy of a parent. is used on removal from flat list.
   node.isChildOf = function(parentNode) {
     if (parentNode === this.parentNode) {
       return true;
@@ -222,7 +224,6 @@ scout.Tree.prototype._initTreeNode = function(node, parentNode) {
     }
     return this.filterAccepted;
   };
-  this._applyFiltersForNode(node);
 
   this._updateMarkChildrenChecked(node, true, node.checked);
 
@@ -230,7 +231,7 @@ scout.Tree.prototype._initTreeNode = function(node, parentNode) {
 };
 
 scout.Tree.prototype._initTreeNodeInternal = function(node, parentNode) {
-  //override this if you want a custom node init before filtering.
+  // override this if you want a custom node init before filtering.
 };
 
 scout.Tree.prototype.destroy = function() {
@@ -2012,6 +2013,13 @@ scout.Tree.prototype.deleteNodes = function(nodes, parentNode) {
     // remove children from node map
     this._visitNodes(node.childNodes, this._destroyTreeNode.bind(this));
   }, this);
+
+  // update child node indices
+  if (parentNode) {
+    this._updateChildNodeIndex(parentNode.childNodes);
+  } else {
+    this._updateChildNodeIndex(this.nodes);
+  }
 
   // remove node from html document
   if (this.rendered) {

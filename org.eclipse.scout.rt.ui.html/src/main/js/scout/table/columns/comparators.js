@@ -55,6 +55,63 @@ scout.comparators = {
       }
       return 0;
     }
+  },
+
+  /**
+   * Alphanumeric comparator.
+   */
+  ALPHANUMERIC: {
+    collator: null,
+    installed: false,
+    install: function(session) {
+      scout.comparators.TEXT.install(session);
+      this.collator = scout.comparators.TEXT.collator;
+      return !!this.collator && scout.comparators.NUMERIC.install(session);
+    },
+    compare: function(valueA, valueB) {
+      if (!valueA && !valueB) {
+        return 0;
+      }
+      if (!valueA) {
+        return -1;
+      }
+      if (!valueB) {
+        return 1;
+      }
+
+      var pattern = '(([0-9]+)|([^0-9]+))';
+      var regexp1 = new RegExp(pattern, 'g');
+      var regexp2 = new RegExp(pattern, 'g');
+      var found1 = regexp1.exec(valueA);
+      var found2 = regexp2.exec(valueB);
+      while (found1 && found2) {
+        var n1 = parseInt(found1[1], 0);
+        var n2 = parseInt(found2[1], 0);
+        if (!isNaN(n1) && !isNaN(n2)) {
+          var numericResult = scout.comparators.NUMERIC.compare(n1, n2);
+          if (numericResult !== 0) {
+            return numericResult;
+          }
+        } else {
+          var textResult = scout.comparators.TEXT.compare(found1[1], found2[1]);
+          if (textResult !== 0) {
+            return textResult;
+          }
+        }
+        found1 = regexp1.exec(valueA);
+        found2 = regexp2.exec(valueB);
+      }
+
+      if (!found1 && !found2) {
+        return 0;
+      }
+      if (!found1) {
+        return -1;
+      }
+      if (!found2) {
+        return 1;
+      }
+    }
   }
 
 };

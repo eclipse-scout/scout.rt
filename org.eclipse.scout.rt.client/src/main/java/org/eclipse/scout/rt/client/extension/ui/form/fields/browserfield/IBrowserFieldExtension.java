@@ -11,11 +11,14 @@
 package org.eclipse.scout.rt.client.extension.ui.form.fields.browserfield;
 
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
-import org.eclipse.scout.rt.client.extension.ui.form.fields.browserfield.BrowserFieldChains.BrowserFieldLocationChangedChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.browserfield.BrowserFieldChains.BrowserFieldExternalWindowStateChangedChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.browserfield.BrowserFieldChains.BrowserFieldPostMessageChain;
 import org.eclipse.scout.rt.client.ui.form.fields.browserfield.AbstractBrowserField;
 
 public interface IBrowserFieldExtension<OWNER extends AbstractBrowserField> extends IFormFieldExtension<OWNER> {
 
-  void execPostMessage(BrowserFieldLocationChangedChain chain, String data, String origin);
+  void execPostMessage(BrowserFieldPostMessageChain chain, String data, String origin);
+
+  void execExternalWindowStateChanged(BrowserFieldExternalWindowStateChangedChain chain, boolean state);
 
 }

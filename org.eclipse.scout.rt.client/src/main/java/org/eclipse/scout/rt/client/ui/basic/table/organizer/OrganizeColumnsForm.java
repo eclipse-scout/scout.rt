@@ -31,6 +31,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.IHeaderCell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.TableRow;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractAlphanumericSortingStringColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractIntegerColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
@@ -304,7 +305,7 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
             }
 
             @Order(10)
-            public class ConfigNameColumn extends AbstractStringColumn {
+            public class ConfigNameColumn extends AbstractAlphanumericSortingStringColumn {
               @Override
               protected boolean getConfiguredEditable() {
                 return true;
@@ -313,11 +314,6 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
               @Override
               protected int getConfiguredSortIndex() {
                 return 1;
-              }
-
-              @Override
-              public int compareTableRows(ITableRow r1, ITableRow r2) {
-                return StringUtility.ALPHANUMERIC_COMPARATOR.compare(getValue(r1), getValue(r2));
               }
 
               @Override

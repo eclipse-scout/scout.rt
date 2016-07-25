@@ -36,6 +36,9 @@ import org.eclipse.scout.rt.client.extension.ui.form.fixture.OrigForm;
 import org.eclipse.scout.rt.client.extension.ui.form.fixture.OrigForm.MainBox.BottomBox;
 import org.eclipse.scout.rt.client.extension.ui.form.fixture.OrigForm.MainBox.TopBox;
 import org.eclipse.scout.rt.client.extension.ui.form.fixture.OrigForm.MainBox.TopBox.NameField;
+import org.eclipse.scout.rt.client.extension.ui.form.fixture.OrigFormEx;
+import org.eclipse.scout.rt.client.extension.ui.form.fixture.OrigFormEx.BottomBoxEx;
+import org.eclipse.scout.rt.client.extension.ui.form.fixture.OrigFormEx.BottomBoxEx.CityField;
 import org.eclipse.scout.rt.client.extension.ui.form.fixture.SingleTemplateUsageForm;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -57,11 +60,30 @@ public class MoveFormFieldTest extends AbstractLocalExtensionTestCase {
   public void testMoveField() throws Exception {
     BEANS.get(IExtensionRegistry.class).registerMove(NameField.class, 20d, BottomBox.class);
     OrigForm form = new OrigForm();
+    assertOrigFormMovedFields(form);
+    assertEquals(2, form.getBottomBox().getFieldCount());
+  }
 
+  @Test
+  public void testMoveFieldToReplacedContainer() {
+    BEANS.get(IExtensionRegistry.class).registerMove(NameField.class, 20d, BottomBox.class);
+    OrigFormEx form = new OrigFormEx();
+    assertOrigFormMovedFields(form);
+
+    // additional assertions for OrigFormEx with replaced BottomBox
+    assertEquals(3, form.getBottomBox().getFieldCount());
+    assertTrue(form.getBottomBox() instanceof BottomBoxEx);
+    assertSame(form.getNameField(), form.getFieldByClass(BottomBoxEx.class).getFieldByClass(NameField.class));
+    assertSame(form.getFieldByClass(CityField.class), form.getBottomBox().getFieldByClass(CityField.class));
+  }
+
+  /**
+   * Basic assertions for OrigForm and NameField moved to BottomBox.
+   */
+  private void assertOrigFormMovedFields(OrigForm form) {
     assertEquals(1, form.getTopBox().getFieldCount());
     assertSame(form.getSalutationField(), form.getTopBox().getFields().get(0));
 
-    assertEquals(2, form.getBottomBox().getFieldCount());
     assertSame(form.getStreetField(), form.getBottomBox().getFields().get(0));
     assertSame(form.getNameField(), form.getBottomBox().getFields().get(1));
     assertEquals(20d, form.getNameField().getOrder(), 0);

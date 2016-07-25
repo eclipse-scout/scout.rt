@@ -8,15 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.ui.form.fields.browserfield;
+package org.eclipse.scout.rt.client.ui.basic.table.columns;
 
-import org.eclipse.scout.rt.platform.resource.BinaryResource;
+public interface IAlphanumericSortingStringColumn extends IStringColumn {
 
-public interface IBrowserFieldUIFacade {
-
-  void firePostExternalWindowStateFromUI(boolean windowState);
-
-  void firePostMessageFromUI(String data, String origin);
-
-  BinaryResource requestBinaryResourceFromUI(String filename);
 }
