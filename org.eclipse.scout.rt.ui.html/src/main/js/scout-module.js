@@ -29,6 +29,7 @@
   __include("scout/util/fonts.js");
   __include("scout/util/icons.js");
   __include("scout/util/inspector.js");
+  __include("scout/util/locales.js");
   __include("scout/util/logging.js");
   __include("scout/util/mimeTypes.js");
   __include("scout/util/model.js");
