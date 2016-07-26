@@ -136,6 +136,16 @@ scout.BrowserField.prototype._openPopupWindow = function(reopenIfClosed) {
 
   if (!this._popupWindow || (reopenIfClosed && this._popupWindow.closed)) {
     var popupBlockerHandler = new scout.PopupBlockerHandler(this.session);
+    // (a) positioning and sizing
+    // screenLeft, screenTop might reveal the actual document screen position; screenX, screenY is just the browser window screen position
+    // window should not be positioned outside of the available screen (probably not even possible), subtract 400 pixel of lower right corner of screen
+    var windowLeft = Math.min(scout.nvl(window.screenLeft, window.screenX) + this.$field.offset().left, window.screen.availWidth - 400);
+    // add 50 px (guessing there is a toolbar of 50 px)
+    var windowTop = Math.min(scout.nvl(window.screenTop, window.screenY + 50) + this.$field.offset().top, window.screen.availHeight - 400);
+    // do not taskbar hide window, leave a safety margin of 40 pixel to lower screen bound (suppose a taskbar is shown there)
+    var windowWidth = ((this.$field.width() + windowLeft) > window.screen.availWidth) ? (window.screen.availWidth - windowLeft) : this.$field.width();
+    var windowHeight = ((this.$field.height() + windowTop) > window.screen.availHeight) ? (window.screen.availHeight - windowTop) : this.$field.height();
+    // (b) window specifications
     var windowSpecs = scout.strings.join(',',
         'directories=no',
         'location=no',
@@ -145,12 +155,10 @@ scout.BrowserField.prototype._openPopupWindow = function(reopenIfClosed) {
         'scrollbars=' + (this.scrollBarEnabled ? 'yes' : 'no'),
         'toolbar=no',
         'dependent=yes',
-        // screenLeft might reveal the actual document screen position, screenX is just the browser window screen position
-        'left=' + (scout.nvl(window.screenLeft, window.screenX) + this.$field.offset().left),
-        // screenTop might reveal the actual document screen position, screenY is just the browser window screen position - add 50 px (guessing there is a toolbar of 50 px)
-        'top=' + (scout.nvl(window.screenTop, window.screenY + 50) + this.$field.offset().top),
-        'width=' + this.$field.width(),
-        'height=' + this.$field.height()
+        'left=' + windowLeft,
+        'top=' + windowTop,
+        'width=' + windowWidth,
+        'height=' + windowHeight
         );
     this._popupWindow = popupBlockerHandler.openWindow(this.location,
         undefined,
