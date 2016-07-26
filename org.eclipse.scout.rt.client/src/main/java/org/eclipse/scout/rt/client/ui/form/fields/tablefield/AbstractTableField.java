@@ -46,12 +46,10 @@ import org.eclipse.scout.rt.platform.util.XmlUtility;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldBeanData;
-import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 
-@SuppressWarnings("deprecation")
 @ClassId("76887bde-6815-4f7d-9cbd-60409b49488d")
 @FormData(value = AbstractTableFieldBeanData.class, sdkCommand = SdkCommand.USE, defaultSubtypeSdkCommand = DefaultSubtypeSdkCommand.CREATE)
 public abstract class AbstractTableField<T extends ITable> extends AbstractFormField implements ITableField<T> {
@@ -260,11 +258,7 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
   @Override
   public void exportFormFieldData(AbstractFormFieldData target) {
     if (m_table != null) {
-      if (target instanceof AbstractTableFieldData) {
-        AbstractTableFieldData tableFieldData = (AbstractTableFieldData) target;
-        m_table.extractTableData(tableFieldData);
-      }
-      else if (target instanceof AbstractTableFieldBeanData) {
+      if (target instanceof AbstractTableFieldBeanData) {
         AbstractTableFieldBeanData tableBeanData = (AbstractTableFieldBeanData) target;
         m_table.exportToTableBeanData(tableBeanData);
         target.setValueSet(true);
@@ -281,11 +275,7 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
           if (!valueChangeTriggersEnabled) {
             setValueChangeTriggerEnabled(false);
           }
-          if (source instanceof AbstractTableFieldData) {
-            AbstractTableFieldData tableFieldData = (AbstractTableFieldData) source;
-            m_table.updateTable(tableFieldData);
-          }
-          else if (source instanceof AbstractTableFieldBeanData) {
+          if (source instanceof AbstractTableFieldBeanData) {
             AbstractTableFieldBeanData tableBeanData = (AbstractTableFieldBeanData) source;
             m_table.importFromTableBeanData(tableBeanData);
           }

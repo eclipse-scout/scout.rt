@@ -24,7 +24,6 @@ import org.eclipse.scout.rt.platform.holders.ITableBeanHolder;
 import org.eclipse.scout.rt.platform.holders.ITableHolder;
 import org.eclipse.scout.rt.platform.holders.NVPair;
 import org.eclipse.scout.rt.platform.holders.TableBeanHolderFilter;
-import org.eclipse.scout.rt.platform.holders.TableHolderFilter;
 import org.eclipse.scout.rt.server.TestJdbcServerSession;
 import org.eclipse.scout.rt.server.jdbc.fixture.ContainerBean;
 import org.eclipse.scout.rt.server.jdbc.fixture.FormDataWithArray;
@@ -32,7 +31,6 @@ import org.eclipse.scout.rt.server.jdbc.fixture.FormDataWithSet;
 import org.eclipse.scout.rt.server.jdbc.fixture.SqlServiceMock;
 import org.eclipse.scout.rt.server.jdbc.fixture.TableFieldBeanData;
 import org.eclipse.scout.rt.server.jdbc.fixture.TableFieldBeanData.TableFieldBeanDataRowData;
-import org.eclipse.scout.rt.server.jdbc.fixture.TableFieldData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.testing.server.runner.RunWithServerSession;
@@ -47,135 +45,6 @@ import org.junit.runner.RunWith;
 @RunWithServerSession(TestJdbcServerSession.class)
 @RunWithSubject("default")
 public class SelectInputBindTest {
-
-  /**
-   * {@link TableFieldData} is from type {@link ITableHolder} (existing before Luna). Direct batch update.
-   */
-  @Test
-  public void testBatchUpdateFromTableFieldData() throws Exception {
-    SqlServiceMock sql = createSqlServiceMock();
-    TableFieldData tableData = createTableFieldData(false);
-    sql.update("UDPATE my_table SET a=:{active}, s=:{state} where n=:{name} ", tableData);
-    assertExpectedProtocol(sql);
-  }
-
-  /**
-   * {@link TableFieldData} is from type {@link ITableHolder} (existing before Luna). TableData for batch update is in
-   * NVPair bind.
-   */
-  @Test
-  public void testBatchUpdateFromTableFieldDataInNVPair() throws Exception {
-    SqlServiceMock sql = createSqlServiceMock();
-    TableFieldData tableData = createTableFieldData(false);
-    sql.update("UDPATE my_table SET a=:{table.active}, s=:{table.state} where n=:{table.name} ", new NVPair("table", tableData));
-    assertExpectedProtocol(sql);
-  }
-
-  /**
-   * {@link TableFieldData} is from type {@link ITableHolder} (existing before Luna). TableData for batch update is in
-   * Map bind.
-   */
-  @Test
-  public void testBatchUpdateFromTableFieldDataInMap() throws Exception {
-    SqlServiceMock sql = createSqlServiceMock();
-    TableFieldData tableData = createTableFieldData(false);
-    Map<String, ?> map = Collections.singletonMap("table", tableData);
-    sql.update("UDPATE my_table SET a=:{table.active}, s=:{table.state} where n=:{table.name} ", map);
-    assertExpectedProtocol(sql);
-  }
-
-  /**
-   * {@link TableFieldData} is from type {@link ITableHolder} (existing before Luna). TableData for batch update is in a
-   * bean (ContainerBean).
-   */
-  @Test
-  public void testBatchUpdateFromTableFieldDataInBean() throws Exception {
-    SqlServiceMock sql = createSqlServiceMock();
-    TableFieldData tableData = createTableFieldData(false);
-    ContainerBean bean = new ContainerBean();
-    bean.setTableFieldData(tableData);
-    sql.update("UDPATE my_table SET a=:{tableFieldData.active}, s=:{tableFieldData.state} where n=:{tableFieldData.name} ", bean);
-    assertExpectedProtocol(sql);
-  }
-
-  /**
-   * {@link TableFieldData} in combination with {@link TableHolderFilter} (existing before Luna). Direct batch update.
-   */
-  @Test
-  public void testBatchUpdateFromTableHolderFilter() throws Exception {
-    SqlServiceMock sql = createSqlServiceMock();
-    TableFieldData tableData = createTableFieldData(true);
-    TableHolderFilter filter = new TableHolderFilter(tableData, ITableHolder.STATUS_UPDATED);
-    sql.update("UDPATE my_table SET a=:{active}, s=:{state} where n=:{name} ", filter);
-    assertExpectedProtocol(sql);
-  }
-
-  /**
-   * {@link TableFieldData} in combination with {@link TableHolderFilter} (existing before Luna). TableData for batch
-   * update is in NVPair bind.
-   */
-  @Test
-  public void testBatchUpdateFromTableHolderFilterInNVPair() throws Exception {
-    SqlServiceMock sql = createSqlServiceMock();
-    TableFieldData tableData = createTableFieldData(true);
-    TableHolderFilter filter = new TableHolderFilter(tableData, ITableHolder.STATUS_UPDATED);
-    sql.update("UDPATE my_table SET a=:{filter.active}, s=:{filter.state} where n=:{filter.name} ", new NVPair("filter", filter));
-    assertExpectedProtocol(sql);
-  }
-
-  /**
-   * {@link TableFieldData} in combination with {@link TableHolderFilter} (existing before Luna). TableData for batch
-   * update is in Map bind.
-   */
-  @Test
-  public void testBatchUpdateFromTableHolderFilterInMap() throws Exception {
-    SqlServiceMock sql = createSqlServiceMock();
-    TableFieldData tableData = createTableFieldData(true);
-    TableHolderFilter filter = new TableHolderFilter(tableData, ITableHolder.STATUS_UPDATED);
-    Map<String, ?> map = Collections.singletonMap("filter", filter);
-    sql.update("UDPATE my_table SET a=:{filter.active}, s=:{filter.state} where n=:{filter.name} ", map);
-    assertExpectedProtocol(sql);
-  }
-
-  /**
-   * {@link TableFieldData} in combination with {@link TableHolderFilter} (existing before Luna). TableData for batch
-   * update is in a bean (ContainerBean).
-   */
-  @Test
-  public void testBatchUpdateFromTableHolderFilterInBean() throws Exception {
-    SqlServiceMock sql = createSqlServiceMock();
-    TableFieldData tableData = createTableFieldData(true);
-    TableHolderFilter filter = new TableHolderFilter(tableData, ITableHolder.STATUS_UPDATED);
-    ContainerBean bean = new ContainerBean();
-    bean.setTableHolderFilter(filter);
-    sql.update("UDPATE my_table SET a=:{TableHolderFilter.active}, s=:{TableHolderFilter.state} where n=:{TableHolderFilter.name} ", bean);
-    assertExpectedProtocol(sql);
-  }
-
-  private TableFieldData createTableFieldData(boolean withAdditionalRows) {
-    TableFieldData tableData = new TableFieldData();
-    if (withAdditionalRows) {
-      createRow(tableData, ITableHolder.STATUS_INSERTED, false, 6, "xxx");
-    }
-    createRow(tableData, ITableHolder.STATUS_UPDATED, true, 3, "lorem");
-    if (withAdditionalRows) {
-      createRow(tableData, ITableHolder.STATUS_DELETED, false, 8, "yyy");
-    }
-    createRow(tableData, ITableHolder.STATUS_UPDATED, false, 6, "ipsum");
-    if (withAdditionalRows) {
-      createRow(tableData, ITableHolder.STATUS_INSERTED, true, 2, "zzz");
-    }
-    return tableData;
-  }
-
-  @SuppressWarnings("deprecation")
-  private void createRow(TableFieldData tableData, int rowStatus, Boolean active, Integer state, String name) {
-    int row;
-    row = tableData.addRow(rowStatus);
-    tableData.setActive(row, active);
-    tableData.setState(row, state);
-    tableData.setName(row, name);
-  }
 
   /**
    * {@link TableFieldBeanData} is from type {@link ITableBeanHolder} (introduced with Luna). Direct batch update.

@@ -339,29 +339,6 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
   /*
    * Service aspect
    */
-
-  /**
-   * extract transfer data to be sent to the backend
-   *
-   * @Deprecated: 'Array based TableData' are not supported by the Scout SDK in Neon. Use
-   *              {@link #exportToTableBeanData(AbstractTableFieldBeanData)} instead. This method will be removed with
-   *              Oxygen. See Bug 496292.
-   */
-  @Deprecated
-  @SuppressWarnings("deprecation")
-  void extractTableData(org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldData target);
-
-  /**
-   * apply transfer data to this table
-   *
-   * @Deprecated: 'Array based TableData' are not supported by the Scout SDK in Neon. Use
-   *              {@link #importFromTableBeanData(AbstractTableFieldBeanData)} instead. This method will be removed with
-   *              Oxygen. See Bug 496292.
-   */
-  @Deprecated
-  @SuppressWarnings("deprecation")
-  void updateTable(org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldData source);
-
   List<IKeyStroke> getKeyStrokes();
 
   void setKeyStrokes(List<? extends IKeyStroke> keyStrokes);

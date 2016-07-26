@@ -14,18 +14,9 @@ import org.eclipse.scout.rt.platform.holders.TableBeanHolderFilter;
 import org.eclipse.scout.rt.platform.holders.TableHolderFilter;
 
 public class ContainerBean {
-  private TableFieldData m_tableFieldData;
   private TableFieldBeanData m_tableFieldBeanData;
   private TableHolderFilter m_tableHolderFilter;
   private TableBeanHolderFilter m_tableBeanHolderFilter;
-
-  public TableFieldData getTableFieldData() {
-    return m_tableFieldData;
-  }
-
-  public void setTableFieldData(TableFieldData tableFieldData) {
-    m_tableFieldData = tableFieldData;
-  }
 
   public TableFieldBeanData getTableFieldBeanData() {
     return m_tableFieldBeanData;

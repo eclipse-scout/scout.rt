@@ -108,7 +108,6 @@ import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 import org.eclipse.scout.rt.platform.util.concurrent.OptimisticLock;
 import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldBeanData;
-import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldData;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 import org.eclipse.scout.rt.shared.extension.ContributionComposite;
 import org.eclipse.scout.rt.shared.extension.ExtensionUtility;
@@ -124,7 +123,6 @@ import org.slf4j.LoggerFactory;
  * Columns are defined as inner classes<br>
  * for every inner column class there is a generated getXYColumn method directly on the table
  */
-@SuppressWarnings("deprecation")
 public abstract class AbstractTable extends AbstractPropertyObserver implements ITable, IContributionOwner, IExtensibleObject {
   private static final Logger LOG = LoggerFactory.getLogger(AbstractTable.class);
 
@@ -1691,82 +1689,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       }
       finally {
         setTableChanging(false);
-      }
-    }
-  }
-
-  @Override
-  public void extractTableData(AbstractTableFieldData target) {
-    for (int i = 0, ni = getRowCount(); i < ni; i++) {
-      ITableRow row = getRow(i);
-      int newRowIndex = target.addRow();
-      for (int j = 0, nj = row.getCellCount(); j < nj; j++) {
-        target.setValueAt(newRowIndex, j, row.getCellValue(j));
-      }
-      target.setRowState(newRowIndex, row.getStatus());
-    }
-    for (ITableRow delRow : getDeletedRows()) {
-      int newRowIndex = target.addRow();
-      for (int j = 0, nj = delRow.getCellCount(); j < nj; j++) {
-        target.setValueAt(newRowIndex, j, delRow.getCellValue(j));
-      }
-      target.setRowState(newRowIndex, AbstractTableFieldData.STATUS_DELETED);
-    }
-    target.setValueSet(true);
-  }
-
-  @Override
-  @SuppressWarnings({"unchecked"})
-  public void updateTable(AbstractTableFieldData source) {
-    if (source.isValueSet()) {
-      discardAllDeletedRows();
-      int deleteCount = 0;
-      List<ITableRow> newRows = new ArrayList<ITableRow>();
-      for (int i = 0, ni = source.getRowCount(); i < ni; i++) {
-        int importState = source.getRowState(i);
-        if (importState != AbstractTableFieldData.STATUS_DELETED) {
-          ITableRow newTableRow = new TableRow(getColumnSet());
-          for (int j = 0, nj = source.getColumnCount(); j < nj; j++) {
-            if (j < getColumnCount()) {
-              getColumnSet().getColumn(j).setValue(newTableRow, source.getValueAt(i, j));
-            }
-            else {
-              newTableRow.setCellValue(j, source.getValueAt(i, j));
-            }
-          }
-          newTableRow.setStatus(importState);
-          newRows.add(newTableRow);
-        }
-        else {
-          deleteCount++;
-        }
-      }
-      replaceRows(newRows);
-      if (deleteCount > 0) {
-        try {
-          setTableChanging(true);
-          //
-          for (int i = 0, ni = source.getRowCount(); i < ni; i++) {
-            int importState = source.getRowState(i);
-            if (importState == AbstractTableFieldData.STATUS_DELETED) {
-              ITableRow newTableRow = new TableRow(getColumnSet());
-              for (int j = 0, nj = source.getColumnCount(); j < nj; j++) {
-                if (j < getColumnCount()) {
-                  getColumnSet().getColumn(j).setValue(newTableRow, source.getValueAt(i, j));
-                }
-                else {
-                  newTableRow.setCellValue(j, source.getValueAt(i, j));
-                }
-              }
-              newTableRow.setStatus(ITableRow.STATUS_NON_CHANGED);
-              ITableRow addedRow = addRow(newTableRow);
-              deleteRow(addedRow);
-            }
-          }
-        }
-        finally {
-          setTableChanging(false);
-        }
       }
     }
   }
