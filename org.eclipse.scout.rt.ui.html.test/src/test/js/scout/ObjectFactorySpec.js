@@ -52,7 +52,7 @@ describe('ObjectFactory', function() {
     } else if ('AggregateTableControl' === objectType) {
       model.table = {
         columns: [],
-        on: function(){}
+        on: function() {}
       };
     } else if ('TabBox' === objectType) {
       var tabItemId = 'tabItem' + id;
@@ -131,6 +131,17 @@ describe('ObjectFactory', function() {
       my.VariantStringField = function() {};
       var model = {
         objectType: 'my.StringField.Variant'
+      };
+      var object = scout.objectFactory._createObjectByType(model);
+      expect(object instanceof my.VariantStringField).toBe(true);
+    });
+
+    it('can handle too many dots in objectType', function() {
+      window.my = {};
+      var my = window.my;
+      my.VariantStringField = function() {};
+      var model = {
+        objectType: 'my.StringField.Variant.Foo'
       };
       var object = scout.objectFactory._createObjectByType(model);
       expect(object instanceof my.VariantStringField).toBe(true);

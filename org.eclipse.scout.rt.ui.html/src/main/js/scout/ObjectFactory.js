@@ -59,8 +59,8 @@ scout.ObjectFactory.prototype._createObjectByType = function(model) {
 
     // Extract variant
     var variant = '';
-    if (objectTypeParts.length === 2) {
-      variant = objectTypeParts[1];
+    if (objectTypeParts.length >= 2) {
+      variant = objectTypeParts[1]; // ignore the rest
     }
 
     scoutClass = variant + objectTypeParts[0];
