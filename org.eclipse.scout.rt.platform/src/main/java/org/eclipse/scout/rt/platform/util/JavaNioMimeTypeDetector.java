@@ -30,12 +30,6 @@ import org.eclipse.scout.rt.platform.Order;
 @ApplicationScoped
 public class JavaNioMimeTypeDetector implements IMimeTypeDetector {
 
-  /**
-   * Do not use this constructor, use BEANS.get(JavaNioMimeTypeDetector.class) instead.
-   */
-  public JavaNioMimeTypeDetector() {
-  }
-
   @Override
   public String getMimeType(Path path) {
     try {
@@ -46,5 +40,4 @@ public class JavaNioMimeTypeDetector implements IMimeTypeDetector {
     }
     return null;
   }
-
 }

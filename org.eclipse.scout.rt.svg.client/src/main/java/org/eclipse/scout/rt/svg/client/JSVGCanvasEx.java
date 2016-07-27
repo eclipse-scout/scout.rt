@@ -36,9 +36,6 @@ public class JSVGCanvasEx extends JSVGCanvas {
 
   protected class ToolTipModifierEx implements EventListener {
 
-    public ToolTipModifierEx() {
-    }
-
     @Override
     public void handleEvent(Event evt) {
       if (matchLastToolTipEvent(evt.getTimeStamp(), evt.getTarget())) {

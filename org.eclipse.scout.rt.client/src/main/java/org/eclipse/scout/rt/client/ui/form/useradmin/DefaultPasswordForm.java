@@ -176,11 +176,6 @@ public class DefaultPasswordForm extends AbstractForm {
   }
 
   public class ChangeHandler extends AbstractFormHandler {
-
-    @Override
-    protected void execLoad() {
-    }
-
     @Override
     protected void execStore() {
       if (getNewPasswordField().getValue() != null && !getNewPasswordField().getValue().equals(getRepeatPasswordField().getValue())) {

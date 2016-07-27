@@ -37,6 +37,7 @@ public class TablePageState extends AbstractPageState implements Serializable, C
   private List<TableColumnState> m_availableColumns;
 
   public TablePageState() {
+    super();
   }
 
   protected TablePageState(TablePageState state) {

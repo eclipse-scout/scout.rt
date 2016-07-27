@@ -19,9 +19,6 @@ import org.eclipse.scout.rt.platform.util.date.DateFormatProvider;
 
 public class DateTimeFormatFactory {
 
-  public DateTimeFormatFactory() {
-  }
-
   public DateFormat getDayMonthYear(int style) {
     return BEANS.get(DateFormatProvider.class).getDateInstance(style, NlsLocale.get());
   }
@@ -54,5 +51,4 @@ public class DateTimeFormatFactory {
   private String removeYear(String s) {
     return s.replaceAll("[/\\-,. ]*[y]+[/\\-,.]*", "").trim();
   }
-
 }

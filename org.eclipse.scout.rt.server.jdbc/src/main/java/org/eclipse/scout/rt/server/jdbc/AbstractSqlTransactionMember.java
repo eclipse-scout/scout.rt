@@ -37,11 +37,6 @@ public abstract class AbstractSqlTransactionMember extends AbstractTransactionMe
     return true;
   }
 
-  @Override
-  public boolean commitPhase1() {
-    return true;
-  }
-
   protected void setFinishingTransaction(boolean finishingTransaction) {
     m_finishingTransaction = finishingTransaction;
   }
@@ -96,5 +91,4 @@ public abstract class AbstractSqlTransactionMember extends AbstractTransactionMe
       }
     }
   }
-
 }

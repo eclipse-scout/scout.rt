@@ -23,9 +23,6 @@ public class CallInfo {
   private Throwable m_returnException;
   private Object[] m_outVariables;
 
-  public CallInfo() {
-  }
-
   public String getService() {
     return m_service;
   }

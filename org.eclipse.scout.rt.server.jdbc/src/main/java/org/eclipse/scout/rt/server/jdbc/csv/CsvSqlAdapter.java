@@ -222,6 +222,7 @@ public class CsvSqlAdapter {
 
           @Override
           public void finished(Connection con, PreparedStatement stm, ResultSet rs, int rowCount) {
+            // do nothing
           }
         };
         m_sqlService.selectStreaming(sqlText, handler, base);

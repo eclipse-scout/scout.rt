@@ -21,5 +21,6 @@ public class UiHttpSessionListener implements HttpSessionListener {
 
   @Override
   public void sessionDestroyed(HttpSessionEvent event) {
+    // ignore notifications about destroyed HTTP sessions. SessionStore is responsible for acting on them
   }
 }

@@ -53,6 +53,7 @@ public class VirtualTreeNode implements IVirtualTreeNode, ICellObserver {
 
   @Override
   public void initTreeNode() {
+    // do nothing
   }
 
   @Override
@@ -62,6 +63,7 @@ public class VirtualTreeNode implements IVirtualTreeNode, ICellObserver {
 
   @Override
   public void setInitializing(boolean b) {
+    // do nothing
   }
 
   @Override
@@ -92,10 +94,12 @@ public class VirtualTreeNode implements IVirtualTreeNode, ICellObserver {
 
   @Override
   public void setStatusInternal(int status) {
+    // do nothing
   }
 
   @Override
   public void setStatus(int status) {
+    // do nothing
   }
 
   @Override
@@ -144,6 +148,7 @@ public class VirtualTreeNode implements IVirtualTreeNode, ICellObserver {
 
   @Override
   public void resetFilterCache() {
+    // do nothing
   }
 
   @Override
@@ -173,6 +178,7 @@ public class VirtualTreeNode implements IVirtualTreeNode, ICellObserver {
 
   @Override
   public final void decorateCell() {
+    // do nothing
   }
 
   @Override
@@ -182,10 +188,12 @@ public class VirtualTreeNode implements IVirtualTreeNode, ICellObserver {
 
   @Override
   public void setLeafInternal(boolean b) {
+    // do nothing
   }
 
   @Override
   public void setLeaf(boolean b) {
+    // do nothing
   }
 
   @Override
@@ -195,6 +203,7 @@ public class VirtualTreeNode implements IVirtualTreeNode, ICellObserver {
 
   @Override
   public void setChecked(boolean b) {
+    // do nothing
   }
 
   @Override
@@ -204,6 +213,7 @@ public class VirtualTreeNode implements IVirtualTreeNode, ICellObserver {
 
   @Override
   public void setExpandedInternal(boolean b) {
+    // do nothing
   }
 
   @Override
@@ -213,6 +223,7 @@ public class VirtualTreeNode implements IVirtualTreeNode, ICellObserver {
 
   @Override
   public void setExpandedLazyInternal(boolean expandedLazy) {
+    // do nothing
   }
 
   @Override
@@ -222,6 +233,7 @@ public class VirtualTreeNode implements IVirtualTreeNode, ICellObserver {
 
   @Override
   public void setLazyExpandingEnabled(boolean lazyExpandingEnabled) {
+    // do nothing
   }
 
   @Override
@@ -231,14 +243,17 @@ public class VirtualTreeNode implements IVirtualTreeNode, ICellObserver {
 
   @Override
   public void setInitialExpanded(boolean b) {
+    // do nothing
   }
 
   @Override
   public void setExpanded(boolean b) {
+    // do nothing
   }
 
   @Override
   public void setVisiblePermissionInternal(Permission p) {
+    // do nothing
   }
 
   @Override
@@ -253,26 +268,32 @@ public class VirtualTreeNode implements IVirtualTreeNode, ICellObserver {
 
   @Override
   public void setVisibleInternal(boolean b) {
+    // do nothing
   }
 
   @Override
   public void setVisibleGrantedInternal(boolean b) {
+    // do nothing
   }
 
   @Override
   public void setVisiblePermission(Permission p) {
+    // do nothing
   }
 
   @Override
   public void setVisible(boolean b) {
+    // do nothing
   }
 
   @Override
   public void setVisibleGranted(boolean b) {
+    // do nothing
   }
 
   @Override
   public void setEnabledPermissionInternal(Permission p) {
+    // do nothing
   }
 
   @Override
@@ -292,10 +313,12 @@ public class VirtualTreeNode implements IVirtualTreeNode, ICellObserver {
 
   @Override
   public void setEnabledGrantedInternal(boolean b) {
+    // do nothing
   }
 
   @Override
   public void setEnabledPermission(Permission p) {
+    // do nothing
   }
 
   @Override
@@ -305,6 +328,7 @@ public class VirtualTreeNode implements IVirtualTreeNode, ICellObserver {
 
   @Override
   public void setEnabledGranted(boolean b) {
+    // do nothing
   }
 
   @Override
@@ -314,6 +338,7 @@ public class VirtualTreeNode implements IVirtualTreeNode, ICellObserver {
 
   @Override
   public void setChildrenVolatile(boolean childrenVolatile) {
+    // do nothing
   }
 
   @Override
@@ -323,6 +348,7 @@ public class VirtualTreeNode implements IVirtualTreeNode, ICellObserver {
 
   @Override
   public void setChildrenDirty(boolean dirty) {
+    // A VirtualTreeNode has no children. They are always loaded (see isChildrenLoaded)
   }
 
   @Override
@@ -332,6 +358,7 @@ public class VirtualTreeNode implements IVirtualTreeNode, ICellObserver {
 
   @Override
   public void setPrimaryKey(Object key) {
+    // primary key is always null
   }
 
   @Override
@@ -346,6 +373,7 @@ public class VirtualTreeNode implements IVirtualTreeNode, ICellObserver {
 
   @Override
   public void setMenus(List<? extends IMenu> a) {
+    // VirtualTreeNodes do not have any menus (see getMenus and getMenu)
   }
 
   @Override
@@ -465,10 +493,12 @@ public class VirtualTreeNode implements IVirtualTreeNode, ICellObserver {
 
   @Override
   public void nodeAddedNotify() {
+    // do nothing
   }
 
   @Override
   public void nodeRemovedNotify() {
+    // do nothing
   }
 
   @Override
@@ -478,10 +508,12 @@ public class VirtualTreeNode implements IVirtualTreeNode, ICellObserver {
 
   @Override
   public void setChildrenLoaded(boolean b) {
+    // A VirtualTreeNode has no children. They are always loaded (see isChildrenLoaded)
   }
 
   @Override
   public final void ensureChildrenLoaded() {
+    // A VirtualTreeNode has no children. They are always loaded (see isChildrenLoaded)
   }
 
   @Override
@@ -499,6 +531,7 @@ public class VirtualTreeNode implements IVirtualTreeNode, ICellObserver {
 
   @Override
   public void loadChildren() {
+    // A VirtualTreeNode has no children. They are always loaded (see isChildrenLoaded)
   }
 
   @Override
@@ -525,6 +558,6 @@ public class VirtualTreeNode implements IVirtualTreeNode, ICellObserver {
 
   @Override
   public void dispose() {
+    // nothing to dispose
   }
-
 }

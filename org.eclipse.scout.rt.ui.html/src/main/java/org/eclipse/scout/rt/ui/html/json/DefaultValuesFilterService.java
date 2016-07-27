@@ -39,9 +39,6 @@ public class DefaultValuesFilterService implements IDefaultValuesFilterService {
   private long m_lastCheckForFileUpdate = -1; // timestamp in milliseconds (only used in dev mode)
   private String m_combinedDefaultValuesConfiguration = null;
 
-  public DefaultValuesFilterService() {
-  }
-
   protected DefaultValuesFilter getFilter() {
     return m_filter;
   }

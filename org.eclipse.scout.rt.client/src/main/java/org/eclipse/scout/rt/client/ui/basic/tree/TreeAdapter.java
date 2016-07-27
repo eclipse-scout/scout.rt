@@ -27,5 +27,6 @@ public class TreeAdapter implements TreeListener {
 
   @Override
   public void treeChanged(TreeEvent e) {
+    // expected to be overridden by subclass
   }
 }

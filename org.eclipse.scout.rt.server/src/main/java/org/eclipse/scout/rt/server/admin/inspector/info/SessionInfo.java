@@ -22,9 +22,6 @@ public class SessionInfo {
   private Subject m_subject;
   private UserAgent m_userAgent;
 
-  public SessionInfo() {
-  }
-
   public String getUserId() {
     return m_userId;
   }

@@ -114,24 +114,6 @@ public class PreparedStatementCache extends AbstractTransactionMember implements
   }
 
   @Override
-  public boolean needsCommit() {
-    return false;
-  }
-
-  @Override
-  public boolean commitPhase1() {
-    return true;
-  }
-
-  @Override
-  public void commitPhase2() {
-  }
-
-  @Override
-  public void rollback() {
-  }
-
-  @Override
   public void release() {
     for (Iterator<Entry<String, PreparedStatement>> iterator = m_statementCache.entrySet().iterator(); iterator.hasNext();) {
       Entry<String, PreparedStatement> entry = iterator.next();

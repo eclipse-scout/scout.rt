@@ -136,5 +136,6 @@ public class GzipServletFilter implements Filter {
 
   @Override
   public void destroy() {
+    // no resources to destroy
   }
 }

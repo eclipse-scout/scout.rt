@@ -243,6 +243,7 @@ public class HttpServiceTunnel extends AbstractServiceTunnel {
    * read and interpret custom HTTP headers.
    */
   protected void interceptHttpResponse(URLConnection urlConn, ServiceTunnelRequest call, int httpCode) {
+    // subclasses may intercept HTTP response
   }
 
   /**

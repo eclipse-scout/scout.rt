@@ -30,9 +30,6 @@ public class BasicTransaction implements ITransaction {
   private boolean m_commitPhase;
   private boolean m_cancelled;
 
-  public BasicTransaction() {
-  }
-
   @Override
   public void registerMember(ITransactionMember member) {
     synchronized (m_memberMapLock) {

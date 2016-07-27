@@ -27,9 +27,6 @@ import org.eclipse.scout.rt.shared.services.lookup.IServerBatchLookupService;
 @Order(4900)
 public class BatchLookupServiceClientProxy implements IBatchLookupService {
 
-  public BatchLookupServiceClientProxy() {
-  }
-
   @Override
   public List<List<ILookupRow<?>>> getBatchDataByKey(BatchLookupCall batch) {
     List<ILookupCall<?>> allCalls = batch.getCallBatch();

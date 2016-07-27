@@ -163,9 +163,6 @@ public class SqlParser {
     }
   }
 
-  public SqlParser() {
-  }
-
   public Statement parse(String s) {
     ParseContext ctx = new ParseContext();
     List<IToken> list = tokenize(s, ctx);

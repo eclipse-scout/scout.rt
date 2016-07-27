@@ -30,9 +30,6 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
 public class LocalLookupCall<T> extends LookupCall<T> {
   private static final long serialVersionUID = 0L;
 
-  public LocalLookupCall() {
-  }
-
   @Override
   public boolean equals(Object obj) {
     return super.equals(obj);

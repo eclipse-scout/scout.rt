@@ -22,6 +22,7 @@ public class AffineTransformSpec implements Serializable {
   public double angle = 0;
 
   public AffineTransformSpec() {
+    super();
   }
 
   public AffineTransformSpec(double dx, double dy, double sx, double sy, double angle) {

@@ -571,12 +571,12 @@ public class VirtualDesktop implements IDesktop {
 
   @Override
   public void addNotification(IDesktopNotification notification) {
-    // NOP
+    // desktop notifications are silently ignored
   }
 
   @Override
   public void removeNotification(IDesktopNotification notification) {
-    // NOP
+    // desktop notifications are silently ignored
   }
 
   @Override
@@ -621,7 +621,7 @@ public class VirtualDesktop implements IDesktop {
 
   @Override
   public void setDisplayStyle(String displayStyle) {
-    // NOP
+    // always DISPLAY_STYLE_DEFAULT is used
   }
 
   @Override
@@ -661,6 +661,7 @@ public class VirtualDesktop implements IDesktop {
 
   @Override
   public void setBrowserHistoryEntry(BrowserHistoryEntry browserHistory) {
+    // NOP
   }
 
   @Override
@@ -675,6 +676,7 @@ public class VirtualDesktop implements IDesktop {
 
   @Override
   public void setBenchVisible(boolean visible) {
+    // NOP
   }
 
   @Override

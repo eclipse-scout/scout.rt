@@ -30,9 +30,6 @@ import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 public class TestingLookupService implements ILookupService<Long> {
   private List<ILookupRow<Long>> m_rows = new ArrayList<ILookupRow<Long>>();
 
-  public TestingLookupService() {
-  }
-
   public List<ILookupRow<Long>> getRows() {
     return CollectionUtility.arrayList(m_rows);
   }

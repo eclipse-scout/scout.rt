@@ -21,9 +21,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.composer.node.EntityNode;
 
 public class ComposerDisplayTextBuilder {
 
-  public ComposerDisplayTextBuilder() {
-  }
-
   public void build(ITreeNode node, StringBuilder buf, String prefix) {
     visitAndNodes(node.getChildNodes(), buf, prefix);
   }

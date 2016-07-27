@@ -36,10 +36,6 @@ public class DownloadHandlerStorage {
   private final Map<String, BinaryResource> m_valueMap = new HashMap<>();
   private final Map<String, IFuture> m_futureMap = new HashMap<>();
 
-  public DownloadHandlerStorage() {
-
-  }
-
   protected Map<String, BinaryResource> valueMap() {
     return m_valueMap;
   }

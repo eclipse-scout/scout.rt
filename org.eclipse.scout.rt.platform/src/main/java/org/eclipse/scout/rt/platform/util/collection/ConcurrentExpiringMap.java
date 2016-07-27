@@ -476,6 +476,7 @@ public class ConcurrentExpiringMap<K, V> extends AbstractMap<K, V> implements Co
    * @param value
    */
   protected void execEntryEvicted(K key, V value) {
+    // hook method for subclasses
   }
 
   private final class EntrySet extends AbstractSet<Map.Entry<K, V>> {

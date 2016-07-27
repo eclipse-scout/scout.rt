@@ -43,6 +43,7 @@ public class UriBuilder {
   private String m_fragment;
 
   public UriBuilder() {
+    super();
   }
 
   public UriBuilder(String uri) {

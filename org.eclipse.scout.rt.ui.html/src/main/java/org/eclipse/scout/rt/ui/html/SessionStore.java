@@ -420,6 +420,7 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
 
   @Override
   public void valueBound(HttpSessionBindingEvent event) {
+    // ignore notifications about being bound to an HTTP session
   }
 
   @Override

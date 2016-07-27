@@ -21,9 +21,6 @@ public class ComposerEitherOrNodeData extends TreeNodeData {
   private boolean m_beginOfEitherOr;
   private boolean m_negated = false;
 
-  public ComposerEitherOrNodeData() {
-  }
-
   public boolean isBeginOfEitherOr() {
     return m_beginOfEitherOr;
   }

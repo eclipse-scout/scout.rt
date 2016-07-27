@@ -128,9 +128,6 @@ public class TokenBasedSearchFilter extends SearchFilter implements Cloneable {
     private final List<TreeNodeToken> m_children = new ArrayList<TreeNodeToken>(1);
     private boolean m_negative;
 
-    public TreeNodeToken() {
-    }
-
     public void addChild(TreeNodeToken child) {
       if (child != null) {
         m_children.add(child);
@@ -152,16 +149,10 @@ public class TokenBasedSearchFilter extends SearchFilter implements Cloneable {
 
   public static class AndNodeToken extends TreeNodeToken implements Serializable {
     private static final long serialVersionUID = 1L;
-
-    public AndNodeToken() {
-    }
   }
 
   public static class OrNodeToken extends TreeNodeToken implements Serializable {
     private static final long serialVersionUID = 1L;
-
-    public OrNodeToken() {
-    }
   }
 
   public static class AttributeNodeToken extends TreeNodeToken implements Serializable {

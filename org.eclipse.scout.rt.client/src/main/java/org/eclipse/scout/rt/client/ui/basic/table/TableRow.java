@@ -329,10 +329,12 @@ public class TableRow implements ITableRow {
 
   @Override
   public void touch() {
+    // TableRow is not managed by a table
   }
 
   @Override
   public void delete() {
+    // TableRow is not managed by a table
   }
 
   @Override

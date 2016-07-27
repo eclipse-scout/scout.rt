@@ -29,12 +29,6 @@ import org.eclipse.scout.rt.platform.resource.MimeType;
 @ApplicationScoped
 public class PrimaryMimeTypeDetector implements IMimeTypeDetector {
 
-  /**
-   * Do not use this constructor, use BEANS.get(PrimaryMimeTypeDetector.class) instead.
-   */
-  public PrimaryMimeTypeDetector() {
-  }
-
   @Override
   public String getMimeType(Path path) {
     if (path == null) {

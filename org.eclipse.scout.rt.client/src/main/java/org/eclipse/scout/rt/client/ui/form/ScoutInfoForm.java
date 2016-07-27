@@ -67,7 +67,12 @@ public class ScoutInfoForm extends AbstractForm {
     startInternal(new ModifyHandler());
   }
 
+  /**
+   * Call-back method for sub classes allowing them to add additional binary resources (e.g. images). This default
+   * implementation does not add any resources.
+   */
   protected void contributeHtmlAttachments(Collection<BinaryResource> collection) {
+    // subclasses may add additional resources
   }
 
   protected String createHtmlBody() {

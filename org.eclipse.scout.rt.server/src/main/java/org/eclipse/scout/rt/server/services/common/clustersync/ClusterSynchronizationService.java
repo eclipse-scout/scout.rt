@@ -303,22 +303,13 @@ public class ClusterSynchronizationService implements IClusterSynchronizationSer
     }
 
     @Override
-    public boolean commitPhase1() {
-      return true;
-    }
-
-    @Override
-    public synchronized void commitPhase2() {
-      publishInternal(m_messageQueue);
-    }
-
-    @Override
     public synchronized boolean needsCommit() {
       return !m_messageQueue.isEmpty();
     }
 
     @Override
-    public void release() {
+    public synchronized void commitPhase2() {
+      publishInternal(m_messageQueue);
     }
 
     @Override

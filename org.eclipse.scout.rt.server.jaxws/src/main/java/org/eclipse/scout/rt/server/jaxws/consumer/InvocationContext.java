@@ -444,10 +444,5 @@ public class InvocationContext<PORT> {
         m_rollbackListener.onRollback();
       }
     }
-
-    @Override
-    public void release() {
-      // NOOP
-    }
   }
 }

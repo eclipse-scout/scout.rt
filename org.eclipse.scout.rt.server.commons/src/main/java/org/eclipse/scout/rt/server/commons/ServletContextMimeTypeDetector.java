@@ -23,12 +23,6 @@ import org.eclipse.scout.rt.platform.util.IMimeTypeDetector;
 @ApplicationScoped
 public class ServletContextMimeTypeDetector implements IMimeTypeDetector {
 
-  /**
-   * Do not use this constructor, use BEANS.get(ServletContextMimeTypeDetector.class) instead.
-   */
-  public ServletContextMimeTypeDetector() {
-  }
-
   @Override
   public String getMimeType(Path path) {
     if (path == null) {
@@ -41,5 +35,4 @@ public class ServletContextMimeTypeDetector implements IMimeTypeDetector {
     String name = path.getFileName().toString();
     return servletContext.getMimeType(name);
   }
-
 }

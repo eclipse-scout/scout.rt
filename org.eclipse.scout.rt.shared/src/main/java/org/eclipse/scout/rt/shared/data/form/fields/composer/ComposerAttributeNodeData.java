@@ -24,9 +24,6 @@ public class ComposerAttributeNodeData extends TreeNodeData implements DataModel
   private Integer m_aggregationType;
   private boolean m_negated = false;
 
-  public ComposerAttributeNodeData() {
-  }
-
   public String getAttributeExternalId() {
     return m_attributeExternalId;
   }

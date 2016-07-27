@@ -27,5 +27,6 @@ public class TableAdapter implements TableListener {
 
   @Override
   public void tableChanged(TableEvent e) {
+    // expected to be overridden by subclass
   }
 }

@@ -36,9 +36,6 @@ public class BatchLookupNormalizer {
   private int[] m_forwardMapping;
   private List<ILookupCall<?>> m_normalizedCalls;
 
-  public BatchLookupNormalizer() {
-  }
-
   /**
    * When two {@link LookupCall}s are {@link Object#equals(Object)} then the first one iq used, subsequent ones
    * reference the first ones directly.

@@ -53,9 +53,6 @@ public class JmsPublishSubscribeMessageService extends AbstractSimpleJmsService<
   private ConnectionFactory m_connectionFactory;
   private Destination m_destination;
 
-  public JmsPublishSubscribeMessageService() {
-  }
-
   @PostConstruct
   protected void initializeService() {
     try {

@@ -101,6 +101,7 @@ public class CookieAccessController implements IAccessController {
 
   @Override
   public void destroy() {
+    // no resources to destroy
   }
 
   protected String getTarget(final HttpServletRequest request) {
@@ -222,5 +223,4 @@ public class CookieAccessController implements IAccessController {
       return 36000L;
     }
   }
-
 }

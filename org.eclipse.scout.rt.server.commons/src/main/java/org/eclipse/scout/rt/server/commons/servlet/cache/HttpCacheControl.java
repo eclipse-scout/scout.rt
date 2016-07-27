@@ -54,9 +54,6 @@ public class HttpCacheControl {
    */
   public static final int MAX_AGE_NONE = 0;
 
-  public HttpCacheControl() {
-  }
-
   /**
    * Checks whether a cached response (304) can be returned or not, depending on the request headers and
    * {@link BinaryResources}.

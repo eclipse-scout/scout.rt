@@ -18,9 +18,6 @@ import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNodeFilter;
  */
 class CheckedNodesFilter implements ITreeNodeFilter {
 
-  public CheckedNodesFilter() {
-  }
-
   @Override
   public boolean accept(ITreeNode node, int level) {
     if (node.isChecked()) {
@@ -28,5 +25,4 @@ class CheckedNodesFilter implements ITreeNodeFilter {
     }
     return false;
   }
-
 }

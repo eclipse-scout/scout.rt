@@ -35,12 +35,6 @@ public class MailMessage {
   private final List<MailAttachment> m_attachments = new ArrayList<MailAttachment>();
 
   /**
-   * Creates an empty mail message.
-   */
-  public MailMessage() {
-  }
-
-  /**
    * @return an unmodifiable list of TO recipients.
    */
   public List<MailParticipant> getToRecipients() {

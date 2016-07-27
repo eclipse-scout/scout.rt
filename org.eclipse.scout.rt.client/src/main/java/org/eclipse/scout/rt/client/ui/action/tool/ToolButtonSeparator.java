@@ -37,5 +37,6 @@ public class ToolButtonSeparator extends AbstractToolButton {
   @ConfigOperation
   @Order(10)
   protected void execAction() {
+    // tool button separator has no action
   }
 }

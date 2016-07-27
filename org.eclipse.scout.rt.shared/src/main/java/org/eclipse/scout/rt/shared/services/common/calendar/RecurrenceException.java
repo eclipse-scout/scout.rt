@@ -19,9 +19,6 @@ public class RecurrenceException implements java.io.Serializable {
   private Date m_originalStartDate;
   private boolean m_exists = true;
 
-  public RecurrenceException() {
-  }
-
   public ICalendarItem getItem() {
     return m_item;
   }
@@ -49,5 +46,4 @@ public class RecurrenceException implements java.io.Serializable {
   public void delete() {
     m_exists = false;
   }
-
 }

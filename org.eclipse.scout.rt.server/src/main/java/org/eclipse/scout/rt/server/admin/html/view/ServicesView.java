@@ -158,6 +158,7 @@ public class ServicesView extends DefaultView {
 
       @Override
       public void run() {
+        // do nothing
       }
     }, false);
     for (ServiceInspector serviceInspector : sortMap.values()) {

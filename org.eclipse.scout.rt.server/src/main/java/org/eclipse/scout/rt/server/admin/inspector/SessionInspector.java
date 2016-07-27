@@ -102,6 +102,7 @@ public class SessionInspector {
   }
 
   public void update() {
+    // do nothing
   }
 
   private void manageCallInspectorList(long timeoutMillis) {
@@ -117,5 +118,4 @@ public class SessionInspector {
       }
     }
   }
-
 }

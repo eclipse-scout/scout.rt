@@ -16,7 +16,7 @@ import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.TEXTS;
 
-public class AbstractSearchOutline extends AbstractOutline implements ISearchOutline {
+public abstract class AbstractSearchOutline extends AbstractOutline implements ISearchOutline {
 
   private int m_minSearchTokenLength;
 

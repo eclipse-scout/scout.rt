@@ -27,5 +27,6 @@ public class CalendarAdapter implements CalendarListener {
 
   @Override
   public void calendarChanged(CalendarEvent e) {
+    // expected to be overridden by subclass
   }
 }

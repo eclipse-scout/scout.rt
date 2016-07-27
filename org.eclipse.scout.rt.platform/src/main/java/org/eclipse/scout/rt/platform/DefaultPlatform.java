@@ -16,6 +16,4 @@ import org.eclipse.scout.rt.platform.internal.PlatformImplementor;
  * @since 5.1
  */
 public class DefaultPlatform extends PlatformImplementor {
-  public DefaultPlatform() {
-  }
 }

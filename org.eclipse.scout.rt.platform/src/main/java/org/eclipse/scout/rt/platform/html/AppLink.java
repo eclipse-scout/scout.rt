@@ -23,6 +23,7 @@ public class AppLink implements Serializable {
   private String m_name;
 
   public AppLink() {
+    super();
   }
 
   /**

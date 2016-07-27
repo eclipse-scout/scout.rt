@@ -27,6 +27,7 @@ public class TableColumnState implements Serializable, Cloneable {
   private String m_backgroundEffect;
 
   public TableColumnState() {
+    super();
   }
 
   protected TableColumnState(TableColumnState state) {

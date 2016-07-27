@@ -115,9 +115,6 @@ public class SoapServiceTunnelContentHandler extends AbstractServiceTunnelConten
   private String m_originAddress;
   private Boolean m_receivedCompressed;
 
-  public SoapServiceTunnelContentHandler() {
-  }
-
   @Override
   public void initialize() {
     super.initialize();

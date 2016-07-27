@@ -76,12 +76,6 @@ public class MessageBox extends AbstractPropertyObserver implements IMessageBox 
   private boolean m_answerSet;
   private int m_severity;
 
-  /**
-   * Do not use, use {@link MessageBoxes#create()} instead.
-   */
-  public MessageBox() {
-  }
-
   @PostConstruct
   protected void initConfig() {
     m_displayParent = BEANS.get(DisplayParentResolver.class).resolve(this);

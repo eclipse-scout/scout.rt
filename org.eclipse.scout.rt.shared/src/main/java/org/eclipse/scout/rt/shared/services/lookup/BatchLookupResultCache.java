@@ -32,9 +32,6 @@ public class BatchLookupResultCache {
 
   private HashMap<ILookupCall, List<ILookupRow<?>>> m_cache = new HashMap<ILookupCall, List<ILookupRow<?>>>();
 
-  public BatchLookupResultCache() {
-  }
-
   /**
    * reset the result cache
    */

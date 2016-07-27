@@ -89,10 +89,12 @@ public class ServiceUtility {
     new AbstractHolderArgumentVisitor() {
       @Override
       public void visitHolder(IHolder input, IHolder output) {
+        // do nothing
       }
 
       @Override
       public void visitOther(Object[] input, Object[] output, int index) {
+        // do nothing
       }
     }.startVisiting(callerArgs, holderArgs, 1, true);
     return holderArgs;

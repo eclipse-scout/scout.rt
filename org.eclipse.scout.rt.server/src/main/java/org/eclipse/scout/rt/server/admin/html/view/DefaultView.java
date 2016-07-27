@@ -35,14 +35,16 @@ public class DefaultView implements IView, Serializable {
 
   @Override
   public void produceTitle(HtmlComponent p) {
+    // empty default implementation
   }
 
   @Override
   public void produceBody(HtmlComponent p) {
+    // empty default implementation
   }
 
   @Override
   public void activated() {
+    // empty default implementation
   }
-
 }

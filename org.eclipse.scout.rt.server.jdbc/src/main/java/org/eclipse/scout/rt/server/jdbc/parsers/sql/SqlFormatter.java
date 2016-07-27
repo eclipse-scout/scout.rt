@@ -116,9 +116,6 @@ public class SqlFormatter {
     }
   }
 
-  public SqlFormatter() {
-  }
-
   public static String wellform(String s) {
     return new SqlFormatter().wellform(s, 10);
   }

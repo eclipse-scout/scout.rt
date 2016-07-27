@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.svg.client;
 
 import org.apache.batik.swing.svg.SVGUserAgentAdapter;
 
+@SuppressWarnings("squid:S1186")
 public class SilentSVGUserAgentAdapter extends SVGUserAgentAdapter {
   @Override
   public void displayMessage(String message) {

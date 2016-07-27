@@ -366,9 +366,6 @@ public class ComposerAttributeForm extends AbstractForm {
   }
 
   public class ModifyHandler extends AbstractFormHandler {
-    @Override
-    protected void execLoad() {
-    }
   }
 
   public void startNew() {

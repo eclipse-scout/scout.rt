@@ -109,6 +109,7 @@ final class SqlParserToken {
 
   public static class Comment extends AbstractToken {
     public Comment() {
+      super();
     }
 
     public Comment(String text) {
@@ -207,8 +208,5 @@ final class SqlParserToken {
   }
 
   public static class Unparsed extends AbstractToken {
-  }
-
-  public SqlParserToken() {
   }
 }

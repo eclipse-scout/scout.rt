@@ -19,7 +19,7 @@ public class BoundsSpec implements java.io.Serializable {
   public int height;
 
   public BoundsSpec() {
-
+    super();
   }
 
   public BoundsSpec(int x, int y, int width, int height) {

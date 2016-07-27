@@ -42,9 +42,6 @@ public class BookmarkService implements IBookmarkService {
   private static final Logger LOG = LoggerFactory.getLogger(BookmarkService.class);
   private static final String SESSION_DATA_KEY = "bookmarkServiceState";
 
-  public BookmarkService() {
-  }
-
   private ServiceState getServiceState() {
     IClientSession session = ClientSessionProvider.currentSession();
     if (session == null) {

@@ -19,9 +19,6 @@ import org.eclipse.scout.rt.shared.data.form.properties.AbstractPropertyData;
 
 public class FormDataPropertyFilter implements IPropertyFilter {
 
-  public FormDataPropertyFilter() {
-  }
-
   @Override
   public boolean accept(FastPropertyDescriptor descriptor) {
     Class<?> propertyType = descriptor.getPropertyType();

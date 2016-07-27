@@ -34,9 +34,6 @@ class MultiTimeRange implements Cloneable {
 
   private TreeMap<Date/* fromDate */, TimeRange> m_multipleTimeRangeMap = new TreeMap<Date, TimeRange>();
 
-  public MultiTimeRange() {
-  }
-
   /**
    * add a time range to this timerange-collection.
    * <p>

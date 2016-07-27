@@ -88,9 +88,6 @@ public class RecurrencePattern implements java.io.Serializable {
   private int m_monthOfYear;
   private ArrayList<RecurrenceException> m_recurrenceExceptions = new ArrayList<RecurrenceException>();
 
-  public RecurrencePattern() {
-  }
-
   public long getLastModified() {
     return m_lastModified;
   }

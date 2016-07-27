@@ -19,9 +19,6 @@ import org.eclipse.scout.rt.ui.html.json.AbstractEventFilter;
 @Bean
 public class DesktopEventFilter extends AbstractEventFilter<DesktopEvent, DesktopEventFilterCondition> {
 
-  public DesktopEventFilter() {
-  }
-
   @Override
   public DesktopEvent filter(DesktopEvent event) {
     for (DesktopEventFilterCondition condition : getConditions()) {

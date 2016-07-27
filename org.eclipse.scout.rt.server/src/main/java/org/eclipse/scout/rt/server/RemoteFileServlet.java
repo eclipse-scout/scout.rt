@@ -45,9 +45,6 @@ public class RemoteFileServlet extends HttpServlet {
 
   private String m_folder;
 
-  public RemoteFileServlet() {
-  }
-
   @Override
   public void init(ServletConfig config) throws ServletException {
     super.init(config);

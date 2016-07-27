@@ -282,6 +282,7 @@ public class ImapAdapter implements IImapAdapter {
    *          live list of mail properties
    */
   protected void interceptProperties(Properties props) {
+    // subclasses may modify properties
   }
 
   protected Folder findFolder(String name) {

@@ -20,9 +20,6 @@ import org.eclipse.scout.rt.client.ui.action.tree.IActionNode;
  */
 public class ActionFinder {
 
-  public ActionFinder() {
-  }
-
   public <T extends IAction> T findAction(List<? extends IAction> actionTree, Class<T> searchType) {
     List<T> filteredActions = findActions(actionTree, searchType, true, true);
     if (filteredActions.size() > 0) {

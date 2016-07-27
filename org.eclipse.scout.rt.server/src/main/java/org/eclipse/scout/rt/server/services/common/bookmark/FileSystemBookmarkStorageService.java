@@ -36,9 +36,6 @@ public class FileSystemBookmarkStorageService extends AbstractBookmarkStorageSer
 
   public static final String GLOBAL_FILE_NAME = "all_users";
 
-  public FileSystemBookmarkStorageService() {
-  }
-
   /**
    * supports the targetGroup properties
    * <ul>

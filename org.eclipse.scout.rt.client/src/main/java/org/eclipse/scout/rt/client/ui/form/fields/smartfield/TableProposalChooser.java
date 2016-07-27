@@ -14,8 +14,8 @@ import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
+import org.eclipse.scout.rt.client.ui.basic.table.TableAdapter;
 import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
-import org.eclipse.scout.rt.client.ui.basic.table.TableListener;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
@@ -44,12 +44,7 @@ public class TableProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<IC
   protected IContentAssistFieldTable createModel() {
     IContentAssistFieldTable<LOOKUP_KEY> table = createConfiguredOrDefaultModel(IContentAssistFieldTable.class);
     table.setMultilineText(m_contentAssistField.isMultilineText());
-    table.addTableListener(new TableListener() {
-
-      @Override
-      public void tableChangedBatch(List<? extends TableEvent> batch) {
-      }
-
+    table.addTableListener(new TableAdapter() {
       @Override
       public void tableChanged(TableEvent e) {
         if (e.getType() == TableEvent.TYPE_ROW_CLICK) {

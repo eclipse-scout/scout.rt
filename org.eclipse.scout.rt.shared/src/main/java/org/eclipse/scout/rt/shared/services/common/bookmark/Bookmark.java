@@ -53,6 +53,7 @@ public class Bookmark implements Serializable, Cloneable, IOrdered {
   private transient byte[] m_serializedData;
 
   public Bookmark() {
+    super();
   }
 
   public Bookmark(Bookmark bm) {

@@ -16,6 +16,7 @@ public class NodePageState extends AbstractPageState implements Serializable, Cl
   private static final long serialVersionUID = 1L;
 
   public NodePageState() {
+    super();
   }
 
   protected NodePageState(NodePageState state) {
@@ -26,5 +27,4 @@ public class NodePageState extends AbstractPageState implements Serializable, Cl
   public Object clone() {
     return new NodePageState(this);
   }
-
 }

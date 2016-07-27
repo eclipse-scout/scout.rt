@@ -18,9 +18,6 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITableRowFilter;
  */
 class CheckedRowsFilter implements ITableRowFilter {
 
-  public CheckedRowsFilter() {
-  }
-
   @Override
   public boolean accept(ITableRow row) {
     if (row.isChecked()) {
@@ -28,5 +25,4 @@ class CheckedRowsFilter implements ITableRowFilter {
     }
     return false;
   }
-
 }

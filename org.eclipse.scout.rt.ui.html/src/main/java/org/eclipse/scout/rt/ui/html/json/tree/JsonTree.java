@@ -233,6 +233,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
   }
 
   protected void attachNode(ITreeNode node, boolean attachChildren) {
+    // empty default implementation
   }
 
   protected void attachNodes(Collection<ITreeNode> nodes, boolean attachChildren) {
@@ -437,6 +438,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
    * Default impl. does nothing. Override this method to handle custom tree-events.
    */
   protected void handleModelOtherTreeEvent(TreeEvent event) {
+    // empty default implementation
   }
 
   protected void handleModelNodeExpanded(ITreeNode modelNode, boolean recursive) {
@@ -996,15 +998,13 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonPropertyObserver<T
    *          The old, virtual node
    */
   protected void putUpdatedPropertiesForResolvedNode(JSONObject jsonNode, String nodeId, ITreeNode node, IVirtualTreeNode virtualNode) {
+    // empty default implementation
   }
 
   protected static class CheckedInfo {
     private final List<ITreeNode> m_allNodes = new ArrayList<ITreeNode>();
     private final List<ITreeNode> m_checkedNodes = new ArrayList<ITreeNode>();
     private final List<ITreeNode> m_uncheckedNodes = new ArrayList<ITreeNode>();
-
-    public CheckedInfo() {
-    }
 
     public List<ITreeNode> getAllNodes() {
       return m_allNodes;

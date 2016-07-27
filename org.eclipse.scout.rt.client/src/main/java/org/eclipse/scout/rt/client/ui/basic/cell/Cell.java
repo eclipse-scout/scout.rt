@@ -57,10 +57,10 @@ public class Cell implements ICell, IStyleable, IHtmlCapable {
   private IMultiStatus m_errorStatus = null;
 
   public Cell() {
+    super();
   }
 
   public Cell(ICell c) {
-    super();
     try {
       updateFrom(c);
     }
@@ -71,12 +71,10 @@ public class Cell implements ICell, IStyleable, IHtmlCapable {
   }
 
   public Cell(ICellObserver observer) {
-    super();
     setObserver(observer);
   }
 
   public Cell(ICellObserver observer, ICell c) {
-    super();
     updateFrom(c);
     setObserver(observer);
   }
@@ -414,5 +412,4 @@ public class Cell implements ICell, IStyleable, IHtmlCapable {
     }
     return s;
   }
-
 }

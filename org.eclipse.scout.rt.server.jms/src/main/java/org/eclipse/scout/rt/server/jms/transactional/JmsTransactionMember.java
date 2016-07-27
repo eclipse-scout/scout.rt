@@ -118,11 +118,6 @@ public class JmsTransactionMember<T> extends AbstractTransactionMember {
   }
 
   @Override
-  public boolean commitPhase1() {
-    return true;
-  }
-
-  @Override
   public void commitPhase2() {
     try {
       getSession().commit();
