@@ -215,7 +215,7 @@ scout.SmartField.prototype._onKeyDown = function(e) {
   }
 
   // We must prevent default focus handling
-  if (e.which === scout.keys.TAB) {
+  if (e.which === scout.keys.TAB && this.mode !== scout.FormField.MODE_CELLEDITOR ) {
     if (this._isPreventDefaultTabHandling()) {
       e.preventDefault();
       this._tabPrevented = {
@@ -556,10 +556,11 @@ scout.SmartField.prototype.virtual = function() {
  * @override ValueField.js
  */
 scout.SmartField.prototype.acceptInput = function(whileTyping) {
-  if (this.mode !== scout.FormField.MODE_CELLEDITOR && !this._acceptedInput) {
-    this._acceptProposal(true);
-    this._acceptedInput = true;
+  if (this._acceptedInput) {
+    return;
   }
+  this._acceptProposal(true);
+  this._acceptedInput = true;
 };
 
 /**
