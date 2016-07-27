@@ -39,6 +39,10 @@ public final class NlsResourceBundle extends PropertyResourceBundle {
     super(stream);
   }
 
+  /**
+   * Creates a {@link NlsResourceBundle} for each property file found using the given base name. The created bundles are
+   * linked according to the sub tags of the language tag. To root (most specific) bundle is returned.
+   */
   public static NlsResourceBundle getBundle(String baseName, Locale locale, ClassLoader cl) {
     String ls = locale.toString();
     List<String> suffixes = new LinkedList<>();
@@ -55,24 +59,39 @@ public final class NlsResourceBundle extends PropertyResourceBundle {
     NlsResourceBundle root = null;
     NlsResourceBundle child = null;
     for (String suffix : suffixes) {
-      String fileName = baseName.replace('.', '/') + suffix + '.' + TEXT_RESOURCE_EXTENSION;
-      URL res = cl.getResource(fileName);
-      if (res != null) {
-        try (InputStream in = res.openStream()) {
-          NlsResourceBundle parent = new NlsResourceBundle(in);
-          if (root == null) {
-            root = parent;
-          }
-          if (child != null) {
-            child.setParent(parent);
-          }
-          child = parent;
+      try {
+        NlsResourceBundle bundle = getBundle(baseName, suffix, cl);
+        if (bundle == null) {
+          continue;
         }
-        catch (IOException e) {
-          LOG.warn("Error loading nls resource URL '{}'.", res.toExternalForm(), e);
+        if (root == null) {
+          root = bundle;
         }
+        if (child != null) {
+          child.setParent(bundle);
+        }
+        child = bundle;
+      }
+      catch (IOException e) {
+        LOG.warn("Error loading nls resource with base name '{}' and suffix '{}'", baseName, suffix, e);
       }
     }
     return root;
   }
+
+  /**
+   * Creates and returns a new {@link NlsResourceBundle} if there is a property file found using the given base name and
+   * suffix. Otherwise it returns null.
+   */
+  public static NlsResourceBundle getBundle(String baseName, String suffix, ClassLoader cl) throws IOException {
+    String fileName = baseName.replace('.', '/') + suffix + '.' + TEXT_RESOURCE_EXTENSION;
+    URL res = cl.getResource(fileName);
+    if (res != null) {
+      try (InputStream in = res.openStream()) {
+        return new NlsResourceBundle(in);
+      }
+    }
+    return null;
+  }
+
 }

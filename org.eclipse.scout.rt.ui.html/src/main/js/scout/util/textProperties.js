@@ -12,56 +12,105 @@ scout.textProperties = {
 
   TEXT_KEY_REGEX: /\$\{textKey\:([a-zA-Z0-9\.]*)\}/,
 
-  _textMap: {},
+  textsByLocale: {},
 
   bootstrap: function() {
     var that = this;
 
-    // FIXME [awe] 6.1: load texts with different locales
-    // - define which locales are available (or simply try to load a property file, and use default if it does not exist?)
-    // - define which local is currently used, because this info is required to load the proper file
-
-    // FIXME [awe] 6.1 sollen wir fallback-logik implementieren (wenn key x nicht vorhanden in *_de.properties, schauen
-    // ob property in *.properties vorhanden ist (würde bedeuten, dass wir auch andere properties files laden müssen)
     return $.ajax({
-      url: 'res/texts.properties',
-      dataType: 'text',
-      contentType: 'text/plain; charset=UTF-8'
-    }).done(that._onTextsDone.bind(that))
-      .fail(that._onTextsFail.bind(that));
+      url: 'res/texts.json',
+      dataType: 'json',
+      contentType: 'application/json; charset=UTF-8'
+    }).done(that._onLoadDone.bind(that))
+    .fail(that._onLoadFail.bind(that));
   },
 
-  _onTextsDone: function(data) {
-    var keyValue, key, value,
-      lines = data.split('\n'),
-      textMap = {};
-    lines.forEach(function(line) {
-      keyValue = line.split('=');
-      if (keyValue.length === 2) {
-        key = keyValue[0].trim();
-        value = keyValue[1].trim();
-        textMap[key] = value;
-      }
-    });
-    this._textMap = textMap;
+  _onLoadDone: function(data) {
+    this.init(data);
   },
 
-  _onTextsFail: function(jqXHR, textStatus, errorThrown) {
+  _onLoadFail: function(jqXHR, textStatus, errorThrown) {
     throw new Error('Error while loading texts: ' + errorThrown);
   },
 
-  getTextMap: function() {
-    return this._textMap;
+  init: function(model) {
+    var textMap, languageTag;
+    for (languageTag in model) {
+      textMap = model[languageTag];
+      this.put(languageTag, new scout.Texts(textMap));
+    }
+    for (languageTag in model) {
+      this.link(languageTag);
+    }
   },
 
-  resolveTextKeys: function(value) {
-    var textKey,
-      result = this.TEXT_KEY_REGEX.exec(value);
-    if (result && result.length === 2) {
-      textKey = result[1];
-      value = this._textMap[textKey];
+  /**¨
+   * Links the texts of the given languageTag to make parent lookup possible (e.g. look first in de-CH, then in de, then in default)
+   */
+  link: function(languageTag) {
+    var tags = this.splitLanguageTag(languageTag);
+    var child;
+    tags.forEach(function(tag) {
+      var texts = this._get(tag);
+      if (!texts) {
+        // If there are no texts for the given tag, create an empty Texts object for linking purpose
+        texts = new scout.Texts();
+        this.put(tag, texts);
+      }
+      if (child) {
+        child.setParent(texts);
+      }
+      child = texts;
+    }, this);
+  },
+
+  /**
+   * Creates an array containing all relevant tags.
+   * <p>
+   * Examples:<br>
+   * - 'de-CH' generates the array: ['de-CH', 'de', 'default']
+   * - 'de' generates the array: ['de', 'default']
+   * - 'default' generates the array: ['default']
+   */
+  splitLanguageTag: function(languageTag) {
+    var tags = [],
+      i = languageTag.lastIndexOf('-');
+
+    tags.push(languageTag);
+
+    while (i >= 0) {
+      languageTag = languageTag.substring(0, i);
+      tags.push(languageTag);
+      i = languageTag.lastIndexOf('-');
     }
-    return value;
+
+    if (languageTag !== 'default') {
+      tags.push('default');
+    }
+    return tags;
+  },
+
+  /**
+   * Returns the Texts object for the given language tag.
+   */
+  get: function(languageTag) {
+    var texts = this._get(languageTag);
+    if (!texts) {
+      this.link(languageTag);
+    }
+    texts = this._get(languageTag);
+    if (!texts) {
+      throw new Error('texts still missing.');
+    }
+    return texts;
+  },
+
+  _get: function(languageTag) {
+    return this.textsByLocale[languageTag];
+  },
+
+  put: function(languageTag, texts) {
+    this.textsByLocale[languageTag] = texts;
   }
 
 };

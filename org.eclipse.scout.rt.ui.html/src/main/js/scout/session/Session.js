@@ -58,6 +58,11 @@ scout.Session = function($entryPoint, options) {
   this.modelAdapterRegistry = {};
   this._clonedModelAdapterRegistry = {}; // key = adapter-ID, value = array of clones for that adapter
   this.locale = options.locale;
+  if (this.locale) {
+    this._texts = scout.textProperties.get(this.locale.languageTag);
+  } else {
+    this._texts = new scout.Texts();
+  }
   this.ajaxRequests = [];
   this._asyncEvents = [];
   this.responseQueue = new scout.ResponseQueue(this);
@@ -70,7 +75,6 @@ scout.Session = function($entryPoint, options) {
   this.desktop;
   this.url = 'json';
   this._adapterDataCache = {};
-  this._texts = new scout.Texts();
   this._requestsPendingCounter = 0;
   this._busyCounter = 0; // >0 = busy
   this.layoutValidator = new scout.LayoutValidator();

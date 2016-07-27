@@ -25,7 +25,7 @@ scout.TreeNode = function() {
   this.level;
   this.parentNode;
   this.rendered = false;
-  this.text;  
+  this.text;
 };
 
 scout.TreeNode.prototype.init = function(model) {
@@ -34,7 +34,10 @@ scout.TreeNode.prototype.init = function(model) {
 };
 
 scout.TreeNode.prototype._resolveTextKeys = function() {
-  this.text = scout.textProperties.resolveTextKeys(this.text);
+  var key = scout.Texts.resolveKey(this.text);
+  if (key) {
+    this.text = this.parent.session.text(key);
+  }
 };
 
 scout.TreeNode.prototype.getTree = function() {

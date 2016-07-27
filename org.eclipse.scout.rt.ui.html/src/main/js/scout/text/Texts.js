@@ -12,12 +12,20 @@ scout.Texts = function(textMap) {
   this._textMap = textMap || {};
 };
 
+scout.Texts.TEXT_KEY_REGEX = /\$\{textKey\:([a-zA-Z0-9\.]*)\}/;
+
 /**
+ * Returns the text for the given key.
+ * If the key does not exist in this text map, a lookup in the parent text map is done.
+ *
  * @param textKey key to lookup the text
  * @param vararg texts to replace the placeholders specified by {0}, {1}, etc.
  */
 scout.Texts.prototype.get = function(textKey) {
-  if (!this.exists(textKey)) {
+  if (!this._exists(textKey)) {
+    if (this.parent) {
+      return scout.Texts.prototype.get.apply(this.parent, arguments);
+    }
     return '[undefined text: ' + textKey + ']';
   }
   var len = arguments.length,
@@ -34,7 +42,10 @@ scout.Texts.prototype.get = function(textKey) {
 };
 
 scout.Texts.prototype.optGet = function(textKey, defaultValue) {
-  if (!this.exists(textKey)) {
+  if (!this._exists(textKey)) {
+    if (this.parent) {
+      return scout.Texts.prototype.optGet.apply(this.parent, arguments);
+    }
     return defaultValue;
   }
   if (arguments.length > 2) {
@@ -47,7 +58,21 @@ scout.Texts.prototype.optGet = function(textKey, defaultValue) {
 };
 
 scout.Texts.prototype.exists = function(textKey) {
+  if (this._exists(textKey)) {
+    return true;
+  }
+  if (this.parent) {
+    return this.parent.exists(textKey);
+  }
+  return false;
+};
+
+scout.Texts.prototype._exists = function(textKey) {
   return this._textMap.hasOwnProperty(textKey);
+};
+
+scout.Texts.prototype.setParent = function(parent) {
+  this.parent = parent;
 };
 
 // ----- static methods -----
@@ -69,4 +94,11 @@ scout.Texts.readFromDOM = function() {
     textMap[key] = value;
   });
   return textMap;
+};
+
+scout.Texts.resolveKey = function(value) {
+  var result = this.TEXT_KEY_REGEX.exec(value);
+  if (result && result.length === 2) {
+    return result[1];
+  }
 };

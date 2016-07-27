@@ -15,7 +15,7 @@ import org.eclipse.scout.rt.platform.Order;
 @Order(5050)
 public class ScoutTextProviderService extends AbstractDynamicNlsTextProviderService {
   @Override
-  protected String getDynamicNlsBaseName() {
+  public String getDynamicNlsBaseName() {
     return "org.eclipse.scout.rt.shared.texts.ScoutTexts";
   }
 }

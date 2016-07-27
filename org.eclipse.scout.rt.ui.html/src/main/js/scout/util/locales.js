@@ -19,17 +19,17 @@ scout.locales = {
         url: 'res/locales.json',
         dataType: 'json',
         contentType: 'application/json; charset=UTF-8'
-      }).done(that._onLocalesDone.bind(that))
-      .fail(that._onLocalesFail.bind(that));
+      }).done(that._onLoadDone.bind(that))
+      .fail(that._onLoadFail.bind(that));
   },
 
-  _onLocalesDone: function(data) {
+  _onLoadDone: function(data) {
     data.forEach(function(locale) {
       this.localesMap[locale.languageTag] = locale;
     }, this);
   },
 
-  _onLocalesFail: function(jqXHR, textStatus, errorThrown) {
+  _onLoadFail: function(jqXHR, textStatus, errorThrown) {
     throw new Error('Error while loading locales: ' + errorThrown);
   },
 

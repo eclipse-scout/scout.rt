@@ -569,7 +569,10 @@ scout.Widget.prototype.toString = function() {
 
 scout.Widget.prototype.resolveTextKeys = function(properties) {
   properties.forEach(function(property) {
-    this[property] = scout.textProperties.resolveTextKeys(this[property]);
+    var key = scout.Texts.resolveKey(this[property]);
+    if (key) {
+      this[property] = this.session.text(key);
+    }
   }, this);
 };
 

@@ -10,58 +10,98 @@
  ******************************************************************************/
 describe("texts", function() {
 
-    // In production mode these texts are sent by the server in the initialize event of the session
-    var texts = new scout.Texts({
-      NoOptions: 'Keine Übereinstimmung',
-      NumOptions: '{0} Optionen',
-      Greeting: 'Hello {0}, my name is {2}, {1}.',
-      WrongInput: 'Wrong input: {0}. Try to replace {0} with {1}.',
-      Empty: '',
-      Null: null
-    });
+  var texts = new scout.Texts({
+    NoOptions: 'Keine Übereinstimmung',
+    NumOptions: '{0} Optionen',
+    Greeting: 'Hello {0}, my name is {2}, {1}.',
+    WrongInput: 'Wrong input: {0}. Try to replace {0} with {1}.',
+    Empty: '',
+    Null: null
+  });
 
-    it("check if correct text is returned", function() {
+  var textsChild = new scout.Texts({
+    ChildKey: 'A Child Key',
+    DuplicateKey: 'Child Duplicate Key'
+  });
+
+  var textsParent = new scout.Texts({
+    ParentKey: 'A Parent Key',
+    DuplicateKey: 'Parent Duplicate Key'
+  });
+  textsChild.setParent(textsParent);
+
+  describe("get", function() {
+
+    it("returns correct text for key", function() {
       expect(texts.get('NoOptions')).toBe('Keine Übereinstimmung');
     });
 
-    it("check if empty text is returned", function() {
+    it("may return empty text", function() {
       expect(texts.get('Empty')).toBe('');
     });
 
-    it("check if null text is returned", function() {
+    it("may return null text", function() {
       expect(texts.get('Null')).toBe(null);
     });
 
-    it("check if arguments are replaced in text", function() {
+    it("replaces arguments in text", function() {
       expect(texts.get('NumOptions', 3)).toBe('3 Optionen');
     });
 
-    it("check if multiple arguments are replaced in text", function() {
+    it("may replace multiple arguments", function() {
       expect(texts.get('Greeting', 'Computer', 'nice to meet you', 'User')).toBe('Hello Computer, my name is User, nice to meet you.');
     });
 
-    it("check if undefined texts return an error message", function() {
+    it("returns a text containing undefinied if the key is not found", function() {
       expect(texts.get('DoesNotExist')).toBe('[undefined text: DoesNotExist]');
     });
 
-    it("optGet returns undefined if key is not found", function() {
-      expect(texts.optGet('DoesNotExist')).toBe(undefined);
+    it("does a parent lookup if key is not found", function() {
+      expect(textsChild.get('ChildKey')).toBe('A Child Key');
+      expect(textsChild.get('ParentKey')).toBe('A Parent Key');
+      expect(textsChild.get('DuplicateKey')).toBe('Child Duplicate Key');
+
+      expect(textsParent.get('ChildKey')).toBe('[undefined text: ChildKey]');
+      expect(textsParent.get('ParentKey')).toBe('A Parent Key');
+      expect(textsChild.get('DuplicateKey')).toBe('Parent Duplicate Key');
     });
 
-    it("optGet returns default value if key is not found", function() {
-      expect(texts.optGet('DoesNotExist', '#Default', 'Any argument')).toBe('#Default');
-    });
-
-    it("optGet returns text if key found", function() {
-      expect(texts.optGet('NoOptions')).toBe('Keine Übereinstimmung');
-    });
-
-    it("optGet returns text if key found, with arguments", function() {
-      expect(texts.optGet('NumOptions', '#Default', 7)).toBe('7 Optionen');
-    });
-
-    it("check if the same placeholder can be used multiple times", function() {
-      expect(texts.get('WrongInput', 'red', 'blue')).toBe('Wrong input: red. Try to replace red with blue.');
+    it("returns a text containing undefinied if neither child nor parent contains the key", function() {
+      expect(textsChild.get('abc')).toBe('[undefined text: abc]');
     });
 
   });
+
+  describe("optGet", function() {
+
+    it("returns undefined if key is not found", function() {
+      expect(texts.optGet('DoesNotExist')).toBe(undefined);
+    });
+
+    it("returns default value if key is not found", function() {
+      expect(texts.optGet('DoesNotExist', '#Default', 'Any argument')).toBe('#Default');
+    });
+
+    it("returns text if key is found", function() {
+      expect(texts.optGet('NoOptions')).toBe('Keine Übereinstimmung');
+    });
+
+    it("returns text if key is found, with arguments", function() {
+      expect(texts.optGet('NumOptions', '#Default', 7)).toBe('7 Optionen');
+    });
+
+    it("replaces the same placeholder if used multiple times", function() {
+      expect(texts.get('WrongInput', 'red', 'blue')).toBe('Wrong input: red. Try to replace red with blue.');
+    });
+
+    it("does a parent lookup if key is not found", function() {
+      expect(textsChild.optGet('ChildKey')).toBe('A Child Key');
+      expect(textsChild.optGet('ParentKey')).toBe('A Parent Key');
+
+      expect(textsParent.optGet('ChildKey')).toBe('[undefined text: ChildKey]');
+      expect(textsParent.optGet('ParentKey')).toBe('A Parent Key');
+    });
+
+  });
+
+});
