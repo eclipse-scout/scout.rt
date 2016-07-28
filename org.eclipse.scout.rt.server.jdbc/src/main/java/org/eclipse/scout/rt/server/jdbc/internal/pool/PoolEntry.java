@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.server.jdbc.internal.pool;
 
 import java.sql.Connection;
 
+@SuppressWarnings({"squid:S00116", "squid:ClassVariableVisibilityCheck"})
 class PoolEntry {
   public Connection conn;
   public long createTime;

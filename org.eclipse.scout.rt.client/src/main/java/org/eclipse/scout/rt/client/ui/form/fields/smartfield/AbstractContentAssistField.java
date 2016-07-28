@@ -81,7 +81,12 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
   /**
    * Null object used for {@link #installLookupRowContext(ILookupRow)}.
    */
-  private final ILookupRow<LOOKUP_KEY> EMPTY_LOOKUP_ROW = new LookupRow<>(null, "");
+  private static final ILookupRow EMPTY_LOOKUP_ROW = new LookupRow<>(null, "");
+
+  @SuppressWarnings("unchecked")
+  private static final <KEY> ILookupRow<KEY> emptyLookupRow() {
+    return EMPTY_LOOKUP_ROW;
+  }
 
   private final EventListenerList m_listenerList = new EventListenerList();
 
@@ -781,7 +786,7 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
    */
   protected void installLookupRowContext(ILookupRow<LOOKUP_KEY> row) {
     if (row == null) {
-      row = EMPTY_LOOKUP_ROW;
+      row = emptyLookupRow();
     }
 
     m_installingRowContext = true;

@@ -30,8 +30,8 @@ public class JConditionalEx implements JStatement {
   private final List<P_ElseIf> m_elseIfs = new ArrayList<>();
 
   private JExpression m_test = null;
-  private final JBlock _then = new JBlock();
-  private JBlock _else = null;
+  private final JBlock m_then = new JBlock();
+  private JBlock m_else = null;
 
   public JConditionalEx(final JBlock block) {
     block.add(this);
@@ -39,24 +39,24 @@ public class JConditionalEx implements JStatement {
 
   public JBlock _if(final JExpression test) {
     m_test = test;
-    return _then;
+    return m_then;
   }
 
   public JBlock _then() {
-    return _then;
+    return m_then;
   }
 
   public JBlock _else() {
-    if (_else == null) {
-      _else = new JBlock();
+    if (m_else == null) {
+      m_else = new JBlock();
     }
-    return _else;
+    return m_else;
   }
 
   public JBlock _elseif(final JExpression boolExp) {
     if (m_test == null) {
       m_test = boolExp;
-      return _then;
+      return m_then;
     }
     else {
       final P_ElseIf elseIf = new P_ElseIf(boolExp, new JBlock(true, true));
@@ -68,13 +68,13 @@ public class JConditionalEx implements JStatement {
   @Override
   public void state(final JFormatter f) {
     f.p("if ").g(m_test);
-    f.g(_then);
+    f.g(m_then);
 
     for (final P_ElseIf elseIf : m_elseIfs) {
       f.nl().p("else if ").g(elseIf.getExpr()).g(elseIf.getThenBlock());
     }
-    if (_else != null) {
-      f.nl().p("else").g(_else);
+    if (m_else != null) {
+      f.nl().p("else").g(m_else);
     }
     f.nl();
   }

@@ -817,9 +817,10 @@ public class StatementProcessor implements IStatementProcessor {
       return null;
     }
 
+    @SuppressWarnings("squid:S00116")
     private static class P_TextSection {
-      public int from;
-      public int to;
+      final int from;
+      final int to;
 
       public P_TextSection(int from, int to) {
         this.from = from;

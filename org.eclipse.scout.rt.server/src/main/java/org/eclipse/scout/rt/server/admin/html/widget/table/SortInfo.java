@@ -14,22 +14,23 @@ import java.io.Serializable;
 
 public class SortInfo implements Serializable {
   private static final long serialVersionUID = 8320003242979252331L;
-  private int columnIndex = -1;
-  private boolean ascending = true;
+
+  private int m_columnIndex = -1;
+  private boolean m_ascending = true;
 
   public int getColumnIndex() {
-    return columnIndex;
+    return m_columnIndex;
   }
 
   public void setColumnIndex(int columnIndex) {
-    this.columnIndex = columnIndex;
+    this.m_columnIndex = columnIndex;
   }
 
   public boolean isAscending() {
-    return ascending;
+    return m_ascending;
   }
 
   public void setAscending(boolean ascending) {
-    this.ascending = ascending;
+    this.m_ascending = ascending;
   }
 }

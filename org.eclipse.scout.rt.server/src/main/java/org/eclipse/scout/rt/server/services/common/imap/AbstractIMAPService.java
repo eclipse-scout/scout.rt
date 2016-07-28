@@ -215,7 +215,7 @@ public abstract class AbstractIMAPService implements IIMAPService {
 
   private class ReadMailTask extends AbstractMailTask {
 
-    private ArrayList<Message> messages = new ArrayList<Message>();
+    private final ArrayList<Message> m_messages = new ArrayList<Message>();
 
     @Override
     public void doTask(Folder folder) {
@@ -225,7 +225,7 @@ public abstract class AbstractIMAPService implements IIMAPService {
         for (int i = 0; i < Array.getLength(m); i++) {
           item = m[i];
           if (!item.isSet(Flags.Flag.SEEN)) {
-            messages.add(item);
+            m_messages.add(item);
           }
         }
       }
@@ -235,30 +235,30 @@ public abstract class AbstractIMAPService implements IIMAPService {
     }
 
     public Message[] getUnreadMessages() {
-      Message[] messageArray = new Message[messages.size()];
-      messages.toArray(messageArray);
+      Message[] messageArray = new Message[m_messages.size()];
+      m_messages.toArray(messageArray);
       return messageArray;
     }
   }
 
   private class DeleteMailTask extends AbstractMailTask {
 
-    private Message[] toDelete;
-    private boolean deleteAll;
+    private Message[] m_toDelete;
+    private boolean m_deleteAll;
 
     DeleteMailTask(boolean all) {
-      deleteAll = all;
+      m_deleteAll = all;
     }
 
     @Override
     public void doTask(Folder folder) {
       try {
         Message[] m = folder.getMessages();
-        if (deleteAll == true) {
-          toDelete = folder.getMessages();
+        if (m_deleteAll == true) {
+          m_toDelete = folder.getMessages();
         }
-        for (int i = 0; i < Array.getLength(toDelete); i++) {
-          Message item = toDelete[i];
+        for (int i = 0; i < Array.getLength(m_toDelete); i++) {
+          Message item = m_toDelete[i];
           for (int j = 0; j < Array.getLength(m); j++) {
             Message msg = m[j];
             if (item.equals(msg)) {
@@ -273,8 +273,7 @@ public abstract class AbstractIMAPService implements IIMAPService {
     }
 
     public void setMessagesToDelete(Message[] msgs) {
-      toDelete = msgs;
+      m_toDelete = msgs;
     }
-
   }
 }

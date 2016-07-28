@@ -34,20 +34,20 @@ public abstract class AbstractDynamicNlsTextProviderService implements ITextProv
    */
   protected abstract String getDynamicNlsBaseName();
 
-  protected final DynamicNls instance = new DynamicNls();
+  private final DynamicNls m_instance = new DynamicNls();
 
   @PostConstruct
   protected void registerResourceBundle() {
-    instance.registerResourceBundle(getDynamicNlsBaseName(), getClass());
+    m_instance.registerResourceBundle(getDynamicNlsBaseName(), getClass());
   }
 
   @Override
   public String getText(Locale locale, String key, String... messageArguments) {
-    return instance.getText(locale, key, messageArguments);
+    return m_instance.getText(locale, key, messageArguments);
   }
 
   @Override
   public Map<String, String> getTextMap(Locale locale) {
-    return instance.getTextMap(locale);
+    return m_instance.getTextMap(locale);
   }
 }

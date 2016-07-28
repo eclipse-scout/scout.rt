@@ -1332,6 +1332,7 @@ public final class StringUtility {
     return buf.toString();
   }
 
+  @SuppressWarnings("squid:S00116")
   private static class TagBounds {
     final int begin;
     final int end;
@@ -1707,8 +1708,8 @@ public final class StringUtility {
    * Attempts to match the entire region against the regex.
    * </p>
    * <p>
-   * <small>Thereby, the pattern works case-insensitive and in dot-all mode. See {@link Pattern for more
-   * information} </small>
+   * <small>Thereby, the pattern works case-insensitive and in dot-all mode. See {@link Pattern for more information}
+   * </small>
    * </p>
    *
    * @param s

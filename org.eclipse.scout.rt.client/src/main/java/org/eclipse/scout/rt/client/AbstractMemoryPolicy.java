@@ -35,12 +35,12 @@ public abstract class AbstractMemoryPolicy implements IMemoryPolicy {
   private static final Logger LOG = LoggerFactory.getLogger(AbstractMemoryPolicy.class);
 
   public static class SearchFormState {
-    final String formContentXml;
-    final SearchFilter searchFilter;
+    final String m_formContentXml;
+    final SearchFilter m_searchFilter;
 
     public SearchFormState(String xml, SearchFilter filter) {
-      formContentXml = xml;
-      searchFilter = filter;
+      m_formContentXml = xml;
+      m_searchFilter = filter;
     }
   }
 

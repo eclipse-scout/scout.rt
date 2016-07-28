@@ -17,6 +17,7 @@ import java.util.Map;
 
 public abstract class AbstractPropertyObserver implements IPropertyObserver {
 
+  @SuppressWarnings("squid:S00116")
   protected final BasicPropertySupport propertySupport = new BasicPropertySupport(this);
 
   @Override
@@ -46,5 +47,4 @@ public abstract class AbstractPropertyObserver implements IPropertyObserver {
   public Map<String, List<PropertyChangeListener>> getSpecificPropertyChangeListeners() {
     return propertySupport.getSpecificPropertyChangeListeners();
   }
-
 }

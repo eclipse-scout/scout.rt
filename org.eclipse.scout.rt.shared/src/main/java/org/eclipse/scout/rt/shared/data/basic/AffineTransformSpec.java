@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.shared.data.basic;
 
 import java.io.Serializable;
 
+@SuppressWarnings({"squid:S00116", "squid:ClassVariableVisibilityCheck"})
 public class AffineTransformSpec implements Serializable {
   private static final long serialVersionUID = 1L;
 

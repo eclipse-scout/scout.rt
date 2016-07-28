@@ -14,6 +14,7 @@ package org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal.matrix;
  * @author Andreas Hoegger
  * @since 4.0.0 M6 25.02.2014
  */
+@SuppressWarnings({"squid:S00116", "squid:ClassVariableVisibilityCheck"})
 public class MatrixCursor {
   public static enum Orientation {
     Horizontal,
@@ -116,5 +117,4 @@ public class MatrixCursor {
     builder.append("]");
     return builder.toString();
   }
-
 }

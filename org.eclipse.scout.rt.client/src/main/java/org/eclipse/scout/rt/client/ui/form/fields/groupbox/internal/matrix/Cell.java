@@ -17,6 +17,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
  * @author Andreas Hoegger
  * @since 4.0.0 M6 25.02.2014
  */
+@SuppressWarnings({"squid:S00116", "squid:ClassVariableVisibilityCheck"})
 public class Cell {
 
   public final IFormField field;
@@ -34,5 +35,4 @@ public class Cell {
   boolean isEmpty() {
     return field == null;
   }
-
 }

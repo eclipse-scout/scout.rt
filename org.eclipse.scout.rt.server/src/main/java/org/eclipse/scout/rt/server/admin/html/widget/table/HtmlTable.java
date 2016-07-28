@@ -34,7 +34,7 @@ public class HtmlTable extends HtmlComponent {
 
   @Override
   public void tableHeaderCell(String content) {
-    out.print("<th>");
+    m_out.print("<th>");
     final int columnIndex = m_temporaryColumn;
     // next
     m_temporaryColumn++;
@@ -65,19 +65,19 @@ public class HtmlTable extends HtmlComponent {
       }
     });
     if (m_sortInfo.getColumnIndex() == columnIndex) {
-      out.print("<b>");
+      m_out.print("<b>");
     }
     if (!StringUtility.hasText(content)) {
-      out.print("&nbsp;");
+      m_out.print("&nbsp;");
     }
     else {
       print(content);
     }
     if (m_sortInfo.getColumnIndex() == columnIndex) {
-      out.print("</b>");
+      m_out.print("</b>");
     }
     endLinkAction();
-    out.print("</th>");
+    m_out.print("</th>");
   }
 
   public VirtualRow addVirtualRow() {

@@ -62,12 +62,13 @@ import java.util.List;
  * <p>
  * Each stringer may be used to encode a single top level value. Instances of this class are not thread safe. Although
  * this class is nonfinal, it was not designed for inheritance and should not be subclassed. In particular, self-use by
- * overrideable methods is not specified. See <i>Effective Java</i> Item 17,
- * "Design and Document or inheritance or else prohibit it" for further information.
+ * overrideable methods is not specified. See <i>Effective Java</i> Item 17, "Design and Document or inheritance or else
+ * prohibit it" for further information.
  */
 public class JSONStringer {
 
   /** The output data, containing at most one top-level array or object. */
+  @SuppressWarnings("squid:S00116")
   final StringBuilder out = new StringBuilder();
 
   /**
@@ -111,21 +112,21 @@ public class JSONStringer {
   /**
    * Unlike the original implementation, this stack isn't limited to 20 levels of nesting.
    */
-  private final List<Scope> stack = new ArrayList<Scope>();
+  private final List<Scope> m_stack = new ArrayList<Scope>();
 
   /**
    * A string containing a full set of spaces for a single level of indentation, or null for no pretty printing.
    */
-  private final String indent;
+  private final String m_indent;
 
   public JSONStringer() {
-    indent = null;
+    m_indent = null;
   }
 
   JSONStringer(int indentSpaces) {
     char[] indentChars = new char[indentSpaces];
     Arrays.fill(indentChars, ' ');
-    indent = new String(indentChars);
+    m_indent = new String(indentChars);
   }
 
   /**
@@ -168,11 +169,11 @@ public class JSONStringer {
    * Enters a new scope by appending any necessary whitespace and the given bracket.
    */
   JSONStringer open(Scope empty, String openBracket) throws JSONException {
-    if (stack.isEmpty() && out.length() > 0) {
+    if (m_stack.isEmpty() && out.length() > 0) {
       throw new JSONException("Nesting problem: multiple top-level roots");
     }
     beforeValue();
-    stack.add(empty);
+    m_stack.add(empty);
     out.append(openBracket);
     return this;
   }
@@ -186,7 +187,7 @@ public class JSONStringer {
       throw new JSONException("Nesting problem");
     }
 
-    stack.remove(stack.size() - 1);
+    m_stack.remove(m_stack.size() - 1);
     if (context == nonempty) {
       newline();
     }
@@ -198,17 +199,17 @@ public class JSONStringer {
    * Returns the value on the top of the stack.
    */
   private Scope peek() throws JSONException {
-    if (stack.isEmpty()) {
+    if (m_stack.isEmpty()) {
       throw new JSONException("Nesting problem");
     }
-    return stack.get(stack.size() - 1);
+    return m_stack.get(m_stack.size() - 1);
   }
 
   /**
    * Replace the value on the top of the stack with the given value.
    */
   private void replaceTop(Scope topOfStack) {
-    stack.set(stack.size() - 1, topOfStack);
+    m_stack.set(m_stack.size() - 1, topOfStack);
   }
 
   /**
@@ -220,7 +221,7 @@ public class JSONStringer {
    * @return this stringer.
    */
   public JSONStringer value(Object value) throws JSONException {
-    if (stack.isEmpty()) {
+    if (m_stack.isEmpty()) {
       throw new JSONException("Nesting problem");
     }
 
@@ -259,7 +260,7 @@ public class JSONStringer {
    * @return this stringer.
    */
   public JSONStringer value(boolean value) throws JSONException {
-    if (stack.isEmpty()) {
+    if (m_stack.isEmpty()) {
       throw new JSONException("Nesting problem");
     }
     beforeValue();
@@ -275,7 +276,7 @@ public class JSONStringer {
    * @return this stringer.
    */
   public JSONStringer value(double value) throws JSONException {
-    if (stack.isEmpty()) {
+    if (m_stack.isEmpty()) {
       throw new JSONException("Nesting problem");
     }
     beforeValue();
@@ -289,7 +290,7 @@ public class JSONStringer {
    * @return this stringer.
    */
   public JSONStringer value(long value) throws JSONException {
-    if (stack.isEmpty()) {
+    if (m_stack.isEmpty()) {
       throw new JSONException("Nesting problem");
     }
     beforeValue();
@@ -350,13 +351,13 @@ public class JSONStringer {
   }
 
   private void newline() {
-    if (indent == null) {
+    if (m_indent == null) {
       return;
     }
 
     out.append("\n");
-    for (int i = 0; i < stack.size(); i++) {
-      out.append(indent);
+    for (int i = 0; i < m_stack.size(); i++) {
+      out.append(m_indent);
     }
   }
 
@@ -396,7 +397,7 @@ public class JSONStringer {
    * adjusts the stack to expect either a closing bracket or another element.
    */
   private void beforeValue() throws JSONException {
-    if (stack.isEmpty()) {
+    if (m_stack.isEmpty()) {
       return;
     }
 
@@ -410,7 +411,7 @@ public class JSONStringer {
       newline();
     }
     else if (context == Scope.DANGLING_KEY) { // value for key
-      out.append(indent == null ? ":" : ": ");
+      out.append(m_indent == null ? ":" : ": ");
       replaceTop(Scope.NONEMPTY_OBJECT);
     }
     else if (context != Scope.NULL) {

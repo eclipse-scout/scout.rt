@@ -21,22 +21,22 @@ import java.util.Map;
  * This lenient implementation creates SimplePropertyDescriptor objects that are also speed optimized.
  */
 public class FastBeanInfo {
-  private final Class beanClass;
-  private final Map<String/*propertyName*/, FastPropertyDescriptor> propertyMap;
-  private final FastPropertyDescriptor[] propertyArray;
+  private final Class m_beanClass;
+  private final Map<String/*propertyName*/, FastPropertyDescriptor> m_propertyMap;
+  private final FastPropertyDescriptor[] m_propertyArray;
 
   public FastBeanInfo(Class<?> beanClass, Class<?> stopClass) {
-    this.beanClass = beanClass;
-    this.propertyMap = Collections.unmodifiableMap(FastBeanUtility.createPropertyDescriptorMap(beanClass, stopClass));
-    this.propertyArray = propertyMap.values().toArray(new FastPropertyDescriptor[propertyMap.size()]);
+    m_beanClass = beanClass;
+    m_propertyMap = Collections.unmodifiableMap(FastBeanUtility.createPropertyDescriptorMap(beanClass, stopClass));
+    m_propertyArray = m_propertyMap.values().toArray(new FastPropertyDescriptor[m_propertyMap.size()]);
   }
 
   public Class getBeanClass() {
-    return beanClass;
+    return m_beanClass;
   }
 
   public Map<String, FastPropertyDescriptor> getPropertyDescriptorMap() {
-    return propertyMap;
+    return m_propertyMap;
   }
 
   /**
@@ -46,20 +46,20 @@ public class FastBeanInfo {
    *         {@link #getPropertyDescriptor("vATRate")} will also check for property "VATRate" and vis versa.
    */
   public FastPropertyDescriptor getPropertyDescriptor(String name) {
-    FastPropertyDescriptor p = propertyMap.get(name);
+    FastPropertyDescriptor p = m_propertyMap.get(name);
     if (p == null && name.length() > 0) {
       //be lenient with uppercase/lowercase names
       if (Character.isUpperCase(name.charAt(0))) {
-        p = propertyMap.get(Character.toLowerCase(name.charAt(0)) + name.substring(1));
+        p = m_propertyMap.get(Character.toLowerCase(name.charAt(0)) + name.substring(1));
       }
       else {
-        p = propertyMap.get(Character.toUpperCase(name.charAt(0)) + name.substring(1));
+        p = m_propertyMap.get(Character.toUpperCase(name.charAt(0)) + name.substring(1));
       }
     }
     return p;
   }
 
   public FastPropertyDescriptor[] getPropertyDescriptors() {
-    return propertyArray;
+    return m_propertyArray;
   }
 }

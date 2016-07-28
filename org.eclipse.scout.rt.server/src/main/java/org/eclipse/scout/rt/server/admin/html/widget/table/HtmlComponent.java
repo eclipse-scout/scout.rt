@@ -26,7 +26,7 @@ public class HtmlComponent {
   protected HttpServletRequest m_req;
   protected HttpServletResponse m_res;
   protected StringWriter m_writer;
-  protected PrintWriter out;
+  protected PrintWriter m_out;
   // action list
   protected Map<String, AbstractHtmlAction> m_actionMap;
   // action invokation feedback
@@ -37,7 +37,7 @@ public class HtmlComponent {
     m_res = res;
     m_baseURL = m_req.getContextPath() + m_req.getServletPath();
     m_writer = new StringWriter();
-    out = new PrintWriter(m_writer, true);
+    m_out = new PrintWriter(m_writer, true);
     m_actionMap = new HashMap<String, AbstractHtmlAction>();
   }
 
@@ -48,12 +48,12 @@ public class HtmlComponent {
     m_invokedAction = other.m_invokedAction;
     //
     m_writer = new StringWriter();
-    out = new PrintWriter(m_writer, true);
+    m_out = new PrintWriter(m_writer, true);
     m_actionMap = new HashMap<String, AbstractHtmlAction>();
   }
 
   public void append(HtmlComponent other) {
-    out.print(other.getProducedHtml());
+    m_out.print(other.getProducedHtml());
     m_actionMap.putAll(other.m_actionMap);
   }
 
@@ -95,19 +95,19 @@ public class HtmlComponent {
     String actionId = buildActionId(action);
     m_actionMap.put(actionId, action);
     String u = m_baseURL + "?actionId=" + actionId + "#focus";
-    out.print("<a href='" + u + "'>");
+    m_out.print("<a href='" + u + "'>");
   }
 
   public void endLinkAction() {
-    out.print("</a>");
+    m_out.print("</a>");
   }
 
   public void startForm(AbstractHtmlAction action) {
     String actionId = buildActionId(action);
     m_actionMap.put(actionId, action);
     String u = m_baseURL;
-    out.print("<form action='" + u + "' method='get'>");
-    out.print("<input type='hidden' name='actionId' value='" + actionId + "'>");
+    m_out.print("<form action='" + u + "' method='get'>");
+    m_out.print("<input type='hidden' name='actionId' value='" + actionId + "'>");
   }
 
   public void formTextArea(String fieldName, String value) {
@@ -119,23 +119,23 @@ public class HtmlComponent {
     int rows = 1;
     rows = Math.max(rows, (valueLen + cols - 1) / cols);
     rows = Math.max(rows, StringUtility.getLineCount(value));
-    out.print("<textarea rows=" + rows + " cols=" + cols + " name='" + fieldName + "'>");
+    m_out.print("<textarea rows=" + rows + " cols=" + cols + " name='" + fieldName + "'>");
     print(value);
-    out.print("</textarea>");
+    m_out.print("</textarea>");
   }
 
   public void startListBox(String fieldName, int size, boolean actionOnClick) {
-    out.print("<select name=\"" + fieldName + "\" size=\"" + size + "\"");
+    m_out.print("<select name=\"" + fieldName + "\" size=\"" + size + "\"");
     if (actionOnClick) {
-      out.print(" onchange=\"javascript:window.location.href='" + m_baseURL + "?actionId='+this.value+'#focus';\"");
+      m_out.print(" onchange=\"javascript:window.location.href='" + m_baseURL + "?actionId='+this.value+'#focus';\"");
     }
-    out.print(">");
+    m_out.print(">");
   }
 
   public void radioBoxOption(String fieldName, String text, AbstractHtmlAction action, boolean selected) {
     String actionId = buildActionId(action);
     m_actionMap.put(actionId, action);
-    out.print("<input type=\"radio\" name=\"" + fieldName + "\" value=\"" + actionId + "\" " + (selected ? " checked=\"checked\" " : "") + " onchange=\"javascript:window.location.href='" + m_baseURL + "?actionId='+this.value+'#focus';\">"
+    m_out.print("<input type=\"radio\" name=\"" + fieldName + "\" value=\"" + actionId + "\" " + (selected ? " checked=\"checked\" " : "") + " onchange=\"javascript:window.location.href='" + m_baseURL + "?actionId='+this.value+'#focus';\">"
         + javaToHtml(text) + "</input>");
   }
 
@@ -143,7 +143,7 @@ public class HtmlComponent {
    * normaly used with {@link #startListBox(int, FALSE)}
    */
   public void listBoxOption(String text, String value, boolean selected) {
-    out.print("<option" + (selected ? " selected" : "") + " value=\"" + value + "\">" + javaToHtml(text) + "</option>");
+    m_out.print("<option" + (selected ? " selected" : "") + " value=\"" + value + "\">" + javaToHtml(text) + "</option>");
   }
 
   /**
@@ -152,69 +152,69 @@ public class HtmlComponent {
   public void listBoxOption(String text, AbstractHtmlAction action, boolean selected) {
     String actionId = buildActionId(action);
     m_actionMap.put(actionId, action);
-    out.print("<option" + (selected ? " selected" : "") + " value=\"" + actionId + "\">" + javaToHtml(text) + "</option>");
+    m_out.print("<option" + (selected ? " selected" : "") + " value=\"" + actionId + "\">" + javaToHtml(text) + "</option>");
   }
 
   public void endListBox() {
-    out.print("</select>");
+    m_out.print("</select>");
   }
 
   public void formSubmit(String value) {
-    out.print("<input type=submit value='" + value + "'>");
+    m_out.print("<input type=submit value='" + value + "'>");
   }
 
   public void endForm() {
-    out.print("</form>");
+    m_out.print("</form>");
   }
 
   public void print(String s) {
-    out.print(javaToHtml(s));
+    m_out.print(javaToHtml(s));
   }
 
   public void printNoBreak(String s) {
     s = javaToHtml(s);
     s = s.replaceAll(" ", "&nbsp;");
-    out.print(s);
+    m_out.print(s);
   }
 
   public void br() {
-    out.print("<br>");
+    m_out.print("<br>");
   }
 
   public void focusAnchor() {
-    out.print("<a name=\"focus\"></a>");
+    m_out.print("<a name=\"focus\"></a>");
   }
 
   public void bold(String text) {
-    out.print("<b>");
+    m_out.print("<b>");
     print(text);
-    out.print("</b>");
+    m_out.print("</b>");
   }
 
   public void pBold(String text) {
-    out.print("<p><b>");
+    m_out.print("<p><b>");
     print(text);
-    out.print("</b></p>");
+    m_out.print("</b></p>");
   }
 
   public void pItalic(String text) {
-    out.print("<p><i>");
+    m_out.print("<p><i>");
     print(text);
-    out.print("</i></p>");
+    m_out.print("</i></p>");
   }
 
   public void p(String text) {
-    out.print("<p>");
+    m_out.print("<p>");
     print(text);
-    out.print("</p>");
+    m_out.print("</p>");
   }
 
   public void p() {
-    out.print("<p>");
+    m_out.print("<p>");
   }
 
   public void raw(String s) {
-    out.print(s);
+    m_out.print(s);
   }
 
   public void startTable() {
@@ -230,40 +230,40 @@ public class HtmlComponent {
   }
 
   public void startTable(int border, int cellspacing, int cellpadding, String width) {
-    out.print("<table");
+    m_out.print("<table");
     if (border >= 0) {
-      out.print(" border=" + border);
+      m_out.print(" border=" + border);
     }
     if (cellspacing >= 0) {
-      out.print(" cellspacing=" + cellspacing);
+      m_out.print(" cellspacing=" + cellspacing);
     }
     if (cellpadding >= 0) {
-      out.print(" cellpadding=" + cellpadding);
+      m_out.print(" cellpadding=" + cellpadding);
     }
     if (width != null) {
-      out.print(" width='" + width + "'");
+      m_out.print(" width='" + width + "'");
     }
-    out.print(">");
+    m_out.print(">");
   }
 
   public void endTable() {
-    out.print("</table>");
+    m_out.print("</table>");
   }
 
   public void startTableRow() {
-    out.print("<tr>");
+    m_out.print("<tr>");
   }
 
   public void endTableRow() {
-    out.println("</tr>");
+    m_out.println("</tr>");
   }
 
   public void spacingRow(int columnCount) {
-    out.print("<tr>");
-    out.print("<td colspan=\"" + columnCount + "\">");
-    out.print("&nbsp;");
-    out.print("</td>");
-    out.println("</tr>");
+    m_out.print("<tr>");
+    m_out.print("<td colspan=\"" + columnCount + "\">");
+    m_out.print("&nbsp;");
+    m_out.print("</td>");
+    m_out.println("</tr>");
   }
 
   public void startTableCell() {
@@ -275,21 +275,21 @@ public class HtmlComponent {
   }
 
   public void startTableCell(int rows, int cols, String color) {
-    out.print("<td");
+    m_out.print("<td");
     if (rows > 1) {
-      out.print(" rowspan=" + rows);
+      m_out.print(" rowspan=" + rows);
     }
     if (cols > 1) {
-      out.print(" colspan=" + cols);
+      m_out.print(" colspan=" + cols);
     }
     if (color != null) {
-      out.print(" bgcolor='#" + color + "'");
+      m_out.print(" bgcolor='#" + color + "'");
     }
-    out.print(">");
+    m_out.print(">");
   }
 
   public void endTableCell() {
-    out.print("</td>");
+    m_out.print("</td>");
   }
 
   public void tableCell(String content) {
@@ -303,7 +303,7 @@ public class HtmlComponent {
   public void tableCell(String content, int rows, int cols, String color) {
     startTableCell(rows, cols, color);
     if (!StringUtility.hasText(content)) {
-      out.print("&nbsp;");
+      m_out.print("&nbsp;");
     }
     else {
       print(content);
@@ -312,14 +312,14 @@ public class HtmlComponent {
   }
 
   public void tableHeaderCell(String content) {
-    out.print("<th>");
+    m_out.print("<th>");
     if (!StringUtility.hasText(content)) {
-      out.print("&nbsp;");
+      m_out.print("&nbsp;");
     }
     else {
       print(content);
     }
-    out.print("</th>");
+    m_out.print("</th>");
   }
 
   public String javaToHtml(String s) {
@@ -330,5 +330,4 @@ public class HtmlComponent {
     s = s.replaceAll(">", "&gt;");
     return s;
   }
-
 }

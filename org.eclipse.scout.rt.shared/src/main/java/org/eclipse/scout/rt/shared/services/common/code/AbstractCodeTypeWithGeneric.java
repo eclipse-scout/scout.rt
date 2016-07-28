@@ -391,15 +391,15 @@ public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE ex
   public int getCodeIndex(final CODE_ID id) {
     final IntegerHolder result = new IntegerHolder(-1);
     ICodeVisitor<ICode<CODE_ID>> v = new ICodeVisitor<ICode<CODE_ID>>() {
-      private int index = 0;
+      private int m_index = 0;
 
       @Override
       public boolean visit(ICode<CODE_ID> code, int treeLevel) {
         if (CompareUtility.equals(code.getId(), id)) {
-          result.setValue(index);
+          result.setValue(m_index);
         }
         else {
-          index++;
+          m_index++;
         }
         return result.getValue() < 0;
       }
@@ -412,15 +412,15 @@ public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE ex
   public int getCodeIndex(final ICode<CODE_ID> c) {
     final IntegerHolder result = new IntegerHolder(-1);
     ICodeVisitor<ICode<CODE_ID>> v = new ICodeVisitor<ICode<CODE_ID>>() {
-      private int index = 0;
+      private int m_index = 0;
 
       @Override
       public boolean visit(ICode<CODE_ID> code, int treeLevel) {
         if (code == c) {
-          result.setValue(index);
+          result.setValue(m_index);
         }
         else {
-          index++;
+          m_index++;
         }
         return result.getValue() < 0;
       }

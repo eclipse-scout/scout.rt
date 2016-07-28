@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.data.basic;
 
+@SuppressWarnings({"squid:S00116", "squid:ClassVariableVisibilityCheck"})
 public class BoundsSpec implements java.io.Serializable {
   private static final long serialVersionUID = 1L;
 

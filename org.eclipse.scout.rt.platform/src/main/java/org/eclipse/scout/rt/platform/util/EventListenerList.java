@@ -23,8 +23,8 @@ import org.eclipse.scout.rt.platform.eventlistprofiler.IEventListenerSource;
  */
 public class EventListenerList implements IEventListenerSource {
   private static final Object[] NULL_ARRAY = new Object[0];
-  private final Object listenerListLock = new Object();
-  private transient Object[] listenerList = NULL_ARRAY;
+  private final Object m_listenerListLock = new Object();
+  private transient Object[] m_listenerList = NULL_ARRAY;
 
   public EventListenerList() {
     if (EventListenerProfiler.getInstance().isEnabled()) {
@@ -34,10 +34,10 @@ public class EventListenerList implements IEventListenerSource {
 
   @Override
   public void dumpListenerList(IEventListenerSnapshot snapshot) {
-    synchronized (listenerListLock) {
-      for (int i = listenerList.length - 2; i >= 0; i -= 2) {
-        Class c = (Class) listenerList[i];
-        Object o = listenerList[i + 1];
+    synchronized (m_listenerListLock) {
+      for (int i = m_listenerList.length - 2; i >= 0; i -= 2) {
+        Class c = (Class) m_listenerList[i];
+        Object o = m_listenerList[i + 1];
         if (o instanceof WeakReference) {
           snapshot.add(c, null, ((WeakReference) o).get());
         }
@@ -53,9 +53,9 @@ public class EventListenerList implements IEventListenerSource {
    */
   @SuppressWarnings("unchecked")
   public <T extends EventListener> T[] getListeners(Class<T> t) {
-    synchronized (listenerListLock) {
+    synchronized (m_listenerListLock) {
       maintainListNoLocking();
-      Object[] lList = listenerList;
+      Object[] lList = m_listenerList;
       int n = getListenerCountNoLock(t);
       T[] result = (T[]) Array.newInstance(t, n);
       int j = 0;
@@ -90,7 +90,7 @@ public class EventListenerList implements IEventListenerSource {
   }
 
   public <T extends EventListener> int getListenerCount(Class<T> t) {
-    synchronized (listenerListLock) {
+    synchronized (m_listenerListLock) {
       return getListenerCountNoLock(t);
     }
   }
@@ -98,7 +98,7 @@ public class EventListenerList implements IEventListenerSource {
   @SuppressWarnings("unchecked")
   private <T extends EventListener> int getListenerCountNoLock(Class<T> t) {
     int count = 0;
-    Object[] lList = listenerList;
+    Object[] lList = m_listenerList;
     for (int i = 0; i < lList.length; i += 2) {
       if (t == (Class<T>) lList[i]) {
         count++;
@@ -121,20 +121,20 @@ public class EventListenerList implements IEventListenerSource {
     else {
       ref = listener;
     }
-    synchronized (listenerListLock) {
-      if (listenerList == NULL_ARRAY) {
-        listenerList = new Object[]{t, ref};
+    synchronized (m_listenerListLock) {
+      if (m_listenerList == NULL_ARRAY) {
+        m_listenerList = new Object[]{t, ref};
       }
       else {
-        int n = listenerList.length + 2;
+        int n = m_listenerList.length + 2;
         int k = 0;
         Object[] tmp = new Object[n];
         if (k < n - 2) {
-          System.arraycopy(listenerList, k, tmp, k + 2, n - 2 - k);
+          System.arraycopy(m_listenerList, k, tmp, k + 2, n - 2 - k);
         }
         tmp[k] = t;
         tmp[k + 1] = ref;
-        listenerList = tmp;
+        m_listenerList = tmp;
       }
       maintainListNoLocking();
     }
@@ -154,17 +154,17 @@ public class EventListenerList implements IEventListenerSource {
     else {
       ref = listener;
     }
-    synchronized (listenerListLock) {
-      if (listenerList == NULL_ARRAY) {
-        listenerList = new Object[]{t, ref};
+    synchronized (m_listenerListLock) {
+      if (m_listenerList == NULL_ARRAY) {
+        m_listenerList = new Object[]{t, ref};
       }
       else {
-        int i = listenerList.length;
+        int i = m_listenerList.length;
         Object[] tmp = new Object[i + 2];
-        System.arraycopy(listenerList, 0, tmp, 0, i);
+        System.arraycopy(m_listenerList, 0, tmp, 0, i);
         tmp[i] = t;
         tmp[i + 1] = ref;
-        listenerList = tmp;
+        m_listenerList = tmp;
       }
       maintainListNoLocking();
     }
@@ -179,16 +179,16 @@ public class EventListenerList implements IEventListenerSource {
       return false;
     }
     int index = -1;
-    for (int i = listenerList.length - 2; i >= 0; i -= 2) {
-      if (listenerList[i] == t) {
-        if (listenerList[i + 1] instanceof WeakReference) {
-          if (((WeakReference) listenerList[i + 1]).get() == listener) {
+    for (int i = m_listenerList.length - 2; i >= 0; i -= 2) {
+      if (m_listenerList[i] == t) {
+        if (m_listenerList[i + 1] instanceof WeakReference) {
+          if (((WeakReference) m_listenerList[i + 1]).get() == listener) {
             index = i;
             break;
           }
         }
         else {
-          if (listenerList[i + 1] == listener) {
+          if (m_listenerList[i + 1] == listener) {
             index = i;
             break;
           }
@@ -196,12 +196,12 @@ public class EventListenerList implements IEventListenerSource {
       }
     }
     if (index != -1) {
-      Object[] tmp = new Object[listenerList.length - 2];
-      System.arraycopy(listenerList, 0, tmp, 0, index);
+      Object[] tmp = new Object[m_listenerList.length - 2];
+      System.arraycopy(m_listenerList, 0, tmp, 0, index);
       if (index < tmp.length) {
-        System.arraycopy(listenerList, index + 2, tmp, index, tmp.length - index);
+        System.arraycopy(m_listenerList, index + 2, tmp, index, tmp.length - index);
       }
-      listenerList = (tmp.length == 0) ? NULL_ARRAY : tmp;
+      m_listenerList = (tmp.length == 0) ? NULL_ARRAY : tmp;
     }
     return index != -1;
   }
@@ -213,7 +213,7 @@ public class EventListenerList implements IEventListenerSource {
     if (listener == null) {
       return;
     }
-    synchronized (listenerListLock) {
+    synchronized (m_listenerListLock) {
       removeInternal(t, listener);
       maintainListNoLocking();
     }
@@ -226,7 +226,7 @@ public class EventListenerList implements IEventListenerSource {
     if (listener == null) {
       return;
     }
-    synchronized (listenerListLock) {
+    synchronized (m_listenerListLock) {
       while (removeInternal(t, listener)) {
         // nop
       }
@@ -237,39 +237,39 @@ public class EventListenerList implements IEventListenerSource {
   private void maintainListNoLocking() {
     int j = 0;
     int nullCount = 0;
-    for (int i = listenerList.length - 2; i >= 0; i -= 2) {
-      Object ref = listenerList[i + 1];
+    for (int i = m_listenerList.length - 2; i >= 0; i -= 2) {
+      Object ref = m_listenerList[i + 1];
       if (ref instanceof WeakReference) {
         if (((WeakReference) ref).get() == null) {
-          listenerList[i + 1] = null;
+          m_listenerList[i + 1] = null;
           nullCount++;
         }
       }
       else {
         if (ref == null) {
-          listenerList[i + 1] = null;
+          m_listenerList[i + 1] = null;
           nullCount++;
         }
       }
     }
     if (nullCount > 0) {
-      Object[] tmp = new Object[listenerList.length - nullCount * 2];
+      Object[] tmp = new Object[m_listenerList.length - nullCount * 2];
       j = 0;
-      for (int i = 0; i < listenerList.length; i = i + 2) {
-        if (listenerList[i + 1] != null) {
-          tmp[j] = listenerList[i];
-          tmp[j + 1] = listenerList[i + 1];
+      for (int i = 0; i < m_listenerList.length; i = i + 2) {
+        if (m_listenerList[i + 1] != null) {
+          tmp[j] = m_listenerList[i];
+          tmp[j + 1] = m_listenerList[i + 1];
           j = j + 2;
         }
       }
-      listenerList = tmp;
+      m_listenerList = tmp;
     }
   }
 
   @Override
   public String toString() {
-    synchronized (listenerListLock) {
-      Object[] lList = listenerList;
+    synchronized (m_listenerListLock) {
+      Object[] lList = m_listenerList;
       String s = "EventListenerList: ";
       s += lList.length / 2 + " listeners: ";
       for (int i = 0; i <= lList.length - 2; i += 2) {

@@ -240,6 +240,7 @@ public class VerticalGridMatrix implements IGridMatrix {
     return builder.toString();
   }
 
+  @SuppressWarnings({"squid:S00116", "squid:ClassVariableVisibilityCheck"})
   protected static final class Bounds {
     public int x, y, w, h;
 

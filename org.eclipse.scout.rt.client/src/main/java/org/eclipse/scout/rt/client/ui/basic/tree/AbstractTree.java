@@ -2064,11 +2064,11 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     if (current != null) {
       final Holder<ITreeNode> foundVisited = new Holder<ITreeNode>(ITreeNode.class);
       ITreeVisitor v = new ITreeVisitor() {
-        boolean foundCurrent;
+        boolean m_foundCurrent;
 
         @Override
         public boolean visit(ITreeNode node) {
-          if (foundCurrent) {
+          if (m_foundCurrent) {
             if (node.isFilterAccepted()) {
               foundVisited.setValue(node);
             }
@@ -2076,7 +2076,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
           }
           else {
             if (node == current) {
-              foundCurrent = true;
+              m_foundCurrent = true;
             }
             return true;
           }
@@ -2098,15 +2098,15 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     if (current != null) {
       final Holder<ITreeNode> foundVisited = new Holder<ITreeNode>(ITreeNode.class);
       ITreeVisitor v = new ITreeVisitor() {
-        boolean foundCurrent;
+        boolean m_foundCurrent;
 
         @Override
         public boolean visit(ITreeNode node) {
-          if (foundCurrent) {
+          if (m_foundCurrent) {
             return false;
           }
           if (node == current) {
-            foundCurrent = true;
+            m_foundCurrent = true;
           }
           else if (node.isFilterAccepted()) {
             foundVisited.setValue(node);

@@ -24,15 +24,14 @@ public class GridCell {
   private IFormField m_field;
   private int m_gridColumnCount;
   private GridCell m_up, m_down, m_right;
-
-  protected GridData data;
+  private GridData m_data;
 
   public GridCell(IFormField f, int gridColumnCount) {
     m_field = f;
     m_gridColumnCount = gridColumnCount;
     if (f != null) {
       GridData hints = GridDataBuilder.createFromHints(f, gridColumnCount);
-      data = new GridData(hints);
+      m_data = new GridData(hints);
     }
   }
 
@@ -42,28 +41,28 @@ public class GridCell {
 
   // down, then right
   protected void calculateGridLayout(int gridX, int gridY) {
-    if (data.w >= m_gridColumnCount || gridX >= m_gridColumnCount) {
+    if (m_data.w >= m_gridColumnCount || gridX >= m_gridColumnCount) {
       gridX = 0;
     }
-    data.x = gridX;
-    data.y = gridY;
+    m_data.x = gridX;
+    m_data.y = gridY;
     //
     if (m_field != null) {
-      m_field.setGridDataInternal(new GridData(data));
+      m_field.setGridDataInternal(new GridData(m_data));
     }
     //
     if (m_down != null) {
-      m_down.calculateGridLayout(gridX, gridY + data.h);
+      m_down.calculateGridLayout(gridX, gridY + m_data.h);
     }
     if (m_right != null) {
-      m_right.calculateGridLayout(gridX + data.w, gridY);
+      m_right.calculateGridLayout(gridX + m_data.w, gridY);
     }
   }
 
   protected GridCell getSplitCell(int before, int maxWeight, int colCount) {
-    int after = maxWeight - before - data.h * data.w;
+    int after = maxWeight - before - m_data.h * m_data.w;
     // split-off item with ancestor and descendant
-    if ((colCount - 1) * before >= (data.h + after)) {
+    if ((colCount - 1) * before >= (m_data.h + after)) {
       return this;
     }
     // split-off item with ancestor and no descendant
@@ -72,7 +71,7 @@ public class GridCell {
     }
     // not the split-off item
     if (m_down != null) {
-      GridCell cell = m_down.getSplitCell(before + data.h, maxWeight, colCount);
+      GridCell cell = m_down.getSplitCell(before + m_data.h, maxWeight, colCount);
       if (cell != null) {
         return cell;
       }
@@ -93,28 +92,28 @@ public class GridCell {
   protected int getMaxWeight() {
     int wDown = m_down != null ? m_down.getMaxWeight() : 0;
     int wRight = m_right != null ? m_right.getMaxWeight() : 0;
-    return Math.max(data.h * Math.max(data.w, 1) + wDown, wRight);
+    return Math.max(m_data.h * Math.max(m_data.w, 1) + wDown, wRight);
   }
 
   protected int getMaxY() {
     int mdown = m_down != null ? m_down.getMaxY() : 0;
     int mright = m_right != null ? m_right.getMaxY() : 0;
-    return Math.max(data.h + mdown, mright);
+    return Math.max(m_data.h + mdown, mright);
   }
 
   protected int getMaxCols() {
     int mdown = m_down != null ? m_down.getMaxCols() : 0;
     int mright = m_right != null ? m_right.getMaxCols() : 0;
-    return Math.max(mdown, data.w + mright);
+    return Math.max(mdown, m_data.w + mright);
   }
 
   protected void addBottomCell(GridCell c) {// down or right
     int mdown = m_down != null ? m_down.getMaxY() : 0;
     int mright = m_right != null ? m_right.getMaxY() : 0;
-    if (m_down != null && data.h + mdown >= mright) {
+    if (m_down != null && m_data.h + mdown >= mright) {
       m_down.addBottomCellImpl(c);
     }
-    else if (m_right != null && mright > data.h) {
+    else if (m_right != null && mright > m_data.h) {
       m_right.addBottomCellImpl(c);
     }
     else {
@@ -186,7 +185,7 @@ public class GridCell {
     StringBuilder buf = new StringBuilder();
     buf.append(getClass().getSimpleName());
     buf.append("[");
-    buf.append(data);
+    buf.append(m_data);
     buf.append(" field=" + (m_field != null ? m_field.getFieldId() : null));
     buf.append(" class=" + (m_field != null ? m_field.getClass() : null));
     buf.append("]");

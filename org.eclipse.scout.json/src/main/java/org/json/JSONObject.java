@@ -106,13 +106,13 @@ public class JSONObject {
     }
   };
 
-  private final LinkedHashMap<String, Object> nameValuePairs;
+  private final LinkedHashMap<String, Object> m_nameValuePairs;
 
   /**
    * Creates a {@code JSONObject} with no name/value mappings.
    */
   public JSONObject() {
-    nameValuePairs = new LinkedHashMap<String, Object>();
+    m_nameValuePairs = new LinkedHashMap<String, Object>();
   }
 
   /**
@@ -136,7 +136,7 @@ public class JSONObject {
       if (key == null) {
         throw new NullPointerException("key == null");
       }
-      nameValuePairs.put(key, wrap(entry.getValue()));
+      m_nameValuePairs.put(key, wrap(entry.getValue()));
     }
   }
 
@@ -156,7 +156,7 @@ public class JSONObject {
     Object object = readFrom.nextValue();
     if (object instanceof JSONObject) {
       JSONObject jsonObject = (JSONObject) object;
-      this.nameValuePairs = jsonObject.nameValuePairs;
+      this.m_nameValuePairs = jsonObject.m_nameValuePairs;
     }
     else {
       throw JSON.typeMismatch(object, "JSONObject");
@@ -184,7 +184,7 @@ public class JSONObject {
     for (String name : names) {
       Object value = copyFrom.opt(name);
       if (value != null) {
-        nameValuePairs.put(name, value);
+        m_nameValuePairs.put(name, value);
       }
     }
   }
@@ -193,7 +193,7 @@ public class JSONObject {
    * Returns the number of name/value mappings in this object.
    */
   public int length() {
-    return nameValuePairs.size();
+    return m_nameValuePairs.size();
   }
 
   /**
@@ -202,7 +202,7 @@ public class JSONObject {
    * @return this object.
    */
   public JSONObject put(String name, boolean value) throws JSONException {
-    nameValuePairs.put(checkName(name), value);
+    m_nameValuePairs.put(checkName(name), value);
     return this;
   }
 
@@ -214,7 +214,7 @@ public class JSONObject {
    * @return this object.
    */
   public JSONObject put(String name, double value) throws JSONException {
-    nameValuePairs.put(checkName(name), JSON.checkDouble(value));
+    m_nameValuePairs.put(checkName(name), JSON.checkDouble(value));
     return this;
   }
 
@@ -224,7 +224,7 @@ public class JSONObject {
    * @return this object.
    */
   public JSONObject put(String name, int value) throws JSONException {
-    nameValuePairs.put(checkName(name), value);
+    m_nameValuePairs.put(checkName(name), value);
     return this;
   }
 
@@ -234,7 +234,7 @@ public class JSONObject {
    * @return this object.
    */
   public JSONObject put(String name, long value) throws JSONException {
-    nameValuePairs.put(checkName(name), value);
+    m_nameValuePairs.put(checkName(name), value);
     return this;
   }
 
@@ -249,14 +249,14 @@ public class JSONObject {
    */
   public JSONObject put(String name, Object value) throws JSONException {
     if (value == null) {
-      nameValuePairs.remove(name);
+      m_nameValuePairs.remove(name);
       return this;
     }
     if (value instanceof Number) {
       // deviate from the original by checking all Numbers, not just floats & doubles
       JSON.checkDouble(((Number) value).doubleValue());
     }
-    nameValuePairs.put(checkName(name), value);
+    m_nameValuePairs.put(checkName(name), value);
     return this;
   }
 
@@ -287,7 +287,7 @@ public class JSONObject {
   // TODO [5.2] bsh: Change {@code append) to {@link #append} when append is
   // unhidden.
   public JSONObject accumulate(String name, Object value) throws JSONException {
-    Object current = nameValuePairs.get(checkName(name));
+    Object current = m_nameValuePairs.get(checkName(name));
     if (current == null) {
       return put(name, value);
     }
@@ -300,7 +300,7 @@ public class JSONObject {
       JSONArray array = new JSONArray();
       array.checkedPut(current);
       array.checkedPut(value);
-      nameValuePairs.put(name, array);
+      m_nameValuePairs.put(name, array);
     }
     return this;
   }
@@ -316,7 +316,7 @@ public class JSONObject {
    * @hide
    */
   public JSONObject append(String name, Object value) throws JSONException {
-    Object current = nameValuePairs.get(checkName(name));
+    Object current = m_nameValuePairs.get(checkName(name));
 
     final JSONArray array;
     if (current instanceof JSONArray) {
@@ -324,7 +324,7 @@ public class JSONObject {
     }
     else if (current == null) {
       JSONArray newArray = new JSONArray();
-      nameValuePairs.put(name, newArray);
+      m_nameValuePairs.put(name, newArray);
       array = newArray;
     }
     else {
@@ -349,14 +349,14 @@ public class JSONObject {
    * @return the value previously mapped by {@code name}, or null if there was no such mapping.
    */
   public Object remove(String name) {
-    return nameValuePairs.remove(name);
+    return m_nameValuePairs.remove(name);
   }
 
   /**
    * Returns true if this object has no mapping for {@code name} or if it has a mapping whose value is {@link #NULL}.
    */
   public boolean isNull(String name) {
-    Object value = nameValuePairs.get(name);
+    Object value = m_nameValuePairs.get(name);
     return value == null || value == NULL;
   }
 
@@ -364,7 +364,7 @@ public class JSONObject {
    * Returns true if this object has a mapping for {@code name}. The mapping may be {@link #NULL}.
    */
   public boolean has(String name) {
-    return nameValuePairs.containsKey(name);
+    return m_nameValuePairs.containsKey(name);
   }
 
   /**
@@ -374,7 +374,7 @@ public class JSONObject {
    *           if no such mapping exists.
    */
   public Object get(String name) throws JSONException {
-    Object result = nameValuePairs.get(name);
+    Object result = m_nameValuePairs.get(name);
     if (result == null) {
       throw new JSONException("No value for " + name);
     }
@@ -385,7 +385,7 @@ public class JSONObject {
    * Returns the value mapped by {@code name}, or null if no such mapping exists.
    */
   public Object opt(String name) {
-    return nameValuePairs.get(name);
+    return m_nameValuePairs.get(name);
   }
 
   /**
@@ -634,7 +634,7 @@ public class JSONObject {
    * modified after the iterator is returned, the iterator's behavior is undefined. The order of the keys is undefined.
    */
   public Iterator<String> keys() {
-    return nameValuePairs.keySet().iterator();
+    return m_nameValuePairs.keySet().iterator();
   }
 
   /**
@@ -643,7 +643,7 @@ public class JSONObject {
    * undefined if this object is modified after it is returned. See {@link #keys()}. @hide.
    */
   public Set<String> keySet() {
-    return nameValuePairs.keySet();
+    return m_nameValuePairs.keySet();
   }
 
   /**
@@ -651,9 +651,9 @@ public class JSONObject {
    * mappings.
    */
   public JSONArray names() {
-    return nameValuePairs.isEmpty()
+    return m_nameValuePairs.isEmpty()
         ? null
-        : new JSONArray(new ArrayList<String>(nameValuePairs.keySet()));
+        : new JSONArray(new ArrayList<String>(m_nameValuePairs.keySet()));
   }
 
   /**
@@ -699,7 +699,7 @@ public class JSONObject {
 
   void writeTo(JSONStringer stringer) throws JSONException {
     stringer.object();
-    for (Map.Entry<String, Object> entry : nameValuePairs.entrySet()) {
+    for (Map.Entry<String, Object> entry : m_nameValuePairs.entrySet()) {
       stringer.key(entry.getKey()).value(entry.getValue());
     }
     stringer.endObject();

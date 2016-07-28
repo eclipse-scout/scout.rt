@@ -1840,6 +1840,7 @@ public final class TypeCastUtility {
     return o.isUndefined() ? false : o.getBooleanValue().booleanValue();
   }
 
+  @SuppressWarnings("squid:S00116")
   private static class TypeDesc {
     int parameterizedTypeIndex;
     TypeVariable<?> typeVariable;

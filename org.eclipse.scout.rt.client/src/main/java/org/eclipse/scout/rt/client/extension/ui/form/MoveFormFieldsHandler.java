@@ -152,14 +152,14 @@ public class MoveFormFieldsHandler {
   }
 
   private class P_FormFieldVisitor implements IFormFieldVisitor {
-    private final P_FormFieldParentIterator parentIterator = new P_FormFieldParentIterator();
+    private final P_FormFieldParentIterator m_parentIterator = new P_FormFieldParentIterator();
 
     @Override
     public boolean visitField(IFormField field, int level, int fieldIndex) {
       // setup parent field iterator
-      parentIterator.setCurrentField(field);
+      m_parentIterator.setCurrentField(field);
       // lookup move items
-      MoveDescriptor<IFormField> moveDesc = m_extensionRegistry.createModelMoveDescriptorFor(field, parentIterator);
+      MoveDescriptor<IFormField> moveDesc = m_extensionRegistry.createModelMoveDescriptorFor(field, m_parentIterator);
       if (moveDesc != null) {
         m_moveDescriptors.add(moveDesc);
       }

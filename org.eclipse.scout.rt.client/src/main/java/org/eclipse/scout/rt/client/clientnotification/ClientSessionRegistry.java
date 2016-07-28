@@ -18,16 +18,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.security.auth.Subject;
-
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.CompareUtility;
 import org.eclipse.scout.rt.shared.ISession;
-import org.eclipse.scout.rt.shared.SharedConfigProperties.NotificationSubjectProperty;
 import org.eclipse.scout.rt.shared.services.common.ping.IPingService;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnel;
 import org.eclipse.scout.rt.shared.session.IGlobalSessionListener;
@@ -37,11 +33,6 @@ import org.slf4j.LoggerFactory;
 
 public class ClientSessionRegistry implements IClientSessionRegistry, IGlobalSessionListener {
   private static final Logger LOG = LoggerFactory.getLogger(ClientSessionRegistry.class);
-
-  /**
-   * Subject for server calls for client notification related updates.
-   */
-  protected final Subject NOTIFICATION_SUBJECT = CONFIG.getPropertyValue(NotificationSubjectProperty.class);
 
   private final Object m_cacheLock = new Object();
   private final Map<String /*sessionId*/, WeakReference<IClientSession>> m_sessionIdToSession = new HashMap<>();

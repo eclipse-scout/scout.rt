@@ -51,11 +51,11 @@ public class MediumMemoryPolicy extends AbstractMemoryPolicy {
     //check if there is stored search form data
     SearchFormState state = m_searchFormCache.get(pageFormIdentifier);
     if (state != null) {
-      if (state.formContentXml != null) {
-        f.loadFromXmlString(state.formContentXml);
+      if (state.m_formContentXml != null) {
+        f.loadFromXmlString(state.m_formContentXml);
       }
-      if (state.searchFilter != null) {
-        f.setSearchFilter(state.searchFilter);
+      if (state.m_searchFilter != null) {
+        f.setSearchFilter(state.m_searchFilter);
       }
     }
   }

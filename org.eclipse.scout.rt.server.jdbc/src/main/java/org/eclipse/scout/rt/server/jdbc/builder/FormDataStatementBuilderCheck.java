@@ -25,6 +25,7 @@ import org.eclipse.scout.rt.shared.data.model.IDataModelAttribute;
 import org.eclipse.scout.rt.shared.data.model.IDataModelEntity;
 
 public class FormDataStatementBuilderCheck {
+  @SuppressWarnings("squid:S00116")
   protected final FormDataStatementBuilder builder;
   private TreeSet<String> m_imports;
   private ArrayList<String> m_body;

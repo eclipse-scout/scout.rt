@@ -19,6 +19,7 @@ package org.eclipse.scout.rt.client.ui.form.fields;
 /**
  * Grid Cell as container helper for dynamic layouting in scout
  */
+@SuppressWarnings({"squid:S00116", "squid:ClassVariableVisibilityCheck"})
 public final class GridData {
 
   public int x;

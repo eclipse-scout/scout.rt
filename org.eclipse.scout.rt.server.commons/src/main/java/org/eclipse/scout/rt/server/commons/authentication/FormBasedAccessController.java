@@ -123,8 +123,8 @@ public class FormBasedAccessController implements IAccessController {
    * @param response
    */
   protected void handleForbidden(final int status, final HttpServletResponse response) throws IOException, ServletException {
-    if (m_config.get403WaitMillis() > 0L) {
-      SleepUtil.sleepSafe(m_config.get403WaitMillis(), TimeUnit.MILLISECONDS);
+    if (m_config.getStatus403WaitMillis() > 0L) {
+      SleepUtil.sleepSafe(m_config.getStatus403WaitMillis(), TimeUnit.MILLISECONDS);
     }
     response.sendError(HttpServletResponse.SC_FORBIDDEN);
   }
@@ -152,7 +152,7 @@ public class FormBasedAccessController implements IAccessController {
   public static class FormBasedAuthConfig {
 
     private boolean m_enabled = true;
-    private long m_403WaitMillis = 500L;
+    private long m_status403WaitMillis = 500L;
     private ICredentialVerifier m_credentialVerifier;
     private IPrincipalProducer m_principalProducer = BEANS.get(SimplePrincipalProducer.class);
 
@@ -190,16 +190,16 @@ public class FormBasedAccessController implements IAccessController {
       return this;
     }
 
-    public long get403WaitMillis() {
-      return m_403WaitMillis;
+    public long getStatus403WaitMillis() {
+      return m_status403WaitMillis;
     }
 
     /**
      * Sets the time to wait to respond with a 403 response code. That is a simple mechanism to address brute-force
      * attacks, but may have a negative effect on DoS attacks. By default, this authenticator waits for 500ms.
      */
-    public FormBasedAuthConfig with403WaitMillis(final long waitMillis) {
-      m_403WaitMillis = waitMillis;
+    public FormBasedAuthConfig withStatus403WaitMillis(final long waitMillis) {
+      m_status403WaitMillis = waitMillis;
       return this;
     }
   }
