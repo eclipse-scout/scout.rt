@@ -59,9 +59,9 @@ scout.Session = function($entryPoint, options) {
   this._clonedModelAdapterRegistry = {}; // key = adapter-ID, value = array of clones for that adapter
   this.locale = options.locale;
   if (this.locale) {
-    this._texts = scout.textProperties.get(this.locale.languageTag);
+    this._texts = scout.texts.get(this.locale.languageTag);
   } else {
-    this._texts = new scout.Texts();
+    this._texts = new scout.TextMap();
   }
   this.ajaxRequests = [];
   this._asyncEvents = [];
@@ -1173,7 +1173,7 @@ scout.Session.prototype._onLocaleChanged = function(event) {
 
 scout.Session.prototype._putLocaleData = function(locale, textMap) {
   this.locale = new scout.Locale(locale);
-  this._texts = new scout.Texts(textMap);
+  this._texts = new scout.TextMap(textMap);
   // FIXME bsh: inform components to reformat display text? also check Collator in scout.comparators.TEXT
 };
 
@@ -1257,11 +1257,11 @@ scout.Session.prototype.getAdapterData = function(id) {
 };
 
 scout.Session.prototype.text = function(textKey) {
-  return scout.Texts.prototype.get.apply(this._texts, arguments);
+  return scout.TextMap.prototype.get.apply(this._texts, arguments);
 };
 
 scout.Session.prototype.optText = function(textKey, defaultValue) {
-  return scout.Texts.prototype.optGet.apply(this._texts, arguments);
+  return scout.TextMap.prototype.optGet.apply(this._texts, arguments);
 };
 
 scout.Session.prototype.textExists = function(textKey) {

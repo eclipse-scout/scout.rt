@@ -34,7 +34,7 @@ scout.TreeNode.prototype.init = function(model) {
 };
 
 scout.TreeNode.prototype._resolveTextKeys = function() {
-  var key = scout.Texts.resolveKey(this.text);
+  var key = scout.texts.resolveKey(this.text);
   if (key) {
     this.text = this.parent.session.text(key);
   }

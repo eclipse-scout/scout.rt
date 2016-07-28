@@ -18,7 +18,7 @@ scout.login = {
    */
   init: function(opts) {
     opts = opts || {};
-    opts.texts = $.extend({}, scout.Texts.readFromDOM(), opts.texts);
+    opts.texts = $.extend({}, scout.texts.readFromDOM(), opts.texts);
 
     scout.prepareDOM();
 

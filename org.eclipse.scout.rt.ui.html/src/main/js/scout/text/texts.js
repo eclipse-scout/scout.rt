@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-scout.textProperties = {
+scout.texts = {
 
   TEXT_KEY_REGEX: /\$\{textKey\:([a-zA-Z0-9\.]*)\}/,
 
@@ -37,7 +37,7 @@ scout.textProperties = {
     var textMap, languageTag;
     for (languageTag in model) {
       textMap = model[languageTag];
-      this.put(languageTag, new scout.Texts(textMap));
+      this.put(languageTag, new scout.TextMap(textMap));
     }
     for (languageTag in model) {
       this.link(languageTag);
@@ -54,7 +54,7 @@ scout.textProperties = {
       var texts = this._get(tag);
       if (!texts) {
         // If there are no texts for the given tag, create an empty Texts object for linking purpose
-        texts = new scout.Texts();
+        texts = new scout.TextMap();
         this.put(tag, texts);
       }
       if (child) {
@@ -111,6 +111,31 @@ scout.textProperties = {
 
   put: function(languageTag, texts) {
     this.textsByLocale[languageTag] = texts;
-  }
+  },
 
+  /**
+   * Extracts NLS texts from the DOM tree. Texts are expected in the following format:
+   *
+   *   <scout-text data-key="..." data-value="..." />
+   *
+   * This method returns a map with all found texts. It must be called before scout.prepareDOM()
+   * is called, as that method removes all <scout-text> tags.
+   */
+  readFromDOM: function() {
+    var textMap = {};
+    $('scout-text').each(function() {
+      // No need to unescape strings (the browser did this already)
+      var key = $(this).data('key');
+      var value = $(this).data('value');
+      textMap[key] = value;
+    });
+    return textMap;
+  },
+
+  resolveKey: function(value) {
+    var result = this.TEXT_KEY_REGEX.exec(value);
+    if (result && result.length === 2) {
+      return result[1];
+    }
+  }
 };

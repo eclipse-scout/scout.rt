@@ -8,9 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-describe("texts", function() {
+describe("TextMap", function() {
 
-  var texts = new scout.Texts({
+  var texts = new scout.TextMap({
     NoOptions: 'Keine Übereinstimmung',
     NumOptions: '{0} Optionen',
     Greeting: 'Hello {0}, my name is {2}, {1}.',
@@ -19,12 +19,12 @@ describe("texts", function() {
     Null: null
   });
 
-  var textsChild = new scout.Texts({
+  var textsChild = new scout.TextMap({
     ChildKey: 'A Child Key',
     DuplicateKey: 'Child Duplicate Key'
   });
 
-  var textsParent = new scout.Texts({
+  var textsParent = new scout.TextMap({
     ParentKey: 'A Parent Key',
     DuplicateKey: 'Parent Duplicate Key'
   });

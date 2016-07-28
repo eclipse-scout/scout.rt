@@ -40,7 +40,6 @@
   __include("scout/util/Status.js");
   __include("scout/util/strings.js");
   __include("scout/util/styles.js");
-  __include("scout/util/textProperties.js");
   __include("scout/util/URL.js");
   __include("scout/util/filters.js");
   __include("scout/util/hAlign.js");
@@ -97,7 +96,8 @@
   __include("scout/splitter/Splitter.js");
   __include("scout/text/DateFormat.js");
   __include("scout/text/DecimalFormat.js");
-  __include("scout/text/Texts.js");
+  __include("scout/text/TextMap.js");
+  __include("scout/text/texts.js");
   __include("scout/tooltip/Tooltip.js");
   __include("scout/tooltip/tooltips.js");
   __include("scout/action/Action.js");
