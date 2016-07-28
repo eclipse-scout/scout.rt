@@ -16,13 +16,44 @@ scout.logout = {
    * - logoUrl: default points to 'res/logo.png'
    */
   init: function(opts) {
-    opts = opts || {};
-    opts.texts = $.extend({}, scout.Texts.readFromDOM(), opts.texts);
+    var deferreds = this._bootstrap();
+    $.when.apply($, deferreds)
+      .done(this._init.bind(this, opts));
+  },
+
+  /**
+   * Executes the default bootstrap functions and returns an array of deferred objects.<p>
+   * The actual startup begins only when every of these deferred objects are completed.
+   * This gives the possibility to dynamically load additional scripts or files which are mandatory for a successful startup.
+   * The individual bootstrap functions may return null or undefined, a single deferred or multiple deferreds as an array.
+   */
+  _bootstrap : function() {
+    var deferredValues = [
+      scout.logging.bootstrap()
+    ];
+
+    var deferreds = [];
+    deferredValues.forEach(function(value) {
+      if (Array.isArray(value)) {
+        deferreds.concat(value);
+      } else if (value) {
+        deferreds.push(value);
+      }
+    });
+    return deferreds;
+  },
+
+  /**
+   * Initializes login box
+   */
+  _init : function(options) {
+    options = options || {};
+    options.texts = $.extend({}, scout.Texts.readFromDOM(), options.texts);
 
     scout.prepareDOM();
+    scout.objectFactory.init();
 
-    var logoutBox = new scout.LogoutBox(opts);
+    var logoutBox = scout.create('LogoutBox', options);
     logoutBox.render($('body'));
   }
-
 };

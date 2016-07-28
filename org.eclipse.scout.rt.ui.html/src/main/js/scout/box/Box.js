@@ -13,7 +13,7 @@
  * Beside custom elements it may contain a header with a logo and a button bar.
  * Note: It does not extend from Widget because widget has too many dependencies which are not needed for this simple use case (login-module does not include these dependencies)
  */
-scout.Box = function(opts) {
+scout.Box = function() {
 };
 
 scout.Box.prototype.render = function($parent) {

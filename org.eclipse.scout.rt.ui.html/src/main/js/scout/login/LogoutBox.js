@@ -8,9 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-scout.LogoutBox = function(opts) {
-  scout.LogoutBox.parent.call(this, opts);
+scout.LogoutBox = function() {
+  scout.LogoutBox.parent.call(this);
+};
+scout.inherits(scout.LogoutBox, scout.Box);
 
+scout.LogoutBox.prototype.init = function(opts) {
   var defaultOpts = {
     loginUrl: sessionStorage.getItem('scout:loginUrl') || './',
     logoUrl: 'res/logo.png'
@@ -26,7 +29,6 @@ scout.LogoutBox = function(opts) {
   this.loginUrl = this.options.loginUrl;
   this.logoUrl = this.options.logoUrl;
 };
-scout.inherits(scout.LogoutBox, scout.Box);
 
 scout.LogoutBox.prototype.render = function($parent) {
   scout.LogoutBox.parent.prototype.render.call(this, $parent);
