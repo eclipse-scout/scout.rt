@@ -63,7 +63,7 @@ describe("texts", function() {
 
       expect(textsParent.get('ChildKey')).toBe('[undefined text: ChildKey]');
       expect(textsParent.get('ParentKey')).toBe('A Parent Key');
-      expect(textsChild.get('DuplicateKey')).toBe('Parent Duplicate Key');
+      expect(textsParent.get('DuplicateKey')).toBe('Parent Duplicate Key');
     });
 
     it("returns a text containing undefinied if neither child nor parent contains the key", function() {
@@ -98,7 +98,8 @@ describe("texts", function() {
       expect(textsChild.optGet('ChildKey')).toBe('A Child Key');
       expect(textsChild.optGet('ParentKey')).toBe('A Parent Key');
 
-      expect(textsParent.optGet('ChildKey')).toBe('[undefined text: ChildKey]');
+      expect(textsParent.optGet('ChildKey')).toBeUndefined();
+      expect(textsParent.optGet('ChildKey', 'default value')).toBe('default value');
       expect(textsParent.optGet('ParentKey')).toBe('A Parent Key');
     });
 
