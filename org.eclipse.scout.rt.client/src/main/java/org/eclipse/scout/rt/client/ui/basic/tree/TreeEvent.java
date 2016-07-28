@@ -243,7 +243,10 @@ public class TreeEvent extends EventObject implements IModelEvent {
    */
   protected void setNodes(Collection<ITreeNode> nodes) {
     m_nodes = nodes;
-    m_commonParentNode = TreeUtility.calculateCommonParentNode(nodes);
+    // do not updated common parent node because for TYPE_ALL_CHILD_NODES_DELETED events because it is required by event handlers.
+    if (getType() != TYPE_ALL_CHILD_NODES_DELETED) {
+      m_commonParentNode = TreeUtility.calculateCommonParentNode(nodes);
+    }
   }
 
   /**
