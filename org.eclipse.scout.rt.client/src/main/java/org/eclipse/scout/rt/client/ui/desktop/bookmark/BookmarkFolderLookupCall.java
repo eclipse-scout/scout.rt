@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.client.ui.desktop.bookmark;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 import org.eclipse.scout.rt.shared.services.common.bookmark.BookmarkFolder;
 import org.eclipse.scout.rt.shared.services.common.bookmark.IBookmarkVisitor;
@@ -23,6 +24,7 @@ import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 /**
  * hierarchy lookup call for bookmark folder tree
  */
+@ClassId("a6df6454-6752-43ea-8624-26c691a1145b")
 public class BookmarkFolderLookupCall extends LocalLookupCall<BookmarkFolder> {
   private static final long serialVersionUID = 1L;
 

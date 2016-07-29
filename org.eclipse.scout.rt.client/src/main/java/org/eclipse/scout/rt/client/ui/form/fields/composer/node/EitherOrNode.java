@@ -20,6 +20,7 @@ import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.IComposerField;
 import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 
 public class EitherOrNode extends AbstractComposerNode {
@@ -87,6 +88,7 @@ public class EitherOrNode extends AbstractComposerNode {
   }
 
   @Order(1)
+  @ClassId("86864de8-85bf-4274-a134-2ec8ae602315")
   public class AddAdditionalOrMenu extends AbstractMenu {
     @Override
     protected String getConfiguredText() {
@@ -100,6 +102,7 @@ public class EitherOrNode extends AbstractComposerNode {
   }
 
   @Order(5)
+  @ClassId("7a388969-391d-4920-8f90-23759f53f86c")
   public class AddEitherOrMenu extends AbstractMenu {
     @Override
     protected String getConfiguredText() {
@@ -114,10 +117,12 @@ public class EitherOrNode extends AbstractComposerNode {
   }
 
   @Order(10)
+  @ClassId("28fc0085-83af-4b19-95f7-1ed70c43f1c8")
   public class Separator1Menu extends AbstractMenuSeparator {
   }
 
   @Order(20)
+  @ClassId("b8237afc-8794-498b-a6a5-efa1848ef201")
   public class NegateEitherOrMenu extends AbstractMenu {
 
     @Override
@@ -136,6 +141,7 @@ public class EitherOrNode extends AbstractComposerNode {
   }
 
   @Order(30)
+  @ClassId("7461e694-1f88-438f-91b4-93e65db76f3e")
   public class DeleteEitherOrMenu extends AbstractMenu {
 
     @Override
@@ -163,10 +169,12 @@ public class EitherOrNode extends AbstractComposerNode {
   }
 
   @Order(40)
+  @ClassId("59c754f8-684b-4eea-80ff-11e1b1b916c2")
   public class Separator2Menu extends AbstractMenuSeparator {
   }
 
   @Order(50)
+  @ClassId("b444ace8-d032-44d0-941a-a261bc48777b")
   public class AddAttributeOnEitherOrMenu extends AbstractAddAttributeMenu {
     public AddAttributeOnEitherOrMenu() {
       super(getComposerField(), EitherOrNode.this);
@@ -174,10 +182,12 @@ public class EitherOrNode extends AbstractComposerNode {
   }
 
   @Order(60)
+  @ClassId("1914f76c-4635-4b54-ae29-6ec1857bca90")
   public class Separator3Menu extends AbstractMenuSeparator {
   }
 
   @Order(70)
+  @ClassId("567ee492-6de3-4801-a4bc-2476c5392b7c")
   public class AddEntityOnEitherOrPlaceholderMenu extends AbstractMenuSeparator {
   }
 }

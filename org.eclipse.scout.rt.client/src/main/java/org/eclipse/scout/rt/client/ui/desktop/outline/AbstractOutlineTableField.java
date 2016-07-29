@@ -24,12 +24,14 @@ import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 
 /**
  * This field can be used to place the default outline table (which changes on every outline tree change) inside a
  * custom form.<br>
  * The default outline table form makes use of this field.
  */
+@ClassId("f0770b37-8113-4476-a486-73ceabfdef90")
 public abstract class AbstractOutlineTableField extends AbstractTableField<ITable> implements IOutlineTableField {
   private DesktopListener m_desktopListener;
   private PropertyChangeListener m_tablePropertyListener;

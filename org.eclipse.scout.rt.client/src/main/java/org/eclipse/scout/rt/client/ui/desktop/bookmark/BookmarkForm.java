@@ -26,11 +26,13 @@ import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 import org.eclipse.scout.rt.shared.services.common.bookmark.BookmarkFolder;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 
+@ClassId("036f030f-784a-4b55-be08-c95746acd664")
 public class BookmarkForm extends AbstractForm implements IBookmarkForm {
   private BookmarkFolder m_bookmarkRootFolder;
   private Bookmark m_bookmark;
@@ -112,6 +114,7 @@ public class BookmarkForm extends AbstractForm implements IBookmarkForm {
   }
 
   @Order(10)
+  @ClassId("c9263068-999d-4127-9974-2617fd52991b")
   public class MainBox extends AbstractGroupBox {
     @Override
     protected int getConfiguredGridColumnCount() {
@@ -119,9 +122,11 @@ public class BookmarkForm extends AbstractForm implements IBookmarkForm {
     }
 
     @Order(10)
+    @ClassId("1a433540-f1f6-4dfd-be5b-44865e448c49")
     public class GroupBox extends AbstractGroupBox {
 
       @Order(10)
+      @ClassId("30c9307c-093a-4d15-83d6-51ea2312a657")
       public class TitleField extends AbstractStringField {
         @Override
         protected String getConfiguredLabel() {
@@ -140,6 +145,7 @@ public class BookmarkForm extends AbstractForm implements IBookmarkForm {
       }
 
       @Order(20)
+      @ClassId("44e332c0-62ac-4474-80c9-88d85994ba06")
       public class FolderField extends AbstractSmartField<BookmarkFolder> {
         @Override
         protected String getConfiguredLabel() {
@@ -158,6 +164,7 @@ public class BookmarkForm extends AbstractForm implements IBookmarkForm {
       }
 
       @Order(30)
+      @ClassId("68d3442e-32f4-4755-abd8-98f67e6013cd")
       public class KeyStrokeField extends AbstractSmartField<String> {
         @Override
         protected String getConfiguredLabel() {
@@ -176,6 +183,7 @@ public class BookmarkForm extends AbstractForm implements IBookmarkForm {
       }
 
       @Order(35)
+      @ClassId("8687aa9e-3322-4aa3-90ab-090b33c7168c")
       public class SortOrderField extends AbstractBigDecimalField {
         @Override
         protected String getConfiguredLabel() {
@@ -194,6 +202,7 @@ public class BookmarkForm extends AbstractForm implements IBookmarkForm {
       }
 
       @Order(40)
+      @ClassId("8313302a-12a9-4170-8d69-da4bfa3e2815")
       public class DescriptionField extends AbstractStringField {
         @Override
         protected String getConfiguredLabel() {
@@ -233,10 +242,12 @@ public class BookmarkForm extends AbstractForm implements IBookmarkForm {
     }
 
     @Order(40)
+    @ClassId("d97f8aa9-03df-4545-ab09-50dd2925459b")
     public class OkButton extends AbstractOkButton {
     }
 
     @Order(50)
+    @ClassId("b5ff8950-1f7d-4b5f-a66d-2de8b7d25bae")
     public class CancelButton extends AbstractCancelButton {
     }
   }

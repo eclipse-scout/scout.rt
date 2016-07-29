@@ -13,9 +13,11 @@ package org.eclipse.scout.rt.client.ui.desktop.outline;
 import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeUIFacade;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.TEXTS;
 
+@ClassId("57c90097-ba28-414c-8ce6-0ae32bfef803")
 public abstract class AbstractSearchOutline extends AbstractOutline implements ISearchOutline {
 
   private int m_minSearchTokenLength;

@@ -12,7 +12,9 @@ package org.eclipse.scout.rt.client.ui.action.keystroke;
 
 import org.eclipse.scout.rt.client.extension.ui.action.keystroke.IKeyStrokeExtension;
 import org.eclipse.scout.rt.client.ui.action.AbstractAction;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 
+@ClassId("a65c2866-e55c-4f31-a5fa-cd3f0ecfea05")
 public abstract class AbstractKeyStroke extends AbstractAction implements IKeyStroke {
 
   /**

@@ -30,6 +30,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.listbox.AbstractListBox;
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.AbstractSequenceBox;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.shared.ScoutTexts;
@@ -38,6 +39,7 @@ import org.eclipse.scout.rt.shared.data.model.IDataModelAttributeOp;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 
+@ClassId("d9667ad1-93a3-4675-a158-c1da9931c7df")
 public class ComposerAttributeForm extends AbstractForm {
   private List<IDataModelAttribute> m_validAttributes;
   /**
@@ -157,6 +159,7 @@ public class ComposerAttributeForm extends AbstractForm {
   }
 
   @Order(1)
+  @ClassId("1e682698-544a-4636-9332-4a3e0405f257")
   public class MainBox extends AbstractGroupBox {
 
     @Override
@@ -165,6 +168,7 @@ public class ComposerAttributeForm extends AbstractForm {
     }
 
     @Order(1)
+    @ClassId("1f790491-1a71-4252-9209-e9277dbd77d5")
     public class SequenceBox extends AbstractSequenceBox {
 
       @Override
@@ -193,6 +197,7 @@ public class ComposerAttributeForm extends AbstractForm {
       }
 
       @Order(1)
+      @ClassId("4d2fc7d9-186e-4ea6-bce8-cb35c1f3b35b")
       public class AttributeField extends AbstractListBox<IDataModelAttribute> {
         @Override
         protected String getConfiguredLabel() {
@@ -254,6 +259,7 @@ public class ComposerAttributeForm extends AbstractForm {
       }
 
       @Order(2)
+      @ClassId("dd082fb2-2f03-41df-be38-ffa9811fa614")
       public class OperatorField extends AbstractListBox<IDataModelAttributeOp> {
         @Override
         protected String getConfiguredLabel() {
@@ -317,6 +323,7 @@ public class ComposerAttributeForm extends AbstractForm {
       }
 
       @Order(3)
+      @ClassId("6fd21045-eee6-41fd-a8d6-ef1cfd40209a")
       public class ValueField extends AbstractComposerValueBox {
         @Override
         protected String getConfiguredLabel() {
@@ -349,10 +356,12 @@ public class ComposerAttributeForm extends AbstractForm {
     }
 
     @Order(100)
+    @ClassId("1b3d5630-209e-492e-8d0e-1f1ab7672730")
     public class OkButton extends AbstractOkButton {
     }
 
     @Order(101)
+    @ClassId("83c8bafb-ca6a-49e9-9e8e-49414bfb1511")
     public class CancelButton extends AbstractCancelButton {
     }
   }

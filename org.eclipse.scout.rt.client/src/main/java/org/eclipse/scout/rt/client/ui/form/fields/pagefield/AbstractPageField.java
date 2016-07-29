@@ -172,6 +172,7 @@ public abstract class AbstractPageField<PAGE extends IPage> extends AbstractGrou
   }
 
   @Order(10)
+  @ClassId("5eb7b330-3549-4bdf-a4e9-cc4486e44f36")
   public class SearchFormField extends AbstractWrappedFormField<IForm> {
 
     @Override
@@ -207,6 +208,7 @@ public abstract class AbstractPageField<PAGE extends IPage> extends AbstractGrou
   }
 
   @Order(20)
+  @ClassId("5bff61f0-9f9a-492c-ba33-cdc1407eeade")
   public class TableField extends AbstractTableField<ITable> {
 
     @Override
@@ -252,6 +254,7 @@ public abstract class AbstractPageField<PAGE extends IPage> extends AbstractGrou
   }
 
   @Order(30)
+  @ClassId("8808ad60-c941-4086-b470-72f23dd8125e")
   public class DetailFormField extends AbstractWrappedFormField<IForm> {
 
     @Override
@@ -276,6 +279,7 @@ public abstract class AbstractPageField<PAGE extends IPage> extends AbstractGrou
     }
   }
 
+  @ClassId("6be65846-72ec-49ec-aad2-42caa75709d3")
   public static class SimpleOutline extends AbstractOutline {
 
     @Override

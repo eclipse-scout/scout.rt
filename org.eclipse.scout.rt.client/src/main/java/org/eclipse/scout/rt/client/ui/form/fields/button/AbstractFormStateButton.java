@@ -40,6 +40,7 @@ public abstract class AbstractFormStateButton extends AbstractButton {
   }
 
   @Order(10)
+  @ClassId("db8cdb66-c87a-40c3-be7c-02433e079f99")
   public class SaveMenu extends AbstractMenu {
 
     @Override
@@ -54,6 +55,7 @@ public abstract class AbstractFormStateButton extends AbstractButton {
   }
 
   @Order(20)
+  @ClassId("84786b4f-d807-4b9b-9b63-c917b4de3133")
   public class SaveAsMenu extends AbstractMenu {
 
     @Override

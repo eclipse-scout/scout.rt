@@ -14,10 +14,12 @@ import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@ClassId("24d7ddcd-7656-487b-af5a-caf7b5d3791b")
 public class ActivateBookmarkMenu extends AbstractMenu {
   private static final Logger LOG = LoggerFactory.getLogger(ActivateBookmarkMenu.class);
 

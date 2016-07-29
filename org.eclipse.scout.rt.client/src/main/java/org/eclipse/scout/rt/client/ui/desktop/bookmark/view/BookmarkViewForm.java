@@ -39,6 +39,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.tabbox.AbstractTabBox;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.util.StringUtility;
@@ -53,6 +54,7 @@ import org.eclipse.scout.rt.shared.services.common.bookmark.BookmarkFolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@ClassId("f75ab95f-f827-431b-b5e9-53c71b5eb965")
 public class BookmarkViewForm extends AbstractForm {
   private static final Logger LOG = LoggerFactory.getLogger(BookmarkViewForm.class);
 
@@ -104,12 +106,15 @@ public class BookmarkViewForm extends AbstractForm {
   }
 
   @Order(10)
+  @ClassId("6cba98a1-570b-4cca-b85b-3a2408fccf1d")
   public class MainBox extends AbstractGroupBox {
 
     @Order(10)
+    @ClassId("80d03507-9df7-448f-ba2f-4d35613d03cc")
     public class TabBox extends AbstractTabBox {
 
       @Order(10)
+      @ClassId("549d76a2-9231-412f-8635-aedc0e2b801a")
       public class BookmarksBox extends AbstractGroupBox {
         @Override
         protected String getConfiguredLabel() {
@@ -122,6 +127,7 @@ public class BookmarkViewForm extends AbstractForm {
         }
 
         @Order(20)
+        @ClassId("23af2442-38f6-4c74-a590-2180c39cff15")
         public class UserBookmarkSearchField extends AbstractStringField implements ITreeNodeFilter {
           private Pattern m_lowercaseFilterPattern;
 
@@ -176,6 +182,7 @@ public class BookmarkViewForm extends AbstractForm {
         }
 
         @Order(20)
+        @ClassId("abaae7ed-f148-4368-94ac-e53710b25b24")
         public class UserBookmarkTreeField extends AbstractBookmarkTreeField {
           @Override
           protected int getConfiguredGridW() {
@@ -199,6 +206,7 @@ public class BookmarkViewForm extends AbstractForm {
         }
 
         @Order(100)
+        @ClassId("10b52ed7-ce47-48ae-a45b-927c1e49fa55")
         public class AddBookmarksLinkButton extends AbstractLinkButton {
           @Override
           protected String getConfiguredLabel() {
@@ -258,6 +266,7 @@ public class BookmarkViewForm extends AbstractForm {
         }
 
         @Order(110)
+        @ClassId("c055e650-5f0e-458c-a4f9-10ecf37e78d0")
         public class SetStartPageLinkButton extends AbstractLinkButton {
           @Override
           protected String getConfiguredLabel() {
@@ -283,6 +292,7 @@ public class BookmarkViewForm extends AbstractForm {
         }
 
         @Order(120)
+        @ClassId("3fdab4a7-3f4f-4cae-96bd-31b0d7cd77c5")
         public class ClearStartPageLinkButton extends AbstractLinkButton {
           @Override
           protected String getConfiguredLabel() {

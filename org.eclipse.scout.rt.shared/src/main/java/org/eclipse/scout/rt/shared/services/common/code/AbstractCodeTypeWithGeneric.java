@@ -23,6 +23,7 @@ import java.util.Map;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.holders.IntegerHolder;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
@@ -44,6 +45,7 @@ import org.eclipse.scout.rt.shared.extension.services.common.code.MoveCodesHandl
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@ClassId("119a9156-45e7-4f32-9b55-01aa6b5283d7")
 public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE extends ICode<CODE_ID>> implements ICodeType<CODE_TYPE_ID, CODE_ID>, IContributionOwner, IExtensibleObject, Serializable {
   private static final Logger LOG = LoggerFactory.getLogger(AbstractCodeTypeWithGeneric.class);
   private static final long serialVersionUID = 1L;

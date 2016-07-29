@@ -17,10 +17,12 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractProposalField;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 
+@ClassId("ab22d90c-fedf-4f24-9ab2-4fd5096e36fb")
 public abstract class AbstractProposalColumn<LOOKUP_TYPE> extends AbstractContentAssistColumn<String, LOOKUP_TYPE> implements IProposalColumn<LOOKUP_TYPE> {
 
   public AbstractProposalColumn() {
@@ -91,6 +93,7 @@ public abstract class AbstractProposalColumn<LOOKUP_TYPE> extends AbstractConten
   /**
    * Internal editor field
    */
+  @ClassId("ceb1ae13-664c-43ce-a670-034e1f36c0b5")
   protected class ProposalEditorField extends AbstractProposalField<LOOKUP_TYPE> {
     private ITableRow m_row;
 

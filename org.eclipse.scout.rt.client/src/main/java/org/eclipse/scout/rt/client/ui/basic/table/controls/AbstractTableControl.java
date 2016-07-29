@@ -12,10 +12,12 @@ package org.eclipse.scout.rt.client.ui.basic.table.controls;
 
 import org.eclipse.scout.rt.client.ui.action.AbstractAction;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 
 /**
  * @since 5.1.0
  */
+@ClassId("8fa1676b-042d-4d56-b4ba-af620eeee4cb")
 public abstract class AbstractTableControl extends AbstractAction implements ITableControl {
   private ITable m_table;
 

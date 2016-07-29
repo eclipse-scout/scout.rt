@@ -409,6 +409,7 @@ scout.TableFooter.prototype.openControlContainer = function(control) {
   if (this.open) {
     // Calling open again may resize the container -> don't return
   }
+  this.opening = true;
   this.open = true;
 
   var insets = scout.graphics.getInsets(this.$controlContainer),
@@ -433,6 +434,7 @@ scout.TableFooter.prototype.openControlContainer = function(control) {
   }, {
     duration: this.rendered ? control.animateDuration : 0,
     complete: function() {
+      this.opening = false;
       control.onControlContainerOpened();
       this.table.invalidateLayoutTree();
     }.bind(this)

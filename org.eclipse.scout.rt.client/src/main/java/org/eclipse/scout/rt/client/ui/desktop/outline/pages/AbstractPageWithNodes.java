@@ -42,6 +42,7 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
@@ -56,6 +57,7 @@ import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
  * A NodeManagedPage normally contains no menus, actions, etc. because the TableManagedPage handles node events on
  * itself AND its children
  */
+@ClassId("d33a8000-e240-4ed4-9a93-44f168ec1ab8")
 public abstract class AbstractPageWithNodes extends AbstractPage<ITable> implements IPageWithNodes {
 
   private static final IMenuTypeMapper TREE_MENU_TYPE_MAPPER = new IMenuTypeMapper() {
@@ -336,6 +338,7 @@ public abstract class AbstractPageWithNodes extends AbstractPage<ITable> impleme
   /**
    * inner table
    */
+  @ClassId("d657e4bf-e2eb-44ed-9a9b-898db24ff408")
   private class P_Table extends AbstractTable {
 
     @Override
@@ -374,6 +377,7 @@ public abstract class AbstractPageWithNodes extends AbstractPage<ITable> impleme
     }
 
     @Order(1)
+    @ClassId("d30cb908-98b8-4b46-ba5f-62354a9eb969")
     public class LabelColumn extends AbstractStringColumn {
 
       @Override

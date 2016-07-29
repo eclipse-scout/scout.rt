@@ -29,6 +29,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractOkButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.security.DeleteGlobalBookmarkPermission;
 import org.eclipse.scout.rt.shared.security.DeleteUserBookmarkPermission;
@@ -36,6 +37,7 @@ import org.eclipse.scout.rt.shared.security.ReadUserBookmarkPermission;
 import org.eclipse.scout.rt.shared.security.UpdateGlobalBookmarkPermission;
 import org.eclipse.scout.rt.shared.security.UpdateUserBookmarkPermission;
 
+@ClassId("e233756c-9f3e-40bf-918d-a869b6321af8")
 public class ManageBookmarksForm extends AbstractForm implements BookmarkServiceListener {
 
   public ManageBookmarksForm() {
@@ -86,9 +88,11 @@ public class ManageBookmarksForm extends AbstractForm implements BookmarkService
   }
 
   @Order(10)
+  @ClassId("2970a2e1-2461-4154-869e-f5ee3884adfc")
   public class MainBox extends AbstractGroupBox {
 
     @Order(11)
+    @ClassId("f7849d3b-3ed1-4eec-884b-d7fa33010702")
     public class GlobalBox extends AbstractGroupBox {
       @Override
       protected String getConfiguredLabel() {
@@ -101,6 +105,7 @@ public class ManageBookmarksForm extends AbstractForm implements BookmarkService
       }
 
       @Order(10)
+      @ClassId("10eaebc7-785a-4dd2-91b2-0052fa20cf21")
       public class GlobalBookmarkTreeField extends AbstractBookmarkTreeField {
         @Override
         protected int getConfiguredGridW() {
@@ -125,6 +130,7 @@ public class ManageBookmarksForm extends AbstractForm implements BookmarkService
     }
 
     @Order(20)
+    @ClassId("ba0c7a0f-db77-42ce-90ac-86caea9f2c1e")
     public class UserBox extends AbstractGroupBox {
       @Override
       protected String getConfiguredLabel() {
@@ -137,6 +143,7 @@ public class ManageBookmarksForm extends AbstractForm implements BookmarkService
       }
 
       @Order(10)
+      @ClassId("34f55c13-dd28-41a5-a619-9ad9aa5a35ea")
       public class UserBookmarkTreeField extends AbstractBookmarkTreeField {
         @Override
         protected int getConfiguredGridW() {
@@ -161,10 +168,12 @@ public class ManageBookmarksForm extends AbstractForm implements BookmarkService
     }// end group box
 
     @Order(40)
+    @ClassId("57108978-7b2f-41c6-b89f-dd1558cbb935")
     public class OkButton extends AbstractOkButton {
     }
 
     @Order(50)
+    @ClassId("f8d566ec-58b6-4499-b435-e43bc3bd5268")
     public class CancelButton extends AbstractCancelButton {
     }
 

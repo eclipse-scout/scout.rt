@@ -25,6 +25,7 @@ import org.eclipse.scout.rt.client.ui.action.IActionVisitor;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 import org.eclipse.scout.rt.client.ui.action.tree.IActionNode;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.reflect.AbstractPropertyObserver;
 import org.eclipse.scout.rt.platform.reflect.IPropertyObserver;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
@@ -40,6 +41,7 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
  * since the class is not intended for that purpose. Only use it when you want to use an existing menu somewhere else,
  * using the state of the original menu.
  */
+@ClassId("28ec2113-6461-4810-9527-253d0bf68788")
 public class OutlineMenuWrapper extends AbstractPropertyObserver implements IMenu {
 
   private IMenu m_wrappedMenu;

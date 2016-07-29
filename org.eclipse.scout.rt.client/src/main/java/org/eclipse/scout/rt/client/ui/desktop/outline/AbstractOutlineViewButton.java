@@ -20,7 +20,9 @@ import org.eclipse.scout.rt.client.ui.desktop.AbstractDesktopExtension;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 
+@ClassId("401907e2-6767-435b-8452-9c819f3af82f")
 public abstract class AbstractOutlineViewButton extends AbstractViewButton implements IOutlineViewButton {
 
   private final IDesktop m_desktop;

@@ -18,6 +18,7 @@ import java.util.TreeSet;
 
 import org.eclipse.scout.rt.client.services.common.bookmark.IBookmarkService;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 import org.eclipse.scout.rt.shared.services.common.bookmark.BookmarkFolder;
 import org.eclipse.scout.rt.shared.services.common.bookmark.IBookmarkVisitor;
@@ -25,6 +26,7 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.LocalLookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 
+@ClassId("786fb2d7-5d48-4239-b267-bec20cca8a88")
 public class KeyStrokeLookupCall extends LocalLookupCall<String> {
   private static final long serialVersionUID = 1L;
 

@@ -29,6 +29,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.shared.ScoutTexts;
@@ -43,6 +44,7 @@ import org.slf4j.LoggerFactory;
  * Maintain a menu per bookmark and its key stroke on the desktop
  */
 @Order(1)
+@ClassId("91003d66-44f8-44de-8740-7f15e31fad5f")
 public abstract class AbstractBookmarkMenu extends AbstractMenu {
   private static final Logger LOG = LoggerFactory.getLogger(AbstractBookmarkMenu.class);
 
@@ -154,6 +156,7 @@ public abstract class AbstractBookmarkMenu extends AbstractMenu {
   }
 
   @Order(1)
+  @ClassId("42aecebe-fee7-4149-aec3-b90df48f3f52")
   public class AddUserBookmarkMenu extends AbstractMenu {
     @Override
     protected String getConfiguredText() {
@@ -172,6 +175,7 @@ public abstract class AbstractBookmarkMenu extends AbstractMenu {
   }
 
   @Order(2)
+  @ClassId("f0c60ee8-e2ff-44ee-8eac-63032801efc9")
   public class AddGlobalBookmarkMenu extends AbstractMenu {
     @Override
     protected String getConfiguredText() {
@@ -191,6 +195,7 @@ public abstract class AbstractBookmarkMenu extends AbstractMenu {
   }
 
   @Order(3)
+  @ClassId("6acccba1-83e0-4ee2-8b5d-c2a69f65217b")
   public class ManageBookmarksMenu extends AbstractMenu {
     @Override
     protected String getConfiguredText() {
@@ -205,6 +210,7 @@ public abstract class AbstractBookmarkMenu extends AbstractMenu {
   }
 
   @Order(4)
+  @ClassId("3d85d9fe-2518-4a7e-8ddd-f8bb71cef646")
   public class StartBookmarkMenu extends AbstractMenu {
     @Override
     protected String getConfiguredText() {
@@ -212,6 +218,7 @@ public abstract class AbstractBookmarkMenu extends AbstractMenu {
     }
 
     @Order(1)
+    @ClassId("402b47ba-2116-48f4-8c6c-fe024d3ea91e")
     public class ActivateStartBookmarkMenu extends AbstractMenu {
       @Override
       protected String getConfiguredText() {
@@ -234,6 +241,7 @@ public abstract class AbstractBookmarkMenu extends AbstractMenu {
     }
 
     @Order(2)
+    @ClassId("a4d4f9bc-cc5f-4d7a-a80c-bf5888f99566")
     public class Separator1Menu extends AbstractMenu {
       @Override
       protected boolean getConfiguredSeparator() {
@@ -242,6 +250,7 @@ public abstract class AbstractBookmarkMenu extends AbstractMenu {
     }
 
     @Order(3)
+    @ClassId("2c7eca51-4a19-4825-9f45-697bacd47409")
     public class SetStartBookmarkMenu extends AbstractMenu {
       @Override
       protected String getConfiguredText() {
@@ -257,6 +266,7 @@ public abstract class AbstractBookmarkMenu extends AbstractMenu {
     }
 
     @Order(4)
+    @ClassId("6d0a7507-57c4-4d93-8552-79ba4f66eb35")
     public class DeleteStartBookmarkMenu extends AbstractMenu {
       @Override
       protected String getConfiguredText() {
@@ -274,6 +284,7 @@ public abstract class AbstractBookmarkMenu extends AbstractMenu {
   }
 
   @Order(5)
+  @ClassId("9dba06d9-a3a7-4c78-bc9a-b654ea6ee5c0")
   public class Separator1Menu extends AbstractMenuSeparator {
   }
 

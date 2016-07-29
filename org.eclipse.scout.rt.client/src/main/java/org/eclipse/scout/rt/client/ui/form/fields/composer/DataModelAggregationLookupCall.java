@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.client.ui.form.fields.composer;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.data.model.DataModelConstants;
@@ -28,6 +29,7 @@ import org.slf4j.LoggerFactory;
  * <p>
  * This lookup call expects the property {@link #setAttribute(IDataModelAttribute)} to be set.
  */
+@ClassId("d7a38deb-3d92-4bf2-853c-d3fda0219b7f")
 public class DataModelAggregationLookupCall extends LocalLookupCall<Integer> {
   private static final long serialVersionUID = 1L;
   private static final Logger LOG = LoggerFactory.getLogger(DataModelAggregationLookupCall.class);

@@ -53,6 +53,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.exception.VetoException;
@@ -76,6 +77,7 @@ import org.slf4j.LoggerFactory;
  * A page containing a list of "menu" entries<br>
  * child pages are explicitly added
  */
+@ClassId("b131ace3-9d63-46d9-9659-e288ca26b367")
 public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPage<T> implements IPageWithTable<T>, IContributionOwner {
   private static final Logger LOG = LoggerFactory.getLogger(AbstractPageWithTable.class);
 

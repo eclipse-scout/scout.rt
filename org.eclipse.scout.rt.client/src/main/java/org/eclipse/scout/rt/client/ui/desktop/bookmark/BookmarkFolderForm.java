@@ -18,8 +18,10 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractOkButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 
+@ClassId("605749af-29e7-47a8-a929-5102da1ab6b4")
 public class BookmarkFolderForm extends AbstractForm {
 
   public BookmarkFolderForm() {
@@ -48,6 +50,7 @@ public class BookmarkFolderForm extends AbstractForm {
   }
 
   @Order(10)
+  @ClassId("b40ce120-1a20-40ee-94c1-1f89ea319690")
   public class MainBox extends AbstractGroupBox {
 
     @Override
@@ -56,9 +59,11 @@ public class BookmarkFolderForm extends AbstractForm {
     }
 
     @Order(10)
+    @ClassId("9341bc40-6cc9-4259-8de1-3a49c4eaaa3e")
     public class GroupBox extends AbstractGroupBox {
 
       @Order(10)
+      @ClassId("cd6c194a-4205-43c3-8c0b-cb66c29b66b1")
       public class NameField extends AbstractStringField {
         @Override
         protected String getConfiguredLabel() {
@@ -83,10 +88,12 @@ public class BookmarkFolderForm extends AbstractForm {
     }
 
     @Order(40)
+    @ClassId("1edb51b0-c7cf-44f0-92e8-57e18365af6f")
     public class OkButton extends AbstractOkButton {
     }
 
     @Order(50)
+    @ClassId("4a611674-c998-4e15-971e-693d9afdbd8a")
     public class CancelButton extends AbstractCancelButton {
     }
   }

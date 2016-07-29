@@ -25,6 +25,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.ValidationFailedStatus;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.job.DoneEvent;
@@ -48,6 +49,7 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupRowFetchedCallback;
  * @param <VALUE>
  * @param <LOOKUP_KEY>
  */
+@ClassId("25035a5d-55ea-4e91-a5a4-8c216e0a3ffb")
 public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends AbstractContentAssistField<VALUE, LOOKUP_KEY> implements IMixedSmartField<VALUE, LOOKUP_KEY> {
 
   public static final int NOT_UNIQUE_ERROR_CODE = 1;

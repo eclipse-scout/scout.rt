@@ -36,6 +36,7 @@ import org.eclipse.scout.rt.shared.ScoutTexts;
  *
  * @since 24.11.2009
  */
+@ClassId("dc649273-10aa-4677-8b8d-11ed0965d644")
 public class DefaultWizardContainerForm extends AbstractWizardContainerForm {
 
   public DefaultWizardContainerForm(IWizard wizard) {
@@ -111,7 +112,7 @@ public class DefaultWizardContainerForm extends AbstractWizardContainerForm {
   }
 
   @Order(10)
-  @ClassId("6790a3df-7bb5-478b-99af-f31ff972790f")
+  @ClassId("051f6ae5-8a54-4f6c-8213-9b1e8f280a2a")
   public class MainBox extends AbstractGroupBox {
 
     @Override
@@ -135,12 +136,12 @@ public class DefaultWizardContainerForm extends AbstractWizardContainerForm {
     }
 
     @Order(10)
-    @ClassId("631c45f0-1151-4512-91d1-d865a67c42ef")
+    @ClassId("41e660ac-c25d-47a0-80f8-ebcaa0493e87")
     public class WizardProgressField extends AbstractWizardProgressField {
     }
 
     @Order(20)
-    @ClassId("f0dae133-df4c-42b2-941f-ce0a8dfb5f98")
+    @ClassId("bcae045d-410d-4ffd-bae7-d39d55de9b17")
     public class ContentBox extends AbstractGroupBox {
 
       @Override
@@ -149,7 +150,7 @@ public class DefaultWizardContainerForm extends AbstractWizardContainerForm {
       }
 
       @Order(10)
-      @ClassId("712c494a-e922-4a8d-bc62-a36477a1b2b0")
+      @ClassId("954d9fb4-8d8f-4590-a4f1-9b4f3f15f2d1")
       public class WrappedWizardForm extends AbstractWrappedFormField<IForm> {
 
         @Override
@@ -160,7 +161,7 @@ public class DefaultWizardContainerForm extends AbstractWizardContainerForm {
     }
 
     @Order(30)
-    @ClassId("56c3c98d-bb66-45da-a58b-3a036f02d66f")
+    @ClassId("6da76125-d126-49eb-a6c5-081cb5635c4e")
     public class WizardPreviousStepButton extends AbstractButton implements IWizardAction {
 
       @Override
@@ -175,7 +176,7 @@ public class DefaultWizardContainerForm extends AbstractWizardContainerForm {
     }
 
     @Order(40)
-    @ClassId("d8f695ba-f5f6-40ca-9c99-d406484bb802")
+    @ClassId("08bc7570-d67f-4d3c-98c0-c0a3af9b43ce")
     public class WizardNextStepButton extends AbstractButton implements IWizardAction {
 
       @Override
@@ -195,7 +196,7 @@ public class DefaultWizardContainerForm extends AbstractWizardContainerForm {
     }
 
     @Order(50)
-    @ClassId("eded1d6c-a2ad-4326-8367-428b5f53056d")
+    @ClassId("e8191b4e-d1bf-464e-ac87-c634f246daf1")
     public class WizardFinishButton extends AbstractButton implements IWizardAction {
 
       @Override
@@ -215,7 +216,7 @@ public class DefaultWizardContainerForm extends AbstractWizardContainerForm {
     }
 
     @Order(60)
-    @ClassId("47013388-10d5-460e-85bd-15e48d9627ca")
+    @ClassId("2424b287-6397-4aaa-89d2-69ec4cb293bb")
     public class WizardCancelButton extends AbstractButton implements IWizardAction {
 
       @Override
@@ -240,7 +241,7 @@ public class DefaultWizardContainerForm extends AbstractWizardContainerForm {
     }
 
     @Order(70)
-    @ClassId("f1dc6392-f201-45f1-85de-b8e9b010a328")
+    @ClassId("0602c31b-eedc-42f0-a739-a55f39e8d35f")
     public class WizardSuspendButton extends AbstractButton implements IWizardAction {
 
       @Override

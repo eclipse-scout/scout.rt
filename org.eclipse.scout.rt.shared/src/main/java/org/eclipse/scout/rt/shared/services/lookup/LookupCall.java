@@ -16,6 +16,7 @@ import java.util.List;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.classid.ITypeWithClassId;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.job.IFuture;
@@ -54,6 +55,7 @@ import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
  * LookupCall: subclass of LocalLookupCall() with implementation of method
  * {@link LocalLookupCall#execCreateLookupRows()}
  */
+@ClassId("0f461d52-9712-494f-9748-8016e5f4ca5a")
 public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, Serializable, ITypeWithClassId {
 
   private static final long serialVersionUID = 0L;

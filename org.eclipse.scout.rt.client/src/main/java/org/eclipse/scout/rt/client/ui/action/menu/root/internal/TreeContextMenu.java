@@ -26,8 +26,10 @@ import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeAdapter;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
+@ClassId("8af6de2d-6e4a-4008-821f-1830b6a360fd")
 public class TreeContextMenu extends AbstractContextMenu<ITree> implements ITreeContextMenu {
   private Set<? extends ITreeNode> m_currentSelection;
 

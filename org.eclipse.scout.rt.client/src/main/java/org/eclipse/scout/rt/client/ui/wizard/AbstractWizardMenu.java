@@ -11,11 +11,13 @@
 package org.eclipse.scout.rt.client.ui.wizard;
 
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 
 /**
  * Convenience base class for {@link AbstractMenu} that implement {@link IWizardAction}. Because menus lack the property
  * "label", this class redirects the label methods to the "text" property.
  */
+@ClassId("45e07452-4c69-4922-b74f-678991893326")
 public abstract class AbstractWizardMenu extends AbstractMenu implements IWizardAction {
 
   @Override

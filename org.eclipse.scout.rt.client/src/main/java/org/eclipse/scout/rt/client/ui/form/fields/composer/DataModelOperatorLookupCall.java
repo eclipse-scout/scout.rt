@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.client.ui.form.fields.composer;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.shared.data.model.IDataModelAttribute;
 import org.eclipse.scout.rt.shared.data.model.IDataModelAttributeOp;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
@@ -24,6 +25,7 @@ import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
  * <p>
  * This lookup call expects the property {@link #setAttribute(IDataModelAttribute)} to be set.
  */
+@ClassId("5692346e-a059-45ff-a287-781319c00d6a")
 public class DataModelOperatorLookupCall extends LocalLookupCall<IDataModelAttributeOp> {
   private static final long serialVersionUID = 1L;
 

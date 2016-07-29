@@ -20,7 +20,9 @@ import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.fields.treefield.AbstractTreeField;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 
+@ClassId("b04fef69-6bd2-409f-b37e-ea9e941d362d")
 public abstract class AbstractOutlineTreeField extends AbstractTreeField implements IOutlineTreeField {
   private DesktopListener m_desktopListener;
   private PropertyChangeListener m_treePropertyListener;

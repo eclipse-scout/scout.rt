@@ -14,11 +14,13 @@ import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.ISearchFor
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.FormUtility;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 
 /**
  * Search form for the outline must contain a SearchHandler<br>
  * The method startSearch() starts the first inner class of type IFormHandler that is found
  */
+@ClassId("75cd4723-b739-4f65-a3ba-1793ac2cbf6f")
 public abstract class AbstractSearchForm extends AbstractForm implements ISearchForm {
 
   public AbstractSearchForm() {

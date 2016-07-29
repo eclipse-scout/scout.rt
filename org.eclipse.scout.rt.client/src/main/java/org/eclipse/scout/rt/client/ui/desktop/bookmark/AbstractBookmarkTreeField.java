@@ -44,6 +44,7 @@ import org.eclipse.scout.rt.client.ui.messagebox.MessageBoxes;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
@@ -60,6 +61,7 @@ import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@ClassId("bf0f76a0-fa75-43bf-a1c1-21839934aa7c")
 public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
   private static final Logger LOG = LoggerFactory.getLogger(AbstractBookmarkTreeField.class);
 
@@ -470,6 +472,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
     }
 
     @Order(10)
+    @ClassId("f4256720-a11d-448f-87b0-21c3fae8f89f")
     public class NewRootFolderMenu extends AbstractMenu {
       @Override
       protected String getConfiguredText() {
@@ -493,6 +496,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
     }
 
     @Order(11)
+    @ClassId("7d9a535d-3961-4c3c-8156-b006f3dc2af8")
     public class NewChildFolderMenu extends AbstractMenu {
       @Override
       protected String getConfiguredText() {
@@ -517,6 +521,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
     }
 
     @Order(20)
+    @ClassId("8a421dd6-be94-4071-9acc-675f59efb491")
     public class Separator1Menu extends AbstractMenuSeparator {
 
     }
@@ -534,6 +539,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
     }
 
     @Order(30)
+    @ClassId("f5760597-fd46-4859-aaef-40a024685495")
     public class RenameMenu extends AbstractMenu {
       @Override
       protected String getConfiguredText() {
@@ -563,6 +569,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
     }
 
     @Order(40)
+    @ClassId("a47a34fe-72ce-4964-8552-1711d5f63036")
     public class DeleteMenu extends AbstractMenu {
       @Override
       protected String getConfiguredText() {
@@ -687,6 +694,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
     }
 
     @Order(40)
+    @ClassId("47ef0581-37b2-45e7-839e-513d77bb94a1")
     public class OpenMenu extends AbstractMenu {
       @Override
       protected String getConfiguredText() {
@@ -707,6 +715,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
     }
 
     @Order(50)
+    @ClassId("1aa820d0-7dff-4007-a840-0ce266b94c1e")
     public class EditMenu extends AbstractMenu {
       @Override
       protected String getConfiguredText() {
@@ -787,6 +796,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
     }
 
     @Order(60)
+    @ClassId("fe15adbb-b0fc-49ac-81cd-aac2806fa28e")
     public class UpdateWithCurrentMenu extends AbstractMenu {
 
       @Override
@@ -820,6 +830,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
     }
 
     @Order(70)
+    @ClassId("f35613ce-57f5-4507-9fe6-e7c47ee83ea6")
     public class DeleteMenu extends AbstractMenu {
       @Override
       protected String getConfiguredText() {
@@ -869,10 +880,12 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
     }
 
     @Order(80)
+    @ClassId("a8c515ec-457e-42b9-af4d-82996573df01")
     public class SeparatorMenu1 extends AbstractMenuSeparator {
     }
 
     @Order(90)
+    @ClassId("7962bd36-8f6e-420e-a493-586ddfda83f4")
     public class PublishMenu extends AbstractMenu {
       @Override
       protected String getConfiguredText() {
@@ -902,6 +915,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
     }
 
     @Order(100)
+    @ClassId("cb7bf775-860c-47db-a000-3e8066459eb5")
     public class ApplyToSearchMenu extends AbstractMenu {
       @Override
       protected String getConfiguredText() {

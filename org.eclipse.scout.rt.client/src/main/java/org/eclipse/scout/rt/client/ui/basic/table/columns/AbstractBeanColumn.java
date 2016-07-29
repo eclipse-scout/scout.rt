@@ -12,10 +12,12 @@ package org.eclipse.scout.rt.client.ui.basic.table.columns;
 
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 
 /**
  * This column may be used if the value is relevant for the gui, and not just the display text.
  */
+@ClassId("2804d433-bf07-4b47-aeae-c631fe2e8434")
 public abstract class AbstractBeanColumn<VALUE> extends AbstractColumn<VALUE> implements IBeanColumn<VALUE> {
 
   @Override

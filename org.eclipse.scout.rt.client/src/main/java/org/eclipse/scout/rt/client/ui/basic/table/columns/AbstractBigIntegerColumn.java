@@ -18,11 +18,13 @@ import org.eclipse.scout.rt.client.ui.form.fields.bigintegerfield.AbstractBigInt
 import org.eclipse.scout.rt.client.ui.form.fields.bigintegerfield.IBigIntegerField;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 
 /**
  * Column holding {@link BigInteger}
  */
+@ClassId("bb1b70a8-0d69-4427-8034-bfa6ea31805e")
 public abstract class AbstractBigIntegerColumn extends AbstractNumberColumn<BigInteger> implements IBigIntegerColumn {
 
   public AbstractBigIntegerColumn() {

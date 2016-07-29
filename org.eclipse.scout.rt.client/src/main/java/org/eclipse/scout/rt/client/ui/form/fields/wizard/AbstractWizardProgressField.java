@@ -26,9 +26,11 @@ import org.eclipse.scout.rt.client.ui.wizard.WizardListener;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.WeakEventListener;
 
+@ClassId("bcaedbdd-221f-438c-b537-80b5c5056eb7")
 public class AbstractWizardProgressField extends AbstractFormField implements IWizardProgressField {
 
   private IWizardProgressFieldUIFacade m_uiFacade;

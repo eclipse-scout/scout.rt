@@ -153,8 +153,10 @@ public class UnsavedFormChangesForm extends AbstractForm {
           return false;
         }
 
+        @ClassId("ee7f1455-7da5-402b-98c0-c9d75a221595")
         public class Tree extends DefaultListBoxTable {
           @Order(10)
+          @ClassId("00ee88b2-be05-418c-8b21-ad0b324ab78e")
           public class CheckAllMenu extends AbstractMenu {
 
             @Override
@@ -174,6 +176,7 @@ public class UnsavedFormChangesForm extends AbstractForm {
           }
 
           @Order(20)
+          @ClassId("94666a06-2f50-4242-b3ba-5a75252eaf44")
           public class UncheckAllMenu extends AbstractMenu {
 
             @Override

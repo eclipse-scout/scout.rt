@@ -21,6 +21,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.resource.MimeType;
 import org.eclipse.scout.rt.shared.TEXTS;
@@ -29,6 +30,7 @@ import org.eclipse.scout.rt.shared.TEXTS;
  * Clipboard field to receive paste events, e.g. can be used where a paste event must be triggered on a specific field
  * to be caught.
  */
+@ClassId("288fbdae-2af3-485c-8dec-529b557550f5")
 public abstract class AbstractClipboardField extends AbstractValueField<Collection<BinaryResource>> implements IClipboardField {
 
   public AbstractClipboardField() {
