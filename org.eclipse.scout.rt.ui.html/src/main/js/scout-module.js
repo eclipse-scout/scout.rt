@@ -75,6 +75,7 @@
   __include("scout/keystroke/KeyStrokeContext.js");
   __include("scout/keystroke/InputFieldKeyStrokeContext.js");
   __include("scout/keystroke/KeyStroke.js");
+  __include("scout/keystroke/KeyStrokeAdapter.js");
   __include("scout/keystroke/RangeKeyStroke.js");
   __include("scout/keystroke/ContextMenuKeyStroke.js");
   __include("scout/keystroke/MnemonicKeyStroke.js");
@@ -101,6 +102,7 @@
   __include("scout/tooltip/Tooltip.js");
   __include("scout/tooltip/tooltips.js");
   __include("scout/action/Action.js");
+  __include("scout/action/ActionAdapter.js");
   __include("scout/action/ActionKeyStroke.js");
   __include("scout/box/Box.js");
   __include("scout/popup/Popup.js");
@@ -117,6 +119,7 @@
   __include("scout/datepicker/DatePickerTouchPopup.js");
   __include("scout/menu/menus.js");
   __include("scout/menu/Menu.js");
+  __include("scout/menu/MenuAdapter.js");
   __include("scout/menu/MenuKeyStroke.js");
   __include("scout/menu/MenuExecKeyStroke.js");
   __include("scout/menu/MenuItemsOrder.js");
@@ -131,28 +134,35 @@
   __include("scout/menu/menubar/MenuBarRightKeyStroke.js");
   __include("scout/menu/menubar/MenuBarPopup.js");
   __include("scout/calendar/Calendar.js");
+  __include("scout/calendar/CalendarAdapter.js");
   __include("scout/calendar/CalendarComponent.js");
   __include("scout/calendar/CalendarListComponent.js");
   __include("scout/calendar/CalendarLayout.js");
   __include("scout/calendar/DateRange.js");
   __include("scout/calendar/YearPanel.js");
   __include("scout/planner/Planner.js");
+  __include("scout/planner/PlannerAdapter.js");
   __include("scout/planner/PlannerHeader.js");
   __include("scout/planner/PlannerLayout.js");
   __include("scout/planner/PlannerMenuItemsOrder.js");
   __include("scout/filechooser/FileChooser.js");
+  __include("scout/filechooser/FileChooserAdapter.js");
   __include("scout/filechooser/FileChooserController.js");
   __include("scout/slider/Slider.js");
+  __include("scout/slider/SliderAdapter.js");
   __include("scout/slider/SliderLayout.js");
   // Form
   __include("scout/form/Form.js");
+  __include("scout/form/FormAdapter.js");
   __include("scout/form/FormLayout.js");
   __include("scout/form/FormMenu.js");
+  __include("scout/form/FormMenuAdapter.js");
   __include("scout/form/FormMenuPopup.js");
   __include("scout/form/FormMenuPopupLayout.js");
   __include("scout/form/DialogLayout.js");
   // Table
   __include("scout/table/Table.js");
+  __include("scout/table/TableAdapter.js");
   __include("scout/table/TableRow.js");
   __include("scout/table/TableMatrix.js");
   __include("scout/table/TableFooter.js");
@@ -178,9 +188,12 @@
   __include("scout/table/columns/IconColumn.js"); //requires Column.js
   __include("scout/table/columns/NumberColumn.js"); //requires Column.js
   __include("scout/table/controls/TableControl.js");
+  __include("scout/table/controls/TableControlAdapter.js");
   __include("scout/table/controls/TableControlAdapterMenu.js"); // requires FormMenu and TableControl
   __include("scout/table/controls/AggregateTableControl.js"); // requires TableControl.js
+  __include("scout/table/controls/AggregateTableControlAdapter.js");
   __include("scout/table/controls/FormTableControl.js"); // requires TableControl.js
+  __include("scout/table/controls/FormTableControlAdapter.js");
   __include("scout/table/controls/FormTableControlLayout.js");
   __include("scout/table/editor/CellEditorPopup.js");
   __include("scout/table/editor/CellEditorPopupLayout.js");
@@ -209,6 +222,7 @@
   __include("scout/table/userfilter/TableTextUserFilter.js");
   // Tree
   __include("scout/tree/Tree.js");
+  __include("scout/tree/TreeAdapter.js");
   __include("scout/tree/TreeNode.js");
   __include("scout/tree/TreeLayout.js");
   __include("scout/tree/LazyNodeFilter.js");
@@ -230,6 +244,7 @@
   __include("scout/tree/keystrokes/CompactTreeRightKeyStroke.js");
   // Desktop
   __include("scout/desktop/Desktop.js");
+  __include("scout/desktop/DesktopAdapter.js");
   __include("scout/desktop/DesktopLayout.js");
   __include("scout/desktop/DesktopLogo.js");
   __include("scout/desktop/DesktopKeyStroke.js");
@@ -258,6 +273,7 @@
   __include("scout/desktop/popupblocker/PopupBlockerDesktopNotification.js");
   __include("scout/desktop/toolbox/DesktopToolBox.js");
   __include("scout/desktop/viewbutton/ViewButton.js");
+  __include("scout/desktop/viewbutton/ViewButtonAdapter.js");
   __include("scout/desktop/viewbutton/ViewButtonBox.js");
   __include("scout/desktop/viewbutton/ViewButtonBoxLayout.js");
   __include("scout/desktop/viewbutton/ViewMenuOpenKeyStroke.js");
@@ -274,11 +290,14 @@
   __include("scout/tabbox/SimpleTabAreaLayout.js");
   __include("scout/desktop/outline/DetailTableTreeFilter.js");
   __include("scout/desktop/outline/Outline.js");
+  __include("scout/desktop/outline/OutlineAdapter.js");
   __include("scout/desktop/outline/OutlineOverview.js");
   __include("scout/desktop/outline/OutlineLayout.js");
   __include("scout/desktop/outline/OutlineViewButton.js"); // requires ViewButton.js
+  __include("scout/desktop/outline/OutlineViewButtonAdapter.js");
   __include("scout/desktop/outline/PageLayout.js");
   __include("scout/desktop/outline/SearchOutline.js");
+  __include("scout/desktop/outline/SearchOutlineAdapter.js");
   __include("scout/desktop/outline/SearchOutlineLayout.js");
   __include("scout/desktop/outline/navigation/NavigateButton.js"); // requires Menu.js
   __include("scout/desktop/outline/navigation/NavigateDownButton.js");
@@ -289,78 +308,113 @@
   __include("scout/form/fields/fields.js");
   __include("scout/form/fields/AppLinkKeyStroke.js");
   __include("scout/form/fields/FormField.js");
+  __include("scout/form/fields/FormFieldAdapter.js");
   __include("scout/form/fields/FormFieldLayout.js");
   __include("scout/form/fields/GridData.js");
   __include("scout/form/fields/CompositeField.js");
+  __include("scout/form/fields/CompositeFieldAdapter.js");
   __include("scout/form/fields/ValueField.js");
+  __include("scout/form/fields/ValueFieldAdapter.js");
   __include("scout/form/fields/BasicField.js");
+  __include("scout/form/fields/BasicFieldAdapter.js");
   __include("scout/form/FormController.js");
   // Basics for message boxes
   __include("scout/messagebox/MessageBox.js");
+  __include("scout/messagebox/MessageBoxAdapter.js");
   __include("scout/messagebox/MessageBoxController.js");
   // Form fields (A-Z)
   __include("scout/form/fields/beanfield/BeanField.js");
+  __include("scout/form/fields/beanfield/BeanFieldAdapter.js");
   __include("scout/form/fields/browserfield/BrowserField.js");
+  __include("scout/form/fields/browserfield/BrowserFieldAdapter.js");
   __include("scout/form/fields/button/Button.js");
+  __include("scout/form/fields/button/ButtonAdapter.js");
   __include("scout/form/fields/button/ButtonLayout.js");
   __include("scout/form/fields/button/ButtonMnemonicKeyStroke.js");
   __include("scout/form/fields/button/ButtonKeyStroke.js");
   __include("scout/form/fields/calendarfield/CalendarField.js");
+  __include("scout/form/fields/calendarfield/CalendarFieldAdapter.js");
   __include("scout/form/fields/checkbox/CheckBoxField.js");
+  __include("scout/form/fields/checkbox/CheckBoxFieldAdapter.js");
   __include("scout/form/fields/checkbox/CheckBoxToggleKeyStroke.js");
   __include("scout/form/fields/clipboardfield/ClipboardField.js");
+  __include("scout/form/fields/clipboardfield/ClipboardFieldAdapter.js");
   __include("scout/form/fields/colorfield/ColorField.js");
+  __include("scout/form/fields/colorfield/ColorFieldAdapter.js");
   __include("scout/form/fields/datefield/DateField.js");
+  __include("scout/form/fields/datefield/DateFieldAdapter.js");
   __include("scout/form/fields/datefield/DateTimeCompositeLayout.js");
   __include("scout/form/fields/filechooserfield/FileChooserField.js");
   __include("scout/form/fields/groupbox/GroupBox.js");
+  __include("scout/form/fields/groupbox/GroupBoxAdapter.js");
   __include("scout/form/fields/groupbox/GroupBoxLayout.js");
   __include("scout/form/fields/groupbox/GroupBoxMenuItemsOrder.js");
   __include("scout/form/fields/htmlfield/HtmlField.js");
+  __include("scout/form/fields/htmlfield/HtmlFieldAdapter.js");
   __include("scout/form/fields/imagefield/ImageField.js");
+  __include("scout/form/fields/imagefield/ImageFieldAdapter.js");
   __include("scout/form/fields/imagefield/ImageFieldLayout.js");
   __include("scout/form/fields/labelfield/LabelField.js");
+  __include("scout/form/fields/labelfield/LabelFieldAdapter.js");
   __include("scout/form/fields/listbox/ListBox.js");
+  __include("scout/form/fields/listbox/ListBoxAdapter.js");
   __include("scout/form/fields/listbox/ListBoxLayout.js");
   __include("scout/form/fields/numberfield/NumberField.js");
+  __include("scout/form/fields/numberfield/NumberFieldAdapter.js");
   __include("scout/form/fields/numberfield/Calculator.js");
   __include("scout/form/fields/placeholder/PlaceholderField.js");
+  __include("scout/form/fields/placeholder/PlaceholderFieldAdapter.js");
   __include("scout/form/fields/plannerfield/PlannerField.js");
+  __include("scout/form/fields/plannerfield/PlannerFieldAdapter.js");
   __include("scout/form/fields/radiobutton/RadioButton.js");
+  __include("scout/form/fields/radiobutton/RadioButtonAdapter.js");
   __include("scout/form/fields/radiobutton/RadioButtonGroup.js");
+  __include("scout/form/fields/radiobutton/RadioButtonGroupAdapter.js");
   __include("scout/form/fields/radiobutton/RadioButtonGroupLeftKeyStroke.js");
   __include("scout/form/fields/radiobutton/RadioButtonGroupRightKeyStroke.js");
   __include("scout/form/fields/radiobutton/RadioButtonKeyStroke.js");
   __include("scout/form/fields/sequencebox/SequenceBox.js");
+  __include("scout/form/fields/sequencebox/SequenceBoxAdapter.js");
   __include("scout/form/fields/slider/SliderField.js");
   __include("scout/form/fields/smartfield/SmartField.js");
+  __include("scout/form/fields/smartfield/SmartFieldAdapter.js");
   __include("scout/form/fields/smartfield/SmartFieldTouchPopup.js");
   __include("scout/form/fields/smartfield/SmartFieldLayout.js");
   __include("scout/form/fields/smartfield/SmartFieldPopup.js");
   __include("scout/form/fields/smartfield/SmartFieldPopupLayout.js");
   __include("scout/form/fields/smartfield/ProposalChooser.js");
+  __include("scout/form/fields/smartfield/ProposalChooserAdapter.js");
   __include("scout/form/fields/smartfield/ProposalChooserLayout.js");
   __include("scout/form/fields/smartfield/SmartFieldMultiline.js");
   __include("scout/form/fields/smartfield/SmartFieldMultilineLayout.js");
   __include("scout/form/fields/splitbox/SplitBox.js");
+  __include("scout/form/fields/splitbox/SplitBoxAdapter.js");
   __include("scout/form/fields/splitbox/SplitBoxCollapseKeyStroke.js");
   __include("scout/form/fields/splitbox/SplitBoxLayout.js");
   __include("scout/form/fields/stringfield/StringField.js");
+  __include("scout/form/fields/stringfield/StringFieldAdapter.js");
   __include("scout/form/fields/stringfield/StringFieldEnterKeyStroke.js");
   __include("scout/form/fields/stringfield/StringFieldCtrlEnterKeyStroke.js");
   __include("scout/form/fields/tabbox/TabAreaLayout.js");
   __include("scout/form/fields/tabbox/TabBox.js");
+  __include("scout/form/fields/tabbox/TabBoxAdapter.js");
   __include("scout/form/fields/tabbox/TabItemMnemonicKeyStroke.js");
   __include("scout/form/fields/tabbox/TabBoxLayout.js");
   __include("scout/form/fields/tabbox/TabItem.js");
+  __include("scout/form/fields/tabbox/TabItemAdapter.js");
   __include("scout/form/fields/tabbox/TabItemLayout.js");
   __include("scout/form/fields/tablefield/TableField.js");
+  __include("scout/form/fields/tablefield/TableFieldAdapter.js");
   __include("scout/form/fields/treebox/TreeBox.js");
+  __include("scout/form/fields/treebox/TreeBoxAdapter.js");
   __include("scout/form/fields/treebox/TreeBoxLayout.js");
   __include("scout/form/fields/treefield/TreeField.js");
+  __include("scout/form/fields/treefield/TreeFieldAdapter.js");
   __include("scout/form/fields/wizard/WizardProgressField.js");
+  __include("scout/form/fields/wizard/WizardProgressFieldAdapter.js");
   __include("scout/form/fields/wizard/WizardProgressFieldLayout.js");
   __include("scout/form/fields/wrappedform/WrappedFormField.js");
+  __include("scout/form/fields/wrappedform/WrappedFormFieldAdapter.js");
   // More misc. elements
   __include("scout/desktop/DesktopFormController.js");
   __include("scout/table/FilterFieldsGroupBox.js"); // requires GroupBox.js

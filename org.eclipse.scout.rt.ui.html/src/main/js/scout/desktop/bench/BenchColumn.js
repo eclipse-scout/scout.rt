@@ -23,7 +23,7 @@ scout.BenchColumn = function() {
 
   this._addEventSupport();
 };
-scout.inherits(scout.BenchColumn, scout.ModelAdapter);
+scout.inherits(scout.BenchColumn, scout.Widget);
 
 scout.BenchColumn.TAB_BOX_INDEX = {
   TOP: 0,

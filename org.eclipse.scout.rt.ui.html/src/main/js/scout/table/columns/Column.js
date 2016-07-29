@@ -216,17 +216,17 @@ scout.Column.prototype.onMouseUp = function(event, $row) {
     cell = this.table.cell(this, row);
 
   if (this.table.enabled && row.enabled && cell.editable && !event.ctrlKey && !event.shiftKey) {
-    this.table.prepareCellEdit(row.id, this.id, true);
+    this.table.prepareCellEdit(this, row, true);
   }
 };
 
-scout.Column.prototype.startCellEdit = function(row, fieldId) {
+scout.Column.prototype.startCellEdit = function(row, field) {
   var popup,
     $row = row.$row,
     cell = this.table.cell(this, row),
     $cell = this.table.$cell(this, $row);
 
-  cell.field = this.session.getOrCreateModelAdapter(fieldId, this.table);
+  cell.field = field;
   // Override field alignment with the cell's alignment
   cell.field.gridData.horizontalAlignment = cell.horizontalAlignment;
 

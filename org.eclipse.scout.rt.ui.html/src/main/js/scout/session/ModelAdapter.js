@@ -24,7 +24,6 @@
  * </ol>
  */
 scout.ModelAdapter = function() {
-  scout.ModelAdapter.parent.call(this);
 
   // Adapter structure
   this.owner;
@@ -40,10 +39,8 @@ scout.ModelAdapter = function() {
 
   this._register = true;
   this.remoteHandler = scout.NullRemoteHandler;
-  this._addKeyStrokeContextSupport();
-  this._addEventSupport();
+  this._widgetListener;
 };
-scout.inherits(scout.ModelAdapter, scout.Widget);
 
 // NullRemoteHandler is used as default for local objects
 // in place of this.session.sendEvent
@@ -57,16 +54,31 @@ scout.EventRemoteHandler = function(event, delay) {
   this.trigger(event.type, event);
 };
 
+scout.ModelAdapter.prototype.init = function(model) {
+  this._init(model);
+  this.initialized = true;
+};
+
 /**
  * @param model expects parent session to be set. Other options:
  *   _register: (optional) when set to true the adapter instance is un-/registered in the modelAdapterRegistry of the session
  *   when not set, the default-value is true. When working with local objects (see LocalObject.js) the register flag is set to false.
  */
 scout.ModelAdapter.prototype._init = function(model) {
-  scout.ModelAdapter.parent.prototype._init.call(this, model);
+  model.objectType = model.objectType.replace('Adapter', ''); // FIXME [6.1] cgu aufräumen, ObjectFactory braucht vermutlich einen parameter objectType damit man ihn übersteuern kann. Oder sollte ModelAdapter doch den Adapter object type haben?
+
   this.id = model.id;
   this.objectType = model.objectType;
   this._register = scout.nvl(model._register, true); // FIXME [awe] 6.1 discuss -> die registry kommt auch in den RemoteProxy
+
+  if (!model.owner) {
+    throw new Error('Owner expected: ' + this);
+  }
+  this.owner = model.owner;
+  this.session = model.session || this.owner.session;
+  if (!this.session) {
+    throw new Error('Session expected: ' + this);
+  }
 
   // FIMXE CGU [6.1] rmove EventRemoteHandler
   if (!this.session.remote) {
@@ -78,9 +90,9 @@ scout.ModelAdapter.prototype._init = function(model) {
   }
 
   // Make a copy to prevent a modification of the given object
-  model = $.extend({}, model);
+  this.model = $.extend({}, model);
   // Fill in the missing default values (has to before copying the properties, so that modelProperties considers default values as well)
-  scout.defaultValues.applyTo(model);
+  scout.defaultValues.applyTo(this.model);
 
   // copy all properties from model to this adapter
   this._eachProperty(model, function(propertyName, value, isAdapterProp) {
@@ -94,9 +106,63 @@ scout.ModelAdapter.prototype._init = function(model) {
     }
     if (isAdapterProp && value) {
       value = this._createAdapters(propertyName, value);
+//      if (value) {
+//        model[propertyName] = value.widget;
+//      }
     }
-    this[propertyName] = value;
+    this.model[propertyName] = value;
   }.bind(this));
+
+//  model.parent = this;
+//  this.widget = this._createWidget(model);
+//  if (this.widget) {
+//    this._attachWidget();
+//  }
+};
+
+scout.ModelAdapter.prototype.createWidget = function(parent) { // FIXME CGU getOrCreate? :/
+  if (this.widget) {
+    return this.widget;
+  }
+//  this.widget = this._createWidget();
+//
+//  this._adapterProperties.forEach(function(property) {
+//    var adapter = this[property];
+//    if (!adapter) {
+//      return;
+//    }
+//    this._processAdapters(adapter, function(adapter) {
+//      adapter.createWidget();
+//    }.bind(this));
+//  }, this);
+  this.model.parent = parent;
+  this.widget = this._createWidget(this.model);
+  if (this.widget) {
+    this._attachWidget();
+  }
+  return this.widget;
+};
+
+scout.ModelAdapter.prototype._createWidget = function(model) {
+  return scout.create(this.objectType.replace('Adapter', ''), model);
+};
+
+scout.ModelAdapter.prototype._attachWidget = function() {
+  if (this._widgetListener) {
+    return;
+  }
+  this._widgetListener = {
+    func: this._onWidgetEvent.bind(this)
+  };
+  this.widget.events.addListener(this._widgetListener);
+};
+
+scout.ModelAdapter.prototype._detachWidget = function() {
+  if (!this._widgetListener) {
+    return;
+  }
+  this.widget.removeListener(this._widgetListener);
+  this._widgetListener = null;
 };
 
 /**
@@ -129,7 +195,11 @@ scout.ModelAdapter.prototype._sendProperty = function(propertyName) {
   this._send('property', data);
 };
 
+// FIXME CGU move to widget?
 scout.ModelAdapter.prototype.render = function($parent) {
+  if (this.widget) {
+    return;
+  }
   scout.ModelAdapter.parent.prototype.render.call(this, $parent);
   if (this.session.offline) {
     this.goOffline();
@@ -199,6 +269,9 @@ scout.ModelAdapter.prototype.destroy = function() {
     ownedAdapter.destroy();
   });
 
+  if (this.widget) {
+    this._detachWidget();
+  }
   this.remove();
   if (this._register) {
     this.session.unregisterModelAdapter(this);
@@ -363,6 +436,20 @@ scout.ModelAdapter.prototype.onModelPropertyChange = function(event) {
  */
 scout.ModelAdapter.prototype.onModelAction = function(event) {
   $.log.warn('Model action "' + event.type + '" is not supported by model-adapter ' + this.objectType);
+};
+
+scout.ModelAdapter.prototype._onWidgetEvent = function(event) {
+  console.log('widget event ', event);
+  if (event.type === 'property') {
+    this._onWidgetPropertyChange(event);
+  }
+};
+
+scout.ModelAdapter.prototype._onWidgetPropertyChange = function(event) {
+  console.log('property change event ', event);
+  event.changedProperties.forEach(function(property) {
+    this._sendProperty(property);
+  }, this);
 };
 
 scout.ModelAdapter.prototype._syncPropertiesOnPropertyChange = function(oldProperties, newProperties, preventRendering) {
@@ -609,8 +696,7 @@ scout.ModelAdapter.prototype._isAdapterProperty = function(propertyName) {
 };
 
 scout.ModelAdapter.prototype.toString = function() {
-  return 'ModelAdapter[objectType=' + this.objectType + ' id=' + this.id +
-    ' super=' + scout.ModelAdapter.parent.prototype.toString.call(this) + ']';
+  return 'ModelAdapter[objectType=' + this.objectType + ' id=' + this.id + ']';
 };
 
 /* --- STATIC HELPERS ------------------------------------------------------------- */

@@ -42,5 +42,5 @@ scout.TableStartCellEditKeyStroke.prototype._accept = function(event) {
 
 scout.TableStartCellEditKeyStroke.prototype.handle = function(event) {
   var editPosition = event._editPosition;
-  this.field.prepareCellEdit(editPosition.row.id, editPosition.column.id, true);
+  this.field.prepareCellEdit(editPosition.column, editPosition.row, true);
 };

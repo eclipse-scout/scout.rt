@@ -34,13 +34,15 @@ scout.AggregateTableControl.CONTAINER_ANIMATE_DURATION = 200;
 scout.AggregateTableControl.prototype._init = function(model) {
   scout.AggregateTableControl.parent.prototype._init.call(this, model);
 
-  this.table.on('columnStructureChanged', this._tableColumnStructureChangedHandler);
+  //FIXME [6.1] CGU wann steht table zur Verfügung? Wie passiert die Verlinkung? über TableControlAdapter?
+  this.table = this.owner.widget;
+//  this.table.on('columnStructureChanged', this._tableColumnStructureChangedHandler);
 };
 
 scout.AggregateTableControl.prototype.destroy = function() {
   scout.AggregateTableControl.parent.prototype.destroy.call(this);
 
-  this.table.off('columnStructureChanged', this._tableColumnStructureChangedHandler);
+//  this.table.off('columnStructureChanged', this._tableColumnStructureChangedHandler);
 };
 
 scout.AggregateTableControl.prototype._render = function($parent) {

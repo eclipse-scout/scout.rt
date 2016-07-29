@@ -77,7 +77,7 @@ public class HttpServletControl {
   protected Map<String, String> getCspDirectives() {
     Map<String, String> cspDirectives = new LinkedHashMap<>();
     cspDirectives.put("default-src", "'self'");
-    cspDirectives.put("script-src", "'self'");
+    cspDirectives.put("script-src", "'self' 'unsafe-eval");
     cspDirectives.put("style-src", "'self' 'unsafe-inline'");
     cspDirectives.put("frame-src", "*");
     cspDirectives.put("child-src", "*");
@@ -98,6 +98,13 @@ public class HttpServletControl {
    */
   @Deprecated
   protected String cspRule() {
+    // build csp rule only once to eliminate overhead with each request
+    List<String> cspDirectives = new ArrayList<>();
+    for (Entry<String, String> entry : getCspDirectives().entrySet()) {
+      cspDirectives.add(StringUtility.join(" ", entry.getKey(), entry.getValue()));
+    }
+
+    m_cspValue = StringUtility.join("; ", cspDirectives);
     return m_cspValue;
   }
 

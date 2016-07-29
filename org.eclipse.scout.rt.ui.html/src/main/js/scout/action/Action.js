@@ -37,7 +37,7 @@ scout.Action = function() {
   this.textVisible = true;
   this.compact = false;
 };
-scout.inherits(scout.Action, scout.ModelAdapter);
+scout.inherits(scout.Action, scout.Widget);
 
 scout.Action.ActionStyle = {
   DEFAULT: 0,

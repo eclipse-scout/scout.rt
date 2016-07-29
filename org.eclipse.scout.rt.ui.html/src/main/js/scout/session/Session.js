@@ -88,7 +88,7 @@ scout.Session = function($entryPoint, options) {
 
   this.rootAdapter = new scout.ModelAdapter();
   this.rootAdapter.init({
-    parent: new scout.NullWidget(),
+    owner: {},
     session: this,
     id: '1',
     objectType: 'GlobalAdapter'
@@ -147,7 +147,7 @@ scout.Session.prototype.getOrCreateModelAdapter = function(id, parent) {
     if (!adapter.rendered) {
       // Re-link
       $.log.trace('unlink ' + adapter + ' from ' + adapter.parent + ' and link to new parent ' + parent);
-      adapter.setParent(parent);
+//      adapter.setParent(parent); // FIXME CGU [6.1] relinking widgets necessary?
     } else {
       $.log.trace('adapter ' + adapter + ' is already rendered. keeping link to parent ' + adapter.parent);
     }
@@ -180,8 +180,14 @@ scout.Session.prototype.createModelAdapter = function(adapterData, parent) {
   adapterData.owner = owner;
   adapterData.parent = parent;
   adapterData._register = true;
+  var objectType = adapterData.objectType;
+  adapterData.objectType = adapterData.objectType + 'Adapter';
   var adapter = scout.create(adapterData);
   $.log.trace('created new adapter ' + adapter + '. owner=' + owner + ' parent=' + parent);
+
+  // FIXME [6.1] CGU ev. besser bei scout create 2. param verwenden, dort darf es adapterData aber auch nicht ändern
+  adapter.model.objectType = objectType;
+//  adapter.objectType = objectType;
 
   owner.addOwnedAdapter(adapter);
   return adapter;
@@ -313,8 +319,10 @@ scout.Session.prototype._processStartupResponse = function(data) {
   this._putLocaleData(data.startupData.locale, data.startupData.textMap);
   // Extract client session data without creating a model adapter for it. It is (currently) only used to transport the desktop's adapterId.
   var clientSessionData = this._getAdapterData(data.startupData.clientSession);
-  this.desktop = this.getOrCreateModelAdapter(clientSessionData.desktop, this.rootAdapter);
-
+  var model = this.getOrCreateModelAdapter(clientSessionData.desktop, this.rootAdapter);
+  var parent = new scout.NullWidget();
+  parent.session = this;
+  this.desktop = model.createWidget(parent);
   var renderDesktopImpl = function() {
     this._renderDesktop();
 

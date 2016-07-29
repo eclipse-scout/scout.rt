@@ -39,7 +39,7 @@ scout.Desktop = function() {
   // event listeners
   this._benchActiveViewChangedHandler = this._onBenchActivateViewChanged.bind(this);
 };
-scout.inherits(scout.Desktop, scout.ModelAdapter);
+scout.inherits(scout.Desktop, scout.Widget);
 
 scout.Desktop.DisplayStyle = {
   DEFAULT: 'default',

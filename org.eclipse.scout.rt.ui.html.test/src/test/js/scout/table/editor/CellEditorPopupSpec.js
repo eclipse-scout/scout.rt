@@ -53,13 +53,13 @@ describe("CellEditor", function() {
     table.render(session.$entryPoint);
 
     var field = createField('StringField', table);
-    table._startCellEdit(table.columns[0], table.rows[0], field.id);
+    table.startCellEdit(table.columns[0], table.rows[0], field);
     return findPopup();
   }
 
   function startAndAssertCellEdit(table, column, row) {
     var field = createField('StringField', table);
-    var popup = table._startCellEdit(column, row, field.id);
+    var popup = table.startCellEdit(column, row, field);
     expect($findPopup().length).toBe(1);
     expect($findPopup().find('.form-field').length).toBe(1);
     expect(popup.cell.field.rendered).toBe(true);

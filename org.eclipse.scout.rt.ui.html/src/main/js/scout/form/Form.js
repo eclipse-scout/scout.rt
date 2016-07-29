@@ -35,7 +35,7 @@ scout.Form = function() {
    */
   this.renderInitialFocusEnabled = true;
 };
-scout.inherits(scout.Form, scout.ModelAdapter);
+scout.inherits(scout.Form, scout.Widget);
 
 scout.Form.DisplayHint = {
   DIALOG: 'dialog',

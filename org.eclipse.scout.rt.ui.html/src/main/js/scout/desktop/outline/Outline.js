@@ -181,14 +181,17 @@ scout.Outline.prototype._initTreeNodeInternal = function(node, parentNode) {
   scout.Outline.parent.prototype._initTreeNodeInternal.call(this, node, parentNode);
   node.detailFormVisibleByUi = true;
   if (node.detailTable) {
-    if (!(node.detailTable instanceof scout.Table)) {
-      node.detailTable = this.session.getOrCreateModelAdapter(node.detailTable, this);
+    if (node.detailTable instanceof scout.ModelAdapter) {
+      node.detailTable = node.detailTable.createWidget(this); // FIXME [6.1] CGU widget should not have a dependency to model adapter
+//    } else if (!(node.detailTable instanceof scout.Table)) {
+//      node.detailTable.model.parent = this; // FIXME CGU necessary?
+//      node.detailTable = scout.create(node.detailTable);
     }
     this._initDetailTable(node);
   }
   if (node.detailForm) {
-    if (!(node.detailForm instanceof scout.Form)) {
-      node.detailForm = this.session.getOrCreateModelAdapter(node.detailForm, this);
+    if (node.detailForm instanceof scout.ModelAdapter) {
+      node.detailForm = node.detailForm.createWidget(this); // FIXME [6.1] CGU widget should not have a dependency to model adapter
     }
     this._initDetailForm(node);
   }
@@ -1004,12 +1007,14 @@ scout.Outline.prototype._onPageChanged = function(event) {
     node.detailFormVisible = event.detailFormVisible;
     node.detailForm = this.session.getOrCreateModelAdapter(event.detailForm, this);
     if (node.detailForm) {
+      node.detailForm = node.detailForm.widget;
       this._initDetailForm(node);
     }
 
     node.detailTableVisible = event.detailTableVisible;
     node.detailTable = this.session.getOrCreateModelAdapter(event.detailTable, this);
     if (node.detailTable) {
+      node.detailTable = node.detailTable.widget; // FIXME [6.1] cgu where to do this?
       this._initDetailTable(node);
     }
   } else {

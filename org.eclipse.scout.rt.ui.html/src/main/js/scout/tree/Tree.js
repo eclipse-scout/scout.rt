@@ -64,7 +64,7 @@ scout.Tree = function() {
   this.$data;
   this._scrolldirections = 'both';
 };
-scout.inherits(scout.Tree, scout.ModelAdapter);
+scout.inherits(scout.Tree, scout.Widget);
 
 scout.Tree.DisplayStyle = {
   DEFAULT: 'default',
@@ -274,22 +274,8 @@ scout.Tree.prototype._destroyTreeNode = function(node, parentNode) {
   }
 };
 
-/**
- * if func returns true the children of the visited node are not visited.
- */
 scout.Tree.prototype._visitNodes = function(nodes, func, parentNode) {
-  var i, node;
-  if (!nodes) {
-    return;
-  }
-
-  for (i = 0; i < nodes.length; i++) {
-    node = nodes[i];
-    var doNotProcessChildren = func(node, parentNode);
-    if (!doNotProcessChildren && node.childNodes.length > 0) {
-      this._visitNodes(node.childNodes, func, node);
-    }
-  }
+  return scout.Tree.visitNodes(nodes, func, parentNode);
 };
 
 scout.Tree.prototype._render = function($parent) {
@@ -1810,10 +1796,6 @@ scout.Tree.prototype.selectNodes = function(nodes, notifyServer, debounceSend) {
 
   // Make a copy so that original array stays untouched
   this.selectedNodes = nodes.slice();
-
-  if (notifyServer) {
-    this._sendNodesSelected(this.selectedNodes, debounceSend);
-  }
   this._triggerNodesSelected(debounceSend);
 
   if (this.selectedNodes.length > 0 && !this.visibleNodesMap[this.selectedNodes[0].id]) {
@@ -2194,18 +2176,6 @@ scout.Tree.prototype.checkChildren = function(node, checked) {
   return updatedNodes;
 };
 
-scout.Tree.prototype._sendNodesSelected = function(nodes, debounceSend) {
-  var eventData = {
-    nodeIds: this._nodesToIds(nodes)
-  };
-
-  // send delayed to avoid a lot of requests while selecting
-  // coalesce: only send the latest selection changed event for a field
-  this._send('nodesSelected', eventData, debounceSend ? 250 : 0, function(previous) {
-    return this.id === previous.id && this.type === previous.type;
-  });
-};
-
 scout.Tree.prototype._sendNodesChecked = function(nodes) {
   var data = {
     nodes: []
@@ -2307,8 +2277,8 @@ scout.Tree.prototype._onNodeMouseUp = function(event) {
     return;
   }
 
-  this._send('nodeClicked', {
-    nodeId: node.id
+  this.trigger('nodeClicked', {
+    node: node
   });
   return true;
 };
@@ -2949,4 +2919,22 @@ scout.Tree.collectSubtree = function($rootNode, includeRootNodeInResult) {
     $result = $result.add($rootNode);
   }
   return $result;
+};
+
+/**
+ * if func returns true the children of the visited node are not visited.
+ */
+scout.Tree.visitNodes = function(nodes, func, parentNode) {
+  var i, node;
+  if (!nodes) {
+    return;
+  }
+
+  for (i = 0; i < nodes.length; i++) {
+    node = nodes[i];
+    var doNotProcessChildren = func(node, parentNode);
+    if (!doNotProcessChildren && node.childNodes.length > 0) {
+      scout.Tree.visitNodes(node.childNodes, func, node);
+    }
+  }
 };

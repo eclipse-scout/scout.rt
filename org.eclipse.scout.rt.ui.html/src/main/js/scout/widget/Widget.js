@@ -31,6 +31,13 @@ scout.Widget = function() {
   // This expects a css animation which may be triggered by the class 'removed'
   // If browser does not support css animation, remove will be executed immediately
   this.animateRemoval;
+
+  this._adapterProperties = [];
+  // FIXME [6.1] CGU probably not necessary anymore?
+  this._modelProperties = [];
+
+  this._addKeyStrokeContextSupport();
+  this._addEventSupport();
 };
 
 scout.Widget.prototype.init = function(options) {
@@ -57,6 +64,15 @@ scout.Widget.prototype._init = function(options) {
     throw new Error('Session expected: ' + this);
   }
   this.animateRemoval = scout.nvl(options.animateRemoval, false);
+
+  // copy the model to this widget
+  $.extend(this, options);
+  this._eachProperty(options, function(propertyName, value, isAdapterProp) {
+    if (isAdapterProp && value) {
+      value = this._createWidgets(propertyName, value);
+    }
+    this[propertyName] = value;
+  }.bind(this));
 };
 
 scout.Widget.prototype._initKeyStrokeContext = function(keyStrokeContext) {
@@ -580,6 +596,81 @@ scout.Widget.prototype.resolveIconIds = function(properties) {
   properties.forEach(function(property) {
     this[property] = scout.icons.resolveIconId(this[property]);
   }, this);
+};
+
+// FIXME CGU [6.1] temporary, rename, extract to Composite.js?
+scout.Widget.prototype._addAdapterProperties = function(properties) {
+  this._addProperties('_adapterProperties', properties);
+};
+
+scout.Widget.prototype._addModelProperties = function(properties) {
+  this._addProperties('_modelProperties', properties);
+};
+
+scout.Widget.prototype._addProperties = function(propertyName, properties) {
+  if (Array.isArray(properties)) {
+    this[propertyName] = this[propertyName].concat(properties);
+  } else {
+    this[propertyName].push(properties);
+  }
+};
+
+scout.Widget.prototype._eachProperty = function(model, func) {
+  var propertyName, value, i;
+
+  // Loop through primitive properties
+  for (propertyName in model) {
+    if (this._adapterProperties.indexOf(propertyName) > -1) {
+      continue; // will be handled below
+    }
+    value = model[propertyName];
+    func(propertyName, value);
+  }
+
+  //Loop through adapter properties (any order will do).
+  for (i = 0; i < this._adapterProperties.length; i++) {
+    propertyName = this._adapterProperties[i];
+    value = model[propertyName];
+    if (value === undefined) {
+      continue;
+    }
+
+    func(propertyName, value, true);
+  }
+};
+
+scout.Widget.prototype._removeAdapterProperties = function(properties) {
+  if (Array.isArray(properties)) {
+    scout.arrays.removeAll(this._adapterProperties, properties);
+  } else {
+    scout.arrays.remove(this._adapterProperties, properties);
+  }
+};
+
+scout.Widget.prototype._createWidgets = function(propertyName, model) {
+  return this._processWidgets(model, function(model) {
+    if (model instanceof scout.ModelAdapter) {
+      return model.createWidget(this); // FIXME [6.1] CGU widget should not have a dependency to model adapter
+    } else {
+//      model.parent = this; // FIXME [6.1] necessary?
+//      return scout.create(model);
+    }
+  }.bind(this));
+};
+
+// FIXME CGU [6.1] Move to arrays util?
+scout.Widget.prototype._processWidgets = function(value, func) {
+  var adapters, adapter, i;
+  if (Array.isArray(value)) {
+    adapters = [];
+    for (i = 0; i < value.length; i++) {
+      adapter = func(value[i]);
+      adapters.push(adapter);
+    }
+    return adapters;
+  } else {
+    return func(value);
+  }
 };
 
 /**

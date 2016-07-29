@@ -64,7 +64,7 @@ scout.FormField = function() {
   this.disabledCopyOverlay = false;
   this.$disabledCopyOverlay;
 };
-scout.inherits(scout.FormField, scout.ModelAdapter);
+scout.inherits(scout.FormField, scout.Widget);
 
 scout.FormField.LABEL_POSITION_DEFAULT = 0;
 scout.FormField.LABEL_POSITION_LEFT = 1;
@@ -86,7 +86,7 @@ scout.FormField.MODE_CELLEDITOR = 'celleditor';
 
 scout.FormField.prototype._init = function(model) {
   scout.FormField.parent.prototype._init.call(this, model);
-  this.refFieldId = this.uniqueId('ref');
+//  this.refFieldId = this.uniqueId('ref'); // FIXME [6.1] CGU move to widget or form field adapter?
   this._syncKeyStrokes(this.keyStrokes);
   this._syncMenus(this.menus);
   this._syncErrorStatus(this.errorStatus);
