@@ -80,7 +80,7 @@ public class JsonProposalChooser<PROPOSAL_CHOOSER extends IProposalChooser> exte
     }
   }
 
-  private void handleActiveFilterChanged(JsonEvent event) {
+  protected void handleActiveFilterChanged(JsonEvent event) {
     String state = event.getData().optString("state", null);
     getModel().updateActiveFilter(TriState.valueOf(state));
   }

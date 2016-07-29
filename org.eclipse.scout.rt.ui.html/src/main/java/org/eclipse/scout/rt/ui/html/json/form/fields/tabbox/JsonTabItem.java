@@ -72,7 +72,7 @@ public class JsonTabItem<GROUP_BOX extends IGroupBox> extends JsonGroupBox<GROUP
     }
   }
 
-  private boolean updateMarker(int markStrategy) {
+  protected boolean updateMarker(int markStrategy) {
     ICompositeField parent = getModel().getParentField();
     if (parent instanceof ITabBox) {
       return ((ITabBox) parent).getMarkStrategy() == markStrategy;
@@ -94,8 +94,7 @@ public class JsonTabItem<GROUP_BOX extends IGroupBox> extends JsonGroupBox<GROUP
     }
   }
 
-  private void addMarkedPropertyChangeEvent() {
+  protected void addMarkedPropertyChangeEvent() {
     addPropertyChangeEvent(PROP_MARKED, m_marked);
   }
-
 }

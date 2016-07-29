@@ -36,7 +36,7 @@ public class JsonNumberColumnUserFilter extends JsonColumnUserFilter<NumberColum
     return number.toString();
   }
 
-  private BigDecimal toBigDecimal(String numberString) {
+  protected BigDecimal toBigDecimal(String numberString) {
     if (StringUtility.isNullOrEmpty(numberString)) {
       return null;
     }

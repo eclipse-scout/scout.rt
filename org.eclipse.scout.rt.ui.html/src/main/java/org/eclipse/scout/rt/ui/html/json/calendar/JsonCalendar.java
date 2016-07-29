@@ -309,18 +309,18 @@ public class JsonCalendar<CALENDAR extends ICalendar> extends AbstractJsonProper
     LOG.debug("viewRange={}", viewRange);
   }
 
-  private Range<Date> extractViewRange(JSONObject data) {
+  protected Range<Date> extractViewRange(JSONObject data) {
     JSONObject viewRange = data.optJSONObject("viewRange");
     Date fromDate = toJavaDate(viewRange, "from");
     Date toDate = toJavaDate(viewRange, "to");
     return new Range<Date>(fromDate, toDate);
   }
 
-  private Date extractSelectedDate(JSONObject data) {
+  protected Date extractSelectedDate(JSONObject data) {
     return toJavaDate(data, "selectedDate");
   }
 
-  private Date toJavaDate(JSONObject data, String propertyName) {
+  protected Date toJavaDate(JSONObject data, String propertyName) {
     return new JsonDate(data.optString(propertyName, null)).asJavaDate();
   }
 

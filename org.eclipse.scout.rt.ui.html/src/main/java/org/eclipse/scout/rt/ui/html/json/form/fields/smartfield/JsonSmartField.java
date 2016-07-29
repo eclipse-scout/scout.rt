@@ -126,18 +126,13 @@ public class JsonSmartField<VALUE, LOOKUP_KEY, CONTENT_ASSIST_FIELD extends ICon
     getModel().getUIFacade().openProposalChooserFromUI(searchText, selectCurrentValue);
   }
 
-  private String getSearchTextAndAddFilter(JsonEvent event) {
+  protected String getSearchTextAndAddFilter(JsonEvent event) {
     String text = event.getData().optString("searchText", null);
     addPropertyEventFilterCondition(IValueField.PROP_DISPLAY_TEXT, text);
     return text;
   }
 
-  @Override
-  public JSONObject toJson() {
-    return putProperty(super.toJson(), PROP_PROPOSAL, m_proposal);
-  }
-
-  private boolean checkStatusContainsCode(IMultiStatus status, int code) {
+  protected boolean checkStatusContainsCode(IMultiStatus status, int code) {
     for (IStatus child : status.getChildren()) {
       if (child instanceof IMultiStatus && checkStatusContainsCode((IMultiStatus) child, code)) {
         return true;
@@ -147,5 +142,10 @@ public class JsonSmartField<VALUE, LOOKUP_KEY, CONTENT_ASSIST_FIELD extends ICon
       }
     }
     return false;
+  }
+
+  @Override
+  public JSONObject toJson() {
+    return putProperty(super.toJson(), PROP_PROPOSAL, m_proposal);
   }
 }
