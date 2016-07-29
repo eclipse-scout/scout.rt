@@ -862,6 +862,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
     }
   }
 
+  @ClassId("90c662a2-28ac-4ca3-b34c-9b58cf14b3d9")
   private class InvisibleRootPage extends AbstractPageWithNodes {
     @Override
     protected void execCreateChildPages(List<IPage<?>> pageList) {

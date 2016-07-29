@@ -22,12 +22,14 @@ import org.eclipse.scout.rt.shared.services.lookup.LocalLookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 
 /**
  * Convenience lookup call to present {@link IDataModelAttribute#getAggregationTypes()}
  * <p>
  * This lookup call expects the property {@link #setAttribute(IDataModelAttribute)} to be set.
  */
+@ClassId("d7a38deb-3d92-4bf2-853c-d3fda0219b7f")
 public class DataModelAggregationLookupCall extends LocalLookupCall<Integer> {
   private static final long serialVersionUID = 1L;
   private static final Logger LOG = LoggerFactory.getLogger(DataModelAggregationLookupCall.class);

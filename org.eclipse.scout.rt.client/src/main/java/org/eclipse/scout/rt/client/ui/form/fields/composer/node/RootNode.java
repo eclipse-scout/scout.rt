@@ -22,6 +22,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.composer.IComposerField;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 
 public class RootNode extends AbstractComposerNode {
 
@@ -54,6 +55,7 @@ public class RootNode extends AbstractComposerNode {
   }
 
   @Order(10)
+  @ClassId("5cfcc21b-0df5-40ca-954a-81713b7fa515")
   public class AddAttributeOnRootMenu extends AbstractAddAttributeMenu {
     public AddAttributeOnRootMenu() {
       super(getComposerField(), RootNode.this);
@@ -61,6 +63,7 @@ public class RootNode extends AbstractComposerNode {
   }
 
   @Order(20)
+  @ClassId("17711cbc-4cb6-4626-a616-e3f5f3925792")
   public class AddEitherOrOnRootMenu extends AbstractMenu {
     @Override
     protected String getConfiguredText() {

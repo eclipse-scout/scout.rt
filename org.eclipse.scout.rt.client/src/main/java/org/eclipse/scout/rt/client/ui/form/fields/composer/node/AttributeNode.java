@@ -23,6 +23,7 @@ import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.data.model.DataModelConstants;
 import org.eclipse.scout.rt.shared.data.model.IDataModelAttribute;
 import org.eclipse.scout.rt.shared.data.model.IDataModelAttributeOp;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 
 public class AttributeNode extends AbstractComposerNode {
   private IDataModelAttribute m_attribute;
@@ -125,6 +126,7 @@ public class AttributeNode extends AbstractComposerNode {
   }
 
   @Order(1)
+  @ClassId("fb5120e5-26be-426d-a589-7e88a5c577f0")
   public class EditAttributeMenu extends AbstractMenu {
 
     @Override
@@ -162,6 +164,7 @@ public class AttributeNode extends AbstractComposerNode {
   }
 
   @Order(3)
+  @ClassId("24139c45-1e06-4967-a27f-7d4c457d9b30")
   public class DeleteAttributeMenu extends AbstractMenu {
 
     @Override

@@ -22,6 +22,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 
 /**
  * For performance optimizations, child pages are only loaded when needed. Until then they are virtualized using
@@ -34,6 +35,7 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
  * {@link AbstractPageWithTable#execCreateChildPage(org.eclipse.scout.rt.client.ui.basic.table.ITableRow)} resp.
  * {@link AbstractPageWithNodes#execCreateChildPages(java.util.Collection)}
  */
+@ClassId("28ecb0f0-18b8-478c-8328-d56a2586d0ef")
 public class VirtualPage extends VirtualTreeNode implements IPage, IVirtualTreeNode {
 
   @Override

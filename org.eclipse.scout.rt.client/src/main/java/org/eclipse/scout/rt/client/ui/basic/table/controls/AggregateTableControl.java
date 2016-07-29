@@ -12,7 +12,9 @@ package org.eclipse.scout.rt.client.ui.basic.table.controls;
 
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.TEXTS;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 
+@ClassId("94a7bf28-8c9a-4b27-8edd-151c5620d987")
 public class AggregateTableControl extends AbstractTableControl implements IAggregateTableControl {
 
   public AggregateTableControl() {

@@ -18,12 +18,14 @@ import org.eclipse.scout.rt.shared.data.model.IDataModelAttributeOp;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.LocalLookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 
 /**
  * Convenience lookup call to present {@link IDataModelAttribute#getOperators()}
  * <p>
  * This lookup call expects the property {@link #setAttribute(IDataModelAttribute)} to be set.
  */
+@ClassId("5692346e-a059-45ff-a287-781319c00d6a")
 public class DataModelOperatorLookupCall extends LocalLookupCall<IDataModelAttributeOp> {
   private static final long serialVersionUID = 1L;
 

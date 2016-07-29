@@ -25,10 +25,12 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.TableAdapter;
 import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 
 /**
  * The invisible root menu node of any table. (internal usage only)
  */
+@ClassId("97f17065-0142-4362-9dd4-a34148e20bb3")
 public class TableContextMenu extends AbstractContextMenu<ITable> implements ITableContextMenu {
   private List<? extends ITableRow> m_currentSelection;
 

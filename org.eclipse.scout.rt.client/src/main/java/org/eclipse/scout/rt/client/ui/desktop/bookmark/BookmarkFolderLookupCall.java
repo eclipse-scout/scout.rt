@@ -19,10 +19,12 @@ import org.eclipse.scout.rt.shared.services.common.bookmark.IBookmarkVisitor;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.LocalLookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 
 /**
  * hierarchy lookup call for bookmark folder tree
  */
+@ClassId("a6df6454-6752-43ea-8624-26c691a1145b")
 public class BookmarkFolderLookupCall extends LocalLookupCall<BookmarkFolder> {
   private static final long serialVersionUID = 1L;
 

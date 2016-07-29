@@ -22,7 +22,9 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.TEXTS;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 
+@ClassId("dc8237d6-18b8-4406-91b0-bb4a95bf9fec")
 public class OrganizeColumnsMenu extends AbstractFormMenu<IOrganizeColumnsForm> {
   private final ITable m_table;
 

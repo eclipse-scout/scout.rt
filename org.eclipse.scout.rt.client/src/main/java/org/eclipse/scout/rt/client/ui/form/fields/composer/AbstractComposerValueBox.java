@@ -240,6 +240,7 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
   }
 
   @Order(10)
+  @ClassId("93c506dc-737d-4e12-89a2-2a3a21e49fbe")
   @FormData(defaultSubtypeSdkCommand = DefaultSubtypeSdkCommand.IGNORE)
   public class ListBoxField extends AbstractListBox<Object> implements IComposerValueField {
 
@@ -329,6 +330,7 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
   }
 
   @Order(10)
+  @ClassId("32cf9165-ff77-46a5-afb2-1a2b1aff42c8")
   @FormData(defaultSubtypeSdkCommand = DefaultSubtypeSdkCommand.IGNORE)
   public class TreeBoxField extends AbstractTreeBox<Object> implements IComposerValueField {
 
@@ -418,6 +420,7 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
   }
 
   @Order(10)
+  @ClassId("5e26128b-2d65-4ed7-88cc-c23a466b6e88")
   @FormData(defaultSubtypeSdkCommand = DefaultSubtypeSdkCommand.IGNORE)
   public class DateField extends AbstractDateField implements IComposerValueField {
     @Override
@@ -470,6 +473,7 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
   }
 
   @Order(10)
+  @ClassId("0ea204ce-bc8b-472d-9535-d9de4d117acb")
   @FormData(defaultSubtypeSdkCommand = DefaultSubtypeSdkCommand.IGNORE)
   public class TimeField extends AbstractTimeField implements IComposerValueField {
     @Override
@@ -530,6 +534,7 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
   }
 
   @Order(10)
+  @ClassId("0e51fb86-c4f7-471d-8cb1-6329fc8c31a6")
   @FormData(defaultSubtypeSdkCommand = DefaultSubtypeSdkCommand.IGNORE)
   public class DateTimeField extends AbstractDateField implements IComposerValueField {
 
@@ -586,6 +591,7 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
   }
 
   @Order(10)
+  @ClassId("462688c6-9246-49be-adf6-2d21abbff066")
   @FormData(defaultSubtypeSdkCommand = DefaultSubtypeSdkCommand.IGNORE)
   public class IntegerField extends AbstractIntegerField implements IComposerValueField {
     @Override
@@ -646,6 +652,7 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
   }
 
   @Order(10)
+  @ClassId("c0b921cd-59f2-46cf-9108-533aa8612c8d")
   @FormData(defaultSubtypeSdkCommand = DefaultSubtypeSdkCommand.IGNORE)
   public class LongField extends AbstractLongField implements IComposerValueField {
     @Override
@@ -706,6 +713,7 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
   }
 
   @Order(10)
+  @ClassId("6cd73fce-6b42-4e38-9f77-3cd1b73e799c")
   @FormData(defaultSubtypeSdkCommand = DefaultSubtypeSdkCommand.IGNORE)
   public class BigDecimalField extends AbstractBigDecimalField implements IComposerValueField {
     @Override
@@ -773,6 +781,7 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
   }
 
   @Order(10)
+  @ClassId("055381df-86e7-4971-95bb-8d9f1074e409")
   @FormData(defaultSubtypeSdkCommand = DefaultSubtypeSdkCommand.IGNORE)
   public class StringField extends AbstractStringField implements IComposerValueField {
     @Override
@@ -823,6 +832,7 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
   }
 
   @Order(10)
+  @ClassId("4707c050-3f4b-4ce3-a8c9-0452522becdc")
   @FormData(defaultSubtypeSdkCommand = DefaultSubtypeSdkCommand.IGNORE)
   public class SmartField extends AbstractSmartField<Object> implements IComposerValueField {
 
@@ -883,13 +893,16 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
   //XXXXXXXXXXXXXXXXXXXXXXX
 
   @Order(10)
+  @ClassId("83ead684-0cb1-43b3-8545-7815db2facb3")
   @FormData(defaultSubtypeSdkCommand = DefaultSubtypeSdkCommand.IGNORE)
   public class BetweenDateField extends AbstractSequenceBox implements IComposerValueField {
     @Order(10)
+    @ClassId("4be8320d-841e-46c7-990f-47dc66294f9e")
     public class DateFromField extends AbstractDateField {
     }
 
     @Order(20)
+    @ClassId("5a031971-bb60-4366-bbfc-3ce906e022f9")
     public class DateToField extends AbstractDateField {
     }
 
@@ -952,13 +965,16 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
   }
 
   @Order(10)
+  @ClassId("85010cb1-d6fa-4879-a5d2-7247685b95b7")
   @FormData(defaultSubtypeSdkCommand = DefaultSubtypeSdkCommand.IGNORE)
   public class BetweenTimeField extends AbstractSequenceBox implements IComposerValueField {
     @Order(10)
+    @ClassId("0a86c867-8907-4395-bf67-79c117c9c54c")
     public class TimeFromField extends AbstractTimeField {
     }
 
     @Order(20)
+    @ClassId("0fb0159c-c781-4243-b1f4-169eb489692b")
     public class TimeToField extends AbstractTimeField {
     }
 
@@ -1026,9 +1042,11 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
   }
 
   @Order(10)
+  @ClassId("cb94b834-2f10-4d81-b22b-c433bd065963")
   @FormData(defaultSubtypeSdkCommand = DefaultSubtypeSdkCommand.IGNORE)
   public class BetweenDateTimeField extends AbstractSequenceBox implements IComposerValueField {
     @Order(10)
+    @ClassId("c94de66d-5d6d-44f4-9418-0fc8fc7c679c")
     public class DateTimeFromField extends AbstractDateField {
       @Override
       protected boolean getConfiguredHasTime() {
@@ -1037,6 +1055,7 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
     }
 
     @Order(20)
+    @ClassId("6e1d5025-5e29-498f-8027-75c3843c1d9e")
     public class DateTimeToField extends AbstractDateField {
       @Override
       protected boolean getConfiguredHasTime() {
@@ -1102,13 +1121,16 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
   }
 
   @Order(10)
+  @ClassId("4d0ae72b-dffd-4a09-945b-4e50d4037d16")
   @FormData(defaultSubtypeSdkCommand = DefaultSubtypeSdkCommand.IGNORE)
   public class BetweenIntegerField extends AbstractSequenceBox implements IComposerValueField {
     @Order(10)
+    @ClassId("f17a7e6d-1df2-484e-9e96-8b3d32c7d095")
     public class IntegerFromField extends AbstractIntegerField {
     }
 
     @Order(20)
+    @ClassId("9cdddae5-de01-41d6-9cfc-5ae7c0ad3663")
     public class IntegerToField extends AbstractIntegerField {
     }
 
@@ -1170,13 +1192,16 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
   }
 
   @Order(10)
+  @ClassId("91376e0a-af80-4deb-b089-2675c3870dbc")
   @FormData(defaultSubtypeSdkCommand = DefaultSubtypeSdkCommand.IGNORE)
   public class BetweenLongField extends AbstractSequenceBox implements IComposerValueField {
     @Order(10)
+    @ClassId("c084e230-ccc8-4672-bcfd-09538630e9e7")
     public class LongFromField extends AbstractLongField {
     }
 
     @Order(20)
+    @ClassId("e94e9352-4690-4dcd-8be4-d73135636d27")
     public class LongToField extends AbstractLongField {
     }
 
@@ -1238,13 +1263,16 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
   }
 
   @Order(10)
+  @ClassId("1eb9aa40-936f-4cd0-b34c-c345c7486685")
   @FormData(defaultSubtypeSdkCommand = DefaultSubtypeSdkCommand.IGNORE)
   public class BetweenBigDecimalField extends AbstractSequenceBox implements IComposerValueField {
     @Order(10)
+    @ClassId("07c002ce-e3df-45d5-8f5e-5acdd4fb1ad1")
     public class BigDecimalFromField extends AbstractBigDecimalField {
     }
 
     @Order(20)
+    @ClassId("3df14616-fdbc-4854-8b83-6feb08518047")
     public class BigDecimalToField extends AbstractBigDecimalField {
     }
 

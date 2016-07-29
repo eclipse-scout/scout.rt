@@ -24,6 +24,7 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.data.model.IDataModelAttribute;
 import org.eclipse.scout.rt.shared.data.model.IDataModelEntity;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 
 public class EntityNode extends AbstractComposerNode {
 
@@ -105,6 +106,7 @@ public class EntityNode extends AbstractComposerNode {
   }
 
   @Order(10)
+  @ClassId("8d03343b-7dd8-4d88-8686-9b835fe4dd6d")
   public class AddAttributeOnEntityMenu extends AbstractAddAttributeMenu {
     public AddAttributeOnEntityMenu() {
       super(getComposerField(), EntityNode.this);
@@ -112,6 +114,7 @@ public class EntityNode extends AbstractComposerNode {
   }
 
   @Order(20)
+  @ClassId("75ef4b93-4c3b-463f-b221-a786eb6cbdf8")
   public class AddEitherOrOnEntityMenu extends AbstractMenu {
     @Override
     protected String getConfiguredText() {
@@ -133,6 +136,7 @@ public class EntityNode extends AbstractComposerNode {
   }
 
   @Order(40)
+  @ClassId("fa6a5b03-6110-4026-a9c0-8e453c39ba2a")
   public class NegateEntityMenu extends AbstractMenu {
 
     @Override
@@ -151,6 +155,7 @@ public class EntityNode extends AbstractComposerNode {
   }
 
   @Order(50)
+  @ClassId("f9fc783d-341a-48de-a3a9-9ee7ab1a51ba")
   public class DeleteEntityMenu extends AbstractMenu {
 
     @Override

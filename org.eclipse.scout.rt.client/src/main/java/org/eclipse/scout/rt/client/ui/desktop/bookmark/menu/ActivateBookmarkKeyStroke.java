@@ -15,7 +15,9 @@ import org.eclipse.scout.rt.client.ui.action.keystroke.KeyStroke;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 
+@ClassId("29cd5135-9b4d-4de7-a16b-e5cea26901ef")
 public class ActivateBookmarkKeyStroke extends KeyStroke {
   private static final Logger LOG = LoggerFactory.getLogger(ActivateBookmarkKeyStroke.class);
 

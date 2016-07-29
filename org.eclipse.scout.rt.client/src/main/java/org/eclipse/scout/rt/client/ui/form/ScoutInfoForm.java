@@ -39,7 +39,9 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.OfficialVersion;
 import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 
+@ClassId("dee01442-979d-4231-a3f9-bd2a163e752a")
 public class ScoutInfoForm extends AbstractForm {
 
   public ScoutInfoForm() {
@@ -126,12 +128,15 @@ public class ScoutInfoForm extends AbstractForm {
   }
 
   @Order(10)
+  @ClassId("794bf4a4-727b-44f3-a2eb-2d2187110036")
   public class MainBox extends AbstractGroupBox {
 
     @Order(10)
+    @ClassId("e5b5d699-9e8a-49c7-84ea-128289f1e616")
     public class GroupBox extends AbstractGroupBox {
 
       @Order(20)
+      @ClassId("cd526428-76ca-4e8f-8b8e-4a4f0964c518")
       public class HtmlField extends AbstractHtmlField {
 
         @Override
@@ -162,6 +167,7 @@ public class ScoutInfoForm extends AbstractForm {
     }
 
     @Order(20)
+    @ClassId("8c451981-7963-49aa-80ca-ed13469267d8")
     public class CloseButton extends AbstractCloseButton {
 
     }

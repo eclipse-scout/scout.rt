@@ -24,7 +24,9 @@ import org.eclipse.scout.rt.shared.services.common.bookmark.IBookmarkVisitor;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.LocalLookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 
+@ClassId("786fb2d7-5d48-4239-b267-bec20cca8a88")
 public class KeyStrokeLookupCall extends LocalLookupCall<String> {
   private static final long serialVersionUID = 1L;
 

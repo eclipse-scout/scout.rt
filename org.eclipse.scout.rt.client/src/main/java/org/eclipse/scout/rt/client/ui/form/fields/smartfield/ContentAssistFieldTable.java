@@ -28,7 +28,9 @@ import org.eclipse.scout.rt.platform.util.CompareUtility;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 
+@ClassId("a6216b7d-43bc-48f8-8632-dc4fd60b0cef")
 @FormData(value = AbstractTableRowData.class, sdkCommand = FormData.SdkCommand.USE, defaultSubtypeSdkCommand = FormData.DefaultSubtypeSdkCommand.CREATE)
 public class ContentAssistFieldTable<LOOKUP_KEY> extends AbstractTable implements IContentAssistFieldTable<LOOKUP_KEY> {
 
@@ -148,6 +150,7 @@ public class ContentAssistFieldTable<LOOKUP_KEY> extends AbstractTable implement
 
   @Order(10)
   @ColumnData(SdkColumnCommand.IGNORE)
+  @ClassId("0cc6cfc4-dba0-4e00-a4f3-0ea262bca431")
   public class KeyColumn extends AbstractColumn<ILookupRow<LOOKUP_KEY>> {
     @Override
     protected String getConfiguredHeaderText() {
@@ -172,6 +175,7 @@ public class ContentAssistFieldTable<LOOKUP_KEY> extends AbstractTable implement
 
   @Order(20)
   @ColumnData(SdkColumnCommand.IGNORE)
+  @ClassId("2230f7b2-c1d5-4fbb-8664-90a46148502c")
   public class TextColumn extends AbstractStringColumn {
 
     @Override

@@ -33,6 +33,7 @@ import org.eclipse.scout.rt.client.ui.wizard.LegacyHtmlStatusWizardContainerForm
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 
 /**
  * <h3>LegacyHtmlStatusWizardContainerForm</h3> A container form containing a wizard form area (current step) a status
@@ -44,6 +45,7 @@ import org.eclipse.scout.rt.shared.ScoutTexts;
  *             will be removed in Scout 6.1.
  */
 @Deprecated
+@ClassId("422da96c-0da2-4020-a905-7bb594135a07")
 public class LegacyHtmlStatusWizardContainerForm extends AbstractWizardContainerForm {
 
   public LegacyHtmlStatusWizardContainerForm(IWizard wizard) {
@@ -127,6 +129,7 @@ public class LegacyHtmlStatusWizardContainerForm extends AbstractWizardContainer
   }
 
   @Order(10)
+  @ClassId("c303615d-ad82-4ef4-9b04-dfd6e09c85be")
   public class MainBox extends AbstractGroupBox {
 
     @Override
@@ -150,6 +153,7 @@ public class LegacyHtmlStatusWizardContainerForm extends AbstractWizardContainer
     }
 
     @Order(20)
+    @ClassId("fef9cb06-b4b8-4ffd-88d4-1818a0cbd1a7")
     public class SplitBox extends AbstractSplitBox {
 
       @Override
@@ -163,6 +167,7 @@ public class LegacyHtmlStatusWizardContainerForm extends AbstractWizardContainer
       }
 
       @Order(10)
+      @ClassId("f89b6186-3c82-4bdb-abb0-98157cf08f61")
       public class ContentBox extends AbstractGroupBox {
 
         @Override
@@ -171,6 +176,7 @@ public class LegacyHtmlStatusWizardContainerForm extends AbstractWizardContainer
         }
 
         @Order(10)
+        @ClassId("2d686e4f-ee2c-450c-93cd-0a81f719dd01")
         public class WrappedWizardForm extends AbstractWrappedFormField<IForm> {
 
           @Override
@@ -181,6 +187,7 @@ public class LegacyHtmlStatusWizardContainerForm extends AbstractWizardContainer
       }
 
       @Order(20)
+      @ClassId("fb682cc7-1d9c-43eb-a2fa-239866dca1ff")
       public class StatusBox extends AbstractGroupBox {
 
         @Override
@@ -200,6 +207,7 @@ public class LegacyHtmlStatusWizardContainerForm extends AbstractWizardContainer
         }
 
         @Order(20)
+        @ClassId("9b04f649-72db-4584-95b3-ad4df4903454")
         public class StatusField extends AbstractWizardStatusField {
 
           @Override
@@ -226,6 +234,7 @@ public class LegacyHtmlStatusWizardContainerForm extends AbstractWizardContainer
     }
 
     @Order(30)
+    @ClassId("920f4327-88f6-4ecf-a435-7a46e90bee1d")
     public class WizardPreviousStepButton extends AbstractButton implements IWizardAction {
 
       @Override
@@ -245,6 +254,7 @@ public class LegacyHtmlStatusWizardContainerForm extends AbstractWizardContainer
     }
 
     @Order(40)
+    @ClassId("32568b24-346c-45c7-b86f-20db0a8d652c")
     public class WizardNextStepButton extends AbstractButton implements IWizardAction {
 
       @Override
@@ -269,6 +279,7 @@ public class LegacyHtmlStatusWizardContainerForm extends AbstractWizardContainer
     }
 
     @Order(50)
+    @ClassId("b22178eb-6727-4f05-b5ec-930475f4f3b4")
     public class WizardFinishButton extends AbstractButton implements IWizardAction {
 
       @Override
@@ -293,6 +304,7 @@ public class LegacyHtmlStatusWizardContainerForm extends AbstractWizardContainer
     }
 
     @Order(60)
+    @ClassId("1fa42cc2-9006-4c47-b420-f6c710ac176b")
     public class WizardCancelButton extends AbstractButton implements IWizardAction {
 
       @Override
@@ -322,6 +334,7 @@ public class LegacyHtmlStatusWizardContainerForm extends AbstractWizardContainer
     }
 
     @Order(70)
+    @ClassId("93ddf703-c181-4c4c-acc3-420ea858fffb")
     public class WizardSuspendButton extends AbstractButton implements IWizardAction {
 
       @Override

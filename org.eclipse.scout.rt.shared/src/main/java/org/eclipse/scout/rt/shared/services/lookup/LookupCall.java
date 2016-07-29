@@ -26,6 +26,7 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.ToStringBuilder;
 import org.eclipse.scout.rt.platform.util.TriState;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 
 /**
  * There are 2 variants to use lookup values <br>
@@ -54,6 +55,7 @@ import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
  * LookupCall: subclass of LocalLookupCall() with implementation of method
  * {@link LocalLookupCall#execCreateLookupRows()}
  */
+@ClassId("0f461d52-9712-494f-9748-8016e5f4ca5a")
 public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, Serializable, ITypeWithClassId {
 
   private static final long serialVersionUID = 0L;

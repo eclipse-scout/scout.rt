@@ -48,6 +48,7 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.CompareUtility;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 
 /**
  * A page containing a list of "menu" entries<br>
@@ -336,6 +337,7 @@ public abstract class AbstractPageWithNodes extends AbstractPage<ITable> impleme
   /**
    * inner table
    */
+  @ClassId("d657e4bf-e2eb-44ed-9a9b-898db24ff408")
   private class P_Table extends AbstractTable {
 
     @Override
@@ -374,6 +376,7 @@ public abstract class AbstractPageWithNodes extends AbstractPage<ITable> impleme
     }
 
     @Order(1)
+    @ClassId("d30cb908-98b8-4b46-ba5f-62354a9eb969")
     public class LabelColumn extends AbstractStringColumn {
 
       @Override

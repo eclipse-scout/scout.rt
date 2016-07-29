@@ -14,12 +14,14 @@ import org.eclipse.scout.rt.client.ui.action.menu.MenuSeparator;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 
 /**
  * @deprecated use {@link MenuSeparator} instead, will be removed in Scout 6.1
  */
 @Deprecated
 @SuppressWarnings("deprecation")
+@ClassId("3fcbae56-446a-4a03-b668-2c510e91d2c5")
 public class ToolButtonSeparator extends AbstractToolButton {
 
   public ToolButtonSeparator() {

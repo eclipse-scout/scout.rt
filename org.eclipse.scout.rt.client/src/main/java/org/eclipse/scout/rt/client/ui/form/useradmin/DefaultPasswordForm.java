@@ -26,7 +26,9 @@ import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.services.common.pwd.IPasswordManagementService;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 
+@ClassId("5bcb48f0-9b72-4f28-9c08-038cd5d9a1c4")
 public class DefaultPasswordForm extends AbstractForm {
   private String m_userId;
 
@@ -80,12 +82,15 @@ public class DefaultPasswordForm extends AbstractForm {
   }
 
   @Order(20)
+  @ClassId("02df65d9-252a-4c24-a232-27bb0924a1b1")
   public class MainBox extends AbstractGroupBox {
 
     @Order(10)
+    @ClassId("b44b8225-ce40-448c-a908-4ef8dc4df876")
     public class GroupBox extends AbstractGroupBox {
 
       @Order(10)
+      @ClassId("b27cada2-acb5-4702-a2c5-87e529fb26bc")
       public class OldPasswordField extends AbstractStringField {
 
         @Override
@@ -105,6 +110,7 @@ public class DefaultPasswordForm extends AbstractForm {
       }
 
       @Order(20)
+      @ClassId("9fb80aa1-3c3c-4881-8395-7155d69d4425")
       public class NewPasswordField extends AbstractStringField {
 
         @Override
@@ -124,6 +130,7 @@ public class DefaultPasswordForm extends AbstractForm {
       }
 
       @Order(30)
+      @ClassId("14d4143c-ceb3-4a3a-8c83-cfeb09b0727f")
       public class RepeatPasswordField extends AbstractStringField {
 
         @Override
@@ -144,10 +151,12 @@ public class DefaultPasswordForm extends AbstractForm {
     }
 
     @Order(40)
+    @ClassId("d228bd1e-a052-4036-8ca4-7b0ec4ac42ae")
     public class OkButton extends AbstractOkButton {
     }
 
     @Order(50)
+    @ClassId("0a491aaf-cf8d-49ce-91d9-f9e2a5ee86f9")
     public class CancelButton extends AbstractCancelButton {
     }
 

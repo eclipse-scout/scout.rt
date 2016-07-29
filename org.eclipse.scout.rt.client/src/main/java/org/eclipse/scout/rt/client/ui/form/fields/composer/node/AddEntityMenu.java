@@ -18,10 +18,12 @@ import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.IComposerField;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.data.model.IDataModelEntity;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 
 /**
  * Dynamic menu to add a new entity to the composer tree
  */
+@ClassId("08771479-8a4b-42de-bf8c-521215cc214e")
 public class AddEntityMenu extends AbstractMenu {
   private final IComposerField m_field;
   private final ITreeNode m_parentNode;

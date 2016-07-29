@@ -34,6 +34,7 @@ import org.eclipse.scout.rt.shared.extension.ContributionComposite;
 import org.eclipse.scout.rt.shared.extension.IContributionOwner;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 
 public abstract class AbstractMixedSmartColumn<VALUE_TYPE, LOOKUP_CALL_KEY_TYPE> extends AbstractContentAssistColumn<VALUE_TYPE, LOOKUP_CALL_KEY_TYPE> implements IMixedSmartColumn<VALUE_TYPE, LOOKUP_CALL_KEY_TYPE>, IContributionOwner {
   private boolean m_sortCodesByDisplayText;
@@ -216,6 +217,7 @@ public abstract class AbstractMixedSmartColumn<VALUE_TYPE, LOOKUP_CALL_KEY_TYPE>
   /**
    * Internal editor field
    */
+  @ClassId("eb0895b4-c31e-4376-b97b-35aea0063c79")
   protected class MixedSmartEditorField extends AbstractMixedSmartField<VALUE_TYPE, LOOKUP_CALL_KEY_TYPE> {
     private ITableRow m_row;
 

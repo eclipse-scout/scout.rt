@@ -13,12 +13,14 @@ package org.eclipse.scout.rt.client.ui.wizard;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 
 /**
  * Wizard step containing another wizard. This step invokes the parent's <code>doNextStep()</code> method when
  * terminated (i.e. either finished or canceled). vastly reduced amount of automation and allows for much more custom
  * flexibility in handling wizard processes.
  */
+@ClassId("f66e442b-7056-4fbd-bd72-f19a0b63c1c3")
 public class WrappedWizardWizardStep extends AbstractWizardStep<IForm> {
 
   private final IWizard m_parentWizard;

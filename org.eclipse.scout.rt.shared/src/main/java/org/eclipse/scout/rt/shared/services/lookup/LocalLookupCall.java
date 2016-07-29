@@ -18,6 +18,7 @@ import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 
 /**
  * LookupCall for cases where no backend service exists.<br>
@@ -27,6 +28,7 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
  *
  * @see LookupCall
  */
+@ClassId("6a7d238a-11ab-478b-a3fb-7a99494b711d")
 public class LocalLookupCall<T> extends LookupCall<T> {
   private static final long serialVersionUID = 0L;
 

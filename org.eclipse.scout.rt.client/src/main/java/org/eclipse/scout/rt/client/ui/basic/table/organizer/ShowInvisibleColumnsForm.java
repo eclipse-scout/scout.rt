@@ -28,7 +28,9 @@ import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 
+@ClassId("2d5554d8-68f1-49ab-a0aa-638f3de3e1fe")
 public class ShowInvisibleColumnsForm extends AbstractForm implements IShowInvisibleColumnsForm {
 
   private ITable m_table = null;
@@ -73,6 +75,7 @@ public class ShowInvisibleColumnsForm extends AbstractForm implements IShowInvis
   }
 
   @Order(10)
+  @ClassId("60f3556f-6252-4933-9c35-342a7e0684ae")
   public class MainBox extends AbstractGroupBox {
 
     @Override
@@ -87,9 +90,11 @@ public class ShowInvisibleColumnsForm extends AbstractForm implements IShowInvis
     }
 
     @Order(10)
+    @ClassId("ee038f0e-bd8a-4ab5-9af6-fbb2e6a7ff00")
     public class GroupBox extends AbstractGroupBox {
 
       @Order(10)
+      @ClassId("9aa78206-cbf3-406f-a8c5-0783bfd1de9b")
       public class ColumnsTableField extends AbstractTableField<ColumnsTableField.Table> {
         @Override
         protected int getConfiguredGridH() {
@@ -149,6 +154,7 @@ public class ShowInvisibleColumnsForm extends AbstractForm implements IShowInvis
           }
         }
 
+        @ClassId("251571e3-58b2-4711-91ae-3d438988481e")
         public class Table extends AbstractTable {
 
           @Override
@@ -175,6 +181,7 @@ public class ShowInvisibleColumnsForm extends AbstractForm implements IShowInvis
           }
 
           @Order(10)
+          @ClassId("da373e46-147f-4298-99ff-34c5f83c4029")
           public class KeyColumn extends AbstractColumn<IColumn<?>> {
 
             @Override
@@ -189,6 +196,7 @@ public class ShowInvisibleColumnsForm extends AbstractForm implements IShowInvis
           }
 
           @Order(20)
+          @ClassId("fdef9323-d352-4802-9069-d6a3005a8f15")
           public class TitleColumn extends AbstractStringColumn {
 
             @Override
@@ -204,10 +212,12 @@ public class ShowInvisibleColumnsForm extends AbstractForm implements IShowInvis
     }
 
     @Order(15)
+    @ClassId("44339c5f-8885-4f3a-bd6d-8996ad9900a9")
     public class OkButton extends AbstractOkButton {
     }
 
     @Order(20)
+    @ClassId("f6b3f35e-f935-4cd3-94cf-a085ab5dd6b2")
     public class CancelButton extends AbstractCancelButton {
     }
 

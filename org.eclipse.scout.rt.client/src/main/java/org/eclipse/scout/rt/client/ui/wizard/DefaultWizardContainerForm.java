@@ -28,6 +28,7 @@ import org.eclipse.scout.rt.client.ui.wizard.DefaultWizardContainerForm.MainBox.
 import org.eclipse.scout.rt.client.ui.wizard.DefaultWizardContainerForm.MainBox.WizardSuspendButton;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 
 /**
  * <h3>DefaultWizardContainerForm</h3> A container form containing a wizard form area (current step) a status area. see
@@ -35,6 +36,7 @@ import org.eclipse.scout.rt.shared.ScoutTexts;
  *
  * @since 24.11.2009
  */
+@ClassId("dc649273-10aa-4677-8b8d-11ed0965d644")
 public class DefaultWizardContainerForm extends AbstractWizardContainerForm {
 
   public DefaultWizardContainerForm(IWizard wizard) {
@@ -110,6 +112,7 @@ public class DefaultWizardContainerForm extends AbstractWizardContainerForm {
   }
 
   @Order(10)
+  @ClassId("051f6ae5-8a54-4f6c-8213-9b1e8f280a2a")
   public class MainBox extends AbstractGroupBox {
 
     @Override
@@ -133,10 +136,12 @@ public class DefaultWizardContainerForm extends AbstractWizardContainerForm {
     }
 
     @Order(10)
+    @ClassId("41e660ac-c25d-47a0-80f8-ebcaa0493e87")
     public class WizardProgressField extends AbstractWizardProgressField {
     }
 
     @Order(20)
+    @ClassId("bcae045d-410d-4ffd-bae7-d39d55de9b17")
     public class ContentBox extends AbstractGroupBox {
 
       @Override
@@ -145,6 +150,7 @@ public class DefaultWizardContainerForm extends AbstractWizardContainerForm {
       }
 
       @Order(10)
+      @ClassId("954d9fb4-8d8f-4590-a4f1-9b4f3f15f2d1")
       public class WrappedWizardForm extends AbstractWrappedFormField<IForm> {
 
         @Override
@@ -155,6 +161,7 @@ public class DefaultWizardContainerForm extends AbstractWizardContainerForm {
     }
 
     @Order(30)
+    @ClassId("6da76125-d126-49eb-a6c5-081cb5635c4e")
     public class WizardPreviousStepButton extends AbstractButton implements IWizardAction {
 
       @Override
@@ -169,6 +176,7 @@ public class DefaultWizardContainerForm extends AbstractWizardContainerForm {
     }
 
     @Order(40)
+    @ClassId("08bc7570-d67f-4d3c-98c0-c0a3af9b43ce")
     public class WizardNextStepButton extends AbstractButton implements IWizardAction {
 
       @Override
@@ -188,6 +196,7 @@ public class DefaultWizardContainerForm extends AbstractWizardContainerForm {
     }
 
     @Order(50)
+    @ClassId("e8191b4e-d1bf-464e-ac87-c634f246daf1")
     public class WizardFinishButton extends AbstractButton implements IWizardAction {
 
       @Override
@@ -207,6 +216,7 @@ public class DefaultWizardContainerForm extends AbstractWizardContainerForm {
     }
 
     @Order(60)
+    @ClassId("2424b287-6397-4aaa-89d2-69ec4cb293bb")
     public class WizardCancelButton extends AbstractButton implements IWizardAction {
 
       @Override
@@ -231,6 +241,7 @@ public class DefaultWizardContainerForm extends AbstractWizardContainerForm {
     }
 
     @Order(70)
+    @ClassId("0602c31b-eedc-42f0-a739-a55f39e8d35f")
     public class WizardSuspendButton extends AbstractButton implements IWizardAction {
 
       @Override

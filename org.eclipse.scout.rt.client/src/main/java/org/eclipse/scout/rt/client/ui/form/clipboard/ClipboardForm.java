@@ -33,7 +33,9 @@ import org.eclipse.scout.rt.client.ui.form.fields.labelfield.AbstractLabelField;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.resource.MimeType;
 import org.eclipse.scout.rt.shared.TEXTS;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 
+@ClassId("5aaf757b-4a82-4ffb-bc7e-05f4e5cc1964")
 @FormData(sdkCommand = SdkCommand.IGNORE, defaultSubtypeSdkCommand = DefaultSubtypeSdkCommand.IGNORE)
 public class ClipboardForm extends AbstractForm {
 
@@ -98,6 +100,7 @@ public class ClipboardForm extends AbstractForm {
     return getFieldByClass(CancelButton.class);
   }
 
+  @ClassId("520d5971-438b-4b81-8ca3-6201f0181b27")
   public class MainBox extends AbstractGroupBox {
 
     @Override
@@ -106,6 +109,7 @@ public class ClipboardForm extends AbstractForm {
     }
 
     @Order(10)
+    @ClassId("7f2f4401-7bc8-45aa-9cf5-e23129aafd44")
     public class ClipboardLabel extends AbstractLabelField {
 
       @Override
@@ -140,6 +144,7 @@ public class ClipboardForm extends AbstractForm {
     }
 
     @Order(20)
+    @ClassId("7248dcf2-e2de-4aa6-8c35-5144a6e02c00")
     public class ClipboardBox extends AbstractGroupBox {
 
       @Override
@@ -153,6 +158,7 @@ public class ClipboardForm extends AbstractForm {
       }
 
       @Order(10)
+      @ClassId("5c81521d-f16d-411a-85f1-c349d8b71a28")
       public class ClipboardField extends AbstractClipboardField {
 
         @Override
@@ -184,10 +190,12 @@ public class ClipboardForm extends AbstractForm {
     }
 
     @Order(30)
+    @ClassId("818d7930-126e-481e-ac47-b7e8654e8060")
     public class OkButton extends AbstractOkButton {
     }
 
     @Order(40)
+    @ClassId("a54fc3fc-ee5a-4351-b82f-3168e96c2f34")
     public class CancelButton extends AbstractCancelButton {
     }
 
@@ -196,6 +204,7 @@ public class ClipboardForm extends AbstractForm {
      * form with ESC anyway.
      */
     @Order(50)
+    @ClassId("18fc9914-495f-4523-b75c-41259de828db")
     public class EscapeKeyStroke extends AbstractKeyStroke {
 
       @Override

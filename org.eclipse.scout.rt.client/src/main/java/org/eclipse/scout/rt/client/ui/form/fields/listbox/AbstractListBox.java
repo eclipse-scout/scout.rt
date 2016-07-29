@@ -962,6 +962,7 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
     }
   }
 
+  @ClassId("44c5f5e6-0f81-40cb-9842-6b61bee8e8e8")
   public class DefaultListBoxTable extends AbstractTable {
     @Override
     protected boolean getConfiguredAutoResizeColumns() {
@@ -999,6 +1000,7 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
     }
 
     @Order(1)
+    @ClassId("7199a815-0d92-4c39-b28f-262b0295a814")
     public class KeyColumn extends AbstractColumn<KEY> {
       @Override
       protected boolean getConfiguredPrimaryKey() {
@@ -1018,11 +1020,13 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
     }
 
     @Order(2)
+    @ClassId("5cc5bf09-c711-4557-9b11-a26b45723743")
     public class TextColumn extends AbstractStringColumn {
 
     }
 
     @Order(3)
+    @ClassId("1ee3754a-32a1-4e6b-bfcb-2cae34505ee6")
     public class ActiveColumn extends AbstractBooleanColumn {
       @Override
       protected boolean getConfiguredDisplayable() {
