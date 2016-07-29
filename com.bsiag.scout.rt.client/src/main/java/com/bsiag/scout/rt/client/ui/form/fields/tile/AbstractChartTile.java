@@ -22,6 +22,7 @@ import com.bsiag.scout.rt.client.ui.form.fields.tile.AbstractChartTile.ChartFiel
 /**
  * @since 5.2
  */
+@ClassId("e482fd82-fb1b-4dd5-8a42-ade0a0fa5eaf")
 public abstract class AbstractChartTile extends AbstractTile<ChartField> {
 
   public AbstractChartTile() {
