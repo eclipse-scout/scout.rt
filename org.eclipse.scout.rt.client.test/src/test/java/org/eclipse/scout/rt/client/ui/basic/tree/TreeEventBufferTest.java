@@ -45,6 +45,13 @@ import org.mockito.stubbing.Answer;
  */
 public class TreeEventBufferTest {
 
+  /**
+   * each test should finish within 1000ms running on a workstation. running on jenkins / CI, due to unpredictable load
+   * of the system, they might need substantially more time to complete. therefore this timout value is extracted to
+   * constant and can be changed to a lower value when running locally / within ide.
+   */
+
+  private static final int TIMEOUT_VALUE = 20000; //ms
   private TreeEventBuffer m_testBuffer;
   private Map<String, ITreeNode> m_mockNodes;
 
@@ -737,7 +744,7 @@ public class TreeEventBufferTest {
     assertEquals(2, treeEvents.size());
   }
 
-  @Test(timeout = 10000)
+  @Test(timeout = TIMEOUT_VALUE)
   public void testCoalesceSameTypeWithManyInsertEvents() throws Exception {
     final int eventCount = 10000;
     ITreeNode parentA = mockNode("parentA");
@@ -752,7 +759,7 @@ public class TreeEventBufferTest {
     assertEquals(eventCount, CollectionUtility.firstElement(treeEvents).getNodeCount());
   }
 
-  @Test(timeout = 10000)
+  @Test(timeout = TIMEOUT_VALUE)
   public void testCoalesceSameTypeWithManyInsertHavingDifferentParentsEvents() throws Exception {
     final int eventCount = 10000;
     LinkedList<TreeEvent> treeEvents = new LinkedList<>();
@@ -776,7 +783,7 @@ public class TreeEventBufferTest {
     assertSame(parentB, secondEvent.getCommonParentNode());
   }
 
-  @Test(timeout = 10000)
+  @Test(timeout = TIMEOUT_VALUE)
   public void testCoalesceSameTypeWithManyInsertUpdateEvents() throws Exception {
     final int eventCount = 10000;
     LinkedList<TreeEvent> treeEvents = new LinkedList<>();
@@ -792,7 +799,7 @@ public class TreeEventBufferTest {
     assertEquals(2 * eventCount, treeEvents.size());
   }
 
-  @Test(timeout = 10000)
+  @Test(timeout = TIMEOUT_VALUE)
   public void testCoalesceSameTypeWithManyInsertInsertUpdateUpdateEvents() throws Exception {
     final int eventCount = 10000;
     LinkedList<TreeEvent> events = new LinkedList<>();
@@ -811,7 +818,7 @@ public class TreeEventBufferTest {
     assertEquals(2 * eventCount, events.size());
   }
 
-  @Test(timeout = 10000)
+  @Test(timeout = TIMEOUT_VALUE)
   public void testRemoveNodesContainedInPreviousEventsWithManyInsertAndUpdateEvents() throws Exception {
     final int eventCount = 10000;
     LinkedList<TreeEvent> events = new LinkedList<>();
@@ -835,7 +842,7 @@ public class TreeEventBufferTest {
     }
   }
 
-  @Test(timeout = 10000)
+  @Test(timeout = TIMEOUT_VALUE)
   public void testRemoveIdenticalEventsWithManyInsertEvents() throws Exception {
     final int eventCount = 10000;
     LinkedList<TreeEvent> events = new LinkedList<>();
@@ -850,7 +857,7 @@ public class TreeEventBufferTest {
     assertEquals(eventCount, events.size());
   }
 
-  @Test(timeout = 10000)
+  @Test(timeout = TIMEOUT_VALUE)
   public void testRemoveIdenticalEventsWithManyInsertAndDeleteEvents() throws Exception {
     final int eventCount = 10000;
     LinkedList<TreeEvent> events = new LinkedList<>();
@@ -863,7 +870,7 @@ public class TreeEventBufferTest {
     assertEquals(2 * eventCount, events.size());
   }
 
-  @Test(timeout = 10000)
+  @Test(timeout = TIMEOUT_VALUE)
   public void testRemoveObsoleteWithManyNodesInsertAndDelete() throws Exception {
     final int eventCount = 10000;
     LinkedList<TreeEvent> events = new LinkedList<>();
@@ -883,7 +890,7 @@ public class TreeEventBufferTest {
     }
   }
 
-  @Test(timeout = 10000)
+  @Test(timeout = TIMEOUT_VALUE)
   public void testRemoveObsoleteWithManyNodesPairwiseInsertAndDelete() throws Exception {
     final int eventCount = 10000;
     LinkedList<TreeEvent> events = new LinkedList<>();
@@ -901,7 +908,7 @@ public class TreeEventBufferTest {
     }
   }
 
-  @Test(timeout = 10000)
+  @Test(timeout = TIMEOUT_VALUE)
   public void testRemoveObsoleteWithManyUpdateAndOneDeleteAllNodesEvent() throws Exception {
     final int eventCount = 10000;
     LinkedList<TreeEvent> events = new LinkedList<>();
@@ -928,7 +935,7 @@ public class TreeEventBufferTest {
     }
   }
 
-  @Test(timeout = 10000)
+  @Test(timeout = TIMEOUT_VALUE)
   public void testRemoveObsoleteWithManyNodesUpdateAndDelete() throws Exception {
     final int eventCount = 10000;
     LinkedList<TreeEvent> events = new LinkedList<>();
