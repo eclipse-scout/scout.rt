@@ -257,22 +257,16 @@ public abstract class AbstractStringField extends AbstractBasicField<String> imp
   }
 
   @Override
-  public void setMaxLength(int len) {
-    if (len > 0) {
-      propertySupport.setPropertyInt(PROP_MAX_LENGTH, len);
-    }
-    if (isInitialized()) {
+  public void setMaxLength(int maxLength) {
+    boolean changed = propertySupport.setPropertyInt(PROP_MAX_LENGTH, Math.max(0, maxLength));
+    if (changed && isInitialized()) {
       setValue(getValue());
     }
   }
 
   @Override
   public int getMaxLength() {
-    int len = propertySupport.getPropertyInt(PROP_MAX_LENGTH);
-    if (len <= 0) {
-      len = 200;
-    }
-    return len;
+    return propertySupport.getPropertyInt(PROP_MAX_LENGTH);
   }
 
   @Override
