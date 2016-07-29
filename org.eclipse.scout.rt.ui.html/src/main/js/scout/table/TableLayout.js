@@ -41,10 +41,13 @@ scout.TableLayout.prototype.layout = function($container) {
     // Layout table footer and add size of footer (including the control content) to 'height'
     footer.revalidateLayout();
     height += scout.graphics.getSize(footer.$container).height;
-    if (footer.open) {
+    if (footer.opening) {
       // Layout may be called when container stays open but changes its size using an animation.
       // At that time the controlContainer has not yet the final size, therefore measuring is not possible, but not necessary anyway.
       height += footer.selectedControl.height;
+    } else if (footer.open) {
+      // Measure the real height
+      height += scout.graphics.getSize(footer.$controlContainer).height;
     }
   }
   if (header) {
