@@ -142,7 +142,7 @@ public class JsonBrowserField<BROWSER_FIELD extends IBrowserField> extends JsonF
     if (EVENT_POST_MESSAGE.equals(event.getType())) {
       handleUiPostMessage(event);
     }
-    if (EVENT_EXTERNAL_WINDOW_STATE.equals(event.getType())) {
+    else if (EVENT_EXTERNAL_WINDOW_STATE.equals(event.getType())) {
       handleUiWindowState(event);
     }
     else {

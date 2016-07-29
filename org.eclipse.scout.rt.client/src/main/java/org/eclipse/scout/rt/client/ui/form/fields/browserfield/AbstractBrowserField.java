@@ -152,13 +152,13 @@ public abstract class AbstractBrowserField extends AbstractFormField implements 
    * </pre>
    *
    * @param data
-   * @param orgin
+   * @param origin
    *          The origin of the window that sent the message at the time postMessage was called
    * @see <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage">Window.postMessage()</a>
    */
   @ConfigOperation
   @Order(260)
-  protected void execPostMessage(String data, String orgin) {
+  protected void execPostMessage(String data, String origin) {
   }
 
   /**
