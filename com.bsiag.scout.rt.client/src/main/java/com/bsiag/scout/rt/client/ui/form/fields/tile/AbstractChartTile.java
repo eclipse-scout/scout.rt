@@ -134,6 +134,7 @@ public abstract class AbstractChartTile extends AbstractTile<ChartField> {
       return AbstractChartTile.this.classId() + ID_CONCAT_SYMBOL + ConfigurationUtility.getAnnotatedClassIdWithFallback(getClass(), true);
     }
 
+    @ClassId("7c238257-fea0-4de1-8154-7db7f763ae85")
     public class Chart extends AbstractChart {
     }
   }

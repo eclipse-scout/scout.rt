@@ -115,6 +115,7 @@ public class AbstractChartField<T extends IChart> extends AbstractFormField impl
 
   // TODO [15.1] nbu: export import, interception
 
+  @ClassId("a6e76b7c-f42c-43b2-bcb8-55bbbc534b80")
   public class Chart extends AbstractChart {
 
   }
