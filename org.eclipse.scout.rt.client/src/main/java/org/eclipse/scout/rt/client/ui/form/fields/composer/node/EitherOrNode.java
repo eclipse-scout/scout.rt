@@ -20,8 +20,8 @@ import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.IComposerField;
 import org.eclipse.scout.rt.platform.Order;
-import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.platform.classid.ClassId;
+import org.eclipse.scout.rt.shared.ScoutTexts;
 
 public class EitherOrNode extends AbstractComposerNode {
   private boolean m_beginEitherOr;
@@ -174,6 +174,7 @@ public class EitherOrNode extends AbstractComposerNode {
   }
 
   @Order(50)
+  @ClassId("b444ace8-d032-44d0-941a-a261bc48777b")
   public class AddAttributeOnEitherOrMenu extends AbstractAddAttributeMenu {
     public AddAttributeOnEitherOrMenu() {
       super(getComposerField(), EitherOrNode.this);
@@ -181,10 +182,12 @@ public class EitherOrNode extends AbstractComposerNode {
   }
 
   @Order(60)
+  @ClassId("1914f76c-4635-4b54-ae29-6ec1857bca90")
   public class Separator3Menu extends AbstractMenuSeparator {
   }
 
   @Order(70)
+  @ClassId("567ee492-6de3-4801-a4bc-2476c5392b7c")
   public class AddEntityOnEitherOrPlaceholderMenu extends AbstractMenuSeparator {
   }
 }

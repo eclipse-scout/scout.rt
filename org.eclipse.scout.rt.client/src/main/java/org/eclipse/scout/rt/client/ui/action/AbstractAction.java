@@ -30,6 +30,7 @@ import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.Replace;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.classid.ITypeWithClassId;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.reflect.AbstractPropertyObserver;
@@ -44,6 +45,7 @@ import org.eclipse.scout.rt.shared.services.common.security.IAccessControlServic
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@ClassId("d3cdbb0d-4c53-4854-b6f2-23465050c3c5")
 public abstract class AbstractAction extends AbstractPropertyObserver implements IAction, IExtensibleObject {
   private static final Logger LOG = LoggerFactory.getLogger(AbstractAction.class);
 

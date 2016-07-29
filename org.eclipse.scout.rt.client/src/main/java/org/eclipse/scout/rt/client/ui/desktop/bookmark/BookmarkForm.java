@@ -26,11 +26,11 @@ import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 import org.eclipse.scout.rt.shared.services.common.bookmark.BookmarkFolder;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
-import org.eclipse.scout.rt.platform.classid.ClassId;
 
 @ClassId("036f030f-784a-4b55-be08-c95746acd664")
 public class BookmarkForm extends AbstractForm implements IBookmarkForm {
@@ -247,6 +247,7 @@ public class BookmarkForm extends AbstractForm implements IBookmarkForm {
     }
 
     @Order(50)
+    @ClassId("b5ff8950-1f7d-4b5f-a66d-2de8b7d25bae")
     public class CancelButton extends AbstractCancelButton {
     }
   }

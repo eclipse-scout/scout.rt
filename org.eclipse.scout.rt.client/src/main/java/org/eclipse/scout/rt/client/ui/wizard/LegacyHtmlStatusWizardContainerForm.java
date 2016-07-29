@@ -31,9 +31,9 @@ import org.eclipse.scout.rt.client.ui.wizard.LegacyHtmlStatusWizardContainerForm
 import org.eclipse.scout.rt.client.ui.wizard.LegacyHtmlStatusWizardContainerForm.MainBox.WizardResetButton;
 import org.eclipse.scout.rt.client.ui.wizard.LegacyHtmlStatusWizardContainerForm.MainBox.WizardSuspendButton;
 import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 import org.eclipse.scout.rt.shared.ScoutTexts;
-import org.eclipse.scout.rt.platform.classid.ClassId;
 
 /**
  * <h3>LegacyHtmlStatusWizardContainerForm</h3> A container form containing a wizard form area (current step) a status
@@ -364,6 +364,7 @@ public class LegacyHtmlStatusWizardContainerForm extends AbstractWizardContainer
     }
 
     @Order(80)
+    @ClassId("e406e02c-48c1-474c-8d03-28201d40287d")
     public class WizardResetButton extends AbstractButton implements IWizardAction {
 
       @Override

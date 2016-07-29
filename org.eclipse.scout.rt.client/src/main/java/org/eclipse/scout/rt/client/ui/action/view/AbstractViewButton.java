@@ -14,7 +14,9 @@ import org.eclipse.scout.rt.client.extension.ui.action.view.IViewButtonExtension
 import org.eclipse.scout.rt.client.ui.action.AbstractAction;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 
+@ClassId("87ad04db-8bf0-4eb4-866e-f547b632e020")
 public abstract class AbstractViewButton extends AbstractAction implements IViewButton {
 
   public AbstractViewButton() {

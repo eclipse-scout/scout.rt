@@ -23,10 +23,10 @@ import org.eclipse.scout.rt.client.ui.form.useradmin.DefaultPasswordForm.MainBox
 import org.eclipse.scout.rt.client.ui.form.useradmin.DefaultPasswordForm.MainBox.OkButton;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.services.common.pwd.IPasswordManagementService;
-import org.eclipse.scout.rt.platform.classid.ClassId;
 
 @ClassId("5bcb48f0-9b72-4f28-9c08-038cd5d9a1c4")
 public class DefaultPasswordForm extends AbstractForm {

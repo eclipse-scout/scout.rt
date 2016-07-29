@@ -12,8 +12,8 @@ package org.eclipse.scout.rt.client.ui.wizard;
 
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.classid.ClassId;
+import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 
 /**
  * Wizard step containing another wizard. This step invokes the parent's <code>doNextStep()</code> method when

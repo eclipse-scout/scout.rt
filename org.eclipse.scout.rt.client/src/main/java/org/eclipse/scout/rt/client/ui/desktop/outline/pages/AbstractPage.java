@@ -56,6 +56,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.status.IStatus;
@@ -65,6 +66,7 @@ import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@ClassId("ef0d789e-dfbf-4715-9ab7-eedaefc936f3")
 public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode implements IPage<T> {
 
   private static final Logger LOG = LoggerFactory.getLogger(AbstractPage.class);

@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.client.ui.form.fields.composer;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.data.model.DataModelConstants;
@@ -22,7 +23,6 @@ import org.eclipse.scout.rt.shared.services.lookup.LocalLookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.eclipse.scout.rt.platform.classid.ClassId;
 
 /**
  * Convenience lookup call to present {@link IDataModelAttribute#getAggregationTypes()}

@@ -10,6 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.action.menu;
 
+import org.eclipse.scout.rt.platform.classid.ClassId;
+
+@ClassId("37764b18-0496-47f2-bcaf-36bf0fb26ecd")
 public abstract class AbstractMenuSeparator extends AbstractMenu {
 
   @Override

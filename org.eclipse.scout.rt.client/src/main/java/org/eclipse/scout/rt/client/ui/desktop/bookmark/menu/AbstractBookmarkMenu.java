@@ -29,6 +29,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.shared.ScoutTexts;
@@ -38,12 +39,12 @@ import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 import org.eclipse.scout.rt.shared.services.common.bookmark.BookmarkFolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.eclipse.scout.rt.platform.classid.ClassId;
 
 /**
  * Maintain a menu per bookmark and its key stroke on the desktop
  */
 @Order(1)
+@ClassId("91003d66-44f8-44de-8740-7f15e31fad5f")
 public abstract class AbstractBookmarkMenu extends AbstractMenu {
   private static final Logger LOG = LoggerFactory.getLogger(AbstractBookmarkMenu.class);
 

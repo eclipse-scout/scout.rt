@@ -18,6 +18,7 @@ import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
 import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.IProposalFieldExtension;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.util.CompareUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
@@ -30,6 +31,7 @@ import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
  * This field is similar to the smart field but also allows custom text. A proposal field is always of the value type
  * {@link String}. The proposals are delivered as lookup rows of any type.
  */
+@ClassId("61dd2913-49f2-4637-8d05-b0c324ee172a")
 public abstract class AbstractProposalField<LOOKUP_KEY> extends AbstractContentAssistField<String, LOOKUP_KEY> implements IProposalField<LOOKUP_KEY> {
 
   private IContentAssistFieldUIFacade m_uiFacade;

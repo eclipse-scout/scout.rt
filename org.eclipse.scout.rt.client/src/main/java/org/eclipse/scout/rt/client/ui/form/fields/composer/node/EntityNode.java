@@ -20,11 +20,11 @@ import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.IComposerField;
 import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.data.model.IDataModelAttribute;
 import org.eclipse.scout.rt.shared.data.model.IDataModelEntity;
-import org.eclipse.scout.rt.platform.classid.ClassId;
 
 public class EntityNode extends AbstractComposerNode {
 
@@ -176,10 +176,12 @@ public class EntityNode extends AbstractComposerNode {
   }
 
   @Order(60)
+  @ClassId("be9f8629-b3ce-46c7-af9b-ebfe83fc903a")
   public class Separator2Menu extends AbstractMenuSeparator {
   }
 
   @Order(70)
+  @ClassId("ebef316f-f872-4143-bacf-68b47139e536")
   public class AddEntityPlaceholderOnEntityMenu extends AbstractMenuSeparator {
   }
 

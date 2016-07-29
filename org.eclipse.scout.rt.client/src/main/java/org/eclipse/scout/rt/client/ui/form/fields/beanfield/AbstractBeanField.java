@@ -22,10 +22,12 @@ import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 
 /**
  * This field may be used if the value is relevant for the gui, and not just the display text.
  */
+@ClassId("9fcc88ba-acf8-4409-b310-7d7132a0b6f3")
 public abstract class AbstractBeanField<VALUE> extends AbstractValueField<VALUE> implements IBeanField<VALUE> {
   private IBeanFieldUIFacade m_uiFacade;
 

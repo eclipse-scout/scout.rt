@@ -27,8 +27,8 @@ import org.eclipse.scout.rt.client.ui.wizard.DefaultWizardContainerForm.MainBox.
 import org.eclipse.scout.rt.client.ui.wizard.DefaultWizardContainerForm.MainBox.WizardResetButton;
 import org.eclipse.scout.rt.client.ui.wizard.DefaultWizardContainerForm.MainBox.WizardSuspendButton;
 import org.eclipse.scout.rt.platform.Order;
-import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.platform.classid.ClassId;
+import org.eclipse.scout.rt.shared.ScoutTexts;
 
 /**
  * <h3>DefaultWizardContainerForm</h3> A container form containing a wizard form area (current step) a status area. see
@@ -266,6 +266,7 @@ public class DefaultWizardContainerForm extends AbstractWizardContainerForm {
     }
 
     @Order(80)
+    @ClassId("e6d08552-7384-45ea-ae91-db37bfa33f98")
     public class WizardResetButton extends AbstractButton implements IWizardAction {
 
       @Override

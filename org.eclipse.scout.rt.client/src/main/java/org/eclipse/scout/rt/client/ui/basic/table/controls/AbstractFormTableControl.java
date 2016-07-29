@@ -23,12 +23,14 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 
 /**
  * @since 6.0
  */
+@ClassId("ee0673b2-f19b-4fa6-be96-a1f373edfc52")
 public abstract class AbstractFormTableControl extends AbstractTableControl implements IFormTableControl {
 
   public AbstractFormTableControl() {

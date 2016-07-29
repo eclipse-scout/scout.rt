@@ -12,9 +12,9 @@ package org.eclipse.scout.rt.client.ui.basic.table.controls;
 
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.TEXTS;
-import org.eclipse.scout.rt.platform.classid.ClassId;
 
 /**
  * @since 5.1.0

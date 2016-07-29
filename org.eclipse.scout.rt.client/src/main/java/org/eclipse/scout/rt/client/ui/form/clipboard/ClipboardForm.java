@@ -31,9 +31,9 @@ import org.eclipse.scout.rt.client.ui.form.fields.clipboardfield.AbstractClipboa
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.labelfield.AbstractLabelField;
 import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.resource.MimeType;
 import org.eclipse.scout.rt.shared.TEXTS;
-import org.eclipse.scout.rt.platform.classid.ClassId;
 
 @ClassId("5aaf757b-4a82-4ffb-bc7e-05f4e5cc1964")
 @FormData(sdkCommand = SdkCommand.IGNORE, defaultSubtypeSdkCommand = DefaultSubtypeSdkCommand.IGNORE)

@@ -16,10 +16,12 @@ import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.IComposerField;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.internal.ComposerAttributeForm;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.data.model.IDataModelAttribute;
 import org.eclipse.scout.rt.shared.data.model.IDataModelAttributeOp;
 
+@ClassId("db83fd12-1690-4c31-8528-8f115fda496f")
 public abstract class AbstractAddAttributeMenu extends AbstractMenu {
   private final IComposerField m_field;
   private final ITreeNode m_parentNode;

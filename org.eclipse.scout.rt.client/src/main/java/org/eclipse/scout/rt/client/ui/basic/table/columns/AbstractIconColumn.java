@@ -10,9 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table.columns;
 
+import org.eclipse.scout.rt.platform.classid.ClassId;
+
 /**
  * A column that renders its content as a font icon or image
  */
+@ClassId("d5beef55-b40e-44f6-a539-be3bd75d3e33")
 public abstract class AbstractIconColumn extends AbstractColumn<String> implements IIconColumn {
 
   @Override

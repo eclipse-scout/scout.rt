@@ -24,7 +24,6 @@ import org.eclipse.scout.rt.platform.inventory.ClassInventory;
 import org.eclipse.scout.rt.platform.inventory.IClassInfo;
 import org.eclipse.scout.rt.platform.inventory.IClassInventory;
 import org.eclipse.scout.rt.shared.SharedConfigProperties.CreateTunnelToServerBeansProperty;
-import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelProxyProducer;
 import org.eclipse.scout.rt.shared.TunnelToServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

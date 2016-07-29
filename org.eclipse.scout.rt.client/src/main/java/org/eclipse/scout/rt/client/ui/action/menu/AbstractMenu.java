@@ -31,11 +31,13 @@ import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.CompareUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@ClassId("e8dbfee4-503c-401e-8579-d0aa8618f59d")
 public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements IMenu {
   private static final Logger LOG = LoggerFactory.getLogger(AbstractMenu.class);
 

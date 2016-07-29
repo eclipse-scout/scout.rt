@@ -16,9 +16,9 @@ import java.beans.PropertyChangeListener;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.IComposerField;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.data.model.IDataModelEntity;
-import org.eclipse.scout.rt.platform.classid.ClassId;
 
 /**
  * Dynamic menu to add a new entity to the composer tree

@@ -18,8 +18,8 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractOkButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.platform.Order;
-import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.platform.classid.ClassId;
+import org.eclipse.scout.rt.shared.ScoutTexts;
 
 @ClassId("605749af-29e7-47a8-a929-5102da1ab6b4")
 public class BookmarkFolderForm extends AbstractForm {
@@ -88,10 +88,12 @@ public class BookmarkFolderForm extends AbstractForm {
     }
 
     @Order(40)
+    @ClassId("1edb51b0-c7cf-44f0-92e8-57e18365af6f")
     public class OkButton extends AbstractOkButton {
     }
 
     @Order(50)
+    @ClassId("4a611674-c998-4e15-971e-693d9afdbd8a")
     public class CancelButton extends AbstractCancelButton {
     }
   }

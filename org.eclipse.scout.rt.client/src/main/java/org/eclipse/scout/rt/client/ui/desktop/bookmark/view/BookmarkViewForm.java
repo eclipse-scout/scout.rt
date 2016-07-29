@@ -39,6 +39,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.tabbox.AbstractTabBox;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.util.StringUtility;
@@ -52,7 +53,6 @@ import org.eclipse.scout.rt.shared.services.common.bookmark.BookmarkChangedClien
 import org.eclipse.scout.rt.shared.services.common.bookmark.BookmarkFolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.eclipse.scout.rt.platform.classid.ClassId;
 
 @ClassId("f75ab95f-f827-431b-b5e9-53c71b5eb965")
 public class BookmarkViewForm extends AbstractForm {

@@ -18,6 +18,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
 import org.eclipse.scout.rt.client.ui.basic.table.TableListener;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.slf4j.Logger;
@@ -193,6 +194,7 @@ public class TableProposalChooser<LOOKUP_KEY> extends AbstractProposalChooser<IC
   /**
    * Default table class used when smart-field doesn't provide a custom table class.
    */
+  @ClassId("b51cc743-cbff-4567-843a-e743e818e57e")
   static class P_DefaultProposalTable<LOOKUP_KEY> extends ContentAssistFieldTable<LOOKUP_KEY> {
   }
 

@@ -14,6 +14,7 @@ import org.eclipse.scout.rt.client.ui.action.tool.IToolButton;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormMenu;
 import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 
 /**
  * A tool button that can be used in the {@link IDesktop} to toggle a form in the tools area.
@@ -22,5 +23,6 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
  */
 @SuppressWarnings("deprecation")
 @Deprecated
+@ClassId("abc1e19e-222e-4849-9f52-88aba7f4c950")
 public abstract class AbstractFormToolButton<FORM extends IForm> extends AbstractFormMenu<FORM> implements IToolButton {
 }

@@ -22,12 +22,14 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 
 /**
  * A tool button that can be used in the {@link IDesktop} to toggle a form in the tools area.
  */
+@ClassId("c40132fa-5aac-4d25-8330-76b9210c07ca")
 public abstract class AbstractFormMenu<FORM extends IForm> extends AbstractMenu implements IFormMenu<FORM> {
 
   @Override

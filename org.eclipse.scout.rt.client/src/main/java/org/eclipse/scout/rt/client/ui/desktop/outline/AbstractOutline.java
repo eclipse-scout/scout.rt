@@ -60,6 +60,7 @@ import org.eclipse.scout.rt.shared.services.common.security.IAccessControlServic
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@ClassId("fe822e40-23a0-4ec2-b2b0-6357df01d115")
 public abstract class AbstractOutline extends AbstractTree implements IOutline {
 
   private static final Logger LOG = LoggerFactory.getLogger(AbstractOutline.class);

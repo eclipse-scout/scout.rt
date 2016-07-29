@@ -46,6 +46,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
@@ -68,6 +69,7 @@ import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@ClassId("d9f41936-b7c1-4635-b769-f7999dd5eb0d")
 public abstract class AbstractWizard extends AbstractPropertyObserver implements IWizard, IContributionOwner, IExtensibleObject {
   private static final Logger LOG = LoggerFactory.getLogger(AbstractWizard.class);
 

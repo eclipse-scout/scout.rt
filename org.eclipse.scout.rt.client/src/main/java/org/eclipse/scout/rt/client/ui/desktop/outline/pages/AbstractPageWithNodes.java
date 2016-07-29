@@ -42,13 +42,13 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.CompareUtility;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
-import org.eclipse.scout.rt.platform.classid.ClassId;
 
 /**
  * A page containing a list of "menu" entries<br>
@@ -57,6 +57,7 @@ import org.eclipse.scout.rt.platform.classid.ClassId;
  * A NodeManagedPage normally contains no menus, actions, etc. because the TableManagedPage handles node events on
  * itself AND its children
  */
+@ClassId("d33a8000-e240-4ed4-9a93-44f168ec1ab8")
 public abstract class AbstractPageWithNodes extends AbstractPage<ITable> implements IPageWithNodes {
 
   private static final IMenuTypeMapper TREE_MENU_TYPE_MAPPER = new IMenuTypeMapper() {

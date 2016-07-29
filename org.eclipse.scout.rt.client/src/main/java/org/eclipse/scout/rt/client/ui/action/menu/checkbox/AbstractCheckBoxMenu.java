@@ -12,7 +12,9 @@ package org.eclipse.scout.rt.client.ui.action.menu.checkbox;
 
 import org.eclipse.scout.rt.client.extension.ui.action.menu.checkbox.ICheckBoxMenuExtension;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 
+@ClassId("9ab423b0-8347-41d6-bc74-6835da982d84")
 public abstract class AbstractCheckBoxMenu extends AbstractMenu implements ICheckBoxMenu {
 
   private boolean m_supportedChangeToggleBehaviour;

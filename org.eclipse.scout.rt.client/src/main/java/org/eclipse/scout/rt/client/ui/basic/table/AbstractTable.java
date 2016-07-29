@@ -94,6 +94,7 @@ import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.Replace;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.classid.ITypeWithClassId;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.html.HTML;
@@ -127,6 +128,7 @@ import org.slf4j.LoggerFactory;
  * for every inner column class there is a generated getXYColumn method directly on the table
  */
 @SuppressWarnings("deprecation")
+@ClassId("e88f7f88-9747-40ea-88bd-744803aef7a7")
 public abstract class AbstractTable extends AbstractPropertyObserver implements ITable, IContributionOwner, IExtensibleObject {
   private static final Logger LOG = LoggerFactory.getLogger(AbstractTable.class);
 

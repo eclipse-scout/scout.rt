@@ -20,6 +20,7 @@ import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 
 /**
@@ -27,6 +28,7 @@ import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
  *
  * @since 24.11.2009
  */
+@ClassId("c2e405b4-be26-4d27-b379-06ec62793d84")
 public abstract class AbstractWizardContainerForm extends AbstractForm implements IWizardContainerForm {
 
   private IWizard m_wizard;

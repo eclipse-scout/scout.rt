@@ -14,10 +14,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.eclipse.scout.rt.platform.IOrdered;
-
-import java.util.Set;
 
 public abstract class AbstractContainerValidationService implements IExtensionRegistrationValidatorService {
 
