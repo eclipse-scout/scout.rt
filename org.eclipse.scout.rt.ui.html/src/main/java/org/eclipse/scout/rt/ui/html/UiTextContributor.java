@@ -34,6 +34,7 @@ public class UiTextContributor implements IUiTextContributor {
         "ui.CalendarCalendarWeek",
         "ui.CalendarMonth",
         "ui.CalendarYear",
+        "ui.CannotInsertTextTooLong",
         "ui.Column",
         "ui.addColumn",
         "ui.removeColumn",
