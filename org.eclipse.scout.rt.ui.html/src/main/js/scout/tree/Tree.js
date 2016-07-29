@@ -175,6 +175,7 @@ scout.Tree.prototype._remove = function() {
     delete node.$node;
   });
   scout.scrollbars.uninstall(this.$data, this.session);
+  this._uninstallDragAndDropHandler();
   this._uninstallNodeTooltipSupport();
   scout.Tree.parent.prototype._remove.call(this);
 };

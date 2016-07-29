@@ -277,6 +277,7 @@ scout.Table.prototype._renderProperties = function() {
 
 scout.Table.prototype._remove = function() {
   scout.scrollbars.uninstall(this.$data, this.session);
+  this._uninstallDragAndDropHandler();
   // FIXME CGU do not delete header and footer!
   this.header = null;
   this.footer = null;

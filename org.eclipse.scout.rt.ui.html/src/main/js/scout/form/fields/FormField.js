@@ -125,6 +125,7 @@ scout.FormField.prototype._remove = function() {
   this._removeStatus();
   this._removeLabel();
   this._removeDisabledCopyOverlay();
+  this._uninstallDragAndDropHandler();
 };
 
 scout.FormField.prototype._renderMandatory = function() {
