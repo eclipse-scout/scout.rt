@@ -233,6 +233,24 @@ public class TreeEventTest {
     assertNull(event.getCommonParentNode());
   }
 
+  @Test
+  public void testSetNodesAndSubNodesTypeAllChildNodesDeleted() {
+    ITree tree = mock(ITree.class);
+    ITreeNode parentA = mockNode("parentA");
+    ITreeNode nodeA = mockNode("a", parentA);
+    TreeEvent event = new TreeEvent(tree, TreeEvent.TYPE_ALL_CHILD_NODES_DELETED, nodeA);
+
+    assertEquals(Arrays.asList(nodeA), event.getNodes());
+    assertEquals(parentA, event.getCommonParentNode());
+
+    ITreeNode nodeB = mockNode("b", nodeA);
+
+    event.setNodes(Arrays.asList(nodeA, nodeB));
+
+    assertEquals(Arrays.asList(nodeA, nodeB), event.getNodes());
+    assertEquals(parentA, event.getCommonParentNode());
+  }
+
   private VirtualTreeNode wrapByVirtualNode(ITreeNode nodeA) {
     VirtualTreeNode virtualNodaA = new VirtualTreeNode();
     virtualNodaA.setResolvedNode(nodeA);
