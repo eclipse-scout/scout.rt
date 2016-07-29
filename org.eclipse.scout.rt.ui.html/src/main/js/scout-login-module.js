@@ -11,7 +11,8 @@
   __include("jquery/jquery-scout.js");
   __include("scout/main.js");
   __include("scout/box/Box.js");
-  __include("scout/text/Texts.js");
+  __include("scout/text/TextMap.js");
+  __include("scout/text/texts.js");
   __include("scout/util/strings.js");
   __include("scout/util/Device.js");
   __include("scout/util/strings.js");
