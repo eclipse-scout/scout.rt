@@ -113,6 +113,7 @@ public class ClientNotificationAddress implements Serializable {
   }
 
   @Override
+  @SuppressWarnings("squid:S2583")
   public int hashCode() {
     final int prime = 31;
     int result = 1;
@@ -131,7 +132,6 @@ public class ClientNotificationAddress implements Serializable {
 
   @Override
   public boolean equals(final Object obj) {
-
     if (this == obj) {
       return true;
     }
@@ -188,5 +188,4 @@ public class ClientNotificationAddress implements Serializable {
     m_notifyAllNodes = notifyAllNodes;
     return this;
   }
-
 }

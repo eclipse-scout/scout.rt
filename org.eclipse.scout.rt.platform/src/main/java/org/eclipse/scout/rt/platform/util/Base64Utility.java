@@ -91,11 +91,9 @@ public final class Base64Utility {
     if (length == 0) {
       return new byte[0];
     }
-    P_Base64InputStream is = new P_Base64InputStream(string);
-    ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-
-    int c1, c2, c3, c4;
-    try {
+    try (P_Base64InputStream is = new P_Base64InputStream(string)) {
+      ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+      int c1, c2, c3, c4;
       c1 = is.read();
       c2 = is.read();
       c3 = is.read();
@@ -118,22 +116,12 @@ public final class Base64Utility {
         c3 = is.read();
         c4 = is.read();
       }
+      return buffer.toByteArray();
     }
     catch (IOException e) {
       LOG.error("IOException in Base64Utility.decode()", e);
       return new byte[0];
     }
-    finally {
-      try {
-        if (is != null) {
-          is.close();
-        }
-      }
-      catch (IOException e) {
-        LOG.warn("P_Base64InputStream couldn't be closed.", e);
-      }
-    }
-    return buffer.toByteArray();
   }
 
   private static class P_Base64InputStream extends InputStream {

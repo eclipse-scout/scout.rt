@@ -12,13 +12,11 @@ package org.eclipse.scout.rt.shared.csv;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
-import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
@@ -304,24 +302,13 @@ public class CsvHelper {
   }
 
   public void exportData(Object[][] data, File f, String encoding, List<String> columnNames, boolean writeColumnNames, List<String> columnTypes, boolean writeColumnTypes) {
-    try {
-      if (encoding == null) {
-        encoding = StandardCharsets.UTF_8.name();
-      }
-      Writer writer = new OutputStreamWriter(new FileOutputStream(f), encoding);
-      try {
-        exportData(data, writer, columnNames, writeColumnNames, columnTypes, writeColumnTypes);
-      }
-      finally {
-        try {
-          writer.close();
-        }
-        catch (IOException e) {
-          // nop
-        }
-      }
+    if (encoding == null) {
+      encoding = StandardCharsets.UTF_8.name();
     }
-    catch (UnsupportedEncodingException | FileNotFoundException e) {
+    try (Writer writer = new OutputStreamWriter(new FileOutputStream(f), encoding)) {
+      exportData(data, writer, columnNames, writeColumnNames, columnTypes, writeColumnTypes);
+    }
+    catch (IOException e) {
       throw new ProcessingException(f.getAbsolutePath(), e);
     }
   }

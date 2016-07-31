@@ -3644,7 +3644,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       return null;
     }
     if (!(row instanceof InternalTableRow)) {
-      throw new IllegalArgumentException("only accept InternalTableRow, not " + (row != null ? row.getClass() : null));
+      throw new IllegalArgumentException("only accept InternalTableRow, not " + row.getClass());
     }
     // check owner
     if (row.getTable() == this) {

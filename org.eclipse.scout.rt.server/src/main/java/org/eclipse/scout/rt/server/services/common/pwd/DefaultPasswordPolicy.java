@@ -15,7 +15,7 @@ import org.eclipse.scout.rt.shared.ScoutTexts;
 
 /**
  * Title: BSI Scout V3 Copyright: Copyright (c) 2001,2009 BSI AG
- * 
+ *
  * @version 3.x
  */
 
@@ -29,24 +29,23 @@ public class DefaultPasswordPolicy implements IPasswordPolicy {
   }
 
   @Override
-  @SuppressWarnings("null")
   public void check(String userId, String newPassword, String userName, int historyIndex) {
     if (newPassword == null || newPassword.length() < MIN_PASSWORD_LENGTH) {
       throwFailure("PasswordMin8Chars");
     }
-    if (!newPassword.matches(".*[0-9]+.*")) {
+    else if (!newPassword.matches(".*[0-9]+.*")) {
       throwFailure("PasswordMinOneDigit");
     }
-    if (!newPassword.matches(".*[[a-z]|[A-Z]]+.*")) {
+    else if (!newPassword.matches(".*[[a-z]|[A-Z]]+.*")) {
       throwFailure("PasswordMinOneChar");
     }
-    if (!newPassword.matches(".*[!|@|#|\\$|%|\\^|&|\\*|\\(|\\)|_|\\+|\\||~|\\-|=|\\\\|`|\\{|\\}|\\[|\\]|:|\"|;|'|<|>|?|,|.|/]+.*")) {
+    else if (!newPassword.matches(".*[!|@|#|\\$|%|\\^|&|\\*|\\(|\\)|_|\\+|\\||~|\\-|=|\\\\|`|\\{|\\}|\\[|\\]|:|\"|;|'|<|>|?|,|.|/]+.*")) {
       throwFailure("PasswordMinOnNonStdChar");
     }
-    if (userName != null && newPassword.toUpperCase().indexOf(userName.toUpperCase()) >= 0) {
+    else if (userName != null && newPassword.toUpperCase().indexOf(userName.toUpperCase()) >= 0) {
       throwFailure("PasswordUsernameNotPartOfPass");
     }
-    if (historyIndex >= 0) {
+    else if (historyIndex >= 0) {
       throwFailure("PasswordNotSameAsLasts");
     }
   }

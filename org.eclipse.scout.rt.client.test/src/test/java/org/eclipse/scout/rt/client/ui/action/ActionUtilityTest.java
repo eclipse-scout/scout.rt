@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.client.ui.action;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -49,7 +50,7 @@ public class ActionUtilityTest {
     IMenu s2 = createMenu("s2", true, true);
     IMenu s3 = createMenu("s3", true, true);
     List<IMenu> cleanList = ActionUtility.visibleNormalizedActions(CollectionUtility.arrayList(s1, s2, s3));
-    assertTrue(cleanList.isEmpty());
+    assertEquals(Collections.emptyList(), cleanList);
   }
 
   @Test
@@ -59,8 +60,7 @@ public class ActionUtilityTest {
     IMenu s3 = createMenu("s3", true, true);
     IMenu m4 = createMenu("m4", false, true);
     List<IMenu> cleanList = ActionUtility.visibleNormalizedActions(CollectionUtility.arrayList(s1, s2, s3, m4));
-    assertEquals(1, cleanList.size());
-    assertEquals("m4", cleanList.get(0).getText());
+    assertEquals(Arrays.asList(m4), cleanList);
   }
 
   @Test
@@ -73,8 +73,7 @@ public class ActionUtilityTest {
     IMenu s6 = createMenu("s6", true, true);
     IMenu s7 = createMenu("s7", true, true);
     List<IMenu> cleanList = ActionUtility.visibleNormalizedActions(CollectionUtility.arrayList(s1, s2, s3, m4, s5, s6, s7));
-    assertEquals(1, cleanList.size());
-    assertEquals("m4", cleanList.get(0).getText());
+    assertEquals(Arrays.asList(m4), cleanList);
   }
 
   @Test
@@ -88,10 +87,7 @@ public class ActionUtilityTest {
     IMenu s7 = createMenu("s7", true, true);
     IMenu m8 = createMenu("m8", false, true);
     List<IMenu> cleanList = ActionUtility.visibleNormalizedActions(CollectionUtility.arrayList(s1, s2, s3, m4, s5, s6, s7, m8));
-    assertEquals(3, cleanList.size());
-    assertEquals("m4", cleanList.get(0).getText());
-    assertEquals("s5", cleanList.get(1).getText());
-    assertEquals("m8", cleanList.get(2).getText());
+    assertEquals(Arrays.asList(m4, s5, m8), cleanList);
   }
 
   @Test
@@ -169,6 +165,11 @@ public class ActionUtilityTest {
 
     public boolean isExecDisposeCalled() {
       return m_execDisposeCalled;
+    }
+
+    @Override
+    public String toString() {
+      return getText();
     }
   }
 }

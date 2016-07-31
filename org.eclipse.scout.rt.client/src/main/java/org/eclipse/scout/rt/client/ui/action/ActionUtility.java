@@ -65,31 +65,21 @@ public final class ActionUtility {
 
   public static <T extends IAction> void normalizeSeparators(List<T> actions) {
     // remove multiple and leading separators
-    T prevSeparator = null;
     T prevAction = null;
     ListIterator<T> it = actions.listIterator();
     while (it.hasNext()) {
-      T actionNode = it.next();
-
-      if (actionNode.isSeparator()) {
-        if (prevAction == null || prevSeparator != null) {
-          // remove leading
-          it.remove();
-        }
-        prevAction = null;
-        prevSeparator = actionNode;
+      T currentAction = it.next();
+      if (currentAction.isSeparator() && (prevAction == null || prevAction.isSeparator())) {
+        it.remove();
+        continue;
       }
-      else {
-        prevSeparator = null;
-        prevAction = actionNode;
-      }
+      prevAction = currentAction;
     }
-    // remove ending separators
+    // remove trailing separators
     while (it.hasPrevious()) {
       T previous = it.previous();
       if (previous.isSeparator()) {
         it.remove();
-
       }
       else {
         break;
@@ -98,7 +88,6 @@ public final class ActionUtility {
   }
 
   public static <T extends IAction> List<T> getActions(List<T> actions, final IActionFilter filter) {
-
     if (actions != null) {
       List<T> result = new ArrayList<T>(actions.size());
       for (T a : actions) {

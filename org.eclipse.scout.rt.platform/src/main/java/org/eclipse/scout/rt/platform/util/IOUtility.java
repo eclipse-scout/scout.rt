@@ -35,7 +35,9 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -771,9 +773,7 @@ public final class IOUtility {
    *           if an {@link IOException} occurs (e.g. if file does not exists)
    */
   public static void appendFile(PrintWriter writer, File file) {
-    BufferedReader reader = null;
-    try {
-      reader = new BufferedReader(new FileReader(file));
+    try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
       String line;
       while ((line = reader.readLine()) != null) {
         writer.println(line);
@@ -782,17 +782,6 @@ public final class IOUtility {
     catch (IOException e) {
       throw new ProcessingException("Error appending file: " + file.getName(), e);
     }
-    finally {
-      if (reader != null) {
-        try {
-          reader.close();
-        }
-        catch (IOException e) {
-          // ignore
-        }
-      }
-    }
-
   }
 
   /**
@@ -804,30 +793,12 @@ public final class IOUtility {
    *           if an {@link IOException} occurs (e.g. if file does not exists)
    */
   public static List<String> readLines(File file, String charsetName) {
-    ArrayList<String> lines;
-    lines = new ArrayList<String>();
-    BufferedReader bufferedReader = null;
     try {
-      bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(file), charsetName));
-      String line;
-      while ((line = bufferedReader.readLine()) != null) {
-        lines.add(line);
-      }
+      return CollectionUtility.arrayList(Files.readAllLines(file.toPath(), Charset.forName(charsetName)));
     }
     catch (IOException e) {
-      throw new ProcessingException("Error reading config file.", e);
+      throw new ProcessingException("Error reading all lines of file '{}'", file, e);
     }
-    finally {
-      if (bufferedReader != null) {
-        try {
-          bufferedReader.close();
-        }
-        catch (IOException e) {
-          // ignore
-        }
-      }
-    }
-    return lines;
   }
 
   /**

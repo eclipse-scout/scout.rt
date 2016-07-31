@@ -27,7 +27,7 @@ import org.eclipse.scout.rt.ui.html.scriptprocessor.internal.loader.SandboxClass
  * Default wrapper for YUI and LESS used to compile and minify javscript and css.
  */
 @ApplicationScoped
-public class ScriptProcessor implements AutoCloseable {
+public class ScriptProcessor {
   private URLClassLoader m_yuiLoader;
   private URLClassLoader m_lessLoader;
 
@@ -46,7 +46,6 @@ public class ScriptProcessor implements AutoCloseable {
         .build(null);
   }
 
-  @Override
   public void close() throws IOException {
     if (m_yuiLoader != null) {
       m_yuiLoader.close();

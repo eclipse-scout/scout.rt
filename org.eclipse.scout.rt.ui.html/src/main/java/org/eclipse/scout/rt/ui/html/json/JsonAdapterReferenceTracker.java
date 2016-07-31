@@ -27,7 +27,7 @@ public class JsonAdapterReferenceTracker {
 
   public void put(IJsonAdapter jsonAdapter, IJsonAdapter parent) {
     Set<Object> parents = new HashSet<>();
-    if (parents != null) {
+    if (parent != null) {
       parents.add(parent);
     }
     m_usageMap.put(jsonAdapter, parents);

@@ -1946,8 +1946,7 @@ public final class TypeCastUtility {
         return true;
       }
       boolean foundStopClass = false;
-      if (!foundStopClass
-          && !c.isInterface()) {
+      if (!c.isInterface()) {
         Type a = c.getGenericSuperclass();
         if (a != null) {
           try {

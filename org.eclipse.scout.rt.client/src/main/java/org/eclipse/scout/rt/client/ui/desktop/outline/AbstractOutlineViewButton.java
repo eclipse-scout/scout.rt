@@ -21,6 +21,7 @@ import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.platform.classid.ClassId;
+import org.eclipse.scout.rt.platform.util.Assertions;
 
 @ClassId("401907e2-6767-435b-8452-9c819f3af82f")
 public abstract class AbstractOutlineViewButton extends AbstractViewButton implements IOutlineViewButton {
@@ -33,7 +34,7 @@ public abstract class AbstractOutlineViewButton extends AbstractViewButton imple
    */
   public AbstractOutlineViewButton(IDesktop desktop, Class<? extends IOutline> outlineType) {
     super(false);
-    m_desktop = desktop;
+    m_desktop = Assertions.assertNotNull(desktop);
     IOutline outline = null;
     for (IOutline o : desktop.getAvailableOutlines()) {
       if (o.getClass() == outlineType) {
@@ -42,9 +43,6 @@ public abstract class AbstractOutlineViewButton extends AbstractViewButton imple
       }
     }
     m_outline = outline;
-    if (m_desktop == null) {
-      throw new IllegalArgumentException("Desktop can not be null");
-    }
     if (m_outline == null) {
       throw new IllegalArgumentException("the outline type " + outlineType.getName() + " is not registered in the desktop");
     }

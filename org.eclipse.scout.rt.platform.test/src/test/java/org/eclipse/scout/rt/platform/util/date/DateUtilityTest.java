@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.util.date;
 
+import static org.eclipse.scout.rt.platform.util.date.DateUtility.truncDate;
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
@@ -861,6 +863,28 @@ public class DateUtilityTest {
   public void testLenientBehavior() {
     assertDateEquals("2016-02-29 00:00:00.000", dateOf("2016-02-29 00:00:00.000")); // valid, does not fail
     assertDateEquals("2015-02-29 00:00:00.000", dateOf("2015-02-29 00:00:00.000")); // fails with exception
+  }
+
+  @Test
+  public void testGetCoveredDays() {
+    // null from and to
+    assertArrayEquals(new Date[0], DateUtility.getCoveredDays(null, null));
+
+    // either from or to is null
+    Date date1 = dateOf("2008-03-13 12:00:00.000");
+    assertArrayEquals(new Date[]{DateUtility.truncDate(date1)}, DateUtility.getCoveredDays(date1, null));
+    assertArrayEquals(new Date[]{DateUtility.truncDate(date1)}, DateUtility.getCoveredDays(null, date1));
+
+    // same from and to
+    assertArrayEquals(new Date[]{DateUtility.truncDate(date1)}, DateUtility.getCoveredDays(date1, date1));
+
+    // different from and to, to ends just at the next day
+    Date date2 = dateOf("2008-03-14 00:00:00.000");
+    assertArrayEquals(new Date[]{truncDate(date1)}, DateUtility.getCoveredDays(date1, date2));
+
+    // different from and to, to ends within next day
+    Date date3 = dateOf("2008-03-14 12:00:00.000");
+    assertArrayEquals(new Date[]{truncDate(date1), truncDate(date3)}, DateUtility.getCoveredDays(date1, date3));
   }
 
   public static void assertDateEquals(String expectedDate, Date date) {

@@ -334,7 +334,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
          * Ticket 77332 (deleting a node in the tree) also requires a reload So
          * the selected and its ancestor nodes require same processing
          */
-        else if (desktop != null) {
+        else if (desktop != null) { // NOSONAR
           Bookmark bm = desktop.createBookmark();
           setChildrenDirty(true);
           //activate bookmark without activating the outline, since this would hide active tabs.

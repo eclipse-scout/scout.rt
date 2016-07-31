@@ -110,7 +110,6 @@ public final class FileUtility {
    * @throws IOException
    *           if an error occurs during the copy operation
    */
-  @SuppressWarnings("resource")
   public static void copyFile(File source, File dest) throws IOException {
     if (!source.exists()) {
       throw new FileNotFoundException(source.getAbsolutePath());
@@ -140,57 +139,39 @@ public final class FileUtility {
     }
     if (needCopy) {
       // Copies the file
-      FileChannel input = null;
-      FileChannel output = null;
-      try {
-        // magic number for Windows, 64Mb - 32Kb
-        //
-        int mbCount = 64;
-        boolean done = false;
-        // java.io.IOException: Insufficient system resources exist to complete
-        // the requested service
-        while (!done) {
-          input = new FileInputStream(source).getChannel();
-          if (!dest.exists()) {
-            dest.getParentFile().mkdirs();
-          }
-          output = new FileOutputStream(dest).getChannel();
+      // magic number for Windows, 64Mb - 32Kb
+      int mbCount = 64;
+      boolean done = false;
+      // java.io.IOException: Insufficient system resources exist to complete
+      // the requested service
+      while (!done) {
+        if (!dest.exists()) {
+          dest.getParentFile().mkdirs();
+        }
+        try (FileInputStream in = new FileInputStream(source);
+            FileChannel input = in.getChannel();
+            FileOutputStream out = new FileOutputStream(dest);
+            FileChannel output = out.getChannel()) {
 
-          try {
-            int maxCount = (mbCount * KILO_BYTE * KILO_BYTE) - (32 * KILO_BYTE);
-            long size = input.size();
-            long position = 0;
-            while (position < size) {
-              position +=
-                  input.transferTo(position, maxCount, output);
-            }
-            done = true;
+          int maxCount = (mbCount * KILO_BYTE * KILO_BYTE) - (32 * KILO_BYTE);
+          long size = input.size();
+          long position = 0;
+          while (position < size) {
+            position +=
+                input.transferTo(position, maxCount, output);
           }
-          catch (IOException ioXcp) {
-            if (ioXcp.getMessage().contains("Insufficient system resources exist to complete the requested service")) {
-              mbCount--;
-              if (mbCount == 0) {
-                done = true;
-              }
-              if (input != null) {
-                input.close();
-              }
-              if (output != null) {
-                output.close();
-              }
-            }
-            else {
-              throw ioXcp;
+          done = true;
+        }
+        catch (IOException ioXcp) {
+          if (ioXcp.getMessage().contains("Insufficient system resources exist to complete the requested service")) {
+            mbCount--;
+            if (mbCount == 0) {
+              done = true;
             }
           }
-        }
-      }
-      finally {
-        if (input != null) {
-          input.close();
-        }
-        if (output != null) {
-          output.close();
+          else {
+            throw ioXcp;
+          }
         }
       }
 

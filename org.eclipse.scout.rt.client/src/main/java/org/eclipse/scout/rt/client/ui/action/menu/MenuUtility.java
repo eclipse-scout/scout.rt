@@ -156,7 +156,7 @@ public final class MenuUtility {
    * @return the sub-menu of the given context menu owner that implements the given type. If no implementation is found,
    *         <code>null</code> is returned. Note: This method uses instance-of checks, hence the menu replacement
    *         mapping is not required.
-   * @throws IllegalArgumentException
+   * @throws IllegalStateException
    *           when more than one menu implements the given type
    * @throws IllegalArgumentException
    *           when no context menu owner is provided.
@@ -166,21 +166,21 @@ public final class MenuUtility {
       throw new IllegalArgumentException("Argument 'contextMenuOwner' must not be null");
     }
     IContextMenu contextMenu = contextMenuOwner.getContextMenu();
+    if (contextMenu == null || menuType == null) {
+      return null;
+    }
 
     final List<T> collectedMenus = new ArrayList<T>();
-    if (contextMenu != null && menuType != null) {
-      contextMenu.acceptVisitor(new IActionVisitor() {
-        @Override
-        public int visit(IAction action) {
-          if (menuType.isAssignableFrom(action.getClass())) {
-            @SuppressWarnings("unchecked")
-            T menu = (T) action;
-            collectedMenus.add(menu);
-          }
-          return CONTINUE;
+    contextMenu.acceptVisitor(new IActionVisitor() {
+      @Override
+      public int visit(IAction action) {
+        if (menuType.isInstance(action)) {
+          T menu = menuType.cast(action);
+          collectedMenus.add(menu);
         }
-      });
-    }
+        return CONTINUE;
+      }
+    });
 
     if (collectedMenus.isEmpty()) {
       return null;

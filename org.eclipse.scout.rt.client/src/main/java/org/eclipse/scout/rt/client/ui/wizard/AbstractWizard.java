@@ -715,10 +715,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
     if (fromIndex < toIndex) {
       return IWizardStep.STEP_NEXT;
     }
-    if (fromIndex > toIndex) {
-      return IWizardStep.STEP_PREVIOUS;
-    }
-    return IWizardStep.STEP_NEXT;
+    return IWizardStep.STEP_PREVIOUS;
   }
 
   @Override
@@ -729,13 +726,13 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
       return list;
     }
     if (from == null) {
-      if (to != null && includeTo) {
+      if (includeTo) {
         list.add(to);
       }
       return list;
     }
     if (to == null) {
-      if (from != null && includeFrom) {
+      if (includeFrom) {
         list.add(from);
       }
       return list;

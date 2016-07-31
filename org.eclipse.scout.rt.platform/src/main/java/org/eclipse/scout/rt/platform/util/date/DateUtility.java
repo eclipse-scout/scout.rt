@@ -276,7 +276,7 @@ public final class DateUtility {
   /**
    * truncate the date to week (does not depend on locale, monday is always the first day in a week)
    *
-   * @see ISO 8601
+   * @see "ISO 8601"
    */
   public static Date truncDateToIsoWeek(Date d) {
     if (d == null) {
@@ -641,6 +641,9 @@ public final class DateUtility {
    * @return array of days that with time set to 00:00:00.000
    */
   public static Date[] getCoveredDays(Date from, Date to) {
+    if (from == null && to == null) {
+      return new Date[0];
+    }
     if (from == null) {
       from = to;
     }

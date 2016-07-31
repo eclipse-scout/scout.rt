@@ -360,19 +360,12 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
 
   @Override
   protected boolean execIsSaveNeeded() {
-    boolean b = false;
-    if (m_table != null && !m_tableExternallyManaged) {
-      if (b == false && m_table.getDeletedRowCount() > 0) {
-        b = true;
-      }
-      if (b == false && m_table.getInsertedRowCount() > 0) {
-        b = true;
-      }
-      if (b == false && m_table.getUpdatedRowCount() > 0) {
-        b = true;
-      }
+    if (m_table == null || m_tableExternallyManaged) {
+      return false;
     }
-    return b;
+    return m_table.getDeletedRowCount() > 0
+        || m_table.getInsertedRowCount() > 0
+        || m_table.getUpdatedRowCount() > 0;
   }
 
   @Override

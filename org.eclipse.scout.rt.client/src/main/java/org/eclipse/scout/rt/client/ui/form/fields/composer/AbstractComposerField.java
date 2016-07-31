@@ -693,17 +693,12 @@ public abstract class AbstractComposerField extends AbstractFormField implements
 
   @Override
   protected boolean execIsSaveNeeded() {
-    boolean b = false;
-    if (b == false && m_tree.getDeletedNodeCount() > 0) {
-      b = true;
+    if (m_tree == null) {
+      return false;
     }
-    if (b == false && m_tree.getInsertedNodeCount() > 0) {
-      b = true;
-    }
-    if (b == false && m_tree.getUpdatedNodeCount() > 0) {
-      b = true;
-    }
-    return b;
+    return m_tree.getDeletedNodeCount() > 0
+        || m_tree.getInsertedNodeCount() > 0
+        || m_tree.getUpdatedNodeCount() > 0;
   }
 
   @Override

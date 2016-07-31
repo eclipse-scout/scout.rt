@@ -16,10 +16,14 @@ public final class ConsoleTest implements ExampleScripts {
   }
 
   public static void main(String[] args) throws Exception {
-    try (ScriptProcessor impl = new ScriptProcessor()) {
+    ScriptProcessor impl = new ScriptProcessor();
+    try {
       System.out.println("minifyJs: " + impl.minifyJs(JS_INPUT));
       System.out.println("compileCss: " + impl.compileCss(CSS_INPUT));
       System.out.println("minifyCss: " + impl.minifyCss(CSS_INPUT));
+    }
+    finally {
+      impl.close();
     }
   }
 }

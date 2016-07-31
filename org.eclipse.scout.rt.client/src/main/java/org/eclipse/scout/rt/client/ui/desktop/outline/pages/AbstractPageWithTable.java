@@ -851,7 +851,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
           if (row != null) {
             newSelectedNode = getTreeNodeFor(row);
           }
-          else if (oldSelectedNode != null && oldSelectedNode.getTree() == tree) {
+          else if (oldSelectedNode != null && oldSelectedNode.getTree() == tree) { // NOSONAR
             newSelectedNode = oldSelectedNode;
           }
           else {

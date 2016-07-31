@@ -17,23 +17,34 @@ public class ScriptProcessorTest implements ExampleScripts {
 
   @Test
   public void testMinifyJsWithYui() throws Exception {
-    try (ScriptProcessor p = new ScriptProcessor()) {
+    ScriptProcessor p = new ScriptProcessor();
+    try {
       Assert.assertEquals(JS_MINIFY_OUTPUT, p.minifyJs(JS_INPUT));
+    }
+    finally {
+      p.close();
     }
   }
 
   @Test
   public void testCompileCssWithLess() throws Exception {
-    try (ScriptProcessor p = new ScriptProcessor()) {
+    ScriptProcessor p = new ScriptProcessor();
+    try {
       Assert.assertEquals(CSS_COMPILE_OUTPUT, p.compileCss(CSS_INPUT));
+    }
+    finally {
+      p.close();
     }
   }
 
   @Test
   public void testMinifyCssWithYui() throws Exception {
-    try (ScriptProcessor p = new ScriptProcessor()) {
+    ScriptProcessor p = new ScriptProcessor();
+    try {
       Assert.assertEquals(CSS_MINIFY_OUTPUT, p.minifyCss(CSS_INPUT));
     }
+    finally {
+      p.close();
+    }
   }
-
 }

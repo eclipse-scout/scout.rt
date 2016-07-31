@@ -221,7 +221,7 @@ public abstract class AbstractPageWithNodes extends AbstractPage<ITable> impleme
       // restore currently selected tree node when it was owned by our table rows.
       // in case selection was lost, try to select similar index as before
       if (tree != null && oldSelectionOwned && tree.getSelectedNode() == null) {
-        if (oldSelectedNode != null && oldSelectedNode.getTree() == tree) {
+        if (oldSelectedNode != null && oldSelectedNode.getTree() == tree) { // NOSONAR
           tree.selectNode(oldSelectedNode);
         }
         else {

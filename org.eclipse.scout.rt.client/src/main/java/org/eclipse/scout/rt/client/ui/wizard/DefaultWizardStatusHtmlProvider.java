@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.wizard;
 
-import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
@@ -142,7 +141,6 @@ public class DefaultWizardStatusHtmlProvider implements IWizardStatusHtmlProvide
       return;
     }
     String tempIconName = iconName;
-    ByteArrayInputStream is = null;
     try {
       int index;
       // determine file format
@@ -169,16 +167,6 @@ public class DefaultWizardStatusHtmlProvider implements IWizardStatusHtmlProvide
     }
     catch (Exception t) {
       LOG.warn("Failed to load icon '{}'", tempIconName, t);
-    }
-    finally {
-      if (is != null) {
-        try {
-          is.close();
-        }
-        catch (Exception t) {
-          // nop
-        }
-      }
     }
   }
 }

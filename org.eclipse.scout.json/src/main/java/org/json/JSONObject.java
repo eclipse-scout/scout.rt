@@ -96,6 +96,7 @@ public class JSONObject {
    */
   public static final Object NULL = new Object() {
     @Override
+    @SuppressWarnings("squid:S1206") // hashCode() cannot be implemented for value <code>null</code>.
     public boolean equals(Object o) {
       return o == this || o == null; // API specifies this broken equals implementation
     }
