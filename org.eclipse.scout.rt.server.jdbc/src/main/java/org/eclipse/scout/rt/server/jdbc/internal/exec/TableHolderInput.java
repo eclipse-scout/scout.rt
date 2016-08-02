@@ -95,7 +95,7 @@ class TableHolderInput implements IBindInput {
     Object value = null;
     if (m_batchIndex < m_filteredRowIndices.length) {
       try {
-        value = m_getterMethod.invoke(m_table, new Object[]{new Integer(m_filteredRowIndices[m_batchIndex])});
+        value = m_getterMethod.invoke(m_table, new Object[]{Integer.valueOf(m_filteredRowIndices[m_batchIndex])});
       }
       catch (ReflectiveOperationException e) {
         throw BEANS.get(DefaultRuntimeExceptionTranslator.class).translate(e);

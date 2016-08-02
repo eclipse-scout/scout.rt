@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 
 public final class NumberUtility {
   private static final Logger LOG = LoggerFactory.getLogger(NumberUtility.class);
+  @SuppressWarnings("squid:S2245") // pseudo-random number generator for cases where cryptographic strength is not required
   private static final Random UNSECURE_RANDOM = new Random();
 
   private NumberUtility() {

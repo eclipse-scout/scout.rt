@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -122,7 +123,7 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
   protected void handleUploadFileRequest(IUiSession uiSession, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, String targetAdapterId) throws IOException, FileUploadException {
     IBinaryResourceConsumer binaryResourceConsumer = resolveJsonAdapter(uiSession, targetAdapterId);
     if (binaryResourceConsumer == null) {
-      //Request was already processed and adapter does not exist anymore;
+      //Request was already processed and adapter does not exist anymore
       return;
     }
 
@@ -142,7 +143,8 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
     }
 
     // GUI requests for the same session must be processed consecutively
-    uiSession.uiSessionLock().lock();
+    final ReentrantLock uiSessionLock = uiSession.uiSessionLock();
+    uiSessionLock.lock();
     try {
       if (uiSession.isDisposed()) {
         writeJsonResponse(httpServletResponse, m_jsonRequestHelper.createSessionTimeoutResponse());
@@ -155,7 +157,7 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
       writeJsonResponse(httpServletResponse, jsonResp);
     }
     finally {
-      uiSession.uiSessionLock().unlock();
+      uiSessionLock.unlock();
     }
   }
 

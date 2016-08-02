@@ -70,7 +70,7 @@ public class BookmarkForm extends AbstractForm implements IBookmarkForm {
       getTitleField().setValue(bookmark.getTitle());
       getKeyStrokeField().setValue(bookmark.getKeyStroke());
       getDescriptionField().setValue(bookmark.getText());
-      getSortOrderField().setValue(new BigDecimal(bookmark.getOrder()));
+      getSortOrderField().setValue(BigDecimal.valueOf(bookmark.getOrder()));
     }
   }
 

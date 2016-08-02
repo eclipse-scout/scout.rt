@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.ui.html.json;
 
 import java.io.IOException;
+import java.util.concurrent.locks.ReentrantLock;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletResponse;
@@ -310,12 +311,13 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
   protected void handleUnloadRequest(HttpServletResponse resp, IUiSession uiSession, JsonRequest jsonReq) throws IOException {
     LOG.info("Unloading UI session with ID {} (requested by UI)", jsonReq.getUiSessionId());
     if (uiSession != null) {
-      uiSession.uiSessionLock().lock();
+      final ReentrantLock uiSessionLock = uiSession.uiSessionLock();
+      uiSessionLock.lock();
       try {
         uiSession.dispose();
       }
       finally {
-        uiSession.uiSessionLock().unlock();
+        uiSessionLock.unlock();
       }
     }
     writeJsonResponse(resp, m_jsonRequestHelper.createEmptyResponse()); // send empty response to satisfy clients expecting a valid response
@@ -324,7 +326,8 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
   protected void handleSyncResponseQueueRequest(HttpServletResponse resp, IUiSession uiSession, JsonRequest jsonReq) throws IOException {
     LOG.info("Sync response queue for UI session {}", uiSession.getUiSessionId());
     // Without lock we might miss the response of a running UI request that was started before going offline.
-    uiSession.uiSessionLock().lock();
+    final ReentrantLock uiSessionLock = uiSession.uiSessionLock();
+    uiSessionLock.lock();
     try {
       JSONObject response = uiSession.processSyncResponseQueueRequest(jsonReq);
       if (response == null) {
@@ -333,7 +336,7 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
       writeJsonResponse(resp, response);
     }
     finally {
-      uiSession.uiSessionLock().unlock();
+      uiSessionLock.unlock();
     }
   }
 

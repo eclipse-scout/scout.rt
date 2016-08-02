@@ -47,6 +47,7 @@ public class WsseUsernameTokenMethod implements IAuthenticationMethod {
   protected static final String WS_SEC = "Security";
   protected static final String USERNAME_TOKEN = "UsernameToken";
   protected static final String USERNAME = "Username";
+  @SuppressWarnings("squid:S2068") // this is not a password
   protected static final String PASSWORD = "Password";
   protected static final String NAME_SPACE_URI = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd";
 

@@ -427,29 +427,29 @@ public abstract class AbstractSqlStyle implements ISqlStyle {
         o = getConfiguredDecimalConversionStrategy().convertDecimalType(rs.getBigDecimal(jdbcBindIndex));
         break;
       }
-        // Long
+      // Long
       case Types.BIT:
       case Types.BIGINT:
       case Types.SMALLINT:
       case Types.INTEGER:
       case Types.TINYINT: {
-        o = new Long(rs.getLong(jdbcBindIndex));
+        o = Long.valueOf(rs.getLong(jdbcBindIndex));
         break;
       }
-        // Double
+      // Double
       case Types.DOUBLE:
       case Types.FLOAT:
       case Types.REAL: {
         o = new Double(rs.getDouble(jdbcBindIndex));
         break;
       }
-        // String
+      // String
       case Types.VARCHAR:
       case Types.CHAR: {
         o = rs.getString(jdbcBindIndex);
         break;
       }
-        // Date
+      // Date
       case Types.DATE: {
         // Build 154: changed from getDate to getTimestamp()
         // o=result.getDate(i+1);
@@ -464,7 +464,7 @@ public abstract class AbstractSqlStyle implements ISqlStyle {
         o = rs.getTimestamp(jdbcBindIndex);
         break;
       }
-        // Raw
+      // Raw
       case Types.LONGVARCHAR: {
         try {
           o = rs.getString(jdbcBindIndex);

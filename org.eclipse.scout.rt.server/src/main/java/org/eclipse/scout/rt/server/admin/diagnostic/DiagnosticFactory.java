@@ -59,9 +59,6 @@ public final class DiagnosticFactory {
 
   public static IDiagnostic[] getDiagnosticProviders() {
     synchronized (DIAGNOSTIC_STATUS_PROVIDERS) {
-      if (DIAGNOSTIC_STATUS_PROVIDERS == null) {
-        return null;
-      }
       IDiagnostic[] copy = DIAGNOSTIC_STATUS_PROVIDERS.toArray(new IDiagnostic[DIAGNOSTIC_STATUS_PROVIDERS.size()]);
       return copy;
     }
@@ -75,9 +72,6 @@ public final class DiagnosticFactory {
 
   public static IDiagnostic getDiagnosticProvider(String action) {
     synchronized (DIAGNOSTIC_STATUS_PROVIDER_ACTION_MAP) {
-      if (DIAGNOSTIC_STATUS_PROVIDER_ACTION_MAP == null) {
-        return null;
-      }
       return DIAGNOSTIC_STATUS_PROVIDER_ACTION_MAP.get(action);
     }
   }

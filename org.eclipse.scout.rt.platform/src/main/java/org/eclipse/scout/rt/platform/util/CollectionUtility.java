@@ -755,7 +755,7 @@ public final class CollectionUtility {
         else {
           // try to make long
           try {
-            o = new Long(Long.parseLong(s));
+            o = Long.valueOf(s);
           }
           catch (Exception e) {
             /* nop */
