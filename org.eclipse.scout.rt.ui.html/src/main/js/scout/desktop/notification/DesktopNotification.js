@@ -17,7 +17,7 @@ scout.DesktopNotification.prototype._init = function(model) {
   this.duration = model.duration;
   this.status = model.status;
   this.closable = scout.nvl(model.closable, true);
-  this.desktop = this.parent;
+  this.desktop = model.desktop || this.parent;
 };
 
 /**
@@ -60,6 +60,7 @@ scout.DesktopNotification.prototype._renderMessage = function() {
 scout.DesktopNotification.prototype._renderClosable = function() {
   if (this.closable) {
     this.$content
+      .addClass('closable')
       .appendDiv('closer')
       .on('click', this._onCloseIconClick.bind(this));
   }

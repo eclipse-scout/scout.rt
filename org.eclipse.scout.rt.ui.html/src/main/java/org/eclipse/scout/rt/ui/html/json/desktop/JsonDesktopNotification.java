@@ -42,7 +42,7 @@ public class JsonDesktopNotification implements IJsonObject {
     return json;
   }
 
-  private static String getNotificationId(IDesktopNotification notification) {
+  protected static String getNotificationId(IDesktopNotification notification) {
     return String.valueOf(System.identityHashCode(notification));
   }
 

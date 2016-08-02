@@ -118,21 +118,13 @@ public class JsonSmartField<VALUE, LOOKUP_KEY, CONTENT_ASSIST_FIELD extends ICon
     getModel().getUIFacade().openProposalChooserFromUI(displayText, selectCurrentValue);
   }
 
-  private String getDisplayTextAndAddFilter(JsonEvent event) {
+  protected String getDisplayTextAndAddFilter(JsonEvent event) {
     String text = event.getData().optString("displayText", null);
     addPropertyEventFilterCondition(IValueField.PROP_DISPLAY_TEXT, text);
     return text;
   }
 
-  @Override
-  public JSONObject toJson() {
-    JSONObject json = super.toJson();
-    putProperty(json, PROP_PROPOSAL, m_proposal);
-    putProperty(json, IContentAssistField.PROP_BROWSE_MAX_ROW_COUNT, getModel().getBrowseMaxRowCount());
-    return json;
-  }
-
-  private boolean checkStatusContainsCode(IMultiStatus status, int code) {
+  protected boolean checkStatusContainsCode(IMultiStatus status, int code) {
     for (IStatus child : status.getChildren()) {
       if (child instanceof IMultiStatus && checkStatusContainsCode((IMultiStatus) child, code)) {
         return true;
@@ -142,5 +134,13 @@ public class JsonSmartField<VALUE, LOOKUP_KEY, CONTENT_ASSIST_FIELD extends ICon
       }
     }
     return false;
+  }
+
+  @Override
+  public JSONObject toJson() {
+    JSONObject json = super.toJson();
+    putProperty(json, PROP_PROPOSAL, m_proposal);
+    putProperty(json, IContentAssistField.PROP_BROWSE_MAX_ROW_COUNT, getModel().getBrowseMaxRowCount());
+    return json;
   }
 }

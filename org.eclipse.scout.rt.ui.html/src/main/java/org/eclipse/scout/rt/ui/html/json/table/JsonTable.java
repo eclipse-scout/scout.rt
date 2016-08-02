@@ -406,7 +406,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     return json;
   }
 
-  private JSONArray tableRowsToJson(Collection<ITableRow> rows) {
+  protected JSONArray tableRowsToJson(Collection<ITableRow> rows) {
     JSONArray jsonRows = new JSONArray();
     for (ITableRow row : rows) {
       if (isRowAccepted(row)) {
@@ -492,7 +492,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     }
   }
 
-  private void handleUiColumnOrganizeAction(JsonEvent event) {
+  protected void handleUiColumnOrganizeAction(JsonEvent event) {
     JSONObject data = event.getData();
     String action = data.getString("action");
     ITableOrganizer organizer = getModel().getTableOrganizer();
@@ -1048,7 +1048,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     }
   }
 
-  private boolean containsInsertOrDelete(List<TableEvent> events) {
+  protected boolean containsInsertOrDelete(List<TableEvent> events) {
     boolean rowOrderChangedFound = false;
     for (TableEvent event : events) {
       if (TableEvent.TYPE_ROW_ORDER_CHANGED == event.getType()) {
