@@ -23,7 +23,7 @@ scout.graphics = {
   prefSize: function($elem, includeMargin, options) {
     // Return 0/0 if element is not displayed (display: none).
     // We don't use isVisible by purpose because isVisible returns false for elements with visibility: hidden which is wrong here (we would like to be able to measure hidden elements)
-    if ($elem.isDisplayNone()) {
+    if (!$elem[0] || $elem.isDisplayNone()) {
       return new scout.Dimension(0, 0);
     }
 
@@ -53,12 +53,12 @@ scout.graphics = {
       'height': newHeight
     });
 
-    var prefSize;
     // measure
-    if (options.useCssSize) {
-      prefSize = scout.graphics.getSize($elem, includeMargin);
-    } else {
-      prefSize = scout.graphics.getScrollSizes($elem, includeMargin);
+    var bcr = $elem[0].getBoundingClientRect();
+    var prefSize = new scout.Dimension(bcr.width, bcr.height);
+    if (includeMargin) {
+      prefSize.width += $elem.cssMarginX();
+      prefSize.height += $elem.cssMarginY();
     }
 
     // reset the modified style attribute
@@ -70,22 +70,20 @@ scout.graphics = {
       scout.scrollbars.restoreScrollPositions($elem);
     }
 
-    return prefSize;
-  },
+    // Ensure resulting numbers are integers. getBoundingClientRect() might correctly return fractional values
+    // (because of the browser's sub-pixel rendering). However, if we use those numbers to set the size
+    // of an element using CSS, it gets rounded or cut off. The behavior is not defined amongst different
+    // browser engines.
+    // Example:
+    // - Measured size from this method:      h = 345.239990234375
+    // - Set the size to an element:          $elem.css('height', h + 'px')
+    // - Results:
+    //     IE                   <div id="elem" style="height: 345.23px">     [Fractional part cut off after two digits]
+    //     Firefox & Chrome     <div id="elem" style="height: 345.24px">     [Fractional part rounded to three digits]
+    prefSize.width = Math.ceil(prefSize.width);
+    prefSize.height = Math.ceil(prefSize.height);
 
-  getScrollSizes: function($comp, includeMargin) {
-    var marginWidth = 0,
-      marginHeight = 0,
-      scrollWidth = $comp[0] ? $comp[0].scrollWidth : 0,
-      scrollHeight = $comp[0] ? $comp[0].scrollHeight : 0;
-    includeMargin = scout.nvl(includeMargin, false);
-    if (includeMargin) {
-      marginHeight += parseFloat(scout.nvl($comp.css('margin-top'), 0)) + parseFloat(scout.nvl($comp.css('margin-bottom'), 0));
-      marginWidth += parseFloat(scout.nvl($comp.css('margin-left'), 0)) + parseFloat(scout.nvl($comp.css('margin-right'), 0));
-    }
-    return new scout.Dimension(
-      scrollWidth + marginWidth + parseFloat($comp.css("border-left-width")) + parseFloat($comp.css("border-right-width")),
-      scrollHeight + marginHeight + parseFloat($comp.css("border-top-width")) + parseFloat($comp.css("border-bottom-width")));
+    return prefSize;
   },
 
   /* These functions are designed to be used with box-sizing:box-model. The only reliable
@@ -97,10 +95,19 @@ scout.graphics = {
    * @param includeMargin when set to true, returned dimensions include margins of component, default is <code>false</code>.
    */
   getSize: function($comp, includeMargin) {
-    includeMargin = scout.nvl(includeMargin, false);
-    return new scout.Dimension(
-      $comp.outerWidth(includeMargin),
-      $comp.outerHeight(includeMargin));
+    if (!$comp[0] || $comp.isDisplayNone()) {
+      return new scout.Dimension(0, 0);
+    }
+    var bcr = $comp[0].getBoundingClientRect();
+    var size = new scout.Dimension(bcr.width, bcr.height);
+    if (scout.nvl(includeMargin, false)) {
+      size.width += $comp.cssMarginX();
+      size.height += $comp.cssMarginY();
+    }
+    // see comments in prefSize()
+    size.width = Math.ceil(size.width);
+    size.height = Math.ceil(size.height);
+    return size;
   },
 
   setSize: function($comp, vararg, height) {

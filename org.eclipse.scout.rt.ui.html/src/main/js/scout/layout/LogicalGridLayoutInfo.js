@@ -172,6 +172,7 @@ scout.LogicalGridLayoutInfo.prototype._initializeColumns = function(compSize, hg
       } else {
         prefw = this.logicalWidthInPixel(cons);
       }
+      prefw = Math.floor(prefw);
       for (j = cons.gridx; j < cons.gridx + cons.gridw && j < this.cols; j++) {
         prefWidths[j] = Math.max(prefWidths[j], prefw);
         if (cons.weightx === 0) {
@@ -200,7 +201,7 @@ scout.LogicalGridLayoutInfo.prototype._initializeColumns = function(compSize, hg
         distWidth = this.logicalWidthInPixel(cons) - spanWidth - (hSpan - 1) * hgap;
       }
       if (distWidth > 0) {
-        var equalWidth = (distWidth + spanWidth) / hSpan;
+        var equalWidth = Math.floor((distWidth + spanWidth) / hSpan);
         var remainder = (distWidth + spanWidth) % hSpan;
         var last = -1;
         for (j = cons.gridx; j < cons.gridx + cons.gridw && j < this.cols; j++) {
@@ -279,6 +280,7 @@ scout.LogicalGridLayoutInfo.prototype._initializeRows = function(compSize, vgap)
       } else {
         prefh = this.logicalHeightInPixel(cons);
       }
+      prefh = Math.floor(prefh);
       for (j = cons.gridy; j < cons.gridy + cons.gridh && j < this.rows; j++) {
         prefHeights[j] = Math.max(prefHeights[j], prefh);
         if (cons.weighty === 0) {
@@ -307,7 +309,7 @@ scout.LogicalGridLayoutInfo.prototype._initializeRows = function(compSize, vgap)
         distHeight = this.logicalHeightInPixel(cons) - spanHeight - (vSpan - 1) * vgap;
       }
       if (distHeight > 0) {
-        var equalHeight = (distHeight + spanHeight) / vSpan;
+        var equalHeight = Math.floor((distHeight + spanHeight) / vSpan);
         var remainder = (distHeight + spanHeight) % vSpan;
         var last = -1;
         for (j = cons.gridy; j < cons.gridy + cons.gridh && j < this.rows; j++) {
