@@ -124,15 +124,7 @@ public class JsonSmartField<VALUE, LOOKUP_KEY, CONTENT_ASSIST_FIELD extends ICon
     return text;
   }
 
-  @Override
-  public JSONObject toJson() {
-    JSONObject json = super.toJson();
-    putProperty(json, PROP_PROPOSAL, m_proposal);
-    putProperty(json, IContentAssistField.PROP_BROWSE_MAX_ROW_COUNT, getModel().getBrowseMaxRowCount());
-    return json;
-  }
-
-  private boolean checkStatusContainsCode(IMultiStatus status, int code) {
+  protected boolean checkStatusContainsCode(IMultiStatus status, int code) {
     for (IStatus child : status.getChildren()) {
       if (child instanceof IMultiStatus && checkStatusContainsCode((IMultiStatus) child, code)) {
         return true;
@@ -146,6 +138,9 @@ public class JsonSmartField<VALUE, LOOKUP_KEY, CONTENT_ASSIST_FIELD extends ICon
 
   @Override
   public JSONObject toJson() {
-    return putProperty(super.toJson(), PROP_PROPOSAL, m_proposal);
+    JSONObject json = super.toJson();
+    putProperty(json, PROP_PROPOSAL, m_proposal);
+    putProperty(json, IContentAssistField.PROP_BROWSE_MAX_ROW_COUNT, getModel().getBrowseMaxRowCount());
+    return json;
   }
 }
