@@ -44,6 +44,16 @@ describe("HtmlComponent", function() {
     jqueryMock.outerHeight = function(withMargins) {
       return 7;
     };
+    jqueryMock[0] = {};
+    jqueryMock[0].getBoundingClientRect = function() {
+      return {
+        width: 6,
+        height: 7
+      };
+    };
+    jqueryMock.isDisplayNone = function() {
+      return false;
+    };
   };
 
   describe("Ctor", function() {
@@ -60,7 +70,7 @@ describe("HtmlComponent", function() {
 
     addWidthHeightMock(jqueryMock);
 
-    it("returns outerWidth() and outerHeight() of JQuery comp", function() {
+    it("returns getBoundingClientRect() of JQuery comp", function() {
       var htmlComp = new scout.HtmlComponent(jqueryMock, session);
       var size = htmlComp.getSize();
       expect(size.width).toBe(6);
