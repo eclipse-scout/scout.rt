@@ -41,7 +41,7 @@ scout.Calendar = function() {
 
   this._addAdapterProperties(['components', 'menus', 'selectedComponent']);
 };
-scout.inherits(scout.Calendar, scout.ModelAdapter);
+scout.inherits(scout.Calendar, scout.Widget);
 
 scout.Calendar.prototype.init = function(model, session, register) {
   scout.Calendar.parent.prototype.init.call(this, model, session, register);

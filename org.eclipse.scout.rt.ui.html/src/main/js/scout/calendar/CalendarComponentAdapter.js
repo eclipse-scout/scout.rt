@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-scout.PlaceholderFieldAdapter = function() {
-  scout.PlaceholderFieldAdapter.parent.call(this);
+scout.CalendarComponentAdapter = function() {
+  scout.CalendarComponentAdapter.parent.call(this);
 };
-scout.inherits(scout.PlaceholderFieldAdapter, scout.FormFieldAdapter);
+scout.inherits(scout.CalendarComponentAdapter, scout.ModelAdapter);

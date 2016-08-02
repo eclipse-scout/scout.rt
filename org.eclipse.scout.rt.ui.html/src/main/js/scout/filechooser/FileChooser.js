@@ -13,7 +13,7 @@ scout.FileChooser = function() {
   this._files = [];
   this._glassPaneRenderer;
 };
-scout.inherits(scout.FileChooser, scout.ModelAdapter);
+scout.inherits(scout.FileChooser, scout.Widget);
 
 scout.FileChooser.prototype._init = function(model) {
   scout.FileChooser.parent.prototype._init.call(this, model);

@@ -18,7 +18,7 @@ scout.CalendarComponent = function() {
   this._$parts = [];
   this.events = new scout.EventSupport();
 };
-scout.inherits(scout.CalendarComponent, scout.ModelAdapter);
+scout.inherits(scout.CalendarComponent, scout.Widget);
 
 /**
  * Since we cannot configure any key-strokes on a calendar-component we must

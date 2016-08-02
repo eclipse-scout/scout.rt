@@ -850,20 +850,18 @@ scout.Session.prototype.showFatalMessage = function(options, errorCode) {
     messageBox = scout.create('MessageBox', model),
     $entryPoint = options.entryPoint || this.$entryPoint;
 
-  messageBox.remoteHandler = function(event) {
-    if ('action' === event.type) {
-      delete this._fatalMessagesOnScreen[errorCode];
-      messageBox.remove();
-      var option = event.option;
-      if (option === 'yes' && options.yesButtonAction) {
-        options.yesButtonAction.apply(this);
-      } else if (option === 'no' && options.noButtonAction) {
-        options.noButtonAction.apply(this);
-      } else if (option === 'cancel' && options.cancelButtonAction) {
-        options.cancelButtonAction.apply(this);
-      }
+  messageBox.on('action', function(event) {
+    delete this._fatalMessagesOnScreen[errorCode];
+    messageBox.remove();
+    var option = event.option;
+    if (option === 'yes' && options.yesButtonAction) {
+      options.yesButtonAction.apply(this);
+    } else if (option === 'no' && options.noButtonAction) {
+      options.noButtonAction.apply(this);
+    } else if (option === 'cancel' && options.cancelButtonAction) {
+      options.cancelButtonAction.apply(this);
     }
-  }.bind(this);
+  }.bind(this));
   messageBox.render($entryPoint);
 };
 

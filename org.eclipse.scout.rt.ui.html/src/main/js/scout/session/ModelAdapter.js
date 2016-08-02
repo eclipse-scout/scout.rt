@@ -38,22 +38,10 @@ scout.ModelAdapter = function() {
   this._modelProperties = [];
 
   this._register = true;
-  this.remoteHandler = scout.NullRemoteHandler;
   this._widgetListener;
 };
 
-// NullRemoteHandler is used as default for local objects
-// in place of this.session.sendEvent
-scout.NullRemoteHandler = function() {
-  // NOP
-};
-
-// FIXME [awe] 6.1 discuss -> konzept für events / send (Menu.js, MenuProxy.js, MenuRemoteProxy.js?)
-// was machen wir mit param delay? Der gehört eher auf den RemoteProxy
-scout.EventRemoteHandler = function(event, delay) {
-  this.trigger(event.type, event);
-};
-
+// FIXME CGU [6.1] ev. renamen to RemoteAdapter
 scout.ModelAdapter.prototype.init = function(model) {
   this._init(model);
   this.initialized = true;
@@ -80,13 +68,8 @@ scout.ModelAdapter.prototype._init = function(model) {
     throw new Error('Session expected: ' + this);
   }
 
-  // FIMXE CGU [6.1] rmove EventRemoteHandler
-  if (!this.session.remote) {
-    this.remoteHandler = scout.EventRemoteHandler;
-  }
-  else if (this._register) {
+  if (this._register) {
     this.session.registerModelAdapter(this);
-    this.remoteHandler = this.session.sendEvent.bind(this.session);
   }
 
   // Make a copy to prevent a modification of the given object
@@ -137,7 +120,7 @@ scout.ModelAdapter.prototype.createWidget = function(parent) { // FIXME CGU getO
 //  }, this);
   this.model.parent = parent;
   this.widget = this._createWidget(this.model);
-  if (this.widget) {
+  if (this.widget) { // FIXME CGU null check wegnehmen, davon ausgehen dass alle ein widget haben
     this._attachWidget();
   }
   return this.widget;
@@ -167,9 +150,7 @@ scout.ModelAdapter.prototype._detachWidget = function() {
 
 /**
  * @returns Creates a scout.Event object from the current adapter instance and
- *   sends the event by using the Session#sendEvent() method. Local objects may
- *   set a different remoteHandler to call custom code instead of the Session#sendEvent()
- *   method.
+ *   sends the event by using the Session#sendEvent() method.
  *
  * @param type of event
  * @param data of event
@@ -183,7 +164,7 @@ scout.ModelAdapter.prototype._send = function(type, data, delay, coalesceFunc) {
   if (coalesceFunc) {
     event.coalesce = coalesceFunc;
   }
-  adapter.remoteHandler(event, delay);
+  this.session.sendEvent(event, delay);
 };
 
 /**
@@ -413,22 +394,9 @@ scout.ModelAdapter.prototype._processAdapters = function(value, func) {
  * You can always rely that these two steps are processed in that order, but you cannot rely that
  * individual properties are processed in a certain order.
  */
+//FIXME [6.1] CGU adjust java doc
 scout.ModelAdapter.prototype.onModelPropertyChange = function(event) {
-  var oldProperties = {},
-    preventRendering = [];
-
-  // step 1 synchronizing - apply properties on adapter or calls syncPropertyName if it exists
-  this._syncPropertiesOnPropertyChange(oldProperties, event.properties, preventRendering);
-
-  // step 2 rendering - call render methods to update UI, but only if it is displayed (rendered)
-  if (this.rendered) {
-    this._renderPropertiesOnPropertyChange(oldProperties, event.properties, preventRendering);
-  }
-
-  // step 3 notify - fire propertyChange _after_ properties have been rendered. (This is important
-  // to make sure the DOM is in the right state, when the propertyChange event is consumed.)
-  // Note: A new event object has to be created, because it is altered in EventSuppor.trigger().
-  this._fireBulkPropertyChange(oldProperties, event.properties);
+  this._syncPropertiesOnPropertyChange(event.properties);
 };
 
 /**
@@ -442,6 +410,14 @@ scout.ModelAdapter.prototype._onWidgetEvent = function(event) {
   console.log('widget event ', event);
   if (event.type === 'property') {
     this._onWidgetPropertyChange(event);
+  } else {
+    // FIXME CGU [6.1] temporary, until model adapter separation
+    if (event.sendToServer) {
+      event = $.extend({}, event); // copy
+      delete event.source;
+      delete event.sendToServer;
+      this._send(event.type, event);
+    }
   }
 };
 
@@ -452,11 +428,10 @@ scout.ModelAdapter.prototype._onWidgetPropertyChange = function(event) {
   }, this);
 };
 
-scout.ModelAdapter.prototype._syncPropertiesOnPropertyChange = function(oldProperties, newProperties, preventRendering) {
+scout.ModelAdapter.prototype._syncPropertiesOnPropertyChange = function(newProperties) {
   this._eachProperty(newProperties, function(propertyName, value, isAdapterProp) {
     var syncFuncName = '_sync' + scout.ModelAdapter._preparePropertyNameForFunctionCall(propertyName),
       oldValue = this[propertyName];
-    oldProperties[propertyName] = oldValue;
 
     if (isAdapterProp) {
       if (oldValue) {
@@ -465,53 +440,25 @@ scout.ModelAdapter.prototype._syncPropertiesOnPropertyChange = function(oldPrope
       }
       if (value) {
         value = this._createAdapters(propertyName, value);
+        // FIXME CGU [6.1] create widgets here? value must not be an adapter
       }
     }
 
     if (this[syncFuncName]) {
-      if (this[syncFuncName](value, oldValue) === false) {
-        // _syncPropName may return false to prevent the rendering (e.g. if the property has not changed)
-        // This may be useful for some properties with an expensive render method
-        // Do not prevent if undefined is returned!
-        preventRendering.push(propertyName);
-      }
+      this[syncFuncName](value, oldValue);
     } else {
-      this[propertyName] = value;
+      this._callSetter(propertyName, value);
     }
   }.bind(this));
 };
 
-scout.ModelAdapter.prototype._renderPropertiesOnPropertyChange = function(oldProperties, newProperties, preventRendering) {
-  this._eachProperty(newProperties, function(propertyName, value, isAdapterProp) {
-    if (preventRendering.indexOf(propertyName) > -1) {
-      // Do not render if _syncPropName returned false
-      return;
-    }
-
-    var renderFuncName = '_render' + scout.ModelAdapter._preparePropertyNameForFunctionCall(propertyName);
-    var oldValue = oldProperties[propertyName];
-    var newValue = this[propertyName];
-    $.log.debug('call ' + renderFuncName + '(' + value + ')');
-    // Call the render function for regular properties, for adapters see onChildAdapterChange
-    if (isAdapterProp) {
-      this.onChildAdapterChange(propertyName, oldValue, newValue);
-    } else {
-      if (!this[renderFuncName]) {
-        throw new Error('Render function ' + renderFuncName + ' does not exist in ' + this.toString());
-      }
-      // TODO awe, cgu: (model-adapter) value and oldValue should be switched to conform with other functions.
-      // Or better create remove function as it is done with adapters? currently only "necessary" for AnalysisTableControl
-      // Input von 08.04.15: z.Z. wird die _renderXxx Methode sehr uneinheitlich verwendet. Manche mit ohne Parameter, andere mit
-      // 1 oder 2 Parameter. Dann gibt es noch Fälle (DateField.js) bei denen es nötig ist, render aufzurufen, aber mit einem
-      // anderen Wert für xxx als this.xxx. Nur wenige benötigen den 2. Parameter für old-value (FormField#_renderCssClass).
-      // Vorgeschlagene Lösung:
-      // - renderXxx() ist grundsätzlich Parameterlos und verwendet this.xxx
-      // - wenn jemand den old-value von this.xxx braucht, muss er sich diesen selber auf dem adapter merken
-      // - wenn jemand die render methode mit anderen werten als this.xxx aufrufen können muss, implementiert er für
-      //   diesen speziellen fall: function renderXxx(xxx) { xxx = xxx || this.xxx; ...
-      this[renderFuncName](newValue, oldValue);
-    }
-  }.bind(this));
+scout.ModelAdapter.prototype._callSetter = function(propertyName, value) {
+  var setterFuncName = 'setter' + scout.ModelAdapter._preparePropertyNameForFunctionCall(propertyName);
+  if (this.widget[setterFuncName]) {
+    this.widget[setterFuncName]();
+  } else {
+    this.widget.setProperty(propertyName, value);
+  }
 };
 
 /**

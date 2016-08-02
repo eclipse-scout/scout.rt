@@ -10,5 +10,6 @@
  ******************************************************************************/
 scout.SplitBoxAdapter = function() {
   scout.SplitBoxAdapter.parent.call(this);
+  this._addAdapterProperties(['firstField', 'secondField', 'collapsibleField']);
 };
 scout.inherits(scout.SplitBoxAdapter, scout.CompositeFieldAdapter);

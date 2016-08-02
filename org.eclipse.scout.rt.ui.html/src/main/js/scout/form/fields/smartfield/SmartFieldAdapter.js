@@ -8,8 +8,8 @@
    * Contributors:
    *     BSI Business Systems Integration AG - initial API and implementation
    ******************************************************************************/
-  scout.ProposalChooserAdapter = function() {
-    scout.ProposalChooserAdapter.parent.call(this);
+  scout.SmartFieldAdapter = function() {
+    scout.SmartFieldAdapter.parent.call(this);
     this._addAdapterProperties(['proposalChooser']);
   };
-  scout.inherits(scout.ProposalChooserAdapter, scout.ValueFieldAdapter);
+  scout.inherits(scout.SmartFieldAdapter, scout.ValueFieldAdapter);

@@ -39,7 +39,7 @@ scout.Planner = function() {
   this.yearPanelVisible = false;
   this._addAdapterProperties(['menus']);
 };
-scout.inherits(scout.Planner, scout.ModelAdapter);
+scout.inherits(scout.Planner, scout.Widget);
 
 scout.Planner.Direction = {
   BACKWARD: -1,

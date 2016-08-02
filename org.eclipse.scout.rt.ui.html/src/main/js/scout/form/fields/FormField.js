@@ -809,11 +809,11 @@ scout.FormField.prototype._createCopyContextMenu = function(event) {
     parent: this,
     text: this.session.text('ui.Copy')
   });
-  menu.remoteHandler = function(event) {
-    if ('doAction' === event.type && field instanceof scout.ValueField) {
+  menu.on('doAction', function(event) {
+    if (field instanceof scout.ValueField) {
       field._send('exportToClipboard');
     }
-  };
+  });
 
   var popup = scout.create('ContextMenuPopup', {
     parent: this,

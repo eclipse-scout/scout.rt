@@ -648,12 +648,14 @@ scout.Widget.prototype._removeAdapterProperties = function(properties) {
 };
 
 scout.Widget.prototype._createWidgets = function(propertyName, model) {
+  // FIXME CGU zügeln nach model adapter
   return this._processWidgets(model, function(model) {
     if (model instanceof scout.ModelAdapter) {
       return model.createWidget(this); // FIXME [6.1] CGU widget should not have a dependency to model adapter
     } else {
 //      model.parent = this; // FIXME [6.1] necessary?
 //      return scout.create(model);
+      return model;
     }
   }.bind(this));
 };
@@ -670,6 +672,28 @@ scout.Widget.prototype._processWidgets = function(value, func) {
     return adapters;
   } else {
     return func(value);
+  }
+};
+
+// FIXME CGU [6.1] temporary, remove after model adapter separation
+scout.Widget.prototype._send = function(type, data) {
+  data = data || {};
+  data.sendToServer = true;
+  this.trigger(type, data);
+};
+
+scout.Widget.prototype.setProperty = function(name, value) {
+  if (this[name] === value) {
+    return;
+  }
+  this._setProperty(name, value);
+  if (this.rendered) {
+    var renderFuncName = '_render' + scout.strings.toUpperCaseFirstLetter(name);
+    if (!this[renderFuncName]) {
+      throw new Error('Render function ' + renderFuncName + ' does not exist in ' + this.toString());
+    }
+    // FIXME CGU [6.1] new and old value übergeben? eher nicht
+    this[renderFuncName]();
   }
 };
 

@@ -18,7 +18,7 @@ scout.ProposalChooser = function() {
 
   this._updateStatusTimeout;
 };
-scout.inherits(scout.ProposalChooser, scout.ModelAdapter);
+scout.inherits(scout.ProposalChooser, scout.Widget);
 
 /**
  * @see IContentAssistField#getActiveFilterLabels() - should have the same order.

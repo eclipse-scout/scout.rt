@@ -27,8 +27,8 @@ scout.TreeAdapter.prototype._sendNodesSelected = function(nodeIds, debounceSend)
 };
 
 scout.TreeAdapter.prototype._onWidgetNodeClicked = function(event) {
-  this._send({
-    node: event.node.id
+  this._send('nodeClicked', {
+    nodeId: event.node.id
   });
 };
 
