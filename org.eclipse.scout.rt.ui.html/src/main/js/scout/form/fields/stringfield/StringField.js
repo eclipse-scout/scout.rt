@@ -104,20 +104,17 @@ scout.StringField.prototype._renderProperties = function() {
   this._renderDropType();
 };
 
-scout.StringField.prototype._renderMaxLength = function(maxLength0) {
-  var maxLength = maxLength0 || this.maxLength;
+scout.StringField.prototype._renderMaxLength = function() {
+  // Check if "maxLength" attribute is supported by browser
   if (this.$field[0].maxLength) {
-    if (maxLength) { // 0, undefined, null (zero maxlength makes no sense since you could not enter anything)
-      this.$field.attr('maxlength', maxLength);
-    } else {
-      this.$field.removeAttr('maxlength');
-    }
+    this.$field.attr('maxlength', this.maxLength);
   } else {
+    // Fallback for IE9
     this.$field.on('keyup paste', function(e) {
       setTimeout(function() {
-        var currLength = this.$field.val().length;
-        if (currLength > this.maxLength) {
-          this.$field.val(this.$field.val().slice(0, this.maxLength));
+        var text = this.$field.val();
+        if (text.length > this.maxLength) {
+          this.$field.val(text.slice(0, this.maxLength));
         }
       }.bind(this), 0);
     }.bind(this));
@@ -209,8 +206,24 @@ scout.StringField.prototype._renderInsertText = function() {
   if (!this.insertText) {
     return;
   }
-  var selection = this._getSelection();
   var text = this.$field.val();
+
+  // Prevent insert if new length would exceed maxLength to prevent unintended deletion of characters at the end of the string
+  if (this.insertText.length + text.length > this.maxLength) {
+    scout.create('DesktopNotification', {
+      parent: this,
+      id: scout.numbers.randomId(),
+      desktop: this.session.desktop,
+      duration: 3000,
+      status: {
+        message: this.session.text('ui.CannotInsertTextTooLong'),
+        severity: scout.Status.Severity.WARNING
+      }
+    }).show();
+    return;
+  }
+
+  var selection = this._getSelection();
   text = text.slice(0, selection.start) + this.insertText + text.slice(selection.end);
   this.$field.val(text);
 

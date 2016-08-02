@@ -86,4 +86,23 @@ public class AbstractStringFieldTest extends AbstractStringField {
     assertEquals(2, m_displayTextChangedCounter.get());
     assertArrayEquals(new String[]{"Test", ""}, m_displayTextChangedHistory.toArray());
   }
+
+  @Test
+  public void testMaxLength() {
+    int initialMaxLength = getMaxLength();
+    assertEquals(getConfiguredMaxLength(), initialMaxLength);
+    setMaxLength(1234);
+    assertEquals(1234, getMaxLength());
+    setMaxLength(0);
+    assertEquals(0, getMaxLength());
+    setMaxLength(-2);
+    assertEquals(0, getMaxLength());
+
+    // set value
+    setValue("the clown has a red nose");
+    assertEquals(null, getValue());
+    setMaxLength(9);
+    setValue("the clown has a red nose");
+    assertEquals("the clown", getValue());
+  }
 }

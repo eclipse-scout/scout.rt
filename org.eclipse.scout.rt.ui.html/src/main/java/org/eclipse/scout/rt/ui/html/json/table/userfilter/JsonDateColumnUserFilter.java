@@ -39,7 +39,7 @@ public class JsonDateColumnUserFilter extends JsonColumnUserFilter<DateColumnUse
   }
 
   // FIXME AWE: (filter) fix this poor-mans solution and use JsonDate, property date-format
-  private Date toDate(String dateString) {
+  protected Date toDate(String dateString) {
     if (StringUtility.isNullOrEmpty(dateString)) {
       return null;
     }

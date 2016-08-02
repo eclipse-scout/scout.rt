@@ -118,7 +118,7 @@ public class JsonSmartField<VALUE, LOOKUP_KEY, CONTENT_ASSIST_FIELD extends ICon
     getModel().getUIFacade().openProposalChooserFromUI(displayText, selectCurrentValue);
   }
 
-  private String getDisplayTextAndAddFilter(JsonEvent event) {
+  protected String getDisplayTextAndAddFilter(JsonEvent event) {
     String text = event.getData().optString("displayText", null);
     addPropertyEventFilterCondition(IValueField.PROP_DISPLAY_TEXT, text);
     return text;
@@ -142,5 +142,10 @@ public class JsonSmartField<VALUE, LOOKUP_KEY, CONTENT_ASSIST_FIELD extends ICon
       }
     }
     return false;
+  }
+
+  @Override
+  public JSONObject toJson() {
+    return putProperty(super.toJson(), PROP_PROPOSAL, m_proposal);
   }
 }

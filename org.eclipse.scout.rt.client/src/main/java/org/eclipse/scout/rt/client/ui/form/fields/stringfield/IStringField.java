@@ -36,7 +36,10 @@ public interface IStringField extends IBasicField<String>, IDNDSupport, IHtmlCap
   String FORMAT_UPPER = "A";
   String FORMAT_LOWER = "a";
 
-  void setMaxLength(int len);
+  /**
+   * Sets the maximum length of this field. Negative values are automatically converted to 0.
+   */
+  void setMaxLength(int maxLength);
 
   int getMaxLength();
 

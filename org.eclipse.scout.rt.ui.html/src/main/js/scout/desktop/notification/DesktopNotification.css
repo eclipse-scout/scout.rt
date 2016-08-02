@@ -86,6 +86,11 @@
   border-left-width: 0;
   padding: 10px;
 
+  /* Prevent overlay of text and close icon */
+  &.closable {
+    padding-right: 25px;
+  }
+
   & > .closer {
     position: absolute;
     right: 10px;

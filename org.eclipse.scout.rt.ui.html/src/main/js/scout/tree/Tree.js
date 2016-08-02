@@ -318,6 +318,7 @@ scout.Tree.prototype._remove = function() {
   this._visitNodes(this.nodes, this._resetTreeNode.bind(this));
 
   scout.scrollbars.uninstall(this.$data, this.session);
+  this._uninstallDragAndDropHandler();
   this._uninstallNodeTooltipSupport();
   this.$fillBefore = null;
   this.$fillAfter = null;
