@@ -29,6 +29,10 @@
     }
   }
 
+  &:not(:focus):not(.focused).header-invisible > .table-data > .table-row.selected.first {
+    border-top-color: transparent;
+  }
+
   & > .menubar {
     &:not(.main-menubar) {
       padding-left: @table-cell-padding-left;

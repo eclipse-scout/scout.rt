@@ -3185,6 +3185,7 @@ scout.Table.prototype._renderTableHeader = function() {
     this._removeTableHeader();
     changed = true;
   }
+  this.$container.toggleClass('header-invisible', !this.header);
   if (changed) {
     this.invalidateLayoutTree();
   }
