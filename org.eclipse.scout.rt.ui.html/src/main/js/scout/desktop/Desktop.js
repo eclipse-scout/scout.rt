@@ -68,14 +68,6 @@ scout.Desktop.prototype._initKeyStrokeContext = function(keyStrokeContext) {
   keyStrokeContext.registerKeyStroke(new scout.DisableBrowserTabSwitchingKeyStroke(this));
 };
 
-scout.Desktop.prototype._onChildAdapterCreation = function(propertyName, model) {
-  if (propertyName === 'viewButtons') {
-    model.desktop = this;
-  } else if (propertyName === 'menus') {
-    model.desktop = this;
-  }
-};
-
 scout.Desktop.prototype._onBenchActivateViewChanged = function(event) {
   if (this.initialFormRendering) {
     return;

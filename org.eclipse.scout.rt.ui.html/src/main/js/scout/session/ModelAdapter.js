@@ -148,6 +148,12 @@ scout.ModelAdapter.prototype._detachWidget = function() {
   this._widgetListener = null;
 };
 
+scout.ModelAdapter.prototype._createWidgets = function(propertyName, model) {
+  return this._processAdapters(model, function(model) {
+    return model.createWidget(this.widget);
+  }.bind(this));
+};
+
 /**
  * @returns Creates a scout.Event object from the current adapter instance and
  *   sends the event by using the Session#sendEvent() method.
@@ -433,6 +439,7 @@ scout.ModelAdapter.prototype._syncPropertiesOnPropertyChange = function(newPrope
     var syncFuncName = '_sync' + scout.ModelAdapter._preparePropertyNameForFunctionCall(propertyName),
       oldValue = this[propertyName];
 
+    // FIXME CGU [6.1] dieser Teil sollte irgendiwe in der Sync Funktion sein, anstatt callSetter syncProperty aufrufen, würde aber viele Funktionen brechen
     if (isAdapterProp) {
       if (oldValue) {
         // TODO CGU this should actually be configurable, otherwise m_disposeOnChange=false on server doesn't work
@@ -440,6 +447,7 @@ scout.ModelAdapter.prototype._syncPropertiesOnPropertyChange = function(newPrope
       }
       if (value) {
         value = this._createAdapters(propertyName, value);
+        value = this._createWidgets(propertyName, value);
         // FIXME CGU [6.1] create widgets here? value must not be an adapter
       }
     }

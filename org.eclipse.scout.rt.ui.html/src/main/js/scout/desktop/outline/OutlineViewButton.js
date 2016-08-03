@@ -31,7 +31,7 @@ scout.OutlineViewButton.prototype._goOffline = function() {
  */
 scout.OutlineViewButton.prototype.beforeSendDoAction = function() {
   if (this.outline) {
-    this.desktop.bringOutlineToFront(this.outline);
+    this.session.desktop.bringOutlineToFront(this.outline);
   }
 };
 
