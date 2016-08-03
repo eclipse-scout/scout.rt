@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-scout.model = {
+scout.models = {
 
   modelMap: {},
 
@@ -18,7 +18,7 @@ scout.model = {
     var that = this;
 
     return $.ajax({
-      url: 'res/model.json',
+      url: 'res/models.json',
       dataType: 'json',
       contentType: 'application/json; charset=UTF-8'
     }).done(that._onModelDone.bind(that))
@@ -33,7 +33,7 @@ scout.model = {
     throw new Error('Error while loading model: ' + errorThrown);
   },
 
-  getModel: function(modelId, parent) {
+  get: function(modelId, parent) {
     if (!parent) {
       throw new Error('missing argument parent');
     }

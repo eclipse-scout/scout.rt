@@ -39,7 +39,7 @@ scout.Page.prototype.createDetailForm = function() {
      *   und wenn man dort nichts findet schaut, ob es einen Constructor für x gibt.
      *
      * Wenn man selber eine Page implementiert hat, überschreibt man createDetailForm
-     *   und ruft selber scout.create bzw. scout.model.getModel auf.
+     *   und ruft selber scout.create bzw. scout.models.get auf.
      *
      * Die getModel() method sollte evtl. mit scout.create kombiniert werden (options object?) oder createWithModel() methode?
      */

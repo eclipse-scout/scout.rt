@@ -32,7 +32,7 @@
   __include("scout/util/locales.js");
   __include("scout/util/logging.js");
   __include("scout/util/mimeTypes.js");
-  __include("scout/util/model.js");
+  __include("scout/util/models.js");
   __include("scout/util/numbers.js");
   __include("scout/util/objects.js");
   __include("scout/util/polyfills.js");
