@@ -137,5 +137,21 @@ scout.texts = {
     if (result && result.length === 2) {
       return result[1];
     }
+  },
+
+  /**
+   * Utility function to easily replace an object property which contains a text-key like ${textKey:Version}.
+   *
+   * @param object object having a text property which contains a text-key
+   * @param textProperty (optional) name of the property where a text-key should be replaced by a text. By default 'text' is used as property name.
+   * @param session (optional) can be undefined when given 'object' has a session property, otherwise mandatory
+   */
+  resolveTextProperty: function(object, textProperty, session) {
+    textProperty = textProperty || 'text';
+    session = object.session || session;
+    var key = scout.texts.resolveKey(object[textProperty]);
+    if (key) {
+      object[textProperty] = session.text(key);
+    }
   }
 };

@@ -30,14 +30,7 @@ scout.TreeNode = function() {
 
 scout.TreeNode.prototype.init = function(model) {
   this._init(model);
-  this._resolveTextKeys();
-};
-
-scout.TreeNode.prototype._resolveTextKeys = function() {
-  var key = scout.texts.resolveKey(this.text);
-  if (key) {
-    this.text = this.parent.session.text(key);
-  }
+  scout.texts.resolveTextProperty(this, 'text', this.parent.session);
 };
 
 scout.TreeNode.prototype.getTree = function() {
