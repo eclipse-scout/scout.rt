@@ -56,6 +56,8 @@ scout.fonts = {
    *     A single string or object (or an array of them) specifying which fonts should
    *     be preloaded. A string is interpreted as font-family. If the style is relevant,
    *     too, an object with the properties 'font-family' and 'style' should be provided.
+   *     Alternatively, the style can be specified in the string after the font name,
+   *     separated by a pipe character ('|').
    *   [onComplete]
    *     Mandatory function to be called when all of the specified fonts have been
    *     loaded or if a timeout occurs. An argument 'success' is given to indicate
@@ -67,11 +69,13 @@ scout.fonts = {
    *     Default is 30 seconds.
    *
    * Examples:
-   *   preload({fonts: "Sauna Pro"});
-   *   preload({fonts: "Sauna Pro", onComplete: handleLoadFinished});
-   *   preload({fonts: ["Sauna Pro", "Dolly Pro"]});
-   *   preload({fonts: {family:"Sauna", style: "font-style:italic; font-weight:700"}, timeout: 999});
-   *   preload({fonts: ["Fakir-Black", {family:"Fakir-Italic", style:"font-style:italic"}], timeout: 2500, onComplete: function() { setCookie("fakir","loaded") }});
+   *   preload({fonts: 'Sauna Pro'});
+   *   preload({fonts: 'Sauna Pro|font-style:italic'});
+   *   preload({fonts: 'Sauna Pro | font-style: italic; font-weight: 700'});
+   *   preload({fonts: 'Sauna Pro', onComplete: handleLoadFinished});
+   *   preload({fonts: ['Sauna Pro', 'Dolly Pro']});
+   *   preload({fonts: {family:'Sauna', style: 'font-style:italic; font-weight:700'}, timeout: 999});
+   *   preload({fonts: ['Fakir-Black', {family:'Fakir-Italic', style:'font-style:italic'}], timeout: 2500, onComplete: function() { setCookie('fakir','loaded') }});
    *
    * Inspired by Zenfonts (https://github.com/zengabor/zenfonts, public domain).
    */
@@ -94,9 +98,17 @@ scout.fonts = {
     fonts.forEach(function(font) {
       // Convert to object
       if (typeof font === 'string') {
-        font = {
-          family: font
-        };
+        var m = font.match(/^(.*?)\s*\|\s*(.*)$/);
+        if (m) {
+          font = {
+            family: m[1],
+            style: m[2]
+          };
+        } else {
+          font = {
+            family: font
+          };
+        }
       }
       font.family = font.family || '';
       font.style = font.style || '';
@@ -113,6 +125,11 @@ scout.fonts = {
       var originalWidth = $div.outerWidth();
       $div.data('original-width', originalWidth);
       $div.css('font-family', '\'' + font.family + '\',' + testFonts);
+      if (font.style) {
+        var style = ($div.attr('style') || '').trim();
+        var sep = (style.substr(-1) === ';' ? '' : ';') + (style ? ' ' : '');
+        $div.attr('style', style + sep + font.style);
+      }
 
       if ($div.outerWidth() !== originalWidth) {
         // Font already loaded, nothing to do
