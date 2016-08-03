@@ -181,13 +181,17 @@ scout.Session.prototype.createModelAdapter = function(adapterData, parent) {
   adapterData.parent = parent;
   adapterData._register = true;
   var objectType = adapterData.objectType;
-  adapterData.objectType = adapterData.objectType + 'Adapter';
-  var adapter = scout.create(adapterData);
+  var objectTypeParts = objectType.split('.');
+  if (objectTypeParts.length === 2) {
+    objectType = objectTypeParts[0] + 'Adapter.' + objectTypeParts[1];
+    // If no adapter exists for the given variant then create an adapter without variant.
+    // Mostly variant is only essential for the widget, not the adapter
+    adapterData.variantLenient = true;
+  } else {
+    objectType = objectType + 'Adapter';
+  }
+  var adapter = scout.create(objectType, adapterData);
   $.log.trace('created new adapter ' + adapter + '. owner=' + owner + ' parent=' + parent);
-
-  // FIXME [6.1] CGU ev. besser bei scout create 2. param verwenden, dort darf es adapterData aber auch nicht ändern
-  adapter.model.objectType = objectType;
-//  adapter.objectType = objectType;
 
   owner.addOwnedAdapter(adapter);
   return adapter;

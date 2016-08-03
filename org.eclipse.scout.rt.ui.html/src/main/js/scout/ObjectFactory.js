@@ -22,7 +22,7 @@ scout.ObjectFactory = function() {
 };
 
 /**
- * Creates the object from the given model.objectType. Only the constructor is called, but not the init() method.<p>
+ * Creates the object using the given type, or if undefined the objectType of the model. Only the constructor is called, but not the init() method.<p>
  * When scout.objectFactories contains a create function for the given objectType, this function is called.
  * Otherwise it tries to find the constructor function by the following logic:<br>
  * If the objectType provides a namespace, it is used. Otherwise it takes the default 'scout' namespace.
@@ -34,12 +34,15 @@ scout.ObjectFactory = function() {
  * Object type is Outline.MyVariant -> constructor scout.MyVariantOutline is called
  * Object type is myNamespace.Outline.MyVariant -> constructor myNamespace.MyVariantOutline is called
  *
- * @param model needs to contain property objectType
+ * @param model with property objectType
+ * @param type optional, if defined will be used instead of model.objectType
  */
-scout.ObjectFactory.prototype._createObjectByType = function(model) {
+scout.ObjectFactory.prototype._createObjectByType = function(model, type) {
   // check if requested objectType / variant is registered
   var objectTypeParts, scoutClass, scoutObject,
-    objectType = model.objectType,
+    variant = '',
+    namespaceName = '',
+    objectType = type || model.objectType,
     createFunc = this._registry[objectType];
 
   if (createFunc) {
@@ -50,20 +53,28 @@ scout.ObjectFactory.prototype._createObjectByType = function(model) {
     objectTypeParts = objectType.split('.');
 
     var namespace = scout;
+
     // Extract namespace
     if (objectTypeParts.length >= 2 && window.hasOwnProperty(objectTypeParts[0])) {
       // FIXME CGU [6.1] maybe it would be better to define the namespace in scout.App to avoid name clashes in the window object (if objectType is named after a var in window)
-      namespace = window[objectTypeParts[0]];
+      namespaceName = objectTypeParts[0];
+      namespace = window[namespaceName];
       objectTypeParts = objectTypeParts.slice(1);
     }
 
     // Extract variant
-    var variant = '';
+    variant = '';
     if (objectTypeParts.length === 2) {
       variant = objectTypeParts[1];
     }
 
     scoutClass = variant + objectTypeParts[0];
+    if (!namespace[scoutClass] && model.variantLenient && variant) {
+      delete model.variantLenient;
+
+      // Try without variant if variantLenient is true
+      return this._createObjectByType(model, namespaceName + '.' + objectTypeParts[0]);
+    }
     try {
       scoutObject = new namespace[scoutClass]();
     } catch (e) {
@@ -105,11 +116,11 @@ scout.ObjectFactory.prototype._createObjectByType = function(model) {
  *  @param model (optional) must be set when vararg is a string
  */
 scout.ObjectFactory.prototype.create = function(vararg, model) {
-  var scoutObject;
+  var scoutObject, objectType;
   model = model || {};
   if (typeof vararg === 'string') {
-    model.objectType = vararg;
-    scoutObject = this._createObjectByType(model);
+    objectType = vararg;
+    scoutObject = this._createObjectByType(model, objectType);
   } else if (typeof vararg === 'object') {
     model = vararg;
     scoutObject = this._createObjectByType(model);

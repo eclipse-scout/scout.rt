@@ -123,6 +123,8 @@ describe('ObjectFactory', function() {
       scout.VariantStringField = function() {};
       var object = scout.objectFactory._createObjectByType(model);
       expect(object instanceof scout.VariantStringField).toBe(true);
+
+      delete scout.VariantStringField;
     });
 
     it('considers variants also within a custom namespace', function() {
@@ -134,6 +136,29 @@ describe('ObjectFactory', function() {
       };
       var object = scout.objectFactory._createObjectByType(model);
       expect(object instanceof my.VariantStringField).toBe(true);
+    });
+
+    describe('variantLenient', function() {
+      it('tries to create an object without variant if with variant fails', function() {
+        var model = {
+          objectType: 'StringField.Variant',
+          variantLenient: true
+        };
+        var object = scout.objectFactory._createObjectByType(model);
+        expect(object instanceof scout.StringField).toBe(true);
+      });
+
+      it('tries to create an object without variant if with variant fails also with custom namespace', function() {
+        window.my = {};
+        var my = window.my;
+        my.StringField = function() {};
+        var model = {
+          objectType: 'my.StringField.Variant',
+          variantLenient: true
+        };
+        var object = scout.objectFactory._createObjectByType(model);
+        expect(object instanceof my.StringField).toBe(true);
+      });
     });
   });
 });
