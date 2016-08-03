@@ -116,14 +116,18 @@ scout.DesktopNavigation.prototype.setOutline = function(outline) {
 };
 
 scout.DesktopNavigation.prototype.sendToBack = function() {
-  this.viewButtonBox.sendToBack();
+  if(this.viewButtonBox){
+    this.viewButtonBox.sendToBack();
+  }
   if (this.outline) {
     this.outline.sendToBack();
   }
 };
 
 scout.DesktopNavigation.prototype.bringToFront = function() {
-  this.viewButtonBox.bringToFront();
+  if(this.viewButtonBox){
+    this.viewButtonBox.bringToFront();
+  }
   if (this.outline) {
     this.outline.bringToFront();
   }
