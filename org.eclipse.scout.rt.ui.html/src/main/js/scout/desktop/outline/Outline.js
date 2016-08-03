@@ -999,40 +999,20 @@ scout.Outline.prototype._onPageChanged2 = function(page) {
   this._triggerPageChanged(page);
 };
 
-scout.Outline.prototype._onPageChanged = function(event) {
-  var node;
-  if (event.nodeId) {
-    node = this.nodesMap[event.nodeId];
-
-    node.detailFormVisible = event.detailFormVisible;
-    node.detailForm = this.session.getOrCreateModelAdapter(event.detailForm, this);
-    if (node.detailForm) {
-      node.detailForm = node.detailForm.widget;
-      this._initDetailForm(node);
+scout.Outline.prototype.pageChanged = function(page) {
+  if (page) {
+    if (page.detailForm) {
+      this._initDetailForm(page);
     }
-
-    node.detailTableVisible = event.detailTableVisible;
-    node.detailTable = this.session.getOrCreateModelAdapter(event.detailTable, this);
-    if (node.detailTable) {
-      node.detailTable = node.detailTable.widget; // FIXME [6.1] cgu where to do this?
-      this._initDetailTable(node);
+    if (page.detailTable) {
+      this._initDetailTable(page);
     }
-  } else {
-    this.defaultDetailForm = this.session.getOrCreateModelAdapter(event.detailForm, this);
   }
 
   var selectedPage = this.selectedNodes[0];
-  if (!node && !selectedPage || node === selectedPage) {
+  if (!page && !selectedPage || page === selectedPage) {
     this.updateDetailContent();
   }
 
-  this._triggerPageChanged(node);
-};
-
-scout.Outline.prototype.onModelAction = function(event) {
-  if (event.type === 'pageChanged') {
-    this._onPageChanged(event);
-  } else {
-    scout.Outline.parent.prototype.onModelAction.call(this, event);
-  }
+  this._triggerPageChanged(page);
 };

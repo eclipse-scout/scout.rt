@@ -30,3 +30,40 @@ scout.OutlineAdapter.prototype._initPage = function(page, parentNode) {
     page.detailForm = this.session.getOrCreateModelAdapter(page.detailForm, this);
   }
 };
+
+scout.OutlineAdapter.prototype._onPageChanged = function(event) {
+  var page;
+  if (event.nodeId) {
+    page = this.widget._nodeById(event.nodeId);
+
+    page.detailFormVisible = event.detailFormVisible;
+    page.detailForm = this.session.getOrCreateModelAdapter(event.detailForm, this);
+    if (page.detailForm) {
+      if (!page.detailForm.widget) {
+        page.detailForm.createWidget(this.widget); // FIXME [6.1] CGU das mit dem create muss einfacher sein -> getOrCreate überlassen?
+      }
+      page.detailForm = page.detailForm.widget;
+    }
+
+    page.detailTableVisible = event.detailTableVisible;
+    page.detailTable = this.session.getOrCreateModelAdapter(event.detailTable, this);
+    if (page.detailTable) {
+      if (!page.detailTable.widget) {
+        page.detailTable.createWidget(this.widget); // FIXME [6.1] CGU das mit dem create muss einfacher sein -> getOrCreate überlassen?
+      }
+      page.detailTable = page.detailTable.widget;
+    }
+  } else {
+    this.defaultDetailForm = this.session.getOrCreateModelAdapter(event.detailForm, this);
+  }
+
+  this.widget.pageChanged(page);
+};
+
+scout.OutlineAdapter.prototype.onModelAction = function(event) {
+  if (event.type === 'pageChanged') {
+    this._onPageChanged(event);
+  } else {
+    scout.OutlineAdapter.parent.prototype.onModelAction.call(this, event);
+  }
+};

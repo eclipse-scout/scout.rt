@@ -8,6 +8,7 @@
 */
 // protects $ and undefined from being redefined by another library
 (function(scout, $, undefined) {
+  // FIXME CGU [6.1] maybe extract remote/modeladapter files into remotescout-module.js
   __include("jquery/jquery-scout.js");
   __include("scout/main.js");
   __include("scout/App.js");
