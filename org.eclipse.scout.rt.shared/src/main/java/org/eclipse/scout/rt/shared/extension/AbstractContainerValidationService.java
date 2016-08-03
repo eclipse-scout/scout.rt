@@ -79,12 +79,12 @@ public abstract class AbstractContainerValidationService implements IExtensionRe
   }
 
   @Override
-  public boolean isValidContribution(Class<?> contribution, Class<?> container) throws IllegalExtensionException {
+  public boolean isValidContribution(Class<?> contribution, Class<?> container) {
     return isValid(container, contribution, m_possibleContributionsByContainer);
   }
 
   @Override
-  public boolean isValidMove(Class<? extends IOrdered> modelClass, Class<? extends IOrdered> newContainerClass) throws IllegalExtensionException {
+  public boolean isValidMove(Class<? extends IOrdered> modelClass, Class<? extends IOrdered> newContainerClass) {
     return isValid(modelClass, newContainerClass, m_possibleMovesByContainer);
   }
 }

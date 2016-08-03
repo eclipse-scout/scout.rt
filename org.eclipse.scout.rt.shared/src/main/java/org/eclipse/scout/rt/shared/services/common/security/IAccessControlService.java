@@ -15,7 +15,6 @@ import java.security.PermissionCollection;
 
 import javax.security.auth.Subject;
 
-import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.service.IService;
 import org.eclipse.scout.rt.shared.cache.ICache;
 import org.eclipse.scout.rt.shared.security.BasicHierarchyPermission;
@@ -63,11 +62,10 @@ public interface IAccessControlService extends IService {
   /**
    * Clear all caches. This can be useful when some permissions and/or user-role mappings have changed.
    */
-  void clearCache() throws ProcessingException;
+  void clearCache();
 
   /**
    * Invalidates the cached {@link PermissionCollection} of the current user.
    */
-  void clearCacheOfCurrentUser() throws ProcessingException;
-
+  void clearCacheOfCurrentUser();
 }

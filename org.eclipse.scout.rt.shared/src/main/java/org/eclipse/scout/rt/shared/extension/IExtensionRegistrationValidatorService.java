@@ -35,7 +35,7 @@ public interface IExtensionRegistrationValidatorService extends IService {
    *           May be used to throw a more detailed exception. Throwing such an {@link IllegalExtensionException} also
    *           declares the contribution to be NOT valid.
    */
-  boolean isValidContribution(Class<?> contribution, Class<?> container) throws IllegalExtensionException;
+  boolean isValidContribution(Class<?> contribution, Class<?> container);
 
   /**
    * Checks if the given move is allowed or not.<br>
@@ -49,5 +49,5 @@ public interface IExtensionRegistrationValidatorService extends IService {
    *           May be used to throw a more detailed exception. Throwing such an {@link IllegalExtensionException} also
    *           declares the move to be NOT valid.
    */
-  boolean isValidMove(Class<? extends IOrdered> modelClass, Class<? extends IOrdered> newContainerClass) throws IllegalExtensionException;
+  boolean isValidMove(Class<? extends IOrdered> modelClass, Class<? extends IOrdered> newContainerClass);
 }

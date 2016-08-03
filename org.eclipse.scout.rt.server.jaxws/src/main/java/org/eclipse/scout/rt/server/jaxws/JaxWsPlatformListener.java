@@ -36,7 +36,7 @@ public class JaxWsPlatformListener implements IPlatformListener {
   private static final Logger LOG = LoggerFactory.getLogger(JaxWsPlatformListener.class);
 
   @Override
-  public void stateChanged(final PlatformEvent event) throws PlatformException {
+  public void stateChanged(final PlatformEvent event) {
     IPlatform platform = event.getSource();
 
     switch (event.getState()) {

@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 
@@ -144,8 +145,9 @@ public class ImapAdapter implements IImapAdapter {
       destFolder = findFolder(destFolderName);
       if (destFolder != null) {
         Map<Folder, Set<Message>> messagesBySourceFolder = groupMessagesBySourceFolder(messages);
-        for (Folder sourceFolder : messagesBySourceFolder.keySet()) {
-          Set<Message> messageSet = messagesBySourceFolder.get(sourceFolder);
+        for (Entry<Folder, Set<Message>> entry : messagesBySourceFolder.entrySet()) {
+          final Folder sourceFolder = entry.getKey();
+          final Set<Message> messageSet = entry.getValue();
           Message[] messagesForSourceFolder = messageSet.toArray(new Message[messageSet.size()]);
           // use copyMessages instead of appendMessages because this can be optimized by the mail-server
           sourceFolder.copyMessages(messagesForSourceFolder, destFolder);

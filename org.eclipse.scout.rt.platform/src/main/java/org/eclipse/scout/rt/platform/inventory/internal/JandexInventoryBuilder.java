@@ -50,7 +50,7 @@ public class JandexInventoryBuilder {
     m_indexList = new ArrayList<>();
   }
 
-  public void scanAllModules() throws PlatformException {
+  public void scanAllModules() {
     try {
       for (Enumeration<URL> en = getClass().getClassLoader().getResources(SCOUT_XML_PATH); en.hasMoreElements();) {
         URL url = en.nextElement();

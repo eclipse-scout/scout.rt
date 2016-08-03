@@ -452,7 +452,7 @@ public final class IOUtility {
    * @return new file
    * @throws ProcessingException
    */
-  public static File createTempFile(InputStream content, String filename, String extension) throws ProcessingException {
+  public static File createTempFile(InputStream content, String filename, String extension) {
     try {
       File temp = File.createTempFile(filename, extension);
       try (InputStream in = content; FileOutputStream out = new FileOutputStream(temp)) {

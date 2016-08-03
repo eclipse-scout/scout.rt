@@ -28,7 +28,6 @@ import javax.security.auth.Subject;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContext;
-import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.cache.AbstractCacheValueResolver;
 import org.eclipse.scout.rt.shared.cache.AllCacheEntryFilter;
@@ -41,12 +40,12 @@ import org.eclipse.scout.rt.shared.servicetunnel.LenientPermissionsWrapper;
 
 /**
  * Common logic for an {@link IAccessControlService} implementation. An Implementation has to override
- * {@link #getCurrentUserCacheKey()} and {@link #execLoadPermissions(Object)}. For example use as generic key
- * type String and simply return as cache key the current userId in {@link #getCurrentUserCacheKey()}. You may use
+ * {@link #getCurrentUserCacheKey()} and {@link #execLoadPermissions(Object)}. For example use as generic key type
+ * String and simply return as cache key the current userId in {@link #getCurrentUserCacheKey()}. You may use
  * {@link #getUserIdOfCurrentUser()} for this purpose.
  * <p>
- * <b>Note</b> that the method {@link #execLoadPermissions(Object)} must not have a valid implementation in the
- * client, as a client will always get the value from the server. Therefore consider two implementations like
+ * <b>Note</b> that the method {@link #execLoadPermissions(Object)} must not have a valid implementation in the client,
+ * as a client will always get the value from the server. Therefore consider two implementations like
  * <tt>'CustomAccessControlService'</tt> and <tt>'CustomServerAccessControlService'</tt>.
  * <p>
  * This class caches the permissions as a default transactional and with a time to live duration of one hour. To change
@@ -267,16 +266,16 @@ public abstract class AbstractAccessControlService<K> implements IAccessControlS
   }
 
   @Override
-  public void clearCache() throws ProcessingException {
+  public void clearCache() {
     getCache().invalidate(new AllCacheEntryFilter<K, PermissionCollection>(), true);
   }
 
   @Override
-  public void clearCacheOfCurrentUser() throws ProcessingException {
+  public void clearCacheOfCurrentUser() {
     clearCache(Collections.singleton(getCurrentUserCacheKey()));
   }
 
-  protected void clearCache(Collection<? extends K> cacheKeys) throws ProcessingException {
+  protected void clearCache(Collection<? extends K> cacheKeys) {
     if (cacheKeys != null && !cacheKeys.isEmpty()) {
       getCache().invalidate(new KeyCacheEntryFilter<K, PermissionCollection>(cacheKeys), true);
     }

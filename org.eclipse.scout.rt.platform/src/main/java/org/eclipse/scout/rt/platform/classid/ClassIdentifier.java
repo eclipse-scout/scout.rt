@@ -25,11 +25,11 @@ import java.util.Arrays;
  *   public class InnerClass {
  *   }
  * }
- * 
+ *
  * public class Foo {
  *   public class A extends Template {
  *   }
- * 
+ *
  *   public class B extends Template {
  *   }
  * }
@@ -48,7 +48,7 @@ public class ClassIdentifier implements Serializable {
   private final Class<?>[] m_segments;
   private final int m_hash;
 
-  public ClassIdentifier(Class<?>... segments) throws IllegalArgumentException {
+  public ClassIdentifier(Class<?>... segments) {
     if (segments == null || segments.length == 0) {
       throw new IllegalArgumentException("The given classes array must not be null or empty");
     }

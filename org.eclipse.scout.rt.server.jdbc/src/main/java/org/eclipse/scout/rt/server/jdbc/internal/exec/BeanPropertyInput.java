@@ -159,7 +159,7 @@ class BeanPropertyInput implements IBindInput {
     }
   }
 
-  private Object[] getRawValues() throws IllegalArgumentException {
+  private Object[] getRawValues() {
     if (m_rawValues != null) {
       return m_rawValues;
     }

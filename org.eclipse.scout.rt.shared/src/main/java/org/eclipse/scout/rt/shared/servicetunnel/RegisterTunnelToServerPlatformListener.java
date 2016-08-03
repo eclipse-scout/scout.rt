@@ -19,7 +19,6 @@ import org.eclipse.scout.rt.platform.IPlatform;
 import org.eclipse.scout.rt.platform.IPlatformListener;
 import org.eclipse.scout.rt.platform.PlatformEvent;
 import org.eclipse.scout.rt.platform.config.CONFIG;
-import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.inventory.ClassInventory;
 import org.eclipse.scout.rt.platform.inventory.IClassInfo;
 import org.eclipse.scout.rt.platform.inventory.IClassInventory;
@@ -35,7 +34,7 @@ public class RegisterTunnelToServerPlatformListener implements IPlatformListener
   private static final Logger LOG = LoggerFactory.getLogger(RegisterTunnelToServerPlatformListener.class);
 
   @Override
-  public void stateChanged(PlatformEvent event) throws PlatformException {
+  public void stateChanged(PlatformEvent event) {
     if (event.getState() == IPlatform.State.BeanManagerPrepared) {
       if (!isEnabled()) {
         return;

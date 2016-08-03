@@ -134,7 +134,7 @@ public class JSONStringer {
    *
    * @return this stringer.
    */
-  public JSONStringer array() throws JSONException {
+  public JSONStringer array() {
     return open(Scope.EMPTY_ARRAY, "[");
   }
 
@@ -143,7 +143,7 @@ public class JSONStringer {
    *
    * @return this stringer.
    */
-  public JSONStringer endArray() throws JSONException {
+  public JSONStringer endArray() {
     return close(Scope.EMPTY_ARRAY, Scope.NONEMPTY_ARRAY, "]");
   }
 
@@ -152,7 +152,7 @@ public class JSONStringer {
    *
    * @return this stringer.
    */
-  public JSONStringer object() throws JSONException {
+  public JSONStringer object() {
     return open(Scope.EMPTY_OBJECT, "{");
   }
 
@@ -161,14 +161,14 @@ public class JSONStringer {
    *
    * @return this stringer.
    */
-  public JSONStringer endObject() throws JSONException {
+  public JSONStringer endObject() {
     return close(Scope.EMPTY_OBJECT, Scope.NONEMPTY_OBJECT, "}");
   }
 
   /**
    * Enters a new scope by appending any necessary whitespace and the given bracket.
    */
-  JSONStringer open(Scope empty, String openBracket) throws JSONException {
+  JSONStringer open(Scope empty, String openBracket) {
     if (m_stack.isEmpty() && out.length() > 0) {
       throw new JSONException("Nesting problem: multiple top-level roots");
     }
@@ -181,7 +181,7 @@ public class JSONStringer {
   /**
    * Closes the current scope by appending any necessary whitespace and the given bracket.
    */
-  JSONStringer close(Scope empty, Scope nonempty, String closeBracket) throws JSONException {
+  JSONStringer close(Scope empty, Scope nonempty, String closeBracket) {
     Scope context = peek();
     if (context != nonempty && context != empty) {
       throw new JSONException("Nesting problem");
@@ -198,7 +198,7 @@ public class JSONStringer {
   /**
    * Returns the value on the top of the stack.
    */
-  private Scope peek() throws JSONException {
+  private Scope peek() {
     if (m_stack.isEmpty()) {
       throw new JSONException("Nesting problem");
     }
@@ -220,7 +220,7 @@ public class JSONStringer {
    *          {@link Double#isNaN() NaNs} or {@link Double#isInfinite() infinities}.
    * @return this stringer.
    */
-  public JSONStringer value(Object value) throws JSONException {
+  public JSONStringer value(Object value) {
     if (m_stack.isEmpty()) {
       throw new JSONException("Nesting problem");
     }
@@ -259,7 +259,7 @@ public class JSONStringer {
    *
    * @return this stringer.
    */
-  public JSONStringer value(boolean value) throws JSONException {
+  public JSONStringer value(boolean value) {
     if (m_stack.isEmpty()) {
       throw new JSONException("Nesting problem");
     }
@@ -275,7 +275,7 @@ public class JSONStringer {
    *          a finite value. May not be {@link Double#isNaN() NaNs} or {@link Double#isInfinite() infinities}.
    * @return this stringer.
    */
-  public JSONStringer value(double value) throws JSONException {
+  public JSONStringer value(double value) {
     if (m_stack.isEmpty()) {
       throw new JSONException("Nesting problem");
     }
@@ -289,7 +289,7 @@ public class JSONStringer {
    *
    * @return this stringer.
    */
-  public JSONStringer value(long value) throws JSONException {
+  public JSONStringer value(long value) {
     if (m_stack.isEmpty()) {
       throw new JSONException("Nesting problem");
     }
@@ -368,7 +368,7 @@ public class JSONStringer {
    *          the name of the forthcoming value. May not be null.
    * @return this stringer.
    */
-  public JSONStringer key(String name) throws JSONException {
+  public JSONStringer key(String name) {
     if (name == null) {
       throw new JSONException("Names must be non-null");
     }
@@ -380,7 +380,7 @@ public class JSONStringer {
   /**
    * Inserts any necessary separators and whitespace before a name. Also adjusts the stack to expect the key's value.
    */
-  private void beforeKey() throws JSONException {
+  private void beforeKey() {
     Scope context = peek();
     if (context == Scope.NONEMPTY_OBJECT) { // first in object
       out.append(',');
@@ -396,7 +396,7 @@ public class JSONStringer {
    * Inserts any necessary separators and whitespace before a literal value, inline array, or inline object. Also
    * adjusts the stack to expect either a closing bracket or another element.
    */
-  private void beforeValue() throws JSONException {
+  private void beforeValue() {
     if (m_stack.isEmpty()) {
       return;
     }

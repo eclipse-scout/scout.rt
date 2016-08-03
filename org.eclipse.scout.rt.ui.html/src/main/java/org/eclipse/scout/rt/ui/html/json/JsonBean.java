@@ -16,6 +16,8 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.TreeMap;
 
 import org.eclipse.scout.rt.platform.annotations.IgnoreProperty;
@@ -84,11 +86,13 @@ public class JsonBean implements IJsonObject {
     if (Map.class.isAssignableFrom(type)) {
       JSONObject jsonMap = new JSONObject();
       Map map = (Map) m_bean;
-      for (Object key : map.keySet()) {
-        if (!(key instanceof String)) {
+      @SuppressWarnings("unchecked")
+      Set<Entry> entries = (Set<Entry>) map.entrySet();
+      for (Entry entry : entries) {
+        if (!(entry.getKey() instanceof String)) {
           throw new IllegalArgumentException("Cannot convert " + type + " to json object");
         }
-        jsonMap.put((String) key, map.get(key));
+        jsonMap.put((String) entry.getKey(), entry.getValue());
       }
       return jsonMap;
     }
@@ -134,5 +138,4 @@ public class JsonBean implements IJsonObject {
       throw new IllegalArgumentException(type + " to json", e);
     }
   }
-
 }

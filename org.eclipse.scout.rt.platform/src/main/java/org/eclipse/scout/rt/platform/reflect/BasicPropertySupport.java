@@ -21,6 +21,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.eclipse.scout.rt.platform.eventlistprofiler.EventListenerProfiler;
@@ -390,8 +391,9 @@ public class BasicPropertySupport implements IEventListenerSource {
     HashMap<String, List<PropertyChangeListener>> listeners = new HashMap<String, List<PropertyChangeListener>>();
     synchronized (m_listenerLock) {
       if (m_childListeners != null) {
-        for (String propertyName : m_childListeners.keySet()) {
-          List propertySpecificListeners = m_childListeners.get(propertyName);
+        for (Entry<String, List<Object>> entry : m_childListeners.entrySet()) {
+          final String propertyName = entry.getKey();
+          final List propertySpecificListeners = entry.getValue();
           if (propertySpecificListeners != null) {
             for (Object o : propertySpecificListeners) {
               if (o instanceof WeakReference) {
@@ -561,12 +563,14 @@ public class BasicPropertySupport implements IEventListenerSource {
   public boolean hasListeners(String propertyName) {
     synchronized (m_listenerLock) {
       List generalListeners = getPropertyChangeListeners();
+      if (CollectionUtility.hasElements(generalListeners)) {
+        return true;
+      }
       List specificListeners = null;
       if (propertyName != null && m_childListeners != null) {
         specificListeners = getSpecificPropertyChangeListeners().get(propertyName);
       }
-      int count = (generalListeners != null ? generalListeners.size() : 0) + (specificListeners != null ? specificListeners.size() : 0);
-      return count > 0;
+      return CollectionUtility.hasElements(specificListeners);
     }
   }
 }

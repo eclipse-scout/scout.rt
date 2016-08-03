@@ -366,46 +366,41 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
       throw new IllegalStateException("desktop is active");
     }
     m_desktop = desktop;
-    if (m_desktop != null) {
-      if (m_virtualDesktop != null) {
-        for (DesktopListener listener : m_virtualDesktop.getDesktopListeners()) {
-          m_desktop.addDesktopListener(listener);
-        }
-        for (Map.Entry<String, EventListenerList> e : m_virtualDesktop.getPropertyChangeListenerMap().entrySet()) {
-          String propName = e.getKey();
-          EventListenerList list = e.getValue();
-          if (propName == null) {
-            for (PropertyChangeListener listener : list.getListeners(PropertyChangeListener.class)) {
-              m_desktop.addPropertyChangeListener(listener);
-            }
-          }
-          else {
-            for (PropertyChangeListener listener : list.getListeners(PropertyChangeListener.class)) {
-              m_desktop.addPropertyChangeListener(propName, listener);
-            }
-          }
-        }
-        for (Map.Entry<Object, EventListenerList> e : m_virtualDesktop.getDataChangeListenerMap().entrySet()) {
-          Object dataType = e.getKey();
-          EventListenerList list = e.getValue();
-          if (dataType == null) {
-            for (DataChangeListener listener : list.getListeners(DataChangeListener.class)) {
-              m_desktop.addDataChangeListener(listener);
-            }
-          }
-          else {
-            for (DataChangeListener listener : list.getListeners(DataChangeListener.class)) {
-              m_desktop.addDataChangeListener(listener, dataType);
-            }
-          }
-        }
-        m_virtualDesktop = null;
+    if (m_virtualDesktop != null) {
+      for (DesktopListener listener : m_virtualDesktop.getDesktopListeners()) {
+        m_desktop.addDesktopListener(listener);
       }
-      m_desktop.initDesktop();
+      for (Map.Entry<String, EventListenerList> e : m_virtualDesktop.getPropertyChangeListenerMap().entrySet()) {
+        String propName = e.getKey();
+        EventListenerList list = e.getValue();
+        if (propName == null) {
+          for (PropertyChangeListener listener : list.getListeners(PropertyChangeListener.class)) {
+            m_desktop.addPropertyChangeListener(listener);
+          }
+        }
+        else {
+          for (PropertyChangeListener listener : list.getListeners(PropertyChangeListener.class)) {
+            m_desktop.addPropertyChangeListener(propName, listener);
+          }
+        }
+      }
+      for (Map.Entry<Object, EventListenerList> e : m_virtualDesktop.getDataChangeListenerMap().entrySet()) {
+        Object dataType = e.getKey();
+        EventListenerList list = e.getValue();
+        if (dataType == null) {
+          for (DataChangeListener listener : list.getListeners(DataChangeListener.class)) {
+            m_desktop.addDataChangeListener(listener);
+          }
+        }
+        else {
+          for (DataChangeListener listener : list.getListeners(DataChangeListener.class)) {
+            m_desktop.addDataChangeListener(listener, dataType);
+          }
+        }
+      }
+      m_virtualDesktop = null;
     }
-    else {
-      m_virtualDesktop = new VirtualDesktop();
-    }
+    m_desktop.initDesktop();
   }
 
   /**

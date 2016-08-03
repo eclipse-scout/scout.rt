@@ -25,6 +25,7 @@ import com.sun.codemodel.JStatement;
  * @see JConditional
  * @since 5.1
  */
+@SuppressWarnings("squid:S00100")
 public class JConditionalEx implements JStatement {
 
   private final List<P_ElseIf> m_elseIfs = new ArrayList<>();

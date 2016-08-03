@@ -33,7 +33,7 @@ public final class CONFIG {
    * @throws PlatformException
    *           if the property is invalid
    */
-  public static <DATA_TYPE> DATA_TYPE getPropertyValue(Class<? extends IConfigProperty<DATA_TYPE>> clazz) throws PlatformException {
+  public static <DATA_TYPE> DATA_TYPE getPropertyValue(Class<? extends IConfigProperty<DATA_TYPE>> clazz) {
     return BEANS.get(clazz).getValue();
   }
 }

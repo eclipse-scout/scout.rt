@@ -88,7 +88,7 @@ public class JSONArray {
    * @throws JSONException
    *           if the parse fails or doesn't yield a {@code JSONArray}.
    */
-  public JSONArray(JSONTokener readFrom) throws JSONException {
+  public JSONArray(JSONTokener readFrom) {
     /*
      * Getting the parser to populate this could get tricky. Instead, just
      * parse to temporary JSONArray and then steal the data from that.
@@ -111,14 +111,14 @@ public class JSONArray {
    * @throws JSONException
    *           if the parse fails or doesn't yield a {@code JSONArray}.
    */
-  public JSONArray(String json) throws JSONException {
+  public JSONArray(String json) {
     this(new JSONTokener(json));
   }
 
   /**
    * Creates a new {@code JSONArray} with values from the given primitive array.
    */
-  public JSONArray(Object array) throws JSONException {
+  public JSONArray(Object array) {
     if (!array.getClass().isArray()) {
       throw new JSONException("Not a primitive array: " + array.getClass());
     }
@@ -153,7 +153,7 @@ public class JSONArray {
    *          a finite value. May not be {@link Double#isNaN() NaNs} or {@link Double#isInfinite() infinities}.
    * @return this array.
    */
-  public JSONArray put(double value) throws JSONException {
+  public JSONArray put(double value) {
     m_values.add(JSON.checkDouble(value));
     return this;
   }
@@ -195,7 +195,7 @@ public class JSONArray {
   /**
    * Same as {@link #put}, with added validity checks.
    */
-  void checkedPut(Object value) throws JSONException {
+  void checkedPut(Object value) {
     if (value instanceof Number) {
       JSON.checkDouble(((Number) value).doubleValue());
     }
@@ -209,7 +209,7 @@ public class JSONArray {
    *
    * @return this array.
    */
-  public JSONArray put(int index, boolean value) throws JSONException {
+  public JSONArray put(int index, boolean value) {
     return put(index, (Boolean) value);
   }
 
@@ -221,7 +221,7 @@ public class JSONArray {
    *          a finite value. May not be {@link Double#isNaN() NaNs} or {@link Double#isInfinite() infinities}.
    * @return this array.
    */
-  public JSONArray put(int index, double value) throws JSONException {
+  public JSONArray put(int index, double value) {
     return put(index, (Double) value);
   }
 
@@ -231,7 +231,7 @@ public class JSONArray {
    *
    * @return this array.
    */
-  public JSONArray put(int index, int value) throws JSONException {
+  public JSONArray put(int index, int value) {
     return put(index, (Integer) value);
   }
 
@@ -241,7 +241,7 @@ public class JSONArray {
    *
    * @return this array.
    */
-  public JSONArray put(int index, long value) throws JSONException {
+  public JSONArray put(int index, long value) {
     return put(index, (Long) value);
   }
 
@@ -254,7 +254,7 @@ public class JSONArray {
    *          or {@code null}. May not be {@link Double#isNaN() NaNs} or {@link Double#isInfinite() infinities}.
    * @return this array.
    */
-  public JSONArray put(int index, Object value) throws JSONException {
+  public JSONArray put(int index, Object value) {
     if (value instanceof Number) {
       // deviate from the original by checking all Numbers, not just floats & doubles
       JSON.checkDouble(((Number) value).doubleValue());
@@ -282,7 +282,7 @@ public class JSONArray {
    *           if this array has no value at {@code index}, or if that value is the {@code null} reference. This method
    *           returns normally if the value is {@code JSONObject#NULL}.
    */
-  public Object get(int index) throws JSONException {
+  public Object get(int index) {
     try {
       Object value = m_values.get(index);
       if (value == null) {
@@ -321,7 +321,7 @@ public class JSONArray {
    * @throws JSONException
    *           if the value at {@code index} doesn't exist or cannot be coerced to a boolean.
    */
-  public boolean getBoolean(int index) throws JSONException {
+  public boolean getBoolean(int index) {
     Object object = get(index);
     Boolean result = JSON.toBoolean(object);
     if (result == null) {
@@ -354,7 +354,7 @@ public class JSONArray {
    * @throws JSONException
    *           if the value at {@code index} doesn't exist or cannot be coerced to a double.
    */
-  public double getDouble(int index) throws JSONException {
+  public double getDouble(int index) {
     Object object = get(index);
     Double result = JSON.toDouble(object);
     if (result == null) {
@@ -387,7 +387,7 @@ public class JSONArray {
    * @throws JSONException
    *           if the value at {@code index} doesn't exist or cannot be coerced to a int.
    */
-  public int getInt(int index) throws JSONException {
+  public int getInt(int index) {
     Object object = get(index);
     Integer result = JSON.toInteger(object);
     if (result == null) {
@@ -419,7 +419,7 @@ public class JSONArray {
    * @throws JSONException
    *           if the value at {@code index} doesn't exist or cannot be coerced to a long.
    */
-  public long getLong(int index) throws JSONException {
+  public long getLong(int index) {
     Object object = get(index);
     Long result = JSON.toLong(object);
     if (result == null) {
@@ -451,7 +451,7 @@ public class JSONArray {
    * @throws JSONException
    *           if no such value exists.
    */
-  public String getString(int index) throws JSONException {
+  public String getString(int index) {
     Object object = get(index);
     String result = JSON.toString(object);
     if (result == null) {
@@ -484,7 +484,7 @@ public class JSONArray {
    * @throws JSONException
    *           if the value doesn't exist or is not a {@code JSONArray}.
    */
-  public JSONArray getJSONArray(int index) throws JSONException {
+  public JSONArray getJSONArray(int index) {
     Object object = get(index);
     if (object instanceof JSONArray) {
       return (JSONArray) object;
@@ -508,7 +508,7 @@ public class JSONArray {
    * @throws JSONException
    *           if the value doesn't exist or is not a {@code JSONObject}.
    */
-  public JSONObject getJSONObject(int index) throws JSONException {
+  public JSONObject getJSONObject(int index) {
     Object object = get(index);
     if (object instanceof JSONObject) {
       return (JSONObject) object;
@@ -531,7 +531,7 @@ public class JSONArray {
    * Names and values are paired up by index from 0 through to the shorter array's length. Names that are not strings
    * will be coerced to strings. This method returns null if either array is empty.
    */
-  public JSONObject toJSONObject(JSONArray names) throws JSONException {
+  public JSONObject toJSONObject(JSONArray names) {
     JSONObject result = new JSONObject();
     int length = Math.min(names.length(), m_values.size());
     if (length == 0) {
@@ -553,7 +553,7 @@ public class JSONArray {
    * &quot;12\&quot; pizza&quot; + &quot;taco&quot; + &quot;soda&quot;
    * </pre>
    */
-  public String join(String separator) throws JSONException {
+  public String join(String separator) {
     JSONStringer stringer = new JSONStringer();
     stringer.open(JSONStringer.Scope.NULL, "");
     for (int i = 0, size = m_values.size(); i < size; i++) {
@@ -598,13 +598,13 @@ public class JSONArray {
    * @param indentSpaces
    *          the number of spaces to indent for each level of nesting.
    */
-  public String toString(int indentSpaces) throws JSONException {
+  public String toString(int indentSpaces) {
     JSONStringer stringer = new JSONStringer(indentSpaces);
     writeTo(stringer);
     return stringer.toString();
   }
 
-  void writeTo(JSONStringer stringer) throws JSONException {
+  void writeTo(JSONStringer stringer) {
     stringer.array();
     for (Object value : m_values) {
       stringer.value(value);

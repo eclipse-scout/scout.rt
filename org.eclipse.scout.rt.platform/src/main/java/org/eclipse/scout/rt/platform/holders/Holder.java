@@ -64,6 +64,7 @@ public class Holder<T> implements IHolder<T>, Serializable {
   }
 
   @Override
+  @SuppressWarnings("findbugs:RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE")
   public String toString() {
     StringBuilder builder = new StringBuilder();
     builder.append("Holder<");

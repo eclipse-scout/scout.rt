@@ -360,7 +360,7 @@ public class SqlParser {
         le.addChild(oe);
       }
       //restore incomplete
-      if (ls != null && oe == null) {
+      if (ls != null) {
         list.add(0, ls);
       }
       return le;
@@ -449,7 +449,7 @@ public class SqlParser {
         me.addChild(se);
       }
       //restore incomplete
-      if (mo != null && se == null) {
+      if (mo != null) {
         list.add(0, mo);
       }
       return me;
@@ -497,7 +497,7 @@ public class SqlParser {
       }
       else {
         //restore incomplete
-        if (up != null && a == null) {
+        if (up != null) {
           list.add(0, up);
         }
         return null;
@@ -526,7 +526,7 @@ public class SqlParser {
       }
       else {
         //restore incomplete
-        if (mo != null && a == null) {
+        if (mo != null) {
           list.add(0, mo);
         }
         return null;
@@ -555,7 +555,7 @@ public class SqlParser {
       }
       else {
         //restore incomplete
-        if (nm != null && be == null) {
+        if (nm != null) {
           list.add(0, nm);
         }
         return null;
@@ -570,6 +570,7 @@ public class SqlParser {
     }
   }
 
+  @SuppressWarnings("squid:S2583")
   private BracketExpr parseBracketExpr(List<IToken> list, ParseContext ctx) {
     //BracketExpr = OpenBracketToken (Statement | ListExpr) CloseBracketToken
     ParseStep lock = ctx.checkAndAdd("BracketExpr", list);

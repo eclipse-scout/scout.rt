@@ -116,7 +116,7 @@ public class JSONTokener {
    * @throws JSONException
    *           if the input is malformed.
    */
-  public Object nextValue() throws JSONException {
+  public Object nextValue() {
     int c = nextCleanInternal();
     switch (c) {
       case -1:
@@ -138,7 +138,7 @@ public class JSONTokener {
     }
   }
 
-  private int nextCleanInternal() throws JSONException {
+  private int nextCleanInternal() {
     while (m_pos < m_in.length()) {
       int c = m_in.charAt(m_pos++);
       switch (c) {
@@ -214,7 +214,7 @@ public class JSONTokener {
    * @param quote
    *          either ' or ".
    */
-  public String nextString(char quote) throws JSONException {
+  public String nextString(char quote) {
     /*
      * For strings that are free of escape sequences, we can just extract
      * the result as a substring of the input. But if we encounter an escape
@@ -259,7 +259,7 @@ public class JSONTokener {
    * backslash '\' should have already been read. This supports both unicode escapes "u000A" and two-character escapes
    * "\n".
    */
-  private char readEscapeCharacter() throws JSONException {
+  private char readEscapeCharacter() {
     char escaped = m_in.charAt(m_pos++);
     switch (escaped) {
       case 'u':
@@ -302,7 +302,7 @@ public class JSONTokener {
    * Reads a null, boolean, numeric or unquoted string literal value. Numeric values will be returned as an Integer,
    * Long, or Double, in that order of preference.
    */
-  private Object readLiteral() throws JSONException {
+  private Object readLiteral() {
     String literal = nextToInternal("{}[]/\\:,=;# \t\f");
 
     if (literal.length() == 0) {
@@ -381,7 +381,7 @@ public class JSONTokener {
    * Reads a sequence of key/value pairs and the trailing closing brace '}' of an object. The opening brace '{' should
    * have already been read.
    */
-  private JSONObject readObject() throws JSONException {
+  private JSONObject readObject() {
     JSONObject result = new JSONObject();
 
     /* Peek to see if this is the empty object. */
@@ -437,7 +437,7 @@ public class JSONTokener {
    * already been read. Note that "[]" yields an empty array, but "[,]" returns a two-element array equivalent to
    * "[null,null]".
    */
-  private JSONArray readArray() throws JSONException {
+  private JSONArray readArray() {
     JSONArray result = new JSONArray();
 
     /* to cover input that ends with ",]". */
@@ -519,7 +519,7 @@ public class JSONTokener {
   /**
    * Returns the next available character if it equals {@code c}. Otherwise an exception is thrown.
    */
-  public char next(char c) throws JSONException {
+  public char next(char c) {
     char result = next();
     if (result != c) {
       throw syntaxError("Expected " + c + " but was " + result);
@@ -532,7 +532,7 @@ public class JSONTokener {
    * before such a character can be found, the null character '\0' is returned. The return value of this method is
    * ambiguous for JSON strings that contain the character '\0'.
    */
-  public char nextClean() throws JSONException {
+  public char nextClean() {
     int nextCleanInt = nextCleanInternal();
     return nextCleanInt == -1 ? '\0' : (char) nextCleanInt;
   }
@@ -547,7 +547,7 @@ public class JSONTokener {
    * @throws JSONException
    *           if the remaining input is not long enough to satisfy this request.
    */
-  public String next(int length) throws JSONException {
+  public String next(int length) {
     if (m_pos + length > m_in.length()) {
       throw syntaxError(length + " is out of bounds");
     }

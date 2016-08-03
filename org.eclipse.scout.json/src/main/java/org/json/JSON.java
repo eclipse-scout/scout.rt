@@ -32,7 +32,7 @@ class JSON {
   /**
    * Returns the input if it is a JSON-permissible value; throws otherwise.
    */
-  static double checkDouble(double d) throws JSONException {
+  static double checkDouble(double d) {
     if (Double.isInfinite(d) || Double.isNaN(d)) {
       throw new JSONException("Forbidden numeric value: " + d);
     }
@@ -116,8 +116,7 @@ class JSON {
     return null;
   }
 
-  public static JSONException typeMismatch(Object indexOrName, Object actual,
-      String requiredType) throws JSONException {
+  public static JSONException typeMismatch(Object indexOrName, Object actual, String requiredType) {
     if (actual == null) {
       throw new JSONException("Value at " + indexOrName + " is null.");
     }
@@ -128,8 +127,7 @@ class JSON {
     }
   }
 
-  public static JSONException typeMismatch(Object actual, String requiredType)
-      throws JSONException {
+  public static JSONException typeMismatch(Object actual, String requiredType) {
     if (actual == null) {
       throw new JSONException("Value is null.");
     }

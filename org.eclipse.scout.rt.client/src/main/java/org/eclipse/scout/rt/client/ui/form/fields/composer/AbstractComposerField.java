@@ -507,7 +507,10 @@ public abstract class AbstractComposerField extends AbstractFormField implements
       else if ("entity".equals(xmlElem.getTagName())) {
         String id = xmlElem.getAttribute("id");
         boolean negated = Boolean.parseBoolean(xmlElem.getAttribute("negated"));
-        String text = xmlElem.getAttribute("displayValues");
+        String text = null;
+        if (xmlElem.hasAttribute("displayValues")) {
+          text = xmlElem.getAttribute("displayValues");
+        }
         // find definition
         EntityPath entityPath = DataModelUtility.externalIdToEntityPath(getDataModel(), id);
         IDataModelEntity foundEntity = (entityPath != null ? entityPath.lastElement() : null);
