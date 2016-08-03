@@ -52,7 +52,7 @@ describe('ObjectFactory', function() {
     } else if ('AggregateTableControl' === objectType) {
       model.table = {
         columns: [],
-        on: function(){}
+        on: function() {}
       };
     } else if ('TabBox' === objectType) {
       var tabItemId = 'tabItem' + id;
@@ -93,6 +93,25 @@ describe('ObjectFactory', function() {
       modelAdapter = session.getModelAdapter(model.id);
       expect(modelAdapter).toBe(object);
     }
+  });
+
+  it('puts the object type to the object after creation', function() {
+    var object = scout.objectFactory._createObjectByType({}, 'StringField');
+    expect(object.objectType).toBe('StringField');
+  });
+
+  it('uses given object type to create the object', function() {
+    var object = scout.objectFactory._createObjectByType({
+      objectType: 'NumberField'
+    }, 'StringField');
+    expect(object instanceof scout.StringField).toBe(true);
+  });
+
+  it('uses the object type of the model if no explit type is specified', function() {
+    var object = scout.objectFactory._createObjectByType({
+      objectType: 'NumberField'
+    });
+    expect(object instanceof scout.NumberField).toBe(true);
   });
 
   describe('finds the correct constructor function if no factory is defined', function() {

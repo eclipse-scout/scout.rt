@@ -87,6 +87,9 @@ scout.ObjectFactory.prototype._createObjectByType = function(model, type) {
       '\' does not exist, or no factory is registered to create an instance for the given objectType');
   }
 
+  // Put object type used to create the object
+  scoutObject.objectType = objectType;
+
   return scoutObject;
 };
 
