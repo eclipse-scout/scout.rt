@@ -10,7 +10,6 @@
  ******************************************************************************/
 scout.SimpleTabAreaLayout = function(tabArea) {
   scout.SimpleTabAreaLayout.parent.call(this);
-
   this.tabArea = tabArea;
   this._$overflowTab;
   this._overflowTabsIndizes = [];
@@ -109,7 +108,8 @@ scout.SimpleTabAreaLayout.prototype.smallPrefSize = function() {
 
 scout.SimpleTabAreaLayout.prototype.preferredLayoutSize = function($container) {
   var numTabs = this.tabArea.getTabs().length;
-  return new scout.Dimension(numTabs * scout.SimpleTabAreaLayout.TAB_WIDTH_LARGE, scout.graphics.prefSize(this.tabArea.htmlComp.$comp, true, {
+  return new scout.Dimension(numTabs * scout.SimpleTabAreaLayout.TAB_WIDTH_LARGE, scout.graphics.prefSize(this.tabArea.htmlComp.$comp, {
+    includeMargin: true,
     useCssSize: true
   }).height);
 };

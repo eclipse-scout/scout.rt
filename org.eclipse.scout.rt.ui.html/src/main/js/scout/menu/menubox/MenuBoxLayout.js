@@ -194,14 +194,14 @@ scout.MenuBoxLayout.prototype.undoCollapse = function(menus) {
   this._removeMenusFromEllipsis(menus, this.menuBox.$container);
 };
 
-scout.MenuBoxLayout.prototype._createAndRenderEllipsis = function($parent) {
+scout.MenuBoxLayout.prototype._createAndRenderEllipsis = function($container) {
   var ellipsis = scout.menus.createEllipsisMenu({
     parent: this.menuBox,
     horizontalAlignment: 1,
     compact: this.menuBox.compact
   });
   ellipsis.uiCssClass = this.menuBox.uiMenuCssClass;
-  ellipsis.render($parent);
+  ellipsis.render($container);
   this._ellipsis = ellipsis;
 };
 
@@ -241,7 +241,8 @@ scout.MenuBoxLayout.prototype.actualPrefSize = function(menus) {
 
   menus = menus || this.visibleMenus();
   menusWidth = this._menusWidth(menus);
-  prefSize = scout.graphics.prefSize(this.menuBox.$container, true, {
+  prefSize = scout.graphics.prefSize(this.menuBox.$container, {
+    includeMargin: true,
     useCssSize: true
   });
   prefSize.width = menusWidth + this.menuBox.htmlComp.getInsets().horizontal();

@@ -180,14 +180,14 @@ scout.HtmlComponent.prototype.setLayout = function(layout) {
  * Returns the preferred size of the component, insets included.
  * @exception When component has no layout
  */
-scout.HtmlComponent.prototype.getPreferredSize = function() {
-  if (this.layout) {
-    var prefSize = this.layout.preferredLayoutSize(this.$comp);
-    $.log.trace('(HtmlComponent#getPreferredSize) ' + this.debug() + ' preferredSize=' + prefSize);
-    return prefSize;
-  } else {
+scout.HtmlComponent.prototype.getPreferredSize = function(options) {
+  if (!this.layout) {
     throw new Error('Called getPreferredSize() but component has no layout');
   }
+  options = options || {};
+  var prefSize = this.layout.preferredLayoutSize(this.$comp, options);
+  $.log.trace('(HtmlComponent#getPreferredSize) ' + this.debug() + ' widthHint=' + options.widthHint + ' heightHint=' + options.heightHint + ' preferredSize=' + prefSize);
+  return prefSize;
 };
 
 /**

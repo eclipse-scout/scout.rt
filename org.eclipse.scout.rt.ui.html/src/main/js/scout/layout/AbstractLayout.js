@@ -40,6 +40,6 @@ scout.AbstractLayout.prototype.layout = function($container) { //
  *
  * @return scout.Dimension preferred size
  */
-scout.AbstractLayout.prototype.preferredLayoutSize = function($container) {
-  return scout.graphics.prefSize($container);
+scout.AbstractLayout.prototype.preferredLayoutSize = function($container, options) {
+  return scout.graphics.prefSize($container, options);
 };

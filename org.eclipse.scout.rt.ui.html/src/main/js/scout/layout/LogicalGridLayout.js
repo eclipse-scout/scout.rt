@@ -13,7 +13,7 @@
  */
 scout.LogicalGridLayout = function(hgap, vgap) {
   scout.LogicalGridLayout.parent.call(this);
-  this.validityBasedOnParentSize = new scout.Dimension();
+  this.validityBasedOnContainerSize = new scout.Dimension();
   this.valid = false;
   this.m_info;
   this.m_hgap = hgap || 0;
@@ -21,13 +21,13 @@ scout.LogicalGridLayout = function(hgap, vgap) {
 };
 scout.inherits(scout.LogicalGridLayout, scout.AbstractLayout);
 
-scout.LogicalGridLayout.prototype._verifyLayout = function($parent) {
-  var htmlParent = scout.HtmlComponent.get($parent),
-    parentSize = htmlParent.getSize();
+scout.LogicalGridLayout.prototype._verifyLayout = function($container) {
+  var htmlContainer = scout.HtmlComponent.get($container),
+    containerSize = htmlContainer.getSize();
 
-  if (!this.valid || !this.validityBasedOnParentSize.equals(parentSize)) {
-    this.validityBasedOnParentSize = parentSize;
-    this.validateLayout($parent);
+  if (!this.valid || !this.validityBasedOnContainerSize.equals(containerSize)) {
+    this.validityBasedOnContainerSize = containerSize;
+    this.validateLayout($container);
     this.valid = true;
   }
 };
@@ -39,9 +39,9 @@ scout.LogicalGridLayout.prototype.invalidate = function() {
   this.valid = false;
 };
 
-scout.LogicalGridLayout.prototype.validateLayout = function($parent) {
+scout.LogicalGridLayout.prototype.validateLayout = function($container) {
   var visibleComps = [], visibleCons = [], i, cons,
-    $children = $parent.children('.form-field');
+    $children = $container.children('.form-field');
 
   for (i = 0; i < $children.length; i++) {
     var $comp = $children.eq(i);
@@ -54,16 +54,16 @@ scout.LogicalGridLayout.prototype.validateLayout = function($parent) {
     }
   }
   this.m_info = new scout.LogicalGridLayoutInfo(visibleComps, visibleCons, this.m_hgap, this.m_vgap);
-  $.log.trace('(LogicalGridLayout#validateLayout) $parent=' + scout.HtmlComponent.get($parent).debug());
+  $.log.trace('(LogicalGridLayout#validateLayout) $container=' + scout.HtmlComponent.get($container).debug());
 };
 
-scout.LogicalGridLayout.prototype.layout = function($parent) {
-  this._verifyLayout($parent);
-  var htmlParent = scout.HtmlComponent.get($parent),
-    parentSize = htmlParent.getAvailableSize(),
-    parentInsets = htmlParent.getInsets();
-  $.log.trace('(LogicalGridLayout#layout) parent ' + htmlParent.debug() + ' size=' + parentSize + ' insets=' + parentInsets);
-  var cellBounds = this.m_info.layoutCellBounds(parentSize, parentInsets);
+scout.LogicalGridLayout.prototype.layout = function($container) {
+  this._verifyLayout($container);
+  var htmlContainer = scout.HtmlComponent.get($container),
+    containerSize = htmlContainer.getAvailableSize(),
+    containerInsets = htmlContainer.getInsets();
+  $.log.trace('(LogicalGridLayout#layout) container ' + htmlContainer.debug() + ' size=' + containerSize + ' insets=' + containerInsets);
+  var cellBounds = this.m_info.layoutCellBounds(containerSize, containerInsets);
 
   // Set bounds of components
   var r1, r2, r, d, $comp, i, htmlComp, data, delta, margins;
@@ -123,12 +123,12 @@ scout.LogicalGridLayout.prototype.layout = function($parent) {
   }
 };
 
-scout.LogicalGridLayout.prototype.preferredLayoutSize = function($parent) {
-  return this.getLayoutSize($parent, scout.LayoutConstants.PREF);
+scout.LogicalGridLayout.prototype.preferredLayoutSize = function($container) {
+  return this.getLayoutSize($container, scout.LayoutConstants.PREF);
 };
 
-scout.LogicalGridLayout.prototype.getLayoutSize = function($parent, sizeflag) {
-  this._verifyLayout($parent);
+scout.LogicalGridLayout.prototype.getLayoutSize = function($container, sizeflag) {
+  this._verifyLayout($container);
   var dim = new scout.Dimension();
   // w
   var i, w, h, useCount = 0;
@@ -151,7 +151,7 @@ scout.LogicalGridLayout.prototype.getLayoutSize = function($parent, sizeflag) {
     useCount++;
   }
   if (dim.width > 0 && dim.height > 0) {
-    var insets = scout.HtmlComponent.get($parent).getInsets();
+    var insets = scout.HtmlComponent.get($container).getInsets();
     dim.width += insets.horizontal();
     dim.height += insets.vertical();
   }

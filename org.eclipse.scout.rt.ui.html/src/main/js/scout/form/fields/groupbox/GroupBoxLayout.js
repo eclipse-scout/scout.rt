@@ -145,7 +145,9 @@ scout.GroupBoxLayout.prototype.preferredLayoutSize = function($container) {
 };
 
 scout.GroupBoxLayout.prototype._titleHeight = function() {
-  return scout.graphics.prefSize(this._groupBox.$title, true).height;
+  return scout.graphics.prefSize(this._groupBox.$title, {
+    includeMargin: true
+  }).height;
 };
 
 scout.GroupBoxLayout.prototype._menuBarSize = function(htmlMenuBar, containerSize, statusWidth) {

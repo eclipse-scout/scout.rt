@@ -8,8 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-scout.ImageFieldLayout = function(formField) {
-  scout.ImageFieldLayout.parent.call(this, formField);
+scout.ImageFieldLayout = function(imageField) {
+  scout.ImageFieldLayout.parent.call(this, imageField);
 };
 scout.inherits(scout.ImageFieldLayout, scout.FormFieldLayout);
 

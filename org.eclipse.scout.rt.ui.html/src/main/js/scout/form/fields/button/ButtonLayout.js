@@ -18,5 +18,7 @@ scout.ButtonLayout = function(button) {
 scout.inherits(scout.ButtonLayout, scout.FormFieldLayout);
 
 scout.ButtonLayout.prototype.naturalSize = function() {
-  return scout.graphics.prefSize(this.button.$field, true);
+  return scout.graphics.prefSize(this.button.$field, {
+    includeMargin: true
+  });
 };

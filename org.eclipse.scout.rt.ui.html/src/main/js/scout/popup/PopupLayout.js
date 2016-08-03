@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 scout.PopupLayout = function(popup) {
-  scout.PopupLayout.parent.call(this, popup);
+  scout.PopupLayout.parent.call(this);
   this.popup = popup;
 };
 scout.inherits(scout.PopupLayout, scout.AbstractLayout);

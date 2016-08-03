@@ -9,6 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 scout.DatePickerLayout = function(datePicker) {
+  scout.DatePickerLayout.parent.call(this);
   this._datePicker = datePicker;
   this._cache = {
     monthWidth: 0,

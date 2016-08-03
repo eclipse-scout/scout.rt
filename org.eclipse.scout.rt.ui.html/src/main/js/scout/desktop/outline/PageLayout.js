@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 scout.PageLayout = function(outline, page) {
-  scout.PageLayout.parent.call(this, outline);
+  scout.PageLayout.parent.call(this);
   this.outline = outline;
   this.page = page;
 };
@@ -65,7 +65,8 @@ scout.PageLayout.prototype.preferredLayoutSize = function($container) {
   }
 
   // needs a width to be able to calculate the pref height -> container width needs to be correct already
-  titlePrefHeight = scout.graphics.prefSize($text, true, {
+  titlePrefHeight = scout.graphics.prefSize($text, {
+    includeMargin: true,
     widthHint: containerSize.width - nodeMenuBarWidth
   }).height;
 

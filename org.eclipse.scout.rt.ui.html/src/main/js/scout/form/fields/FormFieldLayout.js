@@ -57,7 +57,9 @@ scout.FormFieldLayout.prototype.layout = function($container) {
       if (formField.$label.hasClass('empty')) {
         labelWidth = 0;
       } else {
-        labelWidth = scout.graphics.prefSize(formField.$label, true).width;
+        labelWidth = scout.graphics.prefSize(formField.$label, {
+          includeMargin: true
+        }).width;
       }
     }
     if (scout.isOneOf(formField.labelPosition, scout.FormField.LABEL_POSITION_DEFAULT, scout.FormField.LABEL_POSITION_LEFT)) {
@@ -191,7 +193,9 @@ scout.FormFieldLayout.prototype.preferredLayoutSize = function($container) {
       if (formField.$label.hasClass('empty')) {
         labelWidth = 0;
       } else {
-        labelWidth = scout.graphics.prefSize(formField.$label, true).width;
+        labelWidth = scout.graphics.prefSize(formField.$label, {
+          includeMargin: true
+        }).width;
       }
     }
     labelPositionLeft = formField.labelPosition === scout.FormField.LABEL_POSITION_DEFAULT ||
@@ -248,5 +252,7 @@ scout.FormFieldLayout.prototype._layoutIcon = function(formField, fieldBounds, r
  * another size (which is required when the field-content is scrollable).
  */
 scout.FormFieldLayout.prototype.naturalSize = function(formField) {
-  return scout.graphics.prefSize(formField.$fieldContainer, true);
+  return scout.graphics.prefSize(formField.$fieldContainer, {
+    includeMargin: true
+  });
 };

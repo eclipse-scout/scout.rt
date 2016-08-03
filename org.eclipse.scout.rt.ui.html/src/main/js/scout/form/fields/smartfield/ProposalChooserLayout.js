@@ -178,7 +178,9 @@ scout.ProposalChooserLayout.prototype.preferredLayoutSize = function($container)
     .css('display', 'inline-block')
     .css('width', 'auto')
     .css('height', 'auto');
-  modelSize.width = scout.graphics.prefSize($container, undefined, {restoreScrollPositions: false}).width;
+  modelSize.width = scout.graphics.prefSize($container, {
+    restoreScrollPositions: false
+  }).width;
 
   this._typeHandler.restoreDom($container);
   $container

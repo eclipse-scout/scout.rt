@@ -10,7 +10,6 @@
  ******************************************************************************/
 scout.TableFooterLayout = function(tableFooter) {
   scout.TableFooterLayout.parent.call(this);
-
   this._tableFooter = tableFooter;
 };
 scout.inherits(scout.TableFooterLayout, scout.AbstractLayout);

@@ -10,7 +10,6 @@
  ******************************************************************************/
 scout.PopupWithHeadLayout = function(popup) {
   scout.PopupWithHeadLayout.parent.call(this, popup);
-  this.popup = popup;
 };
 scout.inherits(scout.PopupWithHeadLayout, scout.PopupLayout);
 
@@ -78,7 +77,9 @@ scout.PopupWithHeadLayout.prototype.preferredLayoutSize = function($container) {
       width: 'auto',
       height: 'auto'
     });
-    prefSize = scout.graphics.prefSize(this.popup.$body, true)
+    prefSize = scout.graphics.prefSize(this.popup.$body, {
+        includeMargin: true
+      })
       .add(htmlComp.getInsets());
     this.popup.$container.attr('style', popupStyleBackup);
   } else {

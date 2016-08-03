@@ -10,7 +10,6 @@
  ******************************************************************************/
 scout.DesktopHeaderLayout = function(header) {
   scout.DesktopHeaderLayout.parent.call(this);
-
   this.header = header;
   this.desktop = header.desktop;
 };

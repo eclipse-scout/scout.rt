@@ -18,18 +18,44 @@ scout.graphics = {
    * Precondition: $elem and it's parents must not be hidden (display: none. Visibility: hidden would be ok
    * because in this case the browser reserves the space the element would be using).
    *
+   * OPTION                   DEFAULT VALUE   DESCRIPTION
+   * ------------------------------------------------------------------------------------------------------
+   * includeMargin            false           Whether to include $elem's margins in the returned size.
+   *
+   * useCssSize               false           If true, the width and height properties are set to '' while
+   *                                          measuring, thus allowing existing CSS rules to influence the
+   *                                          sizes. If set to false, the sizes are set to 'auto' or the
+   *                                          corresponding hint values (see below).
+   *
+   * widthHint                undefined       If useCssSize is false, this value is used as width (in pixels)
+   *                                          instead of 'auto'. Useful to get the preferred height for a
+   *                                          given width.
+   *
+   * heightHint               undefined       Same as 'widthHint' but for the height.
+   *
+   * restoreScrollPositions   true            By default, the $elem's scrolling position is saved and restored
+   *                                          during the execution of this method (because applying
+   *                                          intermediate styles for measurement might change the current
+   *                                          position). If the calling method does that itself, you should
+   *                                          set this option to false to prevent overriding the stored
+   *                                          scrolling position in $elem's data attributes.
+   *
    * @memberOf scout.graphics
    */
-  prefSize: function($elem, includeMargin, options) {
+  prefSize: function($elem, options) {
     // Return 0/0 if element is not displayed (display: none).
     // We don't use isVisible by purpose because isVisible returns false for elements with visibility: hidden which is wrong here (we would like to be able to measure hidden elements)
     if (!$elem[0] || $elem.isDisplayNone()) {
       return new scout.Dimension(0, 0);
     }
 
+    options = options || {};
+
     var defaults = {
+      includeMargin: false,
       useCssSize: false,
-      resetWidth: true,
+      widthHint: undefined,
+      heightHint: undefined,
       restoreScrollPositions: true
     };
     options = $.extend({}, defaults, options);
@@ -45,7 +71,7 @@ scout.graphics = {
     // UseCssSize is necessary if the css rules have a fix height or width set.
     // Otherwise setting the width/height to auto could result in a different size
     var newWidth = (options.useCssSize ? '' : scout.nvl(options.widthHint, 'auto'));
-    var newHeight = (options.useCssSize ? '' : 'auto');
+    var newHeight = (options.useCssSize ? '' : scout.nvl(options.heightHint, 'auto'));
 
     // modify properties which prevent reading the preferred size
     $elem.css({
@@ -56,7 +82,7 @@ scout.graphics = {
     // measure
     var bcr = $elem[0].getBoundingClientRect();
     var prefSize = new scout.Dimension(bcr.width, bcr.height);
-    if (includeMargin) {
+    if (options.includeMargin) {
       prefSize.width += $elem.cssMarginX();
       prefSize.height += $elem.cssMarginY();
     }
