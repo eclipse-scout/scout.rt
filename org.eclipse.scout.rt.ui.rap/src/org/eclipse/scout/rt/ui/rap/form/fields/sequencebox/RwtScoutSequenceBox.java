@@ -179,11 +179,11 @@ public class RwtScoutSequenceBox extends RwtScoutFieldComposite<ISequenceBox> im
   protected void detachScout() {
     if (m_changeListener != null) {
       for (IFormField f : getScoutObject().getFields()) {
-        f.addPropertyChangeListener(IFormField.PROP_VISIBLE, m_changeListener);
-        f.addPropertyChangeListener(IFormField.PROP_LABEL_VISIBLE, m_changeListener);
-        f.addPropertyChangeListener(IFormField.PROP_LABEL, m_changeListener);
-        f.addPropertyChangeListener(IFormField.PROP_MANDATORY, m_changeListener);
-        f.addPropertyChangeListener(IFormField.PROP_ERROR_STATUS, m_changeListener);
+        f.removePropertyChangeListener(IFormField.PROP_VISIBLE, m_changeListener);
+        f.removePropertyChangeListener(IFormField.PROP_LABEL_VISIBLE, m_changeListener);
+        f.removePropertyChangeListener(IFormField.PROP_LABEL, m_changeListener);
+        f.removePropertyChangeListener(IFormField.PROP_MANDATORY, m_changeListener);
+        f.removePropertyChangeListener(IFormField.PROP_ERROR_STATUS, m_changeListener);
       }
       m_changeListener = null;
     }
