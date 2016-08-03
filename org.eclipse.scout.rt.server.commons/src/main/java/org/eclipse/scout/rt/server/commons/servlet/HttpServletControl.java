@@ -22,7 +22,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.server.commons.ServerCommonsConfigProperties.CspEnabledProperty;
 
 /**
  * Add default (security) handling to servlets
@@ -55,7 +57,6 @@ public class HttpServletControl {
     for (Entry<String, String> entry : getCspDirectives().entrySet()) {
       cspDirectives.add(StringUtility.join(" ", entry.getKey(), entry.getValue()));
     }
-
     m_cspValue = StringUtility.join("; ", cspDirectives);
   }
 
@@ -88,16 +89,7 @@ public class HttpServletControl {
   /**
    * Override {@link #getCspDirectives()} to add new or change / remove existing directives.
    */
-  public String getCspValue() {
-    return cspRule();
-  }
-
-  /**
-   * @deprecated Use {@link #getCspValue()} to get value, override {@link #getCspDirectives()} to add own directives.
-   *             Will be removed with 6.1.
-   */
-  @Deprecated
-  protected String cspRule() {
+  protected String getCspValue() {
     return m_cspValue;
   }
 
@@ -116,10 +108,16 @@ public class HttpServletControl {
   }
 
   protected void setResponseHeaders(HttpServlet servlet, HttpServletRequest req, HttpServletResponse resp) {
+    if (!"GET".equals(req.getMethod())) {
+      return;
+    }
     resp.setHeader(HTTP_HEADER_X_FRAME_OPTIONS, SAMEORIGIN);
     resp.setHeader(HTTP_HEADER_X_XSS_PROTECTION, XSS_MODE_BLOCK);
 
-    resp.setHeader(HTTP_HEADER_CSP, getCspValue());
-    resp.setHeader(HTTP_HEADER_CSP_LEGACY, getCspValue());
+    if (CONFIG.getPropertyValue(CspEnabledProperty.class)) {
+      // TODO [6.1] AWE/BSH Check user agent for legacy header
+      resp.setHeader(HTTP_HEADER_CSP, getCspValue());
+      resp.setHeader(HTTP_HEADER_CSP_LEGACY, getCspValue());
+    }
   }
 }

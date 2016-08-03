@@ -28,4 +28,20 @@ public final class ServerCommonsConfigProperties {
       return "scout.urlHints.enabled";
     }
   }
+
+  /**
+   * Enable or disable Content Security Policy (CSP) headers.
+   */
+  public static class CspEnabledProperty extends AbstractBooleanConfigProperty {
+
+    @Override
+    protected Boolean getDefaultValue() {
+      return true;
+    }
+
+    @Override
+    public String getKey() {
+      return "scout.csp.enabled";
+    }
+  }
 }
