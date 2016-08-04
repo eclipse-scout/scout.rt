@@ -90,6 +90,9 @@ scout.TreeNode.prototype.isFilterAccepted = function(forceFilter) {
   return this.filterAccepted;
 };
 
+/**
+ * @return jQuery.Deferred
+ */
 scout.TreeNode.prototype.loadChildren = function() {
   // NOP
 };

@@ -72,11 +72,15 @@ scout.Page.prototype._createTable = function() {
 // AbstractPageWithTable#loadChildren -> hier wird die table geladen und der baum neu aufgebaut
 // wird von AbstractTree#P_UIFacade aufgerufen
 scout.Page.prototype.loadTableData = function() {
-  if (this.detailTable) {
+  if (this.detailTable) { // FIXME [awe] 6.1 - check if we ever DO NOT have a detailTable
     this.detailTable.deleteAllRows();
-    this._loadTableData()
+    return this._loadTableData()
       .done(this._onLoadTableDataDone.bind(this))
       .fail(this._onLoadTableDataFail.bind(this));
+  } else {
+    var deferred = $.Deferred(); // FIXME [awe] 6.1 review with C.GU. is it Ok to return a DFD when no detailTable is available?
+    deferred.resolve();
+    return deferred; // FIXME [awe] 6.1 - check if we must return deferred.promise() instead of the deferred itself
   }
 };
 
@@ -105,13 +109,21 @@ scout.Page.prototype._loadTableData = function() {
  * object to table rows.
  *
  * @param tableData data loaded by <code>_loadTableData</code>
- *
  */
 scout.Page.prototype._onLoadTableDataDone = function(tableData) {
   var rows = this._transformTableDataToTableRows(tableData);
   if (rows && rows.length > 0) {
     this.detailTable.insertRows(rows);
   }
+  // FIXME [awe] 6.1 - discuss with C.GU, is this the right place?
+  this._ensureDetailForm();
+};
+
+scout.Page.prototype._ensureDetailForm = function() {
+  if (this.detailForm) {
+    return;
+  }
+  this.detailForm = this.createDetailForm();
 };
 
 /**
@@ -127,24 +139,4 @@ scout.Page.prototype._transformTableDataToTableRows = function(tableData) {
 
 scout.Page.prototype._onLoadTableDataFail = function(jqXHR, textStatus, errorThrown) {
   $.log.error('Failed to load tableData. error=' + textStatus);
-};
-
-//scout.Page.prototype.getTreeNodeFor = function(tableRow) {
-//
-//};
-//
-//scout.Page.prototype.getPageFor = function(tableRow) {
-//
-//};
-//
-//scout.Page.prototype.getTableRowFor = function(treeNode) {
-//
-//};
-//
-//scout.Page.prototype.getTableRowsFor = function(treeNodes) {
-//
-//};
-
-scout.Page.prototype.addChildPage = function(childPage) {
-  this.childNodes.push(childPage);
 };

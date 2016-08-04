@@ -983,32 +983,23 @@ scout.Outline.prototype._onDetailTableEvent = function(event) {
  */
 scout.Outline.prototype._nodesSelectedInternal = function() {
   scout.Outline.parent.prototype._nodesSelectedInternal.call(this);
-  // FIXME [awe] 6.1 - braucht es hier deselectedPage, newSelectedPage?
-  this._handleActivePageChanged();
+  // FIXME [awe] 6.1 - braucht es hier deselectedPage, newSelectedPage wie im Java model?
+  var activePage = this.selectedNodes[0];
+  if (activePage) {
+    activePage.loadChildren()
+      .done(this._onLoadChildrenDone.bind(this, activePage));
+  }
 };
 
-scout.Outline.prototype._handleActivePageChanged = function() {
-  var detailForm, detailTable, searchForm;
-
-  // FIXME [awe] 6.1 continue...
-};
-
-// FIXME [awe] 6.1 - merge this with online logic in onPageChanged
-scout.Outline.prototype._onPageChanged2 = function(page) {
-  if (page.detailTable) {
-    this._initDetailTable(page);
+scout.Outline.prototype._onLoadChildrenDone = function(activePage) {
+  if (activePage.detailTable) {
+    this._initDetailTable(activePage);
   }
-
-  if (page.detailForm) {
-    this._initDetailForm(page);
+  if (activePage.detailForm) {
+    this._initDetailForm(activePage);
   }
-
-  var selectedPage = this.selectedNodes[0];
-  if (!page && !selectedPage || page === selectedPage) {
-    this.updateDetailContent();
-  }
-
-  this._triggerPageChanged(page);
+  this.updateDetailContent();
+  this._triggerPageChanged(activePage);
 };
 
 scout.Outline.prototype._onPageChanged = function(event) {

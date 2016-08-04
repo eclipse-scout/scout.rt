@@ -26,6 +26,7 @@ scout.PageWithNodes.prototype._createTable = function() {
     parent: this.parent,
     id: 'PageWithNodesTable',
     autoResizeColumns: true,
+    headerVisible: false,
     columns: [nodeColumn]
   });
 };
@@ -34,18 +35,19 @@ scout.PageWithNodes.prototype._createTable = function() {
  * @override Page.js
  */
 scout.PageWithNodes.prototype._loadTableData = function() {
-  var i = 0, rows = [];
+  var i = 0, rows = [],
+    deferred = $.Deferred();
   this.childNodes.forEach(function(node) {
     rows.push({id: i.toString(), cells: [node.text]});
     i++;
   });
-  return rows;
+  deferred.resolve(rows);
+  return deferred;
 };
 
 /**
  * @override TreeNode.js
  */
 scout.PageWithNodes.prototype.loadChildren = function() {
-  // FIXME 6.1 [awe] - remove this hack
-  this.getTree()._onPageChanged2(this);
+  return this.loadTableData();
 };
