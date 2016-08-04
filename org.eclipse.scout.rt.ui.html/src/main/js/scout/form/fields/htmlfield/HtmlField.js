@@ -46,14 +46,21 @@ scout.HtmlField.prototype._renderDisplayText = function() {
     return;
   }
   this.$field.html(this.displayText);
+
+  // Add action and focus behavior to app-links
   this.$field.find('.app-link')
     .on('click', this._onAppLinkAction.bind(this))
     .attr('tabindex', '0')
     .unfocusable();
 
-  // this method replaces the content, the scroll bars get lost -> render again (only necessary if already rendered, otherwise it is done by renderProperties)
-  if (this.rendered) {
-    this._renderScrollBarEnabled(this.scrollBarEnabled);
+  // Add listener to images to update the layout when the images are loaded
+  this.$field.find('img')
+    .on('load', this._onImageLoad.bind(this))
+    .on('error', this._onImageError.bind(this));
+
+  // Because this method replaces the content, the scroll bars might have to be added or removed
+  if (this.rendered) { // (only necessary if already rendered, otherwise it is done by renderProperties)
+    this._renderScrollBarEnabled();
   }
 
   this.invalidateLayoutTree();
@@ -100,4 +107,12 @@ scout.HtmlField.prototype._sendAppLinkAction = function(ref) {
   this._send('appLinkAction', {
     ref: ref
   });
+};
+
+scout.HtmlField.prototype._onImageLoad = function(event) {
+  this.invalidateLayoutTree();
+};
+
+scout.HtmlField.prototype._onImageError = function(event) {
+  this.invalidateLayoutTree();
 };
