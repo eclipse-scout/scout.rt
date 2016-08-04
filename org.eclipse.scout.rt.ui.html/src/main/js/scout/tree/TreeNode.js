@@ -13,6 +13,7 @@ scout.TreeNode = function() {
   this.attached = false;
   this.checked = false;
   this.childNodes = [];
+  this.childrenLoaded = false;
   this.enabled = true;
   this.expanded = false;
   this.expandedLazy = false;
@@ -91,8 +92,13 @@ scout.TreeNode.prototype.isFilterAccepted = function(forceFilter) {
 };
 
 /**
- * @return jQuery.Deferred
+ * This method loads the child nodes of this node and returns a jQuery.Deferred to register callbacks
+ * when loading is done or has failed. This method should only be called when childrenLoaded is false.
+ *
+ * @return jQuery.Deferred or null when TreeNode cannot load children (which is the case for all
+ *     TreeNodes in the remote case). The default impl. return null.
  */
 scout.TreeNode.prototype.loadChildren = function() {
-  // NOP
+  return null;
 };
+

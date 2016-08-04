@@ -104,7 +104,7 @@ describe("Outline", function() {
     beforeEach(function() {
       model = helper.createModelFixture(3, 2, true);
       outline = helper.createOutline(model);
-      node = model.nodes[0];
+      node = outline.nodes[0];
     });
 
     it("handle navigateUp only once", function() {

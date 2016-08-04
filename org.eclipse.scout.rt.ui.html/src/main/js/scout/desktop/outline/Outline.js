@@ -982,23 +982,20 @@ scout.Outline.prototype._onDetailTableEvent = function(event) {
  * @override Tree.js
  */
 scout.Outline.prototype._nodesSelectedInternal = function() {
-  scout.Outline.parent.prototype._nodesSelectedInternal.call(this);
   // FIXME [awe] 6.1 - braucht es hier deselectedPage, newSelectedPage wie im Java model?
   var activePage = this.selectedNodes[0];
   if (activePage) {
-    activePage.loadChildren()
-      .done(this._onLoadChildrenDone.bind(this, activePage));
+    if (activePage.childrenLoaded) {
+      return;
+    }
+    var promise = activePage.loadChildren();
+    if (promise) {
+      promise.done(this._onLoadChildrenDone.bind(this, activePage));
+    }
   }
 };
 
 scout.Outline.prototype._onLoadChildrenDone = function(activePage) {
-  if (activePage.detailTable) {
-    this._initDetailTable(activePage);
-  }
-  if (activePage.detailForm) {
-    this._initDetailForm(activePage);
-  }
-  this.updateDetailContent();
   this._triggerPageChanged(activePage);
 };
 

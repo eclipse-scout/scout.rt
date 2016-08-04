@@ -22,23 +22,38 @@ scout.PageWithNodes.prototype._createTable = function() {
     index: 0,
     id: 'NodeColumn'
   });
-  return scout.create('Table', {
+  var table = scout.create('Table', {
     parent: this.parent,
     id: 'PageWithNodesTable',
     autoResizeColumns: true,
     headerVisible: false,
     columns: [nodeColumn]
   });
+  table.on('rowAction', this._onDetailTableRowAction.bind(this));
+  return table;
+};
+
+scout.PageWithNodes.prototype._onDetailTableRowAction = function(event) {
+  var clickedRow = event.source.rowsMap[event.rowId]; // FIXME [awe] 6.1 - discuss with C.GU. I'd rather have a 'row' property on the event
+  var nodeToSelect = clickedRow.node;
+  this.getOutline().selectNode(nodeToSelect);
 };
 
 /**
  * @override Page.js
  */
 scout.PageWithNodes.prototype._loadTableData = function() {
-  var i = 0, rows = [],
+  var i = 0, row, rows = [],
     deferred = $.Deferred();
   this.childNodes.forEach(function(node) {
-    rows.push({id: i.toString(), cells: [node.text]});
+    // we add an additional property 'node' to the table-row. This way, we
+    // don't need an additional map to link the table-row with the tree-node
+    row = {
+      id: i.toString(),
+      cells: [node.text],
+      node: node
+    };
+    rows.push(row);
     i++;
   });
   deferred.resolve(rows);

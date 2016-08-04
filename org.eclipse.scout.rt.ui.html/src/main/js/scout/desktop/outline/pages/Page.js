@@ -8,8 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-scout.Page = function(outline) {
-  scout.Page.parent.call(this, outline);
+scout.Page = function() {
+  scout.Page.parent.call(this);
 
   this.detailTable;
   this.detailTableVisible = true;
@@ -76,11 +76,11 @@ scout.Page.prototype.loadTableData = function() {
     this.detailTable.deleteAllRows();
     return this._loadTableData()
       .done(this._onLoadTableDataDone.bind(this))
-      .fail(this._onLoadTableDataFail.bind(this));
+      .fail(this._onLoadTableDataFail.bind(this))
+      .always(this._onLoadTableDataAlways.bind(this));
   } else {
-    var deferred = $.Deferred(); // FIXME [awe] 6.1 review with C.GU. is it Ok to return a DFD when no detailTable is available?
-    deferred.resolve();
-    return deferred; // FIXME [awe] 6.1 - check if we must return deferred.promise() instead of the deferred itself
+    // FIXME [awe] 6.1 review with C.GU. is it Ok to return a deferred when no detailTable is available?
+    return $.resolvedDeferred();
   }
 };
 
@@ -119,6 +119,10 @@ scout.Page.prototype._onLoadTableDataDone = function(tableData) {
   this._ensureDetailForm();
 };
 
+scout.Page.prototype._onLoadTableDataAlways = function() {
+  this.childrenLoaded = true;
+};
+
 scout.Page.prototype._ensureDetailForm = function() {
   if (this.detailForm) {
     return;
@@ -139,4 +143,12 @@ scout.Page.prototype._transformTableDataToTableRows = function(tableData) {
 
 scout.Page.prototype._onLoadTableDataFail = function(jqXHR, textStatus, errorThrown) {
   $.log.error('Failed to load tableData. error=' + textStatus);
+};
+
+/**
+ * @returns The tree / outline / parent instance. it's all the same, but it's more
+ *     intuitive to work with the 'outline' when we deal with pages.
+ */
+scout.Page.prototype.getOutline = function() {
+  return this.parent;
 };

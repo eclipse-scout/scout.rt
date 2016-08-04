@@ -1810,6 +1810,7 @@ scout.Tree.prototype.selectNodes = function(nodes, notifyServer, debounceSend) {
 
   // Make a copy so that original array stays untouched
   this.selectedNodes = nodes.slice();
+  this._nodesSelectedInternal();
 
   if (notifyServer) {
     this._sendNodesSelected(this.selectedNodes, debounceSend);
@@ -1829,7 +1830,7 @@ scout.Tree.prototype.selectNodes = function(nodes, notifyServer, debounceSend) {
     }
     this.filter(true);
   }
-  this._nodesSelectedInternal();
+  this._updateMenuBar();
   if (this.rendered) {
     this._renderSelection();
     // restore scrollTop (removeSelection removes all the selection classes which makes a lot of elements invisible and therefore the scrollHeight smaller)
@@ -1839,8 +1840,11 @@ scout.Tree.prototype.selectNodes = function(nodes, notifyServer, debounceSend) {
   }
 };
 
-scout.Tree.prototype._nodesSelectedInternal = function() {
-  this._updateMenuBar();
+/**
+ * This method is overridden by subclasses of Tree. The default impl. does nothing.
+ */
+scout.Tree.prototype._nodesSelectedInternal = function(node) {
+  // NOP
 };
 
 scout.Tree.prototype.deselectNode = function(node) {
