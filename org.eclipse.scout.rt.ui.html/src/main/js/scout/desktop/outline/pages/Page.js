@@ -60,7 +60,6 @@ scout.Page.prototype._init = function(model) {
       this.detailTable.setTableStatusVisible(this.tableStatusVisible);
     }
   }
-  // FIXME [awe] 6.1 scout.create für detailTable aufrufen, damit man detailTable auch in model.json konfigurieren kann
 };
 
 /**
@@ -75,35 +74,76 @@ scout.Page.prototype._createTable = function() {
 scout.Page.prototype.loadTableData = function() {
   if (this.detailTable) {
     this.detailTable.deleteAllRows();
-    var rows = this._loadTableData();
-    if (rows && rows.length > 0) {
-      this.detailTable.insertRows(rows);
-    }
+    this._loadTableData()
+      .done(this._onLoadTableDataDone.bind(this))
+      .fail(this._onLoadTableDataFail.bind(this));
   }
 };
 
 /**
  * Override this method to load table data (rows to be added to table).
+ * This is an asynchronous operation working with a Deferred. When table data load is successful
+ * <code>_onLoadTableData(data)</code> will be called. When a failure occurs while loading table
+ * data <code>_onLoadTableFail(data)</code> will be called.
+ * <p>
+ * When you want to return static data you still need a deferred. But you can resolve it
+ * immediately. Example code:
+ * <code>
+ *   var deferred = $.Deferred();
+ *   deferred.resolve([{...},{...}]);
+ *   return deferred;
+ * </code>
+ *
+ * @return jQuery.Deferred
  */
 scout.Page.prototype._loadTableData = function() {
   // NOP
 };
 
-scout.Page.prototype.getTreeNodeFor = function(tableRow) {
-
+/**
+ * This method is called when table data load is successful. It should transform the table data
+ * object to table rows.
+ *
+ * @param tableData data loaded by <code>_loadTableData</code>
+ *
+ */
+scout.Page.prototype._onLoadTableDataDone = function(tableData) {
+  var rows = this._transformTableDataToTableRows(tableData);
+  if (rows && rows.length > 0) {
+    this.detailTable.insertRows(rows);
+  }
 };
 
-scout.Page.prototype.getPageFor = function(tableRow) {
-
+/**
+ * This method converts the loaded table data, which can be any object, into table rows.
+ * You must override this method unless tableData is already an array of table rows.
+ *
+ * @param tableData
+ * @returns
+ */
+scout.Page.prototype._transformTableDataToTableRows = function(tableData) {
+  return tableData;
 };
 
-scout.Page.prototype.getTableRowFor = function(treeNode) {
-
+scout.Page.prototype._onLoadTableDataFail = function(jqXHR, textStatus, errorThrown) {
+  $.log.error('Failed to load tableData. error=' + textStatus);
 };
 
-scout.Page.prototype.getTableRowsFor = function(treeNodes) {
-
-};
+//scout.Page.prototype.getTreeNodeFor = function(tableRow) {
+//
+//};
+//
+//scout.Page.prototype.getPageFor = function(tableRow) {
+//
+//};
+//
+//scout.Page.prototype.getTableRowFor = function(treeNode) {
+//
+//};
+//
+//scout.Page.prototype.getTableRowsFor = function(treeNodes) {
+//
+//};
 
 scout.Page.prototype.addChildPage = function(childPage) {
   this.childNodes.push(childPage);

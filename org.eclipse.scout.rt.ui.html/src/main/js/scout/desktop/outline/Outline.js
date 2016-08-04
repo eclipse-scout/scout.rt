@@ -978,6 +978,21 @@ scout.Outline.prototype._onDetailTableEvent = function(event) {
   }
 };
 
+/**
+ * @override Tree.js
+ */
+scout.Outline.prototype._nodesSelectedInternal = function() {
+  scout.Outline.parent.prototype._nodesSelectedInternal.call(this);
+  // FIXME [awe] 6.1 - braucht es hier deselectedPage, newSelectedPage?
+  this._handleActivePageChanged();
+};
+
+scout.Outline.prototype._handleActivePageChanged = function() {
+  var detailForm, detailTable, searchForm;
+
+  // FIXME [awe] 6.1 continue...
+};
+
 // FIXME [awe] 6.1 - merge this with online logic in onPageChanged
 scout.Outline.prototype._onPageChanged2 = function(page) {
   if (page.detailTable) {
