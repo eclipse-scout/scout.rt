@@ -65,7 +65,7 @@ scout.DesktopNavigationLayout.prototype.preferredLayoutSize = function($containe
     prefSizeBoxes.height = Math.max(prefSizeBoxes.height, prefSizeViewButtonBox.height);
   }
   if (toolBox) {
-    var prefSizeToolBox = viewButtonBox.htmlComp.getPreferredSize();
+    var prefSizeToolBox = toolBox.htmlComp.getPreferredSize();
     prefSizeBoxes.width += prefSizeToolBox.width;
     prefSizeBoxes.height = Math.max(prefSizeBoxes.height, prefSizeToolBox.height);
   }
