@@ -17,7 +17,6 @@ scout.inherits(scout.SimpleTabBoxLayout, scout.AbstractLayout);
 scout.SimpleTabBoxLayout.prototype.layout = function($container) {
   var containerSize, viewContentSize,
     htmlContainer = scout.HtmlComponent.get($container),
-
     htmlViewContent = scout.HtmlComponent.get(this.tabBox.$viewContent),
     tabAreaSize ;
 
@@ -29,7 +28,6 @@ scout.SimpleTabBoxLayout.prototype.layout = function($container) {
   viewContentSize = containerSize.subtract(htmlViewContent.getMargins());
   viewContentSize.height -= tabAreaSize.height;
   htmlViewContent.setSize(viewContentSize);
-
 };
 
 /**

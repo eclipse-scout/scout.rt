@@ -77,7 +77,6 @@ scout.DesktopNavigation.prototype._renderOutline = function() {
   }
   this.outline.setParent(this);
   this.outline.render(this.$body);
-  this.outline.validateRoot = true;
   this.outline.invalidateLayoutTree();
   // Layout immediate to prevent flickering when breadcrumb mode is enabled
   // but not initially while desktop gets rendered because it will be done at the end anyway
