@@ -228,9 +228,9 @@ scout.FormField.prototype._renderStatusVisible = function() {
   // Pseudo status is only for layouting purpose, therefore tooltip, errorStatus etc. must not influence its visibility -> not necessary to use _computeStatusVisible
   this._renderChildVisible(this.$pseudoStatus, statusVisible);
 
-  // Make sure tooltip gets removed if there is no status anymore (tooltip points to the status)
+  // Make sure tooltip gets destroyed if there is no status anymore (tooltip points to the status)
   if (this.$status && !this.$status.isVisible() && this.tooltip) {
-    this.tooltip.remove();
+    this.tooltip.destroy();
   }
 };
 
@@ -452,7 +452,7 @@ scout.FormField.prototype._onStatusMousedown = function(event) {
     scout.menus.showContextMenuWithWait(this.session, func, event);
   } else {
     // Toggle tooltip
-    if (this.tooltip && this.tooltip.rendered) {
+    if (this.tooltip) {
       this._hideStatusMessage();
     } else {
       this._showStatusMessage();
@@ -477,8 +477,7 @@ scout.FormField.prototype._showStatusMessage = function() {
     autoRemove = !(this.errorStatus && this.errorStatus.isError());
     if (this.tooltip && this.tooltip.autoRemove !== autoRemove) {
       // AutoRemove may not be changed dynamically -> Remove and reopen tooltip
-      this.tooltip.remove();
-      this.tooltip = null;
+      this.tooltip.destroy();
     }
   }
 
@@ -487,7 +486,7 @@ scout.FormField.prototype._showStatusMessage = function() {
     return;
   }
 
-  if (this.tooltip && this.tooltip.rendered) {
+  if (this.tooltip) {
     // update existing tooltip
     this.tooltip.setText(text);
     this.tooltip.setSeverity(severity);
@@ -501,14 +500,16 @@ scout.FormField.prototype._showStatusMessage = function() {
       $anchor: this.$status
     };
     this.tooltip = scout.create('Tooltip', opts);
+    this.tooltip.one('destroy', function() {
+      this.tooltip = null;
+    }.bind(this));
     this.tooltip.render();
   }
 };
 
 scout.FormField.prototype._hideStatusMessage = function() {
   if (this.tooltip) {
-    this.tooltip.remove();
-    this.tooltip = null;
+    this.tooltip.destroy();
   }
 };
 

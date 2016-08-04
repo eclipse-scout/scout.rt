@@ -199,7 +199,6 @@ scout.SimpleTabBox.prototype.removeView = function(view, showSiblingView) {
     });
 
     if (this.rendered) {
-
       this.viewContent.invalidateLayoutTree();
       this.viewContent.validateLayoutTree();
     }

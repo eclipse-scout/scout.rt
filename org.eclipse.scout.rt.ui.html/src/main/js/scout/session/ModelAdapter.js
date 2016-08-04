@@ -43,8 +43,6 @@ scout.ModelAdapter.prototype.init = function(model) {
  *   when not set, the default-value is true. When working with local objects (see LocalObject.js) the register flag is set to false.
  */
 scout.ModelAdapter.prototype._init = function(model) {
-  model.objectType = model.objectType.replace('Adapter', ''); // FIXME [6.1] cgu aufräumen, ObjectFactory braucht vermutlich einen parameter objectType damit man ihn übersteuern kann. Oder sollte ModelAdapter doch den Adapter object type haben?
-
   this.id = model.id;
   this.objectType = model.objectType;
 
@@ -206,7 +204,8 @@ scout.ModelAdapter.prototype.destroy = function() {
 
   if (this.widget) {
     this._detachWidget();
-//    this.widget.destroy();//FIXME [6.1] CGU see Widget.js
+    this.widget.destroy();
+    this.widget = null;
   }
   this.session.unregisterModelAdapter(this);
 
@@ -217,8 +216,6 @@ scout.ModelAdapter.prototype.destroy = function() {
   }
 
   this.destroyed = true;
-  // Inform listeners
-  this.trigger('destroy');
 };
 
 scout.ModelAdapter.prototype.addOwnedAdapter = function(ownedAdapter) {
@@ -274,15 +271,10 @@ scout.ModelAdapter.prototype._createAdapters = function(propertyName, adapterOrI
     } else if (scout.objects.isString(adapterOrId)) {
       // String (by ID)
       model = this.session.getAdapterData(adapterOrId);
-      if (model) {
-        // Allow the creator to adapt the model of the child adapter
-        this._onChildAdapterCreation(propertyName, model);
-      }
       adapter = this.session.getOrCreateModelAdapter(adapterOrId, this);
     } else if (scout.objects.isPlainObject(adapterOrId)) {
       // Model object
       model = adapterOrId;
-      this._onChildAdapterCreation(propertyName, model);
       adapter = this.session.createModelAdapter(model, this);
     } else {
       throw new Error('adapterOrId must be either a scout.ModelAdapter, a string or a (model-) object');
@@ -394,67 +386,9 @@ scout.ModelAdapter.prototype._syncPropertiesOnPropertyChange = function(newPrope
     if (this[syncFuncName]) {
       this[syncFuncName](value, oldValue);
     } else {
-      this._callSetter(propertyName, value);
+      this.widget.callSetter(propertyName, value);
     }
   }.bind(this));
-};
-
-scout.ModelAdapter.prototype._callSetter = function(propertyName, value) {
-  var setterFuncName = 'set' + scout.strings.toUpperCaseFirstLetter(propertyName);
-  if (this.widget[setterFuncName]) {
-    this.widget[setterFuncName]();
-  } else {
-    this.widget.setProperty(propertyName, value);
-  }
-};
-
-/**
- * Removes the existing adapter specified by oldValue. Renders the new adapters if this.$container is set.<br>
- * To prevent this behavior just implement the method _renderPropertyName or _removePropertyName (e.g _removeTable).
- */
-scout.ModelAdapter.prototype.onChildAdapterChange = function(propertyName, oldValue, newValue) {
-  var i,
-    funcName = scout.strings.toUpperCaseFirstLetter(propertyName),
-    renderFuncName = '_render' + funcName,
-    removeFuncName = '_remove' + funcName;
-
-  // Remove old adapter, if there is one
-  if (oldValue) {
-    if (!this[removeFuncName]) {
-      if (Array.isArray(oldValue)) {
-        for (i = 0; i < oldValue.length; i++) {
-          oldValue[i].remove();
-        }
-      } else {
-        oldValue.remove();
-      }
-    } else {
-      this[removeFuncName](oldValue);
-    }
-  }
-
-  // Render new adapter, if there is one
-  if (newValue) {
-    var $container = this.$container;
-    if (!this[renderFuncName] && $container) {
-      if (Array.isArray(newValue)) {
-        for (i = 0; i < newValue.length; i++) {
-          newValue[i].render($container);
-        }
-      } else {
-        newValue.render($container);
-      }
-    } else {
-      this[renderFuncName](newValue);
-    }
-  }
-};
-
-/**
- * Maybe overridden to adapt the model. Default is empty.
- */
-scout.ModelAdapter.prototype._onChildAdapterCreation = function(propertyName, adapter) {
-  // NOP may be implemented by subclasses
 };
 
 scout.ModelAdapter.prototype.goOffline = function() {

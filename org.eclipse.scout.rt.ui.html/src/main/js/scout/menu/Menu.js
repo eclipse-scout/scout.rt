@@ -166,8 +166,7 @@ scout.Menu.prototype._doActionTogglesPopup = function() {
 };
 
 /**
- * Overrides the default render logic in ModelAdapter#onChildAdapterChange.
- * We must only render child actions if the sub-menu popup is opened.
+ * Only render child actions if the sub-menu popup is open.
  */
 scout.Menu.prototype._renderChildActions = function() {
   if (scout.objects.optProperty(this.popup, 'rendered')) {

@@ -48,7 +48,7 @@ scout.TableFooterLayout.prototype.layout = function($container) {
   if (controlsWidth + infoWidth <= containerWidth) {
     // Make sure table info tooltip is not shown anymore (only available in compact style)
     if (this._tableFooter._tableInfoTooltip) {
-      this._tableFooter._tableInfoTooltip.remove();
+      this._tableFooter._tableInfoTooltip.destroy();
     }
     contentFits = true;
   }

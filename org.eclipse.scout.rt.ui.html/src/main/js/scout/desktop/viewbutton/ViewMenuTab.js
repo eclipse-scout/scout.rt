@@ -162,6 +162,7 @@ scout.ViewMenuTab.prototype._openPopup = function() {
     parent: this,
     $tab: this.$container,
     viewMenus: this.viewMenus,
+    dontDestroy: this.viewMenus,
     naviBounds: naviBounds
   });
   // The class needs to be added to the container before the popup gets opened so that the modified style may be copied to the head.

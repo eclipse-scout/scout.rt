@@ -180,7 +180,7 @@ scout.DesktopNavigation.prototype._removeToolBox = function() {
   if (!this.toolBox) {
     return;
   }
-  this.toolBox.remove();
+  this.toolBox.destroy();
   this.toolBox = null;
 };
 
@@ -209,7 +209,7 @@ scout.DesktopNavigation.prototype._removeHandle = function() {
   if (!this.handle) {
     return;
   }
-  this.handle.remove();
+  this.handle.destroy();
   this.handle = null;
 };
 

@@ -247,7 +247,7 @@ scout.Tooltip.prototype._onAnchorScroll = function(event) {
   if (this.scrollType === 'position') {
     this.position();
   } else if (this.scrollType === 'remove') {
-    this.remove();
+    this.destroy();
   }
 };
 
@@ -275,11 +275,11 @@ scout.Tooltip.prototype._isMousedownOutside = function(event) {
  * Method invoked once a mouse down event occurs outside the tooltip.
  */
 scout.Tooltip.prototype._onMousedownOutside = function() {
-  this.remove();
+  this.destroy();
 };
 
 scout.Tooltip.prototype._onDocumentKeydown = function(event) {
-  this.remove();
+  this.destroy();
 };
 
 /* --- STATIC HELPERS ------------------------------------------------------------- */

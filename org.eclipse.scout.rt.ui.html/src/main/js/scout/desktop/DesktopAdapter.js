@@ -10,7 +10,7 @@
  ******************************************************************************/
 scout.DesktopAdapter = function() {
   scout.DesktopAdapter.parent.call(this);
-  this._addAdapterProperties(['viewButtons', 'menus', 'views', 'dialogs', 'outline', 'messageBoxes', 'fileChoosers', 'addOns', 'keyStrokes']);
+  this._addAdapterProperties(['activeForm', 'viewButtons', 'menus', 'views', 'dialogs', 'outline', 'messageBoxes', 'fileChoosers', 'addOns', 'keyStrokes']);
 };
 scout.inherits(scout.DesktopAdapter, scout.ModelAdapter);
 
@@ -124,11 +124,16 @@ scout.DesktopAdapter.prototype._onOpenUri = function(event) {
 };
 
 scout.DesktopAdapter.prototype._onOutlineChanged = function(event) {
-  var outline = this.session.getOrCreateModelAdapter(event.outline, this);
-  if (!outline.widget) {
-    outline.createWidget(this.widget);
+  var outline,
+    outlineAdapter = this.session.getOrCreateModelAdapter(event.outline, this);
+
+  if (outlineAdapter) {
+    if (!outlineAdapter.widget) {
+      outlineAdapter.createWidget(this.widget);
+    }
+    outline = outlineAdapter.widget;
   }
-  this.widget.setOutline(outline.widget);
+  this.widget.setOutline(outline);
 };
 
 scout.DesktopAdapter.prototype._onAddNotification = function(event) {

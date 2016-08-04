@@ -10,7 +10,7 @@
  ******************************************************************************/
 scout.Form = function() {
   scout.Form.parent.call(this);
-  this._addAdapterProperties(['rootGroupBox', 'views', 'dialogs', 'messageBoxes', 'fileChoosers']);
+  this._addAdapterProperties(['rootGroupBox', 'views', 'dialogs', 'initialFocus', 'messageBoxes', 'fileChoosers']);
 
   this.displayHint = scout.Form.DisplayHint.DIALOG;
   this.maximizeEnabled = true;
@@ -335,7 +335,8 @@ scout.Form.prototype.renderInitialFocus = function() {
  */
 scout.Form.prototype._initialFocusElement = function() {
   var focusElement,
-    initialFocusField = this.session.getOrCreateModelAdapter(this.initialFocus, this);
+    initialFocusField = this.initialFocus;
+
   if (initialFocusField) {
     focusElement = initialFocusField.getFocusableElement();
   }

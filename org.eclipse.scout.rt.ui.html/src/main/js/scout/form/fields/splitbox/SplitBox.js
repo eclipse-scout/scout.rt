@@ -316,7 +316,7 @@ scout.SplitBox.prototype._updateCollapseHandle = function() {
     this._updateCollapseHandleButtons();
   } else {
      if (this._collapseHandle) {
-       this._collapseHandle.remove();
+       this._collapseHandle.destroy();
        this._collapseHandle = null;
      }
   }

@@ -67,3 +67,5 @@ scout.OutlineAdapter.prototype.onModelAction = function(event) {
     scout.OutlineAdapter.parent.prototype.onModelAction.call(this, event);
   }
 };
+
+// FIXME [6.1] CGU detail table adapter must be destroyed, add listener on init?

@@ -1272,7 +1272,7 @@ scout.Table.prototype._removeRow = function(row) {
     return;
   }
 
-  this._removeTooltipsForRow(row);
+  this._destroyTooltipsForRow(row);
   this._removeCellEditorForRow(row);
 
   // Do not remove rows which are removed using an animation
@@ -2176,7 +2176,7 @@ scout.Table.prototype.updateRows = function(rows) {
       scout.Table.linkRowToDiv(updatedRow, $updatedRow);
       $updatedRow.copyCssClasses(oldRow.$row, scout.Table.SELECTION_CLASSES + ' first last');
       oldRow.$row.replaceWith($updatedRow);
-      this._removeTooltipsForRow(updatedRow);
+      this._destroyTooltipsForRow(updatedRow);
       this._removeCellEditorForRow(updatedRow);
       this._installRow(updatedRow);
     }
@@ -2213,10 +2213,10 @@ scout.Table.prototype.updateRowOrder = function(rows) {
   this._animateAggregateRows = false;
 };
 
-scout.Table.prototype._removeTooltipsForRow = function(row) {
+scout.Table.prototype._destroyTooltipsForRow = function(row) {
   for (var i = this.tooltips.length - 1; i >= 0; i--) {
     if (this.tooltips[i].row.id === row.id) {
-      this.tooltips[i].remove();
+      this.tooltips[i].destroy();
       this.tooltips.splice(i, 1);
     }
   }
@@ -2240,7 +2240,7 @@ scout.Table.prototype.endCellEdit = function(field) {
   if (this.cellEditorPopup) {
     // Remove the cell-editor popup prior destroying the field, so that the 'cell-editor-popup's focus context is uninstalled first and the focus can be restored onto the last focused element of the surrounding focus context.
     // Otherwise, if the currently focused field is removed from DOM, the $entryPoint would be focused first, which can be avoided if removing the popup first.
-    this.cellEditorPopup.remove();
+    this.cellEditorPopup.destroy();
     this.cellEditorPopup = null;
   }
   field.destroy();

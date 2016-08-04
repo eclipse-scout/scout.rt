@@ -34,7 +34,7 @@ scout.Desktop = function() {
   this.offline = false;
   this.notifications = [];
   this.inBackground = false;
-  this._addAdapterProperties(['viewButtons', 'menus', 'views', 'dialogs', 'outline', 'messageBoxes', 'fileChoosers', 'addOns', 'keyStrokes']);
+  this._addAdapterProperties(['activeForm', 'viewButtons', 'menus', 'views', 'dialogs', 'outline', 'messageBoxes', 'fileChoosers', 'addOns', 'keyStrokes']);
 
   // event listeners
   this._benchActiveViewChangedHandler = this._onBenchActivateViewChanged.bind(this);
@@ -217,11 +217,11 @@ scout.Desktop.prototype._removeBench = function() {
     return;
   }
   this.bench.off('viewActivated', this._benchActiveViewChangedHandler);
-  this.bench.on('remove', function() {
+  this.bench.on('destroy', function() {
     this.bench = null;
     this.invalidateLayoutTree();
   }.bind(this));
-  this.bench.remove();
+  this.bench.destroy();
 };
 
 scout.Desktop.prototype._renderBenchVisible = function() {
@@ -254,7 +254,7 @@ scout.Desktop.prototype._removeNavigation = function() {
   if (!this.navigation) {
     return;
   }
-  this.navigation.remove();
+  this.navigation.destroy();
   this.navigation = null;
   this.invalidateLayoutTree();
 };
@@ -295,11 +295,11 @@ scout.Desktop.prototype._removeHeader = function() {
   if (!this.header) {
     return;
   }
-  this.header.on('remove', function() {
+  this.header.on('destroy', function() {
     this.invalidateLayoutTree();
     this.header = null;
   }.bind(this));
-  this.header.remove();
+  this.header.destroy();
 };
 
 scout.Desktop.prototype._renderHeaderVisible = function() {
@@ -344,7 +344,7 @@ scout.Desktop.prototype._removeSplitter = function() {
   if (!this.splitter) {
     return;
   }
-  this.splitter.remove();
+  this.splitter.destroy();
   this.splitter = null;
 };
 
@@ -619,15 +619,15 @@ scout.Desktop.prototype.removeNotification = function(notification) {
 };
 
 /**
- * Removes every popup which is a descendant of the given widget.
+ * Destroys every popup which is a descendant of the given widget.
  */
-scout.Desktop.prototype.removePopupsFor = function(widget) {
+scout.Desktop.prototype.destroyPopupsFor = function(widget) {
   this.$container.children('.popup').each(function(i, elem) {
     var $popup = $(elem),
       popup = scout.Widget.getWidgetFor($popup);
 
     if (widget.has(popup)) {
-      popup.remove();
+      popup.destroy();
     }
   });
 };

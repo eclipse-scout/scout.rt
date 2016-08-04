@@ -68,7 +68,7 @@ scout.DesktopTab.prototype._cssClassUpdated = function(cssClass, oldCssClass) {
 
 /**
  * We cannot not bind the 'remove' event of the view to the remove function
- * of the this tab, because in bench-mode we the tab is never rendered
+ * of the this tab, because in bench-mode the tab is never rendered
  * and thus the _remove function is never called.
  */
 scout.DesktopTab.prototype._onViewRemoved = function() {

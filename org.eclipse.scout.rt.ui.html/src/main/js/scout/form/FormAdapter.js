@@ -10,6 +10,6 @@
  ******************************************************************************/
 scout.FormAdapter = function() {
   scout.FormAdapter.parent.call(this);
-  this._addAdapterProperties(['rootGroupBox', 'views', 'dialogs', 'messageBoxes', 'fileChoosers']);
+  this._addAdapterProperties(['rootGroupBox', 'views', 'dialogs', 'initialFocus', 'messageBoxes', 'fileChoosers']);
 };
 scout.inherits(scout.FormAdapter, scout.ModelAdapter);

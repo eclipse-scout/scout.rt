@@ -158,17 +158,17 @@ scout.Button.prototype.togglePopup = function() {
     this.popup.close();
   } else {
     this.popup = this._openPopup();
-    this.popup.on('remove', function(event) {
+    this.popup.one('destroy', function(event) {
       this.popup = null;
     }.bind(this));
   }
 };
 
 scout.Button.prototype._openPopup = function() {
-  // FIXME bsh: Improve this
   var popup = scout.create('ContextMenuPopup', {
     parent: this,
     menuItems: this.menus,
+    dontDestroy: this.menus,
     cloneMenuItems: false,
     closeOnAnchorMousedown: false,
     $anchor: this.$field

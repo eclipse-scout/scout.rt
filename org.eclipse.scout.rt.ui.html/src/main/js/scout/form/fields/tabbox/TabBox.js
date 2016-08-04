@@ -67,9 +67,6 @@ scout.TabBox.prototype._remove = function() {
   scout.TabBox.parent.prototype._remove.call(this);
   this._removeTabs();
   this._removeTabContent();
-  if (this.menuBar) {
-    this.menuBar.remove();
-  }
 };
 
 /**

@@ -147,7 +147,7 @@ scout.BenchColumn.prototype._revalidateSplitters = function(clearPosition) {
   if (this.components) {
     this.components.forEach(function(comp) {
       if (comp instanceof scout.Splitter) {
-        comp.remove();
+        comp.destroy();
       }
     });
   }

@@ -34,5 +34,5 @@ scout.TableInfoFilterTooltip.prototype._renderText = function() {
 
 scout.TableInfoFilterTooltip.prototype._onRemoveFilterClick = function() {
   this.tableFooter.table.resetFilter();
-  this.remove();
+  this.destroy();
 };

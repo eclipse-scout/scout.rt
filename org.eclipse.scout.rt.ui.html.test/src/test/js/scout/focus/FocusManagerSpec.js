@@ -103,7 +103,7 @@ describe('scout.FocusManager', function() {
       });
 
       afterEach(function() {
-        form.remove();
+        form.destroy();
         form = null;
       });
 

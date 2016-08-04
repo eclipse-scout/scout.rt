@@ -143,11 +143,11 @@ scout.SimpleTabArea.prototype.addTab = function(tab, sibling) {
   }
 };
 
-scout.SimpleTabArea.prototype.removeTab = function(tab) {
+scout.SimpleTabArea.prototype.destroyTab = function(tab) {
   var index = this.tabs.indexOf(tab);
   if (index > -1) {
     this.tabs.splice(index, 1);
-    tab.remove();
+    tab.destroy();
     tab.off('tabClicked', this._viewTabSelectionHandler);
     this._renderVisible();
     this.invalidateLayoutTree();

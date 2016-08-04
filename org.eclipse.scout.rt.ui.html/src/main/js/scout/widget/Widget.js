@@ -26,6 +26,12 @@ scout.Widget = function() {
   this.rendered = false;
   this.attached = false;
   this.destroyed = false;
+
+  /**
+   * Array of children which must not be destroyed when the widget is being destroyed.
+   */
+  this.dontDestroy;
+
   this.$container;
   // If set to true, remove won't remove the element immediately but after the animation has been finished
   // This expects a css animation which may be triggered by the class 'removed'
@@ -78,25 +84,32 @@ scout.Widget.prototype._initKeyStrokeContext = function(keyStrokeContext) {
   // NOP
 };
 
-//FIXME [6.1] CGU currently child/parent hierarchy is linked in render/remove. destroy would be more sync with init, replace popup.remove etc with popup.destroy
-//scout.Widget.prototype.destroy = function() {
-//  // Destroy children in reverse order
-//  this.children.slice().reverse().forEach(function(child) {
-//    child.destroy();
-//  });
-//
-//  this.remove();
-//
-//  // Disconnect from parent (widget is being destroyed, it will never be rendered again)
-//  if (this.parent) {
-//    this.parent.removeChild(this);
-//    this.parent = null;
-//  }
-//  this.destroyed = true;
-//
-//  // Inform listeners
-//  this.trigger('destroy');
-//};
+scout.Widget.prototype.destroy = function() {
+  if (this.destroyed) {
+    // Already destroyed, do nothing
+    return;
+  }
+
+  // Destroy children in reverse order
+  this.children.slice().reverse().forEach(function(child) {
+    if (this.dontDestroy && this.dontDestroy.indexOf(child) > -1) {
+      return;
+    }
+    child.destroy();
+  }, this);
+
+  this.remove();
+
+  // Disconnect from parent (widget is being destroyed, it will never be rendered again)
+  if (this.parent) {
+    this.parent.removeChild(this);
+    this.parent = null;
+  }
+  this.destroyed = true;
+
+  // Inform listeners
+  this.trigger('destroy');
+};
 
 scout.Widget.prototype.render = function($parent) {
   $.log.trace('Rendering widget: ' + this);
@@ -113,9 +126,6 @@ scout.Widget.prototype.render = function($parent) {
   this._renderInternal($parent);
   this._link();
   this.session.keyStrokeManager.installKeyStrokeContext(this.keyStrokeContext);
-  if (this.parent) {
-    this.parent.addChild(this);
-  }
   this.rendering = false;
   this.rendered = true;
   this.attached = true;
@@ -203,9 +213,6 @@ scout.Widget.prototype._removeInternal = function() {
   this.session.keyStrokeManager.uninstallKeyStrokeContext(this.keyStrokeContext);
   this._cleanup();
   this._remove();
-  if (this.parent) {
-    this.parent.removeChild(this);
-  }
   this.rendered = false;
   this.attached = false;
   this.removing = false;
@@ -223,8 +230,8 @@ scout.Widget.prototype._removeAnimated = function() {
     return;
   }
 
-  // Remove open popups first, they are not animated
-  this.session.desktop.removePopupsFor(this);
+  // Destroy open popups first, they are not animated
+  this.session.desktop.destroyPopupsFor(this);
 
   this.removalPending = true;
   // Don't execute immediately to make sure nothing interferes with the animation (e.g. layouting) which could make it laggy
@@ -601,13 +608,23 @@ scout.Widget.prototype.setProperty = function(name, value) {
   if (this[name] === value) {
     return;
   }
-  this._setProperty(name, value);
+  if (this.rendered) {
+    var removeFuncName = '_remove' + scout.strings.toUpperCaseFirstLetter(name);
+    if (this[removeFuncName]) {
+      this[removeFuncName]();
+    }
+  }
+  var syncFuncName = '_sync' + scout.strings.toUpperCaseFirstLetter(name);
+  if (this[syncFuncName]) {
+    this[syncFuncName](value); // FIXME [6.1] CGU rename to _setFuncName
+  } else {
+    this._setProperty(name, value);
+  }
   if (this.rendered) {
     var renderFuncName = '_render' + scout.strings.toUpperCaseFirstLetter(name);
-    if (!this[renderFuncName]) {
+    if (!this[renderFuncName]) { // FIXME [6.1] cgu remove this error and remove every empty render function
       throw new Error('Render function ' + renderFuncName + ' does not exist in ' + this.toString());
     }
-    // FIXME CGU [6.1] new and old value übergeben? eher nicht
     this[renderFuncName]();
   }
 };
@@ -766,7 +783,7 @@ scout.Widget.prototype._mirror = function(source) {
     func: this._onMirrorEvent.bind(this)
   };
   source.events.addListener(this._mirrorListener);
-  this.one('remove', function() { // FIXME [6.1] CGU destroy would be better
+  this.one('destroy', function() {
     this.unmirror(source);
   }.bind(this));
 };
@@ -803,7 +820,7 @@ scout.Widget.prototype._onMirrorPropertyChange = function(event) {
 scout.Widget.prototype.callSetter = function(propertyName, value) {
   var setterFuncName = 'set' + scout.strings.toUpperCaseFirstLetter(propertyName);
   if (this[setterFuncName]) {
-    this[setterFuncName]();
+    this[setterFuncName](value);
   } else {
     this.setProperty(propertyName, value);
   }

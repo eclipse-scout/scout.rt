@@ -174,7 +174,7 @@ scout.DesktopBench.prototype._removeNavigationHandle = function() {
   if (!this.navigationHandle) {
     return;
   }
-  this.navigationHandle.remove();
+  this.navigationHandle.destroy();
   this.navigationHandle = null;
 };
 
@@ -414,7 +414,7 @@ scout.DesktopBench.prototype._revalidateSplitters = function() {
   if (this.components) {
     this.components.forEach(function(comp) {
       if (comp instanceof scout.Splitter) {
-        comp.remove();
+        comp.destroy();
       }
     });
   }

@@ -147,7 +147,7 @@ scout.Popup.prototype._remove = function() {
 
 scout.Popup.prototype.close = function() {
   this.trigger('close');
-  this.remove();
+  this.destroy();
 };
 
 /**

@@ -27,7 +27,7 @@ scout.DesktopFormController.prototype.render = function() {
   // find active form and set selected.
   var selectable;
   if (this.desktop.activeForm) {
-    var form = this.session.getModelAdapter(this.desktop.activeForm);
+    var form = this.desktop.activeForm;
     if (form.isDialog()) {
       // find ui selectable part
       selectable = this._findActiveSelectablePart(form);

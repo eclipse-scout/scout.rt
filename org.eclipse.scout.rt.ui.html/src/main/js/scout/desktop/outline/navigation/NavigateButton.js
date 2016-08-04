@@ -41,12 +41,6 @@ scout.NavigateButton.prototype._init = function(options) {
   this.outline = options.outline;
 };
 
-scout.NavigateButton.prototype.destroy = function() {
-  if (this.rendered) {
-    this.remove();
-  }
-};
-
 /**
  * @override
  */

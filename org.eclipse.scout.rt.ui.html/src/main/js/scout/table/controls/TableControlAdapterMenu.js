@@ -13,6 +13,8 @@ scout.TableControlAdapterMenu = function() {
 
   this._tableControlPropertyChangeHandler = this._onTableControlPropertyChange.bind(this);
   this._tableControlDestroyHandler = this._onTableControlDestroy.bind(this);
+
+  this._addCloneProperties(['tableControl']);
 };
 scout.inherits(scout.TableControlAdapterMenu, scout.FormMenu);
 
@@ -55,7 +57,7 @@ scout.TableControlAdapterMenu.prototype._onTableControlPropertyChange = function
 };
 
 scout.TableControlAdapterMenu.prototype._onTableControlDestroy = function(event) {
-  this.remove();
+  this.destroy();
   this._uninstallListeners();
 };
 

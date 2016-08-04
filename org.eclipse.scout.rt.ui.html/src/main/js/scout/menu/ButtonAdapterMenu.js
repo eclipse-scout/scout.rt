@@ -14,6 +14,8 @@ scout.ButtonAdapterMenu = function() {
 
   this._buttonPropertyChangeHandler = this._onButtonPropertyChange.bind(this);
   this._buttonDestroyHandler = this._onButtonDestroy.bind(this);
+
+  this._addCloneProperties(['button']);
 };
 scout.inherits(scout.ButtonAdapterMenu, scout.Menu);
 
@@ -62,7 +64,7 @@ scout.ButtonAdapterMenu.prototype._onButtonPropertyChange = function(event) {
 };
 
 scout.ButtonAdapterMenu.prototype._onButtonDestroy = function(event) {
-  this.remove();
+  this.destroy();
   this._uninstallListeners();
 };
 

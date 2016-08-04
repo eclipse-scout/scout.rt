@@ -297,8 +297,7 @@ scout.ContextMenuPopup.prototype._renderMenuItems = function(menus, initialSubMe
       menu = menu.cloneAndMirror({
         parent: this
       });
-      menu.on('doAction', this._onMenuDoAction.bind(this));
-      menu.on('propertyChange', this._onMenuPropertyChange.bind(this));
+      this._attachCloneMenuListeners(menu);
     } else {
       menu.oldParentMenu = parentMenu;
       menu.setParent(this);
@@ -349,12 +348,18 @@ scout.ContextMenuPopup.prototype._updateIconAndText = function(menu, iconOffset)
   return iconOffset;
 };
 
-scout.ContextMenuPopup.prototype._onMenuDoAction = function(event) {
+scout.ContextMenuPopup.prototype._attachCloneMenuListeners = function(menu) {
+  menu.on('doAction', this._onCloneMenuDoAction.bind(this));
+  menu.on('propertyChange', this._onCloneMenuPropertyChange.bind(this));
+  menu.childActions.forEach(this._attachCloneMenuListeners.bind(this));
+};
+
+scout.ContextMenuPopup.prototype._onCloneMenuDoAction = function(event) {
   var menu = event.source;
   menu.cloneOf.doAction();
 };
 
-scout.ContextMenuPopup.prototype._onMenuPropertyChange = function(event) {
+scout.ContextMenuPopup.prototype._onCloneMenuPropertyChange = function(event) {
   if (event.changedProperties.indexOf('selected') !== -1) {
     var menu = event.source;
     menu.cloneOf.setSelected(event.newProperties.selected);

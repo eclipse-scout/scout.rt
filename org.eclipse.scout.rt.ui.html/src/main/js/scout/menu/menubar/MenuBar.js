@@ -25,6 +25,7 @@ scout.MenuBar = function() {
   }; // Object containing "left" and "right" menus
   this.defaultMenu = null;
   this.visible = false;
+  this.ellipsis;
 
   /**
    * This array is === menuItems when menu-bar is not over-sized.

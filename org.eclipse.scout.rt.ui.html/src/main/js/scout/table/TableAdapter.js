@@ -69,7 +69,7 @@ scout.TableAdapter.prototype._onWidgetEvent = function(event) {
  */
 scout.TableAdapter.prototype._onChildAdapterCreation = function(propertyName, model) {
   if (propertyName === 'tableControls') {
-    model.table = this;
+    model.table = this; // FIXME [6.1] CGU fix this, this is not executed anymore
   }
 };
 
@@ -78,7 +78,7 @@ scout.TableAdapter.prototype._onRowsInserted = function(rows) {
 };
 
 scout.TableAdapter.prototype._onRowsDeleted = function(rowIds) {
-  var rows = this.widget.rowsByIds(rowIds);
+  var rows = this.widget._rowsByIds(rowIds);
   this.widget.deleteRows(rows);
 };
 
@@ -91,7 +91,10 @@ scout.TableAdapter.prototype._onRowsUpdated = function(rows) {
 };
 
 scout.TableAdapter.prototype._onRowsSelected = function(rowIds) {
-  this._syncSelectedRows(rowIds);
+  var rows = this.widget._rowsByIds(rowIds);
+  this.widget.selectRows(rows);
+  // FIXME [6.1] CGU what is this for? seems wrong here
+  this.widget.selectionHandler.clearLastSelectedRowMarker();
 };
 
 scout.TableAdapter.prototype._onRowsChecked = function(rows) {
@@ -147,6 +150,7 @@ scout.TableAdapter.prototype._onStartCellEdit = function(columnId, rowId, fieldI
 scout.TableAdapter.prototype._onEndCellEdit = function(fieldId) {
   var field = this.session.getModelAdapter(fieldId);
   this.widget.endCellEdit(field.widget);
+  // FIXME [6.1] CGU field must be destroyed, listener or do it here?
 };
 
 scout.TableAdapter.prototype._onRequestFocus = function() {

@@ -369,9 +369,8 @@ scout.TableFooter.prototype._setInfoVisible = function($info, visible, complete)
 };
 
 scout.TableFooter.prototype._toggleTableInfoTooltip = function($info, tooltipType) {
-  if (this._tableInfoTooltip && this._tableInfoTooltip.rendered) {
-    this._tableInfoTooltip.remove();
-    this._tableInfoTooltip = null;
+  if (this._tableInfoTooltip) {
+    this._tableInfoTooltip.destroy();
   } else {
     this._tableInfoTooltip = scout.create(tooltipType, {
       parent: this,
@@ -381,6 +380,9 @@ scout.TableFooter.prototype._toggleTableInfoTooltip = function($info, tooltipTyp
       arrowPositionUnit: '%',
       $anchor: $info
     });
+    this._tableInfoTooltip.one('destroy', function() {
+      this._tableInfoTooltip = null;
+    }.bind(this));
     this._tableInfoTooltip.render();
   }
 };
@@ -459,16 +461,15 @@ scout.TableFooter.prototype.closeControlContainer = function(control) {
 
 scout.TableFooter.prototype._hideTableStatusTooltip = function() {
   clearTimeout(this._autoHideTableStatusTooltipTimeoutId);
-  if (this._tableStatusTooltip && this._tableStatusTooltip.rendered) {
-    this._tableStatusTooltip.remove();
-    this._tableStatusTooltip = null;
+  if (this._tableStatusTooltip) {
+    this._tableStatusTooltip.destroy();
   }
 };
 
 scout.TableFooter.prototype._showTableStatusTooltip = function() {
   // Remove existing tooltip (might have the wrong css class)
-  if (this._tableStatusTooltip && this._tableStatusTooltip.rendered) {
-    this._tableStatusTooltip.remove();
+  if (this._tableStatusTooltip) {
+    this._tableStatusTooltip.destroy();
   }
 
   var tableStatus = this.table.tableStatus;
@@ -486,6 +487,9 @@ scout.TableFooter.prototype._showTableStatusTooltip = function() {
     $anchor: this._$infoTableStatusIcon
   };
   this._tableStatusTooltip = scout.create('Tooltip', opts);
+  this._tableStatusTooltip.one('destroy', function() {
+    this._tableStatusTooltip = null;
+  }.bind(this));
   this._tableStatusTooltip.render();
 
   // Adjust icon style
@@ -519,7 +523,7 @@ scout.TableFooter.prototype.onControlSelected = function(control) {
 
 scout.TableFooter.prototype._onStatusMousedown = function(event) {
   // Toggle tooltip
-  if (this._tableStatusTooltip && this._tableStatusTooltip.rendered) {
+  if (this._tableStatusTooltip) {
     this.table.tableStatus.uiState = 'user-hidden';
     this._hideTableStatusTooltip();
   } else {

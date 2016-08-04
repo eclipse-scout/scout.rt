@@ -85,7 +85,7 @@ scout.TooltipSupport.prototype.uninstall = function($comp) {
     .removeData('tooltipSupport')
     .off('mouseleave', this._options.selector, this._mouseLeaveHandler)
     .off('mouseenter', this._options.selector, this._onMouseEnterHandler);
-  this._removeTooltip();
+  this._destroyTooltip();
   clearTimeout(this._tooltipTimeoutId);
 };
 
@@ -102,13 +102,13 @@ scout.TooltipSupport.prototype._onMouseEnter = function(event) {
 };
 
 scout.TooltipSupport.prototype._onMouseLeave = function(event) {
-  this._removeTooltip();
+  this._destroyTooltip();
 };
 
-scout.TooltipSupport.prototype._removeTooltip = function() {
+scout.TooltipSupport.prototype._destroyTooltip = function() {
   clearTimeout(this._tooltipTimeoutId);
   if (this._tooltip) {
-    this._tooltip.remove();
+    this._tooltip.destroy();
     this._tooltip = null;
   }
 };

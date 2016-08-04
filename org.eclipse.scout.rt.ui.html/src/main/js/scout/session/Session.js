@@ -851,7 +851,7 @@ scout.Session.prototype.showFatalMessage = function(options, errorCode) {
 
   messageBox.on('action', function(event) {
     delete this._fatalMessagesOnScreen[errorCode];
-    messageBox.remove();
+    messageBox.destroy();
     var option = event.option;
     if (option === 'yes' && options.yesButtonAction) {
       options.yesButtonAction.apply(this);
@@ -1041,7 +1041,7 @@ scout.Session.prototype._removeBusy = function() {
 
   // Remove busy indicator (if it was already created)
   if (this._busyIndicator) {
-    this._busyIndicator.remove();
+    this._busyIndicator.destroy();
     this._busyIndicator = null;
   }
 };

@@ -73,7 +73,7 @@ scout.DesktopHeader.prototype._removeToolBox = function() {
   if (!this.toolBox) {
     return;
   }
-  this.toolBox.remove();
+  this.toolBox.destroy();
   this.toolBox = null;
 };
 
@@ -111,7 +111,7 @@ scout.DesktopHeader.prototype._removeLogo = function() {
   if (!this.logo) {
     return;
   }
-  this.logo.remove();
+  this.logo.destroy();
   this.logo = null;
 };
 
@@ -135,7 +135,7 @@ scout.DesktopHeader.prototype._removeViewButtonBox = function() {
   if (!this.viewButtonBox) {
     return;
   }
-  this.viewButtonBox.remove();
+  this.viewButtonBox.destroy();
   this.viewButtonBox = null;
 };
 
