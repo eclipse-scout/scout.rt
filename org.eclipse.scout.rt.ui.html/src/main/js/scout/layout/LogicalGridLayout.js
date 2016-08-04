@@ -150,10 +150,9 @@ scout.LogicalGridLayout.prototype.getLayoutSize = function($container, sizeflag)
     dim.height += h;
     useCount++;
   }
-  if (dim.width > 0 && dim.height > 0) {
-    var insets = scout.HtmlComponent.get($container).getInsets();
-    dim.width += insets.horizontal();
-    dim.height += insets.vertical();
-  }
+  // insets
+  var insets = scout.HtmlComponent.get($container).getInsets();
+  dim.width += insets.horizontal();
+  dim.height += insets.vertical();
   return dim;
 };
