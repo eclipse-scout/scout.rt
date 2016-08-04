@@ -11,7 +11,6 @@
 scout.Menu = function() {
   scout.Menu.parent.call(this);
   this._addAdapterProperties('childActions');
-  this._addModelProperties('overflow');
 
   this.defaultMenu = false;
   this.separator = false;
@@ -32,6 +31,8 @@ scout.Menu = function() {
    * to true, button style menus must be displayed as regular menus.
    */
   this.overflow = false;
+
+  this._addCloneProperties(['defaultMenu', 'menuTypes', 'overflow', 'separator']);
 };
 scout.inherits(scout.Menu, scout.Action);
 
@@ -286,4 +287,15 @@ scout.Menu.prototype._handleSelectedInEllipsis = function() {
   if (this.selected) {
     this.overflowMenu.setSelected(true);
   }
+};
+
+scout.Menu.prototype.clone = function(model) {
+  var clone = scout.Menu.parent.prototype.clone.call(this, model);
+  var childClones = [];
+  this.childActions.forEach(function(child) {
+    var childClone = child.clone({parent: clone});
+    childClones.push(childClone);
+  });
+  clone.childActions = childClones;
+  return clone;
 };

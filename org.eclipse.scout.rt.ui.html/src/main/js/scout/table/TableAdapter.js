@@ -146,7 +146,7 @@ scout.TableAdapter.prototype._onStartCellEdit = function(columnId, rowId, fieldI
 
 scout.TableAdapter.prototype._onEndCellEdit = function(fieldId) {
   var field = this.session.getModelAdapter(fieldId);
-  this.widget.endCellEdit(field);
+  this.widget.endCellEdit(field.widget);
 };
 
 scout.TableAdapter.prototype._onRequestFocus = function() {

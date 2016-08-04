@@ -10,7 +10,6 @@
  ******************************************************************************/
 scout.Action = function() {
   scout.Action.parent.call(this);
-  this._addModelProperties(['tabbable']);
 
   this.enabled = true;
   this.visible = true;
@@ -36,6 +35,7 @@ scout.Action = function() {
   this.actionStyle = scout.Action.ActionStyle.DEFAULT;
   this.textVisible = true;
   this.compact = false;
+  this._addCloneProperties(['actionStyle', 'cssClass', 'enabled', 'horizontalAlignment', 'iconId', 'selected', 'tabbable', 'text', 'tooltipText', 'toggleAction']);
 };
 scout.inherits(scout.Action, scout.Widget);
 

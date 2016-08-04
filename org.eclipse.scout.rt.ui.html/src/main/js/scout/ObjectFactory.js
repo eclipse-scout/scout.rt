@@ -103,9 +103,6 @@ scout.ObjectFactory.prototype._createObjectByType = function(model, type) {
  *     required. A lookup is performed to find the constructor function.</li>
  * </ul>
  *
- * When the provided model does not contain the property '_register', the property is set to false, which means the
- * object is not registered in the adapter registry. Which is the desired default behavior when we create local objects.
- *
  * When the provided model does not contain the property 'id', the property is set to a random, unqiue value
  * having the prefix 'ui'.
  *
@@ -129,10 +126,6 @@ scout.ObjectFactory.prototype.create = function(vararg, model) {
     scoutObject = this._createObjectByType(model);
   } else {
     throw new Error('parameter vararg must be an objectType string or an object having an objectType property');
-  }
-
-  if (scoutObject instanceof scout.ModelAdapter && model._register === undefined) {
-    model._register = false;
   }
 
   if (model.id === undefined) {

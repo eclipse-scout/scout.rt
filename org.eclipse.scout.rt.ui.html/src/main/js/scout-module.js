@@ -388,6 +388,7 @@
   __include("scout/form/fields/smartfield/ProposalChooserAdapter.js");
   __include("scout/form/fields/smartfield/ProposalChooserLayout.js");
   __include("scout/form/fields/smartfield/SmartFieldMultiline.js");
+  __include("scout/form/fields/smartfield/SmartFieldMultilineAdapter.js");
   __include("scout/form/fields/smartfield/SmartFieldMultilineLayout.js");
   __include("scout/form/fields/splitbox/SplitBox.js");
   __include("scout/form/fields/splitbox/SplitBoxAdapter.js");

@@ -10,6 +10,5 @@
  ******************************************************************************/
 scout.DateFieldAdapter = function() {
   scout.DateFieldAdapter.parent.call(this);
-  this._addModelProperties(['timestamp', 'timestampAsDate']);
 };
 scout.inherits(scout.DateFieldAdapter, scout.ValueFieldAdapter);

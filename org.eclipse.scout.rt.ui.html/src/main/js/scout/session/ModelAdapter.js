@@ -29,15 +29,6 @@ scout.ModelAdapter = function() {
   this.owner;
   this.ownedAdapters = [];
   this._adapterProperties = [];
-
-  /**
-   * This array contains the name of all model-properties. It is used to distinct between ModelAdapter properties
-   * from the (server-side) model and other properties (like $container, etc.) which are added on the ModelAdapter
-   * instance.
-   */
-  this._modelProperties = [];
-
-  this._register = true;
   this._widgetListener;
 };
 
@@ -49,7 +40,6 @@ scout.ModelAdapter.prototype.init = function(model) {
 
 /**
  * @param model expects parent session to be set. Other options:
- *   _register: (optional) when set to true the adapter instance is un-/registered in the modelAdapterRegistry of the session
  *   when not set, the default-value is true. When working with local objects (see LocalObject.js) the register flag is set to false.
  */
 scout.ModelAdapter.prototype._init = function(model) {
@@ -57,7 +47,6 @@ scout.ModelAdapter.prototype._init = function(model) {
 
   this.id = model.id;
   this.objectType = model.objectType;
-  this._register = scout.nvl(model._register, true); // FIXME [awe] 6.1 discuss -> die registry kommt auch in den RemoteProxy
 
   if (!model.owner) {
     throw new Error('Owner expected: ' + this);
@@ -68,56 +57,31 @@ scout.ModelAdapter.prototype._init = function(model) {
     throw new Error('Session expected: ' + this);
   }
 
-  if (this._register) {
-    this.session.registerModelAdapter(this);
-  }
+  this.session.registerModelAdapter(this);
 
   // Make a copy to prevent a modification of the given object
   this.model = $.extend({}, model);
-  // Fill in the missing default values (has to before copying the properties, so that modelProperties considers default values as well)
+
+  // Fill in the missing default values
   scout.defaultValues.applyTo(this.model);
 
   // copy all properties from model to this adapter
   this._eachProperty(model, function(propertyName, value, isAdapterProp) {
-    // if property is not yet in the array of property names -> add property
-    // the same property should exist only once in the array
-    if (this._modelProperties.indexOf(propertyName) === -1) {
-      this._modelProperties.push(propertyName);
-    }
     if (scout.isOneOf(propertyName, 'id', 'session', 'objectType')) {
       return; // Ignore (already set manually above)
     }
     if (isAdapterProp && value) {
       value = this._createAdapters(propertyName, value);
-//      if (value) {
-//        model[propertyName] = value.widget;
-//      }
     }
     this.model[propertyName] = value;
   }.bind(this));
-
-//  model.parent = this;
-//  this.widget = this._createWidget(model);
-//  if (this.widget) {
-//    this._attachWidget();
-//  }
 };
 
 scout.ModelAdapter.prototype.createWidget = function(parent) { // FIXME CGU getOrCreate? :/
   if (this.widget) {
+//    this.widget.setParent() // FIXME CGU anstatt re-link in session.js?
     return this.widget;
   }
-//  this.widget = this._createWidget();
-//
-//  this._adapterProperties.forEach(function(property) {
-//    var adapter = this[property];
-//    if (!adapter) {
-//      return;
-//    }
-//    this._processAdapters(adapter, function(adapter) {
-//      adapter.createWidget();
-//    }.bind(this));
-//  }, this);
   this.model.parent = parent;
   this.widget = this._createWidget(this.model);
   if (this.widget) { // FIXME CGU null check wegnehmen, davon ausgehen dass alle ein widget haben
@@ -144,7 +108,7 @@ scout.ModelAdapter.prototype._detachWidget = function() {
   if (!this._widgetListener) {
     return;
   }
-  this.widget.removeListener(this._widgetListener);
+  this.widget.events.removeListener(this._widgetListener);
   this._widgetListener = null;
 };
 
@@ -164,9 +128,7 @@ scout.ModelAdapter.prototype._createWidgets = function(propertyName, model) {
  * @param coalesceFunc (optional) coalesce function added to event-object
  */
 scout.ModelAdapter.prototype._send = function(type, data, delay, coalesceFunc) {
-  // If adapter is a clone, get original adapter and get its id
-  var adapter = this.original();
-  var event = new scout.Event(adapter.id, type, data);
+  var event = new scout.Event(this.id, type, data);
   if (coalesceFunc) {
     event.coalesce = coalesceFunc;
   }
@@ -182,11 +144,8 @@ scout.ModelAdapter.prototype._sendProperty = function(propertyName) {
   this._send('property', data);
 };
 
-// FIXME CGU move to widget?
+// FIXME CGU move to widget? maybe better to attach rendered listener and call setEnabled in goOffline case?
 scout.ModelAdapter.prototype.render = function($parent) {
-  if (this.widget) {
-    return;
-  }
   scout.ModelAdapter.parent.prototype.render.call(this, $parent);
   if (this.session.offline) {
     this.goOffline();
@@ -218,17 +177,6 @@ scout.ModelAdapter.prototype._addAdapterProperties = function(properties) {
   this._addProperties('_adapterProperties', properties);
 };
 
-/**
- * Adds property name(s) of model properties. They're used when a model adpater is cloned (see #cloneAdapter()).
- * You only need to call this method for UI-only properties. Properties from the server-side model are automatically
- * added in the _init method of the model adapter.
- *
- * @param properties String or String-array with property names.
- */
-scout.ModelAdapter.prototype._addModelProperties = function(properties) {
-  this._addProperties('_modelProperties', properties);
-};
-
 scout.ModelAdapter.prototype._addProperties = function(propertyName, properties) {
   if (Array.isArray(properties)) {
     this[propertyName] = this[propertyName].concat(properties);
@@ -258,22 +206,16 @@ scout.ModelAdapter.prototype.destroy = function() {
 
   if (this.widget) {
     this._detachWidget();
+//    this.widget.destroy();//FIXME [6.1] CGU see Widget.js
   }
-  this.remove();
-  if (this._register) {
-    this.session.unregisterModelAdapter(this);
-  }
+  this.session.unregisterModelAdapter(this);
 
   // Disconnect from owner
   if (this.owner) {
     this.owner.removeOwnedAdapter(this);
     this.owner = null;
   }
-  // Disconnect from parent (adapter is being destroyed, it will never be rendered again)
-  if (this.parent) {
-    this.parent.removeChild(this);
-    this.parent = null;
-  }
+
   this.destroyed = true;
   // Inform listeners
   this.trigger('destroy');
@@ -413,7 +355,6 @@ scout.ModelAdapter.prototype.onModelAction = function(event) {
 };
 
 scout.ModelAdapter.prototype._onWidgetEvent = function(event) {
-  console.log('widget event ', event);
   if (event.type === 'property') {
     this._onWidgetPropertyChange(event);
   } else {
@@ -428,7 +369,6 @@ scout.ModelAdapter.prototype._onWidgetEvent = function(event) {
 };
 
 scout.ModelAdapter.prototype._onWidgetPropertyChange = function(event) {
-  console.log('property change event ', event);
   event.changedProperties.forEach(function(property) {
     this._sendProperty(property);
   }, this);
@@ -436,7 +376,7 @@ scout.ModelAdapter.prototype._onWidgetPropertyChange = function(event) {
 
 scout.ModelAdapter.prototype._syncPropertiesOnPropertyChange = function(newProperties) {
   this._eachProperty(newProperties, function(propertyName, value, isAdapterProp) {
-    var syncFuncName = '_sync' + scout.ModelAdapter._preparePropertyNameForFunctionCall(propertyName),
+    var syncFuncName = '_sync' + scout.strings.toUpperCaseFirstLetter(propertyName),
       oldValue = this[propertyName];
 
     // FIXME CGU [6.1] dieser Teil sollte irgendiwe in der Sync Funktion sein, anstatt callSetter syncProperty aufrufen, würde aber viele Funktionen brechen
@@ -448,7 +388,6 @@ scout.ModelAdapter.prototype._syncPropertiesOnPropertyChange = function(newPrope
       if (value) {
         value = this._createAdapters(propertyName, value);
         value = this._createWidgets(propertyName, value);
-        // FIXME CGU [6.1] create widgets here? value must not be an adapter
       }
     }
 
@@ -461,7 +400,7 @@ scout.ModelAdapter.prototype._syncPropertiesOnPropertyChange = function(newPrope
 };
 
 scout.ModelAdapter.prototype._callSetter = function(propertyName, value) {
-  var setterFuncName = 'setter' + scout.ModelAdapter._preparePropertyNameForFunctionCall(propertyName);
+  var setterFuncName = 'set' + scout.strings.toUpperCaseFirstLetter(propertyName);
   if (this.widget[setterFuncName]) {
     this.widget[setterFuncName]();
   } else {
@@ -475,7 +414,7 @@ scout.ModelAdapter.prototype._callSetter = function(propertyName, value) {
  */
 scout.ModelAdapter.prototype.onChildAdapterChange = function(propertyName, oldValue, newValue) {
   var i,
-    funcName = scout.ModelAdapter._preparePropertyNameForFunctionCall(propertyName),
+    funcName = scout.strings.toUpperCaseFirstLetter(propertyName),
     renderFuncName = '_render' + funcName,
     removeFuncName = '_remove' + funcName;
 
@@ -573,92 +512,10 @@ scout.ModelAdapter.prototype.uniqueId = function(qualifier) {
   return s.replace(/\s/g, '');
 };
 
-/**
- * Creates a deep clone of the current adapter instance. For each adapter a local object is created.
- * The 'cloneOf' property of the local-object points to the original adapter. When the ModelAdapter#
- * _send() method sends events to the server, it uses the ID of the original adapter for cloned instances
- * so the original adapter/model is notified on the server.
- */
-scout.ModelAdapter.prototype.cloneAdapter = function(modelOverride) {
-  var cloneProperty, cloneAdapter, adapterProperty,
-    cloneModel = modelOverride || {};
-
-  // #1 - clone model (excl. all adapter properties since they require a parent instance
-  this._modelProperties.forEach(function(propertyName) {
-    if (cloneModel.hasOwnProperty(propertyName)) {
-      // NOP - when property is already set by modelOverride
-    } else if ('id' === propertyName) {
-      // must set ID to undefined - so scout#_createLocalObject will
-      // create a new unique ID for the cloned adapter. You can still
-      // pass an ID by the modelOverride argument.
-      cloneModel[propertyName] = undefined;
-    } else if (this._isAdapterProperty(propertyName)) {
-      // NOP - we deal with adapter properties below
-    } else if ('_register' === propertyName) {
-      // NOP - is initialized on create of adapter
-    } else if (this.hasOwnProperty(propertyName)) {
-      cloneModel[propertyName] = this[propertyName];
-    }
-  }, this);
-
-  cloneAdapter = scout.create(cloneModel);
-
-  // #2 - create child adapters, use cloneAdapter as parent
-  this._adapterProperties.forEach(function(propertyName) {
-    if (cloneModel.hasOwnProperty(propertyName)) {
-      // NOP - when property is already set by modelOverride
-    } else if (this.hasOwnProperty(propertyName)) {
-      adapterProperty = this[propertyName];
-      if(adapterProperty === null){
-        cloneProperty = null;
-      } else if (Array.isArray(adapterProperty)) {
-        cloneProperty = [];
-        adapterProperty.forEach(function(adapterPropertyElement) {
-          cloneProperty.push(adapterPropertyElement.cloneAdapter({
-            parent: cloneAdapter
-          }));
-        }, this);
-      } else {
-        cloneProperty = adapterProperty.cloneAdapter({
-          parent: cloneAdapter
-        });
-      }
-      cloneAdapter[propertyName] = cloneProperty;
-    }
-  }, this);
-
-  this.session.registerAdapterClone(this, cloneAdapter);
-  return cloneAdapter;
-};
-
-/**
- * @returns the original adapter from which this one was cloned. If it is not a clone, itself is returned.
- */
-scout.ModelAdapter.prototype.original = function() {
-  var original = this;
-  while (original.cloneOf) {
-    original = original.cloneOf;
-  }
-  return original;
-};
-
-scout.ModelAdapter.prototype._isModelProperty = function(propertyName) {
-  return this._modelProperties.indexOf(propertyName) > -1;
-};
-
 scout.ModelAdapter.prototype._isAdapterProperty = function(propertyName) {
   return this._adapterProperties.indexOf(propertyName) > -1;
 };
 
 scout.ModelAdapter.prototype.toString = function() {
   return 'ModelAdapter[objectType=' + this.objectType + ' id=' + this.id + ']';
-};
-
-/* --- STATIC HELPERS ------------------------------------------------------------- */
-
-/**
- * @memberOf scout.ModelAdapter
- */
-scout.ModelAdapter._preparePropertyNameForFunctionCall = function(propertyName) {
-  return propertyName.substring(0, 1).toUpperCase() + propertyName.substring(1);
 };

@@ -42,7 +42,14 @@ scout.ContextMenuPopup.prototype._render = function($parent) {
     parent: this
   });
   this._renderMenuItems();
+};
 
+/**
+ * @override
+ */
+scout.ContextMenuPopup.prototype._remove = function() {
+  scout.scrollbars.uninstall(this.$body, this.session);
+  scout.ContextMenuPopup.parent.prototype._remove.call(this);
 };
 
 scout.ContextMenuPopup.prototype.removeSubMenuItems = function(parentMenu, animated) {
@@ -287,9 +294,10 @@ scout.ContextMenuPopup.prototype._renderMenuItems = function(menus, initialSubMe
     // prevent loosing original parent
     var parentMenu = menu.parent;
     if (this.options.cloneMenuItems && !menu.cloneOf) {
-      menu = menu.cloneAdapter({
+      menu = menu.cloneAndMirror({
         parent: this
       });
+      menu.on('doAction', this._onMenuDoAction.bind(this));
       menu.on('propertyChange', this._onMenuPropertyChange.bind(this));
     } else {
       menu.oldParentMenu = parentMenu;
@@ -341,46 +349,21 @@ scout.ContextMenuPopup.prototype._updateIconAndText = function(menu, iconOffset)
   return iconOffset;
 };
 
+scout.ContextMenuPopup.prototype._onMenuDoAction = function(event) {
+  var menu = event.source;
+  menu.cloneOf.doAction();
+};
+
 scout.ContextMenuPopup.prototype._onMenuPropertyChange = function(event) {
-  if (event.selected) {
+  if (event.changedProperties.indexOf('selected') !== -1) {
     var menu = event.source;
-    menu.cloneOf.onModelPropertyChange({
-      properties: {
-        selected: event.selected
-      }
-    });
+    menu.cloneOf.setSelected(event.newProperties.selected);
   }
 };
 
 scout.ContextMenuPopup.prototype._onMenuRemove = function(event) {
   var menu = event.source;
-  if (this.options.cloneMenuItems && menu.cloneOf) {
-    this.session.unregisterAllAdapterClones(menu.cloneOf);
-  }
   menu.setParent(menu.oldParentMenu);
-};
-
-/**
- * When cloneMenuItems is true, it means the menu instance is also used elsewhere (for instance in a menu-bar).
- * When cloneMenuItems is false, it means the menu instance is only used in this popup.
- * In the first case we must _not_ call the remove() method, since the menu is still in use outside of the
- * popup. In the second case we must call remove(), because the menu is only used in the popup and no one
- * else would remove the widget otherwise.
- *
- * @override Widget.js
- */
-scout.ContextMenuPopup.prototype._remove = function() {
-  this._getMenuItems().forEach(function(menu) {
-    if (this.options.cloneMenuItems) {
-      if (this.session.hasClones(menu)) {
-        this.session.unregisterAllAdapterClones(menu);
-      }
-    } else {
-      menu.remove();
-    }
-  }, this);
-  scout.scrollbars.uninstall(this.$body, this.session);
-  scout.ContextMenuPopup.parent.prototype._remove.call(this);
 };
 
 /**

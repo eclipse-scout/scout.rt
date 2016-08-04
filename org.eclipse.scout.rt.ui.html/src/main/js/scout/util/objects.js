@@ -48,6 +48,16 @@ scout.objects = {
   },
 
   /**
+   * Copies the specified properties (including the ones from the prototype.) from dest to source
+   */
+  extractProperties: function(source, dest, properties) {
+    properties.forEach(function(propertyName) {
+      dest[propertyName] = source[propertyName];
+    });
+    return dest;
+  },
+
+  /**
    * returns
    *  - true if the obj has at least one of the given properties.
    *  - false if the obj has none of the given properties.

@@ -73,4 +73,39 @@ describe('Widget', function() {
 
   });
 
+  describe('clone', function() {
+
+    var model, widget, expectedProperties = ['id', 'session', 'objectType', 'parent', 'text'];
+
+    beforeEach(function() {
+      model = createSimpleModel('Menu', session);
+      model.label = 'bar';
+      widget = scout.create(model);
+      widget.$container = 'dummy container property';
+    });
+
+    it('clones only properties marked as clone property', function() {
+      var widgetClone = widget.cloneAdapter();
+      // should contain the following properties:
+      expectedProperties.forEach(function(propertyName) {
+        expect(widgetClone[propertyName]).not.toBe(undefined);
+      });
+      // but not the $container property (which has been added later)
+      expect(widgetClone.$container).toBe(undefined);
+    });
+
+    it('\'text\' must be recognized as clone property, but not \'$container\'', function() {
+      expect(widget._isCloneProperty('text')).toBe(true);
+      expect(widget._isCloneProperty('$container')).toBe(false);
+    });
+
+    it('prefers properties passed as modelOverride', function() {
+      var widgetClone = widget.cloneAdapter({
+        text: 'foo'
+      });
+      expect(widgetClone.text).toBe('foo');
+    });
+
+  });
+
 });

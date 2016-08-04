@@ -56,7 +56,6 @@ scout.Session = function($entryPoint, options) {
   this.userAgent = options.userAgent || new scout.UserAgent(scout.device.type, scout.device.supportsTouch());
   this.suppressErrors = scout.nvl(options.suppressErrors, false);
   this.modelAdapterRegistry = {};
-  this._clonedModelAdapterRegistry = {}; // key = adapter-ID, value = array of clones for that adapter
   this.locale = options.locale;
   if (this.locale) {
     this._texts = scout.texts.get(this.locale.languageTag);
@@ -111,9 +110,6 @@ scout.Session.prototype._throwError = function(message) {
 
 scout.Session.prototype.unregisterModelAdapter = function(modelAdapter) {
   delete this.modelAdapterRegistry[modelAdapter.id];
-  if (this.hasClones(modelAdapter)) {
-    this.unregisterAllAdapterClones(modelAdapter);
-  }
 };
 
 scout.Session.prototype.registerModelAdapter = function(modelAdapter) {
@@ -179,7 +175,6 @@ scout.Session.prototype.createModelAdapter = function(adapterData, parent) {
   // we can access them in ModelAdapter#init()
   adapterData.owner = owner;
   adapterData.parent = parent;
-  adapterData._register = true;
   var objectType = adapterData.objectType;
   var objectTypeParts = objectType.split('.');
   if (objectTypeParts.length === 2) {
@@ -1123,7 +1118,7 @@ scout.Session.prototype._setApplicationLoading = function(applicationLoading) {
 };
 
 scout.Session.prototype._processEvents = function(events) {
-  var i, j, event, adapter, adapterClones, eventTargets;
+  var i, j, event, adapter, eventTargets;
   for (i = 0; i < events.length; i++) {
     event = events[i];
     this.currentEvent = event;
@@ -1140,7 +1135,6 @@ scout.Session.prototype._processEvents = function(events) {
       throw new Error('No adapter registered for ID ' + event.target);
     }
     eventTargets = [adapter];
-    scout.arrays.pushAll(eventTargets, this.getAdapterClones(adapter));
     for (j = 0; j < eventTargets.length; j++) {
       var target = eventTargets[j];
       if (event.type === 'property') { // Special handling for 'property' type
@@ -1276,46 +1270,4 @@ scout.Session.prototype.optText = function(textKey, defaultValue) {
 
 scout.Session.prototype.textExists = function(textKey) {
   return this._texts.exists(textKey);
-};
-
-scout.Session.prototype.registerAdapterClone = function(adapter, clone) {
-  clone.cloneOf = adapter;
-  var entry = this._clonedModelAdapterRegistry[adapter.id];
-  if (entry) {
-    entry.push(clone);
-  } else {
-    this._clonedModelAdapterRegistry[adapter.id] = [clone];
-  }
-};
-
-scout.Session.prototype.getAdapterClones = function(adapter) {
-  var entry = this._clonedModelAdapterRegistry[adapter.id];
-  return scout.arrays.ensure(entry);
-};
-
-scout.Session.prototype.hasClones = function(adapter) {
-  return this.getAdapterClones(adapter).length > 0;
-};
-
-scout.Session.prototype.unregisterAllAdapterClones = function(adapter) {
-  var entry = this._clonedModelAdapterRegistry[adapter.id];
-  if (entry === undefined) {
-    throw new Error('No clones registered for the given adapter');
-  }
-  delete this._clonedModelAdapterRegistry[adapter.id];
-};
-
-scout.Session.prototype.unregisterAdapterClone = function(clone) {
-  if (clone.cloneOf === undefined) {
-    throw new Error('Tried to unregister a clone but the property cloneOf is not set');
-  }
-  var entry = this._clonedModelAdapterRegistry[clone.cloneOf.id];
-  if (!entry) {
-    throw new Error('No clones registered for adapter');
-  }
-  var i = entry.indexOf(clone);
-  if (i === -1) {
-    throw new Error('Adapter found, but clone is not registered');
-  }
-  entry.splice(i, 1);
 };

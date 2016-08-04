@@ -162,7 +162,7 @@ describe('SmartField', function() {
   describe('touch = true', function() {
 
     it('opens a touch popup when smart field gets touched', function() {
-      var proposalChooser = scout.create('Table', {parent: new scout.NullWidget(), session: session, _register: true});
+      var proposalChooser = scout.create('Table', {parent: new scout.NullWidget(), session: session});
 
       smartField.touch = true;
       smartField.render(session.$entryPoint);
@@ -196,7 +196,7 @@ describe('SmartField', function() {
     });
 
     it('opens a touch popup if there already is a proposal chooser while rendering', function() {
-      smartField.proposalChooser = scout.create('Table', {parent: new scout.NullWidget(), session: session, _register: true});
+      smartField.proposalChooser = scout.create('Table', {parent: new scout.NullWidget(), session: session});
       smartField.touch = true;
       smartField.render(session.$entryPoint);
       expect(smartField.popup.rendered).toBe(true);
@@ -208,7 +208,7 @@ describe('SmartField', function() {
     });
 
     it('shows smartfield with same text as clicked smartfield', function() {
-      smartField.proposalChooser = scout.create('Table', {parent: new scout.NullWidget(), session: session, _register: true});
+      smartField.proposalChooser = scout.create('Table', {parent: new scout.NullWidget(), session: session});
       smartField.touch = true;
       smartField.displayText = 'row 1';
       smartField.render(session.$entryPoint);
@@ -218,18 +218,6 @@ describe('SmartField', function() {
       expect(smartField.popup._field.displayText).toBe(smartField.displayText);
       expect(smartField.popup._field.$field.val()).toBe(smartField.displayText);
       smartField.popup.close();
-    });
-
-    it('properly unregisters the field when the popup gets closed', function() {
-      smartField.proposalChooser = scout.create('Table', {parent: new scout.NullWidget(), session: session, _register: true});
-      smartField.touch = true;
-      smartField.render(session.$entryPoint);
-      expect(smartField.popup.rendered).toBe(true);
-
-      // Popup creates a clone -> validate that it will be unregistered when popup closes
-      expect(session._clonedModelAdapterRegistry[smartField.id][0]).toBe(smartField.popup._field);
-      smartField.popup.close();
-      expect(session._clonedModelAdapterRegistry[smartField.id].length).toBe(0);
     });
 
   });

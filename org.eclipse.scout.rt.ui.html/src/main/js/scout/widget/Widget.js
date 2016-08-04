@@ -33,8 +33,7 @@ scout.Widget = function() {
   this.animateRemoval;
 
   this._adapterProperties = [];
-  // FIXME [6.1] CGU probably not necessary anymore?
-  this._modelProperties = [];
+  this._cloneProperties = [];
 
   this._addKeyStrokeContextSupport();
   this._addEventSupport();
@@ -78,6 +77,26 @@ scout.Widget.prototype._init = function(options) {
 scout.Widget.prototype._initKeyStrokeContext = function(keyStrokeContext) {
   // NOP
 };
+
+//FIXME [6.1] CGU currently child/parent hierarchy is linked in render/remove. destroy would be more sync with init, replace popup.remove etc with popup.destroy
+//scout.Widget.prototype.destroy = function() {
+//  // Destroy children in reverse order
+//  this.children.slice().reverse().forEach(function(child) {
+//    child.destroy();
+//  });
+//
+//  this.remove();
+//
+//  // Disconnect from parent (widget is being destroyed, it will never be rendered again)
+//  if (this.parent) {
+//    this.parent.removeChild(this);
+//    this.parent = null;
+//  }
+//  this.destroyed = true;
+//
+//  // Inform listeners
+//  this.trigger('destroy');
+//};
 
 scout.Widget.prototype.render = function($parent) {
   $.log.trace('Rendering widget: ' + this);
@@ -578,6 +597,21 @@ scout.Widget.prototype._setProperty = function(propertyName, newValue) {
   this._firePropertyChange(propertyName, oldValue, newValue);
 };
 
+scout.Widget.prototype.setProperty = function(name, value) {
+  if (this[name] === value) {
+    return;
+  }
+  this._setProperty(name, value);
+  if (this.rendered) {
+    var renderFuncName = '_render' + scout.strings.toUpperCaseFirstLetter(name);
+    if (!this[renderFuncName]) {
+      throw new Error('Render function ' + renderFuncName + ' does not exist in ' + this.toString());
+    }
+    // FIXME CGU [6.1] new and old value übergeben? eher nicht
+    this[renderFuncName]();
+  }
+};
+
 scout.Widget.prototype.toString = function() {
   return 'Widget[rendered=' + this.rendered +
     (this.$container ? ' $container=' + scout.graphics.debugOutput(this.$container) : '') + ']';
@@ -603,8 +637,16 @@ scout.Widget.prototype._addAdapterProperties = function(properties) {
   this._addProperties('_adapterProperties', properties);
 };
 
-scout.Widget.prototype._addModelProperties = function(properties) {
-  this._addProperties('_modelProperties', properties);
+scout.Widget.prototype._isAdapterProperty = function(propertyName) {
+  return this._adapterProperties.indexOf(propertyName) > -1;
+};
+
+scout.Widget.prototype._addCloneProperties = function(properties) {
+  this._addProperties('_cloneProperties', properties);
+};
+
+scout.Widget.prototype._isCloneProperty = function(propertyName) {
+  return this._cloneProperties.indexOf(propertyName) > -1;
 };
 
 scout.Widget.prototype._addProperties = function(propertyName, properties) {
@@ -652,11 +694,8 @@ scout.Widget.prototype._createWidgets = function(propertyName, model) {
   return this._processWidgets(model, function(model) {
     if (model instanceof scout.ModelAdapter) {
       return model.createWidget(this); // FIXME [6.1] CGU widget should not have a dependency to model adapter
-    } else {
-//      model.parent = this; // FIXME [6.1] necessary?
-//      return scout.create(model);
-      return model;
     }
+    return model;
   }.bind(this));
 };
 
@@ -682,18 +721,91 @@ scout.Widget.prototype._send = function(type, data) {
   this.trigger(type, data);
 };
 
-scout.Widget.prototype.setProperty = function(name, value) {
-  if (this[name] === value) {
+scout.Widget.prototype.cloneAndMirror = function(model) {
+  var clone = this.clone(model);
+  clone.mirror();
+  return clone;
+};
+
+/**
+ * @returns the original widget from which this one was cloned. If it is not a clone, itself is returned.
+ */
+scout.Widget.prototype.original = function() {
+  var original = this;
+  while (original.cloneOf) {
+    original = original.cloneOf;
+  }
+  return original;
+};
+
+scout.Widget.prototype.clone = function(model) {
+  var clone, cloneModel;
+  model = model || {};
+
+  cloneModel = scout.objects.extractProperties(this, model, this._cloneProperties);
+  clone = scout.create(this.objectType, cloneModel);
+  clone.cloneOf = this;
+
+  return clone;
+};
+
+scout.Widget.prototype.mirror = function() {
+  this._mirror(this.cloneOf);
+  this.children.forEach(function(childClone) {
+    if (childClone.cloneOf) {
+      childClone.mirror(childClone.cloneOf);
+    }
+  });
+};
+
+scout.Widget.prototype._mirror = function(source) {
+  if (this._mirrorListener) {
     return;
   }
-  this._setProperty(name, value);
-  if (this.rendered) {
-    var renderFuncName = '_render' + scout.strings.toUpperCaseFirstLetter(name);
-    if (!this[renderFuncName]) {
-      throw new Error('Render function ' + renderFuncName + ' does not exist in ' + this.toString());
+  this._mirrorListener = {
+    func: this._onMirrorEvent.bind(this)
+  };
+  source.events.addListener(this._mirrorListener);
+  this.one('remove', function() { // FIXME [6.1] CGU destroy would be better
+    this.unmirror(source);
+  }.bind(this));
+};
+
+scout.Widget.prototype.unmirror = function() {
+  this.children.forEach(function(childClone) {
+    if (childClone.cloneOf) {
+      childClone.unmirror(childClone.cloneOf);
     }
-    // FIXME CGU [6.1] new and old value übergeben? eher nicht
-    this[renderFuncName]();
+  });
+  this._unmirror(this.cloneOf);
+};
+
+scout.Widget.prototype._unmirror = function(source) {
+  if (!this._mirrorListener) {
+    return;
+  }
+  source.events.removeListener(this._mirrorListener);
+  this._mirrorListener = null;
+};
+
+scout.Widget.prototype._onMirrorEvent = function(event) {
+  if (event.type === 'propertyChange') {
+    this._onMirrorPropertyChange(event);
+  }
+};
+
+scout.Widget.prototype._onMirrorPropertyChange = function(event) {
+  event.changedProperties.forEach(function(property) {
+    this.callSetter(property, event.newProperties[property]);
+  }, this);
+};
+
+scout.Widget.prototype.callSetter = function(propertyName, value) {
+  var setterFuncName = 'set' + scout.strings.toUpperCaseFirstLetter(propertyName);
+  if (this[setterFuncName]) {
+    this[setterFuncName]();
+  } else {
+    this.setProperty(propertyName, value);
   }
 };
 
