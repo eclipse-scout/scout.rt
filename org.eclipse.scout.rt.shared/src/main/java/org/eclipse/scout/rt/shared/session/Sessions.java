@@ -23,7 +23,7 @@ public final class Sessions {
    * Returns the session associated with the current thread, or <code>null</code> if not set, or if not of the expected
    * type.
    */
-  public static final <SESSION extends ISession> SESSION currentSession(final Class<SESSION> type) {
+  public static <SESSION extends ISession> SESSION currentSession(final Class<SESSION> type) {
     final ISession session = ISession.CURRENT.get();
     if (session == null) {
       return null;
@@ -33,7 +33,7 @@ public final class Sessions {
       return TypeCastUtility.castValue(session, type);
     }
     catch (final IllegalArgumentException e) {
-      LOG.debug("Session not of the expected type [session={}, expectedType={}]", session, type);
+      LOG.debug("Session not of the expected type [session={}, expectedType={}]", session, type, e);
       return null;
     }
   }

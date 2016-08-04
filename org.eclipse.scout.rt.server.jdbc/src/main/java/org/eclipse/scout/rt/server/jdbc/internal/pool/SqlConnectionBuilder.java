@@ -111,7 +111,7 @@ public class SqlConnectionBuilder {
         try {
           initialContext.close();
         }
-        catch (Exception e) {
+        catch (Exception e) { // NOSONAR
         }
       }
     }

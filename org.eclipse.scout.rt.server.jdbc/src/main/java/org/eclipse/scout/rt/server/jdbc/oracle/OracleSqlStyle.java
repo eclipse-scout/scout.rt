@@ -58,19 +58,8 @@ public class OracleSqlStyle extends AbstractSqlStyle {
 
   @Override
   public void testConnection(Connection conn) throws SQLException {
-    Statement testStatement = null;
-    try {
-      testStatement = conn.createStatement();
+    try (Statement testStatement = conn.createStatement();) {
       testStatement.execute("SELECT 1 FROM DUAL");
-    }
-    finally {
-      if (testStatement != null) {
-        try {
-          testStatement.close();
-        }
-        catch (Throwable t) {
-        }
-      }
     }
   }
 

@@ -218,7 +218,7 @@ public final class ScoutClientAssert {
     private final String m_positive;
     private final String m_negative;
 
-    private ViewKind(String name, String positive, String negative) {
+    ViewKind(String name, String positive, String negative) {
       m_name = name;
       m_positive = positive;
       m_negative = negative;

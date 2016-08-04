@@ -133,7 +133,7 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
     try {
       readUploadData(httpServletRequest, binaryResourceConsumer.getMaximumBinaryResourceUploadSize(), uploadProperties, uploadResources);
     }
-    catch (PlatformException ex) {
+    catch (PlatformException ex) { // NOSONAR
       writeJsonResponse(httpServletResponse, m_jsonRequestHelper.createUnsafeUploadResponse());
       return;
     }

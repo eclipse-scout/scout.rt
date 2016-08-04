@@ -22,6 +22,7 @@ import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -46,11 +47,14 @@ import org.slf4j.LoggerFactory;
  * <pre>
  * {@code
  * <?xml version="1.0" encoding="UTF-8"?>
- * <soapenv:Envelope soapenv:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
+ * <soapenv:Envelope soapenv:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" xmlns:soapenv=
+"http://schemas.xmlsoap.org/soap/envelope/">
  *   <soapenv:Body>
- *     <request version="3.0.0" format="de_CH" language="de_CH" service="org.eclipse.scout.rt.shared.services.common.ping.IPingService" operation="ping"/>
+ *     <request version="3.0.0" format="de_CH" language="de_CH" service=
+"org.eclipse.scout.rt.shared.services.common.ping.IPingService" operation="ping"/>
  *     <data>...</data>
- *     <info ts="20080715114301917" origin="192.168.1.105">For maximum performance, data is reduced, compressed and base64 encoded.</info>
+ *     <info ts="20080715114301917" origin=
+"192.168.1.105">For maximum performance, data is reduced, compressed and base64 encoded.</info>
  *   </soapenv:Body>
  * </soapenv:Envelope>
  * }
@@ -61,11 +65,13 @@ import org.slf4j.LoggerFactory;
  * <pre>
  * {@code
  * <?xml version="1.0" encoding="UTF-8"?>
- * <soapenv:Envelope soapenv:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
+ * <soapenv:Envelope soapenv:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" xmlns:soapenv=
+"http://schemas.xmlsoap.org/soap/envelope/">
  *   <soapenv:Body>
  *     <response status="OK" type="String"/>
  *     <data>...</data>
- *     <info ts="20080715114301917" origin="192.168.3.2">For maximum performance, data is reduced, compressed and base64 encoded.</info>
+ *     <info ts="20080715114301917" origin=
+"192.168.3.2">For maximum performance, data is reduced, compressed and base64 encoded.</info>
  *   </soapenv:Body>
  * </soapenv:Envelope>
  * }
@@ -76,13 +82,15 @@ import org.slf4j.LoggerFactory;
  * <pre>
  * {@code
  * <?xml version="1.0" encoding="UTF-8"?>
- * <soapenv:Envelope soapenv:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
+ * <soapenv:Envelope soapenv:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" xmlns:soapenv=
+"http://schemas.xmlsoap.org/soap/envelope/">
  *   <soapenv:Body>
  *     <response status="ERROR">
  *       <exception type="SecurityException">Access denied</exception>
  *     </response>
  *     <data>...</data>
- *     <info ts="20080715114301917" origin="192.168.3.2">For maximum performance, data is reduced, compressed and base64 encoded.</info>
+ *     <info ts="20080715114301917" origin=
+"192.168.3.2">For maximum performance, data is reduced, compressed and base64 encoded.</info>
  *   </soapenv:Body>
  * </soapenv:Envelope>
  * }
@@ -121,8 +129,8 @@ public class SoapServiceTunnelContentHandler extends AbstractServiceTunnelConten
     try {
       m_originAddress = InetAddress.getLocalHost().getHostAddress();
     }
-    catch (Throwable t) {
-      // nop
+    catch (UnknownHostException | RuntimeException e) {
+      LOG.warn("Could not determine local ip address", e);
     }
   }
 
@@ -260,7 +268,7 @@ public class SoapServiceTunnelContentHandler extends AbstractServiceTunnelConten
         try {
           deflater.end();
         }
-        catch (Throwable fatal) {
+        catch (Throwable fatal) { // NOSONAR
         }
       }
     }
@@ -345,7 +353,7 @@ public class SoapServiceTunnelContentHandler extends AbstractServiceTunnelConten
         try {
           inflater.end();
         }
-        catch (Throwable fatal) {
+        catch (Throwable fatal) { // NOSONAR
         }
       }
     }

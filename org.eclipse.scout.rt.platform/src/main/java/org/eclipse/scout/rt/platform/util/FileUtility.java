@@ -19,6 +19,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.channels.FileChannel;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -330,11 +331,11 @@ public final class FileUtility {
     try {
       return getMimeType(Paths.get(path));
     }
-    catch (Exception e1) {
+    catch (RuntimeException e1) { // NOSONAR
       try {
         return getMimeType(Paths.get("file." + getFileExtension(path)));
       }
-      catch (Exception e2) {
+      catch (RuntimeException e2) { // NOSONAR
         return getMimeType((Path) null);
       }
     }
@@ -380,9 +381,9 @@ public final class FileUtility {
       int test = in.readInt();
       return test == 0x504b0304; // magic number of a zip file
     }
-    catch (Exception e) {
-      return false;
+    catch (IOException e) { // NOSONAR
     }
+    return false;
   }
 
   public static byte[] removeByteOrderMark(File f) {
@@ -475,7 +476,7 @@ public final class FileUtility {
       Paths.get(s);
       //ok
     }
-    catch (Exception ex) {
+    catch (InvalidPathException ex) { // NOSONAR
       //nok, check every character in sandwich test
       StringBuilder buf = new StringBuilder();
       for (char ch : s.toCharArray()) {
@@ -483,7 +484,7 @@ public final class FileUtility {
           Paths.get("a" + ch + "a");
           buf.append(ch);
         }
-        catch (Exception ex2) {
+        catch (InvalidPathException ex2) { // NOSONAR
           //skip ch
         }
       }

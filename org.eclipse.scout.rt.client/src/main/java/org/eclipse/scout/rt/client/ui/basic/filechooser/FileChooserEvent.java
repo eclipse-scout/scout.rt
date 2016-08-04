@@ -53,7 +53,7 @@ public class FileChooserEvent extends EventObject implements IModelEvent {
         }
       }
     }
-    catch (Exception t) {
+    catch (Exception t) { // NOSONAR
       buf.append("#" + m_type);
     }
     buf.append("]");

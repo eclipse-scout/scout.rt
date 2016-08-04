@@ -31,6 +31,7 @@ import java.io.Reader;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLDecoder;
@@ -741,7 +742,7 @@ public final class IOUtility {
       try {
         url = new URL(text);
       }
-      catch (Exception e) {
+      catch (MalformedURLException e) {
         if (text.contains("@")) {
           text = "mailto:" + text;
         }
@@ -751,7 +752,7 @@ public final class IOUtility {
         try {
           url = new URL(text);
         }
-        catch (Exception e1) {
+        catch (MalformedURLException e1) {
           LOG.debug("Could not create url from '{}'", text, e1);
         }
       }

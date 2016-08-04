@@ -125,7 +125,7 @@ public class UnsavedFormChangesForm extends AbstractForm {
             try {
               f.validateForm();
             }
-            catch (RuntimeException e) {
+            catch (RuntimeException e) { // NOSONAR
               invalidForms.add(f);
             }
           }

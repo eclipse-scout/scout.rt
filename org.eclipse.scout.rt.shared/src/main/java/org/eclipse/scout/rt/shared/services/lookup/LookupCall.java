@@ -27,6 +27,8 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.ToStringBuilder;
 import org.eclipse.scout.rt.platform.util.TriState;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * There are 2 variants to use lookup values <br>
@@ -59,6 +61,7 @@ import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, Serializable, ITypeWithClassId {
 
   private static final long serialVersionUID = 0L;
+  private static final Logger LOG = LoggerFactory.getLogger(LookupCall.class);
 
   private KEY_TYPE m_key;
   private String m_text;
@@ -238,6 +241,7 @@ public class LookupCall<KEY_TYPE> implements ILookupCall<KEY_TYPE>, Cloneable, S
       c = (LookupCall) super.clone();
     }
     catch (CloneNotSupportedException e) {
+      LOG.warn("Could not clone lookup call instance", e);
     }
     return c;
   }

@@ -26,6 +26,8 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.shared.SharedConfigProperties.AuthTokenPrivateKeyProperty;
 import org.eclipse.scout.rt.shared.SharedConfigProperties.AuthTokenPublicKeyProperty;
 import org.eclipse.scout.rt.shared.SharedConfigProperties.AuthTokenTimeToLiveProperty;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <h3>{@link DefaultAuthToken}</h3> Authentication Token used in {@link HttpServiceTunnel} to tell the backend which
@@ -33,6 +35,7 @@ import org.eclipse.scout.rt.shared.SharedConfigProperties.AuthTokenTimeToLivePro
  */
 @Bean
 public class DefaultAuthToken {
+  private static final Logger LOG = LoggerFactory.getLogger(DefaultAuthToken.class);
 
   public static boolean isEnabled() {
     byte[] privateKey = CONFIG.getPropertyValue(AuthTokenPrivateKeyProperty.class);
@@ -72,7 +75,8 @@ public class DefaultAuthToken {
       try {
         signature = HexUtility.decode(parts[parts.length - 1]);
       }
-      catch (Exception ex) {
+      catch (RuntimeException e) {
+        LOG.debug("Could not decode hex string", e);
         signature = new byte[0];
       }
       m_userId = userId;
@@ -175,7 +179,7 @@ public class DefaultAuthToken {
     try {
       return verify();
     }
-    catch (Exception e) {
+    catch (RuntimeException e) { // NOSONAR
       return false;
     }
   }

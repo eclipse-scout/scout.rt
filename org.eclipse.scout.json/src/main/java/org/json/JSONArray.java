@@ -290,7 +290,7 @@ public class JSONArray {
       }
       return value;
     }
-    catch (IndexOutOfBoundsException e) {
+    catch (IndexOutOfBoundsException e) { // NOSONAR
       throw new JSONException("Index " + index + " out of range [0.." + m_values.size() + ")");
     }
   }
@@ -580,7 +580,7 @@ public class JSONArray {
       writeTo(stringer);
       return stringer.toString();
     }
-    catch (JSONException e) {
+    catch (JSONException e) { // NOSONAR
       return null;
     }
   }

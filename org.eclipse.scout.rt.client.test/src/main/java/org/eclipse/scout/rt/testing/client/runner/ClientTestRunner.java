@@ -220,7 +220,7 @@ public class ClientTestRunner extends PlatformTestRunner {
       try {
         m.getUIFacade().setResultFromUI(IMessageBox.CANCEL_OPTION);
       }
-      catch (Exception ex) {
+      catch (Exception ex) { // NOSONAR
         //nop
       }
       finally {
@@ -233,7 +233,7 @@ public class ClientTestRunner extends PlatformTestRunner {
         f.setAskIfNeedSave(false);
         f.doClose();
       }
-      catch (Exception ex) {
+      catch (Exception ex) { // NOSONAR
         //nop
       }
       finally {
@@ -245,7 +245,7 @@ public class ClientTestRunner extends PlatformTestRunner {
       try {
         f.getUIFacade().setResultFromUI(new ArrayList<BinaryResource>());
       }
-      catch (Exception ex) {
+      catch (Exception ex) { // NOSONAR
         //nop
       }
       finally {

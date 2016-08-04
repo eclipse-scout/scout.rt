@@ -42,7 +42,7 @@ public class LogoutService implements ILogoutService {
         session.invalidate();
       }
     }
-    catch (IllegalStateException e) {
+    catch (IllegalStateException e) { // NOSONAR
       //already invalid
     }
     catch (Exception e) {

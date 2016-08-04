@@ -268,7 +268,7 @@ public class ImapAdapter implements IImapAdapter {
           }
         }
       }
-      catch (AuthenticationFailedException e) {
+      catch (AuthenticationFailedException e) { // NOSONAR
         throw new ProcessingException("IMAP-Authentication failed on " + (m_host == null ? "?" : m_host) + ":" + m_port + ":" + m_username);
       }
       catch (MessagingException e) {
@@ -342,8 +342,8 @@ public class ImapAdapter implements IImapAdapter {
               folder.close(false);
             }
           }
-          catch (Throwable fatal) {
-            // nop
+          catch (MessagingException e) {
+            LOG.warn("Could not close folder", e);
           }
         }
       }

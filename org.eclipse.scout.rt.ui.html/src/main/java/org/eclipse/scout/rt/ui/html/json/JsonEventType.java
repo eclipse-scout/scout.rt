@@ -22,7 +22,7 @@ public enum JsonEventType {
 
   private String m_eventType;
 
-  private JsonEventType(String eventType) {
+  JsonEventType(String eventType) {
     m_eventType = eventType;
   }
 

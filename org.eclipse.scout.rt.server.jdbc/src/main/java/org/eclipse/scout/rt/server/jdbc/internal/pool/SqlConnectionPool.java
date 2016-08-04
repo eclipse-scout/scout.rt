@@ -37,6 +37,7 @@ import org.slf4j.LoggerFactory;
  * thread-safe
  */
 @Bean
+@SuppressWarnings("squid:S1166")
 public class SqlConnectionPool {
   private static final Logger LOG = LoggerFactory.getLogger(SqlConnectionPool.class);
 

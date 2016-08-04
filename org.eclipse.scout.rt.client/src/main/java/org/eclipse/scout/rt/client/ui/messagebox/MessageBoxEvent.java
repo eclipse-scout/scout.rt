@@ -53,7 +53,7 @@ public class MessageBoxEvent extends EventObject implements IModelEvent {
         }
       }
     }
-    catch (Exception t) {
+    catch (Exception t) { // NOSONAR
       buf.append("#" + m_type);
     }
     // messageBox

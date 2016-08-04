@@ -20,11 +20,11 @@ public enum UiLayer implements IUiLayer {
 
   final boolean m_webUi;
 
-  private UiLayer(boolean webUi) {
+  UiLayer(boolean webUi) {
     m_webUi = webUi;
   }
 
-  private UiLayer() {
+  UiLayer() {
     this(false);
   }
 
@@ -41,5 +41,4 @@ public enum UiLayer implements IUiLayer {
   public static IUiLayer createByIdentifier(String identifier) {
     return valueOf(identifier);
   }
-
 }

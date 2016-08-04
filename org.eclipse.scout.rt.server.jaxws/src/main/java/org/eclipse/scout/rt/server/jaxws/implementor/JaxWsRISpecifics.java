@@ -46,7 +46,7 @@ public class JaxWsRISpecifics extends JaxWsImplementorSpecifics {
 
       return String.format("%s (http://jax-ws.java.net, %s, bundled with JRE)", version, versionClass.getPackage().getImplementationVendor());
     }
-    catch (final ClassNotFoundException e) {
+    catch (final ClassNotFoundException e) { // NOSONAR
       throw new PlatformException("Application configured to run with JAX-WS RI (bundled with JRE), but implementor could not be found on classpath.");
     }
     catch (final ReflectiveOperationException e) {

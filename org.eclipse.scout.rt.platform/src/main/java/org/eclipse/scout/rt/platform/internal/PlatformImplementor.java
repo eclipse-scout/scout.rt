@@ -207,6 +207,7 @@ public class PlatformImplementor implements IPlatform {
           }
         }
       }
+      StringBuilder sb = new StringBuilder();
       for (Class s : serviceInterfaces) {
         if (s.equals(IService.class)) {
           continue;
@@ -217,18 +218,19 @@ public class PlatformImplementor implements IPlatform {
           if (list.size() <= 1) {
             continue;
           }
-          System.out.println("-------- " + s.getName() + " --------");
+          sb.append("-------- ").append(s.getName()).append(" --------\n");
           for (IBean<?> bean : list) {
-            System.out.println(" @Order(" + BeanHierarchy.orderOf(bean) + ") " + bean.getBeanClazz());
+            sb.append(" @Order(").append(BeanHierarchy.orderOf(bean)).append(") ").append(bean.getBeanClazz()).append('\n');
           }
         }
         catch (Exception e) {
-          e.printStackTrace();
+          LOG.warn("Could not list beans of class [{}]", s.getName(), e);
         }
       }
+      LOG.info("Query classes that are resolving to multiple beans\n{}", sb);
     }
     catch (Exception e) {
-      //nop
+      LOG.warn("Could not validate bean manager", e);
     }
   }
 

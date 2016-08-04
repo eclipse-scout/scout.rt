@@ -180,6 +180,7 @@ public abstract class AbstractSqlStyle implements ISqlStyle {
           nullType = TypeCastUtility.getGenericsParameterClass(nullType, IHolder.class);
         }
         catch (RuntimeException t) {
+          LOG.debug("Could not determine type parameter class", t);
           nullType = null;
         }
       }
@@ -338,7 +339,7 @@ public abstract class AbstractSqlStyle implements ISqlStyle {
           ps.setNull(jdbcBindIndex, Types.NULL);
 
         }
-        catch (SQLException e) {
+        catch (SQLException e) { // NOSONAR
           ps.setNull(jdbcBindIndex, Types.VARCHAR);
         }
         break;
@@ -384,7 +385,7 @@ public abstract class AbstractSqlStyle implements ISqlStyle {
             // try using byte stream
             ps.setBinaryStream(jdbcBindIndex, new ByteArrayInputStream(data), data.length);
           }
-          catch (SQLException e2) {
+          catch (SQLException e2) { // NOSONAR
             // send original exception
             if (e1 instanceof SQLException) {
               throw (SQLException) e1;

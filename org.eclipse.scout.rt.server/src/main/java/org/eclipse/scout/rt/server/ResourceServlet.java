@@ -87,7 +87,7 @@ public class ResourceServlet extends HttpServlet {
 
   private boolean writeStaticResource(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
     String pathInfo = req.getPathInfo();
-    if (pathInfo == null || pathInfo.endsWith("/") || pathInfo.equals("")) {
+    if (StringUtility.isNullOrEmpty(pathInfo) || pathInfo.endsWith("/")) {
       pathInfo = "/index.html";
     }
     URL url = null;

@@ -73,7 +73,7 @@ import org.eclipse.scout.rt.server.jaxws.provider.auth.method.IAuthenticationMet
 @Inherited
 public @interface WebServiceEntryPoint {
 
-  public static final String DERIVED = "derived";
+  String DERIVED = "derived";
 
   /**
    * Specifies the endpoint interface for which to generate an entry point during compile-time.
@@ -139,8 +139,7 @@ public @interface WebServiceEntryPoint {
    * <li>If providing a <em>handler binding file</em> yourself, this annotation is ignored.</li>
    * </ul>
    */
-  Authentication authentication() default @Authentication()
-  ;
+  Authentication authentication() default @Authentication();
 
   /**
    * Specifies the handlers to be installed. The order of the handlers is as declared. A handler is looked up as a bean,

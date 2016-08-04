@@ -622,11 +622,11 @@ public class UiSession implements IUiSession {
       try {
         return BEANS.get(UiJobs.class).awaitAndGet(future);
       }
-      catch (ThreadInterruptedException e) {
+      catch (ThreadInterruptedException e) { // NOSONAR
         future.cancel(true);
         return null;
       }
-      catch (FutureCancelledException e) {
+      catch (FutureCancelledException e) { // NOSONAR
         return null;
       }
     }

@@ -62,7 +62,7 @@ public class ServicesView extends DefaultView {
       }
       m_serviceInspectors = list.toArray(new ServiceInspector[list.size()]);
     }
-    catch (Exception e) {
+    catch (Exception e) { // NOSONAR
       // nop
     }
   }
@@ -269,7 +269,7 @@ public class ServicesView extends DefaultView {
           try {
             propValue = formatPropertyValue(desc, desc.getReadMethod().invoke(service.getService(), (Object[]) null));
           }
-          catch (Exception e) {
+          catch (Exception e) { // NOSONAR
             // nop
           }
         }

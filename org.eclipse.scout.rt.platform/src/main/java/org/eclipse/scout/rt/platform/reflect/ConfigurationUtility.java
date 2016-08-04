@@ -216,7 +216,7 @@ public final class ConfigurationUtility {
         c.getDeclaredMethod(declaredMethod.getName(), declaredMethod.getParameterTypes());
         return true;
       }
-      catch (NoSuchMethodException | SecurityException e) {
+      catch (NoSuchMethodException | SecurityException e) { // NOSONAR
         //nop
       }
       //up

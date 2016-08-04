@@ -44,7 +44,7 @@ public class JaxWsMetroSpecifics extends JaxWsImplementorSpecifics {
       final Package pck = Class.forName("com.sun.xml.ws.util.RuntimeVersion").getPackage();
       return String.format("JAX-WS Metro %s (http://jax-ws.java.net, %s, not bundled with JRE)", pck.getImplementationVersion(), pck.getImplementationVendor());
     }
-    catch (final ClassNotFoundException e) {
+    catch (final ClassNotFoundException e) { // NOSONAR
       throw new PlatformException("Application configured to run with JAX-WS Metro (not bundled with JRE), but implementor could not be found on classpath.");
     }
   }

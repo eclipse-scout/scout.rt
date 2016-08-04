@@ -29,10 +29,14 @@ import javax.mail.Store;
 
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class POP3Adapter {
 
   public static final String TRASH_FOLDER_NAME = "Trash";
+  private static final Logger LOG = LoggerFactory.getLogger(POP3Adapter.class);
+
   private boolean m_useSSL;
   private String m_host;
   private int m_port;
@@ -212,7 +216,8 @@ public class POP3Adapter {
           try {
             folder.close(false);
           }
-          catch (Throwable fatal) {
+          catch (MessagingException e) {
+            LOG.warn("Could not close folder", e);
           }
         }
       }

@@ -149,6 +149,7 @@ public final class TestingUtility {
       map.clear();
     }
     catch (Exception e) {
+      LOG.warn("Could not clear HTTP authentication cache", e);
       successful = false;
     }
     return successful;

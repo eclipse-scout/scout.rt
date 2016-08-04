@@ -70,7 +70,7 @@ public final class SQL {
       Connection conn = getConnection();
       driverName = conn.getMetaData().getDriverName();
     }
-    catch (SQLException | RuntimeException e) {
+    catch (SQLException | RuntimeException e) { // NOSONAR
       // nop
     }
     return driverName;

@@ -50,7 +50,7 @@ public final class RunContexts {
    * a new {@link RunMonitor} is created. However, even if there is a current {@link RunMonitor}, it is NOT registered
    * as child monitor, meaning that it will not be cancelled once the current {@link RunMonitor} is cancelled.
    */
-  public static final RunContext empty() {
+  public static RunContext empty() {
     final RunContext runContext = BEANS.get(RunContext.class);
     runContext.fillEmptyValues();
     return runContext;

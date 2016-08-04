@@ -227,10 +227,7 @@ public final class JsonObjectUtility {
             f.set(o, val);
             missingNames.remove(key);
           }
-          catch (NoSuchElementException nse) {
-            //nop
-          }
-          catch (NoSuchFieldException nse) {
+          catch (NoSuchElementException | NoSuchFieldException e) { // NOSONAR
             //nop
           }
         }

@@ -671,7 +671,7 @@ public class JSONObject {
       writeTo(stringer);
       return stringer.toString();
     }
-    catch (JSONException e) {
+    catch (JSONException e) { // NOSONAR
       return null;
     }
   }
@@ -743,16 +743,11 @@ public class JSONObject {
     if (data == null) {
       return "\"\"";
     }
-    try {
-      JSONStringer stringer = new JSONStringer();
-      stringer.open(JSONStringer.Scope.NULL, "");
-      stringer.value(data);
-      stringer.close(JSONStringer.Scope.NULL, JSONStringer.Scope.NULL, "");
-      return stringer.toString();
-    }
-    catch (JSONException e) {
-      throw new AssertionError();
-    }
+    JSONStringer stringer = new JSONStringer();
+    stringer.open(JSONStringer.Scope.NULL, "");
+    stringer.value(data);
+    stringer.close(JSONStringer.Scope.NULL, JSONStringer.Scope.NULL, "");
+    return stringer.toString();
   }
 
   /**
@@ -799,7 +794,7 @@ public class JSONObject {
         return o.toString();
       }
     }
-    catch (Exception ignored) {
+    catch (Exception ignored) { // NOSONAR
     }
     return null;
   }

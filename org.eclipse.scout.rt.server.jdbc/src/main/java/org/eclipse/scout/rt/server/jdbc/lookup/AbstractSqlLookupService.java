@@ -93,8 +93,8 @@ public abstract class AbstractSqlLookupService<T> extends AbstractLookupService<
       try {
         genericsParameterClass = TypeCastUtility.getGenericsParameterClass(getClass(), ILookupService.class);
       }
-      catch (IllegalArgumentException e) {
-        LOG.warn("Unable to calculate type parameters for lookup service '" + getClass().getName() + "'. No key type validation will be performed.");
+      catch (IllegalArgumentException e) { // NOSONAR
+        LOG.warn("Unable to calculate type parameters for lookup service [{}]. No key type validation will be performed.", getClass().getName());
       }
       return createLookupRowArray(data, call, genericsParameterClass);
     }

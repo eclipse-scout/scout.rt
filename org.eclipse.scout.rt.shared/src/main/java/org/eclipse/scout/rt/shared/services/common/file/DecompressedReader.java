@@ -22,7 +22,12 @@ import java.nio.charset.StandardCharsets;
 import java.util.zip.Inflater;
 import java.util.zip.InflaterInputStream;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class DecompressedReader extends Reader {
+  private static final Logger LOG = LoggerFactory.getLogger(DecompressedReader.class);
+
   private RemoteFile m_remoteFile;
   private ByteArrayInputStream m_buffer;
   private Inflater m_inflater;
@@ -44,6 +49,7 @@ public class DecompressedReader extends Reader {
       m_inputReader = new InputStreamReader(m_inflaterInputStream, charsetName);
     }
     catch (UnsupportedEncodingException e) {
+      LOG.warn("unsupporeted encoding '{}'", charsetName, e);
       m_inputReader = new InputStreamReader(m_inflaterInputStream);
     }
   }

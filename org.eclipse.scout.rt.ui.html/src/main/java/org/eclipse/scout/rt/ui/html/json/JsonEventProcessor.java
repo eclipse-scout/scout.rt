@@ -52,7 +52,7 @@ public class JsonEventProcessor {
       jsonAdapter.handleUiEvent(event);
       jsonAdapter.cleanUpEventFilters();
     }
-    catch (PlatformException e) {
+    catch (PlatformException e) { // NOSONAR
       throw e
           .withContextInfo("ui.event", event.getType())
           .withContextInfo("ui.adapter", jsonAdapter);

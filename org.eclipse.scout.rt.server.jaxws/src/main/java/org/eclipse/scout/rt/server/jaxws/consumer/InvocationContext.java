@@ -377,7 +377,7 @@ public class InvocationContext<PORT> {
               wsResult.setValue(m_invocationHandler.invoke(port, method, args)); // Custom InvocationHandler installed.
             }
           }
-          catch (final InvocationTargetException e) {
+          catch (final InvocationTargetException e) { // NOSONAR
             wsError.setValue(e.getCause());
           }
           catch (final Throwable t) {

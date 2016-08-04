@@ -93,7 +93,7 @@ public final class SVGUtility {
     try {
       cn = Class.forName("org.apache.xerces.parsers.SAXParser").getName();
     }
-    catch (ClassNotFoundException t) {
+    catch (ClassNotFoundException t) {// NOSONAR
       try {
         cn = Class.forName("com.sun.org.apache.xerces.internal.parsers.SAXParser").getName();
       }

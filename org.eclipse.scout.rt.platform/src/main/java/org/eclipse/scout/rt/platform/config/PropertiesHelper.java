@@ -322,7 +322,7 @@ public class PropertiesHelper {
         // in case it is an URL: make absolute file path
         value = new File(new URL(value).getFile()).getAbsolutePath();
       }
-      catch (Exception e) {
+      catch (Exception e) { // NOSONAR
       }
 
       t = t.substring(0, m.start()) + value + t.substring(m.end());

@@ -75,7 +75,7 @@ public class PlaceholderException extends Exception {
         try {
           pe = (ProcessingException) transformWellKnownException(throwable, cause, newStatus);
         }
-        catch (RuntimeException fatal) {
+        catch (RuntimeException fatal) { // NOSONAR
           // nop
         }
         if (pe == null) {
@@ -118,7 +118,7 @@ public class PlaceholderException extends Exception {
           transformedThrowable = ctor.newInstance(processingStatus);
         }
       }
-      catch (Exception e) {
+      catch (Exception e) { // NOSONAR
         // nop
       }
     }
@@ -139,7 +139,7 @@ public class PlaceholderException extends Exception {
           transformedThrowable = ctor.newInstance(message, cause);
         }
       }
-      catch (Exception e) {
+      catch (Exception e) { // NOSONAR
         // nop
       }
     }
@@ -152,7 +152,7 @@ public class PlaceholderException extends Exception {
           transformedThrowable = ctor.newInstance(message);
         }
       }
-      catch (Exception e) {
+      catch (Exception e) { // NOSONAR
         // nop
       }
     }
@@ -165,7 +165,7 @@ public class PlaceholderException extends Exception {
           transformedThrowable = ctor.newInstance(cause);
         }
       }
-      catch (Exception e) {
+      catch (Exception e) { // NOSONAR
         // nop
       }
     }
@@ -175,7 +175,7 @@ public class PlaceholderException extends Exception {
       try {
         transformedThrowable = clazz.newInstance();
       }
-      catch (Exception e) {
+      catch (Exception e) { // NOSONAR
         // nop
       }
     }

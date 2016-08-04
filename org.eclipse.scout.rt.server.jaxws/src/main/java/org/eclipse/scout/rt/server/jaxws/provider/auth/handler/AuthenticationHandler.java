@@ -138,7 +138,7 @@ public class AuthenticationHandler implements SOAPHandler<SOAPMessageContext> {
       m_implementorSpecifics.interceptWebServiceRequestRejected(messageContext, httpStatusCode);
       return false;
     }
-    catch (final WebServiceRequestRejectedException e) {
+    catch (final WebServiceRequestRejectedException e) { // NOSONAR
       throw new HTTPException(e.getHttpStatusCode());
     }
     catch (final Throwable t) {
@@ -153,7 +153,7 @@ public class AuthenticationHandler implements SOAPHandler<SOAPMessageContext> {
       try {
         m_implementorSpecifics.interceptWebServiceRequestRejected(messageContext, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
       }
-      catch (final WebServiceRequestRejectedException e) {
+      catch (final WebServiceRequestRejectedException e) { // NOSONAR
         throw new HTTPException(e.getHttpStatusCode()); // SECURITY: Do not propagate cause to the caller.
       }
 

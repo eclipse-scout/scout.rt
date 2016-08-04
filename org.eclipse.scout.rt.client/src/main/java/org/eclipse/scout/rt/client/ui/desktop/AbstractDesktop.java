@@ -2323,7 +2323,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
             break;
           }
         }
-        catch (VetoException e) {
+        catch (VetoException e) { // NOSONAR
           continueClosing = false;
         }
         catch (RuntimeException e) {

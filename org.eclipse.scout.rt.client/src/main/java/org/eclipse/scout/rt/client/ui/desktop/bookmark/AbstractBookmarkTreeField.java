@@ -940,7 +940,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
                   success = true;
                   break;
                 }
-                catch (RuntimeException e) {
+                catch (RuntimeException e) { // NOSONAR
                   success = false;
                 }
               }

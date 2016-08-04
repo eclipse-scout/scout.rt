@@ -230,7 +230,7 @@ public class DefaultValuesFilter {
       // Try to match types (to make Integer "1" equal to Double "1.0")
       value = TypeCastUtility.castValue(value, defaultValue.getClass());
     }
-    catch (RuntimeException e) {
+    catch (RuntimeException e) { // NOSONAR
       // Types do not match
       return false;
     }

@@ -135,7 +135,7 @@ public class JsonRequestHelper {
     try {
       servletResponse.getOutputStream().write(data);
     }
-    catch (final EOFException e) {
+    catch (final EOFException e) { // NOSONAR
       final StringBuilder sb = new StringBuilder("EOF - Client disconnected, cannot write response");
       if (LOG.isDebugEnabled()) {
         sb.append(": ").append(jsonText);

@@ -46,7 +46,7 @@ public class SqlBind {
         }
       }
     }
-    catch (Throwable t) {
+    catch (Throwable t) { // NOSONAR
       // nop
     }
     return "type=" + i;

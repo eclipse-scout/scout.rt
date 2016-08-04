@@ -302,7 +302,7 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
           setValue(null);
         }
       }
-      catch (Exception e) {
+      catch (Exception e) { // NOSONAR
         // nop
         setValue(null);
       }
@@ -393,7 +393,7 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
           setValue(null);
         }
       }
-      catch (Exception e) {
+      catch (Exception e) { // NOSONAR
         // nop
         setValue(null);
       }
@@ -445,7 +445,7 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
           setValue(null);
         }
       }
-      catch (Exception e) {
+      catch (Exception e) { // NOSONAR
         // nop
         setValue(null);
       }
@@ -508,7 +508,7 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
           setValue(null);
         }
       }
-      catch (Exception e) {
+      catch (Exception e) { // NOSONAR
         // nop
         setValue(null);
       }
@@ -565,7 +565,7 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
           setValue(null);
         }
       }
-      catch (Exception e) {
+      catch (Exception e) { // NOSONAR
         // nop
         setValue(null);
       }
@@ -626,7 +626,7 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
           setValue(null);
         }
       }
-      catch (Exception e) {
+      catch (Exception e) { // NOSONAR
         // nop
         setValue(null);
       }
@@ -687,7 +687,7 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
           setValue(null);
         }
       }
-      catch (Exception e) {
+      catch (Exception e) { // NOSONAR
         // nop
         setValue(null);
       }
@@ -755,7 +755,7 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
           setValue(null);
         }
       }
-      catch (Exception e) {
+      catch (Exception e) { // NOSONAR
         // nop
         setValue(null);
       }
@@ -806,7 +806,7 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
           setValue(null);
         }
       }
-      catch (Exception e) {
+      catch (Exception e) { // NOSONAR
         // nop
         setValue(null);
       }
@@ -865,7 +865,7 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
       try {
         setValue(CollectionUtility.<Object> firstElement(values));
       }
-      catch (Exception e) {
+      catch (Exception e) { // NOSONAR
         // nop
         setValue(null);
       }
@@ -935,7 +935,7 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
           }
         }
       }
-      catch (Exception e) {
+      catch (Exception e) { // NOSONAR
         // nop
       }
     }
@@ -1012,7 +1012,7 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
           }
         }
       }
-      catch (Exception e) {
+      catch (Exception e) { // NOSONAR
         // nop
       }
     }
@@ -1091,7 +1091,7 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
           }
         }
       }
-      catch (Exception e) {
+      catch (Exception e) { // NOSONAR
         // nop
       }
     }
@@ -1162,7 +1162,7 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
           }
         }
       }
-      catch (Exception e) {
+      catch (Exception e) { // NOSONAR
         // nop
       }
     }
@@ -1233,7 +1233,7 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
           }
         }
       }
-      catch (Exception e) {
+      catch (Exception e) { // NOSONAR
         // nop
       }
     }
@@ -1304,7 +1304,7 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
           }
         }
       }
-      catch (Exception e) {
+      catch (Exception e) { // NOSONAR
         // nop
       }
     }

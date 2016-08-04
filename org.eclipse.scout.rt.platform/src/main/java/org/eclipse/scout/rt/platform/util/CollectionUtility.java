@@ -745,10 +745,9 @@ public final class CollectionUtility {
         else if (s.indexOf('.') >= 0) {
           // try to make double
           try {
-            o = new Double(Double.parseDouble(s));
+            o = Double.valueOf(s);
           }
-          catch (Exception e) {
-            /* nop */
+          catch (NumberFormatException e) {
             o = s;
           }
         }
@@ -757,8 +756,7 @@ public final class CollectionUtility {
           try {
             o = Long.valueOf(s);
           }
-          catch (Exception e) {
-            /* nop */
+          catch (NumberFormatException e) {
             o = s;
           }
         }

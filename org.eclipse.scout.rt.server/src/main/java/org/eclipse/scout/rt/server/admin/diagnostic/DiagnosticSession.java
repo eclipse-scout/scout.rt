@@ -289,7 +289,7 @@ public class DiagnosticSession {
       ip = addr.getHostAddress();
       hostname = addr.getHostName();
     }
-    catch (UnknownHostException e) {
+    catch (UnknownHostException e) { // NOSONAR
       hostname = "Unknown";
       ip = "Unknown";
     }

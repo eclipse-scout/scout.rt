@@ -22,6 +22,8 @@ import java.util.Locale;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class DateUtility {
 
@@ -29,6 +31,8 @@ public final class DateUtility {
   }
 
   public static final long DAY_MILLIS = 24L * 3600L * 1000L;
+
+  private static final Logger LOG = LoggerFactory.getLogger(DateUtility.class);
 
   //2 letter code countries for different weekends worldwide
   private static final List<String> SUN_WEEKEND_DAYS_COUNTRIES = Arrays.asList(new String[]{"GQ", "IN", "TH", "UG"});
@@ -117,8 +121,9 @@ public final class DateUtility {
       return true;
     }
     catch (IllegalArgumentException e) {
-      return false;
+      LOG.debug("could not parse date from given text [s='{}',pattern='{}']", s, pattern, e);
     }
+    return false;
   }
 
   public static Date addMilliseconds(Date d, int milliseconds) {

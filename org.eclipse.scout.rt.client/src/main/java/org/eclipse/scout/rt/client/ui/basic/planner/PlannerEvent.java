@@ -126,7 +126,7 @@ public class PlannerEvent extends java.util.EventObject implements IModelEvent {
         }
       }
     }
-    catch (Exception t) {
+    catch (Exception t) { // NOSONAR
       buf.append("#" + m_type);
     }
     buf.append(" ");

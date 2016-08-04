@@ -43,7 +43,7 @@ public final class JmsRunContexts {
   /**
    * Creates an empty <code>JmsRunContext</code>.
    */
-  public static final JmsRunContext empty() {
+  public static JmsRunContext empty() {
     final JmsRunContext runContext = BEANS.get(JmsRunContext.class);
     runContext.fillEmptyValues();
     return runContext;

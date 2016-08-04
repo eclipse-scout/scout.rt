@@ -338,7 +338,7 @@ public class BindParser {
     }
     int index = m_pos.getIndex();
     if (matches("::") || matches("##")) {
-      boolean plainValue = m_str.substring(index, index + 2).equals("##");
+      boolean plainValue = "##".equals(m_str.substring(index, index + 2));
       String name;
       ArrayList<String> args;
       if ((name = parseName()) != null && parseWhitespace(0) && matches("(") && parseWhitespace(0) && (args = parseFunctionArgList()).size() > 0 && parseWhitespace(0) && matches(")")) {

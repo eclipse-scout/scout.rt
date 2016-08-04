@@ -104,7 +104,7 @@ public class DynamicNls {
           }
         }
       }
-      catch (MissingResourceException e) {
+      catch (MissingResourceException e) { // NOSONAR
         //nop
       }
     }
@@ -133,7 +133,7 @@ public class DynamicNls {
           }
         }
       }
-      catch (MissingResourceException e) {
+      catch (MissingResourceException e) { // NOSONAR
         //nop
       }
     }

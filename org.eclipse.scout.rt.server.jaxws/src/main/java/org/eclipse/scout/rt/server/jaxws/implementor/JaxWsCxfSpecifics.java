@@ -43,7 +43,7 @@ public class JaxWsCxfSpecifics extends JaxWsImplementorSpecifics {
       final Package pck = Class.forName("org.apache.cxf.jaxws.JaxWsClientProxy").getPackage();
       return String.format("JAX-WS Apache CXF %s (%s)", pck.getImplementationVersion(), pck.getImplementationVendor());
     }
-    catch (final ClassNotFoundException e) {
+    catch (final ClassNotFoundException e) { // NOSONAR
       throw new PlatformException("Application configured to run with JAX-WS Apache CXF, but implementor could not be found on classpath.");
     }
   }

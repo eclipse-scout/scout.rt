@@ -210,6 +210,7 @@ public class MailUtility {
               text = new String(content, getCharacterEncodingOfMimePart(mimePart));
             }
             catch (UnsupportedEncodingException e) {
+              LOG.warn("unsupporeted encoding", e);
               text = new String(content);
             }
           }
@@ -658,8 +659,9 @@ public class MailUtility {
       try {
         textPlainClass = Class.forName(className);
       }
-      catch (Throwable t) {
+      catch (ClassNotFoundException e) {
         //class not found, cancel
+        LOG.debug("Could not modify Mailcap command map because expected class has not been found", e);
         return;
       }
       CommandMap cmap = MailcapCommandMap.getDefaultCommandMap();

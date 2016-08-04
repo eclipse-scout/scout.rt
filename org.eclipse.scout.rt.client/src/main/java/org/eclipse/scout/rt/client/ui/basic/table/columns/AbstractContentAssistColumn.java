@@ -240,8 +240,8 @@ public abstract class AbstractContentAssistColumn<VALUE, LOOKUP_TYPE> extends Ab
       try {
         validValue = TypeCastUtility.castValue(rawValue, getDataType());
       }
-      catch (Exception e) {
-        throw new ProcessingException("invalid " + getDataType().getSimpleName() + " value in column '" + getClass().getName() + "': " + rawValue + " class=" + rawValue.getClass());
+      catch (RuntimeException e) {
+        throw new ProcessingException("invalid {} value in column '{}': {} class={}", getDataType().getSimpleName(), getClass().getName(), rawValue, rawValue.getClass(), e);
       }
     }
     return validValue;

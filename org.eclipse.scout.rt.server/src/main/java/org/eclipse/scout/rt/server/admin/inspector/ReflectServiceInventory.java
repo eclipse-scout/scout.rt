@@ -71,7 +71,7 @@ public class ReflectServiceInventory {
     TreeMap<CompositeObject, PropertyDescriptor> sortMap = new TreeMap<CompositeObject, PropertyDescriptor>();
     int index = 0;
     for (PropertyDescriptor p : m_properties) {
-      if (p.getName().equals("class")) {
+      if ("class".equals(p.getName())) {
         // ignore
       }
       else {
@@ -99,7 +99,7 @@ public class ReflectServiceInventory {
     TreeMap<CompositeObject, Method> sortMap = new TreeMap<CompositeObject, Method>();
     int index = 0;
     for (Method m : m_operations) {
-      if (m.getName().equals("getInventory")) {
+      if ("getInventory".equals(m.getName())) {
         // ignore
       }
       else {

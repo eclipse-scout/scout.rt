@@ -159,7 +159,7 @@ public class BatchLookupResultCache {
           t.getDeclaredMethod("equals", Object.class);
           //found
         }
-        catch (Exception ex) {
+        catch (Exception ex) { // NOSONAR
           //not found
           LOG.warn("{} subclasses LookupCall with an additional member field '{}.{}' and should therefore override the 'boolean equals(Object obj)' and 'int hashCode()' methods",
               clazz, t.getSimpleName(), f.getName());

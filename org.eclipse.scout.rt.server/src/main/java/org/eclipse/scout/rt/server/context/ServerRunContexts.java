@@ -56,7 +56,7 @@ public final class ServerRunContexts {
    * <strong>TransactionScope</strong><br>
    * {@link TransactionScope#REQUIRES_NEW}.
    */
-  public static final ServerRunContext empty() {
+  public static ServerRunContext empty() {
     final ServerRunContext runContext = BEANS.get(ServerRunContext.class);
     runContext.fillEmptyValues();
     return runContext;

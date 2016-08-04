@@ -343,7 +343,9 @@ public class CsvSqlAdapter {
         m_sqlService.insert(m_statement, bindBase.toArray());
       }
       catch (RuntimeException e) {
-        throw new ProcessingException("line=" + lineNr + " row=" + row + "\n" + e.getMessage());
+        throw new ProcessingException(e.getMessage(), e)
+            .withContextInfo("lineNr", lineNr)
+            .withContextInfo("row", row);
       }
     }
   }

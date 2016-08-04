@@ -25,7 +25,7 @@ public enum TriState {
 
   private final Boolean m_value;
 
-  private TriState(Boolean value) {
+  TriState(Boolean value) {
     this.m_value = value;
   }
 

@@ -33,8 +33,12 @@ import org.eclipse.scout.rt.server.ServerConfigProperties.ImapPasswordProperty;
 import org.eclipse.scout.rt.server.ServerConfigProperties.ImapPortProperty;
 import org.eclipse.scout.rt.server.ServerConfigProperties.ImapSslProtocolsProperty;
 import org.eclipse.scout.rt.server.ServerConfigProperties.ImapUsernameProperty;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class AbstractIMAPService implements IIMAPService {
+
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractIMAPService.class);
 
   private final String m_host;
   private final int m_port;
@@ -166,14 +170,16 @@ public abstract class AbstractIMAPService implements IIMAPService {
         try {
           m_folder.close(false);
         }
-        catch (Throwable fatal) {
+        catch (MessagingException e) {
+          LOG.warn("Could not close folder", e);
         }
       }
       if (m_store != null) {
         try {
           m_store.close();
         }
-        catch (Throwable fatal) {
+        catch (MessagingException e) {
+          LOG.warn("Could not close store", e);
         }
       }
     }

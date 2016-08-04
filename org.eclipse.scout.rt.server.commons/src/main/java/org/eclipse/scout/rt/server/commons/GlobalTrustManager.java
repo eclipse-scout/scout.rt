@@ -122,7 +122,7 @@ public class GlobalTrustManager {
         LOG.info("Trusted certificate '{}' successfully installed.", certRemoteFile.getName());
       }
       catch (Exception e) {
-        LOG.info("Failed to install trusted certificate '{}'.", certRemoteFile.getName());
+        LOG.info("Failed to install trusted certificate '{}'.", certRemoteFile.getName(), e);
       }
     }
     return trustedCerts;
@@ -133,20 +133,10 @@ public class GlobalTrustManager {
   }
 
   protected X509Certificate readX509Cert(InputStream inputStream) throws CertificateException, IOException {
-    BufferedInputStream bis = new BufferedInputStream(inputStream);
-    CertificateFactory certFactory = CertificateFactory.getInstance("X.509");
-    X509Certificate cert = null;
-    while (bis.available() > 0) {
-      cert = (X509Certificate) certFactory.generateCertificate(bis);
+    try (BufferedInputStream bis = new BufferedInputStream(inputStream)) {
+      CertificateFactory certFactory = CertificateFactory.getInstance("X.509");
+      return (X509Certificate) certFactory.generateCertificate(bis);
     }
-
-    try {
-      bis.close();
-    }
-    catch (IOException e) {
-      LOG.warn("could not close input stream for certificate");
-    }
-    return cert;
   }
 
   protected class P_GlobalTrustManager implements X509TrustManager {
@@ -216,7 +206,7 @@ public class GlobalTrustManager {
             // certificate accepted
             return;
           }
-          catch (GeneralSecurityException e) {
+          catch (GeneralSecurityException e) { // NOSONAR
             // Security exception is thrown if a certificate is not valid.
           }
         }

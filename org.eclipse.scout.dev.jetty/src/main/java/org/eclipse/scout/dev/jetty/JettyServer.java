@@ -108,7 +108,7 @@ public class JettyServer {
         try {
           while (true) {
             String command = br.readLine().trim();
-            if (command.equalsIgnoreCase("shutdown")) {
+            if ("shutdown".equalsIgnoreCase(command)) {
               try {
                 LOG.warn("Shutting down...");
                 server.stop();
@@ -231,7 +231,7 @@ public class JettyServer {
         URL resourceUrl = resourceUrls.nextElement();
         String absoluteResourcePath = resourceUrl.getPath();
 
-        if (resourceUrl.toURI().getScheme().equals("jar")) {
+        if ("jar".equals(resourceUrl.toURI().getScheme())) {
           // The resource is located within a packed JAR. (e.g. located in Maven repository)
           resources.addAll(JettyServer.listFilesFromJar(absoluteResourcePath, path));
         }

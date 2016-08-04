@@ -48,7 +48,7 @@ public enum OpenUriAction implements IOpenUriAction {
 
   private final String m_identifier;
 
-  private OpenUriAction(String identifier) {
+  OpenUriAction(String identifier) {
     m_identifier = identifier;
   }
 

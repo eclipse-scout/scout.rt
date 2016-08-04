@@ -1624,7 +1624,7 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
         catch (FutureCancelledException | ThreadInterruptedException e) {
           callback.onSuccess(Collections.<ILookupRow<LOOKUP_KEY>> emptyList());
         }
-        catch (final RuntimeException e) {
+        catch (final RuntimeException e) { // NOSONAR
           callback.onFailure(exception);
         }
       }

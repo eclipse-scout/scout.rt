@@ -243,6 +243,7 @@ public abstract class AbstractSMTPService implements ISMTPService {
         }
       }
       catch (Exception e) {
+        LOG.warn("Could not close transport", e);
       }
     }
   }

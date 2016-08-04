@@ -81,7 +81,7 @@ public class BinaryServiceTunnelContentHandler extends AbstractServiceTunnelCont
         try {
           deflater.end();
         }
-        catch (Throwable fatal) {
+        catch (Throwable fatal) { // NOSONAR
         }
       }
     }
@@ -105,7 +105,7 @@ public class BinaryServiceTunnelContentHandler extends AbstractServiceTunnelCont
         try {
           inflater.end();
         }
-        catch (Throwable fatal) {
+        catch (Throwable fatal) { // NOSONAR
         }
       }
     }

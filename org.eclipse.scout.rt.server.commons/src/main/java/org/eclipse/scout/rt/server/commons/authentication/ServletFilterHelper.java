@@ -163,7 +163,7 @@ public class ServletFilterHelper {
             }
           });
     }
-    catch (PrivilegedActionException e) {
+    catch (PrivilegedActionException e) { // NOSONAR
       Throwable t = e.getCause();
       if (t instanceof IOException) {
         throw (IOException) t;

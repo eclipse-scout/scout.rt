@@ -19,12 +19,15 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.scout.rt.platform.nls.NlsLocale;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class is Thread safe
  */
 public final class EventListenerProfiler {
 
+  private static final Logger LOG = LoggerFactory.getLogger(EventListenerProfiler.class);
   private static final EventListenerProfiler INSTANCE = new EventListenerProfiler();
 
   public static EventListenerProfiler getInstance() {
@@ -69,7 +72,7 @@ public final class EventListenerProfiler {
     /**
      * this call to gc is intended
      */
-    System.gc();
+    System.gc(); // NOSONAR
     if (!m_enabled) {
       return;
     }
@@ -92,8 +95,8 @@ public final class EventListenerProfiler {
       }
       snapshot.dump(out);
     }
-    catch (Throwable t) {
-      t.printStackTrace();
+    catch (RuntimeException e) {
+      LOG.warn("Could not dump event listener snapshot", e);
     }
   }
 

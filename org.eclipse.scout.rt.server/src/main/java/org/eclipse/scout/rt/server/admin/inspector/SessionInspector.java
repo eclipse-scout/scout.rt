@@ -52,8 +52,7 @@ public class SessionInspector {
     try {
       m_info.setSubject(Subject.getSubject(AccessController.getContext()));
     }
-    catch (Exception e) {
-      // ignore
+    catch (Exception e) { // NOSONAR
     }
   }
 

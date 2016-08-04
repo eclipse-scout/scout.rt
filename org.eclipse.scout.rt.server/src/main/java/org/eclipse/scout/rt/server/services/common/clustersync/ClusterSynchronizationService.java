@@ -97,7 +97,7 @@ public class ClusterSynchronizationService implements IClusterSynchronizationSer
       try {
         hostname = InetAddress.getLocalHost().getHostName();
       }
-      catch (UnknownHostException e) {
+      catch (UnknownHostException e) { // NOSONAR
         hostname = null;
       }
       // might result in a hostname 'localhost'

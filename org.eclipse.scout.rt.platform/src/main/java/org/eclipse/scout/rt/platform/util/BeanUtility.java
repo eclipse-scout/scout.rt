@@ -247,7 +247,7 @@ public final class BeanUtility {
         return ctor;
       }
     }
-    catch (NoSuchMethodException e) {
+    catch (NoSuchMethodException e) { // NOSONAR
       LOG.debug("exact constructor does not exist");
     }
     // default constructor is not available

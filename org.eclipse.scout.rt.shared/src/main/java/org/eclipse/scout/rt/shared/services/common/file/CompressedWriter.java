@@ -68,16 +68,10 @@ public class CompressedWriter extends Writer {
     // m_buffer
     // (in
     // remote_file)
-    try {
-      String str = new String(cbuf, off, len);
-      byte[] b = str.getBytes(m_charsetName);
-      m_crc32.update(b, 0, b.length);
-      m_deflaterOutputStream.write(b, 0, b.length);
-      flush();
-    }
-    catch (Exception e) {
-      throw new IOException(e.getMessage());
-    }
+    String str = new String(cbuf, off, len);
+    byte[] b = str.getBytes(m_charsetName);
+    m_crc32.update(b, 0, b.length);
+    m_deflaterOutputStream.write(b, 0, b.length);
+    flush();
   }
-
 }

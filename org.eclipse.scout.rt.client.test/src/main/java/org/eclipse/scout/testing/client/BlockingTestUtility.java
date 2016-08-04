@@ -178,7 +178,7 @@ public final class BlockingTestUtility {
   }
 
   public static interface IBlockingConditionTimeoutHandle extends IRegistrationHandle {
-    public Exception getFirstException();
+    Exception getFirstException();
   }
 
   private static class BlockingConditionTimeoutListener implements IJobListener {

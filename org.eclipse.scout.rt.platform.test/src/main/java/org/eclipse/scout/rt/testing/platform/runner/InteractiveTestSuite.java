@@ -22,8 +22,8 @@ import org.junit.runners.model.RunnerBuilder;
  * <p>
  * By default {@link InteractiveTestSuite#run(RunNotifier, Runner)} is called.
  * <p>
- * Note that unfortunately the eclipse junit integration doesn't support dynamic test runs in its GUI view (
- * "Unroooted Tests") . However, the console output will inform you correctly about the test results.
+ * Note that unfortunately the eclipse junit integration doesn't support dynamic test runs in its GUI view ( "Unroooted
+ * Tests") . However, the console output will inform you correctly about the test results.
  */
 public class InteractiveTestSuite extends Runner {
   private final Class<?> m_annotatedClass;
@@ -69,7 +69,7 @@ public class InteractiveTestSuite extends Runner {
         try {
           runMethod = m_annotatedClass.getMethod("run", Runner.class, RunNotifier.class);
         }
-        catch (Throwable t) {
+        catch (Throwable t) { // NOSONAR
           runMethod = InteractiveTestSuite.class.getMethod("run", Runner.class, RunNotifier.class);
         }
         Class<?> testClass = Class.forName(line, true, m_annotatedClass.getClassLoader());
@@ -118,7 +118,7 @@ public class InteractiveTestSuite extends Runner {
         }
       }
     }
-    catch (Exception e) {
+    catch (Exception e) { // NOSONAR
       return false;
     }
   }

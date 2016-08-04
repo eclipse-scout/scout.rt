@@ -186,7 +186,7 @@ class BeanPropertyInput implements IBindInput {
       String op = m_target.getParsedOp();
       m_target.setParsedAttribute(null);
       m_target.setParsedOp(null);
-      if (op.equalsIgnoreCase("IN") || op.equalsIgnoreCase("=")) {
+      if ("IN".equalsIgnoreCase(op) || "=".equalsIgnoreCase(op)) {
         m_target.setReplaceToken(sqlStyle.createInList(att, plain, values));
       }
       else {

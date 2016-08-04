@@ -42,6 +42,8 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.NumberFormatProvider;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.date.DateFormatProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Helper for reading and writing CSV data. <br/>
@@ -52,6 +54,7 @@ public class CsvHelper {
    * a column named with "null" will be ignored, its data will not be imported
    */
   public static final String IGNORED_COLUMN_NAME = "null";
+  private static final Logger LOG = LoggerFactory.getLogger(CsvHelper.class);
 
   private final Locale m_locale;
   private final char m_separatorChar;// ";"
@@ -331,6 +334,7 @@ public class CsvHelper {
         writer.close();
       }
       catch (Exception e) {
+        LOG.warn("Could not close writer", e);
       }
     }
   }
@@ -407,6 +411,7 @@ public class CsvHelper {
           writer.close();
         }
         catch (Exception e) {
+          LOG.warn("Could not close writer", e);
         }
       }
     }
@@ -594,23 +599,12 @@ public class CsvHelper {
    * @return the current row in the reader as cell tokens based on this helpers context
    */
   public List<String> getCurrentRow(Reader reader) {
-    BufferedReader bufferedReader = null;
-    try {
-      bufferedReader = new BufferedReader(reader);
+    try (
+        BufferedReader bufferedReader = new BufferedReader(reader)) {
       return importRow(bufferedReader);
     }
     catch (Exception e) {
       throw new ProcessingException("reading header row", e);
     }
-    finally {
-      if (bufferedReader != null) {
-        try {
-          bufferedReader.close();
-        }
-        catch (Exception e) {
-        }
-      }
-    }
   }
-
 }

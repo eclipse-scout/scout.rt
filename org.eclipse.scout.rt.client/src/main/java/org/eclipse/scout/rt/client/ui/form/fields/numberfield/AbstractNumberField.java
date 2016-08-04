@@ -354,7 +354,7 @@ public abstract class AbstractNumberField<NUMBER extends Number> extends Abstrac
       try {
         retVal = roundParsedValue(valBeforeRounding);
       }
-      catch (ArithmeticException e) {
+      catch (ArithmeticException e) { // NOSONAR
         throw new ProcessingException(ScoutTexts.get("InvalidNumberMessageX", text));
       }
       // check for bad range

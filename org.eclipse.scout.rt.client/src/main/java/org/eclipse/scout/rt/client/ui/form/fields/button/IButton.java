@@ -129,5 +129,5 @@ public interface IButton extends IFormField {
 
   void setView(boolean visible, boolean enabled);
 
-  public Object getKeyStrokeScope();
+  Object getKeyStrokeScope();
 }

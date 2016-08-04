@@ -24,6 +24,7 @@ import org.eclipse.scout.rt.server.transaction.AbstractTransactionMember;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@SuppressWarnings("squid:S1166")
 public class PreparedStatementCache extends AbstractTransactionMember implements IStatementCache {
   private static final Logger LOG = LoggerFactory.getLogger(PreparedStatementCache.class);
 

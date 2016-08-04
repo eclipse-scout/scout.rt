@@ -404,8 +404,9 @@ public final class XmlUtility {
       return document;
     }
     catch (ParserConfigurationException e) {
-      return null;
+      LOG.debug("Could not create new xml document", e);
     }
+    return null;
   }
 
   /**

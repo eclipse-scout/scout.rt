@@ -111,7 +111,7 @@ public abstract class AbstractSvgField extends AbstractFormField implements ISvg
         LOG.trace("{}.setSvgDocument\n{}", getClass().getName(), new String(out.toByteArray(), StandardCharsets.UTF_8));
       }
       catch (RuntimeException e) {
-        //nop
+        LOG.warn("Could not set svg document", e);
       }
     }
     propertySupport.setProperty(PROP_SVG_DOCUMENT, doc);

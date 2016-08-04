@@ -32,6 +32,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.resource.BinaryResources;
@@ -92,7 +93,7 @@ public class RemoteFile implements Serializable {
         readData(conn.getInputStream());
         m_exists = true;
       }
-      catch (IOException e) {
+      catch (IOException e) { // NOSONAR
         m_exists = false;
       }
     }
@@ -157,7 +158,7 @@ public class RemoteFile implements Serializable {
         readData(new ByteArrayInputStream(res.getContent()));
       }
       catch (IOException e) {
-        throw new IllegalArgumentException("Cannot read binary data");
+        throw new PlatformException("Cannot read binary data", e);
       }
     }
   }
@@ -172,7 +173,7 @@ public class RemoteFile implements Serializable {
           .build();
     }
     catch (IOException e) {
-      throw new IllegalArgumentException("Cannot write binary data");
+      throw new PlatformException("Cannot write binary data", e);
     }
   }
 

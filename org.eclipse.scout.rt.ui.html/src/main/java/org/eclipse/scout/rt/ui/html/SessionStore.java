@@ -380,7 +380,7 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
           LOG.info("Invalidate HTTP session with ID {} because session store contains no more client sessions", m_httpSessionId);
           m_httpSession.invalidate();
         }
-        catch (IllegalStateException e) {
+        catch (IllegalStateException e) { // NOSONAR
           // already invalid
         }
       }

@@ -35,7 +35,7 @@ public class JavaNioMimeTypeDetector implements IMimeTypeDetector {
     try {
       return Files.probeContentType(path);
     }
-    catch (IOException e) {
+    catch (IOException e) { // NOSONAR
       //ignore
     }
     return null;

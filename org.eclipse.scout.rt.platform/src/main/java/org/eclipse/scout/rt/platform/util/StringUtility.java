@@ -34,6 +34,8 @@ import java.util.zip.InflaterInputStream;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.nls.CollatorProvider;
 import org.eclipse.scout.rt.platform.nls.NlsLocale;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class StringUtility {
 
@@ -48,6 +50,7 @@ public final class StringUtility {
   public static final Comparator<String> ALPHANUMERIC_COMPARATOR_IGNORE_CASE = new AlphanumericComparator(true);
 
   private static final String[] EMPTY_ARRAY = new String[0];
+  private static final Logger LOG = LoggerFactory.getLogger(StringUtility.class);
 
   public interface ITagProcessor {
     String/* tagReplacement */ processTag(String tagName, String tagContent);
@@ -145,7 +148,7 @@ public final class StringUtility {
       try {
         return Pattern.compile(buf.toString()).pattern();
       }
-      catch (PatternSyntaxException ex) {
+      catch (PatternSyntaxException ex) { // NOSONAR
         return "INVALID_PATTERN";
       }
     }
@@ -1482,6 +1485,7 @@ public final class StringUtility {
     return s;
   }
 
+  @SuppressWarnings("squid:S1166")
   public static byte[] compress(String s) {
     ByteArrayOutputStream buffer = new ByteArrayOutputStream();
     Deflater deflater = new Deflater(Deflater.BEST_COMPRESSION);
@@ -1537,6 +1541,7 @@ public final class StringUtility {
     return buffer.toByteArray();
   }
 
+  @SuppressWarnings("squid:S1166")
   public static String decompress(byte[] compressed) {
     ByteArrayInputStream in = new ByteArrayInputStream(compressed);
     Inflater inflater = new Inflater();
@@ -1724,9 +1729,10 @@ public final class StringUtility {
       Pattern pattern = Pattern.compile(".*" + regex + ".*", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
       return pattern.matcher(s).matches();
     }
-    catch (RuntimeException t) {
-      return false;
+    catch (RuntimeException e) {
+      LOG.debug("Could not check wether string matches regex [s='{}',regex='{}']", s, regex, e);
     }
+    return false;
   }
 
   /**

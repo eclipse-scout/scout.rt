@@ -18,8 +18,8 @@ import java.util.concurrent.Callable;
 import javax.security.auth.Subject;
 
 import org.eclipse.scout.rt.platform.chain.callable.CallableChain;
-import org.eclipse.scout.rt.platform.chain.callable.ICallableInterceptor;
 import org.eclipse.scout.rt.platform.chain.callable.CallableChain.Chain;
+import org.eclipse.scout.rt.platform.chain.callable.ICallableInterceptor;
 import org.eclipse.scout.rt.platform.util.CompareUtility;
 
 /**
@@ -48,7 +48,7 @@ public class SubjectProcessor<RESULT> implements ICallableInterceptor<RESULT> {
         }
       });
     }
-    catch (final PrivilegedActionException e) {
+    catch (final PrivilegedActionException e) { // NOSONAR
       throw e.getException();
     }
   }

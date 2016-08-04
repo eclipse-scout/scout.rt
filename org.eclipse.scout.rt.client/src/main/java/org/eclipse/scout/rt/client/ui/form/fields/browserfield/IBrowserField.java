@@ -35,7 +35,7 @@ public interface IBrowserField extends IFormField {
 
     private String m_attribute;
 
-    private SandboxPermission(String attribute) {
+    SandboxPermission(String attribute) {
       m_attribute = attribute;
     }
 

@@ -166,7 +166,8 @@ public class ServiceOperationInvoker {
     try {
       verifyMethod = interfaceClass.getMethod(interfaceMethod.getName(), interfaceMethod.getParameterTypes());
     }
-    catch (Throwable t) {
+    catch (NoSuchMethodException | RuntimeException t) {
+      LOG.debug("Could not lookup service method", t);
       throw new SecurityException("access denied (code 1c).");
     }
     //exists
@@ -188,8 +189,8 @@ public class ServiceOperationInvoker {
       try {
         m = c.getMethod(interfaceMethod.getName(), interfaceMethod.getParameterTypes());
       }
-      catch (Throwable t) {
-        //nop
+      catch (NoSuchMethodException | RuntimeException t) {
+        LOG.debug("Could not lookup service method", t);
       }
       if (m != null && m.isAnnotationPresent(RemoteServiceAccessDenied.class)) {
         throw new SecurityException("access denied (code 2b).");

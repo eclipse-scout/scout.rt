@@ -773,7 +773,7 @@ public abstract class AbstractSqlService implements ISqlService, IServiceInvento
               return c;
             }
           }
-          catch (ClassNotFoundException t) {
+          catch (ClassNotFoundException t) { // NOSONAR
             LOG.warn("Could not load class with lenient name '{}'", new Object[]{name});
           }
         }

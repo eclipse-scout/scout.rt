@@ -43,7 +43,7 @@ public class DataModelAggregationLookupCall extends LocalLookupCall<Integer> {
       try {
         updateLookupRows();
       }
-      catch (Exception t) {
+      catch (Exception t) { // NOSONAR
         LOG.error("Failed updating aggregation lookup rows for attribute {}", attribute);
         m_lookupRows = CollectionUtility.emptyArrayList();
       }
