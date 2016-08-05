@@ -2534,10 +2534,12 @@ scout.Tree.prototype._insertNodeInDOM = function(node, indexHint) {
   node.attached = true;
 };
 
-scout.Tree.prototype._ensureParentIsInDOM = function(node, useAnimation, indexHint) {
-  var parentNode = node.parentNode;
-  if (parentNode && !parentNode.attached && parentNode === this.visibleNodesFlat[indexHint] && indexHint >= this.viewRangeRendered.from && indexHint < this.viewRangeRendered.to) {
-    this.showNode(parentNode, useAnimation, indexHint);
+/**
+ * Attaches node to DOM, if it is visible and in view range
+ * */
+scout.Tree.prototype._ensureNodeInDOM = function(node, useAnimation, indexHint) {
+  if (node && !node.attached && node === this.visibleNodesFlat[indexHint] && indexHint >= this.viewRangeRendered.from && indexHint < this.viewRangeRendered.to) {
+    this.showNode(node, useAnimation, indexHint);
   }
 };
 
@@ -2555,6 +2557,7 @@ scout.Tree.prototype._insertNodeInDOMAtPlace = function(node, index) {
 
   // append after index
   var nodeBefore = this.visibleNodesFlat[index - 1];
+  this._ensureNodeInDOM(nodeBefore, false, index-1);
   if (nodeBefore.attached) {
     $node.insertAfter(nodeBefore.$node);
     return;
@@ -2580,7 +2583,7 @@ scout.Tree.prototype.showNode = function(node, useAnimation, indexHint) {
   if (node.attached || !this.rendered) {
     return;
   }
-  this._ensureParentIsInDOM(node, useAnimation, indexHint - 1);
+  this._ensureNodeInDOM(node.parentNode, useAnimation, indexHint - 1);
   this._insertNodeInDOM(node, indexHint);
   if (!node.rendered) {
     return;
