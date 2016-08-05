@@ -104,34 +104,44 @@ scout.AbstractTableNavigationKeyStroke.prototype.firstRowBeforeSelection = funct
  * Searches for the last selected row in the current selection block, starting from rowIndex. Expects row at rowIndex to be selected.
  */
 scout.AbstractTableNavigationKeyStroke.prototype._findLastSelectedRowBefore = function(table, rowIndex) {
-  var rows = table.filteredRows();
+  var row, rows = table.filteredRows();
   if (rowIndex === 0) {
     return rows[rowIndex];
   }
-  return scout.arrays.findFromPrev(rows, rowIndex, function(row, i) {
+  row = scout.arrays.findFromPrev(rows, rowIndex, function(row, i) {
     var previousRow = rows[i - 1];
     if (!previousRow) {
       return false;
     }
     return !table.isRowSelected(previousRow);
   });
+  // when no row has been found, use first row in table
+  if (!row) {
+    row = rows[0];
+  }
+  return row;
 };
 
 /**
  * Searches for the last selected row in the current selection block, starting from rowIndex. Expects row at rowIndex to be selected.
  */
 scout.AbstractTableNavigationKeyStroke.prototype._findLastSelectedRowAfter = function(table, rowIndex) {
-  var rows = table.filteredRows();
+  var row, rows = table.filteredRows();
   if (rowIndex === rows.length - 1) {
     return rows[rowIndex];
   }
-  return scout.arrays.findFromPrev(rows, rowIndex, function(row, i) {
+  row = scout.arrays.findFromPrev(rows, rowIndex, function(row, i) {
     var nextRow = rows[i + 1];
     if (!nextRow) {
       return false;
     }
     return !table.isRowSelected(nextRow);
   });
+  // when no row has been found, use last row in table
+  if (!row) {
+    row = rows[rows.length - 1];
+  }
+  return row;
 };
 
 scout.AbstractTableNavigationKeyStroke.prototype._findFirstRowInViewport = function(table, viewportBounds) {
