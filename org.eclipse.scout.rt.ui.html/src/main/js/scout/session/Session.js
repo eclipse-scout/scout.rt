@@ -66,6 +66,7 @@ scout.Session = function($entryPoint, options) {
   this.requestTimeoutPoll = 75000; // ms
   this.requestTimeoutPing = 5000; // ms
   this.ready = false; // true after desktop has been completely rendered
+  this.unloading = false; // true when 'beforeOnload' event has been triggered
   this.unloaded = false; // true after unload event has been received from the window
   this.desktop;
   this.url = 'json';
@@ -917,9 +918,11 @@ scout.Session.prototype.goOffline = function() {
   // In Firefox, the current async polling request is interrupted immediately when the page is unloaded. Therefore,
   // an offline message would appear at once on the desktop. When reloading the page, all elements are cleared anyway,
   // thus we wait some short period of time before displaying the message and starting the reconnector. If
-  // we find that goOffline() was called because of request unloading, we skip the unnecessary part.
+  // we find that goOffline() was called because of request unloading, we skip the unnecessary part. Note that
+  // FF doesn't guarantee that _onWindowUnload() is called before this setTimeout() function is called. Therefore,
+  // we have to look at another property "unloading" that is set earlier in _onWindowBeforeUnload().
   setTimeout(function() {
-    if (this.unloaded) {
+    if (this.unloading || this.unloaded) {
       return;
     }
     this.rootAdapter.goOffline();
@@ -1212,6 +1215,15 @@ scout.Session.prototype._onReloadPage = function(event) {
 scout.Session.prototype._onWindowBeforeUnload = function() {
   $.log.info('Session before unloading...');
   // TODO BSH Cancel pending requests
+
+  // Set a flag that indicates unloading before _onWindowUnload() is called.
+  // See goOffline() why this is necessary.
+  this.unloading = true;
+  setTimeout(function() {
+    // Because there is no callback when the unloading was cancelled, we always
+    // reset the flag after a short period of time.
+    this.unloading = false;
+  }.bind(this), 200);
 };
 
 scout.Session.prototype._onWindowUnload = function() {
