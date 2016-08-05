@@ -40,9 +40,10 @@
 
 .search-outline-status {
   #scout.overflow-ellipsis-nowrap();
+  cursor: pointer;
   padding-right: 8px;
   text-align: right;
-  margin-top: 10px;
+  padding-top: 10px;
   margin-bottom: -4px;
 }
 
