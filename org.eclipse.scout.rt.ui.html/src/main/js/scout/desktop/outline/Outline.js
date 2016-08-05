@@ -118,10 +118,11 @@ scout.Outline.prototype._remove = function() {
 
 scout.Outline.prototype._renderTitle = function() {
   if (!this.$title) {
-    this.$title = this.$container
-      .prependDiv('outline-title')
+    this.$title = this.$container.prependDiv('outline-title');
+
+    // Listener is added to the text instead of the title to not get the clicks on the title menubar
+    this.$titleText = this.$title.prependDiv('outline-title-text')
       .on('click', this._onTitleClick.bind(this));
-    this.$titleText = this.$title.prependDiv('outline-title-text');
   }
   this.$titleText.text(this.title);
 };
