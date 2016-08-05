@@ -25,8 +25,8 @@ scout.SplitBox.SPLITTER_POSITION_TYPE_ABSOLUTE_SECOND = 'absoluteSecond';
 
 scout.SplitBox.prototype._init = function(model) {
   scout.SplitBox.parent.prototype._init.call(this, model);
-  this._updateCollapseHandle();
   this._syncCollapseKeyStroke(this.collapseKeyStroke);
+  this._updateCollapseHandle();
 };
 
 scout.SplitBox.prototype._render = function($parent) {
@@ -303,12 +303,19 @@ scout.SplitBox.prototype.setCollapsibleField = function(field) {
 };
 
 scout.SplitBox.prototype._updateCollapseHandle = function() {
+  // always unregister key stroke first (although it may have been added by _syncCollapseKeyStroke before)
+  if (this.collapseKeyStroke) {
+    this.unregisterKeyStrokes(this.collapseKeyStroke);
+  }
   if (this.collapsibleField) {
     if (!this._collapseHandle) {
       this._collapseHandle = scout.create('CollapseHandle', {
         parent: this
       });
       this._collapseHandle.on('action', this.toggleFieldCollapsed.bind(this));
+      if (this.collapseKeyStroke) {
+        this.registerKeyStrokes(this.collapseKeyStroke);
+      }
     }
     this._updateCollapseHandleButtons();
   } else {
@@ -350,8 +357,13 @@ scout.SplitBox.prototype._renderCollapsibleField = function() {
 
 scout.SplitBox.prototype._syncCollapseKeyStroke = function(keyStroke) {
   if (keyStroke) {
+    if (this.collapseKeyStroke instanceof scout.KeyStroke) {
+      this.unregisterKeyStrokes(this.collapseKeyStroke);
+    }
     this.collapseKeyStroke = new scout.SplitBoxCollapseKeyStroke(this, keyStroke);
-    this.registerKeyStrokes(this.collapseKeyStroke);
+    if (this._collapseHandle) {
+      this.registerKeyStrokes(this.collapseKeyStroke);
+    }
   }
   return false;
 };
