@@ -129,7 +129,7 @@ public class ExtensionRegistry implements IInternalExtensionRegistry {
 
       if (isExtension) {
         // 1. try type parameter of extension
-        ownerClassIdentifier = new ClassIdentifier(extensionGeneric);
+        ownerClassIdentifier = new ClassIdentifier(ownerClassIdentifierFromDeclaring, extensionGeneric);
       }
 
       if (ownerClassIdentifier == null) {
