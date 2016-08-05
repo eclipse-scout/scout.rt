@@ -24,7 +24,7 @@ public class ChartEvent extends EventObject implements IModelEvent {
 
   private final int m_type;
 
-  private int m_axesPosition[];
+  private int[] m_axesPosition;
   private BigDecimal m_value;
 
   public ChartEvent(IChart source, int type) {
