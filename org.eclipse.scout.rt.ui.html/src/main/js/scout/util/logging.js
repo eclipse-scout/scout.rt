@@ -32,7 +32,7 @@ scout.logging = {
       };
       if (typeof log4javascript === 'undefined') {
         // If log4javascript is not yet installed, dynamically load the library
-        deferred = $.getCachedScript('res/log4javascript.min.js')
+        deferred = $.injectScript('res/log4javascript.min.js')
           .done(function(script, textStatus) {
             initLog4Javascript();
           });

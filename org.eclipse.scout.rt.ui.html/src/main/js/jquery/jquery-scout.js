@@ -186,15 +186,47 @@ $.colorOpacity = function(hex, opacity) {
 };
 
 /**
- * from http://api.jquery.com/jquery.getscript/
+ * CSP-safe method to dynamically load a script from the server. A new <script>
+ * tag is added to the head element to prevent problematic "eval()" calls. A
+ * jQuery deferred object is returned which can be used to execute code after
+ * the loading has been complete:
+ *
+ *   $injectScript('http://www....').done(function() { ... });
+ *
+ * Options (optional):
+ *
+ * NAME              DEFAULT             DESCRIPTION
+ * --------------------------------------------------------------------------------------------
+ * document          window.document     Which document to inject the script to.
+ *
+ * removeTag         false               Whether to remove the script tag again from the DOM
+ *                                       after the script has been loaded.
  */
-$.getCachedScript = function(url, options) {
-  options = $.extend(options || {}, {
-    dataType: 'script',
-    cache: true,
-    url: url
-  });
-  return $.ajax(options);
+$.injectScript = function(url, options) {
+  options = options || {};
+  var deferred = $.Deferred();
+
+  var myDocument = options.document || window.document;
+  var scriptTag = myDocument.createElement('script');
+  $(scriptTag)
+    .attr('src', url)
+    .attr('async', true)
+    .on('load error', function(event) {
+      if (options.removeTag) {
+        myDocument.head.removeChild(scriptTag);
+      }
+      if (event.type === 'error') {
+        deferred.reject();
+      } else {
+        deferred.resolve();
+      }
+    });
+  // Use raw JS function to append the <script> tag, because jQuery handles
+  // script tags specially (see "domManip" function) and uses eval() which
+  // is not CSP-safe.
+  myDocument.head.appendChild(scriptTag);
+
+  return deferred.promise();
 };
 
 $.pxToNumber = function(pixel) {

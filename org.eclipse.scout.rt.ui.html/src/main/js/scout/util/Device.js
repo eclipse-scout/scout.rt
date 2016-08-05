@@ -135,7 +135,7 @@ scout.Device.prototype._loadJQueryMobileDeferred = function() {
 
 scout.Device.prototype._loadScriptDeferred = function(scriptUrl, doneFunc) {
   return $
-    .getCachedScript(scriptUrl)
+    .injectScript(scriptUrl)
     .done(doneFunc);
 };
 
