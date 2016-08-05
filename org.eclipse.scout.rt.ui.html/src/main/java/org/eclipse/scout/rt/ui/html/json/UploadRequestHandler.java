@@ -191,7 +191,7 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
       if (item.isFormField()) {
         // Handle non-file fields (interpreted as properties)
         String name = item.getFieldName();
-        uploadProperties.put(name, new String(content, StandardCharsets.UTF_8.name()));
+        uploadProperties.put(name, new String(content, StandardCharsets.UTF_8));
       }
       else {
         // Handle files

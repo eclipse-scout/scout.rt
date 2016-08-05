@@ -98,7 +98,7 @@ public class PlatformException extends RuntimeException implements Serializable 
       return this;
     }
 
-    final String formattedValue = MessageFormatter.arrayFormat(valueAsString.toString(), valueArgs).getMessage();
+    final String formattedValue = MessageFormatter.arrayFormat(valueAsString, valueArgs).getMessage();
     final String contextInfo = String.format("%s=%s", name, formattedValue);
     if (m_contextInfos.contains(contextInfo)) {
       return this;

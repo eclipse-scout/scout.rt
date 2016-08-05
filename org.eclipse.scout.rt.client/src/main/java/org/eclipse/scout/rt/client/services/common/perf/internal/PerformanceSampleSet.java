@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.services.common.perf.internal;
 
+import java.util.Arrays;
+
 public class PerformanceSampleSet {
   private Object m_samplesLock = new Object();
   private long[] m_samples;
@@ -19,10 +21,8 @@ public class PerformanceSampleSet {
   public PerformanceSampleSet(int size, long initialValue) {
     m_samplesSum = 0;
     m_samples = new long[size];
-    for (int i = 0; i < m_samples.length; i++) {
-      m_samples[i] = initialValue;
-      m_samplesSum += m_samples[i];
-    }
+    Arrays.fill(m_samples, initialValue);
+    m_samplesSum = size * initialValue;
     m_samplesLastIndex = m_samples.length - 1;
   }
 
@@ -50,5 +50,4 @@ public class PerformanceSampleSet {
   public long getValue() {
     return m_samplesSum / m_samples.length;
   }
-
 }

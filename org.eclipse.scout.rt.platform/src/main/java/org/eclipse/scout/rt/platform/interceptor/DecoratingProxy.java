@@ -172,7 +172,7 @@ public class DecoratingProxy<INSTANCE> {
       return getDecoratingProxy().invokeImpl(method, args);
     }
 
-    protected DecoratingProxy<T> getDecoratingProxy() {
+    DecoratingProxy<T> getDecoratingProxy() {
       return m_decoratingProxy;
     }
   }

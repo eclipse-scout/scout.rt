@@ -58,13 +58,13 @@ public class HtmlDocumentParser {
 
   public byte[] parseDocument(byte[] document) throws IOException {
     // the order of calls is important: first we must resolve all includes
-    m_workingContent = new String(document, StandardCharsets.UTF_8.name());
+    m_workingContent = new String(document, StandardCharsets.UTF_8);
     replaceIncludeTags();
     replaceBaseTags();
     replaceMessageTags();
     replaceStylesheetTags();
     replaceScriptTags();
-    return m_workingContent.getBytes(StandardCharsets.UTF_8.name());
+    return m_workingContent.getBytes(StandardCharsets.UTF_8);
   }
 
   protected void replaceScriptTags(Pattern pattern, String tagPrefix, String tagSuffix) throws IOException {
@@ -212,7 +212,7 @@ public class HtmlDocumentParser {
       }
       else {
         byte[] includeContent = IOUtility.readFromUrl(includeUrl);
-        String replacement = new String(includeContent, StandardCharsets.UTF_8.name());
+        String replacement = new String(includeContent, StandardCharsets.UTF_8);
         // Ensure exactly 1 newline before and after the replacement (to improve readability in resulting document)
         replacement = "\n" + replacement.trim() + "\n";
         m.appendReplacement(sb, replacement);

@@ -145,7 +145,7 @@ public class SoapServiceTunnelContentHandler extends AbstractServiceTunnelConten
     if (debugEnabled) {
       stream = new DebugOutputStream(stream);
     }
-    try (OutputStreamWriter out = new OutputStreamWriter(stream, StandardCharsets.UTF_8.name())) {
+    try (OutputStreamWriter out = new OutputStreamWriter(stream, StandardCharsets.UTF_8)) {
 
       // build soap message without sax (hi-speed)
       boolean compressed = isUseCompression();
@@ -192,7 +192,7 @@ public class SoapServiceTunnelContentHandler extends AbstractServiceTunnelConten
     if (debugEnabled) {
       stream = new DebugOutputStream(stream);
     }
-    try (OutputStreamWriter out = new OutputStreamWriter(stream, StandardCharsets.UTF_8.name())) {
+    try (OutputStreamWriter out = new OutputStreamWriter(stream, StandardCharsets.UTF_8)) {
 
       // build soap message without sax (hi-speed)
       boolean compressed = isUseCompression();
@@ -292,7 +292,7 @@ public class SoapServiceTunnelContentHandler extends AbstractServiceTunnelConten
     String dataPart = null;
     boolean compressed = true;
     try {
-      Reader r = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8.name()));
+      Reader r = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
       StringBuilder buf = new StringBuilder();
       int ch;
       while ((ch = r.read()) >= 0) {

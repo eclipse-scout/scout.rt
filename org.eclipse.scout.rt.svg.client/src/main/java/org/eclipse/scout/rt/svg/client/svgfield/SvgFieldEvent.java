@@ -65,7 +65,7 @@ public class SvgFieldEvent extends EventObject {
     return m_appLinkRef;
   }
 
-  private class Point implements Serializable {
+  private static class Point implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private float m_x;

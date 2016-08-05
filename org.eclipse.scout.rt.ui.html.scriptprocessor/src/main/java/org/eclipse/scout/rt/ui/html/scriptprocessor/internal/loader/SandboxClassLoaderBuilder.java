@@ -85,7 +85,7 @@ public final class SandboxClassLoaderBuilder {
     });
   }
 
-  protected static URL unwrapNestedJar(URL url) {
+  static URL unwrapNestedJar(URL url) {
     if (!url.getPath().endsWith(".jar")) {
       return url;
     }
@@ -146,7 +146,7 @@ public final class SandboxClassLoaderBuilder {
   /**
    * Determines the sha1 hash (hex representation) of the data provided by the input stream.
    */
-  protected static String getSha1(InputStream inputStream) throws NoSuchAlgorithmException, IOException {
+  static String getSha1(InputStream inputStream) throws NoSuchAlgorithmException, IOException {
     MessageDigest sha1Digest = MessageDigest.getInstance("SHA-1");
     byte[] buf = new byte[ANY_SIZE];
     int n;
@@ -160,7 +160,7 @@ public final class SandboxClassLoaderBuilder {
   /**
    * Writes the content from the url output stream to the provided file.
    */
-  protected static void writeContent(URL url, File f) throws IOException {
+  static void writeContent(URL url, File f) throws IOException {
     // ensure folder exists
     File folder = f.getParentFile();
     if (!folder.exists() && !folder.mkdirs()) {

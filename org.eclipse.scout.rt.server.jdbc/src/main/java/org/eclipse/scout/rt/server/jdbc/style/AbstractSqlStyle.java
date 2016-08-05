@@ -380,7 +380,7 @@ public abstract class AbstractSqlStyle implements ISqlStyle {
           // try using setBytes()
           ps.setBytes(jdbcBindIndex, data);
         }
-        catch (SQLException e1) {
+        catch (SQLException | RuntimeException e1) {
           try {
             // try using byte stream
             ps.setBinaryStream(jdbcBindIndex, new ByteArrayInputStream(data), data.length);

@@ -98,7 +98,7 @@ public final class JsonAdapterUtility {
    * <p>
    * Example: StringField -> [ GroupBox, GroupBox, TabBox, GroupBox, SequenceBox, StringField ].
    */
-  protected static List<IFormField> getFieldHierarchy(IFormField formField) {
+  static List<IFormField> getFieldHierarchy(IFormField formField) {
     List<IFormField> fieldHierarchy = new ArrayList<IFormField>();
     while (formField != null) {
       fieldHierarchy.add(0, formField);

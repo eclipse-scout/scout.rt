@@ -35,12 +35,8 @@ public class MemoryOptimizedObject implements Serializable {
       else {
         // remove object
         Object[] newData = new Object[m_data.length - 1];
-        for (int i = 0; i < index; i++) {
-          newData[i] = m_data[i];
-        }
-        for (int i = index; i < newData.length; i++) {
-          newData[i] = m_data[i + 1];
-        }
+        System.arraycopy(m_data, 0, newData, 0, index);
+        System.arraycopy(m_data, index + 1, newData, index, m_data.length - index - 1);
         m_data = newData;
         m_bits = (short) (m_bits - (1 << bitPos));
       }
@@ -57,13 +53,9 @@ public class MemoryOptimizedObject implements Serializable {
         }
         index = setCountBefore;
         Object[] newData = new Object[m_data.length + 1];
-        for (int i = 0; i < index; i++) {
-          newData[i] = m_data[i];
-        }
+        System.arraycopy(m_data, 0, newData, 0, index);
         newData[index] = newValue;
-        for (int i = index + 1; i < newData.length; i++) {
-          newData[i] = m_data[i - 1];
-        }
+        System.arraycopy(m_data, index, newData, index + 1, m_data.length - index);
         m_data = newData;
         m_bits = (short) (m_bits | (1 << bitPos));
         return true;

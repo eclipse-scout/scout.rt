@@ -842,9 +842,7 @@ public class StatementProcessor implements IStatementProcessor {
   private void bindBatch(PreparedStatement ps) {
     try {
       // bind inputs
-      if (ps instanceof PreparedStatement) {
-        writeBinds(ps);
-      }
+      writeBinds(ps);
       // register outputs
       if (ps instanceof CallableStatement) {
         registerOutputs((CallableStatement) ps);

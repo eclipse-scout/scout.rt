@@ -687,7 +687,7 @@ public final class IOUtility {
       return null;
     }
 
-    String s = url.toString().trim();
+    String s = url.trim();
     if (s.length() == 0) {
       return "";
     }
@@ -715,7 +715,7 @@ public final class IOUtility {
       return null;
     }
 
-    String s = encodedUrl.toString().trim();
+    String s = encodedUrl.trim();
     if (s.length() == 0) {
       return "";
     }

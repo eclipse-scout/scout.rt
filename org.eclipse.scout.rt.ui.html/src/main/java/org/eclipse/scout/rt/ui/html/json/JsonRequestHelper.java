@@ -118,7 +118,7 @@ public class JsonRequestHelper {
    */
   public void writeResponse(final ServletResponse servletResponse, final JSONObject jsonResponse) throws IOException {
     String jsonText = jsonResponse.toString();
-    final byte[] data = jsonText.getBytes(StandardCharsets.UTF_8.name());
+    final byte[] data = jsonText.getBytes(StandardCharsets.UTF_8);
     if (LOG.isDebugEnabled() && !LOG.isTraceEnabled() && jsonText.length() > 10000) {
       // Truncate log output to not spam the log (and in case of eclipse to not make it freeze: https://bugs.eclipse.org/bugs/show_bug.cgi?id=175888)
       jsonText = jsonText.substring(0, 10000) + "...";

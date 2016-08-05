@@ -59,13 +59,13 @@ public class DefaultAuthToken {
     }
 
     try {
-      String userId = new String(HexUtility.decode(parts[0]), StandardCharsets.UTF_8.name());
+      String userId = new String(HexUtility.decode(parts[0]), StandardCharsets.UTF_8);
       long validUntil = Long.parseLong(parts[1], 16);
       String[] customArgs = null;
       if (parts.length > 3) {
         customArgs = Arrays.copyOfRange(parts, 2, parts.length - 1);
         for (int i = 0; i < customArgs.length; i++) {
-          customArgs[i] = new String(HexUtility.decode(customArgs[i]), StandardCharsets.UTF_8.name());
+          customArgs[i] = new String(HexUtility.decode(customArgs[i]), StandardCharsets.UTF_8);
         }
       }
       if (customArgs != null && customArgs.length == 0) {

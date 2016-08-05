@@ -919,12 +919,8 @@ public class ClientUIPreferences {
     int[] a = getPropertyIntArray(DESKTOP_COLUMN_SPLITS);
     if (a != null && a.length == rowCount * colCount) {
       int[][] splits = new int[rowCount][colCount];
-      int index = 0;
       for (int r = 0; r < rowCount; r++) {
-        for (int c = 0; c < colCount; c++) {
-          splits[r][c] = a[index];
-          index++;
-        }
+        System.arraycopy(a, r * colCount, splits[r], 0, colCount);
       }
       return splits;
     }

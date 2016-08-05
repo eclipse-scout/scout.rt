@@ -24,7 +24,7 @@ import org.eclipse.scout.rt.platform.eventlistprofiler.IEventListenerSource;
 public class EventListenerList implements IEventListenerSource {
   private static final Object[] NULL_ARRAY = new Object[0];
   private final Object m_listenerListLock = new Object();
-  private transient Object[] m_listenerList = NULL_ARRAY;
+  private Object[] m_listenerList = NULL_ARRAY;
 
   public EventListenerList() {
     if (EventListenerProfiler.getInstance().isEnabled()) {

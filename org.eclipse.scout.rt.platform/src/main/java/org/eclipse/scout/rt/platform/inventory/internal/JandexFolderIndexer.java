@@ -34,7 +34,7 @@ public final class JandexFolderIndexer {
     return indexer.complete();
   }
 
-  protected static void scanDirectory(File folder, Indexer indexer) {
+  static void scanDirectory(File folder, Indexer indexer) {
     for (File f : folder.listFiles()) {
       if (f.isDirectory()) {
         if (!f.getName().startsWith(".")) {

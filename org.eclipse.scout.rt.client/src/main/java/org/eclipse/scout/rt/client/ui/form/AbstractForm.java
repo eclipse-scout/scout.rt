@@ -2003,9 +2003,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     P_AbstractCollectingFieldVisitor<IFormField> v = new P_AbstractCollectingFieldVisitor<IFormField>() {
       @Override
       public boolean visitField(IFormField f, int level, int fieldIndex) {
-        if (f instanceof IFormField) {
-          f.checkSaveNeeded();
-        }
+        f.checkSaveNeeded();
         return true;
       }
     };
@@ -2331,7 +2329,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   @Override
   public void doExportXml(boolean saveAs) {
     // export search parameters
-    try (ByteArrayOutputStream bos = new ByteArrayOutputStream(); Writer w = new OutputStreamWriter(bos, StandardCharsets.UTF_8.name())) {
+    try (ByteArrayOutputStream bos = new ByteArrayOutputStream(); Writer w = new OutputStreamWriter(bos, StandardCharsets.UTF_8)) {
       XmlUtility.wellformDocument(storeToXml(), w);
       BinaryResource res = new BinaryResource("form.xml", bos.toByteArray());
       getDesktop().openUri(res, OpenUriAction.DOWNLOAD);

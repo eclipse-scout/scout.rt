@@ -13,11 +13,11 @@ package org.eclipse.scout.rt.platform.util;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Locale;
 
-import org.eclipse.scout.rt.platform.util.ArrayComparator;
-import org.eclipse.scout.rt.platform.util.MatrixUtility;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -150,4 +150,57 @@ public class MatrixUtilityTest {
     assertArrayEquals(m_array, m_array);
   }
 
+  @Test
+  public void testUnionEqualSizedRows() {
+    @SuppressWarnings("unchecked")
+    Object[][] union = MatrixUtility.union(new Collection[]{
+        Arrays.<Object> asList("a", "b", "c"),
+        Arrays.<Object> asList("1", "2", "3"),
+        null});
+
+    assertArrayEquals(new Object[][]{
+        {"a", "b", "c"},
+        {"1", "2", "3"},
+        {null, null, null}
+    }, union);
+  }
+
+  @Test
+  public void testUnionDifferentSizedRows() {
+    @SuppressWarnings("unchecked")
+    Object[][] union = MatrixUtility.union(new Collection[]{
+        Arrays.asList("a", "b", "c", "d"),
+        Arrays.asList("1", "2", "3"),
+        null});
+
+    assertArrayEquals(new Object[][]{
+        {"a", "b", "c", "d"},
+        {"1", "2", "3", null},
+        {null, null, null, null}
+    }, union);
+  }
+
+  @Test
+  public void testToMatrixEqualSizedRows() {
+    Object[][] union = MatrixUtility.toMatrix(
+        new String[]{"a", "b", "c"},
+        new String[]{"1", "2", "3"});
+
+    assertArrayEquals(new Object[][]{
+        {"a", "b", "c"},
+        {"1", "2", "3"}
+    }, union);
+  }
+
+  @Test
+  public void testToMatrixDifferentSizedRows() {
+    Object[][] union = MatrixUtility.toMatrix(
+        new String[]{"a", "b", "c", "d"},
+        new String[]{"1", "2", "3"});
+
+    assertArrayEquals(new Object[][]{
+        {"a", "b", "c", "d"},
+        {"1", "2", "3", null}
+    }, union);
+  }
 }

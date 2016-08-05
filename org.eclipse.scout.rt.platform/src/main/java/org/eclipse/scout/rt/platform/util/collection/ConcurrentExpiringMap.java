@@ -533,7 +533,7 @@ public class ConcurrentExpiringMap<K, V> extends AbstractMap<K, V> implements Co
       advance();
     }
 
-    protected void advance() {
+    void advance() {
       while (true) {
         if (m_elementMapIterator.hasNext()) {
           K key = m_elementMapIterator.next();

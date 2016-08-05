@@ -28,9 +28,10 @@ import org.eclipse.scout.rt.shared.cache.ICache;
 /**
  * <p>
  * A thread-safe map with a transactional behavior based on {@link ITransaction}. The map uses a sharedMap to share
- * values between transactions. Access is delegated to a transaction member {@link AbstractMapTransactionMember}. Any changes on
- * the map are local within the current transaction. In commit phase2 of the transaction member, so after committing
- * [transactional] data sources, modified values within the transaction member are committed into the shared map.
+ * values between transactions. Access is delegated to a transaction member {@link AbstractMapTransactionMember}. Any
+ * changes on the map are local within the current transaction. In commit phase2 of the transaction member, so after
+ * committing [transactional] data sources, modified values within the transaction member are committed into the shared
+ * map.
  * <p>
  * Use this map for lazy loaded shared caches in a scout server where the cached values origin from a transactional data
  * source.
@@ -410,7 +411,7 @@ public abstract class AbstractTransactionalMap<K, V> implements Map<K, V> {
         advance();
       }
 
-      protected void advance() {
+      void advance() {
         while (true) {
           if (m_sharedIterator.hasNext()) {
             Map.Entry<K, V> entry = m_sharedIterator.next();

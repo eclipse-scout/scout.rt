@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.extension.ui.form;
 
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 import org.eclipse.scout.rt.client.ui.form.IForm;
@@ -194,7 +195,7 @@ public class MoveFormFieldsHandler {
     @Override
     public Object next() {
       if (m_currentField == null) {
-        throw new IllegalStateException();
+        throw new NoSuchElementException();
       }
 
       IFormField field = m_currentField;
@@ -207,7 +208,7 @@ public class MoveFormFieldsHandler {
       if (form != null) {
         return form;
       }
-      throw new IllegalStateException();
+      throw new NoSuchElementException();
     }
 
     @Override
@@ -235,7 +236,7 @@ public class MoveFormFieldsHandler {
     @Override
     public Class<?> next() {
       if (m_index < 0) {
-        throw new IllegalStateException();
+        throw new NoSuchElementException();
       }
       Class<?> next = m_identifier.getSegment(m_index);
       m_index--;

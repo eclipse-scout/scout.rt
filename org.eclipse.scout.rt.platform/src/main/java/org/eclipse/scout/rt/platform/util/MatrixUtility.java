@@ -92,9 +92,7 @@ public final class MatrixUtility {
     for (Collection<Object> list : collections) {
       if (list != null) {
         Object[] a = list.toArray();
-        for (int c = 0; c < colCount && c < a.length; c++) {
-          matrix[r][c] = a[c];
-        }
+        System.arraycopy(a, 0, matrix[r], 0, Math.min(colCount, a.length));
       }
       r++;
     }
@@ -147,6 +145,7 @@ public final class MatrixUtility {
     return matrix;
   }
 
+  @SuppressWarnings("pmd:AvoidArrayLoops")
   public static Object[][] toMatrix(Object[]... rows) {
     if (rows == null) {
       return new Object[0][0];
