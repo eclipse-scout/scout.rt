@@ -40,43 +40,61 @@ public class ScriptSource {
      * <p>
      * Typically placed inside <code>/src/main/resources/WebContent/res</code>
      * <p>
-     * Example: the request to <code>/res/crm-14.0.0.min.js</code> is mapped to the file
-     * <code>/src/main/resources/WebContent/res/crm-macro.js</code> which has include directives
-     * <code>//@include("jquery-4.0.0.min.js")</code> and <code>//@include("scout-5.0.0.min.js")</code>
+     * Example: the request to <code>/res/myproject-d5ab7846.min.js</code> is mapped to the file
+     * <code>/src/main/resources/WebContent/res/myproject-macro.js</code> which has include directives
+     * <code>//@include("jquery-module.js")</code> and <code>//@include("scout-module.js")</code>
      */
     MACRO,
 
     /**
-     * A library or third-party library is available in minimized and/or non-minimized form with the file name pattern
-     * *.min.js or *.min.css respectively *.js or *.css
+     * A library or third-party library in non-minimized form with the file name pattern *.js or *.css. If only the
+     * minimized version of a library is found (*.min.js or *.min.css, respectively), is is returned even when
+     * <i>minify=false</i>.
      * <p>
      * Typically placed inside <code>/src/main/resources/WebContent/res</code>
      * <p>
-     * Example: the request to <code>/res/jquery-4.0.0.min.js</code> is mapped to the minimized file
-     * <code>/src/main/resources/WebContent/res/jquery-4.0.0.min.js</code> and the non-minimized file
-     * <code>/src/main/resources/WebContent/res/jquery-4.0.0.js</code>
+     * Example: the request to <code>/res/lib.min.js</code> is mapped to the file
+     * <code>/src/main/resources/WebContent/res/lib.js</code> (preferred) or
+     * <code>/src/main/resources/WebContent/res/lib.min.js</code> (fallback).
+     *
+     * @see {@link #LIBRARY_MINIFIED}.
      */
     LIBRARY,
+
+    /**
+     * A library or third-party library in minimized form with the file name pattern *.min.js or *.min.css. If only the
+     * non-minimized version of a library is found (*.js or *.css, respectively), is is returned even when
+     * <i>minify=true</i>.
+     * <p>
+     * Typically placed inside <code>/src/main/resources/WebContent/res</code>
+     * <p>
+     * Example: the request to <code>/res/lib.min.js</code> is mapped to the file
+     * <code>/src/main/resources/WebContent/res/lib.min.js</code> (preferred) or
+     * <code>/src/main/resources/WebContent/res/lib.js</code> (fallback).
+     *
+     * @see {@link #LIBRARY}.
+     */
+    LIBRARY_MINIFIED,
 
     /**
      * A source module is a project javascript file that is being developed, it may consist of multiple fragments. The
      * file name pattern is *-module.js or *-module.css
      * <p>
-     * Placed inside <code>/src/main/resources/js</code>
+     * Typically placed inside <code>/src/main/js</code>
      * <p>
-     * Example: the request to <code>/res/scout-5.0.0.min.js</code> is mapped to the file
-     * <code>/src/main/resources/js/scout-module.js</code> which has include directives
-     * <code>//@include("tree/Tree.js")</code> and <code>//@include("table/Table.js")</code>
+     * Example: the request to <code>/res/scout.js</code> is mapped to the file
+     * <code>/src/main/js/scout-module.js</code> which has include directives
+     * <code>//@include("scout/tree/Tree.js")</code> and <code>//@include("scout/table/Table.js")</code>
      */
     SRC_MODULE,
 
     /**
      * Fragments are the individual parts of a module
      * <p>
-     * Placed inside <code>/META-INF/resources/js</code>
+     * Typically placed inside <code>/src/main/js/...</code>
      * <p>
-     * Example: the include <code>tree/Tree.js</code> is mapped to the file
-     * <code>/META-INF/resources/js/tree/Tree.js</code>
+     * Example: the include <code>scout/tree/Tree.js</code> is mapped to the file
+     * <code>/src/main/js/scout/tree/Tree.js</code>
      */
     SRC_FRAGMENT,
 

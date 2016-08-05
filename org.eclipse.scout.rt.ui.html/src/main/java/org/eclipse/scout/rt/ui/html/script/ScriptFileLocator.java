@@ -42,7 +42,7 @@ public class ScriptFileLocator {
     // only (external) libraries are available minified and non-minified
     // all other files are always non-minified on the classpath
     FileLookup library = new FileLookup(true, parent + fileName + "." + fileExtension, ScriptSource.NodeType.LIBRARY);
-    FileLookup libraryMinified = new FileLookup(true, parent + fileName + ".min." + fileExtension, ScriptSource.NodeType.LIBRARY);
+    FileLookup libraryMinified = new FileLookup(true, parent + fileName + ".min." + fileExtension, ScriptSource.NodeType.LIBRARY_MINIFIED);
 
     FileLookup[] lookups = new FileLookup[]{
         macro,
