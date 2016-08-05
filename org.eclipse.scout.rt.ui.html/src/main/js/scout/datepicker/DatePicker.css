@@ -51,11 +51,19 @@
 
   &:hover:not(.date-picker-disabled) {
     border-color: @item-selection-border-color;
-    background-color:  @palette-blue-0;
+    background-color: @palette-blue-0;
 
     &.date-picker-now {
-      border-color:  @highlight-color;
-      background-color:  @palette-orange-0;
+      border-color: @highlight-color;
+      background-color: @palette-orange-0;
+    }
+
+    &.date-picker-selected {
+      background-color: @palette-blue-4;
+
+      &.date-picker-now {
+        background-color: @palette-orange-3;
+      }
     }
   }
 
@@ -81,16 +89,16 @@
     border-style: dashed;
 
     &.date-picker-now {
-      border-color:  @highlight-color;
+      border-color: @highlight-color;
     }
   }
 
   &.date-picker-selected {
-    background-color:  @item-selection-border-color;
+    background-color: @item-selection-border-color;
     color: @palette-white;
 
     &.date-picker-now {
-      background-color:  @highlight-color;
+      background-color: @highlight-color;
       color: @palette-white;
     }
   }
