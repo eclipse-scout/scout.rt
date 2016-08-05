@@ -2606,6 +2606,7 @@ scout.Table.prototype._applyFilters = function(rows) {
     newHiddenRows = [];
 
   if (this._filterCount() === 0) {
+    this._filteredRowsDirty = true;
     return;
   }
 
