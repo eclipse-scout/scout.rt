@@ -941,6 +941,16 @@ scout.Outline.prototype._onDetailTableRowsFiltered = function(event) {
 
 scout.Outline.prototype._onDetailTableRowInitialized = function(event) {
   this._linkNodeWithRow(event.row);
+  var node = this.nodesMap[event.row.nodeId];
+
+  // If a row, which was already linked to a node, gets initialized again, re apply the filter to make sure the node has the correct state
+  if (this.rendered && node && this._applyFiltersForNode(node)){
+    if (node.isFilterAccepted()) {
+      this._addToVisibleFlatList(node, false);
+    } else {
+      this._removeFromFlatList(node, false);
+    }
+  }
 };
 
 scout.Outline.prototype._onDetailTableEvent = function(event) {
