@@ -49,15 +49,29 @@ public class ClassIdentifier implements Serializable {
   private final int m_hash;
 
   public ClassIdentifier(Class<?>... segments) {
-    if (segments == null || segments.length == 0) {
-      throw new IllegalArgumentException("The given classes array must not be null or empty");
+    this(null, segments);
+  }
+
+  public ClassIdentifier(ClassIdentifier context, Class<?>... segments) throws IllegalArgumentException {
+    if (context == null && (segments == null || segments.length == 0)) {
+      throw new IllegalArgumentException("The given context and classes array must not be null or empty");
     }
-    for (Class<?> segment : segments) {
-      if (segment == null) {
-        throw new IllegalArgumentException("null segments are not allowed.");
+    final int contextLength = context == null ? 0 : context.m_segments.length;
+    final int segmentsLength = segments == null ? 0 : segments.length;
+    m_segments = new Class<?>[contextLength + segmentsLength];
+    if (context != null) {
+      System.arraycopy(context.m_segments, 0, m_segments, 0, contextLength);
+    }
+
+    if (segments != null) {
+      for (Class<?> segment : segments) {
+        if (segment == null) {
+          throw new IllegalArgumentException("null segments are not allowed.");
+        }
       }
+      System.arraycopy(segments, 0, m_segments, contextLength, segmentsLength);
     }
-    m_segments = segments;
+
     m_hash = Arrays.hashCode(m_segments);
   }
 

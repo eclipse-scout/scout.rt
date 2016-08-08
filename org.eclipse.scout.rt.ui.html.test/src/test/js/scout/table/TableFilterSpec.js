@@ -246,6 +246,39 @@ describe("Table Filter", function() {
       expect(table.rows[2].$row).toBeFalsy();
     });
 
+    it("properly handles reset table case", function() {
+      var model = helper.createModelFixture(2, 2),
+        table = helper.createTable(model),
+        column0 = table.columns[0],
+        row1 = table.rows[1];
+
+      // Filter active
+      var filter = createAndRegisterColumnFilter(table, column0, ['cell1_0']);
+      table.filter();
+      table.render(session.$entryPoint);
+      expect(table._filterCount()).toBe(1);
+      expect(table.rows.length).toBe(2);
+      expect(table.filteredRows().length).toBe(1);
+      expect(table.$rows().length).toBe(1);
+
+      // Delete all rows
+      table.deleteAllRows();
+      expect(table.rows.length).toBe(0);
+      expect(table.filteredRows().length).toBe(0);
+      expect(table.$rows().length).toBe(0);
+
+      // Remove filters
+      table._onFiltersChanged([]);
+      expect(table._filterCount()).toBe(0);
+
+      // Insert rows again
+      var rows = helper.createModelRows(2, 2);
+      table.insertRows(rows);
+      expect(table.rows.length).toBe(2);
+      expect(table.filteredRows().length).toBe(2);
+      expect(table.$rows().length).toBe(2);
+    });
+
     it("considers view range", function() {
       var model = helper.createModelFixture(2, 7),
         table = helper.createTable(model),

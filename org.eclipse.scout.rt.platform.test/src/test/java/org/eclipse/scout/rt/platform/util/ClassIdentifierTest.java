@@ -81,6 +81,40 @@ public class ClassIdentifierTest {
     assertArrayEquals(new ClassIdentifier[]{new ClassIdentifier(String.class), new ClassIdentifier(Integer.class)}, cids);
   }
 
+  @Test
+  public void testCreateWithContextOnly() {
+    ClassIdentifier cid = new ClassIdentifier(String.class);
+    ClassIdentifier cid2 = new ClassIdentifier(cid);
+    ClassIdentifier cid3 = new ClassIdentifier(cid, (Class[]) null);
+    assertNotSame(cid, cid2);
+    assertNotSame(cid, cid3);
+    assertEquals(cid, cid2);
+    assertEquals(cid, cid3);
+    assertArrayEquals(new Class[]{String.class}, cid2.getClasses());
+    assertArrayEquals(new Class[]{String.class}, cid3.getClasses());
+  }
+
+  @Test
+  public void testCreateWithContextAndCalss() {
+    ClassIdentifier cid = new ClassIdentifier(String.class);
+    ClassIdentifier cid2 = new ClassIdentifier(cid, Long.class);
+    assertNotSame(cid, cid2);
+    assertArrayEquals(new Class[]{String.class, Long.class}, cid2.getClasses());
+  }
+
+  @Test
+  public void testCreateWithContextAndCalsses() {
+    ClassIdentifier cid = new ClassIdentifier(String.class);
+    ClassIdentifier cid2 = new ClassIdentifier(cid, Long.class, Boolean.class);
+    assertNotSame(cid, cid2);
+    assertArrayEquals(new Class[]{String.class, Long.class, Boolean.class}, cid2.getClasses());
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testCreateWithNullSegement() {
+    new ClassIdentifier(String.class, null);
+  }
+
   public abstract static class AbstractTemplate {
     public class InnerClass {
     }

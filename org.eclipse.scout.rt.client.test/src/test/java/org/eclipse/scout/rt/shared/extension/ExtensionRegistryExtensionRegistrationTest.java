@@ -125,13 +125,19 @@ public class ExtensionRegistryExtensionRegistrationTest {
     assertEquals(1, items.size());
     assertModelExtensionItem(CollectionUtility.firstElement(items), BasicForm.class, null, NestedBasicFormExtension.class, 1);
 
-    items = m_clientExtensionManager.getModelExtensionItemsFor(FirstNameField.class);
-    assertEquals(1, items.size());
-    assertModelExtensionItem(CollectionUtility.firstElement(items), FirstNameField.class, NestedBasicFormExtension.class, NestedBasicFormExtension.FirstNameFieldExtension.class, 2);
+    try {
+      m_clientExtensionManager.pushScope(BasicForm.class);
+      items = m_clientExtensionManager.getModelExtensionItemsFor(FirstNameField.class);
+      assertEquals(1, items.size());
+      assertModelExtensionItem(CollectionUtility.firstElement(items), FirstNameField.class, NestedBasicFormExtension.class, NestedBasicFormExtension.FirstNameFieldExtension.class, 2);
 
-    items = m_clientExtensionManager.getModelExtensionItemsFor(NameField.class);
-    assertEquals(1, items.size());
-    assertModelExtensionItem(CollectionUtility.firstElement(items), NameField.class, NestedBasicFormExtension.class, NestedBasicFormExtension.NameFieldExtension.class, 3);
+      items = m_clientExtensionManager.getModelExtensionItemsFor(NameField.class);
+      assertEquals(1, items.size());
+      assertModelExtensionItem(CollectionUtility.firstElement(items), NameField.class, NestedBasicFormExtension.class, NestedBasicFormExtension.NameFieldExtension.class, 3);
+    }
+    finally {
+      m_clientExtensionManager.popScope();
+    }
   }
 
   @Test

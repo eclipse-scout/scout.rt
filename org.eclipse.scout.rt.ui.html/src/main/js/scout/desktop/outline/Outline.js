@@ -120,10 +120,11 @@ scout.Outline.prototype._remove = function() {
 scout.Outline.prototype._renderTitle = function() {
   if (this.titleVisible) {
     if (!this.$title) {
-      this.$title = this.$container
-        .prependDiv('outline-title')
+    this.$title = this.$container.prependDiv('outline-title');
+
+    // Listener is added to the text instead of the title to not get the clicks on the title menubar
+    this.$titleText = this.$title.prependDiv('outline-title-text')
         .on('click', this._onTitleClick.bind(this));
-        this.$titleText = this.$title.prependDiv('outline-title-text');
     }
     this.$titleText.text(this.title);
   }
@@ -947,6 +948,16 @@ scout.Outline.prototype._onDetailTableRowsFiltered = function(event) {
 
 scout.Outline.prototype._onDetailTableRowInitialized = function(event) {
   this._linkNodeWithRow(event.row);
+  var node = this.nodesMap[event.row.nodeId];
+
+  // If a row, which was already linked to a node, gets initialized again, re apply the filter to make sure the node has the correct state
+  if (this.rendered && node && this._applyFiltersForNode(node)){
+    if (node.isFilterAccepted()) {
+      this._addToVisibleFlatList(node, false);
+    } else {
+      this._removeFromFlatList(node, false);
+    }
+  }
 };
 
 scout.Outline.prototype._onDetailTableEvent = function(event) {
