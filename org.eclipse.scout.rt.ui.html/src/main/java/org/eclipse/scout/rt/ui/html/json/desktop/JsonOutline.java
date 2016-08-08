@@ -141,7 +141,6 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
 
   @Override
   public void handleUiEvent(JsonEvent event) {
-    super.handleUiEvent(event);
     if ("breadcrumbEnabled".equals(event.getType())) {
       handleUiBreadcrumbEnabled(event);
     }
