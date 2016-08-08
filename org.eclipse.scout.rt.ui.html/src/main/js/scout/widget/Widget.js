@@ -711,6 +711,9 @@ scout.Widget.prototype._createWidgets = function(propertyName, model) {
   return this._processWidgets(model, function(model) {
     if (model instanceof scout.ModelAdapter) {
       return model.createWidget(this); // FIXME [6.1] CGU widget should not have a dependency to model adapter
+    } else if(!(model instanceof scout.Widget)) {
+      model.parent = this;
+      return scout.create(model);
     }
     return model;
   }.bind(this));

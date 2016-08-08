@@ -81,8 +81,10 @@ scout.App.prototype._createSession = function($entryPoint, options) {
   var session = new scout.Session($entryPoint, options);
 
   // FIXME improve this, init must not be executed because it currently does a server request
+  var parent = new scout.NullWidget();
+  parent.session = session;
   session.desktop = scout.create('Desktop', {
-    parent: session.rootAdapter
+    parent: parent
   });
   session.render(function() {
     this.onSessionReady(session);
