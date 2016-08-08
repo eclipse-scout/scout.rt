@@ -33,7 +33,6 @@ scout.PopupWithHead.prototype._init = function(options) {
 
 scout.PopupWithHead.prototype._render = function($parent) {
   scout.PopupWithHead.parent.prototype._render.call(this, $parent);
-  this.$parent = $parent;
   this.$parent.window().on('resize', this.resizeHandler);
 
   this.$body = this._$createNewBody();
@@ -168,6 +167,10 @@ scout.PopupWithHead.prototype._position = function($container, switchIfNecessary
       x: pos.left,
       y: pos.top
     });
+    // this.$parent might not be at (0,0) of the document
+    var parentOffset = this.$parent.offset();
+    overlap.x -= parentOffset.left;
+    overlap.y -= parentOffset.top;
     if (overlap.y > 0) {
       // switch opening direction
       openingDirectionY = 'up';
@@ -198,7 +201,6 @@ scout.PopupWithHead.prototype._positionImpl = function(openingDirectionX, openin
 
   // Make sure the elements inside the header have the same style as to blueprint (menu)
   // This makes it possible to position the content in the header (icon, text) exactly on top of the content of the blueprint
-  //this.$head.copyCss(this.$headBlueprint, 'line-height');
   this.$head.copyCssIfGreater(this.$headBlueprint, 'padding');
   this.$head.height(this.$headBlueprint.height());
 

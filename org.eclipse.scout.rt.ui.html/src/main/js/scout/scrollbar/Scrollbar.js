@@ -134,7 +134,7 @@ scout.Scrollbar.prototype._scrollTo = function(event) {
 
 scout.Scrollbar.prototype._remove = function() {
   // Uninstall listeners
-  this._$parent
+  this.$parent
     .off('DOMMouseScroll mousewheel', this._onScrollWheelHandler)
     .off('scroll', this._onScrollHandler)
     .data('scrollbars').forEach(function(scrollbar) {
@@ -152,13 +152,13 @@ scout.Scrollbar.prototype._remove = function() {
  */
 scout.Scrollbar.prototype.update = function() {
   var margin = this.$container['cssMargin' + this.axis.toUpperCase()](),
-    scrollPos = this._$parent[this._scrollDir](),
-    scrollLeft = this._$parent.scrollLeft(),
-    scrollTop = this._$parent.scrollTop();
+    scrollPos = this.$parent[this._scrollDir](),
+    scrollLeft = this.$parent.scrollLeft(),
+    scrollTop = this.$parent.scrollTop();
 
   this.reset();
-  this._offsetSize = this._$parent[0]['offset' + this._dim];
-  this._scrollSize = this._$parent[0]['scroll' + this._dim];
+  this._offsetSize = this.$parent[0]['offset' + this._dim];
+  this._scrollSize = this.$parent[0]['scroll' + this._dim];
 
   // calc size and range of thumb
   var thumbSize = Math.max(this._offsetSize * this._offsetSize / this._scrollSize - margin, 30);
@@ -201,7 +201,7 @@ scout.Scrollbar.prototype.scroll = function(posDiff) {
     posNew = Math.min(this._thumbRange, Math.max(0, posOld + posDiff)),
     scrollPos = (this._scrollSize - this._offsetSize) / this._thumbRange * posNew;
 
-  this._$parent[this._scrollDir](scrollPos);
+  this.$parent[this._scrollDir](scrollPos);
 
   // Thumb and scrollbar would be updated by the scroll handler. To make it more fluent it is done here as well
   this._$thumb.css(this._dir, posNew);

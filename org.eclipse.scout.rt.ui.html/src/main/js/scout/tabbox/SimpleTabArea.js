@@ -65,7 +65,7 @@ scout.SimpleTabArea.prototype._renderVisible = function() {
 };
 
 scout.SimpleTabArea.prototype._attach = function() {
-  this._$parent.prepend(this.$container);
+  this.$parent.prepend(this.$container);
   this.session.detachHelper.afterAttach(this.$container);
   // If the parent was resized while this view was detached, the view has a wrong size.
   this.invalidateLayoutTree(false);

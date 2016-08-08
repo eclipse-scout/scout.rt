@@ -39,7 +39,7 @@ scout.OutlineOverview.prototype.destroy = function() {
  * @override Widget.js
  */
 scout.OutlineOverview.prototype._attach = function() {
-  this._$parent.append(this.$container);
+  this.$parent.append(this.$container);
   var htmlParent = this.htmlComp.getParent();
   this.htmlComp.setSize(htmlParent.getSize());
   this.session.detachHelper.afterAttach(this.$container);

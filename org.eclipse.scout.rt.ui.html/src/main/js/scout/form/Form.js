@@ -266,7 +266,7 @@ scout.Form.prototype._renderIconId = function() {
  * @override Widget.js
  */
 scout.Form.prototype._attach = function() {
-  this._$parent.append(this.$container);
+  this.$parent.append(this.$container);
 
   // If the parent was resized while this view was detached, the view has a wrong size.
   if (this.isView()) {

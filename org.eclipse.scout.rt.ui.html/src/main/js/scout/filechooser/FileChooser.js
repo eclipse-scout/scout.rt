@@ -259,7 +259,7 @@ scout.FileChooser.prototype._onDrop = function(event) {
  * @override Widget.js
  */
 scout.FileChooser.prototype._attach = function() {
-  this._$parent.append(this.$container);
+  this.$parent.append(this.$container);
   this.session.detachHelper.afterAttach(this.$container);
   scout.FileChooser.parent.prototype._attach.call(this);
 };

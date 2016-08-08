@@ -255,7 +255,7 @@ scout.TabItem.prototype._syncMenusVisible = function() {
  * @override Widgets.js
  */
 scout.TabItem.prototype._attach = function() {
-  this._$parent.append(this.$container);
+  this.$parent.append(this.$container);
   this.session.detachHelper.afterAttach(this.$container);
   scout.TabItem.parent.prototype._attach.call(this);
 };

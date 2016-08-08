@@ -223,7 +223,7 @@ scout.Table.prototype.handleAppLinkAction = function(event) {
 };
 
 scout.Table.prototype._render = function($parent) {
-  this.$container = this._$parent.appendDiv('table');
+  this.$container = this.$parent.appendDiv('table');
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
   this.htmlComp.setLayout(new scout.TableLayout(this));
   this.htmlComp.pixelBasedSizing = false;
@@ -3850,7 +3850,7 @@ scout.Table.prototype.onModelAction = function(event) {
  * @override Widget.js
  */
 scout.Table.prototype._attach = function() {
-  this._$parent.append(this.$container);
+  this.$parent.append(this.$container);
   var htmlParent = this.htmlComp.getParent();
   this.htmlComp.setSize(htmlParent.getSize());
   this.session.detachHelper.afterAttach(this.$container);

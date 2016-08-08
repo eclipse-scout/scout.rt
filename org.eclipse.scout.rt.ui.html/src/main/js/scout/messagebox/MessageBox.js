@@ -184,7 +184,7 @@ scout.MessageBox.prototype.close = function() {
  * @override Widget.js
  */
 scout.MessageBox.prototype._attach = function() {
-  this._$parent.append(this.$container);
+  this.$parent.append(this.$container);
   this.session.detachHelper.afterAttach(this.$container);
   scout.MessageBox.parent.prototype._attach.call(this);
 };

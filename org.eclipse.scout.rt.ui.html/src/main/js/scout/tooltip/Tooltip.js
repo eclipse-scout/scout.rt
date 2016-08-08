@@ -31,6 +31,10 @@ scout.inherits(scout.Tooltip, scout.Widget);
 /**
  * <ul>
  * <li>options.text - either a String or a function which returns a String.</li>
+ * <li>options.originRelativeToParent - when the origin point is calculated using $element.offset(),
+ *       the result is absolute to the window. When positioning the tooltip, the $parent's offset must
+ *       be subtracted. When the given origin is already relative to the parent, set this option to
+ *       "true" to disable this additional calculation.
  * </ul>
  */
 scout.Tooltip.prototype._init = function(options) {
@@ -43,6 +47,7 @@ scout.Tooltip.prototype._init = function(options) {
   this.windowPaddingX = options.windowPaddingX !== undefined ? options.windowPaddingX : 10;
   this.windowPaddingY = options.windowPaddingY !== undefined ? options.windowPaddingY : 5;
   this.origin = options.origin;
+  this.originRelativeToParent = scout.nvl(options.originRelativeToParent, false);
   this.$anchor = options.$anchor;
   this.autoRemove = options.autoRemove !== undefined ? options.autoRemove : true;
   this.cssClass = options.cssClass;
@@ -53,11 +58,9 @@ scout.Tooltip.prototype._init = function(options) {
 
 scout.Tooltip.prototype._render = function($parent) {
   // Auto-detect parent
-  $parent = $parent || (this.$anchor && this.$anchor.closest('.desktop'));
-  // Remember parent (necessary for detach helper)
-  this.$parent = $parent;
+  this.$parent = this.$parent || (this.$anchor && this.$anchor.closest('.desktop'));
 
-  this.$container = $parent
+  this.$container = this.$parent
     .appendDiv('tooltip')
     .hide()
     .data('tooltip', this);
@@ -186,7 +189,7 @@ scout.Tooltip.prototype.position = function() {
     origin = this.origin;
     x = origin.x;
   } else {
-    origin = this.$anchor && scout.graphics.offsetBounds(this.$anchor);
+    origin = scout.graphics.offsetBounds(this.$anchor);
     x = origin.x + origin.width / 2;
   }
   y = origin.y;
@@ -195,6 +198,13 @@ scout.Tooltip.prototype.position = function() {
     // Sticky tooltip must only be visible if the location where the tooltip points is in view (prevents that the tooltip points at an invisible anchor)
     inView = scout.scrollbars.isLocationInView(origin, this.$anchor.scrollParent());
     this.$container.setVisible(inView);
+  }
+
+  // this.$parent might not be at (0,0) of the document
+  if (!this.originRelativeToParent) {
+    var parentOffset = this.$parent.offset();
+    x -= parentOffset.left;
+    y -= parentOffset.top;
   }
 
   arrowDivWidth = this.$arrow.outerWidth();
@@ -212,7 +222,7 @@ scout.Tooltip.prototype.position = function() {
 
   top = y - tooltipHeight - arrowSize;
   left = x - arrowPosition;
-  overlapX = left + tooltipWidth + this.windowPaddingX - this.$anchor.window().width();
+  overlapX = left + tooltipWidth + this.windowPaddingX - this.$parent.width();
   overlapY = top - this.windowPaddingY;
 
   // Move tooltip to the left until it gets fully visible

@@ -89,7 +89,7 @@ scout.Widget.prototype.render = function($parent) {
 
 // Currently only necessary for ModelAdapter
 scout.Widget.prototype._renderInternal = function($parent) {
-  this._$parent = $parent;
+  this.$parent = $parent;
   this._render($parent);
   this._renderProperties();
   scout.inspector.applyInfo(this);
@@ -171,6 +171,7 @@ scout.Widget.prototype._removeInternal = function() {
   if (this.parent) {
     this.parent.removeChild(this);
   }
+  this.$parent = null;
   this.rendered = false;
   this.attached = false;
   this.removing = false;
@@ -424,7 +425,7 @@ scout.Widget.prototype._afterAttach = function(parent) {
 
 /**
  * Override this method to do something when Widget is attached again. Typically
- * you will append this.$container to this._$parent. The default implementation
+ * you will append this.$container to this.$parent. The default implementation
  * sets this.attached to true.
  *
  * @param the event.target property is used to decide if a Widget must attach

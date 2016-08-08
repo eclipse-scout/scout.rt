@@ -891,7 +891,7 @@ scout.Outline.prototype._glassPaneTargets = function() {
   if (desktop.navigation) {
     elements.push(desktop.navigation.$body);
   }
-  if (desktop.bench && desktop.bench.outlineContent.rendered) {
+  if (desktop.bench && desktop.bench.outlineContent && desktop.bench.outlineContent.rendered) {
     elements.push(desktop.bench.outlineContent.$container);
   }
   return elements;

@@ -284,6 +284,11 @@ scout.Popup.prototype.prefLocation = function($container, openingDirectionY) {
     y += anchorBounds.height;
   }
 
+  // this.$parent might not be at (0,0) of the document
+  var parentOffset = this.$parent.offset();
+  x -= parentOffset.left;
+  y -= parentOffset.top;
+
   return {
     x: x,
     y: y
@@ -293,7 +298,7 @@ scout.Popup.prototype.prefLocation = function($container, openingDirectionY) {
 scout.Popup.prototype.getAnchorBounds = function() {
   var anchorBounds = this.anchorBounds;
   if (!anchorBounds) {
-    anchorBounds = this.$anchor && scout.graphics.offsetBounds(this.$anchor);
+    anchorBounds = scout.graphics.offsetBounds(this.$anchor);
   }
   return anchorBounds;
 };
@@ -306,11 +311,10 @@ scout.Popup.prototype.overlap = function($container, location) {
     height = $container.outerHeight(),
     width = $container.outerWidth(),
     left = location.x,
-    top = location.y,
-    $window = $container.window();
+    top = location.y;
 
-  overlapX = left + width + this.windowPaddingX - $window.width();
-  overlapY = top + height + this.windowPaddingY - $window.height();
+  overlapX = left + width + this.windowPaddingX - this.session.$entryPoint.outerWidth(true);
+  overlapY = top + height + this.windowPaddingY - this.session.$entryPoint.outerHeight(true);
   return {
     x: overlapX,
     y: overlapY

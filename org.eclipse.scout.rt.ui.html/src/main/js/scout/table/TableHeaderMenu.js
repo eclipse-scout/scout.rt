@@ -71,7 +71,6 @@ scout.TableHeaderMenu.prototype._render = function($parent) {
   var leftGroups = [],
     $rightGroups = [];
 
-  this.$parent = $parent;
   this.$headerItem.select(true);
 
   this.$container = $parent.appendDiv('table-header-menu');
