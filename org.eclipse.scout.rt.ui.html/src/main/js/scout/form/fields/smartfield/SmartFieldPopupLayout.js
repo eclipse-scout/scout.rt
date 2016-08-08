@@ -23,7 +23,7 @@ scout.SmartFieldPopupLayout = function(popup) {
 scout.inherits(scout.SmartFieldPopupLayout, scout.PopupLayout);
 
 scout.SmartFieldPopupLayout.prototype.layout = function($container) {
-  var size, prefSize, popupSize,
+  var size, popupSize,
     htmlProposalChooser = this._htmlProposalChooser($container);
 
   scout.SmartFieldPopupLayout.parent.prototype.layout.call(this, $container);
