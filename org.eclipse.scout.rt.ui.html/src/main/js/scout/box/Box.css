@@ -14,6 +14,7 @@
  */
 @box-width: 420px;
 @box-margin-v: 15px;
+
 .box {
   display: table;
   position: absolute;
@@ -26,7 +27,6 @@
     vertical-align: middle;
   }
 }
-
 
 .box-content {
   border: 1px solid @palette-gray-5;
@@ -45,6 +45,10 @@
     }
   }
 
+  &.small > .header > .logo {
+    max-width: 50%;
+  }
+
   & > .button-bar {
     padding-top: 32px;
     text-align: center;
@@ -52,10 +56,6 @@
     & > .button {
       padding: 7px @button-padding-x;
     }
-  }
-
-  &.small > .header > .logo {
-    width: 50%;
   }
 
   &.centered {
