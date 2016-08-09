@@ -152,7 +152,8 @@ describe("StringField", function() {
       expect(jasmine.Ajax.requests.count()).toBe(1);
       var event = new scout.Event(field.id, 'displayTextChanged', {
         displayText: 'Test1',
-        whileTyping: false
+        whileTyping: false,
+        noBusyIndicator: false
       });
       expect(mostRecentJsonRequest()).toContainEvents(event);
 
@@ -167,7 +168,8 @@ describe("StringField", function() {
       expect(jasmine.Ajax.requests.count()).toBe(2);
       event = new scout.Event(field.id, 'displayTextChanged', {
         displayText: 'Test1ABC2',
-        whileTyping: false
+        whileTyping: false,
+        noBusyIndicator: false
       });
       expect(mostRecentJsonRequest()).toContainEvents(event);
     });
@@ -187,11 +189,13 @@ describe("StringField", function() {
       // displayTextChanged needs to be sent twice, with whileTyping = true and = false
       events[0] = new scout.Event(field.id, 'displayTextChanged', {
         displayText: 'Test1',
-        whileTyping: true
+        whileTyping: true,
+        noBusyIndicator: true
       });
       events[1] = new scout.Event(field.id, 'displayTextChanged', {
         displayText: 'Test1',
-        whileTyping: false
+        whileTyping: false,
+        noBusyIndicator: false
       });
       expect(mostRecentJsonRequest()).toContainEventsExactly(events);
 
@@ -207,11 +211,13 @@ describe("StringField", function() {
       events = [];
       events[0] = new scout.Event(field.id, 'displayTextChanged', {
         displayText: 'Test1ABC2',
-        whileTyping: true
+        whileTyping: true,
+        noBusyIndicator: true
       });
       events[1] = new scout.Event(field.id, 'displayTextChanged', {
         displayText: 'Test1ABC2',
-        whileTyping: false
+        whileTyping: false,
+        noBusyIndicator: false
       });
       expect(mostRecentJsonRequest()).toContainEventsExactly(events);
     });

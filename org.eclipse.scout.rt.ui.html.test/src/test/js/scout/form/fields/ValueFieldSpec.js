@@ -153,6 +153,7 @@ describe("ValueField", function() {
       var event = new scout.Event(formField.id, 'displayTextChanged', {
         displayText: 'abc123contextmenu', whileTyping: false
       });
+      event.noBusyIndicator = false;
       expect(mostRecentJsonRequest()).toContainEvents(event);
     });
 

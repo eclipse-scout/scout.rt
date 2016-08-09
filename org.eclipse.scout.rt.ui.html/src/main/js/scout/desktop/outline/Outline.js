@@ -221,6 +221,9 @@ scout.Outline.prototype._linkNodeWithRow = function(row) {
   var node = this.nodesMap[row.nodeId];
   if (node) {
     node.row = row;
+    if(this._applyFiltersForNode(node)){
+      this._renderNodeFilterAccepted(node);
+    }
     if (!node.row) {
       throw new Error('node.row is not defined');
     }
