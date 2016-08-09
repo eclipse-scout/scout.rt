@@ -17,7 +17,7 @@ public interface IChartTableControl extends ITableControl {
   String PROP_CHART_TYPE = "chartType";
   String PROP_CHART_GROUP_1 = "chartGroup1";
   String PROP_CHART_GROUP_2 = "chartGroup2";
-  String PROP_CHART_AGGRAGATION = "chartAggregation";
+  String PROP_CHART_AGGREGATION = "chartAggregation";
 
   /**
    * Sets the chart type

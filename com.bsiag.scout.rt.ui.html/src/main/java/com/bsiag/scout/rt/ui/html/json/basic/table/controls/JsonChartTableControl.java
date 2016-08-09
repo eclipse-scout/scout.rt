@@ -42,7 +42,7 @@ public class JsonChartTableControl<CHART_TABLE_CONTROL extends IChartTableContro
         return getModel().getChartType();
       }
     });
-    putJsonProperty(new JsonProperty<CHART_TABLE_CONTROL>(IChartTableControl.PROP_CHART_AGGRAGATION, model) {
+    putJsonProperty(new JsonProperty<CHART_TABLE_CONTROL>(IChartTableControl.PROP_CHART_AGGREGATION, model) {
       @Override
       protected IChartColumnParam modelValue() {
         return getModel().getAggregation();
@@ -122,9 +122,9 @@ public class JsonChartTableControl<CHART_TABLE_CONTROL extends IChartTableContro
       addPropertyEventFilterCondition(IChartTableControl.PROP_CHART_TYPE, chartType);
       getModel().setChartType(chartType);
     }
-    else if (IChartTableControl.PROP_CHART_AGGRAGATION.equals(propertyName)) {
+    else if (IChartTableControl.PROP_CHART_AGGREGATION.equals(propertyName)) {
       JSONObject chartAggregation = data.getJSONObject(propertyName);
-      addPropertyEventFilterCondition(IChartTableControl.PROP_CHART_AGGRAGATION, chartAggregation);
+      addPropertyEventFilterCondition(IChartTableControl.PROP_CHART_AGGREGATION, chartAggregation);
       getModel().setAggregation(createColumnParam(chartAggregation));
     }
     else if (IChartTableControl.PROP_CHART_GROUP_1.equals(propertyName)) {
