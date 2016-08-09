@@ -50,23 +50,72 @@ scout.SimpleTabBoxLayout.prototype._layoutTabArea = function(containerSize) {
 /**
  * Preferred size of the tab-box aligns every tab-item in a single line, so that each item is visible.
  */
-scout.SimpleTabBoxLayout.prototype.preferredLayoutSize = function($container) {
-  var htmlContainer = scout.HtmlComponent.get($container),
-    htmlViewContent = scout.HtmlComponent.get(this.tabBox.$viewContent),
-    htmlViewTabs = scout.HtmlComponent.get(this.tabBox.$tabArea),
-    viewTabsSize = new scout.Dimension(),
-    viewContentSize = new scout.Dimension();
+scout.SimpleTabBoxLayout.prototype.preferredLayoutSize = function($container, options) {
+  options = options || {};
+  var htmlContainer = this.tabBox.htmlComp,
+    containerInsets = htmlContainer.getInsets(),
+    prefSize = new scout.Dimension();
 
-  if (htmlViewTabs.isVisible()) {
-    viewTabsSize = htmlViewTabs.getPreferredSize()
-      .add(htmlViewTabs.getMargins());
+  var prefSizeTabArea = getPrefSizeTabArea(this.tabBox.tabArea.htmlComp);
+  var prefSizeContent = getPrefSizeContent(this.tabBox.viewContent);
+
+  prefSize.width = Math.max(prefSizeTabArea.width, prefSizeContent.width);
+  prefSize.height = prefSizeTabArea.width + prefSizeContent.height;
+
+  return prefSize.add(containerInsets);
+
+  // ----- Helper functions -----
+
+  function getPrefSizeTabArea(htmlInnerComp) {
+    if (!htmlInnerComp || !htmlInnerComp.isVisible()) {
+      return new scout.Dimension(0, 0);
+    }
+
+    var innerMargins = htmlInnerComp.getMargins();
+    var innerOptions = {};
+    if (options.widthHint) {
+      innerOptions.widthHint = options.widthHint - containerInsets.horizontal() - innerMargins.horizontal();
+    }
+    // XXX heightHint not supported!
+
+    var innerPrefSize = htmlInnerComp.getPreferredSize(innerOptions);
+    return innerPrefSize.add(innerMargins);
   }
 
-  viewContentSize = htmlViewContent.getPreferredSize()
-    .add(htmlContainer.getInsets())
-    .add(htmlViewContent.getMargins());
+  function getPrefSizeContent(htmlInnerComp) {
+    if (!htmlInnerComp || !htmlInnerComp.isVisible()) {
+      return new scout.Dimension(0, 0);
+    }
 
-  return new scout.Dimension(
-    Math.max(viewTabsSize.width, viewContentSize.width),
-    viewContentSize.height + viewTabsSize.height);
+    var innerMargins = htmlInnerComp.getMargins();
+    var innerOptions = {};
+    if (options.widthHint) {
+      innerOptions.widthHint = options.widthHint - containerInsets.horizontal() - innerMargins.horizontal();
+    }
+    if (options.heightHint) {
+      innerOptions.heightHint = options.heightHint - containerInsets.vertical() - prefSizeTabArea.height - innerMargins.vertical();
+    }
+
+    var innerPrefSize = htmlInnerComp.getPreferredSize(innerOptions);
+    return innerPrefSize.add(innerMargins);
+  }
+
+//  var htmlContainer = scout.HtmlComponent.get($container),
+//    htmlViewContent = scout.HtmlComponent.get(this.tabBox.$viewContent),
+//    htmlViewTabs = scout.HtmlComponent.get(this.tabBox.$tabArea),
+//    viewTabsSize = new scout.Dimension(),
+//    viewContentSize = new scout.Dimension();
+//
+//  if (htmlViewTabs.isVisible()) {
+//    viewTabsSize = htmlViewTabs.getPreferredSize()
+//      .add(htmlViewTabs.getMargins());
+//  }
+//
+//  viewContentSize = htmlViewContent.getPreferredSize()
+//    .add(htmlContainer.getInsets())
+//    .add(htmlViewContent.getMargins());
+//
+//  return new scout.Dimension(
+//    Math.max(viewTabsSize.width, viewContentSize.width),
+//    viewContentSize.height + viewTabsSize.height);
 };

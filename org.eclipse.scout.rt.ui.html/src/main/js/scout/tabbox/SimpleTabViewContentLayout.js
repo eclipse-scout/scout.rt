@@ -29,16 +29,65 @@ scout.SimpleTabViewContentLayout.prototype.layout = function($container) {
   currentView.htmlComp.setSize(size);
 };
 
-scout.SimpleTabViewContentLayout.prototype.preferredLayoutSize = function($container) {
+scout.SimpleTabViewContentLayout.prototype.preferredLayoutSize = function($container, options) {
+  options = options || {};
+  var htmlContainer = this.tabBox.viewContent,
+    containerInsets = htmlContainer.getInsets(),
+    prefSize = new scout.Dimension();
+
   var currentView = this.tabBox.currentView;
-  if (!currentView || !currentView.rendered || !currentView.htmlComp) {
-    return new scout.Dimension();
+  if (currentView && currentView.rendered && currentView.htmlComp) { // XXX Is this check necessary?
+    var htmlInnerComp = currentView.htmlComp;
+    if (htmlInnerComp && htmlInnerComp.isVisible()) {
+      var innerMargins = htmlInnerComp.getMargins();
+      var innerOptions = {};
+      if (options.widthHint) {
+        innerOptions.widthHint = options.widthHint - containerInsets.horizontal() - innerMargins.horizontal();
+      }
+      if (options.heightHint) {
+        innerOptions.heightHint = options.heightHint - containerInsets.vertical() - innerMargins.vertical();
+      }
+
+      var innerPrefSize = currentView.htmlComp.getPreferredSize(innerOptions);
+      prefSize.width += innerPrefSize.width + innerMargins.horizontal();
+      prefSize.height += innerPrefSize.height + innerMargins.vertical();
+    }
   }
 
-  var htmlContainer = scout.HtmlComponent.get($container);
-  var prefSize = currentView.htmlComp.getPreferredSize()
-    .add(htmlContainer.getInsets())
-    .add(currentView.htmlComp.getMargins());
+  return prefSize.add(containerInsets);
 
-  return prefSize;
+//  options = options || {};
+//  var htmlContainer = this.tabBox.htmlComp,
+//    containerInsets = htmlContainer.getInsets(),
+//    prefSize = new scout.Dimension();
+//
+//  var currentView = this.tabBox.currentView;
+//  if (currentView && currentView.rendered && currentView.htmlComp) { // XXX Is this check necessary?
+//    var innerMargins = currentView.htmlComp.getMargins();
+//    var innerOptions = {};
+//    if (options.widthHint) {
+//      innerOptions.widthHint = options.widthHint - containerInsets.horizontal() - innerMargins.horizontal();
+//    }
+//    if (options.heightHint) {
+//      innerOptions.heightHint = options.heightHint - containerInsets.vertical() - innerMargins.vertical();
+//    }
+//
+//    var innerPrefSize = currentView.htmlComp.getPreferredSize(innerOptions);
+//    prefSize.width += innerPrefSize.width + innerMargins.horizontal();
+//    prefSize.height += innerPrefSize.height + innerMargins.vertical();
+//  }
+//
+//  return prefSize.add(containerInsets);
+
+//  var currentView = this.tabBox.currentView;
+//  if (!currentView || !currentView.rendered || !currentView.htmlComp) {
+//    return new scout.Dimension();
+//  }
+//
+//  var htmlContainer = scout.HtmlComponent.get($container);
+//  var prefSize = currentView.htmlComp.getPreferredSize()
+//    .add(htmlContainer.getInsets())
+//    .add(currentView.htmlComp.getMargins());
+//
+//  return prefSize;
 };

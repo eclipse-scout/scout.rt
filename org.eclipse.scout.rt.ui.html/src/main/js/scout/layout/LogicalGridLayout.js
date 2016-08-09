@@ -22,13 +22,18 @@ scout.LogicalGridLayout = function(hgap, vgap) {
 };
 scout.inherits(scout.LogicalGridLayout, scout.AbstractLayout);
 
-scout.LogicalGridLayout.prototype._verifyLayout = function($container) {
-  var htmlContainer = scout.HtmlComponent.get($container),
-    containerSize = htmlContainer.getSize();
+scout.LogicalGridLayout.prototype._verifyLayout = function($container, options) {
+  var containerSize;
+  if (options) {
+    // XXX Correct?
+    containerSize = new scout.Dimension(options.widthHint, options.heightHint);
+  } else {
+    containerSize = scout.HtmlComponent.get($container).getSize();
+  }
 
   if (!this.valid || !this.validityBasedOnContainerSize.equals(containerSize)) {
     this.validityBasedOnContainerSize = containerSize;
-    this.validateLayout($container);
+    this.validateLayout($container, options);
     this.valid = true;
   }
 };
@@ -40,28 +45,33 @@ scout.LogicalGridLayout.prototype.invalidate = function() {
   this.valid = false;
 };
 
-scout.LogicalGridLayout.prototype.validateLayout = function($container) {
-  var visibleComps = [], visibleCons = [], cons;
-
+scout.LogicalGridLayout.prototype.validateLayout = function($container, options) {
+  var visibleComps = [],
+    visibleCons = [];
   $container.children().each(function (idx, elem) {
     var $comp = $(elem);
     var htmlComp = scout.HtmlComponent.optGet($comp);
     if (htmlComp && $comp.isVisible()) {
       visibleComps.push($comp);
-      cons = htmlComp.layoutData;
+      var cons = htmlComp.layoutData;
       cons.validate();
       visibleCons.push(cons);
     }
   });
-  this.m_info = new scout.LogicalGridLayoutInfo(visibleComps, visibleCons, this.m_hgap, this.m_vgap);
+  this.m_info = new scout.LogicalGridLayoutInfo(visibleComps, visibleCons, this.m_hgap, this.m_vgap, options);
   $.log.trace('(LogicalGridLayout#validateLayout) $container=' + scout.HtmlComponent.get($container).debug());
 };
 
 scout.LogicalGridLayout.prototype.layout = function($container) {
-  this._verifyLayout($container);
   var htmlContainer = scout.HtmlComponent.get($container),
     containerSize = htmlContainer.getAvailableSize(),
     containerInsets = htmlContainer.getInsets();
+
+  // XXX STRANGE PATTERN!
+  this._verifyLayout($container, {
+    widthHint: containerSize.width - containerInsets.horizontal(),
+    heightHint: containerSize.height - containerInsets.vertical()
+  });
   $.log.trace('(LogicalGridLayout#layout) container ' + htmlContainer.debug() + ' size=' + containerSize + ' insets=' + containerInsets);
   var cellBounds = this.m_info.layoutCellBounds(containerSize, containerInsets);
 
@@ -119,16 +129,31 @@ scout.LogicalGridLayout.prototype.layout = function($container) {
       }
     }
     $.log.trace('(LogicalGridLayout#layout) comp=' + htmlComp.debug() + ' bounds=' + r);
+    console.log($comp.data('widget').objectType + '[' + $comp.data('widget').id + ']' +
+        '\n  r orig : ' + r1.union(r2) +
+        '\n  r      : ' + r +
+        '\n  hints  : width=' + (containerSize.width - containerInsets.horizontal()) + ', height=' + (containerSize.height - containerInsets.vertical()));
     htmlComp.setBounds(r);
   }
 };
 
-scout.LogicalGridLayout.prototype.preferredLayoutSize = function($container) {
-  return this.getLayoutSize($container, scout.LayoutConstants.PREF);
+scout.LogicalGridLayout.prototype.preferredLayoutSize = function($container, options) {
+  return this.getLayoutSize($container, scout.LayoutConstants.PREF, options);
 };
 
-scout.LogicalGridLayout.prototype.getLayoutSize = function($container, sizeflag) {
-  this._verifyLayout($container);
+scout.LogicalGridLayout.prototype.getLayoutSize = function($container, sizeflag, options) {
+  // XXX STRANGE PATTERN!
+  var htmlContainer = scout.HtmlComponent.get($container),
+    containerInsets = htmlContainer.getInsets();
+  var innerOptions = {};
+  if (options.widthHint) {
+    innerOptions.widthHint = options.widthHint - containerInsets.horizontal();
+  }
+  if (options.heightHint) {
+    innerOptions.heightHint = options.heightHint - containerInsets.vertical();
+  }
+  this._verifyLayout($container, innerOptions);
+
   var dim = new scout.Dimension();
   // w
   var i, w, h, useCount = 0;
@@ -151,8 +176,10 @@ scout.LogicalGridLayout.prototype.getLayoutSize = function($container, sizeflag)
     useCount++;
   }
   // insets
-  var insets = scout.HtmlComponent.get($container).getInsets();
-  dim.width += insets.horizontal();
-  dim.height += insets.vertical();
+//  var insets = scout.HtmlComponent.get($container).getInsets();
+//  dim.width += insets.horizontal();
+//  dim.height += insets.vertical();
+  dim.width += containerInsets.horizontal();
+  dim.height += containerInsets.vertical();
   return dim;
 };

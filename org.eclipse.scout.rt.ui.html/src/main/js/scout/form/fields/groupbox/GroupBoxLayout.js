@@ -109,39 +109,121 @@ scout.GroupBoxLayout.prototype._layoutStatus = function() {
   }
 };
 
-scout.GroupBoxLayout.prototype.preferredLayoutSize = function($container) {
+scout.GroupBoxLayout.prototype.preferredLayoutSize = function($container, options) {
+  options = options || {};
   var htmlContainer = this._groupBox.htmlComp,
-    htmlGbBody = this._htmlGbBody(),
-    htmlMenuBar,
-    prefSize;
+    containerInsets = htmlContainer.getInsets(),
+    prefSize = new scout.Dimension();
+
+  // XXX isVisible? includeMargin?
+  var prefSizeTitle = scout.graphics.prefSize(this._groupBox.$title, {
+    includeMargin: true
+  });
 
   if (this._groupBox.expanded) {
-    prefSize = htmlGbBody.getPreferredSize()
-      .add(htmlGbBody.getMargins());
+    var widthInPixel = this._groupBox.gridData.widthInPixel;//(this._groupBox.gridData && this._groupBox.gridData.widthInPixel);
+    var heightInPixel = this._groupBox.gridData.heightInPixel;//XXX (this._groupBox.gridData && this._groupBox.gridData.heightInPixel);
 
-    htmlMenuBar = this._htmlMenuBar();
-    if (htmlMenuBar) {
-      prefSize.height += htmlMenuBar.getPreferredSize().height;
-      //in this case there is no padding. add some padding to width.
-      if (!this._groupBox.borderVisible) {
-        prefSize.height += this._groupBox.menuBar.position === 'top' ? 14 : 16;
+    if (widthInPixel && heightInPixel) {
+      prefSize.width = widthInPixel;
+      prefSize.height = heightInPixel;
+    } else {
+      var prefSizeMenuBar = getPrefSizeMenuBar(this._htmlMenuBar());
+      var prefSizeBody = getPrefSizeBody(this._htmlGbBody());
+
+      prefSize.width = Math.max(prefSizeTitle.width, prefSizeMenuBar.width, prefSizeBody.width);
+      prefSize.height = prefSizeTitle.height + prefSizeMenuBar.height + prefSizeBody.height;
+
+      if (widthInPixel) {
+        prefSize.width = widthInPixel;
+      }
+      if (heightInPixel) {
+        prefSize.height = heightInPixel;
       }
     }
   } else {
-    prefSize = new scout.Dimension(0, 0);
-  }
-  prefSize = prefSize.add(htmlContainer.getInsets());
-  prefSize.height += this._titleHeight();
-
-  // predefined height or width in pixel override other values
-  if (this._groupBox.gridData && this._groupBox.gridData.widthInPixel) {
-    prefSize.width = this._groupBox.gridData.widthInPixel;
-  }
-  if (this._groupBox.gridData && this._groupBox.gridData.heightInPixel) {
-    prefSize.height = this._groupBox.gridData.heightInPixel;
+    prefSize.width = prefSizeTitle.width;
+    prefSize.height = prefSizeTitle.height;
   }
 
-  return prefSize;
+  console.log('/gb/ ' + htmlContainer.debug() + '\n  prefSize=' + prefSize + ' result=' + prefSize.add(containerInsets));
+  return prefSize;//.add(containerInsets);
+
+  // ----- Helper functions -----
+
+  function getPrefSizeMenuBar(htmlInnerComp) {
+    if (!htmlInnerComp || !htmlInnerComp.isVisible()) {
+      return new scout.Dimension(0, 0);
+    }
+
+    var innerMargins = htmlInnerComp.getMargins();
+    var innerOptions = {};
+    if (options.widthHint) {
+      innerOptions.widthHint = options.widthHint - containerInsets.horizontal() - innerMargins.horizontal();
+    }
+    // XXX heightHint not supported!
+
+    var innerPrefSize = htmlInnerComp.getPreferredSize(innerOptions);
+    // XXX
+//  //in this case there is no padding. add some padding to width.
+//  if (!this._groupBox.borderVisible) {
+//    prefSize.height += this._groupBox.menuBar.position === 'top' ? 14 : 16;
+//  }
+    return innerPrefSize.add(innerMargins);
+  }
+
+  function getPrefSizeBody(htmlInnerComp) {
+    if (!htmlInnerComp || !htmlInnerComp.isVisible()) {
+      return new scout.Dimension(0, 0);
+    }
+
+    var innerMargins = htmlInnerComp.getMargins();
+    var innerOptions = {};
+    if (options.widthHint) {
+      innerOptions.widthHint = options.widthHint - containerInsets.horizontal() - innerMargins.horizontal();
+    }
+    if (options.heightHint) {
+      innerOptions.heightHint = options.heightHint - containerInsets.vertical() - prefSizeTitle.height - prefSizeMenuBar.height - innerMargins.vertical();
+    }
+
+    var innerPrefSize = htmlInnerComp.getPreferredSize(innerOptions);
+    return innerPrefSize.add(innerMargins);
+  }
+
+  // ---------------
+
+//  var htmlContainer = this._groupBox.htmlComp,
+//    htmlGbBody = this._htmlGbBody(),
+//    htmlMenuBar,
+//    prefSize;
+//
+//  if (this._groupBox.expanded) {
+//    prefSize = htmlGbBody.getPreferredSize()
+//      .add(htmlGbBody.getMargins());
+//
+//    htmlMenuBar = this._htmlMenuBar();
+//    if (htmlMenuBar) {
+//      prefSize.height += htmlMenuBar.getPreferredSize().height;
+//      //in this case there is no padding. add some padding to width.
+//      if (!this._groupBox.borderVisible) {
+//        prefSize.height += this._groupBox.menuBar.position === 'top' ? 14 : 16;
+//      }
+//    }
+//  } else {
+//    prefSize = new scout.Dimension(0, 0);
+//  }
+//  prefSize = prefSize.add(htmlContainer.getInsets());
+//  prefSize.height += this._titleHeight();
+//
+//  // predefined height or width in pixel override other values
+//  if (this._groupBox.gridData && this._groupBox.gridData.widthInPixel) {
+//    prefSize.width = this._groupBox.gridData.widthInPixel;
+//  }
+//  if (this._groupBox.gridData && this._groupBox.gridData.heightInPixel) {
+//    prefSize.height = this._groupBox.gridData.heightInPixel;
+//  }
+//
+//  return prefSize;
 };
 
 scout.GroupBoxLayout.prototype._titleHeight = function() {

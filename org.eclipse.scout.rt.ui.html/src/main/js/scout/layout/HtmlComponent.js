@@ -77,7 +77,9 @@ scout.HtmlComponent.prototype.getAvailableSize = function() {
     prefSize;
 
   if (this.scrollable) {
-    prefSize = this.getPreferredSize();
+    prefSize = this.getPreferredSize({ // XXX Correct?
+      widthHint: size.width
+    });
     if (prefSize.height > size.height) {
       size.height = prefSize.height;
     }

@@ -187,7 +187,166 @@ scout.FormFieldLayout.prototype._isStatusVisible = function() {
   return this.formField.$status && (this.formField.statusVisible || this.formField.$status.isVisible());
 };
 
-scout.FormFieldLayout.prototype.preferredLayoutSize = function($container) {
+scout.FormFieldLayout.prototype.preferredLayoutSize = function($container, options) {
+  options = options || {};
+  var htmlContainer = scout.HtmlComponent.get(this.formField.$container),
+    containerInsets = htmlContainer.getInsets();
+
+  var formField = this.formField;
+
+  var prefSizeLabel = new scout.Dimension();
+  var prefSizeMandatory = new scout.Dimension();
+  var prefSizeStatus = new scout.Dimension();
+  var prefSizeField = new scout.Dimension();
+
+  var innerOptions = {};
+  if (options.widthHint) {
+    innerOptions.widthHint = options.widthHint - containerInsets.horizontal();
+  }
+  if (options.heightHint) {
+    innerOptions.heightHint = options.heightHint - containerInsets.vertical();
+  }
+
+  // Mandatory indicator
+  if (formField.$mandatory) {
+    prefSizeMandatory = scout.graphics.getSize(formField.$mandatory, true);
+    if (innerOptions.widthHint) {
+      innerOptions.widthHint -= prefSizeMandatory.width;
+    }
+  }
+
+  // Label
+  if (this._isLabelVisible()) {
+    var labelOptions = {
+      includeMargin: true
+    };
+    if (!formField.labelUseUiWidth) {
+      if (scout.isOneOf(formField.labelPosition, scout.FormField.LABEL_POSITION_DEFAULT, scout.FormField.LABEL_POSITION_LEFT)) {
+        labelOptions.widthHint = this.labelWidth;
+      } else if (formField.labelPosition === scout.FormField.LABEL_POSITION_TOP && innerOptions.widthHint) {
+        labelOptions.widthHint = innerOptions.widthHint - scout.graphics.getMargins(formField.$label).horizontal();
+      }
+    }
+    prefSizeLabel = scout.graphics.prefSize(formField.$label, labelOptions);
+    if (!labelOptions.widthHint && innerOptions.widthHint) {
+      prefSizeLabel.width = Math.min(prefSizeLabel.width, innerOptions.widthHint);
+    }
+
+//    if (formField.labelUseUiWidth) {
+//      // XXX if (!formField.$label.hasClass('empty')) {
+//      prefSizeLabel = scout.graphics.prefSize(formField.$label, {
+//        includeMargin: true
+//      });
+//      if (innerOptions.widthHint) {
+//        prefSizeLabel.width = Math.min(prefSizeLabel.width, innerOptions.widthHint);
+//      }
+//    } else {
+//      if (scout.isOneOf(formField.labelPosition, scout.FormField.LABEL_POSITION_DEFAULT, scout.FormField.LABEL_POSITION_LEFT)) {
+//        prefSizeLabel = scout.graphics.prefSize(formField.$label, {
+//          includeMargin: true,
+//          widthHint: this.labelWidth
+//        });
+//      }
+////      var labelWidthHint = this.labelWidth;
+////      if (options.widthHint) {
+////        labelWidthHint = Math.min(labelWidthHint, options.widthHint - containerInsets.horizontal() - scout.graphics.getMargins(formField.$label).horizontal());
+////      }
+////      prefSizeLabel = scout.graphics.prefSize(formField.$label, {
+////        includeMargin: true,
+////        widthHint: labelWidthHint
+////      });
+//    }
+    if (scout.isOneOf(formField.labelPosition, scout.FormField.LABEL_POSITION_DEFAULT, scout.FormField.LABEL_POSITION_LEFT)) {
+      if (innerOptions.widthHint) {
+        innerOptions.widthHint -= prefSizeLabel.width;
+      }
+    } else if (formField.labelPosition === scout.FormField.LABEL_POSITION_TOP) {
+      if (innerOptions.heightHint) {
+        innerOptions.heightHint -= prefSizeLabel.height;
+      }
+    }
+  }
+
+  // Status
+  if (this._isStatusVisible()) {
+    //prefSizeStatus = scout.graphics.getSize(formField.$status, true);
+    prefSizeStatus = scout.graphics.prefSize(formField.$status, {
+      useCssSize: true
+    });
+    prefSizeStatus.width = Math.max(prefSizeStatus.width, this.statusWidth) + formField.$status.cssMarginX();
+    //width += statusWidth + formField.$status.cssMarginX();
+    if (formField.statusPosition === scout.FormField.STATUS_POSITION_DEFAULT) {
+      if (innerOptions.widthHint) {
+        innerOptions.widthHint -= prefSizeStatus.width;
+      }
+    }
+    // XXX Was ist mit position top? Und in Kombination mit dem Label???
+  }
+
+  // Field
+  if (formField.$fieldContainer) {
+    var htmlInnerComp = scout.HtmlComponent.optGet(formField.$fieldContainer);
+    if (htmlInnerComp) {
+      if (htmlInnerComp.isVisible()) {
+        var innerMargins = htmlInnerComp.getMargins();
+        if (innerOptions.widthHint) {
+          innerOptions.widthHint -= innerMargins.horizontal();
+        }
+        if (innerOptions.heightHint) {
+          innerOptions.heightHint -= innerMargins.vertical();
+        }
+        prefSizeField = htmlInnerComp.getPreferredSize(innerOptions)
+          .add(innerMargins);
+      }
+    } else {
+      prefSizeField = this.naturalSize(formField, innerOptions);
+      if ($container.attr('id') === 'scout.BeanField.Needs[1-53]') {
+        console.log('@nat: io={' + innerOptions.widthHint + '} ps=' + prefSizeField);
+      }
+    }
+  }
+
+  // Combine
+  var prefSize = new scout.Dimension();
+
+  prefSize.width = prefSizeField.width;
+  prefSize.height = prefSizeField.height;
+
+  if (formField.statusPosition === scout.FormField.STATUS_POSITION_DEFAULT) {
+    prefSize.width += prefSizeStatus.width;
+    prefSize.height = Math.max(prefSize.height, prefSizeStatus.height);
+  }
+
+  if (scout.isOneOf(formField.labelPosition, scout.FormField.LABEL_POSITION_DEFAULT, scout.FormField.LABEL_POSITION_LEFT)) {
+    prefSize.width += prefSizeLabel.width;
+    prefSize.height = Math.max(prefSize.height, prefSizeLabel.height);
+  } else if (formField.labelPosition === scout.FormField.LABEL_POSITION_TOP) {
+    prefSize.width = Math.max(prefSize.width, prefSizeLabel.width);
+    prefSize.height += prefSizeLabel.height;
+  }
+
+  prefSize.width += prefSizeMandatory.width;
+  prefSize.height = Math.max(prefSize.height, prefSizeMandatory.height);
+
+  // Ensure min. formRowHeight
+  var oldPS = prefSize;
+  prefSize = prefSize.add(containerInsets);
+  prefSize.height = Math.max(prefSize.height, scout.HtmlEnvironment.formRowHeight);
+
+//  if (formField instanceof scout.BeanField) {
+//    console.log(formField.objectType + '[' + formField.id + ']' +
+//        '\n  prefSize        : ' + prefSize +
+//        '\n  containerInsets : ' + containerInsets +
+//        '\n  oldPrefSize     : ' + oldPS +
+//        '\n  labelPrefSize   : ' + prefSizeLabel +
+//        '\n  fieldPrefSize   : ' + prefSizeField +
+//        '\n  options         : ', options,
+//        '\n  innerOptions    : ', innerOptions);
+//  }
+  return prefSize;
+
+  // ================================
+/*
   var prefSize, htmlField, labelPositionLeft,
     width = 0,
     htmlContainer = scout.HtmlComponent.get($container),
@@ -239,7 +398,7 @@ scout.FormFieldLayout.prototype.preferredLayoutSize = function($container) {
   width += prefSize.width;
   height = Math.max(height, prefSize.height);
 
-  return new scout.Dimension(width, height);
+  return new scout.Dimension(width, height);*/
 };
 
 scout.FormFieldLayout.prototype._layoutIcon = function(formField, fieldBounds, right, top) {
@@ -260,8 +419,8 @@ scout.FormFieldLayout.prototype._layoutIcon = function(formField, fieldBounds, r
  * By default we return the size of the $fieldContainer. Override this method when you must return
  * another size (which is required when the field-content is scrollable).
  */
-scout.FormFieldLayout.prototype.naturalSize = function(formField) {
-  return scout.graphics.prefSize(formField.$fieldContainer, {
+scout.FormFieldLayout.prototype.naturalSize = function(formField, options) {
+  return scout.graphics.prefSize(formField.$fieldContainer, $.extend({
     includeMargin: true
-  });
+  }, options));
 };

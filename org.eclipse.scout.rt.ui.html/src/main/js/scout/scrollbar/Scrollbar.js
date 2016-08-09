@@ -174,6 +174,7 @@ scout.Scrollbar.prototype.update = function() {
   if (this._offsetSize >= this._scrollSize) {
     this.$container.css('display', 'none');
   } else {
+    //console.log('~ SCROLLBAR[' + this.axis + ']: offsetSize=' + this._offsetSize + ', scrollSize=' + this._scrollSize);
     this.$container.css('display', '');
   }
 

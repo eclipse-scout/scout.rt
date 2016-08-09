@@ -53,7 +53,7 @@ scout.DesktopBenchLayout.prototype._layoutByRatio = function(components, contain
   // set positions from ratio
   components.forEach(function(comp) {
     if (comp instanceof scout.Splitter) {
-      comp.setPosition(Math.floor(comp.getRatio() * containerSize.width));
+      comp.setPosition(Math.floor(comp.getRatio() * containerSize.width), false);
     }
   });
   this._layoutBySplitterPosition(components, containerSize);
