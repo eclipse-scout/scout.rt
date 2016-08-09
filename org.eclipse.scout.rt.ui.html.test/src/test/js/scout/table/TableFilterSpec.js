@@ -648,7 +648,8 @@ describe("Table Filter", function() {
         expect(jasmine.Ajax.requests.count()).toBe(1);
 
         var event = new scout.Event(table.id, 'rowsFiltered', {
-          rowIds: [table.rows[1].id]
+          rowIds: [table.rows[1].id],
+          noBusyIndicator: true
         });
         expect(mostRecentJsonRequest()).toContainEvents(event);
       });
