@@ -674,7 +674,8 @@ describe("Table", function() {
       sendQueuedAjaxCalls('', 1000);
       var event = new scout.Event(table.id, 'columnResized', {
         columnId: table.columns[0].id,
-        width: 100
+        width: 100,
+        noBusyIndicator: true
       });
       expect(mostRecentJsonRequest()).toContainEvents(event);
     });
@@ -708,7 +709,8 @@ describe("Table", function() {
 
       var event = new scout.Event(table.id, 'columnResized', {
         columnId: table.columns[0].id,
-        width: 150
+        width: 150,
+        noBusyIndicator: true
       });
       expect(mostRecentJsonRequest()).toContainEvents(event);
     });
