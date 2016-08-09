@@ -48,14 +48,16 @@ describe("BasicField", function() {
       sendQueuedAjaxCalls();
       var event = new scout.Event(field.id, 'displayTextChanged', {
         displayText: 'Test1',
-        whileTyping: true
+        whileTyping: true,
+        noBusyIndicator: true
       });
       expect(mostRecentJsonRequest()).toContainEvents(event);
       field.$field.triggerBlur();
       sendQueuedAjaxCalls();
       event = new scout.Event(field.id, 'displayTextChanged', {
         displayText: 'Test1',
-        whileTyping: false
+        whileTyping: false,
+        noBusyIndicator: false
       });
       expect(mostRecentJsonRequest()).toContainEvents(event);
     });
@@ -68,14 +70,16 @@ describe("BasicField", function() {
       sendQueuedAjaxCalls();
       var event = new scout.Event(field.id, 'displayTextChanged', {
         displayText: 'Test2',
-        whileTyping: true
+        whileTyping: true,
+        noBusyIndicator: true
       });
       expect(mostRecentJsonRequest()).not.toContainEvents(event);
       field.$field.triggerBlur();
       sendQueuedAjaxCalls();
       event = new scout.Event(field.id, 'displayTextChanged', {
         displayText: 'Test2',
-        whileTyping: false
+        whileTyping: false,
+        noBusyIndicator: false
       });
       expect(mostRecentJsonRequest()).toContainEvents(event);
     });
@@ -89,7 +93,8 @@ describe("BasicField", function() {
       sendQueuedAjaxCalls();
       var event = new scout.Event(field.id, 'displayTextChanged', {
         displayText: 'Test3',
-        whileTyping: true
+        whileTyping: true,
+        noBusyIndicator: true
       });
       expect(mostRecentJsonRequest()).toContainEvents(event);
       event = createPropertyChangeEvent(field, {
@@ -100,7 +105,8 @@ describe("BasicField", function() {
       sendQueuedAjaxCalls();
       event = new scout.Event(field.id, 'displayTextChanged', {
         displayText: 'Test3',
-        whileTyping: false
+        whileTyping: false,
+        noBusyIndicator: false
       });
       expect(mostRecentJsonRequest()).toContainEvents(event);
     });
@@ -114,7 +120,8 @@ describe("BasicField", function() {
       sendQueuedAjaxCalls();
       var event = new scout.Event(field.id, 'displayTextChanged', {
         displayText: 'Test3',
-        whileTyping: true
+        whileTyping: true,
+        noBusyIndicator: true
       });
       expect(mostRecentJsonRequest()).toContainEvents(event);
     });
@@ -128,14 +135,16 @@ describe("BasicField", function() {
       sendQueuedAjaxCalls();
       var event = new scout.Event(field.id, 'displayTextChanged', {
         displayText: 'Test4',
-        whileTyping: true
+        whileTyping: true,
+        noBusyIndicator: true
       });
       expect(mostRecentJsonRequest()).not.toContainEvents(event);
       field.$field.triggerBlur();
       sendQueuedAjaxCalls();
       event = new scout.Event(field.id, 'displayTextChanged', {
         displayText: 'Test4',
-        whileTyping: false
+        whileTyping: false,
+        noBusyIndicator: true
       });
       expect(mostRecentJsonRequest()).not.toContainEvents(event);
     });
@@ -149,14 +158,16 @@ describe("BasicField", function() {
       sendQueuedAjaxCalls();
       var event = new scout.Event(field.id, 'displayTextChanged', {
         displayText: 'Test5',
-        whileTyping: true
+        whileTyping: true,
+        noBusyIndicator: true
       });
       expect(mostRecentJsonRequest()).not.toContainEvents(event);
       field.$field.triggerBlur();
       sendQueuedAjaxCalls();
       event = new scout.Event(field.id, 'displayTextChanged', {
         displayText: 'Test5',
-        whileTyping: false
+        whileTyping: false,
+        noBusyIndicator: false
       });
       expect(mostRecentJsonRequest()).not.toContainEvents(event);
     });
