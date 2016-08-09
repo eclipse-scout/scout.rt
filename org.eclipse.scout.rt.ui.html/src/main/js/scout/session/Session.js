@@ -363,6 +363,12 @@ scout.Session.prototype._sendNow = function() {
     uiSessionId: this.uiSessionId,
     events: this._asyncEvents
   };
+  if (request.events) {
+    request.noBusyIndicator = true;
+    request.noBusyIndicator = !request.events.some(function(event) {
+      return !event.noBusyIndicator;
+    });
+  }
   this.responseQueue.prepareRequest(request);
   // Send request
   this._sendRequest(request);
@@ -407,6 +413,9 @@ scout.Session.prototype._sendRequest = function(request) {
   var ajaxOptions = this.defaultAjaxOptions(request);
 
   var busyHandling = true;
+  if (request.noBusyIndicator) {
+    busyHandling = false;
+  }
   if (request.unload) {
     ajaxOptions.async = false;
     busyHandling = false;
@@ -981,6 +990,12 @@ scout.Session.prototype.areEventsQueued = function() {
   return this._asyncEvents.length > 0;
 };
 
+scout.Session.prototype.areBusyIndicatedEventsQueued = function() {
+  return this._asyncEvents.some(function(event){
+    return !event.noBusyIndicator;
+  });
+};
+
 scout.Session.prototype.areResponsesQueued = function() {
   return this.responseQueue.size() > 0;
 };
@@ -998,7 +1013,7 @@ scout.Session.prototype.setBusy = function(busy) {
   } else {
     this._busyCounter--;
     // Do not remove busy indicators if there is a scheduled request which will run immediately to prevent busy cursor flickering
-    if (this._busyCounter === 0 && (!this.areEventsQueued() || this.offline)) {
+    if (this._busyCounter === 0 && (!this.areBusyIndicatedEventsQueued() || this.offline)) {
       this._removeBusy();
     }
   }

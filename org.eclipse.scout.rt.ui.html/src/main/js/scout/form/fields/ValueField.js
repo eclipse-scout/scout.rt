@@ -100,7 +100,7 @@ scout.ValueField.prototype._sendDisplayTextChanged = function(displayText, while
     displayText: displayText,
     whileTyping: whileTyping
   };
-  this._send('displayTextChanged', event);
+  this._send('displayTextChanged', event, null, null, whileTyping);
   this.trigger('displayTextChanged', event);
 };
 

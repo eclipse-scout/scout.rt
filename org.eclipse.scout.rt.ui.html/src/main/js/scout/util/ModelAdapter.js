@@ -96,8 +96,9 @@ scout.ModelAdapter.prototype._init = function(model) {
  * @param data of event
  * @param delay (optional) delay before event is sent. default 0
  * @param coalesceFunc (optional) coalesce function added to event-object
+ * @param noBusyIndicator (optional) mark the event as non ui blocking event
  */
-scout.ModelAdapter.prototype._send = function(type, data, delay, coalesceFunc) {
+scout.ModelAdapter.prototype._send = function(type, data, delay, coalesceFunc, noBusyIndicator) {
   var adapter = this,
     adapterId = this.id;
 
@@ -111,6 +112,7 @@ scout.ModelAdapter.prototype._send = function(type, data, delay, coalesceFunc) {
   if (coalesceFunc) {
     event.coalesce = coalesceFunc;
   }
+  event.noBusyIndicator = noBusyIndicator;
   adapter.remoteHandler(event, delay);
   this.trigger('send', event);
 };

@@ -109,7 +109,10 @@ scout.SearchOutline.prototype._renderRequestFocusQueryField = function() {
 scout.SearchOutline.prototype._sendSearch = function() {
   this._send('search', {
     query: scout.nvl(this.searchQuery, '')
-  });
+  },
+  null,
+  null,
+  true);
 };
 
 scout.SearchOutline.prototype._onQueryFieldInput = function(event) {

@@ -1513,7 +1513,7 @@ scout.Table.prototype._sendRowsFiltered = function(rowIds) {
   // coalesce: only send last event (don't coalesce remove and 'add' events, the UI server needs both)
   this._send('rowsFiltered', eventData, 250, function(previous) {
     return this.id === previous.id && this.type === previous.type && this.remove === previous.remove;
-  });
+  }, true);
 };
 
 scout.Table.prototype._sendRowAction = function(row, column) {
@@ -2776,7 +2776,7 @@ scout.Table.prototype._sendColumnResized = function(column) {
   // coalesce: only send the latest resize event for a column
   this._send('columnResized', eventData, 750, function(previous) {
     return this.id === previous.id && this.type === previous.type && this.columnId === previous.columnId;
-  });
+  }, true);
 };
 
 scout.Table.prototype._sendColumnMoved = function(column, index) {
