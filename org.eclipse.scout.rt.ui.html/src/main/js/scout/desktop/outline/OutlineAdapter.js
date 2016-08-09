@@ -16,7 +16,7 @@ scout.inherits(scout.OutlineAdapter, scout.TreeAdapter);
 
 scout.OutlineAdapter.prototype._init = function(model) {
   scout.OutlineAdapter.parent.prototype._init.call(this, model);
-  scout.Tree.visitNodes(model.nodes, this._initPage.bind(this));
+//  scout.Tree.visitNodes(model.nodes, this._initPage.bind(this));
 };
 
 scout.OutlineAdapter.prototype._initPage = function(page, parentNode) {
@@ -37,24 +37,12 @@ scout.OutlineAdapter.prototype._onPageChanged = function(event) {
     page = this.widget._nodeById(event.nodeId);
 
     page.detailFormVisible = event.detailFormVisible;
-    page.detailForm = this.session.getOrCreateModelAdapter(event.detailForm, this);
-    if (page.detailForm) {
-      if (!page.detailForm.widget) {
-        page.detailForm.createWidget(this.widget); // FIXME [6.1] CGU das mit dem create muss einfacher sein -> getOrCreate überlassen?
-      }
-      page.detailForm = page.detailForm.widget;
-    }
+    page.detailForm = this.session.getOrCreateWidget(event.detailForm, this, this.widget);
 
     page.detailTableVisible = event.detailTableVisible;
-    page.detailTable = this.session.getOrCreateModelAdapter(event.detailTable, this);
-    if (page.detailTable) {
-      if (!page.detailTable.widget) {
-        page.detailTable.createWidget(this.widget); // FIXME [6.1] CGU das mit dem create muss einfacher sein -> getOrCreate überlassen?
-      }
-      page.detailTable = page.detailTable.widget;
-    }
+    page.detailTable = this.session.getOrCreateWidget(event.detailTable, this, this.widget);
   } else {
-    this.defaultDetailForm = this.session.getOrCreateModelAdapter(event.detailForm, this);
+    this.widget.defaultDetailForm = this.session.getOrCreateWidget(event.detailForm, this, this.widget);
   }
 
   this.widget.pageChanged(page);

@@ -193,7 +193,7 @@ scout.TableAdapter.prototype._onAggregationFunctionChanged = function(event) {
 };
 
 scout.TableAdapter.prototype._onFiltersChanged = function(filters) {
-  this._syncFilters(filters);
+  this.widget.setFilters(filters);
   // do not refilter while the table is being rebuilt (because column.index in filter and row.cells may be inconsistent)
   if (!this.widget._rebuildingTable) {//FIXME CGU [6.1] gehört das nicht direkt in filter rein?
     this.filter();

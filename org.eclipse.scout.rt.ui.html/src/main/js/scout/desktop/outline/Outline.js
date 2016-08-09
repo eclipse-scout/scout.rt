@@ -181,18 +181,20 @@ scout.Outline.prototype._initTreeNodeInternal = function(node, parentNode) {
   scout.Outline.parent.prototype._initTreeNodeInternal.call(this, node, parentNode);
   node.detailFormVisibleByUi = true;
   if (node.detailTable) {
-    if (node.detailTable instanceof scout.ModelAdapter) {
-      node.detailTable = node.detailTable.createWidget(this); // FIXME [6.1] CGU widget should not have a dependency to model adapter
+    node.detailTable = this.createFromProperty('detailTable', node.detailTable);
+//    if (node.detailTable instanceof scout.ModelAdapter) {
+//      node.detailTable = node.detailTable.createWidget(this); // FIXME [6.1] CGU widget should not have a dependency to model adapter
 //    } else if (!(node.detailTable instanceof scout.Table)) {
 //      node.detailTable.model.parent = this; // FIXME CGU necessary?
 //      node.detailTable = scout.create(node.detailTable);
-    }
+//    }
     this._initDetailTable(node);
   }
   if (node.detailForm) {
-    if (node.detailForm instanceof scout.ModelAdapter) {
-      node.detailForm = node.detailForm.createWidget(this); // FIXME [6.1] CGU widget should not have a dependency to model adapter
-    }
+    node.detailForm = this.createFromProperty('detailForm', node.detailForm);
+//    if (node.detailForm instanceof scout.ModelAdapter) {
+//      node.detailForm = node.detailForm.createWidget(this); // FIXME [6.1] CGU widget should not have a dependency to model adapter
+//    }
     this._initDetailForm(node);
   }
 

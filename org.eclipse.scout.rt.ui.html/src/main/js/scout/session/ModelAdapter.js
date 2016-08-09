@@ -69,6 +69,7 @@ scout.ModelAdapter.prototype._init = function(model) {
   scout.defaultValues.applyTo(this.model);
 
   // copy all properties from model to this adapter
+  /*
   this._eachProperty(model, function(propertyName, value, isAdapterProp) {
     if (scout.isOneOf(propertyName, 'id', 'session', 'objectType')) {
       return; // Ignore (already set manually above)
@@ -78,14 +79,16 @@ scout.ModelAdapter.prototype._init = function(model) {
     }
     this.model[propertyName] = value;
   }.bind(this));
+  */
 };
 
-scout.ModelAdapter.prototype.createWidget = function(parent) { // FIXME CGU getOrCreate? :/
+scout.ModelAdapter.prototype.getOrCreateWidget = function(parent) { // FIXME CGU getOrCreate? :/
   if (this.widget) {
 //    this.widget.setParent() // FIXME CGU anstatt re-link in session.js?
     return this.widget;
   }
   this.model.parent = parent;
+  this.model.remoteAdapter = this; // FIXME [awe] 6.1 discuss with C.GU. wichtig, vor _createWidget, wegen rekursion!
   this.widget = this._createWidget(this.model);
   if (this.widget) { // FIXME CGU null check wegnehmen, davon ausgehen dass alle ein widget haben
     this._attachWidget();
@@ -115,12 +118,6 @@ scout.ModelAdapter.prototype._detachWidget = function() {
   this._widgetListener = null;
 };
 
-scout.ModelAdapter.prototype._createWidgets = function(propertyName, model) {
-  return this._processAdapters(model, function(model) {
-    return model.createWidget(this.widget);
-  }.bind(this));
-};
-
 /**
  * @returns Creates a scout.Event object from the current adapter instance and
  *   sends the event by using the Session#sendEvent() method.
@@ -138,9 +135,12 @@ scout.ModelAdapter.prototype._send = function(type, data, delay, coalesceFunc) {
   this.session.sendEvent(event, delay);
 };
 
-scout.ModelAdapter.prototype._sendProperty = function(propertyName, value) {
+/**
+ * Sends the current state of the given property to the server.
+ */
+scout.ModelAdapter.prototype._sendProperty = function(propertyName) {
   var data = {};
-  data[propertyName] = value;
+  data[propertyName] = this[propertyName];
   this._send('property', data);
 };
 
@@ -262,33 +262,6 @@ scout.ModelAdapter.prototype._eachProperty = function(model, func) {
   }
 };
 
-/**
- * This method creates adapter instances for a given adapter-ID or an array of adapter-IDs.
- * In some cases the adapter-ID is already resolved and replaced by a ModelAdapter instance,
- * this happens when you use the ModelAdapter#extractModel() method. In that case we simply
- * use the provided instance and don't lookup the adapter by ID.
- */
-scout.ModelAdapter.prototype._createAdapters = function(propertyName, adapterOrIds) {
-  return this._processAdapters(adapterOrIds, function(adapterOrId) {
-    var adapter, model;
-    if (adapterOrId instanceof scout.ModelAdapter) {
-      // Model adapter
-      adapter = adapterOrId;
-    } else if (scout.objects.isString(adapterOrId)) {
-      // String (by ID)
-      model = this.session.getAdapterData(adapterOrId);
-      adapter = this.session.getOrCreateModelAdapter(adapterOrId, this);
-    } else if (scout.objects.isPlainObject(adapterOrId)) {
-      // Model object
-      model = adapterOrId;
-      adapter = this.session.createModelAdapter(model, this);
-    } else {
-      throw new Error('adapterOrId must be either a scout.ModelAdapter, a string or a (model-) object');
-    }
-    return adapter;
-  }.bind(this));
-};
-
 scout.ModelAdapter.prototype._destroyAdapters = function(propertyName, oldAdapters, newAdapterIds) {
   return this._processAdapters(oldAdapters, function(oldAdapter) {
     // Only destroy it if its linked to this adapter (-> don't destroy global adapters)
@@ -380,8 +353,8 @@ scout.ModelAdapter.prototype._onWidgetPropertyChange = function(event) {
 
 scout.ModelAdapter.prototype._syncPropertiesOnPropertyChange = function(newProperties) {
   this._eachProperty(newProperties, function(propertyName, value, isAdapterProp) {
-    var syncFuncName = '_sync' + scout.strings.toUpperCaseFirstLetter(propertyName),
-      oldValue = this[propertyName];
+    var ensureTypeFuncName = '_ensure' + scout.strings.toUpperCaseFirstLetter(propertyName),
+      oldValue = this.widget[propertyName];
 
     // FIXME CGU [6.1] dieser Teil sollte irgendiwe in der Sync Funktion sein, anstatt callSetter syncProperty aufrufen, würde aber viele Funktionen brechen
     if (isAdapterProp) {
@@ -389,17 +362,13 @@ scout.ModelAdapter.prototype._syncPropertiesOnPropertyChange = function(newPrope
         // TODO CGU this should actually be configurable, otherwise m_disposeOnChange=false on server doesn't work
         this._destroyAdapters(propertyName, oldValue, value);
       }
-      if (value) {
-        value = this._createAdapters(propertyName, value);
-        value = this._createWidgets(propertyName, value);
-      }
     }
 
-    if (this[syncFuncName]) {
-      this[syncFuncName](value, oldValue);
-    } else {
-      this.widget.callSetter(propertyName, value);
-    }
+    if (this[ensureTypeFuncName]) {
+      value = this[ensureTypeFuncName](value/*, oldValue*/);
+    } /*else {*/
+    this.widget.callSetter(propertyName, value);
+//    }
   }.bind(this));
 };
 

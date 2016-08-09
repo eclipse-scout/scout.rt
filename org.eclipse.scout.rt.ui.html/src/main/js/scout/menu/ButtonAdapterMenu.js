@@ -58,9 +58,10 @@ scout.ButtonAdapterMenu.prototype._onButtonPropertyChange = function(event) {
   event.changedProperties.forEach(function(prop) {
     changedProperties[prop] = event.newProperties[prop];
   });
-  this.onModelPropertyChange({
-    properties: scout.ButtonAdapterMenu.adaptButtonProperties(changedProperties)
-  });
+  changedProperties = scout.ButtonAdapterMenu.adaptButtonProperties(changedProperties);
+  for (var prop in changedProperties) {
+    this.setProperty(prop, changedProperties[prop]);
+  }
 };
 
 scout.ButtonAdapterMenu.prototype._onButtonDestroy = function(event) {

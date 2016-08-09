@@ -40,13 +40,14 @@ scout.Widget = function() {
 
   this._adapterProperties = [];
   this._cloneProperties = [];
+  this._propertyConfig = {};
 
   this._addKeyStrokeContextSupport();
   this._addEventSupport();
 };
 
-scout.Widget.prototype.init = function(options) {
-  this._init(options);
+scout.Widget.prototype.init = function(model) {
+  this._init(model);
   this._initKeyStrokeContext(this.keyStrokeContext);
   this.initialized = true;
   this.trigger('initialized');
@@ -57,27 +58,41 @@ scout.Widget.prototype.init = function(options) {
  * - parent (required): The parent widget
  * - session (optional): If not specified the session of the parent is used
  */
-scout.Widget.prototype._init = function(options) {
-  options = options || {};
-  if (!options.parent) {
+scout.Widget.prototype._init = function(model) {
+  model = model || {};
+  if (!model.parent) {
     throw new Error('Parent expected: ' + this);
   }
-  this.setParent(options.parent);
+  this.setParent(model.parent);
 
-  this.session = options.session || this.parent.session;
+  this.session = model.session || this.parent.session;
   if (!this.session) {
     throw new Error('Session expected: ' + this);
   }
-  this.animateRemoval = scout.nvl(options.animateRemoval, false);
+  this.animateRemoval = scout.nvl(model.animateRemoval, false);
 
   // copy the model to this widget
-  $.extend(this, options);
-  this._eachProperty(options, function(propertyName, value, isAdapterProp) {
-    if (isAdapterProp && value) {
-      value = this._createWidgets(propertyName, value);
-    }
-    this[propertyName] = value;
+  $.extend(this, model);
+
+  this._eachProperty(model, function(propertyName, value, isAdapterProperty) {
+    if (isAdapterProperty) {
+      this[propertyName] = this._ensureType(propertyName, value);
+      // this.callSetter(propertyName, value);
+    } // FIXME evtl. im else callSetter machen
   }.bind(this));
+};
+
+scout.Widget.prototype.createFromProperty = function(propertyName, value) {
+  // Was ist das für ein Fall? Manchmal existiert das Widget schon (Menu 133 BusinessForm MainBox)
+  if (value instanceof scout.Widget) {
+    return value;
+  }
+  value.parent = this;
+  return scout.create(value);
+};
+
+scout.Widget.prototype._isPropertyRemotable = function(propertyName) {
+  return true; // FIXME [awe] 6.1 - hier propertyConfig lesen, diese Funktion würde für tableStatus / Status false zurückgeben weil es keinen Adapter gibt
 };
 
 scout.Widget.prototype._initKeyStrokeContext = function(keyStrokeContext) {
@@ -608,6 +623,11 @@ scout.Widget.prototype.setProperty = function(name, value) {
   if (this[name] === value) {
     return;
   }
+
+  if (this._isAdapterProperty(name)) { // FIXME durch propertyConfig ersetzen
+    value = this._ensureType(name, value);
+  }
+
   if (this.rendered) {
     var removeFuncName = '_remove' + scout.strings.toUpperCaseFirstLetter(name);
     if (this[removeFuncName]) {
@@ -627,6 +647,18 @@ scout.Widget.prototype.setProperty = function(name, value) {
     }
     this[renderFuncName]();
   }
+};
+
+scout.Widget.prototype._ensureType = function(propertyName, value) {
+  if (Array.isArray(value)) {
+    var returnValues = [];
+    value.forEach(function(elementValue, i) {
+      returnValues[i] = this._ensureType(propertyName, elementValue);
+    }, this);
+    return returnValues;
+  }
+
+  return this.createFromProperty(propertyName, value);
 };
 
 scout.Widget.prototype.toString = function() {
@@ -703,34 +735,6 @@ scout.Widget.prototype._removeAdapterProperties = function(properties) {
     scout.arrays.removeAll(this._adapterProperties, properties);
   } else {
     scout.arrays.remove(this._adapterProperties, properties);
-  }
-};
-
-scout.Widget.prototype._createWidgets = function(propertyName, model) {
-  // FIXME CGU zügeln nach model adapter
-  return this._processWidgets(model, function(model) {
-    if (model instanceof scout.ModelAdapter) {
-      return model.createWidget(this); // FIXME [6.1] CGU widget should not have a dependency to model adapter
-    } else if(!(model instanceof scout.Widget)) {
-      model.parent = this;
-      return scout.create(model);
-    }
-    return model;
-  }.bind(this));
-};
-
-// FIXME CGU [6.1] Move to arrays util?
-scout.Widget.prototype._processWidgets = function(value, func) {
-  var adapters, adapter, i;
-  if (Array.isArray(value)) {
-    adapters = [];
-    for (i = 0; i < value.length; i++) {
-      adapter = func(value[i]);
-      adapters.push(adapter);
-    }
-    return adapters;
-  } else {
-    return func(value);
   }
 };
 

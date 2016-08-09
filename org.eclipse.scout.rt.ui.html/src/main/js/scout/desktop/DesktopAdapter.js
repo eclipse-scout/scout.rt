@@ -20,11 +20,8 @@ scout.DesktopAdapter.prototype._onFormShow = function(event) {
     displayParent = this.session.getModelAdapter(event.displayParent);
 
   if (displayParent) {
-    form = this.session.getOrCreateModelAdapter(event.form, displayParent);
-    if (!form.widget) {
-      form.createWidget(this.widget);
-    }
-    this.widget.showForm(form.widget, displayParent.widget, event.position, false);
+    form = this.session.getOrCreateWidget(event.form, displayParent, this.widget);
+    this.widget.showForm(form, displayParent.widget, event.position, false);
   }
 };
 

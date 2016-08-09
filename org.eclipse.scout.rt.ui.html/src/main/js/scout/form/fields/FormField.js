@@ -374,38 +374,23 @@ scout.FormField.prototype._syncErrorStatus = function(errorStatus) {
 };
 
 scout.FormField.prototype.setLabel = function(label) {
-  this._setProperty('label', label);
-  if (this.rendered) {
-    this._renderLabel();
-  }
+  this.setProperty('label', label);
 };
 
 scout.FormField.prototype.setTooltipText = function(tooltipText) {
-  this._setProperty('tooltipText', tooltipText);
-  if (this.rendered) {
-    this._renderTooltipText();
-  }
+  this.setProperty('tooltipText', tooltipText);
 };
 
 scout.FormField.prototype.setErrorStatus = function(errorStatus) {
-  this._setProperty('errorStatus', errorStatus);
-  if (this.rendered) {
-    this._renderErrorStatus();
-  }
+  this.setProperty('errorStatus', errorStatus);
 };
 
 scout.FormField.prototype.setMenus = function(menus) {
-  this._setProperty('menus', menus);
-  if (this.rendered) {
-    this._renderMenus();
-  }
+  this.setProperty('menus', menus);
 };
 
 scout.FormField.prototype.setMenusVisible = function(menusVisible) {
-  this._setProperty('menusVisible', menusVisible);
-  if (this.rendered) {
-    this._renderMenusVisible();
-  }
+  this.setProperty('menusVisible', menusVisible);
 };
 
 /**

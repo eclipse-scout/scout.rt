@@ -18,7 +18,7 @@ scout.model = {
     var that = this;
 
     return $.ajax({
-      url: 'res/model.json',
+      url: 'res/models.json',
       dataType: 'json',
       contentType: 'application/json; charset=UTF-8'
     }).done(that._onModelDone.bind(that))

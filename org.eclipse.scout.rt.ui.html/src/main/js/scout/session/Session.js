@@ -128,8 +128,8 @@ scout.Session.prototype.getModelAdapter = function(id) {
  * When a new adapter is created it will be automatically registered in the
  * model-adpater registry.
  */
-scout.Session.prototype.getOrCreateModelAdapter = function(id, parent) {
-  $.log.trace('getOrCreate(' + id + (parent ? ', ' + parent : '') + ')');
+scout.Session.prototype.getOrCreateModelAdapter = function(id, owner) {
+  $.log.trace('getOrCreate(' + id + (owner ? ', ' + owner : '') + ')');
   if (!id) {
     return;
   }
@@ -139,10 +139,10 @@ scout.Session.prototype.getOrCreateModelAdapter = function(id, parent) {
 
   var adapter = this.modelAdapterRegistry[id];
   if (adapter) {
-    $.log.trace('model adapter already exists: ' + adapter + ' --> owner = ' + adapter.owner + ', parent = ' + adapter.parent + ', new parent = ' + parent);
+    $.log.trace('model adapter already exists: ' + adapter + ' --> owner = ' + adapter.owner + ', parent = ' + adapter.parent + ', new parent = ' + owner);
     if (!adapter.rendered) {
       // Re-link
-      $.log.trace('unlink ' + adapter + ' from ' + adapter.parent + ' and link to new parent ' + parent);
+      $.log.trace('unlink ' + adapter + ' from ' + adapter.parent + ' and link to new parent ' + owner);
 //      adapter.setParent(parent); // FIXME CGU [6.1] relinking widgets necessary?
     } else {
       $.log.trace('adapter ' + adapter + ' is already rendered. keeping link to parent ' + adapter.parent);
@@ -155,26 +155,21 @@ scout.Session.prototype.getOrCreateModelAdapter = function(id, parent) {
     throw new Error('no adapterData found for id=' + id);
   }
 
-  return this.createModelAdapter(adapterData, parent);
+  return this.createModelAdapter(adapterData, owner);
 };
 
-scout.Session.prototype.createModelAdapter = function(adapterData, parent) {
-  var owner;
+scout.Session.prototype.createModelAdapter = function(adapterData, owner) {
   if (adapterData.owner !== undefined) {
     // Prefer the owner sent by the server
     owner = this.getModelAdapter(adapterData.owner);
-    parent = parent || owner; // convenience when 'parent' was not set, e.g. in tests
-  } else {
-    if (!parent) {
-      throw new Error('parent must be defined');
-    }
-    owner = parent;
+  }
+  if (!owner) {
+    throw new Error('owner must be defined');
   }
 
   // override previously set owner/parent for adapter-data so
   // we can access them in ModelAdapter#init()
   adapterData.owner = owner;
-  adapterData.parent = parent;
   var objectType = adapterData.objectType;
   var objectTypeParts = objectType.split('.');
   if (objectTypeParts.length === 2) {
@@ -186,21 +181,29 @@ scout.Session.prototype.createModelAdapter = function(adapterData, parent) {
     objectType = objectType + 'Adapter';
   }
   var adapter = scout.create(objectType, adapterData);
-  $.log.trace('created new adapter ' + adapter + '. owner=' + owner + ' parent=' + parent);
+  $.log.trace('created new adapter ' + adapter + '. owner=' + owner);
 
   owner.addOwnedAdapter(adapter);
   return adapter;
 };
 
-scout.Session.prototype.getOrCreateModelAdapters = function(ids, parent) {
+scout.Session.prototype.getOrCreateModelAdapters = function(ids, owner) {
   if (!ids) {
     return [];
   }
   var adapters = [];
   for (var i = 0; i < ids.length; i++) {
-    adapters[i] = this.getOrCreateModelAdapter(ids[i], parent);
+    adapters[i] = this.getOrCreateModelAdapter(ids[i], owner);
   }
   return adapters;
+};
+
+scout.Session.prototype.getOrCreateWidget = function(adapterId, owner, parent) {
+  if (!adapterId) {
+    return null;
+  }
+  var adapter = this.getOrCreateModelAdapter(adapterId, owner);
+  return adapter.getOrCreateWidget(parent);
 };
 
 /**
@@ -317,11 +320,10 @@ scout.Session.prototype._processStartupResponse = function(data) {
   // Create the desktop
   this._putLocaleData(data.startupData.locale, data.startupData.textMap);
   // Extract client session data without creating a model adapter for it. It is (currently) only used to transport the desktop's adapterId.
-  var clientSessionData = this._getAdapterData(data.startupData.clientSession);
-  var model = this.getOrCreateModelAdapter(clientSessionData.desktop, this.rootAdapter);
   var parent = new scout.NullWidget();
   parent.session = this;
-  this.desktop = model.createWidget(parent);
+  var clientSessionData = this._getAdapterData(data.startupData.clientSession);
+  this.desktop = this.getOrCreateWidget(clientSessionData.desktop, this.rootAdapter, parent);
   var renderDesktopImpl = function() {
     this._renderDesktop();
 

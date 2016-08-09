@@ -101,7 +101,7 @@ scout.Table.prototype._init = function(model) {
   this.menuBar.bottom();
 
   this._syncSelectedRows(this.selectedRows);
-  this._syncFilters(this.filters);
+  this.setFilters(this.filters);
   this._syncKeyStrokes(this.keyStrokes);
   this._syncMenus(this.menus);
   this._syncTableControls(this.tableControls);
@@ -3087,20 +3087,28 @@ scout.Table.prototype._syncKeyStrokes = function(keyStrokes, oldKeyStrokes) {
   this.keyStrokes = keyStrokes;
 };
 
-scout.Table.prototype._syncFilters = function(filters) {
+scout.Table.prototype.setFilters = function(filters) {
   for (var key in this._filterMap) {
     this.removeFilterByKey(key, false);
   }
   if (filters) {
-    filters.forEach(function(filterData) {
-      if (filterData.column) {
-        filterData.column = this._columnById(filterData.column);
-      }
-      filterData.table = this;
-      filterData.session = this.session;
-      this.addFilter(scout.create(filterData), false);
+    filters.forEach(function(filter) {
+      filter = this._ensureFilter(filter);
+      this.addFilter(filter, false);
     }, this);
   }
+};
+
+scout.Table.prototype._ensureFilter = function(filter) {
+  if (filter instanceof scout.TableUserFilter) {
+    return filter;
+  }
+  if (filter.column) {
+    filter.column = this._columnById(filter.column);
+  }
+  filter.table = this;
+  filter.session = this.session;
+  return scout.create(filter);
 };
 
 scout.Table.prototype._syncTableStatus = function(tableStatus) {
