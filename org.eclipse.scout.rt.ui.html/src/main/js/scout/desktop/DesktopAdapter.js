@@ -11,6 +11,7 @@
 scout.DesktopAdapter = function() {
   scout.DesktopAdapter.parent.call(this);
   this._addAdapterProperties(['activeForm', 'viewButtons', 'menus', 'views', 'dialogs', 'outline', 'messageBoxes', 'fileChoosers', 'addOns', 'keyStrokes']);
+  this._addRemoteProperties(['benchVisible', 'navigationVisible', 'headerVisible']);
 };
 scout.inherits(scout.DesktopAdapter, scout.ModelAdapter);
 

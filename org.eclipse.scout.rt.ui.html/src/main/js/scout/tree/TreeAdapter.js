@@ -11,6 +11,7 @@
 scout.TreeAdapter = function() {
   scout.TreeAdapter.parent.call(this);
   this._addAdapterProperties(['menus', 'keyStrokes']);
+  this._addRemoteProperties(['displayStyle']);
 };
 scout.inherits(scout.TreeAdapter, scout.ModelAdapter);
 

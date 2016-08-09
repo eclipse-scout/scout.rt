@@ -10,5 +10,6 @@
  ******************************************************************************/
 scout.RadioButtonAdapter = function() {
   scout.RadioButtonAdapter.parent.call(this);
+  this._addRemoteProperties(['selected']);
 };
 scout.inherits(scout.RadioButtonAdapter, scout.ButtonAdapter);

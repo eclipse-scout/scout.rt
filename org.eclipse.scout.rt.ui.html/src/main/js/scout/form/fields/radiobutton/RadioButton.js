@@ -71,7 +71,6 @@ scout.RadioButton.prototype.setSelected = function(selected) {
     return;
   }
   this._setProperty('selected', selected);
-  this._sendProperty('selected');
   if (this.rendered) {
     this._renderSelected();
   }

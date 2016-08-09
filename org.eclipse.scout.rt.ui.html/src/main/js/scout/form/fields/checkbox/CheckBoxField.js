@@ -78,7 +78,6 @@ scout.CheckBoxField.prototype.setValue = function(value) {
     return;
   }
   this._setProperty('value', value);
-  this._sendProperty('value');
   if (this.rendered) {
     this._renderValue();
   }

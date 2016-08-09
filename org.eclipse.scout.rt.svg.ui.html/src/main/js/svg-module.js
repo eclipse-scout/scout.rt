@@ -8,4 +8,5 @@
 */
 (function(scout, $, undefined) {
   __include("scout/svg/SvgField.js");
+  __include("scout/svg/SvgFieldAdapter.js");
 }(scout, jQuery));

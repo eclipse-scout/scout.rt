@@ -282,7 +282,6 @@ scout.SplitBox.prototype.setFieldCollapsed = function(collapsed) {
     return;
   }
   this._setProperty('fieldCollapsed', collapsed);
-  this._sendProperty('fieldCollapsed');
   this._updateCollapseHandleButtons();
   if (this.rendered) {
     this._renderFieldCollapsed();
@@ -298,7 +297,6 @@ scout.SplitBox.prototype.setCollapsibleField = function(field) {
     return;
   }
   this._setProperty('collapsibleField', field);
-  this._sendProperty('collapsibleField');
   this._updateCollapseHandle();
   if (this.rendered) {
     this._renderCollapsibleField();

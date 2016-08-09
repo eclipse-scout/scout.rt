@@ -140,11 +140,12 @@ scout.TableAdapter.prototype._onColumnHeadersUpdated = function(columns) {
 };
 
 scout.TableAdapter.prototype._onStartCellEdit = function(columnId, rowId, fieldId) {
-  var column = this._columnById(columnId),
-    row = this._rowById(rowId),
+  var column = this.widget._columnById(columnId),
+    row = this.widget._rowById(rowId),
     field = this.session.getOrCreateModelAdapter(fieldId, this);
 
-  this.widget.startCellEdit(column, row, field);
+  field.createWidget(this.widget);
+  this.widget.startCellEdit(column, row, field.widget);
 };
 
 scout.TableAdapter.prototype._onEndCellEdit = function(fieldId) {
@@ -171,8 +172,8 @@ scout.TableAdapter.prototype._onColumnBackgroundEffectChanged = function(event) 
 };
 
 scout.TableAdapter.prototype._onRequestFocusInCell = function(event) {
-  var row = this._rowById(event.rowId),
-    column = this._columnById(event.columnId);
+  var row = this.widget._rowById(event.rowId),
+    column = this.widget._columnById(event.columnId);
 
   this.widget.requestFocusInCell(column, row);
 };
@@ -183,7 +184,7 @@ scout.TableAdapter.prototype._onAggregationFunctionChanged = function(event) {
 
   event.eventParts.forEach(function(eventPart) {
     var func = eventPart.aggregationFunction,
-      column = this._columnById(eventPart.columnId);
+      column = this.widget._columnById(eventPart.columnId);
     columns.push(column);
     functions.push(func);
   }, this);

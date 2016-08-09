@@ -1264,10 +1264,6 @@ scout.Tree.prototype.setDisplayStyle = function(displayStyle, notifyServer) {
   }
   this._renderViewportBlocked = true;
   this._setProperty('displayStyle', displayStyle);
-  notifyServer = scout.nvl(notifyServer, true);
-  if (notifyServer) {
-    this._sendProperty('displayStyle');
-  }
 
   if (displayStyle && this.selectedNodes.length > 0) {
     var selectedNode = this.selectedNodes[0];

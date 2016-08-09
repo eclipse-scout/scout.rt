@@ -10,5 +10,6 @@
  ******************************************************************************/
 scout.CheckBoxFieldAdapter = function() {
   scout.CheckBoxFieldAdapter.parent.call(this);
+  this._addRemoteProperties(['value']);
 };
 scout.inherits(scout.CheckBoxFieldAdapter, scout.ValueFieldAdapter);

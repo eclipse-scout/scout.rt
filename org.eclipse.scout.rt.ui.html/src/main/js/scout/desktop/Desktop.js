@@ -468,10 +468,6 @@ scout.Desktop.prototype.setNavigationVisible = function(visible, notifyServer) {
     return;
   }
   this._setProperty('navigationVisible', visible);
-  notifyServer = scout.nvl(notifyServer, true);
-  if (notifyServer) {
-    this._sendProperty('navigationVisible');
-  }
   if (this.rendered) {
     this._renderNavigationVisible();
   }
@@ -488,10 +484,6 @@ scout.Desktop.prototype.setBenchVisible = function(visible, notifyServer) {
     return;
   }
   this._setProperty('benchVisible', visible);
-  notifyServer = scout.nvl(notifyServer, true);
-  if (notifyServer) {
-    this._sendProperty('benchVisible');
-  }
   if (this.rendered) {
     this._renderBenchVisible();
   }
@@ -504,9 +496,6 @@ scout.Desktop.prototype.setHeaderVisible = function(visible, notifyServer) {
   }
   this._setProperty('headerVisible', visible);
   notifyServer = scout.nvl(notifyServer, true);
-  if (notifyServer) {
-    this._sendProperty('headerVisible');
-  }
   if (this.rendered) {
     this._renderHeaderVisible();
   }

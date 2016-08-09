@@ -8,9 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-scout.SplitBoxAdapter = function() {
-  scout.SplitBoxAdapter.parent.call(this);
-  this._addAdapterProperties(['firstField', 'secondField', 'collapsibleField']);
-  this._addRemoteProperties(['collapsibleField', 'fieldCollapsed']);
+scout.SvgFieldAdapter = function() {
+  scout.SvgFieldAdapter.parent.call(this);
 };
-scout.inherits(scout.SplitBoxAdapter, scout.CompositeFieldAdapter);
+scout.inherits(scout.SvgFieldAdapter, scout.ButtonAdapter);

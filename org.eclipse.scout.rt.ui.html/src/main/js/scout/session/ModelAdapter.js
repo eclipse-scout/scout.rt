@@ -29,6 +29,11 @@ scout.ModelAdapter = function() {
   this.owner;
   this.ownedAdapters = [];
   this._adapterProperties = [];
+
+  /**
+   * Widget properties which should be sent to server on property change.
+   */
+  this._remoteProperties = [];
   this._widgetListener;
 };
 
@@ -133,12 +138,9 @@ scout.ModelAdapter.prototype._send = function(type, data, delay, coalesceFunc) {
   this.session.sendEvent(event, delay);
 };
 
-/**
- * Sends the current state of the given property to the server.
- */
-scout.ModelAdapter.prototype._sendProperty = function(propertyName) {
+scout.ModelAdapter.prototype._sendProperty = function(propertyName, value) {
   var data = {};
-  data[propertyName] = this[propertyName];
+  data[propertyName] = value;
   this._send('property', data);
 };
 
@@ -173,6 +175,10 @@ scout.ModelAdapter.prototype._renderUniqueId = function(qualifier, $target) {
  */
 scout.ModelAdapter.prototype._addAdapterProperties = function(properties) {
   this._addProperties('_adapterProperties', properties);
+};
+
+scout.ModelAdapter.prototype._addRemoteProperties = function(properties) {
+  this._addProperties('_remoteProperties', properties);
 };
 
 scout.ModelAdapter.prototype._addProperties = function(propertyName, properties) {
@@ -347,7 +353,7 @@ scout.ModelAdapter.prototype.onModelAction = function(event) {
 };
 
 scout.ModelAdapter.prototype._onWidgetEvent = function(event) {
-  if (event.type === 'property') {
+  if (event.type === 'propertyChange') {
     this._onWidgetPropertyChange(event);
   } else {
     // FIXME CGU [6.1] temporary, until model adapter separation
@@ -361,8 +367,14 @@ scout.ModelAdapter.prototype._onWidgetEvent = function(event) {
 };
 
 scout.ModelAdapter.prototype._onWidgetPropertyChange = function(event) {
-  event.changedProperties.forEach(function(property) {
-    this._sendProperty(property);
+  event.changedProperties.forEach(function(propertyName) {
+    if (this._isRemoteProperty(propertyName)) {
+      var value = event.newProperties[propertyName];
+      if (value && this._isAdapterProperty(propertyName)) {
+//        value = value.modelAdapter; // FIXME CGU [6.1] get adapter for widget
+      }
+      this._sendProperty(propertyName, value);
+    }
   }, this);
 };
 
@@ -448,6 +460,10 @@ scout.ModelAdapter.prototype.uniqueId = function(qualifier) {
 
 scout.ModelAdapter.prototype._isAdapterProperty = function(propertyName) {
   return this._adapterProperties.indexOf(propertyName) > -1;
+};
+
+scout.ModelAdapter.prototype._isRemoteProperty = function(propertyName) {
+  return this._remoteProperties.indexOf(propertyName) > -1;
 };
 
 scout.ModelAdapter.prototype.toString = function() {
