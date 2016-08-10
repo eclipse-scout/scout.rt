@@ -11,4 +11,4 @@
 scout.AggregateTableControlAdapter = function() {
   scout.AggregateTableControlAdapter.parent.call(this);
 };
-scout.inherits(scout.AggregateTableControlAdapter, scout.ModelAdapter);
+scout.inherits(scout.AggregateTableControlAdapter, scout.TableControlAdapter);

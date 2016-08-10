@@ -180,9 +180,6 @@ scout.TableControl.prototype.setSelected = function(selected, notifyServer, clos
   if (this.rendered) {
     this._renderSelected(selected, closeWhenUnselected);
   }
-  if (scout.nvl(notifyServer, true)) {
-    this.sendSelected();
-  }
 };
 
 scout.TableControl.prototype._configureTooltip = function() {

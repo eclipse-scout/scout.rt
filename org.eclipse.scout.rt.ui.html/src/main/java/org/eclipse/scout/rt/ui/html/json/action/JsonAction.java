@@ -21,6 +21,7 @@ import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterPropertyConfig;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterPropertyConfigBuilder;
 import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
+import org.json.JSONObject;
 
 public abstract class JsonAction<ACTION extends IAction> extends AbstractJsonPropertyObserver<ACTION> {
   public static final String EVENT_DO_ACTION = "doAction";
@@ -133,9 +134,6 @@ public abstract class JsonAction<ACTION extends IAction> extends AbstractJsonPro
     if (EVENT_DO_ACTION.equals(event.getType())) {
       handleUiDoAction(event);
     }
-    else if (IAction.PROP_SELECTED.equals(event.getType())) {
-      handleUiSelected(event);
-    }
     else {
       super.handleUiEvent(event);
     }
@@ -145,10 +143,16 @@ public abstract class JsonAction<ACTION extends IAction> extends AbstractJsonPro
     getModel().getUIFacade().fireActionFromUI();
   }
 
-  protected void handleUiSelected(JsonEvent event) {
-    boolean selected = event.getData().getBoolean(IAction.PROP_SELECTED);
-    addPropertyEventFilterCondition(IAction.PROP_SELECTED, selected);
-    getModel().getUIFacade().setSelectedFromUI(selected);
+  @Override
+  protected void handleUiPropertyChange(String propertyName, JSONObject data) {
+    if (IAction.PROP_SELECTED.equals(propertyName)) {
+      boolean selected = data.getBoolean(IAction.PROP_SELECTED);
+      addPropertyEventFilterCondition(IAction.PROP_SELECTED, selected);
+      getModel().getUIFacade().setSelectedFromUI(selected);
+    }
+    else {
+      super.handleUiPropertyChange(propertyName, data);
+    }
   }
 
 }

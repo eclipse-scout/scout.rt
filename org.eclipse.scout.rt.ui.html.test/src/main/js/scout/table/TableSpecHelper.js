@@ -198,6 +198,12 @@ scout.TableSpecHelper.prototype.createTable = function(model) {
   return table;
 };
 
+scout.TableSpecHelper.prototype.createTableAdapter = function(model) {
+  var tableAdapter = new scout.TableAdapter();
+  tableAdapter.init(model);
+  return tableAdapter;
+};
+
 scout.TableSpecHelper.prototype.createColumnFilter = function(model) {
   var filter = new scout.TextColumnUserFilter();
   filter.init(model);

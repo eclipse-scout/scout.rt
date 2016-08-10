@@ -368,10 +368,9 @@ scout.Column.prototype.setBackgroundEffect = function(effect, notifyServer) {
   this.backgroundEffect = effect;
   this.backgroundEffectFunc = this._resolveBackgroundEffectFunc();
 
-  notifyServer = scout.nvl(notifyServer, true);
-  if (notifyServer) {
-    this.table._sendColumnBackgroundEffectChanged(this);
-  }
+  this.table.trigger('columnBackgroundEffectChanged', {
+    column: this
+  });
 
   if (this.backgroundEffect && (this.minValue === undefined || this.maxValue === undefined)) {
     // No need to calculate the values again when switching background effects

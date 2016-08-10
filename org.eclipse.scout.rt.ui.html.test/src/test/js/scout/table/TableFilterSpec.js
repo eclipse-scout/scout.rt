@@ -603,8 +603,10 @@ describe("Table Filter", function() {
 
       it("gets sent to server containing rowIds when rows are filtered", function() {
         var model = helper.createModelFixture(2, 2),
-          table = helper.createTable(model),
+          adapter = helper.createTableAdapter(model),
+          table = adapter.getOrCreateWidget(session.desktop),
           column0 = table.columns[0];
+
         table.render(session.$entryPoint);
 
         var filter = createAndRegisterColumnFilter(table, column0, ['cell1_0']);

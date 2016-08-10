@@ -10,6 +10,5 @@
  ******************************************************************************/
 scout.TableControlAdapter = function() {
   scout.TableControlAdapter.parent.call(this);
-  this._addAdapterProperties(['tableControls', 'menus', 'keyStrokes']);
 };
-scout.inherits(scout.TableControlAdapter, scout.ModelAdapter);
+scout.inherits(scout.TableControlAdapter, scout.ActionAdapter);

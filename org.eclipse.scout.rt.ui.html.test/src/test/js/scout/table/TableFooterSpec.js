@@ -36,15 +36,8 @@ describe("TableFooterSpec", function() {
       expect(table.footer).not.toBeUndefined();
       var listenerCount = table.events._eventListeners.length;
 
-      var event = createPropertyChangeEvent(table, {
-        "tableStatusVisible": false
-      });
-      table.onModelPropertyChange(event);
-
-      event = createPropertyChangeEvent(table, {
-        "tableStatusVisible": true
-      });
-      table.onModelPropertyChange(event);
+      table.setTableStatusVisible(false);
+      table.setTableStatusVisible(true);
 
       // Still same amount of listeners expected after footer visibility changed
       expect(table.events._eventListeners.length).toBe(listenerCount);

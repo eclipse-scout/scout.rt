@@ -12,4 +12,4 @@ scout.FormTableControlAdapter = function() {
   scout.FormTableControlAdapter.parent.call(this);
   this._addAdapterProperties('form');
 };
-scout.inherits(scout.FormTableControlAdapter, scout.ModelAdapter);
+scout.inherits(scout.FormTableControlAdapter, scout.TableControlAdapter);

@@ -624,7 +624,8 @@ describe("Table", function() {
 
     it("sends selection event containing rowIds", function() {
       var model = helper.createModelFixture(2, 5);
-      var table = helper.createTable(model);
+      var adapter = helper.createTableAdapter(model);
+      var table = adapter.getOrCreateWidget(session.desktop);
       table.render(session.$entryPoint);
 
       var rows = [table.rows[0], table.rows[4]];
@@ -645,7 +646,8 @@ describe("Table", function() {
   describe("toggle selection", function() {
     it("selects all if not all are selected", function() {
       var model = helper.createModelFixture(2, 5);
-      var table = helper.createTable(model);
+      var adapter = helper.createTableAdapter(model);
+      var table = adapter.getOrCreateWidget(session.desktop);
       table.render(session.$entryPoint);
 
       var $selectedRows = table.$selectedRows();
@@ -659,7 +661,8 @@ describe("Table", function() {
 
     it("selects none if all are selected", function() {
       var model = helper.createModelFixture(2, 5);
-      var table = helper.createTable(model);
+      var adapter = helper.createTableAdapter(model);
+      var table = adapter.getOrCreateWidget(session.desktop);
       table.render(session.$entryPoint);
 
       var $selectedRows = table.$selectedRows();
@@ -712,7 +715,8 @@ describe("Table", function() {
 
     it("sends rowAction event with row and column", function() {
       var model = helper.createModelFixture(2, 5);
-      var table = helper.createTable(model);
+      var adapter = helper.createTableAdapter(model);
+      var table = adapter.getOrCreateWidget(session.desktop);
       var row0 = table.rows[0];
       var column0 = table.columns[0];
 
@@ -734,7 +738,8 @@ describe("Table", function() {
 
     it("does not send rowAction event if the row is not selected", function() {
       var model = helper.createModelFixture(2, 5);
-      var table = helper.createTable(model);
+      var adapter = helper.createTableAdapter(model);
+      var table = adapter.getOrCreateWidget(session.desktop);
       var row0 = table.rows[0];
       var column0 = table.columns[0];
 
@@ -773,7 +778,8 @@ describe("Table", function() {
 
     it("does not send rowAction event if it is not the only one selected row", function() {
       var model = helper.createModelFixture(2, 5);
-      var table = helper.createTable(model);
+      var adapter = helper.createTableAdapter(model);
+      var table = adapter.getOrCreateWidget(session.desktop);
       var row0 = table.rows[0];
       var column0 = table.columns[0];
 
@@ -793,7 +799,8 @@ describe("Table", function() {
 
     it("updates column model and sends resize event ", function() {
       var model = helper.createModelFixture(2, 5);
-      var table = helper.createTable(model);
+      var adapter = helper.createTableAdapter(model);
+      var table = adapter.getOrCreateWidget(session.desktop);
       table.render(session.$entryPoint);
 
       expect(table.columns[0].width).not.toBe(100);
@@ -810,7 +817,8 @@ describe("Table", function() {
 
     it("does not send resize event when resizing is in progress", function() {
       var model = helper.createModelFixture(2, 5);
-      var table = helper.createTable(model);
+      var adapter = helper.createTableAdapter(model);
+      var table = adapter.getOrCreateWidget(session.desktop);
       table.render(session.$entryPoint);
 
       table.resizeColumn(table.columns[0], 50);
@@ -823,7 +831,8 @@ describe("Table", function() {
 
     it("sends resize event when resizing is finished", function() {
       var model = helper.createModelFixture(2, 5);
-      var table = helper.createTable(model);
+      var adapter = helper.createTableAdapter(model);
+      var table = adapter.getOrCreateWidget(session.desktop);
       table.render(session.$entryPoint);
 
       table.resizeColumn(table.columns[0], 50);
@@ -854,10 +863,7 @@ describe("Table", function() {
       table.render(session.$entryPoint);
       table.$data.width(450);
 
-      var event = createPropertyChangeEvent(table, {
-        "autoResizeColumns": true
-      });
-      table.onModelPropertyChange(event);
+      table.setProperty('autoResizeColumns', true);
 
       // Triggers TableLayout._layoutColumns()
       table.revalidateLayout();
@@ -877,10 +883,7 @@ describe("Table", function() {
       table.render(session.$entryPoint);
       table.$data.width(450);
 
-      var event = createPropertyChangeEvent(table, {
-        "autoResizeColumns": true
-      });
-      table.onModelPropertyChange(event);
+      table.setProperty('autoResizeColumns', true);
 
       // Triggers TableLayout._layoutColumns()
       table.revalidateLayout();
@@ -897,10 +900,7 @@ describe("Table", function() {
       table.render(session.$entryPoint);
       table.$data.width(240);
 
-      var event = createPropertyChangeEvent(table, {
-        "autoResizeColumns": true
-      });
-      table.onModelPropertyChange(event);
+      table.setProperty('autoResizeColumns', true);
 
       // Triggers TableLayout._layoutColumns()
       table.revalidateLayout();
@@ -917,10 +917,7 @@ describe("Table", function() {
       table.render(session.$entryPoint);
       table.$data.width(450);
 
-      var event = createPropertyChangeEvent(table, {
-        "autoResizeColumns": true
-      });
-      table.onModelPropertyChange(event);
+      table.setProperty('autoResizeColumns', true);
 
       // Triggers TableLayout._layoutColumns()
       table.revalidateLayout();
@@ -932,12 +929,21 @@ describe("Table", function() {
   });
 
   describe("sort", function() {
-    var model, table, column0, column1, column2;
+    var model, table, adapter, column0, column1, column2;
     var $colHeaders, $header0, $header1, $header2;
 
     function prepareTable() {
       model = helper.createModelFixture(3, 3);
       table = helper.createTable(model);
+      column0 = model.columns[0];
+      column1 = model.columns[1];
+      column2 = model.columns[2];
+    }
+
+    function prepareTableWithAdapter() {
+      model = helper.createModelFixture(3, 3);
+      adapter = helper.createTableAdapter(model);
+      table = adapter.getOrCreateWidget(session.desktop);
       column0 = model.columns[0];
       column1 = model.columns[1];
       column2 = model.columns[2];
@@ -1025,7 +1031,7 @@ describe("Table", function() {
         column2.initialAlwaysIncludeSortAtBegin = true;
         column2.sortActive = true;
         column2.sortIndex = 0;
-        table._onColumnStructureChanged(table.columns); // (re)initialize columns, have been initialised already during init
+        table.updateColumnStructure(table.columns); // (re)initialize columns, have been initialised already during init
         render(table);
 
         table.sort(table.columns[0], 'desc');
@@ -1057,7 +1063,7 @@ describe("Table", function() {
         column2.initialAlwaysIncludeSortAtEnd = true;
         column2.sortActive = true;
         column2.sortIndex = 0;
-        table._onColumnStructureChanged(table.columns); // (re)initialize columns, have been initialised already during init
+        table.updateColumnStructure(table.columns); // (re)initialize columns, have been initialised already during init
         render(table);
 
         table.sort(table.columns[0], 'desc');
@@ -1089,7 +1095,7 @@ describe("Table", function() {
         column2.initialAlwaysIncludeSortAtBegin = true;
         column2.sortActive = true;
         column2.sortIndex = 0;
-        table._onColumnStructureChanged(table.columns); // (re)initialize columns, have been initialised already during init
+        table.updateColumnStructure(table.columns); // (re)initialize columns, have been initialised already during init
         render(table);
 
         table.sort(table.columns[0], 'desc');
@@ -1143,7 +1149,7 @@ describe("Table", function() {
     });
 
     it("sends rowsSorted event when client side sorting is possible", function() {
-      prepareTable();
+      prepareTableWithAdapter();
       render(table);
       // Make sure sorting is not executed because it does not work with phantomJS
       spyOn(scout.device, "supportsInternationalization").and.returnValue(true);
@@ -1160,7 +1166,7 @@ describe("Table", function() {
     });
 
     it("sends sortRows event when client side sorting is not possible", function() {
-      prepareTable();
+      prepareTableWithAdapter();
       render(table);
       spyOn(scout.device, "supportsInternationalization").and.returnValue(false);
 
@@ -1870,7 +1876,8 @@ describe("Table", function() {
 
     it("sends selection and click events", function() {
       var model = helper.createModelFixture(2, 5);
-      var table = helper.createTable(model);
+      var adapter = helper.createTableAdapter(model);
+      var table = adapter.getOrCreateWidget(session.desktop);
       table.render(session.$entryPoint);
 
       var $row = table.$rows().first();
@@ -1884,7 +1891,8 @@ describe("Table", function() {
 
     it("sends only click if row already is selected", function() {
       var model = helper.createModelFixture(2, 5);
-      var table = helper.createTable(model);
+      var adapter = helper.createTableAdapter(model);
+      var table = adapter.getOrCreateWidget(session.desktop);
       table.render(session.$entryPoint);
 
       var $row = table.$rows().first();
@@ -1906,7 +1914,8 @@ describe("Table", function() {
     it("sends selection, checked and click events if table is checkable and checkbox has been clicked", function() {
       var model = helper.createModelFixture(2, 5);
       model.checkable = true;
-      var table = helper.createTable(model);
+      var adapter = helper.createTableAdapter(model);
+      var table = adapter.getOrCreateWidget(session.desktop);
       table.render(session.$entryPoint);
 
       var $checkbox = table.$rows().first().find('.check-box').first();
@@ -1990,48 +1999,6 @@ describe("Table", function() {
       expect($menu.find('.menu-item').length).toBe(1);
       expect($menu.find('.menu-item').eq(0).isVisible()).toBe(true);
     });
-    // TODO nbu
-    //    it("context menu only shows sub-menus of matching type", function() {
-    //      var model = helper.createModelFixture(2, 2);
-    //      var table = helper.createTable(model);
-    //      table.selectedRows = [table.rows[0]];
-    //      table.render(session.$entryPoint);
-    //
-    //      var menuModelTop = helper.createMenuModel('topMenu'),
-    //      menuTop = helper.menuHelper.createMenu(menuModelTop),
-    //      menuModel1 = helper.createMenuModel('singleSelectionMenu'),
-    //      menu1 = helper.menuHelper.createMenu(menuModel1),
-    //      menuModel2 = helper.createMenuModel('multiSelectionMenu'),
-    //      menu2 = helper.menuHelper.createMenu(menuModel2);
-    //      menu2.menuTypes = ['Table.MultiSelection'];
-    //      // TODO [5.2] nbu: enable when TODO in ContextMenuPopup.prototype._renderMenuItems is done
-    ////      var menuModel3 = helper.createMenuModel('emptySpaceMenu'),
-    ////      menu3 = helper.menuHelper.createMenu(menuModel3);
-    ////      menu3.menuTypes = ['Table.EmptySpace'];
-    //
-    //      menuTop.childActions = [menu1, menu2
-    //      // TODO [5.2] nbu: enable when TODO in ContextMenuPopup.prototype._renderMenuItems is done
-    //                              //, menu3
-    //                              ];
-    //      table.menus = [menuTop];
-    //      table._syncMenus([menuTop]);
-    //      var $row0 = table.$data.children('.table-row').eq(0);
-    //      $row0.triggerContextMenu();
-    //
-    //      sendQueuedAjaxCalls();
-    //
-    //      var $menu = helper.getDisplayingContextMenu(table);
-    //      expect($menu.find('.menu-item').length).toBe(1);
-    //      expect($menu.find('.menu-item').eq(0).isVisible()).toBe(true);
-    //
-    //      var $menuTop = $menu.find('.menu-item');
-    //      $menuTop.triggerClick();
-    //      sendQueuedAjaxCalls();
-    //      expect($('.menu-item').find("span:contains('singleSelectionMenu')").length).toBe(1);
-    //      expect($('.menu-item').find("span:contains('multiSelectionMenu')").length).toBe(0);
-    //      // TODO [5.2] nbu: enable when TODO in ContextMenuPopup.prototype._renderMenuItems is done
-    ////      expect($('.menu-item').find("span:contains('emptySpaceMenu')").length).toBe(0);
-    //    });
 
   });
 
@@ -2166,7 +2133,8 @@ describe("Table", function() {
 
     it("only sends selection event, no click", function() {
       var model = helper.createModelFixture(2, 5);
-      var table = helper.createTable(model);
+      var adapter = helper.createTableAdapter(model);
+      var table = adapter.getOrCreateWidget(session.desktop);
       table.render(session.$entryPoint);
 
       var $rows = table.$data.children('.table-row');
@@ -2195,7 +2163,8 @@ describe("Table", function() {
 
     it("only send one event for mousedown and immediate mouseup on the same row", function() {
       var model = helper.createModelFixture(2, 5);
-      var table = helper.createTable(model);
+      var adapter = helper.createTableAdapter(model);
+      var table = adapter.getOrCreateWidget(session.desktop);
       table.render(session.$entryPoint);
 
       var $rows = table.$data.children('.table-row');
@@ -2220,7 +2189,8 @@ describe("Table", function() {
 
     it("only selects first row if mouse move selection or multi selection is disabled", function() {
       var model = helper.createModelFixture(2, 4);
-      var table = helper.createTable(model);
+      var adapter = helper.createTableAdapter(model);
+      var table = adapter.getOrCreateWidget(session.desktop);
       table.selectionHandler.mouseMoveSelectionEnabled = false;
       verifyMouseMoveSelectionIsDisabled(model, table, false);
 
@@ -2325,658 +2295,306 @@ describe("Table", function() {
 
   });
 
-  describe("onModelAction", function() {
 
-    function createRowsInsertedEvent(model, rows) {
-      return {
-        target: model.id,
-        rows: rows,
-        type: 'rowsInserted'
-      };
-    }
+  describe("updateRowOrder", function() {
+    var model, table, row0, row1, row2;
 
-    describe("rowsSelected event", function() {
-
-      function createRowsSelectedEvent(model, rowIds) {
-        return {
-          target: model.id,
-          rowIds: rowIds,
-          type: 'rowsSelected'
-        };
-      }
-
-      it("calls selectRows", function() {
-        var model = helper.createModelFixture(2, 5);
-        var table = helper.createTable(model);
-        table.render(session.$entryPoint);
-
-        spyOn(table, 'selectRows');
-
-        var rowIds = [table.rows[0].id, table.rows[4].id];
-        var event = createRowsSelectedEvent(model, rowIds);
-        table.onModelAction(event);
-        expect(table.selectRows).toHaveBeenCalledWith([table.rows[0], table.rows[4]], false);
-      });
+    beforeEach(function() {
+      model = helper.createModelFixture(2, 3);
+      table = helper.createTable(model);
+      row0 = model.rows[0];
+      row1 = model.rows[1];
+      row2 = model.rows[2];
     });
 
-    describe("rowsDeleted event", function() {
-      var model, table, rows, row0, row1, row2;
+    it("does not animate ordering for newly inserted rows", function() {
+      table.render(session.$entryPoint);
+      expect(table.rows.length).toBe(3);
 
-      function createRowsDeletedEvent(model, rowIds) {
-        return {
-          target: model.id,
-          rowIds: rowIds,
-          type: 'rowsDeleted'
-        };
-      }
+      var newRows = [
+        helper.createModelRow(null, helper.createModelCells(2)),
+        helper.createModelRow(null, helper.createModelCells(2))
+      ];
 
-      beforeEach(function() {
-        model = helper.createModelFixture(2, 3);
-        table = helper.createTable(model);
-        rows = table.rows;
-        row0 = model.rows[0];
-        row1 = model.rows[1];
-        row2 = model.rows[2];
+      // Insert new rows and switch rows 0 and 1
+      table.insertRows(newRows);
+      table.updateRowOrder([row1, row0, newRows[0], newRows[1], row2]);
+
+      // Check if rows were inserted
+      expect(table.rows.length).toBe(5);
+
+      // Check if animation is not done for the inserted rows
+      // The animation should be done for the other rows (row0 and 1 are switched -> visualize)
+      var $rows = table.$rows();
+      $rows.each(function() {
+        var $row = $(this);
+        var rowId = $row.data('row').id;
+        if (rowId === newRows[0].id || rowId === newRows[1].id) {
+          expect($row.is(':animated')).toBe(false);
+        } else {
+          expect($row.is(':animated')).toBe(true);
+        }
       });
-
-      it("calls deleteRows", function() {
-        spyOn(table, 'deleteRows');
-
-        var rowIds = [rows[0].id, rows[2].id];
-        var event = createRowsDeletedEvent(model, rowIds);
-        table.onModelAction(event);
-        expect(table.deleteRows).toHaveBeenCalledWith([rows[0], rows[2]]);
-      });
-
-    });
-
-    describe("allRowsDeleted event", function() {
-      var model, table, row0, row1, row2;
-
-      function createAllRowsDeletedEvent(model, rowIds) {
-        return {
-          target: model.id,
-          type: 'allRowsDeleted'
-        };
-      }
-
-      beforeEach(function() {
-        model = helper.createModelFixture(2, 3);
-        table = helper.createTable(model);
-      });
-
-      it("calls deleteAllRows", function() {
-        spyOn(table, 'deleteAllRows');
-
-        var event = createAllRowsDeletedEvent(model);
-        table.onModelAction(event);
-        expect(table.deleteAllRows).toHaveBeenCalled();
-      });
-
-    });
-
-    describe("rowsInserted event", function() {
-      var model, table;
-
-      beforeEach(function() {
-        model = helper.createModelFixture(2);
-        table = helper.createTable(model);
-      });
-
-      it("calls insertRows", function() {
-        spyOn(table, 'insertRows');
-
-        var rows = helper.createModelRows(2, 5);
-        var event = createRowsInsertedEvent(model, rows);
-        table.onModelAction(event);
-        expect(table.insertRows).toHaveBeenCalledWith(rows, true);
-      });
-    });
-
-    describe("rowOrderChanged event", function() {
-      var model, table, row0, row1, row2;
-
-      beforeEach(function() {
-        model = helper.createModelFixture(2, 3);
-        table = helper.createTable(model);
-        row0 = model.rows[0];
-        row1 = model.rows[1];
-        row2 = model.rows[2];
-      });
-
-      function createRowOrderChangedEvent(model, rowIds) {
-        return {
-          target: model.id,
-          rowIds: rowIds,
-          type: 'rowOrderChanged'
-        };
-      }
-
-      it("calls updateRowOrder", function() {
-        spyOn(table, 'updateRowOrder');
-
-        var event = createRowOrderChangedEvent(model, [row2.id, row1.id, row0.id]);
-        table.onModelAction(event);
-        expect(table.updateRowOrder).toHaveBeenCalledWith([row2, row1, row0]);
-      });
-
-      it("does not animate ordering for newly inserted rows", function() {
-        table.render(session.$entryPoint);
-        expect(table.rows.length).toBe(3);
-
-        var newRows = [
-          helper.createModelRow(null, helper.createModelCells(2)),
-          helper.createModelRow(null, helper.createModelCells(2))
-        ];
-
-        // Insert new rows and switch rows 0 and 1
-        var message = {
-          events: [
-            createRowsInsertedEvent(model, newRows),
-            createRowOrderChangedEvent(model, [row1.id, row0.id, newRows[0].id, newRows[1].id, row2.id])
-          ]
-        };
-        session._processSuccessResponse(message);
-
-        // Check if rows were inserted
-        expect(table.rows.length).toBe(5);
-
-        // Check if animation is not done for the inserted rows
-        // The animation should be done for the other rows (row0 and 1 are switched -> visualize)
-        var $rows = table.$rows();
-        $rows.each(function() {
-          var $row = $(this);
-          var rowId = $row.data('row').id;
-          if (rowId === newRows[0].id || rowId === newRows[1].id) {
-            expect($row.is(':animated')).toBe(false);
-          } else {
-            expect($row.is(':animated')).toBe(true);
-          }
-        });
-      });
-
-    });
-
-    describe("rowsUpdated event", function() {
-      var model, table, row0;
-
-      function createRowsUpdatedEvent(model, rows) {
-        return {
-          target: model.id,
-          rows: rows,
-          type: 'rowsUpdated'
-        };
-      }
-
-      beforeEach(function() {
-        model = helper.createModelFixture(2, 2);
-        model.rows[0].cells[0].text = 'cellText0';
-        model.rows[0].cells[1].text = 'cellText1';
-        table = helper.createTable(model);
-      });
-
-      it("calls updateRows", function() {
-        spyOn(table, 'updateRows');
-
-        var row = {
-          id: table.rows[0].id,
-          cells: ['newCellText0', 'newCellText1']
-        };
-        var event = createRowsUpdatedEvent(model, [row]);
-        table.onModelAction(event);
-        expect(table.updateRows).toHaveBeenCalledWith([row]);
-      });
-
-    });
-
-    describe("columnStructureChanged event", function() {
-      var model, table, column0, column1, column2;
-
-      beforeEach(function() {
-        model = helper.createModelFixture(3, 2);
-        table = helper.createTable(model);
-        column0 = model.columns[0];
-        column1 = model.columns[1];
-        column2 = model.columns[2];
-      });
-
-      function createColumnStructureChangedEvent(model, columns) {
-        return {
-          target: model.id,
-          columns: columns,
-          type: 'columnStructureChanged'
-        };
-      }
-
-      it("resets the model columns", function() {
-        var message = {
-          events: [createColumnStructureChangedEvent(model, [column2, column1])]
-        };
-        session._processSuccessResponse(message);
-
-        expect(table.columns.length).toBe(2);
-        expect(table.columns[0].id).toBe(column2.id);
-        expect(table.columns[1].id).toBe(column1.id);
-      });
-
-      it("redraws the header to reflect header cell changes (text)", function() {
-        table.render(session.$entryPoint);
-
-        var $colHeaders = table.header.findHeaderItems();
-        expect($colHeaders.eq(0).text()).toBe(column0.text);
-        expect($colHeaders.eq(1).text()).toBe(column1.text);
-        expect($colHeaders.eq(2).text()).toBe(column2.text);
-
-        column0.text = 'newColText0';
-        column1.text = 'newColText1';
-
-        var message = {
-          events: [createColumnStructureChangedEvent(model, [column0, column1, column2])]
-        };
-        session._processSuccessResponse(message);
-
-        //Check column header text
-        $colHeaders = table.header.findHeaderItems();
-        expect($colHeaders.eq(0).text()).toBe(column0.text);
-        expect($colHeaders.eq(1).text()).toBe(column1.text);
-        expect($colHeaders.eq(2).text()).toBe(column2.text);
-      });
-    });
-
-    describe("columnOrderChanged event", function() {
-      var model, table, column0, column1, column2;
-
-      beforeEach(function() {
-        model = helper.createModelFixture(3, 2);
-        table = helper.createTable(model);
-        column0 = model.columns[0];
-        column1 = model.columns[1];
-        column2 = model.columns[2];
-      });
-
-      function createColumnOrderChangedEvent(model, columnIds) {
-        return {
-          target: model.id,
-          columnIds: columnIds,
-          type: 'columnOrderChanged'
-        };
-      }
-
-      it("reorders the model columns", function() {
-        var message = {
-          events: [createColumnOrderChangedEvent(model, [column2.id, column0.id, column1.id])]
-        };
-        session._processSuccessResponse(message);
-
-        expect(table.columns.length).toBe(3);
-        expect(table.columns[0]).toBe(column2);
-        expect(table.columns[1]).toBe(column0);
-        expect(table.columns[2]).toBe(column1);
-      });
-
-      it("reorders the html nodes", function() {
-        table.render(session.$entryPoint);
-
-        var $colHeaders = table.header.findHeaderItems();
-        expect($colHeaders.length).toBe(3);
-        expect($colHeaders.eq(0).data('column')).toBe(column0);
-        expect($colHeaders.eq(1).data('column')).toBe(column1);
-        expect($colHeaders.eq(2).data('column')).toBe(column2);
-
-        var $rows = table.$rows();
-        var $cells0 = $rows.eq(0).find('.table-cell');
-        var $cells1 = $rows.eq(1).find('.table-cell');
-
-        expect($cells0.eq(0).text()).toBe('0');
-        expect($cells0.eq(1).text()).toBe('1');
-        expect($cells0.eq(2).text()).toBe('2');
-        expect($cells1.eq(0).text()).toBe('0');
-        expect($cells1.eq(1).text()).toBe('1');
-        expect($cells1.eq(2).text()).toBe('2');
-
-        var message = {
-          events: [createColumnOrderChangedEvent(model, [column2.id, column0.id, column1.id])]
-        };
-        session._processSuccessResponse(message);
-
-        // Check column header order
-        $colHeaders = table.header.findHeaderItems();
-        expect($colHeaders.length).toBe(3);
-        expect($colHeaders.eq(0).data('column')).toBe(column2);
-        expect($colHeaders.eq(1).data('column')).toBe(column0);
-        expect($colHeaders.eq(2).data('column')).toBe(column1);
-
-        // Check cells order
-        $rows = table.$rows();
-        $cells0 = $rows.eq(0).find('.table-cell');
-        $cells1 = $rows.eq(1).find('.table-cell');
-        expect($cells0.eq(0).text()).toBe('2');
-        expect($cells0.eq(1).text()).toBe('0');
-        expect($cells0.eq(2).text()).toBe('1');
-        expect($cells1.eq(0).text()).toBe('2');
-        expect($cells1.eq(1).text()).toBe('0');
-        expect($cells1.eq(2).text()).toBe('1');
-      });
-
-      it("silently moves cells which are not rendered in view range", function() {
-        table.viewRangeSize = 1;
-        table.render(session.$entryPoint);
-        expect(table.viewRangeRendered).toEqual(new scout.Range(0, 1));
-
-        var $colHeaders = table.header.findHeaderItems();
-        var $rows = table.$rows();
-        var $cells0 = $rows.eq(0).find('.table-cell');
-
-        expect($rows.length).toBe(1);
-        expect(table.rows.length).toBe(2);
-        expect($cells0.eq(0).text()).toBe('0');
-        expect($cells0.eq(1).text()).toBe('1');
-        expect($cells0.eq(2).text()).toBe('2');
-
-        var message = {
-          events: [createColumnOrderChangedEvent(model, [column2.id, column0.id, column1.id])]
-        };
-        session._processSuccessResponse(message);
-
-        // Check column header order
-        $colHeaders = table.header.findHeaderItems();
-        expect($colHeaders.length).toBe(3);
-        expect($colHeaders.eq(0).data('column')).toBe(column2);
-        expect($colHeaders.eq(1).data('column')).toBe(column0);
-        expect($colHeaders.eq(2).data('column')).toBe(column1);
-
-        // Check cells order
-        $rows = table.$rows();
-        expect($rows.length).toBe(1);
-        expect(table.rows.length).toBe(2);
-        $cells0 = $rows.eq(0).find('.table-cell');
-        expect($cells0.eq(0).text()).toBe('2');
-        expect($cells0.eq(1).text()).toBe('0');
-        expect($cells0.eq(2).text()).toBe('1');
-      });
-
-      //TODO [5.2] cgu: fails because css is not applied -> include css files in SpecRunner
-      //      it("moves the table header menu if it is open", function() {
-      //        table.render(session.$entryPoint);
-      //
-      //        var $colHeaders = table.header.findHeaderItems();
-      //
-      //        var $clickedHeader = $colHeaders.eq(0);
-      //        $clickedHeader.triggerClick();
-      //
-      //        var tableHeaderMenu = table.header._tableHeaderMenu;
-      //        var menuLeftPosition = tableHeaderMenu.$headerMenu.position().left;
-      //        expect(tableHeaderMenu.isOpen()).toBe(true);
-      //
-      //        var message = {
-      //            events: [createColumnOrderChangedEvent(model, [column2.id, column0.id, column1.id])]
-      //        };
-      //        session._processSuccessResponse(message);
-      //
-      //        expect(tableHeaderMenu.$headerMenu.position().left > menuLeftPosition).toBe(true);
-      //      });
-
-    });
-
-    describe("columnHeadersUpdated event", function() {
-      var model, table, column0, column1, column2;
-
-      beforeEach(function() {
-        model = helper.createModelFixture(3, 2);
-        column0 = model.columns[0];
-        column1 = model.columns[1];
-        column2 = model.columns[2];
-      });
-
-      function createColumnHeadersUpdatedEvent(model, columns) {
-        return {
-          target: model.id,
-          columns: columns,
-          type: 'columnHeadersUpdated'
-        };
-      }
-
-      it("updates the text and sorting state of model columns", function() {
-        table = helper.createTable(model);
-        var text0 = table.columns[0].text;
-
-        column1 = helper.createModelColumn('newText1');
-        column1.id = model.columns[1].id;
-        column1.sortActive = true;
-        column1.sortAscending = true;
-        column2 = helper.createModelColumn('newText2');
-        column2.id = model.columns[2].id;
-
-        var message = {
-          events: [createColumnHeadersUpdatedEvent(model, [column1, column2])]
-        };
-        session._processSuccessResponse(message);
-
-        expect(table.columns.length).toBe(3);
-        expect(table.columns[0].text).toBe(text0);
-        expect(table.columns[1].text).toBe(column1.text);
-        expect(table.columns[1].sortAscending).toBe(column1.sortAscending);
-        expect(table.columns[1].sortActive).toBe(column1.sortActive);
-        expect(table.columns[2].text).toBe(column2.text);
-        expect(table.columns[2].sortAscending).toBe(column2.sortAscending);
-        expect(table.columns[2].sortActive).toBe(column2.sortActive);
-      });
-
-      it("updates sort indices of the sort columns if a sort column got removed", function() {
-        model.columns[1].id = model.columns[1].id;
-        model.columns[1].sortActive = true;
-        model.columns[1].sortAscending = true;
-        model.columns[1].sortIndex = 1;
-        model.columns[2].id = model.columns[2].id;
-        model.columns[2].sortActive = true;
-        model.columns[2].sortAscending = true;
-        model.columns[2].sortIndex = 0;
-
-        table = helper.createTable(model);
-
-        expect(table.columns[1].sortActive).toBe(true);
-        expect(table.columns[1].sortAscending).toBe(true);
-        expect(table.columns[1].sortIndex).toBe(1);
-        expect(table.columns[2].sortActive).toBe(true);
-        expect(table.columns[2].sortAscending).toBe(true);
-        expect(table.columns[2].sortIndex).toBe(0);
-
-        var message = {
-          events: [createColumnHeadersUpdatedEvent(model, [{
-            id: model.columns[2].id,
-            sortActive: false
-          }])]
-        };
-        session._processSuccessResponse(message);
-
-        expect(table.columns[1].sortAscending).toBe(true);
-        expect(table.columns[1].sortActive).toBe(true);
-        expect(table.columns[1].sortIndex).toBe(0);
-        expect(table.columns[2].sortAscending).toBe(true);
-        expect(table.columns[2].sortActive).toBe(false);
-        expect(table.columns[2].sortIndex).toBe(-1);
-      });
-
-      it("updates the text and sorting state of html table header nodes", function() {
-        table = helper.createTable(model);
-        table.render(session.$entryPoint);
-
-        var $colHeaders = table.header.findHeaderItems();
-        expect($colHeaders.eq(0).text()).toBe(column0.text);
-        expect($colHeaders.eq(1).text()).toBe(column1.text);
-        expect($colHeaders.eq(1)).not.toHaveClass('sort-asc');
-        expect($colHeaders.eq(2).text()).toBe(column2.text);
-
-        column1 = helper.createModelColumn('newText1');
-        column1.id = model.columns[1].id;
-        column1.sortActive = true;
-        column1.sortAscending = true;
-        column2 = helper.createModelColumn('newText2');
-        column2.id = model.columns[2].id;
-
-        var message = {
-          events: [createColumnHeadersUpdatedEvent(model, [column1, column2])]
-        };
-        session._processSuccessResponse(message);
-
-        $colHeaders = table.header.findHeaderItems();
-        expect($colHeaders.eq(0).text()).toBe(column0.text);
-        expect($colHeaders.eq(1).text()).toBe(column1.text);
-        expect($colHeaders.eq(1)).toHaveClass('sort-asc');
-        expect($colHeaders.eq(2).text()).toBe(column2.text);
-      });
-
-      it("updates the custom css class of table header nodes", function() {
-        table = helper.createTable(model);
-        table.render(session.$entryPoint);
-
-        var $colHeaders = table.header.findHeaderItems();
-        expect($colHeaders.eq(1)).not.toHaveClass('custom-header');
-
-        column1 = helper.createModelColumn();
-        column1.id = model.columns[1].id;
-        column1.headerCssClass = 'custom-header';
-        var message = {
-          events: [createColumnHeadersUpdatedEvent(model, [column1])]
-        };
-        session._processSuccessResponse(message);
-
-        $colHeaders = table.header.findHeaderItems();
-        expect($colHeaders.eq(0)).not.toHaveClass('custom-header');
-        expect($colHeaders.eq(1)).toHaveClass('custom-header');
-
-        column1 = helper.createModelColumn();
-        column1.id = model.columns[1].id;
-        message = {
-          events: [createColumnHeadersUpdatedEvent(model, [column1])]
-        };
-        session._processSuccessResponse(message);
-
-        $colHeaders = table.header.findHeaderItems();
-        expect($colHeaders.eq(0)).not.toHaveClass('custom-header');
-        expect($colHeaders.eq(1)).not.toHaveClass('custom-header');
-      });
-    });
-  });
-
-  describe("onModelPropertyChange", function() {
-
-    describe("headerVisible", function() {
-
-      it("hides the table header", function() {
-        var model = helper.createModelFixture(2);
-        var table = helper.createTable(model);
-        table.render(session.$entryPoint);
-
-        expect(table.header).toBeTruthy();
-
-        var event = createPropertyChangeEvent(table, {
-          "headerVisible": false
-        });
-        table.onModelPropertyChange(event);
-
-        expect(table.header).toBeFalsy();
-      });
-
-    });
-
-    describe("menus", function() {
-
-      it("creates and registers menu adapters", function() {
-        var model = helper.createModelFixture(2);
-        var table = helper.createTable(model);
-        var menu1 = helper.createMenuModel();
-        var menu2 = helper.createMenuModel();
-
-        var message = {
-          adapterData: createAdapterData([menu1, menu2]),
-          events: [createPropertyChangeEvent(table, {
-            menus: [menu1.id, menu2.id]
-          })]
-        };
-        session._processSuccessResponse(message);
-
-        expect(session.getModelAdapter(menu1.id)).toBe(table.menus[0]);
-        expect(session.getModelAdapter(menu2.id)).toBe(table.menus[1]);
-      });
-
-      it("destroys the old menus", function() {
-        var model = helper.createModelFixture(2);
-        var table = helper.createTable(model);
-        var menu1 = helper.createMenuModel();
-        var menu2 = helper.createMenuModel();
-
-        var message = {
-          adapterData: createAdapterData([menu1, menu2]),
-          events: [createPropertyChangeEvent(table, {
-            menus: [menu1.id, menu2.id]
-          })]
-        };
-        session._processSuccessResponse(message);
-
-        expect(session.getModelAdapter(menu1.id)).toBe(table.menus[0]);
-        expect(session.getModelAdapter(menu2.id)).toBe(table.menus[1]);
-
-        message = {
-          events: [createPropertyChangeEvent(table, {
-            menus: [menu2.id]
-          })]
-        };
-        session._processSuccessResponse(message);
-
-        expect(table.menus.length).toBe(1);
-        expect(session.getModelAdapter(menu2.id)).toBe(table.menus[0]);
-        expect(session.getModelAdapter(menu1.id)).toBeFalsy();
-      });
-
-      it("destroys the old and creates the new menus if the list contains both", function() {
-        var model = helper.createModelFixture(2);
-        var table = helper.createTable(model);
-        var menu1 = helper.createMenuModel();
-        var menu2 = helper.createMenuModel();
-        var menu3 = helper.createMenuModel();
-
-        var message = {
-          adapterData: createAdapterData([menu1, menu2]),
-          events: [createPropertyChangeEvent(table, {
-            menus: [menu1.id, menu2.id]
-          })]
-        };
-        session._processSuccessResponse(message);
-
-        expect(session.getModelAdapter(menu1.id)).toBe(table.menus[0]);
-        expect(session.getModelAdapter(menu2.id)).toBe(table.menus[1]);
-
-        message = {
-          adapterData: createAdapterData(menu3),
-          events: [createPropertyChangeEvent(table, {
-            menus: [menu2.id, menu3.id]
-          })]
-        };
-        session._processSuccessResponse(message);
-
-        expect(table.menus.length).toBe(2);
-        expect(session.getModelAdapter(menu2.id)).toBe(table.menus[0]);
-        expect(session.getModelAdapter(menu3.id)).toBe(table.menus[1]);
-        expect(session.getModelAdapter(menu1.id)).toBeFalsy();
-      });
-
     });
 
   });
 
-  describe("_sendRowsFiltered", function() {
+  describe("updateColumnStructure", function() {
+    var model, table, column0, column1, column2;
 
-    // Test case for ticket #175700
-    it("should not coalesce remove and 'add' events", function() {
-      var model = helper.createModelFixture(1, 2);
+    beforeEach(function() {
+      model = helper.createModelFixture(3, 2);
+      table = helper.createTable(model);
+      column0 = model.columns[0];
+      column1 = model.columns[1];
+      column2 = model.columns[2];
+    });
+
+    it("resets the model columns", function() {
+      table.updateColumnStructure([column2, column1]);
+
+      expect(table.columns.length).toBe(2);
+      expect(table.columns[0].id).toBe(column2.id);
+      expect(table.columns[1].id).toBe(column1.id);
+    });
+
+    it("redraws the header to reflect header cell changes (text)", function() {
+      table.render(session.$entryPoint);
+
+      var $colHeaders = table.header.findHeaderItems();
+      expect($colHeaders.eq(0).text()).toBe(column0.text);
+      expect($colHeaders.eq(1).text()).toBe(column1.text);
+      expect($colHeaders.eq(2).text()).toBe(column2.text);
+
+      column0.text = 'newColText0';
+      column1.text = 'newColText1';
+      table.updateColumnStructure([column0, column1, column2]);
+
+      //Check column header text
+      $colHeaders = table.header.findHeaderItems();
+      expect($colHeaders.eq(0).text()).toBe(column0.text);
+      expect($colHeaders.eq(1).text()).toBe(column1.text);
+      expect($colHeaders.eq(2).text()).toBe(column2.text);
+    });
+  });
+
+  describe("updateColumnOrder", function() {
+    var model, table, column0, column1, column2;
+
+    beforeEach(function() {
+      model = helper.createModelFixture(3, 2);
+      table = helper.createTable(model);
+      column0 = table.columns[0];
+      column1 = table.columns[1];
+      column2 = table.columns[2];
+    });
+
+    it("reorders the model columns", function() {
+      table.updateColumnOrder([column2, column0, column1]);
+      expect(table.columns.length).toBe(3);
+      expect(table.columns[0]).toBe(column2);
+      expect(table.columns[1]).toBe(column0);
+      expect(table.columns[2]).toBe(column1);
+    });
+
+    it("reorders the html nodes", function() {
+      table.render(session.$entryPoint);
+
+      var $colHeaders = table.header.findHeaderItems();
+      expect($colHeaders.length).toBe(3);
+      expect($colHeaders.eq(0).data('column')).toBe(column0);
+      expect($colHeaders.eq(1).data('column')).toBe(column1);
+      expect($colHeaders.eq(2).data('column')).toBe(column2);
+
+      var $rows = table.$rows();
+      var $cells0 = $rows.eq(0).find('.table-cell');
+      var $cells1 = $rows.eq(1).find('.table-cell');
+
+      expect($cells0.eq(0).text()).toBe('0');
+      expect($cells0.eq(1).text()).toBe('1');
+      expect($cells0.eq(2).text()).toBe('2');
+      expect($cells1.eq(0).text()).toBe('0');
+      expect($cells1.eq(1).text()).toBe('1');
+      expect($cells1.eq(2).text()).toBe('2');
+
+      table.updateColumnOrder([column2, column0, column1]);
+
+      // Check column header order
+      $colHeaders = table.header.findHeaderItems();
+      expect($colHeaders.length).toBe(3);
+      expect($colHeaders.eq(0).data('column')).toBe(column2);
+      expect($colHeaders.eq(1).data('column')).toBe(column0);
+      expect($colHeaders.eq(2).data('column')).toBe(column1);
+
+      // Check cells order
+      $rows = table.$rows();
+      $cells0 = $rows.eq(0).find('.table-cell');
+      $cells1 = $rows.eq(1).find('.table-cell');
+      expect($cells0.eq(0).text()).toBe('2');
+      expect($cells0.eq(1).text()).toBe('0');
+      expect($cells0.eq(2).text()).toBe('1');
+      expect($cells1.eq(0).text()).toBe('2');
+      expect($cells1.eq(1).text()).toBe('0');
+      expect($cells1.eq(2).text()).toBe('1');
+    });
+
+    it("silently moves cells which are not rendered in view range", function() {
+      table.viewRangeSize = 1;
+      table.render(session.$entryPoint);
+      expect(table.viewRangeRendered).toEqual(new scout.Range(0, 1));
+
+      var $colHeaders = table.header.findHeaderItems();
+      var $rows = table.$rows();
+      var $cells0 = $rows.eq(0).find('.table-cell');
+
+      expect($rows.length).toBe(1);
+      expect(table.rows.length).toBe(2);
+      expect($cells0.eq(0).text()).toBe('0');
+      expect($cells0.eq(1).text()).toBe('1');
+      expect($cells0.eq(2).text()).toBe('2');
+
+      table.updateColumnOrder([column2, column0, column1]);
+
+      // Check column header order
+      $colHeaders = table.header.findHeaderItems();
+      expect($colHeaders.length).toBe(3);
+      expect($colHeaders.eq(0).data('column')).toBe(column2);
+      expect($colHeaders.eq(1).data('column')).toBe(column0);
+      expect($colHeaders.eq(2).data('column')).toBe(column1);
+
+      // Check cells order
+      $rows = table.$rows();
+      expect($rows.length).toBe(1);
+      expect(table.rows.length).toBe(2);
+      $cells0 = $rows.eq(0).find('.table-cell');
+      expect($cells0.eq(0).text()).toBe('2');
+      expect($cells0.eq(1).text()).toBe('0');
+      expect($cells0.eq(2).text()).toBe('1');
+    });
+
+  });
+
+  describe("updateColumnHeaders", function() {
+    var model, table, column0, column1, column2;
+
+    beforeEach(function() {
+      model = helper.createModelFixture(3, 2);
+      column0 = model.columns[0];
+      column1 = model.columns[1];
+      column2 = model.columns[2];
+    });
+
+    it("updates the text and sorting state of model columns", function() {
+      table = helper.createTable(model);
+      var text0 = table.columns[0].text;
+
+      column1 = helper.createModelColumn('newText1');
+      column1.id = model.columns[1].id;
+      column1.sortActive = true;
+      column1.sortAscending = true;
+      column2 = helper.createModelColumn('newText2');
+      column2.id = model.columns[2].id;
+
+      table.updateColumnHeaders([column1, column2]);
+      expect(table.columns.length).toBe(3);
+      expect(table.columns[0].text).toBe(text0);
+      expect(table.columns[1].text).toBe(column1.text);
+      expect(table.columns[1].sortAscending).toBe(column1.sortAscending);
+      expect(table.columns[1].sortActive).toBe(column1.sortActive);
+      expect(table.columns[2].text).toBe(column2.text);
+      expect(table.columns[2].sortAscending).toBe(column2.sortAscending);
+      expect(table.columns[2].sortActive).toBe(column2.sortActive);
+    });
+
+    it("updates sort indices of the sort columns if a sort column got removed", function() {
+      model.columns[1].id = model.columns[1].id;
+      model.columns[1].sortActive = true;
+      model.columns[1].sortAscending = true;
+      model.columns[1].sortIndex = 1;
+      model.columns[2].id = model.columns[2].id;
+      model.columns[2].sortActive = true;
+      model.columns[2].sortAscending = true;
+      model.columns[2].sortIndex = 0;
+
+      table = helper.createTable(model);
+      expect(table.columns[1].sortActive).toBe(true);
+      expect(table.columns[1].sortAscending).toBe(true);
+      expect(table.columns[1].sortIndex).toBe(1);
+      expect(table.columns[2].sortActive).toBe(true);
+      expect(table.columns[2].sortAscending).toBe(true);
+      expect(table.columns[2].sortIndex).toBe(0);
+
+      table.updateColumnHeaders([{
+        id: model.columns[2].id,
+        sortActive: false
+      }]);
+      expect(table.columns[1].sortAscending).toBe(true);
+      expect(table.columns[1].sortActive).toBe(true);
+      expect(table.columns[1].sortIndex).toBe(0);
+      expect(table.columns[2].sortAscending).toBe(true);
+      expect(table.columns[2].sortActive).toBe(false);
+      expect(table.columns[2].sortIndex).toBe(-1);
+    });
+
+    it("updates the text and sorting state of html table header nodes", function() {
+      table = helper.createTable(model);
+      table.render(session.$entryPoint);
+
+      var $colHeaders = table.header.findHeaderItems();
+      expect($colHeaders.eq(0).text()).toBe(column0.text);
+      expect($colHeaders.eq(1).text()).toBe(column1.text);
+      expect($colHeaders.eq(1)).not.toHaveClass('sort-asc');
+      expect($colHeaders.eq(2).text()).toBe(column2.text);
+
+      column1 = helper.createModelColumn('newText1');
+      column1.id = model.columns[1].id;
+      column1.sortActive = true;
+      column1.sortAscending = true;
+      column2 = helper.createModelColumn('newText2');
+      column2.id = model.columns[2].id;
+
+      table.updateColumnHeaders([column1, column2]);
+      $colHeaders = table.header.findHeaderItems();
+      expect($colHeaders.eq(0).text()).toBe(column0.text);
+      expect($colHeaders.eq(1).text()).toBe(column1.text);
+      expect($colHeaders.eq(1)).toHaveClass('sort-asc');
+      expect($colHeaders.eq(2).text()).toBe(column2.text);
+    });
+
+    it("updates the custom css class of table header nodes", function() {
+      table = helper.createTable(model);
+      table.render(session.$entryPoint);
+
+      var $colHeaders = table.header.findHeaderItems();
+      expect($colHeaders.eq(1)).not.toHaveClass('custom-header');
+
+      column1 = helper.createModelColumn();
+      column1.id = model.columns[1].id;
+      column1.headerCssClass = 'custom-header';
+      table.updateColumnHeaders([column1]);
+      $colHeaders = table.header.findHeaderItems();
+      expect($colHeaders.eq(0)).not.toHaveClass('custom-header');
+      expect($colHeaders.eq(1)).toHaveClass('custom-header');
+
+      column1 = helper.createModelColumn();
+      column1.id = model.columns[1].id;
+      table.updateColumnHeaders([column1]);
+      $colHeaders = table.header.findHeaderItems();
+      expect($colHeaders.eq(0)).not.toHaveClass('custom-header');
+      expect($colHeaders.eq(1)).not.toHaveClass('custom-header');
+    });
+  });
+
+  describe("headerVisible", function() {
+
+    it("hides/shows the table header", function() {
+      var model = helper.createModelFixture(2);
       var table = helper.createTable(model);
-      table._sendRowsFiltered(['1','2']); // should create a remove event, because number of rows is equals to the length of rowIds
-      table._sendRowsFiltered(['1']); // should create an 'add' event
-      table._sendRowsFiltered(['2']); // should be coalesced with previous add event
-      expect(session._asyncEvents.length).toBe(2);
-      expect(session._asyncEvents[0].remove).toBe(true);
-      expect(session._asyncEvents[1].remove).toBe(undefined);
+      table.render(session.$entryPoint);
+
+      expect(table.header).toBeTruthy();
+      table.setHeaderVisible(false);
+      expect(table.header).toBeFalsy();
     });
 
   });

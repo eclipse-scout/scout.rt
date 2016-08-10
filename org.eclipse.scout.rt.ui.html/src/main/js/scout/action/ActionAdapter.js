@@ -10,5 +10,6 @@
  ******************************************************************************/
 scout.ActionAdapter = function() {
   scout.ActionAdapter.parent.call(this);
+  this._addRemoteProperties(['selected']);
 };
 scout.inherits(scout.ActionAdapter, scout.ModelAdapter);

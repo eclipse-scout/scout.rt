@@ -250,18 +250,9 @@ scout.Action.prototype.setSelected = function(selected, notifyServer) {
     return;
   }
   this._setProperty('selected', selected);
-  if (scout.nvl(notifyServer, true)) {
-    this.sendSelected();
-  }
   if (this.rendered) {
     this._renderSelected();
   }
-};
-
-scout.Action.prototype.sendSelected = function() {
-  this._send('selected', {
-    selected: this.selected
-  });
 };
 
 scout.Action.prototype._syncSelected = function(selected) {

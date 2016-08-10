@@ -138,7 +138,7 @@ scout.ModelAdapter.prototype._sendWidgetEvent = function(widgetEvent) {
  */
 scout.ModelAdapter.prototype._sendProperty = function(propertyName) {
   var data = {};
-  data[propertyName] = this[propertyName];
+  data[propertyName] = this.widget[propertyName];
   this._send('property', data);
 };
 

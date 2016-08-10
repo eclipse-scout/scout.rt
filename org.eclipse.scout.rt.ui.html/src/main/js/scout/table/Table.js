@@ -230,7 +230,7 @@ scout.Table.prototype._insertRowIconColumn = function() {
 scout.Table.prototype.handleAppLinkAction = function(event) {
   var $appLink = $(event.target);
   var column = this._columnAtX($appLink.offset().left);
-  this._sendAppLinkAction(column.id, $appLink.data('ref'));
+  this._triggerAppLinkAction(column, $appLink.data('ref'));
 };
 
 scout.Table.prototype._render = function($parent) {
@@ -399,11 +399,11 @@ scout.Table.prototype._onRowMouseUp = function(event) {
   }
   row = $row.data('row');
   if ($appLink) {
-    this._sendAppLinkAction(column.id, $appLink.data('ref'));
+    this._triggerAppLinkAction(column, $appLink.data('ref'));
   } else if (column.guiOnly) {
-    this.triggerRowClicked(row, mouseButton);
+    this._triggerRowClicked(row, mouseButton);
   } else {
-    this.triggerRowClicked(row, mouseButton, column);
+    this._triggerRowClicked(row, mouseButton, column);
   }
 };
 
@@ -557,11 +557,11 @@ scout.Table.prototype.reload = function() {
   }
   this._removeRows();
   this._renderFiller();
-  this._sendReload();
+  this._triggerReload();
 };
 
 scout.Table.prototype.exportToClipboard = function() {
-  this._sendExportToClipboard();
+  this._triggerExportToClipboard();
 };
 
 scout.Table.prototype.toggleSelection = function() {
@@ -923,7 +923,6 @@ scout.Table.prototype.changeAggregations = function(columns, functions) {
     var func = functions[i];
     column.setAggregationFunction(func);
 
-    this._sendAggregationFunctionChanged(column);
     this._triggerAggregationFunctionChanged(column);
   }, this);
 
@@ -1448,16 +1447,16 @@ scout.Table.prototype._removeMenus = function() {
 };
 
 scout.Table.prototype.notifyRowSelectionFinished = function() {
-//  if (this._sendRowsPending) {
-//    this._sendRowsSelected(this._rowsToIds(this.selectedRows));
-//    this._sendRowsPending = false;
-    //XXX CGU what is this?
-//  }
+  //  if (this._sendRowsPending) {
+  //    this._sendRowsSelected(this._rowsToIds(this.selectedRows));
+  //    this._sendRowsPending = false;
+  //XXX CGU what is this?
+  //  }
   this._triggerRowsSelected();
   this._updateMenuBar();
 };
 
-scout.Table.prototype.triggerRowClicked = function(row, mouseButton, column) {
+scout.Table.prototype._triggerRowClicked = function(row, mouseButton, column) {
   var event = {
     row: row,
     mouseButton: mouseButton
@@ -1468,6 +1467,13 @@ scout.Table.prototype.triggerRowClicked = function(row, mouseButton, column) {
   this.trigger('rowClicked', event);
 };
 
+scout.Table.prototype._triggerRowAction = function(row, column) {
+  this.trigger('rowAction', {
+    row: row,
+    column: column
+  });
+};
+
 /**
  * @param openFieldPopupOnCellEdit when this parameter is set to true, the CellEditorPopup sets an
  *    additional property 'cellEditor' on the editor-field. The field instance may use this property
@@ -1476,81 +1482,7 @@ scout.Table.prototype.triggerRowClicked = function(row, mouseButton, column) {
  */
 scout.Table.prototype.prepareCellEdit = function(column, row, openFieldPopupOnCellEdit) {
   this.openFieldPopupOnCellEdit = scout.nvl(openFieldPopupOnCellEdit, false);
-  this._sendPrepareCellEdit(row.id, column.id);
-};
-
-scout.Table.prototype._sendPrepareCellEdit = function(rowId, columnId) {
-  var data = {
-    rowId: rowId,
-    columnId: columnId
-  };
-  this._send('prepareCellEdit', data);
-};
-
-scout.Table.prototype._sendCompleteCellEdit = function(fieldId) {
-  var data = {
-    fieldId: fieldId
-  };
-  this._send('completeCellEdit', data);
-};
-
-scout.Table.prototype._sendCancelCellEdit = function(fieldId) {
-  var data = {
-    fieldId: fieldId
-  };
-  this._send('cancelCellEdit', data);
-};
-
-scout.Table.prototype._sendRowsChecked = function(rows) {
-  var data = {
-    rows: []
-  };
-
-  for (var i = 0; i < rows.length; i++) {
-    data.rows.push({
-      rowId: rows[i].id,
-      checked: rows[i].checked
-    });
-  }
-
-  this._send('rowsChecked', data);
-};
-
-scout.Table.prototype._sendRowsFiltered = function(rowIds) {
-  var eventData = {};
-  if (rowIds.length === this.rows.length) {
-    eventData.remove = true;
-  } else {
-    eventData.rowIds = rowIds;
-  }
-
-  // send with timeout, mainly for incremental load of a large table
-  // coalesce: only send last event (don't coalesce remove and 'add' events, the UI server needs both)
-  this._send('rowsFiltered', eventData, 250, function(previous) {
-    return this.id === previous.id && this.type === previous.type && this.remove === previous.remove;
-  });
-};
-
-scout.Table.prototype._sendRowAction = function(row, column) {
-  this._send('rowAction', {
-    rowId: row.id,
-    columnId: column.id
-  });
-};
-
-scout.Table.prototype._sendAppLinkAction = function(columnId, ref) {
-  this._send('appLinkAction', {
-    columnId: columnId,
-    ref: ref
-  });
-};
-
-scout.Table.prototype._sendReload = function() {
-  this._send('reload');
-};
-
-scout.Table.prototype._sendExportToClipboard = function() {
-  this._send('exportToClipboard');
+  this._triggerPrepareCellEdit(row, column);
 };
 
 scout.Table.prototype.cell = function(column, row) {
@@ -1961,15 +1893,12 @@ scout.Table.prototype.checkRows = function(rows, options) {
     updatedRows.push(row);
   }, this);
 
-  if (opts.notifyServer) {
-    this._sendRowsChecked(updatedRows);
-  }
   if (this.rendered) {
     updatedRows.forEach(function(row) {
       this._renderRowChecked(row);
     }, this);
   }
-  this._triggerRowsChecked();
+  this._triggerRowsChecked(updatedRows);
 };
 
 scout.Table.prototype.uncheckRow = function(row, notifyServer) {
@@ -1999,7 +1928,7 @@ scout.Table.prototype.doRowAction = function(row, column) {
   if (!row || !column) {
     return;
   }
-  this._sendRowAction(row, column);
+  this._triggerRowAction(row, column);
 };
 
 scout.Table.prototype.insertRow = function(row) {
@@ -2616,7 +2545,6 @@ scout.Table.prototype._rowsFiltered = function(hiddenRows) {
   this.deselectRows(hiddenRows);
   // notify
   this._filteredRowsDirty = true;
-  this._sendRowsFiltered(this._rowsToIds(this.filteredRows()));
   this._triggerRowsFiltered();
 };
 
@@ -2727,10 +2655,6 @@ scout.Table.prototype.addFilter = function(filter, notifyServer) {
     throw new Error('key has to be defined');
   }
   this._filterMap[key] = filter;
-
-  if (notifyServer && filter instanceof scout.TableUserFilter) {
-    this._send('addFilter', filter.createAddFilterEventData());
-  }
   this.trigger('addFilter', {
     filter: filter
   });
@@ -2750,10 +2674,6 @@ scout.Table.prototype.removeFilterByKey = function(key, notifyServer) {
     return;
   }
   delete this._filterMap[key];
-
-  if (notifyServer && filter instanceof scout.TableUserFilter) {
-    this._send('removeFilter', filter.createRemoveFilterEventData());
-  }
   this.trigger('removeFilter', {
     filter: filter
   });
@@ -2805,54 +2725,12 @@ scout.Table.prototype.resizeColumn = function(column, width) {
   this.updateScrollbars();
 
   this._triggerColumnResized(column);
-  this._sendColumnResized(column);
 
   if (column.resizingInProgress) {
     this._renderEmptyData();
   } else {
     this._renderEmptyData(this.rowWidth - this.rowBorderWidth);
   }
-};
-
-scout.Table.prototype._sendColumnResized = function(column) {
-  if (column.fixedWidth || this.autoResizeColumns) {
-    return;
-  }
-
-  var eventData = {
-    columnId: column.id,
-    width: column.width
-  };
-
-  // send delayed to avoid a lot of requests while resizing
-  // coalesce: only send the latest resize event for a column
-  this._send('columnResized', eventData, 750, function(previous) {
-    return this.id === previous.id && this.type === previous.type && this.columnId === previous.columnId;
-  });
-};
-
-scout.Table.prototype._sendColumnMoved = function(column, index) {
-  var data = {
-    columnId: column.id,
-    index: index
-  };
-  this._send('columnMoved', data);
-};
-
-scout.Table.prototype._sendColumnBackgroundEffectChanged = function(column) {
-  var data = {
-    columnId: column.id,
-    backgroundEffect: column.backgroundEffect
-  };
-  this._send('columnBackgroundEffectChanged', data);
-};
-
-scout.Table.prototype._sendAggregationFunctionChanged = function(column) {
-  var data = {
-    columnId: column.id,
-    aggregationFunction: column.aggregationFunction
-  };
-  this._send('aggregationFunctionChanged', data);
 };
 
 scout.Table.prototype.moveColumn = function(column, oldPos, newPos, dragged) {
@@ -2868,16 +2746,7 @@ scout.Table.prototype.moveColumn = function(column, oldPos, newPos, dragged) {
   scout.arrays.remove(this.columns, column);
   scout.arrays.insert(this.columns, column, newPos);
 
-  index = newPos;
-  this.columns.forEach(function(iteratingColumn, i) {
-    // Adjust index if column is only known on the gui
-    if (iteratingColumn.guiOnly) {
-      index--;
-    }
-  });
-
   this._triggerColumnMoved(column, oldPos, newPos, dragged);
-  this._sendColumnMoved(column, index);
 
   // move aggregated rows
   this._aggregateRows.forEach(function(aggregateRow) {
@@ -2942,11 +2811,15 @@ scout.Table.prototype._triggerAllRowsDeleted = function() {
 };
 
 scout.Table.prototype._triggerRowsSelected = function(debounce) {
-  this.trigger('rowsSelected', {debounce: debounce});
+  this.trigger('rowsSelected', {
+    debounce: debounce
+  });
 };
 
-scout.Table.prototype._triggerRowsChecked = function() {
-  this.trigger('rowsChecked');
+scout.Table.prototype._triggerRowsChecked = function(updatedRows) {
+  this.trigger('rowsChecked', {
+    updatedRows: updatedRows
+  });
 };
 
 scout.Table.prototype._triggerRowsFiltered = function() {
@@ -2955,6 +2828,40 @@ scout.Table.prototype._triggerRowsFiltered = function() {
 
 scout.Table.prototype._triggerFilterResetted = function() {
   this.trigger('filterResetted');
+};
+
+scout.Table.prototype._triggerAppLinkAction = function(column, ref) {
+  this.trigger('appLinkAction', {
+    column: column,
+    ref: ref
+  });
+};
+
+scout.Table.prototype._triggerPrepareCellEdit = function(row, column) {
+  this.trigger('prepareCellEdit', {
+    row: row,
+    column: column
+  });
+};
+
+scout.Table.prototype._triggerCompleteCellEdit = function(field) {
+  this._send('completeCellEdit', {
+    field: field
+  });
+};
+
+scout.Table.prototype._triggerCancelCellEdit = function(field) {
+  this._send('cancelCellEdit', {
+    field: field
+  });
+};
+
+scout.Table.prototype._triggerReload = function() {
+  this.trigger('reload');
+};
+
+scout.Table.prototype._triggerExportToClipboard = function() {
+  this.trigger('exportToClipboard');
 };
 
 scout.Table.prototype._triggerRowOrderChanged = function(row, animating) {
@@ -3142,6 +3049,10 @@ scout.Table.prototype.setFooterVisible = function(visible) {
   if (!visible && this.footer) {
     this.footer = null;
   }
+};
+
+scout.Table.prototype.setHeaderVisible = function(visible) {
+  this.setProperty('headerVisible', visible);
 };
 
 /**

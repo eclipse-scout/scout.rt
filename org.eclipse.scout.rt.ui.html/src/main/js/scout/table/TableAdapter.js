@@ -54,11 +54,222 @@ scout.TableAdapter.prototype._onWidgetRowClicked = function(event) {
   this._sendRowClicked(event.row.id, event.mouseButton, columnId);
 };
 
+scout.TableAdapter.prototype._onWidgetAddFilter = function(event) {
+  var filter = event.filter;
+  if (filter instanceof scout.TableUserFilter) {
+    this._send('addFilter', filter.createAddFilterEventData());
+  }
+};
+
+scout.TableAdapter.prototype._onWidgetRemoveFilter = function(event) {
+  var filter = event.filter;
+  if (filter instanceof scout.TableUserFilter) {
+    this._send('removeFilter', filter.createRemoveFilterEventData());
+  }
+};
+
+scout.TableAdapter.prototype._onWidgetColumnResized = function(event) {
+  this._sendColumnResized(event.column);
+};
+
+scout.TableAdapter.prototype._sendColumnResized = function(column) {
+  if (column.fixedWidth || this.widget.autoResizeColumns) {
+    return;
+  }
+
+  var eventData = {
+    columnId: column.id,
+    width: column.width
+  };
+
+  // send delayed to avoid a lot of requests while resizing
+  // coalesce: only send the latest resize event for a column
+  this._send('columnResized', eventData, 750, function(previous) {
+    return this.id === previous.id && this.type === previous.type && this.columnId === previous.columnId;
+  });
+};
+
+scout.TableAdapter.prototype._onWidgetAggregationFunctionChanged = function(event) {
+  this._sendAggregationFunctionChanged(event.column);
+};
+
+scout.TableAdapter.prototype._sendAggregationFunctionChanged = function(column) {
+  var data = {
+    columnId: column.id,
+    aggregationFunction: column.aggregationFunction
+  };
+  this._send('aggregationFunctionChanged', data);
+};
+
+scout.TableAdapter.prototype._onWidgetColumnBackgroundEffectChanged = function(event) {
+  this._sendColumnBackgroundEffectChanged(event.column);
+};
+
+scout.TableAdapter.prototype._sendColumnBackgroundEffectChanged = function(column) {
+  var data = {
+    columnId: column.id,
+    backgroundEffect: column.backgroundEffect
+  };
+  this._send('columnBackgroundEffectChanged', data);
+};
+
+scout.TableAdapter.prototype._onWidgetColumnMoved = function(event) {
+  var index = event.newPos;
+  this.widget.columns.forEach(function(iteratingColumn, i) {
+    // Adjust index if column is only known on the gui
+    if (iteratingColumn.guiOnly) {
+      index--;
+    }
+  });
+  this._sendColumnMoved(event.column, index);
+};
+
+scout.TableAdapter.prototype._sendColumnMoved = function(column, index) {
+  var data = {
+    columnId: column.id,
+    index: index
+  };
+  this._send('columnMoved', data);
+};
+
+scout.TableAdapter.prototype._onWidgetPrepareCellEdit = function(event) {
+  this._sendPrepareCellEdit(event.row, event.column);
+};
+
+scout.TableAdapter.prototype._sendPrepareCellEdit = function(row, column) {
+  var data = {
+    rowId: row.id,
+    columnId: column.id
+  };
+  this._send('prepareCellEdit', data);
+};
+
+scout.TableAdapter.prototype._onWidgetCompleteCellEdit = function(event) {
+  this._sendCompleteCellEdit(event.field);
+};
+
+scout.TableAdapter.prototype._sendCompleteCellEdit = function(field) {
+  var data = {
+    fieldId: field.id
+  };
+  this._send('completeCellEdit', data);
+};
+
+scout.TableAdapter.prototype._onWidgetCancelCellEdit = function(event) {
+  this._sendCancelCellEdit(event.field);
+};
+
+scout.TableAdapter.prototype._sendCancelCellEdit = function(field) {
+  var data = {
+    fieldId: field.id
+  };
+  this._send('cancelCellEdit', data);
+};
+
+scout.TableAdapter.prototype._onWidgetRowsChecked = function(event) {
+  this._sendRowsChecked(event.updatedRows);
+};
+
+scout.TableAdapter.prototype._sendRowsChecked = function(rows) {
+  var data = {
+    rows: []
+  };
+
+  for (var i = 0; i < rows.length; i++) {
+    data.rows.push({
+      rowId: rows[i].id,
+      checked: rows[i].checked
+    });
+  }
+
+  this._send('rowsChecked', data);
+};
+
+scout.TableAdapter.prototype._onWidgetRowsFiltered = function(event) {
+  var rowIds = this.widget._rowsToIds(this.widget.filteredRows());
+  this._sendRowsFiltered(rowIds);
+};
+
+scout.TableAdapter.prototype._sendRowsFiltered = function(rowIds) {
+  var eventData = {};
+  if (rowIds.length === this.widget.rows.length) {
+    eventData.remove = true;
+  } else {
+    eventData.rowIds = rowIds;
+  }
+
+  // send with timeout, mainly for incremental load of a large table
+  // coalesce: only send last event (don't coalesce remove and 'add' events, the UI server needs both)
+  this._send('rowsFiltered', eventData, 250, function(previous) {
+    return this.id === previous.id && this.type === previous.type && this.remove === previous.remove;
+  });
+};
+
+scout.TableAdapter.prototype._onWidgetRowAction = function(event) {
+  this._sendRowAction(event.row, event.column);
+};
+
+scout.TableAdapter.prototype._sendRowAction = function(row, column) {
+  this._send('rowAction', {
+    rowId: row.id,
+    columnId: column.id
+  });
+};
+
+scout.TableAdapter.prototype._onWidgetAppLinkAction = function(event) {
+  this._sendAppLinkAction(event.column, event.ref);
+};
+
+scout.TableAdapter.prototype._sendAppLinkAction = function(column, ref) {
+  this._send('appLinkAction', {
+    columnId: column.id,
+    ref: ref
+  });
+};
+
+scout.TableAdapter.prototype._onWidgetReload = function(event) {
+  this._send('reload');
+};
+
+scout.TableAdapter.prototype._onWidgetExportToClipbaord = function(event) {
+  this._send('exportToClipboard');
+};
+
 scout.TableAdapter.prototype._onWidgetEvent = function(event) {
   if (event.type === 'rowsSelected') {
     this._onWidgetRowsSelected(event);
+  } else if (event.type === 'rowsChecked') {
+    this._onWidgetRowsChecked(event);
+  } else if (event.type === 'rowsFiltered') {
+    this._onWidgetRowsFiltered(event);
   } else if (event.type === 'rowClicked') {
     this._onWidgetRowClicked(event);
+  } else if (event.type === 'rowAction') {
+    this._onWidgetRowAction(event);
+  } else if (event.type === 'prepareCellEdit') {
+    this._onWidgetPrepareCellEdit(event);
+  } else if (event.type === 'completeCellEdit') {
+    this._onWidgetCompleteCellEdit(event);
+  } else if (event.type === 'cancelCellEdit') {
+    this._onWidgetCancelCellEdit(event);
+  } else if (event.type === 'appLinkAction') {
+    this._onWidgetAppLinkAction(event);
+  } else if (event.type === 'exportToClipboard') {
+    this._onWidgetExportToClipbaord(event);
+  } else if (event.type === 'reload') {
+    this._onWidgetReload(event);
+  } else if (event.type === 'addFilter') {
+    this._onWidgetAddFilter(event);
+  } else if (event.type === 'removeFilter') {
+    this._onWidgetRemoveFilter(event);
+  } else if (event.type === 'columnResized') {
+    this._onWidgetColumnResized(event);
+  } else if (event.type === 'columnMoved') {
+    this._onWidgetColumnMoved(event);
+  } else if (event.type === 'columnBackgroundEffectChanged') {
+    this._onWidgetColumnBackgroundEffectChanged(event);
+  } else if (event.type === 'aggregationFunctionChanged') {
+    this._onWidgetAggregationFunctionChanged(event);
   } else {
     scout.TableAdapter.parent.prototype._onWidgetEvent.call(this, event);
   }
@@ -135,7 +346,7 @@ scout.TableAdapter.prototype._onStartCellEdit = function(columnId, rowId, fieldI
     row = this.widget._rowById(rowId),
     field = this.session.getOrCreateModelAdapter(fieldId, this);
 
-  field.createWidget(this.widget);
+  field.getOrCreateWidget(this.widget);
   this.widget.startCellEdit(column, row, field.widget);
 };
 
@@ -197,16 +408,6 @@ scout.TableAdapter.prototype._onColumnActionsChanged = function(event) {
 };
 
 scout.TableAdapter.prototype.onModelAction = function(event) {
-  // _renderRows() might not have drawn all rows yet, therefore postpone the
-  // execution of this method to prevent conflicts on the row objects.
-  if (this.widget._renderRowsInProgress) {
-    var that = this;
-    setTimeout(function() {
-      that.onModelAction(event);
-    }, 0);
-    return;
-  }
-
   if (event.type === 'rowsInserted') {
     this._onRowsInserted(event.rows);
   } else if (event.type === 'rowsDeleted') {
