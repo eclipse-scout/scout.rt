@@ -42,7 +42,7 @@ scout.RadioButton.prototype._render = function($parent) {
   });
 };
 
-scout.RadioButton.prototype._remove = function($parent) {
+scout.RadioButton.prototype._remove = function() {
   scout.tooltips.uninstall(this.$field);
   scout.RadioButton.parent.prototype._remove.call(this);
 };

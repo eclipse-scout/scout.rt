@@ -209,6 +209,9 @@ scout.FormField.prototype._renderPlaceholder = function($field) {
   }
 };
 
+/**
+ * @param $field (optional) argument is required by DateField.js, when not set this.$field is used
+ */
 scout.FormField.prototype._removePlaceholder = function($field) {
   $field = scout.nvl($field, this.$field);
   if ($field) {

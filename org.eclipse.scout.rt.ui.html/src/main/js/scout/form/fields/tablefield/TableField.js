@@ -29,7 +29,7 @@ scout.TableField.prototype._renderTable = function() {
   }
 };
 
-scout.TableField.prototype._removeTable = function(oldTable) {
-  oldTable.remove();
+scout.TableField.prototype._removeTable = function() {
+  this.table.remove();
   this._removeField();
 };

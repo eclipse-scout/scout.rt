@@ -46,7 +46,7 @@ scout.CheckBoxField.prototype._render = function($parent) {
   this.addStatus();
 };
 
-scout.CheckBoxField.prototype._remove = function($parent) {
+scout.CheckBoxField.prototype._remove = function() {
   scout.tooltips.uninstall(this.$checkBoxLabel);
   scout.CheckBoxField.parent.prototype._remove.call(this);
 };

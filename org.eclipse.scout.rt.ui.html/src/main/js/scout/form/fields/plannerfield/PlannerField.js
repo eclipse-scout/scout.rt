@@ -33,8 +33,8 @@ scout.PlannerField.prototype._renderPlanner = function() {
   this.addField(this.planner.$container);
 };
 
-scout.PlannerField.prototype._removePlanner = function(oldPlanner) {
-  oldPlanner.remove();
+scout.PlannerField.prototype._removePlanner = function() {
+  this.planner.remove();
   this._removeField();
 };
 

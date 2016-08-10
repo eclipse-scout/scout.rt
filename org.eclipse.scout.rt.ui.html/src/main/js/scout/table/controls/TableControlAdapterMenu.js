@@ -51,9 +51,10 @@ scout.TableControlAdapterMenu.prototype._onTableControlPropertyChange = function
   event.changedProperties.forEach(function(prop) {
     changedProperties[prop] = event.newProperties[prop];
   });
-  this.onModelPropertyChange({
-    properties: scout.TableControlAdapterMenu.adaptTableControlProperties(changedProperties)
-  });
+  changedProperties = scout.TableControlAdapterMenu.adaptTableControlProperties(changedProperties);
+  for (var prop in changedProperties) {
+    this.setProperty(prop, changedProperties[prop]);
+  }
 };
 
 scout.TableControlAdapterMenu.prototype._onTableControlDestroy = function(event) {
