@@ -235,17 +235,12 @@ scout.graphics = {
   },
 
   _bounds: function($elem, pos, includeSizeMargin, includePosMargin) {
-    if (includeSizeMargin === undefined) {
-      includeSizeMargin = false;
-    }
-    if (includePosMargin === undefined) {
-      includePosMargin = false;
-    }
     if (includePosMargin) {
       pos.left += $elem.cssMarginLeft();
       pos.top += $elem.cssMarginTop();
     }
-    return new scout.Rectangle(pos.left, pos.top, $elem.outerWidth(includeSizeMargin), $elem.outerHeight(includeSizeMargin));
+    var size = scout.graphics.getSize($elem, includeSizeMargin);
+    return new scout.Rectangle(pos.left, pos.top, size.width, size.height);
   },
 
   debugOutput: function($comp) {
