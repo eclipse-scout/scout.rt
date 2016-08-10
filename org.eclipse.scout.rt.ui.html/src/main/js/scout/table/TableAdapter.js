@@ -64,15 +64,6 @@ scout.TableAdapter.prototype._onWidgetEvent = function(event) {
   }
 };
 
-/**
- * @override
- */
-scout.TableAdapter.prototype._onChildAdapterCreation = function(propertyName, model) {
-  if (propertyName === 'tableControls') {
-    model.table = this; // FIXME [6.1] CGU fix this, this is not executed anymore
-  }
-};
-
 scout.TableAdapter.prototype._onRowsInserted = function(rows) {
   this.widget.insertRows(rows, true);
 };

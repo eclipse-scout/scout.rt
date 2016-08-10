@@ -11,4 +11,4 @@
 scout.SvgFieldAdapter = function() {
   scout.SvgFieldAdapter.parent.call(this);
 };
-scout.inherits(scout.SvgFieldAdapter, scout.ButtonAdapter);
+scout.inherits(scout.SvgFieldAdapter, scout.ValueFieldAdapter);

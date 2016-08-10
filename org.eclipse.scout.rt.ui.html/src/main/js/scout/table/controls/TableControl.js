@@ -21,6 +21,12 @@ scout.inherits(scout.TableControl, scout.Action);
 scout.TableControl.CONTAINER_SIZE = 345;
 scout.TableControl.CONTAINER_ANIMATE_DURATION = 350;
 
+scout.TableControl.prototype._init = function(model) {
+  this.parent = model.parent;
+  this.table = this.getTable();
+  scout.TableControl.parent.prototype._init.call(this, model);
+};
+
 /**
  * @override ModelAdapter.js
  */
@@ -215,6 +221,19 @@ scout.TableControl.prototype.onControlContainerClosed = function() {
 scout.TableControl.prototype._createActionKeyStroke = function() {
   return new scout.TableControlActionKeyStroke(this);
 };
+
+scout.TableControl.prototype.getTable = function() {
+  var parent = this.parent;
+  while (parent) {
+    if (parent instanceof scout.Table) {
+      return parent;
+    }
+    parent = parent.parent;
+  }
+
+  return null;
+};
+
 
 /**
  * TableControlActionKeyStroke

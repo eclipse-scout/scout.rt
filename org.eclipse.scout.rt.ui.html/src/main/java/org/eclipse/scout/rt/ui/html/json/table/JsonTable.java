@@ -32,6 +32,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
 import org.eclipse.scout.rt.client.ui.basic.table.TableListener;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.INumberColumn;
+import org.eclipse.scout.rt.client.ui.basic.table.controls.ITableControl;
 import org.eclipse.scout.rt.client.ui.basic.table.organizer.ITableOrganizer;
 import org.eclipse.scout.rt.client.ui.basic.table.userfilter.TableTextUserFilterState;
 import org.eclipse.scout.rt.client.ui.basic.userfilter.IUserFilterState;
@@ -232,17 +233,17 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
         return JsonStatus.toJson((IStatus) value);
       }
     });
-//    putJsonProperty(new JsonAdapterProperty<ITable>(ITable.PROP_TABLE_CONTROLS, model, getUiSession()) {
-//      @Override
-//      protected JsonAdapterPropertyConfig createConfig() {
-//        return new JsonAdapterPropertyConfigBuilder().filter(new DisplayableActionFilter<ITableControl>()).build();
-//      }
-//
-//      @Override
-//      protected List<ITableControl> modelValue() {
-//        return getModel().getTableControls();
-//      }
-//    });
+    putJsonProperty(new JsonAdapterProperty<ITable>(ITable.PROP_TABLE_CONTROLS, model, getUiSession()) {
+      @Override
+      protected JsonAdapterPropertyConfig createConfig() {
+        return new JsonAdapterPropertyConfigBuilder().filter(new DisplayableActionFilter<ITableControl>()).build();
+      }
+
+      @Override
+      protected List<ITableControl> modelValue() {
+        return getModel().getTableControls();
+      }
+    });
     putJsonProperty(new JsonProperty<ITable>(ITable.PROP_DROP_TYPE, model) {
       @Override
       protected Integer modelValue() {

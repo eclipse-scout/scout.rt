@@ -16,5 +16,8 @@ scout.objectFactories = {
   'ComposerField': function() {
     // Composer is just a tree field, there is currently no need to duplicate the JS/CSS code
     return new scout.TreeField();
+  },
+  'ComposerFieldAdapter': function() {
+    return new scout.TreeFieldAdapter();
   }
 };
