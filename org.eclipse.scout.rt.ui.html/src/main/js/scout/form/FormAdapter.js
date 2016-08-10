@@ -13,3 +13,16 @@ scout.FormAdapter = function() {
   this._addAdapterProperties(['rootGroupBox', 'views', 'dialogs', 'initialFocus', 'messageBoxes', 'fileChoosers']);
 };
 scout.inherits(scout.FormAdapter, scout.ModelAdapter);
+
+scout.FormAdapter.prototype.onModelAction = function(event) {
+  if (event.type === 'requestFocus') {
+    this._onRequestFocus(event.formField);
+  } else {
+    scout.FormAdapter.parent.prototype.onModelAction.call(this, event);
+  }
+};
+
+scout.FormAdapter.prototype._onRequestFocus = function(formFieldId) {
+  var formFieldWidget = this.session.getOrCreateWidget(formFieldId, this, this.widget);
+  this.widget.requestFocus(formFieldWidget);
+};

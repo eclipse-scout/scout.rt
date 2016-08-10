@@ -864,6 +864,10 @@ scout.Widget.prototype.getWidgetById = function(widgetId) {
   }
 };
 
+scout.Widget.prototype.requestFocus = function() {
+  this.session.focusManager.requestFocus(this.$container);
+};
+
 /* --- STATIC HELPERS ------------------------------------------------------------- */
 
 scout.Widget.getWidgetFor = function($elem) {

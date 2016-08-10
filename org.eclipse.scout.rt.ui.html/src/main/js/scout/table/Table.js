@@ -3688,10 +3688,6 @@ scout.Table.prototype.updateColumnHeaders = function(columns) {
   }
 };
 
-scout.Table.prototype.requestFocus = function() {
-  this.session.focusManager.requestFocus(this.$container);
-};
-
 scout.Table.prototype.requestFocusInCell = function(column, row) {
   var cell = this.cell(column, row);
   if (this.enabled && row.enabled && cell.editable) {

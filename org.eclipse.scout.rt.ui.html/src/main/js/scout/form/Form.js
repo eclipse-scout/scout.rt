@@ -392,19 +392,5 @@ scout.Form.prototype.requestFocus = function(formField) {
   if (!formField) {
     return;
   }
-
   formField.focus();
-};
-
-scout.Form.prototype._onRequestFocus = function(formFieldId) {
-  var formField = this.session.getOrCreateModelAdapter(formFieldId, this);
-  this.requestFocus(formField);
-};
-
-scout.Form.prototype.onModelAction = function(event) {
-  if (event.type === 'requestFocus') {
-    this._onRequestFocus(event.formField);
-  } else {
-    scout.Form.parent.prototype.onModelAction.call(this, event);
-  }
 };
