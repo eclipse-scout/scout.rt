@@ -39,9 +39,10 @@ scout.Widget = function() {
   this.animateRemoval;
 
   this._adapterProperties = [];
-  this._cloneProperties = [];
+  this._cloneProperties = ['parent', 'session']; // FIXME [awe, cgu] discuss: when not cloned automatically we need to pass 'parent' in clone method
   this._propertyConfig = {};
 
+  // FIXME [awe, cgu] 6.1 discuss: wenn alle widgets events und keyStrokeContext haben sollen braucht es die add methoden nicht mehr
   this._addKeyStrokeContextSupport();
   this._addEventSupport();
 };

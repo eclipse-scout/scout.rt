@@ -29,6 +29,11 @@ function sandboxSession(options) {
   options.renderDesktop = scout.nvl(options.renderDesktop, true);
   options.remote = true; // required so adapters will be registered in the adapter registry
 
+  // Since most of the tests are written to simulate RemoteApp behavior we must run
+  // the RemoteApp#_init here. FIXME [awe, cgu] 6.1 - sollen wir hier besser eine JasmineApp machen?
+  var app = new scout.RemoteApp();
+  app._init({});
+
   session = new scout.Session($sandbox, options);
   // Simulate successful session initialization
   session.uiSessionId = '1.1';
@@ -65,6 +70,7 @@ function createSimpleModel(objectType, session, id) {
   return {
     id: id,
     objectType: objectType,
+    owner: new scout.NullModelAdapter(),
     parent: new scout.NullWidget(),
     session: session
   };

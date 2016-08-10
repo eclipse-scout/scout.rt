@@ -8,15 +8,14 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-scout.NullWidget = function() {
-  scout.NullWidget.parent.call(this);
+scout.NullModelAdapter = function() {
+  scout.NullModelAdapter.parent.call(this);
 };
-scout.inherits(scout.NullWidget, scout.Widget);
+scout.inherits(scout.NullModelAdapter, scout.ModelAdapter);
 
 /**
- * @override Widget.js
+ * @override ModelAdapter.js
  */
-scout.NullWidget.prototype._createKeyStrokeContext = function() {
-  return null; // FIXME [awe, cgu] 6.1 see fixme in Widget.js CTOR (causes missing $bindTarget error otherwise)
+scout.NullModelAdapter.prototype._createWidget = function(model) {
+  return scout.create('NullWidget', model);
 };
-

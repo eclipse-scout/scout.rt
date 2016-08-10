@@ -48,11 +48,15 @@ scout.objects = {
   },
 
   /**
-   * Copies the specified properties (including the ones from the prototype.) from dest to source
+   * Copies the specified properties (including the ones from the prototype.) from dest to source.
+   * Properties that already exist on dest are NOT overwritten.
    */
   extractProperties: function(source, dest, properties) {
+    var destProperty;
     properties.forEach(function(propertyName) {
-      dest[propertyName] = source[propertyName];
+      if (!dest[propertyName]) {
+        dest[propertyName] = source[propertyName];
+      }
     });
     return dest;
   },

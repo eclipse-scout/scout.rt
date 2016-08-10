@@ -67,28 +67,15 @@ scout.ModelAdapter.prototype._init = function(model) {
 
   // Fill in the missing default values
   scout.defaultValues.applyTo(this.model);
-
-  // copy all properties from model to this adapter
-  /*
-  this._eachProperty(model, function(propertyName, value, isAdapterProp) {
-    if (scout.isOneOf(propertyName, 'id', 'session', 'objectType')) {
-      return; // Ignore (already set manually above)
-    }
-    if (isAdapterProp && value) {
-      value = this._createAdapters(propertyName, value);
-    }
-    this.model[propertyName] = value;
-  }.bind(this));
-  */
 };
 
-scout.ModelAdapter.prototype.getOrCreateWidget = function(parent) { // FIXME CGU getOrCreate? :/
+scout.ModelAdapter.prototype.getOrCreateWidget = function(parent) {
   if (this.widget) {
 //    this.widget.setParent() // FIXME CGU anstatt re-link in session.js?
     return this.widget;
   }
   this.model.parent = parent;
-  this.model.remoteAdapter = this; // FIXME [awe] 6.1 discuss with C.GU. wichtig, vor _createWidget, wegen rekursion!
+  this.model.remoteAdapter = this;
   this.widget = this._createWidget(this.model);
   if (this.widget) { // FIXME CGU null check wegnehmen, davon ausgehen dass alle ein widget haben
     this._attachWidget();
@@ -370,18 +357,17 @@ scout.ModelAdapter.prototype._syncPropertiesOnPropertyChange = function(newPrope
       oldValue = this.widget[propertyName];
 
     // FIXME CGU [6.1] dieser Teil sollte irgendiwe in der Sync Funktion sein, anstatt callSetter syncProperty aufrufen, würde aber viele Funktionen brechen
-    if (isAdapterProp) {
-      if (oldValue) {
-        // TODO CGU this should actually be configurable, otherwise m_disposeOnChange=false on server doesn't work
-        this._destroyAdapters(propertyName, oldValue, value);
-      }
+    if (isAdapterProp && oldValue) {
+      // TODO CGU this should actually be configurable, otherwise m_disposeOnChange=false on server doesn't work
+      this._destroyAdapters(propertyName, oldValue, value);
     }
 
     if (this[ensureTypeFuncName]) {
-      value = this[ensureTypeFuncName](value/*, oldValue*/);
-    } /*else {*/
+      value = this[ensureTypeFuncName](value);
+    }
+
     this.widget.callSetter(propertyName, value);
-//    }
+
   }.bind(this));
 };
 

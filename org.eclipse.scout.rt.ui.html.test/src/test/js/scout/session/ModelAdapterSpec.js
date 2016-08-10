@@ -10,7 +10,7 @@
  ******************************************************************************/
 describe('ModelAdapter', function() {
 
-  var session, myObjectFactory,
+  var session, $sandbox, myObjectFactory,
     model = {},
     originalObjectFactory = scout.objectFactory;
 
@@ -18,10 +18,10 @@ describe('ModelAdapter', function() {
     setFixtures(sandbox());
     jasmine.Ajax.install();
     jasmine.clock().install();
-
     session = sandboxSession();
     session.init();
     uninstallUnloadHandlers(session);
+    $sandbox = $('#sandbox');
 
     // Create a private object factory used for these tests
     myObjectFactory = new scout.ObjectFactory();
@@ -53,107 +53,101 @@ describe('ModelAdapter', function() {
   }
 
   function createModelAdapter(model, adapterProps) {
-    var adapter = new scout.ModelAdapter();
+    model = $.extend(createSimpleModel('NullModelAdapter', session), model);
+    var adapter = scout.create('NullModelAdapter', model);
     adapter._addAdapterProperties(adapterProps);
-    adapter.init(model);
     return adapter;
   }
 
   it('can handle properties in any order', function() {
-    var event;
-
-    // Create a dummy object
-    var modelAdapter = new scout.ModelAdapter();
-    model.id = '2';
-    model.parent = new scout.NullWidget();
-    model.session = session;
-    modelAdapter.init(model);
-    session.registerModelAdapter(modelAdapter);
+    var adapter = createModelAdapter({id: '2'});
+    var widget = adapter.getOrCreateWidget(session.desktop);
 
     // Send a dummy event to this object which contains both a new object and a id-only ref to that new object
-    event = new scout.Event('2', 'property', {
-      'properties': {
-        'x1': 'val1',
-        'x2': 'val2',
-        'o1': {
-          'id': '3',
-          'objectType': 'GroupBox',
-          'visible': true
+    var event = new scout.Event('2', 'property', {
+      properties: {
+        x1: 'val1',
+        x2: 'val2',
+        o1: {
+          id: '3',
+          objectType: 'GroupBox',
+          visible: true
         },
-        'o2': {
-          'id': '3'
+        o2: {
+          id: '3'
         }
       }
     });
     session._processEvents([event]);
 
-    expect(modelAdapter.x1).toBe('val1');
-    expect(modelAdapter.x2).toBe('val2');
-    expect(modelAdapter.o1).toBeDefined();
-    expect(modelAdapter.o1.id).toBe('3');
-    expect(modelAdapter.o2).toBeDefined();
-    expect(modelAdapter.o2.id).toBe('3');
+    expect(widget.x1).toBe('val1');
+    expect(widget.x2).toBe('val2');
+    expect(widget.o1).toBeDefined();
+    expect(widget.o1.id).toBe('3');
+    expect(widget.o2).toBeDefined();
+    expect(widget.o2.id).toBe('3');
 
     // Now send a second event, but now send the id-only ref first (in o1).
     event = new scout.Event('2', 'property', {
-      'properties': {
-        'x2': 'val20',
-        'x1': 'val10',
-        'o1': {
-          'id': '4'
+      properties: {
+        x2: 'val20',
+        x1: 'val10',
+        o1: {
+          id: '4'
         },
-        'o2': {
-          'id': '4',
-          'objectType': 'GroupBox',
-          'visible': false
+        o2: {
+          id: '4',
+          objectType: 'GroupBox',
+          visible: false
         }
       }
     });
     session._processEvents([event]);
 
-    expect(modelAdapter.x1).toBe('val10');
-    expect(modelAdapter.x2).toBe('val20');
-    expect(modelAdapter.o1).toBeDefined();
-    expect(modelAdapter.o1.id).toBe('4');
-    expect(modelAdapter.o2).toBeDefined();
-    expect(modelAdapter.o2.id).toBe('4');
+    expect(widget.x1).toBe('val10');
+    expect(widget.x2).toBe('val20');
+    expect(widget.o1).toBeDefined();
+    expect(widget.o1.id).toBe('4');
+    expect(widget.o2).toBeDefined();
+    expect(widget.o2.id).toBe('4');
   });
 
-  it("_syncPropertiesOnPropertyChange calls _sync* method or sets property", function() {
-    var adapter = new scout.ModelAdapter(),
-      oldValues = {},
-      newValues = {
+  it('_syncPropertiesOnPropertyChange calls set* methods or _setProperty method', function() {
+    var adapter = createModelAdapter({
+      id: '2',
+      foo: 1,
+      bar: 2});
+    var widget = adapter.getOrCreateWidget(session.desktop);
+    widget.setFoo = function(value) {
+      this.foo = value;
+    };
+    var newValues = {
         foo: 6,
         bar: 7
       };
-    adapter.foo = 1;
-    adapter.bar = 2;
-    adapter._syncFoo = function(value) {
-      this.foo = value;
-    };
-    spyOn(adapter, '_syncFoo').and.callThrough();
-    adapter._syncPropertiesOnPropertyChange(oldValues, newValues);
-    expect(adapter.foo).toBe(6);
-    expect(adapter.bar).toBe(7);
-    expect(adapter._syncFoo).toHaveBeenCalled();
-    expect(oldValues.foo).toBe(1);
-    expect(oldValues.bar).toBe(2);
+    spyOn(widget, 'setFoo').and.callThrough();
+    spyOn(widget, 'setProperty').and.callThrough();
+
+    adapter._syncPropertiesOnPropertyChange(newValues);
+    expect(widget.foo).toBe(6);
+    expect(widget.bar).toBe(7);
+    expect(widget.setFoo).toHaveBeenCalled(); // for property 'foo'
+    expect(widget.setProperty).toHaveBeenCalled(); // for property 'bar'
   });
 
-  describe("_renderPropertiesOnPropertyChange", function() {
+  describe('_renderPropertiesOnPropertyChange', function() {
 
-    it("for non-adapter property -> expects a _render* method", function() {
-      var adapter = new scout.ModelAdapter(),
-        $div = $('<div>');
-      adapter._renderFoo = function(value) {
-        $div.text(value);
+    it('for non-adapter property -> expects a _render* method', function() {
+      var adapter = createModelAdapter();
+      var widget = adapter.getOrCreateWidget(session.desktop);
+      var $div = $('<div>');
+      widget.render($sandbox);
+      widget._renderFoo = function() {
+        $div.text(this.foo);
       };
-      adapter._syncPropertiesOnPropertyChange({}, {
+      adapter._syncPropertiesOnPropertyChange({
         foo: 'bar'
-      }, []);
-      adapter._renderPropertiesOnPropertyChange({}, {
-        foo: 'bar'
-      }, []);
+      });
       expect($div.text()).toBe('bar');
     });
 

@@ -28,7 +28,8 @@ scout.FormSpecHelper.prototype.createFormWithOneField = function(parentId) {
   form.owner = parentId || this.session.rootAdapter.id;
   rootGroupBox.fields = [field.id];
 
-  return createAdapter(form, this.session, [rootGroupBox, field]);
+  var adapter = createAdapter(form, this.session, [rootGroupBox, field]);
+  return adapter.getOrCreateWidget(this.session.desktop);
 };
 
 scout.FormSpecHelper.prototype.createGroupBoxWithOneField = function(parentId) {

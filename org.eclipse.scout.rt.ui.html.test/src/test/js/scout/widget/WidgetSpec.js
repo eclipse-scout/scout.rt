@@ -17,7 +17,7 @@ describe('Widget', function() {
     session = sandboxSession();
     session.init();
 
-    widget = new scout.Widget(),
+    widget = new scout.NullWidget(),
     parent = new scout.Widget();
   });
 
@@ -85,7 +85,7 @@ describe('Widget', function() {
     });
 
     it('clones only properties marked as clone property', function() {
-      var widgetClone = widget.cloneAdapter();
+      var widgetClone = widget.clone();
       // should contain the following properties:
       expectedProperties.forEach(function(propertyName) {
         expect(widgetClone[propertyName]).not.toBe(undefined);
@@ -100,7 +100,7 @@ describe('Widget', function() {
     });
 
     it('prefers properties passed as modelOverride', function() {
-      var widgetClone = widget.cloneAdapter({
+      var widgetClone = widget.clone({
         text: 'foo'
       });
       expect(widgetClone.text).toBe('foo');
