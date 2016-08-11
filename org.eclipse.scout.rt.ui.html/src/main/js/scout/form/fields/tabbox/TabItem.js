@@ -22,15 +22,22 @@ scout.TabItem.prototype._init = function(model) {
   this._syncMenusVisible(this.menusVisible);
 };
 
-scout.TabItem.prototype._renderCssClass = function(cssClass, oldCssClass) {
+scout.TabItem.prototype._removeCssClass = function() {
   // Call super only if the group-box is rendered or is rendering
   if (this.$container) {
-    scout.TabItem.parent.prototype._renderCssClass.call(this, cssClass, oldCssClass);
+    scout.TabItem.parent.prototype._removeCssClass.call(this);
   }
 
-  cssClass = cssClass || this.cssClass;
-  this.$tabContainer.removeClass(oldCssClass);
-  this.$tabContainer.addClass(cssClass);
+  this.$tabContainer.removeClass(this.cssClass);
+};
+
+scout.TabItem.prototype._renderCssClass = function() {
+  // Call super only if the group-box is rendered or is rendering
+  if (this.$container) {
+    scout.TabItem.parent.prototype._renderCssClass.call(this);
+  }
+
+  this.$tabContainer.addClass(this.cssClass);
 };
 
 scout.TabItem.prototype._render = function($parent) {

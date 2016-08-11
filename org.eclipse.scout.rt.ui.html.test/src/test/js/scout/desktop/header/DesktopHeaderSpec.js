@@ -56,38 +56,38 @@ describe("DesktopHeader", function() {
     it("attaches listener to new outline content", function() {
       var detailForm0MenuBar = node0.detailForm.rootGroupBox.menuBar;
       var detailForm1MenuBar = node1.detailForm.rootGroupBox.menuBar;
-      expect(detailForm0MenuBar.events._eventListeners.length).toBe(0);
-      expect(detailForm1MenuBar.events._eventListeners.length).toBe(0);
+      expect(detailForm0MenuBar.events._eventListeners.length).toBe(2); // 2 listeners are already attached by keystrokes
+      expect(detailForm1MenuBar.events._eventListeners.length).toBe(2);
       outline.selectNodes(node0);
-      expect(detailForm0MenuBar.events._eventListeners.length).toBe(1);
-      expect(detailForm1MenuBar.events._eventListeners.length).toBe(0);
+      expect(detailForm0MenuBar.events._eventListeners.length).toBe(3);
+      expect(detailForm1MenuBar.events._eventListeners.length).toBe(2);
     });
 
     it("removes listener from old outline content", function() {
       var detailForm0MenuBar = node0.detailForm.rootGroupBox.menuBar;
       var detailForm1MenuBar = node1.detailForm.rootGroupBox.menuBar;
-      expect(detailForm0MenuBar.events._eventListeners.length).toBe(0);
-      expect(detailForm1MenuBar.events._eventListeners.length).toBe(0);
+      expect(detailForm0MenuBar.events._eventListeners.length).toBe(2);
+      expect(detailForm1MenuBar.events._eventListeners.length).toBe(2);
       outline.selectNodes(node0);
-      expect(detailForm0MenuBar.events._eventListeners.length).toBe(1);
-      expect(detailForm1MenuBar.events._eventListeners.length).toBe(0);
+      expect(detailForm0MenuBar.events._eventListeners.length).toBe(3);
+      expect(detailForm1MenuBar.events._eventListeners.length).toBe(2);
 
       outline.selectNodes(node1);
-      expect(detailForm0MenuBar.events._eventListeners.length).toBe(0);
-      expect(detailForm1MenuBar.events._eventListeners.length).toBe(1);
+      expect(detailForm0MenuBar.events._eventListeners.length).toBe(2);
+      expect(detailForm1MenuBar.events._eventListeners.length).toBe(3);
 
       outline.selectNodes(node0);
-      expect(detailForm0MenuBar.events._eventListeners.length).toBe(1);
-      expect(detailForm1MenuBar.events._eventListeners.length).toBe(0);
+      expect(detailForm0MenuBar.events._eventListeners.length).toBe(3);
+      expect(detailForm1MenuBar.events._eventListeners.length).toBe(2);
     });
 
     it("removes listener when getting removed", function() {
       var detailForm0MenuBar = node0.detailForm.rootGroupBox.menuBar;
       outline.selectNodes(node0);
-      expect(detailForm0MenuBar.events._eventListeners.length).toBe(1);
+      expect(detailForm0MenuBar.events._eventListeners.length).toBe(3);
 
       desktop.setHeaderVisible(false);
-      expect(detailForm0MenuBar.events._eventListeners.length).toBe(0);
+      expect(detailForm0MenuBar.events._eventListeners.length).toBe(2);
     });
 
   });

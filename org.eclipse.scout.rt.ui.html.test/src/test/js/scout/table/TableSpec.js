@@ -625,7 +625,7 @@ describe("Table", function() {
     it("sends selection event containing rowIds", function() {
       var model = helper.createModelFixture(2, 5);
       var adapter = helper.createTableAdapter(model);
-      var table = adapter.getOrCreateWidget(session.desktop);
+      var table = adapter.createWidget(model, session.desktop);
       table.render(session.$entryPoint);
 
       var rows = [table.rows[0], table.rows[4]];
@@ -647,7 +647,7 @@ describe("Table", function() {
     it("selects all if not all are selected", function() {
       var model = helper.createModelFixture(2, 5);
       var adapter = helper.createTableAdapter(model);
-      var table = adapter.getOrCreateWidget(session.desktop);
+      var table = adapter.createWidget(model, session.desktop);
       table.render(session.$entryPoint);
 
       var $selectedRows = table.$selectedRows();
@@ -662,7 +662,7 @@ describe("Table", function() {
     it("selects none if all are selected", function() {
       var model = helper.createModelFixture(2, 5);
       var adapter = helper.createTableAdapter(model);
-      var table = adapter.getOrCreateWidget(session.desktop);
+      var table = adapter.createWidget(model, session.desktop);
       table.render(session.$entryPoint);
 
       var $selectedRows = table.$selectedRows();
@@ -716,7 +716,7 @@ describe("Table", function() {
     it("sends rowAction event with row and column", function() {
       var model = helper.createModelFixture(2, 5);
       var adapter = helper.createTableAdapter(model);
-      var table = adapter.getOrCreateWidget(session.desktop);
+      var table = adapter.createWidget(model, session.desktop);
       var row0 = table.rows[0];
       var column0 = table.columns[0];
 
@@ -739,7 +739,7 @@ describe("Table", function() {
     it("does not send rowAction event if the row is not selected", function() {
       var model = helper.createModelFixture(2, 5);
       var adapter = helper.createTableAdapter(model);
-      var table = adapter.getOrCreateWidget(session.desktop);
+      var table = adapter.createWidget(model, session.desktop);
       var row0 = table.rows[0];
       var column0 = table.columns[0];
 
@@ -779,7 +779,7 @@ describe("Table", function() {
     it("does not send rowAction event if it is not the only one selected row", function() {
       var model = helper.createModelFixture(2, 5);
       var adapter = helper.createTableAdapter(model);
-      var table = adapter.getOrCreateWidget(session.desktop);
+      var table = adapter.createWidget(model, session.desktop);
       var row0 = table.rows[0];
       var column0 = table.columns[0];
 
@@ -800,7 +800,7 @@ describe("Table", function() {
     it("updates column model and sends resize event ", function() {
       var model = helper.createModelFixture(2, 5);
       var adapter = helper.createTableAdapter(model);
-      var table = adapter.getOrCreateWidget(session.desktop);
+      var table = adapter.createWidget(model, session.desktop);
       table.render(session.$entryPoint);
 
       expect(table.columns[0].width).not.toBe(100);
@@ -818,7 +818,7 @@ describe("Table", function() {
     it("does not send resize event when resizing is in progress", function() {
       var model = helper.createModelFixture(2, 5);
       var adapter = helper.createTableAdapter(model);
-      var table = adapter.getOrCreateWidget(session.desktop);
+      var table = adapter.createWidget(model, session.desktop);
       table.render(session.$entryPoint);
 
       table.resizeColumn(table.columns[0], 50);
@@ -832,7 +832,7 @@ describe("Table", function() {
     it("sends resize event when resizing is finished", function() {
       var model = helper.createModelFixture(2, 5);
       var adapter = helper.createTableAdapter(model);
-      var table = adapter.getOrCreateWidget(session.desktop);
+      var table = adapter.createWidget(model, session.desktop);
       table.render(session.$entryPoint);
 
       table.resizeColumn(table.columns[0], 50);
@@ -943,7 +943,7 @@ describe("Table", function() {
     function prepareTableWithAdapter() {
       model = helper.createModelFixture(3, 3);
       adapter = helper.createTableAdapter(model);
-      table = adapter.getOrCreateWidget(session.desktop);
+      table = adapter.createWidget(model, session.desktop);
       column0 = model.columns[0];
       column1 = model.columns[1];
       column2 = model.columns[2];
@@ -1877,7 +1877,7 @@ describe("Table", function() {
     it("sends selection and click events", function() {
       var model = helper.createModelFixture(2, 5);
       var adapter = helper.createTableAdapter(model);
-      var table = adapter.getOrCreateWidget(session.desktop);
+      var table = adapter.createWidget(model, session.desktop);
       table.render(session.$entryPoint);
 
       var $row = table.$rows().first();
@@ -1892,7 +1892,7 @@ describe("Table", function() {
     it("sends only click if row already is selected", function() {
       var model = helper.createModelFixture(2, 5);
       var adapter = helper.createTableAdapter(model);
-      var table = adapter.getOrCreateWidget(session.desktop);
+      var table = adapter.createWidget(model, session.desktop);
       table.render(session.$entryPoint);
 
       var $row = table.$rows().first();
@@ -1915,7 +1915,7 @@ describe("Table", function() {
       var model = helper.createModelFixture(2, 5);
       model.checkable = true;
       var adapter = helper.createTableAdapter(model);
-      var table = adapter.getOrCreateWidget(session.desktop);
+      var table = adapter.createWidget(model, session.desktop);
       table.render(session.$entryPoint);
 
       var $checkbox = table.$rows().first().find('.check-box').first();
@@ -2134,7 +2134,7 @@ describe("Table", function() {
     it("only sends selection event, no click", function() {
       var model = helper.createModelFixture(2, 5);
       var adapter = helper.createTableAdapter(model);
-      var table = adapter.getOrCreateWidget(session.desktop);
+      var table = adapter.createWidget(model, session.desktop);
       table.render(session.$entryPoint);
 
       var $rows = table.$data.children('.table-row');
@@ -2164,7 +2164,7 @@ describe("Table", function() {
     it("only send one event for mousedown and immediate mouseup on the same row", function() {
       var model = helper.createModelFixture(2, 5);
       var adapter = helper.createTableAdapter(model);
-      var table = adapter.getOrCreateWidget(session.desktop);
+      var table = adapter.createWidget(model, session.desktop);
       table.render(session.$entryPoint);
 
       var $rows = table.$data.children('.table-row');
@@ -2190,7 +2190,7 @@ describe("Table", function() {
     it("only selects first row if mouse move selection or multi selection is disabled", function() {
       var model = helper.createModelFixture(2, 4);
       var adapter = helper.createTableAdapter(model);
-      var table = adapter.getOrCreateWidget(session.desktop);
+      var table = adapter.createWidget(model, session.desktop);
       table.selectionHandler.mouseMoveSelectionEnabled = false;
       verifyMouseMoveSelectionIsDisabled(model, table, false);
 

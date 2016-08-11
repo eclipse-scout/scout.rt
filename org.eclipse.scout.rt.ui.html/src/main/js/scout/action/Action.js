@@ -149,10 +149,12 @@ scout.Action.prototype._renderHorizontalAlignment = function() {
   // nothing to render, property is only considered by the menubar
 };
 
-scout.Action.prototype._renderCssClass = function(cssClass, oldCssClass) {
-  cssClass = cssClass || this.cssClass;
-  this.$container.removeClass(oldCssClass)
-    .addClass(cssClass);
+scout.Action.prototype._removeCssClass = function() {
+  this.$container.removeClass(this.cssClass);
+};
+
+scout.Action.prototype._renderCssClass = function() {
+  this.$container.addClass(this.cssClass);
 };
 
 

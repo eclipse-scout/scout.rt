@@ -2972,9 +2972,13 @@ scout.Table.prototype._syncSelectedRows = function(selectedRowIds) {
   this.selectionHandler.clearLastSelectedRowMarker();
 };
 
+scout.Table.prototype.setMenus = function(menus) {
+  this.setProperty('menus', menus);
+};
+
 scout.Table.prototype._syncMenus = function(menus, oldMenus) {
   this.updateKeyStrokes(menus, oldMenus);
-  this.menus = menus;
+  this._setProperty('menus', menus);
   this._updateMenuBar();
 
   if (this.header) {

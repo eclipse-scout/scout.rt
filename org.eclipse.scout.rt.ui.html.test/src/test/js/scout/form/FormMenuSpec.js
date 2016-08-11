@@ -18,14 +18,25 @@ describe("FormMenu", function() {
     desktop = session.desktop;
   });
 
-  function createMenu(model) {
+  function createModel() {
+    var model = createSimpleModel('FormMenu', session);
     model.form = helper.createFormWithOneField();
     model.desktop = desktop;
+    return model;
+  }
 
+  function createMenu(model) {
     var menu = new scout.FormMenu();
     menu.init(model);
     menu.position = function() {};
     return menu;
+  }
+
+  function createMenuAdapter(model) {
+    model.owner = new scout.NullWidgetAdapter();
+    var adapter = new scout.FormMenuAdapter();
+    adapter.init(model);
+    return adapter;
   }
 
   function findPopup() {
@@ -35,7 +46,7 @@ describe("FormMenu", function() {
   describe("setSelected", function() {
 
     it("opens and closes the form popup", function() {
-      var menu = createMenu(createSimpleModel('FormMenu', session));
+      var menu = createMenu(createModel());
       menu.render(session.$entryPoint);
       expect(findPopup()).not.toExist();
 
@@ -53,7 +64,7 @@ describe("FormMenu", function() {
       });
       ellipsisMenu.render(session.$entryPoint);
 
-      var menu = createMenu(createSimpleModel('FormMenu', session));
+      var menu = createMenu(createModel());
       menu.render(session.$entryPoint);
 
       scout.menus.moveMenuIntoEllipsis(menu, ellipsisMenu);
@@ -77,7 +88,7 @@ describe("FormMenu", function() {
       });
       ellipsisMenu.render(session.$entryPoint);
 
-      var model = createSimpleModel('FormMenu', session);
+      var model = createModel();
       model.popupStyle = scout.FormMenu.PopupStyle.MOBILE;
       var menu = createMenu(model);
       menu.render(session.$entryPoint);
@@ -102,7 +113,9 @@ describe("FormMenu", function() {
     describe("selected", function() {
 
       it("calls setSelected", function() {
-        var menu = createMenu(createSimpleModel('FormMenu', session));
+        var model = createModel();
+        var adapter = createMenuAdapter(model);
+        var menu = adapter.createWidget(model, session.desktop);
         menu.render(session.$entryPoint);
         expect(findPopup()).not.toExist();
 
@@ -111,7 +124,7 @@ describe("FormMenu", function() {
         var event = createPropertyChangeEvent(menu, {
           "selected": true
         });
-        menu.onModelPropertyChange(event);
+        adapter.onModelPropertyChange(event);
         expect(menu.setSelected).toHaveBeenCalled();
       });
 

@@ -25,6 +25,10 @@ scout.BasicField.prototype._renderProperties = function() {
   this._renderUpdateDisplayTextOnModify();
 };
 
+scout.BasicField.prototype.setUpdateDisplayTextOnModify = function(updateDisplayTextOnModify) {
+  this.setProperty('updateDisplayTextOnModify', updateDisplayTextOnModify);
+};
+
 scout.BasicField.prototype._renderUpdateDisplayTextOnModify = function() {
   if (this.updateDisplayTextOnModify) {
     this.$field.on('input', this._onDisplayTextModifiedHandler);

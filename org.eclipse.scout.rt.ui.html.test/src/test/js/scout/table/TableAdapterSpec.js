@@ -53,7 +53,7 @@ describe("TableAdapter", function() {
       it("calls selectRows", function() {
         var model = helper.createModelFixture(2, 5);
         var adapter = helper.createTableAdapter(model);
-        var table = adapter.getOrCreateWidget(session.desktop);
+        var table = adapter.createWidget(model, session.desktop);
         table.render(session.$entryPoint);
 
         spyOn(table, 'selectRows');
@@ -79,7 +79,7 @@ describe("TableAdapter", function() {
       beforeEach(function() {
         model = helper.createModelFixture(2, 3);
         adapter = helper.createTableAdapter(model);
-        table = adapter.getOrCreateWidget(session.desktop);
+        table = adapter.createWidget(model, session.desktop);
         rows = table.rows;
         row0 = model.rows[0];
         row1 = model.rows[1];
@@ -110,7 +110,7 @@ describe("TableAdapter", function() {
       beforeEach(function() {
         model = helper.createModelFixture(2, 3);
         adapter = helper.createTableAdapter(model);
-        table = adapter.getOrCreateWidget(session.desktop);
+        table = adapter.createWidget(model, session.desktop);
       });
 
       it("calls deleteAllRows", function() {
@@ -129,7 +129,7 @@ describe("TableAdapter", function() {
       beforeEach(function() {
         model = helper.createModelFixture(2);
         adapter = helper.createTableAdapter(model);
-        table = adapter.getOrCreateWidget(session.desktop);
+        table = adapter.createWidget(model, session.desktop);
       });
 
       it("calls insertRows", function() {
@@ -148,7 +148,7 @@ describe("TableAdapter", function() {
       beforeEach(function() {
         model = helper.createModelFixture(2, 3);
         adapter = helper.createTableAdapter(model);
-        table = adapter.getOrCreateWidget(session.desktop);
+        table = adapter.createWidget(model, session.desktop);
         row0 = model.rows[0];
         row1 = model.rows[1];
         row2 = model.rows[2];
@@ -223,7 +223,7 @@ describe("TableAdapter", function() {
         model.rows[0].cells[0].text = 'cellText0';
         model.rows[0].cells[1].text = 'cellText1';
         adapter = helper.createTableAdapter(model);
-        table = adapter.getOrCreateWidget(session.desktop);
+        table = adapter.createWidget(model, session.desktop);
       });
 
       it("calls updateRows", function() {
@@ -246,7 +246,7 @@ describe("TableAdapter", function() {
       beforeEach(function() {
         model = helper.createModelFixture(3, 2);
         adapter = helper.createTableAdapter(model);
-        table = adapter.getOrCreateWidget(session.desktop);
+        table = adapter.createWidget(model, session.desktop);
         column0 = model.columns[0];
         column1 = model.columns[1];
         column2 = model.columns[2];
@@ -276,7 +276,7 @@ describe("TableAdapter", function() {
       beforeEach(function() {
         model = helper.createModelFixture(3, 2);
         adapter = helper.createTableAdapter(model);
-        table = adapter.getOrCreateWidget(session.desktop);
+        table = adapter.createWidget(model, session.desktop);
         column0 = table.columns[0];
         column1 = table.columns[1];
         column2 = table.columns[2];
@@ -321,7 +321,7 @@ describe("TableAdapter", function() {
 
       it("calls updateColumnHeaders", function() {
         adapter = helper.createTableAdapter(model);
-        table = adapter.getOrCreateWidget(session.desktop);
+        table = adapter.createWidget(model, session.desktop);
         spyOn(table, 'updateColumnHeaders');
 
         column1 = helper.createModelColumn('newText1');
@@ -347,7 +347,7 @@ describe("TableAdapter", function() {
       it("creates and registers menu adapters", function() {
         var model = helper.createModelFixture(2);
         var adapter = helper.createTableAdapter(model);
-        var table = adapter.getOrCreateWidget(session.desktop);
+        var table = adapter.createWidget(model, session.desktop);
         var menu1 = helper.createMenuModel();
         var menu2 = helper.createMenuModel();
 
@@ -366,7 +366,7 @@ describe("TableAdapter", function() {
       it("destroys the old menus", function() {
         var model = helper.createModelFixture(2);
         var adapter = helper.createTableAdapter(model);
-        var table = adapter.getOrCreateWidget(session.desktop);
+        var table = adapter.createWidget(model, session.desktop);
         var menu1 = helper.createMenuModel();
         var menu2 = helper.createMenuModel();
 
@@ -396,7 +396,7 @@ describe("TableAdapter", function() {
       it("destroys the old and creates the new menus if the list contains both", function() {
         var model = helper.createModelFixture(2);
         var adapter = helper.createTableAdapter(model);
-        var table = adapter.getOrCreateWidget(session.desktop);
+        var table = adapter.createWidget(model, session.desktop);
         var menu1 = helper.createMenuModel();
         var menu2 = helper.createMenuModel();
         var menu3 = helper.createMenuModel();
@@ -436,7 +436,7 @@ describe("TableAdapter", function() {
     it("should not coalesce remove and 'add' events", function() {
       var model = helper.createModelFixture(1, 2);
       var adapter = helper.createTableAdapter(model);
-      var table = adapter.getOrCreateWidget(session.desktop);
+      var table = adapter.createWidget(model, session.desktop);
       adapter._sendRowsFiltered(['1','2']); // should create a remove event, because number of rows is equals to the length of rowIds
       adapter._sendRowsFiltered(['1']); // should create an 'add' event
       adapter._sendRowsFiltered(['2']); // should be coalesced with previous add event

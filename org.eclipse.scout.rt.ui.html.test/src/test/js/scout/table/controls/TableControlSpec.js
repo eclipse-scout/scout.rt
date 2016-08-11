@@ -109,10 +109,12 @@ describe("TableControl", function() {
     });
 
     it("sends selected events (for current and previous selection)", function() {
-      var adapter = createTableControlAdapter(createModel());
-      var action = adapter.getOrCreateWidget(session.desktop);
-      var adapter2 = createTableControlAdapter(createModel());
-      var action2 = adapter2.getOrCreateWidget(session.desktop);
+      var model = createModel();
+      var adapter = createTableControlAdapter(model);
+      var action = adapter.createWidget(model, session.desktop);
+      var model2 = createModel();
+      var adapter2 = createTableControlAdapter(model);
+      var action2 = adapter2.createWidget(model, session.desktop);
       table._syncTableControls([action, action2]);
 
       action.selected = true;

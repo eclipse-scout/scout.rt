@@ -200,6 +200,7 @@ scout.TableSpecHelper.prototype.createTable = function(model) {
 
 scout.TableSpecHelper.prototype.createTableAdapter = function(model) {
   var tableAdapter = new scout.TableAdapter();
+  model.owner = new scout.NullWidgetAdapter();
   tableAdapter.init(model);
   return tableAdapter;
 };

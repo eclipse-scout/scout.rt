@@ -288,10 +288,12 @@ scout.FormField.prototype._renderEnabled = function(enabled) {
   this._updateDisabledCopyOverlay();
 };
 
-scout.FormField.prototype._renderCssClass = function(cssClass, oldCssClass) {
-  cssClass = cssClass || this.cssClass;
-  this.$container.removeClass(oldCssClass);
-  this.$container.addClass(cssClass);
+scout.FormField.prototype._removeCssClass = function() {
+  this.$container.removeClass(this.cssClass);
+};
+
+scout.FormField.prototype._renderCssClass = function() {
+  this.$container.addClass(this.cssClass);
 };
 
 scout.FormField.prototype._renderFont = function() {
@@ -374,6 +376,10 @@ scout.FormField.prototype._syncErrorStatus = function(errorStatus) {
   } else {
     this.errorStatus = null;
   }
+};
+
+scout.FormField.prototype.setCssClass = function(cssClass) {
+  this.setProperty('cssClass', cssClass);
 };
 
 scout.FormField.prototype.setLabel = function(label) {

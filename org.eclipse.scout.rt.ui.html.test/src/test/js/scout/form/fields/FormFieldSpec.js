@@ -18,6 +18,16 @@ describe("FormField", function() {
     helper = new scout.FormSpecHelper(session);
   });
 
+  function createFormField(model) {
+    var formField = new scout.FormField();
+    formField._render = function($parent) {
+      this.addContainer($parent, 'form-field');
+      this.addStatus();
+    };
+    formField.init(model);
+    return formField;
+  }
+
   describe("inheritance", function() {
     var formField, model;
 
@@ -96,12 +106,7 @@ describe("FormField", function() {
 
     beforeEach(function() {
       model = helper.createFieldModel();
-      formField = new scout.FormField();
-      formField._render = function($parent) {
-        this.addContainer($parent, 'form-field');
-        this.addStatus();
-      };
-      formField.init(model);
+      formField = createFormField(model);
     });
 
     it("shows a status if status visible = true", function() {
@@ -124,11 +129,7 @@ describe("FormField", function() {
       formField.render(session.$entryPoint);
 
       expect(formField.$status.isVisible()).toBe(true);
-
-      var event = createPropertyChangeEvent(formField, {
-        tooltipText: ''
-      });
-      formField.onModelPropertyChange(event);
+      formField.setTooltipText(null);
       expect(formField.$status.isVisible()).toBe(false);
     });
 
@@ -138,62 +139,28 @@ describe("FormField", function() {
       formField.render(session.$entryPoint);
 
       expect(formField.$status.isVisible()).toBe(true);
-
-      var event = createPropertyChangeEvent(formField, {
-        errorStatus: ''
-      });
-      formField.onModelPropertyChange(event);
+      formField.setErrorStatus(null);
       expect(formField.$status.isVisible()).toBe(false);
     });
 
   });
 
-  describe("onModelPropertyChange", function() {
+  describe("property css class", function() {
     var formField, model;
 
     beforeEach(function() {
       model = helper.createFieldModel();
-      formField = new scout.FormField();
-      formField._render = function($parent) {
-        this.addContainer($parent, 'form-field');
-      };
-      formField.init(model);
+      formField = createFormField(model);
     });
 
-    it("event should update model", function() {
-      // Note: normally an event for ID 123 would never be applied
-      // to an adpater with ID 2! We only do this here in order to
-      // check whether or not the onModelPropertyChange method applies
-      // the ID of the event by error (should not happen).
-      var event = {
-        id:'123',
-        type:'property',
-        properties: {
-          errorStatus: {message: 'foo'}
-        }
-      };
-      // required
-      formField._$statusLabel = $('<div></div>');
-      formField.onModelPropertyChange(event);
-      expect(formField.errorStatus).toEqual(new scout.Status({message: 'foo'}));
-      // never apply id, type, properties on model
-      expect(formField.id).toBe(model.id);
-      expect(formField.hasOwnProperty('type')).toBe(false);
-      expect(formField.hasOwnProperty('properties')).toBe(false);
-    });
-
-    it("considers custom css class", function() {
+    it("adds or removes custom css class", function() {
       formField.render(session.$entryPoint);
 
-      var event = createPropertyChangeEvent(formField, {cssClass: 'custom-class'});
-      formField.onModelPropertyChange(event);
+      formField.setCssClass('custom-class');
       expect(formField.$container).toHaveClass('custom-class');
 
-      event = createPropertyChangeEvent(formField, {cssClass: ''});
-      formField.onModelPropertyChange(event);
+      formField.setCssClass('');
       expect(formField.$container).not.toHaveClass('custom-class');
     });
-
   });
-
 });
