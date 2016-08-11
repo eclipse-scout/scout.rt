@@ -170,9 +170,8 @@ describe('ModelAdapter', function() {
 
   describe('init', function() {
 
-    it('copies properties to adapter and widget', function() {
+    it('copies properties to widget', function() {
       var widget = createWidget({foo: 6});
-      expect(widget.remoteAdapter.model.foo).toBe(6);
       expect(widget.foo).toBe(6);
     });
 

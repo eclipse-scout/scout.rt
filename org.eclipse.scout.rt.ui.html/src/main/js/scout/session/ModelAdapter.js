@@ -38,53 +38,52 @@ scout.ModelAdapter = function() {
 };
 
 // FIXME CGU [6.1] ev. renamen to RemoteAdapter
-scout.ModelAdapter.prototype.init = function(model) {
-  this._init(model);
+scout.ModelAdapter.prototype.init = function(id, session, owner) {
+  this._init(id, session, owner);
   this.initialized = true;
 };
 
 /**
- * @param model expects parent session to be set. Other options:
- *   when not set, the default-value is true. When working with local objects (see LocalObject.js) the register flag is set to false.
+ * @param model expects a plain-object with properties: id, session, owner
  */
 scout.ModelAdapter.prototype._init = function(model) {
-  this.id = model.id;
-  this.objectType = model.objectType;
-
+  if (!model.id) {
+    throw new Error('id required');
+  }
+  if (!model.session) {
+    throw new Error('session required');
+  }
   if (!model.owner) {
-    throw new Error('Owner expected: ' + this);
+    throw new Error('owner required');
   }
-  this.owner = model.owner;
-  this.session = model.session || this.owner.session;
-  if (!this.session) {
-    throw new Error('Session expected: ' + this);
-  }
-
+  $.extend(this, model);
   this.session.registerModelAdapter(this);
-
-  // Make a copy to prevent a modification of the given object
-  this.model = $.extend({}, model);
-
-  // Fill in the missing default values
-  scout.defaultValues.applyTo(this.model);
 };
 
-scout.ModelAdapter.prototype.getOrCreateWidget = function(parent) {
-  if (this.widget) {
-//    this.widget.setParent() // FIXME CGU anstatt re-link in session.js?
-    return this.widget;
-  }
-  this.model.parent = parent;
-  this.model.remoteAdapter = this;
-  this.widget = this._createWidget(this.model); // FIXME [awe] 6.1 - this.model delete nachdem widget existiert
-  if (this.widget) { // FIXME CGU null check wegnehmen, davon ausgehen dass alle ein widget haben
-    this._attachWidget();
-  }
+scout.ModelAdapter.prototype.createWidget = function(adapterData, parent) {
+  var model = this._prepareModel(adapterData, parent);
+  this.widget = this._createWidget(model);
+  this._attachWidget();
   return this.widget;
 };
 
+scout.ModelAdapter.prototype._prepareModel = function(adapterData, parent) {
+  // Make a copy to prevent a modification of the given adapterData
+  var model = $.extend({}, adapterData);
+
+  // Fill in the missing default values
+  scout.defaultValues.applyTo(model);
+
+  model.parent = parent;
+  model.remoteAdapter = this;
+  return model;
+};
+
+/**
+ * @returns A new widget instance. The default impl. uses calls scout.create() with property objectType from given model.
+ */
 scout.ModelAdapter.prototype._createWidget = function(model) {
-  return scout.create(this.objectType.replace('Adapter', ''), model);
+  return scout.create(model.objectType, model);
 };
 
 scout.ModelAdapter.prototype._attachWidget = function() {
@@ -206,18 +205,14 @@ scout.ModelAdapter.prototype.destroy = function() {
     ownedAdapter.destroy();
   });
 
-  if (this.widget) {
-    this._detachWidget();
-    this.widget.destroy();
-    this.widget = null;
-  }
+  this._detachWidget();
+  this.widget.destroy();
+  this.widget = null;
   this.session.unregisterModelAdapter(this);
 
   // Disconnect from owner
-  if (this.owner) {
-    this.owner.removeOwnedAdapter(this);
-    this.owner = null;
-  }
+  this.owner.removeOwnedAdapter(this);
+  this.owner = null;
 
   this.destroyed = true;
 };

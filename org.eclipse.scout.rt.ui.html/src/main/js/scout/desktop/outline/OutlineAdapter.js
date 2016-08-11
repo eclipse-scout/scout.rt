@@ -24,10 +24,10 @@ scout.OutlineAdapter.prototype._initPage = function(page, parentNode) {
     page.childNodes = [];
   }
   if (page.detailTable) {
-    page.detailTable = this.session.getOrCreateModelAdapter(page.detailTable, this);
+    page.detailTable = this.session.getOrCreateWidget(page.detailTable, this, this.widget);
   }
   if (page.detailForm) {
-    page.detailForm = this.session.getOrCreateModelAdapter(page.detailForm, this);
+    page.detailForm = this.session.getOrCreateWidget(page.detailForm, this, this.widget);
   }
 };
 

@@ -41,11 +41,8 @@ scout.DesktopAdapter.prototype._onFormActivate = function(event) {
     displayParent = this.session.getModelAdapter(event.displayParent);
 
   if (displayParent) {
-    form = this.session.getOrCreateModelAdapter(event.form, displayParent);
-    if (!form.widget) {
-      form.createWidget(this.widget);
-    }
-    this.widget.activateForm(form.widget, false);
+    form = this.session.getOrCreateWidget(event.form, displayParent, this.widghet);
+    this.widget.activateForm(form, false);
   }
 };
 
@@ -54,11 +51,8 @@ scout.DesktopAdapter.prototype._onMessageBoxShow = function(event) {
     displayParent = this.session.getModelAdapter(event.displayParent);
 
   if (displayParent) {
-    messageBox = this.session.getOrCreateModelAdapter(event.messageBox, displayParent);
-    if (!messageBox.widget) {
-      messageBox.createWidget(this.widget);
-    }
-    displayParent.widget.messageBoxController.registerAndRender(messageBox.widget);
+    messageBox = this.session.getOrCreateWidget(event.messageBox, displayParent, this.widget);
+    displayParent.widget.messageBoxController.registerAndRender(messageBox);
   }
 };
 
@@ -77,11 +71,8 @@ scout.DesktopAdapter.prototype._onFileChooserShow = function(event) {
     displayParent = this.session.getModelAdapter(event.displayParent);
 
   if (displayParent) {
-    fileChooser = this.session.getOrCreateModelAdapter(event.fileChooser, displayParent);
-    if (!fileChooser.widget) {
-      fileChooser.createWidget(this.widget);
-    }
-    displayParent.fileChooserController.registerAndRender(fileChooser.widget);
+    fileChooser = this.session.getOrCreateWidget(event.fileChooser, displayParent, this.widget);
+    displayParent.fileChooserController.registerAndRender(fileChooser);
   }
 };
 
@@ -122,15 +113,7 @@ scout.DesktopAdapter.prototype._onOpenUri = function(event) {
 };
 
 scout.DesktopAdapter.prototype._onOutlineChanged = function(event) {
-  var outline,
-    outlineAdapter = this.session.getOrCreateModelAdapter(event.outline, this);
-
-  if (outlineAdapter) {
-    if (!outlineAdapter.widget) {
-      outlineAdapter.createWidget(this.widget);
-    }
-    outline = outlineAdapter.widget;
-  }
+  var outline = this.session.getOrCreateWidget(event.outline, this, this.widget);
   this.widget.setOutline(outline);
 };
 

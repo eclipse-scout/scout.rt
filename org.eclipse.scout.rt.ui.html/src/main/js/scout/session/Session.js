@@ -123,39 +123,25 @@ scout.Session.prototype.getModelAdapter = function(id) {
   return this.modelAdapterRegistry[id];
 };
 
-/**
- * Creates a new adapter for the given ID or returns an existing instance.
- * When a new adapter is created it will be automatically registered in the
- * model-adpater registry.
- */
-scout.Session.prototype.getOrCreateModelAdapter = function(id, owner) {
-  $.log.trace('getOrCreate(' + id + (owner ? ', ' + owner : '') + ')');
-  if (!id) {
-    return;
+scout.Session.prototype.getOrCreateWidget = function(adapterId, owner, parent) {
+  if (!adapterId) {
+    return null;
   }
-  if (typeof id !== 'string') {
-    throw new Error('typeof id must be string');
+  if (typeof adapterId !== 'string') {
+    throw new Error('typeof adapterId must be string');
   }
-
-  var adapter = this.modelAdapterRegistry[id];
+  var adapter = this.getModelAdapter(adapterId);
   if (adapter) {
-    $.log.trace('model adapter already exists: ' + adapter + ' --> owner = ' + adapter.owner + ', parent = ' + adapter.parent + ', new parent = ' + owner);
-    if (!adapter.rendered) {
-      // Re-link
-      $.log.trace('unlink ' + adapter + ' from ' + adapter.parent + ' and link to new parent ' + owner);
-//      adapter.setParent(parent); // FIXME CGU [6.1] relinking widgets necessary?
-    } else {
-      $.log.trace('adapter ' + adapter + ' is already rendered. keeping link to parent ' + adapter.parent);
-    }
-    return adapter;
+    var widget = adapter.widget;
+    widget.setParent(parent);
+    return widget;
   }
-
-  var adapterData = this._getAdapterData(id);
+  var adapterData = this._getAdapterData(adapterId);
   if (!adapterData) {
-    throw new Error('no adapterData found for id=' + id);
+    throw new Error('no adapterData found for adapterId=' + adapterId);
   }
-
-  return this.createModelAdapter(adapterData, owner);
+  adapter = this.createModelAdapter(adapterData, owner);
+  return adapter.createWidget(adapterData, parent);
 };
 
 scout.Session.prototype.createModelAdapter = function(adapterData, owner) {
@@ -167,9 +153,6 @@ scout.Session.prototype.createModelAdapter = function(adapterData, owner) {
     throw new Error('owner must be defined');
   }
 
-  // override previously set owner/parent for adapter-data so
-  // we can access them in ModelAdapter#init()
-  adapterData.owner = owner;
   var objectType = adapterData.objectType;
   var objectTypeParts = objectType.split('.');
   if (objectTypeParts.length === 2) {
@@ -180,30 +163,16 @@ scout.Session.prototype.createModelAdapter = function(adapterData, owner) {
   } else {
     objectType = objectType + 'Adapter';
   }
-  var adapter = scout.create(objectType, adapterData);
+  var adapterModel = {
+    id: adapterData.id,
+    session: this,
+    owner: owner
+  };
+  var adapter = scout.create(objectType, adapterModel);
   $.log.trace('created new adapter ' + adapter + '. owner=' + owner);
 
   owner.addOwnedAdapter(adapter);
   return adapter;
-};
-
-scout.Session.prototype.getOrCreateModelAdapters = function(ids, owner) {
-  if (!ids) {
-    return [];
-  }
-  var adapters = [];
-  for (var i = 0; i < ids.length; i++) {
-    adapters[i] = this.getOrCreateModelAdapter(ids[i], owner);
-  }
-  return adapters;
-};
-
-scout.Session.prototype.getOrCreateWidget = function(adapterId, owner, parent) {
-  if (!adapterId) {
-    return null;
-  }
-  var adapter = this.getOrCreateModelAdapter(adapterId, owner);
-  return adapter.getOrCreateWidget(parent);
 };
 
 /**
@@ -1136,14 +1105,10 @@ scout.Session.prototype._processEvents = function(events) {
     if (!adapter) {
       throw new Error('No adapter registered for ID ' + event.target);
     }
-    eventTargets = [adapter];
-    for (j = 0; j < eventTargets.length; j++) {
-      var target = eventTargets[j];
-      if (event.type === 'property') { // Special handling for 'property' type
-        target.onModelPropertyChange(event);
-      } else {
-        target.onModelAction(event);
-      }
+    if (event.type === 'property') { // Special handling for 'property' type
+      adapter.onModelPropertyChange(event);
+    } else {
+      adapter.onModelAction(event);
     }
   }
   this.currentEvent = null;
