@@ -11,6 +11,9 @@
 scout.MenuBoxLayout = function(menuBox) {
   scout.MenuBoxLayout.parent.call(this);
   this.menuBox = menuBox;
+  // References to prevent too many DOM updates
+  this.firstMenu = null;
+  this.lastMenu = null;
 };
 scout.inherits(scout.MenuBoxLayout, scout.AbstractLayout);
 
@@ -18,22 +21,21 @@ scout.inherits(scout.MenuBoxLayout, scout.AbstractLayout);
  * @override AbstractLayout.js
  */
 scout.MenuBoxLayout.prototype.layout = function($container) {
-  this._layout($container);
-
-  this.visibleMenus().forEach(function(menu) {
-    // Make sure open popups are at the correct position after layouting
-    if (menu.popup) {
-      menu.popup.position();
-    }
-  });
-};
-
-scout.MenuBoxLayout.prototype._layout = function($container) {
   var htmlContainer = this.menuBox.htmlComp,
     containerSize = htmlContainer.getSize(),
     menus = this.visibleMenus(),
     menusWidth = 0;
 
+  // Make sure open popups are at the correct position after layouting
+  this.menuBox.session.layoutValidator.schedulePostValidateFunction(function() {
+    menus.forEach(function(menu) {
+      if (menu.popup) {
+        menu.popup.position();
+      }
+    });
+  });
+
+  this.updateFirstAndLastMenuMarker(menus);
   this.undoCollapse(menus);
   this.undoCompact(menus);
   this.undoShrink(menus);
@@ -68,6 +70,7 @@ scout.MenuBoxLayout.prototype._layout = function($container) {
 scout.MenuBoxLayout.prototype.preferredLayoutSize = function($container) {
   var menus = this.visibleMenus();
 
+  this.updateFirstAndLastMenuMarker(menus);
   this.undoCollapse(menus);
   this.undoCompact(menus);
   this.undoShrink(menus);
@@ -182,7 +185,8 @@ scout.MenuBoxLayout.prototype.undoShrinkMenus = function(menus) {
 
 scout.MenuBoxLayout.prototype.collapse = function(menus, containerSize, menusWidth) {
   this._createAndRenderEllipsis(this.menuBox.$container);
-  this._moveOverflowMenusIntoEllipsis(containerSize, menusWidth);
+  var collapsedMenus = this._moveOverflowMenusIntoEllipsis(containerSize, menusWidth);
+  this.updateFirstAndLastMenuMarker(collapsedMenus);
 };
 
 /**
@@ -213,9 +217,11 @@ scout.MenuBoxLayout.prototype._destroyEllipsis = function() {
 };
 
 /**
- * Moves every menu which doesn't fit into the container into the ellipsis menu
+ * Moves every menu which doesn't fit into the container into the ellipsis menu.
+ * Returns the list of "surviving" menus (with the ellipsis menu being the last element).
  */
 scout.MenuBoxLayout.prototype._moveOverflowMenusIntoEllipsis = function(containerSize, menusWidth) {
+  var collapsedMenus = [this._ellipsis];
   var ellipsisSize = scout.graphics.getSize(this._ellipsis.$container, true);
   menusWidth += ellipsisSize.width;
   this.visibleMenus().slice().reverse().forEach(function(menu) {
@@ -225,8 +231,11 @@ scout.MenuBoxLayout.prototype._moveOverflowMenusIntoEllipsis = function(containe
       menuSize = scout.graphics.getSize(menu.$container, true);
       menusWidth -= menuSize.width;
       scout.menus.moveMenuIntoEllipsis(menu, this._ellipsis);
+    } else {
+      collapsedMenus.unshift(menu); // add as first element
     }
   }, this);
+  return collapsedMenus;
 };
 
 scout.MenuBoxLayout.prototype._removeMenusFromEllipsis = function(menus) {
@@ -269,6 +278,7 @@ scout.MenuBoxLayout.prototype._menusWidth = function(menus) {
 scout.MenuBoxLayout.prototype.compactPrefSize = function(menus) {
   menus = menus || this.visibleMenus();
 
+  this.updateFirstAndLastMenuMarker(menus);
   this.undoCollapse(menus);
   this.undoShrink(menus);
   this.compact(menus);
@@ -279,6 +289,7 @@ scout.MenuBoxLayout.prototype.compactPrefSize = function(menus) {
 scout.MenuBoxLayout.prototype.shrinkPrefSize = function(menus) {
   menus = menus || this.visibleMenus();
 
+  this.updateFirstAndLastMenuMarker(menus);
   this.undoCollapse(menus);
   this.compact(menus);
   this.shrink(menus);
@@ -290,4 +301,39 @@ scout.MenuBoxLayout.prototype.visibleMenus = function() {
   return this.menuBox.menus.filter(function(menu) {
     return menu.visible;
   }, this);
+};
+
+scout.MenuBoxLayout.prototype.updateFirstAndLastMenuMarker = function(menus) {
+  // Find first and last rendered menu
+  var firstMenu = null;
+  var lastMenu = null;
+  (menus || []).forEach(function(menu) {
+    if (menu.rendered) {
+      if (!firstMenu) {
+        firstMenu = menu;
+      }
+      lastMenu = menu;
+    }
+  });
+
+  // Check if first or last menu has changed (prevents unnecessary DOM updates)
+  if (firstMenu !== this.firstMenu || lastMenu !== this.lastMenu) {
+    // Remove existing markers
+    if (this.firstMenu && this.firstMenu.rendered) {
+      this.firstMenu.$container.removeClass('first');
+    }
+    if (this.lastMenu && this.lastMenu.rendered) {
+      this.lastMenu.$container.removeClass('last');
+    }
+    // Remember found menus
+    this.firstMenu = firstMenu;
+    this.lastMenu = lastMenu;
+    // Add markers to found menus
+    if (this.firstMenu) {
+      this.firstMenu.$container.addClass('first');
+    }
+    if (this.lastMenu) {
+      this.lastMenu.$container.addClass('last');
+    }
+  }
 };

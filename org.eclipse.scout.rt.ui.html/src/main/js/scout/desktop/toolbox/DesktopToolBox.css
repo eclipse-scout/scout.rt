@@ -30,6 +30,10 @@
   margin-left: 20px;
   margin-right: 20px;
 
+  &.last {
+    margin-right: 0;
+  }
+
   &:hover {
     color: @hover-color;
 
@@ -58,6 +62,10 @@
   &.compact {
     margin-left: 10px;
     margin-right: 10px;
+
+    &.last {
+      margin-right: 0;
+    }
 
     & > .submenu-icon {
       display: none;

@@ -154,7 +154,7 @@ scout.menus = {
     menu.remove();
     menu.overflow = true;
     menu.overflowMenu = ellipsis;
-    ellipsis.childActions.push(menu);
+    ellipsis.childActions.unshift(menu); // add as first element
   },
 
   removeMenuFromEllipsis: function(menu, $parent) {
