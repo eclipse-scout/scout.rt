@@ -106,10 +106,12 @@ scout.KeyStrokeContext.prototype.registerKeyStroke = function(keyStroke) {
       this.keyStrokes.push(ks);
 
       // Registers a destroy listener, so that the keystroke is uninstalled once its field is destroyed.
-      if (ks.field) {
-        ks.field.one('destroy', function(event) {
+      if (ks.field && !ks.destroyListener) {
+        ks.destroyListener = function(event) {
           this.unregisterKeyStroke(ks);
-        }.bind(this));
+          ks.destroyListener = null;
+        }.bind(this);
+        ks.field.one('destroy', ks.destroyListener);
       }
     }, this);
 };
@@ -120,7 +122,10 @@ scout.KeyStrokeContext.prototype.registerKeyStroke = function(keyStroke) {
 scout.KeyStrokeContext.prototype.unregisterKeyStroke = function(keyStroke) {
   keyStroke = this._resolveKeyStroke(keyStroke);
 
-  scout.arrays.remove(this.keyStrokes, keyStroke);
+  if (scout.arrays.remove(this.keyStrokes, keyStroke) && keyStroke.field && keyStroke.destroyListener) {
+    keyStroke.field.off('destroy', keyStroke.destroyListener);
+    keyStroke.destroyListener = null;
+  }
 };
 
 scout.KeyStrokeContext.prototype._resolveKeyStroke = function(keyStroke) {
