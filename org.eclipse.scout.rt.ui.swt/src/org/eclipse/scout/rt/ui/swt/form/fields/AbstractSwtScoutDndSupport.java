@@ -251,6 +251,10 @@ public abstract class AbstractSwtScoutDndSupport implements ISwtScoutDndSupport 
 
     @Override
     public void dragSetData(DragSourceEvent event) {
+      if (event.data instanceof String && event.data == "") {
+        event.doit = false;
+        return;
+      }
       TransferObject scoutTransferObject = handleSwtDragRequest();
       if (scoutTransferObject == null) {
         return;
