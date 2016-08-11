@@ -14,9 +14,10 @@
   position: absolute;
   top: 0;
   white-space: nowrap;
+  padding-right: 20px;
 
   &.compact {
-    padding-right: 5px;
+    padding-right: 15px;
   }
 }
 
