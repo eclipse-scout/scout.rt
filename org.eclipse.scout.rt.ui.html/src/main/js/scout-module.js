@@ -77,7 +77,6 @@
   __include("scout/keystroke/KeyStrokeContext.js");
   __include("scout/keystroke/InputFieldKeyStrokeContext.js");
   __include("scout/keystroke/KeyStroke.js");
-  __include("scout/keystroke/KeyStrokeAdapter.js");
   __include("scout/keystroke/RangeKeyStroke.js");
   __include("scout/keystroke/ContextMenuKeyStroke.js");
   __include("scout/keystroke/MnemonicKeyStroke.js");

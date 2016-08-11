@@ -27,7 +27,14 @@ scout.RemoteApp.prototype._createSession = function($entryPoint, options) {
  * @override
  */
 scout.RemoteApp.prototype._init = function(options) {
+  scout.RemoteApp.modifyWidgetPrototype();
+  scout.RemoteApp.parent.prototype._init.call(this, options);
+};
 
+/**
+ * Static method to modify the prototype of scout.Widget.
+ */
+scout.RemoteApp.modifyWidgetPrototype = function() {
   scout.Widget.prototype.createFromProperty = function(propertyName, value) {
     // Was ist das für ein Fall? Manchmal existiert das Widget schon (Menu 133 BusinessForm MainBox)
     if (value instanceof scout.Widget) {
@@ -55,7 +62,4 @@ scout.RemoteApp.prototype._init = function(options) {
       return null;
     }
   };
-
-  scout.RemoteApp.parent.prototype._init.call(this, options);
 };
-

@@ -31,8 +31,7 @@ function sandboxSession(options) {
 
   // Since most of the tests are written to simulate RemoteApp behavior we must run
   // the RemoteApp#_init here. FIXME [awe, cgu] 6.1 - sollen wir hier besser eine JasmineApp machen?
-  var app = new scout.RemoteApp();
-  app._init({});
+  scout.RemoteApp.modifyWidgetPrototype();
 
   session = new scout.Session($sandbox, options);
   // Simulate successful session initialization

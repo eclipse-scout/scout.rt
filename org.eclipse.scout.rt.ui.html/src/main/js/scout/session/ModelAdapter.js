@@ -38,8 +38,8 @@ scout.ModelAdapter = function() {
 };
 
 // FIXME CGU [6.1] ev. renamen to RemoteAdapter
-scout.ModelAdapter.prototype.init = function(id, session, owner) {
-  this._init(id, session, owner);
+scout.ModelAdapter.prototype.init = function(model) {
+  this._init(model);
   this.initialized = true;
 };
 

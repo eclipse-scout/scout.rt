@@ -37,6 +37,8 @@ describe('Session', function() {
 
     it('sends multiple async events in one call', function() {
       var session = createSession();
+      // initially there should be no request at all
+      expect(jasmine.Ajax.requests.count()).toBe(0);
 
       send(session, 1, 'nodeClicked');
       expect(jasmine.Ajax.requests.count()).toBe(0);

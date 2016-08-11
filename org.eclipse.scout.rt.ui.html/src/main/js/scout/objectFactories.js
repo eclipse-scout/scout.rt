@@ -13,6 +13,9 @@ scout.objectFactories = {
     // A model keystroke is represented as an Action
     return new scout.Action();
   },
+  'KeyStrokeAdapter': function() {
+    return new scout.ActionAdapter();
+  },
   'ComposerField': function() {
     // Composer is just a tree field, there is currently no need to duplicate the JS/CSS code
     return new scout.TreeField();

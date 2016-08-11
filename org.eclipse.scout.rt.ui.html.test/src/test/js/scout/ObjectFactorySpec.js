@@ -14,6 +14,7 @@ describe('ObjectFactory', function() {
     setFixtures(sandbox());
     session = sandboxSession();
     session.locale = new scout.LocaleSpecHelper().createLocale(scout.LocaleSpecHelper.DEFAULT_LOCALE);
+    scout.objectFactory.init();
     // Needed because some model adapters make JSON calls during initialization (e.g. Calendar.js)
     jasmine.Ajax.install();
     jasmine.clock().install();
@@ -70,12 +71,15 @@ describe('ObjectFactory', function() {
       model.button = {
         on: function() {}
       };
-    }
-
-    if ('GroupBox' === objectType || 'TabItem' === objectType) {
+    } else if ('GroupBox' === objectType || 'TabItem' === objectType) {
       model.getForm = function() {
         return createSimpleModel('Form', session);
       };
+    }
+
+    // All *Adapters must have an owner. Hopefully they all end with 'Adapter'
+    if (scout.strings.endsWith(objectType, 'Adapter')) {
+      model.owner = '1';
     }
 
     return model;
@@ -87,12 +91,18 @@ describe('ObjectFactory', function() {
     var i, model, factory, object, modelAdapter, objectType;
     for (objectType in scout.objectFactories) {
       model = createModel(session, i, objectType);
-      object = scout.objectFactories[objectType](model);
+      object = scout.objectFactories[objectType]();
       object.init(model);
       session.registerModelAdapter(object);
       modelAdapter = session.getModelAdapter(model.id);
       expect(modelAdapter).toBe(object);
     }
+  });
+
+  it('scout.create works with KeyStroke', function() {
+    // when creating a KeyStroke via factory, scout.Action should be initialized.
+    var keyStroke = scout.create('KeyStroke', {parent: session.desktop});
+    expect(scout.Action.prototype.isPrototypeOf(keyStroke)).toBe(true);
   });
 
   it('puts the object type to the object after creation', function() {
