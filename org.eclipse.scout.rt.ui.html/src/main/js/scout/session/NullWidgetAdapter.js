@@ -8,14 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-scout.NullModelAdapter = function() {
-  scout.NullModelAdapter.parent.call(this);
-};
-scout.inherits(scout.NullModelAdapter, scout.ModelAdapter);
+scout.NullWidgetAdapter = function() {
+  scout.NullWidgetAdapter.parent.call(this);
 
-/**
- * @override ModelAdapter.js
- */
-scout.NullModelAdapter.prototype._createWidget = function(model) {
-  return scout.create('NullWidget', model);
+  this._addAdapterProperties(['childWidget']);
 };
+scout.inherits(scout.NullWidgetAdapter, scout.ModelAdapter);

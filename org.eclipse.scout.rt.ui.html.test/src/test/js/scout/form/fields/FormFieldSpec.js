@@ -27,8 +27,8 @@ describe("FormField", function() {
       formField.init(model);
     });
 
-    it("inherits from ModelAdapter", function() {
-      expect(scout.ModelAdapter.prototype.isPrototypeOf(formField)).toBe(true);
+    it("inherits from Widget", function() {
+      expect(scout.Widget.prototype.isPrototypeOf(formField)).toBe(true);
     });
 
   });

@@ -18,7 +18,7 @@ describe('Widget', function() {
     session.init();
 
     widget = new scout.NullWidget(),
-    parent = new scout.Widget();
+    parent = new scout.NullWidget();
   });
 
   describe('rendering', function() {
@@ -69,6 +69,45 @@ describe('Widget', function() {
       widget.remove();
       expect(widget.rendered).toBe(false);
       expect(widget.attached).toBe(false);
+    });
+
+  });
+
+  describe('_firePropertyChange', function() {
+
+    var propertyChangeEvent, widget;
+
+    beforeEach(function() {
+      widget = new scout.NullWidget();
+    });
+
+    function firePropertyChange(oldValue, newValue) {
+      widget.on('propertyChange', function(event) {
+        propertyChangeEvent = event;
+      });
+      widget._firePropertyChange('selected', oldValue, newValue);
+    }
+
+    it('fires the expected event object', function() {
+      firePropertyChange(false, true);
+
+      expect(scout.objects.countOwnProperties(propertyChangeEvent.oldProperties)).toBe(1);
+      expect(scout.objects.countOwnProperties(propertyChangeEvent.newProperties)).toBe(1);
+      expect(propertyChangeEvent.changedProperties.length).toBe(1);
+
+      expect(propertyChangeEvent.oldProperties.selected).toBe(false);
+      expect(propertyChangeEvent.newProperties.selected).toBe(true);
+      expect(propertyChangeEvent.changedProperties[0]).toBe('selected');
+    });
+
+    // TODO [awe] 6.1: discuss with B.SH - when a property has _not_ changed, should it be
+    // fired as new/old property anyway? When no property has changed, should the propertyChange
+    // event be fired anyway?
+    it('changedProperties is only set when new and old value are not equals', function() {
+      firePropertyChange(true, true);
+      expect(scout.objects.countOwnProperties(propertyChangeEvent.oldProperties)).toBe(1);
+      expect(scout.objects.countOwnProperties(propertyChangeEvent.newProperties)).toBe(1);
+      expect(propertyChangeEvent.changedProperties.length).toBe(0);
     });
 
   });

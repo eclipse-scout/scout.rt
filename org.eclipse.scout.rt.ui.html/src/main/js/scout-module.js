@@ -51,7 +51,7 @@
   __include("scout/session/Event.js");
   __include("scout/session/Locale.js");
   __include("scout/session/ModelAdapter.js");
-  __include("scout/session/NullModelAdapter.js");
+  __include("scout/session/NullWidgetAdapter.js");
   __include("scout/session/Reconnector.js");
   __include("scout/session/ResponseQueue.js");
   __include("scout/session/Session.js");

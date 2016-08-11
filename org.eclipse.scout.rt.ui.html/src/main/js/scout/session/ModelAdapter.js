@@ -28,7 +28,7 @@ scout.ModelAdapter = function() {
   // Adapter structure
   this.owner;
   this.ownedAdapters = [];
-  this._adapterProperties = [];
+  this._adapterProperties = []; // FIXME [awe, cgu] 6.1 - hier löschen (nur noch auf Widget.js)
 
   /**
    * Widget properties which should be sent to server on property change.
@@ -76,7 +76,7 @@ scout.ModelAdapter.prototype.getOrCreateWidget = function(parent) {
   }
   this.model.parent = parent;
   this.model.remoteAdapter = this;
-  this.widget = this._createWidget(this.model);
+  this.widget = this._createWidget(this.model); // FIXME [awe] 6.1 - this.model delete nachdem widget existiert
   if (this.widget) { // FIXME CGU null check wegnehmen, davon ausgehen dass alle ein widget haben
     this._attachWidget();
   }
@@ -241,7 +241,7 @@ scout.ModelAdapter.prototype._eachProperty = function(model, func) {
 
   // Loop through primitive properties
   for (propertyName in model) {
-    if (this._adapterProperties.indexOf(propertyName) > -1) {
+    if (this._isAdapterProperty(propertyName)) {
       continue; // will be handled below
     }
     value = model[propertyName];

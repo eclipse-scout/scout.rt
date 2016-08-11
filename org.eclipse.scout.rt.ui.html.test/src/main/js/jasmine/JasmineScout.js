@@ -70,7 +70,6 @@ function createSimpleModel(objectType, session, id) {
   return {
     id: id,
     objectType: objectType,
-    owner: new scout.NullModelAdapter(),
     parent: new scout.NullWidget(),
     session: session
   };
