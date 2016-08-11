@@ -183,8 +183,6 @@ scout.MenuBar.prototype._updateItems = function() {
   this._removeMenuItems();
 
   this.visibleMenuItems = this.menuItems;
-  this._lastVisibleItemLeft = null;
-  this._lastVisibleItemRight = null;
 
   // Make sure menubar is visible before the items get rendered
   // especially important for menu items with open popups to position them correctly
@@ -193,10 +191,7 @@ scout.MenuBar.prototype._updateItems = function() {
   this._renderMenuItems(this._orderedMenuItems.left, false);
   this._renderMenuItems(this._orderedMenuItems.right, true);
   this.updateDefaultMenu();
-  var lastVisibleItem = this._lastVisibleItemRight || this._lastVisibleItemLeft;
-  if (lastVisibleItem) {
-    lastVisibleItem.$container.addClass('last');
-  }
+  this.updateLastItemMarker();
 
   // Make first valid MenuItem tabbable so that it can be focused. All other items
   // are not tabbable. But they can be selected with the arrow keys.
@@ -224,24 +219,29 @@ scout.MenuBar.prototype.setTabbableMenu = function(menu) {
 };
 
 /**
- * Ensures that the last visible right-aligned item has the class 'last' (to remove the margin-right).
- * Call this method whenever the visibility of single items change. The 'last' class is assigned
- * initially in _renderMenuItems().
+ * Ensures that the last visible menu item (no matter if it is in the left or the right menu box)
+ * has the class 'last' (to remove the margin-right). Call this method whenever the visibility of
+ * single items change.
  */
 scout.MenuBar.prototype.updateLastItemMarker = function() {
-  // Remove the last class from all items
-  this.$container.children('.last').removeClass('last');
-  // Find last visible right aligned menu item
-  var lastMenuItem;
-  for (var i = 0; i < this.visibleMenuItems.length; i++) {
-    var menuItem = this.visibleMenuItems[i];
-    if (menuItem.rightAligned) {
-      lastMenuItem = menuItem;
-    }
+  // Remove the 'last' class from the current last visible item
+  if (this._lastVisibleItem && this._lastVisibleItem.rendered) {
+    this._lastVisibleItem.$container.removeClass('last');
   }
+  this._lastVisibleItem = null;
+
+  // Find the new last visible item (from left to right)
+  var setLastVisibleItemFn = function(item) {
+    if (item.visible) {
+      this._lastVisibleItem = item;
+    }
+  }.bind(this);
+  this._orderedMenuItems.left.forEach(setLastVisibleItemFn);
+  this._orderedMenuItems.right.forEach(setLastVisibleItemFn);
+
   // Assign the class to the found item
-  if (lastMenuItem) {
-    lastMenuItem.$container.addClass('last');
+  if (this._lastVisibleItem && this._lastVisibleItem.rendered) {
+    this._lastVisibleItem.$container.addClass('last');
   }
 };
 
@@ -322,13 +322,6 @@ scout.MenuBar.prototype._renderMenuItems = function(menuItems, right) {
     if (right) {
       // Mark as right-aligned
       item.rightAligned = true;
-      if (item.visible) {
-        this._lastVisibleItemRight = item;
-      }
-    } else {
-      if (item.visible) {
-        this._lastVisibleItemLeft = item;
-      }
     }
 
     // Attach a propertyChange listener to the item, so the menubar can be updated when one of

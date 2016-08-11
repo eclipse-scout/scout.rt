@@ -11,6 +11,7 @@
 scout.LayoutValidator = function() {
   this._invalidComponents = [];
   this._validateTimeoutId = null;
+  this._postValidateFunctions = [];
 };
 
 scout.LayoutValidator.prototype.invalidateTree = function(htmlComp) {
@@ -74,6 +75,10 @@ scout.LayoutValidator.prototype.validate = function() {
       scout.arrays.remove(this._invalidComponents, comp);
     }
   }, this);
+  this._postValidateFunctions.slice().forEach(function(func) {
+    func();
+    scout.arrays.remove(this._postValidateFunctions, func);
+  }, this);
 };
 
 /**
@@ -86,4 +91,13 @@ scout.LayoutValidator.prototype.cleanupInvalidComponents = function($parentConta
       scout.arrays.remove(this._invalidComponents, comp);
     }
   }, this);
+};
+
+/**
+ * Runs the given function at the end of validate().
+ */
+scout.LayoutValidator.prototype.schedulePostValidateFunction = function(func) {
+  if (func) {
+    this._postValidateFunctions.push(func);
+  }
 };
