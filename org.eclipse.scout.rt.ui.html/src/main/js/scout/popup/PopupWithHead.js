@@ -184,7 +184,7 @@ scout.PopupWithHead.prototype._position = function($container, switchIfNecessary
 };
 
 scout.PopupWithHead.prototype._positionImpl = function(openingDirectionX, openingDirectionY) {
-  var pos, headSize, bodySize, bodyWidth, widthDiff, subPixelCorr, $blueprintChildren, left, top, headInsets, menuInsets,
+  var pos, headSize, bodySize, bodyWidth, widthDiff, $blueprintChildren, left, top, headInsets, menuInsets,
     bodyTop = 0,
     headTop = 0,
     decoTop = 0;
@@ -239,15 +239,12 @@ scout.PopupWithHead.prototype._positionImpl = function(openingDirectionX, openin
   this.$deco.cssTop(decoTop);
 
   if (openingDirectionX === 'left') {
-    // when we use float:right, browser uses fractions of pixels, that's why we must
-    // use the subPixelCorr variable. It corrects some visual pixel-shifting issues.
     widthDiff = bodyWidth - headSize.width;
-    subPixelCorr = left - Math.floor(left);
     left -= widthDiff + headInsets.left - menuInsets.left;
     this.$head.cssLeft(widthDiff);
-    this.$body.cssLeft(subPixelCorr);
+    this.$body.cssLeft(0);
     this.$deco.cssLeft(widthDiff + this.$head.cssBorderLeftWidth())
-      .width(headSize.width - this.$head.cssBorderWidthX() + subPixelCorr);
+      .width(headSize.width - this.$head.cssBorderWidthX());
   } else {
     left = left - headInsets.left + menuInsets.left;
     this.$head.cssLeft(0);
