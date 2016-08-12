@@ -96,19 +96,39 @@ scout.ModelAdapter.prototype._init = function(model) {
  *
  * @param type of event
  * @param data of event
- * @param delay (optional) delay before event is sent. default 0
- * @param coalesceFunc (optional) coalesce function added to event-object
- * @param noBusyIndicator (optional) mark the event as non ui blocking event
+ * @param options (optional) options according to the following table:
+ *
+ * Option name         Default value   Description
+ * -----------------------------------------------------------------------------------------
+ * delay               0               Delay in milliseconds before the event is sent.
+ *
+ * coalesce            undefined       Coalesce function added to event-object.
+ *
+ * showBusyIndicator   true            Whether sending the event should block the UI
+ *                                     after a certain delay
  */
-scout.ModelAdapter.prototype._send = function(type, data, delay, coalesceFunc, noBusyIndicator) {
+scout.ModelAdapter.prototype._send = function(type, data, options) {
+  // Legacy fallback with all options as arguments
+  var opts = {};
+  if (arguments.length > 2) {
+    if (options !== null && typeof options === 'object') {
+      opts = options;
+    } else {
+      opts.delay = arguments[2];
+      opts.coalesce = arguments[3];
+      opts.showBusyIndicator = arguments[4];
+    }
+  }
+  options = opts;
+  // (End legacy fallback)
+
   // If adapter is a clone, get original adapter and get its id
   var adapter = this.original();
   var event = new scout.Event(adapter.id, type, data);
-  if (coalesceFunc) {
-    event.coalesce = coalesceFunc;
-  }
-  event.noBusyIndicator = noBusyIndicator;
-  adapter.remoteHandler(event, delay);
+  // The following properties will not be sent to the server, see Session._requestToJson().
+  event.coalesce = options.coalesce;
+  event.showBusyIndicator = scout.nvl(options.showBusyIndicator, true);
+  adapter.remoteHandler(event, options.delay);
 };
 
 /**
