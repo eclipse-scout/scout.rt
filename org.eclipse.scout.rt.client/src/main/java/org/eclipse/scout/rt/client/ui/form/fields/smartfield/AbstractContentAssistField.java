@@ -1132,7 +1132,7 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
     return futureResult;
   }
 
-  private ILookupCall<LOOKUP_KEY> cloneLookupCall() {
+  protected ILookupCall<LOOKUP_KEY> cloneLookupCall() {
     return BEANS.get(ILookupCallProvisioningService.class).newClonedInstance(getLookupCall(), new FormFieldProvisioningContext(AbstractContentAssistField.this));
   }
 
