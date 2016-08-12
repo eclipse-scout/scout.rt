@@ -329,6 +329,7 @@ scout.Desktop.prototype._renderSplitter = function() {
   this.splitter.$container.insertBefore(this.$overlaySeparator);
   this.splitter.on('move', this._onSplitterMove.bind(this));
   this.splitter.on('moveEnd', this._onSplitterMoveEnd.bind(this));
+  this.splitter.on('positionChanged', this._onSplitterPositionChanged.bind(this));
   this.updateSplitterPosition();
 };
 
@@ -810,8 +811,11 @@ scout.Desktop.prototype._onSplitterMove = function(event) {
   this.resizing = true;
   var max = Math.floor(this.$container.outerWidth(true) / 2);
   if (event.position > max) {
-    event.position = max;
+    event.setPosition(max);
   }
+};
+
+scout.Desktop.prototype._onSplitterPositionChanged = function(event) {
   this.revalidateLayout();
 };
 
