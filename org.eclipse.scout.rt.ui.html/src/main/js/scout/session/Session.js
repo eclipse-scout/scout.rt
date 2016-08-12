@@ -344,7 +344,8 @@ scout.Session.prototype._processStartupResponse = function(data) {
 scout.Session.prototype._sendUnloadRequest = function() {
   var request = {
     uiSessionId: this.uiSessionId,
-    unload: true
+    unload: true,
+    showBusyIndicator: false
   };
   // Send request
   this._sendRequest(request);
@@ -359,12 +360,10 @@ scout.Session.prototype._sendNow = function() {
     uiSessionId: this.uiSessionId,
     events: this._asyncEvents
   };
-  if (request.events) {
-    request.noBusyIndicator = true;
-    request.noBusyIndicator = !request.events.some(function(event) {
-      return !event.noBusyIndicator;
-    });
-  }
+  // Busy indicator required when at least one event requests it
+  request.showBusyIndicator = request.events.some(function(event) {
+    return event.showBusyIndicator;
+  });
   this.responseQueue.prepareRequest(request);
   // Send request
   this._sendRequest(request);
@@ -399,7 +398,7 @@ scout.Session.prototype._sendRequest = function(request) {
     // - http://stackoverflow.com/questions/15479103/can-beforeunload-unload-be-used-to-send-xmlhttprequests-reliably
     // - https://groups.google.com/a/chromium.org/forum/#!topic/blink-dev/7nKMdg_ALcc
     // - https://developer.mozilla.org/en-US/docs/Web/API/Navigator/sendBeacon
-    var msg = new Blob([JSON.stringify(request)], {
+    var msg = new Blob([this._requestToJson(request)], {
       type: 'application/json; charset=UTF-8'
     });
     navigator.sendBeacon(this._decorateUrl(this.url, request), msg);
@@ -408,13 +407,9 @@ scout.Session.prototype._sendRequest = function(request) {
 
   var ajaxOptions = this.defaultAjaxOptions(request);
 
-  var busyHandling = true;
-  if (request.noBusyIndicator) {
-    busyHandling = false;
-  }
+  var busyHandling = scout.nvl(request.showBusyIndicator, true);
   if (request.unload) {
     ajaxOptions.async = false;
-    busyHandling = false;
   }
   this._performUserAjaxRequest(ajaxOptions, busyHandling, request);
 };
@@ -456,7 +451,7 @@ scout.Session.prototype.defaultAjaxOptions = function(request) {
     contentType: 'application/json; charset=UTF-8',
     cache: false,
     url: url,
-    data: JSON.stringify(request)
+    data: this._requestToJson(request)
   };
 
   // Ensure that certain request don't run forever. When a timeout occurs, the session
@@ -494,6 +489,17 @@ scout.Session.prototype._decorateUrl = function(url, request) {
     url = new scout.URL(url).addParameter(urlHint).toString();
   }
   return url;
+};
+
+scout.Session.prototype._requestToJson = function(request) {
+  return JSON.stringify(request, function(key, value) {
+    // Replacer function that filter certain properties from the resulting JSON string.
+    // See https://developer.mozilla.org/de/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify
+    var ignore =
+      (this === request && key === 'showBusyIndicator') ||
+      (this instanceof scout.Event && scout.isOneOf(key, 'showBusyIndicator', 'coalesce'));
+    return (ignore ? undefined : value);
+  });
 };
 
 scout.Session.prototype._performUserAjaxRequest = function(ajaxOptions, busyHandling, request) {
@@ -732,7 +738,7 @@ scout.Session.prototype._processErrorResponse = function(jqXHR, textStatus, erro
   // Status code = 0 -> no connection
   // Status code >= 12000 come from windows, see http://msdn.microsoft.com/en-us/library/aa383770%28VS.85%29.aspx. Not sure if it is necessary for IE >= 9.
   var offline = (!jqXHR.status || jqXHR.status >= 12000);
-  if (offline){
+  if (offline) {
     if (this.ready) {
       this.goOffline();
       if (!this._queuedRequest && request && !request.pollForBackgroundJobs) {
@@ -986,8 +992,8 @@ scout.Session.prototype.areEventsQueued = function() {
 };
 
 scout.Session.prototype.areBusyIndicatedEventsQueued = function() {
-  return this._asyncEvents.some(function(event){
-    return !event.noBusyIndicator;
+  return this._asyncEvents.some(function(event) {
+    return event.showBusyIndicator;
   });
 };
 

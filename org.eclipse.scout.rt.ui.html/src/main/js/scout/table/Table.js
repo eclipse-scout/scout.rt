@@ -1513,8 +1513,11 @@ scout.Table.prototype._sendRowsSelected = function(rowIds, debounceSend) {
 
   // send delayed to avoid a lot of requests while selecting
   // coalesce: only send the latest selection changed event for a field
-  this._send('rowsSelected', eventData, debounceSend ? 250 : 0, function(previous) {
-    return this.id === previous.id && this.type === previous.type;
+  this._send('rowsSelected', eventData, {
+    delay: debounceSend ? 250 : 0,
+    coalesce: function(previous) {
+      return this.id === previous.id && this.type === previous.type;
+    }
   });
 };
 
@@ -1528,9 +1531,13 @@ scout.Table.prototype._sendRowsFiltered = function(rowIds) {
 
   // send with timeout, mainly for incremental load of a large table
   // coalesce: only send last event (don't coalesce remove and 'add' events, the UI server needs both)
-  this._send('rowsFiltered', eventData, 250, function(previous) {
-    return this.id === previous.id && this.type === previous.type && this.remove === previous.remove;
-  }, true);
+  this._send('rowsFiltered', eventData, {
+    delay: 250,
+    coalesce: function(previous) {
+      return this.id === previous.id && this.type === previous.type && this.remove === previous.remove;
+    },
+    showBusyIndicator: false
+  });
 };
 
 scout.Table.prototype._sendRowAction = function(row, column) {
@@ -2817,9 +2824,13 @@ scout.Table.prototype._sendColumnResized = function(column) {
 
   // send delayed to avoid a lot of requests while resizing
   // coalesce: only send the latest resize event for a column
-  this._send('columnResized', eventData, 750, function(previous) {
-    return this.id === previous.id && this.type === previous.type && this.columnId === previous.columnId;
-  }, true);
+  this._send('columnResized', eventData, {
+    delay: 750,
+    coalesce: function(previous) {
+      return this.id === previous.id && this.type === previous.type && this.columnId === previous.columnId;
+    },
+    showBusyIndicator: false
+  });
 };
 
 scout.Table.prototype._sendColumnMoved = function(column, index) {

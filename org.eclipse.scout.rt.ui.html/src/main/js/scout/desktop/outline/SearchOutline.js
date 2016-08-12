@@ -110,10 +110,9 @@ scout.SearchOutline.prototype._renderRequestFocusQueryField = function() {
 scout.SearchOutline.prototype._sendSearch = function() {
   this._send('search', {
     query: scout.nvl(this.searchQuery, '')
-  },
-  null,
-  null,
-  true);
+  }, {
+    showBusyIndicator: false
+  });
 };
 
 scout.SearchOutline.prototype._onQueryFieldInput = function(event) {
@@ -134,7 +133,7 @@ scout.SearchOutline.prototype._onQueryFieldKeyPress = function(event) {
 };
 
 scout.SearchOutline.prototype._setSearchQuery = function(searchQuery) {
-    this.searchQuery = searchQuery;
+  this.searchQuery = searchQuery;
 };
 
 /**

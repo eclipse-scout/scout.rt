@@ -773,8 +773,10 @@ scout.Desktop.prototype._sendFormActivated = function(form) {
     formId: form ? form.id : null
   };
 
-  this._send('formActivated', eventData, 0, function(previous) {
-    return this.type === previous.type;
+  this._send('formActivated', eventData, {
+    coalesce: function(previous) {
+      return this.type === previous.type;
+    }
   });
 };
 
