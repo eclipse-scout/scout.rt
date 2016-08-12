@@ -321,10 +321,9 @@ scout.SmartField.prototype._proposalTyped = function() {
     $.log.debug('(SmartField#_proposalTyped) send searchText=' + searchText);
     this._send('proposalTyped', {
       searchText: searchText
-    },
-    null,
-    null,
-    true);
+    }, {
+      showBusyIndicator: false
+    });
   }.bind(this);
   id = setTimeout(func, this.DEBOUNCE_DELAY);
   this._pendingProposalTyped = {func: func, id: id};

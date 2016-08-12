@@ -914,8 +914,11 @@ scout.Tree.prototype.selectNodes = function(nodes, notifyServer, debounceSend) {
 
     // send delayed to avoid a lot of requests while selecting
     // coalesce: only send the latest selection changed event for a field
-    this._send('nodesSelected', eventData, debounceSend ? 250 : 0, function(previous) {
-      return this.id === previous.id && this.type === previous.type;
+    this._send('nodesSelected', eventData, {
+      delay: (debounceSend ? 250 : 0),
+      coalesce: function(previous) {
+        return this.id === previous.id && this.type === previous.type;
+      }
     });
   }
 

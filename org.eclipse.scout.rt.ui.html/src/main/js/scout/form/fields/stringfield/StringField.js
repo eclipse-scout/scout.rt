@@ -320,8 +320,11 @@ scout.StringField.prototype._sendSelectionChanged = function() {
 
   // send delayed to avoid a lot of requests while selecting
   // coalesce: only send the latest selection changed event for a field
-  this._send('selectionChanged', eventData, 500, function(previous) {
-    return this.id === previous.id && this.type === previous.type;
+  this._send('selectionChanged', eventData, {
+    delay: 500,
+    coalesce: function(previous) {
+      return this.id === previous.id && this.type === previous.type;
+    }
   });
 };
 
