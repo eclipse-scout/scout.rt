@@ -15,88 +15,58 @@ describe('TabItem', function() {
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
-    helper = new scout.FormSpecHelper(session);
+    helper = new scout.TabBoxSpecHelper(session);
   });
 
-  function createTabBox(tabItems) {
-    var model = helper.createFieldModel('TabBox');
-
-    // Form is necessary to make keystrokes work
-    var form = helper.createFormWithOneField();
-    form.render(session.$entryPoint);
-
-    model.tabItems = [];
-    for (var i=0; i < tabItems.length; i++) {
-      model.tabItems.push(tabItems[i].id);
-    }
-    model.selectedTab = 0;
-    model.owner = form.id;
-    model.parent = form;
-    return createAdapter(model, session, tabItems);
-  }
-
   describe('_renderStatusVisible', function() {
-    var field;
+    var tabBox;
 
     beforeEach(function() {
-      var groupBox = helper.createFieldModel('TabItem');
-      groupBox.label = 'Foo';
-      field = createTabBox([groupBox]);
+      var tabItem = helper.createTabItem({label: 'Foo'});
+      tabBox = helper.createTabBox([tabItem]);
     });
 
     it('invalidates tabarea if status visibility changes', function() {
-      field.render(session.$entryPoint);
-      field.validateLayout();
-      expect(scout.HtmlComponent.get(field._$tabArea).valid).toBe(true);
-      expect(field.tabItems[0]._computeStatusVisible()).toBe(false);
+      tabBox.render(session.$entryPoint);
+      tabBox.validateLayout();
+      expect(scout.HtmlComponent.get(tabBox._$tabArea).valid).toBe(true);
+      expect(tabBox.tabItems[0]._computeStatusVisible()).toBe(false);
 
       // TabArea needs to be invalidated, it may necessary to show ellipsis now because status got visible
-      field.tabItems[0].setTooltipText('test');
-      expect(field.tabItems[0]._computeStatusVisible()).toBe(true);
-      expect(scout.HtmlComponent.get(field._$tabArea).valid).toBe(false);
+      tabBox.tabItems[0].setTooltipText('test');
+      expect(tabBox.tabItems[0]._computeStatusVisible()).toBe(true);
+      expect(scout.HtmlComponent.get(tabBox._$tabArea).valid).toBe(false);
     });
 
   });
 
   describe('_renderCssClass', function() {
-    var groupBox;
+    var tabItem;
 
     beforeEach(function() {
-      groupBox = helper.createFieldModel('TabItem');
-      groupBox.cssClass = 'foo1';
-      var field = createTabBox([groupBox]);
-      field.render(session.$entryPoint);
-      groupBox = field.tabItems[0];
+      tabItem = helper.createTabItem({cssClass: 'foo1'});
+      var tabBox = helper.createTabBox([tabItem]);
+      tabBox.render(session.$entryPoint);
     });
 
     it('adds CSS class to both, TabItem and GroupBox', function() {
       // Test initial CSS class
-      expect(groupBox.$tabContainer.hasClass('foo1')).toBe(true);
-      expect(groupBox.$container.hasClass('foo1')).toBe(true);
+      expect(tabItem.$tabContainer.hasClass('foo1')).toBe(true);
+      expect(tabItem.$container.hasClass('foo1')).toBe(true);
 
       // Test adding a CSS class
-      groupBox.onModelPropertyChange({
-        type:'property',
-        properties: {
-          cssClass: 'foo2'
-        }
-      });
-      expect(groupBox.$tabContainer.hasClass('foo1')).toBe(false);
-      expect(groupBox.$container.hasClass('foo1')).toBe(false);
-      expect(groupBox.$tabContainer.hasClass('foo2')).toBe(true);
-      expect(groupBox.$container.hasClass('foo2')).toBe(true);
+      tabItem.setProperty('cssClass', 'foo2');
+      expect(tabItem.$tabContainer.hasClass('foo1')).toBe(false);
+      expect(tabItem.$container.hasClass('foo1')).toBe(false);
+      expect(tabItem.$tabContainer.hasClass('foo2')).toBe(true);
+      expect(tabItem.$container.hasClass('foo2')).toBe(true);
 
       // Test adding another CSS class
-      groupBox.onModelPropertyChange({
-        type:'property',
-        properties: {
-          cssClass: 'foo3'
-        }
-      });
-      expect(groupBox.$tabContainer.hasClass('foo2')).toBe(false);
-      expect(groupBox.$container.hasClass('foo2')).toBe(false);
-      expect(groupBox.$tabContainer.hasClass('foo3')).toBe(true);
-      expect(groupBox.$container.hasClass('foo3')).toBe(true);
+      tabItem.setProperty('cssClass', 'foo3');
+      expect(tabItem.$tabContainer.hasClass('foo2')).toBe(false);
+      expect(tabItem.$container.hasClass('foo2')).toBe(false);
+      expect(tabItem.$tabContainer.hasClass('foo3')).toBe(true);
+      expect(tabItem.$container.hasClass('foo3')).toBe(true);
     });
   });
 });

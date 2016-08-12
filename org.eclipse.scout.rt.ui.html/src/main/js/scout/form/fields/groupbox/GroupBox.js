@@ -35,7 +35,7 @@ scout.inherits(scout.GroupBox, scout.CompositeField);
 
 scout.GroupBox.prototype._init = function(model) {
   scout.GroupBox.parent.prototype._init.call(this, model);
-  this._prepareFields();
+  this.setFields(this.fields);
   this.menuBar = scout.create('MenuBar', {
     parent: this,
     menuOrder: new scout.GroupBoxMenuItemsOrder()
@@ -44,6 +44,16 @@ scout.GroupBox.prototype._init = function(model) {
     this.menuBar.large();
   }
   this._updateMenuBar();
+};
+
+// FIXME [awe] discuss with C.GU... is this correct?
+scout.GroupBox.prototype.setFields = function(fields) {
+  this.setProperty('fields', fields);
+};
+
+scout.GroupBox.prototype._syncFields = function(fields) {
+  this.fields = fields;
+  this._prepareFields();
 };
 
 /**

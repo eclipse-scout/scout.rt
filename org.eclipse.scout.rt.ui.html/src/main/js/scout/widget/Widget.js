@@ -625,7 +625,7 @@ scout.Widget.prototype.setProperty = function(name, value) {
     return;
   }
 
-  if (this._isAdapterProperty(name)) { // FIXME durch propertyConfig ersetzen
+  if (this._isAdapterProperty(name)) { // FIXME [6.1] CGU, AWE durch propertyConfig ersetzen
     value = this._ensureType(name, value);
   }
 

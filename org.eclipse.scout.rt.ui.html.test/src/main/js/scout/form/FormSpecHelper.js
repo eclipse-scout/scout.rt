@@ -12,12 +12,14 @@ scout.FormSpecHelper = function(session) {
   this.session = session;
 };
 
+// FIXME [awe] 6.1 jasmine - DEPRECATED, remove method -> use *2 and rename
 scout.FormSpecHelper.prototype.createViewWithOneField = function(parentId) {
   var form = this.createFormWithOneField(parentId);
   form.displayHint = scout.Form.DisplayHint.VIEW;
   return form;
 };
 
+// FIXME [awe] 6.1 jasmine - DEPRECATED, remove method -> use *2 and rename
 scout.FormSpecHelper.prototype.createFormWithOneField = function(parentId) {
   var form = this.createFormModel();
   var rootGroupBox = this.createGroupBoxModel();
@@ -30,6 +32,7 @@ scout.FormSpecHelper.prototype.createFormWithOneField = function(parentId) {
   return scout.create(form);
 };
 
+// FIXME [awe] 6.1 jasmine - DEPRECATED, remove method -> use *2 and rename
 scout.FormSpecHelper.prototype.createGroupBoxWithOneField = function(parentId) {
   var groupBox = this.createGroupBoxModel();
   var field = this.createFieldModel('StringField');
@@ -40,6 +43,45 @@ scout.FormSpecHelper.prototype.createGroupBoxWithOneField = function(parentId) {
   return createAdapter(groupBox, this.session, [field]);
 };
 
+scout.FormSpecHelper.prototype.createFormWithOneField2 = function(parent) {
+  parent = scout.nvl(parent, this.session.desktop);
+  var form = scout.create('Form', {parent: parent});
+  var rootGroupBox = this.createGroupBoxWithFields(form, true, 1);
+  form.rootGroupBox = rootGroupBox;
+  return form;
+};
+
+scout.FormSpecHelper.prototype.createGroupBoxWithOneField2 = function(parent, mainBox, numFields) {
+  return this.createGroupBoxWithFields(parent, false, 1);
+};
+
+scout.FormSpecHelper.prototype.createGroupBoxWithFields = function(parent, mainBox, numFields) {
+  parent = scout.nvl(parent, this.session.desktop);
+  mainBox = scout.nvl(mainBox, false);
+  numFields = scout.nvl(numFields, 1);
+  var
+    fields = [],
+    groupBox = scout.create('GroupBox', {
+    parent: parent,
+    mainBox: scout.nvl(mainBox, false)});
+  for (var i = 0; i < numFields; i++) {
+    fields.push(scout.create('StringField', {parent: groupBox}));
+  }
+  groupBox.setFields(fields);
+  return groupBox;
+};
+
+scout.FormSpecHelper.prototype.createFormWithFields = function(parent, isModal, numFields) {
+  parent = scout.nvl(parent, this.session.desktop);
+  var form = scout.create('Form', {
+    parent: parent,
+    displayHint: isModal ? 'dialog' : 'view'});
+  var rootGroupBox = this.createGroupBoxWithFields(form, true, numFields);
+  form.setRootGroupBox(rootGroupBox);
+  return form;
+};
+
+// FIXME [awe] 6.1 jasmine - DEPRECATED, remove method
 scout.FormSpecHelper.prototype.createFormModel = function() {
   var form = createSimpleModel('Form', this.session);
   // By definition, a Form must have a 'displayParent'. That is why a mocked parent is set.
@@ -58,6 +100,17 @@ scout.FormSpecHelper.prototype.createFormModel = function() {
   return form;
 };
 
+scout.FormSpecHelper.prototype.createField = function(objectType, parent, modelProperties) {
+  parent = scout.nvl(parent, this.session.desktop);
+  var model = createSimpleModel(objectType || 'StringField', this.session);
+  model.parent = parent;
+  if (modelProperties) {
+    $.extend(model, modelProperties);
+  }
+  return scout.create(objectType, model);
+};
+
+// FIXME [awe] 6.1 jasmine - DEPRECATED, remove method
 scout.FormSpecHelper.prototype.createFieldModel = function(objectType) {
   var session = this.session;
   var model = createSimpleModel(objectType || 'StringField', session);
@@ -66,10 +119,12 @@ scout.FormSpecHelper.prototype.createFieldModel = function(objectType) {
   return model;
 };
 
+// FIXME [awe] 6.1 jasmine - DEPRECATED, remove method
 scout.FormSpecHelper.prototype.createGroupBoxModel = function() {
   return this.createFieldModel('GroupBox');
 };
 
+// FIXME [awe] 6.1 jasmine - remove method createFormXFields -> use new createFormWithFields
 scout.FormSpecHelper.prototype.createFormXFields = function(x, isModal) {
   var form = isModal ? this.createFormModelWithDisplayHint('dialog') : this.createFormModelWithDisplayHint('view');
   var rootGroupBox = this.createGroupBoxModel();
@@ -84,6 +139,7 @@ scout.FormSpecHelper.prototype.createFormXFields = function(x, isModal) {
   return scout.create(form);
 };
 
+// FIXME [awe] 6.1 jasmine - DEPRECATED, remove method createFormModelWithDisplayHint
 scout.FormSpecHelper.prototype.createFormModelWithDisplayHint = function(displayHint) {
   var model = this.createFormModel();
   model.displayHint = displayHint;

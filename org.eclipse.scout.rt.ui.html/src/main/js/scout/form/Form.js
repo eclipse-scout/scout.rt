@@ -45,13 +45,12 @@ scout.Form.DisplayHint = {
 
 scout.Form.prototype._init = function(model) {
   scout.Form.parent.prototype._init.call(this, model);
-  if (this.isDialog() || this.searchForm || this.parent instanceof scout.WrappedFormField) {
-    this.rootGroupBox.menuBar.bottom();
-  }
 
   this.formController = new scout.FormController(this, this.session);
   this.messageBoxController = new scout.MessageBoxController(this, this.session);
   this.fileChooserController = new scout.FileChooserController(this, this.session);
+
+  this.setRootGroupBox(this.rootGroupBox);
 
   // Only render glassPanes if modal and not being a wrapped Form.
   var renderGlassPanes = (this.modal && !(this.parent instanceof scout.WrappedFormField));
@@ -66,6 +65,19 @@ scout.Form.prototype._init = function(model) {
   this.one('destroy', function() {
     this.off('propertyChange', glasspaneRendererHandler);
   }.bind(this));
+};
+
+// FIXME [awe] discuss with C.GU... is this correct?
+scout.Form.prototype.setRootGroupBox = function(rootGroupBox) {
+  this.setProperty('rootGroupBox', rootGroupBox);
+};
+
+scout.Form.prototype._syncRootGroupBox = function(rootGroupBox) {
+  this.rootGroupBox = rootGroupBox;
+  if (this.rootGroupBox &&
+     (this.isDialog() || this.searchForm || this.parent instanceof scout.WrappedFormField)) {
+    this.rootGroupBox.menuBar.bottom();
+  }
 };
 
 /**
