@@ -22,7 +22,7 @@ scout.FormSpecHelper.prototype.createViewWithOneField = function(parentId) {
 // FIXME [awe] 6.1 jasmine - DEPRECATED, remove method -> use *2 and rename
 scout.FormSpecHelper.prototype.createFormWithOneField = function(parentId) {
   var form = this.createFormModel();
-  var rootGroupBox = this.createGroupBoxModel();
+  var rootGroupBox = this.createFieldModel('GroupBox');
   var field = this.createFieldModel('StringField');
 
   form.rootGroupBox = rootGroupBox;
@@ -30,17 +30,6 @@ scout.FormSpecHelper.prototype.createFormWithOneField = function(parentId) {
   rootGroupBox.fields = [field];
 
   return scout.create(form);
-};
-
-// FIXME [awe] 6.1 jasmine - DEPRECATED, remove method -> use *2 and rename
-scout.FormSpecHelper.prototype.createGroupBoxWithOneField = function(parentId) {
-  var groupBox = this.createGroupBoxModel();
-  var field = this.createFieldModel('StringField');
-
-  groupBox.owner = parentId || this.session.rootAdapter.id;
-  groupBox.fields = [field.id];
-
-  return createAdapter(groupBox, this.session, [field]);
 };
 
 scout.FormSpecHelper.prototype.createFormWithOneField2 = function(parent) {
@@ -51,7 +40,7 @@ scout.FormSpecHelper.prototype.createFormWithOneField2 = function(parent) {
   return form;
 };
 
-scout.FormSpecHelper.prototype.createGroupBoxWithOneField2 = function(parent, mainBox, numFields) {
+scout.FormSpecHelper.prototype.createGroupBoxWithOneField = function(parent, mainBox, numFields) {
   return this.createGroupBoxWithFields(parent, false, 1);
 };
 
@@ -117,47 +106,4 @@ scout.FormSpecHelper.prototype.createFieldModel = function(objectType) {
   model.enabled = true;
   model.visible = true;
   return model;
-};
-
-// FIXME [awe] 6.1 jasmine - DEPRECATED, remove method
-scout.FormSpecHelper.prototype.createGroupBoxModel = function() {
-  return this.createFieldModel('GroupBox');
-};
-
-// FIXME [awe] 6.1 jasmine - remove method createFormXFields -> use new createFormWithFields
-scout.FormSpecHelper.prototype.createFormXFields = function(x, isModal) {
-  var form = isModal ? this.createFormModelWithDisplayHint('dialog') : this.createFormModelWithDisplayHint('view');
-  var rootGroupBox = this.createGroupBoxModel();
-  var fields = [];
-  var field;
-  for (var i = 0; i < x; i++) {
-    field = this.createFieldModel();
-    fields.push(field);
-  }
-  rootGroupBox.fields = fields;
-  form.rootGroupBox = rootGroupBox;
-  return scout.create(form);
-};
-
-// FIXME [awe] 6.1 jasmine - DEPRECATED, remove method createFormModelWithDisplayHint
-scout.FormSpecHelper.prototype.createFormModelWithDisplayHint = function(displayHint) {
-  var model = this.createFormModel();
-  model.displayHint = displayHint;
-  return model;
-};
-
-/**
- * Creates an adapter with rootAdapter as owner.
- * Expects model.fields to be set, creates an adapter for each field.
- * Also replaces model.fields with the ids of the fields.
- */
-scout.FormSpecHelper.prototype.createCompositeField = function(session, model) {
-  var fields = model.fields || [];
-  model.fields = [];
-  fields.forEach(function(field) {
-    field.owner = model.id;
-    model.fields.push(field.id);
-  });
-  model.owner = session.rootAdapter.id;
-  return createAdapter(model, session, fields);
 };

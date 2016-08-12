@@ -139,18 +139,6 @@ function createAdapterData(adapterDataArray) {
   return adapterData;
 }
 
-function createAdapter(model, session, adapterDataArray) {
-  var adapterData, adapter;
-  adapterDataArray = scout.arrays.ensure(adapterDataArray);
-  adapterDataArray.push(model);
-
-  adapterData = createAdapterData(adapterDataArray);
-  session._copyAdapterData(adapterData);
-  adapter = session.getOrCreateModelAdapter(model.id, model.parent);
-  expect(session.getModelAdapter(adapter.id)).toBe(adapter);
-  return adapter;
-}
-
 function stripCommentsFromJson(input) {
   if (!input || typeof input !== 'string') {
     return input;

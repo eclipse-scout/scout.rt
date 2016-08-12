@@ -30,6 +30,8 @@ scout.TableField.prototype._renderTable = function() {
 };
 
 scout.TableField.prototype._removeTable = function() {
-  this.table.remove();
+  if (this.table) {
+    this.table.remove();
+  }
   this._removeField();
 };

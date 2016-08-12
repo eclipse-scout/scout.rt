@@ -85,7 +85,7 @@ describe("GroupBox", function() {
   describe('focus', function() {
 
     it('focus first focusable field in groupBox', function() {
-      var groupBox = helper.createGroupBoxWithOneField2(session.desktop);
+      var groupBox = helper.createGroupBoxWithOneField(session.desktop);
       groupBox.render(session.$entryPoint);
       expect(scout.focusUtils.isActiveElement(groupBox.fields[0].$field[0])).toBe(false);
       groupBox.focus();

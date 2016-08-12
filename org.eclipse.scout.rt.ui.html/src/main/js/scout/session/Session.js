@@ -85,6 +85,7 @@ scout.Session = function($entryPoint, options) {
   // FIXME CGU [6.1] flag necessary for modeladapter, remove it
   this.remote = options.remote;
 
+  // FIXME [awe] 6.1 - rename in RootAdapter, should also have a widget, see FIXME in Session#_processEvents
   this.rootAdapter = new scout.ModelAdapter();
   this.rootAdapter.init({
     owner: {},
@@ -94,7 +95,6 @@ scout.Session = function($entryPoint, options) {
   });
 
   // Install focus management for this session.
-
   this.focusManager = new scout.FocusManager({
     session: this,
     active: options.focusManagerActive
@@ -1100,7 +1100,7 @@ scout.Session.prototype._processEvents = function(events) {
       // FIXME bsh, cgu: Check if this should only be getModelAdapter()
       // See commit by CGU 2014-08-15 18:20:43 ("HtmlUi: Fixed 'No adapter' bug")
       // --> This re-links the parent adapter to the root adapter!!!
-      adapter = this.getOrCreateModelAdapter(event.target, this.rootAdapter);
+      adapter = this.getOrCreateWidget(event.target, this.rootAdapter, {}); // FIXME [awe] 6.1 --> what's the parent here?
     }
     if (!adapter) {
       throw new Error('No adapter registered for ID ' + event.target);

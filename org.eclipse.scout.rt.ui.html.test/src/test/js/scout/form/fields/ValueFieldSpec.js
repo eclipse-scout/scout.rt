@@ -48,10 +48,7 @@ describe("ValueField", function() {
       formField.render(session.$entryPoint);
       expect(formField.$status.isVisible()).toBe(true);
 
-      var event = createPropertyChangeEvent(formField, {
-        menusVisible: false
-      });
-      formField.onModelPropertyChange(event);
+      formField.setProperty('menusVisible', false);
       expect(formField.$status.isVisible()).toBe(false);
     });
 

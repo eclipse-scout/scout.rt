@@ -32,10 +32,8 @@ describe("CellEditor", function() {
     }
   });
 
-  function createField (objectType, table) {
-    var field = formHelper.createFieldModel(objectType);
-    field.owner = table.id;
-    return createAdapter(field, session);
+  function createStringField(table) {
+    return formHelper.createField('StringField', session.desktop);
   }
 
   function $findPopup() {
@@ -52,13 +50,13 @@ describe("CellEditor", function() {
     var table = helper.createTable(model);
     table.render(session.$entryPoint);
 
-    var field = createField('StringField', table);
+    var field = createStringField(table);
     table.startCellEdit(table.columns[0], table.rows[0], field);
     return findPopup();
   }
 
   function startAndAssertCellEdit(table, column, row) {
-    var field = createField('StringField', table);
+    var field = createStringField(table);
     var popup = table.startCellEdit(column, row, field);
     expect($findPopup().length).toBe(1);
     expect($findPopup().find('.form-field').length).toBe(1);
