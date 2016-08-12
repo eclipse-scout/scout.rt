@@ -574,41 +574,16 @@ scout.Outline.prototype._renderInBackground = function() {
   this.$container.toggleClass('in-background', this.inBackground);
 };
 
-/**
- * === Method required for objects that act as 'displayParent' ===
- *
- * Returns the DOM elements to paint a glassPanes over, once a modal Form, message-box or file-chooser is showed with this Outline as its 'displayParent'.
- */
-scout.Outline.prototype.glassPaneTargets = function() {
-  if (this.rendered) {
-    var desktop = this.session.desktop;
-    var elements = [];
-    if (desktop.navigation) {
-      elements.push(desktop.navigation.$container); // navigation container; not available if application has no navigation.
-    }
-    if (desktop._outlineContent) {
-      elements.push(desktop._outlineContent.$container); // outline content; not available if application has no navigation.
-    }
-    return elements;
-  } else {
-    var deferred = new scout.DeferredGlassPaneTarget();
-    var renderedHandler = function(event) {
-      var desktop = event.eventOn.session.desktop;
-      var elements = [];
-      if (desktop.navigation) {
-        elements.push(desktop.navigation.$container); // navigation container; not available if application has no navigation.
-      }
-      if (desktop._outlineContent) {
-        elements.push(desktop._outlineContent.$container); // outline content; not available if application has no navigation.
-      }
-      deferred.ready(elements);
-    };
-    this.one('rendered', renderedHandler);
-    this.one('destroy', function() {
-      this.off('rendered', renderedHandler);
-    }.bind(this));
-    return [deferred];
+scout.Outline.prototype._glassPaneTargets = function() {
+  var desktop = this.session.desktop;
+  var elements = [];
+  if (desktop.navigation) {
+    elements.push(desktop.navigation.$container);
   }
+  if (desktop._outlineContent) {
+    scout.arrays.pushAll(elements, desktop._outlineContent.glassPaneTargets());
+  }
+  return elements;
 };
 
 scout.Outline.prototype._renderMenus = function() {

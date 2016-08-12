@@ -407,6 +407,25 @@ scout.Widget.prototype._beforeDetach = function(parent) {
   // NOP
 };
 
+/**
+ * Method required for widgets which are supposed to be directly covered by a glasspane.<p>
+ *
+ * Returns the DOM elements to paint a glassPanes over, once a modal Form, message-box or file-chooser is shown with this widget as its 'displayParent'.<br>
+ * If the widget is not rendered yet, a scout.DerredGlassPaneTarget is returned.<br>
+ * In both cases the method _glassPaneTargets is called which may be overridden by the actual widget.
+ */
+scout.Widget.prototype.glassPaneTargets = function() {
+  if (this.rendered) {
+    return this._glassPaneTargets();
+  }
+
+  return scout.DeferredGlassPaneTarget.createFor(this, this._glassPaneTargets.bind(this));
+};
+
+scout.Widget.prototype._glassPaneTargets = function() {
+  return [this.$container];
+};
+
 scout.Widget.prototype.toString = function() {
   return 'Widget[rendered=' + this.rendered +
     (this.$container ? ' $container=' + scout.graphics.debugOutput(this.$container) : '') + ']';
