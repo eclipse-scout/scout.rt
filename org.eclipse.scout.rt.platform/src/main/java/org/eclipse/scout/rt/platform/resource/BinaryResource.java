@@ -71,7 +71,7 @@ public final class BinaryResource implements Serializable {
    */
   @Deprecated
   public BinaryResource(String filename, String contentType, String charset, byte[] content, long lastModified, boolean cachingAllowed, int cacheMaxAge) {
-    m_filename = filename;
+    m_filename = FileUtility.toValidFilename(filename);
     if (contentType == null) {
       if (filename != null) {
         contentType = FileUtility.getMimeType(filename);
