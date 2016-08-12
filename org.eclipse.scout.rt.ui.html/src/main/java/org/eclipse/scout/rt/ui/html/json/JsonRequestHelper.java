@@ -118,10 +118,6 @@ public class JsonRequestHelper {
   public void writeResponse(final ServletResponse servletResponse, final JSONObject jsonResponse) throws IOException {
     String jsonText = jsonResponse.toString();
     final byte[] data = jsonText.getBytes(StandardCharsets.UTF_8.name());
-    if (LOG.isDebugEnabled() && !LOG.isTraceEnabled() && jsonText.length() > 10000) {
-      // Truncate log output to not spam the log (and in case of eclipse to not make it freeze: https://bugs.eclipse.org/bugs/show_bug.cgi?id=175888)
-      jsonText = jsonText.substring(0, 10000) + "...";
-    }
     servletResponse.setContentLength(data.length);
     if (servletResponse.getContentType() == null) {
       servletResponse.setContentType("application/json");
@@ -148,7 +144,7 @@ public class JsonRequestHelper {
     finally {
       interruption.restore();
     }
-    LOG.debug("Returned: {}", jsonText);
+    LOG.debug("Returned: {}", formatJsonForLogging(jsonText));
   }
 
   /**
@@ -157,11 +153,19 @@ public class JsonRequestHelper {
   public JSONObject readJsonRequest(final ServletRequest servletRequest) {
     try {
       final String jsonData = IOUtility.getContent(servletRequest.getReader());
-      LOG.debug("Received: {}", jsonData);
+      LOG.debug("Received: {}", formatJsonForLogging(jsonData));
       return (jsonData == null ? new JSONObject() : new JSONObject(jsonData));
     }
     catch (RuntimeException | IOException e) {
       throw new UiException(e.getMessage(), e);
     }
+  }
+
+  protected String formatJsonForLogging(String jsonText) {
+    if (LOG.isDebugEnabled() && !LOG.isTraceEnabled() && jsonText != null && jsonText.length() > 10000) {
+      // Truncate log output to not spam the log (and in case of eclipse to not make it freeze: https://bugs.eclipse.org/bugs/show_bug.cgi?id=175888)
+      return jsonText.substring(0, 10000) + "...";
+    }
+    return jsonText;
   }
 }
