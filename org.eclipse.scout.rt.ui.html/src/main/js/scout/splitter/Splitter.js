@@ -42,6 +42,7 @@ scout.Splitter.prototype.getPosition = function() {
 scout.Splitter.prototype.getRatio = function() {
   return this.ratio;
 };
+
 /**
  * Sets the splitter position to the specified newSize (in pixels). If the newSize is
  * not specified, the size is calculated automatically by reading the this.$anchor
@@ -51,7 +52,6 @@ scout.Splitter.prototype.getRatio = function() {
  * Note: This function does not fire any events.
  */
 scout.Splitter.prototype.setPosition = function(newPosition, updateRatio, firePositionChanged) {
-
   if (!$.isNumeric(newPosition)) {
     // Get size automatically from $anchor element's bounds
     var anchorBounds = scout.graphics.offsetBounds(this.$anchor);
@@ -133,22 +133,21 @@ scout.Splitter.prototype._getSplitterPosition = function(event) {
 scout.Splitter.prototype._onMouseMove = function(event) {
   var splitterPosition = this._getSplitterPosition(event);
   // fire event
-  var positionChangeEvent = {
+  var moveEvent = {
     position: splitterPosition,
     defaultPrevented: false,
     preventDefault: function() {
       this.defaultPrevented = true;
     },
-    setPosition: function (newPosition) {
+    setPosition: function(newPosition) {
       this.position = newPosition;
     }
-
   };
-  this.trigger('move', positionChangeEvent);
-  if (positionChangeEvent.defaultPrevented) {
+  this.trigger('move', moveEvent);
+  if (moveEvent.defaultPrevented) {
     return;
   }
-  this._setPosition(positionChangeEvent.position, true);
+  this._setPosition(moveEvent.position, true);
 };
 
 scout.Splitter.prototype._onMouseUp = function(event) {
