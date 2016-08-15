@@ -102,8 +102,12 @@ scout.ModelAdapter.prototype._init = function(model) {
  *
  * coalesce            undefined       Coalesce function added to event-object.
  *
- * showBusyIndicator   true            Whether sending the event should block the UI
- *                                     after a certain delay
+ * showBusyIndicator   undefined       Whether sending the event should block the UI
+ *                     (true*)         after a certain delay.
+ *                                     * The default value 'undefined' means that the
+ *                                       default value ('true') is determined in Session.js.
+ *                                       We don't write it explicitly to the event here
+ *                                       because that would break many Jasmine tests.
  */
 scout.ModelAdapter.prototype._send = function(type, data, options) {
   // Legacy fallback with all options as arguments
@@ -131,8 +135,12 @@ scout.ModelAdapter.prototype._send = function(type, data, options) {
 
   var event = new scout.Event(adapterId, type, data);
   // The following properties will not be sent to the server, see Session._requestToJson().
-  event.coalesce = options.coalesce;
-  event.showBusyIndicator = scout.nvl(options.showBusyIndicator, true);
+  if (options.coalesce !== undefined) {
+    event.coalesce = options.coalesce;
+  }
+  if (options.showBusyIndicator !== undefined) {
+    event.showBusyIndicator = options.showBusyIndicator;
+  }
   adapter.remoteHandler(event, options.delay);
   this.trigger('send', event);
 };

@@ -366,7 +366,7 @@ scout.Session.prototype._sendNow = function() {
   };
   // Busy indicator required when at least one event requests it
   request.showBusyIndicator = request.events.some(function(event) {
-    return event.showBusyIndicator;
+    return scout.nvl(event.showBusyIndicator, true);
   });
   this.responseQueue.prepareRequest(request);
   // Send request
@@ -997,7 +997,7 @@ scout.Session.prototype.areEventsQueued = function() {
 
 scout.Session.prototype.areBusyIndicatedEventsQueued = function() {
   return this._asyncEvents.some(function(event) {
-    return event.showBusyIndicator;
+    return scout.nvl(event.showBusyIndicator, true);
   });
 };
 
