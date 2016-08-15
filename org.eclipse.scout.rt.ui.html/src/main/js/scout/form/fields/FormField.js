@@ -46,6 +46,7 @@ scout.FormField = function() {
    */
   this.$status;
   this._addAdapterProperties(['keyStrokes', 'menus']);
+  this._addCloneProperties(['displayText']);
   this.refFieldId;
   this.mode = scout.FormField.MODE_DEFAULT;
   this.loadingSupport; // Object to handle the 'loading' property (different for tile fields)

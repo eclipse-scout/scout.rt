@@ -743,7 +743,7 @@ scout.Widget.prototype._removeAdapterProperties = function(properties) {
 
 // FIXME CGU [6.1] temporary, remove after model adapter separation
 scout.Widget.prototype._send = function(type, data) {
-  data = data || {};
+  data = $.extend({}, data); // create a copy, so we don't change the original data unintentionally
   data.sendToServer = true;
   this.trigger(type, data);
 };
