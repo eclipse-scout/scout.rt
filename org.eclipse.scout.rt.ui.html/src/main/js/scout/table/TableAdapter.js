@@ -344,7 +344,7 @@ scout.TableAdapter.prototype._onColumnHeadersUpdated = function(columns) {
 scout.TableAdapter.prototype._onStartCellEdit = function(columnId, rowId, fieldId) {
   var column = this.widget._columnById(columnId),
     row = this.widget._rowById(rowId),
-    field = this.session.getOrCreateWidget(fieldId, this, this.widget);
+    field = this.session.getOrCreateWidget(fieldId, this.widget);
 
   this.widget.startCellEdit(column, row, field);
 };

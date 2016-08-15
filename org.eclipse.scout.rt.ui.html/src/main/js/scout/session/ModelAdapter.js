@@ -24,10 +24,6 @@
  * </ol>
  */
 scout.ModelAdapter = function() {
-
-  // Adapter structure
-  this.owner;
-  this.ownedAdapters = [];
   this._adapterProperties = []; // FIXME [awe, cgu] 6.1 - hier löschen (nur noch auf Widget.js)
 
   /**
@@ -44,7 +40,7 @@ scout.ModelAdapter.prototype.init = function(model) {
 };
 
 /**
- * @param model expects a plain-object with properties: id, session, owner
+ * @param model expects a plain-object with properties: id, session
  */
 scout.ModelAdapter.prototype._init = function(model) {
   if (!model.id) {
@@ -52,9 +48,6 @@ scout.ModelAdapter.prototype._init = function(model) {
   }
   if (!model.session) {
     throw new Error('session required');
-  }
-  if (!model.owner) {
-    throw new Error('owner required');
   }
   $.extend(this, model);
   this.session.registerModelAdapter(this);
@@ -67,16 +60,23 @@ scout.ModelAdapter.prototype.createWidget = function(adapterData, parent) {
   return this.widget;
 };
 
-scout.ModelAdapter.prototype._prepareModel = function(adapterData, parent) {
-  // Make a copy to prevent a modification of the given adapterData
-  var model = $.extend({}, adapterData);
+scout.ModelAdapter.prototype._prepareModel = function(model, parent) {
+  // Make a copy to prevent a modification of the given model
+  model = $.extend({}, model);
 
   // Fill in the missing default values
   scout.defaultValues.applyTo(model);
 
   model.parent = parent;
-//  model.owner = parent; // FIXME CGU owner von adapterData bevorzugen
   model.remoteAdapter = this;
+
+  if (model.owner !== undefined) {
+    // Prefer the owner sent by the server
+    model.owner = this.session.getModelAdapter(model.owner).widget;
+    if (!model.owner) {
+      throw new Error('owner not found.');
+    }
+  }
   return model;
 };
 
@@ -201,31 +201,11 @@ scout.ModelAdapter.prototype._removeAdapterProperties = function(properties) {
 };
 
 scout.ModelAdapter.prototype.destroy = function() {
-  // destroy owned adapters in reverse order.
-  this.ownedAdapters.slice().reverse().forEach(function(ownedAdapter) {
-    ownedAdapter.destroy();
-  });
-
   this._detachWidget();
   this.widget.destroy();
   this.widget = null;
   this.session.unregisterModelAdapter(this);
-
-  // Disconnect from owner
-  this.owner.removeOwnedAdapter(this);
-  this.owner = null;
-
   this.destroyed = true;
-};
-
-scout.ModelAdapter.prototype.addOwnedAdapter = function(ownedAdapter) {
-  $.log.trace('addOwnedAdapter(' + ownedAdapter + ') to ' + this);
-  this.ownedAdapters.push(ownedAdapter);
-};
-
-scout.ModelAdapter.prototype.removeOwnedAdapter = function(ownedAdapter) {
-  $.log.trace('removeOwnedAdapter(' + ownedAdapter + ') from ' + this);
-  scout.arrays.remove(this.ownedAdapters, ownedAdapter);
 };
 
 /**
@@ -256,26 +236,6 @@ scout.ModelAdapter.prototype._eachProperty = function(model, func) {
   }
 };
 
-scout.ModelAdapter.prototype._destroyAdapters = function(propertyName, oldAdapters, newAdapterIds) {
-  return this._processAdapters(oldAdapters, function(oldAdapter) {
-    // Only destroy it if its linked to this adapter (-> don't destroy global adapters)
-    if (oldAdapter.owner !== this) {
-      return;
-    }
-
-    if (Array.isArray(newAdapterIds)) {
-      // If the old adapter is not in the array anymore -> destroy it
-      if (newAdapterIds.indexOf(oldAdapter.id) < 0) {
-        oldAdapter.destroy();
-      }
-    } else {
-      // If the value is not an array, always destroy the oldAdapter
-      oldAdapter.destroy();
-    }
-    return oldAdapter;
-  }.bind(this));
-};
-
 /**
  * If the value is an array: Loops through the array and calls func.
  * If the value is not an array: Calls the func.
@@ -296,18 +256,8 @@ scout.ModelAdapter.prototype._processAdapters = function(value, func) {
 };
 
 /**
- * Processes the JSON event from the server and sets dynamically properties on the adapter (-model)
- * and calls the right function to update the UI. For each property a corresponding function-name
- * must exist (property-name 'myValue', function-name 'setMyValue').
- *
- * This happens in two steps:
- * 1.) Synchronizing: when a sync[propertyName] method exists, call that method - otherwise simply set the property [propertyName]
- * 2.) Rendering: Call render[propertyName] function to update UI
- *
- * You can always rely that these two steps are processed in that order, but you cannot rely that
- * individual properties are processed in a certain order.
+ * Processes the JSON event from the server and calls the corresponding setter of the widget for each property.
  */
-//FIXME [6.1] CGU adjust java doc
 scout.ModelAdapter.prototype.onModelPropertyChange = function(event) {
   this._syncPropertiesOnPropertyChange(event.properties);
 };
@@ -320,7 +270,9 @@ scout.ModelAdapter.prototype.onModelAction = function(event) {
 };
 
 scout.ModelAdapter.prototype._onWidgetEvent = function(event) {
-  if (event.type === 'propertyChange') {
+  if (event.type === 'destroy') {
+    this._onWidgetDestroy(event);
+  } else if (event.type === 'propertyChange') {
     this._onWidgetPropertyChange(event);
   } else {
     // FIXME CGU [6.1] temporary, until model adapter separation - anmerkung von AWE: eigentlich ist das kein schlechter
@@ -335,12 +287,16 @@ scout.ModelAdapter.prototype._onWidgetEvent = function(event) {
   }
 };
 
+scout.ModelAdapter.prototype._onWidgetDestroy = function() {
+  this.destroy();
+};
+
 scout.ModelAdapter.prototype._onWidgetPropertyChange = function(event) {
   event.changedProperties.forEach(function(propertyName) {
     if (this._isRemoteProperty(propertyName)) {
       var value = event.newProperties[propertyName];
       if (value && this._isAdapterProperty(propertyName)) {
-//        value = value.modelAdapter; // FIXME CGU [6.1] get adapter for widget
+        value = value.remoteAdapter;
       }
       this._sendProperty(propertyName, value);
     }
@@ -352,30 +308,27 @@ scout.ModelAdapter.prototype._syncPropertiesOnPropertyChange = function(newPrope
     var ensureTypeFuncName = '_ensure' + scout.strings.toUpperCaseFirstLetter(propertyName),
       oldValue = this.widget[propertyName];
 
-    // FIXME CGU [6.1] dieser Teil sollte irgendiwe in der Sync Funktion sein, anstatt callSetter syncProperty aufrufen, würde aber viele Funktionen brechen
-    if (isAdapterProp && oldValue) {
-      // TODO CGU this should actually be configurable, otherwise m_disposeOnChange=false on server doesn't work
-      this._destroyAdapters(propertyName, oldValue, value);
-    }
-
+    // Call ensure function in case the adapter wants to adapt the property before calling the setter of the widget
     if (this[ensureTypeFuncName]) {
       value = this[ensureTypeFuncName](value);
     }
-
+    // Call the setter of the widget
     this.widget.callSetter(propertyName, value);
 
   }.bind(this));
 };
 
 scout.ModelAdapter.prototype.goOffline = function() {
-  var i;
-  for (i = 0; i < this.ownedAdapters.length; i++) {
-    if (!this.ownedAdapters[i].rendered) {
-      //going offline must not modify model state -> only necessary to inform rendered objects
-      continue;
+  this.widget.children.forEach(function(child) {
+    if (!child.rendered) {
+      // going offline must not modify model state -> only necessary to inform rendered objects
+      return;
     }
-    this.ownedAdapters[i].goOffline();
-  }
+    if (!child.remoteAdapter) {
+      return;
+    }
+    child.remoteAdapter.goOffline();
+  }, this);
   this._goOffline();
 };
 
@@ -384,14 +337,16 @@ scout.ModelAdapter.prototype._goOffline = function() {
 };
 
 scout.ModelAdapter.prototype.goOnline = function() {
-  var i;
-  for (i = 0; i < this.ownedAdapters.length; i++) {
-    if (!this.ownedAdapters[i].rendered) {
-      //going offline must not modify model state -> only necessary to inform rendered objects
-      continue;
+  this.widget.children.forEach(function(child) {
+    if (!child.rendered) {
+      // going online must not modify model state -> only necessary to inform rendered objects
+      return;
     }
-    this.ownedAdapters[i].goOnline();
-  }
+    if (!child.remoteAdapter) {
+      return;
+    }
+    child.remoteAdapter.goOnline();
+  }, this);
   this._goOnline();
 };
 

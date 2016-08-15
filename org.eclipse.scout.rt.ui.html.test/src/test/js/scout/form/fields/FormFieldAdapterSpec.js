@@ -23,7 +23,6 @@ describe("FormFieldAdapter", function() {
 
     beforeEach(function() {
       model = helper.createFieldModel();
-      model.owner = new scout.NullWidgetAdapter();
       adapter = new scout.FormFieldAdapter();
       adapter.init(model);
       formField = adapter.createWidget(model, session.desktop);

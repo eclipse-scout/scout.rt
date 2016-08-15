@@ -22,6 +22,10 @@ scout.TableField.prototype._render = function($parent) {
   this._renderTable();
 };
 
+scout.TableField.prototype.setTable = function(table) {
+  this.setProperty('table', table);
+};
+
 scout.TableField.prototype._renderTable = function() {
   if (this.table) {
     this.table.render(this.$container);

@@ -24,10 +24,10 @@ scout.OutlineAdapter.prototype._initPage = function(page, parentNode) {
     page.childNodes = [];
   }
   if (page.detailTable) {
-    page.detailTable = this.session.getOrCreateWidget(page.detailTable, this, this.widget);
+    page.detailTable = this.session.getOrCreateWidget(page.detailTable, this.widget);
   }
   if (page.detailForm) {
-    page.detailForm = this.session.getOrCreateWidget(page.detailForm, this, this.widget);
+    page.detailForm = this.session.getOrCreateWidget(page.detailForm, this.widget);
   }
 };
 
@@ -37,12 +37,12 @@ scout.OutlineAdapter.prototype._onPageChanged = function(event) {
     page = this.widget._nodeById(event.nodeId);
 
     page.detailFormVisible = event.detailFormVisible;
-    page.detailForm = this.session.getOrCreateWidget(event.detailForm, this, this.widget);
+    page.detailForm = this.session.getOrCreateWidget(event.detailForm, this.widget);
 
     page.detailTableVisible = event.detailTableVisible;
-    page.detailTable = this.session.getOrCreateWidget(event.detailTable, this, this.widget);
+    page.detailTable = this.session.getOrCreateWidget(event.detailTable, this.widget);
   } else {
-    this.widget.defaultDetailForm = this.session.getOrCreateWidget(event.detailForm, this, this.widget);
+    this.widget.defaultDetailForm = this.session.getOrCreateWidget(event.detailForm, this.widget);
   }
 
   this.widget.pageChanged(page);
@@ -55,5 +55,3 @@ scout.OutlineAdapter.prototype.onModelAction = function(event) {
     scout.OutlineAdapter.parent.prototype.onModelAction.call(this, event);
   }
 };
-
-// FIXME [6.1] CGU detail table adapter must be destroyed, add listener on init?

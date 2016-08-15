@@ -27,11 +27,6 @@ scout.Widget = function() {
   this.attached = false;
   this.destroyed = false;
 
-  /**
-   * Array of children which must not be destroyed when the widget is being destroyed.
-   */
-  this.dontDestroy;
-
   this.$container;
   // If set to true, remove won't remove the element immediately but after the animation has been finished
   // This expects a css animation which may be triggered by the class 'removed'
@@ -64,6 +59,7 @@ scout.Widget.prototype._init = function(model) {
   if (!model.parent) {
     throw new Error('Parent expected: ' + this);
   }
+  this.setOwner(model.owner || model.parent);
   this.setParent(model.parent);
 
   this.session = model.session || this.parent.session;
@@ -79,12 +75,12 @@ scout.Widget.prototype._init = function(model) {
     if (isAdapterProperty) {
       this[propertyName] = this._ensureType(propertyName, value);
       // this.callSetter(propertyName, value);
-    } // FIXME evtl. im else callSetter machen
+    } // FIXME [6.1] awe evtl. im else callSetter machen
   }.bind(this));
 };
 
 scout.Widget.prototype.createFromProperty = function(propertyName, value) {
-  // Was ist das für ein Fall? Manchmal existiert das Widget schon (Menu 133 BusinessForm MainBox)
+  // FIXME [6.1] awe Was ist das für ein Fall? Manchmal existiert das Widget schon (Menu 133 BusinessForm MainBox)
   if (value instanceof scout.Widget) {
     return value;
   }
@@ -108,11 +104,7 @@ scout.Widget.prototype.destroy = function() {
 
   // Destroy children in reverse order
   this.children.slice().reverse().forEach(function(child) {
-    if (this.dontDestroy && this.dontDestroy.indexOf(child) > -1) {
-      //FIXME CGU nur wenn owner stimmt
-      return;
-    }
-    child.destroy();
+    this._destroyChild(child);
   }, this);
 
   this.remove();
@@ -126,6 +118,14 @@ scout.Widget.prototype.destroy = function() {
 
   // Inform listeners
   this.trigger('destroy');
+};
+
+scout.Widget.prototype._destroyChild = function(child) {
+  if (child.owner !== this) {
+    // Only the owner is allowed to destroy its children.
+    return;
+  }
+  child.destroy();
 };
 
 scout.Widget.prototype.render = function($parent) {
@@ -287,12 +287,23 @@ scout.Widget.prototype._remove = function() {
   }
 };
 
+scout.Widget.prototype.setOwner = function(owner) {
+  if (this.owner) {
+    // Remove from old owner
+    this.owner.removeChild(this);
+  }
+  this.owner = owner;
+  this.owner.addChild(this);
+};
+
 scout.Widget.prototype.setParent = function(parent) {
-  if (this.parent) {
+  if (this.parent && this.parent !== this.owner) {
     // Remove from old parent if getting relinked
+    // If the old parent is still the owner, don't remove it because owner stays responsible for destryoing it
     this.parent.removeChild(this);
   }
   this.parent = parent;
+  // FIXME CGU [6.1] remove this check, parent must never be null
   if (this.parent) { //prevent trying to set child on undefined
     this.parent.addChild(this);
   }
@@ -621,14 +632,22 @@ scout.Widget.prototype._setProperty = function(propertyName, newValue) {
   this._firePropertyChange(propertyName, oldValue, newValue);
 };
 
+/**
+ * Sets a new value for a specific property. If the new value is the same value as the old one, nothing is performed.
+ * Otherwise the following phases are executed:
+ * <p>
+ * 1. Preparation: If the property is a widget property, several actions are performed in _prepareWidgetProperty().
+ * 2. DOM removal: If the widget is rendered and there is a custom remove function (e.g. _removeXY where XY is the property name), it will be called.
+ * 3. Model update: If there is a custom sync function (e.g. _syncXY where XY is the property name), it will be called. Otherwise the default sync function _setProperty is called.
+ * 4. DOM rendering: If the widget is rendered and there is a custom render function (e.g. _renderXY where XY is the property name), it will be called.
+ */
 scout.Widget.prototype.setProperty = function(name, value) {
   if (this[name] === value) {
     return;
   }
 
   if (this._isAdapterProperty(name)) { // FIXME [6.1] CGU, AWE durch propertyConfig ersetzen
-    value = this._ensureType(name, value);
-    // FIXME CGU hier setParent verknüpfen
+    value = this._prepareWidgetProperty(name, value);
   }
 
   if (this.rendered) {
@@ -652,7 +671,48 @@ scout.Widget.prototype.setProperty = function(name, value) {
   }
 };
 
+scout.Widget.prototype._prepareWidgetProperty = function(name, value) {
+  // Create new child widget(s)
+  value = this._ensureType(name, value);
+
+  var oldValue = this[name];
+  if (oldValue && Array.isArray(value)) {
+    // if new value is an array, old value has to be one as well
+    // copy to prevent modification of original
+    oldValue = oldValue.slice();
+
+    // only destroy those which are not in the new array
+    scout.arrays.removeAll(oldValue, value);
+  }
+
+  // Destroy old child widget(s)
+  this._destroyOldValue(oldValue);
+
+  // FIXME [6.1] CGU hier setParent verknüpfen
+  return value;
+};
+
+scout.Widget.prototype._destroyOldValue = function(value) {
+  if (value === null || value === undefined) {
+    return;
+  }
+
+  if (Array.isArray(value)) {
+    var returnValues = [];
+    value.forEach(function(elementValue, i) {
+      returnValues[i] = this._destroyOldValue(elementValue);
+    }, this);
+    return returnValues;
+  }
+
+  return this._destroyChild(value);
+};
+
 scout.Widget.prototype._ensureType = function(propertyName, value) {
+  if (value === null || value === undefined) {
+    return null;
+  }
+
   if (Array.isArray(value)) {
     var returnValues = [];
     value.forEach(function(elementValue, i) {
@@ -660,7 +720,7 @@ scout.Widget.prototype._ensureType = function(propertyName, value) {
     }, this);
     return returnValues;
   }
-
+  // FIXME [6.1] cgu rename to createChild? remove propertyName
   return this.createFromProperty(propertyName, value);
 };
 

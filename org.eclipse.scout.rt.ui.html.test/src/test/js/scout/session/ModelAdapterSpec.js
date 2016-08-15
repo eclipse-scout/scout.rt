@@ -66,7 +66,7 @@ describe('ModelAdapter', function() {
    */
   function createWidget(model) {
     model = createModel(model);
-    return session.getOrCreateWidget(model.id, session.rootAdapter, session.desktop);
+    return session.getOrCreateWidget(model.id, session.desktop);
   }
 
   it('can handle properties in any order', function() {
@@ -321,23 +321,25 @@ describe('ModelAdapter', function() {
           })]
         };
         session._processSuccessResponse(message);
-
         expect(widget.childWidget[0]).toBeTruthy();
         expect(widget.childWidget[1]).toBeTruthy();
         expect(session.getModelAdapter(childModel.id)).toBe(widget.childWidget[0].remoteAdapter);
         expect(session.getModelAdapter(childModel2.id)).toBe(widget.childWidget[1].remoteAdapter);
 
+        var childWidget = widget.childWidget[0];
+        var childWidget2 = widget.childWidget[1];
         message = {
           events: [createPropertyChangeEvent(adapter, {
             childWidget: [childModel2.id]
           })]
         };
         session._processSuccessResponse(message);
-
         expect(widget.childWidget.length).toBe(1);
         expect(widget.childWidget[0]).toBeTruthy();
-        expect(session.getModelAdapter(childModel.id)).toBe(widget.childWidget[0].remoteAdapter);
-        expect(session.getModelAdapter(childModel2.id)).toBeFalsy();
+        expect(session.getModelAdapter(childModel.id)).toBeFalsy();
+        expect(childWidget.destroyed).toBe(true);
+        expect(session.getModelAdapter(childModel2.id)).toBe(widget.childWidget[0].remoteAdapter);
+        expect(childWidget2.destroyed).toBe(false);
       });
 
       it('destroys the old and creates the new adapters if the array contains both', function() {

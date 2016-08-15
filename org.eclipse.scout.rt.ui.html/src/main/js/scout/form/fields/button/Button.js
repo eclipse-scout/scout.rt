@@ -168,7 +168,6 @@ scout.Button.prototype._openPopup = function() {
   var popup = scout.create('ContextMenuPopup', {
     parent: this,
     menuItems: this.menus,
-    dontDestroy: this.menus,
     cloneMenuItems: false,
     closeOnAnchorMousedown: false,
     $anchor: this.$field

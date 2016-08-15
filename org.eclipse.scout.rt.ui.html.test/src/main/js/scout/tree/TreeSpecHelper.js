@@ -72,7 +72,6 @@ scout.TreeSpecHelper.prototype.createTree = function(model) {
 
 scout.TreeSpecHelper.prototype.createTreeAdapter = function(model) {
   var adapter = new scout.TreeAdapter();
-  model.owner = new scout.NullWidgetAdapter();
   adapter.init(model);
   return adapter;
 };

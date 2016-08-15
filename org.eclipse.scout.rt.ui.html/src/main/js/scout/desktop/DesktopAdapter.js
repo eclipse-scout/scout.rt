@@ -20,7 +20,7 @@ scout.DesktopAdapter.prototype._onFormShow = function(event) {
     displayParent = this.session.getModelAdapter(event.displayParent);
 
   if (displayParent) {
-    form = this.session.getOrCreateWidget(event.form, displayParent, this.widget);
+    form = this.session.getOrCreateWidget(event.form, this.widget);
     this.widget.showForm(form, displayParent.widget, event.position, false);
   }
 };
@@ -41,7 +41,7 @@ scout.DesktopAdapter.prototype._onFormActivate = function(event) {
     displayParent = this.session.getModelAdapter(event.displayParent);
 
   if (displayParent) {
-    form = this.session.getOrCreateWidget(event.form, displayParent, this.widghet);
+    form = this.session.getOrCreateWidget(event.form, this.widghet);
     this.widget.activateForm(form, false);
   }
 };
@@ -51,7 +51,7 @@ scout.DesktopAdapter.prototype._onMessageBoxShow = function(event) {
     displayParent = this.session.getModelAdapter(event.displayParent);
 
   if (displayParent) {
-    messageBox = this.session.getOrCreateWidget(event.messageBox, displayParent, this.widget);
+    messageBox = this.session.getOrCreateWidget(event.messageBox, this.widget);
     displayParent.widget.messageBoxController.registerAndRender(messageBox);
   }
 };
@@ -71,7 +71,7 @@ scout.DesktopAdapter.prototype._onFileChooserShow = function(event) {
     displayParent = this.session.getModelAdapter(event.displayParent);
 
   if (displayParent) {
-    fileChooser = this.session.getOrCreateWidget(event.fileChooser, displayParent, this.widget);
+    fileChooser = this.session.getOrCreateWidget(event.fileChooser, this.widget);
     displayParent.fileChooserController.registerAndRender(fileChooser);
   }
 };
@@ -113,7 +113,7 @@ scout.DesktopAdapter.prototype._onOpenUri = function(event) {
 };
 
 scout.DesktopAdapter.prototype._onOutlineChanged = function(event) {
-  var outline = this.session.getOrCreateWidget(event.outline, this, this.widget);
+  var outline = this.session.getOrCreateWidget(event.outline, this.widget);
   this.widget.setOutline(outline);
 };
 

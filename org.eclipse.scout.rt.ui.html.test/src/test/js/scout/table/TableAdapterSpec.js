@@ -358,9 +358,8 @@ describe("TableAdapter", function() {
           })]
         };
         session._processSuccessResponse(message);
-
-        expect(session.getModelAdapter(menu1.id)).toBe(table.menus[0]);
-        expect(session.getModelAdapter(menu2.id)).toBe(table.menus[1]);
+        expect(session.getModelAdapter(menu1.id)).toBe(table.menus[0].remoteAdapter);
+        expect(session.getModelAdapter(menu2.id)).toBe(table.menus[1].remoteAdapter);
       });
 
       it("destroys the old menus", function() {
@@ -377,20 +376,20 @@ describe("TableAdapter", function() {
           })]
         };
         session._processSuccessResponse(message);
+        expect(session.getModelAdapter(menu1.id)).toBe(table.menus[0].remoteAdapter);
+        expect(session.getModelAdapter(menu2.id)).toBe(table.menus[1].remoteAdapter);
 
-        expect(session.getModelAdapter(menu1.id)).toBe(table.menus[0]);
-        expect(session.getModelAdapter(menu2.id)).toBe(table.menus[1]);
-
+        var menu1Widget = session.getModelAdapter(menu1.id).widget;
         message = {
           events: [createPropertyChangeEvent(table, {
             menus: [menu2.id]
           })]
         };
         session._processSuccessResponse(message);
-
         expect(table.menus.length).toBe(1);
-        expect(session.getModelAdapter(menu2.id)).toBe(table.menus[0]);
+        expect(session.getModelAdapter(menu2.id)).toBe(table.menus[0].remoteAdapter);
         expect(session.getModelAdapter(menu1.id)).toBeFalsy();
+        expect(menu1Widget.destroyed).toBe(true);
       });
 
       it("destroys the old and creates the new menus if the list contains both", function() {
@@ -408,10 +407,10 @@ describe("TableAdapter", function() {
           })]
         };
         session._processSuccessResponse(message);
+        expect(session.getModelAdapter(menu1.id)).toBe(table.menus[0].remoteAdapter);
+        expect(session.getModelAdapter(menu2.id)).toBe(table.menus[1].remoteAdapter);
 
-        expect(session.getModelAdapter(menu1.id)).toBe(table.menus[0]);
-        expect(session.getModelAdapter(menu2.id)).toBe(table.menus[1]);
-
+        var menu1Widget = session.getModelAdapter(menu1.id).widget;
         message = {
           adapterData: createAdapterData(menu3),
           events: [createPropertyChangeEvent(table, {
@@ -419,11 +418,11 @@ describe("TableAdapter", function() {
           })]
         };
         session._processSuccessResponse(message);
-
         expect(table.menus.length).toBe(2);
-        expect(session.getModelAdapter(menu2.id)).toBe(table.menus[0]);
-        expect(session.getModelAdapter(menu3.id)).toBe(table.menus[1]);
+        expect(session.getModelAdapter(menu2.id)).toBe(table.menus[0].remoteAdapter);
+        expect(session.getModelAdapter(menu3.id)).toBe(table.menus[1].remoteAdapter);
         expect(session.getModelAdapter(menu1.id)).toBeFalsy();
+        expect(menu1Widget.destroyed).toBe(true);
       });
 
     });

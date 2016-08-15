@@ -35,7 +35,6 @@ describe("CellEditor", function() {
   function createStringField(table) {
     var model = formHelper.createFieldModel('StringField', session.desktop);
     var adapter = new scout.StringFieldAdapter();
-    model.owner = new scout.NullWidgetAdapter();
     adapter.init(model);
     return adapter.createWidget(model, session.desktop);
   }

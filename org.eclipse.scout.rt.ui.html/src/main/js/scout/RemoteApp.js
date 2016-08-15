@@ -42,10 +42,10 @@ scout.RemoteApp.modifyWidgetPrototype = function() {
     }
 
     // Remote Case
-    var remoteAdapter = findRemoteAdapter(this);
+    var remoteAdapter = findRemoteAdapter(this); // FIXME [6.1] AWE cleanup this german text
     if (remoteAdapter &&                           // Wenn das widget (oder ein parent davon) ein remote adapter hat, sind auch die properties remotable
         this._isPropertyRemotable(propertyName)) { // True, wenn es für diese managed property einen Remote Adapter gibt
-      return this.session.getOrCreateWidget(value, remoteAdapter, this); // value ist ein String, enthält remote object ID
+      return this.session.getOrCreateWidget(value, this); // value ist ein String, enthält remote object ID
     }
 
     // Default: Local-Fall

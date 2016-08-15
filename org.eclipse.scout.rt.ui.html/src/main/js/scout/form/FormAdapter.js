@@ -23,6 +23,6 @@ scout.FormAdapter.prototype.onModelAction = function(event) {
 };
 
 scout.FormAdapter.prototype._onRequestFocus = function(formFieldId) {
-  var formFieldWidget = this.session.getOrCreateWidget(formFieldId, this, this.widget);
+  var formFieldWidget = this.session.getOrCreateWidget(formFieldId, this.widget);
   this.widget.requestFocus(formFieldWidget);
 };

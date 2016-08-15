@@ -88,11 +88,15 @@ scout.Session = function($entryPoint, options) {
   // FIXME [awe] 6.1 - rename in RootAdapter, should also have a widget, see FIXME in Session#_processEvents
   this.rootAdapter = new scout.ModelAdapter();
   this.rootAdapter.init({
-    owner: {},
     session: this,
     id: '1',
     objectType: 'GlobalAdapter'
   });
+  this.rootAdapter.createWidget({
+    session: this,
+    id: '1',
+    objectType: 'NullWidget'
+  }, new scout.NullWidget());
 
   // Install focus management for this session.
   this.focusManager = new scout.FocusManager({
@@ -123,7 +127,7 @@ scout.Session.prototype.getModelAdapter = function(id) {
   return this.modelAdapterRegistry[id];
 };
 
-scout.Session.prototype.getOrCreateWidget = function(adapterId, owner, parent) {
+scout.Session.prototype.getOrCreateWidget = function(adapterId, parent) {
   if (!adapterId) {
     return null;
   }
@@ -140,19 +144,11 @@ scout.Session.prototype.getOrCreateWidget = function(adapterId, owner, parent) {
   if (!adapterData) {
     throw new Error('no adapterData found for adapterId=' + adapterId);
   }
-  adapter = this.createModelAdapter(adapterData, owner);
+  adapter = this.createModelAdapter(adapterData);
   return adapter.createWidget(adapterData, parent);
 };
 
-scout.Session.prototype.createModelAdapter = function(adapterData, owner) {
-  if (adapterData.owner !== undefined) {
-    // Prefer the owner sent by the server
-    owner = this.getModelAdapter(adapterData.owner);
-  }
-  if (!owner) {
-    throw new Error('owner must be defined');
-  }
-
+scout.Session.prototype.createModelAdapter = function(adapterData) {
   var objectType = adapterData.objectType;
   var objectTypeParts = objectType.split('.');
   if (objectTypeParts.length === 2) {
@@ -166,13 +162,10 @@ scout.Session.prototype.createModelAdapter = function(adapterData, owner) {
   var adapterModel = {
     id: adapterData.id,
     session: this,
-    owner: owner,
     variantLenient: adapterData.variantLenient
   };
   var adapter = scout.create(objectType, adapterModel);
-  $.log.trace('created new adapter ' + adapter + '. owner=' + owner);
-
-  owner.addOwnedAdapter(adapter);
+  $.log.trace('created new adapter ' + adapter);
   return adapter;
 };
 
@@ -290,10 +283,8 @@ scout.Session.prototype._processStartupResponse = function(data) {
   // Create the desktop
   this._putLocaleData(data.startupData.locale, data.startupData.textMap);
   // Extract client session data without creating a model adapter for it. It is (currently) only used to transport the desktop's adapterId.
-  var parent = new scout.NullWidget();
-  parent.session = this;
   var clientSessionData = this._getAdapterData(data.startupData.clientSession);
-  this.desktop = this.getOrCreateWidget(clientSessionData.desktop, this.rootAdapter, parent);
+  this.desktop = this.getOrCreateWidget(clientSessionData.desktop, this.rootAdapter.widget);
   var renderDesktopImpl = function() {
     this._renderDesktop();
 
@@ -1097,12 +1088,6 @@ scout.Session.prototype._processEvents = function(events) {
 
     $.log.debug("Processing event '" + event.type + "' for adapter with ID " + event.target);
     adapter = this.getModelAdapter(event.target);
-    if (!adapter) {
-      // FIXME bsh, cgu: Check if this should only be getModelAdapter()
-      // See commit by CGU 2014-08-15 18:20:43 ("HtmlUi: Fixed 'No adapter' bug")
-      // --> This re-links the parent adapter to the root adapter!!!
-      adapter = this.getOrCreateWidget(event.target, this.rootAdapter, {}); // FIXME [awe] 6.1 --> what's the parent here?
-    }
     if (!adapter) {
       throw new Error('No adapter registered for ID ' + event.target);
     }

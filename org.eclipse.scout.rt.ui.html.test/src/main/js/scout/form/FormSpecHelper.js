@@ -102,12 +102,3 @@ scout.FormSpecHelper.prototype.createFieldModel = function(objectType, parent, m
 scout.FormSpecHelper.prototype.createField = function(objectType, parent, modelProperties) {
   return scout.create(objectType, this.createFieldModel(objectType, parent, modelProperties));
 };
-
-// FIXME [awe] 6.1 jasmine - DEPRECATED, remove method
-scout.FormSpecHelper.prototype.createFieldModel = function(objectType) {
-  var session = this.session;
-  var model = createSimpleModel(objectType || 'StringField', session);
-  model.enabled = true;
-  model.visible = true;
-  return model;
-};

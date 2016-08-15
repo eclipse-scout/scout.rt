@@ -77,11 +77,6 @@ describe('ObjectFactory', function() {
       };
     }
 
-    // All *Adapters must have an owner. Hopefully they all end with 'Adapter'
-    if (scout.strings.endsWith(objectType, 'Adapter')) {
-      model.owner = '1';
-    }
-
     return model;
   }
 

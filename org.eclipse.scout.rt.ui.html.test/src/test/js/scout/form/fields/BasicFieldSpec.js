@@ -27,7 +27,6 @@ describe("BasicField", function() {
 
   function createField(model) {
     var adapter = new scout.BasicFieldAdapter();
-    model.owner = new scout.NullWidgetAdapter();
     adapter.init(model);
     var field = adapter.createWidget(model, session.desktop);
     field.$field = $('<input>').on('blur', field._onFieldBlur.bind(field));

@@ -147,4 +147,94 @@ describe('Widget', function() {
 
   });
 
+  describe('destroy', function() {
+    it('destroys the widget', function() {
+      var widget = scout.create('NullWidget', {parent: parent, session: session});
+      expect(widget.destroyed).toBe(false);
+
+      widget.destroy();
+      expect(widget.destroyed).toBe(true);
+    });
+
+    it('destroys the children', function() {
+      var widget = scout.create('NullWidget', {parent: parent, session: session});
+      var child0 = scout.create('NullWidget', {parent: widget});
+      var child1 = scout.create('NullWidget', {parent: widget});
+      expect(widget.destroyed).toBe(false);
+      expect(child0.destroyed).toBe(false);
+      expect(child1.destroyed).toBe(false);
+
+      widget.destroy();
+      expect(widget.destroyed).toBe(true);
+      expect(child0.destroyed).toBe(true);
+      expect(child1.destroyed).toBe(true);
+    });
+
+    it('does only destroy children if the parent is the owner', function() {
+      var widget = scout.create('NullWidget', {parent: parent, session: session});
+      var another = scout.create('NullWidget', {parent: parent, session: session});
+      var child0 = scout.create('NullWidget', {parent: widget, owner: another});
+      var child1 = scout.create('NullWidget', {parent: widget});
+      expect(widget.destroyed).toBe(false);
+      expect(another.destroyed).toBe(false);
+      expect(child0.destroyed).toBe(false);
+      expect(child1.destroyed).toBe(false);
+
+      widget.destroy();
+      expect(widget.destroyed).toBe(true);
+      expect(another.destroyed).toBe(false);
+      expect(child0.destroyed).toBe(false);
+      expect(child1.destroyed).toBe(true);
+
+      another.destroy();
+      expect(another.destroyed).toBe(true);
+      expect(child0.destroyed).toBe(true);
+    });
+  });
+
+  describe('setParent', function() {
+    it('links the widget with the new parent', function() {
+      var widget = scout.create('NullWidget', {parent: parent, session: session});
+      var another = scout.create('NullWidget', {parent: parent, session: session});
+      expect(widget.parent).toBe(parent);
+      expect(another.parent).toBe(parent);
+
+      another.setParent(widget);
+      expect(widget.parent).toBe(parent);
+      expect(another.parent).toBe(widget);
+    });
+
+    it('removes the widget from the old parent if the old is not the owner', function() {
+      var widget = scout.create('NullWidget', {parent: parent, session: session});
+      var owner = scout.create('NullWidget', {parent: new scout.NullWidget(), session: session});
+      var another = scout.create('NullWidget', {parent: parent, session: session, owner: owner});
+      expect(parent.children[0]).toBe(widget);
+      expect(parent.children[1]).toBe(another);
+      expect(widget.children.length).toBe(0);
+
+      another.setParent(widget);
+      expect(parent.children[0]).toBe(widget);
+      expect(parent.children.length).toBe(1);
+      expect(widget.children.length).toBe(1);
+      expect(widget.children[0]).toBe(another);
+    });
+
+    it('does not remove the widget from the old parent if the old is the owner', function() {
+      var widget = scout.create('NullWidget', {parent: parent, session: session});
+      var another = scout.create('NullWidget', {parent: parent, session: session});
+      expect(another.owner).toBe(parent);
+      expect(parent.children[0]).toBe(widget);
+      expect(parent.children[1]).toBe(another);
+      expect(widget.children.length).toBe(0);
+
+      // The reference to the owner must always be maintained so that the widget will be destroyed eventually
+      another.setParent(widget);
+      expect(parent.children[0]).toBe(widget);
+      expect(parent.children[1]).toBe(another);
+      expect(parent.children.length).toBe(2);
+      expect(widget.children.length).toBe(1);
+      expect(widget.children[0]).toBe(another);
+    });
+  });
+
 });
