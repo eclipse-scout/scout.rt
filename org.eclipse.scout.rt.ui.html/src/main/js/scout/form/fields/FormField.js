@@ -736,6 +736,7 @@ scout.FormField.prototype._updateDisabledCopyOverlay = function() {
       this._removeDisabledCopyOverlay();
     } else {
       this._renderDisabledCopyOverlay();
+      this.revalidateLayout(); // because bounds of overlay is set in FormFieldLayout
     }
   }
 };
