@@ -45,6 +45,7 @@ describe("TableControl", function() {
 
   function createTableControlAdapter(model) {
     var action = new scout.TableControlAdapter();
+    model.owner = new scout.NullWidgetAdapter(model);
     action.init(model);
     return action;
   }

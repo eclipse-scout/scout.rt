@@ -109,6 +109,7 @@ scout.Widget.prototype.destroy = function() {
   // Destroy children in reverse order
   this.children.slice().reverse().forEach(function(child) {
     if (this.dontDestroy && this.dontDestroy.indexOf(child) > -1) {
+      //FIXME CGU nur wenn owner stimmt
       return;
     }
     child.destroy();
@@ -627,6 +628,7 @@ scout.Widget.prototype.setProperty = function(name, value) {
 
   if (this._isAdapterProperty(name)) { // FIXME [6.1] CGU, AWE durch propertyConfig ersetzen
     value = this._ensureType(name, value);
+    // FIXME CGU hier setParent verknüpfen
   }
 
   if (this.rendered) {

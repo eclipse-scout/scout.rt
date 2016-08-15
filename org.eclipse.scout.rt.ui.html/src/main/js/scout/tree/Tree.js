@@ -915,6 +915,10 @@ scout.Tree.prototype._filterMenus = function(menus, destination, onlyVisible, en
   return scout.menus.filterAccordingToSelection('Tree', this.selectedNodes.length, menus, destination, onlyVisible, enableDisableKeyStroke);
 };
 
+scout.Tree.prototype.setEnabled = function(enabled) {
+  this.setProperty('enabled', enabled);
+};
+
 scout.Tree.prototype._renderEnabled = function() {
   var enabled = this.enabled;
   this.$data.setEnabled(enabled);
@@ -1390,8 +1394,8 @@ scout.Tree.prototype.setNodeExpanded = function(node, expanded, opts) {
       this._removeChildrenFromFlatList(node, renderAnimated);
     }
     if (notifyServer) {
-      this._send('nodeExpanded', {
-        nodeId: node.id,
+      this.trigger('nodeExpanded', {
+        node: node,
         expanded: expanded,
         expandedLazy: lazy
       });
@@ -1885,6 +1889,9 @@ scout.Tree.prototype._updateChildNodeIndex = function(nodes, startIndex) {
 
 scout.Tree.prototype.insertNodes = function(nodes, parentNode) {
   nodes = this._ensureTreeNodes(nodes); // FIXME [awe] 6.1 - wir müssen schauen, wo wir überall das nodeModel in ein TreeNode oder Page konvertieren wollen
+  if (parentNode && !(parentNode instanceof scout.TreeNode)) {
+    throw new Error('parent has to be a tree node: ' + parentNode);
+  }
 
   // Append continuous node blocks
   nodes.sort(function(a, b) {
@@ -2109,7 +2116,7 @@ scout.Tree.prototype.checkNodes = function(nodes, options) {
     checked: true,
     notifyServer: true,
     checkOnlyEnabled: true,
-    isCheckChildren: false
+    checkChildren: false
   };
   $.extend(opts, options);
   var updatedNodes = [];
@@ -2119,7 +2126,7 @@ scout.Tree.prototype.checkNodes = function(nodes, options) {
   nodes = scout.arrays.ensure(nodes);
   nodes.forEach(function(node) {
     if ((!node.enabled && opts.checkOnlyEnabled) || node.checked === opts.checked) {
-      if (opts.isCheckChildren) {
+      if (opts.checkChildren) {
         updatedNodes = updatedNodes.concat(this.checkChildren(node, opts.checked));
       }
       return;
@@ -2138,14 +2145,14 @@ scout.Tree.prototype.checkNodes = function(nodes, options) {
     }
     updatedNodes.push(node);
     this._updateMarkChildrenChecked(node, false, opts.checked, true);
-    if (opts.notifyServer) {
+    if (opts.notifyServer) { // FIXME [6.1] CGU what is the difference to above checkChildren?
       updatedNodes = updatedNodes.concat(this.checkChildren(node, opts.checked));
     }
   }, this);
 
-  if (opts.notifyServer) {
-    this._sendNodesChecked(updatedNodes);
-  }
+  this.trigger('nodesChecked', {
+    nodes: updatedNodes
+  });
   if (this.rendered) {
     updatedNodes.forEach(function(node) {
       this._renderNodeChecked(node);
@@ -2172,25 +2179,10 @@ scout.Tree.prototype.checkChildren = function(node, checked) {
     updatedNodes = this.checkNodes(node.childNodes, {
       checked: checked,
       notifyServer: false,
-      isCheckChildren: true
+      checkChildren: true
     });
   }
   return updatedNodes;
-};
-
-scout.Tree.prototype._sendNodesChecked = function(nodes) {
-  var data = {
-    nodes: []
-  };
-
-  for (var i = 0; i < nodes.length; i++) {
-    data.nodes.push({
-      nodeId: nodes[i].id,
-      checked: nodes[i].checked
-    });
-  }
-
-  this._send('nodesChecked', data);
 };
 
 scout.Tree.prototype._triggerNodesSelected = function(debounce) {
@@ -2672,8 +2664,8 @@ scout.Tree.prototype._onNodeDoubleClick = function(event) {
     return;
   }
 
-  this._send('nodeAction', {
-    nodeId: node.id
+  this.trigger('nodeAction', {
+    node: node
   });
 
   this.setNodeExpanded(node, expanded, {

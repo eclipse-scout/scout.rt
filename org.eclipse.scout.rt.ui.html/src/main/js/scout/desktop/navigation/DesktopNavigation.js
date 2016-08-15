@@ -64,10 +64,10 @@ scout.DesktopNavigation.prototype._renderViewButtonBox = function() {
   if (this.desktop.viewButtons.length === 0) {
     return;
   }
+
   this.viewButtonBox = scout.create('ViewButtonBox', {
     parent: this,
-    viewButtons: this.desktop.viewButtons,
-    dontDestroy: this.desktop.viewButtons
+    viewButtons: this.desktop.viewButtons
   });
   this.viewButtonBox.render(this.$container);
 };

@@ -70,6 +70,13 @@ scout.TreeSpecHelper.prototype.createTree = function(model) {
   return tree;
 };
 
+scout.TreeSpecHelper.prototype.createTreeAdapter = function(model) {
+  var adapter = new scout.TreeAdapter();
+  model.owner = new scout.NullWidgetAdapter();
+  adapter.init(model);
+  return adapter;
+};
+
 scout.TreeSpecHelper.prototype.createCompactTree = function(model) {
   var tree = new scout.CompactTree();
   tree.init(model);
@@ -78,16 +85,6 @@ scout.TreeSpecHelper.prototype.createCompactTree = function(model) {
 
 scout.TreeSpecHelper.prototype.findAllNodes = function(tree) {
   return tree.$container.find('.tree-node');
-};
-
-/**
- * Finds a node in the tree by the given ID.
- */
-scout.TreeSpecHelper.prototype.findNodeById = function(tree, nodeId) {
-  if (tree.nodesMap) {
-    return tree.nodesMap[nodeId];
-  }
-  return null;
 };
 
 scout.TreeSpecHelper.prototype.createNodeExpandedEvent = function(model, nodeId, expanded) {

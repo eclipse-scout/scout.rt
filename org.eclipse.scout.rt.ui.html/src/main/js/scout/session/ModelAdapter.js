@@ -75,6 +75,7 @@ scout.ModelAdapter.prototype._prepareModel = function(adapterData, parent) {
   scout.defaultValues.applyTo(model);
 
   model.parent = parent;
+//  model.owner = parent; // FIXME CGU owner von adapterData bevorzugen
   model.remoteAdapter = this;
   return model;
 };

@@ -33,9 +33,40 @@ scout.TreeAdapter.prototype._onWidgetNodeClicked = function(event) {
   });
 };
 
+scout.TreeAdapter.prototype._onWidgetNodeAction = function(event) {
+  this._send('nodeAction');
+};
+
 scout.TreeAdapter.prototype._onWidgetNodesSelected = function(event) {
   var nodeIds = this.widget._nodesToIds(this.widget.selectedNodes);
   this._sendNodesSelected(nodeIds, event.debounce);
+};
+
+scout.TreeAdapter.prototype._onWidgetNodeExpanded = function(event) {
+  this._send('nodeExpanded', {
+    nodeId: event.node.id,
+    expanded: event.expanded,
+    expandedLazy: event.expandedLazy
+  });
+};
+
+scout.TreeAdapter.prototype._onWidgetNodesChecked = function(event) {
+  this._sendNodesChecked(event.nodes);
+};
+
+scout.TreeAdapter.prototype._sendNodesChecked = function(nodes) {
+  var data = {
+    nodes: []
+  };
+
+  for (var i = 0; i < nodes.length; i++) {
+    data.nodes.push({
+      nodeId: nodes[i].id,
+      checked: nodes[i].checked
+    });
+  }
+
+  this._send('nodesChecked', data);
 };
 
 scout.TreeAdapter.prototype._onWidgetEvent = function(event) {
@@ -43,6 +74,12 @@ scout.TreeAdapter.prototype._onWidgetEvent = function(event) {
     this._onWidgetNodesSelected(event);
   } else if (event.type === 'nodeClicked') {
     this._onWidgetNodeClicked(event);
+  } else if (event.type === 'nodeAction') {
+    this._onWidgetNodeAction(event);
+  } else if (event.type === 'nodeExpanded') {
+    this._onWidgetNodeExpanded(event);
+  } else if (event.type === 'nodesChecked') {
+    this._onWidgetNodesChecked(event);
   } else {
     scout.TreeAdapter.parent.prototype._onWidgetEvent.call(this, event);
   }
