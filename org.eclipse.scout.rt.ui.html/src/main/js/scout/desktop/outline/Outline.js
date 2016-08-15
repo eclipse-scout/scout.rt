@@ -856,39 +856,14 @@ scout.Outline.prototype.setNodeMenuBarVisible = function(visible) {
   }
 };
 
-/**
- * === Method required for objects that act as 'displayParent' ===
- *
- * Returns the DOM elements to paint a glassPanes over, once a modal Form, message-box or file-chooser is showed with this Outline as its 'displayParent'.
- */
-scout.Outline.prototype.glassPaneTargets = function() {
-  if (this.rendered) {
-    var desktop = this.session.desktop;
-    var elements = this._glassPaneTargets();
-    return elements;
-  } else {
-    var deferred = new scout.DeferredGlassPaneTarget();
-    var renderedHandler = function(event) {
-      var elements = this._glassPaneTargets();
-      deferred.ready(elements);
-    }.bind(this);
-
-    this.one('rendered', renderedHandler);
-    this.one('destroy', function() {
-      this.off('rendered', renderedHandler);
-    }.bind(this));
-    return [deferred];
-  }
-};
-
 scout.Outline.prototype._glassPaneTargets = function() {
   var desktop = this.session.desktop;
   var elements = [];
   if (desktop.navigation) {
     elements.push(desktop.navigation.$body);
   }
-  if (desktop.bench && desktop.bench.outlineContent.rendered) {
-    elements.push(desktop.bench.outlineContent.$container);
+  if (desktop.bench.outlineContent) {
+    scout.arrays.pushAll(elements, desktop.bench.outlineContent.glassPaneTargets());
   }
   return elements;
 };

@@ -39,3 +39,27 @@ scout.DeferredGlassPaneTarget.prototype.renderWhenReady = function() {
     }.bind(this));
   }
 };
+
+/* --- STATIC HELPERS ------------------------------------------------------------- */
+
+/**
+ * @param widget a not rendered scout.Widget
+ * @findGlassPaneTargets function which returns the targets
+ */
+scout.DeferredGlassPaneTarget.createFor = function(widget, findGlassPaneTargets) {
+  if (widget.rendered) {
+    throw new Error('Don\'t call this function if widget is already rendered.');
+  }
+
+  var deferred = new scout.DeferredGlassPaneTarget();
+  var renderedHandler = function(event) {
+    var elements = findGlassPaneTargets();
+    deferred.ready(elements);
+  };
+
+  widget.one('rendered', renderedHandler);
+  widget.one('destroy', function() {
+    widget.off('rendered', renderedHandler);
+  }.bind(widget));
+  return [deferred];
+};
