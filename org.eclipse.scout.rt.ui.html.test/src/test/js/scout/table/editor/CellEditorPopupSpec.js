@@ -33,7 +33,11 @@ describe("CellEditor", function() {
   });
 
   function createStringField(table) {
-    return formHelper.createField('StringField', session.desktop);
+    var model = formHelper.createFieldModel('StringField', session.desktop);
+    var adapter = new scout.StringFieldAdapter();
+    model.owner = new scout.NullWidgetAdapter();
+    adapter.init(model);
+    return adapter.createWidget(model, session.desktop);
   }
 
   function $findPopup() {
@@ -47,7 +51,8 @@ describe("CellEditor", function() {
   function createTableAndStartCellEdit() {
     var model = helper.createModelFixture(2, 2);
     model.rows[0].cells[0].editable = true;
-    var table = helper.createTable(model);
+    var adapter = helper.createTableAdapter(model) ;
+    var table = adapter.createWidget(model, session.desktop);
     table.render(session.$entryPoint);
 
     var field = createStringField(table);
@@ -340,10 +345,7 @@ describe("CellEditor", function() {
 
       var updatedRows = helper.createModelRows(2, 1);
       updatedRows[0].id = row0.id;
-      var message = {
-        events: [createRowsUpdatedEvent(model, updatedRows)]
-      };
-      session._processSuccessResponse(message);
+      table.updateRows(updatedRows);
 
       // Check if popup is correctly linked to updated row and new $cell
       row0 = table.rows[0];
@@ -358,30 +360,30 @@ describe("CellEditor", function() {
       row0.cells[0].editable = true;
       table.render(session.$entryPoint);
       startAndAssertCellEdit(table, table.columns[0], row0);
-      spyOn(table, '_sendCancelCellEdit');
+      spyOn(table, '_triggerCancelCellEdit');
 
       table.deleteRows([row0]);
 
       // Check if popup is closed
       expect($findPopup().length).toBe(0);
 
-      // Check whether cancel edit has been sent
-      expect(table._sendCancelCellEdit).toHaveBeenCalled();
+      // Check whether cancel edit has been called
+      expect(table._triggerCancelCellEdit).toHaveBeenCalled();
     });
 
     it("closes popup if all rows get deleted", function() {
       row0.cells[0].editable = true;
       table.render(session.$entryPoint);
       startAndAssertCellEdit(table, table.columns[0], row0);
-      spyOn(table, '_sendCancelCellEdit');
+      spyOn(table, '_triggerCancelCellEdit');
 
       table.deleteAllRows();
 
       // Check if popup is closed
       expect($findPopup().length).toBe(0);
 
-      // Check whether cancel edit has been sent
-      expect(table._sendCancelCellEdit).toHaveBeenCalled();
+      // Check whether cancel edit has been called
+      expect(table._triggerCancelCellEdit).toHaveBeenCalled();
     });
 
   });

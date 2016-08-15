@@ -166,7 +166,8 @@ scout.Session.prototype.createModelAdapter = function(adapterData, owner) {
   var adapterModel = {
     id: adapterData.id,
     session: this,
-    owner: owner
+    owner: owner,
+    variantLenient: adapterData.variantLenient
   };
   var adapter = scout.create(objectType, adapterModel);
   $.log.trace('created new adapter ' + adapter + '. owner=' + owner);

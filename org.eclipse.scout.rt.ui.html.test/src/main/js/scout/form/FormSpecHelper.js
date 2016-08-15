@@ -56,7 +56,7 @@ scout.FormSpecHelper.prototype.createGroupBoxWithFields = function(parent, mainB
   for (var i = 0; i < numFields; i++) {
     fields.push(scout.create('StringField', {parent: groupBox}));
   }
-  groupBox.setFields(fields);
+  groupBox.setProperty('fields', fields);
   return groupBox;
 };
 
@@ -89,14 +89,18 @@ scout.FormSpecHelper.prototype.createFormModel = function() {
   return form;
 };
 
-scout.FormSpecHelper.prototype.createField = function(objectType, parent, modelProperties) {
+scout.FormSpecHelper.prototype.createFieldModel = function(objectType, parent, modelProperties) {
   parent = scout.nvl(parent, this.session.desktop);
   var model = createSimpleModel(objectType || 'StringField', this.session);
   model.parent = parent;
   if (modelProperties) {
     $.extend(model, modelProperties);
   }
-  return scout.create(objectType, model);
+  return model;
+};
+
+scout.FormSpecHelper.prototype.createField = function(objectType, parent, modelProperties) {
+  return scout.create(objectType, this.createFieldModel(objectType, parent, modelProperties));
 };
 
 // FIXME [awe] 6.1 jasmine - DEPRECATED, remove method
