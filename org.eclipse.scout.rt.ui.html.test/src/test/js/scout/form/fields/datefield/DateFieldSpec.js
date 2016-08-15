@@ -188,10 +188,11 @@ describe("DateField", function() {
       // Otherwise server would generate a display text as soon as timestamp changes and send it back even if it is the same as the ui is sending
       var events = [
         new scout.Event(dateField.id, 'displayTextChanged', {
-          displayText: "11.02.2015"
+          displayText: '11.02.2015',
+          showBusyIndicator: true
         }),
         new scout.Event(dateField.id, 'timestampChanged', {
-          timestamp: "2015-02-11"
+          timestamp: '2015-02-11'
         })
       ];
       expect(mostRecentJsonRequest()).toContainEventsExactly(events);
@@ -263,10 +264,11 @@ describe("DateField", function() {
 
       var events = [
         new scout.Event(dateField.id, 'displayTextChanged', {
-          displayText: "01.02.2016"
+          displayText: '01.02.2016',
+          showBusyIndicator: true
         }),
         new scout.Event(dateField.id, 'timestampChanged', {
-          timestamp: "2016-02-01"
+          timestamp: '2016-02-01'
         })
       ];
       expect(mostRecentJsonRequest()).toContainEventsExactly(events);

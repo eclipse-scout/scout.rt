@@ -153,7 +153,7 @@ describe("StringField", function() {
       var event = new scout.Event(field.id, 'displayTextChanged', {
         displayText: 'Test1',
         whileTyping: false,
-        noBusyIndicator: false
+        showBusyIndicator: true
       });
       expect(mostRecentJsonRequest()).toContainEvents(event);
 
@@ -169,7 +169,7 @@ describe("StringField", function() {
       event = new scout.Event(field.id, 'displayTextChanged', {
         displayText: 'Test1ABC2',
         whileTyping: false,
-        noBusyIndicator: false
+        showBusyIndicator: true
       });
       expect(mostRecentJsonRequest()).toContainEvents(event);
     });
@@ -190,12 +190,12 @@ describe("StringField", function() {
       events[0] = new scout.Event(field.id, 'displayTextChanged', {
         displayText: 'Test1',
         whileTyping: true,
-        noBusyIndicator: true
+        showBusyIndicator: false
       });
       events[1] = new scout.Event(field.id, 'displayTextChanged', {
         displayText: 'Test1',
         whileTyping: false,
-        noBusyIndicator: false
+        showBusyIndicator: true
       });
       expect(mostRecentJsonRequest()).toContainEventsExactly(events);
 
@@ -212,12 +212,12 @@ describe("StringField", function() {
       events[0] = new scout.Event(field.id, 'displayTextChanged', {
         displayText: 'Test1ABC2',
         whileTyping: true,
-        noBusyIndicator: true
+        showBusyIndicator: false
       });
       events[1] = new scout.Event(field.id, 'displayTextChanged', {
         displayText: 'Test1ABC2',
         whileTyping: false,
-        noBusyIndicator: false
+        showBusyIndicator: true
       });
       expect(mostRecentJsonRequest()).toContainEventsExactly(events);
     });

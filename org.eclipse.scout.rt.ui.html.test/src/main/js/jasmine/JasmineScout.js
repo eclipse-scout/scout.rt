@@ -29,6 +29,15 @@ function sandboxSession(options) {
   options.renderDesktop = scout.nvl(options.renderDesktop, true);
 
   session = new scout.Session($sandbox, options);
+
+  // Install non-filtering requestToJson() function. This is required to test
+  // the value of the "showBusyIndicator" using toContainEvents(). Usually, this
+  // flag is filtered from the request before sending the AJAX call, however in
+  // the tests we want to keep it.
+  session._requestToJson = function(request) {
+    return JSON.stringify(request);
+  };
+
   // Simulate successful session initialization
   session.uiSessionId = '1.1';
   session.modelAdapterRegistry[session.uiSessionId] = session;

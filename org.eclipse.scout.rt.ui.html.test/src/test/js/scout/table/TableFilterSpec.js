@@ -649,7 +649,7 @@ describe("Table Filter", function() {
 
         var event = new scout.Event(table.id, 'rowsFiltered', {
           rowIds: [table.rows[1].id],
-          noBusyIndicator: true
+          showBusyIndicator: false
         });
         expect(mostRecentJsonRequest()).toContainEvents(event);
       });
