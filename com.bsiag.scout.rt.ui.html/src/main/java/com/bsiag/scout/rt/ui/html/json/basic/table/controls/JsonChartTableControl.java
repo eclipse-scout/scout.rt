@@ -9,7 +9,6 @@
  ******************************************************************************/
 package com.bsiag.scout.rt.ui.html.json.basic.table.controls;
 
-import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
@@ -80,8 +79,7 @@ public class JsonChartTableControl<CHART_TABLE_CONTROL extends IChartTableContro
   private JSONObject createJsonObject(IChartColumnParam columnParam) {
     JSONObject json = new JSONObject();
     if (columnParam != null) {
-
-      String columnId = getColumnId(columnParam.getColumnIndex());
+      String columnId = getTableAdapter().getColumnId(columnParam.getColumn());
       int columnModifier = columnParam.getColumnModifier();
       json.put("id", columnId);
       json.put("modifier", columnModifier);
@@ -92,27 +90,6 @@ public class JsonChartTableControl<CHART_TABLE_CONTROL extends IChartTableContro
 
   private JsonTable getTableAdapter() {
     return (JsonTable) getAdapter(getModel().getTable());
-  }
-
-  private String getColumnId(int index) {
-    if (index > 0) {
-      final ITable table = getModel().getTable();
-      IColumn column = table.getColumns().get(index);
-      return getTableAdapter().getColumnId(column);
-    }
-    else {
-      return null;
-    }
-  }
-
-  private int getColumnIndex(String id) {
-    final IColumn column = getTableAdapter().optColumn(id);
-    if (column != null) {
-      return column.getColumnIndex();
-    }
-    else {
-      return -1; //TODO [jgu] necessary, use column instead?
-    }
   }
 
   @Override
@@ -142,8 +119,8 @@ public class JsonChartTableControl<CHART_TABLE_CONTROL extends IChartTableContro
   private ChartColumnParam createColumnParam(JSONObject jsonValue) {
     String id = jsonValue.optString("id");
     int modifier = jsonValue.optInt("modifier");
-    final ChartColumnParam param = new ChartColumnParam(getColumnIndex(id), modifier);
-    return param;
+    IColumn column = getTableAdapter().optColumn(id);
+    return new ChartColumnParam(column, modifier);
   }
 
 }

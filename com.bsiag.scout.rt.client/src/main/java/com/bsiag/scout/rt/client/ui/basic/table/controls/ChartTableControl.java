@@ -59,7 +59,7 @@ public class ChartTableControl extends AbstractTableControl implements IChartTab
   @ConfigProperty(ConfigProperty.OBJECT)
   @Order(200)
   protected IChartColumnParam getConfiguredAggregation() {
-    return new ChartColumnParam(-1, IChartColumnParam.AGGREGATION_COUNT);
+    return new ChartColumnParam(IChartColumnParam.AGGREGATION_COUNT);
   }
 
   @ConfigProperty(ConfigProperty.OBJECT)
