@@ -74,12 +74,7 @@
                   <type>target</type>
                   <classifier>eclipse-mars</classifier>
                 </artifact>
-                <artifact>
-                  <file>eclipse-mars-integration.target</file>
-                  <type>target</type>
-                  <classifier>eclipse-mars-integration</classifier>
-                </artifact>
-              </artifacts>
+               </artifacts>
             </configuration>
           </execution>
         </executions>
