@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-describe("SequenceBox", function() {
+describe('SequenceBox', function() {
   var session, helper, menuHelper;
 
   beforeEach(function() {
@@ -28,10 +28,10 @@ describe("SequenceBox", function() {
     return seqBox;
   }
 
-  describe("mandatory indicator", function() {
+  describe('mandatory indicator', function() {
 
     // Must not contain an indicator to prevent a double indicator if the first field is mandatory too
-    it("does not exist", function() {
+    it('does not exist', function() {
       var field = createField({mandatory: true});
       field.render(session.$entryPoint);
 
@@ -40,9 +40,9 @@ describe("SequenceBox", function() {
 
   });
 
-  describe("label width", function() {
+  describe('label width', function() {
 
-    it("is 0 if it is empty", function() {
+    it('is 0 if it is empty', function() {
       var field = createField();
       field.render(session.$entryPoint);
       // css is not applied, therefore we need to adjust display style here
@@ -54,9 +54,9 @@ describe("SequenceBox", function() {
 
   });
 
-  describe("status handling", function() {
+  describe('status handling', function() {
 
-    it("moves the error status of the last field to the seq box", function() {
+    it('moves the error status of the last field to the seq box', function() {
       var field = createField({statusVisible: false});
       field.render(session.$entryPoint);
 
@@ -73,7 +73,7 @@ describe("SequenceBox", function() {
       expect(field.fields[1].errorStatus.message).toBe('foo');
     });
 
-    it("moves the tooltip of the last field to the seq box", function() {
+    it('moves the tooltip of the last field to the seq box', function() {
       var field = createField({statusVisible: false});
       field.render(session.$entryPoint);
 
@@ -90,7 +90,7 @@ describe("SequenceBox", function() {
       expect(field.fields[1].tooltipText).toBe('foo');
     });
 
-    it("moves the menus of the last field to the seq box", function() {
+    it('moves the menus of the last field to the seq box', function() {
       var field = createField({statusVisible: false});
       var menu0 = menuHelper.createMenu(menuHelper.createModel());
       field.fields[1].menus = [menu0];
@@ -110,7 +110,7 @@ describe("SequenceBox", function() {
       expect(field.fields[1].$status.isVisible()).toBe(false);
     });
 
-    it("does not display the error message of the last field, only the one of the seq box", function() {
+    it('does not display the error message of the last field, only the one of the seq box', function() {
       var field = createField({statusVisible: false});
       field.render(session.$entryPoint);
 
@@ -123,7 +123,7 @@ describe("SequenceBox", function() {
       expect(field.tooltip.rendered).toBe(true);
     });
 
-    it("removes the tooltip from the seq box if last field gets invisible", function() {
+    it('removes the tooltip from the seq box if last field gets invisible', function() {
       var field = createField({statusVisible: false});
       field.fields[1].tooltipText = 'foo';
       field.render(session.$entryPoint);
@@ -141,7 +141,7 @@ describe("SequenceBox", function() {
       expect(field.fields[1].tooltipText).toBe('foo');
     });
 
-    it("moves the tooltip from the first field to the seq box if it gets the last field after a visibility change", function() {
+    it('moves the tooltip from the first field to the seq box if it gets the last field after a visibility change', function() {
       var field = createField({statusVisible: false});
       field.fields[0].tooltipText = 'foo';
       field.render(session.$entryPoint);
@@ -159,7 +159,7 @@ describe("SequenceBox", function() {
       expect(field.fields[0].tooltipText).toBe('foo');
     });
 
-    it("moves the error from the first field to the seq box if it gets the last field after a visibility change", function() {
+    it('moves the error from the first field to the seq box if it gets the last field after a visibility change', function() {
       var field = createField({statusVisible: false});
       field.fields[0].errorStatus = new scout.Status({message: 'foo'});
       field.render(session.$entryPoint);
@@ -176,11 +176,11 @@ describe("SequenceBox", function() {
       expect(field.$status.isVisible()).toBe(true);
       expect(field.errorStatus.message).toBe('foo');
       expect(field.fields[0].$status.isVisible()).toBe(false);
-      expect(field.fields[0].tooltip.rendered).toBe(false);
+      expect(field.fields[0].tooltip).toBe(null);
       expect(field.fields[0].errorStatus.message).toBe('foo');
     });
 
-    it("makes sure the status may be displayed on the field again if the field was the last visible field once", function() {
+    it('makes sure the status may be displayed on the field again if the field was the last visible field once', function() {
       var field = createField({statusVisible: false});
       field.fields[0].errorStatus = new scout.Status({message: 'foo'});
       field.render(session.$entryPoint);
@@ -197,7 +197,7 @@ describe("SequenceBox", function() {
       expect(field.$status.isVisible()).toBe(true);
       expect(field.errorStatus.message).toBe('foo');
       expect(field.fields[0].$status.isVisible()).toBe(false);
-      expect(field.fields[0].tooltip.rendered).toBe(false);
+      expect(field.fields[0].tooltip).toBe(null);
       expect(field.fields[0].errorStatus.message).toBe('foo');
 
       field.fields[1].setProperty('visible', true);

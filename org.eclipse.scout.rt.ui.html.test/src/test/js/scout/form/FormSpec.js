@@ -8,7 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-describe("Form", function() {
+/* global linkWidgetAndAdapter */
+describe('Form', function() {
   var session, helper;
 
   beforeEach(function() {
@@ -27,9 +28,9 @@ describe("Form", function() {
     jasmine.clock().uninstall();
   });
 
-  describe("destroy", function() {
+  describe('destroy', function() {
 
-    it("destroys the adapter and its children", function() {
+    it('destroys the adapter and its children', function() {
       var form = helper.createFormWithOneField2();
 
       expect(form.rootGroupBox).toBeTruthy();
@@ -45,9 +46,9 @@ describe("Form", function() {
 
   });
 
-  describe("onModelAction", function() {
+  describe('onModelAction', function() {
 
-    describe("formClose", function() {
+    describe('formClose', function() {
 
       function createDisposeAdapterEvent(model) {
         return {
@@ -57,8 +58,9 @@ describe("Form", function() {
         };
       }
 
-      it("destroys the form", function() {
+      it('destroys the form', function() {
         var form = helper.createFormWithOneField2();
+        linkWidgetAndAdapter(form, new scout.FormAdapter());
         spyOn(form, 'destroy');
 
         var message = {

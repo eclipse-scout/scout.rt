@@ -8,6 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
+/* global linkWidgetAndAdapter */
 describe('FormMenu', function() {
   var session, desktop, helper;
 
@@ -98,6 +99,7 @@ describe('FormMenu', function() {
 
       it('calls setSelected', function() {
         var menu = createMenu();
+        linkWidgetAndAdapter(menu, new scout.MenuAdapter());
         menu.render(session.$entryPoint);
         expect(findPopup()).not.toExist();
 

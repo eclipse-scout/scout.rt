@@ -145,11 +145,13 @@ function createAdapterData(adapterDataArray) {
  * where you have an existing widget and later create a new adapter instance to that widget.
  */
 function linkWidgetAndAdapter(widget, adapter) {
+  var session = widget.session;
   adapter.widget = widget;
-  adapter.session = widget.session;
+  adapter.session = session;
   adapter.id = widget.id;
   widget.remoteAdapter = adapter;
   adapter._attachWidget();
+  session.registerModelAdapter(adapter);
 }
 
 function stripCommentsFromJson(input) {
