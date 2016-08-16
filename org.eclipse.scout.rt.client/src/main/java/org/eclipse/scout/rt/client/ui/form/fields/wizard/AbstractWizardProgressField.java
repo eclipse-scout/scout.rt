@@ -31,7 +31,7 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.WeakEventListener;
 
 @ClassId("bcaedbdd-221f-438c-b537-80b5c5056eb7")
-public class AbstractWizardProgressField extends AbstractFormField implements IWizardProgressField {
+public abstract class AbstractWizardProgressField extends AbstractFormField implements IWizardProgressField {
 
   private IWizardProgressFieldUIFacade m_uiFacade;
   private final WizardListener m_wizardListener = new P_WizardListener();
@@ -84,6 +84,16 @@ public class AbstractWizardProgressField extends AbstractFormField implements IW
   @Override
   public void setActiveStep(IWizardStep<? extends IForm> activeStep) {
     propertySupport.setProperty(PROP_ACTIVE_STEP, activeStep);
+  }
+
+  @Override
+  protected boolean getConfiguredLabelVisible() {
+    return false;
+  }
+
+  @Override
+  protected boolean getConfiguredStatusVisible() {
+    return false;
   }
 
   @Override

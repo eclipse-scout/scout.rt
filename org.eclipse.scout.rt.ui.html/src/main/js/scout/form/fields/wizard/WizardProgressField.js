@@ -31,6 +31,8 @@ scout.WizardProgressField.prototype._init = function(model) {
 scout.WizardProgressField.prototype._render = function($parent) {
   this.addContainer($parent, 'wizard-progress-field', new scout.WizardProgressFieldLayout(this));
   this.addField($parent.makeDiv('wizard-steps'));
+  this.addStatus();
+  this.addLabel();
 
   this.$wizardStepsBody = this.$field.appendDiv('wizard-steps-body');
 

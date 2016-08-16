@@ -120,7 +120,7 @@
   }
 
   /* Step separator */
-  .wizard-step-separator {
+  & > .wizard-step-separator {
     /* Arrow separators (::after is behind ::before) */
     &::after,
     &::before {
