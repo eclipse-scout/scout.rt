@@ -9,7 +9,8 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 /* global LocaleSpecHelper */
-describe("Column", function() {
+/* global linkWidgetAndAdapter */
+describe('Column', function() {
   var session;
   var helper;
   var locale;
@@ -32,7 +33,7 @@ describe("Column", function() {
   /**
    * Test assumes that default values for horiz. alignment are set on cell object.
    */
-  it("considers horizontal alignment", function() {
+  it('considers horizontal alignment', function() {
     var model = helper.createModelFixture(3, 2);
     model.columns[1].horizontalAlignment = 0;
     model.columns[2].horizontalAlignment = 1;
@@ -88,7 +89,7 @@ describe("Column", function() {
     expect($cells1.eq(2)).toHaveClass('halign-right');
   });
 
-  it("converts linebreak into <br> in header cells", function() {
+  it('converts linebreak into <br> in header cells', function() {
     var model = helper.createModelFixture(3, 2);
     model.columns[0].text = 'header text';
     model.columns[1].text = 'header text\nNew line';
@@ -103,7 +104,7 @@ describe("Column", function() {
     expect($headerItem1Text.html()).toBe('header text<br>New line');
   });
 
-  it("considers custom css class of a column", function() {
+  it('considers custom css class of a column', function() {
     var model = helper.createModelFixture(3, 2);
     model.columns[0].cssClass = 'abc';
 
@@ -123,7 +124,7 @@ describe("Column", function() {
     expect($cells1.eq(1)).not.toHaveClass('abc');
   });
 
-  it("considers custom css class of a column, as well for checkbox columns", function() {
+  it('considers custom css class of a column, as well for checkbox columns', function() {
     var model = helper.createModelFixture(3, 2);
     model.columns[0].cssClass = 'abc';
     model.columns[0].objectType = 'BooleanColumn';
@@ -144,7 +145,7 @@ describe("Column", function() {
     expect($cells1.eq(1)).not.toHaveClass('abc');
   });
 
-  it("considers custom css class of a cell, if both are set only the cell class is used", function() {
+  it('considers custom css class of a cell, if both are set only the cell class is used', function() {
     var model = helper.createModelFixture(3, 2);
     model.columns[0].cssClass = 'abc';
     model.rows[0].cells[0].cssClass = 'custom-cell-0';
@@ -167,7 +168,7 @@ describe("Column", function() {
     expect($cells1.eq(1)).not.toHaveClass('abc');
   });
 
-  it("considers htmlEnabled of a cell", function() {
+  it('considers htmlEnabled of a cell', function() {
     var model = helper.createModelFixture(3, 2);
     model.rows[0].cells[0].text = '<b>hi</b>';
     model.rows[0].cells[0].htmlEnabled = false;
@@ -184,7 +185,7 @@ describe("Column", function() {
     expect($cells0.eq(1).text()).toBe('hi');
   });
 
-  it("caches encoded text of a cell to improve performance", function() {
+  it('caches encoded text of a cell to improve performance', function() {
     var model = helper.createModelFixture(3, 1);
     model.rows[0].cells[0].text = '<b>hi</b>';
     model.rows[0].cells[0].htmlEnabled = false;
@@ -193,7 +194,7 @@ describe("Column", function() {
     expect(table.rows[0].cells[0].text).toBe('<b>hi</b>');
     expect(table.rows[0].cells[0].encodedText).toBeFalsy();
 
-    spyOn(scout.strings, "encode").and.callThrough();
+    spyOn(scout.strings, 'encode').and.callThrough();
     table.render(session.$entryPoint);
 
     expect(scout.strings.encode.calls.count()).toBe(6); // header and table cells
@@ -208,8 +209,8 @@ describe("Column", function() {
     expect(scout.strings.encode.calls.count()).toBe(3); // only for header cells
   });
 
-  describe("multilineText", function() {
-    it("replaces\n with br, but only if htmlEnabled is false", function() {
+  describe('multilineText', function() {
+    it('replaces\n with br, but only if htmlEnabled is false', function() {
       var model = helper.createModelFixture(3, 2);
       model.multilineText = true;
       model.rows[0].cells[0].text = '<br>hello\nyou';
@@ -229,7 +230,7 @@ describe("Column", function() {
     });
   });
 
-  describe("textWrap", function() {
+  describe('textWrap', function() {
     var table, model, $rows, $cells0, $cell0_0, $cell0_1;
 
     beforeEach(function() {
@@ -237,7 +238,7 @@ describe("Column", function() {
       table = helper.createTable(model);
     });
 
-    it("wraps text if column.textWrap and table.multilineText are true", function() {
+    it('wraps text if column.textWrap and table.multilineText are true', function() {
       table.multilineText = true;
       table.columns[0].textWrap = true;
       table.render(session.$entryPoint);
@@ -247,7 +248,7 @@ describe("Column", function() {
       expect($cell0_0).not.toHaveClass('white-space-nowrap');
     });
 
-    it("does not wrap text if column.textWrap is false and table.multilineText is true", function() {
+    it('does not wrap text if column.textWrap is false and table.multilineText is true', function() {
       table.multilineText = true;
       table.columns[0].textWrap = false;
       table.render(session.$entryPoint);
@@ -257,7 +258,7 @@ describe("Column", function() {
       expect($cell0_0).toHaveClass('white-space-nowrap');
     });
 
-    it("does not wrap text if column.textWrap is true and table.multilineText is false", function() {
+    it('does not wrap text if column.textWrap is true and table.multilineText is false', function() {
       table.multilineText = false;
       table.columns[0].textWrap = true;
       table.render(session.$entryPoint);
@@ -268,7 +269,7 @@ describe("Column", function() {
     });
   });
 
-  describe("background effect", function() {
+  describe('background effect', function() {
     var rgbLevel0 = 'rgb(255, 175, 175)';
     var rgbLevel50 = 'rgb(213, 195, 161)';
     var rgbLevel100 = 'rgb(171, 214, 147)';
@@ -297,8 +298,8 @@ describe("Column", function() {
       defaultBackgroundColor = $div.css('background-color');
     });
 
-    describe("colorGradient1", function() {
-      it("colors cells from red to green", function() {
+    describe('colorGradient1', function() {
+      it('colors cells from red to green', function() {
         var model = helper.createModelSingleColumnByValues([0, 50, 100], 'NumberColumn');
         var table = helper.createTable(model);
         var column0 = table.columns[0];
@@ -310,7 +311,7 @@ describe("Column", function() {
         expect(table.$cell(column0, table.rows[2].$row).css('background-color')).toBe(rgbLevel100);
       });
 
-      it("colors cells according to rounded values", function() {
+      it('colors cells according to rounded values', function() {
         var model = helper.createModelSingleColumnByValues([0, 0.005, 0.006, 0.02], 'NumberColumn');
         var table = helper.createTable(model);
         var column0 = table.columns[0];
@@ -327,7 +328,7 @@ describe("Column", function() {
       });
     });
 
-    it("considers view range -> only colors rendered cells", function() {
+    it('considers view range -> only colors rendered cells', function() {
       var model = helper.createModelSingleColumnByValues([0, 50, 100], 'NumberColumn');
       var table = helper.createTable(model);
       var column0 = table.columns[0];
@@ -347,7 +348,7 @@ describe("Column", function() {
       expect(table.$cell(column0, table.rows[2].$row).css('background-color')).toBe(rgbLevel100);
     });
 
-    it("updates colors if row gets deleted", function() {
+    it('updates colors if row gets deleted', function() {
       var model = helper.createModelSingleColumnByValues([0, 50, 100], 'NumberColumn');
       var table = helper.createTable(model);
       var column0 = table.columns[0];
@@ -359,7 +360,7 @@ describe("Column", function() {
       expect(table.$cell(column0, table.rows[1].$row).css('background-color')).toBe(rgbLevel100);
     });
 
-    it("updates colors if row gets inserted", function() {
+    it('updates colors if row gets inserted', function() {
       var model = helper.createModelSingleColumnByValues([0, 50, 100], 'NumberColumn');
       var table = helper.createTable(model);
       var column0 = table.columns[0];
@@ -374,7 +375,7 @@ describe("Column", function() {
       expect(table.$cell(column0, table.rows[3].$row).css('background-color')).toBe(rgbLevel100);
     });
 
-    it("updates colors if row gets updated", function() {
+    it('updates colors if row gets updated', function() {
       var model = helper.createModelSingleColumnByValues([0, 50, 100], 'NumberColumn');
       model.columns[0].backgroundEffect = 'colorGradient1';
       var table = helper.createTable(model);
@@ -392,7 +393,7 @@ describe("Column", function() {
       expect(table.$cell(column0, table.rows[2].$row).css('background-color')).toBe(rgbLevel50);
     });
 
-    it("colors cells if table gets rendered", function() {
+    it('colors cells if table gets rendered', function() {
       var model = helper.createModelSingleColumnByValues([0, 50, 100], 'NumberColumn');
       model.columns[0].backgroundEffect = 'colorGradient1';
       var table = helper.createTable(model);
@@ -404,7 +405,7 @@ describe("Column", function() {
       expect(table.$cell(column0, table.rows[2].$row).css('background-color')).toBe(rgbLevel100);
     });
 
-    it("restores existing background color if background effect gets removed", function() {
+    it('restores existing background color if background effect gets removed', function() {
       var model = helper.createModelSingleColumnByValues([0, 50, 100], 'NumberColumn');
       model.rows[1].cells[0].backgroundColor = 'ff0000';
       var table = helper.createTable(model);
@@ -422,8 +423,8 @@ describe("Column", function() {
       expect(table.$cell(column0, table.rows[1].$row).css('background-image')).toBe('none');
     });
 
-    describe("barChart", function() {
-      it("does not overwrite existing background color", function() {
+    describe('barChart', function() {
+      it('does not overwrite existing background color', function() {
         if (!scout.device.supportsCssGradient()) {
           // PhantomJs does not support gradients
           return;
@@ -440,8 +441,8 @@ describe("Column", function() {
       });
     });
 
-    describe("setBackgroundEffect", function() {
-      it("changes the background effect", function() {
+    describe('setBackgroundEffect', function() {
+      it('changes the background effect', function() {
         var model = helper.createModelSingleColumnByValues([0, 50, 100], 'NumberColumn');
         var table = helper.createTable(model);
         var column0 = table.columns[0];
@@ -473,12 +474,13 @@ describe("Column", function() {
         expect(table.$cell(column0, table.rows[1].$row).css('background-image')).toBe('none');
       });
 
-      it("sends columnBackgroundEffectChanged event", function() {
+      it('sends columnBackgroundEffectChanged event', function() {
         var model = helper.createModelSingleColumnByValues([0, 50, 100], 'NumberColumn');
         var table = helper.createTable(model);
         var column0 = table.columns[0];
         table.render(session.$entryPoint);
 
+        linkWidgetAndAdapter(table, new scout.TableAdapter());
         table.setColumnBackgroundEffect(column0, 'barChart');
 
         sendQueuedAjaxCalls();
@@ -493,8 +495,8 @@ describe("Column", function() {
     });
   });
 
-  describe("calculateMinMaxValues", function() {
-    it("calculates the min/max values based on rounded values", function() {
+  describe('calculateMinMaxValues', function() {
+    it('calculates the min/max values based on rounded values', function() {
       var model = helper.createModelSingleColumnByValues([0.005, 0.006], 'NumberColumn');
       var table = helper.createTable(model);
       var column0 = table.columns[0];

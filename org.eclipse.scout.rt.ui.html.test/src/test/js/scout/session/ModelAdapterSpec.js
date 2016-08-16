@@ -10,7 +10,7 @@
  ******************************************************************************/
 describe('ModelAdapter', function() {
 
-  var session, $sandbox, myObjectFactory,
+  var session, $sandbox, myObjectFactory, helper,
     model = {},
     originalObjectFactory = scout.objectFactory;
 
@@ -20,6 +20,7 @@ describe('ModelAdapter', function() {
     jasmine.clock().install();
     session = sandboxSession();
     session.init();
+    helper = new scout.FormSpecHelper(session);
     uninstallUnloadHandlers(session);
     $sandbox = $('#sandbox');
 
@@ -57,7 +58,7 @@ describe('ModelAdapter', function() {
       model.objectType = 'NullWidget';
     }
     model = $.extend(createSimpleModel(model.objectType, session), model);
-    session._copyAdapterData(createAdapterData(model));
+    helper.registerAdapterData(model);
     return model;
   }
 

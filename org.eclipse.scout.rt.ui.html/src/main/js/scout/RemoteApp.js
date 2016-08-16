@@ -36,16 +36,15 @@ scout.RemoteApp.prototype._init = function(options) {
  */
 scout.RemoteApp.modifyWidgetPrototype = function() {
   scout.Widget.prototype.createFromProperty = function(propertyName, value) {
-    // Was ist das für ein Fall? Manchmal existiert das Widget schon (Menu 133 BusinessForm MainBox)
-    if (value instanceof scout.Widget) {
+    if (value instanceof scout.Widget) { // FIXME [awe] 6.1: check if this code is still required. In some cases (menu) we already have a Widget instance
       return value;
     }
 
     // Remote Case
-    var remoteAdapter = findRemoteAdapter(this); // FIXME [6.1] AWE cleanup this german text
-    if (remoteAdapter &&                           // Wenn das widget (oder ein parent davon) ein remote adapter hat, sind auch die properties remotable
-        this._isPropertyRemotable(propertyName)) { // True, wenn es für diese managed property einen Remote Adapter gibt
-      return this.session.getOrCreateWidget(value, this); // value ist ein String, enthält remote object ID
+    var remoteAdapter = findRemoteAdapter(this);
+    if (remoteAdapter &&                                  // If the widget (or one of its parents) has a remote-adapter, all its properties must be remotable
+        this._isPropertyRemotable(propertyName)) {        // True, if it's a 'managed' property of this remote-adapter
+      return this.session.getOrCreateWidget(value, this); // value is a StringString, contains (remote) object ID
     }
 
     // Default: Local-Fall

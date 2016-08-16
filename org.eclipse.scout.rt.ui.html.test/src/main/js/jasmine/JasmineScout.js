@@ -128,6 +128,7 @@ function createPropertyChangeEvent(model, properties) {
   };
 }
 
+// FIXME [awe] 6.1 - DEPRECATED --> use FormSpecHelper.map/registerAdapterData instead
 function createAdapterData(adapterDataArray) {
   var i,
     adapterData = {};
@@ -137,6 +138,18 @@ function createAdapterData(adapterDataArray) {
     adapterData[adapterDataArray[i].id] = adapterDataArray[i];
   }
   return adapterData;
+}
+
+/**
+ * This function links and existing widget with a new adapter instance. This is useful for tests
+ * where you have an existing widget and later create a new adapter instance to that widget.
+ */
+function linkWidgetAndAdapter(widget, adapter) {
+  adapter.widget = widget;
+  adapter.session = widget.session;
+  adapter.id = widget.id;
+  widget.remoteAdapter = adapter;
+  adapter._attachWidget();
 }
 
 function stripCommentsFromJson(input) {

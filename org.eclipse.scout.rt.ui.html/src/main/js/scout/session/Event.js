@@ -9,6 +9,8 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 scout.Event = function(target, type, data) {
+  scout.objects.mandatoryParameter('target', target);
+  scout.objects.mandatoryParameter('type', type);
   $.extend(this, data);
   this.target = target;
   this.type = type;

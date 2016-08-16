@@ -125,6 +125,16 @@ scout.objects = {
   },
 
   /**
+   * Use this method in your functions to assert that a mandatory parameter is passed
+   * to the function. Throws an Error when value is not set.
+   */
+  mandatoryParameter: function(parameterName, value) {
+    if (!value) {
+      throw new Error('Missing required parameter \'' + parameterName + '\'');
+    }
+  },
+
+  /**
    * Returns the given property if the object is truthy.
    */
   optProperty: function(obj, property) {

@@ -36,13 +36,13 @@ describe("DateField", function() {
       dateFormatPattern: 'dd.MM.yyyy'
     }, scout.nvl(model, {}));
     model = $.extend(model, createSimpleModel(model.objectType, session));
-    session._copyAdapterData(createAdapterData(model));
+    helper.registerAdapterData(model);
     return model;
   }
 
   function createField(modelProperties) {
     var model = createModel(modelProperties);
-    return session.getOrCreateWidget(model.id, session.rootAdapter, session.desktop);
+    return session.getOrCreateWidget(model.id, session.desktop);
   }
 
   function createFieldAndFocusAndOpenPicker(modelProperties) {

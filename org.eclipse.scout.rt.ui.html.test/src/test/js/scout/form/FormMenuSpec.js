@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-describe("FormMenu", function() {
+describe('FormMenu', function() {
   var session, desktop, helper;
 
   beforeEach(function() {
@@ -29,9 +29,9 @@ describe("FormMenu", function() {
     return $('.popup');
   }
 
-  describe("setSelected", function() {
+  describe('setSelected', function() {
 
-    it("opens and closes the form popup", function() {
+    it('opens and closes the form popup', function() {
       var menu = createMenu();
       menu.render(session.$entryPoint);
       expect(findPopup()).not.toExist();
@@ -43,7 +43,7 @@ describe("FormMenu", function() {
       expect(findPopup()).not.toExist();
     });
 
-    it("opens the popup and the ellipsis if the menu is overflown", function() {
+    it('opens the popup and the ellipsis if the menu is overflown', function() {
       var ellipsisMenu = scout.menus.createEllipsisMenu({
         parent: new scout.NullWidget(),
         session: session
@@ -67,7 +67,7 @@ describe("FormMenu", function() {
       ellipsisMenu.setSelected(false);
     });
 
-    it("opens the popup but not the ellipsis if the menu is overflown and mobile popup style is used", function() {
+    it('opens the popup but not the ellipsis if the menu is overflown and mobile popup style is used', function() {
       var ellipsisMenu = scout.menus.createEllipsisMenu({
         parent: new scout.NullWidget(),
         session: session
@@ -92,11 +92,11 @@ describe("FormMenu", function() {
 
   });
 
-  describe("onModelPropertyChange", function() {
+  describe('onModelPropertyChange', function() {
 
-    describe("selected", function() {
+    describe('selected', function() {
 
-      it("calls setSelected", function() {
+      it('calls setSelected', function() {
         var menu = createMenu();
         menu.render(session.$entryPoint);
         expect(findPopup()).not.toExist();
@@ -104,7 +104,7 @@ describe("FormMenu", function() {
         spyOn(menu, 'setSelected');
 
         var event = createPropertyChangeEvent(menu, {
-          "selected": true
+          'selected': true
         });
         menu.remoteAdapter.onModelPropertyChange(event);
         expect(menu.setSelected).toHaveBeenCalled();
