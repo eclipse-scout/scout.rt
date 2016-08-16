@@ -106,7 +106,6 @@
                     <param>eclipse-kepler.target</param>
                     <param>eclipse-luna.target</param>
                     <param>eclipse-mars.target</param>
-                    <param>eclipse-mars-integration.target</param>
                   </targetFiles>
                   <failOnError>true</failOnError>
                 </configuration>
