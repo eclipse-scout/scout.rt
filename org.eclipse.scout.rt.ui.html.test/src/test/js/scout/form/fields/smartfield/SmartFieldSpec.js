@@ -8,6 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
+/* global linkWidgetAndAdapter */
 describe('SmartField', function() {
   var session;
   var smartField;
@@ -33,6 +34,7 @@ describe('SmartField', function() {
     var model = helper.createFieldModel('SmartField');
     smartField = new scout.SmartField();
     smartField.init(model);
+    linkWidgetAndAdapter(smartField, 'SmartFieldAdapter');
   });
 
   describe('_onKeyUp', function() {
@@ -89,23 +91,33 @@ describe('SmartField', function() {
 
     it('must "browse all" when field is valid and browseAll parameter is true', function() {
       smartField._openProposal(true);
-      expect(events[0].displayText).toBe('foo');
-      expect(events[0].browseAll).toBe(true);
-      expect(events[0].selectCurrentValue).toBe(true);
+      sendQueuedAjaxCalls();
+      var expectedEvent = new scout.Event(smartField.id, 'openProposal', {
+        displayText: 'foo',
+        browseAll: true,
+        selectCurrentValue: true});
+      expect(mostRecentJsonRequest()).toContainEvents([expectedEvent]);
     });
 
     it('must search by display-text when field is valid and browseAll parameter is false', function() {
       smartField._openProposal(false);
-      expect(events[0].displayText).toBe('foo');
-      expect(events[0].selectCurrentValue).toBe(false);
+      sendQueuedAjaxCalls();
+      var expectedEvent = new scout.Event(smartField.id, 'openProposal', {
+        displayText: 'foo',
+        browseAll: false,
+        selectCurrentValue: false});
+      expect(mostRecentJsonRequest()).toContainEvents([expectedEvent]);
     });
 
     it('must "browseAll" when field is invalid', function() {
       smartField.errorStatus = {};
       smartField._openProposal(true);
-      expect(events[0].displayText).toBe('foo');
-      expect(events[0].browseAll).toBe(true);
-      expect(events[0].selectCurrentValue).toBe(false);
+      sendQueuedAjaxCalls();
+      var expectedEvent = new scout.Event(smartField.id, 'openProposal', {
+        displayText: 'foo',
+        browseAll: true,
+        selectCurrentValue: false});
+      expect(mostRecentJsonRequest()).toContainEvents([expectedEvent]);
     });
   });
 
@@ -132,18 +144,24 @@ describe('SmartField', function() {
       smartField.render(session.$entryPoint);
       smartField._oldDisplayText = 'foo';
       smartField.$field.val('foo');
-      spyOn(smartField, 'remoteHandler');
       smartField._acceptProposal();
-      expect(smartField.remoteHandler).not.toHaveBeenCalled();
+
+      sendQueuedAjaxCalls();
+      expect(jasmine.Ajax.requests.count()).toBe(0);
     });
 
     it('send _acceptProposal when displayText has changed', function() {
       smartField.render(session.$entryPoint);
       smartField._oldDisplayText = 'foo';
       smartField.$field.val('bar');
-      spyOn(smartField, 'remoteHandler');
       smartField._acceptProposal();
-      expect(smartField.remoteHandler).toHaveBeenCalled();
+
+      sendQueuedAjaxCalls();
+      var expectedEvent = new scout.Event(smartField.id, 'acceptProposal', {
+        chooser: false,
+        displayText: 'bar',
+        forceClose: false});
+      expect(mostRecentJsonRequest()).toContainEvents([expectedEvent]);
     });
 
     // test for ticket #168652
@@ -152,9 +170,10 @@ describe('SmartField', function() {
       smartField._oldDisplayText = 'foo';
       smartField.$field.val('');
       smartField.proposalChooser = {}; // fake proposal-chooser is open
-      spyOn(smartField, '_sendDeleteProposal');
       smartField._acceptProposal();
-      expect(smartField._sendDeleteProposal).toHaveBeenCalled();
+
+      sendQueuedAjaxCalls();
+      expect(mostRecentJsonRequest()).toContainEventTypesExactly(['deleteProposal']);
     });
 
   });
@@ -163,11 +182,12 @@ describe('SmartField', function() {
 
     it('opens a touch popup when smart field gets touched', function() {
       var proposalChooser = scout.create('Table', {parent: new scout.NullWidget(), session: session});
+      linkWidgetAndAdapter(proposalChooser, 'ProposalChooserAdapter');
 
       smartField.touch = true;
       smartField.render(session.$entryPoint);
       smartField.$field.click();
-      smartField.onModelPropertyChange(createPropertyChangeEvent(smartField, {
+      smartField.remoteAdapter.onModelPropertyChange(createPropertyChangeEvent(smartField, {
         proposalChooser: proposalChooser.id
       }));
       expect(smartField.popup.rendered).toBe(true);
@@ -176,7 +196,7 @@ describe('SmartField', function() {
       expect($('.smart-field-popup').length).toBe(0);
 
       smartField.popup.close();
-      smartField.onModelPropertyChange(createPropertyChangeEvent(smartField, {
+      smartField.remoteAdapter.onModelPropertyChange(createPropertyChangeEvent(smartField, {
         proposalChooser: null
       }));
       expect(smartField.popup).toBe(null);
@@ -185,7 +205,7 @@ describe('SmartField', function() {
 
       // Expect same behavior after a second click
       smartField.$field.click();
-      smartField.onModelPropertyChange(createPropertyChangeEvent(smartField, {
+      smartField.remoteAdapter.onModelPropertyChange(createPropertyChangeEvent(smartField, {
         proposalChooser: proposalChooser.id
       }));
       expect(smartField.popup.rendered).toBe(true);
