@@ -5,12 +5,23 @@ import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractLongColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithTable;
+import org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm;
 import org.eclipse.scout.rt.platform.Order;
 
 /**
  * @since 6.0
  */
 public class AbstractPersonTablePage<T extends AbstractPersonTablePage<T>.Table> extends AbstractPageWithTable<T> {
+
+  @Override
+  protected Class<? extends ISearchForm> getConfiguredSearchForm() {
+    return PersonSearchForm.class;
+  }
+
+  @Override
+  protected void execInitPage() {
+    getSearchFormInternal().setSearchFilter(null);
+  }
 
   public class Table extends AbstractTable {
     public AbstractPersonTablePage<?>.Table.NameColumn getNameColumn() {

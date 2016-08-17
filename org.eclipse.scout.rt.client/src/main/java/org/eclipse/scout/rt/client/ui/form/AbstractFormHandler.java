@@ -35,7 +35,7 @@ public abstract class AbstractFormHandler implements IFormHandler, IExtensibleOb
   private final ObjectExtensions<AbstractFormHandler, IFormHandlerExtension<? extends AbstractFormHandler>> m_objectExtensions;
 
   public AbstractFormHandler() {
-    m_objectExtensions = new ObjectExtensions<AbstractFormHandler, IFormHandlerExtension<? extends AbstractFormHandler>>(this);
+    m_objectExtensions = new ObjectExtensions<AbstractFormHandler, IFormHandlerExtension<? extends AbstractFormHandler>>(this, true);
     interceptInitConfig();
   }
 
@@ -68,8 +68,8 @@ public abstract class AbstractFormHandler implements IFormHandler, IExtensibleOb
   /**
    * Load additional form state<br>
    * this method call is after the form was loaded into the state "Saved / Unchanged"<br>
-   * any changes to fields might result in the form ot fields being changed and therefore in the state
-   * "Save needed / Changed"
+   * any changes to fields might result in the form ot fields being changed and therefore in the state "Save needed /
+   * Changed"
    */
   @ConfigOperation
   @Order(20)

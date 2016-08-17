@@ -21,11 +21,21 @@ public class ObjectExtensions<OWNER, EXTENSION extends IExtension<? extends OWNE
   private static final long serialVersionUID = 1L;
 
   private final OWNER m_owner;
+  private final boolean m_requiresNewScope;
   private List<EXTENSION> m_extensions;
   private ExtensionContext m_extensionContext;
 
+  /**
+   * @deprecated Use {@link #ObjectExtensions(Object, boolean)} instead. Will be removed in O-release.
+   */
+  @Deprecated
   public ObjectExtensions(OWNER owner) {
+    this(owner, false);
+  }
+
+  public ObjectExtensions(OWNER owner, boolean requiresNewScope) {
     m_owner = owner;
+    m_requiresNewScope = requiresNewScope;
   }
 
   @Override
@@ -60,32 +70,45 @@ public class ObjectExtensions<OWNER, EXTENSION extends IExtension<? extends OWNE
     initConfig(localExtension, true, modelObjectInitializer);
   }
 
-  protected void initConfig(EXTENSION localExtension, boolean backupExtensionContext, Runnable modelObjectInitializer) {
+  protected void initConfig(final EXTENSION localExtension, final boolean backupExtensionContext, final Runnable modelObjectInitializer) {
     if (m_extensions != null) {
       throw new IllegalStateException("The model object is already initialized: " + m_owner + ".");
     }
-    IInternalExtensionRegistry extensionRegistry = BEANS.get(IInternalExtensionRegistry.class);
+    final IInternalExtensionRegistry extensionRegistry = BEANS.get(IInternalExtensionRegistry.class);
     if (extensionRegistry == null) {
       return;
     }
-    try {
-      extensionRegistry.pushScope(m_owner.getClass());
-      m_extensions = loadExtensions(localExtension);
-      try {
-        extensionRegistry.pushExtensions(m_extensions);
-        if (backupExtensionContext) {
-          m_extensionContext = extensionRegistry.backupExtensionContext();
+
+    Runnable initConfigRunnable = new Runnable() {
+      @Override
+      public void run() {
+        try {
+          extensionRegistry.pushScope(m_owner.getClass());
+          m_extensions = loadExtensions(localExtension);
+          try {
+            extensionRegistry.pushExtensions(m_extensions);
+            if (backupExtensionContext) {
+              m_extensionContext = extensionRegistry.backupExtensionContext();
+            }
+            if (modelObjectInitializer != null) {
+              modelObjectInitializer.run();
+            }
+          }
+          finally {
+            extensionRegistry.popExtensions(m_extensions);
+          }
         }
-        if (modelObjectInitializer != null) {
-          modelObjectInitializer.run();
+        finally {
+          extensionRegistry.popScope();
         }
       }
-      finally {
-        extensionRegistry.popExtensions(m_extensions);
-      }
+    };
+
+    if (m_requiresNewScope) {
+      extensionRegistry.runInContext(null, initConfigRunnable);
     }
-    finally {
-      extensionRegistry.popScope();
+    else {
+      initConfigRunnable.run();
     }
   }
 

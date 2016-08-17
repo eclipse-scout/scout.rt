@@ -206,7 +206,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     m_rowFilters = new ArrayList<ITableRowFilter>(1);
     m_initLock = new OptimisticLock();
     m_actionRunning = false;
-    m_objectExtensions = new ObjectExtensions<AbstractTable, ITableExtension<? extends AbstractTable>>(this);
+    m_objectExtensions = new ObjectExtensions<AbstractTable, ITableExtension<? extends AbstractTable>>(this, false);
     //add single observer listener
     addTableListener(new P_TableListener());
     if (callInitializer) {

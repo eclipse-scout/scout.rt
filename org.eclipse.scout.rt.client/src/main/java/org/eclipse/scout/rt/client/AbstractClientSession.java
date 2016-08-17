@@ -112,7 +112,7 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
     m_stateLock = new Object();
     m_userAgent = UserAgent.get();
     m_subject = Subject.getSubject(AccessController.getContext());
-    m_objectExtensions = new ObjectExtensions<AbstractClientSession, IClientSessionExtension<? extends AbstractClientSession>>(this);
+    m_objectExtensions = new ObjectExtensions<AbstractClientSession, IClientSessionExtension<? extends AbstractClientSession>>(this, true);
     m_scoutTexts = new ScoutTexts();
     m_sharedVariableMap = new SharedVariableMap();
 

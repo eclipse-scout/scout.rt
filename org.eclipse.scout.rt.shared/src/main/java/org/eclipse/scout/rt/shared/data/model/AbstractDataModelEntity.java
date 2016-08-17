@@ -71,7 +71,7 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
   public AbstractDataModelEntity(boolean callInitConfig) {
     m_attributes = new ArrayList<IDataModelAttribute>();
     m_entities = new ArrayList<IDataModelEntity>();
-    m_objectExtensions = new ObjectExtensions<AbstractDataModelEntity, IDataModelEntityExtension<? extends AbstractDataModelEntity>>(this);
+    m_objectExtensions = new ObjectExtensions<AbstractDataModelEntity, IDataModelEntityExtension<? extends AbstractDataModelEntity>>(this, false);
     if (callInitConfig) {
       callInitializer();
     }

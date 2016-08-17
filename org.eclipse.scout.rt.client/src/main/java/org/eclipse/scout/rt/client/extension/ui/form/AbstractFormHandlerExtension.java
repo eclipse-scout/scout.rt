@@ -18,8 +18,10 @@ import org.eclipse.scout.rt.client.extension.ui.form.FormHandlerChains.FormHandl
 import org.eclipse.scout.rt.client.extension.ui.form.FormHandlerChains.FormHandlerStoreChain;
 import org.eclipse.scout.rt.client.extension.ui.form.FormHandlerChains.FormHandlerValidateChain;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
+import org.eclipse.scout.rt.platform.extension.InheritOuterExtensionScope;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 
+@InheritOuterExtensionScope(false)
 public abstract class AbstractFormHandlerExtension<OWNER extends AbstractFormHandler> extends AbstractExtension<OWNER> implements IFormHandlerExtension<OWNER> {
 
   /**

@@ -55,7 +55,7 @@ public abstract class AbstractWizardStep<FORM extends IForm> extends AbstractPro
   }
 
   public AbstractWizardStep(boolean callInitializer) {
-    m_objectExtensions = new ObjectExtensions<AbstractWizardStep<FORM>, IWizardStepExtension<FORM, ? extends AbstractWizardStep<FORM>>>(this);
+    m_objectExtensions = new ObjectExtensions<AbstractWizardStep<FORM>, IWizardStepExtension<FORM, ? extends AbstractWizardStep<FORM>>>(this, false);
     if (callInitializer) {
       callInitializer();
     }

@@ -80,7 +80,7 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
   }
 
   public AbstractPlanner(boolean callInitializer) {
-    m_objectExtensions = new ObjectExtensions<AbstractPlanner<RI, AI>, IPlannerExtension<RI, AI, ? extends AbstractPlanner<RI, AI>>>(this);
+    m_objectExtensions = new ObjectExtensions<AbstractPlanner<RI, AI>, IPlannerExtension<RI, AI, ? extends AbstractPlanner<RI, AI>>>(this, false);
     m_resources = new ArrayList<Resource<RI>>();
     m_eventBuffer = createEventBuffer();
     m_resourceObserver = new P_ResourceObserver();

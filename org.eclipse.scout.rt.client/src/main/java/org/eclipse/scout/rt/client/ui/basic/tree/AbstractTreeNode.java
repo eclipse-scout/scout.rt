@@ -29,6 +29,7 @@ import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICellObserver;
+import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPage;
 import org.eclipse.scout.rt.client.ui.profiler.DesktopProfiler;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
@@ -106,7 +107,7 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
     m_childNodeList = new ArrayList<ITreeNode>(0);
     m_filteredChildNodesLock = new Object();
     m_cell = new Cell(this);
-    m_objectExtensions = new ObjectExtensions<AbstractTreeNode, ITreeNodeExtension<? extends AbstractTreeNode>>(this);
+    m_objectExtensions = new ObjectExtensions<AbstractTreeNode, ITreeNodeExtension<? extends AbstractTreeNode>>(this, this instanceof AbstractPage<?>);
     if (callInitializer) {
       callInitializer();
     }
