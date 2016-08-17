@@ -37,7 +37,7 @@ public class ChartColumnParam implements IChartColumnParam {
   }
 
   @Override
-  public IColumn<?> getColumn() {
+  public IColumn getColumn() {
     return m_column;
   }
 

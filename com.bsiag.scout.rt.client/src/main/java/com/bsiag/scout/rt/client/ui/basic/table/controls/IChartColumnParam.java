@@ -14,7 +14,7 @@ public interface IChartColumnParam {
 
   int getColumnIndex();
 
-  IColumn<?> getColumn();
+  IColumn getColumn();
 
   int getColumnModifier();
 

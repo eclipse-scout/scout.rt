@@ -79,7 +79,8 @@ public class JsonChartTableControl<CHART_TABLE_CONTROL extends IChartTableContro
   private JSONObject createJsonObject(IChartColumnParam columnParam) {
     JSONObject json = new JSONObject();
     if (columnParam != null) {
-      String columnId = getTableAdapter().getColumnId(columnParam.getColumn());
+      IColumn column = columnParam.getColumn();
+      String columnId = column != null ? getTableAdapter().getColumnId(column) : null;
       int columnModifier = columnParam.getColumnModifier();
       json.put("id", columnId);
       json.put("modifier", columnModifier);
