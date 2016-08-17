@@ -14,7 +14,7 @@
  * The {@link {@link scout.SimpleTabBoxController}} is used to link a {@link {@link scout.SimpleTabBox}} with a {@link {@link scout.SimpleTabArea}}.
  * There are {@link {@link scout.SimpleTabBox}} with more than one {@link {@link scout.SimpleTabArea}} to actualized.
  * Therefore the linking is separated in a controller.
- * The controller basically listens to 'viewAdded', 'viewRemoved', 'viewActivated', 'viewDeactivated' on the {@link {@link scout.SimpleTabBox}} and
+ * The controller basically listens to 'viewAdded', 'viewReplaced', 'viewRemoved', 'viewActivated', 'viewDeactivated' on the {@link {@link scout.SimpleTabBox}} and
  * updates the {@link {@link scout.SimpleTabArea}}.
  */
 scout.SimpleTabBoxController = function(tabBox, tabArea) {
@@ -22,6 +22,7 @@ scout.SimpleTabBoxController = function(tabBox, tabArea) {
   this.tabArea = tabArea;
 
   this._viewAddedHandler = this._onViewAdded.bind(this);
+  this._viewReplacedHandler = this._onViewReplaced.bind(this);
   this._viewRemovedHandler = this._onViewRemoved.bind(this);
   this._viewActivatedHandler = this._onViewActivated.bind(this);
   this._viewDeactivatedHandler = this._onViewDeactivated.bind(this);
@@ -33,6 +34,7 @@ scout.SimpleTabBoxController = function(tabBox, tabArea) {
 
 scout.SimpleTabBoxController.prototype._installListeners = function() {
   this.tabBox.on('viewAdded', this._viewAddedHandler);
+  this.tabBox.on('viewReplaced', this._viewReplacedHandler);
   this.tabBox.on('viewRemoved', this._viewRemovedHandler);
   this.tabBox.on('viewActivated', this._viewActivatedHandler);
   this.tabBox.on('viewDeactivated', this._viewDeactivatedHandler);
@@ -42,16 +44,16 @@ scout.SimpleTabBoxController.prototype._installListeners = function() {
 
 scout.SimpleTabBoxController.prototype._onViewAdded = function(event) {
   var view = event.view,
-  siblingView = event.siblingView,
-  viewTab,
-  // the sibling to insert the tab after.
-  siblingViewTab;
+    siblingView = event.siblingView,
+    viewTab,
+    // the sibling to insert the tab after.
+    siblingViewTab;
 
   if (!scout.SimpleTabBoxController.hasViewTab(view)) {
     return;
   }
   viewTab = this._getTab(view);
-  if(!viewTab){
+  if (!viewTab) {
     siblingViewTab = this._getTab(siblingView);
     viewTab = scout.create('DesktopTab', {
       parent: this.tabArea,
@@ -59,7 +61,17 @@ scout.SimpleTabBoxController.prototype._onViewAdded = function(event) {
     });
     this.tabArea.addTab(viewTab, siblingViewTab);
   }
+};
 
+scout.SimpleTabBoxController.prototype._onViewReplaced = function(event) {
+  var view = event.view;
+  if (!view) {
+    return;
+  }
+  var viewTab = this._getTab(view);
+  if (viewTab) {
+    viewTab._titlesUpdated();
+  }
 };
 
 scout.SimpleTabBoxController.prototype._onViewRemoved = function(event) {

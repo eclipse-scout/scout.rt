@@ -31,7 +31,6 @@ scout.SimpleTab.prototype._init = function(options) {
   this.subTitle = options.subTitle;
   this.iconId = options.iconId;
   this.selected = false;
-
 };
 
 scout.SimpleTab.prototype.renderAfter = function($parent, sibling) {
@@ -52,8 +51,6 @@ scout.SimpleTab.prototype._render = function($parent) {
   this._cssClassUpdated(this.view.cssClass, null);
 };
 
-
-
 scout.SimpleTab.prototype._renderSelection = function() {
   if (this.$container) {
     if (this.$container.select() === this.selected) {
@@ -72,7 +69,6 @@ scout.SimpleTab.prototype.deselect = function() {
   this.selected = false;
   this._renderSelection();
 };
-
 
 scout.SimpleTab.prototype._onMouseDown = function(event) {
   this.trigger('tabClicked');

@@ -78,6 +78,67 @@ describe("DesktopBench", function() {
       expect(outline.selectedNodes[0].detailForm).toBeFalsy();
       expect(bench.outlineContent).toBeFalsy();
     });
+
+    it("preserves desktop.inBackground when updating outline content", function() {
+
+      // select node 0 (which will be in foreground)
+      outline.selectNodes(outline.nodes[0]);
+      expect(desktop.inBackground).toBeFalsy();
+
+      // open new form in foreground
+      var form = formHelper.createFormWithOneField();
+      form.displayHint = scout.Form.DisplayHint.VIEW;
+      form.displayViewId = 'C';
+      desktop._showForm(form, desktop);
+
+      expect(desktop.inBackground).toBeTruthy();
+
+      // test that replace view is not called
+
+      var form2 = formHelper.createFormWithOneField();
+      outline.nodes[0].detailForm = form2;
+      outline.nodes[0].detailFormVisible = true;
+
+      bench.updateOutlineContent();
+
+      // test that replcaeView is called once
+
+      expect(form.attached).toBeTruthy();
+      expect(bench.outlineContent === outline.nodes[0].detailForm).toBeTruthy();
+      expect(bench.outlineContent.attached).toBeFalsy();
+      expect(desktop.inBackground).toBeTruthy();
+    });
+
+    it("preserves desktop.inBackground when switching nodes", function() {
+
+      // select node 0 (which will be in foreground)
+      outline.selectNodes(outline.nodes[0]);
+      expect(desktop.inBackground).toBeFalsy();
+
+      // open new form in foreground
+      var form = formHelper.createFormWithOneField();
+      form.displayHint = scout.Form.DisplayHint.VIEW;
+      form.displayViewId = 'C';
+      desktop._showForm(form, desktop);
+
+      expect(desktop.inBackground).toBeTruthy();
+
+      // test that replace view is not called
+
+      // switch to node 1
+      outline.nodes[1].detailForm = formHelper.createFormWithOneField();
+      outline.nodes[1].detailFormVisible = true;
+
+      outline.selectNodes(outline.nodes[1]);
+
+      // test that replcaeView is called once
+
+      expect(form.attached).toBeTruthy();
+      expect(bench.outlineContent === outline.nodes[1].detailForm).toBeTruthy();
+      expect(bench.outlineContent.attached).toBeFalsy();
+
+      expect(desktop.inBackground).toBeTruthy();
+    });
   });
 
 });
