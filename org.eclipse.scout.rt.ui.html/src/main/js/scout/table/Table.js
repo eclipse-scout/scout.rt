@@ -3051,6 +3051,7 @@ scout.Table.prototype.setFooterVisible = function(visible) {
     this._renderFooterVisible();
   }
   if (!visible && this.footer) {
+    this.footer.destroy();
     this.footer = null;
   }
 };
@@ -3128,8 +3129,7 @@ scout.Table.prototype._renderTableHeader = function() {
 
 scout.Table.prototype._removeTableHeader = function() {
   if (this.header) {
-    this.header.remove();
-    this.removeChild(this.header);
+    this.header.destroy();
     this.header = null;
   }
 };

@@ -12,27 +12,13 @@ scout.FormSpecHelper = function(session) {
   this.session = session;
 };
 
-// FIXME [awe] 6.1 jasmine - DEPRECATED, remove method -> use *2 and rename
-scout.FormSpecHelper.prototype.createViewWithOneField = function(parentId) {
-  var form = this.createFormWithOneField(parentId);
+scout.FormSpecHelper.prototype.createViewWithOneField = function(parent) {
+  var form = this.createFormWithOneField(parent);
   form.displayHint = scout.Form.DisplayHint.VIEW;
   return form;
 };
 
-// FIXME [awe] 6.1 jasmine - DEPRECATED, remove method -> use *2 and rename
-scout.FormSpecHelper.prototype.createFormWithOneField = function(parentId) {
-  var form = this.createFormModel();
-  var rootGroupBox = this.createFieldModel('GroupBox');
-  var field = this.createFieldModel('StringField');
-
-  form.rootGroupBox = rootGroupBox;
-  rootGroupBox.mainBox = true;
-  rootGroupBox.fields = [field];
-
-  return scout.create(form);
-};
-
-scout.FormSpecHelper.prototype.createFormWithOneField2 = function(parent) {
+scout.FormSpecHelper.prototype.createFormWithOneField = function(parent) {
   parent = scout.nvl(parent, this.session.desktop);
   var form = scout.create('Form', {parent: parent});
   var rootGroupBox = this.createGroupBoxWithFields(form, true, 1);
@@ -67,25 +53,6 @@ scout.FormSpecHelper.prototype.createFormWithFields = function(parent, isModal, 
     displayHint: isModal ? 'dialog' : 'view'});
   var rootGroupBox = this.createGroupBoxWithFields(form, true, numFields);
   form.setRootGroupBox(rootGroupBox);
-  return form;
-};
-
-// FIXME [awe] 6.1 jasmine - DEPRECATED, remove method
-scout.FormSpecHelper.prototype.createFormModel = function() {
-  var form = createSimpleModel('Form', this.session);
-  // By definition, a Form must have a 'displayParent'. That is why a mocked parent is set.
-  form.parent = {
-    rendered: true,
-    removeChild: function() {},
-    setParent: function() {},
-    addChild: function() {},
-    inFront: function() {
-      return true;
-    }, // expected API of a 'displayParent'
-    glassPaneTargets: function() {
-      return [];
-    } // expected API of a 'displayParent'
-  };
   return form;
 };
 

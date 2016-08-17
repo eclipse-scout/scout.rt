@@ -19,6 +19,7 @@ scout.ViewMenuTab = function() {
   this.$arrowIcon; // small "arrow down" icon at the right side of the icon
 
   this.viewButton = null;
+  this.viewMenus = [];
   this.selected = false;
   this.iconId;
   this.inBackground = false;
@@ -27,14 +28,13 @@ scout.ViewMenuTab = function() {
   this.defaultIconId = scout.icons.OUTLINE;
   this._addEventSupport();
   this._viewMenuPropertyChangeHandler = this._onViewMenuPropertyChange.bind(this);
+  this._addAdapterProperties('viewMenus');
 };
 scout.inherits(scout.ViewMenuTab, scout.Widget);
 
 scout.ViewMenuTab.prototype._init = function(model) {
   scout.ViewMenuTab.parent.prototype._init.call(this, model);
-  this.viewMenus = model.viewMenus;
   this.viewMenus.forEach(function(viewMenu) {
-    viewMenu.setParent(this);
     viewMenu.on('propertyChange', this._viewMenuPropertyChangeHandler);
   }, this);
   this._update();

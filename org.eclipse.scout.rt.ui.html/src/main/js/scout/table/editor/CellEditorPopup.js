@@ -25,6 +25,7 @@ scout.CellEditorPopup.prototype._init = function(options) {
   this.column = options.column;
   this.row = options.row;
   this.cell = options.cell;
+  this.link(this.cell.field);
 };
 
 scout.CellEditorPopup.prototype._createLayout = function() {
@@ -69,7 +70,6 @@ scout.CellEditorPopup.prototype._render = function($parent) {
   field.prepareForCellEdit({
     firstCell: firstCell
   });
-  field.setParent(this);
 
   // Make sure cell content is not visible while the editor is open (especially necessary for transparent editors like checkboxes)
   this.$anchor.css('visibility', 'hidden');

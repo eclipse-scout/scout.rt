@@ -160,9 +160,7 @@ scout.MenuBar.prototype.setMenuItems = function(menuItems) {
     this._internalMenuItems = menuItems;
     this._orderedMenuItems = this.menuSorter.order(menuItems, this);
     this.menuItems = this._orderedMenuItems.left.concat(this._orderedMenuItems.right);
-    this.menuItems.forEach(function(menuItem) {
-      menuItem.setParent(this);
-    }, this);
+    this.link(menuItems);
   }
 
   if (this.rendered) {

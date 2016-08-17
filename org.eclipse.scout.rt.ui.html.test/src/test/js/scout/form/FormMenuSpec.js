@@ -21,7 +21,7 @@ describe('FormMenu', function() {
 
   function createMenu(modelProperties) {
     var menu = helper.createField('FormMenu', desktop, modelProperties);
-    menu.form = helper.createFormWithOneField2();
+    menu.form = helper.createFormWithOneField();
     menu.desktop = desktop;
     return menu;
   }

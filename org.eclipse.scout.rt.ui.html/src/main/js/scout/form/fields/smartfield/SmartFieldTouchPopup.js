@@ -10,6 +10,7 @@
  ******************************************************************************/
 scout.SmartFieldTouchPopup = function() {
   scout.SmartFieldTouchPopup.parent.call(this);
+  this._addAdapterProperties('proposalChooser');
 };
 scout.inherits(scout.SmartFieldTouchPopup, scout.TouchPopup);
 
@@ -28,10 +29,13 @@ scout.SmartFieldTouchPopup.prototype._fieldOverrides = function() {
   return obj;
 };
 
-scout.SmartFieldTouchPopup.prototype._renderProposalChooser = function(proposalChooser) {
-  proposalChooser.render(this._$widgetContainer);
-  proposalChooser.setParent(this);
-  proposalChooser.$container.addClass('touch');
+scout.SmartFieldTouchPopup.prototype.setProposalChooser = function(proposalChooser) {
+  this.setProperty('proposalChooser', proposalChooser);
+};
+
+scout.SmartFieldTouchPopup.prototype._renderProposalChooser = function() {
+  this.proposalChooser.render(this._$widgetContainer);
+  this.proposalChooser.$container.addClass('touch');
   this._widgetContainerHtmlComp.invalidateLayoutTree();
 };
 

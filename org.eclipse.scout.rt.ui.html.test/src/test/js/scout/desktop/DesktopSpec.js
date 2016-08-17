@@ -120,7 +120,7 @@ describe('Desktop', function() {
     });
 
     it('removes the content after the animation', function() {
-      var form = formHelper.createFormWithOneField2();
+      var form = formHelper.createFormWithOneField();
       var tabBox = desktop.bench.getTabBox('C');
       form.displayHint = scout.Form.DisplayHint.VIEW;
       desktop.showForm(form, desktop);

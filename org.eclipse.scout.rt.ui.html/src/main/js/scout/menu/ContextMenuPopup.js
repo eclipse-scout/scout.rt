@@ -13,6 +13,8 @@ scout.ContextMenuPopup = function() {
 
   // Make sure head won't be rendered, there is a css selector which is applied only if there is a head
   this._headVisible = false;
+  this.menuItems = [];
+  this._addAdapterProperties('menuItems');
 };
 scout.inherits(scout.ContextMenuPopup, scout.PopupWithHead);
 
@@ -20,7 +22,6 @@ scout.ContextMenuPopup.prototype._init = function(options) {
   options.focusableContainer = true; // In order to allow keyboard navigation, the popup must gain focus. Because menu-items are not focusable, make the container focusable instead.
   scout.ContextMenuPopup.parent.prototype._init.call(this, options);
 
-  this.menuItems = options.menuItems;
   this.menuFilter = options.menuFilter;
   this.options = $.extend({
     cloneMenuItems: true
@@ -298,11 +299,7 @@ scout.ContextMenuPopup.prototype._renderMenuItems = function(menus, initialSubMe
         parent: this
       });
       this._attachCloneMenuListeners(menu);
-    } else {
-      menu.oldParentMenu = parentMenu;
-      menu.setParent(this);
     }
-    menu.on('remove', this._onMenuRemove.bind(this));
 
     // just set once because on second execution of this menu.parent is set to a popup
     if (!menu.parentMenu) {
@@ -364,11 +361,6 @@ scout.ContextMenuPopup.prototype._onCloneMenuPropertyChange = function(event) {
     var menu = event.source;
     menu.cloneOf.setSelected(event.newProperties.selected);
   }
-};
-
-scout.ContextMenuPopup.prototype._onMenuRemove = function(event) {
-  var menu = event.source;
-  menu.setParent(menu.oldParentMenu);
 };
 
 /**

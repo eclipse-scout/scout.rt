@@ -36,7 +36,7 @@ describe('WrappedForm', function() {
 
   describe('test initial focus disabled', function() {
     it('string field in inner form hasn\'t focus', function() {
-      var innerForm = helper.createFormWithOneField2();
+      var innerForm = helper.createFormWithOneField();
       var field = createField({innerForm: innerForm});
       expect(field.initialFocusEnabled).toBe(false);
 
@@ -49,7 +49,7 @@ describe('WrappedForm', function() {
 
   describe('test initial focus enabled', function() {
     it('string field in inner form has focus', function() {
-      var innerForm = helper.createFormWithOneField2();
+      var innerForm = helper.createFormWithOneField();
       var field = createField({initialFocusEnabled: true, innerForm: innerForm});
       expect(field.initialFocusEnabled).toBe(true);
 

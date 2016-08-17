@@ -10,6 +10,7 @@
  ******************************************************************************/
 scout.SmartFieldPopup = function() {
   scout.SmartFieldPopup.parent.call(this);
+  this._addAdapterProperties('proposalChooser');
 };
 scout.inherits(scout.SmartFieldPopup, scout.Popup);
 
@@ -34,10 +35,13 @@ scout.SmartFieldPopup.prototype._render = function($parent) {
   this.htmlComp.validateRoot = true;
 };
 
-scout.SmartFieldPopup.prototype._renderProposalChooser = function(proposalChooser) {
-  proposalChooser.setVirtual(this._field.virtual());
-  proposalChooser.render(this.$container);
-  proposalChooser.setParent(this);
+scout.SmartFieldPopup.prototype.setProposalChooser = function(proposalChooser) {
+  this.setProperty('proposalChooser', proposalChooser);
+};
+
+scout.SmartFieldPopup.prototype._renderProposalChooser = function() {
+  this.proposalChooser.setVirtual(this._field.virtual());
+  this.proposalChooser.render(this.$container);
   this.revalidateLayout();
 };
 

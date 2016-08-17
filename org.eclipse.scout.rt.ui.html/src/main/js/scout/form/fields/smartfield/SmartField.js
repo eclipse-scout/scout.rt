@@ -162,7 +162,7 @@ scout.SmartField.prototype._renderProposalChooser = function() {
     return;
   }
   this.openPopup();
-  this.popup._renderProposalChooser(this.proposalChooser);
+  this.popup.setProposalChooser(this.proposalChooser);
 };
 
 /**

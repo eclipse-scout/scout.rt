@@ -31,7 +31,7 @@ describe('Form', function() {
   describe('destroy', function() {
 
     it('destroys the adapter and its children', function() {
-      var form = helper.createFormWithOneField2();
+      var form = helper.createFormWithOneField();
 
       expect(form.rootGroupBox).toBeTruthy();
       expect(session.getModelAdapter(form.rootGroupBox.id)).toBe(form.rootGroupBox);
@@ -59,7 +59,7 @@ describe('Form', function() {
       }
 
       it('destroys the form', function() {
-        var form = helper.createFormWithOneField2();
+        var form = helper.createFormWithOneField();
         linkWidgetAndAdapter(form, 'FormAdapter');
         spyOn(form, 'destroy');
 

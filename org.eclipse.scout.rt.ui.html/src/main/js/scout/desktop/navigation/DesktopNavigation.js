@@ -76,7 +76,6 @@ scout.DesktopNavigation.prototype._renderOutline = function() {
   if (!this.outline) {
     return;
   }
-  this.outline.setParent(this);
   this.outline.render(this.$body);
   this.outline.validateRoot = true;
   this.outline.invalidateLayoutTree();
@@ -102,6 +101,7 @@ scout.DesktopNavigation.prototype.setOutline = function(outline) {
 
   this.outline = outline;
   if (this.outline) {
+    this.outline.setParent(this);
     this.outline.setBreadcrumbTogglingThreshold(scout.DesktopNavigation.BREADCRUMB_STYLE_WIDTH);
     // Make sure new outline uses same display style as old
     if (currentDisplayStyle && this.outline.autoToggleBreadcrumbStyle) {

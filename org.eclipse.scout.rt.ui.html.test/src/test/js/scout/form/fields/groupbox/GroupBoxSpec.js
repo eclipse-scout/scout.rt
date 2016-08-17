@@ -25,6 +25,7 @@ describe("GroupBox", function() {
     };
 
     model.session = session;
+    model.parent = parent || session.desktop;
     field.init(model);
     return field;
   }
@@ -36,10 +37,6 @@ describe("GroupBox", function() {
         gridData: {
           x: 0,
           y: 0
-        },
-        parent: {
-          objectType: 'GroupBox',
-          addChild: function() {}
         }
       };
 

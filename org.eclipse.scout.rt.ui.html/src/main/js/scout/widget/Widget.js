@@ -10,6 +10,12 @@
  ******************************************************************************/
 scout.Widget = function() {
   this.session;
+
+  /**
+   * The owner is responsible that its children are destroyed when the owner is being destroyed.
+   */
+  this.owner;
+  this.parent;
   this.children = [];
   this.initialized = false;
 
@@ -40,6 +46,8 @@ scout.Widget = function() {
   // FIXME [awe, cgu] 6.1 discuss: wenn alle widgets events und keyStrokeContext haben sollen braucht es die add methoden nicht mehr
   this._addKeyStrokeContextSupport();
   this._addEventSupport();
+
+  this._parentDestroyHandler = this._onParentDestroy.bind(this);
 };
 
 scout.Widget.prototype.init = function(model) {
@@ -68,14 +76,11 @@ scout.Widget.prototype._init = function(model) {
   }
   this.animateRemoval = scout.nvl(model.animateRemoval, false);
 
-  // copy the model to this widget
-  $.extend(this, model);
-
   this._eachProperty(model, function(propertyName, value, isAdapterProperty) {
     if (isAdapterProperty) {
-      this[propertyName] = this._ensureType(propertyName, value);
-      // this.callSetter(propertyName, value);
-    } // FIXME [6.1] awe evtl. im else callSetter machen
+      value = this._prepareWidgetProperty(propertyName, value);
+    }
+    this[propertyName] = value;
   }.bind(this));
 };
 
@@ -109,11 +114,13 @@ scout.Widget.prototype.destroy = function() {
 
   this.remove();
 
-  // Disconnect from parent (widget is being destroyed, it will never be rendered again)
-  if (this.parent) {
-    this.parent.removeChild(this);
-    this.parent = null;
-  }
+  // Disconnect from owner and parent
+  this.owner.removeChild(this);
+  this.owner = null;
+  this.parent.removeChild(this);
+  this.parent.off('destroy', this._parentDestroyHandler);
+  this.parent = null;
+
   this.destroyed = true;
 
   // Inform listeners
@@ -122,7 +129,6 @@ scout.Widget.prototype.destroy = function() {
 
 scout.Widget.prototype._destroyChild = function(child) {
   if (child.owner !== this) {
-    // Only the owner is allowed to destroy its children.
     return;
   }
   child.destroy();
@@ -141,7 +147,7 @@ scout.Widget.prototype.render = function($parent) {
   }
   this.rendering = true;
   this._renderInternal($parent);
-  this._link();
+  this._linkWithDOM();
   this.session.keyStrokeManager.installKeyStrokeContext(this.keyStrokeContext);
   this.rendering = false;
   this.rendered = true;
@@ -264,7 +270,7 @@ scout.Widget.prototype._removeAnimated = function() {
 /**
  * Links $container with the widget.
  */
-scout.Widget.prototype._link = function() {
+scout.Widget.prototype._linkWithDOM = function() {
   if (this.$container) {
     this.$container.data('widget', this);
   }
@@ -288,6 +294,11 @@ scout.Widget.prototype._remove = function() {
 };
 
 scout.Widget.prototype.setOwner = function(owner) {
+  scout.objects.mandatoryParameter('owner', owner);
+  if (owner === this.owner) {
+    return;
+  }
+
   if (this.owner) {
     // Remove from old owner
     this.owner.removeChild(this);
@@ -297,16 +308,23 @@ scout.Widget.prototype.setOwner = function(owner) {
 };
 
 scout.Widget.prototype.setParent = function(parent) {
-  if (this.parent && this.parent !== this.owner) {
-    // Remove from old parent if getting relinked
-    // If the old parent is still the owner, don't remove it because owner stays responsible for destryoing it
-    this.parent.removeChild(this);
+  scout.objects.mandatoryParameter('parent', parent);
+  if (parent === this.parent) {
+    return;
+  }
+
+  if (this.parent) {
+    this.parent.off('destroy', this._parentDestroyHandler);
+
+    if (this.parent !== this.owner) {
+      // Remove from old parent if getting relinked
+      // If the old parent is still the owner, don't remove it because owner stays responsible for destryoing it
+      this.parent.removeChild(this);
+    }
   }
   this.parent = parent;
-  // FIXME CGU [6.1] remove this check, parent must never be null
-  if (this.parent) { //prevent trying to set child on undefined
-    this.parent.addChild(this);
-  }
+  this.parent.addChild(this);
+  this.parent.one('destroy', this._parentDestroyHandler);
 };
 
 scout.Widget.prototype.addChild = function(child) {
@@ -694,24 +712,40 @@ scout.Widget.prototype._prepareWidgetProperty = function(name, value) {
   // Destroy old child widget(s)
   this._destroyOldValue(oldValue);
 
-  // FIXME [6.1] CGU hier setParent verknüpfen
+  // Link to new parent
+  this.link(value);
+
   return value;
 };
 
+/**
+ * @param value may be an object or array of objects
+ */
 scout.Widget.prototype._destroyOldValue = function(value) {
   if (value === null || value === undefined) {
     return;
   }
 
-  if (Array.isArray(value)) {
-    var returnValues = [];
-    value.forEach(function(elementValue, i) {
-      returnValues[i] = this._destroyOldValue(elementValue);
-    }, this);
-    return returnValues;
+  value = scout.arrays.ensure(value);
+  value.forEach(function(elementValue, i) {
+    this._destroyChild(elementValue);
+  }, this);
+};
+
+/**
+ * Sets this widget as parent of the given widget(s).
+ *
+ * @param value may be an object or array of objects
+ */
+scout.Widget.prototype.link = function(value) {
+  if (value === null || value === undefined) {
+    return;
   }
 
-  return this._destroyChild(value);
+  value = scout.arrays.ensure(value);
+  value.forEach(function(child, i) {
+    child.setParent(this);
+  }, this);
 };
 
 scout.Widget.prototype._ensureType = function(propertyName, value) {
@@ -891,6 +925,15 @@ scout.Widget.prototype._onMirrorPropertyChange = function(event) {
   event.changedProperties.forEach(function(property) {
     this.callSetter(property, event.newProperties[property]);
   }, this);
+};
+
+scout.Widget.prototype._onParentDestroy = function(event) {
+  if (this.destroyed) {
+    return;
+  }
+  // If the parent is destroyed but the widget not make sure it gets a new parent
+  // This ensures the old one may be properly garbage collected
+  this.setParent(this.owner);
 };
 
 scout.Widget.prototype.callSetter = function(propertyName, value) {

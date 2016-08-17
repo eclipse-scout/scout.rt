@@ -18,6 +18,7 @@ scout.ViewMenuPopup = function() {
   this.viewMenus;
   this.viewButtonBoxBounds;
   this._tooltip;
+  this._addAdapterProperties('viewMenus');
 };
 scout.inherits(scout.ViewMenuPopup, scout.PopupWithHead);
 
@@ -29,7 +30,6 @@ scout.ViewMenuPopup.prototype._init = function(options) {
 
   this.$tab = options.$tab;
   this.$headBlueprint = this.$tab;
-  this.viewMenus = options.viewMenus;
   this.viewButtonBoxBounds = options.naviBounds;
 };
 
@@ -52,7 +52,6 @@ scout.ViewMenuPopup.prototype._render = function($parent) {
   this.viewMenus.forEach(function(viewMenu) {
     viewMenu.render(this.$body);
     viewMenu.afterSendDoAction = this.close.bind(this);
-    viewMenu.setParent(this);
   }, this);
 
   // Add last marker to last visible item

@@ -22,3 +22,6 @@ scout.NullWidget.prototype._createKeyStrokeContext = function() {
   return null; // FIXME [awe, cgu] 6.1 see fixme in Widget.js CTOR (causes missing $bindTarget error otherwise)
 };
 
+scout.NullWidget.prototype.setChildWidget = function(childWidget) {
+  this.setProperty('childWidget', childWidget);
+};

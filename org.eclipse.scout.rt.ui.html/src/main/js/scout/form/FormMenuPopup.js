@@ -10,17 +10,18 @@
  ******************************************************************************/
 scout.FormMenuPopup = function() {
   scout.FormMenuPopup.parent.call(this);
+  this.formMenu;
+  this._addAdapterProperties('form');
 };
 scout.inherits(scout.FormMenuPopup, scout.PopupWithHead);
 
 scout.FormMenuPopup.prototype._init = function(options) {
-  this.formMenu = options.formMenu;
-  options.initialFocus = this.formMenu.form._initialFocusElement.bind(this.formMenu.form);
+  options.form = options.formMenu.form;
+  options.initialFocus = options.formMenu.form._initialFocusElement.bind(options.formMenu.form);
   scout.FormMenuPopup.parent.prototype._init.call(this, options);
 
   this.$formMenu = this.formMenu.$container;
   this.$headBlueprint = this.$formMenu;
-  this.form = this.formMenu.form;
 };
 
 scout.FormMenuPopup.prototype._createLayout = function() {
@@ -34,7 +35,6 @@ scout.FormMenuPopup.prototype._render = function($parent) {
   this.form.renderInitialFocusEnabled = false;
   this.form.render(this.$body);
   this.form.htmlComp.pixelBasedSizing = true;
-  this.form.setParent(this);
 };
 
 scout.FormMenuPopup.prototype._renderHead = function() {

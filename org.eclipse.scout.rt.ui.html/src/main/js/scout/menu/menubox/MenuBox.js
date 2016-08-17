@@ -11,6 +11,8 @@
 scout.MenuBox = function(menuBar) {
   scout.MenuBox.parent.call(this);
   this.compact = false;
+  this.menus = [];
+  this._addAdapterProperties('menus');
 };
 scout.inherits(scout.MenuBox, scout.Widget);
 
@@ -27,7 +29,6 @@ scout.MenuBox.prototype._initMenus = function(menus) {
 };
 
 scout.MenuBox.prototype._initMenu = function(menu) {
-  menu.setParent(this);
   menu.uiCssClass = this.uiMenuCssClass;
 };
 
