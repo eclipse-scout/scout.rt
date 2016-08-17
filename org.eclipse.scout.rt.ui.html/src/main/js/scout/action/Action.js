@@ -175,7 +175,7 @@ scout.Action.prototype._configureTooltip = function() {
     $anchor: this.$container,
     arrowPosition: 50,
     arrowPositionUnit: '%',
-    position: this.tooltipPosition
+    tooltipPosition: this.tooltipPosition
   };
 };
 

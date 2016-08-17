@@ -77,7 +77,7 @@ scout.WizardProgressField.prototype._renderSteps = function() {
       scout.tooltips.install($step, {
         parent: this,
         text: step.tooltipText,
-        position: 'bottom'
+        tooltipPosition: 'bottom'
       });
     }
     this._updateStepClasses(step);

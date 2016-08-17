@@ -11,45 +11,26 @@
 scout.Tooltip = function() {
   scout.Tooltip.parent.call(this);
 
-  this.text;
-  this.arrowPosition;
-  this.arrowPositionUnit;
-  this.windowPaddingX;
-  this.windowPaddingY;
+  /**
+   * Either a String or a function which returns a String
+   */
+  this.text = '';
+
+  this.arrowPosition = 25;
+  this.arrowPositionUnit = '%';
+  this.windowPaddingX = 10;
+  this.windowPaddingY = 5;
   this.origin;
   this.$anchor;
-  this.autoRemove;
+  this.autoRemove = true;
   this.cssClass;
-  this.tooltipPosition;
-  this.scrollType;
-  this.htmlEnabled;
+  this.tooltipPosition = 'top';
+  this.scrollType = 'position';
+  this.htmlEnabled = false;
   this.$content;
   this._addEventSupport();
 };
 scout.inherits(scout.Tooltip, scout.Widget);
-
-/**
- * <ul>
- * <li>options.text - either a String or a function which returns a String.</li>
- * </ul>
- */
-scout.Tooltip.prototype._init = function(options) {
-  scout.Tooltip.parent.prototype._init.call(this, options);
-
-  this.text = options.text || '';
-  this.severity = options.severity || 0;
-  this.arrowPosition = options.arrowPosition !== undefined ? options.arrowPosition : 25;
-  this.arrowPositionUnit = options.arrowPositionUnit || '%';
-  this.windowPaddingX = options.windowPaddingX !== undefined ? options.windowPaddingX : 10;
-  this.windowPaddingY = options.windowPaddingY !== undefined ? options.windowPaddingY : 5;
-  this.origin = options.origin;
-  this.$anchor = options.$anchor;
-  this.autoRemove = options.autoRemove !== undefined ? options.autoRemove : true;
-  this.cssClass = options.cssClass;
-  this.tooltipPosition = options.position || 'top';
-  this.scrollType = options.scrollType || 'position';
-  this.htmlEnabled = options.htmlEnabled !== undefined ? options.htmlEnabled : false;
-};
 
 scout.Tooltip.prototype._render = function($parent) {
   // Auto-detect parent
