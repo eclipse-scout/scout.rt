@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 /* global linkWidgetAndAdapter */
-describe('Form', function() {
+describe('FormAdapter', function() {
   var session, helper;
 
   beforeEach(function() {
@@ -28,17 +28,22 @@ describe('Form', function() {
     jasmine.clock().uninstall();
   });
 
-  describe('destroy', function() {
+  describe('form destroy', function() {
 
-    it('destroys its children', function() {
+    it('destroys the adapters of the children', function() {
       var form = helper.createFormWithOneField();
+      linkWidgetAndAdapter(form, 'FormAdapter');
+      linkWidgetAndAdapter(form.rootGroupBox, 'GroupBoxAdapter');
+      linkWidgetAndAdapter(form.rootGroupBox.fields[0], 'StringFieldAdapter');
 
-      expect(form.rootGroupBox).toBeTruthy();
-      expect(form.rootGroupBox.fields[0]).toBeTruthy();
+      expect(session.getModelAdapter(form.id).widget).toBe(form);
+      expect(session.getModelAdapter(form.rootGroupBox.id).widget).toBe(form.rootGroupBox);
+      expect(session.getModelAdapter(form.rootGroupBox.fields[0].id).widget).toBe(form.rootGroupBox.fields[0]);
 
       form.destroy();
-      expect(form.rootGroupBox.destroyed).toBeTruthy();
-      expect(form.rootGroupBox.fields[0].destroyed).toBeTruthy();
+      expect(session.getModelAdapter(form.id)).toBeFalsy();
+      expect(session.getModelAdapter(form.rootGroupBox.id)).toBeFalsy();
+      expect(session.getModelAdapter(form.rootGroupBox.fields[0].id)).toBeFalsy();
     });
 
   });

@@ -61,7 +61,8 @@ describe("Menu", function() {
       expect(menu1.$container.hasClass('menu-separator')).toBe(true);
     });
 
-    it('childActions must not be rendered when popup is not opened. See ticket #173734', function() {
+    it('must not render childActions when popup is not open', function() {
+      // See ticket #173734
       // render menu1 (sub-menu not opened)
       menu1.childActions = [menu2];
       menu1.render($sandbox);
@@ -84,10 +85,7 @@ describe("Menu", function() {
       menu1.remove();
       menu1.setSelected(false);
       menu1.render($sandbox);
-      session._adapterDataCache['123'] = modelMenu3; // to simulate the server-response we must have the correct adapter data
-      menu1.onModelPropertyChange({properties: {
-        childActions: ['123']
-      }});
+      menu1.setProperty('childActions', [modelMenu3]);
       expect(menu1.$container).toBeTruthy();
       $subMenu = $sandbox.find('.menu-item > span:contains(\'baz\')');
       expect($subMenu.length).toBe(0);

@@ -128,16 +128,29 @@ function createPropertyChangeEvent(model, properties) {
   };
 }
 
-// FIXME [awe] 6.1 - DEPRECATED --> use FormSpecHelper.map/registerAdapterData instead
-function createAdapterData(adapterDataArray) {
-  var i,
-    adapterData = {};
+/**
+ * Converts the given adapaterDataArray into a map of adapterData where the key
+ * is the adapterData.id and the value is the adapterData itself.
+ */
+function mapAdapterData(adapterDataArray) {
+  var adapterDataMap = {};
   adapterDataArray = scout.arrays.ensure(adapterDataArray);
+  adapterDataArray.forEach(function(adapterData) {
+    adapterDataMap[adapterData.id] = adapterData;
+  });
+  return adapterDataMap;
+}
 
-  for (i = 0; i < adapterDataArray.length; i++) {
-    adapterData[adapterDataArray[i].id] = adapterDataArray[i];
-  }
-  return adapterData;
+/**
+ * Converts the given adapterDataArray into a map of adapterData and registers the adapterData in the Session.
+ * Only use this function when your tests requires to have a remote adapter. In that case create widget and
+ * remote adapter with Session#getOrCreateWidget().
+ *
+ * @param adapterDataArray
+ */
+function registerAdapterData(adapterDataArray, session) {
+  var adapterDataMap = this.mapAdapterData(adapterDataArray);
+  session._copyAdapterData(adapterDataMap);
 }
 
 /**

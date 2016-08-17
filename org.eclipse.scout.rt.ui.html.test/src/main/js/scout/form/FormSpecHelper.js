@@ -69,29 +69,3 @@ scout.FormSpecHelper.prototype.createFieldModel = function(objectType, parent, m
 scout.FormSpecHelper.prototype.createField = function(objectType, parent, modelProperties) {
   return scout.create(objectType, this.createFieldModel(objectType, parent, modelProperties));
 };
-
-
-/**
- * Converts the given adapterDataArray into a map of adapterData and registers the adapterData in the Session.
- * Only use this function when your tests requires to have a remote adapter. In that case create widget and
- * remote adapter with Session#getOrCreateWidget().
- *
- * @param adapterDataArray
- */
-scout.FormSpecHelper.prototype.registerAdapterData = function(adapterDataArray) {
-  var adapterDataMap = this.mapAdapterData(adapterDataArray);
-  this.session._copyAdapterData(adapterDataMap);
-};
-
-/**
- * Converts the given adapaterDataArray into a map of adapterData where the key
- * is the adapterData.id and the value is the adapterData itself.
- */
-scout.FormSpecHelper.prototype.mapAdapterData = function(adapterDataArray) {
-  var adapterDataMap = {};
-  adapterDataArray = scout.arrays.ensure(adapterDataArray);
-  adapterDataArray.forEach(function(adapterData) {
-    adapterDataMap[adapterData.id] = adapterData;
-  });
-  return adapterDataMap;
-};

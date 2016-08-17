@@ -352,7 +352,7 @@ describe("TableAdapter", function() {
         var menu2 = helper.createMenuModel();
 
         var message = {
-          adapterData: createAdapterData([menu1, menu2]),
+          adapterData: mapAdapterData([menu1, menu2]),
           events: [createPropertyChangeEvent(table, {
             menus: [menu1.id, menu2.id]
           })]
@@ -370,7 +370,7 @@ describe("TableAdapter", function() {
         var menu2 = helper.createMenuModel();
 
         var message = {
-          adapterData: createAdapterData([menu1, menu2]),
+          adapterData: mapAdapterData([menu1, menu2]),
           events: [createPropertyChangeEvent(table, {
             menus: [menu1.id, menu2.id]
           })]
@@ -401,7 +401,7 @@ describe("TableAdapter", function() {
         var menu3 = helper.createMenuModel();
 
         var message = {
-          adapterData: createAdapterData([menu1, menu2]),
+          adapterData: mapAdapterData([menu1, menu2]),
           events: [createPropertyChangeEvent(table, {
             menus: [menu1.id, menu2.id]
           })]
@@ -412,7 +412,7 @@ describe("TableAdapter", function() {
 
         var menu1Widget = session.getModelAdapter(menu1.id).widget;
         message = {
-          adapterData: createAdapterData(menu3),
+          adapterData: mapAdapterData(menu3),
           events: [createPropertyChangeEvent(table, {
             menus: [menu2.id, menu3.id]
           })]

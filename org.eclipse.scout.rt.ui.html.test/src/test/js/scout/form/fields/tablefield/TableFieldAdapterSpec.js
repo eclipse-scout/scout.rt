@@ -30,7 +30,8 @@ describe("TableFieldAdapter", function() {
 
   function createTableFieldWithTableModel() {
     var table = tableHelper.createModelFixture(2, 2);
-    return createTableFieldModel({table: table});
+    registerAdapterData(table, session);
+    return createTableFieldModel({table: table.id});
   }
 
   function createTableFieldAdapter(model) {
@@ -48,7 +49,7 @@ describe("TableFieldAdapter", function() {
       var adapter = createTableFieldAdapter(model);
       var tableField = adapter.createWidget(model, session.desktop);
       var table = tableField.table;
-      expect(session.getModelAdapter(table.id)).adapter.id;
+      expect(session.getModelAdapter(table.id).widget).toBe(table);
 
       var message = {
         events: [createPropertyChangeEvent(tableField, {table: ''})]
@@ -56,7 +57,6 @@ describe("TableFieldAdapter", function() {
       session._processSuccessResponse(message);
       expect(tableField.table).toBeFalsy();
       expect(table.destroyed).toBe(true);
-      expect(adapter.destryoed).toBe(true);
       expect(session.getModelAdapter(table.id)).toBeFalsy();
     });
   });

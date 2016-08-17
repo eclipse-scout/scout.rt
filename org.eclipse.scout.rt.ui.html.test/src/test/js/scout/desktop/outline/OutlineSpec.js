@@ -43,15 +43,13 @@ describe("Outline", function() {
   }
 
   describe("dispose", function() {
-    var model, tree, node0, node1, node2;
+    var model, tree, node0;
 
     beforeEach(function() {
       // A large tree is used to properly test recursion
       model = helper.createModelFixture(3, 2, true);
       tree = helper.createOutline(model);
-      node0 = model.nodes[0];
-      node1 = model.nodes[1];
-      node2 = model.nodes[2];
+      node0 = tree.nodes[0];
     });
 
     it("calls onNodeDeleted for every node to be able to cleanup", function() {
@@ -63,15 +61,51 @@ describe("Outline", function() {
     it("calls onNodeDeleted for every node (which was not already deleted before) to be able to cleanup", function() {
       spyOn(tree, '_onNodeDeleted');
 
-      var message = {
-        events: [createNodesDeletedEvent(model, [node0.id])]
-      };
-      session._processSuccessResponse(message);
+      tree.deleteNodes([node0]);
       expect(tree._onNodeDeleted.calls.count()).toBe(13);
 
       tree._onNodeDeleted.calls.reset();
       tree.destroy();
       expect(tree._onNodeDeleted.calls.count()).toBe(26);
+    });
+
+  });
+
+
+  describe("deleteNodes", function() {
+    var model, tree, node0;
+
+    beforeEach(function() {
+      // A large tree is used to properly test recursion
+      model = helper.createModelFixture(3, 2, true);
+      tree = helper.createOutline(model);
+      node0 = tree.nodes[0];
+    });
+
+    it("calls onNodeDeleted for every node to be able to cleanup", function() {
+      spyOn(tree, '_onNodeDeleted');
+
+      tree.deleteNodes([node0]);
+      expect(tree._onNodeDeleted.calls.count()).toBe(13);
+    });
+
+  });
+
+  describe("deleteAllChildNodes", function() {
+    var model, tree;
+
+    beforeEach(function() {
+      // A large tree is used to properly test recursion
+      model = helper.createModelFixture(3, 2, true);
+      tree = helper.createOutline(model);
+    });
+
+    it("calls onNodeDeleted for every node to be able to cleanup", function() {
+      spyOn(tree, '_onNodeDeleted');
+
+      tree.deleteAllChildNodes();
+      expect(tree._onNodeDeleted.calls.count()).toBe(39);
+      expect(scout.objects.countOwnProperties(tree.nodesMap)).toBe(0);
     });
 
   });
@@ -177,7 +211,6 @@ describe("Outline", function() {
       expect(outline.detailMenuBar.menuItems[0]).toBe(node0.detailTable.menus[0]);
     });
 
-
     it("attaches a listener to the detail table to get dynamic menu changes", function() {
       var outline = helper.createOutlineWithOneDetailTable();
       outline.setCompact(true);
@@ -252,58 +285,4 @@ describe("Outline", function() {
 
   });
 
-  describe("onModelAction", function() {
-
-    describe("nodesDeleted event", function() {
-      var model, tree, node0, node1, node2;
-
-      beforeEach(function() {
-        // A large tree is used to properly test recursion
-        model = helper.createModelFixture(3, 2, true);
-        tree = helper.createOutline(model);
-        node0 = model.nodes[0];
-        node1 = model.nodes[1];
-        node2 = model.nodes[2];
-      });
-
-      it("calls onNodeDeleted for every node to be able to cleanup", function() {
-        spyOn(tree, '_onNodeDeleted');
-
-        var message = {
-          events: [createNodesDeletedEvent(model, [node0.id])]
-        };
-        session._processSuccessResponse(message);
-
-        expect(tree._onNodeDeleted.calls.count()).toBe(13);
-      });
-
-    });
-
-    describe("allChildNodesDeleted event", function() {
-      var model, tree, node0, node1, node2;
-
-      beforeEach(function() {
-        // A large tree is used to properly test recursion
-        model = helper.createModelFixture(3, 2, true);
-        tree = helper.createOutline(model);
-        node0 = model.nodes[0];
-        node1 = model.nodes[1];
-        node2 = model.nodes[2];
-      });
-
-      it("calls onNodeDeleted for every node to be able to cleanup", function() {
-        spyOn(tree, '_onNodeDeleted');
-
-        var message = {
-          events: [createAllChildNodesDeletedEvent(model)]
-        };
-        session._processSuccessResponse(message);
-
-        expect(tree._onNodeDeleted.calls.count()).toBe(39);
-        expect(scout.objects.countOwnProperties(tree.nodesMap)).toBe(0);
-      });
-
-    });
-
-  });
 });

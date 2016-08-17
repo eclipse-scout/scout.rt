@@ -27,8 +27,10 @@
     "sendQueuedAjaxCalls": false,
     "uninstallUnloadHandlers": false,
     "createPropertyChangeEvent": false,
-    "createAdapterData": false,
+    "mapAdapterData": false,
+    "registerAdapterData": false,
     "createSimpleModel": false,
-    "linkWidgetAndAdapter": false
+    "linkWidgetAndAdapter": false,
+    "removePopups": false
   }
 }

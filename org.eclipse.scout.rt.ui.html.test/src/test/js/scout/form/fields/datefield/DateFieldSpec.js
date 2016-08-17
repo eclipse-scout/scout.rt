@@ -36,7 +36,7 @@ describe("DateField", function() {
       dateFormatPattern: 'dd.MM.yyyy'
     }, scout.nvl(model, {}));
     model = $.extend(model, createSimpleModel(model.objectType, session));
-    helper.registerAdapterData(model);
+    registerAdapterData(model, session);
     return model;
   }
 

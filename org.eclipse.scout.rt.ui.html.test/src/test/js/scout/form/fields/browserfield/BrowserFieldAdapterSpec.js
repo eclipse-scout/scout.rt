@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-describe('BrowserField', function() {
+describe('BrowserFieldAdapter', function() {
 
   var session;
 
@@ -19,12 +19,13 @@ describe('BrowserField', function() {
     jasmine.clock().install();
   });
 
-  it('postMessage', function() {
-    var browserField = new scout.BrowserField();
-    browserField.init(createSimpleModel('BrowserField', session, 'foo'));
+  it('sends postMessage on post message', function() {
+    var model = createSimpleModel('BrowserField', session, 'foo');
+    var adapter = scout.create('BrowserFieldAdapter', model);
+    var browserField = adapter.createWidget(model, session.desktop);
     browserField.render(session.$entryPoint);
 
-    // FIXME awe: discuss with C.GU: postMessage is an async call - how to test this with Jasmine?
+    // TODO [6.1] awe: discuss with C.GU: postMessage is an async call - how to test this with Jasmine?
     // window.postMessage('hello world', '*');
     browserField._onPostMessage({
       data: 'hello world',

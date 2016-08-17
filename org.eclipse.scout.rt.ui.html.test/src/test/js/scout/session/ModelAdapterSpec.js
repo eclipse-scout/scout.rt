@@ -58,7 +58,7 @@ describe('ModelAdapter', function() {
       model.objectType = 'NullWidget';
     }
     model = $.extend(createSimpleModel(model.objectType, session), model);
-    helper.registerAdapterData(model);
+    registerAdapterData(model, session);
     return model;
   }
 
@@ -204,7 +204,7 @@ describe('ModelAdapter', function() {
 
     it('destroys the adapter and its children', function() {
       var message = {
-        adapterData: createAdapterData(childModel),
+        adapterData: mapAdapterData(childModel),
         events: [createPropertyChangeEvent(adapter, {
           childWidget: childModel.id
         })]
@@ -225,7 +225,7 @@ describe('ModelAdapter', function() {
       childModel.owner = session.rootAdapter.id;
 
       var message = {
-        adapterData: createAdapterData(childModel),
+        adapterData: mapAdapterData(childModel),
         events: [createPropertyChangeEvent(adapter, {
           childWidget: childModel.id
         })]
@@ -260,7 +260,7 @@ describe('ModelAdapter', function() {
 
       it('creates and registers the new adapter', function() {
         var message = {
-          adapterData: createAdapterData(childModel),
+          adapterData: mapAdapterData(childModel),
           events: [createPropertyChangeEvent(adapter, {
             childWidget: childModel.id
           })]
@@ -273,7 +273,7 @@ describe('ModelAdapter', function() {
 
       it('destroys the old adapter', function() {
         var message = {
-          adapterData: createAdapterData(childModel),
+          adapterData: mapAdapterData(childModel),
           events: [createPropertyChangeEvent(adapter, {
             childWidget: childModel.id
           })]
@@ -284,7 +284,7 @@ describe('ModelAdapter', function() {
         expect(session.getModelAdapter(childModel.id)).toBe(widget.childWidget.remoteAdapter);
 
         message = {
-          adapterData: createAdapterData(childModel2),
+          adapterData: mapAdapterData(childModel2),
           events: [createPropertyChangeEvent(adapter, {
             childWidget: childModel2.id
           })]
@@ -301,7 +301,7 @@ describe('ModelAdapter', function() {
 
       it('creates and registers adapters', function() {
         var message = {
-          adapterData: createAdapterData([childModel, childModel2]),
+          adapterData: mapAdapterData([childModel, childModel2]),
           events: [createPropertyChangeEvent(adapter, {
             childWidget: [childModel.id, childModel2.id]
           })]
@@ -316,7 +316,7 @@ describe('ModelAdapter', function() {
 
       it('destroys the old adapters', function() {
         var message = {
-          adapterData: createAdapterData([childModel, childModel2]),
+          adapterData: mapAdapterData([childModel, childModel2]),
           events: [createPropertyChangeEvent(adapter, {
             childWidget: [childModel.id, childModel2.id]
           })]
@@ -346,7 +346,7 @@ describe('ModelAdapter', function() {
       it('destroys the old and creates the new adapters if the array contains both', function() {
         var childModel3 = createModel();
         var message = {
-          adapterData: createAdapterData([childModel, childModel2]),
+          adapterData: mapAdapterData([childModel, childModel2]),
           events: [createPropertyChangeEvent(adapter, {
             childWidget: [childModel.id, childModel2.id]
           })]
@@ -359,7 +359,7 @@ describe('ModelAdapter', function() {
         expect(session.getModelAdapter(childModel2.id)).toBe(widget.childWidget[1].remoteAdapter);
 
         message = {
-          adapterData: createAdapterData(childModel3),
+          adapterData: mapAdapterData(childModel3),
           events: [createPropertyChangeEvent(adapter, {
             childWidget: [childModel2.id, childModel3.id]
           })]
