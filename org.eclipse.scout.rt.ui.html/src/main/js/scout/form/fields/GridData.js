@@ -1,4 +1,5 @@
-scout.GridData = function() {
+scout.GridData = function(model) {
+  model = model || {};
   this.x = -1;
   this.y = -1;
   this.w = 1;
@@ -13,4 +14,6 @@ scout.GridData = function() {
   this.fillVertical = true;
   this.widthInPixel = 0;
   this.heightInPixel = 0;
+
+  $.extend(this, model);
 };

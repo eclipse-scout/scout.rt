@@ -26,7 +26,7 @@ scout.FormField = function() {
   this.statusPosition = scout.FormField.STATUS_POSITION_DEFAULT;
   this.menus = [];
   this.menusVisible = false;
-  this.gridData = new scout.GridData();
+  this.gridData;
   this.$label;
 
   /**
@@ -91,6 +91,7 @@ scout.FormField.prototype._init = function(model) {
   this._syncKeyStrokes(this.keyStrokes);
   this._syncMenus(this.menus);
   this._syncErrorStatus(this.errorStatus);
+  this._syncGridData(this.gridData);
 };
 
 /**
@@ -359,6 +360,10 @@ scout.FormField.prototype._hasMenus = function() {
 scout.FormField.prototype._updateMenus = function() {
   this._updateStatusVisible();
   this.$container.toggleClass('has-menus', this._hasMenus() && this.menusVisible);
+};
+
+scout.FormField.prototype._syncGridData = function(gridData) {
+  this.gridData = new scout.GridData(gridData);
 };
 
 scout.FormField.prototype._syncKeyStrokes = function(keyStrokes, oldKeyStrokes) {
