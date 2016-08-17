@@ -363,20 +363,17 @@ scout.FormField.prototype._updateMenus = function() {
 
 scout.FormField.prototype._syncKeyStrokes = function(keyStrokes, oldKeyStrokes) {
   this.updateKeyStrokes(keyStrokes, oldKeyStrokes);
-  this.keyStrokes = keyStrokes;
+  this.keyStrokes = keyStrokes; // FIXME [awe] 6.1 - call _setProperty('keyStrokes'... here
 };
 
 scout.FormField.prototype._syncMenus = function(menus, oldMenus) {
   this.updateKeyStrokes(menus, oldMenus);
-  this.menus = menus;
+  this.menus = menus; // FIXME [awe] 6.1 - call _setProperty('menus'... here
 };
 
 scout.FormField.prototype._syncErrorStatus = function(errorStatus) {
-  if (errorStatus) {
-    this.errorStatus = new scout.Status(errorStatus);
-  } else {
-    this.errorStatus = null;
-  }
+  this._setProperty('errorStatus',
+      errorStatus ? new scout.Status(errorStatus) : null);
 };
 
 scout.FormField.prototype.setCssClass = function(cssClass) {

@@ -671,9 +671,7 @@ scout.Widget.prototype.setProperty = function(name, value) {
 scout.Widget.prototype._callSetProperty = function(name, value) {
   var syncFuncName = '_sync' + scout.strings.toUpperCaseFirstLetter(name);
   if (this[syncFuncName]) {
-    var oldValue = this[name]; // FIXME [awe] 6.1: review with C.GU -> how to handle property change event when setProperty is called (_sync/_set case)
     this[syncFuncName](value); // FIXME [6.1] CGU rename to _setFuncName
-    this._firePropertyChange(name, oldValue, value);
   } else {
     this._setProperty(name, value);
   }

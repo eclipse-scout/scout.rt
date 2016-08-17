@@ -35,7 +35,8 @@ scout.Action = function() {
   this.actionStyle = scout.Action.ActionStyle.DEFAULT;
   this.textVisible = true;
   this.compact = false;
-  this._addCloneProperties(['actionStyle', 'cssClass', 'enabled', 'horizontalAlignment', 'iconId', 'selected', 'tabbable', 'text', 'tooltipText', 'toggleAction']);
+  this._addCloneProperties(['actionStyle', 'cssClass', 'visible', 'enabled', 'horizontalAlignment', 'iconId', 'selected', 'tabbable', 'text', 'tooltipText', 'toggleAction']);
+  // FIXME [awe] 6.1 - move visible and enabled properties and base methods to Widget.js
 };
 scout.inherits(scout.Action, scout.Widget);
 

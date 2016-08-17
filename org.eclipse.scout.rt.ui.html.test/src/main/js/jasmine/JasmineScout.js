@@ -144,14 +144,15 @@ function createAdapterData(adapterDataArray) {
  * This function links and existing widget with a new adapter instance. This is useful for tests
  * where you have an existing widget and later create a new adapter instance to that widget.
  */
-function linkWidgetAndAdapter(widget, adapter) {
+function linkWidgetAndAdapter(widget, adapterClass) {
   var session = widget.session;
+  var adapter = scout.create(adapterClass, {
+    id: widget.id,
+    session: session
+  });
   adapter.widget = widget;
-  adapter.session = session;
-  adapter.id = widget.id;
   widget.remoteAdapter = adapter;
   adapter._attachWidget();
-  session.registerModelAdapter(adapter);
 }
 
 function stripCommentsFromJson(input) {

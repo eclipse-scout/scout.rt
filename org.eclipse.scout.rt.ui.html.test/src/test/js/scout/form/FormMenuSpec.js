@@ -99,7 +99,7 @@ describe('FormMenu', function() {
 
       it('calls setSelected', function() {
         var menu = createMenu();
-        linkWidgetAndAdapter(menu, new scout.MenuAdapter());
+        linkWidgetAndAdapter(menu, 'MenuAdapter');
         menu.render(session.$entryPoint);
         expect(findPopup()).not.toExist();
 

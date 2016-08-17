@@ -60,7 +60,7 @@ describe('Form', function() {
 
       it('destroys the form', function() {
         var form = helper.createFormWithOneField2();
-        linkWidgetAndAdapter(form, new scout.FormAdapter());
+        linkWidgetAndAdapter(form, 'FormAdapter');
         spyOn(form, 'destroy');
 
         var message = {

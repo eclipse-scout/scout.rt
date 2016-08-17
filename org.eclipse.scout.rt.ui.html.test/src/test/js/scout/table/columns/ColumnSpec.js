@@ -480,7 +480,7 @@ describe('Column', function() {
         var column0 = table.columns[0];
         table.render(session.$entryPoint);
 
-        linkWidgetAndAdapter(table, new scout.TableAdapter());
+        linkWidgetAndAdapter(table, 'TableAdapter');
         table.setColumnBackgroundEffect(column0, 'barChart');
 
         sendQueuedAjaxCalls();
