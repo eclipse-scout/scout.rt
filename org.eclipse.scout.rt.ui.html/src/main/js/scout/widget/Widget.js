@@ -107,6 +107,14 @@ scout.Widget.prototype.destroy = function() {
     return;
   }
 
+  if (this.animateRemoval && this.rendered) {
+    this.on('remove', function() {
+      this.destroy();
+    }.bind(this));
+    this.remove();
+    return;
+  }
+
   // Destroy children in reverse order
   this.children.slice().reverse().forEach(function(child) {
     this._destroyChild(child);
