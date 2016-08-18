@@ -46,7 +46,7 @@ scout.App.prototype._doBootstrap = function(options) {
     scout.logging.bootstrap(),
     scout.device.bootstrap(),
     scout.fonts.bootstrap(options.fonts),
-    scout.model.bootstrap(),
+    scout.models.bootstrap(),
     scout.locales.bootstrap(),
     scout.texts.bootstrap()
   ];

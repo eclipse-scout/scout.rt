@@ -974,22 +974,25 @@ scout.Outline.prototype._onDetailTableEvent = function(event) {
   }
 };
 
-// FIXME [awe] 6.1 - merge this with online logic in onPageChanged
-scout.Outline.prototype._onPageChanged2 = function(page) {
-  if (page.detailTable) {
-    this._initDetailTable(page);
+/**
+ * @override Tree.js
+ */
+scout.Outline.prototype._nodesSelectedInternal = function() {
+  // FIXME [awe] 6.1 - braucht es hier deselectedPage, newSelectedPage wie im Java model?
+  var activePage = this.selectedNodes[0];
+  if (activePage) {
+    if (activePage.childrenLoaded) {
+      return;
+    }
+    var promise = activePage.loadChildren();
+    if (promise) {
+      promise.done(this._onLoadChildrenDone.bind(this, activePage));
+    }
   }
+};
 
-  if (page.detailForm) {
-    this._initDetailForm(page);
-  }
-
-  var selectedPage = this.selectedNodes[0];
-  if (!page && !selectedPage || page === selectedPage) {
-    this.updateDetailContent();
-  }
-
-  this._triggerPageChanged(page);
+scout.Outline.prototype._onLoadChildrenDone = function(activePage) {
+  this._triggerPageChanged(activePage);
 };
 
 scout.Outline.prototype.pageChanged = function(page) {

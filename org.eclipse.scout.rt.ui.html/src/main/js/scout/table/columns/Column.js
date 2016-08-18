@@ -40,7 +40,7 @@ scout.Column.prototype.init = function(model) {
   // Fill in the missing default values
   scout.defaultValues.applyTo(this);
 
-  // InitialWidth is only sent if it differs from width
+  // Initial width is only sent if it differs from width
   if (this.initialWidth === undefined) {
     this.initialWidth = scout.nvl(this.width, 0);
   }
@@ -48,6 +48,8 @@ scout.Column.prototype.init = function(model) {
   if (this.aggregationFunction) {
     this.setAggregationFunction(this.aggregationFunction);
   }
+
+  scout.texts.resolveTextProperty(this);
 };
 
 /**

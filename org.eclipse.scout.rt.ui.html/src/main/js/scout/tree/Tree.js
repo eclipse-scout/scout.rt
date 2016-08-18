@@ -1802,6 +1802,7 @@ scout.Tree.prototype.selectNodes = function(nodes, notifyServer, debounceSend) {
 
   // Make a copy so that original array stays untouched
   this.selectedNodes = nodes.slice();
+  this._nodesSelectedInternal();
   this._triggerNodesSelected(debounceSend);
 
   if (this.selectedNodes.length > 0 && !this.visibleNodesMap[this.selectedNodes[0].id]) {
@@ -1825,6 +1826,13 @@ scout.Tree.prototype.selectNodes = function(nodes, notifyServer, debounceSend) {
       this.$data[0].scrollTop = scrollTop;
     }
   }
+};
+
+/**
+ * This method is overridden by subclasses of Tree. The default impl. does nothing.
+ */
+scout.Tree.prototype._nodesSelectedInternal = function(node) {
+  // NOP
 };
 
 scout.Tree.prototype.deselectNode = function(node) {

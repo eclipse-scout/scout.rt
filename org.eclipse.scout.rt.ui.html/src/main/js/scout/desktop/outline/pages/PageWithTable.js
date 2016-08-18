@@ -39,15 +39,16 @@ scout.PageWithTable.prototype.createDefaultChildPage = function(tableRow) {
  * @override TreeNode.js
  */
 scout.PageWithTable.prototype.loadChildren = function() {
-  this.loadTableData();
-  var childPage, childNodes = [];
-  // FIXME [awe] 6.1 create child nodes for table rows, check how this is done in Java model
-  this.detailTable.rows.forEach(function(row) {
-    childPage = this._createChildPageInternal(row);
-    if (childPage !== null) {
-      childNodes.push(childPage);
-    }
-  }, this);
-  this.childNodes = childNodes;
-  this.getTree()._onPageChanged2(this); // FIXME 6.1 [awe] - remove this hack
+  return this.loadTableData()
+  .done(function() {
+    var childPage, childNodes = [];
+    this.detailTable.rows.forEach(function(row) {
+      childPage = this._createChildPageInternal(row);
+      if (childPage !== null) {
+        childNodes.push(childPage);
+      }
+    }, this);
+    this.childNodes = childNodes;
+
+  }.bind(this));
 };
