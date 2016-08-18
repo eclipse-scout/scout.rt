@@ -396,7 +396,7 @@ scout.Desktop.prototype._onSplitterResizeEnd = function(event) {
 
   // Store size
   if (this.cacheSplitterPosition) {
-    sessionStorage.setItem('scout:desktopSplitterPosition', splitterPosition);
+    storeSplitterPosition(splitterPosition);
   }
 
   // Check if splitter is smaller than min size
@@ -413,11 +413,21 @@ scout.Desktop.prototype._onSplitterResizeEnd = function(event) {
       }.bind(this),
       complete: function() {
         this.splitter.updatePosition();
-        // Store size
-        sessionStorage.setItem('scout:desktopSplitterPosition', this.splitter.position);
+        storeSplitterPosition(this.splitter.position);
         this._handleUpdateSplitterPosition(this.splitter.position);
       }.bind(this)
     });
+  }
+
+  // ----- Helper functions -----
+
+  function storeSplitterPosition(splitterPosition) {
+    try {
+      sessionStorage.setItem('scout:desktopSplitterPosition', splitterPosition);
+    } catch (err) {
+      // ignore errors (e.g. this can happen in "private mode" on Safari)
+      $.log.error('Error while storing "scout:desktopSplitterPosition" in sessionStorage: ' + err);
+    }
   }
 };
 
