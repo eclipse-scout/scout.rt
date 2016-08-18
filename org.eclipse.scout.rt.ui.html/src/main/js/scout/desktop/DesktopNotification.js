@@ -53,8 +53,7 @@ scout.DesktopNotification.prototype._render = function($parent) {
 };
 
 scout.DesktopNotification.prototype._renderMessage = function() {
-  this.$content.text(scout.strings.hasText(this.status.message) ?
-      this.status.message : '');
+  this.$content.html(scout.strings.nl2br(this.status.message));
 };
 
 scout.DesktopNotification.prototype._renderCloseable = function() {
