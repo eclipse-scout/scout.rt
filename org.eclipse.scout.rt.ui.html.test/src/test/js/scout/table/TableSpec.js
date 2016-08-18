@@ -1843,7 +1843,7 @@ describe("Table", function() {
 
   });
 
-  describe("row click", function() {
+  describe('row click', function() {
 
     function clickRowAndAssertSelection(table, $row) {
       $row.triggerClick();
@@ -1858,7 +1858,7 @@ describe("Table", function() {
       expect($selectedRow.hasClass('select-single')).toBeTruthy();
     }
 
-    it("selects row and unselects others", function() {
+    it('selects row and unselects others', function() {
       var model = helper.createModelFixture(2, 5);
       var table = helper.createTable(model);
       table.render(session.$entryPoint);

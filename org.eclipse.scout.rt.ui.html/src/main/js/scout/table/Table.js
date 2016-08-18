@@ -1447,12 +1447,10 @@ scout.Table.prototype._removeMenus = function() {
 };
 
 scout.Table.prototype.notifyRowSelectionFinished = function() {
-  //  if (this._sendRowsPending) {
-  //    this._sendRowsSelected(this._rowsToIds(this.selectedRows));
-  //    this._sendRowsPending = false;
-  //XXX CGU what is this?
-  //  }
-  this._triggerRowsSelected();
+  if (this._triggerRowsSelectedPending) {
+    this._triggerRowsSelected();
+    this._triggerRowsSelectedPending = false;
+  }
   this._updateMenuBar();
 };
 
@@ -2322,7 +2320,7 @@ scout.Table.prototype.addRowToSelection = function(row, ongoingSelection) {
     }
   }
 
-  this._sendRowsPending = true;
+  this._triggerRowsSelectedPending = true;
   if (!ongoingSelection) {
     this.notifyRowSelectionFinished();
   }
@@ -2337,7 +2335,7 @@ scout.Table.prototype.removeRowFromSelection = function(row, ongoingSelection) {
     if (!ongoingSelection) {
       this._triggerRowsSelected();
     } else {
-      this._sendRowsPending = true;
+      this._triggerRowsSelectedPending = true;
     }
   }
 };
