@@ -2195,8 +2195,9 @@ describe("Table", function() {
       verifyMouseMoveSelectionIsDisabled(model, table, false);
 
       model = helper.createModelFixture(2, 4);
-      table = helper.createTable(model);
-      table.multiSelect = false;
+      model.multiSelect = false;
+      adapter = helper.createTableAdapter(model);
+      table = adapter.createWidget(model, session.desktop);
       verifyMouseMoveSelectionIsDisabled(model, table, true);
     });
 
