@@ -68,6 +68,11 @@ public class DesktopEvent extends EventObject implements IModelEvent {
    */
   public static final int TYPE_NOTIFICATION_REMOVED = 1050;
 
+  /**
+   * Event type to request the desktop's geographic position..
+   */
+  public static final int TYPE_REQUEST_GEOLOCATION = 110;
+
   private final int m_type;
   private IOutline m_outline;
   private IForm m_form;

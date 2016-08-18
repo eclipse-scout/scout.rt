@@ -70,4 +70,10 @@ public interface IDesktopUIFacade {
   void setHeaderVisibleFromUI(boolean visible);
 
   void setBenchVisibleFromUI(boolean visible);
+
+  void setGeoLocationServiceAvailableFromUI(boolean available);
+
+  void fireGeolocationDetermined(String latitude, String longitude);
+
+  void fireGeolocationFailed(String errorCode, String errorMessage);
 }

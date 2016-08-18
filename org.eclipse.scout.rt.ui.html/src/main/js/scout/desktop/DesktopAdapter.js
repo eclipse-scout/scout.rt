@@ -11,7 +11,7 @@
 scout.DesktopAdapter = function() {
   scout.DesktopAdapter.parent.call(this);
   this._addAdapterProperties(['activeForm', 'viewButtons', 'menus', 'views', 'dialogs', 'outline', 'messageBoxes', 'fileChoosers', 'addOns', 'keyStrokes']);
-  this._addRemoteProperties(['benchVisible', 'navigationVisible', 'headerVisible']);
+  this._addRemoteProperties(['benchVisible', 'navigationVisible', 'headerVisible', 'geolocationServiceAvailable']);
 };
 scout.inherits(scout.DesktopAdapter, scout.ModelAdapter);
 
@@ -159,6 +159,24 @@ scout.DesktopAdapter.prototype._onOutlineContentActivate = function(event) {
   this.widget.bringOutlineToFront();
 };
 
+scout.DesktopAdapter.prototype._onRequestGeolocation = function(event) {
+  if (navigator.geolocation) {
+    var success = function(position) {
+      this._send('geolocationDetermined', {
+        latitude: position.coords.latitude,
+        longitude: position.coords.longitude
+      });
+    }.bind(this);
+    var error = function(error) {
+      this._send('geolocationDetermined', {
+        errorCode: error.code,
+        errorMessage: error.message
+      });
+    }.bind(this);
+    navigator.geolocation.getCurrentPosition(success, error);
+  }
+};
+
 scout.DesktopAdapter.prototype.onModelAction = function(event) {
   if (event.type === 'formShow') {
     this._onFormShow(event);
@@ -184,6 +202,8 @@ scout.DesktopAdapter.prototype.onModelAction = function(event) {
     this._onAddNotification(event);
   } else if (event.type === 'removeNotification') {
     this._onRemoveNotification(event);
+  } else if (event.type === 'requestGeolocation') {
+    this._onRequestGeolocation(event);
   } else {
     scout.DesktopAdapter.parent.prototype.onModelAction.call(this, event);
   }

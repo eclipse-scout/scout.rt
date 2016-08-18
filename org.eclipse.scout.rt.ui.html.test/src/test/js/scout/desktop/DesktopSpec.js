@@ -223,6 +223,44 @@ describe('Desktop', function() {
 
   });
 
+  describe('geolocation', function() {
+
+    var browserImpl = navigator.geolocation.getCurrentPosition;
+
+    beforeEach(function() {
+      navigator.geolocation.getCurrentPosition = function(success, error) {
+        success({coords:{latitude:1,longitude:1}});
+      };
+      jasmine.Ajax.install();
+    });
+
+    it('asks the browser for its geographic location', function() {
+      expect(scout.device.supportsGeolocation()).toBe(true);
+      var message = {
+          events: [{
+            target: session.desktop.id,
+            type: 'requestGeolocation'
+          }]
+        };
+      linkWidgetAndAdapter(session.desktop, 'DesktopAdapter');
+      session._processSuccessResponse(message);
+      sendQueuedAjaxCalls();
+
+      var requestData = mostRecentJsonRequest();
+      var expectedEvent = new scout.Event(session.desktop.id, 'geolocationDetermined', {
+        latitude: 1,
+        longitude: 1
+      });
+      expect(requestData).toContainEvents(expectedEvent);
+    });
+
+    afterEach(function() {
+      navigator.geolocation.getCurrentPosition = browserImpl;
+      jasmine.Ajax.uninstall();
+    });
+
+  });
+
   describe('showForm', function() {
 
     beforeEach(function() {

@@ -15,9 +15,11 @@ import java.text.Normalizer.Form;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Future;
 
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.ui.DataChangeListener;
+import org.eclipse.scout.rt.client.ui.Coordinates;
 import org.eclipse.scout.rt.client.ui.IDisplayParent;
 import org.eclipse.scout.rt.client.ui.IStyleable;
 import org.eclipse.scout.rt.client.ui.action.IAction;
@@ -89,6 +91,10 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent, IStyleable 
    * {@link Boolean}
    */
   String PROP_GUI_AVAILABLE = "guiAvailable";
+  /**
+   * {@link Boolean}
+   */
+  String PROP_GEO_LOCATION_SERVICE_AVAILABLE = "geolocationServiceAvailable";
   /**
    * {@link Boolean}
    */
@@ -779,5 +785,20 @@ public interface IDesktop extends IPropertyObserver, IDisplayParent, IStyleable 
    * @since 6.0
    */
   boolean isHeaderVisible();
+
+  /**
+   * @since 6.1
+   */
+  boolean isGeolocationServiceAvailable();
+
+  /**
+   * @since 6.1
+   */
+  void setGeolocationServiceAvailable(boolean available);
+
+  /**
+   * @since 6.1
+   */
+  Future<Coordinates> requestGeolocation();
 
 }

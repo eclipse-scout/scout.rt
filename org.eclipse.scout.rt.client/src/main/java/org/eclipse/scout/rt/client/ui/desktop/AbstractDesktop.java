@@ -24,6 +24,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Future;
 
 import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
@@ -48,6 +49,7 @@ import org.eclipse.scout.rt.client.services.common.bookmark.internal.BookmarkUti
 import org.eclipse.scout.rt.client.services.common.icon.IIconProviderService;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.transformation.IDeviceTransformationService;
+import org.eclipse.scout.rt.client.ui.Coordinates;
 import org.eclipse.scout.rt.client.ui.DataChangeListener;
 import org.eclipse.scout.rt.client.ui.IDisplayParent;
 import org.eclipse.scout.rt.client.ui.action.ActionFinder;
@@ -149,6 +151,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   private final List<Object> m_addOns;
   private IContributionOwner m_contributionHolder;
   private final ObjectExtensions<AbstractDesktop, org.eclipse.scout.rt.client.extension.ui.desktop.IDesktopExtension<? extends AbstractDesktop>> m_objectExtensions;
+  private List<ClientCallback<Coordinates>> m_pendingPositionResponses = Collections.synchronizedList(new ArrayList<ClientCallback<Coordinates>>());
 
   /**
    * do not instantiate a new desktop<br>
@@ -1542,6 +1545,45 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   @Override
+  public boolean isGeolocationServiceAvailable() {
+    return propertySupport.getPropertyBool(PROP_GEO_LOCATION_SERVICE_AVAILABLE);
+  }
+
+  @Override
+  public void setGeolocationServiceAvailable(boolean available) {
+    propertySupport.setPropertyBool(PROP_GEO_LOCATION_SERVICE_AVAILABLE, available);
+  }
+
+  @Override
+  public Future<Coordinates> requestGeolocation() {
+    synchronized (m_pendingPositionResponses) {
+      if (m_pendingPositionResponses.isEmpty()) {
+        fireRequestGeolocation();
+      }
+      ClientCallback<Coordinates> responseFuture = new ClientCallback<Coordinates>() {
+        @Override
+        public boolean cancel(boolean mayInterruptIfRunning) {
+          removePendingResponse();
+          return super.cancel(mayInterruptIfRunning);
+        }
+
+        @Override
+        protected void timedOut() {
+          removePendingResponse();
+        }
+
+        private void removePendingResponse() {
+          synchronized (m_pendingPositionResponses) {
+            m_pendingPositionResponses.remove(this);
+          }
+        }
+      };
+      m_pendingPositionResponses.add(responseFuture);
+      return responseFuture;
+    }
+  }
+
+  @Override
   public void addDesktopListener(DesktopListener l) {
     m_listenerList.add(DesktopListener.class, l);
   }
@@ -1749,6 +1791,11 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
 
   private void fireOpenUri(BinaryResource res, IOpenUriAction openUriAction) {
     DesktopEvent e = new DesktopEvent(this, DesktopEvent.TYPE_OPEN_URI, res, openUriAction);
+    fireDesktopEvent(e);
+  }
+
+  private void fireRequestGeolocation() {
+    DesktopEvent e = new DesktopEvent(this, DesktopEvent.TYPE_REQUEST_GEOLOCATION);
     fireDesktopEvent(e);
   }
 
@@ -2255,6 +2302,38 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     @Override
     public void setBenchVisibleFromUI(boolean visible) {
       setBenchVisible(visible);
+    }
+
+    @Override
+    public void setGeoLocationServiceAvailableFromUI(boolean available) {
+      setGeolocationServiceAvailable(available);
+    }
+
+    @Override
+    public void fireGeolocationDetermined(String latitude, String longitude) {
+      ArrayList<ClientCallback<Coordinates>> pendingCallbacks;
+      synchronized (m_pendingPositionResponses) {
+        pendingCallbacks = new ArrayList<>(m_pendingPositionResponses);
+        m_pendingPositionResponses.clear();
+      }
+      Coordinates location = new Coordinates(latitude, longitude);
+      for (ClientCallback<Coordinates> callback : pendingCallbacks) {
+        callback.done(location);
+      }
+    }
+
+    @Override
+    public void fireGeolocationFailed(String errorCode, String errorMessage) {
+      ArrayList<ClientCallback<Coordinates>> pendingCallbacks;
+      synchronized (m_pendingPositionResponses) {
+        pendingCallbacks = new ArrayList<>(m_pendingPositionResponses);
+        m_pendingPositionResponses.clear();
+      }
+      setGeolocationServiceAvailable(false);
+      ProcessingException pe = new ProcessingException("Geolocation failed. ErrorCode: {}; ErrorMessage: {}", errorCode, errorMessage);
+      for (ClientCallback<Coordinates> callback : pendingCallbacks) {
+        callback.failed(pe);
+      }
     }
   }
 

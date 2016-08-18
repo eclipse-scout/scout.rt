@@ -398,6 +398,13 @@ scout.Device.prototype.supportsCssProperty = function(property) {
   });
 };
 
+scout.Device.prototype.supportsGeolocation = function() {
+  if (navigator.geolocation) {
+    return true;
+  }
+  return false;
+};
+
 scout.Device.prototype.checkCssValue = function(property, value, checkFunc) {
   // Check if property is supported at all, otherwise div.style[property] would just add it and checkFunc would always return true
   if (document.body.style[property] === undefined) {

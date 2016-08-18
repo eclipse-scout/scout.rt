@@ -17,8 +17,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Future;
 
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.ui.Coordinates;
 import org.eclipse.scout.rt.client.ui.DataChangeListener;
 import org.eclipse.scout.rt.client.ui.IDisplayParent;
 import org.eclipse.scout.rt.client.ui.action.IAction;
@@ -711,6 +713,21 @@ public class VirtualDesktop implements IDesktop {
   @Override
   public boolean isNavigationHandleVisible() {
     return false;
+  }
+
+  @Override
+  public boolean isGeolocationServiceAvailable() {
+    return false;
+  }
+
+  @Override
+  public void setGeolocationServiceAvailable(boolean available) {
+    // NOP
+  }
+
+  @Override
+  public Future<Coordinates> requestGeolocation() {
+    throw createUnsupportedOperationException();
   }
 
 }

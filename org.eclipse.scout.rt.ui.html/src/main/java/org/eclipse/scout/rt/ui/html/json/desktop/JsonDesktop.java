@@ -28,6 +28,7 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.server.commons.servlet.cache.DownloadHttpResponseInterceptor;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
@@ -50,6 +51,7 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
   private static final String EVENT_OUTLINE_CONTENT_ACTIVATE = "outlineContentActivate";
   private static final String EVENT_FORM_ACTIVATED = "formActivated";
   private static final String EVENT_HISTORY_ENTRY_ACTIVATED = "historyEntryActivated";
+  private static final String EVENT_GEOLOCATION_DETERMINED = "geolocationDetermined";
 
   public static final String PROP_OUTLINE = "outline";
   public static final String PROP_DISPLAY_PARENT = "displayParent";
@@ -99,6 +101,9 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
     else if (EVENT_HISTORY_ENTRY_ACTIVATED.equals(event.getType())) {
       handleUiHistoryEntryActivated(event);
     }
+    else if (EVENT_GEOLOCATION_DETERMINED.equals(event.getType())) {
+      handleUiGeolocationDetermined(event);
+    }
     else {
       super.handleUiEvent(event);
     }
@@ -127,6 +132,26 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
       addPropertyEventFilterCondition(IDesktop.PROP_HEADER_VISIBLE, visible);
       getModel().getUIFacade().setHeaderVisibleFromUI(visible);
     }
+    else if (IDesktop.PROP_GEO_LOCATION_SERVICE_AVAILABLE.equals(propertyName)) {
+      boolean available = data.getBoolean(propertyName);
+      addPropertyEventFilterCondition(IDesktop.PROP_GEO_LOCATION_SERVICE_AVAILABLE, available);
+      getModel().getUIFacade().setGeoLocationServiceAvailableFromUI(available);
+    }
+    else {
+      super.handleUiPropertyChange(propertyName, data);
+    }
+  }
+
+  protected void handleUiGeolocationDetermined(JsonEvent event) {
+    String errorCode = event.getData().optString("errorCode");
+    String errorMessage = event.getData().optString("errorMessage");
+    if (StringUtility.hasText(errorCode)) {
+      getModel().getUIFacade().fireGeolocationFailed(errorCode, errorMessage);
+      return;
+    }
+    String longitude = event.getData().getString("longitude");
+    String latitude = event.getData().getString("latitude");
+    getModel().getUIFacade().fireGeolocationDetermined(latitude, longitude);
   }
 
   protected void handleUiFormActivated(JsonEvent event) {
@@ -332,9 +357,16 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
       case DesktopEvent.TYPE_NOTIFICATION_REMOVED:
         handleModelNotificationRemoved(event);
         break;
+      case DesktopEvent.TYPE_REQUEST_GEOLOCATION:
+        handleRequestGeolocation(event);
+        break;
       default:
         // NOP
     }
+  }
+
+  protected void handleRequestGeolocation(DesktopEvent event) {
+    addActionEvent("requestGeolocation");
   }
 
   protected void handleModelNotificationAdded(DesktopEvent event) {

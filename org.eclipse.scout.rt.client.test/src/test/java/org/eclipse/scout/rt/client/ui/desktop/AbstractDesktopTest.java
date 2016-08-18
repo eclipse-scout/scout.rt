@@ -16,10 +16,13 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.testenvironment.ui.desktop.TestEnvironmentDesktop;
+import org.eclipse.scout.rt.client.ui.Coordinates;
 import org.eclipse.scout.rt.client.ui.DataChangeListener;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.desktop.AbstractDesktopTest.P_CheckSaveTestForm.MainBox.MessageField;
@@ -33,6 +36,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.classid.ClassId;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.holders.Holder;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.shared.TEXTS;
@@ -388,6 +392,29 @@ public class AbstractDesktopTest {
 
     assertEquals(CollectionUtility.arrayList(form_1, form_2, form_3), desktop.getDialogs(form, false));
     assertEquals(CollectionUtility.arrayList(form_1, form_2_1_1, form_2_1_2_1, form_2_1_2, form_2_1, form_2_2, form_2_3_1, form_2_3, form_2, form_3_1, form_3), desktop.getDialogs(form, true));
+  }
+
+  @Test
+  public void testGeolocation() throws InterruptedException, ExecutionException {
+    TestEnvironmentDesktop desktop = (TestEnvironmentDesktop) IDesktop.CURRENT.get();
+    Future<Coordinates> coordinatesFurure = desktop.requestGeolocation();
+    desktop.getUIFacade().fireGeolocationDetermined("1.0", "2.0");
+    Coordinates coordinates = coordinatesFurure.get();
+    assertEquals("1.0", coordinates.getLatitude());
+    assertEquals("2.0", coordinates.getLongitude());
+  }
+
+  @Test(expected = ProcessingException.class)
+  public void testGeolocationFailure() throws Throwable {
+    TestEnvironmentDesktop desktop = (TestEnvironmentDesktop) IDesktop.CURRENT.get();
+    Future<Coordinates> coordinatesFurure = desktop.requestGeolocation();
+    desktop.getUIFacade().fireGeolocationFailed("-1", "test failure");
+    try {
+      coordinatesFurure.get();
+    }
+    catch (ExecutionException e) {
+      throw e.getCause();
+    }
   }
 
   protected void verifyDataChanged(Holder<Object[]> resultHolder) {
