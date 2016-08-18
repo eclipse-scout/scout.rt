@@ -47,7 +47,7 @@ scout.GroupBox.prototype._init = function(model) {
 };
 
 scout.GroupBox.prototype._syncFields = function(fields) {
-  this.fields = fields;
+  this._setProperty('fields', fields);
   this._prepareFields();
 };
 
@@ -63,7 +63,7 @@ scout.GroupBox.prototype._initKeyStrokeContext = function(keyStrokeContext) {
 /**
  * @override FormField.js
  */
-scout.GroupBox.prototype._syncKeyStrokes = function(keyStrokes, oldKeyStrokes) {
+scout.GroupBox.prototype._syncKeyStrokes = function(keyStrokes) {
   keyStrokes = scout.arrays.ensure(keyStrokes);
 
   var groupBoxRenderingHints = {
@@ -86,7 +86,7 @@ scout.GroupBox.prototype._syncKeyStrokes = function(keyStrokes, oldKeyStrokes) {
       keyStroke.actionKeyStroke.renderingHints = $.extend({}, keyStroke.actionKeyStroke.renderingHints, groupBoxRenderingHints);
     }, this);
 
-  scout.GroupBox.parent.prototype._syncKeyStrokes.call(this, keyStrokes, oldKeyStrokes);
+  scout.GroupBox.parent.prototype._syncKeyStrokes.call(this, keyStrokes);
 };
 
 /**
@@ -260,10 +260,7 @@ scout.GroupBox.prototype._renderBorderDecoration = function() {
 };
 
 scout.GroupBox.prototype.setMenuBarVisible = function(visible) {
-  this.menuBarVisible = visible;
-  if (this.rendered) {
-    this._renderMenuBarVisible();
-  }
+  this.setProperty('menuBarVisible', visible);
 };
 
 scout.GroupBox.prototype._renderMenuBarVisible = function() {
@@ -383,8 +380,8 @@ scout.GroupBox.prototype._computeStatusVisible = function() {
   return scout.GroupBox.parent.prototype._computeStatusVisible.call(this) && this._computeTitleVisible();
 };
 
-scout.GroupBox.prototype._syncMenus = function(menus, oldMenus) {
-  scout.GroupBox.parent.prototype._syncMenus.call(this, menus, oldMenus);
+scout.GroupBox.prototype._syncMenus = function(menus) {
+  scout.GroupBox.parent.prototype._syncMenus.call(this, menus);
 
   if (this.menuBar) {
     // updateMenuBar is required because menuBar is not created yet when synMenus is called initially
@@ -409,7 +406,7 @@ scout.GroupBox.prototype._removeMenus = function() {
 };
 
 scout.GroupBox.prototype.setStaticMenus = function(staticMenus) {
-  this.staticMenus = staticMenus;
+  this._setProperty('staticMenus', staticMenus);
   this._updateMenuBar();
 };
 
@@ -421,17 +418,5 @@ scout.GroupBox.prototype._onControlClick = function(event) {
 };
 
 scout.GroupBox.prototype.setExpanded = function(expanded) {
-  if (this.expanded !== expanded) {
-    this.expanded = expanded;
-    this._sendExpanded();
-  }
-  if (this.rendered) {
-    this._renderExpanded();
-  }
-};
-
-scout.GroupBox.prototype._sendExpanded = function() {
-  this._send('expanded', {
-    expanded: this.expanded
-  });
+  this.setProperty('expanded', expanded);
 };

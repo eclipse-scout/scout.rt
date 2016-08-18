@@ -30,11 +30,7 @@ scout.PlannerHeader.prototype._render = function($parent) {
 };
 
 scout.PlannerHeader.prototype.setAvailableDisplayModes = function(displayModes) {
-  this.availableDisplayModes = displayModes;
-
-  if (this.rendered) {
-    this._renderAvailableDisplayModes();
-  }
+  this.setProperty('availableDisplayModes', displayModes);
 };
 
 scout.PlannerHeader.prototype._renderAvailableDisplayModes = function() {
@@ -81,11 +77,7 @@ scout.PlannerHeader.prototype._renderAvailableDisplayModes = function() {
 };
 
 scout.PlannerHeader.prototype.setDisplayMode = function(displayMode) {
-  this.displayMode = displayMode;
-
-  if (this.rendered) {
-    this._renderDisplayMode();
-  }
+  this.setProperty('displayMode', displayMode);
 };
 
 scout.PlannerHeader.prototype._renderDisplayMode = function() {
@@ -94,11 +86,7 @@ scout.PlannerHeader.prototype._renderDisplayMode = function() {
 };
 
 scout.PlannerHeader.prototype.setVisible = function(visible) {
-  this.visible = visible;
-
-  if (this.rendered) {
-    this._renderVisible();
-  }
+  this.setProperty('visible', visible);
 };
 
 scout.PlannerHeader.prototype._renderVisible = function() {

@@ -153,9 +153,9 @@ scout.Tree.prototype._initTreeKeyStrokeContext = function(keyStrokeContext) {
   });
 };
 
-scout.Tree.prototype._syncMenus = function(menus, oldMenus) {
-  this.updateKeyStrokes(menus, oldMenus);
-  this.menus = menus;
+scout.Tree.prototype._syncMenus = function(menus) {
+  this.updateKeyStrokes(menus, this.menus);
+  this._setProperty('menus', menus);
   this._updateMenuBar();
 };
 
@@ -164,13 +164,9 @@ scout.Tree.prototype._updateMenuBar = function() {
   this.menuBar.setMenuItems(menuItems);
 };
 
-scout.Tree.prototype._syncKeyStrokes = function(keyStrokes, oldKeyStrokes) {
-  this.updateKeyStrokes(keyStrokes, oldKeyStrokes);
-  this.keyStrokes = keyStrokes;
-};
-
-scout.Tree.prototype._syncDisplayStyle = function(newValue) {
-  this.setDisplayStyle(newValue, false);
+scout.Tree.prototype._syncKeyStrokes = function(keyStrokes) {
+  this.updateKeyStrokes(keyStrokes, this.keyStrokes);
+  this._setProperty('keyStrokes', keyStrokes);
 };
 
 scout.Tree.prototype._resetTreeNode = function(node, parentNode) {
@@ -363,7 +359,7 @@ scout.Tree.prototype._onDataScroll = function() {
 
 scout.Table.prototype.setScrollTop = function(scrollTop) {
   scout.scrollbars.scrollTop(this.$data, scrollTop);
-  this.scrollTop = scrollTop;
+  this._setProperty('scrollTop', scrollTop);
 
   // call _renderViewport to make sure nodes are rendered immediately. The browser fires the scroll event handled by onDataScroll delayed
   this._renderViewport();
@@ -710,7 +706,7 @@ scout.Tree.prototype.setViewRangeSize = function(viewRangeSize) {
   if (this.viewRangeSize === viewRangeSize) {
     return;
   }
-  this.viewRangeSize = viewRangeSize;
+  this._setProperty('viewRangeSize', viewRangeSize);
   if (this.rendered) {
     this._renderViewport();
   }
@@ -1262,11 +1258,19 @@ scout.Tree.prototype._isTruncatedNodeTooltipEnabled = function() {
   return true;
 };
 
-scout.Tree.prototype.setDisplayStyle = function(displayStyle, notifyServer) {
+scout.Tree.prototype.setDisplayStyle = function(displayStyle) {
   if (this.displayStyle === displayStyle) {
     return;
   }
   this._renderViewportBlocked = true;
+  this._syncDisplayStyle(displayStyle);
+  if (this.rendered) {
+    this._renderDisplayStyle();
+  }
+  this._renderViewportBlocked = false;
+};
+
+scout.Tree.prototype._syncDisplayStyle = function(displayStyle) {
   this._setProperty('displayStyle', displayStyle);
 
   if (displayStyle && this.selectedNodes.length > 0) {
@@ -1283,18 +1287,13 @@ scout.Tree.prototype.setDisplayStyle = function(displayStyle, notifyServer) {
     this.removeFilter(this.breadcrumbFilter, true);
     this.filter();
   }
-
-  if (this.rendered) {
-    this._renderDisplayStyle();
-  }
-  this._renderViewportBlocked = false;
 };
 
-scout.Tree.prototype.setBreadcrumbStyleActive = function(active, notifyServer) {
+scout.Tree.prototype.setBreadcrumbStyleActive = function(active) {
   if (active) {
-    this.setDisplayStyle(scout.Tree.DisplayStyle.BREADCRUMB, notifyServer);
+    this.setDisplayStyle(scout.Tree.DisplayStyle.BREADCRUMB);
   } else if (!active) {
-    this.setDisplayStyle(scout.Tree.DisplayStyle.DEFAULT, notifyServer);
+    this.setDisplayStyle(scout.Tree.DisplayStyle.DEFAULT);
   }
 };
 
@@ -1307,7 +1306,7 @@ scout.Tree.prototype.isBreadcrumbStyleActive = function() {
 };
 
 scout.Tree.prototype.setBreadcrumbTogglingThreshold = function(width) {
-  this.breadcrumbTogglingThreshold = width;
+  this._setProperty('breadcrumbTogglingThreshold', width); // FIXME CGU [6.1]change to setProperty after making _renderXY optional
 };
 
 scout.Tree.prototype.expandNode = function(node, opts) {

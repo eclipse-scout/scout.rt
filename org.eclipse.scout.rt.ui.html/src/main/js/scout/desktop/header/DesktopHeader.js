@@ -161,33 +161,15 @@ scout.DesktopHeader.prototype.bringToFront = function() {
 };
 
 scout.DesktopHeader.prototype.setLogoUrl = function(logoUrl) {
-  if (this.logoUrl === logoUrl) {
-    return;
-  }
-  this.logoUrl = logoUrl;
-  if (this.rendered) {
-    this._renderLogoUrl();
-  }
+  this.setProperty('logoUrl', logoUrl);
 };
 
 scout.DesktopHeader.prototype.setToolBoxVisible = function(visible) {
-  if (this.toolBoxVisible === visible) {
-    return;
-  }
-  this.toolBoxVisible = visible;
-  if (this.rendered) {
-    this._renderToolBoxVisible();
-  }
+  this.setProperty('toolBoxVisible', visible);
 };
 
 scout.DesktopHeader.prototype.setViewButtonBoxVisible = function(visible) {
-  if (this.viewButtonBoxVisible === visible) {
-    return;
-  }
-  this.viewButtonBoxVisible = visible;
-  if (this.rendered) {
-    this._renderViewButtonBoxVisible();
-  }
+  this.setProperty('viewButtonBoxVisible', visible);
 };
 
 scout.DesktopHeader.prototype.setMenus = function(menus) {

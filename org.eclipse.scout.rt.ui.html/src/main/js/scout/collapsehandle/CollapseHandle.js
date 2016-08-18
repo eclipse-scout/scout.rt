@@ -64,23 +64,11 @@ scout.CollapseHandle.prototype._updateVisibilityClasses = function() {
 };
 
 scout.CollapseHandle.prototype.setLeftVisible = function(visible) {
-  if (this.leftVisible === visible) {
-    return;
-  }
-  this._setProperty('leftVisible', visible);
-  if (this.rendered) {
-    this._renderLeftVisible();
-  }
+  this.setProperty('leftVisible', visible);
 };
 
 scout.CollapseHandle.prototype.setRightVisible = function(visible) {
-  if (this.rightVisible === visible) {
-    return;
-  }
-  this._setProperty('rightVisible', visible);
-  if (this.rendered) {
-    this._renderRightVisible();
-  }
+  this.setProperty('rightVisible', visible);
 };
 
 scout.CollapseHandle.prototype._onLeftMouseDown = function(event) {

@@ -287,6 +287,7 @@ scout.ModelAdapter.prototype._onWidgetDestroy = function() {
   this.destroy();
 };
 
+
 scout.ModelAdapter.prototype._onWidgetPropertyChange = function(event) {
   event.changedProperties.forEach(function(propertyName) {
     if (this._isRemoteProperty(propertyName)) {
@@ -294,20 +295,23 @@ scout.ModelAdapter.prototype._onWidgetPropertyChange = function(event) {
       if (value && this._isAdapterProperty(propertyName)) {
         value = value.remoteAdapter;
       }
-      this._sendProperty(propertyName, value);
+      this._callSendProperty(propertyName, value);
     }
   }, this);
 };
 
+scout.ModelAdapter.prototype._callSendProperty = function(propertyName, value) {
+  var sendFuncName = '_send' + scout.strings.toUpperCaseFirstLetter(propertyName);
+  if (this[sendFuncName]) {
+    this[sendFuncName](value);
+  } else {
+    this._sendProperty(propertyName, value);
+  }
+};
+
 scout.ModelAdapter.prototype._syncPropertiesOnPropertyChange = function(newProperties) {
   this._eachProperty(newProperties, function(propertyName, value, isAdapterProp) {
-    var ensureTypeFuncName = '_ensure' + scout.strings.toUpperCaseFirstLetter(propertyName),
-      oldValue = this.widget[propertyName];
 
-    // Call ensure function in case the adapter wants to adapt the property before calling the setter of the widget
-    if (this[ensureTypeFuncName]) {
-      value = this[ensureTypeFuncName](value);
-    }
     // Call the setter of the widget
     this.widget.callSetter(propertyName, value);
 

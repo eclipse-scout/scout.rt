@@ -63,7 +63,7 @@ scout.FormTableControl.prototype._syncForm = function(form) {
   if (form) {
     form.rootGroupBox.menuBar.bottom();
   }
-  this.form = form;
+  this._setProperty('form', form);
 };
 
 scout.FormTableControl.prototype.onControlContainerOpened = function() {

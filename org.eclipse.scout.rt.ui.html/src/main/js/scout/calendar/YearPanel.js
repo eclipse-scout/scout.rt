@@ -177,7 +177,7 @@ scout.YearPanel.prototype.setDisplayMode = function(displayMode) {
   if (displayMode === this.displayMode) {
     return;
   }
-  this.displayMode = displayMode;
+  this._setProperty('displayMode', displayMode);
   if (this.rendered) {
     this._colorYear();
   }
@@ -187,7 +187,7 @@ scout.YearPanel.prototype.setViewRange = function(viewRange) {
   if (viewRange === this.viewRange) {
     return;
   }
-  this.viewRange = viewRange;
+  this._setProperty('viewRange', viewRange);
   if (this.rendered) {
     this._colorYear();
   }

@@ -46,9 +46,9 @@ scout.NumberField.prototype._renderGridData = function() {
 
 scout.NumberField.prototype._syncDecimalFormat = function(decimalFormat) {
   if (decimalFormat instanceof scout.DecimalFormat) {
-    this.decimalFormat = decimalFormat;
-  } else {
-    this.decimalFormat = new scout.DecimalFormat(this.session.locale, decimalFormat);
+    this._setProperty('decimalFormat', decimalFormat);
+  } else { // FIXME [6.1] cgu ensure type ?
+    this._setProperty('decimalFormat', new scout.DecimalFormat(this.session.locale, decimalFormat));
   }
 };
 
@@ -64,7 +64,7 @@ scout.NumberField.prototype.acceptInput = function(whileTyping) {
 };
 
 scout.NumberField.prototype.setDisplayText = function(value) {
-  this.displayText = scout.objects.isNumber(value) ? value.toString() : '';
+  this._setProperty('displayText', scout.objects.isNumber(value) ? value.toString() : '');
   if (this.rendered) {
     this._renderDisplayText();
   }

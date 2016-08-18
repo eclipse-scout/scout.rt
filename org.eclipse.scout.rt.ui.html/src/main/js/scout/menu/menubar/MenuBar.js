@@ -251,13 +251,7 @@ scout.MenuBar.prototype.updateVisibility = function() {
 };
 
 scout.MenuBar.prototype.setVisible = function(visible) {
-  if (this.visible === visible) {
-    return;
-  }
-  this._setProperty('visible', visible);
-  if (this.rendered) {
-    this._renderVisible();
-  }
+  this.setProperty('visible', visible);
 };
 
 /**
@@ -293,7 +287,7 @@ scout.MenuBar.prototype.setDefaultMenu = function(defaultMenu) {
   if (this.defaultMenu && this.defaultMenu.rendered) {
     this.defaultMenu.$container.removeClass('default-menu');
   }
-  this.defaultMenu = defaultMenu;
+  this._setProperty('defaultMenu', defaultMenu);
   if (this.defaultMenu && this.defaultMenu.rendered) {
     this.defaultMenu.$container.addClass('default-menu');
   }

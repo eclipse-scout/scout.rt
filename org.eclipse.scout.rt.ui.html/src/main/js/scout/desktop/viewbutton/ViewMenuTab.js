@@ -181,33 +181,15 @@ scout.ViewMenuTab.prototype._closePopup = function() {
 };
 
 scout.ViewMenuTab.prototype.setSelected = function(selected) {
-  if (selected === this.selected) {
-    return;
-  }
-  this._setProperty('selected', selected);
-  if (this.rendered) {
-    this._renderSelected();
-  }
+  this.setProperty('selected', selected);
 };
 
 scout.ViewMenuTab.prototype.setIconId = function(iconId) {
-  if (iconId === this.iconId) {
-    return;
-  }
-  this._setProperty('iconId', iconId);
-  if (this.rendered) {
-    this._renderIconId();
-  }
+  this.setProperty('iconId', iconId);
 };
 
 scout.ViewMenuTab.prototype.setVisible = function(visible) {
-  if (this.visible === visible) {
-    return;
-  }
-  this._setProperty('visible', visible);
-  if (this.rendered) {
-    this._renderVisible();
-  }
+  this.setProperty('visible', visible);
 };
 
 scout.ViewMenuTab.prototype.updateVisibility = function() {

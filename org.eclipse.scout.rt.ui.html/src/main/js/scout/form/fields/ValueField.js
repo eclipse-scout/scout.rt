@@ -110,13 +110,7 @@ scout.ValueField.prototype._sendDisplayTextChanged = function(displayText, while
  * May be used to just modify the display text without validation
  */
 scout.ValueField.prototype.setDisplayText = function(displayText) {
-  if (this.displayText === displayText) {
-    return;
-  }
-  this.displayText = displayText;
-  if (this.rendered) {
-    this._renderDisplayText();
-  }
+  this.setProperty('displayText', displayText);
 };
 
 scout.ValueField.prototype.addField = function($field) {

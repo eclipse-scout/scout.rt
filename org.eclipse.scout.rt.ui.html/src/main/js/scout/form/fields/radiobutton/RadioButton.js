@@ -67,13 +67,7 @@ scout.RadioButton.prototype.select = function() {
 };
 
 scout.RadioButton.prototype.setSelected = function(selected) {
-  if (selected === this.selected) {
-    return;
-  }
-  this._setProperty('selected', selected);
-  if (this.rendered) {
-    this._renderSelected();
-  }
+  this.setProperty('selected', selected);
 };
 
 /**

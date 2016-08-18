@@ -82,12 +82,6 @@ scout.Slider.prototype._onValueChange = function(event) {
 };
 
 scout.Slider.prototype.setValue = function(value) {
-  if (value === this.value) {
-    return;
-  }
-  this._setProperty('value', value);
-  if (this.rendered) {
-    this._renderValue();
-  }
+  this.setProperty('value', value);
 };
 

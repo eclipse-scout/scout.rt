@@ -33,7 +33,7 @@ scout.TableHeaderMenuButton.prototype._render = function($parent) {
   this.$container = $parent.appendDiv('table-header-menu-command')
     .unfocusable()
     .on('click', this._onClick.bind(this))
-    .on('mouseenter click', this._onMouseOver.bind(this))
+    .on('mouseenter', this._onMouseOver.bind(this))
     .on('mouseleave', this._onMouseOut.bind(this));
   if (this.cssClass) {
     this.$container.addClass(this.cssClass);
@@ -85,17 +85,11 @@ scout.TableHeaderMenuButton.prototype._renderIcon = function() {
 };
 
 scout.TableHeaderMenuButton.prototype.setVisible = function(visible) {
-  this.visible = visible;
-  if (this.rendered) {
-    this._renderVisible();
-  }
+  this.setProperty('visible', visible);
 };
 
 scout.TableHeaderMenuButton.prototype.setSelected = function(selected) {
-  this.selected = selected;
-  if (this.rendered) {
-    this._renderSelected();
-  }
+  this.setProperty('selected', selected);
   this._updateEnabled();
 };
 
@@ -116,10 +110,7 @@ scout.TableHeaderMenuButton.prototype._renderEnabled = function() {
 };
 
 scout.TableHeaderMenuButton.prototype.setIcon = function(icon) {
-  this.icon = icon;
-  if (this.rendered) {
-    this._renderIcon();
-  }
+  this.setProperty('icon', icon);
 };
 
 scout.TableHeaderMenuButton.prototype.toggle = function() {

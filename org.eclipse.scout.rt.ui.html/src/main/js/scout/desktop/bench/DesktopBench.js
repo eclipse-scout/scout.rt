@@ -196,13 +196,7 @@ scout.DesktopBench.prototype.postRender = function() {
 };
 
 scout.DesktopBench.prototype.setNavigationHandleVisible = function(visible) {
-  if (this.navigationHandleVisible === visible) {
-    return;
-  }
-  this.navigationHandleVisible = visible;
-  if (this.rendered) {
-    this._renderNavigationHandleVisible();
-  }
+  this.setProperty('navigationHandleVisible', visible);
 };
 
 scout.DesktopBench.prototype.setOutline = function(outline) {
@@ -211,7 +205,7 @@ scout.DesktopBench.prototype.setOutline = function(outline) {
     this.outline.off('pageChanged', this._outlinePageChangedHandler);
     this.outline.off('propertyChange', this._outlinePropertyChangeHandler);
   }
-  this.outline = outline;
+  this._setProperty('outline', outline);
   if (this.outline) {
     this.outline.on('nodesSelected', this._outlineNodesSelectedHandler);
     this.outline.on('pageChanged', this._outlinePageChangedHandler);
@@ -269,7 +263,7 @@ scout.DesktopBench.prototype.setOutlineContentVisible = function(visible) {
   if (visible === this.outlineContentVisible) {
     return;
   }
-  this.outlineContentVisible = visible;
+  this._setProperty('outlineContentVisible', visible);
   this.updateOutlineContent();
 };
 

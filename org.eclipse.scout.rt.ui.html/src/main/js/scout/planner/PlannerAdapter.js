@@ -10,23 +10,14 @@
  ******************************************************************************/
 scout.PlannerAdapter = function() {
   scout.PlannerAdapter.parent.call(this);
+  this._addRemoteProperties(['displayMode', 'viewRange']);
 };
 scout.inherits(scout.PlannerAdapter, scout.ModelAdapter);
 
-scout.PlannerAdapter.prototype.onModelAction = function(event) {
-  if (event.type === 'resourcesInserted') {
-    this._onResourcesInserted(event.resources);
-  } else if (event.type === 'resourcesDeleted') {
-    this._onResourcesDeleted(event.resourceIds);
-  } else if (event.type === 'resourcesSelected') {
-    this._onResourcesSelected(event.resourceIds);
-  } else if (event.type === 'allResourcesDeleted') {
-    this._onAllResourcesDeleted();
-  } else if (event.type === 'resourcesUpdated') {
-    this._onResourcesUpdated(event.resources);
-  } else {
-    scout.PlannerAdapter.parent.prototype.onModelAction.call(this, event);
-  }
+scout.PlannerAdapter.prototype._sendViewRange = function(viewRange) {
+  this._send('property', {
+    viewRange: scout.dates.toJsonDateRange(viewRange)
+  });
 };
 
 scout.PlannerAdapter.prototype._onResourcesInserted = function(resources) {
@@ -49,4 +40,20 @@ scout.PlannerAdapter.prototype._onAllResourcesDeleted = function() {
 
 scout.PlannerAdapter.prototype._onResourcesUpdated = function(resources) {
   this.widget._updateResources(resources);
+};
+
+scout.PlannerAdapter.prototype.onModelAction = function(event) {
+  if (event.type === 'resourcesInserted') {
+    this._onResourcesInserted(event.resources);
+  } else if (event.type === 'resourcesDeleted') {
+    this._onResourcesDeleted(event.resourceIds);
+  } else if (event.type === 'resourcesSelected') {
+    this._onResourcesSelected(event.resourceIds);
+  } else if (event.type === 'allResourcesDeleted') {
+    this._onAllResourcesDeleted();
+  } else if (event.type === 'resourcesUpdated') {
+    this._onResourcesUpdated(event.resources);
+  } else {
+    scout.PlannerAdapter.parent.prototype.onModelAction.call(this, event);
+  }
 };

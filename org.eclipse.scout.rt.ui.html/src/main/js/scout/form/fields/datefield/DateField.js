@@ -208,7 +208,7 @@ scout.DateField.prototype._fieldForPlaceholder = function() {
 };
 
 scout.DateField.prototype._syncDateFormatPattern = function(dateFormatPattern) {
-  this.dateFormatPattern = dateFormatPattern;
+  this._setProperty('dateFormatPattern', dateFormatPattern);
   this.isolatedDateFormat = new scout.DateFormat(this.session.locale, this.dateFormatPattern);
 };
 
@@ -220,7 +220,7 @@ scout.DateField.prototype._renderDateFormatPattern = function() {
 };
 
 scout.DateField.prototype._syncTimeFormatPattern = function(timeFormatPattern) {
-  this.timeFormatPattern = timeFormatPattern;
+  this._setProperty('timeFormatPattern', timeFormatPattern);
   this.isolatedTimeFormat = new scout.DateFormat(this.session.locale, this.timeFormatPattern);
 };
 
@@ -269,7 +269,7 @@ scout.DateField.prototype._syncDisplayText = function(displayText) {
     parts;
 
   this.oldDisplayText = this.displayText;
-  this.displayText = displayText;
+  this._setProperty('displayText', displayText);
 
   if (scout.strings.hasText(this.displayText)) {
     parts = this.displayText.split('\n');
@@ -282,11 +282,11 @@ scout.DateField.prototype._syncDisplayText = function(displayText) {
 
 scout.DateField.prototype._syncTimestamp = function(timestamp) {
   // TODO CGU [6.1] no need to keep two timestamp properties, only hold date based type. Convert to back to string when sending. Also rename to value instead of timestamp
-  this.timestampAsDate = scout.dates.parseJsonDate(timestamp);
+  this.timestampAsDate = scout.dates.parseJsonDate(timestamp); // FIXME [6.1] cgu ensure type
 };
 
 scout.DateField.prototype._syncAutoTimestamp = function(autoTimestamp) {
-  this.autoTimestampAsDate = scout.dates.parseJsonDate(autoTimestamp);
+  this.autoTimestampAsDate = scout.dates.parseJsonDate(autoTimestamp);// FIXME [6.1] cgu ensure type
 };
 
 scout.DateField.prototype._syncAllowedDates = function(allowedDates) {
@@ -295,9 +295,9 @@ scout.DateField.prototype._syncAllowedDates = function(allowedDates) {
     allowedDates.forEach(function(dateString) {
       convAllowedDates.push(scout.dates.parseJsonDate(dateString));
     });
-    this.allowedDates = convAllowedDates;
+    this._setProperty('allowedDates', convAllowedDates);
   } else {
-    this.allowedDates = null;
+    this._setProperty('allowedDates', null);
   }
 };
 

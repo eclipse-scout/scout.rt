@@ -180,20 +180,11 @@ scout.Button.prototype._doActionTogglesSubMenu = function() {
 };
 
 scout.Button.prototype.setSelected = function(selected) {
-  this._setProperty('selected', selected);
-  if (this.rendered) {
-    this._renderSelected(this.selected);
-  }
-  this._send('selected', {
-    selected: selected
-  });
+  this.setProperty('selected', selected);
 };
 
 scout.Button.prototype.setIconId = function(iconId) {
-  this._setProperty('iconId', iconId);
-  if (this.rendered) {
-    this._renderIconId();
-  }
+  this.setProperty('iconId', iconId);
 };
 
 /**
@@ -271,7 +262,7 @@ scout.Button.prototype._renderIconId = function() {
 };
 
 scout.Button.prototype._syncKeyStroke = function(keyStroke) {
-  this.keyStroke = keyStroke;
+  this._setProperty('keyStroke', keyStroke);
   this.buttonKeyStroke.parseAndSetKeyStroke(this.keyStroke);
 };
 

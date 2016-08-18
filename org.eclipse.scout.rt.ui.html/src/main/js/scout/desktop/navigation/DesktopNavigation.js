@@ -31,7 +31,7 @@ scout.DesktopNavigation.prototype._init = function(model) {
   this.layoutData = model.layoutData || {};
   this.toolBoxVisible = scout.nvl(model.toolBoxVisible, false);
   this.updateHandleVisibility();
-  this.setOutline(model.outline);
+  this._syncOutline(model.outline);
 };
 
 scout.DesktopNavigation.prototype._render = function($parent) {
@@ -72,6 +72,13 @@ scout.DesktopNavigation.prototype._renderViewButtonBox = function() {
   this.viewButtonBox.render(this.$container);
 };
 
+scout.DesktopNavigation.prototype._removeOutline = function() {
+  if (!this.outline) {
+    return;
+  }
+  this.outline.remove();
+};
+
 scout.DesktopNavigation.prototype._renderOutline = function() {
   if (!this.outline) {
     return;
@@ -88,17 +95,14 @@ scout.DesktopNavigation.prototype._renderOutline = function() {
 };
 
 scout.DesktopNavigation.prototype.setOutline = function(outline) {
+  this.setProperty('outline', outline);
+};
+
+scout.DesktopNavigation.prototype._syncOutline = function(outline) {
   var currentDisplayStyle;
-  if (this.outline === outline) {
-    return;
-  }
   if (this.outline) {
     currentDisplayStyle = this.outline.displayStyle;
-    if (this.rendered) {
-      this.outline.remove();
-    }
   }
-
   this.outline = outline;
   if (this.outline) {
     this.outline.setParent(this);
@@ -110,9 +114,6 @@ scout.DesktopNavigation.prototype.setOutline = function(outline) {
     this.outline.inBackground = this.desktop.inBackground;
     this.outline.on('propertyChange', this._outlinePropertyChangeHandler);
     this._updateHandle();
-    if (this.rendered) {
-      this._renderOutline();
-    }
   }
 };
 
@@ -131,20 +132,11 @@ scout.DesktopNavigation.prototype.bringToFront = function() {
 };
 
 scout.DesktopNavigation.prototype.setToolBoxVisible = function(toolBoxVisible) {
-  this.toolBoxVisible = toolBoxVisible;
-  if (this.rendered) {
-    this._renderToolBoxVisible();
-  }
+  this.setProperty('toolBoxVisible', toolBoxVisible);
 };
 
 scout.DesktopNavigation.prototype.setHandleVisible = function(visible) {
-  if (this.handleVisible === visible) {
-    return;
-  }
-  this.handleVisible = visible;
-  if (this.rendered) {
-    this._renderHandleVisible();
-  }
+  this.setProperty('handleVisible', visible);
 };
 
 scout.DesktopNavigation.prototype._updateHandle = function() {

@@ -56,10 +56,7 @@ scout.TableHeaderMenuGroup.prototype._renderText = function() {
 };
 
 scout.TableHeaderMenuGroup.prototype.setVisible = function(visible) {
-  this.visible = visible;
-  if (this.rendered) {
-    this._renderVisible();
-  }
+  this.setProperty('visible', visible);
 };
 
 scout.TableHeaderMenuGroup.prototype._renderVisible = function() {
@@ -67,8 +64,9 @@ scout.TableHeaderMenuGroup.prototype._renderVisible = function() {
 };
 
 scout.TableHeaderMenuGroup.prototype.setLast = function(last) {
-  this.last = last;
-  if (this.rendered) {
-    this.$container.toggleClass('last', this.last);
-  }
+  this.setProperty('last', last);
+};
+
+scout.TableHeaderMenuGroup.prototype._renderLast = function() {
+  this.$container.toggleClass('last', this.last);
 };

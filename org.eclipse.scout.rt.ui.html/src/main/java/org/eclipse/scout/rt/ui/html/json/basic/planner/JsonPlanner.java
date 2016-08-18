@@ -59,8 +59,6 @@ public class JsonPlanner<PLANNER extends IPlanner<?, ?>> extends AbstractJsonPro
   public static final String EVENT_ALL_RESOURCES_DELETED = "allResourcesDeleted";
 
   // from UI
-  private static final String EVENT_SET_DISPLAY_MODE = "setDisplayMode";
-  private static final String EVENT_SET_VIEW_RANGE = "setViewRange";
   private static final String EVENT_SET_SELECTION = "setSelection";
 
   private PlannerListener m_plannerListener;
@@ -419,33 +417,12 @@ public class JsonPlanner<PLANNER extends IPlanner<?, ?>> extends AbstractJsonPro
 
   @Override
   public void handleUiEvent(JsonEvent event) {
-    if (EVENT_SET_DISPLAY_MODE.equals(event.getType())) {
-      handleUiSetDisplayMode(event);
-    }
-    else if (EVENT_SET_VIEW_RANGE.equals(event.getType())) {
-      handleUiSetViewRange(event);
-    }
-    else if (EVENT_SET_SELECTION.equals(event.getType())) {
+    if (EVENT_SET_SELECTION.equals(event.getType())) {
       handleUiSetSelection(event);
     }
     else {
       super.handleUiEvent(event);
     }
-  }
-
-  protected void handleUiSetDisplayMode(JsonEvent event) {
-    JSONObject data = event.getData();
-    int displayMode = data.getInt("displayMode");
-    addPropertyEventFilterCondition(IPlanner.PROP_DISPLAY_MODE, displayMode);
-    getModel().getUIFacade().setDisplayModeFromUI(displayMode);
-  }
-
-  @SuppressWarnings("unchecked")
-  protected void handleUiSetViewRange(JsonEvent event) {
-    JSONObject data = event.getData();
-    Range<Date> viewRange = extractViewRange(data);
-    addPropertyEventFilterCondition(IPlanner.PROP_VIEW_RANGE, viewRange);
-    getModel().getUIFacade().setViewRangeFromUI(viewRange);
   }
 
   @SuppressWarnings("unchecked")
@@ -465,6 +442,32 @@ public class JsonPlanner<PLANNER extends IPlanner<?, ?>> extends AbstractJsonPro
     Date fromDate = toJavaDate(selectionRange, "from");
     Date toDate = toJavaDate(selectionRange, "to");
     return new Range<Date>(fromDate, toDate);
+  }
+
+  @Override
+  protected void handleUiPropertyChange(String propertyName, JSONObject data) {
+    if (IPlanner.PROP_DISPLAY_MODE.equals(propertyName)) {
+      handleUiDisplayModeChange(data);
+    }
+    else if (IPlanner.PROP_VIEW_RANGE.equals(propertyName)) {
+      handleUiViewRangeChange(data);
+    }
+    else {
+      super.handleUiPropertyChange(propertyName, data);
+    }
+  }
+
+  protected void handleUiDisplayModeChange(JSONObject data) {
+    int displayMode = data.getInt(IPlanner.PROP_DISPLAY_MODE);
+    addPropertyEventFilterCondition(IPlanner.PROP_DISPLAY_MODE, displayMode);
+    getModel().getUIFacade().setDisplayModeFromUI(displayMode);
+  }
+
+  @SuppressWarnings("unchecked")
+  protected void handleUiViewRangeChange(JSONObject data) {
+    Range<Date> viewRange = extractViewRange(data);
+    addPropertyEventFilterCondition(IPlanner.PROP_VIEW_RANGE, viewRange);
+    getModel().getUIFacade().setViewRangeFromUI(viewRange);
   }
 
   protected Range<Date> extractViewRange(JSONObject data) {

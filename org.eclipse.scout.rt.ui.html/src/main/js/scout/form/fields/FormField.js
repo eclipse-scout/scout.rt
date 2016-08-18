@@ -363,20 +363,21 @@ scout.FormField.prototype._updateMenus = function() {
 };
 
 scout.FormField.prototype._syncGridData = function(gridData) {
-  this.gridData = new scout.GridData(gridData);
+  this._setProperty('gridData', new scout.GridData(gridData));
 };
 
-scout.FormField.prototype._syncKeyStrokes = function(keyStrokes, oldKeyStrokes) {
-  this.updateKeyStrokes(keyStrokes, oldKeyStrokes);
-  this.keyStrokes = keyStrokes; // FIXME [awe] 6.1 - call _setProperty('keyStrokes'... here
+scout.FormField.prototype._syncKeyStrokes = function(keyStrokes) {
+  this.updateKeyStrokes(keyStrokes, this.keyStrokes);
+  this._setProperty('keyStrokes', keyStrokes);
 };
 
-scout.FormField.prototype._syncMenus = function(menus, oldMenus) {
-  this.updateKeyStrokes(menus, oldMenus);
-  this.menus = menus; // FIXME [awe] 6.1 - call _setProperty('menus'... here
+scout.FormField.prototype._syncMenus = function(menus) {
+  this.updateKeyStrokes(menus, this.menus);
+  this._setProperty('menus', menus);
 };
 
 scout.FormField.prototype._syncErrorStatus = function(errorStatus) {
+  // FIXME [6.1] cgu ensure type ?
   this._setProperty('errorStatus',
       errorStatus ? new scout.Status(errorStatus) : null);
 };

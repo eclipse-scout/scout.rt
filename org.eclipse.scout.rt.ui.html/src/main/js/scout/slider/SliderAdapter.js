@@ -10,5 +10,6 @@
  ******************************************************************************/
 scout.SliderAdapter = function() {
   scout.SliderAdapter.parent.call(this);
+  this._addRemoteProperties(['value']);
 };
 scout.inherits(scout.SliderAdapter, scout.ModelAdapter);

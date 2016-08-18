@@ -40,8 +40,5 @@ scout.DesktopLogo.prototype._renderUrl = function() {
 };
 
 scout.DesktopLogo.prototype.setUrl = function(url) {
-  this.url = url;
-  if (this.rendered) {
-    this._renderUrl();
-  }
+  this.setProperty('url', url);
 };

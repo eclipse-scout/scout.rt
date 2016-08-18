@@ -53,7 +53,7 @@ scout.WizardProgressField.prototype._renderProperties = function() {
 };
 
 scout.WizardProgressField.prototype._syncSteps = function(steps) {
-  this.steps = steps;
+  this._setProperty('steps', steps);
   this._updateStepsMap();
 };
 
@@ -115,7 +115,7 @@ scout.WizardProgressField.prototype._syncActiveStepIndex = function(activeStepIn
   this.previousActiveStepIndex = this.activeStepIndex;
   // Ensure this.activeStepIndex always has a value. If the server has no active step set (may
   // happen during transition between steps), we use -1 as dummy value
-  this.activeStepIndex = scout.nvl(activeStepIndex, -1);
+  this._setProperty('activeStepIndex', scout.nvl(activeStepIndex, -1));
 };
 
 scout.WizardProgressField.prototype._renderActiveStepIndex = function() {

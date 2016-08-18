@@ -14,11 +14,6 @@ scout.TableAdapter = function() {
 };
 scout.inherits(scout.TableAdapter, scout.ModelAdapter);
 
-scout.TableAdapter.prototype._syncTableStatusVisible = function(visible) {
-  this.widget.setTableStatusVisible(visible);
-  return false;
-};
-
 scout.TableAdapter.prototype._sendRowsSelected = function(rowIds, debounceSend) {
   var eventData = {
     rowIds: rowIds

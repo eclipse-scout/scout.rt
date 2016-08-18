@@ -387,13 +387,7 @@ scout.Desktop.prototype.updateSplitterVisibility = function() {
 };
 
 scout.Desktop.prototype.setSplitterVisible = function(visible) {
-  if (this.splitterVisible === visible) {
-    return;
-  }
-  this._setProperty('splitterVisible', visible);
-  if (this.rendered) {
-    this._renderSplitterVisible();
-  }
+  this.setProperty('splitterVisible', visible);
 };
 
 scout.Desktop.prototype.updateSplitterPosition = function() {
@@ -442,14 +436,14 @@ scout.Desktop.prototype.setOutline = function(outline) {
   }
 };
 
-scout.Desktop.prototype._syncViewButtons = function(viewButtons, oldViewButtons) {
-  this.updateKeyStrokes(viewButtons, oldViewButtons);
-  this.viewButtons = viewButtons;
+scout.Desktop.prototype._syncViewButtons = function(viewButtons) {
+  this.updateKeyStrokes(viewButtons, this.viewButtons);
+  this._setProperty('viewButtons', viewButtons);
 };
 
-scout.Desktop.prototype._syncMenus = function(menus, oldMenus) {
-  this.updateKeyStrokes(menus, oldMenus);
-  this.menus = menus;
+scout.Desktop.prototype._syncMenus = function(menus) {
+  this.updateKeyStrokes(menus, this.menus);
+  this._setProperty('menus', menus);
 };
 
 scout.Desktop.prototype.setMenus = function(menus) {
@@ -458,47 +452,18 @@ scout.Desktop.prototype.setMenus = function(menus) {
   }
 };
 
-scout.Desktop.prototype._syncNavigationVisible = function(visible) {
-  this.setNavigationVisible(visible, false);
-  return false;
-};
-
-scout.Desktop.prototype.setNavigationVisible = function(visible, notifyServer) {
-  if (this.navigationVisible === visible) {
-    return;
-  }
-  this._setProperty('navigationVisible', visible);
-  if (this.rendered) {
-    this._renderNavigationVisible();
-  }
+scout.Desktop.prototype.setNavigationVisible = function(visible) {
+  this.setProperty('navigationVisible', visible);
   this.updateSplitterVisibility();
 };
 
-scout.Desktop.prototype._syncBenchVisible = function(visible) {
-  this.setBenchVisible(visible, false);
-  return false;
-};
-
 scout.Desktop.prototype.setBenchVisible = function(visible, notifyServer) {
-  if (this.benchVisible === visible) {
-    return;
-  }
-  this._setProperty('benchVisible', visible);
-  if (this.rendered) {
-    this._renderBenchVisible();
-  }
+  this.setProperty('benchVisible', visible);
   this.updateSplitterVisibility();
 };
 
 scout.Desktop.prototype.setHeaderVisible = function(visible, notifyServer) {
-  if (this.headerVisible === visible) {
-    return;
-  }
-  this._setProperty('headerVisible', visible);
-  notifyServer = scout.nvl(notifyServer, true);
-  if (this.rendered) {
-    this._renderHeaderVisible();
-  }
+  this.setProperty('headerVisible', visible);
 };
 
 scout.Desktop.prototype.outlineDisplayStyle = function() {

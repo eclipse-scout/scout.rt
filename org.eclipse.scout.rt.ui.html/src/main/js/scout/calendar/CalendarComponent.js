@@ -148,7 +148,7 @@ scout.CalendarComponent.prototype._renderSelected = function() {
 };
 
 scout.CalendarComponent.prototype.setSelected = function(selected) {
-  var oldSelected = this._selected;
+  var oldSelected = this._selected; // FIXME CGU [6.1] use proper property pattern and use property event
   this._selected = selected;
   if (oldSelected !== selected) {
     this.trigger('selected', {

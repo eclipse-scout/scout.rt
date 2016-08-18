@@ -54,29 +54,22 @@ scout.MenuBox.prototype._renderMenus = function() {
   this.invalidateLayoutTree();
 };
 
+scout.MenuBox.prototype._removeMenus = function() {
+  this.menus.forEach(function(menu) {
+    menu.remove();
+  });
+  this.invalidateLayoutTree();
+};
+
 scout.MenuBox.prototype._renderCompact = function() {
   this.$container.toggleClass('compact', this.compact);
   this.invalidateLayoutTree();
 };
 
 scout.MenuBox.prototype.setCompact = function(compact) {
-  if (this.compact === compact) {
-    return;
-  }
-  this.compact = compact;
-  if (this.rendered) {
-    this._renderCompact();
-  }
+  this.setProperty('compact', compact);
 };
 
 scout.MenuBox.prototype.setMenus = function(menus) {
-  if (this.menus) {
-    this.menus.forEach(function(menu) {
-      menu.remove();
-    });
-  }
-  this.menus = menus;
-  if (this.rendered) {
-    this._renderMenus();
-  }
+  this.setProperty('menus', menus);
 };

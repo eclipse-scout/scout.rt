@@ -736,13 +736,7 @@ scout.TableHeaderMenu.prototype._renderCompact = function() {
 };
 
 scout.TableHeaderMenu.prototype.setCompact = function(compact) {
-  if (this.compact === compact) {
-    return;
-  }
-  this.compact = compact;
-  if (this.rendered) {
-    this._renderCompact();
-  }
+  this.setProperty('compact', compact);
 };
 
 scout.TableHeaderMenu.prototype._onLocationChanged = function(event) {

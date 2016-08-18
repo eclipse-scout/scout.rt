@@ -74,13 +74,7 @@ scout.CheckBoxField.prototype.toggleChecked = function() {
 };
 
 scout.CheckBoxField.prototype.setValue = function(value) {
-  if (this.value === value) {
-    return;
-  }
-  this._setProperty('value', value);
-  if (this.rendered) {
-    this._renderValue();
-  }
+  this.setProperty('value', value);
 };
 
 /**

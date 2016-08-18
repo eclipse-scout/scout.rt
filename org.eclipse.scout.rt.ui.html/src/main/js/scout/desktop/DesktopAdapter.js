@@ -72,7 +72,7 @@ scout.DesktopAdapter.prototype._onFileChooserShow = function(event) {
 
   if (displayParent) {
     fileChooser = this.session.getOrCreateWidget(event.fileChooser, this.widget);
-    displayParent.fileChooserController.registerAndRender(fileChooser);
+    displayParent.widget.fileChooserController.registerAndRender(fileChooser);
   }
 };
 

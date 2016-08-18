@@ -11,5 +11,6 @@
 scout.GroupBoxAdapter = function() {
   scout.GroupBoxAdapter.parent.call(this);
   this._addAdapterProperties(['fields', 'menus']);
+  this._addRemoteProperties(['expanded']);
 };
 scout.inherits(scout.GroupBoxAdapter, scout.FormFieldAdapter);

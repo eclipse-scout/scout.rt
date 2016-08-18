@@ -62,6 +62,7 @@ scout.SimpleTabArea.prototype._renderVisible = function() {
       this.detach();
     }
   }
+  this.invalidateLayoutTree();
 };
 
 scout.SimpleTabArea.prototype._attach = function() {
@@ -87,11 +88,7 @@ scout.SimpleTabArea.prototype._onTabSelection = function(event) {
 };
 
 scout.SimpleTabArea.prototype.setVisible = function(visible) {
-  this.visible = visible;
-  if (this.rendered) {
-    this._renderVisible();
-    this.invalidateLayoutTree();
-  }
+  this.setProperty('visible', visible);
 };
 
 scout.SimpleTabArea.prototype.getTabs = function() {

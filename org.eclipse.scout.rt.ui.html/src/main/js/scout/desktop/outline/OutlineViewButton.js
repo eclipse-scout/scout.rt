@@ -36,15 +36,7 @@ scout.OutlineViewButton.prototype.beforeSendDoAction = function() {
 };
 
 scout.OutlineViewButton.prototype.setSelected = function(selected) {
-  var oldSelected = this.selected;
-  if (oldSelected === selected) {
-    return;
-  }
-  this.selected = selected;
-  if (this.rendered) {
-    this._renderSelected();
-  }
-  this._firePropertyChange('selected', oldSelected, selected);
+  this.setProperty('selected', selected);
 };
 
 scout.OutlineViewButton.prototype.onOutlineChanged = function(outline) {

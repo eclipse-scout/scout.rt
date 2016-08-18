@@ -355,7 +355,7 @@ scout.Outline.prototype._renderDefaultDetailForm = function() {
 };
 
 scout.Outline.prototype._syncDefaultDetailForm = function(defaultDetailForm) {
-  this.defaultDetailForm = defaultDetailForm;
+  this._setProperty('defaultDetailForm', defaultDetailForm);
   if (this.defaultDetailForm) {
     if (this.outlineOverview) {
       this.outlineOverview.destroy();
@@ -373,7 +373,7 @@ scout.Outline.prototype._syncDefaultDetailForm = function(defaultDetailForm) {
 };
 
 scout.Outline.prototype._syncNavigateButtonsVisible = function(navigateButtonsVisible) {
-  this.navigateButtonsVisible = navigateButtonsVisible;
+  this._setProperty('navigateButtonsVisible', navigateButtonsVisible);
   this._visitNodes(this.nodes, this._syncNavigateButtonsVisibleForNode.bind(this));
 };
 
@@ -523,10 +523,12 @@ scout.Outline.prototype._renderInBackground = function() {
 
 scout.Outline.prototype._renderCompact = function() {
   this.$container.toggleClass('compact', this.compact);
+  this.invalidateLayoutTree();
 };
 
 scout.Outline.prototype._renderEmbedDetailContent = function() {
   this.$data.toggleClass('has-detail-content', this.embedDetailContent);
+  this.invalidateLayoutTree();
 };
 
 scout.Outline.prototype._renderDetailContent = function() {
@@ -570,19 +572,11 @@ scout.Outline.prototype._postRenderViewRange = function() {
 };
 
 scout.Outline.prototype.setCompact = function(compact) {
-  this.compact = compact;
-  if (this.rendered) {
-    this._renderCompact();
-    this.invalidateLayoutTree();
-  }
+  this.setProperty('compact', compact);
 };
 
-scout.Outline.prototype.setEmbedDetailContent = function(embed) {
-  this.embedDetailContent = embed;
-  if (this.rendered) {
-    this._renderEmbedDetailContent();
-    this.invalidateLayoutTree();
-  }
+scout.Outline.prototype.setEmbedDetailContent = function(embedDetailContent) {
+  this.setProperty('embedDetailContent', embedDetailContent);
   this.updateDetailContent();
 };
 
@@ -601,7 +595,7 @@ scout.Outline.prototype.setDetailContent = function(content) {
   if (this.detailContent && this.detailContent.events) {
     this.detailContent.off('destroy', this._detailContentDestroyHandler);
   }
-  this.detailContent = content;
+  this._setProperty('detailContent', content);
   if (content && content.events) {
     content.on('destroy', this._detailContentDestroyHandler);
   }
@@ -823,10 +817,7 @@ scout.Outline.prototype._removeDetailMenuBar = function() {
 };
 
 scout.Outline.prototype.setDetailMenuBarVisible = function(visible) {
-  this.detailMenuBarVisible = visible;
-  if (this.rendered) {
-    this._renderDetailMenuBarVisible();
-  }
+  this.setProperty('detailMenuBarVisible', visible);
 };
 
 scout.Outline.prototype.setNodeMenus = function(nodeMenus) {
@@ -870,10 +861,7 @@ scout.Outline.prototype._removeNodeMenuBar = function() {
 };
 
 scout.Outline.prototype.setNodeMenuBarVisible = function(visible) {
-  this.nodeMenuBarVisible = visible;
-  if (this.rendered) {
-    this._renderNodeMenuBarVisible();
-  }
+  this.setProperty('nodeMenuBarVisible', visible);
 };
 
 /**
@@ -941,9 +929,10 @@ scout.Outline.prototype.acceptView = function(view) {
 /**
  * @override Tree.js (don't call parent)
  */
-scout.Outline.prototype._syncMenus = function(menus, oldMenus) {
+scout.Outline.prototype._syncMenus = function(menus) {
+  var oldMenus = this.menus;
   this.updateKeyStrokes(menus, oldMenus);
-  this.menus = menus;
+  this._setProperty('menus', menus);
   if (this.titleMenuBar) { // _syncMenus is called by parent class Tree.js, at this time titleMenuBar is not yet initialized
     var menuItems = scout.menus.filter(this.menus, ['Tree.Header']);
     this.titleMenuBar.setMenuItems(menuItems);

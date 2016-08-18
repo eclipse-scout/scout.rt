@@ -333,7 +333,7 @@ scout.Table.prototype._syncTableControls = function(controls) {
   for (i = 0; i < this.tableControls.length; i++) {
     this.keyStrokeContext.unregisterKeyStroke(this.tableControls[i]);
   }
-  this.tableControls = controls;
+  this._setProperty('tableControls', controls);
   for (i = 0; i < this.tableControls.length; i++) {
     this.keyStrokeContext.registerKeyStroke(this.tableControls[i]);
   }
@@ -919,7 +919,7 @@ scout.Table.prototype.changeAggregation = function(column, func) {
 };
 
 scout.Table.prototype.changeAggregations = function(columns, functions) {
-  this.columns.forEach(function(column, i) {
+  columns.forEach(function(column, i) {
     var func = functions[i];
     column.setAggregationFunction(func);
 
@@ -1434,7 +1434,7 @@ scout.Table.prototype._filterMenus = function(menus, destination, onlyVisible, e
 };
 
 scout.Table.prototype.setStaticMenus = function(staticMenus) {
-  this.staticMenus = staticMenus;
+  this._setProperty('staticMenus', staticMenus);
   this._updateMenuBar();
 };
 
@@ -2194,7 +2194,7 @@ scout.Table.prototype.scrollPageDown = function() {
 
 scout.Table.prototype.setScrollTop = function(scrollTop) {
   scout.scrollbars.scrollTop(this.$data, scrollTop);
-  this.scrollTop = scrollTop;
+  this._setProperty('scrollTop', scrollTop);
 
   // call _renderViewport to make sure rows are rendered immediately. The browser fires the scroll event handled by onDataScroll delayed
   this._renderViewport();
@@ -2889,7 +2889,7 @@ scout.Table.prototype._triggerColumnMoved = function(column, oldPos, newPos, dra
 
 scout.Table.prototype._triggerAggregationFunctionChanged = function(column) {
   var event = {
-    column: column.id
+    column: column
   };
   this.trigger('aggregationFunctionChanged', event);
 };
@@ -2908,12 +2908,8 @@ scout.Table.prototype._renderHeaderEnabled = function() {
   this._renderTableHeader();
 };
 
-scout.Table.prototype._syncCheckable = function(checkable, oldValue) {
-  if (checkable === oldValue) {
-    // Do nothing if value has not changed (only on property change, not initially)
-    return false;
-  }
-  this.checkable = checkable;
+scout.Table.prototype._syncCheckable = function(checkable) {
+  this._setProperty('checkable', checkable);
 
   var column = this.checkableColumn;
   if (this.checkable && !column) {
@@ -2949,13 +2945,8 @@ scout.Table.prototype._syncHeadAndTailSortColumns = function() {
   }, this);
 };
 
-scout.Table.prototype._syncRowIconVisible = function(rowIconVisible, oldValue) {
-  if (rowIconVisible === oldValue) {
-    // Do nothing if value has not changed (only on property change, not initially)
-    return false;
-  }
-  this.rowIconVisible = rowIconVisible;
-
+scout.Table.prototype._syncRowIconVisible = function(rowIconVisible) {
+  this._setProperty('rowIconVisible', rowIconVisible);
   var column = this.rowIconColumn;
   if (this.rowIconVisible && !column) {
     this._insertRowIconColumn();
@@ -2965,9 +2956,11 @@ scout.Table.prototype._syncRowIconVisible = function(rowIconVisible, oldValue) {
   }
 };
 
-scout.Table.prototype._syncSelectedRows = function(selectedRowIds) {
-  this.selectRows(this._rowsByIds(selectedRowIds), false);
-  this.selectionHandler.clearLastSelectedRowMarker();
+scout.Table.prototype._syncSelectedRows = function(selectedRows) {
+  if (typeof selectedRows[0] === 'string') {
+    selectedRows = this._rowsByIds(selectedRows);
+  }
+  this._setProperty('selectedRows', selectedRows);
 };
 
 scout.Table.prototype.setMenus = function(menus) {
@@ -2991,9 +2984,9 @@ scout.Table.prototype._updateMenuBar = function() {
   this.menuBar.setMenuItems(menuItems);
 };
 
-scout.Table.prototype._syncKeyStrokes = function(keyStrokes, oldKeyStrokes) {
-  this.updateKeyStrokes(keyStrokes, oldKeyStrokes);
-  this.keyStrokes = keyStrokes;
+scout.Table.prototype._syncKeyStrokes = function(keyStrokes) {
+  this.updateKeyStrokes(keyStrokes, this.keyStrokes);
+  this._setProperty('keyStrokes', keyStrokes);
 };
 
 scout.Table.prototype.setFilters = function(filters) {
@@ -3022,17 +3015,14 @@ scout.Table.prototype._ensureFilter = function(filter) {
 
 scout.Table.prototype._syncTableStatus = function(tableStatus) {
   if (tableStatus) {
-    this.tableStatus = new scout.Status(tableStatus);
+    this._setProperty('tableStatus', new scout.Status(tableStatus)); // FIXME [6.1] cgu ensure type
   } else {
-    this.tableStatus = null;
+    this._setProperty('tableStatus', null);
   }
 };
 
 scout.Table.prototype.setTableStatusVisible = function(visible) {
-  if (this.tableStatusVisible === visible) {
-    return;
-  }
-  this._setProperty('tableStatusVisible', visible);
+  this.setProperty('tableStatusVisible', visible);
   this._updateFooterVisibility();
 };
 
@@ -3041,7 +3031,7 @@ scout.Table.prototype._updateFooterVisibility = function() {
 };
 
 scout.Table.prototype.setFooterVisible = function(visible) {
-  this.footerVisible = visible;
+  this._setProperty('footerVisible', visible);
   if (visible && !this.footer) {
     this.footer = this._createFooter();
   }
@@ -3299,7 +3289,7 @@ scout.Table.prototype.setViewRangeSize = function(viewRangeSize) {
   if (this.viewRangeSize === viewRangeSize) {
     return;
   }
-  this.viewRangeSize = viewRangeSize;
+  this._setProperty('viewRangeSize', viewRangeSize);
   if (this.rendered) {
     this._renderViewport();
   }
@@ -3634,7 +3624,7 @@ scout.Table.prototype._detach = function() {
 };
 
 scout.Table.prototype.setVirtual = function(virtual) {
-  this.virtual = virtual;
+  this._setProperty('virtual', virtual);
 };
 
 /* --- STATIC HELPERS ------------------------------------------------------------- */

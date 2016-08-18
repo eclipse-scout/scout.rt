@@ -10,5 +10,6 @@
  ******************************************************************************/
 scout.ButtonAdapter = function() {
   scout.ButtonAdapter.parent.call(this);
+  this._addRemoteProperties(['selected']);
 };
 scout.inherits(scout.ButtonAdapter, scout.FormFieldAdapter);

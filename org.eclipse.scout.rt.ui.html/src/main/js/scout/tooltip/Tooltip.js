@@ -113,7 +113,10 @@ scout.Tooltip.prototype._remove = function() {
 };
 
 scout.Tooltip.prototype.setText = function(text) {
-  this.text = text;
+  if (this.text === text) {
+    return;
+  }
+  this._setProperty('text', text);
   if (this.rendered) {
     this._renderText();
     this.position();
@@ -121,10 +124,7 @@ scout.Tooltip.prototype.setText = function(text) {
 };
 
 scout.Tooltip.prototype.setSeverity = function(severity) {
-  this.severity = severity;
-  if (this.rendered) {
-    this._renderSeverity();
-  }
+  this.setProperty('severity', severity);
 };
 
 scout.Tooltip.prototype._renderText = function() {

@@ -34,7 +34,9 @@ scout.TreeAdapter.prototype._onWidgetNodeClicked = function(event) {
 };
 
 scout.TreeAdapter.prototype._onWidgetNodeAction = function(event) {
-  this._send('nodeAction');
+  this._send('nodeAction', {
+    nodeId: event.node.id
+  });
 };
 
 scout.TreeAdapter.prototype._onWidgetNodesSelected = function(event) {
