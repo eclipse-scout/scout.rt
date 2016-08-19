@@ -13,7 +13,6 @@ scout.DateField = function() {
 
   this.hasDate = true;
   this.hasTime = false;
-  this.enabledWhenOffline = true;
   this.disabledCopyOverlay = true;
 
   this.$dateField;

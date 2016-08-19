@@ -148,10 +148,6 @@ scout.AggregateTableControl.prototype._updateEnabledAndSelectedState = function(
   this.setEnabled(enabled);
 };
 
-scout.AggregateTableControl.prototype.setEnabled = function(enabled) {
-  this.setProperty('enabled', enabled);
-};
-
 scout.AggregateTableControl.prototype._syncEnabled = function(enabled) {
   this._setProperty('enabled', enabled);
   this._updateEnabledAndSelectedState();

@@ -99,11 +99,9 @@ scout.MenuBar.prototype._remove = function() {
   this.visible = false;
 };
 
-scout.MenuBar.prototype._renderProperties = function() {
-  scout.MenuBar.parent.prototype._renderProperties.call(this);
-  this._renderVisible();
-};
-
+/**
+ * @override
+ */
 scout.MenuBar.prototype._renderVisible = function() {
   this.$container.setVisible(this.visible);
   this.invalidateLayoutTree();
@@ -248,10 +246,6 @@ scout.MenuBar.prototype.updateVisibility = function() {
   this.setVisible(!this.hiddenByUi && this.menuItems.some(function(m) {
     return m.visible;
   }));
-};
-
-scout.MenuBar.prototype.setVisible = function(visible) {
-  this.setProperty('visible', visible);
 };
 
 /**

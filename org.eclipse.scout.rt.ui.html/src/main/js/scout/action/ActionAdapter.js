@@ -13,3 +13,12 @@ scout.ActionAdapter = function() {
   this._addRemoteProperties(['selected']);
 };
 scout.inherits(scout.ActionAdapter, scout.ModelAdapter);
+
+scout.Action.prototype._goOffline = function() {
+  this._enabledBeforeOffline = this.widget.enabled;
+  this.widget.setEnabled(false);
+};
+
+scout.Action.prototype._goOnline = function() {
+  this.widget.setEnabled(this._enabledBeforeOffline);
+};

@@ -92,12 +92,15 @@ scout.ViewMenuTab.prototype._remove = function() {
 };
 
 scout.ViewMenuTab.prototype._renderProperties = function() {
-  this._renderVisible();
+  scout.ViewMenuTab.parent.prototype._renderProperties.call(this);
   this._renderIconId();
   this._renderSelected();
   this._renderInBackground();
 };
 
+/**
+ * @override
+ */
 scout.ViewMenuTab.prototype._renderVisible = function() {
   this.$container.setVisible(this.visible);
   this.invalidateLayoutTree();
@@ -186,10 +189,6 @@ scout.ViewMenuTab.prototype.setSelected = function(selected) {
 
 scout.ViewMenuTab.prototype.setIconId = function(iconId) {
   this.setProperty('iconId', iconId);
-};
-
-scout.ViewMenuTab.prototype.setVisible = function(visible) {
-  this.setProperty('visible', visible);
 };
 
 scout.ViewMenuTab.prototype.updateVisibility = function() {

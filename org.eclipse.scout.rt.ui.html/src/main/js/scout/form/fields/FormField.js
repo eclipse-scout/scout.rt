@@ -14,8 +14,6 @@
  */
 scout.FormField = function() {
   scout.FormField.parent.call(this);
-  this.enabled = true;
-  this.visible = true;
   this.keyStrokes = [];
   this.labelVisible = true;
   this.labelPosition = scout.FormField.LABEL_POSITION_DEFAULT;
@@ -50,12 +48,6 @@ scout.FormField = function() {
   this.refFieldId;
   this.mode = scout.FormField.MODE_DEFAULT;
   this.loadingSupport; // Object to handle the 'loading' property (different for tile fields)
-
-  /**
-   * Set this property to true when the form-field should stay enabled in offline case.
-   * By default the field will be disabled.
-   */
-  this.enabledWhenOffline = false;
 
   /**
    * Some browsers don't support copying text from disabled input fields. If such a browser is detected
@@ -112,9 +104,8 @@ scout.FormField.prototype._render = function($parent) {
 };
 
 scout.FormField.prototype._renderProperties = function() {
-  this._renderEnabled();
+  scout.FormField.parent.prototype._renderProperties.call(this);
   this._renderMandatory();
-  this._renderVisible();
   this._renderTooltipText();
   this._renderErrorStatus();
   this._renderMenus();
@@ -174,9 +165,11 @@ scout.FormField.prototype._renderTooltipText = function() {
   this._updateStatusVisible();
 };
 
-scout.FormField.prototype._renderVisible = function(visible) {
-  visible = scout.nvl(visible, this.visible);
-  this.$container.setVisible(visible);
+/**
+ * @override
+ */
+scout.FormField.prototype._renderVisible = function() {
+  this.$container.setVisible(this.visible);
   if (this.rendered) {
     var htmlCompParent = this.htmlComp.getParent();
     if (htmlCompParent) { // may be null if $container is detached
@@ -281,11 +274,13 @@ scout.FormField.prototype._renderLabelPosition = function(position) {
   this._renderLabel();
 };
 
-scout.FormField.prototype._renderEnabled = function(enabled) {
-  enabled = scout.nvl(enabled, this.enabled);
-  this.$container.setEnabled(enabled);
+/**
+ * @override
+ */
+scout.FormField.prototype._renderEnabled = function() {
+  this.$container.setEnabled(this.enabled);
   if (this.$field) {
-    this.$field.setEnabled(enabled);
+    this.$field.setEnabled(this.enabled);
   }
   this._updateDisabledCopyOverlay();
 };
@@ -528,22 +523,6 @@ scout.FormField.prototype.getForm = function() {
     parent = parent.parent;
   }
   return parent;
-};
-
-scout.FormField.prototype._goOffline = function() {
-  if (this.enabledWhenOffline) {
-    return;
-  }
-  this._renderEnabled(false);
-};
-
-scout.FormField.prototype._goOnline = function() {
-  if (this.enabledWhenOffline) {
-    return;
-  }
-  if (this.enabled) {
-    this._renderEnabled(true);
-  }
 };
 
 /**

@@ -35,8 +35,7 @@ scout.Action = function() {
   this.actionStyle = scout.Action.ActionStyle.DEFAULT;
   this.textVisible = true;
   this.compact = false;
-  this._addCloneProperties(['actionStyle', 'cssClass', 'visible', 'enabled', 'horizontalAlignment', 'iconId', 'selected', 'tabbable', 'text', 'tooltipText', 'toggleAction']);
-  // FIXME [awe] 6.1 - move visible and enabled properties and base methods to Widget.js
+  this._addCloneProperties(['actionStyle', 'cssClass', 'horizontalAlignment', 'iconId', 'selected', 'tabbable', 'text', 'tooltipText', 'toggleAction']);
 };
 scout.inherits(scout.Action, scout.Widget);
 
@@ -60,9 +59,7 @@ scout.Action.prototype._renderProperties = function() {
   this._renderIconId();
   this._renderTooltipText();
   this._renderKeyStroke();
-  this._renderEnabled();
   this._renderSelected();
-  this._renderVisible();
   this._renderTabbable();
   this._renderCompact();
   this._renderCssClass();
@@ -98,14 +95,12 @@ scout.Action.prototype._renderIconId = function() {
   this.$container.icon(iconId);
 };
 
-scout.Action.prototype._renderEnabled = function(enabled) {
-  enabled = scout.nvl(enabled, this.enabled);
-  this.$container.setEnabled(enabled);
+/**
+ * @override
+ */
+scout.Action.prototype._renderEnabled = function() {
+  this.$container.setEnabled(this.enabled);
   this._updateTooltip();
-};
-
-scout.Action.prototype._renderVisible = function() {
-  this.$container.setVisible(this.visible);
 };
 
 scout.Action.prototype._renderSelected = function() {
@@ -176,14 +171,6 @@ scout.Action.prototype._configureTooltip = function() {
     arrowPositionUnit: '%',
     tooltipPosition: this.tooltipPosition
   };
-};
-
-scout.Action.prototype._goOffline = function() {
-  this._renderEnabled(false);
-};
-
-scout.Action.prototype._goOnline = function() {
-  this._renderEnabled(true);
 };
 
 /**

@@ -18,13 +18,6 @@ scout.OutlineViewButton.prototype._renderOutline = function(outline) {
   // NOP
 };
 
-scout.OutlineViewButton.prototype._goOffline = function() {
-  // Disable if outline has not been loaded yet
-  if (!this.outline) {
-    this._renderEnabled(false);
-  }
-};
-
 /**
  * Don't await server response to make it more responsive and offline capable.
  * @override Action.js

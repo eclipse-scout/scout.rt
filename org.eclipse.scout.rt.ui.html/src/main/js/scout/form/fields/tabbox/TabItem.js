@@ -71,7 +71,6 @@ scout.TabItem.prototype.renderTab = function($parent) {
   this._renderTabActive();
   this._renderLabel();
   this._renderMarked();
-  this._renderVisible();
   this._renderCssClass();
   this._renderTooltipText();
   this._renderErrorStatus();
@@ -149,6 +148,9 @@ scout.TabItem.prototype._renderMarked = function(marked) {
   this.$tabContainer.toggleClass('marked', this.marked);
 };
 
+/**
+ * @override
+ */
 scout.TabItem.prototype.setVisible = function(visible) {
   if (this.visible === visible) {
     return;
@@ -160,10 +162,13 @@ scout.TabItem.prototype.setVisible = function(visible) {
   }
 };
 
-scout.TabItem.prototype._renderVisible = function(visible) {
+/**
+ * @override
+ */
+scout.TabItem.prototype._renderVisible = function() {
   // Call super only if the group-box is rendered or is rendering
   if (this.$container) {
-    scout.TabItem.parent.prototype._renderVisible.call(this, visible);
+    scout.TabItem.parent.prototype._renderVisible.call(this);
   }
   this.$tabContainer.setVisible(this.visible);
 };

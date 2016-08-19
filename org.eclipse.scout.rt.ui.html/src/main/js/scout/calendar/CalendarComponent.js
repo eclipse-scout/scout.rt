@@ -133,6 +133,7 @@ scout.CalendarComponent.prototype._partPosition = function($part, y1, y2) {
 };
 
 scout.CalendarComponent.prototype._renderProperties = function() {
+  scout.CalendarComponent.parent.prototype._renderProperties.call(this);
   this._renderSelected();
 };
 

@@ -41,6 +41,7 @@ scout.Slider.prototype._render = function($parent) {
 };
 
 scout.Slider.prototype._renderProperties = function() {
+  scout.Slider.parent.prototype._renderProperties.call(this);
   this._renderValue();
   this._renderMinValue();
   this._renderMaxValue();

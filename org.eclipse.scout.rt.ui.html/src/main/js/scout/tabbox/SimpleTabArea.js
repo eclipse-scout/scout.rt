@@ -16,17 +16,11 @@ scout.inherits(scout.SimpleTabArea, scout.Widget);
 
 scout.SimpleTabArea.prototype._init = function(model) {
   scout.SimpleTabArea.parent.prototype._init.call(this, model);
-  this.visible = true;
   this._selectedViewTab;
 
   this._viewTabSelectionHandler = this._onTabSelection.bind(this);
 
   this._addEventSupport();
-};
-
-scout.SimpleTabArea.prototype.render = function($parent) {
-  scout.SimpleTabArea.parent.prototype.render.call(this, $parent);
-  this._renderVisible();
 };
 
 scout.SimpleTabArea.prototype._render = function($parent) {
@@ -54,13 +48,9 @@ scout.SimpleTabArea.prototype._renderTab = function(tab) {
 
 scout.SimpleTabArea.prototype._renderVisible = function() {
   if (this.visible && this.tabs.length > 0) {
-    if (!this.attached) {
-      this.attach();
-    }
+    this.attach();
   } else {
-    if (this.attached) {
-      this.detach();
-    }
+    this.detach();
   }
   this.invalidateLayoutTree();
 };
@@ -85,10 +75,6 @@ scout.SimpleTabArea.prototype._detach = function() {
 
 scout.SimpleTabArea.prototype._onTabSelection = function(event) {
   this.selectTab(event.source);
-};
-
-scout.SimpleTabArea.prototype.setVisible = function(visible) {
-  this.setProperty('visible', visible);
 };
 
 scout.SimpleTabArea.prototype.getTabs = function() {

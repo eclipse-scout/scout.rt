@@ -33,6 +33,9 @@ scout.Widget = function() {
   this.attached = false;
   this.destroyed = false;
 
+  this.enabled = true;
+  this.visible = true;
+
   this.$container;
   // If set to true, remove won't remove the element immediately but after the animation has been finished
   // This expects a css animation which may be triggered by the class 'removed'
@@ -48,6 +51,8 @@ scout.Widget = function() {
   this._addEventSupport();
 
   this._parentDestroyHandler = this._onParentDestroy.bind(this);
+  this._postRenderActions = [];
+  this._addCloneProperties(['visible', 'enabled']);
 };
 
 scout.Widget.prototype.init = function(model) {
@@ -183,17 +188,22 @@ scout.Widget.prototype._render = function($parent) {
 
 /**
  * This method calls the UI setter methods after the _render method has been executed.
- * Here values of the model are applied to the DOM / UI. The default impl. does nothing.
+ * Here values of the model are applied to the DOM / UI.
  */
 scout.Widget.prototype._renderProperties = function() {
-  // NOP
+  this._renderEnabled();
+  this._renderVisible();
 };
 
 /**
- * Method invoked once rendering completed and 'rendered' flag is set to 'true'.
+ * Method invoked once rendering completed and 'rendered' flag is set to 'true'.<p>
+ * By default executes every action of this._postRenderActions
  */
 scout.Widget.prototype._postRender = function() {
-  // NOP
+  this._postRenderActions.forEach(function(action) {
+    action();
+  });
+  this._postRenderActions = [];
 };
 
 scout.Widget.prototype.remove = function() {
@@ -371,6 +381,29 @@ scout.Widget.prototype.has = function(widget) {
   return false;
 };
 
+
+scout.Widget.prototype.setEnabled = function(enabled) {
+  this.setProperty('enabled', enabled);
+};
+
+scout.Widget.prototype._renderEnabled = function() {
+  if (!this.$container) {
+    return;
+  }
+  this.$container.setEnabled(this.enabled);
+};
+
+scout.Widget.prototype.setVisible = function(visible) {
+  this.setProperty('visible', visible);
+};
+
+scout.Widget.prototype._renderVisible = function() {
+  if (!this.$container) {
+    return;
+  }
+  this.$container.setVisible(this.visible);
+};
+
 /**
  * Adds default loading support to the widget. The default loading support hides
  * the whole field $container when the field is in loading state. Override this
@@ -538,6 +571,10 @@ scout.Widget.prototype._attach = function(event) {
  * widgets, because when a DOM element is detached - child elements are not notified
  */
 scout.Widget.prototype.detach = function() {
+  if (this.rendering) {
+    // Defer the execution of detach. If it was detached while rendering the attached flag would be wrong.
+    this._postRenderActions.push(this.detach.bind(this));
+  }
   if (!this.attached || !this.rendered || this._isRemovalPending()) {
     return;
   }

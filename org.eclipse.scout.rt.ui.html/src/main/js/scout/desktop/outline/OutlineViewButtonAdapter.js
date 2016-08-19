@@ -13,3 +13,16 @@ scout.OutlineViewButtonAdapter = function() {
   this._addAdapterProperties('outline');
 };
 scout.inherits(scout.OutlineViewButtonAdapter, scout.ViewButtonAdapter);
+
+scout.OutlineViewButtonAdapter.prototype._goOffline = function() {
+  // Disable only if outline has not been loaded yet
+  if (this.widget.outline) {
+    return;
+  }
+  this._enabledBeforeOffline = this.widget.enabled;
+  this.widget.setEnabled(false);
+};
+
+scout.OutlineViewButtonAdapter.prototype._goOnline = function() {
+  this.widget.setEnabled(this._enabledBeforeOffline);
+};

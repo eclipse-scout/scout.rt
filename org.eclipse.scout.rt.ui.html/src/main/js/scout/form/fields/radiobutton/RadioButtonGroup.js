@@ -64,6 +64,9 @@ scout.RadioButtonGroup.prototype._render = function($parent) {
   this.addStatus();
 };
 
+/**
+ * @override
+ */
 scout.RadioButtonGroup.prototype._renderEnabled = function() {
   scout.RadioButtonGroup.parent.prototype._renderEnabled.call(this);
   this._provideTabIndex();

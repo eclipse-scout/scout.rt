@@ -54,6 +54,7 @@ scout.DesktopNavigation.prototype._remove = function() {
 };
 
 scout.DesktopNavigation.prototype._renderProperties = function() {
+  scout.DesktopNavigation.parent.prototype._renderProperties.call(this);
   this._renderViewButtonBox();
   this._renderToolBoxVisible();
   this._renderOutline();

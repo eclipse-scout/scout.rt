@@ -10,5 +10,6 @@
  ******************************************************************************/
 scout.BasicFieldAdapter = function() {
   scout.BasicFieldAdapter.parent.call(this);
+  this.enabledWhenOffline = true;
 };
 scout.inherits(scout.BasicFieldAdapter, scout.ValueFieldAdapter);

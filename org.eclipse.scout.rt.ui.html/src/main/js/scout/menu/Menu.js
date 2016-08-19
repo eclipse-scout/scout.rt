@@ -193,6 +193,9 @@ scout.Menu.prototype._renderIconId = function() {
   this.invalidateLayoutTree();
 };
 
+/**
+ * @override
+ */
 scout.Menu.prototype._renderVisible = function() {
   scout.Menu.parent.prototype._renderVisible.call(this);
   this.invalidateLayoutTree();

@@ -336,7 +336,6 @@ scout.Tree.prototype._remove = function() {
 
 scout.Tree.prototype._renderProperties = function() {
   scout.Tree.parent.prototype._renderProperties.call(this);
-  this._renderEnabled();
   this._renderMenus();
   this._renderDropType();
 };
@@ -911,10 +910,9 @@ scout.Tree.prototype._filterMenus = function(menus, destination, onlyVisible, en
   return scout.menus.filterAccordingToSelection('Tree', this.selectedNodes.length, menus, destination, onlyVisible, enableDisableKeyStroke);
 };
 
-scout.Tree.prototype.setEnabled = function(enabled) {
-  this.setProperty('enabled', enabled);
-};
-
+/**
+ * @override
+ */
 scout.Tree.prototype._renderEnabled = function() {
   var enabled = this.enabled;
   this.$data.setEnabled(enabled);

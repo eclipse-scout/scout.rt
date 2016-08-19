@@ -14,7 +14,6 @@
 scout.BasicField = function() {
   scout.BasicField.parent.call(this);
   this._onDisplayTextModifiedHandler = this._onDisplayTextModified.bind(this);
-  this.enabledWhenOffline = true;
   this.disabledCopyOverlay = true;
   this._displayTextModifiedTimeoutId = null;
 };

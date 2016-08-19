@@ -26,7 +26,6 @@ scout.PlannerHeader.prototype._render = function($parent) {
   this.$commands = this.$container.appendDiv('planner-commands');
   this._renderAvailableDisplayModes();
   this._renderDisplayMode();
-  this._renderVisible();
 };
 
 scout.PlannerHeader.prototype.setAvailableDisplayModes = function(displayModes) {
@@ -83,14 +82,6 @@ scout.PlannerHeader.prototype.setDisplayMode = function(displayMode) {
 scout.PlannerHeader.prototype._renderDisplayMode = function() {
   $('.planner-mode', this.$commands).select(false);
   $('[data-mode="' + this.displayMode + '"]', this.$commands).select(true);
-};
-
-scout.PlannerHeader.prototype.setVisible = function(visible) {
-  this.setProperty('visible', visible);
-};
-
-scout.PlannerHeader.prototype._renderVisible = function() {
-  this.$container.setVisible(this.visible);
 };
 
 scout.PlannerHeader.prototype._onTodayClick = function(event) {

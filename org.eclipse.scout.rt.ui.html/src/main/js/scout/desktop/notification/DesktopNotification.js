@@ -24,6 +24,7 @@ scout.DesktopNotification.prototype._init = function(model) {
  * @override Widget.hs
  */
 scout.DesktopNotification.prototype._renderProperties = function() {
+  scout.DesktopNotification.parent.prototype._renderProperties.call(this);
   this._renderMessage();
   this._renderClosable();
 };

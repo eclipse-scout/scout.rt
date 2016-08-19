@@ -188,18 +188,6 @@ scout.TableControl.prototype._configureTooltip = function() {
   return options;
 };
 
-scout.TableControl.prototype._goOffline = function() {
-  if (!this.isContentAvailable()) {
-    this._renderEnabled(false);
-  }
-};
-
-scout.TableControl.prototype._goOnline = function() {
-  if (!this.isContentAvailable() && this.enabled) {
-    this._renderEnabled(true);
-  }
-};
-
 scout.TableControl.prototype._onMouseDown = function() {
   this.toggle();
 };

@@ -32,7 +32,6 @@ scout.ModelAdapter = function() {
   this._remoteProperties = [];
   this._widgetListener;
 
-
   this._propertyChangeEventFilter = new scout.PropertyChangeEventFilter();
   this._widgetEventTypeFilter = new scout.WidgetEventTypeFilter();
   this.eventFilters = [this._propertyChangeEventFilter, this._widgetEventTypeFilter];
@@ -52,6 +51,14 @@ scout.ModelAdapter.prototype._init = function(model) {
   scout.objects.mandatoryParameter('session', model.session);
   $.extend(this, model);
   this.session.registerModelAdapter(this);
+};
+
+scout.ModelAdapter.prototype.destroy = function() {
+  this._detachWidget();
+  this.widget.destroy();
+  this.widget = null;
+  this.session.unregisterModelAdapter(this);
+  this.destroyed = true;
 };
 
 scout.ModelAdapter.prototype.createWidget = function(adapterData, parent) {
@@ -106,51 +113,7 @@ scout.ModelAdapter.prototype._detachWidget = function() {
   this._widgetListener = null;
 };
 
-/**
- * @returns Creates a scout.Event object from the current adapter instance and
- *   sends the event by using the Session#sendEvent() method.
- *
- * @param type of event
- * @param data of event
- * @param delay (optional) delay before event is sent. default 0
- * @param coalesceFunc (optional) coalesce function added to event-object
- */
-scout.ModelAdapter.prototype._send = function(type, data, delay, coalesceFunc) {
-  var event = new scout.Event(this.id, type, data);
-  if (coalesceFunc) {
-    event.coalesce = coalesceFunc;
-  }
-  this.session.sendEvent(event, delay);
-};
-
-/**
- * This method is used to directly send an event triggered by a Widget to the server.
- * Use this method in your _onWidgetEvent code when it makes no sense to implement an
- * own _sendXxx method.
- *
- * @param widgetEvent
- */
-scout.ModelAdapter.prototype._sendWidgetEvent = function(widgetEvent) {
-  this._send(widgetEvent.type, widgetEvent);
-};
-
-/**
- * Sends the current state of the given property to the server.
- */
-scout.ModelAdapter.prototype._sendProperty = function(propertyName) {
-  var data = {};
-  data[propertyName] = this.widget[propertyName];
-  this._send('property', data);
-};
-
-// FIXME CGU move to widget? maybe better to attach rendered listener and call setEnabled in goOffline case?
-scout.ModelAdapter.prototype.render = function($parent) {
-  scout.ModelAdapter.parent.prototype.render.call(this, $parent);
-  if (this.session.offline) {
-    this.goOffline();
-  }
-};
-
+// FIXME [6.1] cgu move to widget? still needed?
 scout.ModelAdapter.prototype._renderInternal = function($parent) {
   scout.ModelAdapter.parent.prototype._renderInternal.call(this, $parent);
   this._renderUniqueId();
@@ -165,196 +128,6 @@ scout.ModelAdapter.prototype._renderUniqueId = function(qualifier, $target) {
   if ($target && !$target.attr('id')) { // don't overwrite
     $target.attr('id', this.uniqueId(qualifier));
   }
-};
-
-/**
- * Adds property name(s) of model properties which must be converted automatically to a model adapter.
- *
- * @param properties String or String-array with property names.
- */
-scout.ModelAdapter.prototype._addAdapterProperties = function(properties) {
-  this._addProperties('_adapterProperties', properties);
-};
-
-scout.ModelAdapter.prototype._addRemoteProperties = function(properties) {
-  this._addProperties('_remoteProperties', properties);
-};
-
-scout.ModelAdapter.prototype._addProperties = function(propertyName, properties) {
-  if (Array.isArray(properties)) {
-    this[propertyName] = this[propertyName].concat(properties);
-  } else {
-    this[propertyName].push(properties);
-  }
-};
-
-/**
- * Removes  property name(s) of model properties which must be converted automatically to a model adapter.
- *
- * Only used for special cases (e.g. when a model adapter wraps another adapter).
- */
-scout.ModelAdapter.prototype._removeAdapterProperties = function(properties) {
-  if (Array.isArray(properties)) {
-    scout.arrays.removeAll(this._adapterProperties, properties);
-  } else {
-    scout.arrays.remove(this._adapterProperties, properties);
-  }
-};
-
-scout.ModelAdapter.prototype.destroy = function() {
-  this._detachWidget();
-  this.widget.destroy();
-  this.widget = null;
-  this.session.unregisterModelAdapter(this);
-  this.destroyed = true;
-};
-
-/**
- * Loops through all properties of the given model. Creates an ModelAdapter instance
- * for the given property when the propertyName is in the _adapterProperties array.
- */
-scout.ModelAdapter.prototype._eachProperty = function(model, func) {
-  var propertyName, value, i;
-
-  // Loop through primitive properties
-  for (propertyName in model) {
-    if (this._isAdapterProperty(propertyName)) {
-      continue; // will be handled below
-    }
-    value = model[propertyName];
-    func(propertyName, value);
-  }
-
-  //Loop through adapter properties (any order will do).
-  for (i = 0; i < this._adapterProperties.length; i++) {
-    propertyName = this._adapterProperties[i];
-    value = model[propertyName];
-    if (value === undefined) {
-      continue;
-    }
-
-    func(propertyName, value, true);
-  }
-};
-
-/**
- * If the value is an array: Loops through the array and calls func.
- * If the value is not an array: Calls the func.
- * @returns the processed adapters (either a list or a single adapter) returned by func.
- */
-scout.ModelAdapter.prototype._processAdapters = function(value, func) {
-  var adapters, adapter, i;
-  if (Array.isArray(value)) {
-    adapters = [];
-    for (i = 0; i < value.length; i++) {
-      adapter = func(value[i]);
-      adapters.push(adapter);
-    }
-    return adapters;
-  } else {
-    return func(value);
-  }
-};
-
-/**
- * Processes the JSON event from the server and calls the corresponding setter of the widget for each property.
- */
-scout.ModelAdapter.prototype.onModelPropertyChange = function(event) {
-  this._propertyChangeEventFilter.addFilterForProperties(event.properties);
-  this._syncPropertiesOnPropertyChange(event.properties);
-};
-
-scout.ModelAdapter.prototype.addFilterForWidgetEventType = function(eventType) {
-  this._widgetEventTypeFilter.addFilterForEventType(eventType);
-};
-
-scout.ModelAdapter.prototype._isPropertyChangeEventFiltered = function(propertyName, value) {
-  return this._propertyChangeEventFilter.filter(propertyName, value);
-};
-
-scout.ModelAdapter.prototype._isWidgetEventFiltered = function(event) {
-  return this._widgetEventTypeFilter.filter(event);
-};
-
-scout.ModelAdapter.prototype.resetEventFilters = function() {
-  this.eventFilters.forEach(function(filter) {
-    filter.reset();
-  });
-};
-
-/**
- * The default impl. only logs a warning that the event is not supported.
- */
-scout.ModelAdapter.prototype.onModelAction = function(event) {
-  $.log.warn('Model action "' + event.type + '" is not supported by model-adapter ' + this.objectType);
-};
-
-/**
- * Do not override this method. Widget event filtering is done here, before _onWidgetEvent is called.
- * @param event
- */
-scout.ModelAdapter.prototype._onWidgetEventInternal = function(event) {
-  if (!this._isWidgetEventFiltered(event)) {
-    this._onWidgetEvent(event);
-  }
-};
-
-scout.ModelAdapter.prototype._onWidgetEvent = function(event) {
-  if (event.type === 'destroy') {
-    this._onWidgetDestroy(event);
-  } else if (event.type === 'propertyChange') {
-    this._onWidgetPropertyChange(event);
-  } else {
-    // FIXME CGU [6.1] temporary, until model adapter separation - anmerkung von AWE: eigentlich ist das kein schlechter
-    // default. Häufig gibt es events vom Widget, die man 1:1 an den server leiten will, ohne eine eigene _sendXxx Methode
-    // zu implementieren. Siehe: _sendWidgetEvent
-    if (event.sendToServer) {
-      event = $.extend({}, event); // copy
-      delete event.source;
-      delete event.sendToServer;
-      this._send(event.type, event);
-    }
-  }
-};
-
-scout.ModelAdapter.prototype._onWidgetDestroy = function() {
-  this.destroy();
-};
-
-
-scout.ModelAdapter.prototype._onWidgetPropertyChange = function(event) {
-  event.changedProperties.forEach(function(propertyName) {
-    var value = event.newProperties[propertyName];
-
-    if (this._isPropertyChangeEventFiltered(propertyName, value)) {
-      return;
-    }
-
-    if (this._isRemoteProperty(propertyName)) {
-      if (value && this._isAdapterProperty(propertyName)) {
-        value = value.remoteAdapter;
-      }
-      this._callSendProperty(propertyName, value);
-    }
-  }, this);
-};
-
-scout.ModelAdapter.prototype._callSendProperty = function(propertyName, value) {
-  var sendFuncName = '_send' + scout.strings.toUpperCaseFirstLetter(propertyName);
-  if (this[sendFuncName]) {
-    this[sendFuncName](value);
-  } else {
-    this._sendProperty(propertyName, value);
-  }
-};
-
-scout.ModelAdapter.prototype._syncPropertiesOnPropertyChange = function(newProperties) {
-  this._eachProperty(newProperties, function(propertyName, value, isAdapterProp) {
-
-    // Call the setter of the widget
-    this.widget.callSetter(propertyName, value);
-
-  }.bind(this));
 };
 
 scout.ModelAdapter.prototype.goOffline = function() {
@@ -422,6 +195,177 @@ scout.ModelAdapter.prototype._isAdapterProperty = function(propertyName) {
 
 scout.ModelAdapter.prototype._isRemoteProperty = function(propertyName) {
   return this._remoteProperties.indexOf(propertyName) > -1;
+};
+
+/**
+ * Adds property name(s) of model properties which must be converted automatically to a model adapter.
+ *
+ * @param properties String or String-array with property names.
+ */
+scout.ModelAdapter.prototype._addAdapterProperties = function(properties) {
+  this._addProperties('_adapterProperties', properties);
+};
+
+scout.ModelAdapter.prototype._addRemoteProperties = function(properties) {
+  this._addProperties('_remoteProperties', properties);
+};
+
+scout.ModelAdapter.prototype._addProperties = function(propertyName, properties) {
+  if (Array.isArray(properties)) {
+    this[propertyName] = this[propertyName].concat(properties);
+  } else {
+    this[propertyName].push(properties);
+  }
+};
+
+/**
+ * Removes  property name(s) of model properties which must be converted automatically to a model adapter.
+ *
+ * Only used for special cases (e.g. when a model adapter wraps another adapter).
+ */
+scout.ModelAdapter.prototype._removeAdapterProperties = function(properties) {
+  if (Array.isArray(properties)) {
+    scout.arrays.removeAll(this._adapterProperties, properties);
+  } else {
+    scout.arrays.remove(this._adapterProperties, properties);
+  }
+};
+
+/**
+ * @returns Creates a scout.Event object from the current adapter instance and
+ *   sends the event by using the Session#sendEvent() method.
+ *
+ * @param type of event
+ * @param data of event
+ * @param delay (optional) delay before event is sent. default 0
+ * @param coalesceFunc (optional) coalesce function added to event-object
+ */
+scout.ModelAdapter.prototype._send = function(type, data, delay, coalesceFunc) {
+  var event = new scout.Event(this.id, type, data);
+  if (coalesceFunc) {
+    event.coalesce = coalesceFunc;
+  }
+  this.session.sendEvent(event, delay);
+};
+
+/**
+ * This method is used to directly send an event triggered by a Widget to the server.
+ * Use this method in your _onWidgetEvent code when it makes no sense to implement an
+ * own _sendXxx method.
+ *
+ * @param widgetEvent
+ */
+scout.ModelAdapter.prototype._sendWidgetEvent = function(widgetEvent) {
+  this._send(widgetEvent.type, widgetEvent);
+};
+
+/**
+ * Sends the current state of the given property to the server.
+ */
+scout.ModelAdapter.prototype._sendProperty = function(propertyName) {
+  var data = {};
+  data[propertyName] = this.widget[propertyName];
+  this._send('property', data);
+};
+
+scout.ModelAdapter.prototype.addFilterForWidgetEventType = function(eventType) {
+  this._widgetEventTypeFilter.addFilterForEventType(eventType);
+};
+
+scout.ModelAdapter.prototype._isPropertyChangeEventFiltered = function(propertyName, value) {
+  return this._propertyChangeEventFilter.filter(propertyName, value);
+};
+
+scout.ModelAdapter.prototype._isWidgetEventFiltered = function(event) {
+  return this._widgetEventTypeFilter.filter(event);
+};
+
+scout.ModelAdapter.prototype.resetEventFilters = function() {
+  this.eventFilters.forEach(function(filter) {
+    filter.reset();
+  });
+};
+
+scout.ModelAdapter.prototype._onWidgetPropertyChange = function(event) {
+  event.changedProperties.forEach(function(propertyName) {
+    var value = event.newProperties[propertyName];
+
+    if (this._isPropertyChangeEventFiltered(propertyName, value)) {
+      return;
+    }
+
+    if (this._isRemoteProperty(propertyName)) {
+      if (value && this._isAdapterProperty(propertyName)) {
+        value = value.remoteAdapter;
+      }
+      this._callSendProperty(propertyName, value);
+    }
+  }, this);
+};
+
+scout.ModelAdapter.prototype._callSendProperty = function(propertyName, value) {
+  var sendFuncName = '_send' + scout.strings.toUpperCaseFirstLetter(propertyName);
+  if (this[sendFuncName]) {
+    this[sendFuncName](value);
+  } else {
+    this._sendProperty(propertyName, value);
+  }
+};
+
+scout.ModelAdapter.prototype._onWidgetDestroy = function() {
+  this.destroy();
+};
+
+/**
+ * Do not override this method. Widget event filtering is done here, before _onWidgetEvent is called.
+ * @param event
+ */
+scout.ModelAdapter.prototype._onWidgetEventInternal = function(event) {
+  if (!this._isWidgetEventFiltered(event)) {
+    this._onWidgetEvent(event);
+  }
+};
+
+scout.ModelAdapter.prototype._onWidgetEvent = function(event) {
+  if (event.type === 'destroy') {
+    this._onWidgetDestroy(event);
+  } else if (event.type === 'propertyChange') {
+    this._onWidgetPropertyChange(event);
+  } else {
+    // FIXME CGU [6.1] temporary, until model adapter separation - anmerkung von AWE: eigentlich ist das kein schlechter
+    // default. Häufig gibt es events vom Widget, die man 1:1 an den server leiten will, ohne eine eigene _sendXxx Methode
+    // zu implementieren. Siehe: _sendWidgetEvent
+    if (event.sendToServer) {
+      event = $.extend({}, event); // copy
+      delete event.source;
+      delete event.sendToServer;
+      this._send(event.type, event);
+    }
+  }
+};
+
+scout.ModelAdapter.prototype._syncPropertiesOnPropertyChange = function(newProperties) {
+  for (var propertyName in newProperties) {
+    var value = newProperties[propertyName];
+
+    // Call the setter of the widget
+    this.widget.callSetter(propertyName, value);
+  }
+};
+
+/**
+ * Processes the JSON event from the server and calls the corresponding setter of the widget for each property.
+ */
+scout.ModelAdapter.prototype.onModelPropertyChange = function(event) {
+  this._propertyChangeEventFilter.addFilterForProperties(event.properties);
+  this._syncPropertiesOnPropertyChange(event.properties);
+};
+
+/**
+ * The default impl. only logs a warning that the event is not supported.
+ */
+scout.ModelAdapter.prototype.onModelAction = function(event) {
+  $.log.warn('Model action "' + event.type + '" is not supported by model-adapter ' + this.objectType);
 };
 
 scout.ModelAdapter.prototype.toString = function() {

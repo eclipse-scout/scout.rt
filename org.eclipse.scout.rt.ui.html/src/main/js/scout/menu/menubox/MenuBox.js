@@ -43,6 +43,7 @@ scout.MenuBox.prototype._render = function($parent) {
 };
 
 scout.MenuBox.prototype._renderProperties = function() {
+  scout.MenuBox.parent.prototype._renderProperties.call(this);
   this._renderMenus();
   this._renderCompact();
 };

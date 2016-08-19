@@ -193,6 +193,7 @@ scout.Calendar.prototype._render = function($parent) {
 };
 
 scout.Calendar.prototype._renderProperties = function() {
+  scout.Calendar.parent.prototype._renderProperties.call(this);
   this._renderComponents();
   this._renderSelectedComponent();
   this._renderLoadInProgress();

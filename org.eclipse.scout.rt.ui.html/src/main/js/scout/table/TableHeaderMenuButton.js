@@ -38,11 +38,9 @@ scout.TableHeaderMenuButton.prototype._render = function($parent) {
   if (this.cssClass) {
     this.$container.addClass(this.cssClass);
   }
-  this._renderVisible();
   this._renderSelected();
   this._renderTogglable();
   this._renderIcon();
-  this._renderEnabled();
 };
 
 scout.TableHeaderMenuButton.prototype._onClick = function() {
@@ -64,10 +62,6 @@ scout.TableHeaderMenuButton.prototype._onMouseOut = function() {
   this.parent.resetText();
 };
 
-scout.TableHeaderMenuButton.prototype._renderVisible = function() {
-  this.$container.setVisible(this.visible);
-};
-
 scout.TableHeaderMenuButton.prototype._renderSelected = function() {
   this.$container.select(this.selected);
 };
@@ -82,10 +76,6 @@ scout.TableHeaderMenuButton.prototype._renderIcon = function() {
   } else {
     this.$container.removeAttr('data-icon');
   }
-};
-
-scout.TableHeaderMenuButton.prototype.setVisible = function(visible) {
-  this.setProperty('visible', visible);
 };
 
 scout.TableHeaderMenuButton.prototype.setSelected = function(selected) {
@@ -104,6 +94,9 @@ scout.TableHeaderMenuButton.prototype._updateEnabled = function() {
   }
 };
 
+/**
+ * @override
+ */
 scout.TableHeaderMenuButton.prototype._renderEnabled = function() {
   this.$container.toggleClass('disabled', !this.enabled);
   this.$container.setTabbable(this.enabled && !scout.device.supportsTouch());

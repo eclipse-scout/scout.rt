@@ -508,7 +508,7 @@ scout.Desktop.prototype.revalidateHeaderLayout = function() {
   }
 };
 
-scout.Desktop.prototype._goOffline = function() {
+scout.Desktop.prototype.goOffline = function() {
   if (this.offline) {
     return;
   }
@@ -525,7 +525,7 @@ scout.Desktop.prototype._goOffline = function() {
   this._offlineNotification.show();
 };
 
-scout.Desktop.prototype._goOnline = function() {
+scout.Desktop.prototype.goOnline = function() {
   if (!this._hideOfflineMessagePending) {
     this.hideOfflineMessage();
   }

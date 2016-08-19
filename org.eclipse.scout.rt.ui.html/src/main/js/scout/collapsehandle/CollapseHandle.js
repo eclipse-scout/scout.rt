@@ -41,6 +41,7 @@ scout.CollapseHandle.prototype._remove = function() {
 };
 
 scout.CollapseHandle.prototype._renderProperties = function() {
+  scout.CollapseHandle.parent.prototype._renderProperties.call(this);
   this._renderLeftVisible();
   this._renderRightVisible();
 };

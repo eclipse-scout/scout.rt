@@ -286,7 +286,6 @@ scout.Table.prototype._renderProperties = function() {
   this._renderTableHeader();
   this._renderFooterVisible();
   this._renderMenus();
-  this._renderEnabled();
   this._renderDropType();
   this._renderCheckableStyle();
   this._renderLoading();
@@ -3176,6 +3175,9 @@ scout.Table.prototype._removeFooter = function() {
   this.footer.remove();
 };
 
+/**
+ * @override
+ */
 scout.Table.prototype._renderEnabled = function() {
   var enabled = this.enabled;
   this.$data.setEnabled(enabled);

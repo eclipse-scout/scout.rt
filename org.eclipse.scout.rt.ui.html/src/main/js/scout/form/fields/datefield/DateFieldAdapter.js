@@ -10,5 +10,6 @@
  ******************************************************************************/
 scout.DateFieldAdapter = function() {
   scout.DateFieldAdapter.parent.call(this);
+  this.enabledWhenOffline = true;
 };
 scout.inherits(scout.DateFieldAdapter, scout.ValueFieldAdapter);

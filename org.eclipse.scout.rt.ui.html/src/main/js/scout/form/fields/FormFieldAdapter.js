@@ -10,6 +10,28 @@
  ******************************************************************************/
 scout.FormFieldAdapter = function() {
   scout.FormFieldAdapter.parent.call(this);
+
+  /**
+   * Set this property to true when the form-field should stay enabled in offline case.
+   * By default the field will be disabled.
+   */
+  this.enabledWhenOffline = false;
+
   this._addAdapterProperties(['keyStrokes', 'menus']);
 };
 scout.inherits(scout.FormFieldAdapter, scout.ModelAdapter);
+
+scout.FormFieldAdapter.prototype._goOffline = function() {
+  if (this.enabledWhenOffline) {
+    return;
+  }
+  this._enabledBeforeOffline = this.widget.enabled;
+  this.widget.setEnabled(false);
+};
+
+scout.FormFieldAdapter.prototype._goOnline = function() {
+  if (this.enabledWhenOffline) {
+    return;
+  }
+  this.widget.setEnabled(this._enabledBeforeOffline);
+};

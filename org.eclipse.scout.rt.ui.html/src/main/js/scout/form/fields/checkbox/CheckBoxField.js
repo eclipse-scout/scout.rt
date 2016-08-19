@@ -80,7 +80,7 @@ scout.CheckBoxField.prototype.setValue = function(value) {
 /**
  * @override
  */
-scout.CheckBoxField.prototype._renderEnabled = function(enabled) {
+scout.CheckBoxField.prototype._renderEnabled = function() {
   scout.CheckBoxField.parent.prototype._renderEnabled.call(this);
   this.$checkBox
     .setTabbable(this.enabled && !scout.device.supportsTouch())

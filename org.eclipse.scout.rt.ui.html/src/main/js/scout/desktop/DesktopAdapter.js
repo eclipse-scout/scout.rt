@@ -15,6 +15,14 @@ scout.DesktopAdapter = function() {
 };
 scout.inherits(scout.DesktopAdapter, scout.ModelAdapter);
 
+scout.DesktopAdapter.prototype._goOffline = function() {
+  this.widget.goOffline();
+};
+
+scout.DesktopAdapter.prototype._goOnline = function() {
+  this.widget.goOnline();
+};
+
 scout.DesktopAdapter.prototype._onFormShow = function(event) {
   var form,
     displayParent = this.session.getModelAdapter(event.displayParent);
