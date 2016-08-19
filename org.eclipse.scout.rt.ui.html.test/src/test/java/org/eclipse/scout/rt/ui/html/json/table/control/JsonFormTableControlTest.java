@@ -24,8 +24,8 @@ import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.fixtures.UiSessionMock;
 import org.eclipse.scout.rt.ui.html.json.form.fixtures.FormWithOneField;
-import org.eclipse.scout.rt.ui.html.json.table.fixtures.Table;
 import org.eclipse.scout.rt.ui.html.json.table.fixtures.FormTableControl;
+import org.eclipse.scout.rt.ui.html.json.table.fixtures.Table;
 import org.eclipse.scout.rt.ui.html.json.testing.JsonTestUtility;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -149,7 +149,7 @@ public class JsonFormTableControlTest {
   public static JsonEvent createJsonSelectedEvent(String adapterId, boolean selected) throws JSONException {
     JSONObject data = new JSONObject();
     data.put("selected", selected);
-    return new JsonEvent(adapterId, "selected", data);
+    return new JsonEvent(adapterId, "property", data);
   }
 
 }
