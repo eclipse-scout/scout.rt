@@ -44,4 +44,31 @@ describe("TableFooterSpec", function() {
     });
 
   });
+
+  describe("controls", function() {
+
+    function createTableControl() {
+      var action = new scout.TableControl();
+      action.init(createSimpleModel('TableControl', session));
+      return action;
+    }
+
+    it("removes old and renders new controls on property change", function() {
+      var model = helper.createModelFixture(2);
+      model.tableStatusVisible = true;
+      var table = helper.createTable(model);
+      table.render(session.$entryPoint);
+
+      var controls = [createTableControl()];
+      table.setTableControls(controls);
+      expect(controls[0].rendered).toBe(true);
+
+      var newControls = [createTableControl(), createTableControl()];
+      table.setTableControls(newControls);
+      expect(controls[0].rendered).toBe(false);
+      expect(newControls[0].rendered).toBe(true);
+      expect(newControls[0].rendered).toBe(true);
+    });
+  });
+
 });

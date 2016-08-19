@@ -42,6 +42,7 @@ scout.Widget = function() {
   // If browser does not support css animation, remove will be executed immediately
   this.animateRemoval;
 
+  // FIXME [6.1] CGU, AWE durch propertyConfig ersetzen oder renamen auf widgetProperties
   this._adapterProperties = [];
   this._cloneProperties = ['parent', 'session']; // FIXME [awe, cgu] discuss: when not cloned automatically we need to pass 'parent' in clone method
   this._propertyConfig = {};
@@ -701,7 +702,7 @@ scout.Widget.prototype._setProperty = function(propertyName, newValue) {
  * Otherwise the following phases are executed:
  * <p>
  * 1. Preparation: If the property is a widget property, several actions are performed in _prepareWidgetProperty().
- * 2. DOM removal: If the widget is rendered and there is a custom remove function (e.g. _removeXY where XY is the property name), it will be called.
+ * 2. DOM removal: If the widget is rendered and there is a custom remove function (e.g. _removeXY where XY is the property name), it will be called. Otherwise the default remove function _removeProperty is called.
  * 3. Model update: If there is a custom sync function (e.g. _syncXY where XY is the property name), it will be called. Otherwise the default sync function _setProperty is called.
  * 4. DOM rendering: If the widget is rendered and there is a custom render function (e.g. _renderXY where XY is the property name), it will be called.
  */
@@ -710,26 +711,73 @@ scout.Widget.prototype.setProperty = function(name, value) {
     return;
   }
 
-  if (this._isAdapterProperty(name)) { // FIXME [6.1] CGU, AWE durch propertyConfig ersetzen
-    value = this._prepareWidgetProperty(name, value);
-  }
-
+  value = this._prepareProperty(name, value);
   if (this.rendered) {
-    var removeFuncName = '_remove' + scout.strings.toUpperCaseFirstLetter(name);
-    if (this[removeFuncName]) {
-      this[removeFuncName]();
-    }
+    this._callRemoveProperty(name);
   }
-
   this._callSetProperty(name, value);
-
   if (this.rendered) {
-    var renderFuncName = '_render' + scout.strings.toUpperCaseFirstLetter(name);
-    if (!this[renderFuncName]) { // FIXME [6.1] cgu remove this error and remove every empty render function
-      throw new Error('Render function ' + renderFuncName + ' does not exist in ' + this.toString());
-    }
-    this[renderFuncName]();
+    this._callRenderProperty(name);
   }
+};
+
+scout.Widget.prototype._prepareProperty = function(name, value) {
+  if (!this._isAdapterProperty(name)) {
+    return value;
+  }
+  return this._prepareWidgetProperty(name, value);
+};
+
+scout.Widget.prototype._prepareWidgetProperty = function(name, widgets) {
+  // Create new child widget(s)
+  widgets = this._ensureType(name, widgets);
+
+  var oldWidgets = this[name];
+  if (oldWidgets && Array.isArray(widgets)) {
+    // if new value is an array, old value has to be one as well
+    // copy to prevent modification of original
+    oldWidgets = oldWidgets.slice();
+
+    // only destroy those which are not in the new array
+    scout.arrays.removeAll(oldWidgets, widgets);
+  }
+
+  // Destroy old child widget(s)
+  this._destroyWidgets(oldWidgets);
+
+  // Link to new parent
+  this.link(widgets);
+
+  return widgets;
+};
+
+scout.Widget.prototype._callRemoveProperty = function(name) {
+  var removeFuncName = '_remove' + scout.strings.toUpperCaseFirstLetter(name);
+  if (this[removeFuncName]) {
+    this[removeFuncName]();
+  } else {
+    this._removeProperty(name);
+  }
+};
+
+/**
+ * Does nothing if the property is not a widget property.<p>
+ * If it is a widget property, it removes the existing widgets. Render has to be implemented by the widget itself.
+ */
+scout.Widget.prototype._removeProperty = function(name) {
+  var widgets = this[name];
+  if (!widgets) {
+    return;
+  }
+  if (!this._isAdapterProperty(name)) {
+    return;
+  }
+
+  // Remove existing widgets on property change. Render should be implemented by the widget itself
+  widgets = scout.arrays.ensure(widgets);
+  widgets.forEach(function(widget) {
+    widget.remove();
+  });
 };
 
 scout.Widget.prototype._callSetProperty = function(name, value) {
@@ -741,55 +789,40 @@ scout.Widget.prototype._callSetProperty = function(name, value) {
   }
 };
 
-scout.Widget.prototype._prepareWidgetProperty = function(name, value) {
-  // Create new child widget(s)
-  value = this._ensureType(name, value);
-
-  var oldValue = this[name];
-  if (oldValue && Array.isArray(value)) {
-    // if new value is an array, old value has to be one as well
-    // copy to prevent modification of original
-    oldValue = oldValue.slice();
-
-    // only destroy those which are not in the new array
-    scout.arrays.removeAll(oldValue, value);
+scout.Widget.prototype._callRenderProperty = function(name) {
+  var renderFuncName = '_render' + scout.strings.toUpperCaseFirstLetter(name);
+  if (!this[renderFuncName]) { // FIXME [6.1] cgu remove this error and remove every empty render function
+    throw new Error('Render function ' + renderFuncName + ' does not exist in ' + this.toString());
   }
-
-  // Destroy old child widget(s)
-  this._destroyOldValue(oldValue);
-
-  // Link to new parent
-  this.link(value);
-
-  return value;
+  this[renderFuncName]();
 };
 
 /**
- * @param value may be an object or array of objects
+ * @param widgets may be an object or array of objects
  */
-scout.Widget.prototype._destroyOldValue = function(value) {
-  if (value === null || value === undefined) {
+scout.Widget.prototype._destroyWidgets = function(widgets) {
+  if (!widgets) {
     return;
   }
 
-  value = scout.arrays.ensure(value);
-  value.forEach(function(elementValue, i) {
-    this._destroyChild(elementValue);
+  widgets = scout.arrays.ensure(widgets);
+  widgets.forEach(function(widget, i) {
+    this._destroyChild(widget);
   }, this);
 };
 
 /**
  * Sets this widget as parent of the given widget(s).
  *
- * @param value may be an object or array of objects
+ * @param widgets may be a widget or array of widgets
  */
-scout.Widget.prototype.link = function(value) {
-  if (value === null || value === undefined) {
+scout.Widget.prototype.link = function(widgets) {
+  if (!widgets) {
     return;
   }
 
-  value = scout.arrays.ensure(value);
-  value.forEach(function(child, i) {
+  widgets = scout.arrays.ensure(widgets);
+  widgets.forEach(function(child, i) {
     child.setParent(this);
   }, this);
 };
