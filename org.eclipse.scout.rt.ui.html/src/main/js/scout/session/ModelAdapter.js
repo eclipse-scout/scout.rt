@@ -31,6 +31,11 @@ scout.ModelAdapter = function() {
    */
   this._remoteProperties = [];
   this._widgetListener;
+
+
+  this._propertyChangeEventFilter = new scout.PropertyChangeEventFilter();
+  this._widgetEventTypeFilter = new scout.WidgetEventTypeFilter();
+  this.eventFilters = [this._propertyChangeEventFilter, this._widgetEventTypeFilter];
 };
 
 // FIXME CGU [6.1] ev. renamen to RemoteAdapter
@@ -88,7 +93,7 @@ scout.ModelAdapter.prototype._attachWidget = function() {
     return;
   }
   this._widgetListener = {
-    func: this._onWidgetEvent.bind(this)
+    func: this._onWidgetEventInternal.bind(this)
   };
   this.widget.events.addListener(this._widgetListener);
 };
@@ -255,7 +260,26 @@ scout.ModelAdapter.prototype._processAdapters = function(value, func) {
  * Processes the JSON event from the server and calls the corresponding setter of the widget for each property.
  */
 scout.ModelAdapter.prototype.onModelPropertyChange = function(event) {
+  this._propertyChangeEventFilter.addFilterForProperties(event.properties);
   this._syncPropertiesOnPropertyChange(event.properties);
+};
+
+scout.ModelAdapter.prototype.addFilterForWidgetEventType = function(eventType) {
+  this._widgetEventTypeFilter.addFilterForEventType(eventType);
+};
+
+scout.ModelAdapter.prototype._isPropertyChangeEventFiltered = function(propertyName, value) {
+  return this._propertyChangeEventFilter.filter(propertyName, value);
+};
+
+scout.ModelAdapter.prototype._isWidgetEventFiltered = function(event) {
+  return this._widgetEventTypeFilter.filter(event);
+};
+
+scout.ModelAdapter.prototype.resetEventFilters = function() {
+  this.eventFilters.forEach(function(filter) {
+    filter.reset();
+  });
 };
 
 /**
@@ -263,6 +287,16 @@ scout.ModelAdapter.prototype.onModelPropertyChange = function(event) {
  */
 scout.ModelAdapter.prototype.onModelAction = function(event) {
   $.log.warn('Model action "' + event.type + '" is not supported by model-adapter ' + this.objectType);
+};
+
+/**
+ * Do not override this method. Widget event filtering is done here, before _onWidgetEvent is called.
+ * @param event
+ */
+scout.ModelAdapter.prototype._onWidgetEventInternal = function(event) {
+  if (!this._isWidgetEventFiltered(event)) {
+    this._onWidgetEvent(event);
+  }
 };
 
 scout.ModelAdapter.prototype._onWidgetEvent = function(event) {
@@ -290,8 +324,13 @@ scout.ModelAdapter.prototype._onWidgetDestroy = function() {
 
 scout.ModelAdapter.prototype._onWidgetPropertyChange = function(event) {
   event.changedProperties.forEach(function(propertyName) {
+    var value = event.newProperties[propertyName];
+
+    if (this._isPropertyChangeEventFiltered(propertyName, value)) {
+      return;
+    }
+
     if (this._isRemoteProperty(propertyName)) {
-      var value = event.newProperties[propertyName];
       if (value && this._isAdapterProperty(propertyName)) {
         value = value.remoteAdapter;
       }

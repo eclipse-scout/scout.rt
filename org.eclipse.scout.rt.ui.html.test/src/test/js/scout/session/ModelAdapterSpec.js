@@ -297,6 +297,71 @@ describe('ModelAdapter', function() {
 
     });
 
+    describe('filters', function() {
+
+      var widget, adapter;
+
+      beforeEach(function() {
+        jasmine.Ajax.requests.reset();
+        widget = createWidget();
+        adapter = widget.remoteAdapter;
+        adapter._addRemoteProperties(['foo']);
+      });
+
+      describe('propertyChange events', function() {
+
+        it('should send event when property change is triggered by widget', function() {
+          widget.setProperty('foo', 'bar');
+          sendQueuedAjaxCalls();
+          expect(jasmine.Ajax.requests.count()).toBe(1);
+
+          var event = new scout.Event(widget.id, 'property', {
+            foo: 'bar'
+          });
+          expect(mostRecentJsonRequest()).toContainEvents(event);
+          expect(widget.foo).toBe('bar');
+        });
+
+        it('should not send event when property is triggered by server', function() {
+          var propertyChangeEvent = new scout.Event('123', 'propertyChange', {
+            properties: {foo: 'bar'}
+          });
+          adapter.onModelPropertyChange(propertyChangeEvent);
+          sendQueuedAjaxCalls();
+          expect(jasmine.Ajax.requests.count()).toBe(0);
+          expect(widget.foo).toBe('bar');
+        });
+
+      });
+
+      // FIXME [awe] 6.1 - make tests where property is an adapter
+      // FIXME [awe] 6.1 - check all occurrences of 'notifyServer' and use filter where applicable
+
+      describe('widget events', function() {
+
+        it('should handle widget event when it is not filtered', function() {
+          spyOn(adapter, '_onWidgetEvent');
+          widget.trigger('fooHappened');
+          expect(adapter._onWidgetEvent).toHaveBeenCalled();
+        });
+
+        it('should not handle widget event when it is filtered', function() {
+          adapter.addFilterForWidgetEventType('fooHappened');
+          spyOn(adapter, '_onWidgetEvent');
+          widget.trigger('fooHappened');
+          expect(adapter._onWidgetEvent).not.toHaveBeenCalled();
+
+          // reset filters, then onWidgetEvent should be called again
+          adapter.resetEventFilters();
+          widget.trigger('fooHappened');
+          expect(adapter._onWidgetEvent).toHaveBeenCalled();
+        });
+
+      });
+
+    });
+
+
     describe('adapters', function() {
 
       it('creates and registers adapters', function() {

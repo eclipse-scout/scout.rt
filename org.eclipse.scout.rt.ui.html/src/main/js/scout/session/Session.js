@@ -1096,6 +1096,7 @@ scout.Session.prototype._processEvents = function(events) {
     } else {
       adapter.onModelAction(event);
     }
+    adapter.resetEventFilters();
   }
   this.currentEvent = null;
 };
@@ -1110,6 +1111,9 @@ scout.Session.prototype.init = function() {
   this._sendStartupRequest();
 };
 
+// FIXME [awe] 6.1 : discuss with C.GU. Session requires same methods as ModelAdapter, but it is NOT a ModelAdapter currently
+// guess we need a SessionAdapter.js - I noticed this in a jasmine test where _processEvents is called an the adapter is the Session
+// (event.type=disposeAdapter), also see resetEventFilters method
 scout.Session.prototype.onModelAction = function(event) {
   if (event.type === 'localeChanged') {
     this._onLocaleChanged(event);
@@ -1122,6 +1126,10 @@ scout.Session.prototype.onModelAction = function(event) {
   } else {
     $.log.warn('Model action "' + event.type + '" is not supported by UI session');
   }
+};
+
+scout.Session.prototype.resetEventFilters = function() {
+  // NOP
 };
 
 scout.Session.prototype._onLocaleChanged = function(event) {

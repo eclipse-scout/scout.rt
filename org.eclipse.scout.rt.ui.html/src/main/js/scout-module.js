@@ -52,10 +52,12 @@
   __include("scout/session/BusyIndicator.js");
   __include("scout/session/Event.js");
   __include("scout/session/Locale.js");
+  __include("scout/session/PropertyChangeEventFilter.js");
   __include("scout/session/Reconnector.js");
   __include("scout/session/ResponseQueue.js");
   __include("scout/session/Session.js");
   __include("scout/session/UserAgent.js");
+  __include("scout/session/WidgetEventTypeFilter.js");
   // Basic layout
   __include("scout/layout/graphics.js");
   __include("scout/layout/AbstractLayout.js");

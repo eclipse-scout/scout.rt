@@ -154,6 +154,7 @@ scout.TreeAdapter.prototype._onAllChildNodesDeleted = function(parentNodeId) {
 };
 
 scout.TreeAdapter.prototype._onNodesSelected = function(nodeIds) {
+  this.addFilterForWidgetEventType('nodesSelected');
   var nodes = this.widget._nodesByIds(nodeIds);
   this.widget.selectNodes(nodes, false);
 };
