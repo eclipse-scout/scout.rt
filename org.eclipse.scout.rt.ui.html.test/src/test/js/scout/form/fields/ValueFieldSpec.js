@@ -48,10 +48,7 @@ describe("ValueField", function() {
       formField.render(session.$entryPoint);
       expect(formField.$status.isVisible()).toBe(true);
 
-      var event = createPropertyChangeEvent(formField, {
-        menusVisible: false
-      });
-      formField.onModelPropertyChange(event);
+      formField.setProperty('menusVisible', false);
       expect(formField.$status.isVisible()).toBe(false);
     });
 
@@ -89,7 +86,6 @@ describe("ValueField", function() {
       formField.render(session.$entryPoint);
 
       formField.$status.triggerContextMenu();
-      sendQueuedAjaxCalls();
 
       var $menu = $('body').find('.popup-body');
       expect($menu.find('.menu-item').length).toBe(1);
@@ -123,19 +119,14 @@ describe("ValueField", function() {
       formField.currentMenuTypes = ['NotNull'];
       formField.$status.triggerContextMenu();
 
-      // trigger acceptInput request (menu won't be shown before request is not finished)
-      jasmine.clock().tick(0);
-      sendQueuedAjaxCalls();
-      // Simulate request response was processed...
-      session._requestsPendingCounter--;
-      session._fireRequestFinished(mostRecentJsonRequest());
-
       $menu = $('body').find('.popup-body');
       expect($menu.find('.menu-item').length).toBe(1);
       expect($menu.find('.menu-item').eq(0).isVisible()).toBe(true);
     });
 
     it("context menu triggers a display text changed event", function() {
+      linkWidgetAndAdapter(formField, 'ValueFieldAdapter');
+
       var menuModel1 = menuHelper.createModel('menu'),
         menu1 = menuHelper.createMenu(menuModel1);
       menu1.menuTypes = ['ValueField.Null', 'ValueField.NotNull'];

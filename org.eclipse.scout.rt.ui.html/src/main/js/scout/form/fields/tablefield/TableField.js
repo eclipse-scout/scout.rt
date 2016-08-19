@@ -22,6 +22,10 @@ scout.TableField.prototype._render = function($parent) {
   this._renderTable();
 };
 
+scout.TableField.prototype.setTable = function(table) {
+  this.setProperty('table', table);
+};
+
 scout.TableField.prototype._renderTable = function() {
   if (this.table) {
     this.table.render(this.$container);
@@ -29,7 +33,9 @@ scout.TableField.prototype._renderTable = function() {
   }
 };
 
-scout.TableField.prototype._removeTable = function(oldTable) {
-  oldTable.remove();
+scout.TableField.prototype._removeTable = function() {
+  if (this.table) {
+    this.table.remove();
+  }
   this._removeField();
 };

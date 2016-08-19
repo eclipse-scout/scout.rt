@@ -129,12 +129,24 @@ public class JsonButton<BUTTON extends IButton> extends JsonFormField<BUTTON> im
     if (JsonEventType.CLICKED.matches(event)) {
       getModel().getUIFacade().fireButtonClickedFromUI();
     }
-    else if (JsonEventType.SELECTED.matches(event)) {
-      Boolean selected = event.getData().optBoolean("selected");
-      getModel().getUIFacade().setSelectedFromUI(selected);
-    }
     else {
       super.handleUiEvent(event);
+    }
+  }
+
+  protected void handleUiSelectedChange(JSONObject data) {
+    boolean selected = data.getBoolean(IButton.PROP_SELECTED);
+    addPropertyEventFilterCondition(IButton.PROP_SELECTED, selected);
+    getModel().getUIFacade().setSelectedFromUI(selected);
+  }
+
+  @Override
+  protected void handleUiPropertyChange(String propertyName, JSONObject data) {
+    if (IButton.PROP_SELECTED.equals(propertyName)) {
+      handleUiSelectedChange(data);
+    }
+    else {
+      super.handleUiPropertyChange(propertyName, data);
     }
   }
 }

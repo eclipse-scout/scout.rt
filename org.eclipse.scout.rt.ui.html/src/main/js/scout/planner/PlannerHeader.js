@@ -26,15 +26,10 @@ scout.PlannerHeader.prototype._render = function($parent) {
   this.$commands = this.$container.appendDiv('planner-commands');
   this._renderAvailableDisplayModes();
   this._renderDisplayMode();
-  this._renderVisible();
 };
 
 scout.PlannerHeader.prototype.setAvailableDisplayModes = function(displayModes) {
-  this.availableDisplayModes = displayModes;
-
-  if (this.rendered) {
-    this._renderAvailableDisplayModes();
-  }
+  this.setProperty('availableDisplayModes', displayModes);
 };
 
 scout.PlannerHeader.prototype._renderAvailableDisplayModes = function() {
@@ -81,28 +76,12 @@ scout.PlannerHeader.prototype._renderAvailableDisplayModes = function() {
 };
 
 scout.PlannerHeader.prototype.setDisplayMode = function(displayMode) {
-  this.displayMode = displayMode;
-
-  if (this.rendered) {
-    this._renderDisplayMode();
-  }
+  this.setProperty('displayMode', displayMode);
 };
 
 scout.PlannerHeader.prototype._renderDisplayMode = function() {
   $('.planner-mode', this.$commands).select(false);
   $('[data-mode="' + this.displayMode + '"]', this.$commands).select(true);
-};
-
-scout.PlannerHeader.prototype.setVisible = function(visible) {
-  this.visible = visible;
-
-  if (this.rendered) {
-    this._renderVisible();
-  }
-};
-
-scout.PlannerHeader.prototype._renderVisible = function() {
-  this.$container.setVisible(this.visible);
 };
 
 scout.PlannerHeader.prototype._onTodayClick = function(event) {

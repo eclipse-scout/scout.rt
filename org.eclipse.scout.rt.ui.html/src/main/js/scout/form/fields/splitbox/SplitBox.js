@@ -10,8 +10,11 @@
  ******************************************************************************/
 scout.SplitBox = function() {
   scout.SplitBox.parent.call(this);
-  this.splitHorizontal; // true = split x-axis, false = split y-axis
   this._addAdapterProperties(['firstField', 'secondField', 'collapsibleField']);
+
+  this.fieldCollapsed = false;
+  this.collapsibleField;
+  this.splitHorizontal; // true = split x-axis, false = split y-axis
   this._collapseKeyStroke;
 
   this._$splitArea;
@@ -206,7 +209,7 @@ scout.SplitBox.prototype._renderProperties = function() {
 };
 
 scout.SplitBox.prototype._syncSplitterPosition = function(splitterPosition) {
-  this.splitterPosition = splitterPosition;
+  this._setProperty('splitterPosition', splitterPosition);
   // If splitter position is explicitly set by an event, no recalculation is necessary
   this._oldSplitterPositionType = null;
 };
@@ -216,14 +219,12 @@ scout.SplitBox.prototype._renderSplitterPosition = function() {
 };
 
 scout.SplitBox.prototype._syncSplitterPositionType = function(splitterPositionType) {
-  if (this.splitterPositionType !== splitterPositionType) {
-    if (this.rendered && !this._oldSplitterPositionType) {
-      this._oldSplitterPositionType = this.splitterPositionType;
-      // We need to recalculate the splitter position. Because this requires the proper
-      // size of the split box, this can only be done in _renderSplitterPositionType().
-    }
-    this.splitterPositionType = splitterPositionType;
+  if (this.rendered && !this._oldSplitterPositionType) {
+    this._oldSplitterPositionType = this.splitterPositionType;
+    // We need to recalculate the splitter position. Because this requires the proper
+    // size of the split box, this can only be done in _renderSplitterPositionType().
   }
+  this._setProperty('splitterPositionType', splitterPositionType);
 };
 
 scout.SplitBox.prototype._renderSplitterPositionType = function() {
@@ -275,15 +276,8 @@ scout.SplitBox.prototype._renderSplitterEnabled = function() {
 };
 
 scout.SplitBox.prototype.setFieldCollapsed = function(collapsed) {
-  if (this.fieldCollapsed === collapsed) {
-    return;
-  }
-  this._setProperty('fieldCollapsed', collapsed);
-  this._sendProperty('fieldCollapsed');
+  this.setProperty('fieldCollapsed', collapsed);
   this._updateCollapseHandleButtons();
-  if (this.rendered) {
-    this._renderFieldCollapsed();
-  }
 };
 
 scout.SplitBox.prototype._renderFieldCollapsed = function() {
@@ -291,15 +285,8 @@ scout.SplitBox.prototype._renderFieldCollapsed = function() {
 };
 
 scout.SplitBox.prototype.setCollapsibleField = function(field) {
-  if (this.collapsibleField === field) {
-    return;
-  }
-  this._setProperty('collapsibleField', field);
-  this._sendProperty('collapsibleField');
+  this.setProperty('collapsibleField', field);
   this._updateCollapseHandle();
-  if (this.rendered) {
-    this._renderCollapsibleField();
-  }
 };
 
 scout.SplitBox.prototype._updateCollapseHandle = function() {
@@ -320,7 +307,7 @@ scout.SplitBox.prototype._updateCollapseHandle = function() {
     this._updateCollapseHandleButtons();
   } else {
      if (this._collapseHandle) {
-       this._collapseHandle.remove();
+       this._collapseHandle.destroy();
        this._collapseHandle = null;
      }
   }
@@ -365,7 +352,6 @@ scout.SplitBox.prototype._syncCollapseKeyStroke = function(keyStroke) {
       this.registerKeyStrokes(this.collapseKeyStroke);
     }
   }
-  return false;
 };
 
 scout.SplitBox.prototype._renderCollapseHandle = function() {

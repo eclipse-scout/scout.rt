@@ -12,15 +12,16 @@ scout.ViewButtonBox = function() {
   scout.ViewButtonBox.parent.call(this);
   this.viewMenuTab;
   this.viewTabs;
+  this.viewButtons = [];
   this._desktopOutlineChangedHandler = this._onDesktopOutlineChanged.bind(this);
   this._viewButtonPropertyChangeHandler = this._onViewButtonPropertyChange.bind(this);
+  this._addAdapterProperties(['viewButtons']);
 };
 scout.inherits(scout.ViewButtonBox, scout.Widget);
 
 scout.ViewButtonBox.prototype._init = function(model) {
   scout.ViewButtonBox.parent.prototype._init.call(this, model);
   this.desktop = this.session.desktop;
-  this.viewButtons = model.viewButtons || [];
 };
 
 scout.ViewButtonBox.prototype._render = function($parent) {
@@ -34,7 +35,6 @@ scout.ViewButtonBox.prototype._render = function($parent) {
 
   this.viewTabs = this._viewButtons('TAB');
   this.viewTabs.forEach(function(viewTab, i) {
-    viewTab.setParent(this);
     viewTab.render(this.$container);
     if (i === this.viewTabs.length - 1) {
       viewTab.last();

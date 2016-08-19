@@ -32,5 +32,5 @@ scout.TableInfoLoadTooltip.prototype._renderText = function() {
 
 scout.TableInfoLoadTooltip.prototype._onReloadClick = function() {
   this.tableFooter.table.reload();
-  this.remove();
+  this.destroy();
 };

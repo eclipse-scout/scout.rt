@@ -117,7 +117,7 @@ scout.SmartField.prototype._renderProperties = function() {
 
 scout.SmartField.prototype._syncDisplayText = function(displayText) {
   this._oldDisplayText = displayText;
-  this.displayText = displayText;
+  this._setProperty('displayText', displayText);
 };
 
 /**
@@ -150,7 +150,7 @@ scout.SmartField.prototype._syncProposalChooser = function(proposalChooser) {
     // Prevent rendering as well, original smart field will render it into the popup
     return false;
   }
-  this.proposalChooser = proposalChooser;
+  this._setProperty('proposalChooser', proposalChooser);
 };
 
 /**
@@ -162,7 +162,7 @@ scout.SmartField.prototype._renderProposalChooser = function() {
     return;
   }
   this.openPopup();
-  this.popup._renderProposalChooser(this.proposalChooser);
+  this.popup.setProposalChooser(this.proposalChooser);
 };
 
 /**
@@ -323,10 +323,8 @@ scout.SmartField.prototype._proposalTyped = function() {
 
   func = function() {
     $.log.debug('(SmartField#_proposalTyped) send displayText=' + displayText);
-    this._send('proposalTyped', {
+    this.trigger('proposalTyped', {
       displayText: displayText
-    }, {
-      showBusyIndicator: false
     });
   }.bind(this);
   id = setTimeout(func, this.DEBOUNCE_DELAY);
@@ -445,7 +443,7 @@ scout.SmartField.prototype._triggerDeleteProposal = function(displayText) {
 
 scout.SmartField.prototype._sendDeleteProposal = function(displayText) {
   this._syncDisplayText(displayText);
-  this._send('deleteProposal');
+  this._send('deleteProposal'); // FIXME [6.1] cgu move to adapter
 };
 
 scout.SmartField.prototype._triggerAcceptProposal = function(displayText) {
@@ -456,7 +454,7 @@ scout.SmartField.prototype._triggerAcceptProposal = function(displayText) {
 
 scout.SmartField.prototype._sendAcceptProposal = function(displayText, chooser, forceClose) {
   this._syncDisplayText(displayText);
-  this._send('acceptProposal', {
+  this._send('acceptProposal', {// FIXME [6.1] cgu move to adapter
     displayText: displayText,
     chooser: chooser,
     forceClose: forceClose

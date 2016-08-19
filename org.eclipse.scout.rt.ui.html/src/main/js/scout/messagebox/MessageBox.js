@@ -21,7 +21,7 @@ scout.MessageBox = function() {
   this._$closeButton;
   this.focusListener;
 };
-scout.inherits(scout.MessageBox, scout.ModelAdapter);
+scout.inherits(scout.MessageBox, scout.Widget);
 
 // represents severity codes from IStatus
 scout.MessageBox.SEVERITY = {

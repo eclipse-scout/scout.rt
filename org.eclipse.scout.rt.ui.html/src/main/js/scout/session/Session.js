@@ -56,8 +56,12 @@ scout.Session = function($entryPoint, options) {
   this.userAgent = options.userAgent || new scout.UserAgent(scout.device.type, scout.device.supportsTouch());
   this.suppressErrors = scout.nvl(options.suppressErrors, false);
   this.modelAdapterRegistry = {};
-  this._clonedModelAdapterRegistry = {}; // key = adapter-ID, value = array of clones for that adapter
-  this.locale;
+  this.locale = options.locale;
+  if (this.locale) {
+    this._texts = scout.texts.get(this.locale.languageTag);
+  } else {
+    this._texts = new scout.TextMap();
+  }
   this.ajaxRequests = [];
   this._asyncEvents = [];
   this.responseQueue = new scout.ResponseQueue(this);
@@ -71,7 +75,6 @@ scout.Session = function($entryPoint, options) {
   this.desktop;
   this.url = 'json';
   this._adapterDataCache = {};
-  this._texts = new scout.Texts();
   this._requestsPendingCounter = 0;
   this._busyCounter = 0; // >0 = busy
   this.layoutValidator = new scout.LayoutValidator();
@@ -80,16 +83,23 @@ scout.Session = function($entryPoint, options) {
   this._fatalMessagesOnScreen = {};
   this._loggedOut = false;
 
+  // FIXME CGU [6.1] flag necessary for modeladapter, remove it
+  this.remote = options.remote;
+
+  // FIXME [awe] 6.1 - rename in RootAdapter, should also have a widget, see FIXME in Session#_processEvents
   this.rootAdapter = new scout.ModelAdapter();
   this.rootAdapter.init({
-    parent: new scout.NullWidget(),
     session: this,
     id: '1',
     objectType: 'GlobalAdapter'
   });
+  this.rootAdapter.createWidget({
+    session: this,
+    id: '1',
+    objectType: 'NullWidget'
+  }, new scout.NullWidget());
 
   // Install focus management for this session.
-
   this.focusManager = new scout.FocusManager({
     session: this,
     active: options.focusManagerActive
@@ -105,9 +115,6 @@ scout.Session.prototype._throwError = function(message) {
 
 scout.Session.prototype.unregisterModelAdapter = function(modelAdapter) {
   delete this.modelAdapterRegistry[modelAdapter.id];
-  if (this.hasClones(modelAdapter)) {
-    this.unregisterAllAdapterClones(modelAdapter);
-  }
 };
 
 scout.Session.prototype.registerModelAdapter = function(modelAdapter) {
@@ -121,71 +128,46 @@ scout.Session.prototype.getModelAdapter = function(id) {
   return this.modelAdapterRegistry[id];
 };
 
-/**
- * Creates a new adapter for the given ID or returns an existing instance.
- * When a new adapter is created it will be automatically registered in the
- * model-adpater registry.
- */
-scout.Session.prototype.getOrCreateModelAdapter = function(id, parent) {
-  $.log.trace('getOrCreate(' + id + (parent ? ', ' + parent : '') + ')');
-  if (!id) {
-    return;
+scout.Session.prototype.getOrCreateWidget = function(adapterId, parent) {
+  if (!adapterId) {
+    return null;
   }
-  if (typeof id !== 'string') {
-    throw new Error('typeof id must be string');
+  if (typeof adapterId !== 'string') {
+    throw new Error('typeof adapterId must be string');
   }
-
-  var adapter = this.modelAdapterRegistry[id];
+  var adapter = this.getModelAdapter(adapterId);
   if (adapter) {
-    $.log.trace('model adapter already exists: ' + adapter + ' --> owner = ' + adapter.owner + ', parent = ' + adapter.parent + ', new parent = ' + parent);
-    if (!adapter.rendered) {
-      // Re-link
-      $.log.trace('unlink ' + adapter + ' from ' + adapter.parent + ' and link to new parent ' + parent);
-      adapter.setParent(parent);
-    } else {
-      $.log.trace('adapter ' + adapter + ' is already rendered. keeping link to parent ' + adapter.parent);
-    }
-    return adapter;
+    var widget = adapter.widget;
+    widget.setParent(parent);
+    return widget;
   }
-
-  var adapterData = this._getAdapterData(id);
+  var adapterData = this._getAdapterData(adapterId);
   if (!adapterData) {
-    throw new Error('no adapterData found for id=' + id);
+    throw new Error('no adapterData found for adapterId=' + adapterId);
   }
-
-  var owner;
-  if (adapterData.owner !== undefined) {
-    // Prefer the owner sent by the server
-    owner = this.getModelAdapter(adapterData.owner);
-    parent = parent || owner; // convenience when 'parent' was not set, e.g. in tests
-  } else {
-    if (!parent) {
-      throw new Error('parent must be defined');
-    }
-    owner = parent;
-  }
-
-  // override previously set owner/parent for adapter-data so
-  // we can access them in ModelAdapter#init()
-  adapterData.owner = owner;
-  adapterData.parent = parent;
-  adapterData._register = true;
-  adapter = scout.create(adapterData);
-  $.log.trace('created new adapter ' + adapter + '. owner=' + owner + ' parent=' + parent);
-
-  owner.addOwnedAdapter(adapter);
-  return adapter;
+  adapter = this.createModelAdapter(adapterData);
+  return adapter.createWidget(adapterData, parent);
 };
 
-scout.Session.prototype.getOrCreateModelAdapters = function(ids, parent) {
-  if (!ids) {
-    return [];
+scout.Session.prototype.createModelAdapter = function(adapterData) {
+  var objectType = adapterData.objectType;
+  var objectTypeParts = objectType.split('.');
+  if (objectTypeParts.length === 2) {
+    objectType = objectTypeParts[0] + 'Adapter.' + objectTypeParts[1];
+    // If no adapter exists for the given variant then create an adapter without variant.
+    // Mostly variant is only essential for the widget, not the adapter
+    adapterData.variantLenient = true;
+  } else {
+    objectType = objectType + 'Adapter';
   }
-  var adapters = [];
-  for (var i = 0; i < ids.length; i++) {
-    adapters[i] = this.getOrCreateModelAdapter(ids[i], parent);
-  }
-  return adapters;
+  var adapterModel = {
+    id: adapterData.id,
+    session: this,
+    variantLenient: adapterData.variantLenient
+  };
+  var adapter = scout.create(objectType, adapterModel);
+  $.log.trace('created new adapter ' + adapter);
+  return adapter;
 };
 
 /**
@@ -303,8 +285,7 @@ scout.Session.prototype._processStartupResponse = function(data) {
   this._putLocaleData(data.startupData.locale, data.startupData.textMap);
   // Extract client session data without creating a model adapter for it. It is (currently) only used to transport the desktop's adapterId.
   var clientSessionData = this._getAdapterData(data.startupData.clientSession);
-  this.desktop = this.getOrCreateModelAdapter(clientSessionData.desktop, this.rootAdapter);
-
+  this.desktop = this.getOrCreateWidget(clientSessionData.desktop, this.rootAdapter.widget);
   var renderDesktopImpl = function() {
     this._renderDesktop();
 
@@ -333,11 +314,15 @@ scout.Session.prototype._processStartupResponse = function(data) {
     }
   }.bind(this);
 
+  this.render(renderDesktopImpl);
+};
+
+scout.Session.prototype.render = function(renderFunc) {
   // Render desktop after fonts have been preloaded (this fixes initial layouting issues when font icons are not yet ready)
   if (scout.fonts.loadingComplete) {
-    renderDesktopImpl();
+    renderFunc();
   } else {
-    scout.fonts.preloader().then(renderDesktopImpl());
+    scout.fonts.preloader().then(renderFunc);
   }
 };
 
@@ -848,20 +833,18 @@ scout.Session.prototype.showFatalMessage = function(options, errorCode) {
     messageBox = scout.create('MessageBox', model),
     $entryPoint = options.entryPoint || this.$entryPoint;
 
-  messageBox.remoteHandler = function(event) {
-    if ('action' === event.type) {
-      delete this._fatalMessagesOnScreen[errorCode];
-      messageBox.remove();
-      var option = event.option;
-      if (option === 'yes' && options.yesButtonAction) {
-        options.yesButtonAction.apply(this);
-      } else if (option === 'no' && options.noButtonAction) {
-        options.noButtonAction.apply(this);
-      } else if (option === 'cancel' && options.cancelButtonAction) {
-        options.cancelButtonAction.apply(this);
-      }
+  messageBox.on('action', function(event) {
+    delete this._fatalMessagesOnScreen[errorCode];
+    messageBox.destroy();
+    var option = event.option;
+    if (option === 'yes' && options.yesButtonAction) {
+      options.yesButtonAction.apply(this);
+    } else if (option === 'no' && options.noButtonAction) {
+      options.noButtonAction.apply(this);
+    } else if (option === 'cancel' && options.cancelButtonAction) {
+      options.cancelButtonAction.apply(this);
     }
-  }.bind(this);
+  }.bind(this));
   messageBox.render($entryPoint);
 };
 
@@ -1050,7 +1033,7 @@ scout.Session.prototype._removeBusy = function() {
 
   // Remove busy indicator (if it was already created)
   if (this._busyIndicator) {
-    this._busyIndicator.remove();
+    this._busyIndicator.destroy();
     this._busyIndicator = null;
   }
 };
@@ -1127,7 +1110,7 @@ scout.Session.prototype._setApplicationLoading = function(applicationLoading) {
 };
 
 scout.Session.prototype._processEvents = function(events) {
-  var i, j, event, adapter, adapterClones, eventTargets;
+  var i, j, event, adapter, eventTargets;
   for (i = 0; i < events.length; i++) {
     event = events[i];
     this.currentEvent = event;
@@ -1135,24 +1118,14 @@ scout.Session.prototype._processEvents = function(events) {
     $.log.debug("Processing event '" + event.type + "' for adapter with ID " + event.target);
     adapter = this.getModelAdapter(event.target);
     if (!adapter) {
-      // FIXME bsh, cgu: Check if this should only be getModelAdapter()
-      // See commit by CGU 2014-08-15 18:20:43 ("HtmlUi: Fixed 'No adapter' bug")
-      // --> This re-links the parent adapter to the root adapter!!!
-      adapter = this.getOrCreateModelAdapter(event.target, this.rootAdapter);
-    }
-    if (!adapter) {
       throw new Error('No adapter registered for ID ' + event.target);
     }
-    eventTargets = [adapter];
-    scout.arrays.pushAll(eventTargets, this.getAdapterClones(adapter));
-    for (j = 0; j < eventTargets.length; j++) {
-      var target = eventTargets[j];
-      if (event.type === 'property') { // Special handling for 'property' type
-        target.onModelPropertyChange(event);
-      } else {
-        target.onModelAction(event);
-      }
+    if (event.type === 'property') { // Special handling for 'property' type
+      adapter.onModelPropertyChange(event);
+    } else {
+      adapter.onModelAction(event);
     }
+    adapter.resetEventFilters();
   }
   this.currentEvent = null;
 };
@@ -1167,6 +1140,9 @@ scout.Session.prototype.init = function() {
   this._sendStartupRequest();
 };
 
+// FIXME [awe] 6.1 : discuss with C.GU. Session requires same methods as ModelAdapter, but it is NOT a ModelAdapter currently
+// guess we need a SessionAdapter.js - I noticed this in a jasmine test where _processEvents is called an the adapter is the Session
+// (event.type=disposeAdapter), also see resetEventFilters method
 scout.Session.prototype.onModelAction = function(event) {
   if (event.type === 'localeChanged') {
     this._onLocaleChanged(event);
@@ -1181,13 +1157,17 @@ scout.Session.prototype.onModelAction = function(event) {
   }
 };
 
+scout.Session.prototype.resetEventFilters = function() {
+  // NOP
+};
+
 scout.Session.prototype._onLocaleChanged = function(event) {
   this._putLocaleData(event.locale, event.textMap);
 };
 
 scout.Session.prototype._putLocaleData = function(locale, textMap) {
   this.locale = new scout.Locale(locale);
-  this._texts = new scout.Texts(textMap);
+  this._texts = new scout.TextMap(textMap);
   // FIXME bsh: inform components to reformat display text? also check Collator in scout.comparators.TEXT
 };
 
@@ -1280,55 +1260,13 @@ scout.Session.prototype.getAdapterData = function(id) {
 };
 
 scout.Session.prototype.text = function(textKey) {
-  return scout.Texts.prototype.get.apply(this._texts, arguments);
+  return scout.TextMap.prototype.get.apply(this._texts, arguments);
 };
 
 scout.Session.prototype.optText = function(textKey, defaultValue) {
-  return scout.Texts.prototype.optGet.apply(this._texts, arguments);
+  return scout.TextMap.prototype.optGet.apply(this._texts, arguments);
 };
 
 scout.Session.prototype.textExists = function(textKey) {
   return this._texts.exists(textKey);
-};
-
-scout.Session.prototype.registerAdapterClone = function(adapter, clone) {
-  clone.cloneOf = adapter;
-  var entry = this._clonedModelAdapterRegistry[adapter.id];
-  if (entry) {
-    entry.push(clone);
-  } else {
-    this._clonedModelAdapterRegistry[adapter.id] = [clone];
-  }
-};
-
-scout.Session.prototype.getAdapterClones = function(adapter) {
-  var entry = this._clonedModelAdapterRegistry[adapter.id];
-  return scout.arrays.ensure(entry);
-};
-
-scout.Session.prototype.hasClones = function(adapter) {
-  return this.getAdapterClones(adapter).length > 0;
-};
-
-scout.Session.prototype.unregisterAllAdapterClones = function(adapter) {
-  var entry = this._clonedModelAdapterRegistry[adapter.id];
-  if (entry === undefined) {
-    throw new Error('No clones registered for the given adapter');
-  }
-  delete this._clonedModelAdapterRegistry[adapter.id];
-};
-
-scout.Session.prototype.unregisterAdapterClone = function(clone) {
-  if (clone.cloneOf === undefined) {
-    throw new Error('Tried to unregister a clone but the property cloneOf is not set');
-  }
-  var entry = this._clonedModelAdapterRegistry[clone.cloneOf.id];
-  if (!entry) {
-    throw new Error('No clones registered for adapter');
-  }
-  var i = entry.indexOf(clone);
-  if (i === -1) {
-    throw new Error('Adapter found, but clone is not registered');
-  }
-  entry.splice(i, 1);
 };

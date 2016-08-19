@@ -46,7 +46,7 @@ scout.CheckBoxField.prototype._render = function($parent) {
   this.addStatus();
 };
 
-scout.CheckBoxField.prototype._remove = function($parent) {
+scout.CheckBoxField.prototype._remove = function() {
   scout.tooltips.uninstall(this.$checkBoxLabel);
   scout.CheckBoxField.parent.prototype._remove.call(this);
 };
@@ -74,20 +74,13 @@ scout.CheckBoxField.prototype.toggleChecked = function() {
 };
 
 scout.CheckBoxField.prototype.setValue = function(value) {
-  if (this.value === value) {
-    return;
-  }
-  this._setProperty('value', value);
-  this._sendProperty('value');
-  if (this.rendered) {
-    this._renderValue();
-  }
+  this.setProperty('value', value);
 };
 
 /**
  * @override
  */
-scout.CheckBoxField.prototype._renderEnabled = function(enabled) {
+scout.CheckBoxField.prototype._renderEnabled = function() {
   scout.CheckBoxField.parent.prototype._renderEnabled.call(this);
   this.$checkBox
     .setTabbable(this.enabled && !scout.device.supportsTouch())

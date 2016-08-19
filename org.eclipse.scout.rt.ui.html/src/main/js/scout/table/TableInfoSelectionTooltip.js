@@ -36,10 +36,10 @@ scout.TableInfoSelectionTooltip.prototype._renderText = function() {
 
 scout.TableInfoSelectionTooltip.prototype._onSelectNoneClick = function() {
   this.tableFooter.table.deselectAll();
-  this.remove();
+  this.destroy();
 };
 
 scout.TableInfoSelectionTooltip.prototype._onSelectAllClick = function() {
   this.tableFooter.table.selectAll();
-  this.remove();
+  this.destroy();
 };

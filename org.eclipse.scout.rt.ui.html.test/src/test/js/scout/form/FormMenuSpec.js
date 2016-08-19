@@ -8,7 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-describe("FormMenu", function() {
+/* global linkWidgetAndAdapter */
+describe('FormMenu', function() {
   var session, desktop, helper;
 
   beforeEach(function() {
@@ -18,13 +19,10 @@ describe("FormMenu", function() {
     desktop = session.desktop;
   });
 
-  function createMenu(model) {
-    model.form = helper.createFormWithOneField();
-    model.desktop = desktop;
-
-    var menu = new scout.FormMenu();
-    menu.init(model);
-    menu.position = function() {};
+  function createMenu(modelProperties) {
+    var menu = helper.createField('FormMenu', desktop, modelProperties);
+    menu.form = helper.createFormWithOneField();
+    menu.desktop = desktop;
     return menu;
   }
 
@@ -32,10 +30,10 @@ describe("FormMenu", function() {
     return $('.popup');
   }
 
-  describe("setSelected", function() {
+  describe('setSelected', function() {
 
-    it("opens and closes the form popup", function() {
-      var menu = createMenu(createSimpleModel('FormMenu', session));
+    it('opens and closes the form popup', function() {
+      var menu = createMenu();
       menu.render(session.$entryPoint);
       expect(findPopup()).not.toExist();
 
@@ -46,14 +44,14 @@ describe("FormMenu", function() {
       expect(findPopup()).not.toExist();
     });
 
-    it("opens the popup and the ellipsis if the menu is overflown", function() {
+    it('opens the popup and the ellipsis if the menu is overflown', function() {
       var ellipsisMenu = scout.menus.createEllipsisMenu({
         parent: new scout.NullWidget(),
         session: session
       });
       ellipsisMenu.render(session.$entryPoint);
 
-      var menu = createMenu(createSimpleModel('FormMenu', session));
+      var menu = createMenu();
       menu.render(session.$entryPoint);
 
       scout.menus.moveMenuIntoEllipsis(menu, ellipsisMenu);
@@ -70,16 +68,14 @@ describe("FormMenu", function() {
       ellipsisMenu.setSelected(false);
     });
 
-    it("opens the popup but not the ellipsis if the menu is overflown and mobile popup style is used", function() {
+    it('opens the popup but not the ellipsis if the menu is overflown and mobile popup style is used', function() {
       var ellipsisMenu = scout.menus.createEllipsisMenu({
         parent: new scout.NullWidget(),
         session: session
       });
       ellipsisMenu.render(session.$entryPoint);
 
-      var model = createSimpleModel('FormMenu', session);
-      model.popupStyle = scout.FormMenu.PopupStyle.MOBILE;
-      var menu = createMenu(model);
+      var menu = createMenu({popupStyle: scout.FormMenu.PopupStyle.MOBILE});
       menu.render(session.$entryPoint);
 
       scout.menus.moveMenuIntoEllipsis(menu, ellipsisMenu);
@@ -97,21 +93,22 @@ describe("FormMenu", function() {
 
   });
 
-  describe("onModelPropertyChange", function() {
+  describe('onModelPropertyChange', function() {
 
-    describe("selected", function() {
+    describe('selected', function() {
 
-      it("calls setSelected", function() {
-        var menu = createMenu(createSimpleModel('FormMenu', session));
+      it('calls setSelected', function() {
+        var menu = createMenu();
+        linkWidgetAndAdapter(menu, 'MenuAdapter');
         menu.render(session.$entryPoint);
         expect(findPopup()).not.toExist();
 
         spyOn(menu, 'setSelected');
 
         var event = createPropertyChangeEvent(menu, {
-          "selected": true
+          'selected': true
         });
-        menu.onModelPropertyChange(event);
+        menu.remoteAdapter.onModelPropertyChange(event);
         expect(menu.setSelected).toHaveBeenCalled();
       });
 

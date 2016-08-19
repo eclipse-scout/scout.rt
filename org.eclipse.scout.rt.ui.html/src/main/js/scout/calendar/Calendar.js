@@ -41,7 +41,7 @@ scout.Calendar = function() {
 
   this._addAdapterProperties(['components', 'menus', 'selectedComponent']);
 };
-scout.inherits(scout.Calendar, scout.ModelAdapter);
+scout.inherits(scout.Calendar, scout.Widget);
 
 scout.Calendar.prototype.init = function(model, session, register) {
   scout.Calendar.parent.prototype.init.call(this, model, session, register);
@@ -105,23 +105,23 @@ scout.Calendar.prototype._init = function(model) {
 };
 
 scout.Calendar.prototype._syncSelectedDate = function(dateString) {
-  this.selectedDate = scout.dates.parseJsonDate(dateString);
+  this._setProperty('selectedDate', scout.dates.parseJsonDate(dateString)); // FIXME [6.1] cgu ensure type
   this._yearPanel.selectDate(this.selectedDate);
 };
 
 scout.Calendar.prototype._syncDisplayMode = function(displayMode) {
-  this.displayMode = displayMode;
+  this._setProperty('displayMode', displayMode);
   this._yearPanel.setDisplayMode(this.displayMode);
 };
 
 scout.Calendar.prototype._syncViewRange = function(viewRange) {
-  this.viewRange = new scout.DateRange(
+  this._setProperty('viewRange', new scout.DateRange(// FIXME [6.1] cgu ensure type
     scout.dates.parseJsonDate(viewRange.from),
-    scout.dates.parseJsonDate(viewRange.to));
+    scout.dates.parseJsonDate(viewRange.to)));
 };
 
-scout.Calendar.prototype._syncMenus = function(menus, oldMenus) {
-  this.menus = menus;
+scout.Calendar.prototype._syncMenus = function(menus) {
+  this._setProperty('menus', menus);
   // FIXME awe: (calendar) here we should update the menu-bar (see Table.js)
   $.log.debug('(Calendar#_syncMenus) impl.');
 };
@@ -193,6 +193,7 @@ scout.Calendar.prototype._render = function($parent) {
 };
 
 scout.Calendar.prototype._renderProperties = function() {
+  scout.Calendar.parent.prototype._renderProperties.call(this);
   this._renderComponents();
   this._renderSelectedComponent();
   this._renderLoadInProgress();

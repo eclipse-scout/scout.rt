@@ -57,13 +57,9 @@
     },
     "Menu": {
       "defaultMenu": false,
-      "systemType": 0,
       "separator": false,
       "childActions": [],
       "menuTypes": ["Table.EmptySpace"]
-    },
-    "TableOrganizeMenu": {
-      "menuTypes": [ "Table.Header" ]
     },
     "Button": {
       "systemType": 0,
@@ -131,6 +127,7 @@
       "autoResizeColumns": false,
       "checkable": false,
       "enabled": true,
+      "headerEnabled": true,
       "headerVisible": true,
       "keyStrokes": [],
       "keyboardNavigation": true,
@@ -146,7 +143,11 @@
       "tableStatusVisible": false
     },
     "Desktop": {
-      "desktopStyle": "DEFAULT",
+      "desktopStyle": "default",
+      "benchVisible": true,
+      "headerVisible": true,
+      "navigationVisible": true,
+      "navigationHandleVisible": true,
       "menus": [],
       "addOns": [],
       "dialogs": [],
@@ -156,7 +157,6 @@
       "fileChoosers": []
     },
     "Outline": {
-      "displayStyle": "default",
       "autoToggleBreadcrumbStyle": true,
       "navigateButtonsVisible": true,
       "dialogs": [],
@@ -179,6 +179,7 @@
       "cacheBounds": false
     },
     "Tree": {
+      "displayStyle": "default",
       "autoCheckChildren": false,
       "checkable": false,
       "enabled": true,

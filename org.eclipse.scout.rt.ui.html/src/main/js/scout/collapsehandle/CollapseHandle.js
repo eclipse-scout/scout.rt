@@ -41,6 +41,7 @@ scout.CollapseHandle.prototype._remove = function() {
 };
 
 scout.CollapseHandle.prototype._renderProperties = function() {
+  scout.CollapseHandle.parent.prototype._renderProperties.call(this);
   this._renderLeftVisible();
   this._renderRightVisible();
 };
@@ -64,23 +65,11 @@ scout.CollapseHandle.prototype._updateVisibilityClasses = function() {
 };
 
 scout.CollapseHandle.prototype.setLeftVisible = function(visible) {
-  if (this.leftVisible === visible) {
-    return;
-  }
-  this._setProperty('leftVisible', visible);
-  if (this.rendered) {
-    this._renderLeftVisible();
-  }
+  this.setProperty('leftVisible', visible);
 };
 
 scout.CollapseHandle.prototype.setRightVisible = function(visible) {
-  if (this.rightVisible === visible) {
-    return;
-  }
-  this._setProperty('rightVisible', visible);
-  if (this.rendered) {
-    this._renderRightVisible();
-  }
+  this.setProperty('rightVisible', visible);
 };
 
 scout.CollapseHandle.prototype._onLeftMouseDown = function(event) {

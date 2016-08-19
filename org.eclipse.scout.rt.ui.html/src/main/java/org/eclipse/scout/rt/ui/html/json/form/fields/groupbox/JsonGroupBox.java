@@ -18,7 +18,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
-import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.action.DisplayableActionFilter;
@@ -111,18 +110,14 @@ public class JsonGroupBox<GROUP_BOX extends IGroupBox> extends JsonCompositeFiel
   }
 
   @Override
-  public void handleUiEvent(JsonEvent event) {
-    if (EVENT_EXPANDED.equals(event.getType())) {
-      handleUiExpanded(event);
+  protected void handleUiPropertyChange(String propertyName, JSONObject data) {
+    if (IGroupBox.PROP_EXPANDED.equals(propertyName)) {
+      boolean expanded = data.getBoolean(IGroupBox.PROP_EXPANDED);
+      addPropertyEventFilterCondition(IGroupBox.PROP_EXPANDED, expanded);
+      getModel().getUIFacade().setExpandedFromUI(expanded);
     }
     else {
-      super.handleUiEvent(event);
+      super.handleUiPropertyChange(propertyName, data);
     }
-  }
-
-  protected void handleUiExpanded(JsonEvent event) {
-    boolean expanded = event.getData().optBoolean("expanded");
-    addPropertyEventFilterCondition(IGroupBox.PROP_EXPANDED, expanded);
-    getModel().getUIFacade().setExpandedFromUI(expanded);
   }
 }

@@ -275,7 +275,7 @@ scout.TableHeader.prototype.openTableHeaderMenu = function(column) {
 };
 
 scout.TableHeader.prototype.closeTableHeaderMenu = function() {
-  this._tableHeaderMenu.remove();
+  this._tableHeaderMenu.destroy();
   this._tableHeaderMenu = null;
 };
 
@@ -584,8 +584,8 @@ scout.TableHeader.prototype._onHeaderItemMousedown = function(event) {
       }
     });
 
-    if (that._tableHeaderMenu && that._tableHeaderMenu.rendered) {
-      that._tableHeaderMenu.remove();
+    if (that._tableHeaderMenu) {
+      that._tableHeaderMenu.destroy();
       that._tableHeaderMenu = null;
     }
   }

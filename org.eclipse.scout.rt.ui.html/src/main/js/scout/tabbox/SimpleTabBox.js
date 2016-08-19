@@ -74,7 +74,6 @@ scout.SimpleTabBox.prototype._renderView = function(view) {
     return;
   }
   view.render(this.$viewContent);
-  view.setParent(this);
   view.$container.addClass('view');
   view.validateRoot = true;
 };
@@ -129,6 +128,7 @@ scout.SimpleTabBox.prototype.addView = function(view, activate) {
   activate = scout.nvl(activate, true);
   // add to view stack
   var siblingView = this._addToViewStack(view);
+  view.setParent(this);
   this.trigger('viewAdded', {
     view: view,
     siblingView: siblingView
@@ -194,7 +194,6 @@ scout.SimpleTabBox.prototype.removeView = function(view, showSiblingView) {
     });
 
     if (this.rendered) {
-
       this.viewContent.invalidateLayoutTree();
       this.viewContent.validateLayoutTree();
     }

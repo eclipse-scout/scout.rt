@@ -31,7 +31,6 @@ scout.TableHeaderMenuGroup.prototype._render = function($parent) {
     this.$container.addClass(this.cssClass);
   }
   this._renderText();
-  this._renderVisible();
   this.children.forEach(function(child) {
     child.render(this.$container);
   }, this);
@@ -55,20 +54,10 @@ scout.TableHeaderMenuGroup.prototype._renderText = function() {
   this.$text.text(this.text);
 };
 
-scout.TableHeaderMenuGroup.prototype.setVisible = function(visible) {
-  this.visible = visible;
-  if (this.rendered) {
-    this._renderVisible();
-  }
-};
-
-scout.TableHeaderMenuGroup.prototype._renderVisible = function() {
-  this.$container.setVisible(this.visible);
-};
-
 scout.TableHeaderMenuGroup.prototype.setLast = function(last) {
-  this.last = last;
-  if (this.rendered) {
-    this.$container.toggleClass('last', this.last);
-  }
+  this.setProperty('last', last);
+};
+
+scout.TableHeaderMenuGroup.prototype._renderLast = function() {
+  this.$container.toggleClass('last', this.last);
 };

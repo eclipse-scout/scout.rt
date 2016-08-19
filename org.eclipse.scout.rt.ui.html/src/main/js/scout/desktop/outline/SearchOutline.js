@@ -109,11 +109,9 @@ scout.SearchOutline.prototype._renderRequestFocusQueryField = function() {
   this.validateFocus();
 };
 
-scout.SearchOutline.prototype._sendSearch = function() {
-  this._send('search', {
+scout.SearchOutline.prototype._triggerSearch = function() {
+  this.trigger('search', {
     query: scout.nvl(this.searchQuery, '')
-  }, {
-    showBusyIndicator: false
   });
 };
 
@@ -123,14 +121,14 @@ scout.SearchOutline.prototype._onQueryFieldInput = function(event) {
   if (this.searchQuery !== searchQuery) {
     // Store locally so that the value persists when changing the outline without performing the search
     this._setSearchQuery(searchQuery);
-    this._sendSearch();
+    this._triggerSearch();
   }
 };
 
 scout.SearchOutline.prototype._onQueryFieldKeyPress = function(event) {
   if (event.which === scout.keys.ENTER) {
     this._setSearchQuery(this.$queryField.val());
-    this._sendSearch();
+    this._triggerSearch();
   }
 };
 

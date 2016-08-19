@@ -86,6 +86,17 @@ scout.EventSupport.prototype.removeListener = function(listener) {
   scout.arrays.remove(this._eventListeners, listener);
 };
 
+scout.EventSupport.prototype.count = function(type) {
+  var count = 0;
+  this._eventListeners.forEach(function(listener) {
+    if (type && type !== listener.type) {
+      return;
+    }
+    count++;
+  });
+  return count;
+};
+
 scout.EventSupport.prototype.trigger = function(type, event) {
   event = event || {};
   event.type = type;

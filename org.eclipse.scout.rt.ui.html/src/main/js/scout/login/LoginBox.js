@@ -26,7 +26,7 @@ scout.LoginBox.prototype.init = function(opts) {
   };
   this.options.texts = $.extend({}, defaultTexts, opts.texts);
 
-  this.texts = new scout.Texts(this.options.texts);
+  this.texts = new scout.TextMap(this.options.texts);
   this.logoUrl = this.options.logoUrl;
 };
 

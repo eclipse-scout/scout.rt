@@ -10,7 +10,9 @@
  ******************************************************************************/
 scout.DateField = function() {
   scout.DateField.parent.call(this);
-  this.enabledWhenOffline = true;
+
+  this.hasDate = true;
+  this.hasTime = false;
   this.disabledCopyOverlay = true;
 
   this.$dateField;
@@ -33,7 +35,7 @@ scout.DateField = function() {
   this.popup;
   this.oldDisplayText = '';
   this.timestamp = null;
-  this._addModelProperties(['timestamp', 'timestampAsDate']);
+  this._addCloneProperties(['timestamp', 'timestampAsDate']);
 };
 scout.inherits(scout.DateField, scout.ValueField);
 
@@ -205,7 +207,7 @@ scout.DateField.prototype._fieldForPlaceholder = function() {
 };
 
 scout.DateField.prototype._syncDateFormatPattern = function(dateFormatPattern) {
-  this.dateFormatPattern = dateFormatPattern;
+  this._setProperty('dateFormatPattern', dateFormatPattern);
   this.isolatedDateFormat = new scout.DateFormat(this.session.locale, this.dateFormatPattern);
 };
 
@@ -217,7 +219,7 @@ scout.DateField.prototype._renderDateFormatPattern = function() {
 };
 
 scout.DateField.prototype._syncTimeFormatPattern = function(timeFormatPattern) {
-  this.timeFormatPattern = timeFormatPattern;
+  this._setProperty('timeFormatPattern', timeFormatPattern);
   this.isolatedTimeFormat = new scout.DateFormat(this.session.locale, this.timeFormatPattern);
 };
 
@@ -266,7 +268,7 @@ scout.DateField.prototype._syncDisplayText = function(displayText) {
     parts;
 
   this.oldDisplayText = this.displayText;
-  this.displayText = displayText;
+  this._setProperty('displayText', displayText);
 
   if (scout.strings.hasText(this.displayText)) {
     parts = this.displayText.split('\n');
@@ -279,11 +281,11 @@ scout.DateField.prototype._syncDisplayText = function(displayText) {
 
 scout.DateField.prototype._syncTimestamp = function(timestamp) {
   // TODO CGU [6.1] no need to keep two timestamp properties, only hold date based type. Convert to back to string when sending. Also rename to value instead of timestamp
-  this.timestampAsDate = scout.dates.parseJsonDate(timestamp);
+  this.timestampAsDate = scout.dates.parseJsonDate(timestamp); // FIXME [6.1] cgu ensure type
 };
 
 scout.DateField.prototype._syncAutoTimestamp = function(autoTimestamp) {
-  this.autoTimestampAsDate = scout.dates.parseJsonDate(autoTimestamp);
+  this.autoTimestampAsDate = scout.dates.parseJsonDate(autoTimestamp);// FIXME [6.1] cgu ensure type
 };
 
 scout.DateField.prototype._syncAllowedDates = function(allowedDates) {
@@ -292,9 +294,9 @@ scout.DateField.prototype._syncAllowedDates = function(allowedDates) {
     allowedDates.forEach(function(dateString) {
       convAllowedDates.push(scout.dates.parseJsonDate(dateString));
     });
-    this.allowedDates = convAllowedDates;
+    this._setProperty('allowedDates', convAllowedDates);
   } else {
-    this.allowedDates = null;
+    this._setProperty('allowedDates', null);
   }
 };
 
@@ -698,7 +700,7 @@ scout.DateField.prototype._onDatePickerDateSelect = function(event) {
   this._setTimeValid(true);
   this.renderDate(event.date);
   if (!event.shifting) {
-    this._sendDisplayTextIfChanged();
+    this._triggerDisplayTextIfChanged();
     this.updateTimestamp(this._newTimestampAsDate(event.date, this.timestampAsDate));
     // closeDatePicker is set to false when date-field is in touch-mode
     // since popup will be closed by the embedded date-field
@@ -894,9 +896,9 @@ scout.DateField.prototype._sendParsingError = function() {
   this._send('parsingError');
 };
 
-scout.DateField.prototype._sendDisplayTextIfChanged = function() {
+scout.DateField.prototype._triggerDisplayTextIfChanged = function() {
   if (this.oldDisplayText !== this.displayText) {
-    this._sendDisplayTextChanged(this.displayText);
+    this._triggerDisplayTextChanged(this.displayText);
     this.oldDisplayText = this.displayText;
   }
 };
@@ -946,7 +948,7 @@ scout.DateField.prototype._acceptDateTimePrediction = function(acceptDate, accep
   this._removePredictionFields();
 
   // Send display text before timestamp, otherwise server would create a display text by its own and send it back
-  this._sendDisplayTextIfChanged();
+  this._triggerDisplayTextIfChanged();
 
   if (success) {
     // parse success -> send new timestamp to server

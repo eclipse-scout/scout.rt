@@ -23,7 +23,7 @@ import org.eclipse.scout.rt.shared.services.common.text.AbstractDynamicNlsTextPr
 public class UiTextProviderService extends AbstractDynamicNlsTextProviderService {
 
   @Override
-  protected String getDynamicNlsBaseName() {
+  public String getDynamicNlsBaseName() {
     return "org.eclipse.scout.rt.ui.html.texts.Texts";
   }
 }

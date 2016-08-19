@@ -18,21 +18,11 @@ describe("LabelField", function() {
     helper = new scout.FormSpecHelper(session);
   });
 
-  function createField(model) {
-    var field = new scout.LabelField();
-    field.init(model);
-    return field;
-  }
-
-  function createModel() {
-    return helper.createFieldModel();
-  }
-
   describe("HtmlEnabled", function() {
     var field;
 
     beforeEach(function() {
-      field = createField(createModel());
+      field = helper.createField('LabelField');
     });
 
     it("if false, encodes html in display text", function() {

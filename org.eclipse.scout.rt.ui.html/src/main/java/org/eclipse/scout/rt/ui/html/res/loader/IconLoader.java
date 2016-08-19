@@ -10,13 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.res.loader;
 
+import java.io.IOException;
+
 import org.eclipse.scout.rt.client.services.common.icon.IconLocator;
 import org.eclipse.scout.rt.client.services.common.icon.IconSpec;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.resource.BinaryResources;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheControl;
-import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheKey;
-import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheObject;
 
 /**
  * This class loads static icon images from {@link IconLocator} (<code>/resource/icons</code> folders of all jars on the
@@ -25,23 +25,21 @@ import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheObject;
 public class IconLoader extends AbstractResourceLoader {
 
   @Override
-  public HttpCacheObject loadResource(HttpCacheKey cacheKey) {
-    String pathInfo = cacheKey.getResourcePath();
+  public BinaryResource loadResource(String pathInfo) throws IOException {
     final String imageId = pathInfo.substring(pathInfo.lastIndexOf('/') + 1);
     IconSpec iconSpec = IconLocator.instance().getIconSpec(imageId);
-    if (iconSpec != null) {
-      // cache: use max-age caching for at most 4 hours
-      BinaryResource content = BinaryResources.create()
-          .withFilename(iconSpec.getName())
-          .withContent(iconSpec.getContent())
-          .withLastModified(System.currentTimeMillis())
-          .withCachingAllowed(true)
-          .withCacheMaxAge(HttpCacheControl.MAX_AGE_4_HOURS)
-          .build();
-
-      return new HttpCacheObject(cacheKey, content);
+    if (iconSpec == null) {
+      return null;
     }
-    return null;
+
+    // cache: use max-age caching for at most 4 hours
+    return BinaryResources.create()
+        .withFilename(iconSpec.getName())
+        .withContent(iconSpec.getContent())
+        .withLastModified(System.currentTimeMillis())
+        .withCachingAllowed(true)
+        .withCacheMaxAge(HttpCacheControl.MAX_AGE_4_HOURS)
+        .build();
   }
 
 }

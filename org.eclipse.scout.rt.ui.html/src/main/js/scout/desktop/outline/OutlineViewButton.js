@@ -18,33 +18,18 @@ scout.OutlineViewButton.prototype._renderOutline = function(outline) {
   // NOP
 };
 
-scout.OutlineViewButton.prototype._goOffline = function() {
-  // Disable if outline has not been loaded yet
-  if (!this.outline) {
-    this._renderEnabled(false);
-  }
-};
-
 /**
  * Don't await server response to make it more responsive and offline capable.
  * @override Action.js
  */
 scout.OutlineViewButton.prototype.beforeSendDoAction = function() {
   if (this.outline) {
-    this.desktop.bringOutlineToFront(this.outline);
+    this.session.desktop.bringOutlineToFront(this.outline);
   }
 };
 
 scout.OutlineViewButton.prototype.setSelected = function(selected) {
-  var oldSelected = this.selected;
-  if (oldSelected === selected) {
-    return;
-  }
-  this.selected = selected;
-  if (this.rendered) {
-    this._renderSelected();
-  }
-  this._firePropertyChange('selected', oldSelected, selected);
+  this.setProperty('selected', selected);
 };
 
 scout.OutlineViewButton.prototype.onOutlineChanged = function(outline) {

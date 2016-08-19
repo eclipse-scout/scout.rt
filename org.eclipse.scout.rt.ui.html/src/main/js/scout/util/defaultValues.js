@@ -20,22 +20,27 @@ scout.defaultValues = {
    */
   _objectTypeHierarchyFlat: {},
 
-  bootstrap: function() {
+  bootstrap: function(options) {
+    options = options || {};
+    var defaultOptions = {
+      url: 'defaultValues'
+    };
+    options = $.extend({}, defaultOptions, options);
     var that = this;
     // Load default value configuration from server (and cache it)
     return $.ajax({
-      async: true,
-      type: 'GET',
-      dataType: 'json',
-      contentType: 'application/json; charset=UTF-8',
-      cache: true,
-      url: 'defaultValues',
-      data: ''
-    }).done(function(data) {
-      that._loadDefaultsConfiguration(data);
-    }).fail(function(jqXHR, textStatus, errorThrown) {
-      throw new Error('Error while loading default values: ' + errorThrown);
-    });
+        async: true,
+        type: 'GET',
+        dataType: 'json',
+        contentType: 'application/json; charset=UTF-8',
+        cache: true,
+        url: options.url,
+        data: ''
+      }).done(function(data) {
+        that._loadDefaultsConfiguration(data);
+      }).fail(function(jqXHR, textStatus, errorThrown) {
+        throw new Error('Error while loading default values: ' + errorThrown);
+      });
   },
 
   _loadDefaultsConfiguration: function(data) {
@@ -106,6 +111,7 @@ scout.defaultValues = {
       objectType = objectType.replace(/\..*/, '');
       objectTypeHierarchy = this._objectTypeHierarchyFlat[objectType];
     }
+    // FIXME [awe] 6.1 --> hier auf den parent gehen (rekursiv) bis wir einen objectType finden.
     if (!objectTypeHierarchy) {
       // Unknown type, nothing to apply
       return;

@@ -46,8 +46,8 @@ scout.PopupWithHead.prototype.onResize = function() {
   this.close();
 };
 
-scout.PopupWithHead.prototype._remove = function($parent) {
-  scout.PopupWithHead.parent.prototype._remove.call(this, $parent);
+scout.PopupWithHead.prototype._remove = function() {
+  scout.PopupWithHead.parent.prototype._remove.call(this);
   this.$parent.window().off('resize', this.resizeHandler);
 };
 

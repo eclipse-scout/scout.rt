@@ -14,6 +14,8 @@ scout.ButtonAdapterMenu = function() {
 
   this._buttonPropertyChangeHandler = this._onButtonPropertyChange.bind(this);
   this._buttonDestroyHandler = this._onButtonDestroy.bind(this);
+
+  this._addCloneProperties(['button']);
 };
 scout.inherits(scout.ButtonAdapterMenu, scout.Menu);
 
@@ -56,13 +58,14 @@ scout.ButtonAdapterMenu.prototype._onButtonPropertyChange = function(event) {
   event.changedProperties.forEach(function(prop) {
     changedProperties[prop] = event.newProperties[prop];
   });
-  this.onModelPropertyChange({
-    properties: scout.ButtonAdapterMenu.adaptButtonProperties(changedProperties)
-  });
+  changedProperties = scout.ButtonAdapterMenu.adaptButtonProperties(changedProperties);
+  for (var prop in changedProperties) {
+    this.setProperty(prop, changedProperties[prop]);
+  }
 };
 
 scout.ButtonAdapterMenu.prototype._onButtonDestroy = function(event) {
-  this.remove();
+  this.destroy();
   this._uninstallListeners();
 };
 

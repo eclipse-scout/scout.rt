@@ -28,100 +28,68 @@ describe("TableField", function() {
     jasmine.clock().uninstall();
   });
 
-  function createModel() {
-    return helper.createFieldModel('TableField');
-  }
-
   function createTableFieldWithTable() {
-    var tableModel = tableHelper.createModelFixture(2, 2);
-    return createTableField(tableModel);
+    var table = createTableModel(2, 2);
+    return createTableField({table: table});
   }
 
   function createTableField(tableModel) {
-    var tableFieldModel = createModel();
-    if (tableModel) {
-      tableFieldModel.table = tableModel.id;
-    }
-    tableFieldModel.owner = session.rootAdapter.id;
-    return createAdapter(tableFieldModel, session, tableModel);
+    return helper.createField('TableField', session.desktop, tableModel);
   }
 
-  describe("property table", function() {
+  function createTable(colCount, rowCount) {
+    return tableHelper.createTable(createTableModel(colCount, rowCount));
+  }
 
-    it("shows (renders) the table if the value is set", function() {
-      var tableModel = tableHelper.createModelFixture(2, 2);
+  function createTableModel(colCount, rowCount) {
+    return tableHelper.createModelFixture(colCount, rowCount);
+  }
+
+  describe('property table', function() {
+
+    it('shows (renders) the table if the value is set', function() {
+      var table = createTable(2, 2);
       var tableField = createTableField();
       tableField.render(session.$entryPoint);
 
       expect(tableField.table).toBeUndefined();
-      var message = {
-        adapterData : createAdapterData(tableModel),
-        events: [createPropertyChangeEvent(tableField, {table: tableModel.id})]
-      };
-      session._processSuccessResponse(message);
-
+      tableField.setProperty('table', table);
       expect(tableField.table.rendered).toBe(true);
 
-      //Field is necessary for the FormFieldLayout
+      // Field is necessary for the FormFieldLayout
       expect(tableField.$field).toBeTruthy();
     });
 
-    it("destroys the table if value is changed to ''", function() {
+    it('destroys the table if value is changed to null', function() {
       var tableField = createTableFieldWithTable();
       var table = tableField.table;
       tableField.render(session.$entryPoint);
-
       expect(table.rendered).toBe(true);
-      var message = {
-        events: [createPropertyChangeEvent(tableField, {table: ''})]
-      };
-      session._processSuccessResponse(message);
+      expect(table.owner).toBe(tableField);
+      expect(table.parent).toBe(tableField);
 
+      tableField.setTable(null);
       expect(tableField.table).toBeFalsy();
       expect(tableField.$field).toBeFalsy();
       expect(table.rendered).toBe(false);
+      expect(table.destroyed).toBe(true);
       expect(session.getModelAdapter(table.id)).toBeFalsy();
     });
 
-    it("if table is global, only removes the table but does not destroy it if value is changed to ''", function() {
-      var tableModel = tableHelper.createModelFixture(2, 2);
-      tableModel.owner = session.rootAdapter.id;
-      var tableField = createTableField(tableModel);
-      var table = tableField.table;
-      tableField.render(session.$entryPoint);
-
-      expect(table.rendered).toBe(true);
-      var message = {
-        events: [createPropertyChangeEvent(tableField, {table: ''})]
-      };
-      session._processSuccessResponse(message);
-
-      // Table is unlinked with table field but still exists
-      expect(tableField.table).toBeFalsy();
-      expect(tableField.$field).toBeFalsy();
-      expect(table.rendered).toBe(false);
-      expect(session.getModelAdapter(table.id)).toBeTruthy();
-    });
-
-    it("table gets class 'field' to make it work with the form field layout", function() {
+    it('table gets class \'field\' to make it work with the form field layout', function() {
       var tableField = createTableFieldWithTable();
       tableField.render(session.$entryPoint);
 
       expect(tableField.table.$container).toHaveClass('field');
     });
 
-    it("table gets class 'field' to make it work with the form field layout (also when loaded by property change event)", function() {
-      var tableModel = tableHelper.createModelFixture(2, 2);
+    it('table gets class \'field\' to make it work with the form field layout (also when table is set later)', function() {
+      var table = createTable(2, 2);
       var tableField = createTableField();
       tableField.render(session.$entryPoint);
 
       expect(tableField.table).toBeUndefined();
-      var message = {
-          adapterData : createAdapterData(tableModel),
-          events: [createPropertyChangeEvent(tableField, {table: tableModel.id})]
-      };
-      session._processSuccessResponse(message);
-
+      tableField.setProperty('table', table);
       expect(tableField.table.$container).toHaveClass('field');
     });
   });

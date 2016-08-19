@@ -125,7 +125,6 @@ describe('main', function() {
             session: session
           });
         expect(menu.session === session).toBe(true);
-        expect(menu._register).toBe(false);
         expect(scout.objects.countOwnProperties(session.modelAdapterRegistry)).toBe(oldNumProperties);
       });
 

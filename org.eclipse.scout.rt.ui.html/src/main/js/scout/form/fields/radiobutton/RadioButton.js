@@ -42,7 +42,7 @@ scout.RadioButton.prototype._render = function($parent) {
   });
 };
 
-scout.RadioButton.prototype._remove = function($parent) {
+scout.RadioButton.prototype._remove = function() {
   scout.tooltips.uninstall(this.$field);
   scout.RadioButton.parent.prototype._remove.call(this);
 };
@@ -67,14 +67,7 @@ scout.RadioButton.prototype.select = function() {
 };
 
 scout.RadioButton.prototype.setSelected = function(selected) {
-  if (selected === this.selected) {
-    return;
-  }
-  this._setProperty('selected', selected);
-  this._sendProperty('selected');
-  if (this.rendered) {
-    this._renderSelected();
-  }
+  this.setProperty('selected', selected);
 };
 
 /**

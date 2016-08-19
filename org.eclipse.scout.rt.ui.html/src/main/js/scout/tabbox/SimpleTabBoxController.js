@@ -69,7 +69,7 @@ scout.SimpleTabBoxController.prototype._onViewRemoved = function(event) {
   }
   var viewTab = this._getTab(view);
   if (viewTab) {
-    this.tabArea.removeTab(viewTab);
+    this.tabArea.destroyTab(viewTab);
   }
 };
 

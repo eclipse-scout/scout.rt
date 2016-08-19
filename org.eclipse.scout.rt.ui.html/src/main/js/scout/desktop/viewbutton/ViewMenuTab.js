@@ -19,6 +19,7 @@ scout.ViewMenuTab = function() {
   this.$arrowIcon; // small "arrow down" icon at the right side of the icon
 
   this.viewButton = null;
+  this.viewMenus = [];
   this.selected = false;
   this.iconId;
   this.inBackground = false;
@@ -27,14 +28,13 @@ scout.ViewMenuTab = function() {
   this.defaultIconId = scout.icons.OUTLINE;
   this._addEventSupport();
   this._viewMenuPropertyChangeHandler = this._onViewMenuPropertyChange.bind(this);
+  this._addAdapterProperties('viewMenus');
 };
 scout.inherits(scout.ViewMenuTab, scout.Widget);
 
 scout.ViewMenuTab.prototype._init = function(model) {
   scout.ViewMenuTab.parent.prototype._init.call(this, model);
-  this.viewMenus = model.viewMenus;
   this.viewMenus.forEach(function(viewMenu) {
-    viewMenu.setParent(this);
     viewMenu.on('propertyChange', this._viewMenuPropertyChangeHandler);
   }, this);
   this._update();
@@ -92,12 +92,15 @@ scout.ViewMenuTab.prototype._remove = function() {
 };
 
 scout.ViewMenuTab.prototype._renderProperties = function() {
-  this._renderVisible();
+  scout.ViewMenuTab.parent.prototype._renderProperties.call(this);
   this._renderIconId();
   this._renderSelected();
   this._renderInBackground();
 };
 
+/**
+ * @override
+ */
 scout.ViewMenuTab.prototype._renderVisible = function() {
   this.$container.setVisible(this.visible);
   this.invalidateLayoutTree();
@@ -181,33 +184,11 @@ scout.ViewMenuTab.prototype._closePopup = function() {
 };
 
 scout.ViewMenuTab.prototype.setSelected = function(selected) {
-  if (selected === this.selected) {
-    return;
-  }
-  this._setProperty('selected', selected);
-  if (this.rendered) {
-    this._renderSelected();
-  }
+  this.setProperty('selected', selected);
 };
 
 scout.ViewMenuTab.prototype.setIconId = function(iconId) {
-  if (iconId === this.iconId) {
-    return;
-  }
-  this._setProperty('iconId', iconId);
-  if (this.rendered) {
-    this._renderIconId();
-  }
-};
-
-scout.ViewMenuTab.prototype.setVisible = function(visible) {
-  if (this.visible === visible) {
-    return;
-  }
-  this._setProperty('visible', visible);
-  if (this.rendered) {
-    this._renderVisible();
-  }
+  this.setProperty('iconId', iconId);
 };
 
 scout.ViewMenuTab.prototype.updateVisibility = function() {

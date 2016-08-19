@@ -82,7 +82,8 @@
     scout.device.isTableAdditionalDivRequired = function() {
       return false;
     }
-    scout._bootstrap();
+    var app = new scout.RemoteApp();
+    app._bootstrap();
   </script>
 
   $specScriptTags$

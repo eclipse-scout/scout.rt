@@ -15,74 +15,6 @@
 scout.sessions = [];
 
 /**
- * @memberOf scout
- *
- * Main initialization function.<p>
- *
- * Calls scout._bootstrap and scout._init.<p>
- * During the bootstrap phase additional scripts may get loaded required for a successful session startup.
- * The actual initialization does not get started before these bootstrap scripts are loaded.
- */
-scout.init = function(options) {
-  var deferreds = scout._bootstrap(options.bootstrap);
-  $.when.apply($, deferreds)
-    .done(scout._init.bind(scout, options.session));
-};
-
-/**
- * Executes the default bootstrap functions and returns an array of deferred objects.<p>
- * The actual session startup begins only when every of these deferred objects are completed.
- * This gives the possibility to dynamically load additional scripts or files which are mandatory for a successful session startup.
- * The individual bootstrap functions may return null or undefined, a single deferred or multiple deferreds as an array.
- */
-scout._bootstrap = function(options) {
-  options = options || {};
-  var deferredValues = [
-    scout.logging.bootstrap(),
-    scout.device.bootstrap(),
-    scout.defaultValues.bootstrap(),
-    scout.fonts.bootstrap(options.fonts)
-  ];
-
-  var deferreds = [];
-  deferredValues.forEach(function(value) {
-    if (Array.isArray(value)) {
-      deferreds.concat(value);
-    } else if (value) {
-      deferreds.push(value);
-    }
-  });
-  return deferreds;
-};
-
-/**
- * Initializes a session for each html element with class '.scout' and stores them in scout.sessions.
- */
-scout._init = function(options) {
-  options = options || {};
-  options.texts = $.extend({}, scout.Texts.readFromDOM(), options.texts);
-
-  if (!this._checkBrowserCompability(options)) {
-    return;
-  }
-
-  scout.polyfills.install(window);
-  scout.prepareDOM();
-  scout.objectFactory.init();
-  this._installGlobalJavascriptErrorHandler();
-  this._installGlobalMouseDownInterceptor(document);
-  this._globalAjaxSetup();
-
-  $('.scout').each(function() {
-    var $entryPoint = $(this);
-    options.portletPartId = options.portletPartId || $entryPoint.data('partid') || '0';
-    var session = new scout.Session($entryPoint, options);
-    session.init();
-    scout.sessions.push(session);
-  });
-};
-
-/**
  * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Details_of_the_Object_Model
  */
 scout.inherits = function(childCtor, parentCtor) {
@@ -135,7 +67,7 @@ scout.create = function(vararg, options) {
  *
  * Currently it does the following:
  * - Remove the <noscript> tag (obviously there is no need for it).
- * - Remove <scout-text> tags (they must have been processed before, see scout.Texts.readFromDOM())
+ * - Remove <scout-text> tags (they must have been processed before, see scout.texts.readFromDOM())
  * - If the browser is Google Chrome, add a special meta header to prevent automatic translation.
  */
 scout.prepareDOM = function(targetDocument) {

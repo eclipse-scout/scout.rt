@@ -10,6 +10,12 @@
  ******************************************************************************/
 scout.Widget = function() {
   this.session;
+
+  /**
+   * The owner is responsible that its children are destroyed when the owner is being destroyed.
+   */
+  this.owner;
+  this.parent;
   this.children = [];
   this.initialized = false;
 
@@ -26,15 +32,31 @@ scout.Widget = function() {
   this.rendered = false;
   this.attached = false;
   this.destroyed = false;
+
+  this.enabled = true;
+  this.visible = true;
+
   this.$container;
   // If set to true, remove won't remove the element immediately but after the animation has been finished
   // This expects a css animation which may be triggered by the class 'removed'
   // If browser does not support css animation, remove will be executed immediately
   this.animateRemoval;
+
+  this._adapterProperties = [];
+  this._cloneProperties = ['parent', 'session']; // FIXME [awe, cgu] discuss: when not cloned automatically we need to pass 'parent' in clone method
+  this._propertyConfig = {};
+
+  // FIXME [awe, cgu] 6.1 discuss: wenn alle widgets events und keyStrokeContext haben sollen braucht es die add methoden nicht mehr
+  this._addKeyStrokeContextSupport();
+  this._addEventSupport();
+
+  this._parentDestroyHandler = this._onParentDestroy.bind(this);
+  this._postRenderActions = [];
+  this._addCloneProperties(['visible', 'enabled']);
 };
 
-scout.Widget.prototype.init = function(options) {
-  this._init(options);
+scout.Widget.prototype.init = function(model) {
+  this._init(model);
   this._initKeyStrokeContext(this.keyStrokeContext);
   this.initialized = true;
   this.trigger('initialized');
@@ -45,22 +67,84 @@ scout.Widget.prototype.init = function(options) {
  * - parent (required): The parent widget
  * - session (optional): If not specified the session of the parent is used
  */
-scout.Widget.prototype._init = function(options) {
-  options = options || {};
-  if (!options.parent) {
+scout.Widget.prototype._init = function(model) {
+  model = model || {};
+  if (!model.parent) {
     throw new Error('Parent expected: ' + this);
   }
-  this.setParent(options.parent);
+  this.setOwner(model.owner || model.parent);
+  this.setParent(model.parent);
 
-  this.session = options.session || this.parent.session;
+  this.session = model.session || this.parent.session;
   if (!this.session) {
     throw new Error('Session expected: ' + this);
   }
-  this.animateRemoval = scout.nvl(options.animateRemoval, false);
+  this.animateRemoval = scout.nvl(model.animateRemoval, false);
+
+  this._eachProperty(model, function(propertyName, value, isAdapterProperty) {
+    if (isAdapterProperty) {
+      value = this._prepareWidgetProperty(propertyName, value);
+    }
+    this[propertyName] = value;
+  }.bind(this));
+};
+
+scout.Widget.prototype.createFromProperty = function(propertyName, value) {
+  // FIXME [6.1] awe Was ist das für ein Fall? Manchmal existiert das Widget schon (Menu 133 BusinessForm MainBox)
+  if (value instanceof scout.Widget) {
+    return value;
+  }
+  value.parent = this;
+  return scout.create(value);
+};
+
+scout.Widget.prototype._isPropertyRemotable = function(propertyName) {
+  return true; // FIXME [awe] 6.1 - hier propertyConfig lesen, diese Funktion würde für tableStatus / Status false zurückgeben weil es keinen Adapter gibt
 };
 
 scout.Widget.prototype._initKeyStrokeContext = function(keyStrokeContext) {
   // NOP
+};
+
+scout.Widget.prototype.destroy = function() {
+  if (this.destroyed) {
+    // Already destroyed, do nothing
+    return;
+  }
+
+  if (this.animateRemoval && this.rendered) {
+    this.on('remove', function() {
+      this.destroy();
+    }.bind(this));
+    this.remove();
+    return;
+  }
+
+  // Destroy children in reverse order
+  this.children.slice().reverse().forEach(function(child) {
+    this._destroyChild(child);
+  }, this);
+
+  this.remove();
+
+  // Disconnect from owner and parent
+  this.owner.removeChild(this);
+  this.owner = null;
+  this.parent.removeChild(this);
+  this.parent.off('destroy', this._parentDestroyHandler);
+  this.parent = null;
+
+  this.destroyed = true;
+
+  // Inform listeners
+  this.trigger('destroy');
+};
+
+scout.Widget.prototype._destroyChild = function(child) {
+  if (child.owner !== this) {
+    return;
+  }
+  child.destroy();
 };
 
 scout.Widget.prototype.render = function($parent) {
@@ -76,11 +160,8 @@ scout.Widget.prototype.render = function($parent) {
   }
   this.rendering = true;
   this._renderInternal($parent);
-  this._link();
+  this._linkWithDOM();
   this.session.keyStrokeManager.installKeyStrokeContext(this.keyStrokeContext);
-  if (this.parent) {
-    this.parent.addChild(this);
-  }
   this.rendering = false;
   this.rendered = true;
   this.attached = true;
@@ -107,17 +188,22 @@ scout.Widget.prototype._render = function($parent) {
 
 /**
  * This method calls the UI setter methods after the _render method has been executed.
- * Here values of the model are applied to the DOM / UI. The default impl. does nothing.
+ * Here values of the model are applied to the DOM / UI.
  */
 scout.Widget.prototype._renderProperties = function() {
-  // NOP
+  this._renderEnabled();
+  this._renderVisible();
 };
 
 /**
- * Method invoked once rendering completed and 'rendered' flag is set to 'true'.
+ * Method invoked once rendering completed and 'rendered' flag is set to 'true'.<p>
+ * By default executes every action of this._postRenderActions
  */
 scout.Widget.prototype._postRender = function() {
-  // NOP
+  this._postRenderActions.forEach(function(action) {
+    action();
+  });
+  this._postRenderActions = [];
 };
 
 scout.Widget.prototype.remove = function() {
@@ -168,9 +254,6 @@ scout.Widget.prototype._removeInternal = function() {
   this.session.keyStrokeManager.uninstallKeyStrokeContext(this.keyStrokeContext);
   this._cleanup();
   this._remove();
-  if (this.parent) {
-    this.parent.removeChild(this);
-  }
   this.$parent = null;
   this.rendered = false;
   this.attached = false;
@@ -189,8 +272,8 @@ scout.Widget.prototype._removeAnimated = function() {
     return;
   }
 
-  // Remove open popups first, they are not animated
-  this.session.desktop.removePopupsFor(this);
+  // Destroy open popups first, they are not animated
+  this.session.desktop.destroyPopupsFor(this);
 
   this.removalPending = true;
   // Don't execute immediately to make sure nothing interferes with the animation (e.g. layouting) which could make it laggy
@@ -206,7 +289,7 @@ scout.Widget.prototype._removeAnimated = function() {
 /**
  * Links $container with the widget.
  */
-scout.Widget.prototype._link = function() {
+scout.Widget.prototype._linkWithDOM = function() {
   if (this.$container) {
     this.$container.data('widget', this);
   }
@@ -229,15 +312,38 @@ scout.Widget.prototype._remove = function() {
   }
 };
 
+scout.Widget.prototype.setOwner = function(owner) {
+  scout.objects.mandatoryParameter('owner', owner);
+  if (owner === this.owner) {
+    return;
+  }
+
+  if (this.owner) {
+    // Remove from old owner
+    this.owner.removeChild(this);
+  }
+  this.owner = owner;
+  this.owner.addChild(this);
+};
+
 scout.Widget.prototype.setParent = function(parent) {
+  scout.objects.mandatoryParameter('parent', parent);
+  if (parent === this.parent) {
+    return;
+  }
+
   if (this.parent) {
-    // Remove from old parent if getting relinked
-    this.parent.removeChild(this);
+    this.parent.off('destroy', this._parentDestroyHandler);
+
+    if (this.parent !== this.owner) {
+      // Remove from old parent if getting relinked
+      // If the old parent is still the owner, don't remove it because owner stays responsible for destryoing it
+      this.parent.removeChild(this);
+    }
   }
   this.parent = parent;
-  if (this.parent) { //prevent trying to set child on undefined
-    this.parent.addChild(this);
-  }
+  this.parent.addChild(this);
+  this.parent.one('destroy', this._parentDestroyHandler);
 };
 
 scout.Widget.prototype.addChild = function(child) {
@@ -274,6 +380,29 @@ scout.Widget.prototype.has = function(widget) {
   }
 
   return false;
+};
+
+
+scout.Widget.prototype.setEnabled = function(enabled) {
+  this.setProperty('enabled', enabled);
+};
+
+scout.Widget.prototype._renderEnabled = function() {
+  if (!this.$container) {
+    return;
+  }
+  this.$container.setEnabled(this.enabled);
+};
+
+scout.Widget.prototype.setVisible = function(visible) {
+  this.setProperty('visible', visible);
+};
+
+scout.Widget.prototype._renderVisible = function() {
+  if (!this.$container) {
+    return;
+  }
+  this.$container.setVisible(this.visible);
 };
 
 /**
@@ -443,6 +572,10 @@ scout.Widget.prototype._attach = function(event) {
  * widgets, because when a DOM element is detached - child elements are not notified
  */
 scout.Widget.prototype.detach = function() {
+  if (this.rendering) {
+    // Defer the execution of detach. If it was detached while rendering the attached flag would be wrong.
+    this._postRenderActions.push(this.detach.bind(this));
+  }
   if (!this.attached || !this.rendered || this._isRemovalPending()) {
     return;
   }
@@ -564,6 +697,120 @@ scout.Widget.prototype._setProperty = function(propertyName, newValue) {
 };
 
 /**
+ * Sets a new value for a specific property. If the new value is the same value as the old one, nothing is performed.
+ * Otherwise the following phases are executed:
+ * <p>
+ * 1. Preparation: If the property is a widget property, several actions are performed in _prepareWidgetProperty().
+ * 2. DOM removal: If the widget is rendered and there is a custom remove function (e.g. _removeXY where XY is the property name), it will be called.
+ * 3. Model update: If there is a custom sync function (e.g. _syncXY where XY is the property name), it will be called. Otherwise the default sync function _setProperty is called.
+ * 4. DOM rendering: If the widget is rendered and there is a custom render function (e.g. _renderXY where XY is the property name), it will be called.
+ */
+scout.Widget.prototype.setProperty = function(name, value) {
+  if (this[name] === value) {
+    return;
+  }
+
+  if (this._isAdapterProperty(name)) { // FIXME [6.1] CGU, AWE durch propertyConfig ersetzen
+    value = this._prepareWidgetProperty(name, value);
+  }
+
+  if (this.rendered) {
+    var removeFuncName = '_remove' + scout.strings.toUpperCaseFirstLetter(name);
+    if (this[removeFuncName]) {
+      this[removeFuncName]();
+    }
+  }
+
+  this._callSetProperty(name, value);
+
+  if (this.rendered) {
+    var renderFuncName = '_render' + scout.strings.toUpperCaseFirstLetter(name);
+    if (!this[renderFuncName]) { // FIXME [6.1] cgu remove this error and remove every empty render function
+      throw new Error('Render function ' + renderFuncName + ' does not exist in ' + this.toString());
+    }
+    this[renderFuncName]();
+  }
+};
+
+scout.Widget.prototype._callSetProperty = function(name, value) {
+  var syncFuncName = '_sync' + scout.strings.toUpperCaseFirstLetter(name);
+  if (this[syncFuncName]) {
+    this[syncFuncName](value); // FIXME [6.1] CGU rename to _setFuncName
+  } else {
+    this._setProperty(name, value);
+  }
+};
+
+scout.Widget.prototype._prepareWidgetProperty = function(name, value) {
+  // Create new child widget(s)
+  value = this._ensureType(name, value);
+
+  var oldValue = this[name];
+  if (oldValue && Array.isArray(value)) {
+    // if new value is an array, old value has to be one as well
+    // copy to prevent modification of original
+    oldValue = oldValue.slice();
+
+    // only destroy those which are not in the new array
+    scout.arrays.removeAll(oldValue, value);
+  }
+
+  // Destroy old child widget(s)
+  this._destroyOldValue(oldValue);
+
+  // Link to new parent
+  this.link(value);
+
+  return value;
+};
+
+/**
+ * @param value may be an object or array of objects
+ */
+scout.Widget.prototype._destroyOldValue = function(value) {
+  if (value === null || value === undefined) {
+    return;
+  }
+
+  value = scout.arrays.ensure(value);
+  value.forEach(function(elementValue, i) {
+    this._destroyChild(elementValue);
+  }, this);
+};
+
+/**
+ * Sets this widget as parent of the given widget(s).
+ *
+ * @param value may be an object or array of objects
+ */
+scout.Widget.prototype.link = function(value) {
+  if (value === null || value === undefined) {
+    return;
+  }
+
+  value = scout.arrays.ensure(value);
+  value.forEach(function(child, i) {
+    child.setParent(this);
+  }, this);
+};
+
+scout.Widget.prototype._ensureType = function(propertyName, value) {
+  if (value === null || value === undefined) {
+    return null;
+  }
+
+  if (Array.isArray(value)) {
+    var returnValues = [];
+    value.forEach(function(elementValue, i) {
+      returnValues[i] = this._ensureType(propertyName, elementValue);
+    }, this);
+    return returnValues;
+  }
+  // FIXME [6.1] cgu rename to createChild? remove propertyName
+  return this.createFromProperty(propertyName, value);
+};
+
+/**
  * Method required for widgets which are supposed to be directly covered by a glasspane.<p>
  *
  * Returns the DOM elements to paint a glassPanes over, once a modal Form, message-box or file-chooser is shown with this widget as its 'displayParent'.<br>
@@ -585,6 +832,214 @@ scout.Widget.prototype._glassPaneTargets = function() {
 scout.Widget.prototype.toString = function() {
   return 'Widget[rendered=' + this.rendered +
     (this.$container ? ' $container=' + scout.graphics.debugOutput(this.$container) : '') + ']';
+};
+
+scout.Widget.prototype.resolveTextKeys = function(properties) {
+  properties.forEach(function(property) {
+    scout.texts.resolveTextProperty(this, property);
+  }, this);
+};
+
+scout.Widget.prototype.resolveIconIds = function(properties) {
+  properties.forEach(function(property) {
+    this[property] = scout.icons.resolveIconId(this[property]);
+  }, this);
+};
+
+// FIXME CGU [6.1] temporary, rename, extract to Composite.js?
+scout.Widget.prototype._addAdapterProperties = function(properties) {
+  this._addProperties('_adapterProperties', properties);
+};
+
+scout.Widget.prototype._isAdapterProperty = function(propertyName) {
+  return this._adapterProperties.indexOf(propertyName) > -1;
+};
+
+scout.Widget.prototype._addCloneProperties = function(properties) {
+  this._addProperties('_cloneProperties', properties);
+};
+
+scout.Widget.prototype._isCloneProperty = function(propertyName) {
+  return this._cloneProperties.indexOf(propertyName) > -1;
+};
+
+scout.Widget.prototype._addProperties = function(propertyName, properties) {
+  if (Array.isArray(properties)) {
+    this[propertyName] = this[propertyName].concat(properties);
+  } else {
+    this[propertyName].push(properties);
+  }
+};
+
+scout.Widget.prototype._eachProperty = function(model, func) {
+  var propertyName, value, i;
+
+  // Loop through primitive properties
+  for (propertyName in model) {
+    if (this._adapterProperties.indexOf(propertyName) > -1) {
+      continue; // will be handled below
+    }
+    value = model[propertyName];
+    func(propertyName, value);
+  }
+
+  //Loop through adapter properties (any order will do).
+  for (i = 0; i < this._adapterProperties.length; i++) {
+    propertyName = this._adapterProperties[i];
+    value = model[propertyName];
+    if (value === undefined) {
+      continue;
+    }
+
+    func(propertyName, value, true);
+  }
+};
+
+scout.Widget.prototype._removeAdapterProperties = function(properties) {
+  if (Array.isArray(properties)) {
+    scout.arrays.removeAll(this._adapterProperties, properties);
+  } else {
+    scout.arrays.remove(this._adapterProperties, properties);
+  }
+};
+
+// FIXME CGU [6.1] temporary, remove after model adapter separation
+scout.Widget.prototype._send = function(type, data) {
+  data = $.extend({}, data); // create a copy, so we don't change the original data unintentionally
+  data.sendToServer = true;
+  this.trigger(type, data);
+};
+
+scout.Widget.prototype.cloneAndMirror = function(model) {
+  var clone = this.clone(model);
+  clone.mirror();
+  return clone;
+};
+
+/**
+ * @returns the original widget from which this one was cloned. If it is not a clone, itself is returned.
+ */
+scout.Widget.prototype.original = function() {
+  var original = this;
+  while (original.cloneOf) {
+    original = original.cloneOf;
+  }
+  return original;
+};
+
+scout.Widget.prototype.clone = function(model) {
+  var clone, cloneModel;
+  model = model || {};
+
+  cloneModel = scout.objects.extractProperties(this, model, this._cloneProperties);
+  clone = scout.create(this.objectType, cloneModel);
+  clone.cloneOf = this;
+
+  return clone;
+};
+
+scout.Widget.prototype.mirror = function() {
+  this._mirror(this.cloneOf);
+  this.children.forEach(function(childClone) {
+    if (childClone.cloneOf) {
+      childClone.mirror(childClone.cloneOf);
+    }
+  });
+};
+
+scout.Widget.prototype._mirror = function(source) {
+  if (this._mirrorListener) {
+    return;
+  }
+  this._mirrorListener = {
+    func: this._onMirrorEvent.bind(this)
+  };
+  source.events.addListener(this._mirrorListener);
+  this.one('destroy', function() {
+    this.unmirror(source);
+  }.bind(this));
+};
+
+scout.Widget.prototype.unmirror = function() {
+  this.children.forEach(function(childClone) {
+    if (childClone.cloneOf) {
+      childClone.unmirror(childClone.cloneOf);
+    }
+  });
+  this._unmirror(this.cloneOf);
+};
+
+scout.Widget.prototype._unmirror = function(source) {
+  if (!this._mirrorListener) {
+    return;
+  }
+  source.events.removeListener(this._mirrorListener);
+  this._mirrorListener = null;
+};
+
+scout.Widget.prototype._onMirrorEvent = function(event) {
+  if (event.type === 'propertyChange') {
+    this._onMirrorPropertyChange(event);
+  }
+};
+
+scout.Widget.prototype._onMirrorPropertyChange = function(event) {
+  event.changedProperties.forEach(function(property) {
+    this.callSetter(property, event.newProperties[property]);
+  }, this);
+};
+
+scout.Widget.prototype._onParentDestroy = function(event) {
+  if (this.destroyed) {
+    return;
+  }
+  // If the parent is destroyed but the widget not make sure it gets a new parent
+  // This ensures the old one may be properly garbage collected
+  this.setParent(this.owner);
+};
+
+scout.Widget.prototype.callSetter = function(propertyName, value) {
+  var setterFuncName = 'set' + scout.strings.toUpperCaseFirstLetter(propertyName);
+  if (this[setterFuncName]) {
+    this[setterFuncName](value);
+  } else {
+    this.setProperty(propertyName, value);
+  }
+};
+
+/**
+ * Traverses the object-tree (children) of this widget and searches for a widget with the given ID.
+ * Returns the widget with the requested ID or null if no widget has been found.
+ * @param widgetId
+ */
+scout.Widget.prototype.getWidgetById = function(widgetId) {
+  return getRecWidgetById(this, widgetId);
+
+  function getRecWidgetById(widget, widgetId) {
+    if (widget.id === widgetId) {
+      return widget;
+    }
+    var i, child;
+    if (widget.children && widget.children.length > 0) {
+      for (i = 0; i < widget.children.length; i++) {
+        child = widget.children[i];
+        if (child.id === widgetId) {
+          return child;
+        } else {
+          child = getRecWidgetById(child, widgetId);
+          if (child) {
+            return child;
+          }
+        }
+      }
+    } else {
+      return null;
+    }
+  }
+};
+
+scout.Widget.prototype.requestFocus = function() {
+  this.session.focusManager.requestFocus(this.$container);
 };
 
 /* --- STATIC HELPERS ------------------------------------------------------------- */

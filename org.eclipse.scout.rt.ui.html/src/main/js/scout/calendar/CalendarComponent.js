@@ -18,7 +18,7 @@ scout.CalendarComponent = function() {
   this._$parts = [];
   this.events = new scout.EventSupport();
 };
-scout.inherits(scout.CalendarComponent, scout.ModelAdapter);
+scout.inherits(scout.CalendarComponent, scout.Widget);
 
 /**
  * Since we cannot configure any key-strokes on a calendar-component we must
@@ -166,6 +166,7 @@ scout.CalendarComponent.prototype._partPosition = function($part, y1, y2) {
 };
 
 scout.CalendarComponent.prototype._renderProperties = function() {
+  scout.CalendarComponent.parent.prototype._renderProperties.call(this);
   this._renderSelected();
 };
 
@@ -181,7 +182,7 @@ scout.CalendarComponent.prototype._renderSelected = function() {
 };
 
 scout.CalendarComponent.prototype.setSelected = function(selected) {
-  var oldSelected = this._selected;
+  var oldSelected = this._selected; // FIXME CGU [6.1] use proper property pattern and use property event
   this._selected = selected;
   if (oldSelected !== selected) {
     this.trigger('selected', {

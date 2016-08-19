@@ -10,7 +10,7 @@
  ******************************************************************************/
 describe('ModelAdapter', function() {
 
-  var session, myObjectFactory,
+  var session, $sandbox, myObjectFactory, helper,
     model = {},
     originalObjectFactory = scout.objectFactory;
 
@@ -18,10 +18,11 @@ describe('ModelAdapter', function() {
     setFixtures(sandbox());
     jasmine.Ajax.install();
     jasmine.clock().install();
-
     session = sandboxSession();
     session.init();
+    helper = new scout.FormSpecHelper(session);
     uninstallUnloadHandlers(session);
+    $sandbox = $('#sandbox');
 
     // Create a private object factory used for these tests
     myObjectFactory = new scout.ObjectFactory();
@@ -48,146 +49,141 @@ describe('ModelAdapter', function() {
     scout.objectFactory = originalObjectFactory;
   });
 
-  function createGenericModel() {
-    return createSimpleModel('Generic', session);
+  /**
+   * Creates a model and stores it as adapterData in the session.
+   */
+  function createModel(model) {
+    model = scout.nvl(model, {});
+    if (!model.objectType) {
+      model.objectType = 'NullWidget';
+    }
+    model = $.extend(createSimpleModel(model.objectType, session), model);
+    registerAdapterData(model, session);
+    return model;
   }
 
-  function createModelAdapter(model, adapterProps) {
-    var adapter = new scout.ModelAdapter();
-    adapter._addAdapterProperties(adapterProps);
-    adapter.init(model);
-    return adapter;
+  /**
+   * Creates widget and remote-adapter.
+   */
+  function createWidget(model) {
+    model = createModel(model);
+    return session.getOrCreateWidget(model.id, session.desktop);
   }
 
   it('can handle properties in any order', function() {
-    var event;
-
-    // Create a dummy object
-    var modelAdapter = new scout.ModelAdapter();
-    model.id = '2';
-    model.parent = new scout.NullWidget();
-    model.session = session;
-    modelAdapter.init(model);
-    session.registerModelAdapter(modelAdapter);
+    var widget = createWidget({id: '2'});
 
     // Send a dummy event to this object which contains both a new object and a id-only ref to that new object
-    event = new scout.Event('2', 'property', {
-      'properties': {
-        'x1': 'val1',
-        'x2': 'val2',
-        'o1': {
-          'id': '3',
-          'objectType': 'GroupBox',
-          'visible': true
+    var event = new scout.Event('2', 'property', {
+      properties: {
+        x1: 'val1',
+        x2: 'val2',
+        o1: {
+          id: '3',
+          objectType: 'GroupBox',
+          visible: true
         },
-        'o2': {
-          'id': '3'
+        o2: {
+          id: '3'
         }
       }
     });
     session._processEvents([event]);
 
-    expect(modelAdapter.x1).toBe('val1');
-    expect(modelAdapter.x2).toBe('val2');
-    expect(modelAdapter.o1).toBeDefined();
-    expect(modelAdapter.o1.id).toBe('3');
-    expect(modelAdapter.o2).toBeDefined();
-    expect(modelAdapter.o2.id).toBe('3');
+    expect(widget.x1).toBe('val1');
+    expect(widget.x2).toBe('val2');
+    expect(widget.o1).toBeDefined();
+    expect(widget.o1.id).toBe('3');
+    expect(widget.o2).toBeDefined();
+    expect(widget.o2.id).toBe('3');
 
     // Now send a second event, but now send the id-only ref first (in o1).
     event = new scout.Event('2', 'property', {
-      'properties': {
-        'x2': 'val20',
-        'x1': 'val10',
-        'o1': {
-          'id': '4'
+      properties: {
+        x2: 'val20',
+        x1: 'val10',
+        o1: {
+          id: '4'
         },
-        'o2': {
-          'id': '4',
-          'objectType': 'GroupBox',
-          'visible': false
+        o2: {
+          id: '4',
+          objectType: 'GroupBox',
+          visible: false
         }
       }
     });
     session._processEvents([event]);
 
-    expect(modelAdapter.x1).toBe('val10');
-    expect(modelAdapter.x2).toBe('val20');
-    expect(modelAdapter.o1).toBeDefined();
-    expect(modelAdapter.o1.id).toBe('4');
-    expect(modelAdapter.o2).toBeDefined();
-    expect(modelAdapter.o2.id).toBe('4');
+    expect(widget.x1).toBe('val10');
+    expect(widget.x2).toBe('val20');
+    expect(widget.o1).toBeDefined();
+    expect(widget.o1.id).toBe('4');
+    expect(widget.o2).toBeDefined();
+    expect(widget.o2.id).toBe('4');
   });
 
-  it("_syncPropertiesOnPropertyChange calls _sync* method or sets property", function() {
-    var adapter = new scout.ModelAdapter(),
-      oldValues = {},
-      newValues = {
+  it('_syncPropertiesOnPropertyChange calls set* methods or _setProperty method', function() {
+    var widget = createWidget({
+      foo: 1,
+      bar: 2});
+    widget.setFoo = function(value) {
+      this.foo = value;
+    };
+    var newValues = {
         foo: 6,
         bar: 7
       };
-    adapter.foo = 1;
-    adapter.bar = 2;
-    adapter._syncFoo = function(value) {
-      this.foo = value;
-    };
-    spyOn(adapter, '_syncFoo').and.callThrough();
-    adapter._syncPropertiesOnPropertyChange(oldValues, newValues);
-    expect(adapter.foo).toBe(6);
-    expect(adapter.bar).toBe(7);
-    expect(adapter._syncFoo).toHaveBeenCalled();
-    expect(oldValues.foo).toBe(1);
-    expect(oldValues.bar).toBe(2);
+    spyOn(widget, 'setFoo').and.callThrough();
+    spyOn(widget, 'setProperty').and.callThrough();
+
+    widget.remoteAdapter._syncPropertiesOnPropertyChange(newValues);
+    expect(widget.foo).toBe(6);
+    expect(widget.bar).toBe(7);
+    expect(widget.setFoo).toHaveBeenCalled(); // for property 'foo'
+    expect(widget.setProperty).toHaveBeenCalled(); // for property 'bar'
   });
 
-  describe("_renderPropertiesOnPropertyChange", function() {
+  describe('_renderPropertiesOnPropertyChange', function() {
 
-    it("for non-adapter property -> expects a _render* method", function() {
-      var adapter = new scout.ModelAdapter(),
-        $div = $('<div>');
-      adapter._renderFoo = function(value) {
-        $div.text(value);
+    it('for non-adapter property -> expects a _render* method', function() {
+      var widget = createWidget();
+      var $div = $('<div>');
+      widget.render($sandbox);
+      widget._renderFoo = function() {
+        $div.text(this.foo);
       };
-      adapter._syncPropertiesOnPropertyChange({}, {
+      widget.remoteAdapter._syncPropertiesOnPropertyChange({
         foo: 'bar'
-      }, []);
-      adapter._renderPropertiesOnPropertyChange({}, {
-        foo: 'bar'
-      }, []);
+      });
       expect($div.text()).toBe('bar');
     });
 
-    it("for non-adapter property -> throw when _render* method does not exist", function() {
-      var adapter = new scout.ModelAdapter();
-      expect(adapter._renderPropertiesOnPropertyChange.bind(adapter, {}, {
+    it('for non-adapter property -> throw when _render* method does not exist', function() {
+      var widget = createWidget();
+      var adapter = widget.remoteAdapter;
+      widget.render($sandbox);
+      expect(adapter._syncPropertiesOnPropertyChange.bind(adapter, {
         foo: 'bar'
       })).toThrow();
     });
 
   });
 
-  describe("init", function() {
+  describe('init', function() {
 
-    it("copies properties to adapter", function() {
-      var model = {
-          foo: 6
-        },
-        adapter = new scout.ModelAdapter();
-      model.id = '123';
-      model.parent = new scout.NullWidget();
-      model.session = session;
-      adapter.init(model);
-      expect(adapter.foo).toBe(6);
+    it('copies properties to widget', function() {
+      var widget = createWidget({foo: 6});
+      expect(widget.foo).toBe(6);
     });
 
-    it("sets default values", function() {
+    it('sets default values', function() {
       // model does not contain a property visible
-      var model = createSimpleModel('Button', session);
+      var model = createModel({objectType: 'Button'});
       expect(model.visible).toBe(undefined);
 
-      // because visible is a default property, the property is set on the adapter
-      var adapter = createModelAdapter(model);
-      expect(adapter.visible).toBe(true);
+      // because visible is a default property, the property is set on the widget/adapter
+      var widget = createWidget(model);
+      expect(widget.visible).toBe(true);
 
       // verify that the original model is not modified
       expect(model.visible).toBe(undefined);
@@ -197,288 +193,250 @@ describe('ModelAdapter', function() {
 
   describe('destroy', function() {
 
-    it('destroys the adapter and its children', function() {
-      var adapter = createModelAdapter(createGenericModel(), 'childAdapter');
-      var model = createGenericModel();
+    // FIXME [awe] 6.1 tests umbauen sobald klar ist wohin die adapterProperties gehören und wie sie heissen sollen
+    var widget, adapter, childModel;
 
+    beforeEach(function() {
+      widget = createWidget();
+      adapter = widget.remoteAdapter;
+      childModel = createModel();
+    });
+
+    it('destroys the adapter and its children', function() {
       var message = {
-        adapterData: createAdapterData(model),
+        adapterData: mapAdapterData(childModel),
         events: [createPropertyChangeEvent(adapter, {
-          childAdapter: model.id
+          childWidget: childModel.id
         })]
       };
       session._processSuccessResponse(message);
 
       expect(session.getModelAdapter(adapter.id)).toBe(adapter);
-      expect(adapter.childAdapter).toBeTruthy();
-      expect(session.getModelAdapter(model.id)).toBe(adapter.childAdapter);
+      expect(widget.childWidget).toBeTruthy();
+      expect(session.getModelAdapter(childModel.id)).toBe(widget.childWidget.remoteAdapter);
 
       adapter.destroy();
 
       expect(session.getModelAdapter(adapter.id)).toBeFalsy();
-      expect(session.getModelAdapter(model.id)).toBeFalsy();
+      expect(session.getModelAdapter(childModel.id)).toBeFalsy();
     });
 
     it('does not destroy children, which are globally used', function() {
-      var adapter = createModelAdapter(createGenericModel(), 'childAdapter');
-      var model = createGenericModel();
-      model.owner = session.rootAdapter.id;
+      childModel.owner = session.rootAdapter.id;
 
       var message = {
-        adapterData: createAdapterData(model),
+        adapterData: mapAdapterData(childModel),
         events: [createPropertyChangeEvent(adapter, {
-          childAdapter: model.id
+          childWidget: childModel.id
         })]
       };
       session._processSuccessResponse(message);
 
       expect(session.getModelAdapter(adapter.id)).toBe(adapter);
-      expect(adapter.childAdapter).toBeTruthy();
-      expect(session.getModelAdapter(model.id)).toBe(adapter.childAdapter);
+      expect(widget.childWidget).toBeTruthy();
+      expect(session.getModelAdapter(childModel.id)).toBe(widget.childWidget.remoteAdapter);
 
       adapter.destroy();
 
       expect(session.getModelAdapter(adapter.id)).toBeFalsy();
       // Child adapter still exists
-      expect(session.getModelAdapter(model.id)).toBeTruthy();
-    });
-
-  });
-
-  describe('_firePropertyChange', function() {
-
-    var propertyChangeEvent, adapter;
-
-    beforeEach(function() {
-      adapter = createModelAdapter(createGenericModel(), 'childAdapter');
-    });
-
-    function firePropertyChange(oldValue, newValue) {
-      adapter.on('propertyChange', function(event) {
-        propertyChangeEvent = event;
-      });
-      adapter._firePropertyChange('selected', oldValue, newValue);
-    }
-
-    it('fires the expected event object', function() {
-      firePropertyChange(false, true);
-
-      expect(scout.objects.countOwnProperties(propertyChangeEvent.oldProperties)).toBe(1);
-      expect(scout.objects.countOwnProperties(propertyChangeEvent.newProperties)).toBe(1);
-      expect(propertyChangeEvent.changedProperties.length).toBe(1);
-
-      expect(propertyChangeEvent.oldProperties.selected).toBe(false);
-      expect(propertyChangeEvent.newProperties.selected).toBe(true);
-      expect(propertyChangeEvent.changedProperties[0]).toBe('selected');
-    });
-
-    // FIXME awe: discuss with B.SH - when a property has _not_ changed, should it be
-    // fired as new/old property anyway? When no property has changed, should the propertyChange
-    // event be fired anyway?
-    it('changedProperties is only set when new and old value are not equals', function() {
-      firePropertyChange(true, true);
-      expect(scout.objects.countOwnProperties(propertyChangeEvent.oldProperties)).toBe(1);
-      expect(scout.objects.countOwnProperties(propertyChangeEvent.newProperties)).toBe(1);
-      expect(propertyChangeEvent.changedProperties.length).toBe(0);
-    });
-
-  });
-
-  describe('cloneAdapter', function() {
-
-    var model, adapter, expectedProperties = ['id', 'session', 'objectType', 'parent', 'label'];
-
-    beforeEach(function() {
-      model = createSimpleModel('Button', session);
-      model.label = 'bar';
-      adapter = createModelAdapter(model);
-      adapter.$container = 'dummy container property';
-    });
-
-    it('clones only model properties', function() {
-      var adapterClone = adapter.cloneAdapter();
-      // should contain the following properties:
-      expectedProperties.forEach(function(propertyName) {
-        expect(adapterClone[propertyName]).not.toBe(undefined);
-      });
-      // but not the $container property (which has been added later)
-      expect(adapterClone.$container).toBe(undefined);
-    });
-
-    it('also considers default properties', function() {
-      // change a default property
-      adapter._setProperty('visible', false);
-
-      // expect that this property is correctly copied to the clone
-      var adapterClone = adapter.cloneAdapter();
-      expect(adapterClone.visible).toBe(false);
-    });
-
-    it('\'label\' must be recognized as model property, but not \'$container\'', function() {
-      expect(adapter._isModelProperty('label')).toBe(true);
-      expect(adapter._isModelProperty('$container')).toBe(false);
-    });
-
-    it('prefers properties passed as modelOverride', function() {
-      var adapterClone = adapter.cloneAdapter({
-        label: 'foo'
-      });
-      expect(adapterClone.label).toBe('foo');
-    });
-
-    it('must register clone in clone adapter registry', function() {
-      var adapterClone = adapter.cloneAdapter();
-      expect(adapterClone.cloneOf).toBe(adapter);
-      // registry may contain multiple clones for a given adapter ID
-      // that's why we access index 0 here
-      expect(session._clonedModelAdapterRegistry[adapter.id][0]).toBe(adapterClone);
-    });
-
-    it('must not register clone in adapter registry', function() {
-      var adapterClone = adapter.cloneAdapter();
-      expect(adapterClone.cloneOf).toBe(adapter);
-      // registry may contain multiple clones for a given adapter ID
-      // that's why we access index 0 here
-      expect(session.modelAdapterRegistry[adapterClone.id]).toBe(undefined);
+      expect(session.getModelAdapter(childModel.id)).toBeTruthy();
     });
 
   });
 
   describe('onModelPropertyChange', function() {
 
+    var widget, adapter, childModel, childModel2;
+
+    beforeEach(function() {
+      widget = createWidget();
+      adapter = widget.remoteAdapter;
+      childModel = createModel();
+      childModel2 = createModel();
+    });
+
     describe('adapter', function() {
 
       it('creates and registers the new adapter', function() {
-        var adapter = createModelAdapter(createGenericModel(), 'childAdapter');
-        var model = createGenericModel();
-
         var message = {
-          adapterData: createAdapterData(model),
+          adapterData: mapAdapterData(childModel),
           events: [createPropertyChangeEvent(adapter, {
-            childAdapter: model.id
+            childWidget: childModel.id
           })]
         };
         session._processSuccessResponse(message);
 
-        expect(adapter.childAdapter).toBeTruthy();
-        expect(session.getModelAdapter(model.id)).toBe(adapter.childAdapter);
+        expect(widget.childWidget).toBeTruthy();
+        expect(session.getModelAdapter(childModel.id)).toBe(widget.childWidget.remoteAdapter);
       });
 
       it('destroys the old adapter', function() {
-        var adapter = createModelAdapter(createGenericModel(), 'childAdapter');
-        var model1 = createGenericModel();
-        var model2 = createGenericModel();
-
         var message = {
-          adapterData: createAdapterData(model1),
+          adapterData: mapAdapterData(childModel),
           events: [createPropertyChangeEvent(adapter, {
-            childAdapter: model1.id
+            childWidget: childModel.id
           })]
         };
         session._processSuccessResponse(message);
 
-        expect(adapter.childAdapter).toBeTruthy();
-        expect(session.getModelAdapter(model1.id)).toBe(adapter.childAdapter);
+        expect(widget.childWidget).toBeTruthy();
+        expect(session.getModelAdapter(childModel.id)).toBe(widget.childWidget.remoteAdapter);
 
         message = {
-          adapterData: createAdapterData(model2),
+          adapterData: mapAdapterData(childModel2),
           events: [createPropertyChangeEvent(adapter, {
-            childAdapter: model2.id
+            childWidget: childModel2.id
           })]
         };
         session._processSuccessResponse(message);
 
-        expect(session.getModelAdapter(model2.id)).toBe(adapter.childAdapter);
-        expect(session.getModelAdapter(model1.id)).toBeFalsy();
+        expect(session.getModelAdapter(childModel2.id)).toBe(widget.childWidget.remoteAdapter);
+        expect(session.getModelAdapter(childModel.id)).toBeFalsy();
       });
 
     });
 
+    describe('filters', function() {
+
+      var widget, adapter;
+
+      beforeEach(function() {
+        jasmine.Ajax.requests.reset();
+        widget = createWidget();
+        adapter = widget.remoteAdapter;
+        adapter._addRemoteProperties(['foo']);
+      });
+
+      describe('propertyChange events', function() {
+
+        it('should send event when property change is triggered by widget', function() {
+          widget.setProperty('foo', 'bar');
+          sendQueuedAjaxCalls();
+          expect(jasmine.Ajax.requests.count()).toBe(1);
+
+          var event = new scout.Event(widget.id, 'property', {
+            foo: 'bar'
+          });
+          expect(mostRecentJsonRequest()).toContainEvents(event);
+          expect(widget.foo).toBe('bar');
+        });
+
+        it('should not send event when property is triggered by server', function() {
+          var propertyChangeEvent = new scout.Event('123', 'propertyChange', {
+            properties: {foo: 'bar'}
+          });
+          adapter.onModelPropertyChange(propertyChangeEvent);
+          sendQueuedAjaxCalls();
+          expect(jasmine.Ajax.requests.count()).toBe(0);
+          expect(widget.foo).toBe('bar');
+        });
+
+      });
+
+      // FIXME [awe] 6.1 - make tests where property is an adapter
+      // FIXME [awe] 6.1 - check all occurrences of 'notifyServer' and use filter where applicable
+
+      describe('widget events', function() {
+
+        it('should handle widget event when it is not filtered', function() {
+          spyOn(adapter, '_onWidgetEvent');
+          widget.trigger('fooHappened');
+          expect(adapter._onWidgetEvent).toHaveBeenCalled();
+        });
+
+        it('should not handle widget event when it is filtered', function() {
+          adapter.addFilterForWidgetEventType('fooHappened');
+          spyOn(adapter, '_onWidgetEvent');
+          widget.trigger('fooHappened');
+          expect(adapter._onWidgetEvent).not.toHaveBeenCalled();
+
+          // reset filters, then onWidgetEvent should be called again
+          adapter.resetEventFilters();
+          widget.trigger('fooHappened');
+          expect(adapter._onWidgetEvent).toHaveBeenCalled();
+        });
+
+      });
+
+    });
+
+
     describe('adapters', function() {
 
       it('creates and registers adapters', function() {
-        var adapter = createModelAdapter(createGenericModel(), 'childAdapters');
-        var model1 = createGenericModel();
-        var model2 = createGenericModel();
-
         var message = {
-          adapterData: createAdapterData([model1, model2]),
+          adapterData: mapAdapterData([childModel, childModel2]),
           events: [createPropertyChangeEvent(adapter, {
-            childAdapters: [model1.id, model2.id]
+            childWidget: [childModel.id, childModel2.id]
           })]
         };
         session._processSuccessResponse(message);
 
-        expect(adapter.childAdapters[0]).toBeTruthy();
-        expect(adapter.childAdapters[1]).toBeTruthy();
-        expect(session.getModelAdapter(model1.id)).toBe(adapter.childAdapters[0]);
-        expect(session.getModelAdapter(model2.id)).toBe(adapter.childAdapters[1]);
+        expect(widget.childWidget[0]).toBeTruthy();
+        expect(widget.childWidget[1]).toBeTruthy();
+        expect(session.getModelAdapter(childModel.id)).toBe(widget.childWidget[0].remoteAdapter);
+        expect(session.getModelAdapter(childModel2.id)).toBe(widget.childWidget[1].remoteAdapter);
       });
 
       it('destroys the old adapters', function() {
-        var adapter = createModelAdapter(createGenericModel(), 'childAdapters');
-        var model1 = createGenericModel();
-        var model2 = createGenericModel();
-
         var message = {
-          adapterData: createAdapterData([model1, model2]),
+          adapterData: mapAdapterData([childModel, childModel2]),
           events: [createPropertyChangeEvent(adapter, {
-            childAdapters: [model1.id, model2.id]
+            childWidget: [childModel.id, childModel2.id]
           })]
         };
         session._processSuccessResponse(message);
+        expect(widget.childWidget[0]).toBeTruthy();
+        expect(widget.childWidget[1]).toBeTruthy();
+        expect(session.getModelAdapter(childModel.id)).toBe(widget.childWidget[0].remoteAdapter);
+        expect(session.getModelAdapter(childModel2.id)).toBe(widget.childWidget[1].remoteAdapter);
 
-        expect(adapter.childAdapters[0]).toBeTruthy();
-        expect(adapter.childAdapters[1]).toBeTruthy();
-        expect(session.getModelAdapter(model1.id)).toBe(adapter.childAdapters[0]);
-        expect(session.getModelAdapter(model2.id)).toBe(adapter.childAdapters[1]);
-
+        var childWidget = widget.childWidget[0];
+        var childWidget2 = widget.childWidget[1];
         message = {
           events: [createPropertyChangeEvent(adapter, {
-            childAdapters: [model2.id]
+            childWidget: [childModel2.id]
           })]
         };
         session._processSuccessResponse(message);
-
-        expect(adapter.childAdapters.length).toBe(1);
-        expect(adapter.childAdapters[0]).toBeTruthy();
-        expect(session.getModelAdapter(model2.id)).toBe(adapter.childAdapters[0]);
-        expect(session.getModelAdapter(model1.id)).toBeFalsy();
+        expect(widget.childWidget.length).toBe(1);
+        expect(widget.childWidget[0]).toBeTruthy();
+        expect(session.getModelAdapter(childModel.id)).toBeFalsy();
+        expect(childWidget.destroyed).toBe(true);
+        expect(session.getModelAdapter(childModel2.id)).toBe(widget.childWidget[0].remoteAdapter);
+        expect(childWidget2.destroyed).toBe(false);
       });
 
       it('destroys the old and creates the new adapters if the array contains both', function() {
-        var adapter = createModelAdapter(createGenericModel(), 'childAdapters');
-        var model1 = createGenericModel();
-        var model2 = createGenericModel();
-        var model3 = createGenericModel();
-
+        var childModel3 = createModel();
         var message = {
-          adapterData: createAdapterData([model1, model2]),
+          adapterData: mapAdapterData([childModel, childModel2]),
           events: [createPropertyChangeEvent(adapter, {
-            childAdapters: [model1.id, model2.id]
+            childWidget: [childModel.id, childModel2.id]
           })]
         };
         session._processSuccessResponse(message);
 
-        expect(adapter.childAdapters[0]).toBeTruthy();
-        expect(adapter.childAdapters[1]).toBeTruthy();
-        expect(session.getModelAdapter(model1.id)).toBe(adapter.childAdapters[0]);
-        expect(session.getModelAdapter(model2.id)).toBe(adapter.childAdapters[1]);
+        expect(widget.childWidget[0]).toBeTruthy();
+        expect(widget.childWidget[1]).toBeTruthy();
+        expect(session.getModelAdapter(childModel.id)).toBe(widget.childWidget[0].remoteAdapter);
+        expect(session.getModelAdapter(childModel2.id)).toBe(widget.childWidget[1].remoteAdapter);
 
         message = {
-          adapterData: createAdapterData(model3),
+          adapterData: mapAdapterData(childModel3),
           events: [createPropertyChangeEvent(adapter, {
-            childAdapters: [model2.id, model3.id]
+            childWidget: [childModel2.id, childModel3.id]
           })]
         };
         session._processSuccessResponse(message);
 
-        expect(adapter.childAdapters.length).toBe(2);
-        expect(adapter.childAdapters[0]).toBeTruthy();
-        expect(adapter.childAdapters[1]).toBeTruthy();
-        expect(session.getModelAdapter(model2.id)).toBe(adapter.childAdapters[0]);
-        expect(session.getModelAdapter(model3.id)).toBe(adapter.childAdapters[1]);
-        expect(session.getModelAdapter(model1.id)).toBeFalsy();
+        expect(widget.childWidget.length).toBe(2);
+        expect(widget.childWidget[0]).toBeTruthy();
+        expect(widget.childWidget[1]).toBeTruthy();
+        expect(session.getModelAdapter(childModel2.id)).toBe(widget.childWidget[0].remoteAdapter);
+        expect(session.getModelAdapter(childModel3.id)).toBe(widget.childWidget[1].remoteAdapter);
+        expect(session.getModelAdapter(childModel.id)).toBeFalsy();
       });
 
     });

@@ -31,7 +31,7 @@ scout.DesktopNavigation.prototype._init = function(model) {
   this.layoutData = model.layoutData || {};
   this.toolBoxVisible = scout.nvl(model.toolBoxVisible, false);
   this.updateHandleVisibility();
-  this.setOutline(model.outline);
+  this._syncOutline(model.outline);
 };
 
 scout.DesktopNavigation.prototype._render = function($parent) {
@@ -54,6 +54,7 @@ scout.DesktopNavigation.prototype._remove = function() {
 };
 
 scout.DesktopNavigation.prototype._renderProperties = function() {
+  scout.DesktopNavigation.parent.prototype._renderProperties.call(this);
   this._renderViewButtonBox();
   this._renderToolBoxVisible();
   this._renderOutline();
@@ -64,6 +65,7 @@ scout.DesktopNavigation.prototype._renderViewButtonBox = function() {
   if (this.desktop.viewButtons.length === 0) {
     return;
   }
+
   this.viewButtonBox = scout.create('ViewButtonBox', {
     parent: this,
     viewButtons: this.desktop.viewButtons
@@ -71,11 +73,17 @@ scout.DesktopNavigation.prototype._renderViewButtonBox = function() {
   this.viewButtonBox.render(this.$container);
 };
 
+scout.DesktopNavigation.prototype._removeOutline = function() {
+  if (!this.outline) {
+    return;
+  }
+  this.outline.remove();
+};
+
 scout.DesktopNavigation.prototype._renderOutline = function() {
   if (!this.outline) {
     return;
   }
-  this.outline.setParent(this);
   this.outline.render(this.$body);
   this.outline.invalidateLayoutTree();
   // Layout immediate to prevent flickering when breadcrumb mode is enabled
@@ -87,19 +95,17 @@ scout.DesktopNavigation.prototype._renderOutline = function() {
 };
 
 scout.DesktopNavigation.prototype.setOutline = function(outline) {
+  this.setProperty('outline', outline);
+};
+
+scout.DesktopNavigation.prototype._syncOutline = function(outline) {
   var currentDisplayStyle;
-  if (this.outline === outline) {
-    return;
-  }
   if (this.outline) {
     currentDisplayStyle = this.outline.displayStyle;
-    if (this.rendered) {
-      this.outline.remove();
-    }
   }
-
   this.outline = outline;
   if (this.outline) {
+    this.outline.setParent(this);
     this.outline.setBreadcrumbTogglingThreshold(scout.DesktopNavigation.BREADCRUMB_STYLE_WIDTH);
     // Make sure new outline uses same display style as old
     if (currentDisplayStyle && this.outline.autoToggleBreadcrumbStyle) {
@@ -108,9 +114,6 @@ scout.DesktopNavigation.prototype.setOutline = function(outline) {
     this.outline.inBackground = this.desktop.inBackground;
     this.outline.on('propertyChange', this._outlinePropertyChangeHandler);
     this._updateHandle();
-    if (this.rendered) {
-      this._renderOutline();
-    }
   }
 };
 
@@ -133,20 +136,11 @@ scout.DesktopNavigation.prototype.bringToFront = function() {
 };
 
 scout.DesktopNavigation.prototype.setToolBoxVisible = function(toolBoxVisible) {
-  this.toolBoxVisible = toolBoxVisible;
-  if (this.rendered) {
-    this._renderToolBoxVisible();
-  }
+  this.setProperty('toolBoxVisible', toolBoxVisible);
 };
 
 scout.DesktopNavigation.prototype.setHandleVisible = function(visible) {
-  if (this.handleVisible === visible) {
-    return;
-  }
-  this.handleVisible = visible;
-  if (this.rendered) {
-    this._renderHandleVisible();
-  }
+  this.setProperty('handleVisible', visible);
 };
 
 scout.DesktopNavigation.prototype._updateHandle = function() {
@@ -183,7 +177,7 @@ scout.DesktopNavigation.prototype._removeToolBox = function() {
   if (!this.toolBox) {
     return;
   }
-  this.toolBox.remove();
+  this.toolBox.destroy();
   this.toolBox = null;
 };
 
@@ -212,7 +206,7 @@ scout.DesktopNavigation.prototype._removeHandle = function() {
   if (!this.handle) {
     return;
   }
-  this.handle.remove();
+  this.handle.destroy();
   this.handle = null;
 };
 

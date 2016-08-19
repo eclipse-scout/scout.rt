@@ -130,12 +130,10 @@ scout.SimpleTabAreaLayout.prototype._onMouseDownOverflow = function(event) {
       text: tab.getMenuText(),
       tab: tab
     });
-    menu.remoteHandler = function(event) {
-      if ('doAction' === event.type) {
-        $.log.debug('(SimpleTabAreaLayout#_onMouseDownOverflow) tab=' + this);
-        tabArea.selectTab(this);
-      }
-    }.bind(tab);
+    menu.on('doAction', function() {
+      $.log.debug('(SimpleTabAreaLayout#_onMouseDownOverflow) tab=' + this);
+      tabArea.selectTab(this);
+    }.bind(tab));
     overflowMenus.push(menu);
   }, this);
 

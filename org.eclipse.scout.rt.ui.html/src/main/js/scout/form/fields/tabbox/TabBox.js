@@ -67,9 +67,6 @@ scout.TabBox.prototype._remove = function() {
   scout.TabBox.parent.prototype._remove.call(this);
   this._removeTabs();
   this._removeTabContent();
-  if (this.menuBar) {
-    this.menuBar.remove();
-  }
 };
 
 /**
@@ -211,11 +208,11 @@ scout.TabBox.prototype._renderTabContent = function() {
   }
 };
 
-scout.TabBox.prototype._syncMenus = function(menus, oldMenus) {
-  scout.TabBox.parent.prototype._syncMenus.call(this, menus, oldMenus);
+scout.TabBox.prototype._syncMenus = function(menus) {
+  scout.TabBox.parent.prototype._syncMenus.call(this, menus);
   if (this.menuBar) {
     // updateMenuBar is required because menuBar is not created yet when synMenus is called initially
-    this._updateMenuBar(menus, oldMenus);
+    this._updateMenuBar(menus);
   }
 };
 
@@ -227,7 +224,7 @@ scout.TabBox.prototype._removeMenus = function() {
   // menubar takes care about removal
 };
 
-scout.TabBox.prototype._updateMenuBar = function(menus, oldMenus) {
+scout.TabBox.prototype._updateMenuBar = function(menus) {
   var menuItems = scout.menus.filter(this.menus, ['TabBox.Header']);
   this.menuBar.setMenuItems(menuItems);
 };

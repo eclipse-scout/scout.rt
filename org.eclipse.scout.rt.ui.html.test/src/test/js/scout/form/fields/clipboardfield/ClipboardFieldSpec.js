@@ -27,14 +27,8 @@ describe('ClipboardField', function() {
     scout.device = origDevice;
   });
 
-  function createField(model) {
-    var field = new scout.ClipboardField();
-    field.init(model || createModel());
-    return field;
-  }
-
-  function createModel() {
-    return helper.createFieldModel();
+  function createField() {
+    return helper.createField('ClipboardField');
   }
 
   it('Rendered container has the right class', function() {

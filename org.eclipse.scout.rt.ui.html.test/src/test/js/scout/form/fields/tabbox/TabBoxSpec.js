@@ -15,44 +15,27 @@ describe('TabBox', function() {
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
-    helper = new scout.FormSpecHelper(session);
+    helper = new scout.TabBoxSpecHelper(session);
   });
 
-  function createTabBox(tabItems) {
-    var model = helper.createFieldModel('TabBox');
-
-    // Form is necessary to make keystrokes work
-    var form = helper.createFormWithOneField();
-    form.render(session.$entryPoint);
-
-    model.tabItems = [];
-    for (var i=0; i < tabItems.length; i++) {
-      model.tabItems.push(tabItems[i].id);
-    }
-    model.selectedTab = 0;
-    model.owner = form.id;
-    model.parent = form;
-    return createAdapter(model, session, tabItems);
-  }
-
   describe('render', function() {
-    var field;
+    var tabBox;
 
     beforeEach(function() {
-      var groupBox = helper.createFieldModel('TabItem');
-      field = createTabBox([groupBox]);
+      var tabItem = helper.createTabItem();
+      tabBox = helper.createTabBox([tabItem]);
     });
 
     it('does NOT call layout for the selected tab on initialization', function() {
       spyOn(session.layoutValidator, 'invalidateTree').and.callThrough();
-      field.render(session.$entryPoint);
+      tabBox.render(session.$entryPoint);
       expect(session.layoutValidator.invalidateTree).not.toHaveBeenCalled();
     });
 
     it('must not create LogicalGridData for tab items', function() {
-      field.render(session.$entryPoint);
+      tabBox.render(session.$entryPoint);
       // See TabItem.js for the reason for this spec
-      expect(field.tabItems[0].htmlComp.layoutData).toBe(null);
+      expect(tabBox.tabItems[0].htmlComp.layoutData).toBe(null);
     });
 
   });

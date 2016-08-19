@@ -49,7 +49,7 @@ scout.login = {
    */
   _init : function(options) {
     options = options || {};
-    options.texts = $.extend({}, scout.Texts.readFromDOM(), options.texts);
+    options.texts = $.extend({}, scout.texts.readFromDOM(), options.texts);
 
     scout.prepareDOM();
     scout.objectFactory.init();

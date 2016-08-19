@@ -135,7 +135,7 @@ scout.scrollbars = {
       $.log.debug('installing JS-scrollbars for container ' + scout.graphics.debugOutput($container));
       scrollbars = scout.arrays.ensure($container.data('scrollbars'));
       scrollbars.forEach(function(scrollbar) {
-        scrollbar.remove();
+        scrollbar.destroy();
       });
       scrollbars = [];
       if (options.axis === 'both') {
@@ -174,7 +174,7 @@ scout.scrollbars = {
     var scrollbars = $container.data('scrollbars');
     if (scrollbars) {
       scrollbars.forEach(function(scrollbar) {
-        scrollbar.remove();
+        scrollbar.destroy();
       });
     }
     this.removeScrollable(session, $container);

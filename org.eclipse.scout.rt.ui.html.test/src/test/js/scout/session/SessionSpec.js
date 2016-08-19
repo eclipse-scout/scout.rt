@@ -37,6 +37,8 @@ describe('Session', function() {
 
     it('sends multiple async events in one call', function() {
       var session = createSession();
+      // initially there should be no request at all
+      expect(jasmine.Ajax.requests.count()).toBe(0);
 
       send(session, 1, 'nodeClicked');
       expect(jasmine.Ajax.requests.count()).toBe(0);
@@ -353,14 +355,14 @@ describe('Session', function() {
 
   });
 
-  // Tests whether delegation to scout.Texts works as expected
+  // Tests whether delegation to scout.TextMap works as expected
   describe('texts', function() {
 
     var session;
 
     beforeEach(function() {
       session = createSession();
-      session._texts = new scout.Texts({
+      session._texts = new scout.TextMap({
         NoOptions: 'Keine Übereinstimmung',
         NumOptions: '{0} Optionen',
         Greeting: 'Hello {0}, my name is {2}, {1}.',

@@ -14,6 +14,7 @@
  */
 scout.ValueField = function() {
   scout.ValueField.parent.call(this);
+  this.displayText = '';
 };
 scout.inherits(scout.ValueField, scout.FormField);
 
@@ -54,7 +55,7 @@ scout.ValueField.prototype._onFieldBlur = function() {
  * It is also called by the _aboutToBlurByMouseDown() function, which is required because our Ok- and Cancel-buttons are not focusable (thus _onBlur() is
  * never called) but changes in the value-field must be sent to the server anyway when a button is clicked.
  * <p>
- * The default reads the display text using this._readDisplayText() and writes it to the model by calling _sendDisplayTextChanged().
+ * The default reads the display text using this._readDisplayText() and writes it to the model by calling _triggerDisplayTextChanged().
  * If subclasses don't have a display-text or want to write another state to the server, they may override this method.
  *
  */
@@ -69,7 +70,7 @@ scout.ValueField.prototype.acceptInput = function(whileTyping) {
     if (displayText !== validatedDisplayText) {
       this._renderDisplayText(this.displayText);
     }
-    this._sendDisplayTextChanged(validatedDisplayText, whileTyping);
+    this._triggerDisplayTextChanged(validatedDisplayText, whileTyping);
   }
 };
 
@@ -95,14 +96,11 @@ scout.ValueField.prototype.aboutToBlurByMouseDown = function(target) {
   }
 };
 
-scout.ValueField.prototype._sendDisplayTextChanged = function(displayText, whileTyping) {
+scout.ValueField.prototype._triggerDisplayTextChanged = function(displayText, whileTyping) {
   var event = {
     displayText: displayText,
     whileTyping: whileTyping
   };
-  this._send('displayTextChanged', event, {
-    showBusyIndicator: !whileTyping
-  });
   this.trigger('displayTextChanged', event);
 };
 
@@ -111,13 +109,7 @@ scout.ValueField.prototype._sendDisplayTextChanged = function(displayText, while
  * May be used to just modify the display text without validation
  */
 scout.ValueField.prototype.setDisplayText = function(displayText) {
-  if (this.displayText === displayText) {
-    return;
-  }
-  this.displayText = displayText;
-  if (this.rendered) {
-    this._renderDisplayText();
-  }
+  this.setProperty('displayText', displayText);
 };
 
 scout.ValueField.prototype.addField = function($field) {

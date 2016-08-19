@@ -132,6 +132,9 @@ describe("Table Filter", function() {
       expect(table.rows[2].$row).toBeFalsy();
     });
 
+    // FIXME [awe] 6.1 add a test where we don't have a row filter (filterCount=0)
+    // and insert rows
+
     it("applies row filter if a row gets updated", function() {
       var model = helper.createModelFixture(2, 2),
         table = helper.createTable(model),
@@ -268,7 +271,7 @@ describe("Table Filter", function() {
       expect(table.$rows().length).toBe(0);
 
       // Remove filters
-      table._onFiltersChanged([]);
+      table.setFilters([]);
       expect(table._filterCount()).toBe(0);
 
       // Insert rows again
@@ -633,8 +636,10 @@ describe("Table Filter", function() {
 
       it("gets sent to server containing rowIds when rows are filtered", function() {
         var model = helper.createModelFixture(2, 2),
-          table = helper.createTable(model),
+          adapter = helper.createTableAdapter(model),
+          table = adapter.createWidget(model, session.desktop),
           column0 = table.columns[0];
+
         table.render(session.$entryPoint);
 
         var filter = createAndRegisterColumnFilter(table, column0, ['cell1_0']);

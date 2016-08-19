@@ -47,6 +47,19 @@
     }
   }
 
+  &.disabled {
+    color: @text-disabled-color;
+
+    &:hover {
+      cursor: default;
+      color: @text-disabled-color;
+
+      &:not(.selected) > .font-icon {
+        color: @text-disabled-color;
+      }
+    }
+  }
+
   &.view-menu-popup-head {
     position: absolute;
     background-color: @active-inverted-color;

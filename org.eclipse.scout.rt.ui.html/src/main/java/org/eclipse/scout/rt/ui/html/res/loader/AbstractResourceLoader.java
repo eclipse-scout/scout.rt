@@ -10,9 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.res.loader;
 
+import java.io.IOException;
+
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.server.commons.servlet.cache.GlobalHttpResourceCache;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheKey;
+import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheObject;
 import org.eclipse.scout.rt.server.commons.servlet.cache.IHttpResourceCache;
 
 /**
@@ -33,6 +37,16 @@ public abstract class AbstractResourceLoader implements IResourceLoader {
    */
   protected AbstractResourceLoader(IHttpResourceCache cache) {
     m_cache = cache; // may also be null
+  }
+
+  @Override
+  public HttpCacheObject loadResource(HttpCacheKey cacheKey) throws IOException {
+    String pathInfo = cacheKey.getResourcePath();
+    BinaryResource content = loadResource(pathInfo);
+    if (content == null) {
+      return null;
+    }
+    return new HttpCacheObject(cacheKey, content);
   }
 
   /**

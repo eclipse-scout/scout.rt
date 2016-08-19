@@ -32,10 +32,11 @@ describe("CellEditor", function() {
     }
   });
 
-  function createField (objectType, table) {
-    var field = formHelper.createFieldModel(objectType);
-    field.owner = table.id;
-    return createAdapter(field, session);
+  function createStringField(table) {
+    var model = formHelper.createFieldModel('StringField', session.desktop);
+    var adapter = new scout.StringFieldAdapter();
+    adapter.init(model);
+    return adapter.createWidget(model, session.desktop);
   }
 
   function $findPopup() {
@@ -49,17 +50,18 @@ describe("CellEditor", function() {
   function createTableAndStartCellEdit() {
     var model = helper.createModelFixture(2, 2);
     model.rows[0].cells[0].editable = true;
-    var table = helper.createTable(model);
+    var adapter = helper.createTableAdapter(model) ;
+    var table = adapter.createWidget(model, session.desktop);
     table.render(session.$entryPoint);
 
-    var field = createField('StringField', table);
-    table._startCellEdit(table.columns[0], table.rows[0], field.id);
+    var field = createStringField(table);
+    table.startCellEdit(table.columns[0], table.rows[0], field);
     return findPopup();
   }
 
   function startAndAssertCellEdit(table, column, row) {
-    var field = createField('StringField', table);
-    var popup = table._startCellEdit(column, row, field.id);
+    var field = createStringField(table);
+    var popup = table.startCellEdit(column, row, field);
     expect($findPopup().length).toBe(1);
     expect($findPopup().find('.form-field').length).toBe(1);
     expect(popup.cell.field.rendered).toBe(true);
@@ -328,7 +330,7 @@ describe("CellEditor", function() {
     beforeEach(function() {
       model = helper.createModelFixture(2, 3);
       table = helper.createTable(model);
-      row0 = model.rows[0];
+      row0 = table.rows[0];
     });
 
     it("reopens popup if row gets updated", function() {
@@ -342,13 +344,10 @@ describe("CellEditor", function() {
 
       var updatedRows = helper.createModelRows(2, 1);
       updatedRows[0].id = row0.id;
-      var message = {
-        events: [createRowsUpdatedEvent(model, updatedRows)]
-      };
-      session._processSuccessResponse(message);
+      table.updateRows(updatedRows);
 
       // Check if popup is correctly linked to updated row and new $cell
-      row0 = updatedRows[0];
+      row0 = table.rows[0];
       $cells0 = table.$cellsForRow(row0.$row);
       $cell0_0 = $cells0.eq(0);
       expect($findPopup().length).toBe(1);
@@ -360,30 +359,30 @@ describe("CellEditor", function() {
       row0.cells[0].editable = true;
       table.render(session.$entryPoint);
       startAndAssertCellEdit(table, table.columns[0], row0);
-      spyOn(table, '_sendCancelCellEdit');
+      spyOn(table, '_triggerCancelCellEdit');
 
       table.deleteRows([row0]);
 
       // Check if popup is closed
       expect($findPopup().length).toBe(0);
 
-      // Check whether cancel edit has been sent
-      expect(table._sendCancelCellEdit).toHaveBeenCalled();
+      // Check whether cancel edit has been called
+      expect(table._triggerCancelCellEdit).toHaveBeenCalled();
     });
 
     it("closes popup if all rows get deleted", function() {
       row0.cells[0].editable = true;
       table.render(session.$entryPoint);
       startAndAssertCellEdit(table, table.columns[0], row0);
-      spyOn(table, '_sendCancelCellEdit');
+      spyOn(table, '_triggerCancelCellEdit');
 
       table.deleteAllRows();
 
       // Check if popup is closed
       expect($findPopup().length).toBe(0);
 
-      // Check whether cancel edit has been sent
-      expect(table._sendCancelCellEdit).toHaveBeenCalled();
+      // Check whether cancel edit has been called
+      expect(table._triggerCancelCellEdit).toHaveBeenCalled();
     });
 
   });

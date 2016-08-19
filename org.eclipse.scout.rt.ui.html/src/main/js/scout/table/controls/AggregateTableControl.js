@@ -148,20 +148,13 @@ scout.AggregateTableControl.prototype._updateEnabledAndSelectedState = function(
   this.setEnabled(enabled);
 };
 
-scout.AggregateTableControl.prototype.setEnabled = function(enabled) {
-  this.enabled = enabled;
-  if (this.rendered) {
-    this._renderEnabled();
-  }
-};
-
 scout.AggregateTableControl.prototype._syncEnabled = function(enabled) {
-  this.enabled = enabled;
+  this._setProperty('enabled', enabled);
   this._updateEnabledAndSelectedState();
 };
 
 scout.AggregateTableControl.prototype._syncSelected = function(selected) {
-  this.selected = selected;
+  this._setProperty('selected', selected);
   this._updateEnabledAndSelectedState();
 };
 

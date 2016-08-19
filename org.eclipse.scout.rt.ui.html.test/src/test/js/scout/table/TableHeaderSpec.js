@@ -35,15 +35,8 @@ describe("TableHeaderSpec", function() {
       expect(table.header).not.toBeUndefined();
       var listenerCount = table.events._eventListeners.length;
 
-      var event = createPropertyChangeEvent(table, {
-        "headerVisible": false
-      });
-      table.onModelPropertyChange(event);
-
-      event = createPropertyChangeEvent(table, {
-        "headerVisible": true
-      });
-      table.onModelPropertyChange(event);
+      table.setHeaderVisible(false);
+      table.setHeaderVisible(true);
 
       // Still same amount of listeners expected after header visibility changed
       expect(table.events._eventListeners.length).toBe(listenerCount);

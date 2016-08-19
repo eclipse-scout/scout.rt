@@ -48,6 +48,20 @@ scout.objects = {
   },
 
   /**
+   * Copies the specified properties (including the ones from the prototype.) from dest to source.
+   * Properties that already exist on dest are NOT overwritten.
+   */
+  extractProperties: function(source, dest, properties) {
+    var destProperty;
+    properties.forEach(function(propertyName) {
+      if (!dest[propertyName]) {
+        dest[propertyName] = source[propertyName];
+      }
+    });
+    return dest;
+  },
+
+  /**
    * returns
    *  - true if the obj has at least one of the given properties.
    *  - false if the obj has none of the given properties.
@@ -111,6 +125,16 @@ scout.objects = {
   },
 
   /**
+   * Use this method in your functions to assert that a mandatory parameter is passed
+   * to the function. Throws an Error when value is not set.
+   */
+  mandatoryParameter: function(parameterName, value) {
+    if (!value) {
+      throw new Error('Missing required parameter \'' + parameterName + '\'');
+    }
+  },
+
+  /**
    * Returns the given property if the object is truthy.
    */
   optProperty: function(obj, property) {
@@ -137,6 +161,10 @@ scout.objects = {
    */
   isNumber: function(obj) {
     return obj !== null && !isNaN(obj) && isFinite(obj);
+  },
+
+  isString: function(obj) {
+    return typeof obj === 'string';
   },
 
   /**

@@ -14,6 +14,17 @@
  */
 scout.FormField = function() {
   scout.FormField.parent.call(this);
+  this.keyStrokes = [];
+  this.labelVisible = true;
+  this.labelPosition = scout.FormField.LABEL_POSITION_DEFAULT;
+  this.labelWidthInPixel = 0;
+  this.loading = false;
+  this.mandatory = false;
+  this.statusVisible = true;
+  this.statusPosition = scout.FormField.STATUS_POSITION_DEFAULT;
+  this.menus = [];
+  this.menusVisible = false;
+  this.gridData;
   this.$label;
 
   /**
@@ -33,15 +44,10 @@ scout.FormField = function() {
    */
   this.$status;
   this._addAdapterProperties(['keyStrokes', 'menus']);
+  this._addCloneProperties(['displayText']);
   this.refFieldId;
   this.mode = scout.FormField.MODE_DEFAULT;
   this.loadingSupport; // Object to handle the 'loading' property (different for tile fields)
-
-  /**
-   * Set this property to true when the form-field should stay enabled in offline case.
-   * By default the field will be disabled.
-   */
-  this.enabledWhenOffline = false;
 
   /**
    * Some browsers don't support copying text from disabled input fields. If such a browser is detected
@@ -51,7 +57,7 @@ scout.FormField = function() {
   this.disabledCopyOverlay = false;
   this.$disabledCopyOverlay;
 };
-scout.inherits(scout.FormField, scout.ModelAdapter);
+scout.inherits(scout.FormField, scout.Widget);
 
 scout.FormField.LABEL_POSITION_DEFAULT = 0;
 scout.FormField.LABEL_POSITION_LEFT = 1;
@@ -73,10 +79,11 @@ scout.FormField.MODE_CELLEDITOR = 'celleditor';
 
 scout.FormField.prototype._init = function(model) {
   scout.FormField.parent.prototype._init.call(this, model);
-  this.refFieldId = this.uniqueId('ref');
+//  this.refFieldId = this.uniqueId('ref'); // FIXME [6.1] CGU move to widget or form field adapter? still needed?
   this._syncKeyStrokes(this.keyStrokes);
   this._syncMenus(this.menus);
   this._syncErrorStatus(this.errorStatus);
+  this._syncGridData(this.gridData);
 };
 
 /**
@@ -97,9 +104,8 @@ scout.FormField.prototype._render = function($parent) {
 };
 
 scout.FormField.prototype._renderProperties = function() {
-  this._renderEnabled();
+  scout.FormField.parent.prototype._renderProperties.call(this);
   this._renderMandatory();
-  this._renderVisible();
   this._renderTooltipText();
   this._renderErrorStatus();
   this._renderMenus();
@@ -160,9 +166,11 @@ scout.FormField.prototype._renderTooltipText = function() {
   this._updateStatusVisible();
 };
 
-scout.FormField.prototype._renderVisible = function(visible) {
-  visible = scout.nvl(visible, this.visible);
-  this.$container.setVisible(visible);
+/**
+ * @override
+ */
+scout.FormField.prototype._renderVisible = function() {
+  this.$container.setVisible(this.visible);
   if (this.rendered) {
     var htmlCompParent = this.htmlComp.getParent();
     if (htmlCompParent) { // may be null if $container is detached
@@ -197,6 +205,9 @@ scout.FormField.prototype._renderPlaceholder = function($field) {
   }
 };
 
+/**
+ * @param $field (optional) argument is required by DateField.js, when not set this.$field is used
+ */
 scout.FormField.prototype._removePlaceholder = function($field) {
   $field = scout.nvl($field, this.$field);
   if ($field) {
@@ -216,9 +227,9 @@ scout.FormField.prototype._renderStatusVisible = function() {
   // Pseudo status is only for layouting purpose, therefore tooltip, errorStatus etc. must not influence its visibility -> not necessary to use _computeStatusVisible
   this._renderChildVisible(this.$pseudoStatus, statusVisible);
 
-  // Make sure tooltip gets removed if there is no status anymore (tooltip points to the status)
+  // Make sure tooltip gets destroyed if there is no status anymore (tooltip points to the status)
   if (this.$status && !this.$status.isVisible() && this.tooltip) {
-    this.tooltip.remove();
+    this.tooltip.destroy();
   }
 };
 
@@ -264,19 +275,23 @@ scout.FormField.prototype._renderLabelPosition = function(position) {
   this._renderLabel();
 };
 
-scout.FormField.prototype._renderEnabled = function(enabled) {
-  enabled = scout.nvl(enabled, this.enabled);
-  this.$container.setEnabled(enabled);
+/**
+ * @override
+ */
+scout.FormField.prototype._renderEnabled = function() {
+  this.$container.setEnabled(this.enabled);
   if (this.$field) {
-    this.$field.setEnabled(enabled);
+    this.$field.setEnabled(this.enabled);
   }
   this._updateDisabledCopyOverlay();
 };
 
-scout.FormField.prototype._renderCssClass = function(cssClass, oldCssClass) {
-  cssClass = cssClass || this.cssClass;
-  this.$container.removeClass(oldCssClass);
-  this.$container.addClass(cssClass);
+scout.FormField.prototype._removeCssClass = function() {
+  this.$container.removeClass(this.cssClass);
+};
+
+scout.FormField.prototype._renderCssClass = function() {
+  this.$container.addClass(this.cssClass);
 };
 
 scout.FormField.prototype._renderFont = function() {
@@ -343,57 +358,48 @@ scout.FormField.prototype._updateMenus = function() {
   this.$container.toggleClass('has-menus', this._hasMenus() && this.menusVisible);
 };
 
-scout.FormField.prototype._syncKeyStrokes = function(keyStrokes, oldKeyStrokes) {
-  this.updateKeyStrokes(keyStrokes, oldKeyStrokes);
-  this.keyStrokes = keyStrokes;
+scout.FormField.prototype._syncGridData = function(gridData) {
+  this._setProperty('gridData', new scout.GridData(gridData));
 };
 
-scout.FormField.prototype._syncMenus = function(menus, oldMenus) {
-  this.updateKeyStrokes(menus, oldMenus);
-  this.menus = menus;
+scout.FormField.prototype._syncKeyStrokes = function(keyStrokes) {
+  this.updateKeyStrokes(keyStrokes, this.keyStrokes);
+  this._setProperty('keyStrokes', keyStrokes);
+};
+
+scout.FormField.prototype._syncMenus = function(menus) {
+  this.updateKeyStrokes(menus, this.menus);
+  this._setProperty('menus', menus);
 };
 
 scout.FormField.prototype._syncErrorStatus = function(errorStatus) {
-  if (errorStatus) {
-    this.errorStatus = new scout.Status(errorStatus);
-  } else {
-    this.errorStatus = null;
-  }
+  // FIXME [6.1] cgu ensure type ?
+  this._setProperty('errorStatus',
+      errorStatus ? new scout.Status(errorStatus) : null);
+};
+
+scout.FormField.prototype.setCssClass = function(cssClass) {
+  this.setProperty('cssClass', cssClass);
 };
 
 scout.FormField.prototype.setLabel = function(label) {
-  this._setProperty('label', label);
-  if (this.rendered) {
-    this._renderLabel();
-  }
+  this.setProperty('label', label);
 };
 
 scout.FormField.prototype.setTooltipText = function(tooltipText) {
-  this._setProperty('tooltipText', tooltipText);
-  if (this.rendered) {
-    this._renderTooltipText();
-  }
+  this.setProperty('tooltipText', tooltipText);
 };
 
 scout.FormField.prototype.setErrorStatus = function(errorStatus) {
-  this._setProperty('errorStatus', errorStatus);
-  if (this.rendered) {
-    this._renderErrorStatus();
-  }
+  this.setProperty('errorStatus', errorStatus);
 };
 
 scout.FormField.prototype.setMenus = function(menus) {
-  this._setProperty('menus', menus);
-  if (this.rendered) {
-    this._renderMenus();
-  }
+  this.setProperty('menus', menus);
 };
 
 scout.FormField.prototype.setMenusVisible = function(menusVisible) {
-  this._setProperty('menusVisible', menusVisible);
-  if (this.rendered) {
-    this._renderMenusVisible();
-  }
+  this.setProperty('menusVisible', menusVisible);
 };
 
 /**
@@ -440,7 +446,7 @@ scout.FormField.prototype._onStatusMousedown = function(event) {
     scout.menus.showContextMenuWithWait(this.session, func, event);
   } else {
     // Toggle tooltip
-    if (this.tooltip && this.tooltip.rendered) {
+    if (this.tooltip) {
       this._hideStatusMessage();
     } else {
       this._showStatusMessage();
@@ -465,8 +471,7 @@ scout.FormField.prototype._showStatusMessage = function() {
     autoRemove = !(this.errorStatus && this.errorStatus.isError());
     if (this.tooltip && this.tooltip.autoRemove !== autoRemove) {
       // AutoRemove may not be changed dynamically -> Remove and reopen tooltip
-      this.tooltip.remove();
-      this.tooltip = null;
+      this.tooltip.destroy();
     }
   }
 
@@ -475,7 +480,7 @@ scout.FormField.prototype._showStatusMessage = function() {
     return;
   }
 
-  if (this.tooltip && this.tooltip.rendered) {
+  if (this.tooltip) {
     // update existing tooltip
     this.tooltip.setText(text);
     this.tooltip.setSeverity(severity);
@@ -489,14 +494,16 @@ scout.FormField.prototype._showStatusMessage = function() {
       $anchor: this.$status
     };
     this.tooltip = scout.create('Tooltip', opts);
+    this.tooltip.one('destroy', function() {
+      this.tooltip = null;
+    }.bind(this));
     this.tooltip.render();
   }
 };
 
 scout.FormField.prototype._hideStatusMessage = function() {
   if (this.tooltip) {
-    this.tooltip.remove();
-    this.tooltip = null;
+    this.tooltip.destroy();
   }
 };
 
@@ -517,22 +524,6 @@ scout.FormField.prototype.getForm = function() {
     parent = parent.parent;
   }
   return parent;
-};
-
-scout.FormField.prototype._goOffline = function() {
-  if (this.enabledWhenOffline) {
-    return;
-  }
-  this._renderEnabled(false);
-};
-
-scout.FormField.prototype._goOnline = function() {
-  if (this.enabledWhenOffline) {
-    return;
-  }
-  if (this.enabled) {
-    this._renderEnabled(true);
-  }
 };
 
 /**
@@ -797,11 +788,11 @@ scout.FormField.prototype._createCopyContextMenu = function(event) {
     parent: this,
     text: this.session.text('ui.Copy')
   });
-  menu.remoteHandler = function(event) {
-    if ('doAction' === event.type && field instanceof scout.ValueField) {
+  menu.on('doAction', function(event) {
+    if (field instanceof scout.ValueField) {
       field._send('exportToClipboard');
     }
-  };
+  });
 
   var popup = scout.create('ContextMenuPopup', {
     parent: this,

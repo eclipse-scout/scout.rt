@@ -82,7 +82,7 @@ scout.SimpleTab.prototype.setTitle = function(title) {
   if (this.title === title) {
     return;
   }
-  this.title = title;
+  this._setProperty('title', title);
   this._titlesUpdated();
 };
 
@@ -91,6 +91,7 @@ scout.SimpleTab.prototype.setSubTitle = function(subTitle) {
     return;
   }
   this.subTitle = subTitle;
+  this._setProperty('subTitle', subTitle);
   this._titlesUpdated();
 };
 
@@ -98,7 +99,7 @@ scout.SimpleTab.prototype.setIconId = function(iconId) {
   if (this.iconId === iconId) {
     return;
   }
-  this.iconId = iconId;
+  this._setProperty('iconId', iconId);
   this._titlesUpdated();
 };
 

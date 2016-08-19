@@ -21,6 +21,8 @@ scout.icons = {
   MAX: 'font:\ue027',
   MIN: 'font:\ue028',
 
+  ICON_ID_REGEX: /\$\{iconId\:([a-zA-Z0-9_\.]*)\}/,
+
   /**
    * Returns an Icon object with structured info contained in the iconId string.
    */
@@ -45,6 +47,26 @@ scout.icons = {
     }
 
     return icon;
+  },
+
+  resolveIconId: function(value) {
+    var iconId, tmp,
+      result = this.ICON_ID_REGEX.exec(value);
+    if (result && result.length === 2) {
+      iconId = result[1];
+      tmp = iconId.split('.');
+      if (tmp.length === 1) {
+        // look for icon in scout.icons.[0]
+        value = scout.icons[tmp];
+      } else if (tmp.length === 2) {
+        // look for icon in global object [0].icons.[1]
+        // FIXME [awe] 6.1 register a kind of icon lookup-service instead of this naming convention?
+        value = window[tmp[0]].icons[tmp[1]];
+      } else {
+        $.log.warn('Invalid iconId: ' + value);
+      }
+    }
+    return value;
   }
 };
 

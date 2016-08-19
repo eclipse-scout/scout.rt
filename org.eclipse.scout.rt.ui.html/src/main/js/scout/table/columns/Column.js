@@ -9,6 +9,19 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 scout.Column = function() {
+  this.cssClass;
+  this.editable = false;
+  this.fixedWidth = false;
+  this.horizontalAlignment = -1;
+  this.htmlEnabled = false;
+  this.mandatory = false;
+  this.sortActive = false;
+  this.sortAscending = true;
+  this.sortIndex = -1;
+  this.summary = false;
+  this.type = 'text';
+  this.width = 60;
+  this.uiSortPossible = false;
   this.minWidth = scout.Column.DEFAULT_MIN_WIDTH;
   this.showSeparator = true; // currently a UI-only property, defaults to true
   this.filterType = 'TextColumnUserFilter';
@@ -27,7 +40,7 @@ scout.Column.prototype.init = function(model) {
   // Fill in the missing default values
   scout.defaultValues.applyTo(this);
 
-  // InitialWidth is only sent if it differs from width
+  // Initial width is only sent if it differs from width
   if (this.initialWidth === undefined) {
     this.initialWidth = scout.nvl(this.width, 0);
   }
@@ -35,6 +48,8 @@ scout.Column.prototype.init = function(model) {
   if (this.aggregationFunction) {
     this.setAggregationFunction(this.aggregationFunction);
   }
+
+  scout.texts.resolveTextProperty(this);
 };
 
 /**
@@ -52,12 +67,15 @@ scout.Column.prototype.initCell = function(cell) {
       text: cell
     };
   }
-  this._initCell(cell);
-  // when cell doesn't define horiz. alignment - use value from column
-  if (cell.horizontalAlignment === undefined) {
-    cell.horizontalAlignment = this.horizontalAlignment;
+  if (!(cell instanceof scout.Cell)) {
+    this._initCell(cell);
+    // when cell doesn't define horiz. alignment - use value from column
+    if (cell.horizontalAlignment === undefined) {
+      cell.horizontalAlignment = this.horizontalAlignment;
+    }
+    cell.parent = this;
+    cell = scout.create('Cell', cell);
   }
-  scout.defaultValues.applyTo(cell, 'Cell');
   return cell;
 };
 
@@ -200,17 +218,17 @@ scout.Column.prototype.onMouseUp = function(event, $row) {
     cell = this.table.cell(this, row);
 
   if (this.table.enabled && row.enabled && cell.editable && !event.ctrlKey && !event.shiftKey) {
-    this.table.prepareCellEdit(row.id, this.id, true);
+    this.table.prepareCellEdit(this, row, true);
   }
 };
 
-scout.Column.prototype.startCellEdit = function(row, fieldId) {
+scout.Column.prototype.startCellEdit = function(row, field) {
   var popup,
     $row = row.$row,
     cell = this.table.cell(this, row),
     $cell = this.table.$cell(this, $row);
 
-  cell.field = this.session.getOrCreateModelAdapter(fieldId, this.table);
+  cell.field = field;
   // Override field alignment with the cell's alignment
   cell.field.gridData.horizontalAlignment = cell.horizontalAlignment;
 
@@ -352,10 +370,9 @@ scout.Column.prototype.setBackgroundEffect = function(effect, notifyServer) {
   this.backgroundEffect = effect;
   this.backgroundEffectFunc = this._resolveBackgroundEffectFunc();
 
-  notifyServer = scout.nvl(notifyServer, true);
-  if (notifyServer) {
-    this.table._sendColumnBackgroundEffectChanged(this);
-  }
+  this.table.trigger('columnBackgroundEffectChanged', {
+    column: this
+  });
 
   if (this.backgroundEffect && (this.minValue === undefined || this.maxValue === undefined)) {
     // No need to calculate the values again when switching background effects

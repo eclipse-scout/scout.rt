@@ -26,11 +26,10 @@ describe("BasicField", function() {
   });
 
   function createField(model) {
-    var field = new scout.BasicField();
-    field._render = function() {};
-    field.$container = $('<div>');
+    var adapter = new scout.BasicFieldAdapter();
+    adapter.init(model);
+    var field = adapter.createWidget(model, session.desktop);
     field.$field = $('<input>').on('blur', field._onFieldBlur.bind(field));
-    field.init(model);
     return field;
   }
 
@@ -97,10 +96,7 @@ describe("BasicField", function() {
         showBusyIndicator: false
       });
       expect(mostRecentJsonRequest()).toContainEvents(event);
-      event = createPropertyChangeEvent(field, {
-        "updateDisplayTextOnModify": false
-      });
-      field.onModelPropertyChange(event);
+      field.setUpdateDisplayTextOnModify(false);
       field.$field.triggerBlur();
       sendQueuedAjaxCalls();
       event = new scout.Event(field.id, 'displayTextChanged', {

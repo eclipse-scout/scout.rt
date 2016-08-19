@@ -19,7 +19,6 @@ import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.resource.BinaryResources;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheControl;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheKey;
-import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheObject;
 import org.eclipse.scout.rt.ui.html.res.IWebContentService;
 import org.eclipse.scout.rt.ui.html.script.ScriptFileBuilder;
 import org.eclipse.scout.rt.ui.html.script.ScriptOutput;
@@ -54,23 +53,21 @@ public class ScriptFileLoader extends AbstractResourceLoader {
   }
 
   @Override
-  public HttpCacheObject loadResource(HttpCacheKey cacheKey) throws IOException {
+  public BinaryResource loadResource(String pathInfo) throws IOException {
     ScriptFileBuilder builder = new ScriptFileBuilder(BEANS.get(IWebContentService.class), m_theme, m_minify);
-    String resourcePath = cacheKey.getResourcePath();
-    ScriptOutput out = builder.buildScript(resourcePath);
-    if (out != null) {
-      BinaryResource content = BinaryResources.create()
-          .withFilename(out.getPathInfo())
-          .withCharset(StandardCharsets.UTF_8)
-          .withContent(out.getContent())
-          .withLastModified(out.getLastModified())
-          .withCachingAllowed(true)
-          .withCacheMaxAge(HttpCacheControl.MAX_AGE_ONE_YEAR)
-          .build();
-
-      return new HttpCacheObject(cacheKey, content);
+    ScriptOutput out = builder.buildScript(pathInfo);
+    if (out == null) {
+      return null;
     }
-    return null;
+
+    return BinaryResources.create()
+        .withFilename(out.getPathInfo())
+        .withCharset(StandardCharsets.UTF_8)
+        .withContent(out.getContent())
+        .withLastModified(out.getLastModified())
+        .withCachingAllowed(true)
+        .withCacheMaxAge(HttpCacheControl.MAX_AGE_ONE_YEAR)
+        .build();
   }
 
 }

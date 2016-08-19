@@ -21,6 +21,12 @@ scout.inherits(scout.TableControl, scout.Action);
 scout.TableControl.CONTAINER_SIZE = 345;
 scout.TableControl.CONTAINER_ANIMATE_DURATION = 350;
 
+scout.TableControl.prototype._init = function(model) {
+  this.parent = model.parent;
+  this.table = this.getTable();
+  scout.TableControl.parent.prototype._init.call(this, model);
+};
+
 /**
  * @override ModelAdapter.js
  */
@@ -174,27 +180,12 @@ scout.TableControl.prototype.setSelected = function(selected, notifyServer, clos
   if (this.rendered) {
     this._renderSelected(selected, closeWhenUnselected);
   }
-  if (scout.nvl(notifyServer, true)) {
-    this.sendSelected();
-  }
 };
 
 scout.TableControl.prototype._configureTooltip = function() {
   var options = scout.TableControl.parent.prototype._configureTooltip.call(this);
   options.cssClass = 'table-control-tooltip';
   return options;
-};
-
-scout.TableControl.prototype._goOffline = function() {
-  if (!this.isContentAvailable()) {
-    this._renderEnabled(false);
-  }
-};
-
-scout.TableControl.prototype._goOnline = function() {
-  if (!this.isContentAvailable() && this.enabled) {
-    this._renderEnabled(true);
-  }
 };
 
 scout.TableControl.prototype._onMouseDown = function() {
@@ -215,6 +206,19 @@ scout.TableControl.prototype.onControlContainerClosed = function() {
 scout.TableControl.prototype._createActionKeyStroke = function() {
   return new scout.TableControlActionKeyStroke(this);
 };
+
+scout.TableControl.prototype.getTable = function() {
+  var parent = this.parent;
+  while (parent) {
+    if (parent instanceof scout.Table) {
+      return parent;
+    }
+    parent = parent.parent;
+  }
+
+  return null;
+};
+
 
 /**
  * TableControlActionKeyStroke

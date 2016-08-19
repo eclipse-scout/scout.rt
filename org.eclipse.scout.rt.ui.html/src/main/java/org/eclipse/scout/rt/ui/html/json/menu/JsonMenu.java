@@ -25,7 +25,6 @@ import org.json.JSONArray;
 public class JsonMenu<MENU extends IMenu> extends JsonAction<MENU> {
 
   public static final String PROP_SEPARATOR = "separator";
-  public static final String PROP_SYSTEM_TYPE = "systemType";
 
   public JsonMenu(MENU model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);

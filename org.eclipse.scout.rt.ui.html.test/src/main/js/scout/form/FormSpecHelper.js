@@ -12,101 +12,60 @@ scout.FormSpecHelper = function(session) {
   this.session = session;
 };
 
-scout.FormSpecHelper.prototype.createViewWithOneField = function(parentId) {
-  var form = this.createFormWithOneField(parentId);
+scout.FormSpecHelper.prototype.createViewWithOneField = function(parent) {
+  var form = this.createFormWithOneField(parent);
   form.displayHint = scout.Form.DisplayHint.VIEW;
   return form;
 };
 
-scout.FormSpecHelper.prototype.createFormWithOneField = function(parentId) {
-  var form = this.createFormModel();
-  var rootGroupBox = this.createGroupBoxModel();
-  var field = this.createFieldModel('StringField');
-
-  form.rootGroupBox = rootGroupBox.id;
-  rootGroupBox.mainBox = true;
-  form.owner = parentId || this.session.rootAdapter.id;
-  rootGroupBox.fields = [field.id];
-
-  return createAdapter(form, this.session, [rootGroupBox, field]);
-};
-
-scout.FormSpecHelper.prototype.createGroupBoxWithOneField = function(parentId) {
-  var groupBox = this.createGroupBoxModel();
-  var field = this.createFieldModel('StringField');
-
-  groupBox.owner = parentId || this.session.rootAdapter.id;
-  groupBox.fields = [field.id];
-
-  return createAdapter(groupBox, this.session, [field]);
-};
-
-scout.FormSpecHelper.prototype.createFormModel = function() {
-  var form = createSimpleModel('Form', this.session);
-  // By definition, a Form must have a 'displayParent'. That is why a mocked parent is set.
-  form.parent = {
-    rendered: true,
-    removeChild: function() {},
-    setParent: function() {},
-    addChild: function() {},
-    inFront: function() {
-      return true;
-    }, // expected API of a 'displayParent'
-    glassPaneTargets: function() {
-      return [];
-    } // expected API of a 'displayParent'
-  };
+scout.FormSpecHelper.prototype.createFormWithOneField = function(parent) {
+  parent = scout.nvl(parent, this.session.desktop);
+  var form = scout.create('Form', {parent: parent});
+  var rootGroupBox = this.createGroupBoxWithFields(form, true, 1);
+  form.rootGroupBox = rootGroupBox;
   return form;
 };
 
-scout.FormSpecHelper.prototype.createFieldModel = function(objectType) {
-  var session = this.session;
-  var model = createSimpleModel(objectType || 'StringField', session);
-  model.enabled = true;
-  model.visible = true;
-  return model;
+scout.FormSpecHelper.prototype.createGroupBoxWithOneField = function(parent, mainBox, numFields) {
+  return this.createGroupBoxWithFields(parent, false, 1);
 };
 
-scout.FormSpecHelper.prototype.createGroupBoxModel = function() {
-  return this.createFieldModel('GroupBox');
-};
-
-scout.FormSpecHelper.prototype.createFormXFields = function(x, isModal, parentId) {
-  var form = isModal ? this.createFormModelWithDisplayHint('dialog') : this.createFormModelWithDisplayHint('view');
-  var rootGroupBox = this.createGroupBoxModel();
-  var fields = [];
-  var fieldIds = [];
-  var field;
-  for (var i = 0; i < x; i++) {
-    field = this.createFieldModel();
-    fields.push(field);
-    fieldIds.push(field.id);
+scout.FormSpecHelper.prototype.createGroupBoxWithFields = function(parent, mainBox, numFields) {
+  parent = scout.nvl(parent, this.session.desktop);
+  mainBox = scout.nvl(mainBox, false);
+  numFields = scout.nvl(numFields, 1);
+  var
+    fields = [],
+    groupBox = scout.create('GroupBox', {
+    parent: parent,
+    mainBox: scout.nvl(mainBox, false)});
+  for (var i = 0; i < numFields; i++) {
+    fields.push(scout.create('StringField', {parent: groupBox}));
   }
-  rootGroupBox.fields = fieldIds;
-  form.rootGroupBox = rootGroupBox.id;
-  form.owner = parentId || this.session.rootAdapter.id;
-  fields.push(rootGroupBox);
-  return createAdapter(form, this.session, fields);
+  groupBox.setProperty('fields', fields);
+  return groupBox;
 };
 
-scout.FormSpecHelper.prototype.createFormModelWithDisplayHint = function(displayHint) {
-  var model = this.createFormModel();
-  model.displayHint = displayHint;
+scout.FormSpecHelper.prototype.createFormWithFields = function(parent, isModal, numFields) {
+  parent = scout.nvl(parent, this.session.desktop);
+  var form = scout.create('Form', {
+    parent: parent,
+    displayHint: isModal ? 'dialog' : 'view'});
+  var rootGroupBox = this.createGroupBoxWithFields(form, true, numFields);
+  form._syncRootGroupBox(rootGroupBox);
+  return form;
+};
+
+scout.FormSpecHelper.prototype.createFieldModel = function(objectType, parent, modelProperties) {
+  parent = scout.nvl(parent, this.session.desktop);
+  var model = createSimpleModel(objectType || 'StringField', this.session);
+  model.parent = parent;
+  if (modelProperties) {
+    $.extend(model, modelProperties);
+  }
   return model;
 };
 
-/**
- * Creates an adapter with rootAdapter as owner.
- * Expects model.fields to be set, creates an adapter for each field.
- * Also replaces model.fields with the ids of the fields.
- */
-scout.FormSpecHelper.prototype.createCompositeField = function(session, model) {
-  var fields = model.fields || [];
-  model.fields = [];
-  fields.forEach(function(field) {
-    field.owner = model.id;
-    model.fields.push(field.id);
-  });
-  model.owner = session.rootAdapter.id;
-  return createAdapter(model, session, fields);
+scout.FormSpecHelper.prototype.createField = function(objectType, parent, modelProperties) {
+  return scout.create(objectType, this.createFieldModel(objectType, parent, modelProperties));
 };

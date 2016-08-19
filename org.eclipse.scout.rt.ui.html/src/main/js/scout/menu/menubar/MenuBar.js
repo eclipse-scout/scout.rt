@@ -25,6 +25,7 @@ scout.MenuBar = function() {
   }; // Object containing "left" and "right" menus
   this.defaultMenu = null;
   this.visible = false;
+  this.ellipsis;
 
   /**
    * This array is === menuItems when menu-bar is not over-sized.
@@ -98,11 +99,9 @@ scout.MenuBar.prototype._remove = function() {
   this.visible = false;
 };
 
-scout.MenuBar.prototype._renderProperties = function() {
-  scout.MenuBar.parent.prototype._renderProperties.call(this);
-  this._renderVisible();
-};
-
+/**
+ * @override
+ */
 scout.MenuBar.prototype._renderVisible = function() {
   this.$container.setVisible(this.visible);
   this.invalidateLayoutTree();
@@ -159,9 +158,7 @@ scout.MenuBar.prototype.setMenuItems = function(menuItems) {
     this._internalMenuItems = menuItems;
     this._orderedMenuItems = this.menuSorter.order(menuItems, this);
     this.menuItems = this._orderedMenuItems.left.concat(this._orderedMenuItems.right);
-    this.menuItems.forEach(function(menuItem) {
-      menuItem.setParent(this);
-    }, this);
+    this.link(menuItems);
   }
 
   if (this.rendered) {
@@ -251,16 +248,6 @@ scout.MenuBar.prototype.updateVisibility = function() {
   }));
 };
 
-scout.MenuBar.prototype.setVisible = function(visible) {
-  if (this.visible === visible) {
-    return;
-  }
-  this._setProperty('visible', visible);
-  if (this.rendered) {
-    this._renderVisible();
-  }
-};
-
 /**
  * First rendered item that is enabled and reacts to ENTER keystroke shall be marked as 'defaultMenu'
  */
@@ -294,7 +281,7 @@ scout.MenuBar.prototype.setDefaultMenu = function(defaultMenu) {
   if (this.defaultMenu && this.defaultMenu.rendered) {
     this.defaultMenu.$container.removeClass('default-menu');
   }
-  this.defaultMenu = defaultMenu;
+  this._setProperty('defaultMenu', defaultMenu);
   if (this.defaultMenu && this.defaultMenu.rendered) {
     this.defaultMenu.$container.addClass('default-menu');
   }

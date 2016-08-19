@@ -32,7 +32,7 @@ scout.TreeField.prototype._renderTree = function() {
   this.addField(this.tree.$container);
 };
 
-scout.TreeField.prototype._removeTree = function(oldTree) {
-  oldTree.remove();
+scout.TreeField.prototype._removeTree = function() {
+  this.tree.remove();
   this._removeField();
 };

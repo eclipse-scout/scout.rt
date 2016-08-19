@@ -25,6 +25,7 @@ scout.CellEditorPopup.prototype._init = function(options) {
   this.column = options.column;
   this.row = options.row;
   this.cell = options.cell;
+  this.link(this.cell.field);
 };
 
 scout.CellEditorPopup.prototype._createLayout = function() {
@@ -69,7 +70,6 @@ scout.CellEditorPopup.prototype._render = function($parent) {
   field.prepareForCellEdit({
     firstCell: firstCell
   });
-  field.setParent(this);
 
   // Make sure cell content is not visible while the editor is open (especially necessary for transparent editors like checkboxes)
   this.$anchor.css('visibility', 'hidden');
@@ -137,12 +137,12 @@ scout.CellEditorPopup.prototype.completeEdit = function() {
   // There is no blur event when the popup gets closed -> trigger blur so that the field may react (accept display text, close popups etc.)
   field.acceptInput();
 
-  this.table._sendCompleteCellEdit(field.id);
+  this.table._triggerCompleteCellEdit(field);
   this.completeCellEditRequested = true;
 };
 
 scout.CellEditorPopup.prototype.cancelEdit = function() {
-  this.table._sendCancelCellEdit(this.cell.field.id);
+  this.table._triggerCancelCellEdit(this.cell.field);
   this.remove();
 };
 

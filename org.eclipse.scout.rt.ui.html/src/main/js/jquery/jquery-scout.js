@@ -238,6 +238,15 @@ $.pxToNumber = function(pixel) {
   return parseFloat(pixel, 10);
 };
 
+/**
+ * @return a promise for an already resolved jQuery.Deferred object.
+ */
+$.resolvedDeferred = function() {
+  var deferred = $.Deferred();
+  deferred.resolve();
+  return deferred.promise();
+};
+
 // === $.prototype extensions ===
 
 $.fn.nvl = function($element) {
@@ -1185,7 +1194,7 @@ $.fn.isContentTruncated = function() {
   return this[0].scrollWidth > this[0].clientWidth;
 };
 
-// FIXME awe: (graph) consider moving this function to DoubleClickHandler.js
+// TODO awe: (graph) consider moving this function to DoubleClickHandler.js
 /**
  * This function is used to distinct between single and double clicks.
  * Instead of executing a handler immediately when the first click occurs,

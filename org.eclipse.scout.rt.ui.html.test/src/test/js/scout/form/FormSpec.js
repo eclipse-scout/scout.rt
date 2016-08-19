@@ -8,7 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-describe("Form", function() {
+/* global linkWidgetAndAdapter */
+describe('Form', function() {
   var session, helper;
 
   beforeEach(function() {
@@ -27,27 +28,24 @@ describe("Form", function() {
     jasmine.clock().uninstall();
   });
 
-  describe("destroy", function() {
+  describe('destroy', function() {
 
-    it("destroys the adapter and its children", function() {
+    it('destroys its children', function() {
       var form = helper.createFormWithOneField();
 
       expect(form.rootGroupBox).toBeTruthy();
-      expect(session.getModelAdapter(form.rootGroupBox.id)).toBe(form.rootGroupBox);
       expect(form.rootGroupBox.fields[0]).toBeTruthy();
-      expect(session.getModelAdapter(form.rootGroupBox.fields[0].id)).toBe(form.rootGroupBox.fields[0]);
 
       form.destroy();
-
-      expect(session.getModelAdapter(form.rootGroupBox.id)).toBeFalsy();
-      expect(session.getModelAdapter(form.rootGroupBox.fields[0].id)).toBeFalsy();
+      expect(form.rootGroupBox.destroyed).toBeTruthy();
+      expect(form.rootGroupBox.fields[0].destroyed).toBeTruthy();
     });
 
   });
 
-  describe("onModelAction", function() {
+  describe('onModelAction', function() {
 
-    describe("formClose", function() {
+    describe('formClose', function() {
 
       function createDisposeAdapterEvent(model) {
         return {
@@ -57,8 +55,9 @@ describe("Form", function() {
         };
       }
 
-      it("destroys the form", function() {
+      it('destroys the form', function() {
         var form = helper.createFormWithOneField();
+        linkWidgetAndAdapter(form, 'FormAdapter');
         spyOn(form, 'destroy');
 
         var message = {

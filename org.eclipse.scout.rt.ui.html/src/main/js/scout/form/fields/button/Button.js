@@ -10,9 +10,16 @@
  ******************************************************************************/
 scout.Button = function() {
   scout.Button.parent.call(this);
-  this.$buttonLabel;
   this._addAdapterProperties(['menus']);
 
+  this.systemType = scout.Button.SystemType.NONE;
+  this.processButton = true;
+  this.selected = false;
+  this.displayStyle = scout.Button.DisplayStyle.DEFAULT;
+  this.keyStroke;
+  this.statusVisible = false;
+
+  this.$buttonLabel;
   this.buttonKeyStroke = new scout.ButtonKeyStroke(this, null);
 };
 scout.inherits(scout.Button, scout.FormField);
@@ -51,12 +58,13 @@ scout.Button.prototype._initKeyStrokeContext = function(keyStrokeContext) {
   this.formKeyStrokeContext.invokeAcceptInputOnActiveValueField = true;
   this.formKeyStrokeContext.registerKeyStroke(this.buttonKeyStroke);
   this.formKeyStrokeContext.$bindTarget = function() {
-    if (this.keyStrokeScope) {
-      var adapter = this.session.getModelAdapter(this.keyStrokeScope);
-      if (adapter) {
-        return adapter.$container;
-      }
-    }
+    // FIXME CGU [6.1] wieso nicht einfach ein adapter property?
+//    if (this.keyStrokeScope) {
+//      var adapter = this.session.getModelAdapter(this.keyStrokeScope);
+//      if (adapter) {
+//        return adapter.$container;
+//      }
+//    }
     //failsave if scope is not set use form
     return this.getForm().$container;
   }.bind(this);
@@ -150,14 +158,13 @@ scout.Button.prototype.togglePopup = function() {
     this.popup.close();
   } else {
     this.popup = this._openPopup();
-    this.popup.on('remove', function(event) {
+    this.popup.one('destroy', function(event) {
       this.popup = null;
     }.bind(this));
   }
 };
 
 scout.Button.prototype._openPopup = function() {
-  // FIXME bsh: Improve this
   var popup = scout.create('ContextMenuPopup', {
     parent: this,
     menuItems: this.menus,
@@ -173,20 +180,11 @@ scout.Button.prototype._doActionTogglesSubMenu = function() {
 };
 
 scout.Button.prototype.setSelected = function(selected) {
-  this._setProperty('selected', selected);
-  if (this.rendered) {
-    this._renderSelected(this.selected);
-  }
-  this._send('selected', {
-    selected: selected
-  });
+  this.setProperty('selected', selected);
 };
 
 scout.Button.prototype.setIconId = function(iconId) {
-  this._setProperty('iconId', iconId);
-  if (this.rendered) {
-    this._renderIconId();
-  }
+  this.setProperty('iconId', iconId);
 };
 
 /**
@@ -264,7 +262,7 @@ scout.Button.prototype._renderIconId = function() {
 };
 
 scout.Button.prototype._syncKeyStroke = function(keyStroke) {
-  this.keyStroke = keyStroke;
+  this._setProperty('keyStroke', keyStroke);
   this.buttonKeyStroke.parseAndSetKeyStroke(this.keyStroke);
 };
 

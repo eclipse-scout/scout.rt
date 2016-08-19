@@ -41,6 +41,7 @@ scout.Slider.prototype._render = function($parent) {
 };
 
 scout.Slider.prototype._renderProperties = function() {
+  scout.Slider.parent.prototype._renderProperties.call(this);
   this._renderValue();
   this._renderMinValue();
   this._renderMaxValue();
@@ -82,12 +83,6 @@ scout.Slider.prototype._onValueChange = function(event) {
 };
 
 scout.Slider.prototype.setValue = function(value) {
-  if (value === this.value) {
-    return;
-  }
-  this._setProperty('value', value);
-  if (this.rendered) {
-    this._renderValue();
-  }
+  this.setProperty('value', value);
 };
 

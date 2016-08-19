@@ -105,13 +105,13 @@ scout.KeyStrokeContext.prototype.registerKeyStroke = function(keyStroke) {
     .forEach(function(ks) {
       this.keyStrokes.push(ks);
 
-      // Registers a destroy listener, so that the keystroke is uninstalled once its field (if applicable, only model adapters fire destroy) is destroyed.
-      // TODO CGU Actually it would be better if every widget can be destroyed -> move destroy to Widget.js
-      if (ks.field && ks.field instanceof scout.ModelAdapter) {
+      // Registers a destroy listener, so that the keystroke is uninstalled once its field is destroyed.
+      if (ks.field && !ks.destroyListener) {
         ks.destroyListener = function(event) {
           this.unregisterKeyStroke(ks);
+          ks.destroyListener = null;
         }.bind(this);
-        ks.field.on('destroy', ks.destroyListener);
+        ks.field.one('destroy', ks.destroyListener);
       }
     }, this);
 };
@@ -124,6 +124,7 @@ scout.KeyStrokeContext.prototype.unregisterKeyStroke = function(keyStroke) {
 
   if (scout.arrays.remove(this.keyStrokes, keyStroke) && keyStroke.field && keyStroke.destroyListener) {
     keyStroke.field.off('destroy', keyStroke.destroyListener);
+    keyStroke.destroyListener = null;
   }
 };
 

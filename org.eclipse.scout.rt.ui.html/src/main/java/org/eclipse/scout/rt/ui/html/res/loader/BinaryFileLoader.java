@@ -19,8 +19,6 @@ import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.resource.BinaryResources;
 import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheControl;
-import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheKey;
-import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheObject;
 import org.eclipse.scout.rt.ui.html.res.IWebContentService;
 
 /**
@@ -29,8 +27,7 @@ import org.eclipse.scout.rt.ui.html.res.IWebContentService;
 public class BinaryFileLoader extends AbstractResourceLoader {
 
   @Override
-  public HttpCacheObject loadResource(HttpCacheKey cacheKey) throws IOException {
-    String pathInfo = cacheKey.getResourcePath();
+  public BinaryResource loadResource(String pathInfo) throws IOException {
     URL url = BEANS.get(IWebContentService.class).getWebContentResource(pathInfo);
     if (url == null) {
       // not handled here
@@ -38,7 +35,7 @@ public class BinaryFileLoader extends AbstractResourceLoader {
     }
     byte[] bytes = IOUtility.readFromUrl(url);
     URLConnection connection = url.openConnection();
-    BinaryResource content = BinaryResources.create()
+    return BinaryResources.create()
         .withFilename(pathInfo)
         .withContent(bytes)
         .withLastModified(connection.getLastModified())
@@ -46,7 +43,6 @@ public class BinaryFileLoader extends AbstractResourceLoader {
         .withCacheMaxAge(HttpCacheControl.MAX_AGE_4_HOURS)
         .build();
 
-    return new HttpCacheObject(cacheKey, content);
   }
 
 }

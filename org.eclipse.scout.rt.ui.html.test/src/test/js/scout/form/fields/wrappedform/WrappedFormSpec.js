@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-describe("WrappedForm", function() {
+describe('WrappedForm', function() {
   var session;
   var helper;
 
@@ -18,23 +18,15 @@ describe("WrappedForm", function() {
     helper = new scout.FormSpecHelper(session);
   });
 
-  function createField(model) {
-    var field = new scout.WrappedFormField();
-    field.init(model);
-    return field;
+  function createField(modelProperties) {
+    return helper.createField('WrappedFormField', session.desktop, modelProperties);
   }
 
-  function createModel() {
-    return helper.createFieldModel('WrappedFormField');
-  }
-
-  describe("mandatory indicator", function() {
+  describe('mandatory indicator', function() {
 
     // Must not contain an indicator to prevent a double indicator if the first field is mandatory too
-    it("does not exist", function() {
-      var model = createModel();
-      model.mandatory = true;
-      var field = createField(model);
+    it('does not exist', function() {
+      var field = createField({mandatory: true});
       field.render(session.$entryPoint);
 
       expect(field.$mandatory).toBeUndefined();
@@ -42,14 +34,10 @@ describe("WrappedForm", function() {
 
   });
 
-  describe("test initial focus disabled", function() {
-    it("string field in inner form hasn't focus", function() {
-      var model = createModel();
+  describe('test initial focus disabled', function() {
+    it('string field in inner form hasn\'t focus', function() {
       var innerForm = helper.createFormWithOneField();
-
-      model.innerForm = innerForm;
-
-      var field = createField(model);
+      var field = createField({innerForm: innerForm});
       expect(field.initialFocusEnabled).toBe(false);
 
       field.render(session.$entryPoint);
@@ -59,15 +47,10 @@ describe("WrappedForm", function() {
     });
   });
 
-  describe("test initial focus enabled", function() {
-    it("string field in inner form has focus", function() {
-      var model = createModel();
+  describe('test initial focus enabled', function() {
+    it('string field in inner form has focus', function() {
       var innerForm = helper.createFormWithOneField();
-
-      model.initialFocusEnabled = true;
-      model.innerForm = innerForm;
-
-      var field = createField(model);
+      var field = createField({initialFocusEnabled: true, innerForm: innerForm});
       expect(field.initialFocusEnabled).toBe(true);
 
       field.render(session.$entryPoint);

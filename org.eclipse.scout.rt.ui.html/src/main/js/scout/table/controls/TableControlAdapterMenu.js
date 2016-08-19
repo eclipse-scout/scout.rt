@@ -13,6 +13,8 @@ scout.TableControlAdapterMenu = function() {
 
   this._tableControlPropertyChangeHandler = this._onTableControlPropertyChange.bind(this);
   this._tableControlDestroyHandler = this._onTableControlDestroy.bind(this);
+
+  this._addCloneProperties(['tableControl']);
 };
 scout.inherits(scout.TableControlAdapterMenu, scout.FormMenu);
 
@@ -49,13 +51,14 @@ scout.TableControlAdapterMenu.prototype._onTableControlPropertyChange = function
   event.changedProperties.forEach(function(prop) {
     changedProperties[prop] = event.newProperties[prop];
   });
-  this.onModelPropertyChange({
-    properties: scout.TableControlAdapterMenu.adaptTableControlProperties(changedProperties)
-  });
+  changedProperties = scout.TableControlAdapterMenu.adaptTableControlProperties(changedProperties);
+  for (var prop in changedProperties) {
+    this.setProperty(prop, changedProperties[prop]);
+  }
 };
 
 scout.TableControlAdapterMenu.prototype._onTableControlDestroy = function(event) {
-  this.remove();
+  this.destroy();
   this._uninstallListeners();
 };
 
@@ -64,11 +67,6 @@ scout.TableControlAdapterMenu.prototype._onTableControlDestroy = function(event)
  */
 scout.TableControlAdapterMenu.prototype.doAction = function() {
   return this.tableControl.doAction();
-};
-
-scout.TableControlAdapterMenu.prototype._syncSelected = function(selected) {
-  // Don't call super, because super prevents rendering and instead delegates to setSelected. But in this case rendering is needed
-  this.selected = selected;
 };
 
 /**

@@ -10,8 +10,21 @@
  ******************************************************************************/
 scout.Form = function() {
   scout.Form.parent.call(this);
+  this._addAdapterProperties(['rootGroupBox', 'views', 'dialogs', 'initialFocus', 'messageBoxes', 'fileChoosers']);
+
+  this.displayHint = scout.Form.DisplayHint.DIALOG;
+  this.maximizeEnabled = true;
+  this.maximized = false;
+  this.minimizeEnabled = true;
+  this.minimized = false;
+  this.modal = true;
+  this.dialogs = [];
+  this.views = [];
+  this.messageBoxes = [];
+  this.fileChoosers = [];
+  this.closable = true;
+  this.cacheBounds = false;
   this.rootGroupBox;
-  this._addAdapterProperties(['rootGroupBox', 'views', 'dialogs', 'messageBoxes', 'fileChoosers']);
   this._locked;
   this.formController;
   this.messageBoxController;
@@ -22,7 +35,7 @@ scout.Form = function() {
    */
   this.renderInitialFocusEnabled = true;
 };
-scout.inherits(scout.Form, scout.ModelAdapter);
+scout.inherits(scout.Form, scout.Widget);
 
 scout.Form.DisplayHint = {
   DIALOG: 'dialog',
@@ -32,13 +45,12 @@ scout.Form.DisplayHint = {
 
 scout.Form.prototype._init = function(model) {
   scout.Form.parent.prototype._init.call(this, model);
-  if (this.isDialog() || this.searchForm || this.parent instanceof scout.WrappedFormField) {
-    this.rootGroupBox.menuBar.bottom();
-  }
 
   this.formController = new scout.FormController(this, this.session);
   this.messageBoxController = new scout.MessageBoxController(this, this.session);
   this.fileChooserController = new scout.FileChooserController(this, this.session);
+
+  this._syncRootGroupBox(this.rootGroupBox);
 
   // Only render glassPanes if modal and not being a wrapped Form.
   var renderGlassPanes = (this.modal && !(this.parent instanceof scout.WrappedFormField));
@@ -53,6 +65,14 @@ scout.Form.prototype._init = function(model) {
   this.one('destroy', function() {
     this.off('propertyChange', glasspaneRendererHandler);
   }.bind(this));
+};
+
+scout.Form.prototype._syncRootGroupBox = function(rootGroupBox) {
+  this._setProperty('rootGroupBox', rootGroupBox);
+  if (this.rootGroupBox &&
+     (this.isDialog() || this.searchForm || this.parent instanceof scout.WrappedFormField)) {
+    this.rootGroupBox.menuBar.bottom();
+  }
 };
 
 /**
@@ -322,7 +342,8 @@ scout.Form.prototype.renderInitialFocus = function() {
  */
 scout.Form.prototype._initialFocusElement = function() {
   var focusElement,
-    initialFocusField = this.session.getOrCreateModelAdapter(this.initialFocus, this);
+    initialFocusField = this.initialFocus;
+
   if (initialFocusField) {
     focusElement = initialFocusField.getFocusableElement();
   }
@@ -359,19 +380,5 @@ scout.Form.prototype.requestFocus = function(formField) {
   if (!formField) {
     return;
   }
-
   formField.focus();
-};
-
-scout.Form.prototype._onRequestFocus = function(formFieldId) {
-  var formField = this.session.getOrCreateModelAdapter(formFieldId, this);
-  this.requestFocus(formField);
-};
-
-scout.Form.prototype.onModelAction = function(event) {
-  if (event.type === 'requestFocus') {
-    this._onRequestFocus(event.formField);
-  } else {
-    scout.Form.parent.prototype.onModelAction.call(this, event);
-  }
 };

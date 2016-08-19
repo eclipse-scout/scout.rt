@@ -17,6 +17,23 @@ describe("ContextMenuSpec", function() {
     helper = new scout.MenuSpecHelper(session);
   });
 
+  /**
+   * Returns a clone for the given originalMenu. In the model we don't know the clone instance
+   * so we have to find the clones by traversing the DOM of the popup, since each DOM node
+   * has a data() referencing the widget instance.
+   */
+  function findClone(popup, originalMenu) {
+    var clone = null;
+    popup.$container.find('.menu-item').each(function() {
+      var $menuItem = $(this);
+      var widget = $menuItem.data('widget');
+      if (widget.cloneOf === originalMenu) {
+        clone = widget;
+      }
+    });
+    return clone;
+  }
+
   describe('renderMenuItems', function() {
     var popup, menu0, menu1, menu2;
 
@@ -36,9 +53,9 @@ describe("ContextMenuSpec", function() {
       });
       popup.render();
 
-      var menu0Clone = session.getAdapterClones(menu0)[0];
-      var menu1Clone = session.getAdapterClones(menu1)[0];
-      var menu2Clone = session.getAdapterClones(menu2)[0];
+      var menu0Clone = findClone(popup, menu0);
+      var menu1Clone = findClone(popup, menu1);
+      var menu2Clone = findClone(popup, menu2);
       expect(menu0Clone.$container.isVisible()).toBe(true);
       expect(menu1Clone.$container.isVisible()).toBe(true);
       expect(menu2Clone.$container.isVisible()).toBe(false);
@@ -54,9 +71,9 @@ describe("ContextMenuSpec", function() {
       });
       popup.render();
 
-      var menu0Clone = session.getAdapterClones(menu0)[0];
-      var menu1Clone = session.getAdapterClones(menu1)[0];
-      var menu2Clone = session.getAdapterClones(menu2)[0];
+      var menu0Clone = findClone(popup, menu0);
+      var menu1Clone = findClone(popup, menu1);
+      var menu2Clone = findClone(popup, menu2);
       expect(menu0Clone.$container).toHaveClass('context-menu-item-first');
       expect(menu2Clone.$container).toHaveClass('context-menu-item-last');
       popup.remove();
@@ -73,9 +90,9 @@ describe("ContextMenuSpec", function() {
       });
       popup.render();
 
-      var menu0Clone = session.getAdapterClones(menu0)[0];
-      var menu1Clone = session.getAdapterClones(menu1)[0];
-      var menu2Clone = session.getAdapterClones(menu2)[0];
+      var menu0Clone = findClone(popup, menu0);
+      var menu1Clone = findClone(popup, menu1);
+      var menu2Clone = findClone(popup, menu2);
       expect(menu0Clone.$container).toHaveClass('context-menu-item-first');
       expect(menu1Clone.$container).toHaveClass('context-menu-item-last');
       expect(menu2Clone.$container).not.toHaveClass('context-menu-item-last');

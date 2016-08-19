@@ -94,7 +94,7 @@ getJasmineRequireObj().base = function(j$) {
     throw new Error("unimplemented method");
   };
 
-  j$.MAX_PRETTY_PRINT_DEPTH = 40;
+  j$.MAX_PRETTY_PRINT_DEPTH = 5; // change from AWE 15.07.2016 - was 40 before
   j$.DEFAULT_TIMEOUT_INTERVAL = 5000;
 
   j$.getGlobal = (function() {

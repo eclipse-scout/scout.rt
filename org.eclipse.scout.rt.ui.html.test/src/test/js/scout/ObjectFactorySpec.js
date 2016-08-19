@@ -14,6 +14,7 @@ describe('ObjectFactory', function() {
     setFixtures(sandbox());
     session = sandboxSession();
     session.locale = new scout.LocaleSpecHelper().createLocale(scout.LocaleSpecHelper.DEFAULT_LOCALE);
+    scout.objectFactory.init();
     // Needed because some model adapters make JSON calls during initialization (e.g. Calendar.js)
     jasmine.Ajax.install();
     jasmine.clock().install();
@@ -70,9 +71,7 @@ describe('ObjectFactory', function() {
       model.button = {
         on: function() {}
       };
-    }
-
-    if ('GroupBox' === objectType || 'TabItem' === objectType) {
+    } else if ('GroupBox' === objectType || 'TabItem' === objectType) {
       model.getForm = function() {
         return createSimpleModel('Form', session);
       };
@@ -87,12 +86,37 @@ describe('ObjectFactory', function() {
     var i, model, factory, object, modelAdapter, objectType;
     for (objectType in scout.objectFactories) {
       model = createModel(session, i, objectType);
-      object = scout.objectFactories[objectType](model);
+      object = scout.objectFactories[objectType]();
       object.init(model);
       session.registerModelAdapter(object);
       modelAdapter = session.getModelAdapter(model.id);
       expect(modelAdapter).toBe(object);
     }
+  });
+
+  it('scout.create works with KeyStroke', function() {
+    // when creating a KeyStroke via factory, scout.Action should be initialized.
+    var keyStroke = scout.create('KeyStroke', {parent: session.desktop});
+    expect(scout.Action.prototype.isPrototypeOf(keyStroke)).toBe(true);
+  });
+
+  it('puts the object type to the object after creation', function() {
+    var object = scout.objectFactory._createObjectByType({}, 'StringField');
+    expect(object.objectType).toBe('StringField');
+  });
+
+  it('uses given object type to create the object', function() {
+    var object = scout.objectFactory._createObjectByType({
+      objectType: 'NumberField'
+    }, 'StringField');
+    expect(object instanceof scout.StringField).toBe(true);
+  });
+
+  it('uses the object type of the model if no explit type is specified', function() {
+    var object = scout.objectFactory._createObjectByType({
+      objectType: 'NumberField'
+    });
+    expect(object instanceof scout.NumberField).toBe(true);
   });
 
   describe('finds the correct constructor function if no factory is defined', function() {
@@ -123,6 +147,8 @@ describe('ObjectFactory', function() {
       scout.VariantStringField = function() {};
       var object = scout.objectFactory._createObjectByType(model);
       expect(object instanceof scout.VariantStringField).toBe(true);
+
+      delete scout.VariantStringField;
     });
 
     it('considers variants also within a custom namespace', function() {
@@ -136,15 +162,38 @@ describe('ObjectFactory', function() {
       expect(object instanceof my.VariantStringField).toBe(true);
     });
 
-    it('can handle too many dots in objectType', function() {
-      window.my = {};
-      var my = window.my;
-      my.VariantStringField = function() {};
-      var model = {
-        objectType: 'my.StringField.Variant.Foo'
-      };
-      var object = scout.objectFactory._createObjectByType(model);
-      expect(object instanceof my.VariantStringField).toBe(true);
+    describe('variantLenient', function() {
+      it('tries to create an object without variant if with variant fails', function() {
+        var model = {
+          objectType: 'StringField.Variant',
+          variantLenient: true
+        };
+        var object = scout.objectFactory._createObjectByType(model);
+        expect(object instanceof scout.StringField).toBe(true);
+      });
+
+      it('tries to create an object without variant if with variant fails also with custom namespace', function() {
+        window.my = {};
+        var my = window.my;
+        my.StringField = function() {};
+        var model = {
+          objectType: 'my.StringField.Variant',
+          variantLenient: true
+        };
+        var object = scout.objectFactory._createObjectByType(model);
+        expect(object instanceof my.StringField).toBe(true);
+      });
+      
+      it('can handle too many dots in objectType', function() {
+        window.my = {};
+        var my = window.my;
+        my.VariantStringField = function() {};
+        var model = {
+          objectType: 'my.StringField.Variant.Foo'
+        };
+        var object = scout.objectFactory._createObjectByType(model);
+        expect(object instanceof my.VariantStringField).toBe(true);
+      });      
     });
   });
 });

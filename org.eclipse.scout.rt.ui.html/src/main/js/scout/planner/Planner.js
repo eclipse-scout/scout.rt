@@ -10,8 +10,14 @@
  ******************************************************************************/
 scout.Planner = function() {
   scout.Planner.parent.call(this);
+
   this.resourceMap = [];
   this.activityMap = [];
+  this.availableDisplayModes = [];
+  this.resources = [];
+  this.viewRange = {};
+  this.selectionRange = {};
+  this.selectedResources = [];
 
   // visual
   this._resourceTitleWidth = 20;
@@ -33,7 +39,7 @@ scout.Planner = function() {
   this.yearPanelVisible = false;
   this._addAdapterProperties(['menus']);
 };
-scout.inherits(scout.Planner, scout.ModelAdapter);
+scout.inherits(scout.Planner, scout.Widget);
 
 scout.Planner.Direction = {
   BACKWARD: -1,
@@ -1053,9 +1059,9 @@ scout.Planner.prototype._afterYearPanelWidthChange = function() {
   }
 };
 
-scout.Planner.prototype._syncMenus = function(menus, oldMenus) {
-  this.updateKeyStrokes(menus, oldMenus);
-  this.menus = menus;
+scout.Planner.prototype._syncMenus = function(menus) {
+  this.updateKeyStrokes(menus, this.menus);
+  this._setProperty('menus', menus);
   this._updateMenuBar();
 };
 
@@ -1105,42 +1111,49 @@ scout.Planner.prototype._renderDisplayMode = function() {
 };
 
 scout.Planner.prototype._syncViewRange = function(viewRange) {
-  this.viewRange = new scout.DateRange(
-    scout.dates.parseJsonDate(viewRange.from),
-    scout.dates.parseJsonDate(viewRange.to)
-  );
+  if (!(viewRange instanceof scout.DateRange)) {
+    viewRange = new scout.DateRange(// FIXME [6.1] cgu ensure type
+      scout.dates.parseJsonDate(viewRange.from),
+      scout.dates.parseJsonDate(viewRange.to)
+    );
+  }
+  this._setProperty('viewRange', viewRange);
   this._yearPanel.setViewRange(this.viewRange);
   this._yearPanel.selectDate(this.viewRange.from);
 };
 
 scout.Planner.prototype._syncDisplayMode = function(displayMode) {
-  this.displayMode = displayMode;
+  this._setProperty('displayMode', displayMode);
   this._yearPanel.setDisplayMode(this.displayMode);
   this._header.setDisplayMode(this.displayMode);
 };
 
 scout.Planner.prototype._syncAvailableDisplayModes = function(availableDisplayModes) {
-  this.availableDisplayModes = availableDisplayModes;
+  this._setProperty('availableDisplayModes', availableDisplayModes);
   this._header.setAvailableDisplayModes(this.availableDisplayModes);
 };
 
 scout.Planner.prototype._syncSelectionRange = function(selectionRange) {
-  this.selectionRange = new scout.Range(scout.dates.parseJsonDate(selectionRange.from), scout.dates.parseJsonDate(selectionRange.to));
+  // FIXME [6.1] cgu ensure type
+  this._setProperty('selectionRange', new scout.Range(scout.dates.parseJsonDate(selectionRange.from), scout.dates.parseJsonDate(selectionRange.to)));
   this._updateMenuBar();
 };
 
 scout.Planner.prototype._syncSelectedResources = function(selectedResources) {
-  this.selectedResources = this._resourcesByIds(selectedResources);
+  if (typeof selectedResources[0] === 'string') {// FIXME [6.1] cgu ensure type ?
+    selectedResources = this._resourcesByIds(selectedResources);
+  }
+  this._setProperty('selectedResources', selectedResources);
   this._updateMenuBar();
 };
 
-scout.Planner.prototype._renderSelectedResources = function(newIds, oldSelectedResources) {
-  if (oldSelectedResources) {
-    oldSelectedResources.forEach(function(resource) {
-      resource.$resource.select(false);
-    });
-  }
+scout.Planner.prototype._removeSelectedResources = function() {
+  this.selectedResources.forEach(function(resource) {
+    resource.$resource.select(false);
+  });
+};
 
+scout.Planner.prototype._renderSelectedResources = function() {
   this.selectedResources.forEach(function(resource) {
     resource.$resource.select(true);
   });
@@ -1204,7 +1217,10 @@ scout.Planner.prototype._renderSelectionRange = function() {
 };
 
 scout.Planner.prototype._syncSelectedActivity = function(selectedActivity) {
-  this.selectedActivity = this._activityById(selectedActivity);
+  if (typeof selectedActivity === 'string') { // FIXME [6.1] cgu ensure type ?
+    selectedActivity = this._activityById(selectedActivity);
+  }
+  this._setProperty('selectedActivity', selectedActivity);
   this._updateMenuBar();
 };
 
@@ -1237,14 +1253,7 @@ scout.Planner.prototype._resourceById = function(id) {
 };
 
 scout.Planner.prototype.setDisplayMode = function(displayMode) {
-  this.displayMode = displayMode;
-  this._yearPanel.setDisplayMode(displayMode);
-
-  this._sendSetDisplayMode(displayMode);
-  if (this.rendered) {
-    this._renderDisplayMode();
-  }
-
+  this.setProperty('displayMode', displayMode);
   this.startRange = null;
   this.lastRange = null;
 };
@@ -1260,7 +1269,7 @@ scout.Planner.prototype.setYearPanelVisible = function(visible) {
   if (this.yearPanelVisible === visible) {
     return;
   }
-  this.yearPanelVisible = visible;
+  this._setProperty('yearPanelVisible', visible);
   if (this.rendered) {
     this._renderYearPanelVisible(true);
   }
@@ -1276,10 +1285,10 @@ scout.Planner.prototype.setViewRangeFrom = function(date) {
 };
 
 scout.Planner.prototype.setViewRange = function(viewRange) {
-  this.viewRange = viewRange;
-  this._yearPanel.setViewRange(viewRange);
-  this._yearPanel.selectDate(this.viewRange.from);
-  this._sendSetViewRange(viewRange);
+  if (this.viewRange === viewRange) {
+    return;
+  }
+  this._syncViewRange(viewRange);
 
   if (this.rendered) {
     this._renderViewRange();
@@ -1429,18 +1438,6 @@ scout.Planner.prototype._updateResources = function(resources) {
   }.bind(this));
 };
 
-scout.Planner.prototype._sendSetDisplayMode = function(displayMode) {
-  this._send('setDisplayMode', {
-    displayMode: displayMode
-  });
-};
-
-scout.Planner.prototype._sendSetViewRange = function(viewRange) {
-  this._send('setViewRange', {
-    viewRange: scout.dates.toJsonDateRange(viewRange)
-  });
-};
-
 scout.Planner.prototype._sendSetSelection = function() {
   var selectionRange = scout.dates.toJsonDateRange(this.selectionRange),
     resourceIds = this.selectedResources.map(function(r) {
@@ -1452,43 +1449,4 @@ scout.Planner.prototype._sendSetSelection = function() {
     resourceIds: resourceIds,
     selectionRange: selectionRange
   });
-};
-
-scout.Planner.prototype._onResourcesInserted = function(resources) {
-  this.insertResources(resources);
-};
-
-scout.Planner.prototype._onResourcesDeleted = function(resourceIds) {
-  var resources = this._resourcesByIds(resourceIds);
-  this.deleteResources(resources);
-};
-
-scout.Planner.prototype._onResourcesSelected = function(resourceIds) {
-  var resources = this._resourcesByIds(resourceIds);
-  this.selectResources(resources, false);
-};
-
-scout.Planner.prototype._onAllResourcesDeleted = function() {
-  this.deleteAllResources();
-};
-
-scout.Planner.prototype._onResourcesUpdated = function(resources) {
-  this._updateResources(resources);
-};
-
-scout.Planner.prototype.onModelAction = function(event) {
-  if (event.type === 'resourcesInserted') {
-    this._onResourcesInserted(event.resources);
-  } else if (event.type === 'resourcesDeleted') {
-    this._onResourcesDeleted(event.resourceIds);
-  } else if (event.type === 'resourcesSelected') {
-    this._onResourcesSelected(event.resourceIds);
-  } else if (event.type === 'allResourcesDeleted') {
-    this._onAllResourcesDeleted();
-  } else if (event.type === 'resourcesUpdated') {
-    this._onResourcesUpdated(event.resources);
-  } else {
-    scout.Planner.parent.prototype.onModelAction.call(this, event);
-
-  }
 };

@@ -32,6 +32,6 @@ scout.CellEditorTabKeyStroke.prototype.handle = function(event) {
 
   pos = table.nextEditableCellPos(column, row, backwards);
   if (pos) {
-    table.prepareCellEdit(pos.row.id, pos.column.id);
+    table.prepareCellEdit(pos.column, pos.row);
   }
 };

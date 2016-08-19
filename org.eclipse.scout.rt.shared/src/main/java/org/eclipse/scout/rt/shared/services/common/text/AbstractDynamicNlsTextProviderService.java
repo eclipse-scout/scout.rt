@@ -19,21 +19,6 @@ import org.eclipse.scout.rt.platform.nls.DynamicNls;
 
 public abstract class AbstractDynamicNlsTextProviderService implements ITextProviderService {
 
-  /**
-   * Gets the base name where the <code>DynamicNls</code> instance searches for .properties files.<br>
-   * Examples:<br>
-   * <ul>
-   * <li>"org.eclipse.scout.rt.shared.texts.Texts": searches in
-   * org/eclipse/scout/rt/shared/texts/Texts&lt;languagesuffix&gt;.properties on the classpath.</li>
-   * <li>"org.eclipse.scout.rt.shared.translations.Docs": searches in
-   * org/eclipse/scout/rt/shared/translations/Docs&lt;languagesuffix&gt;.properties on the classpath</li>
-   * </ul>
-   *
-   * @return A <code>String</code> containing the base name.
-   * @see DynamicNls
-   */
-  protected abstract String getDynamicNlsBaseName();
-
   private final DynamicNls m_instance = new DynamicNls();
 
   @PostConstruct

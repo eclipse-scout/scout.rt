@@ -17,6 +17,12 @@ describe("MenuBar", function() {
     helper = new scout.MenuSpecHelper(session);
   });
 
+  function createModel(text, iconId, menuTypes) {
+    text = scout.nvl(text, 'Foo');
+    menuTypes = scout.nvl(menuTypes, ['Table.EmptySpace']);
+    return helper.createModel(text, iconId, menuTypes);
+  }
+
   function createMenuBar() {
     return scout.create('MenuBar', {
       parent: new scout.NullWidget(),
@@ -45,14 +51,11 @@ describe("MenuBar", function() {
 
     it('must add/destroy dynamically created separators', function() {
       var separator,
-        menu1 = helper.createMenu(helper.createModel('empty')),
-        menu2 = helper.createMenu(helper.createModel('selection-1')),
-        menu3 = helper.createMenu(helper.createModel('selection-2')),
+        menu1 = helper.createMenu(createModel('empty')),
+        menu2 = helper.createMenu(createModel('selection-1', null, ['Table.SingleSelection'])),
+        menu3 = helper.createMenu(createModel('selection-2', null, ['Table.SingleSelection'])),
         menuBar = createMenuBar(),
         menus = [menu1, menu2];
-
-      menu1.menuTypes = ['Table.EmptySpace'];
-      menu2.menuTypes = ['Table.SingleSelection'];
 
       menuBar.render(session.$entryPoint);
       menuBar.setMenuItems(menus);
@@ -72,8 +75,8 @@ describe("MenuBar", function() {
     });
 
     it('renders menu bar invisible if no visible menu items are available', function() {
-      var modelMenu1 = helper.createModel('foo');
-      var modelMenu2 = helper.createModel('bar');
+      var modelMenu1 = createModel('foo');
+      var modelMenu2 = createModel('bar');
       modelMenu2.keyStroke = 'enter';
 
       var menu1 = helper.createMenu(modelMenu1),
@@ -94,8 +97,8 @@ describe("MenuBar", function() {
     });
 
     it('renders menu bar visible if at least one visible menu item is available', function() {
-      var modelMenu1 = helper.createModel('foo');
-      var modelMenu2 = helper.createModel('bar');
+      var modelMenu1 = createModel('foo');
+      var modelMenu2 = createModel('bar');
       modelMenu2.keyStroke = 'enter';
 
       var menu1 = helper.createMenu(modelMenu1),
@@ -119,8 +122,8 @@ describe("MenuBar", function() {
 
   describe('layout', function() {
     it('gets invalidated if a menu changes its visibility', function() {
-      var menu1 = helper.createMenu(helper.createModel('foo')),
-        menu2 = helper.createMenu(helper.createModel('bar')),
+      var menu1 = helper.createMenu(createModel('foo')),
+        menu2 = helper.createMenu(createModel('bar')),
         menuBar = createMenuBar(),
         menus = [menu1, menu2];
 
@@ -134,10 +137,7 @@ describe("MenuBar", function() {
       expect(menu1.$container.isVisible()).toBe(true);
       expect(scout.HtmlComponent.get(menuBar.$container).valid).toBe(true);
 
-      var event = createPropertyChangeEvent(menu1, {
-        "visible": false
-      });
-      menu1.onModelPropertyChange(event);
+      menu1.setProperty('visible', false);
 
       expect(menu1.$container.isVisible()).toBe(false);
       expect(scout.HtmlComponent.get(menuBar.$container).valid).toBe(false);
@@ -146,8 +146,8 @@ describe("MenuBar", function() {
 
   describe('updateDefaultMenu', function() {
     it('marks first visible and enabled menu that reacts to ENTER keystroke as default menu', function() {
-      var modelMenu1 = helper.createModel('foo');
-      var modelMenu2 = helper.createModel('bar');
+      var modelMenu1 = createModel('foo');
+      var modelMenu2 = createModel('bar');
       modelMenu2.keyStroke = 'enter';
 
       var menu1 = helper.createMenu(modelMenu1),
@@ -167,8 +167,8 @@ describe("MenuBar", function() {
     });
 
     it('updates state if menu gets enabled or disabled', function() {
-      var modelMenu1 = helper.createModel('foo');
-      var modelMenu2 = helper.createModel('bar');
+      var modelMenu1 = createModel('foo');
+      var modelMenu2 = createModel('bar');
       modelMenu2.keyStroke = 'enter';
 
       var menu1 = helper.createMenu(modelMenu1),
@@ -190,24 +190,18 @@ describe("MenuBar", function() {
       expect(menuBar.defaultMenu).toBe(menu2);
       expect(menu2.$container).toHaveClass('default-menu');
 
-      var event = createPropertyChangeEvent(menu2, {
-        "enabled": false
-      });
-      menu2.onModelPropertyChange(event);
+      menu2.setProperty('enabled', false);
       expect(menuBar.defaultMenu).toBe(null);
       expect(menu2.$container).not.toHaveClass('default-menu');
 
-      event = createPropertyChangeEvent(menu2, {
-        "enabled": true
-      });
-      menu2.onModelPropertyChange(event);
+      menu2.setProperty('enabled', true);
       expect(menuBar.defaultMenu).toBe(menu2);
       expect(menu2.$container).toHaveClass('default-menu');
     });
 
     it('considers rendered state of default menu', function() {
-      var modelMenu1 = helper.createModel('foo');
-      var modelMenu2 = helper.createModel('bar');
+      var modelMenu1 = createModel('foo');
+      var modelMenu2 = createModel('bar');
       modelMenu2.keyStroke = 'enter';
 
       var menu1 = helper.createMenu(modelMenu1),
@@ -237,17 +231,11 @@ describe("MenuBar", function() {
       expect(menu2.rendered).toBe(false);
       expect(menuBar.defaultMenu).toBe(menu2);
 
-      var event = createPropertyChangeEvent(menu2, {
-        "enabled": false
-      });
-      menu2.onModelPropertyChange(event);
+      menu2.setProperty('enabled', false);
       expect(menuBar.defaultMenu).toBe(null);
       expect(menu2.rendered).toBe(false);
 
-      event = createPropertyChangeEvent(menu2, {
-        "enabled": true
-      });
-      menu2.onModelPropertyChange(event);
+      menu2.setProperty('enabled', true);
       expect(menuBar.defaultMenu).toBe(menu2);
       expect(menu2.rendered).toBe(false);
     });

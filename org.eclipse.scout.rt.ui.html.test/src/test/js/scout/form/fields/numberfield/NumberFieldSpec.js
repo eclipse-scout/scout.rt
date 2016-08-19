@@ -29,21 +29,11 @@ describe("NumberField", function() {
     jasmine.Ajax.uninstall();
   });
 
-  function createField(model) {
-    var field = new scout.NumberField();
-    field.init(model);
-    return field;
-  }
-
-  function createModel() {
-    return helper.createFieldModel();
-  }
-
   describe("parse input (calculate value)", function() {
     var field;
 
     beforeEach(function() {
-      field = createField(createModel());
+      field = helper.createField('NumberField');
     });
 
     it("with . as separator and ' as grouping char", function() {

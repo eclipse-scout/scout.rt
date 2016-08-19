@@ -21,7 +21,7 @@ scout.Splitter = function() {
 scout.inherits(scout.Splitter, scout.Widget);
 
 scout.Splitter.prototype._init = function(options) {
-  scout.BusyIndicator.parent.prototype._init.call(this, options);
+  scout.Splitter.parent.prototype._init.call(this, options);
   this.splitHorizontal = scout.nvl(options.splitHorizontal, true);
   this.$anchor = options.$anchor;
   this._$root = options.$root;

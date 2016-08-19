@@ -28,14 +28,25 @@ describe("DateField", function() {
     $('.date-picker').remove();
   });
 
-  function createField(model) {
-    var field = new scout.DateField();
-    field.init(model);
-    return field;
+  function createModel(model) {
+    model = $.extend({
+      objectType: 'DateField',
+      hasDate: true,
+      timeFormatPattern: 'HH:mm',
+      dateFormatPattern: 'dd.MM.yyyy'
+    }, scout.nvl(model, {}));
+    model = $.extend(model, createSimpleModel(model.objectType, session));
+    registerAdapterData(model, session);
+    return model;
   }
 
-  function createFieldAndFocusAndOpenPicker(model) {
-    var dateField = createField(model);
+  function createField(modelProperties) {
+    var model = createModel(modelProperties);
+    return session.getOrCreateWidget(model.id, session.desktop);
+  }
+
+  function createFieldAndFocusAndOpenPicker(modelProperties) {
+    var dateField = createField(modelProperties);
     dateField.render(session.$entryPoint);
 
     dateField.$dateField.focus();
@@ -45,14 +56,6 @@ describe("DateField", function() {
     expect(findPicker().length).toBe(1);
 
     return dateField;
-  }
-
-  function createModel() {
-    var model = helper.createFieldModel('DateField');
-    model.hasDate = true;
-    model.timeFormatPattern = 'HH:mm';
-    model.dateFormatPattern = 'dd.MM.yyyy';
-    return model;
   }
 
   function findPicker() {
@@ -81,8 +84,7 @@ describe("DateField", function() {
   describe("Clicking the field", function() {
 
     it("opens the datepicker", function() {
-      var model = createModel();
-      var dateField = createField(model);
+      var dateField = createField();
       dateField.render(session.$entryPoint);
       expect(findPicker().length).toBe(0);
 
@@ -159,9 +161,7 @@ describe("DateField", function() {
     });
 
     it("updates the model with the selected value", function() {
-      var model = createModel();
-      model.timestamp = '2014-10-01';
-      var dateField = createFieldAndFocusAndOpenPicker(model);
+      var dateField = createFieldAndFocusAndOpenPicker({timestamp: '2014-10-01'});
       var dateBefore = dateField.timestampAsDate;
       expectDate(dateBefore, 2014, 10, 1);
 
@@ -175,9 +175,7 @@ describe("DateField", function() {
     });
 
     it("sends timestamp and displayText", function() {
-      var model = createModel();
-      model.timestamp = '2014-10-01';
-      var dateField = createFieldAndFocusAndOpenPicker(model);
+      var dateField = createFieldAndFocusAndOpenPicker({timestamp: '2014-10-01'});
 
       dateField.$dateField.val('11.02.2015');
       dateField._onDateFieldBlur();
@@ -199,9 +197,7 @@ describe("DateField", function() {
     });
 
     it("does not send timestamp and displayText again if not changed", function() {
-      var model = createModel();
-      model.timestamp = '2014-10-01';
-      var dateField = createFieldAndFocusAndOpenPicker(model);
+      var dateField = createFieldAndFocusAndOpenPicker({timestamp: '2014-10-01'});
 
       dateField.$dateField.val('11.02.2015');
       dateField._onDateFieldBlur();
@@ -214,8 +210,7 @@ describe("DateField", function() {
     });
 
     it("does not send timestamp and displayText if no date was entered", function() {
-      var model = createModel();
-      var dateField = createFieldAndFocusAndOpenPicker(model);
+      var dateField = createFieldAndFocusAndOpenPicker();
 
       dateField._onDateFieldBlur();
       sendQueuedAjaxCalls();
@@ -536,11 +531,12 @@ describe("DateField", function() {
         dateField.$dateField.triggerClick();
         expect(dateField.popup.rendered).toBe(true);
 
-        // Popup creates a clone -> validate that it will be unregistered when popup closes
-        expect(session._clonedModelAdapterRegistry[dateField.id][0]).toBe(dateField.popup._field);
+        // Popup creates a clone -> validate that it will be destroyed when popup closes
+        var expectedClone = dateField.popup._field;
+        expect(dateField).toBe(expectedClone.cloneOf);
         dateField.popup.close();
         expect(dateField.popup).toBe(null);
-        expect(session._clonedModelAdapterRegistry[dateField.id].length).toBe(0);
+        expect(expectedClone.destroyed).toBe(true);
       });
 
       it('updates displayText and timestamp of datefield if date in picker is selected', function() {
@@ -577,11 +573,11 @@ describe("DateField", function() {
       });
 
       it('shows datefield with same date as clicked datefield', function() {
-        var model = createModel();
-        model.touch = true;
-        model.timestamp = '2012-07-01';
-        model.displayText = '01.07.2012';
-        var dateField = createField(model);
+        var dateField = createField({
+          touch: true,
+          timestamp: '2012-07-01',
+          displayText: '01.07.2012'
+        });
         dateField.render(session.$entryPoint);
 
         expect(dateField.$dateField.text()).toBe(dateField.displayText);
@@ -593,9 +589,7 @@ describe("DateField", function() {
       });
 
       it('shows datefield with same date as clicked datefield, if field empty initially', function() {
-        var model = createModel();
-        model.touch = true;
-        var dateField = createField(model);
+        var dateField = createField({touch: true});
         dateField.render(session.$entryPoint);
 
         // Open
@@ -617,11 +611,11 @@ describe("DateField", function() {
       });
 
       it('clears displayText and timestamp of datefield if date in picker was removed', function() {
-        var model = createModel();
-        model.touch = true;
-        model.timestamp = '2012-07-01';
-        model.displayText = '01.07.2012';
-        var dateField = createField(model);
+        var dateField = createField({
+          touch: true,
+          timestamp: '2012-07-01',
+          displayText: '01.07.2012'
+        });
         dateField.render(session.$entryPoint);
 
         dateField.$dateField.triggerClick();
@@ -637,11 +631,11 @@ describe("DateField", function() {
       });
 
       it('shows datefield with same date as clicked datefield, even if value was deleted before', function() {
-        var model = createModel();
-        model.touch = true;
-        model.timestamp = '2012-07-01';
-        model.displayText = '01.07.2012';
-        var dateField = createField(model);
+        var dateField = createField({
+          touch: true,
+          timestamp: '2012-07-01',
+          displayText: '01.07.2012'
+        });
         dateField.render(session.$entryPoint);
 
         // Open and check display text

@@ -10,7 +10,17 @@
  ******************************************************************************/
 scout.Action = function() {
   scout.Action.parent.call(this);
-  this._addModelProperties(['tabbable']);
+
+  this.enabled = true;
+  this.visible = true;
+  this.selected = false;
+  this.horizontalAlignment = -1;
+  this.iconId = '';
+  this.tooltipText = '';
+  this.text = '';
+  this.cssClass = '';
+  this.toggleAction = false;
+  this.keyStroke = null;
 
   /**
    * This property decides whether or not the tabindex attribute is set in the DOM.
@@ -25,8 +35,9 @@ scout.Action = function() {
   this.actionStyle = scout.Action.ActionStyle.DEFAULT;
   this.textVisible = true;
   this.compact = false;
+  this._addCloneProperties(['actionStyle', 'cssClass', 'horizontalAlignment', 'iconId', 'selected', 'tabbable', 'text', 'tooltipText', 'toggleAction']);
 };
-scout.inherits(scout.Action, scout.ModelAdapter);
+scout.inherits(scout.Action, scout.Widget);
 
 scout.Action.ActionStyle = {
   DEFAULT: 0,
@@ -36,8 +47,9 @@ scout.Action.ActionStyle = {
 scout.Action.prototype._init = function(model) {
   scout.Action.parent.prototype._init.call(this, model);
   this.actionKeyStroke = this._createActionKeyStroke();
+  this.resolveTextKeys(['text', 'tooltipText']);
+  this.resolveIconIds(['iconId']);
   this._syncKeyStroke(this.keyStroke);
-  this._syncSelected(this.selected);
 };
 
 scout.Action.prototype._renderProperties = function() {
@@ -47,9 +59,7 @@ scout.Action.prototype._renderProperties = function() {
   this._renderIconId();
   this._renderTooltipText();
   this._renderKeyStroke();
-  this._renderEnabled();
   this._renderSelected();
-  this._renderVisible();
   this._renderTabbable();
   this._renderCompact();
   this._renderCssClass();
@@ -85,14 +95,12 @@ scout.Action.prototype._renderIconId = function() {
   this.$container.icon(iconId);
 };
 
-scout.Action.prototype._renderEnabled = function(enabled) {
-  enabled = scout.nvl(enabled, this.enabled);
-  this.$container.setEnabled(enabled);
+/**
+ * @override
+ */
+scout.Action.prototype._renderEnabled = function() {
+  this.$container.setEnabled(this.enabled);
   this._updateTooltip();
-};
-
-scout.Action.prototype._renderVisible = function() {
-  this.$container.setVisible(this.visible);
 };
 
 scout.Action.prototype._renderSelected = function() {
@@ -136,10 +144,12 @@ scout.Action.prototype._renderHorizontalAlignment = function() {
   // nothing to render, property is only considered by the menubar
 };
 
-scout.Action.prototype._renderCssClass = function(cssClass, oldCssClass) {
-  cssClass = cssClass || this.cssClass;
-  this.$container.removeClass(oldCssClass)
-    .addClass(cssClass);
+scout.Action.prototype._removeCssClass = function() {
+  this.$container.removeClass(this.cssClass);
+};
+
+scout.Action.prototype._renderCssClass = function() {
+  this.$container.addClass(this.cssClass);
 };
 
 
@@ -159,16 +169,8 @@ scout.Action.prototype._configureTooltip = function() {
     $anchor: this.$container,
     arrowPosition: 50,
     arrowPositionUnit: '%',
-    position: this.tooltipPosition
+    tooltipPosition: this.tooltipPosition
   };
-};
-
-scout.Action.prototype._goOffline = function() {
-  this._renderEnabled(false);
-};
-
-scout.Action.prototype._goOnline = function() {
-  this._renderEnabled(true);
 };
 
 /**
@@ -233,43 +235,23 @@ scout.Action.prototype.afterSendDoAction = function() {
 };
 
 scout.Action.prototype.setSelected = function(selected, notifyServer) {
-  if (selected === this.selected) {
-    return;
-  }
-  this._setProperty('selected', selected);
-  if (scout.nvl(notifyServer, true)) {
-    this.sendSelected();
-  }
-  if (this.rendered) {
-    this._renderSelected();
-  }
-};
-
-scout.Action.prototype.sendSelected = function() {
-  this._send('selected', {
-    selected: this.selected
-  });
-};
-
-scout.Action.prototype._syncSelected = function(selected) {
-  this.setSelected(selected, false);
-  return false;
+  this.setProperty('selected', selected);
 };
 
 scout.Action.prototype._syncKeyStroke = function(keyStroke) {
-  this.keyStroke = keyStroke;
+  this._setProperty('keyStroke', keyStroke);
   this.actionKeyStroke.parseAndSetKeyStroke(keyStroke);
 };
 
 scout.Action.prototype.setTabbable = function(tabbable) {
-  this.tabbable = tabbable;
-  if (this.rendered) {
-    this._renderTabbable();
-  }
+  this.setProperty('tabbable', tabbable);
 };
 
 scout.Action.prototype.setTextVisible = function(textVisible) {
-  this.textVisible = textVisible;
+  if (this.textVisible === textVisible) {
+    return;
+  }
+  this._setProperty('textVisible', textVisible);
   if (this.rendered) {
     this._renderText();
   }

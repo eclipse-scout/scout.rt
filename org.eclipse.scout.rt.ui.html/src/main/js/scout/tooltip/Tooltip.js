@@ -11,50 +11,34 @@
 scout.Tooltip = function() {
   scout.Tooltip.parent.call(this);
 
-  this.text;
-  this.arrowPosition;
-  this.arrowPositionUnit;
-  this.windowPaddingX;
-  this.windowPaddingY;
+  /**
+   * Either a String or a function which returns a String
+   */
+  this.text = '';
+
+  this.arrowPosition = 25;
+  this.arrowPositionUnit = '%';
+  this.windowPaddingX = 10;
+  this.windowPaddingY = 5;
   this.origin;
+  
+  /**
+   * When the origin point is calculated using $element.offset(),
+   * the result is absolute to the window. When positioning the tooltip, the $parent's offset must
+   * be subtracted. When the given origin is already relative to the parent, set this option to
+   * "true" to disable this additional calculation.
+   */
+  this.originRelativeToParent = false;
   this.$anchor;
-  this.autoRemove;
+  this.autoRemove = true;
   this.cssClass;
-  this.tooltipPosition;
-  this.scrollType;
-  this.htmlEnabled;
+  this.tooltipPosition = 'top';
+  this.scrollType = 'position';
+  this.htmlEnabled = false;
   this.$content;
   this._addEventSupport();
 };
 scout.inherits(scout.Tooltip, scout.Widget);
-
-/**
- * <ul>
- * <li>options.text - either a String or a function which returns a String.</li>
- * <li>options.originRelativeToParent - when the origin point is calculated using $element.offset(),
- *       the result is absolute to the window. When positioning the tooltip, the $parent's offset must
- *       be subtracted. When the given origin is already relative to the parent, set this option to
- *       "true" to disable this additional calculation.
- * </ul>
- */
-scout.Tooltip.prototype._init = function(options) {
-  scout.Tooltip.parent.prototype._init.call(this, options);
-
-  this.text = options.text || '';
-  this.severity = options.severity || 0;
-  this.arrowPosition = options.arrowPosition !== undefined ? options.arrowPosition : 25;
-  this.arrowPositionUnit = options.arrowPositionUnit || '%';
-  this.windowPaddingX = options.windowPaddingX !== undefined ? options.windowPaddingX : 10;
-  this.windowPaddingY = options.windowPaddingY !== undefined ? options.windowPaddingY : 5;
-  this.origin = options.origin;
-  this.originRelativeToParent = scout.nvl(options.originRelativeToParent, false);
-  this.$anchor = options.$anchor;
-  this.autoRemove = options.autoRemove !== undefined ? options.autoRemove : true;
-  this.cssClass = options.cssClass;
-  this.tooltipPosition = options.position || 'top';
-  this.scrollType = options.scrollType || 'position';
-  this.htmlEnabled = options.htmlEnabled !== undefined ? options.htmlEnabled : false;
-};
 
 scout.Tooltip.prototype._render = function($parent) {
   // Auto-detect parent
@@ -135,7 +119,10 @@ scout.Tooltip.prototype._remove = function() {
 };
 
 scout.Tooltip.prototype.setText = function(text) {
-  this.text = text;
+  if (this.text === text) {
+    return;
+  }
+  this._setProperty('text', text);
   if (this.rendered) {
     this._renderText();
     this.position();
@@ -143,10 +130,7 @@ scout.Tooltip.prototype.setText = function(text) {
 };
 
 scout.Tooltip.prototype.setSeverity = function(severity) {
-  this.severity = severity;
-  if (this.rendered) {
-    this._renderSeverity();
-  }
+  this.setProperty('severity', severity);
 };
 
 scout.Tooltip.prototype._renderText = function() {
@@ -257,7 +241,7 @@ scout.Tooltip.prototype._onAnchorScroll = function(event) {
   if (this.scrollType === 'position') {
     this.position();
   } else if (this.scrollType === 'remove') {
-    this.remove();
+    this.destroy();
   }
 };
 
@@ -285,11 +269,11 @@ scout.Tooltip.prototype._isMousedownOutside = function(event) {
  * Method invoked once a mouse down event occurs outside the tooltip.
  */
 scout.Tooltip.prototype._onMousedownOutside = function() {
-  this.remove();
+  this.destroy();
 };
 
 scout.Tooltip.prototype._onDocumentKeydown = function(event) {
-  this.remove();
+  this.destroy();
 };
 
 /* --- STATIC HELPERS ------------------------------------------------------------- */

@@ -11,6 +11,8 @@
 scout.MenuBox = function(menuBar) {
   scout.MenuBox.parent.call(this);
   this.compact = false;
+  this.menus = [];
+  this._addAdapterProperties('menus');
 };
 scout.inherits(scout.MenuBox, scout.Widget);
 
@@ -27,7 +29,6 @@ scout.MenuBox.prototype._initMenus = function(menus) {
 };
 
 scout.MenuBox.prototype._initMenu = function(menu) {
-  menu.setParent(this);
   menu.uiCssClass = this.uiMenuCssClass;
 };
 
@@ -42,6 +43,7 @@ scout.MenuBox.prototype._render = function($parent) {
 };
 
 scout.MenuBox.prototype._renderProperties = function() {
+  scout.MenuBox.parent.prototype._renderProperties.call(this);
   this._renderMenus();
   this._renderCompact();
 };
@@ -50,6 +52,14 @@ scout.MenuBox.prototype._renderMenus = function() {
   this.menus.forEach(function(menu) {
     menu.render(this.$container);
   }, this);
+  this.invalidateLayoutTree();
+};
+
+scout.MenuBox.prototype._removeMenus = function() {
+  this.menus.forEach(function(menu) {
+    menu.remove();
+  });
+  this.invalidateLayoutTree();
 };
 
 scout.MenuBox.prototype._renderCompact = function() {
@@ -58,11 +68,9 @@ scout.MenuBox.prototype._renderCompact = function() {
 };
 
 scout.MenuBox.prototype.setCompact = function(compact) {
-  if (this.compact === compact) {
-    return;
-  }
-  this.compact = compact;
-  if (this.rendered) {
-    this._renderCompact();
-  }
+  this.setProperty('compact', compact);
+};
+
+scout.MenuBox.prototype.setMenus = function(menus) {
+  this.setProperty('menus', menus);
 };

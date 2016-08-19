@@ -154,15 +154,13 @@ scout.TabAreaLayout.prototype._onClickEllipsis = function(event) {
       tabItem: tabItem,
       visible: tabItem.visible
     });
-    menu.remoteHandler = function(event) {
-      if ('doAction' === event.type) {
-        $.log.debug('(TabAreaLayout#_onClickEllipsis) tabItem=' + tabItem);
-        tabBox._selectTab(tabItem);
-        popup.one('remove', function(event){
-            tabItem.session.focusManager.requestFocus(tabItem.$tabContainer);
-        });
-      }
-    };
+    menu.on('doAction', function(event) {
+      $.log.debug('(TabAreaLayout#_onClickEllipsis) tabItem=' + tabItem);
+      tabBox._selectTab(tabItem);
+      popup.one('remove', function(event){
+          tabItem.session.focusManager.requestFocus(tabItem.$tabContainer);
+      });
+    });
     overflowMenus.push(menu);
   });
 

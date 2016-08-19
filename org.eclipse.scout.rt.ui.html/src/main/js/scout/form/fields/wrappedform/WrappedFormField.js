@@ -11,6 +11,8 @@
 scout.WrappedFormField = function() {
   scout.WrappedFormField.parent.call(this);
   this._addAdapterProperties(['innerForm']);
+
+  this.initialFocusEnabled = false;
 };
 scout.inherits(scout.WrappedFormField, scout.FormField);
 
@@ -52,9 +54,9 @@ scout.WrappedFormField.prototype._renderInitialFocusEnabled = function() {
   }
 };
 
-scout.WrappedFormField.prototype._removeInnerForm = function(oldInnerForm) {
-  if (oldInnerForm) {
-    oldInnerForm.remove();
+scout.WrappedFormField.prototype._removeInnerForm = function() {
+  if (this.innerForm) {
+    this.innerForm.remove();
   }
   this._removeField();
 };

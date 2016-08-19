@@ -22,15 +22,22 @@ scout.TabItem.prototype._init = function(model) {
   this._syncMenusVisible(this.menusVisible);
 };
 
-scout.TabItem.prototype._renderCssClass = function(cssClass, oldCssClass) {
+scout.TabItem.prototype._removeCssClass = function() {
   // Call super only if the group-box is rendered or is rendering
   if (this.$container) {
-    scout.TabItem.parent.prototype._renderCssClass.call(this, cssClass, oldCssClass);
+    scout.TabItem.parent.prototype._removeCssClass.call(this);
   }
 
-  cssClass = cssClass || this.cssClass;
-  this.$tabContainer.removeClass(oldCssClass);
-  this.$tabContainer.addClass(cssClass);
+  this.$tabContainer.removeClass(this.cssClass);
+};
+
+scout.TabItem.prototype._renderCssClass = function() {
+  // Call super only if the group-box is rendered or is rendering
+  if (this.$container) {
+    scout.TabItem.parent.prototype._renderCssClass.call(this);
+  }
+
+  this.$tabContainer.addClass(this.cssClass);
 };
 
 scout.TabItem.prototype._render = function($parent) {
@@ -64,7 +71,6 @@ scout.TabItem.prototype.renderTab = function($parent) {
   this._renderTabActive();
   this._renderLabel();
   this._renderMarked();
-  this._renderVisible();
   this._renderCssClass();
   this._renderTooltipText();
   this._renderErrorStatus();
@@ -127,12 +133,14 @@ scout.TabItem.prototype.removeTab = function() {
   }
 };
 
-scout.TabItem.prototype._syncMarked = function(marked) {
-  this.marked = marked;
+scout.TabItem.prototype.setMarked = function(marked) {
+  if (this.marked === marked) {
+    return;
+  }
+  this._setProperty('marked', marked);
   // Marked affects the tab item -> it needs to be rendered even if groupox is not
   if (this._tabRendered) {
     this._renderMarked();
-    return false;
   }
 };
 
@@ -140,29 +148,39 @@ scout.TabItem.prototype._renderMarked = function(marked) {
   this.$tabContainer.toggleClass('marked', this.marked);
 };
 
-scout.TabItem.prototype._syncVisible = function(visible) {
-  this.visible = visible;
+/**
+ * @override
+ */
+scout.TabItem.prototype.setVisible = function(visible) {
+  if (this.visible === visible) {
+    return;
+  }
+  this._setProperty('visible', visible);
   // Visible affects the tab item -> it needs to be rendered even if groupox is not
   if (this._tabRendered) {
     this._renderVisible();
-    return false;
   }
 };
 
-scout.TabItem.prototype._renderVisible = function(visible) {
+/**
+ * @override
+ */
+scout.TabItem.prototype._renderVisible = function() {
   // Call super only if the group-box is rendered or is rendering
   if (this.$container) {
-    scout.TabItem.parent.prototype._renderVisible.call(this, visible);
+    scout.TabItem.parent.prototype._renderVisible.call(this);
   }
   this.$tabContainer.setVisible(this.visible);
 };
 
-scout.TabItem.prototype._syncLabel = function(label) {
-  this.label = label;
+scout.TabItem.prototype.setLabel = function(label) {
+  if (this.label === label) {
+    return;
+  }
+  this._setProperty('label', label);
   // Label affects the tab item -> it needs to be rendered even if groupox is not
   if (this._tabRendered) {
     this._renderLabel();
-    return false;
   }
 };
 
@@ -193,7 +211,7 @@ scout.TabItem.prototype.addStatus = function() {
 
 scout.TabItem.prototype._syncStatusVisible = function() {
   // Always invisible to not waste space, icon will be visible if status needs to be shown
-  this.statusVisible = false;
+  this._setProperty('statusVisible', false);
 };
 
 /**
@@ -248,7 +266,7 @@ scout.TabItem.prototype._syncMenusVisible = function() {
   // Actually not needed at the moment because only value fields have menus (at least at the java model).
   // But actually we should change this so that menus are possible for every form field
   // TODO CGU [6.0] remove this comment if java model supports form field menus
-  this.menusVisible = false;
+  this._setProperty('menusVisible', false);
 };
 
 /**

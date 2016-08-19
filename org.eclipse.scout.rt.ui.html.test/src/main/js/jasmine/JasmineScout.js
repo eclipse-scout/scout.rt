@@ -27,6 +27,11 @@ function sandboxSession(options) {
   options.backgroundJobPollingEnabled = false;
   options.suppressErrors = true;
   options.renderDesktop = scout.nvl(options.renderDesktop, true);
+  options.remote = true; // required so adapters will be registered in the adapter registry
+
+  // Since most of the tests are written to simulate RemoteApp behavior we must run
+  // the RemoteApp#_init here. FIXME [awe, cgu] 6.1 - sollen wir hier besser eine JasmineApp machen?
+  scout.RemoteApp.modifyWidgetPrototype();
 
   session = new scout.Session($sandbox, options);
 
@@ -47,7 +52,9 @@ function sandboxSession(options) {
   desktop.navigationVisible = scout.nvl(desktop.navigationVisible, false);
   desktop.headerVisible = scout.nvl(desktop.headerVisible, false);
   desktop.benchVisible = scout.nvl(desktop.benchVisible, false);
-  desktop.parent = scout.nvl(desktop.parent, session.rootAdapter);
+  var rootWidget = new scout.NullWidget();
+  rootWidget.session = session;
+  desktop.parent = scout.nvl(desktop.parent, rootWidget);
   session.desktop = scout.create('Desktop', desktop);
   if (options.renderDesktop) {
     session._renderDesktop();
@@ -130,27 +137,44 @@ function createPropertyChangeEvent(model, properties) {
   };
 }
 
-function createAdapterData(adapterDataArray) {
-  var i,
-    adapterData = {};
+/**
+ * Converts the given adapaterDataArray into a map of adapterData where the key
+ * is the adapterData.id and the value is the adapterData itself.
+ */
+function mapAdapterData(adapterDataArray) {
+  var adapterDataMap = {};
   adapterDataArray = scout.arrays.ensure(adapterDataArray);
-
-  for (i = 0; i < adapterDataArray.length; i++) {
-    adapterData[adapterDataArray[i].id] = adapterDataArray[i];
-  }
-  return adapterData;
+  adapterDataArray.forEach(function(adapterData) {
+    adapterDataMap[adapterData.id] = adapterData;
+  });
+  return adapterDataMap;
 }
 
-function createAdapter(model, session, adapterDataArray) {
-  var adapterData, adapter;
-  adapterDataArray = scout.arrays.ensure(adapterDataArray);
-  adapterDataArray.push(model);
+/**
+ * Converts the given adapterDataArray into a map of adapterData and registers the adapterData in the Session.
+ * Only use this function when your tests requires to have a remote adapter. In that case create widget and
+ * remote adapter with Session#getOrCreateWidget().
+ *
+ * @param adapterDataArray
+ */
+function registerAdapterData(adapterDataArray, session) {
+  var adapterDataMap = this.mapAdapterData(adapterDataArray);
+  session._copyAdapterData(adapterDataMap);
+}
 
-  adapterData = createAdapterData(adapterDataArray);
-  session._copyAdapterData(adapterData);
-  adapter = session.getOrCreateModelAdapter(model.id, model.parent);
-  expect(session.getModelAdapter(adapter.id)).toBe(adapter);
-  return adapter;
+/**
+ * This function links and existing widget with a new adapter instance. This is useful for tests
+ * where you have an existing widget and later create a new adapter instance to that widget.
+ */
+function linkWidgetAndAdapter(widget, adapterClass) {
+  var session = widget.session;
+  var adapter = scout.create(adapterClass, {
+    id: widget.id,
+    session: session
+  });
+  adapter.widget = widget;
+  widget.remoteAdapter = adapter;
+  adapter._attachWidget();
 }
 
 function stripCommentsFromJson(input) {

@@ -11,6 +11,13 @@
 scout.Outline = function() {
   scout.Outline.parent.call(this);
   this._addAdapterProperties(['defaultDetailForm', 'views', 'dialogs', 'messageBoxes', 'fileChoosers']);
+
+  this.autoToggleBreadcrumbStyle = true;
+  this.navigateButtonsVisible = true;
+  this.dialogs = [];
+  this.views = [];
+  this.messageBoxes = [];
+  this.fileChoosers = [];
   this.navigateUpInProgress = false; // see NavigateUpButton.js
   this._additionalContainerClasses += ' outline';
   this._treeItemPaddingLeft = 37;
@@ -36,6 +43,9 @@ scout.Outline.prototype._init = function(model) {
   this.formController = new scout.FormController(this, this.session);
   this.messageBoxController = new scout.MessageBoxController(this, this.session);
   this.fileChooserController = new scout.FileChooserController(this, this.session);
+  this.titleVisible = true;
+  this.resolveTextKeys(['title']);
+  this._syncDefaultDetailForm(this.defaultDetailForm);
   this._detailContentDestroyHandler = this._onDetailContentDestroy.bind(this);
 
   // menu bars
@@ -57,6 +67,13 @@ scout.Outline.prototype._init = function(model) {
   this._syncDefaultDetailForm(this.defaultDetailForm);
   this._syncMenus(this.menus);
   this.updateDetailContent();
+};
+
+/**
+ * @override Tree.js
+ */
+scout.Outline.prototype._createTreeNode = function(nodeModel) {
+  return new scout.Page(this);
 };
 
 scout.Outline.prototype._createKeyStrokeContext = function() {
@@ -165,11 +182,11 @@ scout.Outline.prototype._initTreeNodeInternal = function(node, parentNode) {
   scout.Outline.parent.prototype._initTreeNodeInternal.call(this, node, parentNode);
   node.detailFormVisibleByUi = true;
   if (node.detailTable) {
-    node.detailTable = this.session.getOrCreateModelAdapter(node.detailTable, this);
+    node.detailTable = this.createFromProperty('detailTable', node.detailTable);
     this._initDetailTable(node);
   }
   if (node.detailForm) {
-    node.detailForm = this.session.getOrCreateModelAdapter(node.detailForm, this);
+    node.detailForm = this.createFromProperty('detailForm', node.detailForm);
     this._initDetailForm(node);
   }
 
@@ -342,7 +359,7 @@ scout.Outline.prototype._renderDefaultDetailForm = function() {
 };
 
 scout.Outline.prototype._syncDefaultDetailForm = function(defaultDetailForm) {
-  this.defaultDetailForm = defaultDetailForm;
+  this._setProperty('defaultDetailForm', defaultDetailForm);
   if (this.defaultDetailForm) {
     if (this.outlineOverview) {
       this.outlineOverview.destroy();
@@ -360,7 +377,7 @@ scout.Outline.prototype._syncDefaultDetailForm = function(defaultDetailForm) {
 };
 
 scout.Outline.prototype._syncNavigateButtonsVisible = function(navigateButtonsVisible) {
-  this.navigateButtonsVisible = navigateButtonsVisible;
+  this._setProperty('navigateButtonsVisible', navigateButtonsVisible);
   this._visitNodes(this.nodes, this._syncNavigateButtonsVisibleForNode.bind(this));
 };
 
@@ -510,10 +527,12 @@ scout.Outline.prototype._renderInBackground = function() {
 
 scout.Outline.prototype._renderCompact = function() {
   this.$container.toggleClass('compact', this.compact);
+  this.invalidateLayoutTree();
 };
 
 scout.Outline.prototype._renderEmbedDetailContent = function() {
   this.$data.toggleClass('has-detail-content', this.embedDetailContent);
+  this.invalidateLayoutTree();
 };
 
 scout.Outline.prototype._renderDetailContent = function() {
@@ -557,19 +576,11 @@ scout.Outline.prototype._postRenderViewRange = function() {
 };
 
 scout.Outline.prototype.setCompact = function(compact) {
-  this.compact = compact;
-  if (this.rendered) {
-    this._renderCompact();
-    this.invalidateLayoutTree();
-  }
+  this.setProperty('compact', compact);
 };
 
-scout.Outline.prototype.setEmbedDetailContent = function(embed) {
-  this.embedDetailContent = embed;
-  if (this.rendered) {
-    this._renderEmbedDetailContent();
-    this.invalidateLayoutTree();
-  }
+scout.Outline.prototype.setEmbedDetailContent = function(embedDetailContent) {
+  this.setProperty('embedDetailContent', embedDetailContent);
   this.updateDetailContent();
 };
 
@@ -588,7 +599,7 @@ scout.Outline.prototype.setDetailContent = function(content) {
   if (this.detailContent && this.detailContent.events) {
     this.detailContent.off('destroy', this._detailContentDestroyHandler);
   }
-  this.detailContent = content;
+  this._setProperty('detailContent', content);
   if (content && content.events) {
     content.on('destroy', this._detailContentDestroyHandler);
   }
@@ -810,10 +821,7 @@ scout.Outline.prototype._removeDetailMenuBar = function() {
 };
 
 scout.Outline.prototype.setDetailMenuBarVisible = function(visible) {
-  this.detailMenuBarVisible = visible;
-  if (this.rendered) {
-    this._renderDetailMenuBarVisible();
-  }
+  this.setProperty('detailMenuBarVisible', visible);
 };
 
 scout.Outline.prototype.setNodeMenus = function(nodeMenus) {
@@ -857,10 +865,7 @@ scout.Outline.prototype._removeNodeMenuBar = function() {
 };
 
 scout.Outline.prototype.setNodeMenuBarVisible = function(visible) {
-  this.nodeMenuBarVisible = visible;
-  if (this.rendered) {
-    this._renderNodeMenuBarVisible();
-  }
+  this.setProperty('nodeMenuBarVisible', visible);
 };
 
 scout.Outline.prototype._glassPaneTargets = function() {
@@ -903,9 +908,10 @@ scout.Outline.prototype.acceptView = function(view) {
 /**
  * @override Tree.js (don't call parent)
  */
-scout.Outline.prototype._syncMenus = function(menus, oldMenus) {
+scout.Outline.prototype._syncMenus = function(menus) {
+  var oldMenus = this.menus;
   this.updateKeyStrokes(menus, oldMenus);
-  this.menus = menus;
+  this._setProperty('menus', menus);
   if (this.titleMenuBar) { // _syncMenus is called by parent class Tree.js, at this time titleMenuBar is not yet initialized
     var menuItems = scout.menus.filter(this.menus, ['Tree.Header']);
     this.titleMenuBar.setMenuItems(menuItems);
@@ -946,38 +952,41 @@ scout.Outline.prototype._onDetailTableEvent = function(event) {
   }
 };
 
-scout.Outline.prototype._onPageChanged = function(event) {
-  var node;
-  if (event.nodeId) {
-    node = this.nodesMap[event.nodeId];
-
-    node.detailFormVisible = event.detailFormVisible;
-    node.detailForm = this.session.getOrCreateModelAdapter(event.detailForm, this);
-    if (node.detailForm) {
-      this._initDetailForm(node);
+/**
+ * @override Tree.js
+ */
+scout.Outline.prototype._nodesSelectedInternal = function() {
+  // FIXME [awe] 6.1 - braucht es hier deselectedPage, newSelectedPage wie im Java model?
+  var activePage = this.selectedNodes[0];
+  if (activePage) {
+    if (activePage.childrenLoaded) {
+      return;
     }
-
-    node.detailTableVisible = event.detailTableVisible;
-    node.detailTable = this.session.getOrCreateModelAdapter(event.detailTable, this);
-    if (node.detailTable) {
-      this._initDetailTable(node);
+    var promise = activePage.loadChildren();
+    if (promise) {
+      promise.done(this._onLoadChildrenDone.bind(this, activePage));
     }
-  } else {
-    this.defaultDetailForm = this.session.getOrCreateModelAdapter(event.detailForm, this);
+  }
+};
+
+scout.Outline.prototype._onLoadChildrenDone = function(activePage) {
+  this._triggerPageChanged(activePage);
+};
+
+scout.Outline.prototype.pageChanged = function(page) {
+  if (page) {
+    if (page.detailForm) {
+      this._initDetailForm(page);
+    }
+    if (page.detailTable) {
+      this._initDetailTable(page);
+    }
   }
 
   var selectedPage = this.selectedNodes[0];
-  if (!node && !selectedPage || node === selectedPage) {
+  if (!page && !selectedPage || page === selectedPage) {
     this.updateDetailContent();
   }
 
-  this._triggerPageChanged(node);
-};
-
-scout.Outline.prototype.onModelAction = function(event) {
-  if (event.type === 'pageChanged') {
-    this._onPageChanged(event);
-  } else {
-    scout.Outline.parent.prototype.onModelAction.call(this, event);
-  }
+  this._triggerPageChanged(page);
 };

@@ -98,12 +98,12 @@ describe('scout.FocusManager', function() {
 
       var form;
       beforeEach(function() {
-        form = formHelper.createFormXFields(4, false);
+        form = formHelper.createFormWithFields(session.desktop, false, 4);
         form.render(session.$entryPoint);
       });
 
       afterEach(function() {
-        form.remove();
+        form.destroy();
         form = null;
       });
 
@@ -135,7 +135,7 @@ describe('scout.FocusManager', function() {
         var sandboxContext = session.focusManager._findActiveContext();
         expect(sandboxContext.$container).toBe(session.$entryPoint);
 
-        var dialog = formHelper.createFormXFields(2, true);
+        var dialog = formHelper.createFormWithFields(session.desktop, true, 2);
         dialog.render(session.$entryPoint);
 
         expect(session.focusManager._focusContexts.length).toBe(2);

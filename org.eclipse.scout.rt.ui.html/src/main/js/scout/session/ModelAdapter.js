@@ -24,68 +24,211 @@
  * </ol>
  */
 scout.ModelAdapter = function() {
-  scout.ModelAdapter.parent.call(this);
-
-  // Adapter structure
-  this.owner;
-  this.ownedAdapters = [];
-  this._adapterProperties = [];
+  this._adapterProperties = []; // FIXME [awe, cgu] 6.1 - hier löschen (nur noch auf Widget.js)
 
   /**
-   * This array contains the name of all model-properties. It is used to distinct between ModelAdapter properties
-   * from the (server-side) model and other properties (like $container, etc.) which are added on the ModelAdapter
-   * instance.
+   * Widget properties which should be sent to server on property change.
    */
-  this._modelProperties = [];
+  this._remoteProperties = [];
+  this._widgetListener;
 
-  this._register = true;
-  this.remoteHandler = scout.NullRemoteHandler;
-  this._addKeyStrokeContextSupport();
-  this._addEventSupport();
+  this._propertyChangeEventFilter = new scout.PropertyChangeEventFilter();
+  this._widgetEventTypeFilter = new scout.WidgetEventTypeFilter();
+  this.eventFilters = [this._propertyChangeEventFilter, this._widgetEventTypeFilter];
 };
-scout.inherits(scout.ModelAdapter, scout.Widget);
 
-// NullRemoteHandler is used as default for local objects
-// in place of this.session.sendEvent
-scout.NullRemoteHandler = function() {
-  // NOP
+// FIXME CGU [6.1] ev. renamen to RemoteAdapter
+scout.ModelAdapter.prototype.init = function(model) {
+  this._init(model);
+  this.initialized = true;
 };
 
 /**
- * @param model expects parent session to be set. Other options:
- *   _register: (optional) when set to true the adapter instance is un-/registered in the modelAdapterRegistry of the session
- *   when not set, the default-value is true. When working with local objects (see LocalObject.js) the register flag is set to false.
+ * @param model expects a plain-object with properties: id, session
  */
 scout.ModelAdapter.prototype._init = function(model) {
-  scout.ModelAdapter.parent.prototype._init.call(this, model);
-  this.id = model.id;
-  this.objectType = model.objectType;
-  this._register = scout.nvl(model._register, true);
-  if (this._register) {
-    this.session.registerModelAdapter(this);
-    this.remoteHandler = this.session.sendEvent.bind(this.session);
-  }
+  scout.objects.mandatoryParameter('id', model.id);
+  scout.objects.mandatoryParameter('session', model.session);
+  $.extend(this, model);
+  this.session.registerModelAdapter(this);
+};
 
-  // Make a copy to prevent a modification of the given object
+scout.ModelAdapter.prototype.destroy = function() {
+  this._detachWidget();
+  this.widget.destroy();
+  this.widget = null;
+  this.session.unregisterModelAdapter(this);
+  this.destroyed = true;
+};
+
+scout.ModelAdapter.prototype.createWidget = function(adapterData, parent) {
+  var model = this._prepareModel(adapterData, parent);
+  this.widget = this._createWidget(model);
+  this._attachWidget();
+  return this.widget;
+};
+
+scout.ModelAdapter.prototype._prepareModel = function(model, parent) {
+  // Make a copy to prevent a modification of the given model
   model = $.extend({}, model);
-  // Fill in the missing default values (has to before copying the properties, so that modelProperties considers default values as well)
+
+  // Fill in the missing default values
   scout.defaultValues.applyTo(model);
 
-  // copy all properties from model to this adapter
-  this._eachProperty(model, function(propertyName, value, isAdapterProp) {
-    // if property is not yet in the array of property names -> add property
-    // the same property should exist only once in the array
-    if (this._modelProperties.indexOf(propertyName) === -1) {
-      this._modelProperties.push(propertyName);
+  model.parent = parent;
+  model.remoteAdapter = this;
+
+  if (model.owner !== undefined) {
+    // Prefer the owner sent by the server
+    model.owner = this.session.getModelAdapter(model.owner).widget;
+    if (!model.owner) {
+      throw new Error('owner not found.');
     }
-    if (scout.isOneOf(propertyName, 'id', 'session', 'objectType')) {
-      return; // Ignore (already set manually above)
+  }
+  return model;
+};
+
+/**
+ * @returns A new widget instance. The default impl. uses calls scout.create() with property objectType from given model.
+ */
+scout.ModelAdapter.prototype._createWidget = function(model) {
+  return scout.create(model.objectType, model);
+};
+
+scout.ModelAdapter.prototype._attachWidget = function() {
+  if (this._widgetListener) {
+    return;
+  }
+  this._widgetListener = {
+    func: this._onWidgetEventInternal.bind(this)
+  };
+  this.widget.events.addListener(this._widgetListener);
+};
+
+scout.ModelAdapter.prototype._detachWidget = function() {
+  if (!this._widgetListener) {
+    return;
+  }
+  this.widget.events.removeListener(this._widgetListener);
+  this._widgetListener = null;
+};
+
+// FIXME [6.1] cgu move to widget? still needed?
+scout.ModelAdapter.prototype._renderInternal = function($parent) {
+  scout.ModelAdapter.parent.prototype._renderInternal.call(this, $parent);
+  this._renderUniqueId();
+};
+
+scout.ModelAdapter.prototype._renderUniqueId = function(qualifier, $target) {
+  if (typeof qualifier !== 'string' && $target === undefined) {
+    $target = qualifier;
+    qualifier = undefined;
+  }
+  $target = $target || this.$container;
+  if ($target && !$target.attr('id')) { // don't overwrite
+    $target.attr('id', this.uniqueId(qualifier));
+  }
+};
+
+scout.ModelAdapter.prototype.goOffline = function() {
+  this.widget.children.forEach(function(child) {
+    if (!child.rendered) {
+      // going offline must not modify model state -> only necessary to inform rendered objects
+      return;
     }
-    if (isAdapterProp && value) {
-      value = this._createAdapters(propertyName, value);
+    if (!child.remoteAdapter) {
+      return;
     }
-    this[propertyName] = value;
-  }.bind(this));
+    child.remoteAdapter.goOffline();
+  }, this);
+  this._goOffline();
+};
+
+scout.ModelAdapter.prototype._goOffline = function() {
+  // NOP may be implemented by subclasses
+};
+
+scout.ModelAdapter.prototype.goOnline = function() {
+  this.widget.children.forEach(function(child) {
+    if (!child.rendered) {
+      // going online must not modify model state -> only necessary to inform rendered objects
+      return;
+    }
+    if (!child.remoteAdapter) {
+      return;
+    }
+    child.remoteAdapter.goOnline();
+  }, this);
+  this._goOnline();
+};
+
+scout.ModelAdapter.prototype._goOnline = function() {
+  // NOP may be implemented by subclasses
+};
+
+/**
+ * Returns a unique identifier for the modelAdapter, consisting of the object type,
+ * the session's partId and the adapter ID. An optional qualifier argument allows
+ * generation of multiple unique IDs per adapter.
+ *
+ * The return value is suitable for use in the HTML 'id' attribute.
+ *
+ * @see http://www.w3.org/TR/html5/dom.html#the-id-attribute
+ */
+scout.ModelAdapter.prototype.uniqueId = function(qualifier) {
+  var s = 'scout.';
+  if (!this.objectType && qualifier) {
+    s += qualifier;
+  } else {
+    s += scout.nvl(this.objectType, 'NO_TYPE');
+    if (qualifier) {
+      s += '@' + qualifier;
+    }
+  }
+  s += '[' + this.session.partId + '-' + scout.nvl(this.id, 'NO_ID') + ']';
+  return s.replace(/\s/g, '');
+};
+
+scout.ModelAdapter.prototype._isAdapterProperty = function(propertyName) {
+  return this._adapterProperties.indexOf(propertyName) > -1;
+};
+
+scout.ModelAdapter.prototype._isRemoteProperty = function(propertyName) {
+  return this._remoteProperties.indexOf(propertyName) > -1;
+};
+
+/**
+ * Adds property name(s) of model properties which must be converted automatically to a model adapter.
+ *
+ * @param properties String or String-array with property names.
+ */
+scout.ModelAdapter.prototype._addAdapterProperties = function(properties) {
+  this._addProperties('_adapterProperties', properties);
+};
+
+scout.ModelAdapter.prototype._addRemoteProperties = function(properties) {
+  this._addProperties('_remoteProperties', properties);
+};
+
+scout.ModelAdapter.prototype._addProperties = function(propertyName, properties) {
+  if (Array.isArray(properties)) {
+    this[propertyName] = this[propertyName].concat(properties);
+  } else {
+    this[propertyName].push(properties);
+  }
+};
+
+/**
+ * Removes  property name(s) of model properties which must be converted automatically to a model adapter.
+ *
+ * Only used for special cases (e.g. when a model adapter wraps another adapter).
+ */
+scout.ModelAdapter.prototype._removeAdapterProperties = function(properties) {
+  if (Array.isArray(properties)) {
+    scout.arrays.removeAll(this._adapterProperties, properties);
+  } else {
+    scout.arrays.remove(this._adapterProperties, properties);
+  }
 };
 
 /**
@@ -126,9 +269,7 @@ scout.ModelAdapter.prototype._send = function(type, data, options) {
   options = opts;
   // (End legacy fallback)
 
-  // If adapter is a clone, get original adapter and get its id
-  var adapter = this.original();
-  var event = new scout.Event(adapter.id, type, data);
+  var event = new scout.Event(this.id, type, data);
   // The following properties will not be sent to the server, see Session._requestToJson().
   if (options.coalesce !== undefined) {
     event.coalesce = options.coalesce;
@@ -136,7 +277,18 @@ scout.ModelAdapter.prototype._send = function(type, data, options) {
   if (options.showBusyIndicator !== undefined) {
     event.showBusyIndicator = options.showBusyIndicator;
   }
-  adapter.remoteHandler(event, options.delay);
+  this.session.sendEvent(event, options.delay);
+};
+
+/**
+ * This method is used to directly send an event triggered by a Widget to the server.
+ * Use this method in your _onWidgetEvent code when it makes no sense to implement an
+ * own _sendXxx method.
+ *
+ * @param widgetEvent
+ */
+scout.ModelAdapter.prototype._sendWidgetEvent = function(widgetEvent) {
+  this._send(widgetEvent.type, widgetEvent);
 };
 
 /**
@@ -144,228 +296,101 @@ scout.ModelAdapter.prototype._send = function(type, data, options) {
  */
 scout.ModelAdapter.prototype._sendProperty = function(propertyName) {
   var data = {};
-  data[propertyName] = this[propertyName];
+  data[propertyName] = this.widget[propertyName];
   this._send('property', data);
 };
 
-scout.ModelAdapter.prototype.render = function($parent) {
-  scout.ModelAdapter.parent.prototype.render.call(this, $parent);
-  if (this.session.offline) {
-    this.goOffline();
-  }
+scout.ModelAdapter.prototype.addFilterForWidgetEventType = function(eventType) {
+  this._widgetEventTypeFilter.addFilterForEventType(eventType);
 };
 
-scout.ModelAdapter.prototype._renderInternal = function($parent) {
-  scout.ModelAdapter.parent.prototype._renderInternal.call(this, $parent);
-  this._renderUniqueId();
+scout.ModelAdapter.prototype._isPropertyChangeEventFiltered = function(propertyName, value) {
+  return this._propertyChangeEventFilter.filter(propertyName, value);
 };
 
-scout.ModelAdapter.prototype._renderUniqueId = function(qualifier, $target) {
-  if (typeof qualifier !== 'string' && $target === undefined) {
-    $target = qualifier;
-    qualifier = undefined;
-  }
-  $target = $target || this.$container;
-  if ($target && !$target.attr('id')) { // don't overwrite
-    $target.attr('id', this.uniqueId(qualifier));
-  }
+scout.ModelAdapter.prototype._isWidgetEventFiltered = function(event) {
+  return this._widgetEventTypeFilter.filter(event);
 };
 
-/**
- * Adds property name(s) of model properties which must be converted automatically to a model adapter.
- *
- * @param properties String or String-array with property names.
- */
-scout.ModelAdapter.prototype._addAdapterProperties = function(properties) {
-  this._addProperties('_adapterProperties', properties);
-};
-
-/**
- * Adds property name(s) of model properties. They're used when a model adpater is cloned (see #cloneAdapter()).
- * You only need to call this method for UI-only properties. Properties from the server-side model are automatically
- * added in the _init method of the model adapter.
- *
- * @param properties String or String-array with property names.
- */
-scout.ModelAdapter.prototype._addModelProperties = function(properties) {
-  this._addProperties('_modelProperties', properties);
-};
-
-scout.ModelAdapter.prototype._addProperties = function(propertyName, properties) {
-  if (Array.isArray(properties)) {
-    this[propertyName] = this[propertyName].concat(properties);
-  } else {
-    this[propertyName].push(properties);
-  }
-};
-
-/**
- * Removes  property name(s) of model properties which must be converted automatically to a model adapter.
- *
- * Only used for special cases (e.g. when a model adapter wraps another adapter).
- */
-scout.ModelAdapter.prototype._removeAdapterProperties = function(properties) {
-  if (Array.isArray(properties)) {
-    scout.arrays.removeAll(this._adapterProperties, properties);
-  } else {
-    scout.arrays.remove(this._adapterProperties, properties);
-  }
-};
-
-scout.ModelAdapter.prototype.destroy = function() {
-  // destroy owned adapters in reverse order.
-  this.ownedAdapters.slice().reverse().forEach(function(ownedAdapter) {
-    ownedAdapter.destroy();
+scout.ModelAdapter.prototype.resetEventFilters = function() {
+  this.eventFilters.forEach(function(filter) {
+    filter.reset();
   });
-
-  this.remove();
-  if (this._register) {
-    this.session.unregisterModelAdapter(this);
-  }
-
-  // Disconnect from owner
-  if (this.owner) {
-    this.owner.removeOwnedAdapter(this);
-    this.owner = null;
-  }
-  // Disconnect from parent (adapter is being destroyed, it will never be rendered again)
-  if (this.parent) {
-    this.parent.removeChild(this);
-    this.parent = null;
-  }
-  this.destroyed = true;
-  // Inform listeners
-  this.trigger('destroy');
 };
 
-scout.ModelAdapter.prototype.addOwnedAdapter = function(ownedAdapter) {
-  $.log.trace('addOwnedAdapter(' + ownedAdapter + ') to ' + this);
-  this.ownedAdapters.push(ownedAdapter);
-};
+scout.ModelAdapter.prototype._onWidgetPropertyChange = function(event) {
+  event.changedProperties.forEach(function(propertyName) {
+    var value = event.newProperties[propertyName];
 
-scout.ModelAdapter.prototype.removeOwnedAdapter = function(ownedAdapter) {
-  $.log.trace('removeOwnedAdapter(' + ownedAdapter + ') from ' + this);
-  scout.arrays.remove(this.ownedAdapters, ownedAdapter);
-};
-
-/**
- * Loops through all properties of the given model. Creates an ModelAdapter instance
- * for the given property when the propertyName is in the _adapterProperties array.
- */
-scout.ModelAdapter.prototype._eachProperty = function(model, func) {
-  var propertyName, value, i;
-
-  // Loop through primitive properties
-  for (propertyName in model) {
-    if (this._adapterProperties.indexOf(propertyName) > -1) {
-      continue; // will be handled below
-    }
-    value = model[propertyName];
-    func(propertyName, value);
-  }
-
-  //Loop through adapter properties (any order will do).
-  for (i = 0; i < this._adapterProperties.length; i++) {
-    propertyName = this._adapterProperties[i];
-    value = model[propertyName];
-    if (value === undefined) {
-      continue;
-    }
-
-    func(propertyName, value, true);
-  }
-};
-
-/**
- * This method creates adapter instances for a given adapter-ID or an array of adapter-IDs.
- * In some cases the adapter-ID is already resolved and replaced by a ModelAdapter instance,
- * this happens when you use the ModelAdapter#extractModel() method. In that case we simply
- * use the provided instance and don't lookup the adapter by ID.
- */
-scout.ModelAdapter.prototype._createAdapters = function(propertyName, adapterOrIds) {
-  return this._processAdapters(adapterOrIds, function(adapterOrId) {
-    var adapter, model;
-    if (adapterOrId instanceof scout.ModelAdapter) {
-      adapter = adapterOrId;
-    } else {
-      model = this.session.getAdapterData(adapterOrId);
-      if (model) {
-        // Allow the creator to adapt the model of the child adapter
-        this._onChildAdapterCreation(propertyName, model);
-      }
-      adapter = this.session.getOrCreateModelAdapter(adapterOrId, this);
-    }
-    return adapter;
-  }.bind(this));
-};
-
-scout.ModelAdapter.prototype._destroyAdapters = function(propertyName, oldAdapters, newAdapterIds) {
-  return this._processAdapters(oldAdapters, function(oldAdapter) {
-    // Only destroy it if its linked to this adapter (-> don't destroy global adapters)
-    if (oldAdapter.owner !== this) {
+    if (this._isPropertyChangeEventFiltered(propertyName, value)) {
       return;
     }
 
-    if (Array.isArray(newAdapterIds)) {
-      // If the old adapter is not in the array anymore -> destroy it
-      if (newAdapterIds.indexOf(oldAdapter.id) < 0) {
-        oldAdapter.destroy();
+    if (this._isRemoteProperty(propertyName)) {
+      if (value && this._isAdapterProperty(propertyName)) {
+        value = value.remoteAdapter;
       }
-    } else {
-      // If the value is not an array, always destroy the oldAdapter
-      oldAdapter.destroy();
+      this._callSendProperty(propertyName, value);
     }
-    return oldAdapter;
-  }.bind(this));
+  }, this);
+};
+
+scout.ModelAdapter.prototype._callSendProperty = function(propertyName, value) {
+  var sendFuncName = '_send' + scout.strings.toUpperCaseFirstLetter(propertyName);
+  if (this[sendFuncName]) {
+    this[sendFuncName](value);
+  } else {
+    this._sendProperty(propertyName, value);
+  }
+};
+
+scout.ModelAdapter.prototype._onWidgetDestroy = function() {
+  this.destroy();
 };
 
 /**
- * If the value is an array: Loops through the array and calls func.
- * If the value is not an array: Calls the func.
- * @returns the processed adapters (either a list or a single adapter) returned by func.
+ * Do not override this method. Widget event filtering is done here, before _onWidgetEvent is called.
+ * @param event
  */
-scout.ModelAdapter.prototype._processAdapters = function(value, func) {
-  var adapters, adapter, i;
-  if (Array.isArray(value)) {
-    adapters = [];
-    for (i = 0; i < value.length; i++) {
-      adapter = func(value[i]);
-      adapters.push(adapter);
-    }
-    return adapters;
+scout.ModelAdapter.prototype._onWidgetEventInternal = function(event) {
+  if (!this._isWidgetEventFiltered(event)) {
+    this._onWidgetEvent(event);
+  }
+};
+
+scout.ModelAdapter.prototype._onWidgetEvent = function(event) {
+  if (event.type === 'destroy') {
+    this._onWidgetDestroy(event);
+  } else if (event.type === 'propertyChange') {
+    this._onWidgetPropertyChange(event);
   } else {
-    return func(value);
+    // FIXME CGU [6.1] temporary, until model adapter separation - anmerkung von AWE: eigentlich ist das kein schlechter
+    // default. Häufig gibt es events vom Widget, die man 1:1 an den server leiten will, ohne eine eigene _sendXxx Methode
+    // zu implementieren. Siehe: _sendWidgetEvent
+    if (event.sendToServer) {
+      event = $.extend({}, event); // copy
+      delete event.source;
+      delete event.sendToServer;
+      this._send(event.type, event);
+    }
+  }
+};
+
+scout.ModelAdapter.prototype._syncPropertiesOnPropertyChange = function(newProperties) {
+  for (var propertyName in newProperties) {
+    var value = newProperties[propertyName];
+
+    // Call the setter of the widget
+    this.widget.callSetter(propertyName, value);
   }
 };
 
 /**
- * Processes the JSON event from the server and sets dynamically properties on the adapter (-model)
- * and calls the right function to update the UI. For each property a corresponding function-name
- * must exist (property-name 'myValue', function-name 'setMyValue').
- *
- * This happens in two steps:
- * 1.) Synchronizing: when a sync[propertyName] method exists, call that method - otherwise simply set the property [propertyName]
- * 2.) Rendering: Call render[propertyName] function to update UI
- *
- * You can always rely that these two steps are processed in that order, but you cannot rely that
- * individual properties are processed in a certain order.
+ * Processes the JSON event from the server and calls the corresponding setter of the widget for each property.
  */
 scout.ModelAdapter.prototype.onModelPropertyChange = function(event) {
-  var oldProperties = {},
-    preventRendering = [];
-
-  // step 1 synchronizing - apply properties on adapter or calls syncPropertyName if it exists
-  this._syncPropertiesOnPropertyChange(oldProperties, event.properties, preventRendering);
-
-  // step 2 rendering - call render methods to update UI, but only if it is displayed (rendered)
-  if (this.rendered) {
-    this._renderPropertiesOnPropertyChange(oldProperties, event.properties, preventRendering);
-  }
-
-  // step 3 notify - fire propertyChange _after_ properties have been rendered. (This is important
-  // to make sure the DOM is in the right state, when the propertyChange event is consumed.)
-  // Note: A new event object has to be created, because it is altered in EventSuppor.trigger().
-  this._fireBulkPropertyChange(oldProperties, event.properties);
+  this._propertyChangeEventFilter.addFilterForProperties(event.properties);
+  this._syncPropertiesOnPropertyChange(event.properties);
 };
 
 /**
@@ -375,259 +400,6 @@ scout.ModelAdapter.prototype.onModelAction = function(event) {
   $.log.warn('Model action "' + event.type + '" is not supported by model-adapter ' + this.objectType);
 };
 
-scout.ModelAdapter.prototype._syncPropertiesOnPropertyChange = function(oldProperties, newProperties, preventRendering) {
-  this._eachProperty(newProperties, function(propertyName, value, isAdapterProp) {
-    var syncFuncName = '_sync' + scout.ModelAdapter._preparePropertyNameForFunctionCall(propertyName),
-      oldValue = this[propertyName];
-    oldProperties[propertyName] = oldValue;
-
-    if (isAdapterProp) {
-      if (oldValue) {
-        // TODO CGU this should actually be configurable, otherwise m_disposeOnChange=false on server doesn't work
-        this._destroyAdapters(propertyName, oldValue, value);
-      }
-      if (value) {
-        value = this._createAdapters(propertyName, value);
-      }
-    }
-
-    if (this[syncFuncName]) {
-      if (this[syncFuncName](value, oldValue) === false) {
-        // _syncPropName may return false to prevent the rendering (e.g. if the property has not changed)
-        // This may be useful for some properties with an expensive render method
-        // Do not prevent if undefined is returned!
-        preventRendering.push(propertyName);
-      }
-    } else {
-      this[propertyName] = value;
-    }
-  }.bind(this));
-};
-
-scout.ModelAdapter.prototype._renderPropertiesOnPropertyChange = function(oldProperties, newProperties, preventRendering) {
-  this._eachProperty(newProperties, function(propertyName, value, isAdapterProp) {
-    if (preventRendering.indexOf(propertyName) > -1) {
-      // Do not render if _syncPropName returned false
-      return;
-    }
-
-    var renderFuncName = '_render' + scout.ModelAdapter._preparePropertyNameForFunctionCall(propertyName);
-    var oldValue = oldProperties[propertyName];
-    var newValue = this[propertyName];
-    $.log.debug('call ' + renderFuncName + '(' + value + ')');
-    // Call the render function for regular properties, for adapters see onChildAdapterChange
-    if (isAdapterProp) {
-      this.onChildAdapterChange(propertyName, oldValue, newValue);
-    } else {
-      if (!this[renderFuncName]) {
-        throw new Error('Render function ' + renderFuncName + ' does not exist in ' + this.toString());
-      }
-      // TODO awe, cgu: (model-adapter) value and oldValue should be switched to conform with other functions.
-      // Or better create remove function as it is done with adapters? currently only "necessary" for AnalysisTableControl
-      // Input von 08.04.15: z.Z. wird die _renderXxx Methode sehr uneinheitlich verwendet. Manche mit ohne Parameter, andere mit
-      // 1 oder 2 Parameter. Dann gibt es noch Fälle (DateField.js) bei denen es nötig ist, render aufzurufen, aber mit einem
-      // anderen Wert für xxx als this.xxx. Nur wenige benötigen den 2. Parameter für old-value (FormField#_renderCssClass).
-      // Vorgeschlagene Lösung:
-      // - renderXxx() ist grundsätzlich Parameterlos und verwendet this.xxx
-      // - wenn jemand den old-value von this.xxx braucht, muss er sich diesen selber auf dem adapter merken
-      // - wenn jemand die render methode mit anderen werten als this.xxx aufrufen können muss, implementiert er für
-      //   diesen speziellen fall: function renderXxx(xxx) { xxx = xxx || this.xxx; ...
-      this[renderFuncName](newValue, oldValue);
-    }
-  }.bind(this));
-};
-
-/**
- * Removes the existing adapter specified by oldValue. Renders the new adapters if this.$container is set.<br>
- * To prevent this behavior just implement the method _renderPropertyName or _removePropertyName (e.g _removeTable).
- */
-scout.ModelAdapter.prototype.onChildAdapterChange = function(propertyName, oldValue, newValue) {
-  var i,
-    funcName = scout.ModelAdapter._preparePropertyNameForFunctionCall(propertyName),
-    renderFuncName = '_render' + funcName,
-    removeFuncName = '_remove' + funcName;
-
-  // Remove old adapter, if there is one
-  if (oldValue) {
-    if (!this[removeFuncName]) {
-      if (Array.isArray(oldValue)) {
-        for (i = 0; i < oldValue.length; i++) {
-          oldValue[i].remove();
-        }
-      } else {
-        oldValue.remove();
-      }
-    } else {
-      this[removeFuncName](oldValue);
-    }
-  }
-
-  // Render new adapter, if there is one
-  if (newValue) {
-    var $container = this.$container;
-    if (!this[renderFuncName] && $container) {
-      if (Array.isArray(newValue)) {
-        for (i = 0; i < newValue.length; i++) {
-          newValue[i].render($container);
-        }
-      } else {
-        newValue.render($container);
-      }
-    } else {
-      this[renderFuncName](newValue);
-    }
-  }
-};
-
-/**
- * Maybe overridden to adapt the model. Default is empty.
- */
-scout.ModelAdapter.prototype._onChildAdapterCreation = function(propertyName, adapter) {
-  // NOP may be implemented by subclasses
-};
-
-scout.ModelAdapter.prototype.goOffline = function() {
-  var i;
-  for (i = 0; i < this.ownedAdapters.length; i++) {
-    if (!this.ownedAdapters[i].rendered) {
-      //going offline must not modify model state -> only necessary to inform rendered objects
-      continue;
-    }
-    this.ownedAdapters[i].goOffline();
-  }
-  this._goOffline();
-};
-
-scout.ModelAdapter.prototype._goOffline = function() {
-  // NOP may be implemented by subclasses
-};
-
-scout.ModelAdapter.prototype.goOnline = function() {
-  var i;
-  for (i = 0; i < this.ownedAdapters.length; i++) {
-    if (!this.ownedAdapters[i].rendered) {
-      //going offline must not modify model state -> only necessary to inform rendered objects
-      continue;
-    }
-    this.ownedAdapters[i].goOnline();
-  }
-  this._goOnline();
-};
-
-scout.ModelAdapter.prototype._goOnline = function() {
-  // NOP may be implemented by subclasses
-};
-
-/**
- * Returns a unique identifier for the modelAdapter, consisting of the object type,
- * the session's partId and the adapter ID. An optional qualifier argument allows
- * generation of multiple unique IDs per adapter.
- *
- * The return value is suitable for use in the HTML 'id' attribute.
- *
- * @see http://www.w3.org/TR/html5/dom.html#the-id-attribute
- */
-scout.ModelAdapter.prototype.uniqueId = function(qualifier) {
-  var s = 'scout.';
-  if (!this.objectType && qualifier) {
-    s += qualifier;
-  } else {
-    s += scout.nvl(this.objectType, 'NO_TYPE');
-    if (qualifier) {
-      s += '@' + qualifier;
-    }
-  }
-  s += '[' + this.session.partId + '-' + scout.nvl(this.id, 'NO_ID') + ']';
-  return s.replace(/\s/g, '');
-};
-
-/**
- * Creates a deep clone of the current adapter instance. For each adapter a local object is created.
- * The 'cloneOf' property of the local-object points to the original adapter. When the ModelAdapter#
- * _send() method sends events to the server, it uses the ID of the original adapter for cloned instances
- * so the original adapter/model is notified on the server.
- */
-scout.ModelAdapter.prototype.cloneAdapter = function(modelOverride) {
-  var cloneProperty, cloneAdapter, adapterProperty,
-    cloneModel = modelOverride || {};
-
-  // #1 - clone model (excl. all adapter properties since they require a parent instance
-  this._modelProperties.forEach(function(propertyName) {
-    if (cloneModel.hasOwnProperty(propertyName)) {
-      // NOP - when property is already set by modelOverride
-    } else if ('id' === propertyName) {
-      // must set ID to undefined - so scout#_createLocalObject will
-      // create a new unique ID for the cloned adapter. You can still
-      // pass an ID by the modelOverride argument.
-      cloneModel[propertyName] = undefined;
-    } else if (this._isAdapterProperty(propertyName)) {
-      // NOP - we deal with adapter properties below
-    } else if ('_register' === propertyName) {
-      // NOP - is initialized on create of adapter
-    } else if (this.hasOwnProperty(propertyName)) {
-      cloneModel[propertyName] = this[propertyName];
-    }
-  }, this);
-
-  cloneAdapter = scout.create(cloneModel);
-
-  // #2 - create child adapters, use cloneAdapter as parent
-  this._adapterProperties.forEach(function(propertyName) {
-    if (cloneModel.hasOwnProperty(propertyName)) {
-      // NOP - when property is already set by modelOverride
-    } else if (this.hasOwnProperty(propertyName)) {
-      adapterProperty = this[propertyName];
-      if(adapterProperty === null){
-        cloneProperty = null;
-      } else if (Array.isArray(adapterProperty)) {
-        cloneProperty = [];
-        adapterProperty.forEach(function(adapterPropertyElement) {
-          cloneProperty.push(adapterPropertyElement.cloneAdapter({
-            parent: cloneAdapter
-          }));
-        }, this);
-      } else {
-        cloneProperty = adapterProperty.cloneAdapter({
-          parent: cloneAdapter
-        });
-      }
-      cloneAdapter[propertyName] = cloneProperty;
-    }
-  }, this);
-
-  this.session.registerAdapterClone(this, cloneAdapter);
-  return cloneAdapter;
-};
-
-/**
- * @returns the original adapter from which this one was cloned. If it is not a clone, itself is returned.
- */
-scout.ModelAdapter.prototype.original = function() {
-  var original = this;
-  while (original.cloneOf) {
-    original = original.cloneOf;
-  }
-  return original;
-};
-
-scout.ModelAdapter.prototype._isModelProperty = function(propertyName) {
-  return this._modelProperties.indexOf(propertyName) > -1;
-};
-
-scout.ModelAdapter.prototype._isAdapterProperty = function(propertyName) {
-  return this._adapterProperties.indexOf(propertyName) > -1;
-};
-
 scout.ModelAdapter.prototype.toString = function() {
-  return 'ModelAdapter[objectType=' + this.objectType + ' id=' + this.id +
-    ' super=' + scout.ModelAdapter.parent.prototype.toString.call(this) + ']';
-};
-
-/* --- STATIC HELPERS ------------------------------------------------------------- */
-
-/**
- * @memberOf scout.ModelAdapter
- */
-scout.ModelAdapter._preparePropertyNameForFunctionCall = function(propertyName) {
-  return propertyName.substring(0, 1).toUpperCase() + propertyName.substring(1);
+  return 'ModelAdapter[objectType=' + this.objectType + ' id=' + this.id + ']';
 };

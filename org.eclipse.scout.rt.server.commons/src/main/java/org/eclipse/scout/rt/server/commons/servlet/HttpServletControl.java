@@ -90,6 +90,13 @@ public class HttpServletControl {
    * Override {@link #getCspDirectives()} to add new or change / remove existing directives.
    */
   protected String getCspValue() {
+    // build csp rule only once to eliminate overhead with each request
+    List<String> cspDirectives = new ArrayList<>();
+    for (Entry<String, String> entry : getCspDirectives().entrySet()) {
+      cspDirectives.add(StringUtility.join(" ", entry.getKey(), entry.getValue()));
+    }
+
+    m_cspValue = StringUtility.join("; ", cspDirectives);
     return m_cspValue;
   }
 

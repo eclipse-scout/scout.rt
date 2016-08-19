@@ -14,7 +14,6 @@
 scout.BasicField = function() {
   scout.BasicField.parent.call(this);
   this._onDisplayTextModifiedHandler = this._onDisplayTextModified.bind(this);
-  this.enabledWhenOffline = true;
   this.disabledCopyOverlay = true;
   this._displayTextModifiedTimeoutId = null;
 };
@@ -23,6 +22,10 @@ scout.inherits(scout.BasicField, scout.ValueField);
 scout.BasicField.prototype._renderProperties = function() {
   scout.BasicField.parent.prototype._renderProperties.call(this);
   this._renderUpdateDisplayTextOnModify();
+};
+
+scout.BasicField.prototype.setUpdateDisplayTextOnModify = function(updateDisplayTextOnModify) {
+  this.setProperty('updateDisplayTextOnModify', updateDisplayTextOnModify);
 };
 
 scout.BasicField.prototype._renderUpdateDisplayTextOnModify = function() {

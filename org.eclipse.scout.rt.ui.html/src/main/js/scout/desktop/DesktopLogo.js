@@ -32,6 +32,7 @@ scout.DesktopLogo.prototype._render = function($parent) {
 };
 
 scout.DesktopLogo.prototype._renderProperties = function() {
+  scout.DesktopLogo.parent.prototype._renderProperties.call(this);
   this._renderUrl();
 };
 
@@ -40,8 +41,5 @@ scout.DesktopLogo.prototype._renderUrl = function() {
 };
 
 scout.DesktopLogo.prototype.setUrl = function(url) {
-  this.url = url;
-  if (this.rendered) {
-    this._renderUrl();
-  }
+  this.setProperty('url', url);
 };

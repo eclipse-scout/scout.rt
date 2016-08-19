@@ -43,15 +43,13 @@ describe("Outline", function() {
   }
 
   describe("dispose", function() {
-    var model, tree, node0, node1, node2;
+    var model, tree, node0;
 
     beforeEach(function() {
       // A large tree is used to properly test recursion
       model = helper.createModelFixture(3, 2, true);
       tree = helper.createOutline(model);
-      node0 = model.nodes[0];
-      node1 = model.nodes[1];
-      node2 = model.nodes[2];
+      node0 = tree.nodes[0];
     });
 
     it("calls onNodeDeleted for every node to be able to cleanup", function() {
@@ -63,10 +61,7 @@ describe("Outline", function() {
     it("calls onNodeDeleted for every node (which was not already deleted before) to be able to cleanup", function() {
       spyOn(tree, '_onNodeDeleted');
 
-      var message = {
-        events: [createNodesDeletedEvent(model, [node0.id])]
-      };
-      session._processSuccessResponse(message);
+      tree.deleteNodes([node0]);
       expect(tree._onNodeDeleted.calls.count()).toBe(13);
 
       tree._onNodeDeleted.calls.reset();
@@ -76,13 +71,52 @@ describe("Outline", function() {
 
   });
 
+
+  describe("deleteNodes", function() {
+    var model, tree, node0;
+
+    beforeEach(function() {
+      // A large tree is used to properly test recursion
+      model = helper.createModelFixture(3, 2, true);
+      tree = helper.createOutline(model);
+      node0 = tree.nodes[0];
+    });
+
+    it("calls onNodeDeleted for every node to be able to cleanup", function() {
+      spyOn(tree, '_onNodeDeleted');
+
+      tree.deleteNodes([node0]);
+      expect(tree._onNodeDeleted.calls.count()).toBe(13);
+    });
+
+  });
+
+  describe("deleteAllChildNodes", function() {
+    var model, tree;
+
+    beforeEach(function() {
+      // A large tree is used to properly test recursion
+      model = helper.createModelFixture(3, 2, true);
+      tree = helper.createOutline(model);
+    });
+
+    it("calls onNodeDeleted for every node to be able to cleanup", function() {
+      spyOn(tree, '_onNodeDeleted');
+
+      tree.deleteAllChildNodes();
+      expect(tree._onNodeDeleted.calls.count()).toBe(39);
+      expect(scout.objects.countOwnProperties(tree.nodesMap)).toBe(0);
+    });
+
+  });
+
   describe("navigateToTop", function() {
 
     it("collapses all nodes in bread crumb mode", function() {
       var model = helper.createModelFixture(1, 1);
-      var node0 = model.nodes[0];
-
       var tree = helper.createOutline(model);
+      var node0 = tree.nodes[0];
+
       tree.displayStyle = scout.Tree.DisplayStyle.BREADCRUMB;
       tree.render(session.$entryPoint);
 
@@ -104,7 +138,7 @@ describe("Outline", function() {
     beforeEach(function() {
       model = helper.createModelFixture(3, 2, true);
       outline = helper.createOutline(model);
-      node = model.nodes[0];
+      node = outline.nodes[0];
     });
 
     it("handle navigateUp only once", function() {
@@ -177,7 +211,6 @@ describe("Outline", function() {
       expect(outline.detailMenuBar.menuItems[0]).toBe(node0.detailTable.menus[0]);
     });
 
-
     it("attaches a listener to the detail table to get dynamic menu changes", function() {
       var outline = helper.createOutlineWithOneDetailTable();
       outline.setCompact(true);
@@ -192,13 +225,7 @@ describe("Outline", function() {
 
       // Menus change on table -> detail menu bar needs to be updated as well
       var menu = menuHelper.createModel('menu', '', ['Table.EmptySpace']);
-      var message = {
-        adapterData: createAdapterData([menu]),
-        events: [createPropertyChangeEvent(node0.detailTable, {
-          menus: [menu.id]
-        })]
-      };
-      session._processSuccessResponse(message);
+      node0.detailTable.setMenus([menu]);
       expect(outline.detailMenuBarVisible).toBe(true);
       expect(outline.detailMenuBar.menuItems.length).toBe(1);
       expect(outline.detailMenuBar.menuItems[0]).toBe(node0.detailTable.menus[0]);
@@ -258,58 +285,4 @@ describe("Outline", function() {
 
   });
 
-  describe("onModelAction", function() {
-
-    describe("nodesDeleted event", function() {
-      var model, tree, node0, node1, node2;
-
-      beforeEach(function() {
-        // A large tree is used to properly test recursion
-        model = helper.createModelFixture(3, 2, true);
-        tree = helper.createOutline(model);
-        node0 = model.nodes[0];
-        node1 = model.nodes[1];
-        node2 = model.nodes[2];
-      });
-
-      it("calls onNodeDeleted for every node to be able to cleanup", function() {
-        spyOn(tree, '_onNodeDeleted');
-
-        var message = {
-          events: [createNodesDeletedEvent(model, [node0.id])]
-        };
-        session._processSuccessResponse(message);
-
-        expect(tree._onNodeDeleted.calls.count()).toBe(13);
-      });
-
-    });
-
-    describe("allChildNodesDeleted event", function() {
-      var model, tree, node0, node1, node2;
-
-      beforeEach(function() {
-        // A large tree is used to properly test recursion
-        model = helper.createModelFixture(3, 2, true);
-        tree = helper.createOutline(model);
-        node0 = model.nodes[0];
-        node1 = model.nodes[1];
-        node2 = model.nodes[2];
-      });
-
-      it("calls onNodeDeleted for every node to be able to cleanup", function() {
-        spyOn(tree, '_onNodeDeleted');
-
-        var message = {
-          events: [createAllChildNodesDeletedEvent(model)]
-        };
-        session._processSuccessResponse(message);
-
-        expect(tree._onNodeDeleted.calls.count()).toBe(39);
-        expect(scout.objects.countOwnProperties(tree.nodesMap)).toBe(0);
-      });
-
-    });
-
-  });
 });

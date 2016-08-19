@@ -25,6 +25,7 @@ describe("GroupBox", function() {
     };
 
     model.session = session;
+    model.parent = parent || session.desktop;
     field.init(model);
     return field;
   }
@@ -36,10 +37,6 @@ describe("GroupBox", function() {
         gridData: {
           x: 0,
           y: 0
-        },
-        parent: {
-          objectType: 'GroupBox',
-          addChild: function() {}
         }
       };
 
@@ -54,8 +51,11 @@ describe("GroupBox", function() {
     });
   });
 
-  describe("test predefined height and width in pixel", function() {
-    var form, formAdapter, formController, rootGroupBox, model = $.extend(createSimpleModel('GroupBox', session), {
+  describe('test predefined height and width in pixel', function() {
+    var form, formAdapter, formController, rootGroupBox, model;
+
+    beforeEach(function() {
+      model = $.extend(createSimpleModel('GroupBox', session), {
         id: '3',
         label: "fooBar",
         gridData: {
@@ -66,29 +66,23 @@ describe("GroupBox", function() {
         },
         mainBox: true
       });
-
-    beforeEach(function() {
-      form = helper.createFormModel();
-      rootGroupBox = model;
-      rootGroupBox.fields = [];
-      form.rootGroupBox = rootGroupBox.id;
-      form.owner = session.rootAdapter.id;
-      formAdapter = createAdapter(form, session, [rootGroupBox]);
+      rootGroupBox = scout.create('GroupBox', model);
+      form = scout.create('Form', {parent: session.desktop, rootGroupBox: rootGroupBox});
       session.desktop.$container = $('#sandbox');
     });
 
-    it("adds group-box div when label is set", function() {
-      session.desktop.formController._renderDialog(formAdapter);
-      expect(formAdapter.rootGroupBox.$container.cssHeight()).toBe(123);
-      expect(formAdapter.rootGroupBox.$container.cssWidth()).toBe(97);
+    it('adds group-box div when label is set', function() {
+      session.desktop.formController._renderDialog(form);
+      expect(form.rootGroupBox.$container.cssHeight()).toBe(123);
+      expect(form.rootGroupBox.$container.cssWidth()).toBe(97);
     });
 
   });
 
-  describe("focus", function() {
+  describe('focus', function() {
 
-    it("focus first focusable field in groupBox", function() {
-      var groupBox = helper.createGroupBoxWithOneField();
+    it('focus first focusable field in groupBox', function() {
+      var groupBox = helper.createGroupBoxWithOneField(session.desktop);
       groupBox.render(session.$entryPoint);
       expect(scout.focusUtils.isActiveElement(groupBox.fields[0].$field[0])).toBe(false);
       groupBox.focus();

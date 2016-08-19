@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.ui.html.res.loader;
 
 import java.io.IOException;
 
+import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheKey;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheObject;
 import org.eclipse.scout.rt.server.commons.servlet.cache.IHttpResourceCache;
@@ -36,9 +37,11 @@ public interface IResourceLoader {
    */
   HttpCacheObject loadResource(HttpCacheKey cacheKey) throws IOException;
 
+  BinaryResource loadResource(String pathInfo) throws IOException;
+
   /**
    * Gets the {@link IHttpResourceCache} to be used for this loader.
-   * 
+   *
    * @param cacheKey
    * @return The {@link IHttpResourceCache} to store the {@link HttpCacheObject}s or <code>null</code> if no caching
    *         should be supported for this {@link IResourceLoader}.

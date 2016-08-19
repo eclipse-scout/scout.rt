@@ -13,12 +13,29 @@ package org.eclipse.scout.rt.shared.services.common.text;
 import java.util.Locale;
 import java.util.Map;
 
+import org.eclipse.scout.rt.platform.nls.DynamicNls;
 import org.eclipse.scout.rt.platform.service.IService;
 
 /**
  * Interface for Scout Text Providers.
  */
 public interface ITextProviderService extends IService {
+
+  /**
+   * Gets the base name where the <code>DynamicNls</code> instance searches for .properties files.<br>
+   * Examples:<br>
+   * <ul>
+   * <li>"org.eclipse.scout.rt.shared.texts.Texts": searches in
+   * org/eclipse/scout/rt/shared/texts/Texts&lt;languagesuffix&gt;.properties on the classpath.</li>
+   * <li>"org.eclipse.scout.rt.shared.translations.Docs": searches in
+   * org/eclipse/scout/rt/shared/translations/Docs&lt;languagesuffix&gt;.properties on the classpath</li>
+   * </ul>
+   *
+   * @return A <code>String</code> containing the base name.
+   * @see DynamicNls
+   */
+  String getDynamicNlsBaseName();
+
   /**
    * Gets the text for the given key and language.<br>
    * if there are parameters in the translation, they are replaced with the given list.
