@@ -20,9 +20,9 @@ scout.TableMatrix = function(table, session) {
 
 scout.TableMatrix.DateGroup = {
   NONE: 0,
-  YEAR: 1,
-  MONTH: 2,
-  WEEKDAY: 3
+  YEAR: 256,
+  MONTH: 257,
+  WEEKDAY: 258
 };
 
 scout.TableMatrix.NumberGroup = {
