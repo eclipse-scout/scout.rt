@@ -106,9 +106,9 @@ scout.DesktopAdapter.prototype._onOpenUri = function(event) {
       // Since the file cannot be stored on the file system it will be shown in the browser if possible
       // -> create a new window to not replace the existing content.
       // Drawback: Popup-Blocker will show up
-      this._openUriAsNewWindow(event.uri);
+      this.widget._openUriAsNewWindow(event.uri); // FIXME [awe] 6.1 - handle this in Widget? Make public?
     } else {
-      this._openUriInIFrame(event.uri);
+      this.widget._openUriInIFrame(event.uri);
     }
   } else if (event.action === 'open') {
     // Open in same window.
@@ -116,7 +116,7 @@ scout.DesktopAdapter.prototype._onOpenUri = function(event) {
     // Additionally, some url types require to be opened in the same window like tel or mailto, at least on mobile devices
     window.location.href = event.uri;
   } else if (event.action === 'newWindow') {
-    this._openUriAsNewWindow(event.uri);
+    this.widget._openUriAsNewWindow(event.uri);
   }
 };
 
