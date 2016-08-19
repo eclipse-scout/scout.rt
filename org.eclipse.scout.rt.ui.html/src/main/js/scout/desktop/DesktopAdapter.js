@@ -49,7 +49,7 @@ scout.DesktopAdapter.prototype._onFormActivate = function(event) {
     displayParent = this.session.getModelAdapter(event.displayParent);
 
   if (displayParent) {
-    form = this.session.getOrCreateWidget(event.form, this.widghet);
+    form = this.session.getOrCreateWidget(event.form, this.widget);
     this.widget.activateForm(form, false);
   }
 };

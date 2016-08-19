@@ -71,6 +71,7 @@ scout.TabItem.prototype.renderTab = function($parent) {
   this._renderTabActive();
   this._renderLabel();
   this._renderMarked();
+  this._renderVisible();
   this._renderCssClass();
   this._renderTooltipText();
   this._renderErrorStatus();
