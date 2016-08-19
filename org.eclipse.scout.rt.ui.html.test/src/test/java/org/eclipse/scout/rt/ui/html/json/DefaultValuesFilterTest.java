@@ -112,6 +112,14 @@ public class DefaultValuesFilterTest {
     assertEquals(null, format.getJSONArray("localeData").getJSONObject(0).opt("location"));
     assertEquals("here", format.getJSONArray("localeData").getJSONObject(1).opt("location"));
     assertEquals(null, format.getJSONArray("localeData").getJSONObject(2).opt("location"));
+
+    JSONObject button = adapterData.getJSONObject(12);
+    assertEquals(Boolean.TRUE, button.opt("statusVisible"));
+    JSONObject buttonGridData = button.getJSONObject("gridData");
+    assertEquals(-1, buttonGridData.opt("x")); // should not apply default value of "FormField", because "Button" defines another default value
+    assertEquals(null, buttonGridData.opt("y")); // default value of "FormField"
+    assertEquals(2, buttonGridData.opt("h"));
+    assertEquals(null, buttonGridData.opt("w")); // default value of "Button"
   }
 
   @Test

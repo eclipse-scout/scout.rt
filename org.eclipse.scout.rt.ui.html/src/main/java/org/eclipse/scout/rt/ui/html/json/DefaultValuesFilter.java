@@ -10,14 +10,17 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
@@ -164,33 +167,44 @@ public class DefaultValuesFilter {
       // Unknown type, no default values
       return;
     }
+    FilterState filterState = new FilterState();
     for (String t : objectTypeHierarchy) {
       for (Iterator it = json.keys(); it.hasNext();) {
         String prop = (String) it.next();
         Object value = json.opt(prop);
-        if (checkPropertyValueEqualToDefaultValue(t, prop, value)) {
+        filterState.pushProperty(prop);
+        if (!filterState.isCurrentPropertyProcessed() && checkPropertyValueEqualToDefaultValue(t, prop, value, filterState)) {
           // Property value value is equal to the static default value -> remove the property
           it.remove();
         }
+        filterState.popProperty(prop);
       }
     }
   }
 
-  protected boolean checkPropertyValueEqualToDefaultValue(String objectType, String propertyName, Object propertyValue) {
+  protected boolean checkPropertyValueEqualToDefaultValue(String objectType, String propertyName, Object propertyValue, FilterState filterState) {
     // Try to find a default value until one is found or there are no more parent types to check
     Map<String, Object> properties = m_defaults.get(objectType);
-    Object defaultValue = (properties == null ? null : properties.get(propertyName));
-    if (checkValueEqualToDefaultValue(propertyValue, defaultValue)) {
-      return true;
+    if (properties == null) {
+      return false;
+    }
+    if (properties.containsKey(propertyName)) {
+      filterState.markCurrentPropertyAsProcessed();
+      Object defaultValue = properties.get(propertyName);
+      if (checkValueEqualToDefaultValue(propertyValue, defaultValue, filterState)) {
+        return true;
+      }
     }
     // Special case: Check if there is a "pseudo" default value, which will not
     // be removed itself, but might have sub-properties removed.
-    defaultValue = (properties == null ? null : properties.get("~" + propertyName));
-    checkValueEqualToDefaultValue(propertyValue, defaultValue);
+    else if (properties.containsKey("~" + propertyName)) {
+      Object defaultValue = properties.get("~" + propertyName);
+      checkValueEqualToDefaultValue(propertyValue, defaultValue, filterState);
+    }
     return false;
   }
 
-  protected boolean checkValueEqualToDefaultValue(Object value, Object defaultValue) {
+  protected boolean checkValueEqualToDefaultValue(Object value, Object defaultValue, FilterState filterState) {
     // Now compare the given value to the found default value
     if (value == null && defaultValue == null) {
       return true;
@@ -203,13 +217,13 @@ public class DefaultValuesFilter {
         JSONObject jsonValue = (JSONObject) value;
         JSONObject jsonDefaultValue = (JSONObject) defaultValue;
         // Special case: The property cannot be removed, but maybe  we can remove some of the objects attributes
-        return filterDefaultObject(jsonValue, jsonDefaultValue);
+        return filterDefaultObject(jsonValue, jsonDefaultValue, filterState);
       }
       if (value instanceof JSONArray) {
         JSONArray jsonValue = (JSONArray) value;
         JSONObject jsonDefaultValue = (JSONObject) defaultValue;
         // Special case: Apply default value object to each element in the array
-        filterDefaultObject(jsonValue, jsonDefaultValue);
+        filterDefaultObject(jsonValue, jsonDefaultValue, filterState);
       }
       return false;
     }
@@ -244,23 +258,29 @@ public class DefaultValuesFilter {
    *         means that the valueObject itself MAY be removed. Return value <code>false</code> means that not all
    *         properties are equal (but nevertheless, some properties may have been removed from valueObject).
    */
-  protected boolean filterDefaultObject(JSONObject valueObject, JSONObject defaultValueObject) {
+  protected boolean filterDefaultObject(JSONObject valueObject, JSONObject defaultValueObject, FilterState filterState) {
     boolean sameKeys = CollectionUtility.equalsCollection(valueObject.keySet(), defaultValueObject.keySet());
     for (Iterator it = valueObject.keys(); it.hasNext();) {
       String prop = (String) it.next();
-      Object subValue = valueObject.opt(prop);
-      Object subDefaultValue = defaultValueObject.opt(prop);
-      boolean valueEqualToDefaultValue = checkValueEqualToDefaultValue(subValue, subDefaultValue);
-      if (valueEqualToDefaultValue) {
-        // Property value value is equal to the static default value -> remove the property
-        it.remove();
+      filterState.pushProperty(prop);
+      if (!filterState.isCurrentPropertyProcessed()) {
+        Object subValue = valueObject.opt(prop);
+        if (defaultValueObject.has(prop)) {
+          filterState.markCurrentPropertyAsProcessed();
+          Object subDefaultValue = defaultValueObject.opt(prop);
+          if (checkValueEqualToDefaultValue(subValue, subDefaultValue, filterState)) {
+            // Property value value is equal to the static default value -> remove the property
+            it.remove();
+          }
+        }
+        else if (defaultValueObject.has("~" + prop)) {
+          // Special case: Check if there is a "pseudo" default value, which will not
+          // be removed itself, but might have sub-properties removed.
+          Object subDefaultValue = defaultValueObject.opt("~" + prop);
+          checkValueEqualToDefaultValue(subValue, subDefaultValue, filterState);
+        }
       }
-      else {
-        // Special case: Check if there is a "pseudo" default value, which will not
-        // be removed itself, but might have sub-properties removed.
-        subDefaultValue = defaultValueObject.opt("~" + prop);
-        checkValueEqualToDefaultValue(subValue, subDefaultValue);
-      }
+      filterState.popProperty(prop);
     }
     // Even more special case: If valueObject is now empty and it used to have the same keys as
     // the defaultValueObject, it is considered equal to the default value and MAY be removed.
@@ -276,7 +296,7 @@ public class DefaultValuesFilter {
    * completely equal to the defaultValueObject it is <b>not</b> removed, i.e. an empty object remains at this position
    * in the array. Otherwise, we could not restore the object later.
    */
-  protected void filterDefaultObject(JSONArray valueArray, JSONObject defaultValueObject) {
+  protected void filterDefaultObject(JSONArray valueArray, JSONObject defaultValueObject, FilterState filterState) {
     for (int i = 0; i < valueArray.length(); i++) {
       Object value = valueArray.opt(i);
       // Can only filter
@@ -284,11 +304,11 @@ public class DefaultValuesFilter {
         JSONObject jsonValue = (JSONObject) value;
         // Filter, but ignore return value. Element in the array must never be removed,
         // otherwise we could not restore it later.
-        filterDefaultObject(jsonValue, defaultValueObject);
+        filterDefaultObject(jsonValue, defaultValueObject, filterState);
       }
       else if (value instanceof JSONArray) {
         JSONArray jsonArray = (JSONArray) value;
-        filterDefaultObject(jsonArray, defaultValueObject);
+        filterDefaultObject(jsonArray, defaultValueObject, filterState);
       }
     }
   }
@@ -308,5 +328,73 @@ public class DefaultValuesFilter {
       }
     }
     return result;
+  }
+
+  /**
+   * Helper class for an object that is passed through all methods during a call to
+   * {@link DefaultValuesFilter#filter(JSONObject)}.
+   */
+  protected class FilterState {
+
+    /**
+     * Stack of property names that are currently processed (may be nested when default values contain "pseudo" property
+     * with "~" prefix)
+     */
+    private final Deque<String> m_propertyStack = new ArrayDeque<>();
+    /**
+     * Set of all property names that were already processed and don't have to be processed again going up in the object
+     * hierarchy.
+     * <p>
+     * Example:
+     * <ul>
+     * <li>Both "FormField" and "Button" define a default value for the property "statusVisible".
+     * <li>When filtering the JSON of a button, the property "statusVisible" can only be removed when its value is equal
+     * to the value defined for "Button", not for "FormField".
+     * <li>To achieve that, the property is marked as "processed" after comparing its value to the default value defined
+     * for "Button" (no matter if the default value matches or not). This prevents any checks or accidental removals
+     * when checking against the default values of the parent hierarchy.
+     */
+    private final Set<String> m_processedProperties = new HashSet<>();
+
+    protected Deque<String> getPropertyStack() {
+      return m_propertyStack;
+    }
+
+    protected Set<String> getCheckedProperties() {
+      return m_processedProperties;
+    }
+
+    public void pushProperty(String propertyName) {
+      m_propertyStack.push(propertyName);
+    }
+
+    public void popProperty(String propertyName) {
+      if (CompareUtility.notEquals(m_propertyStack.peek(), propertyName)) {
+        throw new IllegalStateException("'" + propertyName + "' is not the last element in the stack: [" + CollectionUtility.format(m_propertyStack) + "]");
+      }
+      m_propertyStack.pop();
+    }
+
+    /**
+     * @return a combined string from all property names on the stack (separated by ".")
+     */
+    public String getCurrentProperty() {
+      StringBuilder sb = new StringBuilder();
+      for (Iterator<String> it = m_propertyStack.descendingIterator(); it.hasNext();) {
+        if (sb.length() > 0) {
+          sb.append(".");
+        }
+        sb.append(it.next());
+      }
+      return sb.toString();
+    }
+
+    public boolean isCurrentPropertyProcessed() {
+      return m_processedProperties.contains(getCurrentProperty());
+    }
+
+    public void markCurrentPropertyAsProcessed() {
+      m_processedProperties.add(getCurrentProperty());
+    }
   }
 }

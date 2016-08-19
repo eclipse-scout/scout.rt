@@ -2,10 +2,11 @@
   "defaults": {
     "FormField": {
       "enabled": true,
-      "gridData": {
+      "~gridData": {
         "x": -1,
         "y": -1
-      }
+      },
+      "statusVisible": true
     },
     "GroupBox": {
       "borderDecoration": "auto"
@@ -40,6 +41,13 @@
           "location": "unknown"
         }
       }
+    },
+    "Button": {
+      "statusVisible": false,
+      "~gridData": {
+        "x": 1,
+        "w": 2
+      }
     }
   },
   "objectTypeHierarchy": {
@@ -47,7 +55,8 @@
       "TableField": null,
       "ValueField": {
         "SmartField": null
-      }
+      },
+      "Button": null
     }
   }
 }
