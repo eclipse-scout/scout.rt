@@ -34,7 +34,7 @@ scout.PageWithNodes.prototype._createTable = function() {
 };
 
 scout.PageWithNodes.prototype._onDetailTableRowAction = function(event) {
-  var clickedRow = event.source.rowsMap[event.rowId]; // FIXME [awe] 6.1 - discuss with C.GU. I'd rather have a 'row' property on the event
+  var clickedRow = event.source.rowsMap[event.row.id];
   var nodeToSelect = clickedRow.node;
   this.getOutline().selectNode(nodeToSelect);
 };
