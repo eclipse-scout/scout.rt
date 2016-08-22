@@ -354,9 +354,6 @@ scout.ContextMenuPopup.prototype._onMenuPropertyChange = function(event) {
 
 scout.ContextMenuPopup.prototype._onMenuRemove = function(event) {
   var menu = event.source;
-  if (this.options.cloneMenuItems && menu.cloneOf) {
-    this.session.unregisterAllAdapterClones(menu.cloneOf);
-  }
   menu.setParent(menu.oldParentMenu);
 };
 
@@ -370,17 +367,24 @@ scout.ContextMenuPopup.prototype._onMenuRemove = function(event) {
  * @override Widget.js
  */
 scout.ContextMenuPopup.prototype._remove = function() {
-  this._getMenuItems().forEach(function(menu) {
-    if (this.options.cloneMenuItems) {
-      if (this.session.hasClones(menu)) {
-        this.session.unregisterAllAdapterClones(menu);
-      }
-    } else {
+  if (this.options.cloneMenuItems) {
+    this._getMenuItems().forEach(unregisterAllAdapterClonesRec, this);
+  } else {
+    this._getMenuItems().forEach(function(menu) {
       menu.remove();
-    }
-  }, this);
+    }, this);
+  }
   scout.scrollbars.uninstall(this.$body, this.session);
   scout.ContextMenuPopup.parent.prototype._remove.call(this);
+
+  // ----- Helper functions -----
+
+  function unregisterAllAdapterClonesRec(menu) {
+    menu.children.slice().reverse().forEach(unregisterAllAdapterClonesRec, this);
+    if (this.session.hasClones(menu)) {
+      this.session.unregisterAllAdapterClones(menu);
+    }
+  }
 };
 
 /**
