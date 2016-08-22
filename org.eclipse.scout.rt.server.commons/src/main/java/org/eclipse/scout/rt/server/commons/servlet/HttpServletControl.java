@@ -10,20 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.commons.servlet;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
-import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.server.commons.ServerCommonsConfigProperties.CspEnabledProperty;
 
 /**
@@ -46,58 +40,22 @@ public class HttpServletControl {
   public static final String HTTP_HEADER_CSP = "Content-Security-Policy";
   public static final String HTTP_HEADER_CSP_LEGACY = "X-Content-Security-Policy";
 
-  public static final String CSP_REPORT_URL = "csp.cgi";
+  public static final String CSP_REPORT_URL = "csp-report";
 
-  private String m_cspValue;
+  // Content Security Policy (CSP) token (built only once to eliminate overhead with each request)
+  private String m_cspToken;
 
   @PostConstruct
-  protected void buildCspValue() {
-    // build csp rule only once to eliminate overhead with each request
-    List<String> cspDirectives = new ArrayList<>();
-    for (Entry<String, String> entry : getCspDirectives().entrySet()) {
-      cspDirectives.add(StringUtility.join(" ", entry.getKey(), entry.getValue()));
-    }
-    m_cspValue = StringUtility.join("; ", cspDirectives);
+  protected void buildCspPolicyToken() {
+    setCspToken(BEANS.get(ContentSecurityPolicy.class).toToken());
   }
 
-  /**
-   * <ul>
-   * <li><b>default-src 'self'</b><br>
-   * Only accept 'self' sources by default.</li>
-   * <li><b>script-src 'self'</b><br>
-   * <li><b>style-src 'self' 'unsafe-inline'</b><br>
-   * Without inline styling many widgets would not work as expected.</li>
-   * <li><b>frame-src *; child-src *</b><br>
-   * Everything is allowed because the iframes created by the browser field run in the sandbox mode and therefore handle
-   * the security policy by their own.</li>
-   * <li><b>report-uri csp.cgi</b><br>
-   * Report errors to csp.cgi, see ContentSecurityPolicyReportHandler</li>
-   * </ul>
-   * Override this method to add new or change / remove existing directives.
-   */
-  protected Map<String, String> getCspDirectives() {
-    Map<String, String> cspDirectives = new LinkedHashMap<>();
-    cspDirectives.put("default-src", "'self'");
-    cspDirectives.put("script-src", "'self'");
-    cspDirectives.put("style-src", "'self' 'unsafe-inline'");
-    cspDirectives.put("frame-src", "*");
-    cspDirectives.put("child-src", "*");
-    cspDirectives.put("report-uri", CSP_REPORT_URL); // see also ContentSecurityPolicyReportHandler
-    return cspDirectives;
+  protected final String getCspToken() {
+    return m_cspToken;
   }
 
-  /**
-   * Override {@link #getCspDirectives()} to add new or change / remove existing directives.
-   */
-  protected String getCspValue() {
-    // build csp rule only once to eliminate overhead with each request
-    List<String> cspDirectives = new ArrayList<>();
-    for (Entry<String, String> entry : getCspDirectives().entrySet()) {
-      cspDirectives.add(StringUtility.join(" ", entry.getKey(), entry.getValue()));
-    }
-
-    m_cspValue = StringUtility.join("; ", cspDirectives);
-    return m_cspValue;
+  protected final void setCspToken(String cspToken) {
+    m_cspToken = cspToken;
   }
 
   /**
@@ -123,8 +81,8 @@ public class HttpServletControl {
 
     if (CONFIG.getPropertyValue(CspEnabledProperty.class)) {
       // TODO [6.1] AWE/BSH Check user agent for legacy header
-      resp.setHeader(HTTP_HEADER_CSP, getCspValue());
-      resp.setHeader(HTTP_HEADER_CSP_LEGACY, getCspValue());
+      resp.setHeader(HTTP_HEADER_CSP, getCspToken());
+      resp.setHeader(HTTP_HEADER_CSP_LEGACY, getCspToken());
     }
   }
 }

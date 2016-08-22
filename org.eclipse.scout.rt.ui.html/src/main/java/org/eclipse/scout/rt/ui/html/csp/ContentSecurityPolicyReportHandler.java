@@ -25,7 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This handler contributes to the {@link UiServlet} as the POST handler for <code>/csp.cgi</code>
+ * This handler contributes to the {@link UiServlet} as the POST handler for <code>/csp-report</code>
  * <p>
  * It is used to collect Content-Security-Policy violations.
  * <p>
@@ -44,7 +44,7 @@ public class ContentSecurityPolicyReportHandler extends AbstractUiServletRequest
 
   @Override
   public boolean handlePost(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
-    // serve only if path is ending with /csp.cgi
+    // serve only if path is ending with /csp-report
     String pathInfo = req.getPathInfo();
     if (pathInfo == null || !pathInfo.endsWith(HANDLER_PATH)) {
       return false;

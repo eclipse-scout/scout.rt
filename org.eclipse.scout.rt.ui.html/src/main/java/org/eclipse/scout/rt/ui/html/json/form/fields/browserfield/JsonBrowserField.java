@@ -129,8 +129,10 @@ public class JsonBrowserField<BROWSER_FIELD extends IBrowserField> extends JsonF
 
   @Override
   public BinaryResourceHolder provideBinaryResource(String filename) {
-    // TODO [5.2] bsh: UIFacade required?
-    return new BinaryResourceHolder(getModel().getUIFacade().requestBinaryResourceFromUI(filename));
+    BinaryResource binaryResource = getModel().getUIFacade().requestBinaryResourceFromUI(filename);
+    BinaryResourceHolder holder = new BinaryResourceHolder(binaryResource);
+    holder.addHttpResponseInterceptor(new BrowserFieldContentHttpResponseInterceptor());
+    return holder;
   }
 
   protected void handleModelContentChanged() {

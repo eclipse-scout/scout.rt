@@ -28,6 +28,7 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
+import org.eclipse.scout.rt.server.commons.servlet.cache.DownloadHttpResponseInterceptor;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
@@ -370,7 +371,9 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonPropertyO
   public BinaryResourceHolder provideBinaryResource(String filename) {
     BinaryResource res = m_downloads.remove(filename);
     if (res != null) {
-      return new BinaryResourceHolder(res, true);
+      BinaryResourceHolder holder = new BinaryResourceHolder(res);
+      holder.addHttpResponseInterceptor(new DownloadHttpResponseInterceptor(res.getFilename()));
+      return holder;
     }
     else {
       return null;

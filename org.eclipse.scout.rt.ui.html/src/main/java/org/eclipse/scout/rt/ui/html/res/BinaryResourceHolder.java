@@ -10,7 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.res;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
+import org.eclipse.scout.rt.server.commons.servlet.cache.IHttpResponseInterceptor;
 
 /**
  * Wrapper used by {@link IBinaryResourceProvider} to hold a binary resource and some additional data.
@@ -18,15 +22,10 @@ import org.eclipse.scout.rt.platform.resource.BinaryResource;
 public class BinaryResourceHolder {
 
   private final BinaryResource m_binaryResource;
-  private final boolean m_download;
+  private final Set<IHttpResponseInterceptor> m_httpResponseInterceptors = new HashSet<>();
 
   public BinaryResourceHolder(BinaryResource binaryResource) {
-    this(binaryResource, false);
-  }
-
-  public BinaryResourceHolder(BinaryResource binaryResource, boolean download) {
     m_binaryResource = binaryResource;
-    m_download = download;
   }
 
   /**
@@ -36,11 +35,20 @@ public class BinaryResourceHolder {
     return m_binaryResource;
   }
 
+  public void addHttpResponseInterceptor(IHttpResponseInterceptor interceptor) {
+    m_httpResponseInterceptors.add(interceptor);
+  }
+
+  public void removeHttpResponseInterceptor(IHttpResponseInterceptor interceptor) {
+    m_httpResponseInterceptors.remove(interceptor);
+  }
+
   /**
-   * @return <code>true</code> if the user requested the resource to be downloaded ("save as" dialog), false otherwise
-   *         (e.g. inline use, such as an image for the ImageFiel).
+   * @return live set of associated {@link IHttpResponseInterceptor} (although it is recommended to use the
+   *         {@link #addHttpResponseInterceptor(IHttpResponseInterceptor)} and
+   *         {@link #removeHttpResponseInterceptor(IHttpResponseInterceptor)} methods). Never <code>null</code>.
    */
-  public boolean isDownload() {
-    return m_download;
+  public Set<IHttpResponseInterceptor> getHttpResponseInterceptors() {
+    return m_httpResponseInterceptors;
   }
 }

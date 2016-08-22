@@ -190,7 +190,7 @@ public class JsonImageField<IMAGE_FIELD extends IImageField> extends JsonFormFie
   public BinaryResourceHolder provideBinaryResource(String filename) {
     BinaryResource res = extractBinaryResource(getModel().getImage());
     if (res != null && filename.equals(res.getFilename())) {
-      return new BinaryResourceHolder(res, false);
+      return new BinaryResourceHolder(res);
     }
     return null;
   }
