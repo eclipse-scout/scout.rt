@@ -26,6 +26,8 @@ import org.eclipse.scout.rt.platform.chain.callable.CallableChain;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.logger.DiagnosticContextValueProcessor;
+import org.eclipse.scout.rt.platform.transaction.ITransaction;
+import org.eclipse.scout.rt.platform.transaction.TransactionScope;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.ThreadLocalProcessor;
 import org.eclipse.scout.rt.platform.util.ToStringBuilder;
@@ -61,8 +63,6 @@ public class ClientRunContext extends RunContext {
 
   @Override
   protected <RESULT> void interceptCallableChain(final CallableChain<RESULT> callableChain) {
-    super.interceptCallableChain(callableChain);
-
     callableChain
         .add(new ThreadLocalProcessor<>(ISession.CURRENT, m_session))
         .add(new DiagnosticContextValueProcessor(BEANS.get(UserIdContextValueProvider.class)))
@@ -95,6 +95,18 @@ public class ClientRunContext extends RunContext {
   @Override
   public ClientRunContext withCorrelationId(final String correlationId) {
     super.withCorrelationId(correlationId);
+    return this;
+  }
+
+  @Override
+  public ClientRunContext withTransactionScope(final TransactionScope transactionScope) {
+    super.withTransactionScope(transactionScope);
+    return this;
+  }
+
+  @Override
+  public ClientRunContext withTransaction(final ITransaction transaction) {
+    super.withTransaction(transaction);
     return this;
   }
 

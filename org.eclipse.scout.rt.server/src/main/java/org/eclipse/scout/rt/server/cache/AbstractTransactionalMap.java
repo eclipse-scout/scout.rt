@@ -21,8 +21,8 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
 
-import org.eclipse.scout.rt.server.transaction.ITransaction;
-import org.eclipse.scout.rt.server.transaction.ITransactionMember;
+import org.eclipse.scout.rt.platform.transaction.ITransaction;
+import org.eclipse.scout.rt.platform.transaction.ITransactionMember;
 import org.eclipse.scout.rt.shared.cache.ICache;
 
 /**

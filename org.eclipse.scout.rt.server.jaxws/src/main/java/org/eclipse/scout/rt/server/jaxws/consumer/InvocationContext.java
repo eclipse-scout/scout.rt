@@ -33,6 +33,10 @@ import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.holders.Holder;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
+import org.eclipse.scout.rt.platform.transaction.AbstractTransactionMember;
+import org.eclipse.scout.rt.platform.transaction.ITransaction;
+import org.eclipse.scout.rt.platform.transaction.ITransactionMember;
+import org.eclipse.scout.rt.platform.transaction.TransactionScope;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedException;
@@ -40,10 +44,6 @@ import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.server.jaxws.MessageContexts;
 import org.eclipse.scout.rt.server.jaxws.implementor.JaxWsImplementorSpecifics;
-import org.eclipse.scout.rt.server.transaction.AbstractTransactionMember;
-import org.eclipse.scout.rt.server.transaction.ITransaction;
-import org.eclipse.scout.rt.server.transaction.ITransactionMember;
-import org.eclipse.scout.rt.server.transaction.TransactionScope;
 
 /**
  * This context represents a webservice Port to interact with a webservice endpoint, and is associated with a dedicated

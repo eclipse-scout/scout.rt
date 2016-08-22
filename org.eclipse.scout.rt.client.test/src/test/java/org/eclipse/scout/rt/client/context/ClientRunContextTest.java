@@ -26,6 +26,7 @@ import javax.security.auth.Subject;
 
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.platform.nls.NlsLocale;
+import org.eclipse.scout.rt.platform.transaction.TransactionScope;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
@@ -59,6 +60,7 @@ public class ClientRunContextTest {
     assertNull(runContext.getSession());
     assertNull(runContext.getUserAgent());
     assertNull(runContext.getLocale());
+    assertEquals(TransactionScope.REQUIRED, runContext.getTransactionScope());
   }
 
   @Test
@@ -284,6 +286,11 @@ public class ClientRunContextTest {
     UserAgent.CURRENT.remove();
     assertNull(ClientRunContexts.copyCurrent().withUserAgent(userAgent3).withSession(session, true).getUserAgent());
     assertEquals(userAgent3, ClientRunContexts.copyCurrent().withUserAgent(userAgent3).withSession(session, false).getUserAgent());
+  }
+
+  @Test
+  public void testCurrentTransactionScope() {
+    assertEquals(TransactionScope.REQUIRED, ClientRunContexts.copyCurrent().getTransactionScope());
   }
 
   private static Set<Object> toSet(Iterator<?> iterator) {

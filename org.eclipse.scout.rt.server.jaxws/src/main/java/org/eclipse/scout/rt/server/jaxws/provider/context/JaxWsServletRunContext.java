@@ -25,6 +25,8 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.chain.callable.CallableChain;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
+import org.eclipse.scout.rt.platform.transaction.ITransaction;
+import org.eclipse.scout.rt.platform.transaction.TransactionScope;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.ThreadLocalProcessor;
 import org.eclipse.scout.rt.platform.util.ToStringBuilder;
@@ -68,8 +70,20 @@ public class JaxWsServletRunContext extends ServletRunContext {
   }
 
   @Override
-  public ServletRunContext withCorrelationId(final String correlationId) {
+  public JaxWsServletRunContext withCorrelationId(final String correlationId) {
     super.withCorrelationId(correlationId);
+    return this;
+  }
+
+  @Override
+  public JaxWsServletRunContext withTransactionScope(final TransactionScope transactionScope) {
+    super.withTransactionScope(transactionScope);
+    return this;
+  }
+
+  @Override
+  public JaxWsServletRunContext withTransaction(final ITransaction transaction) {
+    super.withTransaction(transaction);
     return this;
   }
 

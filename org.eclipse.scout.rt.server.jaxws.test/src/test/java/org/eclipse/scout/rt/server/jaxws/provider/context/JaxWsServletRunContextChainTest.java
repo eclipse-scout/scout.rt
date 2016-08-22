@@ -25,6 +25,7 @@ import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.logger.DiagnosticContextValueProcessor;
 import org.eclipse.scout.rt.platform.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.security.SubjectProcessor;
+import org.eclipse.scout.rt.platform.transaction.TransactionProcessor;
 import org.eclipse.scout.rt.platform.util.ThreadLocalProcessor;
 import org.eclipse.scout.rt.server.commons.servlet.IHttpServletRoundtrip;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
@@ -39,8 +40,12 @@ public class JaxWsServletRunContextChainTest {
    */
   @Test
   public void testCallableChain() throws Exception {
-    CallableChain<Object> chain = new CallableChain<Object>();
-    new JaxWsServletRunContext().interceptCallableChain(chain);
+    CallableChain<Object> chain = new JaxWsServletRunContext() {
+      @Override
+      protected <RESULT> CallableChain<RESULT> createCallableChain() { // overwrite to be accessible in test
+        return super.createCallableChain();
+      }
+    }.createCallableChain();
 
     Iterator<IChainable> chainIterator = chain.values().iterator();
 
@@ -118,6 +123,9 @@ public class JaxWsServletRunContextChainTest {
     assertEquals(ThreadLocalProcessor.class, c.getClass());
     assertSame(IWebServiceContext.CURRENT, ((ThreadLocalProcessor) c).getThreadLocal());
 
+    // 16. TransactionProcessor
+    c = chainIterator.next();
+    assertEquals(TransactionProcessor.class, c.getClass());
     assertFalse(chainIterator.hasNext());
   }
 }

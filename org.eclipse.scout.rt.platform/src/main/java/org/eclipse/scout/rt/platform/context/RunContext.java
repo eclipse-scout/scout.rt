@@ -23,12 +23,17 @@ import javax.security.auth.Subject;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
+import org.eclipse.scout.rt.platform.annotations.Internal;
 import org.eclipse.scout.rt.platform.chain.callable.CallableChain;
 import org.eclipse.scout.rt.platform.exception.DefaultRuntimeExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.IExceptionTranslator;
 import org.eclipse.scout.rt.platform.logger.DiagnosticContextValueProcessor;
 import org.eclipse.scout.rt.platform.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.security.SubjectProcessor;
+import org.eclipse.scout.rt.platform.transaction.ITransaction;
+import org.eclipse.scout.rt.platform.transaction.TransactionProcessor;
+import org.eclipse.scout.rt.platform.transaction.TransactionRequiredException;
+import org.eclipse.scout.rt.platform.transaction.TransactionScope;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.IAdaptable;
@@ -39,13 +44,14 @@ import org.eclipse.scout.rt.platform.util.concurrent.ICancellable;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 
 /**
- * A context typically represents a "snapshot" of the current calling state and is always associated with a
- * {@link RunMonitor}. This class facilitates propagation of that state among different threads, or allows temporary
- * state changes to be done for the time of executing some code.
+ * A {@link RunContext} represents a "snapshot" of the current calling state and is always associated with a
+ * {@link RunMonitor}.
  * <p>
- * Internally, the context is obtained by <code>BEANS.get(RunContext.class)</code>, meaning that the context can be
- * intercepted, or replaced. Thereto, the method {@link #interceptCallableChain(CallableChain)} can be overwritten to
- * contribute some additional behavior.
+ * This class facilitates propagation of state among different threads, or allows temporary state changes for the time
+ * of executing some code. Also, a {@link RunContext} demarcates the transaction boundary, meaning that it controls
+ * whether to use an existing transaction, or to start a new transaction. If starting a new transaction, the transaction
+ * is committed or rolled back upon the completion of the runnable. The default transaction scope is
+ * {@link TransactionScope#REQUIRED}, which starts a new transaction only if not running in a transaction yet.
  *
  * @since 5.1
  */
@@ -58,6 +64,9 @@ public class RunContext implements IAdaptable {
   protected PropertyMap m_propertyMap = new PropertyMap();
   protected String m_correlationId;
   protected Deque<String> m_identifiers = new LinkedList<>();
+
+  protected TransactionScope m_transactionScope = TransactionScope.REQUIRED;
+  protected ITransaction m_transaction;
 
   /**
    * Runs the given {@link IRunnable} on behalf of this {@link RunContext}. Use this method if you run code that does
@@ -116,9 +125,7 @@ public class RunContext implements IAdaptable {
   public <RESULT, EXCEPTION extends Throwable> RESULT call(final Callable<RESULT> callable, final Class<? extends IExceptionTranslator<EXCEPTION>> exceptionTranslator) throws EXCEPTION {
     final ThreadInterrupter threadInterrupter = new ThreadInterrupter(Thread.currentThread(), m_runMonitor);
     try {
-      final CallableChain<RESULT> callableChain = new CallableChain<>();
-      interceptCallableChain(callableChain);
-      return callableChain.call(callable);
+      return this.<RESULT> createCallableChain().call(callable);
     }
     catch (final Throwable t) {
       throw BEANS.get(exceptionTranslator).translate(t);
@@ -129,32 +136,18 @@ public class RunContext implements IAdaptable {
   }
 
   /**
-   * Method invoked to contribute to the {@link CallableChain} to initialize this context. Overwrite this method to
-   * contribute some behavior to the context.
+   * Creates the {@link CallableChain} to initialize this context, and provides basic functionality for this
+   * {@link RunContext}.
    * <p>
-   * Contributions are plugged according to the design pattern: 'chain-of-responsibility'.<br>
-   * To contribute to the end of the chain (meaning that you are invoked <strong>after</strong> the contributions of
-   * super classes and therefore can base on their contributed functionality), you can use constructions of the
-   * following form:
-   *
-   * <pre>
-   * super.interceptCallableChain(callableChain);
-   * callableChain.addLast(new YourDecorator());
-   * </pre>
-   *
-   * To be invoked <strong>before</strong> the super class contributions, you can use constructions of the following
-   * form:
-   *
-   * <pre>
-   * super.interceptCallableChain(callableChain);
-   * callableChain.addFirst(new YourDecorator());
-   * </pre>
-   *
-   * @param callableChain
-   *          The chain used to construct the context.
+   * This method is not intended to be overwritten. To contribute behavior, overwrite
+   * {@link #interceptCallableChain(CallableChain)}. Contributions are added before setting the transaction boundary.
    */
-  protected <RESULT> void interceptCallableChain(final CallableChain<RESULT> callableChain) {
-    callableChain
+  @Internal
+  protected <RESULT> CallableChain<RESULT> createCallableChain() {
+    final CallableChain<RESULT> contributions = new CallableChain<RESULT>();
+    interceptCallableChain(contributions);
+
+    return new CallableChain<RESULT>()
         .add(new ThreadLocalProcessor<>(CorrelationId.CURRENT, m_correlationId))
         .add(new ThreadLocalProcessor<>(RunMonitor.CURRENT, Assertions.assertNotNull(m_runMonitor)))
         .add(new SubjectProcessor<RESULT>(m_subject))
@@ -162,35 +155,37 @@ public class RunContext implements IAdaptable {
         .add(new DiagnosticContextValueProcessor(BEANS.get(CorrelationIdContextValueProvider.class)))
         .add(new ThreadLocalProcessor<>(NlsLocale.CURRENT, m_locale))
         .add(new ThreadLocalProcessor<>(PropertyMap.CURRENT, m_propertyMap))
-        .add(new ThreadLocalProcessor<>(RunContextIdentifiers.CURRENT, m_identifiers));
+        .add(new ThreadLocalProcessor<>(RunContextIdentifiers.CURRENT, m_identifiers))
+        .addAll(contributions.asList())
+        .add(new TransactionProcessor<RESULT>(getTransaction(), m_transactionScope));
   }
 
   /**
-   * @return {@link RunMonitor} to be used, is never <code>null</code>.
+   * Method invoked to contribute to the {@link CallableChain} to initialize this context.
+   *
+   * @param callableChain
+   *          The chain used to construct the context.
+   */
+  protected <RESULT> void interceptCallableChain(final CallableChain<RESULT> callableChain) {
+  }
+
+  /**
+   * Returns the {@link RunMonitor} associated, and is not <code>null</code>.
    */
   public RunMonitor getRunMonitor() {
     return m_runMonitor;
   }
 
   /**
-   * Set a specific {@link RunMonitor} to be used, which must not be <code>null</code>. However, even if there is a
-   * current {@link RunMonitor}, it is NOT registered as child monitor, meaning that it will not be cancelled once the
-   * current {@link RunMonitor} is cancelled. If such a linking is needed, you have to do that yourself:
+   * Associates this context with a {@link RunMonitor}.
+   * <p>
+   * This method does not register the monitor as child monitor of {@link RunMonitor#CURRENT}, meaning that this context
+   * is not cancelled upon cancellation of the current monitor. If propagated cancellation is required, register the
+   * given monitor as following:
    *
    * <pre>
    * <code>
-   *     RunMonitor monitor = BEANS.get(RunMonitor.class);
-   *
-   *     // Register your monitor to be cancelled as well
    *     RunMonitor.CURRENT.get().registerCancellable(monitor);
-   *
-   *     RunContexts.copyCurrent().withRunMonitor(monitor).run(new IRunnable() {
-   *
-   *       &#064;Override
-   *       public void run() throws Exception {
-   *         // do something
-   *       }
-   *     });
    * </code>
    * </pre>
    */
@@ -243,6 +238,45 @@ public class RunContext implements IAdaptable {
    */
   public RunContext withCorrelationId(final String correlationId) {
     m_correlationId = correlationId;
+    return this;
+  }
+
+  /**
+   * @see #withTransactionScope(TransactionScope)
+   */
+  public TransactionScope getTransactionScope() {
+    return m_transactionScope;
+  }
+
+  /**
+   * Sets the transaction scope to demarcate the transaction boundary of this context. The default scope is
+   * {@link TransactionScope#REQUIRED} which starts a new transaction only if not running in a transaction yet.
+   * <ul>
+   * <li>Use {@link TransactionScope#REQUIRES_NEW} to start a new transaction.</li>
+   * <li>Use {@link TransactionScope#REQUIRED} to start a new transaction only if not running in a transaction yet.</li>
+   * <li>Use {@link TransactionScope#MANDATORY} to enforce running in the current transaction. If there is no current
+   * transaction, a {@link TransactionRequiredException} is thrown.</li>
+   * </ul>
+   */
+  public RunContext withTransactionScope(final TransactionScope transactionScope) {
+    m_transactionScope = transactionScope;
+    return this;
+  }
+
+  /**
+   * @see #withTransaction(ITransaction)
+   */
+  public ITransaction getTransaction() {
+    return m_transaction;
+  }
+
+  /**
+   * Sets the transaction to be used for this context. Has only an effect, if the transaction scope is set to
+   * {@link TransactionScope#REQUIRED} or {@link TransactionScope#MANDATORY}. In most cases, this property should not be
+   * set.
+   */
+  public RunContext withTransaction(final ITransaction transaction) {
+    m_transaction = transaction;
     return this;
   }
 
@@ -337,6 +371,8 @@ public class RunContext implements IAdaptable {
     builder.attr("locale", getLocale());
     builder.attr("cid", getCorrelationId());
     builder.attr("identifiers", CollectionUtility.format(getIdentifiers()));
+    builder.ref("transaction", getTransaction());
+    builder.attr("transactionScope", getTransactionScope());
     return builder.toString();
   }
 
@@ -350,6 +386,8 @@ public class RunContext implements IAdaptable {
     m_correlationId = origin.m_correlationId;
     m_propertyMap = new PropertyMap(origin.m_propertyMap);
     m_identifiers = new LinkedList<>(origin.m_identifiers);
+    m_transactionScope = origin.m_transactionScope;
+    m_transaction = origin.m_transaction;
   }
 
   /**
@@ -379,6 +417,9 @@ public class RunContext implements IAdaptable {
     if (callingRunContextIdentifiers != null) {
       m_identifiers.addAll(callingRunContextIdentifiers);
     }
+
+    m_transactionScope = TransactionScope.REQUIRED;
+    m_transaction = ITransaction.CURRENT.get();
   }
 
   /**
@@ -395,6 +436,8 @@ public class RunContext implements IAdaptable {
     m_runMonitor = BEANS.get(RunMonitor.class);
     m_propertyMap = new PropertyMap();
     m_identifiers = new LinkedList<>();
+    m_transactionScope = TransactionScope.REQUIRED;
+    m_transaction = null;
   }
 
   /**

@@ -19,9 +19,9 @@ import javax.jms.MessageProducer;
 import javax.jms.Session;
 
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.transaction.AbstractTransactionMember;
+import org.eclipse.scout.rt.platform.transaction.ITransactionMember;
 import org.eclipse.scout.rt.server.jms.IJmsMessageSerializer;
-import org.eclipse.scout.rt.server.transaction.AbstractTransactionMember;
-import org.eclipse.scout.rt.server.transaction.ITransactionMember;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

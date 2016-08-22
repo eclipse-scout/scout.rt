@@ -15,10 +15,10 @@ import java.util.concurrent.Callable;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.transaction.TransactionScope;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
-import org.eclipse.scout.rt.server.transaction.TransactionScope;
 import org.eclipse.scout.rt.shared.session.Sessions;
 
 /**

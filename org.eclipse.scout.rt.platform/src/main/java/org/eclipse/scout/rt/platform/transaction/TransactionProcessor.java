@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.server.context;
+package org.eclipse.scout.rt.platform.transaction;
 
 import java.util.concurrent.Callable;
 
@@ -22,9 +22,6 @@ import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
 import org.eclipse.scout.rt.platform.util.ThreadLocalProcessor;
-import org.eclipse.scout.rt.server.transaction.ITransaction;
-import org.eclipse.scout.rt.server.transaction.TransactionRequiredException;
-import org.eclipse.scout.rt.server.transaction.TransactionScope;
 
 /**
  * Depending on the {@link TransactionScope} and the existence of a caller transaction, this processor starts a new

@@ -24,11 +24,11 @@ import javax.jms.Session;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.PlatformExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.transaction.ITransactionMember;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.server.jms.context.JmsRunContexts;
 import org.eclipse.scout.rt.server.jms.transactional.AbstractTransactionalJmsService;
-import org.eclipse.scout.rt.server.transaction.ITransactionMember;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

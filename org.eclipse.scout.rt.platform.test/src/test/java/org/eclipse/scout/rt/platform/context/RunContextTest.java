@@ -27,6 +27,7 @@ import java.util.Set;
 import javax.security.auth.Subject;
 
 import org.eclipse.scout.rt.platform.nls.NlsLocale;
+import org.eclipse.scout.rt.platform.transaction.TransactionScope;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
@@ -50,6 +51,7 @@ public class RunContextTest {
     assertNull(runContext.getLocale());
     assertTrue(toSet(runContext.getPropertyMap().iterator()).isEmpty());
     assertNotNull(runContext.getRunMonitor());
+    assertEquals(TransactionScope.REQUIRED, runContext.getTransactionScope());
   }
 
   @Test
@@ -257,6 +259,11 @@ public class RunContextTest {
   @Test(expected = AssertionException.class)
   public void testEmptyWithNullRunMonitor() {
     RunContexts.empty().withRunMonitor(null);
+  }
+
+  @Test
+  public void testCurrentTransactionScope() {
+    assertEquals(TransactionScope.REQUIRED, RunContexts.copyCurrent().getTransactionScope());
   }
 
   private static Set<Object> toSet(Iterator<?> iterator) {

@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.server.context;
+package org.eclipse.scout.rt.platform.transaction;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
@@ -21,6 +21,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 
@@ -31,12 +32,7 @@ import org.eclipse.scout.rt.platform.IBeanInstanceProducer;
 import org.eclipse.scout.rt.platform.chain.callable.CallableChain;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.holders.Holder;
-import org.eclipse.scout.rt.server.transaction.ITransaction;
-import org.eclipse.scout.rt.server.transaction.ITransactionMember;
-import org.eclipse.scout.rt.server.transaction.TransactionRequiredException;
-import org.eclipse.scout.rt.server.transaction.TransactionScope;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
-import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -48,7 +44,7 @@ import org.mockito.MockitoAnnotations;
 @RunWith(PlatformTestRunner.class)
 public class TransactionProcessorTest {
 
-  private List<IBean<?>> m_beans;
+  private List<IBean<?>> m_beans = new ArrayList<>();
 
   private ITransaction m_transaction;
 
@@ -58,13 +54,13 @@ public class TransactionProcessorTest {
 
     m_transaction = Mockito.spy(BEANS.get(ITransaction.class));
 
-    m_beans = TestingUtility.registerBeans(
+    m_beans.add(BEANS.getBeanManager().registerBean(
         new BeanMetaData(ITransaction.class).withOrder(-1000).withProducer(new IBeanInstanceProducer<ITransaction>() {
           @Override
           public ITransaction produce(IBean<ITransaction> bean) {
             return m_transaction;
           }
-        }));
+        })));
 
     RunMonitor.CURRENT.set(new RunMonitor());
   }
@@ -72,7 +68,9 @@ public class TransactionProcessorTest {
   @After
   public void after() {
     RunMonitor.CURRENT.remove();
-    TestingUtility.unregisterBeans(m_beans);
+    for (IBean<?> bean : m_beans) {
+      BEANS.getBeanManager().unregisterBean(bean);
+    }
     m_beans.clear();
   }
 

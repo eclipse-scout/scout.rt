@@ -8,22 +8,22 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.server.context;
+package org.eclipse.scout.rt.platform.transaction;
 
-import org.eclipse.scout.rt.platform.ApplicationScoped;
-import org.eclipse.scout.rt.server.transaction.ITransaction;
+import org.eclipse.scout.rt.platform.exception.PlatformException;
 
 /**
- * Protocol to commit or roll back a transaction.
+ * A <code>TransactionRequiredException</code> is thrown if a {@link ServerRunContext} requires a transaction to be
+ * available.
  *
+ * @see TransactionScope#MANDATORY
  * @since 5.1
  */
-@ApplicationScoped
-public interface ITransactionCommitProtocol {
+public class TransactionRequiredException extends PlatformException {
 
-  /**
-   * Commits the transaction on success, or rolls it back on error.
-   */
-  void commitOrRollback(ITransaction tx);
+  private static final long serialVersionUID = 1L;
 
+  public TransactionRequiredException() {
+    super("Transaction expected, but no transaction is available");
+  }
 }

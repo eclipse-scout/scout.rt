@@ -8,9 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.server.transaction;
-
-import org.eclipse.scout.rt.server.context.ServerRunContext;
+package org.eclipse.scout.rt.platform.transaction;
 
 /**
  * The <code>TransactionScope</code> controls the transaction demarcation of a {@link ServerRunContext}.

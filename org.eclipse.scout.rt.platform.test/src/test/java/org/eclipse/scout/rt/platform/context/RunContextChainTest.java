@@ -21,6 +21,7 @@ import org.eclipse.scout.rt.platform.chain.callable.CallableChain;
 import org.eclipse.scout.rt.platform.logger.DiagnosticContextValueProcessor;
 import org.eclipse.scout.rt.platform.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.security.SubjectProcessor;
+import org.eclipse.scout.rt.platform.transaction.TransactionProcessor;
 import org.eclipse.scout.rt.platform.util.ThreadLocalProcessor;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
@@ -34,8 +35,7 @@ public class RunContextChainTest {
    */
   @Test
   public void testCallableChain() throws Exception {
-    CallableChain<Object> chain = new CallableChain<Object>();
-    new RunContext().interceptCallableChain(chain);
+    CallableChain<Object> chain = new RunContext().createCallableChain();
 
     Iterator<IChainable> chainIterator = chain.values().iterator();
 
@@ -78,6 +78,9 @@ public class RunContextChainTest {
     assertEquals(ThreadLocalProcessor.class, c.getClass());
     assertSame(RunContextIdentifiers.CURRENT, ((ThreadLocalProcessor) c).getThreadLocal());
 
+    // 9. TransactionProcessor
+    c = chainIterator.next();
+    assertEquals(TransactionProcessor.class, c.getClass());
     assertFalse(chainIterator.hasNext());
   }
 }

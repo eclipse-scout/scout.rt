@@ -23,6 +23,8 @@ import org.eclipse.scout.rt.platform.chain.callable.CallableChain;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.logger.DiagnosticContextValueProcessor;
+import org.eclipse.scout.rt.platform.transaction.ITransaction;
+import org.eclipse.scout.rt.platform.transaction.TransactionScope;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.ThreadLocalProcessor;
 import org.eclipse.scout.rt.platform.util.ToStringBuilder;
@@ -49,8 +51,6 @@ public class ServletRunContext extends RunContext {
 
   @Override
   protected <RESULT> void interceptCallableChain(CallableChain<RESULT> callableChain) {
-    super.interceptCallableChain(callableChain);
-
     callableChain
         .add(new ThreadLocalProcessor<>(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST, m_servletRequest))
         .add(new ThreadLocalProcessor<>(IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE, m_servletResponse))
@@ -81,6 +81,18 @@ public class ServletRunContext extends RunContext {
   @Override
   public ServletRunContext withCorrelationId(final String correlationId) {
     super.withCorrelationId(correlationId);
+    return this;
+  }
+
+  @Override
+  public ServletRunContext withTransactionScope(final TransactionScope transactionScope) {
+    super.withTransactionScope(transactionScope);
+    return this;
+  }
+
+  @Override
+  public ServletRunContext withTransaction(final ITransaction transaction) {
+    super.withTransaction(transaction);
     return this;
   }
 

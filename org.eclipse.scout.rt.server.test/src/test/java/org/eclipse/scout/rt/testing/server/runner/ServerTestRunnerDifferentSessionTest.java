@@ -17,10 +17,10 @@ import static org.junit.Assert.assertTrue;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.eclipse.scout.rt.platform.transaction.ITransaction;
 import org.eclipse.scout.rt.server.AbstractServerSession;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.session.ServerSessionProvider;
-import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.testing.server.runner.ServerTestRunnerDifferentSessionTest.JUnitServerSession1;

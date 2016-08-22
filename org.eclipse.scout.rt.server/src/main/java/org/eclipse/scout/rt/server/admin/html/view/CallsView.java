@@ -20,6 +20,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.eclipse.scout.rt.platform.transaction.ITransactionMember;
 import org.eclipse.scout.rt.platform.util.CompositeObject;
 import org.eclipse.scout.rt.server.admin.html.AbstractHtmlAction;
 import org.eclipse.scout.rt.server.admin.html.AdminSession;
@@ -28,7 +29,6 @@ import org.eclipse.scout.rt.server.admin.inspector.CallInspector;
 import org.eclipse.scout.rt.server.admin.inspector.ProcessInspector;
 import org.eclipse.scout.rt.server.admin.inspector.SessionInspector;
 import org.eclipse.scout.rt.server.admin.inspector.info.CallInfo;
-import org.eclipse.scout.rt.server.transaction.ITransactionMember;
 
 public class CallsView extends DefaultView {
   private static final long serialVersionUID = -6384422619943413978L;

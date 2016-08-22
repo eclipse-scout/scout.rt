@@ -20,6 +20,8 @@ import org.eclipse.scout.rt.platform.chain.callable.CallableChain;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.logger.DiagnosticContextValueProcessor;
+import org.eclipse.scout.rt.platform.transaction.ITransaction;
+import org.eclipse.scout.rt.platform.transaction.TransactionScope;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.ThreadLocalProcessor;
 import org.eclipse.scout.rt.platform.util.ToStringBuilder;
@@ -28,9 +30,6 @@ import org.eclipse.scout.rt.server.ServiceTunnelServlet;
 import org.eclipse.scout.rt.server.clientnotification.ClientNotificationCollector;
 import org.eclipse.scout.rt.server.clientnotification.IClientNodeId;
 import org.eclipse.scout.rt.server.session.ServerSessionProvider;
-import org.eclipse.scout.rt.server.transaction.ITransaction;
-import org.eclipse.scout.rt.server.transaction.TransactionRequiredException;
-import org.eclipse.scout.rt.server.transaction.TransactionScope;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.logging.UserIdContextValueProvider;
@@ -68,13 +67,9 @@ public class ServerRunContext extends RunContext {
   protected UserAgent m_userAgent;
   protected String m_clientNodeId;
   protected ClientNotificationCollector m_clientNotificationCollector;
-  protected TransactionScope m_transactionScope;
-  protected ITransaction m_transaction;
 
   @Override
   protected <RESULT> void interceptCallableChain(final CallableChain<RESULT> callableChain) {
-    super.interceptCallableChain(callableChain);
-
     callableChain
         .add(new ThreadLocalProcessor<>(ISession.CURRENT, m_session))
         .add(new DiagnosticContextValueProcessor(BEANS.get(UserIdContextValueProvider.class)))
@@ -82,8 +77,7 @@ public class ServerRunContext extends RunContext {
         .add(new ThreadLocalProcessor<>(UserAgent.CURRENT, m_userAgent))
         .add(new ThreadLocalProcessor<>(IClientNodeId.CURRENT, m_clientNodeId))
         .add(new ThreadLocalProcessor<>(ClientNotificationCollector.CURRENT, m_clientNotificationCollector))
-        .add(new ThreadLocalProcessor<>(ScoutTexts.CURRENT, (m_session != null ? m_session.getTexts() : ScoutTexts.CURRENT.get())))
-        .add(new TransactionProcessor<RESULT>(getTransaction(), m_transactionScope));
+        .add(new ThreadLocalProcessor<>(ScoutTexts.CURRENT, (m_session != null ? m_session.getTexts() : ScoutTexts.CURRENT.get())));
   }
 
   @Override
@@ -111,6 +105,18 @@ public class ServerRunContext extends RunContext {
   }
 
   @Override
+  public ServerRunContext withTransactionScope(final TransactionScope transactionScope) {
+    super.withTransactionScope(transactionScope);
+    return this;
+  }
+
+  @Override
+  public ServerRunContext withTransaction(final ITransaction transaction) {
+    super.withTransaction(transaction);
+    return this;
+  }
+
+  @Override
   public ServerRunContext withProperty(final Object key, final Object value) {
     super.withProperty(key, value);
     return this;
@@ -123,7 +129,7 @@ public class ServerRunContext extends RunContext {
   }
 
   @Override
-  public ServerRunContext withIdentifier(String id) {
+  public ServerRunContext withIdentifier(final String id) {
     super.withIdentifier(id);
     return this;
   }
@@ -208,45 +214,6 @@ public class ServerRunContext extends RunContext {
     return this;
   }
 
-  /**
-   * @see #withTransactionScope(TransactionScope)
-   */
-  public TransactionScope getTransactionScope() {
-    return m_transactionScope;
-  }
-
-  /**
-   * Sets the transaction scope to control in which transaction boundary to run the runnable. By default, a new
-   * transaction is started, and committed or rolled back upon completion.
-   * <ul>
-   * <li>Use {@link TransactionScope#REQUIRES_NEW} to run in a new transaction.</li>
-   * <li>Use {@link TransactionScope#REQUIRED} to only start a new transaction if there is no transaction set.</li>
-   * <li>Use {@link TransactionScope#MANDATORY} to enforce running in the given transaction. Otherwise, a
-   * {@link TransactionRequiredException} is thrown.</li>
-   * </ul>
-   */
-  public ServerRunContext withTransactionScope(final TransactionScope transactionScope) {
-    m_transactionScope = transactionScope;
-    return this;
-  }
-
-  /**
-   * @see #withTransaction(ITransaction)
-   */
-  public ITransaction getTransaction() {
-    return m_transaction;
-  }
-
-  /**
-   * Sets the transaction to be used to run the runnable. Has only an effect, if transaction scope is set to
-   * {@link TransactionScope#REQUIRED} or {@link TransactionScope#MANDATORY}. Normally, this property should not be set
-   * manually.
-   */
-  public ServerRunContext withTransaction(final ITransaction transaction) {
-    m_transaction = transaction;
-    return this;
-  }
-
   @Override
   public String toString() {
     final ToStringBuilder builder = new ToStringBuilder(this);
@@ -258,8 +225,6 @@ public class ServerRunContext extends RunContext {
     builder.attr("userAgent", getUserAgent());
     builder.attr("clientNodeId", getClientNodeId());
     builder.ref("transactionalClientNotificationCollector", getClientNotificationCollector());
-    builder.ref("transaction", getTransaction());
-    builder.attr("transactionScope", getTransactionScope());
     return builder.toString();
   }
 
@@ -274,8 +239,6 @@ public class ServerRunContext extends RunContext {
     m_userAgent = originRunContext.m_userAgent;
     m_clientNotificationCollector = originRunContext.m_clientNotificationCollector;
     m_clientNodeId = originRunContext.m_clientNodeId;
-    m_transactionScope = originRunContext.m_transactionScope;
-    m_transaction = originRunContext.m_transaction;
   }
 
   @Override
@@ -285,9 +248,8 @@ public class ServerRunContext extends RunContext {
     m_userAgent = UserAgent.CURRENT.get();
     m_clientNotificationCollector = ClientNotificationCollector.CURRENT.get();
     m_clientNodeId = IClientNodeId.CURRENT.get();
-    m_transactionScope = TransactionScope.REQUIRES_NEW;
-    m_transaction = ITransaction.CURRENT.get();
     m_session = ServerSessionProvider.currentSession();
+    m_transactionScope = TransactionScope.REQUIRES_NEW;
   }
 
   @Override
@@ -297,9 +259,8 @@ public class ServerRunContext extends RunContext {
     m_userAgent = null;
     m_clientNotificationCollector = new ClientNotificationCollector();
     m_clientNodeId = null;
-    m_transactionScope = TransactionScope.REQUIRES_NEW;
-    m_transaction = null;
     m_session = null;
+    m_transactionScope = TransactionScope.REQUIRES_NEW;
   }
 
   @Override

@@ -18,10 +18,10 @@ import static org.mockito.Mockito.verify;
 
 import java.util.List;
 
+import org.eclipse.scout.rt.platform.transaction.ITransaction;
 import org.eclipse.scout.rt.server.TestServerSession;
 import org.eclipse.scout.rt.server.services.common.clustersync.internal.ClusterNotificationMessage;
 import org.eclipse.scout.rt.server.services.common.clustersync.internal.ClusterNotificationProperties;
-import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.shared.cache.AllCacheEntryFilter;
 import org.eclipse.scout.rt.shared.cache.InvalidateCacheNotification;
 import org.eclipse.scout.rt.shared.services.common.bookmark.BookmarkChangedClientNotification;

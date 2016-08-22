@@ -8,10 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.server.transaction;
+package org.eclipse.scout.rt.platform.transaction;
 
 /**
- * Use this base class when implementing custom transaction members
+ * Use this base class when implementing custom transaction members.
  *
  * @since 3.8
  */

@@ -10,8 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.admin.inspector;
 
+import org.eclipse.scout.rt.platform.transaction.ITransaction;
 import org.eclipse.scout.rt.server.admin.inspector.info.CallInfo;
-import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
 

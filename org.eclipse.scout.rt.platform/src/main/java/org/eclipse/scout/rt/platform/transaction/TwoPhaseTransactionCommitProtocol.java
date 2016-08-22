@@ -8,10 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.server.context;
+package org.eclipse.scout.rt.platform.transaction;
 
 import org.eclipse.scout.rt.platform.annotations.Internal;
-import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

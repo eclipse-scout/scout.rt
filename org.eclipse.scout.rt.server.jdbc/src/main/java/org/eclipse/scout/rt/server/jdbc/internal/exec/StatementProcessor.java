@@ -37,6 +37,8 @@ import org.eclipse.scout.rt.platform.holders.NVPair;
 import org.eclipse.scout.rt.platform.holders.TableBeanHolderFilter;
 import org.eclipse.scout.rt.platform.holders.TableHolderFilter;
 import org.eclipse.scout.rt.platform.reflect.FastPropertyDescriptor;
+import org.eclipse.scout.rt.platform.transaction.ITransaction;
+import org.eclipse.scout.rt.platform.transaction.ITransactionMember;
 import org.eclipse.scout.rt.platform.util.BeanUtility;
 import org.eclipse.scout.rt.platform.util.TriState;
 import org.eclipse.scout.rt.server.IServerSession;
@@ -61,8 +63,6 @@ import org.eclipse.scout.rt.server.jdbc.parsers.token.ValueInputToken;
 import org.eclipse.scout.rt.server.jdbc.parsers.token.ValueOutputToken;
 import org.eclipse.scout.rt.server.jdbc.style.ISqlStyle;
 import org.eclipse.scout.rt.server.session.ServerSessionProvider;
-import org.eclipse.scout.rt.server.transaction.ITransaction;
-import org.eclipse.scout.rt.server.transaction.ITransactionMember;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

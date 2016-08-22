@@ -14,11 +14,11 @@ import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
+import org.eclipse.scout.rt.platform.transaction.TransactionScope;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedException;
 import org.eclipse.scout.rt.platform.util.concurrent.TimedOutException;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
-import org.eclipse.scout.rt.server.transaction.TransactionScope;
 import org.eclipse.scout.rt.testing.platform.runner.SafeStatementInvoker;
 import org.junit.runners.model.Statement;
 import org.junit.runners.model.TestTimedOutException;

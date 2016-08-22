@@ -11,8 +11,8 @@
 package org.eclipse.scout.rt.server.cache;
 
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.transaction.ITransaction;
 import org.eclipse.scout.rt.server.services.common.clustersync.IClusterSynchronizationService;
-import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.shared.cache.AbstractCacheWrapper;
 import org.eclipse.scout.rt.shared.cache.ICache;
 import org.eclipse.scout.rt.shared.cache.ICacheEntryFilter;

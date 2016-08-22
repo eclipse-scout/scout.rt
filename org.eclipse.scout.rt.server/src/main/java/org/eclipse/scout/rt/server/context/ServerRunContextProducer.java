@@ -14,9 +14,9 @@ import javax.security.auth.Subject;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContextProducer;
+import org.eclipse.scout.rt.platform.transaction.TransactionScope;
 import org.eclipse.scout.rt.platform.util.CompareUtility;
 import org.eclipse.scout.rt.server.session.ServerSessionProviderWithCache;
-import org.eclipse.scout.rt.server.transaction.TransactionScope;
 
 /**
  * Producer for {@link ServerRunContext} objects.

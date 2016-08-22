@@ -17,10 +17,10 @@ import static org.junit.Assert.assertTrue;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import org.eclipse.scout.rt.platform.transaction.ITransaction;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.server.commons.servlet.IHttpServletRoundtrip;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
-import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
 import org.junit.Test;
 

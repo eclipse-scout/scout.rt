@@ -16,7 +16,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.scout.rt.server.transaction.ITransactionMember;
+import org.eclipse.scout.rt.platform.transaction.ITransactionMember;
 
 /**
  * Uses a copy-on-write technique in order to ensure a thread-safe behavior. This map may be faster than

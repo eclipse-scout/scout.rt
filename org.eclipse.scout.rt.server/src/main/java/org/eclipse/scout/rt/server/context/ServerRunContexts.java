@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.server.context;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
-import org.eclipse.scout.rt.server.transaction.TransactionScope;
+import org.eclipse.scout.rt.platform.transaction.TransactionScope;
 
 /**
  * Factory methods to create new {@link ServerRunContext} objects to propagate server-side state and to control

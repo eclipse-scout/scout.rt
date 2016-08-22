@@ -17,7 +17,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import org.eclipse.scout.rt.server.transaction.ITransactionMember;
+import org.eclipse.scout.rt.platform.transaction.ITransactionMember;
 
 /**
  * Uses a {@link ConcurrentHashMap} as a shared thread-safe map. Use this class as a default implementation for

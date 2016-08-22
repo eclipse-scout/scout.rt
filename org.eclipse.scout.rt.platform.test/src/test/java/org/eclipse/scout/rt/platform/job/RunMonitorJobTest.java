@@ -55,7 +55,7 @@ public class RunMonitorJobTest {
         assertSame(explicitMonitor, RunMonitor.CURRENT.get());
         assertNotSame(explicitMonitor, currentMonitor);
         assertEquals(1, currentMonitor.getCancellablesCount());//+1 from RunContexts.copyCurrent
-        assertEquals(2, explicitMonitor.getCancellablesCount());//+1 from job cancellable, +1 from run monitor
+        assertEquals(3, explicitMonitor.getCancellablesCount());//+1 from job cancellable, +1 from run monitor, +1 from transaction
       }
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent().withRunMonitor(explicitMonitor)));
@@ -82,7 +82,7 @@ public class RunMonitorJobTest {
       @Override
       public void run() throws Exception {
         setupLatch.countDownAndBlock();
-        assertEquals(2, explicitMonitor.getCancellablesCount());//+1 from job cancellable, +1 from run monitor cancellable
+        assertEquals(3, explicitMonitor.getCancellablesCount());//+1 from job cancellable, +1 from run monitor cancellable, +1 from transaction
         assertSame(explicitMonitor, RunMonitor.CURRENT.get());
       }
     }, Jobs.newInput()

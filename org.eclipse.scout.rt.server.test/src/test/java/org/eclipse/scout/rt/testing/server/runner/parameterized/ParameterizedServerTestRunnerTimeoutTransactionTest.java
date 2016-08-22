@@ -21,7 +21,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.scout.rt.platform.exception.PlatformException;
-import org.eclipse.scout.rt.server.transaction.ITransaction;
+import org.eclipse.scout.rt.platform.transaction.ITransaction;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.testing.platform.runner.parameterized.AbstractScoutTestParameter;
 import org.eclipse.scout.rt.testing.platform.runner.parameterized.IScoutTestParameter;

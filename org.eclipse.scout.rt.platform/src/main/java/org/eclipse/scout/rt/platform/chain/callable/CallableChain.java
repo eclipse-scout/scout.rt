@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.platform.chain.callable;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -42,7 +43,7 @@ public class CallableChain<RESULT> {
   private final LinkedList<IChainable> m_chainables = new LinkedList<>();
 
   /**
-   * Adds the given decorator at the beginning of this chain to decorate the execution of a {@link Callable}.
+   * Adds the given decorator to the beginning of this chain to decorate the execution of a {@link Callable}.
    *
    * @return <code>this</code> in order to support method chaining.
    */
@@ -52,7 +53,7 @@ public class CallableChain<RESULT> {
   }
 
   /**
-   * Adds the given interceptor at the beginning of this chain to wrap the execution of a {@link Callable}.
+   * Adds the given interceptor to the beginning of this chain to wrap the execution of a {@link Callable}.
    *
    * @return <code>this</code> in order to support method chaining.
    */
@@ -62,7 +63,7 @@ public class CallableChain<RESULT> {
   }
 
   /**
-   * Adds the given decorator at the end of this chain to decorate the execution of a {@link Callable}.
+   * Adds the given decorator to the end of this chain to decorate the execution of a {@link Callable}.
    *
    * @return <code>this</code> in order to support method chaining.
    */
@@ -72,7 +73,7 @@ public class CallableChain<RESULT> {
   }
 
   /**
-   * Adds the given interceptor at the end of this chain to wrap the execution of a {@link Callable}.
+   * Adds the given interceptor to the end of this chain to wrap the execution of a {@link Callable}.
    *
    * @return <code>this</code> in order to support method chaining.
    */
@@ -82,26 +83,36 @@ public class CallableChain<RESULT> {
   }
 
   /**
-   * Adds the given decorator at the end of this chain to decorate the execution of a {@link Callable}.
+   * Adds the given decorator to the end of this chain to decorate the execution of a {@link Callable}.
    * <p>
    * This method is equivalent to {@link CallableChain#addLast(ICallableDecorator)}.
    *
    * @return <code>this</code> in order to support method chaining.
    */
   public CallableChain<RESULT> add(final ICallableDecorator decorator) {
-    addLast(decorator);
+    m_chainables.add(decorator);
     return this;
   }
 
   /**
-   * Adds the given interceptor at the end of this chain to wrap the execution of a {@link Callable}.
+   * Adds the given elements to the end of this chain to decorate the execution of a {@link Callable}.
+   *
+   * @return <code>this</code> in order to support method chaining.
+   */
+  public CallableChain<RESULT> addAll(final Collection<? extends IChainable> decorators) {
+    m_chainables.addAll(decorators);
+    return this;
+  }
+
+  /**
+   * Adds the given interceptor to the end of this chain to wrap the execution of a {@link Callable}.
    * <p>
    * This method is equivalent to {@link CallableChain#addLast(ICallableInterceptor)}.
    *
    * @return <code>this</code> in order to support method chaining.
    */
   public CallableChain<RESULT> add(final ICallableInterceptor<RESULT> interceptor) {
-    addLast(interceptor);
+    m_chainables.add(interceptor);
     return this;
   }
 
@@ -136,8 +147,15 @@ public class CallableChain<RESULT> {
   }
 
   /**
+   * Returns all elements in the order as inserted.
+   */
+  public List<IChainable> asList() {
+    return new ArrayList<>(m_chainables);
+  }
+
+  /**
    * A Chain is an object provided by {@link CallableChain} used to invoke the next handler in the chain, or if the
-   * calling handler is the last handler in the chain, to invoke the {@link Callable} at the end of the chain.
+   * calling handler is the last handler in the chain, to finally invoke the {@link Callable}.
    *
    * @param <RESULT>
    *          the result type of the {@link Callable} to be invoked.
@@ -154,7 +172,7 @@ public class CallableChain<RESULT> {
 
     /**
      * Causes the next handler in the chain to be invoked, or if the calling handler is the last handler in the chain,
-     * causes the {@link Callable} at the end of the chain to be invoked.
+     * causes the {@link Callable} to be invoked.
      *
      * @return the {@link Callable}'s return value to pass along to the invoker.
      * @throws Exception

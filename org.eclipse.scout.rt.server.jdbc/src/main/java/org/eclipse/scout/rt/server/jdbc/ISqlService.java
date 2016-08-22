@@ -314,8 +314,8 @@ public interface ISqlService extends IService {
   String getTransactionMemberId();
 
   /**
-   * @return current connection from {@link org.eclipse.scout.rt.server.transaction.ITransactionMember} that is
-   *         registered inside the {@link org.eclipse.scout.rt.server.transaction.ITransaction}.
+   * @return current connection from {@link org.eclipse.scout.rt.platform.transaction.ITransactionMember} that is
+   *         registered inside the {@link org.eclipse.scout.rt.platform.transaction.ITransaction}.
    */
   Connection getConnection();
 

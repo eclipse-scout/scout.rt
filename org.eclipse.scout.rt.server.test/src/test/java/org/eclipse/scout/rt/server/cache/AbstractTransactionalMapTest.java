@@ -19,8 +19,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.eclipse.scout.rt.server.transaction.BasicTransaction;
-import org.eclipse.scout.rt.server.transaction.ITransaction;
+import org.eclipse.scout.rt.platform.transaction.BasicTransaction;
+import org.eclipse.scout.rt.platform.transaction.ITransaction;
 import org.junit.Test;
 
 /**

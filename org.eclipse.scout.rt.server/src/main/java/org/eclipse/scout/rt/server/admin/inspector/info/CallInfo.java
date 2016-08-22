@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.admin.inspector.info;
 
-import org.eclipse.scout.rt.server.transaction.ITransactionMember;
+import org.eclipse.scout.rt.platform.transaction.ITransactionMember;
 
 public class CallInfo {
   private String m_service;

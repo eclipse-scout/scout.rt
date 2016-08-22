@@ -14,7 +14,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashSet;
 
-import org.eclipse.scout.rt.server.transaction.AbstractTransactionMember;
+import org.eclipse.scout.rt.platform.transaction.AbstractTransactionMember;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,7 +43,7 @@ public abstract class AbstractSqlTransactionMember extends AbstractTransactionMe
 
   /**
    * Registers a statement in order to be canceled by
-   * {@link org.eclipse.scout.rt.server.transaction.ITransaction#cancel(boolean)}
+   * {@link org.eclipse.scout.rt.platform.transaction.ITransaction#cancel(boolean)}
    *
    * @param statement
    *          the statement to be registered

@@ -10,10 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.testing.server.runner.statement;
 
+import org.eclipse.scout.rt.platform.transaction.TransactionScope;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.server.clientnotification.ClientNotificationCollector;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
-import org.eclipse.scout.rt.server.transaction.TransactionScope;
 import org.eclipse.scout.rt.testing.platform.runner.SafeStatementInvoker;
 import org.eclipse.scout.rt.testing.server.runner.RunWithClientNotifications;
 import org.junit.runners.model.Statement;

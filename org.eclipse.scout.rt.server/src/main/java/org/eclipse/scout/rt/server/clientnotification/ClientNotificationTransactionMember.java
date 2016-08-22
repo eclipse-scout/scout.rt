@@ -14,9 +14,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.transaction.AbstractTransactionMember;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.server.context.ServerRunContext;
-import org.eclipse.scout.rt.server.transaction.AbstractTransactionMember;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
 
 /**

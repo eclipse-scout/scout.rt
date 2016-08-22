@@ -15,9 +15,9 @@ import javax.jms.JMSException;
 import javax.jms.Session;
 
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.transaction.ITransaction;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.server.jms.AbstractJmsService;
-import org.eclipse.scout.rt.server.transaction.ITransaction;
 
 /**
  * Base class for a JMS scout service that receives messages synchronously. Use this class if you require a
