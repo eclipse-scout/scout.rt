@@ -43,7 +43,6 @@ scout.Outline.prototype._init = function(model) {
   this.formController = new scout.FormController(this, this.session);
   this.messageBoxController = new scout.MessageBoxController(this, this.session);
   this.fileChooserController = new scout.FileChooserController(this, this.session);
-  this.titleVisible = true;
   this.resolveTextKeys(['title']);
   this._syncDefaultDetailForm(this.defaultDetailForm);
   this._detailContentDestroyHandler = this._onDetailContentDestroy.bind(this);
