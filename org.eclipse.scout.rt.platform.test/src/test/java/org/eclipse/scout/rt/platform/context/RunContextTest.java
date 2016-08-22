@@ -46,6 +46,8 @@ import org.mockito.Mockito;
 @RunWith(PlatformTestRunner.class)
 public class RunContextTest {
 
+  private static final ThreadLocal<String> TESTEE = new ThreadLocal<>();
+
   @After
   public void after() {
     NlsLocale.CURRENT.remove();
@@ -340,6 +342,19 @@ public class RunContextTest {
     inOrder.verify(txMember, times(1)).commitPhase2();
     inOrder.verify(txMember, never()).rollback();
     inOrder.verify(txMember, times(1)).release();
+  }
+
+  @Test
+  public void testThreadLocal() {
+    RunContexts.empty()
+        .withThreadLocal(TESTEE, "some value")
+        .run(new IRunnable() {
+
+          @Override
+          public void run() throws Exception {
+            assertEquals("some value", TESTEE.get());
+          }
+        });
   }
 
   private static Set<Object> toSet(Iterator<?> iterator) {

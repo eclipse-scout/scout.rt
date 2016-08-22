@@ -101,6 +101,12 @@ public class JaxWsServletRunContext extends ServletRunContext {
   }
 
   @Override
+  public <THREAD_LOCAL> JaxWsServletRunContext withThreadLocal(final ThreadLocal<THREAD_LOCAL> threadLocal, final THREAD_LOCAL value) {
+    super.withThreadLocal(threadLocal, value);
+    return this;
+  }
+
+  @Override
   public JaxWsServletRunContext withProperty(final Object key, final Object value) {
     super.withProperty(key, value);
     return this;

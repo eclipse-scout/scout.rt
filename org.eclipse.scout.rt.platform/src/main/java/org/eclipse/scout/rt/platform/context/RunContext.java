@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.platform.context;
 import java.security.AccessController;
 import java.util.ArrayList;
 import java.util.Deque;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -67,6 +68,7 @@ public class RunContext implements IAdaptable {
   protected PropertyMap m_propertyMap = new PropertyMap();
   protected String m_correlationId;
   protected Deque<String> m_identifiers = new LinkedList<>();
+  protected Map<ThreadLocal<?>, ThreadLocalProcessor<?>> m_threadLocalProcessors = new HashMap<>();
 
   protected TransactionScope m_transactionScope = TransactionScope.REQUIRED;
   protected ITransaction m_transaction;
@@ -166,6 +168,7 @@ public class RunContext implements IAdaptable {
         .add(new ThreadLocalProcessor<>(NlsLocale.CURRENT, m_locale))
         .add(new ThreadLocalProcessor<>(PropertyMap.CURRENT, m_propertyMap))
         .add(new ThreadLocalProcessor<>(RunContextIdentifiers.CURRENT, m_identifiers))
+        .addAll(m_threadLocalProcessors.values())
         .addAll(contributions.asList())
         .add(transactionProcessor);
   }
@@ -311,6 +314,27 @@ public class RunContext implements IAdaptable {
   }
 
   /**
+   * @see #withThreadLocal(ThreadLocal, Object)
+   */
+  @SuppressWarnings("unchecked")
+  public <VALUE> VALUE getThreadLocal(final ThreadLocal<VALUE> threadLocal) {
+    final ThreadLocalProcessor<?> processor = m_threadLocalProcessors.get(threadLocal);
+    if (processor == null) {
+      return null;
+    }
+    return (VALUE) processor.getValue();
+  }
+
+  /**
+   * Associates this context with the specified {@link ThreadLocal}, meaning that any code running on behalf of this
+   * context has this {@link ThreadLocal} set.
+   */
+  public <THREAD_LOCAL> RunContext withThreadLocal(final ThreadLocal<THREAD_LOCAL> threadLocal, final THREAD_LOCAL value) {
+    m_threadLocalProcessors.put(threadLocal, new ThreadLocalProcessor<>(threadLocal, value));
+    return this;
+  }
+
+  /**
    * Returns the {@link PropertyMap} associated with this context.
    *
    * @see #withProperty(Object, Object)
@@ -404,6 +428,7 @@ public class RunContext implements IAdaptable {
     builder.ref("transaction", getTransaction());
     builder.attr("transactionScope", getTransactionScope());
     builder.ref("transactionMembers", m_transactionMembers);
+    builder.ref("threadLocalProcessors", m_threadLocalProcessors);
     return builder.toString();
   }
 
@@ -420,6 +445,7 @@ public class RunContext implements IAdaptable {
     m_transactionScope = origin.m_transactionScope;
     m_transaction = origin.m_transaction;
     m_transactionMembers = new ArrayList<>(origin.m_transactionMembers);
+    m_threadLocalProcessors = new HashMap<>(origin.m_threadLocalProcessors);
   }
 
   /**
@@ -453,6 +479,8 @@ public class RunContext implements IAdaptable {
     m_transactionScope = TransactionScope.REQUIRED;
     m_transaction = ITransaction.CURRENT.get();
     m_transactionMembers = new ArrayList<>();
+
+    m_threadLocalProcessors = new HashMap<>();
   }
 
   /**
@@ -472,6 +500,8 @@ public class RunContext implements IAdaptable {
     m_transactionScope = TransactionScope.REQUIRED;
     m_transaction = null;
     m_transactionMembers = new ArrayList<>();
+
+    m_threadLocalProcessors = new HashMap<>();
   }
 
   /**

@@ -130,6 +130,12 @@ public class ServerRunContext extends RunContext {
   }
 
   @Override
+  public <THREAD_LOCAL> RunContext withThreadLocal(final ThreadLocal<THREAD_LOCAL> threadLocal, final THREAD_LOCAL value) {
+    super.withThreadLocal(threadLocal, value);
+    return this;
+  }
+
+  @Override
   public ServerRunContext withProperty(final Object key, final Object value) {
     super.withProperty(key, value);
     return this;

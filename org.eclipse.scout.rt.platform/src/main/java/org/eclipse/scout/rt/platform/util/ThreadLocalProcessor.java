@@ -56,4 +56,8 @@ public class ThreadLocalProcessor<THREAD_LOCAL> implements ICallableDecorator {
   public ThreadLocal<THREAD_LOCAL> getThreadLocal() {
     return m_threadLocal;
   }
+
+  public THREAD_LOCAL getValue() {
+    return m_value;
+  }
 }

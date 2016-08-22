@@ -124,6 +124,12 @@ public class ClientRunContext extends RunContext {
   }
 
   @Override
+  public <THREAD_LOCAL> ClientRunContext withThreadLocal(final ThreadLocal<THREAD_LOCAL> threadLocal, final THREAD_LOCAL value) {
+    super.withThreadLocal(threadLocal, value);
+    return this;
+  }
+
+  @Override
   public ClientRunContext withIdentifier(final String id) {
     super.withIdentifier(id);
     return this;

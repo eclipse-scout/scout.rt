@@ -110,6 +110,12 @@ public class ServletRunContext extends RunContext {
   }
 
   @Override
+  public <THREAD_LOCAL> ServletRunContext withThreadLocal(final ThreadLocal<THREAD_LOCAL> threadLocal, final THREAD_LOCAL value) {
+    super.withThreadLocal(threadLocal, value);
+    return this;
+  }
+
+  @Override
   public ServletRunContext withProperty(final Object key, final Object value) {
     super.withProperty(key, value);
     return this;
