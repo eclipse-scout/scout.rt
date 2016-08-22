@@ -96,25 +96,44 @@ public class JsonChartTableControl<CHART_TABLE_CONTROL extends IChartTableContro
   @Override
   protected void handleUiPropertyChange(String propertyName, JSONObject data) {
     if (IChartTableControl.PROP_CHART_TYPE.equals(propertyName)) {
-      int chartType = data.getInt(propertyName);
-      addPropertyEventFilterCondition(IChartTableControl.PROP_CHART_TYPE, chartType);
-      getModel().setChartType(chartType);
+      handleUiChartTypeChange(propertyName, data);
     }
     else if (IChartTableControl.PROP_CHART_AGGREGATION.equals(propertyName)) {
-      JSONObject chartAggregation = data.getJSONObject(propertyName);
-      addPropertyEventFilterCondition(IChartTableControl.PROP_CHART_AGGREGATION, chartAggregation);
-      getModel().setAggregation(createColumnParam(chartAggregation));
+      handleUiChartAggregationChange(propertyName, data);
     }
     else if (IChartTableControl.PROP_CHART_GROUP_1.equals(propertyName)) {
-      JSONObject chartGroup1 = data.getJSONObject(propertyName);
-      addPropertyEventFilterCondition(IChartTableControl.PROP_CHART_GROUP_1, chartGroup1);
-      getModel().setGroup1(createColumnParam(chartGroup1));
+      handleUiChartGroup1Change(propertyName, data);
     }
     else if (IChartTableControl.PROP_CHART_GROUP_2.equals(propertyName)) {
-      JSONObject chartGroup2 = data.getJSONObject(propertyName);
-      addPropertyEventFilterCondition(IChartTableControl.PROP_CHART_GROUP_2, chartGroup2);
-      getModel().setGroup2(createColumnParam(chartGroup2));
+      handleUiChartGroup2Change(propertyName, data);
     }
+    else {
+      super.handleUiPropertyChange(propertyName, data);
+    }
+  }
+
+  protected void handleUiChartTypeChange(String propertyName, JSONObject data) {
+    int chartType = data.getInt(propertyName);
+    addPropertyEventFilterCondition(IChartTableControl.PROP_CHART_TYPE, chartType);
+    getModel().setChartType(chartType);
+  }
+
+  protected void handleUiChartAggregationChange(String propertyName, JSONObject data) {
+    JSONObject chartAggregation = data.getJSONObject(propertyName);
+    addPropertyEventFilterCondition(IChartTableControl.PROP_CHART_AGGREGATION, chartAggregation);
+    getModel().setAggregation(createColumnParam(chartAggregation));
+  }
+
+  protected void handleUiChartGroup1Change(String propertyName, JSONObject data) {
+    JSONObject chartGroup1 = data.getJSONObject(propertyName);
+    addPropertyEventFilterCondition(IChartTableControl.PROP_CHART_GROUP_1, chartGroup1);
+    getModel().setGroup1(createColumnParam(chartGroup1));
+  }
+
+  protected void handleUiChartGroup2Change(String propertyName, JSONObject data) {
+    JSONObject chartGroup2 = data.getJSONObject(propertyName);
+    addPropertyEventFilterCondition(IChartTableControl.PROP_CHART_GROUP_2, chartGroup2);
+    getModel().setGroup2(createColumnParam(chartGroup2));
   }
 
   private ChartColumnParam createColumnParam(JSONObject jsonValue) {
