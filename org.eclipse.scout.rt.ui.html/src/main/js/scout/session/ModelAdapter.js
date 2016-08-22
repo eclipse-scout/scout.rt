@@ -92,7 +92,9 @@ scout.ModelAdapter.prototype._prepareModel = function(model, parent) {
  * @returns A new widget instance. The default impl. uses calls scout.create() with property objectType from given model.
  */
 scout.ModelAdapter.prototype._createWidget = function(model) {
-  return scout.create(model.objectType, model);
+  var widget = scout.create(model.objectType, model);
+  widget._addCloneProperties(['modelClass', 'classId']);
+  return widget;
 };
 
 scout.ModelAdapter.prototype._attachWidget = function() {
