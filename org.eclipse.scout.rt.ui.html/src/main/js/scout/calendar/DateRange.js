@@ -17,22 +17,9 @@ scout.DateRange.prototype.equals = function(other) {
   if (other.from === undefined || other.to === undefined) {
     return false;
   }
-  var fromEquals = scout.DateRange.dateEquals(this.from, other.from);
-  var toEquals = scout.DateRange.dateEquals(this.to, other.to);
+  var fromEquals = scout.dates.equals(this.from, other.from);
+  var toEquals = scout.dates.equals(this.to, other.to);
   return fromEquals && toEquals;
-};
-
-scout.DateRange.dateEquals = function(a, b) {
-  if (a === null && b === null) {
-    return true;
-  }
-  if (a === null && b !== null) {
-    return false;
-  }
-  if (a !== null && b === null) {
-    return false;
-  }
-  return a.valueOf() === b.valueOf();
 };
 
 scout.DateRange.prototype.toString = function() {

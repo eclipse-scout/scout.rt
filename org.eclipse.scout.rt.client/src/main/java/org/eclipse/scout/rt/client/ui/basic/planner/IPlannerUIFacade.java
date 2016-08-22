@@ -23,13 +23,7 @@ public interface IPlannerUIFacade<RI, AI> {
 
   void setSelectedActivityFromUI(Activity<RI, AI> activity);
 
-  void setSelectionFromUI(List<? extends Resource<RI>> resources, Range<Date> selectionRange);
+  void setSelectedResourcesFromUI(List<? extends Resource<RI>> resources);
 
-  /**
-   * Action on a empty cell or activity cell
-   *
-   * @param activityCell
-   *          may be null
-   */
-//  void fireCellActionFromUI(Resource resource, Activity<RI, AI> activityCell);
+  void setSelectionRangeFromUI(Range<Date> selectionRange);
 }

@@ -16,7 +16,7 @@ scout.Planner = function() {
   this.availableDisplayModes = [];
   this.resources = [];
   this.viewRange = {};
-  this.selectionRange = {};
+  this.selectionRange = new scout.DateRange();
   this.selectedResources = [];
 
   // visual
@@ -821,7 +821,7 @@ scout.Planner.prototype._onCellMousedown = function(event) {
       $resource = $activity.parent().parent();
       this.selectResources([$resource.data('resource')]);
       this.selectActivity($activity.data('activity'));
-      this.selectRange(new scout.Range());
+      this.selectRange(new scout.DateRange());
       return;
     }
   }
@@ -969,7 +969,7 @@ scout.Planner.prototype._select = function(whileSelecting) {
     var from = Math.min(this.lastRange.from, this.startRange.from),
       to = Math.max(this.lastRange.to, this.startRange.to);
 
-    var selectionRange = new scout.Range(new Date(from), new Date(to));
+    var selectionRange = new scout.DateRange(new Date(from), new Date(to));
     this.selectRange(selectionRange, !whileSelecting);
   }
 };
@@ -990,7 +990,7 @@ scout.Planner.prototype._findScale = function(x) {
     $scale = this._$elementFromPoint(x, y);
 
   if ($scale.data('date-from') !== undefined) {
-    return new scout.Range($scale.data('date-from').valueOf(), $scale.data('date-to').valueOf());
+    return new scout.DateRange($scale.data('date-from').valueOf(), $scale.data('date-to').valueOf());
   } else {
     return null;
   }
@@ -1134,8 +1134,11 @@ scout.Planner.prototype._syncAvailableDisplayModes = function(availableDisplayMo
 };
 
 scout.Planner.prototype._syncSelectionRange = function(selectionRange) {
+  if (selectionRange && !(selectionRange instanceof scout.DateRange)) {
+    selectionRange = new scout.DateRange(scout.dates.parseJsonDate(selectionRange.from), scout.dates.parseJsonDate(selectionRange.to));
+  }
   // FIXME [6.1] cgu ensure type
-  this._setProperty('selectionRange', new scout.Range(scout.dates.parseJsonDate(selectionRange.from), scout.dates.parseJsonDate(selectionRange.to)));
+  this._setProperty('selectionRange', selectionRange);
   this._updateMenuBar();
 };
 
@@ -1224,10 +1227,13 @@ scout.Planner.prototype._syncSelectedActivity = function(selectedActivity) {
   this._updateMenuBar();
 };
 
-scout.Planner.prototype._renderSelectedActivity = function(selectedActivity, oldSelectedActivity) {
-  if (oldSelectedActivity && oldSelectedActivity.$activity) {
-    oldSelectedActivity.$activity.removeClass('selected');
+scout.Planner.prototype._removeSelectedActivity = function() {
+  if (this.selectedActivity && this.selectedActivity.$activity) {
+    this.selectedActivity.$activity.removeClass('selected');
   }
+};
+
+scout.Planner.prototype._renderSelectedActivity = function() {
   if (this.selectedActivity && this.selectedActivity.$activity) {
     this.selectedActivity.$activity.addClass('selected');
   }
@@ -1302,30 +1308,12 @@ scout.Planner.prototype.selectRange = function(range, notifyServer) {
   if (range && range.equals(this.selectionRange)) {
     return;
   }
-  notifyServer = notifyServer !== undefined ? notifyServer : true;
-  this.selectionRange = range;
-  if (notifyServer) {
-    this._sendSetSelection();
-  }
-  if (this.rendered) {
-    this._renderSelectionRange();
-  }
+  this.setProperty('selectionRange', range);
   this._updateMenuBar();
 };
 
-scout.Planner.prototype.selectActivity = function(activity, notifyServer) {
-  if (activity === this.selectedActivity) {
-    return;
-  }
-  notifyServer = notifyServer !== undefined ? notifyServer : true;
-  var oldSelectedActivity = this.selectedActivity;
-  this.selectedActivity = activity;
-  if (notifyServer) {
-    this._sendSetSelection();
-  }
-  if (this.rendered) {
-    this._renderSelectedActivity('', oldSelectedActivity);
-  }
+scout.Planner.prototype.selectActivity = function(activity) {
+  this.setProperty('selectedActivity', activity);
   this._updateMenuBar();
 };
 
@@ -1333,19 +1321,20 @@ scout.Planner.prototype.selectResources = function(resources, notifyServer) {
   if (scout.arrays.equals(resources, this.selectedResources)) {
     return;
   }
-  var oldSelection = this.selectedResources;
-  notifyServer = notifyServer !== undefined ? notifyServer : true;
-  resources = scout.arrays.ensure(resources);
 
+  resources = scout.arrays.ensure(resources);
   // Make a copy so that original array stays untouched
-  this.selectedResources = resources.slice();
-  if (notifyServer) {
-    this._sendSetSelection();
-  }
-  if (this.rendered) {
-    this._renderSelectedResources('', oldSelection);
-  }
+  resources = resources.slice();
+  this.setProperty('selectedResources', resources);
+  this.trigger('resourcesSelected', {
+    resources: resources
+  });
   this._updateMenuBar();
+
+  if (this.rendered) {
+    // Render selection range as well for the case if selectedRange does not change but selected resources do
+    this._renderSelectionRange();
+  }
 };
 
 /**
@@ -1354,7 +1343,6 @@ scout.Planner.prototype.selectResources = function(resources, notifyServer) {
 scout.Planner.prototype.deselectResources = function(resources, notifyServer) {
   var deselected = false;
   resources = scout.arrays.ensure(resources);
-  notifyServer = notifyServer !== undefined ? notifyServer : true;
   var selectedResources = this.selectedResources.slice(); // copy
   if (scout.arrays.removeAll(selectedResources, resources)) {
     this.selectResources(selectedResources, notifyServer);
@@ -1380,7 +1368,7 @@ scout.Planner.prototype.insertResources = function(resources) {
 
 scout.Planner.prototype.deleteResources = function(resources) {
   if (this.deselectResources(resources, false)) {
-    this.selectRange(new scout.Range(), false);
+    this.selectRange(new scout.DateRange(), false);
   }
   resources.forEach(function(resource) {
     // Update model
@@ -1413,7 +1401,7 @@ scout.Planner.prototype.deleteAllResources = function() {
   this.resourceMap = {};
   this.activityMap = {};
   this.selectResources([], false);
-  this.selectRange(new scout.Range(), false);
+  this.selectRange(new scout.DateRange(), false);
 };
 
 scout.Planner.prototype._updateResources = function(resources) {
@@ -1436,17 +1424,4 @@ scout.Planner.prototype._updateResources = function(resources) {
       this._linkResource($updatedResource, updatedResource);
     }
   }.bind(this));
-};
-
-scout.Planner.prototype._sendSetSelection = function() {
-  var selectionRange = scout.dates.toJsonDateRange(this.selectionRange),
-    resourceIds = this.selectedResources.map(function(r) {
-      return r.id;
-    }),
-    activityId = this.selectedActivity ? this.selectedActivity.id : null;
-  this._send('setSelection', {
-    activityId: activityId,
-    resourceIds: resourceIds,
-    selectionRange: selectionRange
-  });
 };

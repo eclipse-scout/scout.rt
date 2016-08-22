@@ -436,6 +436,10 @@ scout.dates = {
     return diff;
   },
 
+  equals: function(a, b) {
+    return this.compare(a, b) === 0;
+  },
+
   /**
    * TODO [5.2] nbu: Add jasmine test
    * This combines a date and time, passed as date objects to one object with the date part of param date and the time part of param time.

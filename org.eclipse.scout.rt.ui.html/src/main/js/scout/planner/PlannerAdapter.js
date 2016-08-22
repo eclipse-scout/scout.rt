@@ -10,7 +10,7 @@
  ******************************************************************************/
 scout.PlannerAdapter = function() {
   scout.PlannerAdapter.parent.call(this);
-  this._addRemoteProperties(['displayMode', 'viewRange']);
+  this._addRemoteProperties(['displayMode', 'viewRange', 'selectionRange', 'selectedActivity']);
 };
 scout.inherits(scout.PlannerAdapter, scout.ModelAdapter);
 
@@ -18,6 +18,44 @@ scout.PlannerAdapter.prototype._sendViewRange = function(viewRange) {
   this._send('property', {
     viewRange: scout.dates.toJsonDateRange(viewRange)
   });
+};
+
+scout.PlannerAdapter.prototype._sendSelectedActivity = function() {
+  var activityId = null;
+  if (this.widget.selectedActivity) {
+    activityId = this.widget.selectedActivity.id;
+  }
+  this._send('property', {
+    selectedActivity: activityId
+  });
+};
+
+scout.PlannerAdapter.prototype._sendSelectionRange = function() {
+  var selectionRange = scout.dates.toJsonDateRange(this.widget.selectionRange);
+  this._send('property', {
+    selectionRange: selectionRange
+  });
+};
+
+scout.PlannerAdapter.prototype._onWidgetResourcesSelected = function(event) {
+  this._sendResourcesSelected();
+};
+
+scout.PlannerAdapter.prototype._sendResourcesSelected = function() {
+  var resourceIds = this.widget.selectedResources.map(function(r) {
+    return r.id;
+  });
+  this._send('resourcesSelected', {
+    resourceIds: resourceIds
+  });
+};
+
+scout.PlannerAdapter.prototype._onWidgetEvent = function(event) {
+  if (event.type === 'resourcesSelected') {
+    this._onWidgetResourcesSelected(event);
+  } else {
+    scout.PlannerAdapter.parent.prototype._onWidgetEvent.call(this, event);
+  }
 };
 
 scout.PlannerAdapter.prototype._onResourcesInserted = function(resources) {

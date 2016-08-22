@@ -10,18 +10,6 @@
  ******************************************************************************/
 describe('DateRange', function() {
 
-  it('dateEquals', function() {
-    var date1 = scout.dates.create('2015-25-11'),
-      date2 = scout.dates.create('2015-25-11'),
-      date3 = scout.dates.create('2014-25-11');
-
-    expect(scout.DateRange.dateEquals(null, null)).toBe(true);
-    expect(scout.DateRange.dateEquals(date1, null)).toBe(false);
-    expect(scout.DateRange.dateEquals(null, date1)).toBe(false);
-    expect(scout.DateRange.dateEquals(date1, date2)).toBe(true);
-    expect(scout.DateRange.dateEquals(date1, date3)).toBe(false);
-  });
-
   it('equals', function() {
     var range1 = new scout.DateRange(scout.dates.create('2015-24-11'), scout.dates.create('2015-25-11')),
       range2 = new scout.DateRange(scout.dates.create('2015-24-11'), scout.dates.create('2015-25-11')),

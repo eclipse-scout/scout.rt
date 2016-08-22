@@ -1025,15 +1025,19 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractPropertyObserver i
   private class P_PlannerUIFacade implements IPlannerUIFacade<RI, AI> {
 
     @Override
-    public void setSelectionFromUI(List<? extends Resource<RI>> resources, Range<Date> selectionRange) {
+    public void setSelectedResourcesFromUI(List<? extends Resource<RI>> resources) {
       try {
         setPlannerChanging(true);
         selectResources(resources);
-        setSelectionRange(selectionRange);
       }
       finally {
         setPlannerChanging(false);
       }
+    }
+
+    @Override
+    public void setSelectionRangeFromUI(Range<Date> selectionRange) {
+      setSelectionRange(selectionRange);
     }
 
     @Override

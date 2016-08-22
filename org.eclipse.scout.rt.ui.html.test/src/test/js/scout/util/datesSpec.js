@@ -544,6 +544,21 @@ describe("scout.dates", function() {
 
   });
 
+  describe("equals", function() {
+
+    it('returns true if the dates are equal, false if not', function() {
+      var date1 = scout.dates.create('2015-25-11'),
+        date2 = scout.dates.create('2015-25-11'),
+        date3 = scout.dates.create('2014-25-11');
+
+      expect(scout.dates.equals(null, null)).toBe(true);
+      expect(scout.dates.equals(date1, null)).toBe(false);
+      expect(scout.dates.equals(null, date1)).toBe(false);
+      expect(scout.dates.equals(date1, date2)).toBe(true);
+      expect(scout.dates.equals(date1, date3)).toBe(false);
+    });
+  });
+
   describe("isLeapYear", function() {
 
     it("correctly identifies leap years", function() {

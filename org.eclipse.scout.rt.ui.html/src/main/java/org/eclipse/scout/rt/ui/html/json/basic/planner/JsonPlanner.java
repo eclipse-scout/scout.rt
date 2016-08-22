@@ -48,16 +48,12 @@ import org.slf4j.LoggerFactory;
 public class JsonPlanner<PLANNER extends IPlanner<?, ?>> extends AbstractJsonPropertyObserver<PLANNER> implements IJsonContextMenuOwner {
   private static final Logger LOG = LoggerFactory.getLogger(JsonPlanner.class);
 
-  // from model
   public static final String EVENT_PLANNER_CHANGED = "plannerChanged";
   public static final String EVENT_RESOURCES_INSERTED = "resourcesInserted";
   public static final String EVENT_RESOURCES_UPDATED = "resourcesUpdated";
   public static final String EVENT_RESOURCES_DELETED = "resourcesDeleted";
   public static final String EVENT_RESOURCES_SELECTED = "resourcesSelected";
   public static final String EVENT_ALL_RESOURCES_DELETED = "allResourcesDeleted";
-
-  // from UI
-  private static final String EVENT_SET_SELECTION = "setSelection";
 
   private PlannerListener m_plannerListener;
   private final Map<String, Activity<?, ?>> m_activities;
@@ -420,8 +416,8 @@ public class JsonPlanner<PLANNER extends IPlanner<?, ?>> extends AbstractJsonPro
 
   @Override
   public void handleUiEvent(JsonEvent event) {
-    if (EVENT_SET_SELECTION.equals(event.getType())) {
-      handleUiSetSelection(event);
+    if (EVENT_RESOURCES_SELECTED.equals(event.getType())) {
+      handleUiResourcesSelected(event);
     }
     else {
       super.handleUiEvent(event);
@@ -429,22 +425,10 @@ public class JsonPlanner<PLANNER extends IPlanner<?, ?>> extends AbstractJsonPro
   }
 
   @SuppressWarnings("unchecked")
-  protected void handleUiSetSelection(JsonEvent event) {
-    Range<Date> selectionRange = extractSelectionRange(event.getData());
+  protected void handleUiResourcesSelected(JsonEvent event) {
     List<Resource<?>> resources = extractResources(event.getData());
     addPlannerEventFilterCondition(PlannerEvent.TYPE_RESOURCES_SELECTED).setResources(resources);
-    addPropertyEventFilterCondition(IPlanner.PROP_SELECTION_RANGE, selectionRange);
-    getModel().getUIFacade().setSelectionFromUI(resources, selectionRange);
-    Activity<?, ?> activity = extractActivity(event.getData());
-    getModel().getUIFacade().setSelectedActivityFromUI(activity);
-    LOG.debug("selectionRange={}", selectionRange);
-  }
-
-  protected Range<Date> extractSelectionRange(JSONObject data) {
-    JSONObject selectionRange = data.optJSONObject("selectionRange");
-    Date fromDate = toJavaDate(selectionRange, "from");
-    Date toDate = toJavaDate(selectionRange, "to");
-    return new Range<Date>(fromDate, toDate);
+    getModel().getUIFacade().setSelectedResourcesFromUI(resources);
   }
 
   @Override
@@ -455,9 +439,40 @@ public class JsonPlanner<PLANNER extends IPlanner<?, ?>> extends AbstractJsonPro
     else if (IPlanner.PROP_VIEW_RANGE.equals(propertyName)) {
       handleUiViewRangeChange(data);
     }
+    else if (IPlanner.PROP_SELECTED_ACTIVITY.equals(propertyName)) {
+      handleUiSelectedActivityChange(data);
+    }
+    else if (IPlanner.PROP_SELECTION_RANGE.equals(propertyName)) {
+      handleUiSelectionRangeChange(data);
+    }
+    else if (IPlanner.PROP_VIEW_RANGE.equals(propertyName)) {
+      handleUiViewRangeChange(data);
+    }
     else {
       super.handleUiPropertyChange(propertyName, data);
     }
+  }
+
+  @SuppressWarnings("unchecked")
+  protected void handleUiSelectedActivityChange(JSONObject data) {
+    String activityId = data.optString("selectedActivity");
+    Activity<?, ?> selectedActivity = getActivity(activityId);
+    addPropertyEventFilterCondition(IPlanner.PROP_SELECTED_ACTIVITY, selectedActivity);
+    getModel().getUIFacade().setSelectedActivityFromUI(selectedActivity);
+  }
+
+  @SuppressWarnings("unchecked")
+  protected void handleUiSelectionRangeChange(JSONObject data) {
+    Range<Date> selectionRange = extractSelectionRange(data);
+    addPropertyEventFilterCondition(IPlanner.PROP_SELECTION_RANGE, selectionRange);
+    getModel().getUIFacade().setSelectionRangeFromUI(selectionRange);
+  }
+
+  protected Range<Date> extractSelectionRange(JSONObject data) {
+    JSONObject selectionRange = data.optJSONObject("selectionRange");
+    Date fromDate = toJavaDate(selectionRange, "from");
+    Date toDate = toJavaDate(selectionRange, "to");
+    return new Range<Date>(fromDate, toDate);
   }
 
   protected void handleUiDisplayModeChange(JSONObject data) {
@@ -486,11 +501,6 @@ public class JsonPlanner<PLANNER extends IPlanner<?, ?>> extends AbstractJsonPro
       return null;
     }
     return new JsonDate(dateStr).asJavaDate();
-  }
-
-  protected Activity<?, ?> extractActivity(JSONObject json) {
-    String activityId = json.optString("activityId");
-    return getActivity(activityId);
   }
 
   protected List<Resource<?>> extractResources(JSONObject json) {
